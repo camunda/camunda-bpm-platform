@@ -30,7 +30,7 @@
 		
 		<dependency>
 			<groupId>com.camunda.fox.cockpit</groupId>
-			<artifactId>cockpit-core-hibernate</artifactId>
+			<artifactId>cockpit-core</artifactId>
 			<version>${cockpit.version}</version>
 			<exclusions>
 				<exclusion>
@@ -42,11 +42,6 @@
 					<artifactId>activiti-cdi</artifactId>
 				</exclusion>
 			</exclusions>
-		</dependency>
-		<!-- FIXME: jboss as 7 weld scanning / classloading -->
-		<dependency>
-			<groupId>junit</groupId>
-			<artifactId>junit</artifactId>
 		</dependency>
 
 		<!-- el 2.2 -->
