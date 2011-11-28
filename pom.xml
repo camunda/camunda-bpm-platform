@@ -60,8 +60,8 @@
 	</dependencies>
 
 	<build>
-		<finalName>cockpit-webapp-fox</finalName>
-
+		<finalName>cockpit</finalName>
+		
 		<resources>
 			<resource>
 				<directory>src/main/resources</directory>
@@ -82,7 +82,8 @@
 						<manifestEntries>
 							<!-- SVN revision number -->
 							<Implementation-Build>${buildNumber}</Implementation-Build>
-							<Dependencies>org.apache.commons.logging,org.jboss.logging,org.apache.log4j,org.slf4j,org.apache.commons.lang,org.activti.engine</Dependencies>
+							<Dependencies>org.apache.commons.logging,org.jboss.logging,org.apache.log4j,org.slf4j,org.apache.commons.lang,
+							org.activiti.engine</Dependencies>
 						</manifestEntries>
 					</archive>
 					<webResources>

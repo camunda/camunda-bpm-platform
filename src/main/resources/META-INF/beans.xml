@@ -1,0 +1,83 @@
+<beans xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:s="urn:java:ee" 
+	xmlns:t="urn:java:org.jboss.seam.transaction"
+	xmlns:security="urn:java:org.jboss.seam.security"
+	xmlns:activiti="urn:java:org.activiti.cdi"
+	xmlns:jpa="urn:java:javax.persistence"
+	xmlns:fox="urn:java:com.camunda.fox.cdi:com.camunda.fox.cdi.persistence:com.camunda.fox.cdi.webapp.util"
+	xsi:schemaLocation="
+          http://java.sun.com/xml/ns/javaee http://docs.jboss.org/cdi/beans_1_0.xsd
+          http://jboss.org/schema/weld/beans http://jboss.org/schema/weld/beans_1_1.xsd">
+    <!-- set persistence unit annotation and configure unitName -->
+    <fox:SeEntityManagerFactoryProducer>
+    	<s:modifies />
+    	<fox:entityManagerFactory>
+    		<jpa:PersistenceUnit unitName="fox-cockpit" />
+   		</fox:entityManagerFactory>
+    </fox:SeEntityManagerFactoryProducer>
+          
+	<fox:EeEntityManagerFactoryProducer>
+		<!-- remove the @Alternative annotation -->
+		<s:replaces/>
+		<s:ApplicationScoped/>
+		<fox:getEntityManagerFactory>
+			<s:Produces/>
+			<s:ConversationScoped/>
+		</fox:getEntityManagerFactory>
+	</fox:EeEntityManagerFactoryProducer>
+
+	<!-- override the place where to look for the TransactionManager in JNDI -->
+	<t:TransactionManagerSynchronizations>
+		<t:JNDI_LOCATIONS>
+			<s:value>java:jboss/TransactionManager</s:value>		
+			<s:value>java:/TransactionManager</s:value>							
+			<s:value>java:/TransactionManager</s:value>
+			<s:value>java:appserver/TransactionManager</s:value>
+			<s:value>java:comp/TransactionManager</s:value>
+			<s:value>java:pm/TransactionManager</s:value>							
+		</t:JNDI_LOCATIONS>
+		<t:getTransactionManager>
+			<!-- make this bean produce the JTA Transaction Manager -->
+			<s:Produces />
+		</t:getTransactionManager>					
+	</t:TransactionManagerSynchronizations>
+	
+	
+	<!-- =============== activti configuration =================== -->	
+	<fox:SeamConfiguredProcessEngine>
+		<!-- remove the @Alternative annotation -->
+		<s:replaces/>
+		<fox:processEngineConfiguration>
+			<s:value>
+				<!-- use the CdiJtaProcessEngineConfiguration with managed transactions -->
+				<activiti:CdiJtaProcessEngineConfiguration 
+					dataSourceJndiName="java:${beans.dataSourceJndiName}"
+					databaseType="${beans.databaseType}"
+					transactionsExternallyManaged="${beans.transactionsExternallyManaged}"
+					databaseSchemaUpdate="${beans.databaseSchemaUpdate}"
+					jobExecutorActivate="${beans.jobExecutorActivate}">
+					
+					<!-- inject the JTA transaction manager -->
+					<activiti:transactionManager><s:Inject /></activiti:transactionManager>
+				</activiti:CdiJtaProcessEngineConfiguration>
+			</s:value>
+		</fox:processEngineConfiguration>
+	</fox:SeamConfiguredProcessEngine>
+	
+	<!-- use the demo authenticator in development -->
+	<security:IdentityImpl>
+		<s:modifies />
+		<security:authenticatorClass>com.camunda.fox.webapp.security.DemoAuthenticator
+		</security:authenticatorClass>
+	</security:IdentityImpl>
+	
+	<!-- ======== Feature Toggles ========== -->
+
+	<!-- enables automatic appending of the cid (conversation-id) to the request URL -->
+	<!-- EXPERIMENTAL -->
+	<fox:ConversationUtils>
+		<s:modifies />
+		<fox:setCidInUrl>false</fox:setCidInUrl>
+	</fox:ConversationUtils>
+</beans>
+
