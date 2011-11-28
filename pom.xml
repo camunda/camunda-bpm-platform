@@ -19,6 +19,7 @@
 		<cargo.container.download.url>http://download.jboss.org/jbossas/7.0/jboss-as-7.0.2.Final/jboss-as-7.0.2.Final.zip</cargo.container.download.url>
 	</properties>
 
+	<!--  to get this fully working we need to exclude activiti engine from our webapp libs (cockpit-webapp) -->
 	<dependencies>
 		<dependency>
 			<groupId>com.camunda.fox.cockpit</groupId>
@@ -39,7 +40,7 @@
 				</exclusion>
 				<exclusion>
 					<groupId>org.activiti</groupId>
-					<artifactId>activiti-cdi</artifactId>
+					<artifactId>activiti-engine</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>
@@ -81,7 +82,7 @@
 						<manifestEntries>
 							<!-- SVN revision number -->
 							<Implementation-Build>${buildNumber}</Implementation-Build>
-							<Dependencies>org.apache.commons.logging,org.jboss.logging,org.apache.log4j,org.slf4j,org.apache.commons.lang</Dependencies>
+							<Dependencies>org.apache.commons.logging,org.jboss.logging,org.apache.log4j,org.slf4j,org.apache.commons.lang,org.activti.engine</Dependencies>
 						</manifestEntries>
 					</archive>
 					<webResources>
