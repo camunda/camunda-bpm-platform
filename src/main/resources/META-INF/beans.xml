@@ -2,7 +2,7 @@
 	xmlns:s="urn:java:ee" 
 	xmlns:t="urn:java:org.jboss.seam.transaction"
 	xmlns:security="urn:java:org.jboss.seam.security"
-	xmlns:activiti="urn:java:org.activiti.cdi"
+	xmlns:activiti="urn:java:org.activiti.cdi:org.activiti.cdi.impl"
 	xmlns:jpa="urn:java:javax.persistence"
 	xmlns:fox="urn:java:com.camunda.fox.cdi:com.camunda.fox.cdi.persistence:com.camunda.fox.cdi.webapp.util"
 	xsi:schemaLocation="
@@ -44,25 +44,13 @@
 	
 	
 	<!-- =============== activti configuration =================== -->	
-	<fox:SeamConfiguredProcessEngine>
+	<activiti:JndiProcessEngineLookup>
 		<!-- remove the @Alternative annotation -->
-		<s:replaces/>
-		<fox:processEngineConfiguration>
-			<s:value>
-				<!-- use the CdiJtaProcessEngineConfiguration with managed transactions -->
-				<activiti:CdiJtaProcessEngineConfiguration 
-					dataSourceJndiName="java:${beans.dataSourceJndiName}"
-					databaseType="${beans.databaseType}"
-					transactionsExternallyManaged="${beans.transactionsExternallyManaged}"
-					databaseSchemaUpdate="${beans.databaseSchemaUpdate}"
-					jobExecutorActivate="${beans.jobExecutorActivate}">
-					
-					<!-- inject the JTA transaction manager -->
-					<activiti:transactionManager><s:Inject /></activiti:transactionManager>
-				</activiti:CdiJtaProcessEngineConfiguration>
-			</s:value>
-		</fox:processEngineConfiguration>
-	</fox:SeamConfiguredProcessEngine>
+		<s:replaces />
+		<activiti:jndiName>
+			<s:value>java:global/processEngine/default</s:value>
+		</activiti:jndiName>
+	</activiti:JndiProcessEngineLookup>
 	
 	<!-- use the demo authenticator in development -->
 	<security:IdentityImpl>

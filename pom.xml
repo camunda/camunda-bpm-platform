@@ -15,8 +15,6 @@
 
 	<properties>
 		<facesContext.application.projectStage>Production</facesContext.application.projectStage>
-		<cargo.container.id>jboss7x</cargo.container.id>
-		<cargo.container.download.url>http://download.jboss.org/jbossas/7.0/jboss-as-7.0.2.Final/jboss-as-7.0.2.Final.zip</cargo.container.download.url>
 	</properties>
 
 	<!--  to get this fully working we need to exclude activiti engine from our webapp libs (cockpit-webapp) -->
