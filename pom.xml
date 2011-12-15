@@ -37,8 +37,8 @@
 					<artifactId>slf4j-api</artifactId>
 				</exclusion>
 				<exclusion>
-					<groupId>org.activiti</groupId>
-					<artifactId>activiti-engine</artifactId>
+					<groupId>com.camunda.fox</groupId>
+					<artifactId>fox-engine</artifactId>
 				</exclusion>
 			</exclusions>
 		</dependency>
@@ -81,7 +81,7 @@
 							<!-- SVN revision number -->
 							<Implementation-Build>${buildNumber}</Implementation-Build>
 							<Dependencies>org.apache.commons.logging,org.jboss.logging,org.apache.log4j,org.slf4j,org.apache.commons.lang,
-							org.activiti.engine</Dependencies>
+							com.camunda.fox.engine</Dependencies>
 						</manifestEntries>
 					</archive>
 					<webResources>
