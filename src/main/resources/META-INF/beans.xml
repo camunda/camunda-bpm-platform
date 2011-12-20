@@ -55,8 +55,6 @@
 	<!-- use the demo authenticator in development -->
 	<security:IdentityImpl>
 		<s:modifies />
-		<security:authenticatorClass>com.camunda.fox.webapp.security.DemoAuthenticator
-		</security:authenticatorClass>
 	</security:IdentityImpl>
 	
 	<!-- ======== Feature Toggles ========== -->
