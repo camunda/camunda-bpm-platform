@@ -79,7 +79,7 @@
 							<!-- SVN revision number -->
 							<Implementation-Build>${buildNumber}</Implementation-Build>
 							<Dependencies>org.apache.commons.logging,org.jboss.logging,org.apache.log4j,org.slf4j,org.apache.commons.lang,
-							com.camunda.fox.engine</Dependencies>
+							org.activiti.engine</Dependencies>
 						</manifestEntries>
 					</archive>
 					<webResources>
