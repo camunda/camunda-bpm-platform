@@ -2,7 +2,6 @@
 	xmlns:s="urn:java:ee" 
 	xmlns:t="urn:java:org.jboss.seam.transaction"
 	xmlns:security="urn:java:org.jboss.seam.security"
-	xmlns:activiti="urn:java:org.activiti.cdi:org.activiti.cdi.impl"
 	xmlns:jpa="urn:java:javax.persistence"
 	xmlns:fox="urn:java:com.camunda.fox.cdi:com.camunda.fox.cdi.persistence:com.camunda.fox.cdi.webapp.util"
 	xsi:schemaLocation="
@@ -44,13 +43,13 @@
 	
 	
 	<!-- =============== activti configuration =================== -->	
-	<activiti:JndiProcessEngineLookup>
+	<fox:JndiProcessEngineLookup>
 		<!-- remove the @Alternative annotation -->
 		<s:replaces />
-		<activiti:jndiName>
+		<fox:jndiName>
 			<s:value>java:global/processEngine/default</s:value>
-		</activiti:jndiName>
-	</activiti:JndiProcessEngineLookup>
+		</fox:jndiName>
+	</fox:JndiProcessEngineLookup>
 	
 	<!-- use the demo authenticator in development -->
 	<security:IdentityImpl>
