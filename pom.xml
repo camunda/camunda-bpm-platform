@@ -26,6 +26,13 @@
 		</dependency>
 		
 		<dependency>
+			<groupId>com.camunda.fox</groupId>
+			<artifactId>fox-platform-lib</artifactId>
+			<version>${project.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		
+		<dependency>
 			<groupId>com.camunda.fox.cockpit</groupId>
 			<artifactId>cockpit-core</artifactId>
 			<version>${project.version}</version>
@@ -53,6 +60,21 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
+		
+		<dependency>
+			<groupId>org.jboss.spec</groupId>
+			<artifactId>jboss-javaee-web-6.0</artifactId>
+			<version>2.0.0.Final</version>
+			<type>pom</type>
+			<scope>provided</scope>
+			<exclusions>
+				<exclusion>
+					<artifactId>xalan</artifactId>
+					<groupId>org.apache.xalan</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+						
 	</dependencies>
 
 	<build>
@@ -67,6 +89,14 @@
 		
 		<plugins>
 			<plugin>
+		        <groupId>org.apache.maven.plugins</groupId>
+		        <artifactId>maven-compiler-plugin</artifactId>
+		        <configuration>
+		          <source>1.6</source>
+		          <target>1.6</target>
+		    	</configuration>
+		    </plugin>
+			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-war-plugin</artifactId>
 				<configuration>
@@ -79,7 +109,7 @@
 							<!-- SVN revision number -->
 							<Implementation-Build>${buildNumber}</Implementation-Build>
 							<Dependencies>org.apache.commons.logging,org.jboss.logging,org.apache.log4j,org.slf4j,org.apache.commons.lang,
-							org.activiti.engine</Dependencies>
+							deployment.fox-platform-lib.jar</Dependencies>
 						</manifestEntries>
 					</archive>
 					<webResources>
@@ -102,12 +132,7 @@
 						</overlay>
 					</overlays>
 				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.jboss.as.plugins</groupId>
-				<artifactId>jboss-as-maven-plugin</artifactId>
-				<version>7.0.1.Final</version>
-			</plugin>
+			</plugin>			
 		</plugins>
 	</build>
 	

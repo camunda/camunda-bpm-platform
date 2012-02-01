@@ -24,32 +24,6 @@
 			<s:ConversationScoped/>
 		</fox:getEntityManagerFactory>
 	</fox:EeEntityManagerFactoryProducer>
-
-	<!-- override the place where to look for the TransactionManager in JNDI -->
-	<t:TransactionManagerSynchronizations>
-		<t:JNDI_LOCATIONS>
-			<s:value>java:jboss/TransactionManager</s:value>		
-			<s:value>java:/TransactionManager</s:value>							
-			<s:value>java:/TransactionManager</s:value>
-			<s:value>java:appserver/TransactionManager</s:value>
-			<s:value>java:comp/TransactionManager</s:value>
-			<s:value>java:pm/TransactionManager</s:value>							
-		</t:JNDI_LOCATIONS>
-		<t:getTransactionManager>
-			<!-- make this bean produce the JTA Transaction Manager -->
-			<s:Produces />
-		</t:getTransactionManager>					
-	</t:TransactionManagerSynchronizations>
-	
-	
-	<!-- =============== activti configuration =================== -->	
-	<fox:JndiProcessEngineLookup>
-		<!-- remove the @Alternative annotation -->
-		<s:replaces />
-		<fox:jndiName>
-			<s:value>java:global/processEngine/default</s:value>
-		</fox:jndiName>
-	</fox:JndiProcessEngineLookup>
 	
 	<!-- use the demo authenticator in development -->
 	<security:IdentityImpl>
