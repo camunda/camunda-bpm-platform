@@ -4,6 +4,7 @@
           http://jboss.org/schema/weld/beans http://jboss.org/schema/weld/beans_1_1.xsd">
     <alternatives>
 		<!-- generates some demo data for development purposes -->
-		<class>com.camunda.fox.cockpit.webapp.security.DemoDataGenerator</class>
+		<class>com.camunda.fox.cockpit.webapp.demo.DemoDataGenerator</class>
+		<class>com.camunda.fox.cockpit.demo.deployer.FoxPlatformDemoDataDeployer</class>
 	</alternatives>
 </beans>
