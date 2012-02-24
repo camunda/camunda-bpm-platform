@@ -4,7 +4,7 @@
 	<parent>
 		<artifactId>cockpit-root</artifactId>
 		<groupId>com.camunda.fox.cockpit</groupId>
-		<version>6.0.1-alpha</version>
+		<version>6.0.sprint18-SNAPSHOT</version>
 	</parent>
 
 	<artifactId>cockpit-webapp-fox</artifactId>
