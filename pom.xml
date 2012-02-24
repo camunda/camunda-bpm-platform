@@ -33,18 +33,6 @@
 		</dependency>
 		
 		<dependency>
-            <groupId>com.camunda.fox</groupId>
-            <artifactId>fox-engine-cdi</artifactId>
-            <version>${project.version}</version>
-            <exclusions>
-	            <exclusion>
-	                <groupId>com.camunda.fox</groupId>
-	                <artifactId>fox-engine</artifactId>
-	            </exclusion>
-            </exclusions>
-        </dependency>
-		
-		<dependency>
 			<groupId>com.camunda.fox.cockpit</groupId>
 			<artifactId>cockpit-core</artifactId>
 			<version>${project.version}</version>
