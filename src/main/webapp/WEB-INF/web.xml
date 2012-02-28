@@ -50,7 +50,7 @@
 
 	<listener>
 		<!-- retrieves the PersistenceUnit and makes it available to the application -->
-		<listener-class>com.camunda.fox.cdi.persistence.PersistenceUnitContextListener</listener-class>
+		<listener-class>com.camunda.fox.cockpit.cdi.persistence.FoxEnginePersistenceUnitContextListener</listener-class>
 	</listener>
 
 	<servlet>

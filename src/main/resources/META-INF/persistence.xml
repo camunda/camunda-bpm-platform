@@ -29,5 +29,18 @@
 			
 		</properties>
 	</persistence-unit>
-
+  <persistence-unit name="fox-engine" transaction-type="JTA">
+		<jta-data-source>java:${persistence.ds.name}</jta-data-source>
+    <class>com.camunda.fox.jpa.entity.ExecutionEntity</class>
+    <class>com.camunda.fox.jpa.entity.VariableEntity</class>
+    <class>com.camunda.fox.jpa.entity.ByteArrayEntity</class>
+    <class>com.camunda.fox.jpa.entity.JobEntity</class>
+    <class>com.camunda.fox.jpa.entity.HistoricProcessInstanceEntity</class>
+    <class>com.camunda.fox.jpa.entity.ProcessDefinitionEntity</class>
+    
+    <properties>		
+			<property name="hibernate.hbm2ddl.auto" value="${persistence.ds.hibernate.hbm2ddl.auto}" />			
+			<property name="hibernate.show_sql" value="${persistence.ds.hibernate.show_sql}" />
+		</properties>
+	</persistence-unit>
 </persistence>
