@@ -39,7 +39,8 @@
     <class>com.camunda.fox.jpa.entity.ProcessDefinitionEntity</class>
     
     <properties>		
-			<property name="hibernate.hbm2ddl.auto" value="${persistence.ds.hibernate.hbm2ddl.auto}" />			
+      <!-- this is a read only operating persistence unit -->
+			<property name="hibernate.hbm2ddl.auto" value="false" />		
 			<property name="hibernate.show_sql" value="${persistence.ds.hibernate.show_sql}" />
 		</properties>
 	</persistence-unit>
