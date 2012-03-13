@@ -63,7 +63,7 @@ public class PluggableActivitiTestCase extends AbstractActivitiTestCase {
       try {
         InitialContext initialContext = new InitialContext();
         ProcessEngineService processEngineService = (ProcessEngineService) initialContext.lookup(PROCESS_ENGINE_SERVICE_LOOKUP);
-        cachedProcessEngine = processEngineService.getProcessEngine();
+        cachedProcessEngine = processEngineService.getDefaultProcessEngine();
       }catch (Exception e) {
         throw new FoxPlatformException("Could not lookup process engine: ",e);
       }

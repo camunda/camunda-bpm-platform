@@ -263,7 +263,7 @@ public abstract class AbstractProcessEngineService implements ProcessArchiveServ
   // ProcessEngineService implementation //////////////////////////
   
   @Override
-  public ProcessEngine getProcessEngine() {
+  public ProcessEngine getDefaultProcessEngine() {
     return globalProcessEngine;
   }
   
