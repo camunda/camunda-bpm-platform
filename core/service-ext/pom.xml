@@ -1,8 +1,8 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>fox-platform-service</artifactId>
+	<artifactId>fox-platform-service-ext</artifactId>
 	<packaging>jar</packaging>
-	<name>fox platform EE - core service</name>
+	<name>fox platform EE - core service extensions</name>
 
 	<parent>
 		<groupId>com.camunda.fox</groupId>
@@ -11,37 +11,26 @@
 	</parent>
 
 	<dependencies>
-
 		<dependency>
 			<groupId>com.camunda.fox</groupId>
-			<artifactId>fox-platform-api</artifactId>
+			<artifactId>fox-platform-service</artifactId>
 			<version>${project.version}</version>
 		</dependency>
-
-		<dependency>
-			<groupId>com.camunda.fox</groupId>
-			<artifactId>fox-platform-deployer</artifactId>
-			<version>${project.version}</version>
-		</dependency>
-
+    
 		<dependency>
 			<groupId>org.jboss.spec</groupId>
 			<artifactId>jboss-javaee-web-6.0</artifactId>
 			<type>pom</type>
 			<scope>provided</scope>
 		</dependency>
-
-		<dependency>
-			<groupId>com.camunda.fox</groupId>
-			<artifactId>fox-engine</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.camunda.fox</groupId>
-			<artifactId>fox-engine-cdi</artifactId>
-			<scope>provided</scope>
-		</dependency>
-		
+    
+    <dependency>
+      <groupId>com.camunda.fox</groupId>
+      <artifactId>fox-engine-spring</artifactId>
+      <version>${fox.engine.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    
 		<!-- jboss as7 dependencies -->
 		<dependency>
 			<groupId>org.jboss</groupId>
@@ -61,7 +50,14 @@
 			<version>7.1.0.Final</version>
 			<scope>provided</scope>
 		</dependency>
-
+    
+    <!-- websphere dependencies -->
+    <dependency>
+      <groupId>com.bea.commonj</groupId>
+      <artifactId>com.springsource.commonj</artifactId>
+      <version>1.1.0</version>
+      <scope>provided</scope>
+    </dependency>
 	</dependencies>
 
 	<build>

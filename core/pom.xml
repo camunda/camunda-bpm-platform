@@ -4,10 +4,10 @@
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>fox-platform-core</artifactId>
-  <version>0.18.0-SNAPSHOT</version>
+  <version>6.0.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
-  <name>fox platform CE - core</name>
+  <name>fox platform EE - core</name>
 
   <parent>
     <groupId>com.camunda.fox</groupId>
@@ -79,6 +79,7 @@
     <module>service</module>
     <module>client</module>
     <module>deployer</module>
+    <module>service-ext</module>
   </modules>
 
 </project>

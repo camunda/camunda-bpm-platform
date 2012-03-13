@@ -6,12 +6,12 @@
   <artifactId>fox-platform-jboss-modules</artifactId>
   <packaging>pom</packaging>
 
-  <name>fox platform CE - jboss7 modules</name>
+  <name>fox platform EE - jboss7 modules</name>
 
   <parent>
     <groupId>com.camunda.fox</groupId>
     <artifactId>fox-platform-jboss</artifactId>
-    <version>0.18.0-SNAPSHOT</version>
+    <version>6.0.0-SNAPSHOT</version>
   </parent>
 
   <properties>
