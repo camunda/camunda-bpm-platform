@@ -4,14 +4,14 @@
 
   <groupId>com.camunda.fox</groupId>
   <artifactId>fox-platform</artifactId>
-  <version>0.18.0-SNAPSHOT</version>
+  <version>6.0.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
-  <name>fox platform CE (Community Edition)</name>
+  <name>fox platform EE (Enterprise Edition)</name>
   
   <description>
     This pom defines the modules that make up the build. 
-    The pom under parent is used as parent for the ce projects.
+    The pom under parent is used as parent for the ee projects.
   </description>
 
   <modules>
@@ -20,5 +20,8 @@
     <module>qa</module>
     <module>jbossas71</module>
     <module>explorer</module>
+    <module>cdi-lib</module>
+    <module>ejb-service</module>
+    <module>ibmWs8</module>
   </modules>
 </project>

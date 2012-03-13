@@ -2,14 +2,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<name>fox platform CE - core deployer</name>
+	<name>fox platform EE - core deployer</name>
 	<artifactId>fox-platform-deployer</artifactId>
 	<packaging>jar</packaging>
 
 	<parent>
 		<groupId>com.camunda.fox</groupId>
 		<artifactId>fox-platform-core</artifactId>
-		<version>0.18.0-SNAPSHOT</version>
+		<version>6.0.0-SNAPSHOT</version>
 	</parent>
 
 	<dependencies>

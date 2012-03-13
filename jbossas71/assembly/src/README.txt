@@ -1,10 +1,10 @@
 This is a distribution of the 
 
-   camunda fox bpm platform community edition (ce)
+   camunda fox bpm platform enterprise edition (ee)
 
-camunda fox ce is licensed under the Apache License, Version 2.0. 
-This does not include the packaged jboss as 7 server which is 
-licensed under the LGPL license.
+camunda fox ee, (c) camunda services GmbH
+ 
+Packaged jboss as 7 server is licensed under the LGPL license.
 
 ==================
 
@@ -30,5 +30,5 @@ Contents:
 
 ==================		
 		
-camunda fox ce version: ${project.version}
+camunda fox ee version: ${project.version}
 jboss as server version: ${version.jboss.as}
