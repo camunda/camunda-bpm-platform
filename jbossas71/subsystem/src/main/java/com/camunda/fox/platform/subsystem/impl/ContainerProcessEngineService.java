@@ -38,9 +38,9 @@ import org.jboss.msc.value.InjectedValue;
 
 import com.camunda.fox.platform.api.ProcessArchiveService;
 import com.camunda.fox.platform.api.ProcessEngineService;
-import com.camunda.fox.platform.impl.AbstractProcessEngineService;
 import com.camunda.fox.platform.impl.configuration.JtaCmpeProcessEngineConfiguration;
 import com.camunda.fox.platform.impl.jobexecutor.simple.SimpleJobExecutor;
+import com.camunda.fox.platform.impl.service.AbstractPlatformService;
 import com.camunda.fox.platform.subsystem.impl.util.ProcessEngineServiceReferenceFactory;
 import com.camunda.fox.platform.subsystem.impl.util.Tccl;
 import com.camunda.fox.platform.subsystem.impl.util.Tccl.Operation;
@@ -56,7 +56,7 @@ import com.camunda.fox.platform.subsystem.impl.util.Tccl.Operation;
  * 
  * @author Daniel Meyer
  */
-public class ContainerProcessEngineService extends AbstractProcessEngineService implements Service<ContainerProcessEngineService> {
+public class ContainerProcessEngineService extends AbstractPlatformService implements Service<ContainerProcessEngineService> {
   
   private static Logger log = Logger.getLogger(ContainerProcessEngineService.class.getName());
   

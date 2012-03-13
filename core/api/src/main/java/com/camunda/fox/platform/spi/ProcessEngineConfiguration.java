@@ -13,7 +13,11 @@ public interface ProcessEngineConfiguration {
   
   public String getDatasourceJndiName();
   
-  public String getHistoryLevel(); 
+  public String getHistoryLevel();
+
+  public boolean isAutoSchemaUpdate();
+
+  public boolean isActivateJobExcutor(); 
   
   // TODO: add more properties here.
 
