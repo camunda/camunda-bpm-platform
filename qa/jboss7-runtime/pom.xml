@@ -3,7 +3,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>fox-platform-ce-qa-jboss-runtime</artifactId>
+  <artifactId>fox-platform-qa-jboss-runtime</artifactId>
   <packaging>pom</packaging>
 
   <name>fox platform CE - qa jboss7 test runtime</name>
@@ -14,7 +14,7 @@
 
   <parent>
     <groupId>com.camunda.fox</groupId>
-    <artifactId>fox-platform-ce-qa</artifactId>
+    <artifactId>fox-platform-qa</artifactId>
     <version>0.18.0-SNAPSHOT</version>
   </parent>
 
@@ -22,7 +22,7 @@
     <dependency>
       <!-- make sure it comes after assembly in the build -->
       <groupId>com.camunda.fox</groupId>
-      <artifactId>fox-platform-ce-jboss-assembly</artifactId>
+      <artifactId>fox-platform-jboss-assembly</artifactId>
       <version>${project.version}</version>
       <type>pom</type>
     </dependency>

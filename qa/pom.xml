@@ -2,14 +2,14 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>fox-platform-ce-qa</artifactId>
+  <artifactId>fox-platform-qa</artifactId>
   <packaging>pom</packaging>
 
   <name>fox platform CE - qa</name>
 
   <parent>
     <groupId>com.camunda.fox</groupId>
-    <artifactId>fox-platform-ce-parent</artifactId>
+    <artifactId>fox-platform-parent</artifactId>
     <version>0.18.0-SNAPSHOT</version>
     <relativePath>../parent</relativePath>
   </parent>

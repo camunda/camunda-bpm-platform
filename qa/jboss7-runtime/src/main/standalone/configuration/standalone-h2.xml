@@ -26,7 +26,7 @@
         <extension module="org.jboss.as.web"/>
         <extension module="org.jboss.as.webservices"/>
         <extension module="org.jboss.as.weld"/>
-        <extension module="com.camunda.fox.fox-platform-ce-jboss-subsystem"/>
+        <extension module="com.camunda.fox.fox-platform-jboss-subsystem"/>
     </extensions>
 
     <management>
@@ -286,7 +286,7 @@
             </endpoint-config>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:weld:1.0"/>
-        <subsystem xmlns="urn:com.camunda.fox.fox-platform-ce:1.0">
+        <subsystem xmlns="urn:com.camunda.fox.fox-platform:1.0">
                 <process-engines>
                     <process-engine name="process-engine" datasource="java:jboss/datasources/FoxEngineDS" />
                 </process-engines>

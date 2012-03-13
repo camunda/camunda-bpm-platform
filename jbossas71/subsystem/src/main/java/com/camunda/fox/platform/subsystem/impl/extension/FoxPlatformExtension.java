@@ -64,10 +64,10 @@ import org.jboss.staxmapper.XMLExtendedStreamWriter;
 public class FoxPlatformExtension implements Extension {
 
   /** The name space used for the {@code subsystem} element */
-  public static final String NAMESPACE = "urn:com.camunda.fox.fox-platform-ce:1.0";
+  public static final String NAMESPACE = "urn:com.camunda.fox.fox-platform:1.0";
 
   /** The name of our subsystem within the model. */
-  public static final String SUBSYSTEM_NAME = "fox-platform-ce";
+  public static final String SUBSYSTEM_NAME = "fox-platform";
   
   /** The parser used for parsing our subsystem */
   private final SubsystemParser parser = new SubsystemParser();

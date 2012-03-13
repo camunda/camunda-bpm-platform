@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.camunda.fox</groupId>
-  <artifactId>fox-platform-ce</artifactId>
+  <artifactId>fox-platform</artifactId>
   <version>0.18.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 

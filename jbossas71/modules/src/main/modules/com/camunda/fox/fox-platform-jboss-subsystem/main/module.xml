@@ -1,6 +1,6 @@
-<module xmlns="urn:jboss:module:1.0" name="com.camunda.fox.fox-platform-ce-jboss-subsystem">
+<module xmlns="urn:jboss:module:1.0" name="com.camunda.fox.fox-platform-jboss-subsystem">
   <resources>
-    <resource-root path="fox-platform-ce-jboss-subsystem-@project.version@.jar" />
+    <resource-root path="fox-platform-jboss-subsystem-@project.version@.jar" />
   </resources>
 
   <dependencies>
