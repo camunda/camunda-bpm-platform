@@ -1,0 +1,91 @@
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <artifactId>fox-platform-core-bom</artifactId>
+  <version>0.18.0-SNAPSHOT</version>
+  <packaging>pom</packaging>
+
+  <name>fox platform CE - core bill of material</name>
+
+  <parent>
+    <groupId>com.camunda.fox</groupId>
+    <artifactId>fox-engine-root</artifactId>
+    <version>6.0.sprint18-SNAPSHOT</version>
+  </parent>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <fox.engine.version>6.0.sprint18-SNAPSHOT</fox.engine.version>
+  </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <!-- ============================================================= -->
+      <!-- modules part of this project -->
+      <dependency>
+        <groupId>com.camunda.fox</groupId>
+        <artifactId>fox-platform-service</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.camunda.fox</groupId>
+        <artifactId>fox-platform-api</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.camunda.fox</groupId>
+        <artifactId>fox-platform-deployer</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.camunda.fox</groupId>
+        <artifactId>fox-platform-client</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+
+      <!-- ============================================================= -->
+      <!-- dependencies -->
+      <dependency>
+        <groupId>com.camunda.fox</groupId>
+        <artifactId>fox-engine</artifactId>
+        <version>${fox.engine.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.camunda.fox</groupId>
+        <artifactId>fox-engine-cdi</artifactId>
+        <version>${fox.engine.version}</version>
+      </dependency>     
+      <dependency>
+        <groupId>org.jboss.spec</groupId>
+        <artifactId>jboss-javaee-web-6.0</artifactId>
+        <version>2.0.0.Final</version>
+        <type>pom</type>
+        <exclusions>
+          <exclusion>
+            <artifactId>xalan</artifactId>
+            <groupId>org.apache.xalan</groupId>
+          </exclusion>
+        </exclusions>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+  
+  <repositories>
+    <repository>
+      <id>camunda-fox</id>
+      <name>camunda fox Maven Mirror</name>
+      <url>http://fox.camunda.com/mvn/</url>
+      <releases>
+        <enabled>true</enabled>
+        <updatePolicy>always</updatePolicy>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+        <updatePolicy>always</updatePolicy>
+      </snapshots>
+    </repository>
+  </repositories>
+
+</project>

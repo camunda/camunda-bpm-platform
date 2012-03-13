@@ -1,0 +1,24 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.camunda.fox</groupId>
+  <artifactId>fox-platform-ce</artifactId>
+  <version>0.18.0-SNAPSHOT</version>
+  <packaging>pom</packaging>
+
+  <name>fox platform CE (Community Edition)</name>
+  
+  <description>
+    This pom defines the modules that make up the build. 
+    The pom under parent is used as parent for the ce projects.
+  </description>
+
+  <modules>
+    <module>core</module>
+    <module>parent</module>
+    <module>qa</module>
+    <module>jbossas71</module>
+    <module>explorer</module>
+  </modules>
+</project>

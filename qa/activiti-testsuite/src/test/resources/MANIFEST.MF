@@ -1,0 +1,3 @@
+Manifest-Version: 1.0
+Created-By: camunda-fox
+Dependencies: com.camunda.fox.fox-engine, com.camunda.fox.fox-platform-lib, org.mybatis.mybatis

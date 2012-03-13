@@ -1,0 +1,17 @@
+<module xmlns="urn:jboss:module:1.0" name="com.camunda.fox.fox-engine">
+  <resources>
+    <resource-root path="fox-engine-6.0.sprint18-SNAPSHOT.jar" />
+  </resources>
+
+  <dependencies>
+    
+    <module name="javax.api" />
+    <module name="javax.transaction.api"/>
+  
+	<module name="org.mybatis.mybatis" />	
+    <module name="com.fasterxml.uuid.java-uuid-generator"/>
+    <module name="org.livetribe.livetribe-jsr223" />    
+    <module name="org.junit"/>
+        
+  </dependencies>
+</module>

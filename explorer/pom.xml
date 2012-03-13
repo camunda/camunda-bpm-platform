@@ -1,0 +1,96 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <artifactId>camunda-fox-ce-explorer</artifactId>
+  <packaging>war</packaging>
+
+  <parent>
+    <groupId>com.camunda.fox</groupId>
+    <artifactId>fox-platform-ce-parent</artifactId>
+    <version>0.18.0-SNAPSHOT</version>
+    <relativePath>../parent</relativePath>
+  </parent>
+
+  <name>camunda fox ce explorer</name>
+
+  <dependencies>
+
+    <dependency>
+      <groupId>com.camunda.fox</groupId>
+      <artifactId>fox-engine-webapp-explorer2</artifactId>
+      <version>${fox.engine.version}</version>
+      <type>war</type>
+    </dependency>
+    
+    <dependency>
+      <groupId>com.google.gwt</groupId>
+      <artifactId>gwt-user</artifactId>
+      <version>2.3.0</version>
+    </dependency>
+
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-war-plugin</artifactId>
+        <version>2.1-beta-1</version>
+        <configuration>
+          <warSourceDirectory>src/main/webapp</warSourceDirectory>
+          <dependentWarExcludes>
+            WEB-INF/lib/activation*.jar,
+            WEB-INF/lib/activiti*.jar,
+            WEB-INF/lib/antlr*.jar,
+            WEB-INF/lib/asm*.jar,
+            WEB-INF/lib/commons-dbcp*.jar,
+            WEB-INF/lib/commons-email*.jar,
+            WEB-INF/lib/commons-lang*.jar,
+            WEB-INF/lib/commons-pool*.jar,
+            WEB-INF/lib/groovy*.jar,
+            WEB-INF/lib/h2*.jar,
+            WEB-INF/lib/junit*.jar,
+            WEB-INF/lib/livetribe*.jar,
+            WEB-INF/lib/mail*.jar,
+            WEB-INF/lib/mybatis*.jar
+          </dependentWarExcludes>
+          <archive>
+            <manifestEntries>
+              <Dependencies>com.camunda.fox.fox-engine, com.camunda.fox.fox-platform-api</Dependencies>
+            </manifestEntries>
+          </archive>          
+        </configuration>        
+      </plugin>
+      
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>1.7</version>
+        <executions>
+          <execution>
+            <id>copy-dependencies</id>
+            <phase>package</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <target>
+
+                <dependencyfilesets />
+
+                <copy todir="target/classes/WEB-INF/lib" flatten="true">
+                  <fileset refid="com.google.gwt:gwt-user:jar"/>                                                
+                </copy>
+
+              </target>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      
+      
+    </plugins>
+  </build>
+
+</project>

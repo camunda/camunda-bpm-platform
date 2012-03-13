@@ -1,0 +1,86 @@
+
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <artifactId>fox-platform-ce-jboss-modules</artifactId>
+  <packaging>pom</packaging>
+
+  <name>fox platform CE - jboss7 modules</name>
+
+  <parent>
+    <groupId>com.camunda.fox</groupId>
+    <artifactId>fox-platform-ce-jboss</artifactId>
+    <version>0.18.0-SNAPSHOT</version>
+  </parent>
+
+  <properties>
+    <org.jboss.shrinkwrap.resolver.version>1.0.0-beta-5</org.jboss.shrinkwrap.resolver.version>
+  </properties>
+  
+  <dependencies>
+    <dependency>
+      <groupId>com.camunda.fox</groupId>
+      <artifactId>fox-platform-ce-jboss-subsystem</artifactId>
+      <version>${project.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.apache.commons</groupId>
+          <artifactId>commons-email</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.springframework</groupId>
+          <artifactId>spring-beans</artifactId>
+        </exclusion>       
+        <exclusion>
+          <groupId>commons-lang</groupId>
+          <artifactId>commons-lang</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>com.camunda.fox</groupId>
+      <artifactId>fox-engine-cdi</artifactId>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <finalName>${project.artifactId}</finalName>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>1.7</version>
+        <executions>
+          <execution>
+            <id>copy-dependencies</id>
+            <phase>package</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <target>
+                <dependencyfilesets scopes="compile" />
+
+                <mkdir dir="target/modules" />
+
+                <copy todir="target/modules" flatten="false">
+                  <fileset refid="maven.project.dependencies" />
+                  <regexpmapper from="^(.*)/([^/]+)/([^/]*)$$" to="\1/main/\3" handledirsep="yes" />                  
+                </copy>
+
+                <copy todir="target/modules" flatten="false">
+                  <fileset dir="src/main/modules" />               
+                </copy>
+                
+                <replace dir="target/modules" token="@project.version@" value="${project.version}">
+                  <include name="**/module.xml"/>
+                </replace>                
+              </target>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>

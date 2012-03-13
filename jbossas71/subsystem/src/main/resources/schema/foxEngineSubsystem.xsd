@@ -1,0 +1,25 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+            targetNamespace="urn:com.camunda.fox.engine:1.0"
+            xmlns="urn:com.camunda.fox.engine:1.0"
+            elementFormDefault="qualified"
+            attributeFormDefault="unqualified"
+            version="1.0">
+
+   <xs:element name="subsystem" type="subsystemType"/>
+   <xs:complexType name="subsystemType">
+      <xs:all>
+         <xs:element name="process-engines" type="process-enginesType" />
+      </xs:all>
+   </xs:complexType>
+   <xs:complexType name="process-enginesType">
+      <xs:choice minOccurs="1" maxOccurs="unbounded">
+         <xs:element name="process-engine" type="process-engineType"/>
+      </xs:choice>
+   </xs:complexType>
+   <xs:complexType name="process-engineType">
+      <xs:attribute name="name" use="required"/>
+      <xs:attribute name="datasource" use="required"/>
+      <xs:attribute name="history-level" use="optional"/>
+      <xs:attribute name="db-schema-update" use="optional"/>
+   </xs:complexType>
+</xs:schema>

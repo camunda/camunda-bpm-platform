@@ -1,0 +1,35 @@
+<module xmlns="urn:jboss:module:1.0" name="com.camunda.fox.fox-platform-ce-jboss-subsystem">
+  <resources>
+    <resource-root path="fox-platform-ce-jboss-subsystem-@project.version@.jar" />
+  </resources>
+
+  <dependencies>
+    
+    <module name="javax.api" />
+    <module name="javax.transaction.api" />
+    <module name="javax.enterprise.api" />
+    <module name="javax.inject.api" />
+    
+    <module name="org.jboss.staxmapper" />
+    <module name="org.jboss.as.controller" />
+    <module name="org.jboss.as.server" />
+    <module name="org.jboss.modules" />
+    <module name="org.jboss.msc" />
+    <module name="org.jboss.logging" />
+    <module name="org.jboss.vfs" />
+    <module name="org.jboss.jandex" />
+    <module name="org.jboss.weld.spi" />
+    <module name="org.jboss.as.weld" />
+    <module name="org.jboss.as.naming" />
+    <module name="org.jboss.as.connector" />
+        
+    <module name="com.camunda.fox.fox-engine" />
+    <module name="com.camunda.fox.fox-engine-cdi" />
+    <module name="com.camunda.fox.fox-platform-api" />
+    <module name="com.camunda.fox.fox-platform-service" />
+    <module name="com.camunda.fox.fox-platform-deployer" />
+    
+    <module name="org.livetribe.livetribe-jsr223" />  
+        
+  </dependencies>
+</module>

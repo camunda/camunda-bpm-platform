@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:context="http://www.springframework.org/schema/context"
+	xmlns:tx="http://www.springframework.org/schema/tx" xmlns:jee="http://www.springframework.org/schema/jee"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+       http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.0.xsd
+       http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
+       http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-3.0.xsd">
+  
+  <!-- look up the container managed process engine -->
+  <bean id="processEngineService" class="org.springframework.jndi.JndiObjectFactoryBean">
+	<property name="jndiName" value="java:global/camunda-fox-platform/process-engine/ProcessEngineService!com.camunda.fox.platform.api.ProcessEngineService" />
+  </bean>
+  
+  <bean id="processEngine" factory-bean="processEngineService" factory-method="getProcessEngine" />
+  
+  <bean id="demoDataGenerator" class="org.activiti.explorer.demo.DemoDataGenerator">
+    <property name="processEngine" ref="processEngine" />
+  </bean>
+
+  <bean id="repositoryService" factory-bean="processEngine" factory-method="getRepositoryService" />
+  <bean id="runtimeService" factory-bean="processEngine" factory-method="getRuntimeService" />
+  <bean id="taskService" factory-bean="processEngine" factory-method="getTaskService" />
+  <bean id="historyService" factory-bean="processEngine" factory-method="getHistoryService" />
+  <bean id="managementService" factory-bean="processEngine" factory-method="getManagementService" />
+  <bean id="identityService" factory-bean="processEngine" factory-method="getIdentityService" />
+  
+  <bean id="activitiLoginHandler" class="org.activiti.explorer.ui.login.DefaultLoginHandler">
+    <property name="identityService" ref="identityService" />
+  </bean>
+  
+  <!-- Include the UI-related wiring. This UI context will be used in the alfresco activiti admin UI -->
+  <import resource="activiti-ui-context.xml" />
+  
+  <!--  Custom form types -->
+  <bean id="userFormType" class="org.activiti.explorer.form.UserFormType"/>
+	
+</beans>

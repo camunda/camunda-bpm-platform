@@ -1,0 +1,54 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.camunda.fox</groupId>
+  <artifactId>fox-platform-ce-parent</artifactId>
+  <version>0.18.0-SNAPSHOT</version>
+  <packaging>pom</packaging>
+
+  <name>fox platform CE - parent</name>
+
+  <properties>
+    <version.jboss.as>7.1.0.Final</version.jboss.as>
+    <fox.engine.version>6.0.sprint18-SNAPSHOT</fox.engine.version>  
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>com.camunda.fox</groupId>
+        <artifactId>fox-platform-core-bom</artifactId>
+        <version>${project.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
+  <repositories>
+    <repository>
+      <id>camunda-fox</id>
+      <name>camunda fox Maven Mirror</name>
+      <url>http://fox.camunda.com/mvn/</url>
+      <releases>
+        <enabled>true</enabled>
+        <updatePolicy>always</updatePolicy>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+        <updatePolicy>always</updatePolicy>
+      </snapshots>
+    </repository>
+    <repository>
+      <id>repository.jboss.org</id>
+      <url>http://repository.jboss.org/nexus/content/groups/public-jboss</url>
+    </repository>
+    <repository>
+      <id>Jboss Groups Public</id>
+      <url>http://repository.jboss.org/nexus/content/groups/public</url>
+    </repository>
+  </repositories>
+
+</project>

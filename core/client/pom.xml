@@ -1,0 +1,99 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<artifactId>fox-platform-client</artifactId>
+	<name>fox platform CE - client</name>
+	<packaging>jar</packaging>
+
+	<parent>
+		<groupId>com.camunda.fox</groupId>
+		<artifactId>fox-platform-core</artifactId>
+		<version>0.18.0-SNAPSHOT</version>		
+	</parent>
+
+	<dependencies>
+		<dependency>
+			<groupId>org.jboss.spec</groupId>
+			<artifactId>jboss-javaee-web-6.0</artifactId>
+			<type>pom</type>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.camunda.fox</groupId>
+			<artifactId>fox-engine-cdi</artifactId>
+			<exclusions>
+				<exclusion>
+					<artifactId>spring-beans</artifactId>
+					<groupId>org.springframework</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>commons-lang</artifactId>
+					<groupId>commons-lang</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>mybatis</artifactId>
+					<groupId>org.mybatis</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>livetribe-jsr223</artifactId>
+					<groupId>org.livetribe</groupId>
+				</exclusion>
+				<exclusion>
+					<artifactId>commons-email</artifactId>
+					<groupId>org.apache.commons</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>		
+		<dependency>
+			<groupId>com.camunda.fox</groupId>
+			<artifactId>fox-platform-api</artifactId>
+			<version>${project.version}</version>
+			<scope>provided</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<plugins>
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.3.1</version>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+				</configuration>
+			</plugin>
+			
+			<!-- package activiti-cdi -->
+			
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-shade-plugin</artifactId>
+				<version>1.5</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>shade</goal>
+						</goals>
+						<configuration>
+							<artifactSet>
+								<includes>
+									<include>com.camunda.fox:fox-engine-cdi</include>
+								</includes>
+							</artifactSet>		
+							<filters>
+								<filter>
+									<artifact>com.camunda.fox:fox-engine-cdi</artifact>									
+									<excludes>
+										<exclude>org/activiti/cdi/impl/util/ActivitiServices.class</exclude>
+										<exclude>org/activiti/cdi/impl/ActivitiExtension.class</exclude>															
+									</excludes>
+								</filter>							
+							</filters>					
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+	
+</project>
