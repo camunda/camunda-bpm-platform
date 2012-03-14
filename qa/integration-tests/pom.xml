@@ -60,6 +60,12 @@
       <artifactId>fox-engine</artifactId>
       <scope>provided</scope>
     </dependency>
+    
+    <dependency>
+      <groupId>com.camunda.fox</groupId>
+      <artifactId>fox-platform-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
   </dependencies>
 
   <build>

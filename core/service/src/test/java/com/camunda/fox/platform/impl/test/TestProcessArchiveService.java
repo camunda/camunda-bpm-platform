@@ -1,4 +1,4 @@
-package com.camunda.fox.platform.impl.test.service;
+package com.camunda.fox.platform.impl.test;
 
 import java.util.HashMap;
 import java.util.concurrent.Future;
@@ -8,11 +8,9 @@ import junit.framework.Assert;
 import org.activiti.engine.ProcessEngine;
 import org.junit.Test;
 
-import com.camunda.fox.platform.api.ProcessArchiveService.ProcessArchiveInstallOperation;
-import com.camunda.fox.platform.api.ProcessArchiveService.ProcessArchiveUninstallOperation;
+import com.camunda.fox.platform.FoxPlatformException;
+import com.camunda.fox.platform.api.ProcessArchiveService.ProcessArchiveInstallation;
 import com.camunda.fox.platform.api.ProcessEngineService.ProcessEngineStartOperation;
-import com.camunda.fox.platform.api.ProcessEngineService.ProcessEngineStopOperation;
-import com.camunda.fox.platform.impl.test.PlatformServiceTest;
 import com.camunda.fox.platform.impl.test.util.DummyProcessArchive;
 import com.camunda.fox.platform.impl.test.util.DummyProcessEngineConfiguration;
 import com.camunda.fox.platform.spi.ProcessArchive;
@@ -49,10 +47,11 @@ public class TestProcessArchiveService extends PlatformServiceTest {
     Assert.assertEquals(0, processArchiveService.getInstalledProcessArchives(engine1.getName()).size());
     
     ProcessArchive processArchive = new DummyProcessArchive("archive1", engine1.getName(), false, new HashMap<String, byte[]>(), true);    
-    Future<ProcessArchiveInstallOperation> installProcessArchive = processArchiveService.installProcessArchive(processArchive);
-    ProcessArchiveInstallOperation processArchiveInstallOperation = installProcessArchive.get();
+    ProcessArchiveInstallation installProcessArchive = processArchiveService.installProcessArchive(processArchive);    
     
-    Assert.assertTrue(processArchiveInstallOperation.wasSuccessful());
+    Assert.assertNotNull(installProcessArchive.getProcessenEngine());
+    Assert.assertNull(installProcessArchive.getProcessEngineDeploymentId());
+    
     Assert.assertEquals(1, processArchiveService.getInstalledProcessArchives().size());
     Assert.assertEquals(1, processArchiveService.getInstalledProcessArchives(engine1).size());
     Assert.assertEquals(1, processArchiveService.getInstalledProcessArchives(engine1.getName()).size());    
@@ -67,18 +66,15 @@ public class TestProcessArchiveService extends PlatformServiceTest {
     Assert.assertEquals(0, processArchiveService.getInstalledProcessArchives(engine1.getName()).size());
     
     ProcessArchive processArchive = new DummyProcessArchive("archive1", null, false, new HashMap<String, byte[]>(), true);    
-    Future<ProcessArchiveInstallOperation> installProcessArchive = processArchiveService.installProcessArchive(processArchive);
-    ProcessArchiveInstallOperation processArchiveInstallOperation = installProcessArchive.get();
     
-    Assert.assertTrue(processArchiveInstallOperation.wasSuccessful());
+    processArchiveService.installProcessArchive(processArchive);    
+    
     Assert.assertEquals(1, processArchiveService.getInstalledProcessArchives().size());
     Assert.assertEquals(1, processArchiveService.getInstalledProcessArchives(engine1).size());
     Assert.assertEquals(1, processArchiveService.getInstalledProcessArchives(engine1.getName()).size());    
     
-    Future<ProcessArchiveUninstallOperation> unInstallProcessArchive = processArchiveService.unInstallProcessArchive(processArchive);
-    ProcessArchiveUninstallOperation processArchiveUninstallOperation = unInstallProcessArchive.get();
+    processArchiveService.unInstallProcessArchive(processArchive);
     
-    Assert.assertTrue(processArchiveUninstallOperation.wasSuccessful());
     Assert.assertEquals(0, processArchiveService.getInstalledProcessArchives().size());
     Assert.assertEquals(0, processArchiveService.getInstalledProcessArchives(engine1).size());
     Assert.assertEquals(0, processArchiveService.getInstalledProcessArchives(engine1.getName()).size());     
@@ -93,25 +89,22 @@ public class TestProcessArchiveService extends PlatformServiceTest {
     Assert.assertEquals(0, processArchiveService.getInstalledProcessArchives(engine1.getName()).size());
     
     ProcessArchive processArchive = new DummyProcessArchive("archive1", engine1.getName(), false, new HashMap<String, byte[]>(), true);    
-    Future<ProcessArchiveInstallOperation> installProcessArchive = processArchiveService.installProcessArchive(processArchive);
-    ProcessArchiveInstallOperation processArchiveInstallOperation = installProcessArchive.get();
+
+    processArchiveService.installProcessArchive(processArchive);
     
-    Assert.assertTrue(processArchiveInstallOperation.wasSuccessful());
     Assert.assertEquals(1, processArchiveService.getInstalledProcessArchives().size());
     Assert.assertEquals(1, processArchiveService.getInstalledProcessArchives(engine1).size());
     Assert.assertEquals(1, processArchiveService.getInstalledProcessArchives(engine1.getName()).size());    
     
-    Future<ProcessArchiveUninstallOperation> unInstallProcessArchive = processArchiveService.unInstallProcessArchive(processArchive);
-    ProcessArchiveUninstallOperation processArchiveUninstallOperation = unInstallProcessArchive.get();
+    processArchiveService.unInstallProcessArchive(processArchive);
     
-    Assert.assertTrue(processArchiveUninstallOperation.wasSuccessful());
     Assert.assertEquals(0, processArchiveService.getInstalledProcessArchives().size());
     Assert.assertEquals(0, processArchiveService.getInstalledProcessArchives(engine1).size());
     Assert.assertEquals(0, processArchiveService.getInstalledProcessArchives(engine1.getName()).size());    
   }
   
   @Test
-  public void testInstallMultipleSequentially() throws Exception {    
+  public void testInstallMultiple() throws Exception {    
     ProcessEngine engine1 = startProcessEgine1();
     
     Assert.assertEquals(0, processArchiveService.getInstalledProcessArchives().size());
@@ -119,41 +112,15 @@ public class TestProcessArchiveService extends PlatformServiceTest {
     Assert.assertEquals(0, processArchiveService.getInstalledProcessArchives(engine1.getName()).size());
     
     ProcessArchive processArchive = new DummyProcessArchive("archive1", engine1.getName(), false, new HashMap<String, byte[]>(), true);    
-    Future<ProcessArchiveInstallOperation> installProcessArchive = processArchiveService.installProcessArchive(processArchive);
-    ProcessArchiveInstallOperation processArchiveInstallOperation = installProcessArchive.get();
-
-    Assert.assertTrue(processArchiveInstallOperation.wasSuccessful());
+    processArchiveService.installProcessArchive(processArchive);
+  
     Assert.assertEquals(1, processArchiveService.getInstalledProcessArchives().size());
     Assert.assertEquals(1, processArchiveService.getInstalledProcessArchives(engine1).size());
     Assert.assertEquals(1, processArchiveService.getInstalledProcessArchives(engine1.getName()).size()); 
     
     ProcessArchive processArchive2 = new DummyProcessArchive("archive2", engine1.getName(), false, new HashMap<String, byte[]>(), true);    
-    Future<ProcessArchiveInstallOperation> installProcessArchive2 = processArchiveService.installProcessArchive(processArchive2);
-    ProcessArchiveInstallOperation processArchiveInstallOperation2 = installProcessArchive2.get();
+    processArchiveService.installProcessArchive(processArchive2);
     
-    Assert.assertTrue(processArchiveInstallOperation2.wasSuccessful());
-    Assert.assertEquals(2, processArchiveService.getInstalledProcessArchives().size());
-    Assert.assertEquals(2, processArchiveService.getInstalledProcessArchives(engine1).size());
-    Assert.assertEquals(2, processArchiveService.getInstalledProcessArchives(engine1.getName()).size());    
-  }
-  
-  @Test
-  public void testInstallMultipleConcurrently() throws Exception {    
-    ProcessEngine engine1 = startProcessEgine1();
-    
-    Assert.assertEquals(0, processArchiveService.getInstalledProcessArchives().size());
-    Assert.assertEquals(0, processArchiveService.getInstalledProcessArchives(engine1).size());
-    Assert.assertEquals(0, processArchiveService.getInstalledProcessArchives(engine1.getName()).size());
-    
-    ProcessArchive processArchive = new DummyProcessArchive("archive1", engine1.getName(), false, new HashMap<String, byte[]>(), true);    
-    Future<ProcessArchiveInstallOperation> installProcessArchive = processArchiveService.installProcessArchive(processArchive);
-    ProcessArchive processArchive2 = new DummyProcessArchive("archive2", engine1.getName(), false, new HashMap<String, byte[]>(), true);    
-    Future<ProcessArchiveInstallOperation> installProcessArchive2 = processArchiveService.installProcessArchive(processArchive2);
-    
-    ProcessArchiveInstallOperation processArchiveInstallOperation = installProcessArchive.get();  
-    ProcessArchiveInstallOperation processArchiveInstallOperation2 = installProcessArchive2.get();
-    
-    Assert.assertTrue(processArchiveInstallOperation2.wasSuccessful() && processArchiveInstallOperation.wasSuccessful());
     Assert.assertEquals(2, processArchiveService.getInstalledProcessArchives().size());
     Assert.assertEquals(2, processArchiveService.getInstalledProcessArchives(engine1).size());
     Assert.assertEquals(2, processArchiveService.getInstalledProcessArchives(engine1.getName()).size());    
@@ -168,15 +135,16 @@ public class TestProcessArchiveService extends PlatformServiceTest {
     Assert.assertEquals(0, processArchiveService.getInstalledProcessArchives(engine1.getName()).size());
     
     ProcessArchive processArchive = new DummyProcessArchive("archive1", engine1.getName(), false, new HashMap<String, byte[]>(), true);    
-    Future<ProcessArchiveInstallOperation> installProcessArchive = processArchiveService.installProcessArchive(processArchive);
+    processArchiveService.installProcessArchive(processArchive);
+   
     ProcessArchive processArchive2 = new DummyProcessArchive("archive1", engine1.getName(), false, new HashMap<String, byte[]>(), true);    
-    Future<ProcessArchiveInstallOperation> installProcessArchive2 = processArchiveService.installProcessArchive(processArchive2);
-    
-    ProcessArchiveInstallOperation processArchiveInstallOperation = installProcessArchive.get();  
-    ProcessArchiveInstallOperation processArchiveInstallOperation2 = installProcessArchive2.get();
-    
-    Assert.assertFalse(processArchiveInstallOperation2.wasSuccessful() && processArchiveInstallOperation.wasSuccessful());
-    Assert.assertTrue(processArchiveInstallOperation2.wasSuccessful() || processArchiveInstallOperation.wasSuccessful());
+    try {
+      processArchiveService.installProcessArchive(processArchive2);
+      Assert.fail("expected");
+    }catch (FoxPlatformException e) {
+      // expected
+    }
+        
     Assert.assertEquals(1, processArchiveService.getInstalledProcessArchives().size());
     Assert.assertEquals(1, processArchiveService.getInstalledProcessArchives(engine1).size());
     Assert.assertEquals(1, processArchiveService.getInstalledProcessArchives(engine1.getName()).size());    
@@ -192,15 +160,16 @@ public class TestProcessArchiveService extends PlatformServiceTest {
     Assert.assertEquals(0, processArchiveService.getInstalledProcessArchives(engine1.getName()).size());
     
     ProcessArchive processArchive = new DummyProcessArchive("archive1", engine1.getName(), false, new HashMap<String, byte[]>(), true);    
-    Future<ProcessArchiveInstallOperation> installProcessArchive = processArchiveService.installProcessArchive(processArchive);
+    processArchiveService.installProcessArchive(processArchive);
+    
     ProcessArchive processArchive2 = new DummyProcessArchive("archive1", engine2.getName(), false, new HashMap<String, byte[]>(), true);    
-    Future<ProcessArchiveInstallOperation> installProcessArchive2 = processArchiveService.installProcessArchive(processArchive2);
+    try {
+      processArchiveService.installProcessArchive(processArchive2);
+      Assert.fail("expected");
+    }catch (FoxPlatformException e) {
+      // expected
+    }
     
-    ProcessArchiveInstallOperation processArchiveInstallOperation = installProcessArchive.get();  
-    ProcessArchiveInstallOperation processArchiveInstallOperation2 = installProcessArchive2.get();
-    
-    Assert.assertFalse(processArchiveInstallOperation2.wasSuccessful() && processArchiveInstallOperation.wasSuccessful());
-    Assert.assertTrue(processArchiveInstallOperation2.wasSuccessful() || processArchiveInstallOperation.wasSuccessful());
     Assert.assertEquals(1, processArchiveService.getInstalledProcessArchives().size());
   }
   
@@ -209,49 +178,34 @@ public class TestProcessArchiveService extends PlatformServiceTest {
     
     Assert.assertEquals(0, processArchiveService.getInstalledProcessArchives().size());
     
-    ProcessArchive processArchive = new DummyProcessArchive("archive1", "unexistingProcessEngine", false, new HashMap<String, byte[]>(), true);    
-    Future<ProcessArchiveInstallOperation> installProcessArchive = processArchiveService.installProcessArchive(processArchive);
+    ProcessArchive processArchive = new DummyProcessArchive("archive1", "unexistingProcessEngine", false, new HashMap<String, byte[]>(), true);      
+    try {
+      processArchiveService.installProcessArchive(processArchive);
+      Assert.fail("expected");
+    }catch (FoxPlatformException e) {
+      // expected
+    }
     
-    ProcessArchiveInstallOperation processArchiveInstallOperation = installProcessArchive.get();  
-    
-    Assert.assertFalse(processArchiveInstallOperation.wasSuccessful());
-    Assert.assertNotNull(processArchiveInstallOperation.getException());
     Assert.assertEquals(0, processArchiveService.getInstalledProcessArchives().size());
   }
   
   @Test
   public void testInstallToStoppedEngineFails() throws Exception {    
     ProcessEngine engine1 = startProcessEgine1();    
-    processEngineService.stopProcessEngine(engine1).get();
+    processEngineService.stopProcessEngine(engine1);
     
     Assert.assertEquals(0, processArchiveService.getInstalledProcessArchives().size());
     
     ProcessArchive processArchive = new DummyProcessArchive("archive1", engine1.getName(), false, new HashMap<String, byte[]>(), true);    
-    Future<ProcessArchiveInstallOperation> installProcessArchive = processArchiveService.installProcessArchive(processArchive);
+    try {
+      processArchiveService.installProcessArchive(processArchive);
+      Assert.fail("expected");
+    }catch (FoxPlatformException e) {
+      // expected
+    }
     
-    ProcessArchiveInstallOperation processArchiveInstallOperation = installProcessArchive.get();  
-    
-    Assert.assertFalse(processArchiveInstallOperation.wasSuccessful());
-    Assert.assertNotNull(processArchiveInstallOperation.getException());
     Assert.assertEquals(0, processArchiveService.getInstalledProcessArchives().size());
   }
-  
-  @Test
-  public void testInstallToStoppedEngineConcurrentlyFails() throws Exception {    
     
-    ProcessEngine engine1 = startProcessEgine1();   
-    
-    ProcessArchive processArchive = new DummyProcessArchive("archive1", engine1.getName(), false, new HashMap<String, byte[]>(), true);    
- 
-    Future<ProcessEngineStopOperation> stopProcessEngine = processEngineService.stopProcessEngine(engine1);       
-    Future<ProcessArchiveInstallOperation> installProcessArchive = processArchiveService.installProcessArchive(processArchive);
-    
-    ProcessArchiveInstallOperation processArchiveInstallOperation = installProcessArchive.get();    
-    ProcessEngineStopOperation processEngineStopOperation = stopProcessEngine.get();
-            
-    Assert.assertFalse(processArchiveInstallOperation.wasSuccessful() && processEngineStopOperation.wasSuccessful());
-    Assert.assertTrue(processArchiveInstallOperation.wasSuccessful() || processEngineStopOperation.wasSuccessful());    
-  }
-  
 }
 

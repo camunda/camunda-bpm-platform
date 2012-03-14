@@ -16,7 +16,6 @@
 package com.camunda.fox.platform.api;
 
 import java.util.List;
-import java.util.concurrent.Future;
 
 import org.activiti.engine.ProcessEngine;
 
@@ -36,11 +35,11 @@ import com.camunda.fox.platform.spi.ProcessArchive;
  */
 public interface ProcessArchiveService {
   
-  public Future<ProcessArchiveInstallOperation> installProcessArchive(ProcessArchive processArchive);
+  public ProcessArchiveInstallation installProcessArchive(ProcessArchive processArchive);
 
-  public Future<ProcessArchiveUninstallOperation> unInstallProcessArchive(ProcessArchive processArchive);
+  public void unInstallProcessArchive(ProcessArchive processArchive);
   
-  public Future<ProcessArchiveUninstallOperation> unInstallProcessArchive(String processArchiveName);
+  public void unInstallProcessArchive(String processArchiveName);
   
   public List<ProcessArchive> getInstalledProcessArchives();
   
@@ -50,13 +49,8 @@ public interface ProcessArchiveService {
   
   // operations ////////////////////////////////////
   
-  public static interface ProcessArchiveInstallOperation {
-    
-    /**
-     * @return true if the {@link ProcessArchive} could successfully be installed 
-     */
-    public boolean wasSuccessful();
-    
+  public static interface ProcessArchiveInstallation {
+
     /**
      * @return the {@link ProcessEngine} to which the {@link ProcessArchive} was installed.
      */
@@ -65,25 +59,8 @@ public interface ProcessArchiveService {
     /**
      * @return the id of the deployment made to the {@link ProcessEngine}. 
      */
-    public String processEngineDeploymentId();
+    public String getProcessEngineDeploymentId();
     
-    /**
-     * @return the exception that was thrown while attempting to install the {@link ProcessArchive}
-     */
-    public Throwable getException();
   }
   
-  public static interface ProcessArchiveUninstallOperation {
-    
-    /**
-     * @return true if the {@link ProcessArchive} could successfully be uninstalled 
-     */
-    public boolean wasSuccessful();
-        
-    /**
-     * @return the exception that was thrown while attempting to uninstall the {@link ProcessArchive}
-     */
-    public Throwable getException();
-  }
-
 }

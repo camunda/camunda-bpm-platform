@@ -134,14 +134,19 @@ public abstract class TestHelper {
       public <T> T executeWithinContext(ProcessArchiveCallback<T> callback) throws Exception {
         return processArchiveContextExecutor.executeWithinContext(callback);
       }
+
+      @Override
+      public String getProcessEngineName() {
+        return "process-engine";
+      }
+
+      @Override
+      public boolean scanForProcessDefinitions() {
+        return false;
+      }
     };
     
-    ProcessEngine processEngine = processArchiveService.installProcessArchive(processArchive);
-      
-    return processEngine.getRepositoryService()
-             .createDeploymentQuery()
-             .singleResult()
-             .getId();
+    return processArchiveService.installProcessArchive(processArchive).getProcessEngineDeploymentId();      
   }
 
   public static void annotationDeploymentTearDown(ProcessEngine processEngine, String deploymentId, Class<?> testClass, String methodName) {

@@ -1,4 +1,4 @@
-package com.camunda.fox.platform.impl.test.service;
+package com.camunda.fox.platform.impl.test;
 
 import java.util.concurrent.Future;
 
@@ -9,8 +9,6 @@ import org.junit.Test;
 
 import com.camunda.fox.platform.FoxPlatformException;
 import com.camunda.fox.platform.api.ProcessEngineService.ProcessEngineStartOperation;
-import com.camunda.fox.platform.api.ProcessEngineService.ProcessEngineStopOperation;
-import com.camunda.fox.platform.impl.test.PlatformServiceTest;
 import com.camunda.fox.platform.impl.test.util.DummyProcessEngineConfiguration;
 
 /**
@@ -36,13 +34,12 @@ public class TestProcessEngineService extends PlatformServiceTest {
     Assert.assertEquals(0, processEngineService.getProcessEngines().size());
     Assert.assertEquals(0, processEngineService.getProcessEngineNames().size());
     
-    Future<ProcessEngineStartOperation> startProcessEngine = processEngineService.startProcessEngine(processEngineConfiguration);
-    
-    ProcessEngineStartOperation processEngineStartOperation = startProcessEngine.get();    
-    
-    Assert.assertFalse(processEngineStartOperation.wasSuccessful());
-    Assert.assertNotNull(processEngineStartOperation.getException());
-    Assert.assertNull(processEngineStartOperation.getProcessenEngine());
+    try {
+      processEngineService.startProcessEngine(processEngineConfiguration);
+      Assert.fail("exception expected");
+    }catch (Exception e) {
+      // expected
+    }    
   }
     
   @Test
@@ -81,9 +78,7 @@ public class TestProcessEngineService extends PlatformServiceTest {
     Assert.assertNotNull(processEngine);
     Assert.assertFalse(null == ProcessEngines.getProcessEngine(processEngine.getName()));   
     
-    Future<ProcessEngineStopOperation> stopProcessEngine = processEngineService.stopProcessEngine(processEngine);
-    ProcessEngineStopOperation processEngineStopOperation = stopProcessEngine.get();
-    Assert.assertTrue(processEngineStopOperation.wasSuccessful());
+    processEngineService.stopProcessEngine(processEngine);  
     
     Assert.assertTrue(null == ProcessEngines.getProcessEngine(processEngine.getName()));
     Assert.assertEquals(0, processEngineService.getProcessEngines().size());
@@ -92,17 +87,23 @@ public class TestProcessEngineService extends PlatformServiceTest {
   
   @Test
   public void testStopUnexistingProcessEngineFails() throws Exception {
-    Future<ProcessEngineStopOperation> stopProcessEngine = processEngineService.stopProcessEngine("unexistingProcessEngine");
-    ProcessEngineStopOperation processEngineStopOperation = stopProcessEngine.get();
-    Assert.assertFalse(processEngineStopOperation.wasSuccessful());        
+    try {
+      processEngineService.stopProcessEngine("unexistingProcessEngine");
+      Assert.fail("exception expected");
+    }catch (FoxPlatformException e) {
+      // expected
+    }
   }
   
   @Test
   public void testStopNullNamedProcessEngineFails() throws Exception {
-    String name = null;
-    Future<ProcessEngineStopOperation> stopProcessEngine = processEngineService.stopProcessEngine(name);
-    ProcessEngineStopOperation processEngineStopOperation = stopProcessEngine.get();
-    Assert.assertFalse(processEngineStopOperation.wasSuccessful());
+    try {
+      String name = null;
+      processEngineService.stopProcessEngine(name);
+    Assert.fail("exception expected");
+    }catch (FoxPlatformException e) {
+      // expected
+    }
   }
   
   @Test
@@ -182,14 +183,16 @@ public class TestProcessEngineService extends PlatformServiceTest {
     Assert.assertEquals(0, processEngineService.getProcessEngineNames().size());
     
     Future<ProcessEngineStartOperation> startProcessEngine1 = processEngineService.startProcessEngine(processEngineConfiguration1);
-    Future<ProcessEngineStartOperation> startProcessEngine2 = processEngineService.startProcessEngine(processEngineConfiguration2);
+    try {
+      processEngineService.startProcessEngine(processEngineConfiguration2);
+      Assert.fail("exception expected");
+    }catch (Exception e) {
+      // expected
+    }
     
-    ProcessEngineStartOperation processEngineStartOperation1 = startProcessEngine1.get();    
-    ProcessEngineStartOperation processEngineStartOperation2 = startProcessEngine2.get();    
+    ProcessEngineStartOperation processEngineStartOperation1 = startProcessEngine1.get();   
     
-    // only one can start (we do not know which one)
-    Assert.assertFalse(processEngineStartOperation1.wasSuccessful() && processEngineStartOperation2.wasSuccessful());
-    Assert.assertTrue(processEngineStartOperation1.wasSuccessful() || processEngineStartOperation2.wasSuccessful());
+    Assert.assertTrue(processEngineStartOperation1.wasSuccessful());
     Assert.assertEquals(1, processEngineService.getProcessEngines().size());
     Assert.assertEquals(1, processEngineService.getProcessEngineNames().size());
   }
@@ -200,14 +203,15 @@ public class TestProcessEngineService extends PlatformServiceTest {
     DummyProcessEngineConfiguration processEngineConfiguration2 = new DummyProcessEngineConfiguration(true, "default2", ENGINE_DS2, "audit", true, false);
     
     Future<ProcessEngineStartOperation> startProcessEngine1 = processEngineService.startProcessEngine(processEngineConfiguration1);
-    Future<ProcessEngineStartOperation> startProcessEngine2 = processEngineService.startProcessEngine(processEngineConfiguration2);
+    try {
+      processEngineService.startProcessEngine(processEngineConfiguration2);
+      Assert.fail("exception expected");
+    }catch (Exception e) {
+      // expected
+    }
     
-    ProcessEngineStartOperation processEngineStartOperation1 = startProcessEngine1.get();    
-    ProcessEngineStartOperation processEngineStartOperation2 = startProcessEngine2.get();    
-    
-    // only one can start (we do not know which one)
-    Assert.assertFalse(processEngineStartOperation1.wasSuccessful() && processEngineStartOperation2.wasSuccessful());
-    Assert.assertTrue(processEngineStartOperation1.wasSuccessful() || processEngineStartOperation2.wasSuccessful());
+    ProcessEngineStartOperation processEngineStartOperation1 = startProcessEngine1.get();        
+    Assert.assertTrue(processEngineStartOperation1.wasSuccessful());
   }
   
   @Test
@@ -225,10 +229,8 @@ public class TestProcessEngineService extends PlatformServiceTest {
     
     Assert.assertEquals(processEngineService.getDefaultProcessEngine(), processEngine);
     
-    Future<ProcessEngineStopOperation> stopProcessEngine = processEngineService.stopProcessEngine(processEngine);
-    ProcessEngineStopOperation processEngineStopOperation = stopProcessEngine.get();
-    Assert.assertTrue(processEngineStopOperation.wasSuccessful());
-    
+    processEngineService.stopProcessEngine(processEngine);
+      
     Assert.assertTrue(null == ProcessEngines.getProcessEngine(processEngine.getName()));
     
     try{

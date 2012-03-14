@@ -8,14 +8,14 @@ import org.activiti.engine.impl.interceptor.CommandContextInterceptor;
 import org.activiti.engine.impl.interceptor.CommandInterceptor;
 import org.activiti.engine.impl.interceptor.LogInterceptor;
 
-import com.camunda.fox.platform.impl.service.PlatformProcessEngine;
+import com.camunda.fox.platform.impl.service.ProcessEngineController;
 
 /**
  * @author Daniel Meyer
  */
 public class StandaloneCmpeProcessEngineConfiguration extends CmpeProcessEngineConfiguration {
 
-  public StandaloneCmpeProcessEngineConfiguration(PlatformProcessEngine processEngineServiceBean) {
+  public StandaloneCmpeProcessEngineConfiguration(ProcessEngineController processEngineServiceBean) {
     super(processEngineServiceBean);
   }
 

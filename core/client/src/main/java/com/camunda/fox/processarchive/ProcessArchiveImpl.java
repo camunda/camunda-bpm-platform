@@ -65,5 +65,15 @@ public class ProcessArchiveImpl implements ProcessArchive {
   public <T> T executeWithinContext(ProcessArchiveCallback<T> callback) throws Exception {
     return executor.executeWithinContext(callback);
  }
+
+  @Override
+  public String getProcessEngineName() {
+    return "process-engine";
+  }
+
+  @Override
+  public boolean scanForProcessDefinitions() {
+    return true;
+  }
   
 }

@@ -39,15 +39,17 @@ import com.camunda.fox.platform.impl.engine.ProcessArchiveProcessEngine;
 import com.camunda.fox.platform.impl.schema.DbSchemaOperations;
 import com.camunda.fox.platform.impl.util.Services;
 import com.camunda.fox.platform.spi.ProcessArchive;
+import com.camunda.fox.platform.spi.ProcessEngineConfiguration;
 
 /**
- * <p>Implementation of a container managed process engine</p>
+ * <p>The controller is in charge of managing the lifecycle of a process engine
+ * and the process are deployed to it.</p>
  * 
  * @author Daniel Meyer
  */
-public class PlatformProcessEngine {
+public class ProcessEngineController {
   
-  private static Logger log = Logger.getLogger(PlatformProcessEngine.class.getName());
+  private static Logger log = Logger.getLogger(ProcessEngineController.class.getName());
 
   ///////////////////////////////// state
     
@@ -74,19 +76,47 @@ public class PlatformProcessEngine {
   protected int jobExecutor_maxJobsPerAcquisition;
   protected int jobExecutor_waitTimeInMillis;
   protected int jobExecutor_lockTimeInMillis;
+
+  protected ProcessEngineRegistry processEngineRegistry;
+  protected final ProcessEngineConfiguration processEngineUserConfiguration;
+  
+  public ProcessEngineController(ProcessEngineConfiguration processEngineConfiguration) {
+    
+    this.processEngineUserConfiguration = processEngineConfiguration;    
+    
+    this.processEngineName = processEngineConfiguration.getProcessEngineName();
+    this.datasourceJndiName = processEngineConfiguration.getDatasourceJndiName();
+    this.isAutoUpdateSchema = processEngineConfiguration.isAutoSchemaUpdate();
+    this.history = processEngineConfiguration.getHistoryLevel();    
+  }
       
   ////////////////////////////////// lifecycle
   
   public synchronized void start() {
-    init();
-		isActive = true;
+    try {     
+      init();
+      processEngineRegistry.processEngineInstallationSuccess(processEngineUserConfiguration, this);
+  		isActive = true;  		
+    } catch (Exception e) {
+      processEngineRegistry.processEngineInstallationFailed(processEngineUserConfiguration);
+      throw new FoxPlatformException("Exception while attempting to start process engine: ", e);
+    }
   }
 
   public synchronized void stop() {
-    closeProcessEngine();   
+    closeProcessEngine();       
+
+    for (ProcessArchiveContext processArchive : installedProcessArchivesByName.values()) {
+      unInstallProcessArchive(processArchive.getProcessArchive());      
+    }
+
+    processEngineRegistry.processEngineUninstalled(this);
+
     installedProcessArchivesByName.clear();
     installedProcessArchivesByProcessDefinitionKey.clear();
-    isActive = false;
+    activitiProcessEngine = null;
+    processEngineConfiguration = null;    
+    isActive = false;    
   }
   
   protected void init() { 
@@ -104,8 +134,6 @@ public class PlatformProcessEngine {
     if(jobExecutor.isActive()) {
       jobExecutor.shutdown();
     }
-    activitiProcessEngine = null;
-    processEngineConfiguration = null;    
   }
 
   protected void logConfiguration() {
@@ -278,11 +306,11 @@ public class PlatformProcessEngine {
 
   
   public Map<String, ProcessArchiveContext> getInstalledProcessArchivesByName() {
-    return installedProcessArchivesByName;
+    return new HashMap<String, ProcessArchiveContext>(installedProcessArchivesByName);
   }
   
   public Map<String, ProcessArchiveContext> getInstalledProcessArchivesByProcessDefinitionKey() {
-    return installedProcessArchivesByProcessDefinitionKey;
+    return new HashMap<String, ProcessArchiveContext>(installedProcessArchivesByProcessDefinitionKey);
   }
 
   public ProcessEngineConfigurationImpl getProcessEngineConfiguration() {
@@ -388,4 +416,9 @@ public class PlatformProcessEngine {
   public List<ProcessArchive> getCachedProcessArchives() {
     return cachedProcessArchives;
   }
+  
+  public void setProcessEngineRegistry(ProcessEngineRegistry processEngineRegistry) {
+    this.processEngineRegistry = processEngineRegistry;
+  }
+  
 }

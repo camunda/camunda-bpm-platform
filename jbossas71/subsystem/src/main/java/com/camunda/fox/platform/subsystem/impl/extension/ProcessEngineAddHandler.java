@@ -44,7 +44,10 @@ import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceController.Mode;
 import org.jboss.msc.service.ServiceName;
 
-import com.camunda.fox.platform.subsystem.impl.ContainerProcessEngineService;
+import com.camunda.fox.platform.spi.ProcessEngineConfiguration;
+import com.camunda.fox.platform.subsystem.impl.platform.ContainerPlatformService;
+import com.camunda.fox.platform.subsystem.impl.platform.ProcessEngineConfigurationImpl;
+import com.camunda.fox.platform.subsystem.impl.platform.ProcessEngineControllerService;
 
 /**
  * Provides the description and the implementation of the process-engine#add operation.
@@ -91,8 +94,7 @@ public class ProcessEngineAddHandler extends AbstractAddStepHandler implements D
           ServiceVerificationHandler verificationHandler, List<ServiceController<?>> newControllers)
           throws OperationFailedException {
     
-    String engineName = PathAddress.pathAddress(operation.get(ModelDescriptionConstants.ADDRESS)).getLastElement().getValue();
-    
+    String engineName = PathAddress.pathAddress(operation.get(ModelDescriptionConstants.ADDRESS)).getLastElement().getValue();    
     String datasource = operation.get(ATTR_DATASOURCE).asString();
     
     // TODO: read these values from config
@@ -106,26 +108,18 @@ public class ProcessEngineAddHandler extends AbstractAddStepHandler implements D
     int jobExecutor_lockTimeInMillis= 5 * 60 * 1000;
     int jobExecutor_waitTimeInMillis = 5 * 1000;
     
-    ContainerProcessEngineService service = new ContainerProcessEngineService(engineName);
-    service.setHistory(historyLevel);
-    service.setDatasourceJndiName(datasource);
-    service.setActivateJobExecutor(activateJobExecutor);
-    service.setAutoUpdateSchema(isAutoUpdateSchema);
-    service.setJobExecutor_maxJobsPerAcquisition(jobExecutor_maxJobsPerAcquisition);
-    service.setJobExecutor_corePoolSize(jobExecutor_corePoolSize);
-    service.setJobExecutor_maxPoolSize(jobExecutor_maxPoolSize);
-    service.setJobExecutor_queueSize(jobExecutor_queueSize);
-    service.setJobExecutor_lockTimeInMillis(jobExecutor_lockTimeInMillis);
-    service.setJobExecutor_waitTimeInMillis(jobExecutor_waitTimeInMillis);
-    
-    ServiceName name = ContainerProcessEngineService.createServiceName(engineName);    
+    ProcessEngineConfiguration processEngineConfiguration = new ProcessEngineConfigurationImpl(true, engineName, datasource, historyLevel, isAutoUpdateSchema, activateJobExecutor);        
+    ProcessEngineControllerService service = new ProcessEngineControllerService(processEngineConfiguration);
+        
+    ServiceName name = ProcessEngineControllerService.createServiceName(engineName);    
     String datasourceJndiName = operation.get(ATTR_DATASOURCE).asString();    
     ContextNames.BindInfo datasourceBindInfo = ContextNames.bindInfoFor(datasourceJndiName);
     
-    ServiceController<ContainerProcessEngineService> controller = context.getServiceTarget()           
+    ServiceController<ProcessEngineControllerService> controller = context.getServiceTarget()           
             .addService(name, service)
-            .addDependency(ServiceName.JBOSS.append("txn").append("TransactionManager"), TransactionManager.class, service.getTransactionManagerValue())
-            .addDependency(datasourceBindInfo.getBinderServiceName(), DataSourceReferenceFactoryService.class, service.getDatasourceBinderServiceValue())
+            .addDependency(ServiceName.JBOSS.append("txn").append("TransactionManager"), TransactionManager.class, service.getTransactionManagerInjector())
+            .addDependency(datasourceBindInfo.getBinderServiceName(), DataSourceReferenceFactoryService.class, service.getDatasourceBinderServiceInjector())
+            .addDependency(ContainerPlatformService.getServiceName(), ContainerPlatformService.class, service.getContainerPlatformServiceInjector())
             .addListener(verificationHandler)
             .setInitialMode(Mode.ACTIVE)
             .install();

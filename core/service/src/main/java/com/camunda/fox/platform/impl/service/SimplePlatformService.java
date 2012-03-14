@@ -3,9 +3,10 @@ package com.camunda.fox.platform.impl.service;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import com.camunda.fox.platform.api.ProcessEngineService;
-import com.camunda.fox.platform.spi.ProcessArchive;
+import com.camunda.fox.platform.FoxPlatformException;
 import com.camunda.fox.platform.spi.ProcessEngineConfiguration;
 
 /**
@@ -18,46 +19,38 @@ import com.camunda.fox.platform.spi.ProcessEngineConfiguration;
  *  
  * @author Daniel Meyer
  */
-public class SimplePlatformService extends AbstractPlatformService {
+public class SimplePlatformService extends PlatformService {
+  
+  final private static Logger log = Logger.getLogger(SimplePlatformService.class.getName());
 
   public Future<ProcessEngineStartOperation> startProcessEngine(final ProcessEngineConfiguration processEngineConfiguration) {
+    
+    processEngineRegistry.startInstallingNewProcessEngine(processEngineConfiguration);
+        
     FutureTask<ProcessEngineStartOperation> task = new FutureTask<ProcessEngineStartOperation>(new Callable<ProcessEngineStartOperation>() {
-      public ProcessEngineStartOperation call() throws Exception {        
-        return doStartProcessEngine(processEngineConfiguration);
+      public ProcessEngineStartOperation call() throws Exception {
+        try {
+          ProcessEngineController processEngineController = new ProcessEngineController(processEngineConfiguration);
+          processEngineController.setProcessEngineRegistry(processEngineRegistry);
+          processEngineController.start();      
+          return new ProcessEngineStartOperationImpl(processEngineController.getProcessEngine());
+        } catch (Exception e) {
+          log.log(Level.SEVERE,"Caught exception while tying to start process engine", e);
+          return new ProcessEngineStartOperationImpl(e);
+        }
       }
     });
     task.run();
     return task;
   }
 
-  public Future<ProcessEngineStopOperation> stopProcessEngine(final String name) {
-    FutureTask<ProcessEngineStopOperation> task = new FutureTask<ProcessEngineService.ProcessEngineStopOperation>(new Callable<ProcessEngineStopOperation>() {
-      public ProcessEngineStopOperation call() throws Exception {        
-        return doStopProcessEngine(name);
-      }
-    });
-    task.run();
-    return task;
-  }
-
-  public Future<ProcessArchiveInstallOperation> installProcessArchive(final ProcessArchive processArchive) {
-    FutureTask<ProcessArchiveInstallOperation> task = new FutureTask<ProcessArchiveInstallOperation>(new Callable<ProcessArchiveInstallOperation>() {
-      public ProcessArchiveInstallOperation call() throws Exception {        
-        return doInstallProcessArchive(processArchive);
-      }
-    });
-    task.run();
-    return task;
-  }
-
-  public Future<ProcessArchiveUninstallOperation> unInstallProcessArchive(final String processArchiveName) {
-    FutureTask<ProcessArchiveUninstallOperation> task = new FutureTask<ProcessArchiveUninstallOperation>(new Callable<ProcessArchiveUninstallOperation>() {
-      public ProcessArchiveUninstallOperation call() throws Exception {        
-        return doUnInstallProcessArchive(processArchiveName);
-      }
-    });
-    task.run();
-    return task;
+  @Override
+  public void stopProcessEngine(String name) {
+    ProcessEngineController processEngineController = processEngineRegistry.getProcessEngineController(name);
+    if(processEngineController == null) {
+      throw new FoxPlatformException("Cannot stop process engine with name '"+name+"': no such process engine found.");
+    }
+    processEngineController.stop();
   }
 
 }

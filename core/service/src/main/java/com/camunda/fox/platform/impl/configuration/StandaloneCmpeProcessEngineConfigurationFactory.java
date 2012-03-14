@@ -3,14 +3,14 @@ package com.camunda.fox.platform.impl.configuration;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 
 import com.camunda.fox.platform.impl.configuration.spi.ProcessEngineConfigurationFactory;
-import com.camunda.fox.platform.impl.service.PlatformProcessEngine;
+import com.camunda.fox.platform.impl.service.ProcessEngineController;
 
 /**
  * @author Daniel Meyer
  */
 public class StandaloneCmpeProcessEngineConfigurationFactory implements ProcessEngineConfigurationFactory {
 
-  private PlatformProcessEngine processEngineServiceBean;
+  private ProcessEngineController processEngineServiceBean;
 
   @Override
   public ProcessEngineConfigurationImpl getProcessEngineConfiguration() {
@@ -18,7 +18,7 @@ public class StandaloneCmpeProcessEngineConfigurationFactory implements ProcessE
   }
 
   @Override
-  public void setProcessEngineServiceBean(PlatformProcessEngine processEngineServiceBean) {
+  public void setProcessEngineServiceBean(ProcessEngineController processEngineServiceBean) {
     this.processEngineServiceBean = processEngineServiceBean;
 
   }

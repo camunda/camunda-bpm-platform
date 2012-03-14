@@ -50,13 +50,13 @@ public class ProcessArchiveSupport {
           "java:global/" +
           "camunda-fox-platform/" +
           "process-engine/" +
-          "ProcessEngineService!com.camunda.fox.platform.api.ProcessArchiveService";
+          "PlatformService!com.camunda.fox.platform.api.ProcessArchiveService";
   
   public final static String PROCESS_ENGINE_SERVICE_NAME =
           "java:global/" +
           "camunda-fox-platform/" +
           "process-engine/" +
-          "ProcessEngineService!com.camunda.fox.platform.api.ProcessArchiveService";
+          "PlatformService!com.camunda.fox.platform.api.ProcessArchiveService";
   
   @EJB(lookup=PROCESS_ARCHIVE_SERVICE_NAME)
   protected ProcessArchiveService processArchiveService;
@@ -78,7 +78,7 @@ public class ProcessArchiveSupport {
     ProcessesXml processesXml = parser.parseProcessesXml();
     setProcessArchiveName(processesXml);
     processArchive = new ProcessArchiveImpl(processesXml, processArchiveContextExecutorBean);
-    processEngine = processArchiveService.installProcessArchive(processArchive);
+    processEngine = processArchiveService.installProcessArchive(processArchive).getProcessenEngine();
   }
 
   @PreDestroy

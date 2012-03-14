@@ -48,11 +48,11 @@ public abstract class PlatformServiceTest {
   public void cleanup() throws Exception {
     // uninstall all process archives
     for (ProcessArchive processArchive : platformService.getInstalledProcessArchives()) {
-      platformService.unInstallProcessArchive(processArchive).get();
+      platformService.unInstallProcessArchive(processArchive);
     }
     // stop all process engines
     for (ProcessEngine processEngine : platformService.getProcessEngines()) {      
-      platformService.stopProcessEngine(processEngine).get();
+      platformService.stopProcessEngine(processEngine);
     }
   }
 

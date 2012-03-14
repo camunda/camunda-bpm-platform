@@ -14,37 +14,41 @@
  * limitations under the License.
  */
 package com.camunda.fox.platform.test.deployment.war;
+import java.io.File;
+
 import org.activiti.cdi.impl.util.ProgrammaticBeanLookup;
 import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.RepositoryService;
 import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
+import org.jboss.shrinkwrap.resolver.api.DependencyResolvers;
+import org.jboss.shrinkwrap.resolver.api.maven.MavenDependencyResolver;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import com.camunda.fox.platform.test.FoxPlatformIntegrationTest;
-
 
 @RunWith(Arquillian.class)
-public class TestWarDeployment extends FoxPlatformIntegrationTest {
+public class TestWarDeployment {
   
   private static final String PROCESS_ARCHIVE = "processArchive";
   private static final String EMPTY_PROCESS_ARCHIVE = "emptyProcessArchive";
   
-  @Deployment(name=EMPTY_PROCESS_ARCHIVE)
-  public static WebArchive emptyProcessArchive() {
-    
-    return ShrinkWrap.create(WebArchive.class, "test.war")
-            .addAsWebInfResource(EmptyAsset.INSTANCE, "classes/META-INF/processes.xml")
-            .addAsLibraries(getFoxPlatformClient());           
+  protected static File[] getFoxPlatformClient() {
+    MavenDependencyResolver resolver = DependencyResolvers.use(MavenDependencyResolver.class).goOffline().loadMetadataFromPom("pom.xml");
+    return resolver.artifact("com.camunda.fox:fox-platform-client").resolveAsFiles();
   }
+//  
+//  public static WebArchive emptyProcessArchive() {
+//    
+//    return ShrinkWrap.create(WebArchive.class, "test.war")
+//            .addAsWebInfResource(EmptyAsset.INSTANCE, "classes/META-INF/processes.xml")
+//            .addAsLibraries(getFoxPlatformClient());           
+//  }
 
-  @Deployment(name=PROCESS_ARCHIVE)
+  @Deployment
   public static WebArchive processArchive() {
     
     return ShrinkWrap.create(WebArchive.class, "test.war")
@@ -53,7 +57,7 @@ public class TestWarDeployment extends FoxPlatformIntegrationTest {
             .addAsLibraries(getFoxPlatformClient());           
   }
   
-  @Test @OperateOnDeployment(PROCESS_ARCHIVE)
+  @Test
   public void testDeployProcessArchive() {
     ProcessEngine processEngine = ProgrammaticBeanLookup.lookup(ProcessEngine.class);
     Assert.assertNotNull(processEngine);
@@ -65,11 +69,11 @@ public class TestWarDeployment extends FoxPlatformIntegrationTest {
     Assert.assertEquals(1, count);
   }
   
-        
-  @Test @OperateOnDeployment(EMPTY_PROCESS_ARCHIVE)
-  public void testEmptyProcessArchive() {            
-    ProcessEngine processEngine = ProgrammaticBeanLookup.lookup(ProcessEngine.class);
-    Assert.assertNotNull(processEngine);
-  }
+//        
+//  @Test
+//  public void testEmptyProcessArchive() {            
+//    ProcessEngine processEngine = ProgrammaticBeanLookup.lookup(ProcessEngine.class);
+//    Assert.assertNotNull(processEngine);
+//  }
 
 }

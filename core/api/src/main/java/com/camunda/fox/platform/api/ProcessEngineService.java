@@ -82,7 +82,7 @@ public interface ProcessEngineService {
    * @param processEngine
    *          the process engine to be stopped.
    */
-  public Future<ProcessEngineStopOperation> stopProcessEngine(ProcessEngine processEngine);
+  public void stopProcessEngine(ProcessEngine processEngine);
   
   /**
    * Stops which is named after the parameter passed in to this method.
@@ -92,7 +92,7 @@ public interface ProcessEngineService {
    * @param processEngine
    *          the process engine to be stopped.
    */
-  public Future<ProcessEngineStopOperation> stopProcessEngine(String name);
+  public void stopProcessEngine(String name);
   
   
   // operations ////////////////////////////////////
@@ -116,17 +116,4 @@ public interface ProcessEngineService {
     public Throwable getException();
   }
   
-  public static interface ProcessEngineStopOperation {
-    
-    /**
-     * @return true if the process engine could successfully be stopped
-     */
-    public boolean wasSuccessful();
-    
-    /**
-     * @return the exception thrown while attempting to stop the process engine.
-     */
-    public Throwable getException();
-  }
-
 }

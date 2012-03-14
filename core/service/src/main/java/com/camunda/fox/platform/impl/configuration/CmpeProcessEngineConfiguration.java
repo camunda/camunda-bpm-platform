@@ -35,7 +35,7 @@ import org.activiti.engine.impl.variable.VariableType;
 import com.camunda.fox.platform.impl.context.ProcessArchiveServicesSupport;
 import com.camunda.fox.platform.impl.context.spi.ProcessArchiveServices;
 import com.camunda.fox.platform.impl.jobexecutor.spi.JobExecutorFactory;
-import com.camunda.fox.platform.impl.service.PlatformProcessEngine;
+import com.camunda.fox.platform.impl.service.ProcessEngineController;
 import com.camunda.fox.platform.impl.util.Services;
 
 /**
@@ -50,9 +50,9 @@ import com.camunda.fox.platform.impl.util.Services;
 public abstract class CmpeProcessEngineConfiguration extends ProcessEngineConfigurationImpl {
   
   protected ProcessArchiveServices processArchiveServices;
-  protected final PlatformProcessEngine cmpeProcessEngine;
+  protected final ProcessEngineController cmpeProcessEngine;
   
-  public CmpeProcessEngineConfiguration(PlatformProcessEngine processEngineServiceBean) {
+  public CmpeProcessEngineConfiguration(ProcessEngineController processEngineServiceBean) {
     this.cmpeProcessEngine = processEngineServiceBean;
   }
     
@@ -128,7 +128,7 @@ public abstract class CmpeProcessEngineConfiguration extends ProcessEngineConfig
     return processArchiveServices;
   }
   
-  public PlatformProcessEngine getProcessEngineServiceBean() {
+  public ProcessEngineController getProcessEngineServiceBean() {
     return cmpeProcessEngine;
   }
   

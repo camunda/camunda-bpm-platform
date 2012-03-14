@@ -28,7 +28,7 @@ import org.jboss.as.controller.descriptions.ModelDescriptionConstants;
 import org.jboss.dmr.ModelNode;
 import org.jboss.msc.service.ServiceName;
 
-import com.camunda.fox.platform.subsystem.impl.ContainerProcessEngineService;
+import com.camunda.fox.platform.subsystem.impl.platform.ProcessEngineControllerService;
 
 /**
  * Provides the description and the implementation of the process-engine#remove operation.
@@ -47,7 +47,7 @@ public class ProcessEngineRemoveHandler extends AbstractRemoveStepHandler implem
 
   protected void performRuntime(OperationContext context, ModelNode operation, ModelNode model) throws OperationFailedException {
     String suffix = PathAddress.pathAddress(operation.get(ModelDescriptionConstants.ADDRESS)).getLastElement().getValue();
-    ServiceName name = ContainerProcessEngineService.createServiceName(suffix);
+    ServiceName name = ProcessEngineControllerService.createServiceName(suffix);
     context.removeService(name);
   }
 

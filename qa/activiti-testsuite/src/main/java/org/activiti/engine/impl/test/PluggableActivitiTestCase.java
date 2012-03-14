@@ -34,13 +34,13 @@ public class PluggableActivitiTestCase extends AbstractActivitiTestCase {
           "java:global/" +
           "camunda-fox-platform/" +
           "process-engine/" +
-          "ProcessEngineService!com.camunda.fox.platform.api.ProcessEngineService";
+          "PlatformService!com.camunda.fox.platform.api.ProcessEngineService";
   
   public static final String PROCESS_ARCHIVE_SERVICE_LOOKUP = 
           "java:global/" +
           "camunda-fox-platform/" +
           "process-engine/" +
-          "ProcessEngineService!com.camunda.fox.platform.api.ProcessArchiveService";
+          "PlatformService!com.camunda.fox.platform.api.ProcessArchiveService";
   
   public static final String PROCESS_ARCHIVE_CONTEXT_EXECUTOR =
           "java:global/" +
@@ -63,7 +63,7 @@ public class PluggableActivitiTestCase extends AbstractActivitiTestCase {
       try {
         InitialContext initialContext = new InitialContext();
         ProcessEngineService processEngineService = (ProcessEngineService) initialContext.lookup(PROCESS_ENGINE_SERVICE_LOOKUP);
-        cachedProcessEngine = processEngineService.getDefaultProcessEngine();
+        cachedProcessEngine = processEngineService.getProcessEngine("process-engine");
       }catch (Exception e) {
         throw new FoxPlatformException("Could not lookup process engine: ",e);
       }
