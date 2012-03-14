@@ -19,6 +19,7 @@ import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 
 import com.camunda.fox.platform.impl.configuration.spi.ProcessEngineConfigurationFactory;
 import com.camunda.fox.platform.impl.service.AbstractPlatformService;
+import com.camunda.fox.platform.impl.service.PlatformProcessEngine;
 
 /**
  * <p>Default {@link ProcessEngineConfigurationFactory}, returning a {@link JtaCmpeProcessEngineConfiguration}</p>
@@ -27,13 +28,13 @@ import com.camunda.fox.platform.impl.service.AbstractPlatformService;
  */
 public class JtaCmpeProcessEngineConfigurationFactory implements ProcessEngineConfigurationFactory {
 
-  protected AbstractPlatformService processEngineServiceBean;
+  protected PlatformProcessEngine processEngineServiceBean;
 
-  public void setProcessEngineServiceBean(AbstractPlatformService processEngineServiceBean) {
+  public void setProcessEngineServiceBean(PlatformProcessEngine processEngineServiceBean) {
     this.processEngineServiceBean = processEngineServiceBean;
   }
 
-  public AbstractPlatformService getProcessEngineServiceBean() {
+  public PlatformProcessEngine getProcessEngineServiceBean() {
     return processEngineServiceBean;
   }
   

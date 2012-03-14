@@ -61,6 +61,37 @@
 			<version>7.1.0.Final</version>
 			<scope>provided</scope>
 		</dependency>
+    
+        <!-- test infrastructure -->        
+        <dependency>
+          <groupId>junit</groupId>
+          <artifactId>junit</artifactId>
+          <scope>test</scope>
+        </dependency>
+        
+        <dependency>
+          <groupId>org.springframework</groupId>
+          <artifactId>spring-test</artifactId>
+          <scope>test</scope>
+        </dependency>
+        
+        <dependency>
+         	<groupId>commons-dbcp</groupId>
+	       <artifactId>commons-dbcp</artifactId>
+          <scope>test</scope>
+        </dependency>
+        
+        <dependency>
+          <groupId>com.h2database</groupId>
+          <artifactId>h2</artifactId>
+          <scope>test</scope>
+        </dependency>
+        
+        <dependency>
+          <groupId>com.fasterxml.uuid</groupId>
+          <artifactId>java-uuid-generator</artifactId>
+          <scope>test</scope>
+        </dependency>
 
 	</dependencies>
 

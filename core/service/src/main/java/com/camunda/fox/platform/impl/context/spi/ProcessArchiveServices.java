@@ -21,7 +21,7 @@ import javax.persistence.EntityManagerFactory;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 
 import com.camunda.fox.platform.impl.context.ProcessArchiveContext;
-import com.camunda.fox.platform.impl.service.CmpeProcessEngineService;
+import com.camunda.fox.platform.impl.service.PlatformProcessEngine;
 
 public interface ProcessArchiveServices {
 
@@ -36,7 +36,7 @@ public interface ProcessArchiveServices {
 
   public ProcessArchiveContext getProcessArchiveContext(String processDefinitionKey);
 
-  public void setProcessEngineServiceBean(CmpeProcessEngineService processEngineServiceBean);
+  public void setProcessEngineServiceBean(PlatformProcessEngine processEngineServiceBean);
 
   /**
    * This method assumes it it called from an activiti command 

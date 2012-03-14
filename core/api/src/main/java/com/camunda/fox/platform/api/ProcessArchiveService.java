@@ -38,9 +38,9 @@ public interface ProcessArchiveService {
   
   public Future<ProcessArchiveInstallOperation> installProcessArchive(ProcessArchive processArchive);
 
-  public Future<ProcessArchiveInstallOperation> unInstallProcessArchive(ProcessArchive processArchive);
+  public Future<ProcessArchiveUninstallOperation> unInstallProcessArchive(ProcessArchive processArchive);
   
-  public Future<ProcessArchiveInstallOperation> unInstallProcessArchive(String processArchiveName);
+  public Future<ProcessArchiveUninstallOperation> unInstallProcessArchive(String processArchiveName);
   
   public List<ProcessArchive> getInstalledProcessArchives();
   

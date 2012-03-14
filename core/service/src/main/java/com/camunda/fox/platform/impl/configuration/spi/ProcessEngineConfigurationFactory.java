@@ -17,7 +17,7 @@ package com.camunda.fox.platform.impl.configuration.spi;
 
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 
-import com.camunda.fox.platform.impl.service.CmpeProcessEngineService;
+import com.camunda.fox.platform.impl.service.PlatformProcessEngine;
 
 /**
  * Factory responsible for producing {@link ProcessEngineConfigurationImpl} objects  
@@ -28,6 +28,6 @@ public interface ProcessEngineConfigurationFactory {
 
   public ProcessEngineConfigurationImpl getProcessEngineConfiguration();
 
-  public void setProcessEngineService(CmpeProcessEngineService processEngineServiceBean);
+  public void setProcessEngineServiceBean(PlatformProcessEngine processEngineServiceBean);
 
 }
