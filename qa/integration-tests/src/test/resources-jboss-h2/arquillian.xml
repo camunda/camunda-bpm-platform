@@ -4,7 +4,7 @@
 
   <container qualifier="jboss" default="true">
     <configuration>
-      <property name="jbossHome">../../qa/jboss7-runtime/target/jboss-as-${version.jboss.as}/</property>
+      <property name="jbossHome">../jboss7-runtime/target/jboss-as-${version.jboss.as}/</property>
       <property name="managementPort">21009</property>
       <property name="serverConfig">standalone-h2.xml</property>
     </configuration>
