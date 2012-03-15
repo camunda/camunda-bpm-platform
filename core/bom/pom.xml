@@ -17,7 +17,7 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <fox.engine.version>6.0.sprint18-SNAPSHOT</fox.engine.version>
+    <fox.engine.version>${project.version}</fox.engine.version>
   </properties>
 
   <dependencyManagement>

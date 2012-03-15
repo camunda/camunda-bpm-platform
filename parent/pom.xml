@@ -11,7 +11,7 @@
 
   <properties>
     <version.jboss.as>7.1.0.Final</version.jboss.as>
-    <fox.engine.version>6.0.sprint18-SNAPSHOT</fox.engine.version>  
+    <fox.engine.version>0.18.0-SNAPSHOT</fox.engine.version>  
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
