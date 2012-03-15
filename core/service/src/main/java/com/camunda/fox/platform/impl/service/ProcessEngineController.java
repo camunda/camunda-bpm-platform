@@ -164,6 +164,7 @@ public class ProcessEngineController {
   protected void initProcessEngineConfiguration() {
     // obtain a configuration form the factory
     ProcessEngineConfigurationFactory configurationFactory = Services.getService(ProcessEngineConfigurationFactory.class);
+    configurationFactory.setProcessEngineController(this);
     
     processEngineConfiguration = configurationFactory.getProcessEngineConfiguration();
     processEngineConfiguration.setProcessEngineName(processEngineName);

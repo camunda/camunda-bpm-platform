@@ -28,6 +28,6 @@ public interface ProcessEngineConfigurationFactory {
 
   public ProcessEngineConfigurationImpl getProcessEngineConfiguration();
 
-  public void setProcessEngineServiceBean(ProcessEngineController processEngineServiceBean);
+  public void setProcessEngineController(ProcessEngineController processEngineController);
 
 }

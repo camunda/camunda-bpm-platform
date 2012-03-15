@@ -39,10 +39,10 @@ public class DefaultProcessArchiveServices implements ProcessArchiveServices {
   
   private static Logger log = Logger.getLogger(DefaultProcessArchiveServices.class.getName());
 
-  protected ProcessEngineController processEngineServiceBean;
+  protected ProcessEngineController processEngineServiceController;
     
-  public void setProcessEngineServiceBean(ProcessEngineController processEngineServiceBean) {
-    this.processEngineServiceBean = processEngineServiceBean;
+  public void setProcessEngineServiceBean(ProcessEngineController processEngineServiceController) {
+    this.processEngineServiceController = processEngineServiceController;
   }
 
   public BeanManager getBeanManager() {
@@ -83,7 +83,7 @@ public class DefaultProcessArchiveServices implements ProcessArchiveServices {
   }
 
   public ProcessArchiveContext getProcessArchiveContext(String processDefinitionKey) {
-    return processEngineServiceBean.getProcessArchiveContext(processDefinitionKey);
+    return processEngineServiceController.getProcessArchiveContext(processDefinitionKey);
   }
   
   @Override

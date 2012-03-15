@@ -1,6 +1,6 @@
 <module xmlns="urn:jboss:module:1.0" name="com.camunda.fox.fox-engine-cdi">
   <resources>
-    <resource-root path="fox-engine-cdi-6.0.sprint18-SNAPSHOT.jar" />
+    <resource-root path="fox-engine-cdi-@project.version@.jar" />
   </resources>
 
   <dependencies>  

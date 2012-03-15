@@ -10,16 +10,16 @@ import com.camunda.fox.platform.impl.service.ProcessEngineController;
  */
 public class StandaloneCmpeProcessEngineConfigurationFactory implements ProcessEngineConfigurationFactory {
 
-  private ProcessEngineController processEngineServiceBean;
+  private ProcessEngineController processEngineServiceController;
 
   @Override
   public ProcessEngineConfigurationImpl getProcessEngineConfiguration() {
-    return new StandaloneCmpeProcessEngineConfiguration(processEngineServiceBean);
+    return new StandaloneCmpeProcessEngineConfiguration(processEngineServiceController);
   }
 
   @Override
-  public void setProcessEngineServiceBean(ProcessEngineController processEngineServiceBean) {
-    this.processEngineServiceBean = processEngineServiceBean;
+  public void setProcessEngineController(ProcessEngineController processEngineServiceController) {
+    this.processEngineServiceController = processEngineServiceController;
 
   }
 

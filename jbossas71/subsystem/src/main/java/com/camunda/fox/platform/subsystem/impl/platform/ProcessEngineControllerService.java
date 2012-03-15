@@ -53,7 +53,7 @@ public class ProcessEngineControllerService extends ProcessEngineController impl
         start();
         return null;
       }
-    }, getClass().getClassLoader());   
+    }, ProcessEngineControllerService.class.getClassLoader());   
   }
   
   protected void initProcessEngineConfiguration() {

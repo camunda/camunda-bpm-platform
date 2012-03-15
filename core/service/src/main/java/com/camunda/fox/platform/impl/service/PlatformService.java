@@ -88,8 +88,10 @@ public abstract class PlatformService implements ProcessEngineService, ProcessAr
       return new ProcessArchiveInstallationImpl(processEngineHandle, deploymentId);
 
     } catch (Exception e) {
-      processEnginesByProcessArchiveName.remove(processArchive.getName());
-      throw new FoxPlatformException("",e);
+      synchronized (this) {
+        processEnginesByProcessArchiveName.remove(processArchive.getName());        
+      }
+      throw new FoxPlatformException("Exception while intalling process archive",e);
     }
   }
 

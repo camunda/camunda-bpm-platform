@@ -56,7 +56,7 @@ public class ProcessArchiveSupport {
           "java:global/" +
           "camunda-fox-platform/" +
           "process-engine/" +
-          "PlatformService!com.camunda.fox.platform.api.ProcessArchiveService";
+          "PlatformService!com.camunda.fox.platform.api.ProcessEngineService";
   
   @EJB(lookup=PROCESS_ARCHIVE_SERVICE_NAME)
   protected ProcessArchiveService processArchiveService;
