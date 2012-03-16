@@ -44,6 +44,7 @@ public class ProcessEngineControllerService extends ProcessEngineController impl
   public void start(StartContext context) throws StartException {
     
     processEngineRegistry = containerPlatformServiceInjector.getValue().getProcessEngineRegistry();
+    processEngineRegistry.startInstallingNewProcessEngine(processEngineUserConfiguration);
     
     // setting the TCCL to the Classloader of this module.
     // this exploits a hack in MyBatis allowing it to use the TCCL to load the 

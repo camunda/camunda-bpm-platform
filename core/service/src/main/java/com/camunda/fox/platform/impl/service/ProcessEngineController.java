@@ -72,10 +72,10 @@ public class ProcessEngineController {
   protected boolean isAutoUpdateSchema;
   protected String history;
 
-  protected boolean activateJobExecutor;
-  protected int jobExecutor_maxJobsPerAcquisition;
-  protected int jobExecutor_waitTimeInMillis;
-  protected int jobExecutor_lockTimeInMillis;
+  protected boolean activateJobExecutor = true;
+  protected int jobExecutor_maxJobsPerAcquisition = 3;
+  protected int jobExecutor_waitTimeInMillis =  5 * 1000;
+  protected int jobExecutor_lockTimeInMillis =  5 * 60 * 1000;
 
   protected ProcessEngineRegistry processEngineRegistry;
   protected final ProcessEngineConfiguration processEngineUserConfiguration;

@@ -17,8 +17,6 @@ package com.camunda.fox.platform.test.services;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-import javax.ejb.EJB;
-
 import junit.framework.Assert;
 
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -29,35 +27,23 @@ import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import com.camunda.fox.platform.api.ProcessEngineService;
 import com.camunda.fox.platform.api.ProcessEngineService.ProcessEngineStartOperation;
 import com.camunda.fox.platform.test.services.util.ProcessEngineConfigurationImpl;
+import com.camunda.fox.platform.test.util.AbstractFoxPlatformIntegrationTest;
 
 
 @RunWith(Arquillian.class)
-public class PlatformServicesTest {
-  
-  public final static String PROCESS_ARCHIVE_SERVICE_NAME =
-          "java:global/" +
-          "camunda-fox-platform/" +
-          "process-engine/" +
-          "PlatformService!com.camunda.fox.platform.api.ProcessArchiveService";
-  
-  public final static String PROCESS_ENGINE_SERVICE_NAME =
-          "java:global/" +
-          "camunda-fox-platform/" +
-          "process-engine/" +
-          "PlatformService!com.camunda.fox.platform.api.ProcessArchiveService";  
+public class PlatformServicesTest extends AbstractFoxPlatformIntegrationTest {
+ 
   
   @Deployment
   public static WebArchive processArchive() {    
     return ShrinkWrap.create(WebArchive.class, "test.war")
             .addClass(ProcessEngineConfigurationImpl.class)
+            .addClass(AbstractFoxPlatformIntegrationTest.class)
             .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml");           
   }
   
-  @EJB(lookup=PROCESS_ENGINE_SERVICE_NAME)
-  private ProcessEngineService processEngineService;
   
   @Test
   public void testStartStopProcessEngine() throws InterruptedException, ExecutionException {
