@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 package com.camunda.fox.platform.test.services;
-import java.io.File;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -27,14 +26,12 @@ import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
-import org.jboss.shrinkwrap.resolver.api.DependencyResolvers;
-import org.jboss.shrinkwrap.resolver.api.maven.MavenDependencyResolver;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import com.camunda.fox.platform.api.ProcessEngineService;
 import com.camunda.fox.platform.api.ProcessEngineService.ProcessEngineStartOperation;
-import com.camunda.fox.platform.spi.ProcessEngineConfiguration;
+import com.camunda.fox.platform.test.services.util.ProcessEngineConfigurationImpl;
 
 
 @RunWith(Arquillian.class)
@@ -63,7 +60,7 @@ public class PlatformServicesTest {
   private ProcessEngineService processEngineService;
   
   @Test
-  public void testStartProcessEngine() throws InterruptedException, ExecutionException {
+  public void testStartStopProcessEngine() throws InterruptedException, ExecutionException {
     Assert.assertEquals(1, processEngineService.getProcessEngines().size());
     
     ProcessEngineConfigurationImpl configurationImpl = new ProcessEngineConfigurationImpl(false, "testEngine1", "java:jboss/datasources/ExampleDS", "audit", true, false);
@@ -71,6 +68,10 @@ public class PlatformServicesTest {
     ProcessEngineStartOperation processEngineStartOperation = startProcessEngine.get();
     
     Assert.assertEquals(2, processEngineService.getProcessEngines().size());
+    
+    processEngineService.stopProcessEngine(processEngineStartOperation.getProcessenEngine());
+    
+    Assert.assertEquals(1, processEngineService.getProcessEngines().size());
   }
   
 }

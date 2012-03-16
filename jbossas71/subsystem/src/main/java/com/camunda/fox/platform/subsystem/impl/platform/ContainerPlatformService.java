@@ -10,11 +10,14 @@ import org.jboss.as.naming.ManagedReferenceFactory;
 import org.jboss.as.naming.ServiceBasedNamingStore;
 import org.jboss.as.naming.deployment.ContextNames;
 import org.jboss.as.naming.service.BinderService;
+import org.jboss.msc.service.AbstractServiceListener;
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.ServiceBuilder;
 import org.jboss.msc.service.ServiceContainer;
 import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceController.Mode;
+import org.jboss.msc.service.ServiceController.Substate;
+import org.jboss.msc.service.ServiceController.Transition;
 import org.jboss.msc.service.ServiceName;
 import org.jboss.msc.service.StartContext;
 import org.jboss.msc.service.StartException;
@@ -127,15 +130,38 @@ public class ContainerPlatformService extends PlatformService implements Service
     
     return listener;
   }
-    
+  
+  @SuppressWarnings("unchecked")
   public void stopProcessEngine(String name) {
-    if(processEngineRegistry.getProcessEngineNames().contains(name)) {
+    if(!processEngineRegistry.getProcessEngineNames().contains(name)) {
+      throw new FoxPlatformException("Cannot stop process engine '"+name+"': no such process engine found");
+    } else {
       ServiceController<ProcessEngineControllerService> service = 
                 (ServiceController<ProcessEngineControllerService>) serviceContainer.getService(ProcessEngineControllerService.createServiceName(name));
-      service.setMode(Mode.REMOVE);
-    } else {
-      throw new FoxPlatformException("Cannot stop process engine '"+name+"': no such process engine found");
-    }
+      
+      final Object shutdownMonitor = new Object();      
+      service.addListener(new AbstractServiceListener<ProcessEngineControllerService>() {
+        public void transition(ServiceController< ? extends ProcessEngineControllerService> controller, Transition transition) {
+          if(transition.getAfter().equals(Substate.DOWN)) {
+            synchronized (shutdownMonitor) {
+              shutdownMonitor.notifyAll();              
+            }
+          }
+        }        
+      });
+      // block until the service is down (give up after 2 minutes):
+      synchronized (shutdownMonitor) {
+        service.setMode(Mode.REMOVE);        
+        try {
+          shutdownMonitor.wait(2*60*1000);
+          if(!service.getSubstate().equals(Substate.DOWN)) {
+            throw new FoxPlatformException("Timeout while waiting for process engine '"+name+"' to shut down.");
+          }
+        } catch (InterruptedException e) {          
+          throw new FoxPlatformException("Interrupted while waiting for process engine '"+name+"' to shut down.");
+        }                
+      }
+    } 
   }
 
   public ContainerPlatformService getValue() throws IllegalStateException, IllegalArgumentException {
