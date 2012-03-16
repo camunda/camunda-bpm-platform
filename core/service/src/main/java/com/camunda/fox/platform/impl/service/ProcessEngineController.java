@@ -17,6 +17,7 @@ package com.camunda.fox.platform.impl.service;
 
 import java.io.StringWriter;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -106,7 +107,8 @@ public class ProcessEngineController {
   public synchronized void stop() {
     closeProcessEngine();       
 
-    for (ProcessArchiveContext processArchive : installedProcessArchivesByName.values()) {
+    Collection<ProcessArchiveContext> installedProcessArchives = new ArrayList<ProcessArchiveContext>(installedProcessArchivesByName.values());
+    for (ProcessArchiveContext processArchive : installedProcessArchives) {
       unInstallProcessArchive(processArchive.getProcessArchive());      
     }
 
