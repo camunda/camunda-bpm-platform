@@ -136,32 +136,39 @@ public class ContainerPlatformService extends PlatformService implements Service
     if(!processEngineRegistry.getProcessEngineNames().contains(name)) {
       throw new FoxPlatformException("Cannot stop process engine '"+name+"': no such process engine found");
     } else {
-      ServiceController<ProcessEngineControllerService> service = 
-                (ServiceController<ProcessEngineControllerService>) serviceContainer.getService(ProcessEngineControllerService.createServiceName(name));
+      
+      final ServiceName createServiceName = ProcessEngineControllerService.createServiceName(name);
+      final ServiceController<ProcessEngineControllerService> service = (ServiceController<ProcessEngineControllerService>) serviceContainer.getService(createServiceName);
       
       final Object shutdownMonitor = new Object();      
       service.addListener(new AbstractServiceListener<ProcessEngineControllerService>() {
         public void transition(ServiceController< ? extends ProcessEngineControllerService> controller, Transition transition) {
-          if(transition.getAfter().equals(Substate.DOWN)) {
+          if(isDown(transition.getAfter())) {
             synchronized (shutdownMonitor) {
               shutdownMonitor.notifyAll();              
             }
           }
         }        
       });
-      // block until the service is down (give up after 2 minutes):
+      
       synchronized (shutdownMonitor) {
-        service.setMode(Mode.REMOVE);        
-        try {
-          shutdownMonitor.wait(2*60*1000);
-          if(!service.getSubstate().equals(Substate.DOWN)) {
-            throw new FoxPlatformException("Timeout while waiting for process engine '"+name+"' to shut down.");
+        service.setMode(Mode.REMOVE);
+        if (!isDown(service.getSubstate())) {
+          try {
+            // block until the service is down (give up after 2 minutes):
+            shutdownMonitor.wait(2 * 60 * 1000);
+          } catch (InterruptedException e) {
+            throw new FoxPlatformException("Interrupted while waiting for process engine '" + name + "' to shut down.");
           }
-        } catch (InterruptedException e) {          
-          throw new FoxPlatformException("Interrupted while waiting for process engine '"+name+"' to shut down.");
-        }                
+        }
       }
+      
     } 
+  }
+
+
+  private boolean isDown(Substate state) {
+    return state.equals(Substate.DOWN)||state.equals(Substate.REMOVED);
   }
 
   public ContainerPlatformService getValue() throws IllegalStateException, IllegalArgumentException {
