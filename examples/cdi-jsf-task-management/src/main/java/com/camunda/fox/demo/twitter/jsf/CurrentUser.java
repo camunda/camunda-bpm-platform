@@ -13,27 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.camunda.fox.platform.spi;
+package com.camunda.fox.demo.twitter.jsf;
+
+import java.io.Serializable;
+
+import javax.enterprise.context.SessionScoped;
+import javax.inject.Named;
 
 /**
- * <p>The user-configuration of a process engine.</p>
- * 
  * @author Daniel Meyer
  */
-public interface ProcessEngineConfiguration {
-  
-  public boolean isDefault();
-  
-  public String getProcessEngineName();
-  
-  public String getDatasourceJndiName();
-  
-  public String getHistoryLevel();
+@Named
+@SessionScoped
+public class CurrentUser implements Serializable {
 
-  public boolean isAutoSchemaUpdate();
+  private static final long serialVersionUID = 1L;
 
-  public boolean isActivateJobExcutor(); 
-  
-  // TODO: add more properties here.
+  private String username = "kermit";
+
+  public void setUsername(String username) {
+    this.username = username;
+  }
+
+  public String getUsername() {
+    return username;
+  }
 
 }

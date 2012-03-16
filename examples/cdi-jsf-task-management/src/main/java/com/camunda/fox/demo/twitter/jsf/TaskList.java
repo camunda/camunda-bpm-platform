@@ -13,27 +13,34 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.camunda.fox.platform.spi;
+package com.camunda.fox.demo.twitter.jsf;
+
+import java.util.List;
+
+import javax.enterprise.inject.Produces;
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import org.activiti.engine.TaskService;
+import org.activiti.engine.task.Task;
 
 /**
- * <p>The user-configuration of a process engine.</p>
- * 
- * @author Daniel Meyer
+ * Backing bean producing the activiti task list
  */
-public interface ProcessEngineConfiguration {
-  
-  public boolean isDefault();
-  
-  public String getProcessEngineName();
-  
-  public String getDatasourceJndiName();
-  
-  public String getHistoryLevel();
+public class TaskList {
 
-  public boolean isAutoSchemaUpdate();
+  @Inject
+  private CurrentUser currentUser;
 
-  public boolean isActivateJobExcutor(); 
+  @Inject
+  private TaskService taskService;
   
-  // TODO: add more properties here.
+  @Produces  
+  @Named("personalTaskList")
+  public List<Task> getPersonalTaskList() {
+     return taskService.createTaskQuery()
+           .taskAssignee(currentUser.getUsername())
+           .list();
+  }
 
 }

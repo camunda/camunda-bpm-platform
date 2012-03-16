@@ -13,27 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.camunda.fox.platform.spi;
+package com.camunda.fox.demo.twitter.jsf;
 
-/**
- * <p>The user-configuration of a process engine.</p>
- * 
- * @author Daniel Meyer
- */
-public interface ProcessEngineConfiguration {
-  
-  public boolean isDefault();
-  
-  public String getProcessEngineName();
-  
-  public String getDatasourceJndiName();
-  
-  public String getHistoryLevel();
+import javax.inject.Inject;
+import javax.inject.Named;
 
-  public boolean isAutoSchemaUpdate();
+@Named
+public class TweetService {
 
-  public boolean isActivateJobExcutor(); 
-  
-  // TODO: add more properties here.
+  @Inject
+  private TweetFeed tweetFeed;
+
+  public void tweet(String tweetContent) {
+    tweetFeed.addTweet(tweetContent);
+  }
 
 }

@@ -47,15 +47,37 @@
       </includes>
       <directoryMode>0700</directoryMode>
     </fileSet>
+    <fileSet>
+      <directory>../assembly/target/camunda-fox-ce-${project.version}/camunda-fox-ce-${project.version}</directory>
+      <outputDirectory />
+      <includes>
+        <include>**/jboss-*/domain/tmp/auth</include>
+        <include>**/jboss-*/standalone/tmp/auth</include>
+      </includes>
+      <directoryMode>0700</directoryMode>
+    </fileSet>
+    <fileSet>
+      <directory>../../examples/cdi-jsf-task-management</directory>
+      <outputDirectory>examples/src/cdi-jsf-task-management</outputDirectory>  
+      <excludes>
+        <exclude>target/</exclude>
+      </excludes>
+    </fileSet>
   </fileSets>
 
+  
   <dependencySets>
     <dependencySet>
       <includes>
         <include>*:war:*</include>
       </includes>
-      <outputDirectory>server/jboss-as-${version.jboss.as}/standalone/deployments
-      </outputDirectory>
+      <outputDirectory>server/jboss-as-${version.jboss.as}/standalone/deployments</outputDirectory>
+    </dependencySet>
+    <dependencySet>
+      <includes>
+        <include>*:war:*</include>
+      </includes>
+      <outputDirectory>examples/bin/</outputDirectory>
     </dependencySet>
   </dependencySets>
 

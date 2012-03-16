@@ -20,5 +20,6 @@
     <module>qa</module>
     <module>jbossas71</module>
     <module>explorer</module>
+	<module>examples</module>
   </modules>
 </project>
