@@ -33,6 +33,7 @@ import javax.ejb.TransactionManagementType;
 import org.activiti.engine.ProcessEngine;
 
 import com.camunda.fox.platform.api.ProcessArchiveService;
+import com.camunda.fox.platform.api.ProcessEngineService;
 import com.camunda.fox.processarchive.executor.ProcessArchiveContextExecutor;
 import com.camunda.fox.processarchive.parser.DefaultProcessesXmlParser;
 import com.camunda.fox.processarchive.parser.spi.ProcessesXmlParser;
@@ -61,6 +62,9 @@ public class ProcessArchiveSupport {
   @EJB(lookup=PROCESS_ARCHIVE_SERVICE_NAME)
   protected ProcessArchiveService processArchiveService;
   
+  @EJB(lookup=PROCESS_ENGINE_SERVICE_NAME)
+  protected ProcessEngineService processEngineService;
+  
   // lookup the process archive context executor
   @EJB
   protected ProcessArchiveContextExecutor processArchiveContextExecutorBean;
@@ -74,10 +78,12 @@ public class ProcessArchiveSupport {
     
   @PostConstruct
   protected void installProcessArchive() {
-    ProcessesXmlParser parser = getProcessesXmlParser();
+    final String defaultProcessEngineName = processEngineService.getDefaultProcessEngine().getName(); 
+    final ProcessesXmlParser parser = getProcessesXmlParser();
+    
     ProcessesXml processesXml = parser.parseProcessesXml();
     setProcessArchiveName(processesXml);
-    processArchive = new ProcessArchiveImpl(processesXml, processArchiveContextExecutorBean);
+    processArchive = new ProcessArchiveImpl(processesXml, processArchiveContextExecutorBean, defaultProcessEngineName);
     processEngine = processArchiveService.installProcessArchive(processArchive).getProcessenEngine();
   }
 
