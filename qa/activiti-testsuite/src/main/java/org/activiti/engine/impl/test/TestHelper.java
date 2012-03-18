@@ -39,6 +39,7 @@ import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.test.Deployment;
 
 import com.camunda.fox.platform.api.ProcessArchiveService;
+import com.camunda.fox.platform.api.ProcessEngineService;
 import com.camunda.fox.platform.spi.ProcessArchive;
 import com.camunda.fox.platform.spi.ProcessArchiveCallback;
 import com.camunda.fox.processarchive.executor.ProcessArchiveContextExecutor;
@@ -137,7 +138,7 @@ public abstract class TestHelper {
 
       @Override
       public String getProcessEngineName() {
-        return "process-engine";
+        return null;
       }
 
       @Override
