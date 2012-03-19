@@ -79,8 +79,8 @@ public class ProcessEngineController {
   protected int jobExecutor_lockTimeInMillis =  5 * 60 * 1000;
 
   protected ProcessEngineRegistry processEngineRegistry;
-  protected final ProcessEngineConfiguration processEngineUserConfiguration;
-  
+  protected ProcessEngineConfiguration processEngineUserConfiguration;
+     
   public ProcessEngineController(ProcessEngineConfiguration processEngineConfiguration) {
     
     this.processEngineUserConfiguration = processEngineConfiguration;    
@@ -88,7 +88,8 @@ public class ProcessEngineController {
     this.processEngineName = processEngineConfiguration.getProcessEngineName();
     this.datasourceJndiName = processEngineConfiguration.getDatasourceJndiName();
     this.isAutoUpdateSchema = processEngineConfiguration.isAutoSchemaUpdate();
-    this.history = processEngineConfiguration.getHistoryLevel();    
+    this.history = processEngineConfiguration.getHistoryLevel();  
+    this.activateJobExecutor = processEngineConfiguration.isActivateJobExcutor();
   }
       
   ////////////////////////////////// lifecycle
