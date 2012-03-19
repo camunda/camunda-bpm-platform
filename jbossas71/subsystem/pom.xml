@@ -1,5 +1,6 @@
+
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>fox-platform-jboss-subsystem</artifactId>
@@ -23,6 +24,11 @@
       <dependency>
         <groupId>org.jboss.as</groupId>
         <artifactId>jboss-as-server</artifactId>
+        <version>${version.jboss.as}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jboss.as</groupId>
+        <artifactId>jboss-as-subsystem-test</artifactId>
         <version>${version.jboss.as}</version>
       </dependency>
       <dependency>
@@ -98,6 +104,12 @@
       <artifactId>jboss-as-weld</artifactId>
       <scope>provided</scope>
     </dependency>
+    <!-- test dependencies -->
+    <dependency>
+      <groupId>org.jboss.as</groupId>
+      <artifactId>jboss-as-subsystem-test</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>
@@ -126,6 +138,7 @@
           </systemProperties>
           <includes>
             <include>**/*TestCase.java</include>
+            <include>**/*Test.java</include>
           </includes>
           <forkMode>once</forkMode>
         </configuration>
