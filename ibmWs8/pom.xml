@@ -19,8 +19,8 @@
   </properties>
 
   <modules>
-    <module>ear-ibmWs8</module>
-    <module>service-ibmWs8</module>
+    <module>ear</module>
+    <module>service</module>
   </modules>
 
 </project>
