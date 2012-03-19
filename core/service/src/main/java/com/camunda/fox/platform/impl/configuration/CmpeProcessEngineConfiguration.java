@@ -32,10 +32,10 @@ import org.activiti.engine.impl.variable.ShortType;
 import org.activiti.engine.impl.variable.StringType;
 import org.activiti.engine.impl.variable.VariableType;
 
-import com.camunda.fox.platform.impl.AbstractProcessEngineService;
 import com.camunda.fox.platform.impl.context.ProcessArchiveServicesSupport;
 import com.camunda.fox.platform.impl.context.spi.ProcessArchiveServices;
 import com.camunda.fox.platform.impl.jobexecutor.spi.JobExecutorFactory;
+import com.camunda.fox.platform.impl.service.ProcessEngineController;
 import com.camunda.fox.platform.impl.util.Services;
 
 /**
@@ -50,10 +50,10 @@ import com.camunda.fox.platform.impl.util.Services;
 public abstract class CmpeProcessEngineConfiguration extends ProcessEngineConfigurationImpl {
   
   protected ProcessArchiveServices processArchiveServices;
-  protected final AbstractProcessEngineService processEngineServiceBean;
+  protected final ProcessEngineController cmpeProcessEngine;
   
-  public CmpeProcessEngineConfiguration(AbstractProcessEngineService processEngineServiceBean) {
-    this.processEngineServiceBean = processEngineServiceBean;
+  public CmpeProcessEngineConfiguration(ProcessEngineController processEngineServiceBean) {
+    this.cmpeProcessEngine = processEngineServiceBean;
   }
     
   @Override
@@ -66,7 +66,7 @@ public abstract class CmpeProcessEngineConfiguration extends ProcessEngineConfig
   protected void initProcessArchiveServices() {
     if(processArchiveServices == null) {
       processArchiveServices = Services.getService(ProcessArchiveServices.class);
-      processArchiveServices.setProcessEngineServiceBean(processEngineServiceBean);
+      processArchiveServices.setProcessEngineServiceBean(cmpeProcessEngine);
     }
   }
  
@@ -128,8 +128,8 @@ public abstract class CmpeProcessEngineConfiguration extends ProcessEngineConfig
     return processArchiveServices;
   }
   
-  public AbstractProcessEngineService getProcessEngineServiceBean() {
-    return processEngineServiceBean;
+  public ProcessEngineController getProcessEngineServiceBean() {
+    return cmpeProcessEngine;
   }
   
   @Override

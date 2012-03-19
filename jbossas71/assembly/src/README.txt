@@ -27,6 +27,17 @@ Contents:
 		run the		
 			server/jboss-as-${version.jboss.as}/bin/standalone.{bat/sh} 
 		script to start up the the server.
+		
+	examples/
+		 This directory contains the sources and binaries for 
+		 a set of examples showcasing the capabilities of the fox
+		 platform. Note that when you start the pre-assembled server 
+		 located under 'server/', the examples are already deloyed.
+		 
+		 Access the examples using the following URLs:
+		 
+		 http://localhost:8080/explorer
+		 http://localhost:8080/example-cdi-jsf-taskmanagement 
 
 ==================		
 		

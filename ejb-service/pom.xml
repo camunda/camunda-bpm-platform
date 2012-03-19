@@ -8,7 +8,7 @@
   <parent>
     <groupId>com.camunda.fox</groupId>
     <artifactId>fox-platform-parent</artifactId>
-    <version>6.0.0-SNAPSHOT</version>
+    <version>6.0.sprint18-SNAPSHOT</version>
     <relativePath>../parent</relativePath>
   </parent>
 
@@ -18,6 +18,13 @@
       <artifactId>fox-platform-service</artifactId>
       <scope>provided</scope>
     </dependency>
+    
+    <dependency>
+      <groupId>com.camunda.fox</groupId>
+      <artifactId>fox-platform-client</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    
     <dependency>
       <groupId>com.camunda.fox</groupId>
       <artifactId>fox-platform-service-ext</artifactId>
@@ -37,57 +44,55 @@
     </dependency>
 
     <dependency>
-      <groupId>org.jboss.spec</groupId>
-      <artifactId>jboss-javaee-web-6.0</artifactId>
-      <type>pom</type>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
       <groupId>com.camunda.fox</groupId>
       <artifactId>fox-engine</artifactId>
       <scope>provided</scope>
     </dependency>
 
     <dependency>
-      <groupId>com.camunda.fox</groupId>
-      <artifactId>fox-engine-cdi</artifactId>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.core</artifactId>
+      <scope>test</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.jboss.arquillian.junit</groupId>
+      <artifactId>arquillian-junit-container</artifactId>
+      <version>1.0.0.CR7</version>
+      <scope>test</scope>
+    </dependency>
+
+
+    <dependency>
+      <groupId>org.jboss.arquillian.container</groupId>
+      <artifactId>arquillian-glassfish-embedded-3.1</artifactId>
+      <version>1.0.0.CR3</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.glassfish.extras</groupId>
+      <artifactId>glassfish-embedded-all</artifactId>
+      <version>3.1.1</version>
       <scope>provided</scope>
     </dependency>
 
     <dependency>
-      <groupId>com.camunda.fox</groupId>
-      <artifactId>fox-engine-spring</artifactId>
-      <version>${fox.engine.version}</version>
-      <scope>provided</scope>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <scope>test</scope>
     </dependency>
-
-    <!-- websphere dependencies -->
+    
     <dependency>
-      <groupId>com.bea.commonj</groupId>
-      <artifactId>com.springsource.commonj</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
-
-    <!-- jboss as7 dependencies -->
-    <dependency>
-      <groupId>org.jboss</groupId>
-      <artifactId>jboss-vfs</artifactId>
-      <version>3.0.1.GA</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.jboss.modules</groupId>
-      <artifactId>jboss-modules</artifactId>
-      <version>1.0.2.GA</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.jboss.as</groupId>
-      <artifactId>jboss-as-server</artifactId>
-      <version>${version.jboss.as}</version>
-      <scope>provided</scope>
+      <groupId>com.fasterxml.uuid</groupId>
+      <artifactId>java-uuid-generator</artifactId>
+      <scope>test</scope>
     </dependency>
 
   </dependencies>

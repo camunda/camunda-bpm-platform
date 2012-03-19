@@ -26,6 +26,9 @@ import com.camunda.fox.platform.spi.ProcessArchive;
  */
 public interface ProcessArchiveScanner {
   
+  public static final String MARKER_FILE_LOCATION = "META-INF/processes.xml";
+  public static final String BPMN_20_RESOURCE_SUFFIX = "bpmn20.xml";
+  
   public Map<String, byte[]> findResources(ProcessArchive processArchive);
 
 }

@@ -15,7 +15,7 @@
   <parent>
     <groupId>com.camunda.fox</groupId>
     <artifactId>fox-platform-qa</artifactId>
-    <version>6.0.0-SNAPSHOT</version>
+    <version>6.0.sprint18-SNAPSHOT</version>
   </parent>
 
   <dependencies>

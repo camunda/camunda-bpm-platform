@@ -29,14 +29,14 @@ import org.activiti.engine.impl.interceptor.JtaTransactionInterceptor;
 import org.activiti.engine.impl.interceptor.LogInterceptor;
 
 import com.camunda.fox.platform.FoxPlatformException;
-import com.camunda.fox.platform.impl.AbstractProcessEngineService;
+import com.camunda.fox.platform.impl.service.ProcessEngineController;
 
 /**
  * @author Daniel Meyer
  */
 public class JtaCmpeProcessEngineConfiguration extends CmpeProcessEngineConfiguration {
 
-  public JtaCmpeProcessEngineConfiguration(AbstractProcessEngineService processEngineServiceBean) {
+  public JtaCmpeProcessEngineConfiguration(ProcessEngineController processEngineServiceBean) {
     super(processEngineServiceBean);
   }
   

@@ -20,6 +20,7 @@
     <module>qa</module>
     <module>jbossas71</module>
     <module>explorer</module>
+	<module>examples</module>
     <module>cdi-lib</module>
     <module>ejb-service</module>
     <module>ibmWs8</module>

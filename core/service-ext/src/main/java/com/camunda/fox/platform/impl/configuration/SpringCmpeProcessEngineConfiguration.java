@@ -16,9 +16,9 @@ import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.jta.JtaTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
 
-import com.camunda.fox.platform.impl.AbstractProcessEngineService;
 import com.camunda.fox.platform.impl.jobexecutor.commonj.WorkManagerJobExecutor;
 import com.camunda.fox.platform.impl.jobexecutor.simple.SimpleJobExecutor;
+import com.camunda.fox.platform.impl.service.ProcessEngineController;
 import com.camunda.fox.platform.impl.transactions.spi.TransactionManagerFactory;
 import com.camunda.fox.platform.impl.util.Services;
 
@@ -59,8 +59,8 @@ public class SpringCmpeProcessEngineConfiguration extends CmpeProcessEngineConfi
   
   protected PlatformTransactionManager transactionManager;
   
-  public SpringCmpeProcessEngineConfiguration(AbstractProcessEngineService processEngineServiceBean) {
-    super(processEngineServiceBean);
+  public SpringCmpeProcessEngineConfiguration(ProcessEngineController processEngineController) {
+    super(processEngineController);
   }
     
   @Override
@@ -70,11 +70,10 @@ public class SpringCmpeProcessEngineConfiguration extends CmpeProcessEngineConfi
   }
 
   protected void initSpringTransactionManager() {
-    if(transactionManager != null) {
-      return;
+    if(transactionManager == null) {      
+      TransactionManagerFactory transactionManagerFactory = Services.getService(TransactionManagerFactory.class);
+      transactionManager = transactionManagerFactory.getTransactionManager();
     }
-    TransactionManagerFactory transactionManagerFactory = Services.getService(TransactionManagerFactory.class);
-    transactionManager = transactionManagerFactory.getTransactionManager();
   }
 
   @Override

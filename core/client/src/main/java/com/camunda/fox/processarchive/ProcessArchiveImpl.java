@@ -33,10 +33,12 @@ public class ProcessArchiveImpl implements ProcessArchive {
   protected final ProcessesXml processesXml;
   protected final ClassLoader classLoader;
   protected final ProcessArchiveContextExecutor executor;
+  private final String defaultProcessEngineName;
     
-  public ProcessArchiveImpl(ProcessesXml processesXml, ProcessArchiveContextExecutor executor) {
+  public ProcessArchiveImpl(ProcessesXml processesXml, ProcessArchiveContextExecutor executor, String defaultProcessEngineName) {
     this.processesXml = processesXml;
     this.executor = executor;
+    this.defaultProcessEngineName = defaultProcessEngineName;
     this.classLoader = getClass().getClassLoader();    
   }
   
@@ -65,5 +67,15 @@ public class ProcessArchiveImpl implements ProcessArchive {
   public <T> T executeWithinContext(ProcessArchiveCallback<T> callback) throws Exception {
     return executor.executeWithinContext(callback);
  }
+
+  @Override
+  public String getProcessEngineName() {
+    return defaultProcessEngineName;
+  }
+
+  @Override
+  public boolean scanForProcessDefinitions() {
+    return true;
+  }
   
 }

@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	template="/WEB-INF/templates/template.xhtml">
+	<ui:define name="content">
+
+		<h1>List of assigned Tasks</h1>
+
+		<h:form>
+			<p>
+				Tasks for user: 
+				<h:inputText value="#{currentUser.username}"> 
+					<f:ajax render="taskList" event="keyup" />
+				</h:inputText>
+			</p>			
+
+			<h:dataTable value="#{personalTaskList}" var="v_task" id="taskList">
+				<h:column>
+					<f:facet name="header">Task Name</f:facet>
+						#{v_task.name}
+					</h:column>
+				<h:column>
+					<f:facet name="header">Description</f:facet>
+						#{v_task.description}
+					</h:column>
+				<h:column>
+					<f:facet name="header">Action</f:facet>
+					<h:outputLink
+						value="#{formService.getTaskFormData(v_task.id).formKey}">
+					Complete
+					<f:param name="taskId" value="#{v_task.id}"></f:param>
+					</h:outputLink>
+				</h:column>
+			</h:dataTable>
+
+		</h:form>
+
+	</ui:define>
+</ui:composition>

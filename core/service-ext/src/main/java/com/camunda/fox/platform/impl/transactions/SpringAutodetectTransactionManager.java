@@ -16,7 +16,7 @@ import com.camunda.fox.platform.impl.transactions.spi.TransactionManagerFactory;
  * @author Daniel Meyer
  */
 public class SpringAutodetectTransactionManager extends JtaTransactionManagerBeanDefinitionParser implements TransactionManagerFactory {
-
+  
   private static Logger log = Logger.getLogger(SpringAutodetectTransactionManager.class.getName());
 
   public JtaTransactionManager getTransactionManager() {

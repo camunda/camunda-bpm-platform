@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>fox-platform-core-bom</artifactId>
-  <version>6.0.0-SNAPSHOT</version>
+  <version>6.0.sprint18-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>fox platform EE - core bill of material</name>
@@ -17,7 +17,7 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <fox.engine.version>6.0.sprint18-SNAPSHOT</fox.engine.version>
+    <fox.engine.version>${project.version}</fox.engine.version>
   </properties>
 
   <dependencyManagement>

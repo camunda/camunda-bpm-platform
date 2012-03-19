@@ -120,7 +120,12 @@
         <subsystem xmlns="urn:jboss:domain:deployment-scanner:1.1">
             <deployment-scanner path="deployments" relative-to="jboss.server.base.dir" scan-interval="5000"/>
         </subsystem>
-        <subsystem xmlns="urn:jboss:domain:ee:1.0"/>
+        <subsystem xmlns="urn:jboss:domain:ee:1.0">
+          <global-modules>
+            <module name="com.camunda.fox.fox-platform-api" />
+            <module name="com.camunda.fox.fox-engine" />
+          </global-modules>
+        </subsystem>
         <subsystem xmlns="urn:jboss:domain:ejb3:1.2">
             <session-bean>
                 <stateless>
@@ -288,7 +293,7 @@
         <subsystem xmlns="urn:jboss:domain:weld:1.0"/>
         <subsystem xmlns="urn:com.camunda.fox.fox-platform:1.0">
                 <process-engines>
-                    <process-engine name="process-engine" datasource="java:jboss/datasources/FoxEngineDS" />
+                    <process-engine name="default" datasource="java:jboss/datasources/FoxEngineDS" />
                 </process-engines>
         </subsystem>
     </profile>

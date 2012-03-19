@@ -1,6 +1,6 @@
 <module xmlns="urn:jboss:module:1.0" name="com.camunda.fox.fox-engine">
   <resources>
-    <resource-root path="fox-engine-6.0.sprint18-SNAPSHOT.jar" />
+    <resource-root path="fox-engine-@project.version@.jar" />
   </resources>
 
   <dependencies>

@@ -17,11 +17,6 @@
     <module name="org.jboss.msc" />
     <module name="org.jboss.logging" />
     <module name="org.jboss.vfs" />
-    <module name="org.jboss.jandex" />
-    <module name="org.jboss.weld.spi" />
-    <module name="org.jboss.as.weld" />
-    <module name="org.jboss.as.naming" />
-    <module name="org.jboss.as.connector" />
         
     <module name="com.camunda.fox.fox-engine" />
     <module name="com.camunda.fox.fox-engine-cdi" />

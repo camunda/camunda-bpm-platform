@@ -25,29 +25,40 @@ import org.jboss.as.controller.OperationFailedException;
 import org.jboss.as.controller.ServiceVerificationHandler;
 import org.jboss.dmr.ModelNode;
 import org.jboss.msc.service.ServiceController;
+import org.jboss.msc.service.ServiceController.Mode;
+
+import com.camunda.fox.platform.subsystem.impl.platform.ContainerPlatformService;
 
 /**
  * Provides the description and the implementation of the subsystem#add operation.
- * 
- * Registers the {@link ProcessArchiveModuleDependencies}.
  * 
  * @author Daniel Meyer
  */
 public class SubsystemAddHandler extends AbstractBoottimeAddStepHandler {
   
   static final SubsystemAddHandler INSTANCE = new SubsystemAddHandler();
-
+  
+  /** {@inheritDoc} */
+  @Override
+  protected void populateModel(ModelNode operation, ModelNode model) throws OperationFailedException {
+    model.get(ELEMENT_PROCESS_ENGINES).setEmptyObject();
+  }
+  
   /** {@inheritDoc} */
   @Override
   protected void performBoottime(OperationContext context, ModelNode operation, ModelNode model, ServiceVerificationHandler verificationHandler,
           List<ServiceController< ? >> newControllers) throws OperationFailedException {
     
-  }
-
-  /** {@inheritDoc} */
-  @Override
-  protected void populateModel(ModelNode operation, ModelNode model) throws OperationFailedException {
-    model.get(ELEMENT_PROCESS_ENGINES).setEmptyObject();
+    final ContainerPlatformService containerPlatformService = new ContainerPlatformService();
+    
+    final ServiceController<ContainerPlatformService> controller = context.getServiceTarget()           
+            .addService(ContainerPlatformService.getServiceName(), containerPlatformService)        
+            .addListener(verificationHandler)
+            .setInitialMode(Mode.ACTIVE)
+            .install();
+    
+    newControllers.add(controller);
+    
   }
 
 }
