@@ -16,11 +16,11 @@
 package com.camunda.fox.platform.impl.configuration;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
 import javax.naming.InitialContext;
-import javax.naming.NamingException;
 import javax.transaction.TransactionManager;
 
 import org.activiti.engine.impl.interceptor.CommandContextInterceptor;
@@ -35,6 +35,13 @@ import com.camunda.fox.platform.impl.service.ProcessEngineController;
  * @author Daniel Meyer
  */
 public class JtaCmpeProcessEngineConfiguration extends CmpeProcessEngineConfiguration {
+  
+  /** common locations for the JTA transaction manger in JNDI*/
+  public static String[] TRANSACTION_MANAGER_LOCATIONS = {
+    "java:appserver/TransactionManager", // glassfish 3.1
+    "java:/TransactionManager", // jboss 6/7
+    "java:jboss/TransactionManager",  // jboss 7
+  };
 
   public JtaCmpeProcessEngineConfiguration(ProcessEngineController processEngineServiceBean) {
     super(processEngineServiceBean);
@@ -48,10 +55,26 @@ public class JtaCmpeProcessEngineConfiguration extends CmpeProcessEngineConfigur
 
   protected void initTransactionManager() {
     if(transactionManager == null) {
-      try {
-        transactionManager = InitialContext.doLookup(transactionManagerLookup);
-      } catch (NamingException e) {
-        throw new FoxPlatformException("Could not lookup JtaTransactionManager using name '"+transactionManagerLookup+".", e);
+      if(transactionManagerLookup == null) {
+        for (String transactionManagerLocation : TRANSACTION_MANAGER_LOCATIONS) {
+          try {
+            transactionManager = InitialContext.doLookup(transactionManagerLocation);
+            if(transactionManager != null) {            
+              break;
+            }
+          } catch (Exception e) {
+            // ignore
+          }                
+        }
+      } else {
+        try {
+          transactionManager = InitialContext.doLookup(transactionManagerLookup);
+        } catch (Exception e) {
+          throw new FoxPlatformException("Could not lookup a transaction manager using '"+transactionManagerLookup+"'", e);
+        }        
+      }
+      if(transactionManager == null) {            
+        throw new FoxPlatformException("Could not lookup a transaction manager using the following known locations: "+Arrays.toString(TRANSACTION_MANAGER_LOCATIONS));
       }
     }
   }
