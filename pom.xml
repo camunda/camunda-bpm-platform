@@ -4,7 +4,7 @@
 
   <groupId>com.camunda.fox</groupId>
   <artifactId>fox-platform</artifactId>
-  <version>6.0.0-SNAPSHOT</version>
+  <version>6.0.sprint18-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>fox platform EE (Enterprise Edition)</name>
@@ -21,7 +21,6 @@
     <module>jbossas71</module>
     <module>explorer</module>
 	<module>examples</module>
-    <module>cdi-lib</module>
     <module>ejb-service</module>
     <module>ibmWs8</module>
   </modules>
