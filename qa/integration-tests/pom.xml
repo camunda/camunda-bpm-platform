@@ -9,7 +9,7 @@
   <parent>
     <groupId>com.camunda.fox</groupId>
     <artifactId>fox-platform-qa</artifactId>
-    <version>6.0.0-SNAPSHOT</version>
+    <version>6.0.sprint18-SNAPSHOT</version>
   </parent>
   
   <dependencies>
@@ -60,6 +60,12 @@
       <artifactId>fox-engine</artifactId>
       <scope>provided</scope>
     </dependency>
+    
+    <dependency>
+      <groupId>com.camunda.fox</groupId>
+      <artifactId>fox-platform-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
   </dependencies>
 
   <build>
@@ -96,6 +102,12 @@
           <groupId>org.jboss.as</groupId>
           <artifactId>jboss-as-arquillian-container-managed</artifactId>
           <version>${version.jboss.as}</version>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.jboss.arquillian.protocol</groupId>
+          <artifactId>arquillian-protocol-servlet</artifactId>
+          <version>1.0.0.CR7</version>
           <scope>test</scope>
         </dependency>
       </dependencies>

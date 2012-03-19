@@ -7,12 +7,11 @@
        http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
        http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee-3.0.xsd">
   
-  <!-- look up the container managed process engine -->
   <bean id="processEngineService" class="org.springframework.jndi.JndiObjectFactoryBean">
-	<property name="jndiName" value="java:global/camunda-fox-platform/process-engine/ProcessEngineService!com.camunda.fox.platform.api.ProcessEngineService" />
+	<property name="jndiName" value="java:global/camunda-fox-platform/process-engine/PlatformService!com.camunda.fox.platform.api.ProcessEngineService" />
   </bean>
   
-  <bean id="processEngine" factory-bean="processEngineService" factory-method="getProcessEngine" />
+  <bean id="processEngine" factory-bean="processEngineService" factory-method="getDefaultProcessEngine" />  
   
   <bean id="demoDataGenerator" class="org.activiti.explorer.demo.DemoDataGenerator">
     <property name="processEngine" ref="processEngine" />

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	template="/WEB-INF/templates/template.xhtml">
+	<ui:define name="content">
+
+		<h1>List of deployed processes</h1>
+
+		<h:dataTable value="#{processDefinitionList}" var="v_process">
+			<h:column>
+				<f:facet name="header">Key</f:facet>
+				#{v_process.key} 
+			</h:column>
+			<h:column>
+				<f:facet name="header">Name</f:facet>
+				#{v_process.name}
+			</h:column>
+			<h:column>
+				<f:facet name="header">Version</f:facet>
+				#{v_process.version}
+			</h:column>
+			<h:column>
+				<f:facet name="header">Action</f:facet>
+				<h:outputLink value="#{formService.getStartFormData(v_process.id).formKey}">
+					Start
+					<f:param name="processDefinitionKey" value="#{v_process.key}"></f:param>
+				</h:outputLink>
+			</h:column>
+		</h:dataTable>
+
+
+	</ui:define>
+</ui:composition>

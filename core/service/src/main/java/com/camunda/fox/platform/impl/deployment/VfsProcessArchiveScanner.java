@@ -53,7 +53,7 @@ public class VfsProcessArchiveScanner implements ProcessArchiveScanner {
     Map<String, byte[]> resources = new HashMap<String, byte[]>();
     
     Module module = Module.forClassLoader(processArchive.getClassLoader(), true);
-    Enumeration<URL> markerFileLocations = module.getExportedResources(ProcessArchive.MARKER_FILE_LOCATION);
+    Enumeration<URL> markerFileLocations = module.getExportedResources(MARKER_FILE_LOCATION);
     while (markerFileLocations.hasMoreElements()) { 
       URL url = markerFileLocations.nextElement();
       try {
@@ -74,7 +74,7 @@ public class VfsProcessArchiveScanner implements ProcessArchiveScanner {
     try {
       List<VirtualFile> deployableResources = processArchiveRoot.getChildrenRecursively(new VirtualFileFilter() {
         public boolean accepts(VirtualFile file) {
-          return file.getName().endsWith(ProcessArchive.BPMN_20_RESOURCE_SUFFIX);
+          return file.getName().endsWith(BPMN_20_RESOURCE_SUFFIX);
         }
       });
       for (VirtualFile virtualFile : deployableResources) {

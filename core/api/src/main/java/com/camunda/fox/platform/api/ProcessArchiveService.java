@@ -15,16 +15,18 @@
  */
 package com.camunda.fox.platform.api;
 
+import java.util.List;
+
 import org.activiti.engine.ProcessEngine;
 
 import com.camunda.fox.platform.spi.ProcessArchive;
 
 /**
- * <p>The container-managed process archive service.</p>
+ * <p>The process archive service manages {@link ProcessArchive} deployments.</p>
  *
  * <p>This class allows to install and uninstall {@link ProcessArchive ProcessArchives} 
- * on the container managed process engine service and through that process, obtain an 
- * handle to a {@link ProcessEngine}.</p>
+ * to a managed process engine and through that process, obtain a handle to 
+ * a {@link ProcessEngine}.</p>
  * 
  * <p>Users of this class may look up an instance of the service through a lookup strategy
  * appropriate for the platform they are using (Examples: Jndi, OSGi Service Registry ...)</p>
@@ -32,9 +34,33 @@ import com.camunda.fox.platform.spi.ProcessArchive;
  * @author Daniel Meyer
  */
 public interface ProcessArchiveService {
-
-  public ProcessEngine installProcessArchive(ProcessArchive processArchive);
+  
+  public ProcessArchiveInstallation installProcessArchive(ProcessArchive processArchive);
 
   public void unInstallProcessArchive(ProcessArchive processArchive);
+  
+  public void unInstallProcessArchive(String processArchiveName);
+  
+  public List<ProcessArchive> getInstalledProcessArchives();
+  
+  public List<ProcessArchive> getInstalledProcessArchives(ProcessEngine processEngine);
+  
+  public List<ProcessArchive> getInstalledProcessArchives(String processEngineName);
+  
+  // operations ////////////////////////////////////
+  
+  public static interface ProcessArchiveInstallation {
 
+    /**
+     * @return the {@link ProcessEngine} to which the {@link ProcessArchive} was installed.
+     */
+    public ProcessEngine getProcessenEngine();
+    
+    /**
+     * @return the id of the deployment made to the {@link ProcessEngine}. 
+     */
+    public String getProcessEngineDeploymentId();
+    
+  }
+  
 }

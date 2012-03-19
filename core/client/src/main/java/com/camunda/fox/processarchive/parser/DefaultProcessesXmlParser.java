@@ -26,7 +26,6 @@ import javax.xml.bind.Unmarshaller;
 import org.activiti.engine.impl.util.IoUtil;
 
 import com.camunda.fox.platform.FoxPlatformException;
-import com.camunda.fox.platform.spi.ProcessArchive;
 import com.camunda.fox.processarchive.parser.spi.ProcessesXmlParser;
 import com.camunda.fox.processarchive.schema.ProcessesXml;
 
@@ -37,13 +36,15 @@ import com.camunda.fox.processarchive.schema.ProcessesXml;
  */
 public class DefaultProcessesXmlParser implements ProcessesXmlParser {
   
+  private static final String MARKER_FILE_LOCATION = "META-INF/processes.xml";
+  
   private static Logger log = Logger.getLogger(DefaultProcessesXmlParser.class.getName());
   
   public ProcessesXml parseProcessesXml() {
     InputStream processesXmlStream = getProcessesXmlAsStream();  
     try {      
       if(processesXmlStream == null) { // markerfile not found
-        throw new FoxPlatformException("Could not locate '"+ProcessArchive.MARKER_FILE_LOCATION+"'.");
+        throw new FoxPlatformException("Could not locate '"+MARKER_FILE_LOCATION+"'.");
       } else if(isEmptyStream(processesXmlStream)) { // markerfile empty
         return handleEmptyMarkerfile();
       } else {         
@@ -60,7 +61,7 @@ public class DefaultProcessesXmlParser implements ProcessesXmlParser {
     try {
       return processesXmlStream.available() == 0;
     } catch (IOException e) {
-      log.log(Level.INFO, "Exception while reading '"+ProcessArchive.MARKER_FILE_LOCATION+"': "+e.getMessage(),e);
+      log.log(Level.INFO, "Exception while reading '"+MARKER_FILE_LOCATION+"': "+e.getMessage(),e);
       return false;
     }
   }
@@ -72,12 +73,12 @@ public class DefaultProcessesXmlParser implements ProcessesXmlParser {
       ProcessesXml processesXml = (ProcessesXml) unmarshaller.unmarshal(processesXmlStream);       
       return processesXml;
     }catch (Exception e) {
-      throw new FoxPlatformException("Exception while parsing '"+ProcessArchive.MARKER_FILE_LOCATION+"': "+e.getMessage(),e);
+      throw new FoxPlatformException("Exception while parsing '"+MARKER_FILE_LOCATION+"': "+e.getMessage(),e);
     }
   }
 
   protected ProcessesXml handleEmptyMarkerfile() {
-    log.info(""+ProcessArchive.MARKER_FILE_LOCATION+" is empty: using default values for process archive.");
+    log.info(""+MARKER_FILE_LOCATION+" is empty: using default values for process archive.");
     return new ProcessesXml();
   }
 

@@ -39,6 +39,7 @@ import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.test.Deployment;
 
 import com.camunda.fox.platform.api.ProcessArchiveService;
+import com.camunda.fox.platform.api.ProcessEngineService;
 import com.camunda.fox.platform.spi.ProcessArchive;
 import com.camunda.fox.platform.spi.ProcessArchiveCallback;
 import com.camunda.fox.processarchive.executor.ProcessArchiveContextExecutor;
@@ -134,14 +135,19 @@ public abstract class TestHelper {
       public <T> T executeWithinContext(ProcessArchiveCallback<T> callback) throws Exception {
         return processArchiveContextExecutor.executeWithinContext(callback);
       }
+
+      @Override
+      public String getProcessEngineName() {
+        return null;
+      }
+
+      @Override
+      public boolean scanForProcessDefinitions() {
+        return false;
+      }
     };
     
-    ProcessEngine processEngine = processArchiveService.installProcessArchive(processArchive);
-      
-    return processEngine.getRepositoryService()
-             .createDeploymentQuery()
-             .singleResult()
-             .getId();
+    return processArchiveService.installProcessArchive(processArchive).getProcessEngineDeploymentId();      
   }
 
   public static void annotationDeploymentTearDown(ProcessEngine processEngine, String deploymentId, Class<?> testClass, String methodName) {

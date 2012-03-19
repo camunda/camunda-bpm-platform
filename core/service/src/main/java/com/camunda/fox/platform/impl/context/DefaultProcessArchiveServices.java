@@ -28,8 +28,8 @@ import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
 
 import com.camunda.fox.platform.FoxPlatformException;
-import com.camunda.fox.platform.impl.AbstractProcessEngineService;
 import com.camunda.fox.platform.impl.context.spi.ProcessArchiveServices;
+import com.camunda.fox.platform.impl.service.ProcessEngineController;
 import com.camunda.fox.platform.spi.ProcessArchiveCallback;
 
 /**
@@ -39,10 +39,10 @@ public class DefaultProcessArchiveServices implements ProcessArchiveServices {
   
   private static Logger log = Logger.getLogger(DefaultProcessArchiveServices.class.getName());
 
-  protected AbstractProcessEngineService processEngineServiceBean;
+  protected ProcessEngineController processEngineServiceController;
     
-  public void setProcessEngineServiceBean(AbstractProcessEngineService processEngineServiceBean) {
-    this.processEngineServiceBean = processEngineServiceBean;
+  public void setProcessEngineServiceBean(ProcessEngineController processEngineServiceController) {
+    this.processEngineServiceController = processEngineServiceController;
   }
 
   public BeanManager getBeanManager() {
@@ -83,7 +83,7 @@ public class DefaultProcessArchiveServices implements ProcessArchiveServices {
   }
 
   public ProcessArchiveContext getProcessArchiveContext(String processDefinitionKey) {
-    return processEngineServiceBean.getProcessArchiveContext(processDefinitionKey);
+    return processEngineServiceController.getProcessArchiveContext(processDefinitionKey);
   }
   
   @Override

@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>fox-platform-core</artifactId>
-  <version>6.0.0-SNAPSHOT</version>
+  <version>6.0.sprint18-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>fox platform EE - core</name>
@@ -17,7 +17,7 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <fox.engine.version>6.0.sprint18-SNAPSHOT</fox.engine.version>
+    <fox.engine.version>${project.version}</fox.engine.version>
   </properties>
 
   <dependencyManagement>
@@ -53,7 +53,7 @@
     <repository>
       <id>camunda-fox</id>
       <name>camunda fox Maven Mirror</name>
-      <url>http://fox.camunda.com/mvn/</url>
+      <url>http://fox.camunda.com/enterprise/mvn/</url>
       <releases>
         <enabled>true</enabled>
         <updatePolicy>always</updatePolicy>
@@ -81,5 +81,22 @@
     <module>deployer</module>
     <module>service-ext</module>
   </modules>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-source-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>attach-sources</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 
 </project>

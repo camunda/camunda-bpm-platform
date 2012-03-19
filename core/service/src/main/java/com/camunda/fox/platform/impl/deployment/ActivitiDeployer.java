@@ -63,12 +63,11 @@ public class ActivitiDeployer extends AbstractActivitiDeployer {
   }
   
   protected Map<String, byte[]> getDeployableResources(ProcessArchive processArchive) {
-    Map<String, byte[]> processResources = processArchive.getProcessResources();
-    if(processResources.size() != 0) { // proceses declared in processes.xml
-      return processResources;
+    if(processArchive.scanForProcessDefinitions()) {
+      return processArchiveScanner.findResources(processArchive);      
     } else {
-      return processArchiveScanner.findResources(processArchive);
-    }
+      return processArchive.getProcessResources();
+    }    
   }
 
   public void processArchiveUndeployed(ProcessArchive processArchive) {

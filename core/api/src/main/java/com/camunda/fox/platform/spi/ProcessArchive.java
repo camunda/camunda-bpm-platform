@@ -17,15 +17,14 @@ package com.camunda.fox.platform.spi;
 
 import java.util.Map;
 
+import javax.naming.InitialContext;
+
 /**
- * <p>A process archive represents an application deployed to the fox platform</p>
+ * <p>A process archive represents a deployment to the fox platform</p>
  * 
  * @author Daniel Meyer
  */
 public interface ProcessArchive {
-  
-  public static final String MARKER_FILE_LOCATION = "META-INF/processes.xml";
-  public static final String BPMN_20_RESOURCE_SUFFIX = ".bpmn20.xml";
   
   /**
    * The name of the process archive (must be unique for a given process engine)
@@ -33,7 +32,22 @@ public interface ProcessArchive {
   public String getName();
   
   /**
-   * The diagram resources as byte arrays
+   * If this method returns 'null', the default process engine is used. 
+   * 
+   * @return the name of the process engine this process archive is to be deployed to.
+   */
+  public String getProcessEngineName();
+  
+  /**
+   * 
+   * @return true if the classloader should be scanned for process definitions.
+   */
+  public boolean scanForProcessDefinitions();
+  
+  /**
+   * This method is only invoked if {@link #scanForProcessDefinitions()} returns false.
+   *  
+   * @return a collection of named process definitions as byte arrays. 
    */
   public Map<String, byte[]> getProcessResources();
   
@@ -44,6 +58,8 @@ public interface ProcessArchive {
   public boolean isDeleteUponUndeploy();
   
   /**
+   * <p>Executes a callback inside the context of the process archive</p>
+   * 
    * <p>Allows the CMPE (Container-Managed Process Engine) to perform context switching and 
    * execute commands within the context of the process archive.</p>
    * 
@@ -64,5 +80,5 @@ public interface ProcessArchive {
    * @return the {@link ClassLoader} used to load classes from the process archive. 
    */
   public ClassLoader getClassLoader();
-
+  
 }

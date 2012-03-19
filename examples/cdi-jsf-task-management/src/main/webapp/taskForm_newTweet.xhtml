@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	template="/WEB-INF/templates/template.xhtml">
+	
+	<ui:define name="metadata">
+    	<f:metadata>
+			<!-- bind the key of the process to be started -->
+			<f:viewParam name="processDefinitionKey" value="#{processList.processDefinitionKey}" />
+		</f:metadata>
+    </ui:define>
+	
+	<ui:define name="content">		
+		<h1>New Tweet</h1>
+		<h:form>
+			<table>
+				<tr>
+					<td>Your twitter account:</td>
+					<td><h:inputText value="#{processVariables['twitterAccount']}" />
+					</td>
+				</tr>
+				<tr>
+					<td>Tweet content:</td>
+					<td><h:inputText value="#{processVariables['tweetContent']}" />
+					</td>
+				</tr>
+				<tr>
+					<td></td>
+					<td><h:commandButton value="Submit"
+							action="#{businessProcess.startProcessByKey(processList.processDefinitionKey)}" />
+					</td>
+				</tr>
+			</table>
+		</h:form>
+	</ui:define>
+
+</ui:composition>

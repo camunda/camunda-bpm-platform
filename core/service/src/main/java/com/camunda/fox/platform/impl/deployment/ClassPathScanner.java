@@ -15,9 +15,6 @@
  */
 package com.camunda.fox.platform.impl.deployment;
 
-import static com.camunda.fox.platform.spi.ProcessArchive.BPMN_20_RESOURCE_SUFFIX;
-import static com.camunda.fox.platform.spi.ProcessArchive.MARKER_FILE_LOCATION;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -49,7 +46,7 @@ import com.camunda.fox.platform.spi.ProcessArchive;
  * @author Daniel Meyer
  */
 public class ClassPathScanner implements ProcessArchiveScanner {
-  
+
   private static Logger log = Logger.getLogger(ClassPathScanner.class.getName());
   
   @Override

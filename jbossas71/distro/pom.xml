@@ -3,13 +3,13 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>camunda-fox-ce</artifactId>
+  <artifactId>fox-platform-jboss-distro</artifactId>
   <packaging>pom</packaging>
 
   <parent>
     <groupId>com.camunda.fox</groupId>
     <artifactId>fox-platform-jboss</artifactId>
-    <version>6.0.0-SNAPSHOT</version>
+    <version>6.0.sprint18-SNAPSHOT</version>
   </parent>
 
   <name>fox platform EE - jboss7 distro</name>
@@ -28,7 +28,14 @@
 
     <dependency>
       <groupId>com.camunda.fox</groupId>
-      <artifactId>camunda-fox-ce-explorer</artifactId>
+      <artifactId>camunda-fox-ee-explorer</artifactId>
+      <version>${project.version}</version>
+      <type>war</type>
+    </dependency>
+    
+    <dependency>
+      <groupId>com.camunda.fox.examples</groupId>
+      <artifactId>fox-examples-cdi-jsf-taskmanagement</artifactId>
       <version>${project.version}</version>
       <type>war</type>
     </dependency>

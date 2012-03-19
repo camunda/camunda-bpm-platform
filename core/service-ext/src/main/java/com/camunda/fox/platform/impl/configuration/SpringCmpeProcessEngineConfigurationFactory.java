@@ -1,9 +1,9 @@
 package com.camunda.fox.platform.impl.configuration;
 
-import com.camunda.fox.platform.impl.AbstractProcessEngineService;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 
 import com.camunda.fox.platform.impl.configuration.spi.ProcessEngineConfigurationFactory;
+import com.camunda.fox.platform.impl.service.ProcessEngineController;
 
 /**
  * <p>Default {@link ProcessEngineConfigurationFactory}, returning a {@link SpringCmpeProcessEngineConfiguration}</p>
@@ -13,18 +13,14 @@ import com.camunda.fox.platform.impl.configuration.spi.ProcessEngineConfiguratio
  */
 public class SpringCmpeProcessEngineConfigurationFactory implements ProcessEngineConfigurationFactory {
 
-  protected AbstractProcessEngineService processEngineServiceBean;
-
-  public void setProcessEngineServiceBean(AbstractProcessEngineService processEngineServiceBean) {
-    this.processEngineServiceBean = processEngineServiceBean;
-  }
-
-  public AbstractProcessEngineService getProcessEngineServiceBean() {
-    return processEngineServiceBean;
+  protected ProcessEngineController processEngineController;
+  
+  public void setProcessEngineController(ProcessEngineController processEngineController) {
+    this.processEngineController = processEngineController;
   }
   
   public ProcessEngineConfigurationImpl getProcessEngineConfiguration() {
-    return new SpringCmpeProcessEngineConfiguration(processEngineServiceBean);
+    return new SpringCmpeProcessEngineConfiguration(processEngineController);
   }
 
 }
