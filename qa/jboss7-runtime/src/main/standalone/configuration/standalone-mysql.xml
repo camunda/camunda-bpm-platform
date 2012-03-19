@@ -103,7 +103,15 @@
                     </security>
                 </datasource>
                 <datasource jndi-name="java:jboss/datasources/FoxEngineDS" enabled="true" use-java-context="true" jta="true" use-ccm="true" pool-name="FoxEngineDS">
-                    <connection-url>jdbc:mysql://localhost:3306/cockpit-test</connection-url>
+                    <connection-url>jdbc:mysql://localhost:3306/fox-test</connection-url>
+                    <driver>mysql</driver>
+                    <security>
+                        <user-name>cockpit</user-name>
+                        <password>cockpit</password>
+                    </security>
+                </datasource>
+                <datasource jndi-name="java:jboss/datasources/CockpitDS" enabled="true" use-java-context="true" jta="true" use-ccm="true" pool-name="CockpitDS">
+                    <connection-url>jdbc:mysql://localhost:3306/fox-test</connection-url>
                     <driver>mysql</driver>
                     <security>
                         <user-name>cockpit</user-name>
@@ -111,8 +119,11 @@
                     </security>
                 </datasource>
                 <drivers>
-                    <driver name="mysql" module="mysql">
+                    <driver name="mysql" module="mysql.mysql-connector-java">
                         <xa-datasource-class>com.mysql.jdbc.jdbc2.optional.MysqlXADataSource</xa-datasource-class>
+                    </driver>
+                    <driver name="h2" module="com.h2database.h2">
+                        <xa-datasource-class>org.h2.jdbcx.JdbcDataSource</xa-datasource-class>
                     </driver>
                 </drivers>
             </datasources>

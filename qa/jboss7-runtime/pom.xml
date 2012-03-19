@@ -78,12 +78,11 @@
             </goals>
             <configuration>
               <target unless="maven.test.skip">
-
                 <dependencyfilesets scopes="test" />
                 
                 <copy todir="target/jboss-as-${version.jboss.as}/modules" flatten="false">
                   <fileset refid="maven.project.dependencies" />
-                  <regexpmapper from="^(.*)/([^/]+)/([^/]*)$$" to="\1/main/\3" handledirsep="yes" />                  
+                  <regexpmapper from="^(.*)/([^/]+)/([^/]*)$$" to="\1/main/\3" handledirsep="yes" />
                 </copy>
 
                 <copy todir="target/jboss-as-${version.jboss.as}/modules" flatten="false">
