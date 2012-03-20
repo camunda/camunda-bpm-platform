@@ -1,6 +1,6 @@
 
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>camunda-fox-enterprise-edition-jboss</artifactId>
@@ -17,8 +17,8 @@
   <dependencies>
 
     <dependency>
-      <!-- this dependency is to make sure that we are executed after the integration 
-        tests have passed in the reactor -->
+      <!-- this dependency is to make sure that we are executed after the 
+        integration tests have passed in the reactor -->
       <groupId>com.camunda.fox</groupId>
       <artifactId>fox-platform-qa</artifactId>
       <version>${project.version}</version>
@@ -32,21 +32,21 @@
       <version>${project.version}</version>
       <type>war</type>
     </dependency>
-    
+
     <dependency>
       <groupId>com.camunda.fox.examples</groupId>
       <artifactId>fox-examples-cdi-jsf-taskmanagement</artifactId>
       <version>${project.version}</version>
       <type>war</type>
     </dependency>
-    
+
     <dependency>
       <groupId>com.camunda.fox.cockpit</groupId>
       <artifactId>cockpit-webapp-fox</artifactId>
       <version>${project.version}</version>
       <type>war</type>
     </dependency>
-    
+
     <dependency>
       <groupId>com.camunda.fox.cycle</groupId>
       <artifactId>cycle-webapp-fox-ee</artifactId>
@@ -64,41 +64,34 @@
   </dependencies>
 
 
-  <profiles>
-    <profile>
-      <id>distro</id>
-      <activation>
-        <activeByDefault>false</activeByDefault>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-assembly-plugin</artifactId>
-            <version>2.3</version>
-            <executions>
-              <execution>
-                <id>distro</id>
-                <phase>package</phase>
-                <goals>
-                  <goal>single</goal>
-                </goals>
-                <configuration>
-                  <descriptors>
-                    <descriptor>assembly.xml</descriptor>
-                  </descriptors>
-                  <attach>true</attach>
-                  <appendAssemblyId>false</appendAssemblyId>
-                  <outputDirectory>target/</outputDirectory>
-                  <workDirectory>target/assembly/work</workDirectory>
-                  <tarLongFileMode>gnu</tarLongFileMode>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-  </profiles>
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <version>2.3</version>
+        <executions>
+          <execution>
+            <id>distro</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <configuration>
+              <descriptors>
+                <descriptor>assembly.xml</descriptor>
+              </descriptors>
+              <attach>true</attach>
+              <appendAssemblyId>false</appendAssemblyId>
+              <outputDirectory>target/</outputDirectory>
+              <workDirectory>target/assembly/work</workDirectory>
+              <tarLongFileMode>gnu</tarLongFileMode>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
 
 </project>
