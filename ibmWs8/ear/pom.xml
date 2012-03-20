@@ -39,7 +39,7 @@
   <dependencies>
     <dependency>
       <groupId>com.camunda.fox</groupId>
-      <artifactId>fox-platform-cdi-lib</artifactId>
+      <artifactId>fox-engine-cdi</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
