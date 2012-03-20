@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>fox-platform-core-bom</artifactId>
-  <version>6.0.sprint18-SNAPSHOT</version>
+  <version>1.18.4</version>
   <packaging>pom</packaging>
 
   <name>fox platform EE - core bill of material</name>
@@ -11,7 +11,7 @@
   <parent>
     <groupId>com.camunda.fox</groupId>
     <artifactId>fox-engine-root</artifactId>
-    <version>6.0.sprint18-SNAPSHOT</version>
+    <version>1.18.4</version>
   </parent>
 
   <properties>
