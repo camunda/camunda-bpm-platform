@@ -39,6 +39,20 @@
       <version>${project.version}</version>
       <type>war</type>
     </dependency>
+    
+    <dependency>
+      <groupId>com.camunda.fox.cockpit</groupId>
+      <artifactId>cockpit-webapp-fox</artifactId>
+      <version>${project.version}</version>
+      <type>war</type>
+    </dependency>
+    
+    <dependency>
+      <groupId>com.camunda.fox.cycle</groupId>
+      <artifactId>cycle-webapp-fox-ee</artifactId>
+      <version>${project.version}</version>
+      <type>war</type>
+    </dependency>
 
   </dependencies>
 

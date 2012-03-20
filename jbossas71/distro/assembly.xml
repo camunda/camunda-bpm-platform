@@ -72,13 +72,7 @@
         <include>*:war:*</include>
       </includes>
       <outputDirectory>server/jboss-as-${version.jboss.as}/standalone/deployments</outputDirectory>
-    </dependencySet>
-    <dependencySet>
-      <includes>
-        <include>*:war:*</include>
-      </includes>
-      <outputDirectory>examples/bin/</outputDirectory>
-    </dependencySet>
+    </dependencySet>   
   </dependencySets>
 
 </assembly>
