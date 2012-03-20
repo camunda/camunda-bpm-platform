@@ -3,7 +3,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>fox-platform-jboss-distro</artifactId>
+  <artifactId>camunda-fox-enterprise-edition-jboss</artifactId>
   <packaging>pom</packaging>
 
   <parent>
@@ -50,6 +50,13 @@
     <dependency>
       <groupId>com.camunda.fox.cycle</groupId>
       <artifactId>cycle-webapp-fox-ee</artifactId>
+      <version>${project.version}</version>
+      <type>war</type>
+    </dependency>
+
+    <dependency>
+      <groupId>com.camunda.fox</groupId>
+      <artifactId>camunda-fox-h2-webapp</artifactId>
       <version>${project.version}</version>
       <type>war</type>
     </dependency>
