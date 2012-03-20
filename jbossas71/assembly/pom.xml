@@ -12,7 +12,7 @@
   <parent>
     <groupId>com.camunda.fox</groupId>
     <artifactId>fox-platform-jboss</artifactId>
-    <version>6.0.sprint18-SNAPSHOT</version>
+    <version>1.18.1</version>
   </parent>
 
   <name>fox platform EE - jboss7 assembly</name>
