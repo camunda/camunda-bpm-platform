@@ -19,7 +19,7 @@
     <dependency>
       <groupId>com.camunda.fox</groupId>
       <artifactId>fox-engine-webapp-explorer2</artifactId>
-      <version>${fox.engine.version}</version>
+      <version>${project.version}</version>
       <type>war</type>
     </dependency>
     
