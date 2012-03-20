@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>fox-platform-core</artifactId>
-  <version>1.18.4.CR</version>
+  <version>1.19.0.CR-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>fox platform CE - core</name>
@@ -12,12 +12,12 @@
   <parent>
     <groupId>com.camunda.fox</groupId>
     <artifactId>fox-engine-root</artifactId>
-    <version>1.18.4.CR</version>
+    <version>1.19.0.CR-SNAPSHOT</version>
   </parent>
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <fox.engine.version>1.18.4.CR</fox.engine.version>
+    <fox.engine.version>1.19.0.CR-SNAPSHOT</fox.engine.version>
   </properties>
 
   <dependencyManagement>
