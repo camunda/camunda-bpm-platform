@@ -22,6 +22,6 @@
     <module>explorer</module>
 	<module>examples</module>
     <module>ejb-service</module>
-    <module>ibmWs8</module>
+    <!-- <module>ibmWs8</module> -->
   </modules>
 </project>
