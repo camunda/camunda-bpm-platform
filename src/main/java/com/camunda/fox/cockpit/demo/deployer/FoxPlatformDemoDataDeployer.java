@@ -16,7 +16,7 @@ public class FoxPlatformDemoDataDeployer implements DemoDataDeployer {
      "java:global/" +
      "camunda-fox-platform/" +
      "process-engine/" +
-     "ProcessEngineService!com.camunda.fox.platform.api.ProcessArchiveService")
+     "PlatformService!com.camunda.fox.platform.api.ProcessArchiveService")
   protected ProcessArchiveService processEngineService;
  
   // lookup the process archive context executor
