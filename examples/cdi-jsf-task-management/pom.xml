@@ -4,7 +4,7 @@
 	<artifactId>fox-examples-cdi-jsf-taskmanagement</artifactId>	
 	<name>fox platform EE - examples taskmanagement</name>
 	<packaging>war</packaging>
-	<version>1.18.4</version>
+	<version>6.0.sprint18-SNAPSHOT</version>
 
 	<dependencies>
 		<dependency>
@@ -73,8 +73,8 @@
 	</repositories>
   
     <scm>
-   <connection>scm:git:git@bitbucket.org:camunda/fox-platform-ee.git/tags/1.18.4</connection>
-   <developerConnection>scm:git:git@bitbucket.org:camunda/fox-platform-ee.git/tags/1.18.4</developerConnection>
+   <connection>scm:git:git@bitbucket.org:camunda/fox-platform-ee.git</connection>
+   <developerConnection>scm:git:git@bitbucket.org:camunda/fox-platform-ee.git</developerConnection>
   </scm>
   
   <distributionManagement>
