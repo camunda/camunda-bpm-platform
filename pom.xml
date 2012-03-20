@@ -4,7 +4,7 @@
 
   <groupId>com.camunda.fox</groupId>
   <artifactId>fox-platform</artifactId>
-  <version>0.18.0-SNAPSHOT</version>
+  <version>1.18.4.CR</version>
   <packaging>pom</packaging>
 
   <name>fox platform CE (Community Edition)</name>

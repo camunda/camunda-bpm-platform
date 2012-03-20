@@ -5,13 +5,13 @@
   <parent>
     <groupId>com.camunda.fox</groupId>
     <artifactId>fox-platform-parent</artifactId>
-    <version>0.18.0-SNAPSHOT</version>
+    <version>1.18.4.CR</version>
     <relativePath>../parent</relativePath>
   </parent>
   
   <groupId>com.camunda.fox</groupId>
   <artifactId>fox-platform-jboss</artifactId>
-  <version>0.18.0-SNAPSHOT</version>
+  <version>1.18.4.CR</version>
   <packaging>pom</packaging>
 
   <name>fox platform CE - jboss7</name>

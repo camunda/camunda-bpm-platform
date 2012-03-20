@@ -4,14 +4,14 @@
 
   <groupId>com.camunda.fox</groupId>
   <artifactId>fox-platform-parent</artifactId>
-  <version>0.18.0-SNAPSHOT</version>
+  <version>1.18.4.CR</version>
   <packaging>pom</packaging>
 
   <name>fox platform CE - parent</name>
 
   <properties>
     <version.jboss.as>7.1.0.Final</version.jboss.as>
-    <fox.engine.version>0.18.0-SNAPSHOT</fox.engine.version>  
+    <fox.engine.version>1.18.4.CR</fox.engine.version>  
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 

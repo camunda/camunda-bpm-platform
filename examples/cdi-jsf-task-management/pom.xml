@@ -5,7 +5,7 @@
 	<artifactId>fox-examples-cdi-jsf-taskmanagement</artifactId>	
 	<name>fox platform CE - examples taskmanagement</name>
 	<packaging>war</packaging>
-	<version>0.18.0-SNAPSHOT</version>
+	<version>1.18.4.CR</version>
 
 	<dependencies>
 		<dependency>
