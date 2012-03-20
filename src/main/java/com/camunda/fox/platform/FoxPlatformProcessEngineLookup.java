@@ -19,12 +19,12 @@ public class FoxPlatformProcessEngineLookup implements FoxProcessEngineLookup {
 		      "java:global/" +
 		      "camunda-fox-platform/" +
 		      "process-engine/" +
-		      "ProcessEngineService!com.camunda.fox.platform.api.ProcessEngineService")
+		      "PlatformService!com.camunda.fox.platform.api.ProcessEngineService")
 	private ProcessEngineService processEngineService;
 	
 	@Override
 	public ProcessEngine getProcessEngine() {
-		return processEngineService.getProcessEngine();
+		return processEngineService.getDefaultProcessEngine();
 	}
 
 	@Override

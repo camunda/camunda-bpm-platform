@@ -18,6 +18,14 @@ public class DemoDataProcessArchiveImpl implements ProcessArchive {
     this.archiveContextExecutor = archiveContextExecutor;
   }
   
+  public String getProcessEngineName() {
+    return null;  // = use default
+  }
+  
+  public boolean scanForProcessDefinitions() {
+    return false;
+  }
+  
   @Override
   public String getName() {
     return "COCKPIT_DEMO_PROCESSES";
