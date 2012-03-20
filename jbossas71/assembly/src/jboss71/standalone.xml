@@ -103,8 +103,17 @@
                     </security>
                 </datasource>
                 <datasource jndi-name="java:jboss/datasources/FoxEngineDS" enabled="true" use-java-context="true" jta="true" use-ccm="true" pool-name="FoxEngineDS">
-                    <connection-url>jdbc:h2:mem:foxEngine;DB_CLOSE_DELAY=-1;MVCC=TRUE;DB_CLOSE_ON_EXIT=FALSE</connection-url>
+                    <connection-url>jdbc:h2:./fox-h2-dbs/fox-engine;DB_CLOSE_DELAY=-1;MVCC=TRUE;DB_CLOSE_ON_EXIT=FALSE</connection-url>
                     <driver>h2</driver>
+                    <security>
+                        <user-name>sa</user-name>
+                        <password>sa</password>
+                    </security>                   
+                </datasource>               
+                <datasource jndi-name="java:jboss/datasources/CycleDS" enabled="true" use-java-context="true" jta="true" use-ccm="true" pool-name="FoxEngineDS">
+                    <connection-url>jdbc:h2:./fox-h2-dbs/cycle;DB_CLOSE_DELAY=-1;MVCC=TRUE;DB_CLOSE_ON_EXIT=FALSE</connection-url>
+                    <driver>h2</driver>
+                    <pool></pool>
                     <security>
                         <user-name>sa</user-name>
                         <password>sa</password>
