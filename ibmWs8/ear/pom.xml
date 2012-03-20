@@ -68,7 +68,7 @@
     <dependency>
       <groupId>com.camunda.fox</groupId>
       <artifactId>fox-engine-spring</artifactId>
-      <version>${fox.engine.version}</version>
+      <version>${project.version}</version>
     </dependency>
     
     <!-- exclude engine form ear -->
