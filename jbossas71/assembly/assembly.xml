@@ -22,8 +22,8 @@
           <exclude>**/standalone/configuration/standalone.xml</exclude>        
           <exclude>**/bin/standalone.conf</exclude>
           <exclude>**/bin/standalone.conf.bat</exclude>
-        </excludes>
-      </unpackOptions>
+        </excludes>        
+      </unpackOptions>      
     </dependencySet>
     <dependencySet>
       <outputDirectory>client</outputDirectory>
