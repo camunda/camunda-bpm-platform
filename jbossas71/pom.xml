@@ -4,13 +4,13 @@
   <parent>
     <groupId>com.camunda.fox</groupId>
     <artifactId>fox-platform-parent</artifactId>
-    <version>6.0.sprint18-SNAPSHOT</version>
+    <version>1.18.3</version>
     <relativePath>../parent</relativePath>
   </parent>
   
   <groupId>com.camunda.fox</groupId>
   <artifactId>fox-platform-jboss</artifactId>
-  <version>6.0.sprint18-SNAPSHOT</version>
+  <version>1.18.3</version>
   <packaging>pom</packaging>
 
   <name>fox platform EE - jboss7</name>
