@@ -56,7 +56,7 @@
         <groupId>com.camunda.fox</groupId>
         <artifactId>fox-engine-cdi</artifactId>
         <version>${fox.engine.version}</version>
-      </dependency>     
+      </dependency>
       <dependency>
         <groupId>org.jboss.spec</groupId>
         <artifactId>jboss-javaee-web-6.0</artifactId>

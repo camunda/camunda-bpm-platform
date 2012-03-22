@@ -84,7 +84,7 @@ public class ProcessArchiveSupport {
     ProcessesXml processesXml = parser.parseProcessesXml();
     setProcessArchiveName(processesXml);
     processArchive = new ProcessArchiveImpl(processesXml, processArchiveContextExecutorBean, defaultProcessEngineName);
-    processEngine = processArchiveService.installProcessArchive(processArchive).getProcessenEngine();
+    processEngine = processArchiveService.installProcessArchive(processArchive).getProcessEngine();
   }
 
   @PreDestroy
