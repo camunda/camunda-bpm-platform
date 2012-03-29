@@ -11,7 +11,7 @@
 		<h:form>
 			<p>
 				Tasks for user: 
-				<h:inputText value="#{currentUser.username}"> 
+				<h:inputText id="task_user" value="#{currentUser.username}"> 
 					<f:ajax render="taskList" event="keyup" />
 				</h:inputText>
 			</p>			
@@ -28,9 +28,10 @@
 				<h:column>
 					<f:facet name="header">Action</f:facet>
 					<h:outputLink
+					    id="task_complete_link"
 						value="#{formService.getTaskFormData(v_task.id).formKey}">
 					Complete
-					<f:param name="taskId" value="#{v_task.id}"></f:param>
+					<f:param id="param_taskId" name="taskId" value="#{v_task.id}"></f:param>
 					</h:outputLink>
 				</h:column>
 			</h:dataTable>

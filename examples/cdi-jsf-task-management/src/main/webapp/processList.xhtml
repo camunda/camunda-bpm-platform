@@ -23,7 +23,7 @@
 			</h:column>
 			<h:column>
 				<f:facet name="header">Action</f:facet>
-				<h:outputLink value="#{formService.getStartFormData(v_process.id).formKey}">
+				<h:outputLink id="start_process_link" value="#{formService.getStartFormData(v_process.id).formKey}">
 					Start
 					<f:param name="processDefinitionKey" value="#{v_process.key}"></f:param>
 				</h:outputLink>
