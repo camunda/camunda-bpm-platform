@@ -55,9 +55,7 @@ import com.camunda.fox.platform.subsystem.impl.platform.ProcessEngineControllerS
  * @author Daniel Meyer
  */
 public class ProcessEngineAddHandler extends AbstractAddStepHandler implements DescriptionProvider {
-  
-  public static final String ATTR_HISTORY_LEVEL = "history-level";
-  
+    
   public static final ProcessEngineAddHandler INSTANCE = new ProcessEngineAddHandler();
 
   public ModelNode getModelDescription(Locale locale) {
@@ -70,7 +68,7 @@ public class ProcessEngineAddHandler extends AbstractAddStepHandler implements D
     node.get(REQUEST_PROPERTIES, ATTR_HISTORY_LEVEL, DESCRIPTION).set("Which history level to use");
     node.get(REQUEST_PROPERTIES, ATTR_HISTORY_LEVEL, TYPE).set(ModelType.STRING);
     node.get(REQUEST_PROPERTIES, ATTR_HISTORY_LEVEL, REQUIRED).set(false);
-    node.get(REQUEST_PROPERTIES, ATTR_HISTORY_LEVEL, DEFAULT).set("audit");
+//    node.get(REQUEST_PROPERTIES, ATTR_HISTORY_LEVEL, DEFAULT).set("audit");
 
     return node;
   }
