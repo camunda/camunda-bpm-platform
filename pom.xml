@@ -19,7 +19,7 @@
     <module>parent</module>
     <module>qa</module>
     <module>jbossas71</module>
-    <module>explorer</module>
+    <module>webapps/explorer</module>
 	<module>examples</module>
   </modules>
 </project>
