@@ -52,6 +52,7 @@
         <module>examples</module>
         <module>ejb-service</module>
         <module>h2-webapp</module>
+		<module>cockpit-webapp-fox</module>
         <!-- <module>ibmWs8</module> -->
       </modules>
     </profile>
