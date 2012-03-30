@@ -81,6 +81,7 @@
             <groupId>org.jboss.shrinkwrap.descriptors</groupId>
             <artifactId>shrinkwrap-descriptors-impl</artifactId>
             <version>1.1.0-beta-1</version>
+            <scope>test</scope>
         </dependency>
 
 	</dependencies>
