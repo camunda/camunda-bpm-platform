@@ -1,0 +1,52 @@
+<beans xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:s="urn:java:ee" 
+	xmlns:t="urn:java:org.jboss.seam.transaction"
+	xmlns:security="urn:java:org.jboss.seam.security"
+	xmlns:jpa="urn:java:javax.persistence"
+	xmlns:fox="urn:java:com.camunda.fox.cdi:com.camunda.fox.cdi.persistence:com.camunda.fox.cdi.webapp.util"
+	xsi:schemaLocation="
+          http://java.sun.com/xml/ns/javaee http://docs.jboss.org/cdi/beans_1_0.xsd
+          http://jboss.org/schema/weld/beans http://jboss.org/schema/weld/beans_1_1.xsd">
+  
+  <fox:CockpitSeEntityManagerFactoryProducer>
+    <s:modifies/>
+    <s:ApplicationScoped/>
+    <fox:foxEngineEntityManagerFactory>
+      <jpa:PersistenceUnit unitName="fox-engine" />
+    </fox:foxEngineEntityManagerFactory>
+    
+    <fox:cockpitEntityManagerFactory>
+      <jpa:PersistenceUnit unitName="fox-cockpit" />
+    </fox:cockpitEntityManagerFactory>
+  </fox:CockpitSeEntityManagerFactoryProducer>
+  
+  <fox:CockpitEeEntityManagerFactoryProducer>
+    <s:replaces/>
+		<s:ApplicationScoped/>
+    <fox:getFoxEngineEntityManagerFactory>      
+			<s:Produces/>
+      <fox:FoxEngineResource />
+			<s:ConversationScoped/>
+    </fox:getFoxEngineEntityManagerFactory>
+    
+    <fox:getCockpitEntityManagerFactory>
+      <s:Produces/>
+			<s:ConversationScoped/>
+    </fox:getCockpitEntityManagerFactory>
+  </fox:CockpitEeEntityManagerFactoryProducer>
+  
+	<!-- use the demo authenticator in development -->
+	<security:IdentityImpl>
+		<s:modifies />
+	</security:IdentityImpl>
+	
+	<!-- ======== Feature Toggles ========== -->
+
+	<!-- enables automatic appending of the cid (conversation-id) to the request URL -->
+	<!-- EXPERIMENTAL -->
+	<fox:ConversationUtils>
+		<s:modifies />
+		<fox:setCidInUrl>false</fox:setCidInUrl>
+	</fox:ConversationUtils>
+</beans>
+
