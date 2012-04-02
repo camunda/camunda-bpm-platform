@@ -26,6 +26,52 @@
     <!-- <module>ibmWs8</module> -->
   </modules>
 
+  <profiles>
+    <profile>
+      <id>core</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+      </activation>
+      <modules>
+        <module>core</module>
+      </modules>
+    </profile>
+    <profile>
+      <id>distro</id>
+      <activation>
+        <activeByDefault>false</activeByDefault>
+      </activation>
+      <modules>
+        <module>parent</module>
+        <module>qa</module>
+        <module>jbossas71</module>
+        <module>explorer</module>
+        <module>examples</module>
+        <module>ejb-service</module>
+        <module>h2-webapp</module>
+      </modules>
+    </profile>
+    <profile>
+      <id>default</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <modules>
+        <module>core</module>
+        <module>parent</module>
+        <module>qa</module>
+        <module>jbossas71</module>
+        <module>explorer</module>
+        <module>examples</module>
+        <module>ejb-service</module>
+        <module>h2-webapp</module>
+		<module>cockpit-webapp-fox</module>
+        <!-- <module>ibmWs8</module> -->
+      </modules>
+    </profile>
+  </profiles>
+
+
   <scm>
     <connection>scm:git:git@bitbucket.org:camunda/fox-platform-ee.git</connection>
     <developerConnection>scm:git:git@bitbucket.org:camunda/fox-platform-ee.git</developerConnection>
