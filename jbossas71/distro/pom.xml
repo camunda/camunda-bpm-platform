@@ -48,7 +48,7 @@
 
     <dependency>
       <groupId>com.camunda.fox.cycle</groupId>
-      <artifactId>cycle-webapp-fox-ee</artifactId>
+      <artifactId>cycle-webapp-fox</artifactId>
       <version>${project.version}</version>
       <type>war</type>
     </dependency>
