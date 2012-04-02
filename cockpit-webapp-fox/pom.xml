@@ -8,6 +8,7 @@
       <relativePath>../parent</relativePath>
     </parent>
 
+	<groupId>com.camunda.fox.cockpit</groupId>
 	<artifactId>cockpit-webapp-fox</artifactId>
 	<packaging>war</packaging>
 	<name>camunda fox cockpit - Webapp Fox</name>
