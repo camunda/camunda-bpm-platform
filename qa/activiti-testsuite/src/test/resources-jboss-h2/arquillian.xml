@@ -7,7 +7,7 @@
     <property name="deploymentExportPath">target/</property>
   </engine>
   
-  <!-- must be specified or test suite will not run -->
+  <!-- must be specified or test suite will not run (e.g. experience a timeout) -->
   <defaultProtocol type="Servlet 3.0" />
   
   <container qualifier="jboss" default="true">
