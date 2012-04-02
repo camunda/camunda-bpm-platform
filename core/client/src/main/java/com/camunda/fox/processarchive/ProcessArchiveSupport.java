@@ -17,6 +17,8 @@ package com.camunda.fox.processarchive;
 
 import java.util.Iterator;
 import java.util.ServiceLoader;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -34,6 +36,7 @@ import org.activiti.engine.ProcessEngine;
 
 import com.camunda.fox.platform.api.ProcessArchiveService;
 import com.camunda.fox.platform.api.ProcessEngineService;
+import com.camunda.fox.platform.spi.ProcessArchive;
 import com.camunda.fox.processarchive.executor.ProcessArchiveContextExecutor;
 import com.camunda.fox.processarchive.parser.DefaultProcessesXmlParser;
 import com.camunda.fox.processarchive.parser.spi.ProcessesXmlParser;
@@ -46,6 +49,8 @@ import com.camunda.fox.processarchive.schema.ProcessesXml;
 //make sure the container does not synchronize access to this bean
 @ConcurrencyManagement(ConcurrencyManagementType.BEAN) 
 public class ProcessArchiveSupport {
+  
+  private final static Logger log = Logger.getLogger(ProcessArchiveSupport.class.getName());
   
   public final static String PROCESS_ARCHIVE_SERVICE_NAME =
           "java:global/" +
@@ -82,14 +87,21 @@ public class ProcessArchiveSupport {
     final ProcessesXmlParser parser = getProcessesXmlParser();
     
     ProcessesXml processesXml = parser.parseProcessesXml();
-    setProcessArchiveName(processesXml);
-    processArchive = new ProcessArchiveImpl(processesXml, processArchiveContextExecutorBean, defaultProcessEngineName);
-    processEngine = processArchiveService.installProcessArchive(processArchive).getProcessEngine();
+    if(processesXml == null) {
+      log.log(Level.INFO, "No META-INF/processes.xml found. Not creating a process archive installation.");
+      processEngine = processEngineService.getDefaultProcessEngine();
+    } else {
+      setProcessArchiveName(processesXml);
+      processArchive = new ProcessArchiveImpl(processesXml, processArchiveContextExecutorBean, defaultProcessEngineName);
+      processEngine = processArchiveService.installProcessArchive(processArchive).getProcessEngine();
+    }
   }
 
   @PreDestroy
   protected void uninstallProcessArchive() { 
-    processArchiveService.unInstallProcessArchive(processArchive);    
+    if(processArchive != null) {
+      processArchiveService.unInstallProcessArchive(processArchive);
+    }
   }
 
   protected ProcessesXmlParser getProcessesXmlParser() {

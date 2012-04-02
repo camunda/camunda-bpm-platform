@@ -49,13 +49,6 @@
 	      <scope>test</scope>
 	    </dependency>
 	    
-	    <dependency>
-	      <groupId>org.jboss.arquillian.container</groupId>
-	      <artifactId>arquillian-container-spi</artifactId>
-	      <version>1.0.0.CR7</version>
-	      <scope>test</scope>
-	    </dependency>	
-	    
 		<dependency>
 	      <groupId>org.jboss.jsfunit</groupId>
 	      <artifactId>jboss-jsfunit-core</artifactId>
@@ -77,13 +70,6 @@
 	      <scope>test</scope>
 	    </dependency>
 	    
-        <dependency>
-            <groupId>org.jboss.shrinkwrap.descriptors</groupId>
-            <artifactId>shrinkwrap-descriptors-impl</artifactId>
-            <version>1.1.0-beta-1</version>
-            <scope>test</scope>
-        </dependency>
-
 	</dependencies>
 
 	<build>	
