@@ -9,7 +9,6 @@
     <relativePath>../parent</relativePath>
   </parent>
   
-  <groupId>com.camunda.fox</groupId>
   <artifactId>fox-platform-examples</artifactId>
   <packaging>pom</packaging>
 

@@ -30,16 +30,12 @@
   <repositories>
     <repository>
       <id>camunda-fox</id>
-      <name>camunda fox Maven Mirror</name>
+      <name>camunda fox Maven</name>
       <url>http://fox.camunda.com/mvn/</url>
       <releases>
         <enabled>true</enabled>
         <updatePolicy>always</updatePolicy>
       </releases>
-      <snapshots>
-        <enabled>true</enabled>
-        <updatePolicy>always</updatePolicy>
-      </snapshots>
     </repository>
     <repository>
       <id>repository.jboss.org</id>
@@ -69,4 +65,21 @@
     </plugins>
   </build>
 
+  <scm>
+   <connection>scm:git:git@bitbucket.org:camunda/fox-platform-ce.git</connection>
+   <developerConnection>scm:git:git@bitbucket.org:camunda/fox-platform-ce.git</developerConnection>
+  </scm>
+
+  <distributionManagement>
+	<repository>
+		<id>fox-ce-releases</id>
+		<name>Fox Releases</name>
+		<url>${distro.repo.ce}</url>
+	</repository>
+    <snapshotRepository>
+       <id>fox-snapshots</id>
+       <name>Fox Snapshots</name>
+       <url>https://app.camunda.com/nexus/content/repositories/fox-snapshot/</url>
+    </snapshotRepository>	
+  </distributionManagement>
 </project>
