@@ -4,7 +4,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>fox-platform-core-bom</artifactId>
-  <version>0.18.0-SNAPSHOT</version>
+  <version>1.19.0.CR-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>fox platform CE - core bill of material</name>
@@ -12,7 +12,7 @@
   <parent>
     <groupId>com.camunda.fox</groupId>
     <artifactId>fox-engine-root</artifactId>
-    <version>6.0.sprint18-SNAPSHOT</version>
+    <version>1.19.0.CR-SNAPSHOT</version>
   </parent>
 
   <properties>
@@ -50,12 +50,12 @@
       <dependency>
         <groupId>com.camunda.fox</groupId>
         <artifactId>fox-engine</artifactId>
-        <version>${fox.engine.version}</version>
+        <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>com.camunda.fox</groupId>
         <artifactId>fox-engine-cdi</artifactId>
-        <version>${fox.engine.version}</version>
+        <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>org.jboss.spec</groupId>
