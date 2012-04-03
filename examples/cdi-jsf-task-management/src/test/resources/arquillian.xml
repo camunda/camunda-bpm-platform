@@ -6,9 +6,9 @@
 
   <container qualifier="jboss" default="true">
     <configuration>
-      <property name="jbossHome">../../qa/jboss7-runtime/target/jboss-as-7.1.0.Final/</property>
-      <property name="managementPort">21009</property>
-      <property name="serverConfig">standalone-h2.xml</property>
+      <property name="jbossHome">${jboss.location}</property>
+      <property name="managementPort">${jboss.port}</property>
+      <property name="serverConfig">${jboss.configuration}</property>
       <property name="javaVmArguments">-Xmx512m -XX:MaxPermSize=128m -Xrunjdwp:transport=dt_socket,address=8787,server=y,suspend=n</property>
     </configuration>
   </container>
