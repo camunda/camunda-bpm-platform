@@ -26,6 +26,11 @@
       </dependency>
       <dependency>
         <groupId>org.jboss.as</groupId>
+        <artifactId>jboss-as-subsystem-test</artifactId>
+        <version>${version.jboss.as}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jboss.as</groupId>
         <artifactId>jboss-as-weld</artifactId>
         <version>${version.jboss.as}</version>
       </dependency>
@@ -97,6 +102,12 @@
       <artifactId>jboss-as-weld</artifactId>
       <scope>provided</scope>
     </dependency>
+    <!-- test dependencies -->
+    <dependency>
+      <groupId>org.jboss.as</groupId>
+      <artifactId>jboss-as-subsystem-test</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>
@@ -125,6 +136,7 @@
           </systemProperties>
           <includes>
             <include>**/*TestCase.java</include>
+            <include>**/*Test.java</include>
           </includes>
           <forkMode>once</forkMode>
         </configuration>

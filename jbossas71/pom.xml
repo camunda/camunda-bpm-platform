@@ -8,7 +8,6 @@
     <relativePath>../parent</relativePath>
   </parent>
   
-  <groupId>com.camunda.fox</groupId>
   <artifactId>fox-platform-jboss</artifactId>
   <version>6.0.sprint18-SNAPSHOT</version>
   <packaging>pom</packaging>

@@ -1,0 +1,210 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.camunda.fox.examples</groupId>
+	<artifactId>fox-examples-cdi-jsf-taskmanagement</artifactId>	
+	<name>fox platform CE - examples taskmanagement</name>
+	<packaging>war</packaging>
+	<version>1.19.0.CR-SNAPSHOT</version>
+	
+	<properties>
+		<jboss.location>../../../server/jboss-as-7.1.0.Final/</jboss.location>
+		<jboss.port>9999</jboss.port>
+		<jboss.configuration>standalone.xml</jboss.configuration>
+	</properties>
+
+	<dependencies>
+	
+		<dependency>
+			<groupId>com.camunda.fox</groupId>
+			<artifactId>fox-platform-client</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		
+		<dependency>
+			<groupId>com.camunda.fox</groupId>
+			<artifactId>fox-engine</artifactId>
+			<version>${project.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		
+		<dependency>
+			<groupId>org.jboss.spec</groupId>
+			<artifactId>jboss-javaee-6.0</artifactId>
+			<version>2.0.0.Final</version>
+			<scope>provided</scope>
+			<type>pom</type>
+			<exclusions>
+				<exclusion>
+					<artifactId>xalan</artifactId>
+					<groupId>org.apache.xalan</groupId>
+				</exclusion>
+			</exclusions>
+		</dependency>
+		
+		<!-- dependencies required for integration testing -->
+		
+	    <dependency>
+	      <groupId>org.jboss.arquillian.junit</groupId>
+	      <artifactId>arquillian-junit-container</artifactId>
+		  <scope>test</scope>
+	    </dependency>
+	    
+		<dependency>
+	      <groupId>org.jboss.jsfunit</groupId>
+	      <artifactId>jboss-jsfunit-core</artifactId>
+	      <version>2.0.0.Beta2</version>
+		  <scope>test</scope>
+	    </dependency>
+	    
+	    <dependency>
+			<groupId>org.jboss.jsfunit</groupId>
+			<artifactId>jsfunit-arquillian</artifactId>
+			<version>2.0.0.Beta2</version>
+			<scope>test</scope>
+		</dependency>
+	    
+		<dependency>
+	      <groupId>junit</groupId>
+	      <artifactId>junit</artifactId>
+	      <version>4.8.2</version>
+	      <scope>test</scope>
+	    </dependency>
+		
+		<dependency>
+			<groupId>org.jboss.shrinkwrap.resolver</groupId>
+			<artifactId>shrinkwrap-resolver-impl-maven</artifactId>
+			<scope>test</scope>
+		</dependency>
+	    
+	</dependencies>
+	
+	<dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.jboss.arquillian</groupId>
+                <artifactId>arquillian-bom</artifactId>
+                <version>1.0.0.CR7</version>
+                <scope>import</scope>
+                <type>pom</type>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+	<build>	
+	    <testResources>
+	      <testResource>
+	        <directory>src/test/resources</directory>
+	        <filtering>true</filtering>
+	        <includes>
+	          <include>**/*.xml</include>
+	          <include>**/*.properties</include>
+	        </includes>
+	      </testResource>
+	    </testResources>	
+		<plugins>
+			<!-- Ensures we are compiling at 1.6 level -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<artifactId>maven-war-plugin</artifactId>
+				<version>2.1.1</version>
+				<configuration>
+					<!-- Java EE 6 doesn't require web.xml, Maven needs to catch up! -->
+					<failOnMissingWebXml>false</failOnMissingWebXml>
+				</configuration>
+			</plugin>
+
+		</plugins>
+	</build>
+
+	<profiles>		
+		<profile>
+			<id>default</id>
+			
+			<!-- this is the default profile in which we skip the tests -->
+			
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<build>
+			 <plugins>
+			  <plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-surefire-plugin</artifactId>
+				<version>2.12</version>
+				<configuration>
+				  <skipTests>true</skipTests>
+				</configuration>
+			  </plugin>
+			</plugins>
+		  </build>
+		</profile>	
+		
+		<profile>
+			<id>jboss-as-managed</id>
+			
+			<!-- this profile runs the tests using a managed jboss as container -->
+			<!-- the server is started and stopped by arquillian -->
+			<!-- the location of the jboss server is set through the properties 
+				 declared at the head of this file -->
+			
+			<dependencies>
+				<dependency>
+					<groupId>org.jboss.as</groupId>
+					<artifactId>jboss-as-arquillian-container-managed</artifactId>
+					<version>7.1.0.Final</version>
+					<scope>test</scope>
+				</dependency>
+				<dependency>
+					<groupId>org.jboss.arquillian.protocol</groupId>
+					<artifactId>arquillian-protocol-servlet</artifactId>
+					<version>1.0.0.CR7</version>
+					<scope>test</scope>
+				</dependency>
+			</dependencies>
+		</profile>	
+		<profile>
+			<id>jboss-as-remote</id>
+			
+			<!-- this profile runs the tests using a remote jboss as container -->
+			<!-- you need to start the server before you can run the tests -->
+			
+			<dependencies>
+				<dependency>
+					<groupId>org.jboss.as</groupId>
+					<artifactId>jboss-as-arquillian-container-remote</artifactId>
+					<version>7.1.0.Final</version>
+					<scope>test</scope>
+				</dependency>
+				<dependency>
+					<groupId>org.jboss.arquillian.protocol</groupId>
+					<artifactId>arquillian-protocol-servlet</artifactId>
+					<scope>test</scope>
+				</dependency>
+			</dependencies>
+		</profile>			
+	</profiles>	
+
+	<repositories>
+		<repository>
+			<id>repository.jboss.org</id>
+			<url>http://repository.jboss.org/nexus/content/groups/public-jboss</url>
+		</repository>
+		<repository>
+			<id>Jboss Groups Public</id>
+			<url>http://repository.jboss.org/nexus/content/groups/public</url>
+		</repository>	
+		<repository>
+			<id>camunda-fox</id>
+			<name>camunda fox Maven Repository</name>
+			<url>http://fox.camunda.com/mvn/</url>
+		</repository>	
+	</repositories>
+</project>

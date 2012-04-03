@@ -42,7 +42,7 @@
 					<groupId>org.apache.commons</groupId>
 				</exclusion>
 			</exclusions>
-		</dependency>		
+		</dependency>
 		<dependency>
 			<groupId>com.camunda.fox</groupId>
 			<artifactId>fox-platform-api</artifactId>

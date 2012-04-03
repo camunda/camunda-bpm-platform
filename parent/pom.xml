@@ -41,16 +41,12 @@
     </repository>
     <repository>
       <id>camunda-fox</id>
-      <name>camunda fox Maven Mirror</name>
+      <name>camunda fox Maven</name>
       <url>http://fox.camunda.com/mvn/</url>
       <releases>
         <enabled>true</enabled>
         <updatePolicy>always</updatePolicy>
       </releases>
-      <snapshots>
-        <enabled>true</enabled>
-        <updatePolicy>always</updatePolicy>
-      </snapshots>
     </repository>
     <repository>
       <id>repository.jboss.org</id>
@@ -67,6 +63,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-source-plugin</artifactId>
+        <version>2.1.2</version>
         <executions>
           <execution>
             <id>attach-sources</id>
@@ -78,18 +75,5 @@
       </plugin>
     </plugins>
   </build>
-  
-  <scm>
-   <connection>scm:git:git@bitbucket.org:camunda/fox-platform-ee.git</connection>
-   <developerConnection>scm:git:git@bitbucket.org:camunda/fox-platform-ee.git</developerConnection>
-  </scm>
-  
-	<distributionManagement>
-		<repository>
-			<id>fox-ee-releases</id>
-			<name>Fox Enterprise Releases Maven Repository</name>
-			<url>${distro.repo.ee}</url>
-		</repository>
-	</distributionManagement>
-  
+
 </project>
