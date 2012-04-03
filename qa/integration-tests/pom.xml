@@ -8,7 +8,7 @@
   <parent>
     <groupId>com.camunda.fox</groupId>
     <artifactId>fox-platform-qa</artifactId>
-    <version>1.19.0.CRtest4</version>
+    <version>1.19.0.CR-SNAPSHOT</version>
   </parent>
   
   <dependencies>
