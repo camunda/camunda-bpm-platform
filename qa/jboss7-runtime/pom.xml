@@ -57,13 +57,15 @@
                 
                 <!-- remove activiti test classes from engine -->
                 
-                <unzip src="target/jboss-as-${version.jboss.as}/modules/com/camunda/fox/fox-engine/main/fox-engine-${project.version}.jar" dest="target/fox-engine" />
+                <unzip src="target/jboss-as-${version.jboss.as}/modules/com/camunda/fox/fox-engine/main/fox-engine-${project.version}.jar" 
+                       dest="target/fox-engine" />
 
                 <delete dir="target/fox-engine/org/activiti/engine/impl/test" />
                 
                 <delete file="target/jboss-as-${version.jboss.as}/modules/com/camunda/fox/fox-engine/main/fox-engine-${project.version}.jar" />
                 
-                <zip destfile="target/jboss-as-${version.jboss.as}/modules/com/camunda/fox/fox-engine/main/fox-engine-${project.version}.jar" basedir="target/fox-engine" />
+                <zip destfile="target/jboss-as-${version.jboss.as}/modules/com/camunda/fox/fox-engine/main/fox-engine-${project.version}.jar"
+                     basedir="target/fox-engine" />
               </target>
             </configuration>
           </execution>
@@ -75,12 +77,11 @@
             </goals>
             <configuration>
               <target unless="maven.test.skip">
-
                 <dependencyfilesets scopes="test" />
                 
                 <copy todir="target/jboss-as-${version.jboss.as}/modules" flatten="false">
                   <fileset refid="maven.project.dependencies" />
-                  <regexpmapper from="^(.*)/([^/]+)/([^/]*)$$" to="\1/main/\3" handledirsep="yes" />                  
+                  <regexpmapper from="^(.*)/([^/]+)/([^/]*)$$" to="\1/main/\3" handledirsep="yes" />
                 </copy>
 
                 <copy todir="target/jboss-as-${version.jboss.as}/modules" flatten="false">
@@ -94,4 +95,37 @@
     </plugins>
   </build>
 
+  <profiles>
+    <profile>
+      <id>install-test-runtime</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-assembly-plugin</artifactId>
+            <version>2.3</version>
+            <executions>
+              <execution>
+                <id>assemble</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>single</goal>
+                </goals>
+                <configuration>
+                  <descriptors>
+                    <descriptor>assembly.xml</descriptor>
+                  </descriptors>
+                  <finalName>fox-platform-qa-jboss-runtime-${project.version}</finalName>
+                  <appendAssemblyId>false</appendAssemblyId>
+                  <outputDirectory>target/</outputDirectory>
+                  <workDirectory>target/assembly/work</workDirectory>
+                  <tarLongFileMode>gnu</tarLongFileMode>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>

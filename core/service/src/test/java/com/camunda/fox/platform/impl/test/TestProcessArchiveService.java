@@ -49,7 +49,7 @@ public class TestProcessArchiveService extends PlatformServiceTest {
     ProcessArchive processArchive = new DummyProcessArchive("archive1", engine1.getName(), false, new HashMap<String, byte[]>(), true);    
     ProcessArchiveInstallation installProcessArchive = processArchiveService.installProcessArchive(processArchive);    
     
-    Assert.assertNotNull(installProcessArchive.getProcessenEngine());
+    Assert.assertNotNull(installProcessArchive.getProcessEngine());
     Assert.assertNull(installProcessArchive.getProcessEngineDeploymentId());
     
     Assert.assertEquals(1, processArchiveService.getInstalledProcessArchives().size());

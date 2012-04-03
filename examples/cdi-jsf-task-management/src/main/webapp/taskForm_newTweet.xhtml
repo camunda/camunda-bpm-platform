@@ -18,17 +18,17 @@
 			<table>
 				<tr>
 					<td>Your twitter account:</td>
-					<td><h:inputText value="#{processVariables['twitterAccount']}" />
+					<td><h:inputText id="twitter_account" value="#{processVariables['twitterAccount']}" />
 					</td>
 				</tr>
 				<tr>
 					<td>Tweet content:</td>
-					<td><h:inputText value="#{processVariables['tweetContent']}" />
+					<td><h:inputText id="tweet_content" value="#{processVariables['tweetContent']}" />
 					</td>
 				</tr>
 				<tr>
 					<td></td>
-					<td><h:commandButton value="Submit"
+					<td><h:commandButton id="submit_button" value="Submit"
 							action="#{businessProcess.startProcessByKey(processList.processDefinitionKey)}" />
 					</td>
 				</tr>

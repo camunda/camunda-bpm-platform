@@ -5,3 +5,5 @@ target
 build.properties
 bin
 .metadata
+transaction.log
+nbactions.xml

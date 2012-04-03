@@ -43,8 +43,8 @@ public class DefaultProcessesXmlParser implements ProcessesXmlParser {
   public ProcessesXml parseProcessesXml() {
     InputStream processesXmlStream = getProcessesXmlAsStream();  
     try {      
-      if(processesXmlStream == null) { // markerfile not found
-        throw new FoxPlatformException("Could not locate '"+MARKER_FILE_LOCATION+"'.");
+      if(processesXmlStream == null) { // markerfile not found        
+        return null;        
       } else if(isEmptyStream(processesXmlStream)) { // markerfile empty
         return handleEmptyMarkerfile();
       } else {         

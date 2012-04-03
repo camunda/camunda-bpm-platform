@@ -54,7 +54,7 @@ public interface ProcessArchiveService {
     /**
      * @return the {@link ProcessEngine} to which the {@link ProcessArchive} was installed.
      */
-    public ProcessEngine getProcessenEngine();
+    public ProcessEngine getProcessEngine();
     
     /**
      * @return the id of the deployment made to the {@link ProcessEngine}. 

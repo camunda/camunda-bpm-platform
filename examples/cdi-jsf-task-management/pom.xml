@@ -4,9 +4,30 @@
 	<artifactId>fox-examples-cdi-jsf-taskmanagement</artifactId>	
 	<name>fox platform EE - examples taskmanagement</name>
 	<packaging>war</packaging>
-	<version>6.0.sprint18-SNAPSHOT</version>
+	
+	<properties>
+		<jboss.location>../../qa/jboss7-runtime/target/jboss-as-7.1.0.Final/</jboss.location>
+		<jboss.port>21019</jboss.port>
+		<jboss.configuration>standalone-h2.xml</jboss.configuration>
+	</properties>
+	
+	<parent>
+		<groupId>com.camunda.fox</groupId>
+		<artifactId>fox-platform-parent</artifactId>
+		<version>1.19.0.CR-SNAPSHOT</version>
+		<relativePath>../../parent</relativePath>
+    </parent>
 
 	<dependencies>
+		<dependency>
+	      <!-- make sure this comes after runtime in the reactor build -->
+	      <groupId>com.camunda.fox</groupId>
+	      <artifactId>fox-platform-qa-jboss-runtime</artifactId>
+	      <version>${project.version}</version>
+	      <scope>provided</scope>
+	      <type>pom</type>
+	    </dependency>
+		
 		<dependency>
 			<groupId>com.camunda.fox</groupId>
 			<artifactId>fox-platform-client</artifactId>
@@ -30,10 +51,60 @@
 					<groupId>org.apache.xalan</groupId>
 				</exclusion>
 			</exclusions>
+		</dependency>		
+		
+	    <dependency>
+	      <groupId>org.jboss.arquillian.junit</groupId>
+	      <artifactId>arquillian-junit-container</artifactId>
+	      <scope>test</scope>
+	    </dependency>
+	    
+		<dependency>
+	      <groupId>org.jboss.jsfunit</groupId>
+	      <artifactId>jboss-jsfunit-core</artifactId>
+	      <version>2.0.0.Beta2</version>
+	      <scope>test</scope>
+	    </dependency>
+	    
+	    <dependency>
+			<groupId>org.jboss.jsfunit</groupId>
+			<artifactId>jsfunit-arquillian</artifactId>
+			<version>2.0.0.Beta2</version>
+			<scope>test</scope>
 		</dependency>
+	    
+		<dependency>
+	      <groupId>junit</groupId>
+	      <artifactId>junit</artifactId>
+	      <version>4.8.2</version>
+	      <scope>test</scope>
+	    </dependency>
+		
 	</dependencies>
+	
+	<dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.jboss.arquillian</groupId>
+                <artifactId>arquillian-bom</artifactId>
+                <version>1.0.0.CR7</version>
+                <scope>import</scope>
+                <type>pom</type>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
 	<build>	
+		<testResources>
+	      <testResource>
+	        <directory>src/test/resources</directory>
+	        <filtering>true</filtering>
+	        <includes>
+	          <include>**/*.xml</include>
+	          <include>**/*.properties</include>
+	        </includes>
+	      </testResource>
+	    </testResources>	
 		<plugins>
 			<!-- Ensures we are compiling at 1.6 level -->
 			<plugin>
@@ -55,33 +126,75 @@
 
 		</plugins>
 	</build>
+	
+	
+	<profiles>
+		<profile>
+			<id>jboss</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<dependencies>
+				<dependency>
+					<groupId>org.jboss.as</groupId>
+					<artifactId>jboss-as-arquillian-container-managed</artifactId>
+					<version>7.1.0.Final</version>
+					<scope>test</scope>
+				</dependency>
+				<dependency>
+					<groupId>org.jboss.arquillian.protocol</groupId>
+					<artifactId>arquillian-protocol-servlet</artifactId>
+					<scope>test</scope>
+				</dependency>
+			</dependencies>
+		</profile>
+		<profile>
+			<id>h2</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+			<build>
+				<testResources>
+					<testResource>
+						<directory>src/test/resources</directory>
+						<filtering>true</filtering>
+						<includes>
+							<include>**/*.xml</include>
+							<include>**/*.properties</include>
+						</includes>
+					</testResource>
+				</testResources>
+			</build>
+		</profile>
+		<profile>
+			<id>default</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+			</activation>
+		</profile>
+		<profile>
+			<!-- This profile is used by the ci server. The maven build on the ci 
+				server uses a local maven repository. This allows us to give the arquillian 
+				maven resolver access to the artifacts produced by this build. -->
+			<id>ci</id>
+			<activation>
+			</activation>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<version>2.12</version>
+						<configuration>
+							<systemPropertyVariables>
+								<org.apache.maven.user-settings>../../../../../m2/settings.xml</org.apache.maven.user-settings>
+							</systemPropertyVariables>
+						</configuration>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+	</profiles>
 
-	<repositories>
-		<repository>
-			<id>repository.jboss.org</id>
-			<url>http://repository.jboss.org/nexus/content/groups/public-jboss</url>
-		</repository>
-		<repository>
-			<id>Jboss Groups Public</id>
-			<url>http://repository.jboss.org/nexus/content/groups/public</url>
-		</repository>	
-		<repository>
-			<id>camunda-fox</id>
-			<name>camunda fox Maven Repository</name>
-			<url>http://fox.camunda.com/mvn/</url>
-		</repository>	
-	</repositories>
   
-    <scm>
-   <connection>scm:git:git@bitbucket.org:camunda/fox-platform-ee.git</connection>
-   <developerConnection>scm:git:git@bitbucket.org:camunda/fox-platform-ee.git</developerConnection>
-  </scm>
-  
-  <distributionManagement>
-    <repository>
-      <id>fox-ee-releases</id>
-      <name>Fox Enterprise Releases Maven Repository</name>
-      <url>${distro.repo.ee}</url>
-    </repository>
-  </distributionManagement>
 </project>

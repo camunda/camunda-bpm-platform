@@ -55,7 +55,7 @@ import com.camunda.fox.platform.subsystem.impl.platform.ProcessEngineControllerS
  * @author Daniel Meyer
  */
 public class ProcessEngineAddHandler extends AbstractAddStepHandler implements DescriptionProvider {
-  
+    
   public static final ProcessEngineAddHandler INSTANCE = new ProcessEngineAddHandler();
 
   public ModelNode getModelDescription(Locale locale) {
@@ -68,7 +68,7 @@ public class ProcessEngineAddHandler extends AbstractAddStepHandler implements D
     node.get(REQUEST_PROPERTIES, ATTR_HISTORY_LEVEL, DESCRIPTION).set("Which history level to use");
     node.get(REQUEST_PROPERTIES, ATTR_HISTORY_LEVEL, TYPE).set(ModelType.STRING);
     node.get(REQUEST_PROPERTIES, ATTR_HISTORY_LEVEL, REQUIRED).set(false);
-    node.get(REQUEST_PROPERTIES, ATTR_HISTORY_LEVEL, DEFAULT).set("audit");
+//    node.get(REQUEST_PROPERTIES, ATTR_HISTORY_LEVEL, DEFAULT).set("audit");
 
     return node;
   }
@@ -95,10 +95,10 @@ public class ProcessEngineAddHandler extends AbstractAddStepHandler implements D
           throws OperationFailedException {
     
     String engineName = PathAddress.pathAddress(operation.get(ModelDescriptionConstants.ADDRESS)).getLastElement().getValue();    
-    String datasource = operation.get(ATTR_DATASOURCE).asString();
+    String datasource = operation.get(ATTR_DATASOURCE).asString();   
+    String historyLevel = operation.get(ATTR_HISTORY_LEVEL).asString();
     
     // TODO: read these values from config
-    String historyLevel = "audit";
     boolean activateJobExecutor=true;
     boolean isAutoUpdateSchema =true;
     int jobExecutor_maxJobsPerAcquisition =3;

@@ -87,6 +87,27 @@
           <target>1.6</target>
         </configuration>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>2.4</version>
+        <executions>
+          <!-- install enhanced artifact -->
+          <execution>
+            <id>create-test-jar</id>
+            <phase>package</phase>
+            <goals>
+              <goal>test-jar</goal>
+            </goals>
+            <configuration>
+              <forceCreate>true</forceCreate>
+              <includes>
+                <include>**/com/camunda/fox/platform/test/util/**/*.class</include>
+              </includes>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
   </build>
   
@@ -128,6 +149,29 @@
           </testResource>
           <testResource>
             <directory>src/test/resources-jboss-h2</directory>
+            <filtering>true</filtering>
+            <includes>
+              <include>**/*.xml</include>
+              <include>**/*.properties</include>
+            </includes>
+          </testResource>
+        </testResources>
+      </build>
+    </profile>
+    <profile>
+      <id>mysql</id>
+      <build>
+        <testResources>
+          <testResource>
+            <directory>src/test/resources</directory>
+            <filtering>true</filtering>
+            <includes>
+              <include>**/*.xml</include>
+              <include>**/*.properties</include>
+            </includes>
+          </testResource>
+          <testResource>
+            <directory>src/test/resources-jboss-mysql</directory>
             <filtering>true</filtering>
             <includes>
               <include>**/*.xml</include>

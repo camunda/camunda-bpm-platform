@@ -214,7 +214,7 @@ public abstract class PlatformService implements ProcessEngineService, ProcessAr
       this.processEngineDeploymentId = processEngineDeploymentId;
     }
 
-    public ProcessEngine getProcessenEngine() {
+    public ProcessEngine getProcessEngine() {
       return processEngine;
     }
 

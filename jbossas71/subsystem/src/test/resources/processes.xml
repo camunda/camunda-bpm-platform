@@ -1,0 +1,8 @@
+<subsystem xmlns="urn:com.camunda.fox.engine:1.0"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="urn:com.camunda.fox.engine:1.0 ../../main/resources/schema/foxEngineSubsystem.xsd">
+             
+  <process-engines>
+    <process-engine name="__default" datasource="java:comp/env/asdf" />
+  </process-engines>
+</subsystem>

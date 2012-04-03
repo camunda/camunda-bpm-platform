@@ -1,0 +1,5 @@
+<subsystem xmlns="urn:com.camunda.fox.fox-platform:1.0">
+  <process-engines>
+    <process-engine name="__default" datasource="java:jboss/datasources/FoxEngineDS" />
+  </process-engines>
+</subsystem>
