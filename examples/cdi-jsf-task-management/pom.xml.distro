@@ -5,7 +5,7 @@
 	<artifactId>fox-examples-cdi-jsf-taskmanagement</artifactId>	
 	<name>fox platform CE - examples taskmanagement</name>
 	<packaging>war</packaging>
-	<version>1.19.0.CR-SNAPSHOT</version>
+	<version>6.0.sprint18-SNAPSHOT</version>
 	
 	<properties>
 		<jboss.location>../../../server/jboss-as-7.1.0.Final/</jboss.location>
