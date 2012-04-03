@@ -9,7 +9,7 @@
 	<parent>
 		<groupId>com.camunda.fox</groupId>
 		<artifactId>fox-platform-core</artifactId>
-		<version>1.19.0.CR-SNAPSHOT</version>
+		<version>1.19.0.CRtest6</version>
 	</parent>
 
 	<dependencies>
