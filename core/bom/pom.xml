@@ -12,6 +12,7 @@
     <groupId>com.camunda.fox</groupId>
     <artifactId>fox-engine-root</artifactId>
     <version>1.19.0.CR-SNAPSHOT</version>
+	<relativePath>../../../fox-engine/pom.xml</relativePath>
   </parent>
 
   <properties>
