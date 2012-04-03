@@ -14,7 +14,7 @@
 	<parent>
 		<groupId>com.camunda.fox</groupId>
 		<artifactId>fox-platform-parent</artifactId>
-		<version>1.19.0.CRtest6</version>
+		<version>1.19.0.CR-SNAPSHOT</version>
 		<relativePath>../../parent</relativePath>
     </parent>
 
