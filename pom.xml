@@ -3,7 +3,7 @@
 
   <groupId>com.camunda.fox</groupId>
   <artifactId>fox-platform</artifactId>
-  <version>1.19.0.CRtest2</version>
+  <version>1.19.0.CR-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>fox platform CE (Community Edition)</name>
