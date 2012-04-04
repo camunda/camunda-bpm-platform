@@ -72,7 +72,7 @@
 
   <distributionManagement>
 	<repository>
-		<id>fox-ce-releases</id>
+		<id>camunda-fox</id>
 		<name>Fox Releases</name>
 		<url>${distro.repo.ce}</url>
 	</repository>
