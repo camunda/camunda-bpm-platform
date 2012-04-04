@@ -100,12 +100,12 @@
 
   <distributionManagement>
 	<repository>
-		<id>fox-ce-releases</id>
+		<id>camunda-fox</id>
 		<name>Fox Releases</name>
 		<url>${distro.repo.ce}</url>
 	</repository>
     <snapshotRepository>
-       <id>fox-snapshots</id>
+       <id>camunda-fox</id>
        <name>Fox Snapshots</name>
        <url>https://app.camunda.com/nexus/content/repositories/fox-snapshot/</url>
     </snapshotRepository>	
