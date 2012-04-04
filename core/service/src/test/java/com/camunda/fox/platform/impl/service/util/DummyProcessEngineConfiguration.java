@@ -1,4 +1,4 @@
-package com.camunda.fox.platform.impl.test.util;
+package com.camunda.fox.platform.impl.service.util;
 
 import com.camunda.fox.platform.spi.ProcessEngineConfiguration;
 

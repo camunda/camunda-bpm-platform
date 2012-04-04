@@ -1,4 +1,4 @@
-package com.camunda.fox.platform.impl.test;
+package com.camunda.fox.platform.impl.service;
 
 import java.util.concurrent.Future;
 
@@ -9,7 +9,7 @@ import org.junit.Test;
 
 import com.camunda.fox.platform.FoxPlatformException;
 import com.camunda.fox.platform.api.ProcessEngineService.ProcessEngineStartOperation;
-import com.camunda.fox.platform.impl.test.util.DummyProcessEngineConfiguration;
+import com.camunda.fox.platform.impl.service.util.DummyProcessEngineConfiguration;
 
 /**
  * 

@@ -1,4 +1,4 @@
-package com.camunda.fox.platform.impl.test;
+package com.camunda.fox.platform.impl.service;
 
 import org.activiti.engine.ProcessEngine;
 import org.apache.commons.dbcp.BasicDataSource;
