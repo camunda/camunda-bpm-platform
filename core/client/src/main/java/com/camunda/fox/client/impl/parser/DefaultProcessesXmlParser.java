@@ -21,15 +21,14 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
 
 import org.activiti.engine.impl.util.IoUtil;
 
 import com.camunda.fox.client.impl.parser.spi.ProcessesXmlParser;
 import com.camunda.fox.client.impl.schema.ProcessesXml;
-import com.camunda.fox.client.impl.schema.ProcessesXmlDeprecated;
 import com.camunda.fox.client.impl.schema.ProcessesXml.ProcessArchiveXml;
+import com.camunda.fox.client.impl.schema.ProcessesXmlDeprecated;
 import com.camunda.fox.client.impl.schema.ProcessesXmlDeprecated.Process;
 import com.camunda.fox.platform.FoxPlatformException;
 

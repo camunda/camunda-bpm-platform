@@ -11,12 +11,7 @@
 	</parent>
 
 	<dependencies>
-		<dependency>
-			<groupId>org.jboss.spec</groupId>
-			<artifactId>jboss-javaee-web-6.0</artifactId>
-			<type>pom</type>
-			<scope>provided</scope>
-		</dependency>
+	
 		<dependency>
 			<groupId>com.camunda.fox</groupId>
 			<artifactId>fox-engine-cdi</artifactId>
@@ -65,13 +60,13 @@
         <dependency>
           <groupId>org.jboss.weld</groupId>
           <artifactId>weld-core</artifactId>
-          <scope>test</scope>
+          <scope>provided</scope>
         </dependency>
         
         <dependency>
           <groupId>org.jboss.weld</groupId>
           <artifactId>weld-api</artifactId>
-          <scope>test</scope>
+          <scope>provided</scope>
         </dependency>
         
         <dependency>
@@ -85,6 +80,13 @@
           <artifactId>arquillian-junit-container</artifactId>
           <version>1.0.0.CR7</version>
           <scope>test</scope>
+        </dependency>
+        
+        <dependency>
+          <groupId>org.jboss.spec</groupId>
+          <artifactId>jboss-javaee-web-6.0</artifactId>
+          <type>pom</type>
+          <scope>provided</scope>
         </dependency>
 
 	</dependencies>
