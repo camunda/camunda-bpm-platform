@@ -13,17 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.camunda.fox.processarchive.parser.spi;
+package com.camunda.fox.client.impl.parser.spi;
 
-import com.camunda.fox.processarchive.schema.ProcessesXml;
+import com.camunda.fox.client.impl.schema.ProcessesXml;
 
 /**
- * Locates and parses the META-INF/processes.xml file
+ * Parses the processes.xml marker file
  * 
  * @author Daniel Meyer
  */
 public interface ProcessesXmlParser {
 
-  public ProcessesXml parseProcessesXml();
+  public ProcessesXml parseProcessesXml(String processesXmlLocation);
 
 }

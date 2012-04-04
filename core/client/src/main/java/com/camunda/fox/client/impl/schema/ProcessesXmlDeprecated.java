@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.camunda.fox.processarchive.schema;
+package com.camunda.fox.client.impl.schema;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,32 +31,32 @@ import javax.xml.bind.annotation.XmlRootElement;
  */
 @XmlRootElement(name = "processArchive")
 @XmlAccessorType(XmlAccessType.FIELD)
-public class ProcessesXml {
-  
+public class ProcessesXmlDeprecated {
+
   public String name = null;
 
-  @XmlElement(name="configuration")
+  @XmlElement(name = "configuration")
   public Configuration configuration = new Configuration();
 
-  @XmlElements(@XmlElement(name="process", type=Process.class))
-  public List<Process> processes = new ArrayList<ProcessesXml.Process>();
+  @XmlElements(@XmlElement(name = "process", type = Process.class))
+  public List<Process> processes = new ArrayList<ProcessesXmlDeprecated.Process>();
 
   public static class Configuration {
 
-    @XmlElement(name="undeployment")
+    @XmlElement(name = "undeployment")
     public Undeployment undeployment = new Undeployment();
-   
+
     public static class Undeployment {
-      
-      @XmlAttribute(required=true)
+
+      @XmlAttribute(required = true)
       public boolean delete = false;
-      
+
     }
   }
 
   public static class Process {
 
-    @XmlAttribute(required=true)
+    @XmlAttribute(required = true)
     public String resourceName;
   }
 

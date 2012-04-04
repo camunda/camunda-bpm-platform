@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.camunda.fox.processarchive.util;
+package com.camunda.fox.client.impl.util;
 
 import java.io.InputStream;
 import java.util.HashMap;
@@ -21,7 +21,8 @@ import java.util.Map;
 
 import org.activiti.engine.impl.util.IoUtil;
 
-import com.camunda.fox.processarchive.schema.ProcessesXml;
+import com.camunda.fox.client.impl.schema.ProcessesXml;
+import com.camunda.fox.client.impl.schema.ProcessesXml.ProcessArchiveXml;
 
 /**
  * 
@@ -29,10 +30,10 @@ import com.camunda.fox.processarchive.schema.ProcessesXml;
  */
 public class BpmnResourceLoader {
 
-  public Map<String, byte[]> readBpmnResources(ProcessesXml processesXml) {
+  public Map<String, byte[]> readBpmnResources(ProcessArchiveXml processArchiveXml) {
     HashMap<String, byte[]> processesMap = new HashMap<String, byte[]>();
         
-    for (ProcessesXml.Process process : processesXml.processes) {
+    for (ProcessesXml.ProcessArchiveXml.ProcessResourceXml process : processArchiveXml.processes) {
       String resourceName = process.resourceName;
       InputStream processAsInputStream = getProcessAsInputStream(resourceName);
       byte[] bs = IoUtil.readInputStream(processAsInputStream, resourceName);

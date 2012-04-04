@@ -13,9 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.camunda.fox.processarchive;
+package com.camunda.fox.client.impl;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -34,13 +38,16 @@ import javax.ejb.TransactionManagementType;
 
 import org.activiti.engine.ProcessEngine;
 
+import com.camunda.fox.client.impl.executor.ProcessArchiveContextExecutor;
+import com.camunda.fox.client.impl.parser.DefaultProcessesXmlParser;
+import com.camunda.fox.client.impl.parser.spi.ProcessesXmlParser;
+import com.camunda.fox.client.impl.schema.ProcessesXml;
+import com.camunda.fox.client.impl.schema.ProcessesXml.ProcessArchiveXml;
+import com.camunda.fox.platform.FoxPlatformException;
 import com.camunda.fox.platform.api.ProcessArchiveService;
+import com.camunda.fox.platform.api.ProcessArchiveService.ProcessArchiveInstallation;
 import com.camunda.fox.platform.api.ProcessEngineService;
 import com.camunda.fox.platform.spi.ProcessArchive;
-import com.camunda.fox.processarchive.executor.ProcessArchiveContextExecutor;
-import com.camunda.fox.processarchive.parser.DefaultProcessesXmlParser;
-import com.camunda.fox.processarchive.parser.spi.ProcessesXmlParser;
-import com.camunda.fox.processarchive.schema.ProcessesXml;
 
 @Startup
 @Singleton
@@ -51,6 +58,8 @@ import com.camunda.fox.processarchive.schema.ProcessesXml;
 public class ProcessArchiveSupport {
   
   private final static Logger log = Logger.getLogger(ProcessArchiveSupport.class.getName());
+  
+  public final static String PROCESSES_XML_FILE_LOCATION = "META-INF/processes.xml";
   
   public final static String PROCESS_ARCHIVE_SERVICE_NAME =
           "java:global/" +
@@ -77,31 +86,52 @@ public class ProcessArchiveSupport {
   @Resource
   protected SessionContext sessionContext;
 
-  protected ProcessArchiveImpl processArchive;
-
-  protected ProcessEngine processEngine;
+  protected Map<ProcessArchive, ProcessEngine> installedProcessArchives = new HashMap<ProcessArchive, ProcessEngine>();
     
   @PostConstruct
-  protected void installProcessArchive() {
-    final String defaultProcessEngineName = processEngineService.getDefaultProcessEngine().getName(); 
+  protected void installProcessArchives() {
     final ProcessesXmlParser parser = getProcessesXmlParser();
     
-    ProcessesXml processesXml = parser.parseProcessesXml();
-    if(processesXml == null) {
-      log.log(Level.INFO, "No META-INF/processes.xml found. Not creating a process archive installation.");
-      processEngine = processEngineService.getDefaultProcessEngine();
+    ProcessesXml processesXml = parser.parseProcessesXml(PROCESSES_XML_FILE_LOCATION);
+    if(processesXml != null) {
+      List<ProcessArchive> processArchives = getConfiguredProcessArchives(processesXml);
+      for (ProcessArchive processArchive : processArchives) {
+        ProcessArchiveInstallation installation = processArchiveService.installProcessArchive(processArchive);
+        installedProcessArchives.put(processArchive, installation.getProcessEngine());
+      }
     } else {
-      setProcessArchiveName(processesXml);
-      processArchive = new ProcessArchiveImpl(processesXml, processArchiveContextExecutorBean, defaultProcessEngineName);
-      processEngine = processArchiveService.installProcessArchive(processArchive).getProcessEngine();
+      log.log(Level.INFO, "No "+PROCESSES_XML_FILE_LOCATION+" found. Not creating a process archive installation.");
+    }
+  }
+  
+  @PreDestroy
+  protected void uninstallProcessArchives() { 
+    for (ProcessArchive processArchive : installedProcessArchives.keySet()) {
+      processArchiveService.unInstallProcessArchive(processArchive);
     }
   }
 
-  @PreDestroy
-  protected void uninstallProcessArchive() { 
-    if(processArchive != null) {
-      processArchiveService.unInstallProcessArchive(processArchive);
-    }
+  protected List<ProcessArchive> getConfiguredProcessArchives(ProcessesXml processesXml) {
+    List<ProcessArchive> processArchives = new ArrayList<ProcessArchive>();
+    List<String> processArchiveNamesSeen = new ArrayList<String>();
+    for (ProcessArchiveXml processArchiveXml : processesXml.processArchives) {
+      if(processArchiveXml.name == null) {
+        setProcessArchiveName(processArchiveXml);
+      }
+      if(processArchiveNamesSeen.contains(processArchiveXml.name)) {
+        throw new FoxPlatformException("Cannot install more than one process archive with name '" + processArchiveXml.name
+                + "'. Make sure to set different names when declaring more than a single process-archive in '"+PROCESSES_XML_FILE_LOCATION+"'.");
+      } else {
+        processArchiveNamesSeen.add(processArchiveXml.name);
+      }
+      
+      if(processArchiveXml.configuration.processEngineName == null) {
+        processArchiveXml.configuration.processEngineName = processEngineService.getDefaultProcessEngine().getName();
+      }
+      
+      processArchives.add(new ProcessArchiveImpl(processArchiveXml, processArchiveContextExecutorBean));      
+    }    
+    return processArchives;
   }
 
   protected ProcessesXmlParser getProcessesXmlParser() {
@@ -114,9 +144,9 @@ public class ProcessArchiveSupport {
     }
   }
   
-  protected void setProcessArchiveName(ProcessesXml processesXml) {
-    if(processesXml.name == null || processesXml.name.length() == 0) {      
-      processesXml.name = getContextName();
+  protected void setProcessArchiveName(ProcessArchiveXml processArchive) {
+    if(processArchive.name == null || processArchive.name.length() == 0) {      
+      processArchive.name = getContextName();
     }
   }
 
@@ -125,11 +155,8 @@ public class ProcessArchiveSupport {
     return appName;    
   }
     
-  public ProcessEngine getProcessEngine() {
-    return processEngine;
+  public Map<ProcessArchive, ProcessEngine> getInstalledProcessArchives() {
+    return installedProcessArchives;
   }
-    
-  public ProcessArchiveImpl getProcessArchive() {
-    return processArchive;
-  }
+   
 }

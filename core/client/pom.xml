@@ -43,14 +43,64 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-		<dependency>
+		
+        <dependency>
 			<groupId>com.camunda.fox</groupId>
 			<artifactId>fox-platform-api</artifactId>
 			<version>${project.version}</version>
 			<scope>provided</scope>
 		</dependency>
+		
+        <dependency>
+		  <groupId>junit</groupId>
+		  <artifactId>junit</artifactId>
+		</dependency>
+
+        <dependency>
+          <groupId>org.jboss.arquillian.container</groupId>
+          <artifactId>arquillian-weld-ee-embedded-1.1</artifactId>
+          <scope>test</scope>
+        </dependency>
+        
+        <dependency>
+          <groupId>org.jboss.weld</groupId>
+          <artifactId>weld-core</artifactId>
+          <scope>test</scope>
+        </dependency>
+        
+        <dependency>
+          <groupId>org.jboss.weld</groupId>
+          <artifactId>weld-api</artifactId>
+          <scope>test</scope>
+        </dependency>
+        
+        <dependency>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-simple</artifactId>
+          <scope>test</scope>
+        </dependency>
+
+        <dependency>
+          <groupId>org.jboss.arquillian.junit</groupId>
+          <artifactId>arquillian-junit-container</artifactId>
+          <version>1.0.0.CR7</version>
+          <scope>test</scope>
+        </dependency>
+
 	</dependencies>
 
+      <dependencyManagement>
+        <dependencies>
+          <dependency>
+            <groupId>org.jboss.weld</groupId>
+            <artifactId>weld-core-bom</artifactId>
+            <version>1.1.5.Final</version>
+            <type>pom</type>
+            <scope>import</scope>
+          </dependency>
+        </dependencies>
+     </dependencyManagement>
+    
 	<build>
 		<plugins>
 			<plugin>
@@ -82,11 +132,11 @@
 							</artifactSet>		
 							<filters>
 								<filter>
-									<artifact>com.camunda.fox:fox-engine-cdi</artifact>									
+									<artifact>com.camunda.fox:fox-engine-cdi</artifact>                  									
 									<excludes>
 										<exclude>org/activiti/cdi/impl/util/ActivitiServices.class</exclude>
 										<exclude>org/activiti/cdi/impl/ActivitiExtension.class</exclude>															
-									</excludes>
+									</excludes>                  
 								</filter>							
 							</filters>					
 						</configuration>

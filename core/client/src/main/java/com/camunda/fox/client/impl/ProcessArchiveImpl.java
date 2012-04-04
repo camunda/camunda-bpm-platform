@@ -13,15 +13,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.camunda.fox.processarchive;
+package com.camunda.fox.client.impl;
 
 import java.util.Map;
 
+import com.camunda.fox.client.impl.executor.ProcessArchiveContextExecutor;
+import com.camunda.fox.client.impl.schema.ProcessesXml.ProcessArchiveXml;
+import com.camunda.fox.client.impl.util.BpmnResourceLoader;
 import com.camunda.fox.platform.spi.ProcessArchive;
 import com.camunda.fox.platform.spi.ProcessArchiveCallback;
-import com.camunda.fox.processarchive.executor.ProcessArchiveContextExecutor;
-import com.camunda.fox.processarchive.schema.ProcessesXml;
-import com.camunda.fox.processarchive.util.BpmnResourceLoader;
 
 /**
  * <p>Implementation of the {@link ProcessArchive} SPI.</p>
@@ -30,25 +30,23 @@ import com.camunda.fox.processarchive.util.BpmnResourceLoader;
  */
 public class ProcessArchiveImpl implements ProcessArchive {
 
-  protected final ProcessesXml processesXml;
   protected final ClassLoader classLoader;
   protected final ProcessArchiveContextExecutor executor;
-  private final String defaultProcessEngineName;
+  private final ProcessArchiveXml processArchiveXml;
     
-  public ProcessArchiveImpl(ProcessesXml processesXml, ProcessArchiveContextExecutor executor, String defaultProcessEngineName) {
-    this.processesXml = processesXml;
+  public ProcessArchiveImpl(ProcessArchiveXml processArchiveXml, ProcessArchiveContextExecutor executor) {
+    this.processArchiveXml = processArchiveXml;
     this.executor = executor;
-    this.defaultProcessEngineName = defaultProcessEngineName;
     this.classLoader = getClass().getClassLoader();    
   }
   
   public String getName() {
-    return processesXml.name;
+    return processArchiveXml.name;
   }
   
   public Map<String, byte[]> getProcessResources() {
     BpmnResourceLoader bpmnResourceLoader = getBpmnResourceLoader();
-    return bpmnResourceLoader.readBpmnResources(processesXml);
+    return bpmnResourceLoader.readBpmnResources(processArchiveXml);
   }
   
   protected BpmnResourceLoader getBpmnResourceLoader() {
@@ -56,7 +54,7 @@ public class ProcessArchiveImpl implements ProcessArchive {
   }
  
   public boolean isDeleteUponUndeploy() {
-    return processesXml.configuration.undeployment.delete;
+    return processArchiveXml.configuration.undeployment.delete;
   }
   
   public ClassLoader getClassLoader() {
@@ -70,7 +68,7 @@ public class ProcessArchiveImpl implements ProcessArchive {
 
   @Override
   public String getProcessEngineName() {
-    return defaultProcessEngineName;
+    return processArchiveXml.configuration.processEngineName;
   }
 
   @Override
