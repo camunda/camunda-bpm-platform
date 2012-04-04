@@ -12,7 +12,7 @@
   <parent>
     <groupId>com.camunda.fox</groupId>
     <artifactId>fox-platform-jboss</artifactId>
-    <version>1.19.0.CR-SNAPSHOT</version>
+    <version>1.19.0.CRtest7</version>
   </parent>
 
   <name>fox platform CE - jboss7 assembly</name>
