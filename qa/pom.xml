@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>fox-platform-qa</artifactId>
@@ -13,10 +12,20 @@
     <version>1.19.0.CR-SNAPSHOT</version>
     <relativePath>../parent</relativePath>
   </parent>
-
-  <modules>
-    <module>jboss7-runtime</module>
-    <module>integration-tests</module>
-    <module>activiti-testsuite</module>
-  </modules>
+  
+	<modules>
+		<module>jboss7-runtime</module>
+		<module>integration-tests</module>
+	</modules>
+  
+	<profiles>
+		<profile>
+			<id>full</id>	
+			<modules>
+				<module>jboss7-runtime</module>
+				<module>integration-tests</module>
+				<module>activiti-testsuite</module>
+			</modules>
+		</profile>	
+	</profiles>
 </project>

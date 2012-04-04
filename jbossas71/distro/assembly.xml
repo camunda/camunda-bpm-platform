@@ -61,15 +61,31 @@
       <outputDirectory>examples/src/cdi-jsf-task-management</outputDirectory>  
       <excludes>
         <exclude>target/</exclude>
-      </excludes>
+        <exclude>pom.xml</exclude>		
+		<exclude>pom.xml.distro</exclude>
+      </excludes>	 
+    </fileSet>
+	<fileSet>
+      <directory>../../examples/cdi-jsf-task-management</directory>
+      <outputDirectory>examples/src/cdi-jsf-task-management</outputDirectory>  
+      <includes>	
+		<include>pom.xml.distro</include>
+      </includes>	 
     </fileSet>
   </fileSets>
-
+  
+  <files>
+	<file>
+		<source>../../examples/cdi-jsf-task-management/pom.xml.distro</source>
+		<outputDirectory>examples/src/cdi-jsf-task-management</outputDirectory>
+		<destName>pom.xml</destName>
+	</file>
+  </files>
   
   <dependencySets>
     <dependencySet>
       <includes>
-        <include>*:war:*</include>
+        <include>com.camunda.fox:camunda-fox-ce-explorer:war:*</include>
       </includes>
       <outputDirectory>server/jboss-as-${version.jboss.as}/standalone/deployments</outputDirectory>
     </dependencySet>
