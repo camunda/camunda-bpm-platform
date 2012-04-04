@@ -25,10 +25,17 @@ import com.camunda.fox.platform.spi.ProcessArchive;
  * @author Daniel Meyer
  */
 public interface ProcessArchiveScanner {
-  
-  public static final String MARKER_FILE_LOCATION = "META-INF/processes.xml";
-  public static final String BPMN_20_RESOURCE_SUFFIX = "bpmn20.xml";
-  
+    
   public Map<String, byte[]> findResources(ProcessArchive processArchive);
+  
+  public static class ScanningUtil {
+    public static String MARKER_FILE_LOCATION = "META-INF/processes.xml";
+    
+    public static boolean isDeployable(String filename) {
+      return filename.endsWith(".bpmn20.xml") 
+             || filename.endsWith(".bpmn"); 
+    }
+    
+  }
 
 }

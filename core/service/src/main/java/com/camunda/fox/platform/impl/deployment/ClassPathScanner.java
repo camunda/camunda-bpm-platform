@@ -15,6 +15,9 @@
  */
 package com.camunda.fox.platform.impl.deployment;
 
+import static com.camunda.fox.platform.impl.deployment.spi.ProcessArchiveScanner.ScanningUtil.MARKER_FILE_LOCATION;
+import static com.camunda.fox.platform.impl.deployment.spi.ProcessArchiveScanner.ScanningUtil.isDeployable;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -136,7 +139,7 @@ public class ClassPathScanner implements ProcessArchiveScanner {
       while (entries.hasMoreElements()) {
         ZipEntry zipEntry = (ZipEntry) entries.nextElement();
         String name = zipEntry.getName();
-        if(name.endsWith(BPMN_20_RESOURCE_SUFFIX)) {
+        if(isDeployable(name)) {
           discoveredProceses.add(name);
           log.log(Level.FINEST, "discovered process {0}", name);
         }      
@@ -151,7 +154,7 @@ public class ClassPathScanner implements ProcessArchiveScanner {
     File[] paths = file.listFiles();
     for (File path : paths) {      
       String fileName = path.getPath();
-      if(!path.isDirectory() && fileName.endsWith(BPMN_20_RESOURCE_SUFFIX)) {
+      if(!path.isDirectory() && isDeployable(fileName)) {
         String nameRelative = fileName.substring(rootPath.length());
         discoveredProceses.add(nameRelative);
         log.log(Level.FINEST, "discovered process {0}", nameRelative);

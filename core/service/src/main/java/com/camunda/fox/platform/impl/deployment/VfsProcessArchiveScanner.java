@@ -15,6 +15,9 @@
  */
 package com.camunda.fox.platform.impl.deployment;
 
+import static com.camunda.fox.platform.impl.deployment.spi.ProcessArchiveScanner.ScanningUtil.MARKER_FILE_LOCATION;
+import static com.camunda.fox.platform.impl.deployment.spi.ProcessArchiveScanner.ScanningUtil.isDeployable;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
@@ -74,7 +77,7 @@ public class VfsProcessArchiveScanner implements ProcessArchiveScanner {
     try {
       List<VirtualFile> deployableResources = processArchiveRoot.getChildrenRecursively(new VirtualFileFilter() {
         public boolean accepts(VirtualFile file) {
-          return file.getName().endsWith(BPMN_20_RESOURCE_SUFFIX);
+          return isDeployable(file.getName());
         }
       });
       for (VirtualFile virtualFile : deployableResources) {
