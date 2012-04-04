@@ -33,7 +33,7 @@
 
   <distributionManagement>
     <repository>
-      <id>fox-ee-releases</id>
+      <id>camunda-fox</id>
       <name>Fox Enterprise Releases Maven Repository</name>
       <url>${distro.repo.ee}</url>
     </repository>
