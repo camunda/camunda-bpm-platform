@@ -38,11 +38,11 @@ import org.activiti.engine.impl.util.IoUtil;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.test.Deployment;
 
+import com.camunda.fox.client.impl.executor.ProcessArchiveContextExecutor;
 import com.camunda.fox.platform.api.ProcessArchiveService;
 import com.camunda.fox.platform.api.ProcessEngineService;
 import com.camunda.fox.platform.spi.ProcessArchive;
 import com.camunda.fox.platform.spi.ProcessArchiveCallback;
-import com.camunda.fox.processarchive.executor.ProcessArchiveContextExecutor;
 
 
 /**
