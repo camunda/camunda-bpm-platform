@@ -76,4 +76,16 @@
     </plugins>
   </build>
 
+  <scm>
+    <connection>scm:git:git@bitbucket.org:camunda/fox-platform-ee.git</connection>
+    <developerConnection>scm:git:git@bitbucket.org:camunda/fox-platform-ee.git</developerConnection>
+  </scm>
+  
+  <distributionManagement>
+    <repository>
+      <id>camunda-fox</id>
+      <name>Fox Enterprise Releases Maven Repository</name>
+      <url>${distro.repo.ee}</url>
+    </repository>
+  </distributionManagement>
 </project>
