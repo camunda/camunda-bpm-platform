@@ -84,17 +84,4 @@
    <developerConnection>scm:git:git@bitbucket.org:camunda/fox-platform-ce.git</developerConnection>
   </scm>
 
-  <distributionManagement>
-	<repository>
-		<id>fox-ce-releases</id>
-		<name>Fox Releases</name>
-		<url>${distro.repo.ce}</url>
-	</repository>
-    <snapshotRepository>
-       <id>fox-snapshots</id>
-       <name>Fox Snapshots</name>
-       <url>https://app.camunda.com/nexus/content/repositories/fox-snapshot/</url>
-    </snapshotRepository>	
-  </distributionManagement>
-
 </project>
