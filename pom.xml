@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.camunda.fox</groupId>
@@ -22,4 +21,23 @@
     <module>webapps/explorer</module>
 	<module>examples</module>
   </modules>
+  
+  <scm>
+   	<connection>scm:git:git@bitbucket.org:camunda/fox-releasemanagement.git</connection>
+   	<developerConnection>scm:git:git@bitbucket.org:camunda/fox-releasemanagement.git</developerConnection>
+  </scm>
+
+  <distributionManagement>
+	<repository>
+	  <id>camunda-fox</id>
+	  <name>Fox Community Releases</name>
+	  <url>${distro.repo.ce}</url>
+	</repository>
+	<snapshotRepository>
+      <id>camunda-fox</id>
+      <name>Fox Enterprise Snapshots</name>
+      <url>https://app.camunda.com/nexus/content/repositories/fox-snapshot/</url>
+	</snapshotRepository>
+  </distributionManagement>
+  
 </project>

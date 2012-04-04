@@ -1,6 +1,5 @@
 
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>camunda-fox-ce</artifactId>
@@ -84,18 +83,5 @@
    <connection>scm:git:git@bitbucket.org:camunda/fox-platform-ce.git</connection>
    <developerConnection>scm:git:git@bitbucket.org:camunda/fox-platform-ce.git</developerConnection>
   </scm>
-
-  <distributionManagement>
-	<repository>
-		<id>fox-ce-releases</id>
-		<name>Fox Releases</name>
-		<url>${distro.repo.ce}</url>
-	</repository>
-    <snapshotRepository>
-       <id>fox-snapshots</id>
-       <name>Fox Snapshots</name>
-       <url>https://app.camunda.com/nexus/content/repositories/fox-snapshot/</url>
-    </snapshotRepository>	
-  </distributionManagement>
 
 </project>
