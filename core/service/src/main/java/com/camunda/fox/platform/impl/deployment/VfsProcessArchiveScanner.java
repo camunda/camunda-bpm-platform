@@ -15,6 +15,10 @@
  */
 package com.camunda.fox.platform.impl.deployment;
 
+import static com.camunda.fox.platform.impl.deployment.spi.ProcessArchiveScanner.ScanningUtil.MARKER_FILE_LOCATION;
+import static com.camunda.fox.platform.impl.deployment.spi.ProcessArchiveScanner.ScanningUtil.isDeployable;
+import static com.camunda.fox.platform.impl.deployment.spi.ProcessArchiveScanner.ScanningUtil.isDiagramForProcess;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
@@ -42,6 +46,7 @@ import com.camunda.fox.platform.spi.ProcessArchive;
  * <p>This implementation should be used on Jboss AS 7</p>
  * 
  * @author Daniel Meyer
+ * @author Falko Menge
  */
 public class VfsProcessArchiveScanner implements ProcessArchiveScanner {
 
@@ -72,20 +77,37 @@ public class VfsProcessArchiveScanner implements ProcessArchiveScanner {
 
   protected void scanRoot(VirtualFile processArchiveRoot, Map<String, byte[]> resources) {
     try {
-      List<VirtualFile> deployableResources = processArchiveRoot.getChildrenRecursively(new VirtualFileFilter() {
+      List<VirtualFile> processes = processArchiveRoot.getChildrenRecursively(new VirtualFileFilter() {
         public boolean accepts(VirtualFile file) {
-          return file.getName().endsWith(BPMN_20_RESOURCE_SUFFIX);
+          return isDeployable(file.getName());
         }
       });
-      for (VirtualFile virtualFile : deployableResources) {
-        String resourceName = virtualFile.getPathNameRelativeTo(processArchiveRoot);
-        InputStream inputStream = virtualFile.openStream();
-        byte[] bytes = IoUtil.readInputStream(inputStream, resourceName);
-        IoUtil.closeSilently(inputStream);
-        resources.put(resourceName,bytes);        
+      for (final VirtualFile process : processes) {
+        addResource(process, processArchiveRoot, resources);
+        // find diagram(s) for process
+        List<VirtualFile> diagrams = process.getParent().getChildren(new VirtualFileFilter() {
+          public boolean accepts(VirtualFile file) {
+            return isDiagramForProcess(file.getName(), process.getName());
+          }
+        });
+        for (VirtualFile diagram : diagrams) {
+          addResource(diagram, processArchiveRoot, resources);
+        }
       }
     } catch (IOException e) {
       log.log(Level.WARNING, "Could not scan VFS root: "+processArchiveRoot, e);
+    }
+  }
+
+  private void addResource(VirtualFile virtualFile, VirtualFile processArchiveRoot, Map<String, byte[]> resources) {
+    String resourceName = virtualFile.getPathNameRelativeTo(processArchiveRoot);
+    try {
+      InputStream inputStream = virtualFile.openStream();
+      byte[] bytes = IoUtil.readInputStream(inputStream, resourceName);
+      IoUtil.closeSilently(inputStream);
+      resources.put(resourceName, bytes);
+    } catch (IOException e) {
+      log.log(Level.WARNING, "Could not read input stream of file '" + resourceName + "' from process archive '" + processArchiveRoot + "'.", e);
     }
   }
 
