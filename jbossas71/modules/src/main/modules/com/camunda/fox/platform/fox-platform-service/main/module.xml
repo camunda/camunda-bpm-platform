@@ -1,4 +1,4 @@
-<module xmlns="urn:jboss:module:1.0" name="com.camunda.fox.fox-platform-service">
+<module xmlns="urn:jboss:module:1.0" name="com.camunda.fox.platform.fox-platform-service">
   <resources>
     <resource-root path="fox-platform-service-@project.version@.jar" />
   </resources>
@@ -18,10 +18,10 @@
     <module name="org.jboss.logging" />
     <module name="org.jboss.vfs" />
         
-    <module name="com.camunda.fox.fox-engine" />
-    <module name="com.camunda.fox.fox-engine-cdi" />
-    <module name="com.camunda.fox.fox-platform-api" />
-    <module name="com.camunda.fox.fox-platform-deployer" />
+    <module name="com.camunda.fox.engine.fox-engine" />
+    <module name="com.camunda.fox.engine.fox-engine-cdi" />
+    <module name="com.camunda.fox.platform.fox-platform-api" />
+    <module name="com.camunda.fox.platform.fox-platform-deployer" />
     
   </dependencies>
 </module>

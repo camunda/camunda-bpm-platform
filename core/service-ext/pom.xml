@@ -2,17 +2,17 @@
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>fox-platform-service-ext</artifactId>
 	<packaging>jar</packaging>
-	<name>fox platform EE - core service extensions</name>
+	<name>fox platform EE - Core Service Extensions</name>
 
 	<parent>
-		<groupId>com.camunda.fox</groupId>
+		<groupId>com.camunda.fox.platform</groupId>
 		<artifactId>fox-platform-core</artifactId>
 		<version>6.0.sprint18-SNAPSHOT</version>
 	</parent>
 
 	<dependencies>
 		<dependency>
-			<groupId>com.camunda.fox</groupId>
+			<groupId>com.camunda.fox.platform</groupId>
 			<artifactId>fox-platform-service</artifactId>
 			<version>${project.version}</version>
 		</dependency>
@@ -25,7 +25,7 @@
 		</dependency>
     
     <dependency>
-      <groupId>com.camunda.fox</groupId>
+      <groupId>com.camunda.fox.engine</groupId>
       <artifactId>fox-engine-spring</artifactId>
       <version>${project.version}</version>
       <scope>provided</scope>

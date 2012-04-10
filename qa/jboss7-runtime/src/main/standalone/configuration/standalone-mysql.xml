@@ -26,7 +26,7 @@
         <extension module="org.jboss.as.web"/>
         <extension module="org.jboss.as.webservices"/>
         <extension module="org.jboss.as.weld"/>
-        <extension module="com.camunda.fox.fox-platform-jboss-subsystem"/>
+        <extension module="com.camunda.fox.platform.fox-platform-jboss-subsystem"/>
     </extensions>
 
     <management>
@@ -133,8 +133,8 @@
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:ee:1.0">
           <global-modules>
-            <module name="com.camunda.fox.fox-platform-api" />
-            <module name="com.camunda.fox.fox-engine" />
+            <module name="com.camunda.fox.platform.fox-platform-api" />
+            <module name="com.camunda.fox.engine.fox-engine" />
           </global-modules>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:ejb3:1.2">

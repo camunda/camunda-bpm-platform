@@ -1,12 +1,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>com.camunda.fox</groupId>
+  <groupId>com.camunda.fox.platform</groupId>
   <artifactId>fox-platform</artifactId>
   <version>6.0.sprint18-SNAPSHOT</version>
   <packaging>pom</packaging>
 
-  <name>fox platform EE (Enterprise Edition)</name>
+  <name>fox platform EE - Root Pom</name>
 
   <description>
     This pom defines the modules that make up the build. 

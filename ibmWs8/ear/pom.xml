@@ -3,11 +3,11 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <artifactId>fox-platform-ibmWs8-ear</artifactId>
-  <name>fox platform EE - IBM WebSphere 8 ear</name>
+  <name>fox platform EE - IBM WebSphere 8 EAR</name>
   <packaging>ear</packaging>
 
   <parent>
-    <groupId>com.camunda.fox</groupId>
+    <groupId>com.camunda.fox.platform</groupId>
     <artifactId>fox-platform-ibmWs8</artifactId>
     <version>6.0.sprint18-SNAPSHOT</version>
   </parent>
@@ -38,42 +38,42 @@
 
   <dependencies>
     <dependency>
-      <groupId>com.camunda.fox</groupId>
+      <groupId>com.camunda.fox.engine</groupId>
       <artifactId>fox-engine-cdi</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>com.camunda.fox</groupId>
+      <groupId>com.camunda.fox.platform</groupId>
       <artifactId>fox-platform-deployer</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>com.camunda.fox</groupId>
+      <groupId>com.camunda.fox.platform</groupId>
       <artifactId>fox-platform-service</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
-      <groupId>com.camunda.fox</groupId>
+      <groupId>com.camunda.fox.platform</groupId>
       <artifactId>fox-platform-service-ext</artifactId>
       <version>${project.version}</version>
     </dependency>
     
     <dependency>
-      <groupId>com.camunda.fox</groupId>
+      <groupId>com.camunda.fox.platform</groupId>
       <artifactId>fox-platform-service-ibmWs8</artifactId>
       <version>${project.version}</version>
       <type>ejb</type>
     </dependency>
 
     <dependency>
-      <groupId>com.camunda.fox</groupId>
+      <groupId>com.camunda.fox.engine</groupId>
       <artifactId>fox-engine-spring</artifactId>
       <version>${project.version}</version>
     </dependency>
     
     <!-- exclude engine form ear -->
     <dependency>
-      <groupId>com.camunda.fox</groupId>
+      <groupId>com.camunda.fox.engine</groupId>
       <artifactId>fox-engine</artifactId>
       <scope>provided</scope>
     </dependency>

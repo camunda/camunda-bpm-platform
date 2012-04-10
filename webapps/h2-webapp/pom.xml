@@ -1,17 +1,17 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>camunda-fox-h2-webapp</artifactId>
+  <artifactId>fox-h2-webapp</artifactId>
   <packaging>war</packaging>
 
   <parent>
-    <groupId>com.camunda.fox</groupId>
+    <groupId>com.camunda.fox.platform</groupId>
     <artifactId>fox-platform-parent</artifactId>
     <version>6.0.sprint18-SNAPSHOT</version>
     <relativePath>../../parent</relativePath>
   </parent>
 
-  <name>camunda fox ee h2 webapp</name>
+  <name>fox platform EE - H2 Webapp</name>
 
   <build>
     <plugins>

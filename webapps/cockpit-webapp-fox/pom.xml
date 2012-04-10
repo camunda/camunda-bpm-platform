@@ -2,7 +2,7 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
     <parent>
-      <groupId>com.camunda.fox</groupId>
+      <groupId>com.camunda.fox.platform</groupId>
       <artifactId>fox-platform-parent</artifactId>
       <version>6.0.sprint18-SNAPSHOT</version>
       <relativePath>../../parent</relativePath>
@@ -11,7 +11,7 @@
 	<groupId>com.camunda.fox.cockpit</groupId>
 	<artifactId>cockpit-webapp-fox</artifactId>
 	<packaging>war</packaging>
-	<name>camunda fox cockpit - Webapp Fox</name>
+	<name>fox cockpit - Webapp Fox</name>
 
 	<properties>
 		<facesContext.application.projectStage>Production</facesContext.application.projectStage>
@@ -28,14 +28,14 @@
 		</dependency>
 		
 		<dependency>
-			<groupId>com.camunda.fox</groupId>
+			<groupId>com.camunda.fox.platform</groupId>
 			<artifactId>fox-platform-api</artifactId>
 			<version>${project.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		
 		<dependency>
-			<groupId>com.camunda.fox</groupId>
+			<groupId>com.camunda.fox.engine</groupId>
 			<artifactId>fox-engine</artifactId>
 			<version>${project.version}</version>
 			<scope>provided</scope>
@@ -51,7 +51,7 @@
 					<artifactId>slf4j-api</artifactId>
 				</exclusion>
 				<exclusion>
-					<groupId>com.camunda.fox</groupId>
+					<groupId>com.camunda.fox.engine</groupId>
 					<artifactId>fox-engine</artifactId>
 				</exclusion>
 			</exclusions>

@@ -1,4 +1,4 @@
-<module xmlns="urn:jboss:module:1.0" name="com.camunda.fox.fox-engine">
+<module xmlns="urn:jboss:module:1.0" name="com.camunda.fox.engine.fox-engine">
   <resources>
     <resource-root path="fox-engine-@project.version@.jar" />
   </resources>

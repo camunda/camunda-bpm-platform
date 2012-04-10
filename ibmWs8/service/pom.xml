@@ -3,10 +3,10 @@
   <modelVersion>4.0.0</modelVersion>
   <artifactId>fox-platform-ibmWs8-service</artifactId>
   <packaging>ejb</packaging>
-  <name>fox platform EE - IBM WebSphere 8 service </name>
+  <name>fox platform EE - IBM WebSphere 8 Service</name>
 
   <parent>
-    <groupId>com.camunda.fox</groupId>
+    <groupId>com.camunda.fox.platform</groupId>
     <artifactId>fox-platform-ibmWs8</artifactId>
     <version>6.0.sprint18-SNAPSHOT</version>
   </parent>
@@ -14,7 +14,7 @@
   <dependencies>
 
     <dependency>
-      <groupId>com.camunda.fox</groupId>
+      <groupId>com.camunda.fox.platform</groupId>
       <artifactId>fox-platform-ejb-service</artifactId>
       <version>${project.version}</version>
       <type>ejb</type>

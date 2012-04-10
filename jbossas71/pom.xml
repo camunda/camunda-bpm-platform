@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>com.camunda.fox</groupId>
+    <groupId>com.camunda.fox.platform</groupId>
     <artifactId>fox-platform-parent</artifactId>
     <version>6.0.sprint18-SNAPSHOT</version>
     <relativePath>../parent</relativePath>
@@ -12,7 +12,7 @@
   <version>6.0.sprint18-SNAPSHOT</version>
   <packaging>pom</packaging>
 
-  <name>fox platform EE - jboss7</name>
+  <name>fox platform EE - jBoss7</name>
   
   <description>
     This pom defines the modules for the JBoss distribution which is shipped as Fox Platform Comunity Edition (CE)

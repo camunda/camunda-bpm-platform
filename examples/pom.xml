@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>com.camunda.fox</groupId>
+    <groupId>com.camunda.fox.platform</groupId>
     <artifactId>fox-platform-parent</artifactId>
     <version>6.0.sprint18-SNAPSHOT</version>
     <relativePath>../parent</relativePath>
@@ -11,7 +11,7 @@
   <artifactId>fox-platform-examples</artifactId>
   <packaging>pom</packaging>
 
-  <name>fox platform EE - examples</name>
+  <name>fox platform EE - Examples</name>
  
   <modules>
     <module>cdi-jsf-task-management</module>   

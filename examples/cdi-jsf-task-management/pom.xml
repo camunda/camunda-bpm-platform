@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.camunda.fox.examples</groupId>
 	<artifactId>fox-examples-cdi-jsf-taskmanagement</artifactId>	
-	<name>fox platform EE - examples taskmanagement</name>
+	<name>fox platform EE - Examples Taskmanagement</name>
 	<packaging>war</packaging>
 	
 	<properties>
@@ -12,7 +12,7 @@
 	</properties>
 	
 	<parent>
-		<groupId>com.camunda.fox</groupId>
+		<groupId>com.camunda.fox.platform</groupId>
 		<artifactId>fox-platform-parent</artifactId>
 		<version>6.0.sprint18-SNAPSHOT</version>
 		<relativePath>../../parent</relativePath>
@@ -21,7 +21,7 @@
 	<dependencies>
 		<dependency>
 	      <!-- make sure this comes after runtime in the reactor build -->
-	      <groupId>com.camunda.fox</groupId>
+	      <groupId>com.camunda.fox.platform</groupId>
 	      <artifactId>fox-platform-qa-jboss-runtime</artifactId>
 	      <version>${project.version}</version>
 	      <scope>provided</scope>
@@ -29,12 +29,12 @@
 	    </dependency>
 		
 		<dependency>
-			<groupId>com.camunda.fox</groupId>
+			<groupId>com.camunda.fox.platform</groupId>
 			<artifactId>fox-platform-client</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		<dependency>
-			<groupId>com.camunda.fox</groupId>
+			<groupId>com.camunda.fox.engine</groupId>
 			<artifactId>fox-engine</artifactId>
 			<version>${project.version}</version>
 			<scope>provided</scope>
