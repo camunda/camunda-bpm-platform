@@ -20,11 +20,11 @@ import org.activiti.engine.impl.ProcessEngineImpl;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.test.AbstractActivitiTestCase;
 
+import com.camunda.fox.client.impl.executor.ProcessArchiveContextExecutor;
 import com.camunda.fox.platform.FoxPlatformException;
 import com.camunda.fox.platform.api.ProcessArchiveService;
 import com.camunda.fox.platform.api.ProcessEngineService;
 import com.camunda.fox.platform.impl.schema.DbSchemaOperations;
-import com.camunda.fox.processarchive.executor.ProcessArchiveContextExecutor;
 
 
 // overlay 

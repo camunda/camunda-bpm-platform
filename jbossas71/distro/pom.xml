@@ -55,13 +55,12 @@
 
     <dependency>
       <groupId>com.camunda.fox.platform</groupId>
-      <artifactId>fox-h2-webapp</artifactId>
+      <artifactId>fox-platform-h2-webapp</artifactId>
       <version>${project.version}</version>
       <type>war</type>
     </dependency>
 
   </dependencies>
-
 
   <build>
     <plugins>

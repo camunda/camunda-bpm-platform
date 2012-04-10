@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.camunda.fox.examples</groupId>
 	<artifactId>fox-examples-cdi-jsf-taskmanagement</artifactId>	
-	<name>fox platform CE - examples taskmanagement</name>
+	<name>fox platform EE - Examples Taskmanagement</name>
 	<packaging>war</packaging>
 	<version>6.0.sprint18-SNAPSHOT</version>
 	

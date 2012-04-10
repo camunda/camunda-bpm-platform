@@ -3,7 +3,6 @@
 
   <artifactId>fox-platform-qa</artifactId>
   <packaging>pom</packaging>
-
   <name>fox platform EE - QA</name>
 
   <parent>

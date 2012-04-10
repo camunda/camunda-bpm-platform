@@ -4,7 +4,6 @@
 
   <artifactId>fox-platform-jboss-modules</artifactId>
   <packaging>pom</packaging>
-
   <name>fox platform EE - jBoss7 Modules</name>
 
   <parent>
@@ -73,7 +72,7 @@
                 </copy>
                 
                 <replace dir="target/modules" token="@project.version@" value="${project.version}">
-                  <include name="**/module.xml"/>
+                  <include name="**/module.xml" />
                 </replace>                
               </target>
             </configuration>
