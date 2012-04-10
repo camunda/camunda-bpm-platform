@@ -3,10 +3,10 @@
 
   <artifactId>fox-platform-qa-integration-tests</artifactId>
 
-  <name>fox platform EE - qa integration tests</name>
+  <name>fox platform EE - QA Integrationtests</name>
 
   <parent>
-    <groupId>com.camunda.fox</groupId>
+    <groupId>com.camunda.fox.platform</groupId>
     <artifactId>fox-platform-qa</artifactId>
     <version>6.0.sprint18-SNAPSHOT</version>
   </parent>
@@ -14,7 +14,7 @@
   <dependencies>
     <dependency>
       <!-- make sure this comes after runtime in the reactor build -->
-      <groupId>com.camunda.fox</groupId>
+      <groupId>com.camunda.fox.platform</groupId>
       <artifactId>fox-platform-qa-jboss-runtime</artifactId>
       <version>${project.version}</version>
       <scope>provided</scope>
@@ -49,19 +49,19 @@
     </dependency>
     
     <dependency>
-      <groupId>com.camunda.fox</groupId>
+      <groupId>com.camunda.fox.platform</groupId>
       <artifactId>fox-platform-client</artifactId>
       <scope>provided</scope>
     </dependency>
 
     <dependency>
-      <groupId>com.camunda.fox</groupId>
+      <groupId>com.camunda.fox.engine</groupId>
       <artifactId>fox-engine</artifactId>
       <scope>provided</scope>
     </dependency>
     
     <dependency>
-      <groupId>com.camunda.fox</groupId>
+      <groupId>com.camunda.fox.platform</groupId>
       <artifactId>fox-platform-api</artifactId>
       <scope>provided</scope>
     </dependency>

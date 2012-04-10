@@ -4,10 +4,10 @@
   <artifactId>fox-platform-jboss-subsystem</artifactId>
   <packaging>jar</packaging>
 
-  <name>fox platform EE - jboss7 subsystem</name>
+  <name>fox platform EE - jBoss7 Subsystem</name>
 
   <parent>
-    <groupId>com.camunda.fox</groupId>
+    <groupId>com.camunda.fox.platform</groupId>
     <artifactId>fox-platform-jboss</artifactId>
     <version>6.0.sprint18-SNAPSHOT</version>
   </parent>
@@ -44,12 +44,12 @@
 
   <dependencies>
     <dependency>
-      <groupId>com.camunda.fox</groupId>
+      <groupId>com.camunda.fox.platform</groupId>
       <artifactId>fox-platform-service</artifactId>
     </dependency>
 
     <dependency>
-      <groupId>com.camunda.fox</groupId>
+      <groupId>com.camunda.fox.engine</groupId>
       <artifactId>fox-engine</artifactId>
       <exclusions>
         <exclusion>
