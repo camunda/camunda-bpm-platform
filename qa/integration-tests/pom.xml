@@ -2,7 +2,6 @@
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>fox-platform-qa-integration-tests</artifactId>
-
   <name>fox platform EE - QA Integrationtests</name>
 
   <parent>
@@ -75,6 +74,7 @@
         <includes>
           <include>**/*.xml</include>
           <include>**/*.properties</include>
+          <include>**/*.png</include>
         </includes>
       </testResource>
     </testResources>

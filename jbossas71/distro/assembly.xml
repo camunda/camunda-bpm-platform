@@ -85,8 +85,8 @@
   <dependencySets>
     <dependencySet>
       <includes>
-        <include>com.camunda.fox.platform:camunda-fox-ee-explorer:war:*</include>
-		<include>com.camunda.fox.platform:camunda-fox-h2-webapp:war:*</include>
+        <include>com.camunda.fox.platform:fox-platform-explorer:war:*</include>
+		<include>com.camunda.fox.platform:fox-platform-h2-webapp:war:*</include>
 		<include>com.camunda.fox.cockpit:cockpit-webapp-fox:war:*</include>
 		<include>com.camunda.fox.cycle:cycle-webapp-fox:war:*</include>						
       </includes>

@@ -5,7 +5,6 @@
   <artifactId>fox-platform</artifactId>
   <version>6.0.sprint18-SNAPSHOT</version>
   <packaging>pom</packaging>
-
   <name>fox platform EE - Root Pom</name>
 
   <description>

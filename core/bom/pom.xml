@@ -2,12 +2,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
+  <groupId>com.camunda.fox.platform</groupId>
   <artifactId>fox-platform-core-bom</artifactId>
   <version>6.0.sprint18-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>fox platform EE - Core Bill Of Material</name>
-
   <parent>
     <groupId>com.camunda.fox.engine</groupId>
     <artifactId>fox-engine-root</artifactId>
@@ -83,5 +83,4 @@
     </dependencies>
   </dependencyManagement>
   
-  <groupId>com.camunda.fox.platform</groupId>
 </project>

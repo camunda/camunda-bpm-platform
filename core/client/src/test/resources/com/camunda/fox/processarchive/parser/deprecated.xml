@@ -1,0 +1,6 @@
+<processArchive>
+   <name>ProcessArchive1</name> 
+    <configuration>
+      <undeployment delete="true" />
+    </configuration>
+</processArchive>
