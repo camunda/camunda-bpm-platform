@@ -82,16 +82,4 @@
     </dependencies>
   </dependencyManagement>
   
-  <repositories>
-    <repository>
-      <id>camunda-fox</id>
-      <name>camunda fox Maven</name>
-      <url>http://fox.camunda.com/enterprise/mvn/</url>
-      <releases>
-        <enabled>true</enabled>
-        <updatePolicy>always</updatePolicy>
-      </releases>
-    </repository>
-  </repositories>
-
 </project>

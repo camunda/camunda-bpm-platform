@@ -27,28 +27,6 @@
 
   <repositories>
     <repository>
-      <id>camunda-fox-enterprise</id>
-      <name>camunda fox Enterprise Maven Mirror</name>
-      <url>http://fox.camunda.com/enterprise/mvn/</url>
-      <releases>
-        <enabled>true</enabled>
-        <updatePolicy>always</updatePolicy>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-        <updatePolicy>always</updatePolicy>
-      </snapshots>
-    </repository>
-    <repository>
-      <id>camunda-fox</id>
-      <name>camunda fox Maven</name>
-      <url>http://fox.camunda.com/mvn/</url>
-      <releases>
-        <enabled>true</enabled>
-        <updatePolicy>always</updatePolicy>
-      </releases>
-    </repository>
-    <repository>
       <id>repository.jboss.org</id>
       <url>http://repository.jboss.org/nexus/content/groups/public-jboss</url>
     </repository>
