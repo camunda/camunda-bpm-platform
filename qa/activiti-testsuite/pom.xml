@@ -4,11 +4,11 @@
 
   <artifactId>fox-platform-qa-activiti-testsuite</artifactId>
 
-  <name>fox platform CE - qa activiti test suite</name>
+  <name>fox platform CE - QA Activiti Testsuite</name>
   <packaging>jar</packaging>
 
   <parent>
-    <groupId>com.camunda.fox</groupId>
+    <groupId>com.camunda.fox.platform</groupId>
     <artifactId>fox-platform-qa</artifactId>
     <version>1.19.0.CR-SNAPSHOT</version>
   </parent>
@@ -16,7 +16,7 @@
   <dependencies>
     <dependency>
       <!-- make sure this comes after runtime in the reactor build -->
-      <groupId>com.camunda.fox</groupId>
+      <groupId>com.camunda.fox.platform</groupId>
       <artifactId>fox-platform-qa-jboss-runtime</artifactId>
       <version>${project.version}</version>
       <scope>provided</scope>
@@ -51,28 +51,28 @@
     </dependency>
 
     <dependency>
-      <groupId>com.camunda.fox</groupId>
+      <groupId>com.camunda.fox.platform</groupId>
       <artifactId>fox-platform-client</artifactId>
       <scope>provided</scope>
     </dependency>
 
     <dependency>
-      <groupId>com.camunda.fox</groupId>
+      <groupId>com.camunda.fox.platform</groupId>
       <artifactId>fox-platform-api</artifactId>
     </dependency>
 
     <dependency>
-      <groupId>com.camunda.fox</groupId>
+      <groupId>com.camunda.fox.platform</groupId>
       <artifactId>fox-platform-service</artifactId>
     </dependency>
 
     <dependency>
-      <groupId>com.camunda.fox</groupId>
+      <groupId>com.camunda.fox.engine</groupId>
       <artifactId>fox-engine</artifactId>
     </dependency>
 
     <dependency>
-      <groupId>com.camunda.fox</groupId>
+      <groupId>com.camunda.fox.engine</groupId>
       <artifactId>fox-engine</artifactId>
       <version>${project.version}</version>
       <classifier>tests</classifier>
@@ -115,7 +115,7 @@
             <configuration>
               <artifactItems>
                 <artifactItem>
-                  <groupId>com.camunda.fox</groupId>
+                  <groupId>com.camunda.fox.engine</groupId>
                   <artifactId>fox-engine</artifactId>
                   <version>${project.version}</version>
                   <classifier>tests</classifier>

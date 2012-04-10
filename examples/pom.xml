@@ -2,8 +2,8 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>com.camunda.fox</groupId>
-    <artifactId>fox-platform-parent</artifactId>
+    <groupId>com.camunda.fox.platform</groupId>
+    <artifactId>fox-platform-root</artifactId>
     <version>1.19.0.CR-SNAPSHOT</version>
     <relativePath>../parent</relativePath>
   </parent>
@@ -11,7 +11,7 @@
   <artifactId>fox-platform-examples</artifactId>
   <packaging>pom</packaging>
 
-  <name>fox platform CE - examples</name>
+  <name>fox platform CE - Examples</name>
  
   <modules>
     <module>cdi-jsf-task-management</module>   

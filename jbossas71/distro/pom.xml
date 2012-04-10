@@ -2,23 +2,23 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>camunda-fox-ce</artifactId>
+  <artifactId>fox-platform-jboss-distro</artifactId>
   <packaging>pom</packaging>
 
   <parent>
-    <groupId>com.camunda.fox</groupId>
+    <groupId>com.camunda.fox.platform</groupId>
     <artifactId>fox-platform-jboss</artifactId>
     <version>1.19.0.CR-SNAPSHOT</version>
   </parent>
 
-  <name>fox platform CE - jboss7 distro</name>
+  <name>fox platform CE - jBoss7 Distro</name>
 
   <dependencies>
 
     <dependency>
       <!-- this dependency is to make sure that we are executed after the integration 
         tests have passed in the reactor -->
-      <groupId>com.camunda.fox</groupId>
+      <groupId>com.camunda.fox.platform</groupId>
       <artifactId>fox-platform-qa</artifactId>
       <version>${project.version}</version>
       <type>pom</type>
@@ -26,8 +26,8 @@
     </dependency>
 
     <dependency>
-      <groupId>com.camunda.fox</groupId>
-      <artifactId>camunda-fox-ce-explorer</artifactId>
+      <groupId>com.camunda.fox.platform</groupId>
+      <artifactId>fox-platform-explorer</artifactId>
       <version>${project.version}</version>
       <type>war</type>
     </dependency>
@@ -83,18 +83,5 @@
    <connection>scm:git:git@bitbucket.org:camunda/fox-platform-ce.git</connection>
    <developerConnection>scm:git:git@bitbucket.org:camunda/fox-platform-ce.git</developerConnection>
   </scm>
-
-  <distributionManagement>
-	<repository>
-		<id>fox-ce-releases</id>
-		<name>Fox Releases</name>
-		<url>${distro.repo.ce}</url>
-	</repository>
-    <snapshotRepository>
-       <id>fox-snapshots</id>
-       <name>Fox Snapshots</name>
-       <url>https://app.camunda.com/nexus/content/repositories/fox-snapshot/</url>
-    </snapshotRepository>	
-  </distributionManagement>
 
 </project>

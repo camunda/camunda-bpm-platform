@@ -2,8 +2,8 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>com.camunda.fox</groupId>
-    <artifactId>fox-platform-parent</artifactId>
+    <groupId>com.camunda.fox.platform</groupId>
+    <artifactId>fox-platform-root</artifactId>
     <version>1.19.0.CR-SNAPSHOT</version>
     <relativePath>../parent</relativePath>
   </parent>
@@ -11,7 +11,7 @@
   <artifactId>fox-platform-jboss</artifactId>
   <packaging>pom</packaging>
 
-  <name>fox platform CE - jboss7</name>
+  <name>fox platform CE - jBoss7</name>
   
   <description>
     This pom defines the modules for the JBoss distribution which is shipped as Fox Platform Comunity Edition (CE)

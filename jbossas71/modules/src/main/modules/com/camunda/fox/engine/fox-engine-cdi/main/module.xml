@@ -1,4 +1,4 @@
-<module xmlns="urn:jboss:module:1.0" name="com.camunda.fox.fox-engine-cdi">
+<module xmlns="urn:jboss:module:1.0" name="com.camunda.fox.engine.fox-engine-cdi">
   <resources>
     <resource-root path="fox-engine-cdi-@project.version@.jar" />
   </resources>
@@ -16,6 +16,6 @@
 	<module name="javax.inject.api"/>
 	<module name="javax.enterprise.api"/>
   
-	<module name="com.camunda.fox.fox-engine"/>  
+	<module name="com.camunda.fox.engine.fox-engine"/>  
   </dependencies>
 </module>

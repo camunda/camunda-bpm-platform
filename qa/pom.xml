@@ -4,11 +4,11 @@
   <artifactId>fox-platform-qa</artifactId>
   <packaging>pom</packaging>
 
-  <name>fox platform CE - qa</name>
+  <name>fox platform CE - QA</name>
 
   <parent>
-    <groupId>com.camunda.fox</groupId>
-    <artifactId>fox-platform-parent</artifactId>
+    <groupId>com.camunda.fox.platform</groupId>
+    <artifactId>fox-platform-root</artifactId>
     <version>1.19.0.CR-SNAPSHOT</version>
     <relativePath>../parent</relativePath>
   </parent>

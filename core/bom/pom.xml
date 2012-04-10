@@ -2,13 +2,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
+  <groupId>com.camunda.fox.platform</groupId>
   <artifactId>fox-platform-core-bom</artifactId>
   <packaging>pom</packaging>
 
-  <name>fox platform CE - core bill of material</name>
+  <name>fox platform CE - Core bill of material</name>
 
   <parent>
-    <groupId>com.camunda.fox</groupId>
+    <groupId>com.camunda.fox.engine</groupId>
     <artifactId>fox-engine-root</artifactId>
     <version>1.19.0.CR-SNAPSHOT</version>
 	<relativePath>../../../fox-engine/pom.xml</relativePath>
@@ -24,22 +25,22 @@
       <!-- ============================================================= -->
       <!-- modules part of this project -->
       <dependency>
-        <groupId>com.camunda.fox</groupId>
+        <groupId>com.camunda.fox.platform</groupId>
         <artifactId>fox-platform-service</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>com.camunda.fox</groupId>
+        <groupId>com.camunda.fox.platform</groupId>
         <artifactId>fox-platform-api</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>com.camunda.fox</groupId>
+        <groupId>com.camunda.fox.platform</groupId>
         <artifactId>fox-platform-deployer</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>com.camunda.fox</groupId>
+        <groupId>com.camunda.fox.platform</groupId>
         <artifactId>fox-platform-client</artifactId>
         <version>${project.version}</version>
       </dependency>
@@ -47,12 +48,12 @@
       <!-- ============================================================= -->
       <!-- dependencies -->
       <dependency>
-        <groupId>com.camunda.fox</groupId>
+        <groupId>com.camunda.fox.engine</groupId>
         <artifactId>fox-engine</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>com.camunda.fox</groupId>
+        <groupId>com.camunda.fox.engine</groupId>
         <artifactId>fox-engine-cdi</artifactId>
         <version>${project.version}</version>
       </dependency>

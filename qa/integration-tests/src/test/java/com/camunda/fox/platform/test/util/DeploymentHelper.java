@@ -25,7 +25,7 @@ public class DeploymentHelper {
   
   public static File[] getFoxPlatformClient() {
     MavenDependencyResolver resolver = DependencyResolvers.use(MavenDependencyResolver.class).goOffline().loadMetadataFromPom("pom.xml");
-    return resolver.artifact("com.camunda.fox:fox-platform-client").resolveAsFiles();
+    return resolver.artifact("com.camunda.fox.platform:fox-platform-client").resolveAsFiles();
   }
 
 }

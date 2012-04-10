@@ -1,24 +1,19 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>fox-platform-client</artifactId>
-	<name>fox platform CE - client</name>
+	<name>fox platform CE - Client</name>
 	<packaging>jar</packaging>
 
 	<parent>
-		<groupId>com.camunda.fox</groupId>
+		<groupId>com.camunda.fox.platform</groupId>
 		<artifactId>fox-platform-core</artifactId>
 		<version>1.19.0.CR-SNAPSHOT</version>		
 	</parent>
 
 	<dependencies>
+	
 		<dependency>
-			<groupId>org.jboss.spec</groupId>
-			<artifactId>jboss-javaee-web-6.0</artifactId>
-			<type>pom</type>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>com.camunda.fox</groupId>
+			<groupId>com.camunda.fox.engine</groupId>
 			<artifactId>fox-engine-cdi</artifactId>
 			<exclusions>
 				<exclusion>
@@ -43,14 +38,71 @@
 				</exclusion>
 			</exclusions>
 		</dependency>
-		<dependency>
-			<groupId>com.camunda.fox</groupId>
+		
+        <dependency>
+			<groupId>com.camunda.fox.platform</groupId>
 			<artifactId>fox-platform-api</artifactId>
 			<version>${project.version}</version>
 			<scope>provided</scope>
 		</dependency>
+		
+        <dependency>
+		  <groupId>junit</groupId>
+		  <artifactId>junit</artifactId>
+		</dependency>
+
+        <dependency>
+          <groupId>org.jboss.arquillian.container</groupId>
+          <artifactId>arquillian-weld-ee-embedded-1.1</artifactId>
+          <scope>test</scope>
+        </dependency>
+        
+        <dependency>
+          <groupId>org.jboss.weld</groupId>
+          <artifactId>weld-core</artifactId>
+          <scope>provided</scope>
+        </dependency>
+        
+        <dependency>
+          <groupId>org.jboss.weld</groupId>
+          <artifactId>weld-api</artifactId>
+          <scope>provided</scope>
+        </dependency>
+        
+        <dependency>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-simple</artifactId>
+          <scope>test</scope>
+        </dependency>
+
+        <dependency>
+          <groupId>org.jboss.arquillian.junit</groupId>
+          <artifactId>arquillian-junit-container</artifactId>
+          <version>1.0.0.CR7</version>
+          <scope>test</scope>
+        </dependency>
+        
+        <dependency>
+          <groupId>org.jboss.spec</groupId>
+          <artifactId>jboss-javaee-web-6.0</artifactId>
+          <type>pom</type>
+          <scope>provided</scope>
+        </dependency>
+
 	</dependencies>
 
+      <dependencyManagement>
+        <dependencies>
+          <dependency>
+            <groupId>org.jboss.weld</groupId>
+            <artifactId>weld-core-bom</artifactId>
+            <version>1.1.5.Final</version>
+            <type>pom</type>
+            <scope>import</scope>
+          </dependency>
+        </dependencies>
+     </dependencyManagement>
+    
 	<build>
 		<plugins>
 			<plugin>
@@ -77,16 +129,16 @@
 						<configuration>
 							<artifactSet>
 								<includes>
-									<include>com.camunda.fox:fox-engine-cdi</include>
+									<include>com.camunda.fox.engine:fox-engine-cdi</include>
 								</includes>
 							</artifactSet>		
 							<filters>
 								<filter>
-									<artifact>com.camunda.fox:fox-engine-cdi</artifact>									
+									<artifact>com.camunda.fox.engine:fox-engine-cdi</artifact>									
 									<excludes>
 										<exclude>org/activiti/cdi/impl/util/ActivitiServices.class</exclude>
 										<exclude>org/activiti/cdi/impl/ActivitiExtension.class</exclude>															
-									</excludes>
+									</excludes>                  
 								</filter>							
 							</filters>					
 						</configuration>
