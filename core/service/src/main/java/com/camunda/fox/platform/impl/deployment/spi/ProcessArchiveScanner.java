@@ -17,25 +17,48 @@ package com.camunda.fox.platform.impl.deployment.spi;
 
 import java.util.Map;
 
+import org.activiti.engine.impl.bpmn.deployer.BpmnDeployer;
+
 import com.camunda.fox.platform.spi.ProcessArchive;
 
 /**
  * <p>Scans a process archive for deployables.</p>
  *  
  * @author Daniel Meyer
+ * @author Falko Menge
  */
 public interface ProcessArchiveScanner {
     
   public Map<String, byte[]> findResources(ProcessArchive processArchive);
   
   public static class ScanningUtil {
+
     public static String MARKER_FILE_LOCATION = "META-INF/processes.xml";
     
     public static boolean isDeployable(String filename) {
-      return filename.endsWith(".bpmn20.xml") 
-             || filename.endsWith(".bpmn"); 
+      for (String bpmnResourceSuffix : BpmnDeployer.BPMN_RESOURCE_SUFFIXES) {
+        if (filename.endsWith(bpmnResourceSuffix)) {
+          return true;
+        }
+      }
+      return false; 
     }
     
+    public static boolean isDiagramForProcess(String diagramFileName, String processFileName) {
+      for (String bpmnResourceSuffix : BpmnDeployer.BPMN_RESOURCE_SUFFIXES) {
+        if (processFileName.endsWith(bpmnResourceSuffix)) {
+          String processFilePrefix = processFileName.substring(0, processFileName.length() - bpmnResourceSuffix.length());
+          if (diagramFileName.startsWith(processFilePrefix)) {
+            for (String diagramResourceSuffix : BpmnDeployer.DIAGRAM_SUFFIXES) {
+              if (diagramFileName.endsWith(diagramResourceSuffix)) {
+                return true;
+              }
+            }
+          }
+        }
+      }
+      return false;
+    }
   }
 
 }

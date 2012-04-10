@@ -17,6 +17,7 @@ package com.camunda.fox.platform.impl.deployment;
 
 import static com.camunda.fox.platform.impl.deployment.spi.ProcessArchiveScanner.ScanningUtil.MARKER_FILE_LOCATION;
 import static com.camunda.fox.platform.impl.deployment.spi.ProcessArchiveScanner.ScanningUtil.isDeployable;
+import static com.camunda.fox.platform.impl.deployment.spi.ProcessArchiveScanner.ScanningUtil.isDiagramForProcess;
 
 import java.io.File;
 import java.io.IOException;
@@ -47,6 +48,7 @@ import com.camunda.fox.platform.spi.ProcessArchive;
  * file </p>
  * 
  * @author Daniel Meyer
+ * @author Falko Menge
  */
 public class ClassPathScanner implements ProcessArchiveScanner {
 
@@ -138,30 +140,53 @@ public class ClassPathScanner implements ProcessArchiveScanner {
       Enumeration< ? extends ZipEntry> entries = zipFile.entries();
       while (entries.hasMoreElements()) {
         ZipEntry zipEntry = (ZipEntry) entries.nextElement();
-        String name = zipEntry.getName();
-        if(isDeployable(name)) {
-          discoveredProceses.add(name);
-          log.log(Level.FINEST, "discovered process {0}", name);
-        }      
-      }   
+        String processFileName = zipEntry.getName();
+        if (isDeployable(processFileName)) {
+          addResource(processFileName, discoveredProceses);
+          // find diagram(s) for process
+          Enumeration< ? extends ZipEntry> entries2 = zipFile.entries();
+          while (entries2.hasMoreElements()) {
+            ZipEntry zipEntry2 = (ZipEntry) entries2.nextElement();
+            String diagramFileName = zipEntry2.getName();
+            if (isDiagramForProcess(diagramFileName, processFileName)) {
+              addResource(diagramFileName, discoveredProceses);
+            }
+          }
+        }
+      }
       zipFile.close();
-    }catch (IOException e) {
+    } catch (IOException e) {
       throw new FoxPlatformException("IOException while scanning archive '"+file+"'.", e);
     }
   }
 
-  protected void handleDirectory(File file, String rootPath, Set<String> discoveredProceses, ClassLoader classLoader) {
-    File[] paths = file.listFiles();
-    for (File path : paths) {      
-      String fileName = path.getPath();
-      if(!path.isDirectory() && isDeployable(fileName)) {
-        String nameRelative = fileName.substring(rootPath.length());
-        discoveredProceses.add(nameRelative);
-        log.log(Level.FINEST, "discovered process {0}", nameRelative);
-      }else if(path.isDirectory()) {
-        handleDirectory(path, rootPath, discoveredProceses, classLoader);
+  protected void handleDirectory(File directory, String rootPath, Set<String> discoveredProcesses, ClassLoader classLoader) {
+    File[] paths = directory.listFiles();
+    for (File path : paths) {
+      String processFileName = path.getPath();
+      if (!path.isDirectory() && isDeployable(processFileName)) {
+        addResource(processFileName, rootPath, discoveredProcesses);
+        // find diagram(s) for process
+        for (File file : paths) {
+          String diagramFileName = file.getPath();
+          if (!path.isDirectory() && isDiagramForProcess(diagramFileName, processFileName)) {
+            addResource(diagramFileName, rootPath, discoveredProcesses);
+          }
+        }
+      } else if (path.isDirectory()) {
+        handleDirectory(path, rootPath, discoveredProcesses, classLoader);
       }
-    }    
+    }
   }
-  
+
+  private void addResource(String fileName, String rootPath, Set<String> discoveredProcessResources) {
+    String nameRelative = fileName.substring(rootPath.length());
+    addResource(nameRelative, discoveredProcessResources);
+  }
+
+  private void addResource(String resourceName, Set<String> discoveredProcessResources) {
+    discoveredProcessResources.add(resourceName);
+    log.log(Level.FINEST, "discovered process resource {0}", resourceName);
+  }
+
 }
