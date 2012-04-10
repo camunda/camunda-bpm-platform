@@ -132,6 +132,7 @@
 							<goal>shade</goal>
 						</goals>
 						<configuration>
+							<createSourcesJar>true</createSourcesJar>
 							<artifactSet>
 								<includes>
 									<include>com.camunda.fox.engine:fox-engine-cdi</include>
