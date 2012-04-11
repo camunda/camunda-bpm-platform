@@ -14,7 +14,7 @@
   <parent>
     <groupId>com.camunda.fox.platform</groupId>
     <artifactId>fox-platform-qa</artifactId>
-    <version>6.0.sprint18-SNAPSHOT</version>
+    <version>6.0.0-SNAPSHOT</version>
   </parent>
 
   <dependencies>
@@ -57,15 +57,13 @@
                 
                 <!-- remove activiti test classes from engine -->
                 
-                <unzip src="target/jboss-as-${version.jboss.as}/modules/com/camunda/fox/engine/fox-engine/main/fox-engine-${project.version}.jar" 
-                       dest="target/fox-engine" />
+                <unzip src="target/jboss-as-${version.jboss.as}/modules/com/camunda/fox/engine/fox-engine/main/fox-engine-${project.version}.jar" dest="target/fox-engine" />
 
                 <delete dir="target/fox-engine/org/activiti/engine/impl/test" />
                 
                 <delete file="target/jboss-as-${version.jboss.as}/modules/com/camunda/fox/engine/fox-engine/main/fox-engine-${project.version}.jar" />
                 
-                <zip destfile="target/jboss-as-${version.jboss.as}/modules/com/camunda/fox/engine/fox-engine/main/fox-engine-${project.version}.jar"
-                     basedir="target/fox-engine" />
+                <zip destfile="target/jboss-as-${version.jboss.as}/modules/com/camunda/fox/engine/fox-engine/main/fox-engine-${project.version}.jar" basedir="target/fox-engine" />
               </target>
             </configuration>
           </execution>
