@@ -9,7 +9,7 @@
   <parent>
     <groupId>com.camunda.fox.platform</groupId>
     <artifactId>fox-platform-root</artifactId>
-    <version>1.19.0.CR-SNAPSHOT</version>
+    <version>1.20.0-SNAPSHOT</version>
     <relativePath>../parent</relativePath>
   </parent>
   
