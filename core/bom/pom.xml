@@ -74,6 +74,19 @@
         </exclusions>
       </dependency>
       
+      <!-- licensing dependencies -->
+      <dependency>
+        <groupId>org.bouncycastle</groupId>
+        <artifactId>bcprov-jdk16</artifactId>
+        <version>1.46</version>
+      </dependency> 
+
+      <dependency>
+        <groupId>org.bouncycastle</groupId>
+        <artifactId>bcpg-jdk16</artifactId>
+        <version>1.46</version>
+      </dependency> 
+      
       <!-- websphere dependencies -->
       <dependency>
         <groupId>com.bea.commonj</groupId>

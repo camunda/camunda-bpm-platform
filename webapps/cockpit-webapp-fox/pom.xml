@@ -115,7 +115,7 @@
 						<manifestEntries>
 							<!-- SVN revision number -->
 							<Implementation-Build>${buildNumber}</Implementation-Build>
-							<Dependencies>org.apache.commons.logging,org.jboss.logging,org.apache.log4j,org.slf4j,org.apache.commons.lang</Dependencies>
+							<Dependencies>org.bouncycastle.bcprov-jdk16,org.bouncycastle.bcpg-jdk16,org.apache.commons.logging,org.jboss.logging,org.apache.log4j,org.slf4j,org.apache.commons.lang</Dependencies>
 						</manifestEntries>
 					</archive>
 					<webResources>
