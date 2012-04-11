@@ -40,6 +40,14 @@
       <groupId>com.camunda.fox.engine</groupId>
       <artifactId>fox-engine-cdi</artifactId>
     </dependency>
+	<dependency>
+		<groupId>org.bouncycastle</groupId>
+		<artifactId>bcprov-jdk16</artifactId>
+	</dependency>
+	<dependency>
+		<groupId>org.bouncycastle</groupId>
+		<artifactId>bcpg-jdk16</artifactId>
+	</dependency> 
   </dependencies>
 
   <build>
