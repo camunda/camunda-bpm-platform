@@ -1,4 +1,3 @@
-
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
@@ -55,13 +54,22 @@
                   <fileset dir="src/main/" />
                 </copy>
                 
-                <!-- remove activiti test classes from engine -->
+                <!-- remove activiti test classes from engine, made it maven 2 and 3 compatible -->
                 
-                <unzip src="target/jboss-as-${version.jboss.as}/modules/com/camunda/fox/engine/fox-engine/main/fox-engine-${project.version}.jar" dest="target/fox-engine" />
-
-                <delete dir="target/fox-engine/org/activiti/engine/impl/test" />
-                
-                <delete file="target/jboss-as-${version.jboss.as}/modules/com/camunda/fox/engine/fox-engine/main/fox-engine-${project.version}.jar" />
+                <unzip dest="target/fox-engine">
+                  <fileset dir="target/jboss-as-${version.jboss.as}/modules/com/camunda/fox/engine/fox-engine/main/">
+                    <include name="*.jar"/>
+                  </fileset>
+                  <patternset>
+                    <exclude name="org/activiti/engine/impl/test/**"/>
+                  </patternset>
+                </unzip>
+				
+                <delete>
+                  <fileset dir="target/jboss-as-${version.jboss.as}/modules/com/camunda/fox/engine/fox-engine/main/">
+                    <include name="*.jar"/>
+                  </fileset>
+                </delete>
                 
                 <zip destfile="target/jboss-as-${version.jboss.as}/modules/com/camunda/fox/engine/fox-engine/main/fox-engine-${project.version}.jar" basedir="target/fox-engine" />
               </target>
