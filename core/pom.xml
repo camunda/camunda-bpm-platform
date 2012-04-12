@@ -1,4 +1,3 @@
-
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
@@ -17,7 +16,6 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <fox.engine.version>1.19.0.CR-SNAPSHOT</fox.engine.version>
   </properties>
 
   <dependencyManagement>
@@ -51,15 +49,6 @@
 
   <repositories>
     <repository>
-      <id>camunda-fox</id>
-      <name>camunda fox Maven</name>
-      <url>http://fox.camunda.com/mvn/</url>
-      <releases>
-        <enabled>true</enabled>
-        <updatePolicy>always</updatePolicy>
-      </releases>
-    </repository>
-    <repository>
       <id>repository.jboss.org</id>
       <url>http://repository.jboss.org/nexus/content/groups/public-jboss</url>
     </repository>
@@ -76,39 +65,22 @@
     <module>client</module>
     <module>deployer</module>
   </modules>
-
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-source-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>attach-sources</id>
-            <goals>
-              <goal>jar</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
   
   <scm>
-   <connection>scm:git:git@bitbucket.org:camunda/fox-platform-ce.git</connection>
-   <developerConnection>scm:git:git@bitbucket.org:camunda/fox-platform-ce.git</developerConnection>
+    <connection>scm:git:git@bitbucket.org:camunda/fox-platform-ce.git</connection>
+    <developerConnection>scm:git:git@bitbucket.org:camunda/fox-platform-ce.git</developerConnection>
   </scm>
 
   <distributionManagement>
 	<repository>
-		<id>camunda-fox</id>
-		<name>Fox Releases</name>
-		<url>${distro.repo.ce}</url>
+	  <id>camunda-fox</id>
+	  <name>Fox Releases</name>
+	  <url>${distro.repo.ce}</url>
 	</repository>
     <snapshotRepository>
-       <id>camunda-fox</id>
-       <name>Fox Snapshots</name>
-       <url>https://app.camunda.com/nexus/content/repositories/fox-snapshot/</url>
+      <id>camunda-fox</id>
+      <name>Fox Snapshots</name>
+      <url>https://app.camunda.com/nexus/content/repositories/fox-snapshot/</url>
     </snapshotRepository>	
   </distributionManagement>  
 

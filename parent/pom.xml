@@ -28,15 +28,6 @@
 
   <repositories>
     <repository>
-      <id>camunda-fox</id>
-      <name>camunda fox Maven</name>
-      <url>http://fox.camunda.com/mvn/</url>
-      <releases>
-        <enabled>true</enabled>
-        <updatePolicy>always</updatePolicy>
-      </releases>
-    </repository>
-    <repository>
       <id>repository.jboss.org</id>
       <url>http://repository.jboss.org/nexus/content/groups/public-jboss</url>
     </repository>
@@ -46,39 +37,21 @@
     </repository>
   </repositories>
 
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-source-plugin</artifactId>
-        <version>2.1.2</version>
-        <executions>
-          <execution>
-            <id>attach-sources</id>
-            <goals>
-              <goal>jar</goal>              
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
-
   <scm>
-   <connection>scm:git:git@bitbucket.org:camunda/fox-platform-ce.git</connection>
-   <developerConnection>scm:git:git@bitbucket.org:camunda/fox-platform-ce.git</developerConnection>
+    <connection>scm:git:git@bitbucket.org:camunda/fox-platform-ce.git</connection>
+    <developerConnection>scm:git:git@bitbucket.org:camunda/fox-platform-ce.git</developerConnection>
   </scm>
 
   <distributionManagement>
 	<repository>
-		<id>camunda-fox</id>
-		<name>Fox Releases</name>
-		<url>${distro.repo.ce}</url>
+	  <id>camunda-fox</id>
+	  <name>Fox Releases</name>
+	  <url>${distro.repo.ce}</url>
 	</repository>
     <snapshotRepository>
-       <id>camunda-fox</id>
-       <name>Fox Snapshots</name>
-       <url>https://app.camunda.com/nexus/content/repositories/fox-snapshot/</url>
+      <id>camunda-fox</id>
+      <name>Fox Snapshots</name>
+      <url>https://app.camunda.com/nexus/content/repositories/fox-snapshot/</url>
     </snapshotRepository>	
   </distributionManagement>
 </project>
