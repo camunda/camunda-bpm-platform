@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 package com.camunda.fox.platform.test.deployment.war;
-import static org.junit.Assert.*;
 
-import java.io.FileInputStream;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
@@ -46,22 +47,38 @@ public class TestWarDeploymentWithDiagram extends AbstractFoxPlatformIntegration
   public static WebArchive processArchive() {    
     return initWebArchiveDeployment()
             .addAsResource("com/camunda/fox/platform/test/testDeployProcessArchive.bpmn20.xml")
-            .addAsResource("com/camunda/fox/platform/test/testDeployProcessArchive.png");
+            .addAsResource("com/camunda/fox/platform/test/testDeployProcessArchive.png")
+            .addAsResource("com/camunda/fox/platform/test/invoice.bpmn20.xml")
+            .addAsResource("com/camunda/fox/platform/test/invoice.jpg");
   }
   
   @Test
   public void testDeployProcessArchive() throws IOException {
+    String expectedDiagramResource = "/com/camunda/fox/platform/test/testDeployProcessArchive.png";
+    String processDefinitionKey = "testDeployProcessArchive";
+    assertDiagramDeployed(expectedDiagramResource, processDefinitionKey);
+  }
+
+  @Test
+  public void testInvoiceProcess() throws IOException {
+    String expectedDiagramResource = "/com/camunda/fox/platform/test/invoice.jpg";
+    String processDefinitionKey = "invoice";
+    assertDiagramDeployed(expectedDiagramResource, processDefinitionKey);
+  }
+
+  private void assertDiagramDeployed(String expectedDiagramResource, String processDefinitionKey) throws IOException {
     ProcessEngine processEngine = ProgrammaticBeanLookup.lookup(ProcessEngine.class);
     Assert.assertNotNull(processEngine);
     RepositoryService repositoryService = processEngine.getRepositoryService();
     ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery()
-      .processDefinitionKey("testDeployProcessArchive")
+      .processDefinitionKey(processDefinitionKey)
       .singleResult();
     assertNotNull(processDefinition);
     InputStream actualStream = repositoryService.getProcessDiagram(processDefinition.getId());
     assertNotNull(actualStream);
     assertTrue(0 < actualStream.available());
-    InputStream expectedStream = new FileInputStream("src/test/resources/com/camunda/fox/platform/test/testDeployProcessArchive.png");
+    InputStream expectedStream = getClass().getResourceAsStream(expectedDiagramResource);
+    assertNotNull(expectedStream);
     assertTrue(isEqual(expectedStream, actualStream));
   }
 
