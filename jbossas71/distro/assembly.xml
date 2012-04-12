@@ -81,17 +81,31 @@
 		<destName>pom.xml</destName>
 	</file>
   </files>
-  
-  <dependencySets>
-    <dependencySet>
-      <includes>
-        <include>com.camunda.fox.platform:fox-platform-explorer:war:*</include>
-		<include>com.camunda.fox.platform:fox-platform-h2-webapp:war:*</include>
-		<include>com.camunda.fox.cockpit:cockpit-webapp-fox:war:*</include>
-		<include>com.camunda.fox.cycle:cycle-webapp-fox:war:*</include>						
-      </includes>
-      <outputDirectory>server/jboss-as-${version.jboss.as}/standalone/deployments</outputDirectory>
-    </dependencySet>   
-  </dependencySets>
 
+  <dependencySets>
+	<dependencySet>
+		<includes>
+			<include>com.camunda.fox.platform:fox-platform-explorer:war:*</include>
+			<include>com.camunda.fox.platform:fox-platform-h2-webapp:war:*</include>
+		</includes>
+		<outputDirectory>server/jboss-as-${version.jboss.as}/standalone/deployments</outputDirectory>
+	</dependencySet>
+
+	<dependencySet>
+		<outputFileNameMapping>cockpit-webapp-${project.version}.${artifact.extension}</outputFileNameMapping>
+		<includes>
+			<include>com.camunda.fox.cockpit:cockpit-webapp-fox:war:*</include>
+		</includes>
+		<outputDirectory>server/jboss-as-${version.jboss.as}/standalone/deployments</outputDirectory>
+	</dependencySet>
+
+	<dependencySet>
+		<outputFileNameMapping>cycle-webapp-${project.version}.${artifact.extension}</outputFileNameMapping>
+		<includes>
+			<include>com.camunda.fox.cycle:cycle-webapp-fox:war:*</include>
+		</includes>
+		<outputDirectory>server/jboss-as-${version.jboss.as}/standalone/deployments</outputDirectory>
+	</dependencySet>
+  </dependencySets>
+  
 </assembly>
