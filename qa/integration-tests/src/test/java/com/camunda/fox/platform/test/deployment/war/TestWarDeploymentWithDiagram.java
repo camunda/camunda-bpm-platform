@@ -14,9 +14,10 @@
  * limitations under the License.
  */
 package com.camunda.fox.platform.test.deployment.war;
-import static org.junit.Assert.*;
 
-import java.io.FileInputStream;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.ByteBuffer;
@@ -61,7 +62,8 @@ public class TestWarDeploymentWithDiagram extends AbstractFoxPlatformIntegration
     InputStream actualStream = repositoryService.getProcessDiagram(processDefinition.getId());
     assertNotNull(actualStream);
     assertTrue(0 < actualStream.available());
-    InputStream expectedStream = new FileInputStream("src/test/resources/com/camunda/fox/platform/test/testDeployProcessArchive.png");
+    InputStream expectedStream = getClass().getResourceAsStream("/com/camunda/fox/platform/test/testDeployProcessArchive.png");
+    assertNotNull(expectedStream);
     assertTrue(isEqual(expectedStream, actualStream));
   }
 
