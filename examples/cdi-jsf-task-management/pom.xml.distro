@@ -200,11 +200,6 @@
 		<repository>
 			<id>Jboss Groups Public</id>
 			<url>http://repository.jboss.org/nexus/content/groups/public</url>
-		</repository>	
-		<repository>
-			<id>camunda-fox</id>
-			<name>camunda fox Maven Repository</name>
-			<url>http://fox.camunda.com/mvn/</url>
-		</repository>	
+		</repository>
 	</repositories>
 </project>
