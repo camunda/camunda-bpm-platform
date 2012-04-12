@@ -26,6 +26,7 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.impl.DeploymentQueryImpl;
 import org.activiti.engine.impl.ProcessDefinitionQueryImpl;
+import org.activiti.engine.impl.bpmn.deployer.BpmnDeployer;
 import org.activiti.engine.impl.interceptor.Command;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.persistence.entity.DeploymentEntity;
@@ -117,37 +118,51 @@ public class DeployIfChangedCmd implements Command<String>, Serializable {
     ProcessDefinition definition = null;
     String deploymentId = null;
     for (Entry<String, byte[]> resourceEntry : resources.entrySet()) {
-      definition = getExistingProcessDefinition(resourceEntry.getKey(), resourceEntry.getValue());
-      if (definition == null) {
-        // 'resourceEntry' is a new process, not contained in the last deployment. 
-        // We need to create a new deployment. 
-        return null;
-      } else if (definition.getDeploymentId() == null) {
-        return null;
-      } else {
-        // candidate deployment:
-        Deployment deployment = new DeploymentQueryImpl(commandContext).deploymentId(definition.getDeploymentId()).singleResult();
-
-        if (deployment.getName().equals(name)) {
-          // check whether the process has changed: 
-          if (hasChanged(resourceEntry, deployment)) {
-            log.info("The process '" + resourceEntry.getKey() + "' has changed, redeploying.");
-            return null;
-          } else {
-            deploymentId = deployment.getId();
-          }
-        } else if (!activeDeployments.contains(deployment.getId())) {
-          // a process with the same key was deployed in a processArchive with a 
-          // different name, but that processArchive is not currently active (i.e. was undeployed).
+      String resourceName = resourceEntry.getKey();
+      if (isBpmnResource(resourceName)) { // ignore non-BPMN files
+        definition = getExistingProcessDefinition(resourceName, resourceEntry.getValue());
+        if (definition == null) {
+          // 'resourceEntry' is a new process, not contained in the last deployment. 
+          // We need to create a new deployment. 
+          return null;
+        } else if (definition.getDeploymentId() == null) {
           return null;
         } else {
-          throw new ActivitiException("Cannot deploy process with id/key='" + definition.getKey()
-            + "', a process with the same key is already deployed in process-archive '" + deployment.getName() + "' (deployment id='" + deployment.getId()
-            + "') and " + deployment.getName() + " is active. Undeploy the existing process-archive or change the key of the process.");
+          // candidate deployment:
+          Deployment deployment = new DeploymentQueryImpl(commandContext).deploymentId(definition.getDeploymentId()).singleResult();
+  
+          if (deployment.getName().equals(name)) {
+            // check whether the process has changed: 
+            if (hasChanged(resourceEntry, deployment)) {
+              log.info("The process '" + resourceName + "' has changed, redeploying.");
+              return null;
+            } else {
+              deploymentId = deployment.getId();
+            }
+          } else if (!activeDeployments.contains(deployment.getId())) {
+            // a process with the same key was deployed in a processArchive with a 
+            // different name, but that processArchive is not currently active (i.e. was undeployed).
+            return null;
+          } else {
+            throw new ActivitiException("Cannot deploy process with id/key='" + definition.getKey()
+              + "', a process with the same key is already deployed in process-archive '" + deployment.getName() + "' (deployment id='" + deployment.getId()
+              + "') and " + deployment.getName() + " is active. Undeploy the existing process-archive or change the key of the process.");
+          }
         }
       }
     }
     return deploymentId;
+  }
+
+  private boolean isBpmnResource(String resourceName) {
+    boolean isBpmnResource = false;
+    for (String bpmnResourceSuffix : BpmnDeployer.BPMN_RESOURCE_SUFFIXES) {
+      if (resourceName.endsWith(bpmnResourceSuffix)) {
+        isBpmnResource = true;
+        break;
+      }
+    }
+    return isBpmnResource;
   }
 
   /**
