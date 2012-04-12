@@ -64,7 +64,7 @@ public class TestTwitterDemoProcess {
               .loadMetadataFromPom("pom.xml")
               .artifact("com.camunda.fox.platform:fox-platform-client").resolveAsFiles());
       
-      war.addAsLibraries(DependencyResolvers.use(MavenDependencyResolver.class)
+      war.addAsLibraries(DependencyResolvers.use(MavenDependencyResolver.class).goOffline()
               .loadMetadataFromPom("pom.xml")
               .artifact("org.jboss.jsfunit:jboss-jsfunit-core:2.0.0.Beta2").resolveAsFiles());
       
