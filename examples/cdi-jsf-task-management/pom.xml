@@ -200,7 +200,7 @@
 						<version>2.12</version>
 						<configuration>
 							<systemPropertyVariables>
-								<org.apache.maven.user-settings>../../../../../m2/settings.xml</org.apache.maven.user-settings>
+								<org.apache.maven.user-settings>../../settings.xml</org.apache.maven.user-settings>
 							</systemPropertyVariables>
 						</configuration>
 					</plugin>
