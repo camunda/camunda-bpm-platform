@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.camunda.fox.examples</groupId>
 	<artifactId>fox-examples-cdi-jsf-taskmanagement</artifactId>	
-	<name>fox platform CE - examples taskmanagement</name>
+	<name>fox platform CE - Examples Taskmanagement</name>
 	<packaging>war</packaging>
 	<version>1.19.0.CR-SNAPSHOT</version>
 	
@@ -16,13 +16,13 @@
 	<dependencies>
 	
 		<dependency>
-			<groupId>com.camunda.fox</groupId>
+			<groupId>com.camunda.fox.platform</groupId>
 			<artifactId>fox-platform-client</artifactId>
 			<version>${project.version}</version>
 		</dependency>
 		
 		<dependency>
-			<groupId>com.camunda.fox</groupId>
+			<groupId>com.camunda.fox.engine</groupId>
 			<artifactId>fox-engine</artifactId>
 			<version>${project.version}</version>
 			<scope>provided</scope>
@@ -200,11 +200,6 @@
 		<repository>
 			<id>Jboss Groups Public</id>
 			<url>http://repository.jboss.org/nexus/content/groups/public</url>
-		</repository>	
-		<repository>
-			<id>camunda-fox</id>
-			<name>camunda fox Maven Repository</name>
-			<url>http://fox.camunda.com/mvn/</url>
-		</repository>	
+		</repository>
 	</repositories>
 </project>

@@ -85,7 +85,7 @@
   <dependencySets>
     <dependencySet>
       <includes>
-        <include>com.camunda.fox:camunda-fox-ce-explorer:war:*</include>
+        <include>com.camunda.fox.platform:fox-platform-explorer:war:*</include>
       </includes>
       <outputDirectory>server/jboss-as-${version.jboss.as}/standalone/deployments</outputDirectory>
     </dependencySet>

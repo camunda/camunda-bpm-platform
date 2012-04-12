@@ -1,22 +1,22 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>camunda-fox-ce-explorer</artifactId>
+  <artifactId>fox-platform-explorer</artifactId>
   <packaging>war</packaging>
 
   <parent>
-    <groupId>com.camunda.fox</groupId>
-    <artifactId>fox-platform-parent</artifactId>
-    <version>1.19.0.CR-SNAPSHOT</version>
+    <groupId>com.camunda.fox.platform</groupId>
+    <artifactId>fox-platform-root</artifactId>
+    <version>1.20.0-SNAPSHOT</version>
     <relativePath>../../parent</relativePath>
   </parent>
 
-  <name>camunda fox ce explorer</name>
+  <name>fox platform CE - fox ce explorer</name>
 
   <dependencies>
 
     <dependency>
-      <groupId>com.camunda.fox</groupId>
+      <groupId>com.camunda.fox.engine</groupId>
       <artifactId>fox-engine-webapp-explorer2</artifactId>
       <version>${project.version}</version>
       <type>war</type>
@@ -56,7 +56,7 @@
           </dependentWarExcludes>
           <archive>
             <manifestEntries>
-              <Dependencies>com.camunda.fox.fox-engine, com.camunda.fox.fox-platform-api</Dependencies>
+              <Dependencies>com.camunda.fox.engine.fox-engine, com.camunda.fox.platform.fox-platform-api</Dependencies>
             </manifestEntries>
           </archive>          
         </configuration>        

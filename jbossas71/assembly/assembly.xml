@@ -26,7 +26,7 @@
     <dependencySet>
       <outputDirectory>client</outputDirectory>
       <includes>
-        <include>com.camunda.fox:fox-platform-client:jar:${project.version}</include>
+        <include>com.camunda.fox.platform:fox-platform-client:jar:${project.version}</include>
       </includes>     
     </dependencySet>
   </dependencySets>

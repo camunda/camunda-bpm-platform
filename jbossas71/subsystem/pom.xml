@@ -5,12 +5,12 @@
   <artifactId>fox-platform-jboss-subsystem</artifactId>
   <packaging>jar</packaging>
 
-  <name>fox platform CE - jboss7 subsystem</name>
+  <name>fox platform CE - jBoss7 Subsystem</name>
 
   <parent>
-    <groupId>com.camunda.fox</groupId>
+    <groupId>com.camunda.fox.platform</groupId>
     <artifactId>fox-platform-jboss</artifactId>
-    <version>1.19.0.CR-SNAPSHOT</version>
+    <version>1.20.0-SNAPSHOT</version>
   </parent>
   
   <dependencyManagement>
@@ -45,12 +45,12 @@
 
   <dependencies>
     <dependency>
-      <groupId>com.camunda.fox</groupId>
+      <groupId>com.camunda.fox.platform</groupId>
       <artifactId>fox-platform-service</artifactId>
     </dependency>
 
     <dependency>
-      <groupId>com.camunda.fox</groupId>
+      <groupId>com.camunda.fox.engine</groupId>
       <artifactId>fox-engine</artifactId>
       <exclusions>
         <exclusion>

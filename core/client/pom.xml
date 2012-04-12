@@ -1,19 +1,19 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<artifactId>fox-platform-client</artifactId>
-	<name>fox platform CE - client</name>
+	<name>fox platform CE - Client</name>
 	<packaging>jar</packaging>
 
 	<parent>
-		<groupId>com.camunda.fox</groupId>
+		<groupId>com.camunda.fox.platform</groupId>
 		<artifactId>fox-platform-core</artifactId>
-		<version>1.19.0.CR-SNAPSHOT</version>		
+		<version>1.20.0-SNAPSHOT</version>		
 	</parent>
 
 	<dependencies>
 	
 		<dependency>
-			<groupId>com.camunda.fox</groupId>
+			<groupId>com.camunda.fox.engine</groupId>
 			<artifactId>fox-engine-cdi</artifactId>
 			<exclusions>
 				<exclusion>
@@ -40,7 +40,7 @@
 		</dependency>
 		
         <dependency>
-			<groupId>com.camunda.fox</groupId>
+			<groupId>com.camunda.fox.platform</groupId>
 			<artifactId>fox-platform-api</artifactId>
 			<version>${project.version}</version>
 			<scope>provided</scope>
@@ -127,14 +127,15 @@
 							<goal>shade</goal>
 						</goals>
 						<configuration>
+							<createSourcesJar>true</createSourcesJar>
 							<artifactSet>
 								<includes>
-									<include>com.camunda.fox:fox-engine-cdi</include>
+									<include>com.camunda.fox.engine:fox-engine-cdi</include>
 								</includes>
 							</artifactSet>		
 							<filters>
 								<filter>
-									<artifact>com.camunda.fox:fox-engine-cdi</artifact>                  									
+									<artifact>com.camunda.fox.engine:fox-engine-cdi</artifact>									
 									<excludes>
 										<exclude>org/activiti/cdi/impl/util/ActivitiServices.class</exclude>
 										<exclude>org/activiti/cdi/impl/ActivitiExtension.class</exclude>															
