@@ -76,6 +76,7 @@
           <include>**/*.xml</include>
           <include>**/*.properties</include>
           <include>**/*.png</include>
+          <include>**/*.jpg</include>
         </includes>
       </testResource>
     </testResources>
