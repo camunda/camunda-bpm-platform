@@ -15,6 +15,8 @@
  */
 package com.camunda.fox.deployer.test;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.util.HashMap;
 import java.util.List;
 
@@ -49,7 +51,7 @@ public class TestFoxDeployer extends FoxDeployerTestcase {
     }
   }
   
-  public void testDeployUndeployDeleteTrue() {    
+  public void testDeployUndeployDeleteTrue() {
     ClassLoader cl = getClass().getClassLoader();
     String name = "processArchive";
     
@@ -208,4 +210,32 @@ public class TestFoxDeployer extends FoxDeployerTestcase {
     
   }
   
+  public void testDeployNonBpmnFile() {
+    ClassLoader cl = getClass().getClassLoader();
+    String name = "processArchive";
+
+    System.err.println();
+    String process = IoUtil.readFileAsString("invoice.png");
+    HashMap<String, byte[]> resources = new HashMap<String, byte[]>();
+    resources.put("invoice.png", process.getBytes());
+
+    // capture messages in System.err from the XML parser in DeployIfChangedCmd#getExistingProcessDefinition(String, byte[])
+    ByteArrayOutputStream errContent = new ByteArrayOutputStream();
+    System.setErr(new PrintStream(errContent));
+
+    deployer.deploy(name, resources, cl);
+
+    assertEquals("System.err is not empty.", "", errContent.toString());
+    System.setErr(null); // reset System.err
+
+    assertNotNull(repositoryService.createDeploymentQuery().deploymentName(name).singleResult());
+    assertNull(repositoryService.createProcessDefinitionQuery().singleResult());
+    assertNull(repositoryService.createProcessDefinitionQuery().active().singleResult());
+
+    deployer.unDeploy(name, true);
+
+    assertNull(repositoryService.createDeploymentQuery().deploymentName(name).singleResult());
+    assertNull(repositoryService.createProcessDefinitionQuery().singleResult());
+  }
+
 }

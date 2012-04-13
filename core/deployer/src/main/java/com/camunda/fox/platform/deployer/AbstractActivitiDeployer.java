@@ -51,21 +51,6 @@ public abstract class AbstractActivitiDeployer {
   
   // /////////////////////////////////////////// Configuration
 
-  public final static Set<String> DEPLOYABLE_RESOURCE_SUFFIXES;
-  static {
-    DEPLOYABLE_RESOURCE_SUFFIXES = new HashSet<String>();
-    DEPLOYABLE_RESOURCE_SUFFIXES.add(".bpmn20.xml");
-    // DEPLOYABLE_RESOURCE_SUFFIXES.add(".form"); NOT SUPPORTED FOR NOW
-  }
-
-  public String getJarExtension() {
-    return ".bar";
-  }
-
-  // NOTE: these are provided for subclasses but not actually used here:
-  protected String processArchiveMarkerFile = "META-INF/processes.xml";
-  protected Set<String> deployableResourceSuffixes = DEPLOYABLE_RESOURCE_SUFFIXES;
-  
   protected final Set<String> activeDeploymentIds = new HashSet<String>();
   
   /////////////////////////////////////////// Deployment methods
@@ -127,21 +112,5 @@ public abstract class AbstractActivitiDeployer {
   /////////////////////////////////////////// Getters / Setters
 
   protected abstract CommandExecutor getCommandExecutor();
-
-  public Set<String> getDeployableResourceSuffixes() {
-    return deployableResourceSuffixes;
-  }
-
-  public String getProcessArchiveMarkerFile() {
-    return processArchiveMarkerFile;
-  }
-
-  public void setProcessArchiveMarkerFile(String processArchiveMarkerFile) {
-    this.processArchiveMarkerFile = processArchiveMarkerFile;
-  }
-
-  public void setDeployableResourceSuffixes(Set<String> deployableResourceSuffixes) {
-    this.deployableResourceSuffixes = deployableResourceSuffixes;
-  }
 
 }

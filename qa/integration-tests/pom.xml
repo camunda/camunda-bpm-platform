@@ -75,6 +75,7 @@
           <include>**/*.xml</include>
           <include>**/*.properties</include>
           <include>**/*.png</include>
+          <include>**/*.jpg</include>
         </includes>
       </testResource>
     </testResources>
@@ -121,6 +122,23 @@
         <dependency>
           <groupId>org.jboss.as</groupId>
           <artifactId>jboss-as-arquillian-container-managed</artifactId>
+          <version>${version.jboss.as}</version>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.jboss.arquillian.protocol</groupId>
+          <artifactId>arquillian-protocol-servlet</artifactId>
+          <version>1.0.0.CR7</version>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
+      <id>jboss-remote</id>
+      <dependencies>
+        <dependency>
+          <groupId>org.jboss.as</groupId>
+          <artifactId>jboss-as-arquillian-container-remote</artifactId>
           <version>${version.jboss.as}</version>
           <scope>test</scope>
         </dependency>
