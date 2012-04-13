@@ -28,7 +28,7 @@ import org.junit.runner.RunWith;
 import com.camunda.fox.platform.test.util.AbstractFoxPlatformIntegrationTest;
 
 /**
- * <p>Deploys two different applications, a process archive and a cleint application.</p>
+ * <p>Deploys two different applications, a process archive and a client application.</p>
  * 
  * <p>This test ensures that when the process is started from the client,
  * it is able to make the context switch to the process archvie and resolve classes from the 
