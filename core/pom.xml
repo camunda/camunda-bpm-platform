@@ -3,14 +3,14 @@
 
   <groupId>com.camunda.fox.platform</groupId>
   <artifactId>fox-platform-core</artifactId>
-  <version>6.0.0-SNAPSHOT</version>
+  <version>6.0.0-alpha4</version>
   <packaging>pom</packaging>
   <name>fox platform EE - Core</name>
 
   <parent>
     <groupId>com.camunda.fox.engine</groupId>
     <artifactId>fox-engine-root</artifactId>
-    <version>6.0.0-SNAPSHOT</version>
+    <version>6.0.0-alpha4</version>
     <relativePath>../../fox-engine-ee/pom.xml</relativePath>
   </parent>
 

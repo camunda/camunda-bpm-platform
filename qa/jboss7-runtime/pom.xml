@@ -13,7 +13,7 @@
   <parent>
     <groupId>com.camunda.fox.platform</groupId>
     <artifactId>fox-platform-qa</artifactId>
-    <version>6.0.0-SNAPSHOT</version>
+    <version>6.0.0-alpha4</version>
   </parent>
 
   <dependencies>
@@ -58,16 +58,16 @@
                 
                 <unzip dest="target/fox-engine">
                   <fileset dir="target/jboss-as-${version.jboss.as}/modules/com/camunda/fox/engine/fox-engine/main/">
-                    <include name="*.jar"/>
+                    <include name="*.jar" />
                   </fileset>
                   <patternset>
-                    <exclude name="org/activiti/engine/impl/test/**"/>
+                    <exclude name="org/activiti/engine/impl/test/**" />
                   </patternset>
                 </unzip>
 				
                 <delete>
                   <fileset dir="target/jboss-as-${version.jboss.as}/modules/com/camunda/fox/engine/fox-engine/main/">
-                    <include name="*.jar"/>
+                    <include name="*.jar" />
                   </fileset>
                 </delete>
                 
