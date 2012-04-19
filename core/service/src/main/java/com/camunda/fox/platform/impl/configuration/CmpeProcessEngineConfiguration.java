@@ -15,7 +15,10 @@
  */
 package com.camunda.fox.platform.impl.configuration;
 
+import java.util.List;
+
 import org.activiti.engine.impl.bpmn.data.ItemInstance;
+import org.activiti.engine.impl.bpmn.parser.BpmnParseListener;
 import org.activiti.engine.impl.bpmn.webservice.MessageInstance;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.persistence.StrongUuidGenerator;
@@ -32,6 +35,8 @@ import org.activiti.engine.impl.variable.ShortType;
 import org.activiti.engine.impl.variable.StringType;
 import org.activiti.engine.impl.variable.VariableType;
 
+import com.camunda.fox.engine.impl.bpmn.parser.FoxFailedJobParseListener;
+import com.camunda.fox.engine.impl.jobexecutor.FoxFailedJobCommandFactory;
 import com.camunda.fox.platform.impl.context.ProcessArchiveServicesSupport;
 import com.camunda.fox.platform.impl.context.spi.ProcessArchiveServices;
 import com.camunda.fox.platform.impl.jobexecutor.spi.JobExecutorFactory;
@@ -59,10 +64,24 @@ public abstract class CmpeProcessEngineConfiguration extends ProcessEngineConfig
   @Override
   protected void init() {
     transactionsExternallyManaged = true;
-    initProcessArchiveServices();    
+    initProcessArchiveServices();
     super.init();    
   }
-
+  
+  @Override
+  protected void initFailedJobCommandFactory() {
+    if (failedJobCommandFactory == null) {
+    	failedJobCommandFactory = new FoxFailedJobCommandFactory();
+    }
+  }
+  
+  @Override
+  protected List<BpmnParseListener> getDefaultBPMNParseListeners() {
+    List<BpmnParseListener> result = super.getDefaultBPMNParseListeners();
+    result.add(new FoxFailedJobParseListener());
+    return result;
+  }
+  
   protected void initProcessArchiveServices() {
     if(processArchiveServices == null) {
       processArchiveServices = Services.getService(ProcessArchiveServices.class);
