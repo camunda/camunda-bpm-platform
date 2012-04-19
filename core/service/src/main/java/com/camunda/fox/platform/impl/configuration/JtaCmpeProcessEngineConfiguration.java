@@ -23,6 +23,7 @@ import java.util.List;
 import javax.naming.InitialContext;
 import javax.transaction.TransactionManager;
 
+import org.activiti.engine.impl.cfg.jta.JtaTransactionContextFactory;
 import org.activiti.engine.impl.interceptor.CommandContextInterceptor;
 import org.activiti.engine.impl.interceptor.CommandInterceptor;
 import org.activiti.engine.impl.interceptor.JtaTransactionInterceptor;
@@ -76,6 +77,12 @@ public class JtaCmpeProcessEngineConfiguration extends CmpeProcessEngineConfigur
       if(transactionManager == null) {            
         throw new FoxPlatformException("Could not lookup a transaction manager using the following known locations: "+Arrays.toString(TRANSACTION_MANAGER_LOCATIONS));
       }
+    }
+  }
+  
+  protected void initTransactionContextFactory() {
+    if(transactionContextFactory == null) {
+      transactionContextFactory = new JtaTransactionContextFactory(transactionManager);
     }
   }
 
