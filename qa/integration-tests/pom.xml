@@ -20,15 +20,6 @@
       <type>pom</type>
     </dependency>
 
-	<dependency>
-		<!-- make sure this comes after runtime in the reactor build -->
-		<groupId>com.camunda.fox.platform</groupId>
-		<artifactId>fox-platform-qa-glassfish-runtime</artifactId>
-		<version>${project.version}</version>
-		<scope>provided</scope>
-		<type>pom</type>
-	</dependency>     
-
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
@@ -161,10 +152,15 @@
     </profile>
      <profile>
       <id>glassfish</id>
-      <activation>
-        <activeByDefault>false</activeByDefault>
-      </activation>
       <dependencies>
+		<dependency>
+			<!-- make sure this comes after runtime in the reactor build -->
+			<groupId>com.camunda.fox.platform</groupId>
+			<artifactId>fox-platform-qa-glassfish-runtime</artifactId>
+			<version>${project.version}</version>
+			<scope>provided</scope>
+			<type>pom</type>
+		</dependency>       
         <dependency>
           <groupId>org.jboss.arquillian.container</groupId>
           <artifactId>arquillian-glassfish-managed-3.1</artifactId>
