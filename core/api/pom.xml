@@ -15,6 +15,16 @@
       <groupId>com.camunda.fox.engine</groupId>
       <artifactId>fox-engine</artifactId>
       <scope>provided</scope>
+      <exclusions>
+        <exclusion>
+          <groupId>org.springframework</groupId>
+          <artifactId>spring-beans</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.livetribe</groupId>
+          <artifactId>livetribe-jsr223</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
   </dependencies>
 

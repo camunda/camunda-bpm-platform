@@ -57,7 +57,7 @@ public abstract class AbstractFoxPlatformIntegrationTest {
           "java:global/" +
           "camunda-fox-platform/" +
           "process-engine/" +
-          "PlatformService!com.camunda.fox.platform.api.ProcessArchiveService";
+          "PlatformService!com.camunda.fox.platform.api.ProcessEngineService";
 
   protected ProcessEngineService processEngineService;
   protected ProcessArchiveService processArchiveService;

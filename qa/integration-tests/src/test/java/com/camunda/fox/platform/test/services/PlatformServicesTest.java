@@ -19,6 +19,7 @@ import java.util.concurrent.Future;
 
 import junit.framework.Assert;
 
+import org.activiti.engine.impl.ProcessEngineImpl;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
@@ -49,7 +50,10 @@ public class PlatformServicesTest extends AbstractFoxPlatformIntegrationTest {
   public void testStartStopProcessEngine() throws InterruptedException, ExecutionException {
     Assert.assertEquals(1, processEngineService.getProcessEngines().size());
     
-    ProcessEngineConfigurationImpl configurationImpl = new ProcessEngineConfigurationImpl(false, "testEngine1", "java:jboss/datasources/ExampleDS", "audit", true, false);
+    org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl defaultEngineConfig = ((ProcessEngineImpl)processEngineService.getDefaultProcessEngine()).getProcessEngineConfiguration();
+    String dataSourceJndiName = defaultEngineConfig.getDataSourceJndiName();
+    
+    ProcessEngineConfigurationImpl configurationImpl = new ProcessEngineConfigurationImpl(false, "testEngine1", dataSourceJndiName, "audit", true, false);
     Future<ProcessEngineStartOperation> startProcessEngine = processEngineService.startProcessEngine(configurationImpl);
     ProcessEngineStartOperation processEngineStartOperation = startProcessEngine.get();
     

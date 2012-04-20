@@ -27,14 +27,14 @@
  */
 package org.activiti.cdi.impl;
 
-import java.util.logging.Logger;
+//import java.util.logging.Logger;
 
 import javax.enterprise.event.Observes;
 import javax.enterprise.inject.spi.AfterBeanDiscovery;
-import javax.enterprise.inject.spi.AfterDeploymentValidation;
+//import javax.enterprise.inject.spi.AfterDeploymentValidation;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.BeforeBeanDiscovery;
-import javax.enterprise.inject.spi.BeforeShutdown;
+//import javax.enterprise.inject.spi.BeforeShutdown;
 import javax.enterprise.inject.spi.Extension;
 
 import org.activiti.cdi.annotation.BusinessProcessScoped;
@@ -42,7 +42,7 @@ import org.activiti.cdi.impl.context.BusinessProcessContext;
 import org.activiti.cdi.impl.context.ThreadContext;
 import org.activiti.cdi.impl.context.ThreadScoped;
 import org.activiti.cdi.impl.util.BeanManagerLookup;
-import org.activiti.cdi.spi.ProcessEngineLookup;
+//import org.activiti.cdi.spi.ProcessEngineLookup;
 
 /**
  * Customized version of the ActivitiExtension which does not 
@@ -52,8 +52,8 @@ import org.activiti.cdi.spi.ProcessEngineLookup;
  */
 public class ActivitiExtension implements Extension {
 
-  private static Logger logger = Logger.getLogger(ActivitiExtension.class.getName());
-  private ProcessEngineLookup processEngineLookup;
+//  private static Logger logger = Logger.getLogger(ActivitiExtension.class.getName());
+//  private ProcessEngineLookup processEngineLookup;
 
   public void beforeBeanDiscovery(@Observes final BeforeBeanDiscovery event) {
     event.addScope(BusinessProcessScoped.class, true, true);
@@ -66,16 +66,16 @@ public class ActivitiExtension implements Extension {
     event.addContext(new ThreadContext());
   }
 
-  public void afterDeploymentValidation(@Observes AfterDeploymentValidation event, BeanManager beanManager) {
-    logger.info("Initializing activiti-cdi.");      
-  }
-
-  public void beforeShutdown(@Observes BeforeShutdown event) {
-    if(processEngineLookup != null) {
-      processEngineLookup.ungetProcessEngine();
-      processEngineLookup = null;
-    }
-    logger.info("Shutting down activiti-cdi");    
-  }
+//  public void afterDeploymentValidation(@Observes AfterDeploymentValidation event, BeanManager beanManager) {
+//    logger.info("Initializing activiti-cdi.");      
+//  }
+//
+//  public void beforeShutdown(@Observes BeforeShutdown event) {
+//    if(processEngineLookup != null) {
+//      processEngineLookup.ungetProcessEngine();
+//      processEngineLookup = null;
+//    }
+//    logger.info("Shutting down activiti-cdi");    
+//  }
 
 }
