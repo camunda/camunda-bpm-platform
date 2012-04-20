@@ -17,9 +17,9 @@ import javax.ejb.TransactionManagementType;
 import com.camunda.fox.platform.FoxPlatformException;
 import com.camunda.fox.platform.api.ProcessArchiveService;
 import com.camunda.fox.platform.api.ProcessEngineService;
-import com.camunda.fox.platform.impl.service.PlatformService;
-import com.camunda.fox.platform.impl.service.ProcessEngineController;
-import com.camunda.fox.platform.impl.service.SimplePlatformService;
+//import com.camunda.fox.platform.impl.service.PlatformService;
+//import com.camunda.fox.platform.impl.service.ProcessEngineController;
+//import com.camunda.fox.platform.impl.service.SimplePlatformService;
 import com.camunda.fox.platform.spi.ProcessEngineConfiguration;
 
 /**
@@ -42,7 +42,8 @@ public class PlatformServiceBean extends PlatformService implements ProcessEngin
     processEngineRegistry.startInstallingNewProcessEngine(processEngineConfiguration);
     
     try {
-      ProcessEngineController processEngineController = new ProcessEngineController(processEngineConfiguration);
+      //ProcessEngineController processEngineController = new ProcessEngineController(processEngineConfiguration);
+      ProcessEngineController processEngineController = new TcclProcessEngineController(processEngineConfiguration);
       processEngineController.setProcessEngineRegistry(processEngineRegistry);
       processEngineController.start();      
       return new AsyncResult<ProcessEngineStartOperation>(new ProcessEngineStartOperationImpl(processEngineController.getProcessEngine()));

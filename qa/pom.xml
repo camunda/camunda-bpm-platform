@@ -16,14 +16,22 @@
 		<module>jboss7-runtime</module>
 		<module>integration-tests</module>
 	</modules>
-  
+	
 	<profiles>
+		<profile>
+			<id>glassfish</id>
+			<modules>
+				<module>gf31-runtime</module>
+				<module>integration-tests</module>
+			</modules>
+		</profile>
 		<profile>
 			<id>full</id>	
 			<modules>
 				<module>jboss7-runtime</module>
 				<module>integration-tests</module>
 				<module>activiti-testsuite</module>
+				<module>gf31-runtime</module>
 			</modules>
 		</profile>	
 	</profiles>

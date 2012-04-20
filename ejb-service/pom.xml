@@ -67,7 +67,6 @@
       <scope>test</scope>
     </dependency>
 
-
     <dependency>
       <groupId>org.jboss.arquillian.container</groupId>
       <artifactId>arquillian-glassfish-embedded-3.1</artifactId>

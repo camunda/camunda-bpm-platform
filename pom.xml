@@ -17,6 +17,7 @@
     <module>parent</module>
     <module>qa</module>
     <module>jbossas71</module>
+    <module>gf31</module>
     <module>webapps/explorer</module>
     <module>examples</module>
     <module>ejb-service</module>
