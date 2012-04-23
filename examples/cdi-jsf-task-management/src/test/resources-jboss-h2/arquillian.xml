@@ -6,9 +6,9 @@
 
   <container qualifier="jboss" default="true">
     <configuration>
-      <property name="jbossHome">${jboss.location}</property>
-      <property name="managementPort">${jboss.port}</property>
-      <property name="serverConfig">${jboss.configuration}</property>
+      <property name="jbossHome">${server.location}</property>
+      <property name="managementPort">${server.port}</property>
+      <property name="serverConfig">${server.configuration}</property>
     </configuration>
   </container>
 </arquillian>

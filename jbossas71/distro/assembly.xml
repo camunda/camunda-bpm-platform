@@ -92,7 +92,7 @@
 	</dependencySet>
 
 	<dependencySet>
-		<outputFileNameMapping>cockpit-webapp-${project.version}.${artifact.extension}</outputFileNameMapping>
+		<outputFileNameMapping>fox-cockpit-${project.version}.${artifact.extension}</outputFileNameMapping>
 		<includes>
 			<include>com.camunda.fox.cockpit:cockpit-webapp-fox:war:*</include>
 		</includes>
@@ -100,7 +100,7 @@
 	</dependencySet>
 
 	<dependencySet>
-		<outputFileNameMapping>cycle-webapp-${project.version}.${artifact.extension}</outputFileNameMapping>
+		<outputFileNameMapping>fox-cycle-${project.version}.${artifact.extension}</outputFileNameMapping>
 		<includes>
 			<include>com.camunda.fox.cycle:cycle-webapp-fox:war:*</include>
 		</includes>

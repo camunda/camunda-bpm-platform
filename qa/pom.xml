@@ -13,11 +13,19 @@
   </parent>
   
 	<modules>
-		<module>jboss7-runtime</module>
 		<module>integration-tests</module>
 	</modules>
 	
 	<profiles>
+		<profile>
+			<id>jboss</id>
+		    <activation>
+			    <activeByDefault>true</activeByDefault>
+		    </activation>
+			<modules>
+				<module>jboss7-runtime</module>
+			</modules>
+		</profile>
 		<profile>
 			<id>glassfish</id>
 			<modules>
@@ -27,6 +35,7 @@
 		<profile>
 			<id>full</id>	
 			<modules>
+				<module>jboss7-runtime</module>
 				<module>activiti-testsuite</module>
 				<module>gf31-runtime</module>
 			</modules>

@@ -9,8 +9,8 @@
     <properties>
     	<!-- Properties for Hibernate -->
       <property name="toplink.ddl-generation" value="drop-and-create-tables"/>
-       <property name="hibernate.hbm2ddl.auto" value="create-drop" />
-       <property name="hibernate.show_sql" value="false" />
+      <property name="hibernate.hbm2ddl.auto" value="create-drop" />
+      <property name="hibernate.show_sql" value="false" />
     </properties>
   </persistence-unit>
 </persistence>
