@@ -12,15 +12,6 @@
   
   <dependencies>
     <dependency>
-      <!-- make sure this comes after runtime in the reactor build -->
-      <groupId>com.camunda.fox.platform</groupId>
-      <artifactId>fox-platform-qa-jboss-runtime</artifactId>
-      <version>${project.version}</version>
-      <scope>provided</scope>
-      <type>pom</type>
-    </dependency>
-
-    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <scope>test</scope>
@@ -120,6 +111,14 @@
       </activation>
       <dependencies>
         <dependency>
+          <!-- make sure this comes after runtime in the reactor build -->
+          <groupId>com.camunda.fox.platform</groupId>
+          <artifactId>fox-platform-qa-jboss-runtime</artifactId>
+          <version>${project.version}</version>
+          <scope>provided</scope>
+          <type>pom</type>
+        </dependency>
+        <dependency>
           <groupId>org.jboss.as</groupId>
           <artifactId>jboss-as-arquillian-container-managed</artifactId>
           <version>${version.jboss.as}</version>
@@ -137,6 +136,14 @@
       <id>jboss-remote</id>
       <dependencies>
         <dependency>
+          <!-- make sure this comes after runtime in the reactor build -->
+          <groupId>com.camunda.fox.platform</groupId>
+          <artifactId>fox-platform-qa-jboss-runtime</artifactId>
+          <version>${project.version}</version>
+          <scope>provided</scope>
+          <type>pom</type>
+        </dependency>
+        <dependency>
           <groupId>org.jboss.as</groupId>
           <artifactId>jboss-as-arquillian-container-remote</artifactId>
           <version>${version.jboss.as}</version>
@@ -150,17 +157,17 @@
         </dependency>
       </dependencies>
     </profile>
-     <profile>
+    <profile>
       <id>glassfish</id>
       <dependencies>
-		<dependency>
-			<!-- make sure this comes after runtime in the reactor build -->
-			<groupId>com.camunda.fox.platform</groupId>
-			<artifactId>fox-platform-qa-glassfish-runtime</artifactId>
-			<version>${project.version}</version>
-			<scope>provided</scope>
-			<type>pom</type>
-		</dependency>       
+        <dependency>
+          <!-- make sure this comes after runtime in the reactor build -->
+          <groupId>com.camunda.fox.platform</groupId>
+          <artifactId>fox-platform-qa-glassfish-runtime</artifactId>
+          <version>${project.version}</version>
+          <scope>provided</scope>
+          <type>pom</type>
+        </dependency>       
         <dependency>
           <groupId>org.jboss.arquillian.container</groupId>
           <artifactId>arquillian-glassfish-managed-3.1</artifactId>
@@ -173,27 +180,27 @@
           <version>${version.arquillian}</version>
           <scope>test</scope>
         </dependency>
-	    <dependency>
-	      <groupId>org.jboss.shrinkwrap.resolver</groupId>
-	      <artifactId>shrinkwrap-resolver-impl-maven</artifactId>
-	      <version>1.0.0-beta-5</version>
-	      <scope>test</scope>    
-	    </dependency>        
-		<dependency>
-		  <groupId>org.jboss.shrinkwrap</groupId>
-		  <artifactId>shrinkwrap-api</artifactId>
-		  <version>1.0.0-cr-3</version>
-		  <scope>test</scope>
-		</dependency>
+        <dependency>
+          <groupId>org.jboss.shrinkwrap.resolver</groupId>
+          <artifactId>shrinkwrap-resolver-impl-maven</artifactId>
+          <version>1.0.0-beta-6</version>
+          <scope>test</scope>    
+        </dependency>        
+        <dependency>
+          <groupId>org.jboss.shrinkwrap</groupId>
+          <artifactId>shrinkwrap-api</artifactId>
+          <version>1.0.0-cr-3</version>
+          <scope>test</scope>
+        </dependency>
       </dependencies>
       <build>
-	    <plugins>
-   		  <plugin>
-			 <groupId>org.apache.maven.plugins</groupId>
-			 <artifactId>maven-surefire-plugin</artifactId>
-			 <version>2.12</version>
-		  </plugin>
-		</plugins>      
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <version>2.12</version>
+          </plugin>
+        </plugins>      
         <testResources>
           <testResource>
             <directory>src/test/resources-glassfish-h2</directory>
@@ -275,7 +282,7 @@
             <version>2.12</version>
             <configuration>
               <systemPropertyVariables>
-                <org.apache.maven.user-settings>../../../../../m2/settings.xml</org.apache.maven.user-settings>                
+                <org.apache.maven.user-settings>../../../../../.m2/settings.xml</org.apache.maven.user-settings>                
               </systemPropertyVariables>
             </configuration>
           </plugin>
