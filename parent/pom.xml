@@ -9,8 +9,7 @@
   <name>fox platform CE - Parent Pom</name>
 
   <properties>
-    <version.jboss.as>7.1.0.Final</version.jboss.as>
-    <fox.engine.version>1.19.0.CR-SNAPSHOT</fox.engine.version>  
+    <version.jboss.as>7.1.1.Final</version.jboss.as>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 

@@ -59,7 +59,7 @@
 		<dependency>
 			<groupId>org.jboss.as</groupId>
 			<artifactId>jboss-as-server</artifactId>
-			<version>7.1.0.Final</version>
+			<version>7.1.1.Final</version>
 			<scope>provided</scope>
 		</dependency>
     

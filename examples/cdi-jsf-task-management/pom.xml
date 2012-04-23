@@ -7,7 +7,7 @@
 	<packaging>war</packaging>
 	
 	<properties>
-		<jboss.location>../../qa/jboss7-runtime/target/jboss-as-7.1.0.Final/</jboss.location>
+		<jboss.location>../../qa/jboss7-runtime/target/jboss-as-7.1.1.Final/</jboss.location>
 		<jboss.port>21009</jboss.port>
 		<jboss.configuration>standalone-h2.xml</jboss.configuration>
 	</properties>

@@ -8,7 +8,7 @@
 	<version>1.19.0.CR-SNAPSHOT</version>
 	
 	<properties>
-		<jboss.location>../../../server/jboss-as-7.1.0.Final/</jboss.location>
+		<jboss.location>../../../server/jboss-as-7.1.1.Final/</jboss.location>
 		<jboss.port>9999</jboss.port>
 		<jboss.configuration>standalone.xml</jboss.configuration>
 	</properties>

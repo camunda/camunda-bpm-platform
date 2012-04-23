@@ -11,7 +11,6 @@
 	<module name="org.mybatis.mybatis" />	
     <module name="com.fasterxml.uuid.java-uuid-generator"/>
     <module name="org.livetribe.livetribe-jsr223" />    
-    <module name="org.junit"/>
         
   </dependencies>
 </module>
