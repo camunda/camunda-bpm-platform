@@ -48,11 +48,15 @@
 		<!-- use Development to see debug messages -->
 	</context-param>
 
-	<listener>
-		<!-- retrieves the PersistenceUnit and makes it available to the application -->
-		<listener-class>com.camunda.fox.cdi.webapp.persistence.CockpitEeEntityManagerFactoryProducerInitializer</listener-class>
-	</listener>
-
+  <filter>
+    <filter-name>Security Filter</filter-name>
+    <filter-class>com.camunda.fox.security.webapp.SecurityFilter</filter-class>
+  </filter>
+  <filter-mapping>
+    <filter-name>Security Filter</filter-name>
+    <url-pattern>*</url-pattern>
+  </filter-mapping>
+  
 	<servlet>
 		<servlet-name>Faces Servlet</servlet-name>
 		<servlet-class>javax.faces.webapp.FacesServlet</servlet-class>
@@ -88,7 +92,7 @@
 	<welcome-file-list>
 		<welcome-file>index.html</welcome-file>
 	</welcome-file-list>
-
+  
 	<session-config>
 		<session-timeout>30</session-timeout>
 	</session-config>
