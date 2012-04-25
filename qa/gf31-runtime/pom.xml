@@ -4,7 +4,7 @@
   <artifactId>fox-platform-qa-glassfish-runtime</artifactId>
   <packaging>pom</packaging>
 
-  <name>fox platform EE - qa Glassfish 3.1.x test runtime</name>
+  <name>fox platform EE - QA Glassfish 3.1.x test runtime</name>
   
   <properties>
     <glassfish.server.location>../../gf31/assembly/target/camunda-fox-ce-${project.version}/camunda-fox-ce-${project.version}/server</glassfish.server.location>
@@ -48,6 +48,9 @@
               <target unless="maven.test.skip">
                 <copy todir="target">
                   <fileset dir="${glassfish.server.location}" />
+                </copy>
+                <copy todir="target/glassfish3/glassfish" overwrite="true">
+                  <fileset dir="src/main" />
                 </copy>
               </target>
             </configuration>

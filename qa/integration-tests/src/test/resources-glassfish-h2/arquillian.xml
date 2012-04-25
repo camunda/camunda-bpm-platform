@@ -6,8 +6,9 @@
 
   <container qualifier="glassfish" default="true">
     <configuration>
-      <property name="glassFishHome">../gf31-runtime/target/glassfish3/</property>     
-<!--       <property name="allowConnectingToRunningServer">true</property>  -->
+      <property name="glassFishHome">../gf31-runtime/target/glassfish3/</property>
+      <property name="adminPort">34848</property>
+      <outputToConsole>true</outputToConsole>
     </configuration>
   </container>
 </arquillian>

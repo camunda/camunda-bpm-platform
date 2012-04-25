@@ -11,9 +11,11 @@ import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.RepositoryService;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.jsfunit.api.BrowserVersion;
 import org.jboss.jsfunit.api.InitialPage;
 import org.jboss.jsfunit.jsfsession.JSFClientSession;
 import org.jboss.jsfunit.jsfsession.JSFServerSession;
+import org.jboss.jsfunit.jsfsession.JSFSession;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.resolver.api.DependencyResolvers;
@@ -85,7 +87,9 @@ public class TestTwitterDemoProcess {
   
   @Test
   @InitialPage("/processList.jsf")
-  public void testStartProcessAndCreateNewTweet(JSFServerSession server, JSFClientSession client) throws Exception {
+  @BrowserVersion(org.jboss.jsfunit.api.Browser.FIREFOX_3_6)
+  public void testStartProcessAndCreateNewTweet(JSFSession session, JSFServerSession server, JSFClientSession client) throws Exception {
+    session.getWebClient().setThrowExceptionOnFailingStatusCode(true);
     Assert.assertNotNull(server);
 
     Assert.assertEquals("/processList.xhtml", server.getCurrentViewID());
@@ -105,7 +109,9 @@ public class TestTwitterDemoProcess {
   
   @Test
   @InitialPage("/taskList.jsf")
-  public void testCompleteTaskForKermit(JSFServerSession server, JSFClientSession client) throws Exception {
+  @BrowserVersion(org.jboss.jsfunit.api.Browser.FIREFOX_3_6)
+  public void testCompleteTaskForKermit(JSFSession session, JSFServerSession server, JSFClientSession client) throws Exception {
+    session.getWebClient().setThrowExceptionOnFailingStatusCode(true);
     Assert.assertNotNull(server);
     
     Assert.assertEquals("/taskList.xhtml", server.getCurrentViewID());
@@ -125,6 +131,8 @@ public class TestTwitterDemoProcess {
     
     client.click("checkbox_approve_publish");
     client.click("submit_button");
+    
+    session.getWebClient().waitForBackgroundJavaScript(2000);
     
     Assert.assertEquals("/taskList.xhtml", server.getCurrentViewID());
     
