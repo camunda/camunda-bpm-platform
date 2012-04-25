@@ -4,7 +4,7 @@
   <artifactId>fox-platform-qa-jboss-runtime</artifactId>
   <packaging>pom</packaging>
 
-  <name>fox platform EE - QA jBoss7 Testruntime</name>
+  <name>fox platform EE - QA jBoss7 test runtime</name>
   
   <properties>
     <jboss.server.location>../../jbossas71/assembly/target/camunda-fox-ce-${project.version}/camunda-fox-ce-${project.version}/server</jboss.server.location>

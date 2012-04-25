@@ -10,6 +10,7 @@
     <server.location>../../qa/jboss7-runtime/target/jboss-as-7.1.0.Final/</server.location>
     <server.port>21019</server.port>
     <server.configuration>standalone-h2.xml</server.configuration>
+    <jsf.unit.version>2.0.0.Beta2</jsf.unit.version>
   </properties>
   
   <parent>
@@ -23,12 +24,10 @@
     <dependency>
       <groupId>com.camunda.fox.platform</groupId>
       <artifactId>fox-platform-client</artifactId>
-      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>com.camunda.fox.engine</groupId>
       <artifactId>fox-engine</artifactId>
-      <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -54,7 +53,7 @@
     <dependency>
       <groupId>org.jboss.jsfunit</groupId>
       <artifactId>jboss-jsfunit-core</artifactId>
-      <version>2.0.0.Beta2</version>
+      <version>${jsf.unit.version}</version>
       <scope>test</scope>
       <exclusions>
         <exclusion>
@@ -67,14 +66,13 @@
     <dependency>
       <groupId>org.jboss.jsfunit</groupId>
       <artifactId>jsfunit-arquillian</artifactId>
-      <version>2.0.0.Beta2</version>
+      <version>${jsf.unit.version}</version>
       <scope>test</scope>
     </dependency>
       
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>4.8.2</version>
       <scope>test</scope>
     </dependency>
 
@@ -296,7 +294,7 @@
             <version>2.12</version>
             <configuration>
               <systemPropertyVariables>
-                <org.apache.maven.user-settings>../../../../../.m2/settings.xml</org.apache.maven.user-settings>
+                <org.apache.maven.user-settings>../../settings.xml</org.apache.maven.user-settings>
               </systemPropertyVariables>
             </configuration>
           </plugin>
