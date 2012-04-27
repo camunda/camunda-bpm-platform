@@ -49,9 +49,7 @@ public class TestTwitterDemoProcess {
               .addAsWebInfResource(new File(WEB_INF_RESOURCES + "beans.xml"), "beans.xml")
               .addAsWebInfResource(new File(WEB_INF_RESOURCES + "jboss-web.xml"), "jboss-web.xml")
               .addAsWebInfResource(new File(WEB_INF_RESOURCES + "web.xml"), "web.xml")
-              .addAsWebInfResource(new File(WEB_INF_RESOURCES + "templates/template.xhtml"),"templates/template.xhtml")
-              .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
-              ;
+              .addAsWebInfResource(new File(WEB_INF_RESOURCES + "templates/template.xhtml"),"templates/template.xhtml");
     
       war.addAsWebResource(new File(WEB_RESOURCES,"index.html"))
          .addAsWebResource(new File(WEB_RESOURCES,"processList.xhtml"))
