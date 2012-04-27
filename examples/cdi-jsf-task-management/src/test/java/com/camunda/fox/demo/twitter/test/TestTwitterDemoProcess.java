@@ -17,6 +17,7 @@ import org.jboss.jsfunit.jsfsession.JSFClientSession;
 import org.jboss.jsfunit.jsfsession.JSFServerSession;
 import org.jboss.jsfunit.jsfsession.JSFSession;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
+import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.resolver.api.DependencyResolvers;
 import org.jboss.shrinkwrap.resolver.api.maven.MavenDependencyResolver;
@@ -48,7 +49,9 @@ public class TestTwitterDemoProcess {
               .addAsWebInfResource(new File(WEB_INF_RESOURCES + "beans.xml"), "beans.xml")
               .addAsWebInfResource(new File(WEB_INF_RESOURCES + "jboss-web.xml"), "jboss-web.xml")
               .addAsWebInfResource(new File(WEB_INF_RESOURCES + "web.xml"), "web.xml")
-              .addAsWebInfResource(new File(WEB_INF_RESOURCES + "templates/template.xhtml"),"templates/template.xhtml");
+              .addAsWebInfResource(new File(WEB_INF_RESOURCES + "templates/template.xhtml"),"templates/template.xhtml")
+              .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
+              ;
     
       war.addAsWebResource(new File(WEB_RESOURCES,"index.html"))
          .addAsWebResource(new File(WEB_RESOURCES,"processList.xhtml"))
