@@ -11,7 +11,7 @@
   <parent>
     <groupId>com.camunda.fox.engine</groupId>
     <artifactId>fox-engine-root</artifactId>
-    <version>1.21.0-SNAPSHOT</version>
+    <version>1.21.0</version>
 	<relativePath>../../../fox-engine/pom.xml</relativePath>
   </parent>
 
