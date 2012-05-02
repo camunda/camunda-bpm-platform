@@ -59,9 +59,4 @@ public class EeEntityManagerProducer extends CockpitEntityManagerProducer {
       cockpitEntityManager.close();
     }
   }
-  
-  @Override
-  public EntityTransaction getTransaction() {
-    return super.getTransaction();
-  }
 }
