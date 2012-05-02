@@ -45,7 +45,7 @@
     <dependency>
       <groupId>org.jboss.arquillian.junit</groupId>
       <artifactId>arquillian-junit-container</artifactId>
-      <version>1.0.0.CR7</version>
+      <version>${version.arquillian}</version>
       <scope>test</scope>
     </dependency>
 
@@ -140,7 +140,7 @@
         <dependency>
           <groupId>org.jboss.arquillian.protocol</groupId>
           <artifactId>arquillian-protocol-servlet</artifactId>
-          <version>1.0.0.CR7</version>
+          <version>${version.arquillian}</version>
           <scope>test</scope>
         </dependency>
         <dependency>
@@ -188,8 +188,6 @@
         ci server uses a local maven repository. This allows us to give the arquillian 
         maven resolver access to the artifacts produced by this build. -->
       <id>ci</id>
-      <activation>
-      </activation>
       <build>
         <plugins>
           <plugin>
@@ -198,7 +196,7 @@
             <version>2.12</version>
             <configuration>
               <systemPropertyVariables>
-                <org.apache.maven.user-settings>../../../../../m2/settings.xml</org.apache.maven.user-settings>
+                <org.apache.maven.user-settings>../../settings.xml</org.apache.maven.user-settings>
               </systemPropertyVariables>
             </configuration>
           </plugin>
@@ -206,6 +204,4 @@
       </build>
     </profile>
   </profiles>
-
-
 </project>

@@ -9,8 +9,10 @@
       <property name="glassFishHome">${server.location}</property>
       <property name="adminPort">34848</property>
       <property name="outputToConsole">true</property>
-      <!-- property name="debug">true</property-->
-      <!-- property name="allowConnectingToRunningServer">true</property-->
     </configuration>
   </container>
+  
+  <extension qualifier="webdriver">
+    <property name="useJavaScript">true</property>
+  </extension>
 </arquillian>

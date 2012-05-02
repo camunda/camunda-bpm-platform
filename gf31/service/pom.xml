@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <artifactId>fox-platform-glassfish-service</artifactId>
   <packaging>jar</packaging>
-  <name>fox platform EE - Glassfish 3.1.x service </name>
+  <name>fox platform EE - Glassfish 3.1.x Service</name>
 
   <parent>
     <groupId>com.camunda.fox.platform</groupId>

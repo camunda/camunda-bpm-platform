@@ -1,8 +1,7 @@
 package com.camunda.fox.demo.twitter.test;
 
 import java.io.File;
-
-import javax.faces.component.UIComponent;
+import java.net.URL;
 
 import junit.framework.Assert;
 
@@ -10,18 +9,18 @@ import org.activiti.cdi.impl.util.ProgrammaticBeanLookup;
 import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.RepositoryService;
 import org.jboss.arquillian.container.test.api.Deployment;
+import org.jboss.arquillian.container.test.api.RunAsClient;
+import org.jboss.arquillian.drone.api.annotation.Drone;
 import org.jboss.arquillian.junit.Arquillian;
-import org.jboss.jsfunit.api.BrowserVersion;
-import org.jboss.jsfunit.api.InitialPage;
-import org.jboss.jsfunit.jsfsession.JSFClientSession;
-import org.jboss.jsfunit.jsfsession.JSFServerSession;
-import org.jboss.jsfunit.jsfsession.JSFSession;
+import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.resolver.api.DependencyResolvers;
 import org.jboss.shrinkwrap.resolver.api.maven.MavenDependencyResolver;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.openqa.selenium.By;
+import org.openqa.selenium.WebDriver;
 
 import com.camunda.fox.demo.twitter.jsf.CurrentUser;
 import com.camunda.fox.demo.twitter.jsf.DontTweetService;
@@ -64,11 +63,9 @@ public class TestTwitterDemoProcess {
      
       war.addAsLibraries(DependencyResolvers.use(MavenDependencyResolver.class).goOffline()
               .loadMetadataFromPom("pom.xml")
-              .artifact("com.camunda.fox.platform:fox-platform-client").resolveAsFiles());
-      
-      war.addAsLibraries(DependencyResolvers.use(MavenDependencyResolver.class).goOffline()
-              .loadMetadataFromPom("pom.xml")
-              .artifact("org.jboss.jsfunit:jboss-jsfunit-core:2.0.0.Beta2").resolveAsFiles());
+              .artifact("com.camunda.fox.platform:fox-platform-client")
+              .artifact("org.seleniumhq.selenium:selenium-api:2.20.0")
+              .resolveAsFiles());
       
       return war;
   }
@@ -86,61 +83,37 @@ public class TestTwitterDemoProcess {
   }
   
   @Test
-  @InitialPage("/processList.jsf")
-  @BrowserVersion(org.jboss.jsfunit.api.Browser.FIREFOX_3_6)
-  public void testStartProcessAndCreateNewTweet(JSFSession session, JSFServerSession server, JSFClientSession client) throws Exception {
-    session.getWebClient().setThrowExceptionOnFailingStatusCode(true);
-    Assert.assertNotNull(server);
-
-    Assert.assertEquals("/processList.xhtml", server.getCurrentViewID());
-      
-    // start process
-    client.click("0:start_process_link");
+  @RunAsClient
+  public void testApplication(@Drone WebDriver driver, @ArquillianResource URL contextPath) {
+    driver.get(contextPath + "processList.jsf");
+    Assert.assertEquals(contextPath + "processList.jsf", driver.getCurrentUrl());
     
-    Assert.assertEquals("/taskForm_newTweet.xhtml", server.getCurrentViewID());
+    // start new process
+    driver.findElement(By.linkText("Start")).click();
+    
+    Assert.assertEquals(contextPath + "taskForm_newTweet.jsf?processDefinitionKey=twitterProcess", driver.getCurrentUrl());
     
     // create new tweet
-    client.setValue("twitter_account", TWITTER_ACCOUNT);
-    client.setValue("tweet_content", TWEET_CONTENT);
-    client.click("submit_button");
+    driver.findElement(By.id("newTweetForm:twitter_account")).sendKeys(TWITTER_ACCOUNT);
+    driver.findElement(By.id("newTweetForm:tweet_content")).sendKeys(TWEET_CONTENT);
+    driver.findElement(By.id("newTweetForm:submit_button")).submit();
     
-    Assert.assertEquals("/taskList.xhtml", server.getCurrentViewID());
-  }
-  
-  @Test
-  @InitialPage("/taskList.jsf")
-  @BrowserVersion(org.jboss.jsfunit.api.Browser.FIREFOX_3_6)
-  public void testCompleteTaskForKermit(JSFSession session, JSFServerSession server, JSFClientSession client) throws Exception {
-    session.getWebClient().setThrowExceptionOnFailingStatusCode(true);
-    Assert.assertNotNull(server);
-    
-    Assert.assertEquals("/taskList.xhtml", server.getCurrentViewID());
+    Assert.assertEquals(contextPath + "taskList.jsf", driver.getCurrentUrl());
     
     // complete task
-    client.setValue("task_user", "kermit");
-    client.click("0:task_complete_link");
+    driver.findElement(By.id("taskListForm:task_user")).sendKeys("kermit");
+    driver.findElement(By.id("taskListForm:taskList:0:task_complete_link")).click();
     
-    Assert.assertEquals("/taskForm_reviewTweet.xhtml", server.getCurrentViewID());
+    Assert.assertTrue(driver.getCurrentUrl().contains(contextPath + "taskForm_reviewTweet.jsf"));
     
     // review tweet
-    Object componentValue = server.findComponent("twitter_account");
-    Assert.assertNotNull(componentValue);
-    String pageAsText = client.getPageAsText();
-    Assert.assertTrue(pageAsText.contains(TWITTER_ACCOUNT));
-    Assert.assertTrue(pageAsText.contains(TWEET_CONTENT));
+    Assert.assertEquals(TWITTER_ACCOUNT, driver.findElement(By.id("reviewTweetForm:twitter_account")).getText());
+    Assert.assertEquals(TWEET_CONTENT, driver.findElement(By.id("reviewTweetForm:tweet_content")).getText());
+
+    driver.findElement(By.id("reviewTweetForm:checkbox_approve_publish")).click();
+    driver.findElement(By.id("reviewTweetForm:submit_button")).submit();
     
-    client.click("checkbox_approve_publish");
-    client.click("submit_button");
-    
-    session.getWebClient().waitForBackgroundJavaScript(2000);
-    
-    Assert.assertEquals("/taskList.xhtml", server.getCurrentViewID());
-    
-    UIComponent component = server.findComponent("last_tweets");
-    Assert.assertNotNull(component);
-    
-    pageAsText = client.getPageAsText();
-    Assert.assertTrue(pageAsText.contains(TWEET_CONTENT));
+    Assert.assertEquals(contextPath + "taskList.jsf", driver.getCurrentUrl());
+    Assert.assertTrue(driver.getPageSource().contains(TWEET_CONTENT));
   }
-  
 }

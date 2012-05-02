@@ -10,7 +10,6 @@
     <server.location>../../qa/jboss7-runtime/target/jboss-as-7.1.0.Final/</server.location>
     <server.port>21019</server.port>
     <server.configuration>standalone-h2.xml</server.configuration>
-    <jsf.unit.version>2.0.0.Beta2</jsf.unit.version>
   </properties>
   
   <parent>
@@ -51,35 +50,21 @@
     </dependency>
       
     <dependency>
-      <groupId>org.jboss.jsfunit</groupId>
-      <artifactId>jboss-jsfunit-core</artifactId>
-      <version>${jsf.unit.version}</version>
-      <scope>test</scope>
-      <exclusions>
-        <exclusion>
-          <artifactId>commons-io</artifactId>
-          <groupId>commons-io</groupId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-      
-    <dependency>
-      <groupId>org.jboss.jsfunit</groupId>
-      <artifactId>jsfunit-arquillian</artifactId>
-      <version>${jsf.unit.version}</version>
-      <scope>test</scope>
-    </dependency>
-      
-    <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <scope>test</scope>
     </dependency>
 
     <dependency>
-      <groupId>commons-io</groupId>
-      <artifactId>commons-io</artifactId>
-      <version>1.4</version>
+      <groupId>org.jboss.arquillian.extension</groupId>
+      <artifactId>arquillian-drone-impl</artifactId>
+      <scope>test</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.jboss.arquillian.extension</groupId>
+      <artifactId>arquillian-drone-webdriver-depchain</artifactId>
+      <type>pom</type>
       <scope>test</scope>
     </dependency>
   </dependencies>
@@ -89,9 +74,16 @@
       <dependency>
         <groupId>org.jboss.arquillian</groupId>
         <artifactId>arquillian-bom</artifactId>
-        <version>1.0.0.CR7</version>
-        <scope>import</scope>
+        <version>${version.arquillian}</version>
         <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.jboss.arquillian.extension</groupId>
+        <artifactId>arquillian-drone-bom</artifactId>
+        <version>${version.arquillian}</version>
+        <type>pom</type>
+        <scope>import</scope>
       </dependency>
     </dependencies>
   </dependencyManagement>
@@ -203,32 +195,13 @@
         </dependency>
         <dependency>
           <groupId>org.jboss.shrinkwrap.resolver</groupId>
-          <artifactId>shrinkwrap-resolver-api</artifactId>
-          <version>1.0.0-beta-6</version>
-          <scope>test</scope>
-        </dependency>
-        <dependency>
-          <groupId>org.jboss.shrinkwrap.resolver</groupId>
-          <artifactId>shrinkwrap-resolver-api-maven</artifactId>
-          <version>1.0.0-beta-6</version>
-          <scope>test</scope>
-        </dependency>
-        <dependency>
-          <groupId>org.jboss.shrinkwrap.resolver</groupId>
           <artifactId>shrinkwrap-resolver-impl-maven</artifactId>
-          <version>1.0.0-beta-6</version>
-          <scope>test</scope>
-        </dependency>        
-        <dependency>
-          <groupId>org.jboss.shrinkwrap</groupId>
-          <artifactId>shrinkwrap-api</artifactId>
-          <version>1.0.0-cr-3</version>
           <scope>test</scope>
         </dependency>
       </dependencies>
       <build>
         <plugins>
-          <!-- needed, otherwise glassfish has issues with stopping -->
+          <!-- needed, otherwise glassfish has issues with shutdown -->
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-surefire-plugin</artifactId>
@@ -284,8 +257,6 @@
         server uses a local maven repository. This allows us to give the arquillian 
         maven resolver access to the artifacts produced by this build. -->
       <id>ci</id>
-      <activation>
-      </activation>
       <build>
         <plugins>
           <plugin>
