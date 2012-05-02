@@ -2,7 +2,7 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <artifactId>fox-platform-glassfish-ear</artifactId>
-  <name>fox platform EE - Glassfish 3.1.x ear</name>
+  <name>fox platform EE - Glassfish 3.1.x EAR</name>
   <packaging>ear</packaging>
 
   <parent>
@@ -39,17 +39,14 @@
     <dependency>
       <groupId>com.camunda.fox.engine</groupId>
       <artifactId>fox-engine-cdi</artifactId>
-      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>com.camunda.fox.platform</groupId>
       <artifactId>fox-platform-deployer</artifactId>
-      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>com.camunda.fox.platform</groupId>
       <artifactId>fox-platform-service</artifactId>
-      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>com.camunda.fox.platform</groupId>

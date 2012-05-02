@@ -167,7 +167,8 @@
           <version>${project.version}</version>
           <scope>provided</scope>
           <type>pom</type>
-        </dependency>       
+        </dependency>
+        <!-- see we can upgrade this to latest arquillian -->
         <dependency>
           <groupId>org.jboss.arquillian.container</groupId>
           <artifactId>arquillian-glassfish-managed-3.1</artifactId>
@@ -177,7 +178,7 @@
         <dependency>
           <groupId>org.jboss.arquillian.protocol</groupId>
           <artifactId>arquillian-protocol-servlet</artifactId>
-          <version>${version.arquillian}</version>
+          <version>1.0.0.CR7</version>
           <scope>test</scope>
         </dependency>
         <dependency>
@@ -272,8 +273,6 @@
         ci server uses a local maven repository. This allows us to give the arquillian 
         maven resolver access to the artifacts produced by this build. -->
       <id>ci</id>
-      <activation>
-      </activation>
       <build>
         <plugins>
           <plugin>
