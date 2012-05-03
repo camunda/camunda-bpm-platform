@@ -26,7 +26,8 @@
         <include>**/*.sh</include>
       </includes>
       <fileMode>0755</fileMode>
-    </fileSet>     
+    </fileSet>
+<!--     
     <fileSet>
       <directory>../../examples/cdi-jsf-task-management</directory>
       <outputDirectory>examples/src/cdi-jsf-task-management</outputDirectory>  
@@ -46,12 +47,13 @@
   </fileSets>
   
   <files>
-        <file>
-                <source>../../examples/cdi-jsf-task-management/pom.xml.distro</source>
-                <outputDirectory>examples/src/cdi-jsf-task-management</outputDirectory>
-                <destName>pom.xml</destName>
-        </file>
+    <file>
+      <source>../../examples/cdi-jsf-task-management/pom.xml.distro</source>
+      <outputDirectory>examples/src/cdi-jsf-task-management</outputDirectory>
+      <destName>pom.xml</destName>
+    </file>
   </files>
+-->
   
   <dependencySets>
     <dependencySet>
@@ -62,7 +64,7 @@
                 <include>com.camunda.fox.cycle:cycle-webapp-fox:war:*</include> -->                                             
       </includes>
       <outputDirectory>server/glassfish3/glassfish/domains/domain1/autodeploy</outputDirectory>
-    </dependencySet>   
+    </dependencySet>
   </dependencySets>
 
 </assembly>
