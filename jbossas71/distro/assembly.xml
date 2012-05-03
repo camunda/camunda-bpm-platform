@@ -56,31 +56,34 @@
       </includes>
       <directoryMode>0700</directoryMode>
     </fileSet>
+    <!--
     <fileSet>
       <directory>../../examples/cdi-jsf-task-management</directory>
       <outputDirectory>examples/src/cdi-jsf-task-management</outputDirectory>  
       <excludes>
         <exclude>target/</exclude>
         <exclude>pom.xml</exclude>		
-		<exclude>pom.xml.distro</exclude>
+		    <exclude>pom.xml.distro</exclude>
       </excludes>	 
     </fileSet>
-	<fileSet>
+	  <fileSet>
       <directory>../../examples/cdi-jsf-task-management</directory>
       <outputDirectory>examples/src/cdi-jsf-task-management</outputDirectory>  
       <includes>	
-		<include>pom.xml.distro</include>
+		    <include>pom.xml.distro</include>
       </includes>	 
     </fileSet>
+    -->
   </fileSets>
-  
+<!--  
   <files>
-	<file>
-		<source>../../examples/cdi-jsf-task-management/pom.xml.distro</source>
-		<outputDirectory>examples/src/cdi-jsf-task-management</outputDirectory>
-		<destName>pom.xml</destName>
-	</file>
+	  <file>
+		  <source>../../examples/cdi-jsf-task-management/pom.xml.distro</source>
+		  <outputDirectory>examples/src/cdi-jsf-task-management</outputDirectory>
+		  <destName>pom.xml</destName>
+	  </file>
   </files>
+-->
   
   <dependencySets>
     <dependencySet>
@@ -89,12 +92,14 @@
       </includes>
       <outputDirectory>server/jboss-as-${version.jboss.as}/standalone/deployments</outputDirectory>
     </dependencySet>
+    <!--
     <dependencySet>
       <includes>
         <include>*:war:*</include>
       </includes>
       <outputDirectory>examples/bin/</outputDirectory>
     </dependencySet>
-  </dependencySets>
+    -->
+  </dependencySets>  
 
 </assembly>
