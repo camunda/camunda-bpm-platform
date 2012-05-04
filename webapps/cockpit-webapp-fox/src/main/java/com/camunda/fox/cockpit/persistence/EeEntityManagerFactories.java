@@ -1,8 +1,5 @@
-package com.camunda.fox.cockpit.cdi.persistence;
+package com.camunda.fox.cockpit.persistence;
 
-import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.inject.Alternative;
-import javax.enterprise.inject.Produces;
 import javax.enterprise.inject.Specializes;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
