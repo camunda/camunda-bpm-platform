@@ -93,7 +93,6 @@
           <artifactId>java-uuid-generator</artifactId>
           <scope>test</scope>
         </dependency>
-
 	</dependencies>
 
 	<build>

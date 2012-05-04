@@ -27,7 +27,7 @@
       </includes>
       <fileMode>0755</fileMode>
     </fileSet>
-<!--     
+    <!--     
     <fileSet>
       <directory>../../examples/cdi-jsf-task-management</directory>
       <outputDirectory>examples/src/cdi-jsf-task-management</outputDirectory>  
@@ -44,8 +44,9 @@
         <include>pom.xml.distro</include>
       </includes>        
     </fileSet>
+    -->
   </fileSets>
-  
+  <!--
   <files>
     <file>
       <source>../../examples/cdi-jsf-task-management/pom.xml.distro</source>
@@ -53,7 +54,7 @@
       <destName>pom.xml</destName>
     </file>
   </files>
--->
+  -->
   
   <dependencySets>
     <dependencySet>
