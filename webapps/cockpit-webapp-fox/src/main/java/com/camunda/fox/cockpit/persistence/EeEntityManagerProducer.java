@@ -1,8 +1,7 @@
-package com.camunda.fox.cockpit.cdi.persistence;
+package com.camunda.fox.cockpit.persistence;
 
 import com.camunda.fox.cockpit.cdi.FoxEngineResource;
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
+import javax.enterprise.context.ConversationScoped;
 import javax.enterprise.context.RequestScoped;
 import javax.enterprise.inject.Produces;
 import javax.enterprise.inject.Specializes;
@@ -15,6 +14,7 @@ import javax.persistence.EntityTransaction;
  * @author nico.rehwaldt
  */
 @Specializes
+@ConversationScoped
 public class EeEntityManagerProducer extends CockpitEntityManagerProducer {
   
   @Inject
@@ -24,7 +24,6 @@ public class EeEntityManagerProducer extends CockpitEntityManagerProducer {
   private EntityManager foxEngineEntityManager;
   
   @Specializes
-  @Produces
   @FoxEngineResource
   @RequestScoped
   @Override
@@ -32,31 +31,33 @@ public class EeEntityManagerProducer extends CockpitEntityManagerProducer {
     if (foxEngineEntityManager == null) {
       foxEngineEntityManager = entityManagerFactories.getFoxEngineEntityManager();
     }
-    
     return foxEngineEntityManager;
   }
   
   @Specializes
-  @Produces
   @RequestScoped
   @Override
   public EntityManager getCockpitEntityManager() {
     if (cockpitEntityManager == null) {
       cockpitEntityManager = entityManagerFactories.getCockpitEntityManager();
     }
-    
     return cockpitEntityManager;
   }
-    
+
   @Override
-  @PreDestroy
+  @Specializes
+  public EntityTransaction getTransaction() {
+    return getCockpitEntityManager().getTransaction();
+  }
+  
+  @Override
   protected void preDestroy() {
-    if (foxEngineEntityManager != null && foxEngineEntityManager.isOpen()) {
-      foxEngineEntityManager.close();
-    }
-    
     if (cockpitEntityManager != null && cockpitEntityManager.isOpen()) {
       cockpitEntityManager.close();
+    }
+    
+    if (foxEngineEntityManager != null && foxEngineEntityManager.isOpen()) {
+      foxEngineEntityManager.close();
     }
   }
 }

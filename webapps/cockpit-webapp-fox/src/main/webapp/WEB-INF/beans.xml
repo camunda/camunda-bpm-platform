@@ -1,8 +1,8 @@
-
-<beans xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xsi:schemaLocation="
-          http://java.sun.com/xml/ns/javaee http://docs.jboss.org/cdi/beans_1_0.xsd">
-                    
+<?xml version="1.0"?>
+<beans xmlns="http://java.sun.com/xml/ns/javaee"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://java.sun.com/xml/ns/javaee  http://docs.jboss.org/cdi/beans_1_0.xsd">
+  
   <alternatives>
 		<!-- generates some demo data for development purposes -->
     <class>com.camunda.fox.cockpit.webapp.demo.DemoDataGenerator</class>
