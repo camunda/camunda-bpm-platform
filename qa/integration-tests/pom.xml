@@ -2,7 +2,6 @@
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>fox-platform-qa-integration-tests</artifactId>
-
   <name>fox platform CE - QA Integrationtests</name>
 
   <parent>
@@ -12,15 +11,6 @@
   </parent>
   
   <dependencies>
-    <dependency>
-      <!-- make sure this comes after runtime in the reactor build -->
-      <groupId>com.camunda.fox.platform</groupId>
-      <artifactId>fox-platform-qa-jboss-runtime</artifactId>
-      <version>${project.version}</version>
-      <scope>provided</scope>
-      <type>pom</type>
-    </dependency>
-
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
@@ -44,7 +34,7 @@
     <dependency>
       <groupId>org.jboss.arquillian.junit</groupId>
       <artifactId>arquillian-junit-container</artifactId>
-      <version>1.0.0.CR7</version>
+      <version>${version.arquillian}</version>
       <scope>test</scope>
     </dependency>
     
@@ -121,6 +111,14 @@
       </activation>
       <dependencies>
         <dependency>
+          <!-- make sure this comes after runtime in the reactor build -->
+          <groupId>com.camunda.fox.platform</groupId>
+          <artifactId>fox-platform-qa-jboss-runtime</artifactId>
+          <version>${project.version}</version>
+          <scope>provided</scope>
+          <type>pom</type>
+        </dependency>
+        <dependency>
           <groupId>org.jboss.as</groupId>
           <artifactId>jboss-as-arquillian-container-managed</artifactId>
           <version>${version.jboss.as}</version>
@@ -129,7 +127,7 @@
         <dependency>
           <groupId>org.jboss.arquillian.protocol</groupId>
           <artifactId>arquillian-protocol-servlet</artifactId>
-          <version>1.0.0.CR7</version>
+          <version>${version.arquillian}</version>
           <scope>test</scope>
         </dependency>
       </dependencies>
@@ -137,6 +135,14 @@
     <profile>
       <id>jboss-remote</id>
       <dependencies>
+        <dependency>
+          <!-- make sure this comes after runtime in the reactor build -->
+          <groupId>com.camunda.fox.platform</groupId>
+          <artifactId>fox-platform-qa-jboss-runtime</artifactId>
+          <version>${project.version}</version>
+          <scope>provided</scope>
+          <type>pom</type>
+        </dependency>
         <dependency>
           <groupId>org.jboss.as</groupId>
           <artifactId>jboss-as-arquillian-container-remote</artifactId>
@@ -146,7 +152,7 @@
         <dependency>
           <groupId>org.jboss.arquillian.protocol</groupId>
           <artifactId>arquillian-protocol-servlet</artifactId>
-          <version>1.0.0.CR7</version>
+          <version>${version.arquillian}</version>
           <scope>test</scope>
         </dependency>
       </dependencies>
@@ -211,8 +217,6 @@
         ci server uses a local maven repository. This allows us to give the arquillian 
         maven resolver access to the artifacts produced by this build. -->
       <id>ci</id>
-      <activation>
-      </activation>
       <build>
         <plugins>
           <plugin>
@@ -221,7 +225,7 @@
             <version>2.12</version>
             <configuration>
               <systemPropertyVariables>
-                <org.apache.maven.user-settings>../../../../../m2/settings.xml</org.apache.maven.user-settings>                
+                <org.apache.maven.user-settings>../../settings.xml</org.apache.maven.user-settings>                
               </systemPropertyVariables>
             </configuration>
           </plugin>

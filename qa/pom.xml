@@ -3,7 +3,6 @@
 
   <artifactId>fox-platform-qa</artifactId>
   <packaging>pom</packaging>
-
   <name>fox platform CE - QA</name>
 
   <parent>
@@ -22,8 +21,6 @@
 		<profile>
 			<id>full</id>	
 			<modules>
-				<module>jboss7-runtime</module>
-				<module>integration-tests</module>
 				<module>activiti-testsuite</module>
 			</modules>
 		</profile>	

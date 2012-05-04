@@ -15,7 +15,6 @@
  */
 package com.camunda.fox.platform.test.util;
 
-import java.io.File;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -37,8 +36,6 @@ import org.activiti.engine.impl.jobexecutor.JobExecutor;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
-import org.jboss.shrinkwrap.resolver.api.DependencyResolvers;
-import org.jboss.shrinkwrap.resolver.api.maven.MavenDependencyResolver;
 import org.junit.Assert;
 import org.junit.Before;
 
@@ -57,7 +54,7 @@ public abstract class AbstractFoxPlatformIntegrationTest {
           "java:global/" +
           "camunda-fox-platform/" +
           "process-engine/" +
-          "PlatformService!com.camunda.fox.platform.api.ProcessArchiveService";
+          "PlatformService!com.camunda.fox.platform.api.ProcessEngineService";
 
   protected ProcessEngineService processEngineService;
   protected ProcessArchiveService processArchiveService;
@@ -81,11 +78,6 @@ public abstract class AbstractFoxPlatformIntegrationTest {
   
   public static WebArchive initWebArchiveDeployment() {
     return initWebArchiveDeployment("test.war");
-  }
-  
-  public static File[] getFoxPlatformClient() {
-    MavenDependencyResolver resolver = DependencyResolvers.use(MavenDependencyResolver.class).goOffline().loadMetadataFromPom("pom.xml");
-    return resolver.artifact("com.camunda.fox.platform:fox-platform-client").resolveAsFiles();
   }
   
   public static ProcessEngineService getProcessEngineService() {

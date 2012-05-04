@@ -18,7 +18,6 @@
   <name>fox platform CE - jBoss7 Assembly</name>
 
   <dependencies>
-
     <dependency>
       <groupId>org.jboss.as</groupId>
       <artifactId>jboss-as-dist</artifactId>
@@ -45,7 +44,6 @@
       <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
-
   </dependencies>
 
   <build>
@@ -77,8 +75,6 @@
         </executions>
       </plugin>
     </plugins>
-
   </build>
-
 
 </project>

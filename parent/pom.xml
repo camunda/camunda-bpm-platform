@@ -10,6 +10,7 @@
 
   <properties>
     <version.jboss.as>7.1.0.Final</version.jboss.as>
+    <version.arquillian>1.0.0.Final</version.arquillian>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 

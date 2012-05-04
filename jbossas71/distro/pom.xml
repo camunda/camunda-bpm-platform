@@ -13,7 +13,6 @@
   <name>fox platform CE - jBoss7 Distro</name>
 
   <dependencies>
-
     <dependency>
       <!-- this dependency is to make sure that we are executed after the integration 
         tests have passed in the reactor -->

@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>fox-platform-qa-activiti-testsuite</artifactId>
@@ -46,7 +45,7 @@
     <dependency>
       <groupId>org.jboss.arquillian.junit</groupId>
       <artifactId>arquillian-junit-container</artifactId>
-      <version>1.0.0.CR7</version>
+      <version>${version.arquillian}</version>
       <scope>test</scope>
     </dependency>
 
@@ -141,7 +140,7 @@
         <dependency>
           <groupId>org.jboss.arquillian.protocol</groupId>
           <artifactId>arquillian-protocol-servlet</artifactId>
-          <version>1.0.0.CR7</version>
+          <version>${version.arquillian}</version>
           <scope>test</scope>
         </dependency>
         <dependency>
@@ -189,8 +188,6 @@
         ci server uses a local maven repository. This allows us to give the arquillian 
         maven resolver access to the artifacts produced by this build. -->
       <id>ci</id>
-      <activation>
-      </activation>
       <build>
         <plugins>
           <plugin>
@@ -199,7 +196,7 @@
             <version>2.12</version>
             <configuration>
               <systemPropertyVariables>
-                <org.apache.maven.user-settings>../../../../../m2/settings.xml</org.apache.maven.user-settings>
+                <org.apache.maven.user-settings>../../settings.xml</org.apache.maven.user-settings>
               </systemPropertyVariables>
             </configuration>
           </plugin>
@@ -207,6 +204,4 @@
       </build>
     </profile>
   </profiles>
-
-
 </project>

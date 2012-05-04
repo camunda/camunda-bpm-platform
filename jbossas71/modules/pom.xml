@@ -3,7 +3,6 @@
 
   <artifactId>fox-platform-jboss-modules</artifactId>
   <packaging>pom</packaging>
-
   <name>fox platform CE - jBoss7 Modules</name>
 
   <parent>
