@@ -3,8 +3,8 @@
 
   <groupId>com.camunda.fox.platform</groupId>
   <artifactId>fox-platform-core</artifactId>
-  <version>6.0.0-SNAPSHOT</version>
   <packaging>pom</packaging>
+
   <name>fox platform EE - Core</name>
 
   <parent>
@@ -92,7 +92,6 @@
     <module>deployer</module>
     <module>service-ext</module>
   </modules>
-  
   
   <scm>
    <connection>scm:git:git@bitbucket.org:camunda/fox-platform-ee.git</connection>
