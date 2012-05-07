@@ -21,7 +21,20 @@ import com.camunda.fox.platform.impl.service.ProcessEngineController;
 import com.camunda.fox.platform.spi.ProcessArchive;
 
 /**
- * <p>SPI Interface for implemeting extensions to the platform services</p>
+ * <p>SPI Interface for implemeting extensions to the platform services.</p>
+ * 
+ * <p>An instance of this class is created once per {@link PlatformService} instance.
+ * This means that you will have one instance of this service per extension. More 
+ * practically speaking: {@link #onPlatformServiceStart(PlatformService)} will be invoked 
+ * on the same instance as {@link #onPlatformServiceStop(PlatformService)} 
+ * and each other method listend here. As a consequence, the {@link ProcessEngineController} 
+ * and {@link ProcessArchive} lifecycle methods 
+ * (like {@link #beforeProcessEngineControllerStart(ProcessEngineController)}) are all invoked on 
+ * the same instance of this class. The instance is 
+ * released after {@link #onPlatformServiceStop(PlatformService)} is invoked on the last 
+ * extension instance.</p>
+ * 
+ * <p>Consider using {@link PlatformServiceExtensionAdapter} when writing implementations.</p>
  * 
  * @author Daniel Meyer
  * @see PlatformServiceExtensionAdapter

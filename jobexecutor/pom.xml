@@ -1,0 +1,22 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>fox-platform-jobexecutor</artifactId>
+  <packaging>pom</packaging>
+  <name>fox platform EE - Job Executor</name>
+
+  <parent>
+    <groupId>com.camunda.fox.platform</groupId>
+    <artifactId>fox-platform-root</artifactId>
+    <version>6.1.0-SNAPSHOT</version>
+    <relativePath>../parent</relativePath>
+  </parent>
+
+  <modules>
+    <module>core</module>
+    <module>ra</module>
+    <module>rar</module>
+    <module>service</module>
+  </modules>
+
+</project>

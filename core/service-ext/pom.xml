@@ -50,14 +50,14 @@
 			<version>7.1.0.Final</version>
 			<scope>provided</scope>
 		</dependency>
-    
-    <!-- websphere dependencies -->
-    <dependency>
-      <groupId>com.bea.commonj</groupId>
-      <artifactId>com.springsource.commonj</artifactId>
-      <version>1.1.0</version>
-      <scope>provided</scope>
-    </dependency>
+
+		<dependency>
+		  <groupId>com.camunda.fox.platform</groupId>
+		  <artifactId>fox-platform-jobexecutor-core</artifactId>
+		  <version>${project.version}</version>
+          <scope>provided</scope>
+		</dependency>
+
 	</dependencies>
 
 	<build>

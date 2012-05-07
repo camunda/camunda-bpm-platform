@@ -29,6 +29,7 @@ public class ProcessEngineConfigurationBean implements ProcessEngineConfiguratio
   private boolean isDefault;
   private String processEngineName;
   private String datasourceJndiName;
+  private String jobAcquisitionName;
   private Map<String, Object> properties = new HashMap<String, Object>();
 
   // //////////////////////////////////////////
@@ -85,6 +86,7 @@ public class ProcessEngineConfigurationBean implements ProcessEngineConfiguratio
   public Map<String, Object> getProperties() {
     properties.put(PROP_IS_ACTIVATE_JOB_EXECUTOR, isActivateJobExcutor);
     properties.put(PROP_IS_AUTO_SCHEMA_UPDATE, isAutoSchemaUpdate);
+    properties.put(PROP_JOB_EXECUTOR_ACQUISITION_NAME, jobAcquisitionName);
     return properties;
   }
   
@@ -112,6 +114,14 @@ public class ProcessEngineConfigurationBean implements ProcessEngineConfiguratio
 
   public void setDatasourceJndiName(String datasourceJndiName) {
     this.datasourceJndiName = datasourceJndiName;
+  }
+  
+  public String getJobAcquisitionName() {
+    return jobAcquisitionName;
+  }
+  
+  public void setJobAcquisitionName(String jobAcquisitionName) {
+    this.jobAcquisitionName = jobAcquisitionName;
   }
 
 }
