@@ -34,6 +34,9 @@ public interface ProcessEngineConfiguration {
   /** the prefix to be used for all process engine database tables */
   public static String PROP_DB_TABLE_PREFIX = "dbTablePrefix";
   
+  /** the name of the platform job executor acquisition to use */
+  public static String PROP_JOB_EXECUTOR_ACQUISITION_NAME = "jobExecutorAcquisitionName";
+  
   /**
    * @return true if this is the default process engine.
    * There can only be one default process engine per 

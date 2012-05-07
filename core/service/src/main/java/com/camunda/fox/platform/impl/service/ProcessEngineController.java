@@ -146,7 +146,7 @@ public class ProcessEngineController {
   protected void closeProcessEngine() {
     ProcessEngines.unregister(activitiProcessEngine);
     JobExecutor jobExecutor = processEngineConfiguration.getJobExecutor();
-    if(jobExecutor.isActive()) {
+    if(jobExecutor != null && jobExecutor.isActive()) {
       jobExecutor.shutdown();
     }
   }
@@ -438,6 +438,10 @@ public class ProcessEngineController {
   
   public void setProcessEngineRegistry(ProcessEngineRegistry processEngineRegistry) {
     this.processEngineRegistry = processEngineRegistry;
+  }
+  
+  public ProcessEngineConfiguration getProcessEngineUserConfiguration() {
+    return processEngineUserConfiguration;
   }
   
   // extensions support ////////////////////////////////////////////////////
