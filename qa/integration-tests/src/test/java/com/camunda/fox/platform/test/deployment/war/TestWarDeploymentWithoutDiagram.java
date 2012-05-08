@@ -15,8 +15,12 @@
  */
 package com.camunda.fox.platform.test.deployment.war;
 
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+
 import java.io.IOException;
 
+import org.activiti.engine.ActivitiException;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
@@ -27,33 +31,28 @@ import com.camunda.fox.platform.test.util.AbstractFoxPlatformIntegrationTest;
 import com.camunda.fox.platform.test.util.TestHelper;
 
 /**
- * @author Falko Menge
+ * @author Christian Lipphardt
  */
 @RunWith(Arquillian.class)
-public class TestWarDeploymentWithDiagram extends AbstractFoxPlatformIntegrationTest {
+public class TestWarDeploymentWithoutDiagram extends AbstractFoxPlatformIntegrationTest {
 
   @Deployment
   public static WebArchive processArchive() {    
     return initWebArchiveDeployment()
             .addClass(TestHelper.class)
-            .addAsResource("com/camunda/fox/platform/test/testDeployProcessArchive.bpmn20.xml")
-            .addAsResource("com/camunda/fox/platform/test/testDeployProcessArchive.png")
-            .addAsResource("com/camunda/fox/platform/test/invoice.bpmn20.xml")
-            .addAsResource("com/camunda/fox/platform/test/invoice.jpg");
+            .addAsResource("com/camunda/fox/platform/test/testDeployProcessArchive.bpmn20.xml");
   }
   
   @Test
-  public void testDeployProcessArchive() throws IOException {
-    String expectedDiagramResource = "/com/camunda/fox/platform/test/testDeployProcessArchive.png";
-    String processDefinitionKey = "testDeployProcessArchive";
-    TestHelper.assertDiagramDeployed(getClass(), expectedDiagramResource, processDefinitionKey);
+  public void testDeployProcessArchiveDiagramCreationDisabled() throws IOException {
+    try {
+      String expectedDiagramResource = "/com/camunda/fox/platform/test/testDeployProcessArchive.png";
+      String processDefinitionKey = "testDeployProcessArchive";
+      TestHelper.assertDiagramDeployed(getClass(), expectedDiagramResource, processDefinitionKey);
+      fail();
+    } catch (ActivitiException e) {
+      assertTrue(e.getMessage().contains("resourceName is null"));
+    }
   }
-
-  @Test
-  public void testInvoiceProcess() throws IOException {
-    String expectedDiagramResource = "/com/camunda/fox/platform/test/invoice.jpg";
-    String processDefinitionKey = "invoice";
-    TestHelper.assertDiagramDeployed(getClass(), expectedDiagramResource, processDefinitionKey);
-  }
-  
+    
 }

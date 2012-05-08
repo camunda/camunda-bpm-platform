@@ -99,7 +99,7 @@ public abstract class AbstractFoxPlatformIntegrationTest {
       return null;
     }
   }
-         
+
   @Before
   public void setupBeforeTest() {
     processEngineService = getProcessEngineService();

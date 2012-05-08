@@ -59,6 +59,7 @@ public abstract class CmpeProcessEngineConfiguration extends ProcessEngineConfig
   @Override
   protected void init() {
     transactionsExternallyManaged = true;
+    isCreateDiagramOnDeploy = false;
     initProcessArchiveServices();    
     super.init();    
   }
