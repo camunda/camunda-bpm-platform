@@ -9,7 +9,7 @@
   <name>fox platform EE - Parent Pom</name>
 
   <properties>
-    <version.jboss.as>7.1.0.Final</version.jboss.as>
+    <version.jboss.as>7.1.1.Final</version.jboss.as>
     <version.glassfish>3.1.1</version.glassfish>
     <version.arquillian>1.0.0.Final</version.arquillian>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
