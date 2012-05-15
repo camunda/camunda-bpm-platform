@@ -46,14 +46,14 @@ public class TestWarDeploymentWithDiagram extends AbstractFoxPlatformIntegration
   public void testDeployProcessArchive() throws IOException {
     String expectedDiagramResource = "/com/camunda/fox/platform/test/testDeployProcessArchive.png";
     String processDefinitionKey = "testDeployProcessArchive";
-    TestHelper.assertDiagramDeployed(getClass(), expectedDiagramResource, processDefinitionKey);
+    TestHelper.assertDiagramIsDeployed(true, getClass(), expectedDiagramResource, processDefinitionKey);
   }
 
   @Test
   public void testInvoiceProcess() throws IOException {
     String expectedDiagramResource = "/com/camunda/fox/platform/test/invoice.jpg";
     String processDefinitionKey = "invoice";
-    TestHelper.assertDiagramDeployed(getClass(), expectedDiagramResource, processDefinitionKey);
+    TestHelper.assertDiagramIsDeployed(true, getClass(), expectedDiagramResource, processDefinitionKey);
   }
   
 }

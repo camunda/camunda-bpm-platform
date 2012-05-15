@@ -1,6 +1,7 @@
 package com.camunda.fox.platform.test.util;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
@@ -18,7 +19,7 @@ import org.junit.Assert;
 
 public class TestHelper {
 
-  public static void assertDiagramDeployed(Class<?> clazz, String expectedDiagramResource, String processDefinitionKey) throws IOException {
+  public static void assertDiagramIsDeployed(boolean deployed, Class<?> clazz, String expectedDiagramResource, String processDefinitionKey) throws IOException {
     ProcessEngine processEngine = ProgrammaticBeanLookup.lookup(ProcessEngine.class);
     Assert.assertNotNull(processEngine);
     RepositoryService repositoryService = processEngine.getRepositoryService();
@@ -27,11 +28,15 @@ public class TestHelper {
       .singleResult();
     assertNotNull(processDefinition);
     InputStream actualStream = repositoryService.getProcessDiagram(processDefinition.getId());
-    assertNotNull(actualStream);
-    assertTrue(0 < actualStream.available());
-    InputStream expectedStream = clazz.getResourceAsStream(expectedDiagramResource);
-    assertNotNull(expectedStream);
-    assertTrue(isEqual(expectedStream, actualStream));
+    if (deployed) {
+      assertNotNull(actualStream);
+      assertTrue(0 < actualStream.available());
+      InputStream expectedStream = clazz.getResourceAsStream(expectedDiagramResource);
+      assertNotNull(expectedStream);
+      assertTrue(isEqual(expectedStream, actualStream));
+    } else {
+      assertNull(actualStream);      
+    }
   }
 
   protected static boolean isEqual(InputStream stream1, InputStream stream2)
