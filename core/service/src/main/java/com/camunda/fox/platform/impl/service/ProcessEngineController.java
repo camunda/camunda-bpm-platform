@@ -38,6 +38,7 @@ import com.camunda.fox.platform.impl.context.ProcessArchiveContext;
 import com.camunda.fox.platform.impl.deployment.ActivitiDeployer;
 import com.camunda.fox.platform.impl.engine.ProcessArchiveProcessEngine;
 import com.camunda.fox.platform.impl.schema.DbSchemaOperations;
+import com.camunda.fox.platform.impl.util.PropertyHelper;
 import com.camunda.fox.platform.impl.util.Services;
 import com.camunda.fox.platform.spi.ProcessArchive;
 import com.camunda.fox.platform.spi.ProcessEngineConfiguration;
@@ -73,7 +74,7 @@ public class ProcessEngineController {
   protected boolean isAutoUpdateSchema;
   protected String history;
 
-  protected boolean activateJobExecutor = true;
+  protected boolean activateJobExecutor;
   protected int jobExecutor_maxJobsPerAcquisition = 3;
   protected int jobExecutor_waitTimeInMillis =  5 * 1000;
   protected int jobExecutor_lockTimeInMillis =  5 * 60 * 1000;
@@ -87,7 +88,8 @@ public class ProcessEngineController {
     
     this.processEngineName = processEngineConfiguration.getProcessEngineName();
     this.datasourceJndiName = processEngineConfiguration.getDatasourceJndiName();
-    this.isAutoUpdateSchema = processEngineConfiguration.isAutoSchemaUpdate();
+    this.isAutoUpdateSchema = PropertyHelper.getProperty(processEngineConfiguration.getProperties(), ProcessEngineConfiguration.PROP_IS_AUTO_SCHEMA_UPDATE, false);
+    this.activateJobExecutor = PropertyHelper.getProperty(processEngineConfiguration.getProperties(), ProcessEngineConfiguration.PROP_IS_ACTIVATE_JOB_EXECUTOR, false);
     this.history = processEngineConfiguration.getHistoryLevel();    
   }
       

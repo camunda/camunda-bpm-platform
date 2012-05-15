@@ -1,5 +1,6 @@
 package com.camunda.fox.platform.impl.service.util;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import com.camunda.fox.platform.spi.ProcessArchive;
@@ -13,14 +14,14 @@ public class DummyProcessArchive implements ProcessArchive {
   
   private final String name;
   private final String processEngineName;
-  private final boolean scan;
   private final Map<String, byte[]> processResources;
   private final boolean isDelete;
+  private Map<String, Object> properties =  new HashMap<String, Object>();
 
   public DummyProcessArchive(String name, String processEngineName, boolean scan, Map<String, byte[]> processResources, boolean isDelete) {
     this.name = name;
     this.processEngineName = processEngineName;
-    this.scan = scan;
+    properties.put(PROP_IS_SCAN_FOR_PROCESS_DEFINITIONS, scan);
     this.processResources = processResources;
     this.isDelete = isDelete;
   }
@@ -31,10 +32,6 @@ public class DummyProcessArchive implements ProcessArchive {
 
   public String getProcessEngineName() {
     return processEngineName;
-  }
-
-  public boolean scanForProcessDefinitions() {
-    return scan;
   }
 
   public Map<String, byte[]> getProcessResources() {
@@ -51,6 +48,10 @@ public class DummyProcessArchive implements ProcessArchive {
 
   public ClassLoader getClassLoader() {
     return getClass().getClassLoader();
+  }
+
+  public Map<String, Object> getProperties() {
+    return properties;
   }
 
 }

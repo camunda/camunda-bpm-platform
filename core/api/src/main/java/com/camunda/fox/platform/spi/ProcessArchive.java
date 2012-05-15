@@ -26,8 +26,14 @@ import javax.naming.InitialContext;
  */
 public interface ProcessArchive {
   
+  /** Indicates whether the undeployment of the process archive should trigger deleting the process engine deployment.
+   * If the process engine deployment is deleted, all running and historic process instances are removed as well. */
+  public static final String PROP_IS_DELETE_UPON_UNDEPLOY = "isDeleteUponUndeploy";  
+  /** Indicates whether the classloader should be scanned for process definitions. */
+  public static final String PROP_IS_SCAN_FOR_PROCESS_DEFINITIONS = "isScanForProcessDefinitions";
+  
   /**
-   * The name of the process archive (must be unique for a given process engine)
+   * @return the name of the process archive (must be unique for a given process engine)
    */
   public String getName();
   
@@ -39,28 +45,20 @@ public interface ProcessArchive {
   public String getProcessEngineName();
   
   /**
-   * 
-   * @return true if the classloader should be scanned for process definitions.
+   * @return the {@link ClassLoader} used to load classes from the process archive. 
    */
-  public boolean scanForProcessDefinitions();
+  public ClassLoader getClassLoader();
   
   /**
-   * This method is only invoked if {@link #scanForProcessDefinitions()} returns false.
-   *  
-   * @return a collection of named process definitions as byte arrays. 
+   * Allows the process archive to supply a map of type Map<String, byte[]> of
+   * process resources to be deployed.
    */
   public Map<String, byte[]> getProcessResources();
   
   /**
-   * If 'true' the process engine deletes both running and historic process instances when performing
-   * undeployment. 
-   */
-  public boolean isDeleteUponUndeploy();
-  
-  /**
    * <p>Executes a callback inside the context of the process archive</p>
    * 
-   * <p>Allows the CMPE (Container-Managed Process Engine) to perform context switching and 
+   * <p>Allows the Process Engine to perform context switching and 
    * execute commands within the context of the process archive.</p>
    * 
    * <p>An implementation must make sure that the {@link ProcessArchiveCallback} passed in to 
@@ -75,10 +73,13 @@ public interface ProcessArchive {
    * @throws Exception 
    */
   public <T> T executeWithinContext(ProcessArchiveCallback<T> callback) throws Exception;
-
+  
   /**
-   * @return the {@link ClassLoader} used to load classes from the process archive. 
+   * @return a map of properties
+   * 
+   * @see #PROP_IS_DELETE_UPON_UNDEPLOY
+   * @see #PROP_PROCESS_RESOURCES
    */
-  public ClassLoader getClassLoader();
+  public Map<String, Object> getProperties();
   
 }

@@ -15,25 +15,51 @@
  */
 package com.camunda.fox.platform.spi;
 
+import java.util.Map;
+
 /**
  * <p>The user-configuration of a process engine.</p>
  * 
  * @author Daniel Meyer
  */
 public interface ProcessEngineConfiguration {
+
+  /** indicates whether the process engine should automatically create / 
+   * update the database schema upon startup */ 
+  public static String PROP_IS_AUTO_SCHEMA_UPDATE = "isAutoSchemaUpdate";
   
+  /** indicates whether the job executor should be automatically activated */
+  public static String PROP_IS_ACTIVATE_JOB_EXECUTOR = "isActivateJobExecutor";
+  
+  /**
+   * @return true if this is the default process engine.
+   * There can only be one default process engine per 
+   * instance of the fox platform.
+   */
   public boolean isDefault();
   
+  /**
+   * @return the name of the process engine
+   */
   public String getProcessEngineName();
   
+  /**
+   * @return the jndi name of the datasource to use for the process engine
+   */
   public String getDatasourceJndiName();
   
+  /**
+   * @return the history level to use
+   */
   public String getHistoryLevel();
-
-  public boolean isAutoSchemaUpdate();
-
-  public boolean isActivateJobExcutor(); 
   
-  // TODO: add more properties here.
+  /**
+   * @return a {@link Map} of additional properties
+   * 
+   * @see #PROP_IS_AUTO_SCHEMA_UPDATE
+   * @see #PROP_IS_ACTIVATE_JOB_EXECUTOR
+   */
+  public Map<String, Object> getProperties();
+ 
 
 }

@@ -41,7 +41,7 @@ public class ProcessArchiveContextExecutor {
   {
     try {
       return callback.execute();  
-    }catch (RuntimeException e) {
+    }catch (Exception e) {
       throw new FoxApplicationException("Caught Exception", e);
     }
   }
