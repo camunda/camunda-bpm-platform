@@ -21,6 +21,6 @@ package com.camunda.fox.platform.spi;
  */
 public interface ProcessArchiveCallback<T> {
   
-  public T execute() throws RuntimeException;
+  public T execute();
 
 }

@@ -15,6 +15,7 @@
  */
 package com.camunda.fox.client.impl;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import com.camunda.fox.client.impl.executor.ProcessArchiveContextExecutor;
@@ -32,12 +33,16 @@ public class ProcessArchiveImpl implements ProcessArchive {
 
   protected final ClassLoader classLoader;
   protected final ProcessArchiveContextExecutor executor;
-  private final ProcessArchiveXml processArchiveXml;
+  protected final ProcessArchiveXml processArchiveXml;
+  protected final Map<String, Object> properties;
     
   public ProcessArchiveImpl(ProcessArchiveXml processArchiveXml, ProcessArchiveContextExecutor executor) {
     this.processArchiveXml = processArchiveXml;
     this.executor = executor;
     this.classLoader = getClass().getClassLoader();    
+    properties = new HashMap<String, Object>();
+    properties.put(PROP_IS_DELETE_UPON_UNDEPLOY, processArchiveXml.configuration.undeployment.delete);
+    properties.put(PROP_IS_SCAN_FOR_PROCESS_DEFINITIONS, true);
   }
   
   public String getName() {
@@ -52,28 +57,22 @@ public class ProcessArchiveImpl implements ProcessArchive {
   protected BpmnResourceLoader getBpmnResourceLoader() {
     return new BpmnResourceLoader();
   }
- 
-  public boolean isDeleteUponUndeploy() {
-    return processArchiveXml.configuration.undeployment.delete;
-  }
-  
+   
   public ClassLoader getClassLoader() {
     return classLoader;
   }
 
-  @Override
   public <T> T executeWithinContext(ProcessArchiveCallback<T> callback) throws Exception {
     return executor.executeWithinContext(callback);
  }
 
-  @Override
   public String getProcessEngineName() {
     return processArchiveXml.configuration.processEngineName;
   }
 
-  @Override
-  public boolean scanForProcessDefinitions() {
-    return true;
+  public Map<String, Object> getProperties() {
+    return properties;
   }
+
   
 }

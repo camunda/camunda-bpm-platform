@@ -1,6 +1,7 @@
 package com.camunda.fox.platform.impl.service;
 
-import java.util.concurrent.ExecutionException;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -18,7 +19,7 @@ import com.camunda.fox.platform.spi.ProcessEngineConfiguration;
  * 
  * @author Daniel Meyer
  */
-public class ProcessEngineConfigurationBean implements ProcessEngineConfiguration {
+public class ProcessEngineConfigurationBean implements ProcessEngineConfiguration {  
 
   // state ////////////////////////////////////
 
@@ -28,6 +29,7 @@ public class ProcessEngineConfigurationBean implements ProcessEngineConfiguratio
   private boolean isDefault;
   private String processEngineName;
   private String datasourceJndiName;
+  private Map<String, Object> properties = new HashMap<String, Object>();
 
   // //////////////////////////////////////////
 
@@ -78,6 +80,12 @@ public class ProcessEngineConfigurationBean implements ProcessEngineConfiguratio
 
   public String getDatasourceJndiName() {
     return datasourceJndiName;
+  }
+  
+  public Map<String, Object> getProperties() {
+    properties.put(PROP_IS_ACTIVATE_JOB_EXECUTOR, isActivateJobExcutor);
+    properties.put(PROP_IS_AUTO_SCHEMA_UPDATE, isAutoSchemaUpdate);
+    return properties;
   }
   
   // getters / setters ///////////////////////////

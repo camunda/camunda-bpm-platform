@@ -22,6 +22,7 @@ import org.activiti.engine.impl.interceptor.CommandExecutor;
 
 import com.camunda.fox.platform.deployer.AbstractActivitiDeployer;
 import com.camunda.fox.platform.impl.deployment.spi.ProcessArchiveScanner;
+import com.camunda.fox.platform.impl.util.PropertyHelper;
 import com.camunda.fox.platform.impl.util.Services;
 import com.camunda.fox.platform.spi.ProcessArchive;
 
@@ -63,7 +64,7 @@ public class ActivitiDeployer extends AbstractActivitiDeployer {
   }
   
   protected Map<String, byte[]> getDeployableResources(ProcessArchive processArchive) {
-    if(processArchive.scanForProcessDefinitions()) {
+    if(PropertyHelper.getProperty(processArchive.getProperties(), ProcessArchive.PROP_IS_SCAN_FOR_PROCESS_DEFINITIONS, false)) {
       return processArchiveScanner.findResources(processArchive);      
     } else {
       return processArchive.getProcessResources();
@@ -71,11 +72,11 @@ public class ActivitiDeployer extends AbstractActivitiDeployer {
   }
 
   public void processArchiveUndeployed(ProcessArchive processArchive) {
-    final boolean deleteUponUndeploy = processArchive.isDeleteUponUndeploy();
+    final boolean deleteUponUndeploy = PropertyHelper.getProperty(processArchive.getProperties(), ProcessArchive.PROP_IS_DELETE_UPON_UNDEPLOY, false);
     final String paName = processArchive.getName();
     unDeploy(paName, deleteUponUndeploy);    
   }
-  
+    
   protected CommandExecutor getCommandExecutor() {
     return commandExecutor;
   }
