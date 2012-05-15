@@ -15,12 +15,8 @@
  */
 package com.camunda.fox.platform.test.deployment.war;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import java.io.IOException;
 
-import org.activiti.engine.ActivitiException;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
@@ -45,14 +41,9 @@ public class TestWarDeploymentWithoutDiagram extends AbstractFoxPlatformIntegrat
   
   @Test
   public void testDeployProcessArchiveDiagramCreationDisabled() throws IOException {
-    try {
-      String expectedDiagramResource = "/com/camunda/fox/platform/test/testDeployProcessArchive.png";
-      String processDefinitionKey = "testDeployProcessArchive";
-      TestHelper.assertDiagramDeployed(getClass(), expectedDiagramResource, processDefinitionKey);
-      fail();
-    } catch (ActivitiException e) {
-      assertTrue(e.getMessage().contains("resourceName is null"));
-    }
+    String expectedDiagramResource = "/com/camunda/fox/platform/test/testDeployProcessArchive.png";
+    String processDefinitionKey = "testDeployProcessArchive";
+    TestHelper.assertDiagramIsDeployed(false, getClass(), expectedDiagramResource, processDefinitionKey);
   }
     
 }
