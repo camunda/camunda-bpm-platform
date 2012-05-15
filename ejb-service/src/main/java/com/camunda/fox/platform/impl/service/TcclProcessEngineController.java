@@ -1,6 +1,5 @@
 package com.camunda.fox.platform.impl.service;
 
-import org.activiti.engine.ProcessEngine;
 import com.camunda.fox.platform.impl.service.util.Tccl;
 import com.camunda.fox.platform.impl.service.util.Tccl.Operation;
 import com.camunda.fox.platform.spi.ProcessEngineConfiguration;
@@ -21,7 +20,7 @@ public class TcclProcessEngineController extends ProcessEngineController {
         TcclProcessEngineController.super.start();
         return null;
       }
-    }, ProcessEngine.class.getClassLoader());
+    }, ProcessEngineController.class.getClassLoader());
   }
 
 }

@@ -1,5 +1,8 @@
 package com.camunda.fox.platform.impl.service.util;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import com.camunda.fox.platform.spi.ProcessEngineConfiguration;
 
 /**
@@ -8,12 +11,11 @@ import com.camunda.fox.platform.spi.ProcessEngineConfiguration;
  */
 public class DummyProcessEngineConfiguration implements ProcessEngineConfiguration {
   
-  private final boolean isActivateJobExecutor;
-  private final boolean isAutoSchemaUpdate;
   private final String historyLevel;
   private final boolean isDefault;
   private final String processEngineName;
   private final String dataSourceJndiName;
+  private final Map<String, Object> properties;
 
   public DummyProcessEngineConfiguration(boolean isDefault,
                                          String processEngineName,
@@ -25,9 +27,10 @@ public class DummyProcessEngineConfiguration implements ProcessEngineConfigurati
     this.processEngineName = processEngineName;
     this.dataSourceJndiName = dataSourceJndiName;
     this.historyLevel = historyLevel;
-    this.isAutoSchemaUpdate = isAutoSchemaUpdate;
-    this.isActivateJobExecutor = isActivateJobExecutor;
-   
+    
+    properties = new HashMap<String, Object>();
+    properties.put(PROP_IS_ACTIVATE_JOB_EXECUTOR, isActivateJobExecutor);
+    properties.put(PROP_IS_AUTO_SCHEMA_UPDATE, isAutoSchemaUpdate);   
   }
 
   public boolean isDefault() {
@@ -46,12 +49,8 @@ public class DummyProcessEngineConfiguration implements ProcessEngineConfigurati
     return historyLevel;
   }
 
-  public boolean isAutoSchemaUpdate() {
-    return isAutoSchemaUpdate;
-  }
-
-  public boolean isActivateJobExcutor() {
-    return isActivateJobExecutor;
+  public Map<String, Object> getProperties() {
+    return properties;
   }
 
 }

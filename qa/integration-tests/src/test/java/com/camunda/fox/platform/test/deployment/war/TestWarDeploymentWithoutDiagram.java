@@ -15,12 +15,8 @@
  */
 package com.camunda.fox.platform.test.deployment.war;
 
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
-
 import java.io.IOException;
 
-import org.activiti.engine.ActivitiException;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
