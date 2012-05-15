@@ -17,7 +17,7 @@ import org.activiti.engine.repository.ProcessDefinition;
 import org.junit.Assert;
 
 
-public class TestHelper {
+public abstract class TestHelper {
 
   public static void assertDiagramIsDeployed(boolean deployed, Class<?> clazz, String expectedDiagramResource, String processDefinitionKey) throws IOException {
     ProcessEngine processEngine = ProgrammaticBeanLookup.lookup(ProcessEngine.class);
