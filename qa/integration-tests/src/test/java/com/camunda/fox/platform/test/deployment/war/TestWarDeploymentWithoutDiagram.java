@@ -45,14 +45,9 @@ public class TestWarDeploymentWithoutDiagram extends AbstractFoxPlatformIntegrat
   
   @Test
   public void testDeployProcessArchiveDiagramCreationDisabled() throws IOException {
-    try {
-      String expectedDiagramResource = "/com/camunda/fox/platform/test/testDeployProcessArchive.png";
-      String processDefinitionKey = "testDeployProcessArchive";
-      TestHelper.assertDiagramDeployed(getClass(), expectedDiagramResource, processDefinitionKey);
-      fail();
-    } catch (ActivitiException e) {
-      assertTrue(e.getMessage().contains("resourceName is null"));
-    }
+    String expectedDiagramResource = "/com/camunda/fox/platform/test/testDeployProcessArchive.png";
+    String processDefinitionKey = "testDeployProcessArchive";
+    TestHelper.assertDiagramIsDeployed(false, getClass(), expectedDiagramResource, processDefinitionKey);
   }
     
 }
