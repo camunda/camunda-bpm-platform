@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /**
  * Copyright (C) 2011, 2012 camunda services GmbH
  *
@@ -13,6 +14,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+=======
+>>>>>>> bf1847a0643ae882b03606507f3a99c94fa433eb
 package com.camunda.fox.platform.impl.util;
 
 import java.util.Map;
