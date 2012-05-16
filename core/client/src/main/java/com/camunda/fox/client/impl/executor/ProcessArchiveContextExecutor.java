@@ -18,6 +18,8 @@ package com.camunda.fox.client.impl.executor;
 import javax.ejb.ConcurrencyManagement;
 import javax.ejb.ConcurrencyManagementType;
 import javax.ejb.Singleton;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 
 import com.camunda.fox.platform.spi.ProcessArchive;
 import com.camunda.fox.platform.spi.ProcessArchiveCallback;
@@ -33,6 +35,7 @@ import com.camunda.fox.platform.spi.ProcessArchiveCallback;
 @Singleton
 //make sure the container does not synchronize access to this bean
 @ConcurrencyManagement(ConcurrencyManagementType.BEAN) 
+@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 public class ProcessArchiveContextExecutor {
   
   public <T> T executeWithinContext(ProcessArchiveCallback<T> callback) throws
