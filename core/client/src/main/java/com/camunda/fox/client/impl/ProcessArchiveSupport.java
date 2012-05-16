@@ -43,6 +43,7 @@ import com.camunda.fox.client.impl.parser.DefaultProcessesXmlParser;
 import com.camunda.fox.client.impl.parser.spi.ProcessesXmlParser;
 import com.camunda.fox.client.impl.schema.ProcessesXml;
 import com.camunda.fox.client.impl.schema.ProcessesXml.ProcessArchiveXml;
+import com.camunda.fox.client.impl.spi.ProcessArchiveExtension;
 import com.camunda.fox.platform.FoxPlatformException;
 import com.camunda.fox.platform.api.ProcessArchiveService;
 import com.camunda.fox.platform.api.ProcessArchiveService.ProcessArchiveInstallation;
@@ -85,10 +86,25 @@ public class ProcessArchiveSupport {
   
   @Resource
   protected SessionContext sessionContext;
+  
+  protected ServiceLoader<ProcessArchiveExtension> processArchiveExtensionLoader;
 
   protected Map<ProcessArchive, ProcessEngine> installedProcessArchives = new HashMap<ProcessArchive, ProcessEngine>();
     
   @PostConstruct
+  public void start() {
+    fireBeforeProcessArchiveStart();
+    installProcessArchives();
+    fireAfterProcessArchiveStart();
+  }
+
+  @PreDestroy
+  public void stop() {
+    fireBeforeProcessArchiveStop();
+    uninstallProcessArchives();
+    fireAfterProcessArchiveStop();
+  }
+  
   protected void installProcessArchives() {
     final ProcessesXmlParser parser = getProcessesXmlParser();
     
@@ -104,7 +120,6 @@ public class ProcessArchiveSupport {
     }
   }
   
-  @PreDestroy
   protected void uninstallProcessArchives() { 
     for (ProcessArchive processArchive : installedProcessArchives.keySet()) {
       processArchiveService.unInstallProcessArchive(processArchive);
@@ -158,5 +173,68 @@ public class ProcessArchiveSupport {
   public Map<ProcessArchive, ProcessEngine> getInstalledProcessArchives() {
     return installedProcessArchives;
   }
-   
+  
+  public ProcessArchiveService getProcessArchiveService() {
+    return processArchiveService;
+  }
+  
+  public ProcessEngineService getProcessEngineService() {
+    return processEngineService;
+  }
+  
+  public ProcessArchiveContextExecutor getProcessArchiveContextExecutorBean() {
+    return processArchiveContextExecutorBean;
+  }
+  
+  // extensions //////////////////////////////////
+  
+
+  protected void fireBeforeProcessArchiveStart() {
+    processArchiveExtensionLoader = ServiceLoader.load(ProcessArchiveExtension.class);
+    Iterator<ProcessArchiveExtension> loadableExtensions = processArchiveExtensionLoader.iterator();
+    while (loadableExtensions.hasNext()) {
+      ProcessArchiveExtension processArchiveExtension = (ProcessArchiveExtension) loadableExtensions.next();
+      try {
+        processArchiveExtension.beforeProcessArchiveStart(this);
+      }catch (Exception e) {
+        throw new FoxPlatformException("Exception while invoking 'beforeProcessArchiveStart' for ProcessArchiveExtension "+processArchiveExtension.getClass(), e);
+      }
+    }
+  }
+  
+  protected void fireAfterProcessArchiveStart() {
+    Iterator<ProcessArchiveExtension> loadableExtensions = processArchiveExtensionLoader.iterator();
+    while (loadableExtensions.hasNext()) {
+      ProcessArchiveExtension processArchiveExtension = (ProcessArchiveExtension) loadableExtensions.next();
+      try {
+        processArchiveExtension.afterProcessArchiveStart(this);
+      }catch (Exception e) {
+        log.log(Level.SEVERE, "Exception while invoking 'afterProcessArchiveStart' for ProcessArchiveExtension "+processArchiveExtension.getClass(), e);
+      }
+    }
+  }
+  
+  protected void fireBeforeProcessArchiveStop() {
+    Iterator<ProcessArchiveExtension> loadableExtensions = processArchiveExtensionLoader.iterator();
+    while (loadableExtensions.hasNext()) {
+      ProcessArchiveExtension processArchiveExtension = (ProcessArchiveExtension) loadableExtensions.next();
+      try {
+        processArchiveExtension.beforeProcessArchiveStop(this);
+      }catch (Exception e) {
+        throw new FoxPlatformException("Exception while invoking 'beforeProcessArchiveStop' for ProcessArchiveExtension "+processArchiveExtension.getClass(), e);
+      }
+    }
+  }
+  
+  protected void fireAfterProcessArchiveStop() {
+    Iterator<ProcessArchiveExtension> loadableExtensions = processArchiveExtensionLoader.iterator();
+    while (loadableExtensions.hasNext()) {
+      ProcessArchiveExtension processArchiveExtension = (ProcessArchiveExtension) loadableExtensions.next();
+      try {
+        processArchiveExtension.afterProcessArchiveStop(this);
+      }catch (Exception e) {
+        log.log(Level.SEVERE, "Exception while invoking 'afterProcessArchiveStop' for ProcessArchiveExtension "+processArchiveExtension.getClass(), e);
+      }
+    }
+  }
 }
