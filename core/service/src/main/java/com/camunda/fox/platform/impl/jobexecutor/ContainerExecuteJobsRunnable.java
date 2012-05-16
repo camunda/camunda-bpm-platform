@@ -60,12 +60,7 @@ public class ContainerExecuteJobsRunnable extends ExecuteJobsRunnable {
       return;
     }
     
-    if(processArchiveContext == null) {
-      // undeployed: -> do not execute
-      log.log(Level.INFO, "Acquired jobs {0} from inactive (undeployed?) process archive. Ignoring...", jobIds);      
-    } else {    
-      ProcessArchiveContext.executeWithinContext(getCallback(), processArchiveContext);
-    }    
+    ProcessArchiveContext.executeWithinContext(getCallback(), processArchiveContext);
   }
 
   protected ProcessArchiveCallback<?> getCallback() {
