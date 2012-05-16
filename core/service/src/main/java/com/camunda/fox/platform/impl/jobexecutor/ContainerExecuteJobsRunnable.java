@@ -60,7 +60,11 @@ public class ContainerExecuteJobsRunnable extends ExecuteJobsRunnable {
       return;
     }
     
-    ProcessArchiveContext.executeWithinContext(getCallback(), processArchiveContext);
+    if (processArchiveContext != null) {
+      ProcessArchiveContext.executeWithinContext(getCallback(), processArchiveContext);
+    } else {
+      getCallback().execute();
+    }
   }
 
   protected ProcessArchiveCallback<?> getCallback() {
