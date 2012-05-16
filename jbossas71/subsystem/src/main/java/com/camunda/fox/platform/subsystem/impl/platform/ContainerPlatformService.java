@@ -62,6 +62,7 @@ public class ContainerPlatformService extends PlatformService implements Service
 
   @Override
   public void start(StartContext context) throws StartException {
+    start();
     serviceContainer = context.getController().getServiceContainer();
     createJndiBindings(context);
   }
@@ -69,6 +70,7 @@ public class ContainerPlatformService extends PlatformService implements Service
 
   @Override
   public void stop(StopContext context) {
+    stop();
     removeJndiBindings();
   }
   

@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -38,6 +39,8 @@ import com.camunda.fox.platform.impl.context.ProcessArchiveContext;
 import com.camunda.fox.platform.impl.deployment.ActivitiDeployer;
 import com.camunda.fox.platform.impl.engine.ProcessArchiveProcessEngine;
 import com.camunda.fox.platform.impl.schema.DbSchemaOperations;
+import com.camunda.fox.platform.impl.service.spi.PlatformServiceExtension;
+import com.camunda.fox.platform.impl.util.PlatformServiceExtensionHelper;
 import com.camunda.fox.platform.impl.util.PropertyHelper;
 import com.camunda.fox.platform.impl.util.Services;
 import com.camunda.fox.platform.spi.ProcessArchive;
@@ -97,9 +100,11 @@ public class ProcessEngineController {
   
   public synchronized void start() {
     try {     
+      fireBeforeProcessEngineControllerStart(this);
       init();
       processEngineRegistry.processEngineInstallationSuccess(processEngineUserConfiguration, this);
-  		isActive = true;  		
+  		isActive = true;
+  		fireAfterProcessEngineControllerStart(this);
     } catch (Exception e) {
       processEngineRegistry.processEngineInstallationFailed(processEngineUserConfiguration);
       throw new FoxPlatformException("Exception while attempting to start process engine: ", e);
@@ -107,6 +112,7 @@ public class ProcessEngineController {
   }
 
   public synchronized void stop() {
+    fireBeforeProcessEngineControllerStop(this);    
     closeProcessEngine();       
 
     Collection<ProcessArchiveContext> installedProcessArchives = new ArrayList<ProcessArchiveContext>(installedProcessArchivesByName.values());
@@ -120,7 +126,9 @@ public class ProcessEngineController {
     installedProcessArchivesByProcessDefinitionKey.clear();
     activitiProcessEngine = null;
     processEngineConfiguration = null;    
-    isActive = false;    
+    isActive = false;
+    
+    fireAfterProcessEngineControllerStop(this);
   }
   
   protected void init() { 
@@ -424,6 +432,56 @@ public class ProcessEngineController {
   
   public void setProcessEngineRegistry(ProcessEngineRegistry processEngineRegistry) {
     this.processEngineRegistry = processEngineRegistry;
+  }
+  
+  // extensions support ////////////////////////////////////////////////////
+  
+  protected void fireBeforeProcessEngineControllerStart(ProcessEngineController processEngineController) {
+    Iterator<PlatformServiceExtension> loadableExtensions = PlatformServiceExtensionHelper.getLoadableExtensions();
+    while (loadableExtensions.hasNext()) {
+      PlatformServiceExtension platformServiceExtension = (PlatformServiceExtension) loadableExtensions.next();
+      try {
+        platformServiceExtension.beforeProcessEngineControllerStart(processEngineController);
+      }catch (Exception e) {
+        throw new FoxPlatformException("Exception while invoking 'beforeProcessEngineControllerStart' for PlatformServiceExtension "+platformServiceExtension.getClass(), e);
+      }
+    }
+  }
+  
+  protected void fireAfterProcessEngineControllerStart(ProcessEngineController processEngineController) {
+    Iterator<PlatformServiceExtension> loadableExtensions = PlatformServiceExtensionHelper.getLoadableExtensions();
+    while (loadableExtensions.hasNext()) {
+      PlatformServiceExtension platformServiceExtension = (PlatformServiceExtension) loadableExtensions.next();
+      try {
+        platformServiceExtension.afterProcessEngineControllerStart(processEngineController);
+      }catch (Exception e) {
+        log.log(Level.SEVERE, "Exception while invoking 'afterProcessEngineControllerStart' for PlatformServiceExtension "+platformServiceExtension.getClass(), e);
+      }
+    }
+  }
+  
+  protected void fireBeforeProcessEngineControllerStop(ProcessEngineController processEngineController) {
+    Iterator<PlatformServiceExtension> loadableExtensions = PlatformServiceExtensionHelper.getLoadableExtensions();
+    while (loadableExtensions.hasNext()) {
+      PlatformServiceExtension platformServiceExtension = (PlatformServiceExtension) loadableExtensions.next();
+      try {
+        platformServiceExtension.beforeProcessEngineControllerStop(processEngineController);
+      }catch (Exception e) {
+        throw new FoxPlatformException("Exception while invoking 'beforeProcessEngineControllerStop' for PlatformServiceExtension "+platformServiceExtension.getClass(), e);
+      }
+    }
+  }
+  
+  protected void fireAfterProcessEngineControllerStop(ProcessEngineController processEngineController) {
+    Iterator<PlatformServiceExtension> loadableExtensions = PlatformServiceExtensionHelper.getLoadableExtensions();
+    while (loadableExtensions.hasNext()) {
+      PlatformServiceExtension platformServiceExtension = (PlatformServiceExtension) loadableExtensions.next();
+      try {
+        platformServiceExtension.afterProcessEngineControllerStop(processEngineController);
+      }catch (Exception e) {
+        log.log(Level.SEVERE, "Exception while invoking 'afterProcessEngineControllerStop' for PlatformServiceExtension "+platformServiceExtension.getClass(), e);
+      }
+    }
   }
   
 }
