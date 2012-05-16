@@ -76,6 +76,7 @@ public class ProcessEngineController {
   protected String datasourceJndiName;
   protected boolean isAutoUpdateSchema;
   protected String history;
+  protected String databaseTablePrefix;
 
   protected boolean activateJobExecutor;
   protected int jobExecutor_maxJobsPerAcquisition = 3;
@@ -84,6 +85,7 @@ public class ProcessEngineController {
 
   protected ProcessEngineRegistry processEngineRegistry;
   protected final ProcessEngineConfiguration processEngineUserConfiguration;
+
   
   public ProcessEngineController(ProcessEngineConfiguration processEngineConfiguration) {
     
@@ -93,6 +95,7 @@ public class ProcessEngineController {
     this.datasourceJndiName = processEngineConfiguration.getDatasourceJndiName();
     this.isAutoUpdateSchema = PropertyHelper.getProperty(processEngineConfiguration.getProperties(), ProcessEngineConfiguration.PROP_IS_AUTO_SCHEMA_UPDATE, false);
     this.activateJobExecutor = PropertyHelper.getProperty(processEngineConfiguration.getProperties(), ProcessEngineConfiguration.PROP_IS_ACTIVATE_JOB_EXECUTOR, false);
+    this.databaseTablePrefix = PropertyHelper.getProperty(processEngineConfiguration.getProperties(), ProcessEngineConfiguration.PROP_DB_TABLE_PREFIX, null);
     this.history = processEngineConfiguration.getHistoryLevel();    
   }
       
@@ -183,6 +186,9 @@ public class ProcessEngineController {
     processEngineConfiguration.setDataSourceJndiName(datasourceJndiName);
     processEngineConfiguration.setJobExecutorActivate(activateJobExecutor);    
     processEngineConfiguration.setDatabaseSchemaUpdate("false");  // never perform operations with this PEC
+    if(databaseTablePrefix != null) {
+      processEngineConfiguration.setDatabaseTablePrefix(databaseTablePrefix);
+    }
     processEngineConfiguration.setHistory(history);
   }
 
