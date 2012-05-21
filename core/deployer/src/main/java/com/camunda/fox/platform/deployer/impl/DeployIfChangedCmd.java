@@ -212,11 +212,16 @@ public class DeployIfChangedCmd implements Command<String>, Serializable {
     String processDefinitionKey = null;
 
     try {
-      doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(new ByteArrayInputStream(value));
-      Element definitionElement = (Element) doc.getElementsByTagName("process").item(0);
+      DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+      documentBuilderFactory.setNamespaceAware(true);
+      doc = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(value));
+      Element definitionElement = (Element) doc.getElementsByTagNameNS("*", "process").item(0);
+//      if (definitionElement == null) {
+//        definitionElement = (Element) doc.getElementsByTagNameNS("http://www.omg.org/spec/BPMN/20100524/MODEL", "process").item(0);
+//      }
       processDefinitionKey = definitionElement.getAttribute("id");
     } catch (Exception e) {
-      log.warning("Could not retreive key from process definition. Creating a new deployment.");
+      log.warning("Could not retrieve key from process definition. Creating a new deployment.");
       log.log(Level.FINE, "Exception", e);
     }
 
