@@ -71,7 +71,7 @@ public class DeployIfChangedCmd implements Command<String>, Serializable {
       if (resources.isEmpty()) {
         throw new ActivitiException("Deployment must contain at least one resource.");
       }
-
+      
       deploymentId = tryResume();
       if (deploymentId != null) {
         log.info("No changes in  '" + name + "', loading exisiting process engine deployment with id " + deploymentId);
@@ -132,7 +132,7 @@ public class DeployIfChangedCmd implements Command<String>, Serializable {
           Deployment deployment = new DeploymentQueryImpl(commandContext).deploymentId(definition.getDeploymentId()).singleResult();
   
           if (deployment.getName().equals(name)) {
-            // check whether the process has changed: 
+            // check whether the process has changed:
             if (hasChanged(resourceEntry, deployment)) {
               log.info("The process '" + resourceName + "' has changed, redeploying.");
               return null;
@@ -175,9 +175,10 @@ public class DeployIfChangedCmd implements Command<String>, Serializable {
     byte[] existingProcessDefinitionBytes = commandContext.getDeploymentManager().findDeploymentById(deployment.getId()).getResource(resourceEntry.getKey()).getBytes();
 
     try {
-      String existingProcessDefinitionXml = new String(existingProcessDefinitionBytes);
+      String existingProcessDefinitionXml = new String(existingProcessDefinitionBytes, "UTF8");
       String newProcessDefinitionXml = new String(resourceEntry.getValue(), "UTF8");
-      return !xmlEquals(existingProcessDefinitionXml, newProcessDefinitionXml);
+      boolean returnVal = !xmlEquals(existingProcessDefinitionXml, newProcessDefinitionXml);
+      return returnVal;
     } catch (Exception e) {
       log.log(Level.SEVERE, "Could not compare process definitions", e);
       return true;
@@ -220,7 +221,7 @@ public class DeployIfChangedCmd implements Command<String>, Serializable {
     }
 
     if (processDefinitionKey != null) {
-      // get latest definition for the same key: 
+      // get latest definition for the same key (if exists): 
       return new ProcessDefinitionQueryImpl(commandContext).processDefinitionKey(processDefinitionKey).latestVersion().singleResult();
     } else {
       return null;
