@@ -17,7 +17,6 @@ package com.camunda.fox.deployer.test;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
-import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.List;
 
@@ -175,7 +174,7 @@ public class TestFoxDeployer extends FoxDeployerTestcase {
     
   }
   
-  public void testScenarioRedeployNoChangesInProcessForUTF8() throws UnsupportedEncodingException {    
+  public void testScenarioRedeployNoChangesInProcessForUTF8() {    
     ClassLoader cl = getClass().getClassLoader();
     String name = "processArchive";
     
@@ -208,6 +207,43 @@ public class TestFoxDeployer extends FoxDeployerTestcase {
     deployer.unDeploy(name, true);    
     
   }
+  
+  public void testScenarioReDeployAdonisProcess() {    
+    ClassLoader cl = getClass().getClassLoader();
+    String name = "processArchive";
+    
+    deployer.unDeploy(name, true);
+    
+    String process = IoUtil.readFileAsString("adonis-invoice.bpmn");
+    HashMap<String, byte[]> resources = new HashMap<String, byte[]>();
+    resources.put("adonis-invoice.bpmn", process.getBytes());
+        
+    String deploymentId = deployer.deploy(name, resources, cl);
+    
+    assertNotNull(deploymentId);
+    
+    deployer.unDeploy(name, false);
+    
+    assertEquals(1, repositoryService.createDeploymentQuery().deploymentName(name).count());
+    assertEquals(1, repositoryService.createProcessDefinitionQuery().count());
+    assertEquals(1, repositoryService.createProcessDefinitionQuery().suspended().count());
+    
+    // re-deploy same version
+    String noChangesProcess = IoUtil.readFileAsString("adonis-invoice.bpmn");
+    resources = new HashMap<String, byte[]>();
+    resources.put("adonis-invoice.bpmn", noChangesProcess.getBytes());
+    
+    deployer.deploy(name, resources, cl);
+    
+    assertEquals(1, repositoryService.createDeploymentQuery().deploymentName(name).count());
+    assertEquals(1, repositoryService.createProcessDefinitionQuery().count());
+    assertEquals(1, repositoryService.createProcessDefinitionQuery().active().count());
+    
+    // clean db:
+    deployer.unDeploy(name, true);    
+    
+  }
+
   
   public void testScenarioUpgrade() {    
     ClassLoader cl = getClass().getClassLoader();
