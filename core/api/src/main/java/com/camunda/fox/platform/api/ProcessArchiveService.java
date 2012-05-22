@@ -47,6 +47,10 @@ public interface ProcessArchiveService {
   
   public List<ProcessArchive> getInstalledProcessArchives(String processEngineName);
   
+  public ProcessArchive getProcessArchiveByProcessDefinitionId(String processDefinitionId, String processEngineName);
+  
+  public ProcessArchive getProcessArchiveByProcessDefinitionKey(String processDefinitionKey, String processEngineName);
+  
   // operations ////////////////////////////////////
   
   public static interface ProcessArchiveInstallation {
