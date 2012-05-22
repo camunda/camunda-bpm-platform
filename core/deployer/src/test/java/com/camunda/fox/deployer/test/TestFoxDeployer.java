@@ -309,4 +309,57 @@ public class TestFoxDeployer extends FoxDeployerTestcase {
     assertNull(repositoryService.createProcessDefinitionQuery().singleResult());
   }
 
+  public void testDeployOnlyIsExecutableFlaggedProcesses() {
+    ClassLoader cl = getClass().getClassLoader();
+    String name = "processArchive";
+    
+    String process = IoUtil.readFileAsString("collaboration_with_non_executable_process.bpmn");
+    HashMap<String, byte[]> resources = new HashMap<String, byte[]>();
+    resources.put("collaboration_with_non_executable_process.bpmn", process.getBytes());
+    
+    ByteArrayOutputStream errContent = new ByteArrayOutputStream();
+    System.setErr(new PrintStream(errContent));
+
+    String deploymentId = deployer.deploy(name, resources, cl);
+    
+    assertEquals("System.err is not empty.", "", errContent.toString());
+    System.setErr(null); // reset System.err
+    
+    assertNotNull(deploymentId);
+    
+    assertEquals(1, repositoryService.createDeploymentQuery().deploymentName(name).count());
+    assertEquals(2, repositoryService.createProcessDefinitionQuery().count());
+    
+    deployer.unDeploy(name, true);
+    
+    assertNull(repositoryService.createDeploymentQuery().deploymentName(name).singleResult());
+    assertNull(repositoryService.createProcessDefinitionQuery().singleResult());
+  }
+  
+  public void testDontDeployIsExecutableFalseFlaggedProcesses() {
+    ClassLoader cl = getClass().getClassLoader();
+    String name = "processArchive";
+    
+    String process = IoUtil.readFileAsString("collaboration_with_non_executable_processes.bpmn");
+    HashMap<String, byte[]> resources = new HashMap<String, byte[]>();
+    resources.put("collaboration_with_non_executable_processes.bpmn", process.getBytes());
+    
+    ByteArrayOutputStream errContent = new ByteArrayOutputStream();
+    System.setErr(new PrintStream(errContent));
+
+    String deploymentId = deployer.deploy(name, resources, cl);
+    
+    assertEquals("System.err is not empty.", "", errContent.toString());
+    System.setErr(null); // reset System.err
+    
+    assertNotNull(deploymentId);
+    
+    assertEquals(1, repositoryService.createDeploymentQuery().deploymentName(name).count());
+    assertEquals(0, repositoryService.createProcessDefinitionQuery().count());
+    
+    deployer.unDeploy(name, true);
+    
+    assertNull(repositoryService.createDeploymentQuery().deploymentName(name).singleResult());
+    assertNull(repositoryService.createProcessDefinitionQuery().singleResult());
+  }
 }

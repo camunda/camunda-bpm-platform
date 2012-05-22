@@ -35,6 +35,7 @@ import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 /**
  * Command creating a deployment if at least one process has changed
@@ -112,45 +113,76 @@ public class DeployIfChangedCmd implements Command<String>, Serializable {
    * belongs to a deployment with a different name as the current deployment, throw exception if it is part of a
    * deployment with the same name: check whether it has changed if true deploy a new version ( i.e. the method returns
    * null )
+   * @throws Exception
    */
-  protected String tryResume() {
+  protected String tryResume() throws Exception {
     // try to retrieve a deployment with the same name:
     ProcessDefinition definition = null;
     String deploymentId = null;
+    boolean deployProcessArchive = false;
+    
     for (Entry<String, byte[]> resourceEntry : resources.entrySet()) {
       String resourceName = resourceEntry.getKey();
-      if (isBpmnResource(resourceName)) { // ignore non-BPMN files
-        definition = getExistingProcessDefinition(resourceName, resourceEntry.getValue());
-        if (definition == null) {
-          // 'resourceEntry' is a new process, not contained in the last deployment. 
-          // We need to create a new deployment. 
-          return null;
-        } else if (definition.getDeploymentId() == null) {
-          return null;
-        } else {
-          // candidate deployment:
-          Deployment deployment = new DeploymentQueryImpl(commandContext).deploymentId(definition.getDeploymentId()).singleResult();
-  
-          if (deployment.getName().equals(name)) {
-            // check whether the process has changed:
-            if (hasChanged(resourceEntry, deployment)) {
-              log.info("The process '" + resourceName + "' has changed, redeploying.");
-              return null;
-            } else {
-              deploymentId = deployment.getId();
+      boolean isBpmnResource = isBpmnResource(resourceName);
+      if (isBpmnResource) { // ignore non-BPMN files
+        DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
+        documentBuilderFactory.setNamespaceAware(true);
+        Document doc = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(resourceEntry.getValue()));
+          
+        NodeList definitionElements = doc.getElementsByTagNameNS("*", "process");
+        for (int i = 0; i < definitionElements.getLength(); i++) {
+          Element definitionElement = (Element) definitionElements.item(i);
+          String isExecutableStr = definitionElement.getAttribute("isExecutable");
+          if (isExecutableStr.isEmpty() || Boolean.parseBoolean(isExecutableStr)) {
+            String processDefinitionKey = definitionElement.getAttribute("id");
+            if (processDefinitionKey != null) {
+              // get latest definition for the same key (if exists): 
+              definition = new ProcessDefinitionQueryImpl(commandContext).processDefinitionKey(processDefinitionKey).latestVersion().singleResult();
             }
-          } else if (!activeDeployments.contains(deployment.getId())) {
-            // a process with the same key was deployed in a processArchive with a 
-            // different name, but that processArchive is not currently active (i.e. was undeployed).
-            return null;
+            if (definition == null) {
+              // 'resourceEntry' is a new process, not contained in the last deployment. 
+              // We need to create a new deployment.
+              deployProcessArchive = true;
+            } else if (definition.getDeploymentId() == null) {
+              deployProcessArchive = true;
+            } else {
+              // candidate for deployment:
+              Deployment deployment = new DeploymentQueryImpl(commandContext).deploymentId(definition.getDeploymentId()).singleResult();
+      
+              if (deployment.getName().equals(name)) {
+                // check whether the process has changed:
+                if (hasChanged(resourceEntry, deployment)) {
+                  log.info("The process '" + resourceName + "' has changed, redeploying.");
+                  deployProcessArchive = true;
+                } else {
+                  deploymentId = deployment.getId();
+                }
+              } else if (!activeDeployments.contains(deployment.getId())) {
+                // a process with the same key was deployed in a processArchive with a 
+                // different name, but that processArchive is not currently active (i.e. was undeployed).
+                deployProcessArchive = true;
+              } else {
+                throw new ActivitiException("Cannot deploy process with id/key='" + definition.getKey()
+                  + "', a process with the same key is already deployed in process-archive '" + deployment.getName() + "' (deployment id='" + deployment.getId()
+                  + "') and " + deployment.getName() + " is active. Undeploy the existing process-archive or change the key of the process.");
+              }
+            }
+            
+            if (deployProcessArchive) {
+              return null;
+            }
           } else {
-            throw new ActivitiException("Cannot deploy process with id/key='" + definition.getKey()
-              + "', a process with the same key is already deployed in process-archive '" + deployment.getName() + "' (deployment id='" + deployment.getId()
-              + "') and " + deployment.getName() + " is active. Undeploy the existing process-archive or change the key of the process.");
+            log.info("Ignoring non-executable process with id='" + definitionElement.getAttribute("id") + "'. Set the attribute isExecutable=\"true\" to deploy this process.");
           }
         }
       }
     }
+    
+    if (!deployProcessArchive && deploymentId == null) {
+      // all processes are flagged isExecutable = false
+      log.info("No process marked for execution. Set at least one process to isExecutable=\"true\".");
+    }
+    
     return deploymentId;
   }
 
@@ -207,29 +239,4 @@ public class DeployIfChangedCmd implements Command<String>, Serializable {
     return st.replaceAll("\n", "").replaceAll("\t", "");
   }
 
-  protected ProcessDefinition getExistingProcessDefinition(String key, byte[] value) {
-    Document doc = null;
-    String processDefinitionKey = null;
-
-    try {
-      DocumentBuilderFactory documentBuilderFactory = DocumentBuilderFactory.newInstance();
-      documentBuilderFactory.setNamespaceAware(true);
-      doc = documentBuilderFactory.newDocumentBuilder().parse(new ByteArrayInputStream(value));
-      Element definitionElement = (Element) doc.getElementsByTagNameNS("*", "process").item(0);
-//      if (definitionElement == null) {
-//        definitionElement = (Element) doc.getElementsByTagNameNS("http://www.omg.org/spec/BPMN/20100524/MODEL", "process").item(0);
-//      }
-      processDefinitionKey = definitionElement.getAttribute("id");
-    } catch (Exception e) {
-      log.warning("Could not retrieve key from process definition. Creating a new deployment.");
-      log.log(Level.FINE, "Exception", e);
-    }
-
-    if (processDefinitionKey != null) {
-      // get latest definition for the same key (if exists): 
-      return new ProcessDefinitionQueryImpl(commandContext).processDefinitionKey(processDefinitionKey).latestVersion().singleResult();
-    } else {
-      return null;
-    }
-  }
 }
