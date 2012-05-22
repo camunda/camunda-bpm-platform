@@ -31,6 +31,8 @@ public interface ProcessArchive {
   public static final String PROP_IS_DELETE_UPON_UNDEPLOY = "isDeleteUponUndeploy";  
   /** Indicates whether the classloader should be scanned for process definitions. */
   public static final String PROP_IS_SCAN_FOR_PROCESS_DEFINITIONS = "isScanForProcessDefinitions";
+  /** The servlet context path of the process archive. (only available if the process archive is a web archive) */
+  public static final String PROP_SERVLET_CONTEXT_PATH = "servletContextPath";
   
   /**
    * @return the name of the process archive (must be unique for a given process engine)
