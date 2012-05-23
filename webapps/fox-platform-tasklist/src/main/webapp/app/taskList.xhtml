@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	template="/WEB-INF/templates/template.xhtml">
+<ui:define name="content">
+
+	<h2>Tasks</h2>
+	
+	<ui:repeat value="#{taskList.list}" var="task">
+		<div class="row">
+			<div class="span3">
+				<strong>
+					<h:outputText value="#{task.name} "/>
+				</strong>
+			</div>
+			<div class="span3">
+				<h:outputText value="#{task.createTime} "/>
+			</div>
+			<div class="span1">
+				<h:outputText value="#{task.assignee  == null ? '-' : task.assignee} "/>
+			</div>
+			<h:outputLink styleClass="span1" value="#{taskList.getFormKey(task)}.jsf?taskId=#{task.id}">edit</h:outputLink>
+		</div>
+	</ui:repeat>
+	
+</ui:define>
+</ui:composition>

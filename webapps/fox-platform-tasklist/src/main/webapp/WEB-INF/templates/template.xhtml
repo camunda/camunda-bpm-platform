@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html 
+	lang="en"
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets">
+
+<h:head>
+	<title>camunda fox task list</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<h:outputStylesheet name="css/bootstrap.min.css" />
+	<h:outputStylesheet name="css/bootstrap-responsive.min.css" />
+	<style>
+      body {
+        padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
+      }
+    </style>
+</h:head>
+
+<h:body>
+	<div class="navbar navbar-fixed-top">
+		<div class="navbar-inner">
+	    	<div class="container">
+	      		<a class="brand" href="#">camunda fox - task list</a>
+				<ul class="nav">
+					<li ><h:outputLink value="taskList.jsf">Home</h:outputLink></li>
+				</ul>
+	    	</div>
+	  </div>
+	</div>
+
+	<h:panelGroup id="page" layout="block" styleClass="container">
+		<hr />
+		<h:panelGroup id="container" layout="block">		
+			<h:panelGroup>	
+				<h:panelGroup id="content" layout="block">
+					<h:messages globalOnly="true"/>
+					<ui:insert name="content">Main Content</ui:insert>
+				</h:panelGroup>
+			</h:panelGroup>
+			<h:panelGroup id="footer" layout="block">
+				<hr />
+				powered by <a href="http://www.camunda.com/fox/">camunda fox</a>
+			</h:panelGroup>
+		</h:panelGroup>		
+	</h:panelGroup>
+
+</h:body>
+</html>
