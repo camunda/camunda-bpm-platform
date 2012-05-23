@@ -82,6 +82,10 @@
     </dependency>
     <dependency>
       <groupId>com.camunda.fox.platform</groupId>
+      <artifactId>fox-platform-ext-config</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.camunda.fox.platform</groupId>
       <artifactId>fox-platform-jobexecutor-core</artifactId>
       <version>${project.version}</version>
     </dependency>

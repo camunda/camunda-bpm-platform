@@ -4,6 +4,8 @@ import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import javax.ejb.AsyncResult;
 import javax.ejb.Asynchronous;
 import javax.ejb.ConcurrencyManagement;
@@ -33,6 +35,16 @@ public class PlatformServiceBean extends PlatformService implements ProcessEngin
 
   final private static Logger log = Logger.getLogger(SimplePlatformService.class.getName());
 
+  @PostConstruct
+  public void start() {
+    super.start();
+  }
+  
+  @PreDestroy
+  public void stop() {
+    super.stop();
+  }
+  
   @Asynchronous
   public Future<ProcessEngineStartOperation> startProcessEngine(final ProcessEngineConfiguration processEngineConfiguration) {
     
