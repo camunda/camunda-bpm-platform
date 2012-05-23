@@ -13,6 +13,7 @@
 
 package org.activiti.engine.impl.pvm.runtime;
 
+
 import org.activiti.engine.impl.pvm.PvmProcessElement;
 import org.activiti.engine.impl.pvm.PvmProcessInstance;
 import org.activiti.engine.impl.pvm.PvmTransition;
@@ -58,6 +59,8 @@ public interface InterpretableExecution extends ActivityExecution, ExecutionList
   InterpretableExecution getSuperExecution();
 
   void deleteCascade(String deleteReason);
+  
+  void deleteCascade2(String deleteReason);
   
   boolean isDeleteRoot();
 

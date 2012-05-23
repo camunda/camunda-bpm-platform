@@ -16,17 +16,20 @@ package org.activiti.engine.test.pvm;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.activiti.engine.delegate.ExecutionListener;
 import org.activiti.engine.impl.pvm.ProcessDefinitionBuilder;
 import org.activiti.engine.impl.pvm.PvmExecution;
 import org.activiti.engine.impl.pvm.PvmProcessDefinition;
 import org.activiti.engine.impl.pvm.PvmProcessInstance;
+import org.activiti.engine.impl.pvm.runtime.ExecutionImpl;
+import org.activiti.engine.impl.pvm.runtime.InterpretableExecution;
 import org.activiti.engine.impl.test.PvmTestCase;
 import org.activiti.engine.test.pvm.activities.Automatic;
 import org.activiti.engine.test.pvm.activities.EmbeddedSubProcess;
 import org.activiti.engine.test.pvm.activities.End;
 import org.activiti.engine.test.pvm.activities.ParallelGateway;
 import org.activiti.engine.test.pvm.activities.WaitState;
+
+import com.camunda.fox.engine.impl.cmd.FoxDeleteProcessInstanceCmd;
 
 
 /**
@@ -211,6 +214,7 @@ public class PvmEventTest extends PvmTestCase {
     assertEquals("expected "+expectedEvents+", but was \n"+eventCollector+"\n", expectedEvents, eventCollector.events); 
   }
   
+  
   /**
    *                   +--+
    *              +--->|c1|---+
@@ -288,6 +292,82 @@ public class PvmEventTest extends PvmTestCase {
     expectedEvents.add("end on Activity(join)");
     expectedEvents.add("start on Activity(end)");
     expectedEvents.add("end on Activity(end)");
+    expectedEvents.add("end on ProcessDefinition(events)");
+    
+    assertEquals("expected "+expectedEvents+", but was \n"+eventCollector+"\n", expectedEvents, eventCollector.events); 
+  }
+  
+  /**
+   *           +-----------------------------------------------+
+   * +-----+   | +-----------+   +------------+   +----------+ |   +---+
+   * |start|-->| |startInside|-->| taskInside |-->|endInsdide| |-->|end|
+   * +-----+   | +-----------+   +------------+   +----------+ |   +---+
+   *           +-----------------------------------------------+
+   */
+  public void testEmbeddedSubProcessEventsDelete() {
+    EventCollector eventCollector = new EventCollector();
+    
+    PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder("events")
+      .executionListener(org.activiti.engine.impl.pvm.PvmEvent.EVENTNAME_START, eventCollector)
+      .executionListener(org.activiti.engine.impl.pvm.PvmEvent.EVENTNAME_END, eventCollector)
+      .createActivity("start")
+        .initial()
+        .behavior(new Automatic())
+        .executionListener(org.activiti.engine.impl.pvm.PvmEvent.EVENTNAME_START, eventCollector)
+        .executionListener(org.activiti.engine.impl.pvm.PvmEvent.EVENTNAME_END, eventCollector)
+        .transition("embeddedsubprocess")
+      .endActivity()
+      .createActivity("embeddedsubprocess")
+        .scope()
+        .behavior(new EmbeddedSubProcess())
+        .executionListener(org.activiti.engine.impl.pvm.PvmEvent.EVENTNAME_START, eventCollector)
+        .executionListener(org.activiti.engine.impl.pvm.PvmEvent.EVENTNAME_END, eventCollector)
+        .createActivity("startInside")
+          .behavior(new Automatic())
+          .executionListener(org.activiti.engine.impl.pvm.PvmEvent.EVENTNAME_START, eventCollector)
+          .executionListener(org.activiti.engine.impl.pvm.PvmEvent.EVENTNAME_END, eventCollector)
+          .transition("taskInside")
+        .endActivity()
+        .createActivity("taskInside")
+          .behavior(new WaitState())
+          .executionListener(org.activiti.engine.impl.pvm.PvmEvent.EVENTNAME_START, eventCollector)
+          .executionListener(org.activiti.engine.impl.pvm.PvmEvent.EVENTNAME_END, eventCollector)
+          .transition("endInside")
+        .endActivity()
+        .createActivity("endInside")
+          .behavior(new End())
+          .executionListener(org.activiti.engine.impl.pvm.PvmEvent.EVENTNAME_START, eventCollector)
+          .executionListener(org.activiti.engine.impl.pvm.PvmEvent.EVENTNAME_END, eventCollector)
+        .endActivity()
+        .transition("end")
+      .endActivity()
+      .createActivity("end")
+        .behavior(new End())
+        .executionListener(org.activiti.engine.impl.pvm.PvmEvent.EVENTNAME_START, eventCollector)
+        .executionListener(org.activiti.engine.impl.pvm.PvmEvent.EVENTNAME_END, eventCollector)
+      .endActivity()
+    .buildProcessDefinition();
+    
+    PvmProcessInstance processInstance = processDefinition.createProcessInstance(); 
+    processInstance.start();
+    
+    ExecutionImpl execution = (ExecutionImpl) processInstance;
+    FoxDeleteProcessInstanceCmd cmd = new FoxDeleteProcessInstanceCmd(null, null);
+    List<InterpretableExecution> collectExecutionToDelete = cmd.collectExecutionToDelete(execution);
+    for (InterpretableExecution interpretableExecution : collectExecutionToDelete) {
+      interpretableExecution.deleteCascade2("");      
+    }
+    
+    List<String> expectedEvents = new ArrayList<String>();
+    expectedEvents.add("start on ProcessDefinition(events)");
+    expectedEvents.add("start on Activity(start)");
+    expectedEvents.add("end on Activity(start)");
+    expectedEvents.add("start on Activity(embeddedsubprocess)");
+    expectedEvents.add("start on Activity(startInside)");
+    expectedEvents.add("end on Activity(startInside)");
+    expectedEvents.add("start on Activity(taskInside)");
+    expectedEvents.add("end on Activity(taskInside)");
+    expectedEvents.add("end on Activity(embeddedsubprocess)");
     expectedEvents.add("end on ProcessDefinition(events)");
     
     assertEquals("expected "+expectedEvents+", but was \n"+eventCollector+"\n", expectedEvents, eventCollector.events); 

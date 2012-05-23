@@ -36,6 +36,8 @@ import org.activiti.engine.impl.pvm.process.ActivityImpl;
 import org.activiti.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.activiti.engine.impl.pvm.process.TransitionImpl;
 
+import com.camunda.fox.engine.impl.pvm.runtime.FoxAtomicOperationDeleteCascadeFireActivityEnd;
+
 /**
  * @author Tom Baeyens
  * @author Joram Barrez
@@ -861,5 +863,11 @@ public class ExecutionImpl implements
   
   public void disposeStartingExecution() {
     startingExecution = null;
+  }
+
+  public void deleteCascade2(String deleteReason) {
+    this.deleteReason = deleteReason;
+    this.deleteRoot = true;
+    performOperation(new FoxAtomicOperationDeleteCascadeFireActivityEnd());
   }
 }
