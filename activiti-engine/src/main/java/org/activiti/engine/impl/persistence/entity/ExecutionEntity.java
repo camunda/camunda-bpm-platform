@@ -55,6 +55,8 @@ import org.activiti.engine.runtime.Execution;
 import org.activiti.engine.runtime.Job;
 import org.activiti.engine.runtime.ProcessInstance;
 
+import com.camunda.fox.engine.impl.pvm.runtime.FoxAtomicOperationDeleteCascadeFireActivityEnd;
+
 
 /**
  * @author Tom Baeyens
@@ -1074,6 +1076,12 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
     this.deleteReason = deleteReason;
     this.deleteRoot = true;
     performOperation(AtomicOperation.DELETE_CASCADE);
+  }
+  
+  public void deleteCascade2(String deleteReason) {
+    this.deleteReason = deleteReason;
+    this.deleteRoot = true;
+    performOperation(new FoxAtomicOperationDeleteCascadeFireActivityEnd());
   }
   
   public int getRevisionNext() {
