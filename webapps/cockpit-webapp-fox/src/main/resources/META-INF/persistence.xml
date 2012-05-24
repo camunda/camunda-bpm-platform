@@ -3,9 +3,9 @@
 	xmlns="http://java.sun.com/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_1_0.xsd">
 
- 	<persistence-unit name="fox-cockpit" transaction-type="RESOURCE_LOCAL">
-<!--		<jta-data-source>java:${persistence.ds.name}</jta-data-source>-->
-		<non-jta-data-source>java:${persistence.ds.name}</non-jta-data-source>
+ 	<persistence-unit name="fox-cockpit" transaction-type="JTA">
+	<jta-data-source>java:${persistence.ds.name}</jta-data-source>
+		<!-- <non-jta-data-source>java:${persistence.ds.name}</non-jta-data-source> -->
 		<class>com.camunda.fox.cockpit.entity.CockpitItem</class>
         <class>com.camunda.fox.cockpit.entity.CockpitUser</class>
         <class>com.camunda.fox.cockpit.entity.CockpitPermission</class>
@@ -32,9 +32,9 @@
 			
 		</properties>
 	</persistence-unit>
-  <persistence-unit name="fox-engine" transaction-type="RESOURCE_LOCAL">
-		<non-jta-data-source>java:${persistence.ds.name}</non-jta-data-source>
-<!--		<jta-data-source>java:${persistence.ds.name}</jta-data-source>-->
+  <persistence-unit name="fox-engine" transaction-type="JTA">
+<!-- 		<non-jta-data-source>java:${persistence.ds.name}</non-jta-data-source> -->
+		<jta-data-source>java:${persistence.ds.name}</jta-data-source>
     <class>com.camunda.fox.jpa.entity.ExecutionEntity</class>
     <class>com.camunda.fox.jpa.entity.VariableEntity</class>
     <class>com.camunda.fox.jpa.entity.ByteArrayEntity</class>
