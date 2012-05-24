@@ -3,6 +3,8 @@ package com.camunda.fox.cockpit.persistence;
 import com.camunda.fox.cdi.transaction.impl.JtaTransactionEvent;
 import com.camunda.fox.cdi.transaction.impl.JtaTransactionEvent.TransactionEventType;
 import com.camunda.fox.cockpit.cdi.FoxEngineResource;
+
+import javax.annotation.PreDestroy;
 import javax.enterprise.context.ConversationScoped;
 import javax.enterprise.context.RequestScoped;
 import javax.enterprise.event.Observes;
@@ -58,6 +60,7 @@ public class EeEntityManagerProducer extends CockpitEntityManagerProducer {
     }
   }
   
+  @PreDestroy
   @Override
   protected void preDestroy() {
     if (cockpitEntityManager != null && cockpitEntityManager.isOpen()) {
