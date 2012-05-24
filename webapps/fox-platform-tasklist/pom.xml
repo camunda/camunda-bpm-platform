@@ -24,6 +24,13 @@
       <artifactId>fox-platform-client</artifactId>
       <version>${fox.version}</version>
     </dependency>
+    
+    <dependency>
+      <groupId>com.camunda.fox.platform</groupId>
+      <artifactId>fox-platform-api</artifactId>
+      <version>${fox.version}</version>
+    </dependency>
+    
     <dependency>
       <groupId>com.camunda.fox.engine</groupId>
       <artifactId>fox-engine</artifactId>
