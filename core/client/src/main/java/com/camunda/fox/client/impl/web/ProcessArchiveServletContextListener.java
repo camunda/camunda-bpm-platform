@@ -21,7 +21,7 @@ public class ProcessArchiveServletContextListener implements ServletContextListe
   @Inject
   private ProcessArchiveSupport processArchiveSupport;
 
-  public void contextDestroyed(ServletContextEvent contextEvent) {
+  public void contextInitialized(ServletContextEvent contextEvent) {
 
     String contextPath = contextEvent.getServletContext().getContextPath();
     
@@ -32,7 +32,7 @@ public class ProcessArchiveServletContextListener implements ServletContextListe
     
   }
 
-  public void contextInitialized(ServletContextEvent arg0) {
+  public void contextDestroyed(ServletContextEvent arg0) {
   }
 
 }
