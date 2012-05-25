@@ -44,6 +44,12 @@
       <artifactId>fox-engine</artifactId>
       <scope>provided</scope>
     </dependency>
+    
+    <dependency>
+      <groupId>com.camunda.fox.commons</groupId>
+       <artifactId>commons-transactions-jta</artifactId>
+       <version>${project.version}</version>
+    </dependency>
 		
     <dependency>
       <groupId>com.camunda.fox.cockpit</groupId>

@@ -1,12 +1,12 @@
 package com.camunda.fox.cockpit.platform;
 
 import javax.ejb.EJB;
+import javax.enterprise.context.ApplicationScoped;
 
 import org.activiti.engine.ProcessEngine;
 
 import com.camunda.fox.cdi.FoxProcessEngineLookup;
 import com.camunda.fox.platform.api.ProcessEngineService;
-import javax.enterprise.context.ApplicationScoped;
 
 /**
  * <p>Implementation of the {@link FoxProcessEngineLookup} interface looking 
