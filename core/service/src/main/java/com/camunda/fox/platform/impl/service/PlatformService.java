@@ -1,9 +1,27 @@
+/**
+ * Copyright (C) 2011, 2012 camunda services GmbH
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.camunda.fox.platform.impl.service;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.repository.Deployment;
@@ -12,6 +30,8 @@ import com.camunda.fox.platform.FoxPlatformException;
 import com.camunda.fox.platform.api.ProcessArchiveService;
 import com.camunda.fox.platform.api.ProcessEngineService;
 import com.camunda.fox.platform.impl.context.ProcessArchiveContext;
+import com.camunda.fox.platform.impl.service.spi.PlatformServiceExtension;
+import com.camunda.fox.platform.impl.util.PlatformServiceExtensionHelper;
 import com.camunda.fox.platform.spi.ProcessArchive;
 
 /**
@@ -21,11 +41,23 @@ import com.camunda.fox.platform.spi.ProcessArchive;
  * @author Daniel Meyer
  */
 public abstract class PlatformService implements ProcessEngineService, ProcessArchiveService {
+  
+  private static Logger log = Logger.getLogger(PlatformService.class.getName());
     
   // state //////////////////////////////////////////////////////////////////////////
     
   protected Map<String, ProcessEngineController> processEnginesByProcessArchiveName = new HashMap<String, ProcessEngineController>();
   protected final ProcessEngineRegistry processEngineRegistry = new ProcessEngineRegistry();
+  
+  // Lifecycle ///////////////////////////////////////////////////////////////////////
+  
+  public void start() {
+    fireOnPlatformServiceStart();
+  }
+
+  public void stop() {
+    fireOnPlatformServiceStop();
+  }
   
   // ProcessEngineService implementation /////////////////////////////////////////////
   
@@ -61,6 +93,8 @@ public abstract class PlatformService implements ProcessEngineService, ProcessAr
     }
 
     final ProcessEngineController processEngine = getProcessEngineSerivce(processArchive);
+    
+    fireBeforeProcessArchiveInstalled(processArchive, processEngine);
 
     synchronized (this) {
       ProcessEngineController platformProcessEngine = processEnginesByProcessArchiveName.get(processArchive.getName());
@@ -84,6 +118,8 @@ public abstract class PlatformService implements ProcessEngineService, ProcessAr
       }
 
       processEnginesByProcessArchiveName.put(processArchive.getName(), processEngine);
+      
+      fireAfterProcessArchiveInstalled(processArchive, processEngine, deploymentId);
 
       return new ProcessArchiveInstallationImpl(processEngineHandle, deploymentId);
 
@@ -129,9 +165,13 @@ public abstract class PlatformService implements ProcessEngineService, ProcessAr
               .getInstalledProcessArchivesByName()
               .get(processArchiveName);
       
+      fireBeforeProcessArchiveUninstalled(processArchiveContext.getProcessArchive(), processEngine);
+      
       processEngine.unInstallProcessArchive(processArchiveContext.getProcessArchive());
 
       processEnginesByProcessArchiveName.remove(processArchiveName);
+      
+      fireAfterProcessArchiveUninstalled(processArchiveContext.getProcessArchive(), processEngine);
     }
 
   }
@@ -222,5 +262,84 @@ public abstract class PlatformService implements ProcessEngineService, ProcessAr
       return processEngineDeploymentId;
     }
   }
+  
+  // extensions support //////////////////////////////////////////////////////
+  
+
+  protected void fireOnPlatformServiceStart() {
+    PlatformServiceExtensionHelper.clearCachedExtensions();
+    Iterator<PlatformServiceExtension> loadableExtensions = PlatformServiceExtensionHelper.getLoadableExtensions();
+    while (loadableExtensions.hasNext()) {
+      PlatformServiceExtension platformServiceExtension = (PlatformServiceExtension) loadableExtensions.next();
+      try {
+        platformServiceExtension.onPlatformServiceStart(this);
+      }catch (Exception e) {
+        throw new FoxPlatformException("Exception while invoking 'onPlatformServiceStart' for PlatformServiceExtension "+platformServiceExtension.getClass(), e);
+      }
+    }    
+  }  
+  
+  protected void fireOnPlatformServiceStop() {
+    Iterator<PlatformServiceExtension> loadableExtensions = PlatformServiceExtensionHelper.getLoadableExtensions();
+    while (loadableExtensions.hasNext()) {
+      PlatformServiceExtension platformServiceExtension = (PlatformServiceExtension) loadableExtensions.next();
+      try {
+        platformServiceExtension.onPlatformServiceStop(this);
+      }catch (Exception e) {
+        log.log(Level.SEVERE, "Exception while invoking 'onPlatformServiceStop' for PlatformServiceExtension "+platformServiceExtension.getClass(), e);
+      }
+    }
+    PlatformServiceExtensionHelper.clearCachedExtensions();
+  }
+  
+  protected void fireBeforeProcessArchiveInstalled(ProcessArchive processArchive, ProcessEngineController processEngine) {
+    Iterator<PlatformServiceExtension> loadableExtensions = PlatformServiceExtensionHelper.getLoadableExtensions();
+    while (loadableExtensions.hasNext()) {
+      PlatformServiceExtension platformServiceExtension = (PlatformServiceExtension) loadableExtensions.next();
+      try {
+        platformServiceExtension.beforeProcessArchiveInstalled(processArchive, processEngine);
+      }catch (Exception e) {
+        throw new FoxPlatformException("Exception while invoking 'beforeProcessArchiveInstalled' for PlatformServiceExtension "+platformServiceExtension.getClass(), e);
+      }
+    }
+  }
+  
+  protected void fireAfterProcessArchiveInstalled(ProcessArchive processArchive, ProcessEngineController processEngine, String deploymentId) {
+    Iterator<PlatformServiceExtension> loadableExtensions = PlatformServiceExtensionHelper.getLoadableExtensions();
+    while (loadableExtensions.hasNext()) {
+      PlatformServiceExtension platformServiceExtension = (PlatformServiceExtension) loadableExtensions.next();
+      try {
+        platformServiceExtension.afterProcessArchiveInstalled(processArchive, processEngine, deploymentId);
+      }catch (Exception e) {
+        log.log(Level.SEVERE, "Exception while invoking 'afterProcessArchiveInstalled' for PlatformServiceExtension "+platformServiceExtension.getClass(), e);
+      }
+    }
+  }
+  
+
+  protected void fireBeforeProcessArchiveUninstalled(ProcessArchive processArchive, ProcessEngineController processEngine) {
+    Iterator<PlatformServiceExtension> loadableExtensions = PlatformServiceExtensionHelper.getLoadableExtensions();
+    while (loadableExtensions.hasNext()) {
+      PlatformServiceExtension platformServiceExtension = (PlatformServiceExtension) loadableExtensions.next();
+      try {
+        platformServiceExtension.beforeProcessArchiveUninstalled(processArchive, processEngine);
+      }catch (Exception e) {
+        throw new FoxPlatformException("Exception while invoking 'beforeProcessArchiveUninstalled' for PlatformServiceExtension "+platformServiceExtension.getClass(), e);
+      }
+    }
+  }
+  
+  protected void fireAfterProcessArchiveUninstalled(ProcessArchive processArchive, ProcessEngineController processEngine) {
+    Iterator<PlatformServiceExtension> loadableExtensions = PlatformServiceExtensionHelper.getLoadableExtensions();
+    while (loadableExtensions.hasNext()) {
+      PlatformServiceExtension platformServiceExtension = (PlatformServiceExtension) loadableExtensions.next();
+      try {
+        platformServiceExtension.afterProcessArchiveUninstalled(processArchive, processEngine);
+      }catch (Exception e) {
+        log.log(Level.SEVERE, "Exception while invoking 'afterProcessArchiveUninstalled' for PlatformServiceExtension "+platformServiceExtension.getClass(), e);
+      }
+    }
+  }
+
     
 }

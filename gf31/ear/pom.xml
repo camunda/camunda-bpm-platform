@@ -78,11 +78,32 @@
     </dependency>
     <dependency>
       <groupId>com.camunda.fox.platform</groupId>
+      <artifactId>fox-platform-service-ext</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.camunda.fox.platform</groupId>
+      <artifactId>fox-platform-jobexecutor-core</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.camunda.fox.platform</groupId>
       <artifactId>fox-platform-glassfish-service</artifactId>
       <version>${project.version}</version>
       <type>ejb</type>
     </dependency>
-       
+    <dependency>
+      <groupId>com.camunda.fox.platform</groupId>
+      <artifactId>fox-platform-jobexecutor-rar</artifactId>
+      <version>${project.version}</version>
+      <type>rar</type>
+    </dependency>
+    <dependency>
+      <groupId>com.camunda.fox.platform</groupId>
+      <artifactId>fox-platform-jobexecutor-service</artifactId>
+      <version>${project.version}</version>
+      <type>ejb</type>
+    </dependency>
+
     <!-- exclude engine from ear -->
     <dependency>
       <groupId>com.camunda.fox.engine</groupId>
