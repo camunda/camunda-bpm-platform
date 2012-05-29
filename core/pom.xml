@@ -90,7 +90,8 @@
     <module>service</module>
     <module>client</module>
     <module>deployer</module>
-    <module>service-ext</module>
+    <module>ext-service</module>
+    <module>ext-config</module>
   </modules>
   
   <scm>
