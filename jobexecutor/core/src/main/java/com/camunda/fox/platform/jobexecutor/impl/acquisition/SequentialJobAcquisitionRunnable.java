@@ -43,6 +43,7 @@ public class SequentialJobAcquisitionRunnable extends AcquireJobsRunnable {
           if (registeredProcessEngines.size() > 0) {
             if (registeredProcessEngines.size() <= processEngineLoopCounter) {
               processEngineLoopCounter = 0;
+              isJobAdded = false;
               idleEngines.clear();
             }
             currentProcessEngine = registeredProcessEngines.get(processEngineLoopCounter);
@@ -99,6 +100,10 @@ public class SequentialJobAcquisitionRunnable extends AcquireJobsRunnable {
       
     }
     log.info(jobExecutor.getName() + " stopped job acquisition");
+  }
+  
+  public boolean isJobAdded() {
+    return isJobAdded;
   }
 
 }
