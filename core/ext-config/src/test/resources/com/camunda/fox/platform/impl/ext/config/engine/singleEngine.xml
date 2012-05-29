@@ -1,0 +1,17 @@
+<process-engines>
+
+  <process-engine name="default" default="true">
+
+    <datasource>jdbc/FoxEngine</datasource>
+    <history-level>audit</history-level>
+    
+    <properties>
+      <property name="isAutoSchemaUpdate">true</property>
+      <property name="isActivateJobExecutor">false</property>
+      <property name="dbTablePrefix">prefix</property>
+      <property name="jobExecutorAcquisitionName">default</property>
+    </properties>
+    
+  </process-engine>
+
+</process-engines>

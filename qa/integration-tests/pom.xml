@@ -55,6 +55,12 @@
       <artifactId>fox-platform-api</artifactId>
       <scope>provided</scope>
     </dependency>
+    
+     <dependency>
+      <groupId>com.camunda.fox.platform</groupId>
+      <artifactId>fox-platform-ext-config</artifactId>
+      <scope>provided</scope>
+    </dependency>
   </dependencies>
 
   <build>
