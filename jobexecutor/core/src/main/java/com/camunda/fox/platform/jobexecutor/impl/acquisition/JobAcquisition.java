@@ -9,6 +9,7 @@ import java.util.Map;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.cmd.AcquireJobsCmd;
 import org.activiti.engine.impl.interceptor.CommandExecutor;
+import org.activiti.engine.impl.jobexecutor.AcquireJobsRunnable;
 import org.activiti.engine.impl.jobexecutor.JobExecutor;
 
 import com.camunda.fox.platform.FoxPlatformException;
@@ -96,6 +97,10 @@ public class JobAcquisition extends JobExecutor {
   
   public JobAcquisitionConfiguration getJobAcquisitionConfiguration() {
     return jobAcquisitionConfiguration;
+  }
+  
+  public AcquireJobsRunnable getAcquireJobsRunnable() {
+    return this.acquireJobsRunnable;
   }
 
 }
