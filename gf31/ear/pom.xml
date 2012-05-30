@@ -97,12 +97,6 @@
     </dependency>
     <dependency>
       <groupId>com.camunda.fox.platform</groupId>
-      <artifactId>fox-platform-jobexecutor-rar</artifactId>
-      <version>${project.version}</version>
-      <type>rar</type>
-    </dependency>
-    <dependency>
-      <groupId>com.camunda.fox.platform</groupId>
       <artifactId>fox-platform-jobexecutor-service</artifactId>
       <version>${project.version}</version>
       <type>ejb</type>
@@ -119,7 +113,12 @@
       <groupId>com.camunda.fox.platform</groupId>
       <artifactId>fox-platform-api</artifactId>
       <scope>provided</scope>
-    </dependency>        
+    </dependency>
+    <dependency>
+    	<groupId>com.camunda.fox.platform</groupId>
+    	<artifactId>fox-platform-jobexecutor-ra</artifactId>
+    	<version>${project.version}</version>
+    </dependency>
   </dependencies>
 
 </project>
