@@ -1,4 +1,4 @@
-package com.camunda.fox.platform.impl.ext.config.engine;
+package com.camunda.fox.platform.impl.jobexecutor.ext.config;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,29 +13,26 @@ import javax.xml.bind.Unmarshaller;
 import org.activiti.engine.impl.util.IoUtil;
 
 import com.camunda.fox.platform.FoxPlatformException;
-import com.camunda.fox.platform.impl.ext.config.engine.spi.ProcessEnginesXmlParser;
+import com.camunda.fox.platform.impl.jobexecutor.ext.config.spi.JobExecutorXmlParser;
 
-/**
- * Simple JAXB parser for parsing all META-INF/process-engines.xml found on our classpath.
- * 
- * @author Daniel Meyer
- * 
- */
-public class ProcessEnginesXmlParserImpl implements ProcessEnginesXmlParser {
 
+public class JobExecutorXmlParserImpl implements JobExecutorXmlParser {
+  
   protected JAXBContext context;
 
-  public List<ProcessEnginesXml> parseProcessEnginesXml(String processEnginesXmlLocation) {
-    List<ProcessEnginesXml> result = new ArrayList<ProcessEnginesXml>();
+  @Override
+  public List<JobExecutorXml> parseJobExecutorXml(String jobExecutorXmlLocation) {
+    List<JobExecutorXml> result = new ArrayList<JobExecutorXml>();
     
-    Enumeration<URL> resources = getResourcesAsStream(processEnginesXmlLocation);
+    Enumeration<URL> resources = this.getResourcesAsStream(jobExecutorXmlLocation);
     while (resources.hasMoreElements()) {
+      System.out.println("--------------------------------------------------------------------->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> bin in der Schleife");
       URL url = (URL) resources.nextElement();
       InputStream stream = null;
       try {
         stream = url.openStream();
-        ProcessEnginesXml parsedResource = parseStream(stream, processEnginesXmlLocation);
-        parsedResource.resourceName = url.getFile();
+        JobExecutorXml parsedResource = this.parseStream(stream, jobExecutorXmlLocation);
+        parsedResource.setResourceName(url.getFile());
         result.add(parsedResource);        
       }catch (IOException e) {
         throw new FoxPlatformException("Could not load resources '"+url.getFile()+"'");
@@ -48,17 +45,17 @@ public class ProcessEnginesXmlParserImpl implements ProcessEnginesXmlParser {
     
     return result;
   }
-
-  protected ProcessEnginesXml parseStream(InputStream stream, String processEnginesXmlLocation) {
+  
+  protected JobExecutorXml parseStream(InputStream stream, String jobExecutorXmlLocation) {
     try {
       if(context == null) {
-        context = JAXBContext.newInstance(ProcessEnginesXml.class);
+        context = JAXBContext.newInstance(JobExecutorXml.class);
       }
       Unmarshaller unmarshaller = context.createUnmarshaller();
-      ProcessEnginesXml processEnginesXml = (ProcessEnginesXml) unmarshaller.unmarshal(stream);
+      JobExecutorXml processEnginesXml = (JobExecutorXml) unmarshaller.unmarshal(stream);
       return processEnginesXml;
     } catch (Exception e) {
-      throw new FoxPlatformException("Exception while parsing '" + processEnginesXmlLocation + "': " + e.getMessage(), e);
+      throw new FoxPlatformException("Exception while parsing '" + jobExecutorXmlLocation + "': " + e.getMessage(), e);
     }
   }
 

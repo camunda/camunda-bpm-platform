@@ -1,0 +1,13 @@
+<job-executor>
+
+  <job-acquisition name="default" acquisition-strategy="SEQUENTIAL">
+  
+    <properties>
+      <property name="lockTimeInMillis">10000</property>
+      <property name="waitTimeInMillis">50000</property>
+      <property name="maxJobsPerAcquisition">10</property>
+    </properties>
+  
+  </job-acquisition> 
+
+</job-executor>
