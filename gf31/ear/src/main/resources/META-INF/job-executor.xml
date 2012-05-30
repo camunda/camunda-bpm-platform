@@ -1,0 +1,5 @@
+<job-executor>
+
+  <job-acquisition name="default" acquisition-strategy="SEQUENTIAL" />
+
+</job-executor>
