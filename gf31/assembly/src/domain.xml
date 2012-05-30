@@ -35,13 +35,13 @@
     </jdbc-connection-pool>
     <resource-adapter-config
       enabled="true" 
-      resource-adapter-name="camunda-fox-platform#fox-platform-jobexecutor-rar-6.1.0-SNAPSHOT"
+      resource-adapter-name="fox-platform-jobexecutor-rar"
       thread-pool-ids="platform-jobexecutor-tp" >
     </resource-adapter-config>
     <connector-connection-pool
         enabled="true" 
         name="platformJobExecutorPool" 
-        resource-adapter-name="camunda-fox-platform#fox-platform-jobexecutor-rar-6.1.0-SNAPSHOT" 
+        resource-adapter-name="fox-platform-jobexecutor-rar" 
         connection-definition-name="com.camunda.fox.platform.jobexecutor.impl.ra.outbound.PlatformJobExecutorConnectionFactory" 
         transaction-support="NoTransaction" />
     <connector-resource

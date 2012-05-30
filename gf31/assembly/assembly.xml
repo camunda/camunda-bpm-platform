@@ -48,6 +48,7 @@
       <outputDirectory>server/glassfish3/glassfish/domains/domain1/autodeploy</outputDirectory>
       <includes>
         <include>com.camunda.fox.platform:fox-platform-glassfish-ear:ear:*</include>
+        <include>com.camunda.fox.platform:fox-platform-jobexecutor-rar:rar:*</include>
       </includes>     
     </dependencySet>
     <dependencySet>

@@ -125,6 +125,12 @@
       <artifactId>java-uuid-generator</artifactId>
     </dependency>
 
+    <dependency>
+    	<groupId>com.camunda.fox.platform</groupId>
+    	<artifactId>fox-platform-jobexecutor-rar</artifactId>
+    	<version>${project.version}</version>
+    	<type>rar</type>
+    </dependency>
   </dependencies>
 
   <build>
