@@ -1,0 +1,5 @@
+<web-fragment>
+  <listener>
+    <listener-class>com.camunda.fox.client.impl.web.ProcessArchiveServletContextListener</listener-class>
+  </listener>
+</web-fragment>
