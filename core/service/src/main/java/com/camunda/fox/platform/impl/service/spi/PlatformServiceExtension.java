@@ -36,10 +36,21 @@ import com.camunda.fox.platform.spi.ProcessArchive;
  * 
  * <p>Consider using {@link PlatformServiceExtensionAdapter} when writing implementations.</p>
  * 
+ * <p>Each implementation declares a "precedence". The precedence controls the order in which 
+ * the resolved implementations will be invoked. (See: getPrecedence().) 
+ * Implementations with a lower precedence will we invoked first.</p> 
+ * 
  * @author Daniel Meyer
+ * @author roman.smirnov
  * @see PlatformServiceExtensionAdapter
  */
 public interface PlatformServiceExtension {
+  
+  /**
+   * determines the ordering in which implementations are invoked. Implementations with a low
+   * ordering are invoked first.
+   */
+  public int getPrecedence();
   
   public void onPlatformServiceStart(PlatformService platformService);  
   public void onPlatformServiceStop(PlatformService platformService);
