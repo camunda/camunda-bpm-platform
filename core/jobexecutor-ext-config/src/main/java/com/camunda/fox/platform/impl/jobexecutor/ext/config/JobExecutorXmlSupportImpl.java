@@ -39,7 +39,7 @@ public class JobExecutorXmlSupportImpl implements JobExecutorXmlSupport {
       try {
         startedJobAcquisitions.add((JobAcquisition) platformJobExecutorService.startJobAcquisition(jobAcquisitionConfiguration));
       } catch (Exception e) {
-        log.log(Level.SEVERE, "Exception while staring job-acquisition '" + jobAcquisitionConfiguration.getAcquisitionName() + "' defined in file '"+jobExecutorXml.getResourceName()+"'.", e);
+        log.log(Level.SEVERE, "Exception while starting job-acquisition '" + jobAcquisitionConfiguration.getAcquisitionName() + "' defined in file '"+jobExecutorXml.getResourceName()+"'.", e);
       }
     }
     if (!startedJobAcquisitions.isEmpty()) {
@@ -73,6 +73,7 @@ public class JobExecutorXmlSupportImpl implements JobExecutorXmlSupport {
         errorMessage.append("   ");
         errorMessage.append(engineName);
       }
+      errorMessage.append("\n");
       errorMessage.append("Consider restarting the fox platform.");
       log.severe(errorMessage.toString());      
     }

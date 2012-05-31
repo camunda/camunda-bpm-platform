@@ -15,6 +15,10 @@ import com.camunda.fox.platform.impl.service.PlatformServiceExtensionAdapter;
 public class ProcessEnginesXmlPlatformServiceExtension extends PlatformServiceExtensionAdapter {
 
   protected ProcessEnginesXmlSupport processEnginesXmlSupport;
+  
+  public int getPrecedence() {
+    return 200;
+  }
 
   public void onPlatformServiceStart(PlatformService platformService) {
     processEnginesXmlSupport = ServiceLoaderUtil.loadService(ProcessEnginesXmlSupport.class, ProcessEnginesXmlSupportImpl.class);

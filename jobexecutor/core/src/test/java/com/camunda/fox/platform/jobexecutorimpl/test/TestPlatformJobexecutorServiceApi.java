@@ -32,7 +32,7 @@ public class TestPlatformJobexecutorServiceApi {
     
     JobAcquisitionConfigurationBean acquisitionConfiguration = new JobAcquisitionConfigurationBean();
     acquisitionConfiguration.setAcquisitionName("default");
-    acquisitionConfiguration.setJobAcquisitionStrategy(JobAcquisitionStrategy.SEQENTIAL);
+    acquisitionConfiguration.setJobAcquisitionStrategy(JobAcquisitionStrategy.SEQUENTIAL);
     acquisitionConfiguration.setLockOwner(UUID.randomUUID().toString());
     acquisitionConfiguration.setLockTimeInMillis(5*60*1000);
     acquisitionConfiguration.setMaxJobsPerAcquisition(3);
@@ -196,7 +196,7 @@ public class TestPlatformJobexecutorServiceApi {
   public void testAddRemoveJobAcquisition() {
     JobAcquisitionConfigurationBean acquisitionConfiguration = new JobAcquisitionConfigurationBean();
     acquisitionConfiguration.setAcquisitionName("acquisition2");
-    acquisitionConfiguration.setJobAcquisitionStrategy(JobAcquisitionStrategy.SEQENTIAL);
+    acquisitionConfiguration.setJobAcquisitionStrategy(JobAcquisitionStrategy.SEQUENTIAL);
     acquisitionConfiguration.setLockOwner(UUID.randomUUID().toString());
     acquisitionConfiguration.setLockTimeInMillis(5*60*1000);
     acquisitionConfiguration.setMaxJobsPerAcquisition(3);
@@ -225,7 +225,7 @@ public class TestPlatformJobexecutorServiceApi {
   public void testAddJobAcquisitionWithExistingNameFails() {
     JobAcquisitionConfigurationBean acquisitionConfiguration = new JobAcquisitionConfigurationBean();
     acquisitionConfiguration.setAcquisitionName("default");
-    acquisitionConfiguration.setJobAcquisitionStrategy(JobAcquisitionStrategy.SEQENTIAL);
+    acquisitionConfiguration.setJobAcquisitionStrategy(JobAcquisitionStrategy.SEQUENTIAL);
     acquisitionConfiguration.setLockOwner(UUID.randomUUID().toString());
     acquisitionConfiguration.setLockTimeInMillis(5*60*1000);
     acquisitionConfiguration.setMaxJobsPerAcquisition(3);

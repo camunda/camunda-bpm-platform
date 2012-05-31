@@ -2,7 +2,7 @@
 
   <job-acquisition name="default">
   
-    <acquisition-strategy>SEQUENTIAL</acquisition-strategy>
+    <acquisition-strategy>SEQUENTIAL</acquisition-strategy> 
   
   </job-acquisition>
 

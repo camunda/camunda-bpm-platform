@@ -26,7 +26,6 @@ public class JobExecutorXmlParserImpl implements JobExecutorXmlParser {
     
     Enumeration<URL> resources = this.getResourcesAsStream(jobExecutorXmlLocation);
     while (resources.hasMoreElements()) {
-      System.out.println("--------------------------------------------------------------------->>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>> bin in der Schleife");
       URL url = (URL) resources.nextElement();
       InputStream stream = null;
       try {

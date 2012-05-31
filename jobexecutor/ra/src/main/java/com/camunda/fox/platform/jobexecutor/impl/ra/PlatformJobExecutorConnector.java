@@ -1,6 +1,5 @@
 package com.camunda.fox.platform.jobexecutor.impl.ra;
 
-import java.util.UUID;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -19,8 +18,6 @@ import com.camunda.fox.platform.jobexecutor.impl.ra.execution.JcaWorkManagerPlat
 import com.camunda.fox.platform.jobexecutor.impl.ra.inflow.JobExecutionHandler;
 import com.camunda.fox.platform.jobexecutor.impl.ra.inflow.JobExecutionHandlerActivation;
 import com.camunda.fox.platform.jobexecutor.impl.ra.inflow.JobExecutionHandlerActivationSpec;
-import com.camunda.fox.platform.jobexecutor.impl.util.JobAcquisitionConfigurationBean;
-import com.camunda.fox.platform.jobexecutor.spi.JobAcquisitionStrategy;
 
 /**
  * <p>The {@link ResourceAdapter} responsible for bootstrapping the {@link PlatformJobExecutor}</p>
@@ -46,16 +43,6 @@ public class PlatformJobExecutorConnector implements ResourceAdapter {
   public void start(BootstrapContext ctx) throws ResourceAdapterInternalException {
     platformJobExecutor = new JcaWorkManagerPlatformJobExecutor(ctx.getWorkManager(),this);
     platformJobExecutor.start();
-
-    // starting the default acquisition
-    JobAcquisitionConfigurationBean configurationBean = new JobAcquisitionConfigurationBean();
-    configurationBean.setAcquisitionName("default");
-    configurationBean.setJobAcquisitionStrategy(JobAcquisitionStrategy.SEQENTIAL);
-    configurationBean.setWaitTimeInMillis(5000);
-    configurationBean.setMaxJobsPerAcquisition(3);
-    configurationBean.setLockOwner(UUID.randomUUID().toString());
-    configurationBean.setLockTimeInMillis(300000);
-    platformJobExecutor.startJobAcquisition(configurationBean);
     
     log.log(Level.INFO, "platform job executor started");
   }

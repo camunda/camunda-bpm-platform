@@ -1,6 +1,8 @@
 <job-executor>
 
-  <job-acquisition name="jobAcquisition1" acquisition-strategy="SEQUENTIAL">
+  <job-acquisition name="jobAcquisition1">
+
+    <acquisition-strategy>SEQUENTIAL</acquisition-strategy>
   
     <properties>
       <property name="lockTimeInMillis">10000</property>
@@ -10,8 +12,11 @@
 
   </job-acquisition>
   
-  <job-acquisition name="jobAcquisition2" acquisition-strategy="SEQUENTIAL">
-      <properties>
+  <job-acquisition name="jobAcquisition2">
+  
+    <acquisition-strategy>SEQUENTIAL</acquisition-strategy>
+    
+    <properties>
       <property name="lockTimeInMillis">50000</property>
       <property name="waitTimeInMillis">10000</property>
       <property name="maxJobsPerAcquisition">50</property>
