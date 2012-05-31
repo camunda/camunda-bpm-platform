@@ -197,9 +197,33 @@ public abstract class PlatformService implements ProcessEngineService, ProcessAr
     } else {
       final ProcessEngineController processEngineService = processEngineRegistry.getProcessEngineController(processEngineName); 
       if(processEngineService == null) {
-        throw new FoxPlatformException("Cannot retreive list of process archives fot process engine: process engine with name '"+processEngineName+"' is not managed by the fox platform.");
+        throw new FoxPlatformException("Cannot retreive list of process archives for process engine: process engine with name '"+processEngineName+"' is not managed by the fox platform.");
       }    
       return processEngineService.getCachedProcessArchives();
+    }
+  }
+  
+  public ProcessArchive getProcessArchiveByProcessDefinitionId(String processDefinitionId, String processEngineName) {
+    if(processEngineName == null) {
+      throw new FoxPlatformException("Cannot retreive process archive for process engine: process engine name is null.");
+    } else {
+      final ProcessEngineController processEngineService = processEngineRegistry.getProcessEngineController(processEngineName); 
+      if(processEngineService == null) {
+        throw new FoxPlatformException("Cannot retreive list of process archives for process engine: process engine with name '"+processEngineName+"' is not managed by the fox platform.");
+      }    
+      return processEngineService.getProcessArchiveByProcessDefinitionId(processDefinitionId);
+    }
+  }
+  
+  public ProcessArchive getProcessArchiveByProcessDefinitionKey(String processDefinitionKey, String processEngineName) {
+    if(processEngineName == null) {
+      throw new FoxPlatformException("Cannot retreive process archive for process engine: process engine name is null.");
+    } else {
+      final ProcessEngineController processEngineService = processEngineRegistry.getProcessEngineController(processEngineName); 
+      if(processEngineService == null) {
+        throw new FoxPlatformException("Cannot retreive list of process archives for process engine: process engine with name '"+processEngineName+"' is not managed by the fox platform.");
+      }    
+      return processEngineService.getProcessArchiveByProcessDefinitionKey(processDefinitionKey);
     }
   }
   
