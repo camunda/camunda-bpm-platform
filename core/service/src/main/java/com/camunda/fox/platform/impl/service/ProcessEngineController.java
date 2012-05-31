@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -447,9 +446,8 @@ public class ProcessEngineController {
   // extensions support ////////////////////////////////////////////////////
   
   protected void fireBeforeProcessEngineControllerStart(ProcessEngineController processEngineController) {
-    Iterator<PlatformServiceExtension> loadableExtensions = PlatformServiceExtensionHelper.getLoadableExtensions();
-    while (loadableExtensions.hasNext()) {
-      PlatformServiceExtension platformServiceExtension = (PlatformServiceExtension) loadableExtensions.next();
+    List<PlatformServiceExtension> loadableExtensions = PlatformServiceExtensionHelper.getLoadableExtensions();
+    for (PlatformServiceExtension platformServiceExtension : loadableExtensions) {      
       try {
         platformServiceExtension.beforeProcessEngineControllerStart(processEngineController);
       }catch (Exception e) {
@@ -459,9 +457,8 @@ public class ProcessEngineController {
   }
   
   protected void fireAfterProcessEngineControllerStart(ProcessEngineController processEngineController) {
-    Iterator<PlatformServiceExtension> loadableExtensions = PlatformServiceExtensionHelper.getLoadableExtensions();
-    while (loadableExtensions.hasNext()) {
-      PlatformServiceExtension platformServiceExtension = (PlatformServiceExtension) loadableExtensions.next();
+    List<PlatformServiceExtension> loadableExtensions = PlatformServiceExtensionHelper.getLoadableExtensions();
+    for (PlatformServiceExtension platformServiceExtension : loadableExtensions) {
       try {
         platformServiceExtension.afterProcessEngineControllerStart(processEngineController);
       }catch (Exception e) {
@@ -471,9 +468,9 @@ public class ProcessEngineController {
   }
   
   protected void fireBeforeProcessEngineControllerStop(ProcessEngineController processEngineController) {
-    Iterator<PlatformServiceExtension> loadableExtensions = PlatformServiceExtensionHelper.getLoadableExtensions();
-    while (loadableExtensions.hasNext()) {
-      PlatformServiceExtension platformServiceExtension = (PlatformServiceExtension) loadableExtensions.next();
+    List<PlatformServiceExtension> loadableExtensions = PlatformServiceExtensionHelper.getLoadableExtensions();
+    Collections.reverse(loadableExtensions);
+    for (PlatformServiceExtension platformServiceExtension : loadableExtensions) {
       try {
         platformServiceExtension.beforeProcessEngineControllerStop(processEngineController);
       }catch (Exception e) {
@@ -483,9 +480,9 @@ public class ProcessEngineController {
   }
   
   protected void fireAfterProcessEngineControllerStop(ProcessEngineController processEngineController) {
-    Iterator<PlatformServiceExtension> loadableExtensions = PlatformServiceExtensionHelper.getLoadableExtensions();
-    while (loadableExtensions.hasNext()) {
-      PlatformServiceExtension platformServiceExtension = (PlatformServiceExtension) loadableExtensions.next();
+    List<PlatformServiceExtension> loadableExtensions = PlatformServiceExtensionHelper.getLoadableExtensions();
+    Collections.reverse(loadableExtensions);
+    for (PlatformServiceExtension platformServiceExtension : loadableExtensions) {
       try {
         platformServiceExtension.afterProcessEngineControllerStop(processEngineController);
       }catch (Exception e) {
