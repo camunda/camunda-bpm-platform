@@ -65,4 +65,9 @@ public class CountingPlatformServiceExtension implements PlatformServiceExtensio
     afterProcessArchiveUninstalled++;
   }
 
+  @Override
+  public int getPrecedence() {
+    return 0;
+  }
+
 }

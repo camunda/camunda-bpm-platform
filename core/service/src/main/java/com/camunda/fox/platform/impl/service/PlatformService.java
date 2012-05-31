@@ -16,8 +16,8 @@
 package com.camunda.fox.platform.impl.service;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -292,9 +292,8 @@ public abstract class PlatformService implements ProcessEngineService, ProcessAr
 
   protected void fireOnPlatformServiceStart() {
     PlatformServiceExtensionHelper.clearCachedExtensions();
-    Iterator<PlatformServiceExtension> loadableExtensions = PlatformServiceExtensionHelper.getLoadableExtensions();
-    while (loadableExtensions.hasNext()) {
-      PlatformServiceExtension platformServiceExtension = (PlatformServiceExtension) loadableExtensions.next();
+    List<PlatformServiceExtension> loadableExtensions = PlatformServiceExtensionHelper.getLoadableExtensions();
+    for (PlatformServiceExtension platformServiceExtension : loadableExtensions) {
       try {
         platformServiceExtension.onPlatformServiceStart(this);
       }catch (Exception e) {
@@ -304,9 +303,9 @@ public abstract class PlatformService implements ProcessEngineService, ProcessAr
   }  
   
   protected void fireOnPlatformServiceStop() {
-    Iterator<PlatformServiceExtension> loadableExtensions = PlatformServiceExtensionHelper.getLoadableExtensions();
-    while (loadableExtensions.hasNext()) {
-      PlatformServiceExtension platformServiceExtension = (PlatformServiceExtension) loadableExtensions.next();
+    List<PlatformServiceExtension> loadableExtensions = PlatformServiceExtensionHelper.getLoadableExtensions();
+    Collections.reverse(loadableExtensions);
+    for (PlatformServiceExtension platformServiceExtension : loadableExtensions) {
       try {
         platformServiceExtension.onPlatformServiceStop(this);
       }catch (Exception e) {
@@ -317,9 +316,8 @@ public abstract class PlatformService implements ProcessEngineService, ProcessAr
   }
   
   protected void fireBeforeProcessArchiveInstalled(ProcessArchive processArchive, ProcessEngineController processEngine) {
-    Iterator<PlatformServiceExtension> loadableExtensions = PlatformServiceExtensionHelper.getLoadableExtensions();
-    while (loadableExtensions.hasNext()) {
-      PlatformServiceExtension platformServiceExtension = (PlatformServiceExtension) loadableExtensions.next();
+    List<PlatformServiceExtension> loadableExtensions = PlatformServiceExtensionHelper.getLoadableExtensions();
+    for (PlatformServiceExtension platformServiceExtension : loadableExtensions) {
       try {
         platformServiceExtension.beforeProcessArchiveInstalled(processArchive, processEngine);
       }catch (Exception e) {
@@ -329,9 +327,8 @@ public abstract class PlatformService implements ProcessEngineService, ProcessAr
   }
   
   protected void fireAfterProcessArchiveInstalled(ProcessArchive processArchive, ProcessEngineController processEngine, String deploymentId) {
-    Iterator<PlatformServiceExtension> loadableExtensions = PlatformServiceExtensionHelper.getLoadableExtensions();
-    while (loadableExtensions.hasNext()) {
-      PlatformServiceExtension platformServiceExtension = (PlatformServiceExtension) loadableExtensions.next();
+    List<PlatformServiceExtension> loadableExtensions = PlatformServiceExtensionHelper.getLoadableExtensions();
+    for (PlatformServiceExtension platformServiceExtension : loadableExtensions) {
       try {
         platformServiceExtension.afterProcessArchiveInstalled(processArchive, processEngine, deploymentId);
       }catch (Exception e) {
@@ -342,9 +339,9 @@ public abstract class PlatformService implements ProcessEngineService, ProcessAr
   
 
   protected void fireBeforeProcessArchiveUninstalled(ProcessArchive processArchive, ProcessEngineController processEngine) {
-    Iterator<PlatformServiceExtension> loadableExtensions = PlatformServiceExtensionHelper.getLoadableExtensions();
-    while (loadableExtensions.hasNext()) {
-      PlatformServiceExtension platformServiceExtension = (PlatformServiceExtension) loadableExtensions.next();
+    List<PlatformServiceExtension> loadableExtensions = PlatformServiceExtensionHelper.getLoadableExtensions();
+    Collections.reverse(loadableExtensions);
+    for (PlatformServiceExtension platformServiceExtension : loadableExtensions) {
       try {
         platformServiceExtension.beforeProcessArchiveUninstalled(processArchive, processEngine);
       }catch (Exception e) {
@@ -354,9 +351,9 @@ public abstract class PlatformService implements ProcessEngineService, ProcessAr
   }
   
   protected void fireAfterProcessArchiveUninstalled(ProcessArchive processArchive, ProcessEngineController processEngine) {
-    Iterator<PlatformServiceExtension> loadableExtensions = PlatformServiceExtensionHelper.getLoadableExtensions();
-    while (loadableExtensions.hasNext()) {
-      PlatformServiceExtension platformServiceExtension = (PlatformServiceExtension) loadableExtensions.next();
+    List<PlatformServiceExtension> loadableExtensions = PlatformServiceExtensionHelper.getLoadableExtensions();
+    Collections.reverse(loadableExtensions);
+    for (PlatformServiceExtension platformServiceExtension : loadableExtensions) {
       try {
         platformServiceExtension.afterProcessArchiveUninstalled(processArchive, processEngine);
       }catch (Exception e) {
