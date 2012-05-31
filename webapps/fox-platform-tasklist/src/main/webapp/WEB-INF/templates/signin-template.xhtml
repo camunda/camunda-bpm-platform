@@ -5,7 +5,7 @@
   xmlns:ui="http://java.sun.com/jsf/facelets">
 
 <h:head>
-  <title>camunda fox - task list</title>
+  <title>camunda fox - task list - Sign in</title>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <h:outputStylesheet name="css/bootstrap.css" />
@@ -33,30 +33,22 @@ body {
   <div class="navbar navbar-fixed-top">
     <div class="navbar-inner">
       <div class="container-fluid">
-        <a class="btn btn-navbar" data-toggle="collapse"
-          data-target=".nav-collapse"> <span class="icon-bar"></span>
-          <span class="icon-bar"></span> <span class="icon-bar"></span>
-        </a> <a class="brand" href="#">camunda fox - task list</a>
-        <ui:insert name="nav-top-content">Content ov top navigation</ui:insert>
+        <a class="brand" href="#">camunda fox - task list</a>
       </div>
     </div>
   </div>
 
+  <hr />
   <div class="container-fluid">
-    <div class="row-fluid">
-      <div class="span3">
-        <div class="well sidebar-nav">
-          <ui:insert name="nav-left-content">Content of left navigation</ui:insert>
-        </div>
-        <!--/.well -->
+    <div id="content">
+      <div class="row">
+        <h1 class="span4 offset4">Sign in</h1>
       </div>
-      <!--/span-->
-      <div class="span9">
+      <div class="row">
         <ui:insert name="content">Main content</ui:insert>
       </div>
-      <!--/span-->
     </div>
-    <!--/row-->
+
 
     <hr />
 
