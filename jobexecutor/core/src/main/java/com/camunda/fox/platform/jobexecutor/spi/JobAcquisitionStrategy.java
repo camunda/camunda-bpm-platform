@@ -22,7 +22,7 @@ public interface JobAcquisitionStrategy {
   
   /** this strategy iterates through the process engines and queries 
    * each process engine for jobs, one process engine at a time */
-  public static String SEQENTIAL = "SEQUENTIAL";
+  public static String SEQUENTIAL = "SEQUENTIAL";
   
 // TODO:
 //  /** this strategy queries multile process engines at the same time */

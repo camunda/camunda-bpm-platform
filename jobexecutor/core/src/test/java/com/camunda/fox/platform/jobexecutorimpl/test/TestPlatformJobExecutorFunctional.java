@@ -13,7 +13,6 @@ import junit.framework.Assert;
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.ManagementService;
 import org.activiti.engine.ProcessEngine;
-import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
 import org.activiti.engine.impl.cfg.StandaloneProcessEngineConfiguration;
 import org.activiti.engine.impl.jobexecutor.JobExecutor;
@@ -40,7 +39,7 @@ public class TestPlatformJobExecutorFunctional {
   @Parameters
   public static List<String[]> strategies() {
     return Arrays.asList(new String[][]{
-      {JobAcquisitionStrategy.SEQENTIAL},
+      {JobAcquisitionStrategy.SEQUENTIAL},
 //      {JobAcquisitionStrategy.SIMULTANEOUS}
     });    
   }

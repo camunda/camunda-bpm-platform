@@ -18,7 +18,7 @@ import com.camunda.fox.platform.jobexecutor.spi.JobAcquisitionStrategy;
 public class SequentialJobAcquisition implements JobAcquisitionStrategy {
 
   public String getJobAcquisitionName() {
-    return SEQENTIAL;
+    return SEQUENTIAL;
   }
 
   public AcquireJobsRunnable getAcquireJobsRunnable(JobAcquisition jobAcquisition) {

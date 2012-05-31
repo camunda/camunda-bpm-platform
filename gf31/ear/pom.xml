@@ -51,9 +51,6 @@
                 <copy todir="target/temp-ear/lib/" overwrite="true">
                   <fileset file="target/fox-engine-cdi-${project.version}.jar" />
                 </copy>
-                <copy todir="target/temp-ear/META-INF/" overwrite="true">
-                  <fileset file="src/main/resources/META-INF/job-executor.xml" />
-                </copy>
                 <delete file="target/fox-platform-glassfish-ear-${project.version}.ear" />
                 <zip file="target/fox-platform-glassfish-ear-${project.version}.ear">
                   <zipfileset dir="target/temp-ear/" />
@@ -86,6 +83,10 @@
     <dependency>
       <groupId>com.camunda.fox.platform</groupId>
       <artifactId>fox-platform-ext-config</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.camunda.fox.platform</groupId>
+      <artifactId>fox-platform-jobexecutor-ext-config</artifactId>
     </dependency>
     <dependency>
       <groupId>com.camunda.fox.platform</groupId>

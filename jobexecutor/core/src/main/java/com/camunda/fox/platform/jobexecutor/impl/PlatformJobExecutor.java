@@ -53,8 +53,8 @@ public abstract class PlatformJobExecutor implements PlatformJobExecutorService 
     }
     
     // register default strategies if not overriden by user:
-    if(!discoveredStrategies.containsKey(JobAcquisitionStrategy.SEQENTIAL)) {
-      discoveredStrategies.put(JobAcquisitionStrategy.SEQENTIAL, new SequentialJobAcquisition());
+    if(!discoveredStrategies.containsKey(JobAcquisitionStrategy.SEQUENTIAL)) {
+      discoveredStrategies.put(JobAcquisitionStrategy.SEQUENTIAL, new SequentialJobAcquisition());
     }
   }
 

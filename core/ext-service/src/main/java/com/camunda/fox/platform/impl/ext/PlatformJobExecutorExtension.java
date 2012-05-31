@@ -84,5 +84,9 @@ public class PlatformJobExecutorExtension extends PlatformServiceExtensionAdapte
     }
     return platformJobExecutorService;
   }
+  
+  public int getPrecedence() {
+    return 300;
+  }
 
 }

@@ -1,6 +1,8 @@
 <job-executor>
 
-  <job-acquisition name="default" acquisition-strategy="SEQUENTIAL">
+  <job-acquisition name="default">
+  
+    <acquisition-strategy>SEQUENTIAL</acquisition-strategy>
   
     <properties>
       <property name="lockTimeInMillis">10000</property>

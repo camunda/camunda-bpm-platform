@@ -21,7 +21,7 @@ public class JobAcquisitionXml implements JobAcquisitionConfiguration {
   @XmlAttribute(name = "name", required = true)
   private String acquisitionName;
 
-  @XmlAttribute(name = "acquisition-strategy", required = true)
+  @XmlElement(name = "acquisition-strategy", required = true)
   private String jobAcquistionStrategy;
   
   @XmlElement(name="properties", required=false)
