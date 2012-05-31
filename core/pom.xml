@@ -92,6 +92,7 @@
     <module>deployer</module>
     <module>ext-service</module>
     <module>ext-config</module>
+    <module>jobexecutor-ext-config</module>
   </modules>
   
   <scm>
