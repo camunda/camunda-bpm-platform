@@ -1,57 +1,78 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui:composition xmlns="http://www.w3.org/1999/xhtml"
-	xmlns:ui="http://java.sun.com/jsf/facelets"
-	xmlns:f="http://java.sun.com/jsf/core"
-	xmlns:h="http://java.sun.com/jsf/html"
-	template="/WEB-INF/templates/template.xhtml">
+  xmlns:ui="http://java.sun.com/jsf/facelets"
+  xmlns:f="http://java.sun.com/jsf/core"
+  xmlns:h="http://java.sun.com/jsf/html"
+  template="/WEB-INF/templates/template.xhtml">
 
-	<ui:define name="nav-top-content">
-		<div class="btn-group pull-right">
-			<a class="btn dropdown-toggle" data-toggle="dropdown" href="#"><i
-				class="icon-user"></i> Username<span class="caret"></span></a>
-			<ul class="dropdown-menu">
-				<li><a href="#">Profile</a></li>
-				<li class="divider"></li>
-				<li><a href="#">Sign Out</a></li>
-			</ul>
-		</div>
-		<div class="btn-group pull-right">
-			<a class="btn dropdown-toggle" data-toggle="dropdown" href="#"><i
-				class="icon-play"></i> Start Process<span class="caret"></span></a>
-			<ul class="dropdown-menu">
-				<li><a href="#">Start xy process</a></li>
-				<li class="divider"></li>
-				<li><a href="#about">start z process</a></li>
-			</ul>
-		</div>
-	</ui:define>
+  <ui:define name="nav-top-content">
 
-	<ui:define name="nav-left-content">
-		<ul class="nav nav-list">
-			<li class="nav-header">Tasks</li>
-			<li class="active"><a href="#">My Tasks (21)</a></li>
-			<li><a href="#">Unassigned Tasks (3)</a></li>
-			<li class="nav-header">Group Tasks</li>
-			<li><a href="#">Accounting (2)</a></li>
-			<li><a href="#">Management (1)</a></li>
-			<li><a href="#">IT (0)</a></li>
-		</ul>
-	</ui:define>
+    <div class="btn-group pull-right">
+      <a class="btn dropdown-toggle" data-toggle="dropdown" href="#"><i
+        class="icon-user"></i> <h:outputText value="&#160;" /> <h:outputText
+          value="#{identity.currentUser.username} " /><span
+        class="caret"></span></a>
+      <ul class="dropdown-menu">
+        <li><a href="#">Profile</a></li>
+        <li class="divider"></li>
+        <li><h:form style="margin:0;">
+            <h:commandLink action="#{identity.signOut()}">Sign out</h:commandLink>
+          </h:form></li>
+      </ul>
+    </div>
+    <div class="btn-group pull-right">
+      <a class="btn dropdown-toggle" data-toggle="dropdown" href="#"><i
+        class="icon-play"></i> Start Process<span class="caret"></span></a>
 
-	<ui:define name="content">
-		<ui:repeat value="#{taskList.list}" var="task">
-			<div class="row-fluid">
-				<div class="span12">
-					<h2><h:outputText value="#{task.name} "/></h2>
-					<p><h:outputText value="#{task.description} "/></p>
-					<p>
-						<h:outputLink styleClass="btn" value="#{taskList.getTaskFormUrl(task)}">Edit &#187;</h:outputLink>
-					</p>
-				</div>
-				<!--/span-->
-			</div>
-			<!--/row-->
-		</ui:repeat>
-	</ui:define>
+      <!-- TODO: create a list of links to start deployed processes -->
+
+      <ul class="dropdown-menu">
+        <li><a href="#">Start xy process</a></li>
+        <li class="divider"></li>
+        <li><a href="#about">start z process</a></li>
+      </ul>
+    </div>
+  </ui:define>
+
+  <ui:define name="nav-left-content">
+    <h:form style="margin:0;">
+      <ul class="nav nav-list">
+        <li class="nav-header">Tasks</li>
+        <li class="active"><h:commandLink
+            value="My Tasks (#{taskList.countMyTasks()})"
+            action="#{taskList.setTaskCategory()}">
+            <f:ajax render=":taskList" />
+          </h:commandLink></li>
+        <li><a href="#">Unassigned Tasks (3)</a></li>
+        <li class="nav-header">Group Tasks</li>
+        <li><a href="#">Accounting (2)</a></li>
+        <li><a href="#">Management (1)</a></li>
+        <li><a href="#">IT (0)</a></li>
+      </ul>
+    </h:form>
+  </ui:define>
+
+  <ui:define name="content">
+    <h:panelGroup id="taskList">
+      <ui:repeat value="#{taskList.list}" var="task">
+        <div class="row-fluid">
+          <div class="span12">
+            <h2>
+              <h:outputText value="#{task.name} " />
+            </h2>
+            <p>
+              <h:outputText value="#{task.description} " />
+            </p>
+            <p>
+              <h:outputLink styleClass="btn"
+                value="#{taskList.getTaskFormUrl(task)}">Edit &#187;</h:outputLink>
+            </p>
+          </div>
+          <!--/span-->
+        </div>
+        <!--/row-->
+      </ui:repeat>
+    </h:panelGroup>
+  </ui:define>
 
 </ui:composition>

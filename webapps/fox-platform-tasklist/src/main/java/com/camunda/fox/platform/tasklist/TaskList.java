@@ -1,6 +1,7 @@
 package com.camunda.fox.platform.tasklist;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.ejb.EJB;
@@ -36,14 +37,36 @@ public class TaskList implements Serializable {
   @Inject
   private ProcessEngine processEngine;
 
+  @Inject
+  Identity identity;
+  
+  private List<Task> tasks = new ArrayList<Task>();
+  
   public void update() {
-    // do nothing here, since a refreh trigger a reload of the list anyway
   }
 
   public List<Task> getList() {
-    return taskService.createTaskQuery().list();
+    return tasks;
   }
 
+  @Deprecated
+  public int countMyTasks() {
+    return (int) taskService.createTaskQuery().taskAssignee(identity.getCurrentUser().getUsername()).count();
+  }
+
+  public List<Task> getMyTasks() {
+    return taskService.createTaskQuery().taskAssignee(identity.getCurrentUser().getUsername()).list();
+  }
+
+  @Deprecated
+  public int countUnassignedTasks() {
+    return (int)taskService.createTaskQuery().taskCandidateUser(identity.getCurrentUser().getUsername()).count();
+  }
+  
+  public List<Task> getUnassignedTasks() {
+    return taskService.createTaskQuery().taskCandidateUser(identity.getCurrentUser().getUsername()).list();
+  }
+  
   public String getTaskFormUrl(Task task) {
     String formKey, taskFormUrl = "";
     TaskFormData taskFormData = formService.getTaskFormData(task.getId());
@@ -54,8 +77,19 @@ public class TaskList implements Serializable {
     ProcessArchive processArchive = processArchiveService.getProcessArchiveByProcessDefinitionId(task.getProcessDefinitionId(), processEngine.getName());
     String contextPath = (String) processArchive.getProperties().get(ProcessArchive.PROP_SERVLET_CONTEXT_PATH);
 
-    taskFormUrl = "../" + contextPath + "/" + formKey + ".jsf?taskId=" + task.getId();
+    taskFormUrl = "../../" + contextPath + "/" + formKey + ".jsf?taskId=" + task.getId();
 
     return taskFormUrl;
+  }
+
+  public void setTaskCategory() {
+//    if(taskCategory.equalsIgnoreCase("mytasks")) {
+//      this.tasks = getMyTasks();
+//    } else if (taskCategory.equalsIgnoreCase("unassigned")) {
+//      this.tasks = getUnassignedTasks();
+//    }
+    
+    tasks = getMyTasks();
+    
   }
 }

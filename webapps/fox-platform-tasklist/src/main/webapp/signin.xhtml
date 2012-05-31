@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui:composition xmlns="http://www.w3.org/1999/xhtml"
+  xmlns:ui="http://java.sun.com/jsf/facelets"
+  xmlns:f="http://java.sun.com/jsf/core"
+  xmlns:h="http://java.sun.com/jsf/html"
+  template="/WEB-INF/templates/signin-template.xhtml">
+
+  <ui:define name="content">
+    <h:form id="signin" styleClass="well span4 offset4">
+      <label><strong>Username:</strong>
+        <h:inputText id="username" value="#{identity.currentUser.username}" />
+      </label>
+      <label><strong>Password:</strong>
+        <h:inputSecret id="password" value="#{identity.currentUser.password}" />
+      </label>
+      <h:commandButton id="submit_button" styleClass="btn btn-primary" value="Sign in" action="#{identity.signIn()}" />
+    </h:form>
+  </ui:define>
+
+</ui:composition>
