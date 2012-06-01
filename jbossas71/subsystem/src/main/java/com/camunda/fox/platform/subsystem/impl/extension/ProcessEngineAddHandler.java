@@ -15,17 +15,18 @@
  */
 package com.camunda.fox.platform.subsystem.impl.extension;
 
-
-import static com.camunda.fox.platform.subsystem.impl.extension.ModelConstants.ATTR_DATASOURCE;
-import static com.camunda.fox.platform.subsystem.impl.extension.ModelConstants.ATTR_HISTORY_LEVEL;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.DEFAULT;
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.ADD;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.DESCRIPTION;
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OPERATION_NAME;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.REQUEST_PROPERTIES;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.REQUIRED;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.TYPE;
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.VALUE_TYPE;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import javax.transaction.TransactionManager;
 
@@ -40,11 +41,14 @@ import org.jboss.as.controller.descriptions.ModelDescriptionConstants;
 import org.jboss.as.naming.deployment.ContextNames;
 import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.ModelType;
+import org.jboss.dmr.Property;
 import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceController.Mode;
 import org.jboss.msc.service.ServiceName;
 
 import com.camunda.fox.platform.spi.ProcessEngineConfiguration;
+import com.camunda.fox.platform.subsystem.impl.extension.FoxPlatformParser.Attribute;
+import com.camunda.fox.platform.subsystem.impl.extension.FoxPlatformParser.Tag;
 import com.camunda.fox.platform.subsystem.impl.platform.ContainerPlatformService;
 import com.camunda.fox.platform.subsystem.impl.platform.ProcessEngineConfigurationImpl;
 import com.camunda.fox.platform.subsystem.impl.platform.ProcessEngineControllerService;
@@ -61,32 +65,54 @@ public class ProcessEngineAddHandler extends AbstractAddStepHandler implements D
   public ModelNode getModelDescription(Locale locale) {
     ModelNode node = new ModelNode();
     node.get(DESCRIPTION).set("Adds a process engine");
-    node.get(REQUEST_PROPERTIES, ATTR_DATASOURCE, DESCRIPTION).set("Which datasource to use");
-    node.get(REQUEST_PROPERTIES, ATTR_DATASOURCE, TYPE).set(ModelType.STRING);
-    node.get(REQUEST_PROPERTIES, ATTR_DATASOURCE, REQUIRED).set(true);
+    node.get(OPERATION_NAME).set(ADD);
     
-    node.get(REQUEST_PROPERTIES, ATTR_HISTORY_LEVEL, DESCRIPTION).set("Which history level to use");
-    node.get(REQUEST_PROPERTIES, ATTR_HISTORY_LEVEL, TYPE).set(ModelType.STRING);
-    node.get(REQUEST_PROPERTIES, ATTR_HISTORY_LEVEL, REQUIRED).set(false);
-//    node.get(REQUEST_PROPERTIES, ATTR_HISTORY_LEVEL, DEFAULT).set("audit");
+    node.get(REQUEST_PROPERTIES, Attribute.DEFAULT.getLocalName(), DESCRIPTION).set("Should it be the default engine");
+    node.get(REQUEST_PROPERTIES, Attribute.DEFAULT.getLocalName(), TYPE).set(ModelType.BOOLEAN);
+    node.get(REQUEST_PROPERTIES, Attribute.DEFAULT.getLocalName(), REQUIRED).set(false);
+    
+    node.get(REQUEST_PROPERTIES, Tag.DATASOURCE.getLocalName(), DESCRIPTION).set("Which datasource to use");
+    node.get(REQUEST_PROPERTIES, Tag.DATASOURCE.getLocalName(), TYPE).set(ModelType.STRING);
+    node.get(REQUEST_PROPERTIES, Tag.DATASOURCE.getLocalName(), REQUIRED).set(true);
+    
+    node.get(REQUEST_PROPERTIES, Tag.HISTORY_LEVEL.getLocalName(), DESCRIPTION).set("Which history level to use");
+    node.get(REQUEST_PROPERTIES, Tag.HISTORY_LEVEL.getLocalName(), TYPE).set(ModelType.STRING);
+    node.get(REQUEST_PROPERTIES, Tag.HISTORY_LEVEL.getLocalName(), REQUIRED).set(false);
+    
+    node.get(REQUEST_PROPERTIES, Tag.PROPERTIES.getLocalName(), DESCRIPTION).set("Additional properties");
+    node.get(REQUEST_PROPERTIES, Tag.PROPERTIES.getLocalName(), TYPE).set(ModelType.LIST);
+    node.get(REQUEST_PROPERTIES, Tag.PROPERTIES.getLocalName(), VALUE_TYPE).set(ModelType.PROPERTY);
+    node.get(REQUEST_PROPERTIES, Tag.PROPERTIES.getLocalName(), REQUIRED).set(false);
 
     return node;
   }
 
   @Override
   protected void populateModel(ModelNode operation, ModelNode model) throws OperationFailedException {
-    String historyLevel = "audit";
-    if (operation.hasDefined(ATTR_HISTORY_LEVEL)) {
-      historyLevel = operation.get(ATTR_HISTORY_LEVEL).asString();
+    Boolean isDefault = Boolean.TRUE;
+    if (operation.hasDefined(Attribute.DEFAULT.getLocalName())) {
+      isDefault = operation.get(Attribute.DEFAULT.getLocalName()).asBoolean();
     }
-    model.get(ATTR_HISTORY_LEVEL).set(historyLevel);
+    model.get(Attribute.DEFAULT.getLocalName()).set(isDefault);
+    
+    String historyLevel = "audit";
+    if (operation.hasDefined(Tag.HISTORY_LEVEL.getLocalName())) {
+      historyLevel = operation.get(Tag.HISTORY_LEVEL.getLocalName()).asString();
+    }
+    model.get(Tag.HISTORY_LEVEL.getLocalName()).set(historyLevel);
     
     String datasource = "java:jboss/datasources/ExampleDS";
-    if (operation.hasDefined(ATTR_DATASOURCE)) {
-      datasource = operation.get(ATTR_DATASOURCE).asString();
+    if (operation.hasDefined(Tag.DATASOURCE.getLocalName())) {
+      datasource = operation.get(Tag.DATASOURCE.getLocalName()).asString();
     }
-    model.get(ATTR_DATASOURCE).set(datasource);
+    model.get(Tag.DATASOURCE.getLocalName()).set(datasource);
     
+    // retrieve all properties
+    List<ModelNode> properties = null;
+    if (operation.hasDefined(Tag.PROPERTIES.getLocalName())) {
+      properties = operation.get(Tag.PROPERTIES.getLocalName()).asList();
+    }
+    model.get(Tag.PROPERTIES.getLocalName()).set(properties);
   }
   
   @Override
@@ -94,9 +120,19 @@ public class ProcessEngineAddHandler extends AbstractAddStepHandler implements D
           ServiceVerificationHandler verificationHandler, List<ServiceController<?>> newControllers)
           throws OperationFailedException {
     
-    String engineName = PathAddress.pathAddress(operation.get(ModelDescriptionConstants.ADDRESS)).getLastElement().getValue();    
-    String datasource = operation.get(ATTR_DATASOURCE).asString();   
-    String historyLevel = operation.get(ATTR_HISTORY_LEVEL).asString();
+    String engineName = PathAddress.pathAddress(operation.get(ModelDescriptionConstants.ADDRESS)).getLastElement().getValue();
+    String datasourceJndiName = operation.get(Tag.DATASOURCE.getLocalName()).asString();   
+    String historyLevel = operation.get(Tag.HISTORY_LEVEL.getLocalName()).asString();
+    boolean isDefault = operation.get(Attribute.DEFAULT.getLocalName()).asBoolean();
+    
+    List<Property> propertyList = operation.get(Tag.PROPERTIES.getLocalName()).asPropertyList();
+    Map<String,Object> properties = null;
+    if (!propertyList.isEmpty()) {
+      properties = new HashMap<String, Object>();
+      for (Property property : propertyList) {
+        properties.put(property.getName(), property.getValue().asString());
+      }
+    }
     
     // TODO: read these values from config
     boolean activateJobExecutor=true;
@@ -108,11 +144,11 @@ public class ProcessEngineAddHandler extends AbstractAddStepHandler implements D
     int jobExecutor_lockTimeInMillis= 5 * 60 * 1000;
     int jobExecutor_waitTimeInMillis = 5 * 1000;
     
-    ProcessEngineConfiguration processEngineConfiguration = new ProcessEngineConfigurationImpl(true, engineName, datasource, historyLevel, isAutoUpdateSchema, activateJobExecutor);        
+    ProcessEngineConfiguration processEngineConfiguration = new ProcessEngineConfigurationImpl(isDefault, engineName, datasourceJndiName, historyLevel, isAutoUpdateSchema, activateJobExecutor);
+    processEngineConfiguration.getProperties().putAll(properties);
     ProcessEngineControllerService service = new ProcessEngineControllerService(processEngineConfiguration);
         
     ServiceName name = ProcessEngineControllerService.createServiceName(engineName);    
-    String datasourceJndiName = operation.get(ATTR_DATASOURCE).asString();    
     ContextNames.BindInfo datasourceBindInfo = ContextNames.bindInfoFor(datasourceJndiName);
     
     ServiceController<ProcessEngineControllerService> controller = context.getServiceTarget()           

@@ -15,8 +15,6 @@
  */
 package com.camunda.fox.platform.subsystem.impl.extension;
 
-import static com.camunda.fox.platform.subsystem.impl.extension.ModelConstants.ELEMENT_PROCESS_ENGINES;
-
 import java.util.List;
 
 import org.jboss.as.controller.AbstractBoottimeAddStepHandler;
@@ -27,6 +25,7 @@ import org.jboss.dmr.ModelNode;
 import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceController.Mode;
 
+import com.camunda.fox.platform.subsystem.impl.extension.FoxPlatformParser.Tag;
 import com.camunda.fox.platform.subsystem.impl.platform.ContainerPlatformService;
 
 /**
@@ -41,7 +40,7 @@ public class SubsystemAddHandler extends AbstractBoottimeAddStepHandler {
   /** {@inheritDoc} */
   @Override
   protected void populateModel(ModelNode operation, ModelNode model) throws OperationFailedException {
-    model.get(ELEMENT_PROCESS_ENGINES).setEmptyObject();
+    model.get(Tag.PROCESS_ENGINES.getLocalName()).setEmptyObject();
   }
   
   /** {@inheritDoc} */

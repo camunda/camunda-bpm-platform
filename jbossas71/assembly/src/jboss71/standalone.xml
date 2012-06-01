@@ -292,9 +292,12 @@
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:weld:1.0"/>
         <subsystem xmlns="urn:com.camunda.fox.fox-platform:1.0">
-                <process-engines>
-                    <process-engine name="default" datasource="java:jboss/datasources/FoxEngineDS" history-level="audit" />
-                </process-engines>
+            <process-engines>
+                <process-engine name="default" default="true">
+                    <datasource>java:jboss/datasources/FoxEngineDS</datasource>
+                    <history-level>audit</history-level>                
+                </process-engine>
+            </process-engines>
         </subsystem>
     </profile>
 

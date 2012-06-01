@@ -15,13 +15,17 @@
  */
 package com.camunda.fox.platform.subsystem.impl;
 
-import com.camunda.fox.platform.subsystem.impl.extension.FoxPlatformExtension;
 import java.util.List;
+
+import junit.framework.Assert;
+
 import org.jboss.as.subsystem.test.AbstractSubsystemTest;
 import org.jboss.as.subsystem.test.KernelServices;
 import org.jboss.dmr.ModelNode;
 import org.junit.Ignore;
 import org.junit.Test;
+
+import com.camunda.fox.platform.subsystem.impl.extension.FoxPlatformExtension;
 
 /**
  *
@@ -36,19 +40,30 @@ public class JBossSubsystemTest extends AbstractSubsystemTest {
   @Test
   public void testParseSubsystemXml() throws Exception {
     String subsystemXml = FileUtils.readFile("subsystem.xml");
-    System.out.println(subsystemXml);
+    System.out.println(normalizeXML(subsystemXml));
     
     List<ModelNode> operations = parse(subsystemXml);
+    Assert.assertEquals(3, operations.size());
+    System.out.println(operations);
+  }
+  
+  @Test
+  public void testWriteSubsystemXml() throws Exception {
+    String subsystemXml = FileUtils.readFile("subsystem.xml");
+    KernelServices services = installInController(subsystemXml);
+    ModelNode model = services.readWholeModel();
+    System.out.println("----------- ReadWholeModel -------------");
+    System.out.println(model);
+    System.out.println("----------- PersistedSubsystemXML -------------");
+    System.out.println(services.getPersistedSubsystemXml());
+    
   }
   
   @Test
   @Ignore(value="Won't work")
   public void testSubsystemBoot() throws Exception {
-    
     String subsystemXml = FileUtils.readFile("subsystem.xml");
-    
     KernelServices services = installInController(subsystemXml);
-    
     ModelNode model = services.readWholeModel();
   }
 }

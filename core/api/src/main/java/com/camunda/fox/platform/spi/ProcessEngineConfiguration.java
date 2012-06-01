@@ -61,8 +61,8 @@ public interface ProcessEngineConfiguration {
    * 
    * @see #PROP_IS_AUTO_SCHEMA_UPDATE
    * @see #PROP_IS_ACTIVATE_JOB_EXECUTOR
+   * @see #PROP_DB_TABLE_PREFIX
    */
   public Map<String, Object> getProperties();
  
-
 }

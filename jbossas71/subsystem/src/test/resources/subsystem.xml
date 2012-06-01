@@ -1,5 +1,20 @@
 <subsystem xmlns="urn:com.camunda.fox.fox-platform:1.0">
   <process-engines>
-    <process-engine name="__default" datasource="java:jboss/datasources/FoxEngineDS" />
+    <process-engine name="__default" default="true">
+      <datasource>java:jboss/datasources/FoxEngineDS</datasource>
+      <history-level>full</history-level>
+      <properties>
+        <property name="job-acquisition-name">default</property>
+        <property name="job-acquisition">default</property>
+        <property name="job-name">default</property>
+      </properties>
+    </process-engine>
+    <process-engine name="__test">
+      <datasource>java:jboss/datasources/FoxEngineDS</datasource>
+      <history-level>full</history-level>
+      <properties>
+        <property name="job-acquisition-name">default</property>
+      </properties>
+    </process-engine>
   </process-engines>
 </subsystem>
