@@ -13,9 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.camunda.fox.platform.subsystem.impl.extension;
-
-import static com.camunda.fox.platform.subsystem.impl.extension.ModelConstants.ELEMENT_PROCESS_ENGINES;
+package com.camunda.fox.platform.subsystem.impl.extension.handler;
 
 import java.util.List;
 
@@ -27,6 +25,7 @@ import org.jboss.dmr.ModelNode;
 import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceController.Mode;
 
+import com.camunda.fox.platform.subsystem.impl.extension.ModelConstants;
 import com.camunda.fox.platform.subsystem.impl.platform.ContainerPlatformService;
 
 /**
@@ -34,14 +33,17 @@ import com.camunda.fox.platform.subsystem.impl.platform.ContainerPlatformService
  * 
  * @author Daniel Meyer
  */
-public class SubsystemAddHandler extends AbstractBoottimeAddStepHandler {
+public class FoxPlatformSubsystemAdd extends AbstractBoottimeAddStepHandler {
   
-  static final SubsystemAddHandler INSTANCE = new SubsystemAddHandler();
+  public static final FoxPlatformSubsystemAdd INSTANCE = new FoxPlatformSubsystemAdd();
+  
+  private FoxPlatformSubsystemAdd() {
+  }
   
   /** {@inheritDoc} */
   @Override
   protected void populateModel(ModelNode operation, ModelNode model) throws OperationFailedException {
-    model.get(ELEMENT_PROCESS_ENGINES).setEmptyObject();
+    model.get(ModelConstants.PROCESS_ENGINES);
   }
   
   /** {@inheritDoc} */

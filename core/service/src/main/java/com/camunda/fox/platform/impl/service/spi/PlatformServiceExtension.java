@@ -21,6 +21,7 @@ import com.camunda.fox.platform.impl.service.ProcessEngineController;
 import com.camunda.fox.platform.spi.ProcessArchive;
 
 /**
+<<<<<<< HEAD
  * <p>SPI Interface for implemeting extensions to the platform services.</p>
  * 
  * <p>An instance of this class is created once per {@link PlatformService} instance.
@@ -35,6 +36,9 @@ import com.camunda.fox.platform.spi.ProcessArchive;
  * extension instance.</p>
  * 
  * <p>Consider using {@link PlatformServiceExtensionAdapter} when writing implementations.</p>
+=======
+ * <p>SPI Interface for implemeting extensions to the platform services</p>
+>>>>>>> platform-ce/master
  * 
  * <p>Each implementation declares a "precedence". The precedence controls the order in which 
  * the resolved implementations will be invoked. (See: getPrecedence().) 

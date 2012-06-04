@@ -13,8 +13,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.camunda.fox.platform.subsystem.impl.extension;
+package com.camunda.fox.platform.subsystem.impl.extension.handler;
 
+import static com.camunda.fox.platform.subsystem.impl.extension.ModelConstants.DATASOURCE;
+import static com.camunda.fox.platform.subsystem.impl.extension.ModelConstants.DEFAULT;
+import static com.camunda.fox.platform.subsystem.impl.extension.ModelConstants.HISTORY_LEVEL;
+import static com.camunda.fox.platform.subsystem.impl.extension.ModelConstants.NAME;
+import static com.camunda.fox.platform.subsystem.impl.extension.ModelConstants.PROPERTIES;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.ADD;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.DESCRIPTION;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OPERATION_NAME;
@@ -48,7 +53,7 @@ import org.jboss.msc.service.ServiceName;
 
 import com.camunda.fox.platform.spi.ProcessEngineConfiguration;
 import com.camunda.fox.platform.subsystem.impl.extension.FoxPlatformParser.Attribute;
-import com.camunda.fox.platform.subsystem.impl.extension.FoxPlatformParser.Tag;
+import com.camunda.fox.platform.subsystem.impl.extension.Element;
 import com.camunda.fox.platform.subsystem.impl.platform.ContainerJobExecutorService;
 import com.camunda.fox.platform.subsystem.impl.platform.ContainerPlatformService;
 import com.camunda.fox.platform.subsystem.impl.platform.ProcessEngineConfigurationImpl;
@@ -59,61 +64,71 @@ import com.camunda.fox.platform.subsystem.impl.platform.ProcessEngineControllerS
  * 
  * @author Daniel Meyer
  */
-public class ProcessEngineAddHandler extends AbstractAddStepHandler implements DescriptionProvider {
+public class ProcessEngineAdd extends AbstractAddStepHandler implements DescriptionProvider {
     
-  public static final ProcessEngineAddHandler INSTANCE = new ProcessEngineAddHandler();
+  public static final ProcessEngineAdd INSTANCE = new ProcessEngineAdd();
 
   public ModelNode getModelDescription(Locale locale) {
     ModelNode node = new ModelNode();
     node.get(DESCRIPTION).set("Adds a process engine");
     node.get(OPERATION_NAME).set(ADD);
     
-    node.get(REQUEST_PROPERTIES, Attribute.DEFAULT.getLocalName(), DESCRIPTION).set("Should it be the default engine");
-    node.get(REQUEST_PROPERTIES, Attribute.DEFAULT.getLocalName(), TYPE).set(ModelType.BOOLEAN);
-    node.get(REQUEST_PROPERTIES, Attribute.DEFAULT.getLocalName(), REQUIRED).set(false);
+    node.get(REQUEST_PROPERTIES, NAME, DESCRIPTION).set("Name of the process engine");
+    node.get(REQUEST_PROPERTIES, NAME, TYPE).set(ModelType.STRING);
+    node.get(REQUEST_PROPERTIES, NAME, REQUIRED).set(true);
     
-    node.get(REQUEST_PROPERTIES, Tag.DATASOURCE.getLocalName(), DESCRIPTION).set("Which datasource to use");
-    node.get(REQUEST_PROPERTIES, Tag.DATASOURCE.getLocalName(), TYPE).set(ModelType.STRING);
-    node.get(REQUEST_PROPERTIES, Tag.DATASOURCE.getLocalName(), REQUIRED).set(true);
+    node.get(REQUEST_PROPERTIES, DATASOURCE, DESCRIPTION).set("Which datasource to use");
+    node.get(REQUEST_PROPERTIES, DATASOURCE, TYPE).set(ModelType.STRING);
+    node.get(REQUEST_PROPERTIES, DATASOURCE, REQUIRED).set(true);
     
-    node.get(REQUEST_PROPERTIES, Tag.HISTORY_LEVEL.getLocalName(), DESCRIPTION).set("Which history level to use");
-    node.get(REQUEST_PROPERTIES, Tag.HISTORY_LEVEL.getLocalName(), TYPE).set(ModelType.STRING);
-    node.get(REQUEST_PROPERTIES, Tag.HISTORY_LEVEL.getLocalName(), REQUIRED).set(false);
+    node.get(REQUEST_PROPERTIES, DEFAULT, DESCRIPTION).set("Should it be the default engine");
+    node.get(REQUEST_PROPERTIES, DEFAULT, TYPE).set(ModelType.BOOLEAN);
+    node.get(REQUEST_PROPERTIES, DEFAULT, REQUIRED).set(false);
     
-    node.get(REQUEST_PROPERTIES, Tag.PROPERTIES.getLocalName(), DESCRIPTION).set("Additional properties");
-    node.get(REQUEST_PROPERTIES, Tag.PROPERTIES.getLocalName(), TYPE).set(ModelType.LIST);
-    node.get(REQUEST_PROPERTIES, Tag.PROPERTIES.getLocalName(), VALUE_TYPE).set(ModelType.PROPERTY);
-    node.get(REQUEST_PROPERTIES, Tag.PROPERTIES.getLocalName(), REQUIRED).set(false);
+    node.get(REQUEST_PROPERTIES, HISTORY_LEVEL, DESCRIPTION).set("Which history level to use");
+    node.get(REQUEST_PROPERTIES, HISTORY_LEVEL, TYPE).set(ModelType.STRING);
+    node.get(REQUEST_PROPERTIES, HISTORY_LEVEL, REQUIRED).set(false);
+    
+    node.get(REQUEST_PROPERTIES, PROPERTIES, DESCRIPTION).set("Additional properties");
+    node.get(REQUEST_PROPERTIES, PROPERTIES, TYPE).set(ModelType.OBJECT);
+    node.get(REQUEST_PROPERTIES, PROPERTIES, VALUE_TYPE).set(ModelType.LIST);
+    node.get(REQUEST_PROPERTIES, PROPERTIES, REQUIRED).set(false);
 
     return node;
   }
 
   @Override
   protected void populateModel(ModelNode operation, ModelNode model) throws OperationFailedException {
-    Boolean isDefault = Boolean.TRUE;
-    if (operation.hasDefined(Attribute.DEFAULT.getLocalName())) {
-      isDefault = operation.get(Attribute.DEFAULT.getLocalName()).asBoolean();
+    String name = "default";
+    if (operation.hasDefined(NAME)) {
+      name = operation.get(NAME).asString();
     }
-    model.get(Attribute.DEFAULT.getLocalName()).set(isDefault);
+    model.get(NAME).set(name);
+    
+    Boolean isDefault = Boolean.FALSE;
+    if (operation.hasDefined(DEFAULT)) {
+      isDefault = operation.get(DEFAULT).asBoolean();
+    }
+    model.get(DEFAULT).set(isDefault);
     
     String historyLevel = "audit";
-    if (operation.hasDefined(Tag.HISTORY_LEVEL.getLocalName())) {
-      historyLevel = operation.get(Tag.HISTORY_LEVEL.getLocalName()).asString();
+    if (operation.hasDefined(HISTORY_LEVEL)) {
+      historyLevel = operation.get(HISTORY_LEVEL).asString();
     }
-    model.get(Tag.HISTORY_LEVEL.getLocalName()).set(historyLevel);
+    model.get(HISTORY_LEVEL).set(historyLevel);
     
     String datasource = "java:jboss/datasources/ExampleDS";
-    if (operation.hasDefined(Tag.DATASOURCE.getLocalName())) {
-      datasource = operation.get(Tag.DATASOURCE.getLocalName()).asString();
+    if (operation.hasDefined(DATASOURCE)) {
+      datasource = operation.get(DATASOURCE).asString();
     }
-    model.get(Tag.DATASOURCE.getLocalName()).set(datasource);
+    model.get(DATASOURCE).set(datasource);
     
     // retrieve all properties
-    List<ModelNode> properties = null;
-    if (operation.hasDefined(Tag.PROPERTIES.getLocalName())) {
-      properties = operation.get(Tag.PROPERTIES.getLocalName()).asList();
+    ModelNode properties = new ModelNode();
+    if (operation.hasDefined(PROPERTIES)) {
+      properties = operation.get(PROPERTIES).asObject();
     }
-    model.get(Tag.PROPERTIES.getLocalName()).set(properties);
+    model.get(PROPERTIES).set(properties);
   }
   
   @Override
@@ -122,35 +137,12 @@ public class ProcessEngineAddHandler extends AbstractAddStepHandler implements D
           throws OperationFailedException {
     
     String engineName = PathAddress.pathAddress(operation.get(ModelDescriptionConstants.ADDRESS)).getLastElement().getValue();
-    String datasourceJndiName = operation.get(Tag.DATASOURCE.getLocalName()).asString();   
-    String historyLevel = operation.get(Tag.HISTORY_LEVEL.getLocalName()).asString();
-    boolean isDefault = operation.get(Attribute.DEFAULT.getLocalName()).asBoolean();
-    
-    List<Property> propertyList = operation.get(Tag.PROPERTIES.getLocalName()).asPropertyList();
-    Map<String,Object> properties = null;
-    if (!propertyList.isEmpty()) {
-      properties = new HashMap<String, Object>();
-      for (Property property : propertyList) {
-        properties.put(property.getName(), property.getValue().asString());
-      }
-    }
-    
-    // TODO: read these values from config
-    boolean activateJobExecutor=true;
-    boolean isAutoUpdateSchema =true;
-    int jobExecutor_maxJobsPerAcquisition =3;
-    int jobExecutor_corePoolSize=1;
-    int jobExecutor_maxPoolSize=3;
-    int jobExecutor_queueSize=3;
-    int jobExecutor_lockTimeInMillis= 5 * 60 * 1000;
-    int jobExecutor_waitTimeInMillis = 5 * 1000;
-    
-    ProcessEngineConfiguration processEngineConfiguration = new ProcessEngineConfigurationImpl(isDefault, engineName, datasourceJndiName, historyLevel, isAutoUpdateSchema, activateJobExecutor);
-    processEngineConfiguration.getProperties().putAll(properties);
+
+    ProcessEngineConfiguration processEngineConfiguration = transformConfiguration(context, engineName, model);
     ProcessEngineControllerService service = new ProcessEngineControllerService(processEngineConfiguration);
         
-    ServiceName name = ProcessEngineControllerService.createServiceName(engineName);    
-    ContextNames.BindInfo datasourceBindInfo = ContextNames.bindInfoFor(datasourceJndiName);
+    ServiceName name = ProcessEngineControllerService.createServiceName(processEngineConfiguration.getProcessEngineName());    
+    ContextNames.BindInfo datasourceBindInfo = ContextNames.bindInfoFor(processEngineConfiguration.getDatasourceJndiName());
     
     ServiceController<ProcessEngineControllerService> controller = context.getServiceTarget()           
             .addService(name, service)
@@ -163,7 +155,39 @@ public class ProcessEngineAddHandler extends AbstractAddStepHandler implements D
             .install();
     
     newControllers.add(controller);
-    
   }
 
+  private ProcessEngineConfiguration transformConfiguration(final OperationContext context, String engineName, final ModelNode model) {
+    
+    String datasourceJndiName = model.get(DATASOURCE).asString();   
+    String historyLevel = model.get(HISTORY_LEVEL).asString();
+    boolean isDefault = model.get(DEFAULT).asBoolean();
+    
+    Map<String,Object> properties = new HashMap<String, Object>();
+    if (model.hasDefined(Element.PROPERTIES.getLocalName())) {
+      ModelNode propertiesNode = model.get(Element.PROPERTIES.getLocalName());
+      List<Property> propertyList = propertiesNode.asPropertyList();
+      if (!propertyList.isEmpty()) {
+        for (Property property : propertyList) {
+          properties.put(property.getName(), property.getValue().asString());
+        }
+      }
+    }
+    
+    // TODO: read these values from config
+    int jobExecutor_maxJobsPerAcquisition =3;
+    int jobExecutor_corePoolSize=1;
+    int jobExecutor_maxPoolSize=3;
+    int jobExecutor_queueSize=3;
+    int jobExecutor_lockTimeInMillis= 5 * 60 * 1000;
+    int jobExecutor_waitTimeInMillis = 5 * 1000;
+    
+    ProcessEngineConfiguration processEngineConfiguration = 
+            new ProcessEngineConfigurationImpl(isDefault, engineName, datasourceJndiName, historyLevel, properties);
+    if (!properties.isEmpty()) {
+      processEngineConfiguration.getProperties().putAll(properties);
+    }
+    
+    return processEngineConfiguration;
+  }
 }
