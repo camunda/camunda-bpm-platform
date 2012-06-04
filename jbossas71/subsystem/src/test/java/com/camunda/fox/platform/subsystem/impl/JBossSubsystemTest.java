@@ -15,15 +15,9 @@
  */
 package com.camunda.fox.platform.subsystem.impl;
 
-import java.util.List;
+import java.io.IOException;
 
-import junit.framework.Assert;
-
-import org.jboss.as.subsystem.test.AbstractSubsystemTest;
-import org.jboss.as.subsystem.test.KernelServices;
-import org.jboss.dmr.ModelNode;
-import org.junit.Ignore;
-import org.junit.Test;
+import org.jboss.as.subsystem.test.AbstractSubsystemBaseTest;
 
 import com.camunda.fox.platform.subsystem.impl.extension.FoxPlatformExtension;
 
@@ -31,39 +25,22 @@ import com.camunda.fox.platform.subsystem.impl.extension.FoxPlatformExtension;
  *
  * @author nico.rehwaldt@camunda.com
  */
-public class JBossSubsystemTest extends AbstractSubsystemTest {
+public class JBossSubsystemTest extends AbstractSubsystemBaseTest {
 
   public JBossSubsystemTest() {
     super(FoxPlatformExtension.SUBSYSTEM_NAME, new FoxPlatformExtension());
   }
 
-  @Test
-  public void testParseSubsystemXml() throws Exception {
-    String subsystemXml = FileUtils.readFile("subsystem.xml");
-    System.out.println(normalizeXML(subsystemXml));
-    
-    List<ModelNode> operations = parse(subsystemXml);
-    Assert.assertEquals(3, operations.size());
-    System.out.println(operations);
-  }
-  
-  @Test
-  public void testWriteSubsystemXml() throws Exception {
-    String subsystemXml = FileUtils.readFile("subsystem.xml");
-    KernelServices services = installInController(subsystemXml);
-    ModelNode model = services.readWholeModel();
-    System.out.println("----------- ReadWholeModel -------------");
-    System.out.println(model);
-    System.out.println("----------- PersistedSubsystemXML -------------");
-    System.out.println(services.getPersistedSubsystemXml());
-    
-  }
-  
-  @Test
-  @Ignore(value="Won't work")
-  public void testSubsystemBoot() throws Exception {
-    String subsystemXml = FileUtils.readFile("subsystem.xml");
-    KernelServices services = installInController(subsystemXml);
-    ModelNode model = services.readWholeModel();
+  @Override
+  protected String getSubsystemXml() throws IOException {
+    try {
+//      return FileUtils.readFile(JBossSubsystemXMLTest.SUBSYSTEM_WITH_PROCESS_ENGINES_ELEMENT_ONLY);
+      return FileUtils.readFile(JBossSubsystemXMLTest.SUBSYSTEM_WITH_ENGINES);
+//      return FileUtils.readFile(JBossSubsystemXMLTest.SUBSYSTEM_WITH_ENGINES_AND_PROPERTIES);
+//      return FileUtils.readFile(JBossSubsystemXMLTest.SUBSYSTEM_WITH_DUPLICATE_ENGINE_NAMES);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    return null;
   }
 }

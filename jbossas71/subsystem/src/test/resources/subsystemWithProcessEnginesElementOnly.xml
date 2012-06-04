@@ -1,0 +1,3 @@
+<subsystem xmlns="urn:com.camunda.fox.fox-platform:1.0">
+  <process-engines/>
+</subsystem>
