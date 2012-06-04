@@ -56,4 +56,8 @@ public class PlatformServiceExtensionAdapter implements PlatformServiceExtension
   public void afterProcessArchiveUninstalled(ProcessArchive processArchive, ProcessEngineController processEngineController) {
   }
 
+  public int getPrecedence() {
+    return 0;
+  }
+
 }

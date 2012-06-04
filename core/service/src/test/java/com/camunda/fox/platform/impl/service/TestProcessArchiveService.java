@@ -1,11 +1,14 @@
 package com.camunda.fox.platform.impl.service;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.Future;
 
 import junit.framework.Assert;
 
 import org.activiti.engine.ProcessEngine;
+import org.activiti.engine.impl.util.IoUtil;
+import org.activiti.engine.repository.ProcessDefinition;
 import org.junit.Test;
 
 import com.camunda.fox.platform.FoxPlatformException;
@@ -205,6 +208,159 @@ public class TestProcessArchiveService extends PlatformServiceTest {
     }
     
     Assert.assertEquals(0, processArchiveService.getInstalledProcessArchives().size());
+  }
+  
+  @Test
+  public void testGetProcessArchiveByProcessDefinitionKey()  throws Exception {
+    ProcessEngine engine1 = startProcessEgine1();
+    
+    HashMap<String, byte[]> processResources = new HashMap<String, byte[]>();
+    String processResource = IoUtil.readFileAsString("com/camunda/fox/platform/impl/service/testDeployProcessArchive.bpmn20.xml");
+    processResources.put("testDeployProcessArchive.bpmn20.xml", processResource.getBytes());
+    
+    ProcessArchive processArchive = new DummyProcessArchive("archive1", engine1.getName(), false, processResources, true);    
+    processArchiveService.installProcessArchive(processArchive);
+    
+    ProcessArchive retreivedArchive = processArchiveService.getProcessArchiveByProcessDefinitionKey("testDeployProcessArchive", engine1.getName());
+    Assert.assertNotNull(retreivedArchive);
+    Assert.assertEquals(processArchive, retreivedArchive);
+  }
+  
+  @Test
+  public void testGetProcessArchiveByProcessDefinitionKeyUnknownKeyFails()  throws Exception {
+    ProcessEngine engine1 = startProcessEgine1();
+    
+    HashMap<String, byte[]> processResources = new HashMap<String, byte[]>();
+    String processResource = IoUtil.readFileAsString("com/camunda/fox/platform/impl/service/testDeployProcessArchive.bpmn20.xml");
+    processResources.put("testDeployProcessArchive.bpmn20.xml", processResource.getBytes());
+    
+    ProcessArchive processArchive = new DummyProcessArchive("archive1", engine1.getName(), false, processResources, true);    
+    processArchiveService.installProcessArchive(processArchive);
+    
+    try {
+      processArchiveService.getProcessArchiveByProcessDefinitionKey("unknownKey", engine1.getName());
+      Assert.fail("exception expected.");
+    }catch (FoxPlatformException e) {
+      // expected
+    }
+  }
+  
+  @Test
+  public void testGetProcessArchiveByProcessDefinitionKeyUnknownEngineFails()  throws Exception {
+    ProcessEngine engine1 = startProcessEgine1();
+    
+    HashMap<String, byte[]> processResources = new HashMap<String, byte[]>();
+    String processResource = IoUtil.readFileAsString("com/camunda/fox/platform/impl/service/testDeployProcessArchive.bpmn20.xml");
+    processResources.put("testDeployProcessArchive.bpmn20.xml", processResource.getBytes());
+    
+    ProcessArchive processArchive = new DummyProcessArchive("archive1", engine1.getName(), false, processResources, true);    
+    processArchiveService.installProcessArchive(processArchive);
+    
+    try {
+      processArchiveService.getProcessArchiveByProcessDefinitionKey("testDeployProcessArchive", "unknownEngine");
+      Assert.fail("exception expected.");
+    }catch (FoxPlatformException e) {
+      // expected
+    }
+  }
+  
+  @Test
+  public void testGetProcessArchiveByProcessDefinitionId()  throws Exception {
+    ProcessEngine engine1 = startProcessEgine1();
+    
+    HashMap<String, byte[]> processResources = new HashMap<String, byte[]>();
+    String processResource = IoUtil.readFileAsString("com/camunda/fox/platform/impl/service/testDeployProcessArchive.bpmn20.xml");
+    processResources.put("testDeployProcessArchive.bpmn20.xml", processResource.getBytes());
+    
+    ProcessArchive processArchive = new DummyProcessArchive("archive1", engine1.getName(), false, processResources, true);    
+    processArchiveService.installProcessArchive(processArchive);
+    
+    ProcessDefinition processDefinition = engine1.getRepositoryService().createProcessDefinitionQuery().singleResult();
+    
+    ProcessArchive retreivedArchive = processArchiveService.getProcessArchiveByProcessDefinitionId(processDefinition.getId(), engine1.getName());
+    Assert.assertNotNull(retreivedArchive);
+    Assert.assertEquals(processArchive, retreivedArchive);
+  }
+  
+  @Test
+  public void testGetProcessArchiveByProcessDefinitionIdUnknownDefinition()  throws Exception {
+    ProcessEngine engine1 = startProcessEgine1();
+    
+    HashMap<String, byte[]> processResources = new HashMap<String, byte[]>();
+    String processResource = IoUtil.readFileAsString("com/camunda/fox/platform/impl/service/testDeployProcessArchive.bpmn20.xml");
+    processResources.put("testDeployProcessArchive.bpmn20.xml", processResource.getBytes());
+    
+    ProcessArchive processArchive = new DummyProcessArchive("archive1", engine1.getName(), false, processResources, true);    
+    processArchiveService.installProcessArchive(processArchive);
+
+    try { 
+      processArchiveService.getProcessArchiveByProcessDefinitionId("bogus", engine1.getName());
+      Assert.fail("Exception expected");
+    }catch (FoxPlatformException e) {
+      // expected
+    }
+  }
+  
+  @Test
+  public void testGetProcessArchiveByProcessDefinitionIdUnknownEngine()  throws Exception {
+    ProcessEngine engine1 = startProcessEgine1();
+    
+    HashMap<String, byte[]> processResources = new HashMap<String, byte[]>();
+    String processResource = IoUtil.readFileAsString("com/camunda/fox/platform/impl/service/testDeployProcessArchive.bpmn20.xml");
+    processResources.put("testDeployProcessArchive.bpmn20.xml", processResource.getBytes());
+    
+    ProcessArchive processArchive = new DummyProcessArchive("archive1", engine1.getName(), false, processResources, true);    
+    processArchiveService.installProcessArchive(processArchive);
+    
+    ProcessDefinition processDefinition = engine1.getRepositoryService().createProcessDefinitionQuery().singleResult();
+
+    try { 
+      processArchiveService.getProcessArchiveByProcessDefinitionId(processDefinition.getId(), "bogus");
+      Assert.fail("Exception expected");
+    }catch (FoxPlatformException e) {
+      // expected
+    }
+  }
+  
+  @Test
+  public void testGetProcessArchiveByProcessDefinitionIdAfterUpdate()  throws Exception {
+    ProcessEngine engine1 = startProcessEgine1();
+    
+    HashMap<String, byte[]> processResources = new HashMap<String, byte[]>();
+    String processResource = IoUtil.readFileAsString("com/camunda/fox/platform/impl/service/testDeployProcessArchive.bpmn20.xml");
+    processResources.put("testDeployProcessArchive.bpmn20.xml", processResource.getBytes());
+    
+    ProcessArchive processArchive = new DummyProcessArchive("archive1", engine1.getName(), false, processResources, false);    
+    processArchiveService.installProcessArchive(processArchive);
+    
+    ProcessDefinition processDefinitionBeforeUpdate = engine1.getRepositoryService().createProcessDefinitionQuery().singleResult();
+    
+    processArchiveService.unInstallProcessArchive(processArchive);
+    
+    processResources = new HashMap<String, byte[]>();
+    processResource = IoUtil.readFileAsString("com/camunda/fox/platform/impl/service/testDeployProcessArchiveUpdate.bpmn20.xml");
+    processResources.put("testDeployProcessArchive.bpmn20.xml", processResource.getBytes());
+    
+    processArchive = new DummyProcessArchive("archive1", engine1.getName(), false, processResources, true);    
+    processArchiveService.installProcessArchive(processArchive);
+    
+    List<ProcessDefinition> processDefinitionsAfterUpdate = engine1.getRepositoryService().createProcessDefinitionQuery().list();
+    Assert.assertEquals(2, processDefinitionsAfterUpdate.size());
+    
+    ProcessDefinition processDefinitionAfterUpdate = null;
+    for (ProcessDefinition processDefinition : processDefinitionsAfterUpdate) {
+      if(!processDefinition.getId().equals(processDefinitionBeforeUpdate.getId())) {
+        processDefinitionAfterUpdate = processDefinition;
+      }
+    }   
+    
+    ProcessArchive retreivedArchive = processArchiveService.getProcessArchiveByProcessDefinitionId(processDefinitionBeforeUpdate.getId(), engine1.getName());
+    Assert.assertNotNull(retreivedArchive);
+    Assert.assertEquals(processArchive, retreivedArchive);
+    
+    retreivedArchive = processArchiveService.getProcessArchiveByProcessDefinitionId(processDefinitionAfterUpdate.getId(), engine1.getName());
+    Assert.assertNotNull(retreivedArchive);
+    Assert.assertEquals(processArchive, retreivedArchive);
   }
     
 }
