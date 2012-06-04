@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -93,7 +94,7 @@ public class DefaultPlatformJobExecutor extends PlatformJobExecutor {
 
   @Override
   public void executeJobs(List<String> jobIds, CommandExecutor commandExecutor) {
-    threadPoolExecutor.execute(new PlatformExecuteJobsRunnable(jobIds, commandExecutor));
+      threadPoolExecutor.execute(new PlatformExecuteJobsRunnable(jobIds, commandExecutor));
   }
 
 }

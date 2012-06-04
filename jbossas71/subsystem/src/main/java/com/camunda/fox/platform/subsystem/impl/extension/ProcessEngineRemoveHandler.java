@@ -16,6 +16,8 @@
 package com.camunda.fox.platform.subsystem.impl.extension;
 
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.DESCRIPTION;
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OPERATION_NAME;
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.REMOVE;
 
 import java.util.Locale;
 
@@ -42,6 +44,7 @@ public class ProcessEngineRemoveHandler extends AbstractRemoveStepHandler implem
   public ModelNode getModelDescription(Locale locale) {
     ModelNode node = new ModelNode();
     node.get(DESCRIPTION).set("Removes a process engine");
+    node.get(OPERATION_NAME).set(REMOVE);
     return node;
   }
 

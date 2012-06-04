@@ -43,6 +43,7 @@ public class ProcessEngineControllerService extends ProcessEngineController impl
   private final InjectedValue<TransactionManager> transactionManagerInjector = new InjectedValue<TransactionManager>();
   private final InjectedValue<DataSourceReferenceFactoryService> datasourceBinderServiceInjector = new InjectedValue<DataSourceReferenceFactoryService>();
   private final InjectedValue<ContainerPlatformService> containerPlatformServiceInjector = new InjectedValue<ContainerPlatformService>();
+  private final InjectedValue<ContainerJobExecutorService> containerJobExecutorInjector = new InjectedValue<ContainerJobExecutorService>();
   
   public ProcessEngineControllerService(ProcessEngineConfiguration processEngineConfiguration) {
     super(processEngineConfiguration);
@@ -96,6 +97,10 @@ public class ProcessEngineControllerService extends ProcessEngineController impl
     
   public InjectedValue<ContainerPlatformService> getContainerPlatformServiceInjector() {
     return containerPlatformServiceInjector;
+  }
+  
+  public InjectedValue<ContainerJobExecutorService> getContainerJobExecutorInjector() {
+    return containerJobExecutorInjector;
   }
 
 }

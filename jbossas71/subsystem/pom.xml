@@ -48,6 +48,19 @@
       <artifactId>fox-platform-service</artifactId>
     </dependency>
 
+	<dependency>
+	  <groupId>com.camunda.fox.platform</groupId>
+	  <artifactId>fox-platform-jobexecutor-core</artifactId>
+	  <version>${project.version}</version>
+	</dependency>
+	
+	<dependency>
+    	<groupId>org.jboss.as</groupId>
+    	<artifactId>jboss-as-threads</artifactId>
+    	<version>${version.jboss.as}</version>
+    	<scope>provided</scope>
+    </dependency>
+
     <dependency>
       <groupId>com.camunda.fox.engine</groupId>
       <artifactId>fox-engine</artifactId>
