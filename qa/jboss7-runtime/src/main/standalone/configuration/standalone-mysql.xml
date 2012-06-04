@@ -316,7 +316,7 @@
                     	<history-level>audit</history-level>
                     	
                     	<properties>
-					      <!--property name="isAutoSchemaUpdate">true</property-->
+					      <property name="isAutoSchemaUpdate">true</property>
 					      <property name="jobExecutorAcquisitionName">default</property>                    	
                     	</properties>
                     </process-engine>
