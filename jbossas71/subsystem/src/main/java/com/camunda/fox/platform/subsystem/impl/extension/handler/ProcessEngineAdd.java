@@ -52,7 +52,6 @@ import org.jboss.msc.service.ServiceController.Mode;
 import org.jboss.msc.service.ServiceName;
 
 import com.camunda.fox.platform.spi.ProcessEngineConfiguration;
-import com.camunda.fox.platform.subsystem.impl.extension.FoxPlatformParser.Attribute;
 import com.camunda.fox.platform.subsystem.impl.extension.Element;
 import com.camunda.fox.platform.subsystem.impl.platform.ContainerJobExecutorService;
 import com.camunda.fox.platform.subsystem.impl.platform.ContainerPlatformService;

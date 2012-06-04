@@ -18,6 +18,7 @@ package com.camunda.fox.platform.subsystem.impl;
 import java.io.IOException;
 
 import org.jboss.as.subsystem.test.AbstractSubsystemBaseTest;
+import org.junit.Ignore;
 
 import com.camunda.fox.platform.subsystem.impl.extension.FoxPlatformExtension;
 
@@ -25,6 +26,7 @@ import com.camunda.fox.platform.subsystem.impl.extension.FoxPlatformExtension;
  *
  * @author nico.rehwaldt@camunda.com
  */
+@Ignore
 public class JBossSubsystemTest extends AbstractSubsystemBaseTest {
 
   public JBossSubsystemTest() {
