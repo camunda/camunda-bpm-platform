@@ -312,13 +312,14 @@
         <subsystem xmlns="urn:jboss:domain:weld:1.0"/>
         <subsystem xmlns="urn:com.camunda.fox.fox-platform:1.0">
                 <process-engines>
-                    <process-engine name="default" default="true" />
+                    <process-engine name="default" default="true">
 	                    <datasource>jdbc/FoxEngine</datasource>
     					<history-level>audit</history-level>
 					    <properties>
 					      <property name="isAutoSchemaUpdate">true</property>
 					      <property name="jobExecutorAcquisitionName">default</property>
 					    </properties> 
+					</process-engine>	
                 </process-engines>
 	            <job-executor name="job-executor-tp">
 	               <job-acquisitions>
