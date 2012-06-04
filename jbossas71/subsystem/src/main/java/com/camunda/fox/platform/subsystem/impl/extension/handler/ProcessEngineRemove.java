@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.camunda.fox.platform.subsystem.impl.extension;
+package com.camunda.fox.platform.subsystem.impl.extension.handler;
 
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.DESCRIPTION;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OPERATION_NAME;
@@ -37,9 +37,9 @@ import com.camunda.fox.platform.subsystem.impl.platform.ProcessEngineControllerS
  * 
  * @author Daniel Meyer
  */
-public class ProcessEngineRemoveHandler extends AbstractRemoveStepHandler implements DescriptionProvider {
+public class ProcessEngineRemove extends AbstractRemoveStepHandler implements DescriptionProvider {
 
-  public static final ProcessEngineRemoveHandler INSTANCE = new ProcessEngineRemoveHandler();
+  public static final ProcessEngineRemove INSTANCE = new ProcessEngineRemove();
 
   public ModelNode getModelDescription(Locale locale) {
     ModelNode node = new ModelNode();

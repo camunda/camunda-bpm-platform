@@ -15,7 +15,6 @@
  */
 package com.camunda.fox.platform.subsystem.impl.platform;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import com.camunda.fox.platform.spi.ProcessEngineConfiguration;
@@ -36,16 +35,14 @@ public class ProcessEngineConfigurationImpl implements ProcessEngineConfiguratio
                                          String processEngineName,
                                          String dataSourceJndiName,
                                          String historyLevel,
-                                         boolean isAutoSchemaUpdate,
-                                         boolean isActivateJobExecutor) {
+                                         Map<String, Object> properties) {
     this.isDefault = isDefault;
     this.processEngineName = processEngineName;
     this.dataSourceJndiName = dataSourceJndiName;
     this.historyLevel = historyLevel;
+    this.properties = properties;
     
-    properties = new HashMap<String, Object>();
-    properties.put(PROP_IS_ACTIVATE_JOB_EXECUTOR, isActivateJobExecutor);
-    properties.put(PROP_IS_AUTO_SCHEMA_UPDATE, isAutoSchemaUpdate);   
+    initProcessEngineConfigurationDefaultValues();
   }
 
   public boolean isDefault() {
@@ -68,4 +65,20 @@ public class ProcessEngineConfigurationImpl implements ProcessEngineConfiguratio
     return properties;
   }
 
+  private void initProcessEngineConfigurationDefaultValues() {
+    // TODO: populate ProcessEngineConfiguration field via reflection from this map
+    boolean isActivateJobExecutor=true;
+    boolean isAutoUpdateSchema =true;
+    String dbTablePrefix = null;
+    
+    if (properties.get(PROP_IS_ACTIVATE_JOB_EXECUTOR) == null) {
+      properties.put(PROP_IS_ACTIVATE_JOB_EXECUTOR, isActivateJobExecutor);
+    }
+    if (properties.get(PROP_IS_AUTO_SCHEMA_UPDATE) == null) {
+      properties.put(PROP_IS_AUTO_SCHEMA_UPDATE, isAutoUpdateSchema);
+    }
+    if (properties.get(PROP_DB_TABLE_PREFIX) == null) {
+      properties.put(PROP_DB_TABLE_PREFIX, dbTablePrefix);
+    }
+  }
 }

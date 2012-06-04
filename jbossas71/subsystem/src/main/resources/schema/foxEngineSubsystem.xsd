@@ -21,12 +21,12 @@
   
   <xs:complexType name="process-engineType">
     <xs:sequence>
+      <xs:element name="datasource" minOccurs="1" maxOccurs="1" />
+      <xs:element name="history-level" minOccurs="0" maxOccurs="1" />
       <xs:element name="properties" type="propertiesType" minOccurs="0" maxOccurs="1" />
     </xs:sequence>
     <xs:attribute name="name" use="required" />
-    <xs:attribute name="datasource" use="required" />
-    <xs:attribute name="history-level" use="optional" />
-    <xs:attribute name="db-schema-update" use="optional" />
+    <xs:attribute name="default" use="optional" />
   </xs:complexType>
   
   <xs:complexType name="propertiesType">

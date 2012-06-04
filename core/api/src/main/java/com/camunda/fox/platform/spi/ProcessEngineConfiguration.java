@@ -68,5 +68,4 @@ public interface ProcessEngineConfiguration {
    */
   public Map<String, Object> getProperties();
  
-
 }

@@ -15,28 +15,30 @@
  */
 package com.camunda.fox.platform.subsystem.impl.extension;
 
+
 /**
  * Constants used in the model
  * 
  * @author Daniel Meyer
+ * @author christian.lipphardt@camunda.com
  */
 public interface ModelConstants {
   
-  public final static String ELEMENT_PROCESS_ENGINES = "process-engines";
-  public final static String ELEMENT_PROCESS_ENGINE = "process-engine";
-  public final static String ELEMENT_DATASOURCE = "datasource";
-  public final static String ELEMENT_HISTORY_LEVEL = "history-level";
+  // elements
+  public final static String ACQUISITION_STRATEGY = "acquisition-strategy";
+  public final static String DATASOURCE = "datasource";
+  public final static String HISTORY_LEVEL = "history-level";
+  public final static String JOB_ACQUISITION = "job-acquisition";
+  public final static String JOB_ACQUISITIONS = "job-acquisitions";
+  public final static String JOB_EXECUTOR = "job-executor";
+  public final static String PROCESS_ENGINE = "process-engine";
+  public final static String PROCESS_ENGINES = "process-engines";
+  public final static String PROPERTY = "property";
+  public final static String PROPERTIES = "properties";
   
-  public final static String ELEMENT_JOB_EXECUTOR = "job-executor";
-  public final static String ATTR_THREAD_POOL_NAME = "thread-pool-name";
-  public final static String ELEMENT_JOB_ACQUISITIONS = "job-acquisitions";
-  public final static String ELEMENT_JOB_ACQUISITION = "job-acquisition";
-  public final static String ELEMENT_ACQUISITION_STRATEGY = "acquisition-strategy";
+  // attributes
+  public final static String DEFAULT = "default";
+  public final static String NAME = "name";
+  public final static String THREAD_POOL_NAME = "thread-pool-name";
   
-  public final static String ELEMENT_PROPERTIES = "properties";
-  public final static String ELEMENT_PROPERTY = "property";
-  
-  public final static String ATTR_NAME = "name";
-  public final static String ATTR_DEFAULT = "default";
-
 }
