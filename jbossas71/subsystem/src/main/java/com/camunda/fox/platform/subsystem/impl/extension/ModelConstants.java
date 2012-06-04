@@ -24,9 +24,19 @@ public interface ModelConstants {
   
   public final static String ELEMENT_PROCESS_ENGINES = "process-engines";
   public final static String ELEMENT_PROCESS_ENGINE = "process-engine";
+  public final static String ELEMENT_DATASOURCE = "datasource";
+  public final static String ELEMENT_HISTORY_LEVEL = "history-level";
   
-  public final static String ATTR_NAME = "name";    
-  public final static String ATTR_DATASOURCE = "datasource";
-  public final static String ATTR_HISTORY_LEVEL = "history-level";
+  public final static String ELEMENT_JOB_EXECUTOR = "job-executor";
+  public final static String ATTR_THREAD_POOL_NAME = "thread-pool-name";
+  public final static String ELEMENT_JOB_ACQUISITIONS = "job-acquisitions";
+  public final static String ELEMENT_JOB_ACQUISITION = "job-acquisition";
+  public final static String ELEMENT_ACQUISITION_STRATEGY = "acquisition-strategy";
+  
+  public final static String ELEMENT_PROPERTIES = "properties";
+  public final static String ELEMENT_PROPERTY = "property";
+  
+  public final static String ATTR_NAME = "name";
+  public final static String ATTR_DEFAULT = "default";
 
 }

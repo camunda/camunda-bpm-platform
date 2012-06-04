@@ -52,7 +52,7 @@ public class SubsystemAddHandler extends AbstractBoottimeAddStepHandler {
     final ContainerPlatformService containerPlatformService = new ContainerPlatformService();
     
     final ServiceController<ContainerPlatformService> controller = context.getServiceTarget()           
-            .addService(ContainerPlatformService.getServiceName(), containerPlatformService)        
+            .addService(ContainerPlatformService.getServiceName(), containerPlatformService)
             .addListener(verificationHandler)
             .setInitialMode(Mode.ACTIVE)
             .install();

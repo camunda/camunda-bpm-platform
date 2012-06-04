@@ -39,6 +39,7 @@ public class JBossSubsystemTest extends AbstractSubsystemTest {
     System.out.println(subsystemXml);
     
     List<ModelNode> operations = parse(subsystemXml);
+    System.out.println(operations);
   }
   
   @Test

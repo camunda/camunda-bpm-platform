@@ -6,7 +6,7 @@
     <history-level>audit</history-level>
     
     <properties>
-      <property name="isAutoSchemaUpdate">false</property>
+      <!--property name="isAutoSchemaUpdate">false</property-->
       <property name="isActivateJobExecutor">false</property>
     </properties>
     
@@ -18,7 +18,7 @@
     <history-level>audit</history-level>
     
     <properties>
-      <property name="isAutoSchemaUpdate">false</property>
+      <!--property name="isAutoSchemaUpdate">false</property-->
       <property name="isActivateJobExecutor">false</property>
     </properties>
     
