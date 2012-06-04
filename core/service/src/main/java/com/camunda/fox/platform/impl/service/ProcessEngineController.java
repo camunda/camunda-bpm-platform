@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
@@ -29,7 +28,12 @@ import java.util.logging.Logger;
 import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.ProcessEngines;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.activiti.engine.impl.cmd.GetDeploymentProcessDefinitionCmd;
+import org.activiti.engine.impl.context.Context;
+import org.activiti.engine.impl.interceptor.Command;
+import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.jobexecutor.JobExecutor;
+import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.repository.ProcessDefinition;
 
@@ -315,6 +319,41 @@ public class ProcessEngineController {
   public ProcessArchiveContext getProcessArchiveContext(String processDefinitionKey) {
     return installedProcessArchivesByProcessDefinitionKey.get(processDefinitionKey);
   }
+  
+  public ProcessArchive getProcessArchiveByProcessDefinitionId(final String processDefinitionId) {
+    // first try to hit the cache
+    ProcessDefinitionEntity processDefinitionEntity = processEngineConfiguration
+      .getDeploymentCache()
+      .getProcessDefinitionCache()
+      .get(processDefinitionId);
+    if(processDefinitionEntity == null) {
+      // now look for it in the database (will add it to the cache).
+      processDefinitionEntity = processEngineConfiguration
+        .getCommandExecutorTxRequired()
+        .execute(new Command<ProcessDefinitionEntity>() {
+          public ProcessDefinitionEntity execute(CommandContext commandContext) {
+            return commandContext.getProcessDefinitionManager()
+              .findLatestProcessDefinitionById(processDefinitionId);
+            }
+          });
+    }
+    if(processDefinitionEntity == null) {
+      throw new FoxPlatformException("Could not find process definition with id '"+processDefinitionId+"' for process engine '"+processEngineName+"'.");  
+    }    
+    String processDefinitionKey = processDefinitionEntity.getKey();
+    if(processDefinitionKey == null) {
+      throw new FoxPlatformException("Could not find process definition with id '"+processDefinitionId+"' for process engine '"+processEngineName+"'.");
+    }
+    return getProcessArchiveByProcessDefinitionKey(processDefinitionKey);
+  }
+  
+  public ProcessArchive getProcessArchiveByProcessDefinitionKey(String processDefinitionKey) {
+    ProcessArchiveContext processArchiveContext = installedProcessArchivesByProcessDefinitionKey.get(processDefinitionKey);
+    if(processArchiveContext == null) {
+      throw new FoxPlatformException("No process archive installed for key '"+processDefinitionKey+"', on process engine '"+processEngineName+"'.");
+    }
+    return processArchiveContext.getProcessArchive();
+  }
 
   
   // getters/setters //////////////////////////////////////////////
@@ -443,9 +482,8 @@ public class ProcessEngineController {
   // extensions support ////////////////////////////////////////////////////
   
   protected void fireBeforeProcessEngineControllerStart(ProcessEngineController processEngineController) {
-    Iterator<PlatformServiceExtension> loadableExtensions = PlatformServiceExtensionHelper.getLoadableExtensions();
-    while (loadableExtensions.hasNext()) {
-      PlatformServiceExtension platformServiceExtension = (PlatformServiceExtension) loadableExtensions.next();
+    List<PlatformServiceExtension> loadableExtensions = PlatformServiceExtensionHelper.getLoadableExtensions();
+    for (PlatformServiceExtension platformServiceExtension : loadableExtensions) {      
       try {
         platformServiceExtension.beforeProcessEngineControllerStart(processEngineController);
       }catch (Exception e) {
@@ -455,9 +493,8 @@ public class ProcessEngineController {
   }
   
   protected void fireAfterProcessEngineControllerStart(ProcessEngineController processEngineController) {
-    Iterator<PlatformServiceExtension> loadableExtensions = PlatformServiceExtensionHelper.getLoadableExtensions();
-    while (loadableExtensions.hasNext()) {
-      PlatformServiceExtension platformServiceExtension = (PlatformServiceExtension) loadableExtensions.next();
+    List<PlatformServiceExtension> loadableExtensions = PlatformServiceExtensionHelper.getLoadableExtensions();
+    for (PlatformServiceExtension platformServiceExtension : loadableExtensions) {
       try {
         platformServiceExtension.afterProcessEngineControllerStart(processEngineController);
       }catch (Exception e) {
@@ -467,9 +504,9 @@ public class ProcessEngineController {
   }
   
   protected void fireBeforeProcessEngineControllerStop(ProcessEngineController processEngineController) {
-    Iterator<PlatformServiceExtension> loadableExtensions = PlatformServiceExtensionHelper.getLoadableExtensions();
-    while (loadableExtensions.hasNext()) {
-      PlatformServiceExtension platformServiceExtension = (PlatformServiceExtension) loadableExtensions.next();
+    List<PlatformServiceExtension> loadableExtensions = PlatformServiceExtensionHelper.getLoadableExtensions();
+    Collections.reverse(loadableExtensions);
+    for (PlatformServiceExtension platformServiceExtension : loadableExtensions) {
       try {
         platformServiceExtension.beforeProcessEngineControllerStop(processEngineController);
       }catch (Exception e) {
@@ -479,9 +516,9 @@ public class ProcessEngineController {
   }
   
   protected void fireAfterProcessEngineControllerStop(ProcessEngineController processEngineController) {
-    Iterator<PlatformServiceExtension> loadableExtensions = PlatformServiceExtensionHelper.getLoadableExtensions();
-    while (loadableExtensions.hasNext()) {
-      PlatformServiceExtension platformServiceExtension = (PlatformServiceExtension) loadableExtensions.next();
+    List<PlatformServiceExtension> loadableExtensions = PlatformServiceExtensionHelper.getLoadableExtensions();
+    Collections.reverse(loadableExtensions);
+    for (PlatformServiceExtension platformServiceExtension : loadableExtensions) {
       try {
         platformServiceExtension.afterProcessEngineControllerStop(processEngineController);
       }catch (Exception e) {
