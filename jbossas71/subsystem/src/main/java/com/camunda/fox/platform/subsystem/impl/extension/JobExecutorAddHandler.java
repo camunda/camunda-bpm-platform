@@ -18,10 +18,6 @@ package com.camunda.fox.platform.subsystem.impl.extension;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.ADD;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.DESCRIPTION;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OPERATION_NAME;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.REQUEST_PROPERTIES;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.REQUIRED;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.TYPE;
-import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.VALUE_TYPE;
 
 import java.util.List;
 import java.util.Locale;
@@ -34,11 +30,8 @@ import org.jboss.as.controller.ServiceVerificationHandler;
 import org.jboss.as.controller.descriptions.DescriptionProvider;
 import org.jboss.as.controller.descriptions.ModelDescriptionConstants;
 import org.jboss.dmr.ModelNode;
-import org.jboss.dmr.ModelType;
 import org.jboss.msc.service.ServiceController;
 
-import com.camunda.fox.platform.subsystem.impl.extension.FoxPlatformParser.Attribute;
-import com.camunda.fox.platform.subsystem.impl.extension.FoxPlatformParser.Tag;
 import com.camunda.fox.platform.subsystem.impl.platform.ContainerJobExecutorService;
 
 /**

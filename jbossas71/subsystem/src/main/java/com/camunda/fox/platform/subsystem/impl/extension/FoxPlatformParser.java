@@ -248,7 +248,7 @@ public class FoxPlatformParser implements XMLStreamConstants, XMLElementReader<L
   }
 
   private void parseJobExecutor(XMLExtendedStreamReader reader, List<ModelNode> list, ModelNode parentAddress) throws XMLStreamException {
-    if (!Tag.JOB_EXECUTOR.getLocalName().equals(reader.getLocalName())) {
+    if (!Element.JOB_EXECUTOR.getLocalName().equals(reader.getLocalName())) {
       throw unexpectedElement(reader);
     }
     
@@ -271,7 +271,7 @@ public class FoxPlatformParser implements XMLStreamConstants, XMLElementReader<L
     ModelNode addJobExecutor = new ModelNode();
     addJobExecutor.get(OP).set(ModelDescriptionConstants.ADD);
     PathAddress addr = PathAddress.pathAddress(PathElement.pathElement(SUBSYSTEM, FoxPlatformExtension.SUBSYSTEM_NAME),
-    PathElement.pathElement(Tag.JOB_EXECUTOR.getLocalName(), jobExecutorThreadPoolName));
+    PathElement.pathElement(Element.JOB_EXECUTOR.getLocalName(), jobExecutorThreadPoolName));
     addJobExecutor.get(OP_ADDR).set(addr.toModelNode());
 
     list.add(addJobExecutor);
@@ -280,13 +280,13 @@ public class FoxPlatformParser implements XMLStreamConstants, XMLElementReader<L
     while (reader.hasNext()) {
       switch (reader.nextTag()) {
       case END_ELEMENT: {
-        if (Tag.forName(reader.getLocalName()) == Tag.JOB_EXECUTOR) {
+        if (Element.forName(reader.getLocalName()) == Element.JOB_EXECUTOR) {
           // should mean we're done, so ignore it.
           return;
         }
       }
       case START_ELEMENT: {
-        switch (Tag.forName(reader.getLocalName())) {
+        switch (Element.forName(reader.getLocalName())) {
           case JOB_AQUISITIONS: {
             parseJobAcquisitions(reader, list, addJobExecutor);
             break;
@@ -302,7 +302,7 @@ public class FoxPlatformParser implements XMLStreamConstants, XMLElementReader<L
   }
 
   private void parseJobAcquisitions(XMLExtendedStreamReader reader, List<ModelNode> list, ModelNode parentAddress) throws XMLStreamException {
-    if (!Tag.JOB_AQUISITIONS.getLocalName().equals(reader.getLocalName())) {
+    if (!Element.JOB_AQUISITIONS.getLocalName().equals(reader.getLocalName())) {
       throw unexpectedElement(reader);
     }
     
@@ -319,13 +319,13 @@ public class FoxPlatformParser implements XMLStreamConstants, XMLElementReader<L
     while (reader.hasNext()) {
       switch (reader.nextTag()) {
         case END_ELEMENT: {
-          if (Tag.forName(reader.getLocalName()) == Tag.JOB_AQUISITIONS) {
+          if (Element.forName(reader.getLocalName()) == Element.JOB_AQUISITIONS) {
             // should mean we're done, so ignore it.
             return;
           }
         }
         case START_ELEMENT: {
-          switch (Tag.forName(reader.getLocalName())) {
+          switch (Element.forName(reader.getLocalName())) {
             case JOB_AQUISITION: {
               parseJobAcquisition(reader, list, parentAddress);
               break;
@@ -341,7 +341,7 @@ public class FoxPlatformParser implements XMLStreamConstants, XMLElementReader<L
   }
 
   private void parseJobAcquisition(XMLExtendedStreamReader reader, List<ModelNode> list, ModelNode parentAddress) throws XMLStreamException {
-    if (!Tag.JOB_AQUISITION.getLocalName().equals(reader.getLocalName())) {
+    if (!Element.JOB_AQUISITION.getLocalName().equals(reader.getLocalName())) {
       throw unexpectedElement(reader);
     }
 
@@ -364,7 +364,7 @@ public class FoxPlatformParser implements XMLStreamConstants, XMLElementReader<L
     ModelNode addJobAcquisition = new ModelNode();
     addJobAcquisition.get(OP).set(ModelDescriptionConstants.ADD);
     PathAddress addr = PathAddress.pathAddress(PathElement.pathElement(SUBSYSTEM, FoxPlatformExtension.SUBSYSTEM_NAME),
-    PathElement.pathElement(Tag.JOB_AQUISITIONS.getLocalName(), acquisitionName));
+    PathElement.pathElement(Element.JOB_AQUISITIONS.getLocalName(), acquisitionName));
     addJobAcquisition.get(OP_ADDR).set(addr.toModelNode());
 
     list.add(addJobAcquisition);
@@ -373,19 +373,19 @@ public class FoxPlatformParser implements XMLStreamConstants, XMLElementReader<L
     while (reader.hasNext()) {
       switch (reader.nextTag()) {
       case END_ELEMENT: {
-        if (Tag.forName(reader.getLocalName()) == Tag.JOB_AQUISITION) {
+        if (Element.forName(reader.getLocalName()) == Element.JOB_AQUISITION) {
           // should mean we're done, so ignore it.
           return;
         }
       }
       case START_ELEMENT: {
-        switch (Tag.forName(reader.getLocalName())) {
+        switch (Element.forName(reader.getLocalName())) {
         case PROPERTIES: {
           parseProperties(reader, list, addJobAcquisition);
           break;
         }
-        case JOB_ACQUISITION_STRATEGY: {
-          parseElement(Tag.JOB_ACQUISITION_STRATEGY, reader, addJobAcquisition);
+        case ACQUISITION_STRATEGY: {
+          parseElement(Element.ACQUISITION_STRATEGY, reader, addJobAcquisition);
           break;
         }
         default: {
