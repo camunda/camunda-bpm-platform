@@ -22,7 +22,7 @@ import com.camunda.fox.platform.subsystem.impl.platform.ContainerPlatformService
 
 
 /**
- * used by the {@link ContainerProcessEngineService} to create the jndi bindings
+ * Used by the {@link ContainerProcessEngineService} to create the jndi bindings
  * 
  * @author Daniel Meyer
  */

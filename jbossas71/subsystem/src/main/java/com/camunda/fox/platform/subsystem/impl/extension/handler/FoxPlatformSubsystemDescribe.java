@@ -1,6 +1,21 @@
+/**
+ * Copyright (C) 2011, 2012 camunda services GmbH
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.camunda.fox.platform.subsystem.impl.extension.handler;
 
-import static com.camunda.fox.platform.subsystem.impl.extension.ModelConstants.PROCESS_ENGINES;
+import static com.camunda.fox.platform.subsystem.impl.extension.ModelConstants.*;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.ADD;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OP;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OP_ADDR;
@@ -27,13 +42,14 @@ public class FoxPlatformSubsystemDescribe implements OperationStepHandler, Descr
 
   public static final FoxPlatformSubsystemDescribe INSTANCE = new FoxPlatformSubsystemDescribe();
 
+  /** {@inheritDoc} */
   @Override
   public ModelNode getModelDescription(Locale locale) {
     return CommonDescriptions.getSubsystemDescribeOperation(locale);
   }
 
-  @Override
   /** {@inheritDoc} */
+  @Override
   public void execute(OperationContext context, ModelNode operation) throws OperationFailedException {
     final Resource resource = context.readResource(PathAddress.EMPTY_ADDRESS);
     final ModelNode subModel = Resource.Tools.readModel(resource);
@@ -61,17 +77,20 @@ public class FoxPlatformSubsystemDescribe implements OperationStepHandler, Descr
     context.completeStep();
   }
 
-  private void addProcessEngine(ModelNode propertyValue, ModelNode processEngineAdd, PathAddress processEngineAddress, ModelNode result) {
-//    processEngineAdd.get(NAME).set(propertyValue.getValue().get(NAME).asString());
-//    if (propertyValue.getValue().hasDefined(DEFAULT)) {
-//      processEngineAdd.get(DEFAULT).set(propertyValue.getValue().get(DEFAULT).asString());
-//    }
-//    if (propertyValue.getValue().hasDefined(DATASOURCE)) {
-//      processEngineAdd.get(DATASOURCE).set(propertyValue.getValue().get(DATASOURCE).asString());
-//    }
-//    if (propertyValue.getValue().hasDefined(HISTORY_LEVEL)) {
-//      processEngineAdd.get(HISTORY_LEVEL).set(propertyValue.getValue().get(HISTORY_LEVEL).asString());
-//    }
+  private void addProcessEngine(ModelNode property, ModelNode processEngineAdd, PathAddress processEngineAddress, ModelNode result) {
+    processEngineAdd.get(NAME).set(property.get(NAME).asString());
+    if (property.hasDefined(DATASOURCE)) {
+      processEngineAdd.get(DATASOURCE).set(property.get(DATASOURCE).asString());
+    }
+    if (property.hasDefined(DEFAULT)) {
+      processEngineAdd.get(DEFAULT).set(property.get(DEFAULT).asBoolean());
+    }
+    if (property.hasDefined(HISTORY_LEVEL)) {
+      processEngineAdd.get(HISTORY_LEVEL).set(property.get(HISTORY_LEVEL).asString());
+    }
+    if (property.hasDefined(PROPERTIES)) {
+      processEngineAdd.get(PROPERTIES).set(property.get(PROPERTIES).asList());
+    }
     
     result.add(processEngineAdd);
   }

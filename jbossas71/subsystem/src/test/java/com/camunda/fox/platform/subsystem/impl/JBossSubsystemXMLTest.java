@@ -22,7 +22,6 @@ import junit.framework.Assert;
 import org.jboss.as.subsystem.test.AbstractSubsystemTest;
 import org.jboss.as.subsystem.test.KernelServices;
 import org.jboss.dmr.ModelNode;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import com.camunda.fox.platform.FoxPlatformException;
@@ -37,7 +36,7 @@ public class JBossSubsystemXMLTest extends AbstractSubsystemTest {
 
   public static final String SUBSYSTEM_WITH_ENGINES = "subsystemWithEngines.xml";
   public static final String SUBSYSTEM_WITH_PROCESS_ENGINES_ELEMENT_ONLY = "subsystemWithProcessEnginesElementOnly.xml";
-  public static final String SUBSYSTEM_WITH_ENGINES_AND_PROPERTIES = "subsystemWithEnginesandProperties.xml";
+  public static final String SUBSYSTEM_WITH_ENGINES_AND_PROPERTIES = "subsystemWithEnginesAndProperties.xml";
   public static final String SUBSYSTEM_WITH_DUPLICATE_ENGINE_NAMES = "subsystemWithDuplicateEngineNames.xml";
 
   public JBossSubsystemXMLTest() {
@@ -109,7 +108,7 @@ public class JBossSubsystemXMLTest extends AbstractSubsystemTest {
       installInController(subsystemXml);
 //    services.getContainer().dumpServices();
     } catch (FoxPlatformException fpe) {
-      Assert.assertTrue("", fpe.getMessage().contains("A process engine with name '__test' already exists."));
+      Assert.assertTrue("Duplicate process engine detected!", fpe.getMessage().contains("A process engine with name '__test' already exists."));
     }
   }
 }

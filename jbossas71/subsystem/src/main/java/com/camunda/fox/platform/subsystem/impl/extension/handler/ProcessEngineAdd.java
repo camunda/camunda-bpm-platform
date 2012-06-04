@@ -157,7 +157,6 @@ public class ProcessEngineAdd extends AbstractAddStepHandler implements Descript
   }
 
   private ProcessEngineConfiguration transformConfiguration(final OperationContext context, String engineName, final ModelNode model) {
-    
     String datasourceJndiName = model.get(DATASOURCE).asString();   
     String historyLevel = model.get(HISTORY_LEVEL).asString();
     boolean isDefault = model.get(DEFAULT).asBoolean();
@@ -183,9 +182,6 @@ public class ProcessEngineAdd extends AbstractAddStepHandler implements Descript
     
     ProcessEngineConfiguration processEngineConfiguration = 
             new ProcessEngineConfigurationImpl(isDefault, engineName, datasourceJndiName, historyLevel, properties);
-    if (!properties.isEmpty()) {
-      processEngineConfiguration.getProperties().putAll(properties);
-    }
     
     return processEngineConfiguration;
   }
