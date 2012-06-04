@@ -1,5 +1,6 @@
 package com.camunda.fox.platform.subsystem.impl.extension;
 
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.ADD;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OP;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OP_ADDR;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.SUBSYSTEM;
@@ -11,9 +12,7 @@ import static org.jboss.as.controller.parsing.ParseUtils.unexpectedAttribute;
 import static org.jboss.as.controller.parsing.ParseUtils.unexpectedElement;
 
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
@@ -22,6 +21,7 @@ import javax.xml.stream.XMLStreamReader;
 import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.PathElement;
 import org.jboss.as.controller.descriptions.ModelDescriptionConstants;
+import org.jboss.as.controller.parsing.ParseUtils;
 import org.jboss.as.controller.persistence.SubsystemMarshallingContext;
 import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.Property;
@@ -30,6 +30,8 @@ import org.jboss.staxmapper.XMLElementWriter;
 import org.jboss.staxmapper.XMLExtendedStreamReader;
 import org.jboss.staxmapper.XMLExtendedStreamWriter;
 
+import com.camunda.fox.platform.FoxPlatformException;
+
 
 public class FoxPlatformParser implements XMLStreamConstants, XMLElementReader<List<ModelNode>>, XMLElementWriter<SubsystemMarshallingContext> {
   
@@ -37,18 +39,23 @@ public class FoxPlatformParser implements XMLStreamConstants, XMLElementReader<L
   @Override
   public void readElement(XMLExtendedStreamReader reader, List<ModelNode> list) throws XMLStreamException {
     // Require no attributes
-//    ParseUtils.requireNoAttributes(reader);
+    ParseUtils.requireNoAttributes(reader);
 
     //Add the main subsystem 'add' operation
-    ModelNode subsystemAddress = FoxPlatformExtension.createAddSubsystemOperation();
-    list.add(subsystemAddress);
-
+    final ModelNode subsystemAddress = new ModelNode();
+    subsystemAddress.add(SUBSYSTEM, FoxPlatformExtension.SUBSYSTEM_NAME);
+    subsystemAddress.protect();
+    
+    final ModelNode subsystemAdd = new ModelNode();
+    subsystemAdd.get(OP).set(ADD);
+    subsystemAdd.get(OP_ADDR).set(subsystemAddress);
+    list.add(subsystemAdd);
+    
     int iterate;
     try {
       iterate = reader.nextTag();
     } catch (XMLStreamException e) {
-      // founding a non tag..go on. Normally non-tag found at beginning are
-      // comments or DTD declaration
+      // founding a non tag..go on. Normally non-tag found at beginning are comments or DTD declaration
       iterate = reader.nextTag();
     }
 
@@ -58,7 +65,7 @@ public class FoxPlatformParser implements XMLStreamConstants, XMLElementReader<L
         break;
       }
       case START_ELEMENT: {
-        switch (Tag.forName(reader.getLocalName())) {
+        switch (Element.forName(reader.getLocalName())) {
           case PROCESS_ENGINES: {
             parseProcessEngines(reader, list, subsystemAddress);
             break;
@@ -80,30 +87,20 @@ public class FoxPlatformParser implements XMLStreamConstants, XMLElementReader<L
   }
 
   private void parseProcessEngines(XMLExtendedStreamReader reader, List<ModelNode> list, ModelNode parentAddress) throws XMLStreamException {
-    if (!Tag.PROCESS_ENGINES.getLocalName().equals(reader.getLocalName())) {
+    if (!Element.PROCESS_ENGINES.getLocalName().equals(reader.getLocalName())) {
       throw unexpectedElement(reader);
     }
-    
-//    ModelNode processEngines = new ModelNode();
-//    processEngines.get(OP).set(ModelDescriptionConstants.ADD);
-//    PathAddress addr = PathAddress.pathAddress(
-//            PathElement.pathElement(SUBSYSTEM, FoxPlatformExtension.SUBSYSTEM_NAME),
-//            PathElement.pathElement(Tag.PROCESS_ENGINES.getLocalName())); 
-//    processEngines.get(OP_ADDR).set(addr.toModelNode());
-//    
-//    list.add(processEngines);
-    
     
     while (reader.hasNext()) {
       switch (reader.nextTag()) {
         case END_ELEMENT: {
-          if (Tag.forName(reader.getLocalName()) == Tag.PROCESS_ENGINES) {
+          if (Element.forName(reader.getLocalName()) == Element.PROCESS_ENGINES) {
             // should mean we're done, so ignore it.
             return;
           }
         }
         case START_ELEMENT: {
-          switch (Tag.forName(reader.getLocalName())) {
+          switch (Element.forName(reader.getLocalName())) {
             case PROCESS_ENGINE: {
               parseProcessEngine(reader, list, parentAddress);
               break;
@@ -119,7 +116,7 @@ public class FoxPlatformParser implements XMLStreamConstants, XMLElementReader<L
   }
   
   private void parseProcessEngine(XMLExtendedStreamReader reader, List<ModelNode> list, ModelNode parentAddress) throws XMLStreamException {
-    if (!Tag.PROCESS_ENGINE.getLocalName().equals(reader.getLocalName())) {
+    if (!Element.PROCESS_ENGINE.getLocalName().equals(reader.getLocalName())) {
         throw unexpectedElement(reader);
     }
     
@@ -146,13 +143,16 @@ public class FoxPlatformParser implements XMLStreamConstants, XMLElementReader<L
     addProcessEngine.get(OP).set(ModelDescriptionConstants.ADD);
     PathAddress addr = PathAddress.pathAddress(
             PathElement.pathElement(SUBSYSTEM, FoxPlatformExtension.SUBSYSTEM_NAME),
-//            PathElement.pathElement(Tag.PROCESS_ENGINES.getLocalName()),
-            PathElement.pathElement(Tag.PROCESS_ENGINE.getLocalName(), engineName));
+            PathElement.pathElement(Element.PROCESS_ENGINES.getLocalName(), engineName));
     addProcessEngine.get(OP_ADDR).set(addr.toModelNode());
  
+    addProcessEngine.get(Attribute.NAME.getLocalName()).set(engineName);
+    
     if(isDefault != null) {
       addProcessEngine.get(Attribute.DEFAULT.getLocalName()).set(isDefault);
     }
+    
+    checkIfProcessNameWithNameExists(list, engineName);
     
     list.add(addProcessEngine);
     
@@ -160,23 +160,23 @@ public class FoxPlatformParser implements XMLStreamConstants, XMLElementReader<L
     while (reader.hasNext()) {
       switch (reader.nextTag()) {
         case END_ELEMENT: {
-          if (Tag.forName(reader.getLocalName()) == Tag.PROCESS_ENGINE) {
+          if (Element.forName(reader.getLocalName()) == Element.PROCESS_ENGINE) {
             // should mean we're done, so ignore it.
             return;
           }
         }
         case START_ELEMENT: {
-          switch (Tag.forName(reader.getLocalName())) {
+          switch (Element.forName(reader.getLocalName())) {
             case PROPERTIES: {
               parseProperties(reader, list, addProcessEngine);
               break;
             }
             case DATASOURCE: {
-              parseElement(Tag.DATASOURCE, reader, addProcessEngine);
+              parseElement(Element.DATASOURCE, reader, addProcessEngine);
               break;
             }
             case HISTORY_LEVEL: {
-              parseElement(Tag.HISTORY_LEVEL, reader, addProcessEngine);
+              parseElement(Element.HISTORY_LEVEL, reader, addProcessEngine);
               break;
             }
             default: {
@@ -189,8 +189,19 @@ public class FoxPlatformParser implements XMLStreamConstants, XMLElementReader<L
     }
   }
   
+  private void checkIfProcessNameWithNameExists(List<ModelNode> list, String engineName) {
+    for (ModelNode modelNode : list) {
+      if (modelNode.hasDefined(Attribute.NAME.getLocalName())) {
+        String existingEngineName = modelNode.get(Attribute.NAME.getLocalName()).asString();
+        if ((existingEngineName.equalsIgnoreCase(engineName))) {
+          throw new FoxPlatformException("A process engine with name '" + engineName + "' already exists. Please chose another name.");
+        }
+      }
+    }
+  }
+
   private void parseProperties(XMLExtendedStreamReader reader, List<ModelNode> list, ModelNode parentAddress) throws XMLStreamException {
-    if (!Tag.PROPERTIES.getLocalName().equals(reader.getLocalName())) {
+    if (!Element.PROPERTIES.getLocalName().equals(reader.getLocalName())) {
       throw unexpectedElement(reader);
     }
     
@@ -201,14 +212,14 @@ public class FoxPlatformParser implements XMLStreamConstants, XMLElementReader<L
     while (reader.hasNext()) {
       switch (reader.nextTag()) {
         case END_ELEMENT: {
-          if (Tag.forName(reader.getLocalName()) == Tag.PROPERTIES) {
+          if (Element.forName(reader.getLocalName()) == Element.PROPERTIES) {
             // should mean we're done, so ignore it.
-            parentAddress.get(Tag.PROPERTIES.getLocalName()).set(properties);
+            parentAddress.get(Element.PROPERTIES.getLocalName()).set(properties);
             return;
           }
         }
         case START_ELEMENT: {
-          switch (Tag.forName(reader.getLocalName())) {
+          switch (Element.forName(reader.getLocalName())) {
             case PROPERTY: {
               parseProperty(reader, list, properties);
               break;
@@ -232,7 +243,7 @@ public class FoxPlatformParser implements XMLStreamConstants, XMLElementReader<L
       throw missingRequired(reader, Collections.singleton(Attribute.NAME));
     }
 
-    parentAddress.add(name, value);
+    parentAddress.get(name).set(value);
   }
 
   private void parseJobExecutor(XMLExtendedStreamReader reader, List<ModelNode> list) throws XMLStreamException {
@@ -247,8 +258,8 @@ public class FoxPlatformParser implements XMLStreamConstants, XMLElementReader<L
     // TODO: implement
   }
   
-  private void parseElement(Tag element, XMLExtendedStreamReader reader, ModelNode parentAddress) throws XMLStreamException {
-    if (!element.equals(Tag.forName(reader.getLocalName()))) {
+  private void parseElement(Element element, XMLExtendedStreamReader reader, ModelNode parentAddress) throws XMLStreamException {
+    if (!element.equals(Element.forName(reader.getLocalName()))) {
       throw unexpectedElement(reader);
     }
     
@@ -261,27 +272,27 @@ public class FoxPlatformParser implements XMLStreamConstants, XMLElementReader<L
 
     context.startSubsystemElement(FoxPlatformExtension.NAMESPACE, false);
 
-    writer.writeStartElement(Tag.PROCESS_ENGINES.getLocalName());
+    writer.writeStartElement(Element.PROCESS_ENGINES.getLocalName());
 
     ModelNode node = context.getModelNode();
-    ModelNode processEngine = node.get(Tag.PROCESS_ENGINE.getLocalName());
-    for (Property property : processEngine.asPropertyList()) {
-
-      // write each child element to xml
-      writer.writeStartElement(Tag.PROCESS_ENGINE.getLocalName());
-      
-      writer.writeAttribute(Attribute.NAME.getLocalName(), property.getName());
-      ModelNode entry = property.getValue();
-      writeAttribute(Attribute.DEFAULT, writer, entry);
-      writeElement(Tag.DATASOURCE, writer, entry);
-      writeElement(Tag.HISTORY_LEVEL, writer, entry);
-
-      writeProperties(writer, entry);
-
-      writer.writeEndElement();
+    
+    ModelNode processEngineConfigurations = node.get(Element.PROCESS_ENGINES.getLocalName());
+    if (processEngineConfigurations.isDefined()) {
+      for (Property property : processEngineConfigurations.asPropertyList()) {
+        // write each child element to xml
+        writer.writeStartElement(Element.PROCESS_ENGINE.getLocalName());
+        
+        writer.writeAttribute(Attribute.NAME.getLocalName(), property.getName());
+        ModelNode entry = property.getValue();
+        writeAttribute(Attribute.DEFAULT, writer, entry);
+        writeElement(Element.DATASOURCE, writer, entry);
+        writeElement(Element.HISTORY_LEVEL, writer, entry);
+  
+        writeProperties(writer, entry);
+  
+        writer.writeEndElement();
+      }
     }
-    // end process-engine
-    writer.writeEndElement();
     // end process-engines
     writer.writeEndElement();
   }
@@ -292,7 +303,7 @@ public class FoxPlatformParser implements XMLStreamConstants, XMLElementReader<L
     }
   }
 
-  private void writeElement(Tag element, final XMLExtendedStreamWriter writer, ModelNode entry) throws XMLStreamException {
+  private void writeElement(Element element, final XMLExtendedStreamWriter writer, ModelNode entry) throws XMLStreamException {
     if (entry.hasDefined(element.getLocalName())) {
       writer.writeStartElement(element.getLocalName());
       writer.writeCharacters(entry.get(element.getLocalName()).asString());
@@ -301,13 +312,13 @@ public class FoxPlatformParser implements XMLStreamConstants, XMLElementReader<L
   }
   
   private void writeProperties(final XMLExtendedStreamWriter writer, ModelNode entry) throws XMLStreamException {
-    if (entry.hasDefined(Tag.PROPERTIES.getLocalName())) {
-      writer.writeStartElement(Tag.PROPERTIES.getLocalName());
+    if (entry.hasDefined(Element.PROPERTIES.getLocalName())) {
+      writer.writeStartElement(Element.PROPERTIES.getLocalName());
       
-      List<Property> propertyList = entry.get(Tag.PROPERTIES.getLocalName()).asPropertyList();
+      List<Property> propertyList = entry.get(Element.PROPERTIES.getLocalName()).asPropertyList();
       if (!propertyList.isEmpty()) {
         for (Property property : propertyList) {
-          writer.writeStartElement(Tag.PROPERTY.getLocalName());
+          writer.writeStartElement(Element.PROPERTY.getLocalName());
           writer.writeAttribute(Attribute.NAME.getLocalName(), property.getName());
           writer.writeCharacters(property.getValue().asString());
           writer.writeEndElement();
@@ -342,166 +353,5 @@ public class FoxPlatformParser implements XMLStreamConstants, XMLElementReader<L
     String attributeString = 
             reader.getAttributeValue("", attributeName) == null ? null : reader.getAttributeValue("", attributeName).trim();
     return attributeString;
-  }
-  
-  /**
-   * A Tag.
-   *
-   * @author <a href="stefano.maestri@jboss.com">Stefano Maestri</a>
-   */
-  public enum Tag {
-      /**
-       * always first
-       */
-      UNKNOWN(null),
-
-      /**
-       * Parent tag for process-engines
-       */
-      PROCESS_ENGINES("process-engines"),
-      
-      /**
-       * Tag for single process-engine
-       */
-      PROCESS_ENGINE("process-engine"),
-      
-      /**
-       * Datasource for process-engine
-       */
-      DATASOURCE("datasource"),
-      
-      /**
-       * History level for process-engine
-       */
-      HISTORY_LEVEL("history-level"),
-      
-      /**
-       * Parent tag for job-acquisitions
-       */
-      JOB_EXECUTOR("job-executor"),
-      
-      /**
-       * Parent tag for job-acquisition
-       */
-      JOB_AQUISITIONS("job-acquisitions"),
-      
-      /**
-       * Tag for single job-acquisition
-       */
-      JOB_AQUISITION("job-acquisition"),
-      
-      /**
-       * Parent tag for property
-       */
-      PROPERTIES("properties"),
-      
-      /**
-       * Tag for specify any property
-       */
-      PROPERTY("property");
-
-      private final String name;
-
-      /**
-       * Create a new Tag.
-       *
-       * @param name a name
-       */
-      Tag(final String name) {
-          this.name = name;
-      }
-
-      /**
-       * Get the local name of this element.
-       *
-       * @return the local name
-       */
-      public String getLocalName() {
-          return name;
-      }
-
-      private static final Map<String, Tag> MAP;
-
-      static {
-          final Map<String, Tag> map = new HashMap<String, Tag>();
-          for (Tag element : values()) {
-              final String name = element.getLocalName();
-              if (name != null)
-                  map.put(name, element);
-          }
-          MAP = map;
-      }
-
-      /**
-       * Static method to get enum instance given localName string
-       *
-       * @param localName a string used as localname (typically tag name as defined in xsd)
-       * @return the enum instance
-       */
-      public static Tag forName(String localName) {
-          final Tag element = MAP.get(localName);
-          return element == null ? UNKNOWN : element;
-      }
-
-  }
-  
-  /**
-   * An attribute.
-   *
-   * @author <a href="stefano.maestri@jboss.com">Stefano Maestri</a>
-   */
-  public enum Attribute {
-      /**
-       * always first
-       */
-      UNKNOWN(null),
-
-      NAME("name"),
-      
-      DEFAULT("default");
-      
-      private final String name;
-
-      /**
-       * Create a new attribute.
-       *
-       * @param name a name
-       */
-      Attribute(final String name) {
-          this.name = name;
-      }
-
-      /**
-       * Get the local name of this attribute.
-       *
-       * @return the local name
-       */
-      public String getLocalName() {
-          return name;
-      }
-
-      private static final Map<String, Attribute> MAP;
-
-      static {
-          final Map<String, Attribute> map = new HashMap<String, Attribute>();
-          for (Attribute attribute : values()) {
-              final String name = attribute.getLocalName();
-              if (name != null)
-                  map.put(name, attribute);
-          }
-          MAP = map;
-      }
-
-      /**
-       * Static method to get enum instance given localName string
-       *
-       * @param localName a string used as localname (typically attribute name as defined in xsd)
-       * @return the enum instance
-       */
-      public static Attribute forName(String localName) {
-          final Attribute attribute = MAP.get(localName);
-          return attribute == null ? UNKNOWN : attribute;
-      }
-
   }
 }
