@@ -28,6 +28,7 @@ import org.jboss.as.controller.registry.OperationEntry;
 
 import com.camunda.fox.platform.subsystem.impl.extension.handler.FoxPlatformSubsystemDescribe;
 import com.camunda.fox.platform.subsystem.impl.extension.resource.FoxPlatformSubsystemRootResourceDefinition;
+import com.camunda.fox.platform.subsystem.impl.extension.resource.JobAcquisitionResourceDefinition;
 import com.camunda.fox.platform.subsystem.impl.extension.resource.JobExecutorResourceDefinition;
 import com.camunda.fox.platform.subsystem.impl.extension.resource.ProcessEnginesResourceDefinition;
 
@@ -63,6 +64,9 @@ public class FoxPlatformExtension implements Extension {
     
     // Job executor
     final ManagementResourceRegistration jobExecutorRegistration = rootRegistration.registerSubModel(new JobExecutorResourceDefinition());
+    
+    //Job acquisition
+    final ManagementResourceRegistration jobAcquisitionRegistration = jobExecutorRegistration.registerSubModel(new JobAcquisitionResourceDefinition());
     
     // THINK: here we could add handlers for additional read-write attributes. They would react to a change in the model. 
     // A process engine is mostly read only. However, I could imagine values like the locktime of the jobexecutor to be configurable here.

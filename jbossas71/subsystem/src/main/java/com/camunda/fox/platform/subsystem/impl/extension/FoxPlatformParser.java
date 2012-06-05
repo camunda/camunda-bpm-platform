@@ -25,6 +25,7 @@ import static org.jboss.as.controller.parsing.ParseUtils.requireNoAttributes;
 import static org.jboss.as.controller.parsing.ParseUtils.requireSingleAttribute;
 import static org.jboss.as.controller.parsing.ParseUtils.unexpectedAttribute;
 import static org.jboss.as.controller.parsing.ParseUtils.unexpectedElement;
+import static com.camunda.fox.platform.subsystem.impl.extension.ModelConstants.NAME;
 
 import java.util.Collections;
 import java.util.List;
@@ -66,21 +67,9 @@ public class FoxPlatformParser implements XMLStreamConstants, XMLElementReader<L
     subsystemAdd.get(OP_ADDR).set(subsystemAddress);
     list.add(subsystemAdd);
     
-    int iterate;
-    try {
-      iterate = reader.nextTag();
-    } catch (XMLStreamException e) {
-      // founding a non tag..go on. Normally non-tag found at beginning are comments or DTD declaration
-      iterate = reader.nextTag();
-    }
-
-    switch (iterate) {
-      case END_ELEMENT: {
-        // should mean we're done, so ignore it.
-        break;
-      }
-      case START_ELEMENT: {
-        switch (Element.forName(reader.getLocalName())) {
+    while (reader.hasNext() && reader.nextTag() != END_ELEMENT) {
+    final Element element = Element.forName(reader.getLocalName());
+    switch (element) {
           case PROCESS_ENGINES: {
             parseProcessEngines(reader, list, subsystemAddress);
             break;
@@ -93,12 +82,6 @@ public class FoxPlatformParser implements XMLStreamConstants, XMLElementReader<L
             throw unexpectedElement(reader);
           }
         }
-  
-        break;
-      }
-      default: {
-        throw new IllegalStateException();
-      }
     }
   }
 
@@ -215,7 +198,7 @@ public class FoxPlatformParser implements XMLStreamConstants, XMLElementReader<L
       }
     }
   }
-
+  
   private void parseProperties(XMLExtendedStreamReader reader, List<ModelNode> list, ModelNode parentAddress) throws XMLStreamException {
     if (!Element.PROPERTIES.getLocalName().equals(reader.getLocalName())) {
       throw unexpectedElement(reader);
@@ -285,10 +268,13 @@ public class FoxPlatformParser implements XMLStreamConstants, XMLElementReader<L
     // Add the 'add' operation for each 'job-executor' child
     ModelNode addJobExecutor = new ModelNode();
     addJobExecutor.get(OP).set(ModelDescriptionConstants.ADD);
-    PathAddress addr = PathAddress.pathAddress(PathElement.pathElement(SUBSYSTEM, FoxPlatformExtension.SUBSYSTEM_NAME),
-    PathElement.pathElement(Element.JOB_EXECUTOR.getLocalName(), jobExecutorThreadPoolName));
+    PathAddress addr = PathAddress.pathAddress(
+              PathElement.pathElement(SUBSYSTEM, FoxPlatformExtension.SUBSYSTEM_NAME),
+              PathElement.pathElement(Element.JOB_EXECUTOR.getLocalName(), jobExecutorThreadPoolName));
     addJobExecutor.get(OP_ADDR).set(addr.toModelNode());
-
+    
+    addJobExecutor.get(Attribute.NAME.getLocalName()).set(jobExecutorThreadPoolName);
+    
     list.add(addJobExecutor);
   
     // iterate deeper
@@ -370,6 +356,7 @@ public class FoxPlatformParser implements XMLStreamConstants, XMLElementReader<L
     addJobAcquisition.get(OP).set(ModelDescriptionConstants.ADD);
     PathAddress addr = PathAddress.pathAddress(
             PathElement.pathElement(SUBSYSTEM, FoxPlatformExtension.SUBSYSTEM_NAME),
+            PathElement.pathElement(Element.JOB_EXECUTOR.getLocalName(), parentAddress.get(NAME).asString()),
             PathElement.pathElement(Element.JOB_AQUISITIONS.getLocalName(), acquisitionName));
     addJobAcquisition.get(OP_ADDR).set(addr.toModelNode());
     

@@ -74,6 +74,26 @@ public class FoxPlatformSubsystemDescribe implements OperationStepHandler, Descr
       }
     }
     
+    if (subModel.hasDefined(JOB_EXECUTOR)) {
+      for (Property property : subModel.get(JOB_EXECUTOR).asPropertyList()) {
+        ModelNode jobExecutorAdd = new ModelNode();
+        jobExecutorAdd.get(OP).set(ADD);
+        PathAddress jobExecutorAddress = rootAddress.append(PathElement.pathElement(JOB_EXECUTOR, property.getName()));
+        jobExecutorAdd.get(OP_ADDR).set(jobExecutorAddress.toModelNode());
+        addJobExecutor(property.getValue(), jobExecutorAdd, jobExecutorAddress, result);
+      }
+    }
+    
+    if (subModel.hasDefined(JOB_ACQUISITIONS)) {
+      for (Property property : subModel.get(JOB_ACQUISITIONS).asPropertyList()) {
+        ModelNode jobAcquisitionAdd = new ModelNode();
+        jobAcquisitionAdd.get(OP).set(ADD);
+        PathAddress jobAcquisitionAddress = rootAddress.append(PathElement.pathElement(JOB_ACQUISITIONS, property.getName()));
+        jobAcquisitionAdd.get(OP_ADDR).set(jobAcquisitionAddress.toModelNode());
+        addJobAcquisition(property.getValue(), jobAcquisitionAdd, jobAcquisitionAddress, result);
+      }
+    }
+    
     context.completeStep();
   }
 
@@ -93,6 +113,24 @@ public class FoxPlatformSubsystemDescribe implements OperationStepHandler, Descr
     }
     
     result.add(processEngineAdd);
+  }
+  
+  private void addJobExecutor(ModelNode property, ModelNode jobExecutorAdd, PathAddress jobExecutorAddress, ModelNode result) {
+    jobExecutorAdd.get(NAME).set(property.get(NAME).asString());
+    
+    result.add(jobExecutorAdd);
+  }
+  
+  private void addJobAcquisition(ModelNode property, ModelNode jobAcquisitionAdd, PathAddress jobAcquisitionAddress, ModelNode result) {
+    jobAcquisitionAdd.get(NAME).set(property.get(NAME).asString());
+    if (property.hasDefined(ACQUISITION_STRATEGY)) {
+      jobAcquisitionAdd.get(ACQUISITION_STRATEGY).set(property.get(ACQUISITION_STRATEGY).asString());
+    }
+    if (property.hasDefined(PROPERTIES)) {
+      jobAcquisitionAdd.get(PROPERTIES).set(property.get(PROPERTIES).asList());
+    }
+    
+    result.add(jobAcquisitionAdd);
   }
   
 }

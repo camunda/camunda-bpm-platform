@@ -15,14 +15,19 @@
  */
 package com.camunda.fox.platform.subsystem.impl.extension.handler;
 
+import static com.camunda.fox.platform.subsystem.impl.extension.ModelConstants.NAME;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.ADD;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.DESCRIPTION;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OPERATION_NAME;
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.REQUEST_PROPERTIES;
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.REQUIRED;
+import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.TYPE;
 
 import java.util.List;
 import java.util.Locale;
 
 import org.jboss.as.controller.AbstractAddStepHandler;
+import org.jboss.as.controller.AbstractBoottimeAddStepHandler;
 import org.jboss.as.controller.OperationContext;
 import org.jboss.as.controller.OperationFailedException;
 import org.jboss.as.controller.PathAddress;
@@ -30,6 +35,7 @@ import org.jboss.as.controller.ServiceVerificationHandler;
 import org.jboss.as.controller.descriptions.DescriptionProvider;
 import org.jboss.as.controller.descriptions.ModelDescriptionConstants;
 import org.jboss.dmr.ModelNode;
+import org.jboss.dmr.ModelType;
 import org.jboss.msc.service.ServiceController;
 
 import com.camunda.fox.platform.subsystem.impl.platform.ContainerJobExecutorService;
@@ -38,7 +44,7 @@ import com.camunda.fox.platform.subsystem.impl.platform.ContainerJobExecutorServ
  * Provides the description and the implementation of the process-engine#add operation.
  * 
  */
-public class JobExecutorAdd extends AbstractAddStepHandler implements DescriptionProvider {
+public class JobExecutorAdd extends AbstractBoottimeAddStepHandler implements DescriptionProvider {
     
   public static final JobExecutorAdd INSTANCE = new JobExecutorAdd();
 
@@ -47,56 +53,26 @@ public class JobExecutorAdd extends AbstractAddStepHandler implements Descriptio
     node.get(DESCRIPTION).set("Adds a job executor");
     node.get(OPERATION_NAME).set(ADD);
     
-//    node.get(REQUEST_PROPERTIES, Attribute.NAME.getLocalName(), DESCRIPTION).set("Should it be the default engine");
-//    node.get(REQUEST_PROPERTIES, Attribute.DEFAULT.getLocalName(), TYPE).set(ModelType.BOOLEAN);
-//    node.get(REQUEST_PROPERTIES, Attribute.DEFAULT.getLocalName(), REQUIRED).set(false);
-//    
-//    node.get(REQUEST_PROPERTIES, Tag.DATASOURCE.getLocalName(), DESCRIPTION).set("Which datasource to use");
-//    node.get(REQUEST_PROPERTIES, Tag.DATASOURCE.getLocalName(), TYPE).set(ModelType.STRING);
-//    node.get(REQUEST_PROPERTIES, Tag.DATASOURCE.getLocalName(), REQUIRED).set(true);
-//    
-//    node.get(REQUEST_PROPERTIES, Tag.HISTORY_LEVEL.getLocalName(), DESCRIPTION).set("Which history level to use");
-//    node.get(REQUEST_PROPERTIES, Tag.HISTORY_LEVEL.getLocalName(), TYPE).set(ModelType.STRING);
-//    node.get(REQUEST_PROPERTIES, Tag.HISTORY_LEVEL.getLocalName(), REQUIRED).set(false);
-//    
-//    node.get(REQUEST_PROPERTIES, Tag.PROPERTIES.getLocalName(), DESCRIPTION).set("Additional properties");
-//    node.get(REQUEST_PROPERTIES, Tag.PROPERTIES.getLocalName(), TYPE).set(ModelType.LIST);
-//    node.get(REQUEST_PROPERTIES, Tag.PROPERTIES.getLocalName(), VALUE_TYPE).set(ModelType.PROPERTY);
-//    node.get(REQUEST_PROPERTIES, Tag.PROPERTIES.getLocalName(), REQUIRED).set(false);
-
+    node.get(REQUEST_PROPERTIES, NAME, DESCRIPTION).set("Thread pool name for global job executor");
+    node.get(REQUEST_PROPERTIES, NAME, TYPE).set(ModelType.STRING);
+    node.get(REQUEST_PROPERTIES, NAME, REQUIRED).set(true);
+    
     return node;
   }
 
   @Override
   protected void populateModel(ModelNode operation, ModelNode model) throws OperationFailedException {
-//    Boolean isDefault = Boolean.TRUE;
-//    if (operation.hasDefined(Attribute.DEFAULT.getLocalName())) {
-//      isDefault = operation.get(Attribute.DEFAULT.getLocalName()).asBoolean();
-//    }
-//    model.get(Attribute.DEFAULT.getLocalName()).set(isDefault);
-//    
-//    String historyLevel = "audit";
-//    if (operation.hasDefined(Tag.HISTORY_LEVEL.getLocalName())) {
-//      historyLevel = operation.get(Tag.HISTORY_LEVEL.getLocalName()).asString();
-//    }
-//    model.get(Tag.HISTORY_LEVEL.getLocalName()).set(historyLevel);
-//    
-//    String datasource = "java:jboss/datasources/ExampleDS";
-//    if (operation.hasDefined(Tag.DATASOURCE.getLocalName())) {
-//      datasource = operation.get(Tag.DATASOURCE.getLocalName()).asString();
-//    }
-//    model.get(Tag.DATASOURCE.getLocalName()).set(datasource);
-//    
-//    // retrieve all properties
-//    List<ModelNode> properties = null;
-//    if (operation.hasDefined(Tag.PROPERTIES.getLocalName())) {
-//      properties = operation.get(Tag.PROPERTIES.getLocalName()).asList();
-//    }
-//    model.get(Tag.PROPERTIES.getLocalName()).set(properties);
+      String jobExecutorThreadPoolName = "default";
+      if (operation.hasDefined(NAME)) {
+         jobExecutorThreadPoolName = operation.get(NAME).asString();
+      }
+      
+      model.get(NAME).set(jobExecutorThreadPoolName);
   }
   
+  
   @Override
-  protected void performRuntime(OperationContext context, ModelNode operation, ModelNode model,
+  protected void performBoottime(OperationContext context, ModelNode operation, ModelNode model,
           ServiceVerificationHandler verificationHandler, List<ServiceController<?>> newControllers)
           throws OperationFailedException {
     

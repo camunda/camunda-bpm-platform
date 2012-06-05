@@ -22,11 +22,12 @@ import junit.framework.Assert;
 import org.jboss.as.subsystem.test.AbstractSubsystemTest;
 import org.jboss.as.subsystem.test.KernelServices;
 import org.jboss.dmr.ModelNode;
-import org.junit.Ignore;
+import org.jboss.msc.service.ServiceController;
 import org.junit.Test;
 
 import com.camunda.fox.platform.FoxPlatformException;
 import com.camunda.fox.platform.subsystem.impl.extension.FoxPlatformExtension;
+import com.camunda.fox.platform.subsystem.impl.platform.ContainerJobExecutorService;
 
 /**
  *
@@ -40,6 +41,7 @@ public class JBossSubsystemXMLTest extends AbstractSubsystemTest {
   public static final String SUBSYSTEM_WITH_ENGINES_AND_PROPERTIES = "subsystemWithEnginesAndProperties.xml";
   public static final String SUBSYSTEM_WITH_DUPLICATE_ENGINE_NAMES = "subsystemWithDuplicateEngineNames.xml";
   public static final String SUBSYSTEM_WITH_JOB_EXECUTOR = "subsystemWithJobExecutor.xml";
+  public static final String SUBSYSTEM_WITH_PROCESS_ENGINES_AND_JOB_EXECUTOR = "subsystemWithProcessEnginesAndJobExecutor.xml";
 
   public JBossSubsystemXMLTest() {
     super(FoxPlatformExtension.SUBSYSTEM_NAME, new FoxPlatformExtension());
@@ -115,15 +117,22 @@ public class JBossSubsystemXMLTest extends AbstractSubsystemTest {
   }
   
   @Test
-  @Ignore
   public void testInstallSubsystemWithJobExecutorXml() throws Exception {
     String subsystemXml = FileUtils.readFile(SUBSYSTEM_WITH_JOB_EXECUTOR);
     System.out.println(normalizeXML(subsystemXml));
-    try {
-      installInController(subsystemXml);
-//    services.getContainer().dumpServices();
-    } catch (FoxPlatformException fpe) {
-      Assert.assertTrue("Duplicate process engine detected!", fpe.getMessage().contains("A process engine with name '__test' already exists."));
-    }
-  }  
+    KernelServices services = installInController(subsystemXml);
+    //services.getContainer().dumpServices();
+    Assert.assertEquals(5, services.getContainer().getServiceNames().size());
+  }
+  
+  @Test
+  public void testParseSubsystemXmlWithEnginesAndJobExecutor() throws Exception {
+    String subsystemXml = FileUtils.readFile(SUBSYSTEM_WITH_PROCESS_ENGINES_AND_JOB_EXECUTOR);
+    System.out.println(normalizeXML(subsystemXml));
+    
+    List<ModelNode> operations = parse(subsystemXml);
+    System.out.println(operations);
+    Assert.assertEquals(6, operations.size());
+  }
+
 }
