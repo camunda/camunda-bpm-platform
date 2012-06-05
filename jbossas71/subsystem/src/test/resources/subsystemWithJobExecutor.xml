@@ -1,0 +1,17 @@
+<subsystem xmlns="urn:com.camunda.fox.fox-platform:1.0">
+	<job-executor name="job-executor-tp">
+		<job-acquisitions>
+			<job-acquisition name="default">
+				<acquisition-strategy>SEQUENTIAL</acquisition-strategy>
+				<properties>
+					<property name="lockTimeInMillis">5000</property>
+					<property name="waitTimeInMillis">10000</property>
+					<property name="maxJobsPerAcquisition">50</property>
+				</properties>
+			</job-acquisition>
+			<job-acquisition name="anders">
+				<acquisition-strategy>SEQUENTIAL</acquisition-strategy>
+			</job-acquisition>
+		</job-acquisitions>
+	</job-executor>
+</subsystem>
