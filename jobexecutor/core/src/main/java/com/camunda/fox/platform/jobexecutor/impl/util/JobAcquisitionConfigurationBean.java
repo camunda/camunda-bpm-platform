@@ -73,9 +73,9 @@ public class JobAcquisitionConfigurationBean implements JobAcquisitionConfigurat
 
   @Override
   public Map<String, Object> getJobAcquisitionProperties() {
-    properties.put(PROP_LOCK_TIME_IN_MILLIS, lockTimeInMillis);
-    properties.put(PROP_MAX_JOBS_PER_ACQUISITION, maxJobsPerAcquisition);
-    properties.put(PROP_WAIT_TIME_IN_MILLIS, waitTimeInMillis);
+//    properties.put(PROP_LOCK_TIME_IN_MILLIS, lockTimeInMillis);
+//    properties.put(PROP_MAX_JOBS_PER_ACQUISITION, maxJobsPerAcquisition);
+//    properties.put(PROP_WAIT_TIME_IN_MILLIS, waitTimeInMillis);
     return properties;
   }
 
