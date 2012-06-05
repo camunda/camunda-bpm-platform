@@ -1,13 +1,18 @@
 package com.camunda.fox.platform.tasklist;
 
 import java.io.Serializable;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
+import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
-import javax.enterprise.context.SessionScoped;
+import javax.enterprise.event.Observes;
+import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.servlet.http.HttpServletRequest;
 
 import org.activiti.engine.FormService;
 import org.activiti.engine.ProcessEngine;
@@ -18,8 +23,9 @@ import org.activiti.engine.task.Task;
 import com.camunda.fox.client.impl.ProcessArchiveSupport;
 import com.camunda.fox.platform.api.ProcessArchiveService;
 import com.camunda.fox.platform.spi.ProcessArchive;
+import com.camunda.fox.platform.tasklist.event.TaskNavigationLinkSelectedEvent;
 
-@SessionScoped
+@ViewScoped
 @Named
 public class TaskList implements Serializable {
 
@@ -39,34 +45,46 @@ public class TaskList implements Serializable {
 
   @Inject
   Identity identity;
-  
-  private List<Task> tasks = new ArrayList<Task>();
-  
-  public void update() {
+
+  private List<Task> tasks;
+
+  private List<Task> myTasks;
+  private List<Task> unassignedTasks;
+  private Map<String, List<Task>> groupTasksMap;
+
+  @PostConstruct
+  protected void init() {
+    tasks = getMyTasks();
   }
 
-  public List<Task> getList() {
+  public List<Task> getTasks() {
     return tasks;
   }
 
-  @Deprecated
-  public int countMyTasks() {
-    return (int) taskService.createTaskQuery().taskAssignee(identity.getCurrentUser().getUsername()).count();
-  }
-
   public List<Task> getMyTasks() {
-    return taskService.createTaskQuery().taskAssignee(identity.getCurrentUser().getUsername()).list();
+    if (myTasks == null) {
+      myTasks = taskService.createTaskQuery().taskAssignee(identity.getCurrentUser().getUsername()).list();
+    }
+    return myTasks;
   }
 
-  @Deprecated
-  public int countUnassignedTasks() {
-    return (int)taskService.createTaskQuery().taskCandidateUser(identity.getCurrentUser().getUsername()).count();
-  }
-  
   public List<Task> getUnassignedTasks() {
-    return taskService.createTaskQuery().taskCandidateUser(identity.getCurrentUser().getUsername()).list();
+    if (unassignedTasks == null) {
+      unassignedTasks = taskService.createTaskQuery().taskCandidateUser(identity.getCurrentUser().getUsername()).list();
+    }
+    return unassignedTasks;
   }
-  
+
+  public List<Task> getGroupTasks(String groupId) {
+    if(groupTasksMap == null) {
+      groupTasksMap = new HashMap<String, List<Task>>();
+    }
+    if(groupTasksMap.get(groupId) == null) {
+      groupTasksMap.put(groupId, taskService.createTaskQuery().taskCandidateGroup(groupId).list());
+    }
+    return groupTasksMap.get(groupId);
+  }
+
   public String getTaskFormUrl(Task task) {
     String formKey, taskFormUrl = "";
     TaskFormData taskFormData = formService.getTaskFormData(task.getId());
@@ -76,20 +94,29 @@ public class TaskList implements Serializable {
     formKey = taskFormData.getFormKey();
     ProcessArchive processArchive = processArchiveService.getProcessArchiveByProcessDefinitionId(task.getProcessDefinitionId(), processEngine.getName());
     String contextPath = (String) processArchive.getProperties().get(ProcessArchive.PROP_SERVLET_CONTEXT_PATH);
-
-    taskFormUrl = "../../" + contextPath + "/" + formKey + ".jsf?taskId=" + task.getId();
-
+    String callbackUrl = getRequestURL();
+    taskFormUrl = "../.." + contextPath + "/" + formKey + ".jsf?taskId=" + task.getId() + "&callbackUrl=" + callbackUrl;
     return taskFormUrl;
   }
 
-  public void setTaskCategory() {
-//    if(taskCategory.equalsIgnoreCase("mytasks")) {
-//      this.tasks = getMyTasks();
-//    } else if (taskCategory.equalsIgnoreCase("unassigned")) {
-//      this.tasks = getUnassignedTasks();
-//    }
-    
-    tasks = getMyTasks();
-    
+  private String getRequestURL() {
+    Object request = FacesContext.getCurrentInstance().getExternalContext().getRequest();
+    if (request instanceof HttpServletRequest) {
+      return ((HttpServletRequest) request).getRequestURL().toString();
+    } else {
+      return "";
+    }
   }
+
+  public void linkSelected(@Observes TaskNavigationLinkSelectedEvent taskNavigationLinkSelectedEvent) {
+    TaskNavigationLink link = taskNavigationLinkSelectedEvent.getLink();
+    if (link instanceof MyTasksLink) {
+      tasks = getMyTasks();
+    } else if (link instanceof UnassignedTasksLink) {
+      tasks = getUnassignedTasks();
+    } else if (link instanceof GroupTasksLink) {
+      tasks = getGroupTasks(((GroupTasksLink) link).getGroupId());
+    }
+  }
+
 }

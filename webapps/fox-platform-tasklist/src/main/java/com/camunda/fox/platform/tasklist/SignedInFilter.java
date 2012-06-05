@@ -18,7 +18,7 @@ import javax.servlet.http.HttpServletResponse;
 public class SignedInFilter implements Filter {
 
   private final static Logger log = Logger.getLogger(SignedInFilter.class.getSimpleName());
-  
+
   @Inject
   Identity identity;
 
@@ -28,14 +28,12 @@ public class SignedInFilter implements Filter {
 
   @Override
   public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
-    
-    log.info("Checking if user is signed in");
-    
+    log.fine("Checking if user is signed in");
     if (!identity.isSignedIn()) {
-      log.info("Redirecting to sign in page");
+      log.fine("Redirecting to sign in page");
       ((HttpServletResponse) servletResponse).sendRedirect(((HttpServletRequest) servletRequest).getContextPath() + "/signin.jsf");
     } else {
-      log.info("User is signed in, continuing filter chain");
+      log.fine("User is signed in");
       filterChain.doFilter(servletRequest, servletResponse);
     }
   }

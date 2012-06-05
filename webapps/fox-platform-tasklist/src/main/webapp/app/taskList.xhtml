@@ -5,6 +5,7 @@
   xmlns:h="http://java.sun.com/jsf/html"
   template="/WEB-INF/templates/template.xhtml">
 
+  <!-- Top Navigation Bar -->
   <ui:define name="nav-top-content">
 
     <div class="btn-group pull-right">
@@ -33,28 +34,43 @@
       </ul>
     </div>
   </ui:define>
+  <!-- /Top Navigation Bar -->
 
+  <!-- Task Navigation -->
   <ui:define name="nav-left-content">
-    <h:form style="margin:0;">
+    <h:form style="margin:0;" id="taskNavigation">
       <ul class="nav nav-list">
         <li class="nav-header">Tasks</li>
-        <li class="active"><h:commandLink
-            value="My Tasks (#{taskList.countMyTasks()})"
-            action="#{taskList.setTaskCategory()}">
-            <f:ajax render=":taskList" />
+        <li class="#{taskNavigation.myTasksLink.active ? 'active' : ''}">
+          <h:commandLink
+            action="#{taskNavigation.select(taskNavigation.myTasksLink)}"
+            value="#{taskNavigation.myTasksLink.label}">
+            <f:ajax render=":taskList :taskNavigation" />
+          </h:commandLink>
+        </li>
+        <li
+          class="#{taskNavigation.unassignedTasksLink.active ? 'active' : ''}"><h:commandLink
+            value="#{taskNavigation.unassignedTasksLink.label}"
+            action="#{taskNavigation.select(taskNavigation.unassignedTasksLink)}">
+            <f:ajax render=":taskList :taskNavigation" />
           </h:commandLink></li>
-        <li><a href="#">Unassigned Tasks (3)</a></li>
         <li class="nav-header">Group Tasks</li>
-        <li><a href="#">Accounting (2)</a></li>
-        <li><a href="#">Management (1)</a></li>
-        <li><a href="#">IT (0)</a></li>
+        <ui:repeat value="#{taskNavigation.groupTasksLinks}" var="item">
+          <li class="#{item.active ? 'active' : ''}"><h:commandLink
+              value="#{item.label}"
+              action="#{taskNavigation.select(item)}">
+              <f:ajax render=":taskList :taskNavigation" />
+            </h:commandLink></li>
+        </ui:repeat>
       </ul>
     </h:form>
   </ui:define>
+  <!-- /Task Navigation -->
 
+  <!-- Task List -->
   <ui:define name="content">
     <h:panelGroup id="taskList">
-      <ui:repeat value="#{taskList.list}" var="task">
+      <ui:repeat value="#{taskList.tasks}" var="task">
         <div class="row-fluid">
           <div class="span12">
             <h2>
@@ -74,5 +90,6 @@
       </ui:repeat>
     </h:panelGroup>
   </ui:define>
+  <!-- /Task List -->
 
 </ui:composition>
