@@ -26,6 +26,7 @@ import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceController.Mode;
 
 import com.camunda.fox.platform.subsystem.impl.extension.ModelConstants;
+import com.camunda.fox.platform.subsystem.impl.platform.ContainerJobExecutorService;
 import com.camunda.fox.platform.subsystem.impl.platform.ContainerPlatformService;
 
 /**

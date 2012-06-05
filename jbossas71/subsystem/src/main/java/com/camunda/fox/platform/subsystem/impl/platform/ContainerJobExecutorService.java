@@ -33,7 +33,6 @@ public class ContainerJobExecutorService extends PlatformJobExecutor implements 
   public static ServiceController<?> addService(final ServiceTarget target, final ServiceListener<Object> listeners, String jobExecutorThreadPoolName) {
     final ContainerJobExecutorService service = new ContainerJobExecutorService();
     return target.addService(ContainerJobExecutorService.getServiceName(), service)
-         // TODO: config auslesen für job-executor-tp
         .addDependency(ThreadsServices.EXECUTOR.append(jobExecutorThreadPoolName), ManagedQueueExecutorService.class, service.getManagedQueueInjector())
         .addListener(listeners)
         .setInitialMode(Mode.ACTIVE)

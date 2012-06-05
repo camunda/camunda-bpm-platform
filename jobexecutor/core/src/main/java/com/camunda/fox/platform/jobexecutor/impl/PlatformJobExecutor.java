@@ -37,6 +37,7 @@ public abstract class PlatformJobExecutor implements PlatformJobExecutorService 
   }
   
   protected void loadJobAcquisitionStrategies() {
+    System.out.println("*********** LOAD JOB ACQUISITION STRATEGY ****************");
     discoveredStrategies = new HashMap<String, JobAcquisitionStrategy>();
     
     // load user-provided strategies
@@ -82,9 +83,15 @@ public abstract class PlatformJobExecutor implements PlatformJobExecutorService 
     }
     acquisition.setJobAcquisitionStrategy(jobAcquisitionStrategy);
     Map<String, Object> properties = configuration.getJobAcquisitionProperties();
-    acquisition.setLockTimeInMillis((Integer) properties.get(JobAcquisitionConfiguration.PROP_LOCK_TIME_IN_MILLIS));
-    acquisition.setWaitTimeInMillis((Integer) properties.get(JobAcquisitionConfiguration.PROP_WAIT_TIME_IN_MILLIS));
-    acquisition.setMaxJobsPerAcquisition((Integer) properties.get(JobAcquisitionConfiguration.PROP_MAX_JOBS_PER_ACQUISITION));
+    if (properties.containsKey(JobAcquisitionConfiguration.PROP_LOCK_TIME_IN_MILLIS)) {
+      acquisition.setLockTimeInMillis((Integer) properties.get(JobAcquisitionConfiguration.PROP_LOCK_TIME_IN_MILLIS));
+    }
+    if (properties.containsKey(JobAcquisitionConfiguration.PROP_MAX_JOBS_PER_ACQUISITION)) {
+      acquisition.setWaitTimeInMillis((Integer) properties.get(JobAcquisitionConfiguration.PROP_WAIT_TIME_IN_MILLIS));
+    }
+    if (properties.containsKey(JobAcquisitionConfiguration.PROP_WAIT_TIME_IN_MILLIS)) {
+      acquisition.setMaxJobsPerAcquisition((Integer) properties.get(JobAcquisitionConfiguration.PROP_MAX_JOBS_PER_ACQUISITION));
+    }
     jobAcquisitionsByName.put(configuration.getAcquisitionName(), acquisition);
     return acquisition;
   }
