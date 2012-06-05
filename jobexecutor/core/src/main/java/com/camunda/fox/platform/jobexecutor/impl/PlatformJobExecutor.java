@@ -37,7 +37,6 @@ public abstract class PlatformJobExecutor implements PlatformJobExecutorService 
   }
   
   protected void loadJobAcquisitionStrategies() {
-    System.out.println("*********** LOAD JOB ACQUISITION STRATEGY ****************");
     discoveredStrategies = new HashMap<String, JobAcquisitionStrategy>();
     
     // load user-provided strategies
