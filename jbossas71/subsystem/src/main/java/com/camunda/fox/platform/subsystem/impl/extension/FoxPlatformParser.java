@@ -321,16 +321,6 @@ public class FoxPlatformParser implements XMLStreamConstants, XMLElementReader<L
       throw unexpectedElement(reader);
     }
     
-//    ModelNode processEngines = new ModelNode();
-//    processEngines.get(OP).set(ModelDescriptionConstants.ADD);
-//    PathAddress addr = PathAddress.pathAddress(
-//            PathElement.pathElement(SUBSYSTEM, FoxPlatformExtension.SUBSYSTEM_NAME),
-//            PathElement.pathElement(Tag.PROCESS_ENGINES.getLocalName())); 
-//    processEngines.get(OP_ADDR).set(addr.toModelNode());
-//    
-//    list.add(processEngines);
-    
-    
     while (reader.hasNext()) {
       switch (reader.nextTag()) {
         case END_ELEMENT: {
@@ -378,12 +368,15 @@ public class FoxPlatformParser implements XMLStreamConstants, XMLElementReader<L
     // Add the 'add' operation for each 'job-acquisition' child
     ModelNode addJobAcquisition = new ModelNode();
     addJobAcquisition.get(OP).set(ModelDescriptionConstants.ADD);
-    PathAddress addr = PathAddress.pathAddress(PathElement.pathElement(SUBSYSTEM, FoxPlatformExtension.SUBSYSTEM_NAME),
-    PathElement.pathElement(Element.JOB_AQUISITIONS.getLocalName(), acquisitionName));
+    PathAddress addr = PathAddress.pathAddress(
+            PathElement.pathElement(SUBSYSTEM, FoxPlatformExtension.SUBSYSTEM_NAME),
+            PathElement.pathElement(Element.JOB_AQUISITIONS.getLocalName(), acquisitionName));
     addJobAcquisition.get(OP_ADDR).set(addr.toModelNode());
+    
+    addJobAcquisition.get(Attribute.NAME.getLocalName()).set(acquisitionName);
 
     list.add(addJobAcquisition);
-  
+    
     // iterate deeper
     while (reader.hasNext()) {
       switch (reader.nextTag()) {
