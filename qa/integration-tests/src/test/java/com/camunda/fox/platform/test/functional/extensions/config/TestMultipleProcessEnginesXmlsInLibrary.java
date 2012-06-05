@@ -31,9 +31,9 @@ public class TestMultipleProcessEnginesXmlsInLibrary extends AbstractFoxPlatform
             .addAsLibraries(resolver.artifact("com.camunda.fox.platform:fox-platform-ext-config").resolveAsFiles())
             .addAsLibraries(
               ShrinkWrap.create(JavaArchive.class, "engine1.jar")
-                    .addAsResource("com/camunda/fox/platform/test/functional/extensions/config/singleEngine.xml", "META-INF/process-engines.xml"),
+                    .addAsResource("singleEngine.xml", "META-INF/process-engines.xml"),
               ShrinkWrap.create(JavaArchive.class, "engine2.jar")
-                   .addAsResource("com/camunda/fox/platform/test/functional/extensions/config/twoEngines.xml", "META-INF/process-engines.xml")
+                   .addAsResource("twoEngines.xml", "META-INF/process-engines.xml")
          );
   }
   

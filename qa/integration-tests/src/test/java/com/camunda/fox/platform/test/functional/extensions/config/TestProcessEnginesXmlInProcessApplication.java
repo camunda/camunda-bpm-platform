@@ -25,7 +25,7 @@ public class TestProcessEnginesXmlInProcessApplication extends AbstractFoxPlatfo
     
     return initWebArchiveDeployment()
             .addAsLibraries(resolver.artifact("com.camunda.fox.platform:fox-platform-ext-config").resolveAsFiles())
-            .addAsWebInfResource("com/camunda/fox/platform/test/functional/extensions/config/singleEngine.xml", "classes/META-INF/process-engines.xml");
+            .addAsWebInfResource("singleEngine.xml", "classes/META-INF/process-engines.xml");
   }
   
   @Test

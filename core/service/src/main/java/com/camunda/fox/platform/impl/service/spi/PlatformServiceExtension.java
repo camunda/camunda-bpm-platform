@@ -46,6 +46,17 @@ import com.camunda.fox.platform.spi.ProcessArchive;
  */
 public interface PlatformServiceExtension {
   
+  // Current available PlatformServiceExtensions and their assigned precedence.
+  
+  /** JobExecutorXmlPlatformServiceExtension has the precedence 100 */
+  public static final int JOB_EXECUTOR_XML_PLATFORM_SERVICE_EXTENSION_PRECEDENCE = 100;
+  /** ProcessEnginesXmlPlatformServiceExtension has the precedence 200 */
+  public static final int PROCESS_ENGINES_XML_PLATFORM_SERVICE_EXTENSION_PRECEDENCE = 200;
+  /** PlatformJobExecutorExtension has the precedence 300 */
+  public static final int PLATFORM_JOB_EXECUTOR_EXTENSION_PRECEDENCE = 300;
+  
+  // Operations
+  
   /**
    * determines the ordering in which implementations are invoked. Implementations with a low
    * ordering are invoked first.
