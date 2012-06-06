@@ -120,12 +120,9 @@ public class TaskList implements Serializable {
     return task.getAssignee().equals(identity.getCurrentUser().getUsername());
   }
   
-  public void claimTask(Task task) {
-    log.info("trying to claim task " + task.getName() + " for user " + identity.getCurrentUser().getUsername());
-    
-    System.out.println("claim task");
-    
-    taskService.claim(task.getId(), identity.getCurrentUser().getUsername());
+  public String claimTask(Task task) {
+    taskService.delegateTask(task.getId(), identity.getCurrentUser().getUsername());
+    return "taskList.jsf";
   }
   
   private String getRequestURL() {
