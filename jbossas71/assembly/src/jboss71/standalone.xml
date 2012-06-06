@@ -275,6 +275,7 @@
                 </security-domain>
             </security-domains>
         </subsystem>
+        <subsystem xmlns="urn:jboss:domain:threads:1.1"/>
         <subsystem xmlns="urn:jboss:domain:transactions:1.1">
             <core-environment>
                 <process-id>
