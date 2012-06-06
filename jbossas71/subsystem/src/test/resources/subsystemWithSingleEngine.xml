@@ -1,0 +1,8 @@
+<subsystem xmlns="urn:com.camunda.fox.fox-platform:1.0">
+  <process-engines>
+    <process-engine name="__default" default="true">
+      <datasource>java:jboss/datasources/ExampleDS</datasource>
+      <history-level>audit</history-level>
+    </process-engine>
+  </process-engines>
+</subsystem>
