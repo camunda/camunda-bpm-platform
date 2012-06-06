@@ -34,6 +34,7 @@ import com.camunda.fox.platform.subsystem.impl.extension.FoxPlatformExtension;
  */
 public class JBossSubsystemXMLTest extends AbstractSubsystemTest {
 
+  public static final String SUBSYSTEM_WITH_SINGLE_ENGINE = "subsystemWithSingleEngine.xml";
   public static final String SUBSYSTEM_WITH_ENGINES = "subsystemWithEngines.xml";
   public static final String SUBSYSTEM_WITH_PROCESS_ENGINES_ELEMENT_ONLY = "subsystemWithProcessEnginesElementOnly.xml";
   public static final String SUBSYSTEM_WITH_ENGINES_AND_PROPERTIES = "subsystemWithEnginesAndProperties.xml";
@@ -113,6 +114,17 @@ public class JBossSubsystemXMLTest extends AbstractSubsystemTest {
     } catch (FoxPlatformException fpe) {
       Assert.assertTrue("Duplicate process engine detected!", fpe.getMessage().contains("A process engine with name '__test' already exists."));
     }
+  }
+
+  @Test
+  public void testInstallSubsystemWithSingleEngineXml() throws Exception {
+    String subsystemXml = FileUtils.readFile(SUBSYSTEM_WITH_SINGLE_ENGINE);
+    System.out.println(normalizeXML(subsystemXml));
+    KernelServices services = installInController(subsystemXml);
+//    services.getContainer().dumpServices();
+    Assert.assertEquals(5, services.getContainer().getServiceNames().size());
+    String persistedSubsystemXml = services.getPersistedSubsystemXml();
+    compareXml(null, subsystemXml, persistedSubsystemXml);
   }
   
   @Test

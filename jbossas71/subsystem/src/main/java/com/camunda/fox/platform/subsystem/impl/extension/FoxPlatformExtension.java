@@ -62,7 +62,6 @@ public class FoxPlatformExtension implements Extension {
     // Process Engine
     final ManagementResourceRegistration processEnginesRegistration = rootRegistration.registerSubModel(new ProcessEnginesResourceDefinition());
     
-    // Job executor
     final ManagementResourceRegistration jobExecutorRegistration = rootRegistration.registerSubModel(new JobExecutorResourceDefinition());
     
     //Job acquisition

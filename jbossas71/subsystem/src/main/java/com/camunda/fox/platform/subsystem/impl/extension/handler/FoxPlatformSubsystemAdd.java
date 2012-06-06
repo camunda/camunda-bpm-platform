@@ -61,7 +61,6 @@ public class FoxPlatformSubsystemAdd extends AbstractBoottimeAddStepHandler {
             .install();
     
     newControllers.add(controller);
-    
   }
 
 }
