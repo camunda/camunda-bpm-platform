@@ -109,6 +109,10 @@ public class JobAcquisitionAdd extends AbstractAddStepHandler implements Descrip
     JobAcquisitionConfiguration jobAcquisitionConfiguration = transformConfiguration(context, acquisitionName, model);
     
     ContainerJobExecutorService service = (ContainerJobExecutorService) context.getServiceRegistry(false).getService(ContainerJobExecutorService.getServiceName()).getService();
+    // HACK to resolve parallel starts from job executor and job acuqisition
+    if (service.getDiscoveredStrategies() == null) {
+      service.start();
+    }
     service.startJobAcquisition(jobAcquisitionConfiguration);
   }
 

@@ -313,10 +313,9 @@
         <subsystem xmlns="urn:com.camunda.fox.fox-platform:1.0">
                 <process-engines>
                     <process-engine name="default" default="true">
-	                    <datasource>jdbc/FoxEngine</datasource>
+	                    <datasource>java:jboss/datasources/FoxEngineDS</datasource>
     					<history-level>audit</history-level>
 					    <properties>
-					      <property name="isAutoSchemaUpdate">true</property>
 					      <property name="jobExecutorAcquisitionName">default</property>
 					    </properties> 
 					</process-engine>	

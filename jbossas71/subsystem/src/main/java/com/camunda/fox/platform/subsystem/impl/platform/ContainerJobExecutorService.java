@@ -52,13 +52,13 @@ public class ContainerJobExecutorService extends PlatformJobExecutor implements 
 
   @Override
   public void start(StartContext context) throws StartException {
-    log.info("Starting Platform Job Executor Service");
+    log.info("Starting Container Job Executor Service");
     start();
   }
 
   @Override
   public void stop(StopContext context) {
-    log.info("Stopping Platform Job Executor Service");
+    log.info("Stopping Container Job Executor Service");
     stop();
   }
   

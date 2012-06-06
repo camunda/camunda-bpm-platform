@@ -9,6 +9,7 @@
       <property name="jbossHome">${server.location}</property>
       <property name="managementPort">${server.port}</property>
       <property name="serverConfig">${server.configuration}</property>
+      <!-- property name="javaVmArguments">-Xrunjdwp:transport=dt_socket,address=8787,server=y,suspend=n</property-->
     </configuration>
   </container>
 </arquillian>

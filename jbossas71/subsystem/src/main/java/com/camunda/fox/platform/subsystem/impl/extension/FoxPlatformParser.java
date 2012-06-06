@@ -405,7 +405,15 @@ public class FoxPlatformParser implements XMLStreamConstants, XMLElementReader<L
   public void writeContent(final XMLExtendedStreamWriter writer, final SubsystemMarshallingContext context) throws XMLStreamException {
 
     context.startSubsystemElement(FoxPlatformExtension.NAMESPACE, false);
+    
+    writeProcessEnginesContent(writer, context);
+    
+    writeJobExecutorContent(writer, context);
 
+  }
+  
+  private void writeProcessEnginesContent(final XMLExtendedStreamWriter writer, final SubsystemMarshallingContext context) throws XMLStreamException {
+    
     writer.writeStartElement(Element.PROCESS_ENGINES.getLocalName());
 
     ModelNode node = context.getModelNode();
@@ -428,6 +436,44 @@ public class FoxPlatformParser implements XMLStreamConstants, XMLElementReader<L
       }
     }
     // end process-engines
+    writer.writeEndElement();
+  }
+  
+  private void writeJobExecutorContent(final XMLExtendedStreamWriter writer, final SubsystemMarshallingContext context) throws XMLStreamException {
+    writer.writeStartElement(Element.JOB_EXECUTOR.getLocalName());
+    
+    ModelNode node = context.getModelNode();
+    
+    ModelNode jobExecutorNode = node.get(Element.JOB_EXECUTOR.getLocalName());
+    writer.writeAttribute(Attribute.NAME.getLocalName(), jobExecutorNode.get(NAME).asString());
+    
+    writeJobAcquisitionsContent(writer, context);
+    
+    // end job-executor
+    writer.writeEndElement();
+  }
+  
+  private void writeJobAcquisitionsContent(final XMLExtendedStreamWriter writer, final SubsystemMarshallingContext context) throws XMLStreamException {
+    writer.writeStartElement(Element.JOB_AQUISITIONS.getLocalName());
+
+    ModelNode node = context.getModelNode();
+    
+    ModelNode processEngineConfigurations = node.get(Element.JOB_AQUISITIONS.getLocalName());
+    if (processEngineConfigurations.isDefined()) {
+      for (Property property : processEngineConfigurations.asPropertyList()) {
+        // write each child element to xml
+        writer.writeStartElement(Element.JOB_AQUISITION.getLocalName());
+        
+        writer.writeAttribute(Attribute.NAME.getLocalName(), property.getName());
+        ModelNode entry = property.getValue();
+        writeElement(Element.ACQUISITION_STRATEGY, writer, entry);
+  
+        writeProperties(writer, entry);
+  
+        writer.writeEndElement();
+      }
+    }
+    // end job-acquisitions
     writer.writeEndElement();
   }
 
