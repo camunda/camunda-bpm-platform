@@ -117,7 +117,11 @@ public class TaskList implements Serializable {
   }
 
   public boolean isPersonalTask(Task task) {
-    return task.getAssignee().equals(identity.getCurrentUser().getUsername());
+    String assignee = task.getAssignee(); 
+    if(assignee == null) {
+      return false;
+    }
+    return assignee.equals(identity.getCurrentUser().getUsername());
   }
   
   public String claimTask(Task task) {
