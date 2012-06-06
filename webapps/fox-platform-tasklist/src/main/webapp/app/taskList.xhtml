@@ -86,13 +86,9 @@
 
   <!-- Task List -->
   <ui:define name="content">
-
-    <h:panelGroup id="taskListView">
-
-      <h:form>
+      <h:form id="taskListView">
         <h:dataTable value="#{taskList.tasks}" var="task">
           <h:column>
-
             <div class="row-fluid">
               <div class="span12">
                 <h2>
@@ -123,7 +119,6 @@
           </h:column>
         </h:dataTable>
       </h:form>
-    </h:panelGroup>
 
   </ui:define>
   <!-- /Task List -->
