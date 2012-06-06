@@ -431,9 +431,9 @@ public class FoxPlatformParser implements XMLStreamConstants, XMLElementReader<L
   private void writeJobAcquisitionsContent(final XMLExtendedStreamWriter writer, final SubsystemMarshallingContext context, ModelNode parentNode) throws XMLStreamException {
     writer.writeStartElement(Element.JOB_AQUISITIONS.getLocalName());
 
-    ModelNode processEngineConfigurations = parentNode.get(Element.JOB_AQUISITIONS.getLocalName());
-    if (processEngineConfigurations.isDefined()) {
-      for (Property property : processEngineConfigurations.asPropertyList()) {
+    ModelNode jobAcquisitionConfigurations = parentNode.get(Element.JOB_AQUISITIONS.getLocalName());
+    if (jobAcquisitionConfigurations.isDefined()) {
+      for (Property property : jobAcquisitionConfigurations.asPropertyList()) {
         // write each child element to xml
         writer.writeStartElement(Element.JOB_AQUISITION.getLocalName());
         

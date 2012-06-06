@@ -181,7 +181,8 @@ public class JBossSubsystemXMLTest extends AbstractSubsystemTest {
     //services.getContainer().dumpServices();
     Assert.assertEquals(7, services.getContainer().getServiceNames().size());
     
-    System.out.println(services.getPersistedSubsystemXml());
+    String persistedSubsystemXml = services.getPersistedSubsystemXml();
+    compareXml(null, subsystemXml, persistedSubsystemXml);
   }
   
 }

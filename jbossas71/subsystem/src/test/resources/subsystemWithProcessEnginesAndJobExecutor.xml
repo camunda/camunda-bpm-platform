@@ -9,7 +9,7 @@
 				<property name="job-name">default</property>
 			</properties>
 		</process-engine>
-		<process-engine name="__test">
+		<process-engine name="__test" default="false">
 			<datasource>java:jboss/datasources/ExampleDS</datasource>
 			<history-level>full</history-level>
 			<properties>
