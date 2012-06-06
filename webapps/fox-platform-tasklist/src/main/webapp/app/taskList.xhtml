@@ -55,29 +55,23 @@
             <f:ajax render=":taskListView :taskNavigation" />
           </h:commandLink></li>
         <li class="nav-header">Group Tasks</li>
-        <h:dataTable value="#{taskNavigation.groupTasksLinks}"
-          var="item">
-          <h:column>
-            <li class="#{item.active ? 'active' : ''}"><h:commandLink
-                value="#{item.label}"
-                action="#{taskNavigation.select(item)}">
-                <f:ajax render=":taskListView :taskNavigation" />
-              </h:commandLink></li>
-          </h:column>
-        </h:dataTable>
+        <ui:repeat value="#{taskNavigation.groupTasksLinks}" var="item">
+          <li class="#{item.active ? 'active' : ''}"><h:commandLink
+              value="#{item.label}"
+              action="#{taskNavigation.select(item)}">
+              <f:ajax render=":taskListView :taskNavigation" />
+            </h:commandLink></li>
+        </ui:repeat>
         <li class="nav-header">Colleagues</li>
 
-        <h:dataTable value="#{taskNavigation.colleaguesTasksLinks}"
+        <ui:repeat value="#{taskNavigation.colleaguesTasksLinks}"
           var="item">
-          <h:column>
-            <li class="#{item.active ? 'active' : ''}"><h:commandLink
-                value="#{item.label}"
-                action="#{taskNavigation.select(item)}">
-                <f:ajax render=":taskListView :taskNavigation" />
-              </h:commandLink></li>
-          </h:column>
-
-        </h:dataTable>
+          <li class="#{item.active ? 'active' : ''}"><h:commandLink
+              value="#{item.label}"
+              action="#{taskNavigation.select(item)}">
+              <f:ajax render=":taskListView :taskNavigation" />
+            </h:commandLink></li>
+        </ui:repeat>
 
       </ul>
     </h:form>
@@ -86,39 +80,33 @@
 
   <!-- Task List -->
   <ui:define name="content">
-      <h:form id="taskListView">
-        <h:dataTable value="#{taskList.tasks}" var="task">
-          <h:column>
-            <div class="row-fluid">
-              <div class="span12">
-                <h2>
-                  <h:outputText value="#{task.name} " />
-                </h2>
-                <p>
-                  <h:outputText value="#{task.description} " />
-                </p>
-                <p>
-                  <h:panelGroup
-                    rendered="#{taskList.isPersonalTask(task)}">
-                    <h:outputLink styleClass="btn"
-                      value="#{taskList.getTaskFormUrl(task)}">Edit &#187;</h:outputLink>
-                  </h:panelGroup>
-
-
-                  <h:commandLink styleClass="btn" value="Claim Task"
-                    action="#{taskList.claimTask(task)}">
-                    <f:ajax render=":taskListView :taskNavigation" />
-                  </h:commandLink>
-
-
-                </p>
-              </div>
-              <!--/span-->
-            </div>
-            <!--/row-->
-          </h:column>
-        </h:dataTable>
-      </h:form>
+    <h:form id="taskListView">
+      <ui:repeat value="#{taskList.tasks}" var="task">
+        <div class="row-fluid">
+          <div class="span12">
+            <h2>
+              <h:outputText value="#{task.name} " />
+            </h2>
+            <p>
+              <h:outputText value="#{task.description} " />
+            </p>
+            <p>
+              <h:panelGroup rendered="#{taskList.isPersonalTask(task)}">
+                <h:outputLink styleClass="btn"
+                  value="#{taskList.getTaskFormUrl(task)}">Edit &#187;</h:outputLink>
+              </h:panelGroup>
+              <h:panelGroup rendered="#{!taskList.isPersonalTask(task)}">
+                <h:commandLink styleClass="btn" value="Claim Task"
+                  action="#{taskList.claimTask(task)}">
+                </h:commandLink>
+              </h:panelGroup>
+            </p>
+          </div>
+          <!--/span-->
+        </div>
+        <!--/row-->
+      </ui:repeat>
+    </h:form>
 
   </ui:define>
   <!-- /Task List -->
