@@ -38,30 +38,47 @@
 
   <!-- Task Navigation -->
   <ui:define name="nav-left-content">
-    <h:form style="margin:0;" id="taskNavigation">
+    <h:form style="margin:0;" id="taskNavigation" prependId="false">
       <ul class="nav nav-list">
         <li class="nav-header">Tasks</li>
         <li class="#{taskNavigation.myTasksLink.active ? 'active' : ''}">
           <h:commandLink
             action="#{taskNavigation.select(taskNavigation.myTasksLink)}"
             value="#{taskNavigation.myTasksLink.label}">
-            <f:ajax render=":taskList :taskNavigation" />
+            <f:ajax render=":taskListView :taskNavigation" />
           </h:commandLink>
         </li>
         <li
           class="#{taskNavigation.unassignedTasksLink.active ? 'active' : ''}"><h:commandLink
             value="#{taskNavigation.unassignedTasksLink.label}"
             action="#{taskNavigation.select(taskNavigation.unassignedTasksLink)}">
-            <f:ajax render=":taskList :taskNavigation" />
+            <f:ajax render=":taskListView :taskNavigation" />
           </h:commandLink></li>
         <li class="nav-header">Group Tasks</li>
-        <ui:repeat value="#{taskNavigation.groupTasksLinks}" var="item">
-          <li class="#{item.active ? 'active' : ''}"><h:commandLink
-              value="#{item.label}"
-              action="#{taskNavigation.select(item)}">
-              <f:ajax render=":taskList :taskNavigation" />
-            </h:commandLink></li>
-        </ui:repeat>
+        <h:dataTable value="#{taskNavigation.groupTasksLinks}"
+          var="item">
+          <h:column>
+            <li class="#{item.active ? 'active' : ''}"><h:commandLink
+                value="#{item.label}"
+                action="#{taskNavigation.select(item)}">
+                <f:ajax render=":taskListView :taskNavigation" />
+              </h:commandLink></li>
+          </h:column>
+        </h:dataTable>
+        <li class="nav-header">Colleagues</li>
+
+        <h:dataTable value="#{taskNavigation.colleaguesTasksLinks}"
+          var="item">
+          <h:column>
+            <li class="#{item.active ? 'active' : ''}"><h:commandLink
+                value="#{item.label}"
+                action="#{taskNavigation.select(item)}">
+                <f:ajax render=":taskListView :taskNavigation" />
+              </h:commandLink></li>
+          </h:column>
+
+        </h:dataTable>
+
       </ul>
     </h:form>
   </ui:define>
@@ -69,26 +86,45 @@
 
   <!-- Task List -->
   <ui:define name="content">
-    <h:panelGroup id="taskList">
-      <ui:repeat value="#{taskList.tasks}" var="task">
-        <div class="row-fluid">
-          <div class="span12">
-            <h2>
-              <h:outputText value="#{task.name} " />
-            </h2>
-            <p>
-              <h:outputText value="#{task.description} " />
-            </p>
-            <p>
-              <h:outputLink styleClass="btn"
-                value="#{taskList.getTaskFormUrl(task)}">Edit &#187;</h:outputLink>
-            </p>
-          </div>
-          <!--/span-->
-        </div>
-        <!--/row-->
-      </ui:repeat>
+
+    <h:panelGroup id="taskListView">
+
+      <h:form>
+        <h:dataTable value="#{taskList.tasks}" var="task">
+          <h:column>
+
+            <div class="row-fluid">
+              <div class="span12">
+                <h2>
+                  <h:outputText value="#{task.name} " />
+                </h2>
+                <p>
+                  <h:outputText value="#{task.description} " />
+                </p>
+                <p>
+                  <h:panelGroup
+                    rendered="#{taskList.isPersonalTask(task)}">
+                    <h:outputLink styleClass="btn"
+                      value="#{taskList.getTaskFormUrl(task)}">Edit &#187;</h:outputLink>
+                  </h:panelGroup>
+
+
+                  <h:commandLink styleClass="btn" value="Claim Task"
+                    action="#{taskList.claimTask(task)}">
+                    <f:ajax render=":taskListView :taskNavigation" />
+                  </h:commandLink>
+
+
+                </p>
+              </div>
+              <!--/span-->
+            </div>
+            <!--/row-->
+          </h:column>
+        </h:dataTable>
+      </h:form>
     </h:panelGroup>
+
   </ui:define>
   <!-- /Task List -->
 
