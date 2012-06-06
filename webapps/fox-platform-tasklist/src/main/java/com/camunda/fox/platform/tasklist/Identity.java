@@ -1,7 +1,9 @@
 package com.camunda.fox.platform.tasklist;
 
 import java.io.Serializable;
+import java.util.logging.Logger;
 
+import javax.annotation.PostConstruct;
 import javax.enterprise.context.SessionScoped;
 import javax.enterprise.event.Event;
 import javax.inject.Inject;
@@ -14,6 +16,8 @@ import com.camunda.fox.platform.tasklist.event.SignOutEvent;
 @Named
 public class Identity implements Serializable {
 
+  private static final Logger log = Logger.getLogger(Identity.class.getSimpleName());
+  
   private static final long serialVersionUID = 1L;
   private User currentUser = new User();
 
@@ -22,6 +26,11 @@ public class Identity implements Serializable {
   
   @Inject
   Event<SignOutEvent> signOutEvent;
+
+  @PostConstruct
+  protected void init() {
+    log.info("initializing " + this.getClass().getSimpleName() + " (" + this + ")");
+  }
   
   public User getCurrentUser() {
     return currentUser;

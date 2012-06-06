@@ -12,12 +12,11 @@ import javax.faces.bean.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.activiti.engine.IdentityService;
 import org.activiti.engine.TaskService;
-import org.activiti.engine.identity.Group;
 
 import com.camunda.fox.platform.tasklist.event.SignOutEvent;
 import com.camunda.fox.platform.tasklist.event.TaskNavigationLinkSelectedEvent;
+import com.camunda.fox.platform.tasklist.identity.FoxIdentityService;
 
 @Named
 @ViewScoped
@@ -34,7 +33,7 @@ public class TaskNavigation implements Serializable {
   TaskService taskService;
 
   @Inject
-  IdentityService identityService;
+  FoxIdentityService foxIdentityService;
 
   @Inject
   private Event<TaskNavigationLinkSelectedEvent> taskNavigationLinkSelectedEvent;
@@ -42,12 +41,13 @@ public class TaskNavigation implements Serializable {
   private MyTasksLink myTasksLink;
   private UnassignedTasksLink unassignedTasksLink;
   private List<GroupTasksLink> groupTasksLinks;
+  private List<ColleaguesTasksLink> colleaguesTasksLinks;
 
   private TaskNavigationLink selected;
 
   @PostConstruct
   protected void init() {
-    log.fine("initializing " + this.getClass().getSimpleName() + " (" + this + ")");
+    log.info("initializing " + this.getClass().getSimpleName() + " (" + this + ")");
     selected = getMyTasksLink();
     selected.setActive(true);
   }
@@ -71,14 +71,28 @@ public class TaskNavigation implements Serializable {
   public List<GroupTasksLink> getGroupTasksLinks() {
     if (groupTasksLinks == null) {
       groupTasksLinks = new ArrayList<GroupTasksLink>();
-      List<Group> groups = identityService.createGroupQuery().groupMember(identity.getCurrentUser().getUsername()).list();
-      for (Group group : groups) {
-        long groupTasksCount = taskService.createTaskQuery().taskCandidateGroup(group.getId()).count();
-        GroupTasksLink gourpLink = new GroupTasksLink(group.getName() + " (" + groupTasksCount + ")", group.getId(), false);
+      List<String> groups = foxIdentityService.getGroupsByUserId(identity.getCurrentUser().getUsername());
+      for (String groupId : groups) {
+        long groupTasksCount = taskService.createTaskQuery().taskCandidateGroup(groupId).count();
+        GroupTasksLink gourpLink = new GroupTasksLink(groupId + " (" + groupTasksCount + ")", groupId, false);
         groupTasksLinks.add(gourpLink);
       }
     }
     return groupTasksLinks;
+  }
+
+  public List<ColleaguesTasksLink> getColleaguesTasksLinks() {
+    if (colleaguesTasksLinks == null) {
+      colleaguesTasksLinks = new ArrayList<ColleaguesTasksLink>();
+      List<com.camunda.fox.platform.tasklist.identity.User> colleagues = foxIdentityService.getColleaguesByUserId(identity.getCurrentUser().getUsername());
+      for (com.camunda.fox.platform.tasklist.identity.User colleague : colleagues) {
+        long colleagueTasksCount = taskService.createTaskQuery().taskAssignee(colleague.getUsername()).count();
+        ColleaguesTasksLink colleaguesLink = new ColleaguesTasksLink(colleague.getFirstname() + " " + colleague.getLastname() + " (" + colleagueTasksCount
+                + ")", colleague.getUsername(), false);
+        colleaguesTasksLinks.add(colleaguesLink);
+      }
+    }
+    return colleaguesTasksLinks;
   }
 
   public void select(@Observes TaskNavigationLinkSelectedEvent taskNavigationLinkSelectedEvent) {

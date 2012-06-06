@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import javax.annotation.PostConstruct;
 import javax.ejb.EJB;
@@ -29,6 +30,8 @@ import com.camunda.fox.platform.tasklist.event.TaskNavigationLinkSelectedEvent;
 @Named
 public class TaskList implements Serializable {
 
+  private final static Logger log = Logger.getLogger(TaskList.class.getSimpleName());
+  
   private static final long serialVersionUID = 1L;
 
   @Inject
@@ -51,12 +54,16 @@ public class TaskList implements Serializable {
   private List<Task> myTasks;
   private List<Task> unassignedTasks;
   private Map<String, List<Task>> groupTasksMap;
+  private Map<String, List<Task>> colleaguesTasksMap;
 
   @PostConstruct
   protected void init() {
+    
+    log.info("initializing " + this.getClass().getSimpleName() + " (" + this + ")");
+    
     tasks = getMyTasks();
   }
-
+  
   public List<Task> getTasks() {
     return tasks;
   }
@@ -84,6 +91,16 @@ public class TaskList implements Serializable {
     }
     return groupTasksMap.get(groupId);
   }
+  
+  public List<Task> getCoolleaguesTasks(String colleagueId) {
+    if(colleaguesTasksMap == null) {
+      colleaguesTasksMap = new HashMap<String, List<Task>>();
+    }
+    if(colleaguesTasksMap.get(colleagueId) == null) {
+      colleaguesTasksMap.put(colleagueId, taskService.createTaskQuery().taskAssignee(colleagueId).list());
+    }
+    return colleaguesTasksMap.get(colleagueId);
+  }
 
   public String getTaskFormUrl(Task task) {
     String formKey, taskFormUrl = "";
@@ -99,6 +116,18 @@ public class TaskList implements Serializable {
     return taskFormUrl;
   }
 
+  public boolean isPersonalTask(Task task) {
+    return task.getAssignee().equals(identity.getCurrentUser().getUsername());
+  }
+  
+  public void claimTask(Task task) {
+    log.info("trying to claim task " + task.getName() + " for user " + identity.getCurrentUser().getUsername());
+    
+    System.out.println("claim task");
+    
+    taskService.claim(task.getId(), identity.getCurrentUser().getUsername());
+  }
+  
   private String getRequestURL() {
     Object request = FacesContext.getCurrentInstance().getExternalContext().getRequest();
     if (request instanceof HttpServletRequest) {
@@ -107,7 +136,7 @@ public class TaskList implements Serializable {
       return "";
     }
   }
-
+  
   public void linkSelected(@Observes TaskNavigationLinkSelectedEvent taskNavigationLinkSelectedEvent) {
     TaskNavigationLink link = taskNavigationLinkSelectedEvent.getLink();
     if (link instanceof MyTasksLink) {
@@ -116,6 +145,8 @@ public class TaskList implements Serializable {
       tasks = getUnassignedTasks();
     } else if (link instanceof GroupTasksLink) {
       tasks = getGroupTasks(((GroupTasksLink) link).getGroupId());
+    } else if (link instanceof ColleaguesTasksLink) {
+      tasks = getCoolleaguesTasks(((ColleaguesTasksLink)link).getColleagueId());
     }
   }
 
