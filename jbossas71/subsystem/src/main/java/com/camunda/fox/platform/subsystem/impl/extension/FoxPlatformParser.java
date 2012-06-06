@@ -380,7 +380,9 @@ public class FoxPlatformParser implements XMLStreamConstants, XMLElementReader<L
     writeProcessEnginesContent(writer, context);
     
     writeJobExecutorContent(writer, context);
-
+    
+    // end subsystem
+    writer.writeEndElement();
   }
   
   private void writeProcessEnginesContent(final XMLExtendedStreamWriter writer, final SubsystemMarshallingContext context) throws XMLStreamException {
@@ -388,8 +390,6 @@ public class FoxPlatformParser implements XMLStreamConstants, XMLElementReader<L
     writer.writeStartElement(Element.PROCESS_ENGINES.getLocalName());
 
     ModelNode node = context.getModelNode();
-    
-    writer.writeStartElement(Element.PROCESS_ENGINES.getLocalName());
     
     ModelNode processEngineConfigurations = node.get(Element.PROCESS_ENGINES.getLocalName());
     if (processEngineConfigurations.isDefined()) {
@@ -410,31 +410,28 @@ public class FoxPlatformParser implements XMLStreamConstants, XMLElementReader<L
     }
     // end process-engines
     writer.writeEndElement();
-    
-    // end subsystem
-    writer.writeEndElement();
   }
   
   private void writeJobExecutorContent(final XMLExtendedStreamWriter writer, final SubsystemMarshallingContext context) throws XMLStreamException {
-    writer.writeStartElement(Element.JOB_EXECUTOR.getLocalName());
-    
     ModelNode node = context.getModelNode();
-    
     ModelNode jobExecutorNode = node.get(Element.JOB_EXECUTOR.getLocalName());
-    writer.writeAttribute(Attribute.NAME.getLocalName(), jobExecutorNode.get(NAME).asString());
     
-    writeJobAcquisitionsContent(writer, context);
-    
-    // end job-executor
-    writer.writeEndElement();
+    if (jobExecutorNode.isDefined()) { 
+      writer.writeStartElement(Element.JOB_EXECUTOR.getLocalName());
+      Property property = jobExecutorNode.asProperty();
+      writer.writeAttribute(Attribute.NAME.getLocalName(), property.getName());
+      
+      writeJobAcquisitionsContent(writer, context, property.getValue());
+      
+      // end job-executor
+      writer.writeEndElement();
+    }
   }
   
-  private void writeJobAcquisitionsContent(final XMLExtendedStreamWriter writer, final SubsystemMarshallingContext context) throws XMLStreamException {
+  private void writeJobAcquisitionsContent(final XMLExtendedStreamWriter writer, final SubsystemMarshallingContext context, ModelNode parentNode) throws XMLStreamException {
     writer.writeStartElement(Element.JOB_AQUISITIONS.getLocalName());
 
-    ModelNode node = context.getModelNode();
-    
-    ModelNode processEngineConfigurations = node.get(Element.JOB_AQUISITIONS.getLocalName());
+    ModelNode processEngineConfigurations = parentNode.get(Element.JOB_AQUISITIONS.getLocalName());
     if (processEngineConfigurations.isDefined()) {
       for (Property property : processEngineConfigurations.asPropertyList()) {
         // write each child element to xml
