@@ -180,6 +180,8 @@ public class JBossSubsystemXMLTest extends AbstractSubsystemTest {
     KernelServices services = installInController(subsystemXml);
     //services.getContainer().dumpServices();
     Assert.assertEquals(7, services.getContainer().getServiceNames().size());
+    
+    System.out.println(services.getPersistedSubsystemXml());
   }
   
 }
