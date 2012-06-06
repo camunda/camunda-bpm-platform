@@ -23,14 +23,18 @@
     </div>
     <div class="btn-group pull-right">
       <a class="btn dropdown-toggle" data-toggle="dropdown" href="#"><i
-        class="icon-play"></i> Start Process<span class="caret"></span></a>
-
-      <!-- TODO: create a list of links to start deployed processes -->
-
+        class="icon-play"></i> Start Process... <span class="caret"></span></a>
       <ul class="dropdown-menu">
-        <li><a href="#">Start xy process</a></li>
-        <li class="divider"></li>
-        <li><a href="#about">start z process</a></li>
+        <ui:repeat value="#{processStarter.deployedProcesses}"
+          var="item">
+          <li><h:form style="margin:0;">
+              <h:commandLink
+                id="processStarterLink"
+                action="#{processStarter.startProcess(item)}"
+                value="'#{item.name}'" />
+                <h:message for="processStarterLink" />
+            </h:form></li>
+        </ui:repeat>
       </ul>
     </div>
   </ui:define>
@@ -63,7 +67,6 @@
             </h:commandLink></li>
         </ui:repeat>
         <li class="nav-header">Colleagues</li>
-
         <ui:repeat value="#{taskNavigation.colleaguesTasksLinks}"
           var="item">
           <li class="#{item.active ? 'active' : ''}"><h:commandLink
@@ -72,7 +75,6 @@
               <f:ajax render=":taskListView :taskNavigation" />
             </h:commandLink></li>
         </ui:repeat>
-
       </ul>
     </h:form>
   </ui:define>
