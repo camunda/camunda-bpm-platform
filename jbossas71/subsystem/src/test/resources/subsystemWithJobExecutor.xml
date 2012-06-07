@@ -1,5 +1,5 @@
 <subsystem xmlns="urn:com.camunda.fox.fox-platform:1.0">
-	<job-executor name="job-executor-tp">
+	<job-executor thread-pool-name="job-executor-tp">
 		<job-acquisitions>
 			<job-acquisition name="default">
 				<acquisition-strategy>SEQUENTIAL</acquisition-strategy>
