@@ -17,7 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 @WebFilter(filterName = "SignedInFilter", urlPatterns = { "/app/*" })
 public class SignedInFilter implements Filter {
 
-  private final static Logger log = Logger.getLogger(SignedInFilter.class.getSimpleName());
+  private final static Logger log = Logger.getLogger(SignedInFilter.class.getCanonicalName());
 
   @Inject
   Identity identity;

@@ -16,7 +16,7 @@ import com.camunda.fox.platform.tasklist.event.SignOutEvent;
 @Named
 public class Identity implements Serializable {
 
-  private static final Logger log = Logger.getLogger(Identity.class.getSimpleName());
+  private static final Logger log = Logger.getLogger(Identity.class.getCanonicalName());
   
   private static final long serialVersionUID = 1L;
   private User currentUser = new User();
@@ -29,7 +29,7 @@ public class Identity implements Serializable {
 
   @PostConstruct
   protected void init() {
-    log.info("initializing " + this.getClass().getSimpleName() + " (" + this + ")");
+    log.finest("initializing " + this.getClass().getSimpleName() + " (" + this + ")");
   }
   
   public User getCurrentUser() {
@@ -41,6 +41,7 @@ public class Identity implements Serializable {
   }
 
   public void signIn() {
+    // TODO: add authentication
     signInEvent.fire(new SignInEvent());
   }
 
