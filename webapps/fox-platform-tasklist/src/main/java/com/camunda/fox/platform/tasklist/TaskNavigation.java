@@ -22,7 +22,7 @@ import com.camunda.fox.platform.tasklist.identity.FoxIdentityService;
 @ViewScoped
 public class TaskNavigation implements Serializable {
 
-  private static final Logger log = Logger.getLogger(TaskNavigation.class.getSimpleName());
+  private static final Logger log = Logger.getLogger(TaskNavigation.class.getCanonicalName());
 
   private static final long serialVersionUID = 1L;
 
@@ -47,7 +47,7 @@ public class TaskNavigation implements Serializable {
 
   @PostConstruct
   protected void init() {
-    log.info("initializing " + this.getClass().getSimpleName() + " (" + this + ")");
+    log.finest("initializing " + this.getClass().getSimpleName() + " (" + this + ")");
     selected = getMyTasksLink();
     selected.setActive(true);
   }
@@ -112,7 +112,7 @@ public class TaskNavigation implements Serializable {
   }
 
   public void select(TaskNavigationLink link) {
-    log.fine("Menu entry " + link + " was selected, firing TaskNavigationLinkSelectedEvent.");
+    log.finest("Menu entry " + link + " was selected, firing TaskNavigationLinkSelectedEvent.");
     taskNavigationLinkSelectedEvent.fire(new TaskNavigationLinkSelectedEvent(link));
   }
 

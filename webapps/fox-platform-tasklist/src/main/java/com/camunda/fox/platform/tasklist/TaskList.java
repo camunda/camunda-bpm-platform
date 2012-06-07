@@ -30,7 +30,7 @@ import com.camunda.fox.platform.tasklist.event.TaskNavigationLinkSelectedEvent;
 @Named
 public class TaskList implements Serializable {
 
-  private final static Logger log = Logger.getLogger(TaskList.class.getSimpleName());
+  private final static Logger log = Logger.getLogger(TaskList.class.getCanonicalName());
   
   private static final long serialVersionUID = 1L;
 
@@ -58,9 +58,7 @@ public class TaskList implements Serializable {
 
   @PostConstruct
   protected void init() {
-    
-    log.info("initializing " + this.getClass().getSimpleName() + " (" + this + ")");
-    
+    log.finest("initializing " + this.getClass().getSimpleName() + " (" + this + ")");
     tasks = getMyTasks();
   }
   
