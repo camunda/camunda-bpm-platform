@@ -15,7 +15,7 @@
  */
 package com.camunda.fox.platform.subsystem.impl.extension.handler;
 
-import static com.camunda.fox.platform.subsystem.impl.extension.ModelConstants.NAME;
+import static com.camunda.fox.platform.subsystem.impl.extension.ModelConstants.THREAD_POOL_NAME;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.ADD;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.DESCRIPTION;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OPERATION_NAME;
@@ -52,9 +52,9 @@ public class JobExecutorAdd extends AbstractBoottimeAddStepHandler implements De
     node.get(DESCRIPTION).set("Adds a job executor");
     node.get(OPERATION_NAME).set(ADD);
     
-    node.get(REQUEST_PROPERTIES, NAME, DESCRIPTION).set("Thread pool name for global job executor");
-    node.get(REQUEST_PROPERTIES, NAME, TYPE).set(ModelType.STRING);
-    node.get(REQUEST_PROPERTIES, NAME, REQUIRED).set(true);
+    node.get(REQUEST_PROPERTIES, THREAD_POOL_NAME, DESCRIPTION).set("Thread pool name for global job executor");
+    node.get(REQUEST_PROPERTIES, THREAD_POOL_NAME, TYPE).set(ModelType.STRING);
+    node.get(REQUEST_PROPERTIES, THREAD_POOL_NAME, REQUIRED).set(true);
     
     return node;
   }
@@ -62,11 +62,11 @@ public class JobExecutorAdd extends AbstractBoottimeAddStepHandler implements De
   @Override
   protected void populateModel(ModelNode operation, ModelNode model) throws OperationFailedException {
       String jobExecutorThreadPoolName = "default";
-      if (operation.hasDefined(NAME)) {
-         jobExecutorThreadPoolName = operation.get(NAME).asString();
+      if (operation.hasDefined(THREAD_POOL_NAME)) {
+         jobExecutorThreadPoolName = operation.get(THREAD_POOL_NAME).asString();
       }
       
-      model.get(NAME).set(jobExecutorThreadPoolName);
+      model.get(THREAD_POOL_NAME).set(jobExecutorThreadPoolName);
   }
   
   

@@ -276,12 +276,12 @@
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:threads:1.1">
             <bounded-queue-thread-pool name="job-executor-tp" allow-core-timeout="true">
-                <core-threads count="50"/>
-                <queue-length count="50"/>
-                <max-threads count="50"/>
+                <core-threads count="3"/>
+                <queue-length count="3"/>
+                <max-threads count="10"/>
                 <keepalive-time time="10" unit="seconds"/>
             </bounded-queue-thread-pool>
-		</subsystem>        	
+        </subsystem>        	
         <subsystem xmlns="urn:jboss:domain:transactions:1.1">
             <core-environment>
                 <process-id>
@@ -310,33 +310,31 @@
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:weld:1.0"/>
         <subsystem xmlns="urn:com.camunda.fox.fox-platform:1.0">
-                <process-engines>
-                    <process-engine name="default" default="true">
-                    	<datasource>java:jboss/datasources/FoxEngineDS</datasource>
-                    	<history-level>audit</history-level>
-                    	
-                    	<properties>
-					      <!--property name="isAutoSchemaUpdate">true</property-->
-					      <property name="jobExecutorAcquisitionName">default</property>
-					      <property name="isAutoSchemaUpdate">true</property>                    	
-                    	</properties>
-                    </process-engine>
-                </process-engines>
-	            <job-executor name="job-executor-tp">
-	               <job-acquisitions>
-	                <job-acquisition name="default">
-	                    <acquisition-strategy>SEQUENTIAL</acquisition-strategy>
+            <process-engines>
+                <process-engine name="default" default="true">
+                    <datasource>java:jboss/datasources/FoxEngineDS</datasource>
+                    <history-level>audit</history-level>
+                    <properties>
+                        <property name="jobExecutorAcquisitionName">default</property>
+                        <property name="isAutoSchemaUpdate">true</property>                    	
+                    </properties>
+                </process-engine>
+            </process-engines>
+            <job-executor thread-pool-name="job-executor-tp">
+                <job-acquisitions>
+                    <job-acquisition name="default">
+                        <acquisition-strategy>SEQUENTIAL</acquisition-strategy>
 	                    <properties>
-	                    	<property name="lockTimeInMillis">5000</property>
-						    <property name="waitTimeInMillis">10000</property>
-  					        <property name="maxJobsPerAcquisition">50</property>
-	                    </properties>
-	                </job-acquisition>
-	                <job-acquisition name="anders">
-	                	<acquisition-strategy>SEQUENTIAL</acquisition-strategy>
-	                </job-acquisition>
-				   </job-acquisitions>	                
-	            </job-executor>                 
+                            <property name="lockTimeInMillis">300000</property>
+                            <property name="waitTimeInMillis">5000</property>
+                            <property name="maxJobsPerAcquisition">3</property>
+                        </properties>
+                    </job-acquisition>
+                    <job-acquisition name="anders">
+                        <acquisition-strategy>SEQUENTIAL</acquisition-strategy>
+                    </job-acquisition>
+                </job-acquisitions>	                
+            </job-executor>                 
         </subsystem>
     </profile>
 

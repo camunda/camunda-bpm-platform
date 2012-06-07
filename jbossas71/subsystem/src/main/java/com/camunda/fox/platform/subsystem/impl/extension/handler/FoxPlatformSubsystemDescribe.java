@@ -116,7 +116,7 @@ public class FoxPlatformSubsystemDescribe implements OperationStepHandler, Descr
   }
   
   private void addJobExecutor(ModelNode property, ModelNode jobExecutorAdd, PathAddress jobExecutorAddress, ModelNode result) {
-    jobExecutorAdd.get(NAME).set(property.get(NAME).asString());
+    jobExecutorAdd.get(THREAD_POOL_NAME).set(property.get(THREAD_POOL_NAME).asString());
     
     result.add(jobExecutorAdd);
   }

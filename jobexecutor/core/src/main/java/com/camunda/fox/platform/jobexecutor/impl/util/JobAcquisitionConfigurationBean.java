@@ -22,6 +22,10 @@ public class JobAcquisitionConfigurationBean implements JobAcquisitionConfigurat
   protected Integer waitTimeInMillis;
   
   protected Map<String, Object> properties = new HashMap<String, Object>();
+  
+  public JobAcquisitionConfigurationBean() {
+    initJobAcquisitionConfigurationDefaultValues();
+  }
 
   public String getAcquisitionName() {
     return acquisitionName;
@@ -77,6 +81,23 @@ public class JobAcquisitionConfigurationBean implements JobAcquisitionConfigurat
 //    properties.put(PROP_MAX_JOBS_PER_ACQUISITION, maxJobsPerAcquisition);
 //    properties.put(PROP_WAIT_TIME_IN_MILLIS, waitTimeInMillis);
     return properties;
+  }
+  
+  private void initJobAcquisitionConfigurationDefaultValues() {
+    lockTimeInMillis = 5 * 60 * 1000;
+    maxJobsPerAcquisition = 3;
+    waitTimeInMillis = 5 * 1000;
+    
+    if (properties.get(JobAcquisitionConfiguration.PROP_LOCK_TIME_IN_MILLIS) == null) {
+       properties.put(JobAcquisitionConfiguration.PROP_LOCK_TIME_IN_MILLIS, lockTimeInMillis);          
+    }
+    if (properties.get(JobAcquisitionConfiguration.PROP_MAX_JOBS_PER_ACQUISITION) == null) {
+       properties.put(JobAcquisitionConfiguration.PROP_MAX_JOBS_PER_ACQUISITION, maxJobsPerAcquisition);
+    }
+    if (properties.get(JobAcquisitionConfiguration.PROP_WAIT_TIME_IN_MILLIS) == null) {
+       properties.put(JobAcquisitionConfiguration.PROP_WAIT_TIME_IN_MILLIS, waitTimeInMillis);
+    }    
+
   }
 
 }
