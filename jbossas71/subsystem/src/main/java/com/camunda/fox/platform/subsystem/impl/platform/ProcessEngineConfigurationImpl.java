@@ -68,7 +68,7 @@ public class ProcessEngineConfigurationImpl implements ProcessEngineConfiguratio
   private void initProcessEngineConfigurationDefaultValues() {
     // TODO: populate ProcessEngineConfiguration field via reflection from this map
     boolean isActivateJobExecutor=true;
-    boolean isAutoUpdateSchema =true;
+    boolean isAutoUpdateSchema =false;
     String dbTablePrefix = null;
     
     if (properties.get(PROP_IS_ACTIVATE_JOB_EXECUTOR) == null) {
