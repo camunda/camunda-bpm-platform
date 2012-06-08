@@ -20,9 +20,15 @@ import com.camunda.fox.platform.tasklist.identity.User;
 public class ActivitiIdentityServiceImpl implements FoxIdentityService, Serializable {
 
   private static final long serialVersionUID = 1L;
+  
   @Inject
-  IdentityService identityService;
+  private IdentityService identityService;
 
+  @Override
+  public void authenticateUser(String userId, String password) {
+    // always authenticate
+  }
+  
   @Override
   public List<String> getGroupsByUserId(String userId) {
     List<String> groupIds = new ArrayList<String>();
