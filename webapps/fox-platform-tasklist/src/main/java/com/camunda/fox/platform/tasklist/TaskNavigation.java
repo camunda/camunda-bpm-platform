@@ -30,10 +30,10 @@ public class TaskNavigation implements Serializable {
   private Identity identity;
 
   @Inject
-  TaskService taskService;
+  private TaskService taskService;
 
   @Inject
-  FoxIdentityService foxIdentityService;
+  private FoxIdentityService foxIdentityService;
 
   @Inject
   private Event<TaskNavigationLinkSelectedEvent> taskNavigationLinkSelectedEvent;

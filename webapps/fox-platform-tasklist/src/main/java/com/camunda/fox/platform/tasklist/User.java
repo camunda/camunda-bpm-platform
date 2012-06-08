@@ -14,7 +14,6 @@ public class User implements Serializable {
   }
 
   public User(String username, String password) {
-    super();
     this.username = username;
     this.password = password;
   }
@@ -33,5 +32,10 @@ public class User implements Serializable {
 
   public void setPassword(String password) {
     this.password = password;
+  }
+
+  @Override
+  public String toString() {
+    return "User [username=" + username + "]";
   }
 }
