@@ -6,6 +6,7 @@ import java.util.Hashtable;
 import java.util.List;
 
 import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.inject.Alternative;
 import javax.inject.Named;
 import javax.naming.AuthenticationException;
 import javax.naming.Context;
@@ -17,6 +18,7 @@ import com.camunda.fox.platform.tasklist.identity.User;
 
 @Named
 @ApplicationScoped
+@Alternative
 public class LdapIdentityServiceImpl implements FoxIdentityService, Serializable {
 
   private static final long serialVersionUID = 1L;
