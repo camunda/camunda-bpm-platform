@@ -13,13 +13,13 @@ import javax.naming.Context;
 import javax.naming.directory.DirContext;
 import javax.naming.directory.InitialDirContext;
 
-import com.camunda.fox.platform.tasklist.identity.FoxIdentityService;
+import com.camunda.fox.platform.tasklist.identity.TasklistIdentityService;
 import com.camunda.fox.platform.tasklist.identity.User;
 
 @Named
 @ApplicationScoped
 @Alternative
-public class LdapIdentityServiceImpl implements FoxIdentityService, Serializable {
+public class LdapIdentityServiceImpl implements TasklistIdentityService, Serializable {
 
   private static final long serialVersionUID = 1L;
 

@@ -12,12 +12,12 @@ import javax.inject.Named;
 import org.activiti.engine.IdentityService;
 import org.activiti.engine.identity.Group;
 
-import com.camunda.fox.platform.tasklist.identity.FoxIdentityService;
+import com.camunda.fox.platform.tasklist.identity.TasklistIdentityService;
 import com.camunda.fox.platform.tasklist.identity.User;
 
 @Named
 @ApplicationScoped
-public class ActivitiIdentityServiceImpl implements FoxIdentityService, Serializable {
+public class ActivitiIdentityServiceImpl implements TasklistIdentityService, Serializable {
 
   private static final long serialVersionUID = 1L;
   

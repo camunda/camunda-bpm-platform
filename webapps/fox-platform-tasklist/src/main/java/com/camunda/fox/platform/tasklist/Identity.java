@@ -11,7 +11,7 @@ import javax.inject.Named;
 
 import com.camunda.fox.platform.tasklist.event.SignInEvent;
 import com.camunda.fox.platform.tasklist.event.SignOutEvent;
-import com.camunda.fox.platform.tasklist.identity.FoxIdentityService;
+import com.camunda.fox.platform.tasklist.identity.TasklistIdentityService;
 
 @SessionScoped
 @Named
@@ -29,7 +29,7 @@ public class Identity implements Serializable {
   private Event<SignOutEvent> signOutEvent;
   
   @Inject
-  private FoxIdentityService foxIdentityService;
+  private TasklistIdentityService foxIdentityService;
 
   @PostConstruct
   protected void init() {
