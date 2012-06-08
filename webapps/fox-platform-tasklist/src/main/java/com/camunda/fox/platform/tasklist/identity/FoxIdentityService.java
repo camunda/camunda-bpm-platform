@@ -10,6 +10,12 @@ import java.util.List;
 public interface FoxIdentityService {
 
   // ...
+  
+  /**
+   * check the user with the given id and password and throws an exception
+   * if the user doesn't exist or the password is invalid.
+   */
+  public void authenticateUser(String userId, String password);
 
   /**
    * Returns a list of group ids, representing the groups the user is a member

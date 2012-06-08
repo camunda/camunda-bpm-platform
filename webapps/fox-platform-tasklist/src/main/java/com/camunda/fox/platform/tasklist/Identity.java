@@ -11,6 +11,7 @@ import javax.inject.Named;
 
 import com.camunda.fox.platform.tasklist.event.SignInEvent;
 import com.camunda.fox.platform.tasklist.event.SignOutEvent;
+import com.camunda.fox.platform.tasklist.identity.FoxIdentityService;
 
 @SessionScoped
 @Named
@@ -22,10 +23,13 @@ public class Identity implements Serializable {
   private User currentUser = new User();
 
   @Inject
-  Event<SignInEvent> signInEvent;
+  private Event<SignInEvent> signInEvent;
   
   @Inject
-  Event<SignOutEvent> signOutEvent;
+  private Event<SignOutEvent> signOutEvent;
+  
+  @Inject
+  private FoxIdentityService foxIdentityService;
 
   @PostConstruct
   protected void init() {
@@ -41,7 +45,8 @@ public class Identity implements Serializable {
   }
 
   public void signIn() {
-    // TODO: add authentication
+    foxIdentityService.authenticateUser(currentUser.getUsername(), currentUser.getPassword());
+
     signInEvent.fire(new SignInEvent());
   }
 
