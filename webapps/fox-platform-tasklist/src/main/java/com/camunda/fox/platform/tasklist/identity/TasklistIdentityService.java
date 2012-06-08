@@ -7,7 +7,7 @@ import java.util.List;
  * 
  * @author Nils Preusker - nils.preusker@camunda.com
  */
-public interface FoxIdentityService {
+public interface TasklistIdentityService {
 
   // ...
   

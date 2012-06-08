@@ -16,7 +16,7 @@ import org.activiti.engine.TaskService;
 
 import com.camunda.fox.platform.tasklist.event.SignOutEvent;
 import com.camunda.fox.platform.tasklist.event.TaskNavigationLinkSelectedEvent;
-import com.camunda.fox.platform.tasklist.identity.FoxIdentityService;
+import com.camunda.fox.platform.tasklist.identity.TasklistIdentityService;
 
 @Named
 @ViewScoped
@@ -33,7 +33,7 @@ public class TaskNavigation implements Serializable {
   private TaskService taskService;
 
   @Inject
-  private FoxIdentityService foxIdentityService;
+  private TasklistIdentityService foxIdentityService;
 
   @Inject
   private Event<TaskNavigationLinkSelectedEvent> taskNavigationLinkSelectedEvent;
