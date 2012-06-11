@@ -88,33 +88,45 @@
   <!-- Task List -->
   <ui:define name="content">
     <h:form id="taskListView">
+	<div class="row">
+		<div class="span2">
+			<strong>Task</strong>
+		</div>
+		<div class="span2">
+			<strong>Process</strong>
+		</div>
+		<div class="span2">
+			<strong>Creation Date</strong>
+		</div>
+		<div class="span3">
+			<strong>Action</strong>
+		</div>
+		<div class="span2">
+			<strong>Delegate To</strong>
+		</div>
+	</div>
 	<ui:repeat value="#{taskList.tasks}" var="task">
 			<div class="row">
 				<div class="span2">
-					<strong>
-						<h:outputText value="#{task.name} "/>
-					</strong>
+					<h:outputText value="#{task.name} "/>
+				</div>
+				<div class="span2">
+					 <h:outputText value="#{taskList.getProcessDefinition(task.processDefinitionId).name}" />
 				</div>
 				<div class="span2">
 					 <h:outputText value="#{task.createTime}" >
            					<f:convertDateTime pattern="yyyy-MMM-dd HH:mm" /> 
 					 </h:outputText>
 				</div>
-				<div class="span2">
-					<h:outputText value="#{task.dueDate} ">
-           					<f:convertDateTime pattern="yyyy-MMM-dd HH:mm" /> 
-					</h:outputText>
-				</div>
 				<h:panelGroup rendered="#{taskList.isPersonalTask(task)}">
 					<div class="span3">
 	                	<h:outputLink value="#{taskList.getTaskFormUrl(task)}" rendered="#{taskList.getTaskFormUrl(task) != null}">work on task &#187;</h:outputLink>
-	                	<h:outputText value="no task form provided" rendered="#{taskList.getTaskFormUrl(task)} == null}" />
+	                	<h:outputText value="no task form provided" rendered="#{taskList.getTaskFormUrl(task) == null}" />
 					</div>
-					<div class="span1">
-	                	<h:commandLink action="#{taskList.delegate(task)}" value="delegate to:" />
+					<div class="span2">
+	                	<h:commandLink action="#{taskList.delegate(task)}" value="do" />
 	                	<h:selectOneMenu value="#{taskList.delegateToColleague}">
-							<f:selectItems value="#{taskList.colleages}" var="user" 
-								itemLabel="#{user.firstname} #{user.lastname}" itemValue="#{user.username}" />
+							<f:selectItems value="#{taskList.colleages}" var="user" itemLabel="#{user.firstname} #{user.lastname}" itemValue="#{user.username}" />
 	                	</h:selectOneMenu>
 	                </div>
                 </h:panelGroup>
