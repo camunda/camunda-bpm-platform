@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.annotation.PostConstruct;
@@ -117,17 +118,23 @@ public class TaskList implements Serializable {
   }
 
   public String getTaskFormUrl(Task task) {
-    String formKey, taskFormUrl = "";
-    TaskFormData taskFormData = formService.getTaskFormData(task.getId());
-    if (taskFormData == null || taskFormData.getFormKey() == null) {
+    try {
+      String formKey, taskFormUrl = "";
+      TaskFormData taskFormData = formService.getTaskFormData(task.getId());
+      if (taskFormData == null || taskFormData.getFormKey() == null) {
+        return null;
+      }
+      formKey = taskFormData.getFormKey();
+      ProcessArchive processArchive = processArchiveService.getProcessArchiveByProcessDefinitionId(task.getProcessDefinitionId(), processEngine.getName());
+      String contextPath = (String) processArchive.getProperties().get(ProcessArchive.PROP_SERVLET_CONTEXT_PATH);
+      String callbackUrl = getRequestURL();
+      taskFormUrl = "../.." + contextPath + "/" + formKey + ".jsf?taskId=" + task.getId() + "&callbackUrl=" + callbackUrl;
+      return taskFormUrl;
+    }
+    catch (Exception ex) {
+      log.log(Level.WARNING, "Could not resolve task form URL for " + task, ex);
       return null;
     }
-    formKey = taskFormData.getFormKey();
-    ProcessArchive processArchive = processArchiveService.getProcessArchiveByProcessDefinitionId(task.getProcessDefinitionId(), processEngine.getName());
-    String contextPath = (String) processArchive.getProperties().get(ProcessArchive.PROP_SERVLET_CONTEXT_PATH);
-    String callbackUrl = getRequestURL();
-    taskFormUrl = "../.." + contextPath + "/" + formKey + ".jsf?taskId=" + task.getId() + "&callbackUrl=" + callbackUrl;
-    return taskFormUrl;
   }
 
   public String delegate(Task task) {
