@@ -107,7 +107,8 @@
 				</div>
 				<h:panelGroup rendered="#{taskList.isPersonalTask(task)}">
 					<div class="span3">
-	                	<h:outputLink value="#{taskList.getTaskFormUrl(task)}">work on task &#187;</h:outputLink>
+	                	<h:outputLink value="#{taskList.getTaskFormUrl(task)}" rendered="#{taskList.getTaskFormUrl(task) != null}">work on task &#187;</h:outputLink>
+	                	<h:outputText value="no task form provided" rendered="#{taskList.getTaskFormUrl(task)} == null}" />
 					</div>
 					<div class="span1">
 	                	<h:commandLink action="#{taskList.delegate(task)}" value="delegate to:" />
