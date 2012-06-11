@@ -3,9 +3,9 @@
 	<modelVersion>4.0.0</modelVersion>
 	<!-- <parent> <artifactId>fox-platform</artifactId> <groupId>com.camunda.fox.platform</groupId> 
 		<version>6.1.0-SNAPSHOT</version> </parent> -->
-	<groupId>com.camunda.fox.platform</groupId>
-	<artifactId>fox-platform-tasklist</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<groupId>com.camunda.fox.tasklist</groupId>
+	<artifactId>tasklist-webapp</artifactId>
+	<version>6.1.0-SNAPSHOT</version>
 	<packaging>war</packaging>
 	<name>fox platform EE - Task List</name>
 	<description>fox platform EE Task List is a basic example for showcasing human task management with the fox platform.</description>
