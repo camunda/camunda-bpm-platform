@@ -1,3 +1,4 @@
+package com.camunda.fox.client.impl.web;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -11,7 +12,7 @@ import org.activiti.cdi.BusinessProcess;
 
 @ConversationScoped
 @Named
-public class TasklistCallback implements Serializable {
+public class TaskForm implements Serializable {
 
   private static final long serialVersionUID = 1L;
 
@@ -19,12 +20,16 @@ public class TasklistCallback implements Serializable {
   
   @Inject
   private BusinessProcess businessProcess;
+  
+  public void beginTask(String taskId, String callbackUrl) {
+    // Note that we always run in a conversation
+    this.url = callbackUrl;
+    businessProcess.startTask(taskId, true);
+  }
 
-  public void completeTask(boolean endConversation) throws IOException {
-    // TODO: Verify conversation state (remove parameter from method?) since 
-    // with running conversation this results in an exception:
-    // 
-    businessProcess.completeTask(endConversation);
+  public void completeTask() throws IOException {
+    // the conversation is always ended on task completion (otherwise the redirect will end up in an exception anyway!)
+    businessProcess.completeTask(true);
     FacesContext.getCurrentInstance().getExternalContext().redirect(url);
   }
     
