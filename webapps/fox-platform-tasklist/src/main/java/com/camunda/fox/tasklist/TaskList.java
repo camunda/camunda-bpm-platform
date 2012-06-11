@@ -18,8 +18,10 @@ import javax.servlet.http.HttpServletRequest;
 
 import org.activiti.engine.FormService;
 import org.activiti.engine.ProcessEngine;
+import org.activiti.engine.RepositoryService;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.form.TaskFormData;
+import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.task.Task;
 import org.activiti.engine.task.TaskQuery;
 
@@ -40,6 +42,9 @@ public class TaskList implements Serializable {
 
   @Inject
   private TaskService taskService;
+  
+  @Inject
+  private RepositoryService repositoryService;  
 
   @Inject
   private FormService formService;
@@ -85,6 +90,12 @@ public class TaskList implements Serializable {
     }
     return myTasks;
   }
+  
+  public ProcessDefinition getProcessDefinition(String processDefinitionId) {
+    // TODO: For performance improvements we could introduce our own DTO which queries the process definition together with the tasks immediately
+    // see https://app.camunda.com/confluence/display/foxUserGuide/Performance+Tuning+with+custom+Queries
+    return repositoryService.createProcessDefinitionQuery().processDefinitionId(processDefinitionId).singleResult();
+  }  
 
   private List<Task> getList(TaskQuery taskQuery) {
     return taskQuery.orderByTaskCreateTime().desc().list();
