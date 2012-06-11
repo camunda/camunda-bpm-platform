@@ -21,7 +21,7 @@ public class TaskForm implements Serializable {
   @Inject
   private BusinessProcess businessProcess;
   
-  public void beginTask(String taskId, String callbackUrl) {
+  public void startTask(String taskId, String callbackUrl) {
     // Note that we always run in a conversation
     this.url = callbackUrl;
     businessProcess.startTask(taskId, true);
