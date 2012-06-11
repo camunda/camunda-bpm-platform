@@ -7,3 +7,4 @@ bin
 .metadata
 transaction.log
 nbactions.xml
+/webapps/fox-platform-tasklist/server-work

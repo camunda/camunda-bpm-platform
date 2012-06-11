@@ -14,8 +14,10 @@
           value="#{identity.currentUser.username} " /><span
         class="caret"></span></a>
       <ul class="dropdown-menu">
+      	<!-- Not yet used
         <li><a href="#">Profile</a></li>
         <li class="divider"></li>
+         -->
         <li><h:form style="margin:0;">
             <h:commandLink action="#{identity.signOut()}">Sign out</h:commandLink>
           </h:form></li>
@@ -31,7 +33,7 @@
               <h:commandLink
                 id="processStarterLink"
                 action="#{processStarter.startProcess(item)}"
-                value="'#{item.name}'" />
+                value="#{item.name}" />
                 <h:message for="processStarterLink" />
             </h:form></li>
         </ui:repeat>
@@ -52,12 +54,15 @@
             <f:ajax render=":taskListView :taskNavigation" />
           </h:commandLink>
         </li>
+        <h:panelGroup rendered="#{taskNavigation.unassignedTasksLink.count>0}">
         <li
-          class="#{taskNavigation.unassignedTasksLink.active ? 'active' : ''}"><h:commandLink
-            value="#{taskNavigation.unassignedTasksLink.label}"
-            action="#{taskNavigation.select(taskNavigation.unassignedTasksLink)}">
-            <f:ajax render=":taskListView :taskNavigation" />
-          </h:commandLink></li>
+	            class="#{taskNavigation.unassignedTasksLink.active ? 'active' : ''}">
+	            <h:commandLink
+	            	value="#{taskNavigation.unassignedTasksLink.label}"
+	            	action="#{taskNavigation.select(taskNavigation.unassignedTasksLink)}">
+	            	<f:ajax render=":taskListView :taskNavigation" />
+	          </h:commandLink>
+	    </li></h:panelGroup>
         <li class="nav-header">Group Tasks</li>
         <ui:repeat value="#{taskNavigation.groupTasksLinks}" var="item">
           <li class="#{item.active ? 'active' : ''}"><h:commandLink
@@ -83,31 +88,42 @@
   <!-- Task List -->
   <ui:define name="content">
     <h:form id="taskListView">
-      <ui:repeat value="#{taskList.tasks}" var="task">
-        <div class="row-fluid">
-          <div class="span12">
-            <h2>
-              <h:outputText value="#{task.name} " />
-            </h2>
-            <p>
-              <h:outputText value="#{task.description} " />
-            </p>
-            <p>
-              <h:panelGroup rendered="#{taskList.isPersonalTask(task)}">
-                <h:outputLink styleClass="btn"
-                  value="#{taskList.getTaskFormUrl(task)}">Edit &#187;</h:outputLink>
-              </h:panelGroup>
-              <h:panelGroup rendered="#{!taskList.isPersonalTask(task)}">
-                <h:commandLink styleClass="btn" value="Claim Task"
-                  action="#{taskList.claimTask(task)}">
-                </h:commandLink>
-              </h:panelGroup>
-            </p>
-          </div>
-          <!--/span-->
-        </div>
-        <!--/row-->
-      </ui:repeat>
+	<ui:repeat value="#{taskList.tasks}" var="task">
+			<div class="row">
+				<div class="span2">
+					<strong>
+						<h:outputText value="#{task.name} "/>
+					</strong>
+				</div>
+				<div class="span2">
+					 <h:outputText value="#{task.createTime}" >
+           					<f:convertDateTime pattern="yyyy-MMM-dd HH:mm" /> 
+					 </h:outputText>
+				</div>
+				<div class="span2">
+					<h:outputText value="#{task.dueDate} ">
+           					<f:convertDateTime pattern="yyyy-MMM-dd HH:mm" /> 
+					</h:outputText>
+				</div>
+				<h:panelGroup rendered="#{taskList.isPersonalTask(task)}">
+					<div class="span3">
+	                	<h:outputLink value="#{taskList.getTaskFormUrl(task)}">work on task &#187;</h:outputLink>
+					</div>
+					<div class="span1">
+	                	<h:commandLink action="#{taskList.delegate(task)}" value="delegate to:" />
+	                	<h:selectOneMenu value="#{taskList.delegateToColleague}">
+							<f:selectItems value="#{taskList.colleages}" var="user" 
+								itemLabel="#{user.firstname} #{user.lastname}" itemValue="#{user.username}" />
+	                	</h:selectOneMenu>
+	                </div>
+                </h:panelGroup>
+                <h:panelGroup rendered="#{!taskList.isPersonalTask(task)}">
+					<div class="span3">
+		                <h:commandLink value="claim" action="#{taskList.claimTask(task)}" />
+		            </div>
+                </h:panelGroup>
+			</div>
+		</ui:repeat>      
     </h:form>
 
   </ui:define>
