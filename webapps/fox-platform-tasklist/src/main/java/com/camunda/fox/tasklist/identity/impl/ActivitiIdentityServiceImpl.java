@@ -2,7 +2,6 @@ package com.camunda.fox.tasklist.identity.impl;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.enterprise.context.ApplicationScoped;
@@ -41,18 +40,19 @@ public class ActivitiIdentityServiceImpl implements TasklistIdentityService, Ser
 
   @Override
   public List<User> getColleaguesByUserId(String userId) {
-    User kermit = new User("kermit", "Kermit", "The Frog");
-    User gonzo = new User("gonzo", "Gonzo", "The Great");
-    User fozzie = new User("fozzie", "Fozzie", "Bear");
-    if (userId.equals("kermit")) {
-      return Arrays.asList(new User[] { gonzo, fozzie });
-    } else if (userId.equals("gonzo")) {
-      return Arrays.asList(new User[] { kermit, fozzie });
-    } else if (userId.equals("fozzie")) {
-      return Arrays.asList(new User[] { gonzo, kermit });
-    } else {
-      return new ArrayList<User>();
+    // always return all Activiti demo users as colleagues
+    // even if we logged on with some other user
+    ArrayList<User> colleagues = new ArrayList<User>();
+    if (!userId.equals("kermit")) {
+      colleagues.add(new User("kermit", "Kermit", "The Frog"));
     }
+    if (!userId.equals("gonzo")) {
+      colleagues.add(new User("gonzo", "Gonzo", "The Great"));
+    }
+    if (!userId.equals("fozzie")) {
+      colleagues.add(new User("fozzie", "Fozzie", "Bear"));
+    } 
+    return colleagues;
   }
 
 }
