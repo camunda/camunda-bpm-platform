@@ -14,10 +14,6 @@
           value="#{identity.currentUser.username} " /><span
         class="caret"></span></a>
       <ul class="dropdown-menu">
-      	<!-- Not yet used
-        <li><a href="#">Profile</a></li>
-        <li class="divider"></li>
-         -->
         <li><h:form style="margin:0;">
             <h:commandLink action="#{identity.signOut()}">Sign out</h:commandLink>
           </h:form></li>
@@ -30,7 +26,8 @@
         <ui:repeat value="#{processStarter.deployedProcesses}"
           var="item">
           <li><h:form style="margin:0;">
-              <h:commandLink
+          	  <h:outputLink value="#{taskList.getStartFormUrl(item)}" rendered="#{taskList.getStartFormUrl(item) != null}">#{item.name} &#187;</h:outputLink>
+              <h:commandLink rendered="#{taskList.getStartFormUrl(item) == null}"
                 id="processStarterLink"
                 action="#{processStarter.startProcess(item)}"
                 value="#{item.name}" />

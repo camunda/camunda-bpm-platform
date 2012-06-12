@@ -3,12 +3,16 @@ package com.camunda.fox.client.impl.web;
 import java.io.IOException;
 import java.io.Serializable;
 
+import javax.enterprise.context.Conversation;
 import javax.enterprise.context.ConversationScoped;
+import javax.enterprise.inject.Instance;
 import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.activiti.cdi.BusinessProcess;
+import org.activiti.engine.RepositoryService;
+import org.activiti.engine.repository.ProcessDefinition;
 
 @ConversationScoped
 @Named
@@ -17,10 +21,18 @@ public class TaskForm implements Serializable {
   private static final long serialVersionUID = 1L;
 
   private String url;
+
+  private String processDefinitionId; 
   
   @Inject
   private BusinessProcess businessProcess;
-  
+
+  @Inject
+  private RepositoryService repositoryService;
+
+  @Inject
+  private Instance<Conversation> conversationInstance;
+
   public void startTask(String taskId, String callbackUrl) {
     // Note that we always run in a conversation
     this.url = callbackUrl;
@@ -28,11 +40,37 @@ public class TaskForm implements Serializable {
   }
 
   public void completeTask() throws IOException {
-    // the conversation is always ended on task completion (otherwise the redirect will end up in an exception anyway!)
+    // the conversation is always ended on task completion (otherwise the
+    // redirect will end up in an exception anyway!)
     businessProcess.completeTask(true);
     FacesContext.getCurrentInstance().getExternalContext().redirect(url);
   }
+
+  public void startProcessInstanceForm(String processDefinitionId, String callbackUrl) {
+    this.url = callbackUrl;
+    this.processDefinitionId = processDefinitionId;
     
+    // begin conversation
+    if (conversationInstance.get().isTransient()) {
+      conversationInstance.get().begin();
+    }
+  }
+
+  public void completeProcessInstanceForm() throws IOException {
+    // start the process instance
+    businessProcess.startProcessById(processDefinitionId);
+    
+    // End the conversation   
+    conversationInstance.get().end();
+    
+    // and redirect
+    FacesContext.getCurrentInstance().getExternalContext().redirect(url);
+  }
+  
+  public ProcessDefinition getProcessDefinition() {
+    return repositoryService.createProcessDefinitionQuery().processDefinitionId(processDefinitionId).singleResult();
+  }
+  
   public String getUrl() {
     return url;
   }

@@ -16,10 +16,12 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 
+import org.activiti.engine.ActivitiException;
 import org.activiti.engine.FormService;
 import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.TaskService;
+import org.activiti.engine.form.StartFormData;
 import org.activiti.engine.form.TaskFormData;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.task.Task;
@@ -42,9 +44,9 @@ public class TaskList implements Serializable {
 
   @Inject
   private TaskService taskService;
-  
+
   @Inject
-  private RepositoryService repositoryService;  
+  private RepositoryService repositoryService;
 
   @Inject
   private FormService formService;
@@ -90,12 +92,14 @@ public class TaskList implements Serializable {
     }
     return myTasks;
   }
-  
+
   public ProcessDefinition getProcessDefinition(String processDefinitionId) {
-    // TODO: For performance improvements we could introduce our own DTO which queries the process definition together with the tasks immediately
-    // see https://app.camunda.com/confluence/display/foxUserGuide/Performance+Tuning+with+custom+Queries
+    // TODO: For performance improvements we could introduce our own DTO which
+    // queries the process definition together with the tasks immediately
+    // see
+    // https://app.camunda.com/confluence/display/foxUserGuide/Performance+Tuning+with+custom+Queries
     return repositoryService.createProcessDefinitionQuery().processDefinitionId(processDefinitionId).singleResult();
-  }  
+  }
 
   private List<Task> getList(TaskQuery taskQuery) {
     return taskQuery.orderByTaskCreateTime().desc().list();
@@ -129,23 +133,41 @@ public class TaskList implements Serializable {
   }
 
   public String getTaskFormUrl(Task task) {
-    try {
-      String formKey, taskFormUrl = "";
-      TaskFormData taskFormData = formService.getTaskFormData(task.getId());
-      if (taskFormData == null || taskFormData.getFormKey() == null) {
-        return null;
-      }
-      formKey = taskFormData.getFormKey();
-      ProcessArchive processArchive = processArchiveService.getProcessArchiveByProcessDefinitionId(task.getProcessDefinitionId(), processEngine.getName());
-      String contextPath = (String) processArchive.getProperties().get(ProcessArchive.PROP_SERVLET_CONTEXT_PATH);
-      String callbackUrl = getRequestURL();
-      taskFormUrl = "../.." + contextPath + "/" + formKey + ".jsf?taskId=" + task.getId() + "&callbackUrl=" + callbackUrl;
-      return taskFormUrl;
+    TaskFormData taskFormData = formService.getTaskFormData(task.getId());
+    if (taskFormData == null || taskFormData.getFormKey() == null) {
+      return null;
+    } else {
+      return getFormUrl(task.getProcessDefinitionId(), taskFormData.getFormKey(), "taskId=" + task.getId());
     }
-    catch (Exception ex) {
-      log.log(Level.WARNING, "Could not resolve task form URL for " + task, ex);
+  }
+
+  public String getStartFormUrl(ProcessDefinition processDefinition) {
+    StartFormData startFormData = null;
+    try {
+      startFormData = formService.getStartFormData(processDefinition.getId());
+    } catch (ActivitiException ex) {
+      // TODO: Improve to be able to query start forms without causing an
+      // exception which is logged
       return null;
     }
+    if (startFormData == null || startFormData.getFormKey() == null) {
+      return null;
+    } else {
+      return getFormUrl(processDefinition.getId(), startFormData.getFormKey(), "processDefinitionId=" + processDefinition.getId());
+    }
+  }
+
+  private String getFormUrl(String processDefinitionId, String formKey, String urlParameters) {
+    try {
+      ProcessArchive processArchive = processArchiveService.getProcessArchiveByProcessDefinitionId(processDefinitionId, processEngine.getName());
+      String contextPath = (String) processArchive.getProperties().get(ProcessArchive.PROP_SERVLET_CONTEXT_PATH);
+      String callbackUrl = getRequestURL();
+      return "../.." + contextPath + "/" + formKey + ".jsf?" + urlParameters + "&callbackUrl=" + callbackUrl;
+    } catch (Exception ex) {
+      log.log(Level.INFO, "Could not resolve context path for process definition " + processDefinitionId, ex);
+      return null;
+    }
+
   }
 
   public String delegate(Task task) {
