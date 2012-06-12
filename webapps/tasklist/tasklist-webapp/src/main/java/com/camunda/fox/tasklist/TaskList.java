@@ -160,7 +160,7 @@ public class TaskList implements Serializable {
     if (startFormData == null || startFormData.getFormKey() == null) {
       return null;
     } else {
-      return getFormUrl(processDefinition.getId(), startFormData.getFormKey(), "processDefinitionId=" + processDefinition.getId());
+      return getFormUrl(processDefinition.getId(), startFormData.getFormKey(), "processDefinitionKey=" + processDefinition.getKey());
     }
   }
 
