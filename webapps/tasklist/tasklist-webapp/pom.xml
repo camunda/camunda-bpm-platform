@@ -11,8 +11,11 @@
 	<artifactId>tasklist-webapp</artifactId>
 	<packaging>war</packaging>
 
-	<name>fox platform EE - Task List</name>
-	<description>fox platform EE Task List is a basic example for showcasing human task management with the fox platform.</description>
+	<name>fox tasklist</name>
+	<description>
+		Central tasklist application in the fox platform being able to work together with Process Applications which only deploy forms.
+		See https://app.camunda.com/confluence/display/foxUserGuide/fox+tasklist for details.
+	</description>
 
 	<dependencies>
 		<dependency>
@@ -20,6 +23,17 @@
 			<artifactId>tasklist-core</artifactId>
 			<version>${fox.version}</version>
 		</dependency>
+		
+		<!-- include jar to enable different authentication mechanisms, e.g. LDAP.
+			 Additionaly you have to set the implementation class as CDI alternative via the file
+			 src/main/webapp/WEB-INF/beans.xml
+			 
+		<dependency>
+			<groupId>com.camunda.fox.quickstart</groupId>
+			<artifactId>ldap-integration</artifactId>
+			<version>${fox.version}</version>
+		</dependency>		
+		-->
 		
 		<dependency>
 			<groupId>com.camunda.fox.platform</groupId>
