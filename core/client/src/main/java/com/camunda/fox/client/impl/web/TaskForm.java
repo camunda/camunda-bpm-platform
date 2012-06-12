@@ -68,6 +68,7 @@ public class TaskForm implements Serializable {
   }
   
   public ProcessDefinition getProcessDefinition() {
+    // TODO cache result to avoid multiple queries within one page request
     return repositoryService.createProcessDefinitionQuery().processDefinitionId(processDefinitionId).singleResult();
   }
   
