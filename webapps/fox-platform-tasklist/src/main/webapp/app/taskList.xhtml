@@ -14,6 +14,10 @@
           value="#{identity.currentUser.username} " /><span
         class="caret"></span></a>
       <ul class="dropdown-menu">
+        <!-- Not yet used
+        <li><a href="#">Profile</a></li>
+        <li class="divider"></li>
+         -->
         <li><h:form style="margin:0;">
             <h:commandLink action="#{identity.signOut()}">Sign out</h:commandLink>
           </h:form></li>
@@ -26,12 +30,14 @@
         <ui:repeat value="#{processStarter.deployedProcesses}"
           var="item">
           <li><h:form style="margin:0;">
-          	  <h:outputLink value="#{taskList.getStartFormUrl(item)}" rendered="#{taskList.getStartFormUrl(item) != null}">#{item.name} &#187;</h:outputLink>
-              <h:commandLink rendered="#{taskList.getStartFormUrl(item) == null}"
+              <h:outputLink value="#{taskList.getStartFormUrl(item)}"
+                rendered="#{taskList.getStartFormUrl(item) != null}">#{item.name} &#187;</h:outputLink>
+              <h:commandLink
+                rendered="#{taskList.getStartFormUrl(item) == null}"
                 id="processStarterLink"
                 action="#{processStarter.startProcess(item)}"
                 value="#{item.name}" />
-                <h:message for="processStarterLink" />
+              <h:message for="processStarterLink" />
             </h:form></li>
         </ui:repeat>
       </ul>
@@ -51,15 +57,17 @@
             <f:ajax render=":taskListView :taskNavigation" />
           </h:commandLink>
         </li>
-        <h:panelGroup rendered="#{taskNavigation.unassignedTasksLink.count>0}">
-        <li
-	            class="#{taskNavigation.unassignedTasksLink.active ? 'active' : ''}">
-	            <h:commandLink
-	            	value="#{taskNavigation.unassignedTasksLink.label}"
-	            	action="#{taskNavigation.select(taskNavigation.unassignedTasksLink)}">
-	            	<f:ajax render=":taskListView :taskNavigation" />
-	          </h:commandLink>
-	    </li></h:panelGroup>
+        <h:panelGroup
+          rendered="#{taskNavigation.unassignedTasksLink.count>0}">
+          <li
+            class="#{taskNavigation.unassignedTasksLink.active ? 'active' : ''}">
+            <h:commandLink
+              value="#{taskNavigation.unassignedTasksLink.label}"
+              action="#{taskNavigation.select(taskNavigation.unassignedTasksLink)}">
+              <f:ajax render=":taskListView :taskNavigation" />
+            </h:commandLink>
+          </li>
+        </h:panelGroup>
         <li class="nav-header">Group Tasks</li>
         <ui:repeat value="#{taskNavigation.groupTasksLinks}" var="item">
           <li class="#{item.active ? 'active' : ''}"><h:commandLink
@@ -84,56 +92,64 @@
 
   <!-- Task List -->
   <ui:define name="content">
-    <h:form id="taskListView">
-	<div class="row">
-		<div class="span2">
-			<strong>Task</strong>
-		</div>
-		<div class="span2">
-			<strong>Process</strong>
-		</div>
-		<div class="span2">
-			<strong>Creation Date</strong>
-		</div>
-		<div class="span3">
-			<strong>Action</strong>
-		</div>
-		<div class="span2">
-			<strong>Delegate To</strong>
-		</div>
-	</div>
-	<ui:repeat value="#{taskList.tasks}" var="task">
-			<div class="row">
-				<div class="span2">
-					<h:outputText value="#{task.name} "/>
-				</div>
-				<div class="span2">
-					 <h:outputText value="#{taskList.getProcessDefinition(task.processDefinitionId).name}" />
-				</div>
-				<div class="span2">
-					 <h:outputText value="#{task.createTime}" >
-           					<f:convertDateTime pattern="yyyy-MMM-dd HH:mm" /> 
-					 </h:outputText>
-				</div>
-				<h:panelGroup rendered="#{taskList.isPersonalTask(task)}">
-					<div class="span3">
-	                	<h:outputLink value="#{taskList.getTaskFormUrl(task)}" rendered="#{taskList.getTaskFormUrl(task) != null}">work on task &#187;</h:outputLink>
-	                	<h:outputText value="no task form provided" rendered="#{taskList.getTaskFormUrl(task) == null}" />
-					</div>
-					<div class="span2">
-	                	<h:commandLink action="#{taskList.delegate(task)}" value="do" />
-	                	<h:selectOneMenu value="#{taskList.delegateToColleague}">
-							<f:selectItems value="#{taskList.colleages}" var="user" itemLabel="#{user.firstname} #{user.lastname}" itemValue="#{user.username}" />
-	                	</h:selectOneMenu>
-	                </div>
-                </h:panelGroup>
-                <h:panelGroup rendered="#{!taskList.isPersonalTask(task)}">
-					<div class="span3">
-		                <h:commandLink value="claim" action="#{taskList.claimTask(task)}" />
-		            </div>
-                </h:panelGroup>
-			</div>
-		</ui:repeat>      
+    <h:form id="taskListView" styleClass="form-horizontal">
+      <table class="table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Process</th>
+            <th>Created</th>
+            <th>Actions</th>
+            <th><h:outputText value="Delegate to..."
+                rendered="#{taskList.personalTasks}" /></th>
+          </tr>
+        </thead>
+        <tbody>
+          <h:panelGroup
+            rendered="#{taskList.tasks == null || taskList.tasks.size() == 0}">
+            <tr>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td>-</td>
+              <td></td>
+            </tr>
+          </h:panelGroup>
+          <ui:repeat value="#{taskList.tasks}" var="task">
+            <tr>
+              <td><h:outputText value="#{task.name} " /></td>
+              <td><h:outputText
+                  value="#{taskList.getProcessDefinition(task.processDefinitionId).name}" /></td>
+              <td><h:outputText value="#{task.createTime}">
+                  <f:convertDateTime pattern="yyyy-MMM-dd HH:mm" />
+                </h:outputText></td>
+              <td><h:panelGroup
+                  rendered="#{taskList.isPersonalTask(task)}">
+                  <h:outputLink value="#{taskList.getTaskFormUrl(task)}"
+                    rendered="#{taskList.getTaskFormUrl(task) != null}">work on task &#187;</h:outputLink>
+                  <h:outputText value="no task form provided"
+                    rendered="#{taskList.getTaskFormUrl(task)} == null}" />
+                </h:panelGroup> <h:panelGroup
+                  rendered="#{!taskList.isPersonalTask(task)}">
+                  <h:commandLink value="claim"
+                    action="#{taskList.claimTask(task)}" />
+                </h:panelGroup></td>
+              <td><h:panelGroup
+                  rendered="#{taskList.isPersonalTask(task)}">
+                  <h:selectOneMenu
+                    value="#{taskList.delegateToColleague}">
+                    <f:selectItems value="#{taskList.colleages}"
+                      var="user"
+                      itemLabel="#{user.firstname} #{user.lastname}"
+                      itemValue="#{user.username}" />
+                  </h:selectOneMenu>
+                  <h:commandLink action="#{taskList.delegate(task)}"
+                    value=" Go!" />
+                </h:panelGroup></td>
+            </tr>
+          </ui:repeat>
+        </tbody>
+      </table>
     </h:form>
 
   </ui:define>

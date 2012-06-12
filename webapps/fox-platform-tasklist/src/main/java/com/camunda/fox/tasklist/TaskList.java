@@ -70,6 +70,8 @@ public class TaskList implements Serializable {
   private Map<String, List<Task>> groupTasksMap;
   private Map<String, List<Task>> colleaguesTasksMap;
 
+  private boolean personalTasks = true;
+  
   private String delegateToColleague = "";
 
   @PostConstruct
@@ -86,6 +88,11 @@ public class TaskList implements Serializable {
     return tasks;
   }
 
+  
+  public boolean isPersonalTasks() {
+    return personalTasks;
+  }
+  
   public List<Task> getMyTasks() {
     if (myTasks == null) {
       myTasks = getList(taskService.createTaskQuery().taskAssignee(currentIdentity.getCurrentUser().getUsername()));
@@ -202,12 +209,16 @@ public class TaskList implements Serializable {
   public void linkSelected(@Observes TaskNavigationLinkSelectedEvent taskNavigationLinkSelectedEvent) {
     TaskNavigationLink link = taskNavigationLinkSelectedEvent.getLink();
     if (link instanceof MyTasksLink) {
+      personalTasks = true;
       tasks = getMyTasks();
     } else if (link instanceof UnassignedTasksLink) {
+      personalTasks = false;
       tasks = getUnassignedTasks();
     } else if (link instanceof GroupTasksLink) {
+      personalTasks = false;
       tasks = getGroupTasks(((GroupTasksLink) link).getGroupId());
     } else if (link instanceof ColleaguesTasksLink) {
+      personalTasks = false;
       tasks = getCoolleaguesTasks(((ColleaguesTasksLink) link).getColleagueId());
     }
   }
