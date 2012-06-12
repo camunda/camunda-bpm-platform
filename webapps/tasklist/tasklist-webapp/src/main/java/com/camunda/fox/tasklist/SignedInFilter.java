@@ -14,13 +14,15 @@ import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.activiti.engine.impl.identity.Authentication;
+
 @WebFilter(filterName = "SignedInFilter", urlPatterns = { "/app/*" })
 public class SignedInFilter implements Filter {
 
   private final static Logger log = Logger.getLogger(SignedInFilter.class.getCanonicalName());
 
   @Inject
-  Identity identity;
+  private Identity identity;
 
   @Override
   public void destroy() {
@@ -35,7 +37,14 @@ public class SignedInFilter implements Filter {
     } else {
       log.fine("User is signed in");
       filterChain.doFilter(servletRequest, servletResponse);
+      notifyActivitiAuthenticator();
     }
+  }
+
+  private void notifyActivitiAuthenticator() {
+    // do this for convenience to allow to use the default initiator mechanism: http://www.activiti.org/userguide/index.html#bpmnStartEvents
+    log.fine("Set User in Activiti Authentication module to allow to capture inititator");    
+    Authentication.setAuthenticatedUserId(identity.getCurrentUser().getUsername());    
   }
 
   @Override
