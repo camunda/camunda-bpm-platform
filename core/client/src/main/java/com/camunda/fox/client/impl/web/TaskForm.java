@@ -23,6 +23,7 @@ public class TaskForm implements Serializable {
   private String url;
 
   private String processDefinitionId; 
+  private String processDefinitionKey; 
   
   @Inject
   private BusinessProcess businessProcess;
@@ -46,19 +47,34 @@ public class TaskForm implements Serializable {
     FacesContext.getCurrentInstance().getExternalContext().redirect(url);
   }
 
-  public void startProcessInstanceForm(String processDefinitionId, String callbackUrl) {
-    this.url = callbackUrl;
-    this.processDefinitionId = processDefinitionId;
-    
-    // begin conversation
+  private void beginConversation() {
     if (conversationInstance.get().isTransient()) {
       conversationInstance.get().begin();
     }
   }
+  
+  public void startProcessInstanceByIdForm(String processDefinitionId, String callbackUrl) {
+    this.url = callbackUrl;
+    this.processDefinitionId = processDefinitionId;
+    beginConversation();
+  }
+
+  public void startProcessInstanceByKeyForm(String processDefinitionKey, String callbackUrl) {
+    this.url = callbackUrl;
+    this.processDefinitionKey = processDefinitionKey;    
+    beginConversation();
+  }
 
   public void completeProcessInstanceForm() throws IOException {
     // start the process instance
-    businessProcess.startProcessById(processDefinitionId);
+    if (processDefinitionId!=null) {
+      businessProcess.startProcessById(processDefinitionId);
+      processDefinitionId = null;
+    }
+    else {
+      businessProcess.startProcessByKey(processDefinitionKey);
+      processDefinitionKey = null;
+    }
     
     // End the conversation   
     conversationInstance.get().end();
