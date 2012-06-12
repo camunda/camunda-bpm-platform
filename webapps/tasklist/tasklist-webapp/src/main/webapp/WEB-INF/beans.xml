@@ -5,8 +5,9 @@
 		<class>org.activiti.cdi.impl.annotation.StartProcessInterceptor</class>
 	</interceptors>
 
-	<!-- comment out to "fall back" on the default one using the Activiti IdentityService -->
-	<!-- <alternatives>
-		<class>com.camunda.fox.tasklist.identity.ldap.LdapIdentityServiceImpl</class>
-	</alternatives> -->
+	<!-- By providing an alternative you can add your own IdentityService, e.g using LDAP: 
+	<alternatives>
+		<class>com.camunda.fox.quickstart.ldap.tasklist.LdapIdentityServiceImpl</class>
+	</alternatives>
+	-->
 </beans>
