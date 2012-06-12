@@ -3,7 +3,7 @@
 	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/beans_1_0.xsd">
 	
 	<!-- comment out to "fall back" on the default one using the Activiti IdentityService -->
-	<alternatives>
+	<!-- <alternatives>
 		<class>com.camunda.fox.tasklist.identity.ldap.LdapIdentityServiceImpl</class>
-	</alternatives>
+	</alternatives> -->
 </beans>

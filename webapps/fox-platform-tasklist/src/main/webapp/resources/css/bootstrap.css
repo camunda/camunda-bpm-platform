@@ -715,7 +715,7 @@ input[type="file"] {
   line-height: 18px \9;
 }
 select {
-  width: 220px;
+  width: 150px;
   background-color: #ffffff;
 }
 select[multiple],

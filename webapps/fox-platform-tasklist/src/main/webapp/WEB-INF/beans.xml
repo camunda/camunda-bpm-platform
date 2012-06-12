@@ -6,7 +6,7 @@
 	</interceptors>
 
 	<!-- comment out to "fall back" on the default one using the Activiti IdentityService -->
-	<alternatives>
+	<!-- <alternatives>
 		<class>com.camunda.fox.tasklist.identity.ldap.LdapIdentityServiceImpl</class>
-	</alternatives>
+	</alternatives> -->
 </beans>
