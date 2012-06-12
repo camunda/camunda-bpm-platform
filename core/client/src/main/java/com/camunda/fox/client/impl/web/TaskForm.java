@@ -88,7 +88,7 @@ public class TaskForm implements Serializable {
     if (processDefinitionId!=null) {
       return repositoryService.createProcessDefinitionQuery().processDefinitionId(processDefinitionId).singleResult();
     } else {
-      return repositoryService.createProcessDefinitionQuery().processDefinitionId(processDefinitionKey).latestVersion().singleResult();      
+      return repositoryService.createProcessDefinitionQuery().processDefinitionKey(processDefinitionKey).latestVersion().singleResult();      
     }
   }
   
