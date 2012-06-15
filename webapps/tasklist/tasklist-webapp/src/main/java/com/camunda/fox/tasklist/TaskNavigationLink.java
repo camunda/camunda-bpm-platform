@@ -7,7 +7,7 @@ public abstract class TaskNavigationLink {
   private long count;
 
   public TaskNavigationLink(String label, long count, boolean active) {
-    this.label = label + "(" + count + ")";
+    this.label = label;
     this.count = count;
     this.active = active;
   }
