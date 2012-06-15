@@ -14,6 +14,7 @@ import javax.inject.Named;
 
 import org.activiti.engine.TaskService;
 
+import com.camunda.fox.tasklist.api.TaskListGroup;
 import com.camunda.fox.tasklist.api.TasklistIdentityService;
 import com.camunda.fox.tasklist.api.TasklistUser;
 import com.camunda.fox.tasklist.event.SignOutEvent;
@@ -56,7 +57,7 @@ public class TaskNavigation implements Serializable {
   public MyTasksLink getMyTasksLink() {
     if (myTasksLink == null) {
       long personalTasksCount = taskService.createTaskQuery().taskAssignee(currentIdentity.getCurrentUser().getUsername()).count();
-      myTasksLink = new MyTasksLink("My Tasks", personalTasksCount, false);
+      myTasksLink = new MyTasksLink("My Tasks (" + personalTasksCount + ")", personalTasksCount, false);
     }
     return myTasksLink;
   }
@@ -64,7 +65,7 @@ public class TaskNavigation implements Serializable {
   public UnassignedTasksLink getUnassignedTasksLink() {
     if (unassignedTasksLink == null) {
       long unassignedTasksCount = taskService.createTaskQuery().taskCandidateUser(currentIdentity.getCurrentUser().getUsername()).count();
-      unassignedTasksLink = new UnassignedTasksLink("Unassigned Tasks", unassignedTasksCount, false);
+      unassignedTasksLink = new UnassignedTasksLink("Unassigned Tasks (" + unassignedTasksCount + ")", unassignedTasksCount, false);
     }
     return unassignedTasksLink;
   }
@@ -72,10 +73,10 @@ public class TaskNavigation implements Serializable {
   public List<GroupTasksLink> getGroupTasksLinks() {
     if (groupTasksLinks == null) {
       groupTasksLinks = new ArrayList<GroupTasksLink>();
-      List<String> groups = tasklistIdentityService.getGroupsByUserId(currentIdentity.getCurrentUser().getUsername());
-      for (String groupId : groups) {
-        long groupTasksCount = taskService.createTaskQuery().taskCandidateGroup(groupId).count();
-        GroupTasksLink gourpLink = new GroupTasksLink(groupId , groupTasksCount, groupId, false);
+      List<TaskListGroup> groups = tasklistIdentityService.getGroupsByUserId(currentIdentity.getCurrentUser().getUsername());
+      for (TaskListGroup taskListGroup : groups) {
+        long groupTasksCount = taskService.createTaskQuery().taskCandidateGroup(taskListGroup.getGroupId()).count();
+        GroupTasksLink gourpLink = new GroupTasksLink(taskListGroup.getGroupName() + " (" + groupTasksCount + ")", groupTasksCount, taskListGroup.getGroupId(), false);
         groupTasksLinks.add(gourpLink);
       }
     }
@@ -88,7 +89,7 @@ public class TaskNavigation implements Serializable {
       List<TasklistUser> colleagues = tasklistIdentityService.getColleaguesByUserId(currentIdentity.getCurrentUser().getUsername());
       for (TasklistUser colleague : colleagues) {
         long colleagueTasksCount = taskService.createTaskQuery().taskAssignee(colleague.getUsername()).count();
-        ColleaguesTasksLink colleaguesLink = new ColleaguesTasksLink(colleague.getFirstname() + " " + colleague.getLastname(), colleagueTasksCount, colleague.getUsername(), false);
+        ColleaguesTasksLink colleaguesLink = new ColleaguesTasksLink(colleague.getFirstname() + " " + colleague.getLastname() + " (" + colleagueTasksCount + ")", colleagueTasksCount, colleague.getUsername(), false);
         colleaguesTasksLinks.add(colleaguesLink);
       }
     }

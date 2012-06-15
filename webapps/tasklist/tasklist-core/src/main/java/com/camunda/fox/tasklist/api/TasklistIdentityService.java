@@ -3,30 +3,28 @@ package com.camunda.fox.tasklist.api;
 import java.util.List;
 
 /**
- * This interface provides an example API for an identity service. 
+ * This interface provides an example API for an identity service.
  * 
  * @author Nils Preusker - nils.preusker@camunda.com
  */
 public interface TasklistIdentityService {
 
   // ...
-  
+
   /**
-   * check the user with the given id and password and throws an exception
-   * if the user doesn't exist or the password is invalid.
+   * check the user with the given id and password and throws an exception if
+   * the user doesn't exist or the password is invalid.
    */
   public void authenticateUser(String userId, String password);
 
   /**
-   * Returns a list of group ids, representing the groups the user is a member
-   * of.
+   * Returns a list of the groups the user is a member of.
    * 
    * @param userId
    *          the id of the user who's groups should be searched for
-   * @return a list of group ids, representing the groups the user is a member
-   *         of
+   * @return a list of groups the user is a member of
    */
-  public List<String> getGroupsByUserId(String userId);
+  public List<TaskListGroup> getGroupsByUserId(String userId);
 
   /**
    * Returns the colleagues of the user with the given id.

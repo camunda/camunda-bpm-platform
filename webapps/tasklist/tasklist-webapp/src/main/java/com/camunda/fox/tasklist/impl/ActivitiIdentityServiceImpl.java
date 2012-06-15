@@ -11,6 +11,7 @@ import javax.inject.Named;
 import org.activiti.engine.IdentityService;
 import org.activiti.engine.identity.Group;
 
+import com.camunda.fox.tasklist.api.TaskListGroup;
 import com.camunda.fox.tasklist.api.TasklistIdentityService;
 import com.camunda.fox.tasklist.api.TasklistUser;
 
@@ -30,13 +31,13 @@ public class ActivitiIdentityServiceImpl implements TasklistIdentityService, Ser
   }
   
   @Override
-  public List<String> getGroupsByUserId(String userId) {
-    List<String> groupIds = new ArrayList<String>();
+  public List<TaskListGroup> getGroupsByUserId(String userId) {
+    List<TaskListGroup> taskListGroups = new ArrayList<TaskListGroup>();
     List<Group> groups = identityService.createGroupQuery().groupMember(userId).list();
     for (Group group : groups) {
-      groupIds.add(group.getId());
+      taskListGroups.add(new TaskListGroup(group.getId(), group.getName()));
     }
-    return groupIds;
+    return taskListGroups;
   }
 
   @Override
