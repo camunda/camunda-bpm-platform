@@ -40,6 +40,7 @@
     <class>com.camunda.fox.jpa.entity.ByteArrayEntity</class>
     <class>com.camunda.fox.jpa.entity.JobEntity</class>
     <class>com.camunda.fox.jpa.entity.HistoricProcessInstanceEntity</class>
+    <class>com.camunda.fox.jpa.entity.HistoricActivityEntity</class>
     <class>com.camunda.fox.jpa.entity.ProcessDefinitionEntity</class>
     
     <properties>		
