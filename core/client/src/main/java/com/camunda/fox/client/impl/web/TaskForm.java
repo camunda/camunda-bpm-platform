@@ -15,7 +15,7 @@ import org.activiti.engine.RepositoryService;
 import org.activiti.engine.repository.ProcessDefinition;
 
 @ConversationScoped
-@Named
+@Named("fox.taskForm")
 public class TaskForm implements Serializable {
 
   private static final long serialVersionUID = 1L;
