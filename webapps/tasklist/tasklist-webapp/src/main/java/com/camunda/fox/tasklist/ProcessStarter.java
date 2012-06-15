@@ -37,7 +37,7 @@ public class ProcessStarter implements Serializable {
 
   public String startProcess(ProcessDefinition processDefinition) {
     runtimeService.startProcessInstanceByKey(processDefinition.getKey());
-    return "taskList.jsf";
+    return "taskList.jsf?faces-redirect=true";
   }
 
 }
