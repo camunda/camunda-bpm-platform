@@ -315,7 +315,7 @@
 		   <process-engines>
 			<process-engine name="default" default="true">
 				<datasource>java:jboss/datasources/FoxEngineDS</datasource>
-				<history-level>audit</history-level>
+				<history-level>full</history-level>
 				<properties>
 					<property name="jobExecutorAcquisitionName">default</property>
 					<property name="isAutoSchemaUpdate">true</property>
