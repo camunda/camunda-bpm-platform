@@ -53,7 +53,7 @@ public class PlatformServicesTest extends AbstractFoxPlatformIntegrationTest {
     org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl defaultEngineConfig = ((ProcessEngineImpl)processEngineService.getDefaultProcessEngine()).getProcessEngineConfiguration();
     String dataSourceJndiName = defaultEngineConfig.getDataSourceJndiName();
     
-    ProcessEngineConfigurationImpl configurationImpl = new ProcessEngineConfigurationImpl(false, "testEngine1", dataSourceJndiName, "audit", true, false);
+    ProcessEngineConfigurationImpl configurationImpl = new ProcessEngineConfigurationImpl(false, "testEngine1", dataSourceJndiName, "full", true, false);
     Future<ProcessEngineStartOperation> startProcessEngine = processEngineService.startProcessEngine(configurationImpl);
     ProcessEngineStartOperation processEngineStartOperation = startProcessEngine.get();
     
