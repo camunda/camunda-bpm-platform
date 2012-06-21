@@ -15,8 +15,10 @@
  */
 package com.camunda.fox.platform.impl.jobexecutor;
 
+import org.activiti.engine.ActivitiException;
 import org.activiti.engine.impl.interceptor.Command;
 import org.activiti.engine.impl.interceptor.CommandContext;
+import org.activiti.engine.impl.jobexecutor.ProcessEventJobHandler;
 import org.activiti.engine.impl.jobexecutor.TimerStartEventJobHandler;
 import org.activiti.engine.impl.persistence.entity.JobEntity;
 
@@ -45,8 +47,14 @@ public class GetProcessDefintionKeyForJobId implements Command<String> {
     
     String executionId = jobEntity.getExecutionId();
     
-    if(executionId == null && jobEntity.getJobHandlerType().equals(TimerStartEventJobHandler.TYPE)) {
-      return jobEntity.getJobHandlerConfiguration();
+    if(executionId == null) {
+      if (jobEntity.getJobHandlerType().equals(TimerStartEventJobHandler.TYPE)) {
+        return jobEntity.getJobHandlerConfiguration();
+      }
+      else if (jobEntity.getJobHandlerType().equals(ProcessEventJobHandler.TYPE)) {
+        return jobEntity.getJobHandlerConfiguration();
+      }
+      throw new ActivitiException("Job [id="+jobEntity+"] of type '"+jobEntity.getJobHandlerType()+"' does not reference any execution, which is an invalid state");
     }
     
     String processDefinitionId = commandContext.getExecutionManager()
