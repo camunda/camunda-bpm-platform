@@ -43,7 +43,7 @@ public class TestPlatformProcessEngineServiceBean {
     
   @Test
   public void testProcessEngineServiceEjb() throws NamingException, InterruptedException, ExecutionException {
-    ProcessEngineConfiguration configuration = new DummyProcessEngineConfiguration(true, "default", "java:global/test/FoxEngine", "audit", true, false);
+    ProcessEngineConfiguration configuration = new DummyProcessEngineConfiguration(true, "default", "java:global/test/FoxEngine", "full", true, false);
     
     Assert.assertEquals(0, processEngineService.getProcessEngines().size());
     

@@ -3,7 +3,7 @@
   <process-engine name="engine2" default="false">
 
     <datasource>java:jboss/datasources/FoxEngineDS</datasource>
-    <history-level>audit</history-level>
+    <history-level>full</history-level>
     
     <properties>
       <!--property name="isAutoSchemaUpdate">false</property-->
@@ -15,7 +15,7 @@
     <process-engine name="engine3" default="false">
 
     <datasource>java:jboss/datasources/FoxEngineDS</datasource>
-    <history-level>audit</history-level>
+    <history-level>full</history-level>
     
     <properties>
       <!--property name="isAutoSchemaUpdate">false</property-->
