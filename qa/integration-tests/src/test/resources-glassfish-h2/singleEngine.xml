@@ -3,7 +3,7 @@
   <process-engine name="engine1" default="false">
 
     <datasource>jdbc/FoxEngine</datasource>
-    <history-level>audit</history-level>
+    <history-level>full</history-level>
     
     <properties>
       <!--property name="isAutoSchemaUpdate">false</property-->
