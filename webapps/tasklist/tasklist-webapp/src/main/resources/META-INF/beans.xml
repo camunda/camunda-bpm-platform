@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/beans_1_0.xsd">
-	
+
+  <!-- note that for an alternative login configuration you have to adjust the src/main/webapp/WEB_INF/beans.xml, at least on JBOss AS 7 -->
+
 </beans>
