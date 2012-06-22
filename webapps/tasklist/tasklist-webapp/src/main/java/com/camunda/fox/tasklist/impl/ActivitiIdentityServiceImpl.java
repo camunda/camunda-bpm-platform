@@ -15,21 +15,22 @@ import com.camunda.fox.tasklist.api.TaskListGroup;
 import com.camunda.fox.tasklist.api.TasklistIdentityService;
 import com.camunda.fox.tasklist.api.TasklistUser;
 
-
 @Named
 @ApplicationScoped
 public class ActivitiIdentityServiceImpl implements TasklistIdentityService, Serializable {
 
   private static final long serialVersionUID = 1L;
-  
+
   @Inject
   private IdentityService identityService;
 
   @Override
   public void authenticateUser(String userId, String password) {
-    // always authenticate
+    if (!identityService.checkPassword(userId, password)) {
+      throw new RuntimeException("Username or password is incorrect");
+    }
   }
-  
+
   @Override
   public List<TaskListGroup> getGroupsByUserId(String userId) {
     List<TaskListGroup> taskListGroups = new ArrayList<TaskListGroup>();
@@ -53,7 +54,7 @@ public class ActivitiIdentityServiceImpl implements TasklistIdentityService, Ser
     }
     if (!userId.equals("fozzie")) {
       colleagues.add(new TasklistUser("fozzie", "Fozzie", "Bear"));
-    } 
+    }
     return colleagues;
   }
 
