@@ -27,14 +27,13 @@
 		<!-- include jar to enable different authentication mechanisms, e.g. LDAP.
 			 Additionaly you have to set the implementation class as CDI alternative via the file
 			 src/main/webapp/WEB-INF/beans.xml
-			 
 		<dependency>
-			<groupId>com.camunda.fox.quickstart</groupId>
-			<artifactId>ldap-integration</artifactId>
-			<version>${fox.version}</version>
-		</dependency>		
+			<groupId>com.camunda.fox.demo.outerspace</groupId>
+			<artifactId>tasklist-ldap-integration</artifactId>
+			<version>6.0.2-SNAPSHOT</version>
+		</dependency>
 		-->
-		
+				
 		<dependency>
 			<groupId>com.camunda.fox.platform</groupId>
 			<artifactId>fox-platform-client</artifactId>
