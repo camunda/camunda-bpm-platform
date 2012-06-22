@@ -7,7 +7,7 @@
 
 	<!-- By providing an alternative you can add your own IdentityService, e.g using LDAP: 
 	<alternatives>
-		<class>com.camunda.fox.quickstart.ldap.tasklist.LdapIdentityServiceImpl</class>
+		<class>com.camunda.fox.demo.ldap.tasklist.LdapIdentityServiceImpl</class>
 	</alternatives>
 	-->
 </beans>
