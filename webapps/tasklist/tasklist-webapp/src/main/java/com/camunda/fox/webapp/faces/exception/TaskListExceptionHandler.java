@@ -53,7 +53,7 @@ public class TaskListExceptionHandler extends ExceptionHandlerWrapper {
             message = new FacesMessage("Oops, something went wrong. Please log in and try again.");
           }
           fc.addMessage(null, message);
-          nav.handleNavigation(fc, null, "signin");
+          nav.handleNavigation(fc, null, "signin.jsf");
           fc.renderResponse();
         } finally {
           itr.remove();

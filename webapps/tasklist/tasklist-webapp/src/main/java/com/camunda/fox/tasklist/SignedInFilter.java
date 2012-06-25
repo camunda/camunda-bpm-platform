@@ -33,7 +33,7 @@ public class SignedInFilter implements Filter {
     log.fine("Checking if user is signed in");
     if (!identity.isSignedIn()) {
       log.fine("Redirecting to sign in page");
-      ((HttpServletResponse) servletResponse).sendRedirect(((HttpServletRequest) servletRequest).getContextPath() + "/signin.jsf");
+      ((HttpServletResponse) servletResponse).sendRedirect(((HttpServletRequest) servletRequest).getContextPath() + "/signin.jsf?faces-redirect=true");
     } else {
       log.fine("User is signed in");
       filterChain.doFilter(servletRequest, servletResponse);
