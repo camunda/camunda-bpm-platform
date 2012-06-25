@@ -14,6 +14,7 @@ import org.activiti.engine.identity.Group;
 import com.camunda.fox.tasklist.api.TaskListGroup;
 import com.camunda.fox.tasklist.api.TasklistIdentityService;
 import com.camunda.fox.tasklist.api.TasklistUser;
+import com.camunda.fox.webapp.faces.exception.TaskListAuthenticationFailedException;
 
 @Named
 @ApplicationScoped
@@ -27,7 +28,7 @@ public class ActivitiIdentityServiceImpl implements TasklistIdentityService, Ser
   @Override
   public void authenticateUser(String userId, String password) {
     if (!identityService.checkPassword(userId, password)) {
-      throw new RuntimeException("Username or password is incorrect");
+      throw new TaskListAuthenticationFailedException("The username or password you entered is incorrect.");
     }
   }
 
