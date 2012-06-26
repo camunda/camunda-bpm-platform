@@ -23,6 +23,7 @@
     <module>webapps/h2-webapp</module>
     <module>webapps/explorer</module>
     <module>webapps/cockpit-webapp-fox</module>
+    <module>webapps/tasklist</module>
 	<module>jobexecutor</module>
     <!--  module>ibmWs8</module -->
   </modules>
