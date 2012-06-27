@@ -69,6 +69,13 @@
 			</exclusions>
 		</dependency>
 
+        <dependency>
+          <groupId>com.camunda.fox</groupId>
+          <artifactId>fox-layout-bootstrap</artifactId>
+          <version>${fox.version}</version>
+          <type>war</type>  
+        </dependency>
+
 		<!-- test dependencies -->
 		<dependency>
 			<groupId>junit</groupId>
@@ -111,6 +118,12 @@
 				<configuration>
 					<source>1.6</source>
 					<target>1.6</target>
+                    <overlays>
+                      <overlay>
+                        <groupId>com.camunda.fox</groupId>
+                        <artifactId>fox-layout-bootstrap</artifactId>
+                      </overlay>
+                    </overlays>
 				</configuration>
 			</plugin>
 			<plugin>
