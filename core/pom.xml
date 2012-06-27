@@ -10,7 +10,7 @@
   <parent>
     <groupId>com.camunda.fox.engine</groupId>
     <artifactId>fox-engine-root</artifactId>
-    <version>6.1.0-SNAPSHOT</version>
+    <version>6.1.0-alpha3</version>
     <relativePath>../../fox-engine-ee/pom.xml</relativePath>
   </parent>
 
