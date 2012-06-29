@@ -129,17 +129,6 @@ public abstract class CmpeProcessEngineConfiguration extends ProcessEngineConfig
     }
   }
     
-  @Override
-  protected void initDelegateInterceptor() {
-    if(delegateInterceptor == null) {
-      delegateInterceptor = new CmpeVariableFlushingDelegateInterceptor(processArchiveServices);
-    }
-    if (delegateInterceptor instanceof ProcessArchiveServicesSupport) {
-      ProcessArchiveServicesSupport support = (ProcessArchiveServicesSupport) delegateInterceptor;
-      support.setProcessArchiveServices(processArchiveServices);        
-    }
-  }
-    
   public void setProcessArchiveServices(ProcessArchiveServices paServices) {
     this.processArchiveServices = paServices;
   }
