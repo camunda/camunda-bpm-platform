@@ -20,6 +20,7 @@ import com.camunda.fox.platform.test.functional.cdi.beans.InvocationCounterServi
 import com.camunda.fox.platform.test.functional.cdi.beans.InvocationCounterServiceBean;
 import com.camunda.fox.platform.test.functional.cdi.beans.InvocationCounterServiceLocal;
 import com.camunda.fox.platform.test.functional.cdi.beans.RequestScopedDelegateBean;
+import com.camunda.fox.platform.test.functional.cdi.beans.RequestScopedSFSBDelegate;
 import com.camunda.fox.platform.test.util.AbstractFoxPlatformIntegrationTest;
 
 /**
@@ -36,10 +37,12 @@ public class JobExecutorRequestContextTest extends AbstractFoxPlatformIntegratio
   public static WebArchive processArchive() {    
     return initWebArchiveDeployment()
       .addClass(RequestScopedDelegateBean.class)            
+      .addClass(RequestScopedSFSBDelegate.class)
       .addClass(InvocationCounterDelegateBean.class)
       .addClass(InvocationCounterDelegateBeanLocal.class)
       .addAsResource("com/camunda/fox/platform/test/functional/cdi/JobExecutorRequestContextTest.testResolveBean.bpmn20.xml")
       .addAsResource("com/camunda/fox/platform/test/functional/cdi/JobExecutorRequestContextTest.testScoping.bpmn20.xml")
+      .addAsResource("com/camunda/fox/platform/test/functional/cdi/JobExecutorRequestContextTest.testScopingSFSB.bpmn20.xml")
       .addAsResource("com/camunda/fox/platform/test/functional/cdi/JobExecutorRequestContextTest.testScopingExclusiveJobs.bpmn20.xml")
       .addAsResource("com/camunda/fox/platform/test/functional/cdi/JobExecutorRequestContextTest.testContextPropagationEjbRemote.bpmn20.xml")
       .addAsResource("com/camunda/fox/platform/test/functional/cdi/JobExecutorRequestContextTest.testContextPropagationEjbLocal.bpmn20.xml")      
@@ -80,6 +83,34 @@ public class JobExecutorRequestContextTest extends AbstractFoxPlatformIntegratio
     // in the context of the same job, we get the same instance
     
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("testScoping");    
+    
+    waitForJobExecutorToProcessAllJobs(6000, 100);
+    
+    Object variable = runtimeService.getVariable(pi.getId(), "invocationCounter");
+    // -> the same bean instance was invoked 2 times!
+    Assert.assertEquals(2, variable);
+    
+    Task task = taskService.createTaskQuery()
+      .processInstanceId(pi.getProcessInstanceId())
+      .singleResult();
+    taskService.complete(task.getId());
+    
+    waitForJobExecutorToProcessAllJobs(6000, 100);
+    
+    variable = runtimeService.getVariable(pi.getId(), "invocationCounter");
+    // now it's '1' again! -> new instance of the bean
+    Assert.assertEquals(1, variable);
+    
+  }
+  
+  @Test
+  @OperateOnDeployment("pa")
+  public void testScopingSFSB() {
+    
+    // verifies that if the same @RequestScoped SFSB Bean is invoked multiple times 
+    // in the context of the same job, we get the same instance
+    
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("testScopingSFSB");    
     
     waitForJobExecutorToProcessAllJobs(6000, 100);
     
