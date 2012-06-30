@@ -13,29 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.camunda.fox.platform.test.functional.cdi;
+package com.camunda.fox.platform.test.functional.cdi.beans;
 
+import javax.enterprise.context.ApplicationScoped;
 import javax.inject.Named;
 
-import org.activiti.engine.delegate.DelegateExecution;
-import org.activiti.engine.delegate.JavaDelegate;
-
 @Named
-public class ExampleDelegateBean implements JavaDelegate {
+@ApplicationScoped
+public class ExampleBean {
   
-  public static boolean invoked;
-    
+  protected boolean invoked;
+  
+  public void invoke() {
+    this.invoked = true;    
+  }
+  
   public boolean isInvoked() {
     return invoked;
   }  
     
   public void setInvoked(boolean invoked) {
-    ExampleDelegateBean.invoked = invoked;
-  }
-
-  @Override
-  public void execute(DelegateExecution execution) throws Exception {
-    invoked = true;    
+    this.invoked = invoked;
   }
   
 }
