@@ -20,6 +20,8 @@
     <module name="org.jboss.vfs" />
     <module name="org.jboss.jandex" />
     <module name="org.jboss.weld.spi" />
+    <module name="org.jboss.weld.api" />
+    <module name="org.jboss.weld.core" />
     <module name="org.jboss.as.weld" />
     <module name="org.jboss.as.naming" />
     <module name="org.jboss.as.connector" />

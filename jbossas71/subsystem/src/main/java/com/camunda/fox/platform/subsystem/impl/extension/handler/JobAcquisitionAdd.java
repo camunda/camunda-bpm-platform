@@ -46,7 +46,7 @@ import org.jboss.msc.service.ServiceController;
 import com.camunda.fox.platform.jobexecutor.impl.util.JobAcquisitionConfigurationBean;
 import com.camunda.fox.platform.jobexecutor.spi.JobAcquisitionConfiguration;
 import com.camunda.fox.platform.subsystem.impl.extension.Element;
-import com.camunda.fox.platform.subsystem.impl.platform.ContainerJobExecutorService;
+import com.camunda.fox.platform.subsystem.impl.service.ContainerJobExecutorService;
 
 /**
  * Provides the description and the implementation of the job-acquisition#add operation.

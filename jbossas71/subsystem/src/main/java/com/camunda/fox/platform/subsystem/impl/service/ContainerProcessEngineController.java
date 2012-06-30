@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.camunda.fox.platform.subsystem.impl.platform;
+package com.camunda.fox.platform.subsystem.impl.service;
 
 import javax.sql.DataSource;
 import javax.transaction.TransactionManager;
@@ -28,6 +28,7 @@ import org.jboss.msc.service.StopContext;
 import org.jboss.msc.value.InjectedValue;
 
 import com.camunda.fox.platform.impl.configuration.JtaCmpeProcessEngineConfiguration;
+import com.camunda.fox.platform.impl.context.ProcessArchiveContext;
 import com.camunda.fox.platform.impl.service.ProcessEngineController;
 import com.camunda.fox.platform.spi.ProcessEngineConfiguration;
 import com.camunda.fox.platform.subsystem.impl.util.Tccl;
@@ -36,7 +37,7 @@ import com.camunda.fox.platform.subsystem.impl.util.Tccl.Operation;
 /**
  * @author Daniel Meyer
  */
-public class ProcessEngineControllerService extends ProcessEngineController implements Service<ProcessEngineControllerService> {
+public class ContainerProcessEngineController extends ProcessEngineController implements Service<ContainerProcessEngineController> {
     
   // Injecting these values makes the MSC aware of our dependencies on these resources.
   // This ensures that they are available when this service is started
@@ -45,7 +46,7 @@ public class ProcessEngineControllerService extends ProcessEngineController impl
   private final InjectedValue<ContainerPlatformService> containerPlatformServiceInjector = new InjectedValue<ContainerPlatformService>();
   private final InjectedValue<ContainerJobExecutorService> containerJobExecutorInjector = new InjectedValue<ContainerJobExecutorService>();
   
-  public ProcessEngineControllerService(ProcessEngineConfiguration processEngineConfiguration) {
+  public ContainerProcessEngineController(ProcessEngineConfiguration processEngineConfiguration) {
     super(processEngineConfiguration);
   }
   
@@ -53,7 +54,7 @@ public class ProcessEngineControllerService extends ProcessEngineController impl
     return ServiceName.of("foxPlatform", "processEngineController", engineName);
   }
 
-  public ProcessEngineControllerService getValue() throws IllegalStateException, IllegalArgumentException {
+  public ContainerProcessEngineController getValue() throws IllegalStateException, IllegalArgumentException {
     return this;
   }
   
@@ -70,7 +71,7 @@ public class ProcessEngineControllerService extends ProcessEngineController impl
         start();
         return null;
       }
-    }, ProcessEngineControllerService.class.getClassLoader());   
+    }, ContainerProcessEngineController.class.getClassLoader());   
   }
   
   protected void initProcessEngineConfiguration() {
@@ -101,6 +102,10 @@ public class ProcessEngineControllerService extends ProcessEngineController impl
   
   public InjectedValue<ContainerJobExecutorService> getContainerJobExecutorInjector() {
     return containerJobExecutorInjector;
+  }
+  
+  public ProcessArchiveContext getProcessArchiveContextByName(String processArchiveName) {
+    return installedProcessArchivesByName.get(processArchiveName);
   }
 
 }

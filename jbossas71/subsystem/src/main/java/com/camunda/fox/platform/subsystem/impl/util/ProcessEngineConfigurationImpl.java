@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.camunda.fox.platform.subsystem.impl.platform;
+package com.camunda.fox.platform.subsystem.impl.util;
 
 import java.util.Map;
 
@@ -67,8 +67,8 @@ public class ProcessEngineConfigurationImpl implements ProcessEngineConfiguratio
 
   private void initProcessEngineConfigurationDefaultValues() {
     // TODO: populate ProcessEngineConfiguration field via reflection from this map
-    boolean isActivateJobExecutor=true;
-    boolean isAutoUpdateSchema =false;
+    boolean isActivateJobExecutor = false;
+    boolean isAutoUpdateSchema = false;
     String dbTablePrefix = null;
     
     if (properties.get(PROP_IS_ACTIVATE_JOB_EXECUTOR) == null) {
