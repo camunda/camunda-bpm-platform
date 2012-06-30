@@ -27,7 +27,8 @@ public class JobExecutorRequestContextTest extends AbstractFoxPlatformIntegratio
     return initWebArchiveDeployment()
       .addClass(RequestScopedDelegateBean.class)            
       .addAsResource("com/camunda/fox/platform/test/functional/cdi/JobExecutorRequestContextTest.testResolveBean.bpmn20.xml")
-      .addAsResource("com/camunda/fox/platform/test/functional/cdi/JobExecutorRequestContextTest.testScoping.bpmn20.xml");
+      .addAsResource("com/camunda/fox/platform/test/functional/cdi/JobExecutorRequestContextTest.testScoping.bpmn20.xml")
+      .addAsResource("com/camunda/fox/platform/test/functional/cdi/JobExecutorRequestContextTest.testScopingExclusiveJobs.bpmn20.xml");
   }
     
   @Test
@@ -66,6 +67,34 @@ public class JobExecutorRequestContextTest extends AbstractFoxPlatformIntegratio
     
     variable = runtimeService.getVariable(pi.getId(), "invocationCounter");
     // now it's '1' again! -> new instance of the bean
+    Assert.assertEquals(1, variable);
+    
+  }
+  
+  @Test
+  public void testScopingExclusiveJobs() {
+    
+    // verifies that if the same @RequestScoped Bean is invoked 
+    // in the context of two subsequent exclusive jobs, we have 
+    // seperate requests for each job, eben if the jobs are executed 
+    // subsequently by the same thread. 
+    
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("testScopingExclusiveJobs");    
+    
+    waitForJobExecutorToProcessAllJobs(6000, 500);
+    
+    Object variable = runtimeService.getVariable(pi.getId(), "invocationCounter");
+    // -> seperate requests
+    Assert.assertEquals(1, variable);
+    
+    Task task = taskService.createTaskQuery()
+      .processInstanceId(pi.getProcessInstanceId())
+      .singleResult();
+    taskService.complete(task.getId());
+    
+    waitForJobExecutorToProcessAllJobs(6000, 100);
+    
+    variable = runtimeService.getVariable(pi.getId(), "invocationCounter");
     Assert.assertEquals(1, variable);
     
   }
