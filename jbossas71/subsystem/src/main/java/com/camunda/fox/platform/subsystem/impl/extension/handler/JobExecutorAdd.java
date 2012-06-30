@@ -33,11 +33,15 @@ import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.ServiceVerificationHandler;
 import org.jboss.as.controller.descriptions.DescriptionProvider;
 import org.jboss.as.controller.descriptions.ModelDescriptionConstants;
+import org.jboss.as.threads.ManagedQueueExecutorService;
+import org.jboss.as.threads.ThreadsServices;
 import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.ModelType;
 import org.jboss.msc.service.ServiceController;
+import org.jboss.msc.service.ServiceController.Mode;
 
-import com.camunda.fox.platform.subsystem.impl.platform.ContainerJobExecutorService;
+import com.camunda.fox.platform.subsystem.impl.service.ContainerJobExecutorService;
+import com.camunda.fox.platform.subsystem.impl.service.ContainerPlatformService;
 
 /**
  * Provides the description and the implementation of the process-engine#add operation.
@@ -77,7 +81,15 @@ public class JobExecutorAdd extends AbstractBoottimeAddStepHandler implements De
     
     String jobExecutorThreadPoolName = PathAddress.pathAddress(operation.get(ModelDescriptionConstants.ADDRESS)).getLastElement().getValue();
 
-    newControllers.add(ContainerJobExecutorService.addService(context.getServiceTarget(), verificationHandler, jobExecutorThreadPoolName));
+    ContainerJobExecutorService service = new ContainerJobExecutorService();
+    ServiceController<ContainerJobExecutorService> serviceController = context.getServiceTarget().addService(ContainerJobExecutorService.getServiceName(), service)
+        .addDependency(ThreadsServices.EXECUTOR.append(jobExecutorThreadPoolName), ManagedQueueExecutorService.class, service.getManagedQueueInjector())
+        .addDependency(ContainerPlatformService.getServiceName(), ContainerPlatformService.class, service.getContainerPlatformServiceInjector())
+        .addListener(verificationHandler)
+        .setInitialMode(Mode.ACTIVE)
+        .install();
+    
+    newControllers.add(serviceController);
     
   }
 

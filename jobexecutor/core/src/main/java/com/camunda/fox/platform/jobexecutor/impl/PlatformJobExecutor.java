@@ -33,7 +33,9 @@ public abstract class PlatformJobExecutor implements PlatformJobExecutorService 
   public Map<String, JobAcquisitionStrategy> discoveredStrategies;
 
   public synchronized void start() {
-    loadJobAcquisitionStrategies();
+    if(discoveredStrategies == null) {
+      loadJobAcquisitionStrategies();
+    }
   }
   
   protected void loadJobAcquisitionStrategies() {

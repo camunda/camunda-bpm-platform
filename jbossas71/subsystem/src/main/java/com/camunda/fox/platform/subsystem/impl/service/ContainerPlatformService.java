@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.camunda.fox.platform.subsystem.impl.platform;
+package com.camunda.fox.platform.subsystem.impl.service;
 
 import java.util.concurrent.Future;
 import java.util.logging.Logger;
@@ -39,9 +39,12 @@ import org.jboss.msc.service.StartException;
 import org.jboss.msc.service.StopContext;
 
 import com.camunda.fox.platform.FoxPlatformException;
+import com.camunda.fox.platform.impl.context.ProcessArchiveContext;
 import com.camunda.fox.platform.impl.service.PlatformService;
+import com.camunda.fox.platform.impl.service.ProcessEngineController;
 import com.camunda.fox.platform.spi.ProcessEngineConfiguration;
 import com.camunda.fox.platform.subsystem.impl.util.PlatformServiceReferenceFactory;
+import com.camunda.fox.platform.subsystem.impl.util.ServiceListenerFuture;
 
 /**
  * @author Daniel Meyer
@@ -57,7 +60,7 @@ public class ContainerPlatformService extends PlatformService implements Service
   protected ServiceController<ManagedReferenceFactory> processEngineServiceBinding;
 
   private ServiceContainer serviceContainer;
-      
+        
   ///////////////////////////////////////////////////
 
   @Override
@@ -123,24 +126,23 @@ public class ContainerPlatformService extends PlatformService implements Service
     processEngineServiceBinding.setMode(Mode.REMOVE);
     processArchiveServiceBinding.setMode(Mode.REMOVE);
   }
-  
-  
 
   public Future<ProcessEngineStartOperation> startProcessEngine(ProcessEngineConfiguration processEngineConfiguration) {    
   
-    final ProcessEngineControllerService processEngineController = new ProcessEngineControllerService(processEngineConfiguration);    
+    final ContainerProcessEngineController processEngineController = new ContainerProcessEngineController(processEngineConfiguration);    
     final ContextNames.BindInfo datasourceBindInfo = ContextNames.bindInfoFor(processEngineConfiguration.getDatasourceJndiName());
    
-    final ServiceListenerFuture<ProcessEngineControllerService, ProcessEngineStartOperation> listener = new ServiceListenerFuture<ProcessEngineControllerService, ProcessEngineStartOperation>(processEngineController) {
+    final ServiceListenerFuture<ContainerProcessEngineController, ProcessEngineStartOperation> listener = new ServiceListenerFuture<ContainerProcessEngineController, ProcessEngineStartOperation>(processEngineController) {
       protected void serviceAvailable() {
         this.value = new ProcessEngineStartOperationImpl(serviceInstance.getProcessEngine());
       }      
     };
     
-    serviceContainer.addService(ProcessEngineControllerService.createServiceName(processEngineConfiguration.getProcessEngineName()), processEngineController)
+    serviceContainer.addService(ContainerProcessEngineController.createServiceName(processEngineConfiguration.getProcessEngineName()), processEngineController)
       .addDependency(ServiceName.JBOSS.append("txn").append("TransactionManager"), TransactionManager.class, processEngineController.getTransactionManagerInjector())
       .addDependency(datasourceBindInfo.getBinderServiceName(), DataSourceReferenceFactoryService.class, processEngineController.getDatasourceBinderServiceInjector())
-      .addDependency(getServiceName(), ContainerPlatformService.class, processEngineController.getContainerPlatformServiceInjector()) 
+      .addDependency(getServiceName(), ContainerPlatformService.class, processEngineController.getContainerPlatformServiceInjector())
+      .addDependency(ContainerJobExecutorService.getServiceName(), ContainerJobExecutorService.class, processEngineController.getContainerJobExecutorInjector())
       .setInitialMode(Mode.ACTIVE)
       .addListener(listener)
       .install();
@@ -154,12 +156,12 @@ public class ContainerPlatformService extends PlatformService implements Service
       throw new FoxPlatformException("Cannot stop process engine '"+name+"': no such process engine found");
     } else {
       
-      final ServiceName createServiceName = ProcessEngineControllerService.createServiceName(name);
-      final ServiceController<ProcessEngineControllerService> service = (ServiceController<ProcessEngineControllerService>) serviceContainer.getService(createServiceName);
+      final ServiceName createServiceName = ContainerProcessEngineController.createServiceName(name);
+      final ServiceController<ContainerProcessEngineController> service = (ServiceController<ContainerProcessEngineController>) serviceContainer.getService(createServiceName);
       
       final Object shutdownMonitor = new Object();      
-      service.addListener(new AbstractServiceListener<ProcessEngineControllerService>() {
-        public void transition(ServiceController< ? extends ProcessEngineControllerService> controller, Transition transition) {
+      service.addListener(new AbstractServiceListener<ContainerProcessEngineController>() {
+        public void transition(ServiceController< ? extends ContainerProcessEngineController> controller, Transition transition) {
           if(isDown(transition.getAfter())) {
             synchronized (shutdownMonitor) {
               shutdownMonitor.notifyAll();              
@@ -182,8 +184,7 @@ public class ContainerPlatformService extends PlatformService implements Service
       
     } 
   }
-
-
+  
   private boolean isDown(Substate state) {
     return state.equals(Substate.DOWN)||state.equals(Substate.REMOVED);
   }
@@ -194,6 +195,17 @@ public class ContainerPlatformService extends PlatformService implements Service
   
   public static ServiceName getServiceName() {
     return ServiceName.of("foxPlatform", "platformService");
+  }
+
+  public ProcessArchiveContext getProcessArchiveContext(String processArchiveName, String processEngineName) {
+    ContainerProcessEngineController processEngineController = (ContainerProcessEngineController) processEngineRegistry.getProcessEngineController(processEngineName);
+    
+    if(processEngineController == null) {      
+      return null;
+    }
+    
+    return processEngineController.getProcessArchiveContextByName(processArchiveName);
+    
   }
 
 }

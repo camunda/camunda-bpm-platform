@@ -18,7 +18,7 @@ package com.camunda.fox.platform.subsystem.impl.util;
 import org.jboss.as.naming.ManagedReference;
 import org.jboss.as.naming.ManagedReferenceFactory;
 
-import com.camunda.fox.platform.subsystem.impl.platform.ContainerPlatformService;
+import com.camunda.fox.platform.subsystem.impl.service.ContainerPlatformService;
 
 
 /**
