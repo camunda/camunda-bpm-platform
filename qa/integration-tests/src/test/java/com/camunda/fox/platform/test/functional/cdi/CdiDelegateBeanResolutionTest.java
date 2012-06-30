@@ -28,6 +28,7 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import com.camunda.fox.platform.test.functional.cdi.beans.ExampleDelegateBean;
 import com.camunda.fox.platform.test.util.AbstractFoxPlatformIntegrationTest;
 
 /**
