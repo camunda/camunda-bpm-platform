@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:activiti="http://activiti.org/bpmn"
+  xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
+  xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema"
+  expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="Examples">
+  
+  <process id="testScopingExclusiveJobs">
+  
+    <startEvent id="theStart" />
+
+    <serviceTask id="servicetask1"      
+      activiti:delegateExpression="${requestScopedDelegateBean}"
+      activiti:async="true" />
+      
+    <serviceTask id="servicetask2"      
+      activiti:delegateExpression="${requestScopedDelegateBean}" 
+      activiti:async="true" />
+
+    <userTask id="waitHere" />
+    
+    <serviceTask id="servicetask3"      
+      activiti:delegateExpression="${requestScopedDelegateBean}"
+      activiti:async="true" />
+      
+    <userTask id="waitAgain" />
+
+    <sequenceFlow sourceRef="theStart" targetRef="servicetask1" />
+    <sequenceFlow sourceRef="servicetask1" targetRef="servicetask2" />
+    <sequenceFlow sourceRef="servicetask2" targetRef="waitHere" />
+    <sequenceFlow sourceRef="waitHere" targetRef="servicetask3" />
+    <sequenceFlow sourceRef="servicetask3" targetRef="waitAgain" />
+    <sequenceFlow sourceRef="waitAgain" targetRef="endevent1" />
+
+    <endEvent id="endevent1" />
+    
+  </process>
+  
+</definitions>
