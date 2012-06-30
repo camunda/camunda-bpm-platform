@@ -39,6 +39,7 @@ public class JobExecutorRequestContextTest extends AbstractFoxPlatformIntegratio
       .addClass(RequestScopedDelegateBean.class)            
       .addClass(RequestScopedSFSBDelegate.class)
       .addClass(InvocationCounterDelegateBean.class)
+      .addClass(InvocationCounterService.class) // interface (remote)
       .addClass(InvocationCounterDelegateBeanLocal.class)
       .addAsResource("com/camunda/fox/platform/test/functional/cdi/JobExecutorRequestContextTest.testResolveBean.bpmn20.xml")
       .addAsResource("com/camunda/fox/platform/test/functional/cdi/JobExecutorRequestContextTest.testScoping.bpmn20.xml")
@@ -103,6 +104,7 @@ public class JobExecutorRequestContextTest extends AbstractFoxPlatformIntegratio
     
   }
   
+  @Ignore // does not work on GF, See HEMERA-2454
   @Test
   @OperateOnDeployment("pa")
   public void testScopingSFSB() {
@@ -160,7 +162,7 @@ public class JobExecutorRequestContextTest extends AbstractFoxPlatformIntegratio
     
   }
   
-  @Ignore // does not work with a local invocation (Bug in Jboss AS?)
+  @Ignore // does not work with a local invocation (Bug in Jboss AS?) SEE HEMERA-2453
   @Test
   @OperateOnDeployment("pa")
   public void testRequestContextPropagationEjbLocal() throws Exception{
@@ -182,7 +184,7 @@ public class JobExecutorRequestContextTest extends AbstractFoxPlatformIntegratio
     waitForJobExecutorToProcessAllJobs(6000, 100);
     
     Object variable = runtimeService.getVariable(pi.getId(), "invocationCounter");
-    // -> the same bean instance was invoked 2 times!
+    // -> the same bean instance was invoked 1 times!
     Assert.assertEquals(2, variable);
     
     Task task = taskService.createTaskQuery()
@@ -197,7 +199,8 @@ public class JobExecutorRequestContextTest extends AbstractFoxPlatformIntegratio
     Assert.assertEquals(1, variable);
   }
   
-  @Ignore // does not work with a remote invocation (Bug in Jboss AS?)
+  @Ignore // does not work on Jboss AS with a remote invocation (Bug in Jboss AS?) SEE HEMERA-2453
+          // works with Glassfish
   @Test
   @OperateOnDeployment("pa")
   public void testRequestContextPropagationEjbRemote() {
@@ -210,7 +213,7 @@ public class JobExecutorRequestContextTest extends AbstractFoxPlatformIntegratio
     waitForJobExecutorToProcessAllJobs(6000, 100);
     
     Object variable = runtimeService.getVariable(pi.getId(), "invocationCounter");
-    // -> the same bean instance was invoked 2 times!
+    // remote invocations of a bean from  a seperate deployment constitutes seperate requests
     Assert.assertEquals(2, variable);
     
     Task task = taskService.createTaskQuery()
