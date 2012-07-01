@@ -23,7 +23,6 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.persistence.EntityManagerFactory;
 
-import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
 import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
 
@@ -86,12 +85,8 @@ public class DefaultProcessArchiveServices implements ProcessArchiveServices {
     return processEngineServiceController.getProcessArchiveContext(processDefinitionKey);
   }
   
-  @Override
   public ProcessArchiveContext getProcessArchiveContextForExecution(ExecutionEntity executionEntity) {
-    ProcessDefinitionEntity processDefinitionEntity = Context.getCommandContext()
-      .getProcessDefinitionManager()
-      .findLatestProcessDefinitionById(executionEntity.getProcessDefinitionId());
-    
+    ProcessDefinitionEntity processDefinitionEntity = (ProcessDefinitionEntity) executionEntity.getProcessDefinition();    
     return getProcessArchiveContext(processDefinitionEntity.getKey());
   }
 
