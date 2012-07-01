@@ -1,4 +1,4 @@
-package com.camunda.fox.platform.test.functional.cdi.beans;
+package com.camunda.fox.platform.test.functional.ejb.request.beans;
 
 import javax.ejb.Stateful;
 import javax.enterprise.context.RequestScoped;
