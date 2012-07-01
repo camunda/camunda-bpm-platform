@@ -1,4 +1,4 @@
-package com.camunda.fox.platform.test.functional.cdi.beans;
+package com.camunda.fox.platform.test.functional.ejb.request.beans;
 
 import javax.ejb.EJB;
 import javax.inject.Named;
@@ -14,10 +14,9 @@ import org.activiti.engine.delegate.JavaDelegate;
 @Named
 public class InvocationCounterDelegateBeanLocal implements JavaDelegate {
   
-  @EJB(lookup="java:/" +
-    "global/" +
+  @EJB(lookup="java:global/" +
   	"service/" +
-  	"InvocationCounterServiceBean!com.camunda.fox.platform.test.functional.cdi.beans.InvocationCounterServiceLocal")
+  	"InvocationCounterServiceBean!com.camunda.fox.platform.test.functional.ejb.request.beans.InvocationCounterServiceLocal")
   private InvocationCounterServiceLocal invocationCounterService;
 
   public void execute(DelegateExecution execution) throws Exception {    
