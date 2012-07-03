@@ -8,6 +8,8 @@
   </parent>
   <artifactId>tasklist-core</artifactId>
   <packaging>jar</packaging>
+  
+  <name>fox tasklist - Core</name>
 
   <dependencies>
     <dependency>
