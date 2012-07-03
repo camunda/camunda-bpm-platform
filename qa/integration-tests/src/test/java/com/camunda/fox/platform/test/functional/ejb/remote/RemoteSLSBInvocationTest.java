@@ -8,7 +8,6 @@ import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Assert;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -29,7 +28,6 @@ import com.camunda.fox.platform.test.util.AbstractFoxPlatformIntegrationTest;
  * @author Daniel Meyer
  *
  */
-@Ignore
 @RunWith(Arquillian.class)
 public class RemoteSLSBInvocationTest extends AbstractFoxPlatformIntegrationTest {
  
