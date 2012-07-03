@@ -28,7 +28,7 @@ public class SFSBDelegateTest extends AbstractFoxPlatformIntegrationTest {
       .addClass(SFSBDelegate.class)
       .addClass(SFSBClientDelegate.class)  
       .addAsResource("com/camunda/fox/platform/test/functional/ejb/SFSBDelegateTest.testBeanResolution.bpmn20.xml")
-      .addAsResource("com/camunda/fox/platform/test/functional/ejb/SFSBDelegateTest.testBeanResolutionfromClient.bpmn20.xml");
+      .addAsResource("com/camunda/fox/platform/test/functional/ejb/SFSBDelegateTest.testBeanResolutionFromClient.bpmn20.xml");
   }
   
   
