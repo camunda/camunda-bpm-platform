@@ -28,7 +28,7 @@ public class SingletonBeanDelegateTest extends AbstractFoxPlatformIntegrationTes
       .addClass(SingletonBeanDelegate.class)
       .addClass(SingletonBeanClientDelegate.class)    
       .addAsResource("com/camunda/fox/platform/test/functional/ejb/SingletonBeanDelegateTest.testBeanResolution.bpmn20.xml")
-      .addAsResource("com/camunda/fox/platform/test/functional/ejb/SingletonBeanDelegateTest.testBeanResolutionfromClient.bpmn20.xml");
+      .addAsResource("com/camunda/fox/platform/test/functional/ejb/SingletonBeanDelegateTest.testBeanResolutionFromClient.bpmn20.xml");
   }
   
   
