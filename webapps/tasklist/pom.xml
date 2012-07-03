@@ -7,12 +7,15 @@
   <version>6.1.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
+  <name>fox tasklist - Root</name>
+  
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <fox.version>6.1.0-SNAPSHOT</fox.version>
   </properties>
 
   <modules>
+    <module>../fox-layout-bootstrap</module>
     <module>tasklist-core</module>
     <module>tasklist-webapp</module>
   </modules>

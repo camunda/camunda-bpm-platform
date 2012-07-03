@@ -11,7 +11,7 @@
   <artifactId>tasklist-webapp</artifactId>
   <packaging>war</packaging>
 
-  <name>fox tasklist</name>
+  <name>fox tasklist - Webapp</name>
   <description>
 		Central tasklist application in the fox platform being able to work together with Process Applications which only deploy forms.
 		See https://app.camunda.com/confluence/display/foxUserGuide/fox+tasklist for details.
