@@ -14,22 +14,24 @@ import org.activiti.engine.identity.Group;
 import com.camunda.fox.tasklist.api.TaskListGroup;
 import com.camunda.fox.tasklist.api.TasklistIdentityService;
 import com.camunda.fox.tasklist.api.TasklistUser;
-
+import com.camunda.fox.webapp.faces.exception.TaskListAuthenticationFailedException;
 
 @Named
 @ApplicationScoped
 public class ActivitiIdentityServiceImpl implements TasklistIdentityService, Serializable {
 
   private static final long serialVersionUID = 1L;
-  
+
   @Inject
   private IdentityService identityService;
 
   @Override
   public void authenticateUser(String userId, String password) {
-    // always authenticate
+    if (!identityService.checkPassword(userId, password)) {
+      throw new TaskListAuthenticationFailedException("The username or password you entered is incorrect.");
+    }
   }
-  
+
   @Override
   public List<TaskListGroup> getGroupsByUserId(String userId) {
     List<TaskListGroup> taskListGroups = new ArrayList<TaskListGroup>();
@@ -53,7 +55,7 @@ public class ActivitiIdentityServiceImpl implements TasklistIdentityService, Ser
     }
     if (!userId.equals("fozzie")) {
       colleagues.add(new TasklistUser("fozzie", "Fozzie", "Bear"));
-    } 
+    }
     return colleagues;
   }
 

@@ -86,7 +86,7 @@ public abstract class CmpeProcessEngineConfiguration extends ProcessEngineConfig
   protected void initProcessArchiveServices() {
     if(processArchiveServices == null) {
       processArchiveServices = Services.getService(ProcessArchiveServices.class);
-      processArchiveServices.setProcessEngineServiceBean(cmpeProcessEngine);
+      processArchiveServices.setProcessEngineController(cmpeProcessEngine);
     }
   }
  

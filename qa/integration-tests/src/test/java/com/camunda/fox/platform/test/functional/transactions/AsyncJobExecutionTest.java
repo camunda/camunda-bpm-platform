@@ -1,20 +1,16 @@
 package com.camunda.fox.platform.test.functional.transactions;
 
 import java.util.HashMap;
-import java.util.Map;
 
 import javax.inject.Inject;
-import javax.transaction.Status;
-import javax.transaction.UserTransaction;
 
 import org.activiti.engine.RuntimeService;
-import org.activiti.engine.runtime.ProcessInstance;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.junit.Assert;
 
 import com.camunda.fox.platform.test.util.AbstractFoxPlatformIntegrationTest;
 

@@ -18,7 +18,6 @@ package org.activiti.cdi.impl.util;
 import javax.ejb.EJB;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.Dependent;
-import javax.enterprise.context.RequestScoped;
 import javax.enterprise.inject.Produces;
 import javax.inject.Named;
 
@@ -54,20 +53,20 @@ public class ActivitiServices {
     // noop
   }
 
-  @Produces @Named @RequestScoped public ProcessEngine processEngine() { return processEngineService.getDefaultProcessEngine(); }
+  @Produces @Named @ApplicationScoped public ProcessEngine processEngine() { return processEngineService.getDefaultProcessEngine(); }
 
-  @Produces @Named @RequestScoped public RuntimeService runtimeService() { return processEngine().getRuntimeService(); }
+  @Produces @Named @ApplicationScoped public RuntimeService runtimeService() { return processEngine().getRuntimeService(); }
 
-  @Produces @Named @RequestScoped public TaskService taskService() { return processEngine().getTaskService(); }
+  @Produces @Named @ApplicationScoped public TaskService taskService() { return processEngine().getTaskService(); }
 
-  @Produces @Named @RequestScoped public RepositoryService repositoryService() { return processEngine().getRepositoryService(); }
+  @Produces @Named @ApplicationScoped public RepositoryService repositoryService() { return processEngine().getRepositoryService(); }
 
-  @Produces @Named @RequestScoped public FormService formService() { return processEngine().getFormService(); }
+  @Produces @Named @ApplicationScoped public FormService formService() { return processEngine().getFormService(); }
 
-  @Produces @Named @RequestScoped public HistoryService historyService() { return processEngine().getHistoryService(); }
+  @Produces @Named @ApplicationScoped public HistoryService historyService() { return processEngine().getHistoryService(); }
 
-  @Produces @Named @RequestScoped public IdentityService identityService() { return processEngine().getIdentityService(); }
+  @Produces @Named @ApplicationScoped public IdentityService identityService() { return processEngine().getIdentityService(); }
 
-  @Produces @Named @RequestScoped public ManagementService managementService() { return processEngine().getManagementService(); }
+  @Produces @Named @ApplicationScoped public ManagementService managementService() { return processEngine().getManagementService(); }
 
 }

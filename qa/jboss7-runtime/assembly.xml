@@ -17,4 +17,8 @@
       <outputDirectory></outputDirectory>
     </fileSet>
   </fileSets>
+  
+  <!-- ####################################################################################### -->
+  <!-- WARNING: This file is currently not used, have a look at copy-distro profile in pom.xml -->
+  <!-- ####################################################################################### -->
 </assembly>

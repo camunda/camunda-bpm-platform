@@ -53,10 +53,10 @@ import org.jboss.msc.service.ServiceName;
 
 import com.camunda.fox.platform.spi.ProcessEngineConfiguration;
 import com.camunda.fox.platform.subsystem.impl.extension.Element;
-import com.camunda.fox.platform.subsystem.impl.platform.ContainerJobExecutorService;
-import com.camunda.fox.platform.subsystem.impl.platform.ContainerPlatformService;
-import com.camunda.fox.platform.subsystem.impl.platform.ProcessEngineConfigurationImpl;
-import com.camunda.fox.platform.subsystem.impl.platform.ProcessEngineControllerService;
+import com.camunda.fox.platform.subsystem.impl.service.ContainerJobExecutorService;
+import com.camunda.fox.platform.subsystem.impl.service.ContainerPlatformService;
+import com.camunda.fox.platform.subsystem.impl.service.ContainerProcessEngineController;
+import com.camunda.fox.platform.subsystem.impl.util.ProcessEngineConfigurationImpl;
 
 /**
  * Provides the description and the implementation of the process-engine#add operation.
@@ -138,12 +138,12 @@ public class ProcessEngineAdd extends AbstractAddStepHandler implements Descript
     String engineName = PathAddress.pathAddress(operation.get(ModelDescriptionConstants.ADDRESS)).getLastElement().getValue();
 
     ProcessEngineConfiguration processEngineConfiguration = transformConfiguration(context, engineName, model);
-    ProcessEngineControllerService service = new ProcessEngineControllerService(processEngineConfiguration);
+    ContainerProcessEngineController service = new ContainerProcessEngineController(processEngineConfiguration);
         
-    ServiceName name = ProcessEngineControllerService.createServiceName(processEngineConfiguration.getProcessEngineName());    
+    ServiceName name = ContainerProcessEngineController.createServiceName(processEngineConfiguration.getProcessEngineName());    
     ContextNames.BindInfo datasourceBindInfo = ContextNames.bindInfoFor(processEngineConfiguration.getDatasourceJndiName());
     
-    ServiceController<ProcessEngineControllerService> controller = context.getServiceTarget()           
+    ServiceController<ContainerProcessEngineController> controller = context.getServiceTarget()           
             .addService(name, service)
             .addDependency(ServiceName.JBOSS.append("txn").append("TransactionManager"), TransactionManager.class, service.getTransactionManagerInjector())
             .addDependency(datasourceBindInfo.getBinderServiceName(), DataSourceReferenceFactoryService.class, service.getDatasourceBinderServiceInjector())
@@ -156,7 +156,7 @@ public class ProcessEngineAdd extends AbstractAddStepHandler implements Descript
     newControllers.add(controller);
   }
 
-  private ProcessEngineConfiguration transformConfiguration(final OperationContext context, String engineName, final ModelNode model) {
+  protected ProcessEngineConfiguration transformConfiguration(final OperationContext context, String engineName, final ModelNode model) {
     String datasourceJndiName = model.get(DATASOURCE).asString();   
     String historyLevel = model.get(HISTORY_LEVEL).asString();
     boolean isDefault = model.get(DEFAULT).asBoolean();
@@ -171,15 +171,7 @@ public class ProcessEngineAdd extends AbstractAddStepHandler implements Descript
         }
       }
     }
-    
-    // TODO: read these values from config
-    int jobExecutor_maxJobsPerAcquisition =3;
-    int jobExecutor_corePoolSize=1;
-    int jobExecutor_maxPoolSize=3;
-    int jobExecutor_queueSize=3;
-    int jobExecutor_lockTimeInMillis= 5 * 60 * 1000;
-    int jobExecutor_waitTimeInMillis = 5 * 1000;
-    
+        
     ProcessEngineConfiguration processEngineConfiguration = 
             new ProcessEngineConfigurationImpl(isDefault, engineName, datasourceJndiName, historyLevel, properties);
     

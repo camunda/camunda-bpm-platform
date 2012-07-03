@@ -36,7 +36,7 @@ public interface ProcessArchiveServices {
 
   public ProcessArchiveContext getProcessArchiveContext(String processDefinitionKey);
 
-  public void setProcessEngineServiceBean(ProcessEngineController processEngineServiceBean);
+  public void setProcessEngineController(ProcessEngineController processEngineServiceBean);
 
   /**
    * This method assumes it it called from an activiti command 
