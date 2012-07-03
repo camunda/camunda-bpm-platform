@@ -41,7 +41,7 @@ public class DefaultProcessArchiveServices implements ProcessArchiveServices {
 
   protected ProcessEngineController processEngineServiceController;
     
-  public void setProcessEngineServiceBean(ProcessEngineController processEngineServiceController) {
+  public void setProcessEngineController(ProcessEngineController processEngineServiceController) {
     this.processEngineServiceController = processEngineServiceController;
   }
 

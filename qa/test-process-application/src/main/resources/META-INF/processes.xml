@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<process-archives>
+  <process-archive>
+    <configuration>
+      <undeployment delete="true" />
+    </configuration>
+  </process-archive>
+</process-archives>

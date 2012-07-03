@@ -54,7 +54,7 @@ public class Identity implements Serializable {
   public String signOut() {
     signOutEvent.fire(new SignOutEvent());
     this.currentUser = new TasklistUser();
-    return "../signin.jsf";
+    return "../signin.jsf?faces-redirect=true";
   }
 
   public boolean isSignedIn() {

@@ -29,6 +29,13 @@
       <artifactId>mysql-connector-java</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>com.camunda.fox.tasklist</groupId>
+      <artifactId>tasklist-webapp</artifactId>
+      <version>${project.version}</version>
+      <type>war</type>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>
@@ -93,6 +100,12 @@
                 <copy todir="target/jboss-as-${version.jboss.as}/modules" flatten="false">
                   <fileset dir="src/main/modules" />
                 </copy>
+                
+                <copy todir="target/jboss-as-${version.jboss.as}/standalone/deployments">
+                  <fileset refid="com.camunda.fox.tasklist:tasklist-webapp:war"/>
+                </copy>
+                                
+                                
               </target>
             </configuration>
           </execution>

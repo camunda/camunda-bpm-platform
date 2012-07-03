@@ -15,5 +15,9 @@
       <redirect />
     </navigation-case>
   </navigation-rule>
+  
+  <factory>
+    <exception-handler-factory>com.camunda.fox.webapp.faces.exception.TaskListExceptionHandlerFactory</exception-handler-factory>
+  </factory>
 
 </faces-config>

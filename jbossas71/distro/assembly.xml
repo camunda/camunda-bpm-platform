@@ -103,6 +103,14 @@
 	</dependencySet>
 
 	<dependencySet>
+		<outputFileNameMapping>fox-tasklist-${project.version}.${artifact.extension}</outputFileNameMapping>
+		<includes>
+			<include>com.camunda.fox.tasklist:tasklist-webapp:war:*</include>
+		</includes>
+		<outputDirectory>server/jboss-as-${version.jboss.as}/standalone/deployments</outputDirectory>
+	</dependencySet>
+
+	<dependencySet>
 		<outputFileNameMapping>fox-cycle-${project.version}.${artifact.extension}</outputFileNameMapping>
 		<includes>
 			<include>com.camunda.fox.cycle:cycle-webapp-fox:war:*</include>

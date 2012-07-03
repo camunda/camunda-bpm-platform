@@ -15,6 +15,7 @@
  */
 package com.camunda.fox.platform.test.util;
 
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -33,6 +34,7 @@ import org.activiti.engine.TaskService;
 import org.activiti.engine.impl.ProcessEngineImpl;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.jobexecutor.JobExecutor;
+import org.activiti.engine.runtime.Job;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
@@ -144,7 +146,8 @@ public abstract class AbstractFoxPlatformIntegrationTest {
   }
 
   public boolean areJobsAvailable() {
-    return !managementService.createJobQuery().executable().list().isEmpty();
+    List<Job> list = managementService.createJobQuery().executable().list();
+    return !list.isEmpty();
   }
 
   private static class InteruptTask extends TimerTask {
