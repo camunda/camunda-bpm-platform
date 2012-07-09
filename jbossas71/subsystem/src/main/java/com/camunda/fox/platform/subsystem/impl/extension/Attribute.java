@@ -32,8 +32,7 @@ public enum Attribute {
   UNKNOWN((String) null),
   
   NAME(ModelConstants.NAME),
-  DEFAULT(ModelConstants.DEFAULT),
-  THREAD_POOL_NAME(ModelConstants.THREAD_POOL_NAME);
+  DEFAULT(ModelConstants.DEFAULT);
 
   private final String name;
   private final AttributeDefinition definition;

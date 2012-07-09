@@ -320,7 +320,8 @@
                     </properties>
                 </process-engine>
             </process-engines>
-            <job-executor thread-pool-name="job-executor-tp">
+            <job-executor>
+                <thread-pool-name>job-executor-tp</thread-pool-name>
                 <job-acquisitions>
                     <job-acquisition name="default">
                         <acquisition-strategy>SEQUENTIAL</acquisition-strategy>

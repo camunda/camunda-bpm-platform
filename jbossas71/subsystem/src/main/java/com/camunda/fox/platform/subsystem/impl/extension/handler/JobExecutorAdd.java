@@ -40,6 +40,7 @@ import org.jboss.dmr.ModelType;
 import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceController.Mode;
 
+import com.camunda.fox.platform.FoxPlatformException;
 import com.camunda.fox.platform.subsystem.impl.service.ContainerJobExecutorService;
 import com.camunda.fox.platform.subsystem.impl.service.ContainerPlatformService;
 
@@ -79,7 +80,11 @@ public class JobExecutorAdd extends AbstractBoottimeAddStepHandler implements De
           ServiceVerificationHandler verificationHandler, List<ServiceController<?>> newControllers)
           throws OperationFailedException {
     
-    String jobExecutorThreadPoolName = PathAddress.pathAddress(operation.get(ModelDescriptionConstants.ADDRESS)).getLastElement().getValue();
+    if (!operation.hasDefined(THREAD_POOL_NAME)) {
+      throw new FoxPlatformException("Unable to configure threadpool for ContainerJobExecutorService, missing element '" + THREAD_POOL_NAME + "' in JobExecutor configuration.");
+    }
+    
+    String jobExecutorThreadPoolName = operation.get(THREAD_POOL_NAME).asString();
 
     ContainerJobExecutorService service = new ContainerJobExecutorService();
     ServiceController<ContainerJobExecutorService> serviceController = context.getServiceTarget().addService(ContainerJobExecutorService.getServiceName(), service)
