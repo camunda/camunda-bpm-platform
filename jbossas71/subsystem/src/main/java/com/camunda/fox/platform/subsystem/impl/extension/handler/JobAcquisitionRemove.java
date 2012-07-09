@@ -19,8 +19,10 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.DES
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OPERATION_NAME;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.REMOVE;
 
+import java.util.List;
 import java.util.Locale;
 
+import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.jboss.as.controller.AbstractRemoveStepHandler;
 import org.jboss.as.controller.OperationContext;
 import org.jboss.as.controller.OperationFailedException;
@@ -28,9 +30,10 @@ import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.descriptions.DescriptionProvider;
 import org.jboss.as.controller.descriptions.ModelDescriptionConstants;
 import org.jboss.dmr.ModelNode;
-import org.jboss.msc.service.ServiceName;
 
-import com.camunda.fox.platform.subsystem.impl.service.ContainerProcessEngineController;
+import com.camunda.fox.platform.FoxPlatformException;
+import com.camunda.fox.platform.jobexecutor.impl.acquisition.JobAcquisition;
+import com.camunda.fox.platform.subsystem.impl.service.ContainerJobExecutorService;
 
 /**
  * Provides the description and the implementation of the process-engine#remove operation.
@@ -49,9 +52,22 @@ public class JobAcquisitionRemove extends AbstractRemoveStepHandler implements D
   }
 
   protected void performRuntime(OperationContext context, ModelNode operation, ModelNode model) throws OperationFailedException {
-    String suffix = PathAddress.pathAddress(operation.get(ModelDescriptionConstants.ADDRESS)).getLastElement().getValue();
-    ServiceName name = ContainerProcessEngineController.createServiceName(suffix);
-    context.removeService(name);
+    ContainerJobExecutorService service = (ContainerJobExecutorService) context.getServiceRegistry(false).getService(ContainerJobExecutorService.getServiceName()).getService();
+    String jobAcquisitionName = PathAddress.pathAddress(operation.get(ModelDescriptionConstants.ADDRESS)).getLastElement().getValue();
+    JobAcquisition jobAcquisition = service.getJobAcquisitionByName(jobAcquisitionName);
+    
+    if (!jobAcquisition.getRegisteredProcessEngines().isEmpty()) {
+      List<ProcessEngineConfigurationImpl> registeredProcessEngines = jobAcquisition.getRegisteredProcessEngines();
+      StringBuffer sb = new StringBuffer("[");
+      for (ProcessEngineConfigurationImpl peci : registeredProcessEngines) {
+        sb.append(peci.getProcessEngineName() + ", ");
+      }
+      sb.append("]");
+      int lastIndexOf = sb.lastIndexOf(",");
+      sb.deleteCharAt(lastIndexOf).deleteCharAt(lastIndexOf+1);
+      throw new FoxPlatformException("Unable to remove jobAcquisition '" + jobAcquisitionName + "' because following process engines are still registered with it: " + sb.toString());
+    }
+    service.stopJobAcquisition(jobAcquisitionName);
   }
 
 }

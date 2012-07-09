@@ -19,12 +19,19 @@ import java.util.List;
 
 import junit.framework.Assert;
 
+import org.jboss.as.controller.PathAddress;
+import org.jboss.as.controller.PathElement;
+import org.jboss.as.controller.descriptions.ModelDescriptionConstants;
 import org.jboss.as.subsystem.test.AbstractSubsystemTest;
 import org.jboss.as.subsystem.test.KernelServices;
 import org.jboss.dmr.ModelNode;
+import org.jboss.dmr.Property;
 import org.junit.Test;
 
+import com.arjuna.ats.jbossatx.logging.jbossatxI18NLogger;
 import com.camunda.fox.platform.FoxPlatformException;
+import com.camunda.fox.platform.subsystem.impl.extension.Attribute;
+import com.camunda.fox.platform.subsystem.impl.extension.Element;
 import com.camunda.fox.platform.subsystem.impl.extension.FoxPlatformExtension;
 
 /**
@@ -133,7 +140,31 @@ public class JBossSubsystemXMLTest extends AbstractSubsystemTest {
     System.out.println(normalizeXML(subsystemXml));
     
     List<ModelNode> operations = parse(subsystemXml);
+    System.out.println(operations);
     Assert.assertEquals(4, operations.size());
+    
+    ModelNode jobExecutor = operations.get(1);
+    PathAddress pathAddress = PathAddress.pathAddress(jobExecutor.get(ModelDescriptionConstants.OP_ADDR));
+    Assert.assertEquals(2, pathAddress.size());
+
+    PathElement element = pathAddress.getElement(0);
+    Assert.assertEquals(ModelDescriptionConstants.SUBSYSTEM, element.getKey());
+    Assert.assertEquals(FoxPlatformExtension.SUBSYSTEM_NAME, element.getValue());
+    element = pathAddress.getElement(1);
+    Assert.assertEquals(Element.JOB_EXECUTOR.getLocalName(), element.getKey());
+    Assert.assertEquals(Attribute.DEFAULT.getLocalName(), element.getValue());
+    
+    Assert.assertEquals("job-executor-tp", jobExecutor.get(Element.THREAD_POOL_NAME.getLocalName()).asString());
+    
+    ModelNode jobAcquisition = operations.get(2);
+    Assert.assertEquals("default", jobAcquisition.get(Attribute.NAME.getLocalName()).asString());
+    Assert.assertEquals("SEQUENTIAL", jobAcquisition.get(Element.ACQUISITION_STRATEGY.getLocalName()).asString());
+    Assert.assertTrue(jobAcquisition.has(Element.PROPERTIES.getLocalName()));
+    Assert.assertTrue(!jobAcquisition.hasDefined(Element.PROPERTIES.getLocalName()));
+    
+    jobAcquisition = operations.get(3);
+    Assert.assertEquals("anders", jobAcquisition.get(Attribute.NAME.getLocalName()).asString());
+    Assert.assertEquals("SEQUENTIAL", jobAcquisition.get(Element.ACQUISITION_STRATEGY.getLocalName()).asString());
   }
   
   @Test
@@ -182,6 +213,7 @@ public class JBossSubsystemXMLTest extends AbstractSubsystemTest {
     Assert.assertEquals(7, services.getContainer().getServiceNames().size());
     
     String persistedSubsystemXml = services.getPersistedSubsystemXml();
+    System.out.println(persistedSubsystemXml);
     compareXml(null, subsystemXml, persistedSubsystemXml);
   }
   
