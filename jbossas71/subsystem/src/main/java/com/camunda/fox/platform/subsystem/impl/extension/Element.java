@@ -42,7 +42,8 @@ public enum Element {
   JOB_AQUISITION(ModelConstants.JOB_ACQUISITION),
   ACQUISITION_STRATEGY(ModelConstants.ACQUISITION_STRATEGY),
   PROPERTIES(ModelConstants.PROPERTIES),
-  PROPERTY(ModelConstants.PROPERTY);
+  PROPERTY(ModelConstants.PROPERTY),
+  THREAD_POOL_NAME(ModelConstants.THREAD_POOL_NAME);
 
   private final String name;
   private final AttributeDefinition definition;
