@@ -220,30 +220,13 @@ public class FoxPlatformParser implements XMLStreamConstants, XMLElementReader<L
       throw unexpectedElement(reader);
     }
     
-    String jobExecutorThreadPoolName = null;
-
-    for (int i = 0; i < reader.getAttributeCount(); i++) {
-      String attr = reader.getAttributeLocalName(i);
-      if (Attribute.forName(attr).equals(Attribute.THREAD_POOL_NAME)) {
-        jobExecutorThreadPoolName = String.valueOf(reader.getAttributeValue(i));
-      } else {
-        throw unexpectedAttribute(reader, i);
-      }
-    }
-
-    if (jobExecutorThreadPoolName.equals("null")) {
-      throw missingRequiredElement(reader, Collections.singleton(Attribute.THREAD_POOL_NAME.getLocalName()));
-    }
-
-    // Add the 'add' operation for each 'job-executor' child
+    // Add the 'add' operation for 'job-executor' parent
     ModelNode addJobExecutor = new ModelNode();
     addJobExecutor.get(OP).set(ModelDescriptionConstants.ADD);
     PathAddress addr = PathAddress.pathAddress(
               PathElement.pathElement(SUBSYSTEM, FoxPlatformExtension.SUBSYSTEM_NAME),
-              PathElement.pathElement(Element.JOB_EXECUTOR.getLocalName(), jobExecutorThreadPoolName));
+              PathElement.pathElement(Element.JOB_EXECUTOR.getLocalName(), ModelConstants.DEFAULT));
     addJobExecutor.get(OP_ADDR).set(addr.toModelNode());
-    
-    addJobExecutor.get(Attribute.THREAD_POOL_NAME.getLocalName()).set(jobExecutorThreadPoolName);
     
     list.add(addJobExecutor);
   
@@ -260,6 +243,10 @@ public class FoxPlatformParser implements XMLStreamConstants, XMLElementReader<L
         switch (Element.forName(reader.getLocalName())) {
           case JOB_AQUISITIONS: {
             parseJobAcquisitions(reader, list, addJobExecutor);
+            break;
+          }
+          case THREAD_POOL_NAME: {
+            parseElement(Element.THREAD_POOL_NAME, reader, addJobExecutor);
             break;
           }
           default: {
@@ -323,10 +310,10 @@ public class FoxPlatformParser implements XMLStreamConstants, XMLElementReader<L
 
     // Add the 'add' operation for each 'job-acquisition' child
     ModelNode addJobAcquisition = new ModelNode();
-    addJobAcquisition.get(OP).set(ModelDescriptionConstants.ADD);
+    addJobAcquisition.get(OP).set(ADD);
     PathAddress addr = PathAddress.pathAddress(
             PathElement.pathElement(SUBSYSTEM, FoxPlatformExtension.SUBSYSTEM_NAME),
-            PathElement.pathElement(Element.JOB_EXECUTOR.getLocalName(), parentAddress.get(Attribute.THREAD_POOL_NAME.getLocalName()).asString()),
+            PathElement.pathElement(Element.JOB_EXECUTOR.getLocalName(), ModelConstants.DEFAULT),
             PathElement.pathElement(Element.JOB_AQUISITIONS.getLocalName(), acquisitionName));
     addJobAcquisition.get(OP_ADDR).set(addr.toModelNode());
     
@@ -417,8 +404,9 @@ public class FoxPlatformParser implements XMLStreamConstants, XMLElementReader<L
     
     if (jobExecutorNode.isDefined()) { 
       writer.writeStartElement(Element.JOB_EXECUTOR.getLocalName());
+      
       Property property = jobExecutorNode.asProperty();
-      writer.writeAttribute(Attribute.THREAD_POOL_NAME.getLocalName(), property.getName());
+      writeElement(Element.THREAD_POOL_NAME, writer, property.getValue());
       
       writeJobAcquisitionsContent(writer, context, property.getValue());
       

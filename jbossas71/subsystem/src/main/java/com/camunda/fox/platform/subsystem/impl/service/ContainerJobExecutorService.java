@@ -60,7 +60,7 @@ public class ContainerJobExecutorService extends PlatformJobExecutor implements 
       managedQueueExecutorService.executeBlocking(new ContainerExecuteJobsRunnable(jobIds, commandExecutor, containerPlatformService), 2, TimeUnit.SECONDS);
       
     } catch (InterruptedException e) {
-      // the the acquisition thread is interrupted, this probably means the app server is turning the lights off -> ignore          
+      // the acquisition thread is interrupted, this probably means the app server is turning the lights off -> ignore          
     } catch (ExecutionTimedOutException e) {
       rejected = true;
     } catch (RejectedExecutionException e) {
