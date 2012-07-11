@@ -27,6 +27,7 @@ import org.jboss.as.subsystem.test.KernelServices;
 import org.jboss.dmr.ModelNode;
 
 import com.camunda.fox.platform.subsystem.impl.extension.FoxPlatformExtension;
+import com.camunda.fox.platform.subsystem.impl.extension.ModelConstants;
 
 /**
  *
@@ -35,7 +36,7 @@ import com.camunda.fox.platform.subsystem.impl.extension.FoxPlatformExtension;
 public class FoxPlatformSubsystemTest extends AbstractSubsystemBaseTest {
 
   public FoxPlatformSubsystemTest() {
-    super(FoxPlatformExtension.SUBSYSTEM_NAME, new FoxPlatformExtension());
+    super(ModelConstants.SUBSYSTEM_NAME, new FoxPlatformExtension());
   }
 
   @Override
