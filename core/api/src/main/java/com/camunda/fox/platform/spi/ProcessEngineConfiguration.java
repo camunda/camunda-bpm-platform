@@ -27,7 +27,11 @@ public interface ProcessEngineConfiguration {
   /** indicates whether the process engine should automatically create / 
    * update the database schema upon startup */ 
   public static String PROP_IS_AUTO_SCHEMA_UPDATE = "isAutoSchemaUpdate";
-  
+
+  /** indicates whether the identity module is used and if this tables are
+   *  required */ 
+  public static String PROP_IS_IDENTITY_USED = "isIdentityUsed";
+
   /** indicates whether the job executor should be automatically activated */
   public static String PROP_IS_ACTIVATE_JOB_EXECUTOR = "isActivateJobExecutor";
   
