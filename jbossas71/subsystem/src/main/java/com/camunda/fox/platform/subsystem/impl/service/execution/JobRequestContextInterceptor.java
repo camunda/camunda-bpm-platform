@@ -22,6 +22,8 @@ import com.camunda.fox.platform.spi.ProcessArchiveCallback;
  * <p>ProcessArchiveCallback allowing us to execute a job in the context of 
  * the owning ProcessArchive while activating the CDI RequestScope.</p>
  * 
+ * <p>See: org.jboss.as.weld.ejb.EjbRequestScopeActivationInterceptor</p>
+ * 
  * @author Daniel Meyer
  *
  */
