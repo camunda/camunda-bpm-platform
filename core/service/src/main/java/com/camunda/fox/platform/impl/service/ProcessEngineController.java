@@ -207,6 +207,7 @@ public class ProcessEngineController {
       log.info("now performing process engine auto schema update.");
       DbSchemaOperations dbSchemaOperations = new DbSchemaOperations();
       dbSchemaOperations.setHistory(history);
+      dbSchemaOperations.setDbIdentityUsed(isIdentityUsed);
       dbSchemaOperations.setDataSourceJndiName(datasourceJndiName);    
       dbSchemaOperations.update();      
     }
