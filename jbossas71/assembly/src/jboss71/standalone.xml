@@ -105,22 +105,21 @@
                         <password>sa</password>
                     </security>
                 </datasource>
-                <datasource jndi-name="java:jboss/datasources/FoxEngineDS" enabled="true" use-java-context="true" jta="true" use-ccm="true" pool-name="FoxEngineDS">
+                <datasource jta="true" jndi-name="java:jboss/datasources/FoxEngineDS" pool-name="FoxEngineDS" enabled="true" use-java-context="true" use-ccm="true">
                     <connection-url>jdbc:h2:./fox-h2-dbs/fox-engine;DB_CLOSE_DELAY=-1;MVCC=TRUE;DB_CLOSE_ON_EXIT=FALSE</connection-url>
                     <driver>h2</driver>
                     <security>
                         <user-name>sa</user-name>
                         <password>sa</password>
-                    </security>                   
-                </datasource>               
-                <datasource jndi-name="java:jboss/datasources/CycleDS" enabled="true" use-java-context="true" jta="true" use-ccm="true" pool-name="CycleDS">
+                    </security>
+                </datasource>
+                <datasource jta="true" jndi-name="java:jboss/datasources/CycleDS" pool-name="CycleDS" enabled="true" use-java-context="true" use-ccm="true">
                     <connection-url>jdbc:h2:./fox-h2-dbs/cycle;DB_CLOSE_DELAY=-1;MVCC=TRUE;DB_CLOSE_ON_EXIT=FALSE</connection-url>
                     <driver>h2</driver>
-                    <pool></pool>
                     <security>
                         <user-name>sa</user-name>
                         <password>sa</password>
-                    </security>                   
+                    </security>
                 </datasource>
                 <drivers>
                     <driver name="h2" module="com.h2database.h2">
@@ -133,10 +132,10 @@
             <deployment-scanner path="deployments" relative-to="jboss.server.base.dir" scan-interval="5000"/>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:ee:1.0">
-          <global-modules>
-            <module name="com.camunda.fox.platform.fox-platform-api" />
-            <module name="com.camunda.fox.engine.fox-engine" />
-          </global-modules>
+            <global-modules>
+                <module name="com.camunda.fox.platform.fox-platform-api" />
+                <module name="com.camunda.fox.engine.fox-engine" />
+            </global-modules>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:ejb3:1.2">
             <session-bean>
@@ -283,7 +282,7 @@
                 <max-threads count="10" />
                 <keepalive-time time="10" unit="seconds" />
             </bounded-queue-thread-pool>
-        </subsystem>        	
+        </subsystem>
         <subsystem xmlns="urn:jboss:domain:transactions:1.1">
             <core-environment>
                 <process-id>
@@ -310,30 +309,30 @@
                 </pre-handler-chain>
             </endpoint-config>
         </subsystem>
- 	    <subsystem xmlns="urn:jboss:domain:weld:1.0" />
-	    <subsystem xmlns="urn:com.camunda.fox.fox-platform:1.0">
-		   <process-engines>
-			<process-engine name="default" default="true">
-				<datasource>java:jboss/datasources/FoxEngineDS</datasource>
-				<history-level>full</history-level>
-				<properties>
-					<property name="jobExecutorAcquisitionName">default</property>
-					<property name="isAutoSchemaUpdate">true</property>                    
-				</properties>
-			</process-engine>
-		   </process-engines>
-		   <job-executor thread-pool-name="job-executor-tp">
-			<job-acquisitions>
-				<job-acquisition name="default">
-					<acquisition-strategy>SEQUENTIAL</acquisition-strategy>
-					<properties>
-						<property name="lockTimeInMillis">300000</property>
-						<property name="waitTimeInMillis">5000</property>
-						<property name="maxJobsPerAcquisition">3</property>
-					</properties>
-				</job-acquisition>
-			</job-acquisitions>
-		   </job-executor>                 
+        <subsystem xmlns="urn:jboss:domain:weld:1.0"/>
+        <subsystem xmlns="urn:com.camunda.fox.fox-platform:1.0">
+            <process-engines>
+                <process-engine name="default" default="true">
+                    <datasource>java:jboss/datasources/FoxEngineDS</datasource>
+                    <history-level>full</history-level>
+                    <properties>
+                        <property name="jobExecutorAcquisitionName">default</property>
+                        <property name="isAutoSchemaUpdate">true</property>
+                    </properties>
+                </process-engine>
+            </process-engines>
+            <job-executor thread-pool-name="job-executor-tp">
+                <job-acquisitions>
+                    <job-acquisition name="default">
+                        <acquisition-strategy>SEQUENTIAL</acquisition-strategy>
+                        <properties>
+                            <property name="lockTimeInMillis">300000</property>
+                            <property name="waitTimeInMillis">5000</property>
+                            <property name="maxJobsPerAcquisition">3</property>
+                        </properties>
+                    </job-acquisition>
+                </job-acquisitions>
+            </job-executor>
         </subsystem>
     </profile>
 
