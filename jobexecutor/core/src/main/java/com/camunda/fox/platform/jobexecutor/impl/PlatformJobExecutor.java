@@ -54,7 +54,7 @@ public abstract class PlatformJobExecutor implements PlatformJobExecutorService 
       }
     }
     
-    // register default strategies if not overriden by user:
+    // register default strategies if not overridden by user:
     if(!discoveredStrategies.containsKey(JobAcquisitionStrategy.SEQUENTIAL)) {
       discoveredStrategies.put(JobAcquisitionStrategy.SEQUENTIAL, new SequentialJobAcquisition());
     }
@@ -80,7 +80,7 @@ public abstract class PlatformJobExecutor implements PlatformJobExecutorService 
     String jobAcquisitionStrategyName = configuration.getJobAcquisitionStrategy();
     JobAcquisitionStrategy jobAcquisitionStrategy = discoveredStrategies.get(jobAcquisitionStrategyName);
     if(jobAcquisitionStrategy == null) {
-      throw new FoxPlatformException("Unkonwn JobAcquisitionStrategy with name '"+jobAcquisitionStrategyName+"'. Discovered strategies: "+discoveredStrategies.keySet());
+      throw new FoxPlatformException("Unknown JobAcquisitionStrategy with name '"+jobAcquisitionStrategyName+"'. Discovered strategies: "+discoveredStrategies.keySet());
     }
     acquisition.setJobAcquisitionStrategy(jobAcquisitionStrategy);
     Map<String, Object> properties = configuration.getJobAcquisitionProperties();
