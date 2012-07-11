@@ -40,5 +40,7 @@ public interface ModelConstants {
   public final static String DEFAULT = "default";
   public final static String NAME = "name";
   public final static String THREAD_POOL_NAME = "thread-pool-name";
+  /** The name of our subsystem within the model. */
+  public static final String SUBSYSTEM_NAME = "fox-platform";
   
 }

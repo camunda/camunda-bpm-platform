@@ -8,7 +8,7 @@ import com.camunda.fox.platform.jobexecutor.impl.PlatformExecuteJobsRunnable;
 import com.camunda.fox.platform.subsystem.impl.service.ContainerPlatformService;
 
 /**
- * Custom Runnable delagting to the {@link ContainerExecuteJobCmd}
+ * Custom Runnable delegating to the {@link ContainerExecuteJobCmd}
  * 
  * @author Daniel Meyer
  * 

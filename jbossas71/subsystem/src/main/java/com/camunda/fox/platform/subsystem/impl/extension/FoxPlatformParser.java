@@ -58,7 +58,7 @@ public class FoxPlatformParser implements XMLStreamConstants, XMLElementReader<L
 
     //Add the main subsystem 'add' operation
     final ModelNode subsystemAddress = new ModelNode();
-    subsystemAddress.add(SUBSYSTEM, FoxPlatformExtension.SUBSYSTEM_NAME);
+    subsystemAddress.add(SUBSYSTEM, ModelConstants.SUBSYSTEM_NAME);
     subsystemAddress.protect();
     
     final ModelNode subsystemAdd = new ModelNode();
@@ -130,7 +130,7 @@ public class FoxPlatformParser implements XMLStreamConstants, XMLElementReader<L
     ModelNode addProcessEngine = new ModelNode();
     addProcessEngine.get(OP).set(ModelDescriptionConstants.ADD);
     PathAddress addr = PathAddress.pathAddress(
-            PathElement.pathElement(SUBSYSTEM, FoxPlatformExtension.SUBSYSTEM_NAME),
+            PathElement.pathElement(SUBSYSTEM, ModelConstants.SUBSYSTEM_NAME),
             PathElement.pathElement(Element.PROCESS_ENGINES.getLocalName(), engineName));
     addProcessEngine.get(OP_ADDR).set(addr.toModelNode());
  
@@ -224,7 +224,7 @@ public class FoxPlatformParser implements XMLStreamConstants, XMLElementReader<L
     ModelNode addJobExecutor = new ModelNode();
     addJobExecutor.get(OP).set(ModelDescriptionConstants.ADD);
     PathAddress addr = PathAddress.pathAddress(
-              PathElement.pathElement(SUBSYSTEM, FoxPlatformExtension.SUBSYSTEM_NAME),
+              PathElement.pathElement(SUBSYSTEM, ModelConstants.SUBSYSTEM_NAME),
               PathElement.pathElement(Element.JOB_EXECUTOR.getLocalName(), ModelConstants.DEFAULT));
     addJobExecutor.get(OP_ADDR).set(addr.toModelNode());
     
@@ -312,7 +312,7 @@ public class FoxPlatformParser implements XMLStreamConstants, XMLElementReader<L
     ModelNode addJobAcquisition = new ModelNode();
     addJobAcquisition.get(OP).set(ADD);
     PathAddress addr = PathAddress.pathAddress(
-            PathElement.pathElement(SUBSYSTEM, FoxPlatformExtension.SUBSYSTEM_NAME),
+            PathElement.pathElement(SUBSYSTEM, ModelConstants.SUBSYSTEM_NAME),
             PathElement.pathElement(Element.JOB_EXECUTOR.getLocalName(), ModelConstants.DEFAULT),
             PathElement.pathElement(Element.JOB_AQUISITIONS.getLocalName(), acquisitionName));
     addJobAcquisition.get(OP_ADDR).set(addr.toModelNode());
@@ -361,7 +361,7 @@ public class FoxPlatformParser implements XMLStreamConstants, XMLElementReader<L
   @Override
   public void writeContent(final XMLExtendedStreamWriter writer, final SubsystemMarshallingContext context) throws XMLStreamException {
 
-    context.startSubsystemElement(FoxPlatformExtension.NAMESPACE, false);
+    context.startSubsystemElement(Namespace.CURRENT.getUriString(), false);
     
     writeProcessEnginesContent(writer, context);
     

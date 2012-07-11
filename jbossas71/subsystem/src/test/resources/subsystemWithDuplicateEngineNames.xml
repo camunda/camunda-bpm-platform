@@ -1,4 +1,4 @@
-<subsystem xmlns="urn:com.camunda.fox.fox-platform:1.0">
+<subsystem xmlns="urn:com.camunda.fox.fox-platform:1.1">
   <process-engines>
     <process-engine name="__test" default="true">
       <datasource>java:jboss/datasources/ExampleDS</datasource>
