@@ -7,15 +7,14 @@
     <module name="javax.persistence.api"/>
     <module name="javaee.api"/>
     <module name="org.javassist"/>
-	<module name="org.jboss.interceptor"/> 
     <module name="org.jboss.as.weld"/>
     <module name="org.jboss.weld.core"/>
     <module name="org.jboss.weld.api"/>
     <module name="org.jboss.weld.spi"/>	
-	<module name="javax.api"/>
-	<module name="javax.inject.api"/>
-	<module name="javax.enterprise.api"/>
+	  <module name="javax.api"/>
+	  <module name="javax.inject.api"/>
+	  <module name="javax.enterprise.api"/>
   
-	<module name="com.camunda.fox.engine.fox-engine"/>  
+	  <module name="com.camunda.fox.engine.fox-engine"/>  
   </dependencies>
 </module>
