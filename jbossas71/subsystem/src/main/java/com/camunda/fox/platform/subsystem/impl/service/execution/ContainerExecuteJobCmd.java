@@ -31,11 +31,11 @@ import com.camunda.fox.platform.subsystem.impl.service.ContainerPlatformService;
  * </ul>
  * </p>
  * 
- * <p>Actual exeution of the job is handled by the default {@link ExecuteJobsCmd}. We combine both commands 
+ * <p>Actual execution of the job is handled by the default {@link ExecuteJobsCmd}. We combine both commands 
  * ({@link ContainerExecuteJobCmd} and {@link ExecuteJobsCmd}) into a single command context here.
  * The reason is that in order to resolve the process archive for the job, we have to query the database 
  * for the job Entity and referenced entities like the execution. Since the {@link ExecuteJobsCmd} needs to do that 
- * as well, we do not degrade performance as the enities are cached by the shared {@link DbSqlSession}.</p>
+ * as well, we do not degrade performance as the entities are cached by the shared {@link DbSqlSession}.</p>
  * 
  * @author Daniel Meyer
  *
