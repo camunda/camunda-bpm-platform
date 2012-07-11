@@ -66,11 +66,9 @@ public class ContainerExecuteJobCmd implements Command<Void> {
     if(processArchive != null)  {
       
       ProcessArchiveContext processArchiveContext = platformService.getProcessArchiveContext(processArchive.getName(), getProcessEngineName());
-      try {
-        ProcessArchiveContext.executeWithinContext(new JobRequestContextInterceptor(commandContext, executeJobsCmd), processArchiveContext);
-      } catch (Exception e) {
-        log.log(Level.WARNING, "exception while executing job in process archive context"+jobId, e);
-      }
+
+      // let this throw an exception, so that  the command fails and the transaction rolls back.
+      ProcessArchiveContext.executeWithinContext(new JobRequestContextInterceptor(commandContext, executeJobsCmd), processArchiveContext);
       
     } else {
       
