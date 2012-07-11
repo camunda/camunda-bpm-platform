@@ -65,15 +65,15 @@ public class FailingJobBoundaryTimerWithDelegateVariablesTest extends AbstractFo
     assertEquals(3, jobs.get(0).getRetries());
     
     assertEquals(1, runtimeService.createExecutionQuery().processInstanceId(pi.getProcessInstanceId()).activityId("usertask1").count());
+    assertEquals(2, runtimeService.createExecutionQuery().processInstanceId(pi.getProcessInstanceId()).count());
     
-    // set to 10000, 5000 to see expected exception message, which should be set in failing job.
-//    waitForJobExecutorToProcessAllJobs(6000, 400);
-    waitForJobExecutorToProcessAllJobs(10000, 5000);
+    waitForJobExecutorToProcessAllJobs(15000, 5000);
 
     assertEquals(0, managementService.createJobQuery().executable().count()); // should be 0, because it has failed 3 times
     assertEquals(1, managementService.createJobQuery().withException().count()); // should be 1, because job failed!
     
-    assertEquals(1, runtimeService.createExecutionQuery().processInstanceId(pi.getProcessInstanceId()).count()); // okay, still standing at usertask1
+    assertEquals(1, runtimeService.createExecutionQuery().processInstanceId(pi.getProcessInstanceId()).activityId("usertask1").count());
+    assertEquals(2, runtimeService.createExecutionQuery().processInstanceId(pi.getProcessInstanceId()).count());
     
     taskService.complete(taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult().getId()); // complete task with failed job => complete process
     
