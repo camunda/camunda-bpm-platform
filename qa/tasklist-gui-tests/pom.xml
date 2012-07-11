@@ -93,7 +93,7 @@
       <dependency>
         <groupId>org.jboss.arquillian.extension</groupId>
         <artifactId>arquillian-drone-bom</artifactId>
-        <version>${version.arquillian}</version>
+        <version>${version.arquillian.drone}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
