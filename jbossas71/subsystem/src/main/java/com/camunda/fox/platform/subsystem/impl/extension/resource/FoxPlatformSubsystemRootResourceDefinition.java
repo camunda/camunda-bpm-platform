@@ -22,17 +22,18 @@ import org.jboss.as.controller.ReloadRequiredRemoveStepHandler;
 import org.jboss.as.controller.SimpleResourceDefinition;
 
 import com.camunda.fox.platform.subsystem.impl.extension.FoxPlatformExtension;
+import com.camunda.fox.platform.subsystem.impl.extension.ModelConstants;
 import com.camunda.fox.platform.subsystem.impl.extension.handler.FoxPlatformSubsystemAdd;
 
 
 public class FoxPlatformSubsystemRootResourceDefinition extends SimpleResourceDefinition {
 
-  private static final PathElement SUBSYSTEM_PATH  = PathElement.pathElement(SUBSYSTEM, FoxPlatformExtension.SUBSYSTEM_NAME);
+  private static final PathElement SUBSYSTEM_PATH  = PathElement.pathElement(SUBSYSTEM, ModelConstants.SUBSYSTEM_NAME);
 
   public static final FoxPlatformSubsystemRootResourceDefinition INSTANCE = new FoxPlatformSubsystemRootResourceDefinition();
 
   private FoxPlatformSubsystemRootResourceDefinition() {
-      super(SUBSYSTEM_PATH, FoxPlatformExtension.getResourceDescriptionResolver(FoxPlatformExtension.SUBSYSTEM_NAME),
+      super(SUBSYSTEM_PATH, FoxPlatformExtension.getResourceDescriptionResolver(ModelConstants.SUBSYSTEM_NAME),
               FoxPlatformSubsystemAdd.INSTANCE, ReloadRequiredRemoveStepHandler.INSTANCE);
   }
   

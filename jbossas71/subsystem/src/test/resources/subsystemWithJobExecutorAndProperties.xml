@@ -1,4 +1,4 @@
-<subsystem xmlns="urn:com.camunda.fox.fox-platform:1.0">
+<subsystem xmlns="urn:com.camunda.fox.fox-platform:1.1">
 	<job-executor>
 	    <thread-pool-name>job-executor-tp</thread-pool-name>
 		<job-acquisitions>
