@@ -306,7 +306,7 @@
             </endpoint-config>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:weld:1.0"/>
-        <subsystem xmlns="urn:com.camunda.fox.fox-platform:1.0">
+        <subsystem xmlns="urn:com.camunda.fox.fox-platform:1.1">
             <process-engines>
                 <process-engine name="default" default="true">
                     <datasource>java:jboss/datasources/FoxEngineDS</datasource>
