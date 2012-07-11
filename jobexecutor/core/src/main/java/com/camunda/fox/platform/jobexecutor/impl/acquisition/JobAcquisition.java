@@ -32,7 +32,7 @@ public class JobAcquisition extends JobExecutor {
   
   public JobAcquisition(JobAcquisitionConfiguration jobAcquisitionConfiguration) {
     // the configuration is passed in such that a custom JobAcquisitionStrategy implementation 
-    // may retreive custom configuration fields in a custom AcquireJobsRunnable. It is not 
+    // may retrieve custom configuration fields in a custom AcquireJobsRunnable. It is not 
     // used by the default implementation
     this.jobAcquisitionConfiguration = jobAcquisitionConfiguration;
   }
