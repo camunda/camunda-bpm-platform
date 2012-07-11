@@ -33,6 +33,7 @@ import com.camunda.fox.platform.FoxPlatformException;
 import com.camunda.fox.platform.subsystem.impl.extension.Attribute;
 import com.camunda.fox.platform.subsystem.impl.extension.Element;
 import com.camunda.fox.platform.subsystem.impl.extension.FoxPlatformExtension;
+import com.camunda.fox.platform.subsystem.impl.extension.ModelConstants;
 
 /**
  *
@@ -51,7 +52,7 @@ public class JBossSubsystemXMLTest extends AbstractSubsystemTest {
   public static final String SUBSYSTEM_WITH_JOB_EXECUTOR_AND_PROPERTIES = "subsystemWithJobExecutorAndProperties.xml";
 
   public JBossSubsystemXMLTest() {
-    super(FoxPlatformExtension.SUBSYSTEM_NAME, new FoxPlatformExtension());
+    super(ModelConstants.SUBSYSTEM_NAME, new FoxPlatformExtension());
   }
 
   @Test
@@ -149,7 +150,7 @@ public class JBossSubsystemXMLTest extends AbstractSubsystemTest {
 
     PathElement element = pathAddress.getElement(0);
     Assert.assertEquals(ModelDescriptionConstants.SUBSYSTEM, element.getKey());
-    Assert.assertEquals(FoxPlatformExtension.SUBSYSTEM_NAME, element.getValue());
+    Assert.assertEquals(ModelConstants.SUBSYSTEM_NAME, element.getValue());
     element = pathAddress.getElement(1);
     Assert.assertEquals(Element.JOB_EXECUTOR.getLocalName(), element.getKey());
     Assert.assertEquals(Attribute.DEFAULT.getLocalName(), element.getValue());
