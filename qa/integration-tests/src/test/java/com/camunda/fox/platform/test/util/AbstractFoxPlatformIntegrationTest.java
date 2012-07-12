@@ -71,7 +71,7 @@ public abstract class AbstractFoxPlatformIntegrationTest {
   protected TaskService taskService;
   
   public static WebArchive initWebArchiveDeployment(String name) {
-    return ShrinkWrap.create(WebArchive.class)
+    return ShrinkWrap.create(WebArchive.class, name)
               .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
               .addAsLibraries(DeploymentHelper.getFoxPlatformClient())
               .addAsResource("META-INF/processes.xml", "META-INF/processes.xml")
