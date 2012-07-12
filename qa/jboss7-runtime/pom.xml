@@ -104,8 +104,7 @@
                 <copy todir="target/jboss-as-${version.jboss.as}/standalone/deployments">
                   <fileset refid="com.camunda.fox.tasklist:tasklist-webapp:war"/>
                 </copy>
-                                
-                                
+                                                           
               </target>
             </configuration>
           </execution>
