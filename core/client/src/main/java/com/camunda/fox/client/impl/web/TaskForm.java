@@ -2,6 +2,8 @@ package com.camunda.fox.client.impl.web;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.enterprise.context.Conversation;
 import javax.enterprise.context.ConversationScoped;
@@ -17,6 +19,8 @@ import org.activiti.engine.repository.ProcessDefinition;
 @ConversationScoped
 @Named("fox.taskForm")
 public class TaskForm implements Serializable {
+  
+  private static Logger log = Logger.getLogger(TaskForm.class.getName());
 
   private static final long serialVersionUID = 1L;
 
@@ -35,6 +39,17 @@ public class TaskForm implements Serializable {
   private Instance<Conversation> conversationInstance;
 
   public void startTask(String taskId, String callbackUrl) {
+    if (taskId==null || callbackUrl == null) {
+      if (FacesContext.getCurrentInstance().isPostback()) {
+        // if this is an AJAX request ignore it, since we will receive multiple calls to this bean if it is added
+        // as preRenderView event
+        // see http://stackoverflow.com/questions/2830834/jsf-fevent-prerenderview-is-triggered-by-fajax-calls-and-partial-renders-some
+        return;
+      }
+      // return it anyway but log an info message
+      log.log(Level.INFO, "Called startTask method without proper parameter (taskId='"+taskId+"'; callbackUrl='"+callbackUrl+"') even if it seems we are not called by an AJAX Postback. Are you using the fox.taskForm bean corrctly?");
+      return;
+    }
     // Note that we always run in a conversation
     this.url = callbackUrl;
     businessProcess.startTask(taskId, true);
