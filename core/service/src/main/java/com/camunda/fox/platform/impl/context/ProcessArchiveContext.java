@@ -72,12 +72,8 @@ public class ProcessArchiveContext {
     return currentProcessArchiveContext.get();
   }
 
-  public static void setCurrentContext(ProcessArchiveContext processArchiveContext) {
+  private static void setCurrentContext(ProcessArchiveContext processArchiveContext) {
     currentProcessArchiveContext.set(processArchiveContext);
-  }
- 
-  static void clearCurrentContext() {
-    currentProcessArchiveContext.remove();
   }
   
   private static ThreadLocal<Boolean> isWithinProcessArchive = new ThreadLocal<Boolean>() {
@@ -94,21 +90,21 @@ public class ProcessArchiveContext {
     return isWithinProcessArchive.get() && processArchiveContext.equals(getCurrentContext());
   }
 
-  static void setWithinProcessArchive(boolean b) {
+  private static void setWithinProcessArchive(boolean b) {
     isWithinProcessArchive.set(b);
   }
 
   public static <T> T executeWithinContext(ProcessArchiveCallback<T> callback, ProcessArchiveContext processArchiveContext) {
     ProcessArchiveContext contextBefore = getCurrentContext();
     try {      
-      if(!processArchiveContext.equals(contextBefore))  {
-        setCurrentContext(processArchiveContext);
+      if(!processArchiveContext.equals(contextBefore))  {        
+        setCurrentContext(processArchiveContext);        
+        return performContextSwitch(callback);        
+      } else {
+        return callback.execute();
       }      
-      
-      return executeWithinCurrentContext(callback);   
-      
     }finally {      
-      if(contextBefore != processArchiveContext)  {
+      if(!processArchiveContext.equals(contextBefore))  {
         setCurrentContext(contextBefore);             
       }      
     }
