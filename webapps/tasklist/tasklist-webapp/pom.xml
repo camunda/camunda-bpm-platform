@@ -66,8 +66,8 @@
     </dependency>
 
     <dependency>
-      <groupId>com.camunda.fox</groupId>
-      <artifactId>fox-layout-bootstrap</artifactId>
+      <groupId>com.camunda.fox.tasklist</groupId>
+      <artifactId>tasklist-layout</artifactId>
       <version>${fox.version}</version>
       <type>war</type>
     </dependency>
