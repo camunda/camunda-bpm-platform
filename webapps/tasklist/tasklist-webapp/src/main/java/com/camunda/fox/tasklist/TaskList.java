@@ -152,7 +152,7 @@ public class TaskList implements Serializable {
     StartFormData startFormData = null;
     try {
       startFormData = formService.getStartFormData(processDefinition.getId());
-    } catch (ActivitiException ex) {
+    } catch (Exception ex) {
       // TODO: Improve to be able to query start forms without causing an
       // exception which is logged
       return null;
