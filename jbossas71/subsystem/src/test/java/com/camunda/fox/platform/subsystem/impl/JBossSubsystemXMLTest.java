@@ -28,7 +28,6 @@ import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.Property;
 import org.junit.Test;
 
-import com.arjuna.ats.jbossatx.logging.jbossatxI18NLogger;
 import com.camunda.fox.platform.FoxPlatformException;
 import com.camunda.fox.platform.subsystem.impl.extension.Attribute;
 import com.camunda.fox.platform.subsystem.impl.extension.Element;
