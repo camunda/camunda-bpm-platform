@@ -14,6 +14,9 @@ import javax.resource.spi.ResourceAdapter;
 import javax.resource.spi.ResourceAdapterAssociation;
 import javax.security.auth.Subject;
 
+import com.camunda.fox.platform.jobexecutor.ra.outbound.PlatformJobExecutorConnection;
+import com.camunda.fox.platform.jobexecutor.ra.outbound.PlatformJobExecutorConnectionFactory;
+
 @ConnectionDefinition(
   connectionFactory = PlatformJobExecutorConnectionFactory.class, 
   connectionFactoryImpl = PlatformJobExecutorConnectionFactoryImpl.class, 

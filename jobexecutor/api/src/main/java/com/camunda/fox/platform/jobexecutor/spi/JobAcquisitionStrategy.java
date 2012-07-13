@@ -1,8 +1,7 @@
 package com.camunda.fox.platform.jobexecutor.spi;
 
 import org.activiti.engine.impl.jobexecutor.AcquireJobsRunnable;
-
-import com.camunda.fox.platform.jobexecutor.impl.acquisition.JobAcquisition;
+import org.activiti.engine.impl.jobexecutor.JobExecutor;
 
 /**
  * <p>A job acquisition strategy implements the 'active' part of a 
@@ -30,7 +29,7 @@ public interface JobAcquisitionStrategy {
 
   public String getJobAcquisitionName();
   
-  public AcquireJobsRunnable getAcquireJobsRunnable(JobAcquisition jobAcquisition);
+  public AcquireJobsRunnable getAcquireJobsRunnable(JobExecutor jobAcquisition);
   
   
 }

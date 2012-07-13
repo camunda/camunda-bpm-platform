@@ -9,6 +9,7 @@ import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.interceptor.CommandExecutor;
 import org.activiti.engine.impl.jobexecutor.AcquireJobsRunnable;
 import org.activiti.engine.impl.jobexecutor.AcquiredJobs;
+import org.activiti.engine.impl.jobexecutor.JobExecutor;
 
 
 /**
@@ -21,9 +22,9 @@ public class SequentialJobAcquisitionRunnable extends AcquireJobsRunnable {
 
   protected final JobAcquisition jobAcquisition;
 
-  public SequentialJobAcquisitionRunnable(JobAcquisition jobExecutor) {
-    super(jobExecutor);
-    this.jobAcquisition = jobExecutor;
+  public SequentialJobAcquisitionRunnable(JobExecutor jobAcquisition) {
+    super(jobAcquisition);
+    this.jobAcquisition = (JobAcquisition) jobAcquisition;
   }
 
   public synchronized void run() {
