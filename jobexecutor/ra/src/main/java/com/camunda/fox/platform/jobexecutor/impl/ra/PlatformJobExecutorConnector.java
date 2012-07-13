@@ -15,9 +15,9 @@ import javax.transaction.xa.XAResource;
 
 import com.camunda.fox.platform.jobexecutor.impl.PlatformJobExecutor;
 import com.camunda.fox.platform.jobexecutor.impl.ra.execution.JcaWorkManagerPlatformJobExecutor;
-import com.camunda.fox.platform.jobexecutor.impl.ra.inflow.JobExecutionHandler;
 import com.camunda.fox.platform.jobexecutor.impl.ra.inflow.JobExecutionHandlerActivation;
 import com.camunda.fox.platform.jobexecutor.impl.ra.inflow.JobExecutionHandlerActivationSpec;
+import com.camunda.fox.platform.jobexecutor.ra.inflow.JobExecutionHandler;
 
 /**
  * <p>The {@link ResourceAdapter} responsible for bootstrapping the {@link PlatformJobExecutor}</p>

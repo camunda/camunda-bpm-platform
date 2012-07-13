@@ -16,12 +16,12 @@ import org.activiti.engine.impl.jobexecutor.JobExecutor;
 
 import com.camunda.fox.platform.FoxPlatformException;
 import com.camunda.fox.platform.jobexecutor.api.PlatformJobExecutorService;
-import com.camunda.fox.platform.jobexecutor.impl.ra.outbound.PlatformJobExecutorConnection;
-import com.camunda.fox.platform.jobexecutor.impl.ra.outbound.PlatformJobExecutorConnectionFactory;
+import com.camunda.fox.platform.jobexecutor.ra.outbound.PlatformJobExecutorConnection;
+import com.camunda.fox.platform.jobexecutor.ra.outbound.PlatformJobExecutorConnectionFactory;
 import com.camunda.fox.platform.jobexecutor.spi.JobAcquisitionConfiguration;
 
 /**
- * Bean exposing the Jca implementation of the {@link PlatformJobExecutorService} as
+ * Bean exposing the JCA implementation of the {@link PlatformJobExecutorService} as
  * as stateless bean.
  * 
  * @author Daniel Meyer

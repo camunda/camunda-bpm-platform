@@ -1,8 +1,8 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>fox-platform-jobexecutor-rar</artifactId>
-  <packaging>rar</packaging>
-  <name>fox platform EE - Job Executor RAR</name>
+  <artifactId>fox-platform-jobexecutor-api</artifactId>
+  <packaging>jar</packaging>
+  <name>fox platform EE - Job Executor API</name>
 
   <parent>
     <groupId>com.camunda.fox.platform</groupId>
@@ -10,26 +10,28 @@
     <version>6.1.0-SNAPSHOT</version>
   </parent>
 
+  <properties>
+    <!-- TODO: move to parent -->
+    <version.org.jboss.ironjacamar>1.0.10.Final</version.org.jboss.ironjacamar>
+  </properties>
+
   <dependencies>
     <dependency>
-      <groupId>com.camunda.fox.platform</groupId>
-      <artifactId>fox-platform-jobexecutor-ra</artifactId>
-      <version>${project.version}</version>
+      <groupId>com.camunda.fox.engine</groupId>
+      <artifactId>fox-engine</artifactId>
+      <scope>provided</scope>
     </dependency>
+    
     <dependency>
-      <groupId>com.camunda.fox.platform</groupId>
-      <artifactId>fox-platform-jobexecutor-core</artifactId>
-      <version>${project.version}</version>
+      <groupId>org.jboss.ironjacamar</groupId>
+      <artifactId>ironjacamar-spec-api</artifactId>
+      <version>${version.org.jboss.ironjacamar}</version>
+      <scope>provided</scope>
     </dependency>
   </dependencies>
 
   <build>
     <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-rar-plugin</artifactId>
-        <version>2.2</version>
-      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
@@ -39,7 +41,5 @@
         </configuration>
       </plugin>
     </plugins>
-
   </build>
-
 </project>
