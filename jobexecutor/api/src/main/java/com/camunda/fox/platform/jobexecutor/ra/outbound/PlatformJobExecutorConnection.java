@@ -1,4 +1,4 @@
-package com.camunda.fox.platform.jobexecutor.impl.ra.outbound;
+package com.camunda.fox.platform.jobexecutor.ra.outbound;
 
 import com.camunda.fox.platform.jobexecutor.api.PlatformJobExecutorService;
 

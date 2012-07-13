@@ -5,6 +5,7 @@ import java.util.List;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.jobexecutor.JobExecutor;
 
+import com.camunda.fox.platform.jobexecutor.ra.outbound.PlatformJobExecutorConnection;
 import com.camunda.fox.platform.jobexecutor.spi.JobAcquisitionConfiguration;
 
 

@@ -1,4 +1,4 @@
-package com.camunda.fox.platform.jobexecutor.impl.ra.inflow;
+package com.camunda.fox.platform.jobexecutor.ra.inflow;
 
 import org.activiti.engine.impl.interceptor.CommandExecutor;
 

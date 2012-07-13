@@ -13,8 +13,8 @@ import org.activiti.engine.impl.interceptor.CommandExecutor;
 
 import com.camunda.fox.platform.jobexecutor.impl.PlatformExecuteJobsRunnable;
 import com.camunda.fox.platform.jobexecutor.impl.ra.PlatformJobExecutorConnector;
-import com.camunda.fox.platform.jobexecutor.impl.ra.inflow.JobExecutionHandler;
 import com.camunda.fox.platform.jobexecutor.impl.ra.inflow.JobExecutionHandlerActivation;
+import com.camunda.fox.platform.jobexecutor.ra.inflow.JobExecutionHandler;
 
 /**
  * 

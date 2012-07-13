@@ -12,6 +12,7 @@
   </parent>
 
   <modules>
+    <module>api</module>
     <module>core</module>
     <module>ra</module>
     <module>rar</module>

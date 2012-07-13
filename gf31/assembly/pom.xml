@@ -126,6 +126,12 @@
     </dependency>
 
     <dependency>
+      <groupId>com.camunda.fox.platform</groupId>
+      <artifactId>fox-platform-jobexecutor-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
     	<groupId>com.camunda.fox.platform</groupId>
     	<artifactId>fox-platform-jobexecutor-rar</artifactId>
     	<version>${project.version}</version>
