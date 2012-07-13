@@ -19,8 +19,9 @@ import javax.transaction.xa.XAResource;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.jobexecutor.JobExecutor;
 
-import com.camunda.fox.platform.jobexecutor.api.PlatformJobExecutorService;
 import com.camunda.fox.platform.jobexecutor.impl.ra.PlatformJobExecutorConnector;
+import com.camunda.fox.platform.jobexecutor.api.PlatformJobExecutorService;
+import com.camunda.fox.platform.jobexecutor.ra.outbound.PlatformJobExecutorConnection;
 import com.camunda.fox.platform.jobexecutor.spi.JobAcquisitionConfiguration;
 
 /**

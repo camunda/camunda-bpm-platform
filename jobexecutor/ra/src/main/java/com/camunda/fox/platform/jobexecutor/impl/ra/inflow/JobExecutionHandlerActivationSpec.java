@@ -5,6 +5,8 @@ import javax.resource.spi.ActivationSpec;
 import javax.resource.spi.InvalidPropertyException;
 import javax.resource.spi.ResourceAdapter;
 
+import com.camunda.fox.platform.jobexecutor.ra.inflow.JobExecutionHandler;
+
 /**
  * 
  * @author Daniel Meyer

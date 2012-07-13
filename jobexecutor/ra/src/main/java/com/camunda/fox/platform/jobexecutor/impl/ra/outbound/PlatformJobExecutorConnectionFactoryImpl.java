@@ -5,6 +5,9 @@ import javax.naming.Reference;
 import javax.resource.ResourceException;
 import javax.resource.spi.ConnectionManager;
 
+import com.camunda.fox.platform.jobexecutor.ra.outbound.PlatformJobExecutorConnection;
+import com.camunda.fox.platform.jobexecutor.ra.outbound.PlatformJobExecutorConnectionFactory;
+
 /**
  * 
  * @author Daniel Meyer

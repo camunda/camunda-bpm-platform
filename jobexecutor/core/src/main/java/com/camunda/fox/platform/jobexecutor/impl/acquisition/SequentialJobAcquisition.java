@@ -1,6 +1,7 @@
 package com.camunda.fox.platform.jobexecutor.impl.acquisition;
 
 import org.activiti.engine.impl.jobexecutor.AcquireJobsRunnable;
+import org.activiti.engine.impl.jobexecutor.JobExecutor;
 
 import com.camunda.fox.platform.jobexecutor.spi.JobAcquisitionStrategy;
 
@@ -21,7 +22,7 @@ public class SequentialJobAcquisition implements JobAcquisitionStrategy {
     return SEQUENTIAL;
   }
 
-  public AcquireJobsRunnable getAcquireJobsRunnable(JobAcquisition jobAcquisition) {
+  public AcquireJobsRunnable getAcquireJobsRunnable(JobExecutor jobAcquisition) {
     return new SequentialJobAcquisitionRunnable(jobAcquisition);
   }
 }
