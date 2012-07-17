@@ -1,5 +1,7 @@
 package com.camunda.fox.tasklist;
 
+import com.camunda.fox.tasklist.api.TaskNavigationLink;
+
 public class GroupTasksLink extends TaskNavigationLink {
 
   protected String groupId;

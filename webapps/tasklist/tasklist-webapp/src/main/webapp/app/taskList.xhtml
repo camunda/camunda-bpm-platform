@@ -11,7 +11,7 @@
     <div class="btn-group pull-right">
       <a class="btn dropdown-toggle" data-toggle="dropdown" href="#"><i
         class="icon-user"></i> <h:outputText value="&#160;" /> <h:outputText
-          value="#{identity.currentUser.username} " /><span
+          value="#{taskListIdentity.currentUser.username} " /><span
         class="caret"></span></a>
       <ul class="dropdown-menu">
         <!-- Not yet used
@@ -19,7 +19,7 @@
         <li class="divider"></li>
          -->
         <li><h:form style="margin:0;">
-            <h:commandLink action="#{identity.signOut()}">Sign out</h:commandLink>
+            <h:commandLink action="#{taskListIdentity.signOut()}">Sign out</h:commandLink>
           </h:form></li>
       </ul>
     </div>

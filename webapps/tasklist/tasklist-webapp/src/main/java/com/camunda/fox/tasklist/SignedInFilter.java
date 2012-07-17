@@ -16,13 +16,15 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.activiti.engine.impl.identity.Authentication;
 
+import com.camunda.fox.tasklist.api.TaskListIdentity;
+
 @WebFilter(filterName = "SignedInFilter", urlPatterns = { "/app/*" })
 public class SignedInFilter implements Filter {
 
   private final static Logger log = Logger.getLogger(SignedInFilter.class.getCanonicalName());
 
   @Inject
-  private Identity identity;
+  private TaskListIdentity identity;
 
   @Override
   public void destroy() {

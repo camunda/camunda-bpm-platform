@@ -1,4 +1,4 @@
-package com.camunda.fox.tasklist;
+package com.camunda.fox.tasklist.api;
 
 import java.io.Serializable;
 import java.util.logging.Logger;
@@ -9,16 +9,14 @@ import javax.enterprise.event.Event;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import com.camunda.fox.tasklist.api.TasklistIdentityService;
-import com.camunda.fox.tasklist.api.TasklistUser;
 import com.camunda.fox.tasklist.event.SignInEvent;
 import com.camunda.fox.tasklist.event.SignOutEvent;
 
 @SessionScoped
 @Named
-public class Identity implements Serializable {
+public class TaskListIdentity implements Serializable {
 
-  private static final Logger log = Logger.getLogger(Identity.class.getCanonicalName());
+  private static final Logger log = Logger.getLogger(TaskListIdentity.class.getCanonicalName());
   
   private static final long serialVersionUID = 1L;
   private TasklistUser currentUser = new TasklistUser();
