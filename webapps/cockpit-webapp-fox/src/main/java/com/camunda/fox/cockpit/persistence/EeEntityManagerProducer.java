@@ -29,6 +29,7 @@ public class EeEntityManagerProducer extends CockpitEntityManagerProducer {
   private EntityManager foxEngineEntityManager;
   
   @Specializes
+  @Produces
   @FoxEngineResource
   @RequestScoped
   @Override
@@ -40,6 +41,7 @@ public class EeEntityManagerProducer extends CockpitEntityManagerProducer {
   }
   
   @Specializes
+  @Produces
   @RequestScoped
   @Override
   public EntityManager getCockpitEntityManager() {
@@ -47,6 +49,14 @@ public class EeEntityManagerProducer extends CockpitEntityManagerProducer {
       cockpitEntityManager = entityManagerFactories.getCockpitEntityManager();
     }
     return cockpitEntityManager;
+  }
+  
+  @Override
+  @Specializes
+  @Produces
+  @RequestScoped
+  public EntityTransaction getTransaction() {
+    return getCockpitEntityManager().getTransaction();
   }
   
   public void joinTransaction(@Observes JtaTransactionEvent transactionEvent) {
