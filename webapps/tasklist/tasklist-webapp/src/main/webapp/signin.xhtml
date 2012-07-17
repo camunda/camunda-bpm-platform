@@ -10,11 +10,11 @@
       <div class="control-group #{((not empty facesContext.messageList) ? 'error' : '')}">
         <h:messages styleClass="help-inline" style="list-style:none;margin:0;padding:0;"/>
         <label><strong>Username:</strong> <h:inputText
-            id="username" value="#{identity.currentUser.username}" /> </label>
+            id="username" value="#{taskListIdentity.currentUser.username}" /> </label>
         <label><strong>Password:</strong> <h:inputSecret
-            id="password" value="#{identity.currentUser.password}" /> </label>
+            id="password" value="#{taskListIdentity.currentUser.password}" /> </label>
         <h:commandButton id="submit_button" styleClass="btn btn-primary"
-          value="Sign in" action="#{identity.signIn()}" />
+          value="Sign in" action="#{taskListIdentity.signIn()}" />
       </div>
     </h:form>
   </ui:define>

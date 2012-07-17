@@ -16,7 +16,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 
-import org.activiti.engine.ActivitiException;
 import org.activiti.engine.FormService;
 import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.RepositoryService;
@@ -30,6 +29,8 @@ import org.activiti.engine.task.TaskQuery;
 import com.camunda.fox.client.impl.ProcessArchiveSupport;
 import com.camunda.fox.platform.api.ProcessArchiveService;
 import com.camunda.fox.platform.spi.ProcessArchive;
+import com.camunda.fox.tasklist.api.TaskListIdentity;
+import com.camunda.fox.tasklist.api.TaskNavigationLink;
 import com.camunda.fox.tasklist.api.TasklistIdentityService;
 import com.camunda.fox.tasklist.api.TasklistUser;
 import com.camunda.fox.tasklist.event.TaskNavigationLinkSelectedEvent;
@@ -58,7 +59,7 @@ public class TaskList implements Serializable {
   private ProcessEngine processEngine;
 
   @Inject
-  private Identity currentIdentity;
+  private TaskListIdentity currentIdentity;
 
   @Inject
   private TasklistIdentityService identityService;
