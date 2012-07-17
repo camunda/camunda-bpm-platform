@@ -1,5 +1,7 @@
 package com.camunda.fox.tasklist;
 
+import com.camunda.fox.tasklist.api.TaskNavigationLink;
+
 public class ColleaguesTasksLink extends TaskNavigationLink {
 
   private String colleagueId;
