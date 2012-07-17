@@ -1,6 +1,6 @@
 package com.camunda.fox.tasklist.event;
 
-import com.camunda.fox.tasklist.TaskNavigationLink;
+import com.camunda.fox.tasklist.api.TaskNavigationLink;
 
 public class TaskNavigationLinkSelectedEvent {
 

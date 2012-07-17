@@ -1,4 +1,4 @@
-package com.camunda.fox.tasklist;
+package com.camunda.fox.tasklist.api;
 
 public abstract class TaskNavigationLink {
 
