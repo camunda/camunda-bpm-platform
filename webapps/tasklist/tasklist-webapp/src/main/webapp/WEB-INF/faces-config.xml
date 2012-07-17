@@ -9,7 +9,7 @@
   <navigation-rule>
     <from-view-id>/signin.xhtml</from-view-id>
     <navigation-case>
-      <from-action>#{identity.signIn()}</from-action>
+      <from-action>#{taskListIdentity.signIn()}</from-action>
       <if>#{true}</if>
       <to-view-id>/app/taskList.xhtml</to-view-id>
       <redirect />

@@ -15,6 +15,8 @@ import javax.inject.Named;
 import org.activiti.engine.TaskService;
 
 import com.camunda.fox.tasklist.api.TaskListGroup;
+import com.camunda.fox.tasklist.api.TaskListIdentity;
+import com.camunda.fox.tasklist.api.TaskNavigationLink;
 import com.camunda.fox.tasklist.api.TasklistIdentityService;
 import com.camunda.fox.tasklist.api.TasklistUser;
 import com.camunda.fox.tasklist.event.SignOutEvent;
@@ -29,7 +31,7 @@ public class TaskNavigation implements Serializable {
   private static final long serialVersionUID = 1L;
 
   @Inject
-  private Identity currentIdentity;
+  private TaskListIdentity currentIdentity;
 
   @Inject
   private TaskService taskService;
