@@ -37,25 +37,64 @@ public class FoxJobRetryCmd implements Command<Object> {
     this.exception = exception;
   }
   
-  private ExecutionEntity fetchExecutionEntity(String executionId) {
-    return Context.getCommandContext()
-                  .getExecutionManager()
-                  .findExecutionById(executionId);
-  }
-
   public Object execute(CommandContext commandContext) {
     JobEntity job = Context.getCommandContext()
                            .getJobManager()
                            .findJobById(jobId);
 
+    ActivityImpl activity = getCurrentActivity(commandContext, job);
+    
+    if (activity == null) {
+      executeStandardStrategy(commandContext);
+    } else {
+      executeCustomStrategy(commandContext, job, activity);
+    }
+    
+    return null;
+  }
+
+  private void executeCustomStrategy(CommandContext commandContext, JobEntity job, ActivityImpl activity) {
+    String failedJobRetryTimeCycle = (String) activity.getProperty(FoxFailedJobParseListener.FOX_FAILED_JOB_CONFIGURATION);
+    if (failedJobRetryTimeCycle != null) {
+      try {
+        DurationHelper durationHelper = new DurationHelper(failedJobRetryTimeCycle);
+        job.setLockExpirationTime(durationHelper.getDateAfter());
+        // TODO: why isn't the lockOwner set to null like in @DecrementJobRetriesCmd
+        // TODO: why revision == 2, isn't it used for optimistic locking?
+        if (job.getRevision() == 2) {
+          int times = durationHelper.getTimes();
+          if (times > 0) {
+            job.setRetries(durationHelper.getTimes());
+          } else {
+            throw new ActivitiException("Cannot parse the amount of retries.");
+          }
+        }
+      } catch (Exception e) {
+        executeStandardStrategy(commandContext);
+        throw new ActivitiException("Due to parsing failure the default retry strategy has been chosen.", e);
+      }
+      if (exception != null) {
+        job.setExceptionMessage(exception.getMessage());
+        job.setExceptionStacktrace(getExceptionStacktrace());
+      }
+      JobExecutor jobExecutor = Context.getProcessEngineConfiguration().getJobExecutor();
+      MessageAddedNotification messageAddedNotification = new MessageAddedNotification(jobExecutor);
+      TransactionContext transactionContext = commandContext.getTransactionContext();
+      transactionContext.addTransactionListener(TransactionState.COMMITTED, messageAddedNotification);
+    } else {
+      executeStandardStrategy(commandContext);
+    }
+  }
+
+  private ActivityImpl getCurrentActivity(CommandContext commandContext, JobEntity job) {
     String type = job.getJobHandlerType();
     ActivityImpl activity = null;
     if (type.equals(TimerExecuteNestedActivityJobHandler.TYPE)
             || type.equals(TimerCatchIntermediateEventJobHandler.TYPE)) {
       String activityId = job.getJobHandlerConfiguration();
-      ExecutionEntity execution = this.fetchExecutionEntity(job.getExecutionId());
+      ExecutionEntity execution = fetchExecutionEntity(job.getExecutionId());
       if (execution == null) {
-        this.executeStandardStrategy(commandContext);
+        executeStandardStrategy(commandContext);
         throw new ActivitiException("No execution found for key '" + job.getJobHandlerConfiguration() + "'");
       }
       activity = execution.getProcessDefinition().findActivity(activityId);
@@ -65,7 +104,7 @@ public class FoxJobRetryCmd implements Command<Object> {
 
       ProcessDefinitionEntity processDefinition = deploymentCache.findDeployedLatestProcessDefinitionByKey(job.getJobHandlerConfiguration());
       if (processDefinition == null) {
-        this.executeStandardStrategy(commandContext);
+        executeStandardStrategy(commandContext);
         throw new ActivitiException("No process definition found for key '" + job.getJobHandlerConfiguration() + "'");
       }
 
@@ -74,62 +113,32 @@ public class FoxJobRetryCmd implements Command<Object> {
     } else if (type.equals(AsyncContinuationJobHandler.TYPE)) {
       ExecutionEntity execution = this.fetchExecutionEntity(job.getExecutionId());
       if (execution == null) {
-        this.executeStandardStrategy(commandContext);
+        executeStandardStrategy(commandContext);
         throw new ActivitiException("No execution found for key '" + job.getJobHandlerConfiguration() + "'");
       }
       activity = execution.getActivity();
       
-    } 
-//    else if (type.equals(ProcessEventJobHandler.TYPE)) {
-//      EventSubscriptionEntity eventSubscription = Context.getCommandContext()
-//                                                         .getEventSubscriptionManager()
-//                                                         .findEventSubscriptionbyId(job.getJobHandlerConfiguration());
-//      activity = eventSubscription.getActivity();
-//    }
-
-    if (activity == null) {
-      this.executeStandardStrategy(commandContext);
-      return null;
     }
+//  else if (type.equals(ProcessEventJobHandler.TYPE)) {
+//  EventSubscriptionEntity eventSubscription = Context.getCommandContext()
+//                                                     .getEventSubscriptionManager()
+//                                                     .findEventSubscriptionbyId(job.getJobHandlerConfiguration());
+//  activity = eventSubscription.getActivity();
+//}
     
-    String failedJobRetryTimeCycle = (String) activity.getProperty(FoxFailedJobParseListener.FOX_FAILED_JOB_CONFIGURATION);
-    if (failedJobRetryTimeCycle != null) {
-      try {
-        DurationHelper durationHelper = new DurationHelper(failedJobRetryTimeCycle);
-        job.setLockExpirationTime(durationHelper.getDateAfter());
-        List<String> expression = Arrays.asList(failedJobRetryTimeCycle.split("/"));
-        boolean secondRevision = job.getRevision() == 2;
-        if (!secondRevision && !(expression.size() == 1 && expression.get(0).startsWith("D"))) {
-          job.setRetries(job.getRetries() - 1);
-        } else if (secondRevision) {
-          if (expression.size() == 2 && expression.get(0).startsWith("R")) {
-            job.setRetries((expression.get(0).length() ==  1 ? Integer.MAX_VALUE : Integer.parseInt(expression.get(0).substring(1))) - 1);
-          } else if (expression.get(0).startsWith("D")) {
-            job.setRetries(1);
-          }
-        }
-      } catch (Exception e) {
-        this.executeStandardStrategy(commandContext);
-        throw new ActivitiException("Due to parsing failure the default retry strategy has been chosen.", e);
-      }
-      if(exception != null) {
-        job.setExceptionMessage(exception.getMessage());
-        job.setExceptionStacktrace(getExceptionStacktrace());
-      }
-      JobExecutor jobExecutor = Context.getProcessEngineConfiguration().getJobExecutor();
-      MessageAddedNotification messageAddedNotification = new MessageAddedNotification(jobExecutor);
-      TransactionContext transactionContext = commandContext.getTransactionContext();
-      transactionContext.addTransactionListener(TransactionState.COMMITTED, messageAddedNotification);
-    } else {
-      this.executeStandardStrategy(commandContext);
-    }
-    return null;
+    return activity;
   }
   
   private String getExceptionStacktrace() {
     StringWriter stringWriter = new StringWriter();
     exception.printStackTrace(new PrintWriter(stringWriter));
     return stringWriter.toString();
+  }
+  
+  private ExecutionEntity fetchExecutionEntity(String executionId) {
+    return Context.getCommandContext()
+                  .getExecutionManager()
+                  .findExecutionById(executionId);
   }
   
   private void executeStandardStrategy(CommandContext commandContext) {
