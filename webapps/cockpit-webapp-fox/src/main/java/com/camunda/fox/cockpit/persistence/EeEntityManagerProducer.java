@@ -17,6 +17,7 @@ import javax.persistence.EntityTransaction;
 /**
  *
  * @author nico.rehwaldt
+ * @author christian.lipphardt@camunda.com
  */
 @Specializes
 @ConversationScoped
@@ -28,11 +29,11 @@ public class EeEntityManagerProducer extends CockpitEntityManagerProducer {
   private EntityManager cockpitEntityManager;
   private EntityManager foxEngineEntityManager;
   
+  @Override
   @Specializes
   @Produces
   @FoxEngineResource
   @RequestScoped
-  @Override
   public EntityManager getFoxEngineEntityManager() {
     if (foxEngineEntityManager == null) {
       foxEngineEntityManager = entityManagerFactories.getFoxEngineEntityManager();
@@ -40,10 +41,10 @@ public class EeEntityManagerProducer extends CockpitEntityManagerProducer {
     return foxEngineEntityManager;
   }
   
+  @Override
   @Specializes
   @Produces
   @RequestScoped
-  @Override
   public EntityManager getCockpitEntityManager() {
     if (cockpitEntityManager == null) {
       cockpitEntityManager = entityManagerFactories.getCockpitEntityManager();
