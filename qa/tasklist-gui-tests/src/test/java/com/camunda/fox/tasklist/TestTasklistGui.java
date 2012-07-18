@@ -74,7 +74,7 @@ public class TestTasklistGui {
   public void testApplication(@Drone WebDriver driver, @ArquillianResource URL contextPath) {
     driver.get(contextPath + "../tasklist");
     
-    Assert.assertTrue(driver.getCurrentUrl().endsWith("tasklist/signin.jsf"));
+    Assert.assertTrue(driver.getCurrentUrl().contains("tasklist/signin.jsf"));
     
     // sign in
     driver.findElement(By.id("signin:username")).sendKeys("kermit");
