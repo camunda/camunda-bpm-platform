@@ -3,8 +3,8 @@ package com.camunda.fox.cockpit.demo.deployer;
 import javax.ejb.ConcurrencyManagement;
 import javax.ejb.ConcurrencyManagementType;
 import javax.ejb.Singleton;
-import javax.ejb.TransactionManagement;
-import javax.ejb.TransactionManagementType;
+import javax.ejb.TransactionAttribute;
+import javax.ejb.TransactionAttributeType;
 
 import com.camunda.fox.platform.spi.ProcessArchive;
 import com.camunda.fox.platform.spi.ProcessArchiveCallback;
@@ -18,10 +18,9 @@ import com.camunda.fox.platform.spi.ProcessArchiveCallback;
  */
 // singleton bean guarantees maximum efficiency
 @Singleton
-// make sure the container does not rollback transactions if this bean throws an exception
-@TransactionManagement(TransactionManagementType.BEAN)
 //make sure the container does not synchronize access to this bean
 @ConcurrencyManagement(ConcurrencyManagementType.BEAN) 
+@TransactionAttribute(TransactionAttributeType.SUPPORTS)
 public class ProcessArchiveContextExecutor {
   
   public <T> T executeWithinContext(ProcessArchiveCallback<T> callback) throws
