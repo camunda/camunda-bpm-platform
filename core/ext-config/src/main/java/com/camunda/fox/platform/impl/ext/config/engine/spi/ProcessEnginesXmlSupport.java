@@ -15,9 +15,9 @@ import com.camunda.fox.platform.api.ProcessEngineService;
 public interface ProcessEnginesXmlSupport {
 
   /** 
-   * <p>Process engines are started asynchronouly. This method blocks until either 
+   * <p>Process engines are started asynchronously. This method blocks until either 
    * <ul>
-   * <li>all process engines have started sucessfully</li>
+   * <li>all process engines have started successfully</li>
    * <li>if an engine fails to start, all other process engines are stopped</li> 
    * </ul>
    * 
