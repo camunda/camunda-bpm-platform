@@ -116,8 +116,8 @@
           <target>1.6</target>
           <overlays>
             <overlay>
-              <groupId>com.camunda.fox</groupId>
-              <artifactId>fox-layout-bootstrap</artifactId>
+              <groupId>com.camunda.fox.tasklist</groupId>
+              <artifactId>tasklist-layout</artifactId>
             </overlay>
           </overlays>
         </configuration>
