@@ -12,10 +12,6 @@
   
   <name>fox tasklist - Twitter Bootstrap Layout</name>
 
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
-
   <build>
     <finalName>tasklist-layout</finalName>
     <plugins>

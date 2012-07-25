@@ -21,7 +21,7 @@
     <dependency>
       <groupId>com.camunda.fox.tasklist</groupId>
       <artifactId>tasklist-core</artifactId>
-      <version>${fox.version}</version>
+      <version>${project.version}</version>
     </dependency>
 
     <!-- include jar to enable different authentication mechanisms, e.g. 
@@ -33,21 +33,28 @@
     <dependency>
       <groupId>com.camunda.fox.platform</groupId>
       <artifactId>fox-platform-client</artifactId>
-      <version>${fox.version}</version>
+      <version>${project.version}</version>
     </dependency>
 
     <dependency>
       <groupId>com.camunda.fox.platform</groupId>
       <artifactId>fox-platform-api</artifactId>
-      <version>${fox.version}</version>
+      <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
 
     <dependency>
       <groupId>com.camunda.fox.engine</groupId>
       <artifactId>fox-engine</artifactId>
-      <version>${fox.version}</version>
+      <version>${project.version}</version>
       <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>com.camunda.fox.tasklist</groupId>
+      <artifactId>tasklist-layout</artifactId>
+      <version>${project.version}</version>
+      <type>war</type>
     </dependency>
 
     <!-- Java EE 6 Specification -->
@@ -63,13 +70,6 @@
           <groupId>org.apache.xalan</groupId>
         </exclusion>
       </exclusions>
-    </dependency>
-
-    <dependency>
-      <groupId>com.camunda.fox.tasklist</groupId>
-      <artifactId>tasklist-layout</artifactId>
-      <version>${fox.version}</version>
-      <type>war</type>
     </dependency>
 
     <!-- test dependencies -->
