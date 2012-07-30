@@ -61,8 +61,14 @@
       <includes>
         <include>com.camunda.fox.platform:fox-platform-explorer:war:*</include>
    <!-- <include>com.camunda.fox:camunda-fox-h2-webapp:war:*</include>
-                <include>com.camunda.fox.cockpit:cockpit-webapp-fox:war:*</include>
                 <include>com.camunda.fox.cycle:cycle-webapp-fox:war:*</include> -->                                             
+      </includes>
+      <outputDirectory>server/glassfish3/glassfish/domains/domain1/autodeploy</outputDirectory>
+    </dependencySet>
+    <dependencySet>
+      <outputFileNameMapping>fox-cockpit-glassfish-${project.version}.${artifact.extension}</outputFileNameMapping>
+      <includes>
+        <include>com.camunda.fox.cockpit:cockpit-webapp-fox-glassfish:war:*</include>
       </includes>
       <outputDirectory>server/glassfish3/glassfish/domains/domain1/autodeploy</outputDirectory>
     </dependencySet>

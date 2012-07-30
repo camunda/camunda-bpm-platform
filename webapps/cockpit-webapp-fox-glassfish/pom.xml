@@ -1,0 +1,211 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>com.camunda.fox.platform</groupId>
+    <artifactId>fox-platform-root</artifactId>
+    <version>6.1.0-SNAPSHOT</version>
+    <relativePath>../../parent</relativePath>
+  </parent>
+
+  <groupId>com.camunda.fox.cockpit</groupId>
+  <artifactId>cockpit-webapp-fox-glassfish</artifactId>
+  <packaging>war</packaging>
+  <name>fox cockpit - Webapp Fox Glassfish</name>
+
+  <properties>
+    <facesContext.application.projectStage>Production</facesContext.application.projectStage>
+  </properties>
+
+	<!--  to get this fully working we need to exclude activiti engine from our webapp libs (cockpit-webapp) -->
+  <dependencies>
+    <dependency>
+      <groupId>com.camunda.fox.cockpit</groupId>
+      <artifactId>cockpit-webapp-fox</artifactId>
+      <version>6.1.0-SNAPSHOT</version>
+      <scope>provided</scope>
+      <type>war</type>
+    </dependency>
+		
+    <!--dependency>
+      <groupId>com.camunda.fox.cockpit</groupId>
+      <artifactId>cockpit-demo-processes</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>com.camunda.fox.platform</groupId>
+      <artifactId>fox-platform-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+		
+    <dependency>
+      <groupId>com.camunda.fox.engine</groupId>
+      <artifactId>fox-engine</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>com.camunda.fox.commons</groupId>
+       <artifactId>commons-transactions-jta</artifactId>
+       <version>${project.version}</version>
+    </dependency>
+		
+    <dependency>
+      <groupId>com.camunda.fox.cockpit</groupId>
+      <artifactId>cockpit-core</artifactId>
+      <version>${project.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-api</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>com.camunda.fox.engine</groupId>
+          <artifactId>fox-engine</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.jboss.seam</groupId>
+      <artifactId>jboss-el</artifactId>
+      <version>2.0.0.GA</version>
+      <exclusions>
+        <exclusion>
+          <groupId>javax.el</groupId>
+          <artifactId>el-api</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+		
+    <dependency>
+      <groupId>org.jboss.spec</groupId>
+      <artifactId>jboss-javaee-web-6.0</artifactId>
+      <type>pom</type>
+      <scope>provided</scope>
+      <exclusions>
+        <exclusion>
+          <artifactId>xalan</artifactId>
+          <groupId>org.apache.xalan</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency-->
+  </dependencies>
+
+  <build>
+    <finalName>cockpit</finalName>
+		
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>true</filtering>
+      </resource>
+    </resources>
+		
+    <plugins>  
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.6</source>
+          <target>1.6</target>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-war-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifest>
+							<!-- Maven project version number -->
+              <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+            </manifest>
+            <manifestEntries>
+							<!-- SVN revision number -->
+              <Implementation-Build>${buildNumber}</Implementation-Build>
+              <Dependencies>org.bouncycastle.bcprov-jdk16,org.bouncycastle.bcpg-jdk16,org.apache.commons.logging,org.jboss.logging,org.apache.log4j,org.slf4j,org.apache.commons.lang</Dependencies>
+            </manifestEntries>
+          </archive>
+          <webResources>
+            <resource>
+              <directory>src/main/webapp</directory>
+              <filtering>true</filtering>
+            </resource>
+          </webResources>
+          <overlays>
+            <overlay>
+              <id>cockpit-webapp-fox</id>
+              <groupId>com.camunda.fox.cockpit</groupId>
+              <artifactId>cockpit-webapp-fox</artifactId>
+              <excludes>
+                <!-- exclusion for classes overridden by webapp-fox-glassfish -->
+                <exclude>**/beans.xml</exclude>
+                <exclude>**/persistence.xml</exclude>
+                <exclude>**/com/camunda/fox/cockpit/webapp/environment/**</exclude>
+              </excludes>
+            </overlay>
+            <overlay>
+							<!-- empty groupId/artifactId represents the current build -->
+            </overlay>
+          </overlays>
+        </configuration>
+      </plugin>			
+    </plugins>
+  </build>
+	
+  <profiles>
+    <profile>
+			<!-- JBoss 7 dev properties with demo data -->
+      <id>env-dev</id>
+      <activation>
+        <property>
+          <name>env</name>
+          <value>dev</value>
+        </property>
+      </activation>
+      <properties>
+        <facesContext.application.projectStage>Development</facesContext.application.projectStage>
+      </properties>
+      <build>
+        <filters>
+          <filter>src/config/dev/database.properties</filter>
+        </filters>
+      </build>
+    </profile>
+    <profile>
+			<!-- used by Jenkins for the build deployed to the test server -->
+      <id>env-test</id>
+      <activation>
+        <property>
+          <name>env</name>
+          <value>test</value>
+        </property>
+      </activation>
+      <properties>
+        <facesContext.application.projectStage>Development</facesContext.application.projectStage>
+      </properties>
+      <build>
+        <filters>
+          <filter>src/config/test/database.properties</filter>
+        </filters>
+      </build>
+    </profile>
+    <profile>
+			<!-- production configuration -->
+      <id>env-production</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+        <property>
+          <name>env</name>
+          <value>production</value>
+        </property>
+      </activation>
+      <build>
+        <filters>
+          <filter>src/config/production/database.properties</filter>
+        </filters>
+      </build>
+    </profile>
+  </profiles>
+</project>
