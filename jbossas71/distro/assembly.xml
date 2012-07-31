@@ -10,7 +10,7 @@
   </formats>
 
   <includeBaseDirectory>true</includeBaseDirectory>
-
+  
   <fileSets>
     <fileSet>
       <directory>../assembly/target/camunda-fox-ce-${project.version}/camunda-fox-ce-${project.version}</directory>
@@ -74,6 +74,13 @@
       </includes>	 
     </fileSet>
     -->
+    <fileSet>
+      <directory>../../sql-script/target</directory>
+      <outputDirectory />
+      <includes>
+        <include>sql/</include>
+      </includes>
+    </fileSet>    
   </fileSets>
 <!--  
   <files>
