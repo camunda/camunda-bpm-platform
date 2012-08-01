@@ -25,6 +25,7 @@
     <module>webapps/cockpit-webapp-fox</module>
     <module>webapps/tasklist</module>
     <module>jobexecutor</module>
+    <module>sql-script</module>
     <!--  module>ibmWs8</module -->
   </modules>
   
