@@ -45,6 +45,13 @@
       </includes>        
     </fileSet>
     -->
+    <fileSet>
+      <directory>../../sql-script/target</directory>
+      <outputDirectory />
+      <includes>
+        <include>sql/</include>
+      </includes>
+    </fileSet>    
   </fileSets>
   <!--
   <files>
