@@ -73,6 +73,14 @@
       </includes>
       <outputDirectory>server/glassfish3/glassfish/domains/domain1/autodeploy</outputDirectory>
     </dependencySet>
+  	<dependencySet>
+  		<outputFileNameMapping>fox-tasklist-${project.version}.${artifact.extension}</outputFileNameMapping>
+  		<includes>
+  			<include>com.camunda.fox.tasklist:tasklist-webapp:war:*</include>
+  		</includes>
+  		<outputDirectory>server/glassfish3/glassfish/domains/domain1/autodeploy</outputDirectory>
+  	</dependencySet>    
+    
   </dependencySets>
 
 </assembly>
