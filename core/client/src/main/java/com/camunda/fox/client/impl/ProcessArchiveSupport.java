@@ -166,8 +166,15 @@ public class ProcessArchiveSupport {
   }
 
   protected String getContextName() {
-    String appName = (String) sessionContext.lookup("java:app/AppName");   
-    return appName;    
+    String appName = (String) sessionContext.lookup("java:app/AppName");
+    String moduleName = (String) sessionContext.lookup("java:module/ModuleName");
+    
+    if(moduleName != null && !moduleName.equals(appName)) {
+      // make sure that if an EAR carries multiple PAs, they are correctly identified by appName + moduleName
+      return appName + "/" + moduleName;
+    } else {
+      return appName;
+    }
   }
     
   public Map<ProcessArchive, ProcessEngine> getInstalledProcessArchives() {
