@@ -13,22 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.camunda.fox.platform.test.functional.classloading;
+package com.camunda.fox.platform.test.functional.classloading.ear;
 import javax.transaction.SystemException;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
+import org.jboss.shrinkwrap.api.spec.EnterpriseArchive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import com.camunda.fox.platform.test.functional.classloading.beans.ExampleDelegate;
 import com.camunda.fox.platform.test.util.AbstractFoxPlatformIntegrationTest;
 
 /**
- * <p>Deploys two different applications, a process archive and a client application.</p>
+ * <p>Deploys an EAR application which contains a WAR process archive, and a client application deployed as a war</p>
  * 
  * <p>This test ensures that when the process is started from the client,
  * it is able to make the context switch to the process archvie and resolve classes from the 
@@ -38,14 +40,17 @@ import com.camunda.fox.platform.test.util.AbstractFoxPlatformIntegrationTest;
  * @author Daniel Meyer
  */
 @RunWith(Arquillian.class)
-public class JavaDelegateResolutionTest extends AbstractFoxPlatformIntegrationTest {
+public class JavaDelegateResolutionTestEar extends AbstractFoxPlatformIntegrationTest {
     
   @Deployment
-  public static WebArchive createProcessArchiveDeplyoment() {    
-    return initWebArchiveDeployment()
-            .addClass(ExampleDelegate.class)            
-            .addAsResource("com/camunda/fox/platform/test/functional/classloading/JavaDelegateResolutionTest.testResolveClass.bpmn20.xml")
-            .addAsResource("com/camunda/fox/platform/test/functional/classloading/JavaDelegateResolutionTest.testResolveClassFromJobExecutor.bpmn20.xml");
+  public static EnterpriseArchive createProcessArchiveDeplyoment() {    
+    WebArchive processArchiveWar = initWebArchiveDeployment()
+      .addClass(ExampleDelegate.class)            
+      .addAsResource("com/camunda/fox/platform/test/functional/classloading/JavaDelegateResolutionTest.testResolveClass.bpmn20.xml")
+      .addAsResource("com/camunda/fox/platform/test/functional/classloading/JavaDelegateResolutionTest.testResolveClassFromJobExecutor.bpmn20.xml");
+    
+    return ShrinkWrap.create(EnterpriseArchive.class, "test-app.ear")
+      .addAsModule(processArchiveWar);
   }
   
   @Deployment(name="clientDeployment")
@@ -65,7 +70,7 @@ public class JavaDelegateResolutionTest extends AbstractFoxPlatformIntegrationTe
       // expected
     }
     
-    // but the process can since it performs context switch to the process archvie vor execution
+    // but the process can since it performs context switch to the process archive vor execution
     runtimeService.startProcessInstanceByKey("testResolveClass");    
   }
   
