@@ -24,27 +24,13 @@
     </dependency>
 
     <dependency>
-	  <groupId>com.camunda.fox.platform</groupId>
-	  <artifactId>fox-platform-sql-script</artifactId>
-	  <version>${project.version}</version>
-	  <type>pom</type>
-	  <scope>provided</scope>
+      <groupId>com.camunda.fox.platform</groupId>
+      <artifactId>fox-platform-sql-script</artifactId>
+      <version>${project.version}</version>
+      <type>pom</type>
+      <scope>provided</scope>
     </dependency>
 
-    <dependency>
-      <groupId>com.camunda.fox.platform</groupId>
-      <artifactId>fox-platform-explorer</artifactId>
-      <version>${project.version}</version>
-      <type>war</type>
-    </dependency>
-    <!--
-    <dependency>
-      <groupId>com.camunda.fox.examples</groupId>
-      <artifactId>fox-examples-cdi-jsf-taskmanagement</artifactId>
-      <version>${project.version}</version>
-      <type>war</type>
-    </dependency>
-    -->
     <dependency>
       <groupId>com.camunda.fox.cockpit</groupId>
       <artifactId>cockpit-webapp-fox</artifactId>
