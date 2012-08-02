@@ -1,10 +1,9 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.camunda.fox.platform</groupId>
   <artifactId>fox-platform-sql-script</artifactId>
-  <version>6.1.0-SNAPSHOT</version>
+  <version>6.1.0-alpha6</version>
   <packaging>jar</packaging>
 
   <name>fox platform sql script</name>
@@ -75,31 +74,31 @@
                 <mkdir dir="target/sql/create" />
                 
                 <concat destfile="target/sql/create/db2_engine_${project.version}.sql" fixlastline="yes">
-                	<filelist dir="target/fox-engine-${project.version}/org/activiti/db/create" files="activiti.db2.create.engine.sql activiti.db2.create.history.sql"/>
+                	<filelist dir="target/fox-engine-${project.version}/org/activiti/db/create" files="activiti.db2.create.engine.sql activiti.db2.create.history.sql" />
                 </concat>
 
                 <concat destfile="target/sql/create/h2_engine_${project.version}.sql" fixlastline="yes">
-                	<filelist dir="target/fox-engine-${project.version}/org/activiti/db/create" files="activiti.h2.create.engine.sql activiti.h2.create.history.sql"/>
+                	<filelist dir="target/fox-engine-${project.version}/org/activiti/db/create" files="activiti.h2.create.engine.sql activiti.h2.create.history.sql" />
                 </concat>
 
                 <concat destfile="target/sql/create/mssql_engine_${project.version}.sql" fixlastline="yes">
-                	<filelist dir="target/fox-engine-${project.version}/org/activiti/db/create" files="activiti.mssql.create.engine.sql activiti.mssql.create.history.sql"/>
+                	<filelist dir="target/fox-engine-${project.version}/org/activiti/db/create" files="activiti.mssql.create.engine.sql activiti.mssql.create.history.sql" />
                 </concat>
 
                 <concat destfile="target/sql/create/mysql_engine_${project.version}.sql" fixlastline="yes">
-                	<filelist dir="target/fox-engine-${project.version}/org/activiti/db/create" files="activiti.mysql.create.engine.sql activiti.mysql.create.history.sql"/>
+                	<filelist dir="target/fox-engine-${project.version}/org/activiti/db/create" files="activiti.mysql.create.engine.sql activiti.mysql.create.history.sql" />
                 </concat>
 
                 <concat destfile="target/sql/create/oracle_engine_${project.version}.sql" fixlastline="yes">
-                	<filelist dir="target/fox-engine-${project.version}/org/activiti/db/create" files="activiti.oracle.create.engine.sql activiti.oracle.create.history.sql"/>
+                	<filelist dir="target/fox-engine-${project.version}/org/activiti/db/create" files="activiti.oracle.create.engine.sql activiti.oracle.create.history.sql" />
                 </concat>
                 
                 <concat destfile="target/sql/create/postgres_engine_${project.version}.sql" fixlastline="yes">
-                	<filelist dir="target/fox-engine-${project.version}/org/activiti/db/create" files="activiti.postgres.create.engine.sql activiti.postgres.create.history.sql"/>
+                	<filelist dir="target/fox-engine-${project.version}/org/activiti/db/create" files="activiti.postgres.create.engine.sql activiti.postgres.create.history.sql" />
                 </concat>
                 
                 <copy todir="target/sql/create" flatten="false">
-                  <fileset dir="target/fox-engine-${project.version}/org/activiti/db/create"/>
+                  <fileset dir="target/fox-engine-${project.version}/org/activiti/db/create" />
                   <mapper>
                     <chainedmapper>
                       <regexpmapper from="^(activiti.)([A-Za-z0-9]*)(.create.identity.sql)" to="\2_identity_${project.version}.sql" handledirsep="yes" />
@@ -109,7 +108,7 @@
                 
                 <copy todir="target/sql/upgrade">
                   <fileset dir="upgrade">
-                  	<include name="*.sql"/>
+                  	<include name="*.sql" />
                   </fileset>
                 </copy>
 
