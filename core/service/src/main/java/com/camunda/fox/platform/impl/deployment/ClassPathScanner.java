@@ -81,16 +81,20 @@ public class ClassPathScanner implements ProcessArchiveScanner {
     }
     
     if(paResourceRoot != null) {
-    
+      
       Set<String> discoveredProcesses = scanClassPath(paResourceRoot, strippedPaResourceRootPath, isPaLocal);         
       
       for (String resourceName : discoveredProcesses) {            
-        InputStream resourceAsStream = classLoader.getResourceAsStream(resourceName);      
-        if(resourceAsStream == null) {
-          log.warning("Could not load deployable resource: "+resourceName+ " using classloader "+ classLoader);
-        } else {
-          byte[] bytes = IoUtil.readInputStream(resourceAsStream, resourceName);      
-          resourceMap.put(resourceName, bytes);
+        InputStream resourceAsStream = classLoader.getResourceAsStream(resourceName);
+        try {
+          if(resourceAsStream == null) {
+            log.warning("Could not load deployable resource: "+resourceName+ " using classloader "+ classLoader);
+          } else {
+            byte[] bytes = IoUtil.readInputStream(resourceAsStream, resourceName);      
+            resourceMap.put(resourceName, bytes);          
+          }
+        } finally {
+          IoUtil.closeSilently(resourceAsStream);
         }
       }
       
