@@ -38,7 +38,7 @@ public class TestDefaultProcessesXmlParser {
   
   @Test
   public void testParseEmptyProcessesXml() {
-    ProcessesXml processesXml = parser.parseProcessesXml("com/camunda/fox/processarchive/parser/emptyProcesses.xml");
+    ProcessesXml processesXml = parser.parseProcessesXml("com/camunda/fox/processarchive/parser/emptyProcesses.xml").get(0);
     Assert.assertNotNull(processesXml);
     Assert.assertNotNull(processesXml.processArchives);
     Assert.assertEquals(1, processesXml.processArchives.size());
@@ -46,7 +46,7 @@ public class TestDefaultProcessesXmlParser {
   
   @Test
   public void testSingleProcessArchive() {
-    ProcessesXml processesXml = parser.parseProcessesXml("com/camunda/fox/processarchive/parser/singleProcessArchive.xml");
+    ProcessesXml processesXml = parser.parseProcessesXml("com/camunda/fox/processarchive/parser/singleProcessArchive.xml").get(0);
     Assert.assertNotNull(processesXml);
     Assert.assertNotNull(processesXml.processArchives);
     Assert.assertEquals(1, processesXml.processArchives.size());
@@ -55,7 +55,7 @@ public class TestDefaultProcessesXmlParser {
   
   @Test
   public void testConfiguration() {
-    ProcessesXml processesXml = parser.parseProcessesXml("com/camunda/fox/processarchive/parser/configuration.xml");
+    ProcessesXml processesXml = parser.parseProcessesXml("com/camunda/fox/processarchive/parser/configuration.xml").get(0);
     Assert.assertNotNull(processesXml);
     Assert.assertNotNull(processesXml.processArchives);
     Assert.assertEquals(1, processesXml.processArchives.size());
@@ -65,7 +65,7 @@ public class TestDefaultProcessesXmlParser {
   
   @Test
   public void testListedProcesses() {
-    ProcessesXml processesXml = parser.parseProcessesXml("com/camunda/fox/processarchive/parser/processesListed.xml");
+    ProcessesXml processesXml = parser.parseProcessesXml("com/camunda/fox/processarchive/parser/processesListed.xml").get(0);
     Assert.assertNotNull(processesXml);
     Assert.assertNotNull(processesXml.processArchives);
     Assert.assertEquals(1, processesXml.processArchives.size());
@@ -76,7 +76,7 @@ public class TestDefaultProcessesXmlParser {
   
   @Test
   public void testMultipleProcessArchvies() {
-    ProcessesXml processesXml = parser.parseProcessesXml("com/camunda/fox/processarchive/parser/multipleProcessArchives.xml");
+    ProcessesXml processesXml = parser.parseProcessesXml("com/camunda/fox/processarchive/parser/multipleProcessArchives.xml").get(0);
     Assert.assertNotNull(processesXml);
     Assert.assertNotNull(processesXml.processArchives);
     Assert.assertEquals(2, processesXml.processArchives.size());    
@@ -84,7 +84,7 @@ public class TestDefaultProcessesXmlParser {
   
   @Test
   public void testDeprecatedSyntax() {
-    ProcessesXml processesXml = parser.parseProcessesXml("com/camunda/fox/processarchive/parser/deprecated.xml");
+    ProcessesXml processesXml = parser.parseProcessesXml("com/camunda/fox/processarchive/parser/deprecated.xml").get(0);
     Assert.assertNotNull(processesXml);
     Assert.assertNotNull(processesXml.processArchives);
     Assert.assertEquals(1, processesXml.processArchives.size());    

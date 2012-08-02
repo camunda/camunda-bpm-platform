@@ -15,6 +15,7 @@
  */
 package com.camunda.fox.client.impl.schema;
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -35,6 +36,8 @@ public class ProcessesXml {
   
   @XmlElements(@XmlElement(name="process-archive", type=ProcessArchiveXml.class))
   public List<ProcessArchiveXml> processArchives = new ArrayList<ProcessesXml.ProcessArchiveXml>();
+  
+  public URL metaFileUrl;
 
   public static class ProcessArchiveXml {
     
@@ -53,6 +56,9 @@ public class ProcessesXml {
   
       @XmlElement(name="undeployment")
       public Undeployment undeployment = new Undeployment();
+      
+      @XmlElement(name="resourceRootPath")
+      public String resourceRootPath = null;
      
       public static class Undeployment {
         

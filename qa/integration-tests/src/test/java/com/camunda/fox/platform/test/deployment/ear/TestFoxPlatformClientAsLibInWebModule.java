@@ -34,19 +34,32 @@ import com.camunda.fox.platform.test.util.AbstractFoxPlatformIntegrationTest;
  * This test verifies that a process archive packaging the fox platform client
  * can be packaged inside an EAR application.
  * 
+ * 
  * @author Daniel Meyer
  * 
  */
 @RunWith(Arquillian.class)
-public class TestWarPaInEar extends AbstractFoxPlatformIntegrationTest {
-
+public class TestFoxPlatformClientAsLibInWebModule extends AbstractFoxPlatformIntegrationTest {
+  
+  /**
+   * Deployment layout
+   * 
+   * test-application.ear
+   *    |-- test.war
+   *        |-- lib /
+   *            |-- fox-platform-client.jar
+   *        |-- WEB-INF/classes
+   *            |-- META-INF/processes.xml
+   *        |-- com/camunda/fox/platform/test/testDeployProcessArchive.bpmn20.xml
+   *        
+   */ 
   @Deployment
-  public static EnterpriseArchive processArchive() {    
+  public static EnterpriseArchive deployment() {    
     
     // this creates the process archive as a WAR file
     WebArchive processArchive = initWebArchiveDeployment()
       .addAsResource("com/camunda/fox/platform/test/testDeployProcessArchive.bpmn20.xml")
-      .addClass(TestWarPaInEar.class);
+      .addClass(TestFoxPlatformClientAsLibInWebModule.class);
 
     // this packages the WAR file inside an EAR file
     return ShrinkWrap.create(EnterpriseArchive.class, "test-application.ear")

@@ -30,8 +30,8 @@ public class MockProcessArchiveSupport extends ProcessArchiveSupport {
     ProcessArchiveXml mockDescriptor2 = new ProcessArchiveXml();
     mockDescriptor2.name = "tenant2";
         
-    ProcessArchive mockArchive1 = new ProcessArchiveImpl(mockDescriptor1,null);
-    ProcessArchive mockArchive2 = new ProcessArchiveImpl(mockDescriptor2,null);
+    ProcessArchive mockArchive1 = new ProcessArchiveImpl(mockDescriptor1,null,null);
+    ProcessArchive mockArchive2 = new ProcessArchiveImpl(mockDescriptor2,null,null);
     
     installedProcessArchives.put(mockArchive1, new MockProcessEngine("tenant1Engine"));
     installedProcessArchives.put(mockArchive2, new MockProcessEngine("tenant2Engine"));    
