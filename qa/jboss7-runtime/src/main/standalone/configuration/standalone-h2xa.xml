@@ -83,6 +83,9 @@
             <logger category="jacorb.config">
                 <level name="ERROR"/>
             </logger>
+            <logger category="org.jboss.weld.ClassLoading">
+                <level name="WARN"/>
+            </logger>
             <root-logger>
                 <level name="INFO"/>
                 <handlers>
@@ -102,22 +105,18 @@
                         <password>sa</password>
                     </security>
                 </datasource>
-                <datasource jndi-name="java:jboss/datasources/FoxEngineDS" enabled="true" use-java-context="true" jta="true" use-ccm="true" pool-name="FoxEngineDS">
-                    <connection-url>jdbc:h2:mem:foxEngine;DB_CLOSE_DELAY=-1;MVCC=TRUE;DB_CLOSE_ON_EXIT=FALSE</connection-url>
+                <xa-datasource jndi-name="java:jboss/datasources/FoxEngineDS" enabled="true" use-ccm="true" pool-name="FoxEngineDS">
+                    <xa-datasource-property name="URL">jdbc:h2:./fox-h2-dbs/fox-engine;DB_CLOSE_DELAY=-1;MVCC=TRUE;DB_CLOSE_ON_EXIT=FALSE</xa-datasource-property>
                     <driver>h2</driver>
-                    <security>
-                        <user-name>sa</user-name>
-                        <password>sa</password>
-                    </security>                   
-                </datasource>
-                <datasource jndi-name="java:jboss/datasources/CockpitDS" enabled="true" use-java-context="true" jta="true" use-ccm="true" pool-name="CockpitDS">
-                    <connection-url>jdbc:h2:mem:cockpit;DB_CLOSE_DELAY=-1;MVCC=TRUE;DB_CLOSE_ON_EXIT=FALSE</connection-url>
+                    <xa-datasource-property name="User">sa</xa-datasource-property>
+                    <xa-datasource-property name="password">sa</xa-datasource-property>                   
+                </xa-datasource>               
+                <xa-datasource jndi-name="java:jboss/datasources/CycleDS" enabled="true" use-java-context="true" jta="true" use-ccm="true" pool-name="CycleDS">
+                    <xa-datasource-property name="URL">jdbc:h2:./fox-h2-dbs/cycle;DB_CLOSE_DELAY=-1;MVCC=TRUE;DB_CLOSE_ON_EXIT=FALSE</xa-datasource-property>
                     <driver>h2</driver>
-                    <security>
-                        <user-name>sa</user-name>
-                        <password>sa</password>
-                    </security>                   
-                </datasource>
+                    <xa-datasource-property name="User">sa</xa-datasource-property>
+                    <xa-datasource-property name="password">sa</xa-datasource-property>                  
+                </xa-datasource>
                 <drivers>
                     <driver name="h2" module="com.h2database.h2">
                         <xa-datasource-class>org.h2.jdbcx.JdbcDataSource</xa-datasource-class>
