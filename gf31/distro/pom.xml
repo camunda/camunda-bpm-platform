@@ -22,6 +22,14 @@
       <type>pom</type>
       <scope>provided</scope>
     </dependency>
+    
+    <dependency>
+	  <groupId>com.camunda.fox.platform</groupId>
+	  <artifactId>fox-platform-sql-script</artifactId>
+	  <version>${project.version}</version>
+	  <type>pom</type>
+	  <scope>provided</scope>
+    </dependency>    
 
     <dependency>
       <groupId>com.camunda.fox.platform</groupId>
