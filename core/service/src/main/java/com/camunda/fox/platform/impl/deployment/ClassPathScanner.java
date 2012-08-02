@@ -15,7 +15,6 @@
  */
 package com.camunda.fox.platform.impl.deployment;
 
-import static com.camunda.fox.platform.impl.deployment.spi.ProcessArchiveScanner.ScanningUtil.MARKER_FILE_LOCATION;
 import static com.camunda.fox.platform.impl.deployment.spi.ProcessArchiveScanner.ScanningUtil.isDeployable;
 import static com.camunda.fox.platform.impl.deployment.spi.ProcessArchiveScanner.ScanningUtil.isDiagramForProcess;
 
@@ -56,67 +55,96 @@ public class ClassPathScanner implements ProcessArchiveScanner {
   
   @Override
   public Map<String, byte[]> findResources(ProcessArchive processArchive) {    
-    final ClassLoader classLoader = processArchive.getClassLoader();    
     
-    Set<String> discoveredProcesses = scanClassPath(classLoader);         
+    final Map<String, byte[]> resourceMap = new HashMap<String, byte[]>();
+
+    final ClassLoader classLoader = processArchive.getClassLoader();
+    final URL metaFileUrl = (URL) processArchive.getProperties().get(ProcessArchive.PROP_META_FILE_URL);
+    final String paResourceRootPath = (String) processArchive.getProperties().get(ProcessArchive.PROP_RESOURCE_ROOT_PATH);
     
-    Map<String, byte[]> resourceMap = new HashMap<String, byte[]>();
+    URL paResourceRoot = null;
+    String strippedPaResourceRootPath = null;
+    boolean isPaLocal;
     
-    for (String resourceName : discoveredProcesses) {            
-      InputStream resourceAsStream = classLoader.getResourceAsStream(resourceName);      
-      if(resourceAsStream == null) {
-        log.warning("Could not load deployable resource: "+resourceName+ " using classloader "+ classLoader);
-      } else {
-        byte[] bytes = IoUtil.readInputStream(resourceAsStream, resourceName);      
-        resourceMap.put(resourceName, bytes);
+    if(paResourceRootPath != null && !paResourceRootPath.startsWith("pa:")) {
+      strippedPaResourceRootPath = paResourceRootPath.replace("classpath:", "");
+      strippedPaResourceRootPath = strippedPaResourceRootPath.endsWith("/") ? strippedPaResourceRootPath : strippedPaResourceRootPath +"/";
+      paResourceRoot = classLoader.getResource(strippedPaResourceRootPath);
+      isPaLocal = false;
+    } else {
+      if(paResourceRootPath != null) {
+        strippedPaResourceRootPath = paResourceRootPath.replace("pa:", "");        
+        strippedPaResourceRootPath = strippedPaResourceRootPath.endsWith("/") ? strippedPaResourceRootPath : strippedPaResourceRootPath +"/";
       }
+      paResourceRoot = metaFileUrl;
+      isPaLocal = true;
+    }
+    
+    if(paResourceRoot != null) {
+    
+      Set<String> discoveredProcesses = scanClassPath(paResourceRoot, strippedPaResourceRootPath, isPaLocal);         
+      
+      for (String resourceName : discoveredProcesses) {            
+        InputStream resourceAsStream = classLoader.getResourceAsStream(resourceName);      
+        if(resourceAsStream == null) {
+          log.warning("Could not load deployable resource: "+resourceName+ " using classloader "+ classLoader);
+        } else {
+          byte[] bytes = IoUtil.readInputStream(resourceAsStream, resourceName);      
+          resourceMap.put(resourceName, bytes);
+        }
+      }
+      
+    } else {
+      log.warning("Not scanning process archive classloader '"+processArchive.getName()+"': property  '"+ProcessArchive.PROP_META_FILE_URL+"' not set.");
     }
     
     return resourceMap;
   }
   
-  protected Set<String> scanClassPath(ClassLoader classLoader) {
+  protected Set<String> scanClassPath(URL metaFileUrl, String paResourceRootPath, boolean isPaLocal) {
     Set<String> discoveredProcesses = new HashSet<String>();
+
+    String urlPath = metaFileUrl.toExternalForm();
     
-    Enumeration<URL> resources;
-    try {
-      resources = classLoader.getResources(MARKER_FILE_LOCATION);
-    } catch (IOException e) {
-      throw new FoxPlatformException("Could not get resources for "+MARKER_FILE_LOCATION+" using classloader "+classLoader, e);
-    }
-    
-    while (resources.hasMoreElements()) {
-      
-      URL url = (URL) resources.nextElement();      
-      String urlPath = url.toExternalForm();
-      
-      log.log(Level.FINEST, "Discovered 'process.xml' markerfile: {0}", urlPath);
-      
+    if(isPaLocal) {
+  
       if (urlPath.startsWith("file:") || urlPath.startsWith("jar:")) {
-        urlPath = url.getPath();
+        urlPath = metaFileUrl.getPath();
         int withinArchive = urlPath.indexOf('!');
         if (withinArchive != -1) {
           urlPath = urlPath.substring(0, withinArchive);
         } else {
-          File file = new File(urlPath);                    
-          urlPath = file.getParentFile().getParent();          
+          File file = new File(urlPath);
+          urlPath = file.getParentFile().getParent();
         }
       }
-
-      try {
-        urlPath = URLDecoder.decode(urlPath, "UTF-8");
-      } catch (UnsupportedEncodingException e) {
-        throw new FoxPlatformException("Could not decode pathname using utf-8 decoder.", e);
+      
+    } else {
+      
+      if (urlPath.startsWith("file:") || urlPath.startsWith("jar:")) {
+        urlPath = metaFileUrl.getPath();
+        int withinArchive = urlPath.indexOf('!');
+        if (withinArchive != -1) {
+          urlPath = urlPath.substring(0, withinArchive);
+        }
       }
       
-      log.log(Level.FINEST, "Rootpath is {0}", urlPath);
-      
-      handlePaths(urlPath, discoveredProcesses, classLoader);
-     }
+    }
+
+    try {
+      urlPath = URLDecoder.decode(urlPath, "UTF-8");
+    } catch (UnsupportedEncodingException e) {
+      throw new FoxPlatformException("Could not decode pathname using utf-8 decoder.", e);
+    }
+
+    log.log(Level.FINEST, "Rootpath is {0}", urlPath);
+
+    handlePaths(urlPath, discoveredProcesses, paResourceRootPath);
+
     return discoveredProcesses;
   }
 
-  protected void handlePaths(String urlPath, Set<String> discoveredProceses, ClassLoader classLoader) {
+  protected void handlePaths(String urlPath, Set<String> discoveredProceses, String paResourceRootPath) {
     if (urlPath.startsWith("file:")) {
       urlPath = urlPath.substring(5);
     }
@@ -128,20 +156,20 @@ public class ClassPathScanner implements ProcessArchiveScanner {
     if (file.isDirectory()) {
       String path = file.getPath();
       String rootPath = path.endsWith(File.separator) ? path : path+File.separator;
-      handleDirectory(file, rootPath, discoveredProceses, classLoader);
+      handleDirectory(file, rootPath, discoveredProceses, paResourceRootPath);
     } else {
-      handleArchive(file, discoveredProceses, classLoader);
+      handleArchive(file, discoveredProceses, paResourceRootPath);
     }
   }
 
-  protected void handleArchive(File file, Set<String> discoveredProceses, ClassLoader classLoader) {
+  protected void handleArchive(File file, Set<String> discoveredProceses, String paResourceRootPath) {    
     try {
       ZipFile zipFile = new ZipFile(file);
       Enumeration< ? extends ZipEntry> entries = zipFile.entries();
       while (entries.hasMoreElements()) {
         ZipEntry zipEntry = (ZipEntry) entries.nextElement();
-        String processFileName = zipEntry.getName();
-        if (isDeployable(processFileName)) {
+        String processFileName = zipEntry.getName();        
+        if (isDeployable(processFileName) && isBelowPath(processFileName, paResourceRootPath)) {
           addResource(processFileName, discoveredProceses);
           // find diagram(s) for process
           Enumeration< ? extends ZipEntry> entries2 = zipFile.entries();
@@ -160,21 +188,52 @@ public class ClassPathScanner implements ProcessArchiveScanner {
     }
   }
 
-  protected void handleDirectory(File directory, String rootPath, Set<String> discoveredProcesses, ClassLoader classLoader) {
+  protected boolean isBelowPath(String processFileName, String paResourceRootPath) {
+    if(paResourceRootPath == null || paResourceRootPath.length() ==0 ) {
+      return true;
+    } else {
+      return processFileName.startsWith(paResourceRootPath);
+    }    
+  }
+
+  protected void handleDirectory(File directory, String rootPath, Set<String> discoveredProcesses, String paResourceRootPath) {
     File[] paths = directory.listFiles();
+    
+    String currentPathSegment = paResourceRootPath;
+    if (paResourceRootPath != null && paResourceRootPath.length() > 0) {
+      if (paResourceRootPath.indexOf('/') > 0) {
+        currentPathSegment = paResourceRootPath.substring(0, paResourceRootPath.indexOf('/'));
+        paResourceRootPath = paResourceRootPath.substring(paResourceRootPath.indexOf('/') + 1, paResourceRootPath.length());
+      } else {
+        paResourceRootPath = null;
+      }
+    }
+    
     for (File path : paths) {
-      String processFileName = path.getPath();
-      if (!path.isDirectory() && isDeployable(processFileName)) {
-        addResource(processFileName, rootPath, discoveredProcesses);
-        // find diagram(s) for process
-        for (File file : paths) {
-          String diagramFileName = file.getPath();
-          if (!path.isDirectory() && isDiagramForProcess(diagramFileName, processFileName)) {
-            addResource(diagramFileName, rootPath, discoveredProcesses);
+      
+      if(currentPathSegment != null && currentPathSegment.length()>0) {    
+        
+        if(path.isDirectory()) {
+          // only descend into directory, if below resource root:
+          if(path.getName().equals(currentPathSegment)) {
+            handleDirectory(path, rootPath, discoveredProcesses, paResourceRootPath);
           }
         }
-      } else if (path.isDirectory()) {
-        handleDirectory(path, rootPath, discoveredProcesses, classLoader);
+        
+      } else { // at resource root or below -> continue scanning 
+        String processFileName = path.getPath();
+        if (!path.isDirectory() && isDeployable(processFileName)) {
+          addResource(processFileName, rootPath, discoveredProcesses);
+          // find diagram(s) for process
+          for (File file : paths) {
+            String diagramFileName = file.getPath();
+            if (!path.isDirectory() && isDiagramForProcess(diagramFileName, processFileName)) {
+              addResource(diagramFileName, rootPath, discoveredProcesses);
+            }
+          }
+        } else if (path.isDirectory()) {
+          handleDirectory(path, rootPath, discoveredProcesses, paResourceRootPath);
+        }
       }
     }
   }

@@ -40,7 +40,7 @@ import com.camunda.fox.platform.test.util.AbstractFoxPlatformIntegrationTest;
  * @author Daniel Meyer
  */
 @RunWith(Arquillian.class)
-public class JavaDelegateResolutionTestEar extends AbstractFoxPlatformIntegrationTest {
+public class JavaDelegateResolution_ClientAsLibInWebModule extends AbstractFoxPlatformIntegrationTest {
     
   @Deployment
   public static EnterpriseArchive createProcessArchiveDeplyoment() {    

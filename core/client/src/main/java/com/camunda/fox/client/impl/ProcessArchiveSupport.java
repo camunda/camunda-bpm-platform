@@ -106,46 +106,50 @@ public class ProcessArchiveSupport {
   }
   
   protected void installProcessArchives() {
-    final ProcessesXmlParser parser = getProcessesXmlParser();
     
-    ProcessesXml processesXml = parser.parseProcessesXml(PROCESSES_XML_FILE_LOCATION);
-    if(processesXml != null) {
-      List<ProcessArchive> processArchives = getConfiguredProcessArchives(processesXml);
+    final ProcessesXmlParser parser = getProcessesXmlParser();
+    List<ProcessesXml> processesXmls = parser.parseProcessesXml(PROCESSES_XML_FILE_LOCATION);
+
+    if (processesXmls.size() > 0) {
+      List<ProcessArchive> processArchives = getConfiguredProcessArchives(processesXmls);
       for (ProcessArchive processArchive : processArchives) {
         ProcessArchiveInstallation installation = processArchiveService.installProcessArchive(processArchive);
         installedProcessArchives.put(processArchive, installation.getProcessEngine());
       }
+
     } else {
-      log.log(Level.INFO, "No "+PROCESSES_XML_FILE_LOCATION+" found. Not creating a process archive installation.");
+      log.log(Level.INFO, "No " + PROCESSES_XML_FILE_LOCATION + " found. Not creating a process archive installation.");
     }
   }
-  
+
   protected void uninstallProcessArchives() { 
     for (ProcessArchive processArchive : installedProcessArchives.keySet()) {
       processArchiveService.unInstallProcessArchive(processArchive);
     }
   }
 
-  protected List<ProcessArchive> getConfiguredProcessArchives(ProcessesXml processesXml) {
+  protected List<ProcessArchive> getConfiguredProcessArchives(List<ProcessesXml> processesXmls) {
     List<ProcessArchive> processArchives = new ArrayList<ProcessArchive>();
     List<String> processArchiveNamesSeen = new ArrayList<String>();
-    for (ProcessArchiveXml processArchiveXml : processesXml.processArchives) {
-      if(processArchiveXml.name == null) {
-        setProcessArchiveName(processArchiveXml);
-      }
-      if(processArchiveNamesSeen.contains(processArchiveXml.name)) {
-        throw new FoxPlatformException("Cannot install more than one process archive with name '" + processArchiveXml.name
-                + "'. Make sure to set different names when declaring more than a single process-archive in '"+PROCESSES_XML_FILE_LOCATION+"'.");
-      } else {
-        processArchiveNamesSeen.add(processArchiveXml.name);
-      }
-      
-      if(processArchiveXml.configuration.processEngineName == null) {
-        processArchiveXml.configuration.processEngineName = processEngineService.getDefaultProcessEngine().getName();
-      }
-      
-      processArchives.add(new ProcessArchiveImpl(processArchiveXml, processArchiveContextExecutorBean));      
-    }    
+    for (ProcessesXml processesXml : processesXmls) {      
+      for (ProcessArchiveXml processArchiveXml : processesXml.processArchives) {
+        if(processArchiveXml.name == null) {
+          setProcessArchiveName(processArchiveXml);
+        }
+        if(processArchiveNamesSeen.contains(processArchiveXml.name)) {
+          throw new FoxPlatformException("Cannot install more than one process archive with name '" + processArchiveXml.name
+                  + "'. Make sure to set different names when declaring more than a single process-archive in '"+PROCESSES_XML_FILE_LOCATION+"'.");
+        } else {
+          processArchiveNamesSeen.add(processArchiveXml.name);
+        }
+        
+        if(processArchiveXml.configuration.processEngineName == null) {
+          processArchiveXml.configuration.processEngineName = processEngineService.getDefaultProcessEngine().getName();
+        }
+        
+        processArchives.add(new ProcessArchiveImpl(processArchiveXml, processesXml.metaFileUrl, processArchiveContextExecutorBean));      
+      }    
+    }
     return processArchives;
   }
 
