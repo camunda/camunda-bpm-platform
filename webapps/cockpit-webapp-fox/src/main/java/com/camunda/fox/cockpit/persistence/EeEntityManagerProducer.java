@@ -1,9 +1,5 @@
 package com.camunda.fox.cockpit.persistence;
 
-import com.camunda.fox.cdi.transaction.impl.JtaTransactionEvent;
-import com.camunda.fox.cdi.transaction.impl.JtaTransactionEvent.TransactionEventType;
-import com.camunda.fox.cockpit.cdi.FoxEngineResource;
-
 import javax.annotation.PreDestroy;
 import javax.enterprise.context.ConversationScoped;
 import javax.enterprise.context.RequestScoped;
@@ -14,6 +10,9 @@ import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
 
+import com.camunda.fox.cdi.transaction.impl.JtaTransactionEvent;
+import com.camunda.fox.cdi.transaction.impl.JtaTransactionEvent.TransactionEventType;
+
 /**
  *
  * @author nico.rehwaldt
@@ -23,23 +22,12 @@ import javax.persistence.EntityTransaction;
 @ConversationScoped
 public class EeEntityManagerProducer extends CockpitEntityManagerProducer {
   
+  private static final long serialVersionUID = 1L;
+
   @Inject
   private EeEntityManagerFactories entityManagerFactories;
   
   private EntityManager cockpitEntityManager;
-  private EntityManager foxEngineEntityManager;
-  
-  @Override
-  @Specializes
-  @Produces
-  @FoxEngineResource
-  @RequestScoped
-  public EntityManager getFoxEngineEntityManager() {
-    if (foxEngineEntityManager == null) {
-      foxEngineEntityManager = entityManagerFactories.getFoxEngineEntityManager();
-    }
-    return foxEngineEntityManager;
-  }
   
   @Override
   @Specializes
@@ -65,9 +53,6 @@ public class EeEntityManagerProducer extends CockpitEntityManagerProducer {
       if(cockpitEntityManager != null) {
         cockpitEntityManager.joinTransaction();
       }
-      if(foxEngineEntityManager != null) {
-        foxEngineEntityManager.joinTransaction();
-      }
     }
   }
   
@@ -76,10 +61,6 @@ public class EeEntityManagerProducer extends CockpitEntityManagerProducer {
   protected void preDestroy() {
     if (cockpitEntityManager != null && cockpitEntityManager.isOpen()) {
       cockpitEntityManager.close();
-    }
-    
-    if (foxEngineEntityManager != null && foxEngineEntityManager.isOpen()) {
-      foxEngineEntityManager.close();
     }
   }
 }
