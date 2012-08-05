@@ -69,7 +69,7 @@ public class TestWarDeploymentWithMultiplePasAsSubdeployment2 extends AbstractFo
       "<process-archive>" +
       "<name>PA_NAME</name>" +
         "<configuration>" +
-          "<resourceRootPath>pa:directory/</resourceRootPath>" +
+          "<resource-root-path>pa:directory/</resource-root-path>" +
           "<undeployment delete=\"true\" />" +
         "</configuration>" +
       "</process-archive>" +

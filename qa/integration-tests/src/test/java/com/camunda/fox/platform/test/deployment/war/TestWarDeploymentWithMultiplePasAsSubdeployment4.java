@@ -64,14 +64,14 @@ public class TestWarDeploymentWithMultiplePasAsSubdeployment4 extends AbstractFo
       "<process-archive>" +
       "<name>pa1</name>" +
         "<configuration>" +
-          "<resourceRootPath>classpath:directory/</resourceRootPath>" +
+          "<resource-root-path>classpath:directory/</resource-root-path>" +
           "<undeployment delete=\"true\" />" +
         "</configuration>" +
       "</process-archive>" +
       "<process-archive>" +
       "<name>pa2</name>" +
         "<configuration>" +
-          "<resourceRootPath>classpath:alternateDirectory/</resourceRootPath>" +
+          "<resource-root-path>classpath:alternateDirectory/</resource-root-path>" +
           "<undeployment delete=\"true\" />" +
         "</configuration>" +
       "</process-archive>" +
