@@ -106,7 +106,7 @@ public class ClassPathScanner implements ProcessArchiveScanner {
         for (String string : scanResult) {
           String prefix = strippedPath.endsWith("/") ? strippedPath : strippedPath +  "/";
           if(!string.startsWith(prefix)) {
-            string = string.concat(prefix);
+            string = prefix.concat(string);
           }
           discoveredProcesses.add(string);  
         }
