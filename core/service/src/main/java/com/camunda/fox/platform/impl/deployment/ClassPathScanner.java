@@ -96,13 +96,17 @@ public class ClassPathScanner implements ProcessArchiveScanner {
       
       //  1. CASE: paResourceRootPath specified AND it is a "classpath:" resource root
       
-      String strippedPaResourceRootPath = paResourceRootPath.replace("classpath:", "");
-      Enumeration<URL> resourceRoots = loadClasspathResourceRoots(classLoader, strippedPaResourceRootPath);
+      String strippedPath = paResourceRootPath.replace("classpath:", "");
+      Enumeration<URL> resourceRoots = loadClasspathResourceRoots(classLoader, strippedPath);
       
       while (resourceRoots.hasMoreElements()) {
         URL resourceRoot = (URL) resourceRoots.nextElement();
         
-        discoveredProcesses.addAll(scanUrl(resourceRoot, strippedPaResourceRootPath, false));  
+        Set<String> scanResult = scanUrl(resourceRoot, strippedPath, false);
+        for (String string : scanResult) {
+          discoveredProcesses.add((strippedPath.endsWith("/") ? strippedPath : strippedPath +  "/") + string);  
+        }
+       
         
       }
 
