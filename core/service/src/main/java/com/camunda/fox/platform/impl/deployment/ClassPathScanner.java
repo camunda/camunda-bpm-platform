@@ -62,27 +62,11 @@ public class ClassPathScanner implements ProcessArchiveScanner {
     final URL metaFileUrl = (URL) processArchive.getProperties().get(ProcessArchive.PROP_META_FILE_URL);
     final String paResourceRootPath = (String) processArchive.getProperties().get(ProcessArchive.PROP_RESOURCE_ROOT_PATH);
     
-    URL paResourceRoot = null;
-    String strippedPaResourceRootPath = null;
-    boolean isPaLocal;
+    // 1. perform the scanning
+    Set<String> discoveredProcesses = scanPaResourceRootPath(classLoader, metaFileUrl, paResourceRootPath);
     
-    if(paResourceRootPath != null && !paResourceRootPath.startsWith("pa:")) {
-      strippedPaResourceRootPath = paResourceRootPath.replace("classpath:", "");
-      strippedPaResourceRootPath = strippedPaResourceRootPath.endsWith("/") ? strippedPaResourceRootPath : strippedPaResourceRootPath +"/";
-      paResourceRoot = classLoader.getResource(strippedPaResourceRootPath);
-      isPaLocal = false;
-    } else {
-      if(paResourceRootPath != null) {
-        strippedPaResourceRootPath = paResourceRootPath.replace("pa:", "");        
-        strippedPaResourceRootPath = strippedPaResourceRootPath.endsWith("/") ? strippedPaResourceRootPath : strippedPaResourceRootPath +"/";
-      }
-      paResourceRoot = metaFileUrl;
-      isPaLocal = true;
-    }
-    
-    if(paResourceRoot != null) {
-      
-      Set<String> discoveredProcesses = scanClassPath(paResourceRoot, strippedPaResourceRootPath, isPaLocal);         
+    // 2. read the discovered resources
+    if(discoveredProcesses.size() > 0) {      
       
       for (String resourceName : discoveredProcesses) {            
         InputStream resourceAsStream = classLoader.getResourceAsStream(resourceName);
@@ -104,16 +88,48 @@ public class ClassPathScanner implements ProcessArchiveScanner {
     
     return resourceMap;
   }
-  
-  protected Set<String> scanClassPath(URL metaFileUrl, String paResourceRootPath, boolean isPaLocal) {
+
+  protected Set<String> scanPaResourceRootPath(final ClassLoader classLoader, final URL metaFileUrl, final String paResourceRootPath) {
+    Set<String> discoveredProcesses = new HashSet<String>(); 
+    
+    if(paResourceRootPath != null && !paResourceRootPath.startsWith("pa:")) { 
+      
+      //  1. CASE: paResourceRootPath specified AND it is a "classpath:" resource root
+      
+      String strippedPaResourceRootPath = paResourceRootPath.replace("classpath:", "");
+      Enumeration<URL> resourceRoots = loadClasspathResourceRoots(classLoader, strippedPaResourceRootPath);
+      
+      while (resourceRoots.hasMoreElements()) {
+        URL resourceRoot = (URL) resourceRoots.nextElement();
+        
+        discoveredProcesses.addAll(scanUrl(resourceRoot, strippedPaResourceRootPath, false));  
+        
+      }
+
+      
+    } else {
+      
+      // 2nd. CASE: no paResourceRootPath specified OR paResourceRootPath is PA-local
+      
+      String strippedPaResourceRootPath = null;
+      if(paResourceRootPath != null) {
+        strippedPaResourceRootPath = paResourceRootPath.replace("pa:", "");        
+        strippedPaResourceRootPath = strippedPaResourceRootPath.endsWith("/") ? strippedPaResourceRootPath : strippedPaResourceRootPath +"/";
+      }
+      discoveredProcesses.addAll(scanUrl(metaFileUrl, strippedPaResourceRootPath, true));  
+    }
+    return discoveredProcesses;
+  }
+
+  protected Set<String> scanUrl(URL url, String paResourceRootPath, boolean isPaLocal) {
     Set<String> discoveredProcesses = new HashSet<String>();
 
-    String urlPath = metaFileUrl.toExternalForm();
+    String urlPath = url.toExternalForm();
     
     if(isPaLocal) {
   
       if (urlPath.startsWith("file:") || urlPath.startsWith("jar:")) {
-        urlPath = metaFileUrl.getPath();
+        urlPath = url.getPath();
         int withinArchive = urlPath.indexOf('!');
         if (withinArchive != -1) {
           urlPath = urlPath.substring(0, withinArchive);
@@ -124,9 +140,8 @@ public class ClassPathScanner implements ProcessArchiveScanner {
       }
       
     } else {
-      
       if (urlPath.startsWith("file:") || urlPath.startsWith("jar:")) {
-        urlPath = metaFileUrl.getPath();
+        urlPath = url.getPath();
         int withinArchive = urlPath.indexOf('!');
         if (withinArchive != -1) {
           urlPath = urlPath.substring(0, withinArchive);
@@ -143,12 +158,12 @@ public class ClassPathScanner implements ProcessArchiveScanner {
 
     log.log(Level.FINEST, "Rootpath is {0}", urlPath);
 
-    handlePaths(urlPath, discoveredProcesses, paResourceRootPath);
+    scanPath(urlPath, discoveredProcesses, paResourceRootPath, isPaLocal);
 
     return discoveredProcesses;
   }
 
-  protected void handlePaths(String urlPath, Set<String> discoveredProceses, String paResourceRootPath) {
+  protected void scanPath(String urlPath, Set<String> discoveredProceses, String paResourceRootPath, boolean isPaLocal) {
     if (urlPath.startsWith("file:")) {
       urlPath = urlPath.substring(5);
     }
@@ -160,7 +175,7 @@ public class ClassPathScanner implements ProcessArchiveScanner {
     if (file.isDirectory()) {
       String path = file.getPath();
       String rootPath = path.endsWith(File.separator) ? path : path+File.separator;
-      handleDirectory(file, rootPath, discoveredProceses, paResourceRootPath);
+      handleDirectory(file, rootPath, discoveredProceses, paResourceRootPath, isPaLocal);
     } else {
       handleArchive(file, discoveredProceses, paResourceRootPath);
     }
@@ -192,15 +207,7 @@ public class ClassPathScanner implements ProcessArchiveScanner {
     }
   }
 
-  protected boolean isBelowPath(String processFileName, String paResourceRootPath) {
-    if(paResourceRootPath == null || paResourceRootPath.length() ==0 ) {
-      return true;
-    } else {
-      return processFileName.startsWith(paResourceRootPath);
-    }    
-  }
-
-  protected void handleDirectory(File directory, String rootPath, Set<String> discoveredProcesses, String paResourceRootPath) {
+  protected void handleDirectory(File directory, String rootPath, Set<String> discoveredProcesses, String paResourceRootPath, boolean isPaLocal) {
     File[] paths = directory.listFiles();
     
     String currentPathSegment = paResourceRootPath;
@@ -215,12 +222,15 @@ public class ClassPathScanner implements ProcessArchiveScanner {
     
     for (File path : paths) {
       
-      if(currentPathSegment != null && currentPathSegment.length()>0) {    
+    
+      if(isPaLocal   // if it is not PA-local, we have already used the classloader to specify the root path explicitly. 
+              && currentPathSegment != null 
+              && currentPathSegment.length()>0) {    
         
         if(path.isDirectory()) {
           // only descend into directory, if below resource root:
           if(path.getName().equals(currentPathSegment)) {
-            handleDirectory(path, rootPath, discoveredProcesses, paResourceRootPath);
+            handleDirectory(path, rootPath, discoveredProcesses, paResourceRootPath, isPaLocal);
           }
         }
         
@@ -236,18 +246,36 @@ public class ClassPathScanner implements ProcessArchiveScanner {
             }
           }
         } else if (path.isDirectory()) {
-          handleDirectory(path, rootPath, discoveredProcesses, paResourceRootPath);
+          handleDirectory(path, rootPath, discoveredProcesses, paResourceRootPath, isPaLocal);
         }
       }
     }
   }
+  
+  protected Enumeration<URL> loadClasspathResourceRoots(final ClassLoader classLoader, String strippedPaResourceRootPath) {
+    Enumeration<URL> resourceRoots;
+    try {
+      resourceRoots = classLoader.getResources(strippedPaResourceRootPath);
+    } catch (IOException e) {
+      throw new FoxPlatformException("Could not load resources at '"+strippedPaResourceRootPath+"' using classloaded '"+classLoader+"'", e);
+    }
+    return resourceRoots;
+  }
+  
+  protected boolean isBelowPath(String processFileName, String paResourceRootPath) {
+    if(paResourceRootPath == null || paResourceRootPath.length() ==0 ) {
+      return true;
+    } else {
+      return processFileName.startsWith(paResourceRootPath);
+    }    
+  }
 
-  private void addResource(String fileName, String rootPath, Set<String> discoveredProcessResources) {
+  protected void addResource(String fileName, String rootPath, Set<String> discoveredProcessResources) {
     String nameRelative = fileName.substring(rootPath.length());
     addResource(nameRelative, discoveredProcessResources);
   }
 
-  private void addResource(String resourceName, Set<String> discoveredProcessResources) {
+  protected void addResource(String resourceName, Set<String> discoveredProcessResources) {
     discoveredProcessResources.add(resourceName);
     log.log(Level.FINEST, "discovered process resource {0}", resourceName);
   }

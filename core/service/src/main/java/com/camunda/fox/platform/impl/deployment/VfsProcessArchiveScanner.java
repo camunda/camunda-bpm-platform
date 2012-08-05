@@ -22,6 +22,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,57 +50,59 @@ import com.camunda.fox.platform.spi.ProcessArchive;
 public class VfsProcessArchiveScanner implements ProcessArchiveScanner {
 
   private static Logger log = Logger.getLogger(VfsProcessArchiveScanner.class.getName());
-     
-  @Override
+
   public Map<String, byte[]> findResources(ProcessArchive processArchive) {
-
+    
     Map<String, byte[]> resources = new HashMap<String, byte[]>();
-    VirtualFile processArchiveRoot = getProcessArchiveRoot(processArchive);
-
-    if (processArchiveRoot != null) {
-      scanRoot(processArchiveRoot, resources);
-    } else {
-      log.warning("Not scanning process archive classloader '" + processArchive.getName() + "': no resource root provided.");
-    }
-
-    return resources;
-  }
-
-  protected VirtualFile getProcessArchiveRoot(ProcessArchive processArchive) {
 
     final URL metaFileUrl = (URL) processArchive.getProperties().get(ProcessArchive.PROP_META_FILE_URL);
     final String resourceRootPath = (String) processArchive.getProperties().get(ProcessArchive.PROP_RESOURCE_ROOT_PATH);
     final ClassLoader classLoader = processArchive.getClassLoader();
-    
-    VirtualFile metaFile = null;
-    if(metaFileUrl != null) {
-      metaFile = getVirtualFileForUrl(metaFileUrl);
+
+    if(resourceRootPath != null && !resourceRootPath.startsWith("pa:")) {
+      
+        //  1. CASE: paResourceRootPath specified AND it is a "classpath:" resource root
+      
+        String strippedPath = resourceRootPath.replace("classpath:", "");
+        Enumeration<URL> resourceRoots = loadClasspathResourceRoots(classLoader, strippedPath);
+        
+        if(!resourceRoots.hasMoreElements()) {
+          log.warning("Could not find any resources for process archive resource root path '"+resourceRootPath+"' using classloader '"+classLoader+"'");
+        }
+        
+        while (resourceRoots.hasMoreElements()) {
+          URL resourceRoot = (URL) resourceRoots.nextElement();
+          VirtualFile virtualRoot = getVirtualFileForUrl(resourceRoot);
+          scanRoot(virtualRoot, resources);          
+        }
+        
+          
+    } else {
+      
+      // 2nd. CASE: no paResourceRootPath specified OR paResourceRootPath is PA-local
+
+      VirtualFile metaFile = null;
+      if (metaFileUrl != null) {
+        metaFile = getVirtualFileForUrl(metaFileUrl);
+
+        // use the parent resource of the META-INF folder
+        VirtualFile resourceRoot = metaFile.getParent().getParent();
+
+        if (resourceRootPath != null) { // pa-local path provided
+          String strippedPath = resourceRootPath.replace("pa:", "");
+          resourceRoot = resourceRoot.getChild(strippedPath);
+        }
+        
+        // perform the scanning
+        scanRoot(resourceRoot, resources);
+        
+      } else {
+        throw new FoxPlatformException(ProcessArchive.PROP_META_FILE_URL + "-property must be set in order to scan a PA-local path.");
+      }
     }
 
-    if(resourceRootPath != null) {
-      
-      if(resourceRootPath.startsWith("pa:")) { // pa-local path
-        if(metaFile != null) {
-          return metaFile.getParent().getParent().getChild(resourceRootPath.replace("pa:", ""));
-        } else {
-          return null;
-        } 
-        
-      } else { // default is classloader-relative
-        String strippedPath = resourceRootPath.replace("classpath:", "");
-        URL rootUrl = classLoader.getResource(strippedPath);        
-        return getVirtualFileForUrl(rootUrl);
-      }
-      
-    } else {
-      // no resource root path provided -> interpret as pa-local
-      if(metaFile != null) {
-        return metaFile.getParent().getParent();
-      } else {
-        return null;
-      }
-    }
-    
+    return resources;
+
   }
 
   private VirtualFile getVirtualFileForUrl(final URL url) {
@@ -144,6 +147,16 @@ public class VfsProcessArchiveScanner implements ProcessArchiveScanner {
     } catch (IOException e) {
       log.log(Level.WARNING, "Could not read input stream of file '" + resourceName + "' from process archive '" + processArchiveRoot + "'.", e);
     }
+  }
+  
+  protected Enumeration<URL> loadClasspathResourceRoots(final ClassLoader classLoader, String strippedPaResourceRootPath) {
+    Enumeration<URL> resourceRoots;
+    try {
+      resourceRoots = classLoader.getResources(strippedPaResourceRootPath);
+    } catch (IOException e) {
+      throw new FoxPlatformException("Could not load resources at '"+strippedPaResourceRootPath+"' using classloaded '"+classLoader+"'", e);
+    }
+    return resourceRoots;
   }
   
 }
