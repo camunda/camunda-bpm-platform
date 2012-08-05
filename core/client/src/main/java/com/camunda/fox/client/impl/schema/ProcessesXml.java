@@ -57,7 +57,7 @@ public class ProcessesXml {
       @XmlElement(name="undeployment")
       public Undeployment undeployment = new Undeployment();
       
-      @XmlElement(name="resourceRootPath")
+      @XmlElement(name="resource-root-path")
       public String resourceRootPath = null;
      
       public static class Undeployment {
