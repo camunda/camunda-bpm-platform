@@ -152,7 +152,7 @@
                 <exclude>**/web.xml</exclude>
                 <exclude>**/beans.xml</exclude>
                 <exclude>**/persistence.xml</exclude>
-                <exclude>**/com/camunda/fox/cockpit/webapp/environment/**</exclude>
+                <exclude>**/com/camunda/fox/cockpit/engine/spi/impl/**</exclude>
               </excludes>
             </overlay>
             <overlay>
