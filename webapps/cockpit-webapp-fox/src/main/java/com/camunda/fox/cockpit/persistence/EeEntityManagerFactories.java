@@ -15,13 +15,6 @@ public class EeEntityManagerFactories extends CockpitEntityManagerFactories {
   @PersistenceUnit(unitName="fox-cockpit")
   private EntityManagerFactory cockpitEntityManagerFactory;
   
-  @PersistenceUnit(unitName="fox-engine")
-  private EntityManagerFactory foxEngineEntityManagerFactory;
-  
-  public EntityManager getFoxEngineEntityManager() {
-    return foxEngineEntityManagerFactory.createEntityManager();
-  }
-  
   public EntityManager getCockpitEntityManager() {
     return cockpitEntityManagerFactory.createEntityManager();
   }
