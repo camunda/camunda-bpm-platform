@@ -27,24 +27,6 @@
       </includes>
       <fileMode>0755</fileMode>
     </fileSet>
-    <!--     
-    <fileSet>
-      <directory>../../examples/cdi-jsf-task-management</directory>
-      <outputDirectory>examples/src/cdi-jsf-task-management</outputDirectory>  
-      <excludes>
-        <exclude>target/</exclude>
-        <exclude>pom.xml</exclude>              
-        <exclude>pom.xml.distro</exclude>
-      </excludes>        
-    </fileSet>
-    <fileSet>
-      <directory>../../examples/cdi-jsf-task-management</directory>
-      <outputDirectory>examples/src/cdi-jsf-task-management</outputDirectory>  
-      <includes>        
-        <include>pom.xml.distro</include>
-      </includes>        
-    </fileSet>
-    -->
     <fileSet>
       <directory>../../sql-script/target</directory>
       <outputDirectory />
@@ -53,20 +35,9 @@
       </includes>
     </fileSet>    
   </fileSets>
-  <!--
-  <files>
-    <file>
-      <source>../../examples/cdi-jsf-task-management/pom.xml.distro</source>
-      <outputDirectory>examples/src/cdi-jsf-task-management</outputDirectory>
-      <destName>pom.xml</destName>
-    </file>
-  </files>
-  -->
-  
   <dependencySets>
     <dependencySet>
       <includes>
-        <include>com.camunda.fox.platform:fox-platform-explorer:war:*</include>
    <!-- <include>com.camunda.fox:camunda-fox-h2-webapp:war:*</include>
                 <include>com.camunda.fox.cockpit:cockpit-webapp-fox:war:*</include>
                 <include>com.camunda.fox.cycle:cycle-webapp-fox:war:*</include> -->                                             
