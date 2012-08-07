@@ -8,3 +8,4 @@ bin
 transaction.log
 nbactions.xml
 /webapps/fox-platform-tasklist/server-work
+dependency-reduced-pom.xml
