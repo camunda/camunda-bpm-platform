@@ -120,8 +120,12 @@ public abstract class AbstractFoxPlatformIntegrationTest {
 
   public void waitForJobExecutorToProcessAllJobs(long maxMillisToWait, long intervalMillis) {
     JobExecutor jobExecutor = processEngineConfiguration.getJobExecutor();
-    jobExecutor.start();
-
+    boolean jobExecutorWasActive = jobExecutor.isActive();
+    
+    if (!jobExecutorWasActive) {
+      jobExecutor.start();
+    }
+    
     try {
       Timer timer = new Timer();
       InteruptTask task = new InteruptTask(Thread.currentThread());
@@ -141,7 +145,9 @@ public abstract class AbstractFoxPlatformIntegrationTest {
       }
 
     } finally {
-      jobExecutor.shutdown();
+      if (!jobExecutorWasActive) {
+        jobExecutor.shutdown();
+      }
     }
   }
 
