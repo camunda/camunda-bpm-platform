@@ -24,12 +24,24 @@
     </dependency>
     
     <dependency>
-	  <groupId>com.camunda.fox.platform</groupId>
-	  <artifactId>fox-platform-sql-script</artifactId>
-	  <version>${project.version}</version>
-	  <type>pom</type>
-	  <scope>provided</scope>
+  	  <groupId>com.camunda.fox.platform</groupId>
+  	  <artifactId>fox-platform-sql-script</artifactId>
+  	  <version>${project.version}</version>
+  	  <type>pom</type>
+  	  <scope>provided</scope>
     </dependency>    
+    
+    <dependency>
+      <groupId>com.camunda.fox.cockpit</groupId>
+      <artifactId>cockpit-sql-scripts</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>com.camunda.fox.cycle</groupId>
+      <artifactId>cycle-sql-scripts</artifactId>
+      <version>${project.version}</version>
+    </dependency>
     
     <dependency>
       <groupId>com.camunda.fox.tasklist</groupId>
@@ -37,22 +49,13 @@
       <version>${project.version}</version>
       <type>war</type>
     </dependency>
-        
-    <!--
-    <dependency>
-      <groupId>com.camunda.fox.cockpit</groupId>
-      <artifactId>cockpit-webapp-fox</artifactId>
-      <version>${project.version}</version>
-      <type>war</type>
-    </dependency>
 
     <dependency>
-      <groupId>com.camunda.fox.cycle</groupId>
-      <artifactId>cycle-webapp-fox</artifactId>
+      <groupId>com.camunda.fox.cockpit</groupId>
+      <artifactId>cockpit-webapp-fox-glassfish</artifactId>
       <version>${project.version}</version>
       <type>war</type>
     </dependency>
-    -->
   </dependencies>
 
   <build>
