@@ -98,7 +98,7 @@ public class TaskNavigation implements Serializable {
     return colleaguesTasksLinks;
   }
 
-  public void select(@Observes TaskNavigationLinkSelectedEvent taskNavigationLinkSelectedEvent) {
+  public void selectViaEvent(@Observes TaskNavigationLinkSelectedEvent taskNavigationLinkSelectedEvent) {
     if (!taskNavigationLinkSelectedEvent.getLink().equals(selected)) {
       if (selected != null) {
         selected.setActive(false);
@@ -108,7 +108,7 @@ public class TaskNavigation implements Serializable {
     }
   }
 
-  public void reset(@SuppressWarnings("unused") @Observes SignOutEvent signOutEvent) {
+  public void reset(@Observes SignOutEvent signOutEvent) {
     myTasksLink = null;
     unassignedTasksLink = null;
     groupTasksLinks = null;

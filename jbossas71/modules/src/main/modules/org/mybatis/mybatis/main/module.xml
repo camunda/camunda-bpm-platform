@@ -1,6 +1,6 @@
 <module xmlns="urn:jboss:module:1.0" name="org.mybatis.mybatis">
   <resources>
-    <resource-root path="mybatis-3.0.6.jar" />
+    <resource-root path="mybatis-3.1.1.jar" />
   </resources>
 
   <dependencies>    

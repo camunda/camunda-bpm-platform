@@ -33,6 +33,14 @@ Contents:
 		You can access it using the following URL:
 		
 		http://localhost:8080/explorer 
+		
+    sql/
+        This directory contains the create and upgrade sql script
+        for the different databases.
+        The engine create script contain the engine and history tables.
+        
+        Execute the current upgrade script to make the database compatible
+        with the newest fox platform version.
 
 ==================		
 		
