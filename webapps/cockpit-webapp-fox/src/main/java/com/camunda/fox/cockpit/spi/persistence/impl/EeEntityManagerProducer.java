@@ -1,11 +1,11 @@
-package com.camunda.fox.cockpit.persistence;
+package com.camunda.fox.cockpit.spi.persistence.impl;
 
+import java.io.Serializable;
 import javax.annotation.PreDestroy;
 import javax.enterprise.context.ConversationScoped;
 import javax.enterprise.context.RequestScoped;
 import javax.enterprise.event.Observes;
 import javax.enterprise.inject.Produces;
-import javax.enterprise.inject.Specializes;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityTransaction;
@@ -18,9 +18,8 @@ import com.camunda.fox.cdi.transaction.impl.JtaTransactionEvent.TransactionEvent
  * @author nico.rehwaldt
  * @author christian.lipphardt@camunda.com
  */
-@Specializes
 @ConversationScoped
-public class EeEntityManagerProducer extends CockpitEntityManagerProducer {
+public class EeEntityManagerProducer implements Serializable {
   
   private static final long serialVersionUID = 1L;
 
@@ -29,8 +28,6 @@ public class EeEntityManagerProducer extends CockpitEntityManagerProducer {
   
   private EntityManager cockpitEntityManager;
   
-  @Override
-  @Specializes
   @Produces
   @RequestScoped
   public EntityManager getCockpitEntityManager() {
@@ -40,8 +37,6 @@ public class EeEntityManagerProducer extends CockpitEntityManagerProducer {
     return cockpitEntityManager;
   }
   
-  @Override
-  @Specializes
   @Produces
   @RequestScoped
   public EntityTransaction getTransaction() {
@@ -49,7 +44,7 @@ public class EeEntityManagerProducer extends CockpitEntityManagerProducer {
   }
   
   public void joinTransaction(@Observes JtaTransactionEvent transactionEvent) {
-    if(TransactionEventType.AFTER_BEGIN == transactionEvent.getType()) {
+    if (TransactionEventType.AFTER_BEGIN == transactionEvent.getType()) {
       if(cockpitEntityManager != null) {
         cockpitEntityManager.joinTransaction();
       }
@@ -57,7 +52,6 @@ public class EeEntityManagerProducer extends CockpitEntityManagerProducer {
   }
   
   @PreDestroy
-  @Override
   protected void preDestroy() {
     if (cockpitEntityManager != null && cockpitEntityManager.isOpen()) {
       cockpitEntityManager.close();

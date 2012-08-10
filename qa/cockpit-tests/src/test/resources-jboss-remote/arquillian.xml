@@ -5,10 +5,5 @@
   <defaultProtocol type="Servlet 3.0" />
   
   <container qualifier="jboss" default="true">
-    <configuration>
-      <property name="jbossHome">../jboss7-runtime/target/jboss-as-${version.jboss.as}/</property>
-      <property name="managementPort">21009</property>
-      <property name="serverConfig">standalone-mysql.xml</property>
-    </configuration>
   </container>
 </arquillian>

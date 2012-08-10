@@ -30,6 +30,11 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>com.ibm.db2.jcc</groupId>
+      <artifactId>db2jcc4</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
       <groupId>com.camunda.fox.tasklist</groupId>
       <artifactId>tasklist-webapp</artifactId>
       <version>${project.version}</version>

@@ -102,28 +102,50 @@
                         <password>sa</password>
                     </security>
                 </datasource>
-                <datasource jndi-name="java:jboss/datasources/FoxEngineDS" enabled="true" use-java-context="true" jta="true" use-ccm="true" pool-name="FoxEngineDS">
-                    <connection-url>jdbc:mysql://localhost:3306/fox-test</connection-url>
-                    <driver>mysql</driver>
-                    <security>
-                        <user-name>cockpit</user-name>
-                        <password>cockpit</password>
-                    </security>
-                </datasource>
+                <xa-datasource jndi-name="java:jboss/datasources/FoxEngineDS" pool-name="FoxEngineDS" enabled="true" use-ccm="false">
+                    <xa-datasource-property name="ServerName">
+                        localhost
+                    </xa-datasource-property>
+                    <xa-datasource-property name="PortNumber">
+                        50000
+                    </xa-datasource-property>
+                    <xa-datasource-property name="DatabaseName">
+                        PLATFORM
+                    </xa-datasource-property>
+                    <xa-datasource-property name="DriverType">
+                        4
+                    </xa-datasource-property>
+                    <xa-datasource-property name="User">
+                        fox_plat
+                    </xa-datasource-property>
+                    <xa-datasource-property name="Password">
+                        CaPlat12
+                    </xa-datasource-property>
+                    <driver>db2</driver>
+                    <xa-pool>
+                        <is-same-rm-override>false</is-same-rm-override>
+                        <no-tx-separate-pools>true</no-tx-separate-pools>
+                    </xa-pool>
+                    <validation>
+                        <valid-connection-checker class-name="org.jboss.jca.adapters.jdbc.extensions.db2.DB2ValidConnectionChecker"/>
+                        <stale-connection-checker class-name="org.jboss.jca.adapters.jdbc.extensions.db2.DB2StaleConnectionChecker"/>
+                        <exception-sorter class-name="org.jboss.jca.adapters.jdbc.extensions.db2.DB2ExceptionSorter"/>
+                    </validation>
+                </xa-datasource>
                 <datasource jndi-name="java:jboss/datasources/CockpitDS" enabled="true" use-java-context="true" jta="true" use-ccm="true" pool-name="CockpitDS">
-                    <connection-url>jdbc:mysql://localhost:3306/fox-test</connection-url>
-                    <driver>mysql</driver>
+                    <connection-url>jdbc:h2:mem:cockpit;DB_CLOSE_DELAY=-1;MVCC=TRUE;DB_CLOSE_ON_EXIT=FALSE</connection-url>
+                    <driver>h2</driver>
                     <security>
-                        <user-name>cockpit</user-name>
-                        <password>cockpit</password>
-                    </security>
+                        <user-name>sa</user-name>
+                        <password>sa</password>
+                    </security>                   
                 </datasource>
                 <drivers>
-                    <driver name="mysql" module="mysql.mysql-connector-java">
-                        <xa-datasource-class>com.mysql.jdbc.jdbc2.optional.MysqlXADataSource</xa-datasource-class>
-                    </driver>
                     <driver name="h2" module="com.h2database.h2">
                         <xa-datasource-class>org.h2.jdbcx.JdbcDataSource</xa-datasource-class>
+                    </driver>
+                    <driver name="db2" module="com.ibm.db2.jcc.db2jcc4">
+                        <xa-datasource-class>com.ibm.db2.jcc.DB2XADataSource</xa-datasource-class>
                     </driver>
                 </drivers>
             </datasources>
@@ -325,7 +347,7 @@
                 <job-acquisitions>
                     <job-acquisition name="default">
                         <acquisition-strategy>SEQUENTIAL</acquisition-strategy>
-	                    <properties>
+                        <properties>
                             <property name="lockTimeInMillis">300000</property>
                             <property name="waitTimeInMillis">5000</property>
                             <property name="maxJobsPerAcquisition">3</property>

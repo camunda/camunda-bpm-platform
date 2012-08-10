@@ -1,6 +1,6 @@
-package com.camunda.fox.cockpit.engine.spi.impl;
+package com.camunda.fox.cockpit.spi.engine.impl;
 
-import com.camunda.fox.cockpit.engine.spi.ProcessEngines;
+import com.camunda.fox.cockpit.spi.engine.ProcessEngines;
 import com.camunda.fox.platform.api.ProcessEngineService;
 import java.io.Serializable;
 import java.util.List;
@@ -13,7 +13,7 @@ import org.activiti.engine.ProcessEngine;
  * @author nico.rehwaldt
  */
 @ApplicationScoped
-public class PlatformProcessEnginesProvider implements ProcessEngines, Serializable {
+public class PlatformProcessEngines implements ProcessEngines, Serializable {
 
   @EJB(lookup=
 		      "java:global/" +
