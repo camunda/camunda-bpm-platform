@@ -27,6 +27,22 @@
       <type>war</type>
     </dependency>
 		
+    <!-- shared libraries -->
+    <dependency>
+      <artifactId>bcprov-jdk16</artifactId>
+      <groupId>org.bouncycastle</groupId>
+    </dependency>
+    <dependency>
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>bcpg-jdk16</artifactId>
+      <exclusions>
+        <exclusion>
+          <artifactId>bcprov-jdk16</artifactId>
+          <groupId>org.bouncycastle</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    
     <!--dependency>
       <groupId>com.camunda.fox.cockpit</groupId>
       <artifactId>cockpit-demo-processes</artifactId>
