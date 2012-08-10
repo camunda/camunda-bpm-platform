@@ -14,7 +14,7 @@
     <dependencySet>
       <outputDirectory>server</outputDirectory>
       <includes>
-        <include>org.glassfish.distributions:glassfish:zip:*</include>
+        <include>org.glassfish.main.distributions:glassfish:zip:*</include>
       </includes>
       <unpack>true</unpack>
       <unpackOptions>
