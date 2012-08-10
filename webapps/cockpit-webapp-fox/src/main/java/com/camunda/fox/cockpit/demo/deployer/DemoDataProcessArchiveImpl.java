@@ -26,7 +26,7 @@ public class DemoDataProcessArchiveImpl implements ProcessArchive {
   public String getProcessEngineName() {
     return null;  // = use default
   }
-    
+  
   public String getName() {
     if (processArchiveName == null) {
       processArchiveName = "cockpit-demo-processes" + new Random().nextInt(50000);
