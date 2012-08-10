@@ -135,7 +135,7 @@
               <classifier>env-impl</classifier>
               <includes>
                 <include>**/com/camunda/fox/cockpit/spi/engine/impl/*</include>
-                <include>**/com/camunda/fox/cockpit/spi/persistence/impl/*</include>
+                <!-- <include>**/com/camunda/fox/cockpit/spi/persistence/impl/*</include> -->
               </includes>
             </configuration>
           </execution>
