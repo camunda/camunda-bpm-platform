@@ -3,6 +3,12 @@ update ACT_RU_EXECUTION set CACHED_ENT_STATE_ = 7;
 
 create index ACT_IDX_HI_DETAIL_TASK_ID on ACT_HI_DETAIL(TASK_ID_);
 
+alter table ACT_RE_PROCDEF 
+    MODIFY KEY_ varchar(255) not null;
+
+alter table ACT_RE_PROCDEF 
+    MODIFY VERSION_ integer not null;
+
 alter table ACT_RE_PROCDEF
     add constraint ACT_UNIQ_PROCDEF
     unique (KEY_,VERSION_);

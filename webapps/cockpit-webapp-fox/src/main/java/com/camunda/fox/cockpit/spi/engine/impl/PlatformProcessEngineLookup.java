@@ -1,7 +1,7 @@
-package com.camunda.fox.cockpit.engine.spi.impl;
+package com.camunda.fox.cockpit.spi.engine.impl;
 
-import com.camunda.fox.cockpit.engine.spi.ProcessEngineServicesProvider;
-import com.camunda.fox.cockpit.engine.spi.ProcessEngines;
+import com.camunda.fox.cockpit.spi.engine.ConfigurableProcessEngineLookup;
+import com.camunda.fox.cockpit.spi.engine.ProcessEngines;
 import com.camunda.fox.cockpit.persistence.CockpitQueryCommandExecutor;
 import java.io.Serializable;
 import javax.enterprise.context.RequestScoped;
@@ -15,7 +15,7 @@ import org.activiti.engine.ProcessEngine;
  * @author nico.rehwaldt
  */
 @SessionScoped
-public class PlatformProcessEngineServicesProvider implements ProcessEngineServicesProvider, Serializable {
+public class PlatformProcessEngineLookup implements ConfigurableProcessEngineLookup, Serializable {
   
   @Inject
   private ProcessEngines processEnginesProvider;

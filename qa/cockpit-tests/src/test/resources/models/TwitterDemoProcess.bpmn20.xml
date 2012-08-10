@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns:activiti="http://activiti.org/bpmn" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:signavio="http://www.signavio.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" exporter="Signavio Process Editor, http://www.signavio.com" exporterVersion="" id="sid-0bf0b240-d3dd-47e5-a042-c6d94db640cc" targetNamespace="http://www.signavio.com/bpmn20" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/2.0/20100501/BPMN20.xsd">
+   <process id="TwitterDemoProcess" isExecutable="true" name="TwitterDemoProcess">
+      
+      <startEvent id="new_tweet_3" name="new tweet" activiti:formKey="createTweet.form" />
+      <userTask id="Review_Tweet_3" name="Review Tweet" activiti:formKey="reviewTweet.form" activiti:assignee="kermit" />
+      <exclusiveGateway gatewayDirection="Diverging" id="Approved__3" name="Approved?" />
+      <serviceTask id="Publish_on_Twitter_3" name="Publish on Twitter" activiti:class="com.camunda.fox.demo.twitter.TweetContentDelegate" />
+
+      <serviceTask id="Send_rejection_notification_via_email__3" name="Send rejection notification via email" activiti:type="mail">
+		  <extensionElements>
+		    <activiti:field name="from" stringValue="activiti@camunda.com" />
+		    <activiti:field name="to" expression="${email}" />
+		    <activiti:field name="subject" expression="Your tweet has been rejected" />
+		    <activiti:field name="html">
+		      <activiti:expression>
+		        <![CDATA[
+		          <html>
+		            <body>
+		              Hi!<br/><br/>
+		              
+		              Unfortuntaley your tweet has been rejected.<br /><br/>
+		              
+		              Original content: ${content}<br /><br/>
+		              
+		              Comment: ${comments}<br /><br/>
+		               
+		              Sorry, please try with better content the next time :-)
+		            </body>
+		          </html>
+		        ]]>
+		      </activiti:expression>
+		    </activiti:field>      
+		  </extensionElements>       
+      </serviceTask>
+      
+      <exclusiveGateway gatewayDirection="Converging" id="Exclusive_Databased_Gateway_3" name="Exclusive_Databased_Gateway" />
+
+      <endEvent id="EndNoneEvent_3" name="EndNoneEvent" />
+
+      <sequenceFlow id="SequenceFlow_2" name="SequenceFlow" sourceRef="new_tweet_3" targetRef="Review_Tweet_3">
+      </sequenceFlow>
+      <sequenceFlow id="SequenceFlow" name="SequenceFlow" sourceRef="Review_Tweet_3" targetRef="Approved__3">
+      </sequenceFlow>
+      <sequenceFlow id="SequenceFlow_3" name="SequenceFlow" sourceRef="Publish_on_Twitter_3" targetRef="Exclusive_Databased_Gateway_3">
+      </sequenceFlow>
+      <sequenceFlow id="SequenceFlow_4" name="SequenceFlow" sourceRef="Send_rejection_notification_via_email__3" targetRef="Exclusive_Databased_Gateway_3">
+      </sequenceFlow>
+      <sequenceFlow id="SequenceFlow_5" name="SequenceFlow" sourceRef="Exclusive_Databased_Gateway_3" targetRef="EndNoneEvent_3">
+      </sequenceFlow>
+      <sequenceFlow id="no" name="no" sourceRef="Approved__3" targetRef="Send_rejection_notification_via_email__3">
+         <conditionExpression id="sid-06cce917-fea4-4bb9-948d-0621e24a316d" xsi:type="tFormalExpression">#{!approved}</conditionExpression>
+      </sequenceFlow>
+      <sequenceFlow id="yes" isImmediate="false" name="yes" sourceRef="Approved__3" targetRef="Publish_on_Twitter_3">
+         <conditionExpression id="sid-a1b8cfbc-ccef-4ffb-9dc6-74df34ce01e5" xsi:type="tFormalExpression">#{approved}</conditionExpression>
+      </sequenceFlow>
+   </process>
+   <bpmndi:BPMNDiagram id="sid-20868fa9-8e2d-495d-ab41-ad1e2a96f1d2">
+      <bpmndi:BPMNPlane bpmnElement="TwitterDemoProcess" id="sid-29c849fc-d79f-4b29-9de5-73e189d109c3">
+         <bpmndi:BPMNShape bpmnElement="Review_Tweet_3" id="Review_Tweet_3_gui">
+            <omgdc:Bounds height="80.0" width="100.0" x="285.0" y="355.0"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape bpmnElement="Approved__3" id="Approved__3_gui" isMarkerVisible="true">
+            <omgdc:Bounds height="40.0" width="40.0" x="435.0" y="375.0"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape bpmnElement="Send_rejection_notification_via_email__3" id="Send_rejection_notification_via_email__3_gui">
+            <omgdc:Bounds height="80.0" width="100.0" x="540.0" y="285.0"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape bpmnElement="Publish_on_Twitter_3" id="Publish_on_Twitter_3_gui">
+            <omgdc:Bounds height="80.0" width="100.0" x="540.0" y="435.0"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape bpmnElement="Exclusive_Databased_Gateway_3" id="Exclusive_Databased_Gateway_3_gui" isMarkerVisible="true">
+            <omgdc:Bounds height="40.0" width="40.0" x="675.0" y="375.0"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape bpmnElement="EndNoneEvent_3" id="EndNoneEvent_3_gui">
+            <omgdc:Bounds height="28.0" width="28.0" x="830.0" y="381.0"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape bpmnElement="new_tweet_3" id="new_tweet_3_gui">
+            <omgdc:Bounds height="30.0" width="30.0" x="180.0" y="380.0"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNEdge bpmnElement="no" id="no_gui">
+            <omgdi:waypoint x="455.0" y="375.0"/>
+            <omgdi:waypoint x="455.5" y="325.0"/>
+            <omgdi:waypoint x="540.0" y="325.0"/>
+         </bpmndi:BPMNEdge>
+         <bpmndi:BPMNEdge bpmnElement="yes" id="yes_gui">
+            <omgdi:waypoint x="455.0" y="415.0"/>
+            <omgdi:waypoint x="455.5" y="475.0"/>
+            <omgdi:waypoint x="540.0" y="475.0"/>
+         </bpmndi:BPMNEdge>
+         <bpmndi:BPMNEdge bpmnElement="SequenceFlow" id="SequenceFlow_gui">
+            <omgdi:waypoint x="385.0" y="395.0"/>
+            <omgdi:waypoint x="435.0" y="395.0"/>
+         </bpmndi:BPMNEdge>
+         <bpmndi:BPMNEdge bpmnElement="SequenceFlow_4" id="SequenceFlow_4_gui">
+            <omgdi:waypoint x="640.0" y="325.0"/>
+            <omgdi:waypoint x="695.0" y="325.0"/>
+            <omgdi:waypoint x="695.0" y="375.0"/>
+         </bpmndi:BPMNEdge>
+         <bpmndi:BPMNEdge bpmnElement="SequenceFlow_5" id="SequenceFlow_5_gui">
+            <omgdi:waypoint x="715.0" y="395.0"/>
+            <omgdi:waypoint x="830.0" y="395.0"/>
+         </bpmndi:BPMNEdge>
+         <bpmndi:BPMNEdge bpmnElement="SequenceFlow_2" id="SequenceFlow_2_gui">
+            <omgdi:waypoint x="210.0" y="395.0"/>
+            <omgdi:waypoint x="285.0" y="395.0"/>
+         </bpmndi:BPMNEdge>
+         <bpmndi:BPMNEdge bpmnElement="SequenceFlow_3" id="SequenceFlow_3_gui">
+            <omgdi:waypoint x="640.0" y="475.0"/>
+            <omgdi:waypoint x="695.5" y="475.0"/>
+            <omgdi:waypoint x="695.0" y="415.0"/>
+         </bpmndi:BPMNEdge>
+      </bpmndi:BPMNPlane>
+   </bpmndi:BPMNDiagram>
+</definitions>

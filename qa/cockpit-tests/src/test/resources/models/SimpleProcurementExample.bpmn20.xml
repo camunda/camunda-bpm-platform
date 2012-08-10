@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns:activiti="http://activiti.org/bpmn" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:signavio="http://www.signavio.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" exporter="Signavio Process Editor, http://www.signavio.com" exporterVersion="" id="sid-be637f65-bfcf-4a9a-af36-e7a9dbdc11ae" targetNamespace="http://www.signavio.com/bpmn20" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/2.0/20100501/BPMN20.xsd">
+   <process id="SimpleProcurementExample" isExecutable="true" name="SimpleProcurementExample">
+      
+      <startEvent id="Material_required_3" name="Material required" />
+
+      <sequenceFlow id="SequenceFlow_6" name="SequenceFlow" sourceRef="Material_required_3" targetRef="Select_articles_and_create_order_3" />
+      
+      <userTask id="Select_articles_and_create_order_3" name="Select articles and create order" />
+
+      <sequenceFlow id="SequenceFlow" name="SequenceFlow" sourceRef="Select_articles_and_create_order_3" targetRef="send_order_3" />
+      
+      <serviceTask id="send_order_3" name="send order" activiti:class="com.camunda.fox.psi.binding.activiti.ExecuteServiceAdapterDelegate">
+	      <extensionElements>
+	      	<activiti:field name="configuration"><activiti:string>
+	      		<![CDATA[
+	      		  <config>
+					<serviceRequestAdapter class="com.camunda.fox.demo.psi.supplierorder.process.SendOrderServiceRequestAdapter" />
+				  </config>	      	
+	      		]]>
+	      	</activiti:string></activiti:field>      
+    	  </extensionElements>
+      </serviceTask>
+      
+      <sequenceFlow id="SequenceFlow_3" name="SequenceFlow" sourceRef="send_order_3" targetRef="Print_and_archive_order_3" />
+      
+      <userTask id="Print_and_archive_order_3" name="Print and archive order" activiti:assignee="kermit" />
+
+      <sequenceFlow id="SequenceFlow_4" name="SequenceFlow" sourceRef="Print_and_archive_order_3" targetRef="receive_order_confirmation_3" />
+      
+      <serviceTask id="receive_order_confirmation_3" name="receive order confirmation" activiti:class="com.camunda.fox.psi.binding.activiti.ExecuteServiceAdapterDelegate">
+	      <extensionElements>
+	      	<activiti:field name="configuration"><activiti:expression>
+	      		<![CDATA[
+	      		  <config>
+					<serviceResponseAdapter class="com.camunda.fox.demo.psi.supplierorder.process.SendOrderServiceResponseAdapter" />
+	      		  </config>
+	      		]]>
+	      	</activiti:expression></activiti:field>      
+    	  </extensionElements>
+      </serviceTask>
+      
+      <sequenceFlow id="SequenceFlow_2" name="SequenceFlow" sourceRef="receive_order_confirmation_3" targetRef="Insert_order_data_into_ERP_3" />
+      
+      <serviceTask id="Insert_order_data_into_ERP_3" name="Insert order data into ERP" activiti:class="com.camunda.fox.psi.binding.activiti.ExecuteServiceAdapterDelegate">
+	      <extensionElements>
+	      	<activiti:field name="configuration"><activiti:expression>
+	      		<![CDATA[
+	      		   <config>
+					 <serviceRequestAdapter class="com.camunda.fox.demo.psi.supplierorder.process.CreateOrderInErpServiceAdapter" />
+				   </config>
+	      		]]>
+	      	</activiti:expression></activiti:field>      
+    	  </extensionElements>
+      </serviceTask>
+      
+      <sequenceFlow id="SequenceFlow_5" name="SequenceFlow" sourceRef="Insert_order_data_into_ERP_3" targetRef="EndNoneEvent_3" />
+      
+      <endEvent id="EndNoneEvent_3" name="EndNoneEvent" />
+   </process>
+
+   <bpmndi:BPMNDiagram id="sid-641ae91c-0890-4ee2-81ef-669e085376b2">
+      <bpmndi:BPMNPlane bpmnElement="SimpleProcurementExample" id="sid-6059c51a-d31e-4118-b7d1-6f4dbe6df8c3">
+         <bpmndi:BPMNShape bpmnElement="send_order_3" id="send_order_3_gui">
+            <omgdc:Bounds height="30.0" width="30.0" x="395.0" y="285.0"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape bpmnElement="Print_and_archive_order_3" id="Print_and_archive_order_3_gui">
+            <omgdc:Bounds height="80.0" width="100.0" x="485.0" y="260.0"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape bpmnElement="receive_order_confirmation_3" id="receive_order_confirmation_3_gui">
+            <omgdc:Bounds height="30.0" width="30.0" x="647.0" y="285.0"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape bpmnElement="Insert_order_data_into_ERP_3" id="Insert_order_data_into_ERP_3_gui">
+            <omgdc:Bounds height="80.0" width="100.0" x="740.0" y="260.0"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape bpmnElement="EndNoneEvent_3" id="EndNoneEvent_3_gui">
+            <omgdc:Bounds height="28.0" width="28.0" x="905.0" y="286.0"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape bpmnElement="Material_required_3" id="Material_required_3_gui">
+            <omgdc:Bounds height="30.0" width="30.0" x="180.0" y="285.0"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape bpmnElement="Select_articles_and_create_order_3" id="Select_articles_and_create_order_3_gui">
+            <omgdc:Bounds height="80.0" width="100.0" x="245.0" y="260.0"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNEdge bpmnElement="SequenceFlow" id="SequenceFlow_gui">
+            <omgdi:waypoint x="345.0" y="300.0"/>
+            <omgdi:waypoint x="395.0" y="300.0"/>
+         </bpmndi:BPMNEdge>
+         <bpmndi:BPMNEdge bpmnElement="SequenceFlow_6" id="SequenceFlow_6_gui">
+            <omgdi:waypoint x="210.0" y="300.0"/>
+            <omgdi:waypoint x="245.0" y="300.0"/>
+         </bpmndi:BPMNEdge>
+         <bpmndi:BPMNEdge bpmnElement="SequenceFlow_4" id="SequenceFlow_4_gui">
+            <omgdi:waypoint x="585.0" y="300.0"/>
+            <omgdi:waypoint x="647.0" y="300.0"/>
+         </bpmndi:BPMNEdge>
+         <bpmndi:BPMNEdge bpmnElement="SequenceFlow_5" id="SequenceFlow_5_gui">
+            <omgdi:waypoint x="840.0" y="300.0"/>
+            <omgdi:waypoint x="905.0" y="300.0"/>
+         </bpmndi:BPMNEdge>
+         <bpmndi:BPMNEdge bpmnElement="SequenceFlow_2" id="SequenceFlow_2_gui">
+            <omgdi:waypoint x="677.0" y="300.0"/>
+            <omgdi:waypoint x="740.0" y="300.0"/>
+         </bpmndi:BPMNEdge>
+         <bpmndi:BPMNEdge bpmnElement="SequenceFlow_3" id="SequenceFlow_3_gui">
+            <omgdi:waypoint x="425.0" y="300.0"/>
+            <omgdi:waypoint x="485.0" y="300.0"/>
+         </bpmndi:BPMNEdge>
+      </bpmndi:BPMNPlane>
+   </bpmndi:BPMNDiagram>
+</definitions>

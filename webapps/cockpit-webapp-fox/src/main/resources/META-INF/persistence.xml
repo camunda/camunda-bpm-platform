@@ -3,7 +3,6 @@
 
   <persistence-unit name="fox-cockpit" transaction-type="JTA">
     <jta-data-source>java:${persistence.ds.name}</jta-data-source>
-    <!-- <non-jta-data-source>java:${persistence.ds.name}</non-jta-data-source> -->
     <class>com.camunda.fox.cockpit.entity.CockpitItem</class>
     <class>com.camunda.fox.cockpit.entity.CockpitUser</class>
     <class>com.camunda.fox.cockpit.entity.CockpitPermission</class>
