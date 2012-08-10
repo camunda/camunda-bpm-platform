@@ -2,7 +2,7 @@ package com.camunda.fox.cockpit.engine.spi.impl;
 
 import com.camunda.fox.cockpit.engine.spi.ProcessEngineServicesProvider;
 import com.camunda.fox.cockpit.engine.spi.ProcessEngines;
-import com.camunda.fox.cockpit.persistence.CockpitQueryCommandExecutor;
+import com.camunda.fox.cockpit.persistence.CockpitCommandExecutor;
 import java.io.Serializable;
 import javax.enterprise.context.RequestScoped;
 import javax.enterprise.context.SessionScoped;
@@ -21,7 +21,7 @@ public class PlatformProcessEngineServicesProvider implements ProcessEngineServi
   private ProcessEngines processEnginesProvider;
   
   protected ProcessEngine engine; 
-  protected CockpitQueryCommandExecutor executor;
+  protected CockpitCommandExecutor executor;
   
   @Override
   public ProcessEngine getProcessEngine() {
@@ -43,7 +43,7 @@ public class PlatformProcessEngineServicesProvider implements ProcessEngineServi
   
   @Produces
   @RequestScoped
-  public CockpitQueryCommandExecutor getCockpitCommandExecutor() {
+  public CockpitCommandExecutor getCockpitCommandExecutor() {
     if (executor == null) {
       initUsing(getDefaultProcessEngine());
     }
@@ -56,7 +56,7 @@ public class PlatformProcessEngineServicesProvider implements ProcessEngineServi
   
   private void initUsing(ProcessEngine engine) {
     this.engine = engine;
-    this.executor = CockpitQueryCommandExecutor.createFromEngine(engine);
+    this.executor = CockpitCommandExecutor.createFromEngine(engine);
   }
 
   @Override
