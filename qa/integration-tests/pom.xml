@@ -341,6 +341,29 @@
       </build>
     </profile>
     <profile>
+      <id>integration</id>
+      <build>
+        <testResources>
+          <testResource>
+            <directory>src/test/resources</directory>
+            <filtering>true</filtering>
+            <includes>
+              <include>**/*.xml</include>
+              <include>**/*.properties</include>
+            </includes>
+          </testResource>
+          <testResource>
+            <directory>src/test/resources-jboss-integration</directory>
+            <filtering>true</filtering>
+            <includes>
+              <include>**/*.xml</include>
+              <include>**/*.properties</include>
+            </includes>
+          </testResource>
+        </testResources>
+      </build>
+    </profile>
+    <profile>
       <id>default</id>
       <activation>
         <activeByDefault>true</activeByDefault>
