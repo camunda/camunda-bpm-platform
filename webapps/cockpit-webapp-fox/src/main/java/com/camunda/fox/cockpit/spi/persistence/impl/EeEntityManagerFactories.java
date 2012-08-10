@@ -1,6 +1,7 @@
-package com.camunda.fox.cockpit.persistence;
+package com.camunda.fox.cockpit.spi.persistence.impl;
 
-import javax.enterprise.inject.Specializes;
+import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.inject.Produces;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceUnit;
@@ -9,8 +10,8 @@ import javax.persistence.PersistenceUnit;
  *
  * @author nico.rehwaldt
  */
-@Specializes
-public class EeEntityManagerFactories extends CockpitEntityManagerFactories {
+@ApplicationScoped
+public class EeEntityManagerFactories {
 
   @PersistenceUnit(unitName="fox-cockpit")
   private EntityManagerFactory cockpitEntityManagerFactory;
@@ -19,14 +20,9 @@ public class EeEntityManagerFactories extends CockpitEntityManagerFactories {
     return cockpitEntityManagerFactory.createEntityManager();
   }
 
-  @Override
-  @Specializes
+  @Produces
+  @ApplicationScoped
   public EntityManagerFactory getDefaultEntityManagerFactory() {
     return cockpitEntityManagerFactory;
-  }
-
-  @Override
-  public synchronized void close() {
-    ; // managed do not close
   }
 }

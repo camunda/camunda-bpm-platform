@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd" targetNamespace="http://www.activiti.org/test">
+  <process id="ImmediatelyFailing" name="ImmediatelyFailing">
+    <startEvent id="startevent1" name="Start">
+      <outgoing>flow1</outgoing>
+    </startEvent>
+    <endEvent id="endevent1" name="End">
+      <incoming>flow2</incoming>
+      <incoming>flow4</incoming>
+    </endEvent>
+    <userTask id="usertask1" activiti:assignee="Kermit" name="User Task">
+      <incoming>SequenceFlow_1</incoming>
+      <outgoing>flow2</outgoing>
+    </userTask>
+    <sequenceFlow id="flow1" name="" sourceRef="startevent1" targetRef="ServiceTask_1"/>
+    <sequenceFlow id="flow2" name="" sourceRef="usertask1" targetRef="endevent1"/>
+    <boundaryEvent id="boundarytimer1" name="" attachedToRef="usertask1">
+      <outgoing>flow5</outgoing>
+      <timerEventDefinition id="TimerEventDefinition_1">
+        <timeDuration xsi:type="tFormalExpression" id="Expression_1">PT10S</timeDuration>
+      </timerEventDefinition>
+    </boundaryEvent>
+    <serviceTask id="servicetask1" activiti:class="com.camunda.fox.cockpit.test.delegate.TestDelegate" name="Do Something">
+      <extensionElements>
+        <activiti:field name="fail">
+          <activiti:string>true</activiti:string>
+        </activiti:field>
+      </extensionElements>
+      <incoming>flow5</incoming>
+      <outgoing>flow4</outgoing>
+      <outgoing>flow6</outgoing>
+    </serviceTask>
+    <sequenceFlow id="flow4" name="" sourceRef="servicetask1" targetRef="endevent1"/>
+    <sequenceFlow id="flow5" name="" sourceRef="boundarytimer1" targetRef="servicetask1"/>
+    <endEvent id="endevent2" name="End">
+      <incoming>flow6</incoming>
+    </endEvent>
+    <sequenceFlow id="flow6" name="" sourceRef="servicetask1" targetRef="endevent2"/>
+    <serviceTask id="ServiceTask_1" activiti:class="com.camunda.fox.cockpit.test.delegate.TestDelegate" name="Service Task" implementation="##unspecified">
+      <incoming>flow1</incoming>
+      <outgoing>SequenceFlow_1</outgoing>
+    </serviceTask>
+    <sequenceFlow id="SequenceFlow_1" name="" sourceRef="ServiceTask_1" targetRef="usertask1"/>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_ImmediatelyFailing">
+    <bpmndi:BPMNPlane id="BPMNPlane_ImmediatelyFailing" bpmnElement="ImmediatelyFailing">
+      <bpmndi:BPMNShape id="BPMNShape_startevent1" bpmnElement="startevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="59.0" y="292.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_endevent1" bpmnElement="endevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="550.0" y="270.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_usertask1" bpmnElement="usertask1">
+        <omgdc:Bounds height="55.0" width="105.0" x="352.0" y="283.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_boundarytimer1" bpmnElement="boundarytimer1">
+        <omgdc:Bounds height="35.0" width="30.0" x="422.0" y="264.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_servicetask1" bpmnElement="servicetask1">
+        <omgdc:Bounds height="55.0" width="105.0" x="378.0" y="130.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_endevent2" bpmnElement="endevent2">
+        <omgdc:Bounds height="35.0" width="35.0" x="538.0" y="140.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow1" bpmnElement="flow1" sourceElement="BPMNShape_startevent1" targetElement="BPMNShape_ServiceTask_1">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="94.0" y="309.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="180.0" y="308.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow2" bpmnElement="flow2" sourceElement="BPMNShape_usertask1" targetElement="BPMNShape_endevent1">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="457.0" y="310.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="550.0" y="287.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow4" bpmnElement="flow4" sourceElement="BPMNShape_servicetask1" targetElement="BPMNShape_endevent1">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="483.0" y="157.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="567.0" y="270.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow5" bpmnElement="flow5" sourceElement="BPMNShape_boundarytimer1" targetElement="BPMNShape_servicetask1">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="422.0" y="281.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="304.0" y="157.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="378.0" y="157.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_flow6" bpmnElement="flow6" sourceElement="BPMNShape_servicetask1" targetElement="BPMNShape_endevent2">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="483.0" y="157.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="538.0" y="157.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="BPMNShape_ServiceTask_1" bpmnElement="ServiceTask_1">
+        <omgdc:Bounds height="55.0" width="105.0" x="180.0" y="281.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_1" bpmnElement="SequenceFlow_1" sourceElement="BPMNShape_ServiceTask_1" targetElement="BPMNShape_usertask1">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="285.0" y="308.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="352.0" y="310.0"/>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>
