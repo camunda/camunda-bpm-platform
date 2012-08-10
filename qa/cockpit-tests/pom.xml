@@ -10,6 +10,10 @@
     <version>6.1.0-SNAPSHOT</version>
   </parent>
   
+  <properties>
+    <version.fox.commons>${project.version}</version.fox.commons>
+  </properties>
+  
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
@@ -21,20 +25,6 @@
       <groupId>com.camunda.fox.test.arquillian</groupId>
       <artifactId>fox-deployer</artifactId>
       <version>1.0-SNAPSHOT</version>
-      <exclusions>
-        <exclusion>
-          <artifactId>shrinkwrap-impl-base</artifactId>
-          <groupId>org.jboss.shrinkwrap</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>shrinkwrap-api</artifactId>
-          <groupId>org.jboss.shrinkwrap</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>shrinkwrap-descriptors-api-base</artifactId>
-          <groupId>org.jboss.shrinkwrap.descriptors</groupId>
-        </exclusion>
-      </exclusions>
     </dependency>
     
     <dependency>
@@ -56,7 +46,7 @@
       <groupId>com.camunda.fox.cockpit</groupId>
       <artifactId>cockpit-core</artifactId>
       <version>${project.version}</version>
-      <type>test-jar</type>
+      <classifier>test-sources</classifier>
       <scope>test</scope>
     </dependency>
     
@@ -71,28 +61,24 @@
     <dependency>
       <groupId>com.camunda.fox.commons</groupId>
       <artifactId>commons-cdi-utils</artifactId>
-      <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
     
     <dependency>
       <groupId>com.camunda.fox.commons</groupId>
       <artifactId>commons-transactions-core</artifactId>
-      <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
     
     <dependency>
       <groupId>com.camunda.fox.commons</groupId>
       <artifactId>commons-transactions-jta</artifactId>
-      <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
     
     <dependency>
       <groupId>com.camunda.fox.commons</groupId>
       <artifactId>commons-transactions-core</artifactId>
-      <version>${project.version}</version>
       <type>test-jar</type>
       <scope>test</scope>
     </dependency>
@@ -100,7 +86,6 @@
     <dependency>
       <groupId>com.camunda.fox.commons</groupId>
       <artifactId>commons-security-api</artifactId>
-      <version>${project.version}</version>
       <scope>test</scope>
     </dependency>
     
@@ -121,7 +106,6 @@
     <dependency>
       <groupId>org.jboss.arquillian.junit</groupId>
       <artifactId>arquillian-junit-container</artifactId>
-      <version>${version.arquillian}</version>
       <scope>test</scope>
     </dependency>
     
@@ -137,33 +121,51 @@
       <scope>provided</scope>
     </dependency>
     
-     <dependency>
+    <dependency>
       <groupId>com.camunda.fox.platform</groupId>
       <artifactId>fox-platform-ext-config</artifactId>
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.jboss.shrinkwrap</groupId>
-      <artifactId>shrinkwrap-impl-base</artifactId>
-      <version>1.0.1</version>
-    </dependency>
-    <dependency>
-      <groupId>org.jboss.shrinkwrap</groupId>
-      <artifactId>shrinkwrap-api</artifactId>
-      <version>1.0.0</version>
-    </dependency>
-    <dependency>
       <groupId>org.jboss.remoting3</groupId>
       <artifactId>jboss-remoting</artifactId>
-      <version>3.2.2.GA</version>
+      <version>3.2.3.GA</version>
     </dependency>
     <dependency>
-      <groupId>org.jboss.shrinkwrap.descriptors</groupId>
-      <artifactId>shrinkwrap-descriptors-api-base</artifactId>
-      <version>2.0.0-alpha-3</version>
+      <groupId>org.jboss.xnio</groupId>
+      <artifactId>xnio-api</artifactId>
+      <version>3.0.3.GA</version>
+      <exclusions>
+        <exclusion>
+          <artifactId>xnio-api</artifactId>
+          <groupId>org.jboss.xnio</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.as</groupId>
+      <artifactId>jboss-as-build-config</artifactId>
+      <version>7.1.1.Final</version>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.marshalling</groupId>
+      <artifactId>jboss-marshalling</artifactId>
+      <version>1.3.11.GA</version>
     </dependency>
   </dependencies>
 
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>com.camunda.fox.commons</groupId>
+        <artifactId>commons-bom</artifactId>
+        <version>${version.fox.commons}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+  
   <build>
     <testResources>
       <testResource>
@@ -176,25 +178,70 @@
           <include>**/*.jpg</include>
         </includes>
       </testResource>
+      <testResource>
+        <directory>${project.build.directory}/generated-test-sources/cockpit-core-tests/resources</directory>
+      </testResource>
     </testResources>
     <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <version>1.7</version>
+        <executions>
+          <execution>
+            <id>add-test-source</id>
+            <phase>generate-test-sources</phase>
+            <goals>
+              <goal>add-test-source</goal>
+            </goals>
+            <configuration>
+              <sources>
+                <source>${project.build.directory}/generated-test-sources/cockpit-core-tests/src</source>
+              </sources>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
         <version>2.5</version>
         <executions>
           <execution>
-            <id>unpack-tests</id>
-            <phase>process-test-resources</phase>
+            <id>unpack-test-sources</id>
+            <phase>generate-test-sources</phase>
             <goals>
-              <goal>copy</goal>
+              <goal>unpack</goal>
             </goals>
             <configuration>
+              <outputDirectory>${project.build.directory}/generated-test-sources/cockpit-core-tests/src</outputDirectory>
+              <includes>**/*.java</includes>
               <artifactItems>
                 <artifactItem>
                   <groupId>com.camunda.fox.cockpit</groupId>
                   <artifactId>cockpit-core</artifactId>
-                  <type>test-jar</type>
+                  <classifier>test-sources</classifier>
+                  <type>jar</type>
+                </artifactItem>
+              </artifactItems>
+              <!-- other configurations here -->
+            </configuration>
+          </execution>
+          <execution>
+            <id>unpack-test-resources</id>
+            <phase>generate-test-sources</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}/generated-test-sources/cockpit-core-tests/resources</outputDirectory>
+              <excludes>**/*.java</excludes>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>com.camunda.fox.cockpit</groupId>
+                  <artifactId>cockpit-core</artifactId>
+                  <classifier>test-sources</classifier>
+                  <type>jar</type>
                 </artifactItem>
               </artifactItems>
               <!-- other configurations here -->
@@ -252,35 +299,16 @@
         <dependency>
           <groupId>org.jboss.as</groupId>
           <artifactId>jboss-as-arquillian-container-managed</artifactId>
-          <version>${version.jboss.as}</version>
+          <version>7.1.1.Final</version>
           <scope>test</scope>
         </dependency>
         <dependency>
           <groupId>org.jboss.arquillian.protocol</groupId>
           <artifactId>arquillian-protocol-servlet</artifactId>
-          <version>${version.arquillian}</version>
+          <version>1.0.1.Final</version>
           <scope>test</scope>
         </dependency>
       </dependencies>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <version>2.12</version>
-            <configuration>
-              <excludes>
-                <!-- HEMERA-2453 -->
-                <exclude>**/JobExecutorRequestContextRemoteInvocationTest.java</exclude>
-                <!-- HEMERA-2453 -->
-                <exclude>**/JobExecutorRequestContextLocalInvocationTest.java</exclude>
-                <!-- HEMERA-2467 -->
-                <exclude>**/ejb/remote/*</exclude>
-              </excludes>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
     </profile>
     <profile>
       <id>jboss-remote</id>
@@ -390,7 +418,7 @@
                 <exclude>**/JobExecutorRequestContextSFSBDelegateTest.java</exclude>
                 <!-- NOT Implemented -->
                 <exclude>**/JobExecutorRequestContextLocalInvocationTest.java</exclude>
-                 <!-- NOT Implemented -->
+                <!-- NOT Implemented -->
                 <exclude>**/ejb/local/*</exclude>
               </excludes>
             </configuration>
@@ -487,8 +515,8 @@
     </profile>
     <profile>
       <!-- This profile is used by the ci server. The maven build on the 
-        ci server uses a local maven repository. This allows us to give the arquillian 
-        maven resolver access to the artifacts produced by this build. -->
+      ci server uses a local maven repository. This allows us to give the arquillian 
+      maven resolver access to the artifacts produced by this build. -->
       <id>ci</id>
       <build>
         <plugins>

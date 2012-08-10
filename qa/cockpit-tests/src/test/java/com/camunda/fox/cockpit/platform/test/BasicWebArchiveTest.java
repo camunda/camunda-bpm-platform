@@ -60,13 +60,12 @@ public class BasicWebArchiveTest extends CockpitTestBase {
     "models/MyProcess.bpmn20.xml",
     "models/BusinessProcessBeanTest.test.bpmn20.xml",
     "models/SimpleProcurementExample.bpmn20.xml",
-    "models/TwitterDemoProcess.bpmn20.xml",
     "models/ImmediatelyFinishing.bpmn20.xml",
     "models/ImmediatelyFailing.bpmn20.xml"
   })
   public void testInjection() throws Exception {
     assertEquals(1, processEngine.getRepositoryService().createDeploymentQuery().count());
-    assertEquals(7, processEngine.getRepositoryService().createProcessDefinitionQuery().count());
+    assertEquals(6, processEngine.getRepositoryService().createProcessDefinitionQuery().count());
   }
   
   private <T> T lookup(Class<T> cls) {
