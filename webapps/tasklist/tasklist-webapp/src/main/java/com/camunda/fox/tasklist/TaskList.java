@@ -172,7 +172,8 @@ public class TaskList implements Serializable {
       String callbackUrl = getRequestURL();
       return "../.." + contextPath + "/" + formKey + ".jsf?" + urlParameters + "&callbackUrl=" + callbackUrl;
     } catch (Exception ex) {
-      log.log(Level.INFO, "Could not resolve context path for process definition " + processDefinitionId, ex);
+      log.log(Level.INFO, "Could not resolve context path for process definition " + processDefinitionId);
+      log.log(Level.FINER, "Could not resolve context path for process definition " + processDefinitionId, ex);
       return null;
     }
 

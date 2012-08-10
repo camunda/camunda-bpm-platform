@@ -316,9 +316,9 @@
                     <history-level>full</history-level>
                     <properties>
                         <property name="jobExecutorAcquisitionName">default</property>
-                        <property name="isAutoSchemaUpdate">true</property>                    	
+                        <property name="isAutoSchemaUpdate">true</property>	                    
                     </properties>
-                </process-engine>
+                </process-engine> 
             </process-engines>
             <job-executor>
                 <thread-pool-name>job-executor-tp</thread-pool-name>

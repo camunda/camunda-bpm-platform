@@ -75,7 +75,7 @@ public abstract class AbstractFoxPlatformIntegrationTest {
               .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
               .addAsLibraries(DeploymentHelper.getFoxPlatformClient())
               .addAsResource("META-INF/processes.xml", "META-INF/processes.xml")
-              .addClass(AbstractFoxPlatformIntegrationTest.class);    
+              .addClass(AbstractFoxPlatformIntegrationTest.class);
   }
   
   public static WebArchive initWebArchiveDeployment() {
@@ -121,7 +121,7 @@ public abstract class AbstractFoxPlatformIntegrationTest {
   public void waitForJobExecutorToProcessAllJobs(long maxMillisToWait, long intervalMillis) {
     JobExecutor jobExecutor = processEngineConfiguration.getJobExecutor();
     jobExecutor.start();
-
+    
     try {
       Timer timer = new Timer();
       InteruptTask task = new InteruptTask(Thread.currentThread());
