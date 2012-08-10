@@ -17,6 +17,8 @@
 		<module>integration-tests</module>
 		<module>tasklist-gui-tests</module>
 		<module>test-process-application</module>
+		<module>test-deployer</module>
+		<module>cockpit-tests</module>
 	</modules>
 	
 	<profiles>

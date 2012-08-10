@@ -6,6 +6,8 @@ build.properties
 bin
 .metadata
 transaction.log
-nbactions.xml
+nbactions*.xml
+nb-configuration.xml
 /webapps/fox-platform-tasklist/server-work
 dependency-reduced-pom.xml
+faces-config.NavData
