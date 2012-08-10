@@ -9,6 +9,7 @@ import org.activiti.engine.impl.util.IoUtil;
 import com.camunda.fox.cockpit.demo.DemoDataDeployer;
 import com.camunda.fox.platform.spi.ProcessArchive;
 import com.camunda.fox.platform.spi.ProcessArchiveCallback;
+import java.util.Random;
 
 public class DemoDataProcessArchiveImpl implements ProcessArchive {
 
@@ -26,7 +27,7 @@ public class DemoDataProcessArchiveImpl implements ProcessArchive {
   }
     
   public String getName() {
-    return "COCKPIT_DEMO_PROCESSES";
+    return "cockpit-demo-processes" + new Random().nextInt(50000);
   }
 
   public Map<String, byte[]> getProcessResources() {

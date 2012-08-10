@@ -21,11 +21,11 @@
     <module>jbossas71</module>
     <module>gf31</module>
     <module>webapps/h2-webapp</module>
-    <module>webapps/explorer</module>
     <module>webapps/cockpit-webapp-fox</module>
     <module>webapps/cockpit-webapp-fox-glassfish</module>
     <module>webapps/tasklist</module>
     <module>jobexecutor</module>
+    <module>sql-script</module>
     <!--  module>ibmWs8</module -->
   </modules>
   
