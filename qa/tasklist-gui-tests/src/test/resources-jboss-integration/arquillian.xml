@@ -3,7 +3,12 @@
             xsi:schemaLocation="http://jboss.org/schema/arquillian http://jboss.org/schema/arquillian/arquillian-1.0.xsd">
 
   <defaultProtocol type="Servlet 3.0" />
-  
+
   <container qualifier="jboss" default="true">
+    <configuration>
+      <property name="jbossHome">../jboss7-runtime/target/jboss-as-${version.jboss.as}/</property>
+      <property name="managementPort">21019</property>
+      <property name="serverConfig">${jboss.standalone.xml}</property>
+    </configuration>
   </container>
 </arquillian>

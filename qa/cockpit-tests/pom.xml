@@ -171,12 +171,6 @@
       <testResource>
         <directory>src/test/resources</directory>
         <filtering>true</filtering>
-        <includes>
-          <include>**/*.xml</include>
-          <include>**/*.properties</include>
-          <include>**/*.png</include>
-          <include>**/*.jpg</include>
-        </includes>
       </testResource>
       <testResource>
         <directory>${project.build.directory}/generated-test-sources/cockpit-core-tests/resources</directory>
@@ -468,18 +462,10 @@
           <testResource>
             <directory>src/test/resources</directory>
             <filtering>true</filtering>
-            <includes>
-              <include>**/*.xml</include>
-              <include>**/*.properties</include>
-            </includes>
           </testResource>
           <testResource>
             <directory>src/test/resources-jboss-mysql</directory>
             <filtering>true</filtering>
-            <includes>
-              <include>**/*.xml</include>
-              <include>**/*.properties</include>
-            </includes>
           </testResource>
         </testResources>
       </build>
@@ -491,18 +477,25 @@
           <testResource>
             <directory>src/test/resources</directory>
             <filtering>true</filtering>
-            <includes>
-              <include>**/*.xml</include>
-              <include>**/*.properties</include>
-            </includes>
           </testResource>
           <testResource>
             <directory>src/test/resources-jboss-db2</directory>
             <filtering>true</filtering>
-            <includes>
-              <include>**/*.xml</include>
-              <include>**/*.properties</include>
-            </includes>
+          </testResource>
+        </testResources>
+      </build>
+    </profile>
+    <profile>
+      <id>integration</id>
+      <build>
+        <testResources>
+          <testResource>
+            <directory>src/test/resources</directory>
+            <filtering>true</filtering>
+          </testResource>
+          <testResource>
+            <directory>src/test/resources-jboss-integration</directory>
+            <filtering>true</filtering>
           </testResource>
         </testResources>
       </build>
