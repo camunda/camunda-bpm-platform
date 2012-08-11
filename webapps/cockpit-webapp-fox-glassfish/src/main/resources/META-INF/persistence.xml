@@ -17,20 +17,4 @@
       <property name="eclipselink.ddl-generation.output-mode"	value="database" />			
     </properties>
   </persistence-unit>
-  <persistence-unit name="fox-engine" transaction-type="JTA">
-    <jta-data-source>${persistence.ds.name}</jta-data-source>
-    <class>com.camunda.fox.jpa.entity.ExecutionEntity</class>
-    <class>com.camunda.fox.jpa.entity.VariableEntity</class>
-    <class>com.camunda.fox.jpa.entity.ByteArrayEntity</class>
-    <class>com.camunda.fox.jpa.entity.JobEntity</class>
-    <class>com.camunda.fox.jpa.entity.HistoricProcessInstanceEntity</class>
-    <class>com.camunda.fox.jpa.entity.HistoricActivityEntity</class>
-    <class>com.camunda.fox.jpa.entity.HistoricDetailEntity</class>
-    <class>com.camunda.fox.jpa.entity.ProcessDefinitionEntity</class>
-    
-    <properties>		
-      <!-- this is a read only operating persistence unit -->
-      <property name="eclipselink.ddl-generation" value="none" />
-    </properties>
-  </persistence-unit>
 </persistence>
