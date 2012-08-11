@@ -1,14 +1,17 @@
 package com.camunda.fox.cockpit.spi.engine.impl;
 
-import com.camunda.fox.cockpit.spi.engine.ConfigurableProcessEngineLookup;
-import com.camunda.fox.cockpit.spi.engine.ProcessEngines;
-import com.camunda.fox.cockpit.persistence.CockpitQueryCommandExecutor;
 import java.io.Serializable;
+
 import javax.enterprise.context.RequestScoped;
 import javax.enterprise.context.SessionScoped;
 import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
+
 import org.activiti.engine.ProcessEngine;
+
+import com.camunda.fox.cockpit.persistence.CockpitCommandExecutor;
+import com.camunda.fox.cockpit.spi.engine.ConfigurableProcessEngineLookup;
+import com.camunda.fox.cockpit.spi.engine.ProcessEngines;
 
 /**
  *
@@ -21,7 +24,7 @@ public class PlatformProcessEngineLookup implements ConfigurableProcessEngineLoo
   private ProcessEngines processEnginesProvider;
   
   protected ProcessEngine engine; 
-  protected CockpitQueryCommandExecutor executor;
+  protected CockpitCommandExecutor executor;
   
   @Override
   public ProcessEngine getProcessEngine() {
@@ -43,7 +46,7 @@ public class PlatformProcessEngineLookup implements ConfigurableProcessEngineLoo
   
   @Produces
   @RequestScoped
-  public CockpitQueryCommandExecutor getCockpitCommandExecutor() {
+  public CockpitCommandExecutor getCockpitCommandExecutor() {
     if (executor == null) {
       initUsing(getDefaultProcessEngine());
     }
@@ -56,7 +59,7 @@ public class PlatformProcessEngineLookup implements ConfigurableProcessEngineLoo
   
   private void initUsing(ProcessEngine engine) {
     this.engine = engine;
-    this.executor = CockpitQueryCommandExecutor.createFromEngine(engine);
+    this.executor = CockpitCommandExecutor.createFromEngine(engine);
   }
 
   @Override
