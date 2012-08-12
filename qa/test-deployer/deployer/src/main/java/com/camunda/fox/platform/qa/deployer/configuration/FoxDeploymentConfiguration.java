@@ -21,6 +21,8 @@ public class FoxDeploymentConfiguration implements Serializable {
 
   private String processEngineName = "default";
   
+  private boolean bundleActivitiCdi = false;
+  
   public void setExtensionArchiveJndiPrefix(String applicationArchiveName) {
     this.extensionArchiveJndiPrefix = applicationArchiveName;
   }
@@ -35,5 +37,13 @@ public class FoxDeploymentConfiguration implements Serializable {
 
   public void setProcessEngineName(String processEngineName) {
     this.processEngineName = processEngineName;
+  }
+
+  public boolean isBundleActivitiCdi() {
+    return bundleActivitiCdi;
+  }
+
+  public void setBundleActivitiCdi(boolean bundleActivitiCdi) {
+    this.bundleActivitiCdi = bundleActivitiCdi;
   }
 }

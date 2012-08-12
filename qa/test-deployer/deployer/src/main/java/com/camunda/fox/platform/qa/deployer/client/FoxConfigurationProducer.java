@@ -1,7 +1,5 @@
 package com.camunda.fox.platform.qa.deployer.client;
 
-import com.camunda.fox.platform.qa.deployer.configuration.ConfigurationImporter;
-import com.camunda.fox.platform.qa.deployer.configuration.FoxConfiguration;
 import org.jboss.arquillian.config.descriptor.api.ArquillianDescriptor;
 import org.jboss.arquillian.core.api.Instance;
 import org.jboss.arquillian.core.api.InstanceProducer;
@@ -9,6 +7,9 @@ import org.jboss.arquillian.core.api.annotation.ApplicationScoped;
 import org.jboss.arquillian.core.api.annotation.Inject;
 import org.jboss.arquillian.core.api.annotation.Observes;
 import org.jboss.arquillian.test.spi.event.suite.BeforeSuite;
+
+import com.camunda.fox.platform.qa.deployer.configuration.ConfigurationImporter;
+import com.camunda.fox.platform.qa.deployer.configuration.FoxConfiguration;
 
 /**
  *
