@@ -1,10 +1,5 @@
 package com.camunda.fox.platform.qa.deployer.deployment;
 
-import com.camunda.fox.platform.qa.deployer.client.FoxExtension;
-import com.camunda.fox.platform.qa.deployer.configuration.ConfigurationExporter;
-import com.camunda.fox.platform.qa.deployer.configuration.FoxConfiguration;
-import com.camunda.fox.platform.qa.deployer.container.RemoteFoxExtension;
-import com.camunda.fox.platform.qa.deployer.war.impl.ApplicationArchiveContextImpl;
 import java.io.ByteArrayOutputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -20,6 +15,12 @@ import org.jboss.shrinkwrap.api.Filters;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.ByteArrayAsset;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
+
+import com.camunda.fox.platform.qa.deployer.client.FoxExtension;
+import com.camunda.fox.platform.qa.deployer.configuration.ConfigurationExporter;
+import com.camunda.fox.platform.qa.deployer.configuration.FoxConfiguration;
+import com.camunda.fox.platform.qa.deployer.container.RemoteFoxExtension;
+import com.camunda.fox.platform.qa.deployer.war.impl.ApplicationArchiveContextImpl;
 
 /**
  * Creates <code>arquillian-fox-extension.jar</code> archive to run the fox extension. 
