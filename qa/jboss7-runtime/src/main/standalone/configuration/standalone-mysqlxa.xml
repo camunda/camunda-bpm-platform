@@ -107,7 +107,7 @@
                 </datasource>
                 <xa-datasource jndi-name="java:jboss/datasources/FoxEngineDS" pool-name="FoxEngineDS" enabled="true" use-ccm="false">
                     <driver>com.mysql</driver>
-					<xa-datasource-property name="URL">jdbc:mysql://localhost:3306/ca_test_fox-platform</xa-datasource-property>
+					<xa-datasource-property name="URL">jdbc:mysql://${database.host}:3306/ca_test_fox-platform</xa-datasource-property>
 					<xa-datasource-property name="User">ca_test_fox-plat</xa-datasource-property>
 					<xa-datasource-property name="Password">UJLTbhRtrChLzRwq</xa-datasource-property>
 					<xa-pool>
@@ -130,7 +130,7 @@
                 </xa-datasource>
                 <xa-datasource jndi-name="java:jboss/datasources/CycleDS" pool-name="CycleDS" enabled="true" use-ccm="true">
                     <driver>com.mysql</driver>
-					<xa-datasource-property name="URL">jdbc:mysql://localhost:3306/ca_test_fox-platform</xa-datasource-property>
+					<xa-datasource-property name="URL">jdbc:mysql://${database.host}:3306/ca_test_fox-platform</xa-datasource-property>
 					<xa-datasource-property name="User">ca_test_fox-plat</xa-datasource-property>
 					<xa-datasource-property name="Password">UJLTbhRtrChLzRwq</xa-datasource-property>
 					<xa-pool>

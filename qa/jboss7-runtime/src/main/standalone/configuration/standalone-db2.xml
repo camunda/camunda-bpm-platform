@@ -117,19 +117,19 @@
           </security>
         </datasource>
         <datasource jta="true" jndi-name="java:jboss/datasources/CycleDS" pool-name="CycleDS" enabled="true" use-java-context="true" use-ccm="true">
-          <connection-url>jdbc:db2://localhost:50000/USER</connection-url>
+          <connection-url>jdbc:db2://${database.host}:50000/USER</connection-url>
           <driver>db2</driver>
           <security>
-            <user-name>fox_user</user-name>
-            <password>CaUser12</password>
+            <user-name>${database.user}</user-name>
+            <password>${database.password}</password>
           </security>
         </datasource>
         <datasource jndi-name="java:jboss/datasources/FoxEngineDS" pool-name="FoxEngineDS" jta="true" enabled="true" use-java-context="true" use-ccm="true">
-          <connection-url>jdbc:db2://localhost:50000/USER</connection-url>
+          <connection-url>jdbc:db2://${database.host}:50000/USER</connection-url>
           <driver>db2</driver>
           <security>
-            <user-name>fox_user</user-name>
-            <password>CaUser12</password>
+            <user-name>${database.user}</user-name>
+            <password>${database.password}</password>
           </security>
         </datasource>
         <drivers>

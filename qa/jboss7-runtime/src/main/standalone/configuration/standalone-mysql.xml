@@ -103,7 +103,7 @@
                     </security>
                 </datasource>
                 <datasource jndi-name="java:jboss/datasources/FoxEngineDS" enabled="true" use-java-context="true" jta="true" use-ccm="true" pool-name="FoxEngineDS">
-                    <connection-url>jdbc:mysql://localhost:3306/fox-test</connection-url>
+                    <connection-url>jdbc:mysql://${database.host}:3306/fox-test</connection-url>
                     <driver>mysql</driver>
                     <security>
                         <user-name>cockpit</user-name>
@@ -111,7 +111,7 @@
                     </security>
                 </datasource>
                 <datasource jndi-name="java:jboss/datasources/CockpitDS" enabled="true" use-java-context="true" jta="true" use-ccm="true" pool-name="CockpitDS">
-                    <connection-url>jdbc:mysql://localhost:3306/fox-test</connection-url>
+                    <connection-url>jdbc:mysql://${database.host}:3306/fox-test</connection-url>
                     <driver>mysql</driver>
                     <security>
                         <user-name>cockpit</user-name>
@@ -295,7 +295,7 @@
         <subsystem xmlns="urn:jboss:domain:web:1.1" default-virtual-server="default-host" native="false">
             <connector name="http" protocol="HTTP/1.1" scheme="http" socket-binding="http"/>
             <virtual-server name="default-host" enable-welcome-root="true">
-                <alias name="localhost"/>
+                <alias name="${database.host}"/>
                 <alias name="example.com"/>
             </virtual-server>
         </subsystem>
@@ -360,7 +360,7 @@
         <socket-binding name="txn-recovery-environment" port="4712"/>
         <socket-binding name="txn-status-manager" port="4713"/>
         <outbound-socket-binding name="mail-smtp">
-            <remote-destination host="localhost" port="25"/>
+            <remote-destination host="${database.host}" port="25"/>
         </outbound-socket-binding>
     </socket-binding-group>
 </server>
