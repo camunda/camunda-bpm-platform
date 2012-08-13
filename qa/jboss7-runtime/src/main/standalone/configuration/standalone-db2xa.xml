@@ -110,7 +110,7 @@
                         50000
                     </xa-datasource-property>
                     <xa-datasource-property name="DatabaseName">
-                        PLATFORM
+                        USER
                     </xa-datasource-property>
                     <xa-datasource-property name="DriverType">
                         4
