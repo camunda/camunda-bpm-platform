@@ -90,5 +90,10 @@ public class DefaultProcessArchiveServices implements ProcessArchiveServices {
     return getProcessArchiveContext(processDefinitionEntity.getKey());
   }
 
+  @Override
+  public ProcessEngineController getProcessEngineController() {
+    return processEngineServiceController;
+  }
+
 
 }
