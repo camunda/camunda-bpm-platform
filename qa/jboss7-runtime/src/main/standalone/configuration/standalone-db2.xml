@@ -116,10 +116,10 @@
                         4
                     </xa-datasource-property>
                     <xa-datasource-property name="User">
-                        fox_plat
+                        ${datasource.foxEngine.user}
                     </xa-datasource-property>
                     <xa-datasource-property name="Password">
-                        CaPlat12
+                        ${datasource.foxEngine.password}
                     </xa-datasource-property>
                     <driver>db2</driver>
                     <xa-pool>
