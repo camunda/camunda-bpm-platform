@@ -37,6 +37,7 @@ import org.activiti.engine.impl.variable.VariableType;
 
 import com.camunda.fox.engine.impl.bpmn.parser.FoxFailedJobParseListener;
 import com.camunda.fox.engine.impl.jobexecutor.FoxFailedJobCommandFactory;
+import com.camunda.fox.platform.impl.context.DefaultProcessArchiveServices;
 import com.camunda.fox.platform.impl.context.ProcessArchiveServicesSupport;
 import com.camunda.fox.platform.impl.context.spi.ProcessArchiveServices;
 import com.camunda.fox.platform.impl.jobexecutor.spi.JobExecutorFactory;
@@ -85,7 +86,7 @@ public abstract class CmpeProcessEngineConfiguration extends ProcessEngineConfig
   
   protected void initProcessArchiveServices() {
     if(processArchiveServices == null) {
-      processArchiveServices = Services.getService(ProcessArchiveServices.class);
+      processArchiveServices = new DefaultProcessArchiveServices();
       processArchiveServices.setProcessEngineController(cmpeProcessEngine);
     }
   }
