@@ -50,7 +50,7 @@ public class SimplePlatformService extends PlatformService {
           processEngineController.start();      
           return new ProcessEngineStartOperationImpl(processEngineController.getProcessEngine());
         } catch (Exception e) {
-          log.log(Level.SEVERE,"Caught exception while tying to start process engine", e);
+          log.log(Level.SEVERE,"Caught exception while trying to start process engine", e);
           return new ProcessEngineStartOperationImpl(e);
         }
       }
