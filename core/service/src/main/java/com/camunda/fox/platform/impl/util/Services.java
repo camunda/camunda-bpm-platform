@@ -23,8 +23,6 @@ import java.util.ServiceLoader;
 import com.camunda.fox.platform.FoxPlatformException;
 import com.camunda.fox.platform.impl.configuration.JtaCmpeProcessEngineConfigurationFactory;
 import com.camunda.fox.platform.impl.configuration.spi.ProcessEngineConfigurationFactory;
-import com.camunda.fox.platform.impl.context.DefaultProcessArchiveServices;
-import com.camunda.fox.platform.impl.context.spi.ProcessArchiveServices;
 import com.camunda.fox.platform.impl.deployment.ClassPathScanner;
 import com.camunda.fox.platform.impl.deployment.spi.ProcessArchiveScanner;
 import com.camunda.fox.platform.impl.jobexecutor.simple.SimpleJobExecutorFactory;
@@ -46,7 +44,7 @@ public class Services {
     defaultImplementations.put(ProcessEngineConfigurationFactory.class, JtaCmpeProcessEngineConfigurationFactory.class);
     defaultImplementations.put(ProcessArchiveScanner.class, ClassPathScanner.class);
     defaultImplementations.put(JobExecutorFactory.class, SimpleJobExecutorFactory.class);    
-    defaultImplementations.put(ProcessArchiveServices.class, DefaultProcessArchiveServices.class);
+//    defaultImplementations.put(ProcessArchiveServices.class, DefaultProcessArchiveServices.class);
   }
   
   @SuppressWarnings("unchecked")
