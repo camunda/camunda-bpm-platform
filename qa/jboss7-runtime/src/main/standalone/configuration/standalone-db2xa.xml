@@ -160,7 +160,7 @@
             50000
           </xa-datasource-property>
           <xa-datasource-property name="DatabaseName">
-            USER
+            ${database.name}
           </xa-datasource-property>
           <xa-datasource-property name="DriverType">
             4
@@ -189,7 +189,7 @@
             50000
           </xa-datasource-property>
           <xa-datasource-property name="DatabaseName">
-            USER
+            ${database.name}
           </xa-datasource-property>
           <xa-datasource-property name="DriverType">
             4
