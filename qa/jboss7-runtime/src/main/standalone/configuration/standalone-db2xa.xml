@@ -154,7 +154,7 @@
         </datasource>
         <xa-datasource jndi-name="java:jboss/datasources/CycleDS" pool-name="CycleDS" enabled="true" use-ccm="false">
           <xa-datasource-property name="ServerName">
-            localhost
+            ${database.host}
           </xa-datasource-property>
           <xa-datasource-property name="PortNumber">
             50000
@@ -166,10 +166,10 @@
             4
           </xa-datasource-property>
           <xa-datasource-property name="User">
-            fox_user
+            ${database.user}
           </xa-datasource-property>
           <xa-datasource-property name="Password">
-            CaUser12
+            ${database.password}
           </xa-datasource-property>
           <driver>db2</driver>
           <xa-pool>
@@ -183,7 +183,7 @@
         </xa-datasource>
         <xa-datasource jndi-name="java:jboss/datasources/FoxEngineDS" pool-name="FoxEngineDS" enabled="true" use-ccm="false">
           <xa-datasource-property name="ServerName">
-            localhost
+            ${database.host}
           </xa-datasource-property>
           <xa-datasource-property name="PortNumber">
             50000
@@ -195,10 +195,10 @@
             4
           </xa-datasource-property>
           <xa-datasource-property name="User">
-            fox_user
+            ${database.user}
           </xa-datasource-property>
           <xa-datasource-property name="Password">
-            CaUser12
+            ${database.password}
           </xa-datasource-property>
           <driver>db2</driver>
           <xa-pool>
