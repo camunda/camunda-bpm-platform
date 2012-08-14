@@ -29,10 +29,10 @@
 			datasource-classname="com.mysql.jdbc.jdbc2.optional.MysqlXADataSource" 
 			res-type="javax.sql.XADataSource" non-transactional-connections="true" 
 			name="MySQLXAPool">
-		<property name="user" value="database.user"></property>
-		<property name="password" value="database.password"></property>
-		<property name="serverName" value="database.host"></property>
-		<property name="databaseName" value="database.name"></property>
+		<property name="user" value="${database.user}"></property>
+		<property name="password" value="${database.password}"></property>
+		<property name="serverName" value="${database.host}"></property>
+		<property name="databaseName" value="${database.name}"></property>
 	</jdbc-connection-pool>
 	<resource-adapter-config
 		enabled="true" 

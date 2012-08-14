@@ -29,11 +29,11 @@
 			datasource-classname="com.ibm.db2.jcc.DB2ConnectionPoolDataSource" 
 			res-type="javax.sql.ConnectionPoolDataSource" non-transactional-connections="true" 
 			name="DB2Pool">
-		<property name="user" value="database.user"></property>
-		<property name="password" value="database.password"></property>
+		<property name="user" value="${database.user}"></property>
+		<property name="password" value="${database.password}"></property>
 		<property name="portNumber" value="50000"></property>
-		<property name="databaseName" value="database.name"></property>
-		<property name="serverName" value="database.host"></property>
+		<property name="databaseName" value="${database.name}"></property>
+		<property name="serverName" value="${database.host}"></property>
 		<property name="driverType" value="4"></property>
 	</jdbc-connection-pool>
 	<resource-adapter-config
