@@ -17,7 +17,7 @@ public class WithMixedProcessDeployments {
   private ProcessEngine processEngine;
   
   @Deployment(resources = {
-    "processes/CdiResolvingBean.bpmn20.xml",
+    "processes/CdiResolvingBean.bpmn20.xml"
   })
   public void testNotExists() throws Exception {
     

@@ -20,8 +20,10 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 
 import org.activiti.engine.ActivitiException;
+import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
+import org.activiti.engine.impl.persistence.entity.HistoricProcessVariableEntity;
 import org.activiti.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.activiti.engine.impl.util.IoUtil;
 import org.activiti.engine.impl.variable.ByteArrayType;
@@ -93,13 +95,26 @@ public class CmpeSerializableType extends SerializableType {
   }
 
   protected ClassLoader getClassLoader(ValueFields valueFields) {
-    String executionId = ((VariableInstanceEntity)valueFields).getExecutionId();
+    ProcessArchiveContext processArchiveContext = null;
     
-    ExecutionEntity executionEntity = Context.getCommandContext()
-      .getExecutionManager()
-      .findExecutionById(executionId);
-    
-    ProcessArchiveContext processArchiveContext = processArchiveServices.getProcessArchiveContextForExecution(executionEntity);
+    if (valueFields instanceof VariableInstanceEntity) {
+      String executionId = ((VariableInstanceEntity)valueFields).getExecutionId();
+      
+      ExecutionEntity executionEntity = Context.getCommandContext()
+              .getExecutionManager()
+              .findExecutionById(executionId);
+      
+      processArchiveContext = processArchiveServices.getProcessArchiveContextForExecution(executionEntity);
+    } else if (valueFields instanceof HistoricProcessVariableEntity) {
+      HistoricProcessVariableEntity historicVar = (HistoricProcessVariableEntity) valueFields;
+      ProcessEngineConfigurationImpl processEngineController = processArchiveServices.getProcessEngineController().getProcessEngineConfiguration();
+      
+      String processInstanceId = historicVar.getProcessInstanceId();
+      String processDefId = processEngineController.getHistoryService().createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).singleResult().getProcessDefinitionId();
+      String processDefKey = processEngineController.getRepositoryService().createProcessDefinitionQuery().processDefinitionId(processDefId).singleResult().getKey();
+      
+      processArchiveContext = processArchiveServices.getProcessArchiveContext(processDefKey);
+    }
           
     if(processArchiveContext == null) {
       // use this classloader

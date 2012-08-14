@@ -83,6 +83,9 @@
             <logger category="jacorb.config">
                 <level name="ERROR"/>
             </logger>
+            <logger category="org.jboss.weld.ClassLoading">
+                <level name="WARN"/>
+            </logger>
             <root-logger>
                 <level name="INFO"/>
                 <handlers>
@@ -102,28 +105,48 @@
                         <password>sa</password>
                     </security>
                 </datasource>
-                <datasource jndi-name="java:jboss/datasources/FoxEngineDS" enabled="true" use-java-context="true" jta="true" use-ccm="true" pool-name="FoxEngineDS">
-                    <connection-url>jdbc:mysql://localhost:3306/fox-test</connection-url>
-                    <driver>mysql</driver>
+                <datasource jta="true" jndi-name="java:jboss/datasources/FoxEngineDS" pool-name="FoxEngineDS" enabled="true" use-java-context="true" use-ccm="true">
+                    <connection-url>jdbc:mysql://database.host:3306/database.name</connection-url>
+                    <driver>com.mysql</driver>
+                    <transaction-isolation>TRANSACTION_READ_COMMITTED</transaction-isolation>
+                    <pool>
+                        <prefill>false</prefill>
+                        <use-strict-min>false</use-strict-min>
+                        <flush-strategy>FailingConnectionOnly</flush-strategy>
+                    </pool>
                     <security>
-                        <user-name>cockpit</user-name>
-                        <password>cockpit</password>
+                        <user-name>database.user</user-name>
+                        <password>database.password</password>
                     </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
                 </datasource>
-                <datasource jndi-name="java:jboss/datasources/CockpitDS" enabled="true" use-java-context="true" jta="true" use-ccm="true" pool-name="CockpitDS">
-                    <connection-url>jdbc:mysql://localhost:3306/fox-test</connection-url>
-                    <driver>mysql</driver>
+                <datasource jta="true" jndi-name="java:jboss/datasources/CycleDS" pool-name="CycleDS" enabled="true" use-java-context="true" use-ccm="true">
+                    <connection-url>jdbc:mysql://database.host:3306/cdatabase.name</connection-url>
+                    <driver>com.mysql</driver>
+                    <transaction-isolation>TRANSACTION_READ_COMMITTED</transaction-isolation>
+                    <pool>
+                        <prefill>false</prefill>
+                        <use-strict-min>false</use-strict-min>
+                        <flush-strategy>FailingConnectionOnly</flush-strategy>
+                    </pool>
                     <security>
-                        <user-name>cockpit</user-name>
-                        <password>cockpit</password>
+                        <user-name>database.user</user-name>
+                        <password>database.password</password>
                     </security>
+                    <validation>
+                        <validate-on-match>false</validate-on-match>
+                        <background-validation>false</background-validation>
+                    </validation>
                 </datasource>
                 <drivers>
-                    <driver name="mysql" module="mysql.mysql-connector-java">
-                        <xa-datasource-class>com.mysql.jdbc.jdbc2.optional.MysqlXADataSource</xa-datasource-class>
-                    </driver>
                     <driver name="h2" module="com.h2database.h2">
                         <xa-datasource-class>org.h2.jdbcx.JdbcDataSource</xa-datasource-class>
+                    </driver>
+                    <driver name="com.mysql" module="com.mysql">
+                        <xa-datasource-class>com.mysql.jdbc.jdbc2.optional.MysqlDataSource</xa-datasource-class>
                     </driver>
                 </drivers>
             </datasources>
@@ -132,10 +155,10 @@
             <deployment-scanner path="deployments" relative-to="jboss.server.base.dir" scan-interval="5000"/>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:ee:1.0">
-          <global-modules>
-            <module name="com.camunda.fox.platform.fox-platform-api" />
-            <module name="com.camunda.fox.engine.fox-engine" />
-          </global-modules>
+            <global-modules>
+                <module name="com.camunda.fox.platform.fox-platform-api" slot="main"/>
+                <module name="com.camunda.fox.engine.fox-engine" slot="main"/>
+            </global-modules>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:ejb3:1.2">
             <session-bean>
@@ -227,14 +250,13 @@
         <subsystem xmlns="urn:jboss:domain:naming:1.1"/>
         <subsystem xmlns="urn:jboss:domain:osgi:1.2" activation="lazy">
             <properties>
-                <!-- Specifies the beginning start level of the framework -->
-                <property name="org.osgi.framework.startlevel.beginning">1</property>
+                <property name="org.osgi.framework.startlevel.beginning">
+                    1
+                </property>
             </properties>
             <capabilities>
-                <!-- modules registered with the OSGi layer on startup -->
                 <capability name="javax.servlet.api:v25"/>
                 <capability name="javax.transaction.api"/>
-                <!-- bundles started in startlevel 1 -->
                 <capability name="org.apache.felix.log" startlevel="1"/>
                 <capability name="org.jboss.osgi.logging" startlevel="1"/>
                 <capability name="org.apache.felix.configadmin" startlevel="1"/>
@@ -274,14 +296,15 @@
                 </security-domain>
             </security-domains>
         </subsystem>
-        <subsystem xmlns="urn:jboss:domain:threads:1.1">
-            <bounded-queue-thread-pool name="job-executor-tp" allow-core-timeout="true">
-                <core-threads count="3"/>
-                <queue-length count="3"/>
-                <max-threads count="10"/>
-                <keepalive-time time="10" unit="seconds"/>
+        <subsystem xmlns="urn:jboss:domain:threads:1.1" >
+			<bounded-queue-thread-pool name="job-executor-tp"
+                allow-core-timeout="true">
+                <core-threads count="3" />
+                <queue-length count="3" />
+                <max-threads count="10" />
+                <keepalive-time time="10" unit="seconds" />
             </bounded-queue-thread-pool>
-        </subsystem>        	
+		</subsystem>
         <subsystem xmlns="urn:jboss:domain:transactions:1.1">
             <core-environment>
                 <process-id>
@@ -291,7 +314,7 @@
             <recovery-environment socket-binding="txn-recovery-environment" status-socket-binding="txn-status-manager"/>
             <coordinator-environment default-timeout="300"/>
         </subsystem>
-        <subsystem xmlns="urn:jboss:domain:web:1.1" default-virtual-server="default-host" native="false">
+        <subsystem xmlns="urn:jboss:domain:web:1.1" native="false" default-virtual-server="default-host">
             <connector name="http" protocol="HTTP/1.1" scheme="http" socket-binding="http"/>
             <virtual-server name="default-host" enable-welcome-root="true">
                 <alias name="localhost"/>
@@ -309,21 +332,21 @@
             </endpoint-config>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:weld:1.0"/>
-        <subsystem xmlns="urn:com.camunda.fox.fox-platform:1.1">
+        <subsystem xmlns="urn:com.camunda.fox.fox-platform:1.0">
             <process-engines>
                 <process-engine name="default" default="true">
-                    <datasource>java:jboss/datasources/FoxEngineDS</datasource>
-                    <history-level>full</history-level>
-                    <properties>
-                        <property name="jobExecutorAcquisitionName">default</property>
-                        <property name="isAutoSchemaUpdate">true</property>	                    
-                    </properties>
-                </process-engine> 
+					<datasource>java:jboss/datasources/FoxEngineDS</datasource>
+					<history-level>full</history-level>
+					<properties>
+						<property name="jobExecutorAcquisitionName">default</property>
+						<property name="isAutoSchemaUpdate">true</property>
+					</properties>
+				</process-engine>
             </process-engines>
-            <job-executor>
-                <thread-pool-name>job-executor-tp</thread-pool-name>
-                <job-acquisitions>
-                    <job-acquisition name="default">
+			<job-executor>
+				<thread-pool-name>job-executor-tp</thread-pool-name>
+				<job-acquisitions>
+					<job-acquisition name="default">
                         <acquisition-strategy>SEQUENTIAL</acquisition-strategy>
 	                    <properties>
                             <property name="lockTimeInMillis">300000</property>
@@ -334,8 +357,8 @@
                     <job-acquisition name="anders">
                         <acquisition-strategy>SEQUENTIAL</acquisition-strategy>
                     </job-acquisition>
-                </job-acquisitions>	                
-            </job-executor>                 
+				</job-acquisitions>
+			</job-executor>
         </subsystem>
     </profile>
 
@@ -348,7 +371,7 @@
         </interface>
     </interfaces>
 
-    <socket-binding-group name="standard-sockets" default-interface="public" port-offset="${jboss.socket.binding.port-offset:11020}">
+    <socket-binding-group name="standard-sockets" default-interface="public" port-offset="${jboss.socket.binding.port-offset:0}">
         <socket-binding name="http" port="8080"/>
         <socket-binding name="https" port="8443"/>
         <socket-binding name="management-native" interface="management" port="${jboss.management.native.port:9999}"/>
@@ -362,4 +385,5 @@
             <remote-destination host="localhost" port="25"/>
         </outbound-socket-binding>
     </socket-binding-group>
+
 </server>

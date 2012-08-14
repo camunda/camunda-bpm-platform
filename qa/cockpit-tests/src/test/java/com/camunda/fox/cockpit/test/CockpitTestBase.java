@@ -16,7 +16,7 @@ import com.camunda.fox.cockpit.service.ProcessDefinitionService;
 import com.camunda.fox.cockpit.service.ProcessService;
 import com.camunda.fox.cockpit.service.VariableService;
 import com.camunda.fox.cockpit.service.producer.ProcessServicesProducer;
-import com.camunda.fox.cockpit.service.query.impl.MyBatisService;
+import com.camunda.fox.cockpit.service.query.impl.QueryService;
 import com.camunda.fox.cockpit.spi.engine.impl.PlatformProcessEngineLookup;
 import com.camunda.fox.cockpit.spi.engine.impl.PlatformProcessEngines;
 import com.camunda.fox.cockpit.spi.persistence.impl.EeEntityManagerFactories;
@@ -52,7 +52,7 @@ public class CockpitTestBase {
           EntityManagerFactories.class, 
           ProcessService.class,
           VariableService.class,
-          MyBatisService.class,
+          QueryService.class,
           AuditService.class,
           JobService.class,
           ExecutionService.class,

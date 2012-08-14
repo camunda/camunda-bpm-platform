@@ -36,6 +36,8 @@ public interface ProcessArchiveServices {
 
   public ProcessArchiveContext getProcessArchiveContext(String processDefinitionKey);
 
+  public ProcessEngineController getProcessEngineController();
+  
   public void setProcessEngineController(ProcessEngineController processEngineServiceBean);
 
   /**

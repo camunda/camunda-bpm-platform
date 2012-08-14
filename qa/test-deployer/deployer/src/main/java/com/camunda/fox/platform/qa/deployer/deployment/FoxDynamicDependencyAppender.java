@@ -24,9 +24,12 @@ import org.jboss.arquillian.test.spi.TestClass;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.ByteArrayAsset;
+import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.container.LibraryContainer;
 import org.jboss.shrinkwrap.api.spec.EnterpriseArchive;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
+
+import com.camunda.fox.platform.cdi.PlatformProcessEngineLookup;
 
 /**
  *
@@ -37,7 +40,7 @@ public class FoxDynamicDependencyAppender implements ApplicationArchiveProcessor
   private static final Logger log = Logger.getLogger(FoxDynamicDependencyAppender.class.getName());
   
   static final JavaArchive APPLICATION_EXTENSION_ARCHIVE;
-  // static final JavaArchive ACTIVITI_CDI_ARCHIVE;
+  static final JavaArchive ACTIVITI_CDI_ARCHIVE;
   
   static final String APPLICATION_EXTENSION_ARCHIVE_NAME = "fox-arquillian-application-extension-archive.jar";
   static final String ACTIVITI_CDI_ARCHIVE_NAME = "fox-arquillian-activiti-cdi.jar";
@@ -51,12 +54,12 @@ public class FoxDynamicDependencyAppender implements ApplicationArchiveProcessor
       .addClass(ApplicationArchiveContext.class)
       .addClass(ContextExecutionException.class);
     
-//    ACTIVITI_CDI_ARCHIVE = ShrinkWrap.create(JavaArchive.class, ACTIVITI_CDI_ARCHIVE_NAME)
-//      .addPackages(true, "org.activiti.cdi")
-//      .addClass(PlatformProcessEngineLookup.class)
-//      .addAsResource("META-INF/cdi/services/org.activiti.cdi.spi.ProcessEngineLookup", "META-INF/services/org.activiti.cdi.spi.ProcessEngineLookup")
-//      .addAsResource("META-INF/cdi/services/javax.enterprise.inject.spi.Extension", "META-INF/services/javax.enterprise.inject.spi.Extension")
-//      .addAsResource(EmptyAsset.INSTANCE, "META-INF/beans.xml");
+    ACTIVITI_CDI_ARCHIVE = ShrinkWrap.create(JavaArchive.class, ACTIVITI_CDI_ARCHIVE_NAME)
+      .addPackages(true, "org.activiti.cdi")
+      .addClass(PlatformProcessEngineLookup.class)
+      .addAsResource("META-INF/cdi/services/org.activiti.cdi.spi.ProcessEngineLookup", "META-INF/services/org.activiti.cdi.spi.ProcessEngineLookup")
+      .addAsResource("META-INF/cdi/services/javax.enterprise.inject.spi.Extension", "META-INF/services/javax.enterprise.inject.spi.Extension")
+      .addAsResource(EmptyAsset.INSTANCE, "META-INF/beans.xml");
   }
   
   @Override
@@ -79,7 +82,10 @@ public class FoxDynamicDependencyAppender implements ApplicationArchiveProcessor
     }
     
     addResources(applicationArchive, APPLICATION_EXTENSION_ARCHIVE);
-    // addResources(applicationArchive, ACTIVITI_CDI_ARCHIVE);
+    
+    if (deploymentConfiguration.get().isBundleActivitiCdi()) {
+      addResources(applicationArchive, ACTIVITI_CDI_ARCHIVE);
+    }
   }
   
   String extractApplicationExtensionJndiPrefix(Archive<?> applicationArchive, JavaArchive extensionArchive) {

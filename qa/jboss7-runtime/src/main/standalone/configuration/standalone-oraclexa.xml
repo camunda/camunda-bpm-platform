@@ -4,22 +4,17 @@
 
   <extensions>
     <extension module="org.jboss.as.clustering.infinispan"/>
-    <extension module="org.jboss.as.cmp"/>
     <extension module="org.jboss.as.configadmin"/>
     <extension module="org.jboss.as.connector"/>
     <extension module="org.jboss.as.deployment-scanner"/>
     <extension module="org.jboss.as.ee"/>
     <extension module="org.jboss.as.ejb3"/>
-    <extension module="org.jboss.as.jacorb"/>
-    <extension module="org.jboss.as.jaxr"/>
     <extension module="org.jboss.as.jaxrs"/>
     <extension module="org.jboss.as.jdr"/>
     <extension module="org.jboss.as.jmx"/>
     <extension module="org.jboss.as.jpa"/>
-    <extension module="org.jboss.as.jsr77"/>
     <extension module="org.jboss.as.logging"/>
     <extension module="org.jboss.as.mail"/>
-    <extension module="org.jboss.as.messaging"/>
     <extension module="org.jboss.as.naming"/>
     <extension module="org.jboss.as.osgi"/>
     <extension module="org.jboss.as.pojo"/>
@@ -33,11 +28,6 @@
     <extension module="org.jboss.as.weld"/>
     <extension module="com.camunda.fox.platform.fox-platform-jboss-subsystem"/>
   </extensions>
-
-  <system-properties>
-    <property name="jboss.bind.address" value="0.0.0.0"/>
-    <property name="jboss.bind.address.management" value="0.0.0.0"/>
-  </system-properties>
 
   <management>
     <security-realms>
@@ -104,7 +94,6 @@
         </handlers>
       </root-logger>
     </subsystem>
-    <subsystem xmlns="urn:jboss:domain:cmp:1.0"/>
     <subsystem xmlns="urn:jboss:domain:configadmin:1.0"/>
     <subsystem xmlns="urn:jboss:domain:datasources:1.0">
       <datasources>
@@ -116,34 +105,66 @@
             <password>sa</password>
           </security>
         </datasource>
-        <datasource jta="true" jndi-name="java:jboss/datasources/CycleDS" pool-name="CycleDS" enabled="true" use-java-context="true" use-ccm="true">
-          <connection-url>jdbc:db2://database.host:50000/database.name</connection-url>
-          <driver>db2</driver>
-          <security>
-            <user-name>database.user</user-name>
-            <password>database.password</password>
-          </security>
-        </datasource>
-        <datasource jndi-name="java:jboss/datasources/FoxEngineDS" pool-name="FoxEngineDS" jta="true" enabled="true" use-java-context="true" use-ccm="true">
-          <connection-url>jdbc:db2://database.host:50000/database.name</connection-url>
-          <driver>db2</driver>
-          <security>
-            <user-name>database.user</user-name>
-            <password>database.password</password>
-          </security>
-        </datasource>
+        <xa-datasource jndi-name="java:jboss/datasources/FoxEngineDS" pool-name="FoxEngineDS" enabled="true" use-ccm="false">
+          <driver>com.oracle</driver>
+          <xa-datasource-property name="URL">jdbc:oracle:thin:@database.host:1521:database.name</xa-datasource-property>
+          <xa-datasource-property name="User">database.user</xa-datasource-property>
+          <xa-datasource-property name="Password">database.password</xa-datasource-property>
+          <xa-pool>
+            <min-pool-size>1</min-pool-size>
+            <max-pool-size>60</max-pool-size>
+            <prefill>false</prefill>
+            <use-strict-min>false</use-strict-min>
+            <flush-strategy>FailingConnectionOnly</flush-strategy>
+            <no-tx-separate-pools>true</no-tx-separate-pools>
+            <pad-xid>false</pad-xid>
+            <wrap-xa-resource>true</wrap-xa-resource>
+          </xa-pool>
+          <validation>
+            <valid-connection-checker class-name="org.jboss.jca.adapters.jdbc.extensions.oracle.OracleValidConnectionChecker"/>
+            <validate-on-match>false</validate-on-match>
+            <background-validation>false</background-validation>
+            <use-fast-fail>false</use-fast-fail>
+            <stale-connection-checker class-name="org.jboss.jca.adapters.jdbc.extensions.oracle.OracleStaleConnectionChecker"/>
+            <exception-sorter class-name="org.jboss.jca.adapters.jdbc.extensions.oracle.OracleExceptionSorter"/>
+          </validation>
+        </xa-datasource>
+        <xa-datasource jndi-name="java:jboss/datasources/CycleDS" pool-name="CycleDS" enabled="true" use-ccm="false">
+          <driver>com.oracle</driver>
+          <xa-datasource-property name="URL">jdbc:oracle:thin:@database.host:1521:database.name</xa-datasource-property>
+          <xa-datasource-property name="User">database.user</xa-datasource-property>
+          <xa-datasource-property name="Password">database.password</xa-datasource-property>
+          <xa-pool>
+            <min-pool-size>1</min-pool-size>
+            <max-pool-size>60</max-pool-size>
+            <prefill>false</prefill>
+            <use-strict-min>false</use-strict-min>
+            <flush-strategy>FailingConnectionOnly</flush-strategy>
+            <no-tx-separate-pools>true</no-tx-separate-pools>
+            <pad-xid>false</pad-xid>
+            <wrap-xa-resource>true</wrap-xa-resource>
+          </xa-pool>
+          <validation>
+            <valid-connection-checker class-name="org.jboss.jca.adapters.jdbc.extensions.oracle.OracleValidConnectionChecker"/>
+            <validate-on-match>false</validate-on-match>
+            <background-validation>false</background-validation>
+            <use-fast-fail>false</use-fast-fail>
+            <stale-connection-checker class-name="org.jboss.jca.adapters.jdbc.extensions.oracle.OracleStaleConnectionChecker"/>
+            <exception-sorter class-name="org.jboss.jca.adapters.jdbc.extensions.oracle.OracleExceptionSorter"/>
+          </validation>
+        </xa-datasource>
         <drivers>
           <driver name="h2" module="com.h2database.h2">
             <xa-datasource-class>org.h2.jdbcx.JdbcDataSource</xa-datasource-class>
           </driver>
-          <driver name="db2" module="com.ibm.db2.jcc.db2jcc4">
-            <xa-datasource-class>com.ibm.db2.jcc.DB2Driver</xa-datasource-class>
+          <driver name="com.oracle" module="com.oracle.jdbc.ojdbc6">
+            <xa-datasource-class>oracle.jdbc.xa.client.OracleXADataSource</xa-datasource-class>
           </driver>
         </drivers>
       </datasources>
     </subsystem>
     <subsystem xmlns="urn:jboss:domain:deployment-scanner:1.1">
-      <deployment-scanner path="deployments" relative-to="jboss.server.base.dir" scan-interval="5000" deployment-timeout="600"/>
+      <deployment-scanner path="deployments" relative-to="jboss.server.base.dir" scan-interval="5000"/>
     </subsystem>
     <subsystem xmlns="urn:jboss:domain:ee:1.0">
       <global-modules>
@@ -187,7 +208,6 @@
           <keepalive-time time="100" unit="milliseconds"/>
         </thread-pool>
       </thread-pools>
-      <iiop enable-by-default="false" use-qualified-name="false"/>
     </subsystem>
     <subsystem xmlns="urn:jboss:domain:infinispan:1.1" default-cache-container="hibernate">
       <cache-container name="hibernate" default-cache="local-query">
@@ -207,19 +227,10 @@
         </local-cache>
       </cache-container>
     </subsystem>
-    <subsystem xmlns="urn:jboss:domain:jacorb:1.1">
-      <orb>
-        <initializers security="on" transactions="spec"/>
-      </orb>
-    </subsystem>
-    <subsystem xmlns="urn:jboss:domain:jaxr:1.0">
-      <connection-factory jndi-name="java:jboss/jaxr/ConnectionFactory"/>
-      <juddi-server publish-url="http://localhost:8080/juddi/publish" query-url="http://localhost:8080/juddi/query"/>
-    </subsystem>
     <subsystem xmlns="urn:jboss:domain:jaxrs:1.0"/>
     <subsystem xmlns="urn:jboss:domain:jca:1.1">
       <archive-validation enabled="true" fail-on-error="true" fail-on-warn="false"/>
-      <bean-validation enabled="true"/>
+      <bean-validation enabled="false"/>
       <default-workmanager>
         <short-running-threads>
           <core-threads count="50"/>
@@ -234,7 +245,6 @@
           <keepalive-time time="10" unit="seconds"/>
         </long-running-threads>
       </default-workmanager>
-      <cached-connection-manager/>
     </subsystem>
     <subsystem xmlns="urn:jboss:domain:jdr:1.0"/>
     <subsystem xmlns="urn:jboss:domain:jmx:1.1">
@@ -244,99 +254,10 @@
     <subsystem xmlns="urn:jboss:domain:jpa:1.0">
       <jpa default-datasource=""/>
     </subsystem>
-    <subsystem xmlns="urn:jboss:domain:jsr77:1.0"/>
     <subsystem xmlns="urn:jboss:domain:mail:1.0">
       <mail-session jndi-name="java:jboss/mail/Default">
         <smtp-server outbound-socket-binding-ref="mail-smtp"/>
       </mail-session>
-    </subsystem>
-    <subsystem xmlns="urn:jboss:domain:messaging:1.1">
-      <hornetq-server>
-        <persistence-enabled>true</persistence-enabled>
-        <journal-file-size>102400</journal-file-size>
-        <journal-min-files>2</journal-min-files>
-
-        <connectors>
-          <netty-connector name="netty" socket-binding="messaging"/>
-          <netty-connector name="netty-throughput" socket-binding="messaging-throughput">
-            <param key="batch-delay" value="50"/>
-          </netty-connector>
-          <in-vm-connector name="in-vm" server-id="0"/>
-        </connectors>
-
-        <acceptors>
-          <netty-acceptor name="netty" socket-binding="messaging"/>
-          <netty-acceptor name="netty-throughput" socket-binding="messaging-throughput">
-            <param key="batch-delay" value="50"/>
-            <param key="direct-deliver" value="false"/>
-          </netty-acceptor>
-          <in-vm-acceptor name="in-vm" server-id="0"/>
-        </acceptors>
-
-        <security-settings>
-          <security-setting match="#">
-            <permission type="send" roles="guest"/>
-            <permission type="consume" roles="guest"/>
-            <permission type="createNonDurableQueue" roles="guest"/>
-            <permission type="deleteNonDurableQueue" roles="guest"/>
-          </security-setting>
-        </security-settings>
-
-        <address-settings>
-          <address-setting match="#">
-            <dead-letter-address>jms.queue.DLQ</dead-letter-address>
-            <expiry-address>jms.queue.ExpiryQueue</expiry-address>
-            <redelivery-delay>0</redelivery-delay>
-            <max-size-bytes>10485760</max-size-bytes>
-            <address-full-policy>BLOCK</address-full-policy>
-            <message-counter-history-day-limit>10</message-counter-history-day-limit>
-          </address-setting>
-        </address-settings>
-
-        <jms-connection-factories>
-          <connection-factory name="InVmConnectionFactory">
-            <connectors>
-              <connector-ref connector-name="in-vm"/>
-            </connectors>
-            <entries>
-              <entry name="java:/ConnectionFactory"/>
-            </entries>
-          </connection-factory>
-          <connection-factory name="RemoteConnectionFactory">
-            <connectors>
-              <connector-ref connector-name="netty"/>
-            </connectors>
-            <entries>
-              <entry name="RemoteConnectionFactory"/>
-              <entry name="java:jboss/exported/jms/RemoteConnectionFactory"/>
-            </entries>
-          </connection-factory>
-          <pooled-connection-factory name="hornetq-ra">
-            <transaction mode="xa"/>
-            <connectors>
-              <connector-ref connector-name="in-vm"/>
-            </connectors>
-            <entries>
-              <entry name="java:/JmsXA"/>
-            </entries>
-          </pooled-connection-factory>
-        </jms-connection-factories>
-
-        <jms-destinations>
-          <jms-queue name="testQueue">
-            <entry name="queue/test"/>
-            <entry name="java:jboss/exported/jms/queue/test"/>
-          </jms-queue>
-          <jms-queue name="UiMediatorQueue">
-            <entry name="queue/UiMediatorQueue"/>
-            <entry name="java:jboss/exported/jms/queue/UiMediatorQueue"/>
-          </jms-queue>
-          <jms-topic name="testTopic">
-            <entry name="topic/test"/>
-            <entry name="java:jboss/exported/jms/topic/test"/>
-          </jms-topic>
-        </jms-destinations>
-      </hornetq-server>
     </subsystem>
     <subsystem xmlns="urn:jboss:domain:naming:1.1"/>
     <subsystem xmlns="urn:jboss:domain:osgi:1.2" activation="lazy">
@@ -407,7 +328,6 @@
     </subsystem>
     <subsystem xmlns="urn:jboss:domain:web:1.1" native="false" default-virtual-server="default-host">
       <connector name="http" protocol="HTTP/1.1" scheme="http" socket-binding="http"/>
-      <connector name="ajp" protocol="AJP/1.3" scheme="http" socket-binding="ajp" enabled="true"/>
       <virtual-server name="default-host" enable-welcome-root="true">
         <alias name="localhost"/>
         <alias name="example.com"/>
@@ -461,26 +381,18 @@
     <interface name="public">
       <inet-address value="${jboss.bind.address:127.0.0.1}"/>
     </interface>
-    <interface name="unsecure">
-      <inet-address value="127.0.0.1"/>
-    </interface>
   </interfaces>
 
   <socket-binding-group name="standard-sockets" default-interface="public" port-offset="${jboss.socket.binding.port-offset:11020}">
     <socket-binding name="http" port="8080"/>
     <socket-binding name="https" port="8443"/>
-    <socket-binding name="jacorb" interface="unsecure" port="3528"/>
-    <socket-binding name="jacorb-ssl" interface="unsecure" port="3529"/>
     <socket-binding name="management-native" interface="management" port="${jboss.management.native.port:9999}"/>
     <socket-binding name="management-http" interface="management" port="${jboss.management.http.port:9990}"/>
     <socket-binding name="management-https" interface="management" port="${jboss.management.https.port:9443}"/>
-    <socket-binding name="messaging" port="5445"/>
-    <socket-binding name="messaging-throughput" port="5455"/>
     <socket-binding name="osgi-http" interface="management" port="8090"/>
     <socket-binding name="remoting" port="4447"/>
     <socket-binding name="txn-recovery-environment" port="4712"/>
     <socket-binding name="txn-status-manager" port="4713"/>
-    <socket-binding name="ajp" port="8009"/>
     <outbound-socket-binding name="mail-smtp">
       <remote-destination host="localhost" port="25"/>
     </outbound-socket-binding>

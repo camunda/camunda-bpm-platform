@@ -49,6 +49,7 @@ public class ConfigurationExporterToPropertyFilesTest {
 
     FoxDeploymentConfiguration configuration = new FoxDeploymentConfiguration();
     configuration.setExtensionArchiveJndiPrefix("foo/bar");
+    configuration.setBundleActivitiCdi(false);
     
     ConfigurationExporter exporter = new ConfigurationExporter(configuration, FoxDeploymentConfiguration.PROPERTY_PREFIX);
     
