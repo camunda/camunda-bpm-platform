@@ -16,7 +16,9 @@ public class DemoDataProcessArchiveImpl implements ProcessArchive {
   private final ProcessArchiveContextExecutor archiveContextExecutor;
   private final Map<String, Object> properties = new HashMap<String, Object>();
   private String processArchiveName;
-
+  private String processEngineName;
+  
+  
   public DemoDataProcessArchiveImpl(ProcessArchiveContextExecutor archiveContextExecutor) {
     this.archiveContextExecutor = archiveContextExecutor;
     properties.put(PROP_IS_DELETE_UPON_UNDEPLOY, false);
@@ -24,7 +26,7 @@ public class DemoDataProcessArchiveImpl implements ProcessArchive {
   }
   
   public String getProcessEngineName() {
-    return null;  // = use default
+    return processEngineName;
   }
   
   public String getName() {
@@ -56,6 +58,10 @@ public class DemoDataProcessArchiveImpl implements ProcessArchive {
 
   public Map<String, Object> getProperties() {
     return properties;
+  }
+
+  public void setProcessEngineName(String processEngineName) {
+    this.processEngineName = processEngineName;
   }
 
 }
