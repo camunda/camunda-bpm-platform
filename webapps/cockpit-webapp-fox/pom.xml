@@ -49,6 +49,12 @@
       <groupId>com.camunda.fox.commons</groupId>
        <artifactId>commons-transactions-jta</artifactId>
        <version>${project.version}</version>
+       <exclusions>
+       	<exclusion>
+       		<artifactId>commons-transactions-em</artifactId>
+       		<groupId>com.camunda.fox.commons</groupId>
+       	</exclusion>
+       </exclusions>
     </dependency>
 		
     <dependency>
