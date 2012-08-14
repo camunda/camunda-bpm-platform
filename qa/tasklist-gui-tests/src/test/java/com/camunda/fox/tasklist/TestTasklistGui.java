@@ -53,7 +53,7 @@ public class TestTasklistGui {
 
     return war;
   }
-
+  
   @Test
   public void testDeploymentAndPrepareUsers() {
     ProcessEngine processEngine = ProgrammaticBeanLookup.lookup(ProcessEngine.class);
@@ -62,11 +62,13 @@ public class TestTasklistGui {
     long count = repositoryService.createProcessDefinitionQuery().processDefinitionKey("test_process").count();
 
     Assert.assertEquals(1, count);
-
+    
     IdentityService identityService = processEngine.getIdentityService();
-    User kermit = identityService.newUser("kermit");
-    kermit.setPassword("kermit");
-    identityService.saveUser(kermit);
+    if (identityService.createUserQuery().userId("kermit").count() == 0) {
+      User kermit = identityService.newUser("kermit");
+      kermit.setPassword("kermit");
+      identityService.saveUser(kermit);
+    }
   }
 
   @Test
@@ -109,5 +111,13 @@ public class TestTasklistGui {
 
     // make sure the task-list is empty
     Assert.assertTrue(driver.findElement(By.xpath("//*[@id=\"taskListView\"]/table/tbody/tr/td[1]")).getText().equals("-"));
+  }
+  
+  @Test
+  public void removeUser() throws Exception {
+    ProcessEngine processEngine = ProgrammaticBeanLookup.lookup(ProcessEngine.class);
+    
+    IdentityService identityService = processEngine.getIdentityService();
+    identityService.deleteUser("kermit");
   }
 }
