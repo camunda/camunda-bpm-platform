@@ -1,11 +1,10 @@
 package com.camunda.fox.platform.qa.deployer.configuration;
 
 import java.io.*;
-import static org.fest.assertions.Assertions.assertThat;
-
 import java.util.Properties;
-import org.junit.After;
 
+import static org.fest.assertions.Assertions.assertThat;
+import org.junit.After;
 import org.junit.Test;
 
 public class ConfigurationRoundtripTest {

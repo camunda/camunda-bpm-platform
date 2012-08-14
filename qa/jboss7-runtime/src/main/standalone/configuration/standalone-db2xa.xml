@@ -65,7 +65,7 @@
   <profile>
     <subsystem xmlns="urn:jboss:domain:logging:1.1">
       <console-handler name="CONSOLE">
-        <level name="INFO"/>
+        <level name="DEBUG"/>
         <formatter>
           <pattern-formatter pattern="%d{HH:mm:ss,SSS} %-5p [%c] (%t) %s%E%n"/>
         </formatter>
@@ -91,10 +91,46 @@
         <level name="WARN"/>
       </logger>
       <logger category="jacorb.config">
-        <level name="ERROR"/>
+        <level name="WARN"/>
       </logger>
       <logger category="org.jboss.weld.ClassLoading">
         <level name="WARN"/>
+      </logger>
+      <logger category="org.springframework.samples.webflow">
+        <level name="DEBUG"/>
+      </logger>
+      <logger category="org.springframework.webflow">
+        <level name="DEBUG"/>
+      </logger>
+      <logger category="org.springframework.core">
+        <level name="DEBUG"/>
+      </logger>
+      <logger category="org.springframework.beans">
+        <level name="INFO"/>
+      </logger>
+      <logger category="org.springframework.context">
+        <level name="INFO"/>
+      </logger>
+      <logger category="org.springframework.http">
+        <level name="INFO"/>
+      </logger>
+      <logger category="org.springframework.web">
+        <level name="INFO"/>
+      </logger>
+      <logger category="org.springframework.binding">
+        <level name="INFO"/>
+      </logger>
+      <logger category="org.springframework.orm">
+        <level name="INFO"/>
+      </logger>
+      <logger category="javax.persistence">
+        <level name="INFO"/>
+      </logger>
+      <logger category="org.jboss.resource.connectionmanager">
+        <level name="WARN"/>
+      </logger>
+      <logger category="org.jboss.as.connector">
+        <level name="INFO"/>
       </logger>
       <root-logger>
         <level name="INFO"/>
@@ -116,28 +152,70 @@
             <password>sa</password>
           </security>
         </datasource>
-        <datasource jta="true" jndi-name="java:jboss/datasources/CycleDS" pool-name="CycleDS" enabled="true" use-java-context="true" use-ccm="true">
-          <connection-url>jdbc:db2://database.host:50000/database.name</connection-url>
+        <xa-datasource jndi-name="java:jboss/datasources/CycleDS" pool-name="CycleDS" enabled="true" use-ccm="false">
+          <xa-datasource-property name="ServerName">
+            database.host
+          </xa-datasource-property>
+          <xa-datasource-property name="PortNumber">
+            50000
+          </xa-datasource-property>
+          <xa-datasource-property name="DatabaseName">
+            database.name
+          </xa-datasource-property>
+          <xa-datasource-property name="DriverType">
+            4
+          </xa-datasource-property>
+          <xa-datasource-property name="User">
+            database.user
+          </xa-datasource-property>
+          <xa-datasource-property name="Password">
+            database.password
+          </xa-datasource-property>
           <driver>db2</driver>
-          <security>
-            <user-name>database.user</user-name>
-            <password>database.password</password>
-          </security>
-        </datasource>
-        <datasource jndi-name="java:jboss/datasources/FoxEngineDS" pool-name="FoxEngineDS" jta="true" enabled="true" use-java-context="true" use-ccm="true">
-          <connection-url>jdbc:db2://database.host:50000/database.name</connection-url>
+          <xa-pool>
+            <is-same-rm-override>false</is-same-rm-override>
+          </xa-pool>
+          <validation>
+            <valid-connection-checker class-name="org.jboss.jca.adapters.jdbc.extensions.db2.DB2ValidConnectionChecker"/>
+            <stale-connection-checker class-name="org.jboss.jca.adapters.jdbc.extensions.db2.DB2StaleConnectionChecker"/>
+            <exception-sorter class-name="org.jboss.jca.adapters.jdbc.extensions.db2.DB2ExceptionSorter"/>
+          </validation>
+        </xa-datasource>
+        <xa-datasource jndi-name="java:jboss/datasources/FoxEngineDS" pool-name="FoxEngineDS" enabled="true" use-ccm="false">
+          <xa-datasource-property name="ServerName">
+            database.host
+          </xa-datasource-property>
+          <xa-datasource-property name="PortNumber">
+            50000
+          </xa-datasource-property>
+          <xa-datasource-property name="DatabaseName">
+            database.name
+          </xa-datasource-property>
+          <xa-datasource-property name="DriverType">
+            4
+          </xa-datasource-property>
+          <xa-datasource-property name="User">
+            database.user
+          </xa-datasource-property>
+          <xa-datasource-property name="Password">
+            database.password
+          </xa-datasource-property>
           <driver>db2</driver>
-          <security>
-            <user-name>database.user</user-name>
-            <password>database.password</password>
-          </security>
-        </datasource>
+          <xa-pool>
+            <is-same-rm-override>false</is-same-rm-override>
+          </xa-pool>
+          <validation>
+            <valid-connection-checker class-name="org.jboss.jca.adapters.jdbc.extensions.db2.DB2ValidConnectionChecker"/>
+            <stale-connection-checker class-name="org.jboss.jca.adapters.jdbc.extensions.db2.DB2StaleConnectionChecker"/>
+            <exception-sorter class-name="org.jboss.jca.adapters.jdbc.extensions.db2.DB2ExceptionSorter"/>
+          </validation>
+        </xa-datasource>
         <drivers>
           <driver name="h2" module="com.h2database.h2">
             <xa-datasource-class>org.h2.jdbcx.JdbcDataSource</xa-datasource-class>
           </driver>
           <driver name="db2" module="com.ibm.db2.jcc.db2jcc4">
-            <xa-datasource-class>com.ibm.db2.jcc.DB2Driver</xa-datasource-class>
+            <xa-datasource-class>com.ibm.db2.jcc.DB2XADataSource</xa-datasource-class>
           </driver>
         </drivers>
       </datasources>

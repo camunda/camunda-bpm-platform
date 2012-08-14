@@ -47,7 +47,7 @@ public class StressDeploymentTest {
     "processes/CdiResolvingBean.bpmn20.xml",
     "processes/CdiResolvingBeanFromJobExecutor.bpmn20.xml",
     "processes/DelegateExecution.bpmn20.xml",
-    "processes/SimpleExpressionEvaluation.bpmn20.xml",
+    "processes/SimpleExpressionEvaluation.bpmn20.xml"
   })
   public void shouldWorkOkWhenManyProcessesAreDeployedInParallel() throws Exception {
     // given

@@ -1,7 +1,5 @@
 package com.camunda.fox.platform.qa.deployer.configuration;
 
-import static org.fest.assertions.Assertions.assertThat;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -10,6 +8,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Properties;
 
+import static org.fest.assertions.Assertions.assertThat;
 import org.junit.Test;
 
 public class ConfigurationImporterTest {
