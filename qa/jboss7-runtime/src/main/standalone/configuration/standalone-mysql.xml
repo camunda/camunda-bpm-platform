@@ -106,7 +106,7 @@
                     </security>
                 </datasource>
                 <datasource jta="true" jndi-name="java:jboss/datasources/FoxEngineDS" pool-name="FoxEngineDS" enabled="true" use-java-context="true" use-ccm="true">
-                    <connection-url>jdbc:mysql://database.host:3306/database.name</connection-url>
+                    <connection-url>jdbc:mysql://${database.host}:3306/${database.name}</connection-url>
                     <driver>com.mysql</driver>
                     <transaction-isolation>TRANSACTION_READ_COMMITTED</transaction-isolation>
                     <pool>
@@ -115,8 +115,8 @@
                         <flush-strategy>FailingConnectionOnly</flush-strategy>
                     </pool>
                     <security>
-                        <user-name>database.user</user-name>
-                        <password>database.password</password>
+                        <user-name>${database.user}</user-name>
+                        <password>${database.password}</password>
                     </security>
                     <validation>
                         <validate-on-match>false</validate-on-match>
@@ -124,7 +124,7 @@
                     </validation>
                 </datasource>
                 <datasource jta="true" jndi-name="java:jboss/datasources/CycleDS" pool-name="CycleDS" enabled="true" use-java-context="true" use-ccm="true">
-                    <connection-url>jdbc:mysql://database.host:3306/cdatabase.name</connection-url>
+                    <connection-url>jdbc:mysql://${database.host}:3306/c${database.name}</connection-url>
                     <driver>com.mysql</driver>
                     <transaction-isolation>TRANSACTION_READ_COMMITTED</transaction-isolation>
                     <pool>
@@ -133,8 +133,8 @@
                         <flush-strategy>FailingConnectionOnly</flush-strategy>
                     </pool>
                     <security>
-                        <user-name>database.user</user-name>
-                        <password>database.password</password>
+                        <user-name>${database.user}</user-name>
+                        <password>${database.password}</password>
                     </security>
                     <validation>
                         <validate-on-match>false</validate-on-match>

@@ -154,22 +154,22 @@
         </datasource>
         <xa-datasource jndi-name="java:jboss/datasources/CycleDS" pool-name="CycleDS" enabled="true" use-ccm="false">
           <xa-datasource-property name="ServerName">
-            database.host
+            ${database.host}
           </xa-datasource-property>
           <xa-datasource-property name="PortNumber">
             50000
           </xa-datasource-property>
           <xa-datasource-property name="DatabaseName">
-            database.name
+            ${database.name}
           </xa-datasource-property>
           <xa-datasource-property name="DriverType">
             4
           </xa-datasource-property>
           <xa-datasource-property name="User">
-            database.user
+            ${database.user}
           </xa-datasource-property>
           <xa-datasource-property name="Password">
-            database.password
+            ${database.password}
           </xa-datasource-property>
           <driver>db2</driver>
           <xa-pool>
@@ -183,22 +183,22 @@
         </xa-datasource>
         <xa-datasource jndi-name="java:jboss/datasources/FoxEngineDS" pool-name="FoxEngineDS" enabled="true" use-ccm="false">
           <xa-datasource-property name="ServerName">
-            database.host
+            ${database.host}
           </xa-datasource-property>
           <xa-datasource-property name="PortNumber">
             50000
           </xa-datasource-property>
           <xa-datasource-property name="DatabaseName">
-            database.name
+            ${database.name}
           </xa-datasource-property>
           <xa-datasource-property name="DriverType">
             4
           </xa-datasource-property>
           <xa-datasource-property name="User">
-            database.user
+            ${database.user}
           </xa-datasource-property>
           <xa-datasource-property name="Password">
-            database.password
+            ${database.password}
           </xa-datasource-property>
           <driver>db2</driver>
           <xa-pool>

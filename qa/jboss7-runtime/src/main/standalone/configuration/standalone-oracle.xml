@@ -106,7 +106,7 @@
                     </security>
                 </datasource>
                 <datasource jta="true" jndi-name="java:jboss/datasources/FoxEngineDS" pool-name="FoxEngineDS" enabled="true" use-java-context="true" use-ccm="true">
-                    <connection-url>jdbc:oracle:thin:@database.host:1521:database.name</connection-url>
+                    <connection-url>jdbc:oracle:thin:@${database.host}:1521:${database.name}</connection-url>
                     <driver>com.oracle</driver>
                     <transaction-isolation>TRANSACTION_READ_COMMITTED</transaction-isolation>
                     <pool>
@@ -115,8 +115,8 @@
                         <flush-strategy>FailingConnectionOnly</flush-strategy>
                     </pool>
                     <security>
-                        <user-name>database.user</user-name>
-                        <password>database.password</password>
+                        <user-name>${database.user}</user-name>
+                        <password>${database.password}</password>
                     </security>
                     <validation>
                         <validate-on-match>false</validate-on-match>
@@ -124,7 +124,7 @@
                     </validation>
                 </datasource>
                 <datasource jta="true" jndi-name="java:jboss/datasources/CycleDS" pool-name="CycleDS" enabled="true" use-java-context="true" use-ccm="true">
-                    <connection-url>jdbc:oracle:thin:@database.host:1521:database.name</connection-url>
+                    <connection-url>jdbc:oracle:thin:@${database.host}:1521:${database.name}</connection-url>
                     <driver>com.oracle</driver>
                     <transaction-isolation>TRANSACTION_READ_COMMITTED</transaction-isolation>
                     <pool>
@@ -133,8 +133,8 @@
                         <flush-strategy>FailingConnectionOnly</flush-strategy>
                     </pool>
                     <security>
-                        <user-name>database.user</user-name>
-                        <password>database.password</password>
+                        <user-name>${database.user}</user-name>
+                        <password>${database.password}</password>
                     </security>
                     <validation>
                         <validate-on-match>false</validate-on-match>
@@ -145,7 +145,7 @@
                     <driver name="h2" module="com.h2database.h2">
                         <xa-datasource-class>org.h2.jdbcx.JdbcDataSource</xa-datasource-class>
                     </driver>
-                    <driver name="com.oracle" module="com.oracle.jdbc">
+                    <driver name="com.oracle" module="com.oracle.jdbc.ojdbc6">
                         <xa-datasource-class>oracle.jdbc.OracleDriver</xa-datasource-class>
                     </driver>
                 </drivers>

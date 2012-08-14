@@ -106,22 +106,22 @@
           </security>
         </datasource>
         <xa-datasource jndi-name="java:jboss/datasources/FoxEngineDS" enabled="true" use-ccm="false" pool-name="FoxEngineDS">
-          <xa-datasource-property name="URL">jdbc:sqlserver://database.host</xa-datasource-property>
+          <xa-datasource-property name="URL">jdbc:sqlserver://${database.host}</xa-datasource-property>
           <xa-datasource-property name="PortNumber">1433</xa-datasource-property>
-          <xa-datasource-property name="DatabaseName">database.name</xa-datasource-property>
-          <xa-datasource-property name="User">database.user</xa-datasource-property>
-          <xa-datasource-property name="password">database.password</xa-datasource-property>
+          <xa-datasource-property name="DatabaseName">${database.name}</xa-datasource-property>
+          <xa-datasource-property name="User">${database.user}</xa-datasource-property>
+          <xa-datasource-property name="password">${database.password}</xa-datasource-property>
           <driver>com.microsoft.sqlserver</driver>
           <validation>
             <valid-connection-checker class-name="org.jboss.jca.adapters.jdbc.extensions.mssql.MSSQLValidConnectionChecker"></valid-connection-checker>
           </validation>
         </xa-datasource>
         <xa-datasource jndi-name="java:jboss/datasources/CycleDS" enabled="true" use-ccm="false" pool-name="CycleDS">
-          <xa-datasource-property name="URL">jdbc:sqlserver://database.host</xa-datasource-property>
+          <xa-datasource-property name="URL">jdbc:sqlserver://${database.host}</xa-datasource-property>
           <xa-datasource-property name="PortNumber">1433</xa-datasource-property>
-          <xa-datasource-property name="DatabaseName">database.name</xa-datasource-property>
-          <xa-datasource-property name="User">database.user</xa-datasource-property>
-          <xa-datasource-property name="Password">database.password</xa-datasource-property>
+          <xa-datasource-property name="DatabaseName">${database.name}</xa-datasource-property>
+          <xa-datasource-property name="User">${database.user}</xa-datasource-property>
+          <xa-datasource-property name="Password">${database.password}</xa-datasource-property>
           <driver>com.microsoft.sqlserver</driver>
           <validation>
             <valid-connection-checker class-name="org.jboss.jca.adapters.jdbc.extensions.mssql.MSSQLValidConnectionChecker"></valid-connection-checker>
@@ -304,7 +304,7 @@
     <subsystem xmlns="urn:jboss:domain:web:1.1" default-virtual-server="default-host" native="false">
       <connector name="http" protocol="HTTP/1.1" scheme="http" socket-binding="http"/>
       <virtual-server name="default-host" enable-welcome-root="true">
-        <alias name="database.host"/>
+        <alias name="${database.host}"/>
         <alias name="example.com"/>
       </virtual-server>
     </subsystem>
@@ -369,7 +369,7 @@
     <socket-binding name="txn-recovery-environment" port="4712"/>
     <socket-binding name="txn-status-manager" port="4713"/>
     <outbound-socket-binding name="mail-smtp">
-      <remote-destination host="database.host" port="25"/>
+      <remote-destination host="${database.host}" port="25"/>
     </outbound-socket-binding>
   </socket-binding-group>
 </server>
