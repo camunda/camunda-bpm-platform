@@ -37,17 +37,12 @@
         <version>${version.fest_assert}</version>
       </dependency>
       <dependency>
-        <groupId>com.camunda.fox.platform</groupId>
-        <artifactId>fox-platform-core-bom</artifactId>
-        <version>${project.version}</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-      <dependency>
+        <!-- make sure this comes after runtime in the reactor build -->
         <groupId>com.camunda.fox.platform</groupId>
         <artifactId>fox-platform-qa-jboss-runtime</artifactId>
         <version>${project.version}</version>
-        <type>tar.gz</type>
+        <scope>provided</scope>
+        <type>pom</type>
       </dependency>
       <dependency>
         <groupId>org.jboss.arquillian</groupId>
