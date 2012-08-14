@@ -29,11 +29,11 @@
 			datasource-classname="com.microsoft.sqlserver.jdbc.SQLServerXADataSource" 
 			res-type="javax.sql.XADataSource" non-transactional-connections="true" 
 			name="MSSQLPool">
-		<property name="user" value="CA_TEST_FOX_PLAT"></property>
-		<property name="password" value="CaPlat12"></property>
-		<property name="serverName" value="vm19.camunda.com"></property>
+		<property name="user" value="database.user"></property>
+		<property name="password" value="database.password"></property>
+		<property name="serverName" value="database.host"></property>
 		<property name="portNumber" value="1433"></property>
-		<property name="databaseName" value="CA_TEST_FOX_PLAT"></property>
+		<property name="databaseName" value="database.name"></property>
 	</jdbc-connection-pool>
 	<resource-adapter-config
 		enabled="true" 

@@ -106,22 +106,22 @@
           </security>
         </datasource>
         <datasource jndi-name="java:jboss/datasources/FoxEngineDS" enabled="true" use-java-context="true" jta="true" use-ccm="true" pool-name="FoxEngineDS">
-          <connection-url>jdbc:sqlserver://${database.host}:1433;DatabaseName=${database.name}</connection-url>
+          <connection-url>jdbc:sqlserver://database.host:1433;DatabaseName=database.name</connection-url>
           <driver>com.microsoft.sqlserver</driver>
           <security>
-            <user-name>${database.user}</user-name>
-            <password>${database.password}</password>
+            <user-name>database.user</user-name>
+            <password>database.password</password>
           </security>
           <validation>
             <valid-connection-checker class-name="org.jboss.jca.adapters.jdbc.extensions.mssql.MSSQLValidConnectionChecker"></valid-connection-checker>
           </validation>
         </datasource>
         <datasource jndi-name="java:jboss/datasources/CycleDS" enabled="true" use-java-context="true" jta="true" use-ccm="true" pool-name="CycleDS">
-          <connection-url>jdbc:sqlserver://${database.host}:1433;DatabaseName=${database.name}</connection-url>
+          <connection-url>jdbc:sqlserver://database.host:1433;DatabaseName=database.name</connection-url>
           <driver>com.microsoft.sqlserver</driver>
           <security>
-            <user-name>${database.user}</user-name>
-            <password>${database.password}</password>
+            <user-name>database.user</user-name>
+            <password>database.password</password>
           </security>
           <validation>
             <valid-connection-checker class-name="org.jboss.jca.adapters.jdbc.extensions.mssql.MSSQLValidConnectionChecker"></valid-connection-checker>

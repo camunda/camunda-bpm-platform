@@ -107,9 +107,9 @@
         </datasource>
         <xa-datasource jndi-name="java:jboss/datasources/FoxEngineDS" pool-name="FoxEngineDS" enabled="true" use-ccm="false">
           <driver>com.oracle</driver>
-          <xa-datasource-property name="URL">jdbc:oracle:thin:@//${database.host}:1521:${database.name}</xa-datasource-property>
-          <xa-datasource-property name="User">${database.user}</xa-datasource-property>
-          <xa-datasource-property name="Password">${database.password}</xa-datasource-property>
+          <xa-datasource-property name="URL">jdbc:oracle:thin:@//database.host:1521:database.name</xa-datasource-property>
+          <xa-datasource-property name="User">database.user</xa-datasource-property>
+          <xa-datasource-property name="Password">database.password</xa-datasource-property>
           <xa-pool>
             <min-pool-size>1</min-pool-size>
             <max-pool-size>60</max-pool-size>
@@ -131,9 +131,9 @@
         </xa-datasource>
         <xa-datasource jndi-name="java:jboss/datasources/CycleDS" pool-name="CycleDS" enabled="true" use-ccm="false">
           <driver>com.oracle</driver>
-          <xa-datasource-property name="URL">jdbc:oracle:thin:@//${database.host}:1521:${database.name}</xa-datasource-property>
-          <xa-datasource-property name="User">${database.user}</xa-datasource-property>
-          <xa-datasource-property name="Password">${database.password}</xa-datasource-property>
+          <xa-datasource-property name="URL">jdbc:oracle:thin:@//database.host:1521:database.name</xa-datasource-property>
+          <xa-datasource-property name="User">database.user</xa-datasource-property>
+          <xa-datasource-property name="Password">database.password</xa-datasource-property>
           <xa-pool>
             <min-pool-size>1</min-pool-size>
             <max-pool-size>60</max-pool-size>

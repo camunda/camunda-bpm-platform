@@ -29,11 +29,11 @@
 			datasource-classname="com.ibm.db2.jcc.DB2XADataSource" 
 			res-type="javax.sql.XADataSource" non-transactional-connections="true" 
 			name="DB2Pool">
-		<property name="user" value="fox_plat"></property>
-		<property name="password" value="CaPlat12"></property>
+		<property name="user" value="database.user"></property>
+		<property name="password" value="database.password"></property>
 		<property name="portNumber" value="50000"></property>
-		<property name="databaseName" value="PLATFORM"></property>
-		<property name="serverName" value="vm18.camunda.com"></property>
+		<property name="databaseName" value="database.name"></property>
+		<property name="serverName" value="database.host"></property>
 		<property name="driverType" value="4"></property>
 	</jdbc-connection-pool>
 	<resource-adapter-config
