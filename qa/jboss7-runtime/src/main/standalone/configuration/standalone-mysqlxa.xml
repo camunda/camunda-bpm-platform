@@ -107,9 +107,9 @@
                 </datasource>
                 <xa-datasource jndi-name="java:jboss/datasources/FoxEngineDS" pool-name="FoxEngineDS" enabled="true" use-ccm="false">
                     <driver>com.mysql</driver>
-					<xa-datasource-property name="URL">jdbc:mysql://${database.host}:3306/${database.name}</xa-datasource-property>
-					<xa-datasource-property name="User">${database.user}</xa-datasource-property>
-					<xa-datasource-property name="Password">${database.password}</xa-datasource-property>
+					<xa-datasource-property name="URL">jdbc:mysql://database.host:3306/database.name</xa-datasource-property>
+					<xa-datasource-property name="User">database.user</xa-datasource-property>
+					<xa-datasource-property name="Password">database.password</xa-datasource-property>
 					<xa-pool>
                         <min-pool-size>1</min-pool-size>
                         <max-pool-size>60</max-pool-size>
@@ -130,9 +130,9 @@
                 </xa-datasource>
                 <xa-datasource jndi-name="java:jboss/datasources/CycleDS" pool-name="CycleDS" enabled="true" use-ccm="true">
                     <driver>com.mysql</driver>
-					<xa-datasource-property name="URL">jdbc:mysql://${database.host}:3306/${database.name}</xa-datasource-property>
-					<xa-datasource-property name="User">${database.user}</xa-datasource-property>
-					<xa-datasource-property name="Password">${database.password}</xa-datasource-property>
+					<xa-datasource-property name="URL">jdbc:mysql://database.host:3306/database.name</xa-datasource-property>
+					<xa-datasource-property name="User">database.user</xa-datasource-property>
+					<xa-datasource-property name="Password">database.password</xa-datasource-property>
 					<xa-pool>
                         <min-pool-size>1</min-pool-size>
                         <max-pool-size>60</max-pool-size>
@@ -157,9 +157,6 @@
                     </driver>
                     <driver name="com.mysql" module="com.mysql">
                         <xa-datasource-class>com.mysql.jdbc.jdbc2.optional.MysqlXADataSource</xa-datasource-class>
-                    </driver>
-					<driver name="com.oracle" module="com.oracle.ojdbc6">
-                        <xa-datasource-class>oracle.jdbc.OracleDriver</xa-datasource-class>
                     </driver>
                 </drivers>
             </datasources>

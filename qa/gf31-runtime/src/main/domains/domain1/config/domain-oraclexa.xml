@@ -29,9 +29,9 @@
 			datasource-classname="oracle.jdbc.pool.OracleXADataSource" 
 			res-type="javax.sql.XADataSource" non-transactional-connections="true" 
 			name="OraclePool">
-		<property name="user" value="CA_TEST_FOX_PLAT"></property>
-		<property name="password" value="CaPlat12"></property>
-		<property name="url" value="jdbc:oracle:thin:@fox-test-oracle.camunda.com:1521:xe"></property>
+		<property name="user" value="database.user"></property>
+		<property name="password" value="database.password"></property>
+		<property name="url" value="jdbc:oracle:thin:@database.host:1521:database.name"></property>
 	</jdbc-connection-pool>
 	<resource-adapter-config
 		enabled="true" 
