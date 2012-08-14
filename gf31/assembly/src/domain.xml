@@ -7,7 +7,25 @@
       </module>
     </application>
   </system-applications>
-  <applications></applications>
+  <applications>
+    <application location="${com.sun.aas.instanceRootURI}/applications/fox-platform-jobexecutor-rar/" name="fox-platform-jobexecutor-rar" object-type="user">
+      <module name="fox-platform-jobexecutor-rar">
+        <engine sniffer="connector"></engine>
+      </module>
+    </application>
+    <application location="${com.sun.aas.instanceRootURI}/applications/camunda-fox-platform/" name="camunda-fox-platform" object-type="user">
+      <property name="isComposite" value="true"></property>
+      <engine sniffer="ear"></engine>
+      <module name="fox-platform-glassfish-service-${project.version}.jar">
+        <engine sniffer="ejb"></engine>
+        <engine sniffer="security"></engine>
+      </module>
+      <module name="fox-platform-jobexecutor-service-${project.version}.jar">
+        <engine sniffer="ejb"></engine>
+        <engine sniffer="security"></engine>
+      </module>
+    </application>
+  </applications>
   <resources>
     <jdbc-resource pool-name="__TimerPool" jndi-name="jdbc/__TimerPool" object-type="system-admin"></jdbc-resource>
     <jdbc-resource pool-name="DerbyPool" jndi-name="jdbc/__default"></jdbc-resource>
@@ -52,6 +70,8 @@
   <servers>
     <server name="server" config-ref="server-config">
       <application-ref ref="__admingui" virtual-servers="__asadmin"></application-ref>
+      <application-ref ref="fox-platform-jobexecutor-rar" virtual-servers="server"></application-ref>
+      <application-ref ref="camunda-fox-platform" virtual-servers="server"></application-ref>
       <resource-ref ref="jdbc/__TimerPool"></resource-ref>
       <resource-ref ref="jdbc/__default"></resource-ref>
       <resource-ref ref="jdbc/FoxEngine"></resource-ref>
