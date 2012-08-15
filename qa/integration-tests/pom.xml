@@ -251,8 +251,10 @@
                 <exclude>**/JobExecutorRequestContextSFSBDelegateTest.java</exclude>
                 <!-- NOT Implemented -->
                 <exclude>**/JobExecutorRequestContextLocalInvocationTest.java</exclude>
-                 <!-- NOT Implemented -->
+                <!-- NOT Implemented -->
                 <exclude>**/ejb/local/*</exclude>
+                <!-- HEMERA- -->
+                <excludes>**/TestFoxPlatformClientAsEjbModule**</excludes>
               </excludes>
             </configuration>
           </plugin>
