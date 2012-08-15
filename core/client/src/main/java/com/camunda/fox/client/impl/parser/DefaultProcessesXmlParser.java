@@ -17,6 +17,10 @@ package com.camunda.fox.client.impl.parser;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -33,7 +37,7 @@ import com.camunda.fox.client.impl.schema.ProcessesXmlDeprecated.Process;
 import com.camunda.fox.platform.FoxPlatformException;
 
 /**
- * <p>A JAXB-Parser for the META-INF/processes.xml file</p>
+ * <p>A JAXB-Parser for the META-INF/processes.xml files</p>
  * 
  * @author Daniel Meyer
  */
@@ -41,21 +45,40 @@ public class DefaultProcessesXmlParser implements ProcessesXmlParser {
   
   private static Logger log = Logger.getLogger(DefaultProcessesXmlParser.class.getName());
   
-  public ProcessesXml parseProcessesXml(String processesXmlLocation) {
-    InputStream processesXmlStream = getProcessesXmlAsStream(processesXmlLocation);  
-    try {      
-      if(processesXmlStream == null) { // markerfile not found        
-        return null;        
-      } else if(isEmptyStream(processesXmlStream, processesXmlLocation)) { // markerfile empty
-        return handleEmptyMarkerfile(processesXmlLocation);
-      } else {         
-        return parseStream(processesXmlStream, processesXmlLocation);
+  public List<ProcessesXml> parseProcessesXml(String processesXmlLocation) {
+
+    List<ProcessesXml> processesXmls = new ArrayList<ProcessesXml>();
+    
+    Enumeration<URL> processesXmlUrls = getProcessesXmlUrls(processesXmlLocation);        
+    while (processesXmlUrls.hasMoreElements()) {
+      URL url = (URL) processesXmlUrls.nextElement();
+      InputStream processesXmlStream;
+      try {
+        processesXmlStream = url.openStream();
+      } catch (IOException e) {
+        throw new FoxPlatformException("Could not load "+url.getPath()+ " metafile", e);     
       }
-    } finally {
-      if(processesXmlStream != null) {
-        IoUtil.closeSilently(processesXmlStream);
-      }
-    }
+      try {
+        
+        ProcessesXml processesXml = null;
+        if(isEmptyStream(processesXmlStream, processesXmlLocation)) { // markerfile empty
+          processesXml = handleEmptyMarkerfile(processesXmlLocation);
+        } else {         
+           processesXml = parseStream(processesXmlStream, processesXmlLocation, url);
+        }
+        
+        processesXml.metaFileUrl = url;
+        
+        processesXmls.add(processesXml);
+        
+      } finally {
+        if(processesXmlStream != null) {
+          IoUtil.closeSilently(processesXmlStream);
+        }
+      } 
+    }    
+    
+    return processesXmls;
   }
 
   protected boolean isEmptyStream(InputStream processesXmlStream, String processesXmlLocation) {
@@ -67,7 +90,7 @@ public class DefaultProcessesXmlParser implements ProcessesXmlParser {
     }
   }
 
-  protected ProcessesXml parseStream(InputStream processesXmlStream, String processesXmlLocation) {
+  protected ProcessesXml parseStream(InputStream processesXmlStream, String processesXmlLocation, URL url) {
     try {
       JAXBContext context = JAXBContext.newInstance(ProcessesXml.class);    
       Unmarshaller unmarshaller = context.createUnmarshaller();
@@ -75,7 +98,7 @@ public class DefaultProcessesXmlParser implements ProcessesXmlParser {
       return processesXml;
     }catch (Exception e) {
       try {        
-        return temporarySupportForDeprecatedSyntax(processesXmlLocation); 
+        return temporarySupportForDeprecatedSyntax(processesXmlLocation, url); 
       }catch (Exception ex) {
         // throw original exception:
         throw new FoxPlatformException("Exception while parsing '"+processesXmlLocation+"': "+e.getMessage(),e); 
@@ -84,11 +107,11 @@ public class DefaultProcessesXmlParser implements ProcessesXmlParser {
     }
   }
 
-  private ProcessesXml temporarySupportForDeprecatedSyntax(String processesXmlLocation) throws Exception {    
+  private ProcessesXml temporarySupportForDeprecatedSyntax(String processesXmlLocation, URL url) throws Exception {    
     // try using old syntax:
     JAXBContext context = JAXBContext.newInstance(ProcessesXmlDeprecated.class);    
     Unmarshaller unmarshaller = context.createUnmarshaller();
-    InputStream processesXmlAsStream = getProcessesXmlAsStream(processesXmlLocation);
+    InputStream processesXmlAsStream = url.openStream();
     try {
       ProcessesXmlDeprecated processesXmlDeprecated = (ProcessesXmlDeprecated) unmarshaller.unmarshal(processesXmlAsStream);
       log.warning("Using deprecated syntax for "+processesXmlLocation+" file. Please update to the new syntax.");
@@ -117,8 +140,22 @@ public class DefaultProcessesXmlParser implements ProcessesXmlParser {
      return processesXml;
   }
 
-  protected InputStream getProcessesXmlAsStream(String processesXmlLocation) {
-    return getClass().getClassLoader().getResourceAsStream(processesXmlLocation);
+  protected Enumeration<URL> getProcessesXmlUrls(String processesXmlLocation) {
+    ClassLoader classloader = getClassloader();
+    try {
+      return classloader.getResources(processesXmlLocation);
+    }catch (IOException e) {
+      throw new FoxPlatformException("Could not load "+processesXmlLocation+ " metafiles", e);     
+    }    
+  }
+
+  protected ClassLoader getClassloader() {
+    ClassLoader tcl = Thread.currentThread().getContextClassLoader();
+    if(tcl != null) {
+      return tcl;
+    } else {
+      return getClass().getClassLoader();
+    }
   }
   
 }
