@@ -5,19 +5,18 @@
   
   <parent>
     <groupId>com.camunda.fox.platform.qa</groupId>
-    <artifactId>arquillian-test</artifactId>
+    <artifactId>fox-platform-arquillian-test</artifactId>
     <version>6.1.0-SNAPSHOT</version>
   </parent>
   
   <groupId>com.camunda.fox.platform.qa</groupId>
-  <artifactId>arquillian-test-deployer</artifactId>
+  <artifactId>fox-platform-arquillian-test-deployer</artifactId>
   <packaging>jar</packaging>
   
-  <name>fox platform EE - arquillian test integration tests</name>
+  <name>fox platform EE - Arquillian Test Integrationtests</name>
   
   <properties>
     <version.arq.container.glassfish>1.0.0.CR2</version.arq.container.glassfish>
-    <version.jbossas>7.1.0.Final</version.jbossas>
     <version.jbossas_spec>1.0.0.Final</version.jbossas_spec>
     <version.cdi>1.0</version.cdi>
     <version.validation.api>1.0.0.GA</version.validation.api>
@@ -31,7 +30,7 @@
   <dependencies>  
     <dependency>
       <groupId>com.camunda.fox.platform.qa</groupId>
-      <artifactId>arquillian-test-deployer</artifactId>
+      <artifactId>fox-platform-arquillian-test-deployer</artifactId>
       <version>${project.version}</version>
     </dependency>
     
@@ -97,7 +96,7 @@
         <dependency>
           <groupId>org.jboss.as</groupId>
           <artifactId>jboss-as-arquillian-container-managed</artifactId>
-          <version>${version.jbossas}</version>
+          <version>${version.jboss.as}</version>
           <scope>test</scope>
         </dependency>
         <dependency>
@@ -113,7 +112,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-dependency-plugin</artifactId>
-            <version>2.3</version>
+            <version>2.4</version>
             <executions>
               <execution>
                 <id>unpack</id>

@@ -1,19 +1,17 @@
-
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
     <groupId>com.camunda.fox.platform.qa</groupId>
-    <artifactId>arquillian-test</artifactId>
+    <artifactId>fox-platform-arquillian-test</artifactId>
     <version>6.1.0-SNAPSHOT</version>
   </parent>
   
-  <groupId>com.camunda.fox.platform.qa</groupId>
-  <artifactId>arquillian-test-deployer</artifactId>
+  <artifactId>fox-platform-arquillian-test-deployer</artifactId>
   <packaging>jar</packaging>
 
-  <name>fox platform EE - arquillian test deployer</name>
+  <name>fox platform EE - Arquillian Test Deployer</name>
   
   <dependencies>
     <dependency>
@@ -156,20 +154,17 @@
           <!-- make sure this comes after runtime in the reactor build -->
           <groupId>com.camunda.fox.platform</groupId>
           <artifactId>fox-platform-qa-jboss-runtime</artifactId>
-          <version>${project.version}</version>
           <scope>provided</scope>
           <type>pom</type>
         </dependency>
         <dependency>
           <groupId>org.jboss.as</groupId>
           <artifactId>jboss-as-arquillian-container-managed</artifactId>
-          <version>7.1.1.Final</version>
           <scope>test</scope>
         </dependency>
         <dependency>
           <groupId>org.jboss.arquillian.protocol</groupId>
           <artifactId>arquillian-protocol-servlet</artifactId>
-          <version>1.0.1.Final</version>
           <scope>test</scope>
         </dependency>
       </dependencies>
@@ -200,7 +195,7 @@
         <dependency>
           <groupId>org.jboss.as</groupId>
           <artifactId>jboss-as-arquillian-container-remote</artifactId>
-          <version>${version.jbossas}</version>
+          <version>${version.jboss.as}</version>
           <scope>test</scope>
         </dependency>
         <dependency>

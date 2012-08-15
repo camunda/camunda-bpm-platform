@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>com.camunda.fox.platform.qa</groupId>
-  <artifactId>arquillian-test</artifactId>
+  <artifactId>fox-platform-arquillian-test</artifactId>
   
   <parent>
     <groupId>com.camunda.fox.platform</groupId>
@@ -12,7 +12,7 @@
   </parent>
   
   <packaging>pom</packaging>
-  <name>fox platform EE - arquillian test</name>
+  <name>fox platform EE - Arquillian Test</name>
   
   <!-- Properties -->
   <properties>
@@ -21,7 +21,6 @@
     <version.fest_assert>1.4</version.fest_assert>
     <version.el_api>2.2</version.el_api>
     <version.h2>1.2.132</version.h2>
-    <version.fox.commons>${project.version}</version.fox.commons>
   </properties>
   
   <build>
@@ -76,7 +75,7 @@
       <dependency>
         <groupId>com.camunda.fox.commons</groupId>
         <artifactId>commons-bom</artifactId>
-        <version>${version.fox.commons}</version>
+        <version>${project.version}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
