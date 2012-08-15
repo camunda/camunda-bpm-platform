@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>tasklist-gui-tests</artifactId>
-  <name>fox platform EE - task-list GUI tests</name>
+  <name>fox platform EE - Tasklist GUI tests</name>
 
   <parent>
     <groupId>com.camunda.fox.platform</groupId>

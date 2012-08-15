@@ -10,10 +10,6 @@
     <version>6.1.0-SNAPSHOT</version>
   </parent>
   
-  <properties>
-    <version.fox.commons>${project.version}</version.fox.commons>
-  </properties>
-  
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
@@ -23,7 +19,7 @@
 
     <dependency>
       <groupId>com.camunda.fox.platform.qa</groupId>
-      <artifactId>arquillian-test-deployer</artifactId>
+      <artifactId>fox-platform-arquillian-test-deployer</artifactId>
       <version>${project.version}</version>
     </dependency>
     
@@ -145,7 +141,7 @@
     <dependency>
       <groupId>org.jboss.as</groupId>
       <artifactId>jboss-as-build-config</artifactId>
-      <version>7.1.1.Final</version>
+      <version>${version.jboss.as}</version>
     </dependency>
     <dependency>
       <groupId>org.jboss.marshalling</groupId>
@@ -159,7 +155,7 @@
       <dependency>
         <groupId>com.camunda.fox.commons</groupId>
         <artifactId>commons-bom</artifactId>
-        <version>${version.fox.commons}</version>
+        <version>${project.version}</version>
         <type>pom</type>
         <scope>import</scope>
       </dependency>
@@ -293,13 +289,11 @@
         <dependency>
           <groupId>org.jboss.as</groupId>
           <artifactId>jboss-as-arquillian-container-managed</artifactId>
-          <version>7.1.1.Final</version>
           <scope>test</scope>
         </dependency>
         <dependency>
           <groupId>org.jboss.arquillian.protocol</groupId>
           <artifactId>arquillian-protocol-servlet</artifactId>
-          <version>1.0.1.Final</version>
           <scope>test</scope>
         </dependency>
       </dependencies>
