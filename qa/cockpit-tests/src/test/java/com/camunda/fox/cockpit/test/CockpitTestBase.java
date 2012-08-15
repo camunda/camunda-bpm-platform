@@ -1,6 +1,8 @@
 package com.camunda.fox.cockpit.test;
 
 
+import org.jboss.shrinkwrap.api.ArchivePath;
+import org.jboss.shrinkwrap.api.Filter;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
@@ -32,7 +34,7 @@ import com.camunda.fox.license.entity.FoxComponent;
 public class CockpitTestBase {
   
   public static WebArchive createBaseDeployment() {
-    return ShrinkWrap
+	  return ShrinkWrap
       .create(WebArchive.class)
         .addAsManifestResource(EmptyAsset.INSTANCE, "beans.xml")
         .addAsWebInfResource("META-INF/beans.xml", "beans.xml")
@@ -58,11 +60,13 @@ public class CockpitTestBase {
           ExecutionService.class,
           ProcessDefinitionService.class, 
           ProcessServicesProducer.class)
-      
         // Transaction 
-        .addPackages(true, 
-          "com.camunda.fox.cdi.transaction")
-        
+				.addPackages(true, new Filter<ArchivePath>() {
+					@Override
+					public boolean include(ArchivePath path) {
+						return !path.get().endsWith("DefaultTransactionImpl.class");
+					}
+				}, "com.camunda.fox.cdi.transaction")
         // Platform environment
         .addPackage("com.camunda.fox.cockpit.spi.engine")
         .addClasses(
