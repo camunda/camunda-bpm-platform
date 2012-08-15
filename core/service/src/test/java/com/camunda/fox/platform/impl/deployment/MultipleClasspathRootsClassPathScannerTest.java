@@ -49,13 +49,13 @@ public class MultipleClasspathRootsClassPathScannerTest {
     
     assertTrue("'testDeployProcessArchive.bpmn20.xml' not found", contains(scanResult, "testDeployProcessArchive.bpmn20.xml"));
     assertTrue("'testDeployProcessArchive.png' not found", contains(scanResult, "testDeployProcessArchive.png"));
-    assertEquals(4, scanResult.size());
+    assertEquals(2, scanResult.size());
     
     scanResult = scanner.scanPaResourceRootPath(classLoader, null, "directory/");
     
     assertTrue("'testDeployProcessArchive.bpmn20.xml' not found", contains(scanResult, "testDeployProcessArchive.bpmn20.xml"));
     assertTrue("'testDeployProcessArchive.png' not found", contains(scanResult, "testDeployProcessArchive.png"));
-    assertEquals(4, scanResult.size());
+    assertEquals(2, scanResult.size());
     
     scanResult = scanner.scanPaResourceRootPath(classLoader, new URL("file:src/test/resources/com/camunda/fox/platform/impl/deployment/ClassPathScannerTest.testScanClassPathWithFilesRecursive/META-INF/processes.xml"), "pa:directory/");
 
