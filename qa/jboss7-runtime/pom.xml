@@ -40,9 +40,9 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>net.sourceforge.jtds</groupId>
-      <artifactId>jtds</artifactId>
-      <scope>test</scope>
+      <groupId>com.microsoft.sqlserver</groupId>
+      <artifactId>sqljdbc4</artifactId>
+      <version>4.0</version>
     </dependency>
     <dependency>
       <groupId>com.camunda.fox.tasklist</groupId>
