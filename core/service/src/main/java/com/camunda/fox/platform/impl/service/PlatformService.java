@@ -164,6 +164,15 @@ public abstract class PlatformService implements ProcessEngineService, ProcessAr
       final ProcessArchiveContext processArchiveContext = processEngine
               .getInstalledProcessArchivesByName()
               .get(processArchiveName);
+      /*
+       *  FIXME adrobisch: this is called during PreDrestroy of ProcessArchiveSupport,
+       *  it seems, "somebody" else did uninstall the process archive before. maybe we should
+       *  check the uninstalls
+       */
+      if (processArchiveContext == null) {
+        log.info("Cannot uninstall process archive with name '" + processArchiveName + "': no process archive context found");
+        return;
+      }
       
       fireBeforeProcessArchiveUninstalled(processArchiveContext.getProcessArchive(), processEngine);
       
