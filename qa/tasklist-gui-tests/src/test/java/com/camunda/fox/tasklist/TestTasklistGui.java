@@ -2,6 +2,7 @@ package com.camunda.fox.tasklist;
 
 import java.io.File;
 import java.net.URL;
+import java.util.Date;
 
 import junit.framework.Assert;
 
@@ -85,13 +86,14 @@ public class TestTasklistGui {
     
     Assert.assertTrue(driver.getCurrentUrl().endsWith("tasklist/app/taskList.jsf"));
     
+    
     // go to start form of "Test Process"
     driver.findElement(By.linkText("Start Process...")).click();
-    driver.findElement(By.xpath("//*[@id=\"j_idt21:0:j_idt23\"]/a")).click();
+    driver.findElement(By.xpath("//a[contains(., 'Test Process')]")).click();
     
     Assert.assertTrue(driver.getCurrentUrl().contains("test-process-application/app/start.jsf"));
     
-    // fill start form and submit it  
+    // fill start form and submit it
     driver.findElement(By.id("startForm:someVariable")).sendKeys("some text");
     driver.findElement(By.id("startForm:submit_button")).submit();
     
@@ -111,13 +113,5 @@ public class TestTasklistGui {
 
     // make sure the task-list is empty
     Assert.assertTrue(driver.findElement(By.xpath("//*[@id=\"taskListView\"]/table/tbody/tr/td[1]")).getText().equals("-"));
-  }
-  
-  @Test
-  public void removeUser() throws Exception {
-    ProcessEngine processEngine = ProgrammaticBeanLookup.lookup(ProcessEngine.class);
-    
-    IdentityService identityService = processEngine.getIdentityService();
-    identityService.deleteUser("kermit");
   }
 }
