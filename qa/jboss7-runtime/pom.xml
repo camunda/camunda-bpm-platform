@@ -7,7 +7,7 @@
   <name>fox platform EE - QA jBoss7 Test Runtime</name>
   
   <properties>
-    <jboss.server.location>../../jbossas71/assembly/target/camunda-fox-ce-${project.version}/camunda-fox-ce-${project.version}/server</jboss.server.location>
+    <jboss.assembly.location>../../jbossas71/assembly/target/camunda-fox-ce-${project.version}/camunda-fox-ce-${project.version}/server</jboss.assembly.location>
   </properties>
 
   <parent>
@@ -75,7 +75,7 @@
             <configuration>
               <target unless="maven.test.skip">
                 <copy todir="target">
-                  <fileset dir="${jboss.server.location}" />
+                  <fileset dir="${jboss.assembly.location}" />
                 </copy>
                 
                 <!-- processing of src/main/standalone replaced by resource filtering (see below) -->
