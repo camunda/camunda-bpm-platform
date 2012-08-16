@@ -59,3 +59,18 @@ add TASK_ID_ varchar(64);
 
 alter table ACT_HI_ACTINST
 add CALL_PROC_INST_ID_ varchar(64);
+
+alter table ACT_RU_IDENTITYLINK
+add PROC_DEF_ID_ varchar(64);
+
+create index ACT_IDX_ATHRZ_PROCEDEF on ACT_RU_IDENTITYLINK(PROC_DEF_ID_);
+
+alter table ACT_RU_EXECUTION
+    add constraint ACT_FK_EXE_PROCDEF 
+    foreign key (PROC_DEF_ID_) 
+    references ACT_RE_PROCDEF (ID_);
+
+alter table ACT_RU_IDENTITYLINK
+    add constraint ACT_FK_ATHRZ_PROCEDEF 
+    foreign key (PROC_DEF_ID_) 
+    references ACT_RE_PROCDEF (ID_);
