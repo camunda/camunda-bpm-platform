@@ -3,6 +3,7 @@ package com.camunda.fox.cockpit.demo.deployer;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Random;
 
 import org.activiti.engine.impl.util.IoUtil;
 
@@ -14,7 +15,10 @@ public class DemoDataProcessArchiveImpl implements ProcessArchive {
 
   private final ProcessArchiveContextExecutor archiveContextExecutor;
   private final Map<String, Object> properties = new HashMap<String, Object>();
-
+  private String processArchiveName;
+  private String processEngineName;
+  
+  
   public DemoDataProcessArchiveImpl(ProcessArchiveContextExecutor archiveContextExecutor) {
     this.archiveContextExecutor = archiveContextExecutor;
     properties.put(PROP_IS_DELETE_UPON_UNDEPLOY, false);
@@ -22,11 +26,14 @@ public class DemoDataProcessArchiveImpl implements ProcessArchive {
   }
   
   public String getProcessEngineName() {
-    return null;  // = use default
+    return processEngineName;
   }
-    
+  
   public String getName() {
-    return "COCKPIT_DEMO_PROCESSES";
+    if (processArchiveName == null) {
+      processArchiveName = "cockpit-demo-processes" + new Random().nextInt(50000);
+    }
+    return processArchiveName;
   }
 
   public Map<String, byte[]> getProcessResources() {
@@ -51,6 +58,10 @@ public class DemoDataProcessArchiveImpl implements ProcessArchive {
 
   public Map<String, Object> getProperties() {
     return properties;
+  }
+
+  public void setProcessEngineName(String processEngineName) {
+    this.processEngineName = processEngineName;
   }
 
 }

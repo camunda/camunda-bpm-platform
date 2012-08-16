@@ -19,12 +19,12 @@
 
   <dependencies>
 
-    <dependency>
-      <groupId>org.glassfish.distributions</groupId>
-      <artifactId>glassfish</artifactId>
-      <type>zip</type>
-      <version>${version.glassfish}</version>
-      <exclusions>
+	<dependency>
+		<groupId>org.glassfish.main.distributions</groupId>
+		<artifactId>glassfish</artifactId>
+		<version>${version.glassfish}</version>
+		<type>zip</type>
+		<exclusions>
         
         <!-- This keeps maven from downloading a bunch of poms we do not need. 
              We just need the glassfish zip distribution. 
@@ -97,6 +97,12 @@
     <dependency>
       <groupId>com.camunda.fox.platform</groupId>
       <artifactId>fox-platform-glassfish-service</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>com.camunda.fox.platform</groupId>
+      <artifactId>fox-platform-jobexecutor-service</artifactId>
       <version>${project.version}</version>
     </dependency>
     

@@ -270,7 +270,15 @@
                 </security-domain>
             </security-domains>
         </subsystem>
-        <subsystem xmlns="urn:jboss:domain:threads:1.1"/>
+        <subsystem xmlns="urn:jboss:domain:threads:1.1">
+            <bounded-queue-thread-pool name="job-executor-tp"
+                allow-core-timeout="true">
+                <core-threads count="3" />
+                <queue-length count="3" />
+                <max-threads count="10" />
+                <keepalive-time time="10" unit="seconds" />
+            </bounded-queue-thread-pool>
+        </subsystem>
         <subsystem xmlns="urn:jboss:domain:transactions:1.1">
             <core-environment>
                 <process-id>
@@ -298,10 +306,33 @@
             </endpoint-config>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:weld:1.0"/>
-        <subsystem xmlns="urn:com.camunda.fox.fox-platform:1.0">
-                <process-engines>
-                    <process-engine name="default" datasource="java:jboss/datasources/FoxEngineDS" history-level="audit" />
-                </process-engines>
+        <subsystem xmlns="urn:com.camunda.fox.fox-platform:1.1">
+            <process-engines>
+                <process-engine name="default" default="true">
+                    <datasource>java:jboss/datasources/FoxEngineDS</datasource>
+                    <history-level>full</history-level>
+                    <properties>
+                        <property name="jobExecutorAcquisitionName">default</property>
+                        <property name="isAutoSchemaUpdate">true</property>	                    
+                    </properties>
+                </process-engine> 
+            </process-engines>
+            <job-executor>
+                <thread-pool-name>job-executor-tp</thread-pool-name>
+                <job-acquisitions>
+                    <job-acquisition name="default">
+                        <acquisition-strategy>SEQUENTIAL</acquisition-strategy>
+	                    <properties>
+                            <property name="lockTimeInMillis">300000</property>
+                            <property name="waitTimeInMillis">5000</property>
+                            <property name="maxJobsPerAcquisition">3</property>
+                        </properties>
+                    </job-acquisition>
+                    <job-acquisition name="anders">
+                        <acquisition-strategy>SEQUENTIAL</acquisition-strategy>
+                    </job-acquisition>
+                </job-acquisitions>	                
+            </job-executor>
         </subsystem>
     </profile>
 
@@ -314,7 +345,7 @@
         </interface>
     </interfaces>
 
-    <socket-binding-group name="standard-sockets" default-interface="public" port-offset="${jboss.socket.binding.port-offset:0}">
+    <socket-binding-group name="standard-sockets" default-interface="public" port-offset="${jboss.socket.binding.port-offset:11020}">
         <socket-binding name="http" port="8080"/>
         <socket-binding name="https" port="8443"/>
         <socket-binding name="management-native" interface="management" port="${jboss.management.native.port:9999}"/>

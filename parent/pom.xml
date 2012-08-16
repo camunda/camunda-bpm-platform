@@ -10,7 +10,7 @@
 
   <properties>
     <version.jboss.as>7.1.0.Final</version.jboss.as>
-    <version.glassfish>3.1.1</version.glassfish>
+    <version.glassfish>3.1.2</version.glassfish>
     <version.arquillian>1.0.1.Final</version.arquillian>
     <version.arquillian.drone>1.0.0.Final</version.arquillian.drone>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

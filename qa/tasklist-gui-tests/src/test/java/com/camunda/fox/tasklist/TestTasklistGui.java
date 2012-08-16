@@ -2,6 +2,7 @@ package com.camunda.fox.tasklist;
 
 import java.io.File;
 import java.net.URL;
+import java.util.Date;
 
 import junit.framework.Assert;
 
@@ -53,7 +54,7 @@ public class TestTasklistGui {
 
     return war;
   }
-
+  
   @Test
   public void testDeploymentAndPrepareUsers() {
     ProcessEngine processEngine = ProgrammaticBeanLookup.lookup(ProcessEngine.class);
@@ -62,11 +63,13 @@ public class TestTasklistGui {
     long count = repositoryService.createProcessDefinitionQuery().processDefinitionKey("test_process").count();
 
     Assert.assertEquals(1, count);
-
+    
     IdentityService identityService = processEngine.getIdentityService();
-    User kermit = identityService.newUser("kermit");
-    kermit.setPassword("kermit");
-    identityService.saveUser(kermit);
+    if (identityService.createUserQuery().userId("kermit").count() == 0) {
+      User kermit = identityService.newUser("kermit");
+      kermit.setPassword("kermit");
+      identityService.saveUser(kermit);
+    }
   }
 
   @Test
@@ -83,13 +86,14 @@ public class TestTasklistGui {
     
     Assert.assertTrue(driver.getCurrentUrl().endsWith("tasklist/app/taskList.jsf"));
     
+    
     // go to start form of "Test Process"
     driver.findElement(By.linkText("Start Process...")).click();
-    driver.findElement(By.xpath("//*[@id=\"j_idt21:0:j_idt23\"]/a")).click();
+    driver.findElement(By.xpath("//a[contains(., 'Test Process')]")).click();
     
     Assert.assertTrue(driver.getCurrentUrl().contains("test-process-application/app/start.jsf"));
     
-    // fill start form and submit it  
+    // fill start form and submit it
     driver.findElement(By.id("startForm:someVariable")).sendKeys("some text");
     driver.findElement(By.id("startForm:submit_button")).submit();
     

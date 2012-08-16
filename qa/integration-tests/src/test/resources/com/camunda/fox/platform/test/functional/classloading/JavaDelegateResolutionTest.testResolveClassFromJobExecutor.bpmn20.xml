@@ -3,7 +3,7 @@
   <process id="testResolveClassFromJobExecutor" name="TestDeployProcessArchive">
     <startEvent id="theStart" name="Start"></startEvent>
     <endEvent id="endevent1" name="End"></endEvent>
-     <serviceTask id="servicetask1" name="Service Task" activiti:class="com.camunda.fox.platform.test.functional.classloading.ExampleDelegate" activiti:async="true"></serviceTask>
+     <serviceTask id="servicetask1" name="Service Task" activiti:class="com.camunda.fox.platform.test.functional.classloading.beans.ExampleDelegate" activiti:async="true"></serviceTask>
     <sequenceFlow id="flow11" name="" sourceRef="servicetask1" targetRef="endevent1"></sequenceFlow>
     <sequenceFlow id="flow12" name="" sourceRef="theStart" targetRef="servicetask1"></sequenceFlow>
   </process>

@@ -32,8 +32,6 @@ public interface ProcessArchiveScanner {
   public Map<String, byte[]> findResources(ProcessArchive processArchive);
   
   public static class ScanningUtil {
-
-    public static String MARKER_FILE_LOCATION = "META-INF/processes.xml";
     
     public static boolean isDeployable(String filename) {
       for (String bpmnResourceSuffix : BpmnDeployer.BPMN_RESOURCE_SUFFIXES) {

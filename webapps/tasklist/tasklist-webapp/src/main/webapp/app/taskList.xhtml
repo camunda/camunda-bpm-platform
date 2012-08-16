@@ -137,7 +137,7 @@
               <td><h:panelGroup
                   rendered="#{taskList.isPersonalTask(task)}">
                   <h:selectOneMenu
-                    value="#{taskList.delegateToColleague}">
+                    value="#{taskList.delegateToColleague[task]}">
                     <f:selectItems value="#{taskList.colleages}"
                       var="user"
                       itemLabel="#{user.firstname} #{user.lastname}"

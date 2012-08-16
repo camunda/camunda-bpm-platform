@@ -15,15 +15,17 @@
  */
 package com.camunda.fox.client.impl.parser.spi;
 
+import java.util.List;
+
 import com.camunda.fox.client.impl.schema.ProcessesXml;
 
 /**
- * Parses the processes.xml marker file
+ * Parses the processes.xml marker files
  * 
  * @author Daniel Meyer
  */
 public interface ProcessesXmlParser {
 
-  public ProcessesXml parseProcessesXml(String processesXmlLocation);
+  public List<ProcessesXml> parseProcessesXml(String processesXmlLocation);
 
 }

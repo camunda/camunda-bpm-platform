@@ -272,13 +272,14 @@
             </security-domains>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:threads:1.1">
-            <bounded-queue-thread-pool name="job-executor-tp" allow-core-timeout="true">
-                <core-threads count="3"/>
-                <queue-length count="3"/>
-                <max-threads count="10"/>
-                <keepalive-time time="10" unit="seconds"/>
+            <bounded-queue-thread-pool name="job-executor-tp"
+                allow-core-timeout="true">
+                <core-threads count="3" />
+                <queue-length count="3" />
+                <max-threads count="10" />
+                <keepalive-time time="10" unit="seconds" />
             </bounded-queue-thread-pool>
-        </subsystem>        	
+        </subsystem>
         <subsystem xmlns="urn:jboss:domain:transactions:1.1">
             <core-environment>
                 <process-id>
@@ -322,7 +323,7 @@
                 <job-acquisitions>
                     <job-acquisition name="default">
                         <acquisition-strategy>SEQUENTIAL</acquisition-strategy>
-                        <properties>
+	                    <properties>
                             <property name="lockTimeInMillis">300000</property>
                             <property name="waitTimeInMillis">5000</property>
                             <property name="maxJobsPerAcquisition">3</property>
@@ -332,7 +333,7 @@
                         <acquisition-strategy>SEQUENTIAL</acquisition-strategy>
                     </job-acquisition>
                 </job-acquisitions>	                
-            </job-executor>                 
+            </job-executor>
         </subsystem>
     </profile>
 
