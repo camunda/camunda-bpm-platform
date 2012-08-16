@@ -173,8 +173,6 @@
           </xa-datasource-property>
           <driver>db2</driver>
           <xa-pool>
-            <min-pool-size>2</min-pool-size>
-            <max-pool-size>10</max-pool-size>
             <is-same-rm-override>false</is-same-rm-override>
             <no-tx-separate-pools>true</no-tx-separate-pools>
           </xa-pool>
@@ -205,8 +203,6 @@
           </xa-datasource-property>
           <driver>db2</driver>
           <xa-pool>
-            <min-pool-size>2</min-pool-size>
-            <max-pool-size>10</max-pool-size>
             <is-same-rm-override>false</is-same-rm-override>
             <no-tx-separate-pools>true</no-tx-separate-pools>
           </xa-pool>
