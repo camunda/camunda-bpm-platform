@@ -29,8 +29,6 @@ public class BasicWebArchiveTest extends CockpitTestBase {
   @org.jboss.arquillian.container.test.api.Deployment
   public static Archive<?> createApplicationDeployment() {
     WebArchive archive = createBaseDeployment();
-    
-    System.out.println(archive.toString(true));
     return archive;
   }
   
