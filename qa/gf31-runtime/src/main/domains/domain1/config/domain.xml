@@ -29,7 +29,7 @@
           datasource-classname="org.h2.jdbcx.JdbcDataSource" 
           res-type="javax.sql.DataSource" non-transactional-connections="true" 
           name="H2Pool">
-	      <property name="Url" value="jdbc:h2:./fox-h2-dbs/fox-engine;DB_CLOSE_DELAY=-1;MVCC=TRUE;DB_CLOSE_ON_EXIT=FALSE"></property>
+	      <property name="Url" value="jdbc:h2:mem:foxEngine;DB_CLOSE_DELAY=-1;MVCC=TRUE;DB_CLOSE_ON_EXIT=FALSE"></property>
 <!-- 	      <property name="Url" value="jdbc:h2:mem:fox-engine"></property> -->
 	      <property name="User" value="sa"></property>
           <property name="Password" value="sa"></property>

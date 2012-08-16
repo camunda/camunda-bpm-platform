@@ -73,7 +73,7 @@ public class TaskList implements Serializable {
 
   private boolean personalTasks = true;
   
-  private String delegateToColleague = "";
+  private Map<Task, String> delegateToColleague = new HashMap<Task, String>();
 
   @PostConstruct
   protected void init() {
@@ -172,15 +172,16 @@ public class TaskList implements Serializable {
       String callbackUrl = getRequestURL();
       return "../.." + contextPath + "/" + formKey + ".jsf?" + urlParameters + "&callbackUrl=" + callbackUrl;
     } catch (Exception ex) {
-      log.log(Level.INFO, "Could not resolve context path for process definition " + processDefinitionId, ex);
+      log.log(Level.INFO, "Could not resolve context path for process definition " + processDefinitionId);
+      log.log(Level.FINER, "Could not resolve context path for process definition " + processDefinitionId, ex);
       return null;
     }
 
   }
 
   public String delegate(Task task) {
-    if (delegateToColleague != null && delegateToColleague.length() > 0) {
-      taskService.setAssignee(task.getId(), delegateToColleague);
+    if (delegateToColleague.get(task)!=null && delegateToColleague.get(task).length() > 0) {
+      taskService.setAssignee(task.getId(), delegateToColleague.get(task));
     }
     return TASK_LIST_OUTCOME;
   }
@@ -224,12 +225,10 @@ public class TaskList implements Serializable {
     }
   }
 
-  public String getDelegateToColleague() {
+  public Map<Task, String> getDelegateToColleague() {
     return delegateToColleague;
   }
 
-  public void setDelegateToColleague(String delegateToColleague) {
-    this.delegateToColleague = delegateToColleague;
-  }
+
 
 }

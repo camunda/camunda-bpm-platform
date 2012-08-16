@@ -2,19 +2,13 @@
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>tasklist-gui-tests</artifactId>
-  <name>fox platform EE - task-list GUI tests</name>
+  <name>fox platform EE - Tasklist GUI tests</name>
 
   <parent>
     <groupId>com.camunda.fox.platform</groupId>
     <artifactId>fox-platform-qa</artifactId>
     <version>6.1.0-SNAPSHOT</version>
   </parent>
-
-  <properties>
-    <server.location>../../qa/jboss7-runtime/target/jboss-as-7.1.0.Final/</server.location>
-    <server.port>21019</server.port>
-    <server.configuration>standalone-h2.xml</server.configuration>
-  </properties>
 
   <dependencies>
     <dependency>
@@ -101,18 +95,6 @@
   </dependencyManagement>
 
   <build>
-    <testResources>
-      <testResource>
-        <directory>src/test/resources</directory>
-        <filtering>true</filtering>
-        <includes>
-          <include>**/*.xml</include>
-          <include>**/*.properties</include>
-          <include>**/*.png</include>
-          <include>**/*.jpg</include>
-        </includes>
-      </testResource>
-    </testResources>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -145,7 +127,6 @@
       </plugin>
     </plugins>
   </build>
-
   <profiles>
     <profile>
       <id>jboss</id>
@@ -207,15 +188,18 @@
       <build>
         <testResources>
           <testResource>
-            <directory>src/test/resources</directory>
-            <filtering>true</filtering>
-            <includes>
-              <include>**/*.xml</include>
-              <include>**/*.properties</include>
-            </includes>
-          </testResource>
-          <testResource>
             <directory>src/test/resources-jboss-h2</directory>
+            <filtering>true</filtering>
+          </testResource>
+        </testResources>
+      </build>
+    </profile>
+    <profile>
+      <id>mysql</id>
+      <build>
+        <testResources>
+          <testResource>
+            <directory>src/test/resources-jboss-mysql</directory>
             <filtering>true</filtering>
             <includes>
               <include>**/*.xml</include>
@@ -226,24 +210,12 @@
       </build>
     </profile>
     <profile>
-      <id>mysql</id>
+      <id>integration</id>
       <build>
         <testResources>
           <testResource>
-            <directory>src/test/resources</directory>
+            <directory>src/test/resources-jboss-integration</directory>
             <filtering>true</filtering>
-            <includes>
-              <include>**/*.xml</include>
-              <include>**/*.properties</include>
-            </includes>
-          </testResource>
-          <testResource>
-            <directory>src/test/resources-jboss-mysql</directory>
-            <filtering>true</filtering>
-            <includes>
-              <include>**/*.xml</include>
-              <include>**/*.properties</include>
-            </includes>
           </testResource>
         </testResources>
       </build>

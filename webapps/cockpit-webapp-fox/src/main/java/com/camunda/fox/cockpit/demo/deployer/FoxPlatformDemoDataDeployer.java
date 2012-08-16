@@ -25,9 +25,10 @@ public class FoxPlatformDemoDataDeployer implements DemoDataDeployer {
 
   private DemoDataProcessArchiveImpl demoDataProcessArchiveImpl;
   
-  public void deployDemoData() {
+  public String deployDemoData(String processEngineName) {
     demoDataProcessArchiveImpl = new DemoDataProcessArchiveImpl(processArchiveContextExecutorBean);
-    processEngineService.installProcessArchive(demoDataProcessArchiveImpl);
+    demoDataProcessArchiveImpl.setProcessEngineName(processEngineName);
+    return processEngineService.installProcessArchive(demoDataProcessArchiveImpl).getProcessEngineDeploymentId();
   }
   
   public void undeployDemoData() {

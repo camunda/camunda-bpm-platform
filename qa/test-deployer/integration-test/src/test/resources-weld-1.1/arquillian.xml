@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<arquillian xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="http://jboss.org/schema/arquillian"
+  xsi:schemaLocation="http://jboss.org/schema/arquillian
+    http://jboss.org/schema/arquillian/arquillian_1_0.xsd">
+  
+  <extension qualifier="fox">
+    <property name="datasources">cockpit,foxEngine</property>
+    <property name="mockJndi">false</property>
+    
+    <property name="datasources.cockpit.url">jdbc:h2:mem:cockpit</property>
+    <property name="datasources.cockpit.driverClassName">org.h2.Driver</property>
+    <property name="datasources.cockpit.user">sa</property>
+    <property name="datasources.cockpit.password"></property>
+    <property name="datasources.cockpit.jndiName">java:comp/env/jdbc/cockpit</property>
+    <property name="datasources.cockpit.jtaEnabled">false</property>
+    
+    <property name="datasources.foxEngine.url">jdbc:h2:mem:fox-engine</property>
+    <property name="datasources.foxEngine.driverClassName">org.h2.Driver</property>
+    <property name="datasources.foxEngine.user">sa</property>
+    <property name="datasources.foxEngine.password"></property>
+    <property name="datasources.foxEngine.jndiName">java:comp/env/jdbc/fox-engine</property>
+    
+    <property name="transactionManagerJndiName">java:comp/env/TransactionManager</property>
+    <property name="userTransactionJndiName">java:comp/UserTransaction</property>
+  </extension>
+</arquillian>

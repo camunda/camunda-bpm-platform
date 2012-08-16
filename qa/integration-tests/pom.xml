@@ -181,6 +181,26 @@
           <scope>test</scope>
         </dependency>
       </dependencies>
+      <build>
+        <testResources>
+          <testResource>
+            <directory>src/test/resources</directory>
+            <filtering>true</filtering>
+            <includes>
+              <include>**/*.xml</include>
+              <include>**/*.properties</include>
+            </includes>
+          </testResource>
+          <testResource>
+            <directory>src/test/resources-jboss-remote</directory>
+            <filtering>true</filtering>
+            <includes>
+              <include>**/*.xml</include>
+              <include>**/*.properties</include>
+            </includes>
+          </testResource>
+        </testResources>
+      </build>
     </profile>
     <profile>
       <id>glassfish</id>
@@ -231,8 +251,10 @@
                 <exclude>**/JobExecutorRequestContextSFSBDelegateTest.java</exclude>
                 <!-- NOT Implemented -->
                 <exclude>**/JobExecutorRequestContextLocalInvocationTest.java</exclude>
-                 <!-- NOT Implemented -->
+                <!-- NOT Implemented -->
                 <exclude>**/ejb/local/*</exclude>
+                <!-- HEMERA- -->
+                <excludes>**/TestFoxPlatformClientAsEjbModule**</excludes>
               </excludes>
             </configuration>
           </plugin>
@@ -288,6 +310,52 @@
           </testResource>
           <testResource>
             <directory>src/test/resources-jboss-mysql</directory>
+            <filtering>true</filtering>
+            <includes>
+              <include>**/*.xml</include>
+              <include>**/*.properties</include>
+            </includes>
+          </testResource>
+        </testResources>
+      </build>
+    </profile>
+    <profile>
+      <id>db2</id>
+      <build>
+        <testResources>
+          <testResource>
+            <directory>src/test/resources</directory>
+            <filtering>true</filtering>
+            <includes>
+              <include>**/*.xml</include>
+              <include>**/*.properties</include>
+            </includes>
+          </testResource>
+          <testResource>
+            <directory>src/test/resources-jboss-db2</directory>
+            <filtering>true</filtering>
+            <includes>
+              <include>**/*.xml</include>
+              <include>**/*.properties</include>
+            </includes>
+          </testResource>
+        </testResources>
+      </build>
+    </profile>
+    <profile>
+      <id>integration</id>
+      <build>
+        <testResources>
+          <testResource>
+            <directory>src/test/resources</directory>
+            <filtering>true</filtering>
+            <includes>
+              <include>**/*.xml</include>
+              <include>**/*.properties</include>
+            </includes>
+          </testResource>
+          <testResource>
+            <directory>src/test/resources-jboss-integration</directory>
             <filtering>true</filtering>
             <includes>
               <include>**/*.xml</include>

@@ -4,7 +4,7 @@
   <artifactId>fox-platform-qa-jboss-runtime</artifactId>
   <packaging>pom</packaging>
 
-  <name>fox platform EE - QA jBoss7 test runtime</name>
+  <name>fox platform EE - QA jBoss7 Test Runtime</name>
   
   <properties>
     <jboss.server.location>../../jbossas71/assembly/target/camunda-fox-ce-${project.version}/camunda-fox-ce-${project.version}/server</jboss.server.location>
@@ -30,6 +30,21 @@
       <scope>test</scope>
     </dependency>
     <dependency>
+      <groupId>com.ibm.db2.jcc</groupId>
+      <artifactId>db2jcc4</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.oracle.jdbc</groupId>
+      <artifactId>ojdbc6</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.microsoft.sqlserver</groupId>
+      <artifactId>sqljdbc4</artifactId>
+      <version>4.0</version>
+    </dependency>
+    <dependency>
       <groupId>com.camunda.fox.tasklist</groupId>
       <artifactId>tasklist-webapp</artifactId>
       <version>${project.version}</version>
@@ -39,6 +54,12 @@
   </dependencies>
 
   <build>
+    <resources>
+      <resource>
+        <directory>src/main/standalone</directory>
+        <filtering>true</filtering>
+      </resource>
+    </resources>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -57,12 +78,12 @@
                   <fileset dir="${jboss.server.location}" />
                 </copy>
                 
-                <copy todir="target/jboss-as-${version.jboss.as}/" overwrite="true">
-                  <fileset dir="src/main/" />
+                <!-- processing of src/main/standalone replaced by resource filtering (see below) -->
+                <copy todir="target/jboss-as-${version.jboss.as}/modules" overwrite="true">
+                  <fileset dir="src/main/modules" />
                 </copy>
                 
                 <!-- remove activiti test classes from engine, made it maven 2 and 3 compatible -->
-                
                 <unzip dest="target/fox-engine">
                   <fileset dir="target/jboss-as-${version.jboss.as}/modules/com/camunda/fox/engine/fox-engine/main/">
                     <include name="*.jar" />
@@ -106,6 +127,31 @@
                 </copy>
                                                            
               </target>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <!-- copy filtered configuration resources -->
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-resources-plugin</artifactId>
+        <version>2.5</version>
+        <configuration>
+          <delimiters>
+            <delimiter>${*}</delimiter>          
+          </delimiters>
+          <useDefaultDelimiters>false</useDefaultDelimiters>
+        </configuration>
+        <executions>
+          <execution>
+            <id>copy-resources</id>
+            <phase>package</phase>
+            <goals>
+              <goal>resources</goal>
+            </goals>
+            <configuration>
+              <override>true</override>
+              <outputDirectory>target/jboss-as-${version.jboss.as}/standalone</outputDirectory>
             </configuration>
           </execution>
         </executions>

@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.camunda.fox.platform.qa</groupId>
+  <artifactId>fox-platform-arquillian-test</artifactId>
+  
+  <parent>
+    <groupId>com.camunda.fox.platform</groupId>
+    <artifactId>fox-platform-qa</artifactId>
+    <version>6.1.0-SNAPSHOT</version>
+  </parent>
+  
+  <packaging>pom</packaging>
+  <name>fox platform EE - Arquillian Test</name>
+  
+  <!-- Properties -->
+  <properties>
+    <!-- Misc settings -->
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <version.fest_assert>1.4</version.fest_assert>
+    <version.el_api>2.2</version.el_api>
+    <version.h2>1.2.132</version.h2>
+  </properties>
+  
+  <build>
+  <plugins>
+    <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>2.4</version>
+        <configuration>
+          <!-- http://maven.apache.org/plugins/maven-compiler-plugin/ -->
+          <source>1.6</source>
+          <target>1.6</target>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+  
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>4.8.2</version>
+      </dependency>
+      <dependency>
+        <groupId>org.easytesting</groupId>
+        <artifactId>fest-assert</artifactId>
+        <version>${version.fest_assert}</version>
+      </dependency>
+      <dependency>
+        <!-- make sure this comes after runtime in the reactor build -->
+        <groupId>com.camunda.fox.platform</groupId>
+        <artifactId>fox-platform-qa-jboss-runtime</artifactId>
+        <version>${project.version}</version>
+        <scope>provided</scope>
+        <type>pom</type>
+      </dependency>
+      <dependency>
+        <groupId>org.jboss.arquillian</groupId>
+        <artifactId>arquillian-bom</artifactId>
+        <version>${version.arquillian}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.jboss.arquillian</groupId>
+        <artifactId>arquillian-build</artifactId>
+        <version>${version.arquillian}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>      
+      <dependency>
+        <groupId>com.camunda.fox.commons</groupId>
+        <artifactId>commons-bom</artifactId>
+        <version>${project.version}</version>
+        <type>pom</type>
+        <scope>import</scope>
+      </dependency>
+      <dependency>
+        <groupId>javax.enterprise</groupId>
+        <artifactId>cdi-api</artifactId>
+        <version>1.0</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jboss.arquillian.core</groupId>
+        <artifactId>arquillian-core-impl-base</artifactId>
+        <classifier>tests</classifier>
+        <version>${version.arquillian}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jboss.arquillian.test</groupId>
+        <artifactId>arquillian-test-impl-base</artifactId>
+        <classifier>tests</classifier>
+        <version>${version.arquillian}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+  
+  <modules>
+    <module>deployer</module>
+    <!--<module>integration-test</module>-->
+  </modules>
+</project>

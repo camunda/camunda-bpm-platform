@@ -4,7 +4,7 @@
   <artifactId>fox-platform-qa-glassfish-runtime</artifactId>
   <packaging>pom</packaging>
 
-  <name>fox platform EE - QA Glassfish 3.1.x test runtime</name>
+  <name>fox platform EE - QA Glassfish 3.1.x Test Runtime</name>
   
   <properties>
     <glassfish.server.location>../../gf31/assembly/target/camunda-fox-ce-${project.version}/camunda-fox-ce-${project.version}/server</glassfish.server.location>

@@ -107,9 +107,9 @@
                 </datasource>
                 <xa-datasource jndi-name="java:jboss/datasources/FoxEngineDS" pool-name="FoxEngineDS" enabled="true" use-ccm="false">
                     <driver>com.mysql</driver>
-					<xa-datasource-property name="URL">jdbc:mysql://vm11.camunda.com:3306/ca_test_fox-platform</xa-datasource-property>
-					<xa-datasource-property name="User">ca_test_fox-plat</xa-datasource-property>
-					<xa-datasource-property name="Password">UJLTbhRtrChLzRwq</xa-datasource-property>
+					<xa-datasource-property name="URL">jdbc:mysql://${database.host}:3306/${database.name}</xa-datasource-property>
+					<xa-datasource-property name="User">${database.user}</xa-datasource-property>
+					<xa-datasource-property name="Password">${database.password}</xa-datasource-property>
 					<xa-pool>
                         <min-pool-size>1</min-pool-size>
                         <max-pool-size>60</max-pool-size>
@@ -122,17 +122,17 @@
                     </xa-pool>
                     <transaction-isolation>TRANSACTION_READ_COMMITTED</transaction-isolation>
                     <validation>
-						<exception-sorter class-name="org.jboss.resource.adapter.jdbc.vendor.MySQLExceptionSorter" />
-						<valid-connection-checker class-name="org.jboss.jca.adapters.jdbc.extensions.mysql.MySQLValidConnectionChecker" />
+                        <exception-sorter class-name="org.jboss.jca.adapters.jdbc.extensions.mysql.MySQLExceptionSorter" />
+                        <valid-connection-checker class-name="org.jboss.jca.adapters.jdbc.extensions.mysql.MySQLValidConnectionChecker" />
                         <validate-on-match>false</validate-on-match>
                         <background-validation>false</background-validation>
                     </validation>
                 </xa-datasource>
                 <xa-datasource jndi-name="java:jboss/datasources/CycleDS" pool-name="CycleDS" enabled="true" use-ccm="true">
                     <driver>com.mysql</driver>
-					<xa-datasource-property name="URL">jdbc:mysql://vm11.camunda.com:3306/ca_test_fox-platform</xa-datasource-property>
-					<xa-datasource-property name="User">ca_test_fox-plat</xa-datasource-property>
-					<xa-datasource-property name="Password">UJLTbhRtrChLzRwq</xa-datasource-property>
+					<xa-datasource-property name="URL">jdbc:mysql://${database.host}:3306/${database.name}</xa-datasource-property>
+					<xa-datasource-property name="User">${database.user}</xa-datasource-property>
+					<xa-datasource-property name="Password">${database.password}</xa-datasource-property>
 					<xa-pool>
                         <min-pool-size>1</min-pool-size>
                         <max-pool-size>60</max-pool-size>
@@ -145,8 +145,8 @@
                     </xa-pool>
                     <transaction-isolation>TRANSACTION_READ_COMMITTED</transaction-isolation>
                     <validation>
-						<exception-sorter class-name="org.jboss.resource.adapter.jdbc.vendor.MySQLExceptionSorter" />
-						<valid-connection-checker class-name="org.jboss.jca.adapters.jdbc.extensions.mysql.MySQLValidConnectionChecker" />
+                        <exception-sorter class-name="org.jboss.jca.adapters.jdbc.extensions.mysql.MySQLExceptionSorter" />
+                        <valid-connection-checker class-name="org.jboss.jca.adapters.jdbc.extensions.mysql.MySQLValidConnectionChecker" />
                         <validate-on-match>false</validate-on-match>
                         <background-validation>false</background-validation>
                     </validation>
@@ -155,11 +155,8 @@
                     <driver name="h2" module="com.h2database.h2">
                         <xa-datasource-class>org.h2.jdbcx.JdbcDataSource</xa-datasource-class>
                     </driver>
-                    <driver name="com.mysql" module="com.mysql">
+                    <driver name="com.mysql" module="mysql.mysql-connector-java">
                         <xa-datasource-class>com.mysql.jdbc.jdbc2.optional.MysqlXADataSource</xa-datasource-class>
-                    </driver>
-					<driver name="com.oracle" module="com.oracle.ojdbc6">
-                        <xa-datasource-class>oracle.jdbc.OracleDriver</xa-datasource-class>
                     </driver>
                 </drivers>
             </datasources>
@@ -309,7 +306,15 @@
                 </security-domain>
             </security-domains>
         </subsystem>
-        <subsystem xmlns="urn:jboss:domain:threads:1.1"/>
+        <subsystem xmlns="urn:jboss:domain:threads:1.1">
+            <bounded-queue-thread-pool name="job-executor-tp"
+                allow-core-timeout="true">
+                <core-threads count="3" />
+                <queue-length count="3" />
+                <max-threads count="10" />
+                <keepalive-time time="10" unit="seconds" />
+            </bounded-queue-thread-pool>
+        </subsystem>
         <subsystem xmlns="urn:jboss:domain:transactions:1.1">
             <core-environment>
                 <process-id>
@@ -337,10 +342,33 @@
             </endpoint-config>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:weld:1.0"/>
-        <subsystem xmlns="urn:com.camunda.fox.fox-platform:1.0">
+        <subsystem xmlns="urn:com.camunda.fox.fox-platform:1.1">
             <process-engines>
-                <process-engine name="default" datasource="java:jboss/datasources/FoxEngineDS" history-level="audit"/>
+                <process-engine name="default" default="true">
+                    <datasource>java:jboss/datasources/FoxEngineDS</datasource>
+                    <history-level>full</history-level>
+                    <properties>
+                        <property name="jobExecutorAcquisitionName">default</property>
+                        <property name="isAutoSchemaUpdate">true</property>	                    
+                    </properties>
+                </process-engine> 
             </process-engines>
+            <job-executor>
+                <thread-pool-name>job-executor-tp</thread-pool-name>
+                <job-acquisitions>
+                    <job-acquisition name="default">
+                        <acquisition-strategy>SEQUENTIAL</acquisition-strategy>
+	                    <properties>
+                            <property name="lockTimeInMillis">300000</property>
+                            <property name="waitTimeInMillis">5000</property>
+                            <property name="maxJobsPerAcquisition">3</property>
+                        </properties>
+                    </job-acquisition>
+                    <job-acquisition name="anders">
+                        <acquisition-strategy>SEQUENTIAL</acquisition-strategy>
+                    </job-acquisition>
+                </job-acquisitions>	                
+            </job-executor>
         </subsystem>
     </profile>
 
@@ -353,7 +381,7 @@
         </interface>
     </interfaces>
 
-    <socket-binding-group name="standard-sockets" default-interface="public" port-offset="${jboss.socket.binding.port-offset:0}">
+    <socket-binding-group name="standard-sockets" default-interface="public" port-offset="${jboss.socket.binding.port-offset:11020}">
         <socket-binding name="http" port="8080"/>
         <socket-binding name="https" port="8443"/>
         <socket-binding name="management-native" interface="management" port="${jboss.management.native.port:9999}"/>

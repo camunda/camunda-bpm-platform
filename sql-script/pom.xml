@@ -6,7 +6,7 @@
   <version>6.1.0-SNAPSHOT</version>
   <packaging>jar</packaging>
 
-  <name>fox platform sql script</name>
+  <name>fox platform EE - SQL script</name>
   
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -15,7 +15,7 @@
   <build>
   <resources>
   	<resource>
-  	    <targetPath>sql/upgrade</targetPath>
+  	  <targetPath>sql/upgrade</targetPath>
   		<directory>target/sql/upgrade</directory>
   		<includes>
   			<include>*.sql</include>
@@ -44,8 +44,8 @@
             <configuration>
               <artifactItems>
                 <artifactItem>
-				  <groupId>com.camunda.fox.engine</groupId>
-				  <artifactId>fox-engine</artifactId>
+        				  <groupId>com.camunda.fox.engine</groupId>
+        				  <artifactId>fox-engine</artifactId>
                   <version>${project.version}</version>
                   <type>jar</type>
                   <overWrite>true</overWrite>

@@ -3,7 +3,7 @@ package com.camunda.fox.client.impl.spi;
 import com.camunda.fox.client.impl.ProcessArchiveSupport;
 
 /**
- * <p>SPI interface for implementing process archive extensions
+ * <p>SPI interface for implementing process archive extensions</p>
  * 
  * @author Daniel Meyer
  *

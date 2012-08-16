@@ -59,7 +59,7 @@
   </filter>
   <filter-mapping>
     <filter-name>Security Filter</filter-name>
-    <url-pattern>*</url-pattern>
+    <url-pattern>/*</url-pattern>
   </filter-mapping>
   
 	<servlet>

@@ -14,7 +14,7 @@
     <dependencySet>
       <outputDirectory>server</outputDirectory>
       <includes>
-        <include>org.glassfish.distributions:glassfish:zip:*</include>
+        <include>org.glassfish.main.distributions:glassfish:zip:*</include>
       </includes>
       <unpack>true</unpack>
       <unpackOptions>
@@ -43,15 +43,36 @@
         <include>com.camunda.fox.platform:fox-platform-api:jar:*</include>
         <include>com.camunda.fox.platform:fox-platform-jobexecutor-api:jar:*</include>
         <include>org.mybatis:mybatis:jar:*</include>
-        <include>com.fasterxml.uuid:java-uuid-generator:jar:*</include>        
+        <include>com.fasterxml.uuid:java-uuid-generator:jar:*</include>      
       </includes>     
     </dependencySet>
     <dependencySet>
-      <outputDirectory>server/glassfish3/glassfish/domains/domain1/autodeploy</outputDirectory>
+      <outputDirectory>server/glassfish3/glassfish/domains/domain1/applications/camunda-fox-platform</outputDirectory>
       <includes>
         <include>com.camunda.fox.platform:fox-platform-glassfish-ear:ear:*</include>
+      </includes>
+      <unpack>true</unpack>
+    </dependencySet>
+    <dependencySet>
+      <outputDirectory>server/glassfish3/glassfish/domains/domain1/applications/camunda-fox-platform/fox-platform-jobexecutor-service-${project.version}_jar</outputDirectory>
+      <includes>
+    		<include>com.camunda.fox.platform:fox-platform-jobexecutor-service:jar:*</include>
+      </includes>
+      <unpack>true</unpack>
+    </dependencySet>
+    <dependencySet>
+      <outputDirectory>server/glassfish3/glassfish/domains/domain1/applications/camunda-fox-platform/fox-platform-glassfish-service-${project.version}_jar</outputDirectory>
+      <includes>
+        <include>com.camunda.fox.platform:fox-platform-glassfish-service:jar:*</include>
+      </includes>
+      <unpack>true</unpack>
+    </dependencySet>
+    <dependencySet>
+      <outputDirectory>server/glassfish3/glassfish/domains/domain1/applications/fox-platform-jobexecutor-rar</outputDirectory>
+      <includes>
         <include>com.camunda.fox.platform:fox-platform-jobexecutor-rar:rar:*</include>
-      </includes>     
+      </includes>
+      <unpack>true</unpack>     
     </dependencySet>
     <dependencySet>
       <outputDirectory>server/glassfish3/glassfish/lib</outputDirectory>
@@ -78,6 +99,7 @@
     </file>
     <file>
       <source>src/domain.xml</source>
+      <filtered>true</filtered>
       <outputDirectory>server/glassfish3/glassfish/domains/domain1/config</outputDirectory>
     </file>   
   </files>
