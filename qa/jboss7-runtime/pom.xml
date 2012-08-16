@@ -83,6 +83,11 @@
                   <fileset dir="src/main/modules" />
                 </copy>
                 
+                <!-- processing of src/main/standalone replaced by resource filtering (see below) -->
+                <copy todir="target/jboss-as-${version.jboss.as}/standalone/configuration/blueprint" overwrite="true">
+                  <fileset dir="src/main/standalone/configuration" />
+                </copy>
+                
                 <!-- remove activiti test classes from engine, made it maven 2 and 3 compatible -->
                 <unzip dest="target/fox-engine">
                   <fileset dir="target/jboss-as-${version.jboss.as}/modules/com/camunda/fox/engine/fox-engine/main/">
