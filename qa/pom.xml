@@ -12,6 +12,10 @@
     <relativePath>../parent</relativePath>
   </parent>
   
+  <properties>
+    <jboss.runtime.location>../jboss7-runtime/target/jboss-as-${version.jboss.as}/</jboss.runtime.location>
+  </properties>
+  
 	<modules>
 		<module>jboss7-runtime</module>
 		<module>integration-tests</module>
