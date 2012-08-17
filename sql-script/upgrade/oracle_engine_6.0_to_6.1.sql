@@ -3,6 +3,8 @@ update ACT_RU_EXECUTION set CACHED_ENT_STATE_ = 7;
 
 create index ACT_IDX_HI_DETAIL_TASK_ID on ACT_HI_DETAIL(TASK_ID_);
 
+create index ACT_IDX_ATHRZ_PROCEDEF on ACT_RU_IDENTITYLINK(PROC_DEF_ID_);
+
 alter table ACT_RE_PROCDEF
     add constraint ACT_UNIQ_PROCDEF
     unique (KEY_,VERSION_);	
@@ -61,9 +63,7 @@ where NAME_ = 'historyLevel' and VALUE_ >= 2;
 alter table ACT_RU_IDENTITYLINK
 add PROC_DEF_ID_ NVARCHAR2(64);
 
-create index ACT_IDX_ATHRZ_PROCEDEF on ACT_RU_IDENTITYLINK(PROC_DEF_ID_);
 create index ACT_IDX_EXE_PROCDEF on ACT_RU_EXECUTION(PROC_DEF_ID_);
-
 alter table ACT_RU_EXECUTION
     add constraint ACT_FK_EXE_PROCDEF 
     foreign key (PROC_DEF_ID_) 
