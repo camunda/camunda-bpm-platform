@@ -371,7 +371,7 @@
         </interface>
     </interfaces>
 
-    <socket-binding-group name="standard-sockets" default-interface="public" port-offset="${jboss.socket.binding.port-offset:11020}">
+    <socket-binding-group name="standard-sockets" default-interface="public" port-offset="${jboss.runtime.port-offset}">
         <socket-binding name="http" port="8080"/>
         <socket-binding name="https" port="8443"/>
         <socket-binding name="management-native" interface="management" port="${jboss.management.native.port:9999}"/>

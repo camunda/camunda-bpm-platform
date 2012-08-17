@@ -45,8 +45,8 @@
         <module name="org.jboss.logging"/>
         <module name="org.jboss.threads"/>
         <module name="javax.xml.stream.api"/>
-		<module name="com.ibm.db2.jcc.db2jcc4" />
-		<module name="com.oracle.jdbc.ojdbc6" />
-		<module name="mysql.mysql-connector-java" />
+        <module name="com.ibm.db2.jcc.db2jcc4" />
+        <module name="com.oracle.jdbc.ojdbc6" />
+        <module name="mysql.mysql-connector-java" />
     </dependencies>
 </module>
