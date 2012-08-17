@@ -1,3 +1,4 @@
+/** 03.08.2012 */
 alter table ACT_RU_EXECUTION add CACHED_ENT_STATE_ integer;
 update ACT_RU_EXECUTION set CACHED_ENT_STATE_ = 7;
 
