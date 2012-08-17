@@ -32,8 +32,8 @@ create index ACT_IDX_HI_PROCVAR_NAME_TYPE on ACT_HI_PROCVARIABLE(NAME_, VAR_TYPE
 
 /**  fill table ACT_HI_PROCVARIABLE when HISTORY_LEVEL FULL is set, could take a long time depending on the amount of data! */
 insert into ACT_HI_PROCVARIABLE
-  (ID_,PROC_INST_ID_,EXECUTION_ID_,TASK_ID_,ACT_INST_ID_,NAME_,VAR_TYPE_,REV_,TIME_,BYTEARRAY_ID_,DOUBLE_,LONG_,TEXT_,TEXT2_)
-  select d.ID_,d.PROC_INST_ID_,d.EXECUTION_ID_,d.TASK_ID_,d.ACT_INST_ID_,d.NAME_,d.VAR_TYPE_,d.REV_,d.TIME_,d.BYTEARRAY_ID_,d.DOUBLE_,d.LONG_,d.TEXT_,d.TEXT2_
+  (ID_,PROC_INST_ID_,NAME_,VAR_TYPE_,REV_,BYTEARRAY_ID_,DOUBLE_,LONG_,TEXT_,TEXT2_)
+  select d.ID_,d.PROC_INST_ID_,d.NAME_,d.VAR_TYPE_,d.REV_,d.BYTEARRAY_ID_,d.DOUBLE_,d.LONG_,d.TEXT_,d.TEXT2_
   from ACT_HI_DETAIL d
   inner join
     (
@@ -73,7 +73,7 @@ alter table ACT_RU_IDENTITYLINK
     references ACT_RE_PROCDEF (ID_);
     
 alter table ACT_HI_DETAIL
-	MODIFY PROC_INST_ID_ varchar(64) null;
+  MODIFY PROC_INST_ID_ varchar(64) null;
 
 alter table ACT_HI_DETAIL
-	MODIFY EXECUTION_ID_ varchar(64) null;
+  MODIFY EXECUTION_ID_ varchar(64) null;
