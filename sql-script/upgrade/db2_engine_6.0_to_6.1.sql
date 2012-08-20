@@ -55,7 +55,10 @@ set VALUE_ = VALUE_ + 1,
 where NAME_ = 'historyLevel' and VALUE_ >= 2;
 
 alter table ACT_HI_ACTINST
-add (TASK_ID_ varchar(64), CALL_PROC_INST_ID_ varchar(64));
+add TASK_ID_ varchar(64);
+
+alter table ACT_HI_ACTINST
+add CALL_PROC_INST_ID_ varchar(64);
 
 alter table ACT_RU_IDENTITYLINK
 add PROC_DEF_ID_ varchar(64);
