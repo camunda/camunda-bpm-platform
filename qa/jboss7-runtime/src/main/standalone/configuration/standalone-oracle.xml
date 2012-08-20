@@ -124,7 +124,7 @@
                     </validation>
                 </datasource>
                 <datasource jta="true" jndi-name="java:jboss/datasources/CycleDS" pool-name="CycleDS" enabled="true" use-java-context="true" use-ccm="true">
-                    <connection-url>jdbc:oracle:thin:@${database.host}:1521:${database.name}</connection-url>
+                    <connection-url>jdbc:oracle:thin:@${database.host}:1521:xe</connection-url>
                     <driver>com.oracle</driver>
                     <transaction-isolation>TRANSACTION_READ_COMMITTED</transaction-isolation>
                     <pool>
