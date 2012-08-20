@@ -7,7 +7,7 @@
   <container qualifier="jboss" default="true">
     <configuration>
       <property name="jbossHome">${jboss.runtime.location}</property>
-      <property name="managementPort">21019</property>
+      <property name="managementPort">${jboss.runtime.management-port}</property>
       <property name="serverConfig">${jboss.standalone.xml}</property>
     </configuration>
   </container>
