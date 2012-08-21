@@ -206,6 +206,8 @@
             <configuration>
               <outputDirectory>${project.build.directory}/generated-test-sources/cockpit-core-tests/src</outputDirectory>
               <includes>**/*.java</includes>
+              <!-- exclude some tests which rely on isolated deployment environments -->
+              <excludes>com/camunda/fox/cockpit/service/ProcessDefinitionServiceTest.java</excludes>
               <artifactItems>
                 <artifactItem>
                   <groupId>com.camunda.fox.cockpit</groupId>
