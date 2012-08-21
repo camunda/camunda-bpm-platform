@@ -22,7 +22,8 @@ import static org.junit.Assert.assertTrue;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.Set;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.Test;
 
@@ -45,19 +46,24 @@ public class MultipleClasspathRootsClassPathScannerTest {
       });
     
     ClassPathScanner scanner = new ClassPathScanner();
-    Set<String> scanResult = scanner.scanPaResourceRootPath(classLoader, null, "classpath:directory/");
+    
+    Map<String, byte[]> scanResult = new HashMap<String, byte[]>();
+    
+    scanner.scanPaResourceRootPath(classLoader, null, "classpath:directory/",scanResult);
     
     assertTrue("'testDeployProcessArchive.bpmn20.xml' not found", contains(scanResult, "testDeployProcessArchive.bpmn20.xml"));
     assertTrue("'testDeployProcessArchive.png' not found", contains(scanResult, "testDeployProcessArchive.png"));
-    assertEquals(2, scanResult.size());
+    assertEquals(4, scanResult.size());
     
-    scanResult = scanner.scanPaResourceRootPath(classLoader, null, "directory/");
+    scanResult.clear();
+    scanner.scanPaResourceRootPath(classLoader, null, "directory/", scanResult);
     
     assertTrue("'testDeployProcessArchive.bpmn20.xml' not found", contains(scanResult, "testDeployProcessArchive.bpmn20.xml"));
     assertTrue("'testDeployProcessArchive.png' not found", contains(scanResult, "testDeployProcessArchive.png"));
-    assertEquals(2, scanResult.size());
-    
-    scanResult = scanner.scanPaResourceRootPath(classLoader, new URL("file:src/test/resources/com/camunda/fox/platform/impl/deployment/ClassPathScannerTest.testScanClassPathWithFilesRecursive/META-INF/processes.xml"), "pa:directory/");
+    assertEquals(4, scanResult.size());
+
+    scanResult.clear();
+    scanner.scanPaResourceRootPath(classLoader, new URL("file:src/test/resources/com/camunda/fox/platform/impl/deployment/ClassPathScannerTest.testScanClassPathWithFilesRecursive/META-INF/processes.xml"), "pa:directory/", scanResult);
 
     assertTrue("'testDeployProcessArchive.bpmn20.xml' not found", contains(scanResult, "testDeployProcessArchive.bpmn20.xml"));
     assertTrue("'testDeployProcessArchive.png' not found", contains(scanResult, "testDeployProcessArchive.png"));
@@ -65,8 +71,8 @@ public class MultipleClasspathRootsClassPathScannerTest {
 
   }
   
-  private boolean contains(Set<String> scanResult, String suffix) {
-    for (String string : scanResult) {
+  private boolean contains(Map<String, byte[]> scanResult, String suffix) {
+    for (String string : scanResult.keySet()) {
       if (string.endsWith(suffix)) {
         return true;
       }
