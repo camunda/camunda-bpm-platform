@@ -13,6 +13,7 @@ import org.activiti.engine.IdentityService;
 import org.activiti.engine.identity.Group;
 import org.activiti.engine.identity.User;
 
+import com.camunda.fox.platform.FoxPlatformException;
 import com.camunda.fox.tasklist.api.TaskListGroup;
 import com.camunda.fox.tasklist.api.TasklistIdentityService;
 import com.camunda.fox.tasklist.api.TasklistUser;
@@ -24,14 +25,43 @@ public class ActivitiIdentityServiceImpl implements TasklistIdentityService, Ser
   private static final long serialVersionUID = 1L;
 
   private final static Logger log = Logger.getLogger(ActivitiIdentityServiceImpl.class.getCanonicalName());
+  
+  boolean isIdentityTablesPopulated;
 
   @Inject
   private IdentityService identityService;
+  
+  @Inject
+  private Demo demo;
 
   @Override
   public void authenticateUser(String userId, String password) {
-    // don't check user id and password, default implementation should allow
-    // everybody to sign in
+    boolean isIdentityTablesPopulated = false;
+    try {
+      isIdentityTablesPopulated = isIdentityTablesPopulated();
+    }catch (Exception e) {
+      // identity module not present-> let everybody in.
+      return;
+    }
+
+    // if the identity tables are empty -> generate demo data.
+    if (!isIdentityTablesPopulated) {
+      demo.generateData();
+    }
+    
+    // validate the password
+    boolean validPassword = identityService.checkPassword(userId, password);
+    if (!validPassword) {
+      throw new FoxPlatformException("The provided user does not exist or the password is invalid.");
+    }
+  }
+  
+  
+  public boolean isIdentityTablesPopulated() {
+    if(!isIdentityTablesPopulated) {
+      isIdentityTablesPopulated = (identityService.createUserQuery().count()>0);
+    }
+    return isIdentityTablesPopulated;
   }
 
   @Override
