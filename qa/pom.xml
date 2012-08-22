@@ -12,6 +12,12 @@
     <relativePath>../parent</relativePath>
   </parent>
   
+  <properties>
+    <jboss.runtime.location>../jboss7-runtime/target/jboss-as-${version.jboss.as}/</jboss.runtime.location>
+    <jboss.runtime.port-offset>11020</jboss.runtime.port-offset>
+    <jboss.runtime.management-port>21019</jboss.runtime.management-port>
+  </properties>
+  
 	<modules>
 		<module>jboss7-runtime</module>
 		<module>integration-tests</module>
