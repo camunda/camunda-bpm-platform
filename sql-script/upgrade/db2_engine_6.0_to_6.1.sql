@@ -7,16 +7,16 @@ add PROC_DEF_ID_ varchar(64);
 
 create index ACT_IDX_ATHRZ_PROCEDEF on ACT_RU_IDENTITYLINK(PROC_DEF_ID_);
 
-alter table ACT_RE_PROCDEF DATA CAPTURE NONE;
 alter table ACT_RE_PROCDEF
     alter column KEY_ set not null;
 alter table ACT_RE_PROCDEF 
     alter column VERSION_ set not null;
-alter table ACT_RE_PROCDEF DATA CAPTURE CHANGES;
-
+	
+CALL SYSPROC.ADMIN_REVALIDATE_DB_OBJECTS('TABLE', 'FOX_UPDT', NULL);
 alter table ACT_RE_PROCDEF 
     add constraint ACT_UNIQ_PROCDEF
     unique (KEY_,VERSION_);
+
     
 create table ACT_HI_PROCVARIABLE (
     ID_ varchar(64) not null,
@@ -67,10 +67,11 @@ set VALUE_ = VALUE_ + 1,
     REV_ = REV_ + 1
 where NAME_ = 'historyLevel' and VALUE_ >= 2;
 
+CALL SYSPROC.ADMIN_REVALIDATE_DB_OBJECTS('TABLE', 'FOX_UPDT', NULL);
 alter table ACT_RU_EXECUTION
     add constraint ACT_FK_EXE_PROCDEF 
     foreign key (PROC_DEF_ID_) 
-    references ACT_RE_PROCDEF (ID_);  
+    references ACT_RE_PROCDEF (ID_);
 
 alter table ACT_RU_IDENTITYLINK
     add constraint ACT_FK_ATHRZ_PROCEDEF 
