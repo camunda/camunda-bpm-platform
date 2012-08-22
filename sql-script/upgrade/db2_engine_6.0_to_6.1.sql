@@ -7,11 +7,12 @@ add PROC_DEF_ID_ varchar(64);
 
 create index ACT_IDX_ATHRZ_PROCEDEF on ACT_RU_IDENTITYLINK(PROC_DEF_ID_);
 
+alter table ACT_RE_PROCDEF DATA CAPTURE NONE;
 alter table ACT_RE_PROCDEF
     alter column KEY_ set not null;
-
 alter table ACT_RE_PROCDEF 
     alter column VERSION_ set not null;
+alter table ACT_RE_PROCDEF DATA CAPTURE CHANGES;
 
 alter table ACT_RE_PROCDEF 
     add constraint ACT_UNIQ_PROCDEF
