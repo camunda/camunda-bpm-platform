@@ -1,7 +1,11 @@
+/** 03.08.2012 */
 alter table ACT_RU_EXECUTION add CACHED_ENT_STATE_ INTEGER;
 update ACT_RU_EXECUTION set CACHED_ENT_STATE_ = 7;
 
-create index ACT_IDX_HI_DETAIL_TASK_ID on ACT_HI_DETAIL(TASK_ID_);
+alter table ACT_RU_IDENTITYLINK
+add PROC_DEF_ID_ NVARCHAR2(64);
+
+create index ACT_IDX_ATHRZ_PROCEDEF on ACT_RU_IDENTITYLINK(PROC_DEF_ID_);
 
 alter table ACT_RE_PROCDEF
     modify KEY_ not null;
@@ -11,13 +15,13 @@ alter table ACT_RE_PROCDEF
 
 alter table ACT_RE_PROCDEF
     add constraint ACT_UNIQ_PROCDEF
-    unique (KEY_,VERSION_);
-    
+    unique (KEY_,VERSION_); 
+  
 create table ACT_HI_PROCVARIABLE (
     ID_ NVARCHAR2(64) not null,
     PROC_INST_ID_ NVARCHAR2(64) not null,
     NAME_ NVARCHAR2(255) not null,
-    VAR_TYPE_ NVARCHAR2(255),
+    VAR_TYPE_ NVARCHAR2(100),
     REV_ INTEGER,
     BYTEARRAY_ID_ NVARCHAR2(64),
     DOUBLE_ NUMBER(*,10),
@@ -30,10 +34,18 @@ create table ACT_HI_PROCVARIABLE (
 create index ACT_IDX_HI_PROCVAR_PROC_INST on ACT_HI_PROCVARIABLE(PROC_INST_ID_);
 create index ACT_IDX_HI_PROCVAR_NAME_TYPE on ACT_HI_PROCVARIABLE(NAME_, VAR_TYPE_);
 
+alter table ACT_HI_ACTINST
+add TASK_ID_ NVARCHAR2(64);
+
+alter table ACT_HI_ACTINST
+add CALL_PROC_INST_ID_ NVARCHAR2(64);
+
+/** 17.08.2012 */
+
 /**  fill table ACT_HI_PROCVARIABLE when HISTORY_LEVEL FULL is set, could take a long time depending on the amount of data! */
 insert into ACT_HI_PROCVARIABLE
-  (ID_,PROC_INST_ID_,EXECUTION_ID_,TASK_ID_,ACT_INST_ID_,NAME_,VAR_TYPE_,REV_,TIME_,BYTEARRAY_ID_,DOUBLE_,LONG_,TEXT_,TEXT2_)
-  select d.ID_,d.PROC_INST_ID_,d.EXECUTION_ID_,d.TASK_ID_,d.ACT_INST_ID_,d.NAME_,d.VAR_TYPE_,d.REV_,d.TIME_,d.BYTEARRAY_ID_,d.DOUBLE_,d.LONG_,d.TEXT_,d.TEXT2_
+  (ID_,PROC_INST_ID_,NAME_,VAR_TYPE_,REV_,BYTEARRAY_ID_,DOUBLE_,LONG_,TEXT_,TEXT2_)
+  select d.ID_,d.PROC_INST_ID_,d.NAME_,d.VAR_TYPE_,d.REV_,d.BYTEARRAY_ID_,d.DOUBLE_,d.LONG_,d.TEXT_,d.TEXT2_
   from ACT_HI_DETAIL d
   inner join
     (
@@ -54,26 +66,19 @@ set VALUE_ = VALUE_ + 1,
     REV_ = REV_ + 1
 where NAME_ = 'historyLevel' and VALUE_ >= 2;
 
-alter table ACT_HI_ACTINST
-add (TASK_ID_ NVARCHAR2(64), CALL_PROC_INST_ID_ NVARCHAR2(64));
-
-alter table ACT_RU_IDENTITYLINK
-add PROC_DEF_ID_ NVARCHAR2(64);
-
-create index ACT_IDX_ATHRZ_PROCEDEF on ACT_RU_IDENTITYLINK(PROC_DEF_ID_);
-
+create index ACT_IDX_EXE_PROCDEF on ACT_RU_EXECUTION(PROC_DEF_ID_);
 alter table ACT_RU_EXECUTION
     add constraint ACT_FK_EXE_PROCDEF 
     foreign key (PROC_DEF_ID_) 
     references ACT_RE_PROCDEF (ID_);
-
+  
 alter table ACT_RU_IDENTITYLINK
     add constraint ACT_FK_ATHRZ_PROCEDEF 
     foreign key (PROC_DEF_ID_) 
-    references ACT_RE_PROCDEF (ID_);
+    references ACT_RE_PROCDEF (ID_);  
     
 alter table ACT_HI_DETAIL
-	modify PROC_INST_ID_ NVARCHAR2(64) null;
+  modify PROC_INST_ID_ NVARCHAR2(64) null;
 
 alter table ACT_HI_DETAIL
-	modify EXECUTION_ID_ NVARCHAR2(64) null;
+  modify EXECUTION_ID_ NVARCHAR2(64) null;

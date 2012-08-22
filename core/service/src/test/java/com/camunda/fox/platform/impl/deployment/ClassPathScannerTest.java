@@ -24,8 +24,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -75,7 +76,9 @@ public class ClassPathScannerTest {
     
     URLClassLoader classLoader = getClassloader();
     
-    Set<String> scanResult = scanner.scanPaResourceRootPath(classLoader, new URL(url+"/META-INF/processes.xml"), null);
+    Map<String, byte[]> scanResult = new HashMap<String, byte[]>();
+    
+    scanner.scanPaResourceRootPath(classLoader, new URL(url+"/META-INF/processes.xml"), null, scanResult);
 
     assertTrue("'testDeployProcessArchive.bpmn20.xml' not found", contains(scanResult, "testDeployProcessArchive.bpmn20.xml"));
     assertTrue("'testDeployProcessArchive.png' not found", contains(scanResult, "testDeployProcessArchive.png"));
@@ -91,7 +94,8 @@ public class ClassPathScannerTest {
 
     URLClassLoader classLoader = getClassloader();
     
-    Set<String> scanResult = scanner.scanPaResourceRootPath(classLoader, new URL(url+"/META-INF/processes.xml"), "pa:nonexisting");
+    Map<String, byte[]> scanResult = new HashMap<String, byte[]>();
+    scanner.scanPaResourceRootPath(classLoader, new URL(url+"/META-INF/processes.xml"), "pa:nonexisting", scanResult);
 
     assertFalse("'testDeployProcessArchive.bpmn20.xml' found", contains(scanResult, "testDeployProcessArchive.bpmn20.xml"));
     assertFalse("'testDeployProcessArchive.png' found", contains(scanResult, "testDeployProcessArchive.png"));
@@ -103,7 +107,8 @@ public class ClassPathScannerTest {
     
     URLClassLoader classLoader = getClassloader();
     
-    Set<String> scanResult = scanner.scanPaResourceRootPath(classLoader, null, "nonexisting");
+    Map<String, byte[]> scanResult = new HashMap<String, byte[]>();
+    scanner.scanPaResourceRootPath(classLoader, null, "nonexisting", scanResult);
     
     assertFalse("'testDeployProcessArchive.bpmn20.xml' found", contains(scanResult, "testDeployProcessArchive.bpmn20.xml"));
     assertFalse("'testDeployProcessArchive.png' found", contains(scanResult, "testDeployProcessArchive.png"));
@@ -112,11 +117,11 @@ public class ClassPathScannerTest {
 
   @Test
   public void testScanClassPathWithExistingRootPath_relativeToPa() throws MalformedURLException {
-    
 
     URLClassLoader classLoader = getClassloader();
     
-    Set<String> scanResult = scanner.scanPaResourceRootPath(classLoader, new URL(url+"/META-INF/processes.xml"), "pa:directory/");
+    Map<String, byte[]> scanResult = new HashMap<String, byte[]>();
+    scanner.scanPaResourceRootPath(classLoader, new URL(url+"/META-INF/processes.xml"), "pa:directory/", scanResult);
 
     if(url.contains("Recursive")) {
       assertTrue("'testDeployProcessArchive.bpmn20.xml' not found", contains(scanResult, "testDeployProcessArchive.bpmn20.xml"));
@@ -134,7 +139,8 @@ public class ClassPathScannerTest {
     
     URLClassLoader classLoader = getClassloader();
     
-    Set<String> scanResult = scanner.scanPaResourceRootPath(classLoader, null, "directory/");
+    Map<String, byte[]> scanResult = new HashMap<String, byte[]>();
+    scanner.scanPaResourceRootPath(classLoader, null, "directory/", scanResult);
         
     if(url.contains("Recursive")) {
       assertTrue("'testDeployProcessArchive.bpmn20.xml' not found", contains(scanResult, "testDeployProcessArchive.bpmn20.xml"));
@@ -152,8 +158,8 @@ public class ClassPathScannerTest {
     return new URLClassLoader(new URL[]{new URL(url)});
   }
   
-  private boolean contains(Set<String> scanResult, String suffix) {
-    for (String string : scanResult) {
+  private boolean contains(Map<String, byte[]> scanResult, String suffix) {
+    for (String string : scanResult.keySet()) {
       if (string.endsWith(suffix)) {
         return true;
       }
