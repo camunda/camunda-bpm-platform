@@ -42,6 +42,7 @@ public class TaskList implements Serializable {
   private static final long serialVersionUID = 1L;
   private final static Logger log = Logger.getLogger(TaskList.class.getCanonicalName());
   private static final String TASK_LIST_OUTCOME = "taskList.jsf";
+  private static final String PARAM_NAME_TASKFORM_URL_SUFFIX = "fox.taskForm.url.suffix";
 
   @Inject
   private TaskService taskService;
@@ -170,13 +171,24 @@ public class TaskList implements Serializable {
       ProcessArchive processArchive = processArchiveService.getProcessArchiveByProcessDefinitionId(processDefinitionId, processEngine.getName());
       String contextPath = (String) processArchive.getProperties().get(ProcessArchive.PROP_SERVLET_CONTEXT_PATH);
       String callbackUrl = getRequestURL();
-      return "../.." + contextPath + "/" + formKey + ".jsf?" + urlParameters + "&callbackUrl=" + callbackUrl;
+      return "../.." + contextPath + "/" + formKey + getTaskFormKeySuffix() + "?" + urlParameters + "&callbackUrl=" + callbackUrl;
     } catch (Exception ex) {
       log.log(Level.INFO, "Could not resolve context path for process definition " + processDefinitionId);
       log.log(Level.FINER, "Could not resolve context path for process definition " + processDefinitionId, ex);
       return null;
     }
 
+  }
+
+  private String getTaskFormKeySuffix() {
+    String taskFormUrlSuffix = FacesContext.getCurrentInstance().getExternalContext().getInitParameter(PARAM_NAME_TASKFORM_URL_SUFFIX);
+    if (taskFormUrlSuffix!=null) {
+//    return ".jsf";
+      return taskFormUrlSuffix;
+    }
+    else {
+      return "";
+    }
   }
 
   public String delegate(Task task) {
