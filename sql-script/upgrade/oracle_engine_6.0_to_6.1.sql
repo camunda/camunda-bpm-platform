@@ -15,8 +15,8 @@ alter table ACT_RE_PROCDEF
 
 alter table ACT_RE_PROCDEF
     add constraint ACT_UNIQ_PROCDEF
-    unique (KEY_,VERSION_);	
-	
+    unique (KEY_,VERSION_); 
+  
 create table ACT_HI_PROCVARIABLE (
     ID_ NVARCHAR2(64) not null,
     PROC_INST_ID_ NVARCHAR2(64) not null,
@@ -66,19 +66,16 @@ set VALUE_ = VALUE_ + 1,
     REV_ = REV_ + 1
 where NAME_ = 'historyLevel' and VALUE_ >= 2;
 
-alter table ACT_RU_IDENTITYLINK
-add PROC_DEF_ID_ NVARCHAR2(64);
-
 create index ACT_IDX_EXE_PROCDEF on ACT_RU_EXECUTION(PROC_DEF_ID_);
 alter table ACT_RU_EXECUTION
     add constraint ACT_FK_EXE_PROCDEF 
     foreign key (PROC_DEF_ID_) 
     references ACT_RE_PROCDEF (ID_);
-	
+  
 alter table ACT_RU_IDENTITYLINK
     add constraint ACT_FK_ATHRZ_PROCEDEF 
     foreign key (PROC_DEF_ID_) 
-    references ACT_RE_PROCDEF (ID_);	
+    references ACT_RE_PROCDEF (ID_);  
     
 alter table ACT_HI_DETAIL
   modify PROC_INST_ID_ NVARCHAR2(64) null;

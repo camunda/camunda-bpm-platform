@@ -3,7 +3,7 @@ alter table ACT_RU_EXECUTION add CACHED_ENT_STATE_ int;
 update ACT_RU_EXECUTION set CACHED_ENT_STATE_ = 7;
 
 alter table ACT_RU_IDENTITYLINK
-add PROC_DEF_ID_ nvarchar(64);
+  add PROC_DEF_ID_ nvarchar(64);
 
 create index ACT_IDX_ATHRZ_PROCEDEF on ACT_RU_IDENTITYLINK(PROC_DEF_ID_);
 
@@ -35,10 +35,10 @@ create index ACT_IDX_HI_PROCVAR_PROC_INST on ACT_HI_PROCVARIABLE(PROC_INST_ID_);
 create index ACT_IDX_HI_PROCVAR_NAME_TYPE on ACT_HI_PROCVARIABLE(NAME_, VAR_TYPE_);
 
 alter table ACT_HI_ACTINST
-add column TASK_ID_ nvarchar(64);
+  add TASK_ID_ nvarchar(64);
 
 alter table ACT_HI_ACTINST
-add column CALL_PROC_INST_ID_ nvarchar(64);
+  add CALL_PROC_INST_ID_ nvarchar(64);
 
 /** 17.08.2012 */
 
