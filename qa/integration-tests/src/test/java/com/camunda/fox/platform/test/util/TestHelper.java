@@ -56,11 +56,11 @@ public abstract class TestHelper {
     assertNotNull(processDefinition);
     InputStream actualStream = repositoryService.getProcessDiagram(processDefinition.getId());
     if (deployed) {
-    assertNotNull(actualStream);
-    assertTrue(0 < actualStream.available());
-    InputStream expectedStream = clazz.getResourceAsStream(expectedDiagramResource);
-    assertNotNull(expectedStream);
-    assertTrue(isEqual(expectedStream, actualStream));
+      assertNotNull(actualStream);
+      assertTrue(0 < actualStream.available());
+      InputStream expectedStream = clazz.getResourceAsStream(expectedDiagramResource);
+      assertNotNull(expectedStream);
+      assertTrue(isEqual(expectedStream, actualStream));
     } else {
       assertNull(actualStream);
     }
