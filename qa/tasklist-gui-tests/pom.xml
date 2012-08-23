@@ -129,6 +129,41 @@
   </build>
   <profiles>
     <profile>
+      <id>glassfish</id>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <version>2.4.3</version>
+            <configuration>
+              <skip>true</skip>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+      <dependencies>
+         <dependency>
+          <!-- make sure this comes after runtime in the reactor build -->
+          <groupId>com.camunda.fox.platform</groupId>
+          <artifactId>fox-platform-qa-glassfish-runtime</artifactId>
+          <version>${project.version}</version>
+          <scope>provided</scope>
+          <type>pom</type>
+        </dependency>
+        <dependency>
+          <groupId>org.jboss.as</groupId>
+          <artifactId>jboss-as-arquillian-container-managed</artifactId>
+          <version>${version.jboss.as}</version>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.jboss.arquillian.protocol</groupId>
+          <artifactId>arquillian-protocol-servlet</artifactId>
+          <scope>test</scope>
+        </dependency>        
+      </dependencies>
+    </profile>
+    <profile>
       <id>jboss</id>
       <activation>
         <activeByDefault>true</activeByDefault>
