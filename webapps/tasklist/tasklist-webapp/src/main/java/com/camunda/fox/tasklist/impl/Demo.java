@@ -7,7 +7,9 @@ import javax.inject.Inject;
 
 import org.activiti.engine.IdentityService;
 import org.activiti.engine.identity.Group;
+import org.activiti.engine.identity.Picture;
 import org.activiti.engine.identity.User;
+import org.activiti.engine.impl.util.IoUtil;
 
 /**
  * copied shamelessly from 
@@ -47,17 +49,17 @@ public class Demo {
 
   protected void initDemoUsers() {
     createUser("kermit", "Kermit", "The Frog", "kermit", "kermit@activiti.org", 
-            "org/activiti/explorer/images/kermit.jpg",
+            "images/kermit.jpg",
             Arrays.asList("management", "sales", "marketing", "engineering", "user", "admin"),
             Arrays.asList("birthDate", "10-10-1955", "jobTitle", "Muppet", "location", "Hollywoord",
                           "phone", "+123456789", "twitterName", "alfresco", "skype", "activiti_kermit_frog"));
     
     createUser("gonzo", "Gonzo", "The Great", "gonzo", "gonzo@activiti.org", 
-            "org/activiti/explorer/images/gonzo.jpg",
+            "images/gonzo.jpg",
             Arrays.asList("management", "sales", "marketing", "user"),
             null);
     createUser("fozzie", "Fozzie", "Bear", "fozzie", "fozzie@activiti.org", 
-            "org/activiti/explorer/images/fozzie.jpg",
+            "images/fozzie.jpg",
             Arrays.asList("marketing", "engineering", "user"),
             null);
   }
@@ -81,6 +83,14 @@ public class Demo {
           identityService.createMembership(userId, group);
         }
       }
+      
+      // image
+      if (imageResource != null) {
+        byte[] pictureBytes = IoUtil.readInputStream(this.getClass().getClassLoader().getResourceAsStream(imageResource), null);
+        Picture picture = new Picture(pictureBytes, "image/jpeg");
+        identityService.setUserPicture(userId, picture);
+      }
+      
     }
     
     
