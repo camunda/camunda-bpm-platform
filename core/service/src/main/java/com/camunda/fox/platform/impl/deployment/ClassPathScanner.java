@@ -167,14 +167,14 @@ public class ClassPathScanner implements ProcessArchiveScanner {
         ZipEntry zipEntry = (ZipEntry) entries.nextElement();
         String processFileName = zipEntry.getName();        
         if (isDeployable(processFileName) && isBelowPath(processFileName, paResourceRootPath)) {          
-          addResource(zipFile.getInputStream(zipEntry), resourceMap, file.getName()+"!"+processFileName);
+          addResource(zipFile.getInputStream(zipEntry), resourceMap, file.getName()+"!", processFileName);
           // find diagram(s) for process
           Enumeration< ? extends ZipEntry> entries2 = zipFile.entries();
           while (entries2.hasMoreElements()) {
             ZipEntry zipEntry2 = (ZipEntry) entries2.nextElement();
             String diagramFileName = zipEntry2.getName();
             if (isDiagramForProcess(diagramFileName, processFileName)) {
-              addResource(zipFile.getInputStream(zipEntry), resourceMap, file.getName()+"!"+diagramFileName);
+              addResource(zipFile.getInputStream(zipEntry), resourceMap, file.getName()+"!", diagramFileName);
             }
           }
         }
@@ -215,12 +215,12 @@ public class ClassPathScanner implements ProcessArchiveScanner {
       } else { // at resource root or below -> continue scanning 
         String processFileName = path.getPath();
         if (!path.isDirectory() && isDeployable(processFileName)) {
-          addResource(path, resourceMap, paResourceRootPath+processFileName.replace(rootPath, ""));
+          addResource(path, resourceMap, paResourceRootPath, processFileName.replace(rootPath, ""));
           // find diagram(s) for process
           for (File file : paths) {
             String diagramFileName = file.getPath();
             if (!path.isDirectory() && isDiagramForProcess(diagramFileName, processFileName)) {
-              addResource(path, resourceMap, paResourceRootPath+diagramFileName.replace(rootPath, ""));
+              addResource(file, resourceMap, paResourceRootPath, diagramFileName.replace(rootPath, ""));
             }
           }
         } else if (path.isDirectory()) {
@@ -230,9 +230,11 @@ public class ClassPathScanner implements ProcessArchiveScanner {
     }
   }
   
-  protected void addResource(Object source, Map<String, byte[]> resourceMap, String processFileName) {
+  protected void addResource(Object source, Map<String, byte[]> resourceMap, String resourceRootPath, String resourceName) {
     
-    log.log(Level.FINEST, "discovered process resource {0}", processFileName);
+    String resourcePath = (resourceRootPath == null ? "" : resourceRootPath).concat(resourceName);
+    
+    log.log(Level.FINEST, "discovered process resource {0}", resourcePath);
         
     InputStream inputStream = null;
     
@@ -242,9 +244,9 @@ public class ClassPathScanner implements ProcessArchiveScanner {
       } else {
         inputStream = (InputStream) source;
       }
-      byte[] bytes = IoUtil.readInputStream(inputStream, processFileName);
+      byte[] bytes = IoUtil.readInputStream(inputStream, resourcePath);
       
-      resourceMap.put(processFileName, bytes);
+      resourceMap.put(resourcePath, bytes);
       
     } catch (IOException e) {
       // TODO Auto-generated catch block
