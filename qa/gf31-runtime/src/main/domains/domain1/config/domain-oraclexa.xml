@@ -44,7 +44,7 @@
   </jdbc-connection-pool>
   <jdbc-connection-pool 
       is-isolation-level-guaranteed="false" 
-      datasource-classname="oracle.jdbc.pool.OracleXADataSource" 
+      datasource-classname="oracle.jdbc.xa.client.OracleXADataSource" 
       res-type="javax.sql.XADataSource" non-transactional-connections="true" 
       name="OraclePool">
     <property name="user" value="${database.user}"></property>
