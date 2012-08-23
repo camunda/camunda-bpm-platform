@@ -7,7 +7,25 @@
       </module>
     </application>
   </system-applications>
-  <applications></applications>
+  <applications>
+    <application location="${com.sun.aas.instanceRootURI}/applications/fox-platform-jobexecutor-rar/" name="fox-platform-jobexecutor-rar" object-type="user">
+      <module name="fox-platform-jobexecutor-rar">
+        <engine sniffer="connector"></engine>
+      </module>
+    </application>
+    <application location="${com.sun.aas.instanceRootURI}/applications/camunda-fox-platform/" name="camunda-fox-platform" object-type="user">
+      <property name="isComposite" value="true"></property>
+      <engine sniffer="ear"></engine>
+      <module name="fox-platform-glassfish-service-${project.version}.jar">
+        <engine sniffer="ejb"></engine>
+        <engine sniffer="security"></engine>
+      </module>
+      <module name="fox-platform-jobexecutor-service-${project.version}.jar">
+        <engine sniffer="ejb"></engine>
+        <engine sniffer="security"></engine>
+      </module>
+    </application>
+  </applications>
   <resources>
     <jdbc-resource pool-name="__TimerPool" jndi-name="jdbc/__TimerPool" object-type="system-admin"></jdbc-resource>
     <jdbc-resource pool-name="DerbyPool" jndi-name="jdbc/__default"></jdbc-resource>
@@ -29,11 +47,11 @@
           datasource-classname="org.h2.jdbcx.JdbcDataSource" 
           res-type="javax.sql.DataSource" non-transactional-connections="true" 
           name="H2Pool">
-	      <property name="Url" value="jdbc:h2:mem:foxEngine;DB_CLOSE_DELAY=-1;MVCC=TRUE;DB_CLOSE_ON_EXIT=FALSE"></property>
-<!-- 	      <property name="Url" value="jdbc:h2:mem:fox-engine"></property> -->
-	      <property name="User" value="sa"></property>
+        <property name="Url" value="jdbc:h2:mem:foxEngine;DB_CLOSE_DELAY=-1;MVCC=TRUE;DB_CLOSE_ON_EXIT=FALSE"></property>
+<!--        <property name="Url" value="jdbc:h2:mem:fox-engine"></property> -->
+        <property name="User" value="sa"></property>
           <property name="Password" value="sa"></property>
-<!--      	  <property name="connectionAttributes" value=";create=true"></property> -->
+<!--          <property name="connectionAttributes" value=";create=true"></property> -->
     </jdbc-connection-pool>
     <resource-adapter-config
       enabled="true" 
@@ -54,6 +72,8 @@
   <servers>
     <server name="server" config-ref="server-config">
       <application-ref ref="__admingui" virtual-servers="__asadmin"></application-ref>
+      <application-ref ref="fox-platform-jobexecutor-rar" virtual-servers="server"></application-ref>
+      <application-ref ref="camunda-fox-platform" virtual-servers="server"></application-ref>
       <resource-ref ref="jdbc/__TimerPool"></resource-ref>
       <resource-ref ref="jdbc/__default"></resource-ref>
       <resource-ref ref="jdbc/FoxEngine"></resource-ref>
@@ -229,7 +249,7 @@
         <thread-pool name="admin-thread-pool" max-thread-pool-size="50" max-queue-size="256"></thread-pool>
         <thread-pool name="http-thread-pool"></thread-pool>
         <thread-pool name="thread-pool-1" max-thread-pool-size="200"></thread-pool>
-		<thread-pool max-thread-pool-size="6" name="platform-jobexecutor-tp" min-thread-pool-size="3" max-queue-size="10"></thread-pool>
+    <thread-pool max-thread-pool-size="6" name="platform-jobexecutor-tp" min-thread-pool-size="3" max-queue-size="10"></thread-pool>
       </thread-pools>
       <monitoring-service>
         <module-monitoring-levels></module-monitoring-levels>
@@ -400,7 +420,7 @@
         <thread-pool name="http-thread-pool"></thread-pool>
         <thread-pool max-thread-pool-size="200" name="thread-pool-1"></thread-pool>
         <thread-pool name="admin-thread-pool" max-thread-pool-size="50" max-queue-size="256"></thread-pool>
-		<thread-pool max-thread-pool-size="6" name="platform-jobexecutor-tp" min-thread-pool-size="3" max-queue-size="10"></thread-pool>
+    <thread-pool max-thread-pool-size="6" name="platform-jobexecutor-tp" min-thread-pool-size="3" max-queue-size="10"></thread-pool>
       </thread-pools>
       <group-management-service>
         <failure-detection></failure-detection>
