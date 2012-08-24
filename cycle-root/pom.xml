@@ -5,7 +5,7 @@
   <artifactId>cycle-root</artifactId>
   <version>6.2.0-SNAPSHOT</version>
   <packaging>pom</packaging>
-  <name>fox cycle</name>
+  fox cycle - Root Pom
   <modules>
     <module>cycle</module>
   </modules>

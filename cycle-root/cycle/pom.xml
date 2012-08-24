@@ -9,7 +9,7 @@
   </parent>
   <artifactId>cycle</artifactId>
   <packaging>war</packaging>
-  <name>fox cycle</name>
+  <name>fox cycle - App</name>
   <dependencies>
   </dependencies>
   <build>
