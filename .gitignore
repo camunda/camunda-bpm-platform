@@ -1,0 +1,10 @@
+target
+.classpath
+.project
+.settings
+build.properties
+bin
+.metadata
+.LCKpom.xml~
+nbactions.xml
+nb-configuration.xml
