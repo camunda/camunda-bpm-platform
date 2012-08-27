@@ -48,3 +48,11 @@ form input.ng-dirty.ng-invalid {
   bottom: 0px;
   right: 0px;
 }
+
+.sync-options {
+  text-align: center;
+}
+
+.sync-options .actions {
+  line-height: 140px;
+}

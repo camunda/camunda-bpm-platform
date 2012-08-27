@@ -1,6 +1,7 @@
 package com.camunda.fox.cycle.web.dto;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import com.camunda.fox.cycle.entity.BpmnDiagram;
@@ -24,11 +25,14 @@ public class RoundtripDTO {
   
   private BpmnDiagramDTO rightHandSide;
   
+  private Date lastSync;
+  
   public RoundtripDTO() { }
   
   public RoundtripDTO(Roundtrip r) {
     this.id = r.getId();
     this.name = r.getName();
+    this.lastSync = r.getLastSync();
   }
   
   public RoundtripDTO(Roundtrip r, BpmnDiagram leftHandSide, BpmnDiagram rightHandSide) {
@@ -73,6 +77,14 @@ public class RoundtripDTO {
    */
   public static RoundtripDTO wrap(Roundtrip roundtrip) {
     return new RoundtripDTO(roundtrip);
+  }
+
+  public Date getLastSync() {
+    return lastSync;
+  }
+  
+  public void setLastSync(Date lastSync) {
+    this.lastSync = lastSync;
   }
   
   /**

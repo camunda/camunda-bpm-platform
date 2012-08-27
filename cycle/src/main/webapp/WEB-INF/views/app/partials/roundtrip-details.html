@@ -5,7 +5,8 @@
     <div class="span4">
       <div class="bpmn-model thumbnail" ng-show="roundtrip.leftHandSide">
         <div class="diagram">
-          Model selected
+          <span class="label">Model selected</span>
+          <span>{{roundtrip.leftHandSide.modeller}} {{roundtrip.leftHandSide.diagramPath}}</span>
         </div>
       </div>
       <div class="bpmn-model thumbnail" ng-hide="roundtrip.leftHandSide">
@@ -18,10 +19,30 @@
       </div>
     </div>
     
-    <div class="span4 offset2">
+    <div class="span2">
+      <div class="sync-options">
+        <div class="actions">
+          <button class="btn" ng-disabled="!(roundtrip.rightHandSide && roundtrip.rightHandSide)">&larr; sync</button>
+        </div>
+        <div>
+          <span ng-show="roundtrip.lastSync">
+            Last sync {{roundtrip.lastSync | date}}
+          </span>
+          <span ng-hide="roundtrip.lastSync">
+            Not synced yet
+          </span>
+        </div>
+        <div class="actions">
+          <button class="btn" ng-disabled="!(roundtrip.rightHandSide && roundtrip.rightHandSide)">sync &rarr;</button>
+        </div>
+      </div>
+    </div>
+    
+    <div class="span4">
       <div class="bpmn-model thumbnail" ng-show="roundtrip.rightHandSide">
         <div class="diagram">
           <span class="label">Model selected</span>
+          <span>{{roundtrip.rightHandSide.modeller}} {{roundtrip.rightHandSide.diagramPath}}</span>
         </div>
       </div>
       <div class="bpmn-model thumbnail" ng-hide="roundtrip.rightHandSide">
