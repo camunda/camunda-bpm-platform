@@ -19,6 +19,8 @@
               <li class="nav-header" th:text="#{Actions}">Actions</li>
               <li><a ng-click="createNew()"><i class="icon-plus"></i><span th:text="#{Create new}">Create new</span></a></li>
             </ul>
+
+            <!-- begin create-roundtrip-dialog -->
             <div class="modal" id="create-roundtrip-dialog" ng-controller="CreateNewRoundtripController" style="display: none;">
               <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -43,6 +45,8 @@
                 <button href="#" class="btn btn-primary" ng-click="save()" th:text="#{Save}">Save</button>
               </div>
             </div>
+            <!-- end create-roundtrip-dialog -->
+
           </div>
         </div>
         <!-- actual view body is rendered here whenever the url changes -->
