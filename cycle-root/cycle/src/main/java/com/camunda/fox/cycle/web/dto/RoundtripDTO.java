@@ -96,8 +96,22 @@ public class RoundtripDTO {
     this.targetModel = targetModel;
   }
   
+  /**
+   * Wraps a roundtrip as a data object
+   * @param roundtrip
+   * @return 
+   */
+  public static RoundtripDTO wrap(Roundtrip roundtrip) {
+    return new RoundtripDTO(roundtrip);
+  }
   
-  public static List<RoundtripDTO> convertAll(List<Roundtrip> trackers) {
+  /**
+   * Wraps a list of roundtrips as a list of the respective roundtrip data objects
+   * 
+   * @param trackers
+   * @return 
+   */
+  public static List<RoundtripDTO> wrapAll(List<Roundtrip> trackers) {
     List<RoundtripDTO> dtos = new ArrayList<RoundtripDTO>();
     for (Roundtrip t: trackers) {
       dtos.add(new RoundtripDTO(t));

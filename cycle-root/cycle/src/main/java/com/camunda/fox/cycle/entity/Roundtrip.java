@@ -43,6 +43,6 @@ public class Roundtrip implements Serializable {
   
 	@Override
 	public String toString() {
-		return "Roundtrip [name=" + name + "]";
+		return "Roundtrip[name=" + name + "]";
   }
 }

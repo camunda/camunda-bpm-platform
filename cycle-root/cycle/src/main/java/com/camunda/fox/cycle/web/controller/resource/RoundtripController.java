@@ -1,10 +1,6 @@
 package com.camunda.fox.cycle.web.controller.resource;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.TreeMap;
-
-import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -14,10 +10,11 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
+import org.springframework.transaction.annotation.Transactional;
 import com.camunda.fox.cycle.entity.Roundtrip;
 import com.camunda.fox.cycle.web.controller.AbstractController;
 import com.camunda.fox.cycle.web.dto.RoundtripDTO;
-import com.camunda.fox.cycle.web.repository.RoundtripRepository;
+import com.camunda.fox.cycle.repository.RoundtripRepository;
 
 /**
  * This is the main roundtrip rest controller which exposes roundtrip 
@@ -34,59 +31,52 @@ public class RoundtripController extends AbstractController {
 	@Inject
 	private RoundtripRepository roundtripRepository;
   
-  private long currentId = 0;
-  
-  private TreeMap<Long, RoundtripDTO> roundTrips = new TreeMap<Long, RoundtripDTO>();
-  
-  @PostConstruct
-  private void postConstruct() {
-    roundTrips.put(++currentId, new RoundtripDTO(currentId, "MyRoundtrip", "1", "2"));
-    roundTrips.put(++currentId, new RoundtripDTO(currentId, "MyRoundtrip 2", "1", "2"));
-  }
-  
   @GET
   public List<RoundtripDTO> list() {
-    return new ArrayList<RoundtripDTO>(roundTrips.values());
+    return RoundtripDTO.wrapAll(roundtripRepository.findAll());
   }
   
   @GET
   @Path("{id}")
   public RoundtripDTO get(@PathParam("id") long id) {
-    return roundTrips.get(id);
+    return RoundtripDTO.wrap(roundtripRepository.findOne(id));
   }
   
   @POST
   @Path("{id}")
+  @Transactional
   public RoundtripDTO update(RoundtripDTO data) {
     long id = data.getId();
     
-    RoundtripDTO roundTrip = roundTrips.get(id);
-    if (roundTrip == null) {
+    Roundtrip roundtrip = roundtripRepository.findOne(id);
+    if (roundtrip == null) {
       throw new IllegalArgumentException("Not found");
     }
     
-    data.setId(id);
-    roundTrips.put(id, data);
-    
-    return data;
+    update(roundtrip, data);
+    return RoundtripDTO.wrap(roundtrip);
   }
   
   @POST
   public RoundtripDTO create(RoundtripDTO data) {
-    Roundtrip r = roundtripRepository.save(new Roundtrip(data.getName()));
-    return new RoundtripDTO(r);
+    Roundtrip roundtrip = new Roundtrip();
+    update(roundtrip, data);
+    return RoundtripDTO.wrap(roundtripRepository.saveAndFlush(roundtrip));
   }
   
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   @Path("isNameValid")
   public boolean isNameValid(@QueryParam("name") String name) {
-    for (RoundtripDTO r: roundTrips.values()) {
-      if (r.getName().equals(name)) {
-        return false;
-      }
-    }
-    
-    return true;
+    return roundtripRepository.isNameValid(name);
+  }
+  
+  /**
+   * Updates the roundtrip with the given data
+   * @param roundtrip
+   * @param data 
+   */
+  private void update(Roundtrip roundtrip, RoundtripDTO data) {
+    roundtrip.setName(data.getName());
   }
 }
