@@ -1,6 +1,7 @@
 package com.camunda.fox.cycle.web.dto;
 
 import com.camunda.fox.cycle.entity.BpmnDiagram;
+import com.camunda.fox.cycle.entity.BpmnDiagram.Status;
 
 /**
  * This is a data object which exposes a {@link BpmnDiagram} to the client via rest.
@@ -13,10 +14,14 @@ public class BpmnDiagramDTO {
   private String modeller;
   private String diagramPath;
 
+  private Status status;
+  
   private BpmnDiagramDTO(BpmnDiagram diagram) {
     this.id = diagram.getId();
     this.modeller = diagram.getModeller();
     this.diagramPath = diagram.getDiagramPath();
+    
+    this.status = diagram.getStatus();
   }
 
   public Long getId() {

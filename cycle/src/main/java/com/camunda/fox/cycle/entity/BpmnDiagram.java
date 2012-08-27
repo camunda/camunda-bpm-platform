@@ -1,6 +1,8 @@
 package com.camunda.fox.cycle.entity;
 
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 
@@ -11,7 +13,14 @@ import javax.persistence.Id;
  */
 @Entity
 public class BpmnDiagram {
-
+  
+  public static enum Status {
+    UNSPECIFIED,
+    OUT_OF_SYNC, 
+    SYNCED, 
+    WARNING
+  }
+  
   @Id
   @GeneratedValue
   private Long id;
@@ -19,6 +28,9 @@ public class BpmnDiagram {
   private String modeller;
   
   private String diagramPath;
+  
+  @Enumerated(EnumType.STRING)
+  private Status status;
   
   public BpmnDiagram() { }
   
@@ -49,5 +61,13 @@ public class BpmnDiagram {
 
   public String getModeller() {
     return modeller;
+  }
+
+  public Status getStatus() {
+    return status;
+  }
+
+  public void setStatus(Status status) {
+    this.status = status;
   }
 }
