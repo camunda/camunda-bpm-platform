@@ -12,3 +12,8 @@ form input.ng-dirty.ng-invalid {
   border-top: 1px solid #E5E5E5;
   background-color: whiteSmoke;
 }
+
+.tree {
+  border: 1px solid #DDDDDD;
+  overflow: auto;
+}
