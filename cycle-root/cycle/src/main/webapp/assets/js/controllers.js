@@ -3,7 +3,7 @@
 
 angular.module('cycle.controllers', []);
 
-function DefaultController($scope, $http) {
+function DefaultController($scope, $http, $location) {
   
   // TODO: get from cookie
   $scope.currentUser = null;
@@ -15,11 +15,48 @@ function DefaultController($scope, $http) {
   $scope.$on("cycle.userChanged", function(event, user) {
     $scope.currentUser = user;
   });
+  
+  
+  // Bread Crumb 
+  var breadCrumbs = $scope.breadCrumbs = [];
+  	
+  $scope.$on("navigation-changed", function(evt, navigationItem) {
+	  if(navigationItem==undefined) {
+	    breadCrumbs.splice(0, breadCrumbs.length);
+	  } else {
+		var contains = false;
+		var remove = 0;
+		angular.forEach(breadCrumbs, function(item) {
+			if(item.name == navigationItem.name) {
+				contains = true;			
+			}
+			if(item.href.indexOf($location.path()) != 0) {
+				remove++;
+			}
+		});
+		
+		for (var i = 0; i < remove; i++) {
+		  breadCrumbs.pop();						
+		}		
+		
+		if(!contains) {
+			breadCrumbs.push({name:navigationItem.name, href:$location.path()});
+		}		
+	  }
+  });
+  // end Bread Crumb
 };
+
+function HomeController($scope, $routeParams) {
+  $scope.$emit("navigation-changed");
+}
 
 function RoundtripDetailsController($scope, $routeParams, Roundtrip) {
 
-  $scope.roundtrip = Roundtrip.get({id: $routeParams.roundtripId });
+  $scope.roundtrip = Roundtrip.get({id: $routeParams.roundtripId }, function() {
+      $scope.$emit("navigation-changed", {name:$scope.roundtrip.name});
+    } 
+  );
   
   $scope.edit = function() {
     
