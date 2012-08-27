@@ -8,8 +8,13 @@
   <name>fox cycle - root</name>
   
   <properties>
-    <springframework.version>3.1.2.RELEASE</springframework.version>
-    <hibernate.version>4.1.6.Final</hibernate.version>
+    <!-- versions -->
+    <version.springframework>3.1.2.RELEASE</version.springframework>
+    <version.hibernate>4.1.6.Final</version.hibernate>
+    <version.resteasy>2.3.4.Final</version.resteasy>
+    <version.h2>1.3.160</version.h2>
+
+    <!-- properties -->
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
   
@@ -22,13 +27,8 @@
     <dependencies>
       <dependency>
         <groupId>org.hibernate</groupId>
-        <artifactId>hibernate-core</artifactId>
-        <version>${hibernate.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.hibernate</groupId>
         <artifactId>hibernate-entitymanager</artifactId>
-        <version>${hibernate.version}</version>
+        <version>${version.hibernate}</version>
       </dependency>
       <dependency>
         <groupId>org.hibernate.javax.persistence</groupId>
@@ -37,4 +37,5 @@
       </dependency>
     </dependencies>
   </dependencyManagement>
+
 </project>
