@@ -79,10 +79,10 @@
       <artifactId>javax.inject</artifactId>
       <version>1</version>
     </dependency>
+    <!-- jpa 2.0 api -->
     <dependency>
-      <groupId>javax.persistence</groupId>
-      <artifactId>persistence-api</artifactId>
-      <version>1.0.2</version>
+      <groupId>org.hibernate.javax.persistence</groupId>
+      <artifactId>hibernate-jpa-2.0-api</artifactId>
       <scope>provided</scope>
     </dependency>
     
@@ -158,6 +158,12 @@
         <dependency>
           <groupId>org.hibernate</groupId>
           <artifactId>hibernate-entitymanager</artifactId>
+        </dependency>
+        <!-- jpa 2.0 api -->
+        <dependency>
+          <groupId>org.hibernate.javax.persistence</groupId>
+          <artifactId>hibernate-jpa-2.0-api</artifactId>
+          <scope>compile</scope>
         </dependency>
       </dependencies>
       <build>
