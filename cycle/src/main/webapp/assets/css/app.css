@@ -24,6 +24,11 @@ form input.ng-dirty.ng-invalid {
   background-color: whiteSmoke;
 }
 
+.tree {
+  border: 1px solid #DDDDDD;
+  overflow: auto;
+}
+
 .bpmn-model {
   text-align: center;
   position: relative;

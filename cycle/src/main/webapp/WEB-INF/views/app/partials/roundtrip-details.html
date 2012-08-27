@@ -13,7 +13,7 @@
           <span class="label">No model</span>
         </div>
         <div class="actions">
-          <button class="btn">Add</button>
+          <button class="btn" ng-click="addModel()" th:text="#{Add}">Add</button>
         </div>
       </div>
     </div>
@@ -29,9 +29,51 @@
           <span class="label">No model</span>
         </div>
         <div class="actions">
-          <button class="btn">Add</button>
+          <button class="btn" ng-click="addModel()" th:text="#{Add}">Add</button>
         </div>
       </div>
     </div>
   </div>
+
+  <!-- begin add-model-roundtrip-dialog -->
+  <div class="modal" id="add-model-roundtrip-dialog" style="display: none;">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal">&times;</button>
+      <h3 th:text="#{Add file}">Add file</h3>
+    </div>
+    <div class="modal-body">
+      <form class="form-horizontal" novalidate="novalidate" ng-submit="save()" name="addModelRoundtripForm">
+        <fieldset>
+          <div class="control-group" ng-class="errorClass(addModelRoundtripForm)">
+            <label class="control-label" for="input01" th:text="#{Modeler Name}">Modeler Name</label>
+            <div class="controls">
+              <input ng-model="modelerName" name="modelerName" type="text" id="input01" data-provide="typeahead" data-source="" required />
+              <p class="help-block" ng-show="addModelRoundtripForm.modelerName.$error.required" th:text="#{Type in the name of your modeler}"></p>
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label" for="connectors" th:text="#{Select Connector}">Select Connector</label>
+            <div class="controls">
+              <select id="connectors">
+                <option>Signavio</option>
+                <option>SVN</option>
+                <option>Filesystem</option>
+              </select>
+            </div>
+          </div>
+          <div class="control-group">
+            <label class="control-label" for="dojoTree" th:text="#{Select BPMN File}">Dojo Tree</label>
+            <div class="controls">
+              <div id="dojoTree" class="claro tree"></div>
+            </div>
+          </div>
+        </fieldset>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" ng-click="cancel()" th:text="#{Cancel}">Cancel</button>
+      <button href="#" class="btn btn-primary" ng-click="save()" th:text="#{Add}">Add</button>
+    </div>
+  </div>
+  <!-- end add-model-roundtrip-dialog -->
 </div>
