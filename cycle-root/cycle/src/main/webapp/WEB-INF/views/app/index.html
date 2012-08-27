@@ -10,37 +10,37 @@
         <div class="span3">
           <div class="well sidebar-nav" id="roundtrip-list" ng-controller="ListRoundtripsController">
             <ul class="nav nav-list" id="roundtrip-links">
-              <li class="nav-header" th:text="#{roundtrip.myRoundtrips}">My Roundtrips</li>
+              <li class="nav-header" th:text="#{My Roundtrips}">My Roundtrips</li>
               <li ng-repeat="roundtrip in roundtrips" class="roundtrip-link-{{roundtrip.id}}" ng-class="activeClass(roundtrip)">
                 <a ng-click="selectRoundtrip(roundtrip)" href="#/roundtrip/{{roundtrip.id}}" title="Inspect {{roundtrip.name}}">{{roundtrip.name}}</a>
               </li>
             </ul>
             <ul class="nav nav-list">
-              <li class="nav-header" th:text="#{roundtrip.actions}">Actions</li>
-              <li><a ng-click="createNew()"><i class="icon-plus"></i><span th:text="#{roundtrip.createNew}">Create new</span></a></li>
+              <li class="nav-header" th:text="#{Actions}">Actions</li>
+              <li><a ng-click="createNew()"><i class="icon-plus"></i><span th:text="#{Create new}">Create new</span></a></li>
             </ul>
             <div class="modal" id="create-roundtrip-dialog" ng-controller="CreateNewRoundtripController" style="display: none;">
               <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
-                <h3 th:text="#{roundtrip.createRoundtrip}">Create roundtrip</h3>
+                <h3 th:text="#{Create roundtrip}">Create roundtrip</h3>
               </div>
               <div class="modal-body">
                 <form class="form-horizontal" novalidate="novalidate" ng-submit="save()" name="newRoundtripForm">
                   <fieldset>
                     <div class="control-group" ng-class="errorClass(newRoundtripForm)">
-                      <label class="control-label" for="input01" th:text="#{roundtrip.create.name}">Name</label>
+                      <label class="control-label" for="input01" th:text="#{Name}">Name</label>
                       <div class="controls">
                         <input ng-model="name" name="name" type="text" class="input-xlarge" id="input01" required />
-                        <p class="help-block" ng-show="newRoundtripForm.name.$error.required" th:text="#{roundtrip.create.typeNameOfRoundtrip}">Type in the name of your roundtrip</p>
-                        <p class="help-block" ng-show="newRoundtripForm.name.$error.occupied" th:text="#{roundtrip.create.nameIsAlreadyUsed}">The name is already used</p>
+                        <p class="help-block" ng-show="newRoundtripForm.name.$error.required" th:text="#{Type in the name of your roundtrip}"></p>
+                        <p class="help-block" ng-show="newRoundtripForm.name.$error.occupied" th:text="#{The name is already used}">The name is already used</p>
                       </div>
                     </div>
                   </fieldset>
                 </form>
               </div>
               <div class="modal-footer">
-                <button class="btn" ng-click="cancel()" th:text="#{roundtrip.create.cancel}">Cancel</button>
-                <button href="#" class="btn btn-primary" ng-click="save()" th:text="#{roundtrip.create.save}">Save</button>
+                <button class="btn" ng-click="cancel()" th:text="#{Cancel}">Cancel</button>
+                <button href="#" class="btn btn-primary" ng-click="save()" th:text="#{Save}">Save</button>
               </div>
             </div>
           </div>
