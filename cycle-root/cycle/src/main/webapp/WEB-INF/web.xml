@@ -44,6 +44,7 @@
     <filter-name>SlashUriFilter</filter-name>
     <url-pattern>/app/secured/view/*</url-pattern>
   </filter-mapping>
+    
   <!-- security configuration -->
   <security-constraint>
     <web-resource-collection>
@@ -68,4 +69,8 @@
   <security-role>
     <role-name>user</role-name>
   </security-role>
+  <error-page>
+    <error-code>408</error-code>
+    <location>/app/login/expired</location>
+  </error-page>
 </web-app>

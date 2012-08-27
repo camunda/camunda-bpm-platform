@@ -54,6 +54,13 @@ public class DefaultController extends AbstractController {
   }
   
   @POST
+  @Path("login/expired")
+  @Produces(MediaType.TEXT_HTML)
+  public String loginExpired() {
+    return "error/login-expired";
+  }
+  
+  @POST
   @Path("login/error")
   @Produces(MediaType.TEXT_HTML)
   public String loginError() {

@@ -110,16 +110,39 @@
       <version>1.9.16</version>
     </dependency>
   </dependencies>
+  
   <build>
     <finalName>cycle</finalName>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <version>2.4</version>
+        <executions>
+          <execution>
+            <id>create-jar</id>
+            <goals>
+              <goal>jar</goal>
+            </goals>
+            <phase>package</phase>
+            <configuration>
+              <classifier>core</classifier>
+              <includes>
+                <include>**/com/camunda/fox/cycle/**</include>
+              </includes>
+              <excludes>
+                <exclude>**/com/camunda/fox/cycle/web/**</exclude>
+              </excludes>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
   </build>
   
   <profiles>
     <profile>
       <id>tomcat</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
       <dependencies>
         <!-- database -->
         <dependency>
@@ -131,12 +154,10 @@
         <dependency>
           <groupId>org.hibernate</groupId>
           <artifactId>hibernate-core</artifactId>
-          <version>${hibernate.version}</version>
         </dependency>
         <dependency>
           <groupId>org.hibernate</groupId>
           <artifactId>hibernate-entitymanager</artifactId>
-          <version>${hibernate.version}</version>
         </dependency>
       </dependencies>
       <build>
