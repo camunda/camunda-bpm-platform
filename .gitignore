@@ -9,3 +9,4 @@ target
 build.properties
 nbactions.xml
 nb-configuration.xml
+.idea
