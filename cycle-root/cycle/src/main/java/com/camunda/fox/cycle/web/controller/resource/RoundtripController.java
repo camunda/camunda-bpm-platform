@@ -39,7 +39,16 @@ public class RoundtripController extends AbstractController {
   @GET
   @Path("{id}")
   public RoundtripDTO get(@PathParam("id") long id) {
-    return RoundtripDTO.wrap(roundtripRepository.findOne(id));
+    return RoundtripDTO.wrap(roundtripRepository.findById(id));
+  }
+  
+  @GET
+  @Transactional
+  @Path("{id}/details")
+  public RoundtripDTO getDetails(@PathParam("id") long id) {
+    Roundtrip roundtrip = roundtripRepository.findById(id);
+    // TODO: Fetch eager
+    return new RoundtripDTO(roundtrip, roundtrip.getLeftHandSide(), roundtrip.getRightHandSide());
   }
   
   @POST
@@ -48,7 +57,7 @@ public class RoundtripController extends AbstractController {
   public RoundtripDTO update(RoundtripDTO data) {
     long id = data.getId();
     
-    Roundtrip roundtrip = roundtripRepository.findOne(id);
+    Roundtrip roundtrip = roundtripRepository.findById(id);
     if (roundtrip == null) {
       throw new IllegalArgumentException("Not found");
     }

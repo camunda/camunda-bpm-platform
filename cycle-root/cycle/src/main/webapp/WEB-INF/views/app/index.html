@@ -15,7 +15,7 @@
                 <a ng-click="selectRoundtrip(roundtrip)" href="#/roundtrip/{{roundtrip.id}}" title="Inspect {{roundtrip.name}}">{{roundtrip.name}}</a>
               </li>
             </ul>
-            <ul class="nav nav-list">
+            <ul class="nav nav-list" ng-cloak>
               <li class="nav-header" th:text="#{Actions}">Actions</li>
               <li><a ng-click="createNew()"><i class="icon-plus"></i><span th:text="#{Create new}">Create new</span></a></li>
             </ul>

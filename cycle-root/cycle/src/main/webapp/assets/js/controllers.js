@@ -17,11 +17,13 @@ function DefaultController($scope, $http) {
   });
 };
 
-function RoundtripDetailsController($scope, $routeParams, Roundtrip) {
+function RoundtripDetailsController($scope, $routeParams, RoundtripDetails) {
 
-  $scope.roundtrip = Roundtrip.get({id: $routeParams.roundtripId });
+  var roundtrip = $scope.roundtrip = RoundtripDetails.get({id: $routeParams.roundtripId }, function() {
+    
+  });
   
-  $scope.edit = function() {
+  $scope.addBpmnModel = function(side) {
     
   };
 };

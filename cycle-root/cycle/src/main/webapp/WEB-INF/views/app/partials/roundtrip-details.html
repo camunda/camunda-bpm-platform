@@ -1,4 +1,37 @@
-<div>
-  <h1>Details for {{roundtrip.name}}</h1>
-  <p>Those are the details</p>  
+<div ng-cloak>
+  <h1>{{roundtrip.name}}</h1>
+  
+  <div class="row-fluid">
+    <div class="span4">
+      <div class="bpmn-model thumbnail" ng-show="roundtrip.leftHandSide">
+        <div class="diagram">
+          Model selected
+        </div>
+      </div>
+      <div class="bpmn-model thumbnail" ng-hide="roundtrip.leftHandSide">
+        <div class="diagram">
+          <span class="label">No model</span>
+        </div>
+        <div class="actions">
+          <button class="btn">Add</button>
+        </div>
+      </div>
+    </div>
+    
+    <div class="span4 offset2">
+      <div class="bpmn-model thumbnail" ng-show="roundtrip.rightHandSide">
+        <div class="diagram">
+          <span class="label">Model selected</span>
+        </div>
+      </div>
+      <div class="bpmn-model thumbnail" ng-hide="roundtrip.rightHandSide">
+        <div class="diagram">
+          <span class="label">No model</span>
+        </div>
+        <div class="actions">
+          <button class="btn">Add</button>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

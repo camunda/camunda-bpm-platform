@@ -3,6 +3,7 @@ package com.camunda.fox.cycle.web.dto;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.camunda.fox.cycle.entity.BpmnDiagram;
 import com.camunda.fox.cycle.entity.Roundtrip;
 
 /**
@@ -19,25 +20,22 @@ public class RoundtripDTO {
   
   private String name;
   
-  private String sourceModel;
+  private BpmnDiagramDTO leftHandSide;
   
-  private String targetModel;
-
-  public RoundtripDTO() {
-  }
+  private BpmnDiagramDTO rightHandSide;
+  
+  public RoundtripDTO() { }
   
   public RoundtripDTO(Roundtrip r) {
     this.id = r.getId();
     this.name = r.getName();
-    
-    // TODO: Update models?
   }
   
-  public RoundtripDTO(Long id, String name, String sourceModel, String targetModel) {
-    this.id = id;
-    this.name = name;
-    this.sourceModel = sourceModel;
-    this.targetModel = targetModel;
+  public RoundtripDTO(Roundtrip r, BpmnDiagram leftHandSide, BpmnDiagram rightHandSide) {
+    this(r);
+    
+    this.leftHandSide = leftHandSide != null ? BpmnDiagramDTO.wrap(leftHandSide) : null;
+    this.rightHandSide = rightHandSide != null ? BpmnDiagramDTO.wrap(rightHandSide) : null;
   }
   
   /**
@@ -68,34 +66,6 @@ public class RoundtripDTO {
     this.name = name;
   }
 
-  /**
-   * @return the sourceModel
-   */
-  public String getSourceModel() {
-    return sourceModel;
-  }
-
-  /**
-   * @param sourceModel the sourceModel to set
-   */
-  public void setSourceModel(String sourceModel) {
-    this.sourceModel = sourceModel;
-  }
-
-  /**
-   * @return the targetModel
-   */
-  public String getTargetModel() {
-    return targetModel;
-  }
-
-  /**
-   * @param targetModel the targetModel to set
-   */
-  public void setTargetModel(String targetModel) {
-    this.targetModel = targetModel;
-  }
-  
   /**
    * Wraps a roundtrip as a data object
    * @param roundtrip
