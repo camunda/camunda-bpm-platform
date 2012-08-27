@@ -11,11 +11,6 @@ angular
         controller: RoundtripDetailsController, 
         templateUrl: '../partials/roundtrip-details.html'
       });
-
-      $httpProvider.defaults.transformRequest.push(function(d) {
-        console.log(d);
-        return d;
-      });
       
       // $routeProvider.otherwise({redirectTo: '/'});
 

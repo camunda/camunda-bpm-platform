@@ -26,7 +26,7 @@ function RoundtripDetailsController($scope, $routeParams, Roundtrip) {
   };
 };
 
-function CreateNewRoundtripController($scope, $q, $http, $location, Roundtrip) {
+function CreateNewRoundtripController($scope, $q, $http, $location, debouncer, Roundtrip) {
 
   $scope.name = '';
   
@@ -34,12 +34,8 @@ function CreateNewRoundtripController($scope, $q, $http, $location, Roundtrip) {
     return form.$valid || !form.$dirty ? '' : 'error';
   };
   
-  $scope.$watch('name', function(newValue) {
-    isNameValid(newValue).then(function() {
-      $scope.newRoundtripForm.name.$setValidity("occupied", true);
-    }, function() {
-      $scope.newRoundtripForm.name.$setValidity("occupied", false);
-    });
+  $scope.$watch('name', function(newValue, oldValue) {
+    checkName(newValue, oldValue);
   });
   
   $scope.cancel = function() {
@@ -62,8 +58,20 @@ function CreateNewRoundtripController($scope, $q, $http, $location, Roundtrip) {
     $("#create-roundtrip-dialog").modal('hide');
   };
   
+  var checkName = debouncer.debounce(function(name) {
+    isNameValid(name).then(function() {
+      $scope.newRoundtripForm.name.$setValidity("occupied", true);
+    }, function() {
+      $scope.newRoundtripForm.name.$setValidity("occupied", false);
+    });
+  }, 1000);
+  
   function isNameValid(name) {
     var deferred = $q.defer();
+    
+    if (!name || name == "") {
+      deferred.resolve();
+    }
     
     $http.get("../../resources/roundtrip/isNameValid?name=" + name).success(function(data) {
       if (data == "true") {

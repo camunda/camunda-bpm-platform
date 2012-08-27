@@ -44,7 +44,7 @@
     <filter-name>SlashUriFilter</filter-name>
     <url-pattern>/app/secured/view/*</url-pattern>
   </filter-mapping>
-    
+  
   <!-- security configuration -->
   <security-constraint>
     <web-resource-collection>

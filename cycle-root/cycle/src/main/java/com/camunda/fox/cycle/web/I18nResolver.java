@@ -14,11 +14,10 @@ public class I18nResolver implements IMessageResolver {
   }
 
   public MessageResolution resolveMessage(Arguments arguments, String key, Object[] messageParameters) {
-    return new MessageResolution(i18n.tr(key));
+    return new MessageResolution(i18n.tr(key, messageParameters));
   }
 
   public void initialize() {
-
   }
 
   public Integer getOrder() {
@@ -28,5 +27,4 @@ public class I18nResolver implements IMessageResolver {
   public String getName() {
     return "gettext:org.xnap.commons.i18n";
   }
-
 }
