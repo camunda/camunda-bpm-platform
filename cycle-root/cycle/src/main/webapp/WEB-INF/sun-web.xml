@@ -1,0 +1,6 @@
+<sun-web-app>
+  <security-role-mapping>
+    <role-name>admin</role-name>
+    <principal-name>admin</principal-name>
+  </security-role-mapping>
+</sun-web-app>
