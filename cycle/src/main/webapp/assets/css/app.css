@@ -1,0 +1,45 @@
+/** 
+ * loaded to remove angular template flicker on site load
+ * @see http://docs.angularjs.org/api/ng.directive:ngCloak
+ */
+[ng-cloak], .ng-cloak {
+  display: none;
+}
+
+/**
+ * Shared style declarations
+ */
+body {
+  padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
+}
+  
+form input.ng-dirty.ng-invalid {
+  background-color: #FA787E;
+}
+
+.footer {
+  padding: 70px 0;
+  margin-top: 70px;
+  border-top: 1px solid #E5E5E5;
+  background-color: whiteSmoke;
+}
+
+.bpmn-model {
+  text-align: center;
+  position: relative;
+}
+
+.bpmn-model .label {
+  margin-top: 50px;
+}
+
+.bpmn-model .diagram {
+  line-height: 300px;
+  height: 300px;
+}
+
+.bpmn-model .actions {
+  position: absolute;
+  bottom: 0px;
+  right: 0px;
+}
