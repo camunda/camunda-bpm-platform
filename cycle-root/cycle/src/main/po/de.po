@@ -1,0 +1,83 @@
+#: ../webapp/WEB-INF/views/app/index.html:13
+msgid "My Roundtrips"
+msgstr "Meine Rundreisen"
+
+#: ../webapp/WEB-INF/views/app/index.html:19
+msgid "Actions"
+msgstr ""
+
+#: ../webapp/WEB-INF/views/app/index.html:20
+msgid "Create new"
+msgstr ""
+
+#: ../webapp/WEB-INF/views/app/index.html:25
+msgid "Create roundtrip"
+msgstr ""
+
+#: ../webapp/WEB-INF/views/app/index.html:31
+msgid "Name"
+msgstr ""
+
+#: ../webapp/WEB-INF/views/app/index.html:34
+msgid "Type in the name of your roundtrip"
+msgstr ""
+
+#: ../webapp/WEB-INF/views/app/index.html:35
+msgid "The name is already used"
+msgstr ""
+
+#: ../webapp/WEB-INF/views/app/index.html:42
+msgid "Cancel"
+msgstr ""
+
+#: ../webapp/WEB-INF/views/app/index.html:43
+msgid "Save"
+msgstr ""
+
+#: ../webapp/WEB-INF/views/app/partials/no-roundtrip-selected.html:2
+msgid "No roundtrip selected"
+msgstr ""
+
+#: ../webapp/WEB-INF/views/app/partials/no-roundtrip-selected.html:3
+msgid "'Please select one!'"
+msgstr ""
+
+#: ../webapp/WEB-INF/views/error/invalid-login-data.html:10
+#: ../webapp/WEB-INF/views/login.html:10
+msgid "Login"
+msgstr ""
+
+#: ../webapp/WEB-INF/views/error/invalid-login-data.html:16
+#: ../webapp/WEB-INF/views/login.html:12
+msgid "User Name"
+msgstr "Nutzer"
+
+#: ../webapp/WEB-INF/views/error/invalid-login-data.html:20
+#: ../webapp/WEB-INF/views/login.html:16
+msgid "Password"
+msgstr ""
+
+#: ../webapp/WEB-INF/views/error/invalid-login-data.html:24
+#: ../webapp/WEB-INF/views/login.html:20
+msgid "Sign in"
+msgstr ""
+
+#: ../webapp/WEB-INF/views/error/not-found.html:12
+msgid "Return to main page"
+msgstr ""
+
+#: ../webapp/WEB-INF/views/fragment/common.html:58
+msgid "Profile"
+msgstr "Profil"
+
+#: ../webapp/WEB-INF/views/fragment/common.html:60
+msgid "Sign Out"
+msgstr ""
+
+#: ../webapp/WEB-INF/views/logout.html:10
+msgid "You have been logged out"
+msgstr ""
+
+#: ../webapp/WEB-INF/views/logout.html:11
+msgid "Back to start"
+msgstr ""

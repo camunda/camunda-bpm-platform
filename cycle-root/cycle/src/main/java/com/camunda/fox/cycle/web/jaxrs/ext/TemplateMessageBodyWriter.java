@@ -6,6 +6,7 @@ import java.io.OutputStreamWriter;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -23,6 +24,7 @@ import org.springframework.context.ApplicationContext;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.IWebContext;
 import org.thymeleaf.spring3.context.SpringWebContext;
+import org.xnap.commons.i18n.I18n;
 
 /**
  * Renders Strings returned by controllers as templates when 
@@ -44,6 +46,9 @@ public class TemplateMessageBodyWriter implements MessageBodyWriter<String> {
   
   @Inject
   private ApplicationContext applicationContext;
+  
+  @Inject
+  I18n i18n;
   
   @Context
   private HttpServletRequest request;
@@ -91,11 +96,13 @@ public class TemplateMessageBodyWriter implements MessageBodyWriter<String> {
     // Needed to encode that information for angular JS
     model.put("currentUrl", getRealRequestUri(request));
     
+    Locale locale = setLocale(request);
+    
     IWebContext context = new SpringWebContext(
       request,
       response,
       request.getSession().getServletContext(),
-      request.getLocale(),
+      locale,
       model,
       applicationContext);
     
@@ -117,4 +124,34 @@ public class TemplateMessageBodyWriter implements MessageBodyWriter<String> {
     
     return uri;
   }
+  
+  private Locale setLocale(HttpServletRequest request) {
+    String[] localeSplit = getLangTag(request, request.getParameter("lang")).split("-");
+    Locale locale = new Locale(localeSplit[0], localeSplit[1]);
+    i18n.setLocale(locale);
+    return locale;
+  }
+
+  private String getLangTag(HttpServletRequest request, String override) {
+    if (override != null && override.equalsIgnoreCase("de")) {
+      return "de-DE";
+    }
+    
+    String langTag = null;
+    if (override != null && override.contains("-")) {
+      langTag = override;
+    } else {
+      if ( request.getHeader("Accept-Language") == null) {
+        return "de-DE";
+      }
+      
+      try {
+        langTag = request.getHeader("Accept-Language").split(";")[0].split(",")[0];
+      } catch (Exception e) {
+        langTag = "de-DE";
+      }
+    }
+    return langTag;
+  }
+  
 }
