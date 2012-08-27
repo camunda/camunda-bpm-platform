@@ -1,10 +1,11 @@
-target
+.settings
+.externalToolBuilders
 .classpath
 .project
-.settings
-build.properties
 bin
+target
 .metadata
 .LCKpom.xml~
+build.properties
 nbactions.xml
 nb-configuration.xml

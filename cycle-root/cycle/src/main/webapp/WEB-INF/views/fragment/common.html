@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html>
+  <head th:fragment="head">
+    <title>fox cycle</title>
+    
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- 
+    <meta name="description" content="" />
+    -->
+    <meta name="author" content="camunda services GmbH" />
+    
+    <!-- Styles -->
+    <link th:href="@{/assets/css/bootstrap.css}" rel="stylesheet" />
+    <link th:href="@{/assets/css/app.css}" rel="stylesheet" />
+    
+    <!-- For IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    
+    <!-- Favicon -->
+    <!-- <link rel="shortcut icon" th:href="@{/assets/ico/favicon.ico}" />-->
+    
+    <base th:href="${currentUrl}" th:attr="app-base=@{/}" />
+  </head>
+  <body>
+    <div th:fragment="navigation-default" class="navbar navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container-fluid">
+          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar">asd</span>
+            <span class="icon-bar">as</span>
+            <span class="icon-bar">asd</span>
+          </a>
+          <a class="brand" th:href="@{/app/secured/view/index/}">fox cycle</a>
+          <!--/.nav-collapse -->
+        </div>
+      </div>
+    </div>
+    
+    <!-- logged in navigation -->
+    <div th:fragment="navigation-logged-in" class="navbar navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container-fluid">
+          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>
+          <a class="brand" th:href="@{/app/secured/view/index/}">fox cycle</a>
+          <div class="btn-group pull-right" ng-show="currentUser">
+            <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+              <i class="icon-user"></i> {{currentUser.name}}
+              <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu">
+              <li><a href="#" th:text="#{user.profile}">Profile</a></li>
+              <li class="divider"></li>
+              <li><a th:href="@{/app/logout}" th:text="#{user.signOut}">Sign Out</a></li>
+            </ul>
+          </div>
+          <!--/.nav-collapse -->
+        </div>
+      </div>
+    </div>
+    
+    <!-- footer -->
+    <footer class="footer" th:fragment="footer">
+      <div class="container-fluid">
+        <p class="pull-right"><a href="#">Back to top</a></p>
+        <p><a href="@{/app/secured/view/index}">camunda fox cycle</a> / version 6.2.0-SNAPSHOT</p>
+      </div>
+      
+      <script th:src="@{/assets/lib/jquery-1.7.2.min.js}"></script>
+      <script th:src="@{/assets/lib/bootstrap/bootstrap.js}"></script>
+      <script th:src="@{/assets/lib/angular/angular.js}"></script>
+      <script th:src="@{/assets/lib/angular/angular-resource.js}"></script>
+      <!-- 
+      <script th:src="@{'/assets/lib/angular/i18n/angular-locale-' + ${locale} + '.js'}"></script>
+      -->
+      <script th:src="@{/assets/js/extensions.js}"></script>
+      <script th:src="@{/assets/js/app.js}"></script>
+      <script th:src="@{/assets/js/directives.js}"></script>
+      <script th:src="@{/assets/js/filters.js}"></script>
+      <script th:src="@{/assets/js/services.js}"></script>
+      <script th:src="@{/assets/js/controllers.js}"></script>
+    </footer>
+  </body>
+</html>
