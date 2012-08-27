@@ -1,18 +1,19 @@
 <?xml version="1.0"?>
-<project xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd" xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+<project
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd"
+  xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <artifactId>cycle-root</artifactId>
     <groupId>com.camunda.fox.cycle</groupId>
     <version>6.2.0-SNAPSHOT</version>
   </parent>
-  
+
   <artifactId>cycle</artifactId>
   <packaging>war</packaging>
   <name>fox cycle - webapp</name>
   <dependencies>
-    
+
     <!-- Spring Framework -->
     <dependency>
       <groupId>org.springframework</groupId>
@@ -29,7 +30,7 @@
       <artifactId>spring-tx</artifactId>
       <version>${springframework.version}</version>
     </dependency>
-        
+
     <!-- Spring Data JPA -->
     <dependency>
       <groupId>org.springframework.data</groupId>
@@ -42,14 +43,14 @@
         </exclusion>
       </exclusions>
     </dependency>
-    
+
     <!-- CGLIB for various things including @Transactional and spring-data-jpa -->
     <dependency>
       <groupId>cglib</groupId>
       <artifactId>cglib</artifactId>
       <version>2.2.2</version>
     </dependency>
-    
+
     <!-- Resteasy (JAX-RS impl) -->
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
@@ -66,7 +67,7 @@
       <artifactId>resteasy-spring</artifactId>
       <version>2.3.4.Final</version>
     </dependency>
-    
+
     <!-- apis -->
     <dependency>
       <groupId>javax.servlet</groupId>
@@ -85,14 +86,14 @@
       <version>1.0.2</version>
       <scope>provided</scope>
     </dependency>
-    
+
     <!-- logging -->
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-jcl</artifactId>
       <version>1.6.6</version>
     </dependency>
-    
+
     <!-- Thymeleaf -->
     <dependency>
       <groupId>org.thymeleaf</groupId>
@@ -109,11 +110,17 @@
       <artifactId>nekohtml</artifactId>
       <version>1.9.16</version>
     </dependency>
+    <dependency>
+      <!-- required for i18n with GNU gettext -->
+      <groupId>org.xnap.commons</groupId>
+      <artifactId>gettext-commons</artifactId>
+      <version>0.9.6</version>
+    </dependency>
   </dependencies>
   <build>
     <finalName>cycle</finalName>
   </build>
-  
+
   <profiles>
     <profile>
       <id>tomcat</id>
@@ -141,6 +148,33 @@
       </dependencies>
       <build>
         <plugins>
+          <plugin>
+            <!-- required for i18n with GNU gettext -->
+            <!-- run 'mvn gettext:gettext gettext:merge gettext:dist' to update 
+              po files and generate a updated message bundle class -->
+            <groupId>org.xnap.commons</groupId>
+            <artifactId>maven-gettext-plugin</artifactId>
+            <configuration>
+              <!-- Unix shellscript that runs xgettext and parses views -->
+              <xgettextCmd>${basedir}/src/main/po/xgettext.sh</xgettextCmd>
+              <!-- directory, into which message catalogs will be generated -->
+              <poDirectory>${basedir}/src/main/po</poDirectory>
+              <!-- same as AbstractI18n.getMessageBundleName() -->
+              <targetBundle>i18n.Messages</targetBundle>
+              <!-- directory, into which resource bundles will be generated -->
+              <outputDirectory>${basedir}/src/main/resources</outputDirectory>
+            </configuration>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <version>2.4</version>
+            <configuration>
+              <!-- http://maven.apache.org/plugins/maven-compiler-plugin/ -->
+              <source>1.6</source>
+              <target>1.6</target>
+            </configuration>
+          </plugin>
           <plugin>
             <groupId>org.apache.tomcat.maven</groupId>
             <artifactId>tomcat7-maven-plugin</artifactId>

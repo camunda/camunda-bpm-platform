@@ -3,15 +3,12 @@ package com.camunda.fox.cycle.web.controller;
 import java.security.Principal;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
 
 import com.camunda.fox.cycle.web.dto.CurrentUserDTO;
@@ -32,12 +29,12 @@ import com.camunda.fox.cycle.web.dto.CurrentUserDTO;
 @Path("/")
 public class DefaultController extends AbstractController {
   
-  @GET
-  @Consumes(MediaType.APPLICATION_JSON)
-  @Path("login")
-  public String loginJSON() {
-    throw new WebApplicationException(Response.Status.UNAUTHORIZED);
-  }
+//  @GET
+//  @Consumes(MediaType.APPLICATION_JSON)
+//  @Path("login")
+//  public String loginJSON() {
+//    throw new WebApplicationException(Response.Status.UNAUTHORIZED);
+//  }
   
   @GET
   @Path("login")
