@@ -59,10 +59,6 @@ function RoundtripDetailsController($scope, $routeParams, Roundtrip) {
   );
   
   $scope.addBpmnModel = function(side) {
-    
-  };
-
-  $scope.addModel = function() {
     $("#add-model-roundtrip-dialog").modal();
     dojoTree();
   };
