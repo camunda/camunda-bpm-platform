@@ -16,7 +16,7 @@ import org.codehaus.jackson.node.ObjectNode;
 import com.camunda.fox.cycle.api.connector.Connector;
 import com.camunda.fox.cycle.web.dto.ConnectorDTO;
 
-@Path("/connector")
+@Path("secured/connector")
 public class ConnectorService {
   
   @Inject

@@ -1,7 +1,10 @@
 package com.camunda.fox.cycle.connector;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.inject.Inject;
 
@@ -21,17 +24,35 @@ public class ConnectorRegistry {
   ApplicationContext appContext;
   
   @Inject
-  List<Connector> connectors;
+  Map<String ,Connector> connectors;
   
+  Map<String ,Connector> sessionConnectorMap = new HashMap<String, Connector>();
+  
+  List<Connector> sessionConnectors;
+  
+  /**
+   * Create the instances of the connectors for the current session
+   * @return
+   */
   public List<Connector> getConnectors()  {
-    ArrayList<Connector> userConnectors = new ArrayList<Connector>();
-    try {
-      userConnectors.add((Connector) appContext.getBean("vfsConnector").getClass().newInstance());
+    if (sessionConnectors == null) {
+      sessionConnectors = new ArrayList<Connector>();
+      for (Entry<String, Connector> connector : connectors.entrySet()) {
+        try {
+          Connector newConnectorInstance = (Connector) connector.getValue().getClass().newInstance();
+          // TODO set name / configuration from user configuration entities
+          newConnectorInstance.setConnectorId(connector.getKey());
+          newConnectorInstance.setName(connector.getKey());
+          
+          sessionConnectorMap.put(connector.getKey(), newConnectorInstance);
+        } catch (Exception e) {
+          throw new RuntimeException(e);
+        } 
+      }
+      sessionConnectors = new ArrayList<Connector>(sessionConnectorMap.values());
     }
-    catch (Exception e) {
-      
-    }
-    return userConnectors;
+    
+    return sessionConnectors;
   }
   
 }

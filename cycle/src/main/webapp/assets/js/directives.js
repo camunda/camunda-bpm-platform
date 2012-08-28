@@ -7,10 +7,10 @@ angular.module('cycle.directives', []).directive('cycleTree', function() {
 		restrict: "A",
 		replace: false,
 		transclude: false,
-		require: '?ngModel',
+		require: '?connector',
 		scope: {
-			'ngModel' : "=",
-			'ngChange' : '&',
+			'connector' : "=",
+			'id' : "@"	
 		},
 		link: function(scope, element, attrs, model) {
 			
@@ -20,46 +20,56 @@ angular.module('cycle.directives', []).directive('cycleTree', function() {
 			         "dijit/tree/ObjectStoreModel", 
 			         "dijit/Tree",
 			         "dojo/store/Observable",
-			         "dojo/request"], function(ready, window, Memory, ObjectStoreModel, Tree, Observable, request) {
-			    var connectorId = "VFS";
-			    
+			         "dojo/request",
+			         "dijit/registry"], function(ready, window, Memory, ObjectStoreModel, Tree, Observable, request, registry) {
 				ready(function () {
-					request.get(APP_ROOT+"connector/" + connectorId + "/tree/root", {
-			            // Parse data from JSON to a JavaScript object
-			            handleAs: "json"
-			        }).then(function(requestData){
-						
-						var memoryStore = new Memory({
-					        data: requestData,
-					        getChildren: function(object) {
-					        	return request.get(APP_ROOT+"connector/" + connectorId + "/tree/"+object.id+"/children", {
-						            handleAs: "json"
-						        }).then(function(childData){
-						        	return childData;
-						        });
-					        }
-					    });
-						
-						var observableStore = new Observable(memoryStore);
-						
-						// Create the model
-					    var treeModel = new ObjectStoreModel({
-					        store: observableStore,
-					        query: {id: 'root'}
-					    });
-					    
-				        var tree = new Tree({
-				            model: treeModel,
-				            openOnClick: true
-				        });
-				        tree.placeAt(element[0]);
-				        tree.startup();
-					},
-					function(error){
-						console.log("An error occurred: " + error);
-						alert("ERROR");
-					});
-			        
+					
+					scope.$watch("connector", function (newValue , oldValue) {
+				    	if (newValue != undefined && newValue != oldValue) {
+				    		
+							request.get(APP_ROOT+"secured/connector/" + newValue.connectorId + "/tree/root", {
+					            handleAs: "json"
+					        }).then(function(requestData){
+								
+								var memoryStore = new Memory({
+							        data: requestData,
+							        getChildren: function(object) {
+							        	return request.get(APP_ROOT+"secured/connector/" + newValue.connectorId + "/tree/"+object.id+"/children", {
+								            handleAs: "json"
+								        }).then(function(childData){
+								        	return childData;
+								        });
+							        }
+							    });
+								
+								var observableStore = new Observable(memoryStore);
+								
+								// Create the model
+							    var treeModel = new ObjectStoreModel({
+							        store: observableStore,
+							        query: {id: 'root'}
+							    });
+							    
+							    var treeWidget = registry.byId(attrs.id);
+							    if (treeWidget != undefined) {
+							    	registry.byId(attrs.id).destroy();
+	                                registry.remove(attrs.id);
+							    }
+							    
+							    var tree = new Tree({
+							      	id :  attrs.id,
+							           model: treeModel,
+							           openOnClick: true
+							       });
+							    tree.placeAt(element[0]);
+							    tree.startup();
+							},
+							function(error){
+								console.log("An error occurred: " + error);
+								alert(error);
+							});
+				    	}
+				    });
 				});
 			});
 		}
