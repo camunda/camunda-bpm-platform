@@ -53,10 +53,7 @@ function HomeController($scope, $routeParams) {
 
 function RoundtripDetailsController($scope, $routeParams, Roundtrip) {
 
-  $scope.roundtrip = Roundtrip.get({id: $routeParams.roundtripId }, function() {
-      $scope.$emit("navigation-changed", {name:$scope.roundtrip.name});
-    } 
-  );
+  $scope.roundtrip = Roundtrip.get({id: $routeParams.roundtripId });
   
   $scope.addBpmnModel = function(side) {
     
@@ -138,7 +135,15 @@ function ListRoundtripsController($scope, $route, $routeParams, Roundtrip) {
   var selectedRoundtripId = -1; // $routeParams.roundtripId;
   
   $scope.$watch(function() { return $routeParams.roundtripId; }, function(newValue, oldValue) {
-    selectedRoundtripId = parseInt(newValue);
+    selectedRoundtripId = parseInt(newValue);    
+    if($routeParams.roundtripId != undefined) {
+    	angular.forEach($scope.roundtrips, function(item) {
+    		if(item.id == $routeParams.roundtripId) {
+	        	// find the roundtripname for this roundtrip-id
+	        	$scope.$emit("navigation-changed", {name:item.name});
+    		}
+    	});
+    }
   });
   
   $scope.createNew = function() {
