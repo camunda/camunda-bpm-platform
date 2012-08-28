@@ -91,10 +91,17 @@
       <version>1.9.16</version>
     </dependency>
     <dependency>
-      <!-- required for i18n with GNU gettext -->
+    <!-- required for i18n with GNU gettext -->
       <groupId>org.xnap.commons</groupId>
       <artifactId>gettext-commons</artifactId>
       <version>0.9.6</version>
+    </dependency>
+    
+    <!-- saxon for XSLT transformations (roundtrip) -->
+    <dependency>
+      <groupId>net.sourceforge.saxon</groupId>
+      <artifactId>saxon</artifactId>
+      <version>${version.saxon}</version>
     </dependency>
     
     <!-- testing -->

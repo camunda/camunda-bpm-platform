@@ -95,6 +95,7 @@ public class TemplateMessageBodyWriter implements MessageBodyWriter<String> {
     // Always expose current url to model
     // Needed to encode that information for angular JS
     model.put("currentUrl", getRealRequestUri(request));
+    model.put("contextPath", request.getContextPath());
     
     Locale locale = setLocale(request);
     
