@@ -116,6 +116,14 @@
       <artifactId>gettext-commons</artifactId>
       <version>0.9.6</version>
     </dependency>
+    
+    <!-- saxon for XSLT transformations (roundtrip) -->
+    <dependency>
+      <groupId>net.sourceforge.saxon</groupId>
+      <artifactId>saxon</artifactId>
+      <version>${version.saxon}</version>
+    </dependency>
+        
   </dependencies>
   
   <build>
