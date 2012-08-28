@@ -116,6 +116,14 @@
       <artifactId>gettext-commons</artifactId>
       <version>0.9.6</version>
     </dependency>
+    
+    <!-- saxon for XSLT transformations (roundtrip) -->
+    <dependency>
+      <groupId>net.sourceforge.saxon</groupId>
+      <artifactId>saxon</artifactId>
+      <version>${version.saxon}</version>
+    </dependency>
+        
   </dependencies>
   
   <build>
@@ -124,7 +132,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-        <version>2.4</version>
         <configuration>
           <!-- http://maven.apache.org/plugins/maven-compiler-plugin/ -->
           <source>1.6</source>
@@ -197,16 +204,6 @@
               <targetBundle>i18n.Messages</targetBundle>
               <!-- directory, into which resource bundles will be generated -->
               <outputDirectory>${basedir}/src/main/resources</outputDirectory>
-            </configuration>
-          </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-compiler-plugin</artifactId>
-            <version>2.5.1</version>
-            <configuration>
-              <!-- http://maven.apache.org/plugins/maven-compiler-plugin/ -->
-              <source>1.6</source>
-              <target>1.6</target>
             </configuration>
           </plugin>
           <plugin>

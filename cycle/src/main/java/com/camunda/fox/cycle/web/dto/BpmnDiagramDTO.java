@@ -28,12 +28,28 @@ public class BpmnDiagramDTO {
     return id;
   }
 
+  public void setId(Long id) {
+    this.id = id;
+  }
+  
   public String getModeller() {
     return modeller;
+  }
+
+  public void setModeller(String modeller) {
+    this.modeller = modeller;
+  }
+
+  public Status getStatus() {
+    return status;
   }
   
   public String getDiagramPath() {
     return diagramPath;
+  }
+
+  public void setDiagramPath(String diagramPath) {
+    this.diagramPath = diagramPath;
   }
   
   /**

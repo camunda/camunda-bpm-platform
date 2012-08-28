@@ -7,14 +7,10 @@
 }
 
 /**
- * Shared style declarations
+ * shared style declarations
  */
 body {
   padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
-}
-  
-form input.ng-dirty.ng-invalid {
-  background-color: #FA787E;
 }
 
 .footer {
@@ -24,6 +20,39 @@ form input.ng-dirty.ng-invalid {
   background-color: whiteSmoke;
 }
 
+/* for image replacement */
+.ir {
+  display: block;
+  text-indent: -999em;
+  overflow: hidden;
+  background-repeat: no-repeat;
+  text-align: left;
+  direction: ltr;
+}
+
+/**
+ * Logo styling
+ */
+ .navbar .brand {
+   display: block;
+   float: left;
+   
+   background: no-repeat url('../img/cycle-logo.png');
+   width: 142px;
+   height: 40px;
+   padding: 0;
+}
+ 
+/**
+ * form styling
+ */
+form input.ng-dirty.ng-invalid {
+  background-color: #FA787E;
+}
+
+/**
+ * roundtrip view
+ */
 .tree {
   border: 1px solid #DDDDDD;
   overflow: auto;

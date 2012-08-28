@@ -33,15 +33,16 @@
     <base th:href="${currentUrl}" th:attr="app-base=@{/}" />
   </head>
   <body>
+    <!-- logo -->
+    <a th:fragment="logo" class="brand ir" th:href="@{/app/secured/view/index}">
+      fox cycle
+    </a>
+    
+    <!-- default navigation -->
     <div th:fragment="navigation-default" class="navbar navbar-fixed-top">
       <div class="navbar-inner">
         <div class="container-fluid">
-          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-            <span class="icon-bar">asd</span>
-            <span class="icon-bar">as</span>
-            <span class="icon-bar">asd</span>
-          </a>
-          <a class="brand" th:href="@{/app/secured/view/index}">fox cycle</a>
+          <a th:substituteby="fragment/common :: logo"></a>
           <!--/.nav-collapse -->
         </div>
       </div>
@@ -51,12 +52,7 @@
     <div th:fragment="navigation-logged-in" class="navbar navbar-fixed-top">
       <div class="navbar-inner">
         <div class="container-fluid">
-          <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse">
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-            <span class="icon-bar"></span>
-          </a>
-          <a class="brand" th:href="@{/app/secured/view/index}">fox cycle</a>
+          <a th:substituteby="fragment/common :: logo"></a>
           <div class="btn-group pull-right" ng-show="currentUser" ng-cloak>
             <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
               <i class="icon-user"></i> {{currentUser.name}}
