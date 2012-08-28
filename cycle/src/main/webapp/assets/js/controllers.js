@@ -53,12 +53,22 @@ function HomeController($scope, $routeParams) {
 
 function RoundtripDetailsController($scope, $routeParams, RoundtripDetails, $http) {
 
+  $scope.init = function() {
+    $scope.getModelerNames();
+    $scope.getConnectors();
+  }
+
   $scope.modelerName = '';
+  $scope.modelerNames = [];
+  $scope.getModelerNames = function() {
+    $http.get('../../resources/diagram/modelerNames').success(function(data) {
+      $scope.modelerNames = data;
+    });
+  }
 
   $scope.roundtrip = RoundtripDetails.get({id: $routeParams.roundtripId });
   
   $scope.connectors = [];
-  
   $scope.getConnectors = function () {
 	  $http.get(APP_ROOT+"secured/connector/list").success(function (data) {
 		  $scope.connectors = data;

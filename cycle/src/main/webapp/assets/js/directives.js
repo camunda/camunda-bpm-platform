@@ -81,11 +81,11 @@ angular.module('cycle.directives', [])
     restrict: 'A',
     require: 'ngModel',
     scope: {
-      values: '&'
+      values: '='
     },
     link:  function(scope, element, attrs, ngModel) {
       var typeahead = element.typeahead({
-        source: '[]',
+        source: scope.values,
         updater: function(item) {
           scope.$apply(read(item));
           return item;
@@ -97,9 +97,8 @@ angular.module('cycle.directives', [])
         ngModel.$modelValue = item;
       }
 
-      $http.get('../../resources/diagram/modelerNames').success(function(data) {
-        console.log(data);
-        typeahead.data('typeahead').source = data;
+      scope.$watch("values", function(newValue , oldValue) {
+        typeahead.data('typeahead').source = newValue;
       });
     }
   };
