@@ -69,10 +69,18 @@ public class Roundtrip implements Serializable {
     return leftHandSide;
   }
 
+  public void setLeftHandSide(BpmnDiagram leftHandSide) {
+    this.leftHandSide = leftHandSide;
+  }
+
   public BpmnDiagram getRightHandSide() {
     return rightHandSide;
   }
-  
+
+  public void setRightHandSide(BpmnDiagram rightHandSide) {
+    this.rightHandSide = rightHandSide;
+  }
+
 	@Override
 	public String toString() {
 		return "Roundtrip[id=" + id + ", name=" + name + "]";

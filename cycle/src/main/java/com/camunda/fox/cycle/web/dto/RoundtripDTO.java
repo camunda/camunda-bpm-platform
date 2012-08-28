@@ -49,13 +49,10 @@ public class RoundtripDTO {
     return id;
   }
 
-  /**
-   * @param id the id to set
-   */
   public void setId(Long id) {
     this.id = id;
   }
-
+  
   /**
    * @return the name
    */
@@ -63,13 +60,30 @@ public class RoundtripDTO {
     return name;
   }
 
-  /**
-   * @param name the name to set
-   */
   public void setName(String name) {
     this.name = name;
   }
+  
+  public Date getLastSync() {
+    return lastSync;
+  }
+  
+  public BpmnDiagramDTO getLeftHandSide() {
+    return leftHandSide;
+  }
+  
+  public void setLeftHandSide(BpmnDiagramDTO leftHandSide) {
+    this.leftHandSide = leftHandSide;
+  }
 
+  public BpmnDiagramDTO getRightHandSide() {
+    return rightHandSide;
+  }
+
+  public void setRightHandSide(BpmnDiagramDTO rightHandSide) {
+    this.rightHandSide = rightHandSide;
+  }
+  
   /**
    * Wraps a roundtrip as a data object
    * @param roundtrip
@@ -77,14 +91,6 @@ public class RoundtripDTO {
    */
   public static RoundtripDTO wrap(Roundtrip roundtrip) {
     return new RoundtripDTO(roundtrip);
-  }
-
-  public Date getLastSync() {
-    return lastSync;
-  }
-  
-  public void setLastSync(Date lastSync) {
-    this.lastSync = lastSync;
   }
   
   /**
