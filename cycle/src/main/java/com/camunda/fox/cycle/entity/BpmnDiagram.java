@@ -3,8 +3,6 @@ package com.camunda.fox.cycle.entity;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
 
 /**
  * Represents a BPMN 2.0 diagram used in a roundtrip.
@@ -12,7 +10,9 @@ import javax.persistence.Id;
  * @author nico.rehwaldt
  */
 @Entity
-public class BpmnDiagram {
+public class BpmnDiagram extends AbstractEntity {
+  
+  private static final long serialVersionUID = 1L;
   
   public static enum Status {
     UNSPECIFIED,
@@ -20,10 +20,6 @@ public class BpmnDiagram {
     SYNCED, 
     WARNING
   }
-  
-  @Id
-  @GeneratedValue
-  private Long id;
   
   private String modeller;
   
@@ -45,10 +41,6 @@ public class BpmnDiagram {
 
   public void setDiagramPath(String diagramPath) {
     this.diagramPath = diagramPath;
-  }
-
-  public Long getId() {
-    return id;
   }
 
   public void setModeller(String modeller) {

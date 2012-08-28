@@ -4,14 +4,12 @@
              xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_2_0.xsd"
              version="2.0">
   
-  <persistence-unit name="cyclePU" transaction-type="RESOURCE_LOCAL">
+  <persistence-unit name="cycleTestPU" transaction-type="RESOURCE_LOCAL">
     <provider>org.hibernate.ejb.HibernatePersistence</provider>
+    <class>com.camunda.fox.cycle.entity.BpmnDiagram</class>
+    <class>com.camunda.fox.cycle.entity.Roundtrip</class>
     <properties>
-      <property name="javax.persistence.jdbc.url" value="jdbc:h2:mem:cycle"/>
-      <property name="javax.persistence.jdbc.user" value="sa"/>
-      <property name="javax.persistence.jdbc.password" value=""/>
-      <property name="javax.persistence.jdbc.driver" value="org.h2.Driver"/>
-      <property name="hibernate.hbm2ddl.auto" value="update"/>
+      <property name="hibernate.hbm2ddl.auto" value="create-drop"/>
     </properties>
   </persistence-unit>
 </persistence>
