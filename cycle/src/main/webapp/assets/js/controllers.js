@@ -62,6 +62,13 @@ function RoundtripDetailsController($scope, $routeParams, RoundtripDetails) {
   $scope.cancel = function() {
     $("#add-model-roundtrip-dialog").modal('hide');
   };
+  
+  /**
+   * Saves the roundtrip with updated details
+   */
+  $scope.save = function() {
+    $scope.roundtrip.$save();
+  };
 };
 
 function CreateNewRoundtripController($scope, $q, $http, $location, debouncer, Roundtrip) {
