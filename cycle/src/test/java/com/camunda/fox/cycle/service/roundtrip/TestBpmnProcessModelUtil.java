@@ -32,7 +32,7 @@ public class TestBpmnProcessModelUtil {
     String sourceModel = IoUtil.readFileAsString("com/camunda/fox/cycle/service/roundtrip/collaboration.bpmn");
         
     String resultModel = cycleRoundtripUtil.extractExecutablePool(sourceModel);
-    System.out.println(resultModel);
+    Assert.assertFalse(resultModel.contains("Mensch"));
   }
 
 }
