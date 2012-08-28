@@ -13,6 +13,14 @@
     <!-- Styles -->
     <link th:href="@{/assets/css/bootstrap.css}" rel="stylesheet" />
     <link th:href="@{/assets/css/app.css}" rel="stylesheet" />
+    <link th:href="@{/assets/css/tree.css}" rel="stylesheet" />
+    
+    <script src="http://ajax.googleapis.com/ajax/libs/dojo/1.8.0/dojo/dojo.js"></script>
+    <script th:inline="javascript">
+    /*<![CDATA[*/
+    	var APP_ROOT = /*[[${contextPath}+'/app/']]*/;
+    /*]]>*/
+    </script>
     
     <!-- For IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
@@ -80,8 +88,8 @@
       <script th:src="@{'/assets/lib/angular/i18n/angular-locale-' + ${locale} + '.js'}"></script>
       -->
       <script th:src="@{/assets/js/extensions.js}"></script>
-      <script th:src="@{/assets/js/app.js}"></script>
       <script th:src="@{/assets/js/directives.js}"></script>
+      <script th:src="@{/assets/js/app.js}"></script>
       <script th:src="@{/assets/js/filters.js}"></script>
       <script th:src="@{/assets/js/services.js}"></script>
       <script th:src="@{/assets/js/controllers.js}"></script>
