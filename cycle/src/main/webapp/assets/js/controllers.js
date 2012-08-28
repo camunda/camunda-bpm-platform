@@ -51,7 +51,7 @@ function HomeController($scope, $routeParams) {
   $scope.$emit("navigation-changed");
 }
 
-function RoundtripDetailsController($scope, $routeParams, RoundtripDetails) {
+function RoundtripDetailsController($scope, $routeParams, RoundtripDetails, $http) {
 
   $scope.roundtrip = RoundtripDetails.get({id: $routeParams.roundtripId });
   
