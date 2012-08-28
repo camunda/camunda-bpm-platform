@@ -14,7 +14,7 @@
           <span class="label">No model</span>
         </div>
         <div class="actions">
-          <button class="btn" ng-click="addBpmnModel()" th:text="#{Add}">Add</button>
+          <button class="btn" ng-click="addBpmnModel('leftHandSide')" th:text="#{Add}">Add</button>
         </div>
       </div>
     </div>
@@ -50,7 +50,7 @@
           <span class="label">No model</span>
         </div>
         <div class="actions">
-          <button class="btn" ng-click="addBpmnModel()" th:text="#{Add}">Add</button>
+          <button class="btn" ng-click="addBpmnModel('rightHandSide')" th:text="#{Add}">Add</button>
         </div>
       </div>
     </div>
@@ -68,8 +68,7 @@
           <div class="control-group" ng-class="errorClass(addModelRoundtripForm)">
             <label class="control-label" for="input01" th:text="#{Modeler Name}">Modeler Name</label>
             <div class="controls">
-              <input ng-model="modelerName" name="modelerName" type="text" id="input01" data-provide="typeahead" data-source="" required />
-              <p class="help-block" ng-show="addModelRoundtripForm.modelerName.$error.required" th:text="#{Type in the name of your modeler}"></p>
+              <input typeahead ng-model="modelerName" name="modelerName" type="text" id="input01" />
             </div>
           </div>
           <div class="control-group">

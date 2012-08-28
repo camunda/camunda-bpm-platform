@@ -8,6 +8,8 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 
 import org.springframework.transaction.annotation.Transactional;
 
@@ -79,5 +81,12 @@ public class BpmnDiagramController {
   private void update(BpmnDiagram diagram, BpmnDiagramDTO data) {
     diagram.setModeller(data.getModeller());
     diagram.setDiagramPath(data.getDiagramPath());
+  }
+  
+  @GET
+  @Produces(MediaType.APPLICATION_JSON)
+  @Path("modelerNames")
+  public List<String> getModelerNames() {
+    return bpmnDiagramRepository.findAllModelerNames();
   }
 }

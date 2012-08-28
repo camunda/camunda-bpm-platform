@@ -53,6 +53,8 @@ function HomeController($scope, $routeParams) {
 
 function RoundtripDetailsController($scope, $routeParams, RoundtripDetails) {
 
+  $scope.modelerName = '';
+
   $scope.roundtrip = RoundtripDetails.get({id: $routeParams.roundtripId });
   
   $scope.addBpmnModel = function(side) {
