@@ -51,9 +51,9 @@ function HomeController($scope, $routeParams) {
   $scope.$emit("navigation-changed");
 }
 
-function RoundtripDetailsController($scope, $routeParams, Roundtrip) {
+function RoundtripDetailsController($scope, $routeParams, RoundtripDetails) {
 
-  $scope.roundtrip = Roundtrip.get({id: $routeParams.roundtripId });
+  $scope.roundtrip = RoundtripDetails.get({id: $routeParams.roundtripId });
   
   $scope.addBpmnModel = function(side) {
     $("#add-model-roundtrip-dialog").modal();
@@ -62,7 +62,6 @@ function RoundtripDetailsController($scope, $routeParams, Roundtrip) {
   $scope.cancel = function() {
     $("#add-model-roundtrip-dialog").modal('hide');
   };
-
 };
 
 function CreateNewRoundtripController($scope, $q, $http, $location, debouncer, Roundtrip) {

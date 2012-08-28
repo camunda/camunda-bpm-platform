@@ -11,10 +11,13 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 import org.springframework.transaction.annotation.Transactional;
+
+import com.camunda.fox.cycle.entity.BpmnDiagram;
 import com.camunda.fox.cycle.entity.Roundtrip;
 import com.camunda.fox.cycle.web.controller.AbstractController;
 import com.camunda.fox.cycle.web.dto.RoundtripDTO;
 import com.camunda.fox.cycle.repository.RoundtripRepository;
+import com.camunda.fox.cycle.web.dto.BpmnDiagramDTO;
 
 /**
  * This is the main roundtrip rest controller which exposes roundtrip 
@@ -30,6 +33,9 @@ public class RoundtripController extends AbstractController {
 
 	@Inject
 	private RoundtripRepository roundtripRepository;
+  
+  @Inject
+  private BpmnDiagramController bpmnDiagramController;
   
   @GET
   public List<RoundtripDTO> list() {
@@ -64,6 +70,34 @@ public class RoundtripController extends AbstractController {
     
     update(roundtrip, data);
     return RoundtripDTO.wrap(roundtrip);
+  }
+  
+  @POST
+  @Path("{id}/details")
+  @Transactional
+  public RoundtripDTO updateDetails(RoundtripDTO data) {
+    long id = data.getId();
+    
+    Roundtrip roundtrip = roundtripRepository.findById(id);
+    if (roundtrip == null) {
+      throw new IllegalArgumentException("Not found");
+    }
+    
+    if (data.getLeftHandSide() != null) {
+      BpmnDiagram leftHandSide = bpmnDiagramController.createOrUpdate(data.getLeftHandSide());
+      roundtrip.setLeftHandSide(leftHandSide);
+    } else {
+      roundtrip.setLeftHandSide(null);
+    }
+    
+    if (data.getRightHandSide() != null) {
+      BpmnDiagram rightHandSide = bpmnDiagramController.createOrUpdate(data.getRightHandSide());
+      roundtrip.setRightHandSide(rightHandSide);
+    } else {
+      roundtrip.setRightHandSide(null);
+    }
+    
+    return RoundtripDTO.wrap(roundtripRepository.saveAndFlush(roundtrip));
   }
   
   @POST
