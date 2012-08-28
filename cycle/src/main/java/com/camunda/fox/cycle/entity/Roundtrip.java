@@ -3,11 +3,14 @@ package com.camunda.fox.cycle.entity;
 import java.io.Serializable;
 import java.util.Date;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
@@ -19,13 +22,9 @@ import javax.persistence.TemporalType;
  */
 @Entity
 @Table(name = "cy_roundtrip")
-public class Roundtrip implements Serializable {
+public class Roundtrip extends AbstractEntity {
   
   private static final long serialVersionUID = 1L;
-  
-	@Id
-  @GeneratedValue
-  private Long id;
   
   @Column(unique=true)
 	private String name;
@@ -33,10 +32,10 @@ public class Roundtrip implements Serializable {
   @Temporal(TemporalType.TIMESTAMP)
   private Date lastSync;
   
-  @ManyToOne
+  @OneToOne(cascade=CascadeType.ALL, orphanRemoval=true)
   private BpmnDiagram leftHandSide;
   
-  @ManyToOne
+  @OneToOne(cascade=CascadeType.ALL, orphanRemoval=true)
   private BpmnDiagram rightHandSide;
   
 	public Roundtrip() { }
@@ -52,10 +51,6 @@ public class Roundtrip implements Serializable {
 	public void setName(String name) {
 		this.name = name;
 	}
-
-  public Long getId() {
-    return id;
-  }
 
   public Date getLastSync() {
     return lastSync;
@@ -83,6 +78,6 @@ public class Roundtrip implements Serializable {
 
 	@Override
 	public String toString() {
-		return "Roundtrip[id=" + id + ", name=" + name + "]";
+		return "Roundtrip[id=" + getId() + ", name=" + name + "]";
   }
 }

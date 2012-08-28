@@ -51,7 +51,7 @@ function HomeController($scope, $routeParams) {
   $scope.$emit("navigation-changed");
 }
 
-function RoundtripDetailsController($scope, $routeParams, RoundtripDetails, $http) {
+function RoundtripDetailsController($scope, $routeParams, RoundtripDetails) {
 
   $scope.roundtrip = RoundtripDetails.get({id: $routeParams.roundtripId });
   
@@ -71,9 +71,17 @@ function RoundtripDetailsController($scope, $routeParams, RoundtripDetails, $htt
     $("#add-model-roundtrip-dialog").modal('hide');
   };
   
+  /**
+   * Saves the roundtrip with updated details
+   */
+  $scope.save = function() {
+    $scope.roundtrip.$save();
+  };
+
   $scope.changeConnector = function () {
 	  console.log($scope.connector);
   };
+
 };
 
 function CreateNewRoundtripController($scope, $q, $http, $location, debouncer, Roundtrip) {

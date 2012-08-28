@@ -17,31 +17,11 @@
     <!-- Spring Framework -->
     <dependency>
       <groupId>org.springframework</groupId>
-      <artifactId>spring-context</artifactId>
-      <version>${version.springframework}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework</groupId>
       <artifactId>spring-web</artifactId>
-      <version>${version.springframework}</version>
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
-      <artifactId>spring-tx</artifactId>
-      <version>${version.springframework}</version>
-    </dependency>
-
-    <!-- Spring Data JPA -->
-    <dependency>
-      <groupId>org.springframework.data</groupId>
-      <artifactId>spring-data-jpa</artifactId>
-      <version>1.1.0.RELEASE</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.slf4j</groupId>
-          <artifactId>jcl-over-slf4j</artifactId>
-        </exclusion>
-      </exclusions>
+      <artifactId>spring-orm</artifactId>
     </dependency>
 
     <!-- CGLIB for various things including @Transactional and spring-data-jpa -->
@@ -80,6 +60,7 @@
       <artifactId>javax.inject</artifactId>
       <version>1</version>
     </dependency>
+    
     <!-- jpa 2.0 api -->
     <dependency>
       <groupId>org.hibernate.javax.persistence</groupId>
@@ -110,8 +91,8 @@
       <artifactId>nekohtml</artifactId>
       <version>1.9.16</version>
     </dependency>
+    <!-- required for i18n with GNU gettext -->
     <dependency>
-      <!-- required for i18n with GNU gettext -->
       <groupId>org.xnap.commons</groupId>
       <artifactId>gettext-commons</artifactId>
       <version>0.9.6</version>
@@ -123,11 +104,40 @@
       <artifactId>saxon</artifactId>
       <version>${version.saxon}</version>
     </dependency>
-        
+    
+    <!-- testing -->
+    <dependency>
+      <groupId>org.hamcrest</groupId>
+      <artifactId>hamcrest-all</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.kubek2k</groupId>
+      <artifactId>springockito-annotations</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit-dep</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
   
   <build>
     <finalName>cycle</finalName>
+    <testResources>
+      <testResource>
+        <directory>src/test/resources</directory>
+      </testResource>
+      <testResource>
+        <directory>src/test/javascript</directory>
+      </testResource>
+    </testResources>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -166,6 +176,39 @@
 
   <profiles>
     <profile>
+      <id>js-test</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>com.github.searls</groupId>
+            <artifactId>jasmine-maven-plugin</artifactId>
+            <version>1.2.0.1-SNAPSHOT</version>
+            <extensions>true</extensions>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>test</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <jsSrcDir>${project.basedir}/src/main/webapp/assets/js</jsSrcDir>
+              <jsTestSrcDir>${project.basedir}/src/test/javascript</jsTestSrcDir>
+              <include>*_spec.js</include>
+              <preloadSources>
+                <!-- some base lib -->
+                <source>lib/jquery-1.7.2.min.js</source>
+                <source>lib/bootstrap/bootstrap.js</source>
+                <source>lib/angular/angular.js</source>
+                <source>lib/angular/angular-resource.js</source>
+                <source>lib/angular/angular-mocks.js</source>
+              </preloadSources>             
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
       <id>tomcat</id>
       <dependencies>
         <!-- database -->
@@ -191,7 +234,7 @@
           <plugin>
             <!-- required for i18n with GNU gettext -->
             <!-- run 'mvn gettext:gettext gettext:merge gettext:dist' to update 
-              po files and generate a updated message bundle class -->
+            po files and generate a updated message bundle class -->
             <groupId>org.xnap.commons</groupId>
             <artifactId>maven-gettext-plugin</artifactId>
             <version>1.2.3</version>
@@ -226,6 +269,32 @@
           </plugin>
         </plugins>
       </build>
+    </profile>
+    <profile>
+      <id>default</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <dependencies>
+        <!-- javax.persistence -->
+        <dependency>
+          <groupId>org.hibernate</groupId>
+          <artifactId>hibernate-entitymanager</artifactId>
+          <scope>test</scope>
+        </dependency>
+        <!-- jpa 2.0 api -->
+        <dependency>
+          <groupId>org.hibernate.javax.persistence</groupId>
+          <artifactId>hibernate-jpa-2.0-api</artifactId>
+          <scope>compile</scope>
+        </dependency>
+        <dependency>
+          <groupId>com.h2database</groupId>
+          <artifactId>h2</artifactId>
+          <version>${version.h2}</version>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
     </profile>
   </profiles>
 </project>
