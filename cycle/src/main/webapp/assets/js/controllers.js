@@ -59,8 +59,13 @@ function RoundtripDetailsController($scope, $routeParams, RoundtripDetails) {
   );
   
   $scope.addBpmnModel = function(side) {
-    
+    $("#add-model-roundtrip-dialog").modal();
   };
+
+  $scope.cancel = function() {
+    $("#add-model-roundtrip-dialog").modal('hide');
+  };
+
 };
 
 function CreateNewRoundtripController($scope, $q, $http, $location, debouncer, Roundtrip) {
