@@ -55,4 +55,8 @@ public class ConnectorRegistry {
     return sessionConnectors;
   }
   
+  public Map<String, Connector> getSessionConnectorMap() {
+    return sessionConnectorMap;
+  }
+  
 }

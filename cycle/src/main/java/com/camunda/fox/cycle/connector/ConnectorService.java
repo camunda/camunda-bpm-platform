@@ -14,6 +14,8 @@ import org.codehaus.jackson.node.JsonNodeFactory;
 import org.codehaus.jackson.node.ObjectNode;
 
 import com.camunda.fox.cycle.api.connector.Connector;
+import com.camunda.fox.cycle.api.connector.ConnectorFolder;
+import com.camunda.fox.cycle.api.connector.ConnectorNode;
 import com.camunda.fox.cycle.web.dto.ConnectorDTO;
 
 @Path("secured/connector")
@@ -54,12 +56,18 @@ public class ConnectorService {
   public ArrayNode children(@PathParam("id") String connectorId, @PathParam("parentId") String parentId) {
     JsonNodeFactory factory = JsonNodeFactory.instance;
     ArrayNode resultList = factory.arrayNode();
-    ObjectNode rootNode = factory.objectNode();
-    rootNode.put("id", parentId+"child");
-    rootNode.put("name", parentId+"child");
-    rootNode.put("path", parentId+"/child");
-    rootNode.put("type", "folder");
-    resultList.add(rootNode);
+
+    Connector connector = connectorRegistry.getSessionConnectorMap().get(connectorId);
+    
+    for (ConnectorNode node : connector.getChildren(new ConnectorFolder(parentId, parentId))) {
+      ObjectNode rootNode = factory.objectNode();
+      rootNode.put("id", node.getPath());
+      rootNode.put("name", node.getName());
+      rootNode.put("path", node.getPath());
+      rootNode.put("type", "folder");
+      resultList.add(rootNode);
+    }
+    
     return resultList;
   }
   

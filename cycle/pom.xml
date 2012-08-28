@@ -105,6 +105,13 @@
       <version>${version.saxon}</version>
     </dependency>
     
+    <!-- commons vfs for fs connector -->
+    <dependency>
+        <groupId>org.apache.commons</groupId>
+        <artifactId>commons-vfs2</artifactId>
+        <version>2.0</version>
+    </dependency>
+    
     <!-- testing -->
     <dependency>
       <groupId>org.hamcrest</groupId>
