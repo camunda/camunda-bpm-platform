@@ -25,7 +25,11 @@
   </context:component-scan>
   
   <bean name="vfsConnector" class="com.camunda.fox.cycle.connector.VfsConnector">
-    <property name="name" value="My VFS Connector" />
+    <property name="name" value="VFS Connector" />
+  </bean>
+  
+  <bean name="vfsConnector2" class="com.camunda.fox.cycle.connector.VfsConnector">
+    <property name="name" value="VFS Connector 2" />
   </bean>
   
   <!--  bean name="connectorRegistry" scope="session" class="com.camunda.fox.cycle.connector.ConnectorRegistry">
