@@ -2,7 +2,8 @@
 
 /* Directives */
 
-angular.module('cycle.directives', []).directive('cycleTree', function() {
+angular.module('cycle.directives', [])
+.directive('cycleTree', function() {
 	return {
 		restrict: "A",
 		replace: false,
@@ -74,4 +75,32 @@ angular.module('cycle.directives', []).directive('cycleTree', function() {
 			});
 		}
 	};
+})
+.directive('typeahead', function($http) {
+  return {
+    restrict: 'A',
+    require: 'ngModel',
+    scope: {
+      values: '&'
+    },
+    link:  function(scope, element, attrs, ngModel) {
+      var typeahead = element.typeahead({
+        source: '[]',
+        updater: function(item) {
+          scope.$apply(read(item));
+          return item;
+        }
+      });
+
+      // update model with selected value
+      function read(item) {
+        ngModel.$modelValue = item;
+      }
+
+      $http.get('../../resources/diagram/modelerNames').success(function(data) {
+        console.log(data);
+        typeahead.data('typeahead').source = data;
+      });
+    }
+  };
 });
