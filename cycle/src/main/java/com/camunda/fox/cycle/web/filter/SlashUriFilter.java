@@ -39,7 +39,8 @@ public class SlashUriFilter implements Filter {
     if (uri.lastIndexOf(".") > lastIndexOfSlash || lastIndexOfSlash == uri.length() - 1) {
       chain.doFilter(request, response);
     } else {
-      response.sendRedirect(uri + "/");
+      String query = request.getQueryString();
+      response.sendRedirect(uri + "/" + (query != null ? query : ""));
     }
   }
   

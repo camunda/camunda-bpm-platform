@@ -18,17 +18,17 @@
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-context</artifactId>
-      <version>${springframework.version}</version>
+      <version>${version.springframework}</version>
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-web</artifactId>
-      <version>${springframework.version}</version>
+      <version>${version.springframework}</version>
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-tx</artifactId>
-      <version>${springframework.version}</version>
+      <version>${version.springframework}</version>
     </dependency>
 
     <!-- Spring Data JPA -->
@@ -55,17 +55,17 @@
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
       <artifactId>resteasy-jaxrs</artifactId>
-      <version>2.3.4.Final</version>
+      <version>${version.resteasy}</version>
     </dependency>
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
       <artifactId>resteasy-jackson-provider</artifactId>
-      <version>2.3.4.Final</version>
+      <version>${version.resteasy}</version>
     </dependency>
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
       <artifactId>resteasy-spring</artifactId>
-      <version>2.3.4.Final</version>
+      <version>${version.resteasy}</version>
     </dependency>
 
     <!-- apis -->
@@ -117,7 +117,7 @@
       <version>0.9.6</version>
     </dependency>
   </dependencies>
-
+  
   <build>
     <finalName>cycle</finalName>
     <plugins>
@@ -165,13 +165,9 @@
         <dependency>
           <groupId>com.h2database</groupId>
           <artifactId>h2</artifactId>
-          <version>1.3.160</version>
+          <version>${version.h2}</version>
         </dependency>
         <!-- javax.persistence -->
-        <dependency>
-          <groupId>org.hibernate</groupId>
-          <artifactId>hibernate-core</artifactId>
-        </dependency>
         <dependency>
           <groupId>org.hibernate</groupId>
           <artifactId>hibernate-entitymanager</artifactId>
@@ -187,10 +183,11 @@
         <plugins>
           <plugin>
             <!-- required for i18n with GNU gettext -->
-            <!-- run 'mvn gettext:gettext gettext:merge gettext:dist' to 
-              update po files and generate a updated message bundle class -->
+            <!-- run 'mvn gettext:gettext gettext:merge gettext:dist' to update 
+              po files and generate a updated message bundle class -->
             <groupId>org.xnap.commons</groupId>
             <artifactId>maven-gettext-plugin</artifactId>
+            <version>1.2.3</version>
             <configuration>
               <!-- Unix shellscript that runs xgettext and parses views -->
               <xgettextCmd>${basedir}/src/main/po/xgettext.sh</xgettextCmd>
@@ -200,6 +197,16 @@
               <targetBundle>i18n.Messages</targetBundle>
               <!-- directory, into which resource bundles will be generated -->
               <outputDirectory>${basedir}/src/main/resources</outputDirectory>
+            </configuration>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <version>2.5.1</version>
+            <configuration>
+              <!-- http://maven.apache.org/plugins/maven-compiler-plugin/ -->
+              <source>1.6</source>
+              <target>1.6</target>
             </configuration>
           </plugin>
           <plugin>

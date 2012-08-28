@@ -49,7 +49,7 @@
             <span class="icon-bar"></span>
           </a>
           <a class="brand" th:href="@{/app/secured/view/index}">fox cycle</a>
-          <div class="btn-group pull-right" ng-show="currentUser">
+          <div class="btn-group pull-right" ng-show="currentUser" ng-cloak>
             <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
               <i class="icon-user"></i> {{currentUser.name}}
               <span class="caret"></span>
@@ -69,9 +69,9 @@
     <footer class="footer" th:fragment="footer">
       <div class="container-fluid">
         <p class="pull-right"><a href="#">Back to top</a></p>
-        <p><a href="@{/app/secured/view/index}">camunda fox cycle</a> / version 6.2.0-SNAPSHOT</p>
+        <p><a th:href="@{/app/secured/view/index}">camunda fox cycle</a> / version 6.2.0-SNAPSHOT</p>
       </div>
-      
+
       <script th:src="@{/assets/lib/jquery-1.7.2.min.js}"></script>
       <script th:src="@{/assets/lib/bootstrap/bootstrap.js}"></script>
       <script th:src="@{/assets/lib/angular/angular.js}"></script>

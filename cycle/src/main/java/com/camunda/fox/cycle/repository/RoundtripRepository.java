@@ -37,7 +37,7 @@ public class RoundtripRepository {
     return roundtrip;
   }
 
-  public Roundtrip findOne(long id) {
+  public Roundtrip findById(long id) {
     return em.find(Roundtrip.class, id);
   }
 

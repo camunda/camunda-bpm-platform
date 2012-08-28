@@ -7,6 +7,21 @@
     <div th:substituteby="fragment/common :: navigation-logged-in"></div>
     <div class="container-fluid">
       <div class="row-fluid">
+        <div class="span12">
+      	 <div>
+	   	  <ul class="breadcrumb">
+	   	  	<li>
+	   	  	  <a href="#/">Home</a> 
+	   	    </li>	   	  	
+			<li ng-repeat="breadCrumb in breadCrumbs">
+			  <span class="divider">/</span> 
+			  <a href="#{{breadCrumb.href}}">{{breadCrumb.name}}</a>
+			</li>	    
+		  </ul>
+	      </div>
+	    </div>
+	  </div>
+	  <div class="row-fluid">
         <div class="span3">
           <div class="well sidebar-nav" id="roundtrip-list" ng-controller="ListRoundtripsController">
             <ul class="nav nav-list" id="roundtrip-links">
@@ -15,10 +30,12 @@
                 <a ng-click="selectRoundtrip(roundtrip)" href="#/roundtrip/{{roundtrip.id}}" title="Inspect {{roundtrip.name}}">{{roundtrip.name}}</a>
               </li>
             </ul>
-            <ul class="nav nav-list">
+            <ul class="nav nav-list" ng-cloak>
               <li class="nav-header" th:text="#{Actions}">Actions</li>
               <li><a ng-click="createNew()"><i class="icon-plus"></i><span th:text="#{Create new}">Create new</span></a></li>
             </ul>
+
+            <!-- begin create-roundtrip-dialog -->
             <div class="modal" id="create-roundtrip-dialog" ng-controller="CreateNewRoundtripController" style="display: none;">
               <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -43,6 +60,8 @@
                 <button href="#" class="btn btn-primary" ng-click="save()" th:text="#{Save}">Save</button>
               </div>
             </div>
+            <!-- end create-roundtrip-dialog -->
+
           </div>
         </div>
         <!-- actual view body is rendered here whenever the url changes -->

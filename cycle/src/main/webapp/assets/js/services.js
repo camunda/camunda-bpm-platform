@@ -27,4 +27,7 @@ angular
   })
   .factory('Roundtrip', function($resource){
     return $resource('../../resources/roundtrip/:id', {id: "@id"}, {});
-  });
+  })
+  .factory('RoundtripDetails', function($resource){
+    return $resource('../../resources/roundtrip/:id/details', {id: "@id"}, {});
+  });;
