@@ -16,7 +16,6 @@ import com.camunda.fox.cycle.web.controller.AbstractController;
 @Path("test")
 public class TestRunnerController extends AbstractController {
   
-
   @GET
   @Path("runner")
   @Produces(MediaType.TEXT_HTML)

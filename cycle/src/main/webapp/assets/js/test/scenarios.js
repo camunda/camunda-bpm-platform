@@ -18,23 +18,21 @@ describe('cycle', function() {
       browser().navigateTo('#/');
     });
 
-    it('should render view1 when user navigates to /view1', function() {
-      expect(element('[ng-view] p:first').text()).
-        toMatch(/partial for view 1/);
+    it('should render no-roundtrips-view when user navigates to /', function() {
+      expect(element('[ng-view] h1').text()).toMatch(/No roundtrip selected/);
     });
 
   });
   
-  describe('roundtrip-view', function() {
-
-    beforeEach(function() {
-      browser().navigateTo('#/');
+  describe('add-roundtrip', function() {
+    
+    it('should contain add roundtrip button', function() {
+      expect(element('a.btn[ng-click="createNew()"]').count()).toBe(1);
     });
 
-    it('should render view1 when user navigates to /view1', function() {
-      expect(element('[ng-view] p:first').text()).
-        toMatch(/partial for view 1/);
+    
+    it('should contain additional tests', function() {
+      expect(true).toBe(false);
     });
-
   });
 });
