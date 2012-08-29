@@ -44,7 +44,7 @@
                     <div class="control-group" ng-class="errorClass(newRoundtripForm)">
                       <label class="control-label" for="input01" th:text="#{Name}">Name</label>
                       <div class="controls">
-                        <input ng-model="name" name="name" type="text" class="input-xlarge" id="input01" required />
+                        <input ng-model="name" name="name" type="text" class="input-xlarge" id="input01" required autofocus />
                         <p class="help-block" ng-show="newRoundtripForm.name.$error.required" th:text="#{Type in the name of your roundtrip}"></p>
                         <p class="help-block" ng-show="newRoundtripForm.name.$error.occupied" th:text="#{The name is already used}">The name is already used</p>
                       </div>
