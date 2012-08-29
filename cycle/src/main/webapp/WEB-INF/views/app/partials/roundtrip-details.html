@@ -68,8 +68,8 @@
           <div class="control-group">
             <label class="control-label" for="input01" th:text="#{Modeler Name}">Modeler Name</label>
             <div class="controls">
-              <input ngm-if="side == 'leftHandSide'" data-typeahead data-values="modelerNames" ng-model="modelerName" name="modelerName" type="text" id="input01" required />
-              <input ngm-if="side == 'rightHandSide'" ng-model="modelerName" name="modelerName" ng-disabled="true" type="text" id="input01" required />
+              <input ngm-if="side == 'leftHandSide'" data-typeahead data-values="modelerNames" ng-model="modelerName" name="modelerName" type="text" id="input01" required autofocus />
+              <input ngm-if="side == 'rightHandSide'" ng-model="modelerName" name="modelerName" ng-disabled="true" type="text" id="input01" required autofocus />
               <p class="alert alert-info" ng-show="modelerName == ''" th:text="#{Type in / choose the name of your modeler}">Type in / choose the name of your modeler</p>
             </div>
           </div>
