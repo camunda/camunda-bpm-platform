@@ -38,15 +38,15 @@ angular.module('cycle.directives', [])
 							        data: requestData,
 							        getChildren: function(object) {
 							        	return request.post(APP_ROOT+"secured/connector/" + newValue.connectorId + "/tree/children", {
-								            data : {"parent" : object.name, "parentPath" : object.path},
+								            data : {"parent" : object.id, "parentPath" : object.path},
 							        		handleAs: "json"
 								        }).then(function(childData){
 								        	/**
 								        	 * Dojo Tree will behave strange / loop forever without id attribute
 								        	 */
-								        	array.forEach(childData, function (entry, index) {
-								        		entry["id"] = entry["name"];
-								        	});
+								        	//array.forEach(childData, function (entry, index) {
+								        	//	entry["id"] = entry["name"];
+								        	//});
 								        	return childData;
 								        });
 							        }
@@ -57,7 +57,7 @@ angular.module('cycle.directives', [])
 								// Create the model
 							    var treeModel = new ObjectStoreModel({
 							        store: observableStore,
-							        query: {name: '/'},
+							        query: {id: '/'},
 							        labelAttr : "label",
 							        mayHaveChildren: function(item){
 							            return item.type=="FOLDER";
@@ -72,12 +72,12 @@ angular.module('cycle.directives', [])
 							    
 							    var tree = new Tree({
 							      	id :  attrs.id,
-							           model: treeModel,
-							           openOnClick: true,
-								       onClick: function(item){
-								    	   scope.selected = item;
-								    	   scope.$digest();
-							           }
+                      model: treeModel,
+                      openOnClick: true,
+								      onClick: function(item){
+								    	  scope.selected = item;
+								    	  scope.$digest();
+							          }
 							       });
 							    tree.placeAt(element[0]);
 							    tree.startup();

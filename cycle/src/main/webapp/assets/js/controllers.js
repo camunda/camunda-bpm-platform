@@ -121,10 +121,15 @@ function RoundtripDetailsController($scope, $routeParams, RoundtripDetails, $htt
 
     console.log("Saving " + $scope.selectedTreeItem + " to Roundtrip " + $scope.roundtrip.name);
     if ($scope.side == 'leftHandSide') {
-      $scope.selectedTreeItem.modeller = $scope.modelerName;
-      $scope.roundtrip.leftHandSide = $scope.selectedTreeItem;
+      $scope.roundtrip.leftHandSide = {
+        diagramPath: $scope.selectedTreeItem.path,
+        modeller: $scope.modelerName
+      }
     } else {
-      $scope.roundtrip.rightHandSide = $scope.selectedTreeItem;
+      $scope.roundtrip.rightHandSide = {
+        diagramPath: $scope.selectedTreeItem.path,
+        modeller: $scope.modelerName
+      }
     }
     $scope.roundtrip.$save();
     resetModal();
