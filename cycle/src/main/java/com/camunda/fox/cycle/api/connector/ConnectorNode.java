@@ -5,7 +5,7 @@ public class ConnectorNode {
   protected String path;
   protected String name;
   protected String displayName;
-  private ConnectorNodeType type;
+  protected ConnectorNodeType type = ConnectorNodeType.FOLDER;
   
   public enum ConnectorNodeType {
     FILE,

@@ -7,10 +7,12 @@ import java.util.List;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileSystemManager;
+import org.apache.commons.vfs2.FileType;
 import org.apache.commons.vfs2.VFS;
 
 import com.camunda.fox.cycle.api.connector.Connector;
 import com.camunda.fox.cycle.api.connector.ConnectorNode;
+import com.camunda.fox.cycle.api.connector.ConnectorNode.ConnectorNodeType;
 
 public class VfsConnector extends Connector {
 
@@ -28,10 +30,14 @@ public class VfsConnector extends Connector {
 
       // List the children of the Jar file
       FileObject[] children = jarFile.getChildren();
-      for ( int i = 0; i < children.length; i++ )
+      for ( FileObject file : children )
       {
-          String baseName = children[ i ].getName().getBaseName();
-          nodes.add(new ConnectorNode(parent.getPath()+File.separatorChar+baseName, baseName));
+          String baseName = file.getName().getBaseName();
+          ConnectorNode node = new ConnectorNode(parent.getPath()+File.separatorChar+baseName, baseName);
+          if (file.getType() == FileType.FILE) {
+            node.setType(ConnectorNodeType.FILE);
+          }
+          nodes.add(node);
       }
       
       return nodes;

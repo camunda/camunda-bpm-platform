@@ -41,9 +41,6 @@ angular.module('cycle.directives', [])
 								        }).then(function(childData){
 								        	return childData;
 								        });
-							        },
-							        mayHaveChildren : function (item){
-							        	return item.type == 'folder';	
 							        }
 							    });
 								
@@ -52,7 +49,10 @@ angular.module('cycle.directives', [])
 								// Create the model
 							    var treeModel = new ObjectStoreModel({
 							        store: observableStore,
-							        query: {id: 'root'}
+							        query: {id: 'root'},
+							        mayHaveChildren: function(item){
+							            return item.type=="FOLDER";
+							        }
 							    });
 							    
 							    var treeWidget = registry.byId(attrs.id);

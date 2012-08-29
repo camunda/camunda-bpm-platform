@@ -47,7 +47,7 @@ public class ConnectorService {
     rootNode.put("name", "/");
     rootNode.put("displayName", connectorId);
     rootNode.put("path", "/");
-    rootNode.put("type", "folder");
+    rootNode.put("type", "FOLDER");
     resultList.add(rootNode);
     return resultList;
   }
