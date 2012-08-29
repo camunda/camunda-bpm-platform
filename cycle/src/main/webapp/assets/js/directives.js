@@ -72,12 +72,14 @@ angular.module('cycle.directives', [])
 							    
 							    var tree = new Tree({
 							      	id :  attrs.id,
-                      model: treeModel,
-                      openOnClick: true,
-								      onClick: function(item){
-								    	  scope.selected = item;
-								    	  scope.$digest();
-							          }
+							           model: treeModel,
+							           openOnClick: true,
+								       onClick: function(item){
+								    	   scope.selected = item;
+								    	   scope.$digest();
+							           },
+							           showRoot: false,
+							           persist: false
 							       });
 							    tree.placeAt(element[0]);
 							    tree.startup();
