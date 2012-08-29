@@ -2,8 +2,9 @@
   <h1>{{roundtrip.name}}</h1>
   
   <div class="row-fluid">
-    <div class="span4">
+    <div class="span5">
       <div class="bpmn-model thumbnail" ng-show="roundtrip.leftHandSide">
+        <h2>{{roundtrip.leftHandSide.modellerName}}</h2>
         <div class="diagram">
           <span class="label">Model selected</span>
           <span>{{roundtrip.leftHandSide.modeller}} {{roundtrip.leftHandSide.diagramPath}}</span>
@@ -38,8 +39,9 @@
       </div>
     </div>
     
-    <div class="span4">
+    <div class="span5">
       <div class="bpmn-model thumbnail" ng-show="roundtrip.rightHandSide">
+        <h2>{{roundtrip.rightHandSide.modellerName}}</h2>
         <div class="diagram">
           <span class="label">Model selected</span>
           <span>{{roundtrip.rightHandSide.modeller}} {{roundtrip.rightHandSide.diagramPath}}</span>

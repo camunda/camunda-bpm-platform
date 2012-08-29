@@ -33,7 +33,7 @@ body {
 /**
  * Logo styling
  */
- .navbar .brand {
+.navbar .brand {
    display: block;
    float: left;
    
@@ -42,7 +42,20 @@ body {
    height: 39px;
    padding: 0;
 }
- 
+
+/** Usability tweeks */
+.content-container {
+  min-width: 950px;
+}
+
+#navigation {
+  min-width: 220px;
+}
+
+.nav-list li {
+  word-wrap: break-word;
+}
+
 /**
  * form styling
  */

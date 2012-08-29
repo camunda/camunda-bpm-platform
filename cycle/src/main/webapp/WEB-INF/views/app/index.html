@@ -5,7 +5,7 @@
   </head>
   <body ng-controller="DefaultController">
     <div th:substituteby="fragment/common :: navigation-logged-in"></div>
-    <div class="container-fluid">
+    <div class="container-fluid content-container">
       <div class="row-fluid">
         <div class="span12">
           <div>
@@ -21,8 +21,8 @@
           </div>
         </div>
       </div>
-      <div class="row-fluid">
-        <div class="span3">
+      <div class="row-fluid content-container">
+        <div class="span3" id="navigation">
           <div class="well sidebar-nav" id="roundtrip-list" ng-controller="ListRoundtripsController">
             <ul class="nav nav-list" id="roundtrip-links">
               <li class="nav-header" th:text="#{My Roundtrips}">My Roundtrips</li>

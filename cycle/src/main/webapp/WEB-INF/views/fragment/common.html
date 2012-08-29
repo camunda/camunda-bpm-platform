@@ -39,7 +39,7 @@
     </a>
     
     <!-- default navigation -->
-    <div th:fragment="navigation-default" class="navbar navbar-fixed-top">
+    <div th:fragment="navigation-default" class="navbar navbar-fixed-top content-container">
       <div class="navbar-inner">
         <div class="container-fluid">
           <a th:substituteby="fragment/common :: logo"></a>
@@ -49,7 +49,7 @@
     </div>
     
     <!-- logged in navigation -->
-    <div th:fragment="navigation-logged-in" class="navbar navbar-fixed-top">
+    <div th:fragment="navigation-logged-in" class="navbar navbar-fixed-top content-container">
       <div class="navbar-inner">
         <div class="container-fluid">
           <a th:substituteby="fragment/common :: logo"></a>
@@ -70,7 +70,7 @@
     </div>
     
     <!-- footer -->
-    <footer class="footer" th:fragment="footer">
+    <footer class="footer content-container" th:fragment="footer">
       <div class="container-fluid">
         <p class="pull-right"><a href="#">Back to top</a></p>
         <p><a th:href="@{/app/secured/view/index}">camunda fox cycle</a> / version 6.2.0-SNAPSHOT</p>
