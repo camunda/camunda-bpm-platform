@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -14,7 +16,6 @@ import org.codehaus.jackson.node.JsonNodeFactory;
 import org.codehaus.jackson.node.ObjectNode;
 
 import com.camunda.fox.cycle.api.connector.Connector;
-import com.camunda.fox.cycle.api.connector.ConnectorFolder;
 import com.camunda.fox.cycle.api.connector.ConnectorNode;
 import com.camunda.fox.cycle.web.dto.ConnectorDTO;
 
@@ -43,28 +44,29 @@ public class ConnectorService {
     ArrayNode resultList = factory.arrayNode();
     ObjectNode rootNode = factory.objectNode();
     rootNode.put("id", "root");
-    rootNode.put("name", connectorId);
+    rootNode.put("name", "/");
+    rootNode.put("displayName", connectorId);
     rootNode.put("path", "/");
     rootNode.put("type", "folder");
     resultList.add(rootNode);
     return resultList;
   }
   
-  @GET
-  @Path("{id}/tree/{parentId}/children")
+  @POST
+  @Path("{id}/tree/children")
   @Produces("application/json")
-  public ArrayNode children(@PathParam("id") String connectorId, @PathParam("parentId") String parentId) {
+  public ArrayNode children(@PathParam("id") String connectorId, @FormParam("parent") String parent, @FormParam("parentPath") String parentPath) {
     JsonNodeFactory factory = JsonNodeFactory.instance;
     ArrayNode resultList = factory.arrayNode();
 
     Connector connector = connectorRegistry.getSessionConnectorMap().get(connectorId);
     
-    for (ConnectorNode node : connector.getChildren(new ConnectorFolder(parentId, parentId))) {
+    for (ConnectorNode node : connector.getChildren(new ConnectorNode(parentPath, parent))) {
       ObjectNode rootNode = factory.objectNode();
       rootNode.put("id", node.getPath());
       rootNode.put("name", node.getName());
       rootNode.put("path", node.getPath());
-      rootNode.put("type", "folder");
+      rootNode.put("type", node.getType().name());
       resultList.add(rootNode);
     }
     

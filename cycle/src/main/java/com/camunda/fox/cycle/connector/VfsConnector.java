@@ -10,31 +10,28 @@ import org.apache.commons.vfs2.FileSystemManager;
 import org.apache.commons.vfs2.VFS;
 
 import com.camunda.fox.cycle.api.connector.Connector;
-import com.camunda.fox.cycle.api.connector.ConnectorFolder;
 import com.camunda.fox.cycle.api.connector.ConnectorNode;
 
 public class VfsConnector extends Connector {
 
   @Override
-  public List<ConnectorNode> getChildren(ConnectorFolder folder) {
+  public List<ConnectorNode> getChildren(ConnectorNode parent) {
     List<ConnectorNode> nodes = new ArrayList<ConnectorNode>();
     
     try {
       FileSystemManager fsManager = VFS.getManager();
       FileObject jarFile;
       
-      String path = folder.getPath();
-      if (path.equals("root")) {
-        path = "";
-      }
+      String path = parent.getPath();
       
-      jarFile = fsManager.resolveFile( "file://"+System.getProperty("user.home")+File.pathSeparator + path);
+      jarFile = fsManager.resolveFile( "file://"+System.getProperty("user.home")+File.separatorChar + path);
+
       // List the children of the Jar file
       FileObject[] children = jarFile.getChildren();
       for ( int i = 0; i < children.length; i++ )
       {
           String baseName = children[ i ].getName().getBaseName();
-          nodes.add(new ConnectorNode(folder.getPath()+File.pathSeparator+baseName, baseName));
+          nodes.add(new ConnectorNode(parent.getPath()+File.separatorChar+baseName, baseName));
       }
       
       return nodes;

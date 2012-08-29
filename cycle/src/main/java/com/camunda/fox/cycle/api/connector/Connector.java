@@ -7,7 +7,7 @@ public abstract class Connector {
   private String connectorId;
   private String name;
   
-  public abstract List<ConnectorNode> getChildren(ConnectorFolder folder);
+  public abstract List<ConnectorNode> getChildren(ConnectorNode parent);
 
   public String getName() {
     return name;

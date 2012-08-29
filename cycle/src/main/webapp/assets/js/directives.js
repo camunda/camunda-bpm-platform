@@ -35,11 +35,15 @@ angular.module('cycle.directives', [])
 								var memoryStore = new Memory({
 							        data: requestData,
 							        getChildren: function(object) {
-							        	return request.get(APP_ROOT+"secured/connector/" + newValue.connectorId + "/tree/"+object.id+"/children", {
-								            handleAs: "json"
+							        	return request.post(APP_ROOT+"secured/connector/" + newValue.connectorId + "/tree/children", {
+								            data : {"parent" : object.name, "parentPath" : object.path},
+							        		handleAs: "json"
 								        }).then(function(childData){
 								        	return childData;
 								        });
+							        },
+							        mayHaveChildren : function (item){
+							        	return item.type == 'folder';	
 							        }
 							    });
 								
