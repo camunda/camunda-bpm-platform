@@ -16,13 +16,14 @@ angular.module('cycle.directives', [])
 		link: function(scope, element, attrs, model) {
 			
 			require(["dojo/ready", 
-			         "dojo/_base/window", 
+			         "dojo/_base/window",
+			         "dojo/_base/array",
 			         "dojo/store/Memory",
 			         "dijit/tree/ObjectStoreModel", 
 			         "dijit/Tree",
 			         "dojo/store/Observable",
 			         "dojo/request",
-			         "dijit/registry"], function(ready, window, Memory, ObjectStoreModel, Tree, Observable, request, registry) {
+			         "dijit/registry"], function(ready, window, array, Memory, ObjectStoreModel, Tree, Observable, request, registry) {
 				ready(function () {
 					
 					scope.$watch("connector", function (newValue , oldValue) {
@@ -35,9 +36,16 @@ angular.module('cycle.directives', [])
 								var memoryStore = new Memory({
 							        data: requestData,
 							        getChildren: function(object) {
-							        	return request.get(APP_ROOT+"secured/connector/" + newValue.connectorId + "/tree/"+object.id+"/children", {
-								            handleAs: "json"
+							        	return request.post(APP_ROOT+"secured/connector/" + newValue.connectorId + "/tree/children", {
+								            data : {"parent" : object.name, "parentPath" : object.path},
+							        		handleAs: "json"
 								        }).then(function(childData){
+								        	/**
+								        	 * Dojo Tree will behave strange / loop forever without id attribute
+								        	 */
+								        	array.forEach(childData, function (entry, index) {
+								        		entry["id"] = entry["name"];
+								        	});
 								        	return childData;
 								        });
 							        }
@@ -48,7 +56,11 @@ angular.module('cycle.directives', [])
 								// Create the model
 							    var treeModel = new ObjectStoreModel({
 							        store: observableStore,
-							        query: {id: 'root'}
+							        query: {name: '/'},
+							        labelAttr : "label",
+							        mayHaveChildren: function(item){
+							            return item.type=="FOLDER";
+							        }
 							    });
 							    
 							    var treeWidget = registry.byId(attrs.id);

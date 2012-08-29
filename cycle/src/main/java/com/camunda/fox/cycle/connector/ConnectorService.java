@@ -4,18 +4,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 
-import org.codehaus.jackson.node.ArrayNode;
-import org.codehaus.jackson.node.JsonNodeFactory;
-import org.codehaus.jackson.node.ObjectNode;
-
 import com.camunda.fox.cycle.api.connector.Connector;
-import com.camunda.fox.cycle.api.connector.ConnectorFolder;
 import com.camunda.fox.cycle.api.connector.ConnectorNode;
+import com.camunda.fox.cycle.api.connector.ConnectorNode.ConnectorNodeType;
 import com.camunda.fox.cycle.web.dto.ConnectorDTO;
 
 @Path("secured/connector")
@@ -38,37 +36,21 @@ public class ConnectorService {
   @GET
   @Path("{id}/tree/root")
   @Produces("application/json")
-  public ArrayNode tree(@PathParam("id") String connectorId) {
-    JsonNodeFactory factory = JsonNodeFactory.instance;
-    ArrayNode resultList = factory.arrayNode();
-    ObjectNode rootNode = factory.objectNode();
-    rootNode.put("id", "root");
-    rootNode.put("name", connectorId);
-    rootNode.put("path", "/");
-    rootNode.put("type", "folder");
-    resultList.add(rootNode);
-    return resultList;
+  public List<ConnectorNode> tree(@PathParam("id") String connectorId) {
+    ArrayList<ConnectorNode> rootList = new ArrayList<ConnectorNode>();
+    ConnectorNode rootNode = new ConnectorNode("/", "/");
+    rootNode.setLabel(connectorId);
+    rootNode.setType(ConnectorNodeType.FOLDER);
+    rootList.add(rootNode);
+    return rootList;
   }
   
-  @GET
-  @Path("{id}/tree/{parentId}/children")
+  @POST
+  @Path("{id}/tree/children")
   @Produces("application/json")
-  public ArrayNode children(@PathParam("id") String connectorId, @PathParam("parentId") String parentId) {
-    JsonNodeFactory factory = JsonNodeFactory.instance;
-    ArrayNode resultList = factory.arrayNode();
-
+  public List<ConnectorNode> children(@PathParam("id") String connectorId, @FormParam("parent") String parent, @FormParam("parentPath") String parentPath) {
     Connector connector = connectorRegistry.getSessionConnectorMap().get(connectorId);
-    
-    for (ConnectorNode node : connector.getChildren(new ConnectorFolder(parentId, parentId))) {
-      ObjectNode rootNode = factory.objectNode();
-      rootNode.put("id", node.getPath());
-      rootNode.put("name", node.getName());
-      rootNode.put("path", node.getPath());
-      rootNode.put("type", "folder");
-      resultList.add(rootNode);
-    }
-    
-    return resultList;
+    return connector.getChildren(new ConnectorNode(parentPath, parent));
   }
   
 }
