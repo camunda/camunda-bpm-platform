@@ -1,11 +1,15 @@
 package com.camunda.fox.cycle.api.connector;
 
+import java.util.Date;
+
 
 public class ConnectorNode {
   protected String path;
   protected String name;
   protected String label;
   protected ConnectorNodeType type = ConnectorNodeType.FOLDER;
+  protected Date created;
+  private Date lastModified;
   
   public enum ConnectorNodeType {
     FILE,
@@ -60,5 +64,21 @@ public class ConnectorNode {
   public void setType(ConnectorNodeType type) {
     this.type = type;
   }
-  
+
+  public Date getCreated() {
+    return created;
+  }
+
+  public void setCreated(Date created) {
+    this.created = created;
+  }
+
+  public Date getLastModified() {
+    return lastModified;
+  }
+
+  public void setLastModified(Date lastModified) {
+    this.lastModified = lastModified;
+  }
+
 }
