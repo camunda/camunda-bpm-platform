@@ -1,5 +1,6 @@
 package com.camunda.fox.cycle.api.connector;
 
+import java.io.InputStream;
 import java.util.List;
 
 
@@ -7,7 +8,9 @@ public abstract class Connector {
   private String connectorId;
   private String name;
   
-  public abstract List<ConnectorNode> getChildren(ConnectorFolder folder);
+  public abstract List<ConnectorNode> getChildren(ConnectorNode parent);
+  
+  public abstract InputStream getContent(ConnectorNode node);
 
   public String getName() {
     return name;

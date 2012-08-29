@@ -11,6 +11,7 @@
 
 .dijitIconFolderClosed, .dijitFolderClosed { background-position: -464px; }
 .dijitIconFolderOpen, .dijitFolderOpened { background-position: -480px; }
+.dijitIconFile, .dijitLeaf { background-position: -352px; }
 
 .dijitInline {
 	
@@ -88,31 +89,28 @@
 }
 .claro .dijitTreeRowSelected {
   background-repeat: repeat-x;
-  background-color: #cfe5fa;
-  background-image: url(../img/commonHighlight.png);
+  background-color: #D9564B;
   padding: 3px 0 1px;
   margin: 0;
-  border: solid 1px #759dc0;
+  border: solid 1px #888;
   color: #000000;
 }
 .claro .dijitTreeRowHover {
-  background-color: #abd6ff;
-  background-image: url(../img/commonHighlight.png);
+  background-color: #D9564B;
   padding: 3px 0 1px;
   margin: 0;
-  border: solid 1px #759dc0;
+  border: solid 1px #888;
   color: #000000;
   -webkit-transition-duration: 0.25s;
   -moz-transition-duration: 0.25s;
   transition-duration: 0.25s;
 }
 .claro .dijitTreeRowActive {
-  background-color: #7dbdfa;
-  background-image: url(../img/commonHighlight.png);
+  background-color: #D9564B;
   background-position: 0 -177px;
   padding: 3px 0 1px;
   margin-left: 0;
-  border: solid 1px #759dc0;
+  border: solid 1px #888;
   color: #000000;
 }
 .dj_ie6 .claro .dijitTreeRow {
@@ -141,7 +139,7 @@
   background-image: none;
 }
 .claro .dijitTreeExpandoLoading {
-  background-image: url(../img/loadingAnimation.gif);
+  background-image: url(../img/ajax-loader.gif);
 }
 .claro .dijitTreeNode .dojoDndItemBefore .dijitTreeContent {
   border-top: 2px solid #759dc0;
