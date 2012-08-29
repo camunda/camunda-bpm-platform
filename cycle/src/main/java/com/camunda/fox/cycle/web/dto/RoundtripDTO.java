@@ -67,6 +67,10 @@ public class RoundtripDTO {
   public Date getLastSync() {
     return lastSync;
   }
+
+  public void setLastSync(Date lastSync) {
+    this.lastSync = lastSync;
+  }
   
   public BpmnDiagramDTO getLeftHandSide() {
     return leftHandSide;
