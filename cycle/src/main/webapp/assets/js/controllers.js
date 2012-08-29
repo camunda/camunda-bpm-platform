@@ -52,30 +52,58 @@ function HomeController($scope, $routeParams) {
 }
 
 function RoundtripDetailsController($scope, $routeParams, RoundtripDetails, $http) {
+  $scope.roundtrip = RoundtripDetails.get({id: $routeParams.roundtripId });
+
+  $scope.side = '';
   $scope.modelerName = '';
   $scope.modelerNames = [];
   $scope.connectors = [];
+  $scope.selectedTreeItem = undefined;
 
   $scope.initModal = function() {
     getModelerNames();
     getConnectors();
   }
 
-  var getModelerNames = function() {
+  // for debugging
+  $scope.$watch('modelerName', function(newValue) {
+    console.log("modelerName: " + newValue)
+  });
+  $scope.$watch('selectedTreeItem', function(newValue) {
+    if (newValue) {
+      console.log("selectedTreeItem: " + newValue.name)
+    }
+  });
+
+  function resetModal() {
+    $scope.side = '';
+    $scope.modelerName = '';
+    $scope.modelerNames = [];
+    $scope.connectors = [];
+    $scope.selectedTreeItem = undefined;
+  }
+
+  function getModelerNames() {
     $http.get('../../resources/diagram/modelerNames').success(function(data) {
       $scope.modelerNames = data;
+      // set default value, when only one entry
+      if (data.length == 1) {
+        $scope.modelerName = data[0];
+      }
     });
   }
 
-  $scope.roundtrip = RoundtripDetails.get({id: $routeParams.roundtripId });
-
-  var getConnectors = function () {
+  function getConnectors() {
 	  $http.get(APP_ROOT+"secured/connector/list").success(function (data) {
 		  $scope.connectors = data;
 	  });
   };
-  
+
   $scope.addBpmnModel = function(side) {
+    $scope.side = side;
+    if (side == 'rightHandSide') {
+      $scope.modelerName = 'fox designer';
+    }
     $("#add-model-roundtrip-dialog").modal();
   };
 
@@ -87,13 +115,31 @@ function RoundtripDetailsController($scope, $routeParams, RoundtripDetails, $htt
    * Saves the roundtrip with updated details
    */
   $scope.save = function() {
+//    if (!$scope.addModelRoundtripForm.$valid) {
+//      return;
+//    }
+
+    console.log("Saving " + $scope.selectedTreeItem + " to Roundtrip " + $scope.roundtrip.name);
+    if ($scope.side == 'leftHandSide') {
+      $scope.selectedTreeItem.modeller = $scope.modelerName;
+      $scope.roundtrip.leftHandSide = $scope.selectedTreeItem;
+    } else {
+      $scope.roundtrip.rightHandSide = $scope.selectedTreeItem;
+    }
     $scope.roundtrip.$save();
+    resetModal();
   };
 
   $scope.changeConnector = function () {
 	  console.log($scope.connector);
   };
 
+  // checkFormValid
+  // required: selectedTreeItem
+  // optional: modelerName
+  function checkFormValid() {
+    //$scope.addModelRoundtripForm.$valid
+  }
 };
 
 function CreateNewRoundtripController($scope, $q, $http, $location, debouncer, Roundtrip) {
