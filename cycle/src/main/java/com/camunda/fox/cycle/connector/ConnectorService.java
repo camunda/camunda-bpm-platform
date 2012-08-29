@@ -17,6 +17,7 @@ import org.codehaus.jackson.node.ObjectNode;
 
 import com.camunda.fox.cycle.api.connector.Connector;
 import com.camunda.fox.cycle.api.connector.ConnectorNode;
+import com.camunda.fox.cycle.api.connector.ConnectorNode.ConnectorNodeType;
 import com.camunda.fox.cycle.web.dto.ConnectorDTO;
 
 @Path("secured/connector")
@@ -39,38 +40,21 @@ public class ConnectorService {
   @GET
   @Path("{id}/tree/root")
   @Produces("application/json")
-  public ArrayNode tree(@PathParam("id") String connectorId) {
-    JsonNodeFactory factory = JsonNodeFactory.instance;
-    ArrayNode resultList = factory.arrayNode();
-    ObjectNode rootNode = factory.objectNode();
-    rootNode.put("id", "root");
-    rootNode.put("name", "/");
-    rootNode.put("displayName", connectorId);
-    rootNode.put("path", "/");
-    rootNode.put("type", "FOLDER");
-    resultList.add(rootNode);
-    return resultList;
+  public List<ConnectorNode> tree(@PathParam("id") String connectorId) {
+    ArrayList<ConnectorNode> rootList = new ArrayList<ConnectorNode>();
+    ConnectorNode rootNode = new ConnectorNode("/", "/");
+    rootNode.setLabel(connectorId);
+    rootNode.setType(ConnectorNodeType.FOLDER);
+    rootList.add(rootNode);
+    return rootList;
   }
   
   @POST
   @Path("{id}/tree/children")
   @Produces("application/json")
-  public ArrayNode children(@PathParam("id") String connectorId, @FormParam("parent") String parent, @FormParam("parentPath") String parentPath) {
-    JsonNodeFactory factory = JsonNodeFactory.instance;
-    ArrayNode resultList = factory.arrayNode();
-
+  public List<ConnectorNode> children(@PathParam("id") String connectorId, @FormParam("parent") String parent, @FormParam("parentPath") String parentPath) {
     Connector connector = connectorRegistry.getSessionConnectorMap().get(connectorId);
-    
-    for (ConnectorNode node : connector.getChildren(new ConnectorNode(parentPath, parent))) {
-      ObjectNode rootNode = factory.objectNode();
-      rootNode.put("id", node.getPath());
-      rootNode.put("name", node.getName());
-      rootNode.put("path", node.getPath());
-      rootNode.put("type", node.getType().name());
-      resultList.add(rootNode);
-    }
-    
-    return resultList;
+    return connector.getChildren(new ConnectorNode(parentPath, parent));
   }
   
 }

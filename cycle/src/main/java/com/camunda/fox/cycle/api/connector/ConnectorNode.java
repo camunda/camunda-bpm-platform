@@ -4,7 +4,7 @@ package com.camunda.fox.cycle.api.connector;
 public class ConnectorNode {
   protected String path;
   protected String name;
-  protected String displayName;
+  protected String label;
   protected ConnectorNodeType type = ConnectorNodeType.FOLDER;
   
   public enum ConnectorNodeType {
@@ -18,6 +18,7 @@ public class ConnectorNode {
   public ConnectorNode(String path, String name) {
     this.setPath(path);
     this.setName(name);
+    this.setLabel(this.getName());
   }
 
   public String getPath() {
@@ -44,12 +45,12 @@ public class ConnectorNode {
    * The displayed (e.g. for UI purposes) name of this node 
    * @return
    */
-  public String getDisplayName() {
-    return displayName;
+  public String getLabel() {
+    return label;
   }
 
-  public void setDisplayName(String displayName) {
-    this.displayName = displayName;
+  public void setLabel(String label) {
+    this.label = label;
   }
 
   public ConnectorNodeType getType() {

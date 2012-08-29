@@ -49,7 +49,7 @@ angular.module('cycle.directives', [])
 								// Create the model
 							    var treeModel = new ObjectStoreModel({
 							        store: observableStore,
-							        query: {id: 'root'},
+							        query: {name: '/'},
 							        mayHaveChildren: function(item){
 							            return item.type=="FOLDER";
 							        }
@@ -64,7 +64,10 @@ angular.module('cycle.directives', [])
 							    var tree = new Tree({
 							      	id :  attrs.id,
 							           model: treeModel,
-							           openOnClick: true
+							           openOnClick: true,
+								       getLabel : function (item) {
+								        	return item.label;
+								       }
 							       });
 							    tree.placeAt(element[0]);
 							    tree.startup();

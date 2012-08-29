@@ -22,14 +22,18 @@ public class VfsConnector extends Connector {
     
     try {
       FileSystemManager fsManager = VFS.getManager();
-      FileObject jarFile;
+      FileObject fileObject;
       
       String path = parent.getPath();
       
-      jarFile = fsManager.resolveFile( "file://"+System.getProperty("user.home")+File.separatorChar + path);
+      fileObject = fsManager.resolveFile( "file://"+System.getProperty("user.home")+File.separatorChar + path);
 
-      // List the children of the Jar file
-      FileObject[] children = jarFile.getChildren();
+      if (fileObject.getType() == FileType.FILE) {
+        return nodes;
+      }
+      
+      FileObject[] children = fileObject.getChildren();
+      
       for ( FileObject file : children )
       {
           String baseName = file.getName().getBaseName();
@@ -43,8 +47,7 @@ public class VfsConnector extends Connector {
       return nodes;
       
     } catch (FileSystemException e) {
-      e.printStackTrace();
-      return nodes;
+      throw new RuntimeException(e);
     }
 
   }
