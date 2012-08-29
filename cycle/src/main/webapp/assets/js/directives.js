@@ -77,7 +77,9 @@ angular.module('cycle.directives', [])
 								       onClick: function(item){
 								    	   scope.selected = item;
 								    	   scope.$digest();
-							           }
+							           },
+							           showRoot: false,
+							           persist: false
 							       });
 							    tree.placeAt(element[0]);
 							    tree.startup();
