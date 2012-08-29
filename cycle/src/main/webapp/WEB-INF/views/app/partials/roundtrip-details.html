@@ -68,15 +68,15 @@
           <div class="control-group">
             <label class="control-label" for="input01" th:text="#{Modeler Name}">Modeler Name</label>
             <div class="controls">
-              <input ngm-if="side == 'leftHandSide'" data-typeahead data-values="modelerNames" ng-model="modelerName" name="modelerName" type="text" id="input01" required autofocus />
-              <input ngm-if="side == 'rightHandSide'" ng-model="modelerName" name="modelerName" ng-disabled="true" type="text" id="input01" required autofocus />
+              <input ngm-if="side == 'leftHandSide'" class="span8" data-typeahead data-values="modelerNames" ng-model="modelerName" name="modelerName" type="text" id="input01" required autofocus />
+              <input ngm-if="side == 'rightHandSide'" class="span8" ng-model="modelerName" name="modelerName" ng-disabled="true" type="text" id="input01" required />
               <p class="alert alert-info" ng-show="modelerName == ''" th:text="#{Type in / choose the name of your modeler}">Type in / choose the name of your modeler</p>
             </div>
           </div>
           <div class="control-group">
             <label class="control-label" for="connectors" th:text="#{Select Connector}">Select Connector</label>
             <div class="controls">
-              <select id="connectors" data-ng-model="connector" data-ng-options="c.name for c in connectors">
+              <select id="connectors" class="span8" data-ng-model="connector" data-ng-options="c.name for c in connectors">
               </select>
             </div>
           </div>
