@@ -11,6 +11,7 @@ angular.module('cycle.directives', [])
 		require: '?connector',
 		scope: {
 			'connector' : "=",
+			'selected' : "=",
 			'id' : "@"	
 		},
 		link: function(scope, element, attrs, model) {
@@ -72,7 +73,11 @@ angular.module('cycle.directives', [])
 							    var tree = new Tree({
 							      	id :  attrs.id,
 							           model: treeModel,
-							           openOnClick: true
+							           openOnClick: true,
+								       onClick: function(item){
+								    	   scope.selected = item;
+								    	   scope.$digest();
+							           }
 							       });
 							    tree.placeAt(element[0]);
 							    tree.startup();
