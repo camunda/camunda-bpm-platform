@@ -17,7 +17,6 @@ import com.camunda.fox.cycle.entity.Roundtrip;
 import com.camunda.fox.cycle.web.controller.AbstractController;
 import com.camunda.fox.cycle.web.dto.RoundtripDTO;
 import com.camunda.fox.cycle.repository.RoundtripRepository;
-import com.camunda.fox.cycle.web.dto.BpmnDiagramDTO;
 
 /**
  * This is the main roundtrip rest controller which exposes roundtrip 
@@ -97,7 +96,8 @@ public class RoundtripController extends AbstractController {
       roundtrip.setRightHandSide(null);
     }
     
-    return RoundtripDTO.wrap(roundtripRepository.saveAndFlush(roundtrip));
+    Roundtrip saved = roundtripRepository.saveAndFlush(roundtrip); 
+    return new RoundtripDTO(saved, saved.getLeftHandSide(), saved.getRightHandSide());
   }
   
   @POST

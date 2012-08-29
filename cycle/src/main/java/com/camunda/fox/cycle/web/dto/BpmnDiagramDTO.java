@@ -16,7 +16,9 @@ public class BpmnDiagramDTO {
 
   private Status status;
   
-  private BpmnDiagramDTO(BpmnDiagram diagram) {
+  public BpmnDiagramDTO() { }
+  
+  public BpmnDiagramDTO(BpmnDiagram diagram) {
     this.id = diagram.getId();
     this.modeller = diagram.getModeller();
     this.diagramPath = diagram.getDiagramPath();
