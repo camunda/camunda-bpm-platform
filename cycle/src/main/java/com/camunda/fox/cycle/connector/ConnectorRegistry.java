@@ -55,6 +55,8 @@ public class ConnectorRegistry {
           newConnectorInstance.setConnectorId(connector.getKey());
           newConnectorInstance.setName(connector.getKey());
           
+          newConnectorInstance.setConfigurationValues(connector.getValue().getConfigurationValues());
+          
           sessionConnectorMap.put(connector.getKey(), newConnectorInstance);
         } catch (Exception e) {
           throw new RuntimeException(e);
