@@ -57,7 +57,7 @@
   </div>
 
   <!-- begin add-model-roundtrip-dialog -->
-  <div class="modal" id="add-model-roundtrip-dialog" style="display: none;" data-ng-init="init()">
+  <div class="modal" id="add-model-roundtrip-dialog" style="display: none;" data-ng-init="initModal()">
     <div class="modal-header">
       <button type="button" class="close" data-dismiss="modal">&times;</button>
       <h3 th:text="#{Add file}">Add file</h3>
@@ -65,10 +65,10 @@
     <div class="modal-body">
       <form class="form-horizontal" novalidate="novalidate" ng-submit="save()" name="addModelRoundtripForm">
         <fieldset>
-          <div class="control-group" ng-class="errorClass(addModelRoundtripForm)">
+          <div class="control-group">
             <label class="control-label" for="input01" th:text="#{Modeler Name}">Modeler Name</label>
             <div class="controls">
-              <input data-typeahead data-values="modelerNames" ng-model="modelerName" name="modelerName" type="text" id="input01" />
+              <input data-typeahead data-values="modelerNames" ng-model="modelerName" name="modelerName" type="text" id="input01" data-placeholder="Enter a modeler name..."/>
             </div>
           </div>
           <div class="control-group">
@@ -78,7 +78,12 @@
               </select>
             </div>
           </div>
-          <div class="claro" data-cycle-tree data-id="connectorTree" data-connector="connector">
+          <div class="control-group">
+            <label class="control-label" for="tree" th:text="#{Select BPMN File}">Select BPMN File</label>
+            <div class="controls">
+              <div id="tree" class="claro" data-cycle-tree data-id="connectorTree" data-connector="connector">
+              </div>
+            </div>
           </div>
           <tabs>
           </tabs>
