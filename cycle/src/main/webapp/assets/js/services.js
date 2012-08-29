@@ -25,6 +25,26 @@ angular
       };
     }
   })
+  /**
+   * Provides the app service with the functions 
+   * 
+   *  root() -> returns the application root
+   *  uri(str) -> returns a application root relative uri from the given argument
+   */
+  .factory('app', function() {
+    function root() {
+      return $("base").attr("app-base");
+    }
+    
+    return {
+      root: root, 
+      uri: function(str) {
+        console.log(root());
+        
+        return root() + (str.indexOf("/") == 0 ? str.substring(1, str.length) : str);
+      }
+    };
+  })
   .factory('Roundtrip', function($resource){
     return $resource('../../resources/roundtrip/:id', {id: "@id"}, {});
   })

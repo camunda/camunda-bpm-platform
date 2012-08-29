@@ -3,12 +3,12 @@
 
 angular.module('cycle.controllers', []);
 
-function DefaultController($scope, $http, $location) {
+function DefaultController($scope, $http, $location, app) {
   
   // TODO: get from cookie
   $scope.currentUser = null;
   
-  $http.get('../../../currentUser').success(function(data) {
+  $http.get(app.uri('currentUser')).success(function(data) {
     $scope.currentUser = data;
   });
   
@@ -51,7 +51,7 @@ function HomeController($scope, $routeParams) {
   $scope.$emit("navigation-changed");
 }
 
-function RoundtripDetailsController($scope, $routeParams, RoundtripDetails, $http) {
+function RoundtripDetailsController($scope, $routeParams, RoundtripDetails, app, $http) {
 
   $scope.init = function() {
     $scope.getModelerNames();
@@ -61,7 +61,7 @@ function RoundtripDetailsController($scope, $routeParams, RoundtripDetails, $htt
   $scope.modelerName = '';
   $scope.modelerNames = [];
   $scope.getModelerNames = function() {
-    $http.get('../../resources/diagram/modelerNames').success(function(data) {
+    $http.get(app.uri('secured/resources/diagram/modelerNames')).success(function(data) {
       $scope.modelerNames = data;
     });
   }
@@ -70,7 +70,7 @@ function RoundtripDetailsController($scope, $routeParams, RoundtripDetails, $htt
   
   $scope.connectors = [];
   $scope.getConnectors = function () {
-	  $http.get(APP_ROOT+"secured/connector/list").success(function (data) {
+	  $http.get(app.uri("secured/connector/list")).success(function (data) {
 		  $scope.connectors = data;
 	  });
   };
@@ -96,7 +96,7 @@ function RoundtripDetailsController($scope, $routeParams, RoundtripDetails, $htt
 
 };
 
-function CreateNewRoundtripController($scope, $q, $http, $location, debouncer, Roundtrip) {
+function CreateNewRoundtripController($scope, $q, $http, $location, debouncer, app, Roundtrip) {
 
   $scope.name = '';
   
@@ -143,7 +143,7 @@ function CreateNewRoundtripController($scope, $q, $http, $location, debouncer, R
       deferred.resolve();
     }
     
-    $http.get("../../resources/roundtrip/isNameValid?name=" + name).success(function(data) {
+    $http.get(app.uri("secured/resources/roundtrip/isNameValid?name=" + name)).success(function(data) {
       if (data == "true") {
         deferred.resolve();
       } else {

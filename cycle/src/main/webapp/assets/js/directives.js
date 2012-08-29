@@ -3,7 +3,7 @@
 /* Directives */
 
 angular.module('cycle.directives', [])
-.directive('cycleTree', function() {
+.directive('cycleTree', function(app) {
 	return {
 		restrict: "A",
 		replace: false,
@@ -30,7 +30,7 @@ angular.module('cycle.directives', [])
 					scope.$watch("connector", function (newValue , oldValue) {
 				    	if (newValue != undefined && newValue != oldValue) {
 				    		
-							request.get(APP_ROOT+"secured/connector/" + newValue.connectorId + "/tree/root", {
+							request.get(app.uri("secured/connector/" + newValue.connectorId + "/tree/root"), {
 					            handleAs: "json"
 					        }).then(function(requestData){
 								
