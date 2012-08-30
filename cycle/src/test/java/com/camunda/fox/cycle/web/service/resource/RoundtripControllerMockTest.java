@@ -1,4 +1,4 @@
-package com.camunda.fox.cycle.web.controller.resource;
+package com.camunda.fox.cycle.web.service.resource;
 
 import javax.inject.Inject;
 
@@ -34,7 +34,7 @@ public class RoundtripControllerMockTest {
   private RoundtripRepository roundtripRepository;
   
   @Inject
-  private RoundtripController roundtripController;
+  private RoundtripService roundtripController;
   
   @Test
   public void shouldAddRoundtrip() throws Exception {

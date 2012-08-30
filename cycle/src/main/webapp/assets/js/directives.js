@@ -2,7 +2,8 @@
 
 /* Directives */
 
-angular.module('cycle.directives', [])
+angular
+.module('cycle.directives', [])
 .directive('cycleTree', function(app) {
 	return {
 		restrict: "A",
@@ -30,14 +31,14 @@ angular.module('cycle.directives', [])
 					scope.$watch("connector", function (newValue , oldValue) {
 				    	if (newValue != undefined && newValue != oldValue) {
 				    		
-							request.get(app.uri("secured/connector/" + newValue.connectorId + "/tree/root"), {
+							request.get(app.uri("secured/resource/connector/" + newValue.connectorId + "/tree/root"), {
 					            handleAs: "json"
 					        }).then(function(requestData){
 								
 								var memoryStore = new Memory({
 							        data: requestData,
 							        getChildren: function(object) {
-							        	return request.post(APP_ROOT+"secured/connector/" + newValue.connectorId + "/tree/children", {
+							        	return request.post(app.uri("secured/resource/connector/" + newValue.connectorId + "/tree/children"), {
 								            data : {"parent" : object.name, "parentPath" : object.path},
 							        		handleAs: "json"
 								        }).then(function(childData){
@@ -119,4 +120,130 @@ angular.module('cycle.directives', [])
       });
     }
   };
+})
+/**
+ * A directive which conditionally displays a dialog 
+ * and allows it to control it via a explicitly specified model.
+ * 
+ * <dialog model="aModel">
+ *   <div class="model">
+ *     <!-- dialog contents ... -->
+ *   </div>
+ * </dialog>
+ * 
+ * <script>
+ *   // outside the dialog
+ *   aModel.open(); // openes the dialog (asynchronously)
+ *   aModel.close(); // closes the dialog (immediately)
+ *   
+ *   // Or inside the dialog: 
+ *   $model.close();
+ * </script>
+ * Inside the dialog it exposed the dialog model via the $model directive.
+ */
+.directive('dialog', function($http, $timeout) {
+  return {
+    restrict: 'E',
+    scope: {
+      $model: '=model'
+    }, 
+    transclude: true, 
+    template: '<div ngm-if="$model.renderHtml()" ng-transclude></div>',
+    link:  function(scope, element, attrs) {
+      /**
+       * Obtain the dialog
+       * @returns the dialog instance as a jQuery object
+       */
+      function dialog() {
+        return angular.element(element.find(".modal"));
+      }
+
+      /**
+       * Obtain the dialogs model
+       * @returns the dialogs model
+       */
+      function model() {
+        return scope.$model;
+      }
+
+      /**
+       * Init (ie. register events / dialog functionality) and show the dialog.
+       * @returns nothing
+       */
+      function initAndShow() {
+        dialog()
+          .hide()
+          // register events to make sure the model is updated 
+          // when things happen to the dialog. We establish a two-directional mapping
+          // between the dialog model and the bootstrap modal. 
+          .on('hidden', function() {
+            // Model is still opened; refresh it asynchronously
+            if (model().status != "closed") {
+              $timeout(function() {
+                model().status = "closed";
+              });
+            }
+          })
+          .on('shown', function() {
+            model().status = "open";
+          })
+          // and show modal
+          .modal();
+      }
+
+      /**
+       * Hide (and destroys) the dialog
+       * @returns nothing
+       */
+      function hide() {
+        dialog().modal("hide");
+      }
+
+      /**
+       * Watch the $model.status property in order to map it to the 
+       * bootstrap modal dialog live cycle. The HTML has to be rendered first, 
+       * for the dialog to appear and actual stuff can be done with the dialog.
+       */
+      scope.$watch("$model.status", function(newValue , oldValue) {
+        
+        // dialog lifecycle
+        // closed -> opening -> open -> closing -> closed
+        //            ^ html is about to exist       ^ dialog closed (no html)
+        //                       ^ dialog operational and displayed
+        //  ^ dialog closed (no html)    ^ dialog closing
+        switch (newValue) {
+          case "opening": 
+            // dialog about to show and markup will be ready, soon
+            // asynchronously initialize dialog and register events
+            $timeout(initAndShow);
+            break;
+          case "closing": 
+            hide();
+            break;
+        }
+      });
+    }
+  }
 });
+
+
+/** 
+ * Dialog model to be used along with the 
+ * dialog directive
+ */
+function Dialog() {
+  var self = this;
+  self.status = "closed";
+
+  this.open = function() {
+    self.status = "opening";
+  };
+
+  this.close = function() {
+    self.status = "closing";
+  };
+
+  this.renderHtml = function() {
+    return self.status != "closed";
+  }
+};

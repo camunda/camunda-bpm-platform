@@ -39,8 +39,6 @@ angular
     return {
       root: root, 
       uri: function(str) {
-        console.log(root());
-        
         return root() + (str.indexOf("/") == 0 ? str.substring(1, str.length) : str);
       }
     };
@@ -50,4 +48,4 @@ angular
   })
   .factory('RoundtripDetails', function($resource){
     return $resource('../../resources/roundtrip/:id/details', {id: "@id"}, {});
-  });;
+  });

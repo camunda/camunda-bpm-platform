@@ -1,4 +1,4 @@
-package com.camunda.fox.cycle.web.controller.resource;
+package com.camunda.fox.cycle.web.service.resource;
 
 import com.camunda.fox.cycle.repository.BpmnDiagramRepository;
 import java.util.List;
@@ -20,8 +20,8 @@ import com.camunda.fox.cycle.web.dto.BpmnDiagramDTO;
  *
  * @author nico.rehwaldt
  */
-@Path("secured/resources/diagram")
-public class BpmnDiagramController {
+@Path("secured/resource/diagram")
+public class BpmnDiagramService {
 
   @Inject
   private BpmnDiagramRepository bpmnDiagramRepository;

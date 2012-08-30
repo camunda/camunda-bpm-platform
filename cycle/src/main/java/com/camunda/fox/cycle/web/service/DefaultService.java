@@ -1,4 +1,4 @@
-package com.camunda.fox.cycle.web.controller;
+package com.camunda.fox.cycle.web.service;
 
 import java.security.Principal;
 
@@ -27,7 +27,7 @@ import com.camunda.fox.cycle.web.dto.CurrentUserDTO;
  * @author nico.rehwaldt
  */
 @Path("/")
-public class DefaultController extends AbstractController {
+public class DefaultService extends AbstractRestService {
   
 //  @GET
 //  @Consumes(MediaType.APPLICATION_JSON)

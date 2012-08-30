@@ -1,4 +1,4 @@
-package com.camunda.fox.cycle.web.controller.resource;
+package com.camunda.fox.cycle.web.service.resource;
 
 import java.util.Date;
 import com.camunda.fox.cycle.repository.*;
@@ -34,7 +34,7 @@ public class RoundtripControllerTest {
   private RoundtripRepository roundtripRepository;
   
   @Inject
-  private RoundtripController roundtripController;
+  private RoundtripService roundtripController;
   
   @After
   public void after() {

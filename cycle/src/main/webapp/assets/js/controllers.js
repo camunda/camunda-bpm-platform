@@ -16,33 +16,32 @@ function DefaultController($scope, $http, $location, app) {
     $scope.currentUser = user;
   });
   
-  
   // Bread Crumb 
   var breadCrumbs = $scope.breadCrumbs = [];
   	
   $scope.$on("navigation-changed", function(evt, navigationItem) {
-	  if(navigationItem==undefined) {
-	    breadCrumbs.splice(0, breadCrumbs.length);
-	  } else {
-		var contains = false;
-		var remove = 0;
-		angular.forEach(breadCrumbs, function(item) {
-			if(item.name == navigationItem.name) {
-				contains = true;			
-			}
-			if(item.href.indexOf($location.path()) != 0) {
-				remove++;
-			}
-		});
-		
-		for (var i = 0; i < remove; i++) {
-		  breadCrumbs.pop();						
-		}		
-		
-		if(!contains) {
-			breadCrumbs.push({name:navigationItem.name, href:$location.path()});
-		}		
-	  }
+    if(navigationItem==undefined) {
+      breadCrumbs.splice(0, breadCrumbs.length);
+    } else {
+      var contains = false;
+      var remove = 0;
+      angular.forEach(breadCrumbs, function(item) {
+        if(item.name == navigationItem.name) {
+          contains = true;			
+        }
+        if(item.href.indexOf($location.path()) != 0) {
+          remove++;
+        }
+      });
+
+      for (var i = 0; i < remove; i++) {
+        breadCrumbs.pop();						
+      }
+
+      if(!contains) {
+        breadCrumbs.push({name:navigationItem.name, href:$location.path()});
+      }		
+    }
   });
   // end Bread Crumb
 };
@@ -52,28 +51,27 @@ function HomeController($scope, $routeParams) {
 }
 
 function RoundtripDetailsController($scope, $routeParams, RoundtripDetails, app, $http) {
-
-  $scope.init = function() {
-    $scope.getModelerNames();
-    $scope.getConnectors();
-  }
-
   $scope.modelerName = '';
   $scope.modelerNames = [];
-  $scope.getModelerNames = function() {
-    $http.get(app.uri('secured/resources/diagram/modelerNames')).success(function(data) {
-      $scope.modelerNames = data;
-    });
+  $scope.connectors = [];
+
+  function getModelerNames() {
+    $http
+      .get(app.uri('secured/resource/diagram/modelerNames'))
+      .success(function(data) {
+        $scope.modelerNames = data;
+      });
   }
 
-  $scope.roundtrip = RoundtripDetails.get({id: $routeParams.roundtripId });
+  function getConnectors() {
+    $http
+      .get(app.uri("secured/resource/connector/list"))
+      .success(function(data) {
+        $scope.connectors = data;
+      });
+  }
   
-  $scope.connectors = [];
-  $scope.getConnectors = function () {
-	  $http.get(app.uri("secured/connector/list")).success(function (data) {
-		  $scope.connectors = data;
-	  });
-  };
+  $scope.roundtrip = RoundtripDetails.get({id: $routeParams.roundtripId });
   
   $scope.addBpmnModel = function(side) {
     $("#add-model-roundtrip-dialog").modal();
@@ -83,6 +81,11 @@ function RoundtripDetailsController($scope, $routeParams, RoundtripDetails, app,
     $("#add-model-roundtrip-dialog").modal('hide');
   };
   
+  $scope.initModal = function() {
+    getModelerNames();
+    getConnectors();
+  }
+  
   /**
    * Saves the roundtrip with updated details
    */
@@ -91,10 +94,9 @@ function RoundtripDetailsController($scope, $routeParams, RoundtripDetails, app,
   };
 
   $scope.changeConnector = function () {
-	  console.log($scope.connector);
+    console.log($scope.connector);
   };
-
-};
+}
 
 function CreateNewRoundtripController($scope, $q, $http, $location, debouncer, app, Roundtrip) {
 
@@ -109,7 +111,7 @@ function CreateNewRoundtripController($scope, $q, $http, $location, debouncer, a
   });
   
   $scope.cancel = function() {
-    $("#create-roundtrip-dialog").modal('hide'); 
+    $scope.$model.close();
   };
   
   $scope.save = function() {
@@ -119,13 +121,11 @@ function CreateNewRoundtripController($scope, $q, $http, $location, debouncer, a
     
     var roundtrip = new Roundtrip({ name: $scope.name });
     roundtrip.$save(function() {
-
       $location.path("/roundtrip/" + roundtrip.id);
       $scope.$emit("roundtrip-added", roundtrip);
-      $scope.name = '';
     });
 
-    $("#create-roundtrip-dialog").modal('hide');
+    $scope.$model.close();
   };
   
   var checkName = debouncer.debounce(function(name) {
@@ -143,7 +143,7 @@ function CreateNewRoundtripController($scope, $q, $http, $location, debouncer, a
       deferred.resolve();
     }
     
-    $http.get(app.uri("secured/resources/roundtrip/isNameValid?name=" + name)).success(function(data) {
+    $http.get(app.uri("secured/resource/roundtrip/isNameValid?name=" + name)).success(function(data) {
       if (data == "true") {
         deferred.resolve();
       } else {
@@ -157,23 +157,24 @@ function CreateNewRoundtripController($scope, $q, $http, $location, debouncer, a
 
 function ListRoundtripsController($scope, $route, $routeParams, Roundtrip) {
   $scope.roundtrips = Roundtrip.query();
+  $scope.newRoundtripDialog = new Dialog();
   
   var selectedRoundtripId = -1; // $routeParams.roundtripId;
   
   $scope.$watch(function() { return $routeParams.roundtripId; }, function(newValue, oldValue) {
     selectedRoundtripId = parseInt(newValue);    
-    if($routeParams.roundtripId != undefined) {
-    	angular.forEach($scope.roundtrips, function(item) {
-    		if(item.id == $routeParams.roundtripId) {
-	        	// find the roundtripname for this roundtrip-id
-	        	$scope.$emit("navigation-changed", {name:item.name});
-    		}
-    	});
+    if ($routeParams.roundtripId != undefined) {
+      angular.forEach($scope.roundtrips, function(item) {
+        if (item.id == $routeParams.roundtripId) {
+          // find the roundtripname for this roundtrip-id
+          $scope.$emit("navigation-changed", {name:item.name});
+        }
+      });
     }
   });
   
   $scope.createNew = function() {
-    $("#create-roundtrip-dialog").modal(); 
+    $scope.newRoundtripDialog.open();
   };
   
   $scope.activeClass = function(roundtrip) {

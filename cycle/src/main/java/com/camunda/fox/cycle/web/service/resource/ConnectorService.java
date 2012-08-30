@@ -1,4 +1,4 @@
-package com.camunda.fox.cycle.connector;
+package com.camunda.fox.cycle.web.service.resource;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,9 +14,10 @@ import javax.ws.rs.Produces;
 import com.camunda.fox.cycle.api.connector.Connector;
 import com.camunda.fox.cycle.api.connector.ConnectorNode;
 import com.camunda.fox.cycle.api.connector.ConnectorNode.ConnectorNodeType;
+import com.camunda.fox.cycle.connector.ConnectorRegistry;
 import com.camunda.fox.cycle.web.dto.ConnectorDTO;
 
-@Path("secured/connector")
+@Path("secured/resource/connector")
 public class ConnectorService {
   
   @Inject

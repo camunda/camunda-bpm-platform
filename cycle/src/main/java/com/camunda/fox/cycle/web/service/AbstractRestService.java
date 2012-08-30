@@ -1,4 +1,4 @@
-package com.camunda.fox.cycle.web.controller;
+package com.camunda.fox.cycle.web.service;
 
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
@@ -9,7 +9,7 @@ import javax.ws.rs.core.UriInfo;
  * 
  * @author nico.rehwaldt
  */
-public class AbstractController {
+public class AbstractRestService {
 
   @Context 
   private UriInfo uriInfo;

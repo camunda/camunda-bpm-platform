@@ -1,11 +1,11 @@
-package com.camunda.fox.cycle.web.controller.test;
+package com.camunda.fox.cycle.web.service.test;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-import com.camunda.fox.cycle.web.controller.AbstractController;
+import com.camunda.fox.cycle.web.service.AbstractRestService;
 
 
 /**
@@ -14,7 +14,7 @@ import com.camunda.fox.cycle.web.controller.AbstractController;
  * @author nico.rehwaldt
  */
 @Path("test")
-public class TestRunnerController extends AbstractController {
+public class TestRunnerService extends AbstractRestService {
   
   @GET
   @Path("runner")
