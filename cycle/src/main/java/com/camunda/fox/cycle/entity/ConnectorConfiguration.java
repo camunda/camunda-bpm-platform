@@ -10,18 +10,19 @@ import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.MapKeyColumn;
 import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
 
 @Entity
-@Table(name = "cy_connector_config", uniqueConstraints = { @UniqueConstraint(columnNames = { "connectorId", "id" }) })
+@Table(name = "cy_connector_config")
 public class ConnectorConfiguration extends AbstractEntity {
 
   private static final long serialVersionUID = 1L;
 
-  private String connectorId;
+  private String connectorClass;
 
   private String globalUser;
   private String globalPassword;
+  
+  private String label;
 
   @ElementCollection
   @MapKeyColumn(name = "name")
@@ -46,12 +47,12 @@ public class ConnectorConfiguration extends AbstractEntity {
     this.globalPassword = globalPassword;
   }
 
-  public String getConnectorId() {
-    return connectorId;
+  public String getConnectorClass() {
+    return connectorClass;
   }
 
-  public void setConnectorId(String connectorId) {
-    this.connectorId = connectorId;
+  public void setConnectorClass(String connectorClass) {
+    this.connectorClass = connectorClass;
   }
 
   public Map<String, String> getProperties() {
@@ -60,6 +61,18 @@ public class ConnectorConfiguration extends AbstractEntity {
 
   public void setProperties(Map<String, String> properties) {
     this.properties = properties;
+  }
+
+  public String getLabel() {
+    return label;
+  }
+
+  public void setLabel(String label) {
+    this.label = label;
+  }
+  
+  public void setId(Long id) {
+    this.id = id;
   }
 
 }

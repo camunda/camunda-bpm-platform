@@ -25,9 +25,19 @@
   </context:component-scan>
   
   <bean name="vfsConnector" class="com.camunda.fox.cycle.connector.VfsConnector">
-    <property name="name" value="VFS Connector" />
-    <property name="configuration" ref="vfsConnectorConfig"/>
   </bean>
+
+  <bean name="vfsConnectorConfig" class="com.camunda.fox.cycle.entity.ConnectorConfiguration">
+    <property name="id" value="1"/>
+    <property name="label" value="VFS Connector"/>
+    <property name="connectorClass" value="com.camunda.fox.cycle.connector.VfsConnector"/>
+    <property name="properties">
+      <map>
+        <entry key="BASE_PATH" value="file:///home/drobisch/cycle/"/>
+      </map>
+    </property>
+  </bean>
+  
   
   <!--  bean name="connectorRegistry" scope="session" class="com.camunda.fox.cycle.connector.ConnectorRegistry">
     <aop:scoped-proxy/>

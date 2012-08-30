@@ -50,7 +50,7 @@ public class ConnectorService {
   @POST
   @Path("{id}/tree/children")
   @Produces("application/json")
-  public List<ConnectorNodeDTO> children(@PathParam("id") String connectorId, @FormParam("parent") String parent) {
+  public List<ConnectorNodeDTO> children(@PathParam("id") Long connectorId, @FormParam("parent") String parent) {
     Connector connector = connectorRegistry.getSessionConnectorMap().get(connectorId);
     return ConnectorNodeDTO.wrapAll(connector.getChildren(new ConnectorNode(parent)));
   }

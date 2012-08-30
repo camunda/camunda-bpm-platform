@@ -17,13 +17,17 @@ import com.camunda.fox.cycle.api.connector.Connector;
 import com.camunda.fox.cycle.api.connector.ConnectorNode;
 import com.camunda.fox.cycle.api.connector.Secured;
 import com.camunda.fox.cycle.api.connector.ConnectorNode.ConnectorNodeType;
+import com.camunda.fox.cycle.entity.ConnectorConfiguration;
 import com.camunda.fox.cycle.exception.CycleException;
 
 public class VfsConnector extends Connector {
 
-  public static final String BASE_PATH = "file://"+System.getProperty("user.home")+File.separatorChar;
+  public static final String BASE_PATH_KEY = "BASE_PATH";
+  public static final String DEFAULT_BASE_PATH = "file://" + System.getProperty("user.home") + File.separatorChar + "cycle" + File.separatorChar;
   
   Logger log = Logger.getLogger(getClass().getSimpleName());
+
+  private String basePath;
 
   @Secured
   @Override
@@ -34,7 +38,7 @@ public class VfsConnector extends Connector {
       FileSystemManager fsManager = VFS.getManager();
       FileObject fileObject;
       
-      fileObject = fsManager.resolveFile(BASE_PATH + parent.getId());
+      fileObject = fsManager.resolveFile(basePath + parent.getId());
 
       if (fileObject.getType() == FileType.FILE) {
         return nodes;
@@ -76,7 +80,7 @@ public class VfsConnector extends Connector {
       FileSystemManager fsManager = VFS.getManager();
       FileObject fileObject;
       
-      fileObject = fsManager.resolveFile(BASE_PATH + node.getId());
+      fileObject = fsManager.resolveFile(basePath + node.getId());
 
       if (fileObject.getType() != FileType.FILE) {
         throw new CycleException("Cant cant content of non-file node");
@@ -87,5 +91,10 @@ public class VfsConnector extends Connector {
     } catch (FileSystemException e) {
       throw new CycleException(e);
     }
+  }
+  
+  @Override
+  public void init(ConnectorConfiguration config) {
+    this.basePath = config.getProperties().get(BASE_PATH_KEY);
   }
 }
