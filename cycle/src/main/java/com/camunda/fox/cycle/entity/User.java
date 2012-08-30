@@ -3,14 +3,17 @@ package com.camunda.fox.cycle.entity;
 import java.util.List;
 
 import javax.persistence.Entity;
-import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 @Entity
 @Table(name="cy_user")
-public class User {
-  @Id
+public class User extends AbstractEntity {
+  /**
+   * 
+   */
+  private static final long serialVersionUID = 1L;
+
   private String name;
   
   @OneToMany

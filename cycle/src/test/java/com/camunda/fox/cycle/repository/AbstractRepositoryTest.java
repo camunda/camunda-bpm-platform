@@ -28,13 +28,13 @@ public class AbstractRepositoryTest {
 
   @Inject
   private RoundtripRepository roundtripRepository;
-  
+
   @After
   public void after() {
     // Remove all entities
     roundtripRepository.deleteAll();
   }
-  
+
   @Test
   public void shouldDeleteAll() throws Exception {
     // given
@@ -53,7 +53,7 @@ public class AbstractRepositoryTest {
     assertThat(deleted, is(3));
     assertThat(roundtripRepository.findAll(), hasSize(0));
   }
-  
+
   @Test
   public void shouldSaveAndFlush() throws Exception {
     // given
@@ -69,7 +69,7 @@ public class AbstractRepositoryTest {
     assertThat(roundtripRepository.findAll(), hasSize(1));
     assertThat(roundtripFromDB.getName(), is(newRoundtrip.getName()));
   }
-  
+
   @Test
   public void shouldDeleteById() throws Exception {
     // given

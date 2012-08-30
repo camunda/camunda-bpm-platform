@@ -26,10 +26,7 @@
   
   <bean name="vfsConnector" class="com.camunda.fox.cycle.connector.VfsConnector">
     <property name="name" value="VFS Connector" />
-  </bean>
-  
-  <bean name="vfsConnector2" class="com.camunda.fox.cycle.connector.VfsConnector">
-    <property name="name" value="VFS Connector 2" />
+    <property name="configuration" ref="vfsConnectorConfig"/>
   </bean>
   
   <bean name="signavioConnector" class="com.camunda.fox.cycle.impl.connector.signavio.SignavioConnector">

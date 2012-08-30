@@ -70,6 +70,11 @@
       </dependency>
       <dependency>
         <groupId>org.springframework</groupId>
+        <artifactId>spring-security-web</artifactId>
+        <version>${version.springframework}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework</groupId>
         <artifactId>spring-test</artifactId>
         <version>${version.springframework}</version>
       </dependency>

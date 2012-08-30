@@ -17,6 +17,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 import com.camunda.fox.cycle.api.connector.Connector;
 import com.camunda.fox.cycle.aspect.LoginAspect;
+import com.camunda.fox.cycle.security.SecurityContext;
 
 @Component
 @Scope(value = WebApplicationContext.SCOPE_SESSION, proxyMode = ScopedProxyMode.TARGET_CLASS)
@@ -27,6 +28,9 @@ public class ConnectorRegistry {
   
   @Inject
   LoginAspect loginAspect;
+  
+  @Inject
+  SecurityContext securityContext;
   
   /**
    * Get the connector singletons from application context
@@ -42,7 +46,7 @@ public class ConnectorRegistry {
    * Create the instances of the connectors for the current session
    * @return
    */
-  public List<Connector> getConnectors()  {
+  public List<Connector> getSessionConnectors()  {
     if (sessionConnectors == null) {
       sessionConnectors = new ArrayList<Connector>();
       for (Entry<String, Connector> connector : connectors.entrySet()) {
@@ -70,6 +74,10 @@ public class ConnectorRegistry {
   
   public Map<String, Connector> getSessionConnectorMap() {
     return sessionConnectorMap;
+  }
+  
+  public Map<String, Connector> getConnectors() {
+    return connectors;
   }
   
 }

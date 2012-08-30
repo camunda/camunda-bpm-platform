@@ -1,4 +1,4 @@
-package com.camunda.fox.cycle.web.controller.resource;
+package com.camunda.fox.cycle.web.service.resource;
 
 import java.util.List;
 import javax.inject.Inject;
@@ -14,7 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.camunda.fox.cycle.entity.BpmnDiagram;
 import com.camunda.fox.cycle.entity.Roundtrip;
-import com.camunda.fox.cycle.web.controller.AbstractController;
+import com.camunda.fox.cycle.web.service.AbstractRestService;
 import com.camunda.fox.cycle.web.dto.RoundtripDTO;
 import com.camunda.fox.cycle.repository.RoundtripRepository;
 
@@ -27,14 +27,14 @@ import com.camunda.fox.cycle.repository.RoundtripRepository;
  * 
  * @author nico.rehwaldt
  */
-@Path("secured/resources/roundtrip")
-public class RoundtripController extends AbstractController {
+@Path("secured/resource/roundtrip")
+public class RoundtripService extends AbstractRestService {
 
 	@Inject
 	private RoundtripRepository roundtripRepository;
   
   @Inject
-  private BpmnDiagramController bpmnDiagramController;
+  private BpmnDiagramService bpmnDiagramController;
   
   @GET
   public List<RoundtripDTO> list() {

@@ -11,7 +11,7 @@ import com.camunda.fox.cycle.entity.BpmnDiagram.Status;
 public class BpmnDiagramDTO {
   
   private Long id;
-  private String modeller;
+  private String modeler;
   private String diagramPath;
 
   private Status status;
@@ -20,7 +20,7 @@ public class BpmnDiagramDTO {
   
   public BpmnDiagramDTO(BpmnDiagram diagram) {
     this.id = diagram.getId();
-    this.modeller = diagram.getModeller();
+    this.modeler = diagram.getModeler();
     this.diagramPath = diagram.getDiagramPath();
     
     this.status = diagram.getStatus();
@@ -34,12 +34,12 @@ public class BpmnDiagramDTO {
     this.id = id;
   }
   
-  public String getModeller() {
-    return modeller;
+  public String getModeler() {
+    return modeler;
   }
 
-  public void setModeller(String modeller) {
-    this.modeller = modeller;
+  public void setModeler(String modeler) {
+    this.modeler = modeler;
   }
 
   public Status getStatus() {

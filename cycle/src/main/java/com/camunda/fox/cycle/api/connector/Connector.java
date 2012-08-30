@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.camunda.fox.cycle.entity.ConnectorConfiguration;
+
 
 public abstract class Connector {
   
@@ -12,6 +14,7 @@ public abstract class Connector {
   
   private String connectorId;
   private String name;
+  private ConnectorConfiguration configuration;
   
   public abstract List<ConnectorNode> getChildren(ConnectorNode parent);
   
@@ -88,5 +91,13 @@ public abstract class Connector {
   
   public void setConfigurationValues(Map<String, Object> configurationValues) {
     this.configurationValues = configurationValues;
+  }
+
+  public ConnectorConfiguration getConfiguration() {
+    return configuration;
+  }
+
+  public void setConfiguration(ConnectorConfiguration configuration) {
+    this.configuration = configuration;
   }
 }
