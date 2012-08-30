@@ -87,7 +87,7 @@ function RoundtripDetailsController($scope, $routeParams, RoundtripDetails, app,
   }
 
   function getModelerNames() {
-    $http.get('../../resources/diagram/modelerNames').success(function(data) {
+    $http.get(app.uri('secured/resource/diagram/modelerNames')).success(function(data) {
       $scope.modelerNames = data;
       // set default value, when only one entry
       if (data.length == 1) {
@@ -186,10 +186,10 @@ function CreateNewRoundtripController($scope, $q, $http, $location, debouncer, a
   };
   
   var checkName = debouncer.debounce(function(name) {
-    isNameValid(name).then(function() {
-      $scope.newRoundtripForm.name.$setValidity("occupied", true);
-    }, function() {
-      $scope.newRoundtripForm.name.$setValidity("occupied", false);
+    isNameValid(name).then(function(valid) {
+      if ($scope.newRoundtripForm.name) {
+        $scope.newRoundtripForm.name.$setValidity("occupied", !valid);
+      }
     });
   }, 1000);
   
@@ -201,11 +201,7 @@ function CreateNewRoundtripController($scope, $q, $http, $location, debouncer, a
     }
     
     $http.get(app.uri("secured/resource/roundtrip/isNameValid?name=" + name)).success(function(data) {
-      if (data == "true") {
-        deferred.resolve();
-      } else {
-        deferred.reject();
-      }
+      deferred.resolve((data == "true"));
     });
     
     return deferred.promise;
