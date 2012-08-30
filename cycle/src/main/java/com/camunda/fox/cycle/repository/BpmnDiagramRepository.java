@@ -26,6 +26,6 @@ public class BpmnDiagramRepository extends AbstractRepository<BpmnDiagram> {
 //    modelerNames.add("Fox designer");
 //
 //    return modelerNames;
-    return em.createQuery("SELECT DISTINCT b.modeller FROM BpmnDiagram b", String.class).getResultList();
+    return em.createQuery("SELECT DISTINCT b.modeler FROM BpmnDiagram b", String.class).getResultList();
   }
 }

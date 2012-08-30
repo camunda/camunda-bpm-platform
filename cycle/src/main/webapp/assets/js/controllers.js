@@ -131,12 +131,12 @@ function RoundtripDetailsController($scope, $routeParams, RoundtripDetails, app,
     if ($scope.side == 'leftHandSide') {
       $scope.roundtrip.leftHandSide = {
         diagramPath: $scope.selectedTreeItem.path,
-        modeller: $scope.modelerName
+        modeler: $scope.modelerName
       }
     } else {
       $scope.roundtrip.rightHandSide = {
         diagramPath: $scope.selectedTreeItem.path,
-        modeller: $scope.modelerName
+        modeler: $scope.modelerName
       }
     }
     $scope.roundtrip.$save();

@@ -79,7 +79,7 @@ public class BpmnDiagramService {
    * @param data
    */
   private void update(BpmnDiagram diagram, BpmnDiagramDTO data) {
-    diagram.setModeller(data.getModeller());
+    diagram.setModeler(data.getModeler());
     diagram.setDiagramPath(data.getDiagramPath());
   }
   

@@ -43,9 +43,9 @@ angular
       }
     };
   })
-  .factory('Roundtrip', function($resource){
-    return $resource('../../resources/roundtrip/:id', {id: "@id"}, {});
+  .factory('Roundtrip', function($resource, app){
+    return $resource(app.uri('secured/resource/roundtrip/:id'), {id: "@id"}, {});
   })
-  .factory('RoundtripDetails', function($resource){
-    return $resource('../../resources/roundtrip/:id/details', {id: "@id"}, {});
+  .factory('RoundtripDetails', function($resource, app){
+    return $resource(app.uri('secured/resource/roundtrip/:id/details'), {id: "@id"}, {});
   });
