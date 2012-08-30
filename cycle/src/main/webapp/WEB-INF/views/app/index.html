@@ -33,7 +33,7 @@
             </ul>
             <!-- begin create-roundtrip-dialog -->
             <dialog model="newRoundtripDialog" ng-cloak>
-              <div class="modal" ng-controller="CreateNewRoundtripController">
+              <div class="modal" ng-controller="CreateNewRoundtripController" ngm-if="newRoundtripDialog.renderHtml()">
                 <div class="modal-header">
                   <a class="close" data-dismiss="modal">&times;</a>
                   <h3 th:text="#{Create roundtrip}">Create roundtrip</h3>

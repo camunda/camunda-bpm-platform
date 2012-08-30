@@ -128,7 +128,7 @@ angular
  * and allows it to control it via a explicitly specified model.
  * 
  * <dialog model="aModel">
- *   <div class="model">
+ *   <div class="model" ngm-if="aModel.renderHtml()">
  *     <!-- dialog contents ... -->
  *   </div>
  * </dialog>
@@ -141,60 +141,6 @@ angular
  *   // Or inside the dialog: 
  *   $model.close();
  * </script>
- * 
- * Inside the dialog it exposed the dialog model via the $model directive.
- * 
- * Controllers added inside a dialog may not rely on the normal parent / child scope relationship.
- * Instead they have to await the change of the $scope.data attribute which exposes the dialogs
- * model data to the controllers scope. 
- * 
- * Assume we have a controller <code>ParentController</code> and a controller <code>ChildController</code>. 
- * The dialog controller is defined in a subscope of the parent controller's scope, but inside a <dialog/> tag. 
- * 
- * Let's have a look at the following markup: 
- * 
- * <div ng-controller="ParentController">
- *   <dialog>
- *     <div class="modal" ng-controller="ChildController">
- *       <!-- dialog contents -->
- *     </div>
- *   </dialog>
- * </div>
- * 
- * The following controller definition does not work: 
- * 
- * function ParentController($scope) {
- *   $scope.name = "FOO";
- *   
- *   $scope.childDialog = new Dialog();
- *   // ...
- *   $scope.childDialog.open();
- * }
- * 
- * function ChildController($scope) {
- *   $scope.name; // is undefined, because parent and child are isolated
- * }
- * 
- * Instead the following must be done: 
- * 
- * function ParentController($scope) {
- *   $scope.name = "FOO";
- *   
- *   $scope.childDialog = new Dialog();
- *   // ...
- *   
- *   // Publish the name to the in-dialog controller
- *   $scope.childDialog.open({ name: $scope.name });
- * }
- * 
- * function ChildController($scope) {
- * 
- *   // And wait for the dialog data to initialize, 
- *   // which signals that the elements passed via open(data) was were bound to the current scope
- *   $scope.watch("data", function() {
- *     $scope.name; // "FOO";
- *   });
- * }
  */
 .directive('dialog', function($http, $timeout) {
   return {
@@ -203,8 +149,8 @@ angular
       $model: '=model'
     }, 
     transclude: true, 
-    template: '<div ngm-if="$model.renderHtml()" ng-transclude />', 
-    link:  function(scope, element, attrs) {
+    template: '<div ng-transclude />', 
+    link: function(scope, element, attrs) {
       /**
        * Obtain the dialog
        * @returns the dialog instance as a jQuery object
@@ -219,22 +165,6 @@ angular
        */
       function model() {
         return scope.$model;
-      }
-
-      function populateScope() {
-        var m = model();
-        if (m) {
-          /**
-           * Establish a uni-directional binding between this scope and
-           * data defined in the dialog model
-           */
-          angular.forEach(m.data || {}, function(element, name) {
-            console.log("Add scope var", name, element);
-            scope[name] = element;
-          });
-          
-          scope.data = m.data || {};
-        }
       }
       
       /**
@@ -284,8 +214,6 @@ angular
         //  ^ dialog closed (no html)    ^ dialog closing
         switch (newValue) {
           case "opening": 
-            populateScope();
-            
             // dialog about to show and markup will be ready, soon
             // asynchronously initialize dialog and register events            
             $timeout(initAndShow);
@@ -307,13 +235,8 @@ function Dialog() {
   
   var self = this;
   self.status = "closed";
-  self.data = {};
   
-  this.open = function(data) {
-    if (data) {
-      self.data = data;
-    }
-    
+  this.open = function() {
     self.status = "opening";
   };
 

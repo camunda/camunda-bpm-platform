@@ -82,6 +82,7 @@ public class RoundtripService extends AbstractRestService {
       throw new IllegalArgumentException("Not found");
     }
     
+    System.out.println("Received roundtrip data with left:" + data.getLeftHandSide() + " and right:" + data.getRightHandSide());
     if (data.getLeftHandSide() != null) {
       BpmnDiagram leftHandSide = bpmnDiagramController.createOrUpdate(data.getLeftHandSide());
       roundtrip.setLeftHandSide(leftHandSide);

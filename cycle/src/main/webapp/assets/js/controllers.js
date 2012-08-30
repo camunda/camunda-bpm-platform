@@ -55,11 +55,10 @@ function RoundtripDetailsController($scope, $routeParams, RoundtripDetails, app,
   $scope.editDiagramDialog = new Dialog();
   
   $scope.addDiagram = function(side) {
-    $scope.editDiagramDialog.open({
-      editSide: side, 
-      roundtrip: $scope.roundtrip,
-      diagram: $scope.roundtrip[side]
-    });
+    $scope.editDiagram = $scope.roundtrip[side];
+    $scope.editSide = side;
+    
+    $scope.editDiagramDialog.open();
   };
 };
 
@@ -69,7 +68,16 @@ function EditDiagramController($scope, $q, $http, debouncer, app) {
   $scope.connectors = [];
   
   $scope.selectedTreeItem = null;
-  $scope.editDiagram = null;
+  
+  // make a copy of the diagram to edit / add
+  $scope.diagram = angular.copy($scope.editDiagram || {});
+  
+  // set modeler name as fox designer whenever a right hand side 
+  // diagram with no name is edited
+  // relaxed implements AT in HEMERA-2549
+  if ($scope.editSide == 'rightHandSide' && !$scope.diagram.modelerName) {
+    $scope.diagram.modelerName = 'fox designer';
+  }
   
   function getModelerNames() {
     $http.get(app.uri('secured/resource/diagram/modelerNames')).success(function(data) {
@@ -87,24 +95,6 @@ function EditDiagramController($scope, $q, $http, debouncer, app) {
     });
   }
   
-  /**
-   * Watch the data attribute to recognize changes in
-   * the data bound to the underlaying dialog model
-   */
-  $scope.$watch('data', function(data) {
-    if (data) {
-      // set modeler name as fox designer whenever a right hand side 
-      // diagram with no name is edited
-      // relaxed implements AT in HEMERA-2549
-      if ($scope.editSide == 'rightHandSide' && !$scope.diagram.modelerName) {
-        $scope.diagram.modelerName = 'fox designer';
-      }
-      
-      // make a copy of the diagram to edit / add
-      $scope.editDiagram = angular.copy($scope.diagram || {});
-    }
-  });
-  
   $scope.$watch('selectedTreeItem', function(newValue) {
     if (newValue) {
       console.log("selectedTreeItem: " + newValue.name)
@@ -112,19 +102,16 @@ function EditDiagramController($scope, $q, $http, debouncer, app) {
   });
 
   $scope.cancel = function() {
-    $scope.$model.close();
+    $scope.editDiagramDialog.close();
   };
   
   /**
    * Saves the roundtrip with updated details
    */
   $scope.save = function() {
-//    if (!$scope.addModelRoundtripForm.$valid) {
-//      return;
-//    }
-
+    
     console.log("Saving " + $scope.selectedTreeItem + " to Roundtrip " + $scope.roundtrip.name);
-    if ($scope.side == 'leftHandSide') {
+    if ($scope.editSide == 'leftHandSide') {
       $scope.roundtrip.leftHandSide = {
         diagramPath: $scope.selectedTreeItem.id,
         modeler: $scope.modelerName
@@ -136,7 +123,7 @@ function EditDiagramController($scope, $q, $http, debouncer, app) {
       }
     }
     $scope.roundtrip.$save();
-    resetModal();
+    $scope.editDiagramDialog.close();
   };
 
   $scope.changeConnector = function () {
@@ -168,7 +155,7 @@ function CreateNewRoundtripController($scope, $q, $http, $location, debouncer, a
   });
   
   $scope.cancel = function() {
-    $scope.$model.close();
+    $scope.newRoundtripDialog.close();
   };
   
   $scope.save = function() {
@@ -182,7 +169,7 @@ function CreateNewRoundtripController($scope, $q, $http, $location, debouncer, a
       $scope.$emit("roundtrip-added", roundtrip);
     });
 
-    $scope.$model.close();
+    $scope.newRoundtripDialog.close();
   };
   
   var checkName = debouncer.debounce(function(name) {

@@ -62,7 +62,7 @@
 
   <!-- begin add-model-roundtrip-dialog -->
   <dialog model="editDiagramDialog" ng-cloak>
-    <div class="modal" ng-controller="EditDiagramController">
+    <div class="modal" ng-controller="EditDiagramController" ngm-if="editDiagramDialog.renderHtml()">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal">&times;</button>
         <h3 th:text="#{Add file}">Add file</h3>
@@ -73,7 +73,8 @@
             <div class="control-group">
               <label class="control-label" for="input01" th:text="#{Modeler Name}">Modeler Name</label>
               <div class="controls">
-                <input ngm-if="editSide == 'leftHandSide'" class="span8" data-typeahead data-values="modelerNames" ng-model="diagram.modelerName" name="modelerName" type="text" id="input01" required autofocus />
+                <!-- ads-data-typeahead data-values="modelerNames" -->
+                <input ngm-if="editSide == 'leftHandSide'" class="span8" ng-model="diagram.modelerName" name="modelerName" type="text" id="input01" required autofocus />
                 <input ngm-if="editSide == 'rightHandSide'" class="span8" ng-model="diagram.modelerName" name="modelerName" ng-disabled="true" type="text" id="input01" required />
                 <p class="alert alert-info" ng-show="diagram.modelerName == ''" th:text="#{Type in / choose the name of your modeler}">Type in / choose the name of your modeler</p>
               </div>
