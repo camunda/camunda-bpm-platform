@@ -74,6 +74,7 @@ public class VfsConnector extends Connector {
 
   }
 
+  @Secured
   @Override
   public InputStream getContent(ConnectorNode node) {
     try {
@@ -97,4 +98,13 @@ public class VfsConnector extends Connector {
   public void init(ConnectorConfiguration config) {
     this.basePath = config.getProperties().get(BASE_PATH_KEY);
   }
+
+  @Secured
+  @Override
+  public ConnectorNode getRoot() {
+    ConnectorNode rootNode = new ConnectorNode("/", "/");
+    rootNode.setType(ConnectorNodeType.FOLDER);
+    return rootNode;
+  }
+
 }

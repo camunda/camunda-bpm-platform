@@ -59,6 +59,13 @@ function RoundtripDetailsController($scope, $routeParams, RoundtripDetails, app,
   $scope.modelerNames = [];
   $scope.connectors = [];
   $scope.selectedTreeItem = undefined;
+  
+  // Error to be displayed in dialog
+  $scope.error = null;
+  
+  $scope.$on("component-error", function(event, error) {
+    $scope.error = error;
+  });
 
   function getModelerNames() {
     $http

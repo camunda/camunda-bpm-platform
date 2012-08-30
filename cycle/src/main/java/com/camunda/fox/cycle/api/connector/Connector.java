@@ -5,15 +5,13 @@ import java.util.List;
 
 import com.camunda.fox.cycle.entity.ConnectorConfiguration;
 
-/**
- * 
- * @author drobisch
- *
- */
+
 public abstract class Connector {
   private ConnectorConfiguration configuration;
   
   public abstract List<ConnectorNode> getChildren(ConnectorNode parent);
+  
+  public abstract ConnectorNode getRoot();
   
   public abstract InputStream getContent(ConnectorNode node);
   

@@ -10,6 +10,7 @@ import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.MapKeyColumn;
 import javax.persistence.Table;
+import com.camunda.fox.cycle.api.connector.ConnectorLoginMode;
 
 @Entity
 @Table(name = "cy_connector_config")
@@ -23,6 +24,7 @@ public class ConnectorConfiguration extends AbstractEntity {
   private String globalPassword;
   
   private String label;
+  private ConnectorLoginMode loginMode;
 
   @ElementCollection
   @MapKeyColumn(name = "name")
@@ -73,6 +75,14 @@ public class ConnectorConfiguration extends AbstractEntity {
   
   public void setId(Long id) {
     this.id = id;
+  }
+
+  public ConnectorLoginMode getLoginMode() {
+    return loginMode;
+  }
+
+  public void setLoginMode(ConnectorLoginMode loginMode) {
+    this.loginMode = loginMode;
   }
 
 }

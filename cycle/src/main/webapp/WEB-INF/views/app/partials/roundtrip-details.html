@@ -67,6 +67,14 @@
       <h3 th:text="#{Add file}">Add file</h3>
     </div>
     <div class="modal-body">
+      <div class="alert alert-error" ng-show="error">
+        <button type="button" class="close" data-dismiss="alert">×</button>
+        <span ng-switch ng-switch-on="error.component"> <strong
+          ng-switch-when="tree"
+          th:text="#{A problem occured when updating the tree}"></strong> <strong
+          ng-switch-default th:text="#{A problem occured}"></strong>
+        </span> {{error.message}}
+      </div>
       <form class="form-horizontal" novalidate ng-submit="save()" name="addModelRoundtripForm">
         <fieldset>
           <div class="control-group">

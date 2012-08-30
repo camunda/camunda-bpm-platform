@@ -49,7 +49,12 @@ angular
 								        	//	entry["id"] = entry["name"];
 								        	//});
 								        	return childData;
-								        });
+                        },
+                        function(error) {
+                          var e = error.response.data;
+                          e.component = "tree";
+                          scope.$emit("component-error", e);
+                        });
 							        }
 							    });
 								
@@ -85,10 +90,11 @@ angular
 							    tree.placeAt(element[0]);
 							    tree.startup();
 							},
-							function(error){
-								console.log("An error occurred: " + error);
-								alert(error);
-							});
+  							function(error){
+                  var e = error.response.data;
+                  e.component = "tree";
+                  scope.$emit("component-error", e);
+  							});
 				    	}
 				    });
 				});

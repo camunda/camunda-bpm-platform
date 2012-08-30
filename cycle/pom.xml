@@ -28,7 +28,6 @@
       <groupId>org.springframework</groupId>
       <artifactId>spring-aop</artifactId>
     </dependency>
-    
 
     <!-- CGLIB for various things including @Transactional and spring-data-jpa -->
     <dependency>
