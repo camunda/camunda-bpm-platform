@@ -1,4 +1,4 @@
-package com.camunda.fox.cycle.web.controller.resource;
+package com.camunda.fox.cycle.web.service.resource;
 
 import java.util.Date;
 import com.camunda.fox.cycle.repository.*;
@@ -32,16 +32,16 @@ public class RoundtripControllerTest {
 
   @Inject
   private RoundtripRepository roundtripRepository;
-  
+
   @Inject
-  private RoundtripController roundtripController;
-  
+  private RoundtripService roundtripController;
+
   @After
   public void after() {
     // Remove all entities
     roundtripRepository.deleteAll();
   }
-  
+
   @Test
   public void shouldCreateRoundtrip() throws Exception {
     // given
@@ -53,7 +53,7 @@ public class RoundtripControllerTest {
     // then
     assertThat(createdData.getId(), notNullValue());
   }
-  
+
   @Test
   public void shouldUpdateRoundtripDetails() throws Exception {
     // given
@@ -70,24 +70,24 @@ public class RoundtripControllerTest {
     assertThat(createdData.getLeftHandSide().getId(), is(notNullValue()));
     assertThat(createdData.getRightHandSide().getId(), is(notNullValue()));
   }
-  
+
   private RoundtripDTO createTestRoundtripDTO() {
     RoundtripDTO dto = new RoundtripDTO();
     dto.setLastSync(new Date());
     dto.setName("Test Roundtrip");
     return dto;
   }
-  
+
   private RoundtripDTO createTestRoundtripDTOWithDetails() {
     RoundtripDTO dto = createTestRoundtripDTO();
     
     BpmnDiagramDTO rhs = new BpmnDiagramDTO();
     rhs.setDiagramPath("foo/bar");
-    rhs.setModeller("Fox modeller");
+    rhs.setModeler("Fox modeler");
     
     BpmnDiagramDTO lhs = new BpmnDiagramDTO();
     lhs.setDiagramPath("foo/foo");
-    lhs.setModeller("Another Modeller");
+    lhs.setModeler("Another Modeler");
     
     dto.setRightHandSide(rhs);
     dto.setLeftHandSide(lhs);

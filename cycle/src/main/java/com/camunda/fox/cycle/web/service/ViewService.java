@@ -1,4 +1,4 @@
-package com.camunda.fox.cycle.web.controller;
+package com.camunda.fox.cycle.web.service;
 
 
 import javax.ws.rs.GET;
@@ -14,7 +14,7 @@ import javax.ws.rs.core.MediaType;
  * @author nico.rehwaldt
  */
 @Path("secured/view")
-public class ViewController extends AbstractController {
+public class ViewService extends AbstractRestService {
   
   @GET
 	@Path("{name:[\\S]+}")

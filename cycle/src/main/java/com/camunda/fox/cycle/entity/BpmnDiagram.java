@@ -21,7 +21,7 @@ public class BpmnDiagram extends AbstractEntity {
     WARNING
   }
   
-  private String modeller;
+  private String modeler;
   
   private String diagramPath;
   
@@ -30,8 +30,8 @@ public class BpmnDiagram extends AbstractEntity {
   
   public BpmnDiagram() { }
   
-  public BpmnDiagram(String modeller, String diagramPath) {
-    this.modeller = modeller;
+  public BpmnDiagram(String modeler, String diagramPath) {
+    this.modeler = modeler;
     this.diagramPath = diagramPath;
   }
 
@@ -43,12 +43,12 @@ public class BpmnDiagram extends AbstractEntity {
     this.diagramPath = diagramPath;
   }
 
-  public void setModeller(String modeller) {
-    this.modeller = modeller;
+  public void setModeler(String modeler) {
+    this.modeler = modeler;
   }
 
-  public String getModeller() {
-    return modeller;
+  public String getModeler() {
+    return modeler;
   }
 
   public Status getStatus() {
