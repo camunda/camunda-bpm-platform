@@ -11,19 +11,16 @@ public class ConnectorNodeDTO {
 
   private String id;
   private String label;
-  private String path;
   private ConnectorNodeType type;
 
   public ConnectorNodeDTO() {
   }
 
   public ConnectorNodeDTO(ConnectorNode connectorNode) {
-    id = connectorNode.getName();
+    id = connectorNode.getId();
     label = connectorNode.getLabel();
-    path = connectorNode.getPath();
     setType(connectorNode.getType());
   }
-  
   
   public String getId() {
     return id;
@@ -43,14 +40,6 @@ public class ConnectorNodeDTO {
     this.label = label;
   }
 
-  public String getPath() {
-    return path;
-  }
-
-  public void setPath(String path) {
-    this.path = path;
-  }
-  
   public ConnectorNodeType getType() {
     return type;
   }

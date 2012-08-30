@@ -3,10 +3,13 @@ package com.camunda.fox.cycle.api.connector;
 import java.io.InputStream;
 import java.util.List;
 
+import com.camunda.fox.cycle.entity.ConnectorConfiguration;
+
 
 public abstract class Connector {
   private String connectorId;
   private String name;
+  private ConnectorConfiguration configuration;
   
   public abstract List<ConnectorNode> getChildren(ConnectorNode parent);
   
@@ -37,5 +40,13 @@ public abstract class Connector {
   
   public void login(String userName, String password) {
     
+  }
+
+  public ConnectorConfiguration getConfiguration() {
+    return configuration;
+  }
+
+  public void setConfiguration(ConnectorConfiguration configuration) {
+    this.configuration = configuration;
   }
 }

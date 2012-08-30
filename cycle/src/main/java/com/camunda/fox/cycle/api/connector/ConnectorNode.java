@@ -18,6 +18,10 @@ public class ConnectorNode {
   public ConnectorNode() {
   }
   
+  public ConnectorNode(String id) {
+    this.setId(id);
+  }
+  
   public ConnectorNode(String id, String label) {
     this.setId(id);
     this.setLabel(label);

@@ -130,12 +130,12 @@ function RoundtripDetailsController($scope, $routeParams, RoundtripDetails, app,
     console.log("Saving " + $scope.selectedTreeItem + " to Roundtrip " + $scope.roundtrip.name);
     if ($scope.side == 'leftHandSide') {
       $scope.roundtrip.leftHandSide = {
-        diagramPath: $scope.selectedTreeItem.path,
+        diagramPath: $scope.selectedTreeItem.id,
         modeler: $scope.modelerName
       }
     } else {
       $scope.roundtrip.rightHandSide = {
-        diagramPath: $scope.selectedTreeItem.path,
+        diagramPath: $scope.selectedTreeItem.id,
         modeler: $scope.modelerName
       }
     }
