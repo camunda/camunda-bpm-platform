@@ -34,4 +34,8 @@ public abstract class Connector {
   public void setConnectorId(String connectorId) {
     this.connectorId = connectorId;
   }
+  
+  public void login(String userName, String password) {
+    
+  }
 }

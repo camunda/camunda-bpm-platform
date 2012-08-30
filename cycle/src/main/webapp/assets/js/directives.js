@@ -39,15 +39,15 @@ angular
 							        data: requestData,
 							        getChildren: function(object) {
 							        	return request.post(app.uri("secured/resource/connector/" + newValue.connectorId + "/tree/children"), {
-								            data : {"parent" : object.name, "parentPath" : object.path},
+								            data : {"parent" : object.id, "parentPath" : object.path},
 							        		handleAs: "json"
 								        }).then(function(childData){
 								        	/**
 								        	 * Dojo Tree will behave strange / loop forever without id attribute
 								        	 */
-								        	array.forEach(childData, function (entry, index) {
-								        		entry["id"] = entry["name"];
-								        	});
+								        	//array.forEach(childData, function (entry, index) {
+								        	//	entry["id"] = entry["name"];
+								        	//});
 								        	return childData;
 								        });
 							        }
@@ -58,7 +58,7 @@ angular
 								// Create the model
 							    var treeModel = new ObjectStoreModel({
 							        store: observableStore,
-							        query: {name: '/'},
+							        query: {id: '/'},
 							        labelAttr : "label",
 							        mayHaveChildren: function(item){
 							            return item.type=="FOLDER";
@@ -78,7 +78,9 @@ angular
 								       onClick: function(item){
 								    	   scope.selected = item;
 								    	   scope.$digest();
-							           }
+							           },
+							           showRoot: false,
+							           persist: false
 							       });
 							    tree.placeAt(element[0]);
 							    tree.startup();

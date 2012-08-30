@@ -16,6 +16,7 @@ import com.camunda.fox.cycle.api.connector.ConnectorNode;
 import com.camunda.fox.cycle.api.connector.ConnectorNode.ConnectorNodeType;
 import com.camunda.fox.cycle.connector.ConnectorRegistry;
 import com.camunda.fox.cycle.web.dto.ConnectorDTO;
+import com.camunda.fox.cycle.web.dto.ConnectorNodeDTO;
 
 @Path("secured/resource/connector")
 public class ConnectorService {
@@ -37,21 +38,21 @@ public class ConnectorService {
   @GET
   @Path("{id}/tree/root")
   @Produces("application/json")
-  public List<ConnectorNode> tree(@PathParam("id") String connectorId) {
+  public List<ConnectorNodeDTO> tree(@PathParam("id") String connectorId) {
     ArrayList<ConnectorNode> rootList = new ArrayList<ConnectorNode>();
     ConnectorNode rootNode = new ConnectorNode("/", "/");
     rootNode.setLabel(connectorId);
     rootNode.setType(ConnectorNodeType.FOLDER);
     rootList.add(rootNode);
-    return rootList;
+    return ConnectorNodeDTO.wrapAll(rootList);
   }
   
   @POST
   @Path("{id}/tree/children")
   @Produces("application/json")
-  public List<ConnectorNode> children(@PathParam("id") String connectorId, @FormParam("parent") String parent, @FormParam("parentPath") String parentPath) {
+  public List<ConnectorNodeDTO> children(@PathParam("id") String connectorId, @FormParam("parent") String parent, @FormParam("parentPath") String parentPath) {
     Connector connector = connectorRegistry.getSessionConnectorMap().get(connectorId);
-    return connector.getChildren(new ConnectorNode(parentPath, parent));
+    return ConnectorNodeDTO.wrapAll(connector.getChildren(new ConnectorNode(parentPath, parent)));
   }
   
 }

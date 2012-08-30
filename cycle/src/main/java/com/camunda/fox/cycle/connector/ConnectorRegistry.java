@@ -8,6 +8,7 @@ import java.util.Map.Entry;
 
 import javax.inject.Inject;
 
+import org.springframework.aop.aspectj.annotation.AspectJProxyFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.WebApplicationContext;
 
 import com.camunda.fox.cycle.api.connector.Connector;
+import com.camunda.fox.cycle.aspect.LoginAspect;
 
 @Component
 @Scope(value = WebApplicationContext.SCOPE_SESSION, proxyMode = ScopedProxyMode.TARGET_CLASS)
@@ -23,6 +25,12 @@ public class ConnectorRegistry {
   @Inject
   ApplicationContext appContext;
   
+  @Inject
+  LoginAspect loginAspect;
+  
+  /**
+   * Get the connector singletons from application context
+   */
   @Inject
   Map<String ,Connector> connectors;
   
@@ -39,7 +47,10 @@ public class ConnectorRegistry {
       sessionConnectors = new ArrayList<Connector>();
       for (Entry<String, Connector> connector : connectors.entrySet()) {
         try {
-          Connector newConnectorInstance = (Connector) connector.getValue().getClass().newInstance();
+          AspectJProxyFactory factory = new AspectJProxyFactory(connector.getValue().getClass().newInstance()); 
+          factory.addAspect(loginAspect);
+          Connector newConnectorInstance = factory.getProxy();
+          
           // TODO set name / configuration from user configuration entities
           newConnectorInstance.setConnectorId(connector.getKey());
           newConnectorInstance.setName(connector.getKey());
