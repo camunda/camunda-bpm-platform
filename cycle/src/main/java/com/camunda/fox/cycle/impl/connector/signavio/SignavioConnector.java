@@ -47,6 +47,7 @@ public class SignavioConnector extends Connector {
   private static final String WARNING_SNIPPET = "<div id=\"warning\">([^<]+)</div>";
   
   private SignavioClient signavioClient;
+  private boolean loggedIn = false;
 
   @Override
   public void login(String username, String password) {
@@ -64,6 +65,12 @@ public class SignavioConnector extends Connector {
       String errorMessage = matcher.group(1);
       throw new RepositoryException(errorMessage);
     }
+    this.loggedIn = true;
+  }
+  
+  @Override
+  public boolean needsLogin() {
+    return !loggedIn;
   }
   
   private void initializeSignavioClient() {
@@ -103,7 +110,7 @@ public class SignavioConnector extends Connector {
         }
       }
     } catch (Exception e) {
-      throw new RepositoryException("Children for Signavio connector with id '" + this.getConnectorId() + "' could not be loaded in repository '" + parent.getId() + "'.", e);
+      throw new RepositoryException("Children for Signavio connector '" + this.getConfiguration().getLabel() + "' could not be loaded in repository '" + parent.getId() + "'.", e);
     }
     return nodes;
   }

@@ -25,19 +25,29 @@
   </context:component-scan>
   
   <bean name="vfsConnector" class="com.camunda.fox.cycle.connector.VfsConnector">
-    <property name="name" value="VFS Connector" />
-    <property name="configuration" ref="vfsConnectorConfig"/>
+  </bean>
+
+  <bean name="vfsConnectorConfig" class="com.camunda.fox.cycle.entity.ConnectorConfiguration">
+    <property name="id" value="1"/>
+    <property name="label" value="VFS Connector"/>
+    <property name="connectorClass" value="com.camunda.fox.cycle.connector.VfsConnector"/>
+    <property name="properties">
+      <map>
+        <entry key="BASE_PATH" value="file:///home/drobisch/cycle/"/>
+      </map>
+    </property>
   </bean>
   
   <bean name="signavioConnector" class="com.camunda.fox.cycle.impl.connector.signavio.SignavioConnector">
-    <property name="name" value="My SignavioConnector" />
-    <property name="configuration" ref="signavioConfig" />
   </bean>
   
   <bean name="signavioConfig" class="com.camunda.fox.cycle.entity.ConnectorConfiguration">
+    <property name="id" value="2"/>
+    <property name="label" value="My SignavioConnector"/>
+    <property name="connectorClass" value="com.camunda.fox.cycle.impl.connector.signavio.SignavioConnector"/>
     <property name="loginMode" value="GLOBAL" />
     <property name="globalUser" value="test@camunda.com" />
-    <property name="globalPassword" value="testtest1" />
+    <property name="globalPassword" value="testtest" />
     <property name="properties">
       <map>
         <entry key="signavioBaseUrl" value="http://vm2.camunda.com:8080"></entry>
