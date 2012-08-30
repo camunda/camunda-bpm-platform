@@ -17,6 +17,10 @@ public abstract class Connector {
   
   public void login(String userName, String password) {
   }
+  
+  public boolean needsLogin() {
+    return false;
+  }
 
   public ConnectorConfiguration getConfiguration() {
     return configuration;

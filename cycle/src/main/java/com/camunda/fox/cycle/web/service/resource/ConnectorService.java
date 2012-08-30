@@ -37,7 +37,7 @@ public class ConnectorService {
   @GET
   @Path("{id}/tree/root")
   @Produces("application/json")
-  public List<ConnectorNodeDTO> root(@PathParam("id") String connectorId) {
+  public List<ConnectorNodeDTO> root(@PathParam("id") Long connectorId) {
     Connector connector = connectorRegistry.getSessionConnectorMap().get(connectorId);
     List<ConnectorNode> rootList = new ArrayList<ConnectorNode>();
     rootList.add(connector.getRoot());
