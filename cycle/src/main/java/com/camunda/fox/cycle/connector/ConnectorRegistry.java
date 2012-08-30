@@ -58,8 +58,9 @@ public class ConnectorRegistry {
           // TODO set name / configuration from user configuration entities
           newConnectorInstance.setConnectorId(connector.getKey());
           newConnectorInstance.setName(connector.getKey());
-          
-          newConnectorInstance.setConfigurationValues(connector.getValue().getConfigurationValues());
+
+          newConnectorInstance.setConfiguration(connector.getValue().getConfiguration());
+          loginAspect.getConnectorLoggedIn().put(newConnectorInstance.getConnectorId(), false);
           
           sessionConnectorMap.put(connector.getKey(), newConnectorInstance);
         } catch (Exception e) {

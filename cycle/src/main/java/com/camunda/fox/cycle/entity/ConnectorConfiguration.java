@@ -12,6 +12,8 @@ import javax.persistence.MapKeyColumn;
 import javax.persistence.Table;
 import javax.persistence.UniqueConstraint;
 
+import com.camunda.fox.cycle.api.connector.ConnectorLoginMode;
+
 @Entity
 @Table(name = "cy_connector_config", uniqueConstraints = { @UniqueConstraint(columnNames = { "connectorId", "id" }) })
 public class ConnectorConfiguration extends AbstractEntity {
@@ -22,6 +24,7 @@ public class ConnectorConfiguration extends AbstractEntity {
 
   private String globalUser;
   private String globalPassword;
+  private ConnectorLoginMode loginMode;
 
   @ElementCollection
   @MapKeyColumn(name = "name")
@@ -60,6 +63,14 @@ public class ConnectorConfiguration extends AbstractEntity {
 
   public void setProperties(Map<String, String> properties) {
     this.properties = properties;
+  }
+
+  public ConnectorLoginMode getLoginMode() {
+    return loginMode;
+  }
+
+  public void setLoginMode(ConnectorLoginMode loginMode) {
+    this.loginMode = loginMode;
   }
 
 }

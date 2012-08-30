@@ -14,16 +14,18 @@
 
   <context:annotation-config/>
   
-  <!-- 
-    configured to pick up @Path and @Provider annotated classes as spring beans, too 
-    so that there is no need for additional annotations
-  -->
-  
   <bean name="signavioConnector" class="com.camunda.fox.cycle.impl.connector.signavio.SignavioConnector">
     <property name="name" value="My SignavioConnector" />
-    <property name="configurationValues">
+    <property name="configuration" ref="signavioConfig" />
+  </bean>
+  
+  <bean name="signavioConfig" class="com.camunda.fox.cycle.entity.ConnectorConfiguration">
+    <property name="loginMode" value="GLOBAL" />
+    <property name="globalUser" value="test@camunda.com" />
+    <property name="globalPassword" value="testtest" />
+    <property name="properties">
       <map>
-        <entry key="signavioBaseUrl" value="http://vm2.camunda.com:8080"/>      
+        <entry key="signavioBaseUrl" value="http://vm2.camunda.com:8080"></entry>
       </map>
     </property>
   </bean>

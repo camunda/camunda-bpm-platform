@@ -15,8 +15,8 @@ import org.apache.commons.vfs2.VFS;
 
 import com.camunda.fox.cycle.api.connector.Connector;
 import com.camunda.fox.cycle.api.connector.ConnectorNode;
-import com.camunda.fox.cycle.api.connector.Secured;
 import com.camunda.fox.cycle.api.connector.ConnectorNode.ConnectorNodeType;
+import com.camunda.fox.cycle.api.connector.Secured;
 import com.camunda.fox.cycle.exception.CycleException;
 
 public class VfsConnector extends Connector {
@@ -70,6 +70,7 @@ public class VfsConnector extends Connector {
 
   }
 
+  @Secured
   @Override
   public InputStream getContent(ConnectorNode node) {
     try {
@@ -88,4 +89,13 @@ public class VfsConnector extends Connector {
       throw new CycleException(e);
     }
   }
+
+  @Secured
+  @Override
+  public ConnectorNode getRoot() {
+    ConnectorNode rootNode = new ConnectorNode("/", "/");
+    rootNode.setType(ConnectorNodeType.FOLDER);
+    return rootNode;
+  }
+  
 }

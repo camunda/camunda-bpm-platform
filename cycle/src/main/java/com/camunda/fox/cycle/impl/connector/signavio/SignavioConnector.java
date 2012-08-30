@@ -24,7 +24,6 @@ import com.camunda.fox.cycle.api.connector.ConnectorNode;
 import com.camunda.fox.cycle.api.connector.ConnectorNode.ConnectorNodeType;
 import com.camunda.fox.cycle.api.connector.Secured;
 import com.camunda.fox.cycle.exception.RepositoryException;
-import com.camunda.fox.cycle.exception.RepositoryNodeNotFoundException;
 
 @Component
 public class SignavioConnector extends Connector {
@@ -45,6 +44,8 @@ public class SignavioConnector extends Connector {
   private static final String MODEL_URL_SUFFIX = "/model";
   private static final String DIRECTORY_URL_SUFFIX = "/directory";
 
+  private static final String WARNING_SNIPPET = "<div id=\"warning\">([^<]+)</div>";
+  
   private SignavioClient signavioClient;
 
   @Override
@@ -56,9 +57,9 @@ public class SignavioConnector extends Connector {
     
     String responseResult = this.extractResponseResult(response);
     if (responseResult == null || responseResult.equals("")) {
-      throw new RepositoryException("No Security Token received. The user name and/or password might be incorrect.");
+      throw new RepositoryException("Failed to login to connector. The user name and/or password might be incorrect.");
     }
-    Matcher matcher = Pattern.compile("<div id=\"warning\">([^<]+)</div>").matcher(responseResult);
+    Matcher matcher = Pattern.compile(WARNING_SNIPPET).matcher(responseResult);
     if (matcher.find()) {
       String errorMessage = matcher.group(1);
       throw new RepositoryException(errorMessage);
@@ -70,7 +71,7 @@ public class SignavioConnector extends Connector {
       ResteasyProviderFactory providerFactory = ResteasyProviderFactory.getInstance();
       RegisterBuiltin.register(providerFactory);
 
-      String signavioURL = (String) this.getConfigValue(CONFIG_KEY_SIGNAVIO_BASE_URL);
+      String signavioURL = (String) this.getConfiguration().getProperties().get(CONFIG_KEY_SIGNAVIO_BASE_URL);
       if (signavioURL.endsWith("/")) {
         signavioURL = signavioURL + REPOSITORY_BACKEND_URL_SUFFIX; 
       } else {
@@ -83,12 +84,10 @@ public class SignavioConnector extends Connector {
   @Secured
   @Override
   public List<ConnectorNode> getChildren(ConnectorNode parent) {
-    this.login("test@camunda.com", "testtest1"); // TODO: Remove it!
-    
     List<ConnectorNode> nodes = new ArrayList<ConnectorNode>();
     try {
       this.initializeSignavioClient();
-      String result = this.signavioClient.getChildren(parent.getPath());
+      String result = this.signavioClient.getChildren(parent.getId());
       JSONArray jsonArray = new JSONArray(result);
       for (int i = 0; i < jsonArray.length(); i++) {
         JSONObject jsonObj = jsonArray.getJSONObject(i);
@@ -97,18 +96,14 @@ public class SignavioConnector extends Connector {
         String relProp = jsonObj.getString(JSON_REL_PROP);
         if (relProp.equals(JSON_DIR_VALUE)) {
           newNode = this.createFolderNode(jsonObj);
-          
+          nodes.add(newNode);
         } else if (relProp.equals(JSON_MOD_VALUE)) {
           newNode = this.createModelNode(jsonObj);
-        }
-        if (newNode != null) {
-          newNode.setPath("/" + newNode.getName());
           nodes.add(newNode);
         }
       }
-      
     } catch (Exception e) {
-      throw new RepositoryNodeNotFoundException(this.getName(), ConnectorNode.class, parent.getName(), e);
+      throw new RepositoryException("Children for Signavio connector with id '" + this.getConnectorId() + "' could not be loaded in repository '" + parent.getId() + "'.", e);
     }
     return nodes;
   }
@@ -121,7 +116,7 @@ public class SignavioConnector extends Connector {
     
     String href = jsonObj.getString(JSON_HREF_PROP);
     href = href.replace(DIRECTORY_URL_SUFFIX, "");
-    newNode.setName(href.substring(1, href.length()));
+    newNode.setId(href);
     
     return newNode;
   }
@@ -134,7 +129,7 @@ public class SignavioConnector extends Connector {
     
     String href = jsonObj.getString(JSON_HREF_PROP);
     href = href.replace(MODEL_URL_SUFFIX, "");
-    newNode.setName(href.substring(1, href.length()));
+    newNode.setId(href);
     
     return newNode;
   }
@@ -163,12 +158,12 @@ public class SignavioConnector extends Connector {
     }
   }
 
+  @Secured
   @Override
   public InputStream getContent(ConnectorNode node) {
-    this.login("test@camunda.com", "testtest"); // TODO: Remove it!
     this.initializeSignavioClient();
     
-    return this.signavioClient.getContent(node.getName());
+    return this.signavioClient.getContent(node.getId());
   }
   
   private void releaseClientConnection(Response response) {
@@ -176,6 +171,14 @@ public class SignavioConnector extends Connector {
       ClientResponse<?> r = (ClientResponse<?>) response;
       r.releaseConnection();
     }
+  }
+
+  @Secured
+  @Override
+  public ConnectorNode getRoot() {
+    ConnectorNode rootNode = new ConnectorNode("/", "/");
+    rootNode.setType(ConnectorNodeType.FOLDER);
+    return rootNode;
   }
 
 }
