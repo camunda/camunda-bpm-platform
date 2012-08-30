@@ -17,7 +17,7 @@
           <span class="label">No model</span>
         </div>
         <div class="actions">
-          <button class="btn" ng-click="addBpmnModel('leftHandSide')" th:text="#{Add}">Add</button>
+          <button class="btn" ng-click="addDiagram('leftHandSide')" th:text="#{Add}">Add</button>
         </div>
       </div>
     </div>
@@ -54,52 +54,54 @@
           <span class="label">No model</span>
         </div>
         <div class="actions">
-          <button class="btn" ng-click="addBpmnModel('rightHandSide')" th:text="#{Add}">Add</button>
+          <button class="btn" ng-click="addDiagram('rightHandSide')" th:text="#{Add}">Add</button>
         </div>
       </div>
     </div>
   </div>
 
   <!-- begin add-model-roundtrip-dialog -->
-  <div class="modal" id="add-model-roundtrip-dialog" style="display: none;" data-ng-init="initModal()">
-    <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal">&times;</button>
-      <h3 th:text="#{Add file}">Add file</h3>
-    </div>
-    <div class="modal-body">
-      <form class="form-horizontal" novalidate ng-submit="save()" name="addModelRoundtripForm">
-        <fieldset>
-          <div class="control-group">
-            <label class="control-label" for="input01" th:text="#{Modeler Name}">Modeler Name</label>
-            <div class="controls">
-              <input ngm-if="side == 'leftHandSide'" class="span8" data-typeahead data-values="modelerNames" ng-model="modelerName" name="modelerName" type="text" id="input01" required autofocus />
-              <input ngm-if="side == 'rightHandSide'" class="span8" ng-model="modelerName" name="modelerName" ng-disabled="true" type="text" id="input01" required />
-              <p class="alert alert-info" ng-show="modelerName == ''" th:text="#{Type in / choose the name of your modeler}">Type in / choose the name of your modeler</p>
-            </div>
-          </div>
-          <div class="control-group">
-            <label class="control-label" for="connectors" th:text="#{Select Connector}">Select Connector</label>
-            <div class="controls">
-              <select id="connectors" class="span8" data-ng-model="connector" data-ng-options="c.name for c in connectors">
-              </select>
-            </div>
-          </div>
-          <div class="control-group">
-            <label class="control-label" for="tree" th:text="#{Select BPMN File}">Select BPMN File</label>
-            <div class="controls">
-              <p class="alert alert-info" ng-show="selectedTreeItem == undefined" th:text="#{Select a bpmn file}"></p>
-              <div id="tree" class="claro" data-selected="selectedTreeItem" data-cycle-tree data-id="connectorTree" data-connector="connector">
+  <dialog model="editDiagramDialog" ng-cloak>
+    <div class="modal" ng-controller="EditDiagramController">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal">&times;</button>
+        <h3 th:text="#{Add file}">Add file</h3>
+      </div>
+      <div class="modal-body">
+        <form class="form-horizontal" novalidate ng-submit="save()" name="addModelRoundtripForm">
+          <fieldset>
+            <div class="control-group">
+              <label class="control-label" for="input01" th:text="#{Modeler Name}">Modeler Name</label>
+              <div class="controls">
+                <input ngm-if="editSide == 'leftHandSide'" class="span8" data-typeahead data-values="modelerNames" ng-model="diagram.modelerName" name="modelerName" type="text" id="input01" required autofocus />
+                <input ngm-if="editSide == 'rightHandSide'" class="span8" ng-model="diagram.modelerName" name="modelerName" ng-disabled="true" type="text" id="input01" required />
+                <p class="alert alert-info" ng-show="diagram.modelerName == ''" th:text="#{Type in / choose the name of your modeler}">Type in / choose the name of your modeler</p>
               </div>
             </div>
-          </div>
-        </fieldset>
-      </form>
+            <div class="control-group">
+              <label class="control-label" for="connectors" th:text="#{Select Connector}">Select Connector</label>
+              <div class="controls">
+                <select id="connectors" class="span8" data-ng-model="connector" data-ng-options="c.name for c in connectors">
+                </select>
+              </div>
+            </div>
+            <div class="control-group">
+              <label class="control-label" for="tree" th:text="#{Select BPMN File}">Select BPMN File</label>
+              <div class="controls">
+                <p class="alert alert-info" ng-show="selectedTreeItem == undefined" th:text="#{Select a bpmn file}"></p>
+                <div id="tree" class="claro" data-selected="selectedTreeItem" data-cycle-tree data-id="connectorTree" data-connector="connector">
+                </div>
+              </div>
+            </div>
+          </fieldset>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" ng-click="cancel()" th:text="#{Cancel}">Cancel</button>
+        <button href="#" class="btn btn-primary" ng-click="save()" th:text="#{Add}">Add</button>
+      </div>
     </div>
-    <div class="modal-footer">
-      <button class="btn" ng-click="cancel()" th:text="#{Cancel}">Cancel</button>
-      <button href="#" class="btn btn-primary" ng-click="save()" th:text="#{Add}">Add</button>
-    </div>
-  </div>
+  </dialog>
   <!-- end add-model-roundtrip-dialog -->
   
   <!-- begin sync-roundtrip-dialog -->

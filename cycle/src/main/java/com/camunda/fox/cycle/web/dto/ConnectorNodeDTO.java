@@ -19,18 +19,16 @@ public class ConnectorNodeDTO {
   public ConnectorNodeDTO(ConnectorNode connectorNode) {
     id = connectorNode.getId();
     label = connectorNode.getLabel();
-    setType(connectorNode.getType());
+    type = connectorNode.getType();
   }
-  
+
   public String getId() {
     return id;
   }
   
-  
   public void setId(String id) {
     this.id = id;
   }
-  
   
   public String getLabel() {
     return label;

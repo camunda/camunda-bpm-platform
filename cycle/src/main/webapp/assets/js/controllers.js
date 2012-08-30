@@ -50,74 +50,70 @@ function HomeController($scope, $routeParams) {
   $scope.$emit("navigation-changed");
 }
 
-
 function RoundtripDetailsController($scope, $routeParams, RoundtripDetails, app, $http) {
   $scope.roundtrip = RoundtripDetails.get({id: $routeParams.roundtripId });
+  $scope.editDiagramDialog = new Dialog();
+  
+  $scope.addDiagram = function(side) {
+    $scope.editDiagramDialog.open({
+      editSide: side, 
+      roundtrip: $scope.roundtrip,
+      diagram: $scope.roundtrip[side]
+    });
+  };
+};
 
-  $scope.side = '';
-  $scope.modelerName = '';
+function EditDiagramController($scope, $q, $http, debouncer, app) {
+  
   $scope.modelerNames = [];
   $scope.connectors = [];
-  $scope.selectedTreeItem = undefined;
-
+  
+  $scope.selectedTreeItem = null;
+  $scope.editDiagram = null;
+  
   function getModelerNames() {
-    $http
-      .get(app.uri('secured/resource/diagram/modelerNames'))
-      .success(function(data) {
-        $scope.modelerNames = data;
-      });
+    $http.get(app.uri('secured/resource/diagram/modelerNames')).success(function(data) {
+      $scope.modelerNames = data;
+      // set default value, when only one entry
+      if (data.length == 1) {
+        $scope.diagram.modelerName = data[0];
+      }
+    });
   }
 
-  // for debugging
-  $scope.$watch('modelerName', function(newValue) {
-    console.log("modelerName: " + newValue)
+  function getConnectors() {
+    $http.get(app.uri("secured/resource/connector/list")).success(function(data) {
+      $scope.connectors = data;
+    });
+  }
+  
+  /**
+   * Watch the data attribute to recognize changes in
+   * the data bound to the underlaying dialog model
+   */
+  $scope.$watch('data', function(data) {
+    if (data) {
+      // set modeler name as fox designer whenever a right hand side 
+      // diagram with no name is edited
+      // relaxed implements AT in HEMERA-2549
+      if ($scope.editSide == 'rightHandSide' && !$scope.diagram.modelerName) {
+        $scope.diagram.modelerName = 'fox designer';
+      }
+      
+      // make a copy of the diagram to edit / add
+      $scope.editDiagram = angular.copy($scope.diagram || {});
+    }
   });
+  
   $scope.$watch('selectedTreeItem', function(newValue) {
     if (newValue) {
       console.log("selectedTreeItem: " + newValue.name)
     }
   });
 
-  function resetModal() {
-    $scope.side = '';
-    $scope.modelerName = '';
-    $scope.modelerNames = [];
-    $scope.connectors = [];
-    $scope.selectedTreeItem = undefined;
-  }
-
-  function getModelerNames() {
-    $http.get(app.uri('secured/resource/diagram/modelerNames')).success(function(data) {
-      $scope.modelerNames = data;
-      // set default value, when only one entry
-      if (data.length == 1) {
-        $scope.modelerName = data[0];
-      }
-    });
-  }
-
-  function getConnectors() {
-    $http.get(app.uri("secured/resource/connector/list")).success(function (data) {
-      $scope.connectors = data;
-    });
-  };
-
-  $scope.addBpmnModel = function(side) {
-    $scope.side = side;
-    if (side == 'rightHandSide') {
-      $scope.modelerName = 'fox designer';
-    }
-    $("#add-model-roundtrip-dialog").modal();
-  };
-
   $scope.cancel = function() {
-    $("#add-model-roundtrip-dialog").modal('hide');
+    $scope.$model.close();
   };
-  
-  $scope.initModal = function() {
-    getModelerNames();
-    getConnectors();
-  }
   
   /**
    * Saves the roundtrip with updated details
@@ -153,7 +149,11 @@ function RoundtripDetailsController($scope, $routeParams, RoundtripDetails, app,
   function checkFormValid() {
     //$scope.addModelRoundtripForm.$valid
   }
-};
+  
+  // get required data
+  getModelerNames();
+  getConnectors();
+}
 
 function CreateNewRoundtripController($scope, $q, $http, $location, debouncer, app, Roundtrip) {
 
@@ -188,7 +188,7 @@ function CreateNewRoundtripController($scope, $q, $http, $location, debouncer, a
   var checkName = debouncer.debounce(function(name) {
     isNameValid(name).then(function(valid) {
       if ($scope.newRoundtripForm.name) {
-        $scope.newRoundtripForm.name.$setValidity("occupied", !valid);
+        $scope.newRoundtripForm.name.$setValidity("occupied", valid);
       }
     });
   }, 1000);
