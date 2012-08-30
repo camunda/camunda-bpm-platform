@@ -34,7 +34,7 @@ public class VfsConnector extends Connector {
       FileSystemManager fsManager = VFS.getManager();
       FileObject fileObject;
       
-      fileObject = fsManager.resolveFile(BASE_PATH + parent.getPath());
+      fileObject = fsManager.resolveFile(BASE_PATH + parent.getId());
 
       if (fileObject.getType() == FileType.FILE) {
         return nodes;
@@ -45,7 +45,7 @@ public class VfsConnector extends Connector {
       for ( FileObject file : children )
       {
           String baseName = file.getName().getBaseName();
-          ConnectorNode node = new ConnectorNode(parent.getPath()+File.separatorChar+baseName, baseName);
+          ConnectorNode node = new ConnectorNode(parent.getId()+File.separatorChar+baseName, baseName);
           if (file.getType() == FileType.FILE) {
             node.setType(ConnectorNodeType.FILE);
           }
@@ -76,7 +76,7 @@ public class VfsConnector extends Connector {
       FileSystemManager fsManager = VFS.getManager();
       FileObject fileObject;
       
-      fileObject = fsManager.resolveFile(BASE_PATH + node.getPath());
+      fileObject = fsManager.resolveFile(BASE_PATH + node.getId());
 
       if (fileObject.getType() != FileType.FILE) {
         throw new CycleException("Cant cant content of non-file node");

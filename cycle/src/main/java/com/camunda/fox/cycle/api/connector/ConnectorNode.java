@@ -4,8 +4,7 @@ import java.util.Date;
 
 
 public class ConnectorNode {
-  protected String path;
-  protected String name;
+  protected String id;
   protected String label;
   protected ConnectorNodeType type = ConnectorNodeType.FOLDER;
   protected Date created;
@@ -19,34 +18,25 @@ public class ConnectorNode {
   public ConnectorNode() {
   }
   
-  public ConnectorNode(String path, String name) {
-    this.setPath(path);
-    this.setName(name);
-    this.setLabel(this.getName());
-  }
-
-  public String getPath() {
-    return path;
-  }
-
-  public void setPath(String path) {
-    this.path = path;
+  public ConnectorNode(String id, String label) {
+    this.setId(id);
+    this.setLabel(label);
   }
   
   /**
-   * Internal Name of this node, must be unique for the hierarchy level
+   * ID of this node, may contain different representations, depending on the corresponding connector
    * @return
    */
-  public String getName() {
-    return name;
+  public String getId() {
+    return id;
   }
 
-  public void setName(String name) {
-    this.name = name;
+  public void setId(String id) {
+    this.id = id;
   }
   
   /**
-   * The displayed (e.g. for UI purposes) name of this node 
+   * The label of the node for UI purposes
    * @return
    */
   public String getLabel() {

@@ -4,8 +4,10 @@ import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Table;
 
 @Entity
+@Table(name="cy_connector_cred")
 public class ConnectorCredentials {
   @Id
   @GeneratedValue(strategy=GenerationType.AUTO)

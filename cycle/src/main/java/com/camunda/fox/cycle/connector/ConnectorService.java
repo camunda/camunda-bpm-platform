@@ -20,14 +20,14 @@ import com.camunda.fox.cycle.web.dto.ConnectorDTO;
 public class ConnectorService {
   
   @Inject
-  ConnectorRegistry connectorRegistry;
+  protected ConnectorRegistry connectorRegistry;
   
   @GET
   @Path("/list")
   @Produces("application/json")
   public List<ConnectorDTO> list() {
     ArrayList<ConnectorDTO> result = new ArrayList<ConnectorDTO>();
-    for (Connector c : connectorRegistry.getConnectors()) {
+    for (Connector c : connectorRegistry.getSessionConnectors()) {
       result.add(new ConnectorDTO(c));
     }
     return result;
