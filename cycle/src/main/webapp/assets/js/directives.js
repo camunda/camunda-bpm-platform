@@ -77,16 +77,18 @@ angular
 							    }
 							    
 							    var tree = new Tree({
-							      	id :  attrs.id,
-							           model: treeModel,
-							           openOnClick: true,
-								       onClick: function(item){
-								    	   scope.selected = item;
-								    	   scope.$digest();
-							           },
-							           showRoot: false,
-							           persist: false
-							       });
+                    id: attrs.id,
+                    model: treeModel,
+                    openOnClick: true,
+                    onClick: function(item){
+                      scope.$apply(function() {
+                        scope.selected = item;
+                      });
+                    },
+                    showRoot: false,
+                    persist: false
+                  });
+                  
 							    tree.placeAt(element[0]);
 							    tree.startup();
 							},
@@ -109,7 +111,7 @@ angular
     scope: {
       values: '='
     },
-    link:  function(scope, element, attrs, ngModel) {
+    link: function(scope, element, attrs, ngModel) {
       var typeahead = element.typeahead({
         source: scope.values,
         updater: function(item) {
@@ -117,7 +119,7 @@ angular
           return item;
         }
       });
-
+      
       // update model with selected value
       function read(item) {
         ngModel.$modelValue = item;
@@ -130,11 +132,30 @@ angular
   };
 })
 /**
+ * 
+ */
+.directive("bpmnDiagram", function(app) {
+  return {
+    restrict: 'E',
+    scope: {
+      roundtrip: '=', 
+      diagram: '=', 
+      identifier: '@'
+    }, 
+    templateUrl: app.uri("secured/view/partials/bpmn-diagram.html"), 
+    controller: 'BpmnDiagramController', 
+    link: function(scope, element, attrs) {
+      scope.identifier = attrs.identifier;
+    }
+  }
+})
+
+/**
  * A directive which conditionally displays a dialog 
  * and allows it to control it via a explicitly specified model.
  * 
  * <dialog model="aModel">
- *   <div class="model">
+ *   <div class="model" ngm-if="aModel.renderHtml()">
  *     <!-- dialog contents ... -->
  *   </div>
  * </dialog>
@@ -147,7 +168,6 @@ angular
  *   // Or inside the dialog: 
  *   $model.close();
  * </script>
- * Inside the dialog it exposed the dialog model via the $model directive.
  */
 .directive('dialog', function($http, $timeout) {
   return {
@@ -156,8 +176,8 @@ angular
       $model: '=model'
     }, 
     transclude: true, 
-    template: '<div ngm-if="$model.renderHtml()" ng-transclude></div>',
-    link:  function(scope, element, attrs) {
+    template: '<div ng-transclude />', 
+    link: function(scope, element, attrs) {
       /**
        * Obtain the dialog
        * @returns the dialog instance as a jQuery object
@@ -165,7 +185,7 @@ angular
       function dialog() {
         return angular.element(element.find(".modal"));
       }
-
+      
       /**
        * Obtain the dialogs model
        * @returns the dialogs model
@@ -173,7 +193,7 @@ angular
       function model() {
         return scope.$model;
       }
-
+      
       /**
        * Init (ie. register events / dialog functionality) and show the dialog.
        * @returns nothing
@@ -206,7 +226,7 @@ angular
       function hide() {
         dialog().modal("hide");
       }
-
+      
       /**
        * Watch the $model.status property in order to map it to the 
        * bootstrap modal dialog live cycle. The HTML has to be rendered first, 
@@ -222,7 +242,7 @@ angular
         switch (newValue) {
           case "opening": 
             // dialog about to show and markup will be ready, soon
-            // asynchronously initialize dialog and register events
+            // asynchronously initialize dialog and register events            
             $timeout(initAndShow);
             break;
           case "closing": 
@@ -234,20 +254,21 @@ angular
   }
 });
 
-
 /** 
  * Dialog model to be used along with the 
- * dialog directive
+ * dialog directive and attaches it to the given scope
  */
 function Dialog() {
+  
   var self = this;
   self.status = "closed";
-
+  
   this.open = function() {
     self.status = "opening";
   };
 
   this.close = function() {
+    self.data = {};
     self.status = "closing";
   };
 

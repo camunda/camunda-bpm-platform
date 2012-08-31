@@ -4,12 +4,13 @@ import com.camunda.fox.cycle.api.connector.Connector;
 
 
 public class ConnectorDTO {
+  
   private Long connectorId;
   private String name;
   
   public ConnectorDTO(Connector connector) {
-    this.setConnectorId(connector.getConfiguration().getId());
-    this.setName(connector.getConfiguration().getLabel());
+    this.connectorId = connector.getConfiguration().getId();
+    this.name = connector.getConfiguration().getLabel();
   }
   
   public String getName() {
@@ -27,5 +28,4 @@ public class ConnectorDTO {
   public void setConnectorId(Long connectorId) {
     this.connectorId = connectorId;
   }
-
 }

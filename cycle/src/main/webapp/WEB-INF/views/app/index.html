@@ -33,28 +33,37 @@
             </ul>
             <!-- begin create-roundtrip-dialog -->
             <dialog model="newRoundtripDialog" ng-cloak>
-              <div class="modal" ng-controller="CreateNewRoundtripController">
+              <div class="modal" ng-controller="CreateNewRoundtripController" ngm-if="newRoundtripDialog.renderHtml()">
                 <div class="modal-header">
                   <a class="close" data-dismiss="modal">&times;</a>
                   <h3 th:text="#{Create roundtrip}">Create roundtrip</h3>
                 </div>
                 <div class="modal-body">
+                  <div class="alert alert-error" ng-show="error">
+                    <button type="button" class="close" data-dismiss="alert">&times;</button>
+                    <span ng-switch ng-switch-on="error.component"> 
+                      <strong ng-switch-when="name-check"
+                              th:text="#{A problem occured when trying to check your input}"></strong>
+                      
+                      <strong ng-switch-default th:text="#{A problem occured}"></strong>
+                    </span> {{error.message}}
+                  </div>
                   <form class="form-horizontal" novalidate ng-submit="save()" name="newRoundtripForm">
                     <fieldset>
                       <div class="control-group" ng-class="errorClass(newRoundtripForm)">
                         <label class="control-label" for="input01" th:text="#{Name}">Name</label>
                         <div class="controls">
-                          <input ng-model="name" name="name" type="text" class="input-xlarge" id="input01" required />
+                          <input ng-model="name" name="name" type="text" class="input-xlarge" id="input01" required autofocus />
                           <p class="help-block" ng-show="newRoundtripForm.name.$error.required" th:text="#{Type in the name of your roundtrip}"></p>
-                          <p class="help-block" ng-show="newRoundtripForm.name.$error.occupied" th:text="#{The name is already used}"></p>
+                          <p class="help-block" ng-show="newRoundtripForm.name.$error.unused" th:text="#{The name is already used}"></p>
                         </div>
                       </div>
                     </fieldset>
                   </form>
                 </div>
                 <div class="modal-footer">
-                  <button class="btn" ng-click="$model.close()" th:text="#{Cancel}">Cancel</button>
-                  <button href="#" class="btn btn-primary" ng-click="save()" th:text="#{Save}">Save</button>
+                  <button class="btn" ng-click="newRoundtripDialog.close()" th:text="#{Cancel}">Cancel</button>
+                  <button href="#" class="btn btn-primary" ng-click="save()" ng-disabled="!isValid()" th:text="#{Save}">Save</button>
                 </div>
               </div>
             </dialog>
