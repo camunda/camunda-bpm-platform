@@ -166,6 +166,11 @@ function EditDiagramController($scope, $q, $http, debouncer, app) {
   getConnectors();
 }
 
+/**
+ * Responsible for adding a new roundtrip from within the 
+ * roundtrip list
+ * 
+ */
 function CreateNewRoundtripController($scope, $q, $http, $location, debouncer, app, Roundtrip) {
 
   $scope.name = '';
@@ -209,6 +214,10 @@ function CreateNewRoundtripController($scope, $q, $http, $location, debouncer, a
     });
   };
   
+  /**
+   * Checking the name of an argument maximum every 1000ms
+   * and update the model respectively
+   */
   var checkName = debouncer.debounce(function(name) {
     isNameValid(name).then(function(valid) {
       $scope.nameChecked = true;
@@ -219,6 +228,19 @@ function CreateNewRoundtripController($scope, $q, $http, $location, debouncer, a
     });
   }, 1000);
   
+  /**
+   * Checks the validity of a name in the backend.
+   * Returns a promise which is fulfilled when the check was done. 
+   * 
+   * Usage: 
+   * isNameValid("Walter").then(function(nameOk) {
+   *   console.log("Name 'Walter' is ok? ", nameOk);
+   * });
+   * 
+   * @param name to be checked
+   * 
+   * @returns promise to be fulfilled when the check was done
+   */ 
   function isNameValid(name) {
     var deferred = $q.defer();
     
@@ -234,12 +256,17 @@ function CreateNewRoundtripController($scope, $q, $http, $location, debouncer, a
   }
 };
 
+/**
+ * Responsible for listing the roundtrips and updating the currently selected one
+ * 
+ */
 function ListRoundtripsController($scope, $route, $routeParams, Roundtrip) {
   $scope.roundtrips = Roundtrip.query();
   $scope.newRoundtripDialog = new Dialog();
   
-  var selectedRoundtripId = -1; // $routeParams.roundtripId;
+  var selectedRoundtripId = -1; 
   
+  // Update the selected roundtrip on route change
   $scope.$watch(function() { return $routeParams.roundtripId; }, function(newValue, oldValue) {
     selectedRoundtripId = parseInt(newValue);    
     if ($routeParams.roundtripId != undefined) {

@@ -132,7 +132,15 @@ angular
   };
 })
 /**
+ * Realizes a bpmn diagram ui component in the roundtrip details dialog.
  * 
+ * @param roundtrip reference to the roundtrip the diagram belongs to
+ * @param diagram or null the diagram which is managed / displayed
+ * @param identifier the identifier of the diagram (eighter leftHandSide or rightHandSide)
+ * 
+ * Usage:
+ * 
+ * <bpmn-diagram roundtrip="myRoundtrip" diagram="myRoundtrip.leftHandSide" identifier="leftHandSide" />
  */
 .directive("bpmnDiagram", function(app) {
   return {
