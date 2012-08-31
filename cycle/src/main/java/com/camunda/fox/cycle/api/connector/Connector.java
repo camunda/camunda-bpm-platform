@@ -32,4 +32,7 @@ public abstract class Connector {
   
   public void init(ConnectorConfiguration config) {
   }
+  
+  public void createModel() throws Exception {
+  }
 }

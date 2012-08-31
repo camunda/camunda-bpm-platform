@@ -187,5 +187,5 @@ public class SignavioConnector extends Connector {
     rootNode.setType(ConnectorNodeType.FOLDER);
     return rootNode;
   }
-
+  
 }
