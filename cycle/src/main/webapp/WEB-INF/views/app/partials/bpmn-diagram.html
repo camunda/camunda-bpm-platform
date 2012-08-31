@@ -1,21 +1,17 @@
 <div>
-  <div class="bpmn-model" ng-show="diagram">
+  <div class="bpmn-model thumbnail" ng-show="diagram">
     <h3>{{diagram.modeler}}</h3>
-    <div class="thumbnail">
+    <div class="holder">
       <div class="diagram">
-        <span class="label">Model selected</span>
-        <span>{{diagram.diagramPath.label}}</span>
+        <span class="name">{{diagram.diagramPath.label}}</span>
       </div>
     </div>
   </div>
-  <div class="bpmn-model" ng-hide="diagram">
-    <h3>No diagram selected</h3>
-    <div class="thumbnail">
+  <div class="bpmn-model thumbnail" ng-hide="diagram">
+    <h3>&nbsp;</h3>
+    <div class="holder">
       <div class="diagram">
-        <span class="label">No model</span>
-      </div>
-      <div class="actions">
-        <button class="btn" ng-click="addDiagram()" th:text="#{Add}">Add</button>
+        <span class="name"><a class="btn btn-primary btn-large" ng-click="addDiagram()">Add Model</a></span>
       </div>
     </div>
   </div>
@@ -25,7 +21,7 @@
     <div class="modal" ng-controller="EditDiagramController" ngm-if="editDiagramDialog.renderHtml()">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal">&times;</button>
-        <h3 th:text="#{Add file}">Add file</h3>
+        <h3 th:text="#{Add Diagram}">Add Diagram ({{identifier}})</h3>
       </div>
       <div class="modal-body">
         <div class="alert alert-error" ng-show="error">

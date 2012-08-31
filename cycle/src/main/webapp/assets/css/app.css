@@ -9,8 +9,13 @@
 /**
  * shared style declarations
  */
-body {
-  padding-top: 60px; /* 60px to make the container go all the way to the bottom of the topbar */
+html, body {
+  height:100%;
+  min-height: 100%;
+}
+
+body > .container-fluid.breadcrumbs {
+  margin-top: 60px;
 }
 
 .footer {
@@ -18,6 +23,10 @@ body {
   margin-top: 70px;
   border-top: 1px solid #E5E5E5;
   background-color: whiteSmoke;
+  
+  position: absolute;
+  width: 100%;
+  bottom: 0;
 }
 
 /* for image replacement */
@@ -71,14 +80,33 @@ form input.ng-dirty.ng-invalid {
   overflow: auto;
 }
 
-.bpmn-model h3 {
-  text-align: center;
-  margin-bottom: 20px;
+.bpmn-model {
+  padding: 0px;
 }
 
-.bpmn-model .thumbnail {
+.bpmn-model:hover {
+  border: solid 1px #BBB;
+}
+
+.bpmn-model:hover h3 {
+  background: #BBB;
+}
+
+.bpmn-model h3 {
+  text-align: center;
+  line-height: 40px;
+  background: #DDD;
+  margin: 0px;
+}
+
+.bpmn-model .holder {
   text-align: center;
   position: relative;
+  padding: 4px;
+}
+
+.bpmn-model .name {
+  font-size: 2em;
 }
 
 .bpmn-model .label {
