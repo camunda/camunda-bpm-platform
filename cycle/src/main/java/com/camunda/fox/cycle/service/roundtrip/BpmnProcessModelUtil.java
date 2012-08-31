@@ -4,7 +4,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.UnsupportedEncodingException;
 
-import javax.servlet.http.HttpSession;
 import com.camunda.fox.cycle.exception.CycleException;
 import com.camunda.fox.cycle.service.roundtrip.transform.XsltTransformer;
 import com.camunda.fox.cycle.util.IoUtil;

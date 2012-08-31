@@ -49,7 +49,12 @@ angular
 								        	//	entry["id"] = entry["name"];
 								        	//});
 								        	return childData;
-								        });
+                        },
+                        function(error) {
+                          var e = error.response.data;
+                          e.component = "tree";
+                          scope.$emit("component-error", e);
+                        });
 							        }
 							    });
 								
@@ -72,23 +77,26 @@ angular
 							    }
 							    
 							    var tree = new Tree({
-							      	id :  attrs.id,
-							           model: treeModel,
-							           openOnClick: true,
-								       onClick: function(item){
-								    	   scope.selected = item;
-								    	   scope.$digest();
-							           },
-							           showRoot: false,
-							           persist: false
-							       });
+                    id: attrs.id,
+                    model: treeModel,
+                    openOnClick: true,
+                    onClick: function(item){
+                      scope.$apply(function() {
+                        scope.selected = item;
+                      });
+                    },
+                    showRoot: false,
+                    persist: false
+                  });
+                  
 							    tree.placeAt(element[0]);
 							    tree.startup();
 							},
-							function(error){
-								console.log("An error occurred: " + error);
-								alert(error);
-							});
+  							function(error){
+                  var e = error.response.data;
+                  e.component = "tree";
+                  scope.$emit("component-error", e);
+  							});
 				    	}
 				    });
 				});
@@ -123,6 +131,22 @@ angular
     }
   };
 })
+.directive("bpmnDiagram", function(app) {
+  return {
+    restrict: 'E',
+    scope: {
+      roundtrip: '=', 
+      diagram: '=', 
+      identifier: '@'
+    }, 
+    templateUrl: app.uri("secured/view/partials/bpmn-diagram.html"), 
+    controller: 'BpmnDiagramController', 
+    link: function(scope, element, attrs) {
+      scope.identifier = attrs.identifier;
+    }
+  }
+})
+
 /**
  * A directive which conditionally displays a dialog 
  * and allows it to control it via a explicitly specified model.

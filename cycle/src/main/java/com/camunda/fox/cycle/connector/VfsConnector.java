@@ -3,8 +3,12 @@ package com.camunda.fox.cycle.connector;
 import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.logging.Logger;
 
 import org.apache.commons.vfs2.FileObject;
@@ -17,13 +21,17 @@ import com.camunda.fox.cycle.api.connector.Connector;
 import com.camunda.fox.cycle.api.connector.ConnectorNode;
 import com.camunda.fox.cycle.api.connector.Secured;
 import com.camunda.fox.cycle.api.connector.ConnectorNode.ConnectorNodeType;
+import com.camunda.fox.cycle.entity.ConnectorConfiguration;
 import com.camunda.fox.cycle.exception.CycleException;
 
 public class VfsConnector extends Connector {
 
-  public static final String BASE_PATH = "file://"+System.getProperty("user.home")+File.separatorChar;
+  public static final String BASE_PATH_KEY = "BASE_PATH";
+  public static final String DEFAULT_BASE_PATH = "file://" + System.getProperty("user.home") + File.separatorChar + "cycle" + File.separatorChar;
   
-  Logger log = Logger.getLogger(getClass().getSimpleName());
+  private static Logger logger = Logger.getLogger(VfsConnector.class.getSimpleName());
+
+  private String basePath;
 
   @Secured
   @Override
@@ -34,10 +42,10 @@ public class VfsConnector extends Connector {
       FileSystemManager fsManager = VFS.getManager();
       FileObject fileObject;
       
-      fileObject = fsManager.resolveFile(BASE_PATH + parent.getId());
+      fileObject = fsManager.resolveFile(basePath + parent.getId());
 
       if (fileObject.getType() == FileType.FILE) {
-        return nodes;
+        return Collections.<ConnectorNode>emptyList();
       }
       
       FileObject[] children = fileObject.getChildren();
@@ -56,27 +64,28 @@ public class VfsConnector extends Connector {
           try {
             node.setLastModified(new Date(file.getContent().getLastModifiedTime()));
           }catch (Exception exception) {
-            log.fine("Could not set last modified time");
+            logger.fine("Could not set last modified time");
           }
           
           nodes.add(node);
       }
       
-      return nodes;
-      
+      // Sort
+      Collections.sort(nodes, new ConnectorNodeComparator());
+      return nodes; 
     } catch (FileSystemException e) {
       throw new CycleException(e);
     }
-
   }
 
+  @Secured
   @Override
   public InputStream getContent(ConnectorNode node) {
     try {
       FileSystemManager fsManager = VFS.getManager();
       FileObject fileObject;
       
-      fileObject = fsManager.resolveFile(BASE_PATH + node.getId());
+      fileObject = fsManager.resolveFile(basePath + node.getId());
 
       if (fileObject.getType() != FileType.FILE) {
         throw new CycleException("Cant cant content of non-file node");
@@ -88,4 +97,32 @@ public class VfsConnector extends Connector {
       throw new CycleException(e);
     }
   }
+  
+  @Override
+  public void init(ConnectorConfiguration config) {
+    basePath = config.getProperties().get(BASE_PATH_KEY);
+    
+    // Load base path from system property, e.g. ${user.home} if it is passed
+    if (basePath.matches("\\$\\{.*\\}")) {
+      String systemProperty = basePath.substring(2, basePath.length() - 1);
+      String systemPropertyValue = System.getProperty(basePath.substring(2, basePath.length() - 1));
+      if (systemPropertyValue != null) {
+        try {
+          basePath = new File(systemPropertyValue).toURI().toString();
+          logger.info("Loading base path from system property " + systemProperty + ": " + basePath);
+        } catch (Exception e) {
+          ;
+        }
+      }
+    }
+  }
+
+  @Secured
+  @Override
+  public ConnectorNode getRoot() {
+    ConnectorNode rootNode = new ConnectorNode("/", "/");
+    rootNode.setType(ConnectorNodeType.FOLDER);
+    return rootNode;
+  }
+
 }

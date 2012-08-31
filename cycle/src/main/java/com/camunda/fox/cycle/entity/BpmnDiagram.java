@@ -1,5 +1,6 @@
 package com.camunda.fox.cycle.entity;
 
+import javax.persistence.Embedded;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -23,23 +24,24 @@ public class BpmnDiagram extends AbstractEntity {
   
   private String modeler;
   
-  private String diagramPath;
+  @Embedded
+  private PersistentConnectorNode diagramPath;
   
   @Enumerated(EnumType.STRING)
   private Status status;
   
   public BpmnDiagram() { }
   
-  public BpmnDiagram(String modeler, String diagramPath) {
+  public BpmnDiagram(String modeler, PersistentConnectorNode diagramPath) {
     this.modeler = modeler;
     this.diagramPath = diagramPath;
   }
 
-  public String getDiagramPath() {
+  public PersistentConnectorNode getDiagramPath() {
     return diagramPath;
   }
 
-  public void setDiagramPath(String diagramPath) {
+  public void setDiagramPath(PersistentConnectorNode diagramPath) {
     this.diagramPath = diagramPath;
   }
 

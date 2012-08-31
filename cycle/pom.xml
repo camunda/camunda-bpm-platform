@@ -28,7 +28,6 @@
       <groupId>org.springframework</groupId>
       <artifactId>spring-aop</artifactId>
     </dependency>
-    
 
     <!-- CGLIB for various things including @Transactional and spring-data-jpa -->
     <dependency>
@@ -118,9 +117,9 @@
     
     <!-- commons vfs for fs connector -->
     <dependency>
-        <groupId>org.apache.commons</groupId>
-        <artifactId>commons-vfs2</artifactId>
-        <version>2.0</version>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-vfs2</artifactId>
+      <version>2.0</version>
     </dependency>
     
     <!-- testing -->
@@ -153,6 +152,12 @@
   
   <build>
     <finalName>cycle</finalName>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+<!--        <filtering>true</filtering>-->
+      </resource>
+    </resources>
     <testResources>
       <testResource>
         <directory>src/test/resources</directory>

@@ -14,7 +14,9 @@ import javax.ws.rs.core.MediaType;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.camunda.fox.cycle.entity.BpmnDiagram;
+import com.camunda.fox.cycle.entity.PersistentConnectorNode;
 import com.camunda.fox.cycle.web.dto.BpmnDiagramDTO;
+import com.camunda.fox.cycle.web.dto.ConnectorNodeDTO;
 
 /**
  *
@@ -80,7 +82,17 @@ public class BpmnDiagramService {
    */
   private void update(BpmnDiagram diagram, BpmnDiagramDTO data) {
     diagram.setModeler(data.getModeler());
-    diagram.setDiagramPath(data.getDiagramPath());
+    
+    ConnectorNodeDTO connectorNodeData = data.getDiagramPath();
+    
+    if (connectorNodeData != null) {
+      PersistentConnectorNode persistentNode = new PersistentConnectorNode(
+        connectorNodeData.getId(), 
+        connectorNodeData.getLabel(), 
+        connectorNodeData.getConnectorId());
+      
+      diagram.setDiagramPath(persistentNode);
+    }
   }
   
   @GET

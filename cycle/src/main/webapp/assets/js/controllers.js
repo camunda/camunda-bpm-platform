@@ -52,39 +52,51 @@ function HomeController($scope, $routeParams) {
 
 function RoundtripDetailsController($scope, $routeParams, RoundtripDetails, app, $http) {
   $scope.roundtrip = RoundtripDetails.get({id: $routeParams.roundtripId });
-  $scope.editDiagramDialog = new Dialog();
-  
-  $scope.addDiagram = function(side) {
-    $scope.editDiagram = $scope.roundtrip[side];
-    $scope.editSide = side;
-    
-    $scope.editDiagramDialog.open();
-  };
 };
 
+/**
+ * Works along with the bpmn-diagram directive to manage a single bpmn-diagram in
+ * the roundtrip view. 
+ */
+function BpmnDiagramController($scope, $http) {
+  $scope.editDiagramDialog = new Dialog();
+  
+  $scope.addDiagram = function() {
+    $scope.editDiagramDialog.open();
+  };
+ 
+  $scope.cancelAddDiagram = function() {
+    $scope.editDiagramDialog.close();
+  };
+  
+  $scope.saveDiagram = function(diagram) {
+    $scope.roundtrip[$scope.identifier] = diagram;
+    
+    $scope.roundtrip.$save(function() {
+      $scope.editDiagramDialog.close();
+    });
+  };
+}
+
+/**
+ * Realizes the edit operation of a bpmn diagram inside the respective 
+ * dialog. 
+ */
 function EditDiagramController($scope, $q, $http, debouncer, app) {
   
-  $scope.modelerNames = [];
-  $scope.connectors = [];
-  
-  $scope.selectedTreeItem = null;
-  
-  // make a copy of the diagram to edit / add
-  $scope.diagram = angular.copy($scope.editDiagram || {});
-  
-  // set modeler name as fox designer whenever a right hand side 
-  // diagram with no name is edited
-  // relaxed implements AT in HEMERA-2549
-  if ($scope.editSide == 'rightHandSide' && !$scope.diagram.modelerName) {
-    $scope.diagram.modelerName = 'fox designer';
-  }
+  var FOX_DESIGNER = "fox designer", 
+    RIGHT_HAND_SIDE = "rightHandSide";
+
+  var canEditModeler = $scope.canEditModeler = function() {
+    return !!($scope.identifier != RIGHT_HAND_SIDE || $scope.editDiagram.modeler)
+  };
   
   function getModelerNames() {
     $http.get(app.uri('secured/resource/diagram/modelerNames')).success(function(data) {
       $scope.modelerNames = data;
       // set default value, when only one entry
-      if (data.length == 1) {
-        $scope.diagram.modelerName = data[0];
+      if (data.length == 1 && canEditModeler()) {
+        $scope.editDiagram.modeler = data[0];
       }
     });
   }
@@ -94,49 +106,60 @@ function EditDiagramController($scope, $q, $http, debouncer, app) {
       $scope.connectors = data;
     });
   }
+    
+  // is the dialog model valid and can be submitted?
+  var isValid = $scope.isValid = function() {
+    var editDiagram = $scope.editDiagram;
+    console.log(!!editDiagram.modeler, ($scope.addModelForm.$valid !== false), (!!editDiagram.diagramPath && editDiagram.diagramPath.type == 'FILE'), editDiagram.diagramPath ? editDiagram.diagramPath.type : 'null');
+    return !!editDiagram.modeler && ($scope.addModelForm.$valid !== false) && (editDiagram.diagramPath ? editDiagram.diagramPath.type == 'FILE' : false);
+  };
   
-  $scope.$watch('selectedTreeItem', function(newValue) {
+  $scope.cancel = function() {
+    $scope.cancelAddDiagram();
+  };
+  
+  // save the dialog 
+  $scope.save = function() {
+    if (!isValid()) {
+      return;
+    }
+    
+    // Update diagram path
+    $scope.editDiagram.diagramPath.connectorId = $scope.connector.connectorId;
+    
+    $scope.saveDiagram($scope.editDiagram);
+  };
+
+  $scope.modelerNames = [];
+  $scope.connectors = [];
+  
+  // make a copy of the diagram to edit / add
+  $scope.editDiagram = angular.copy($scope.diagram || {});
+
+  // Watch for component error  
+  $scope.$on("component-error", function(event, error) {
+    $scope.error = error;
+  });
+  
+  // Watch for change in diagram path
+  $scope.$watch('editDiagram.diagramPath', function(newValue) {
     if (newValue) {
-      console.log("selectedTreeItem: " + newValue.name)
+      console.log("editDiagram.diagramPath: " + newValue.name)
     }
   });
-
-  $scope.cancel = function() {
-    $scope.editDiagramDialog.close();
-  };
   
-  /**
-   * Saves the roundtrip with updated details
-   */
-  $scope.save = function() {
-    
-    console.log("Saving " + $scope.selectedTreeItem + " to Roundtrip " + $scope.roundtrip.name);
-    if ($scope.editSide == 'leftHandSide') {
-      $scope.roundtrip.leftHandSide = {
-        diagramPath: $scope.selectedTreeItem.id,
-        modeler: $scope.modelerName
-      }
-    } else {
-      $scope.roundtrip.rightHandSide = {
-        diagramPath: $scope.selectedTreeItem.id,
-        modeler: $scope.modelerName
-      }
-    }
-    $scope.roundtrip.$save();
-    $scope.editDiagramDialog.close();
-  };
-
-  $scope.changeConnector = function () {
-    console.log($scope.connector);
-  };
-
-  // checkFormValid
-  // required: selectedTreeItem
-  // optional: modelerName
-  function checkFormValid() {
-    //$scope.addModelRoundtripForm.$valid
+  // set modeler name as fox designer whenever a right hand side 
+  // diagram with no name is edited
+  // relaxed implements AT in HEMERA-2549
+  if (!canEditModeler()) {
+    $scope.editDiagram.modeler = FOX_DESIGNER;
   }
   
+  // Error to be displayed in dialog
+  $scope.error = null;
+  
+  // TODO: nico.rehwaldt: On update: How to initially display the right folder structure?
+  // 
   // get required data
   getModelerNames();
   getConnectors();
@@ -145,37 +168,52 @@ function EditDiagramController($scope, $q, $http, debouncer, app) {
 function CreateNewRoundtripController($scope, $q, $http, $location, debouncer, app, Roundtrip) {
 
   $scope.name = '';
+  $scope.nameChecked = false;
   
   $scope.errorClass = function(form) {
     return form.$valid || !form.$dirty ? '' : 'error';
   };
   
+  // watch the name to check its validity on change
   $scope.$watch('name', function(newValue, oldValue) {
+    $scope.nameChecked = false;
+    $scope.newRoundtripForm.name.$setValidity("unused", true);
     checkName(newValue, oldValue);
   });
   
+  // cancel the add operation áka close the dialog
   $scope.cancel = function() {
     $scope.newRoundtripDialog.close();
   };
   
+  // is the dialog model valid and can be submitted?
+  var isValid = $scope.isValid = function() {
+    return $scope.newRoundtripForm.$valid && $scope.nameChecked;
+  };
+  
+  // save the dialog 
   $scope.save = function() {
-    if (!$scope.newRoundtripForm.$valid) {
+    if (!isValid()) {
       return;
     }
     
     var roundtrip = new Roundtrip({ name: $scope.name });
+    
+    // redirect to created roundtrip after save and close dialog
     roundtrip.$save(function() {
+      $scope.newRoundtripDialog.close();
+      
       $location.path("/roundtrip/" + roundtrip.id);
       $scope.$emit("roundtrip-added", roundtrip);
     });
-
-    $scope.newRoundtripDialog.close();
   };
   
   var checkName = debouncer.debounce(function(name) {
     isNameValid(name).then(function(valid) {
+      $scope.nameChecked = true;
+      
       if ($scope.newRoundtripForm.name) {
-        $scope.newRoundtripForm.name.$setValidity("occupied", valid);
+        $scope.newRoundtripForm.name.$setValidity("unused", valid);
       }
     });
   }, 1000);
@@ -184,12 +222,12 @@ function CreateNewRoundtripController($scope, $q, $http, $location, debouncer, a
     var deferred = $q.defer();
     
     if (!name || name == "") {
-      deferred.resolve();
+      deferred.resolve(true);
+    } else {
+      $http.get(app.uri("secured/resource/roundtrip/isNameValid?name=" + name)).success(function(data) {
+        deferred.resolve(data == "true");
+      });
     }
-    
-    $http.get(app.uri("secured/resource/roundtrip/isNameValid?name=" + name)).success(function(data) {
-      deferred.resolve((data == "true"));
-    });
     
     return deferred.promise;
   }

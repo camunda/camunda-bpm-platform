@@ -17,6 +17,7 @@ import org.springframework.web.context.WebApplicationContext;
 
 import com.camunda.fox.cycle.api.connector.Connector;
 import com.camunda.fox.cycle.aspect.LoginAspect;
+import com.camunda.fox.cycle.entity.ConnectorConfiguration;
 import com.camunda.fox.cycle.security.SecurityContext;
 
 @Component
@@ -36,9 +37,9 @@ public class ConnectorRegistry {
    * Get the connector singletons from application context
    */
   @Inject
-  Map<String ,Connector> connectors;
+  List<ConnectorConfiguration> configurations;
   
-  Map<String ,Connector> sessionConnectorMap = new HashMap<String, Connector>();
+  Map<Long ,Connector> sessionConnectorMap = new HashMap<Long, Connector>();
   
   List<Connector> sessionConnectors;
   
@@ -49,17 +50,17 @@ public class ConnectorRegistry {
   public List<Connector> getSessionConnectors()  {
     if (sessionConnectors == null) {
       sessionConnectors = new ArrayList<Connector>();
-      for (Entry<String, Connector> connector : connectors.entrySet()) {
+      for (ConnectorConfiguration config: configurations) {
         try {
-          AspectJProxyFactory factory = new AspectJProxyFactory(connector.getValue().getClass().newInstance()); 
+          AspectJProxyFactory factory = new AspectJProxyFactory(Class.forName(config.getConnectorClass()).newInstance()); 
           factory.addAspect(loginAspect);
           Connector newConnectorInstance = factory.getProxy();
           
           // TODO set name / configuration from user configuration entities
-          newConnectorInstance.setConnectorId(connector.getKey());
-          newConnectorInstance.setName(connector.getKey());
-          
-          sessionConnectorMap.put(connector.getKey(), newConnectorInstance);
+          newConnectorInstance.setConfiguration(config);
+          newConnectorInstance.init(newConnectorInstance.getConfiguration());
+
+          sessionConnectorMap.put(config.getId(), newConnectorInstance);
         } catch (Exception e) {
           throw new RuntimeException(e);
         } 
@@ -70,12 +71,8 @@ public class ConnectorRegistry {
     return sessionConnectors;
   }
   
-  public Map<String, Connector> getSessionConnectorMap() {
+  public Map<Long, Connector> getSessionConnectorMap() {
     return sessionConnectorMap;
-  }
-  
-  public Map<String, Connector> getConnectors() {
-    return connectors;
   }
   
 }

@@ -3,7 +3,8 @@ package com.camunda.fox.cycle.api.connector;
 import java.util.Date;
 
 
-public class ConnectorNode {
+public class ConnectorNode implements Comparable<ConnectorNode> {
+  
   protected String id;
   protected String label;
   protected ConnectorNodeType type = ConnectorNodeType.FOLDER;
@@ -75,4 +76,8 @@ public class ConnectorNode {
     this.lastModified = lastModified;
   }
 
+  @Override
+  public int compareTo(ConnectorNode o) {
+    return o.label.compareTo(label);
+  }
 }

@@ -12,11 +12,11 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import static org.hamcrest.Matchers.*;
 import org.junit.After;
-import static org.junit.Assume.*;
 import static org.junit.Assert.*;
 
 import com.camunda.fox.cycle.entity.Roundtrip;
 import com.camunda.fox.cycle.web.dto.BpmnDiagramDTO;
+import com.camunda.fox.cycle.web.dto.ConnectorNodeDTO;
 import com.camunda.fox.cycle.web.dto.RoundtripDTO;
 
 /**
@@ -82,11 +82,11 @@ public class RoundtripControllerTest {
     RoundtripDTO dto = createTestRoundtripDTO();
     
     BpmnDiagramDTO rhs = new BpmnDiagramDTO();
-    rhs.setDiagramPath("foo/bar");
+    rhs.setDiagramPath(new ConnectorNodeDTO("foo/foo", "foo", -1l));
     rhs.setModeler("Fox modeler");
     
     BpmnDiagramDTO lhs = new BpmnDiagramDTO();
-    lhs.setDiagramPath("foo/foo");
+    lhs.setDiagramPath(new ConnectorNodeDTO("foo/bar", "bar", -1l));
     lhs.setModeler("Another Modeler");
     
     dto.setRightHandSide(rhs);
