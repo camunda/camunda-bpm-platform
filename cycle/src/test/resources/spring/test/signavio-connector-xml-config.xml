@@ -15,12 +15,12 @@
   <context:annotation-config/>
   
   <bean name="signavioConnector" class="com.camunda.fox.cycle.impl.connector.signavio.SignavioConnector">
-    <property name="name" value="My SignavioConnector" />
-    <property name="connectorId" value="123" />
     <property name="configuration" ref="signavioConfig" />
   </bean>
   
   <bean name="signavioConfig" class="com.camunda.fox.cycle.entity.ConnectorConfiguration">
+    <property name="id" value="2"/>
+    <property name="label" value="My SignavioConnector"/>
     <property name="loginMode" value="GLOBAL" />
     <property name="globalUser" value="test@camunda.com" />
     <property name="globalPassword" value="testtest" />
