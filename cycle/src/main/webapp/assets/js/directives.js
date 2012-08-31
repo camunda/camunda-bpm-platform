@@ -111,7 +111,7 @@ angular
     scope: {
       values: '='
     },
-    link:  function(scope, element, attrs, ngModel) {
+    link: function(scope, element, attrs, ngModel) {
       var typeahead = element.typeahead({
         source: scope.values,
         updater: function(item) {
@@ -131,6 +131,9 @@ angular
     }
   };
 })
+/**
+ * 
+ */
 .directive("bpmnDiagram", function(app) {
   return {
     restrict: 'E',

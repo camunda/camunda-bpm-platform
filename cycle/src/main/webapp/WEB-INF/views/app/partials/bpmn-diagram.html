@@ -42,7 +42,7 @@
               <label class="control-label" for="input01" th:text="#{Modeler Name}">Modeler Name</label>
               <div class="controls">
                 <!-- ads-data-typeahead data-values="modelerNames" -->
-                <input class="span8" ng-model="editDiagram.modeler" name="modelerName" ng-disabled="identifier == 'rightHandSide'" type="text" required autofocus />
+                <input class="span8" ng-model="editDiagram.modeler" name="modelerName" ng-disabled="!canEditModeler()" type="text" required autofocus />
                 <p class="alert alert-info" ng-show="!editDiagram.modeler" th:text="#{Type in / choose the name of your modeler}">Type in / choose the name of your modeler</p>
               </div>
             </div>
@@ -65,7 +65,6 @@
         </form>
       </div>
       <div class="modal-footer">
-        {{addModelForm.$valid}} {{selectedTreeItem}} {{isValid()}}
         <button class="btn" ng-click="cancel()" th:text="#{Cancel}">Cancel</button>
         <button href="#" class="btn btn-primary" ng-click="save()" ng-disabled="!isValid()" th:text="#{Add}">Add</button>
       </div>

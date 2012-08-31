@@ -87,8 +87,9 @@ function EditDiagramController($scope, $q, $http, debouncer, app) {
   var FOX_DESIGNER = "fox designer", 
     RIGHT_HAND_SIDE = "rightHandSide";
 
+  // Can the modeler name be edited?
   var canEditModeler = $scope.canEditModeler = function() {
-    return !!($scope.identifier != RIGHT_HAND_SIDE || $scope.editDiagram.modeler)
+    return !!($scope.identifier != RIGHT_HAND_SIDE || ($scope.editDiagram.modeler && $scope.editDiagram.modeler != FOX_DESIGNER));
   };
   
   function getModelerNames() {
@@ -110,7 +111,6 @@ function EditDiagramController($scope, $q, $http, debouncer, app) {
   // is the dialog model valid and can be submitted?
   var isValid = $scope.isValid = function() {
     var editDiagram = $scope.editDiagram;
-    console.log(!!editDiagram.modeler, ($scope.addModelForm.$valid !== false), (!!editDiagram.diagramPath && editDiagram.diagramPath.type == 'FILE'), editDiagram.diagramPath ? editDiagram.diagramPath.type : 'null');
     return !!editDiagram.modeler && ($scope.addModelForm.$valid !== false) && (editDiagram.diagramPath ? editDiagram.diagramPath.type == 'FILE' : false);
   };
   
@@ -152,6 +152,7 @@ function EditDiagramController($scope, $q, $http, debouncer, app) {
   // diagram with no name is edited
   // relaxed implements AT in HEMERA-2549
   if (!canEditModeler()) {
+    console.log("SET FOX DESIGNER AS MODELLER");
     $scope.editDiagram.modeler = FOX_DESIGNER;
   }
   
