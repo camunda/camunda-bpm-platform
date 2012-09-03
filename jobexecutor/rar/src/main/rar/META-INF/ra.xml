@@ -6,11 +6,11 @@
            http://java.sun.com/xml/ns/j2ee/connector_1_6.xsd"
   version="1.6" metadata-complete="false">
 
-  <module-name>fox-platform-jobexecutor-rar</module-name>
-  
-  <display-name>camunda fox platform resource adapter</display-name>
+  <module-name>camunda-fox-platform-jobexecutor</module-name>
+  <display-name>camunda fox platform jobexecutor resource adapter</display-name>
   <vendor-name>camunda services GmbH</vendor-name>
-  <resourceadapter>
   
-  </resourceadapter> 
+  <resourceadapter>
+
+  </resourceadapter>
 </connector>

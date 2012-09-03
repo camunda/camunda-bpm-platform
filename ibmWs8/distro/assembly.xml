@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<assembly xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="urn:maven:assembly:1.1.2">
+
+  <id>distro</id>
+
+  <formats>
+    <format>zip</format>
+    <format>tar.gz</format>
+  </formats>
+
+  <includeBaseDirectory>false</includeBaseDirectory>
+
+  <fileSets>
+    <fileSet>
+      <directory>../../sql-script/target</directory>
+      <outputDirectory />
+      <includes>
+        <include>sql/</include>
+      </includes>
+    </fileSet>
+  </fileSets>
+
+  <files>
+    <file>
+      <source>src/README.txt</source>
+      <filtered>true</filtered>
+      <outputDirectory></outputDirectory>
+    </file>
+  </files>
+
+  <dependencySets>
+    <dependencySet>
+      <outputDirectory>client/</outputDirectory>
+      <includes>
+        <include>com.camunda.fox.platform:fox-platform-client:jar:*</include>
+      </includes>
+    </dependencySet>
+    
+    <dependencySet>
+      <outputDirectory>modules</outputDirectory>
+      <includes>
+    <include>com.camunda.fox.platform:fox-platform-jobexecutor-rar:rar:*</include>
+        <include>com.camunda.fox.platform:fox-platform-ibm-websphere-ear:ear:*</include>
+      </includes>     
+    </dependencySet>
+    <dependencySet>
+      <outputDirectory>modules/lib</outputDirectory>
+      <includes>
+        <include>com.camunda.fox.engine:fox-engine:jar:*</include>
+        <include>com.camunda.fox.platform:fox-platform-api:jar:*</include>
+        <include>com.camunda.fox.platform:fox-platform-jobexecutor-api:jar:*</include>
+        <include>org.mybatis:mybatis:jar:*</include>
+        <include>com.fasterxml.uuid:java-uuid-generator:jar:*</include>      
+      </includes>     
+    </dependencySet>
+        
+  </dependencySets>
+</assembly>

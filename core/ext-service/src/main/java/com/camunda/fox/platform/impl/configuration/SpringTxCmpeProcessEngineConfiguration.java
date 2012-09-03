@@ -10,13 +10,11 @@ import org.activiti.engine.impl.interceptor.Command;
 import org.activiti.engine.impl.interceptor.CommandContextInterceptor;
 import org.activiti.engine.impl.interceptor.CommandInterceptor;
 import org.activiti.engine.impl.interceptor.LogInterceptor;
-import org.activiti.engine.impl.jobexecutor.JobExecutor;
 import org.activiti.spring.SpringTransactionInterceptor;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.jta.JtaTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
 
-import com.camunda.fox.platform.impl.jobexecutor.simple.SimpleJobExecutor;
 import com.camunda.fox.platform.impl.service.ProcessEngineController;
 import com.camunda.fox.platform.impl.transactions.spi.TransactionManagerFactory;
 import com.camunda.fox.platform.impl.util.Services;
@@ -35,30 +33,20 @@ import com.camunda.fox.platform.impl.util.Services;
  * 
  * <p>We use externally-managed transactions to enable the process engine to participate in 
  * client transactions (and vice versa).</p>
- * 
- * <p><b>Work Management:</b> this configuration performs autodetection of the 
- * right {@link JobExecutor} implementation for the application server we are running in.
- * <ul>
- * <li>On IBM WebSphere / Oracle WebLogic we use the {@link WorkManagerJobExecutor}, delegating 
- * to a CommonJ work manager and thereby using container-managed JEE-Threads.</li>
- * <li>On other application servers we use the {@link SimpleJobExecutor} which uses a 
- * {@link java.util.concurrent.ThreadPoolExecutor} and self-managed threads.</li>
- * </ul>  
- * </p>
- * 
+ *  
  * <p>Note: This configuration uses some classes provided by the spring framework while not building 
  * a Spring application context.</p>
  *  
- * <p>Note: this configuration conforms to IBM and Oracle application server support requirements.</p>
+ * <p>This configuration conforms to IBM and Oracle application server support requirements.</p>
  * 
  * @author Daniel Meyer
  * @author nico.rehwaldt@camunda.com
  */
-public class SpringCmpeProcessEngineConfiguration extends CmpeProcessEngineConfiguration {
+public class SpringTxCmpeProcessEngineConfiguration extends CmpeProcessEngineConfiguration {
   
   protected PlatformTransactionManager transactionManager;
   
-  public SpringCmpeProcessEngineConfiguration(ProcessEngineController processEngineController) {
+  public SpringTxCmpeProcessEngineConfiguration(ProcessEngineController processEngineController) {
     super(processEngineController);
   }
     

@@ -6,12 +6,12 @@ import com.camunda.fox.platform.impl.configuration.spi.ProcessEngineConfiguratio
 import com.camunda.fox.platform.impl.service.ProcessEngineController;
 
 /**
- * <p>Default {@link ProcessEngineConfigurationFactory}, returning a {@link SpringCmpeProcessEngineConfiguration}</p>
+ * <p>Default {@link ProcessEngineConfigurationFactory}, returning a {@link SpringTxCmpeProcessEngineConfiguration}</p>
  * 
  * @author Daniel Meyer
  * @author nico.rehwaldt@camunda.com
  */
-public class SpringCmpeProcessEngineConfigurationFactory implements ProcessEngineConfigurationFactory {
+public class SpringTxCmpeProcessEngineConfigurationFactory implements ProcessEngineConfigurationFactory {
 
   protected ProcessEngineController processEngineController;
   
@@ -20,7 +20,7 @@ public class SpringCmpeProcessEngineConfigurationFactory implements ProcessEngin
   }
   
   public ProcessEngineConfigurationImpl getProcessEngineConfiguration() {
-    return new SpringCmpeProcessEngineConfiguration(processEngineController);
+    return new SpringTxCmpeProcessEngineConfiguration(processEngineController);
   }
 
 }
