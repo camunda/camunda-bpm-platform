@@ -16,7 +16,6 @@
     <module>core</module>
     <module>parent</module>
     <module>qa</module>
-    <module>examples</module>
     <module>ejb-service</module>
     <module>jbossas71</module>
     <module>gf31</module>
@@ -26,7 +25,7 @@
     <module>webapps/tasklist</module>
     <module>jobexecutor</module>
     <module>sql-script</module>
-    <!--  module>ibmWs8</module -->
+    <module>ibmWs8</module>
   </modules>
   
   <scm>
