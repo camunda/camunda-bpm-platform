@@ -15,6 +15,8 @@ public abstract class Connector {
   
   public abstract InputStream getContent(ConnectorNode node);
   
+  public abstract void updateContent(ConnectorNode node, String newContent) throws Exception;
+  
   public void login(String userName, String password) {
   }
   
@@ -35,4 +37,5 @@ public abstract class Connector {
   
   public void createModel() throws Exception {
   }
+  
 }

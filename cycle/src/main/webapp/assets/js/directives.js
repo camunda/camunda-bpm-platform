@@ -213,6 +213,12 @@ angular
        * @returns nothing
        */
       function initAndShow() {
+        
+        var options = model().autoClosable ? {} : {
+          backdrop: 'static', 
+          keyboard: false
+        };
+        
         dialog()
           .hide()
           // register events to make sure the model is updated 
@@ -230,7 +236,7 @@ angular
             model().status = "open";
           })
           // and show modal
-          .modal();
+          .modal(options);
       }
 
       /**
@@ -276,6 +282,7 @@ function Dialog() {
   
   var self = this;
   self.status = "closed";
+  self.autoClosable = true;
   
   this.open = function() {
     self.status = "opening";
@@ -286,6 +293,10 @@ function Dialog() {
     self.status = "closing";
   };
 
+  this.setAutoClosable = function(closable) {
+    self.autoClosable = closable;
+  };
+  
   this.renderHtml = function() {
     return self.status != "closed";
   }

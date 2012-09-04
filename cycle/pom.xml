@@ -23,7 +23,7 @@
       <groupId>org.springframework</groupId>
       <artifactId>spring-orm</artifactId>
     </dependency>
-    
+
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-aop</artifactId>
@@ -54,8 +54,19 @@
     </dependency>
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
+      <artifactId>resteasy-multipart-provider</artifactId>
+      <version>${version.resteasy}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.resteasy</groupId>
       <artifactId>resteasy-spring</artifactId>
       <version>${version.resteasy}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpmime</artifactId>
+      <version>4.1.2</version>
     </dependency>
 
     <!-- apis -->
@@ -70,7 +81,7 @@
       <artifactId>javax.inject</artifactId>
       <version>1</version>
     </dependency>
-    
+
     <!-- jpa 2.0 api -->
     <dependency>
       <groupId>org.hibernate.javax.persistence</groupId>
@@ -107,21 +118,39 @@
       <artifactId>gettext-commons</artifactId>
       <version>0.9.6</version>
     </dependency>
-    
+
     <!-- saxon for XSLT transformations (roundtrip) -->
     <dependency>
       <groupId>net.sourceforge.saxon</groupId>
       <artifactId>saxon</artifactId>
       <version>${version.saxon}</version>
     </dependency>
-    
+    <dependency>
+      <groupId>net.sourceforge.saxon</groupId>
+      <artifactId>saxon</artifactId>
+      <version>${version.saxon}</version>
+      <classifier>dom</classifier>
+    </dependency>
+    <dependency>
+      <groupId>net.sourceforge.saxon</groupId>
+      <artifactId>saxon</artifactId>
+      <version>${version.saxon}</version>
+      <classifier>xpath</classifier>
+    </dependency>
+
     <!-- commons vfs for fs connector -->
     <dependency>
       <groupId>org.apache.commons</groupId>
       <artifactId>commons-vfs2</artifactId>
       <version>2.0</version>
     </dependency>
-    
+
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+      <version>2.1</version>
+    </dependency>
+
     <!-- testing -->
     <dependency>
       <groupId>org.hamcrest</groupId>
@@ -149,13 +178,13 @@
       <version>1.7.0</version>
     </dependency>
   </dependencies>
-  
+
   <build>
     <finalName>cycle</finalName>
     <resources>
       <resource>
         <directory>src/main/resources</directory>
-<!--        <filtering>true</filtering>-->
+        <!-- <filtering>true</filtering> -->
       </resource>
     </resources>
     <testResources>
@@ -221,7 +250,7 @@
                 <source>lib/angular/angular.js</source>
                 <source>lib/angular/angular-resource.js</source>
                 <source>lib/angular/angular-mocks.js</source>
-              </preloadSources>             
+              </preloadSources>
             </configuration>
           </plugin>
         </plugins>
@@ -252,8 +281,8 @@
         <plugins>
           <plugin>
             <!-- required for i18n with GNU gettext -->
-            <!-- run 'mvn gettext:gettext gettext:merge gettext:dist' to update 
-            po files and generate a updated message bundle class -->
+            <!-- run 'mvn gettext:gettext gettext:merge gettext:dist' to update po 
+              files and generate a updated message bundle class -->
             <groupId>org.xnap.commons</groupId>
             <artifactId>maven-gettext-plugin</artifactId>
             <version>1.2.3</version>

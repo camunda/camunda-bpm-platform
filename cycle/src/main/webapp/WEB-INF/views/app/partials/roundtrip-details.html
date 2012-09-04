@@ -11,7 +11,11 @@
     <div class="span2">
       <div class="sync-options">
         <div class="actions">
-          <button class="btn btn-large" ng-disabled="!(roundtrip.rightHandSide && roundtrip.leftHandSide)">sync &rarr;</button>
+          <button class="btn btn-large" ng-show="!roundtrip.rightHandSide && roundtrip.leftHandSide">create &rarr;</button>
+          <button class="btn btn-large" 
+                  ng-hide="!roundtrip.rightHandSide && roundtrip.leftHandSide" 
+                  ng-disabled="!(roundtrip.rightHandSide && roundtrip.leftHandSide)"
+                  ng-click="openSyncDialog('leftToRight')">sync &rarr;</button>
         </div>
         <div>
           <span ng-show="roundtrip.lastSync">
@@ -22,7 +26,9 @@
           </span>
         </div>
         <div class="actions">
-          <button class="btn btn-large" ng-disabled="!(roundtrip.rightHandSide && roundtrip.leftHandSide)">&larr; sync</button>
+          <button class="btn btn-large"
+                  ng-disabled="!(roundtrip.rightHandSide && roundtrip.leftHandSide)"
+                  ng-click="openSyncDialog('rightToLeft')">&larr; sync</button>
         </div>
       </div>
     </div>
@@ -33,43 +39,54 @@
   </div>
   
   <!-- begin sync-roundtrip-dialog -->
-  <dialog model="syncActive">
-    <div class="modal" id="sync-roundtrip-dialog" style="display: none;" data-ng-init="initModal()">
+  <dialog model="syncDialog" ng-cloak>
+    <div class="modal" ng-controller="SyncRoundtripController" ngm-if="syncDialog.renderHtml()">
       <div class="modal-header">
-        <button type="button" class="close" data-dismiss="modal">&times;</button>
-        <h3 th:text="#{Add file}">Add file</h3>
+        <button ng-show="syncDialog.autoClosable" type="button" class="close" data-dismiss="modal">&times;</button>
+        <h3 th:text="#{Synchronize models}">Synchronize models</h3>
       </div>
       <div class="modal-body">
-        <form class="form-horizontal" novalidate ng-submit="save()" name="addModelForm">
-          <fieldset>
-            <div class="control-group">
-              <label class="control-label" for="input01" th:text="#{Modeler Name}">Modeler Name</label>
-              <div class="controls">
-                <input data-typeahead data-values="modelerNames" ng-model="modelerName" name="modelerName" type="text" id="input01" />
-              </div>
+        <div ng-switch on="status">
+          <div ng-switch-when="beforeStart">
+            <p>
+              <span ng-show="syncMode == 'leftToRight'" th:text="#{The synchronization will perform from left to right.}" />
+              <span ng-hide="syncMode == 'leftToRight'" th:text="#{The synchronization will perform from right to left.}" />
+            </p>
+            <p>
+              <span th:text="#{Are you sure to synchronize the models}" />
+            </p>
+          </div>
+          <div ng-switch-when="performSynchronize">
+            <p th:text="#{Synchronization in progress}">Synchronization in progress</p>          
+            <div class="progress progress-striped active">
+              <div class="bar" style="width: 100%;"></div>
             </div>
-            <div class="control-group">
-              <label class="control-label" for="connectors" th:text="#{Select Connector}">Select Connector</label>
-              <div class="controls">
-                <select id="connectors" data-ng-model="connector" data-ng-options="c.name for c in connectors">
-                </select>
-              </div>
-            </div>
-            <div class="control-group">
-              <label class="control-label" for="tree" th:text="#{Select BPMN File}">Select BPMN File</label>
-              <div class="controls">
-                <div id="tree" class="claro" data-selected="selectedTreeItem" data-cycle-tree data-id="connectorTree" data-connector="connector">
-                </div>
-              </div>
-            </div>
-            <tabs>
-            </tabs>
-          </fieldset>
-        </form>
+          </div>
+          <div ng-switch-when="synchronizationFailed">
+            <p>
+              <span th:text="#{The synchronization of the models failed.}">
+                The synchronization of the models failed.
+              </span>
+            </p>
+          </div>
+          <div ng-switch-when="synchronizationSuccess">
+            <p>
+              <span th:text="#{The synchronization of the models was successful.}">
+                The synchronization of the models was successful.
+              </span>
+            </p>
+          </div>
+        </div>
       </div>
       <div class="modal-footer">
-        <button class="btn" ng-click="cancel()" th:text="#{Cancel}">Cancel</button>
-        <button href="#" class="btn btn-primary" ng-click="save()" th:text="#{Add}">Add</button>
+        <button class="btn" ng-click="cancel()" th:text="#{Cancel}"
+                ng-disabled="status == 'performSynchronize'"
+                ng-hide="status == 'synchronizationFailed' || status == 'synchronizationSuccess'">Cancel</button>
+        <button href="#" class="btn btn-primary" ng-click="cancel()" th:text="#{Okay}"
+                ng-show="status == 'synchronizationFailed' || status == 'synchronizationSuccess'">Synchronize</button>
+        <button href="#" class="btn btn-primary" ng-click="performSync()" th:text="#{Synchronize}"
+                ng-disabled="status == 'performSynchronize'"
+                ng-hide="status == 'synchronizationFailed' || status == 'synchronizationSuccess'">Synchronize</button>
       </div>
     </div>
   </dialog>

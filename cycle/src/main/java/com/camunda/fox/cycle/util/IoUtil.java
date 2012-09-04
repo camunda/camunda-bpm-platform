@@ -33,6 +33,8 @@ import com.camunda.fox.cycle.exception.CycleException;
  */
 public class IoUtil {
 
+  private static final int BUFFERSIZE = 4096;
+  
   public static byte[] readInputStream(InputStream inputStream, String inputStreamName) {
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     byte[] buffer = new byte[16*1024];
@@ -109,6 +111,28 @@ public class IoUtil {
       }
     } catch(IOException ignore) {
       // Exception is silently ignored
+    }
+  }
+  
+  public static int copyBytes(InputStream in, OutputStream out) throws IOException {
+    if (in == null || out == null) {
+      throw new IllegalArgumentException("In/OutStream cannot be null");
+    }
+
+    try {
+      int total = 0;
+      byte[] buffer = new byte[BUFFERSIZE];
+      for (int bytesRead; (bytesRead = in.read(buffer)) != -1;) {
+        out.write(buffer, 0, bytesRead);
+        total += bytesRead;
+      }
+      return total;
+    } catch (IOException e) {
+      throw e;
+    } finally {
+      if (in != null) {
+        in.close();
+      }
     }
   }
 }

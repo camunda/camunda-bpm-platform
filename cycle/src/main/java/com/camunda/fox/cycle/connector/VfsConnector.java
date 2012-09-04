@@ -4,13 +4,11 @@ import java.io.File;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
-import java.util.SortedSet;
-import java.util.TreeSet;
 import java.util.logging.Logger;
 
+import org.apache.commons.vfs2.FileContent;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileSystemManager;
@@ -19,10 +17,11 @@ import org.apache.commons.vfs2.VFS;
 
 import com.camunda.fox.cycle.api.connector.Connector;
 import com.camunda.fox.cycle.api.connector.ConnectorNode;
-import com.camunda.fox.cycle.api.connector.Secured;
 import com.camunda.fox.cycle.api.connector.ConnectorNode.ConnectorNodeType;
+import com.camunda.fox.cycle.api.connector.Secured;
 import com.camunda.fox.cycle.entity.ConnectorConfiguration;
 import com.camunda.fox.cycle.exception.CycleException;
+import com.camunda.fox.cycle.exception.RepositoryException;
 
 public class VfsConnector extends Connector {
 
@@ -56,6 +55,8 @@ public class VfsConnector extends Connector {
           ConnectorNode node = new ConnectorNode(parent.getId()+File.separatorChar+baseName, baseName);
           if (file.getType() == FileType.FILE) {
             node.setType(ConnectorNodeType.FILE);
+          } else {
+            node.setType(ConnectorNodeType.FOLDER);
           }
           
           /**
@@ -88,7 +89,7 @@ public class VfsConnector extends Connector {
       fileObject = fsManager.resolveFile(basePath + node.getId());
 
       if (fileObject.getType() != FileType.FILE) {
-        throw new CycleException("Cant cant content of non-file node");
+        throw new CycleException("Cannot get content of non-file node");
       }
       
       return fileObject.getContent().getInputStream();
@@ -123,6 +124,26 @@ public class VfsConnector extends Connector {
     ConnectorNode rootNode = new ConnectorNode("/", "/");
     rootNode.setType(ConnectorNodeType.FOLDER);
     return rootNode;
+  }
+
+  @Secured
+  @Override
+  public void updateContent(ConnectorNode node, String newContent)  throws Exception {
+    FileSystemManager fsManager = VFS.getManager();
+    FileObject fileObject;
+    
+    fileObject = fsManager.resolveFile(this.basePath + node.getId());
+    
+    if (fileObject.exists()) {
+      if (fileObject.getType() != FileType.FILE) {
+        throw new CycleException("Unable to update content of file '" + node.getLabel() + "': Assigned file is not a file.");
+      }
+      FileContent content = fileObject.getContent();
+      content.getOutputStream().write(newContent.getBytes("UTF-8"));
+      content.close();
+    } else {
+      throw new RepositoryException("File '" + node.getLabel() + "' does not exist.");
+    }
   }
 
 }

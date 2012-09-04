@@ -20,6 +20,7 @@ public class LoginAspect {
       Connector con = (Connector) jp.getTarget();
       if (con.needsLogin()) {
         ConnectorConfiguration config = con.getConfiguration();
+        con.init(config);
         if (config.getLoginMode() != null && config.getLoginMode().equals(ConnectorLoginMode.GLOBAL)) {
           con.login(config.getGlobalUser(), config.getGlobalPassword());
         }

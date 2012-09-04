@@ -29,7 +29,7 @@ function DefaultController($scope, $http, $location, App) {
         if(item.name == navigationItem.name) {
           contains = true;			
         }
-        if(item.href.indexOf($location.path()) != 0) {
+        if (item.href.indexOf($location.path()) != 0) {
           remove++;
         }
       });
@@ -38,7 +38,7 @@ function DefaultController($scope, $http, $location, App) {
         breadCrumbs.pop();						
       }
 
-      if(!contains) {
+      if (!contains) {
         breadCrumbs.push({name:navigationItem.name, href:$location.path()});
       }		
     }
@@ -50,9 +50,44 @@ function HomeController($scope, $routeParams) {
   $scope.$emit("navigation-changed");
 }
 
-function RoundtripDetailsController($scope, $routeParams, RoundtripDetails, app, $http) {
-  $scope.roundtrip = RoundtripDetails.get({id: $routeParams.roundtripId });
+function RoundtripDetailsController($scope, $routeParams, RoundtripDetails, $location) {
+  $scope.syncDialog = new Dialog();
+  $scope.syncDialog.setAutoClosable(false);
+  
+  //get roundtrip details and forward to main page if bad request (ie. invalid id) occurs
+  $scope.roundtrip = RoundtripDetails.get({id: $routeParams.roundtripId }, function() {}, function(response) {
+    if (response.status == 400) {
+      $location.path("/");
+    }
+  });
+  
+  $scope.openSyncDialog = function (syncMode) {
+    $scope.syncMode = syncMode;
+    $scope.syncDialog.open();
+  };
+  
 };
+
+function SyncRoundtripController($scope, $http, app) {
+  
+  $scope.status = 'beforeStart';
+  
+  $scope.cancel = function () {
+    $scope.syncDialog.close();
+  };
+  
+  $scope.performSync = function() {
+    $scope.status = 'performSynchronize';
+    
+    $http.post(app.uri('secured/resource/roundtrip/' + $scope.roundtrip.id + '/sync?syncMode=' + $scope.syncMode)).
+      success(function(data) {
+        $scope.status = 'synchronizationSuccess';
+    }).
+      error(function (data) {
+        $scope.status = 'synchronizationFailed';
+      });
+  };
+}
 
 /**
  * Works along with the bpmn-diagram directive to manage a single bpmn-diagram in
@@ -152,7 +187,6 @@ function EditDiagramController($scope, $q, $http, Debouncer, App) {
   // diagram with no name is edited
   // relaxed implements AT in HEMERA-2549
   if (!canEditModeler()) {
-    console.log("SET FOX DESIGNER AS MODELLER");
     $scope.editDiagram.modeler = FOX_DESIGNER;
   }
   
@@ -261,21 +295,30 @@ function CreateNewRoundtripController($scope, $q, $http, $location, Debouncer, A
  * 
  */
 function ListRoundtripsController($scope, $route, $routeParams, Roundtrip) {
+  
+  // TODO: Add documentation page
   $scope.roundtrips = Roundtrip.query();
+  
   $scope.newRoundtripDialog = new Dialog();
   
-  var selectedRoundtripId = -1; 
+  var selectedRoundtripId = null; 
   
   // Update the selected roundtrip on route change
   $scope.$watch(function() { return $routeParams.roundtripId; }, function(newValue, oldValue) {
-    selectedRoundtripId = parseInt(newValue);    
-    if ($routeParams.roundtripId != undefined) {
-      angular.forEach($scope.roundtrips, function(item) {
-        if (item.id == $routeParams.roundtripId) {
-          // find the roundtripname for this roundtrip-id
-          $scope.$emit("navigation-changed", {name:item.name});
-        }
-      });
+    if (newValue) {
+      selectedRoundtripId = parseInt(newValue);
+      if (isNaN(selectedRoundtripId)) {
+        selectedRoundtripId = -1;
+      } else {
+        angular.forEach($scope.roundtrips, function(item) {
+          if (item.id == $routeParams.roundtripId) {
+            // find the roundtripname for this roundtrip-id
+            $scope.$emit("navigation-changed", {name:item.name});
+          }
+        });
+      }
+    } else {
+      selectedRoundtripId = -1;
     }
   });
   

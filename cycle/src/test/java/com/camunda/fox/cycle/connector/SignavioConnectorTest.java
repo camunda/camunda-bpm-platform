@@ -17,6 +17,7 @@ import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.client.ProxyFactory;
 import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
 import org.jboss.resteasy.spi.ResteasyProviderFactory;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kubek2k.springockito.annotations.SpringockitoContextLoader;
@@ -45,6 +46,11 @@ public class SignavioConnectorTest {
   
   private SignavioTestHelperClient signavioClient;
   private boolean loggedIn;
+  
+  @Before
+  public void setUp() throws Exception {
+    this.signavioConnector.init(this.signavioConnector.getConfiguration());
+  }
   
   @Test
   public void testConfigurableViaXml() throws Exception {
@@ -219,6 +225,21 @@ public class SignavioConnectorTest {
     assertEquals("/", root.getLabel());
     assertEquals(ConnectorNodeType.FOLDER, root.getType());
   }
+  
+//  @Test
+//  public void testImportBpmn20Xml() throws Exception {
+//    this.login();
+//    
+//    String modelToImport = IoUtil.readFileAsString("com/camunda/fox/cycle/connector/import-technical-model.bpmn");
+//    
+//    ConnectorNode parentNode = new ConnectorNode();
+//    parentNode.setId("/baca2d6ad18043ebb02e730124f64b66");
+//    parentNode.setLabel("Label");
+//    parentNode.setType(ConnectorNodeType.FOLDER);
+//    
+//    this.signavioConnector.importContent(parentNode, modelToImport);
+//    
+//  }
   
   private ConnectorNode createPublicConnectorNode() {
     ConnectorNode publicNode = new ConnectorNode(SIGNAVIO_PUBLIC_FOLDER_ID, "Public");
