@@ -3,7 +3,14 @@
 /* Directives */
 
 angular
-.module('cycle.directives', [])
+.module('cycle.directives', ['ui'])
+.value('ui.config', ['Commons', function(Commons) {
+  jq: {
+    typeahead: {
+      source: Commons.getModelerNames();
+    }
+  }
+}])
 .directive('cycleTree', function(App) {
 	return {
 		restrict: "A",
@@ -109,9 +116,11 @@ angular
     restrict: 'A',
     require: 'ngModel',
     scope: {
-      values: '='
+      ngModel: '=',
+      values: '=',
+      ngDisabled: '&'
     },
-    link: function(scope, element, attrs, ngModel) {
+    link: function(scope, element, attrs) {
       var typeahead = element.typeahead({
         source: scope.values,
         updater: function(item) {
@@ -119,13 +128,54 @@ angular
           return item;
         }
       });
-      
+
+      if (scope.ngDisabled) {
+        scope.ngDisabled();
+      }
       // update model with selected value
       function read(item) {
-        ngModel.$modelValue = item;
+        scope.ngModel = item;
       }
 
-      scope.$watch('values', function(newValue , oldValue) {
+      scope.$watch('values', function(newValue) {
+        typeahead.data('typeahead').source = newValue;
+      });
+
+      scope.$on('$destroy', function cleanup() {
+        $('ul.typeahead.dropdown-menu').each(function(){
+          $(this).remove();
+        });
+      });
+    }
+  };
+})
+.directive('combobox', function($http) {
+  return {
+    restrict: 'A',
+    require: 'ngModel',
+    scope: {
+      ngModel: '=',
+      values: '=',
+      ngDisabled: '&'
+    },
+    link: function(scope, element, attrs) {
+      var typeahead = element.typeahead({
+        source: scope.values,
+        updater: function(item) {
+          scope.$apply(read(item));
+          return item;
+        }
+      });
+
+      if (scope.ngDisabled) {
+        scope.ngDisabled();
+      }
+      // update model with selected value
+      function read(item) {
+        scope.ngModel = item;
+      }
+
+      scope.$watch('values', function(newValue) {
         typeahead.data('typeahead').source = newValue;
       });
 

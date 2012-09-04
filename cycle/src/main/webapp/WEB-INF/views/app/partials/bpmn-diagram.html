@@ -37,8 +37,12 @@
             <div class="control-group">
               <label class="control-label" for="input01" th:text="#{Modeler Name}">Modeler Name</label>
               <div class="controls">
-                <!-- ads-data-typeahead data-values="modelerNames" -->
-                <input class="span8" ng-model="editDiagram.modeler" name="modelerName" ng-disabled="!canEditModeler()" type="text" required autofocus />
+                <!--
+                <input class="span8" data-typeahead data-values="modelerNames" ng-model="editDiagram.modeler" name="modelerName" type="text" ng-disabled="!canEditModeler()" required autofocus />
+                -->
+                <input class="span8" ui-jq="combobox" ui-options="{ source: ['adonis','signavio','fox designer']}" ng-model="editDiagram.modeler" name="modelerName" type="text" ng-disabled="!canEditModeler()" required autofocus />
+                <!--input class="span8" ng-model="editDiagram.modeler" name="modelerName" ng-disabled="!canEditModeler()" type="text" required autofocus /-->
+                {{editDiagram.modeler}}
                 <p class="alert alert-info" ng-show="!editDiagram.modeler" th:text="#{Type in / choose the name of your modeler}">Type in / choose the name of your modeler</p>
               </div>
             </div>

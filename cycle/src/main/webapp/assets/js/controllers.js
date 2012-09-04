@@ -46,19 +46,18 @@ function DefaultController($scope, $http, $location, App) {
   // end Bread Crumb
 };
 
-function HomeController($scope, $routeParams) {
+function HomeController($scope) {
   $scope.$emit("navigation-changed");
 }
 
-function RoundtripDetailsController($scope, $routeParams, RoundtripDetails, app, $http) {
+function RoundtripDetailsController($scope, $routeParams, RoundtripDetails) {
   $scope.roundtrip = RoundtripDetails.get({id: $routeParams.roundtripId });
 };
 
 /**
- * Works along with the bpmn-diagram directive to manage a single bpmn-diagram in
- * the roundtrip view. 
+ * Works along with the bpmn-diagram directive to manage a single bpmn-diagram in the roundtrip view.
  */
-function BpmnDiagramController($scope, $http) {
+function BpmnDiagramController($scope) {
   $scope.editDiagramDialog = new Dialog();
   
   $scope.addDiagram = function() {
@@ -79,34 +78,17 @@ function BpmnDiagramController($scope, $http) {
 }
 
 /**
- * Realizes the edit operation of a bpmn diagram inside the respective 
- * dialog. 
+ * Realizes the edit operation of a bpmn diagram inside the respective dialog.
  */
-function EditDiagramController($scope, $q, $http, Debouncer, App) {
+function EditDiagramController($scope, $http, App, Commons) {
   
   var FOX_DESIGNER = "fox designer", 
-    RIGHT_HAND_SIDE = "rightHandSide";
+      RIGHT_HAND_SIDE = "rightHandSide";
 
   // Can the modeler name be edited?
   var canEditModeler = $scope.canEditModeler = function() {
     return !!($scope.identifier != RIGHT_HAND_SIDE || ($scope.editDiagram.modeler && $scope.editDiagram.modeler != FOX_DESIGNER));
   };
-  
-  function getModelerNames() {
-    $http.get(App.uri('secured/resource/diagram/modelerNames')).success(function(data) {
-      $scope.modelerNames = data;
-      // set default value, when only one entry
-      if (data.length == 1 && canEditModeler()) {
-        $scope.editDiagram.modeler = data[0];
-      }
-    });
-  }
-
-  function getConnectors() {
-    $http.get(App.uri("secured/resource/connector/list")).success(function(data) {
-      $scope.connectors = data;
-    });
-  }
     
   // is the dialog model valid and can be submitted?
   var isValid = $scope.isValid = function() {
@@ -147,6 +129,13 @@ function EditDiagramController($scope, $q, $http, Debouncer, App) {
       console.log("editDiagram.diagramPath: " + newValue.name)
     }
   });
+
+  // Watch for change in diagram path
+  $scope.$watch('editDiagram.modeler', function(newValue) {
+    if (newValue) {
+      console.log("editDiagram.modeler: " + newValue)
+    }
+  });
   
   // set modeler name as fox designer whenever a right hand side 
   // diagram with no name is edited
@@ -162,13 +151,18 @@ function EditDiagramController($scope, $q, $http, Debouncer, App) {
   // TODO: nico.rehwaldt: On update: How to initially display the right folder structure?
   // 
   // get required data
-  getModelerNames();
-  getConnectors();
+  Commons.getModelerNames().then(function(data) {
+    $scope.modelerNames = data;
+    // set default value, when only one entry
+    if (data.length == 1 && canEditModeler()) {
+      $scope.editDiagram.modeler = data[0];
+    }
+  });
+  $scope.connectors = Commons.getConnectors();
 }
 
 /**
- * Responsible for adding a new roundtrip from within the 
- * roundtrip list
+ * Responsible for adding a new roundtrip from within the roundtrip list
  * 
  */
 function CreateNewRoundtripController($scope, $q, $http, $location, Debouncer, App, Roundtrip) {
@@ -260,14 +254,14 @@ function CreateNewRoundtripController($scope, $q, $http, $location, Debouncer, A
  * Responsible for listing the roundtrips and updating the currently selected one
  * 
  */
-function ListRoundtripsController($scope, $route, $routeParams, Roundtrip) {
+function ListRoundtripsController($scope, $routeParams, Roundtrip) {
   $scope.roundtrips = Roundtrip.query();
   $scope.newRoundtripDialog = new Dialog();
   
   var selectedRoundtripId = -1; 
   
   // Update the selected roundtrip on route change
-  $scope.$watch(function() { return $routeParams.roundtripId; }, function(newValue, oldValue) {
+  $scope.$watch(function() { return $routeParams.roundtripId; }, function(newValue) {
     selectedRoundtripId = parseInt(newValue);    
     if ($routeParams.roundtripId != undefined) {
       angular.forEach($scope.roundtrips, function(item) {
