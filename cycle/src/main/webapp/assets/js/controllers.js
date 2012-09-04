@@ -3,12 +3,12 @@
 
 angular.module('cycle.controllers', []);
 
-function DefaultController($scope, $http, $location, app) {
+function DefaultController($scope, $http, $location, App) {
   
   // TODO: get from cookie
   $scope.currentUser = null;
   
-  $http.get(app.uri('currentUser')).success(function(data) {
+  $http.get(App.uri('currentUser')).success(function(data) {
     $scope.currentUser = data;
   });
   
@@ -82,7 +82,7 @@ function BpmnDiagramController($scope, $http) {
  * Realizes the edit operation of a bpmn diagram inside the respective 
  * dialog. 
  */
-function EditDiagramController($scope, $q, $http, debouncer, app) {
+function EditDiagramController($scope, $q, $http, Debouncer, App) {
   
   var FOX_DESIGNER = "fox designer", 
     RIGHT_HAND_SIDE = "rightHandSide";
@@ -93,7 +93,7 @@ function EditDiagramController($scope, $q, $http, debouncer, app) {
   };
   
   function getModelerNames() {
-    $http.get(app.uri('secured/resource/diagram/modelerNames')).success(function(data) {
+    $http.get(App.uri('secured/resource/diagram/modelerNames')).success(function(data) {
       $scope.modelerNames = data;
       // set default value, when only one entry
       if (data.length == 1 && canEditModeler()) {
@@ -103,7 +103,7 @@ function EditDiagramController($scope, $q, $http, debouncer, app) {
   }
 
   function getConnectors() {
-    $http.get(app.uri("secured/resource/connector/list")).success(function(data) {
+    $http.get(App.uri("secured/resource/connector/list")).success(function(data) {
       $scope.connectors = data;
     });
   }
@@ -171,7 +171,7 @@ function EditDiagramController($scope, $q, $http, debouncer, app) {
  * roundtrip list
  * 
  */
-function CreateNewRoundtripController($scope, $q, $http, $location, debouncer, app, Roundtrip) {
+function CreateNewRoundtripController($scope, $q, $http, $location, Debouncer, App, Roundtrip) {
 
   $scope.name = '';
   $scope.nameChecked = false;
@@ -218,7 +218,7 @@ function CreateNewRoundtripController($scope, $q, $http, $location, debouncer, a
    * Checking the name of an argument maximum every 1000ms
    * and update the model respectively
    */
-  var checkName = debouncer.debounce(function(name) {
+  var checkName = Debouncer.debounce(function(name) {
     isNameValid(name).then(function(valid) {
       $scope.nameChecked = true;
       
@@ -247,7 +247,7 @@ function CreateNewRoundtripController($scope, $q, $http, $location, debouncer, a
     if (!name || name == "") {
       deferred.resolve(true);
     } else {
-      $http.get(app.uri("secured/resource/roundtrip/isNameValid?name=" + name)).success(function(data) {
+      $http.get(App.uri("secured/resource/roundtrip/isNameValid?name=" + name)).success(function(data) {
         deferred.resolve(data == "true");
       });
     }

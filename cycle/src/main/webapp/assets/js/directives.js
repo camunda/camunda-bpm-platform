@@ -4,7 +4,7 @@
 
 angular
 .module('cycle.directives', [])
-.directive('cycleTree', function(app) {
+.directive('cycleTree', function(App) {
 	return {
 		restrict: "A",
 		replace: false,
@@ -31,14 +31,14 @@ angular
 					scope.$watch("connector", function (newValue , oldValue) {
 				    	if (newValue != undefined && newValue != oldValue) {
 				    		
-							request.get(app.uri("secured/resource/connector/" + newValue.connectorId + "/tree/root"), {
+							request.get(App.uri("secured/resource/connector/" + newValue.connectorId + "/tree/root"), {
 					            handleAs: "json"
 					        }).then(function(requestData){
 								
 								var memoryStore = new Memory({
 							        data: requestData,
 							        getChildren: function(object) {
-							        	return request.post(app.uri("secured/resource/connector/" + newValue.connectorId + "/tree/children"), {
+							        	return request.post(App.uri("secured/resource/connector/" + newValue.connectorId + "/tree/children"), {
 								            data : {"parent" : object.id, "parentPath" : object.path},
 							        		handleAs: "json"
 								        }).then(function(childData){
@@ -125,8 +125,14 @@ angular
         ngModel.$modelValue = item;
       }
 
-      scope.$watch("values", function(newValue , oldValue) {
+      scope.$watch('values', function(newValue , oldValue) {
         typeahead.data('typeahead').source = newValue;
+      });
+
+      scope.$on('$destroy', function cleanup() {
+        $('ul.typeahead.dropdown-menu').each(function(){
+          $(this).remove();
+        });
       });
     }
   };
@@ -142,7 +148,7 @@ angular
  * 
  * <bpmn-diagram roundtrip="myRoundtrip" diagram="myRoundtrip.leftHandSide" identifier="leftHandSide" />
  */
-.directive("bpmnDiagram", function(app) {
+.directive("bpmnDiagram", function(App) {
   return {
     restrict: 'E',
     scope: {
@@ -150,7 +156,7 @@ angular
       diagram: '=', 
       identifier: '@'
     }, 
-    templateUrl: app.uri("secured/view/partials/bpmn-diagram.html"), 
+    templateUrl: App.uri("secured/view/partials/bpmn-diagram.html"),
     controller: 'BpmnDiagramController', 
     link: function(scope, element, attrs) {
       scope.identifier = attrs.identifier;

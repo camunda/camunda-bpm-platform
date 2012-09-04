@@ -4,7 +4,7 @@
 
 angular
   .module('cycle.services', ['ngResource'])
-  .value('debouncer', {
+  .value('Debouncer', {
     /**
      * Debounce a function call, making it callable an arbitrary number of times before it is actually executed once. 
      * 
@@ -31,7 +31,7 @@ angular
    *  root() -> returns the application root
    *  uri(str) -> returns a application root relative uri from the given argument
    */
-  .factory('app', function() {
+  .factory('App', function() {
     function root() {
       return $("base").attr("app-base");
     }
@@ -43,9 +43,18 @@ angular
       }
     };
   })
-  .factory('Roundtrip', function($resource, app){
-    return $resource(app.uri('secured/resource/roundtrip/:id'), {id: "@id"}, {});
+  .factory('Roundtrip', function($resource, App){
+    return $resource(App.uri('secured/resource/roundtrip/:id'), {id: "@id"}, {});
   })
-  .factory('RoundtripDetails', function($resource, app){
-    return $resource(app.uri('secured/resource/roundtrip/:id/details'), {id: "@id"}, {});
+  .factory('RoundtripDetails', function($resource, App){
+    return $resource(App.uri('secured/resource/roundtrip/:id/details'), {id: "@id"}, {});
+  })
+  .factory('Commons', function($http) {
+    var commons = {};
+
+    commons.getModelerNames = function() {
+
+    }
+
+    return commons;
   });
