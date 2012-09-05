@@ -48,12 +48,12 @@
       <div class="modal-body">
         <div ng-switch on="status">
           <div ng-switch-when="beforeStart">
-            <p>
-              <span ng-show="syncMode == 'LEFT_TO_RIGHT'" th:text="#{The synchronization will perform from left to right.}" />
-              <span ng-hide="syncMode == 'RIGHT_TO_LEFT'" th:text="#{The synchronization will perform from right to left.}" />
+          	<p>
+              <span ng-show="syncMode == 'LEFT_TO_RIGHT'" th:text="#{The synchronization will perform from left to right.}"></span>
+              <span ng-hide="syncMode == 'LEFT_TO_RIGHT'" th:text="#{The synchronization will perform from right to left.}"></span>
             </p>
             <p>
-              <span th:text="#{Are you sure to synchronize the models}" />
+              <span th:text="#{'Are you sure to synchronize the models?'}" />
             </p>
           </div>
           <div ng-switch-when="performSynchronize">
@@ -83,7 +83,7 @@
                 ng-disabled="status == 'performSynchronize'"
                 ng-hide="status == 'synchronizationFailed' || status == 'synchronizationSuccess'">Cancel</button>
         <button href="#" class="btn btn-primary" ng-click="cancel()" th:text="#{Okay}"
-                ng-show="status == 'synchronizationFailed' || status == 'synchronizationSuccess'">Synchronize</button>
+                ng-show="status == 'synchronizationFailed' || status == 'synchronizationSuccess'">Okay</button>
         <button href="#" class="btn btn-primary" ng-click="performSync()" th:text="#{Synchronize}"
                 ng-disabled="status == 'performSynchronize'"
                 ng-hide="status == 'synchronizationFailed' || status == 'synchronizationSuccess'">Synchronize</button>

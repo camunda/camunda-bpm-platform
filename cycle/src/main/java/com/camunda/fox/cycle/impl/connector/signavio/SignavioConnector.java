@@ -423,4 +423,14 @@ public class SignavioConnector extends Connector {
     throw new UnsupportedOperationException();
   }
   
+  @Override
+  public void dispose() {
+    if (this.httpClient4Executor != null) {
+      this.httpClient4Executor.getHttpClient().getConnectionManager().shutdown();
+      this.httpClient4Executor = null;
+      this.signavioClient = null;
+      this.loggedIn = false;
+    }
+  }
+  
 }
