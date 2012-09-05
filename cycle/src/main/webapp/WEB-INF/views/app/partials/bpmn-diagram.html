@@ -42,7 +42,7 @@
                   ng-options="modeler for modeler in modelerNames" th:attr="placeholder=#{Enter the name of your modeler}">
                   <option value=""></option>
                 </select>
-                <input ngm-if="!canEditModeler()" id="modelerName" name="modelerName" required autofocus ng-model="editDiagram.modeler" ng-disabled="true" type="text" th:attr="placeholder=#{Enter the name of your modeler}">
+                <span ngm-if="!canEditModeler()" id="modelerName" name="modelerName" required class="uneditable-input" type="text">{{editDiagram.modeler}}</span>
               </div>
             </div>
             <div class="control-group">
