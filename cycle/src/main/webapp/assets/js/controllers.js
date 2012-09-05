@@ -66,9 +66,13 @@ function RoundtripDetailsController($scope, $routeParams, RoundtripDetails, $loc
     $scope.syncDialog.open();
   };
   
+  $scope.$on("roundtrip-changed", function(event, roundtrip) {
+    $scope.roundtrip = roundtrip;
+  });
+  
 };
 
-function SyncRoundtripController($scope, $http, app) {
+function SyncRoundtripController($scope, $http, App) {
   
   $scope.status = 'beforeStart';
   
@@ -79,9 +83,10 @@ function SyncRoundtripController($scope, $http, app) {
   $scope.performSync = function() {
     $scope.status = 'performSynchronize';
     
-    $http.post(app.uri('secured/resource/roundtrip/' + $scope.roundtrip.id + '/sync?syncMode=' + $scope.syncMode)).
+    $http.post(App.uri('secured/resource/roundtrip/' + $scope.roundtrip.id + '/sync?syncMode=' + $scope.syncMode)).
       success(function(data) {
         $scope.status = 'synchronizationSuccess';
+        $scope.$emit("roundtrip-changed", data);
     }).
       error(function (data) {
         $scope.status = 'synchronizationFailed';
