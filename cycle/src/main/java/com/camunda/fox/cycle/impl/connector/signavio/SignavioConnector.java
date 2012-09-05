@@ -418,4 +418,14 @@ public class SignavioConnector extends Connector {
     return this.httpClient4Executor;
   }
   
+  @Override
+  public void dispose() {
+    if (this.httpClient4Executor != null) {
+      this.httpClient4Executor.getHttpClient().getConnectionManager().shutdown();
+      this.httpClient4Executor = null;
+      this.signavioClient = null;
+      this.loggedIn = false;
+    }
+  }
+  
 }
