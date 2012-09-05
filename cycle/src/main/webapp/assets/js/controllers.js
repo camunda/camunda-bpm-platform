@@ -151,6 +151,9 @@ function EditDiagramController($scope, $http, App, Commons) {
   // TODO: nico.rehwaldt: On update: How to initially display the right folder structure?
   // 
   // get required data
+
+  //$scope.modelerNames = ['adonis','signavio','fox designer','bizagi'];
+
   Commons.getModelerNames().then(function(data) {
     $scope.modelerNames = data;
     // set default value, when only one entry

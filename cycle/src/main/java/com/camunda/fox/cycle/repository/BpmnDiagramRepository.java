@@ -1,5 +1,6 @@
 package com.camunda.fox.cycle.repository;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.stereotype.Repository;
@@ -14,8 +15,8 @@ import com.camunda.fox.cycle.entity.BpmnDiagram;
 public class BpmnDiagramRepository extends AbstractRepository<BpmnDiagram> {
   
   public List<String> findAllModelerNames() {
-//    List<String> modelerNames = new ArrayList<String>();
-//    modelerNames.add("BOC Adonis");
+    List<String> modelerNames = new ArrayList<String>();
+    modelerNames.add("BOC Adonis");
 //    modelerNames.add("Signavio Process Editor");
 //    modelerNames.add("Cubetto");
 //    modelerNames.add("Yaoqiang");
@@ -24,8 +25,8 @@ public class BpmnDiagramRepository extends AbstractRepository<BpmnDiagram> {
 //    modelerNames.add("BPMN 2.0 Modeler for Visio");
 //    modelerNames.add("ibo Prometheus");
 //    modelerNames.add("Fox designer");
-//
-//    return modelerNames;
-    return em.createQuery("SELECT DISTINCT b.modeler FROM BpmnDiagram b", String.class).getResultList();
+
+    return modelerNames;
+//    return em.createQuery("SELECT DISTINCT b.modeler FROM BpmnDiagram b", String.class).getResultList();
   }
 }

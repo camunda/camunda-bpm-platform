@@ -35,14 +35,13 @@
         <form class="form-horizontal" novalidate ng-submit="save()" name="addModelForm">
           <fieldset>
             <div class="control-group">
-              <label class="control-label" for="input01" th:text="#{Modeler Name}">Modeler Name</label>
+              <label class="control-label" for="modelerName" th:text="#{Modeler Name}">Modeler Name</label>
               <div class="controls">
-                <!--
-                <input class="span8" data-typeahead data-values="modelerNames" ng-model="editDiagram.modeler" name="modelerName" type="text" ng-disabled="!canEditModeler()" required autofocus />
-                -->
-                <input class="span8" ui-jq="combobox" ui-options="{ source: ['adonis','signavio','fox designer']}" ng-model="editDiagram.modeler" name="modelerName" type="text" ng-disabled="!canEditModeler()" required autofocus />
-                <!--input class="span8" ng-model="editDiagram.modeler" name="modelerName" ng-disabled="!canEditModeler()" type="text" required autofocus /-->
-                {{editDiagram.modeler}}
+                <select ngm-if="" id="modelerName" name="modelerName" required autofocus ng-model="editDiagram.modeler" ng-disabled="!canEditModeler()" ng-combobox values="modelerNames"
+                  ng-options="modeler for modeler in modelerNames">
+                  <option value=""></option>
+                </select>
+                <input type="text">
                 <p class="alert alert-info" ng-show="!editDiagram.modeler" th:text="#{Type in / choose the name of your modeler}">Type in / choose the name of your modeler</p>
               </div>
             </div>

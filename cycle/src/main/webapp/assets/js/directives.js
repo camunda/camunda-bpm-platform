@@ -3,14 +3,7 @@
 /* Directives */
 
 angular
-.module('cycle.directives', ['ui'])
-.value('ui.config', ['Commons', function(Commons) {
-  jq: {
-    typeahead: {
-      source: Commons.getModelerNames();
-    }
-  }
-}])
+.module('cycle.directives', [])
 .directive('cycleTree', function(App) {
 	return {
 		restrict: "A",
@@ -111,79 +104,92 @@ angular
 		}
 	};
 })
-.directive('typeahead', function($http) {
+.directive('ngCombobox', function() {
   return {
     restrict: 'A',
     require: 'ngModel',
-    scope: {
-      ngModel: '=',
-      values: '=',
-      ngDisabled: '&'
-    },
-    link: function(scope, element, attrs) {
-      var typeahead = element.typeahead({
-        source: scope.values,
-        updater: function(item) {
-          scope.$apply(read(item));
-          return item;
+    link: function (scope, elm, attrs, model) {
+      var ngChange = 'change';
+
+      if (model) {
+        elm.on(ngChange, function() {
+          scope.$apply(function() {
+            var input = getInputText();
+            if (input) {
+              // catch user typed values (not selected ones)
+              model.$setViewValue(input.value);
+            }
+          });
+        });
+      }
+
+      // value list changed, update combobox
+      scope.$watch(attrs.values, function() {
+        var comboboxContainer = getComboboxContainer();
+        if (comboboxContainer) {
+          // combobox already presents, remove old one
+          var select = elm.detach();
+          $(comboboxContainer).parent().prepend(select);
+          $(comboboxContainer).remove();
+        }
+        // init new combobox
+        elm.combobox();
+      });
+
+      // update input with model when default value is set
+      scope.$watch(model, function() {
+        var input = getInputText();
+        if (input) {
+          var oldValue = input.value;
+          if (oldValue !== model.$modelValue) {
+            $(input).val(model.$modelValue);
+          }
         }
       });
 
-      if (scope.ngDisabled) {
-        scope.ngDisabled();
-      }
-      // update model with selected value
-      function read(item) {
-        scope.ngModel = item;
-      }
-
-      scope.$watch('values', function(newValue) {
-        typeahead.data('typeahead').source = newValue;
-      });
-
-      scope.$on('$destroy', function cleanup() {
-        $('ul.typeahead.dropdown-menu').each(function(){
-          $(this).remove();
-        });
-      });
-    }
-  };
-})
-.directive('combobox', function($http) {
-  return {
-    restrict: 'A',
-    require: 'ngModel',
-    scope: {
-      ngModel: '=',
-      values: '=',
-      ngDisabled: '&'
-    },
-    link: function(scope, element, attrs) {
-      var typeahead = element.typeahead({
-        source: scope.values,
-        updater: function(item) {
-          scope.$apply(read(item));
-          return item;
+      // watch for disabled
+      attrs.$observe('disabled', function(value){
+        var input = getInputText();
+        if (input) {
+          if (value) {
+            $(input).attr('disabled', 'disabled');
+          } else {
+            $(input).removeAttr('disabled');
+          }
         }
       });
 
-      if (scope.ngDisabled) {
-        scope.ngDisabled();
-      }
-      // update model with selected value
-      function read(item) {
-        scope.ngModel = item;
-      }
+      // do some cleanup
+      scope.$on('$destroy', cleanup());
 
-      scope.$watch('values', function(newValue) {
-        typeahead.data('typeahead').source = newValue;
-      });
-
-      scope.$on('$destroy', function cleanup() {
+      function cleanup() {
         $('ul.typeahead.dropdown-menu').each(function(){
           $(this).remove();
         });
-      });
+      }
+
+      // get container which holds the combobox elements
+      function getComboboxContainer() {
+        var comboboxContainer = elm.parent('.combobox-container');
+        if (comboboxContainer.length == 1) {
+          return comboboxContainer[0];
+        } else {
+          return;
+        }
+      }
+
+      // get combobox's input text
+      function getInputText() {
+        var comboboxContainer = getComboboxContainer();
+        if (comboboxContainer) {
+          var input = $(comboboxContainer).children('input')[0];
+          if (input) {
+            return input;
+          }
+        }
+
+        return;
+      }
     }
   };
 })
