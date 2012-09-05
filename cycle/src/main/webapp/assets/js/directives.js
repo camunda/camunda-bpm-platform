@@ -79,11 +79,14 @@ angular
 							    var tree = new Tree({
                     id: attrs.id,
                     model: treeModel,
-                    openOnClick: true,
-                    onClick: function(item){
+                    openOnClick: false,
+                    onClick: function(item, node){
                       scope.selected = item;
                       scope.$digest();
                       scope.$apply();
+                      if (node.isExpandable) {
+                        this._onExpandoClick({node: node});
+                      }
                     },
                     showRoot: false,
                     persist: false
@@ -167,7 +170,8 @@ angular
   return {
     restrict: 'A',
     link: function(scope, element, attrs) {
-      $(element[0]).popover({content: attrs.hint});
+      var title = (attrs.hintTitle == undefined ? "" : attrs.hintTitle) ;
+      $(element[0]).popover({content: attrs.hint, title: title});
     }
   };
 })

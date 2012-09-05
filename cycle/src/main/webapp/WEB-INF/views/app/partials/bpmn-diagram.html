@@ -35,11 +35,10 @@
         <form class="form-horizontal" novalidate ng-submit="save()" name="addModelForm">
           <fieldset>
             <div class="control-group">
-              <label class="control-label" for="input01" th:text="#{Modeler Name}">Modeler Name</label>
+              <label th:attr="data-hint=#{'The Name of the Modeling tool you used.'}" data-hint-title="Modeler Name" class="control-label" for="input01" th:text="#{'Modeler Name'}">Modeler Name</label>
               <div class="controls">
                 <!-- ads-data-typeahead data-values="modelerNames" -->
-                <input class="span8" ng-model="editDiagram.modeler" name="modelerName" ng-disabled="!canEditModeler()" type="text" required autofocus />
-                <p class="alert alert-info" ng-show="!editDiagram.modeler" th:text="#{Type in / choose the name of your modeler}">Type in / choose the name of your modeler</p>
+                <input class="span8" ng-model="editDiagram.modeler" name="modelerName" ng-disabled="!canEditModeler()" type="text" required autofocus th:attr="placeholder=#{Enter the name of your modeler}"/>
               </div>
             </div>
             <div class="control-group">
@@ -52,7 +51,7 @@
             <div class="control-group">
               <label class="control-label" for="tree" th:text="#{Select BPMN File}">Select BPMN File</label>
               <div class="controls">
-                <p class="alert alert-info" ng-hide="editDiagram.diagramPath" th:text="#{Select a bpmn file}"></p>
+                <p class="alert alert-info" ng-hide="editDiagram.diagramPath != undefined && editDiagram.diagramPath.type == 'FILE'" th:text="#{Select a bpmn file}"></p>
                 <div class="claro tree" data-selected="editDiagram.diagramPath" data-cycle-tree data-id="connectorTree" data-connector="connector">
                 </div>
               </div>

@@ -69,7 +69,12 @@ body > .container-fluid.breadcrumbs {
  * form styling
  */
 form input.ng-dirty.ng-invalid {
-  background-color: #FA787E;
+  background-color: #FFDEDE;
+  color: #000;
+}
+
+input.ng-invalid-required {
+  border-color: #f00;
 }
 
 /**
