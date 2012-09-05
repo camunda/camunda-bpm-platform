@@ -173,3 +173,10 @@ input.ng-invalid-required {
 .modal-body {
     max-height: 550px;
 }
+
+.popover-inner {
+  padding: 0px;
+  border: 1px solid #ccc;
+  border-radius: 0px;
+  background-color: #fff;
+}

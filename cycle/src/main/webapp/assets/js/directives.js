@@ -171,7 +171,7 @@ angular
     restrict: 'A',
     link: function(scope, element, attrs) {
       var title = (attrs.hintTitle == undefined ? "" : attrs.hintTitle) ;
-      $(element[0]).popover({content: attrs.hint, title: title});
+      $(element[0]).popover({content: attrs.hint, title: title, delay: 1000});
     }
   };
 })
