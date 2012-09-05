@@ -80,6 +80,7 @@
   margin: 0;
   text-indent: -99999px;
   *text-indent: 0;
+  -webkit-appearance: none;
 }
 .form-search .combobox-container,
 .form-inline .combobox-container {
