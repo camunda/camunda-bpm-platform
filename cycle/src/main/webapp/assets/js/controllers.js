@@ -151,7 +151,7 @@ function EditDiagramController($scope, $q, $http, Debouncer, App) {
   // is the dialog model valid and can be submitted?
   var isValid = $scope.isValid = function() {
     var editDiagram = $scope.editDiagram;
-    return !!editDiagram.modeler && ($scope.addModelForm.$valid !== false) && (editDiagram.diagramPath ? editDiagram.diagramPath.type == 'FILE' : false);
+    return !!editDiagram.modeler && ($scope.addModelForm.$valid !== false) && ($scope.selectedNode ? $scope.selectedNode.type == 'FILE' : false);
   };
   
   $scope.cancel = function() {
@@ -163,10 +163,6 @@ function EditDiagramController($scope, $q, $http, Debouncer, App) {
     if (!isValid()) {
       return;
     }
-    
-    // Update diagram path
-    $scope.editDiagram.diagramPath.connectorId = $scope.connector.connectorId;
-    
     $scope.saveDiagram($scope.editDiagram);
   };
 
@@ -182,9 +178,14 @@ function EditDiagramController($scope, $q, $http, Debouncer, App) {
   });
   
   // Watch for change in diagram path
-  $scope.$watch('editDiagram.diagramPath', function(newValue) {
+  $scope.$watch('selectedNode', function(newValue) {
     if (newValue) {
-      console.log("editDiagram.diagramPath: " + newValue.name)
+      $scope.editDiagram.diagramPath = newValue.id;
+      $scope.editDiagram.label = newValue.label;
+      $scope.editDiagram.connectorId = newValue.connectorId;
+      
+      console.log("selectedNode", newValue);
+      console.log("scope.roundtrip", $scope.roundtrip);
     }
   });
   

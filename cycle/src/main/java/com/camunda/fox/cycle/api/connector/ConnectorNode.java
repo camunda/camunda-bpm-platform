@@ -1,13 +1,20 @@
 package com.camunda.fox.cycle.api.connector;
 
+import java.io.Serializable;
 import java.util.Date;
 
+import javax.persistence.Embeddable;
 
-public class ConnectorNode implements Comparable<ConnectorNode> {
+@Embeddable
+public class ConnectorNode implements Comparable<ConnectorNode>, Serializable {
   
+  private static final long serialVersionUID = 1L;
+
   protected String id;
+  private Long connectorId;
+  
   protected String label;
-  protected ConnectorNodeType type = ConnectorNodeType.FOLDER;
+  protected transient ConnectorNodeType type = ConnectorNodeType.FOLDER;
   protected Date created;
   private Date lastModified;
   
@@ -26,6 +33,11 @@ public class ConnectorNode implements Comparable<ConnectorNode> {
   public ConnectorNode(String id, String label) {
     this.setId(id);
     this.setLabel(label);
+  }
+  
+  public ConnectorNode(String id, String label, Long connectorId) {
+    this(id, label);
+    this.setConnectorId(connectorId);
   }
   
   /**
@@ -104,6 +116,14 @@ public class ConnectorNode implements Comparable<ConnectorNode> {
     } else if (!id.equals(other.id))
       return false;
     return true;
+  }
+
+  public Long getConnectorId() {
+    return connectorId;
+  }
+
+  public void setConnectorId(Long connectorId) {
+    this.connectorId = connectorId;
   }
   
 }

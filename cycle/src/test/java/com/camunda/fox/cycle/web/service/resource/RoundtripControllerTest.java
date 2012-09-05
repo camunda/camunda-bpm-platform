@@ -1,22 +1,23 @@
 package com.camunda.fox.cycle.web.service.resource;
 
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
+import static org.junit.Assert.assertThat;
+
 import java.util.Date;
-import com.camunda.fox.cycle.repository.*;
+
 import javax.inject.Inject;
 
+import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kubek2k.springockito.annotations.SpringockitoContextLoader;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import static org.hamcrest.Matchers.*;
-import org.junit.After;
-import static org.junit.Assert.*;
-
 import com.camunda.fox.cycle.entity.Roundtrip;
+import com.camunda.fox.cycle.repository.RoundtripRepository;
 import com.camunda.fox.cycle.web.dto.BpmnDiagramDTO;
-import com.camunda.fox.cycle.web.dto.ConnectorNodeDTO;
 import com.camunda.fox.cycle.web.dto.RoundtripDTO;
 
 /**
@@ -26,7 +27,7 @@ import com.camunda.fox.cycle.web.dto.RoundtripDTO;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(
   loader = SpringockitoContextLoader.class, 
-  locations = {"classpath:/spring/context.xml", "classpath:/spring/test-*.xml"}
+  locations = {"classpath:/spring/test-*.xml"}
 )
 public class RoundtripControllerTest {
 
@@ -82,11 +83,16 @@ public class RoundtripControllerTest {
     RoundtripDTO dto = createTestRoundtripDTO();
     
     BpmnDiagramDTO rhs = new BpmnDiagramDTO();
-    rhs.setDiagramPath(new ConnectorNodeDTO("foo/foo", "foo", -1l));
+    rhs.setDiagramPath("foo/foo");
+    rhs.setLabel("foo");
+    rhs.setConnectorId(1l);
     rhs.setModeler("Fox modeler");
     
     BpmnDiagramDTO lhs = new BpmnDiagramDTO();
-    lhs.setDiagramPath(new ConnectorNodeDTO("foo/bar", "bar", -1l));
+    
+    lhs.setDiagramPath("foo/bar");
+    lhs.setLabel("bar");
+    lhs.setConnectorId(1l);
     lhs.setModeler("Another Modeler");
     
     dto.setRightHandSide(rhs);

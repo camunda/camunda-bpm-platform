@@ -1,6 +1,5 @@
 package com.camunda.fox.cycle.web.service.resource;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -62,10 +61,13 @@ public class ConnectorService {
   @POST
   @Path("{id}/tree/content")
   @Produces("application/xml")
-  public InputStream content(@PathParam("connectorId") Long connectorId, @FormParam("nodeId") String nodeId) {
+  public String content(@PathParam("connectorId") Long connectorId, @FormParam("nodeId") String nodeId) {
     Connector connector = connectorRegistry.getSessionConnectorMap().get(connectorId);
-    return connector.getContent(new ConnectorNode(nodeId));
+    try {
+      return new java.util.Scanner(connector.getContent(new ConnectorNode(nodeId))).useDelimiter("\\A").next();
+    } catch (java.util.NoSuchElementException e) {
+      return "";
+    }
   }
-  
   
 }

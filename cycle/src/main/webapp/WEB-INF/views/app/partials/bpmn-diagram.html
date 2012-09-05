@@ -3,7 +3,7 @@
     <h3>{{diagram.modeler}}</h3>
     <div class="holder">
       <div class="diagram">
-        <span class="name">{{diagram.diagramPath.label}}</span>
+        <span class="name">{{diagram.label}}</span>
       </div>
     </div>
   </div>
@@ -51,8 +51,8 @@
             <div class="control-group">
               <label class="control-label" for="tree" th:text="#{Select BPMN File}">Select BPMN File</label>
               <div class="controls">
-                <p class="alert alert-info" ng-hide="editDiagram.diagramPath != undefined && editDiagram.diagramPath.type == 'FILE'" th:text="#{Select a bpmn file}"></p>
-                <div class="claro tree" data-selected="editDiagram.diagramPath" data-cycle-tree data-id="connectorTree" data-connector="connector">
+                <p class="alert alert-info" ng-hide="selectedNode != undefined && selectedNode.type == 'FILE'" th:text="#{Select a bpmn file}"></p>
+                <div class="claro tree" data-selected="selectedNode" data-cycle-tree data-id="connectorTree" data-connector="connector">
                 </div>
               </div>
             </div>

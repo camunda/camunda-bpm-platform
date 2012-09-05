@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.commons.vfs2.FileContent;
@@ -52,7 +53,7 @@ public class VfsConnector extends Connector {
       for ( FileObject file : children )
       {
           String baseName = file.getName().getBaseName();
-          ConnectorNode node = new ConnectorNode(parent.getId()+File.separatorChar+baseName, baseName);
+          ConnectorNode node = new ConnectorNode(parent.getId()+File.separatorChar+baseName, baseName, getId());
           if (file.getType() == FileType.FILE) {
             node.setType(ConnectorNodeType.FILE);
           } else {
@@ -112,7 +113,8 @@ public class VfsConnector extends Connector {
           basePath = new File(systemPropertyValue).toURI().toString();
           logger.info("Loading base path from system property " + systemProperty + ": " + basePath);
         } catch (Exception e) {
-          ;
+          logger.log(Level.WARNING, "Could not read base path from system property "+  basePath);
+          basePath = DEFAULT_BASE_PATH;
         }
       }
     }
@@ -146,4 +148,28 @@ public class VfsConnector extends Connector {
     }
   }
 
+  @Override
+  public ConnectorNode getNode(String id) {
+    try {
+      FileSystemManager fsManager = VFS.getManager();
+      FileObject fileObject;
+
+      fileObject = fsManager.resolveFile(basePath + id);
+
+      String baseName = fileObject.getName().getBaseName();
+      ConnectorNode node = new ConnectorNode(id, baseName);
+
+      if (fileObject.getType() == FileType.FILE) {
+        node.setType(ConnectorNodeType.FILE);
+      } else {
+        node.setType(ConnectorNodeType.FOLDER);
+      }
+      
+      return node;
+
+    } catch (Exception e) {
+      throw new CycleException(e);
+    }
+
+  }
 }

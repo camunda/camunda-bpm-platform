@@ -32,6 +32,9 @@ public class SignavioConnectorTest extends AbstractSignavioConnectorTest {
   @Before
   public void setUp() throws Exception {
     this.getSignavioConnector().init(this.getSignavioConnector().getConfiguration());
+    if (this.getSignavioConnector().needsLogin()) {
+      this.getSignavioConnector().login(this.getSignavioConnector().getConfiguration().getGlobalUser(), this.getSignavioConnector().getConfiguration().getGlobalPassword());
+    }
   }
   
   @Test
