@@ -122,21 +122,7 @@ function EditDiagramController($scope, $http, App, Commons) {
   $scope.$on("component-error", function(event, error) {
     $scope.error = error;
   });
-  
-  // Watch for change in diagram path
-  $scope.$watch('editDiagram.diagramPath', function(newValue) {
-    if (newValue) {
-      console.log("editDiagram.diagramPath: " + newValue.name)
-    }
-  });
 
-  // Watch for change in diagram path
-  $scope.$watch('editDiagram.modeler', function(newValue) {
-    if (newValue) {
-      console.log("editDiagram.modeler: " + newValue)
-    }
-  });
-  
   // set modeler name as fox designer whenever a right hand side 
   // diagram with no name is edited
   // relaxed implements AT in HEMERA-2549
@@ -151,9 +137,6 @@ function EditDiagramController($scope, $http, App, Commons) {
   // TODO: nico.rehwaldt: On update: How to initially display the right folder structure?
   // 
   // get required data
-
-  //$scope.modelerNames = ['adonis','signavio','fox designer','bizagi'];
-
   Commons.getModelerNames().then(function(data) {
     $scope.modelerNames = data;
     // set default value, when only one entry
@@ -223,7 +206,7 @@ function CreateNewRoundtripController($scope, $q, $http, $location, Debouncer, A
         $scope.newRoundtripForm.name.$setValidity("unused", valid);
       }
     });
-  }, 1000);
+  }, 500);
   
   /**
    * Checks the validity of a name in the backend.

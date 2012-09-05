@@ -186,11 +186,13 @@
       var that = this
       e.stopPropagation()
       e.preventDefault()
+      /** prevent clearing of input element when losing focus
       var val = this.$element.val()
       if (!this.selected && val != "" ) {
         this.$element.val("")
         this.$target.val("").trigger('change')
       }
+      */
       if (this.shown) {
         setTimeout(function () { that.hide() }, 150)
       }

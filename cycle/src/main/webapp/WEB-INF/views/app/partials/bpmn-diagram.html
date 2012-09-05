@@ -37,11 +37,12 @@
             <div class="control-group">
               <label class="control-label" for="modelerName" th:text="#{Modeler Name}">Modeler Name</label>
               <div class="controls">
-                <select ngm-if="" id="modelerName" name="modelerName" required autofocus ng-model="editDiagram.modeler" ng-disabled="!canEditModeler()" ng-combobox values="modelerNames"
+                <!-- display a combobox on leftside, otherwise a disabled input field -->
+                <select ngm-if="canEditModeler()" id="modelerName" name="modelerName" required autofocus ng-model="editDiagram.modeler" ng-combobox values="modelerNames"
                   ng-options="modeler for modeler in modelerNames">
                   <option value=""></option>
                 </select>
-                <input type="text">
+                <input ngm-if="!canEditModeler()" id="modelerName" name="modelerName" required autofocus ng-model="editDiagram.modeler" ng-disabled="true" type="text">
                 <p class="alert alert-info" ng-show="!editDiagram.modeler" th:text="#{Type in / choose the name of your modeler}">Type in / choose the name of your modeler</p>
               </div>
             </div>

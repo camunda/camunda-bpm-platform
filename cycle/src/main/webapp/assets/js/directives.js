@@ -147,26 +147,13 @@ angular
         }
       });
 
-      // watch for disabled
-      attrs.$observe('disabled', function(value){
-        var input = getInputText();
-        if (input) {
-          if (value) {
-            $(input).attr('disabled', 'disabled');
-          } else {
-            $(input).removeAttr('disabled');
-          }
-        }
-      });
-
       // do some cleanup
-      scope.$on('$destroy', cleanup());
-
-      function cleanup() {
+      scope.$on('$destroy', function () {
         $('ul.typeahead.dropdown-menu').each(function(){
           $(this).remove();
         });
-      }
+        elm.unbind($().combobox());
+      });
 
       // get container which holds the combobox elements
       function getComboboxContainer() {
