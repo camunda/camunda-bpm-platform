@@ -1,7 +1,13 @@
 package com.camunda.fox.cycle.web.service.resource;
 
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.verify;
+
 import javax.inject.Inject;
 
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kubek2k.springockito.annotations.ReplaceWithMock;
@@ -13,17 +19,10 @@ import com.camunda.fox.cycle.entity.Roundtrip;
 import com.camunda.fox.cycle.repository.RoundtripRepository;
 import com.camunda.fox.cycle.web.dto.RoundtripDTO;
 
-import static org.junit.Assert.*;
-import static org.mockito.BDDMockito.*;
-import static org.hamcrest.Matchers.*;
-import org.junit.Ignore;
-import static org.mockito.Matchers.any;
-
 /**
  *
  * @author nico.rehwaldt
  */
-@Ignore // Broke through introduction of AOP
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(
   loader = SpringockitoContextLoader.class, 
@@ -45,7 +44,7 @@ public class RoundtripControllerMockTest {
     Roundtrip roundtrip = new Roundtrip(1l, "ASDF");
     RoundtripDTO dto = new RoundtripDTO(roundtrip);
     
-    given(roundtripRepository.saveAndFlush(any(Roundtrip.class))).willReturn(roundtrip);
+    given(roundtripRepository.saveAndFlush(org.mockito.Matchers.any(Roundtrip.class))).willReturn(roundtrip);
     
     // when
     RoundtripDTO response = roundtripController.create(dto);
@@ -53,6 +52,6 @@ public class RoundtripControllerMockTest {
     // then
     assertThat(response.getId(), is(roundtrip.getId()));
     assertThat(response.getName(), is(roundtrip.getName()));
-    verify(roundtripRepository).saveAndFlush(any(Roundtrip.class));
+    verify(roundtripRepository).saveAndFlush(org.mockito.Matchers.any(Roundtrip.class));
   }
 }
