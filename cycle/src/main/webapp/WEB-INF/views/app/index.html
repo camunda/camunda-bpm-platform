@@ -51,10 +51,10 @@
                   <form class="form-horizontal" novalidate ng-submit="save()" name="newRoundtripForm">
                     <fieldset>
                       <div class="control-group" ng-class="errorClass(newRoundtripForm)">
-                        <label class="control-label" for="input01" th:text="#{Name}">Name</label>
+                        <label class="control-label" for="roundtripName" th:text="#{Name}">Name</label>
                         <div class="controls">
-                          <input ng-model="name" name="name" type="text" class="input-xlarge" id="input01" required autofocus />
-                          <p class="help-block" ng-show="newRoundtripForm.name.$error.required" th:text="#{Type in the name of your roundtrip}"></p>
+                          <input ng-model="name" id="roundtripName" name="name" type="text" class="input-xlarge" required autofocus />
+                          <p class="help-block" ng-show="newRoundtripForm.name.$error.required" th:text="#{Enter the name of your roundtrip}"></p>
                           <p class="help-block" ng-show="newRoundtripForm.name.$error.unused" th:text="#{The name is already used}"></p>
                         </div>
                       </div>
@@ -63,7 +63,7 @@
                 </div>
                 <div class="modal-footer">
                   <button class="btn" ng-click="newRoundtripDialog.close()" th:text="#{Cancel}">Cancel</button>
-                  <button href="#" class="btn btn-primary" ng-click="save()" ng-disabled="!isValid()" th:text="#{Save}">Save</button>
+                  <button href="#" id="saveRoundtripButton" class="btn btn-primary" ng-click="save()" ng-disabled="!isValid()" th:text="#{Save}">Save</button>
                 </div>
               </div>
             </dialog>
