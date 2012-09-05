@@ -271,7 +271,7 @@ public class SignavioConnector extends Connector {
     }
   }
   
-  private ConnectorNode getPrivateFolder() {
+  protected ConnectorNode getPrivateFolder() {
     try {
       String children = this.signavioClient.getChildren(this.getRoot().getId());
       JSONArray jsonArray = new JSONArray(children);
@@ -299,9 +299,12 @@ public class SignavioConnector extends Connector {
     throw new RepositoryException("The private folder could not be determined.");
   }
   
-  private ConnectorNode importContent(ConnectorNode parent, String content) throws Exception {
-    final String modelName = MODEL_NAME_TEMPLATE + new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date());
-    
+  protected ConnectorNode importContent(ConnectorNode parent, String content) throws Exception {
+    String modelName = MODEL_NAME_TEMPLATE + new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss").format(new Date());
+    return this.importContent(parent, content, modelName);
+  }
+  
+  protected ConnectorNode importContent(ConnectorNode parent, String content, final String modelName) throws Exception {
     HttpClient httpClient = this.httpClient4Executor.getHttpClient();
     String signavioURL = this.getConfiguration().getProperties().get(CONFIG_KEY_SIGNAVIO_BASE_URL);
     if (signavioURL.endsWith(SLASH_CHAR)) {
@@ -405,6 +408,14 @@ public class SignavioConnector extends Connector {
     } else {
       this.signavioClient.createModel(newModelForm);
     }
+  }
+  
+  protected SignavioClient getSignavioClient() {
+    return this.signavioClient;
+  }
+  
+  protected ApacheHttpClient4Executor getHttpClient4Executor() {
+    return this.httpClient4Executor;
   }
   
 }

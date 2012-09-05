@@ -1,9 +1,9 @@
-package com.camunda.fox.cycle.connector;
+package com.camunda.fox.cycle.impl.connector.signavio;
 
 import javax.ws.rs.FormParam;
 
 
-public class CreateSignavioFolderForm {
+public class SignavioCreateFolderForm {
 
   @FormParam("name")
   private String name;
@@ -14,7 +14,7 @@ public class CreateSignavioFolderForm {
   @FormParam("parent")
   private String parent;
   
-  public CreateSignavioFolderForm(String name, String description, String parent) {
+  public SignavioCreateFolderForm(String name, String description, String parent) {
     this.name = name;
     this.description = description;
     this.parent = "/directory" + parent;

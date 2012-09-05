@@ -31,11 +31,6 @@ public interface SignavioClient {
   @Consumes(MediaType.APPLICATION_XML)
   public InputStream getContent(@PathParam("model") String model);
   
-//  @POST
-//  @Path("/model{id}")
-//  @Consumes(MediaType.MULTIPART_FORM_DATA)
-//  public Response uploadModel(@MultipartForm SignavioUploadForm form, @PathParam("id") String id);
-  
   @GET
   @Path("/{type}{id}/info")
   @Consumes(MediaType.APPLICATION_JSON)
@@ -65,5 +60,15 @@ public interface SignavioClient {
   @Path("/model/")
   @Consumes(MediaType.APPLICATION_JSON)
   public String createModel(@Form SignavioCreateModelForm form);
+  
+  @POST
+  @Path("/directory/")
+  @Consumes(MediaType.APPLICATION_JSON)
+  public String createFolder(@Form SignavioCreateFolderForm form);
+  
+  @DELETE
+  @Path("/directory{dir}")
+  @Consumes(MediaType.APPLICATION_JSON)
+  public String deleteFolder(@PathParam("dir") String dir);
   
 }

@@ -9,8 +9,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
 /**
- * Developer-friendly BPMN 2.0 Export.
- *
  * @author Bernd Ruecker
  * @author daniel.meyer@camunda.com
  * @author Falko Menge
@@ -18,6 +16,16 @@ import org.w3c.dom.NodeList;
  * @author Andreas Drobisch
  */
 public class ActivitiCompliantBpmn20Provider {
+  
+  /**
+   * Controls if intermediate results are written to files.
+   */
+  public static boolean debug = false;
+
+  /**
+   * Directory, into which intermediate results are written.
+   */
+  public static String debugDir;
   
   private static final String BPMN_DI_NAMESPACE = "http://www.omg.org/spec/BPMN/20100524/DI";
   private static Logger log = Logger.getLogger(ActivitiCompliantBpmn20Provider.class.getSimpleName());

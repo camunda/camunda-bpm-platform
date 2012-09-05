@@ -43,9 +43,6 @@ public class BpmnProcessModelUtil {
   
   public static final String UTF_8 = "UTF-8";
   
-  private static final String MERGE_SOURCE_TECHNICAL_BPMN20_XML = "merge-source-technical.bpmn";
-  private static final String MERGE_SOURCE_BUSINESS_BPMN20_XML = "merge-source-business.bpmn";
-  
   private static final String NAMESPACE_URI_BPMN_20 = "http://www.omg.org/spec/BPMN/20100524/MODEL";
   private static final String NAMESPACE_URI_BPMN_20_DI = "http://www.omg.org/spec/BPMN/20100524/DI";
   
@@ -132,6 +129,9 @@ public class BpmnProcessModelUtil {
     
   }
   
+  /**
+   * Import the changes from a source bpmn process model to a target bpmn process model.
+   */
   public String importChangesFromExecutableBpmnModel(String sourceModel, String targetModel) {
     final String engineProcessDetectionExpression = "//bpmn:process[count(//bpmn:process) = 1 or @isExecutable = 'true' or @name = '%s'][1]";
     
