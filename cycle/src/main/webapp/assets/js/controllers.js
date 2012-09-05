@@ -52,7 +52,21 @@ function HomeController($scope, $routeParams) {
 
 
 function RoundtripDetailsController($scope, $routeParams, RoundtripDetails, app, $http) {
-  $scope.roundtrip = RoundtripDetails.get({id: $routeParams.roundtripId });
+  $scope.roundtrip = RoundtripDetails.get({id: $routeParams.roundtripId }, function success(data) {
+    console.log(data);
+    if (data.leftHandSide.diagramPath) {
+      $http.post({
+        method: '',
+        url: app.uri('secured/resource/connector/2/tree/content'),
+        data : "nodeId="+data.leftHandSide.diagramPath,
+        headers : {"Content-Type" :"application/x-www-form-urlencoded"}
+      }).success(function (data) {
+        alert("success");
+      }).error(function (error) {
+        alert("error");
+      });
+    }
+  });
 
   $scope.side = '';
   $scope.modelerName = '';
