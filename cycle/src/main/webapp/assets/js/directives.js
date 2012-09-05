@@ -107,36 +107,79 @@ angular
 		}
 	};
 })
-.directive('typeahead', function($http) {
+.directive('ngCombobox', function() {
   return {
     restrict: 'A',
     require: 'ngModel',
-    scope: {
-      values: '='
-    },
-    link: function(scope, element, attrs, ngModel) {
-      var typeahead = element.typeahead({
-        source: scope.values,
-        updater: function(item) {
-          scope.$apply(read(item));
-          return item;
-        }
-      });
-      
-      // update model with selected value
-      function read(item) {
-        ngModel.$modelValue = item;
+    link: function (scope, elm, attrs, model) {
+      var ngChange = 'change';
+
+      if (model) {
+        elm.on(ngChange, function() {
+          scope.$apply(function() {
+            var input = getInputText();
+            if (input) {
+              // catch user typed values (not selected ones)
+              model.$setViewValue(input.value);
+            }
+          });
+        });
       }
 
-      scope.$watch('values', function(newValue , oldValue) {
-        typeahead.data('typeahead').source = newValue;
+      // value list changed, update combobox
+      scope.$watch(attrs.values, function() {
+        var comboboxContainer = getComboboxContainer();
+        if (comboboxContainer) {
+          // combobox already presents, remove old one
+          var select = elm.detach();
+          $(comboboxContainer).parent().prepend(select);
+          $(comboboxContainer).remove();
+        }
+        // init new combobox
+        elm.combobox();
       });
 
-      scope.$on('$destroy', function cleanup() {
+      // update input with model when default value is set
+      scope.$watch(model, function() {
+        var input = getInputText();
+        if (input) {
+          var oldValue = input.value;
+          if (oldValue !== model.$modelValue) {
+            $(input).val(model.$modelValue);
+          }
+        }
+      });
+
+      // do some cleanup
+      scope.$on('$destroy', function () {
         $('ul.typeahead.dropdown-menu').each(function(){
           $(this).remove();
         });
+        elm.unbind($().combobox());
       });
+
+      // get container which holds the combobox elements
+      function getComboboxContainer() {
+        var comboboxContainer = elm.parent('.combobox-container');
+        if (comboboxContainer.length == 1) {
+          return comboboxContainer[0];
+        } else {
+          return;
+        }
+      }
+
+      // get combobox's input text
+      function getInputText() {
+        var comboboxContainer = getComboboxContainer();
+        if (comboboxContainer) {
+          var input = $(comboboxContainer).children('input')[0];
+          if (input) {
+            return input;
+          }
+        }
+
+        return;
+      }
     }
   };
 })

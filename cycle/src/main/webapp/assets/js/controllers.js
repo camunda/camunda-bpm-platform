@@ -29,7 +29,7 @@ function DefaultController($scope, $http, $location, App) {
         if(item.name == navigationItem.name) {
           contains = true;			
         }
-        if (item.href.indexOf($location.path()) != 0) {
+        if(item.href.indexOf($location.path()) != 0) {
           remove++;
         }
       });
@@ -38,7 +38,7 @@ function DefaultController($scope, $http, $location, App) {
         breadCrumbs.pop();						
       }
 
-      if (!contains) {
+      if(!contains) {
         breadCrumbs.push({name:navigationItem.name, href:$location.path()});
       }		
     }
@@ -46,11 +46,11 @@ function DefaultController($scope, $http, $location, App) {
   // end Bread Crumb
 };
 
-function HomeController($scope, $routeParams) {
+function HomeController($scope) {
   $scope.$emit("navigation-changed");
 }
 
-function RoundtripDetailsController($scope, $routeParams, RoundtripDetails, $location) {
+function RoundtripDetailsController($scope, $routeParams, RoundtripDetails) {
   $scope.syncDialog = new Dialog();
   $scope.syncDialog.setAutoClosable(false);
   
@@ -95,10 +95,9 @@ function SyncRoundtripController($scope, $http, App) {
 }
 
 /**
- * Works along with the bpmn-diagram directive to manage a single bpmn-diagram in
- * the roundtrip view. 
+ * Works along with the bpmn-diagram directive to manage a single bpmn-diagram in the roundtrip view.
  */
-function BpmnDiagramController($scope, $http) {
+function BpmnDiagramController($scope) {
   $scope.editDiagramDialog = new Dialog();
   
   $scope.addDiagram = function() {
@@ -119,34 +118,17 @@ function BpmnDiagramController($scope, $http) {
 }
 
 /**
- * Realizes the edit operation of a bpmn diagram inside the respective 
- * dialog. 
+ * Realizes the edit operation of a bpmn diagram inside the respective dialog.
  */
-function EditDiagramController($scope, $q, $http, Debouncer, App) {
+function EditDiagramController($scope, $http, App, Commons) {
   
   var FOX_DESIGNER = "fox designer", 
-    RIGHT_HAND_SIDE = "rightHandSide";
+      RIGHT_HAND_SIDE = "rightHandSide";
 
   // Can the modeler name be edited?
   var canEditModeler = $scope.canEditModeler = function() {
     return !!($scope.identifier != RIGHT_HAND_SIDE || ($scope.editDiagram.modeler && $scope.editDiagram.modeler != FOX_DESIGNER));
   };
-  
-  function getModelerNames() {
-    $http.get(App.uri('secured/resource/diagram/modelerNames')).success(function(data) {
-      $scope.modelerNames = data;
-      // set default value, when only one entry
-      if (data.length == 1 && canEditModeler()) {
-        $scope.editDiagram.modeler = data[0];
-      }
-    });
-  }
-
-  function getConnectors() {
-    $http.get(App.uri("secured/resource/connector/list")).success(function(data) {
-      $scope.connectors = data;
-    });
-  }
     
   // is the dialog model valid and can be submitted?
   var isValid = $scope.isValid = function() {
@@ -202,13 +184,18 @@ function EditDiagramController($scope, $q, $http, Debouncer, App) {
   // TODO: nico.rehwaldt: On update: How to initially display the right folder structure?
   // 
   // get required data
-  getModelerNames();
-  getConnectors();
+  Commons.getModelerNames().then(function(data) {
+    $scope.modelerNames = data;
+    // set default value, when only one entry
+    if (data.length == 1 && canEditModeler()) {
+      $scope.editDiagram.modeler = data[0];
+    }
+  });
+  $scope.connectors = Commons.getConnectors();
 }
 
 /**
- * Responsible for adding a new roundtrip from within the 
- * roundtrip list
+ * Responsible for adding a new roundtrip from within the roundtrip list
  * 
  */
 function CreateNewRoundtripController($scope, $q, $http, $location, Debouncer, App, Roundtrip) {
@@ -300,11 +287,10 @@ function CreateNewRoundtripController($scope, $q, $http, $location, Debouncer, A
  * Responsible for listing the roundtrips and updating the currently selected one
  * 
  */
-function ListRoundtripsController($scope, $route, $routeParams, Roundtrip) {
+function ListRoundtripsController($scope, $routeParams, Roundtrip) {
   
   // TODO: Add documentation page
   $scope.roundtrips = Roundtrip.query();
-  
   $scope.newRoundtripDialog = new Dialog();
   
   var selectedRoundtripId = null; 
