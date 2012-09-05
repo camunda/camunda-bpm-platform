@@ -265,7 +265,7 @@ function CreateNewRoundtripController($scope, $q, $http, $location, Debouncer, A
         $scope.newRoundtripForm.name.$setValidity("unused", valid);
       }
     });
-  }, 1000);
+  }, 500);
   
   /**
    * Checks the validity of a name in the backend.

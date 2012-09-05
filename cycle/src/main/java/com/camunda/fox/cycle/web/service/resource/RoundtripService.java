@@ -42,9 +42,11 @@ import com.camunda.fox.cycle.web.service.AbstractRestService;
  */
 @Path("secured/resource/roundtrip")
 public class RoundtripService extends AbstractRestService {
-
-  private static final String LEFT_TO_RIGHT_MODE = "leftToRight";
-  private static final String RIGHT_TO_LEFT_MODE = "rightToLeft";
+  
+  public enum SyncMode {
+    LEFT_TO_RIGHT,
+    RIGHT_TO_LEFT
+  }
   
 	@Inject
 	private RoundtripRepository roundtripRepository;
@@ -146,7 +148,8 @@ public class RoundtripService extends AbstractRestService {
   
   @POST
   @Path("{id}/sync")
-  public RoundtripDTO doSynchronize(@QueryParam("syncMode") String syncMode, @PathParam("id") long id) {
+  @Transactional
+  public RoundtripDTO doSynchronize(@QueryParam("syncMode") SyncMode syncMode, @PathParam("id") long id) {
     Roundtrip roundtrip = this.roundtripRepository.findById(id);
     
     PersistentConnectorNode leftHandSideNode = roundtrip.getLeftHandSide().getDiagramPath();
@@ -161,18 +164,27 @@ public class RoundtripService extends AbstractRestService {
     rightHandSideModelNode.setType(ConnectorNodeType.FILE);
     String rightHandSideModelContent = this.asString(rightHandSideConnector.getContent(rightHandSideModelNode));
     
+    String result = null;
     try {
-      if (syncMode.equals(LEFT_TO_RIGHT_MODE)) {
-        String result = this.bpmnProcessModelUtil.extractExecutablePool(leftHandSideModelContent);
-        rightHandSideConnector.updateContent(rightHandSideModelNode, result);
-      } else if (syncMode.equals(RIGHT_TO_LEFT_MODE)) {
-        String result = this.bpmnProcessModelUtil.importChangesFromExecutableBpmnModel(rightHandSideModelContent, leftHandSideModelContent);
-        leftHandSideConnector.updateContent(leftHandSideModelNode, result);
+      
+      switch (syncMode) {
+        case LEFT_TO_RIGHT:
+          result = this.bpmnProcessModelUtil.extractExecutablePool(leftHandSideModelContent);
+          rightHandSideConnector.updateContent(rightHandSideModelNode, result);
+          break;
+          
+        case RIGHT_TO_LEFT:
+          result = this.bpmnProcessModelUtil.importChangesFromExecutableBpmnModel(rightHandSideModelContent, leftHandSideModelContent);
+          leftHandSideConnector.updateContent(leftHandSideModelNode, result);
+          break;
       }
+      
       roundtrip.setLastSync(new Date());
+      
     } catch (Exception e) {
-      System.out.println(e.getMessage());
+      throw new CycleException(e);
     }
+    
     return new RoundtripDTO(roundtrip, roundtrip.getLeftHandSide(), roundtrip.getRightHandSide());
   }
   

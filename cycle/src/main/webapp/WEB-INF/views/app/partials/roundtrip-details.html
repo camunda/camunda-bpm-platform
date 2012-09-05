@@ -15,11 +15,11 @@
           <button class="btn btn-large" 
                   ng-hide="!roundtrip.rightHandSide && roundtrip.leftHandSide" 
                   ng-disabled="!(roundtrip.rightHandSide && roundtrip.leftHandSide)"
-                  ng-click="openSyncDialog('leftToRight')">sync &rarr;</button>
+                  ng-click="openSyncDialog('LEFT_TO_RIGHT')">sync &rarr;</button>
         </div>
         <div>
           <span ng-show="roundtrip.lastSync">
-            Last sync {{roundtrip.lastSync | date}}
+            Last sync {{roundtrip.lastSync | date:'yyyy-MM-dd @ HH:mm:ss'}}
           </span>
           <span ng-hide="roundtrip.lastSync">
             Not synced yet
@@ -28,7 +28,7 @@
         <div class="actions">
           <button class="btn btn-large"
                   ng-disabled="!(roundtrip.rightHandSide && roundtrip.leftHandSide)"
-                  ng-click="openSyncDialog('rightToLeft')">&larr; sync</button>
+                  ng-click="openSyncDialog('RIGHT_TO_LEFT')">&larr; sync</button>
         </div>
       </div>
     </div>
@@ -49,8 +49,8 @@
         <div ng-switch on="status">
           <div ng-switch-when="beforeStart">
             <p>
-              <span ng-show="syncMode == 'leftToRight'" th:text="#{The synchronization will perform from left to right.}" />
-              <span ng-hide="syncMode == 'rightToLeft'" th:text="#{The synchronization will perform from right to left.}" />
+              <span ng-show="syncMode == 'LEFT_TO_RIGHT'" th:text="#{The synchronization will perform from left to right.}" />
+              <span ng-hide="syncMode == 'RIGHT_TO_LEFT'" th:text="#{The synchronization will perform from right to left.}" />
             </p>
             <p>
               <span th:text="#{Are you sure to synchronize the models}" />
