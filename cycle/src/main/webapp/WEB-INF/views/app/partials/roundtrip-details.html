@@ -2,7 +2,7 @@
   <div class="page-header">
     <h1>{{roundtrip.name}}</h1>
   </div>
-
+  
   <div class="row-fluid">
     <div class="span5">
       <bpmn-diagram roundtrip="roundtrip" diagram="roundtrip.leftHandSide" identifier="leftHandSide" />
@@ -50,7 +50,7 @@
           <div ng-switch-when="beforeStart">
             <p>
               <span ng-show="syncMode == 'leftToRight'" th:text="#{The synchronization will perform from left to right.}" />
-              <span ng-hide="syncMode == 'leftToRight'" th:text="#{The synchronization will perform from right to left.}" />
+              <span ng-hide="syncMode == 'rightToLeft'" th:text="#{The synchronization will perform from right to left.}" />
             </p>
             <p>
               <span th:text="#{Are you sure to synchronize the models}" />

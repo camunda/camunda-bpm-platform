@@ -29,7 +29,7 @@ angular
 				ready(function () {
 					
 					scope.$watch("connector", function (newValue , oldValue) {
-				    	if (newValue != undefined && newValue != oldValue) {
+				    	if (newValue != undefined) {
 				    		
 							request.get(App.uri("secured/resource/connector/" + newValue.connectorId + "/tree/root"), {
 					            handleAs: "json"
@@ -81,9 +81,9 @@ angular
                     model: treeModel,
                     openOnClick: true,
                     onClick: function(item){
-                      scope.$apply(function() {
-                        scope.selected = item;
-                      });
+                      scope.selected = item;
+                      scope.$digest();
+                      scope.$apply();
                     },
                     showRoot: false,
                     persist: false
@@ -162,6 +162,14 @@ angular
       scope.identifier = attrs.identifier;
     }
   }
+})
+.directive("hint", function(App) {
+  return {
+    restrict: 'A',
+    link: function(scope, element, attrs) {
+      $(element[0]).popover({content: attrs.hint});
+    }
+  };
 })
 
 /**
