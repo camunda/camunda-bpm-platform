@@ -1,4 +1,4 @@
-package com.camunda.fox.cycle.connector;
+package com.camunda.fox.cycle.impl.connector.signavio;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -9,14 +9,6 @@ import static org.junit.Assert.fail;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
-import javax.ws.rs.core.Response;
-
-import org.codehaus.jettison.json.JSONObject;
-import org.jboss.resteasy.client.ClientResponse;
-import org.jboss.resteasy.client.ProxyFactory;
-import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
-import org.jboss.resteasy.spi.ResteasyProviderFactory;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -29,34 +21,24 @@ import com.camunda.fox.cycle.api.connector.ConnectorNode;
 import com.camunda.fox.cycle.api.connector.ConnectorNode.ConnectorNodeType;
 import com.camunda.fox.cycle.entity.ConnectorConfiguration;
 import com.camunda.fox.cycle.exception.RepositoryException;
-import com.camunda.fox.cycle.impl.connector.signavio.SignavioConnector;
-import com.camunda.fox.cycle.impl.connector.signavio.SignavioLoginForm;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(
   loader = SpringockitoContextLoader.class, 
   locations = {"classpath:/spring/test/signavio-connector-xml-config.xml"}
 )
-public class SignavioConnectorTest {
+public class SignavioConnectorTest extends AbstractSignavioConnectorTest {
 
-  private static final String SIGNAVIO_PUBLIC_FOLDER_ID = "/3fe94c4502954d01a278370ac71e7ef7";
-  
-  @Inject
-  private SignavioConnector signavioConnector;
-  
-  private SignavioTestHelperClient signavioClient;
-  private boolean loggedIn;
-  
   @Before
   public void setUp() throws Exception {
-    this.signavioConnector.init(this.signavioConnector.getConfiguration());
+    this.getSignavioConnector().init(this.getSignavioConnector().getConfiguration());
   }
   
   @Test
   public void testConfigurableViaXml() throws Exception {
-    assertNotNull(this.signavioConnector);
+    assertNotNull(this.getSignavioConnector());
     
-    ConnectorConfiguration config = this.signavioConnector.getConfiguration();
+    ConnectorConfiguration config = this.getSignavioConnector().getConfiguration();
     assertNotNull(config);
     
     assertTrue(config.getId() == 2);
@@ -75,8 +57,8 @@ public class SignavioConnectorTest {
   @Test
   public void testLogin() {
     try {
-      ConnectorConfiguration config = this.signavioConnector.getConfiguration();
-      this.signavioConnector.login(config.getGlobalUser(), config.getGlobalPassword());
+      ConnectorConfiguration config = this.getSignavioConnector().getConfiguration();
+      this.getSignavioConnector().login(config.getGlobalUser(), config.getGlobalPassword());
     } catch (Exception e) {
       fail("Something went wrong: Login failed with following exception: " + e.getMessage());
     }
@@ -85,8 +67,8 @@ public class SignavioConnectorTest {
   @Test
   public void testFailedLogin() {
     try {
-      ConnectorConfiguration config = this.signavioConnector.getConfiguration();
-      this.signavioConnector.login(config.getGlobalUser(), config.getGlobalPassword() + "1");
+      ConnectorConfiguration config = this.getSignavioConnector().getConfiguration();
+      this.getSignavioConnector().login(config.getGlobalUser(), config.getGlobalPassword() + "1");
       fail("Something went wrong: An exception had to be thrown due to failing login.");
     } catch (RepositoryException e) {
       // everything okay: we excepted an exception here
@@ -97,11 +79,11 @@ public class SignavioConnectorTest {
   public void testGetChildren_Empty() {
     ConnectorNode createdRootNode = null;
     try {
-      createdRootNode = this.createFolder(this.createPublicConnectorNode(), "TestFolder");
+      createdRootNode = this.createFolder(this.getSignavioConnector().getPrivateFolder(), "TestFolder");
       assertEquals("TestFolder", createdRootNode.getLabel());
       assertEquals(ConnectorNodeType.FOLDER, createdRootNode.getType());
       
-      List<ConnectorNode> children = this.signavioConnector.getChildren(createdRootNode);
+      List<ConnectorNode> children = this.getSignavioConnector().getChildren(createdRootNode);
       assertTrue(children.isEmpty());
       this.deleteFolder(createdRootNode);
     } catch (Exception e) {
@@ -116,7 +98,7 @@ public class SignavioConnectorTest {
   public void testGetChildren_ContainingOneFolder() {
     ConnectorNode createdRootNode = null;
     try {
-      createdRootNode = this.createFolder(this.createPublicConnectorNode(), "TestFolder");
+      createdRootNode = this.createFolder(this.getSignavioConnector().getPrivateFolder(), "TestFolder");
       assertEquals("TestFolder", createdRootNode.getLabel());
       assertEquals(ConnectorNodeType.FOLDER, createdRootNode.getType());
       
@@ -124,7 +106,7 @@ public class SignavioConnectorTest {
       assertEquals("ChildFolder", newFolder.getLabel());
       assertEquals(ConnectorNodeType.FOLDER, newFolder.getType());
       
-      List<ConnectorNode> children = this.signavioConnector.getChildren(createdRootNode);
+      List<ConnectorNode> children = this.getSignavioConnector().getChildren(createdRootNode);
       assertFalse(children.isEmpty());
       assertTrue(children.size() == 1);
       
@@ -147,15 +129,15 @@ public class SignavioConnectorTest {
   public void testGetChildren_ContainingOneModel() {
     ConnectorNode createdRootNode = null;
     try {
-      createdRootNode = this.createFolder(this.createPublicConnectorNode(), "TestFolder");
+      createdRootNode = this.createFolder(this.getSignavioConnector().getPrivateFolder(), "TestFolder");
       assertEquals("TestFolder", createdRootNode.getLabel());
       assertEquals(ConnectorNodeType.FOLDER, createdRootNode.getType());
       
-      ConnectorNode newModel = this.createModel(createdRootNode, "model1");
+      ConnectorNode newModel = this.createEmptyModel(createdRootNode, "model1");
       assertEquals("model1", newModel.getLabel());
       assertEquals(ConnectorNodeType.FILE, newModel.getType());
       
-      List<ConnectorNode> children = this.signavioConnector.getChildren(createdRootNode);
+      List<ConnectorNode> children = this.getSignavioConnector().getChildren(createdRootNode);
       
       assertFalse(children.isEmpty());
       assertTrue(children.size() == 1);
@@ -179,7 +161,7 @@ public class SignavioConnectorTest {
   public void testGetChildren_ContainingOneFolderAndOneModel() {
     ConnectorNode createdRootNode = null;
     try {
-      createdRootNode = this.createFolder(this.createPublicConnectorNode(), "TestFolder");
+      createdRootNode = this.createFolder(this.getSignavioConnector().getPrivateFolder(), "TestFolder");
       assertEquals("TestFolder", createdRootNode.getLabel());
       assertEquals(ConnectorNodeType.FOLDER, createdRootNode.getType());
       
@@ -187,11 +169,11 @@ public class SignavioConnectorTest {
       assertEquals("ChildFolder", newFolder.getLabel());
       assertEquals(ConnectorNodeType.FOLDER, newFolder.getType());
       
-      ConnectorNode newModel = this.createModel(createdRootNode, "model1");
+      ConnectorNode newModel = this.createEmptyModel(createdRootNode, "model1");
       assertEquals("model1", newModel.getLabel());
       assertEquals(ConnectorNodeType.FILE, newModel.getType());
       
-      List<ConnectorNode> children = this.signavioConnector.getChildren(createdRootNode);
+      List<ConnectorNode> children = this.getSignavioConnector().getChildren(createdRootNode);
       
       assertFalse(children.isEmpty());
       assertTrue(children.size() == 2);
@@ -220,112 +202,10 @@ public class SignavioConnectorTest {
   
   @Test
   public void testGetRoot() throws Exception {
-    ConnectorNode root = this.signavioConnector.getRoot();
+    ConnectorNode root = this.getSignavioConnector().getRoot();
     assertEquals("/", root.getId());
     assertEquals("/", root.getLabel());
     assertEquals(ConnectorNodeType.FOLDER, root.getType());
-  }
-  
-//  @Test
-//  public void testImportBpmn20Xml() throws Exception {
-//    this.login();
-//    
-//    String modelToImport = IoUtil.readFileAsString("com/camunda/fox/cycle/connector/import-technical-model.bpmn");
-//    
-//    ConnectorNode parentNode = new ConnectorNode();
-//    parentNode.setId("/baca2d6ad18043ebb02e730124f64b66");
-//    parentNode.setLabel("Label");
-//    parentNode.setType(ConnectorNodeType.FOLDER);
-//    
-//    this.signavioConnector.importContent(parentNode, modelToImport);
-//    
-//  }
-  
-  private ConnectorNode createPublicConnectorNode() {
-    ConnectorNode publicNode = new ConnectorNode(SIGNAVIO_PUBLIC_FOLDER_ID, "Public");
-    publicNode.setType(ConnectorNodeType.FOLDER);
-    return publicNode;
-  }
-
-  private void login() {
-    ResteasyProviderFactory providerFactory = ResteasyProviderFactory.getInstance();
-    RegisterBuiltin.register(providerFactory);
-    
-    String signavioURL = (String) this.signavioConnector.getConfiguration().getProperties().get(SignavioConnector.CONFIG_KEY_SIGNAVIO_BASE_URL) + "/p/";
-    this.signavioClient = ProxyFactory.create(SignavioTestHelperClient.class, signavioURL);
-    
-    ConnectorConfiguration config = this.signavioConnector.getConfiguration();
-    SignavioLoginForm loginForm = new SignavioLoginForm(config.getGlobalUser(), config.getGlobalPassword(), "true");
-    Response resp = signavioClient.login(loginForm);
-    
-    if (resp.getStatus() != 200) {
-      fail("Login to Signavio in SignavioConnectorTest failed!");
-    }
-    
-    if (resp instanceof ClientResponse<?>) {
-      ClientResponse<?> r = (ClientResponse<?>) resp;
-      r.releaseConnection();
-    }
-    this.signavioConnector.login(config.getGlobalUser(), config.getGlobalPassword());
-    this.loggedIn = true;
-  }
-  
-  private ConnectorNode createFolder(ConnectorNode parent, String folderName) throws Exception {
-    if (!this.loggedIn) {
-      this.login();
-    }
-    
-    CreateSignavioFolderForm newFolderForm = new CreateSignavioFolderForm(folderName, "Folder to test SignavioConnector.", parent.getId());
-    
-    String result = signavioClient.createFolder(newFolderForm);
-    JSONObject jsonObj = new JSONObject(result);
-    
-    ConnectorNode newNode = new ConnectorNode(); 
-    String href = jsonObj.getString("href");
-    href = href.replace("/directory", "");
-    newNode.setId(href);
-    
-    JSONObject repObj = jsonObj.getJSONObject("rep");
-    String name = repObj.getString("name");
-    newNode.setLabel(name);
-    
-    newNode.setType(ConnectorNodeType.FOLDER);
-    
-    return newNode;
-  }
-  
-  private ConnectorNode createModel(ConnectorNode parentFolder, String modelName) throws Exception {
-    if (!this.loggedIn) {
-      this.login();
-    }
-    
-    CreateSignavioModelForm newModelForm = new CreateSignavioModelForm(modelName, parentFolder.getId());
-    
-    String result = signavioClient.createModel(newModelForm);
-    JSONObject jsonObj = new JSONObject(result);
-    
-    ConnectorNode newNode = new ConnectorNode(); 
-    String href = jsonObj.getString("href");
-    href = href.replace("/model", "");
-    newNode.setId(href);
-    
-    JSONObject repObj = jsonObj.getJSONObject("rep");
-    String name = repObj.getString("name");
-    newNode.setLabel(name);
-    
-    newNode.setType(ConnectorNodeType.FILE);
-    
-    return newNode;
-  }
-  
-  private void deleteFolder(ConnectorNode folderToDelete) {
-    if (!this.loggedIn) {
-      this.login();
-    }
-    if (!folderToDelete.getType().equals(ConnectorNodeType.FOLDER)) {
-      fail("Tried to delete folder but the assigned ConnectorNode was not a folder.");
-    }
-    this.signavioClient.deleteFolder(folderToDelete.getId());
   }
   
 }
