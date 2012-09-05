@@ -164,3 +164,7 @@ form input.ng-dirty.ng-invalid {
   overflow: auto;
   min-height: 220px;
 }
+
+.modal-body {
+    max-height: 550px;
+}
