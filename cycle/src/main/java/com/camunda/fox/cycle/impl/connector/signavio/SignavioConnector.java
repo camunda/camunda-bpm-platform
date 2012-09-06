@@ -14,6 +14,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -56,7 +57,6 @@ public class SignavioConnector extends Connector {
 
   public final static String CONFIG_KEY_SIGNAVIO_BASE_URL = "signavioBaseUrl";
   
-  private static Logger log = Logger.getLogger(SignavioConnector.class.getName());
   private static final String WARNING_SNIPPET = "<div id=\"warning\">([^<]+)</div>";
   
   // JSON properties/objects
@@ -84,6 +84,8 @@ public class SignavioConnector extends Connector {
   private static final String BPMN2_0_FILE_PROP = "bpmn2_0file";
 
   private static final String UTF_8 = "UTF-8";
+
+  private static Logger logger = Logger.getLogger(SignavioConnector.class.getName());
   
   private SignavioClient signavioClient;
   private boolean loggedIn = false;
@@ -138,9 +140,15 @@ public class SignavioConnector extends Connector {
         @SuppressWarnings("rawtypes")
         @Override
         public ClientResponse execute(ClientExecutionContext ctx) throws Exception {
-          // TODO: Logging
-//          ClientRequest request = ctx.getRequest();
+          String uri = "";
+          if (logger.isLoggable(Level.FINEST)) {
+            uri = ctx.getRequest().getUri().toString();
+            logger.finest("Sending request to " + uri);
+          }
           ClientResponse<?> response =  ctx.proceed();
+          if (logger.isLoggable(Level.FINEST)) {
+            logger.finest("Received response from " + uri + " with status " + response.getStatus());
+          }
           return response;
         }
       });
@@ -340,8 +348,8 @@ public class SignavioConnector extends Connector {
     
     // check if something went wrong on Signavio side
     if (postResponse.getStatusLine().getStatusCode() >= 400) {
-      log.severe("Import of BPMN XML failed in Signavio.");
-      log.severe("Error response from server: " + EntityUtils.toString(postResponse.getEntity(), "UTF-8"));
+      logger.severe("Import of BPMN XML failed in Signavio.");
+      logger.severe("Error response from server: " + EntityUtils.toString(postResponse.getEntity(), "UTF-8"));
       throw new RepositoryException("BPMN XML could not be imported: " + content);
     }
 
