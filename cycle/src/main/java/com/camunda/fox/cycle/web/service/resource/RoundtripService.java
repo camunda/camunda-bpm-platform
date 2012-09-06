@@ -162,7 +162,7 @@ public class RoundtripService extends AbstractRestService {
     leftHandSideModelNode.setType(ConnectorNodeType.FILE);
     InputStream leftHandSideModelContent =leftHandSideConnector.getContent(leftHandSideModelNode);
     
-    BpmnDiagram rightHandSide = roundtrip.getLeftHandSide();
+    BpmnDiagram rightHandSide = roundtrip.getRightHandSide();
     
     Connector rightHandSideConnector = this.connectorRegistry.getSessionConnectorMap().get(rightHandSide.getConnectorId());
     ConnectorNode rightHandSideModelNode = new ConnectorNode(rightHandSide.getDiagramPath(), rightHandSide.getLabel());
