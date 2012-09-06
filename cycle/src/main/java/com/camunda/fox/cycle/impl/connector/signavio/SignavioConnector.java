@@ -32,6 +32,7 @@ import org.apache.http.util.EntityUtils;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
+import org.codehaus.plexus.util.IOUtil;
 import org.jboss.resteasy.client.ClientRequestFactory;
 import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.client.core.BaseClientResponse;
@@ -246,9 +247,9 @@ public class SignavioConnector extends Connector {
   }
 
   @Secured
-  public void updateContent(ConnectorNode node, String newContent) throws Exception {
+  public void updateContent(ConnectorNode node, InputStream newContent) throws Exception {
     ConnectorNode privateFolder = this.getPrivateFolder();
-    ConnectorNode importedModel = this.importContent(privateFolder, newContent);
+    ConnectorNode importedModel = this.importContent(privateFolder, IOUtil.toString(newContent, UTF_8));
     String json = this.signavioClient.getJson(importedModel.getId());
     String svg = this.signavioClient.getSVG(importedModel.getId());
     this.deleteNode(importedModel);
@@ -432,5 +433,15 @@ public class SignavioConnector extends Connector {
       this.loggedIn = false;
     }
   }
-  
+
+  @Override
+  public void deleteNode(String id) {
+    throw new UnsupportedOperationException();
+  }
+
+  @Override
+  public ConnectorNode createNode(String id, String label, ConnectorNodeType type) {
+    throw new UnsupportedOperationException();
+  }
+
 }

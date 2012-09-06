@@ -1,10 +1,15 @@
 package com.camunda.fox.cycle.web.service.roundtrip;
 
-import com.camunda.fox.cycle.service.roundtrip.BpmnProcessModelUtil;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+
 import junit.framework.Assert;
 
+import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
+import com.camunda.fox.cycle.service.roundtrip.BpmnProcessModelUtil;
 import com.camunda.fox.cycle.util.IoUtil;
 
 
@@ -29,10 +34,10 @@ public class TestBpmnProcessModelUtil {
   }
   
   @Test
-  public void testExtractPool() {
-    String sourceModel = IoUtil.readFileAsString("com/camunda/fox/cycle/service/roundtrip/collaboration.bpmn");
+  public void testExtractPool() throws IOException {
+    InputStream sourceModel = new FileInputStream(IoUtil.getFile("com/camunda/fox/cycle/service/roundtrip/collaboration.bpmn"));
         
-    String resultModel = cycleRoundtripUtil.extractExecutablePool(sourceModel);
+    String resultModel = IOUtils.toString(cycleRoundtripUtil.extractExecutablePool(sourceModel), "UTF-8");
     Assert.assertFalse(resultModel.contains("Mensch"));
   }
 

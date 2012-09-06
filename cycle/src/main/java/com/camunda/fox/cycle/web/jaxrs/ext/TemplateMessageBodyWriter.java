@@ -127,9 +127,20 @@ public class TemplateMessageBodyWriter implements MessageBodyWriter<String> {
   }
   
   private Locale setLocale(HttpServletRequest request) {
-    String[] localeSplit = getLangTag(request, request.getParameter("lang")).split("-");
-    Locale locale = new Locale(localeSplit[0], localeSplit[1]);
+    String langTag = getLangTag(request, request.getParameter("lang"));
+    Locale locale = null;
+    
+    if (langTag != null && langTag.contains("-")) {
+      String[] localeSplit = langTag.split("-");
+      locale = new Locale(localeSplit[0], localeSplit[1]);
+    }else if (langTag != null) {
+      locale = new Locale(langTag);
+    } else {
+      locale = Locale.getDefault();
+    }
+    
     i18n.setLocale(locale);
+    
     return locale;
   }
 

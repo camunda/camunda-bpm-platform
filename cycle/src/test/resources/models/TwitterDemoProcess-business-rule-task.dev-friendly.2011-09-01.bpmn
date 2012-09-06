@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:signavio="http://www.signavio.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" exporter="Signavio Process Editor, http://www.signavio.com" exporterVersion="5.0.2" id="sid-8a178835-3472-4fad-9642-b4f80a1d363e" targetNamespace="http://www.signavio.com/bpmn20" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/2.0/20100501/BPMN20.xsd">
+   <process id="TwitterDemoProcess-business-rule-task_bpmn20" isExecutable="false" name="TwitterDemoProcess-business-rule-task_bpmn20">
+      <startEvent activiti:formKey="createTweet.form" id="startevent1" name="Start">
+         <outgoing>flow1</outgoing>
+      </startEvent>
+      <businessRuleTask activiti:exclude="false" activiti:resultVariableName="comments" activiti:ruleVariablesInput="${tweet}" activiti:rules="NoTweetsAboutJohnDoe" id="businessruletask1" name="Business rule task">
+         <incoming>flow1</incoming>
+         <outgoing>flow8</outgoing>
+      </businessRuleTask>
+      <exclusiveGateway gatewayDirection="Diverging" id="exclusivegateway3" name="Exclusive Gateway">
+         <incoming>flow8</incoming>
+         <outgoing>flow10</outgoing>
+         <outgoing>flow9</outgoing>
+      </exclusiveGateway>
+      <serviceTask activiti:type="mail" id="mailtask1" name="Send rejection notification via email">
+         <extensionElements>
+            <activiti:field expression="${tweet.email}" name="to"/>
+            <activiti:field expression="activiti@camunda.com" name="from"/>
+            <activiti:field expression="Your tweet has been rejected" name="subject"/>
+            <activiti:field name="html">
+               <activiti:expression>
+		        
+		          &lt;html&gt;
+		            &lt;body&gt;
+		              Hi!&lt;br/&gt;&lt;br/&gt;
+		              
+		              Unfortuntaley your tweet has been rejected.&lt;br /&gt;&lt;br/&gt;
+		              
+		              Original content: ${tweet.content}&lt;br /&gt;&lt;br/&gt;
+		              
+		              Comment: ${comments}&lt;br /&gt;&lt;br/&gt;
+		               
+		              Sorry, please try with better content the next time :-)
+		            &lt;/body&gt;
+		          &lt;/html&gt;
+		        
+		      </activiti:expression>
+        </activiti:field>
+         </extensionElements>
+         <incoming>flow10</incoming>
+         <incoming>flow6</incoming>
+         <outgoing>flow4</outgoing>
+      </serviceTask>
+      <exclusiveGateway gatewayDirection="Diverging" id="exclusivegateway1" name="Approved?">
+         <incoming>flow2</incoming>
+         <outgoing>flow6</outgoing>
+         <outgoing>flow7</outgoing>
+      </exclusiveGateway>
+      <userTask activiti:assignee="kermit" activiti:formKey="reviewTweet.form" id="usertask1" name="Review Tweet">
+         <incoming>flow9</incoming>
+         <outgoing>flow2</outgoing>
+      </userTask>
+      <serviceTask activiti:class="com.camunda.fox.demo.twitter.CreateTweetDelegate" id="servicetask1" name="Publish on Twitter">
+         <incoming>flow7</incoming>
+         <outgoing>flow3</outgoing>
+      </serviceTask>
+      <exclusiveGateway gatewayDirection="Converging" id="exclusivegateway2" name="Exclusive_Databased_Gateway">
+         <incoming>flow3</incoming>
+         <incoming>flow4</incoming>
+         <outgoing>flow5</outgoing>
+      </exclusiveGateway>
+      <endEvent id="endevent1" name="End">
+         <incoming>flow5</incoming>
+      </endEvent>
+      <sequenceFlow id="flow1" isImmediate="true" name="" sourceRef="startevent1" targetRef="businessruletask1">
+         <extensionElements>
+            <activiti:executionListener class="com.camunda.fox.demo.twitter.CreateTweetObjectDelegate" event="take"/>
+         </extensionElements>
+      </sequenceFlow>
+      <sequenceFlow id="flow2" isImmediate="true" name="" sourceRef="usertask1" targetRef="exclusivegateway1"/>
+      <sequenceFlow id="flow3" isImmediate="true" name="" sourceRef="servicetask1" targetRef="exclusivegateway2"/>
+      <sequenceFlow id="flow4" isImmediate="true" name="" sourceRef="mailtask1" targetRef="exclusivegateway2"/>
+      <sequenceFlow id="flow5" isImmediate="true" name="" sourceRef="exclusivegateway2" targetRef="endevent1"/>
+      <sequenceFlow id="flow6" isImmediate="true" name="" sourceRef="exclusivegateway1" targetRef="mailtask1">
+         <conditionExpression id="sid-1f6f057b-6ffc-4140-8564-8f985bebbdac" xsi:type="tFormalExpression">#{!approved}</conditionExpression>
+      </sequenceFlow>
+      <sequenceFlow id="flow7" isImmediate="true" name="" sourceRef="exclusivegateway1" targetRef="servicetask1">
+         <conditionExpression id="sid-be23aee7-1bb6-4dc5-803e-c6360a8e7c50" xsi:type="tFormalExpression">#{approved}</conditionExpression>
+      </sequenceFlow>
+      <sequenceFlow id="flow8" isImmediate="true" name="" sourceRef="businessruletask1" targetRef="exclusivegateway3"/>
+      <sequenceFlow id="flow9" isImmediate="true" name="" sourceRef="exclusivegateway3" targetRef="usertask1">
+         <conditionExpression id="sid-eadff3ad-0b9a-4e11-9fab-9a5b6802aa10" xsi:type="tFormalExpression">#{tweet.approved}</conditionExpression>
+      </sequenceFlow>
+      <sequenceFlow id="flow10" isImmediate="true" name="" sourceRef="exclusivegateway3" targetRef="mailtask1">
+         <conditionExpression id="sid-5899491d-44a6-4224-a686-4bb38ba98d27" xsi:type="tFormalExpression">#{!tweet.approved}</conditionExpression>
+      </sequenceFlow>
+   </process>
+   <bpmndi:BPMNDiagram id="sid-a9d1f182-be56-4f36-9442-39a56abbf7a9">
+      <bpmndi:BPMNPlane bpmnElement="TwitterDemoProcess-business-rule-task_bpmn20" id="sid-de6ae31d-c3c8-4157-9635-5affe99ad8af">
+         <bpmndi:BPMNShape bpmnElement="startevent1" id="startevent1_gui">
+            <omgdc:Bounds height="28.0" width="28.0" x="33.5" y="203.5"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape bpmnElement="businessruletask1" id="businessruletask1_gui">
+            <omgdc:Bounds height="55.0" width="105.0" x="30.0" y="97.0"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape bpmnElement="exclusivegateway3" id="exclusivegateway3_gui" isMarkerVisible="true">
+            <omgdc:Bounds height="40.0" width="40.0" x="157.0" y="104.0"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape bpmnElement="mailtask1" id="mailtask1_gui">
+            <omgdc:Bounds height="55.0" width="105.0" x="390.0" y="97.0"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape bpmnElement="exclusivegateway1" id="exclusivegateway1_gui" isMarkerVisible="true">
+            <omgdc:Bounds height="40.0" width="40.0" x="290.0" y="197.0"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape bpmnElement="usertask1" id="usertask1_gui">
+            <omgdc:Bounds height="55.0" width="105.0" x="125.0" y="190.0"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape bpmnElement="servicetask1" id="servicetask1_gui">
+            <omgdc:Bounds height="55.0" width="105.0" x="390.0" y="297.0"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape bpmnElement="exclusivegateway2" id="exclusivegateway2_gui" isMarkerVisible="true">
+            <omgdc:Bounds height="40.0" width="40.0" x="555.0" y="197.0"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape bpmnElement="endevent1" id="endevent1_gui">
+            <omgdc:Bounds height="28.0" width="28.0" x="658.5" y="203.5"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNEdge bpmnElement="flow10" id="flow10_gui">
+            <omgdi:waypoint x="197.0" y="124.0"/>
+            <omgdi:waypoint x="390.0" y="124.0"/>
+         </bpmndi:BPMNEdge>
+         <bpmndi:BPMNEdge bpmnElement="flow3" id="flow3_gui">
+            <omgdi:waypoint x="495.0" y="324.0"/>
+            <omgdi:waypoint x="575.0" y="324.0"/>
+            <omgdi:waypoint x="575.0" y="237.0"/>
+         </bpmndi:BPMNEdge>
+         <bpmndi:BPMNEdge bpmnElement="flow2" id="flow2_gui">
+            <omgdi:waypoint x="230.0" y="217.0"/>
+            <omgdi:waypoint x="290.0" y="217.0"/>
+         </bpmndi:BPMNEdge>
+         <bpmndi:BPMNEdge bpmnElement="flow5" id="flow5_gui">
+            <omgdi:waypoint x="595.0" y="217.0"/>
+            <omgdi:waypoint x="658.0" y="217.0"/>
+         </bpmndi:BPMNEdge>
+         <bpmndi:BPMNEdge bpmnElement="flow4" id="flow4_gui">
+            <omgdi:waypoint x="495.0" y="124.0"/>
+            <omgdi:waypoint x="575.0" y="124.0"/>
+            <omgdi:waypoint x="575.0" y="197.0"/>
+         </bpmndi:BPMNEdge>
+         <bpmndi:BPMNEdge bpmnElement="flow1" id="flow1_gui">
+            <omgdi:waypoint x="45.0" y="203.0"/>
+            <omgdi:waypoint x="35.0" y="152.0"/>
+         </bpmndi:BPMNEdge>
+         <bpmndi:BPMNEdge bpmnElement="flow7" id="flow7_gui">
+            <omgdi:waypoint x="310.0" y="237.0"/>
+            <omgdi:waypoint x="310.0" y="324.0"/>
+            <omgdi:waypoint x="390.0" y="324.0"/>
+         </bpmndi:BPMNEdge>
+         <bpmndi:BPMNEdge bpmnElement="flow6" id="flow6_gui">
+            <omgdi:waypoint x="310.0" y="197.0"/>
+            <omgdi:waypoint x="310.0" y="124.0"/>
+            <omgdi:waypoint x="390.0" y="124.0"/>
+         </bpmndi:BPMNEdge>
+         <bpmndi:BPMNEdge bpmnElement="flow9" id="flow9_gui">
+            <omgdi:waypoint x="177.0" y="135.0"/>
+            <omgdi:waypoint x="177.0" y="135.0"/>
+         </bpmndi:BPMNEdge>
+         <bpmndi:BPMNEdge bpmnElement="flow8" id="flow8_gui">
+            <omgdi:waypoint x="135.0" y="124.0"/>
+            <omgdi:waypoint x="157.0" y="124.0"/>
+         </bpmndi:BPMNEdge>
+      </bpmndi:BPMNPlane>
+   </bpmndi:BPMNDiagram>
+</definitions>

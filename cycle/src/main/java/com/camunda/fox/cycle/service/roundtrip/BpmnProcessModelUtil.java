@@ -2,6 +2,7 @@ package com.camunda.fox.cycle.service.roundtrip;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -112,18 +113,17 @@ public class BpmnProcessModelUtil {
    * @return the process model containing the extracted pool
    * 
    */
-  public String extractExecutablePool(String sourceModel) {
+  public InputStream extractExecutablePool(InputStream sourceModel) {
     
-    ByteArrayInputStream inputStream = new ByteArrayInputStream(getBytesFromString(sourceModel));
     ByteArrayOutputStream resultModel = null;
     
     try {
       
-      resultModel = transformer.poolExtraction(inputStream, true);
-      return getStringFromBytes(resultModel.toByteArray());
+      resultModel = transformer.poolExtraction(sourceModel, true);
+      return new ByteArrayInputStream(resultModel.toByteArray());
       
     } finally {
-      IoUtil.closeSilently(inputStream);
+      IoUtil.closeSilently(sourceModel);
       IoUtil.closeSilently(resultModel);
     }
     

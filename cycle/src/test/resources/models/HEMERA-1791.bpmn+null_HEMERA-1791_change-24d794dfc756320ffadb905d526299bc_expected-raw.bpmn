@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?><definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:signavio="http://www.signavio.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" exporter="Signavio Process Editor, http://www.signavio.com" exporterVersion="5.4.1" id="sid-d5fd471b-2c78-4c95-8b19-b8eda8617be4" targetNamespace="http://www.signavio.com/bpmn20" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/2.0/20100501/BPMN20.xsd">
+   <collaboration id="sid-5a03bb4d-5635-45f0-9619-4f37c0203221">
+      <participant id="Process_Engine_1" name="Process Engine" processRef="HEMERA-1791_"/>
+   </collaboration>
+   <process id="HEMERA-1791_" isClosed="true" isExecutable="true" name="Process Engine">
+      <laneSet id="sid-cc843ec3-a75a-4eef-8cb7-846cd94ee1f5">
+         <lane id="lane_3">
+            <flowNodeRef>order_position_changed_12</flowNodeRef>
+            <flowNodeRef>mark_order_position_as_ready_for_pickup_16</flowNodeRef>
+            <flowNodeRef>kaputt_21</flowNodeRef>
+            <flowNodeRef>ganz_25</flowNodeRef>
+            <flowNodeRef>every_6_hours_29</flowNodeRef>
+         </lane>
+      </laneSet>
+      <startEvent id="order_position_changed_12" name="order position changed">
+         <outgoing>sequenceFlow_35</outgoing>
+      </startEvent>
+      <userTask completionQuantity="1" id="mark_order_position_as_ready_for_pickup_16" isForCompensation="false" name="mark order position as ready for pickup" startQuantity="1">
+         <incoming>sequenceFlow_35</incoming>
+         <outgoing>sequenceFlow_34</outgoing>
+      </userTask>
+      <endEvent id="kaputt_21" name="kaputt">
+         <incoming>sequenceFlow_33</incoming>
+      </endEvent>
+      <endEvent id="ganz_25" name="ganz">
+         <incoming>sequenceFlow_34</incoming>
+      </endEvent>
+      <boundaryEvent attachedToRef="mark_order_position_as_ready_for_pickup_16" cancelActivity="false" id="every_6_hours_29" name="every 6 hours" parallelMultiple="false">
+         <outgoing>sequenceFlow_33</outgoing>
+         <timerEventDefinition id="sid-b490bed2-4bd1-4328-9ed2-d2ba191185a0">
+            <timeCycle id="sid-4d5517f7-9111-40b8-bc89-2c22127b1dc1" xsi:type="tFormalExpression">PT6H</timeCycle>
+         </timerEventDefinition>
+      </boundaryEvent>
+      <sequenceFlow id="sequenceFlow_33" isImmediate="true" name="" sourceRef="every_6_hours_29" targetRef="kaputt_21"/>
+      <sequenceFlow id="sequenceFlow_35" isImmediate="true" name="" sourceRef="order_position_changed_12" targetRef="mark_order_position_as_ready_for_pickup_16"/>
+      <sequenceFlow id="sequenceFlow_34" isImmediate="true" name="" sourceRef="mark_order_position_as_ready_for_pickup_16" targetRef="ganz_25"/>
+   </process>
+   <bpmndi:BPMNDiagram id="sid-25cc2c6c-4c70-4b27-a5fd-eb64fadfbd39">
+      <bpmndi:BPMNPlane bpmnElement="sid-5a03bb4d-5635-45f0-9619-4f37c0203221" id="sid-9c6f43c9-f059-4f24-94ce-6637b0d746bb">
+         <bpmndi:BPMNShape bpmnElement="Process_Engine_1" id="Process_Engine_1_gui" isHorizontal="true">
+            <omgdc:Bounds height="250.0" width="451.0" x="0.0" y="0.0"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape bpmnElement="lane_3" id="lane_3_gui" isHorizontal="true">
+            <omgdc:Bounds height="250.0" width="421.0" x="30.0" y="0.0"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape bpmnElement="order_position_changed_12" id="order_position_changed_12_gui">
+            <omgdc:Bounds height="28.0" width="28.0" x="91.0" y="111.0"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape bpmnElement="mark_order_position_as_ready_for_pickup_16" id="mark_order_position_as_ready_for_pickup_16_gui">
+            <omgdc:Bounds height="80.0" width="100.0" x="195.0" y="85.0"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape bpmnElement="kaputt_21" id="kaputt_21_gui">
+            <omgdc:Bounds height="28.0" width="28.0" x="390.0" y="195.0"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape bpmnElement="ganz_25" id="ganz_25_gui">
+            <omgdc:Bounds height="28.0" width="28.0" x="390.0" y="111.0"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape bpmnElement="every_6_hours_29" id="every_6_hours_29_gui">
+            <omgdc:Bounds height="28.0" width="28.0" x="228.19905586152623" y="151.0"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNEdge bpmnElement="sequenceFlow_35" id="sequenceFlow_35_gui">
+            <omgdi:waypoint x="119.0" y="125.0"/>
+            <omgdi:waypoint x="195.0" y="125.0"/>
+         </bpmndi:BPMNEdge>
+         <bpmndi:BPMNEdge bpmnElement="sequenceFlow_34" id="sequenceFlow_34_gui">
+            <omgdi:waypoint x="295.0" y="125.0"/>
+            <omgdi:waypoint x="390.0" y="125.0"/>
+         </bpmndi:BPMNEdge>
+         <bpmndi:BPMNEdge bpmnElement="sequenceFlow_33" id="sequenceFlow_33_gui">
+            <omgdi:waypoint x="242.0" y="179.0"/>
+            <omgdi:waypoint x="241.1290322580644" y="209.0"/>
+            <omgdi:waypoint x="390.0" y="209.0"/>
+         </bpmndi:BPMNEdge>
+      </bpmndi:BPMNPlane>
+   </bpmndi:BPMNDiagram>
+</definitions>

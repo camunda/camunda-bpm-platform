@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="UTF-8"?><definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:signavio="http://www.signavio.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" exporter="Signavio Process Editor, http://www.signavio.com" exporterVersion="5.4.1" id="sid-d5e57aff-f5f8-4213-90e7-2d3512b46a7e" targetNamespace="http://www.signavio.com/bpmn20" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/2.0/20100501/BPMN20.xsd">
+   <collaboration id="sid-eacc0ad5-d85b-4f0a-8b2c-e04f5966c513">
+      <participant id="Process_Engine_1" name="changed-processname-Process Engine" processRef="HEMERA-1791-Collaboration_"/>
+      <participant id="My_Collab_2" name="My Collab" processRef="My_Collab_40"/>
+      <messageFlow id="messageFlow_4" name="" sourceRef="mark_order_position_as_ready_for_pickup_19" targetRef="my_task_47"/>
+      <messageFlow id="messageFlow_3" name="" sourceRef="my_task_47" targetRef="mark_order_position_as_ready_for_pickup_19"/>
+   </collaboration>
+   <process id="My_Collab_40" isClosed="true" isExecutable="false" name="My Collab">
+      <laneSet id="sid-788cf2ac-e80e-4765-a94a-bc3c9107bf5a">
+         <lane id="lane_40">
+            <extensionElements>
+               <signavio:signavioMetaData metaKey="bgcolor" metaValue=""/>
+            </extensionElements>
+            <flowNodeRef>my_task_47</flowNodeRef>
+			<flowNodeRef>collab_start_52</flowNodeRef>
+            <flowNodeRef>collab_end_56</flowNodeRef>
+         </lane>
+      </laneSet>
+      <task completionQuantity="1" id="my_task_47" isForCompensation="false" name="my task" startQuantity="1">
+         <extensionElements>
+            <signavio:signavioMetaData metaKey="bgcolor" metaValue="#ffffcc"/>
+         </extensionElements>
+         <incoming>sequenceFlow_61</incoming>
+         <outgoing>sequenceFlow_60</outgoing>
+      </task>
+      <startEvent id="collab_start_52" name="collab start">
+         <extensionElements>
+            <signavio:signavioMetaData metaKey="bgcolor" metaValue="#ffffff"/>
+         </extensionElements>
+         <outgoing>sequenceFlow_61</outgoing>
+      </startEvent>
+      <endEvent id="collab_end_56" name="collab end">
+         <extensionElements>
+            <signavio:signavioMetaData metaKey="bgcolor" metaValue="#ffffff"/>
+         </extensionElements>
+         <incoming>sequenceFlow_60</incoming>
+      </endEvent>
+      <sequenceFlow id="sequenceFlow_60" isImmediate="true" name="" sourceRef="my_task_47" targetRef="collab_end_56"/>
+      <sequenceFlow id="sequenceFlow_61" isImmediate="true" name="" sourceRef="collab_start_52" targetRef="my_task_47"/>
+   </process>
+   <process id="HEMERA-1791-Collaboration_" isClosed="true" isExecutable="true" name="changed-processname-Process Engine">
+      <laneSet id="sid-b07d4860-d24d-4456-9afc-e845b064a58d">
+         <lane id="lane_6">
+            <flowNodeRef>order_position_changed_15</flowNodeRef>
+            <flowNodeRef>mark_order_position_as_ready_for_pickup_19</flowNodeRef>
+            <flowNodeRef>kaputt_24</flowNodeRef>
+            <flowNodeRef>ganz_28</flowNodeRef>
+            <flowNodeRef>every_6_hours_32</flowNodeRef>
+         </lane>
+      </laneSet>
+      <startEvent id="order_position_changed_15" name="order position changed">
+         <outgoing>sequenceFlow_37</outgoing>
+      </startEvent>
+      <userTask completionQuantity="1" id="mark_order_position_as_ready_for_pickup_19" isForCompensation="false" name="mark order position as ready for pickup" startQuantity="1">
+         <incoming>sequenceFlow_37</incoming>
+         <outgoing>sequenceFlow_38</outgoing>
+      </userTask>
+      <endEvent id="kaputt_24" name="kaputt">
+         <incoming>sequenceFlow_36</incoming>
+      </endEvent>
+      <endEvent id="ganz_28" name="ganz">
+         <incoming>sequenceFlow_38</incoming>
+      </endEvent>
+      <boundaryEvent attachedToRef="mark_order_position_as_ready_for_pickup_19" cancelActivity="false" id="every_6_hours_32" name="every 6 hours" parallelMultiple="false">
+         <outgoing>sequenceFlow_36</outgoing>
+         <timerEventDefinition id="sid-e43db509-88c4-45a7-a8d2-9d1916857532">
+            <timeCycle id="sid-a84e144c-ef01-4e18-ba64-04114f393876" xsi:type="tFormalExpression">PT6H</timeCycle>
+         </timerEventDefinition>
+      </boundaryEvent>
+      <sequenceFlow id="sequenceFlow_36" isImmediate="true" name="" sourceRef="every_6_hours_32" targetRef="kaputt_24"/>
+      <sequenceFlow id="sequenceFlow_38" isImmediate="true" name="" sourceRef="mark_order_position_as_ready_for_pickup_19" targetRef="ganz_28"/>
+      <sequenceFlow id="sequenceFlow_37" isImmediate="true" name="" sourceRef="order_position_changed_15" targetRef="mark_order_position_as_ready_for_pickup_19"/>
+   </process>
+   <bpmndi:BPMNDiagram id="sid-bcb65d5a-0207-4c54-a5ac-73eec01fa11d">
+      <bpmndi:BPMNPlane bpmnElement="sid-eacc0ad5-d85b-4f0a-8b2c-e04f5966c513" id="sid-86471344-6519-434e-8b03-8b7271962af3">
+         <bpmndi:BPMNShape bpmnElement="Process_Engine_1" id="Process_Engine_1_gui" isHorizontal="true">
+            <omgdc:Bounds height="250.0" width="600.0" x="90.0" y="300.0"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape bpmnElement="My_Collab_2" id="My_Collab_2_gui" isHorizontal="true">
+            <omgdc:Bounds height="250.0" width="600.0" x="90.0" y="15.0"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape bpmnElement="lane_40" id="lane_40_gui" isHorizontal="true">
+            <omgdc:Bounds height="250.0" width="570.0" x="120.0" y="15.0"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape bpmnElement="my_task_47" id="my_task_47_gui">
+            <omgdc:Bounds height="80.0" width="100.0" x="340.0" y="100.0"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape bpmnElement="collab_start_52" id="collab_start_52_gui">
+            <omgdc:Bounds height="28.0" width="28.0" x="181.0" y="126.0"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape bpmnElement="collab_end_56" id="collab_end_56_gui">
+            <omgdc:Bounds height="28.0" width="28.0" x="485.0" y="126.0"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape bpmnElement="lane_6" id="lane_6_gui" isHorizontal="true">
+            <omgdc:Bounds height="250.0" width="570.0" x="120.0" y="300.0"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape bpmnElement="order_position_changed_15" id="order_position_changed_15_gui">
+            <omgdc:Bounds height="28.0" width="28.0" x="181.0" y="411.0"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape bpmnElement="mark_order_position_as_ready_for_pickup_19" id="mark_order_position_as_ready_for_pickup_19_gui">
+            <omgdc:Bounds height="80.0" width="100.0" x="340.0" y="385.0"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape bpmnElement="kaputt_24" id="kaputt_24_gui">
+            <omgdc:Bounds height="28.0" width="28.0" x="535.0" y="495.0"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape bpmnElement="ganz_28" id="ganz_28_gui">
+            <omgdc:Bounds height="28.0" width="28.0" x="535.0" y="411.0"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape bpmnElement="every_6_hours_32" id="every_6_hours_32_gui">
+            <omgdc:Bounds height="28.0" width="28.0" x="373.19905586152623" y="451.0"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNEdge bpmnElement="sequenceFlow_36" id="sequenceFlow_36_gui">
+            <omgdi:waypoint x="373.0" y="476.0"/>
+            <omgdi:waypoint x="331.1290322580644" y="509.0"/>
+            <omgdi:waypoint x="535.0" y="509.0"/>
+         </bpmndi:BPMNEdge>
+         <bpmndi:BPMNEdge bpmnElement="sequenceFlow_38" id="sequenceFlow_38_gui">
+            <omgdi:waypoint x="440.0" y="425.0"/>
+            <omgdi:waypoint x="535.0" y="425.0"/>
+         </bpmndi:BPMNEdge>
+         <bpmndi:BPMNEdge bpmnElement="sequenceFlow_37" id="sequenceFlow_37_gui">
+            <omgdi:waypoint x="209.0" y="425.0"/>
+            <omgdi:waypoint x="340.0" y="425.0"/>
+         </bpmndi:BPMNEdge>
+         <bpmndi:BPMNEdge bpmnElement="messageFlow_4" id="messageFlow_4_gui">
+            <omgdi:waypoint x="415.0" y="385.0"/>
+            <omgdi:waypoint x="415.0" y="180.0"/>
+         </bpmndi:BPMNEdge>
+         <bpmndi:BPMNEdge bpmnElement="messageFlow_3" id="messageFlow_3_gui">
+            <omgdi:waypoint x="365.0" y="180.0"/>
+            <omgdi:waypoint x="365.0" y="385.0"/>
+         </bpmndi:BPMNEdge>
+         <bpmndi:BPMNEdge bpmnElement="sequenceFlow_60" id="sequenceFlow_60_gui">
+            <omgdi:waypoint x="440.0" y="140.0"/>
+            <omgdi:waypoint x="485.0" y="140.0"/>
+         </bpmndi:BPMNEdge>
+         <bpmndi:BPMNEdge bpmnElement="sequenceFlow_61" id="sequenceFlow_61_gui">
+            <omgdi:waypoint x="209.0" y="140.0"/>
+            <omgdi:waypoint x="340.0" y="140.0"/>
+         </bpmndi:BPMNEdge>
+      </bpmndi:BPMNPlane>
+   </bpmndi:BPMNDiagram>
+</definitions>

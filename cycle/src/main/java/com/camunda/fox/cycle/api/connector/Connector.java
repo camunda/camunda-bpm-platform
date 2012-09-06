@@ -3,6 +3,7 @@ package com.camunda.fox.cycle.api.connector;
 import java.io.InputStream;
 import java.util.List;
 
+import com.camunda.fox.cycle.api.connector.ConnectorNode.ConnectorNodeType;
 import com.camunda.fox.cycle.entity.ConnectorConfiguration;
 
 
@@ -17,7 +18,11 @@ public abstract class Connector {
   
   public abstract InputStream getContent(ConnectorNode node);
   
-  public abstract void updateContent(ConnectorNode node, String newContent) throws Exception;
+  public abstract ConnectorNode createNode(String id, String label, ConnectorNodeType type);
+  
+  public abstract void deleteNode(String id);
+  
+  public abstract void updateContent(ConnectorNode node, InputStream newContent) throws Exception;
   
   public void login(String userName, String password) {
   }
@@ -38,9 +43,6 @@ public abstract class Connector {
   }
   
   public void init(ConnectorConfiguration config) {
-  }
-  
-  public void createModel() throws Exception {
   }
   
   public Long getId() {

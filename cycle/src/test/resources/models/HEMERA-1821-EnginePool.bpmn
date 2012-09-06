@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+             xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
+             xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI"
+             xmlns:signavio="http://www.signavio.com"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             exporter="Signavio Process Editor, http://www.signavio.com"
+             exporterVersion="5.2.1"
+             id="sid-c0cd9bdf-edb1-41be-ab9d-8271e7a8680b"
+             targetNamespace="http://www.omg.org/spec/BPMN/20100524/MODEL">
+   <process id="CollaborationDropTest_" isClosed="true" isExecutable="true" name="TestLane">
+      <startEvent id="startEvent_12"/>
+      <task id="Task1_16" name="Task1"/>
+      <endEvent id="endEvent_23"/>
+      <sequenceFlow id="sequenceFlow_28" sourceRef="Task1_16" targetRef="endEvent_23"/>
+      <sequenceFlow id="sequenceFlow_27" sourceRef="startEvent_12" targetRef="Task1_16"/>
+   </process>
+   <bpmndi:BPMNDiagram id="BPMNDiagram_26">
+      <bpmndi:BPMNPlane bpmnElement="CollaborationDropTest_" id="BPMNPlane_26">
+         <bpmndi:BPMNShape bpmnElement="startEvent_12" id="startEvent_12_gui">
+            <omgdc:Bounds height="28.0" width="28.0" x="46" y="91"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape bpmnElement="Task1_16" id="Task1_16_gui">
+            <omgdc:Bounds height="80.0" width="100.0" x="120" y="65"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape bpmnElement="endEvent_23" id="endEvent_23_gui">
+            <omgdc:Bounds height="28.0" width="28.0" x="265" y="91"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNEdge bpmnElement="sequenceFlow_28" id="sequenceFlow_28_gui">
+            <omgdi:waypoint x="220" y="105"/>
+            <omgdi:waypoint x="265" y="105"/>
+         </bpmndi:BPMNEdge>
+         <bpmndi:BPMNEdge bpmnElement="sequenceFlow_27" id="sequenceFlow_27_gui">
+            <omgdi:waypoint x="74" y="105"/>
+            <omgdi:waypoint x="120" y="105"/>
+         </bpmndi:BPMNEdge>
+      </bpmndi:BPMNPlane>
+   </bpmndi:BPMNDiagram>
+</definitions>

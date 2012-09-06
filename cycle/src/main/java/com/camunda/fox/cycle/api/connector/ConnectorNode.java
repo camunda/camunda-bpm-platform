@@ -3,9 +3,6 @@ package com.camunda.fox.cycle.api.connector;
 import java.io.Serializable;
 import java.util.Date;
 
-import javax.persistence.Embeddable;
-
-@Embeddable
 public class ConnectorNode implements Comparable<ConnectorNode>, Serializable {
   
   private static final long serialVersionUID = 1L;
@@ -40,6 +37,11 @@ public class ConnectorNode implements Comparable<ConnectorNode>, Serializable {
     this.setConnectorId(connectorId);
   }
   
+  public ConnectorNode(String id, String label, ConnectorNodeType type) {
+    this(id, label);
+    this.setType(type);
+  }
+
   /**
    * ID of this node, may contain different representations, depending on the corresponding connector
    * @return

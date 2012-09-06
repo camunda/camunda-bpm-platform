@@ -1,0 +1,269 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+             xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
+             xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI"
+             xmlns:signavio="http://www.signavio.com"
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             exporter="Signavio Process Editor, http://www.signavio.com"
+             exporterVersion="5.4.1"
+             expressionLanguage="http://www.w3.org/1999/XPath"
+             id="sid-2ebd156d-c728-4180-ac6c-b568caf377e1"
+             targetNamespace="http://www.omg.org/spec/BPMN/20100524/MODEL"
+             typeLanguage="http://www.w3.org/2001/XMLSchema"
+             xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/2.0/20100501/BPMN20.xsd">
+   <message id="sid-1dd0a8c3-6e8a-4f05-a657-aa21fc703a1f" name="manual"/>
+   <message id="sid-6961bba4-85aa-45f5-9c24-ea7f42c3914b" name="automatic"/>
+   <error id="sid-4bc65948-2960-4aba-8f46-9b68c6686ed8" name="SAPWriteContactError"/>
+   <error id="sid-0524230b-0b30-4ca9-8da7-ecc93f8bae8f"
+          name="TechnicalMasterDataCreationError"/>
+   <collaboration id="sid-e158340b-181a-4c1b-bc10-ee8ce4dec564">
+      <participant id="UI_Mediator_6" name="UI Mediator"/>
+      <participant id="Prozess_Engine_Akquise_Prozess_15" name="Prozess Engine&#xA;Akquise Prozess"
+                   processRef="CC-Akquise_"/>
+      <textAnnotation id="textAnnotation_28" textFormat="text/plain">
+         <text>Nicht modelliert
+-&gt; Übernimmt Kommunikation zw. GUI und Prozess</text>
+      </textAnnotation>
+   </collaboration>
+   <process id="CC-Akquise_" isClosed="true" isExecutable="true"
+            name="Prozess Engine&#xA;Akquise Prozess"
+            processType="None">
+      <laneSet id="sid-1d305410-6fd1-4b09-86df-1f0b488a271c">
+         <lane id="lane_32">
+            <flowNodeRef>N_chsten_Akquise_Fall_claimen_49</flowNodeRef>
+            <flowNodeRef>Automatische_Akquise_56</flowNodeRef>
+            <flowNodeRef>GP_identifizieren_62</flowNodeRef>
+            <flowNodeRef>Akquisedaten_erfassen_69</flowNodeRef>
+            <flowNodeRef>Technische_Stammdaten_anlegen_77</flowNodeRef>
+            <flowNodeRef>GP_identifiziert___angelegt_84</flowNodeRef>
+            <flowNodeRef>Akquisedaten_erfasst_90</flowNodeRef>
+            <flowNodeRef>Manuelle_Akquise_95</flowNodeRef>
+            <flowNodeRef>Kontakt_abschlie_en_101</flowNodeRef>
+            <flowNodeRef>SAP_Kontakt_schreiben_109</flowNodeRef>
+            <flowNodeRef>endEvent_116</flowNodeRef>
+            <flowNodeRef>boundaryEvent_120</flowNodeRef>
+            <flowNodeRef>boundaryEvent_123</flowNodeRef>
+         </lane>
+      </laneSet>
+      <serviceTask completionQuantity="1" id="N_chsten_Akquise_Fall_claimen_49"
+                   implementation="webService"
+                   isForCompensation="false"
+                   name="Nächsten Akquise Fall claimen"
+                   startQuantity="1"/>
+      <startEvent id="Automatische_Akquise_56" isInterrupting="true" name="Automatische Akquise">
+         <messageEventDefinition id="sid-cfc07524-2afb-455d-989b-fdafd2e8d8e5"
+                                 messageRef="sid-6961bba4-85aa-45f5-9c24-ea7f42c3914b"/>
+      </startEvent>
+      <userTask completionQuantity="1" id="GP_identifizieren_62" implementation="webService"
+                isForCompensation="false"
+                name="GP identifizieren"
+                startQuantity="1"/>
+      <userTask completionQuantity="1" id="Akquisedaten_erfassen_69"
+                implementation="webService"
+                isForCompensation="false"
+                name="Akquisedaten erfassen"
+                startQuantity="1"/>
+      <serviceTask completionQuantity="1" id="Technische_Stammdaten_anlegen_77"
+                   implementation="webService"
+                   isForCompensation="false"
+                   name="Technische Stammdaten anlegen"
+                   startQuantity="1"/>
+      <intermediateThrowEvent id="GP_identifiziert___angelegt_84" name="GP identifiziert / angelegt"/>
+      <intermediateThrowEvent id="Akquisedaten_erfasst_90" name="Akquisedaten erfasst"/>
+      <startEvent id="Manuelle_Akquise_95" isInterrupting="true" name="Manuelle Akquise">
+         <messageEventDefinition id="sid-d7fc927c-79f8-4f50-8687-53d63683d332"
+                                 messageRef="sid-1dd0a8c3-6e8a-4f05-a657-aa21fc703a1f"/>
+      </startEvent>
+      <userTask completionQuantity="1" id="Kontakt_abschlie_en_101" implementation="webService"
+                isForCompensation="false"
+                name="Kontakt abschließen"
+                startQuantity="1"/>
+      <serviceTask completionQuantity="1" id="SAP_Kontakt_schreiben_109"
+                   implementation="webService"
+                   isForCompensation="false"
+                   name="SAP Kontakt schreiben"
+                   startQuantity="1"/>
+      <endEvent id="endEvent_116" name=""/>
+      <boundaryEvent attachedToRef="Technische_Stammdaten_anlegen_77" cancelActivity="true"
+                     id="boundaryEvent_120"
+                     name=""
+                     parallelMultiple="false">
+         <errorEventDefinition errorRef="sid-0524230b-0b30-4ca9-8da7-ecc93f8bae8f"
+                               id="sid-e05d4f69-9f09-47c5-a429-b56e81e0cbc4"/>
+      </boundaryEvent>
+      <boundaryEvent attachedToRef="SAP_Kontakt_schreiben_109" cancelActivity="true"
+                     id="boundaryEvent_123"
+                     name=""
+                     parallelMultiple="false">
+         <errorEventDefinition errorRef="sid-4bc65948-2960-4aba-8f46-9b68c6686ed8"
+                               id="sid-a4326d02-ed89-4f47-a6c3-5d87255acc31"/>
+      </boundaryEvent>
+      <sequenceFlow id="sequenceFlow_137" isImmediate="true" name="" sourceRef="boundaryEvent_123"
+                    targetRef="Kontakt_abschlie_en_101"/>
+      <sequenceFlow id="sequenceFlow_135" isImmediate="true" name=""
+                    sourceRef="SAP_Kontakt_schreiben_109"
+                    targetRef="endEvent_116"/>
+      <sequenceFlow id="sequenceFlow_134" isImmediate="true" name="" sourceRef="boundaryEvent_120"
+                    targetRef="Akquisedaten_erfassen_69"/>
+      <sequenceFlow id="sequenceFlow_126" isImmediate="true" name=""
+                    sourceRef="GP_identifiziert___angelegt_84"
+                    targetRef="Akquisedaten_erfassen_69"/>
+      <sequenceFlow id="sequenceFlow_132" isImmediate="true" name=""
+                    sourceRef="N_chsten_Akquise_Fall_claimen_49"
+                    targetRef="GP_identifizieren_62"/>
+      <sequenceFlow id="sequenceFlow_136" isImmediate="true" name=""
+                    sourceRef="Technische_Stammdaten_anlegen_77"
+                    targetRef="Kontakt_abschlie_en_101"/>
+      <sequenceFlow id="sequenceFlow_130" isImmediate="true" name=""
+                    sourceRef="Kontakt_abschlie_en_101"
+                    targetRef="SAP_Kontakt_schreiben_109"/>
+      <sequenceFlow id="sequenceFlow_131" isImmediate="true" name=""
+                    sourceRef="Manuelle_Akquise_95"
+                    targetRef="GP_identifiziert___angelegt_84"/>
+      <sequenceFlow id="sequenceFlow_133" isImmediate="true" name=""
+                    sourceRef="Akquisedaten_erfassen_69"
+                    targetRef="Akquisedaten_erfasst_90"/>
+      <sequenceFlow id="sequenceFlow_127" isImmediate="true" name=""
+                    sourceRef="GP_identifizieren_62"
+                    targetRef="GP_identifiziert___angelegt_84"/>
+      <sequenceFlow id="sequenceFlow_128" isImmediate="true" name=""
+                    sourceRef="Automatische_Akquise_56"
+                    targetRef="N_chsten_Akquise_Fall_claimen_49"/>
+      <sequenceFlow id="sequenceFlow_129" isImmediate="true" name=""
+                    sourceRef="Akquisedaten_erfasst_90"
+                    targetRef="Technische_Stammdaten_anlegen_77"/>
+      <textAnnotation id="textAnnotation_701" textFormat="text/plain">
+         <text>TODO: Fehlerfall keine Akquisen vorhanden</text>
+      </textAnnotation>
+      <textAnnotation id="textAnnotation_145" textFormat="text/plain">
+         <text>Wirklich direkt ohne Prozess?</text>
+      </textAnnotation>
+      <textAnnotation id="textAnnotation_143" textFormat="text/plain">
+         <text>-&gt; GP-Nummer
+erfasst</text>
+      </textAnnotation>
+      <textAnnotation id="textAnnotation_141" textFormat="text/plain">
+         <text>Wirklich direkt ohne Prozess?</text>
+      </textAnnotation>
+   </process>
+   <bpmndi:BPMNDiagram id="sid-5cc3cea1-e5fa-4265-b935-ed3303deeacc">
+      <bpmndi:BPMNPlane bpmnElement="sid-e158340b-181a-4c1b-bc10-ee8ce4dec564"
+                        id="sid-c4369172-fa8c-4aa1-ad9a-ec145e10230c">
+         <bpmndi:BPMNShape bpmnElement="Prozess_Engine_Akquise_Prozess_15"
+                           id="Prozess_Engine_Akquise_Prozess_15_gui"
+                           isHorizontal="true">
+            <omgdc:Bounds height="299.0" width="4660.0" x="0" y="0"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape bpmnElement="lane_32" id="lane_32_gui" isHorizontal="true">
+            <omgdc:Bounds height="299.0" width="4630.0" x="30" y="0"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape bpmnElement="N_chsten_Akquise_Fall_claimen_49"
+                           id="N_chsten_Akquise_Fall_claimen_49_gui">
+            <omgdc:Bounds height="80.0" width="100.0" x="663" y="134"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape bpmnElement="Automatische_Akquise_56" id="Automatische_Akquise_56_gui">
+            <omgdc:Bounds height="30.0" width="30.0" x="574" y="160"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape bpmnElement="GP_identifizieren_62" id="GP_identifizieren_62_gui">
+            <omgdc:Bounds height="80.0" width="100.0" x="1374" y="134"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape bpmnElement="Akquisedaten_erfassen_69" id="Akquisedaten_erfassen_69_gui">
+            <omgdc:Bounds height="80.0" width="100.0" x="2536" y="134"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape bpmnElement="Technische_Stammdaten_anlegen_77"
+                           id="Technische_Stammdaten_anlegen_77_gui">
+            <omgdc:Bounds height="80.0" width="100.0" x="3426" y="134"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape bpmnElement="GP_identifiziert___angelegt_84"
+                           id="GP_identifiziert___angelegt_84_gui">
+            <omgdc:Bounds height="30.0" width="30.0" x="2181" y="160.8735731322422"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape bpmnElement="Akquisedaten_erfasst_90" id="Akquisedaten_erfasst_90_gui">
+            <omgdc:Bounds height="30.0" width="30.0" x="3314.0019062457704" y="161"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape bpmnElement="Manuelle_Akquise_95" id="Manuelle_Akquise_95_gui">
+            <omgdc:Bounds height="30.0" width="30.0" x="2180" y="47.8735731322422"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape bpmnElement="Kontakt_abschlie_en_101" id="Kontakt_abschlie_en_101_gui">
+            <omgdc:Bounds height="80.0" width="100.0" x="4029" y="134"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape bpmnElement="SAP_Kontakt_schreiben_109" id="SAP_Kontakt_schreiben_109_gui">
+            <omgdc:Bounds height="80.0" width="100.0" x="4194" y="134"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape bpmnElement="endEvent_116" id="endEvent_116_gui">
+            <omgdc:Bounds height="28.0" width="28.0" x="4527" y="160"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape bpmnElement="boundaryEvent_120" id="boundaryEvent_120_gui">
+            <omgdc:Bounds height="30.0" width="30.0" x="3438.4358974359056" y="199"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape bpmnElement="boundaryEvent_123" id="boundaryEvent_123_gui">
+            <omgdc:Bounds height="30.0" width="30.0" x="4196.272727272764" y="199"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape bpmnElement="textAnnotation_701" id="textAnnotation_701_gui">
+            <omgdc:Bounds height="50.0" width="100.0" x="782" y="-82"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape bpmnElement="textAnnotation_145" id="textAnnotation_145_gui">
+            <omgdc:Bounds height="50.0" width="100.0" x="1952" y="-83"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape bpmnElement="textAnnotation_143" id="textAnnotation_143_gui">
+            <omgdc:Bounds height="50.0" width="100.0" x="2283" y="92"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape bpmnElement="textAnnotation_141" id="textAnnotation_141_gui">
+            <omgdc:Bounds height="50.0" width="100.0" x="1007" y="-82"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNEdge bpmnElement="sequenceFlow_132" id="sequenceFlow_132_gui">
+            <omgdi:waypoint x="763" y="174"/>
+            <omgdi:waypoint x="1374" y="174"/>
+         </bpmndi:BPMNEdge>
+         <bpmndi:BPMNEdge bpmnElement="sequenceFlow_133" id="sequenceFlow_133_gui">
+            <omgdi:waypoint x="2636" y="174"/>
+            <omgdi:waypoint x="3314" y="176"/>
+         </bpmndi:BPMNEdge>
+         <bpmndi:BPMNEdge bpmnElement="sequenceFlow_134" id="sequenceFlow_134_gui">
+            <omgdi:waypoint x="3453" y="229"/>
+            <omgdi:waypoint x="3453.4358974359056" y="252"/>
+            <omgdi:waypoint x="2594.062743091873" y="252"/>
+            <omgdi:waypoint x="2594" y="214"/>
+         </bpmndi:BPMNEdge>
+         <bpmndi:BPMNEdge bpmnElement="sequenceFlow_135" id="sequenceFlow_135_gui">
+            <omgdi:waypoint x="4294" y="174"/>
+            <omgdi:waypoint x="4527" y="174"/>
+         </bpmndi:BPMNEdge>
+         <bpmndi:BPMNEdge bpmnElement="sequenceFlow_136" id="sequenceFlow_136_gui">
+            <omgdi:waypoint x="3526" y="174"/>
+            <omgdi:waypoint x="4029" y="174"/>
+         </bpmndi:BPMNEdge>
+         <bpmndi:BPMNEdge bpmnElement="sequenceFlow_137" id="sequenceFlow_137_gui">
+            <omgdi:waypoint x="4211" y="229"/>
+            <omgdi:waypoint x="4211.272727272735" y="265"/>
+            <omgdi:waypoint x="4079" y="265"/>
+            <omgdi:waypoint x="4079" y="214"/>
+         </bpmndi:BPMNEdge>
+         <bpmndi:BPMNEdge bpmnElement="sequenceFlow_129" id="sequenceFlow_129_gui">
+            <omgdi:waypoint x="3344" y="176"/>
+            <omgdi:waypoint x="3426" y="174"/>
+         </bpmndi:BPMNEdge>
+         <bpmndi:BPMNEdge bpmnElement="sequenceFlow_127" id="sequenceFlow_127_gui">
+            <omgdi:waypoint x="1474" y="174"/>
+            <omgdi:waypoint x="2181" y="175"/>
+         </bpmndi:BPMNEdge>
+         <bpmndi:BPMNEdge bpmnElement="sequenceFlow_128" id="sequenceFlow_128_gui">
+            <omgdi:waypoint x="604" y="175"/>
+            <omgdi:waypoint x="663" y="174"/>
+         </bpmndi:BPMNEdge>
+         <bpmndi:BPMNEdge bpmnElement="sequenceFlow_126" id="sequenceFlow_126_gui">
+            <omgdi:waypoint x="2211" y="175"/>
+            <omgdi:waypoint x="2536" y="174"/>
+         </bpmndi:BPMNEdge>
+         <bpmndi:BPMNEdge bpmnElement="sequenceFlow_131" id="sequenceFlow_131_gui">
+            <omgdi:waypoint x="2195" y="77"/>
+            <omgdi:waypoint x="2196" y="160"/>
+         </bpmndi:BPMNEdge>
+         <bpmndi:BPMNEdge bpmnElement="sequenceFlow_130" id="sequenceFlow_130_gui">
+            <omgdi:waypoint x="4129" y="176"/>
+            <omgdi:waypoint x="4194" y="174"/>
+         </bpmndi:BPMNEdge>
+      </bpmndi:BPMNPlane>
+   </bpmndi:BPMNDiagram>
+</definitions>
