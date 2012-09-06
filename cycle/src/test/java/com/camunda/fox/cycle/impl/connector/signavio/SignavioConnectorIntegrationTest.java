@@ -48,7 +48,6 @@ import com.camunda.fox.cycle.api.connector.ConnectorNode;
 import com.camunda.fox.cycle.entity.ConnectorConfiguration;
 import com.camunda.fox.cycle.service.roundtrip.BpmnProcessModelUtil;
 import com.camunda.fox.cycle.service.roundtrip.transform.XsltTransformer;
-import com.camunda.fox.cycle.util.ActivitiCompliantBpmn20Provider;
 import com.camunda.fox.cycle.util.BpmnNamespaceContext;
 import com.camunda.fox.cycle.util.IoUtil;
 import com.camunda.fox.cycle.util.XmlUtil;
@@ -57,7 +56,13 @@ import com.camunda.fox.cycle.util.XmlUtil;
 @ContextConfiguration(loader = SpringockitoContextLoader.class, locations = { "classpath:/spring/test/signavio-connector-xml-config.xml" })
 public class SignavioConnectorIntegrationTest extends AbstractSignavioConnectorTest {
 
+  private static final String INITIAL_RAW_BPMN20_XML = "initial-raw.bpmn";
   private static final String EXPECTED_RAW_BPMN20_XML = "expected-raw.bpmn";
+  private static final String TECHNICAL_BPMN20_XML = "technical.bpmn";
+  private static final String CHANGED_TECHNICAL_BPMN20_XML = "changed-technical.bpmn";
+  private static final String BEFORE_DEPLOY_TECHNICAL_BPMN20_XML = "before-deploy-technical.bpmn";
+  private static final String ACTUAL_RAW_BPMN20_XML = "actual-raw.bpmn";
+  private static final String XML_DIFF_TXT = "xml-diff.txt";
   
   private static final String MODEL_FOLDER = "models";
   private static final String DEBUG_DIR = "target/failsafe-reports";
@@ -271,8 +276,8 @@ public class SignavioConnectorIntegrationTest extends AbstractSignavioConnectorT
   private String bpmnPoolExtractionRoundtrip(String filename, boolean devFriendly, String replaceRegex, String withReplacement, boolean deployToEngine,
           String importXmlFile) throws Exception {
     // enable writing of results to files
-    ActivitiCompliantBpmn20Provider.debug = true;
-    ActivitiCompliantBpmn20Provider.debugDir = DEBUG_DIR;
+    IoUtil.DEBUG = true;
+    IoUtil.DEBUG_DIR = DEBUG_DIR;
 
     String initialRawBpmn20Xml = null; // the initial business model
     String technicalModel = null;
@@ -308,14 +313,13 @@ public class SignavioConnectorIntegrationTest extends AbstractSignavioConnectorT
         initialRawBpmn20XmlInputStream = this.getSignavioConnector().getContent(model);
         initialRawBpmn20Xml = IOUtils.toString(initialRawBpmn20XmlInputStream, "UTF-8");
         IoUtil.closeSilently(initialRawBpmn20XmlInputStream);
+        IoUtil.writeStringToFileIfDebug(initialRawBpmn20Xml, "initial_raw_model", INITIAL_RAW_BPMN20_XML);
+        
 //        ActivitiCompliantBpmn20Provider.writeStringToFileIfDebug(model, initialRawBpmn20Xml, INITIAL_RAW_BPMN20_XML);
 
         // export (developer-friendly) BPMN 2.0 XML of Engine Pool
         if (importXmlFile == null) {
-//          technicalModel = this.bpmnProcessModelUtil.exportTechnicalModel(model, devFriendly).asString(); TODO:
-          
           if (devFriendly) {
-//            technicalModel = this.bpmnProcessModelUtil.replaceDeveloperFriendlyIds(technicalModel);
             String enginePoolId = model.getLabel().replaceFirst("^[^a-zA-Z]", "z").replaceAll("[^a-zA-Z0-9-]", "_").concat("_");
             initialRawBpmn20XmlInputStream = IOUtils.toInputStream(initialRawBpmn20Xml, "UTF-8");
             ByteArrayOutputStream devFriendlyOutput = XsltTransformer.instance().developerFriendly(initialRawBpmn20XmlInputStream, enginePoolId,  true);
@@ -331,23 +335,20 @@ public class SignavioConnectorIntegrationTest extends AbstractSignavioConnectorT
         } else {
           technicalModel = readModel(importXmlFile);
         }
-
-//        ActivitiCompliantBpmn20Provider.writeStringToFileIfDebug(model, technicalModel, TECHNICAL_BPMN20_XML);
+        
+        IoUtil.writeStringToFileIfDebug(technicalModel, "technical_model", TECHNICAL_BPMN20_XML);
 
         // do some changes in the model
         if (replaceRegex != null && !replaceRegex.isEmpty() && withReplacement != null) {
           technicalModel = changeTechnicalModel(replaceRegex, withReplacement, technicalModel);
-//          ActivitiCompliantBpmn20Provider.writeStringToFileIfDebug(model, technicalModel, CHANGED_TECHNICAL_BPMN20_XML);
+          IoUtil.writeStringToFileIfDebug(technicalModel, "changed_technical_model", CHANGED_TECHNICAL_BPMN20_XML);
         }
 
         // test if technical model deploys to engine
         if (deployToEngine) {
-//          ActivitiCompliantBpmn20Provider.writeStringToFileIfDebug(model, technicalModel, BEFORE_DEPLOY_TECHNICAL_BPMN20_XML);
+          IoUtil.writeStringToFileIfDebug(technicalModel, "technical_model_before_deploy", BEFORE_DEPLOY_TECHNICAL_BPMN20_XML);
           validateActivitiDeployable(technicalModel, filename);
         }
-
-//        Content technicalModelContent = new Content();
-//        technicalModelContent.setValue(technicalModel);
 
         // import Engine Pool back into collaboration
         actualRawBpmn20Xml = this.bpmnProcessModelUtil.importChangesFromExecutableBpmnModel(technicalModel, initialRawBpmn20Xml);
@@ -357,10 +358,9 @@ public class SignavioConnectorIntegrationTest extends AbstractSignavioConnectorT
         actualRawBpmn20XmlInputStream = this.getSignavioConnector().getContent(model);
         actualRawBpmn20Xml = IOUtils.toString(actualRawBpmn20XmlInputStream, "UTF-8");
         IoUtil.closeSilently(actualRawBpmn20XmlInputStream);
-
-//        this.asString(getSignavioConnector().getContent(model));
-        //        ActivitiCompliantBpmn20Provider.writeStringToFileIfDebug(model, actualRawBpmn20Xml, ACTUAL_RAW_BPMN20_XML);
         
+        IoUtil.writeStringToFileIfDebug(actualRawBpmn20Xml, "actual_model", ACTUAL_RAW_BPMN20_XML);
+
         // compare result with a previous result stored in TEST_RESOURCES_PATH
         assertRoundtripResultCorrect(filename, importXmlFile, model, replaceRegex, withReplacement, actualRawBpmn20Xml);
 
@@ -387,15 +387,13 @@ public class SignavioConnectorIntegrationTest extends AbstractSignavioConnectorT
         fail("The assertions of this test only work if SignavioConnectorIT#OVERWRITE_EXPECTED_BPMN_FILES is set to false.");
       }
       String expectedRawBpmn20Xml = FileUtils.readFileToString(expectedRawBpmn20XmlFile, "UTF-8").replace("\r", ""); // remove carriage returns in case the files have been fetched via Git on Windows
-//      ActivitiCompliantBpmn20Provider.writeStringToFileIfDebug(model, expectedRawBpmn20Xml, EXPECTED_RAW_BPMN20_XML); // just for convenient comparison
+      IoUtil.writeStringToFileIfDebug(expectedRawBpmn20Xml, "expected_model", EXPECTED_RAW_BPMN20_XML); // just for convenient comparison
       
       DetailedDiff details = compareSignavioBpmn20Xml(expectedRawBpmn20Xml, actualRawBpmn20Xml);
-//      ActivitiCompliantBpmn20Provider.writeStringToFileIfDebug(model, "Comparison with " + expectedRawBpmn20XmlFileName + "\n" + details.toString(),
-//              XML_DIFF_TXT);
-
+      IoUtil.writeStringToFileIfDebug("Comparison:" + "\n" + details.toString(), "comparison_details", XML_DIFF_TXT);
+      
       // show non-recoverable differences if the assertion fails
-      assertTrue("Comparison with " + expectedRawBpmn20XmlFileName + " failed:\n"
-              + details.toString().replaceAll("\\[not identical\\] [^\n]+\n", "").replaceAll("\n\n+", "\n"), details.similar());
+      assertTrue("Comparison:" + "\n" + details.toString().replaceAll("\\[not identical\\] [^\n]+\n", "").replaceAll("\n\n+", "\n"), details.similar());
     } catch (IOException e) {
       throw new RuntimeException("Unable to read or write expected result: " + expectedRawBpmn20XmlFileName, e);
     }
