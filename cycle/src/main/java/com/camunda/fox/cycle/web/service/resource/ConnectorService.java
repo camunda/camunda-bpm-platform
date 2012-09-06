@@ -58,4 +58,16 @@ public class ConnectorService {
     return ConnectorNodeDTO.wrapAll(connector.getChildren(new ConnectorNode(parent)));
   }
   
+  @POST
+  @Path("{id}/tree/content")
+  @Produces("application/xml")
+  public String content(@PathParam("connectorId") Long connectorId, @FormParam("nodeId") String nodeId) {
+    Connector connector = connectorRegistry.getSessionConnectorMap().get(connectorId);
+    try {
+      return new java.util.Scanner(connector.getContent(new ConnectorNode(nodeId))).useDelimiter("\\A").next();
+    } catch (java.util.NoSuchElementException e) {
+      return "";
+    }
+  }
+  
 }

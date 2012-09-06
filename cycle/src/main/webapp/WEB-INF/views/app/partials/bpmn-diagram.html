@@ -3,7 +3,7 @@
     <h3>{{diagram.modeler}}</h3>
     <div class="holder">
       <div class="diagram">
-        <span class="name">{{diagram.diagramPath.label}}</span>
+        <span class="name">{{diagram.label}}</span>
       </div>
     </div>
   </div>
@@ -35,10 +35,14 @@
         <form class="form-horizontal" novalidate ng-submit="save()" name="addModelForm">
           <fieldset>
             <div class="control-group">
-              <label th:attr="data-hint=#{'The Name of the Modeling tool you used.'}" data-hint-title="Modeler Name" class="control-label" for="input01" th:text="#{'Modeler Name'}">Modeler Name</label>
+              <label th:attr="data-hint=#{'The Name of the Modeling tool you used.'}" data-hint-title="Modeler Name" class="control-label" for="modelerName" th:text="#{'Modeler Name'}">Modeler Name</label>
               <div class="controls">
-                <!-- ads-data-typeahead data-values="modelerNames" -->
-                <input class="span8" ng-model="editDiagram.modeler" name="modelerName" ng-disabled="!canEditModeler()" type="text" required autofocus th:attr="placeholder=#{Enter the name of your modeler}"/>
+                <!-- display a combobox on leftside, otherwise a disabled input field -->
+                <select ngm-if="canEditModeler()" id="modelerName" name="modelerName" required autofocus ng-model="editDiagram.modeler" ng-combobox values="modelerNames"
+                  ng-options="modeler for modeler in modelerNames" th:attr="placeholder=#{Enter the name of your modeler}">
+                  <option value=""></option>
+                </select>
+                <span ngm-if="!canEditModeler()" id="modelerName" name="modelerName" required class="uneditable-input" type="text">{{editDiagram.modeler}}</span>
               </div>
             </div>
             <div class="control-group">
@@ -51,8 +55,8 @@
             <div class="control-group">
               <label class="control-label" for="tree" th:text="#{Select BPMN File}">Select BPMN File</label>
               <div class="controls">
-                <p class="alert alert-info" ng-hide="editDiagram.diagramPath != undefined && editDiagram.diagramPath.type == 'FILE'" th:text="#{Select a bpmn file}"></p>
-                <div class="claro tree" data-selected="editDiagram.diagramPath" data-cycle-tree data-id="connectorTree" data-connector="connector">
+                <p class="alert alert-info" ng-hide="selectedNode != undefined && selectedNode.type == 'FILE'" th:text="#{Select a bpmn file}"></p>
+                <div class="claro tree" data-selected="selectedNode" data-cycle-tree data-id="connectorTree" data-connector="connector">
                 </div>
               </div>
             </div>

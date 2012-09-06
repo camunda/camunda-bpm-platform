@@ -43,18 +43,33 @@ angular
       }
     };
   })
-  .factory('Roundtrip', function($resource, App){
+  .factory('Roundtrip', function($resource, App) {
     return $resource(App.uri('secured/resource/roundtrip/:id'), {id: "@id"}, {});
   })
-  .factory('RoundtripDetails', function($resource, App){
+  .factory('RoundtripDetails', function($resource, App) {
     return $resource(App.uri('secured/resource/roundtrip/:id/details'), {id: "@id"}, {});
   })
-  .factory('Commons', function($http) {
-    var commons = {};
-
-    commons.getModelerNames = function() {
-
+  .factory('Commons', function($http, HttpUtils, App) {
+    return {
+      getModelerNames: function() {
+        return HttpUtils.makePromise($http.get(App.uri('secured/resource/diagram/modelerNames')));
+      },
+      getConnectors: function() {
+        return HttpUtils.makePromise($http.get(App.uri("secured/resource/connector/list")));
+      }
     }
-
-    return commons;
+  })
+  .service('HttpUtils', function($q) {
+    return {
+      makePromise: function(http) {
+        var deferred = $q.defer();
+        http.success(function() {
+          deferred.resolve.apply(this, arguments);
+        });
+        http.error(function() {
+          deferred.reject.apply(this, arguments);
+        });
+        return deferred.promise;
+      }
+    };
   });

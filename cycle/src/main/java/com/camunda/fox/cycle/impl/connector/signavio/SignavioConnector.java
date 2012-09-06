@@ -417,6 +417,11 @@ public class SignavioConnector extends Connector {
   protected ApacheHttpClient4Executor getHttpClient4Executor() {
     return this.httpClient4Executor;
   }
+
+  @Override
+  public ConnectorNode getNode(String id) {
+    throw new UnsupportedOperationException();
+  }
   
   @Override
   public void dispose() {

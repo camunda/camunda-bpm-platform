@@ -1,6 +1,5 @@
 package com.camunda.fox.cycle.web.service.resource;
 
-import com.camunda.fox.cycle.repository.BpmnDiagramRepository;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -14,9 +13,8 @@ import javax.ws.rs.core.MediaType;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.camunda.fox.cycle.entity.BpmnDiagram;
-import com.camunda.fox.cycle.entity.PersistentConnectorNode;
+import com.camunda.fox.cycle.repository.BpmnDiagramRepository;
 import com.camunda.fox.cycle.web.dto.BpmnDiagramDTO;
-import com.camunda.fox.cycle.web.dto.ConnectorNodeDTO;
 
 /**
  *
@@ -27,7 +25,7 @@ public class BpmnDiagramService {
 
   @Inject
   private BpmnDiagramRepository bpmnDiagramRepository;
-
+  
 //  @GET
 //  public List<BpmnDiagramDTO> list() {
 //    // NOTE: No such thing as list for diagrams
@@ -76,23 +74,16 @@ public class BpmnDiagramService {
   
   /**
    * Update a diagram with the given data
-   *
+   * 
    * @param diagram
    * @param data
    */
   private void update(BpmnDiagram diagram, BpmnDiagramDTO data) {
     diagram.setModeler(data.getModeler());
-    
-    ConnectorNodeDTO connectorNodeData = data.getDiagramPath();
-    
-    if (connectorNodeData != null) {
-      PersistentConnectorNode persistentNode = new PersistentConnectorNode(
-        connectorNodeData.getId(), 
-        connectorNodeData.getLabel(), 
-        connectorNodeData.getConnectorId());
-      
-      diagram.setDiagramPath(persistentNode);
-    }
+
+    diagram.setLabel(data.getLabel());
+    diagram.setConnectorId(data.getConnectorId());
+    diagram.setDiagramPath(data.getDiagramPath());
   }
   
   @GET

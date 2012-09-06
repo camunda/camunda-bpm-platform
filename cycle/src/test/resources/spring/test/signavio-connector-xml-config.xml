@@ -13,7 +13,7 @@
           http://www.springframework.org/schema/aop/spring-aop.xsd">
 
   <context:annotation-config/>
-  
+
   <bean name="signavioConnector" class="com.camunda.fox.cycle.impl.connector.signavio.SignavioConnector">
     <property name="configuration" ref="signavioConfig" />
   </bean>

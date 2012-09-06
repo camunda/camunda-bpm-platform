@@ -23,7 +23,6 @@ import com.camunda.fox.cycle.api.connector.ConnectorNode;
 import com.camunda.fox.cycle.api.connector.ConnectorNode.ConnectorNodeType;
 import com.camunda.fox.cycle.connector.ConnectorRegistry;
 import com.camunda.fox.cycle.entity.BpmnDiagram;
-import com.camunda.fox.cycle.entity.PersistentConnectorNode;
 import com.camunda.fox.cycle.entity.Roundtrip;
 import com.camunda.fox.cycle.exception.CycleException;
 import com.camunda.fox.cycle.repository.RoundtripRepository;
@@ -152,15 +151,17 @@ public class RoundtripService extends AbstractRestService {
   public RoundtripDTO doSynchronize(@QueryParam("syncMode") SyncMode syncMode, @PathParam("id") long id) {
     Roundtrip roundtrip = this.roundtripRepository.findById(id);
     
-    PersistentConnectorNode leftHandSideNode = roundtrip.getLeftHandSide().getDiagramPath();
-    Connector leftHandSideConnector = this.connectorRegistry.getSessionConnectorMap().get(leftHandSideNode.getConnectorId());
-    ConnectorNode leftHandSideModelNode = new ConnectorNode(leftHandSideNode.getNodeId(), leftHandSideNode.getLabel());
+    BpmnDiagram leftHandSide = roundtrip.getLeftHandSide();
+    
+    Connector leftHandSideConnector = this.connectorRegistry.getSessionConnectorMap().get(leftHandSide.getConnectorId());
+    ConnectorNode leftHandSideModelNode = new ConnectorNode(leftHandSide.getDiagramPath(), leftHandSide.getLabel());
     leftHandSideModelNode.setType(ConnectorNodeType.FILE);
     String leftHandSideModelContent = this.asString(leftHandSideConnector.getContent(leftHandSideModelNode));
     
-    PersistentConnectorNode rightHandSideNode = roundtrip.getRightHandSide().getDiagramPath();
-    Connector rightHandSideConnector = this.connectorRegistry.getSessionConnectorMap().get(rightHandSideNode.getConnectorId());
-    ConnectorNode rightHandSideModelNode = new ConnectorNode(rightHandSideNode.getNodeId(), rightHandSideNode.getLabel());
+    BpmnDiagram rightHandSide = roundtrip.getLeftHandSide();
+    
+    Connector rightHandSideConnector = this.connectorRegistry.getSessionConnectorMap().get(rightHandSide.getConnectorId());
+    ConnectorNode rightHandSideModelNode = new ConnectorNode(rightHandSide.getDiagramPath(), rightHandSide.getLabel());
     rightHandSideModelNode.setType(ConnectorNodeType.FILE);
     String rightHandSideModelContent = this.asString(rightHandSideConnector.getContent(rightHandSideModelNode));
     

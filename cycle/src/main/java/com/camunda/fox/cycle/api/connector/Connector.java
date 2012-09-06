@@ -13,6 +13,8 @@ public abstract class Connector {
   
   public abstract ConnectorNode getRoot();
   
+  public abstract ConnectorNode getNode(String id);
+  
   public abstract InputStream getContent(ConnectorNode node);
   
   public abstract void updateContent(ConnectorNode node, String newContent) throws Exception;
@@ -39,6 +41,10 @@ public abstract class Connector {
   }
   
   public void createModel() throws Exception {
+  }
+  
+  public Long getId() {
+    return getConfiguration().getId();
   }
   
 }

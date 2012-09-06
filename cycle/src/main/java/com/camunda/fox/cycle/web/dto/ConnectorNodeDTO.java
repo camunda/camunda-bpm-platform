@@ -5,7 +5,6 @@ import java.util.List;
 
 import com.camunda.fox.cycle.api.connector.ConnectorNode;
 import com.camunda.fox.cycle.api.connector.ConnectorNode.ConnectorNodeType;
-import com.camunda.fox.cycle.entity.PersistentConnectorNode;
 
 
 public class ConnectorNodeDTO {
@@ -19,19 +18,11 @@ public class ConnectorNodeDTO {
   public ConnectorNodeDTO() {
   }
 
-  public ConnectorNodeDTO(PersistentConnectorNode node) {
-    id = node.getNodeId();
-    label = node.getLabel();
-    connectorId = node.getConnectorId();
-    
-    // May only be a file, when wrapping a connector node from the database
-    type = ConnectorNodeType.FILE;
-  }
-  
   public ConnectorNodeDTO(ConnectorNode connectorNode) {
     id = connectorNode.getId();
     label = connectorNode.getLabel();
     type = connectorNode.getType();
+    connectorId = connectorNode.getConnectorId();
   }
 
   public ConnectorNodeDTO(String id, String label, long connectorId) {

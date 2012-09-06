@@ -71,6 +71,7 @@ public class ConnectorRegistry {
   }
   
   public Map<Long, Connector> getSessionConnectorMap() {
+    getSessionConnectors();
     return sessionConnectorMap;
   }
   

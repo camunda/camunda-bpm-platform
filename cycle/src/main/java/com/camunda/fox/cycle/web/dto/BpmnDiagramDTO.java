@@ -12,7 +12,9 @@ public class BpmnDiagramDTO {
   
   private Long id;
   private String modeler;
-  private ConnectorNodeDTO diagramPath;
+  private String diagramPath;
+  private Long connectorId;
+  private String label;
 
   private Status status;
   
@@ -22,8 +24,9 @@ public class BpmnDiagramDTO {
     this.id = diagram.getId();
     this.modeler = diagram.getModeler();
     this.status = diagram.getStatus();
-    
-    this.diagramPath = diagram.getDiagramPath() != null ? new ConnectorNodeDTO(diagram.getDiagramPath()) : null;
+    this.diagramPath = diagram.getDiagramPath();
+    this.connectorId = diagram.getConnectorId();
+    this.label = diagram.getLabel();
   }
 
   public Long getId() {
@@ -46,11 +49,11 @@ public class BpmnDiagramDTO {
     return status;
   }
   
-  public ConnectorNodeDTO getDiagramPath() {
+  public String getDiagramPath() {
     return diagramPath;
   }
 
-  public void setDiagramPath(ConnectorNodeDTO diagramPath) {
+  public void setDiagramPath(String diagramPath) {
     this.diagramPath = diagramPath;
   }
 
@@ -65,5 +68,21 @@ public class BpmnDiagramDTO {
    */
   public static BpmnDiagramDTO wrap(BpmnDiagram diagram) {
     return new BpmnDiagramDTO(diagram);
+  }
+
+  public Long getConnectorId() {
+    return connectorId;
+  }
+
+  public void setConnectorId(Long connectorId) {
+    this.connectorId = connectorId;
+  }
+
+  public String getLabel() {
+    return label;
+  }
+
+  public void setLabel(String label) {
+    this.label = label;
   }
 }
