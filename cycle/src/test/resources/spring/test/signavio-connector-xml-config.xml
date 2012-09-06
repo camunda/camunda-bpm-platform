@@ -1,10 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:p="http://www.springframework.org/schema/p"
-       xmlns:context="http://www.springframework.org/schema/context"
-       xmlns:aop="http://www.springframework.org/schema/aop"
-       xsi:schemaLocation="
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context"
+  xmlns:aop="http://www.springframework.org/schema/aop"
+  xsi:schemaLocation="
           http://www.springframework.org/schema/beans 
           http://www.springframework.org/schema/beans/spring-beans.xsd
           http://www.springframework.org/schema/context 
@@ -12,15 +10,16 @@
           http://www.springframework.org/schema/aop
           http://www.springframework.org/schema/aop/spring-aop.xsd">
 
-  <context:annotation-config/>
+  <context:annotation-config />
 
-  <bean name="signavioConnector" class="com.camunda.fox.cycle.impl.connector.signavio.SignavioConnector">
+  <bean name="signavioConnector"
+    class="com.camunda.fox.cycle.impl.connector.signavio.SignavioConnector">
     <property name="configuration" ref="signavioConfig" />
   </bean>
-  
+
   <bean name="signavioConfig" class="com.camunda.fox.cycle.entity.ConnectorConfiguration">
-    <property name="id" value="2"/>
-    <property name="label" value="My SignavioConnector"/>
+    <property name="id" value="2" />
+    <property name="label" value="My SignavioConnector" />
     <property name="loginMode" value="GLOBAL" />
     <property name="globalUser" value="test@camunda.com" />
     <property name="globalPassword" value="testtest" />
@@ -30,4 +29,17 @@
       </map>
     </property>
   </bean>
+
+  <bean id="processEngineConfiguration"
+    class="org.activiti.engine.impl.cfg.StandaloneProcessEngineConfiguration">
+    <property name="jdbcUrl" value="jdbc:h2:mem:activiti;DB_CLOSE_DELAY=1000" />
+    <property name="jdbcDriver" value="org.h2.Driver" />
+    <property name="jdbcUsername" value="sa" />
+    <property name="jdbcPassword" value="" />
+    <property name="databaseSchemaUpdate" value="true" />
+    <property name="jobExecutorActivate" value="false" />
+  </bean>
+
+  <bean id="bpmnProcessModelUtil" class="com.camunda.fox.cycle.service.roundtrip.BpmnProcessModelUtil" />
+
 </beans>

@@ -9,6 +9,7 @@ import static org.junit.Assert.fail;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -35,6 +36,11 @@ public class SignavioConnectorTest extends AbstractSignavioConnectorTest {
     if (this.getSignavioConnector().needsLogin()) {
       this.getSignavioConnector().login(this.getSignavioConnector().getConfiguration().getGlobalUser(), this.getSignavioConnector().getConfiguration().getGlobalPassword());
     }
+  }
+  
+  @After
+  public void tearDown() throws Exception {
+    this.getSignavioConnector().dispose();
   }
   
   @Test
@@ -80,6 +86,8 @@ public class SignavioConnectorTest extends AbstractSignavioConnectorTest {
   
   @Test
   public void testGetChildren_Empty() {
+    ConnectorConfiguration config = this.getSignavioConnector().getConfiguration();
+    this.getSignavioConnector().login(config.getGlobalUser(), config.getGlobalPassword());
     ConnectorNode createdRootNode = null;
     try {
       createdRootNode = this.createFolder(this.getSignavioConnector().getPrivateFolder(), "TestFolder");
@@ -99,6 +107,8 @@ public class SignavioConnectorTest extends AbstractSignavioConnectorTest {
   
   @Test
   public void testGetChildren_ContainingOneFolder() {
+    ConnectorConfiguration config = this.getSignavioConnector().getConfiguration();
+    this.getSignavioConnector().login(config.getGlobalUser(), config.getGlobalPassword());
     ConnectorNode createdRootNode = null;
     try {
       createdRootNode = this.createFolder(this.getSignavioConnector().getPrivateFolder(), "TestFolder");
@@ -130,6 +140,8 @@ public class SignavioConnectorTest extends AbstractSignavioConnectorTest {
   
   @Test
   public void testGetChildren_ContainingOneModel() {
+    ConnectorConfiguration config = this.getSignavioConnector().getConfiguration();
+    this.getSignavioConnector().login(config.getGlobalUser(), config.getGlobalPassword());
     ConnectorNode createdRootNode = null;
     try {
       createdRootNode = this.createFolder(this.getSignavioConnector().getPrivateFolder(), "TestFolder");
@@ -162,6 +174,8 @@ public class SignavioConnectorTest extends AbstractSignavioConnectorTest {
   
   @Test
   public void testGetChildren_ContainingOneFolderAndOneModel() {
+    ConnectorConfiguration config = this.getSignavioConnector().getConfiguration();
+    this.getSignavioConnector().login(config.getGlobalUser(), config.getGlobalPassword());
     ConnectorNode createdRootNode = null;
     try {
       createdRootNode = this.createFolder(this.getSignavioConnector().getPrivateFolder(), "TestFolder");
@@ -211,4 +225,16 @@ public class SignavioConnectorTest extends AbstractSignavioConnectorTest {
     assertEquals(ConnectorNodeType.FOLDER, root.getType());
   }
   
+  @Test
+  public void testDispose() {
+    this.getSignavioConnector().dispose();
+    assertTrue(this.getSignavioConnector().needsLogin());
+    try {
+      this.getSignavioConnector().getPrivateFolder();
+      fail("Something went wrong: An exception had to be thrown due to the client has diposed before.");
+    } catch (Exception e) {
+      // everything okay: we excepted an exception here
+    }
+    
+  }
 }

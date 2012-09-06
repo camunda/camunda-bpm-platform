@@ -195,7 +195,7 @@ public class BpmnProcessModelUtil {
     String mergedBpmn20XmlContent;
     if (processes.getLength() < 2) {
       // no merge required
-      mergedBpmn20XmlContent = targetModel;
+      mergedBpmn20XmlContent = sourceModel;
     } else {
       // locate engine pool => get id
       // this search could be avoided by fixing HEMERA-1057
