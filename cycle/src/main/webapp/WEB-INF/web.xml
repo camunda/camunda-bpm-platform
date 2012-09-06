@@ -73,4 +73,7 @@
     <error-code>408</error-code>
     <location>/app/login/expired</location>
   </error-page>
+  <session-config>
+    <session-timeout>60</session-timeout>
+  </session-config>
 </web-app>

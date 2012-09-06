@@ -55,7 +55,7 @@
             <div class="control-group">
               <label class="control-label" for="tree" th:text="#{Select BPMN File}">Select BPMN File</label>
               <div class="controls">
-                <p class="alert alert-info" ng-hide="selectedNode != undefined && selectedNode.type == 'FILE'" th:text="#{Select a bpmn file}"></p>
+                <p class="alert alert-info" ng-hide="selectedNode != undefined && selectedNode.type == 'FILE'" th:text="#{Select a bpmn file}">Select a bpmn file</p>
                 <div class="claro tree" data-selected="selectedNode" data-cycle-tree data-id="connectorTree" data-connector="connector">
                 </div>
               </div>
