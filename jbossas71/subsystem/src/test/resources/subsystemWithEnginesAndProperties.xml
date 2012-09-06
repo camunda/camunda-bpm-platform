@@ -9,19 +9,18 @@
         <property name="job-name">default</property>
       </properties>
     </process-engine>
-    <process-engine name="__test">
+    <process-engine  default="false"  name="__test">
       <datasource>java:jboss/datasources/ExampleDS</datasource>
       <history-level>full</history-level>
       <properties>
         <property name="job-acquisition-name">default</property>
       </properties>
     </process-engine>
-    <process-engine name="__emptyPropertiesTag">
+    <process-engine  default="false"  name="__emptyPropertiesTag">
       <datasource>java:jboss/datasources/ExampleDS</datasource>
       <history-level>full</history-level>
-      <properties/>
     </process-engine>
-    <process-engine name="__noPropertiesTag">
+    <process-engine default="false"  name="__noPropertiesTag">
       <datasource>java:jboss/datasources/ExampleDS</datasource>
       <history-level>full</history-level>
     </process-engine>
