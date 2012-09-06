@@ -49,12 +49,6 @@ public class ConnectorService {
   @Produces("application/json")
   public List<ConnectorNodeDTO> children(@PathParam("id") Long connectorId, @FormParam("parent") String parent) {
     Connector connector = connectorRegistry.getSessionConnectorMap().get(connectorId);
-    
-    try {
-      connector.createModel();
-    } catch (Exception e) {
-    }
-    
     return ConnectorNodeDTO.wrapAll(connector.getChildren(new ConnectorNode(parent)));
   }
   

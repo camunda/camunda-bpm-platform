@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.StringBufferInputStream;
+import java.io.StringReader;
 import java.util.Date;
 import java.util.List;
 
@@ -16,6 +18,8 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
+import org.apache.commons.io.IOUtils;
+import org.codehaus.plexus.util.IOUtil;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.camunda.fox.cycle.api.connector.Connector;
@@ -65,13 +69,13 @@ public class RoundtripService extends AbstractRestService {
   
   @GET
   public List<RoundtripDTO> list() {
-    return RoundtripDTO.wrapAll(roundtripRepository.findAll());
+    return RoundtripDTO.wrapAll(getRoundtripRepository().findAll());
   }
   
   @GET
   @Path("{id}")
   public RoundtripDTO get(@PathParam("id") long id) {
-    return RoundtripDTO.wrap(roundtripRepository.findById(id));
+    return RoundtripDTO.wrap(getRoundtripRepository().findById(id));
   }
   
   @POST
@@ -80,7 +84,7 @@ public class RoundtripService extends AbstractRestService {
   public RoundtripDTO update(RoundtripDTO data) {
     long id = data.getId();
     
-    Roundtrip roundtrip = roundtripRepository.findById(id);
+    Roundtrip roundtrip = getRoundtripRepository().findById(id);
     if (roundtrip == null) {
       throw new IllegalArgumentException("Not found");
     }
@@ -93,7 +97,7 @@ public class RoundtripService extends AbstractRestService {
   public RoundtripDTO create(RoundtripDTO data) {
     Roundtrip roundtrip = new Roundtrip();
     update(roundtrip, data);
-    return RoundtripDTO.wrap(roundtripRepository.saveAndFlush(roundtrip));
+    return RoundtripDTO.wrap(getRoundtripRepository().saveAndFlush(roundtrip));
   }
   
   /**
@@ -104,7 +108,7 @@ public class RoundtripService extends AbstractRestService {
   @Transactional
   @Path("{id}/details")
   public RoundtripDTO getDetails(@PathParam("id") long id) {
-    Roundtrip roundtrip = roundtripRepository.findById(id);
+    Roundtrip roundtrip = getRoundtripRepository().findById(id);
     // TODO: Fetch eager
     return new RoundtripDTO(roundtrip, roundtrip.getLeftHandSide(), roundtrip.getRightHandSide());
   }
@@ -115,7 +119,7 @@ public class RoundtripService extends AbstractRestService {
   public RoundtripDTO updateDetails(RoundtripDTO data) {
     long id = data.getId();
     
-    Roundtrip roundtrip = roundtripRepository.findById(id);
+    Roundtrip roundtrip = getRoundtripRepository().findById(id);
     if (roundtrip == null) {
       throw new IllegalArgumentException("Not found");
     }
@@ -134,7 +138,7 @@ public class RoundtripService extends AbstractRestService {
       roundtrip.setRightHandSide(null);
     }
     
-    Roundtrip saved = roundtripRepository.saveAndFlush(roundtrip); 
+    Roundtrip saved = getRoundtripRepository().saveAndFlush(roundtrip); 
     return new RoundtripDTO(saved, saved.getLeftHandSide(), saved.getRightHandSide());
   }
   
@@ -142,41 +146,39 @@ public class RoundtripService extends AbstractRestService {
   @Produces(MediaType.APPLICATION_JSON)
   @Path("isNameValid")
   public boolean isNameValid(@QueryParam("name") String name) {
-    return roundtripRepository.isNameValid(name);
+    return getRoundtripRepository().isNameValid(name);
   }
   
   @POST
   @Path("{id}/sync")
   @Transactional
   public RoundtripDTO doSynchronize(@QueryParam("syncMode") SyncMode syncMode, @PathParam("id") long id) {
-    Roundtrip roundtrip = this.roundtripRepository.findById(id);
+    Roundtrip roundtrip = this.getRoundtripRepository().findById(id);
     
     BpmnDiagram leftHandSide = roundtrip.getLeftHandSide();
     
     Connector leftHandSideConnector = this.connectorRegistry.getSessionConnectorMap().get(leftHandSide.getConnectorId());
     ConnectorNode leftHandSideModelNode = new ConnectorNode(leftHandSide.getDiagramPath(), leftHandSide.getLabel());
     leftHandSideModelNode.setType(ConnectorNodeType.FILE);
-    String leftHandSideModelContent = this.asString(leftHandSideConnector.getContent(leftHandSideModelNode));
+    InputStream leftHandSideModelContent =leftHandSideConnector.getContent(leftHandSideModelNode);
     
     BpmnDiagram rightHandSide = roundtrip.getLeftHandSide();
     
     Connector rightHandSideConnector = this.connectorRegistry.getSessionConnectorMap().get(rightHandSide.getConnectorId());
     ConnectorNode rightHandSideModelNode = new ConnectorNode(rightHandSide.getDiagramPath(), rightHandSide.getLabel());
     rightHandSideModelNode.setType(ConnectorNodeType.FILE);
-    String rightHandSideModelContent = this.asString(rightHandSideConnector.getContent(rightHandSideModelNode));
+    InputStream rightHandSideModelContent = rightHandSideConnector.getContent(rightHandSideModelNode);
     
-    String result = null;
     try {
       
       switch (syncMode) {
         case LEFT_TO_RIGHT:
-          result = this.bpmnProcessModelUtil.extractExecutablePool(leftHandSideModelContent);
-          rightHandSideConnector.updateContent(rightHandSideModelNode, result);
+          rightHandSideConnector.updateContent(rightHandSideModelNode,  this.bpmnProcessModelUtil.extractExecutablePool(leftHandSideModelContent));
           break;
           
         case RIGHT_TO_LEFT:
-          result = this.bpmnProcessModelUtil.importChangesFromExecutableBpmnModel(rightHandSideModelContent, leftHandSideModelContent);
-          leftHandSideConnector.updateContent(leftHandSideModelNode, result);
+          String result = this.bpmnProcessModelUtil.importChangesFromExecutableBpmnModel(IOUtil.toString(rightHandSideModelContent, "UTF-8"), IOUtil.toString(leftHandSideModelContent, "UTF-8"));
+          leftHandSideConnector.updateContent(leftHandSideModelNode, IOUtils.toInputStream(result, "UTF-8"));
           break;
       }
       
@@ -197,19 +199,13 @@ public class RoundtripService extends AbstractRestService {
   private void update(Roundtrip roundtrip, RoundtripDTO data) {
     roundtrip.setName(data.getName());
   }
-  
-  private String asString(InputStream inputStream) {
-    try {
-      BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
-      StringBuilder stringBuilder = new StringBuilder();
-      String line = null;
-      while ((line = bufferedReader.readLine()) != null) {
-        stringBuilder.append(line + "\n");
-      }
-      bufferedReader.close();
-      return stringBuilder.toString();
-    } catch (IOException e) {
-      throw new CycleException("The content of the assigned file could not be read.", e);
-    }
+
+  public RoundtripRepository getRoundtripRepository() {
+    return roundtripRepository;
   }
+
+  public void setRoundtripRepository(RoundtripRepository roundtripRepository) {
+    this.roundtripRepository = roundtripRepository;
+  }
+
 }

@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.vfs2.FileContent;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
@@ -130,7 +131,7 @@ public class VfsConnector extends Connector {
 
   @Secured
   @Override
-  public void updateContent(ConnectorNode node, String newContent)  throws Exception {
+  public void updateContent(ConnectorNode node, InputStream newContent)  throws Exception {
     FileSystemManager fsManager = VFS.getManager();
     FileObject fileObject;
     
@@ -141,7 +142,7 @@ public class VfsConnector extends Connector {
         throw new CycleException("Unable to update content of file '" + node.getLabel() + "': Assigned file is not a file.");
       }
       FileContent content = fileObject.getContent();
-      content.getOutputStream().write(newContent.getBytes("UTF-8"));
+      IOUtils.copy(newContent, content.getOutputStream());
       content.close();
     } else {
       throw new RepositoryException("File '" + node.getLabel() + "' does not exist.");
@@ -171,5 +172,44 @@ public class VfsConnector extends Connector {
       throw new CycleException(e);
     }
 
+  }
+
+  @Override
+  public ConnectorNode createNode(String id, String label, ConnectorNodeType type) {
+    try {
+      FileSystemManager fsManager = VFS.getManager();
+      FileObject fileObject;
+
+      fileObject = fsManager.resolveFile(basePath + id);
+      
+      switch (type) {
+        case FILE:
+          fileObject.createFile();
+          break;
+        case FOLDER:
+          fileObject.createFolder();
+        default:
+          throw new RuntimeException("Unsupported Node Type");
+      }
+      
+      return new ConnectorNode(id, label, type);
+
+    } catch (Exception e) {
+      throw new CycleException(e);
+    }
+  }
+
+  @Override
+  public void deleteNode(String id) {
+    try {
+      FileSystemManager fsManager = VFS.getManager();
+      FileObject fileObject;
+
+      fileObject = fsManager.resolveFile(basePath + id);
+      fileObject.delete();
+
+    } catch (Exception e) {
+      throw new CycleException(e);
+    }
   }
 }
