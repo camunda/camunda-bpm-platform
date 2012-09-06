@@ -26,13 +26,11 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.TYP
 import java.util.List;
 import java.util.Locale;
 
-import org.jboss.as.controller.AbstractBoottimeAddStepHandler;
+import org.jboss.as.controller.AbstractAddStepHandler;
 import org.jboss.as.controller.OperationContext;
 import org.jboss.as.controller.OperationFailedException;
-import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.ServiceVerificationHandler;
 import org.jboss.as.controller.descriptions.DescriptionProvider;
-import org.jboss.as.controller.descriptions.ModelDescriptionConstants;
 import org.jboss.as.threads.ManagedQueueExecutorService;
 import org.jboss.as.threads.ThreadsServices;
 import org.jboss.dmr.ModelNode;
@@ -48,7 +46,7 @@ import com.camunda.fox.platform.subsystem.impl.service.ContainerPlatformService;
  * Provides the description and the implementation of the process-engine#add operation.
  * 
  */
-public class JobExecutorAdd extends AbstractBoottimeAddStepHandler implements DescriptionProvider {
+public class JobExecutorAdd extends AbstractAddStepHandler implements DescriptionProvider {
     
   public static final JobExecutorAdd INSTANCE = new JobExecutorAdd();
 
@@ -76,7 +74,7 @@ public class JobExecutorAdd extends AbstractBoottimeAddStepHandler implements De
   
   
   @Override
-  protected void performBoottime(OperationContext context, ModelNode operation, ModelNode model,
+  protected void performRuntime(OperationContext context, ModelNode operation, ModelNode model,
           ServiceVerificationHandler verificationHandler, List<ServiceController<?>> newControllers)
           throws OperationFailedException {
     

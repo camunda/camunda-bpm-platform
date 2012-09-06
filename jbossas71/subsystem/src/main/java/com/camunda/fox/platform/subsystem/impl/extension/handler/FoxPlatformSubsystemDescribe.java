@@ -75,22 +75,25 @@ public class FoxPlatformSubsystemDescribe implements OperationStepHandler, Descr
     }
     
     if (subModel.hasDefined(JOB_EXECUTOR)) {
-      for (Property property : subModel.get(JOB_EXECUTOR).asPropertyList()) {
+      ModelNode jobExecutorModel = subModel.get(JOB_EXECUTOR);
+      for (Property property : jobExecutorModel.asPropertyList()) {
+        ModelNode thisJobExecutorModelNode = property.getValue();
         ModelNode jobExecutorAdd = new ModelNode();
         jobExecutorAdd.get(OP).set(ADD);
         PathAddress jobExecutorAddress = rootAddress.append(PathElement.pathElement(JOB_EXECUTOR, property.getName()));
         jobExecutorAdd.get(OP_ADDR).set(jobExecutorAddress.toModelNode());
         addJobExecutor(property.getValue(), jobExecutorAdd, jobExecutorAddress, result);
-      }
-    }
-    
-    if (subModel.hasDefined(JOB_ACQUISITIONS)) {
-      for (Property property : subModel.get(JOB_ACQUISITIONS).asPropertyList()) {
-        ModelNode jobAcquisitionAdd = new ModelNode();
-        jobAcquisitionAdd.get(OP).set(ADD);
-        PathAddress jobAcquisitionAddress = rootAddress.append(PathElement.pathElement(JOB_ACQUISITIONS, property.getName()));
-        jobAcquisitionAdd.get(OP_ADDR).set(jobAcquisitionAddress.toModelNode());
-        addJobAcquisition(property.getValue(), jobAcquisitionAdd, jobAcquisitionAddress, result);
+        
+        if (thisJobExecutorModelNode.hasDefined(JOB_ACQUISITIONS)) {
+          for (Property jobAcquisitionProperty : thisJobExecutorModelNode.get(JOB_ACQUISITIONS).asPropertyList()) {
+            ModelNode jobAcquisitionAdd = new ModelNode();
+            jobAcquisitionAdd.get(OP).set(ADD);
+            PathAddress jobAcquisitionAddress = jobExecutorAddress.append(PathElement.pathElement(JOB_ACQUISITIONS, jobAcquisitionProperty.getName()));
+            jobAcquisitionAdd.get(OP_ADDR).set(jobAcquisitionAddress.toModelNode());
+            addJobAcquisition(jobAcquisitionProperty.getValue(), jobAcquisitionAdd, jobAcquisitionAddress, result);
+          }
+        }
+        
       }
     }
     
