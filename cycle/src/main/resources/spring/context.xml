@@ -39,6 +39,7 @@
   </bean>
   
   <bean name="signavioConnector" class="com.camunda.fox.cycle.impl.connector.signavio.SignavioConnector">
+    <property name="configuration" ref="signavioConfig"></property>
   </bean>
   
   <bean name="signavioConfig" class="com.camunda.fox.cycle.entity.ConnectorConfiguration">

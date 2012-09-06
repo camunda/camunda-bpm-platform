@@ -19,6 +19,11 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.io.IOUtils;
@@ -53,6 +58,7 @@ import com.camunda.fox.cycle.exception.RepositoryException;
 import com.camunda.fox.cycle.util.IoUtil;
 
 @Component
+@Path("signavio")
 public class SignavioConnector extends Connector {
 
   public final static String CONFIG_KEY_SIGNAVIO_BASE_URL = "signavioBaseUrl";
@@ -237,6 +243,17 @@ public class SignavioConnector extends Connector {
   @Override
   public InputStream getContent(ConnectorNode node) {
     return this.signavioClient.getContent(node.getId());
+  }
+  
+  @GET
+  @Produces("image/png")
+  @Path("/model/{modelId}/png")
+  public Response getSvgXml(@PathParam("modelId") String modelId) {
+    this.init(getConfiguration());
+    if (this.needsLogin()) {
+      this.login(getConfiguration().getGlobalUser(), getConfiguration().getGlobalPassword());
+    }
+    return Response.ok(this.signavioClient.getPngContent("/"+modelId)).build();
   }
   
   private void releaseClientConnection(Response response) {

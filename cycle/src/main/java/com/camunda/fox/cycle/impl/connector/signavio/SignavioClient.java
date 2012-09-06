@@ -32,6 +32,11 @@ public interface SignavioClient {
   public InputStream getContent(@PathParam("model") String model);
   
   @GET
+  @Path("/model{model}/png")
+  @Consumes(MediaType.APPLICATION_XML)
+  public InputStream getPngContent(@PathParam("model") String model);
+  
+  @GET
   @Path("/{type}{id}/info")
   @Consumes(MediaType.APPLICATION_JSON)
   public String getInfo(@PathParam("type") String type, @PathParam("id") String id);
