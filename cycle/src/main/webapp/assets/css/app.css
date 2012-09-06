@@ -181,9 +181,10 @@ input.ng-invalid-required {
   background-color: #fff;
 }
 
-.combobox-container input,.typeahead.dropdown-menu {
+.combobox-container input,.typeahead.dropdown-menu, span#modelerName {
   width: 233px;
   -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
   border-radius: 3px;
 }
+
