@@ -180,3 +180,10 @@ input.ng-invalid-required {
   border-radius: 0px;
   background-color: #fff;
 }
+
+.combobox-container input,.typeahead.dropdown-menu {
+  width: 233px;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+}

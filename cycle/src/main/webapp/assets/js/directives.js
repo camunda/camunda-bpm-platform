@@ -136,7 +136,9 @@ angular
           $(comboboxContainer).remove();
         }
         // init new combobox
-        elm.combobox();
+        elm.combobox({
+          template: '<div class="combobox-container"><input type="text" autocomplete="off" class="dropdown-toggle" /><span class="" data-dropdown="dropdown"></span></div>'
+        });
       });
 
       // update input with model when default value is set
