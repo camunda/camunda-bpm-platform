@@ -1,11 +1,6 @@
 package com.camunda.fox.cycle.web.service.resource;
 
-import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.StringBufferInputStream;
-import java.io.StringReader;
 import java.util.Date;
 import java.util.List;
 
@@ -31,6 +26,7 @@ import com.camunda.fox.cycle.entity.Roundtrip;
 import com.camunda.fox.cycle.exception.CycleException;
 import com.camunda.fox.cycle.repository.RoundtripRepository;
 import com.camunda.fox.cycle.service.roundtrip.BpmnProcessModelUtil;
+import com.camunda.fox.cycle.util.IoUtil;
 import com.camunda.fox.cycle.web.dto.RoundtripDTO;
 import com.camunda.fox.cycle.web.service.AbstractRestService;
 
@@ -178,7 +174,9 @@ public class RoundtripService extends AbstractRestService {
           
         case RIGHT_TO_LEFT:
           String result = this.bpmnProcessModelUtil.importChangesFromExecutableBpmnModel(IOUtil.toString(rightHandSideModelContent, "UTF-8"), IOUtil.toString(leftHandSideModelContent, "UTF-8"));
-          leftHandSideConnector.updateContent(leftHandSideModelNode, IOUtils.toInputStream(result, "UTF-8"));
+          InputStream resultStream = IOUtils.toInputStream(result, "UTF-8");
+          leftHandSideConnector.updateContent(leftHandSideModelNode, resultStream);
+          IoUtil.closeSilently(resultStream);
           break;
       }
       
@@ -186,6 +184,10 @@ public class RoundtripService extends AbstractRestService {
       
     } catch (Exception e) {
       throw new CycleException(e);
+    }
+    finally {
+      IoUtil.closeSilently(leftHandSideModelContent);
+      IoUtil.closeSilently(rightHandSideModelContent);
     }
     
     return new RoundtripDTO(roundtrip, roundtrip.getLeftHandSide(), roundtrip.getRightHandSide());

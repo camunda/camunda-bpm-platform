@@ -100,6 +100,19 @@ public abstract class AbstractSignavioConnectorTest {
     }
     this.signavioConnector.getSignavioClient().deleteFolder(folderToDelete.getId());
   }
+
+  protected void deleteModel(ConnectorNode modelToDelete) {
+    if (this.signavioConnector.needsLogin()) {
+      ConnectorConfiguration config = this.signavioConnector.getConfiguration();
+      this.signavioConnector.init(config);
+      this.signavioConnector.login(config.getGlobalUser(), config.getGlobalPassword());
+    }
+    
+    if (!modelToDelete.getType().equals(ConnectorNodeType.FILE)) {
+      fail("Tried to delete folder but the assigned ConnectorNode was not a model.");
+    }
+    this.signavioConnector.getSignavioClient().deleteModel(modelToDelete.getId());
+  }
   
   protected void importSignavioArchive(ConnectorNode folder, String signavioArchive) throws Exception {
     HttpClient httpClient = this.signavioConnector.getHttpClient4Executor().getHttpClient();

@@ -3,9 +3,8 @@ package com.camunda.fox.cycle.web.service.resource;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Matchers.any;
-
+import static org.mockito.Mockito.verify;
 
 import javax.inject.Inject;
 
