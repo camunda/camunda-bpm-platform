@@ -12,8 +12,8 @@
   <artifactId>cycle</artifactId>
   <packaging>war</packaging>
   <name>fox cycle - app</name>
+  
   <dependencies>
-
     <!-- Spring Framework -->
     <dependency>
       <groupId>org.springframework</groupId>
