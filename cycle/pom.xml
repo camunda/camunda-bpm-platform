@@ -276,6 +276,9 @@
       </build>
     </profile>
     <profile>
+      <!--
+        usage: mvn wro4j:csslint -Pwro4j or mvn wro4j:jshint -Pwro4j
+      -->
       <id>wro4j</id>
       <dependencies>
         <dependency>
@@ -292,7 +295,6 @@
             <version>${version.wro4j}</version>
             <executions>
               <execution>
-                <!--phase>compile</phase-->
                 <goals>
                   <goal>jshint</goal>
                 </goals>

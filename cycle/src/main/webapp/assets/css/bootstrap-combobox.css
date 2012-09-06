@@ -66,6 +66,7 @@
   border-radius: 0 3px 3px 0;
 }
 .combobox-container input:first-child {
+  -webkit-appearance: menulist;
   *margin-left: -160px;
 }
 .combobox-container input:first-child + .add-on {

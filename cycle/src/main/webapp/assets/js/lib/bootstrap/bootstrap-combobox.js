@@ -186,7 +186,9 @@
       var that = this
       e.stopPropagation()
       e.preventDefault()
-      /** prevent clearing of input element when losing focus
+      /** 
+       * prevent clearing of input element when losing focus
+       * commented by christian lipphardt@camunda.com
       var val = this.$element.val()
       if (!this.selected && val != "" ) {
         this.$element.val("")
