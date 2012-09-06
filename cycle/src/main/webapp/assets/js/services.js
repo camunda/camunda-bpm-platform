@@ -57,7 +57,7 @@ angular
       getConnectors: function() {
         return HttpUtils.makePromise($http.get(App.uri("secured/resource/connector/list")));
       }
-    }
+    };
   })
   .service('HttpUtils', function($q) {
     return {
@@ -71,5 +71,18 @@ angular
         });
         return deferred.promise;
       }
+    };
+  })
+  .factory('cycleHttpInterceptor', function($q, App) {
+    return function(promise) {
+      console.log("promise", promise);
+      return promise.then(function (response, arg1, arg2)  {
+        return promise;
+      }, function (response)  {
+        console.log("error", response);
+        alert("There was an error, try refreshing this page.");
+        //window.location = App.uri("login");
+        return $q.reject(response);
+      });
     };
   });

@@ -14,6 +14,8 @@ angular
         templateUrl: '../partials/roundtrip-details.html'
       });
       
+      $httpProvider.responseInterceptors.push('cycleHttpInterceptor');
+      
       // $routeProvider.otherwise({redirectTo: '/'});
 
       // $locationProvider.html5Mode(true);
