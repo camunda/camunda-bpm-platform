@@ -185,9 +185,17 @@ function EditDiagramController($scope, $http, App, Commons) {
   // 
   // get required data
   Commons.getModelerNames().then(function(data) {
+    // filter out FOX_DESIGNER
+    for (var i = data.length-1; i >= 0; i--) {
+      if (angular.equals(data[i], FOX_DESIGNER)) {
+        data.splice(i, 1);
+        break;
+      }
+    }
+
     $scope.modelerNames = data;
-    // set default value, when only one entry
-    if (data.length == 1 && canEditModeler()) {
+    // set default value
+    if (data.length > 0 && canEditModeler()) {
       $scope.editDiagram.modeler = data[0];
     }
   });
