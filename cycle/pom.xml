@@ -276,6 +276,39 @@
       </build>
     </profile>
     <profile>
+      <id>wro4j</id>
+      <dependencies>
+        <dependency>
+          <groupId>ro.isdc.wro4j</groupId>
+          <artifactId>wro4j-extensions</artifactId>
+          <version>${version.wro4j}</version>
+        </dependency>
+      </dependencies>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>ro.isdc.wro4j</groupId>
+            <artifactId>wro4j-maven-plugin</artifactId>
+            <version>${version.wro4j}</version>
+            <executions>
+              <execution>
+                <!--phase>compile</phase-->
+                <goals>
+                  <goal>jshint</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <targetGroups>all</targetGroups>
+              <failNever>true</failNever>
+              <minimize>false</minimize>
+              <options>devel,evil,noarg</options>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
       <id>tomcat</id>
       <dependencies>
         <!-- database -->
