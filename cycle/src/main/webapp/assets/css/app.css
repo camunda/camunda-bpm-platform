@@ -18,6 +18,14 @@ html, body {
   margin-top: 60px;
 }
 
+/**
+ * sidenav tweak
+ */
+div.sidebar-nav > ul.nav.nav-list > li.nav-header {
+  font-size: 13px;
+  padding: 3px 0px;
+}
+
 .footer {
   padding: 20px 0;
   margin-top: 20px;
