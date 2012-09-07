@@ -1,5 +1,6 @@
 package com.camunda.fox.cycle.web.service.resource;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,8 +11,11 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Response;
 
 import com.camunda.fox.cycle.api.connector.Connector;
+import com.camunda.fox.cycle.api.connector.Connector.ConnectorContentType;
 import com.camunda.fox.cycle.api.connector.ConnectorNode;
 import com.camunda.fox.cycle.connector.ConnectorRegistry;
 import com.camunda.fox.cycle.web.dto.ConnectorDTO;
@@ -55,7 +59,7 @@ public class ConnectorService {
   @POST
   @Path("{id}/tree/content")
   @Produces("application/xml")
-  public String content(@PathParam("connectorId") Long connectorId, @FormParam("nodeId") String nodeId) {
+  public String content(@PathParam("id") Long connectorId, @FormParam("nodeId") String nodeId) {
     Connector connector = connectorRegistry.getSessionConnectorMap().get(connectorId);
     try {
       return new java.util.Scanner(connector.getContent(new ConnectorNode(nodeId))).useDelimiter("\\A").next();
@@ -63,5 +67,16 @@ public class ConnectorService {
       return "";
     }
   }
+  
+  @GET
+  @Path("{id}/content/{type}")
+  public Response getTypedContent(@PathParam("id") Long connectorId, @QueryParam("nodeId") String nodeId, @PathParam("type") ConnectorContentType type) {
+    Connector connector = connectorRegistry.getSessionConnectorMap().get(connectorId);
+    InputStream content = connector.getContent(new ConnectorNode(nodeId), type);
+    return Response.ok(content)
+            .header("Content-Type", connector.getMimeType(type))
+            .build();
+  }
+  
   
 }

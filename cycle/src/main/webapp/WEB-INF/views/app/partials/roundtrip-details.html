@@ -11,9 +11,7 @@
     <div class="span2">
       <div class="sync-options">
         <div class="actions">
-          <button class="btn btn-large" ng-show="!roundtrip.rightHandSide && roundtrip.leftHandSide">create &rarr;</button>
           <button class="btn btn-large" 
-                  ng-hide="!roundtrip.rightHandSide && roundtrip.leftHandSide" 
                   ng-disabled="!(roundtrip.rightHandSide && roundtrip.leftHandSide)"
                   ng-click="openSyncDialog('LEFT_TO_RIGHT')">sync &rarr;</button>
         </div>

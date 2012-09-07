@@ -44,7 +44,7 @@
   
   <bean name="signavioConfig" class="com.camunda.fox.cycle.entity.ConnectorConfiguration">
     <property name="id" value="2"/>
-    <property name="label" value="My SignavioConnector"/>
+    <property name="label" value="Test Signavio"/>
     <property name="connectorClass" value="com.camunda.fox.cycle.impl.connector.signavio.SignavioConnector"/>
     <property name="loginMode" value="GLOBAL" />
     <property name="globalUser" value="test@camunda.com" />
@@ -55,6 +55,21 @@
       </map>
     </property>
   </bean>
+  
+  <bean name="saasSignavioConfig" class="com.camunda.fox.cycle.entity.ConnectorConfiguration">
+    <property name="id" value="3"/>
+    <property name="label" value="Saas Signavio"/>
+    <property name="connectorClass" value="com.camunda.fox.cycle.impl.connector.signavio.SignavioConnector"/>
+    <property name="loginMode" value="GLOBAL" />
+    <property name="globalUser" value="enteruser" />
+    <property name="globalPassword" value="enterpassword" />
+    <property name="properties">
+      <map>
+        <entry key="signavioBaseUrl" value="https://editor.signavio.com/"></entry>
+      </map>
+    </property>
+  </bean>
+  
   
   <!--  bean name="connectorRegistry" scope="session" class="com.camunda.fox.cycle.connector.ConnectorRegistry">
     <aop:scoped-proxy/>

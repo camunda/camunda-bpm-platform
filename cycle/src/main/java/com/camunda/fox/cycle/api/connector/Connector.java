@@ -1,6 +1,7 @@
 package com.camunda.fox.cycle.api.connector;
 
 import java.io.InputStream;
+import java.util.Arrays;
 import java.util.List;
 
 import com.camunda.fox.cycle.api.connector.ConnectorNode.ConnectorNodeType;
@@ -8,6 +9,12 @@ import com.camunda.fox.cycle.entity.ConnectorConfiguration;
 
 
 public abstract class Connector {
+  
+  public enum ConnectorContentType  {
+    DEFAULT,
+    PNG
+  }
+  
   private ConnectorConfiguration configuration;
   
   public abstract List<ConnectorNode> getChildren(ConnectorNode parent);
@@ -16,7 +23,16 @@ public abstract class Connector {
   
   public abstract ConnectorNode getNode(String id);
   
-  public abstract InputStream getContent(ConnectorNode node);
+  public InputStream getContent(ConnectorNode node) {
+    return getContent(node, ConnectorContentType.DEFAULT);
+  }
+  
+  public List<ConnectorContentType> getSupportedTypes() {
+    ConnectorContentType[] types = {ConnectorContentType.DEFAULT};
+    return Arrays.asList(types);
+  }
+  
+  public abstract InputStream getContent(ConnectorNode node, ConnectorContentType type); 
   
   public abstract ConnectorNode createNode(String id, String label, ConnectorNodeType type);
   
@@ -47,6 +63,15 @@ public abstract class Connector {
   
   public Long getId() {
     return getConfiguration().getId();
+  }
+  
+  public String getMimeType (ConnectorContentType type) {
+    switch (type) {
+    case PNG:
+      return "image/png";
+    default:
+      return "application/xml";
+    }
   }
   
 }
