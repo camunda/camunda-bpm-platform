@@ -83,18 +83,27 @@ public class VfsConnector extends Connector {
 
   @Secured
   @Override
-  public InputStream getContent(ConnectorNode node) {
+  public InputStream getContent(ConnectorNode node, ConnectorContentType type) {
     try {
       FileSystemManager fsManager = VFS.getManager();
-      FileObject fileObject;
       
-      fileObject = fsManager.resolveFile(basePath + node.getId());
+      FileObject fileObject = fsManager.resolveFile(basePath + node.getId());
 
       if (fileObject.getType() != FileType.FILE) {
         throw new CycleException("Cannot get content of non-file node");
       }
       
-      return fileObject.getContent().getInputStream();
+      switch(type) {
+      case PNG:
+        FileObject pngfile = fsManager.resolveFile(basePath + getPngFileName(node.getId()));
+        if (pngfile.exists()) {
+          return pngfile.getContent().getInputStream(); 
+        }else {
+          return getClass().getClassLoader().getResourceAsStream("no-picture.png");
+        }
+      default:
+        return fileObject.getContent().getInputStream(); 
+      }
       
     } catch (FileSystemException e) {
       throw new CycleException(e);
@@ -211,5 +220,10 @@ public class VfsConnector extends Connector {
     } catch (Exception e) {
       throw new CycleException(e);
     }
+  }
+  
+  private String getPngFileName(String nodeId) {
+    int pointIndex = nodeId.lastIndexOf(".");
+    return nodeId.substring(0, pointIndex)+".png";
   }
 }

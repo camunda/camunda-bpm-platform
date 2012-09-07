@@ -119,8 +119,13 @@ input.ng-invalid-required {
 }
 
 .bpmn-model .diagram {
-  line-height: 300px;
-  height: 300px;
+  line-height: 100px;
+  min-height: 300px;
+  overflow: auto;
+}
+
+.bpmn-model .diagram .name {
+  display: block;
 }
 
 .bpmn-model .actions {

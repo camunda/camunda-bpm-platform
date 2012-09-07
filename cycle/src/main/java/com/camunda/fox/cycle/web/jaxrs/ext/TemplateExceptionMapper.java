@@ -1,5 +1,8 @@
 package com.camunda.fox.cycle.web.jaxrs.ext;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
@@ -16,6 +19,8 @@ public class TemplateExceptionMapper implements ExceptionMapper<TemplateInputExc
 
   @Override
   public Response toResponse(TemplateInputException exception) {
+    exception.printStackTrace();
+    Logger.getLogger(getClass().getSimpleName()).log(Level.SEVERE, "Error during JAX-RS Request", exception);
     return Response.status(Response.Status.NOT_FOUND).entity("error/not-found").build();
   }
 }

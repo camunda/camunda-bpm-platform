@@ -14,21 +14,28 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.entity.mime.content.StringBody;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
+import org.apache.http.params.HttpParams;
 import org.apache.http.util.EntityUtils;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
@@ -53,6 +60,7 @@ import com.camunda.fox.cycle.exception.RepositoryException;
 import com.camunda.fox.cycle.util.IoUtil;
 
 @Component
+@Path("signavio")
 public class SignavioConnector extends Connector {
 
   public final static String CONFIG_KEY_SIGNAVIO_BASE_URL = "signavioBaseUrl";
@@ -127,7 +135,12 @@ public class SignavioConnector extends Connector {
         signavioURL = signavioURL + SLASH_CHAR + REPOSITORY_BACKEND_URL_SUFFIX;
       }
       
-      httpClient4Executor = new ApacheHttpClient4Executor();
+      // Use Thread safe connection manager, prevents abortion of ctx.proceed in interceptor if multiple requests are done at once
+      DefaultHttpClient client = new DefaultHttpClient();
+      ClientConnectionManager mgr = client.getConnectionManager();
+      HttpParams params = client.getParams();
+      client = new DefaultHttpClient(new ThreadSafeClientConnManager(mgr.getSchemeRegistry()), params);
+      httpClient4Executor = new ApacheHttpClient4Executor(client);
       
       ClientRequestFactory factory = null;
       try {
@@ -141,18 +154,14 @@ public class SignavioConnector extends Connector {
         @Override
         public ClientResponse execute(ClientExecutionContext ctx) throws Exception {
           String uri = "";
-          if (logger.isLoggable(Level.FINEST)) {
             uri = ctx.getRequest().getUri().toString();
-            logger.finest("Sending request to " + uri);
-          }
+            logger.fine("Sending request to " + uri);
+            logger.fine("Request: " + ctx.getRequest().getHeaders()+ "," + ctx.getRequest().getBody());
           ClientResponse<?> response =  ctx.proceed();
-          if (logger.isLoggable(Level.FINEST)) {
-            logger.finest("Received response from " + uri + " with status " + response.getStatus());
-          }
+            logger.fine("Received response from " + uri + " with status " + response.getStatus());
           return response;
         }
       });
-      
       this.signavioClient = factory.createProxy(SignavioClient.class, signavioURL);
     }
   }
@@ -175,6 +184,9 @@ public class SignavioConnector extends Connector {
         } else if (relProp.equals(JSON_MOD_VALUE)) {
           newNode = this.createModelNode(jsonObj);
           nodes.add(newNode);
+        }
+        if (newNode != null) {
+          newNode.setConnectorId(getConfiguration().getId());  
         }
       }
     } catch (Exception e) {
@@ -235,8 +247,25 @@ public class SignavioConnector extends Connector {
 
   @Secured
   @Override
-  public InputStream getContent(ConnectorNode node) {
-    return this.signavioClient.getContent(node.getId());
+  public InputStream getContent(ConnectorNode node, ConnectorContentType type) {
+    switch (type) {
+    case PNG:
+      return this.signavioClient.getPngContent(node.getId());
+
+    default:
+      return this.signavioClient.getContent(node.getId());
+    }
+  }
+  
+  @GET
+  @Produces("image/png")
+  @Path("/model/{modelId}/png")
+  public Response getSvgXml(@PathParam("modelId") String modelId) {
+    this.init(getConfiguration());
+    if (this.needsLogin()) {
+      this.login(getConfiguration().getGlobalUser(), getConfiguration().getGlobalPassword());
+    }
+    return Response.ok(this.signavioClient.getPngContent("/"+modelId)).build();
   }
   
   private void releaseClientConnection(Response response) {

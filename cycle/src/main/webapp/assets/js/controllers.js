@@ -97,7 +97,18 @@ function SyncRoundtripController($scope, $http, App) {
 /**
  * Works along with the bpmn-diagram directive to manage a single bpmn-diagram in the roundtrip view.
  */
-function BpmnDiagramController($scope) {
+function BpmnDiagramController($scope, App) {
+  $scope.getImageUrl = function (diagram, update) {
+    if (diagram) {
+      var uri = App.uri("secured/resource/connector/")+diagram.connectorId+"/content/PNG?nodeId="+diagram.diagramPath;
+      if (update) {
+        uri +="&updated="+new Date().getTime();
+      }
+      return uri;
+    }
+    return "";
+  };
+  
   $scope.editDiagramDialog = new Dialog();
   
   $scope.addDiagram = function() {
@@ -115,6 +126,17 @@ function BpmnDiagramController($scope) {
       $scope.editDiagramDialog.close();
     });
   };
+  
+  $scope.$watch("diagram", function (newDiagramValue) {
+    if (newDiagramValue != undefined) {
+      $scope.imageUrl = $scope.getImageUrl(newDiagramValue);
+    }
+  });
+  
+  $scope.$on("roundtrip-changed", function(event, roundtrip) {
+    $scope.imageUrl = $scope.getImageUrl($scope.diagram, true);;
+  });
+  
 }
 
 /**
