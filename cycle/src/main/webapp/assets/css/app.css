@@ -14,13 +14,13 @@ html, body {
   min-height: 100%;
 }
 
-body > .container-fluid.breadcrumbs {
+.breadcrumbs {
   margin-top: 60px;
 }
 
 .footer {
-  padding: 70px 0;
-  margin-top: 70px;
+  padding: 20px 0;
+  margin-top: 20px;
   border-top: 1px solid #E5E5E5;
   background-color: whiteSmoke;
   
