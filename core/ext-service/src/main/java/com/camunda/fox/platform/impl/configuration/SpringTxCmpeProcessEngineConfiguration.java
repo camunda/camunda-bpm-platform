@@ -10,6 +10,7 @@ import org.activiti.engine.impl.interceptor.Command;
 import org.activiti.engine.impl.interceptor.CommandContextInterceptor;
 import org.activiti.engine.impl.interceptor.CommandInterceptor;
 import org.activiti.engine.impl.interceptor.LogInterceptor;
+import org.activiti.spring.SpringTransactionContextFactory;
 import org.activiti.spring.SpringTransactionInterceptor;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.jta.JtaTransactionManager;
@@ -60,6 +61,13 @@ public class SpringTxCmpeProcessEngineConfiguration extends CmpeProcessEngineCon
     if(transactionManager == null) {      
       TransactionManagerFactory transactionManagerFactory = Services.getService(TransactionManagerFactory.class);
       transactionManager = transactionManagerFactory.getTransactionManager();
+    }
+  }
+  
+  @Override
+  protected void initTransactionContextFactory() {
+    if(transactionContextFactory == null) {
+      transactionContextFactory = new SpringTransactionContextFactory(transactionManager);
     }
   }
 
