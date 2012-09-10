@@ -16,9 +16,11 @@ import org.springframework.transaction.annotation.Transactional;
 import com.camunda.fox.cycle.api.connector.Connector;
 import com.camunda.fox.cycle.api.connector.ConnectorNode;
 import com.camunda.fox.cycle.connector.ConnectorRegistry;
+import com.camunda.fox.cycle.connector.VfsConnector;
 import com.camunda.fox.cycle.entity.BpmnDiagram;
 import com.camunda.fox.cycle.entity.BpmnDiagram.Status;
 import com.camunda.fox.cycle.entity.Roundtrip;
+import com.camunda.fox.cycle.impl.connector.signavio.SignavioConnector;
 import com.camunda.fox.cycle.repository.BpmnDiagramRepository;
 import com.camunda.fox.cycle.web.dto.BpmnDiagramDTO;
 
@@ -104,24 +106,29 @@ public class BpmnDiagramService {
   }
   
   public BpmnDiagramDTO isDiagramInSync(BpmnDiagramDTO bpmnDiagramDTO, Roundtrip roundtrip) {
+    Date lastModifiedDate = null;
+    
     Connector diagramConnector = this.connectorRegistry.getSessionConnectorMap().get(bpmnDiagramDTO.getConnectorId());
     ConnectorNode connectorNode = new ConnectorNode(bpmnDiagramDTO.getDiagramPath(), bpmnDiagramDTO.getLabel());
-    Date lastModifiedDate = diagramConnector.getLastModifiedDate(connectorNode);
     
+    if (diagramConnector instanceof VfsConnector) {
+      lastModifiedDate = diagramConnector.getLastModifiedDate(connectorNode);
+    } else if (diagramConnector instanceof SignavioConnector) {
+      lastModifiedDate = diagramConnector.getLastModifiedDate(connectorNode);
+    }
+
     if (lastModifiedDate != null && roundtrip.getLastSync() != null) {
-      if (diagramConnector.getConfiguration().getLabel().equals("VFS Connector")) {
   
-        if (lastModifiedDate.before(roundtrip.getLastSync()) || lastModifiedDate.equals(roundtrip.getLastSync())) {
+        if (lastModifiedDate.getTime() <= roundtrip.getLastSync().getTime()) {
           bpmnDiagramDTO.setStatus(Status.SYNCED);
         }
   
-        if (lastModifiedDate.after(roundtrip.getLastSync())) {
+        if (lastModifiedDate.getTime() > roundtrip.getLastSync().getTime()) {
           bpmnDiagramDTO.setStatus(Status.OUT_OF_SYNC);
         }
-      }
-    
+        
     } else {
-      bpmnDiagramDTO.setStatus(Status.UNSPECIFIED);
+       bpmnDiagramDTO.setStatus(Status.UNSPECIFIED);
     }
     
     return bpmnDiagramDTO;

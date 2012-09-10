@@ -106,8 +106,23 @@ public class RoundtripService extends AbstractRestService {
   @Path("{id}/details")
   public RoundtripDTO getDetails(@PathParam("id") long id) {
     Roundtrip roundtrip = getRoundtripRepository().findById(id);
+    
+    RoundtripDTO roundtripDTO = new RoundtripDTO(roundtrip);
+    
+    if (roundtrip.getLeftHandSide() != null) {
+      roundtripDTO.setLeftHandSide(bpmnDiagramController.isDiagramInSync(BpmnDiagramDTO.wrap(roundtrip.getLeftHandSide()), roundtrip));
+    } else {
+      roundtripDTO.setLeftHandSide(null);
+    }
+    
+    if (roundtrip.getRightHandSide() != null) {
+      roundtripDTO.setRightHandSide(bpmnDiagramController.isDiagramInSync(BpmnDiagramDTO.wrap(roundtrip.getRightHandSide()), roundtrip));
+    } else {
+      roundtripDTO.setRightHandSide(null);
+    }
+    
     // TODO: Fetch eager
-    return new RoundtripDTO(roundtrip, roundtrip.getLeftHandSide(), roundtrip.getRightHandSide());
+    return roundtripDTO;
   }
   
   @POST
@@ -154,19 +169,17 @@ public class RoundtripService extends AbstractRestService {
   public RoundtripDTO doSynchronize(@QueryParam("syncMode") SyncMode syncMode, @PathParam("id") long id) {
     Roundtrip roundtrip = this.getRoundtripRepository().findById(id);
     
-    roundtrip.setLastSync(new Date());
+    BpmnDiagram leftHandSide = roundtrip.getLeftHandSide();
     
-    BpmnDiagramDTO leftHandSideDTO = bpmnDiagramController.isDiagramInSync(BpmnDiagramDTO.wrap(roundtrip.getLeftHandSide()), roundtrip);
-    
-    Connector leftHandSideConnector = this.connectorRegistry.getSessionConnectorMap().get(leftHandSideDTO.getConnectorId());
-    ConnectorNode leftHandSideModelNode = new ConnectorNode(leftHandSideDTO.getDiagramPath(), leftHandSideDTO.getLabel());
+    Connector leftHandSideConnector = this.connectorRegistry.getSessionConnectorMap().get(leftHandSide.getConnectorId());
+    ConnectorNode leftHandSideModelNode = new ConnectorNode(leftHandSide.getDiagramPath(), leftHandSide.getLabel());
     leftHandSideModelNode.setType(ConnectorNodeType.FILE);
     InputStream leftHandSideModelContent =leftHandSideConnector.getContent(leftHandSideModelNode);
     
-    BpmnDiagramDTO rightHandSideDTO = bpmnDiagramController.isDiagramInSync(BpmnDiagramDTO.wrap(roundtrip.getRightHandSide()), roundtrip);
+    BpmnDiagram rightHandSide = roundtrip.getRightHandSide();
     
-    Connector rightHandSideConnector = this.connectorRegistry.getSessionConnectorMap().get(rightHandSideDTO.getConnectorId());
-    ConnectorNode rightHandSideModelNode = new ConnectorNode(rightHandSideDTO.getDiagramPath(), rightHandSideDTO.getLabel());
+    Connector rightHandSideConnector = this.connectorRegistry.getSessionConnectorMap().get(rightHandSide.getConnectorId());
+    ConnectorNode rightHandSideModelNode = new ConnectorNode(rightHandSide.getDiagramPath(), rightHandSide.getLabel());
     rightHandSideModelNode.setType(ConnectorNodeType.FILE);
     InputStream rightHandSideModelContent = rightHandSideConnector.getContent(rightHandSideModelNode);
     
@@ -185,7 +198,8 @@ public class RoundtripService extends AbstractRestService {
           break;
       }
       
-//      roundtrip.setLastSync(new Date());
+      roundtrip.setLastSync(new Date());
+      
       
     } catch (Exception e) {
       throw new CycleException(e);
@@ -195,11 +209,13 @@ public class RoundtripService extends AbstractRestService {
       IoUtil.closeSilently(rightHandSideModelContent);
     }
     
+    BpmnDiagramDTO leftHandSideDTO = bpmnDiagramController.isDiagramInSync(BpmnDiagramDTO.wrap(roundtrip.getLeftHandSide()), roundtrip);
+    BpmnDiagramDTO rightHandSideDTO = bpmnDiagramController.isDiagramInSync(BpmnDiagramDTO.wrap(roundtrip.getRightHandSide()), roundtrip);
+    
     RoundtripDTO roundtripDTO = new RoundtripDTO(roundtrip);
     roundtripDTO.setLeftHandSide(leftHandSideDTO);
     roundtripDTO.setRightHandSide(rightHandSideDTO);
     
-    //return new RoundtripDTO(roundtrip, roundtrip.getLeftHandSide(), roundtrip.getRightHandSide());
     return roundtripDTO;
   }
   
