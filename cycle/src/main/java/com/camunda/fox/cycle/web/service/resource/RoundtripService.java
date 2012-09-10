@@ -156,7 +156,7 @@ public class RoundtripService extends AbstractRestService {
     Connector leftHandSideConnector = this.connectorRegistry.getSessionConnectorMap().get(leftHandSide.getConnectorId());
     ConnectorNode leftHandSideModelNode = new ConnectorNode(leftHandSide.getDiagramPath(), leftHandSide.getLabel());
     leftHandSideModelNode.setType(ConnectorNodeType.FILE);
-    InputStream leftHandSideModelContent =leftHandSideConnector.getContent(leftHandSideModelNode);
+    InputStream leftHandSideModelContent = leftHandSideConnector.getContent(leftHandSideModelNode);
     
     BpmnDiagram rightHandSide = roundtrip.getRightHandSide();
     
@@ -169,11 +169,14 @@ public class RoundtripService extends AbstractRestService {
       
       switch (syncMode) {
         case LEFT_TO_RIGHT:
+          IoUtil.closeSilently(rightHandSideModelContent);
           rightHandSideConnector.updateContent(rightHandSideModelNode,  this.bpmnProcessModelUtil.extractExecutablePool(leftHandSideModelContent));
           break;
           
         case RIGHT_TO_LEFT:
           String result = this.bpmnProcessModelUtil.importChangesFromExecutableBpmnModel(IOUtil.toString(rightHandSideModelContent, "UTF-8"), IOUtil.toString(leftHandSideModelContent, "UTF-8"));
+          IoUtil.closeSilently(leftHandSideModelContent);
+          IoUtil.closeSilently(rightHandSideModelContent);
           InputStream resultStream = IOUtils.toInputStream(result, "UTF-8");
           leftHandSideConnector.updateContent(leftHandSideModelNode, resultStream);
           IoUtil.closeSilently(resultStream);
@@ -184,10 +187,6 @@ public class RoundtripService extends AbstractRestService {
       
     } catch (Exception e) {
       throw new CycleException(e);
-    }
-    finally {
-      IoUtil.closeSilently(leftHandSideModelContent);
-      IoUtil.closeSilently(rightHandSideModelContent);
     }
     
     return new RoundtripDTO(roundtrip, roundtrip.getLeftHandSide(), roundtrip.getRightHandSide());
