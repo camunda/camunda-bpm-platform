@@ -4,7 +4,7 @@
 
 angular
 .module('cycle.directives', [])
-.directive('cycleTree', function(App) {
+.directive('cycleTree', function(App, Event) {
 	return {
 		restrict: "A",
 		replace: false,
@@ -27,7 +27,6 @@ angular
 			         "dojo/request",
 			         "dijit/registry"], function(ready, window, array, Memory, ObjectStoreModel, Tree, Observable, request, registry) {
 				ready(function () {
-					
 					scope.$watch("connector", function (newValue , oldValue) {
 				    	if (newValue != undefined) {
 				    		
@@ -53,7 +52,7 @@ angular
                         function(error) {
                           var e = error.response.data;
                           e.component = "tree";
-                          scope.$emit("component-error", e);
+                          scope.$emit(Event.componentError, e);
                         });
 							        }
 							    });
@@ -82,7 +81,6 @@ angular
                     openOnClick: false,
                     onClick: function(item, node){
                       scope.selected = item;
-                      scope.$digest();
                       scope.$apply();
                       if (node.isExpandable) {
                         this._onExpandoClick({node: node});
@@ -98,7 +96,7 @@ angular
   							function(error){
                   var e = error.response.data;
                   e.component = "tree";
-                  scope.$emit("component-error", e);
+                  scope.$emit(Event.componentError, e);
   							});
 				    	}
 				    });
@@ -107,15 +105,13 @@ angular
 		}
 	};
 })
-.directive('ngCombobox', function() {
+.directive('ngCombobox', function(Event) {
   return {
     restrict: 'A',
     require: 'ngModel',
     link: function (scope, elm, attrs, model) {
-      var ngChange = 'change';
-
       if (model) {
-        elm.on(ngChange, function() {
+        elm.on(Event.ngChange, function() {
           scope.$apply(function() {
             var input = getInputText();
             if (input) {
@@ -153,7 +149,7 @@ angular
       });
 
       // do some cleanup
-      scope.$on('$destroy', function () {
+      scope.$on(Event.destroy, function () {
         $('ul.typeahead.dropdown-menu').each(function(){
           $(this).remove();
         });
@@ -216,7 +212,7 @@ angular
     restrict: 'A',
     link: function(scope, element, attrs) {
       var title = (attrs.hintTitle == undefined ? "" : attrs.hintTitle) ;
-      $(element[0]).popover({content: attrs.hint, title: title, delay: 1000});
+      $(element[0]).popover({content: attrs.hint, title: title, delay: 0});
     }
   };
 })
