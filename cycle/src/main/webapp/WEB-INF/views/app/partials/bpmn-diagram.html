@@ -2,7 +2,7 @@
   <div class="bpmn-model thumbnail" ng-show="diagram">
     <h3>{{diagram.modeler}}</h3>
     <div class="holder">
-      <div class="diagram">
+      <div class="diagram vertical-center">
         <span class="name" data-ng-hide="imageAvailable == 'true'">{{diagram.label}}</span>
         <img alt="{{diagram.label}}" data-ng-show="imageAvailable == 'true'" data-ng-src="{{imageUrl}}" data-ng-click="showImage(identifier)" />
       </div>
@@ -14,7 +14,7 @@
     <h3 data-ng-show="identifier == 'leftHandSide'" th:text="#{Your modeler}">Your modeler</h3>
     <h3 data-ng-show="identifier == 'rightHandSide'">fox designer</h3>
     <div class="holder">
-      <div class="diagram">
+      <div class="diagram vertical-center">
         <span class="name"><a class="btn btn-primary btn-large" ng-click="addDiagram()" data-hint-title="Add a process model" data-hint="You need two process models for a Roundtrip, the right side is reserved for the fox designer (the engine model)" >Add Process Model</a></span>
       </div>
     </div>

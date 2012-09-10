@@ -19,22 +19,29 @@ html, body {
 }
 
 /**
- * sidenav tweak
+ * sidebar-nav tweak (My Roundtrips)
  */
 div.sidebar-nav > ul.nav.nav-list > li.nav-header {
   font-size: 13px;
   padding: 3px 0px;
 }
 
-.footer {
-  padding: 20px 0;
-  margin-top: 20px;
+footer {
+  padding: 6px 0;
   border-top: 1px solid #E5E5E5;
   background-color: whiteSmoke;
-  
-  position: absolute;
   width: 100%;
-  bottom: 0;
+}
+
+.wrapper {
+  min-height: 100%;
+  height: auto !important; /* ie7 fix */
+  height: 100%;
+  margin: 0 auto -43px;
+}
+
+.push-down {
+  height: 60px;
 }
 
 /* for image replacement */
@@ -131,6 +138,14 @@ input.ng-invalid-required {
   min-height: 350px;
   max-height: 350px;
   overflow: auto;
+}
+
+.vertical-center:before {
+	content: '';
+  display: inline-block;
+  height: 100%; 
+  vertical-align: middle;
+  margin-right: -0.25em; /* Adjusts for spacing */
 }
 
 .bpmn-model .diagram img {
