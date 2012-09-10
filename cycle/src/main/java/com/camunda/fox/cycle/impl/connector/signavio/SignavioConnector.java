@@ -501,12 +501,16 @@ public class SignavioConnector extends Connector {
       String info = this.signavioClient.getInfo(MODEL_URL_SUFFIX, node.getId());
       JSONObject jsonObj = new JSONObject(info);
       String updated = jsonObj.getString(JSON_UPDATED_PROP);
-      SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss Z");
-      Date lastModifiedDate = dateFormatter.parse(updated);
-      return lastModifiedDate;
+      if (updated != null) {
+        SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss Z");
+        Date lastModifiedDate = dateFormatter.parse(updated);
+        return lastModifiedDate;
+      }
     } catch (Exception e) {
       throw new RepositoryException("The last modified date of node '" + node.getLabel() + "' could not be determined.", e);
     }  
+    
+    return null;
  }
 
 }
