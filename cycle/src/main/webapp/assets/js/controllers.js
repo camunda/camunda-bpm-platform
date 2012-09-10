@@ -3,7 +3,7 @@
 
 angular.module('cycle.controllers', []);
 
-function DefaultController($scope, $http, $location, App) {
+function DefaultController($scope, $http, $location, App, Event) {
   
   // TODO: get from cookie
   $scope.currentUser = null;
@@ -12,14 +12,14 @@ function DefaultController($scope, $http, $location, App) {
     $scope.currentUser = data;
   });
   
-  $scope.$on("cycle.userChanged", function(event, user) {
+  $scope.$on(Event.userChanged, function(event, user) {
     $scope.currentUser = user;
   });
   
   // Bread Crumb 
   var breadCrumbs = $scope.breadCrumbs = [];
   	
-  $scope.$on("navigation-changed", function(evt, navigationItem) {
+  $scope.$on(Event.navigationChanged, function(evt, navigationItem) {
     if(navigationItem==undefined) {
       breadCrumbs.splice(0, breadCrumbs.length);
     } else {
@@ -46,11 +46,11 @@ function DefaultController($scope, $http, $location, App) {
   // end Bread Crumb
 };
 
-function HomeController($scope) {
-  $scope.$emit("navigation-changed");
+function HomeController($scope, Event) {
+  $scope.$emit(Event.navigationChanged);
 }
 
-function RoundtripDetailsController($scope, $routeParams, RoundtripDetails, Commons) {
+function RoundtripDetailsController($scope, $routeParams, RoundtripDetails, Commons, Event) {
   $scope.currentPicture = 'leftHandSide';
   
   $scope.syncDialog = new Dialog();
@@ -68,11 +68,11 @@ function RoundtripDetailsController($scope, $routeParams, RoundtripDetails, Comm
     $scope.syncDialog.open();
   };
   
-  $scope.$on("roundtrip-changed", function(event, roundtrip) {
+  $scope.$on(Event.roundtripChanged, function(event, roundtrip) {
     $scope.roundtrip = roundtrip;
   });
   
-  $scope.$on("model-image-clicked", function(event, side) {
+  $scope.$on(Event.modelImageClicked, function(event, side) {
     $scope.setCurrentPicture(side);
     
     $('.leftHandSide').removeClass("active");
@@ -99,24 +99,30 @@ function RoundtripDetailsController($scope, $routeParams, RoundtripDetails, Comm
   };
 };
 
-function SyncRoundtripController($scope, $http, App) {
+function SyncRoundtripController($scope, $http, App, Event) {
   
-  $scope.status = 'beforeStart';
+  var SYNC_SUCCESS = "synchronizationSuccess",
+      SYNC_FAILED = "synchronizationFailed",
+      PERFORM_SYNC = "performSynchronize",
+      BEFORE_SYNC = "beforeStart";
+      
+  
+  $scope.status = BEFORE_SYNC;
   
   $scope.cancel = function () {
     $scope.syncDialog.close();
   };
   
   $scope.performSync = function() {
-    $scope.status = 'performSynchronize';
+    $scope.status = PERFORM_SYNC;
     
     $http.post(App.uri('secured/resource/roundtrip/' + $scope.roundtrip.id + '/sync?syncMode=' + $scope.syncMode)).
       success(function(data) {
-        $scope.status = 'synchronizationSuccess';
-        $scope.$emit("roundtrip-changed", data);
+        $scope.status = SYNC_SUCCESS;
+        $scope.$emit(Event.roundtripChanged, data);
     }).
       error(function (data) {
-        $scope.status = 'synchronizationFailed';
+        $scope.status = SYNC_FAILED;
       });
   };
 }
@@ -124,7 +130,7 @@ function SyncRoundtripController($scope, $http, App) {
 /**
  * Works along with the bpmn-diagram directive to manage a single bpmn-diagram in the roundtrip view.
  */
-function BpmnDiagramController($scope, App, Commons) {
+function BpmnDiagramController($scope, App, Commons, Event) {
   $scope.imageAvailable = false;
   
   $scope.editDiagramDialog = new Dialog();
@@ -146,7 +152,7 @@ function BpmnDiagramController($scope, App, Commons) {
   };
   
   $scope.showImage = function(side) {
-    $scope.$emit("model-image-clicked", side);
+    $scope.$emit(Event.modelImageClicked, side);
   };
   
   $scope.$watch("diagram", function (newDiagramValue) {
@@ -156,7 +162,7 @@ function BpmnDiagramController($scope, App, Commons) {
     }
   });
   
-  $scope.$on("roundtrip-changed", function(event, roundtrip) {
+  $scope.$on(Event.roundtripChanged, function(event, roundtrip) {
     $scope.imageUrl = Commons.getImageUrl($scope.diagram, true);;
   });
   
@@ -172,7 +178,7 @@ function BpmnDiagramController($scope, App, Commons) {
 /**
  * Realizes the edit operation of a bpmn diagram inside the respective dialog.
  */
-function EditDiagramController($scope,Commons) {
+function EditDiagramController($scope,Commons,Event) {
   
   var FOX_DESIGNER = "fox designer", 
       RIGHT_HAND_SIDE = "rightHandSide";
@@ -207,7 +213,7 @@ function EditDiagramController($scope,Commons) {
   $scope.editDiagram = angular.copy($scope.diagram || {});
 
   // Watch for component error  
-  $scope.$on("component-error", function(event, error) {
+  $scope.$on(Event.componentError, function(event, error) {
     $scope.error = error;
   });
   
@@ -259,7 +265,7 @@ function EditDiagramController($scope,Commons) {
  * Responsible for adding a new roundtrip from within the roundtrip list
  * 
  */
-function CreateNewRoundtripController($scope, $q, $http, $location, Debouncer, App, Roundtrip) {
+function CreateNewRoundtripController($scope, $q, $http, $location, Debouncer, App, Roundtrip, Event) {
 
   $scope.name = '';
   $scope.nameChecked = false;
@@ -298,7 +304,7 @@ function CreateNewRoundtripController($scope, $q, $http, $location, Debouncer, A
       $scope.newRoundtripDialog.close();
       
       $location.path("/roundtrip/" + roundtrip.id);
-      $scope.$emit("roundtrip-added", roundtrip);
+      $scope.$emit(Event.roundtripAdded, roundtrip);
     });
   };
   
@@ -348,7 +354,7 @@ function CreateNewRoundtripController($scope, $q, $http, $location, Debouncer, A
  * Responsible for listing the roundtrips and updating the currently selected one
  * 
  */
-function ListRoundtripsController($scope, $routeParams, Roundtrip) {
+function ListRoundtripsController($scope, $routeParams, Roundtrip, Event) {
   
   // TODO: Add documentation page
   $scope.roundtrips = Roundtrip.query();
@@ -366,7 +372,7 @@ function ListRoundtripsController($scope, $routeParams, Roundtrip) {
         angular.forEach($scope.roundtrips, function(item) {
           if (item.id == $routeParams.roundtripId) {
             // find the roundtripname for this roundtrip-id
-            $scope.$emit("navigation-changed", {name:item.name});
+            $scope.$emit(Event.navigationChanged, {name:item.name});
           }
         });
       }
@@ -383,7 +389,7 @@ function ListRoundtripsController($scope, $routeParams, Roundtrip) {
     return (roundtrip.id == selectedRoundtripId ? 'active' : '');
   };
   
-  $scope.$on("roundtrip-added", function(event, roundtrip) {
+  $scope.$on(Event.roundtripAdded, function(event, roundtrip) {
     $scope.roundtrips.push(roundtrip);
   });
 };
