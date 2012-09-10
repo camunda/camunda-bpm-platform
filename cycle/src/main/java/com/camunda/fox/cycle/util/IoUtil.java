@@ -18,10 +18,13 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import com.camunda.fox.cycle.exception.CycleException;
 
@@ -33,6 +36,16 @@ import com.camunda.fox.cycle.exception.CycleException;
  */
 public class IoUtil {
 
+  /**
+   * Controls if intermediate results are written to files.
+   */
+  public static boolean DEBUG;
+  
+  /**
+   * Directory, into which intermediate results are written.
+   */
+  public static String DEBUG_DIR;
+  
   private static final int BUFFERSIZE = 4096;
   
   public static byte[] readInputStream(InputStream inputStream, String inputStreamName) {
@@ -83,6 +96,30 @@ public class IoUtil {
       throw new CycleException("Couldn't write file " + filePath, e);
     } finally {
       IoUtil.closeSilently(outputStream);
+    }
+  }
+  
+  public static void writeStringToFileIfDebug(String content, String filename, String suffix) {
+    if (DEBUG) {
+      String filePath = "";
+      if (DEBUG_DIR != null && DEBUG_DIR.length() > 0) {
+        filePath = DEBUG_DIR + System.getProperty("file.separator");
+        File debugDirectory = new File(filePath);
+        if (!debugDirectory.exists()) {
+          if (!debugDirectory.mkdirs()) {
+            throw new RuntimeException("Unable to create debugDirectory: " + debugDirectory.getAbsolutePath());
+          }
+        }
+        filePath = filePath + filename + "." + new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss.SSS_").format(new Date()) + suffix;
+        try {
+          FileWriter writer = new FileWriter(filePath);
+          writer.write(content);
+          writer.flush();
+          writer.close();
+        } catch (IOException e) {
+          throw new RuntimeException("Unable to write debug file: " + filePath, e);
+        }
+      }
     }
   }
 

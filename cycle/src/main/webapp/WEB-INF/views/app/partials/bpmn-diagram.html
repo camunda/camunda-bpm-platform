@@ -4,14 +4,16 @@
     <div class="holder">
       <div class="diagram">
         <span class="name">{{diagram.label}}</span>
+        <img data-ng-src="{{imageUrl}}" />
       </div>
     </div>
   </div>
   <div class="bpmn-model thumbnail" ng-hide="diagram">
-    <h3>&nbsp;</h3>
+    <h3 data-ng-show="identifier == 'leftHandSide'" th:text="#{Your modeler}">Your modeler</h3>
+    <h3 data-ng-show="identifier == 'rightHandSide'">fox designer</h3>
     <div class="holder">
       <div class="diagram">
-        <span class="name"><a class="btn btn-primary btn-large" ng-click="addDiagram()" data-hint-title="Add a model" data-hint="You need two models for a Roundtrip, the right side is reserved for the fox designer (the engine model)" >Add Model</a></span>
+        <span class="name"><a class="btn btn-primary btn-large" ng-click="addDiagram()" data-hint-title="Add a process model" data-hint="You need two process models for a Roundtrip, the right side is reserved for the fox designer (the engine model)" >Add Process Model</a></span>
       </div>
     </div>
   </div>
@@ -69,9 +71,8 @@
               </div>
             </div>
             <div class="control-group">
-              <label class="control-label" for="tree" th:text="#{Select BPMN File}">Select BPMN File</label>
+              <label class="control-label" for="tree" th:text="#{'Select BPMN File'}">Select BPMN File</label>
               <div class="controls">
-                <p class="alert alert-info" ng-hide="selectedNode != undefined && selectedNode.type == 'FILE'" th:text="#{Select a bpmn file}"></p>
                 <div class="claro tree" data-selected="selectedNode" data-cycle-tree data-id="connectorTree" data-connector="connector">
                 </div>
               </div>

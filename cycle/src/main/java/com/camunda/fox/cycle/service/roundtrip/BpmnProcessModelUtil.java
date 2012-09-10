@@ -7,6 +7,8 @@ import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -25,7 +27,6 @@ import org.w3c.dom.NodeList;
 import com.camunda.fox.cycle.exception.CycleException;
 import com.camunda.fox.cycle.exception.RepositoryException;
 import com.camunda.fox.cycle.service.roundtrip.transform.XsltTransformer;
-import com.camunda.fox.cycle.util.ActivitiCompliantBpmn20Provider;
 import com.camunda.fox.cycle.util.IoUtil;
 import com.camunda.fox.cycle.util.XmlUtil;
 
@@ -44,6 +45,11 @@ public class BpmnProcessModelUtil {
   
   public static final String UTF_8 = "UTF-8";
   
+  private static final String MERGE_SOURCE_TECHNICAL_BPMN20_XML = "merge-source-technical.bpmn";
+  private static final String MERGE_SOURCE_BUSINESS_BPMN20_XML = "merge-source-business.bpmn";
+  private static final String MERGE_RESULT_BPMN20_XML = "merge-result.bpmn";
+  
+  private static final String BPMN_DI_NAMESPACE = "http://www.omg.org/spec/BPMN/20100524/DI";
   private static final String NAMESPACE_URI_BPMN_20 = "http://www.omg.org/spec/BPMN/20100524/MODEL";
   private static final String NAMESPACE_URI_BPMN_20_DI = "http://www.omg.org/spec/BPMN/20100524/DI";
   
@@ -58,7 +64,20 @@ public class BpmnProcessModelUtil {
   private static final String TARGET_REF = "targetRef";
   private static final String BPMN_PLANE = "BPMNPlane";
   
+  // XPATH expressions
+  private static final String ENGINE_PROCESS_DETECTION_EXPR = "//bpmn:process[count(//bpmn:process) = 1 or @isExecutable = 'true' or @name = '%s'][1]";
+  private static final String NAME_DETECTION_EXPR = "/@name";
+  private static final String ID_DETECTION_EXPR = "/@id";
+  private static final String ENGINE_POOL_DETECTION_EXPR = "//bpmn:participant[@processRef='%s' ]/@id";
+  private static final String PARTICIPANT_DETECTION_EXPR = "//bpmn:participant[@processRef='%s']";
+  private static final String X_COORD_BPMN_SHAPE_DETECTION_EXPR = "//bpmndi:BPMNShape[@bpmnElement='%s']/omgdc:Bounds/@x";
+  private static final String Y_COORD_BPMN_SHAPE_DETECTION_EXPR = "//bpmndi:BPMNShape[@bpmnElement='%s']/omgdc:Bounds/@y";
+  private static final String NAME_ATTR = "name";
+  private static final String IS_EXECUTABLE_ATTR = "isExecutable";
+  
   protected XsltTransformer transformer = XsltTransformer.instance();
+  
+  private static final Logger logger = Logger.getLogger(BpmnProcessModelUtil.class.getName());
   
   /**
    * Replaces the bpmn element IDs in a process model with developer friendly
@@ -133,19 +152,22 @@ public class BpmnProcessModelUtil {
    * Import the changes from a source bpmn process model to a target bpmn process model.
    */
   public String importChangesFromExecutableBpmnModel(String sourceModel, String targetModel) {
-    final String engineProcessDetectionExpression = "//bpmn:process[count(//bpmn:process) = 1 or @isExecutable = 'true' or @name = '%s'][1]";
+    logger.info("Starting to merge bpmn process models.");
     
-    String defaultEngineProcessExpression = String.format(engineProcessDetectionExpression, DEFAULT_ENGINEPOOL_NAME);
-    String engineProcessName = XmlUtil.getXPathResult(defaultEngineProcessExpression + "/@name", sourceModel);
-    String engineProcessId = XmlUtil.getXPathResult(defaultEngineProcessExpression + "/@id", sourceModel);
+    IoUtil.writeStringToFileIfDebug(sourceModel, "source_model", MERGE_SOURCE_TECHNICAL_BPMN20_XML);
+    IoUtil.writeStringToFileIfDebug(targetModel, "target_model", MERGE_SOURCE_BUSINESS_BPMN20_XML);
     
-    String engineProcessIdInBusinessModel = XmlUtil.getXPathResult(String.format(engineProcessDetectionExpression, engineProcessName)+"/@id", targetModel);
+    String defaultEngineProcessExpression = String.format(ENGINE_PROCESS_DETECTION_EXPR, DEFAULT_ENGINEPOOL_NAME);
+    String engineProcessName = XmlUtil.getXPathResult(defaultEngineProcessExpression + NAME_DETECTION_EXPR, sourceModel);
+    String engineProcessId = XmlUtil.getXPathResult(defaultEngineProcessExpression + ID_DETECTION_EXPR, sourceModel);
+    
+    String engineProcessIdInBusinessModel = XmlUtil.getXPathResult(String.format(ENGINE_PROCESS_DETECTION_EXPR, engineProcessName) + ID_DETECTION_EXPR, targetModel);
     
     if (engineProcessIdInBusinessModel == null || (engineProcessIdInBusinessModel != null && engineProcessIdInBusinessModel.isEmpty())){
-      throw new RuntimeException("Could not detect an engine pool. Please make sure that the 'isExecutable' attribute is set, or that the engine pool name matches in technical and business model.");
+      throw new CycleException("Could not detect an engine pool. Please make sure that the 'isExecutable' attribute is set, or that the engine pool name matches in technical and business model.");
     }
     
-    final String enginePoolDetectionExpression = String.format("//bpmn:participant[@processRef='%s' ]/@id", engineProcessIdInBusinessModel);
+    final String enginePoolDetectionExpression = String.format(ENGINE_POOL_DETECTION_EXPR, engineProcessIdInBusinessModel);
     String enginePoolIdInBusinessModel = XmlUtil.getXPathResult(enginePoolDetectionExpression, targetModel);
     
     // if id changed, replace in business model
@@ -159,10 +181,10 @@ public class BpmnProcessModelUtil {
     String offsetY = "0.0";
     
     try {
-      offsetX = "-"+ XmlUtil.getXPathResult(String.format("//bpmndi:BPMNShape[@bpmnElement='%s']/omgdc:Bounds/@x", enginePoolIdInBusinessModel), targetModel);
-      offsetY=  "-"+ XmlUtil.getXPathResult(String.format("//bpmndi:BPMNShape[@bpmnElement='%s']/omgdc:Bounds/@y", enginePoolIdInBusinessModel), targetModel);
+      offsetX = "-"+ XmlUtil.getXPathResult(String.format(X_COORD_BPMN_SHAPE_DETECTION_EXPR, enginePoolIdInBusinessModel), targetModel);
+      offsetY=  "-"+ XmlUtil.getXPathResult(String.format(Y_COORD_BPMN_SHAPE_DETECTION_EXPR, enginePoolIdInBusinessModel), targetModel);
     } catch (Exception e) {
-//      logger.log(Level.FINE, "Could not get offset for engine pool", e);
+      logger.log(Level.FINE, "Could not get offset for engine pool", e);
     }
     
     Document businessModel = null;
@@ -172,13 +194,13 @@ public class BpmnProcessModelUtil {
     
     // update participant name in business model
     try{
-      Element participant = (Element) XmlUtil.getSingleElementByXPath(businessModel, String.format("//bpmn:participant[@processRef='%s']",engineProcessId));
+      Element participant = (Element) XmlUtil.getSingleElementByXPath(businessModel, String.format(PARTICIPANT_DETECTION_EXPR,engineProcessId));
       if (participant != null) {
-        participant.setAttribute("name", engineProcessName);
+        participant.setAttribute(NAME_ATTR, engineProcessName);
       }
     }
     catch(Exception e){
-//      logger.log(Level.FINE, "Could not update participant name", e);
+      logger.log(Level.FINE, "Could not update participant name", e);
     }
 
     try { 
@@ -188,7 +210,7 @@ public class BpmnProcessModelUtil {
               .toString(UTF_8);
       technicalModel = this.getDocumentFromXmlString(techXml);
     } catch (Exception e) {
-      throw new RuntimeException("Error while parsing the technical model, which is to be imported.", e);
+      throw new CycleException("Error while parsing the technical model, which is to be imported.", e);
     }
     
     NodeList processes = businessModel.getElementsByTagNameNS(NAMESPACE_URI_BPMN_20, PROCESS);
@@ -200,14 +222,14 @@ public class BpmnProcessModelUtil {
       // locate engine pool => get id
       // this search could be avoided by fixing HEMERA-1057
       Element engineProcess = (Element) this.getElementById(businessModel, engineProcessId);
-      engineProcess.setAttribute("name", engineProcessName);
-      engineProcess.setAttribute("isExecutable", "true");
+      engineProcess.setAttribute(NAME_ATTR, engineProcessName);
+      engineProcess.setAttribute(IS_EXECUTABLE_ATTR, "true");
         
       // Reconnect Message Flows to Participant if their source or target FlowNode does no longer exist and loop over all Message Flows 
       try {
         redirectMessageFlows(businessModel, technicalModel, engineProcess);
       } catch(Exception e) {
-        throw new RepositoryException("Could not update messageflow references and diagram info", e);
+        throw new CycleException("Could not update messageflow references and diagram info", e);
       }
       
       // exchange process of engine pool and remove all children of engine pool process
@@ -215,7 +237,7 @@ public class BpmnProcessModelUtil {
       this.removeChildrenFromEngineProcess(childNodes);
 
       // remove DI Shapes and Edges that do not have model elements associated to them
-      ActivitiCompliantBpmn20Provider.removeBpmnDiElementsThatReferenceNonExistingBpmnElements(businessModel, engineProcessId);
+      this.removeBpmnDiElementsThatReferenceNonExistingBpmnElements(businessModel, engineProcessId);
         
       // add children of technical process to engine process
       List<String> skipped = addTechnicalChildrenToEngineProcess(businessModel, technicalModel, engineProcess, childNodes);
@@ -233,6 +255,10 @@ public class BpmnProcessModelUtil {
       // convert DOM Document to String  
       mergedBpmn20XmlContent = convertNodeToXmlString(businessModel);
     }
+    
+    IoUtil.writeStringToFileIfDebug(mergedBpmn20XmlContent, "result_model", MERGE_RESULT_BPMN20_XML);
+    
+    logger.info("Finishing to merge bpmn process models.");
     
     return mergedBpmn20XmlContent;
   }
@@ -253,7 +279,7 @@ public class BpmnProcessModelUtil {
               businessElem = (Element) getElementByAttribute(businessModel, "bpmn:"+refType, "name", techElem.getAttribute("name"));
             }
             catch (Exception e) {
-//              logger.log(Level.FINE, "Could not correlate message element, inserting element from tech. model");
+              logger.log(Level.FINE, "Could not correlate message element, inserting element from tech. model");
             }
           }
           
@@ -271,7 +297,6 @@ public class BpmnProcessModelUtil {
         }
       }
     }
-    
   }
   
   private void addTechnicalDIToBusiness(Document businessModel, Document technicalModel, List<String> skipped) {
@@ -318,7 +343,7 @@ public class BpmnProcessModelUtil {
         } else if (childNodeId != null) {
           skipped.add(childNodeId);
           String warning = String.format("Element with ID %s already exists in business model, skipping import of this element", childNodeId);
-//          logger.log(Level.WARNING, warning);
+          logger.log(Level.WARNING, warning);
         }
       }
     }
@@ -483,6 +508,50 @@ public class BpmnProcessModelUtil {
     } catch (Exception e) {
       throw new RepositoryException("Error while parsing the xml into document '" , e);
     }
+  }
+  
+  /**
+   * removes bpmndi-shapes which reference elements which are not present in the
+   * bpmn-model
+   * <p />
+   * bit hacky...
+   *
+   * @author daniel.meyer@camunda.com
+   * @author Falko Menge
+   */
+  private void removeBpmnDiElementsThatReferenceNonExistingBpmnElements(Document document, String engineProcessId) {
+    List<Element> elementsToRemove = findBpmnDiElementsThatReferenceNonExistingBpmnElements(document, "BPMNShape", engineProcessId);
+    elementsToRemove.addAll(findBpmnDiElementsThatReferenceNonExistingBpmnElements(document, "BPMNEdge", engineProcessId));
+
+    for (Element element : elementsToRemove) {
+      element.getParentNode().removeChild(element);
+    }
+  }
+
+  private static List<Element> findBpmnDiElementsThatReferenceNonExistingBpmnElements(Document document, String localName, String engineProcessId) {
+    List<Element> elementsToRemove = new ArrayList<Element>();
+    NodeList bpmnShapes = document.getElementsByTagNameNS(BPMN_DI_NAMESPACE, localName);
+    for (int i = 0; i < bpmnShapes.getLength(); i++) {
+      Element currentShape = (Element) bpmnShapes.item(i);
+      String referencedElementId = currentShape.getAttribute("bpmnElement");
+
+      String xPathIdResult = XmlUtil.getXPathResult(String.format("count(//*[@id=\"%s\" and namespace-uri() != '" + BPMN_DI_NAMESPACE + "'])",referencedElementId), document);
+      
+      if (engineProcessId != null){
+        Boolean removeEnginePoolRef = new Boolean(XmlUtil.getXPathResult(String.format("boolean(//bpmn:participant[@id='%s' and @processRef='%s'])" ,referencedElementId, engineProcessId), document));
+        
+        if (removeEnginePoolRef){
+          elementsToRemove.add(currentShape);
+        }
+      }
+
+      int idCount = new Integer(xPathIdResult);
+
+      if (idCount == 0) {
+        elementsToRemove.add(currentShape);
+      }
+    }
+    return elementsToRemove;
   }
   
   

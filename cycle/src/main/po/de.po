@@ -1,6 +1,6 @@
 #: ../webapp/WEB-INF/views/app/index.html:13
 msgid "My Roundtrips"
-msgstr "Meine Rundreisen"
+msgstr ""
 
 #: ../webapp/WEB-INF/views/app/index.html:19
 msgid "Actions"
@@ -50,7 +50,7 @@ msgstr ""
 #: ../webapp/WEB-INF/views/error/invalid-login-data.html:16
 #: ../webapp/WEB-INF/views/login.html:12
 msgid "User Name"
-msgstr "Nutzer"
+msgstr ""
 
 #: ../webapp/WEB-INF/views/error/invalid-login-data.html:20
 #: ../webapp/WEB-INF/views/login.html:16
@@ -68,7 +68,7 @@ msgstr ""
 
 #: ../webapp/WEB-INF/views/fragment/common.html:58
 msgid "Profile"
-msgstr "Profil"
+msgstr ""
 
 #: ../webapp/WEB-INF/views/fragment/common.html:60
 msgid "Sign Out"

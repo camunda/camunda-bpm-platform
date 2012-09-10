@@ -11,9 +11,7 @@
     <div class="span2">
       <div class="sync-options">
         <div class="actions">
-          <button class="btn btn-large" ng-show="!roundtrip.rightHandSide && roundtrip.leftHandSide">create &rarr;</button>
-          <button class="btn btn-large" 
-                  ng-hide="!roundtrip.rightHandSide && roundtrip.leftHandSide" 
+          <button class="btn btn-large sync-btn"
                   ng-disabled="!(roundtrip.rightHandSide && roundtrip.leftHandSide)"
                   ng-click="openSyncDialog('LEFT_TO_RIGHT')">sync &rarr;</button>
         </div>
@@ -26,7 +24,7 @@
           </span>
         </div>
         <div class="actions">
-          <button class="btn btn-large"
+          <button class="btn btn-large sync-btn"
                   ng-disabled="!(roundtrip.rightHandSide && roundtrip.leftHandSide)"
                   ng-click="openSyncDialog('RIGHT_TO_LEFT')">&larr; sync</button>
         </div>
@@ -49,8 +47,8 @@
         <div ng-switch on="status">
           <div ng-switch-when="beforeStart">
           	<p>
-              <span ng-show="syncMode == 'LEFT_TO_RIGHT'" th:text="#{The synchronization will perform from left to right.}"></span>
-              <span ng-hide="syncMode == 'LEFT_TO_RIGHT'" th:text="#{The synchronization will perform from right to left.}"></span>
+              <span ng-show="syncMode == 'LEFT_TO_RIGHT'" th:text="#{The synchronization will perform from left to right and the model at the right hand side will be overwritten.}"></span>
+              <span ng-hide="syncMode == 'LEFT_TO_RIGHT'" th:text="#{The synchronization will perform from right to left and the model at the left hand side will be merged with changes from the left hand side model.}"></span>
             </p>
             <p>
               <span th:text="#{'Are you sure to synchronize the models?'}" />

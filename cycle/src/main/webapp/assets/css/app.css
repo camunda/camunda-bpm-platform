@@ -14,13 +14,21 @@ html, body {
   min-height: 100%;
 }
 
-body > .container-fluid.breadcrumbs {
+.breadcrumbs {
   margin-top: 60px;
 }
 
+/**
+ * sidenav tweak
+ */
+div.sidebar-nav > ul.nav.nav-list > li.nav-header {
+  font-size: 13px;
+  padding: 3px 0px;
+}
+
 .footer {
-  padding: 70px 0;
-  margin-top: 70px;
+  padding: 20px 0;
+  margin-top: 20px;
   border-top: 1px solid #E5E5E5;
   background-color: whiteSmoke;
   
@@ -119,8 +127,13 @@ input.ng-invalid-required {
 }
 
 .bpmn-model .diagram {
-  line-height: 300px;
-  height: 300px;
+  line-height: 100px;
+  min-height: 300px;
+  overflow: auto;
+}
+
+.bpmn-model .diagram .name {
+  display: block;
 }
 
 .bpmn-model .actions {
@@ -135,6 +148,16 @@ input.ng-invalid-required {
 
 .sync-options .actions {
   line-height: 140px;
+}
+
+.sync-btn {
+  font-weight: bold;
+  width: 100%;
+  padding-right: 0;
+  padding-left: 0;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
 }
 
 /**
@@ -180,3 +203,11 @@ input.ng-invalid-required {
   border-radius: 0px;
   background-color: #fff;
 }
+
+.combobox-container input,.typeahead.dropdown-menu, span#modelerName {
+  width: 233px;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+}
+

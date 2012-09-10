@@ -91,7 +91,9 @@ public class AbstractRepository<T extends AbstractEntity> {
   }
   
   /**
-   * Delete all entities 
+   * Delete all entities
+   * BEWARE: It doesn't trigger cascade or removeOrphan functionality for the deleted entites, 
+   *         because it is an JQL statement, not an @{link EntityManager} method. 
    * 
    * @return 
    */

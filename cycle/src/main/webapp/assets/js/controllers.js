@@ -97,7 +97,18 @@ function SyncRoundtripController($scope, $http, App) {
 /**
  * Works along with the bpmn-diagram directive to manage a single bpmn-diagram in the roundtrip view.
  */
-function BpmnDiagramController($scope, $http, App) {
+function BpmnDiagramController($scope, App) {
+  $scope.getImageUrl = function (diagram, update) {
+    if (diagram) {
+      var uri = App.uri("secured/resource/connector/")+diagram.connectorId+"/content/PNG?nodeId="+diagram.diagramPath;
+      if (update) {
+        uri +="&updated="+new Date().getTime();
+      }
+      return uri;
+    }
+    return "";
+  };
+  
   $scope.editDiagramDialog = new Dialog();
   
   $scope.addDiagram = function() {
@@ -116,25 +127,22 @@ function BpmnDiagramController($scope, $http, App) {
     });
   };
   
-//  $scope.isDiagramInSync = function(diagram) {
-//	  $http.get(App.uri('secured/resource/diagram/' + diagram.id)).
-//	  success(function(data) {
-//		  $scope.syncStatus = data;
-//	  });
-//  };
-//  
-//  $scope.$watch("diagram", function(newDiagramValue) {
-//	  if(newDiagramValue != undefined) {
-//		  $scope.isDiagramInSync(newDiagramValue);
-//	  }
-//  });
+  $scope.$watch("diagram", function (newDiagramValue) {
+    if (newDiagramValue != undefined) {
+      $scope.imageUrl = $scope.getImageUrl(newDiagramValue);
+    }
+  });
+  
+  $scope.$on("roundtrip-changed", function(event, roundtrip) {
+    $scope.imageUrl = $scope.getImageUrl($scope.diagram, true);;
+  });
   
 }
 
 /**
  * Realizes the edit operation of a bpmn diagram inside the respective dialog.
  */
-function EditDiagramController($scope, $http, App, Commons) {
+function EditDiagramController($scope,Commons) {
   
   var FOX_DESIGNER = "fox designer", 
       RIGHT_HAND_SIDE = "rightHandSide";
@@ -199,9 +207,17 @@ function EditDiagramController($scope, $http, App, Commons) {
   // 
   // get required data
   Commons.getModelerNames().then(function(data) {
+    // filter out FOX_DESIGNER
+    for (var i = data.length-1; i >= 0; i--) {
+      if (angular.equals(data[i], FOX_DESIGNER)) {
+        data.splice(i, 1);
+        break;
+      }
+    }
+
     $scope.modelerNames = data;
-    // set default value, when only one entry
-    if (data.length == 1 && canEditModeler()) {
+    // set default value
+    if (data.length > 0 && canEditModeler()) {
       $scope.editDiagram.modeler = data[0];
     }
   });

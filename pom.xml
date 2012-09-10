@@ -14,6 +14,7 @@
     <version.resteasy>2.3.4.Final</version.resteasy>
     <version.h2>1.3.160</version.h2>
     <version.saxon>9.1.0.8</version.saxon>
+    <version.wro4j>1.4.8.1</version.wro4j>
 
     <!-- properties -->
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

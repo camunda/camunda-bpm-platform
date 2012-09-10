@@ -26,24 +26,4 @@ public class ViewService extends AbstractRestService {
     return "app/" + name;
   }
 
-  
-  // TODO: Rewrite change language via filter?
-  //  private void changeLanguage(String language) {
-  //    String[] localeSplit = getLangTag(request, language).split("-", 2);
-  //    return templateEngine.process(name, getTemplateContext(variables, new Locale(localeSplit[0], localeSplit[1]))); 
-  //    }
-  //  }	
-  //	private String getLangTag(HttpServletRequest request, String override) {
-  //		String langTag = null;
-  //		if (override != null) {
-  //			langTag = override;
-  //		}else {
-  //			try {
-  //				langTag = request.getHeader("Accept-Language").split(";")[0].split(",")[0];
-  //			}catch(Exception e) {
-  //				langTag = "de-DE";
-  //			}
-  //		}
-  //		return langTag;
-  //	}
 }

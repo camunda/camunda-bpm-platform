@@ -18,21 +18,30 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.ClientConnectionManager;
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.entity.mime.content.StringBody;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
+import org.apache.http.params.HttpParams;
 import org.apache.http.util.EntityUtils;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.codehaus.plexus.util.IOUtil;
+import org.jboss.resteasy.client.ClientRequest;
 import org.jboss.resteasy.client.ClientRequestFactory;
 import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.client.core.BaseClientResponse;
@@ -52,11 +61,11 @@ import com.camunda.fox.cycle.exception.RepositoryException;
 import com.camunda.fox.cycle.util.IoUtil;
 
 @Component
+@Path("signavio")
 public class SignavioConnector extends Connector {
 
   public final static String CONFIG_KEY_SIGNAVIO_BASE_URL = "signavioBaseUrl";
   
-  private static Logger log = Logger.getLogger(SignavioConnector.class.getName());
   private static final String WARNING_SNIPPET = "<div id=\"warning\">([^<]+)</div>";
   
   // JSON properties/objects
@@ -84,11 +93,14 @@ public class SignavioConnector extends Connector {
   private static final String BPMN2_0_FILE_PROP = "bpmn2_0file";
 
   private static final String UTF_8 = "UTF-8";
+
+  private static Logger logger = Logger.getLogger(SignavioConnector.class.getName());
   
   private SignavioClient signavioClient;
   private boolean loggedIn = false;
 
   private ApacheHttpClient4Executor httpClient4Executor;
+  private String securityToken;
 
   @Override
   public void login(String username, String password) {
@@ -104,6 +116,12 @@ public class SignavioConnector extends Connector {
       String errorMessage = matcher.group(1);
       throw new RepositoryException(errorMessage);
     }
+    
+    if (responseResult.matches("[a-f0-9]{32}")) {
+      this.securityToken = responseResult;
+      logger.fine("SecurityToken: " + this.securityToken);
+    }
+    
     this.loggedIn = true;
   }
   
@@ -125,7 +143,12 @@ public class SignavioConnector extends Connector {
         signavioURL = signavioURL + SLASH_CHAR + REPOSITORY_BACKEND_URL_SUFFIX;
       }
       
-      httpClient4Executor = new ApacheHttpClient4Executor();
+      // Use Thread safe connection manager, prevents abortion of ctx.proceed in interceptor if multiple requests are done at once
+      DefaultHttpClient client = new DefaultHttpClient();
+      ClientConnectionManager mgr = client.getConnectionManager();
+      HttpParams params = client.getParams();
+      client = new DefaultHttpClient(new ThreadSafeClientConnManager(mgr.getSchemeRegistry()), params);
+      httpClient4Executor = new ApacheHttpClient4Executor(client);
       
       ClientRequestFactory factory = null;
       try {
@@ -138,13 +161,20 @@ public class SignavioConnector extends Connector {
         @SuppressWarnings("rawtypes")
         @Override
         public ClientResponse execute(ClientExecutionContext ctx) throws Exception {
-          // TODO: Logging
-//          ClientRequest request = ctx.getRequest();
+          String uri = "";
+          ClientRequest request = ctx.getRequest();
+          uri = request.getUri().toString();
+          logger.fine("Sending request to " + uri);
+          logger.fine("Request: " + request.getHeaders()+ "," + request.getBody());
+          if (SignavioConnector.this.securityToken != null) {
+            request.header("x-signavio-id", SignavioConnector.this.securityToken);
+          }
+          
           ClientResponse<?> response =  ctx.proceed();
+          logger.fine("Received response from " + uri + " with status " + response.getStatus());
           return response;
         }
       });
-      
       this.signavioClient = factory.createProxy(SignavioClient.class, signavioURL);
     }
   }
@@ -167,6 +197,9 @@ public class SignavioConnector extends Connector {
         } else if (relProp.equals(JSON_MOD_VALUE)) {
           newNode = this.createModelNode(jsonObj);
           nodes.add(newNode);
+        }
+        if (newNode != null) {
+          newNode.setConnectorId(getConfiguration().getId());  
         }
       }
     } catch (Exception e) {
@@ -227,8 +260,25 @@ public class SignavioConnector extends Connector {
 
   @Secured
   @Override
-  public InputStream getContent(ConnectorNode node) {
-    return this.signavioClient.getContent(node.getId());
+  public InputStream getContent(ConnectorNode node, ConnectorContentType type) {
+    switch (type) {
+    case PNG:
+      return this.signavioClient.getPngContent(node.getId());
+
+    default:
+      return this.signavioClient.getContent(node.getId());
+    }
+  }
+  
+  @GET
+  @Produces("image/png")
+  @Path("/model/{modelId}/png")
+  public Response getSvgXml(@PathParam("modelId") String modelId) {
+    this.init(getConfiguration());
+    if (this.needsLogin()) {
+      this.login(getConfiguration().getGlobalUser(), getConfiguration().getGlobalPassword());
+    }
+    return Response.ok(this.signavioClient.getPngContent("/"+modelId)).build();
   }
   
   private void releaseClientConnection(Response response) {
@@ -340,8 +390,8 @@ public class SignavioConnector extends Connector {
     
     // check if something went wrong on Signavio side
     if (postResponse.getStatusLine().getStatusCode() >= 400) {
-      log.severe("Import of BPMN XML failed in Signavio.");
-      log.severe("Error response from server: " + EntityUtils.toString(postResponse.getEntity(), "UTF-8"));
+      logger.severe("Import of BPMN XML failed in Signavio.");
+      logger.severe("Error response from server: " + EntityUtils.toString(postResponse.getEntity(), "UTF-8"));
       throw new RepositoryException("BPMN XML could not be imported: " + content);
     }
 
