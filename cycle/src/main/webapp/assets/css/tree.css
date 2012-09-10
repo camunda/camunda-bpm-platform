@@ -92,14 +92,14 @@
   padding: 3px 0 1px;
   margin: 0;
   border: solid 1px #888;
-  color: #000000;
+  color: #ffffff;
 }
 .claro .dijitTreeRowHover {
   background-color: #D9564B;
   padding: 3px 0 1px;
   margin: 0;
   border: solid 1px #888;
-  color: #000000;
+  color: #ffffff;
   -webkit-transition-duration: 0.25s;
   -moz-transition-duration: 0.25s;
   transition-duration: 0.25s;
@@ -110,7 +110,7 @@
   padding: 3px 0 1px;
   margin-left: 0;
   border: solid 1px #888;
-  color: #000000;
+  color: #ffffff;
 }
 .dj_ie6 .claro .dijitTreeRow {
   background-image: none;
