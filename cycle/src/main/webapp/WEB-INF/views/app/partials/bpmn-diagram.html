@@ -19,6 +19,22 @@
       </div>
     </div>
   </div>
+  <div>
+   <div data-ng-switch data-on="diagram.status">
+    <div data-ng-switch-when="UNSPECIFIED"> 
+     <span class="badge"></span>
+     unknown sync status
+    </div>
+    <div data-ng-switch-when="SYNCED">
+  	 <span class="badge badge-success"></span>
+	 no changes since last sync
+	</div>
+	<div data-ng-switch-when="OUT_OF_SYNC">
+	 <span class="badge badge-important"></span>
+	 BPMN 2.0 XML changed since last sync, {{roundtrip.lastSync | date:'yyyy-MM-dd @ HH:mm:ss'}}
+	</div>	
+   </div>
+  </div>
   
   <!-- begin add-model-roundtrip-dialog -->
   <dialog model="editDiagramDialog" ng-cloak>

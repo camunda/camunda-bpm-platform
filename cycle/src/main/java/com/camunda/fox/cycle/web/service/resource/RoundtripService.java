@@ -27,6 +27,7 @@ import com.camunda.fox.cycle.exception.CycleException;
 import com.camunda.fox.cycle.repository.RoundtripRepository;
 import com.camunda.fox.cycle.service.roundtrip.BpmnProcessModelUtil;
 import com.camunda.fox.cycle.util.IoUtil;
+import com.camunda.fox.cycle.web.dto.BpmnDiagramDTO;
 import com.camunda.fox.cycle.web.dto.RoundtripDTO;
 import com.camunda.fox.cycle.web.service.AbstractRestService;
 
@@ -105,8 +106,23 @@ public class RoundtripService extends AbstractRestService {
   @Path("{id}/details")
   public RoundtripDTO getDetails(@PathParam("id") long id) {
     Roundtrip roundtrip = getRoundtripRepository().findById(id);
+    
+    RoundtripDTO roundtripDTO = new RoundtripDTO(roundtrip);
+    
+    if (roundtrip.getLeftHandSide() != null) {
+      roundtripDTO.setLeftHandSide(bpmnDiagramController.isDiagramInSync(BpmnDiagramDTO.wrap(roundtrip.getLeftHandSide()), roundtrip));
+    } else {
+      roundtripDTO.setLeftHandSide(null);
+    }
+    
+    if (roundtrip.getRightHandSide() != null) {
+      roundtripDTO.setRightHandSide(bpmnDiagramController.isDiagramInSync(BpmnDiagramDTO.wrap(roundtrip.getRightHandSide()), roundtrip));
+    } else {
+      roundtripDTO.setRightHandSide(null);
+    }
+    
     // TODO: Fetch eager
-    return new RoundtripDTO(roundtrip, roundtrip.getLeftHandSide(), roundtrip.getRightHandSide());
+    return roundtripDTO;
   }
   
   @POST
@@ -121,14 +137,16 @@ public class RoundtripService extends AbstractRestService {
     }
     
     if (data.getLeftHandSide() != null) {
-      BpmnDiagram leftHandSide = bpmnDiagramController.createOrUpdate(data.getLeftHandSide());
+      BpmnDiagramDTO leftHandSideDTO = bpmnDiagramController.isDiagramInSync(data.getLeftHandSide(), roundtrip);
+      BpmnDiagram leftHandSide = bpmnDiagramController.createOrUpdate(leftHandSideDTO);
       roundtrip.setLeftHandSide(leftHandSide);
     } else {
       roundtrip.setLeftHandSide(null);
     }
     
     if (data.getRightHandSide() != null) {
-      BpmnDiagram rightHandSide = bpmnDiagramController.createOrUpdate(data.getRightHandSide());
+      BpmnDiagramDTO rightHandSideDTO = bpmnDiagramController.isDiagramInSync(data.getRightHandSide(), roundtrip);
+      BpmnDiagram rightHandSide = bpmnDiagramController.createOrUpdate(rightHandSideDTO);
       roundtrip.setRightHandSide(rightHandSide);
     } else {
       roundtrip.setRightHandSide(null);
@@ -156,7 +174,7 @@ public class RoundtripService extends AbstractRestService {
     Connector leftHandSideConnector = this.connectorRegistry.getSessionConnectorMap().get(leftHandSide.getConnectorId());
     ConnectorNode leftHandSideModelNode = new ConnectorNode(leftHandSide.getDiagramPath(), leftHandSide.getLabel());
     leftHandSideModelNode.setType(ConnectorNodeType.FILE);
-    InputStream leftHandSideModelContent =leftHandSideConnector.getContent(leftHandSideModelNode);
+    InputStream leftHandSideModelContent = leftHandSideConnector.getContent(leftHandSideModelNode);
     
     BpmnDiagram rightHandSide = roundtrip.getRightHandSide();
     
@@ -169,11 +187,15 @@ public class RoundtripService extends AbstractRestService {
       
       switch (syncMode) {
         case LEFT_TO_RIGHT:
+          IoUtil.closeSilently(rightHandSideModelContent);
           rightHandSideConnector.updateContent(rightHandSideModelNode,  this.bpmnProcessModelUtil.extractExecutablePool(leftHandSideModelContent));
+          IoUtil.closeSilently(leftHandSideModelContent);
           break;
           
         case RIGHT_TO_LEFT:
           String result = this.bpmnProcessModelUtil.importChangesFromExecutableBpmnModel(IOUtil.toString(rightHandSideModelContent, "UTF-8"), IOUtil.toString(leftHandSideModelContent, "UTF-8"));
+          IoUtil.closeSilently(leftHandSideModelContent);
+          IoUtil.closeSilently(rightHandSideModelContent);
           InputStream resultStream = IOUtils.toInputStream(result, "UTF-8");
           leftHandSideConnector.updateContent(leftHandSideModelNode, resultStream);
           IoUtil.closeSilently(resultStream);
@@ -183,15 +205,19 @@ public class RoundtripService extends AbstractRestService {
       roundtrip.setLastSync(new Date());
       roundtrip.setLastSyncMode(syncMode);
       
+      
     } catch (Exception e) {
       throw new CycleException(e);
     }
-    finally {
-      IoUtil.closeSilently(leftHandSideModelContent);
-      IoUtil.closeSilently(rightHandSideModelContent);
-    }
     
-    return new RoundtripDTO(roundtrip, roundtrip.getLeftHandSide(), roundtrip.getRightHandSide());
+    BpmnDiagramDTO leftHandSideDTO = bpmnDiagramController.isDiagramInSync(BpmnDiagramDTO.wrap(roundtrip.getLeftHandSide()), roundtrip);
+    BpmnDiagramDTO rightHandSideDTO = bpmnDiagramController.isDiagramInSync(BpmnDiagramDTO.wrap(roundtrip.getRightHandSide()), roundtrip);
+    
+    RoundtripDTO roundtripDTO = new RoundtripDTO(roundtrip);
+    roundtripDTO.setLeftHandSide(leftHandSideDTO);
+    roundtripDTO.setRightHandSide(rightHandSideDTO);
+    
+    return roundtripDTO;
   }
   
   /**

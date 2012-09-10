@@ -110,6 +110,26 @@ public class VfsConnector extends Connector {
     }
   }
   
+  @Secured
+  @Override
+  public Date getLastModifiedDate(ConnectorNode node) {
+    try {
+      FileSystemManager fsManager = VFS.getManager();
+      FileObject fileObject;
+      
+      fileObject = fsManager.resolveFile(basePath + node.getId());
+
+      if (fileObject.getType() != FileType.FILE) {
+        throw new CycleException("Cannot get content of non-file node");
+      }
+      
+      return new Date(fileObject.getContent().getLastModifiedTime());
+      
+    } catch (FileSystemException e) {
+      throw new CycleException(e);
+    }
+  }
+  
   @Override
   public void init(ConnectorConfiguration config) {
     basePath = config.getProperties().get(BASE_PATH_KEY);
