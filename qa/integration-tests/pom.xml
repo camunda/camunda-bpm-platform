@@ -310,6 +310,13 @@
         <was_remoteServerSoapPort>${WAS8_REMOTE_SERVER_SOAP_PORT}</was_remoteServerSoapPort>
       </properties>
       <dependencies>    
+      
+        <dependency>
+          <groupId>com.camunda.fox.platform</groupId>
+          <artifactId>fox-platform-qa-websphere-runtime</artifactId>
+          <version>${project.version}</version>
+          <type>pom</type>
+        </dependency>
         
         <dependency>
           <groupId>org.jboss.arquillian.container</groupId>
@@ -387,7 +394,7 @@
                <!--  <excludes>**/TestFoxPlatformClientAsEjbModule**</excludes> -->
               </excludes>
             </configuration>
-          </plugin>
+          </plugin>         
         </plugins>      
         <testResources>
           <testResource>
