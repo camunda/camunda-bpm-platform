@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>fox-platform-qa</artifactId>
@@ -11,35 +12,45 @@
     <version>6.2.0-SNAPSHOT</version>
     <relativePath>../parent</relativePath>
   </parent>
-  
+
   <properties>
     <jboss.runtime.location>../jboss7-runtime/target/jboss-as-${version.jboss.as}/</jboss.runtime.location>
     <jboss.runtime.port-offset>11019</jboss.runtime.port-offset>
     <jboss.runtime.management-port>21018</jboss.runtime.management-port>
   </properties>
-  
-	<modules>
-		<module>jboss7-runtime</module>
-		<module>integration-tests</module>
-		<module>tasklist-gui-tests</module>
-		<module>test-process-application</module>
-		<module>test-deployer</module>
-		<module>cockpit-tests</module>
-	</modules>
-	
-	<profiles>
-		<profile>
-			<id>glassfish</id>
-			<modules>
-				<module>gf31-runtime</module>
-			</modules>
-		</profile>
-		<profile>
-			<id>full</id>	
-			<modules>
-				<module>activiti-testsuite</module>
-				<module>gf31-runtime</module>
-			</modules>
-		</profile>	
-	</profiles>
+
+  <profiles>
+    <profile>
+      <id>was</id>
+      <modules>
+        <module>websphere-runtime</module>
+        <module>integration-tests</module>
+      </modules>
+    </profile>
+    <profile>
+      <id>glassfish</id>
+      <modules>
+        <module>gf31-runtime</module>
+        <module>integration-tests</module>
+        <module>tasklist-gui-tests</module>
+        <module>test-process-application</module>
+        <module>test-deployer</module>
+        <module>cockpit-tests</module>
+      </modules>
+    </profile>
+    <profile>
+      <id>jboss</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <modules>
+        <module>jboss7-runtime</module>
+        <module>integration-tests</module>
+        <module>tasklist-gui-tests</module>
+        <module>test-process-application</module>
+        <module>test-deployer</module>
+        <module>cockpit-tests</module>
+      </modules>
+    </profile>    
+  </profiles>
 </project>
