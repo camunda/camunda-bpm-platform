@@ -6,7 +6,7 @@ import java.util.List;
 
 import com.camunda.fox.cycle.entity.BpmnDiagram;
 import com.camunda.fox.cycle.entity.Roundtrip;
-import com.camunda.fox.cycle.web.service.resource.RoundtripService.SyncMode;
+import com.camunda.fox.cycle.entity.Roundtrip.SyncMode;
 
 /**
  * This is a data object which exposes a {@link Roundtrip} to the client via rest.

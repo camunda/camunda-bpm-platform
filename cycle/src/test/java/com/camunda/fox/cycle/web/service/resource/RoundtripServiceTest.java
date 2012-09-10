@@ -27,11 +27,11 @@ import com.camunda.fox.cycle.api.connector.ConnectorNode.ConnectorNodeType;
 import com.camunda.fox.cycle.connector.ConnectorRegistry;
 import com.camunda.fox.cycle.connector.VfsConnector;
 import com.camunda.fox.cycle.entity.Roundtrip;
+import com.camunda.fox.cycle.entity.Roundtrip.SyncMode;
 import com.camunda.fox.cycle.repository.RoundtripRepository;
 import com.camunda.fox.cycle.util.IoUtil;
 import com.camunda.fox.cycle.web.dto.BpmnDiagramDTO;
 import com.camunda.fox.cycle.web.dto.RoundtripDTO;
-import com.camunda.fox.cycle.web.service.resource.RoundtripService.SyncMode;
 
 /**
  *

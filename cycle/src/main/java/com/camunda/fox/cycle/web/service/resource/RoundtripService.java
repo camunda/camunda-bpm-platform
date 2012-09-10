@@ -23,6 +23,7 @@ import com.camunda.fox.cycle.api.connector.ConnectorNode.ConnectorNodeType;
 import com.camunda.fox.cycle.connector.ConnectorRegistry;
 import com.camunda.fox.cycle.entity.BpmnDiagram;
 import com.camunda.fox.cycle.entity.Roundtrip;
+import com.camunda.fox.cycle.entity.Roundtrip.SyncMode;
 import com.camunda.fox.cycle.exception.CycleException;
 import com.camunda.fox.cycle.repository.RoundtripRepository;
 import com.camunda.fox.cycle.service.roundtrip.BpmnProcessModelUtil;
@@ -42,11 +43,6 @@ import com.camunda.fox.cycle.web.service.AbstractRestService;
  */
 @Path("secured/resource/roundtrip")
 public class RoundtripService extends AbstractRestService {
-  
-  public enum SyncMode {
-    LEFT_TO_RIGHT,
-    RIGHT_TO_LEFT
-  }
   
 	@Inject
 	private RoundtripRepository roundtripRepository;
