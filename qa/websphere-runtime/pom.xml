@@ -83,8 +83,13 @@
             <phase>package</phase>
             <configuration>
               <target>
+              
                 <!-- stop the server -->
-                <exec executable="${was_profile}/bin/stopServer.bat" failonerror="false" failifexecutionfails="false">
+                <exec executable="${was_profile}/bin/stopServer.bat" os="windows" failonerror="false" failifexecutionfails="false">
+                  <arg value="server1" />
+                </exec>
+                
+                <exec executable="${was_profile}/bin/stopServer.sh" os="unix" failonerror="false" failifexecutionfails="false">
                   <arg value="server1" />
                 </exec>
 
@@ -109,7 +114,10 @@
                 </copy>
 
                 <!-- start the server -->
-                <exec executable="${was_profile}/bin/startServer.bat">
+                <exec executable="${was_profile}/bin/startServer.bat" os="windows">
+                  <arg value="server1" />
+                </exec>
+                <exec executable="${was_profile}/bin/startServer.sh" os="unix">
                   <arg value="server1" />
                 </exec>
               </target>
