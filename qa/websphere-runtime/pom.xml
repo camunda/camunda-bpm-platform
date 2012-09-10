@@ -85,11 +85,11 @@
               <target>
               
                 <!-- stop the server -->
-                <exec executable="${was_profile}/bin/stopServer.bat" os="windows" failonerror="false" failifexecutionfails="false">
+                <exec executable="${was_profile}/bin/stopServer.bat" osfamily="windows" failonerror="false" failifexecutionfails="false">
                   <arg value="server1" />
                 </exec>
                 
-                <exec executable="${was_profile}/bin/stopServer.sh" os="unix" failonerror="false" failifexecutionfails="false">
+                <exec executable="${was_profile}/bin/stopServer.sh" osfamily="unix" failonerror="false" failifexecutionfails="false">
                   <arg value="server1" />
                 </exec>
 
@@ -114,10 +114,10 @@
                 </copy>
 
                 <!-- start the server -->
-                <exec executable="${was_profile}/bin/startServer.bat" os="windows">
+                <exec executable="${was_profile}/bin/startServer.bat" osfamily="windows">
                   <arg value="server1" />
                 </exec>
-                <exec executable="${was_profile}/bin/startServer.sh" os="unix">
+                <exec executable="${was_profile}/bin/startServer.sh" osfamily="unix">
                   <arg value="server1" />
                 </exec>
               </target>
