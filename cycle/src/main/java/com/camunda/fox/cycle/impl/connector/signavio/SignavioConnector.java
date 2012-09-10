@@ -77,6 +77,7 @@ public class SignavioConnector extends Connector {
   private static final String JSON_PARENT_PROP = "parent";
   private static final String JSON_PARENT_NAME_PROP = "parentName";
   private static final String JSON_TYPE_PROP = "type";
+  private static final String JSON_UPDATED_PROP = "updated";
   // JSON values
   private static final String JSON_DIR_VALUE = "dir";
   private static final String JSON_MOD_VALUE = "mod";
@@ -493,5 +494,23 @@ public class SignavioConnector extends Connector {
   public ConnectorNode createNode(String id, String label, ConnectorNodeType type) {
     throw new UnsupportedOperationException();
   }
+
+  @Override
+  public Date getLastModifiedDate(ConnectorNode node) {
+    try {
+      String info = this.signavioClient.getInfo(MODEL_URL_SUFFIX, node.getId());
+      JSONObject jsonObj = new JSONObject(info);
+      String updated = jsonObj.getString(JSON_UPDATED_PROP);
+      if (updated != null) {
+        SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss Z");
+        Date lastModifiedDate = dateFormatter.parse(updated);
+        return lastModifiedDate;
+      }
+    } catch (Exception e) {
+      throw new RepositoryException("The last modified date of node '" + node.getLabel() + "' could not be determined.", e);
+    }  
+    
+    return null;
+ }
 
 }
