@@ -56,6 +56,10 @@ angular
       },
       getConnectors: function() {
         return HttpUtils.makePromise($http.get(App.uri("secured/resource/connector/list")));
+      },
+      isImageAvailable : function (connectorId, nodeId) {
+        var uri = "secured/resource/connector/"+connectorId+"/content/PNG/available"+"?nodeId="+escape(nodeId);
+        return HttpUtils.makePromise($http.get(App.uri(uri)));
       }
     };
   })

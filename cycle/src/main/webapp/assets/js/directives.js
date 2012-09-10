@@ -209,7 +209,7 @@ angular
     link: function(scope, element, attrs) {
       scope.identifier = attrs.identifier;
     }
-  }
+  };
 })
 .directive("hint", function(App) {
   return {

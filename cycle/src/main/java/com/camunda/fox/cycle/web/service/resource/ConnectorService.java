@@ -78,5 +78,11 @@ public class ConnectorService {
             .build();
   }
   
+  @GET
+  @Path("{id}/content/{type}/available")
+  public boolean isContentAvailable(@PathParam("id") Long connectorId, @QueryParam("nodeId") String nodeId, @PathParam("type") ConnectorContentType type) {
+    Connector connector = connectorRegistry.getSessionConnectorMap().get(connectorId);
+    return connector.isContentAvailable(new ConnectorNode(nodeId), type);
+  }
   
 }

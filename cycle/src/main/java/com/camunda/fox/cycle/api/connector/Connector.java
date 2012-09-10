@@ -35,6 +35,18 @@ public abstract class Connector {
     return Arrays.asList(types);
   }
   
+  /**
+   * Method to check if a specific content type is currently available in the connector,
+   * default assumption is that all supported content types are always available
+   * 
+   * @param node to check content availabilty for
+   * @param type content type
+   * @return true if content type is currently available for this node, false otherwise
+   */
+  public boolean isContentAvailable(ConnectorNode node, ConnectorContentType type) {
+    return true;
+  }
+  
   public abstract InputStream getContent(ConnectorNode node, ConnectorContentType type); 
   
   public abstract ConnectorNode createNode(String id, String label, ConnectorNodeType type);

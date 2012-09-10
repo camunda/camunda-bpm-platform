@@ -242,6 +242,24 @@ public class VfsConnector extends Connector {
     }
   }
   
+  @Override
+  public boolean isContentAvailable(ConnectorNode node, ConnectorContentType type) {
+    try {
+      FileSystemManager fsManager = VFS.getManager();
+      
+      switch (type) {
+      case PNG:
+        return fsManager.resolveFile(basePath + getPngFileName(node.getId())).exists();
+      case DEFAULT:
+        return fsManager.resolveFile(basePath + node.getId()).exists();
+      default:
+        throw new RuntimeException("Unsupported Node Type");
+      }
+    }catch (FileSystemException e) {
+      throw new CycleException(e);
+    }
+  }
+  
   private String getPngFileName(String nodeId) {
     int pointIndex = nodeId.lastIndexOf(".");
     return nodeId.substring(0, pointIndex)+".png";
