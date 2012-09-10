@@ -41,6 +41,7 @@ import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.codehaus.plexus.util.IOUtil;
+import org.jboss.resteasy.client.ClientRequest;
 import org.jboss.resteasy.client.ClientRequestFactory;
 import org.jboss.resteasy.client.ClientResponse;
 import org.jboss.resteasy.client.core.BaseClientResponse;
@@ -99,6 +100,7 @@ public class SignavioConnector extends Connector {
   private boolean loggedIn = false;
 
   private ApacheHttpClient4Executor httpClient4Executor;
+  private String securityToken;
 
   @Override
   public void login(String username, String password) {
@@ -114,6 +116,12 @@ public class SignavioConnector extends Connector {
       String errorMessage = matcher.group(1);
       throw new RepositoryException(errorMessage);
     }
+    
+    if (responseResult.matches("[a-f0-9]{32}")) {
+      this.securityToken = responseResult;
+      logger.fine("SecurityToken: " + this.securityToken);
+    }
+    
     this.loggedIn = true;
   }
   
@@ -154,11 +162,16 @@ public class SignavioConnector extends Connector {
         @Override
         public ClientResponse execute(ClientExecutionContext ctx) throws Exception {
           String uri = "";
-            uri = ctx.getRequest().getUri().toString();
-            logger.fine("Sending request to " + uri);
-            logger.fine("Request: " + ctx.getRequest().getHeaders()+ "," + ctx.getRequest().getBody());
+          ClientRequest request = ctx.getRequest();
+          uri = request.getUri().toString();
+          logger.fine("Sending request to " + uri);
+          logger.fine("Request: " + request.getHeaders()+ "," + request.getBody());
+          if (SignavioConnector.this.securityToken != null) {
+            request.header("x-signavio-id", SignavioConnector.this.securityToken);
+          }
+          
           ClientResponse<?> response =  ctx.proceed();
-            logger.fine("Received response from " + uri + " with status " + response.getStatus());
+          logger.fine("Received response from " + uri + " with status " + response.getStatus());
           return response;
         }
       });
