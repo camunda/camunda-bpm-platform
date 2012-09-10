@@ -111,12 +111,9 @@ public class BpmnDiagramService {
     Connector diagramConnector = this.connectorRegistry.getSessionConnectorMap().get(bpmnDiagramDTO.getConnectorId());
     ConnectorNode connectorNode = new ConnectorNode(bpmnDiagramDTO.getDiagramPath(), bpmnDiagramDTO.getLabel());
     
-    if (diagramConnector instanceof VfsConnector) {
-      lastModifiedDate = diagramConnector.getLastModifiedDate(connectorNode);
-    } else if (diagramConnector instanceof SignavioConnector) {
-      lastModifiedDate = diagramConnector.getLastModifiedDate(connectorNode);
-    }
-
+    lastModifiedDate = diagramConnector.getLastModifiedDate(connectorNode);
+    bpmnDiagramDTO.setLastModified(lastModifiedDate);
+    
     if (lastModifiedDate != null && roundtrip.getLastSync() != null) {
   
         if (lastModifiedDate.getTime() <= roundtrip.getLastSync().getTime()) {

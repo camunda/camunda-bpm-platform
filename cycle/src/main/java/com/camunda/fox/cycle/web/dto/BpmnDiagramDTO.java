@@ -1,5 +1,7 @@
 package com.camunda.fox.cycle.web.dto;
 
+import java.util.Date;
+
 import com.camunda.fox.cycle.entity.BpmnDiagram;
 import com.camunda.fox.cycle.entity.BpmnDiagram.Status;
 
@@ -15,6 +17,7 @@ public class BpmnDiagramDTO {
   private String diagramPath;
   private Long connectorId;
   private String label;
+  private Date lastModified;
 
   private Status status;
   
@@ -84,5 +87,13 @@ public class BpmnDiagramDTO {
 
   public void setLabel(String label) {
     this.label = label;
+  }
+
+  public Date getLastModified() {
+    return lastModified;
+  }
+
+  public void setLastModified(Date lastModified) {
+    this.lastModified = lastModified;
   }
 }

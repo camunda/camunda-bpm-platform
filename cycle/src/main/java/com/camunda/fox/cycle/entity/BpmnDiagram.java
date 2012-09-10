@@ -1,5 +1,7 @@
 package com.camunda.fox.cycle.entity;
 
+import java.util.Date;
+
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
@@ -31,6 +33,8 @@ public class BpmnDiagram extends AbstractEntity {
   private Long connectorId;
   
   private String label;
+  
+  private Date lastModified;
   
   public BpmnDiagram() { }
   
@@ -78,5 +82,13 @@ public class BpmnDiagram extends AbstractEntity {
 
   public void setLabel(String label) {
     this.label = label;
+  }
+
+  public Date getLastModified() {
+    return lastModified;
+  }
+
+  public void setLastModified(Date lastModified) {
+    this.lastModified = lastModified;
   }
 }

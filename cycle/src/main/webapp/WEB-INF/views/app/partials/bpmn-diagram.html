@@ -19,22 +19,11 @@
       </div>
     </div>
   </div>
-  <div>
-   <div data-ng-switch data-on="diagram.status">
-    <div data-ng-switch-when="UNSPECIFIED"> 
-     <span class="badge"></span>
-     unknown sync status
-    </div>
-    <div data-ng-switch-when="SYNCED">
-  	 <span class="badge badge-success"></span>
-	 no changes since last sync
-	</div>
-	<div data-ng-switch-when="OUT_OF_SYNC">
-	 <span class="badge badge-important"></span>
-	 BPMN 2.0 XML changed since last sync, {{roundtrip.lastSync | date:'yyyy-MM-dd @ HH:mm:ss'}}
-	</div>	
+   <div data-ng-switch data-on="diagram.status" style="display:inline">
+     <span class="badge" data-ng-switch-when="UNSPECIFIED">unknown sync status</span>
+  	 <span class="badge badge-success" data-ng-switch-when="SYNCED">no changes since last sync</span>
+	 <span class="badge badge-important" data-ng-switch-when="OUT_OF_SYNC">changed since last sync, last modified : {{diagram.lastModified | date:'yyyy-MM-dd, HH:mm:ss'}}</span>
    </div>
-  </div>
   
   <!-- begin add-model-roundtrip-dialog -->
   <dialog model="editDiagramDialog" ng-cloak>
@@ -59,7 +48,7 @@
               <div class="controls">
                 <!-- display a combobox on leftside, otherwise a disabled input field -->
                 <select ngm-if="canEditModeler()" id="modelerName" name="modelerName" required autofocus ng-model="editDiagram.modeler" ng-combobox values="modelerNames"
-                  ng-options="modeler for modeler in modelerNames" th:attr="placeholder=#{Enter the name of your modeler}">
+                  ng-options="modeler for modeler in modelerNames" th:attr="data-placeholder=#{Enter the name of your modeler}">
                   <option value=""></option>
                 </select>
                 <span ngm-if="!canEditModeler()" id="modelerName" name="modelerName" required class="uneditable-input" type="text">{{editDiagram.modeler}}</span>

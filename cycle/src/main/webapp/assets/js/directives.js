@@ -137,7 +137,7 @@ angular
         }
         // init new combobox
         elm.combobox({
-          template: '<div class="combobox-container"><input type="text" autocomplete="off" class="dropdown-toggle" /><span class="" data-dropdown="dropdown"></span></div>'
+          template: '<div class="combobox-container"><input type="text" autocomplete="off" class="dropdown-toggle" '+ attrs.placeholder+ '/><span class="" data-dropdown="dropdown"></span></div>'
         });
       });
 
