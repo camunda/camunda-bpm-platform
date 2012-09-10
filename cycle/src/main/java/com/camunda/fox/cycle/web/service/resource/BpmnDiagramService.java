@@ -1,5 +1,6 @@
 package com.camunda.fox.cycle.web.service.resource;
 
+import java.util.Date;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -12,7 +13,12 @@ import javax.ws.rs.core.MediaType;
 
 import org.springframework.transaction.annotation.Transactional;
 
+import com.camunda.fox.cycle.api.connector.Connector;
+import com.camunda.fox.cycle.api.connector.ConnectorNode;
+import com.camunda.fox.cycle.connector.ConnectorRegistry;
 import com.camunda.fox.cycle.entity.BpmnDiagram;
+import com.camunda.fox.cycle.entity.BpmnDiagram.Status;
+import com.camunda.fox.cycle.entity.Roundtrip;
 import com.camunda.fox.cycle.repository.BpmnDiagramRepository;
 import com.camunda.fox.cycle.web.dto.BpmnDiagramDTO;
 
@@ -25,6 +31,9 @@ public class BpmnDiagramService {
 
   @Inject
   private BpmnDiagramRepository bpmnDiagramRepository;
+  
+  @Inject
+  private ConnectorRegistry connectorRegistry;
   
 //  @GET
 //  public List<BpmnDiagramDTO> list() {
@@ -61,6 +70,7 @@ public class BpmnDiagramService {
     
     if (data.getId() == null) {
       diagram = new BpmnDiagram();
+      diagram.setStatus(Status.UNSPECIFIED);
     } else {
       diagram = bpmnDiagramRepository.findById(data.getId());
       if (diagram == null) {
@@ -91,5 +101,29 @@ public class BpmnDiagramService {
   @Path("modelerNames")
   public List<String> getModelerNames() {
     return bpmnDiagramRepository.findAllModelerNames();
+  }
+  
+  public BpmnDiagramDTO isDiagramInSync(BpmnDiagramDTO bpmnDiagramDTO, Roundtrip roundtrip) {
+    Connector diagramConnector = this.connectorRegistry.getSessionConnectorMap().get(bpmnDiagramDTO.getConnectorId());
+    ConnectorNode connectorNode = new ConnectorNode(bpmnDiagramDTO.getDiagramPath(), bpmnDiagramDTO.getLabel());
+    Date lastModifiedDate = diagramConnector.getLastModifiedDate(connectorNode);
+    
+    if (lastModifiedDate != null && roundtrip.getLastSync() != null) {
+      if (diagramConnector.getConfiguration().getLabel().equals("VFS Connector")) {
+  
+        if (lastModifiedDate.before(roundtrip.getLastSync()) || lastModifiedDate.equals(roundtrip.getLastSync())) {
+          bpmnDiagramDTO.setStatus(Status.SYNCED);
+        }
+  
+        if (lastModifiedDate.after(roundtrip.getLastSync())) {
+          bpmnDiagramDTO.setStatus(Status.OUT_OF_SYNC);
+        }
+      }
+    
+    } else {
+      bpmnDiagramDTO.setStatus(Status.UNSPECIFIED);
+    }
+    
+    return bpmnDiagramDTO;
   }
 }

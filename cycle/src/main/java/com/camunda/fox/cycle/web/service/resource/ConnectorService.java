@@ -55,7 +55,7 @@ public class ConnectorService {
   @POST
   @Path("{id}/tree/content")
   @Produces("application/xml")
-  public String content(@PathParam("connectorId") Long connectorId, @FormParam("nodeId") String nodeId) {
+  public String content(@PathParam("id") Long connectorId, @FormParam("nodeId") String nodeId) {
     Connector connector = connectorRegistry.getSessionConnectorMap().get(connectorId);
     try {
       return new java.util.Scanner(connector.getContent(new ConnectorNode(nodeId))).useDelimiter("\\A").next();

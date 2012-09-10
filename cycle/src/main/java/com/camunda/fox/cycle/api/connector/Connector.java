@@ -1,6 +1,7 @@
 package com.camunda.fox.cycle.api.connector;
 
 import java.io.InputStream;
+import java.util.Date;
 import java.util.List;
 
 import com.camunda.fox.cycle.api.connector.ConnectorNode.ConnectorNodeType;
@@ -17,6 +18,8 @@ public abstract class Connector {
   public abstract ConnectorNode getNode(String id);
   
   public abstract InputStream getContent(ConnectorNode node);
+  
+  public abstract Date getLastModifiedDate(ConnectorNode node);
   
   public abstract ConnectorNode createNode(String id, String label, ConnectorNodeType type);
   
