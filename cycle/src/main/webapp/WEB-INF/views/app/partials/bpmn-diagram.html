@@ -3,11 +3,13 @@
     <h3>{{diagram.modeler}}</h3>
     <div class="holder">
       <div class="diagram">
-        <span class="name">{{diagram.label}}</span>
-        <img data-ng-src="{{imageUrl}}" />
+        <span class="name" data-ng-hide="imageAvailable == 'true'">{{diagram.label}}</span>
+        <img alt="{{diagram.label}}" data-ng-show="imageAvailable == 'true'" data-ng-src="{{imageUrl}}" />
       </div>
     </div>
   </div>
+  <span class="label" data-ng-show="imageAvailable == 'true'">{{diagram.label}}</span>
+  
   <div class="bpmn-model thumbnail" ng-hide="diagram">
     <h3 data-ng-show="identifier == 'leftHandSide'" th:text="#{Your modeler}">Your modeler</h3>
     <h3 data-ng-show="identifier == 'rightHandSide'">fox designer</h3>

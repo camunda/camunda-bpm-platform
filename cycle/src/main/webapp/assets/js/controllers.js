@@ -97,10 +97,12 @@ function SyncRoundtripController($scope, $http, App) {
 /**
  * Works along with the bpmn-diagram directive to manage a single bpmn-diagram in the roundtrip view.
  */
-function BpmnDiagramController($scope, App) {
+function BpmnDiagramController($scope, App, Commons) {
+  $scope.imageAvailable = false;
+  
   $scope.getImageUrl = function (diagram, update) {
     if (diagram) {
-      var uri = App.uri("secured/resource/connector/")+diagram.connectorId+"/content/PNG?nodeId="+diagram.diagramPath;
+      var uri = App.uri("secured/resource/connector/")+diagram.connectorId+"/content/PNG?nodeId="+escape(diagram.diagramPath);
       if (update) {
         uri +="&updated="+new Date().getTime();
       }
@@ -130,6 +132,7 @@ function BpmnDiagramController($scope, App) {
   $scope.$watch("diagram", function (newDiagramValue) {
     if (newDiagramValue != undefined) {
       $scope.imageUrl = $scope.getImageUrl(newDiagramValue);
+      $scope.checkImageAvailable();
     }
   });
   
@@ -137,6 +140,13 @@ function BpmnDiagramController($scope, App) {
     $scope.imageUrl = $scope.getImageUrl($scope.diagram, true);;
   });
   
+  $scope.checkImageAvailable = function () {
+    if ($scope.diagram) {
+      Commons.isImageAvailable($scope.diagram.connectorId, $scope.diagram.diagramPath).then(function (data) {
+        $scope.imageAvailable = data;
+      });
+    }
+  }
 }
 
 /**
@@ -221,6 +231,7 @@ function EditDiagramController($scope,Commons) {
       $scope.editDiagram.modeler = data[0];
     }
   });
+  
   $scope.connectors = Commons.getConnectors();
 }
 
