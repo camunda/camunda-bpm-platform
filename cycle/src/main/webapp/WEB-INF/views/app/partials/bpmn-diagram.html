@@ -9,8 +9,8 @@
     </div>
   </div>
   <div class="bpmn-model thumbnail" ng-hide="diagram">
-    <h3 data-ng-show="identifier == 'rightHandSide'">{{FOX_DESIGNER}}</h3>
-    <h3 data-ng-show="identifier == 'leftHandSide'">Your modeler</h3>
+    <h3 data-ng-show="identifier == RIGHT_HAND_SIDE">{{FOX_DESIGNER}}</h3>
+    <h3 data-ng-show="identifier !== RIGHT_HAND_SIDE">Your modeler</h3>
     <div class="holder">
       <div class="diagram">
         <span class="name"><a class="btn btn-primary btn-large" ng-click="addDiagram()" data-hint-title="Add a process model" data-hint="You need two process models for a Roundtrip, the right side is reserved for the fox designer (the engine model)" >Add Process Model</a></span>
