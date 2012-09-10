@@ -10,6 +10,8 @@ import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
+import com.camunda.fox.cycle.web.service.resource.RoundtripService.SyncMode;
+
 /**
  * Represents a roundtrip 
  * 
@@ -26,6 +28,8 @@ public class Roundtrip extends AbstractEntity {
 	
   @Temporal(TemporalType.TIMESTAMP)
   private Date lastSync;
+  
+  private SyncMode lastSyncMode;
   
   @OneToOne(cascade=CascadeType.ALL, orphanRemoval=true)
   private BpmnDiagram leftHandSide;
@@ -79,5 +83,13 @@ public class Roundtrip extends AbstractEntity {
 	@Override
 	public String toString() {
 		return "Roundtrip[id=" + getId() + ", name=" + name + "]";
+  }
+
+  public SyncMode getLastSyncMode() {
+    return lastSyncMode;
+  }
+
+  public void setLastSyncMode(SyncMode lastSyncMode) {
+    this.lastSyncMode = lastSyncMode;
   }
 }

@@ -60,6 +60,16 @@ angular
       isImageAvailable : function (connectorId, nodeId) {
         var uri = "secured/resource/connector/"+connectorId+"/content/PNG/available"+"?nodeId="+escape(nodeId);
         return HttpUtils.makePromise($http.get(App.uri(uri)));
+      },
+      getImageUrl : function (diagram, update) {
+        if (diagram) {
+          var uri = App.uri("secured/resource/connector/")+diagram.connectorId+"/content/PNG?nodeId="+escape(diagram.diagramPath);
+          if (update) {
+            uri +="&updated="+new Date().getTime();
+          }
+          return uri;
+        }
+        return "";
       }
     };
   })

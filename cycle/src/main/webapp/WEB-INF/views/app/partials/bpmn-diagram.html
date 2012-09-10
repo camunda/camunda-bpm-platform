@@ -4,7 +4,7 @@
     <div class="holder">
       <div class="diagram">
         <span class="name" data-ng-hide="imageAvailable == 'true'">{{diagram.label}}</span>
-        <img alt="{{diagram.label}}" data-ng-show="imageAvailable == 'true'" data-ng-src="{{imageUrl}}" />
+        <img alt="{{diagram.label}}" data-ng-show="imageAvailable == 'true'" data-ng-src="{{imageUrl}}" data-ng-click="showImage(identifier)" />
       </div>
     </div>
   </div>

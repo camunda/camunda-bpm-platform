@@ -181,6 +181,7 @@ public class RoundtripService extends AbstractRestService {
       }
       
       roundtrip.setLastSync(new Date());
+      roundtrip.setLastSyncMode(syncMode);
       
     } catch (Exception e) {
       throw new CycleException(e);

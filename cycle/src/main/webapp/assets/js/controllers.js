@@ -50,7 +50,9 @@ function HomeController($scope) {
   $scope.$emit("navigation-changed");
 }
 
-function RoundtripDetailsController($scope, $routeParams, RoundtripDetails) {
+function RoundtripDetailsController($scope, $routeParams, RoundtripDetails, Commons) {
+  $scope.currentPicture = 'leftHandSide';
+  
   $scope.syncDialog = new Dialog();
   $scope.syncDialog.setAutoClosable(false);
   
@@ -70,6 +72,31 @@ function RoundtripDetailsController($scope, $routeParams, RoundtripDetails) {
     $scope.roundtrip = roundtrip;
   });
   
+  $scope.$on("model-image-clicked", function(event, side) {
+    $scope.setCurrentPicture(side);
+    
+    $('.leftHandSide').removeClass("active");
+    $('.rightHandSide').removeClass("active");
+    
+    $('.'+side).addClass("active");
+    
+    $('#pictureModal').modal('show');
+  });
+  
+  $scope.imageUrl = function (side) {
+    switch(side) {
+    case "leftHandSide":
+      return Commons.getImageUrl($scope.roundtrip.leftHandSide);
+    case "rightHandSide":
+      return Commons.getImageUrl($scope.roundtrip.rightHandSide);
+    default:
+      return "";
+    }
+  };
+  
+  $scope.setCurrentPicture = function (picture) {
+    $scope.currentPicture = picture;
+  };
 };
 
 function SyncRoundtripController($scope, $http, App) {
@@ -100,17 +127,6 @@ function SyncRoundtripController($scope, $http, App) {
 function BpmnDiagramController($scope, App, Commons) {
   $scope.imageAvailable = false;
   
-  $scope.getImageUrl = function (diagram, update) {
-    if (diagram) {
-      var uri = App.uri("secured/resource/connector/")+diagram.connectorId+"/content/PNG?nodeId="+escape(diagram.diagramPath);
-      if (update) {
-        uri +="&updated="+new Date().getTime();
-      }
-      return uri;
-    }
-    return "";
-  };
-  
   $scope.editDiagramDialog = new Dialog();
   
   $scope.addDiagram = function() {
@@ -129,15 +145,19 @@ function BpmnDiagramController($scope, App, Commons) {
     });
   };
   
+  $scope.showImage = function(side) {
+    $scope.$emit("model-image-clicked", side);
+  };
+  
   $scope.$watch("diagram", function (newDiagramValue) {
     if (newDiagramValue != undefined) {
-      $scope.imageUrl = $scope.getImageUrl(newDiagramValue);
+      $scope.imageUrl = Commons.getImageUrl(newDiagramValue);
       $scope.checkImageAvailable();
     }
   });
   
   $scope.$on("roundtrip-changed", function(event, roundtrip) {
-    $scope.imageUrl = $scope.getImageUrl($scope.diagram, true);;
+    $scope.imageUrl = Commons.getImageUrl($scope.diagram, true);;
   });
   
   $scope.checkImageAvailable = function () {
