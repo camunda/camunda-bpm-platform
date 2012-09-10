@@ -171,6 +171,7 @@ public class RoundtripService extends AbstractRestService {
         case LEFT_TO_RIGHT:
           IoUtil.closeSilently(rightHandSideModelContent);
           rightHandSideConnector.updateContent(rightHandSideModelNode,  this.bpmnProcessModelUtil.extractExecutablePool(leftHandSideModelContent));
+          IoUtil.closeSilently(leftHandSideModelContent);
           break;
           
         case RIGHT_TO_LEFT:
