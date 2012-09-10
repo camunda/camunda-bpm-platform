@@ -142,7 +142,7 @@ function BpmnDiagramController($scope, App) {
 /**
  * Realizes the edit operation of a bpmn diagram inside the respective dialog.
  */
-function EditDiagramController($scope, $http, App, Commons) {
+function EditDiagramController($scope,Commons) {
   
   var FOX_DESIGNER = "fox designer", 
       RIGHT_HAND_SIDE = "rightHandSide";
