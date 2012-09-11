@@ -5,7 +5,7 @@ xgettext --copyright-holder='camunda services GmbH' --package-name='camunda fox 
 
 # replace some placeholders
 sed -i '1 s/SOME DESCRIPTIVE TITLE/This is the LANGUAGE translation of camunda fox cycle Webapp/' ../po/keys.pot
-sed -i '2 s/YEAR/2011/' ../po/keys.pot
+sed -i '2 s/YEAR/2012/' ../po/keys.pot
 sed -i '3 s/PACKAGE/camunda fox cycle Webapp/' ../po/keys.pot
 
 # fix Java source file locations
@@ -15,7 +15,7 @@ sed -i '3 s/PACKAGE/camunda fox cycle Webapp/' ../po/keys.pot
 echo >> ../po/keys.pot
 
 # extract gettext strings from JSF templates
-grep "#{\(.*\)}" --recursive --exclude-dir=.svn --include='*.html' --only-matching --with-filename --line-number ../ | sed "s/\(.*\)\:#{\(.*\)}/#: \1\nmsgid \"\2\"\nmsgstr \"\"\n/" >> ../po/keys.pot
+grep "#{\([^{]*\)}" --recursive --exclude-dir=.svn --include='*.html' --only-matching --with-filename --line-number ../ | sed "s/\(.*\)\:#{\([^{]*\)}/#: \1\nmsgid \"\2\"\nmsgstr \"\"\n/" >> ../po/keys.pot
 
 # unify duplicate translations in message catalog
 msguniq --sort-by-file --output-file=../po/keys.pot ../po/keys.pot

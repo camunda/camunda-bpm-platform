@@ -82,8 +82,8 @@
         <button class="btn" ng-click="cancel()" th:text="#{Cancel}"
                 ng-disabled="status == 'performSynchronize'"
                 ng-hide="status == 'synchronizationFailed' || status == 'synchronizationSuccess'">Cancel</button>
-        <button href="#" class="btn btn-primary" ng-click="cancel()" th:text="#{Okay}"
-                ng-show="status == 'synchronizationFailed' || status == 'synchronizationSuccess'">Okay</button>
+        <button href="#" class="btn btn-primary" ng-click="cancel()" th:text="#{OK}"
+                ng-show="status == 'synchronizationFailed' || status == 'synchronizationSuccess'">OK</button>
         <button href="#" class="btn btn-primary" ng-click="performSync()" th:text="#{Synchronize}"
                 ng-disabled="status == 'performSynchronize'"
                 ng-hide="status == 'synchronizationFailed' || status == 'synchronizationSuccess'">Synchronize</button>
