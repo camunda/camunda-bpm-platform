@@ -104,7 +104,7 @@ angular
     return function(promise) {
       
       var blockTime = setTimeout(function() {
-        $.blockUI({ message: '<h1>Loading...</h1>' });
+        $.blockUI({ message: '<h1>...</h1>'});
       }, 1300);
       
       return promise.then(function (response, arg1, arg2)  {
