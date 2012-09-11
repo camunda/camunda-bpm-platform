@@ -1,9 +1,9 @@
-<div ng-cloak>
+<div data-ng-cloak>
   <div class="page-header">
     <h1>{{roundtrip.name}}</h1>
   </div>
 
-  <div class="row-fluid">
+  <div class="row-fluid" data-ng-hide="roundtrip.id == undefined">
     <div class="span5">
       <bpmn-diagram roundtrip="roundtrip" diagram="roundtrip.leftHandSide" identifier="leftHandSide" />
     </div>

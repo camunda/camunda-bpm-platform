@@ -77,6 +77,15 @@ angular
       }
     };
   })
+  .service('Error', function () {
+    return {
+      errors : [],
+      addError: function (error) {
+        this.errors.push(error);
+        $('.errorPanel').removeClass("hide");
+      }
+    };
+  })
   .service('HttpUtils', function($q) {
     return {
       makePromise: function(http) {
@@ -91,15 +100,20 @@ angular
       }
     };
   })
-  .factory('cycleHttpInterceptor', function($q, App) {
+  .factory('cycleHttpInterceptor', function($q, Error) {
     return function(promise) {
-      console.log("promise", promise);
+      
+      var blockTime = setTimeout(function() {
+        $.blockUI({ message: '<h1>...</h1>'});
+      }, 1300);
+      
       return promise.then(function (response, arg1, arg2)  {
+        clearTimeout(blockTime);
+        $.unblockUI();
         return promise;
       }, function (response)  {
         console.log("error", response);
-        alert("There was an error, try refreshing this page.");
-        //window.location = App.uri("login");
+        Error.addError(response);
         return $q.reject(response);
       });
     };
