@@ -129,6 +129,7 @@ angular
       roundtripChanged : "roundtrip-changed",
       modelImageClicked : "model-image-clicked",
       componentError : "component-error",
+      selectedConnectorChanged : "selected-connector-changed" ,
       destroy : "$destroy", // angular own event which is fired when current scope is destroyed
       ngChange : "change" // jquery + angularjs event
     };

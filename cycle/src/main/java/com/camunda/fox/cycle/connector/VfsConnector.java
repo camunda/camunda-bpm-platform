@@ -89,9 +89,11 @@ public class VfsConnector extends Connector {
       FileSystemManager fsManager = VFS.getManager();
       
       FileObject fileObject = fsManager.resolveFile(basePath + node.getId());
-
+      
       if (fileObject.getType() != FileType.FILE) {
-        throw new CycleException("Cannot get content of non-file node");
+        //throw new CycleException("Cannot get content of non-file node");
+        logger.log(Level.WARNING, "Cannot get content of non-file node");
+        return null;
       }
       
       switch(type) {
@@ -119,9 +121,11 @@ public class VfsConnector extends Connector {
       FileObject fileObject;
       
       fileObject = fsManager.resolveFile(basePath + node.getId());
-
+      
       if (fileObject.getType() != FileType.FILE) {
-        throw new CycleException("Cannot get content of non-file node");
+        //throw new CycleException("Cannot get content of non-file node");
+        logger.log(Level.WARNING, "Cannot get content of non-file node");
+        return null;
       }
       
       return new Date(fileObject.getContent().getLastModifiedTime());

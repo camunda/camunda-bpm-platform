@@ -135,6 +135,7 @@ function SyncRoundtripController($scope, $http, App, Event) {
  */
 function BpmnDiagramController($scope, App, Commons, Event) {
   $scope.imageAvailable = false;
+  $scope.contentAvailable = false;
   
   $scope.editDiagramDialog = new Dialog();
   
@@ -162,6 +163,7 @@ function BpmnDiagramController($scope, App, Commons, Event) {
     if (newDiagramValue != undefined) {
       $scope.imageUrl = Commons.getImageUrl(newDiagramValue);
       $scope.checkImageAvailable();
+      $scope.checkContentAvailable();
     }
   });
   
@@ -176,6 +178,15 @@ function BpmnDiagramController($scope, App, Commons, Event) {
       });
     }
   };
+  
+  $scope.checkContentAvailable = function () {
+    if ($scope.diagram) {
+     Commons.isContentAvailable($scope.diagram.connectorId, $scope.diagram.diagramPath).then(function (data) {
+      $scope.contentAvailable = data.available;
+     });
+   }
+  };
+
 }
 
 /**
@@ -185,6 +196,9 @@ function EditDiagramController($scope,Commons,Event) {
   
   var FOX_DESIGNER = "fox designer", 
       RIGHT_HAND_SIDE = "rightHandSide";
+  
+  // Error to be displayed in dialog
+  $scope.error = null;
 
   // Can the modeler name be edited?
   var canEditModeler = $scope.canEditModeler = function() {
@@ -219,7 +233,15 @@ function EditDiagramController($scope,Commons,Event) {
   // Watch for component error  
   $scope.$on(Event.componentError, function(event, error) {
     $scope.error = error;
+    $scope.$apply();
   });
+  
+  $scope.$on(Event.selectedConnectorChanged, function(event) {
+    if ($scope.error) {
+      $scope.error = false;
+    }
+    $scope.selectedNode = false;
+  });  
   
   // Watch for change in diagram path
   $scope.$watch('selectedNode', function(newValue) {
@@ -239,9 +261,6 @@ function EditDiagramController($scope,Commons,Event) {
   if (!canEditModeler()) {
     $scope.editDiagram.modeler = FOX_DESIGNER;
   }
-  
-  // Error to be displayed in dialog
-  $scope.error = null;
   
   // TODO: nico.rehwaldt: On update: How to initially display the right folder structure?
   // 
