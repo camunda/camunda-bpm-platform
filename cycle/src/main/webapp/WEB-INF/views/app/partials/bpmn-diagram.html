@@ -35,11 +35,10 @@
       <div class="modal-body">
         <div class="alert alert-error" ng-show="error">
           <button type="button" class="close" data-dismiss="alert">&times;</button>
-          <span ng-switch ng-switch-on="error.component"> <strong
-            ng-switch-when="tree"
-            th:text="#{A problem occured when updating the tree}"></strong> <strong
-            ng-switch-default th:text="#{A problem occured}"></strong>
-          </span> {{error.message}}
+          <span>
+            <strong th:text="#{A problem occured:}"></strong>
+            {{error.message}}
+          </span>
         </div>
         <form class="form-horizontal" novalidate ng-submit="save()" name="addModelForm">
           <fieldset>
