@@ -112,6 +112,6 @@ angular
       modelImageClicked : "model-image-clicked",
       componentError : "component-error",
       destroy : "$destroy", // angular own event which is fired when current scope is destroyed
-      change : "change" // jquery + angularjs event
+      ngChange : "change" // jquery + angularjs event
     };
   });

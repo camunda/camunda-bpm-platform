@@ -106,13 +106,13 @@ public class RoundtripService extends AbstractRestService {
     RoundtripDTO roundtripDTO = new RoundtripDTO(roundtrip);
     
     if (roundtrip.getLeftHandSide() != null) {
-      roundtripDTO.setLeftHandSide(bpmnDiagramController.isDiagramInSync(BpmnDiagramDTO.wrap(roundtrip.getLeftHandSide()), roundtrip));
+      roundtripDTO.setLeftHandSide(bpmnDiagramController.isDiagramInSync(BpmnDiagramDTO.wrap(roundtrip.getLeftHandSide())));
     } else {
       roundtripDTO.setLeftHandSide(null);
     }
     
     if (roundtrip.getRightHandSide() != null) {
-      roundtripDTO.setRightHandSide(bpmnDiagramController.isDiagramInSync(BpmnDiagramDTO.wrap(roundtrip.getRightHandSide()), roundtrip));
+      roundtripDTO.setRightHandSide(bpmnDiagramController.isDiagramInSync(BpmnDiagramDTO.wrap(roundtrip.getRightHandSide())));
     } else {
       roundtripDTO.setRightHandSide(null);
     }
@@ -133,7 +133,7 @@ public class RoundtripService extends AbstractRestService {
     }
     
     if (data.getLeftHandSide() != null) {
-      BpmnDiagramDTO leftHandSideDTO = bpmnDiagramController.isDiagramInSync(data.getLeftHandSide(), roundtrip);
+      BpmnDiagramDTO leftHandSideDTO = bpmnDiagramController.isDiagramInSync(data.getLeftHandSide());
       BpmnDiagram leftHandSide = bpmnDiagramController.createOrUpdate(leftHandSideDTO);
       roundtrip.setLeftHandSide(leftHandSide);
     } else {
@@ -141,7 +141,7 @@ public class RoundtripService extends AbstractRestService {
     }
     
     if (data.getRightHandSide() != null) {
-      BpmnDiagramDTO rightHandSideDTO = bpmnDiagramController.isDiagramInSync(data.getRightHandSide(), roundtrip);
+      BpmnDiagramDTO rightHandSideDTO = bpmnDiagramController.isDiagramInSync(data.getRightHandSide());
       BpmnDiagram rightHandSide = bpmnDiagramController.createOrUpdate(rightHandSideDTO);
       roundtrip.setRightHandSide(rightHandSide);
     } else {
@@ -206,8 +206,11 @@ public class RoundtripService extends AbstractRestService {
       throw new CycleException(e);
     }
     
-    BpmnDiagramDTO leftHandSideDTO = bpmnDiagramController.isDiagramInSync(BpmnDiagramDTO.wrap(roundtrip.getLeftHandSide()), roundtrip);
-    BpmnDiagramDTO rightHandSideDTO = bpmnDiagramController.isDiagramInSync(BpmnDiagramDTO.wrap(roundtrip.getRightHandSide()), roundtrip);
+    leftHandSide.setLastModified(leftHandSideConnector.getLastModifiedDate(leftHandSideModelNode));
+    rightHandSide.setLastModified(rightHandSideConnector.getLastModifiedDate(rightHandSideModelNode));
+    
+    BpmnDiagramDTO leftHandSideDTO = bpmnDiagramController.isDiagramInSync(BpmnDiagramDTO.wrap(roundtrip.getLeftHandSide()));
+    BpmnDiagramDTO rightHandSideDTO = bpmnDiagramController.isDiagramInSync(BpmnDiagramDTO.wrap(roundtrip.getRightHandSide()));
     
     RoundtripDTO roundtripDTO = new RoundtripDTO(roundtrip);
     roundtripDTO.setLeftHandSide(leftHandSideDTO);

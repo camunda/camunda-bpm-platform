@@ -191,7 +191,8 @@ function EditDiagramController($scope,Commons,Event) {
   // is the dialog model valid and can be submitted?
   var isValid = $scope.isValid = function() {
     var editDiagram = $scope.editDiagram;
-    return !!editDiagram.modeler && ($scope.addModelForm.$valid !== false) && ($scope.selectedNode ? $scope.selectedNode.type == 'FILE' : false);
+    var valid = !!editDiagram.modeler && ($scope.addModelForm.$valid !== false) && ($scope.selectedNode ? $scope.selectedNode.type == 'FILE' : false);
+    return valid;
   };
   
   $scope.cancel = function() {
