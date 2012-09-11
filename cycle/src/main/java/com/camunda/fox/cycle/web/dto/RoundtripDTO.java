@@ -6,6 +6,7 @@ import java.util.List;
 
 import com.camunda.fox.cycle.entity.BpmnDiagram;
 import com.camunda.fox.cycle.entity.Roundtrip;
+import com.camunda.fox.cycle.entity.Roundtrip.SyncMode;
 
 /**
  * This is a data object which exposes a {@link Roundtrip} to the client via rest.
@@ -27,12 +28,16 @@ public class RoundtripDTO {
   
   private Date lastSync;
   
+  private SyncMode lastSyncMode;
+  
+  
   public RoundtripDTO() { }
   
   public RoundtripDTO(Roundtrip r) {
     this.id = r.getId();
     this.name = r.getName();
     this.lastSync = r.getLastSync();
+    this.setLastSyncMode(r.getLastSyncMode());
   }
   
   public RoundtripDTO(Roundtrip r, BpmnDiagram leftHandSide, BpmnDiagram rightHandSide) {
@@ -110,5 +115,13 @@ public class RoundtripDTO {
     }
     
     return dtos;
+  }
+
+  public SyncMode getLastSyncMode() {
+    return lastSyncMode;
+  }
+
+  public void setLastSyncMode(SyncMode lastSyncMode) {
+    this.lastSyncMode = lastSyncMode;
   }
 }

@@ -60,6 +60,16 @@ angular
       isImageAvailable : function (connectorId, nodeId) {
         var uri = "secured/resource/connector/"+connectorId+"/content/PNG/available"+"?nodeId="+escape(nodeId);
         return HttpUtils.makePromise($http.get(App.uri(uri)));
+      },
+      getImageUrl : function (diagram, update) {
+        if (diagram) {
+          var uri = App.uri("secured/resource/connector/")+diagram.connectorId+"/content/PNG?nodeId="+escape(diagram.diagramPath);
+          if (update) {
+            uri +="&updated="+new Date().getTime();
+          }
+          return uri;
+        }
+        return "";
       }
     };
   })
@@ -88,5 +98,20 @@ angular
         //window.location = App.uri("login");
         return $q.reject(response);
       });
+    };
+  })
+  /**
+   * Lists all available events used in cycle for emit and on
+   */
+  .factory('Event', function() {
+    return {
+      userChanged : "user-changed",
+      navigationChanged : "navigation-changed",
+      roundtripAdded : "roundtrip-added",
+      roundtripChanged : "roundtrip-changed",
+      modelImageClicked : "model-image-clicked",
+      componentError : "component-error",
+      destroy : "$destroy", // angular own event which is fired when current scope is destroyed
+      change : "change" // jquery + angularjs event
     };
   });

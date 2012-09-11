@@ -19,6 +19,8 @@
           <span ng-show="roundtrip.lastSync">
             Last sync {{roundtrip.lastSync | date:'yyyy-MM-dd @ HH:mm:ss'}}
           </span>
+          <p data-ng-show="roundtrip.lastSyncMode=='LEFT_TO_RIGHT'">from left to right</p>
+          <p data-ng-show="roundtrip.lastSyncMode=='RIGHT_TO_LEFT'">from right to left</p>
           <span ng-hide="roundtrip.lastSync">
             Not synced yet
           </span>
@@ -88,5 +90,34 @@
       </div>
     </div>
   </dialog>
-  <!-- end add-model-roundtrip-dialog -->
+  <!-- end sync-roundtrip-dialog -->
+</div>
+
+<div class="modal hide fade" id="pictureModal">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal"
+      aria-hidden="true">&times;</button>
+    <h3 th:text="#{'Model View'}"></h3>
+  </div>
+  <div class="modal-body">
+    <div id="myCarousel" class="carousel slide" data-interval="false">
+      <!-- Carousel items -->
+      <div class="carousel-inner">
+        <div class="active item leftHandSide" data-ng-show="roundtrip.leftHandSide != undefined">
+          <img data-ng-src="{{imageUrl('leftHandSide')}}" />
+        </div>
+        <div class="item rightHandSide" data-ng-show="roundtrip.rightHandSide != undefined" >
+          <img data-ng-src="{{imageUrl('rightHandSide')}}" />
+        </div>
+      </div>
+      <!-- Carousel nav -->
+      <a class="carousel-control left" 
+        href="#myCarousel" data-slide="prev" data-ng-show="currentPicture == 'rightHandSide' && roundtrip.leftHandSide != undefined" data-ng-click="setCurrentPicture('leftHandSide')">&lsaquo;</a> 
+      <a class="carousel-control right"
+        href="#myCarousel" data-slide="next" data-ng-show="currentPicture == 'leftHandSide' && roundtrip.rightHandSide != undefined" data-ng-click="setCurrentPicture('rightHandSide')" >&rsaquo;</a>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button data-dismiss="modal" class="btn">Close</button>
+  </div>
 </div>

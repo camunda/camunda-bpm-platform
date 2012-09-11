@@ -5,6 +5,8 @@ import java.util.Date;
 import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Temporal;
@@ -21,11 +23,19 @@ public class Roundtrip extends AbstractEntity {
   
   private static final long serialVersionUID = 1L;
   
+  public enum SyncMode {
+    LEFT_TO_RIGHT,
+    RIGHT_TO_LEFT
+  }
+  
   @Column(unique=true)
 	private String name;
 	
   @Temporal(TemporalType.TIMESTAMP)
   private Date lastSync;
+  
+  @Enumerated(EnumType.STRING)
+  private SyncMode lastSyncMode;
   
   @OneToOne(cascade=CascadeType.ALL, orphanRemoval=true)
   private BpmnDiagram leftHandSide;
@@ -76,8 +86,17 @@ public class Roundtrip extends AbstractEntity {
     this.rightHandSide = rightHandSide;
   }
 
-	@Override
-	public String toString() {
-		return "Roundtrip[id=" + getId() + ", name=" + name + "]";
+  public SyncMode getLastSyncMode() {
+    return lastSyncMode;
   }
+
+  public void setLastSyncMode(SyncMode lastSyncMode) {
+    this.lastSyncMode = lastSyncMode;
+  }
+
+  @Override
+  public String toString() {
+    return "Roundtrip [name=" + name + ", lastSync=" + lastSync + ", lastSyncMode=" + lastSyncMode + "]";
+  }
+
 }
