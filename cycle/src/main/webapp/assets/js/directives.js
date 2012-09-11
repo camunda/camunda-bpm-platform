@@ -213,7 +213,7 @@ angular
     restrict: 'A',
     link: function(scope, element, attrs) {
       var title = (attrs.hintTitle == undefined ? "" : attrs.hintTitle) ;
-      $(element[0]).popover({content: attrs.hint, title: title, delay: 0});
+      $(element[0]).popover({content: attrs.hint, title: title, delay: { show: 1000, hide: 0 }, placement: "left"});
     }
   };
 })

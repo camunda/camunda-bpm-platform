@@ -15,6 +15,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 import com.camunda.fox.cycle.api.connector.Connector;
+import com.camunda.fox.cycle.api.connector.ContentInformation;
 import com.camunda.fox.cycle.api.connector.Connector.ConnectorContentType;
 import com.camunda.fox.cycle.api.connector.ConnectorNode;
 import com.camunda.fox.cycle.connector.ConnectorRegistry;
@@ -79,10 +80,10 @@ public class ConnectorService {
   }
   
   @GET
-  @Path("{id}/content/{type}/available")
-  public boolean isContentAvailable(@PathParam("id") Long connectorId, @QueryParam("nodeId") String nodeId, @PathParam("type") ConnectorContentType type) {
+  @Path("{id}/content/{type}/info")
+  public ContentInformation isContentAvailable(@PathParam("id") Long connectorId, @QueryParam("nodeId") String nodeId, @PathParam("type") ConnectorContentType type) {
     Connector connector = connectorRegistry.getSessionConnectorMap().get(connectorId);
-    return connector.isContentAvailable(new ConnectorNode(nodeId), type);
+    return connector.getContentInformation(new ConnectorNode(nodeId), type);
   }
   
 }

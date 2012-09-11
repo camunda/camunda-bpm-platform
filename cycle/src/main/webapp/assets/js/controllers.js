@@ -169,10 +169,10 @@ function BpmnDiagramController($scope, App, Commons, Event) {
   $scope.checkImageAvailable = function () {
     if ($scope.diagram) {
       Commons.isImageAvailable($scope.diagram.connectorId, $scope.diagram.diagramPath).then(function (data) {
-        $scope.imageAvailable = data;
+        $scope.imageAvailable = data.available;
       });
     }
-  }
+  };
 }
 
 /**

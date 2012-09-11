@@ -58,7 +58,11 @@ angular
         return HttpUtils.makePromise($http.get(App.uri("secured/resource/connector/list")));
       },
       isImageAvailable : function (connectorId, nodeId) {
-        var uri = "secured/resource/connector/"+connectorId+"/content/PNG/available"+"?nodeId="+escape(nodeId);
+        var uri = "secured/resource/connector/"+connectorId+"/content/PNG/info"+"?nodeId="+escape(nodeId);
+        return HttpUtils.makePromise($http.get(App.uri(uri)));
+      },
+      isContentAvailable : function (connectorId, nodeId) {
+        var uri = "secured/resource/connector/"+connectorId+"/content/DEFAULT/info"+"?nodeId="+escape(nodeId);
         return HttpUtils.makePromise($http.get(App.uri(uri)));
       },
       getImageUrl : function (diagram, update) {

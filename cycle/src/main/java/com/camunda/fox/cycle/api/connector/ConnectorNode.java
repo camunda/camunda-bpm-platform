@@ -127,5 +127,10 @@ public class ConnectorNode implements Comparable<ConnectorNode>, Serializable {
   public void setConnectorId(Long connectorId) {
     this.connectorId = connectorId;
   }
+
+  @Override
+  public String toString() {
+    return "ConnectorNode [id=" + id + ", connectorId=" + connectorId + ", label=" + label + "]";
+  }
   
 }

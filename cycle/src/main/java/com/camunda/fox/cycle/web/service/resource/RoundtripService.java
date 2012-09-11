@@ -206,8 +206,8 @@ public class RoundtripService extends AbstractRestService {
       throw new CycleException(e);
     }
     
-    leftHandSide.setLastModified(leftHandSideConnector.getLastModifiedDate(leftHandSideModelNode));
-    rightHandSide.setLastModified(rightHandSideConnector.getLastModifiedDate(rightHandSideModelNode));
+    leftHandSide.setLastSync(leftHandSideConnector.getLastModifiedDate(leftHandSideModelNode));
+    rightHandSide.setLastSync(rightHandSideConnector.getLastModifiedDate(rightHandSideModelNode));
     
     BpmnDiagramDTO leftHandSideDTO = bpmnDiagramController.isDiagramInSync(BpmnDiagramDTO.wrap(roundtrip.getLeftHandSide()));
     BpmnDiagramDTO rightHandSideDTO = bpmnDiagramController.isDiagramInSync(BpmnDiagramDTO.wrap(roundtrip.getRightHandSide()));

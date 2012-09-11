@@ -20,7 +20,6 @@ import com.camunda.fox.cycle.api.connector.ConnectorNode;
 import com.camunda.fox.cycle.connector.ConnectorRegistry;
 import com.camunda.fox.cycle.entity.BpmnDiagram;
 import com.camunda.fox.cycle.entity.BpmnDiagram.Status;
-import com.camunda.fox.cycle.entity.Roundtrip;
 import com.camunda.fox.cycle.repository.BpmnDiagramRepository;
 import com.camunda.fox.cycle.web.dto.BpmnDiagramDTO;
 
@@ -124,13 +123,13 @@ public class BpmnDiagramService {
       log.log(Level.WARNING, "", e);
     }
     
-    if (lastModifiedDate != null && bpmnDiagramDTO.getLastModified() != null) {
+    if (lastModifiedDate != null && bpmnDiagramDTO.getLastSync() != null) {
   
-        if (lastModifiedDate.getTime() <= bpmnDiagramDTO.getLastModified().getTime()) {
+        if (lastModifiedDate.getTime() <= bpmnDiagramDTO.getLastSync().getTime()) {
           bpmnDiagramDTO.setStatus(Status.SYNCED);
         }
   
-        if (lastModifiedDate.getTime() > bpmnDiagramDTO.getLastModified().getTime()) {
+        if (lastModifiedDate.getTime() > bpmnDiagramDTO.getLastSync().getTime()) {
           bpmnDiagramDTO.setStatus(Status.OUT_OF_SYNC);
         }
         

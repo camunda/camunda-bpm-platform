@@ -27,7 +27,11 @@ public abstract class Connector {
   public InputStream getContent(ConnectorNode node) {
     return getContent(node, ConnectorContentType.DEFAULT);
   }
-  
+  /**
+   * 
+   * @param node
+   * @return null if no date found
+   */
   public abstract Date getLastModifiedDate(ConnectorNode node);
   
   public List<ConnectorContentType> getSupportedTypes() {
@@ -45,6 +49,10 @@ public abstract class Connector {
    */
   public boolean isContentAvailable(ConnectorNode node, ConnectorContentType type) {
     return true;
+  }
+  
+  public ContentInformation getContentInformation(ConnectorNode node, ConnectorContentType type) {
+    return new ContentInformation(this.isContentAvailable(node, type), getLastModifiedDate(node));
   }
   
   public abstract InputStream getContent(ConnectorNode node, ConnectorContentType type); 

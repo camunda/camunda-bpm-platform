@@ -14,6 +14,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -33,6 +34,7 @@ import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.entity.mime.content.StringBody;
+import org.apache.http.impl.NoConnectionReuseStrategy;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.params.HttpParams;
@@ -146,10 +148,12 @@ public class SignavioConnector extends Connector {
       
       // Use Thread safe connection manager, prevents abortion of ctx.proceed in interceptor if multiple requests are done at once
       DefaultHttpClient client = new DefaultHttpClient();
-      ClientConnectionManager mgr = client.getConnectionManager();
+      final ClientConnectionManager mgr = client.getConnectionManager();
       HttpParams params = client.getParams();
-      client = new DefaultHttpClient(new ThreadSafeClientConnManager(mgr.getSchemeRegistry()), params);
-      httpClient4Executor = new ApacheHttpClient4Executor(client);
+      
+      final DefaultHttpClient signavioHttpClient = new DefaultHttpClient(new ThreadSafeClientConnManager(mgr.getSchemeRegistry()), params);
+      signavioHttpClient.setReuseStrategy(new NoConnectionReuseStrategy());
+      httpClient4Executor = new ApacheHttpClient4Executor(signavioHttpClient);
       
       ClientRequestFactory factory = null;
       try {
@@ -162,6 +166,9 @@ public class SignavioConnector extends Connector {
         @SuppressWarnings("rawtypes")
         @Override
         public ClientResponse execute(ClientExecutionContext ctx) throws Exception {
+          signavioHttpClient.getConnectionManager().closeExpiredConnections();
+          signavioHttpClient.getConnectionManager().closeIdleConnections(1500, TimeUnit.MILLISECONDS);
+          
           String uri = "";
           ClientRequest request = ctx.getRequest();
           uri = request.getUri().toString();
@@ -495,6 +502,7 @@ public class SignavioConnector extends Connector {
     throw new UnsupportedOperationException();
   }
 
+  @Secured
   @Override
   public Date getLastModifiedDate(ConnectorNode node) {
     try {

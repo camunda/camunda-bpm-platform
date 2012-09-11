@@ -36,6 +36,8 @@ public class BpmnDiagram extends AbstractEntity {
   
   private Date lastModified;
   
+  private Date lastSync;
+  
   public BpmnDiagram() { }
   
   public BpmnDiagram(String modeler, String diagramPath, Long connectorId) {
@@ -90,5 +92,13 @@ public class BpmnDiagram extends AbstractEntity {
 
   public void setLastModified(Date lastModified) {
     this.lastModified = lastModified;
+  }
+
+  public Date getLastSync() {
+    return lastSync;
+  }
+
+  public void setLastSync(Date lastSync) {
+    this.lastSync = lastSync;
   }
 }

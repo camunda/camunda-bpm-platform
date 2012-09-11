@@ -18,6 +18,7 @@ public class BpmnDiagramDTO {
   private Long connectorId;
   private String label;
   private Date lastModified;
+  private Date lastSync;
 
   private Status status;
   
@@ -31,6 +32,7 @@ public class BpmnDiagramDTO {
     this.connectorId = diagram.getConnectorId();
     this.label = diagram.getLabel();
     this.lastModified = diagram.getLastModified();
+    this.lastSync = diagram.getLastSync();
   }
 
   public Long getId() {
@@ -96,5 +98,13 @@ public class BpmnDiagramDTO {
 
   public void setLastModified(Date lastModified) {
     this.lastModified = lastModified;
+  }
+
+  public Date getLastSync() {
+    return lastSync;
+  }
+
+  public void setLastSync(Date lastSync) {
+    this.lastSync = lastSync;
   }
 }

@@ -3,12 +3,12 @@
     <h3>{{diagram.modeler}}</h3>
     <div class="holder">
       <div class="diagram vertical-center">
-        <span class="name" data-ng-hide="imageAvailable == 'true'">{{diagram.label}}</span>
-        <img alt="{{diagram.label}}" data-ng-show="imageAvailable == 'true'" data-ng-src="{{imageUrl}}" data-ng-click="showImage(identifier)" />
+        <span class="name" data-ng-hide="imageAvailable == true">{{diagram.label}}</span>
+        <img alt="{{diagram.label}}" data-ng-show="imageAvailable == true" data-ng-src="{{imageUrl}}" data-ng-click="showImage(identifier)" />
       </div>
     </div>
   </div>
-  <span class="label" data-ng-show="imageAvailable == 'true'">{{diagram.label}}</span>
+  <span class="label" data-ng-show="imageAvailable == true">{{diagram.label}}</span>
   
   <div class="bpmn-model thumbnail" ng-hide="diagram">
     <h3 data-ng-show="identifier == 'leftHandSide'" th:text="#{Your modeler}">Your modeler</h3>
@@ -19,11 +19,9 @@
       </div>
     </div>
   </div>
-   <div data-ng-switch data-on="diagram.status" style="display:inline">
-     <span class="badge" data-ng-switch-when="UNSPECIFIED">unknown sync status</span>
-  	 <span class="badge badge-success" data-ng-switch-when="SYNCED">no changes since last sync</span>
-	 <span class="badge badge-important" data-ng-switch-when="OUT_OF_SYNC">changed since last sync, last modified : {{diagram.lastModified | date:'yyyy-MM-dd, HH:mm:ss'}}</span>
-   </div>
+  <span class="badge badge-success" data-ng-show="diagram.status == 'SYNCED'">no changes since last sync</span>
+  <span class="badge badge-important" data-ng-show="diagram.status == 'OUT_OF_SYNC'">changed since last sync, last modified : {{diagram.lastModified | date:'yyyy-MM-dd, HH:mm:ss'}}</span>
+  <span class="badge" data-ng-show="roundtrip.lastSync == undefined || diagram.status == 'UNSPECIFIED'">unknown sync status</span>
   
   <!-- begin add-model-roundtrip-dialog -->
   <dialog model="editDiagramDialog" ng-cloak>

@@ -126,7 +126,8 @@ public class VfsConnector extends Connector {
       return new Date(fileObject.getContent().getLastModifiedTime());
       
     } catch (FileSystemException e) {
-      throw new CycleException(e);
+      logger.log(Level.WARNING, "Could not get last modified date for "+node, e);
+      return null;
     }
   }
   
