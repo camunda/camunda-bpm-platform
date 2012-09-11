@@ -238,6 +238,22 @@
           </execution>
         </executions>
       </plugin>
+		<plugin>
+			<groupId>org.apache.maven.plugins</groupId>
+			<artifactId>maven-war-plugin</artifactId>
+			<version>2.2</version>
+				<configuration>
+					<webResources>
+						<resource>
+							<filtering>true</filtering>
+							<directory>src/main/webapp/WEB-INF/views/fragment</directory>
+							<includes>
+								<include>common.html</include>
+							</includes>
+						</resource>
+					</webResources>
+				</configuration>
+		</plugin>          
     </plugins>
   </build>
 
@@ -399,4 +415,5 @@
       </dependencies>
     </profile>
   </profiles>
+   
 </project>
