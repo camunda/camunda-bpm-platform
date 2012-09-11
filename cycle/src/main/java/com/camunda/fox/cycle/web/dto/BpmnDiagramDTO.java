@@ -30,6 +30,7 @@ public class BpmnDiagramDTO {
     this.diagramPath = diagram.getDiagramPath();
     this.connectorId = diagram.getConnectorId();
     this.label = diagram.getLabel();
+    this.lastModified = diagram.getLastModified();
   }
 
   public Long getId() {

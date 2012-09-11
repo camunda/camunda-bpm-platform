@@ -2,6 +2,8 @@ package com.camunda.fox.cycle.web.service.resource;
 
 import java.util.Date;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.inject.Inject;
 import javax.ws.rs.GET;
@@ -16,11 +18,9 @@ import org.springframework.transaction.annotation.Transactional;
 import com.camunda.fox.cycle.api.connector.Connector;
 import com.camunda.fox.cycle.api.connector.ConnectorNode;
 import com.camunda.fox.cycle.connector.ConnectorRegistry;
-import com.camunda.fox.cycle.connector.VfsConnector;
 import com.camunda.fox.cycle.entity.BpmnDiagram;
 import com.camunda.fox.cycle.entity.BpmnDiagram.Status;
 import com.camunda.fox.cycle.entity.Roundtrip;
-import com.camunda.fox.cycle.impl.connector.signavio.SignavioConnector;
 import com.camunda.fox.cycle.repository.BpmnDiagramRepository;
 import com.camunda.fox.cycle.web.dto.BpmnDiagramDTO;
 
@@ -36,6 +36,8 @@ public class BpmnDiagramService {
   
   @Inject
   private ConnectorRegistry connectorRegistry;
+  
+  Logger log = Logger.getLogger(BpmnDiagramService.class.getName());
   
 //  @GET
 //  public List<BpmnDiagramDTO> list() {
@@ -70,9 +72,13 @@ public class BpmnDiagramService {
   public BpmnDiagram createOrUpdate(BpmnDiagramDTO data) {
     BpmnDiagram diagram;
     
+    Connector diagramConnector = this.connectorRegistry.getSessionConnectorMap().get(data.getConnectorId());
+    ConnectorNode connectorNode = new ConnectorNode(data.getDiagramPath(), data.getLabel());
+    
     if (data.getId() == null) {
       diagram = new BpmnDiagram();
       diagram.setStatus(Status.UNSPECIFIED);
+      diagram.setLastModified(diagramConnector.getLastModifiedDate(connectorNode));
     } else {
       diagram = bpmnDiagramRepository.findById(data.getId());
       if (diagram == null) {
@@ -105,22 +111,26 @@ public class BpmnDiagramService {
     return bpmnDiagramRepository.findAllModelerNames();
   }
   
-  public BpmnDiagramDTO isDiagramInSync(BpmnDiagramDTO bpmnDiagramDTO, Roundtrip roundtrip) {
+  public BpmnDiagramDTO isDiagramInSync(BpmnDiagramDTO bpmnDiagramDTO) {
     Date lastModifiedDate = null;
     
     Connector diagramConnector = this.connectorRegistry.getSessionConnectorMap().get(bpmnDiagramDTO.getConnectorId());
     ConnectorNode connectorNode = new ConnectorNode(bpmnDiagramDTO.getDiagramPath(), bpmnDiagramDTO.getLabel());
     
-    lastModifiedDate = diagramConnector.getLastModifiedDate(connectorNode);
-    bpmnDiagramDTO.setLastModified(lastModifiedDate);
+    try {
+      lastModifiedDate = diagramConnector.getLastModifiedDate(connectorNode);
+      bpmnDiagramDTO.setLastModified(lastModifiedDate);
+    }catch (Exception e) {
+      log.log(Level.WARNING, "", e);
+    }
     
-    if (lastModifiedDate != null && roundtrip.getLastSync() != null) {
+    if (lastModifiedDate != null && bpmnDiagramDTO.getLastModified() != null) {
   
-        if (lastModifiedDate.getTime() <= roundtrip.getLastSync().getTime()) {
+        if (lastModifiedDate.getTime() <= bpmnDiagramDTO.getLastModified().getTime()) {
           bpmnDiagramDTO.setStatus(Status.SYNCED);
         }
   
-        if (lastModifiedDate.getTime() > roundtrip.getLastSync().getTime()) {
+        if (lastModifiedDate.getTime() > bpmnDiagramDTO.getLastModified().getTime()) {
           bpmnDiagramDTO.setStatus(Status.OUT_OF_SYNC);
         }
         
