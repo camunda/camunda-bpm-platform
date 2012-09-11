@@ -5,6 +5,8 @@
       <div class="diagram vertical-center">
         <span class="name" data-ng-hide="imageAvailable == true">{{diagram.label}}</span>
         <img alt="{{diagram.label}}" data-ng-show="imageAvailable == true" data-ng-src="{{imageUrl}}" data-ng-click="showImage(identifier)" />
+        <p data-ng-show="imageAvailable != true" th:text="#{'There is no up to date image available.'}">
+        </p>
       </div>
     </div>
   </div>

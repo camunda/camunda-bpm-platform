@@ -19,6 +19,7 @@ import org.apache.commons.vfs2.VFS;
 
 import com.camunda.fox.cycle.api.connector.Connector;
 import com.camunda.fox.cycle.api.connector.ConnectorNode;
+import com.camunda.fox.cycle.api.connector.ContentInformation;
 import com.camunda.fox.cycle.api.connector.ConnectorNode.ConnectorNodeType;
 import com.camunda.fox.cycle.api.connector.Secured;
 import com.camunda.fox.cycle.entity.ConnectorConfiguration;
@@ -95,7 +96,7 @@ public class VfsConnector extends Connector {
       
       switch(type) {
       case PNG:
-        FileObject pngfile = fsManager.resolveFile(basePath + getPngFileName(node.getId()));
+        FileObject pngfile = fsManager.resolveFile(basePath + getPngNodeId(node.getId()));
         if (pngfile.exists()) {
           return pngfile.getContent().getInputStream(); 
         }else {
@@ -250,7 +251,7 @@ public class VfsConnector extends Connector {
       
       switch (type) {
       case PNG:
-        return fsManager.resolveFile(basePath + getPngFileName(node.getId())).exists();
+        return fsManager.resolveFile(basePath + getPngNodeId(node.getId())).exists();
       case DEFAULT:
         return fsManager.resolveFile(basePath + node.getId()).exists();
       default:
@@ -261,7 +262,19 @@ public class VfsConnector extends Connector {
     }
   }
   
-  private String getPngFileName(String nodeId) {
+  @Override
+  public ContentInformation getContentInformation(ConnectorNode node, ConnectorContentType type) {
+    switch (type) {
+    case PNG:
+      return new ContentInformation(isContentAvailable(node, type), getLastModifiedDate(new ConnectorNode(getPngNodeId(node.getId()))));
+    case DEFAULT:
+      return new ContentInformation(isContentAvailable(node, type), getLastModifiedDate(node));
+    default:
+      throw new RuntimeException("Unsupported Node Type");
+    }
+  }
+  
+  private String getPngNodeId(String nodeId) {
     int pointIndex = nodeId.lastIndexOf(".");
     return nodeId.substring(0, pointIndex)+".png";
   }
