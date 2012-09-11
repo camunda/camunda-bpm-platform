@@ -132,6 +132,7 @@ function SyncRoundtripController($scope, $http, App, Event) {
  */
 function BpmnDiagramController($scope, App, Commons, Event) {
   $scope.imageAvailable = false;
+  $scope.contentAvailable = false;
   
   $scope.editDiagramDialog = new Dialog();
   
@@ -159,6 +160,7 @@ function BpmnDiagramController($scope, App, Commons, Event) {
     if (newDiagramValue != undefined) {
       $scope.imageUrl = Commons.getImageUrl(newDiagramValue);
       $scope.checkImageAvailable();
+      $scope.checkContentAvailable();
     }
   });
   
@@ -173,6 +175,15 @@ function BpmnDiagramController($scope, App, Commons, Event) {
       });
     }
   };
+  
+  $scope.checkContentAvailable = function () {
+    if ($scope.diagram) {
+     Commons.isContentAvailable($scope.diagram.connectorId, $scope.diagram.diagramPath).then(function (data) {
+      $scope.contentAvailable = data.available;
+     });
+   }
+  };
+
 }
 
 /**
