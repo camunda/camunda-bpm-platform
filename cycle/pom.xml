@@ -246,10 +246,7 @@
 					<webResources>
 						<resource>
 							<filtering>true</filtering>
-							<directory>src/main/webapp/WEB-INF/views/fragment</directory>
-							<includes>
-								<include>common.html</include>
-							</includes>
+							<directory>src/main/webapp</directory>
 						</resource>
 					</webResources>
 				</configuration>
