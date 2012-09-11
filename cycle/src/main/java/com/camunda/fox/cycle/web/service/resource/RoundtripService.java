@@ -180,23 +180,24 @@ public class RoundtripService extends AbstractRestService {
     InputStream rightHandSideModelContent = rightHandSideConnector.getContent(rightHandSideModelNode);
     
     try {
-      
+      InputStream resultStream = null;
       switch (syncMode) {
         case LEFT_TO_RIGHT:
+          resultStream = this.bpmnProcessModelUtil.extractExecutablePool(leftHandSideModelContent);
           IoUtil.closeSilently(rightHandSideModelContent);
-          rightHandSideConnector.updateContent(rightHandSideModelNode,  this.bpmnProcessModelUtil.extractExecutablePool(leftHandSideModelContent));
           IoUtil.closeSilently(leftHandSideModelContent);
+          rightHandSideConnector.updateContent(rightHandSideModelNode,  resultStream);
           break;
           
         case RIGHT_TO_LEFT:
           String result = this.bpmnProcessModelUtil.importChangesFromExecutableBpmnModel(IOUtil.toString(rightHandSideModelContent, "UTF-8"), IOUtil.toString(leftHandSideModelContent, "UTF-8"));
           IoUtil.closeSilently(leftHandSideModelContent);
           IoUtil.closeSilently(rightHandSideModelContent);
-          InputStream resultStream = IOUtils.toInputStream(result, "UTF-8");
+          resultStream = IOUtils.toInputStream(result, "UTF-8");
           leftHandSideConnector.updateContent(leftHandSideModelNode, resultStream);
-          IoUtil.closeSilently(resultStream);
           break;
       }
+      IoUtil.closeSilently(resultStream);
       
       roundtrip.setLastSync(new Date());
       roundtrip.setLastSyncMode(syncMode);
