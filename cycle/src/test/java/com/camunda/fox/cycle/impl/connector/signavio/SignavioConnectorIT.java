@@ -54,7 +54,7 @@ import com.camunda.fox.cycle.util.XmlUtil;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(loader = SpringockitoContextLoader.class, locations = { "classpath:/spring/test/signavio-connector-xml-config.xml" })
-public class SignavioConnectorIntegrationTest extends AbstractSignavioConnectorTest {
+public class SignavioConnectorIT extends AbstractSignavioConnectorTest {
 
   private static final String INITIAL_RAW_BPMN20_XML = "initial-raw.bpmn";
   private static final String EXPECTED_RAW_BPMN20_XML = "expected-raw.bpmn";
@@ -402,7 +402,7 @@ public class SignavioConnectorIntegrationTest extends AbstractSignavioConnectorT
   /**
    * Compares two BPMN 2.0 XML files exported by Signavio using XMLUnit.
    * 
-   * Note that XMLUnit is configured in {@link SignavioConnectorIntegrationTest#setUp()}.
+   * Note that XMLUnit is configured in {@link SignavioConnectorIT#setUp()}.
    */
   private DetailedDiff compareSignavioBpmn20Xml(String expectedRawBpmn20Xml, String actualRawBpmn20Xml) {
     try {
@@ -435,7 +435,7 @@ public class SignavioConnectorIntegrationTest extends AbstractSignavioConnectorT
   }
 
   private String readModel(String modelName) {
-    return new Scanner(SignavioConnectorIntegrationTest.class.getClass().getResourceAsStream("/" + MODEL_FOLDER + "/" + modelName), "UTF-8").useDelimiter("\\A").next();
+    return new Scanner(SignavioConnectorIT.class.getClass().getResourceAsStream("/" + MODEL_FOLDER + "/" + modelName), "UTF-8").useDelimiter("\\A").next();
   }
 
   private void validateActivitiDeployable(String bpmnXml, String name) {
