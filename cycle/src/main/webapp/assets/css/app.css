@@ -223,8 +223,8 @@ input.ng-invalid-required {
 div#pictureModal.modal.hide.fade {
   width: 85%;
   max-height: 95%;
-  margin: -40% 0 0 -40%;
-  left: "";
+  left: 25%;
+  top: 40%;
 }
 
 .popover-inner {
