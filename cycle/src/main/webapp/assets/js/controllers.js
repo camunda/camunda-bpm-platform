@@ -3,7 +3,10 @@
 
 angular.module('cycle.controllers', []);
 
-function DefaultController($scope, $http, $location, App, Event) {
+function DefaultController($scope, $http, $location, App, Event, Error) {
+  $scope.appErrors = function () {
+    return Error.errors;
+  };
   
   // TODO: get from cookie
   $scope.currentUser = null;

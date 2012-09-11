@@ -15,14 +15,12 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import javax.ws.rs.GET;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
 import org.apache.commons.io.IOUtils;
@@ -34,9 +32,9 @@ import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.entity.mime.content.StringBody;
-import org.apache.http.impl.NoConnectionReuseStrategy;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
+import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 import org.apache.http.util.EntityUtils;
 import org.codehaus.jettison.json.JSONArray;
@@ -149,10 +147,16 @@ public class SignavioConnector extends Connector {
       // Use Thread safe connection manager, prevents abortion of ctx.proceed in interceptor if multiple requests are done at once
       DefaultHttpClient client = new DefaultHttpClient();
       final ClientConnectionManager mgr = client.getConnectionManager();
-      HttpParams params = client.getParams();
+      final HttpParams params = client.getParams();
       
-      final DefaultHttpClient signavioHttpClient = new DefaultHttpClient(new ThreadSafeClientConnManager(mgr.getSchemeRegistry()), params);
-      signavioHttpClient.setReuseStrategy(new NoConnectionReuseStrategy());
+      final ThreadSafeClientConnManager connectionManager = new ThreadSafeClientConnManager(mgr.getSchemeRegistry(), 5000, TimeUnit.MILLISECONDS);
+      
+      HttpConnectionParams.setConnectionTimeout(params, 3000);
+      HttpConnectionParams.setStaleCheckingEnabled(params, true);
+      HttpConnectionParams.setSoTimeout(params,5000);
+      HttpConnectionParams.setLinger(params, 5000);
+      
+      final DefaultHttpClient signavioHttpClient = new DefaultHttpClient(connectionManager, params);
       httpClient4Executor = new ApacheHttpClient4Executor(signavioHttpClient);
       
       ClientRequestFactory factory = null;
@@ -166,8 +170,8 @@ public class SignavioConnector extends Connector {
         @SuppressWarnings("rawtypes")
         @Override
         public ClientResponse execute(ClientExecutionContext ctx) throws Exception {
-          signavioHttpClient.getConnectionManager().closeExpiredConnections();
-          signavioHttpClient.getConnectionManager().closeIdleConnections(1500, TimeUnit.MILLISECONDS);
+          connectionManager.closeExpiredConnections();
+          connectionManager.closeIdleConnections(2000, TimeUnit.MILLISECONDS);
           
           String uri = "";
           ClientRequest request = ctx.getRequest();
@@ -278,17 +282,6 @@ public class SignavioConnector extends Connector {
     }
   }
   
-  @GET
-  @Produces("image/png")
-  @Path("/model/{modelId}/png")
-  public Response getSvgXml(@PathParam("modelId") String modelId) {
-    this.init(getConfiguration());
-    if (this.needsLogin()) {
-      this.login(getConfiguration().getGlobalUser(), getConfiguration().getGlobalPassword());
-    }
-    return Response.ok(this.signavioClient.getPngContent("/"+modelId)).build();
-  }
-  
   private void releaseClientConnection(Response response) {
     if (response instanceof ClientResponse<?>) {
       ClientResponse<?> r = (ClientResponse<?>) response;
@@ -302,6 +295,21 @@ public class SignavioConnector extends Connector {
     ConnectorNode rootNode = new ConnectorNode(SLASH_CHAR, SLASH_CHAR);
     rootNode.setType(ConnectorNodeType.FOLDER);
     return rootNode;
+  }
+  
+  @Override
+  public boolean isContentAvailable(ConnectorNode node, ConnectorContentType type) {
+    try {
+      boolean result = false;
+      InputStream stream = getContent(getRoot());
+      if (stream != null) {
+        result = true;
+      }
+      IoUtil.closeSilently(stream);
+      return result;
+    } catch (Exception e) {
+      return false;
+    }
   }
 
   @Secured
@@ -514,11 +522,13 @@ public class SignavioConnector extends Connector {
         Date lastModifiedDate = dateFormatter.parse(updated);
         return lastModifiedDate;
       }
+      
+      return null;
+      
     } catch (Exception e) {
-      throw new RepositoryException("The last modified date of node '" + node.getLabel() + "' could not be determined.", e);
+      logger.log(Level.WARNING, "Could not get last modified date for "+node);
+      return null;
     }  
-    
-    return null;
  }
 
 }
