@@ -29,7 +29,11 @@ angular
 				ready(function () {
 					scope.$watch("connector", function (newValue , oldValue) {
 				    	if (newValue != undefined) {
-				    		
+				    	
+				    	if (oldValue != undefined && newValue != oldValue) {
+				    	  scope.$emit(Event.selectedConnectorChanged);
+				    	}
+              
 							request.get(App.uri("secured/resource/connector/" + newValue.connectorId + "/tree/root"), {
 					            handleAs: "json"
 					        }).then(function(requestData){
@@ -51,8 +55,12 @@ angular
                         },
                         function(error) {
                           var e = error.response.data;
-                          e.component = "tree";
                           scope.$emit(Event.componentError, e);
+                          var treeWidget = registry.byId(attrs.id);
+                          if (treeWidget != undefined) {
+                            registry.byId(attrs.id).destroy();
+                            registry.remove(attrs.id);
+                          }
                         });
 							        }
 							    });
@@ -72,7 +80,7 @@ angular
 							    var treeWidget = registry.byId(attrs.id);
 							    if (treeWidget != undefined) {
 							    	registry.byId(attrs.id).destroy();
-	                                registry.remove(attrs.id);
+							    	registry.remove(attrs.id);
 							    }
 							    
 							    var tree = new Tree({
@@ -96,8 +104,12 @@ angular
 							},
   							function(error){
                   var e = error.response.data;
-                  e.component = "tree";
                   scope.$emit(Event.componentError, e);
+                  var treeWidget = registry.byId(attrs.id);
+                  if (treeWidget != undefined) {
+                    registry.byId(attrs.id).destroy();
+                    registry.remove(attrs.id);
+                  }
   							});
 				    	}
 				    });
@@ -325,7 +337,7 @@ angular
         }
       });
     }
-  }
+  };
 });
 
 /** 
@@ -353,5 +365,5 @@ function Dialog() {
   
   this.renderHtml = function() {
     return self.status != "closed";
-  }
+  };
 };
