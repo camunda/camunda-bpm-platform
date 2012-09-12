@@ -34,8 +34,10 @@
         <module>integration-tests</module>
         <module>tasklist-gui-tests</module>
         <module>test-process-application</module>
+        <!-- see HEMERA-2709 - disabled because not supported on gf yet
         <module>test-deployer</module>
         <module>cockpit-tests</module>
+        -->
       </modules>
     </profile>
     <profile>
