@@ -205,7 +205,7 @@ angular
  * 
  * <bpmn-diagram roundtrip="myRoundtrip" diagram="myRoundtrip.leftHandSide" identifier="leftHandSide" />
  */
-.directive("bpmnDiagram", function(App) {
+.directive("bpmnDiagram", function(App, Commons, Event) {
   return {
     restrict: 'E',
     scope: {
@@ -226,6 +226,60 @@ angular
     link: function(scope, element, attrs) {
       var title = (attrs.hintTitle == undefined ? "" : attrs.hintTitle) ;
       $(element[0]).popover({content: attrs.hint, title: title, delay: { show: 1000, hide: 0 }, placement: "left"});
+    }
+  };
+})
+.directive("diagramImage", function(App) {
+  return {
+    restrict: 'E',
+    replace : true,
+    scope : {
+      imgSrc: "=",
+      imgClick : "&",
+      imgShow : "="
+    },
+    template: "<img />",
+    link: function(scope, element, attrs) {
+      
+      element[0].onclick = function () {
+        scope.imgClick();
+      };
+      
+      scope.$watch("imgShow", function (newValue){
+        if (newValue == false) {
+          $(element[0]).addClass("hide");
+        }else {
+          $(element[0]).removeClass("hide");
+        }
+      });
+      
+      scope.$watch("imgSrc", function (newValue){
+        console.log("imgSrc", newValue);
+        if (newValue != undefined) {
+          var spinner = $('<div>').insertBefore(element[0]).addClass("loader");
+          $(element[0]).addClass("hide");
+          
+          element[0].src = newValue;
+          element[0].onload = function () {
+            $(spinner).remove();
+            if (scope.imgShow == true) {
+              $(element[0]).removeClass("hide");  
+            }
+          };
+          var retry = false;
+          
+          element[0].onerror = function () {
+            $(spinner).remove();
+            if (retry == false) {
+              retry = true; 
+              element[0].src = newValue+"&"+retry;
+            }else {
+              $('<div>Could not load image, please try loading again!</div>').insertBefore(element[0]);
+              $(element[0]).remove();
+            }
+          };
+        }
+      });
     }
   };
 })

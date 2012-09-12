@@ -222,9 +222,14 @@ input.ng-invalid-required {
 
 div#pictureModal.modal.hide.fade {
   width: 85%;
+  max-width: 75%;
   max-height: 95%;
-  left: 25%;
   top: 40%;
+  left: 33%;
+}
+
+.sync-mode-arr {
+  font-size: 28px; font-weight: bolder;  
 }
 
 .popover-inner {
@@ -239,5 +244,11 @@ div#pictureModal.modal.hide.fade {
   -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
   border-radius: 3px;
+}
+
+.loader {
+  background-image: url(../img/ajax-loader.gif);
+  width: 16px; 
+  height: 16px
 }
 

@@ -17,10 +17,10 @@
         </div>
         <div>
           <span ng-show="roundtrip.lastSync">
-            Last sync {{roundtrip.lastSync | date:'yyyy-MM-dd @ HH:mm:ss'}}
+            Last sync <br/> {{roundtrip.lastSync | date:'yyyy-MM-dd @ HH:mm:ss'}}
           </span>
-          <p data-ng-show="roundtrip.lastSyncMode=='LEFT_TO_RIGHT'">from left to right</p>
-          <p data-ng-show="roundtrip.lastSyncMode=='RIGHT_TO_LEFT'">from right to left</p>
+          <p data-ng-show="roundtrip.lastSyncMode=='LEFT_TO_RIGHT'" class="sync-mode-arr">&rarr;</p>
+          <p data-ng-show="roundtrip.lastSyncMode=='RIGHT_TO_LEFT'" class="sync-mode-arr">&larr;</p>
           <span ng-hide="roundtrip.lastSync">
             Not synced yet
           </span>
@@ -104,10 +104,10 @@
       <!-- Carousel items -->
       <div class="carousel-inner">
         <div class="active item leftHandSide" data-ng-show="roundtrip.leftHandSide != undefined">
-          <img data-ng-src="{{imageUrl('leftHandSide')}}" />
+          <diagram-image data-img-src="leftHandSideImageUrl" />
         </div>
         <div class="item rightHandSide" data-ng-show="roundtrip.rightHandSide != undefined" >
-          <img data-ng-src="{{imageUrl('rightHandSide')}}" />
+          <diagram-image data-img-src="rightHandSideImageUrl" />
         </div>
       </div>
       <!-- Carousel nav -->

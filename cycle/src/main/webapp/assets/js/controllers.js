@@ -58,6 +58,9 @@ function RoundtripDetailsController($scope, $routeParams, RoundtripDetails, Comm
   $scope.leftHandSideImage = false;
   $scope.rightHandSideImage = false;
   
+  $scope.leftHandSideImageUrl = undefined;
+  $scope.rightHandSideImageUrl = undefined;
+  
   $scope.syncDialog = new Dialog();
   $scope.syncDialog.setAutoClosable(false);
   
@@ -87,21 +90,15 @@ function RoundtripDetailsController($scope, $routeParams, RoundtripDetails, Comm
     $('.leftHandSide').removeClass("active");
     $('.rightHandSide').removeClass("active");
     
+    $scope.leftHandSideImageUrl = Commons.getImageUrl($scope.roundtrip.leftHandSide, true);
+    $scope.rightHandSideImageUrl = Commons.getImageUrl($scope.roundtrip.rightHandSide, true);
+    
+    $scope.$apply();
+    
     $('.'+side).addClass("active");
     
     $('#pictureModal').modal('show');
   });
-  
-  $scope.imageUrl = function (side) {
-    switch(side) {
-    case "leftHandSide":
-      return Commons.getImageUrl($scope.roundtrip.leftHandSide);
-    case "rightHandSide":
-      return Commons.getImageUrl($scope.roundtrip.rightHandSide);
-    default:
-      return "";
-    }
-  };
   
   $scope.setCurrentPicture = function (picture) {
     $scope.currentPicture = picture;
@@ -114,7 +111,6 @@ function SyncRoundtripController($scope, $http, App, Event) {
       SYNC_FAILED = "synchronizationFailed",
       PERFORM_SYNC = "performSynchronize",
       BEFORE_SYNC = "beforeStart";
-      
   
   $scope.status = BEFORE_SYNC;
   
@@ -167,14 +163,10 @@ function BpmnDiagramController($scope, App, Commons, Event) {
   
   $scope.$watch("diagram", function (newDiagramValue) {
     if (newDiagramValue != undefined) {
-      $scope.imageUrl = Commons.getImageUrl(newDiagramValue);
+      $scope.imageUrl = Commons.getImageUrl(newDiagramValue, true);
       $scope.checkImageAvailable();
       $scope.checkContentAvailable();
     }
-  });
-  
-  $scope.$on(Event.roundtripChanged, function(event, roundtrip) {
-    $scope.imageUrl = Commons.getImageUrl($scope.diagram, true);;
   });
   
   $scope.checkImageAvailable = function () {
