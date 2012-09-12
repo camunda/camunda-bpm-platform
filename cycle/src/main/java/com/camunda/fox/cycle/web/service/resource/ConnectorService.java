@@ -14,11 +14,11 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
-import com.camunda.fox.cycle.api.connector.Connector;
-import com.camunda.fox.cycle.api.connector.ContentInformation;
-import com.camunda.fox.cycle.api.connector.Connector.ConnectorContentType;
-import com.camunda.fox.cycle.api.connector.ConnectorNode;
+import com.camunda.fox.cycle.connector.Connector;
+import com.camunda.fox.cycle.connector.ConnectorNode;
 import com.camunda.fox.cycle.connector.ConnectorRegistry;
+import com.camunda.fox.cycle.connector.ContentInformation;
+import com.camunda.fox.cycle.connector.Connector.ConnectorContentType;
 import com.camunda.fox.cycle.util.IoUtil;
 import com.camunda.fox.cycle.web.dto.ConnectorDTO;
 import com.camunda.fox.cycle.web.dto.ConnectorNodeDTO;

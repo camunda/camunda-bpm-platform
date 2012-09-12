@@ -1,4 +1,4 @@
-package com.camunda.fox.cycle.impl.connector.signavio;
+package com.camunda.fox.cycle.connector.signavio;
 
 
 import static org.custommonkey.xmlunit.XMLAssert.assertXpathEvaluatesTo;
@@ -44,10 +44,10 @@ import org.w3c.dom.Element;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import com.camunda.fox.cycle.api.connector.ConnectorNode;
+import com.camunda.fox.cycle.connector.ConnectorNode;
 import com.camunda.fox.cycle.entity.ConnectorConfiguration;
-import com.camunda.fox.cycle.service.roundtrip.BpmnProcessModelUtil;
-import com.camunda.fox.cycle.service.roundtrip.transform.XsltTransformer;
+import com.camunda.fox.cycle.roundtrip.BpmnProcessModelUtil;
+import com.camunda.fox.cycle.roundtrip.XsltTransformer;
 import com.camunda.fox.cycle.util.BpmnNamespaceContext;
 import com.camunda.fox.cycle.util.IoUtil;
 import com.camunda.fox.cycle.util.XmlUtil;

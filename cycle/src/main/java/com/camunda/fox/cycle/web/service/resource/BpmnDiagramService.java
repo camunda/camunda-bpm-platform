@@ -15,8 +15,8 @@ import javax.ws.rs.core.MediaType;
 
 import org.springframework.transaction.annotation.Transactional;
 
-import com.camunda.fox.cycle.api.connector.Connector;
-import com.camunda.fox.cycle.api.connector.ConnectorNode;
+import com.camunda.fox.cycle.connector.Connector;
+import com.camunda.fox.cycle.connector.ConnectorNode;
 import com.camunda.fox.cycle.connector.ConnectorRegistry;
 import com.camunda.fox.cycle.entity.BpmnDiagram;
 import com.camunda.fox.cycle.entity.BpmnDiagram.Status;

@@ -2,8 +2,8 @@ package com.camunda.fox.cycle.web.dto;
 
 import java.util.List;
 
-import com.camunda.fox.cycle.api.connector.Connector;
-import com.camunda.fox.cycle.api.connector.Connector.ConnectorContentType;
+import com.camunda.fox.cycle.connector.Connector;
+import com.camunda.fox.cycle.connector.Connector.ConnectorContentType;
 
 
 public class ConnectorDTO {

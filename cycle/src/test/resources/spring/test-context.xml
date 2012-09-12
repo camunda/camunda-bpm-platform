@@ -24,16 +24,16 @@
 
   <context:component-scan base-package="com.camunda.fox.cycle">
     <context:include-filter type="annotation"
-      expression="javax.ws.rs.Path" />
+                            expression="javax.ws.rs.Path" />
     <context:include-filter type="annotation"
-      expression="javax.ws.rs.ext.Provider" />
+                            expression="javax.ws.rs.ext.Provider" />
   </context:component-scan>
 
   <bean name="vfsConnectorConfig" class="com.camunda.fox.cycle.entity.ConnectorConfiguration">
     <property name="id" value="1" />
     <property name="label" value="Test VFS Connector" />
     <property name="connectorClass"
-      value="com.camunda.fox.cycle.connector.VfsConnector" />
+              value="com.camunda.fox.cycle.connector.vfs.VfsConnector" />
     <property name="properties">
       <map>
         <entry key="BASE_PATH" value="${java.io.tmpdir}" />
@@ -45,7 +45,7 @@
     <property name="id" value="2" />
     <property name="label" value="My SignavioConnector" />
     <property name="connectorClass"
-      value="com.camunda.fox.cycle.impl.connector.signavio.SignavioConnector" />
+              value="com.camunda.fox.cycle.connector.signavio.SignavioConnector" />
     <property name="loginMode" value="GLOBAL" />
     <property name="globalUser" value="test@camunda.com" />
     <property name="globalPassword" value="testtest" />

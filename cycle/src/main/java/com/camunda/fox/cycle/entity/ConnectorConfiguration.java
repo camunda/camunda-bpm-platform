@@ -10,7 +10,8 @@ import javax.persistence.Entity;
 import javax.persistence.JoinColumn;
 import javax.persistence.MapKeyColumn;
 import javax.persistence.Table;
-import com.camunda.fox.cycle.api.connector.ConnectorLoginMode;
+
+import com.camunda.fox.cycle.connector.ConnectorLoginMode;
 
 @Entity
 @Table(name = "cy_connector_config")

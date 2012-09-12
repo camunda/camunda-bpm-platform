@@ -1,4 +1,4 @@
-package com.camunda.fox.cycle.impl.connector.signavio;
+package com.camunda.fox.cycle.connector.signavio;
 
 import java.util.Arrays;
 import java.util.List;

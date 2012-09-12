@@ -14,7 +14,6 @@ import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.WebApplicationContext;
 
-import com.camunda.fox.cycle.api.connector.Connector;
 import com.camunda.fox.cycle.aspect.LoginAspect;
 import com.camunda.fox.cycle.entity.ConnectorConfiguration;
 import com.camunda.fox.cycle.security.SecurityContext;
