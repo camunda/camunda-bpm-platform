@@ -19,6 +19,7 @@ import com.camunda.fox.cycle.api.connector.ContentInformation;
 import com.camunda.fox.cycle.api.connector.Connector.ConnectorContentType;
 import com.camunda.fox.cycle.api.connector.ConnectorNode;
 import com.camunda.fox.cycle.connector.ConnectorRegistry;
+import com.camunda.fox.cycle.util.IoUtil;
 import com.camunda.fox.cycle.web.dto.ConnectorDTO;
 import com.camunda.fox.cycle.web.dto.ConnectorNodeDTO;
 
@@ -74,9 +75,14 @@ public class ConnectorService {
   public Response getTypedContent(@PathParam("id") Long connectorId, @QueryParam("nodeId") String nodeId, @PathParam("type") ConnectorContentType type) {
     Connector connector = connectorRegistry.getSessionConnectorMap().get(connectorId);
     InputStream content = connector.getContent(new ConnectorNode(nodeId), type);
-    return Response.ok(content)
-            .header("Content-Type", connector.getMimeType(type))
-            .build();
+    try {
+      return Response.ok(IoUtil.readInputStream(content, "connector content"))
+              .header("Content-Type", connector.getMimeType(type))
+              .build();
+    }
+    finally {
+      IoUtil.closeSilently(content);
+    }
   }
   
   @GET

@@ -32,6 +32,7 @@ import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntity;
 import org.apache.http.entity.mime.content.FileBody;
 import org.apache.http.entity.mime.content.StringBody;
+import org.apache.http.impl.NoConnectionReuseStrategy;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.params.HttpConnectionParams;
@@ -153,11 +154,12 @@ public class SignavioConnector extends Connector {
       
       HttpConnectionParams.setConnectionTimeout(params, 3000);
       HttpConnectionParams.setStaleCheckingEnabled(params, true);
-      HttpConnectionParams.setSoTimeout(params,5000);
       HttpConnectionParams.setLinger(params, 5000);
+      connectionManager.setDefaultMaxPerRoute(5);
       
       final DefaultHttpClient signavioHttpClient = new DefaultHttpClient(connectionManager, params);
       httpClient4Executor = new ApacheHttpClient4Executor(signavioHttpClient);
+      signavioHttpClient.setReuseStrategy(new NoConnectionReuseStrategy());
       
       ClientRequestFactory factory = null;
       try {
