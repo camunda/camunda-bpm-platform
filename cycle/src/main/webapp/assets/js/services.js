@@ -112,8 +112,10 @@ angular
         $.unblockUI();
         return promise;
       }, function (response)  {
+        clearTimeout(blockTime);
+        $.unblockUI();
         console.log("error", response);
-        Error.addError(response);
+        Error.addError({ "status" : repsonse.status , "config" :  repsonse.config });
         return $q.reject(response);
       });
     };
