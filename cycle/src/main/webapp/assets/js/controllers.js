@@ -180,7 +180,7 @@ function BpmnDiagramController($scope, App, Commons, Event) {
   $scope.checkImageAvailable = function () {
     if ($scope.diagram) {
       Commons.isImageAvailable($scope.diagram.connectorId, $scope.diagram.diagramPath).then(function (data) {
-        $scope.imageAvailable = data.available && (data.lastModified >= $scope.diagram.lastModified);
+        $scope.imageAvailable = data.available && ((data.lastModified - 5000) >= $scope.diagram.lastModified);
         $scope.$emit(Event.imageAvailable, $scope.imageAvailable, $scope.identifier);
       });
     }
