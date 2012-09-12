@@ -55,6 +55,8 @@ function HomeController($scope, Event) {
 
 function RoundtripDetailsController($scope, $routeParams, RoundtripDetails, Commons, Event) {
   $scope.currentPicture = 'leftHandSide';
+  $scope.leftHandSideImage = false;
+  $scope.rightHandSideImage = false;
   
   $scope.syncDialog = new Dialog();
   $scope.syncDialog.setAutoClosable(false);
@@ -73,6 +75,10 @@ function RoundtripDetailsController($scope, $routeParams, RoundtripDetails, Comm
   
   $scope.$on(Event.roundtripChanged, function(event, roundtrip) {
     $scope.roundtrip = roundtrip;
+  });
+  
+  $scope.$on(Event.imageAvailable, function(event, available, side) {
+    $scope[side+"Image"] = available;
   });
   
   $scope.$on(Event.modelImageClicked, function(event, side) {
@@ -175,6 +181,7 @@ function BpmnDiagramController($scope, App, Commons, Event) {
     if ($scope.diagram) {
       Commons.isImageAvailable($scope.diagram.connectorId, $scope.diagram.diagramPath).then(function (data) {
         $scope.imageAvailable = data.available && (data.lastModified >= $scope.diagram.lastModified);
+        $scope.$emit(Event.imageAvailable, $scope.imageAvailable, $scope.identifier);
       });
     }
   };

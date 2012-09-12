@@ -112,9 +112,9 @@
       </div>
       <!-- Carousel nav -->
       <a class="carousel-control left" 
-        href="#myCarousel" data-slide="prev" data-ng-show="currentPicture == 'rightHandSide' && roundtrip.leftHandSide != undefined" data-ng-click="setCurrentPicture('leftHandSide')">&lsaquo;</a> 
+        href="#myCarousel" data-slide="prev" data-ng-show="leftHandSideImage == true && currentPicture == 'rightHandSide' && roundtrip.leftHandSide != undefined" data-ng-click="setCurrentPicture('leftHandSide')">&lsaquo;</a> 
       <a class="carousel-control right"
-        href="#myCarousel" data-slide="next" data-ng-show="currentPicture == 'leftHandSide' && roundtrip.rightHandSide != undefined" data-ng-click="setCurrentPicture('rightHandSide')" >&rsaquo;</a>
+        href="#myCarousel" data-slide="next" data-ng-show="rightHandSideImage == true && currentPicture == 'leftHandSide' && roundtrip.rightHandSide != undefined" data-ng-click="setCurrentPicture('rightHandSide')" >&rsaquo;</a>
     </div>
   </div>
   <div class="modal-footer">
