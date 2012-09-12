@@ -3,6 +3,7 @@ package com.camunda.fox.cycle.connector;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import com.camunda.fox.cycle.connector.vfs.VfsConnector;
 import com.camunda.fox.cycle.entity.ConnectorConfiguration;
 
 @Configuration

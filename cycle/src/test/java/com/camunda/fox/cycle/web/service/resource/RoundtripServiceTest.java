@@ -21,11 +21,11 @@ import org.kubek2k.springockito.annotations.SpringockitoContextLoader;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import com.camunda.fox.cycle.api.connector.Connector;
-import com.camunda.fox.cycle.api.connector.ConnectorNode;
-import com.camunda.fox.cycle.api.connector.ConnectorNode.ConnectorNodeType;
+import com.camunda.fox.cycle.connector.Connector;
+import com.camunda.fox.cycle.connector.ConnectorNode;
+import com.camunda.fox.cycle.connector.ConnectorNode.ConnectorNodeType;
 import com.camunda.fox.cycle.connector.ConnectorRegistry;
-import com.camunda.fox.cycle.connector.VfsConnector;
+import com.camunda.fox.cycle.connector.vfs.VfsConnector;
 import com.camunda.fox.cycle.entity.Roundtrip;
 import com.camunda.fox.cycle.entity.Roundtrip.SyncMode;
 import com.camunda.fox.cycle.repository.RoundtripRepository;
@@ -66,11 +66,11 @@ public class RoundtripServiceTest {
     
     vfsConnector.deleteNode("foo/foo");
     rightNode = vfsConnector.createNode("foo/foo", "Impl", ConnectorNodeType.FILE);
-    vfsConnector.updateContent(rightNode, new FileInputStream(IoUtil.getFile("com/camunda/fox/cycle/service/roundtrip/collaboration_impl.bpmn")));
+    vfsConnector.updateContent(rightNode, new FileInputStream(IoUtil.getFile("com/camunda/fox/cycle/roundtrip/collaboration_impl.bpmn")));
     
     vfsConnector.deleteNode("foo/bar");
     leftNode = vfsConnector.createNode("foo/bar", "Modeler", ConnectorNodeType.FILE);
-    vfsConnector.updateContent(leftNode, new FileInputStream(IoUtil.getFile("com/camunda/fox/cycle/service/roundtrip/collaboration.bpmn")));
+    vfsConnector.updateContent(leftNode, new FileInputStream(IoUtil.getFile("com/camunda/fox/cycle/roundtrip/collaboration.bpmn")));
   }
   
   @After

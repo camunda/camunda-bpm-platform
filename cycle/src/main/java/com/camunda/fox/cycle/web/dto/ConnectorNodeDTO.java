@@ -3,8 +3,8 @@ package com.camunda.fox.cycle.web.dto;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.camunda.fox.cycle.api.connector.ConnectorNode;
-import com.camunda.fox.cycle.api.connector.ConnectorNode.ConnectorNodeType;
+import com.camunda.fox.cycle.connector.ConnectorNode;
+import com.camunda.fox.cycle.connector.ConnectorNode.ConnectorNodeType;
 
 
 public class ConnectorNodeDTO {

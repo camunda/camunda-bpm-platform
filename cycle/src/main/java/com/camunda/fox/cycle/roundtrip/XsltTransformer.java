@@ -1,4 +1,4 @@
-package com.camunda.fox.cycle.service.roundtrip.transform;
+package com.camunda.fox.cycle.roundtrip;
 
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;

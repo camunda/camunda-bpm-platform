@@ -1,4 +1,4 @@
-package com.camunda.fox.cycle.service.roundtrip;
+package com.camunda.fox.cycle.roundtrip;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -25,8 +25,6 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import com.camunda.fox.cycle.exception.CycleException;
-import com.camunda.fox.cycle.exception.RepositoryException;
-import com.camunda.fox.cycle.service.roundtrip.transform.XsltTransformer;
 import com.camunda.fox.cycle.util.IoUtil;
 import com.camunda.fox.cycle.util.XmlUtil;
 
@@ -303,14 +301,14 @@ public class BpmnProcessModelUtil {
     NodeList technichalBPMNPlanes = technicalModel.getElementsByTagNameNS(NAMESPACE_URI_BPMN_20_DI, BPMN_PLANE);
     Element technichalBPMNPlane;
     if (technichalBPMNPlanes.getLength() != 1) {
-      throw new RepositoryException("The technical model to be imported must contain exactly one BPMNPlane.");
+      throw new CycleException("The technical model to be imported must contain exactly one BPMNPlane.");
     } else {
       technichalBPMNPlane = (Element) technichalBPMNPlanes.item(0);
     }
     NodeList businessBPMNPlanes = businessModel.getElementsByTagNameNS(NAMESPACE_URI_BPMN_20_DI, BPMN_PLANE);
     Element businessBPMNPlane;
     if (businessBPMNPlanes.getLength() != 1) {
-      throw new RepositoryException("The business model to be updated must contain exactly one BPMNPlane.");
+      throw new CycleException("The business model to be updated must contain exactly one BPMNPlane.");
     } else {
       businessBPMNPlane = (Element) businessBPMNPlanes.item(0);
     }
@@ -330,7 +328,7 @@ public class BpmnProcessModelUtil {
     List<String> skipped = new ArrayList<String>();
     
     if (technicalProcesses.getLength() != 1) {
-      throw new RepositoryException("The technical model to be imported must contain exactly one process.");
+      throw new CycleException("The technical model to be imported must contain exactly one process.");
     } else {
       Element technicalProcess = (Element) technicalProcesses.item(0);
       childNodes = technicalProcess.getChildNodes();
@@ -481,7 +479,7 @@ public class BpmnProcessModelUtil {
       transformer.transform(new DOMSource(node), new StreamResult(stringWriter));
       return stringWriter.getBuffer().toString();
     } catch (Exception e) {
-      throw new RepositoryException("Error while serializing the updated model.", e);
+      throw new CycleException("Error while serializing the updated model.", e);
     }
   }
   
@@ -506,7 +504,7 @@ public class BpmnProcessModelUtil {
       // Parse and load into memory the Document
       return builder.parse(new ByteArrayInputStream(xml.getBytes(UTF_8)));
     } catch (Exception e) {
-      throw new RepositoryException("Error while parsing the xml into document '" , e);
+      throw new CycleException("Error while parsing the xml into document '" , e);
     }
   }
   

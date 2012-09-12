@@ -1,4 +1,4 @@
-package com.camunda.fox.cycle.web.service.roundtrip;
+package com.camunda.fox.cycle.roundtrip;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -9,7 +9,7 @@ import junit.framework.Assert;
 import org.apache.commons.io.IOUtils;
 import org.junit.Test;
 
-import com.camunda.fox.cycle.service.roundtrip.BpmnProcessModelUtil;
+import com.camunda.fox.cycle.roundtrip.BpmnProcessModelUtil;
 import com.camunda.fox.cycle.util.IoUtil;
 
 
@@ -19,7 +19,7 @@ public class TestBpmnProcessModelUtil {
   
   @Test
   public void testReplaceDeveloperFriendlyIds() {
-    String sourceModel = IoUtil.readFileAsString("com/camunda/fox/cycle/service/roundtrip/collaboration.bpmn");
+    String sourceModel = IoUtil.readFileAsString("com/camunda/fox/cycle/roundtrip/collaboration.bpmn");
         
     String resultModel = cycleRoundtripUtil.replaceDeveloperFriendlyIds(sourceModel);
     Assert.assertTrue(resultModel.contains("Process_Engine"));
@@ -27,7 +27,7 @@ public class TestBpmnProcessModelUtil {
   
   @Test
   public void testReplaceDeveloperFriendlyIdsWithReplacePoolId() {
-    String sourceModel = IoUtil.readFileAsString("com/camunda/fox/cycle/service/roundtrip/collaboration.bpmn");
+    String sourceModel = IoUtil.readFileAsString("com/camunda/fox/cycle/roundtrip/collaboration.bpmn");
         
     String resultModel = cycleRoundtripUtil.replaceDeveloperFriendlyIds(sourceModel,"My Custom Pool Name");
     Assert.assertTrue(resultModel.contains("My Custom Pool Name"));
@@ -35,7 +35,7 @@ public class TestBpmnProcessModelUtil {
   
   @Test
   public void testExtractPool() throws IOException {
-    InputStream sourceModel = new FileInputStream(IoUtil.getFile("com/camunda/fox/cycle/service/roundtrip/collaboration.bpmn"));
+    InputStream sourceModel = new FileInputStream(IoUtil.getFile("com/camunda/fox/cycle/roundtrip/collaboration.bpmn"));
         
     String resultModel = IOUtils.toString(cycleRoundtripUtil.extractExecutablePool(sourceModel), "UTF-8");
     Assert.assertFalse(resultModel.contains("Mensch"));

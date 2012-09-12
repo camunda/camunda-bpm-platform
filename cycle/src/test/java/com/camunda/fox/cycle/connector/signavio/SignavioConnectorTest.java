@@ -1,4 +1,4 @@
-package com.camunda.fox.cycle.impl.connector.signavio;
+package com.camunda.fox.cycle.connector.signavio;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -17,11 +17,11 @@ import org.kubek2k.springockito.annotations.SpringockitoContextLoader;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import com.camunda.fox.cycle.api.connector.ConnectorLoginMode;
-import com.camunda.fox.cycle.api.connector.ConnectorNode;
-import com.camunda.fox.cycle.api.connector.ConnectorNode.ConnectorNodeType;
+import com.camunda.fox.cycle.connector.ConnectorLoginMode;
+import com.camunda.fox.cycle.connector.ConnectorNode;
+import com.camunda.fox.cycle.connector.ConnectorNode.ConnectorNodeType;
 import com.camunda.fox.cycle.entity.ConnectorConfiguration;
-import com.camunda.fox.cycle.exception.RepositoryException;
+import com.camunda.fox.cycle.exception.CycleException;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(
@@ -79,7 +79,7 @@ public class SignavioConnectorTest extends AbstractSignavioConnectorTest {
       ConnectorConfiguration config = this.getSignavioConnector().getConfiguration();
       this.getSignavioConnector().login(config.getGlobalUser(), config.getGlobalPassword() + "1");
       fail("Something went wrong: An exception had to be thrown due to failing login.");
-    } catch (RepositoryException e) {
+    } catch (CycleException e) {
       // everything okay: we excepted an exception here
     }
   }

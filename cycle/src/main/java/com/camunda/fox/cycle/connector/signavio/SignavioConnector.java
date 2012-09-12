@@ -1,4 +1,4 @@
-package com.camunda.fox.cycle.impl.connector.signavio;
+package com.camunda.fox.cycle.connector.signavio;
 
 import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
@@ -53,12 +53,12 @@ import org.jboss.resteasy.spi.interception.ClientExecutionContext;
 import org.jboss.resteasy.spi.interception.ClientExecutionInterceptor;
 import org.springframework.stereotype.Component;
 
-import com.camunda.fox.cycle.api.connector.Connector;
-import com.camunda.fox.cycle.api.connector.ConnectorNode;
-import com.camunda.fox.cycle.api.connector.ConnectorNode.ConnectorNodeType;
-import com.camunda.fox.cycle.api.connector.Secured;
+import com.camunda.fox.cycle.connector.Connector;
+import com.camunda.fox.cycle.connector.ConnectorNode;
+import com.camunda.fox.cycle.connector.ConnectorNode.ConnectorNodeType;
+import com.camunda.fox.cycle.connector.Secured;
 import com.camunda.fox.cycle.entity.ConnectorConfiguration;
-import com.camunda.fox.cycle.exception.RepositoryException;
+import com.camunda.fox.cycle.exception.CycleException;
 import com.camunda.fox.cycle.util.IoUtil;
 
 @Component
@@ -111,12 +111,12 @@ public class SignavioConnector extends Connector {
     
     String responseResult = this.extractResponseResult(response);
     if (responseResult == null || responseResult.equals("")) {
-      throw new RepositoryException("Failed to login to connector. The user name and/or password might be incorrect.");
+      throw new CycleException("Failed to login to connector. The user name and/or password might be incorrect.");
     }
     Matcher matcher = Pattern.compile(WARNING_SNIPPET).matcher(responseResult);
     if (matcher.find()) {
       String errorMessage = matcher.group(1);
-      throw new RepositoryException(errorMessage);
+      throw new CycleException(errorMessage);
     }
     
     if (responseResult.matches("[a-f0-9]{32}")) {
@@ -165,7 +165,7 @@ public class SignavioConnector extends Connector {
       try {
         factory = new ClientRequestFactory(httpClient4Executor, new URI(signavioURL));
       } catch (Exception e) {
-        throw new RepositoryException("The connection to the signavio client could not be initialized.", e);
+        throw new CycleException("The connection to the signavio client could not be initialized.", e);
       }
       factory.getPrefixInterceptors().registerInterceptor(new ClientExecutionInterceptor() {
         
@@ -217,7 +217,7 @@ public class SignavioConnector extends Connector {
         }
       }
     } catch (Exception e) {
-      throw new RepositoryException("Children for Signavio connector '" + this.getConfiguration().getLabel() + "' could not be loaded in repository '" + parent.getId() + "'.", e);
+      throw new CycleException("Children for Signavio connector '" + this.getConfiguration().getLabel() + "' could not be loaded in repository '" + parent.getId() + "'.", e);
     }
     return nodes;
   }
@@ -268,7 +268,7 @@ public class SignavioConnector extends Connector {
     try {
       return new String(data, UTF_8);
     } catch (UnsupportedEncodingException e) {
-      throw new RepositoryException(e.getMessage(), e);
+      throw new CycleException(e.getMessage(), e);
     }
   }
 
@@ -336,7 +336,7 @@ public class SignavioConnector extends Connector {
       result.setType(ConnectorNodeType.FOLDER);
       return result;
     } catch (Exception e) {
-      throw new RepositoryException("The parent of node '" + node.getLabel() + "' could not be determined.", e);
+      throw new CycleException("The parent of node '" + node.getLabel() + "' could not be determined.", e);
     }
   }
   
@@ -363,9 +363,9 @@ public class SignavioConnector extends Connector {
         }
       }
     } catch (JSONException e) {
-      throw new RepositoryException("The private folder could not be determined.", e);
+      throw new CycleException("The private folder could not be determined.", e);
     }
-    throw new RepositoryException("The private folder could not be determined.");
+    throw new CycleException("The private folder could not be determined.");
   }
   
   protected ConnectorNode importContent(ConnectorNode parent, String content) throws Exception {
@@ -403,14 +403,14 @@ public class SignavioConnector extends Connector {
     String responseStream = writer.toString();
     
     if (responseStream != null && !responseStream.startsWith("[true]") && !responseStream.contains("\"errors\":[]")) {
-      throw new RepositoryException("BPMN XML could not be imported because of model errors: " + responseStream); 
+      throw new CycleException("BPMN XML could not be imported because of model errors: " + responseStream); 
     }
     
     // check if something went wrong on Signavio side
     if (postResponse.getStatusLine().getStatusCode() >= 400) {
       logger.severe("Import of BPMN XML failed in Signavio.");
       logger.severe("Error response from server: " + EntityUtils.toString(postResponse.getEntity(), "UTF-8"));
-      throw new RepositoryException("BPMN XML could not be imported: " + content);
+      throw new CycleException("BPMN XML could not be imported: " + content);
     }
 
     return this.getChildNodeByName(parent, modelName);
@@ -423,7 +423,7 @@ public class SignavioConnector extends Connector {
         return connectorNode;
       }
     }
-    throw new RepositoryException("A node named '" + nodeName + "' could not be found in '" + parent.getLabel() + "'.");
+    throw new CycleException("A node named '" + nodeName + "' could not be found in '" + parent.getLabel() + "'.");
   }
   
   private void deleteNode(ConnectorNode node) {
@@ -436,7 +436,7 @@ public class SignavioConnector extends Connector {
     } else if (node.getType().equals(ConnectorNodeType.FOLDER)) {
       return DIRECTORY_URL_SUFFIX;
     } else {
-      throw new RepositoryException("The type of the selected node '" + node.getLabel() + "' could not be determined, so that the parent could not be loaded.");
+      throw new CycleException("The type of the selected node '" + node.getLabel() + "' could not be determined, so that the parent could not be loaded.");
     }
   }
 

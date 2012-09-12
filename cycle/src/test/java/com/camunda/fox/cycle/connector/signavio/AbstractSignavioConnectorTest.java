@@ -1,4 +1,4 @@
-package com.camunda.fox.cycle.impl.connector.signavio;
+package com.camunda.fox.cycle.connector.signavio;
 
 import static org.junit.Assert.fail;
 
@@ -17,8 +17,11 @@ import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.util.EntityUtils;
 import org.codehaus.jettison.json.JSONObject;
 
-import com.camunda.fox.cycle.api.connector.ConnectorNode;
-import com.camunda.fox.cycle.api.connector.ConnectorNode.ConnectorNodeType;
+import com.camunda.fox.cycle.connector.ConnectorNode;
+import com.camunda.fox.cycle.connector.ConnectorNode.ConnectorNodeType;
+import com.camunda.fox.cycle.connector.signavio.SignavioConnector;
+import com.camunda.fox.cycle.connector.signavio.SignavioCreateFolderForm;
+import com.camunda.fox.cycle.connector.signavio.SignavioCreateModelForm;
 import com.camunda.fox.cycle.entity.ConnectorConfiguration;
 import com.camunda.fox.cycle.util.IoUtil;
 

@@ -1,4 +1,4 @@
-package com.camunda.fox.cycle.api.connector;
+package com.camunda.fox.cycle.connector;
 
 
 public enum ConnectorLoginMode {

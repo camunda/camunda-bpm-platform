@@ -1,4 +1,4 @@
-package com.camunda.fox.cycle.connector;
+package com.camunda.fox.cycle.connector.vfs;
 
 import java.io.File;
 import java.io.InputStream;
@@ -17,14 +17,14 @@ import org.apache.commons.vfs2.FileSystemManager;
 import org.apache.commons.vfs2.FileType;
 import org.apache.commons.vfs2.VFS;
 
-import com.camunda.fox.cycle.api.connector.Connector;
-import com.camunda.fox.cycle.api.connector.ConnectorNode;
-import com.camunda.fox.cycle.api.connector.ContentInformation;
-import com.camunda.fox.cycle.api.connector.ConnectorNode.ConnectorNodeType;
-import com.camunda.fox.cycle.api.connector.Secured;
+import com.camunda.fox.cycle.connector.Connector;
+import com.camunda.fox.cycle.connector.ConnectorNode;
+import com.camunda.fox.cycle.connector.ConnectorNode.ConnectorNodeType;
+import com.camunda.fox.cycle.connector.ConnectorNodeComparator;
+import com.camunda.fox.cycle.connector.ContentInformation;
+import com.camunda.fox.cycle.connector.Secured;
 import com.camunda.fox.cycle.entity.ConnectorConfiguration;
 import com.camunda.fox.cycle.exception.CycleException;
-import com.camunda.fox.cycle.exception.RepositoryException;
 
 public class VfsConnector extends Connector {
 
@@ -180,7 +180,7 @@ public class VfsConnector extends Connector {
       IOUtils.copy(newContent, content.getOutputStream());
       content.close();
     } else {
-      throw new RepositoryException("File '" + node.getLabel() + "' does not exist.");
+      throw new CycleException("File '" + node.getLabel() + "' does not exist.");
     }
   }
 

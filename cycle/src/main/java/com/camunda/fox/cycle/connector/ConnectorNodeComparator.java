@@ -2,7 +2,6 @@ package com.camunda.fox.cycle.connector;
 
 import java.util.Comparator;
 
-import com.camunda.fox.cycle.api.connector.ConnectorNode;
 
 /**
  * Compares connector knodes between each other.

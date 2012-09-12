@@ -30,7 +30,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
-import com.camunda.fox.cycle.exception.RepositoryException;
+import com.camunda.fox.cycle.exception.CycleException;
 
 public class XmlUtil {
 	
@@ -88,14 +88,14 @@ public class XmlUtil {
         return null;
       }
     } catch (XPathExpressionException e) {
-      throw new RepositoryException("Error during evaluation of XPath expression '" + expression + "'.", e);
+      throw new CycleException("Error during evaluation of XPath expression '" + expression + "'.", e);
     }
     if (elementsWithThatId.getLength() == 0) {
       return null;
     } else if (elementsWithThatId.getLength() == 1) {
       return elementsWithThatId.item(0);
     } else {
-      throw new RepositoryException("There are multiple elements matching'" +  expression + "'.");
+      throw new CycleException("There are multiple elements matching'" +  expression + "'.");
     }
   }
 	
@@ -104,7 +104,7 @@ public class XmlUtil {
     try {
       return (NodeList) xPathExpression.evaluate(searchContext, XPathConstants.NODESET);
     } catch (XPathExpressionException e) {
-      throw new RepositoryException("Error during evaluation of XPath expression '" + expression + "'.", e);
+      throw new CycleException("Error during evaluation of XPath expression '" + expression + "'.", e);
     }
   }
 	

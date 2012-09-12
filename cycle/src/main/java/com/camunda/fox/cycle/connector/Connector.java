@@ -1,11 +1,11 @@
-package com.camunda.fox.cycle.api.connector;
+package com.camunda.fox.cycle.connector;
 
 import java.io.InputStream;
 import java.util.Date;
 import java.util.Arrays;
 import java.util.List;
 
-import com.camunda.fox.cycle.api.connector.ConnectorNode.ConnectorNodeType;
+import com.camunda.fox.cycle.connector.ConnectorNode.ConnectorNodeType;
 import com.camunda.fox.cycle.entity.ConnectorConfiguration;
 
 
