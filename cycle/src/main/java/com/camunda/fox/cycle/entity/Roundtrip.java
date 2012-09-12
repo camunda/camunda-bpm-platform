@@ -46,7 +46,7 @@ public class Roundtrip extends AbstractEntity {
 	public Roundtrip() { }
 	
   public Roundtrip(Long id, String name) {
-    this.id = id;
+    this.setId(id);
 		this.name = name;
 	}
   

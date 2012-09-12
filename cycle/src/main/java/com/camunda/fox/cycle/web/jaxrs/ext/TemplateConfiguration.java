@@ -33,7 +33,7 @@ public class TemplateConfiguration {
     ServletContextTemplateResolver resolver = new ServletContextTemplateResolver();
     resolver.setTemplateMode("LEGACYHTML5");
     resolver.setCharacterEncoding("UTF-8");
-    resolver.setPrefix("WEB-INF/views/");
+    resolver.setPrefix("/WEB-INF/views/");
     resolver.setSuffix(".html");
     return resolver;
   }

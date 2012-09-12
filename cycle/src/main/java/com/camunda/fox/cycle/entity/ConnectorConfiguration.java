@@ -74,10 +74,6 @@ public class ConnectorConfiguration extends AbstractEntity {
     this.label = label;
   }
   
-  public void setId(Long id) {
-    this.id = id;
-  }
-
   public ConnectorLoginMode getLoginMode() {
     return loginMode;
   }

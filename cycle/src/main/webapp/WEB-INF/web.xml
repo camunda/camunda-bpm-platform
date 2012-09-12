@@ -58,6 +58,7 @@
   </security-constraint>
   <login-config>
     <auth-method>FORM</auth-method>
+    <realm-name>other</realm-name>
     <form-login-config>
       <form-login-page>/app/login</form-login-page>
       <form-error-page>/app/login/error</form-error-page>

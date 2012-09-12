@@ -26,7 +26,7 @@ public class SchemaExport {
     map.put("h2", "org.hibernate.dialect.H2Dialect");
     map.put("mysql", "org.hibernate.dialect.MySQL5InnoDBDialect");
     map.put("oracle", "org.hibernate.dialect.Oracle10gDialect");
-    map.put("postgres", "org.hibernate.dialect.PostgreSQL82Dialect");
+//    map.put("postgres", "org.hibernate.dialect.PostgreSQL82Dialect");
     map.put("mssql", "org.hibernate.dialect.SQLServer2008Dialect");
 
     DB_NAMES_TO_DIALECTS = Collections.unmodifiableMap(map);
