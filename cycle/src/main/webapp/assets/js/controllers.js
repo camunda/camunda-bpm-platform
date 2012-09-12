@@ -134,8 +134,8 @@ function SyncRoundtripController($scope, $http, App, Event) {
  * Works along with the bpmn-diagram directive to manage a single bpmn-diagram in the roundtrip view.
  */
 function BpmnDiagramController($scope, App, Commons, Event) {
-  $scope.imageAvailable = false;
-  $scope.contentAvailable = false;
+  $scope.imageAvailable = undefined;
+  $scope.contentAvailable = undefined;
   
   $scope.editDiagramDialog = new Dialog();
   
