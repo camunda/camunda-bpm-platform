@@ -236,7 +236,8 @@ angular
     scope : {
       imgSrc: "=",
       imgClick : "&",
-      imgShow : "="
+      imgShow : "=",
+      imgId : "="
     },
     template: "<img />",
     link: function(scope, element, attrs) {
@@ -256,14 +257,23 @@ angular
       scope.$watch("imgSrc", function (newValue){
         console.log("imgSrc", newValue);
         if (newValue != undefined) {
+          var id = undefined;
+
           var spinner = $('<div>').insertBefore(element[0]).addClass("loader");
+          
+          if (scope.imgId) {
+            $("#"+scope.imgId).remove();
+            $(spinner).attr("id", scope.imgId);
+          }
+          
+          
           $(element[0]).addClass("hide");
           
           element[0].src = newValue;
           element[0].onload = function () {
             $(spinner).remove();
             if (scope.imgShow == true) {
-              $(element[0]).removeClass("hide");  
+              $(element[0]).removeClass("hide");
             }
           };
           var retry = false;

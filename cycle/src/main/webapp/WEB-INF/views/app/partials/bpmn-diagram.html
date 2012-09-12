@@ -4,7 +4,7 @@
     <div class="holder">
       <div class="diagram vertical-center">
         <span class="name" data-ng-hide="imageAvailable == true">{{diagram.label}}</span>
-        <diagram-image data-img-src="imageUrl"  data-img-click="showImage(identifier)" data-img-show="imageAvailable == true" />
+        <diagram-image data-img-id="identifier" data-img-src="imageUrl"  data-img-click="showImage(identifier)" data-img-show="imageAvailable == true" />
         <p data-ng-show="imageAvailable != true" th:text="#{'There is no up to date image available.'}">
         </p>
       </div>
