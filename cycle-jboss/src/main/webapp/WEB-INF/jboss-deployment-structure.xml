@@ -3,6 +3,10 @@
     <exclusions>
       <!--  We bring our own jaxrs version -->
       <module name="org.jboss.resteasy.resteasy-jaxrs" />
+      <module name="org.jboss.resteasy.resteasy-yaml-provider" />
+      <module name="org.jboss.resteasy.resteasy-jackson-provider" />
+      <module name="org.jboss.resteasy.resteasy-jettison-provider" />
+      <module name="org.jboss.resteasy.resteasy-multipart-provider" />
     </exclusions>
   </deployment>
 </jboss-deployment-structure>
