@@ -23,7 +23,7 @@
   <modules>
     <module>cycle</module>
     <module>cycle-sql</module>
-    <module>cycle-fox</module>
+    <module>cycle-jboss</module>
   </modules>
   
   <dependencyManagement>
