@@ -1,0 +1,8 @@
+<jboss-deployment-structure>
+  <deployment>
+    <exclusions>
+      <!--  We bring our own jaxrs version -->
+      <module name="org.jboss.resteasy.resteasy-jaxrs" />
+    </exclusions>
+  </deployment>
+</jboss-deployment-structure>

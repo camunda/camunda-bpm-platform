@@ -4,6 +4,7 @@ import java.io.BufferedOutputStream;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.StringWriter;
@@ -277,10 +278,20 @@ public class SignavioConnector extends Connector {
   public InputStream getContent(ConnectorNode node, ConnectorContentType type) {
     switch (type) {
     case PNG:
-      return this.signavioClient.getPngContent(node.getId());
+      return wrapStream(this.signavioClient.getPngContent(node.getId()));
 
     default:
-      return this.signavioClient.getContent(node.getId());
+      return wrapStream(this.signavioClient.getContent(node.getId()));
+    }
+  }
+  
+  private InputStream wrapStream(InputStream inputStream) {
+    try {
+      return new ByteArrayInputStream(IOUtils.toByteArray(inputStream));
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }finally{
+      IOUtils.closeQuietly(inputStream);
     }
   }
   

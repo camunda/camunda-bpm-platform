@@ -5,7 +5,6 @@ import java.util.logging.Logger;
 
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
-import javax.ws.rs.ext.Provider;
 
 import org.thymeleaf.exceptions.TemplateInputException;
 
@@ -14,12 +13,11 @@ import org.thymeleaf.exceptions.TemplateInputException;
  * 
  * @author nico.rehwaldt
  */
-@Provider
+//@Provider
 public class TemplateExceptionMapper implements ExceptionMapper<TemplateInputException> {
 
   @Override
   public Response toResponse(TemplateInputException exception) {
-    exception.printStackTrace();
     Logger.getLogger(getClass().getSimpleName()).log(Level.SEVERE, "Error during JAX-RS Request", exception);
     return Response.status(Response.Status.NOT_FOUND).entity("error/not-found").build();
   }
