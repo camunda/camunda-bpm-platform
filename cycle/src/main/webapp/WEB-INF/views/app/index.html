@@ -33,7 +33,7 @@
 	            <ul class="nav nav-list" id="roundtrip-links">
 	              <li class="nav-header" th:text="#{My Roundtrips}">My Roundtrips</li>
 	              <li ng-repeat="roundtrip in roundtrips" class="roundtrip-link-{{roundtrip.id}}" ng-class="activeClass(roundtrip)" ng-cloak>
-	                <a ng-click="selectRoundtrip(roundtrip)" href="#/roundtrip/{{roundtrip.id}}" title="Inspect {{roundtrip.name}}">{{roundtrip.name}}</a>
+	                <a ng-click="selectRoundtrip(roundtrip)" href="#/roundtrip/{{roundtrip.id}}">{{roundtrip.name}}</a>
 	              </li>
 	              <li><a class="btn" ng-click="createNew()" style="margin-top: 30px; display: inline-block"><span th:text="#{Create}">Create</span></a></li>
 	            </ul>
