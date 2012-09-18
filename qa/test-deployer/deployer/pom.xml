@@ -4,7 +4,7 @@
   <parent>
     <groupId>com.camunda.fox.platform.qa</groupId>
     <artifactId>fox-platform-arquillian-test</artifactId>
-    <version>6.2.0-alpha2</version>
+    <version>6.2.0-SNAPSHOT</version>
   </parent>
   
   <artifactId>fox-platform-arquillian-test-deployer</artifactId>
