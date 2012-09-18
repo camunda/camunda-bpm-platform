@@ -16,7 +16,7 @@ import org.activiti.engine.delegate.JavaDelegate;
 @Named
 public class RemoteSingletonBeanClientDelegateBean implements JavaDelegate {
   
-  @EJB(lookup="java:global/service/RemoteSingletonBean!com.camunda.fox.platform.test.functional.ejb.remote.bean.BusinessInterface")
+  @EJB(lookup="java:global/service/service/RemoteSingletonBean!com.camunda.fox.platform.test.functional.ejb.remote.bean.BusinessInterface")
   private BusinessInterface businessInterface;
 
   @Override
