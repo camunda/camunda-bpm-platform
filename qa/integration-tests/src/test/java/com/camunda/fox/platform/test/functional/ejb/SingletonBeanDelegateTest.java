@@ -39,7 +39,7 @@ public class SingletonBeanDelegateTest extends AbstractFoxPlatformIntegrationTes
     
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("testBeanResolution");
     
-    Assert.assertEquals(runtimeService.getVariable(pi.getId(), SingletonBeanDelegate.class.getName()), true);
+    Assert.assertEquals(true, runtimeService.getVariable(pi.getId(), SingletonBeanDelegate.class.getName()));
     
     runtimeService.setVariable(pi.getId(), SingletonBeanDelegate.class.getName(), false);
     
@@ -47,7 +47,7 @@ public class SingletonBeanDelegateTest extends AbstractFoxPlatformIntegrationTes
     
     waitForJobExecutorToProcessAllJobs(6000, 300);
     
-    Assert.assertEquals(runtimeService.getVariable(pi.getId(), SingletonBeanDelegate.class.getName()), true);
+    Assert.assertEquals(true, runtimeService.getVariable(pi.getId(), SingletonBeanDelegate.class.getName()));
     
     taskService.complete(taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult().getId());
     
@@ -83,7 +83,7 @@ public class SingletonBeanDelegateTest extends AbstractFoxPlatformIntegrationTes
     
     for(int i=0; i<instances; i++) {    
       ids[i] = runtimeService.startProcessInstanceByKey("testBeanResolutionfromClient").getId();    
-      Assert.assertEquals(runtimeService.getVariable(ids[i], SingletonBeanDelegate.class.getName()), true);      
+      Assert.assertEquals(true, runtimeService.getVariable(ids[i], SingletonBeanDelegate.class.getName()));      
       runtimeService.setVariable(ids[i], SingletonBeanDelegate.class.getName(), false);
       taskService.complete(taskService.createTaskQuery().processInstanceId(ids[i]).singleResult().getId());
     }
@@ -91,7 +91,7 @@ public class SingletonBeanDelegateTest extends AbstractFoxPlatformIntegrationTes
     waitForJobExecutorToProcessAllJobs(60*1000, 300);
     
     for(int i=0; i<instances; i++) {    
-      Assert.assertEquals(runtimeService.getVariable(ids[i], SingletonBeanDelegate.class.getName()), true);    
+      Assert.assertEquals(true, runtimeService.getVariable(ids[i], SingletonBeanDelegate.class.getName()));    
       taskService.complete(taskService.createTaskQuery().processInstanceId(ids[i]).singleResult().getId());
     }
     
