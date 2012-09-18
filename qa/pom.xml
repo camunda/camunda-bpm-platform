@@ -22,6 +22,9 @@
   <profiles>
     <profile>
       <id>was</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
       <modules>
         <module>websphere-runtime</module>
         <module>integration-tests</module>
@@ -43,7 +46,7 @@
     <profile>
       <id>jboss</id>
       <activation>
-        <activeByDefault>true</activeByDefault>
+        <activeByDefault>false</activeByDefault>
       </activation>
       <modules>
         <module>jboss7-runtime</module>

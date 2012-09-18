@@ -66,7 +66,7 @@ public class JobExecutorRequestContextRemoteInvocationTest extends AbstractFoxPl
     
     Object variable = runtimeService.getVariable(pi.getId(), "invocationCounter");
     // remote invocations of a bean from a separate deployment constitutes separate requests
-    Assert.assertEquals(1, variable);
+    Assert.assertEquals(2, variable);
     
     Task task = taskService.createTaskQuery()
       .processInstanceId(pi.getProcessInstanceId())
