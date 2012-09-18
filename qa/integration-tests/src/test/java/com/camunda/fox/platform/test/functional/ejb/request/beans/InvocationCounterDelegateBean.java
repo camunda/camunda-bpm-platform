@@ -15,7 +15,7 @@ import org.activiti.engine.delegate.JavaDelegate;
 public class InvocationCounterDelegateBean implements JavaDelegate {
   
   @EJB(lookup="java:global/" +
-    "service/" +
+    "service/service/" +
   	"InvocationCounterServiceBean!com.camunda.fox.platform.test.functional.ejb.request.beans.InvocationCounterService")
   private InvocationCounterService invocationCounterService;
 
