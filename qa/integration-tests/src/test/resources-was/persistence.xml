@@ -7,8 +7,13 @@
   <persistence-unit name="primary" transaction-type="JTA">
     <jta-data-source>jdbc/FoxEngine</jta-data-source>
     <properties>
+      <!-- needed for schema creation -->
       <property name="openjpa.jdbc.SynchronizeMappings" value="buildSchema(ForeignKeys=true)"/>
       <property name="openjpa.RuntimeUnenhancedClasses" value="supported"/>
+      <property name="openjpa.Connection2UserName" value="${database.user}"/>
+      <property name="openjpa.Connection2Password" value="${database.password}"/>
+      <property name="openjpa.Connection2URL" value="jdbc:mysql://${database.host}:3306/${database.name}"/>
+      <property name="openjpa.Connection2DriverName" value="com.mysql.jdbc.Driver"/>
     </properties>
   </persistence-unit>
 </persistence>
