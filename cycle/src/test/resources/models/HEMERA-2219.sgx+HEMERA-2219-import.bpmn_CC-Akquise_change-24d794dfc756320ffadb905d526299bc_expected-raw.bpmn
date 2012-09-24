@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?><definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:signavio="http://www.signavio.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" exporter="Signavio Process Editor, http://www.signavio.com" exporterVersion="5.4.1" id="sid-61bbe5e3-c8d4-4732-b8eb-615cee3156fd" targetNamespace="http://www.signavio.com/bpmn20" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/2.0/20100501/BPMN20.xsd">
-   <error id="sid-84bb6c5d-6245-4298-a790-e007b9f83bb0" name="SAPWriteContactError"/>
-   <error id="sid-0f83e869-d7f0-463c-b1ad-63c7969f477b" name="TechnicalMasterDataCreationError"/>
    <message id="sid-5d3ebb03-019a-4b0c-aaa7-5906171edf39" name="manual"/>
    <message id="sid-f4631112-cf02-423a-b5a4-6e5106052a2b" name="automatic"/>
+   <error id="sid-84bb6c5d-6245-4298-a790-e007b9f83bb0" name="SAPWriteContactError"/>
+   <error id="sid-0f83e869-d7f0-463c-b1ad-63c7969f477b" name="TechnicalMasterDataCreationError"/>
    <collaboration id="sid-22073345-acd4-4494-9941-454e7ee59fdc">
       <participant id="UI_Mediator_6" name="UI Mediator">
          <extensionElements>

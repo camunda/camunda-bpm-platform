@@ -9,6 +9,8 @@ import static org.junit.Assert.fail;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -25,8 +27,11 @@ import com.camunda.fox.cycle.exception.CycleException;
 @ContextConfiguration(
   locations = {"classpath:/spring/test/signavio-connector-xml-config.xml"}
 )
-public class SignavioConnectorTest extends AbstractSignavioConnectorTest {
+public class SignavioConnectorTest {
 
+  @Inject
+  private SignavioConnector signavioConnector;
+  
   @Before
   public void setUp() throws Exception {
     this.getSignavioConnector().init(this.getSignavioConnector().getConfiguration());
@@ -93,16 +98,16 @@ public class SignavioConnectorTest extends AbstractSignavioConnectorTest {
     this.getSignavioConnector().login(config.getGlobalUser(), config.getGlobalPassword());
     ConnectorNode createdRootNode = null;
     try {
-      createdRootNode = this.createFolder(this.getSignavioConnector().getPrivateFolder(), "TestFolder");
+      createdRootNode = this.getSignavioConnector().createNode(this.getSignavioConnector().getPrivateFolder().getId(), null, "TestFolder", ConnectorNodeType.FOLDER);
       assertEquals("TestFolder", createdRootNode.getLabel());
       assertEquals(ConnectorNodeType.FOLDER, createdRootNode.getType());
       
       List<ConnectorNode> children = this.getSignavioConnector().getChildren(createdRootNode);
       assertTrue(children.isEmpty());
-      this.deleteFolder(createdRootNode);
+      this.getSignavioConnector().deleteNode(createdRootNode);
     } catch (Exception e) {
       if (createdRootNode != null) {
-        this.deleteFolder(createdRootNode);
+        this.getSignavioConnector().deleteNode(createdRootNode);
       }
       fail("An exception has been thrown: " + e.getMessage());
     }
@@ -114,11 +119,11 @@ public class SignavioConnectorTest extends AbstractSignavioConnectorTest {
     this.getSignavioConnector().login(config.getGlobalUser(), config.getGlobalPassword());
     ConnectorNode createdRootNode = null;
     try {
-      createdRootNode = this.createFolder(this.getSignavioConnector().getPrivateFolder(), "TestFolder");
+      createdRootNode = this.getSignavioConnector().createNode(this.getSignavioConnector().getPrivateFolder().getId(), null, "TestFolder", ConnectorNodeType.FOLDER);
       assertEquals("TestFolder", createdRootNode.getLabel());
       assertEquals(ConnectorNodeType.FOLDER, createdRootNode.getType());
       
-      ConnectorNode newFolder = this.createFolder(createdRootNode, "ChildFolder");
+      ConnectorNode newFolder = this.getSignavioConnector().createNode(createdRootNode.getId(), null, "ChildFolder", ConnectorNodeType.FOLDER);
       assertEquals("ChildFolder", newFolder.getLabel());
       assertEquals(ConnectorNodeType.FOLDER, newFolder.getType());
       
@@ -132,10 +137,10 @@ public class SignavioConnectorTest extends AbstractSignavioConnectorTest {
       assertEquals("ChildFolder", child.getLabel());
       assertEquals(ConnectorNodeType.FOLDER, child.getType());      
       
-      this.deleteFolder(createdRootNode);
+      this.getSignavioConnector().deleteNode(createdRootNode);
     } catch (Exception e) {
       if (createdRootNode != null) {
-        this.deleteFolder(createdRootNode);
+        this.getSignavioConnector().deleteNode(createdRootNode);
       }
       fail("An exception has been thrown: " + e.getMessage());
     }
@@ -147,11 +152,11 @@ public class SignavioConnectorTest extends AbstractSignavioConnectorTest {
     this.getSignavioConnector().login(config.getGlobalUser(), config.getGlobalPassword());
     ConnectorNode createdRootNode = null;
     try {
-      createdRootNode = this.createFolder(this.getSignavioConnector().getPrivateFolder(), "TestFolder");
+      createdRootNode = this.getSignavioConnector().createNode(this.getSignavioConnector().getPrivateFolder().getId(), null, "TestFolder", ConnectorNodeType.FOLDER);
       assertEquals("TestFolder", createdRootNode.getLabel());
       assertEquals(ConnectorNodeType.FOLDER, createdRootNode.getType());
       
-      ConnectorNode newModel = this.createEmptyModel(createdRootNode, "model1");
+      ConnectorNode newModel = this.getSignavioConnector().createNode(createdRootNode.getId(), null, "model1", ConnectorNodeType.FILE);
       assertEquals("model1", newModel.getLabel());
       assertEquals(ConnectorNodeType.FILE, newModel.getType());
       
@@ -166,10 +171,10 @@ public class SignavioConnectorTest extends AbstractSignavioConnectorTest {
       assertEquals("model1", child.getLabel());
       assertEquals(ConnectorNodeType.FILE, child.getType());
       
-      this.deleteFolder(createdRootNode);
+      this.getSignavioConnector().deleteNode(createdRootNode);
     } catch (Exception e) {
       if (createdRootNode != null) {
-        this.deleteFolder(createdRootNode);
+        this.getSignavioConnector().deleteNode(createdRootNode);
       }
       fail("An exception has been thrown: " + e.getMessage());
     }
@@ -181,15 +186,15 @@ public class SignavioConnectorTest extends AbstractSignavioConnectorTest {
     this.getSignavioConnector().login(config.getGlobalUser(), config.getGlobalPassword());
     ConnectorNode createdRootNode = null;
     try {
-      createdRootNode = this.createFolder(this.getSignavioConnector().getPrivateFolder(), "TestFolder");
+      createdRootNode = this.getSignavioConnector().createNode(this.getSignavioConnector().getPrivateFolder().getId(), null, "TestFolder", ConnectorNodeType.FOLDER);
       assertEquals("TestFolder", createdRootNode.getLabel());
       assertEquals(ConnectorNodeType.FOLDER, createdRootNode.getType());
       
-      ConnectorNode newFolder = this.createFolder(createdRootNode, "ChildFolder");
+      ConnectorNode newFolder = this.getSignavioConnector().createNode(createdRootNode.getId(), null, "ChildFolder", ConnectorNodeType.FOLDER);
       assertEquals("ChildFolder", newFolder.getLabel());
       assertEquals(ConnectorNodeType.FOLDER, newFolder.getType());
       
-      ConnectorNode newModel = this.createEmptyModel(createdRootNode, "model1");
+      ConnectorNode newModel = this.getSignavioConnector().createNode(createdRootNode.getId(), null, "model1", ConnectorNodeType.FILE);
       assertEquals("model1", newModel.getLabel());
       assertEquals(ConnectorNodeType.FILE, newModel.getType());
       
@@ -211,10 +216,10 @@ public class SignavioConnectorTest extends AbstractSignavioConnectorTest {
       assertEquals("model1", childModel.getLabel());
       assertEquals(ConnectorNodeType.FILE, childModel.getType());
       
-      this.deleteFolder(createdRootNode);
+      this.getSignavioConnector().deleteNode(createdRootNode);
     } catch (Exception e) {
       if (createdRootNode != null) {
-        this.deleteFolder(createdRootNode);
+        this.getSignavioConnector().deleteNode(createdRootNode);
       }
       fail("An exception has been thrown: " + e.getMessage());
     }
@@ -240,4 +245,9 @@ public class SignavioConnectorTest extends AbstractSignavioConnectorTest {
     }
     
   }
+  
+  private SignavioConnector getSignavioConnector() {
+    return this.signavioConnector;
+  }
+  
 }

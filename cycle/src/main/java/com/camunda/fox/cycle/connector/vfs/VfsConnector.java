@@ -61,7 +61,7 @@ public class VfsConnector extends Connector {
           } else {
             node.setType(ConnectorNodeType.FOLDER);
           }
-          
+          node.setConnectorId(this.getConfiguration().getId());
           /**
            * it's not possible to get last modified date from symlinks
            */
@@ -210,7 +210,7 @@ public class VfsConnector extends Connector {
   }
 
   @Override
-  public ConnectorNode createNode(String id, String label, ConnectorNodeType type) {
+  public ConnectorNode createNode(String parentId, String id, String label, ConnectorNodeType type) {
     try {
       FileSystemManager fsManager = VFS.getManager();
       FileObject fileObject;
@@ -235,12 +235,12 @@ public class VfsConnector extends Connector {
   }
 
   @Override
-  public void deleteNode(String id) {
+  public void deleteNode(ConnectorNode node) {
     try {
       FileSystemManager fsManager = VFS.getManager();
       FileObject fileObject;
 
-      fileObject = fsManager.resolveFile(basePath + id);
+      fileObject = fsManager.resolveFile(basePath + node.getId());
       fileObject.delete();
 
     } catch (Exception e) {

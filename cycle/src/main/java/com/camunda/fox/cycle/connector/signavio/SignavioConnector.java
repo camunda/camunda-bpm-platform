@@ -15,6 +15,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -439,10 +440,6 @@ public class SignavioConnector extends Connector {
     throw new CycleException("A node named '" + nodeName + "' could not be found in '" + parent.getLabel() + "'.");
   }
   
-  private void deleteNode(ConnectorNode node) {
-    this.signavioClient.delete(this.extractType(node), node.getId());
-  }
-  
   private String extractType(ConnectorNode node) {
     if (node.getType() != null && node.getType().equals(ConnectorNodeType.FILE)) {
       return MODEL_URL_SUFFIX;
@@ -516,13 +513,44 @@ public class SignavioConnector extends Connector {
   }
 
   @Override
-  public void deleteNode(String id) {
-    throw new UnsupportedOperationException();
+  public void deleteNode(ConnectorNode node) {
+    this.signavioClient.delete(this.extractType(node), node.getId());
   }
 
   @Override
-  public ConnectorNode createNode(String id, String label, ConnectorNodeType type) {
-    throw new UnsupportedOperationException();
+  public ConnectorNode createNode(String parentId, String id, String label, ConnectorNodeType type) {
+    try {
+      String response = "";
+      ConnectorNode result = null;
+      switch (type) {
+      case FOLDER:
+        SignavioCreateFolderForm form = new SignavioCreateFolderForm(label, "", parentId);
+        response = this.signavioClient.createFolder(form);
+        result = this.createFolderNode(new JSONObject(response));
+        break;
+      case FILE:
+        SignavioCreateModelForm newModelForm = new SignavioCreateModelForm();
+        
+        newModelForm.setId(UUID.randomUUID().toString().replace("-", ""));
+        newModelForm.setName(label);
+        newModelForm.setComment("");
+        newModelForm.setDescription("");
+        newModelForm.setParent(parentId);
+        newModelForm.setJsonXml(IoUtil.readFileAsString("com/camunda/fox/cycle/connector/emptyProcessModelTemplate.json"));
+        newModelForm.setSVG_XML("<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:oryx=\"http://oryx-editor.org\" id=\"sid-80D82B67-3B30-4B35-A6CB-16EEE17A719F\" width=\"50\" height=\"50\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:svg=\"http://www.w3.org/2000/svg\"><defs/><g stroke=\"black\" font-family=\"Verdana, sans-serif\" font-size-adjust=\"none\" font-style=\"normal\" font-variant=\"normal\" font-weight=\"normal\" line-heigth=\"normal\" font-size=\"12\"><g class=\"stencils\" transform=\"translate(25, 25)\"><g class=\"me\"/><g class=\"children\"/><g class=\"edge\"/></g></g></svg>");
+        
+        response = this.signavioClient.createModel(newModelForm);
+        result = this.createModelNode(new JSONObject(response));
+        break;
+      }
+      if (result != null) {
+        result.setConnectorId(this.getConfiguration().getId());  
+      }
+      return result;
+    } catch (Exception e) {
+      logger.fine("Failed to create a new connector node '" + label + "'.");
+      throw new CycleException("Failed to create a new connector node '" + label + "'.", e);
+    }
   }
 
   @Secured
@@ -545,5 +573,9 @@ public class SignavioConnector extends Connector {
       return null;
     }  
  }
+  
+  protected String getSecurityToken() {
+    return this.securityToken;
+  }
 
 }

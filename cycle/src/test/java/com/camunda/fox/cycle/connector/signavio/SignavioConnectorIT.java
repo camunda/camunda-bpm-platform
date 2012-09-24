@@ -9,11 +9,13 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -28,6 +30,13 @@ import org.activiti.engine.impl.persistence.entity.DeploymentEntity;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.mime.HttpMultipartMode;
+import org.apache.http.entity.mime.MultipartEntity;
+import org.apache.http.entity.mime.content.FileBody;
+import org.apache.http.entity.mime.content.StringBody;
+import org.apache.http.util.EntityUtils;
 import org.custommonkey.xmlunit.DetailedDiff;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.ElementNameAndAttributeQualifier;
@@ -37,7 +46,6 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.kubek2k.springockito.annotations.SpringockitoContextLoader;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import org.w3c.dom.Element;
@@ -45,6 +53,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import com.camunda.fox.cycle.connector.ConnectorNode;
+import com.camunda.fox.cycle.connector.ConnectorNode.ConnectorNodeType;
 import com.camunda.fox.cycle.entity.ConnectorConfiguration;
 import com.camunda.fox.cycle.roundtrip.BpmnProcessModelUtil;
 import com.camunda.fox.cycle.roundtrip.XsltTransformer;
@@ -54,7 +63,7 @@ import com.camunda.fox.cycle.util.XmlUtil;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "classpath:/spring/test/signavio-connector-xml-config.xml" })
-public class SignavioConnectorIT extends AbstractSignavioConnectorTest {
+public class SignavioConnectorIT {
 
   private static final String INITIAL_RAW_BPMN20_XML = "initial-raw.bpmn";
   private static final String EXPECTED_RAW_BPMN20_XML = "expected-raw.bpmn";
@@ -77,6 +86,8 @@ public class SignavioConnectorIT extends AbstractSignavioConnectorTest {
   
   @Inject
   private ProcessEngineConfigurationImpl processEngineConfiguration;
+  @Inject
+  private SignavioConnector signavioConnector;
 
   @Before
   public void setUp() throws Exception {
@@ -110,7 +121,7 @@ public class SignavioConnectorIT extends AbstractSignavioConnectorTest {
       String actualXml = IOUtils.toString(actualXmlInputStream, "UTF-8");
       actualXmlInputStream.close();
       
-      this.deleteModel(importedNode);
+      this.getSignavioConnector().deleteNode(importedNode);
       assertXpathEvaluatesTo(expectedElementCount, ACT_ELEMENT_COUNT, actualXml);
       assertXpathEvaluatesTo(expectedAttributeCount, ACT_ATTRIBUTE_COUNT, actualXml);
     }
@@ -292,7 +303,7 @@ public class SignavioConnectorIT extends AbstractSignavioConnectorTest {
     try {
       // create directory
       String folderName = "Cycle: SignavioConnectorIT.testBpmnPoolExtractionRoundtrip " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
-      folder = this.createFolder(this.getSignavioConnector().getPrivateFolder(), folderName);
+      folder = this.getSignavioConnector().createNode(this.getSignavioConnector().getPrivateFolder().getId(), null, folderName, ConnectorNodeType.FOLDER);
 
       // upload model
       if (filename.endsWith(".sgx")) {
@@ -368,7 +379,7 @@ public class SignavioConnectorIT extends AbstractSignavioConnectorTest {
     } finally {
       if (folder != null) {
         // delete folder
-        this.deleteFolder(folder);
+        this.getSignavioConnector().deleteNode(folder);
       }
     }
 
@@ -486,5 +497,32 @@ public class SignavioConnectorIT extends AbstractSignavioConnectorTest {
     }
     return technicalModel;
   }
+  
+  private void importSignavioArchive(ConnectorNode folder, String signavioArchive) throws Exception {
+    HttpClient httpClient = this.signavioConnector.getHttpClient4Executor().getHttpClient();
+    String signavioURL = this.signavioConnector.getConfiguration().getProperties().get("signavioBaseUrl");
+    if (signavioURL.endsWith("/")) {
+      signavioURL = signavioURL + "p/";
+    } else {
+      signavioURL = signavioURL + "/" + "p/";
+    }
+    HttpPost post = new HttpPost(signavioURL + "zip-import");
+    post.addHeader("x-signavio-id", this.signavioConnector.getSecurityToken());
+    
+    MultipartEntity entity = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE);
+    
+    entity.addPart("file", new FileBody(new File(signavioArchive)));
+    
+    String parentFolderId = folder.getId();
+    entity.addPart("directory", new StringBody("/directory" + parentFolderId , Charset.forName("UTF-8")));
+    entity.addPart("signavio-id", new StringBody(UUID.randomUUID().toString(), Charset.forName("UTF-8")));
+    post.setEntity(entity);
+    
+    EntityUtils.toString(httpClient.execute(post).getEntity(), "UTF-8");
+  }
 
+  private SignavioConnector getSignavioConnector() {
+    return this.signavioConnector;
+  }
+  
 }

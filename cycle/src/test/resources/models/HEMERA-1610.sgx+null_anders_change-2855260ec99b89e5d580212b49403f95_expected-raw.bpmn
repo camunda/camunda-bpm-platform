@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?><definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:signavio="http://www.signavio.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" exporter="Signavio Process Editor, http://www.signavio.com" exporterVersion="6.1.0" id="sid-d0fac1c3-abc0-457e-ba85-ee123bc736fd" targetNamespace="http://www.signavio.com/bpmn20" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/2.0/20100501/BPMN20.xsd">
-   <dataStore capacity="0" id="sid-bc35cdc1-6ad4-447b-b41f-33bf2ec1a297" isUnlimited="false" name="Überweisungs-&#10;vorlagen"/>
    <message id="sid-779ac870-7840-4d1d-bc2e-78a3c3cdfea6" name=""/>
+   <dataStore capacity="0" id="sid-bc35cdc1-6ad4-447b-b41f-33bf2ec1a297" isUnlimited="false" name="Überweisungs-&#10;vorlagen"/>
    <collaboration id="sid-5dbf8e5c-524d-4a0e-9512-17a1ea27d4e9">
       <participant id="Team-Assistenz_5" name="Team-Assistenz" processRef="Team-Assistenz_12"/>
       <participant id="Process_Engine_3" name="Process Engine" processRef="anders_"/>

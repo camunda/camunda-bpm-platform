@@ -1,8 +1,8 @@
 package com.camunda.fox.cycle.connector;
 
 import java.io.InputStream;
-import java.util.Date;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 import com.camunda.fox.cycle.connector.ConnectorNode.ConnectorNodeType;
@@ -22,6 +22,14 @@ public abstract class Connector {
   
   public abstract ConnectorNode getRoot();
   
+  /**
+   * Returns a {@link ConnectorNode} to the assigned <code>id</code>. Iff
+   * a {@link ConnectorNode} could not be found, the value <code>null</code>
+   * will be returned. 
+   * @param id Represents the id of a {@link ConnectorNode} to search.
+   * @return A {@link ConnectorNode} to the assigned <code>id</code> or null if no
+   * {@link ConnectorNode} found.
+   */
   public abstract ConnectorNode getNode(String id);
   
   public InputStream getContent(ConnectorNode node) {
@@ -57,9 +65,9 @@ public abstract class Connector {
   
   public abstract InputStream getContent(ConnectorNode node, ConnectorContentType type); 
   
-  public abstract ConnectorNode createNode(String id, String label, ConnectorNodeType type);
+  public abstract ConnectorNode createNode(String parentId, String id, String label, ConnectorNodeType type);
   
-  public abstract void deleteNode(String id);
+  public abstract void deleteNode(ConnectorNode node);
   
   public abstract void updateContent(ConnectorNode node, InputStream newContent) throws Exception;
   

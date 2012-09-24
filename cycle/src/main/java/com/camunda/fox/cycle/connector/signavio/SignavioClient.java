@@ -71,14 +71,4 @@ public interface SignavioClient {
   @Consumes(MediaType.APPLICATION_JSON)
   public String createFolder(@Form SignavioCreateFolderForm form);
   
-  @DELETE
-  @Path("/directory{dir}")
-  @Consumes(MediaType.APPLICATION_JSON)
-  public String deleteFolder(@PathParam("dir") String dir);
-  
-  @DELETE
-  @Path("/model{id}")
-  @Consumes(MediaType.APPLICATION_JSON)
-  public String deleteModel(@PathParam("id") String id);
-  
 }
