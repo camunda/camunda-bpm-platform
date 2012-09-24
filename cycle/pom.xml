@@ -198,15 +198,19 @@
 
   <build>
     <finalName>cycle</finalName>
+    <filters>
+      <filter>src/test/resources/config/test.properties</filter>
+    </filters>
     <resources>
       <resource>
         <directory>src/main/resources</directory>
-        <!-- <filtering>true</filtering> -->
+        <!--<filtering>true</filtering>-->
       </resource>
     </resources>
     <testResources>
       <testResource>
         <directory>src/test/resources</directory>
+        <filtering>true</filtering>
       </testResource>
       <testResource>
         <directory>src/test/javascript</directory>
@@ -236,19 +240,19 @@
           </execution>
         </executions>
       </plugin>
-  		<plugin>
-  			<groupId>org.apache.maven.plugins</groupId>
-  			<artifactId>maven-war-plugin</artifactId>
-  			<version>2.2</version>
-  				<configuration>
-  					<webResources>
-  						<resource>
-  							<filtering>true</filtering>
-  							<directory>src/main/webapp</directory>
-  						</resource>
-  					</webResources>
-  				</configuration>
-  		</plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-war-plugin</artifactId>
+        <version>2.2</version>
+        <configuration>
+          <webResources>
+            <resource>
+              <filtering>true</filtering>
+              <directory>src/main/webapp</directory>
+            </resource>
+          </webResources>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
 

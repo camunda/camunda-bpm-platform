@@ -21,11 +21,11 @@
     <property name="id" value="2" />
     <property name="label" value="My SignavioConnector" />
     <property name="loginMode" value="GLOBAL" />
-    <property name="globalUser" value="test@camunda.com" />
-    <property name="globalPassword" value="testtest" />
+    <property name="globalUser" value="${test.signavioConnector.globalUser}" />
+    <property name="globalPassword" value="${test.signavioConnector.globalPassword}" />
     <property name="properties">
       <map>
-        <entry key="signavioBaseUrl" value="http://vm2.camunda.com:8080"></entry>
+        <entry key="signavioBaseUrl" value="${test.signavioConnector.baseUrl}"></entry>
       </map>
     </property>
   </bean>

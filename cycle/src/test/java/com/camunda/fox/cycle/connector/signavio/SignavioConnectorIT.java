@@ -53,7 +53,7 @@ import com.camunda.fox.cycle.util.IoUtil;
 import com.camunda.fox.cycle.util.XmlUtil;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(loader = SpringockitoContextLoader.class, locations = { "classpath:/spring/test/signavio-connector-xml-config.xml" })
+@ContextConfiguration(locations = { "classpath:/spring/test/signavio-connector-xml-config.xml" })
 public class SignavioConnectorIT extends AbstractSignavioConnectorTest {
 
   private static final String INITIAL_RAW_BPMN20_XML = "initial-raw.bpmn";
@@ -73,8 +73,8 @@ public class SignavioConnectorIT extends AbstractSignavioConnectorTest {
   private static final String[] testBpmnModels = new String[] { "MyProcess.bpmn", "SimpleProcurementExample.bpmn", "TwitterDemoProcess.bpmn",
       "TwitterDemoProcess-business-rule-task.bpmn", "TwitterDemoProcess-business-rule-task.dev-friendly.2011-09-01.bpmn" };
   
-  @Inject
-  private BpmnProcessModelUtil bpmnProcessModelUtil;
+  private BpmnProcessModelUtil bpmnProcessModelUtil = new BpmnProcessModelUtil();
+  
   @Inject
   private ProcessEngineConfigurationImpl processEngineConfiguration;
 

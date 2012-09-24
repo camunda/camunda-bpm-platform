@@ -13,11 +13,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.kubek2k.springockito.annotations.SpringockitoContextLoader;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import com.camunda.fox.cycle.connector.ConnectorLoginMode;
 import com.camunda.fox.cycle.connector.ConnectorNode;
 import com.camunda.fox.cycle.connector.ConnectorNode.ConnectorNodeType;
 import com.camunda.fox.cycle.entity.ConnectorConfiguration;
@@ -25,7 +23,6 @@ import com.camunda.fox.cycle.exception.CycleException;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(
-  loader = SpringockitoContextLoader.class, 
   locations = {"classpath:/spring/test/signavio-connector-xml-config.xml"}
 )
 public class SignavioConnectorTest extends AbstractSignavioConnectorTest {
@@ -53,14 +50,20 @@ public class SignavioConnectorTest extends AbstractSignavioConnectorTest {
     assertTrue(config.getId() == 2);
     assertEquals("My SignavioConnector", config.getLabel());
     
-    assertEquals(ConnectorLoginMode.GLOBAL, config.getLoginMode());
-    assertEquals("test@camunda.com", config.getGlobalUser());
-    assertEquals("testtest", config.getGlobalPassword()); // TODO: decrypt password!
-    
     Map<String, String> prop = config.getProperties();
     assertNotNull(prop);
     
-    assertEquals("http://vm2.camunda.com:8080", prop.get(SignavioConnector.CONFIG_KEY_SIGNAVIO_BASE_URL));
+    assertNotNull(config.getLoginMode());
+    assertNotNull(config.getGlobalUser());
+    assertNotNull(config.getGlobalPassword());
+    assertNotNull(prop.get(SignavioConnector.CONFIG_KEY_SIGNAVIO_BASE_URL));
+    
+    // TODO: nre: cannot do this if credentials are configurable
+    // assertEquals(ConnectorLoginMode.GLOBAL, config.getLoginMode());
+    // assertEquals("test@camunda.com", config.getGlobalUser());
+    // assertEquals("testtest", config.getGlobalPassword()); // TODO: decrypt password!
+    
+    // assertEquals("http://vm2.camunda.com:8080", prop.get(SignavioConnector.CONFIG_KEY_SIGNAVIO_BASE_URL));
   }
   
   @Test
