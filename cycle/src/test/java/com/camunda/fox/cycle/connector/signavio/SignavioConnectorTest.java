@@ -19,7 +19,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.camunda.fox.cycle.connector.ConnectorLoginMode;
 import com.camunda.fox.cycle.connector.ConnectorNode;
-import com.camunda.fox.cycle.connector.ConnectorNode.ConnectorNodeType;
+import com.camunda.fox.cycle.connector.ConnectorNodeType;
 import com.camunda.fox.cycle.entity.ConnectorConfiguration;
 import com.camunda.fox.cycle.exception.CycleException;
 
@@ -150,18 +150,17 @@ public class SignavioConnectorTest extends AbstractSignavioConnectorTest {
       
       ConnectorNode newModel = this.createEmptyModel(createdRootNode, "model1");
       assertEquals("model1", newModel.getLabel());
-      assertEquals(ConnectorNodeType.FILE, newModel.getType());
+      assertEquals(ConnectorNodeType.BPMN_FILE, newModel.getType());
       
       List<ConnectorNode> children = this.getSignavioConnector().getChildren(createdRootNode);
       
-      assertFalse(children.isEmpty());
-      assertTrue(children.size() == 1);
+      assertEquals(1, children.size());
       
       ConnectorNode child = children.get(0);
       assertEquals(newModel, child);
       
       assertEquals("model1", child.getLabel());
-      assertEquals(ConnectorNodeType.FILE, child.getType());
+      assertEquals(ConnectorNodeType.BPMN_FILE, child.getType());
       
       this.deleteFolder(createdRootNode);
     } catch (Exception e) {
@@ -188,7 +187,7 @@ public class SignavioConnectorTest extends AbstractSignavioConnectorTest {
       
       ConnectorNode newModel = this.createEmptyModel(createdRootNode, "model1");
       assertEquals("model1", newModel.getLabel());
-      assertEquals(ConnectorNodeType.FILE, newModel.getType());
+      assertEquals(ConnectorNodeType.BPMN_FILE, newModel.getType());
       
       List<ConnectorNode> children = this.getSignavioConnector().getChildren(createdRootNode);
       
@@ -206,7 +205,7 @@ public class SignavioConnectorTest extends AbstractSignavioConnectorTest {
       assertEquals(newModel, childModel);
       
       assertEquals("model1", childModel.getLabel());
-      assertEquals(ConnectorNodeType.FILE, childModel.getType());
+      assertEquals(ConnectorNodeType.BPMN_FILE, childModel.getType());
       
       this.deleteFolder(createdRootNode);
     } catch (Exception e) {

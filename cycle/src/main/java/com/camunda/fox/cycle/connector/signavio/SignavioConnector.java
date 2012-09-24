@@ -56,7 +56,8 @@ import org.springframework.stereotype.Component;
 
 import com.camunda.fox.cycle.connector.Connector;
 import com.camunda.fox.cycle.connector.ConnectorNode;
-import com.camunda.fox.cycle.connector.ConnectorNode.ConnectorNodeType;
+import com.camunda.fox.cycle.connector.ConnectorNodeType;
+import com.camunda.fox.cycle.connector.ContentInformation;
 import com.camunda.fox.cycle.connector.Secured;
 import com.camunda.fox.cycle.entity.ConnectorConfiguration;
 import com.camunda.fox.cycle.exception.CycleException;
@@ -80,11 +81,13 @@ public class SignavioConnector extends Connector {
   private static final String JSON_PARENT_NAME_PROP = "parentName";
   private static final String JSON_TYPE_PROP = "type";
   private static final String JSON_UPDATED_PROP = "updated";
+  
   // JSON values
   private static final String JSON_DIR_VALUE = "dir";
   private static final String JSON_MOD_VALUE = "mod";
   private static final String JSON_PRIVATE_VALUE = "private";
-
+  private static final String JSON_TYPE_BPMN20_VALUE = "BPMN 2.0";
+  
   private static final String REPOSITORY_BACKEND_URL_SUFFIX = "p/";
   private static final String MODEL_URL_SUFFIX = "model";
   private static final String DIRECTORY_URL_SUFFIX = "directory";
@@ -199,7 +202,7 @@ public class SignavioConnector extends Connector {
   public List<ConnectorNode> getChildren(ConnectorNode parent) {
     List<ConnectorNode> nodes = new ArrayList<ConnectorNode>();
     try {
-      String result = this.signavioClient.getChildren(parent.getId());
+      String result = signavioClient.getChildren(parent.getId());
       JSONArray jsonArray = new JSONArray(result);
       for (int i = 0; i < jsonArray.length(); i++) {
         JSONObject jsonObj = jsonArray.getJSONObject(i);
@@ -207,10 +210,10 @@ public class SignavioConnector extends Connector {
         ConnectorNode newNode = null;
         String relProp = jsonObj.getString(JSON_REL_PROP);
         if (relProp.equals(JSON_DIR_VALUE)) {
-          newNode = this.createFolderNode(jsonObj);
+          newNode = createFolderNode(jsonObj);
           nodes.add(newNode);
         } else if (relProp.equals(JSON_MOD_VALUE)) {
-          newNode = this.createModelNode(jsonObj);
+          newNode = createFileNode(jsonObj);
           nodes.add(newNode);
         }
         if (newNode != null) {
@@ -224,32 +227,30 @@ public class SignavioConnector extends Connector {
   }
   
   private ConnectorNode createFolderNode(JSONObject jsonObj) throws JSONException {
-    ConnectorNode newNode = new ConnectorNode();
-    newNode.setType(ConnectorNodeType.FOLDER);
-    
-    this.extractNodeName(jsonObj, newNode);
+    ConnectorNode node = new ConnectorNode();
+    node.setType(ConnectorNodeType.FOLDER);
+    node.setLabel(extractNodeName(jsonObj));
     
     String href = jsonObj.getString(JSON_HREF_PROP);
     href = href.replace(SLASH_CHAR + DIRECTORY_URL_SUFFIX, "");
-    newNode.setId(href);
+    node.setId(href);
     
-    return newNode;
+    return node;
   }
   
-  private ConnectorNode createModelNode(JSONObject jsonObj) throws JSONException {
-    ConnectorNode newNode = new ConnectorNode();
-    newNode.setType(ConnectorNodeType.FILE);
-
-    this.extractNodeName(jsonObj, newNode);
+  private ConnectorNode createFileNode(JSONObject jsonObj) throws JSONException {
+    ConnectorNode node = new ConnectorNode();
+    node.setLabel(extractNodeName(jsonObj));
     
     String href = jsonObj.getString(JSON_HREF_PROP);
     href = href.replace(SLASH_CHAR + MODEL_URL_SUFFIX, "");
-    newNode.setId(href);
+    node.setId(href);
     
-    return newNode;
+    node.setType(extractContentType(jsonObj));
+    return node;
   }
   
-  private void extractNodeName(JSONObject jsonObj, ConnectorNode node) throws JSONException {
+  private String extractNodeName(JSONObject jsonObj) throws JSONException {
     String label = "";
     JSONObject repJsonObj = jsonObj.getJSONObject(JSON_REP_OBJ);
     if (repJsonObj.has(JSON_NAME_PROP)) {
@@ -257,7 +258,18 @@ public class SignavioConnector extends Connector {
     } else if (repJsonObj.has(JSON_TITLE_PROP)) {
       label = repJsonObj.getString(JSON_TITLE_PROP);
     }
-    node.setLabel(label);
+    
+    return label;
+  }
+  
+  private ConnectorNodeType extractContentType(JSONObject jsonObj) throws JSONException {
+    JSONObject repJsonObj = jsonObj.getJSONObject(JSON_REP_OBJ);
+    
+    if (repJsonObj.has(JSON_TYPE_PROP) && JSON_TYPE_BPMN20_VALUE.equals(repJsonObj.getString(JSON_TYPE_PROP))) {
+      return ConnectorNodeType.BPMN_FILE;
+    } else {
+      return ConnectorNodeType.ANY_FILE;
+    }
   }
   
   @SuppressWarnings("unchecked")
@@ -273,18 +285,54 @@ public class SignavioConnector extends Connector {
     }
   }
 
+  private Date getLastModifiedDate(ConnectorNode node) {
+    try {
+      String info = signavioClient.getInfo(MODEL_URL_SUFFIX, node.getId());
+      JSONObject jsonObj = new JSONObject(info);
+      String updated = jsonObj.getString(JSON_UPDATED_PROP);
+      if (updated != null) {
+        SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss Z");
+        Date lastModifiedDate = dateFormatter.parse(updated);
+        return lastModifiedDate;
+      }
+      
+      return null;
+      
+    } catch (Exception e) {
+      logger.log(Level.WARNING, "Could not get last modified date for " + node);
+      return null;
+    }
+  }
+  
+  private boolean isContentAvailable(ConnectorNode node) {
+    try {
+      boolean result = false;
+      InputStream stream = getContent(node);
+      if (stream != null) {
+        result = true;
+      }
+      IoUtil.closeSilently(stream);
+      return result;
+    } catch (Exception e) {
+      return false;
+    }
+  }
+
   @Secured
   @Override
-  public InputStream getContent(ConnectorNode node, ConnectorContentType type) {
+  public InputStream getContent(ConnectorNode node) {
+    
+    ConnectorNodeType type = node.getType();
+    
     switch (type) {
-    case PNG:
+    case PNG_FILE:
       return wrapStream(this.signavioClient.getPngContent(node.getId()));
 
     default:
       return wrapStream(this.signavioClient.getContent(node.getId()));
     }
   }
-  
+
   private InputStream wrapStream(InputStream inputStream) {
     try {
       return new ByteArrayInputStream(IOUtils.toByteArray(inputStream));
@@ -309,32 +357,26 @@ public class SignavioConnector extends Connector {
     rootNode.setType(ConnectorNodeType.FOLDER);
     return rootNode;
   }
-  
-  @Override
-  public boolean isContentAvailable(ConnectorNode node, ConnectorContentType type) {
-    try {
-      boolean result = false;
-      InputStream stream = getContent(getRoot());
-      if (stream != null) {
-        result = true;
-      }
-      IoUtil.closeSilently(stream);
-      return result;
-    } catch (Exception e) {
-      return false;
-    }
-  }
 
   @Secured
-  public void updateContent(ConnectorNode node, InputStream newContent) throws Exception {
+  @Override
+  public ContentInformation updateContent(ConnectorNode node, InputStream newContent) throws Exception {
     ConnectorNode privateFolder = this.getPrivateFolder();
     ConnectorNode importedModel = this.importContent(privateFolder, IOUtil.toString(newContent, UTF_8));
-    String json = this.signavioClient.getJson(importedModel.getId());
-    String svg = this.signavioClient.getSVG(importedModel.getId());
-    this.deleteNode(importedModel);
+    String json = signavioClient.getJson(importedModel.getId());
+    String svg = signavioClient.getSVG(importedModel.getId());
+    deleteNode(importedModel);
     
-    ConnectorNode parent = this.getParent(node);
-    this.saveModel(parent, node.getId(), node.getLabel(), json, svg, "", "", true);
+    ConnectorNode parent = getParent(node);
+    saveModel(parent, node.getId(), node.getLabel(), json, svg, "", "", true);
+    
+    return getContentInformation(node);
+  }
+
+  @Override
+  @Secured
+  public ContentInformation getContentInformation(ConnectorNode node) {
+    return new ContentInformation(isContentAvailable(node), getLastModifiedDate(node));
   }
 
   private ConnectorNode getParent(ConnectorNode node) {
@@ -353,7 +395,7 @@ public class SignavioConnector extends Connector {
   
   protected ConnectorNode getPrivateFolder() {
     try {
-      String children = this.signavioClient.getChildren(this.getRoot().getId());
+      String children = signavioClient.getChildren(this.getRoot().getId());
       JSONArray jsonArray = new JSONArray(children);
       for (int i = 0; i < jsonArray.length(); i++) {
         JSONObject jsonObj = jsonArray.getJSONObject(i);
@@ -362,21 +404,23 @@ public class SignavioConnector extends Connector {
           JSONObject repJsonObj = jsonObj.getJSONObject(JSON_REP_OBJ);
           String type = repJsonObj.getString(JSON_TYPE_PROP);
           if (type.equals(JSON_PRIVATE_VALUE)) {
-            ConnectorNode privateFolder = new ConnectorNode();
-            this.extractNodeName(jsonObj, privateFolder);
+            ConnectorNode folder = new ConnectorNode();
             
             String href = jsonObj.getString(JSON_HREF_PROP);
             href = href.replace(SLASH_CHAR + DIRECTORY_URL_SUFFIX, "");
-            privateFolder.setId(href);
-            privateFolder.setType(ConnectorNodeType.FOLDER);
-            return privateFolder;
+            folder.setId(href);
+            folder.setType(ConnectorNodeType.FOLDER);
+            folder.setLabel(extractNodeName(jsonObj));
+            
+            return folder;
           }
         }
       }
+      // Could not determine private folder
+      throw new CycleException("The private folder could not be determined.");
     } catch (JSONException e) {
       throw new CycleException("The private folder could not be determined.", e);
     }
-    throw new CycleException("The private folder could not be determined.");
   }
   
   protected ConnectorNode importContent(ConnectorNode parent, String content) throws Exception {
@@ -428,7 +472,7 @@ public class SignavioConnector extends Connector {
   }
   
   private ConnectorNode getChildNodeByName(ConnectorNode parent, String nodeName) {
-    List<ConnectorNode> children = this.getChildren(parent);
+    List<ConnectorNode> children = getChildren(parent);
     for (ConnectorNode connectorNode : children) {
       if (connectorNode.getLabel().equals(nodeName)) {
         return connectorNode;
@@ -442,13 +486,18 @@ public class SignavioConnector extends Connector {
   }
   
   private String extractType(ConnectorNode node) {
-    if (node.getType() != null && node.getType().equals(ConnectorNodeType.FILE)) {
-      return MODEL_URL_SUFFIX;
-    } else if (node.getType().equals(ConnectorNodeType.FOLDER)) {
-      return DIRECTORY_URL_SUFFIX;
-    } else {
-      throw new CycleException("The type of the selected node '" + node.getLabel() + "' could not be determined, so that the parent could not be loaded.");
+    ConnectorNodeType t = node.getType();
+    
+    if (t != null) {
+      if (t.isFile()) {
+        return MODEL_URL_SUFFIX;
+      } else 
+      if (t.equals(ConnectorNodeType.FOLDER)) {
+        return DIRECTORY_URL_SUFFIX;
+      }
     }
+    
+    throw new CycleException("The type of the selected node '" + node.getLabel() + "' could not be determined, so that the parent could not be loaded.");
   }
 
   private void saveModel(ConnectorNode parentFolder, String id, String modelName, String json, String svg,  String comment, String description, boolean update) throws Exception {
@@ -502,7 +551,7 @@ public class SignavioConnector extends Connector {
   public ConnectorNode getNode(String id) {
     throw new UnsupportedOperationException();
   }
-  
+
   @Override
   public void dispose() {
     if (this.httpClient4Executor != null) {
@@ -522,26 +571,5 @@ public class SignavioConnector extends Connector {
   public ConnectorNode createNode(String id, String label, ConnectorNodeType type) {
     throw new UnsupportedOperationException();
   }
-
-  @Secured
-  @Override
-  public Date getLastModifiedDate(ConnectorNode node) {
-    try {
-      String info = this.signavioClient.getInfo(MODEL_URL_SUFFIX, node.getId());
-      JSONObject jsonObj = new JSONObject(info);
-      String updated = jsonObj.getString(JSON_UPDATED_PROP);
-      if (updated != null) {
-        SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss Z");
-        Date lastModifiedDate = dateFormatter.parse(updated);
-        return lastModifiedDate;
-      }
-      
-      return null;
-      
-    } catch (Exception e) {
-      logger.log(Level.WARNING, "Could not get last modified date for "+node);
-      return null;
-    }  
- }
-
+  
 }

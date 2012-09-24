@@ -1,30 +1,61 @@
 <div>
-  <div class="bpmn-model thumbnail" data-ng-show="diagram && contentAvailable == true">
-    <h3>{{diagram.modeler}}</h3>
+  <div class="bpmn-model thumbnail" data-ng-show="diagram" data-ng-class="diagramClass(diagram)">
+    <h3>
+      {{diagram.modeler}} 
+      <a class="pull-right btn sync-status-refresh">
+        <i class="icon-refresh" th:title="#{'Refresh synchronization status'}" ng-click="checkContentAvailable(diagram)"></i>
+      </a>
+    </h3>
     <div class="holder">
-      <div class="diagram vertical-center">
-        <span class="name" data-ng-hide="imageAvailable == true">{{diagram.label}}</span>
-        <diagram-image data-img-id="identifier" data-img-src="imageUrl"  data-img-click="showImage(identifier)" data-img-show="imageAvailable == true" />
-        <p data-ng-show="imageAvailable != true" th:text="#{'There is no up to date image available.'}">
+      <div class="diagram">
+        <diagram-image data-diagram="diagram" data-status="imageStatus" data-click="showImage(identifier)"/>
+      </div>
+      <div class="error" ng-show="modelStatus == 'UNAVAILABLE'">
+        <p>
+          <i class="icon-warning-sign"></i>
+          <span th:text="#{'The model on this side could not be loaded and might have been moved. You may add a new model for this side.'}"></span>
         </p>
       </div>
     </div>
-  </div>
-  <span class="label" data-ng-show="imageAvailable == true && contentAvailable == true">{{diagram.label}}</span>
-
-  <div class="bpmn-model thumbnail" data-ng-hide="diagram && contentAvailable == true">
-    <h3 data-ng-show="identifier == 'leftHandSide'" th:text="#{'Your modeler'}">Your modeler</h3>
-    <h3 data-ng-show="identifier == 'rightHandSide'">fox designer</h3>
-    <div class="holder">
-      <div class="diagram vertical-center">
-        <p data-ng-show="contentAvailable == false" th:text="#{'The model on this side could not be loaded and might have been moved. You may add a new model for this side.'}"></p>
-        <span class="name"><a class="btn btn-primary btn-large" data-ng-show="diagram == undefined || contentAvailable == false" data-ng-click="addDiagram()" data-hint-title="Add a process model" data-hint="You need two process models for a Roundtrip, the right side is reserved for the fox designer (the engine model)" >Add Process Model</a></span>
+    
+    <div class="info">
+      <code class="filename">{{diagram.label}}</code>
+      <div class="pull-right" ng-switch on="modelStatus">
+        <div ng-switch-when="UNAVAILABLE" class="status btn-danger">
+          <span th:text="#{'Not available'}">Not available</span>
+        </div>
+        <div ng-switch-when="UNSPECIFIED" class="status btn-warning">
+          <span th:text="#{'Not synchronized'}">Not synchronized</span>
+        </div>
+        <div ng-switch-when="SYNCED" class="status btn-success">
+          <span th:text="#{'In sync'}">In sync</span>
+        </div>
+        <div ng-switch-when="OUT_OF_SYNC" class="status btn-warning">
+          <span th:text="#{'Changed since last sync'}">Changed since last sync</span>
+        </div>
       </div>
     </div>
   </div>
-  <span class="badge badge-success" data-ng-show="diagram.status == 'SYNCED' && contentAvailable == true">no changes since last sync</span>
-  <span class="badge badge-important" data-ng-show="diagram.status == 'OUT_OF_SYNC' && contentAvailable == true">changed since last sync, last modified : {{diagram.lastModified | date:'yyyy-MM-dd, HH:mm:ss'}}</span>
-  <span class="badge" data-ng-show="(roundtrip.lastSync == undefined || diagram.status == 'UNSPECIFIED') && contentAvailable == true">unknown sync status</span>
+
+  <div class="bpmn-model thumbnail" data-ng-hide="diagram">
+    <h3 data-ng-show="identifier == 'leftHandSide'" th:text="#{'Your modeler'}">Your modeler</h3>
+    <h3 data-ng-show="identifier == 'rightHandSide'">fox designer</h3>
+    <div class="holder">
+      <div class="diagram">
+        <span class="name">
+          <a class="btn btn-primary btn-large" 
+             data-ng-show="!diagram || !contentAvailable" 
+             data-ng-click="addDiagram()" 
+             data-color-invert="true" 
+             data-help-title="Add a process model" 
+             data-help="You need two process models for a Roundtrip, the right side is reserved for the fox designer (the engine model)" >Add Process Model</a></span>
+      </div>
+    </div>
+  </div>
+
+  <span class="badge badge-success" data-ng-show="diagram.status == 'SYNCED' && contentAvailable">no changes since last sync</span>
+  <span class="badge badge-important" data-ng-show="diagram.status == 'OUT_OF_SYNC' && contentAvailable">changed since last sync, last modified : {{diagram.lastModified | date:'yyyy-MM-dd, HH:mm:ss'}}</span>
+  <span class="badge" data-ng-show="(!roundtrip.lastSync || diagram.status == 'UNSPECIFIED') && contentAvailable">unknown sync status</span>
   
   <!-- begin add-model-roundtrip-dialog -->
   <dialog model="editDiagramDialog" ng-cloak>
@@ -44,27 +75,45 @@
         <form class="form-horizontal" novalidate ng-submit="save()" name="addModelForm">
           <fieldset>
             <div class="control-group">
-              <label th:attr="data-hint=#{'The Name of the Modeling tool you used.'}" data-hint-title="Modeler Name" class="control-label" for="modelerName" th:text="#{'Modeler Name'}">Modeler Name</label>
+              <label class="control-label" for="modelerName" 
+                     th:text="#{'Modeler Name'}" 
+                     th:attr="data-help=#{'The Name of the Modeling tool you used.'}" 
+                     data-help-title="Modeler Name">Modeler Name</label>
               <div class="controls">
                 <!-- display a combobox on leftside, otherwise a disabled input field -->
-                <select ngm-if="canEditModeler()" id="modelerName" name="modelerName" required autofocus ng-model="editDiagram.modeler" ng-combobox values="modelerNames"
-                  ng-options="modeler for modeler in modelerNames" th:attr="data-placeholder=#{Enter the name of your modeler}">
+                <select id="modelerName" required autofocus 
+                        ngm-if="canEditModeler()" 
+                        ng-model="editDiagram.modeler" 
+                        ng-combobox values="modelerNames"
+                        ng-options="modeler for modeler in modelerNames" 
+                        th:attr="data-placeholder=#{Enter the name of your modeler}">
                   <option value=""></option>
                 </select>
                 <span ngm-if="!canEditModeler()" id="modelerName" name="modelerName" required class="uneditable-input" type="text">{{editDiagram.modeler}}</span>
               </div>
             </div>
             <div class="control-group">
-              <label class="control-label" for="connectors" th:text="#{Select Connector}">Select Connector</label>
+              <label class="control-label" for="connectors" 
+                     th:text="#{Connector}" 
+                     th:attr="data-help=#{'The connector to get the model from'}" 
+                     data-help-title="Connector">Connector</label>
               <div class="controls">
                 <select id="connectors" class="span8" data-ng-model="connector" required ng-options="c.name for c in connectors">
                 </select>
               </div>
             </div>
-            <div class="control-group">
-              <label class="control-label" for="tree" th:text="#{'Select BPMN File'}">Select BPMN File</label>
+            <div class="control-group" ng-show="connector">
+              <label class="control-label" for="tree" 
+                     th:text="#{'BPMN File'}" 
+                     th:attr="data-help=#{'Select a BPMN 2.0 file from the connector contents. Note that only <code>.xml</code> and <code>.bpmn</code> files may be selected by you.'}" 
+                     data-help-title="BPMN file">BPMN file</label>
+              
+              <div class="controls" style="margin-bottom: 10px;">
+                <input ng-model="selectedNode.label" class="span8" disabled />
+              </div>
+              
               <div class="controls">
-                <div class="claro tree" data-selected="selectedNode" data-cycle-tree data-id="connectorTree" data-connector="connector">
+                <div class="claro tree" data-cycle-tree data-selected="selectedNode" data-id="connectorTree" data-connector="connector">
                 </div>
               </div>
             </div>

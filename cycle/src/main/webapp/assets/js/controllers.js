@@ -21,8 +21,8 @@ function DefaultController($scope, $http, $location, App, Event, Error) {
   
   // Bread Crumb 
   var breadCrumbs = $scope.breadCrumbs = [];
-  	
-  $scope.$on(Event.navigationChanged, function(evt, navigationItem) {
+
+  $scope.$on(Event.navigationChanged, function(event, navigationItem) {
     if(navigationItem==undefined) {
       breadCrumbs.splice(0, breadCrumbs.length);
     } else {
@@ -55,55 +55,56 @@ function HomeController($scope, Event) {
 
 function RoundtripDetailsController($scope, $routeParams, RoundtripDetails, Commons, Event) {
   $scope.currentPicture = 'leftHandSide';
-  $scope.leftHandSideImage = false;
-  $scope.rightHandSideImage = false;
+
+  $scope.leftHandSideImage = null;
+  $scope.rightHandSideImage = null;
+
+  $scope.leftHandSideImageUrl = null;
+  $scope.rightHandSideImageUrl = null;
   
-  $scope.leftHandSideImageUrl = undefined;
-  $scope.rightHandSideImageUrl = undefined;
+  $scope.diagramDetailsDialog = new Dialog();
   
   $scope.syncDialog = new Dialog();
   $scope.syncDialog.setAutoClosable(false);
-  
+
   //get roundtrip details and forward to main page if bad request (ie. invalid id) occurs
   $scope.roundtrip = RoundtripDetails.get({id: $routeParams.roundtripId }, function() {}, function(response) {
     if (response.status == 400) {
       $location.path("/");
     }
   });
-  
+
   $scope.openSyncDialog = function (syncMode) {
     $scope.syncMode = syncMode;
     $scope.syncDialog.open();
   };
-  
+
   $scope.$on(Event.roundtripChanged, function(event, roundtrip) {
     $scope.roundtrip = roundtrip;
   });
-  
+
   $scope.$on(Event.imageAvailable, function(event, available, side) {
     $scope[side+"Image"] = available;
   });
-  
+
   $scope.$on(Event.modelImageClicked, function(event, side) {
     $scope.setCurrentPicture(side);
     
     $('.leftHandSide').removeClass("active");
     $('.rightHandSide').removeClass("active");
+
+    $scope.leftHandSideImageUrl = Commons.getImageUrl($scope.roundtrip.leftHandSide.connectorNode, true);
+    $scope.rightHandSideImageUrl = Commons.getImageUrl($scope.roundtrip.rightHandSide.connectorNode, true);
+
+    $('.' + side).addClass("active");
     
-    $scope.leftHandSideImageUrl = Commons.getImageUrl($scope.roundtrip.leftHandSide, true);
-    $scope.rightHandSideImageUrl = Commons.getImageUrl($scope.roundtrip.rightHandSide, true);
-    
-    $scope.$apply();
-    
-    $('.'+side).addClass("active");
-    
-    $('#pictureModal').modal('show');
+    $scope.diagramDetailsDialog.open();
   });
-  
+
   $scope.setCurrentPicture = function (picture) {
     $scope.currentPicture = picture;
   };
-};
+}
 
 function SyncRoundtripController($scope, $http, App, Event) {
   
@@ -125,8 +126,7 @@ function SyncRoundtripController($scope, $http, App, Event) {
       success(function(data) {
         $scope.status = SYNC_SUCCESS;
         $scope.$emit(Event.roundtripChanged, data);
-    }).
-      error(function (data) {
+      }).error(function (data) {
         $scope.status = SYNC_FAILED;
       });
   };
@@ -135,57 +135,56 @@ function SyncRoundtripController($scope, $http, App, Event) {
 /**
  * Works along with the bpmn-diagram directive to manage a single bpmn-diagram in the roundtrip view.
  */
-function BpmnDiagramController($scope, App, Commons, Event) {
-  $scope.imageAvailable = undefined;
-  $scope.contentAvailable = undefined;
-  
+function BpmnDiagramController($scope, Commons, Event) {
+
+  $scope.imageStatus = "UNKNOWN";
+  $scope.modelStatus = "UNKNOWN";
+
+  function changeModelStatus(status) {
+    $scope.modelStatus = status;
+  }
+
   $scope.editDiagramDialog = new Dialog();
-  
+
   $scope.addDiagram = function() {
     $scope.editDiagramDialog.open();
   };
- 
+
   $scope.cancelAddDiagram = function() {
     $scope.editDiagramDialog.close();
   };
-  
+
   $scope.saveDiagram = function(diagram) {
     $scope.roundtrip[$scope.identifier] = diagram;
-    
+
     $scope.roundtrip.$save(function() {
+      $scope.diagram = $scope.roundtrip[$scope.identifier];
       $scope.editDiagramDialog.close();
     });
   };
+
+  $scope.diagramClass = function(diagram) {
+    return $scope.modelStatus == "UNAVAILABLE" ? "error" : "";
+  };
   
   $scope.showImage = function(side) {
+    alert("foo");
+    
     $scope.$emit(Event.modelImageClicked, side);
   };
-  
-  $scope.$watch("diagram", function (newDiagramValue) {
-    if (newDiagramValue != undefined) {
-      $scope.imageUrl = Commons.getImageUrl(newDiagramValue, true);
-      $scope.checkImageAvailable();
-      $scope.checkContentAvailable();
+
+  $scope.$watch("diagram", function(newDiagramValue) {
+    // Check availability only when diagram is saved
+    if (newDiagramValue && newDiagramValue.id) {
+      $scope.checkContentAvailable(newDiagramValue);
     }
   });
-  
-  $scope.checkImageAvailable = function () {
-    if ($scope.diagram) {
-      Commons.isImageAvailable($scope.diagram.connectorId, $scope.diagram.diagramPath).then(function (data) {
-        $scope.imageAvailable = data.available && ((data.lastModified + 5000) >= $scope.diagram.lastModified);
-        $scope.$emit(Event.imageAvailable, $scope.imageAvailable, $scope.identifier);
-      });
-    }
-  };
-  
-  $scope.checkContentAvailable = function () {
-    if ($scope.diagram) {
-     Commons.isContentAvailable($scope.diagram.connectorId, $scope.diagram.diagramPath).then(function (data) {
-      $scope.contentAvailable = data.available;
-     });
-   }
-  };
 
+  $scope.checkContentAvailable = function(diagram) {
+    Commons.getDiagramStatus(diagram).success(function(data) {
+      changeModelStatus(data.status);
+    });
+  };
 }
 
 /**
@@ -198,7 +197,7 @@ function EditDiagramController($scope,Commons,Event) {
   
   // Error to be displayed in dialog
   $scope.error = null;
-
+  
   // Can the modeler name be edited?
   var canEditModeler = $scope.canEditModeler = function() {
     return !!($scope.identifier != RIGHT_HAND_SIDE || ($scope.editDiagram.modeler && $scope.editDiagram.modeler != FOX_DESIGNER));
@@ -207,7 +206,7 @@ function EditDiagramController($scope,Commons,Event) {
   // is the dialog model valid and can be submitted?
   var isValid = $scope.isValid = function() {
     var editDiagram = $scope.editDiagram;
-    var valid = !!editDiagram.modeler && ($scope.addModelForm.$valid !== false) && ($scope.selectedNode ? $scope.selectedNode.type == 'FILE' : false);
+    var valid = !!editDiagram.modeler && $scope.addModelForm.$valid && $scope.selectedNode && $scope.selectedNode.type == "BPMN_FILE";
     return valid;
   };
   
@@ -232,25 +231,19 @@ function EditDiagramController($scope,Commons,Event) {
   // Watch for component error  
   $scope.$on(Event.componentError, function(event, error) {
     $scope.error = error;
-    $scope.$apply();
   });
   
   $scope.$on(Event.selectedConnectorChanged, function(event) {
     if ($scope.error) {
-      $scope.error = false;
+      $scope.error = null;
     }
-    $scope.selectedNode = false;
+    $scope.selectedNode = null;
   });  
   
   // Watch for change in diagram path
   $scope.$watch('selectedNode', function(newValue) {
     if (newValue) {
-      $scope.editDiagram.diagramPath = newValue.id;
-      $scope.editDiagram.label = newValue.label;
-      $scope.editDiagram.connectorId = newValue.connectorId;
-      
-      console.log("selectedNode", newValue);
-      console.log("scope.roundtrip", $scope.roundtrip);
+      $scope.editDiagram.connectorNode = newValue;
     }
   });
   
@@ -261,7 +254,7 @@ function EditDiagramController($scope,Commons,Event) {
     $scope.editDiagram.modeler = FOX_DESIGNER;
   }
   
-  // TODO: nico.rehwaldt: On update: How to initially display the right folder structure?
+  // TODO: nre: On update: How to initially display the right folder structure?
   // 
   // get required data
   Commons.getModelerNames().then(function(data) {

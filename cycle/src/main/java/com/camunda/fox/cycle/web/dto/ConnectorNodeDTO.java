@@ -4,13 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.camunda.fox.cycle.connector.ConnectorNode;
-import com.camunda.fox.cycle.connector.ConnectorNode.ConnectorNodeType;
+import com.camunda.fox.cycle.connector.ConnectorNodeType;
 
 
 public class ConnectorNodeDTO {
 
   private String id;
   private String label;
+  
   private ConnectorNodeType type;
   
   private Long connectorId;
@@ -62,7 +63,11 @@ public class ConnectorNodeDTO {
   public void setConnectorId(Long connectorId) {
     this.connectorId = connectorId;
   }
-  
+
+  public ConnectorNode toConnectorNode() {
+    return new ConnectorNode(id, label, connectorId, type);
+  }
+
   /**
    * Wraps a list of connector nodes as a list of the respective connector node data objects
    * 

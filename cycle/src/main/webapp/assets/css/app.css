@@ -4,7 +4,42 @@
  */
 [ng\:cloak], [ng-cloak], .ng-cloak {
     display: none;
- }
+}
+
+/** loading icon integration */
+.icon-loading {
+  background-image: url(../img/ajax-loader.gif);
+  width: 16px; 
+  height: 16px;
+  line-height: 16px;
+  background-position: 0px 0px;
+}
+
+/** help system */
+.help-toggle {
+  display: inline-block;
+  margin-left: 5px;
+  
+  cursor: help;
+  opacity: 0.6;
+}
+
+.help-toggle:hover {
+  opacity: 1;
+}
+/** end help system */
+
+/** utilities */
+/** for image replacement */
+.ir {
+  display: block;
+  text-indent: -999em;
+  overflow: hidden;
+  background-repeat: no-repeat;
+  text-align: left;
+  direction: ltr;
+}
+/** end utilities */
 
 /**
  * shared style declarations
@@ -44,16 +79,6 @@ footer {
   height: 60px;
 }
 
-/* for image replacement */
-.ir {
-  display: block;
-  text-indent: -999em;
-  overflow: hidden;
-  background-repeat: no-repeat;
-  text-align: left;
-  direction: ltr;
-}
-
 /**
  * Logo styling
  */
@@ -67,7 +92,7 @@ footer {
    padding: 0;
 }
 
-/** Usability tweeks */
+/** usability tweeks */
 .content-container {
   min-width: 950px;
 }
@@ -79,6 +104,8 @@ footer {
 .nav-list li {
   word-wrap: break-word;
 }
+/** end usability tweeks */
+
 
 /**
  * form styling
@@ -95,29 +122,40 @@ input.ng-invalid-required {
 /**
  * roundtrip view
  */
-.tree {
-  border: 1px solid #DDDDDD;
-  overflow: auto;
+.bpmn-model, .bpmn-model * {
+  border: none 1px #DDD;
+}
+
+/*.bpmn-model:hover, .bpmn-model:hover * {
+  border-color: #BBB;
+}*/
+
+.bpmn-model.error, .bpmn-model.error * {
+  border-color: #D9564B;
 }
 
 .bpmn-model {
   padding: 0px;
+  border-style: solid;
 }
 
-.bpmn-model:hover {
-  border: solid 1px #BBB;
-}
-
-.bpmn-model:hover h3 {
-  background: #BBB;
-}
+/*.bpmn-model .status:hover .sync-status-refresh {
+  background-image: url("../img/glyphicons-halflings-white.png");
+}*/
 
 .bpmn-model h3 {
   text-align: center;
   line-height: 40px;
   background: #DDD;
   margin: 0px;
+  
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
 }
+
+/*.bpmn-model:hover h3 {
+  background: #BBB;
+}*/
 
 .bpmn-model .holder {
   text-align: center;
@@ -126,32 +164,42 @@ input.ng-invalid-required {
 }
 
 .bpmn-model .name {
+  margin-top: 50px;
   font-size: 2em;
 }
 
-.bpmn-model .label {
-  margin-top: 50px;
+.bpmn-model .info {
+  line-height: 30px;
+  padding-left: 10px;
+  border-top-style: solid;
+}
+
+.bpmn-model .info .filename {
+  line-height: 20px;
+}
+
+.bpmn-model .info .status {
+  line-height: 30px;
+  padding: 0px 10px 0 10px;
+  border-radius: 0;
+  border-bottom-right-radius: 3px;
+  border-style: none;
+  border-left-style: solid;
+  vertical-align: top;
 }
 
 .bpmn-model .diagram {
+  text-align: center;
   line-height: 100px;
   min-height: 350px;
   max-height: 350px;
-  overflow: auto;
-}
-
-.vertical-center:before {
-	content: '';
-  display: inline-block;
-  height: 100%; 
-  vertical-align: middle;
-  margin-right: -0.25em; /* Adjusts for spacing */
+  overflow: hidden;
 }
 
 .bpmn-model .diagram img {
-  max-width: 98%;
-  vertical-align:baseline;
-  margin-top:5%;
+  max-width: 100%;
+  max-height: 100%;
+  vertical-align: baseline;
   cursor: pointer;
 }
 
@@ -166,6 +214,7 @@ input.ng-invalid-required {
 }
 
 .sync-options {
+  margin-top: 60px;
   text-align: center;
 }
 
@@ -181,6 +230,11 @@ input.ng-invalid-required {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
+}
+
+.tree {
+  border: 1px solid #DDDDDD;
+  overflow: auto;
 }
 
 /**
@@ -245,10 +299,3 @@ div#pictureModal.modal.hide.fade {
   -moz-border-radius: 3px;
   border-radius: 3px;
 }
-
-.loader {
-  background-image: url(../img/ajax-loader.gif);
-  width: 16px; 
-  height: 16px
-}
-

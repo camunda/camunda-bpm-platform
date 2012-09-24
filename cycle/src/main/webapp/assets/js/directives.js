@@ -4,119 +4,145 @@
 
 angular
 .module('cycle.directives', [])
-.directive('cycleTree', function(App, Event) {
-	return {
-		restrict: "A",
-		replace: false,
-		transclude: false,
-		require: '?connector',
-		scope: {
-			'connector' : "=",
-			'selected' : "=",
-			'id' : "@"	
-		},
-		link: function(scope, element, attrs, model) {
-			
-			require(["dojo/ready", 
-			         "dojo/_base/window",
-			         "dojo/_base/array",
-			         "dojo/store/Memory",
-			         "dijit/tree/ObjectStoreModel", 
-			         "dijit/Tree",
-			         "dojo/store/Observable",
-			         "dojo/request",
-			         "dijit/registry"], function(ready, window, array, Memory, ObjectStoreModel, Tree, Observable, request, registry) {
-				ready(function () {
-					scope.$watch("connector", function (newValue , oldValue) {
-				    	if (newValue != undefined) {
-				    	
-				    	if (oldValue != undefined && newValue != oldValue) {
-				    	  scope.$emit(Event.selectedConnectorChanged);
-				    	}
-              
-							request.get(App.uri("secured/resource/connector/" + newValue.connectorId + "/tree/root"), {
-					            handleAs: "json"
-					        }).then(function(requestData){
-								
-								var memoryStore = new Memory({
-							        data: requestData,
-							        getChildren: function(object) {
-							        	return request.post(App.uri("secured/resource/connector/" + newValue.connectorId + "/tree/children"), {
-								            data : {"parent" : object.id, "parentPath" : object.path},
-							        		handleAs: "json"
-								        }).then(function(childData){
-								        	/**
-								        	 * Dojo Tree will behave strange / loop forever without id attribute
-								        	 */
-								        	//array.forEach(childData, function (entry, index) {
-								        	//	entry["id"] = entry["name"];
-								        	//});
-								        	return childData;
-                        },
-                        function(error) {
-                          var e = error.response.data;
-                          scope.$emit(Event.componentError, e);
-                          var treeWidget = registry.byId(attrs.id);
-                          if (treeWidget != undefined) {
-                            registry.byId(attrs.id).destroy();
-                            registry.remove(attrs.id);
-                          }
-                        });
-							        }
-							    });
-								
-								var observableStore = new Observable(memoryStore);
-								
-								// Create the model
-							    var treeModel = new ObjectStoreModel({
-							        store: observableStore,
-							        query: {id: '/'},
-							        labelAttr : "label",
-							        mayHaveChildren: function(item){
-							            return item.type=="FOLDER";
-							        }
-							    });
-							    
-							    var treeWidget = registry.byId(attrs.id);
-							    if (treeWidget != undefined) {
-							    	registry.byId(attrs.id).destroy();
-							    	registry.remove(attrs.id);
-							    }
-							    
-							    var tree = new Tree({
-                    id: attrs.id,
-                    model: treeModel,
-                    openOnClick: false,
-                    onClick: function(item, node){
-                      scope.selected = item;
-                      scope.$digest();
-                      scope.$apply();
-                      if (node.isExpandable) {
-                        this._onExpandoClick({node: node});
-                      }
-                    },
-                    showRoot: false,
-                    persist: false
-                  });
-                  
-							    tree.placeAt(element[0]);
-							    tree.startup();
-							},
-  							function(error){
-                  var e = error.response.data;
-                  scope.$emit(Event.componentError, e);
-                  var treeWidget = registry.byId(attrs.id);
-                  if (treeWidget != undefined) {
-                    registry.byId(attrs.id).destroy();
-                    registry.remove(attrs.id);
-                  }
-  							});
-				    	}
-				    });
-				});
-			});
-		}
-	};
+.directive('cycleTree', function(App, Event, $http) {
+  return {
+    restrict: "A",
+    replace: false,
+    transclude: false,
+    require: '?connector',
+    scope: {
+      'connector' : "=",
+      'selected' : "=",
+      'id' : "@"
+    },
+    link: function(scope, element, attrs, model) {
+      
+      /**
+       * Pre bootstraping the tree (loading root elements)
+       * and displaying the tree to the user
+       */
+      function preBootstrapTree(Memory, ObjectStoreModel, Tree, Deferred, Observable, registry) {
+        
+        // id of the current connector
+        var connectorId = null;
+        
+        function removeTree() {
+          var treeWidget = registry.byId(attrs.id);
+          if (treeWidget) {
+            registry.byId(attrs.id).destroy();
+            registry.remove(attrs.id);
+          }
+        }
+
+        function handleTreeError(error) {
+          removeTree();
+          scope.$emit(Event.componentError, error);
+        }
+
+        function getRootContents(connectorId) {
+          var deferred = new Deferred();
+
+          $http.get(App.uri("secured/resource/connector/" + connectorId + "/root"))
+            .success(function(data, status, headers, config) {
+              deferred.resolve(data);
+            })
+            .error(function(data, status, headers, config) {
+              handleTreeError(data);
+              deferred.reject(data);
+            });
+
+          return deferred.promise;
+        }
+
+        function getNodeContents(node) {
+          var deferred = new Deferred();
+
+          $http.get(App.uri("secured/resource/connector/" + connectorId + "/children?nodeId=" + encodeURI(node.id)))
+            .success(function(data, status, headers, config) {
+              deferred.resolve(data);
+            })
+            .error(function(data, status, headers, config) {
+              handleTreeError(data);
+              deferred.reject(data);
+            });
+          return deferred.promise;
+        }
+        
+        /**
+         * Actual function performing the tree bootstrap
+         * after the trees root elements have been loaded
+         */
+        function bootstrapTree(roots) {
+          var memoryStore = new Memory({
+            data: roots,
+            getChildren: getNodeContents
+          });
+
+          // Create the model
+          var treeModel = new ObjectStoreModel({
+            store: new Observable(memoryStore),
+            query: {id: '/'},
+            labelAttr : "label",
+            mayHaveChildren: function(item) {
+              return item.type == "FOLDER";
+            }
+          });
+
+          // remove old tree
+          removeTree();
+
+          var tree = new Tree({
+            id: attrs.id,
+            model: treeModel,
+            openOnClick: false,
+            onClick: function(item, node) {
+              if (node.isExpandable) {
+                this._onExpandoClick({node: node});
+              }
+
+              if (item.type == "BPMN_FILE") {
+                scope.$apply(function() {
+                  scope.selected = item;
+                });
+              }
+            },
+            showRoot: false,
+            persist: false
+          });
+
+          tree.placeAt(element[0]);
+          tree.startup();
+        }
+
+        // actual pre bootstrap code whenever 
+        // selected connector changes
+        scope.$watch("connector", function (newValue, oldValue) {
+          if (!newValue) {
+            return;
+          }
+
+          if (newValue != oldValue) {
+            if (oldValue) {
+              scope.$emit(Event.selectedConnectorChanged);
+            }
+            
+            connectorId = newValue.connectorId;
+            
+            getRootContents(connectorId)
+              .then(bootstrapTree, handleTreeError);
+          }
+        });
+      }
+      
+      // Bootstrap the dojo tree
+      require(["dojo/store/Memory",
+               "dijit/tree/ObjectStoreModel", 
+               "dijit/Tree",
+               "dojo/Deferred",
+               "dojo/store/Observable",
+               "dijit/registry"], preBootstrapTree);
+    }
+  };
 })
 .directive('ngCombobox', function(Event) {
   return {
@@ -205,7 +231,7 @@ angular
  * 
  * <bpmn-diagram roundtrip="myRoundtrip" diagram="myRoundtrip.leftHandSide" identifier="leftHandSide" />
  */
-.directive("bpmnDiagram", function(App, Commons, Event) {
+.directive("bpmnDiagram", function(App) {
   return {
     restrict: 'E',
     scope: {
@@ -220,74 +246,85 @@ angular
     }
   };
 })
-.directive("hint", function(App) {
+.directive("help", function(App) {
   return {
     restrict: 'A',
     link: function(scope, element, attrs) {
-      var title = (attrs.hintTitle == undefined ? "" : attrs.hintTitle) ;
-      $(element[0]).popover({content: attrs.hint, title: title, delay: { show: 1000, hide: 0 }, placement: "left"});
+      var help = attrs.help, 
+          helpTitle = attrs.helpTitle, 
+          colorInvert = !!attrs.colorInvert;
+      
+      var helpToggle = $('<span class="help-toggle"><i class="icon-question-sign' + (colorInvert ? ' icon-white' : '') + '"></i></span>');
+      helpToggle
+        .appendTo(element)
+        .popover({content: help, title: helpTitle, delay: { show: 0, hide: 0 }});
     }
   };
 })
-.directive("diagramImage", function(App) {
+.directive("diagramImage", function(App, Commons) {
   return {
     restrict: 'E',
     replace : true,
     scope : {
-      imgSrc: "=",
-      imgClick : "&",
-      imgShow : "=",
-      imgId : "="
+      diagram: "=",
+      status: "=", 
+      click: "&"
     },
-    template: "<img />",
+    templateUrl: App.uri("secured/view/partials/diagram-image.html"),
     link: function(scope, element, attrs) {
-      
-      element[0].onclick = function () {
-        scope.imgClick();
-      };
-      
-      scope.$watch("imgShow", function (newValue){
-        if (newValue == false) {
-          $(element[0]).addClass("hide");
-        }else {
-          $(element[0]).removeClass("hide");
-        }
-      });
-      
-      scope.$watch("imgSrc", function (newValue){
-        console.log("imgSrc", newValue);
-        if (newValue != undefined) {
-          var id = undefined;
 
-          var spinner = $('<div>').insertBefore(element[0]).addClass("loader");
-          
-          if (scope.imgId) {
-            $("#"+scope.imgId).remove();
-            $(spinner).attr("id", scope.imgId);
-          }
-          
-          
-          $(element[0]).addClass("hide");
-          
-          element[0].src = newValue;
-          element[0].onload = function () {
-            $(spinner).remove();
-            if (scope.imgShow == true) {
-              $(element[0]).removeClass("hide");
-            }
-          };
-          var retry = false;
-          
-          element[0].onerror = function () {
-            $(spinner).remove();
-            if (retry == false) {
-              retry = true; 
-              element[0].src = newValue+"&"+retry;
-            }else {
-              $('<div>Could not load image, please try loading again!</div>').insertBefore(element[0]);
-              $(element[0]).remove();
-            }
-          };
+      function changeImageStatus(newStatus) {
+        scope.$apply(function() {
+          scope.status = newStatus;
+        });
+      }
+      
+      function performImageClick() {
+        scope.$apply(function() {
+          scope.click();
+        });
+      }
+      
+      function fixDiagramImageHeight(element) {
+        // fix image height if it is higher than the diagram container
+        var e = $(element);
+        var imgHeight = parseInt(e.css("height"), 10);
+        var containerHeight = parseInt(e.parents(".diagram").css("height"), 10);
+
+        if (imgHeight > containerHeight) {
+          e.css("height", containerHeight + "px");
+        }
+      }
+      
+      // register image load interceptor
+      $(element)
+        .find("img")
+        .css({ width: "auto", height: "auto" })
+        .bind({
+          load: function() {
+            fixDiagramImageHeight(this);
+            changeImageStatus("LOADED");
+          },
+          error: function(){
+            changeImageStatus("UNAVAILABLE");
+          }, 
+          click: performImageClick
+        });
+
+      // $scope.checkImageAvailable();
+//      scope.checkImageAvailable = function () {
+//        if (scope.diagram) {
+//          Commons.isImageAvailable(scope.diagram.connectorNode).then(function (data) {
+//            scope.imageAvailable = data.available && ((data.lastModified + 5000) >= scope.diagram.lastModified);
+//            scope.$emit(Event.imageAvailable, scope.imageAvailable, scope.identifier);
+//          });
+//        }
+//      };
+
+      scope.$watch("diagram", function (newDiagramValue) {
+        if (newDiagramValue) {
+          scope.status = "LOADING";
+          $(element).find("img").attr("src", Commons.getImageUrl(newDiagramValue.connectorNode, true));
         }
       });
     }

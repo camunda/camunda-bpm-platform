@@ -8,7 +8,6 @@ import java.util.Map;
 import javax.inject.Inject;
 
 import org.springframework.aop.aspectj.annotation.AspectJProxyFactory;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Component;
@@ -16,62 +15,138 @@ import org.springframework.web.context.WebApplicationContext;
 
 import com.camunda.fox.cycle.aspect.LoginAspect;
 import com.camunda.fox.cycle.entity.ConnectorConfiguration;
-import com.camunda.fox.cycle.security.SecurityContext;
+import com.camunda.fox.cycle.exception.CycleException;
 
 @Component
-@Scope(value = WebApplicationContext.SCOPE_SESSION, proxyMode = ScopedProxyMode.TARGET_CLASS)
+@Scope(
+  value = WebApplicationContext.SCOPE_SESSION, 
+  proxyMode = ScopedProxyMode.TARGET_CLASS
+)
 public class ConnectorRegistry {
   
   @Inject
-  ApplicationContext appContext;
-  
-  @Inject
-  LoginAspect loginAspect;
-  
-  @Inject
-  SecurityContext securityContext;
+  private LoginAspect loginAspect;
   
   /**
-   * Get the connector singletons from application context
+   * Currently, connector singletons are fetched from the application context
+   * Will change to fetching from database at some point.
    */
   @Inject
-  List<ConnectorConfiguration> configurations;
-  
-  Map<Long ,Connector> sessionConnectorMap = new HashMap<Long, Connector>();
-  
-  List<Connector> sessionConnectors;
+  private List<ConnectorConfiguration> configurations;
   
   /**
-   * Create the instances of the connectors for the current session
-   * @return
+   * Connector cache 
    */
-  public List<Connector> getSessionConnectors()  {
-    if (sessionConnectors == null) {
-      sessionConnectors = new ArrayList<Connector>();
-      for (ConnectorConfiguration config: configurations) {
-        try {
-          AspectJProxyFactory factory = new AspectJProxyFactory(Class.forName(config.getConnectorClass()).newInstance()); 
-          factory.addAspect(loginAspect);
-          Connector newConnectorInstance = factory.getProxy();
-          
-          // TODO set name / configuration from user configuration entities
-          newConnectorInstance.setConfiguration(config);
-          newConnectorInstance.init(newConnectorInstance.getConfiguration());
-
-          sessionConnectorMap.put(config.getId(), newConnectorInstance);
-        } catch (Exception e) {
-          throw new RuntimeException(e);
-        } 
+  private Map<Long, Connector> connectorCache = new HashMap<Long, Connector>();
+  
+  /**
+   * Return connector configuration for given id or null
+   * 
+   * @param connectorId
+   * @return 
+   */
+  private ConnectorConfiguration getConnectorConfiguration(long connectorId) {
+    for (ConnectorConfiguration c: getConnectorConfigurations()) {
+      if (c.getId() == connectorId) {
+        return c;
       }
-      sessionConnectors = new ArrayList<Connector>(sessionConnectorMap.values());
     }
     
-    return sessionConnectors;
+    return null;
   }
   
-  public Map<Long, Connector> getSessionConnectorMap() {
-    getSessionConnectors();
-    return sessionConnectorMap;
+  /**
+   * Returns a list of all connector configurations known to this registry
+   * @return 
+   */
+  public List<ConnectorConfiguration> getConnectorConfigurations() {
+    return configurations;
+  }
+
+  /**
+   * Return the connector with the given class or null if none was found
+   * @param cls
+   * @return 
+   */
+  public Connector getConnector(Class<? extends Connector> cls) {
+    for (ConnectorConfiguration config: getConnectorConfigurations()) {
+      if (config.getConnectorClass().equals(cls.getName())) {
+        return getConnector(config.getId());
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Return a connector with the given id
+   * 
+   * @param connectorId
+   * @return the connector
+   * 
+   * @throws CycleException if the connector is unavailable
+   */
+  public Connector getConnector(long connectorId) {
+    Connector connector = connectorCache.get(connectorId);
+    if (connector == null) {
+      connector = instantiateConnector(connectorId);
+      connectorCache.put(connectorId, connector);
+    }
+    
+    return connector;
+  }
+
+  /**
+   * Eagerly loads all connectors for which a connector 
+   * configuration is available and returns the connectors
+   * 
+   * @return list of connectors loaded in this registry
+   */
+  public List<Connector> getConnectors() {
+    for (ConnectorConfiguration c: getConnectorConfigurations()) {
+      getConnector(c.getId());
+    }
+    
+    return new ArrayList<Connector>(connectorCache.values());
+  }
+
+  /**
+   * Instantiate connector with the given id.
+   * 
+   * @param connectorId
+   * @return 
+   * 
+   * @throws CycleException if connector could not be instantiated
+   */
+  private Connector instantiateConnector(long connectorId) {
+    ConnectorConfiguration config = getConnectorConfiguration(connectorId);
+    if (config == null) {
+      throw new CycleException("Connector configuration for connectorId " + connectorId + " not available");
+    }
+    
+    return instantiateConnector(config);
   }
   
+  /**
+   * Initializes a connector from the given configuration and returns it
+   * 
+   * Does not perform any caching.
+   * 
+   * @param config
+   * @return the newly instantiated connector
+   */
+  Connector instantiateConnector(ConnectorConfiguration config) {
+    try {
+      AspectJProxyFactory factory = new AspectJProxyFactory(Class.forName(config.getConnectorClass()).newInstance());
+      factory.addAspect(loginAspect);
+      Connector instance = factory.getProxy();
+
+      // TODO: set name / configuration from user configuration entities
+      instance.setConfiguration(config);
+      instance.init();
+
+      return instance;
+    } catch (Exception e) {
+      throw new CycleException("Could not init connector", e);
+    }
+  }
 }
