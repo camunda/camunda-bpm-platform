@@ -64,12 +64,12 @@ public class RoundtripServiceTest {
     vfsConnector = connectorRegistry.getSessionConnectorMap().get(1l);
     assertEquals(VfsConnector.class.getName(), vfsConnector.getConfiguration().getConnectorClass());
     
-    vfsConnector.deleteNode("foo/foo");
-    rightNode = vfsConnector.createNode("foo/foo", "Impl", ConnectorNodeType.FILE);
+    vfsConnector.deleteNode(new ConnectorNode("foo/foo"));
+    rightNode = vfsConnector.createNode(null, "foo/foo", "Impl", ConnectorNodeType.FILE);
     vfsConnector.updateContent(rightNode, new FileInputStream(IoUtil.getFile("com/camunda/fox/cycle/roundtrip/collaboration_impl.bpmn")));
     
-    vfsConnector.deleteNode("foo/bar");
-    leftNode = vfsConnector.createNode("foo/bar", "Modeler", ConnectorNodeType.FILE);
+    vfsConnector.deleteNode(new ConnectorNode("foo/bar"));
+    leftNode = vfsConnector.createNode(null, "foo/bar", "Modeler", ConnectorNodeType.FILE);
     vfsConnector.updateContent(leftNode, new FileInputStream(IoUtil.getFile("com/camunda/fox/cycle/roundtrip/collaboration.bpmn")));
   }
   
