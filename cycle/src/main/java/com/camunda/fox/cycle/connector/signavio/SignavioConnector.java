@@ -94,6 +94,7 @@ public class SignavioConnector extends Connector {
   private static final String MODEL_NAME_TEMPLATE = "cycle-import_";
   
   private static final String BPMN2_0_FILE_PROP = "bpmn2_0file";
+  private static final String X_SIGNAVIO_ID_PROP = "x-signavio-id";
 
   private static final String UTF_8 = "UTF-8";
 
@@ -182,7 +183,7 @@ public class SignavioConnector extends Connector {
           logger.fine("Sending request to " + uri);
           logger.fine("Request: " + request.getHeaders()+ "," + request.getBody());
           if (SignavioConnector.this.securityToken != null) {
-            request.header("x-signavio-id", SignavioConnector.this.securityToken);
+            request.header(X_SIGNAVIO_ID_PROP, SignavioConnector.this.securityToken);
           }
           
           ClientResponse<?> response =  ctx.proceed();
@@ -393,6 +394,7 @@ public class SignavioConnector extends Connector {
       signavioURL = signavioURL + SLASH_CHAR + REPOSITORY_BACKEND_URL_SUFFIX;
     }
     HttpPost post = new HttpPost(signavioURL + BPMN2_0_IMPORT_SUFFIX);
+    post.addHeader(X_SIGNAVIO_ID_PROP, this.securityToken);
     
     MultipartEntity entity = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE);
     // creating a temporary file
