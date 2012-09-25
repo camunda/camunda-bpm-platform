@@ -121,10 +121,10 @@
         <div id="myCarousel" class="carousel slide" data-interval="false">
           <!-- Carousel items -->
           <div class="carousel-inner">
-            <div class="item leftHandSide" data-ng-show="roundtrip.leftHandSide && lhsImageStatus == 'LOADED'">
+            <div class="item leftHandSide" ng-class="activeClass('leftHandSide')" data-ng-show="roundtrip.leftHandSide && lhsImageStatus == 'LOADED'">
               <diagram-image data-diagram="roundtrip.leftHandSide" data-status="lhsImageStatus"/>
             </div>
-            <div class="active item rightHandSide" data-ng-show="roundtrip.rightHandSide && rhsImageStatus == 'LOADED'">
+            <div class="item rightHandSide" ng-class="activeClass('rightHandSide')" data-ng-show="roundtrip.rightHandSide && rhsImageStatus == 'LOADED'">
               <diagram-image data-diagram="roundtrip.rightHandSide" data-status="rhsImageStatus" />
             </div>
           </div>

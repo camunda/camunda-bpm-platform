@@ -68,13 +68,12 @@ function RoundtripDetailsController($scope, $routeParams, RoundtripDetails, Comm
     }
   });
 
+  $scope.activeClass = function(side) {
+    return side == $scope.currentPicture ? "active" : "";
+  }
+  
   function fullScreenShowDiagram(side) {
     $scope.setCurrentPicture(side);
-
-    $('.leftHandSide').removeClass("active");
-    $('.rightHandSide').removeClass("active");
-    $('.' + side).addClass("active");
-
     $scope.diagramDetailsDialog.open();
   }
 
@@ -88,7 +87,11 @@ function RoundtripDetailsController($scope, $routeParams, RoundtripDetails, Comm
   };
 
   $scope.setCurrentPicture = function (picture) {
-    $scope.currentPicture = picture;
+    setTimeout(function() {
+      $scope.$apply(function() {
+        $scope.currentPicture = picture;
+      });
+    }, 800);
   };
 }
 
