@@ -86,12 +86,20 @@ function RoundtripDetailsController($scope, $routeParams, RoundtripDetails, Comm
     $scope.syncDialog.open();
   };
 
-  $scope.setCurrentPicture = function (picture) {
+
+  $scope.delayedSetCurrentPicture = function (picture) {
     setTimeout(function() {
-      $scope.$apply(function() {
-        $scope.currentPicture = picture;
-      });
+      console.log(picture);
+      $scope.setCurrentPicture(picture);
+      
+      // Same bug as with the tree; DO NOT DELETE the following two lines!
+      $scope.$digest();
+      $scope.$apply();
     }, 800);
+  };
+  
+  $scope.setCurrentPicture = function (picture) {
+    $scope.currentPicture = picture;
   };
 }
 

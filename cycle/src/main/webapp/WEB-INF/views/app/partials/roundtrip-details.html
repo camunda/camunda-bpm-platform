@@ -130,9 +130,9 @@
           </div>
           <!-- Carousel nav -->
           <a class="carousel-control left" 
-            href="#myCarousel" data-slide="prev" data-ng-show="roundtrip.leftHandSide && lhsImageStatus == 'LOADED' && currentPicture == 'rightHandSide'" data-ng-click="setCurrentPicture('leftHandSide')">&lsaquo;</a> 
+            href="#myCarousel" data-slide="prev" data-ng-show="roundtrip.leftHandSide && lhsImageStatus == 'LOADED' && currentPicture == 'rightHandSide'" data-ng-click="delayedSetCurrentPicture('leftHandSide')">&lsaquo;</a> 
           <a class="carousel-control right"
-            href="#myCarousel" data-slide="next" data-ng-show="roundtrip.rightHandSide && rhsImageStatus == 'LOADED' && currentPicture == 'leftHandSide'" data-ng-click="setCurrentPicture('rightHandSide')" >&rsaquo;</a>
+            href="#myCarousel" data-slide="next" data-ng-show="roundtrip.rightHandSide && rhsImageStatus == 'LOADED' && currentPicture == 'leftHandSide'" data-ng-click="delayedSetCurrentPicture('rightHandSide')" >&rsaquo;</a>
         </div>
       </div>
       <div class="modal-footer">
