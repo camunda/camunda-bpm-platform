@@ -75,7 +75,7 @@ public class AbstractRepository<T extends AbstractEntity> {
   /**
    * Find a given entity by id
    * 
-   * @return 
+   * @return the element or null if the element was not found
    */
   public T findById(long id) {
     return em.find(entityClass, id);

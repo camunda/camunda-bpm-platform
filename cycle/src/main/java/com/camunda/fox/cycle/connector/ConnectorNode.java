@@ -3,47 +3,64 @@ package com.camunda.fox.cycle.connector;
 import java.io.Serializable;
 import java.util.Date;
 
-public class ConnectorNode implements Comparable<ConnectorNode>, Serializable {
-  
+public class ConnectorNode implements Serializable {
+
   private static final long serialVersionUID = 1L;
 
   protected String id;
+
+  // Long because it may be null
   private Long connectorId;
-  
-  protected String label;
-  protected transient ConnectorNodeType type = ConnectorNodeType.FOLDER;
-  protected Date created;
+
+  private String label;
+
+  private Date created;
   private Date lastModified;
-  
-  public enum ConnectorNodeType {
-    FILE,
-    FOLDER
-  }
-  
+
+  private ConnectorNodeType type = ConnectorNodeType.UNSPECIFIED;
+
   public ConnectorNode() {
   }
-  
+
   public ConnectorNode(String id) {
-    this.setId(id);
+    this.id = id;
   }
-  
+
   public ConnectorNode(String id, String label) {
-    this.setId(id);
-    this.setLabel(label);
+    this(id);
+    
+    this.label = label;
   }
-  
+
+  public ConnectorNode(String id, ConnectorNodeType type) {
+    this(id);
+    
+    this.type = type;
+  }
+
   public ConnectorNode(String id, String label, Long connectorId) {
     this(id, label);
-    this.setConnectorId(connectorId);
+    
+    this.connectorId = connectorId;
+  }
+
+  public ConnectorNode(String id, String label, Long connectorId, ConnectorNodeType type) {
+    this(id, label);
+    
+    this.connectorId = connectorId;
+    this.type = type;
   }
   
   public ConnectorNode(String id, String label, ConnectorNodeType type) {
     this(id, label);
-    this.setType(type);
+    
+    this.type = type;
   }
-
+  
   /**
-   * ID of this node, may contain different representations, depending on the corresponding connector
+   * Return the id of this node. May contain different representations, 
+   * depending on the corresponding connector
+   * 
    * @return
    */
   public String getId() {
@@ -53,9 +70,9 @@ public class ConnectorNode implements Comparable<ConnectorNode>, Serializable {
   public void setId(String id) {
     this.id = id;
   }
-  
+
   /**
-   * The label of the node for UI purposes
+   * The label of the node for display purposes in the user interface
    * @return
    */
   public String getLabel() {
@@ -90,9 +107,12 @@ public class ConnectorNode implements Comparable<ConnectorNode>, Serializable {
     this.lastModified = lastModified;
   }
 
-  @Override
-  public int compareTo(ConnectorNode o) {
-    return o.label.compareTo(label);
+  public Long getConnectorId() {
+    return connectorId;
+  }
+
+  public void setConnectorId(Long connectorId) {
+    this.connectorId = connectorId;
   }
 
   @Override
@@ -105,29 +125,31 @@ public class ConnectorNode implements Comparable<ConnectorNode>, Serializable {
 
   @Override
   public boolean equals(Object obj) {
-    if (this == obj)
+    if (this == obj) {
       return true;
-    if (obj == null)
+    }
+    if (obj == null) {
       return false;
-    if (getClass() != obj.getClass())
+    }
+    if (getClass() != obj.getClass()) {
       return false;
+    }
     ConnectorNode other = (ConnectorNode) obj;
     if (id == null) {
-      if (other.id != null)
+      if (other.id != null) {
         return false;
-    } else if (!id.equals(other.id))
+      }
+    } else
+    if (!id.equals(other.id)) {
       return false;
+    }
     return true;
   }
 
-  public Long getConnectorId() {
-    return connectorId;
+  public boolean isDirectory() {
+    return type != null && type.isDirectory();
   }
-
-  public void setConnectorId(Long connectorId) {
-    this.connectorId = connectorId;
-  }
-
+  
   @Override
   public String toString() {
     return "ConnectorNode [id=" + id + ", connectorId=" + connectorId + ", label=" + label + "]";

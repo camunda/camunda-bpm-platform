@@ -53,7 +53,7 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import com.camunda.fox.cycle.connector.ConnectorNode;
-import com.camunda.fox.cycle.connector.ConnectorNode.ConnectorNodeType;
+import com.camunda.fox.cycle.connector.ConnectorNodeType;
 import com.camunda.fox.cycle.entity.ConnectorConfiguration;
 import com.camunda.fox.cycle.roundtrip.BpmnProcessModelUtil;
 import com.camunda.fox.cycle.roundtrip.XsltTransformer;

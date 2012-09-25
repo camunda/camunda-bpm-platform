@@ -12,18 +12,16 @@ import java.util.Date;
 
 import javax.inject.Inject;
 
-import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.kubek2k.springockito.annotations.SpringockitoContextLoader;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.camunda.fox.cycle.connector.Connector;
 import com.camunda.fox.cycle.connector.ConnectorNode;
-import com.camunda.fox.cycle.connector.ConnectorNode.ConnectorNodeType;
+import com.camunda.fox.cycle.connector.ConnectorNodeType;
 import com.camunda.fox.cycle.connector.ConnectorRegistry;
 import com.camunda.fox.cycle.connector.vfs.VfsConnector;
 import com.camunda.fox.cycle.entity.Roundtrip;
@@ -31,6 +29,7 @@ import com.camunda.fox.cycle.entity.Roundtrip.SyncMode;
 import com.camunda.fox.cycle.repository.RoundtripRepository;
 import com.camunda.fox.cycle.util.IoUtil;
 import com.camunda.fox.cycle.web.dto.BpmnDiagramDTO;
+import com.camunda.fox.cycle.web.dto.ConnectorNodeDTO;
 import com.camunda.fox.cycle.web.dto.RoundtripDTO;
 
 /**
@@ -39,7 +38,6 @@ import com.camunda.fox.cycle.web.dto.RoundtripDTO;
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(
-  loader = SpringockitoContextLoader.class, 
   locations = {"classpath:/spring/test-*.xml"}
 )
 public class RoundtripServiceTest {
@@ -61,15 +59,15 @@ public class RoundtripServiceTest {
   
   @Before
   public void before() throws FileNotFoundException, Exception {
-    vfsConnector = connectorRegistry.getSessionConnectorMap().get(1l);
+    vfsConnector = connectorRegistry.getConnector(1);
     assertEquals(VfsConnector.class.getName(), vfsConnector.getConfiguration().getConnectorClass());
     
     vfsConnector.deleteNode(new ConnectorNode("foo/foo"));
-    rightNode = vfsConnector.createNode(null, "foo/foo", "Impl", ConnectorNodeType.FILE);
+    rightNode = vfsConnector.createNode(null, "foo/foo", "Impl", ConnectorNodeType.ANY_FILE);
     vfsConnector.updateContent(rightNode, new FileInputStream(IoUtil.getFile("com/camunda/fox/cycle/roundtrip/collaboration_impl.bpmn")));
     
     vfsConnector.deleteNode(new ConnectorNode("foo/bar"));
-    leftNode = vfsConnector.createNode(null, "foo/bar", "Modeler", ConnectorNodeType.FILE);
+    leftNode = vfsConnector.createNode(null, "foo/bar", "Modeler", ConnectorNodeType.ANY_FILE);
     vfsConnector.updateContent(leftNode, new FileInputStream(IoUtil.getFile("com/camunda/fox/cycle/roundtrip/collaboration.bpmn")));
   }
   
@@ -115,7 +113,7 @@ public class RoundtripServiceTest {
     RoundtripDTO testRoundtrip = getTestRoundtrip();
     roundtripService.doSynchronize(SyncMode.RIGHT_TO_LEFT, testRoundtrip.getId());
     
-    assertTrue(IOUtils.toString(vfsConnector.getContent(leftNode)).contains("activiti:class=\"java.lang.Object\""));
+    assertTrue(IoUtil.toString(vfsConnector.getContent(leftNode)).contains("activiti:class=\"java.lang.Object\""));
   }
   
   @Test
@@ -123,7 +121,7 @@ public class RoundtripServiceTest {
     RoundtripDTO testRoundtrip = getTestRoundtrip();
     roundtripService.doSynchronize(SyncMode.LEFT_TO_RIGHT, testRoundtrip.getId());
     
-    assertTrue(!IOUtils.toString(vfsConnector.getContent(rightNode)).contains("activiti:class=\"java.lang.Object\""));
+    assertTrue(!IoUtil.toString(vfsConnector.getContent(rightNode)).contains("activiti:class=\"java.lang.Object\""));
   }
   
 
@@ -136,23 +134,22 @@ public class RoundtripServiceTest {
 
   private RoundtripDTO createTestRoundtripDTOWithDetails() {
     RoundtripDTO dto = createTestRoundtripDTO();
-    
+
     BpmnDiagramDTO rhs = new BpmnDiagramDTO();
-    rhs.setDiagramPath("foo/foo");
-    rhs.setLabel("Impl");
-    rhs.setConnectorId(1l);
+    ConnectorNodeDTO rhsNode = new ConnectorNodeDTO("foo/foo", "Impl", 1l);
+
     rhs.setModeler("Fox designer");
-    
+    rhs.setConnectorNode(rhsNode);
+
     BpmnDiagramDTO lhs = new BpmnDiagramDTO();
-    
-    lhs.setDiagramPath("foo/bar");
-    lhs.setLabel("Modeler");
-    lhs.setConnectorId(1l);
+    ConnectorNodeDTO lhsNode = new ConnectorNodeDTO("foo/bar", "Modeler", 1l);
+
     lhs.setModeler("Another Modeler");
-    
+    lhs.setConnectorNode(lhsNode);
+
     dto.setRightHandSide(rhs);
     dto.setLeftHandSide(lhs);
-    
+
     return dto;
   }
 }

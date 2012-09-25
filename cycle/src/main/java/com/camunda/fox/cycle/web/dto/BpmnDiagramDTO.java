@@ -3,7 +3,6 @@ package com.camunda.fox.cycle.web.dto;
 import java.util.Date;
 
 import com.camunda.fox.cycle.entity.BpmnDiagram;
-import com.camunda.fox.cycle.entity.BpmnDiagram.Status;
 
 /**
  * This is a data object which exposes a {@link BpmnDiagram} to the client via rest.
@@ -14,25 +13,24 @@ public class BpmnDiagramDTO {
   
   private Long id;
   private String modeler;
-  private String diagramPath;
-  private Long connectorId;
   private String label;
-  private Date lastModified;
   private Date lastSync;
-
-  private Status status;
+  
+  private BpmnDiagramStatusDTO syncStatus; 
+  private ConnectorNodeDTO connectorNode;
   
   public BpmnDiagramDTO() { }
   
   public BpmnDiagramDTO(BpmnDiagram diagram) {
     this.id = diagram.getId();
     this.modeler = diagram.getModeler();
-    this.status = diagram.getStatus();
-    this.diagramPath = diagram.getDiagramPath();
-    this.connectorId = diagram.getConnectorId();
+    
     this.label = diagram.getLabel();
-    this.lastModified = diagram.getLastModified();
     this.lastSync = diagram.getLastSync();
+    
+    this.syncStatus = new BpmnDiagramStatusDTO(diagram);
+    
+    this.connectorNode = diagram.getConnectorNode() != null ? new ConnectorNodeDTO(diagram.getConnectorNode()) : null;
   }
 
   public Long getId() {
@@ -51,22 +49,22 @@ public class BpmnDiagramDTO {
     this.modeler = modeler;
   }
 
-  public Status getStatus() {
-    return status;
-  }
-  
-  public String getDiagramPath() {
-    return diagramPath;
+  public BpmnDiagramStatusDTO getSyncStatus() {
+    return syncStatus;
   }
 
-  public void setDiagramPath(String diagramPath) {
-    this.diagramPath = diagramPath;
+  public void setSyncStatus(BpmnDiagramStatusDTO syncStatus) {
+    this.syncStatus = syncStatus;
   }
 
-  public void setStatus(Status status) {
-    this.status = status;
+  public ConnectorNodeDTO getConnectorNode() {
+    return connectorNode;
   }
-  
+
+  public void setConnectorNode(ConnectorNodeDTO connectorNode) {
+    this.connectorNode = connectorNode;
+  }
+
   /**
    * Wraps a bpmn diagram as a data object
    * @param diagram
@@ -76,28 +74,12 @@ public class BpmnDiagramDTO {
     return new BpmnDiagramDTO(diagram);
   }
 
-  public Long getConnectorId() {
-    return connectorId;
-  }
-
-  public void setConnectorId(Long connectorId) {
-    this.connectorId = connectorId;
-  }
-
   public String getLabel() {
     return label;
   }
 
   public void setLabel(String label) {
     this.label = label;
-  }
-
-  public Date getLastModified() {
-    return lastModified;
-  }
-
-  public void setLastModified(Date lastModified) {
-    this.lastModified = lastModified;
   }
 
   public Date getLastSync() {

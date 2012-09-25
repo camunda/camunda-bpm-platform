@@ -1,7 +1,11 @@
 package com.camunda.fox.cycle.connector.vfs;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -19,12 +23,13 @@ import org.apache.commons.vfs2.VFS;
 
 import com.camunda.fox.cycle.connector.Connector;
 import com.camunda.fox.cycle.connector.ConnectorNode;
-import com.camunda.fox.cycle.connector.ConnectorNode.ConnectorNodeType;
-import com.camunda.fox.cycle.connector.ConnectorNodeComparator;
+import com.camunda.fox.cycle.connector.ConnectorNodeType;
 import com.camunda.fox.cycle.connector.ContentInformation;
 import com.camunda.fox.cycle.connector.Secured;
+import com.camunda.fox.cycle.connector.util.ConnectorNodeComparator;
 import com.camunda.fox.cycle.entity.ConnectorConfiguration;
 import com.camunda.fox.cycle.exception.CycleException;
+import com.camunda.fox.cycle.util.IoUtil;
 
 public class VfsConnector extends Connector {
 
@@ -37,46 +42,38 @@ public class VfsConnector extends Connector {
 
   @Secured
   @Override
-  public List<ConnectorNode> getChildren(ConnectorNode parent) {
+  public List<ConnectorNode> getChildren(ConnectorNode node) {
     List<ConnectorNode> nodes = new ArrayList<ConnectorNode>();
     
     try {
-      FileSystemManager fsManager = VFS.getManager();
-      FileObject fileObject;
+      FileObject fileObject = getFileObject(node);
       
-      fileObject = fsManager.resolveFile(basePath + parent.getId());
-
       if (fileObject.getType() == FileType.FILE) {
         return Collections.<ConnectorNode>emptyList();
       }
       
       FileObject[] children = fileObject.getChildren();
       
-      for ( FileObject file : children )
-      {
-          String baseName = file.getName().getBaseName();
-          ConnectorNode node = new ConnectorNode(parent.getId()+File.separatorChar+baseName, baseName, getId());
-          if (file.getType() == FileType.FILE) {
-            node.setType(ConnectorNodeType.FILE);
-          } else {
-            node.setType(ConnectorNodeType.FOLDER);
-          }
-          node.setConnectorId(this.getConfiguration().getId());
-          /**
-           * it's not possible to get last modified date from symlinks
-           */
-          try {
-            node.setLastModified(new Date(file.getContent().getLastModifiedTime()));
-          }catch (Exception exception) {
-            logger.fine("Could not set last modified time");
-          }
-          
-          nodes.add(node);
+      for (FileObject file: children) {
+        String baseName = file.getName().getBaseName();
+        ConnectorNode child = new ConnectorNode(node.getId() + "/" + baseName, baseName, getId());
+        child.setType(extractFileType(file));
+
+        /**
+         * it's not possible to get last modified date from symlinks
+         */
+        try {
+          child.setLastModified(new Date(file.getContent().getLastModifiedTime()));
+        } catch (Exception exception) {
+          logger.fine("Could not set last modified time");
+        }
+
+        nodes.add(child);
       }
-      
+
       // Sort
       Collections.sort(nodes, new ConnectorNodeComparator());
-      return nodes; 
+      return nodes;
     } catch (FileSystemException e) {
       throw new CycleException(e);
     }
@@ -84,58 +81,33 @@ public class VfsConnector extends Connector {
 
   @Secured
   @Override
-  public InputStream getContent(ConnectorNode node, ConnectorContentType type) {
+  public InputStream getContent(ConnectorNode node) {
     try {
-      FileSystemManager fsManager = VFS.getManager();
-      
-      FileObject fileObject = fsManager.resolveFile(basePath + node.getId());
-      
-      if (fileObject.getType() != FileType.FILE) {
-        //throw new CycleException("Cannot get content of non-file node");
-        logger.log(Level.WARNING, "Cannot get content of non-file node");
+      FileObject file = getFileObject(node);
+      // may only return the contents of existing objects
+      if (!file.exists()) {
         return null;
       }
       
-      switch(type) {
-      case PNG:
-        FileObject pngfile = fsManager.resolveFile(basePath + getPngNodeId(node.getId()));
-        if (pngfile.exists()) {
-          return pngfile.getContent().getInputStream(); 
-        }else {
-          return getClass().getClassLoader().getResourceAsStream("no-picture.png");
-        }
-      default:
-        return fileObject.getContent().getInputStream(); 
+      // may only return the contents of files
+      if (file.getType() != FileType.FILE) {
+        return null;
       }
       
+      InputStream is = file.getContent().getInputStream();
+      ByteArrayOutputStream os = new ByteArrayOutputStream();
+      
+      IOUtils.copy(is, os);
+      IOUtils.closeQuietly(is);
+      
+      return new ByteArrayInputStream(os.toByteArray());
     } catch (FileSystemException e) {
+      throw new CycleException(e);
+    } catch (IOException e) {
       throw new CycleException(e);
     }
   }
-  
-  @Secured
-  @Override
-  public Date getLastModifiedDate(ConnectorNode node) {
-    try {
-      FileSystemManager fsManager = VFS.getManager();
-      FileObject fileObject;
-      
-      fileObject = fsManager.resolveFile(basePath + node.getId());
-      
-      if (fileObject.getType() != FileType.FILE) {
-        //throw new CycleException("Cannot get content of non-file node");
-        logger.log(Level.WARNING, "Cannot get content of non-file node");
-        return null;
-      }
-      
-      return new Date(fileObject.getContent().getLastModifiedTime());
-      
-    } catch (FileSystemException e) {
-      logger.log(Level.WARNING, "Could not get last modified date for "+node, e);
-      return null;
-    }
-  }
-  
+
   @Override
   public void init(ConnectorConfiguration config) {
     basePath = config.getProperties().get(BASE_PATH_KEY);
@@ -166,21 +138,29 @@ public class VfsConnector extends Connector {
 
   @Secured
   @Override
-  public void updateContent(ConnectorNode node, InputStream newContent)  throws Exception {
-    FileSystemManager fsManager = VFS.getManager();
-    FileObject fileObject;
+  public ContentInformation updateContent(ConnectorNode node, InputStream newContent)  throws Exception {
     
-    fileObject = fsManager.resolveFile(this.basePath + node.getId());
-    
-    if (fileObject.exists()) {
+    try {
+      FileObject fileObject = getFileObject(node);
+      
+      if (!fileObject.exists()) {
+        throw new CycleException("File '" + node.getLabel() + "' does not exist.");
+      }
+      
       if (fileObject.getType() != FileType.FILE) {
         throw new CycleException("Unable to update content of file '" + node.getLabel() + "': Assigned file is not a file.");
       }
+
       FileContent content = fileObject.getContent();
-      IOUtils.copy(newContent, content.getOutputStream());
+      OutputStream os = content.getOutputStream();
+      IOUtils.copy(newContent, os);
+      os.flush();
+      IoUtil.closeSilently(os);
       content.close();
-    } else {
-      throw new CycleException("File '" + node.getLabel() + "' does not exist.");
+
+      return getContentInformation(node);
+    } catch (FileSystemException e) {
+      throw new CycleException("Could not update file contents", e);
     }
   }
 
@@ -188,47 +168,40 @@ public class VfsConnector extends Connector {
   public ConnectorNode getNode(String id) {
     try {
       FileSystemManager fsManager = VFS.getManager();
-      FileObject fileObject;
-
-      fileObject = fsManager.resolveFile(basePath + id);
-
-      String baseName = fileObject.getName().getBaseName();
-      ConnectorNode node = new ConnectorNode(id, baseName);
-
-      if (fileObject.getType() == FileType.FILE) {
-        node.setType(ConnectorNodeType.FILE);
-      } else {
-        node.setType(ConnectorNodeType.FOLDER);
+      FileObject file = fsManager.resolveFile(basePath + id);
+      
+      if (!file.exists()) {
+        return null;
       }
       
+      String baseName = file.getName().getBaseName();
+      ConnectorNode node = new ConnectorNode(id, baseName);
+      node.setType(extractFileType(file));
+      
       return node;
-
     } catch (Exception e) {
       throw new CycleException(e);
     }
-
   }
 
   @Override
   public ConnectorNode createNode(String parentId, String id, String label, ConnectorNodeType type) {
+    
+    if (type == null || type == ConnectorNodeType.UNSPECIFIED) {
+      throw new IllegalArgumentException("Must specify a valid node type");
+    }
+    
     try {
       FileSystemManager fsManager = VFS.getManager();
-      FileObject fileObject;
-
-      fileObject = fsManager.resolveFile(basePath + id);
+      FileObject file = fsManager.resolveFile(basePath + id);
       
-      switch (type) {
-        case FILE:
-          fileObject.createFile();
-          break;
-        case FOLDER:
-          fileObject.createFolder();
-        default:
-          throw new RuntimeException("Unsupported Node Type");
+      if (type.isFile()) {
+        file.createFile();
+      } else {
+        file.createFolder();
       }
       
       return new ConnectorNode(id, label, type);
-
     } catch (Exception e) {
       throw new CycleException(e);
     }
@@ -248,38 +221,94 @@ public class VfsConnector extends Connector {
     }
   }
   
+  @Secured
   @Override
-  public boolean isContentAvailable(ConnectorNode node, ConnectorContentType type) {
+  public ContentInformation getContentInformation(ConnectorNode node) {
     try {
-      FileSystemManager fsManager = VFS.getManager();
-      
-      switch (type) {
-      case PNG:
-        return fsManager.resolveFile(basePath + getPngNodeId(node.getId())).exists();
-      case DEFAULT:
-        return fsManager.resolveFile(basePath + node.getId()).exists();
-      default:
-        throw new RuntimeException("Unsupported Node Type");
-      }
-    }catch (FileSystemException e) {
-      throw new CycleException(e);
+      return getContentInformation(getFileObject(node));
+    } catch (FileSystemException e) {
+      throw new RuntimeException("Content information unavailable", e);
+    }
+  }
+
+  private ContentInformation getContentInformation(FileObject file) throws FileSystemException {
+    if (!file.exists()) {
+      return ContentInformation.notFound();
+    } else
+    if (file.getType() != FileType.FILE) {
+      throw new IllegalArgumentException("Can only get content information from files");
+    } else {
+      return new ContentInformation(true, getLastModifiedDate(file));
+    }
+  }
+
+  /**
+   * Returns the last modified date of a file object or null if 
+   * the object denotes a directory.
+   * 
+   * @param file
+   * @return the last modified date or null
+   * 
+   * @throws FileSystemException 
+   */
+  private Date getLastModifiedDate(FileObject file) throws FileSystemException {
+    if (file.getType() != FileType.FILE) {
+      return null;
+    } else {
+      return new Date(file.getContent().getLastModifiedTime());
     }
   }
   
-  @Override
-  public ContentInformation getContentInformation(ConnectorNode node, ConnectorContentType type) {
-    switch (type) {
-    case PNG:
-      return new ContentInformation(isContentAvailable(node, type), getLastModifiedDate(new ConnectorNode(getPngNodeId(node.getId()))));
-    case DEFAULT:
-      return new ContentInformation(isContentAvailable(node, type), getLastModifiedDate(node));
-    default:
-      throw new RuntimeException("Unsupported Node Type");
-    }
+  /**
+   * Returns a {@link FileObject} from the underlaying file system. 
+   * 
+   * Never returns null but throws a {@link FileSystemException} if the file system cannot be accessed.
+   * 
+   * @param path
+   * @return the file object
+   * 
+   * @throws FileSystemException 
+   */
+  private FileObject getFileObject(ConnectorNode node) throws FileSystemException {
+    String path = getTypedNodeSpecificPath(node);
+    
+    FileSystemManager fsManager = VFS.getManager();
+    return fsManager.resolveFile(basePath + path);
   }
   
-  private String getPngNodeId(String nodeId) {
-    int pointIndex = nodeId.lastIndexOf(".");
-    return nodeId.substring(0, pointIndex)+".png";
+  private ConnectorNodeType extractFileType(FileObject file) throws FileSystemException {
+    
+    if (file.getType() != FileType.FILE) {
+      // TODO: What is with the other types?
+      return ConnectorNodeType.FOLDER;
+    }
+    
+    String name = file.getName().getBaseName();
+    if (name.endsWith(".xml") || name.endsWith(".bpmn")) {
+      return ConnectorNodeType.BPMN_FILE;
+    } else 
+    if (name.endsWith(".png")) {
+      return ConnectorNodeType.PNG_FILE;
+    } else {
+      return ConnectorNodeType.ANY_FILE;
+    }
+  }
+
+  /**
+   * Returns a file path specific to the given node type.
+   * May override the current file name with something apropriate.
+   * 
+   * @param node
+   * @return 
+   */
+  private String getTypedNodeSpecificPath(ConnectorNode node) {
+    String path = node.getId();
+    switch (node.getType()) {
+      case PNG_FILE:
+        int pointIndex = path.lastIndexOf(".");
+        return path.substring(0, pointIndex) + ".png";
+      default: 
+        return path;
+    }
   }
 }
