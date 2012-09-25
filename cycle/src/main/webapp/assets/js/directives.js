@@ -101,13 +101,21 @@ angular
               }
 
               if (item.type == "BPMN_FILE") {
-                scope.$apply(function() {
-                  scope.selected = item;
-                });
+                
+                // FIXME digest should to the $apply, 
+                // but obviously its not resulting in a model update for the add button binding
+                // probably a bug in angularjs ?
+                // if you change something here, please test the following:
+                // first enter the modeler name, THEN select the file, add button should be enabled
+                // not working without $apply after digest, $apply function must be empty also
+                scope.selected = item;
+                scope.$digest();
+                scope.$apply();
               } else {
-                scope.$apply(function() {
-                  scope.selected = null;
-                });
+                // FIXME see description above!
+                scope.selected = null;
+                scope.$digest();
+                scope.$apply();
               }
             },
             showRoot: false,
