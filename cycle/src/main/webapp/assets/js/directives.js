@@ -104,6 +104,10 @@ angular
                 scope.$apply(function() {
                   scope.selected = item;
                 });
+              } else {
+                scope.$apply(function() {
+                  scope.selected = null;
+                });
               }
             },
             showRoot: false,

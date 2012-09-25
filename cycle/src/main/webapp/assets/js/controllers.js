@@ -55,12 +55,6 @@ function HomeController($scope, Event) {
 
 function RoundtripDetailsController($scope, $routeParams, RoundtripDetails, Commons, Event) {
   $scope.currentPicture = 'leftHandSide';
-
-  $scope.leftHandSideImage = null;
-  $scope.rightHandSideImage = null;
-
-  $scope.leftHandSideImageUrl = null;
-  $scope.rightHandSideImageUrl = null;
   
   $scope.diagramDetailsDialog = new Dialog();
   
@@ -74,20 +68,23 @@ function RoundtripDetailsController($scope, $routeParams, RoundtripDetails, Comm
     }
   });
 
-  $scope.openSyncDialog = function (syncMode) {
-    $scope.syncMode = syncMode;
-    $scope.syncDialog.open();
-  };
-
-  $scope.fullScreenShowDiagram = function(side) {
+  function fullScreenShowDiagram(side) {
     $scope.setCurrentPicture(side);
-    
+
     $('.leftHandSide').removeClass("active");
     $('.rightHandSide').removeClass("active");
-
     $('.' + side).addClass("active");
 
     $scope.diagramDetailsDialog.open();
+  }
+
+  $scope.$on(Event.modelImageClicked, function(event, side) {
+    fullScreenShowDiagram(side);
+  });
+
+  $scope.openSyncDialog = function (syncMode) {
+    $scope.syncMode = syncMode;
+    $scope.syncDialog.open();
   };
 
   $scope.setCurrentPicture = function (picture) {
@@ -175,6 +172,10 @@ function BpmnDiagramController($scope, Commons, Event) {
 
   $scope.diagramClass = function(diagram) {
     return $scope.modelStatus == "UNAVAILABLE" ? "error" : "";
+  };
+
+  $scope.showImage = function(side) {
+    $scope.$emit(Event.modelImageClicked, side);
   };
 
   $scope.$watch("diagram", function(newDiagramValue) {

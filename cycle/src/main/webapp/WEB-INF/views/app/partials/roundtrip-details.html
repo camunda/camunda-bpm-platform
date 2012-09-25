@@ -121,18 +121,18 @@
         <div id="myCarousel" class="carousel slide" data-interval="false">
           <!-- Carousel items -->
           <div class="carousel-inner">
-            <div class="active item leftHandSide" data-ng-show="roundtrip.leftHandSide">
-              <diagram-image data-diagram="roundtrip.leftHandSide" data-status="lhsAvailable" />
+            <div class="item leftHandSide" data-ng-show="roundtrip.leftHandSide && lhsImageStatus == 'LOADED'">
+              <diagram-image data-diagram="roundtrip.leftHandSide" data-status="lhsImageStatus"/>
             </div>
-            <div class="item rightHandSide" data-ng-show="roundtrip.rightHandSide" >
-              <diagram-image data-diagram="roundtrip.rightHandSide" data-status="rhsAvailable" />
+            <div class="active item rightHandSide" data-ng-show="roundtrip.rightHandSide && rhsImageStatus == 'LOADED'">
+              <diagram-image data-diagram="roundtrip.rightHandSide" data-status="rhsImageStatus" />
             </div>
           </div>
           <!-- Carousel nav -->
           <a class="carousel-control left" 
-            href="#myCarousel" data-slide="prev" data-ng-show="roundtrip.leftHandSide && currentPicture == 'rightHandSide'" data-ng-click="setCurrentPicture('leftHandSide')">&lsaquo;</a> 
+            href="#myCarousel" data-slide="prev" data-ng-show="roundtrip.leftHandSide && lhsImageStatus == 'LOADED' && currentPicture == 'rightHandSide'" data-ng-click="setCurrentPicture('leftHandSide')">&lsaquo;</a> 
           <a class="carousel-control right"
-            href="#myCarousel" data-slide="next" data-ng-show="roundtrip.rightHandSide && currentPicture == 'leftHandSide'" data-ng-click="setCurrentPicture('rightHandSide')" >&rsaquo;</a>
+            href="#myCarousel" data-slide="next" data-ng-show="roundtrip.rightHandSide && rhsImageStatus == 'LOADED' && currentPicture == 'leftHandSide'" data-ng-click="setCurrentPicture('rightHandSide')" >&rsaquo;</a>
         </div>
       </div>
       <div class="modal-footer">
