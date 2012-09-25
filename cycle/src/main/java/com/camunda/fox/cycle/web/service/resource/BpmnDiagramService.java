@@ -148,6 +148,9 @@ public class BpmnDiagramService {
       }
     }
     
-    return new BpmnDiagramStatusDTO(diagram.getId(), status, lastModified);
+    
+    BpmnDiagramStatusDTO statusDTO = new BpmnDiagramStatusDTO(diagram.getId(), status, lastModified);
+    statusDTO.setLastUpdated(new Date());
+    return statusDTO;
   }
 }

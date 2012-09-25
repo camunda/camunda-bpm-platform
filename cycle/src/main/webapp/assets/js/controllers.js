@@ -160,8 +160,6 @@ function BpmnDiagramController($scope, Commons, Event) {
 
   function changeModelStatus(status) {
     $scope.modelStatus = status;
-    $scope.$digest();
-    $scope.$apply();
   }
 
   $scope.editDiagramDialog = new Dialog();
@@ -211,6 +209,8 @@ function BpmnDiagramController($scope, Commons, Event) {
   
   $scope.checkContentAvailable = function(diagram) {
     Commons.getDiagramStatus(diagram).success(function(data) {
+      $scope.diagram.syncStatus = data;
+      console.log($scope.diagram);
       changeModelStatus(data.status);
     });
   };
