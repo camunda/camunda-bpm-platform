@@ -12,23 +12,31 @@
       <div class="sync-options">
         <div class="actions">
           <button class="btn btn-large sync-btn"
-                  ng-disabled="!(roundtrip.rightHandSide && roundtrip.leftHandSide)"
-                  ng-click="openSyncDialog('LEFT_TO_RIGHT')">sync &rarr;</button>
+                  data-ng-disabled="!(roundtrip.rightHandSide && roundtrip.leftHandSide)"
+                  data-ng-hide="(!roundtrip.rightHandSide && roundtrip.leftHandSide)"
+                  data-ng-click="openSyncDialog('LEFT_TO_RIGHT')">sync &rarr;</button>
+          <button class="btn btn-large sync-btn"
+                  data-ng-show="(roundtrip.leftHandSide && !roundtrip.rightHandSide)"
+                  data-ng-click="openSyncDialog('LEFT_TO_RIGHT')">create &rarr;</button>
         </div>
         <div>
-          <span ng-show="roundtrip.lastSync">
+          <span data-ng-show="roundtrip.lastSync">
             Last sync <br/> {{roundtrip.lastSync | date:'yyyy-MM-dd @ HH:mm:ss'}}
           </span>
           <p data-ng-show="roundtrip.lastSyncMode=='LEFT_TO_RIGHT'" class="sync-mode-arr">&rarr;</p>
           <p data-ng-show="roundtrip.lastSyncMode=='RIGHT_TO_LEFT'" class="sync-mode-arr">&larr;</p>
-          <span ng-hide="roundtrip.lastSync">
+          <span data-ng-hide="roundtrip.lastSync">
             Not synced yet
           </span>
         </div>
         <div class="actions">
           <button class="btn btn-large sync-btn"
-                  ng-disabled="!(roundtrip.rightHandSide && roundtrip.leftHandSide)"
-                  ng-click="openSyncDialog('RIGHT_TO_LEFT')">&larr; sync</button>
+                  data-ng-disabled="!(roundtrip.rightHandSide && roundtrip.leftHandSide)"
+                  data-ng-hide="(roundtrip.rightHandSide && !roundtrip.leftHandSide)"
+                  data-ng-click="openSyncDialog('RIGHT_TO_LEFT')">&larr; sync</button>
+          <button class="btn btn-large sync-btn"
+                  data-ng-show="(roundtrip.rightHandSide && !roundtrip.leftHandSide)"
+                  data-ng-click="openSyncDialog('RIGHT_TO_LEFT')">&larr; create</button>
         </div>
       </div>
     </div>
