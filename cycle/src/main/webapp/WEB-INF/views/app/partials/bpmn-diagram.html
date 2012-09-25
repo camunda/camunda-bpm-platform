@@ -19,7 +19,7 @@
     </div>
     
     <div class="info">
-      <code class="filename">{{diagram.label}}</code>
+      <span class="filename" ng-hide="imageStatus == 'UNAVAILABLE'">{{diagram.label}}</span>
       <div class="pull-right" ng-switch on="modelStatus">
         <div ng-switch-when="UNAVAILABLE" class="status btn-danger">
           <span th:text="#{'Not available'}">Not available</span>
@@ -53,10 +53,6 @@
     </div>
   </div>
 
-  <span class="badge badge-success" data-ng-show="diagram.status == 'SYNCED' && contentAvailable">no changes since last sync</span>
-  <span class="badge badge-important" data-ng-show="diagram.status == 'OUT_OF_SYNC' && contentAvailable">changed since last sync, last modified : {{diagram.lastModified | date:'yyyy-MM-dd, HH:mm:ss'}}</span>
-  <span class="badge" data-ng-show="(!roundtrip.lastSync || diagram.status == 'UNSPECIFIED') && contentAvailable">unknown sync status</span>
-  
   <!-- begin add-model-roundtrip-dialog -->
   <dialog model="editDiagramDialog" ng-cloak>
     <div class="modal" ng-controller="EditDiagramController" ngm-if="editDiagramDialog.renderHtml()">

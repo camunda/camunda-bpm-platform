@@ -175,8 +175,13 @@ input.ng-invalid-required {
 
 .bpmn-model .info {
   line-height: 30px;
+  height: 30px;
   padding-left: 10px;
   border-top-style: solid;
+}
+
+.bpmn-model .filename {
+  
 }
 
 .bpmn-model .info .filename {
