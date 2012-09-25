@@ -160,6 +160,8 @@ function BpmnDiagramController($scope, Commons, Event) {
 
   function changeModelStatus(status) {
     $scope.modelStatus = status;
+    $scope.$digest();
+    $scope.$apply();
   }
 
   $scope.editDiagramDialog = new Dialog();
@@ -265,7 +267,7 @@ function EditDiagramController($scope,Commons,Event) {
       $scope.error = null;
     }
     $scope.selectedNode = null;
-  });  
+  });
   
   // Watch for change in diagram path
   $scope.$watch('selectedNode', function(newValue) {
