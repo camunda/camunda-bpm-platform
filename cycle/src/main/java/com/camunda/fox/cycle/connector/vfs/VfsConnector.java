@@ -168,7 +168,7 @@ public class VfsConnector extends Connector {
   public ConnectorNode getNode(String id) {
     try {
       FileSystemManager fsManager = VFS.getManager();
-      FileObject file = fsManager.resolveFile(basePath + id);
+      FileObject file = fsManager.resolveFile(this.createPath(id));
       
       if (!file.exists()) {
         return null;
@@ -193,7 +193,7 @@ public class VfsConnector extends Connector {
     
     try {
       FileSystemManager fsManager = VFS.getManager();
-      FileObject file = fsManager.resolveFile(basePath + id);
+      FileObject file = fsManager.resolveFile(this.createPath(id));
       
       if (type.isFile()) {
         file.createFile();
@@ -213,12 +213,19 @@ public class VfsConnector extends Connector {
       FileSystemManager fsManager = VFS.getManager();
       FileObject fileObject;
 
-      fileObject = fsManager.resolveFile(basePath + node.getId());
+      fileObject = fsManager.resolveFile(this.createPath(node.getId()));
       fileObject.delete();
 
     } catch (Exception e) {
       throw new CycleException(e);
     }
+  }
+  
+  private String createPath(String pathSuffix) {
+    if (!basePath.endsWith("/") && !pathSuffix.startsWith("/")) {
+      pathSuffix = "/" + pathSuffix;
+    }
+    return basePath + pathSuffix;
   }
   
   @Secured
@@ -273,7 +280,7 @@ public class VfsConnector extends Connector {
     String path = getTypedNodeSpecificPath(node);
     
     FileSystemManager fsManager = VFS.getManager();
-    return fsManager.resolveFile(basePath + path);
+    return fsManager.resolveFile(this.createPath(path));
   }
   
   private ConnectorNodeType extractFileType(FileObject file) throws FileSystemException {
