@@ -21,16 +21,16 @@
     <div class="info">
       <span class="filename" ng-hide="imageStatus == 'UNAVAILABLE'">{{diagram.label}}</span>
       <div class="pull-right" ng-switch on="modelStatus">
-        <div ng-switch-when="UNAVAILABLE" class="status btn-danger">
+        <div ng-switch-when="UNAVAILABLE" class="status label label-important">
           <span th:text="#{'Not available'}">Not available</span>
         </div>
-        <div ng-switch-when="UNSPECIFIED" class="status btn-warning">
+        <div ng-switch-when="UNSPECIFIED" class="status label">
           <span th:text="#{'Not yet synchronized'}">Not yet synchronized</span>
         </div>
-        <div ng-switch-when="SYNCED" class="status btn-success">
+        <div ng-switch-when="SYNCED" class="status label label-success">
           <span th:text="#{'In sync'}">In sync</span>
         </div>
-        <div ng-switch-when="OUT_OF_SYNC" class="status btn-warning">
+        <div ng-switch-when="OUT_OF_SYNC" class="status label label-important">
           <span th:text="#{'Changed since last sync'}">Changed since last sync</span>
         </div>
       </div>
@@ -102,7 +102,7 @@
               <label class="control-label" for="tree" 
                      th:text="#{'BPMN File'}" 
                      th:attr="data-help=#{'Select a BPMN 2.0 file from the connector contents. Note that only <code>.xml</code> and <code>.bpmn</code> files may be selected by you.'}" 
-                     data-help-title="BPMN file">BPMN file</label>
+                     data-help-title="BPMN File">BPMN File</label>
               
               <div class="controls" style="margin-bottom: 10px;">
                 <input ng-model="selectedNode.label" class="span8" disabled />
