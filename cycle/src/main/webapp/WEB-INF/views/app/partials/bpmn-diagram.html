@@ -3,12 +3,12 @@
     <h3>
       {{diagram.modeler}} 
       <a class="pull-right btn sync-status-refresh">
-        <i class="icon-refresh" th:title="#{'Refresh synchronization status'}" ng-click="checkContentAvailable(diagram)"></i>
+        <i class="icon-refresh" th:title="#{'Refresh model status'}" ng-click="refreshStatus(diagram)"></i>
       </a>
     </h3>
     <div class="holder">
       <div class="diagram">
-        <diagram-image data-diagram="diagram" data-status="imageStatus" data-click="showImage(identifier)"/>
+        <diagram-image data-diagram="diagram" data-status="imageStatus" data-click="fullScreenShowDiagram(identifier)"/>
       </div>
       <div class="error" ng-show="modelStatus == 'UNAVAILABLE'">
         <p>
@@ -25,7 +25,7 @@
           <span th:text="#{'Not available'}">Not available</span>
         </div>
         <div ng-switch-when="UNSPECIFIED" class="status btn-warning">
-          <span th:text="#{'Not synchronized'}">Not synchronized</span>
+          <span th:text="#{'Not yet synchronized'}">Not yet synchronized</span>
         </div>
         <div ng-switch-when="SYNCED" class="status btn-success">
           <span th:text="#{'In sync'}">In sync</span>

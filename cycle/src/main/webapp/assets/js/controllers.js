@@ -79,34 +79,23 @@ function RoundtripDetailsController($scope, $routeParams, RoundtripDetails, Comm
     $scope.syncDialog.open();
   };
 
-  $scope.$on(Event.roundtripChanged, function(event, roundtrip) {
-    $scope.roundtrip = roundtrip;
-  });
-
-  $scope.$on(Event.imageAvailable, function(event, available, side) {
-    $scope[side+"Image"] = available;
-  });
-
-  $scope.$on(Event.modelImageClicked, function(event, side) {
+  $scope.fullScreenShowDiagram = function(side) {
     $scope.setCurrentPicture(side);
     
     $('.leftHandSide').removeClass("active");
     $('.rightHandSide').removeClass("active");
 
-    $scope.leftHandSideImageUrl = Commons.getImageUrl($scope.roundtrip.leftHandSide.connectorNode, true);
-    $scope.rightHandSideImageUrl = Commons.getImageUrl($scope.roundtrip.rightHandSide.connectorNode, true);
-
     $('.' + side).addClass("active");
-    
+
     $scope.diagramDetailsDialog.open();
-  });
+  };
 
   $scope.setCurrentPicture = function (picture) {
     $scope.currentPicture = picture;
   };
 }
 
-function SyncRoundtripController($scope, $http, App, Event) {
+function SyncRoundtripController($scope, $http, $q, App, Event) {
   
   var SYNC_SUCCESS = "synchronizationSuccess",
       SYNC_FAILED = "synchronizationFailed",
@@ -119,15 +108,36 @@ function SyncRoundtripController($scope, $http, App, Event) {
     $scope.syncDialog.close();
   };
   
+  $scope.syncNoteCls = function(mode) {
+    return mode == 'LEFT_TO_RIGHT' ? 'ltr' : 'rtl';
+  };
+  
   $scope.performSync = function() {
     $scope.status = PERFORM_SYNC;
     
+    var Delay = function(delayMs) {
+      var deferred = $q.defer();
+      
+      setTimeout(function() {
+        deferred.resolve();
+        $scope.$apply();
+      }, delayMs);
+      
+      return deferred.promise;
+    };
+    
+    var delayed = new Delay(2000);
+    
     $http.post(App.uri('secured/resource/roundtrip/' + $scope.roundtrip.id + '/sync?syncMode=' + $scope.syncMode)).
       success(function(data) {
-        $scope.status = SYNC_SUCCESS;
-        $scope.$emit(Event.roundtripChanged, data);
+        delayed.then(function() {
+          $scope.roundtrip.$get({id: $scope.roundtrip.id });
+          $scope.status = SYNC_SUCCESS;
+        });
       }).error(function (data) {
-        $scope.status = SYNC_FAILED;
+        delayed.then(function() {
+          $scope.status = SYNC_FAILED;
+        });
       });
   };
 }
@@ -166,12 +176,6 @@ function BpmnDiagramController($scope, Commons, Event) {
   $scope.diagramClass = function(diagram) {
     return $scope.modelStatus == "UNAVAILABLE" ? "error" : "";
   };
-  
-  $scope.showImage = function(side) {
-    alert("foo");
-    
-    $scope.$emit(Event.modelImageClicked, side);
-  };
 
   $scope.$watch("diagram", function(newDiagramValue) {
     // Check availability only when diagram is saved
@@ -180,6 +184,17 @@ function BpmnDiagramController($scope, Commons, Event) {
     }
   });
 
+ /**
+  * Refresh status of the selected diagram. 
+  * That includes: 
+  *  * Check image availability
+  *  * Check synchronization status
+  */
+  $scope.refreshStatus = function(diagram) {
+    $scope.imageStatus = "UNKNOWN";
+    $scope.checkContentAvailable(diagram);
+  };
+  
   $scope.checkContentAvailable = function(diagram) {
     Commons.getDiagramStatus(diagram).success(function(data) {
       changeModelStatus(data.status);

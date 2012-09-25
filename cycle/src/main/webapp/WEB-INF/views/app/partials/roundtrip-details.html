@@ -46,18 +46,35 @@
         <h3 th:text="#{Synchronize models}">Synchronize models</h3>
       </div>
       <div class="modal-body">
+        <div class="sync-note">
+          <div ng-class="syncNoteCls(syncMode)">
+        </div>
+        
+        </div>
         <div ng-switch on="status">
           <div ng-switch-when="beforeStart">
-            <p>
-              <span ng-show="syncMode == 'LEFT_TO_RIGHT'" th:text="#{The synchronization will perform from left to right and the model at the right hand side will be overwritten.}"></span>
-              <span ng-hide="syncMode == 'LEFT_TO_RIGHT'" th:text="#{The synchronization will perform from right to left and the model at the left hand side will be merged with changes from the left hand side model.}"></span>
+            <p ng-switch on="syncMode">
+              <span ng-switch-when="LEFT_TO_RIGHT">
+                <span th:text="#{'Synchronizing from'}"></span>
+                <strong th:text="#{'left'}"></strong>
+                <span th:text="#{'to'}"></span>
+                <strong th:text="#{'right'}"></strong>
+                <span th:text="#{'will override the right hand side model.'}"></span>
+              </span>
+              <span ng-switch-when="RIGHT_TO_LEFT">
+                <span th:text="#{'Synchronizing from'}"></span>
+                <strong th:text="#{'right'}"></strong>
+                <span th:text="#{'to'}"></span>
+                <strong th:text="#{'left'}"></strong>
+                <span th:text="#{'will merge the right hand side into the left hand side model.'}"></span>
+              </span>
             </p>
             <p>
-              <span th:text="#{'Are you sure to synchronize the models?'}" />
+              <span th:text="#{'Are you sure you would like to continue?'}" />
             </p>
           </div>
           <div ng-switch-when="performSynchronize">
-            <p th:text="#{Synchronization in progress}">Synchronization in progress</p>
+            <p th:text="#{Synchronization in progress}">Synchronization is in progress.</p>
             <div class="progress progress-striped active">
               <div class="bar" style="width: 100%;"></div>
             </div>

@@ -72,7 +72,7 @@ angular
       getImageUrl: function (node, update) {
         var uri = App.uri("secured/resource/connector/" + node.connectorId + "/contents?type=PNG_FILE&nodeId=" + encodeURI(node.id));
         if (update) {
-          uri +="&updated=" + new Date().getTime();
+          uri +="&ts=" + new Date().getTime();
         }
         return uri;
       }

@@ -321,10 +321,23 @@ angular
 //        }
 //      };
 
+      function updateImage(diagram, update) {
+        scope.status = "LOADING";
+        $(element).find("img").attr("src", Commons.getImageUrl(diagram.connectorNode, update));
+      };
+
       scope.$watch("diagram", function (newDiagramValue) {
         if (newDiagramValue) {
-          scope.status = "LOADING";
-          $(element).find("img").attr("src", Commons.getImageUrl(newDiagramValue.connectorNode, true));
+          updateImage(scope.diagram);
+        }
+      });
+
+      /**
+       * Update image status when it is set back to unknown
+       */
+      scope.$watch("status", function (newStatus, oldStatus) {
+        if (scope.diagram && newStatus == "UNKNOWN" && oldStatus) {
+          updateImage(scope.diagram, true);
         }
       });
     }

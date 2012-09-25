@@ -139,9 +139,13 @@ input.ng-invalid-required {
   border-style: solid;
 }
 
-/*.bpmn-model .status:hover .sync-status-refresh {
-  background-image: url("../img/glyphicons-halflings-white.png");
-}*/
+.bpmn-model .sync-status-refresh {
+  vertical-align: top;
+  line-height: 40px;
+  padding: 0px 15px;
+  border-style: none;
+  border-radius: 0 3px 0 0;
+}
 
 .bpmn-model h3 {
   text-align: center;
@@ -151,6 +155,7 @@ input.ng-invalid-required {
   
   border-top-left-radius: 3px;
   border-top-right-radius: 3px;
+  border-bottom-style: solid;
 }
 
 /*.bpmn-model:hover h3 {
@@ -231,6 +236,24 @@ input.ng-invalid-required {
   -moz-box-sizing: border-box;
   box-sizing: border-box;
 }
+/** end roundtrip view */
+
+/** sync dialog */
+.sync-note {
+  text-align: center;
+  padding: 10px 0 30px 0;
+}
+
+.sync-note > div {
+  height: 130px;
+  width: 330px;
+  background-image: url('../img/sync-visualization.png');
+  margin: auto;
+}
+
+.sync-note .ltr {
+  background-position: 0px -130px;
+}
 
 .tree {
   border: 1px solid #DDDDDD;
@@ -282,10 +305,7 @@ div#pictureModal.modal.hide.fade {
   left: 33%;
 }
 
-.sync-mode-arr {
-  font-size: 28px; font-weight: bolder;  
-}
-
+/** popover styles */
 .popover-inner {
   padding: 0px;
   border: 1px solid #ccc;
@@ -293,6 +313,7 @@ div#pictureModal.modal.hide.fade {
   background-color: #fff;
 }
 
+/** combo box styles */
 .combobox-container input,.typeahead.dropdown-menu, span#modelerName {
   width: 233px;
   -webkit-border-radius: 3px;
