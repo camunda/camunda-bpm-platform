@@ -7,8 +7,8 @@ import java.util.Date;
 public class ContentInformation implements Serializable {
   private static final long serialVersionUID = 1L;
 
-  boolean isAvailable;
-  Date lastModified;
+  private boolean isAvailable;
+  private Date lastModified;
   
   public ContentInformation(boolean isAvailable, Date lastModified) {
     super();
@@ -16,7 +16,7 @@ public class ContentInformation implements Serializable {
     this.lastModified = lastModified;
   }
 
-  public boolean isAvailable() {
+  public boolean exists() {
     return isAvailable;
   }
   
@@ -32,4 +32,12 @@ public class ContentInformation implements Serializable {
     this.lastModified = lastModified;
   }
   
+  /**
+   * Standard {@link ContentInformation} for not found files.
+   * 
+   * @return 
+   */
+  public static ContentInformation notFound() {
+    return new ContentInformation(false, null);
+  }
 }

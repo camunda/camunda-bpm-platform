@@ -5,6 +5,11 @@ import java.util.Date;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.Temporal;
+import javax.persistence.TemporalType;
+
+import com.camunda.fox.cycle.connector.ConnectorNode;
+import com.camunda.fox.cycle.connector.ConnectorNodeType;
 
 /**
  * Represents a BPMN 2.0 diagram used in a roundtrip.
@@ -18,6 +23,7 @@ public class BpmnDiagram extends AbstractEntity {
   
   public static enum Status {
     UNSPECIFIED,
+    UNAVAILABLE, 
     OUT_OF_SYNC, 
     SYNCED, 
     WARNING
@@ -34,8 +40,10 @@ public class BpmnDiagram extends AbstractEntity {
   
   private String label;
   
+  @Temporal(TemporalType.TIMESTAMP)
   private Date lastModified;
   
+  @Temporal(TemporalType.TIMESTAMP)
   private Date lastSync;
   
   public BpmnDiagram() { }
@@ -100,5 +108,18 @@ public class BpmnDiagram extends AbstractEntity {
 
   public void setLastSync(Date lastSync) {
     this.lastSync = lastSync;
+  }
+  
+  /**
+   * Returns the connector node stored in this diagram or null if none is stored
+   * 
+   * @return 
+   */
+  public ConnectorNode getConnectorNode() {
+    if (diagramPath != null) {
+      return new ConnectorNode(diagramPath, label, connectorId, ConnectorNodeType.BPMN_FILE);
+    } else {
+      return null;
+    }
   }
 }

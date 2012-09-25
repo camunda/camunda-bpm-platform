@@ -42,25 +42,25 @@ public class Roundtrip extends AbstractEntity {
   
   @OneToOne(cascade=CascadeType.ALL, orphanRemoval=true)
   private BpmnDiagram rightHandSide;
-  
-	public Roundtrip() { }
-	
+
+  public Roundtrip() { }
+
   public Roundtrip(Long id, String name) {
     this.setId(id);
-		this.name = name;
-	}
-  
-	public Roundtrip(String name) {
-		this.name = name;
-	}
-	
-	public String getName() {
-		return name;
-	}
+    this.name = name;
+  }
 
-	public void setName(String name) {
-		this.name = name;
-	}
+  public Roundtrip(String name) {
+    this.name = name;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
 
   public Date getLastSync() {
     return lastSync;

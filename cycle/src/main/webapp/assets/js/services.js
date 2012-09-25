@@ -57,23 +57,24 @@ angular
       getConnectors: function() {
         return HttpUtils.makePromise($http.get(App.uri("secured/resource/connector/list")));
       },
-      isImageAvailable : function (connectorId, nodeId) {
-        var uri = "secured/resource/connector/"+connectorId+"/content/PNG/info"+"?nodeId="+escape(nodeId);
-        return HttpUtils.makePromise($http.get(App.uri(uri)));
+      isImageAvailable : function (node) {
+        var uri = "secured/resource/connector/" + node.connectorId + "/contents/info?type=PNG_FILE&nodeId=" + escape(node.id);
+        return $http.get(App.uri(uri));
       },
-      isContentAvailable : function (connectorId, nodeId) {
-        var uri = "secured/resource/connector/"+connectorId+"/content/DEFAULT/info"+"?nodeId="+escape(nodeId);
-        return HttpUtils.makePromise($http.get(App.uri(uri)));
+      isContentAvailable: function (node) {
+        var uri = "secured/resource/connector/" + node.connectorId + "/contents/info?nodeId=" + encodeURI(node.id);
+        return $http.get(App.uri(uri));
       },
-      getImageUrl : function (diagram, update) {
-        if (diagram) {
-          var uri = App.uri("secured/resource/connector/")+diagram.connectorId+"/content/PNG?nodeId="+escape(diagram.diagramPath);
-          if (update) {
-            uri +="&updated="+new Date().getTime();
-          }
-          return uri;
+      getDiagramStatus: function(diagram) {
+        var uri = "secured/resource/diagram/" + diagram.id + "/syncStatus";
+        return $http.get(App.uri(uri));
+      }, 
+      getImageUrl: function (node, update) {
+        var uri = App.uri("secured/resource/connector/" + node.connectorId + "/contents?type=PNG_FILE&nodeId=" + encodeURI(node.id));
+        if (update) {
+          uri +="&ts=" + new Date().getTime();
         }
-        return "";
+        return uri;
       }
     };
   })

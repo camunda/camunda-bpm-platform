@@ -39,7 +39,4 @@
     <property name="databaseSchemaUpdate" value="true" />
     <property name="jobExecutorActivate" value="false" />
   </bean>
-
-  <bean id="bpmnProcessModelUtil" class="com.camunda.fox.cycle.roundtrip.BpmnProcessModelUtil" />
-
 </beans>

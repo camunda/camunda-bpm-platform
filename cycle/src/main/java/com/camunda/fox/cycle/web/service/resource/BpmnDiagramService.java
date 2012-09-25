@@ -2,7 +2,6 @@ package com.camunda.fox.cycle.web.service.resource;
 
 import java.util.Date;
 import java.util.List;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.inject.Inject;
@@ -11,17 +10,22 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import org.springframework.transaction.annotation.Transactional;
 
 import com.camunda.fox.cycle.connector.Connector;
 import com.camunda.fox.cycle.connector.ConnectorNode;
 import com.camunda.fox.cycle.connector.ConnectorRegistry;
+import com.camunda.fox.cycle.connector.ContentInformation;
 import com.camunda.fox.cycle.entity.BpmnDiagram;
 import com.camunda.fox.cycle.entity.BpmnDiagram.Status;
 import com.camunda.fox.cycle.repository.BpmnDiagramRepository;
 import com.camunda.fox.cycle.web.dto.BpmnDiagramDTO;
+import com.camunda.fox.cycle.web.dto.BpmnDiagramStatusDTO;
+import com.camunda.fox.cycle.web.dto.ConnectorNodeDTO;
 
 /**
  *
@@ -30,13 +34,14 @@ import com.camunda.fox.cycle.web.dto.BpmnDiagramDTO;
 @Path("secured/resource/diagram")
 public class BpmnDiagramService {
 
+  private static Logger log = Logger.getLogger(BpmnDiagramService.class.getName());
+  
   @Inject
   private BpmnDiagramRepository bpmnDiagramRepository;
   
   @Inject
   private ConnectorRegistry connectorRegistry;
   
-  Logger log = Logger.getLogger(BpmnDiagramService.class.getName());
   
 //  @GET
 //  public List<BpmnDiagramDTO> list() {
@@ -71,13 +76,9 @@ public class BpmnDiagramService {
   public BpmnDiagram createOrUpdate(BpmnDiagramDTO data) {
     BpmnDiagram diagram;
     
-    Connector diagramConnector = this.connectorRegistry.getSessionConnectorMap().get(data.getConnectorId());
-    ConnectorNode connectorNode = new ConnectorNode(data.getDiagramPath(), data.getLabel());
-    
     if (data.getId() == null) {
       diagram = new BpmnDiagram();
       diagram.setStatus(Status.UNSPECIFIED);
-      diagram.setLastModified(diagramConnector.getLastModifiedDate(connectorNode));
     } else {
       diagram = bpmnDiagramRepository.findById(data.getId());
       if (diagram == null) {
@@ -98,9 +99,11 @@ public class BpmnDiagramService {
   private void update(BpmnDiagram diagram, BpmnDiagramDTO data) {
     diagram.setModeler(data.getModeler());
 
-    diagram.setLabel(data.getLabel());
-    diagram.setConnectorId(data.getConnectorId());
-    diagram.setDiagramPath(data.getDiagramPath());
+    ConnectorNodeDTO node = data.getConnectorNode();
+    diagram.setLabel(node.getLabel());
+    
+    diagram.setConnectorId(node.getConnectorId());
+    diagram.setDiagramPath(node.getId());
   }
   
   @GET
@@ -110,33 +113,41 @@ public class BpmnDiagramService {
     return bpmnDiagramRepository.findAllModelerNames();
   }
   
-  public BpmnDiagramDTO isDiagramInSync(BpmnDiagramDTO bpmnDiagramDTO) {
-    Date lastModifiedDate = null;
-    
-    Connector diagramConnector = this.connectorRegistry.getSessionConnectorMap().get(bpmnDiagramDTO.getConnectorId());
-    ConnectorNode connectorNode = new ConnectorNode(bpmnDiagramDTO.getDiagramPath(), bpmnDiagramDTO.getLabel());
-    
-    try {
-      lastModifiedDate = diagramConnector.getLastModifiedDate(connectorNode);
-      bpmnDiagramDTO.setLastModified(lastModifiedDate);
-    }catch (Exception e) {
-      log.log(Level.WARNING, "", e);
+  @GET
+  @Transactional
+  @Path("{id}/syncStatus")
+  public BpmnDiagramStatusDTO synchronizationStatus(@PathParam("id") long id) {
+
+    BpmnDiagram diagram = bpmnDiagramRepository.findById(id);
+    if (diagram == null) {
+      throw new WebApplicationException(Response.Status.NOT_FOUND);
     }
-    
-    if (lastModifiedDate != null && bpmnDiagramDTO.getLastSync() != null) {
-  
-        if (lastModifiedDate.getTime() <= bpmnDiagramDTO.getLastSync().getTime()) {
-          bpmnDiagramDTO.setStatus(Status.SYNCED);
-        }
-  
-        if (lastModifiedDate.getTime() > bpmnDiagramDTO.getLastSync().getTime()) {
-          bpmnDiagramDTO.setStatus(Status.OUT_OF_SYNC);
-        }
-        
+
+    ConnectorNode node = diagram.getConnectorNode();
+    Connector connector = connectorRegistry.getConnector(node.getConnectorId());
+
+    Status status = Status.UNSPECIFIED;
+    Date lastModified = null;
+
+    ContentInformation contentInfo = connector.getContentInformation(node);
+    if (!contentInfo.exists()) {
+      status = Status.UNAVAILABLE;
     } else {
-       bpmnDiagramDTO.setStatus(Status.UNSPECIFIED);
+      lastModified = contentInfo.getLastModified();
+
+      if (lastModified != null && diagram.getLastSync() != null) {
+        if (lastModified.getTime() <= diagram.getLastSync().getTime()) {
+          status = Status.SYNCED;
+        }
+
+        if (lastModified.getTime() > diagram.getLastSync().getTime()) {
+          status = Status.OUT_OF_SYNC;
+        }
+      } else {
+        status = Status.UNSPECIFIED;
+      }
     }
     
-    return bpmnDiagramDTO;
+    return new BpmnDiagramStatusDTO(diagram.getId(), status, lastModified);
   }
 }

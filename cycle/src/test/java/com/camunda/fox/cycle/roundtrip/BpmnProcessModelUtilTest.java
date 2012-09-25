@@ -13,7 +13,7 @@ import com.camunda.fox.cycle.roundtrip.BpmnProcessModelUtil;
 import com.camunda.fox.cycle.util.IoUtil;
 
 
-public class TestBpmnProcessModelUtil {
+public class BpmnProcessModelUtilTest {
   
   private BpmnProcessModelUtil cycleRoundtripUtil = new BpmnProcessModelUtil();
   

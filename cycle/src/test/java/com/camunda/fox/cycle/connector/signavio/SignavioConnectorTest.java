@@ -19,7 +19,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.camunda.fox.cycle.connector.ConnectorNode;
-import com.camunda.fox.cycle.connector.ConnectorNode.ConnectorNodeType;
+import com.camunda.fox.cycle.connector.ConnectorNodeType;
 import com.camunda.fox.cycle.entity.ConnectorConfiguration;
 import com.camunda.fox.cycle.exception.CycleException;
 
@@ -156,20 +156,19 @@ public class SignavioConnectorTest {
       assertEquals("TestFolder", createdRootNode.getLabel());
       assertEquals(ConnectorNodeType.FOLDER, createdRootNode.getType());
       
-      ConnectorNode newModel = this.getSignavioConnector().createNode(createdRootNode.getId(), null, "model1", ConnectorNodeType.FILE);
+      ConnectorNode newModel = this.getSignavioConnector().createNode(createdRootNode.getId(), null, "model1", ConnectorNodeType.BPMN_FILE);
       assertEquals("model1", newModel.getLabel());
-      assertEquals(ConnectorNodeType.FILE, newModel.getType());
+      assertEquals(ConnectorNodeType.BPMN_FILE, newModel.getType());
       
       List<ConnectorNode> children = this.getSignavioConnector().getChildren(createdRootNode);
       
-      assertFalse(children.isEmpty());
-      assertTrue(children.size() == 1);
+      assertEquals(1, children.size());
       
       ConnectorNode child = children.get(0);
       assertEquals(newModel, child);
       
       assertEquals("model1", child.getLabel());
-      assertEquals(ConnectorNodeType.FILE, child.getType());
+      assertEquals(ConnectorNodeType.BPMN_FILE, child.getType());
       
       this.getSignavioConnector().deleteNode(createdRootNode);
     } catch (Exception e) {
@@ -194,9 +193,9 @@ public class SignavioConnectorTest {
       assertEquals("ChildFolder", newFolder.getLabel());
       assertEquals(ConnectorNodeType.FOLDER, newFolder.getType());
       
-      ConnectorNode newModel = this.getSignavioConnector().createNode(createdRootNode.getId(), null, "model1", ConnectorNodeType.FILE);
+      ConnectorNode newModel = this.getSignavioConnector().createNode(createdRootNode.getId(), null, "model1", ConnectorNodeType.BPMN_FILE);
       assertEquals("model1", newModel.getLabel());
-      assertEquals(ConnectorNodeType.FILE, newModel.getType());
+      assertEquals(ConnectorNodeType.BPMN_FILE, newModel.getType());
       
       List<ConnectorNode> children = this.getSignavioConnector().getChildren(createdRootNode);
       
@@ -214,7 +213,7 @@ public class SignavioConnectorTest {
       assertEquals(newModel, childModel);
       
       assertEquals("model1", childModel.getLabel());
-      assertEquals(ConnectorNodeType.FILE, childModel.getType());
+      assertEquals(ConnectorNodeType.BPMN_FILE, childModel.getType());
       
       this.getSignavioConnector().deleteNode(createdRootNode);
     } catch (Exception e) {

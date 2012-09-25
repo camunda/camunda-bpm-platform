@@ -14,6 +14,7 @@ package com.camunda.fox.cycle.util;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -21,11 +22,17 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.Reader;
+import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
+import java.io.Writer;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
+import org.apache.commons.io.IOUtils;
 import com.camunda.fox.cycle.exception.CycleException;
 
 
@@ -33,6 +40,8 @@ import com.camunda.fox.cycle.exception.CycleException;
  * @author Tom Baeyens
  * @author Frederik Heremans
  * @author Joram Barrez
+ * 
+ * @author nico.rehwaldt
  */
 public class IoUtil {
 
@@ -40,14 +49,14 @@ public class IoUtil {
    * Controls if intermediate results are written to files.
    */
   public static boolean DEBUG;
-  
+
   /**
    * Directory, into which intermediate results are written.
    */
   public static String DEBUG_DIR;
-  
+
   private static final int BUFFERSIZE = 4096;
-  
+
   public static byte[] readInputStream(InputStream inputStream, String inputStreamName) {
     ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
     byte[] buffer = new byte[16*1024];
@@ -62,7 +71,7 @@ public class IoUtil {
     }
     return outputStream.toByteArray();
   }
-  
+
   public static String readFileAsString(String filePath) {
     byte[] buffer = new byte[(int) getFile(filePath).length()];
     BufferedInputStream inputStream = null;
@@ -76,7 +85,7 @@ public class IoUtil {
     }
     return new String(buffer);
   }
-  
+
   public static File getFile(String filePath) {
     URL url = IoUtil.class.getClassLoader().getResource(filePath);
     try {
@@ -85,7 +94,7 @@ public class IoUtil {
       throw new CycleException("Couldn't get file " + filePath + ": " + e.getMessage());
     }
   }
-  
+
   public static void writeStringToFile(String content, String filePath) {
     BufferedOutputStream outputStream = null;
     try {
@@ -98,7 +107,7 @@ public class IoUtil {
       IoUtil.closeSilently(outputStream);
     }
   }
-  
+
   public static void writeStringToFileIfDebug(String content, String filename, String suffix) {
     if (DEBUG) {
       String filePath = "";
@@ -137,6 +146,12 @@ public class IoUtil {
     }
   }
 
+  public static void closeSilently(InputStream ... streams) {
+    for (InputStream is: streams) {
+      closeSilently(is);
+    }
+  }
+
   /**
    * Closes the given stream. The same as calling {@link OutputStream#close()}, but
    * errors while closing are silently ignored.
@@ -150,7 +165,13 @@ public class IoUtil {
       // Exception is silently ignored
     }
   }
-  
+
+  public static void closeSilently(OutputStream ... streams) {
+    for (OutputStream os: streams) {
+      closeSilently(os);
+    }
+  }
+
   public static int copyBytes(InputStream in, OutputStream out) throws IOException {
     if (in == null || out == null) {
       throw new IllegalArgumentException("In/OutStream cannot be null");
@@ -170,6 +191,29 @@ public class IoUtil {
       if (in != null) {
         in.close();
       }
+    }
+  }
+
+  public static String toString(InputStream input) throws IOException {
+    return IOUtils.toString(input);
+  }
+
+  public static String toString(InputStream input, String encoding) throws IOException {
+    return IOUtils.toString(input, encoding);
+  }
+
+  /**
+   * Returns an input stream serving the given argument
+   * 
+   * @param result
+   * @param encoding
+   * @return 
+   */
+  public static InputStream toInputStream(String result, String encoding) {
+    try {
+      return new ByteArrayInputStream(result.getBytes(encoding));
+    } catch (UnsupportedEncodingException ex) {
+      throw new RuntimeException("Unsupported encoding", ex);
     }
   }
 }

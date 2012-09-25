@@ -38,7 +38,6 @@ import com.camunda.fox.cycle.util.XmlUtil;
  * 
  * @author Daniel Meyer
  */
-@Component
 public class BpmnProcessModelUtil {
   
   public static final String UTF_8 = "UTF-8";
@@ -131,14 +130,12 @@ public class BpmnProcessModelUtil {
    * 
    */
   public InputStream extractExecutablePool(InputStream sourceModel) {
-    
     ByteArrayOutputStream resultModel = null;
     
     try {
       
       resultModel = transformer.poolExtraction(sourceModel, true);
       return new ByteArrayInputStream(resultModel.toByteArray());
-      
     } finally {
       IoUtil.closeSilently(sourceModel);
       IoUtil.closeSilently(resultModel);
