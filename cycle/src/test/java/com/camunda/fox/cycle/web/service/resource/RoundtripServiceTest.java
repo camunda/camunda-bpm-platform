@@ -2,7 +2,6 @@ package com.camunda.fox.cycle.web.service.resource;
 
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
@@ -23,7 +22,6 @@ import com.camunda.fox.cycle.connector.Connector;
 import com.camunda.fox.cycle.connector.ConnectorNode;
 import com.camunda.fox.cycle.connector.ConnectorNodeType;
 import com.camunda.fox.cycle.connector.ConnectorRegistry;
-import com.camunda.fox.cycle.connector.vfs.VfsConnector;
 import com.camunda.fox.cycle.entity.Roundtrip;
 import com.camunda.fox.cycle.entity.Roundtrip.SyncMode;
 import com.camunda.fox.cycle.repository.RoundtripRepository;
@@ -40,7 +38,7 @@ import com.camunda.fox.cycle.web.dto.RoundtripDTO;
 @ContextConfiguration(
   locations = {"classpath:/spring/test-*.xml"}
 )
-public class RoundtripServiceTest {
+public abstract class RoundtripServiceTest {
 
   @Inject
   private RoundtripRepository roundtripRepository;
@@ -55,26 +53,29 @@ public class RoundtripServiceTest {
 
   private ConnectorNode leftNode;
 
-  private Connector vfsConnector;
+  private Connector connector;
   
   @Before
   public void before() throws FileNotFoundException, Exception {
-    vfsConnector = connectorRegistry.getConnector(1);
-    assertEquals(VfsConnector.class.getName(), vfsConnector.getConfiguration().getConnectorClass());
+    initConnector();
     
-    vfsConnector.deleteNode(new ConnectorNode("foo/foo"));
-    rightNode = vfsConnector.createNode(null, "foo/foo", "Impl", ConnectorNodeType.ANY_FILE);
-    vfsConnector.updateContent(rightNode, new FileInputStream(IoUtil.getFile("com/camunda/fox/cycle/roundtrip/collaboration_impl.bpmn")));
+    connector.createNode("/", "foo", "foo", ConnectorNodeType.FOLDER);
     
-    vfsConnector.deleteNode(new ConnectorNode("foo/bar"));
-    leftNode = vfsConnector.createNode(null, "foo/bar", "Modeler", ConnectorNodeType.ANY_FILE);
-    vfsConnector.updateContent(leftNode, new FileInputStream(IoUtil.getFile("com/camunda/fox/cycle/roundtrip/collaboration.bpmn")));
+    rightNode = connector.createNode("/", "foo/Impl", "Impl", ConnectorNodeType.ANY_FILE);
+    connector.updateContent(rightNode, new FileInputStream(IoUtil.getFile("com/camunda/fox/cycle/roundtrip/collaboration_impl.bpmn")));
+    
+    leftNode = connector.createNode("/", "foo/Modeler", "Modeler", ConnectorNodeType.ANY_FILE);
+    connector.updateContent(leftNode, new FileInputStream(IoUtil.getFile("com/camunda/fox/cycle/roundtrip/collaboration.bpmn")));
   }
   
   @After
   public void after() {
     // Remove all entities
     roundtripRepository.deleteAll();
+    
+    connector.deleteNode(new ConnectorNode("foo/Impl"));
+    connector.deleteNode(new ConnectorNode("foo/Modeler"));
+    connector.deleteNode(new ConnectorNode("foo"));
   }
 
   @Test
@@ -113,7 +114,7 @@ public class RoundtripServiceTest {
     RoundtripDTO testRoundtrip = getTestRoundtrip();
     roundtripService.doSynchronize(SyncMode.RIGHT_TO_LEFT, testRoundtrip.getId());
     
-    assertTrue(IoUtil.toString(vfsConnector.getContent(leftNode)).contains("activiti:class=\"java.lang.Object\""));
+    assertTrue(IoUtil.toString(connector.getContent(leftNode)).contains("activiti:class=\"java.lang.Object\""));
   }
   
   @Test
@@ -121,7 +122,7 @@ public class RoundtripServiceTest {
     RoundtripDTO testRoundtrip = getTestRoundtrip();
     roundtripService.doSynchronize(SyncMode.LEFT_TO_RIGHT, testRoundtrip.getId());
     
-    assertTrue(!IoUtil.toString(vfsConnector.getContent(rightNode)).contains("activiti:class=\"java.lang.Object\""));
+    assertTrue(!IoUtil.toString(connector.getContent(rightNode)).contains("activiti:class=\"java.lang.Object\""));
   }
   
 
@@ -136,13 +137,13 @@ public class RoundtripServiceTest {
     RoundtripDTO dto = createTestRoundtripDTO();
 
     BpmnDiagramDTO rhs = new BpmnDiagramDTO();
-    ConnectorNodeDTO rhsNode = new ConnectorNodeDTO("foo/foo", "Impl", 1l);
+    ConnectorNodeDTO rhsNode = new ConnectorNodeDTO("foo/Impl", "Impl", connector.getId());
 
     rhs.setModeler("Fox designer");
     rhs.setConnectorNode(rhsNode);
 
     BpmnDiagramDTO lhs = new BpmnDiagramDTO();
-    ConnectorNodeDTO lhsNode = new ConnectorNodeDTO("foo/bar", "Modeler", 1l);
+    ConnectorNodeDTO lhsNode = new ConnectorNodeDTO("foo/Modeler", "Modeler", connector.getId());
 
     lhs.setModeler("Another Modeler");
     lhs.setConnectorNode(lhsNode);
@@ -152,4 +153,18 @@ public class RoundtripServiceTest {
 
     return dto;
   }
+  
+  protected ConnectorRegistry getConnectorRegistry() {
+    return connectorRegistry;
+  }
+
+  protected Connector getConnector() {
+    return connector;
+  }
+  
+  protected void setConnector(Connector connector) {
+    this.connector = connector;
+  }
+  
+  protected abstract void initConnector();
 }
