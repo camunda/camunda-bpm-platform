@@ -78,8 +78,8 @@ public class RemoteSFSBInvocationTest extends AbstractFoxPlatformIntegrationTest
     String[] ids = new String[instances];
     
     for(int i=0; i<instances; i++) {    
-      ids[i] = runtimeService.startProcessInstanceByKey("testInvokeBean").getId();    
-      Assert.assertEquals(true, runtimeService.getVariable(ids[i], "result"));      
+      ids[i] = runtimeService.startProcessInstanceByKey("testInvokeBean").getId();
+      Assert.assertEquals("Incovation=" + i, true, runtimeService.getVariable(ids[i], "result"));      
       runtimeService.setVariable(ids[i], "result", false);
       taskService.complete(taskService.createTaskQuery().processInstanceId(ids[i]).singleResult().getId());
     }
@@ -87,7 +87,7 @@ public class RemoteSFSBInvocationTest extends AbstractFoxPlatformIntegrationTest
     waitForJobExecutorToProcessAllJobs(60*1000, 300);
     
     for(int i=0; i<instances; i++) {    
-      Assert.assertEquals(true, runtimeService.getVariable(ids[i], "result"));    
+      Assert.assertEquals("Incovation=" + i, true, runtimeService.getVariable(ids[i], "result"));    
       taskService.complete(taskService.createTaskQuery().processInstanceId(ids[i]).singleResult().getId());
     }
     
