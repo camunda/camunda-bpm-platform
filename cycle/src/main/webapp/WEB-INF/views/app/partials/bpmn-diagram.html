@@ -26,7 +26,7 @@
     </div>
     
     <div class="info">
-      <span class="filename" ng-hide="imageStatus != 'LOADED'">{{diagram.label}}</span>
+      <span class="filename" ng-hide="imageStatus != 'LOADED' && modelStatus != 'UNAVAILABLE'">{{diagram.label}}</span>
       <div class="pull-right" ng-switch on="modelStatus">
         <div ng-switch-when="UNAVAILABLE" class="status label label-important">
           <span th:text="#{'Not available'}">Not available</span>
