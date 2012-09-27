@@ -43,6 +43,12 @@
       <version>${version.org.jboss.ironjacamar}</version>
       <scope>provided</scope>
     </dependency>
+    
+    <dependency>
+      <groupId>com.bea.commonj</groupId>
+      <artifactId>com.springsource.commonj</artifactId>
+      <scope>provided</scope>
+    </dependency>
 
     <dependency>
       <groupId>junit</groupId>
@@ -64,5 +70,18 @@
       </plugin>
     </plugins>
   </build>
+
+  <profiles>
+    <profile>
+      <id>was</id>
+      <build>
+        <resources>
+          <resource>
+            <directory>src/main/resources-was</directory>
+          </resource>
+        </resources>
+      </build>
+    </profile>
+  </profiles>
 
 </project>
