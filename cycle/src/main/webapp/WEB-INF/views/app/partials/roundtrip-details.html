@@ -5,7 +5,7 @@
 
   <div class="row-fluid" data-ng-hide="roundtrip.id == undefined">
     <div class="span5">
-      <bpmn-diagram roundtrip="roundtrip" diagram="roundtrip.leftHandSide" identifier="leftHandSide" />
+      <bpmn-diagram handle="leftDiagram" roundtrip="roundtrip" diagram="roundtrip.leftHandSide" identifier="leftHandSide" />
     </div>
 
     <div class="span2">
@@ -17,7 +17,7 @@
                   data-ng-click="openSyncDialog('LEFT_TO_RIGHT')">sync &rarr;</button>
           <button class="btn btn-large sync-btn"
                   data-ng-show="(roundtrip.leftHandSide && !roundtrip.rightHandSide)"
-                  data-ng-click="openSyncDialog('LEFT_TO_RIGHT')">create &rarr;</button>
+                  data-ng-click="createNewDiagram(leftDiagram)">create &rarr;</button>
         </div>
         <div>
           <span data-ng-show="roundtrip.lastSync">
@@ -36,13 +36,13 @@
                   data-ng-click="openSyncDialog('RIGHT_TO_LEFT')">&larr; sync</button>
           <button class="btn btn-large sync-btn"
                   data-ng-show="(roundtrip.rightHandSide && !roundtrip.leftHandSide)"
-                  data-ng-click="openSyncDialog('RIGHT_TO_LEFT')">&larr; create</button>
+                  data-ng-click="createNewDiagram(rightDiagram)">&larr; create</button>
         </div>
       </div>
     </div>
     
     <div class="span5">
-      <bpmn-diagram roundtrip="roundtrip" diagram="roundtrip.rightHandSide" identifier="rightHandSide" />
+      <bpmn-diagram handle="rightDiagram" roundtrip="roundtrip" diagram="roundtrip.rightHandSide" identifier="rightHandSide" />
     </div>
   </div>
 
