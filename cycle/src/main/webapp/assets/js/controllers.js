@@ -157,7 +157,7 @@ function SyncRoundtripController($scope, $http, $q, App, Event) {
 /**
  * Works along with the bpmn-diagram directive to manage a single bpmn-diagram in the roundtrip view.
  */
-function BpmnDiagramController($scope, Commons, Event) {
+function BpmnDiagramController($scope, Commons, Event, $http, App) {
 
   $scope.imageStatus = "UNKNOWN";
   $scope.modelStatus = "UNKNOWN";
@@ -187,13 +187,22 @@ function BpmnDiagramController($scope, Commons, Event) {
   
   $scope.createDiagram = function(diagram) {
 	if ($scope.handle == "leftDiagram") {
-		$scope.identifier = "rightHandSide";
+		$scope.syncMode = "LEFT_TO_RIGHT";
 	} else {
-		$scope.identifier = "leftHandSide";
+		$scope.syncMode = "RIGHT_TO_LEFT";
 	}
-	$scope.roundtrip[$scope.identifier] = diagram;
+	
+    $http.post(App.uri('secured/resource/roundtrip/' + $scope.roundtrip.id + '/create/?diagramlabel=' + diagram.label + '&syncMode=' + $scope.syncMode + '&modeler=' + diagram.modeler + '&connectorId=' + diagram.connectorNode.connectorId + '&connectorNodeId=' + diagram.connectorNode.id))
+    .success(function(data) {
+        $scope.roundtrip.$get({id: $scope.roundtrip.id });
+        $scope.status = SYNC_SUCCESS;
+    })
+    .error(function (data) {
+        $scope.status = SYNC_FAILED;
+    });
+	
+	$scope.editDiagramDialog.close();
 
-    $scope.editDiagramDialog.close();
   };
 
   $scope.diagramClass = function(diagram) {

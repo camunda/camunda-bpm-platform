@@ -17,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.camunda.fox.cycle.connector.Connector;
 import com.camunda.fox.cycle.connector.ConnectorNode;
+import com.camunda.fox.cycle.connector.ConnectorNodeType;
 import com.camunda.fox.cycle.connector.ConnectorRegistry;
 import com.camunda.fox.cycle.connector.ContentInformation;
 import com.camunda.fox.cycle.entity.BpmnDiagram;
@@ -27,6 +28,7 @@ import com.camunda.fox.cycle.repository.RoundtripRepository;
 import com.camunda.fox.cycle.roundtrip.SynchronizationService;
 import com.camunda.fox.cycle.util.IoUtil;
 import com.camunda.fox.cycle.web.dto.BpmnDiagramDTO;
+import com.camunda.fox.cycle.web.dto.ConnectorNodeDTO;
 import com.camunda.fox.cycle.web.dto.RoundtripDTO;
 import com.camunda.fox.cycle.web.service.AbstractRestService;
 
@@ -170,6 +172,45 @@ public class RoundtripService extends AbstractRestService {
     roundtrip.setLastSyncMode(syncMode);
 
     RoundtripDTO roundtripDTO = new RoundtripDTO(roundtrip, roundtrip.getLeftHandSide(), roundtrip.getRightHandSide());
+    return roundtripDTO;
+  }
+  
+  @POST
+  @Path("{id}/create")
+  @Transactional
+  public RoundtripDTO create(@PathParam("id") long roundtripId, @QueryParam("diagramlabel") String diagramLabel, @QueryParam("syncMode") String syncMode, 
+                             @QueryParam("modeler") String modeler, @QueryParam("connectorId") Long connectorId, @QueryParam("connectorNodeId") String connectorNodeId) {
+    
+    Roundtrip roundtrip = roundtripRepository.findById(roundtripId);
+    if (roundtrip == null) {
+      throw new IllegalArgumentException("Roundtrip not found");
+    }
+    
+    //TODO: BpmnDiagramStatusDTO setzen
+    
+    BpmnDiagramDTO bpmnDiagramDTO = new BpmnDiagramDTO();
+    bpmnDiagramDTO.setLabel(diagramLabel);
+    bpmnDiagramDTO.setLastSync(new Date());
+    bpmnDiagramDTO.setModeler(modeler);
+    
+    Connector connector = connectorRegistry.getConnector(connectorId);
+    ConnectorNode newConnectorNode = connector.createNode(null, connectorNodeId + "/" + diagramLabel, diagramLabel, ConnectorNodeType.BPMN_FILE);
+    bpmnDiagramDTO.setConnectorNode(new ConnectorNodeDTO(newConnectorNode));
+
+    BpmnDiagram bpmnDiagram = bpmnDiagramController.createOrUpdate(bpmnDiagramDTO);
+    bpmnDiagram.setDiagramPath(connectorNodeId + "/" + diagramLabel);
+    bpmnDiagram.setConnectorId(connectorId);
+    
+    if (SyncMode.LEFT_TO_RIGHT.toString().equals(syncMode)) {
+      synchronizeModels(roundtrip.getLeftHandSide(), bpmnDiagram, SyncMode.LEFT_TO_RIGHT);
+      roundtrip.setRightHandSide(bpmnDiagram);
+    } else {
+      synchronizeModels(bpmnDiagram, roundtrip.getRightHandSide(), SyncMode.RIGHT_TO_LEFT);
+      roundtrip.setLeftHandSide(bpmnDiagram);
+    }
+    
+    RoundtripDTO roundtripDTO = RoundtripDTO.wrap(roundtrip);
+    
     return roundtripDTO;
   }
 
