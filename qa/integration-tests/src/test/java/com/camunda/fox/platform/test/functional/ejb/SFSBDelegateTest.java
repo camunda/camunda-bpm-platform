@@ -83,7 +83,7 @@ public class SFSBDelegateTest extends AbstractFoxPlatformIntegrationTest {
     
     for(int i=0; i<instances; i++) {    
       ids[i] = runtimeService.startProcessInstanceByKey("testBeanResolutionfromClient").getId();    
-      Assert.assertEquals(true, runtimeService.getVariable(ids[i], SFSBDelegate.class.getName()));      
+      Assert.assertEquals("Incovation=" + i, true, runtimeService.getVariable(ids[i], SFSBDelegate.class.getName()));      
       runtimeService.setVariable(ids[i], SFSBDelegate.class.getName(), false);
       taskService.complete(taskService.createTaskQuery().processInstanceId(ids[i]).singleResult().getId());
     }
@@ -91,7 +91,7 @@ public class SFSBDelegateTest extends AbstractFoxPlatformIntegrationTest {
     waitForJobExecutorToProcessAllJobs(60*1000, 300);
     
     for(int i=0; i<instances; i++) {    
-      Assert.assertEquals(true, runtimeService.getVariable(ids[i], SFSBDelegate.class.getName()));    
+      Assert.assertEquals("Incovation=" + i, true, runtimeService.getVariable(ids[i], SFSBDelegate.class.getName()));    
       taskService.complete(taskService.createTaskQuery().processInstanceId(ids[i]).singleResult().getId());
     }
     
