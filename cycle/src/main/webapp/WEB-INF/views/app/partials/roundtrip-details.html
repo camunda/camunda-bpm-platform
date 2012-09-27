@@ -3,7 +3,7 @@
     <h1>{{roundtrip.name}}</h1>
   </div>
 
-  <div class="row-fluid" data-ng-hide="roundtrip.id == undefined">
+  <div class="row-fluid" data-ng-hide="!roundtrip.id">
     <div class="span5">
       <bpmn-diagram handle="leftDiagram" roundtrip="roundtrip" diagram="roundtrip.leftHandSide" identifier="leftHandSide" />
     </div>

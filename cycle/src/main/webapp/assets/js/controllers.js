@@ -224,6 +224,8 @@ function BpmnDiagramController($scope, Commons, Event) {
   
   $scope.checkContentAvailable = function(diagram) {
     Commons.getDiagramStatus(diagram).success(function(data) {
+      $scope.diagram.syncStatus = data;
+      console.log($scope.diagram);
       changeModelStatus(data.status);
     });
   };
@@ -284,7 +286,7 @@ function EditDiagramController($scope,Commons,Event) {
       $scope.error = null;
     }
     $scope.selectedNode = null;
-  });  
+  });
   
   // Watch for change in diagram path
   $scope.$watch('selectedNode', function(newValue) {

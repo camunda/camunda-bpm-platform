@@ -7,19 +7,26 @@
       </a>
     </h3>
     <div class="holder">
-      <div class="diagram">
+      <div class="diagram" ng-show="modelStatus != 'UNAVAILABLE'">
         <diagram-image data-diagram="diagram" data-status="imageStatus" data-click="showImage(identifier)"/>
       </div>
-      <div class="error" ng-show="modelStatus == 'UNAVAILABLE'">
-        <p>
-          <i class="icon-warning-sign"></i>
-          <span th:text="#{'The model on this side could not be loaded and might have been moved. You may add a new model for this side.'}"></span>
-        </p>
+      <div class="diagram error" ng-show="modelStatus == 'UNAVAILABLE'">
+        <div class="centered">
+          <p class="note">
+            <i class="icon-warning-sign"></i>
+            <span th:text="#{'The model on this side could not be loaded and might have been moved. You may add a new model for this side.'}"></span>
+          </p>
+          <a class="btn btn-primary btn-large" 
+               data-ng-click="addDiagram()" 
+               data-color-invert="true" 
+               data-help-title="Find process model" 
+               data-help="You need two process models for a Roundtrip, the right side is reserved for the fox designer (the engine model)">Find process model</a>
+        </div>
       </div>
     </div>
     
     <div class="info">
-      <span class="filename" ng-hide="imageStatus == 'UNAVAILABLE'">{{diagram.label}}</span>
+      <span class="filename" ng-hide="imageStatus != 'LOADED' && modelStatus != 'UNAVAILABLE'">{{diagram.label}}</span>
       <div class="pull-right" ng-switch on="modelStatus">
         <div ng-switch-when="UNAVAILABLE" class="status label label-important">
           <span th:text="#{'Not available'}">Not available</span>
@@ -42,13 +49,14 @@
     <h3 data-ng-show="identifier == 'rightHandSide'">fox designer</h3>
     <div class="holder">
       <div class="diagram">
-        <span class="name">
+        <div class="centered">
           <a class="btn btn-primary btn-large" 
              data-ng-show="!diagram || !contentAvailable" 
              data-ng-click="addDiagram()" 
              data-color-invert="true" 
              data-help-title="Add a process model" 
-             data-help="You need two process models for a Roundtrip, the right side is reserved for the fox designer (the engine model)" >Add Process Model</a></span>
+             data-help="You need two process models for a Roundtrip, the right side is reserved for the fox designer (the engine model)" >Add Process Model</a>
+        </div>
       </div>
     </div>
   </div>

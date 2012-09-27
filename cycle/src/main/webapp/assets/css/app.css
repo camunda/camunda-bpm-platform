@@ -168,8 +168,9 @@ input.ng-invalid-required {
   padding: 4px;
 }
 
-.bpmn-model .name {
+.bpmn-model .centered {
   margin-top: 50px;
+  padding: 20px;
   font-size: 2em;
 }
 

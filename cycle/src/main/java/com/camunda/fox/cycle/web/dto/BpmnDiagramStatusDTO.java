@@ -18,6 +18,8 @@ public class BpmnDiagramStatusDTO {
   
   private Status status;
   
+  private Date lastUpdated;
+  
   public BpmnDiagramStatusDTO() { }
   
   public BpmnDiagramStatusDTO(BpmnDiagram diagram) {
@@ -54,5 +56,13 @@ public class BpmnDiagramStatusDTO {
 
   public void setStatus(Status status) {
     this.status = status;
+  }
+
+  public Date getLastUpdated() {
+    return lastUpdated;
+  }
+
+  public void setLastUpdated(Date lastUpdated) {
+    this.lastUpdated = lastUpdated;
   }
 }

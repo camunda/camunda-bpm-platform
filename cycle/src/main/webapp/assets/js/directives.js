@@ -290,9 +290,11 @@ angular
     link: function(scope, element, attrs) {
 
       function changeImageStatus(newStatus) {
-        scope.$apply(function() {
           scope.status = newStatus;
-        });
+          
+          // FIXME workaround for a angular bug!
+          scope.$digest();
+          scope.$apply();
       }
       
       function performImageClick() {
