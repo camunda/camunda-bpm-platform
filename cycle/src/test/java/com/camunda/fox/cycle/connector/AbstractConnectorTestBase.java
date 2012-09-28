@@ -139,7 +139,7 @@ public abstract class AbstractConnectorTestBase {
       originalInputStream = getDiagramResourceAsStream("collaboration_impl.bpmn");
       byte[] inputBytes = IoUtil.readInputStream(originalInputStream, "class path is");
 
-      ConnectorNode fileNode = new ConnectorNode("//" + TMP_DIR_NAME + "/collaboration.bpmn");
+      ConnectorNode fileNode = new ConnectorNode("//" + TMP_DIR_NAME + "/collaboration.bpmn", "collaboration.bpmn");
       
       // when
       ContentInformation updatedContentInfo = connector.updateContent(

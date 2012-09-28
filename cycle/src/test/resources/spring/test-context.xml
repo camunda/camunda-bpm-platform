@@ -55,5 +55,18 @@
       </map>
     </property>
   </bean>
+  
+  <bean name="svnConfig" class="com.camunda.fox.cycle.entity.ConnectorConfiguration">
+    <property name="id" value="3" />
+    <property name="label" value="My Svn Connector" />
+    <property name="connectorClass"
+              value="com.camunda.fox.cycle.connector.svn.SvnConnector" />
+    <property name="loginMode" value="LOGIN_NOT_REQUIRED" />
+    <property name="properties">
+      <map>
+        <entry key="repositoryPath" value="https://svn.camunda.com/sandbox" />
+      </map>
+    </property>
+  </bean>
 
 </beans>
