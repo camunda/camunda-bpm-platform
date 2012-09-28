@@ -12,8 +12,10 @@
       <property name="openjpa.RuntimeUnenhancedClasses" value="supported"/>
       <property name="openjpa.Connection2UserName" value="${database.user}"/>
       <property name="openjpa.Connection2Password" value="${database.password}"/>
-      <property name="openjpa.Connection2URL" value="jdbc:mysql://${database.host}:3306/${database.name}"/>
-      <property name="openjpa.Connection2DriverName" value="com.mysql.jdbc.Driver"/>
+      <property name="openjpa.Connection2URL" value="${database.url}"/>
+<!--       jdbc:mysql://localhost:3306/fox-platform -->
+      <property name="openjpa.Connection2DriverName" value="${database.driver}"/>
+<!--       com.mysql.jdbc.Driver -->
     </properties>
   </persistence-unit>
 </persistence>
