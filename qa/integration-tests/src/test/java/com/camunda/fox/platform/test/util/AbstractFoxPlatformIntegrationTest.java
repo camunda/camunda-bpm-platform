@@ -43,6 +43,7 @@ import org.junit.Before;
 
 import com.camunda.fox.platform.api.ProcessArchiveService;
 import com.camunda.fox.platform.api.ProcessEngineService;
+import com.camunda.fox.platform.test.util.JndiConstants;
 
 public abstract class AbstractFoxPlatformIntegrationTest {
   
@@ -75,7 +76,9 @@ public abstract class AbstractFoxPlatformIntegrationTest {
               .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
               .addAsLibraries(DeploymentHelper.getFoxPlatformClient())
               .addAsResource("META-INF/processes.xml", "META-INF/processes.xml")
-              .addClass(AbstractFoxPlatformIntegrationTest.class);
+              .addClass(AbstractFoxPlatformIntegrationTest.class)
+              .addClass(JndiConstants.class)
+              .addAsResource("appname.properties", "appname.properties");
   }
   
   public static WebArchive initWebArchiveDeployment() {

@@ -446,6 +446,8 @@
               <excludes>
                 <!-- HEMERA-2454 -->
                 <exclude>**/JobExecutorRequestContextSFSBDelegateTest.java</exclude>
+                <!-- WAS does not open a new request each time -->
+                <exclude>**/JobExecutorRequestContextRemoteInvocationTest.java</exclude>
                 <!-- NOT Implemented -->
                 <exclude>**/JobExecutorRequestContextLocalInvocationTest.java</exclude>
                 <!-- NOT Implemented -->
@@ -454,16 +456,23 @@
                 <exclude>**/TestProcessEnginesXmlFails.java</exclude>
                 <!-- Only works if EAR classloader isolation is turned OFF (which is the default in AS7, but dunno in WAS8) -->
                 <exclude>**/TestFoxPlatformClientAsEjbModule_pasAsEjbModule.java</exclude>
+                <!-- Bug in OWB 1.1.0 -> ElContextStore is thread-bound -->
+                <exclude>**/CallActivityContextSwitchTest.java</exclude>
+<!--                 <exclude>**/PlatformServicesTest.java</exclude> -->
+                <!-- NOT Implemented -->
+                <exclude>**/ejb/remote/*</exclude>
+                <exclude>**/ejb/*.java</exclude>
               </excludes>
             </configuration>
-          </plugin>         
-        </plugins>      
+          </plugin>
+        </plugins>
         <testResources>
           <testResource>
             <directory>src/test/resources-was</directory>
             <filtering>true</filtering>
             <includes>
               <include>**/*.xml</include>
+              <include>**/*.properties</include>
             </includes> 
           </testResource>
         </testResources>
