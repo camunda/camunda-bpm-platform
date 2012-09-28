@@ -38,7 +38,6 @@ public class CommonjWorkManagerPlatformJobExecutor extends PlatformJobExecutor i
   }
   
   public CommonjWorkManagerPlatformJobExecutor(PlatformJobExecutorConnector platformJobExecutorConnector) {
-//    this.workManager = lookupWorkMananger();
     ra = platformJobExecutorConnector;
   }
 
@@ -55,6 +54,8 @@ public class CommonjWorkManagerPlatformJobExecutor extends PlatformJobExecutor i
   }
 
   public Object scheduleAcquisition(Runnable acquisitionRunnable) {
+    // initialize the workManager here, because we have access to the initial context
+    // of the calling thread (application), so the jndi lookup is working -> see JCA 1.6 specification
     if(workManager == null) {
       workManager = lookupWorkMananger();
     }
