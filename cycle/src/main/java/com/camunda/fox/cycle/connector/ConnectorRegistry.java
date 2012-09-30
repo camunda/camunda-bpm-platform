@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.WebApplicationContext;
 
 import com.camunda.fox.cycle.aspect.LoginAspect;
+import com.camunda.fox.cycle.aspect.ThreadsafeAspect;
 import com.camunda.fox.cycle.entity.ConnectorConfiguration;
 import com.camunda.fox.cycle.exception.CycleException;
 
@@ -26,6 +27,9 @@ public class ConnectorRegistry {
   
   @Inject
   private LoginAspect loginAspect;
+  
+  @Inject
+  private ThreadsafeAspect threadsafeAspect;
   
   /**
    * Currently, connector singletons are fetched from the application context
@@ -138,6 +142,7 @@ public class ConnectorRegistry {
     try {
       AspectJProxyFactory factory = new AspectJProxyFactory(Class.forName(config.getConnectorClass()).newInstance());
       factory.addAspect(loginAspect);
+      factory.addAspect(threadsafeAspect);
       Connector instance = factory.getProxy();
 
       // TODO: set name / configuration from user configuration entities

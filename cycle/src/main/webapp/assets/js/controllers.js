@@ -70,7 +70,7 @@ function RoundtripDetailsController($scope, $routeParams, RoundtripDetails, Comm
 
   $scope.activeClass = function(side) {
     return side == $scope.currentPicture ? "active" : "";
-  }
+  };
   
   function fullScreenShowDiagram(side) {
     $scope.setCurrentPicture(side);
@@ -85,7 +85,11 @@ function RoundtripDetailsController($scope, $routeParams, RoundtripDetails, Comm
     $scope.syncMode = syncMode;
     $scope.syncDialog.open();
   };
-
+  
+  $scope.createNewDiagram = function(diagram) {
+	 $scope.diagram = diagram;
+	 $scope.diagram.editDiagramDialog.open();
+  };
 
   $scope.delayedSetCurrentPicture = function (picture) {
     setTimeout(function() {
@@ -180,6 +184,17 @@ function BpmnDiagramController($scope, Commons, Event) {
       $scope.editDiagramDialog.close();
     });
   };
+  
+  $scope.createDiagram = function(diagram) {
+	if ($scope.handle == "leftDiagram") {
+		$scope.identifier = "rightHandSide";
+	} else {
+		$scope.identifier = "leftHandSide";
+	}
+	$scope.roundtrip[$scope.identifier] = diagram;
+
+    $scope.editDiagramDialog.close();
+  };
 
   $scope.diagramClass = function(diagram) {
     return $scope.modelStatus == "UNAVAILABLE" ? "error" : "";
@@ -235,7 +250,7 @@ function EditDiagramController($scope,Commons,Event) {
   // is the dialog model valid and can be submitted?
   var isValid = $scope.isValid = function() {
     var editDiagram = $scope.editDiagram;
-    var valid = !!editDiagram.modeler && $scope.addModelForm.$valid && $scope.selectedNode && $scope.selectedNode.type == "BPMN_FILE";
+    var valid = !!editDiagram.modeler && $scope.addModelForm.$valid && $scope.selectedNode && ($scope.selectedNode.type == "BPMN_FILE" || $scope.selectedNode.type == "FOLDER");
     return valid;
   };
   
@@ -249,6 +264,10 @@ function EditDiagramController($scope,Commons,Event) {
       return;
     }
     $scope.saveDiagram($scope.editDiagram);
+  };
+  
+  $scope.create = function() {
+  	  $scope.createDiagram($scope.editDiagram);
   };
 
   $scope.modelerNames = [];

@@ -26,7 +26,7 @@
     </div>
     
     <div class="info">
-      <span class="filename" ng-hide="imageStatus != 'LOADED'">{{diagram.label}}</span>
+      <span class="filename" ng-hide="imageStatus != 'LOADED' && modelStatus != 'UNAVAILABLE'">{{diagram.label}}</span>
       <div class="pull-right" ng-switch on="modelStatus">
         <div ng-switch-when="UNAVAILABLE" class="status label label-important">
           <span th:text="#{'Not available'}">Not available</span>
@@ -112,8 +112,13 @@
                      th:attr="data-help=#{'Select a BPMN 2.0 file from the connector contents. Note that only <code>.xml</code> and <code>.bpmn</code> files may be selected by you.'}" 
                      data-help-title="BPMN File">BPMN File</label>
               
-              <div class="controls" style="margin-bottom: 10px;">
-                <input ng-model="selectedNode.label" class="span8" disabled />
+              <div class="controls" style="margin-bottom: 10px;" >
+                <input data-ng-show="!diagram && editDiagram" data-ng-model="selectedNode.label" class="span8" disabled />
+                <div data-ng-switch on="!diagram && editDiagram">
+                    <!-- were are using form validation which has no support to check ng-show or ng-hide, 
+                    so switch is needed here to remove the element from dom: see https://groups.google.com/forum/?fromgroups=#!topic/angular/WxnYFbqjj30 -->
+                    <input data-ng-switch-when="false" data-ng-model="editDiagram.label" class="span8" required />
+                </div>
               </div>
               
               <div class="controls">
@@ -126,7 +131,8 @@
       </div>
       <div class="modal-footer">
         <button class="btn" ng-click="cancel()" th:text="#{Cancel}">Cancel</button>
-        <button href="#" class="btn btn-primary" ng-click="save()" ng-disabled="!isValid()" th:text="#{Add}">Add</button>
+        <button href="#" class="btn btn-primary" data-ng-click="save()" data-ng-disabled="!isValid()" th:text="#{Add}">Add</button>
+        <button href="#" class="btn btn-primary" data-ng-click="create()" data-ng-disabled="!isValid()" th:text="#{Create}">Create</button>
       </div>
     </div>
   </dialog>

@@ -100,7 +100,7 @@ angular
                 this._onExpandoClick({node: node});
               }
 
-              if (item.type == "BPMN_FILE") {
+              if (item.type == "BPMN_FILE" || item.type == "FOLDER") {
                 
                 // FIXME digest should to the $apply, 
                 // but obviously its not resulting in a model update for the add button binding
@@ -241,20 +241,24 @@ angular
  * 
  * Usage:
  * 
- * <bpmn-diagram roundtrip="myRoundtrip" diagram="myRoundtrip.leftHandSide" identifier="leftHandSide" />
+ * <bpmn-diagram handle="leftDiagram" roundtrip="myRoundtrip" diagram="myRoundtrip.leftHandSide" identifier="leftHandSide" />
  */
 .directive("bpmnDiagram", function(App) {
   return {
     restrict: 'E',
     scope: {
       roundtrip: '=', 
-      diagram: '=', 
+      diagram: '=',
+      handle : '@',
       identifier: '@'
     }, 
     templateUrl: App.uri("secured/view/partials/bpmn-diagram.html"),
     controller: 'BpmnDiagramController', 
     link: function(scope, element, attrs) {
       scope.identifier = attrs.identifier;
+      if (attrs.handle) {
+    	  scope.$parent[attrs.handle] = scope;
+   	  }
     }
   };
 })
