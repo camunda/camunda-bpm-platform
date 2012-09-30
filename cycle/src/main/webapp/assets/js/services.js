@@ -72,7 +72,7 @@ angular
       getImageUrl: function (diagram, update) {
         var uri = App.uri("secured/resource/diagram/" + diagram.id + "/image");
         if (update) {
-          uri +="&ts=" + new Date().getTime();
+          uri +="?ts=" + new Date().getTime();
         }
         return uri;
       }
