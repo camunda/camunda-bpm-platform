@@ -232,11 +232,5 @@ public class RoundtripService extends AbstractRestService {
     } catch (Exception e) {
       throw new CycleException("Synchronization failed", e);
     }
-
-    // TODO: Update all synchronization states?
-    // And to which date? 
-    // update synchronization status
-    // lhs.setLastSync(lhsConnector.getLastModifiedDate(lhsNode));
-    // rhs.setLastSync(rhsConnector.getLastModifiedDate(rhsNode));
   }
 }

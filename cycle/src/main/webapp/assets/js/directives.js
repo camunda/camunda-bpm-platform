@@ -337,7 +337,7 @@ angular
 
       function updateImage(diagram, update) {
         scope.status = "LOADING";
-        $(element).find("img").attr("src", Commons.getImageUrl(diagram.connectorNode, update));
+        $(element).find("img").attr("src", Commons.getImageUrl(diagram, update));
       };
 
       scope.$watch("diagram", function (newDiagramValue) {

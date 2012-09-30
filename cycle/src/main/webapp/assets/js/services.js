@@ -69,8 +69,8 @@ angular
         var uri = "secured/resource/diagram/" + diagram.id + "/syncStatus";
         return $http.get(App.uri(uri));
       }, 
-      getImageUrl: function (node, update) {
-        var uri = App.uri("secured/resource/connector/" + node.connectorId + "/contents?type=PNG_FILE&nodeId=" + encodeURI(node.id));
+      getImageUrl: function (diagram, update) {
+        var uri = App.uri("secured/resource/diagram/" + diagram.id + "/image");
         if (update) {
           uri +="&ts=" + new Date().getTime();
         }
