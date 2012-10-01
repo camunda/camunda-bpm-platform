@@ -1,57 +1,56 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
-  <name>Activiti - Camel</name>
-  <groupId>org.activiti</groupId>
-  <artifactId>activiti-camel</artifactId>
-  <packaging>bundle</packaging>
+  <name>fox engine - Camel</name>
+  <groupId>com.camunda.fox.engine</groupId>
+  <artifactId>fox-engine-camel</artifactId>
+        <packaging>bundle</packaging>
 
   <parent>
-    <groupId>org.activiti</groupId>
-    <artifactId>activiti-root</artifactId>
+    <groupId>com.camunda.fox.engine</groupId>
+    <artifactId>fox-engine-root</artifactId>
     <relativePath>../..</relativePath>
-    <version>5.11-SNAPSHOT</version>
+        <version>1.30.0-SNAPSHOT</version>
   </parent>
 
 
-  <dependencies>
-    <dependency>
-      <groupId>org.activiti</groupId>
-      <artifactId>activiti-spring</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.camel</groupId>
-      <artifactId>camel-spring</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.springframework</groupId>
-      <artifactId>spring-test</artifactId>
-      <scope>provided</scope>
-    </dependency>        
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
+    <dependencies>
+        <dependency>
+            <groupId>com.camunda.fox.engine</groupId>
+            <artifactId>fox-engine-spring</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.camel</groupId>
+            <artifactId>camel-spring</artifactId>
+        </dependency>
+		     <dependency>
+		      <groupId>org.springframework</groupId>
+		      <artifactId>spring-test</artifactId>
+		      <scope>provided</scope>
+		    </dependency>        
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
       <scope>test</scope>
-    </dependency>
+        </dependency>
 
-    <dependency>
-      <groupId>com.h2database</groupId>
-      <artifactId>h2</artifactId>
-      <scope>test</scope>
-    </dependency>
-
-  </dependencies>
+    </dependencies>
 
 
-  <properties>
-    <activiti.osgi.import.pkg>*</activiti.osgi.import.pkg>
-    <activiti.artifact>
-      org.activiti.camel
-    </activiti.artifact>
-  </properties>
+    <properties>
+        <activiti.osgi.import.pkg>*</activiti.osgi.import.pkg>
+        <activiti.artifact>
+            org.activiti.camel
+        </activiti.artifact>
+    </properties>
 
   <profiles>
     <profile>
