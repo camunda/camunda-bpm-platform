@@ -13,7 +13,7 @@ import com.camunda.fox.platform.FoxPlatformException;
 public class ServiceLoaderUtil {
 
   public static <T> T loadService(Class<T> type, Class<? extends T> defaultImplementation) {
-    ServiceLoader<T> loader = ServiceLoader.load(type);
+    ServiceLoader<T> loader = ServiceLoader.load(type, ServiceLoaderUtil.class.getClassLoader());
     Iterator<T> iterator = loader.iterator();
     if(iterator.hasNext()) {
       return iterator.next();
