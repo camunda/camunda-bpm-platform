@@ -11,8 +11,10 @@
   </parent>
   
   <properties>
+    <!--
     <WAS8_HOME>/home/hawky4s/Programming/Server/websphere85/AppServer</WAS8_HOME>
     <WAS8_REMOTE_SERVER_SOAP_PORT>8880</WAS8_REMOTE_SERVER_SOAP_PORT>
+    -->
   </properties>
   
   <dependencies>
