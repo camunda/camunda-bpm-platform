@@ -20,6 +20,7 @@ import com.camunda.fox.cycle.connector.ConnectorNode;
 import com.camunda.fox.cycle.connector.ConnectorNodeType;
 import com.camunda.fox.cycle.connector.ConnectorRegistry;
 import com.camunda.fox.cycle.connector.ContentInformation;
+import com.camunda.fox.cycle.connector.signavio.SignavioConnector;
 import com.camunda.fox.cycle.entity.BpmnDiagram;
 import com.camunda.fox.cycle.entity.Roundtrip;
 import com.camunda.fox.cycle.entity.Roundtrip.SyncMode;
@@ -186,26 +187,51 @@ public class RoundtripService extends AbstractRestService {
       throw new IllegalArgumentException("Roundtrip not found");
     }
     
-    //TODO: BpmnDiagramStatusDTO setzen
+    if (roundtrip.getLeftHandSide() == null && roundtrip.getRightHandSide() == null) {
+      throw new CycleException("No model exists in roundtrip '" + roundtrip.getName() + "'. It is not possible to create a diagram model.");
+    }
+    
+    
+    Connector connector = connectorRegistry.getConnector(connectorId);
+    if (!(connector instanceof SignavioConnector)) {
+      if (!diagramLabel.endsWith(".xml") && !diagramLabel.endsWith(".bpmn")) {
+        diagramLabel = diagramLabel.concat(".xml");
+      }
+    }
     
     BpmnDiagramDTO bpmnDiagramDTO = new BpmnDiagramDTO();
     bpmnDiagramDTO.setLabel(diagramLabel);
-    bpmnDiagramDTO.setLastSync(new Date());
     bpmnDiagramDTO.setModeler(modeler);
     
-    Connector connector = connectorRegistry.getConnector(connectorId);
-    ConnectorNode newConnectorNode = connector.createNode(null, connectorNodeId + "/" + diagramLabel, diagramLabel, ConnectorNodeType.BPMN_FILE);
+    ConnectorNode newConnectorNode = connector.createNode(connectorNodeId, connectorNodeId + "/" + diagramLabel, diagramLabel, ConnectorNodeType.BPMN_FILE);
     bpmnDiagramDTO.setConnectorNode(new ConnectorNodeDTO(newConnectorNode));
 
     BpmnDiagram bpmnDiagram = bpmnDiagramController.createOrUpdate(bpmnDiagramDTO);
-    bpmnDiagram.setDiagramPath(connectorNodeId + "/" + diagramLabel);
     bpmnDiagram.setConnectorId(connectorId);
+    bpmnDiagram.setLastModified(new Date());
     
     if (SyncMode.LEFT_TO_RIGHT.toString().equals(syncMode)) {
       synchronizeModels(roundtrip.getLeftHandSide(), bpmnDiagram, SyncMode.LEFT_TO_RIGHT);
       roundtrip.setRightHandSide(bpmnDiagram);
     } else {
-      synchronizeModels(bpmnDiagram, roundtrip.getRightHandSide(), SyncMode.RIGHT_TO_LEFT);
+      // create left hand side model from right hand side model
+      // it's only a copy from the right hand side model, no poolextraction or something else is necessary
+      ConnectorNode rhsNode = roundtrip.getRightHandSide().getConnectorNode();
+      Connector rhsConnector = connectorRegistry.getConnector(rhsNode.getConnectorId());
+      InputStream rhsInputStream = rhsConnector.getContent(rhsNode);
+      
+      try {
+        ContentInformation contentInformation = connector.updateContent(newConnectorNode, rhsInputStream);
+        bpmnDiagram.setLastSync(contentInformation.getLastModified());
+        IoUtil.closeSilently(rhsInputStream);
+        
+        ContentInformation otherSideInfo = rhsConnector.getContentInformation(rhsNode);
+        roundtrip.getRightHandSide().setLastSync(otherSideInfo.getLastModified());
+        
+      } catch (Exception e) {
+        throw new CycleException("Creation of left hand side model failed.", e);
+      }
+       
       roundtrip.setLeftHandSide(bpmnDiagram);
     }
     
@@ -231,7 +257,7 @@ public class RoundtripService extends AbstractRestService {
     }
 
     if (rhs == null) {
-      throw new IllegalArgumentException("RIght hand side model is null");
+      throw new IllegalArgumentException("Right hand side model is null");
     }
 
     ConnectorNode lhsNode = lhs.getConnectorNode();

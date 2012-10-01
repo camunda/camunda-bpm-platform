@@ -131,8 +131,8 @@
       </div>
       <div class="modal-footer">
         <button class="btn" ng-click="cancel()" th:text="#{Cancel}">Cancel</button>
-        <button href="#" class="btn btn-primary" data-ng-click="save()" data-ng-disabled="!isValid()" th:text="#{Add}">Add</button>
-        <button href="#" class="btn btn-primary" data-ng-click="create()" data-ng-disabled="!isValid()" th:text="#{Create}">Create</button>
+        <button href="#" class="btn btn-primary" data-ng-click="save()" data-ng-disabled="!isValid() || selectedNode.type == 'FOLDER' || diagram" th:text="#{Add}">Add</button>
+        <button href="#" class="btn btn-primary" data-ng-click="create()" data-ng-disabled="!isValidAndFolder()" th:text="#{Create}">Create</button>
       </div>
     </div>
   </dialog>

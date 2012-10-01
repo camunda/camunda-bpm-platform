@@ -1,8 +1,6 @@
 package com.camunda.fox.cycle.connector;
 
 import java.io.InputStream;
-import java.util.Arrays;
-import java.util.Date;
 import java.util.List;
 
 import com.camunda.fox.cycle.entity.ConnectorConfiguration;

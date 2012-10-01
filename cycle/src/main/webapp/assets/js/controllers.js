@@ -87,6 +87,17 @@ function RoundtripDetailsController($scope, $routeParams, RoundtripDetails, Comm
   };
   
   $scope.createNewDiagram = function(diagram) {
+	 // need this diagram object modification to set a new modeler name
+	 // for the new bpmn diagram model
+	 // TODO: wenn ein Modell auf der rechten Seite erzeugt werden soll, dann muss im EDIT-Diagram-Dialog
+	 // im Modeler-Name auch "fox designer" unveränderbar stehen.
+	 if (diagram.handle == "leftDiagram") {
+		 //diagram.identifier = "RIGHT_HAND_SIDE";
+		 //diagram.modeler = "fox designer";
+	 } else {
+		 diagram.modeler = "";
+		 diagram.identifier = "LEFT_HAND_SIDE";
+	 };
 	 $scope.diagram = diagram;
 	 $scope.diagram.editDiagramDialog.open();
   };
@@ -259,8 +270,14 @@ function EditDiagramController($scope,Commons,Event) {
   // is the dialog model valid and can be submitted?
   var isValid = $scope.isValid = function() {
     var editDiagram = $scope.editDiagram;
-    var valid = !!editDiagram.modeler && $scope.addModelForm.$valid && $scope.selectedNode && ($scope.selectedNode.type == "BPMN_FILE" || $scope.selectedNode.type == "FOLDER");
+    var valid = !!editDiagram.modeler && $scope.addModelForm.$valid && $scope.selectedNode && $scope.selectedNode.type == "BPMN_FILE";
     return valid;
+  };
+  
+  var isValidAndFolder = $scope.isValidAndFolder = function() {
+	var editDiagram = $scope.editDiagram;
+	var validAndfolder = !!editDiagram.modeler && $scope.addModelForm.$valid && $scope.selectedNode && $scope.selectedNode.type == "FOLDER";
+	return validAndfolder;
   };
   
   $scope.cancel = function() {
