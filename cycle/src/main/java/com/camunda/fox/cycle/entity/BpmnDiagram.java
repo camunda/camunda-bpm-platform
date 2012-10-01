@@ -54,6 +54,12 @@ public class BpmnDiagram extends AbstractEntity {
     this.connectorId = connectorId;
   }
 
+  public BpmnDiagram(String modeler, ConnectorNode connectorNode) {
+    this.modeler = modeler;
+    this.diagramPath = connectorNode.getId();
+    this.connectorId = connectorNode.getConnectorId();
+  }
+  
   public String getDiagramPath() {
     return diagramPath;
   }
