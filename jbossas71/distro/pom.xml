@@ -52,7 +52,7 @@
 
     <dependency>
       <groupId>com.camunda.fox.cycle</groupId>
-      <artifactId>cycle</artifactId>
+      <artifactId>cycle-jboss</artifactId>
       <version>${project.version}</version>
       <type>war</type>
     </dependency>

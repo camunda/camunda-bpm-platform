@@ -1,0 +1,209 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <artifactId>fox-platform-qa-websphere-runtime</artifactId>
+  <packaging>pom</packaging>
+
+  <name>fox platform EE - QA IBM Websphere 8.5 Test Runtime</name>
+
+  <properties>
+    <was_home>${WAS8_HOME}</was_home>
+    <was_profile>${WAS8_PROFILE}</was_profile>
+    <was_scope>${WAS8_SCOPE}</was_scope> <!-- eq. ca-meyerNode03Cell -->
+  </properties>
+
+  <parent>
+    <groupId>com.camunda.fox.platform</groupId>
+    <artifactId>fox-platform-qa</artifactId>
+    <version>6.2.0-SNAPSHOT</version>
+  </parent>
+
+  <dependencies>
+    <dependency>
+      <groupId>com.camunda.fox.engine</groupId>
+      <artifactId>fox-engine</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.camunda.fox.platform</groupId>
+      <artifactId>fox-platform-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.camunda.fox.platform</groupId>
+      <artifactId>fox-platform-jobexecutor-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.mybatis</groupId>
+      <artifactId>mybatis</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.uuid</groupId>
+      <artifactId>java-uuid-generator</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>com.camunda.fox.platform</groupId>
+      <artifactId>fox-platform-ibm-websphere-ear</artifactId>
+      <version>${project.version}</version>
+      <type>ear</type>
+    </dependency>
+    <dependency>
+      <groupId>com.camunda.fox.platform</groupId>
+      <artifactId>fox-platform-jobexecutor-rar</artifactId>
+      <version>${project.version}</version>
+      <type>rar</type>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <version>2.5.1</version>
+        <executions>
+          <execution>
+            <id>unpack</id>
+            <phase>package</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>com.camunda.fox.platform</groupId>
+                  <artifactId>fox-platform-ibm-websphere-ear</artifactId>
+                  <version>${project.version}</version>
+                  <type>ear</type>
+                  <overWrite>false</overWrite>
+                  <outputDirectory>${project.build.directory}/camunda-fox-platform.ear</outputDirectory>
+                  <destFileName>camunda-fox-platform.ear</destFileName>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>com.camunda.fox.platform</groupId>
+                  <artifactId>fox-platform-jobexecutor-rar</artifactId>
+                  <version>${project.version}</version>
+                  <type>rar</type>
+                  <overWrite>false</overWrite>
+                  <outputDirectory>${project.build.directory}/fox-platform-jobexecutor-rar.rar</outputDirectory>
+                  <destFileName>fox-platform-jobexecutor-rar.rar</destFileName>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+          <execution>
+            <id>copy</id>
+            <phase>package</phase>
+            <goals>
+              <goal>copy-dependencies</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>com.camunda.fox.engine</groupId>
+                  <artifactId>fox-engine</artifactId>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>com.camunda.fox.platform</groupId>
+                  <artifactId>fox-platform-api</artifactId>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>com.camunda.fox.platform</groupId>
+                  <artifactId>fox-platform-jobexecutor-api</artifactId>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>org.mybatis</groupId>
+                  <artifactId>mybatis</artifactId>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>com.fasterxml.uuid</groupId>
+                  <artifactId>java-uuid-generator</artifactId>
+                </artifactItem>
+              </artifactItems>
+              <excludeTypes>ear,rar</excludeTypes>
+              <excludeTransitive>true</excludeTransitive>
+              <outputDirectory>target/libs</outputDirectory>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <version>1.7</version>
+        <executions>
+          <execution>
+            <id>compile</id>
+            <phase>package</phase>
+            <configuration>
+              <target>
+
+                <!-- stop the server-->
+                <exec executable="${was_profile}/bin/stopServer.bat"
+                  osfamily="windows" failonerror="false"
+                  failifexecutionfails="false">
+                  <arg value="server1" />
+                </exec>
+
+                <exec executable="${was_profile}/bin/stopServer.sh"
+                  osfamily="unix" failonerror="false"
+                  failifexecutionfails="false">
+                  <arg value="server1" />
+                </exec>
+
+                <!-- replace fox platform deployments -->
+
+                <delete>
+                  <fileset
+                    dir="${was_profile}/installedApps/${was_scope}/camunda-fox-platform.ear" />
+                  <fileset
+                    dir="${was_profile}/installedConnectors/fox-platform-jobexecutor-rar.rar" />
+                  <fileset dir="${was_home}/lib/ext" />
+                </delete>
+
+
+                <copy
+                  todir="${was_profile}/installedApps/${was_scope}/camunda-fox-platform.ear"
+                  overwrite="true">
+                  <fileset
+                    dir="${project.build.directory}/camunda-fox-platform.ear" />
+                </copy>
+
+                <copy
+                  todir="${was_profile}/installedConnectors/fox-platform-jobexecutor-rar.rar"
+                  overwrite="true">
+                  <fileset
+                    dir="${project.build.directory}/fox-platform-jobexecutor-rar.rar" />
+                </copy>
+                
+                <copy
+                  todir="${was_home}/lib/ext">
+                  <fileset
+                    dir="target/libs" />
+                </copy>
+
+                <!-- start the server -->
+                <exec executable="${was_profile}/bin/startServer.bat"
+                  osfamily="windows">
+                  <arg value="server1" />
+                </exec>
+                <exec executable="${was_profile}/bin/startServer.sh"
+                  osfamily="unix">
+                  <arg value="server1" />
+                </exec>
+
+              </target>
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>
