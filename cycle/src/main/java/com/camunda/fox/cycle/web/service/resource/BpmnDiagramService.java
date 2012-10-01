@@ -74,19 +74,20 @@ public class BpmnDiagramService {
 
     ConnectorNode node = diagram.getConnectorNode();
 
-    Date lastSync = diagram.getLastSync();
-    if (lastSync != null) {
-      long lastSyncMs = lastSync.getTime();
-      ContentInformation imageInformation = connectorService.getContentInfo(node.getConnectorId(), node.getId(), ConnectorNodeType.PNG_FILE);
+    ContentInformation imageInformation = connectorService.getContentInfo(node.getConnectorId(), node.getId(), ConnectorNodeType.PNG_FILE);
 
-      if (!imageInformation.exists()) {
-        return notFoundResponse;
-      }
+    if (!imageInformation.exists()) {
+      return notFoundResponse;
+    }
+
+    Date diagramLastModified = diagram.getLastModified();
+    if (diagramLastModified != null) {
+      long diagramLastModifiedMs = diagramLastModified.getTime();
       
       Date imageLastModified = imageInformation.getLastModified();
       if (imageLastModified != null) {
-        if (lastSyncMs > imageLastModified.getTime()) {
-          // image was modified eariler than last sync --> it is to old
+        if (diagramLastModifiedMs > imageLastModified.getTime()) {
+          // diagram is younger than the image --> image out of date
           return notFoundResponse;
         }
       }
@@ -180,9 +181,7 @@ public class BpmnDiagramService {
       if (lastModified != null && diagram.getLastSync() != null) {
         if (lastModified.getTime() <= diagram.getLastSync().getTime()) {
           status = Status.SYNCED;
-        }
-
-        if (lastModified.getTime() > diagram.getLastSync().getTime()) {
+        } else {
           status = Status.OUT_OF_SYNC;
         }
       } else {
@@ -190,6 +189,8 @@ public class BpmnDiagramService {
       }
     }
     
+    // update last modified diagram status
+    diagram.setLastModified(lastModified);
     
     BpmnDiagramStatusDTO statusDTO = new BpmnDiagramStatusDTO(diagram.getId(), status, lastModified);
     statusDTO.setLastUpdated(new Date());
