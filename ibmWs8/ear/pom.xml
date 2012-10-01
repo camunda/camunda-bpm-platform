@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <artifactId>fox-platform-ibm-websphere-ear</artifactId>
   <name>fox platform EE - IBM Websphere EAR</name>
@@ -58,23 +57,15 @@
             </goals>
             <configuration>
               <target>
-                <unzip
-                  src="target/fox-platform-ibm-websphere-ear-${project.version}.ear"
-                  dest="target/temp-ear" />
-                <jar destfile="target/fox-engine-cdi-${project.version}.jar"
-                  filesetmanifest="merge">
-                  <zipfileset
-                    src="target/temp-ear/lib/fox-engine-cdi-${project.version}.jar"
-                    excludes="**/beans.xml" />
+                <unzip src="target/fox-platform-ibm-websphere-ear-${project.version}.ear" dest="target/temp-ear" />
+                <jar destfile="target/fox-engine-cdi-${project.version}.jar" filesetmanifest="merge">
+                  <zipfileset src="target/temp-ear/lib/fox-engine-cdi-${project.version}.jar" excludes="**/beans.xml" />
                 </jar>
                 <copy todir="target/temp-ear/lib/" overwrite="true">
-                  <fileset
-                    file="target/fox-engine-cdi-${project.version}.jar" />
+                  <fileset file="target/fox-engine-cdi-${project.version}.jar" />
                 </copy>
-                <delete
-                  file="target/fox-platform-ibm-websphere-ear-${project.version}.ear" />
-                <zip
-                  file="target/fox-platform-ibm-websphere-ear-${project.version}.ear">
+                <delete file="target/fox-platform-ibm-websphere-ear-${project.version}.ear" />
+                <zip file="target/fox-platform-ibm-websphere-ear-${project.version}.ear">
                   <zipfileset dir="target/temp-ear/" />
                 </zip>
               </target>

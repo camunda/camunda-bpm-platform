@@ -15,7 +15,10 @@
  */
 package com.camunda.fox.platform.subsystem.impl.service;
 
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.logging.Logger;
 
 import javax.transaction.TransactionManager;
@@ -41,7 +44,7 @@ import org.jboss.msc.service.StopContext;
 import com.camunda.fox.platform.FoxPlatformException;
 import com.camunda.fox.platform.impl.context.ProcessArchiveContext;
 import com.camunda.fox.platform.impl.service.PlatformService;
-import com.camunda.fox.platform.impl.service.ProcessEngineController;
+import com.camunda.fox.platform.spi.ProcessArchive;
 import com.camunda.fox.platform.spi.ProcessEngineConfiguration;
 import com.camunda.fox.platform.subsystem.impl.util.PlatformServiceReferenceFactory;
 import com.camunda.fox.platform.subsystem.impl.util.ServiceListenerFuture;
@@ -185,6 +188,50 @@ public class ContainerPlatformService extends PlatformService implements Service
     } 
   }
   
+  public ProcessArchiveInstallation installProcessArchive(ProcessArchive processArchive) {
+      ProcessArchiveService processArchiveService = new ProcessArchiveService(processArchive);
+      ServiceName serviceName = ProcessArchiveService.getServiceName(processArchive.getName());
+      
+      final ServiceListenerFuture<ProcessArchiveService, ProcessArchiveInstallation> listener = new ServiceListenerFuture<ProcessArchiveService, ProcessArchiveInstallation>(processArchiveService) {
+        protected void serviceAvailable() {
+          this.value = serviceInstance.getProcessArchiveInstallation();
+        }      
+      };
+      
+      String processEngineName = processArchive.getProcessEngineName();   
+      ServiceName processEngineServiceName = ContainerProcessEngineController.createServiceName(processEngineName);
+      
+      serviceContainer.addService(serviceName, processArchiveService)
+        .addDependency(processEngineServiceName, ContainerProcessEngineController.class, processArchiveService.getProcessEngineControllerInjector())
+        .addDependency(ContainerPlatformService.getServiceName(), ContainerPlatformService.class, processArchiveService.getContainerPlatformServiceInjector())
+        .setInitialMode(Mode.ACTIVE)
+        .addListener(listener)
+        .install();
+      
+      try {
+        // wait for 60 seconds for the installation to succeed.
+        return listener.get(60, TimeUnit.SECONDS);
+      } catch (InterruptedException e) {
+        throw new FoxPlatformException("Interrupted while waiting for Process archive installation", e);
+      } catch (ExecutionException e) {
+        throw new FoxPlatformException("Exception while waiting for Process archive installation", e);
+      } catch (TimeoutException e) {
+        throw new FoxPlatformException("Timeout while waiting for Process archive installation", e);
+      }
+      
+  }
+  
+  @SuppressWarnings("unchecked")
+  public void unInstallProcessArchive(String processArchiveName) {
+    
+    unInstallProcessArchiveInternal(processArchiveName);
+
+    // remove the process archive service asynchronously.
+    ServiceName serviceName = ProcessArchiveService.getServiceName(processArchiveName);
+    ServiceController<ProcessArchiveService> service = (ServiceController<ProcessArchiveService>) serviceContainer.getService(serviceName);
+    service.setMode(Mode.REMOVE);    
+  }
+   
   private boolean isDown(Substate state) {
     return state.equals(Substate.DOWN)||state.equals(Substate.REMOVED);
   }
@@ -205,6 +252,15 @@ public class ContainerPlatformService extends PlatformService implements Service
     }
     
     return processEngineController.getProcessArchiveContextByName(processArchiveName);
+    
+  }
+
+
+  public void removeProcessArchive(ProcessArchive processArchive) {
+    // only uninstall the process archive if it is currently installed
+    if(processEnginesByProcessArchiveName.get(processArchive.getName())!= null) {
+      unInstallProcessArchiveInternal(processArchive.getName());
+    }
     
   }
 
