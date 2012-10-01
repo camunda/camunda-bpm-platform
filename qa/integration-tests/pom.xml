@@ -446,7 +446,7 @@
               <excludes>
                 <!-- HEMERA-2454 -->
                 <exclude>**/JobExecutorRequestContextSFSBDelegateTest.java</exclude>
-                <!-- WAS does not open a new request each time -->
+                <!-- WAS seems not open a new request context each time -->
                 <exclude>**/JobExecutorRequestContextRemoteInvocationTest.java</exclude>
                 <!-- NOT Implemented -->
                 <exclude>**/JobExecutorRequestContextLocalInvocationTest.java</exclude>
@@ -458,10 +458,10 @@
                 <exclude>**/TestFoxPlatformClientAsEjbModule_pasAsEjbModule.java</exclude>
                 <!-- Bug in OWB 1.1.0 -> ElContextStore is thread-bound -->
                 <exclude>**/CallActivityContextSwitchTest.java</exclude>
-<!--                 <exclude>**/PlatformServicesTest.java</exclude> -->
-                <!-- NOT Implemented -->
+                <!-- MultipleInvocationTest in each testclass fails,
+                 maybe because of same OWB-related bug occuring in CallActivityContextSwitchTest.java -->
                 <exclude>**/ejb/remote/*</exclude>
-                <exclude>**/ejb/*.java</exclude>
+                <exclude>**/ejb/*</exclude>
               </excludes>
             </configuration>
           </plugin>
