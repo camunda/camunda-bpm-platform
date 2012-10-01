@@ -1,12 +1,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
-  <name>Activiti - Upgrade</name>
-  <groupId>org.activiti</groupId>
-  <artifactId>activiti-upgrade</artifactId>
-  <version>5.11-ALWAYS-SNAPSHOT</version>
+  <name>fox engine - Upgrade</name>
+  <groupId>com.camunda.fox.engine</groupId>
+  <artifactId>fox-engine-upgrade</artifactId>
+  <version>0.17.0-ALWAYS-SNAPSHOT</version>
 
   <properties>
     <skipTests>true</skipTests>
@@ -14,9 +14,9 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.activiti</groupId>
-      <artifactId>activiti-engine</artifactId>
-      <version>5.11-SNAPSHOT</version>
+      <groupId>com.camunda.fox.engine</groupId>
+      <artifactId>fox-engine</artifactId>
+      <version>1.19.0.CR-SNAPSHOT</version>
     </dependency>
     <dependency>
       <groupId>junit</groupId>

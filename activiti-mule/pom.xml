@@ -1,18 +1,16 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
-  <name>Activiti - Mule</name>
-  <groupId>org.activiti</groupId>
-  <artifactId>activiti-mule</artifactId>
+  <name>fox engine - Mule</name>
+  <groupId>com.camunda.fox.engine</groupId>
+  <artifactId>fox-engine-mule</artifactId>
 
   <parent>
-    <groupId>org.activiti</groupId>
-    <artifactId>activiti-root</artifactId>
+    <groupId>com.camunda.fox.engine</groupId>
+    <artifactId>fox-engine-root</artifactId>
     <relativePath>../..</relativePath>
-    <version>5.11-SNAPSHOT</version>
-
+    <version>1.30.0-SNAPSHOT</version>
   </parent>
 
   <build>
@@ -38,17 +36,18 @@
         </configuration>
       </plugin>
     </plugins>
+    
   </build>
 
   <dependencies>
     <dependency>
-      <groupId>org.activiti</groupId>
-      <artifactId>activiti-engine</artifactId>
+      <groupId>com.camunda.fox.engine</groupId>
+      <artifactId>fox-engine</artifactId>
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.activiti</groupId>
-      <artifactId>activiti-spring</artifactId>
+      <groupId>com.camunda.fox.engine</groupId>
+      <artifactId>fox-engine-spring</artifactId>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -121,14 +120,14 @@
         </exclusion>
       </exclusions>
     </dependency>
-    <dependency>
+        <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-jdk14</artifactId>
-    </dependency>
-    <dependency>
+        </dependency>
+        <dependency>
       <groupId>commons-logging</groupId>
       <artifactId>commons-logging</artifactId>
-    </dependency>
+        </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-beans</artifactId>
@@ -138,17 +137,17 @@
       <artifactId>h2</artifactId>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>org.mule.transports</groupId>
-      <artifactId>mule-transport-vm</artifactId>
-      <version>${mule.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>org.mule.modules</groupId>
-      <artifactId>mule-module-scripting</artifactId>
-      <version>${mule.version}</version>
-      <scope>test</scope>
-    </dependency>
+        <dependency>
+            <groupId>org.mule.transports</groupId>
+            <artifactId>mule-transport-vm</artifactId>
+            <version>${mule.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.mule.modules</groupId>
+            <artifactId>mule-module-scripting</artifactId>
+            <version>${mule.version}</version>
+            <scope>test</scope>
+        </dependency>
   </dependencies>
 
   <profiles>

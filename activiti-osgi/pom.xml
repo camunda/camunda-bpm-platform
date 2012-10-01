@@ -1,18 +1,17 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
   <modelVersion>4.0.0</modelVersion>
 
-  <name>Activiti - OSGi</name>
-  <groupId>org.activiti</groupId>
-  <artifactId>activiti-osgi</artifactId>
-  <packaging>bundle</packaging>
+  <name>fox engine - OSGi</name>
+  <groupId>com.camunda.fox.engine</groupId>
+  <artifactId>fox-engine-osgi</artifactId>
+    <packaging>bundle</packaging>
 
   <parent>
-    <groupId>org.activiti</groupId>
-    <artifactId>activiti-root</artifactId>
+    <groupId>com.camunda.fox.engine</groupId>
+    <artifactId>fox-engine-root</artifactId>
     <relativePath>../..</relativePath>
-    <version>5.11-SNAPSHOT</version>
+        <version>1.30.0-SNAPSHOT</version>
   </parent>
 
   <build>
@@ -28,40 +27,40 @@
 
   <dependencies>
     <dependency>
-      <groupId>org.activiti</groupId>
-      <artifactId>activiti-engine</artifactId>
+      <groupId>com.camunda.fox.engine</groupId>
+      <artifactId>fox-engine</artifactId>
     </dependency>
-    <dependency>
-      <groupId>org.osgi</groupId>
-      <artifactId>org.osgi.core</artifactId>
-      <version>4.2.0</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.osgi</groupId>
-      <artifactId>org.osgi.compendium</artifactId>
-      <version>4.2.0</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.felix</groupId>
-      <artifactId>org.apache.felix.fileinstall</artifactId>
-      <version>3.0.2</version>
-      <optional>true</optional>
-    </dependency>
+        <dependency>
+          <groupId>org.osgi</groupId>
+          <artifactId>org.osgi.core</artifactId>
+          <version>4.2.0</version>
+          <scope>provided</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.osgi</groupId>
+          <artifactId>org.osgi.compendium</artifactId>
+          <version>4.2.0</version>
+          <scope>provided</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.apache.felix</groupId>
+          <artifactId>org.apache.felix.fileinstall</artifactId>
+          <version>3.0.2</version>
+          <optional>true</optional>
+        </dependency>
   </dependencies>
 
-  <properties>
-    <activiti.osgi.activator>
-      org.activiti.osgi.Activator
-    </activiti.osgi.activator>
-    <activiti.osgi.import.pkg>
-      org.apache.felix.fileinstall*;resolution:=optional,*
-    </activiti.osgi.import.pkg>
-    <activiti.artifact>
-      org.activiti.osgi
-    </activiti.artifact>
-  </properties>
+    <properties>
+        <activiti.osgi.activator>
+            org.activiti.osgi.Activator
+        </activiti.osgi.activator>
+        <activiti.osgi.import.pkg>
+            org.apache.felix.fileinstall*;resolution:=optional,*
+        </activiti.osgi.import.pkg>
+        <activiti.artifact>
+            org.activiti.osgi
+        </activiti.artifact>
+    </properties>
 
   <profiles>
     <profile>
