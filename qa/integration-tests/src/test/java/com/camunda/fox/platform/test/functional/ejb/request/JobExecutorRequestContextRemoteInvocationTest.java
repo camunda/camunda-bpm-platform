@@ -21,7 +21,7 @@ import com.camunda.fox.platform.test.util.AbstractFoxPlatformIntegrationTest;
 
 /**
  * This test verifies that if a delegate bean invoked from the Job Executor 
- * calls a REMOTE SLSB from a different deployment, the RequestContest is active there as well.
+ * calls a REMOTE SLSB from a different deployment, the RequestContext is active there as well.
  * 
  * NOTE: 
  * - does not work on Jboss AS with a remote invocation (Bug in Jboss AS?) SEE HEMERA-2453
@@ -58,14 +58,14 @@ public class JobExecutorRequestContextRemoteInvocationTest extends AbstractFoxPl
   public void testRequestContextPropagationEjbRemote() {
     
     // This test verifies that if a delegate bean invoked from the Job Executor 
-    // calls an EJB from a different deployment, the RequestContest is active there as well.
+    // calls an EJB from a different deployment, the RequestContext is active there as well.
       
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("testContextPropagationEjbRemote");    
     
     waitForJobExecutorToProcessAllJobs(6000, 100);
     
     Object variable = runtimeService.getVariable(pi.getId(), "invocationCounter");
-    // remote invocations of a bean from a seperate deployment constitutes seperate requests
+    // remote invocations of a bean from a separate deployment constitutes separate requests
     Assert.assertEquals(1, variable);
     
     Task task = taskService.createTaskQuery()
