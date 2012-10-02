@@ -150,7 +150,7 @@ public abstract class AbstractConnectorTestBase {
       
       // see if updated was set
       assertFalse(new Date().before(updatedContentInfo.getLastModified()));
-      assertFalse(now.after(updatedContentInfo.getLastModified()));
+      assertFalse(now.getTime() >= updatedContentInfo.getLastModified().getTime());
       
       // see if file contents equal the new contents
       nodeInputStream = connector.getContent(fileNode);
