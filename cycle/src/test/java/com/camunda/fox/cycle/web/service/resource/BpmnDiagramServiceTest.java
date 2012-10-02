@@ -1,8 +1,9 @@
 package com.camunda.fox.cycle.web.service.resource;
 
-import static org.junit.Assert.*;
+import static org.hamcrest.Matchers.instanceOf;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
-import static org.hamcrest.Matchers.*;
 
 import java.util.Date;
 
@@ -14,7 +15,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kubek2k.springockito.annotations.ReplaceWithMock;
 import org.kubek2k.springockito.annotations.SpringockitoContextLoader;
-
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -31,7 +31,7 @@ import com.camunda.fox.cycle.repository.BpmnDiagramRepository;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(
   loader = SpringockitoContextLoader.class,
-  locations = { "classpath:/spring/mock/test-context.xml", "classpath:/spring/test-persistence.xml" }
+  locations = { "classpath:/spring/test-mock-context.xml", "classpath:/spring/test-persistence.xml" }
 )
 public class BpmnDiagramServiceTest {
 

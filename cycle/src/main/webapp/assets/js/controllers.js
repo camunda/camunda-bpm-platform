@@ -91,7 +91,8 @@ function RoundtripDetailsController($scope, $routeParams, RoundtripDetails, Comm
    * Return true if the managed roundtrip can be created (LTR or RTL)
    */
   $scope.canCreate = function(mode) {
-    var sourceModeSyncStatus = null, 
+    var sourceModeSyncStatus = null,
+        targetModeSyncStatus = null,
         roundtrip = $scope.roundtrip;
     
     if (!roundtrip) {
@@ -106,9 +107,10 @@ function RoundtripDetailsController($scope, $routeParams, RoundtripDetails, Comm
           return sourceModeSyncStatus != "UNAVAILABLE";
         }
       } else if (roundtrip.leftHandSide && roundtrip.rightHandSide) {
-        if (roundtrip.rightHandSide.syncStatus) {
+        if (roundtrip.rightHandSide.syncStatus && roundtrip.leftHandSide.syncStatus) {
           sourceModeSyncStatus = roundtrip.rightHandSide.syncStatus.status || "UNAVAILABLE";
-          return sourceModeSyncStatus == "UNAVAILABLE";
+          targetModeSyncStatus = roundtrip.leftHandSide.syncStatus.status || "UNAVAILABLE";
+          return sourceModeSyncStatus == "UNAVAILABLE" && targetModeSyncStatus != "UNAVAILABLE";
         }        
       }
     } else if (mode == "RIGHT_TO_LEFT") {
@@ -119,9 +121,10 @@ function RoundtripDetailsController($scope, $routeParams, RoundtripDetails, Comm
           return sourceModeSyncStatus != "UNAVAILABLE";
         }
       } else if (roundtrip.leftHandSide && roundtrip.rightHandSide) {
-        if (roundtrip.leftHandSide.syncStatus) { 
+        if (roundtrip.leftHandSide.syncStatus && roundtrip.rightHandSide.syncStatus) { 
           sourceModeSyncStatus = roundtrip.leftHandSide.syncStatus.status || "UNAVAILABLE";
-          return sourceModeSyncStatus == "UNAVAILABLE";
+          targetModeSyncStatus = roundtrip.rightHandSide.syncStatus.status || "UNAVAILABLE";
+          return sourceModeSyncStatus == "UNAVAILABLE" && targetModeSyncStatus != "UNAVAILABLE";
         }
       }
     }

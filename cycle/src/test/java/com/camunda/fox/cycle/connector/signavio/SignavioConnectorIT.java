@@ -23,6 +23,8 @@ import javax.inject.Inject;
 
 import org.activiti.engine.impl.bpmn.parser.BpmnParse;
 import org.activiti.engine.impl.bpmn.parser.BpmnParser;
+import org.activiti.engine.impl.cfg.BpmnParseFactory;
+import org.activiti.engine.impl.cfg.DefaultBpmnParseFactory;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.el.ExpressionManager;
@@ -454,7 +456,8 @@ public class SignavioConnectorIT {
     // TODO: Okay, this needs more serious thinking where we get the engine
     // from!
     ExpressionManager expressionManager = processEngineConfiguration.getExpressionManager();
-    BpmnParser bpmnParser = new BpmnParser(expressionManager);
+    BpmnParseFactory bpmnParseFactory = new DefaultBpmnParseFactory();
+    BpmnParser bpmnParser = new BpmnParser(expressionManager, bpmnParseFactory);
     Context.setProcessEngineConfiguration(processEngineConfiguration);
 
     // Unfortunately the deployment id is requested while parsing, so we have to
