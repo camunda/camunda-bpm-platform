@@ -40,7 +40,7 @@ public class JcaInflowExecuteJobsRunnable extends PlatformExecuteJobsRunnable {
   protected void executeJob(String nextJobId) {
     JobExecutionHandlerActivation jobHandlerActivation = ra.getJobHandlerActivation();
     if(jobHandlerActivation == null) {
-      // TODO: stop actisition / only activate acquisition if MDB active?
+      // TODO: stop acquisition / only activate acquisition if MDB active?
       log.warning("Cannot execute acquired job, no JobExecutionHandler MDB deployed.");
       return;
     }
