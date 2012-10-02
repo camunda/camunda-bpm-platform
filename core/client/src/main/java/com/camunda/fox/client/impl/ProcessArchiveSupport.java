@@ -87,7 +87,7 @@ public class ProcessArchiveSupport {
   @Resource
   protected SessionContext sessionContext;
   
-  protected ServiceLoader<ProcessArchiveExtension> processArchiveExtensionLoader;
+  protected List<ProcessArchiveExtension> processArchiveExtensions = new ArrayList<ProcessArchiveExtension>();
 
   protected Map<ProcessArchive, ProcessEngine> installedProcessArchives = new HashMap<ProcessArchive, ProcessEngine>();
     
@@ -199,12 +199,20 @@ public class ProcessArchiveSupport {
   
   // extensions //////////////////////////////////
   
-
-  protected void fireBeforeProcessArchiveStart() {
-    processArchiveExtensionLoader = ServiceLoader.load(ProcessArchiveExtension.class);
+  private void initProcessArchiveExtensions() {
+    ServiceLoader<ProcessArchiveExtension> processArchiveExtensionLoader = ServiceLoader.load(ProcessArchiveExtension.class);
     Iterator<ProcessArchiveExtension> loadableExtensions = processArchiveExtensionLoader.iterator();
     while (loadableExtensions.hasNext()) {
       ProcessArchiveExtension processArchiveExtension = (ProcessArchiveExtension) loadableExtensions.next();
+      processArchiveExtensions.add(processArchiveExtension);
+    }
+    
+  }
+
+  protected void fireBeforeProcessArchiveStart() {
+    initProcessArchiveExtensions();
+    
+    for (ProcessArchiveExtension processArchiveExtension : processArchiveExtensions) {
       try {
         processArchiveExtension.beforeProcessArchiveStart(this);
       }catch (Exception e) {
@@ -214,9 +222,7 @@ public class ProcessArchiveSupport {
   }
   
   protected void fireAfterProcessArchiveStart() {
-    Iterator<ProcessArchiveExtension> loadableExtensions = processArchiveExtensionLoader.iterator();
-    while (loadableExtensions.hasNext()) {
-      ProcessArchiveExtension processArchiveExtension = (ProcessArchiveExtension) loadableExtensions.next();
+    for (ProcessArchiveExtension processArchiveExtension : processArchiveExtensions) {
       try {
         processArchiveExtension.afterProcessArchiveStart(this);
       }catch (Exception e) {
@@ -226,9 +232,7 @@ public class ProcessArchiveSupport {
   }
   
   protected void fireBeforeProcessArchiveStop() {
-    Iterator<ProcessArchiveExtension> loadableExtensions = processArchiveExtensionLoader.iterator();
-    while (loadableExtensions.hasNext()) {
-      ProcessArchiveExtension processArchiveExtension = (ProcessArchiveExtension) loadableExtensions.next();
+    for (ProcessArchiveExtension processArchiveExtension : processArchiveExtensions) {
       try {
         processArchiveExtension.beforeProcessArchiveStop(this);
       }catch (Exception e) {
@@ -238,9 +242,7 @@ public class ProcessArchiveSupport {
   }
   
   protected void fireAfterProcessArchiveStop() {
-    Iterator<ProcessArchiveExtension> loadableExtensions = processArchiveExtensionLoader.iterator();
-    while (loadableExtensions.hasNext()) {
-      ProcessArchiveExtension processArchiveExtension = (ProcessArchiveExtension) loadableExtensions.next();
+    for (ProcessArchiveExtension processArchiveExtension : processArchiveExtensions) {
       try {
         processArchiveExtension.afterProcessArchiveStop(this);
       }catch (Exception e) {
