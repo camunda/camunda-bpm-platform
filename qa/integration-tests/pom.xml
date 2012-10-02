@@ -300,9 +300,10 @@
           <testResource>
             <directory>src/test/resources-glassfish-h2</directory>
             <filtering>true</filtering>
-            <includes>
-              <include>**/*.xml</include>
-            </includes> 
+			<includes>
+			  <include>**/*.xml</include>
+			  <include>**/*.properties</include>
+			</includes>
           </testResource>
         </testResources>
       </build>
