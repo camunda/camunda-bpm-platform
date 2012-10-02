@@ -71,7 +71,7 @@ public class ConnectorService {
   
   @Path("{connectorId}/contents")
   @Produces("application/xml")
-  public String content(@PathParam("connectorId") long connectorId, @QueryParam("nodeId") String nodeId) {
+  public String getXmlContent(@PathParam("connectorId") long connectorId, @QueryParam("nodeId") String nodeId) {
     Connector connector = connectorRegistry.getConnector(connectorId);
     try {
       return new java.util.Scanner(connector.getContent(new ConnectorNode(nodeId))).useDelimiter("\\A").next();

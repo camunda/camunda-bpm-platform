@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.camunda.fox.cycle.connector.Connector;
 import com.camunda.fox.cycle.connector.ConnectorNode;
+import com.camunda.fox.cycle.connector.ConnectorNodeType;
 import com.camunda.fox.cycle.connector.ConnectorRegistry;
 import com.camunda.fox.cycle.connector.ContentInformation;
 import com.camunda.fox.cycle.entity.BpmnDiagram;
@@ -42,6 +43,8 @@ public class BpmnDiagramService {
   @Inject
   private ConnectorRegistry connectorRegistry;
   
+  @Inject
+  private ConnectorService connectorService;
   
 //  @GET
 //  public List<BpmnDiagramDTO> list() {
@@ -52,6 +55,46 @@ public class BpmnDiagramService {
   @Path("{id}")
   public BpmnDiagramDTO get(@PathParam("id") long id) {
     return BpmnDiagramDTO.wrap(bpmnDiagramRepository.findById(id));
+  }
+
+  @GET
+  @Path("{id}/image")
+  public Object getImage(@PathParam("id") long id) {
+    
+    // we do offer the functionality to serve images here, rather than relying on the connector service directly
+    // because we need to add the out of date logic which is not the connector services' concern
+    
+    Response notFoundResponse = Response.status(Response.Status.NOT_FOUND).build();
+    
+    BpmnDiagram diagram = bpmnDiagramRepository.findById(id);
+    
+    if (diagram == null) {
+      return notFoundResponse;
+    }
+
+    ConnectorNode node = diagram.getConnectorNode();
+
+    ContentInformation imageInformation = connectorService.getContentInfo(node.getConnectorId(), node.getId(), ConnectorNodeType.PNG_FILE);
+
+    if (!imageInformation.exists()) {
+      return notFoundResponse;
+    }
+
+    Date diagramLastModified = diagram.getLastModified();
+    if (diagramLastModified != null) {
+      long diagramLastModifiedMs = diagramLastModified.getTime();
+      
+      Date imageLastModified = imageInformation.getLastModified();
+      if (imageLastModified != null) {
+        if (diagramLastModifiedMs > imageLastModified.getTime()) {
+          // diagram is younger than the image --> image out of date
+          return notFoundResponse;
+        }
+      }
+    }
+    
+    // everything ok --> serve image data
+    return connectorService.getTypedContent(node.getConnectorId(), node.getId(), ConnectorNodeType.PNG_FILE);
   }
 
   @POST
@@ -138,9 +181,7 @@ public class BpmnDiagramService {
       if (lastModified != null && diagram.getLastSync() != null) {
         if (lastModified.getTime() <= diagram.getLastSync().getTime()) {
           status = Status.SYNCED;
-        }
-
-        if (lastModified.getTime() > diagram.getLastSync().getTime()) {
+        } else {
           status = Status.OUT_OF_SYNC;
         }
       } else {
@@ -148,6 +189,8 @@ public class BpmnDiagramService {
       }
     }
     
+    // update last modified diagram status
+    diagram.setLastModified(lastModified);
     
     BpmnDiagramStatusDTO statusDTO = new BpmnDiagramStatusDTO(diagram.getId(), status, lastModified);
     statusDTO.setLastUpdated(new Date());

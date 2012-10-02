@@ -113,22 +113,21 @@ angular
               }
 
               if (item.type == "BPMN_FILE" || item.type == "FOLDER") {
-                
-                // FIXME digest should to the $apply, 
-                // but obviously its not resulting in a model update for the add button binding
-                // probably a bug in angularjs ?
-                // if you change something here, please test the following:
-                // first enter the modeler name, THEN select the file, add button should be enabled
-                // not working without $apply after digest, $apply function must be empty also
                 scope.selected = item;
-                scope.$digest();
-                scope.$apply();
               } else {
                 // FIXME see description above!
                 scope.selected = null;
-                scope.$digest();
-                scope.$apply();
               }
+              
+
+              // FIXME digest should to the $apply, 
+              // but obviously its not resulting in a model update for the add button binding
+              // probably a bug in angularjs ?
+              // if you change something here, please test the following:
+              // first enter the modeler name, THEN select the file, add button should be enabled
+              // not working without $apply after digest, $apply function must be empty also
+              scope.$digest();
+              scope.$apply();
             },
             showRoot: false,
             persist: false
@@ -353,12 +352,12 @@ angular
 
       function updateImage(diagram, update) {
         scope.status = "LOADING";
-        $(element).find("img").attr("src", Commons.getImageUrl(diagram.connectorNode, update));
+        $(element).find("img").attr("src", Commons.getImageUrl(diagram, update));
       };
 
       scope.$watch("diagram", function (newDiagramValue) {
-        if (newDiagramValue) {
-          updateImage(scope.diagram);
+        if (newDiagramValue && newDiagramValue.id) {
+          updateImage(newDiagramValue);
         }
       });
 
