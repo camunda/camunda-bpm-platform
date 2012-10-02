@@ -12,12 +12,12 @@
       <div class="sync-options">
         <div class="actions">
           <button class="btn btn-large sync-btn"
-                  data-ng-disabled="!(roundtrip.rightHandSide && roundtrip.leftHandSide)"
-                  data-ng-hide="(!roundtrip.rightHandSide && roundtrip.leftHandSide)"
+                  data-ng-disabled="!canSync()"
+                  data-ng-hide="canCreate('LEFT_TO_RIGHT')"
                   data-ng-click="openSyncDialog('LEFT_TO_RIGHT')">sync &rarr;</button>
           <button class="btn btn-large sync-btn"
-                  data-ng-show="(roundtrip.leftHandSide && !roundtrip.rightHandSide)"
-                  data-ng-click="createNewDiagram(leftDiagram)">create &rarr;</button>
+                  data-ng-show="canCreate('LEFT_TO_RIGHT')"
+                  data-ng-click="createNewDiagram(rightDiagram)">create &rarr;</button>
         </div>
         <div>
           <span data-ng-show="roundtrip.lastSync">
@@ -31,12 +31,12 @@
         </div>
         <div class="actions">
           <button class="btn btn-large sync-btn"
-                  data-ng-disabled="!(roundtrip.rightHandSide && roundtrip.leftHandSide)"
-                  data-ng-hide="(roundtrip.rightHandSide && !roundtrip.leftHandSide)"
+                  data-ng-disabled="!canSync()"
+                  data-ng-hide="canCreate('RIGHT_TO_LEFT')"
                   data-ng-click="openSyncDialog('RIGHT_TO_LEFT')">&larr; sync</button>
           <button class="btn btn-large sync-btn"
-                  data-ng-show="(roundtrip.rightHandSide && !roundtrip.leftHandSide)"
-                  data-ng-click="createNewDiagram(rightDiagram)">&larr; create</button>
+                  data-ng-show="canCreate('RIGHT_TO_LEFT')"
+                  data-ng-click="createNewDiagram(leftDiagram)">&larr; create</button>
         </div>
       </div>
     </div>

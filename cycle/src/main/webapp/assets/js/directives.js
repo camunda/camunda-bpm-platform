@@ -13,9 +13,21 @@ angular
     scope: {
       'connector' : "=",
       'selected' : "=",
+      'filter' : "&", 
       'id' : "@"
     },
     link: function(scope, element, attrs, model) {
+      
+      var resourceTypes = scope.filter();
+      var filterParam = "";
+      
+      angular.forEach(resourceTypes, function(e, i) {
+        if (!filterParam) {
+          filterParam = "type=" + e;
+        } else {
+          filterParam += "&type=" + e;
+        }
+      });
       
       /**
        * Pre bootstraping the tree (loading root elements)
@@ -42,7 +54,7 @@ angular
         function getRootContents(connectorId) {
           var deferred = new Deferred();
 
-          $http.get(App.uri("secured/resource/connector/" + connectorId + "/root"))
+          $http.get(App.uri("secured/resource/connector/" + connectorId + "/root?" + filterParam))
             .success(function(data, status, headers, config) {
               deferred.resolve(data);
             })
@@ -56,8 +68,8 @@ angular
 
         function getNodeContents(node) {
           var deferred = new Deferred();
-
-          $http.get(App.uri("secured/resource/connector/" + connectorId + "/children?nodeId=" + encodeURI(node.id)))
+          
+          $http.get(App.uri("secured/resource/connector/" + connectorId + "/children?nodeId=" + encodeURI(node.id) + "&" + filterParam))
             .success(function(data, status, headers, config) {
               deferred.resolve(data);
             })

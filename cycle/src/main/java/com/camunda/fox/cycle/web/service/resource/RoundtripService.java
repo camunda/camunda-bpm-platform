@@ -179,8 +179,8 @@ public class RoundtripService extends AbstractRestService {
   @POST
   @Path("{id}/create")
   @Transactional
-  public RoundtripDTO create(@PathParam("id") long roundtripId, @QueryParam("diagramlabel") String diagramLabel, @QueryParam("syncMode") String syncMode, 
-                             @QueryParam("modeler") String modeler, @QueryParam("connectorId") Long connectorId, @QueryParam("connectorNodeId") String connectorNodeId) {
+  public RoundtripDTO create(@PathParam("id") long roundtripId, @QueryParam("diagramlabel") String diagramLabel, @QueryParam("syncMode") SyncMode syncMode, 
+                             @QueryParam("modeler") String modeler, @QueryParam("connectorId") Long connectorId, @QueryParam("parentFolderId") String parentFolderId) {
     
     Roundtrip roundtrip = roundtripRepository.findById(roundtripId);
     if (roundtrip == null) {
@@ -195,7 +195,7 @@ public class RoundtripService extends AbstractRestService {
     Connector connector = connectorRegistry.getConnector(connectorId);
     if (!(connector instanceof SignavioConnector)) {
       if (!diagramLabel.endsWith(".xml") && !diagramLabel.endsWith(".bpmn")) {
-        diagramLabel = diagramLabel.concat(".xml");
+        diagramLabel = diagramLabel.concat(".bpmn");
       }
     }
     
@@ -203,17 +203,19 @@ public class RoundtripService extends AbstractRestService {
     bpmnDiagramDTO.setLabel(diagramLabel);
     bpmnDiagramDTO.setModeler(modeler);
     
-    ConnectorNode newConnectorNode = connector.createNode(connectorNodeId, connectorNodeId + "/" + diagramLabel, diagramLabel, ConnectorNodeType.BPMN_FILE);
+    ConnectorNode newConnectorNode = connector.createNode(parentFolderId, diagramLabel, ConnectorNodeType.BPMN_FILE);
     bpmnDiagramDTO.setConnectorNode(new ConnectorNodeDTO(newConnectorNode));
 
     BpmnDiagram bpmnDiagram = bpmnDiagramController.createOrUpdate(bpmnDiagramDTO);
     bpmnDiagram.setConnectorId(connectorId);
     bpmnDiagram.setLastModified(new Date());
     
-    if (SyncMode.LEFT_TO_RIGHT.toString().equals(syncMode)) {
+    switch (syncMode) {
+    case LEFT_TO_RIGHT:
       synchronizeModels(roundtrip.getLeftHandSide(), bpmnDiagram, SyncMode.LEFT_TO_RIGHT);
       roundtrip.setRightHandSide(bpmnDiagram);
-    } else {
+      break;
+    case RIGHT_TO_LEFT:
       // create left hand side model from right hand side model
       // it's only a copy from the right hand side model, no poolextraction or something else is necessary
       ConnectorNode rhsNode = roundtrip.getRightHandSide().getConnectorNode();
@@ -231,9 +233,13 @@ public class RoundtripService extends AbstractRestService {
       } catch (Exception e) {
         throw new CycleException("Creation of left hand side model failed.", e);
       }
-       
+      
       roundtrip.setLeftHandSide(bpmnDiagram);
+      break;
     }
+    
+    roundtrip.setLastSync(new Date());
+    roundtrip.setLastSyncMode(syncMode);
     
     RoundtripDTO roundtripDTO = RoundtripDTO.wrap(roundtrip);
     

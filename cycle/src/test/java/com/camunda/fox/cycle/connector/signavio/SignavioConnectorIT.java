@@ -303,7 +303,7 @@ public class SignavioConnectorIT {
     try {
       // create directory
       String folderName = "Cycle: SignavioConnectorIT.testBpmnPoolExtractionRoundtrip " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
-      folder = this.getSignavioConnector().createNode(this.getSignavioConnector().getPrivateFolder().getId(), null, folderName, ConnectorNodeType.FOLDER);
+      folder = this.getSignavioConnector().createNode(this.getSignavioConnector().getPrivateFolder().getId(), folderName, ConnectorNodeType.FOLDER);
 
       // upload model
       if (filename.endsWith(".sgx")) {

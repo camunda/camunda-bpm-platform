@@ -68,6 +68,67 @@ function RoundtripDetailsController($scope, $routeParams, RoundtripDetails, Comm
     }
   });
 
+  $scope.canSync = function() {
+    
+    var roundtrip = $scope.roundtrip,
+        lhsModeSyncStatus = null,
+        rhsModeSyncStatus = null;
+    
+    if (!roundtrip) {
+      return false;
+    }
+    
+    if (roundtrip.rightHandSide && roundtrip.leftHandSide) {
+      lhsModeSyncStatus = roundtrip.leftHandSide.syncStatus.status || "UNAVAILABLE";
+      rhsModeSyncStatus = roundtrip.rightHandSide.syncStatus.status || "UNAVAILABLE";
+      return lhsModeSyncStatus != "UNAVAILABLE" && rhsModeSyncStatus != "UNAVAILABLE"; 
+    }
+    
+    return false;
+  };
+  
+  /**
+   * Return true if the managed roundtrip can be created (LTR or RTL)
+   */
+  $scope.canCreate = function(mode) {
+    var sourceModeSyncStatus = null, 
+        roundtrip = $scope.roundtrip;
+    
+    if (!roundtrip) {
+      return false;
+    }
+    
+    if (mode == "LEFT_TO_RIGHT") {
+      if (roundtrip.leftHandSide && !roundtrip.rightHandSide) {
+        // added this additional check to avoid an error: roundrip.leftHandSide.syncStatus is undefined
+        if (roundtrip.leftHandSide.syncStatus) { 
+          sourceModeSyncStatus = roundtrip.leftHandSide.syncStatus.status || "UNAVAILABLE";
+          return sourceModeSyncStatus != "UNAVAILABLE";
+        }
+      } else if (roundtrip.leftHandSide && roundtrip.rightHandSide) {
+        if (roundtrip.rightHandSide.syncStatus) {
+          sourceModeSyncStatus = roundtrip.rightHandSide.syncStatus.status || "UNAVAILABLE";
+          return sourceModeSyncStatus == "UNAVAILABLE";
+        }        
+      }
+    } else if (mode == "RIGHT_TO_LEFT") {
+      if (roundtrip.rightHandSide && !roundtrip.leftHandSide) {
+        // added this additional check to avoid an error: roundrip.rightHandSide.syncStatus is undefined
+        if (roundtrip.rightHandSide.syncStatus) {
+          sourceModeSyncStatus = roundtrip.rightHandSide.syncStatus.status || "UNAVAILABLE";
+          return sourceModeSyncStatus != "UNAVAILABLE";
+        }
+      } else if (roundtrip.leftHandSide && roundtrip.rightHandSide) {
+        if (roundtrip.leftHandSide.syncStatus) { 
+          sourceModeSyncStatus = roundtrip.leftHandSide.syncStatus.status || "UNAVAILABLE";
+          return sourceModeSyncStatus == "UNAVAILABLE";
+        }
+      }
+    }
+    
+    return false;
+  };
+  
   $scope.activeClass = function(side) {
     return side == $scope.currentPicture ? "active" : "";
   };
@@ -87,19 +148,20 @@ function RoundtripDetailsController($scope, $routeParams, RoundtripDetails, Comm
   };
   
   $scope.createNewDiagram = function(diagram) {
-	 // need this diagram object modification to set a new modeler name
-	 // for the new bpmn diagram model
-	 // TODO: wenn ein Modell auf der rechten Seite erzeugt werden soll, dann muss im EDIT-Diagram-Dialog
-	 // im Modeler-Name auch "fox designer" unveränderbar stehen.
-	 if (diagram.handle == "leftDiagram") {
-		 //diagram.identifier = "RIGHT_HAND_SIDE";
-		 //diagram.modeler = "fox designer";
-	 } else {
-		 diagram.modeler = "";
-		 diagram.identifier = "LEFT_HAND_SIDE";
-	 };
-	 $scope.diagram = diagram;
-	 $scope.diagram.editDiagramDialog.open();
+    var roundtrip = $scope.roundtrip;
+    
+    diagram.diagramTemplate = null;
+    
+    switch (diagram.identifier) {
+    case "leftHandSide":
+      diagram.diagramTemplate = { label: roundtrip.rightHandSide.label };
+      break;
+    case "rightHandSide":
+      diagram.diagramTemplate = { label: roundtrip.leftHandSide.label };
+    }
+    
+    diagram.editDialogMode = "CREATE_NEW_DIAGRAM";
+    diagram.editDiagramDialog.open();
   };
 
   $scope.delayedSetCurrentPicture = function (picture) {
@@ -170,6 +232,9 @@ function SyncRoundtripController($scope, $http, $q, App, Event) {
  */
 function BpmnDiagramController($scope, Commons, Event, $http, App) {
 
+  var SYNC_SUCCESS = "synchronizationSuccess",
+      SYNC_FAILED = "synchronizationFailed";
+  
   $scope.imageStatus = "UNKNOWN";
   $scope.modelStatus = "UNKNOWN";
 
@@ -180,6 +245,7 @@ function BpmnDiagramController($scope, Commons, Event, $http, App) {
   $scope.editDiagramDialog = new Dialog();
 
   $scope.addDiagram = function() {
+    $scope.editDialogMode = "ADD_DIAGRAM";
     $scope.editDiagramDialog.open();
   };
 
@@ -197,13 +263,15 @@ function BpmnDiagramController($scope, Commons, Event, $http, App) {
   };
   
   $scope.createDiagram = function(diagram) {
-	if ($scope.handle == "leftDiagram") {
-		$scope.syncMode = "LEFT_TO_RIGHT";
-	} else {
-		$scope.syncMode = "RIGHT_TO_LEFT";
-	}
-	
-    $http.post(App.uri('secured/resource/roundtrip/' + $scope.roundtrip.id + '/create/?diagramlabel=' + diagram.label + '&syncMode=' + $scope.syncMode + '&modeler=' + diagram.modeler + '&connectorId=' + diagram.connectorNode.connectorId + '&connectorNodeId=' + diagram.connectorNode.id))
+    switch ($scope.handle) {
+    case "rightDiagram":
+      $scope.syncMode = "LEFT_TO_RIGHT";
+      break;
+    case "leftDiagram":
+      $scope.syncMode = "RIGHT_TO_LEFT";
+    }
+    
+    $http.post(App.uri('secured/resource/roundtrip/' + $scope.roundtrip.id + '/create/?diagramlabel=' + diagram.label + '&syncMode=' + $scope.syncMode + '&modeler=' + diagram.modeler + '&connectorId=' + diagram.connectorNode.connectorId + '&parentFolderId=' + diagram.connectorNode.id))
     .success(function(data) {
         $scope.roundtrip.$get({id: $scope.roundtrip.id });
         $scope.status = SYNC_SUCCESS;
@@ -280,6 +348,16 @@ function EditDiagramController($scope,Commons,Event) {
 	return validAndfolder;
   };
   
+  $scope.acceptedChildTypes = function() {
+    if ($scope.editDialogMode == "ADD_DIAGRAM") {
+      return [ "PNG_FILE", "BPMN_FILE", "FOLDER" ];
+    }
+    if ($scope.editDialogMode == "CREATE_NEW_DIAGRAM") {
+      return [ "FOLDER" ];
+    }
+    return [ "ANY_FILE", "FOLDER" ];
+  };
+  
   $scope.cancel = function() {
     $scope.cancelAddDiagram();
   };
@@ -300,7 +378,7 @@ function EditDiagramController($scope,Commons,Event) {
   $scope.connectors = [];
   
   // make a copy of the diagram to edit / add
-  $scope.editDiagram = angular.copy($scope.diagram || {});
+  $scope.editDiagram = angular.extend(angular.copy($scope.diagram || {}), $scope.diagramTemplate || {});
 
   // Watch for component error  
   $scope.$on(Event.componentError, function(event, error) {

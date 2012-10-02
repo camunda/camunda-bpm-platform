@@ -98,7 +98,7 @@ public class SignavioConnectorTest {
     this.getSignavioConnector().login(config.getGlobalUser(), config.getGlobalPassword());
     ConnectorNode createdRootNode = null;
     try {
-      createdRootNode = this.getSignavioConnector().createNode(this.getSignavioConnector().getPrivateFolder().getId(), null, "TestFolder", ConnectorNodeType.FOLDER);
+      createdRootNode = this.getSignavioConnector().createNode(this.getSignavioConnector().getPrivateFolder().getId(), "TestFolder", ConnectorNodeType.FOLDER);
       assertEquals("TestFolder", createdRootNode.getLabel());
       assertEquals(ConnectorNodeType.FOLDER, createdRootNode.getType());
       
@@ -119,11 +119,11 @@ public class SignavioConnectorTest {
     this.getSignavioConnector().login(config.getGlobalUser(), config.getGlobalPassword());
     ConnectorNode createdRootNode = null;
     try {
-      createdRootNode = this.getSignavioConnector().createNode(this.getSignavioConnector().getPrivateFolder().getId(), null, "TestFolder", ConnectorNodeType.FOLDER);
+      createdRootNode = this.getSignavioConnector().createNode(this.getSignavioConnector().getPrivateFolder().getId(), "TestFolder", ConnectorNodeType.FOLDER);
       assertEquals("TestFolder", createdRootNode.getLabel());
       assertEquals(ConnectorNodeType.FOLDER, createdRootNode.getType());
       
-      ConnectorNode newFolder = this.getSignavioConnector().createNode(createdRootNode.getId(), null, "ChildFolder", ConnectorNodeType.FOLDER);
+      ConnectorNode newFolder = this.getSignavioConnector().createNode(createdRootNode.getId(), "ChildFolder", ConnectorNodeType.FOLDER);
       assertEquals("ChildFolder", newFolder.getLabel());
       assertEquals(ConnectorNodeType.FOLDER, newFolder.getType());
       
@@ -152,11 +152,11 @@ public class SignavioConnectorTest {
     this.getSignavioConnector().login(config.getGlobalUser(), config.getGlobalPassword());
     ConnectorNode createdRootNode = null;
     try {
-      createdRootNode = this.getSignavioConnector().createNode(this.getSignavioConnector().getPrivateFolder().getId(), null, "TestFolder", ConnectorNodeType.FOLDER);
+      createdRootNode = this.getSignavioConnector().createNode(this.getSignavioConnector().getPrivateFolder().getId(), "TestFolder", ConnectorNodeType.FOLDER);
       assertEquals("TestFolder", createdRootNode.getLabel());
       assertEquals(ConnectorNodeType.FOLDER, createdRootNode.getType());
       
-      ConnectorNode newModel = this.getSignavioConnector().createNode(createdRootNode.getId(), null, "model1", ConnectorNodeType.BPMN_FILE);
+      ConnectorNode newModel = this.getSignavioConnector().createNode(createdRootNode.getId(), "model1", ConnectorNodeType.BPMN_FILE);
       assertEquals("model1", newModel.getLabel());
       assertEquals(ConnectorNodeType.BPMN_FILE, newModel.getType());
       
@@ -185,15 +185,15 @@ public class SignavioConnectorTest {
     this.getSignavioConnector().login(config.getGlobalUser(), config.getGlobalPassword());
     ConnectorNode createdRootNode = null;
     try {
-      createdRootNode = this.getSignavioConnector().createNode(this.getSignavioConnector().getPrivateFolder().getId(), null, "TestFolder", ConnectorNodeType.FOLDER);
+      createdRootNode = this.getSignavioConnector().createNode(this.getSignavioConnector().getPrivateFolder().getId(), "TestFolder", ConnectorNodeType.FOLDER);
       assertEquals("TestFolder", createdRootNode.getLabel());
       assertEquals(ConnectorNodeType.FOLDER, createdRootNode.getType());
       
-      ConnectorNode newFolder = this.getSignavioConnector().createNode(createdRootNode.getId(), null, "ChildFolder", ConnectorNodeType.FOLDER);
+      ConnectorNode newFolder = this.getSignavioConnector().createNode(createdRootNode.getId(), "ChildFolder", ConnectorNodeType.FOLDER);
       assertEquals("ChildFolder", newFolder.getLabel());
       assertEquals(ConnectorNodeType.FOLDER, newFolder.getType());
       
-      ConnectorNode newModel = this.getSignavioConnector().createNode(createdRootNode.getId(), null, "model1", ConnectorNodeType.BPMN_FILE);
+      ConnectorNode newModel = this.getSignavioConnector().createNode(createdRootNode.getId(), "model1", ConnectorNodeType.BPMN_FILE);
       assertEquals("model1", newModel.getLabel());
       assertEquals(ConnectorNodeType.BPMN_FILE, newModel.getType());
       

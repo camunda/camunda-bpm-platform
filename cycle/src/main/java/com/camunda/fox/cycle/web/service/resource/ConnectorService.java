@@ -53,7 +53,7 @@ public class ConnectorService {
   @GET
   @Path("{connectorId}/children")
   @Produces("application/json")
-  public List<ConnectorNodeDTO> children(@PathParam("connectorId") long connectorId, @QueryParam("nodeId") String nodeId) {
+  public List<ConnectorNodeDTO> children(@PathParam("connectorId") long connectorId, @QueryParam("nodeId") String nodeId, @QueryParam("type") List<ConnectorNodeType> connectorNodeTypes) {
     Connector connector = connectorRegistry.getConnector(connectorId);
     
     // Filter by content type
@@ -61,7 +61,7 @@ public class ConnectorService {
     Iterator<ConnectorNode> i = children.iterator();
     while (i.hasNext()) {
       ConnectorNode next = i.next();
-      if (!next.getType().isAnyOf(ConnectorNodeType.FOLDER, ConnectorNodeType.BPMN_FILE, ConnectorNodeType.PNG_FILE)) {
+      if (!next.getType().isAnyOf(connectorNodeTypes.toArray(new ConnectorNodeType[0]))) {
         i.remove();
       }
     }

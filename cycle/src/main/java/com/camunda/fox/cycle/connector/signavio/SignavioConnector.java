@@ -567,7 +567,7 @@ public class SignavioConnector extends Connector {
   }
 
   @Override
-  public ConnectorNode createNode(String parentId, String id, String label, ConnectorNodeType type) {
+  public ConnectorNode createNode(String parentId, String label, ConnectorNodeType type) {
     try {
       String response = "";
       ConnectorNode result = null;

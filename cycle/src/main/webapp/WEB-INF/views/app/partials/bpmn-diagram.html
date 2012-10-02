@@ -66,7 +66,8 @@
     <div class="modal" ng-controller="EditDiagramController" ngm-if="editDiagramDialog.renderHtml()">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal">&times;</button>
-        <h3 th:text="#{Add Diagram}"></h3>
+        <h3 data-ng-show="editDialogMode == 'ADD_DIAGRAM'" th:text="#{Add Diagram}"></h3>
+        <h3 data-ng-show="editDialogMode == 'CREATE_NEW_DIAGRAM'" th:text="#{Create Diagram}"></h3>
       </div>
       <div class="modal-body">
         <div class="alert alert-error" ng-show="error">
@@ -106,23 +107,32 @@
                 </select>
               </div>
             </div>
+            
             <div class="control-group" ng-show="connector">
-              <label class="control-label" for="tree" 
-                     th:text="#{'BPMN File'}" 
-                     th:attr="data-help=#{'Select a BPMN 2.0 file from the connector contents. Note that only <code>.xml</code> and <code>.bpmn</code> files may be selected by you.'}" 
-                     data-help-title="BPMN File">BPMN File</label>
-              
-              <div class="controls" style="margin-bottom: 10px;" >
-                <input data-ng-show="!diagram && editDiagram" data-ng-model="selectedNode.label" class="span8" disabled />
-                <div data-ng-switch on="!diagram && editDiagram">
-                    <!-- were are using form validation which has no support to check ng-show or ng-hide, 
-                    so switch is needed here to remove the element from dom: see https://groups.google.com/forum/?fromgroups=#!topic/angular/WxnYFbqjj30 -->
-                    <input data-ng-switch-when="false" data-ng-model="editDiagram.label" class="span8" required />
+              <div data-ng-switch on="editDialogMode">
+                <div data-ng-switch-when="CREATE_NEW_DIAGRAM">
+                  <label class="control-label" for="bpmnFileName"
+                         th:text="#{'BPMN Model Name'}" 
+                         th:attr="data-help=#{'The name for the BPMN 2.0 file.'}" 
+                         data-help-title="BPMN File Name">BPMN File Name</label>
+                  <div class="controls" style="margin-bottom: 10px;" >
+                    <input ng-model="editDiagram.label" id="bpmnFileName" name="name" type="text" class="input-xlarge" required />
+                  </div>
+                </div>
+                  
+                <div data-ng-switch-when="ADD_DIAGRAM">
+                  <label class="control-label" for="tree"
+                         th:text="#{'BPMN File'}" 
+                         th:attr="data-help=#{'Select a BPMN 2.0 file from the connector contents. Note that only <code>.xml</code> and <code>.bpmn</code> files may be selected by you.'}" 
+                         data-help-title="BPMN File">BPMN File</label>
+                  <div class="controls" style="margin-bottom: 10px;" >                         
+                    <input data-ng-model="selectedNode.label" class="span8" disabled />
+                  </div>
                 </div>
               </div>
               
               <div class="controls">
-                <div class="claro tree" data-cycle-tree data-selected="selectedNode" data-id="connectorTree" data-connector="connector">
+                <div class="claro tree" data-cycle-tree data-selected="selectedNode" data-id="connectorTree" data-connector="connector" data-filter="acceptedChildTypes()">
                 </div>
               </div>
             </div>
@@ -131,8 +141,8 @@
       </div>
       <div class="modal-footer">
         <button class="btn" ng-click="cancel()" th:text="#{Cancel}">Cancel</button>
-        <button href="#" class="btn btn-primary" data-ng-click="save()" data-ng-disabled="!isValid() || selectedNode.type == 'FOLDER' || diagram" th:text="#{Add}">Add</button>
-        <button href="#" class="btn btn-primary" data-ng-click="create()" data-ng-disabled="!isValidAndFolder()" th:text="#{Create}">Create</button>
+        <button href="#" data-ng-show="editDialogMode == 'ADD_DIAGRAM'" class="btn btn-primary" data-ng-click="save()" data-ng-disabled="!isValid()" th:text="#{Add}">Add</button>
+        <button href="#" data-ng-show="editDialogMode == 'CREATE_NEW_DIAGRAM'" class="btn btn-primary" data-ng-click="create()" data-ng-disabled="!isValidAndFolder()" th:text="#{Create}">Create</button>
       </div>
     </div>
   </dialog>

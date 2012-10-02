@@ -38,7 +38,7 @@ public abstract class AbstractConnectorTestBase {
   public void shouldCreateDirectory() throws Exception {
     
     Connector connector = getConnector();
-    ConnectorNode tmpFolder = connector.createNode("/", "//" + TMP_DIR_NAME, TMP_DIR_NAME, ConnectorNodeType.FOLDER);
+    ConnectorNode tmpFolder = connector.createNode("//", TMP_DIR_NAME, ConnectorNodeType.FOLDER);
     
     assertThat(tmpFolder, is(equalTo(TMP_FOLDER)));
     
@@ -62,7 +62,7 @@ public abstract class AbstractConnectorTestBase {
     for (String file: filesToImport) {
       InputStream is = getDiagramResourceAsStream(file);
       
-      ConnectorNode fileNode = connector.createNode("/", "//" + TMP_DIR_NAME + "/" + file, file, ConnectorNodeType.ANY_FILE);
+      ConnectorNode fileNode = connector.createNode("//" + TMP_DIR_NAME, file, ConnectorNodeType.ANY_FILE);
       connector.updateContent(fileNode, is);
       
       IoUtil.closeSilently(is);

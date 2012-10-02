@@ -45,7 +45,7 @@ public abstract class Connector {
    */
   public abstract ContentInformation getContentInformation(ConnectorNode node);
   
-  public abstract ConnectorNode createNode(String parentId, String id, String label, ConnectorNodeType type);
+  public abstract ConnectorNode createNode(String parentId, String label, ConnectorNodeType type);
   
   public abstract void deleteNode(ConnectorNode node);
   

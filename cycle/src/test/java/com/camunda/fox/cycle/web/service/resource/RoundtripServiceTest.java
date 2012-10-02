@@ -59,12 +59,12 @@ public abstract class RoundtripServiceTest {
   public void before() throws FileNotFoundException, Exception {
     initConnector();
     
-    connector.createNode("/", "foo", "foo", ConnectorNodeType.FOLDER);
+    connector.createNode("/", "foo", ConnectorNodeType.FOLDER);
     
-    rightNode = connector.createNode("/", "foo/Impl", "Impl", ConnectorNodeType.ANY_FILE);
+    rightNode = connector.createNode("/foo", "Impl", ConnectorNodeType.ANY_FILE);
     connector.updateContent(rightNode, new FileInputStream(IoUtil.getFile("com/camunda/fox/cycle/roundtrip/collaboration_impl.bpmn")));
     
-    leftNode = connector.createNode("/", "foo/Modeler", "Modeler", ConnectorNodeType.ANY_FILE);
+    leftNode = connector.createNode("/foo", "Modeler", ConnectorNodeType.ANY_FILE);
     connector.updateContent(leftNode, new FileInputStream(IoUtil.getFile("com/camunda/fox/cycle/roundtrip/collaboration.bpmn")));
   }
   

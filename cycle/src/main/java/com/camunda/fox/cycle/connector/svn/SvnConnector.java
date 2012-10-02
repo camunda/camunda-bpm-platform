@@ -180,7 +180,7 @@ public class SvnConnector extends Connector {
   @Threadsafe
   @Secured
   @Override
-  public ConnectorNode createNode(String parentId, String id, String label, ConnectorNodeType type) {
+  public ConnectorNode createNode(String parentId, String label, ConnectorNodeType type) {
     try {
       
       if (type == null || type == ConnectorNodeType.UNSPECIFIED) {
@@ -188,6 +188,12 @@ public class SvnConnector extends Connector {
       }
       
       beginTransaction();
+      
+      String id = "";
+      if (!parentId.endsWith("/") && !label.startsWith("/")) {
+        parentId = parentId + "/";
+      }
+      id = parentId + label;
       
       String parentFolder = extractParentFolder(id);
       File temporaryFileStore = getTemporaryFileStore(parentFolder + File.separator + UUID.randomUUID().toString());

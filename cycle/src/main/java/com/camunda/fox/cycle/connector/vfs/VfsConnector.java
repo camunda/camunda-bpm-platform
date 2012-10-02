@@ -185,13 +185,19 @@ public class VfsConnector extends Connector {
   }
 
   @Override
-  public ConnectorNode createNode(String parentId, String id, String label, ConnectorNodeType type) {
+  public ConnectorNode createNode(String parentId, String label, ConnectorNodeType type) {
     
     if (type == null || type == ConnectorNodeType.UNSPECIFIED) {
       throw new IllegalArgumentException("Must specify a valid node type");
     }
     
     try {
+      String id = "";
+      if (!parentId.endsWith("/") && !label.startsWith("/")) {
+        parentId = parentId + "/";
+      }
+      id = parentId + label;
+      
       FileSystemManager fsManager = VFS.getManager();
       FileObject file = fsManager.resolveFile(this.createPath(id));
       
