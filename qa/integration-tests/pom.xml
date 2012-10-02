@@ -446,24 +446,23 @@
             <version>2.12</version>
             <configuration>
               <excludes>
-                <!-- HEMERA-2454 -->
-                <exclude>**/JobExecutorRequestContextSFSBDelegateTest.java</exclude>
-                <!-- WAS seems not open a new request context each time -->
-                <exclude>**/JobExecutorRequestContextRemoteInvocationTest.java</exclude>
                 <!-- NOT Implemented -->
                 <exclude>**/JobExecutorRequestContextLocalInvocationTest.java</exclude>
                 <!-- NOT Implemented -->
                 <exclude>**/ejb/local/*</exclude>
-                <!-- Arquillian WAS connector hides exception when using with @RunAsClient -->
+                <!-- HEMERA-2454 -->
+                <exclude>**/JobExecutorRequestContextSFSBDelegateTest.java</exclude>
+                <!-- HEMERA-2886 -->
+                <exclude>**/JobExecutorRequestContextRemoteInvocationTest.java</exclude>
+                <!-- HEMERA-2887 -->
                 <exclude>**/TestProcessEnginesXmlFails.java</exclude>
-                <!-- Only works if EAR classloader isolation is turned OFF (which is the default in AS7, but dunno in WAS8) -->
-                <exclude>**/TestFoxPlatformClientAsEjbModule_pasAsEjbModule.java</exclude>
-                <!-- Bug in OWB 1.1.0 -> ElContextStore is thread-bound -->
+                <!-- HEMERA-2888 -->
                 <exclude>**/CallActivityContextSwitchTest.java</exclude>
-                <!-- MultipleInvocationTest in each testclass fails,
-                 maybe because of same OWB-related bug occuring in CallActivityContextSwitchTest.java -->
+                <!-- HEMERA-2889 -->
                 <exclude>**/ejb/remote/*</exclude>
                 <exclude>**/ejb/*</exclude>
+                <!-- HEMERA-2980 -->
+                <exclude>**/TestFoxPlatformClientAsEjbModule_pasAsEjbModule.java</exclude>
               </excludes>
             </configuration>
           </plugin>
