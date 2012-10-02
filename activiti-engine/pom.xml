@@ -549,7 +549,7 @@
       <dependencies>
         <dependency>
           <groupId>com.oracle.jdbc</groupId>
-          <artifactId>ojdbc5</artifactId>
+          <artifactId>ojdbc6</artifactId>
           <scope>test</scope>
         </dependency>
       </dependencies>
