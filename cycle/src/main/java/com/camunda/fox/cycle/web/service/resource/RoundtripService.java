@@ -91,6 +91,18 @@ public class RoundtripService extends AbstractRestService {
     update(roundtrip, data);
     return RoundtripDTO.wrap(roundtripRepository.saveAndFlush(roundtrip));
   }
+  
+  @POST
+  @Path("{id}/delete")
+  @Transactional
+  public void delete(@PathParam("id") long id) {
+    Roundtrip roundtrip = roundtripRepository.findById(id);
+    if (roundtrip == null) {
+      throw new IllegalArgumentException("Not found");
+    }
+    
+    roundtripRepository.delete(roundtrip);
+  }
 
   /**
    * Non $resource specific methods

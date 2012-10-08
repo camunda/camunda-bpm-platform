@@ -524,13 +524,14 @@ function CreateNewRoundtripController($scope, $q, $http, $location, Debouncer, A
  * Responsible for listing the roundtrips and updating the currently selected one
  * 
  */
-function ListRoundtripsController($scope, $routeParams, Roundtrip, Event) {
+function ListRoundtripsController($scope, $routeParams, $http, $location, Roundtrip, Event, App) {
   
   // TODO: Add documentation page
   $scope.roundtrips = Roundtrip.query();
   $scope.newRoundtripDialog = new Dialog();
+  $scope.deleteRoundtripDialog = new Dialog();
   
-  var selectedRoundtripId = null; 
+  var selectedRoundtripId = null;
   
   // Update the selected roundtrip on route change
   $scope.$watch(function() { return $routeParams.roundtripId; }, function(newValue, oldValue) {
@@ -555,6 +556,10 @@ function ListRoundtripsController($scope, $routeParams, Roundtrip, Event) {
     $scope.newRoundtripDialog.open();
   };
   
+  $scope.deleteRoundtrip = function() {
+     $scope.deleteRoundtripDialog.open();
+  };
+  
   $scope.activeClass = function(roundtrip) {
     return (roundtrip.id == selectedRoundtripId ? 'active' : '');
   };
@@ -562,4 +567,48 @@ function ListRoundtripsController($scope, $routeParams, Roundtrip, Event) {
   $scope.$on(Event.roundtripAdded, function(event, roundtrip) {
     $scope.roundtrips.push(roundtrip);
   });
+  
+};
+
+/**
+ * Responsible to delete roundtrips
+ * 
+ */
+function DeleteRoundtripController($scope, $routeParams, $http, $location, App) {
+	
+  var PERFORM_DEL = "performRoundtripDeletion",
+  	  DEL_SUCCESS = "deletionSuccess",
+  	  DEL_FAILED = "deletionFailed";
+  
+  $scope.toBeDeleted = PERFORM_DEL;
+  
+  function findRoundtripById(roundtrips, roundtripId) {
+	  var roundtrip = null;
+	  
+	  angular.forEach(roundtrips, function(e, i) {
+		  if (e.id == roundtripId) {
+			  roundtrip = e;
+		  }
+	  });
+	  
+	  return roundtrip;
+  }
+  
+  $scope.performDeletion = function() {
+	if (!$routeParams.roundtripId) {
+		return;
+	}
+	
+	var roundtrip = findRoundtripById($scope.roundtrips, $routeParams.roundtripId);
+	
+    $http.post(App.uri("secured/resource/roundtrip/" + $routeParams.roundtripId + "/delete"))    
+    .success(function(data) {
+    	 $scope.toBeDeleted = DEL_SUCCESS;
+    	 $scope.roundtrips.splice($scope.roundtrips.indexOf(roundtrip), 1);
+		 $location.path("/");
+	})
+	.error(function(data) {
+		$scope.toBeDeleted = DEL_FAILED;
+	});
+  };
 };

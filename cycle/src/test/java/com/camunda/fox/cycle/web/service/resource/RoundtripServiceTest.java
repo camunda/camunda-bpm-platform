@@ -8,10 +8,12 @@ import static org.junit.Assert.assertTrue;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.Date;
+import java.util.List;
 
 import javax.inject.Inject;
 
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -125,6 +127,19 @@ public abstract class RoundtripServiceTest {
     assertTrue(!IoUtil.toString(connector.getContent(rightNode)).contains("activiti:class=\"java.lang.Object\""));
   }
   
+  @Test
+  public void shouldDeleteRoundtrip() {
+    RoundtripDTO roundtripDTO = createTestRoundtripDTO();
+    roundtripDTO = roundtripService.create(roundtripDTO);
+    
+    Roundtrip roundtrip = roundtripRepository.findById(roundtripDTO.getId());
+    Assert.assertNotNull(roundtrip);
+    
+    roundtripRepository.delete(roundtrip.getId());
+    
+    Roundtrip deletedRoundtrip = roundtripRepository.findById(roundtrip.getId());
+    Assert.assertNull(deletedRoundtrip);
+  }
 
   private RoundtripDTO createTestRoundtripDTO() {
     RoundtripDTO dto = new RoundtripDTO();

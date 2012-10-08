@@ -35,7 +35,10 @@
 	              <li ng-repeat="roundtrip in roundtrips" class="roundtrip-link-{{roundtrip.id}}" ng-class="activeClass(roundtrip)" ng-cloak>
 	                <a ng-click="selectRoundtrip(roundtrip)" href="#/roundtrip/{{roundtrip.id}}">{{roundtrip.name}}</a>
 	              </li>
-	              <li><a class="btn" ng-click="createNew()" style="margin-top: 30px; display: inline-block"><span th:text="#{Create}">Create</span></a></li>
+	              <li>
+                    <a class="btn" ng-click="createNew()" style="margin-top: 30px; display: inline-block"><span th:text="#{Create}">Create</span></a>
+                    <a class="btn" data-ng-click="deleteRoundtrip()" style="margin-top: 30px; margin-left: 15px; display: inline-block"><span th:text="#{Delete}">Delete</span></a>
+                  </li>
 	            </ul>
 	            <!-- begin create-roundtrip-dialog -->
 	            <dialog model="newRoundtripDialog" ng-cloak>
@@ -74,10 +77,56 @@
 	              </div>
 	            </dialog>
 	            <!-- end create-roundtrip-dialog -->
+                <!-- begin delete-roundtrip-dialog -->
+                <dialog model="deleteRoundtripDialog" ng-cloak>
+                <div class="modal hide fade" data-ng-controller="DeleteRoundtripController" ngm-if="deleteRoundtripDialog.renderHtml()"> 
+                  <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h3 th:text="#{'Delete roundtrip'}"></h3>
+                  </div>
+                  <div class="modal-body">
+                  <div data-ng-switch data-on="toBeDeleted">
+                    <div data-ng-switch-when="performRoundtripDeletion">
+                        <p> 
+                         <span th:text="#{'Are you sure you would like to delete the selected roundtrip?'}">
+                            Are you sure you would like to delete the selected roundtrip?
+                         </span>
+                        </p>
+                    </div>
+                    <div data-ng-switch-when="deletionSuccess">
+                        <p> 
+                         <span th:text="#{The deletion of the roundtrip was successful.}">
+                            The deletion of the roundtrip was successful.
+                         </span>
+                         </p>
+                    </div>
+                    <div data-ng-switch-when="deletionFailed">
+                        <p>
+                          <span th:text="#{The deletion of the roundtrip failed.}">
+                            The deletion of the roundtrips failed.
+                          </span>
+                        </p>
+                    </div>
+                  </div>
+                  </div>
+                  <div class="modal-footer">
+                    <button data-dismiss="modal" class="btn"                
+                            data-ng-disabled="status == 'performRoundtripDeletion'"
+                            data-ng-click="deleteRoundtripDialog.close()">Cancel</button>
+                    <button data-dismiss="modal" class="btn"
+                            data-ng-hide="status == 'performRoundtripDeletion'" 
+                            data-ng-click="performDeletion()">OK</button>
+                    <button data-dismiss="modal" class="btn"
+                            data-ng-show="status == 'deletionSuccess'" 
+                            data-ng-click="refreshPath()">OK</button>
+                  </div>
+                </div>
+                </dialog>  
+                <!-- end delete-roundtrip-dialog -->
 	          </div>
 	        </div>
 	        <!-- actual view body is rendered here whenever the url changes -->
-	        <div ng-view class="span9">
+	        <div data-ng-view class="span9">
 	        </div>
 	      </div>
 	    </div>
