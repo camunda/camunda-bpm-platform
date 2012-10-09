@@ -614,3 +614,18 @@ function DeleteRoundtripController($scope, $routeParams, $http, $location, App) 
 	});
   };
 };
+
+function ConnectorSetupController($scope, App, Event) {
+	$scope.createNewConnectorDialog = new Dialog();
+	
+	$scope.$emit(Event.navigationChanged, {name:"Connector setup"});
+	
+	$scope.createNewConnector = function() {
+		$scope.createNewConnectorDialog.open();
+	};
+	
+};
+
+function CreateNewConnectorController($scope, App) {
+	
+};
