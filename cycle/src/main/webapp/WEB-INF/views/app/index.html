@@ -81,7 +81,7 @@
                 <dialog model="deleteRoundtripDialog" ng-cloak>
                 <div class="modal hide fade" data-ng-controller="DeleteRoundtripController" ngm-if="deleteRoundtripDialog.renderHtml()"> 
                   <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <button ng-show="deleteRoundtripDialog.autoClosable" type="button" class="close" data-dismiss="modal">&times;</button>
                     <h3 th:text="#{'Delete roundtrip'}"></h3>
                   </div>
                   <div class="modal-body">
@@ -110,15 +110,15 @@
                   </div>
                   </div>
                   <div class="modal-footer">
-                    <button data-dismiss="modal" class="btn"                
-                            data-ng-disabled="status == 'performRoundtripDeletion'"
+                    <button class="btn"      
+                            data-ng-show="toBeDeleted == 'performRoundtripDeletion'"
                             data-ng-click="deleteRoundtripDialog.close()">Cancel</button>
-                    <button data-dismiss="modal" class="btn"
-                            data-ng-hide="status == 'performRoundtripDeletion'" 
-                            data-ng-click="performDeletion()">OK</button>
-                    <button data-dismiss="modal" class="btn"
-                            data-ng-show="status == 'deletionSuccess'" 
-                            data-ng-click="refreshPath()">OK</button>
+                    <button class="btn btn-primary"
+                            data-ng-show="toBeDeleted == 'deletionSuccess' || toBeDeleted == 'deletionFailed'" 
+                            data-ng-click="deleteRoundtripDialog.close()">OK</button>
+                    <button class="btn btn-primary"
+                            data-ng-show="toBeDeleted == 'performRoundtripDeletion'" 
+                            data-ng-click="performDeletion()">Delete</button>
                   </div>
                 </div>
                 </dialog>  

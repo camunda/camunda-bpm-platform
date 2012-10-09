@@ -529,7 +529,9 @@ function ListRoundtripsController($scope, $routeParams, $http, $location, Roundt
   // TODO: Add documentation page
   $scope.roundtrips = Roundtrip.query();
   $scope.newRoundtripDialog = new Dialog();
+  
   $scope.deleteRoundtripDialog = new Dialog();
+  $scope.deleteRoundtripDialog.setAutoClosable(false);
   
   var selectedRoundtripId = null;
   
