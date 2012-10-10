@@ -36,11 +36,11 @@ public class JcaWorkManagerPlatformJobExecutor extends PlatformJobExecutor imple
     this.ra = platformJobExecutorConnector;
   }
 
-  public void executeJobs(List<String> jobIds, CommandExecutor commandExecutor) {
+  public void executeJobs(final List<String> jobIds, final CommandExecutor commandExecutor) {
     try {
-      workManager.scheduleWork(new JcaWorkRunnableAdapter(new JcaInflowExecuteJobsRunnable(jobIds, commandExecutor, ra)));
+      workManager.scheduleWork(new JcaWorkRunnableAdapter(new JcaInflowExecuteJobsRunnable(jobIds, commandExecutor, ra)), 500, null, null);
     } catch (WorkRejectedException e) {
-      // simmulate caller runs policy (execute runnable in our thread)
+      // simulate caller runs policy (execute runnable in our thread)
       // TODO: add pluggable strategy
       new PlatformExecuteJobsRunnable(jobIds, commandExecutor).run();
     } catch (WorkException e) {
@@ -71,7 +71,7 @@ public class JcaWorkManagerPlatformJobExecutor extends PlatformJobExecutor imple
 
   public void setReference(Reference reference) {
     this.reference = reference;        
-  }  
+  }
   
   // getters / setters ////////////////////////////////////
   

@@ -1,10 +1,11 @@
 package com.camunda.fox.platform.test.functional.ejb.request.beans;
 
-import javax.ejb.EJB;
 import javax.inject.Named;
 
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.JavaDelegate;
+
+import com.camunda.fox.platform.test.util.JndiConstants;
 
 /**
  * 
@@ -14,10 +15,10 @@ import org.activiti.engine.delegate.JavaDelegate;
 @Named
 public class InvocationCounterDelegateBean implements JavaDelegate {
   
-  @EJB(lookup="java:global/" +
-    "service/" +
-  	"InvocationCounterServiceBean!com.camunda.fox.platform.test.functional.ejb.request.beans.InvocationCounterService")
-  private InvocationCounterService invocationCounterService;
+  private InvocationCounterService invocationCounterService = JndiConstants.lookup("java:global/" +
+              JndiConstants.getAppName() +
+              "service/" +
+              "InvocationCounterServiceBean!com.camunda.fox.platform.test.functional.ejb.request.beans.InvocationCounterService");
 
   public void execute(DelegateExecution execution) throws Exception {    
     execution.setVariable("invocationCounter", invocationCounterService.getNumOfInvocations());      

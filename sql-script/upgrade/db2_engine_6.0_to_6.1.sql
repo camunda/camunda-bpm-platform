@@ -1,20 +1,25 @@
 /** 03.08.2012 */
+/** NOTE: Need to change the "CALL SYSPROC.ADMIN_REVALIDATE_DB_OBJECTS('TABLE', '<SCHEMA>', NULL);"-Statement - replace <SCHEMA> in Line 67 */ 
 alter table ACT_RU_EXECUTION add CACHED_ENT_STATE_ integer;
 update ACT_RU_EXECUTION set CACHED_ENT_STATE_ = 7;
 
-create index ACT_IDX_HI_DETAIL_TASK_ID on ACT_HI_DETAIL(TASK_ID_);
+alter table ACT_RU_IDENTITYLINK
+add PROC_DEF_ID_ varchar(64);
 
 create index ACT_IDX_ATHRZ_PROCEDEF on ACT_RU_IDENTITYLINK(PROC_DEF_ID_);
 
+alter table ACT_RE_PROCDEF
+    alter column KEY_ set not null;
+
 alter table ACT_RE_PROCDEF 
-    add constraint ACT_UNIQ_PROCDEF
-    unique (KEY_,VERSION_);
+    alter column VERSION_ set not null;
+
     
 create table ACT_HI_PROCVARIABLE (
     ID_ varchar(64) not null,
     PROC_INST_ID_ varchar(64) not null,
     NAME_ varchar(255) not null,
-    VAR_TYPE_ varchar(255),
+    VAR_TYPE_ varchar(100),
     REV_ integer,
     BYTEARRAY_ID_ varchar(64),
     DOUBLE_ double precision,
@@ -28,14 +33,12 @@ create index ACT_IDX_HI_PROCVAR_PROC_INST on ACT_HI_PROCVARIABLE(PROC_INST_ID_);
 create index ACT_IDX_HI_PROCVAR_NAME_TYPE on ACT_HI_PROCVARIABLE(NAME_, VAR_TYPE_);
 
 alter table ACT_HI_ACTINST
-add (TASK_ID_ varchar(64), CALL_PROC_INST_ID_ varchar(64));
+add TASK_ID_ varchar(64);
+
+alter table ACT_HI_ACTINST
+add CALL_PROC_INST_ID_ varchar(64);
 
 /** 17.08.2012 */
-alter table ACT_RE_PROCDEF
-    alter column KEY_ set not null;
-
-alter table ACT_RE_PROCDEF 
-    alter column VERSION_ set not null;
 
 /**  fill table ACT_HI_PROCVARIABLE when HISTORY_LEVEL FULL is set, could take a long time depending on the amount of data! */
 insert into ACT_HI_PROCVARIABLE
@@ -61,19 +64,15 @@ set VALUE_ = VALUE_ + 1,
     REV_ = REV_ + 1
 where NAME_ = 'historyLevel' and VALUE_ >= 2;
 
-alter table ACT_HI_ACTINST
-add TASK_ID_ varchar(64);
-
-alter table ACT_HI_ACTINST
-add CALL_PROC_INST_ID_ varchar(64);
-
-alter table ACT_RU_IDENTITYLINK
-add PROC_DEF_ID_ varchar(64);
-
+CALL SYSPROC.ADMIN_REVALIDATE_DB_OBJECTS('TABLE', '<SCHEMA>', NULL);
 alter table ACT_RU_EXECUTION
     add constraint ACT_FK_EXE_PROCDEF 
     foreign key (PROC_DEF_ID_) 
-    references ACT_RE_PROCDEF (ID_);  
+    references ACT_RE_PROCDEF (ID_);
+	
+alter table ACT_RE_PROCDEF 
+    add constraint ACT_UNIQ_PROCDEF
+    unique (KEY_,VERSION_);
 
 alter table ACT_RU_IDENTITYLINK
     add constraint ACT_FK_ATHRZ_PROCEDEF 
@@ -81,7 +80,7 @@ alter table ACT_RU_IDENTITYLINK
     references ACT_RE_PROCDEF (ID_);
 
 alter table ACT_HI_DETAIL
-  alter column PROC_DEF_ID_ set null;
+  alter column PROC_INST_ID_ DROP NOT NULL;
 
 alter table ACT_HI_DETAIL
-  alter column EXECUTION_ID_ set null;
+  alter column EXECUTION_ID_ DROP NOT NULL;

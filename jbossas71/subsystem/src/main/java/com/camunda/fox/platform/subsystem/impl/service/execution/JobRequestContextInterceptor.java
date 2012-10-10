@@ -4,6 +4,8 @@ import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.enterprise.context.ContextNotActiveException;
+import javax.enterprise.context.RequestScoped;
 import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
@@ -60,15 +62,26 @@ public class JobRequestContextInterceptor implements ProcessArchiveCallback<Void
     final InvocationContext invocationContext = new JobInvocationContext();
     
     try {
+      // if this call succeeds then the context is already active
+      // HEMERA-2789
+      beanManager.getContext(RequestScoped.class);
+      executeJobCommand.execute(commandContext);
+      return;
+    } catch (ContextNotActiveException exception) {
+    }
+    
+    try {
       // activate the CDI request context
       requestContext.associate(invocationContext);
       requestContext.activate();
 
       // now actually execute the job
       executeJobCommand.execute(commandContext);
+      return;
       
     } finally {
       // deactivate the CDI request context
+      requestContext.invalidate();
       requestContext.deactivate();
       requestContext.dissociate(invocationContext);              
     }    

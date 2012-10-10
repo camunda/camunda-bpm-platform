@@ -99,7 +99,7 @@ public class ProcessEnginesXmlSupportImpl implements ProcessEnginesXmlSupport {
           throw new FoxPlatformException("ExecutionException while waiting for process engine to start", e);
         }
       }
-      // then trow exception:
+      // then throw exception:
       throw new FoxPlatformException("Could not start all configured process engines, see logs for details.");
     } else { 
       log.info(startingEngines.size() +" process engines started sucessfully.");
@@ -130,7 +130,7 @@ public class ProcessEnginesXmlSupportImpl implements ProcessEnginesXmlSupport {
         errorMessage.append("   ");
         errorMessage.append(engineName);
       }
-      errorMessage.append("Consider restarting the fox platform.");
+      errorMessage.append("\nConsider restarting the fox platform.");
       log.severe(errorMessage.toString());      
     }
   }

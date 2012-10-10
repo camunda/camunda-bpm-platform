@@ -124,7 +124,7 @@
                     </validation>
                 </datasource>
                 <datasource jta="true" jndi-name="java:jboss/datasources/CycleDS" pool-name="CycleDS" enabled="true" use-java-context="true" use-ccm="true">
-                    <connection-url>jdbc:mysql://${database.host}:3306/c${database.name}</connection-url>
+                    <connection-url>jdbc:mysql://${database.host}:3306/${database.name}</connection-url>
                     <driver>com.mysql</driver>
                     <transaction-isolation>TRANSACTION_READ_COMMITTED</transaction-isolation>
                     <pool>

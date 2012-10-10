@@ -7,7 +7,7 @@
   <parent>
     <groupId>com.camunda.fox.platform</groupId>
     <artifactId>fox-platform-qa</artifactId>
-    <version>6.1.0-SNAPSHOT</version>
+    <version>6.2.0-SNAPSHOT</version>
   </parent>
   
   <dependencies>
@@ -437,14 +437,7 @@
             <artifactId>maven-surefire-plugin</artifactId>
             <version>2.12</version>
             <configuration>
-              <excludes>
-                <!-- HEMERA-2454 -->
-                <exclude>**/JobExecutorRequestContextSFSBDelegateTest.java</exclude>
-                <!-- NOT Implemented -->
-                <exclude>**/JobExecutorRequestContextLocalInvocationTest.java</exclude>
-                <!-- NOT Implemented -->
-                <exclude>**/ejb/local/*</exclude>
-              </excludes>
+              <skipTests>true</skipTests>
             </configuration>
           </plugin>
         </plugins>      

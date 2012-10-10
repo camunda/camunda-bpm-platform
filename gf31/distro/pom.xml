@@ -7,7 +7,7 @@
   <parent>
     <groupId>com.camunda.fox.platform</groupId>
     <artifactId>fox-platform-glassfish</artifactId>
-    <version>6.1.0-SNAPSHOT</version>
+    <version>6.2.0-SNAPSHOT</version>
   </parent>
 
   <name>fox platform EE - Glassfish 3.1.x Distro</name>
@@ -22,7 +22,7 @@
       <type>pom</type>
       <scope>provided</scope>
     </dependency>
-    
+
     <dependency>
   	  <groupId>com.camunda.fox.platform</groupId>
   	  <artifactId>fox-platform-sql-script</artifactId>
@@ -34,12 +34,6 @@
     <dependency>
       <groupId>com.camunda.fox.cockpit</groupId>
       <artifactId>cockpit-sql-scripts</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    
-    <dependency>
-      <groupId>com.camunda.fox.cycle</groupId>
-      <artifactId>cycle-sql-scripts</artifactId>
       <version>${project.version}</version>
     </dependency>
     

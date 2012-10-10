@@ -26,6 +26,7 @@ import static org.jboss.as.controller.parsing.ParseUtils.requireSingleAttribute;
 import static org.jboss.as.controller.parsing.ParseUtils.unexpectedAttribute;
 import static org.jboss.as.controller.parsing.ParseUtils.unexpectedElement;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -89,11 +90,13 @@ public class FoxPlatformParser implements XMLStreamConstants, XMLElementReader<L
       throw unexpectedElement(reader);
     }
     
+    List<String> discoveredEngineNames = new ArrayList<String>();
+    
     while (reader.hasNext() && reader.nextTag() != END_ELEMENT) {
       final Element element = Element.forName(reader.getLocalName());
       switch (element) {
         case PROCESS_ENGINE: {
-          parseProcessEngine(reader, list, parentAddress);
+          parseProcessEngine(reader, list, parentAddress, discoveredEngineNames);
           break;
         }
         default: {
@@ -103,7 +106,7 @@ public class FoxPlatformParser implements XMLStreamConstants, XMLElementReader<L
     }
   }
   
-  private void parseProcessEngine(XMLExtendedStreamReader reader, List<ModelNode> list, ModelNode parentAddress) throws XMLStreamException {
+  private void parseProcessEngine(XMLExtendedStreamReader reader, List<ModelNode> list, ModelNode parentAddress, List<String> discoveredEngineNames) throws XMLStreamException {
     if (!Element.PROCESS_ENGINE.getLocalName().equals(reader.getLocalName())) {
         throw unexpectedElement(reader);
     }
@@ -140,7 +143,11 @@ public class FoxPlatformParser implements XMLStreamConstants, XMLElementReader<L
       addProcessEngine.get(Attribute.DEFAULT.getLocalName()).set(isDefault);
     }
     
-    checkIfProcessNameWithNameExists(list, engineName);
+    if(discoveredEngineNames.contains(engineName)) {
+      throw new FoxPlatformException("A process engine with name '"+engineName+"' already exists. The process engine name must be unique.");
+    } else {
+      discoveredEngineNames.add(engineName);
+    }
     
     list.add(addProcessEngine);
     
@@ -162,17 +169,6 @@ public class FoxPlatformParser implements XMLStreamConstants, XMLElementReader<L
         }
         default: {
           throw unexpectedElement(reader);
-        }
-      }
-    }
-  }
-  
-  private void checkIfProcessNameWithNameExists(List<ModelNode> list, String engineName) {
-    for (ModelNode modelNode : list) {
-      if (modelNode.hasDefined(Attribute.NAME.getLocalName())) {
-        String existingEngineName = modelNode.get(Attribute.NAME.getLocalName()).asString();
-        if ((existingEngineName.equalsIgnoreCase(engineName))) {
-          throw new FoxPlatformException("A process engine with name '" + engineName + "' already exists. Please chose another name.");
         }
       }
     }

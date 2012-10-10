@@ -1,5 +1,6 @@
 package com.camunda.fox.platform.jobexecutor.impl.ra;
 
+import java.util.ServiceLoader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -11,10 +12,11 @@ import javax.resource.spi.ResourceAdapter;
 import javax.resource.spi.ResourceAdapterInternalException;
 import javax.resource.spi.TransactionSupport;
 import javax.resource.spi.endpoint.MessageEndpointFactory;
+import javax.resource.spi.work.WorkManager;
 import javax.transaction.xa.XAResource;
 
 import com.camunda.fox.platform.jobexecutor.impl.PlatformJobExecutor;
-import com.camunda.fox.platform.jobexecutor.impl.ra.execution.JcaWorkManagerPlatformJobExecutor;
+import com.camunda.fox.platform.jobexecutor.impl.ra.execution.spi.PlatformJobExecutorFactory;
 import com.camunda.fox.platform.jobexecutor.impl.ra.inflow.JobExecutionHandlerActivation;
 import com.camunda.fox.platform.jobexecutor.impl.ra.inflow.JobExecutionHandlerActivationSpec;
 import com.camunda.fox.platform.jobexecutor.ra.inflow.JobExecutionHandler;
@@ -33,15 +35,24 @@ public class PlatformJobExecutorConnector implements ResourceAdapter {
   private static Logger log = Logger.getLogger(PlatformJobExecutorConnector.class.getName());
 
   protected JobExecutionHandlerActivation jobHandlerActivation;
-  protected JcaWorkManagerPlatformJobExecutor platformJobExecutor;
+  protected PlatformJobExecutor platformJobExecutor;
 
+  protected WorkManager workManager;
+  
   public PlatformJobExecutorConnector() {
   }
   
   // RA-Lifecycle ///////////////////////////////////////////////////
   
   public void start(BootstrapContext ctx) throws ResourceAdapterInternalException {
-    platformJobExecutor = new JcaWorkManagerPlatformJobExecutor(ctx.getWorkManager(),this);
+    workManager = ctx.getWorkManager();
+    
+    ServiceLoader<PlatformJobExecutorFactory> serviceLoader = ServiceLoader.load(PlatformJobExecutorFactory.class);
+    PlatformJobExecutorFactory platformJobExecutorFactory = serviceLoader.iterator().next();
+    if (platformJobExecutorFactory == null) {
+      
+    }
+    platformJobExecutor = platformJobExecutorFactory.createPlatformJobExecutor(this);
     platformJobExecutor.start();
     
     log.log(Level.INFO, "platform job executor started");
@@ -82,12 +93,16 @@ public class PlatformJobExecutorConnector implements ResourceAdapter {
   
   // getters ///////////////////////////////////////////////////////////////
   
-  public JcaWorkManagerPlatformJobExecutor getPlatformJobExecutor() {
+  public PlatformJobExecutor getPlatformJobExecutor() {
     return platformJobExecutor;
   }
    
   public JobExecutionHandlerActivation getJobHandlerActivation() {
     return jobHandlerActivation;
+  }
+  
+  public WorkManager getWorkManager() {
+    return workManager;
   }
   
   // misc //////////////////////////////////////////////////////////////////
