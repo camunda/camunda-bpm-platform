@@ -20,10 +20,10 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 
 import org.activiti.engine.ActivitiException;
+import org.activiti.engine.history.HistoricVariableInstance;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
-import org.activiti.engine.impl.persistence.entity.HistoricProcessVariableEntity;
 import org.activiti.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.activiti.engine.impl.util.IoUtil;
 import org.activiti.engine.impl.variable.ByteArrayType;
@@ -105,8 +105,8 @@ public class CmpeSerializableType extends SerializableType {
               .findExecutionById(executionId);
       
       processArchiveContext = processArchiveServices.getProcessArchiveContextForExecution(executionEntity);
-    } else if (valueFields instanceof HistoricProcessVariableEntity) {
-      HistoricProcessVariableEntity historicVar = (HistoricProcessVariableEntity) valueFields;
+    } else if (valueFields instanceof HistoricVariableInstance) {
+      HistoricVariableInstance historicVar = (HistoricVariableInstance) valueFields;
       ProcessEngineConfigurationImpl processEngineController = processArchiveServices.getProcessEngineController().getProcessEngineConfiguration();
       
       String processInstanceId = historicVar.getProcessInstanceId();
@@ -117,11 +117,15 @@ public class CmpeSerializableType extends SerializableType {
     }
           
     if(processArchiveContext == null) {
+     
       // use this classloader
       return getClass().getClassLoader();
-    }
+      
+    } else {
     
-    return processArchiveContext.getProcessArchive().getClassLoader();
+      return processArchiveContext.getProcessArchive().getClassLoader();
+      
+    }
   }
 
 }

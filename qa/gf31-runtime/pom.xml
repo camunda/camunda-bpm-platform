@@ -13,7 +13,7 @@
   <parent>
     <groupId>com.camunda.fox.platform</groupId>
     <artifactId>fox-platform-qa</artifactId>
-    <version>6.1.0-SNAPSHOT</version>
+    <version>6.2.0-SNAPSHOT</version>
   </parent>
 
   <dependencies>
@@ -49,11 +49,30 @@
                 <copy todir="target">
                   <fileset dir="${glassfish.server.location}" />
                 </copy>
-                <copy todir="target/glassfish3/glassfish" overwrite="true">
-                  <fileset dir="src/main" />
-                </copy>
               </target>
             </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <artifactId>maven-resources-plugin</artifactId>
+        <version>2.5</version>
+        <executions>
+          <execution>
+            <id>copy-resources</id>
+            <phase>package</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>${project.build.directory}/glassfish3/glassfish/domains</outputDirectory>
+              <resources>          
+                <resource>
+                  <directory>src/main/domains</directory>
+                  <filtering>true</filtering>
+                </resource>
+              </resources>              
+            </configuration>            
           </execution>
         </executions>
       </plugin>

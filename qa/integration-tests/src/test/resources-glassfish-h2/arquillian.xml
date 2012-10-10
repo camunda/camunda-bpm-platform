@@ -5,7 +5,7 @@
   <defaultProtocol type="Servlet 3.0" />
   
   <engine>
-        <property name="deploymentExportPath">target/deployments</property>
+    <property name="deploymentExportPath">target/deployments</property>
   </engine>
 
   <container qualifier="glassfish" default="true">

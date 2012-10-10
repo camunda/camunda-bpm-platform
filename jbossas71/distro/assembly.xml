@@ -117,7 +117,7 @@
   	<dependencySet>
   		<outputFileNameMapping>fox-cycle-${project.version}.${artifact.extension}</outputFileNameMapping>
   		<includes>
-  			<include>com.camunda.fox.cycle:cycle-webapp-fox:war:*</include>
+  			<include>com.camunda.fox.cycle:cycle-jboss:war:*</include>
   		</includes>
   		<outputDirectory>server/jboss-as-${version.jboss.as}/standalone/deployments</outputDirectory>
   	</dependencySet>

@@ -88,6 +88,10 @@ public abstract class PlatformService implements ProcessEngineService, ProcessAr
   // ProcessArchiveService implementation ////////////////////////////////////////////
   
   public ProcessArchiveInstallation installProcessArchive(ProcessArchive processArchive) {
+    return installProcessArchiveInternal(processArchive);
+  }
+  
+  public ProcessArchiveInstallation installProcessArchiveInternal(ProcessArchive processArchive) {
     if (processArchive.getName() == null) {
       throw new FoxPlatformException("Cannot install process archive: name is null");
     }
@@ -154,6 +158,10 @@ public abstract class PlatformService implements ProcessEngineService, ProcessAr
   }
 
   public void unInstallProcessArchive(String processArchiveName) {
+    unInstallProcessArchiveInternal(processArchiveName);
+  }
+  
+  public void unInstallProcessArchiveInternal(String processArchiveName) {
 
     final ProcessEngineController processEngine = processEnginesByProcessArchiveName.get(processArchiveName);
 
