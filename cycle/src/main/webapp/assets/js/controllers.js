@@ -533,14 +533,14 @@ function ListRoundtripsController($scope, $routeParams, $http, $location, Roundt
   $scope.deleteRoundtripDialog = new Dialog();
   $scope.deleteRoundtripDialog.setAutoClosable(false);
   
-  var selectedRoundtripId = null;
+  $scope.selectedRoundtripId = null;
   
   // Update the selected roundtrip on route change
   $scope.$watch(function() { return $routeParams.roundtripId; }, function(newValue, oldValue) {
     if (newValue) {
-      selectedRoundtripId = parseInt(newValue);
-      if (isNaN(selectedRoundtripId)) {
-        selectedRoundtripId = -1;
+      $scope.selectedRoundtripId = parseInt(newValue);
+      if (isNaN($scope.selectedRoundtripId)) {
+        $scope.selectedRoundtripId = null;
       } else {
         angular.forEach($scope.roundtrips, function(item) {
           if (item.id == $routeParams.roundtripId) {
@@ -550,7 +550,7 @@ function ListRoundtripsController($scope, $routeParams, $http, $location, Roundt
         });
       }
     } else {
-      selectedRoundtripId = -1;
+      $scope.selectedRoundtripId = null;
     }
   });
   
@@ -563,7 +563,7 @@ function ListRoundtripsController($scope, $routeParams, $http, $location, Roundt
   };
   
   $scope.activeClass = function(roundtrip) {
-    return (roundtrip.id == selectedRoundtripId ? 'active' : '');
+    return (roundtrip.id == $scope.selectedRoundtripId ? 'active' : '');
   };
   
   $scope.$on(Event.roundtripAdded, function(event, roundtrip) {

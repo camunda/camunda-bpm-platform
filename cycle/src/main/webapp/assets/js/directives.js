@@ -392,7 +392,7 @@ angular
  *   $model.close();
  * </script>
  */
-.directive('dialog', function($http, $timeout) {
+.directive('modalDialog', function($http, $timeout) {
   return {
     restrict: 'E',
     scope: {
@@ -437,12 +437,12 @@ angular
             // Model is still opened; refresh it asynchronously
             if (model().status != "closed") {
               $timeout(function() {
-                model().status = "closed";
+                model().setStatus("closed");
               });
             }
           })
           .on('shown', function() {
-            model().status = "open";
+            model().setStatus("open");
           })
           // and show modal
           .modal(options);
@@ -488,25 +488,30 @@ angular
  * dialog directive and attaches it to the given scope
  */
 function Dialog() {
-  
-  var self = this;
-  self.status = "closed";
-  self.autoClosable = true;
-  
-  this.open = function() {
-    self.status = "opening";
-  };
+  this.status = "closed";
+  this.autoClosable = true;
+}
 
-  this.close = function() {
-    self.data = {};
-    self.status = "closing";
-  };
-
-  this.setAutoClosable = function(closable) {
-    self.autoClosable = closable;
-  };
+Dialog.prototype = {
   
-  this.renderHtml = function() {
-    return self.status != "closed";
-  };
+  open: function() {
+    this.status = "opening";
+  }, 
+
+  close: function() {
+    this.status = "closing";
+  },
+
+  setStatus: function(status) {
+    console.log("new status: " + status);
+    this.status = status;
+  }, 
+  
+  setAutoClosable: function(closable) {
+    this.autoClosable = closable;
+  }, 
+  
+  renderHtml: function() {
+    return this.status != "closed";
+  }
 };

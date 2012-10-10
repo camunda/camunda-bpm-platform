@@ -120,15 +120,20 @@ input.ng-invalid-required {
 }
 
 /**
+ * roundtrip list
+ */
+li.actions .btn {
+  margin-top: 30px; 
+  margin-right: 30px;
+  display: inline-block;
+}
+
+/**
  * roundtrip view
  */
 .bpmn-model, .bpmn-model * {
   border: none 1px #DDD;
 }
-
-/*.bpmn-model:hover, .bpmn-model:hover * {
-  border-color: #BBB;
-}*/
 
 .bpmn-model.error, .bpmn-model.error * {
   border-color: #D9564B;

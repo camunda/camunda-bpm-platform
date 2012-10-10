@@ -62,7 +62,7 @@
   </div>
 
   <!-- begin add-model-roundtrip-dialog -->
-  <dialog model="editDiagramDialog" ng-cloak>
+  <modal-dialog model="editDiagramDialog" ng-cloak>
     <div class="modal" ng-controller="EditDiagramController" ngm-if="editDiagramDialog.renderHtml()">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal">&times;</button>
@@ -145,6 +145,6 @@
         <button href="#" data-ng-show="editDialogMode == 'CREATE_NEW_DIAGRAM'" class="btn btn-primary" data-ng-click="create()" data-ng-disabled="!isValidAndFolder()" th:text="#{Create}">Create</button>
       </div>
     </div>
-  </dialog>
+  </modal-dialog>
   <!-- end add-model-roundtrip-dialog -->
 </div>

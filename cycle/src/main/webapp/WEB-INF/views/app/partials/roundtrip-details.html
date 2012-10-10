@@ -47,7 +47,7 @@
   </div>
 
   <!-- begin sync-roundtrip-dialog -->
-  <dialog model="syncDialog" ng-cloak>
+  <modal-dialog model="syncDialog" ng-cloak>
     <div class="modal" ng-controller="SyncRoundtripController" ngm-if="syncDialog.renderHtml()">
       <div class="modal-header">
         <button ng-show="syncDialog.autoClosable" type="button" class="close" data-dismiss="modal">&times;</button>
@@ -114,11 +114,11 @@
                 ng-hide="status == 'synchronizationFailed' || status == 'synchronizationSuccess'">Synchronize</button>
       </div>
     </div>
-  </dialog>
+  </modal-dialog>
   <!-- end sync-roundtrip-dialog -->
 
   <!-- begin diagram-details-dialog -->
-  <dialog model="diagramDetailsDialog" ng-cloak>
+  <modal-dialog model="diagramDetailsDialog" ng-cloak>
     <div class="modal hide fade" id="pictureModal" ngm-if="diagramDetailsDialog.renderHtml()"> 
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal"
@@ -147,5 +147,5 @@
         <button data-dismiss="modal" class="btn">Close</button>
       </div>
     </div>
-  </dialog>
+  </modal-dialog>
 </div>
