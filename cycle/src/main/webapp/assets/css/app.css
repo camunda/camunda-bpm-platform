@@ -326,3 +326,13 @@ div#pictureModal.modal.hide.fade {
   -moz-border-radius: 3px;
   border-radius: 3px;
 }
+
+/** connector list table **/
+.table {
+  border: 1px solid #E5E5E5;
+  width:100%;
+}
+
+.table thead th {
+  background-color: #DDDDDD;
+}
