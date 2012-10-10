@@ -30,7 +30,7 @@ function DefaultController($scope, $http, $location, App, Event, Error) {
       var remove = 0;
       angular.forEach(breadCrumbs, function(item) {
         if(item.name == navigationItem.name) {
-          contains = true;			
+          contains = true;
         }
         if(item.href.indexOf($location.path()) != 0) {
           remove++;
@@ -38,7 +38,7 @@ function DefaultController($scope, $http, $location, App, Event, Error) {
       });
 
       for (var i = 0; i < remove; i++) {
-        breadCrumbs.pop();						
+        breadCrumbs.pop();
       }
 
       if(!contains) {
@@ -504,7 +504,7 @@ function CreateNewRoundtripController($scope, $q, $http, $location, Debouncer, A
    * @param name to be checked
    * 
    * @returns promise to be fulfilled when the check was done
-   */ 
+   */
   function isNameValid(name) {
     var deferred = $q.defer();
     
@@ -577,40 +577,39 @@ function ListRoundtripsController($scope, $routeParams, $http, $location, Roundt
  * 
  */
 function DeleteRoundtripController($scope, $routeParams, $http, $location, App) {
-	
+
   var PERFORM_DEL = "performRoundtripDeletion",
-  	  DEL_SUCCESS = "deletionSuccess",
-  	  DEL_FAILED = "deletionFailed";
+      DEL_SUCCESS = "deletionSuccess",
+      DEL_FAILED = "deletionFailed";
   
   $scope.toBeDeleted = PERFORM_DEL;
   
   function findRoundtripById(roundtrips, roundtripId) {
-	  var roundtrip = null;
-	  
-	  angular.forEach(roundtrips, function(e, i) {
-		  if (e.id == roundtripId) {
-			  roundtrip = e;
-		  }
-	  });
-	  
-	  return roundtrip;
+    var roundtrip = null;
+    
+    angular.forEach(roundtrips, function(e, i) {
+      if (e.id == roundtripId) {
+        roundtrip = e;
+      }
+    });
+
+    return roundtrip;
   }
   
   $scope.performDeletion = function() {
-	if (!$routeParams.roundtripId) {
-		return;
-	}
-	
-	var roundtrip = findRoundtripById($scope.roundtrips, $routeParams.roundtripId);
-	
-    $http.post(App.uri("secured/resource/roundtrip/" + $routeParams.roundtripId + "/delete"))    
-    .success(function(data) {
-    	 $scope.toBeDeleted = DEL_SUCCESS;
-    	 $scope.roundtrips.splice($scope.roundtrips.indexOf(roundtrip), 1);
-		 $location.path("/");
-	})
-	.error(function(data) {
-		$scope.toBeDeleted = DEL_FAILED;
-	});
+    if (!$routeParams.roundtripId) {
+      return;
+    }
+    
+    var roundtrip = findRoundtripById($scope.roundtrips, $routeParams.roundtripId);
+    $http.post(App.uri("secured/resource/roundtrip/" + $routeParams.roundtripId + "/delete"))
+      .success(function(data) {
+        $scope.toBeDeleted = DEL_SUCCESS;
+        $scope.roundtrips.splice($scope.roundtrips.indexOf(roundtrip), 1);
+        $location.path("/");
+      })
+      .error(function(data) {
+        $scope.toBeDeleted = DEL_FAILED;
+      });
   };
-};
+}
