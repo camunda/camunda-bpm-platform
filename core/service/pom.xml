@@ -63,47 +63,43 @@
 			<scope>provided</scope>
 		</dependency>
     
-        <!-- test infrastructure -->        
-        <dependency>
-          <groupId>junit</groupId>
-          <artifactId>junit</artifactId>
-          <scope>test</scope>
-        </dependency>
-        
-        <dependency>
-          <groupId>org.springframework</groupId>
-          <artifactId>spring-test</artifactId>
-          <scope>test</scope>
-        </dependency>
-        
-        <dependency>
-         	<groupId>commons-dbcp</groupId>
-	       <artifactId>commons-dbcp</artifactId>
-          <scope>test</scope>
-        </dependency>
-        
-        <dependency>
-          <groupId>com.h2database</groupId>
-          <artifactId>h2</artifactId>
-          <scope>test</scope>
-        </dependency>
-        
-        <dependency>
-          <groupId>com.fasterxml.uuid</groupId>
-          <artifactId>java-uuid-generator</artifactId>
-          <scope>test</scope>
-        </dependency>
+    <!-- test infrastructure -->        
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+    
+    <dependency>
+     	<groupId>commons-dbcp</groupId>
+     <artifactId>commons-dbcp</artifactId>
+      <scope>test</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <scope>test</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>com.fasterxml.uuid</groupId>
+      <artifactId>java-uuid-generator</artifactId>
+      <scope>test</scope>
+    </dependency>
 	</dependencies>
 
 	<build>
 		<plugins>
 			<plugin>
+        <groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.3.1</version>
-				<configuration>
-					<source>1.6</source>
-					<target>1.6</target>
-				</configuration>
 			</plugin>			
 		</plugins>
 	</build>
