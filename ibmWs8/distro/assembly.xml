@@ -40,7 +40,7 @@
     <dependencySet>
       <outputDirectory>modules</outputDirectory>
       <includes>
-    <include>com.camunda.fox.platform:fox-platform-jobexecutor-rar:rar:*</include>
+        <include>com.camunda.fox.platform:fox-platform-jobexecutor-rar:rar:*</include>
         <include>com.camunda.fox.platform:fox-platform-ibm-websphere-ear:ear:*</include>
       </includes>     
     </dependencySet>
