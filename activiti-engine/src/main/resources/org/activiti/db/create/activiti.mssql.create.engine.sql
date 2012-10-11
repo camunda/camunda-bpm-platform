@@ -27,7 +27,7 @@ create table ACT_GE_BYTEARRAY (
 create table ACT_RE_DEPLOYMENT (
     ID_ nvarchar(64),
     NAME_ nvarchar(255),
-    DEPLOY_TIME_ datetime,
+    DEPLOY_TIME_ datetime2,
     primary key (ID_)
 );
 
@@ -53,7 +53,7 @@ create table ACT_RU_JOB (
     ID_ nvarchar(64) NOT NULL,
 	REV_ int,
     TYPE_ nvarchar(255) NOT NULL,
-    LOCK_EXP_TIME_ datetime,
+    LOCK_EXP_TIME_ datetime2,
     LOCK_OWNER_ nvarchar(255),
     EXCLUSIVE_ bit,
     EXECUTION_ID_ nvarchar(64),
@@ -61,7 +61,7 @@ create table ACT_RU_JOB (
     RETRIES_ int,
     EXCEPTION_STACK_ID_ nvarchar(64),
     EXCEPTION_MSG_ nvarchar(4000),
-    DUEDATE_ datetime NULL,
+    DUEDATE_ datetime2 NULL,
     REPEAT_ nvarchar(255),
     HANDLER_TYPE_ nvarchar(255),
     HANDLER_CFG_ nvarchar(4000),
@@ -97,8 +97,8 @@ create table ACT_RU_TASK (
     ASSIGNEE_ nvarchar(255),
     DELEGATION_ nvarchar(64),
     PRIORITY_ int,
-    CREATE_TIME_ datetime,
-    DUE_DATE_ datetime,
+    CREATE_TIME_ datetime2,
+    DUE_DATE_ datetime2,
     primary key (ID_)
 );
 
@@ -138,7 +138,7 @@ create table ACT_RU_EVENT_SUBSCR (
     PROC_INST_ID_ nvarchar(64),
     ACTIVITY_ID_ nvarchar(64),
     CONFIGURATION_ nvarchar(255),
-    CREATED_ datetime not null,
+    CREATED_ datetime2 not null,
     primary key (ID_)
 );
 
