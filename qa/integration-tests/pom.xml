@@ -86,16 +86,7 @@
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <source>1.6</source>
-          <target>1.6</target>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
-        <version>2.4</version>
         <executions>
           <!-- install enhanced artifact -->
           <execution>
@@ -147,9 +138,26 @@
       <build>
         <plugins>
           <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>build-helper-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>add-test-source</id>
+                <phase>generate-test-sources</phase>
+                <goals>
+                  <goal>add-test-source</goal>
+                </goals>
+                <configuration>
+                  <sources>
+                    <source>src/test/java-glassfish</source>
+                  </sources>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-resources-plugin</artifactId>
-            <version>2.5</version>
             <configuration>
               <delimiters>
                 <delimiter>${*}</delimiter>          
@@ -179,7 +187,6 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-surefire-plugin</artifactId>
-            <version>2.12</version>
             <configuration>
               <excludes>
                 <!-- HEMERA-2453 -->
@@ -233,7 +240,6 @@
             <filtering>true</filtering>
             <includes>
               <include>**/*.xml</include>
-              <include>**/*.properties</include>
             </includes>
           </testResource>
         </testResources>
@@ -279,9 +285,26 @@
       <build>
         <plugins>
           <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>build-helper-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>add-test-source</id>
+                <phase>generate-test-sources</phase>
+                <goals>
+                  <goal>add-test-source</goal>
+                </goals>
+                <configuration>
+                  <sources>
+                    <source>src/test/java-glassfish</source>
+                  </sources>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-surefire-plugin</artifactId>
-            <version>2.12</version>
             <configuration>
               <excludes>
                 <!-- HEMERA-2454 -->
@@ -300,10 +323,9 @@
           <testResource>
             <directory>src/test/resources-glassfish-h2</directory>
             <filtering>true</filtering>
-			<includes>
-			  <include>**/*.xml</include>
-			  <include>**/*.properties</include>
-			</includes>
+      			<includes>
+      			  <include>**/*.xml</include>
+      			</includes>
           </testResource>
         </testResources>
       </build>
@@ -439,12 +461,30 @@
           <scope>test</scope>
         </dependency>
       </dependencies>
+      
       <build>
         <plugins>
           <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>build-helper-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>add-test-source</id>
+                <phase>generate-test-sources</phase>
+                <goals>
+                  <goal>add-test-source</goal>
+                </goals>
+                <configuration>
+                  <sources>
+                    <source>src/test/java-was</source>
+                  </sources>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-surefire-plugin</artifactId>
-            <version>2.12</version>
             <configuration>
               <excludes>
                 <!-- NOT Implemented -->
@@ -474,7 +514,6 @@
             <filtering>true</filtering>
             <includes>
               <include>**/*.xml</include>
-              <include>**/*.properties</include>
             </includes> 
           </testResource>
         </testResources>
@@ -500,7 +539,6 @@
             <filtering>true</filtering>
             <includes>
               <include>**/*.xml</include>
-              <include>**/*.properties</include>
             </includes>
           </testResource>
         </testResources>
@@ -523,7 +561,6 @@
             <filtering>true</filtering>
             <includes>
               <include>**/*.xml</include>
-              <include>**/*.properties</include>
             </includes>
           </testResource>
         </testResources>
@@ -546,7 +583,6 @@
             <filtering>true</filtering>
             <includes>
               <include>**/*.xml</include>
-              <include>**/*.properties</include>
             </includes>
           </testResource>
         </testResources>
@@ -569,7 +605,6 @@
             <filtering>true</filtering>
             <includes>
               <include>**/*.xml</include>
-              <include>**/*.properties</include>
             </includes>
           </testResource>
         </testResources>
@@ -591,7 +626,6 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-surefire-plugin</artifactId>
-            <version>2.12</version>
             <configuration>
               <systemPropertyVariables>
                 <org.apache.maven.user-settings>../../settings.xml</org.apache.maven.user-settings>                
@@ -602,18 +636,5 @@
       </build>
     </profile>
   </profiles>
-
-  <reporting>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-report-plugin</artifactId>
-        <version>2.12.3</version>
-        <configuration>
-          <showSuccess>false</showSuccess>
-        </configuration>
-      </plugin>
-    </plugins>
-  </reporting>
 
 </project>
