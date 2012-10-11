@@ -1,5 +1,6 @@
 package com.camunda.fox.platform.jobexecutor.impl.ra;
 
+import java.util.Iterator;
 import java.util.ServiceLoader;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -16,6 +17,7 @@ import javax.resource.spi.work.WorkManager;
 import javax.transaction.xa.XAResource;
 
 import com.camunda.fox.platform.jobexecutor.impl.PlatformJobExecutor;
+import com.camunda.fox.platform.jobexecutor.impl.ra.execution.AutoDetectWorkManagerPlatformJobExecutorFactory;
 import com.camunda.fox.platform.jobexecutor.impl.ra.execution.spi.PlatformJobExecutorFactory;
 import com.camunda.fox.platform.jobexecutor.impl.ra.inflow.JobExecutionHandlerActivation;
 import com.camunda.fox.platform.jobexecutor.impl.ra.inflow.JobExecutionHandlerActivationSpec;
@@ -48,14 +50,21 @@ public class PlatformJobExecutorConnector implements ResourceAdapter {
     workManager = ctx.getWorkManager();
     
     ServiceLoader<PlatformJobExecutorFactory> serviceLoader = ServiceLoader.load(PlatformJobExecutorFactory.class);
-    PlatformJobExecutorFactory platformJobExecutorFactory = serviceLoader.iterator().next();
-    if (platformJobExecutorFactory == null) {
-      
+    Iterator<PlatformJobExecutorFactory> iterator = serviceLoader.iterator();
+    PlatformJobExecutorFactory platformJobExecutorFactory = null;
+    if (iterator.hasNext()) {
+      platformJobExecutorFactory = iterator.next();
+      log.log(Level.INFO, "Using user-configured fox platform job executor factory: " + platformJobExecutorFactory.getClass().getName());
+    } else {
+      // try to auto-detect environment (commonJ or JCA)
+      platformJobExecutorFactory = new AutoDetectWorkManagerPlatformJobExecutorFactory();
+      log.log(Level.INFO, "Using default fox platform job executor factory: " + platformJobExecutorFactory.getClass().getName());
     }
+    
     platformJobExecutor = platformJobExecutorFactory.createPlatformJobExecutor(this);
     platformJobExecutor.start();
     
-    log.log(Level.INFO, "platform job executor started");
+    log.log(Level.INFO, "fox platform job executor started.");
   }
 
   public void stop() {
