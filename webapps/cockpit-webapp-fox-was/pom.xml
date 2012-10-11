@@ -1,0 +1,167 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>com.camunda.fox.platform</groupId>
+    <artifactId>fox-platform-root</artifactId>
+    <version>6.2.0-SNAPSHOT</version>
+    <relativePath>../../parent</relativePath>
+  </parent>
+
+  <groupId>com.camunda.fox.cockpit</groupId>
+  <artifactId>cockpit-webapp-fox-was</artifactId>
+  <packaging>war</packaging>
+  <name>fox cockpit - Webapp Fox Websphere</name>
+
+  <properties>
+    <facesContext.application.projectStage>Production</facesContext.application.projectStage>
+  </properties>
+
+	<!--  to get this fully working we need to exclude activiti engine from our webapp libs (cockpit-webapp) -->
+  <dependencies>
+    <dependency>
+      <groupId>com.camunda.fox.cockpit</groupId>
+      <artifactId>cockpit-webapp-fox</artifactId>
+      <version>6.2.0-SNAPSHOT</version>
+      <scope>provided</scope>
+      <type>war</type>
+    </dependency>
+		
+    <!-- shared libraries -->
+<!--     <dependency> -->
+<!--       <artifactId>bcprov-jdk16</artifactId> -->
+<!--       <groupId>org.bouncycastle</groupId> -->
+<!--     </dependency> -->
+    <dependency>
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>bcpg-jdk16</artifactId>
+    </dependency>
+		
+    <!-- need openjpa for was -->
+    <dependency>
+      <groupId>com.camunda.fox.cockpit</groupId>
+      <artifactId>cockpit-core-openjpa</artifactId>
+      <version>${project.version}</version>
+      <exclusions>
+        <exclusion>
+          <groupId>org.slf4j</groupId>
+          <artifactId>slf4j-api</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>com.camunda.fox.engine</groupId>
+          <artifactId>fox-engine</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    
+  </dependencies>
+
+  <build>
+    <finalName>cockpit</finalName>
+		
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+        <filtering>true</filtering>
+      </resource>
+    </resources>
+		
+    <plugins>  
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-war-plugin</artifactId>
+        <configuration>
+          <filteringDeploymentDescriptors>true</filteringDeploymentDescriptors>
+          <archive>
+            <manifest>
+							<!-- Maven project version number -->
+              <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+            </manifest>
+            <manifestEntries>
+							<!-- SVN revision number -->
+              <Implementation-Build>${buildNumber}</Implementation-Build>
+            </manifestEntries>
+          </archive>
+          <webResources>
+            <resource>
+              <directory>src/main/webapp</directory>
+              <filtering>true</filtering>
+            </resource>
+          </webResources>
+          <overlays>
+            <overlay>
+              <id>cockpit-webapp-fox</id>
+              <groupId>com.camunda.fox.cockpit</groupId>
+              <artifactId>cockpit-webapp-fox</artifactId>
+              <excludes>
+                <!-- exclusion for classes overridden by webapp-fox-was -->
+                <exclude>**/beans.xml</exclude>
+                <exclude>**/persistence.xml</exclude>
+                <exclude>**/com/camunda/fox/cockpit/webapp/environment/**</exclude>
+                <exclude>**/lib/cockpit-core-*.jar</exclude>
+              </excludes>
+            </overlay>
+            <overlay>
+							<!-- empty groupId/artifactId represents the current build -->
+            </overlay>
+          </overlays>
+        </configuration>
+      </plugin>			
+    </plugins>
+  </build>
+	
+  <profiles>
+    <profile>
+			<!-- JBoss 7 dev properties with demo data -->
+      <id>env-dev</id>
+      <activation>
+        <property>
+          <name>env</name>
+          <value>dev</value>
+        </property>
+      </activation>
+      <properties>
+        <facesContext.application.projectStage>Development</facesContext.application.projectStage>
+      </properties>
+      <build>
+        <filters>
+          <filter>src/config/dev/database.properties</filter>
+        </filters>
+      </build>
+    </profile>
+    <profile>
+			<!-- used by Jenkins for the build deployed to the test server -->
+      <id>env-test</id>
+      <activation>
+        <property>
+          <name>env</name>
+          <value>test</value>
+        </property>
+      </activation>
+      <properties>
+        <facesContext.application.projectStage>Development</facesContext.application.projectStage>
+      </properties>
+      <build>
+        <filters>
+          <filter>src/config/test/database.properties</filter>
+        </filters>
+      </build>
+    </profile>
+    <profile>
+			<!-- production configuration -->
+      <id>env-production</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+        <property>
+          <name>env</name>
+          <value>production</value>
+        </property>
+      </activation>
+      <build>
+        <filters>
+          <filter>src/config/production/database.properties</filter>
+        </filters>
+      </build>
+    </profile>
+  </profiles>
+</project>
