@@ -100,6 +100,12 @@
   </modules>
   
   <build>
+    <!-- 
+      Plugins defined here are mirrored in PLATFORM_HOME/parent/pom.xml 
+      and should be kept in sync to use same plugin version through
+      whole platform maven build and should only be overwritten in case
+      someone needs an earlier plugin version.
+     -->
     <pluginManagement>
       <plugins>
         <plugin>
@@ -127,8 +133,8 @@
         <!-- code plugins -->
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-resources-plugin</artifactId>
-          <version>2.6</version>
+          <artifactId>maven-dependency-plugin</artifactId>
+          <version>2.5.1</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -137,8 +143,8 @@
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-dependency-plugin</artifactId>
-          <version>2.5.1</version>
+          <artifactId>maven-resources-plugin</artifactId>
+          <version>2.6</version>
         </plugin>
         
         <!-- output plugins -->
@@ -193,8 +199,25 @@
           <artifactId>maven-antrun-plugin</artifactId>
           <version>1.7</version>
         </plugin>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>build-helper-maven-plugin</artifactId>
+          <version>1.7</version>
+        </plugin>
       </plugins>
     </pluginManagement>
+    
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+	<version>2.5.1</version>
+	<configuration>
+            <source>${version.java}</source>
+            <target>${version.java}</target>
+          </configuration>
+      </plugin>
+    </plugins>
   </build>
   
   <scm>

@@ -66,7 +66,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-antrun-plugin</artifactId>
-        <version>1.7</version>
         <executions>
           <execution>
             <id>copy-distro</id>
@@ -142,7 +141,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-resources-plugin</artifactId>
-        <version>2.5</version>
         <configuration>
           <delimiters>
             <delimiter>${*}</delimiter>          
@@ -174,7 +172,6 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-assembly-plugin</artifactId>
-            <version>2.3</version>
             <executions>
               <execution>
                 <id>assemble</id>

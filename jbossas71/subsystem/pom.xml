@@ -48,11 +48,11 @@
       <artifactId>fox-platform-service</artifactId>
     </dependency>
 
-	<dependency>
-	  <groupId>com.camunda.fox.platform</groupId>
-	  <artifactId>fox-platform-jobexecutor-core</artifactId>
-	  <version>${project.version}</version>
-	</dependency>
+  	<dependency>
+  	  <groupId>com.camunda.fox.platform</groupId>
+  	  <artifactId>fox-platform-jobexecutor-core</artifactId>
+  	  <version>${project.version}</version>
+  	</dependency>
   
     <dependency>
       <groupId>com.camunda.fox.platform</groupId>
@@ -60,7 +60,7 @@
       <version>${project.version}</version>
     </dependency>
 	
-	<dependency>
+    <dependency>
     	<groupId>org.jboss.as</groupId>
     	<artifactId>jboss-as-threads</artifactId>
     	<version>${version.jboss.as}</version>
@@ -133,16 +133,8 @@
     <finalName>${project.artifactId}</finalName>
     <plugins>
       <plugin>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <source>1.6</source>
-          <target>1.6</target>
-        </configuration>
-      </plugin>
-      <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
-        <version>2.8.1</version>
         <configuration>
           <redirectTestOutputToFile>true</redirectTestOutputToFile>
           <enableAssertions>true</enableAssertions>
