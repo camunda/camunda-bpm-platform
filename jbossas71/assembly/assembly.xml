@@ -53,6 +53,10 @@
       <outputDirectory>server/jboss-as-${version.jboss.as}/standalone/configuration</outputDirectory>
     </file>
     <file>
+      <source>src/jboss71/standalone-full.xml</source>
+      <outputDirectory>server/jboss-as-${version.jboss.as}/standalone/configuration</outputDirectory>
+    </file>
+    <file>
       <source>src/jboss71/standalone.conf</source>
       <outputDirectory>server/jboss-as-${version.jboss.as}/bin/</outputDirectory>
     </file>
