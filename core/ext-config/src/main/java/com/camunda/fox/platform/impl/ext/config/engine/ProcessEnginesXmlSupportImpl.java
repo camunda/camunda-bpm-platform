@@ -130,7 +130,7 @@ public class ProcessEnginesXmlSupportImpl implements ProcessEnginesXmlSupport {
         errorMessage.append("   ");
         errorMessage.append(engineName);
       }
-      errorMessage.append("Consider restarting the fox platform.");
+      errorMessage.append("\nConsider restarting the fox platform.");
       log.severe(errorMessage.toString());      
     }
   }

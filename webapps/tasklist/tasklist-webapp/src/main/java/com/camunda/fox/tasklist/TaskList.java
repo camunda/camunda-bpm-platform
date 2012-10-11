@@ -171,7 +171,7 @@ public class TaskList implements Serializable {
       ProcessArchive processArchive = processArchiveService.getProcessArchiveByProcessDefinitionId(processDefinitionId, processEngine.getName());
       String contextPath = (String) processArchive.getProperties().get(ProcessArchive.PROP_SERVLET_CONTEXT_PATH);
       String callbackUrl = getRequestURL();
-      return "../.." + contextPath + "/" + formKey + getTaskFormKeySuffix() + "?" + urlParameters + "&callbackUrl=" + callbackUrl;
+      return "../.." + contextPath + "/" + getTaskFormKeyWithSuffix(formKey) + "?" + urlParameters + "&callbackUrl=" + callbackUrl;
     } catch (Exception ex) {
       log.log(Level.INFO, "Could not resolve context path for process definition " + processDefinitionId);
       log.log(Level.FINER, "Could not resolve context path for process definition " + processDefinitionId, ex);
@@ -180,15 +180,17 @@ public class TaskList implements Serializable {
 
   }
 
-  private String getTaskFormKeySuffix() {
+  private String getTaskFormKeyWithSuffix(String formKey) {
     String taskFormUrlSuffix = FacesContext.getCurrentInstance().getExternalContext().getInitParameter(PARAM_NAME_TASKFORM_URL_SUFFIX);
+    
     if (taskFormUrlSuffix!=null) {
-//    return ".jsf";
-      return taskFormUrlSuffix;
+      if (!formKey.endsWith(taskFormUrlSuffix)) { 
+        // if parameter is set, and the formKey does not include the suffix already: add it
+        return formKey + taskFormUrlSuffix;
+      }
     }
-    else {
-      return "";
-    }
+    // else
+    return formKey;
   }
 
   public String delegate(Task task) {

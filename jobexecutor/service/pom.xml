@@ -72,4 +72,17 @@
     </plugins>
   </build>
 
+  <profiles>
+    <profile>
+      <id>was</id>
+      <build>
+        <resources>
+          <resource>
+            <directory>src/main/resources-was</directory>
+          </resource>
+        </resources>
+      </build>
+    </profile>
+  </profiles>
+
 </project>
