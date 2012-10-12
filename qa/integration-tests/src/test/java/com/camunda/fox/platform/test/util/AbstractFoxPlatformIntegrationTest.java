@@ -80,8 +80,7 @@ public abstract class AbstractFoxPlatformIntegrationTest {
               .addAsLibraries(DeploymentHelper.getFoxPlatformClient())
               .addAsResource("META-INF/processes.xml", "META-INF/processes.xml")
               .addClass(AbstractFoxPlatformIntegrationTest.class)
-              .addClass(JndiConstants.class)
-              .addAsResource("appname.properties", "appname.properties");
+              .addClass(JndiConstants.class);
   }
   
   public static WebArchive initWebArchiveDeployment() {
