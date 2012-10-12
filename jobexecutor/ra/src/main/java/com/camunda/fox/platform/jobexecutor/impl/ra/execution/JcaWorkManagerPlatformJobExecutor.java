@@ -26,6 +26,8 @@ import com.camunda.fox.platform.jobexecutor.impl.ra.PlatformJobExecutorConnector
  */
 public class JcaWorkManagerPlatformJobExecutor extends PlatformJobExecutor implements Referenceable {
   
+  public static int START_WORK_TIMEOUT = 1500;
+
   private static Logger logger = Logger.getLogger(JcaWorkManagerPlatformJobExecutor.class.getName());
   
   protected final WorkManager workManager;
@@ -38,7 +40,11 @@ public class JcaWorkManagerPlatformJobExecutor extends PlatformJobExecutor imple
 
   public void executeJobs(final List<String> jobIds, final CommandExecutor commandExecutor) {
     try {
-      workManager.scheduleWork(new JcaWorkRunnableAdapter(new JcaInflowExecuteJobsRunnable(jobIds, commandExecutor, ra)), 500, null, null);
+      JcaInflowExecuteJobsRunnable executeJobsRunnable = new JcaInflowExecuteJobsRunnable(jobIds, commandExecutor, ra);
+      JcaWorkRunnableAdapter jcaWorkRunnableAdapter = new JcaWorkRunnableAdapter(executeJobsRunnable);
+      
+      workManager.startWork(jcaWorkRunnableAdapter, START_WORK_TIMEOUT, null, null);
+      
     } catch (WorkRejectedException e) {
       // simulate caller runs policy (execute runnable in our thread)
       // TODO: add pluggable strategy
