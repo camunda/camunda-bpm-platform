@@ -3,8 +3,8 @@ create table ACT_HI_PROCINST (
     PROC_INST_ID_ nvarchar(64) not null,
     BUSINESS_KEY_ nvarchar(255),
     PROC_DEF_ID_ nvarchar(64) not null,
-    START_TIME_ datetime not null,
-    END_TIME_ datetime,
+    START_TIME_ datetime2 not null,
+    END_TIME_ datetime2,
     DURATION_ numeric(19,0),
     START_USER_ID_ nvarchar(255),
     START_ACT_ID_ nvarchar(255),
@@ -26,8 +26,8 @@ create table ACT_HI_ACTINST (
     ACT_NAME_ nvarchar(255),
     ACT_TYPE_ nvarchar(255) not null,
     ASSIGNEE_ nvarchar(64),
-    START_TIME_ datetime not null,
-    END_TIME_ datetime,
+    START_TIME_ datetime2 not null,
+    END_TIME_ datetime2,
     DURATION_ numeric(19,0),
     primary key (ID_)
 );
@@ -43,12 +43,12 @@ create table ACT_HI_TASKINST (
     DESCRIPTION_ nvarchar(4000),
     OWNER_ nvarchar(255),
     ASSIGNEE_ nvarchar(255),
-    START_TIME_ datetime not null,
-    END_TIME_ datetime,
+    START_TIME_ datetime2 not null,
+    END_TIME_ datetime2,
     DURATION_ numeric(19,0),
     DELETE_REASON_ nvarchar(4000),
     PRIORITY_ int,
-    DUE_DATE_ datetime,
+    DUE_DATE_ datetime2,
     primary key (ID_)
 );
 
@@ -78,7 +78,7 @@ create table ACT_HI_DETAIL (
     NAME_ nvarchar(255) not null,
     VAR_TYPE_ nvarchar(255),
     REV_ int,
-    TIME_ datetime not null,
+    TIME_ datetime2 not null,
     BYTEARRAY_ID_ nvarchar(64),
     DOUBLE_ double precision,
     LONG_ numeric(19,0),
@@ -90,7 +90,7 @@ create table ACT_HI_DETAIL (
 create table ACT_HI_COMMENT (
     ID_ nvarchar(64) not null,
     TYPE_ nvarchar(255),
-    TIME_ datetime not null,
+    TIME_ datetime2 not null,
     USER_ID_ nvarchar(255),
     TASK_ID_ nvarchar(64),
     PROC_INST_ID_ nvarchar(64),
