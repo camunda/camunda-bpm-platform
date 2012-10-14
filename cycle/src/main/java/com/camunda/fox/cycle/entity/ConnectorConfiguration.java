@@ -7,6 +7,9 @@ import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.MapKeyColumn;
 import javax.persistence.Table;
@@ -18,16 +21,23 @@ import com.camunda.fox.cycle.connector.ConnectorLoginMode;
 public class ConnectorConfiguration extends AbstractEntity {
 
   private static final long serialVersionUID = 1L;
-
+  
+  @Column
   private String connectorClass;
 
+  @Column
   private String globalUser;
+  
+  @Column
   private String globalPassword;
   
+  @Column
   private String label;
+  
+  @Enumerated(EnumType.STRING)
   private ConnectorLoginMode loginMode;
 
-  @ElementCollection
+  @ElementCollection(fetch=FetchType.EAGER)
   @MapKeyColumn(name = "name")
   @Column(name = "value")
   @CollectionTable(name = "cy_connector_attributes", joinColumns = @JoinColumn(name = "configuration_id"))

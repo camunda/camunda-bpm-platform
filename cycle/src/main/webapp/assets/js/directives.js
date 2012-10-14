@@ -275,16 +275,26 @@ angular
 })
 .directive("help", function(App) {
   return {
-    restrict: 'A',
+    restrict: 'A',    
+    scope : {
+		helpText: "@",
+		helpTitle: "@", 
+		helpTextVar: "&",
+		helpTitleVar: "&", 
+		colorInvert: "@"
+    },
+    template: '<span ng-transclude></span><span class="help-toggle"><i class="icon-question-sign" ng-class="colorInvertCls()"></i></span>', 
+    transclude: true, 		
     link: function(scope, element, attrs) {
-      var help = attrs.help, 
-          helpTitle = attrs.helpTitle, 
+      var help = attrs.helpText || scope.helpTextVar, 
+          helpTitle = attrs.helpTitle || scope.helpTitleVar, 
           colorInvert = !!attrs.colorInvert;
       
-      var helpToggle = $('<span class="help-toggle"><i class="icon-question-sign' + (colorInvert ? ' icon-white' : '') + '"></i></span>');
-      helpToggle
-        .appendTo(element)
-        .popover({content: help, title: helpTitle, delay: { show: 0, hide: 0 }});
+      scope.colorInvertCls = function() {
+    	  return (colorInvert ? 'icon-white' : '');
+      };
+      
+      $(element).find(".help-toggle").popover({content: help, title: helpTitle, delay: { show: 0, hide: 0 }});
     }
   };
 })

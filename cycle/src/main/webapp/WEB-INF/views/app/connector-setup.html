@@ -22,15 +22,15 @@
                       </tr>
                   </thead>
                   <tbody>
-                      <tr data-ng-repeat="connector in connectors" data-ng-cloak>
-                          <td>{{connector.connectorId}}</td>
-                          <td>{{connector.name}}</td>
-                          <td>{{connector.connectorName}}</td>
-                          <td>{{connector.loginMode}}</td>
+                      <tr data-ng-repeat="connectorConfiguration in connectorConfigurations" data-ng-cloak>
+                          <td>{{connectorConfiguration.connectorId}}</td>
+                          <td>{{connectorConfiguration.name}}</td>
+                          <td>{{connectorConfiguration.connectorName}}</td>
+                          <td>{{connectorConfiguration.loginMode}}</td>
                           <td>
-                            <a>delete</a>
+                            <a data-ng-click="deleteConnector(connectorConfiguration)" th:text="#{delete}">delete</a>
                             <br />
-                            <a data-ng-click="createNewConnector(connector)">edit</a>
+                            <a data-ng-click="editConnector(connectorConfiguration)" th:text="#{edit}">edit</a>
                           </td>
                       </tr>
                   </tbody>
@@ -42,8 +42,8 @@
                <div class="modal hide fade" data-ng-controller="CreateNewConnectorController" data-ngm-if="createNewConnectorDialog.renderHtml()"> 
                  <div class="modal-header">
                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                   <h3 data-ng-show="!editConnector" th:text="#{'Add connector'}"></h3>
-                   <h3 data-ng-show="editConnector" th:text="#{'Edit connector'}"></h3>
+                   <h3 data-ng-show="connectorDialogMode == 'ADD_CONNECTOR'" th:text="#{'Add connector'}"></h3>
+                   <h3 data-ng-show="connectorDialogMode == 'EDIT_CONNECTOR'" th:text="#{'Edit connector'}"></h3>
                  </div>
                  <div class="modal-body">
                    <div class="alert alert-error" data-ng-show="error">
@@ -59,16 +59,17 @@
                          <label class="control-label" for="connectorLabel" 
                                 th:text="#{'Connector Name*'}">Connector Name*</label>
                          <div class="controls" style="margin-bottom: 10px;" >                            
-                          <input id="connectorLabel" name="connectorLabel" type="text" class="span8" required data-ng-model="editConnector.name"/>
+                          <input id="connectorLabel" name="connectorLabel" type="text" class="span8" required data-ng-model="editConnectorConfiguration.name"/>
                          </div>
                        </div>
                        
                        <div class="control-group">                   
-                         <label class="control-label" for="loginModule" 
-                                th:text="#{'Select Login Module*'}">Select Login Module*</label>
+                         <label class="control-label" for="loginMode" 
+                                th:text="#{'Select Login Mode*'}">Select Login Mode*</label>
                          <div class="controls" style="margin-bottom: 10px;" >                            
                            <span class="nullable">
-                             <select id="loginModule" class="span8" data-ng-model="editConnector.loginMode">
+                             <select id="loginMode" class="span8" data-required data-ng-model="editConnectorConfiguration.loginMode">
+                               <option value="">Select...</option>                             
                                <option value="LOGIN_NOT_REQUIRED">no login required</option>
                                <option value="GLOBAL">credentials provided globally</option>
                                <option value="USER">credentials provided by user</option>
@@ -77,18 +78,18 @@
                          </div>
                        </div>
   
-                       <div class="control-group" data-ng-show="editConnector.loginMode != 'LOGIN_NOT_REQUIRED'">                   
+                       <div class="control-group" data-ng-show="editConnectorConfiguration.loginMode == 'GLOBAL'">                   
                          <label class="control-label" for="userName" 
                                 th:text="#{'User Name*'}">User Name*</label>
                          <div class="controls" style="margin-bottom: 10px;" >                                
-                          <input id="userName" name="userName" type="text" class="span8" required data-ng-model="editConnector.user"/>
+                          <input id="userName" name="userName" type="text" class="span8" required data-ng-model="editConnectorConfiguration.user"/>
                          </div> 
                        </div>
-                       <div class="control-group" data-ng-show="editConnector.loginMode != 'LOGIN_NOT_REQUIRED'">                   
+                       <div class="control-group" data-ng-show="editConnectorConfiguration.loginMode == 'GLOBAL'">                   
                          <label class="control-label" for="password" 
                                 th:text="#{'Password*'}">Password*</label>
                          <div class="controls" style="margin-bottom: 10px;" >                                
-                          <input id="password" name="password" type="text" class="span8" required data-ng-model="editConnector.password"/>
+                          <input id="password" name="password" type="text" class="span8" required data-ng-model="editConnectorConfiguration.password"/>
                          </div> 
                        </div>
                        
@@ -96,53 +97,27 @@
                          <label class="control-label" for="connectors" 
                                 th:text="#{'Select Plugin*'}">Select Plugin*</label>
                          <div class="controls" style="margin-bottom: 10px;" >
-                            <select id="connectors" class="span8" required data-ng-options="c.name for c in connectors" data-ng-model="editConnector.connectorName" >
+                            <select id="connectors" class="span8" data-required data-ng-options="c.name for c in connectorConfigurations" data-ng-model="selectedConnectorConfiguration">
+                              <option value="">Select...</option>
                             </select>
                          </div>
-                       </div>                       
-                       
-                       <div class="control-group">                   
-                         <label class="control-label" for="specificField_1" 
-                                th:attr="data-help=#{'TODO'}" 
-                                data-help-title="Spezifisches Feld1" 
-                                th:text="#{'Spezifisches Feld1'}">Spezifisches Feld1</label>
-                         <div class="controls" style="margin-bottom: 10px;" >       
-                          <input id="specificField_1" name="specificField_1" type="text" class="span8" />
-                         </div> 
-                       </div>  
-                       <div class="control-group">
-                         <label class="control-label" for="specificField_2" 
-                                th:attr="data-help=#{'TODO'}" 
-                                data-help-title="Spezifisches Feld2" 
-                                th:text="#{'Spezifisches Feld2'}">Spezifisches Feld2</label>
-                         <div class="controls" style="margin-bottom: 10px;" >       
-                          <input id="specificField_2" name="specificField_2" type="text" class="span8" />
-                         </div> 
-                       </div>  
-                       <div class="control-group">                                            
-                         <label class="control-label" for="specificField_3"
-                                th:attr="data-help=#{'TODO'}" 
-                                data-help-title="Spezifisches Feld3" 
-                                th:text="#{'Spezifisches Feld3'}">Spezifisches Feld3</label>
-                         <div class="controls" style="margin-bottom: 10px;" >       
-                          <input id="specificField_3" name="specificField_3" type="text" class="span8" />
-                         </div> 
-                       </div>  
-                       <div class="control-group">                                                  
-                         <label class="control-label" for="specificField_4"
-                                th:attr="data-help=#{'TODO'}" 
-                                data-help-title="Spezifisches Feld4" 
-                                th:text="#{'Spezifisches Feld4'}">Spezifisches Feld4</label>
-                         <div class="controls" style="margin-bottom: 10px;" >        
-                          <input id="specificField_4" name="specificField_4" type="text" class="span8" />
-                         </div> 
                        </div>
-                     </fieldset>                   
+                       <div class="control-group" data-ng-repeat="(key, value) in editConnectorConfiguration.properties" data-ng-model="editConnectorConfiguration.properties">
+                         <label class="control-label" for="specificField" 
+                                data-help
+                                data-help-text-var="currentHelpText(key)"
+                                data-help-title-var="key">{{key}}</label>
+                          <div class="controls" style="margin-bottom: 10px;" >
+                            <input id="specificField" name="specificField" type="text" class="span8" data-ng-model="editConnectorConfiguration.properties[key]"/>
+                          </div>
+                       </div>                    
+                     </fieldset>
                    </form>
                  </div>
                  <div class="modal-footer">
                    <button class="btn" data-ng-click="createNewConnectorDialog.close()" th:text="#{Cancel}">Cancel</button>
-                   <button class="btn btn-primary" th:text="#{OK}">OK</button>
+                   <button class="btn btn-primary" data-ng-click="save()" th:text="#{OK}">OK</button>
+                   <button class="btn" th:text="#{Test Connector}">Test Connector</button>
                  </div>
                </div>
                </dialog>  

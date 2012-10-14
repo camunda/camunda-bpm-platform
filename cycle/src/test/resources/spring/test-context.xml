@@ -30,7 +30,7 @@
   </context:component-scan>
 
   <bean name="vfsConnectorConfig" class="com.camunda.fox.cycle.entity.ConnectorConfiguration">
-    <property name="id" value="1" />
+<!--     <property name="id" value="1" /> -->
     <property name="label" value="Test VFS Connector" />
     <property name="connectorClass"
               value="com.camunda.fox.cycle.connector.vfs.VfsConnector" />
@@ -42,7 +42,7 @@
   </bean>
 
   <bean name="signavioConfig" class="com.camunda.fox.cycle.entity.ConnectorConfiguration">
-    <property name="id" value="2" />
+<!--     <property name="id" value="2" /> -->
     <property name="label" value="My SignavioConnector" />
     <property name="connectorClass"
               value="com.camunda.fox.cycle.connector.signavio.SignavioConnector" />
@@ -57,7 +57,7 @@
   </bean>
   
   <bean name="svnConfig" class="com.camunda.fox.cycle.entity.ConnectorConfiguration">
-    <property name="id" value="3" />
+<!--     <property name="id" value="3" /> -->
     <property name="label" value="My Svn Connector" />
     <property name="connectorClass"
               value="com.camunda.fox.cycle.connector.svn.SvnConnector" />

@@ -607,7 +607,7 @@ function DeleteRoundtripController($scope, $routeParams, $http, $location, App) 
     .success(function(data) {
     	 $scope.toBeDeleted = DEL_SUCCESS;
     	 $scope.roundtrips.splice($scope.roundtrips.indexOf(roundtrip), 1);
-		 $location.path("/");
+       $location.path("/");
 	})
 	.error(function(data) {
 		$scope.toBeDeleted = DEL_FAILED;
@@ -615,22 +615,110 @@ function DeleteRoundtripController($scope, $routeParams, $http, $location, App) 
   };
 };
 
-function ConnectorSetupController($scope, $routeParams, App, Event, Commons) {
+function ConnectorSetupController($scope, $http, $location, App, Event, Commons, ConnectorConfiguration) {
 	$scope.createNewConnectorDialog = new Dialog();
 	
-	var editConnector = null;
-	
 	$scope.$emit(Event.navigationChanged, {name:"Connector setup"});
+
+	$scope.connectorConfigurations = Commons.getConnectorConfigurations().then(function(connectorConfigurations) {
+		$scope.connectorConfigurations = connectorConfigurations;
+	});
 	
-	$scope.connectors = Commons.getConnectors();
-	
-	$scope.createNewConnector = function(connector) {
-		$scope.editConnector = connector;
+	$scope.createNewConnector = function() {
+    $scope.currentConnectorConfiguration = null;
+		$scope.connectorDialogMode = "ADD_CONNECTOR";
 		$scope.createNewConnectorDialog.open();
+	};
+	
+	$scope.editConnector = function(connectorConfiguration) {
+		$scope.connectorDialogMode = "EDIT_CONNECTOR";
+   	// make a copy of the connector to edit
+		$scope.currentConnectorConfiguration = connectorConfiguration;
+		$scope.createNewConnectorDialog.open();
+	};
+	
+	$scope.deleteConnector = function(connectorConfiguration) {
+    $http.post(App.uri("secured/resource/connector/configuration/" + connectorConfiguration.connectorId + "/delete"))    
+    .success(function(data) {
+      $scope.connectorConfigurations.splice($scope.connectorConfigurations.indexOf(connectorConfiguration), 1);
+      $location("/Connector Setup");
+		})
+		.error(function(data) {
+		});
+	};
+	
+	$scope.saveConnectorConfiguration = function(editConnectorConfiguration) {
+	  //TODO
+    var connectorConfiguration = new ConnectorConfiguration({ editConnectorConfiguration: editConnectorConfiguration });
+    
+    connectorConfiguration.$save(function() {
+      $scope.createNewConnectorDialog.close();
+    });	  
+	};
+	
+	$scope.updateConnectorConfiguration = function(editConnectorConfiguration) {
+	  //TODO
+	  editConnectorConfiguration.$save(function() {
+	    $scope.createNewConnectorDialog.close();
+	  });
+//    $http.post(App.uri("secured/resource/connector/configuration/" + editConnectorConfiguration.connectorId))    
+//    .success(function(data) {
+//      $scope.createNewConnectorDialog.close();
+//    })
+//    .error(function(data) {
+//    });
 	};
 	
 };
 
 function CreateNewConnectorController($scope, App) {
+  
+  var BASE_PATH = "BASE_PATH",
+      SIGNAVIO_BASE_URL = "signavioBaseUrl",
+      REPO_PATH = "repositoryPath",
+      FOLDER_ROOT_PATH = "folderRootPath",
+      ALLOW_ALL_SSL_HOSTNAMES = "allowAllSSLHostnames",
+      TEMPORARY_FILE_STORE = "temporaryFileStore";
 	
+	$scope.selectedConnectorConfiguration = null;
+	
+	$scope.editConnectorConfiguration = angular.extend(angular.copy($scope.currentConnectorConfiguration || {}));
+	
+	$scope.$watch("editConnectorConfiguration", function(editConnectorConfiguration) {
+		if (!editConnectorConfiguration) {
+			return;
+		}
+		
+		angular.forEach($scope.connectorConfigurations, function(e, i) {
+			if (e.connectorId == editConnectorConfiguration.connectorId) {
+				$scope.selectedConnectorConfiguration = e;
+			}
+		});
+	});
+	
+	$scope.save = function() {
+	  //TODO
+	  console.log($scope.editConnectorConfiguration);
+	  if ($scope.editConnectorConfiguration.connectorId) {
+	    $scope.updateConnectorConfiguration($scope.editConnectorConfiguration);
+	  } else {
+	    $scope.saveConnectorConfiguration();
+	  }
+	};
+	
+  $scope.currentHelpText = function(propertyKey) {
+   if (propertyKey == BASE_PATH) {
+     return "provide path to your file system, e.g. 'C:\\Users\\Tommy\\FoxFileSystem'";
+   } else if (propertyKey == SIGNAVIO_BASE_URL) {
+     return "enter the URL to your modelers loginpage, e.g. 'https://editor.signavio.com/'";
+   } else if (propertyKey == REPPO_PATH) {
+     return "The SVN root URL to use, e.g. 'https://svn.camunda.com/fox/'";
+   } else if (propertyKey == FOLDER_ROOT_PATH) {
+     return "if you want to point the fox modeler to some root directory different to the normal Signavio root directory, enter the ID here, e.g. eb36d6fd27794eda95a9f7e9aa16d987";
+   } else if (propertyKey == ALLOW_ALL_SSL_HOSTNAMES) {
+     return "enter 'true' to allow changes in SSL-Hostnames of modeler, otherwise enter 'false'";
+   } else if (propertyKey == TEMPORARY_FILE_STORE) {
+     return "A directory in the local file system which can be used to store temporary files, e.g. 'c:/temp/svn'";
+   }
+  };
 };

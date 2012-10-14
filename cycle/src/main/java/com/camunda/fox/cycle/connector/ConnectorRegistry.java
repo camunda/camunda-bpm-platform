@@ -17,6 +17,7 @@ import com.camunda.fox.cycle.aspect.LoginAspect;
 import com.camunda.fox.cycle.aspect.ThreadsafeAspect;
 import com.camunda.fox.cycle.entity.ConnectorConfiguration;
 import com.camunda.fox.cycle.exception.CycleException;
+import com.camunda.fox.cycle.repository.ConnectorConfigurationRepository;
 
 @Component
 @Scope(
@@ -37,6 +38,9 @@ public class ConnectorRegistry {
    */
   @Inject
   private List<ConnectorConfiguration> configurations;
+  
+  @Inject
+  private ConnectorConfigurationRepository connectorConfigurationRepository;
   
   /**
    * Connector cache 
@@ -63,8 +67,22 @@ public class ConnectorRegistry {
    * Returns a list of all connector configurations known to this registry
    * @return 
    */
+//  public List<ConnectorConfiguration> getConnectorConfigurations() {
+//    return configurations;
+//  }
+  // TODO: kp: change this method to get only the connector configuration from the database
+  // delete the fallback to get the configuration from the context.xml and insert it into the database
   public List<ConnectorConfiguration> getConnectorConfigurations() {
-    return configurations;
+    List<ConnectorConfiguration> connectorConfigurationsList = connectorConfigurationRepository.findAll();
+    if (connectorConfigurationsList != null && !connectorConfigurationsList.isEmpty()) {
+      return connectorConfigurationsList;
+    } else {
+      for (ConnectorConfiguration connectorConfiguration : configurations) {
+        connectorConfigurationRepository.saveAndFlush(connectorConfiguration);
+      }
+    }
+    
+    return connectorConfigurationRepository.findAll();
   }
 
   /**
@@ -96,6 +114,28 @@ public class ConnectorRegistry {
       connectorCache.put(connectorId, connector);
     }
     
+    return connector;
+  }
+  
+  public Connector updateConnector(long connectorId) {
+    Connector connector = connectorCache.get(connectorId);
+    if (connector != null) {
+      connector.dispose();
+      connector = instantiateConnector(connectorId);
+      connectorCache.put(connectorId, connector);
+    }
+    return connector;
+  }
+  
+  public void deleteConnector(long connectorId) {
+    Connector connector = connectorCache.get(connectorId);
+    connector.dispose();
+    connectorCache.remove(connectorId);
+  }
+  
+  public Connector addConnector(long connectorId) {
+    Connector connector = instantiateConnector(connectorId);
+    connectorCache.put(connectorId, connector);
     return connector;
   }
 
