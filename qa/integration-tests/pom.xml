@@ -10,12 +10,10 @@
     <version>6.2.0-SNAPSHOT</version>
   </parent>
   
-  <properties>
-    <!--
-    <WAS8_HOME>/home/hawky4s/Programming/Server/websphere85/AppServer</WAS8_HOME>
-    <WAS8_REMOTE_SERVER_SOAP_PORT>8880</WAS8_REMOTE_SERVER_SOAP_PORT>
-    -->
-  </properties>
+  <!-- <properties>    
+    <WAS8_HOME>C:\Program Files (x86)\IBM\WebSphere85\AppServer</WAS8_HOME>
+    <WAS8_REMOTE_SERVER_SOAP_PORT>8882</WAS8_REMOTE_SERVER_SOAP_PORT>    
+  </properties> -->
   
   <dependencies>
     <dependency>
@@ -490,11 +488,7 @@
                 <!-- NOT Implemented -->
                 <exclude>**/JobExecutorRequestContextLocalInvocationTest.java</exclude>
                 <!-- NOT Implemented -->
-                <exclude>**/ejb/local/*</exclude>
-                <!-- HEMERA-2454 -->
-                <exclude>**/JobExecutorRequestContextSFSBDelegateTest.java</exclude>
-                <!-- HEMERA-2886 -->
-                <exclude>**/JobExecutorRequestContextRemoteInvocationTest.java</exclude>
+                <exclude>**/ejb/local/*</exclude>                          
                 <!-- HEMERA-2887 -->
                 <exclude>**/TestProcessEnginesXmlFails.java</exclude>
                 <!-- HEMERA-2888 -->

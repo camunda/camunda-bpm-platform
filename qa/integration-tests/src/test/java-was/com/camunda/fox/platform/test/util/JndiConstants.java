@@ -7,6 +7,6 @@ package com.camunda.fox.platform.test.util;
  */
 public class JndiConstants {
   
-  public final static String APP_NAME = "service";
+  public final static String APP_NAME = "service/";
   
 }
