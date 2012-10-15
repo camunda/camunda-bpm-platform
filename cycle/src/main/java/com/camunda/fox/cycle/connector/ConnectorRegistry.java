@@ -117,7 +117,7 @@ public class ConnectorRegistry {
     return connector;
   }
   
-  public Connector updateConnector(long connectorId) {
+  public Connector updateConnectorInCache(long connectorId) {
     Connector connector = connectorCache.get(connectorId);
     if (connector != null) {
       connector.dispose();
@@ -127,13 +127,16 @@ public class ConnectorRegistry {
     return connector;
   }
   
-  public void deleteConnector(long connectorId) {
+  public void deleteConnectorFromCache(long connectorId) {
     Connector connector = connectorCache.get(connectorId);
-    connector.dispose();
-    connectorCache.remove(connectorId);
+    if (connector != null) {
+      connector.dispose();
+      connectorCache.remove(connectorId);
+    }
   }
+    
   
-  public Connector addConnector(long connectorId) {
+  public Connector addConnectorToCache(long connectorId) {
     Connector connector = instantiateConnector(connectorId);
     connectorCache.put(connectorId, connector);
     return connector;

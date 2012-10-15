@@ -49,9 +49,8 @@ angular
   .factory('RoundtripDetails', function($resource, App) {
     return $resource(App.uri('secured/resource/roundtrip/:id/details'), {id: "@id"}, {});
   })
-  //TODO
   .factory('ConnectorConfiguration', function($resource, App) {
-    return $resource(App.uri('secured/resource/connector/configuration/:id'), {id: "@id"}, {});
+    return $resource(App.uri('secured/resource/connector/configuration/:id'), {id: "@connectorId"}, {});
   })
   .factory('Commons', function($http, HttpUtils, App) {
     return {
@@ -60,9 +59,6 @@ angular
       },
       getConnectors: function() {
         return HttpUtils.makePromise($http.get(App.uri("secured/resource/connector/list")));
-      },
-      getConnectorConfigurations: function() {
-          return HttpUtils.makePromise($http.get(App.uri("secured/resource/connector/configuration/")));
       },
       isImageAvailable : function (node) {
         var uri = "secured/resource/connector/" + node.connectorId + "/contents/info?type=PNG_FILE&nodeId=" + escape(node.id);

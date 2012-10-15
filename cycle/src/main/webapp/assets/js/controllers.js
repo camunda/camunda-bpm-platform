@@ -620,10 +620,8 @@ function ConnectorSetupController($scope, $http, $location, App, Event, Commons,
 	
 	$scope.$emit(Event.navigationChanged, {name:"Connector setup"});
 
-	$scope.connectorConfigurations = Commons.getConnectorConfigurations().then(function(connectorConfigurations) {
-		$scope.connectorConfigurations = connectorConfigurations;
-	});
-	
+	$scope.connectorConfigurations = ConnectorConfiguration.query();
+
 	$scope.createNewConnector = function() {
     $scope.currentConnectorConfiguration = null;
 		$scope.connectorDialogMode = "ADD_CONNECTOR";
@@ -641,32 +639,28 @@ function ConnectorSetupController($scope, $http, $location, App, Event, Commons,
     $http.post(App.uri("secured/resource/connector/configuration/" + connectorConfiguration.connectorId + "/delete"))    
     .success(function(data) {
       $scope.connectorConfigurations.splice($scope.connectorConfigurations.indexOf(connectorConfiguration), 1);
-      $location("/Connector Setup");
+      $location.path("/Connector Setup");
 		})
 		.error(function(data) {
 		});
 	};
 	
 	$scope.saveConnectorConfiguration = function(editConnectorConfiguration) {
-	  //TODO
-    var connectorConfiguration = new ConnectorConfiguration({ editConnectorConfiguration: editConnectorConfiguration });
+    var connectorConfiguration = new ConnectorConfiguration(editConnectorConfiguration);
     
     connectorConfiguration.$save(function() {
+      $scope.connectorConfigurations.push(connectorConfiguration);
       $scope.createNewConnectorDialog.close();
     });	  
 	};
 	
 	$scope.updateConnectorConfiguration = function(editConnectorConfiguration) {
-	  //TODO
-	  editConnectorConfiguration.$save(function() {
+	  var currentConnectorConfig = $scope.currentConnectorConfiguration;
+	  
+    angular.extend(currentConnectorConfig, editConnectorConfiguration);
+    currentConnectorConfig.$save(function() {
 	    $scope.createNewConnectorDialog.close();
 	  });
-//    $http.post(App.uri("secured/resource/connector/configuration/" + editConnectorConfiguration.connectorId))    
-//    .success(function(data) {
-//      $scope.createNewConnectorDialog.close();
-//    })
-//    .error(function(data) {
-//    });
 	};
 	
 };
@@ -691,21 +685,48 @@ function CreateNewConnectorController($scope, App) {
 		
 		angular.forEach($scope.connectorConfigurations, function(e, i) {
 			if (e.connectorId == editConnectorConfiguration.connectorId) {
-				$scope.selectedConnectorConfiguration = e;
+				$scope.connectorConfigurationBlueprint = e;
 			}
 		});
 	});
 	
+	$scope.$watch("connectorConfigurationBlueprint", function(newBlueprint) {
+	  if (!newBlueprint) {
+	    return;
+	  }
+	  
+	  var config = $scope.editConnectorConfiguration;
+	  
+	  // make sure properties is empty
+	  config.properties = {};
+	  
+	  // copy connector class
+	  config.connectorClass = newBlueprint.connectorClass;
+	  
+	  // extend properties
+	  angular.extend(config.properties, newBlueprint.properties);
+	});
+	
 	$scope.save = function() {
-	  //TODO
-	  console.log($scope.editConnectorConfiguration);
+	  if (!isValid()) {
+	    return;
+	  }
+	  
+	  // TODO: rename connectorId to id
 	  if ($scope.editConnectorConfiguration.connectorId) {
 	    $scope.updateConnectorConfiguration($scope.editConnectorConfiguration);
 	  } else {
-	    $scope.saveConnectorConfiguration();
+	    $scope.saveConnectorConfiguration($scope.editConnectorConfiguration);
 	  }
 	};
-	
+
+  // is the dialog model valid and can be submitted?
+  var isValid = $scope.isValid = function() {
+    var editConnectorConfig = $scope.editConnectorConfiguration;
+    var valid = !!editConnectorConfig.connectorClass && $scope.editConnectorConfigForm.$valid;
+    return valid;
+  };
+  
   $scope.currentHelpText = function(propertyKey) {
    if (propertyKey == BASE_PATH) {
      return "provide path to your file system, e.g. 'C:\\Users\\Tommy\\FoxFileSystem'";

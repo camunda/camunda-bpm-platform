@@ -22,6 +22,8 @@ public class ConnectorConfigurationDTO {
   private String password;
   private Map<String, String> properties;
   
+  private String connectorClass;
+  
   public ConnectorConfigurationDTO() {
   }
   
@@ -36,6 +38,7 @@ public class ConnectorConfigurationDTO {
     this.connectorName = connectorConfiguration.getLabel();
     this.user = connectorConfiguration.getGlobalUser();
     this.password = connectorConfiguration.getGlobalPassword();
+    this.connectorClass = connectorConfiguration.getConnectorClass();
     this.properties = connectorConfiguration.getProperties();
   }
   
@@ -61,6 +64,14 @@ public class ConnectorConfigurationDTO {
   
   public void setConnectorName(String connectorName) {
     this.connectorName = connectorName;
+  }
+  
+  public String getConnectorClass() {
+    return connectorClass;
+  }
+  
+  public void setConnectorClass(String connectorClass) {
+    this.connectorClass = connectorClass;
   }
   
   public String getLoginMode() {

@@ -53,7 +53,7 @@
                        {{error.message}}
                      </span>
                    </div>
-                   <form class="form-horizontal">
+                   <form class="form-horizontal" novalidate data-ng-submit="save()" name="editConnectorConfigForm">
                      <fieldset>
                        <div class="control-group">                   
                          <label class="control-label" for="connectorLabel" 
@@ -78,26 +78,29 @@
                          </div>
                        </div>
   
-                       <div class="control-group" data-ng-show="editConnectorConfiguration.loginMode == 'GLOBAL'">                   
-                         <label class="control-label" for="userName" 
-                                th:text="#{'User Name*'}">User Name*</label>
-                         <div class="controls" style="margin-bottom: 10px;" >                                
-                          <input id="userName" name="userName" type="text" class="span8" required data-ng-model="editConnectorConfiguration.user"/>
-                         </div> 
+                       <div data-ng-switch data-on="editConnectorConfiguration.loginMode">
+                         <div data-ng-switch-when="GLOBAL">
+                           <div class="control-group">                   
+                             <label class="control-label" for="userName" 
+                                    th:text="#{'User Name*'}">User Name*</label>
+                             <div class="controls" style="margin-bottom: 10px;" >                                
+                              <input id="userName" name="userName" type="text" class="span8" required data-ng-model="editConnectorConfiguration.user"/>
+                             </div> 
+                           </div>
+                           <div class="control-group">                   
+                             <label class="control-label" for="password" 
+                                    th:text="#{'Password*'}">Password*</label>
+                             <div class="controls" style="margin-bottom: 10px;" >                                
+                              <input id="password" name="password" type="text" class="span8" required data-ng-model="editConnectorConfiguration.password"/>
+                             </div> 
+                           </div>
+                         </div>
                        </div>
-                       <div class="control-group" data-ng-show="editConnectorConfiguration.loginMode == 'GLOBAL'">                   
-                         <label class="control-label" for="password" 
-                                th:text="#{'Password*'}">Password*</label>
-                         <div class="controls" style="margin-bottom: 10px;" >                                
-                          <input id="password" name="password" type="text" class="span8" required data-ng-model="editConnectorConfiguration.password"/>
-                         </div> 
-                       </div>
-                       
                        <div class="control-group">                   
                          <label class="control-label" for="connectors" 
                                 th:text="#{'Select Plugin*'}">Select Plugin*</label>
                          <div class="controls" style="margin-bottom: 10px;" >
-                            <select id="connectors" class="span8" data-required data-ng-options="c.name for c in connectorConfigurations" data-ng-model="selectedConnectorConfiguration">
+                            <select id="connectors" class="span8" data-required data-ng-options="c.name for c in connectorConfigurations" data-ng-model="connectorConfigurationBlueprint">
                               <option value="">Select...</option>
                             </select>
                          </div>
@@ -116,7 +119,7 @@
                  </div>
                  <div class="modal-footer">
                    <button class="btn" data-ng-click="createNewConnectorDialog.close()" th:text="#{Cancel}">Cancel</button>
-                   <button class="btn btn-primary" data-ng-click="save()" th:text="#{OK}">OK</button>
+                   <button class="btn btn-primary" data-ng-click="save()" data-ng-disabled="!isValid()" th:text="#{Save}">Save</button>
                    <button class="btn" th:text="#{Test Connector}">Test Connector</button>
                  </div>
                </div>

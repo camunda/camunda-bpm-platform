@@ -1,6 +1,5 @@
 package com.camunda.fox.cycle.web.service.resource;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -11,7 +10,6 @@ import javax.ws.rs.PathParam;
 
 import org.springframework.transaction.annotation.Transactional;
 
-import com.camunda.fox.cycle.connector.Connector;
 import com.camunda.fox.cycle.connector.ConnectorLoginMode;
 import com.camunda.fox.cycle.connector.ConnectorRegistry;
 import com.camunda.fox.cycle.entity.ConnectorConfiguration;
@@ -28,11 +26,7 @@ public class ConnectorConfigurationService {
   
   @GET
   public List<ConnectorConfigurationDTO> list() {
-    ArrayList<ConnectorConfigurationDTO> result = new ArrayList<ConnectorConfigurationDTO>();
-    for (Connector c : connectorRegistry.getConnectors()) {
-      result.add(new ConnectorConfigurationDTO(c.getConfiguration()));
-    }
-    return result;
+    return ConnectorConfigurationDTO.wrapAll(connectorRegistry.getConnectorConfigurations());
   }
   
   @GET
@@ -55,7 +49,7 @@ public class ConnectorConfigurationService {
     update(connectorConfiguration, data);
 
     connectorConfigurationRepository.saveAndFlush(connectorConfiguration);
-    connectorRegistry.updateConnector(id);
+    connectorRegistry.updateConnectorInCache(id);
     return ConnectorConfigurationDTO.wrap(connectorConfiguration);
   }
 
@@ -64,7 +58,7 @@ public class ConnectorConfigurationService {
     ConnectorConfiguration connectorConfiguration = new ConnectorConfiguration();
     update(connectorConfiguration, data);
     connectorConfiguration = connectorConfigurationRepository.saveAndFlush(connectorConfiguration);
-    connectorRegistry.addConnector(connectorConfiguration.getId());
+    connectorRegistry.addConnectorToCache(connectorConfiguration.getId());
     return ConnectorConfigurationDTO.wrap(connectorConfiguration);
   }
   
@@ -77,7 +71,7 @@ public class ConnectorConfigurationService {
       throw new IllegalArgumentException("Not found");
     }
     connectorConfigurationRepository.delete(connectorConfiguration);
-    connectorRegistry.deleteConnector(id);
+    connectorRegistry.deleteConnectorFromCache(id);
   }
   
   private void update(ConnectorConfiguration connectorConfiguration, ConnectorConfigurationDTO data) {
@@ -87,6 +81,7 @@ public class ConnectorConfigurationService {
     connectorConfiguration.setLoginMode(ConnectorLoginMode.valueOf(data.getLoginMode()));
     connectorConfiguration.setProperties(data.getProperties());
     connectorConfiguration.setLabel(data.getName());
+    connectorConfiguration.setConnectorClass(data.getConnectorClass());
   }
  
 }
