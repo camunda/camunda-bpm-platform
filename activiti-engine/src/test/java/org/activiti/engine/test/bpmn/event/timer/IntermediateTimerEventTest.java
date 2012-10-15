@@ -66,8 +66,8 @@ public class IntermediateTimerEventTest extends PluggableActivitiTestCase {
     assertEquals(1, managementService.createJobQuery().processInstanceId(pi1.getId()).count());
     assertEquals(1, managementService.createJobQuery().processInstanceId(pi2.getId()).count());
 
-    // After setting the clock to one second in the future the timers should fire
-    ClockUtil.setCurrentTime(new Date(currentTime.getTime() + 1000));
+    // After setting the clock to 2 seconds in the future the timers should fire
+    ClockUtil.setCurrentTime(new Date(currentTime.getTime() + 2000));
     
     List<Job> jobs = managementService.createJobQuery().executable().list();
     for (Job job : jobs) {
