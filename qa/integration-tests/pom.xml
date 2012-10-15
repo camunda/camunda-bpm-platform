@@ -501,7 +501,6 @@
                 <exclude>**/CallActivityContextSwitchTest.java</exclude>
                 <!-- HEMERA-2889 -->
                 <exclude>**/ejb/remote/*</exclude>
-                <exclude>**/ejb/*</exclude>
                 <!-- HEMERA-2980 -->
                 <exclude>**/TestFoxPlatformClientAsEjbModule_pasAsEjbModule.java</exclude>
               </excludes>
