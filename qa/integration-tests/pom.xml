@@ -10,7 +10,7 @@
     <version>6.2.0-SNAPSHOT</version>
   </parent>
   
-  <!-- <properties>    
+  <!--  <properties>    
     <WAS8_HOME>C:\Program Files (x86)\IBM\WebSphere85\AppServer</WAS8_HOME>
     <WAS8_REMOTE_SERVER_SOAP_PORT>8882</WAS8_REMOTE_SERVER_SOAP_PORT>    
   </properties> -->
@@ -493,8 +493,6 @@
                 <exclude>**/TestProcessEnginesXmlFails.java</exclude>
                 <!-- HEMERA-2888 -->
                 <exclude>**/CallActivityContextSwitchTest.java</exclude>
-                <!-- HEMERA-2889 -->
-                <exclude>**/ejb/remote/*</exclude>
                 <!-- HEMERA-2980 -->
                 <exclude>**/TestFoxPlatformClientAsEjbModule_pasAsEjbModule.java</exclude>
               </excludes>
