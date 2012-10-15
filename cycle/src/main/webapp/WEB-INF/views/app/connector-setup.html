@@ -37,7 +37,7 @@
               </table>
               <a class="btn" data-ng-click="createNewConnector()"><span th:text="#{New}">New</span></a>
                
-               <!-- begin delete-roundtrip-dialog -->
+               <!-- begin add/edit-connector-configuration-dialog -->
                <dialog model="createNewConnectorDialog" ng-cloak>
                <div class="modal hide fade" data-ng-controller="CreateNewConnectorController" data-ngm-if="createNewConnectorDialog.renderHtml()"> 
                  <div class="modal-header">
@@ -119,12 +119,59 @@
                  </div>
                  <div class="modal-footer">
                    <button class="btn" data-ng-click="createNewConnectorDialog.close()" th:text="#{Cancel}">Cancel</button>
+                   <button class="btn btn-primary" th:text="#{Test Connector}">Test Connector</button>
                    <button class="btn btn-primary" data-ng-click="save()" data-ng-disabled="!isValid()" th:text="#{Save}">Save</button>
-                   <button class="btn" th:text="#{Test Connector}">Test Connector</button>
                  </div>
                </div>
                </dialog>  
-               <!-- end delete-roundtrip-dialog -->
+               <!-- end add/edit-connector-configuration-dialog -->
+               
+                <!-- begin delete-connector-configuration-dialog -->
+                <dialog model="deleteConnectorConfigurationDialog" ng-cloak>
+                <div class="modal hide fade" data-ng-controller="DeleteConnectorConfigurationController" ngm-if="deleteConnectorConfigurationDialog.renderHtml()"> 
+                  <div class="modal-header">
+                    <button data-ng-show="deleteConnectorConfigurationDialog.autoClosable" type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h3 th:text="#{'Delete connector configuration'}"></h3>
+                  </div>
+                  <div class="modal-body">
+                  <div data-ng-switch data-on="toBeDeleted">
+                    <div data-ng-switch-when="performConnectorDeletion">
+                        <p> 
+                         <span th:text="#{'Are you sure you would like to delete the selected connector configuration?'}">
+                            Are you sure you would like to delete the selected connector configuration?
+                         </span>
+                        </p>
+                    </div>
+                    <div data-ng-switch-when="deletionSuccess">
+                        <p> 
+                         <span th:text="#{The deletion of the connector configuration was successful.}">
+                            The deletion of the connector configuration was successful.
+                         </span>
+                         </p>
+                    </div>
+                    <div data-ng-switch-when="deletionFailed">
+                        <p>
+                          <span th:text="#{The deletion of the connector configuration failed.}">
+                            The deletion of the connector failed.
+                          </span>
+                        </p>
+                    </div>
+                  </div>
+                  </div>
+                  <div class="modal-footer">
+                    <button class="btn"      
+                            data-ng-show="toBeDeleted == 'performConnectorDeletion'"
+                            data-ng-click="deleteConnectorConfigurationDialog.close()">Cancel</button>
+                    <button class="btn btn-primary"
+                            data-ng-show="toBeDeleted == 'deletionSuccess' || toBeDeleted == 'deletionFailed'" 
+                            data-ng-click="deleteConnectorConfigurationDialog.close()">OK</button>
+                    <button class="btn btn-primary"
+                            data-ng-show="toBeDeleted == 'performConnectorDeletion'" 
+                            data-ng-click="performConnectorDeletion()">Delete</button>
+                  </div>
+                </div>
+                </dialog>  
+                <!-- end delete-connector-configuration-dialog -->
                         
             </div>
 	      </div>

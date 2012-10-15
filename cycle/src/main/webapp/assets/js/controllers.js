@@ -618,6 +618,9 @@ function DeleteRoundtripController($scope, $routeParams, $http, $location, App) 
 function ConnectorSetupController($scope, $http, $location, App, Event, Commons, ConnectorConfiguration) {
 	$scope.createNewConnectorDialog = new Dialog();
 	
+  $scope.deleteConnectorConfigurationDialog = new Dialog();
+  $scope.deleteConnectorConfigurationDialog.setAutoClosable(false);
+	
 	$scope.$emit(Event.navigationChanged, {name:"Connector setup"});
 
 	$scope.connectorConfigurations = ConnectorConfiguration.query();
@@ -636,13 +639,8 @@ function ConnectorSetupController($scope, $http, $location, App, Event, Commons,
 	};
 	
 	$scope.deleteConnector = function(connectorConfiguration) {
-    $http.post(App.uri("secured/resource/connector/configuration/" + connectorConfiguration.connectorId + "/delete"))    
-    .success(function(data) {
-      $scope.connectorConfigurations.splice($scope.connectorConfigurations.indexOf(connectorConfiguration), 1);
-      $location.path("/Connector Setup");
-		})
-		.error(function(data) {
-		});
+	  $scope.toBeDeletedConnector = connectorConfiguration;
+	  $scope.deleteConnectorConfigurationDialog.open();
 	};
 	
 	$scope.saveConnectorConfiguration = function(editConnectorConfiguration) {
@@ -743,3 +741,24 @@ function CreateNewConnectorController($scope, App) {
    }
   };
 };
+
+function DeleteConnectorConfigurationController($scope, $location, $http, App) {
+
+  var PERFORM_DEL = "performConnectorDeletion",
+      DEL_SUCCESS = "deletionSuccess",
+      DEL_FAILED = "deletionFailed";
+
+  $scope.toBeDeleted = PERFORM_DEL;
+
+  $scope.performConnectorDeletion = function() {
+    $http.post(App.uri("secured/resource/connector/configuration/" + $scope.toBeDeletedConnector.connectorId + "/delete"))
+    .success(function(data) {
+      $scope.toBeDeleted = DEL_SUCCESS;
+      $scope.connectorConfigurations.splice($scope.connectorConfigurations.indexOf($scope.toBeDeletedConnector), 1);
+      $location.path("/Connector Setup");
+    })
+    .error(function(data) {
+      $scope.toBeDeleted = DEL_FAILED;
+    });
+  };
+}
