@@ -240,7 +240,11 @@ public class ClassPathScanner implements ProcessArchiveScanner {
     
     try {
       if(source instanceof File) {
-        inputStream = new FileInputStream((File) source);
+        try {
+          inputStream = new FileInputStream((File) source);
+        } catch (IOException e) {
+          throw new FoxPlatformException("Could not open file for reading "+source + ". "+e.getMessage(), e);
+        }
       } else {
         inputStream = (InputStream) source;
       }
@@ -248,9 +252,6 @@ public class ClassPathScanner implements ProcessArchiveScanner {
       
       resourceMap.put(resourcePath, bytes);
       
-    } catch (IOException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
     } finally {
       if(inputStream != null) {
         IoUtil.closeSilently(inputStream);
