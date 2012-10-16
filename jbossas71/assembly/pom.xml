@@ -3,7 +3,7 @@
 
   <description>
     Assembles the fox platform and makes it ready for qa. 
-    The assembly is installed to maven later in the reactor, if the integration tests pass sucessfully
+    The assembly is installed to maven later in the reactor, if the integration tests pass successfully
   </description>
 
   <artifactId>fox-platform-jboss-assembly</artifactId>
