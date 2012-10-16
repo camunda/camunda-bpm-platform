@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<module xmlns="urn:jboss:module:1.0" name="org.bouncycastle.bcpg-jdk16">
+<module xmlns="urn:jboss:module:1.0" name="org.bouncycastle.bcpg-jdk15on">
   <resources>
-	<resource-root path="bcpg-jdk16-1.46.jar"/>
+	<resource-root path="bcpg-jdk15on-1.47.jar"/>
   </resources>
           <!-- Insert resources here -->
   <dependencies>
 	<module name="javax.api" />
-	<module name="org.bouncycastle.bcprov-jdk16" />
+	<module name="org.bouncycastle.bcprov-jdk15on" />
   </dependencies>
   
 </module>

@@ -54,6 +54,13 @@
         <include>com.fasterxml.uuid:java-uuid-generator:jar:*</include>      
       </includes>     
     </dependencySet>
+    <dependencySet>
+      <outputDirectory>modules/java/jre/lib/ext</outputDirectory>
+      <includes>
+        <include>org.bouncycastle:bcprov-ext-jdk15on:jar:*</include>
+        <include>org.bouncycastle:bcpg-jdk15on:jar:*</include>
+      </includes>
+    </dependencySet>
         
   </dependencySets>
 </assembly>
