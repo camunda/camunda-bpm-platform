@@ -7,14 +7,6 @@
 
 	<description>The camunda fox cockpit webapp</description>
 
-	<!-- Indicate to JBoss EL implementation bundled with the 
-		webapp. This allows us to use EL 2.2 value expression with zero params.
-		See https://issues.jboss.org/browse/SEAMFACES-208 -->
-	<context-param>
-		<param-name>com.sun.faces.expressionFactory</param-name>
-		<param-value>org.jboss.el.ExpressionFactoryImpl</param-value>
-	</context-param>
-	
 	<context-param>
 		<param-name>com.sun.faces.enableMissingResourceLibraryDetection</param-name>
 		<param-value>true</param-value>
