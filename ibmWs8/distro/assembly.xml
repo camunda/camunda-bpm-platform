@@ -61,6 +61,26 @@
         <include>org.bouncycastle:bcpg-jdk15on:jar:*</include>
       </includes>
     </dependencySet>
+    
+    <dependencySet>
+      <outputDirectory />
+      <unpack>true</unpack>
+      <unpackOptions>
+        <includes>
+          <include>**/*.sql</include>
+        </includes>
+      </unpackOptions>
+      <includes>
+        <include>com.camunda.fox.cockpit:cockpit-sql-scripts:jar:*</include>
+      </includes>
+    </dependencySet>
+    <dependencySet>
+      <outputFileNameMapping>fox-cockpit-was-${project.version}.${artifact.extension}</outputFileNameMapping>
+      <includes>
+        <include>com.camunda.fox.cockpit:cockpit-webapp-fox-was:war:*</include>
+      </includes>
+      <outputDirectory>webapps</outputDirectory>
+    </dependencySet>
         
   </dependencySets>
 </assembly>
