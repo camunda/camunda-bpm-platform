@@ -13,9 +13,6 @@
       activiti:delegateExpression="${invocationCounterDelegateBean}"
       activiti:async="true" />
       
-    <serviceTask id="servicetask2"      
-      activiti:delegateExpression="${invocationCounterDelegateBean}" />
-
     <userTask id="waitHere" />
     
     <serviceTask id="servicetask3"      
@@ -25,8 +22,7 @@
     <userTask id="waitAgain" />
 
     <sequenceFlow sourceRef="theStart" targetRef="servicetask1" />
-    <sequenceFlow sourceRef="servicetask1" targetRef="servicetask2" />
-    <sequenceFlow sourceRef="servicetask2" targetRef="waitHere" />
+    <sequenceFlow sourceRef="servicetask1" targetRef="waitHere" />
     <sequenceFlow sourceRef="waitHere" targetRef="servicetask3" />
     <sequenceFlow sourceRef="servicetask3" targetRef="waitAgain" />
     <sequenceFlow sourceRef="waitAgain" targetRef="endevent1" />
