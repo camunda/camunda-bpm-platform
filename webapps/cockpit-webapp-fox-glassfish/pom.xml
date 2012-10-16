@@ -29,84 +29,9 @@
 		
     <!-- shared libraries -->
     <dependency>
-      <artifactId>bcprov-jdk16</artifactId>
       <groupId>org.bouncycastle</groupId>
+      <artifactId>bcpg-jdk15on</artifactId>
     </dependency>
-    <dependency>
-      <groupId>org.bouncycastle</groupId>
-      <artifactId>bcpg-jdk16</artifactId>
-      <exclusions>
-        <exclusion>
-          <artifactId>bcprov-jdk16</artifactId>
-          <groupId>org.bouncycastle</groupId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    
-    <!--dependency>
-      <groupId>com.camunda.fox.cockpit</groupId>
-      <artifactId>cockpit-demo-processes</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    
-    <dependency>
-      <groupId>com.camunda.fox.platform</groupId>
-      <artifactId>fox-platform-api</artifactId>
-      <scope>provided</scope>
-    </dependency>
-		
-    <dependency>
-      <groupId>com.camunda.fox.engine</groupId>
-      <artifactId>fox-engine</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    
-    <dependency>
-      <groupId>com.camunda.fox.commons</groupId>
-       <artifactId>commons-transactions-jta</artifactId>
-       <version>${project.version}</version>
-    </dependency>
-		
-    <dependency>
-      <groupId>com.camunda.fox.cockpit</groupId>
-      <artifactId>cockpit-core</artifactId>
-      <version>${project.version}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.slf4j</groupId>
-          <artifactId>slf4j-api</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>com.camunda.fox.engine</groupId>
-          <artifactId>fox-engine</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    
-    <dependency>
-      <groupId>org.jboss.seam</groupId>
-      <artifactId>jboss-el</artifactId>
-      <version>2.0.0.GA</version>
-      <exclusions>
-        <exclusion>
-          <groupId>javax.el</groupId>
-          <artifactId>el-api</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-		
-    <dependency>
-      <groupId>org.jboss.spec</groupId>
-      <artifactId>jboss-javaee-web-6.0</artifactId>
-      <type>pom</type>
-      <scope>provided</scope>
-      <exclusions>
-        <exclusion>
-          <artifactId>xalan</artifactId>
-          <groupId>org.apache.xalan</groupId>
-        </exclusion>
-      </exclusions>
-    </dependency-->
   </dependencies>
 
   <build>
@@ -132,7 +57,7 @@
             <manifestEntries>
 							<!-- SVN revision number -->
               <Implementation-Build>${buildNumber}</Implementation-Build>
-              <Dependencies>org.bouncycastle.bcprov-jdk16,org.bouncycastle.bcpg-jdk16,org.apache.commons.logging,org.jboss.logging,org.apache.log4j,org.slf4j,org.apache.commons.lang</Dependencies>
+              <!-- Dependencies>org.bouncycastle.bcprov-jdk15on,org.bouncycastle.bcpg-jdk15on,org.apache.commons.logging,org.jboss.logging,org.apache.log4j,org.slf4j,org.apache.commons.lang</Dependencies-->
             </manifestEntries>
           </archive>
           <webResources>
