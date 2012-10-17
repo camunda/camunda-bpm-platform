@@ -106,7 +106,7 @@
                     </security>
                 </datasource>
                 <datasource jta="true" jndi-name="java:jboss/datasources/FoxEngineDS" pool-name="FoxEngineDS" enabled="true" use-java-context="true" use-ccm="true">
-                    <connection-url>jdbc:postgresql://${database.host}:3306/${database.name}</connection-url>
+                    <connection-url>jdbc:postgresql://${database.host}:5432/${database.name}</connection-url>
                     <driver>postgresql</driver>
                     <transaction-isolation>TRANSACTION_READ_COMMITTED</transaction-isolation>
                     <pool>
@@ -124,7 +124,7 @@
                     </validation>
                 </datasource>
                 <datasource jta="true" jndi-name="java:jboss/datasources/CycleDS" pool-name="CycleDS" enabled="true" use-java-context="true" use-ccm="true">
-                    <connection-url>jdbc:postgresql://${database.host}:3306/${database.name}</connection-url>
+                    <connection-url>jdbc:postgresql://${database.host}:5432/${database.name}</connection-url>
                     <driver>postgresql</driver>
                     <transaction-isolation>TRANSACTION_READ_COMMITTED</transaction-isolation>
                     <pool>
@@ -152,7 +152,7 @@
             </datasources>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:deployment-scanner:1.1">
-            <deployment-scanner path="deployments" relative-to="jboss.server.base.dir" scan-interval="5000"/>
+            <deployment-scanner path="deployments" relative-to="jboss.server.base.dir" scan-interval="5000" deployment-timeout="120"/>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:ee:1.0">
             <global-modules>
