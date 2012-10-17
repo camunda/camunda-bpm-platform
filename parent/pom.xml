@@ -160,7 +160,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-	<configuration>
+	      <configuration>
           <source>${version.java}</source>
           <target>${version.java}</target>
         </configuration>

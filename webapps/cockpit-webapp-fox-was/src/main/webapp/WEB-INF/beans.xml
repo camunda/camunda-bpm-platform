@@ -9,8 +9,12 @@
     <class>com.camunda.fox.cockpit.demo.deployer.FoxPlatformDemoDataDeployer</class>
   </alternatives>
   
+  <!-- disabled because OpenWebBeans only needs/allows the definition of an
+    interceptor in ONE beans.xml, in contrary to Weld, where you must enable
+    an interceptor in the containing jar and the war too.
   <interceptors>
     <class>com.camunda.fox.cdi.transaction.interceptor.TransactionInterceptor</class>
     <class>com.camunda.fox.security.interceptor.SecurityInterceptor</class>
   </interceptors>
+  -->
 </beans>
