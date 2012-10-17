@@ -1,5 +1,5 @@
---------------------------------------------------------
--- rename table ACT_HI_PROCVARIABLE -> ACT_HI_VARINST --
+-- ------------------------------------------------------
+-- rename table ACT_HI_PROCVARIABLE -> ACT_HI_VARINST
 
 create table ACT_HI_VARINST (
     ID_ varchar(64) not null,
@@ -22,22 +22,22 @@ insert into ACT_HI_VARINST
 	select ID_, PROC_INST_ID_, NULL, NULL, NAME_, VAR_TYPE_, REV_, BYTEARRAY_ID_, DOUBLE_, LONG_, TEXT_, TEXT2_ FROM ACT_HI_PROCVARIABLE;
 
 -- drop old indices --
-drop index ACT_IDX_HI_PROCVAR_PROC_INST;
-drop index ACT_IDX_HI_PROCVAR_NAME_TYPE;
+drop index ACT_IDX_HI_PROCVAR_PROC_INST on ACT_HI_PROCVARIABLE;
+drop index ACT_IDX_HI_PROCVAR_NAME_TYPE on ACT_HI_PROCVARIABLE;
 
 -- drop old table --
 drop table ACT_HI_PROCVARIABLE;
 
 -- create new indices --
-create index ACT_IDX_HI_PROCVAR_PROC_INST on ACT_HI_VARINST(PROC_INST_ID_)
+create index ACT_IDX_HI_PROCVAR_PROC_INST on ACT_HI_VARINST(PROC_INST_ID_);
 create index ACT_IDX_HI_PROCVAR_NAME_TYPE on ACT_HI_VARINST(NAME_, VAR_TYPE_);
 
 -- not migrating --
 --   -    DUEDATE_ timestamp null,
 --   +    DUEDATE_ timestamp,
 
---------------------------------------------
--- change column types in ACT_HI_TASKINST --
+-- ------------------------------------------
+-- change column types in ACT_HI_TASKINST
 
 alter table ACT_HI_TASKINST 
     MODIFY OWNER_ varchar(255);
@@ -46,7 +46,7 @@ alter table ACT_HI_TASKINST
     MODIFY ASSIGNEE_ varchar(255);
 
 
-----------------------------------------
+-- --------------------------------------
 -- change column types in ACT_RU_TASK --
 
 alter table ACT_RU_TASK 
@@ -56,26 +56,26 @@ alter table ACT_RU_TASK
     MODIFY ASSIGNEE_ varchar(255);
 
 
-------------------------------------------------
+-- ----------------------------------------------
 -- change column types in ACT_RU_IDENTITYLINK --
 
-drop index ACT_IDX_IDENT_LNK_GROUP;
+drop index ACT_IDX_IDENT_LNK_GROUP on ACT_RU_IDENTITYLINK;
 alter table ACT_RU_IDENTITYLINK 
     MODIFY GROUP_ID_ varchar(255);
 create index ACT_IDX_IDENT_LNK_GROUP on ACT_RU_IDENTITYLINK(GROUP_ID_);
 
-drop index ACT_IDX_IDENT_LNK_USER;
+drop index ACT_IDX_IDENT_LNK_USER on ACT_RU_IDENTITYLINK;
 alter table ACT_RU_IDENTITYLINK 
     MODIFY USER_ID_ varchar(255);
 create index ACT_IDX_IDENT_LNK_USER on ACT_RU_IDENTITYLINK(USER_ID_);	
 
 	
-----------------------------------------------
+-- --------------------------------------------
 -- change column types in ACT_RU_JOB (remove NOT NULL constraint)
 alter table ACT_RU_JOB 
 	MODIFY DUEDATE_ datetime;
 
-----------------------------------------------
+-- --------------------------------------------
 -- revert introduction of new history level --
 
 update ACT_GE_PROPERTY
