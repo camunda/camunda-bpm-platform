@@ -760,6 +760,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       historyLevel = 0;
     } else if (HISTORY_ACTIVITY.equalsIgnoreCase(history)) {
       historyLevel = 1;
+    } else if (HISTORY_VARIABLE.equalsIgnoreCase(history)) {
+      historyLevel = 1;
+      log.warning("Using deprecated history level 'variable'. " +
+      		"This history level is deprecated and replaced by 'activity'. " +
+      		"Consider using 'ACTIVITY' instead.");
     } else if (HISTORY_AUDIT.equalsIgnoreCase(history)) {
       historyLevel = 2;
     } else if (HISTORY_FULL.equalsIgnoreCase(history)) {

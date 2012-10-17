@@ -96,7 +96,9 @@ public abstract class ProcessEngineConfiguration {
    * This means no details for those entities. */
   public static final String HISTORY_ACTIVITY = "activity";
   /** Value for {@link #setHistory(String)} to ensure that only historic process instances, 
-   * historic activity instances and last process variable values are being recorded. */ 
+   * historic activity instances and last process variable values are being recorded. 
+   * <p><strong>NOTE:</strong> This history level has been deprecated. Use level {@link #HISTORY_ACTIVITY} instead.</p> */ 
+  @Deprecated
   public static final String HISTORY_VARIABLE = "variable";
   /** Value for {@link #setHistory(String)} to ensure that only historic process instances, 
    * historic activity instances and submitted form property values are being recorded. */ 
