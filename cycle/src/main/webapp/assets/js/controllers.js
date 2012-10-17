@@ -3,16 +3,20 @@
 
 angular.module('cycle.controllers', []);
 
-function DefaultController($scope, $http, $location, App, Event, Error) {
+window.credentials = null;
+
+function DefaultController($scope, $http, $location, App, Event, Error, Credentials) {
   $scope.appErrors = function () {
     return Error.errors;
   };
   
+  Credentials.reload();
+  
   // TODO: get from cookie
   $scope.currentUser = null;
   
-  $http.get(App.uri('currentUser')).success(function(data) {
-    $scope.currentUser = data;
+  $scope.$watch(Credentials.watchCurrent, function(newValue) {
+    $scope.currentUser = newValue;
   });
   
   $scope.$on(Event.userChanged, function(event, user) {
@@ -30,7 +34,7 @@ function DefaultController($scope, $http, $location, App, Event, Error) {
       var remove = 0;
       angular.forEach(breadCrumbs, function(item) {
         if(item.name == navigationItem.name) {
-          contains = true;			
+          contains = true;      
         }
         if(item.href.indexOf($location.path()) != 0) {
           remove++;
@@ -38,12 +42,12 @@ function DefaultController($scope, $http, $location, App, Event, Error) {
       });
 
       for (var i = 0; i < remove; i++) {
-        breadCrumbs.pop();						
+        breadCrumbs.pop();            
       }
 
       if(!contains) {
         breadCrumbs.push({name:navigationItem.name, href:$location.path()});
-      }		
+      }    
     }
   });
   // end Bread Crumb
@@ -282,8 +286,8 @@ function BpmnDiagramController($scope, Commons, Event, $http, App) {
     .error(function (data) {
         $scope.status = SYNC_FAILED;
     });
-	
-	$scope.editDiagramDialog.close();
+  
+  $scope.editDiagramDialog.close();
 
   };
 
@@ -325,7 +329,7 @@ function BpmnDiagramController($scope, Commons, Event, $http, App) {
 /**
  * Realizes the edit operation of a bpmn diagram inside the respective dialog.
  */
-function EditDiagramController($scope,Commons,Event) {
+function EditDiagramController($scope, Commons, Event, ConnectorConfiguration) {
   
   var FOX_DESIGNER = "fox designer", 
       RIGHT_HAND_SIDE = "rightHandSide";
@@ -333,6 +337,12 @@ function EditDiagramController($scope,Commons,Event) {
   // Error to be displayed in dialog
   $scope.error = null;
   
+  $scope.modelerNames = [];
+  $scope.connectors = ConnectorConfiguration.query();
+
+  // make a copy of the diagram to edit / add
+  $scope.editDiagram = angular.extend(angular.copy($scope.diagram || {}), $scope.diagramTemplate || {});
+
   // Can the modeler name be edited?
   var canEditModeler = $scope.canEditModeler = function() {
     return !!($scope.identifier != RIGHT_HAND_SIDE || ($scope.editDiagram.modeler && $scope.editDiagram.modeler != FOX_DESIGNER));
@@ -346,9 +356,9 @@ function EditDiagramController($scope,Commons,Event) {
   };
   
   var isValidAndFolder = $scope.isValidAndFolder = function() {
-	var editDiagram = $scope.editDiagram;
-	var validAndfolder = !!editDiagram.modeler && $scope.addModelForm.$valid && $scope.selectedNode && $scope.selectedNode.type == "FOLDER";
-	return validAndfolder;
+    var editDiagram = $scope.editDiagram;
+    var validAndfolder = !!editDiagram.modeler && $scope.addModelForm.$valid && $scope.selectedNode && $scope.selectedNode.type == "FOLDER";
+    return validAndfolder;
   };
   
   $scope.acceptedChildTypes = function() {
@@ -374,14 +384,8 @@ function EditDiagramController($scope,Commons,Event) {
   };
   
   $scope.create = function() {
-  	  $scope.createDiagram($scope.editDiagram);
+      $scope.createDiagram($scope.editDiagram);
   };
-
-  $scope.modelerNames = [];
-  $scope.connectors = [];
-  
-  // make a copy of the diagram to edit / add
-  $scope.editDiagram = angular.extend(angular.copy($scope.diagram || {}), $scope.diagramTemplate || {});
 
   // Watch for component error  
   $scope.$on(Event.componentError, function(event, error) {
@@ -394,7 +398,7 @@ function EditDiagramController($scope,Commons,Event) {
     }
     $scope.selectedNode = null;
   });
-  
+
   // Watch for change in diagram path
   $scope.$watch('selectedNode', function(newValue) {
     if (newValue) {
@@ -422,18 +426,16 @@ function EditDiagramController($scope,Commons,Event) {
     }
 
     $scope.modelerNames = data;
+
     // set default value
     if (data.length > 0 && canEditModeler()) {
       $scope.editDiagram.modeler = data[0];
     }
   });
-  
-  $scope.connectors = Commons.getConnectors();
 }
 
 /**
  * Responsible for adding a new roundtrip from within the roundtrip list
- * 
  */
 function CreateNewRoundtripController($scope, $q, $http, $location, Debouncer, App, Roundtrip, Event) {
 
@@ -577,95 +579,95 @@ function ListRoundtripsController($scope, $routeParams, $http, $location, Roundt
  * 
  */
 function DeleteRoundtripController($scope, $routeParams, $http, $location, App) {
-	
+  
   var PERFORM_DEL = "performRoundtripDeletion",
-  	  DEL_SUCCESS = "deletionSuccess",
-  	  DEL_FAILED = "deletionFailed";
+      DEL_SUCCESS = "deletionSuccess",
+      DEL_FAILED = "deletionFailed";
   
   $scope.toBeDeleted = PERFORM_DEL;
   
   function findRoundtripById(roundtrips, roundtripId) {
-	  var roundtrip = null;
-	  
-	  angular.forEach(roundtrips, function(e, i) {
-		  if (e.id == roundtripId) {
-			  roundtrip = e;
-		  }
-	  });
-	  
-	  return roundtrip;
+    var roundtrip = null;
+    
+    angular.forEach(roundtrips, function(e, i) {
+      if (e.id == roundtripId) {
+        roundtrip = e;
+      }
+    });
+    
+    return roundtrip;
   }
   
   $scope.performDeletion = function() {
-	if (!$routeParams.roundtripId) {
-		return;
-	}
-	
-	var roundtrip = findRoundtripById($scope.roundtrips, $routeParams.roundtripId);
-	
+  if (!$routeParams.roundtripId) {
+    return;
+  }
+  
+  var roundtrip = findRoundtripById($scope.roundtrips, $routeParams.roundtripId);
+  
     $http.post(App.uri("secured/resource/roundtrip/" + $routeParams.roundtripId + "/delete"))    
     .success(function(data) {
-    	 $scope.toBeDeleted = DEL_SUCCESS;
-    	 $scope.roundtrips.splice($scope.roundtrips.indexOf(roundtrip), 1);
+       $scope.toBeDeleted = DEL_SUCCESS;
+       $scope.roundtrips.splice($scope.roundtrips.indexOf(roundtrip), 1);
        $location.path("/");
-	})
-	.error(function(data) {
-		$scope.toBeDeleted = DEL_FAILED;
-	});
+  })
+  .error(function(data) {
+    $scope.toBeDeleted = DEL_FAILED;
+  });
   };
 };
 
 function ConnectorSetupController($scope, $http, $location, App, Event, Commons, ConnectorConfiguration) {
-	$scope.createNewConnectorDialog = new Dialog();
-	
-	$scope.$emit(Event.navigationChanged, {name:"Connector setup"});
+  $scope.connectorEditDialog = new Dialog();
+  
+  $scope.$emit(Event.navigationChanged, {name:"Connector setup"});
 
-	$scope.connectorConfigurations = ConnectorConfiguration.query();
+  $scope.connectorConfigurations = ConnectorConfiguration.query();
 
-	$scope.createNewConnector = function() {
+  $scope.createNewConnector = function() {
     $scope.currentConnectorConfiguration = null;
-		$scope.connectorDialogMode = "ADD_CONNECTOR";
-		$scope.createNewConnectorDialog.open();
-	};
-	
-	$scope.editConnector = function(connectorConfiguration) {
-		$scope.connectorDialogMode = "EDIT_CONNECTOR";
-   	// make a copy of the connector to edit
-		$scope.currentConnectorConfiguration = connectorConfiguration;
-		$scope.createNewConnectorDialog.open();
-	};
-	
-	$scope.deleteConnector = function(connectorConfiguration) {
+    $scope.connectorDialogMode = "ADD_CONNECTOR";
+    $scope.connectorEditDialog.open();
+  };
+  
+  $scope.editConnector = function(connectorConfiguration) {
+    $scope.connectorDialogMode = "EDIT_CONNECTOR";
+     // make a copy of the connector to edit
+    $scope.currentConnectorConfiguration = connectorConfiguration;
+    $scope.connectorEditDialog.open();
+  };
+  
+  $scope.deleteConnector = function(connectorConfiguration) {
     $http.post(App.uri("secured/resource/connector/configuration/" + connectorConfiguration.connectorId + "/delete"))    
     .success(function(data) {
       $scope.connectorConfigurations.splice($scope.connectorConfigurations.indexOf(connectorConfiguration), 1);
       $location.path("/Connector Setup");
-		})
-		.error(function(data) {
-		});
-	};
-	
-	$scope.saveConnectorConfiguration = function(editConnectorConfiguration) {
+    })
+    .error(function(data) {
+    });
+  };
+  
+  $scope.saveConnectorConfiguration = function(editConnectorConfiguration) {
     var connectorConfiguration = new ConnectorConfiguration(editConnectorConfiguration);
     
     connectorConfiguration.$save(function() {
       $scope.connectorConfigurations.push(connectorConfiguration);
-      $scope.createNewConnectorDialog.close();
-    });	  
-	};
-	
-	$scope.updateConnectorConfiguration = function(editConnectorConfiguration) {
-	  var currentConnectorConfig = $scope.currentConnectorConfiguration;
-	  
+      $scope.connectorEditDialog.close();
+    });    
+  };
+  
+  $scope.updateConnectorConfiguration = function(editConnectorConfiguration) {
+    var currentConnectorConfig = $scope.currentConnectorConfiguration;
+    
     angular.extend(currentConnectorConfig, editConnectorConfiguration);
     currentConnectorConfig.$save(function() {
-	    $scope.createNewConnectorDialog.close();
-	  });
-	};
-	
+      $scope.connectorEditDialog.close();
+    });
+  };
+  
 };
 
-function CreateNewConnectorController($scope, App) {
+function EditConnectorController($scope, $http, App, ConnectorConfiguration) {
   
   var BASE_PATH = "BASE_PATH",
       SIGNAVIO_BASE_URL = "signavioBaseUrl",
@@ -673,52 +675,77 @@ function CreateNewConnectorController($scope, App) {
       FOLDER_ROOT_PATH = "folderRootPath",
       ALLOW_ALL_SSL_HOSTNAMES = "allowAllSSLHostnames",
       TEMPORARY_FILE_STORE = "temporaryFileStore";
-	
-	$scope.selectedConnectorConfiguration = null;
-	
-	$scope.editConnectorConfiguration = angular.extend(angular.copy($scope.currentConnectorConfiguration || {}));
-	
-	$scope.$watch("editConnectorConfiguration", function(editConnectorConfiguration) {
-		if (!editConnectorConfiguration) {
-			return;
-		}
-		
-		angular.forEach($scope.connectorConfigurations, function(e, i) {
-			if (e.connectorId == editConnectorConfiguration.connectorId) {
-				$scope.connectorConfigurationBlueprint = e;
-			}
-		});
-	});
-	
-	$scope.$watch("connectorConfigurationBlueprint", function(newBlueprint) {
-	  if (!newBlueprint) {
-	    return;
-	  }
-	  
-	  var config = $scope.editConnectorConfiguration;
-	  
-	  // make sure properties is empty
-	  config.properties = {};
-	  
-	  // copy connector class
-	  config.connectorClass = newBlueprint.connectorClass;
-	  
-	  // extend properties
-	  angular.extend(config.properties, newBlueprint.properties);
-	});
-	
-	$scope.save = function() {
-	  if (!isValid()) {
-	    return;
-	  }
-	  
-	  // TODO: rename connectorId to id
-	  if ($scope.editConnectorConfiguration.connectorId) {
-	    $scope.updateConnectorConfiguration($scope.editConnectorConfiguration);
-	  } else {
-	    $scope.saveConnectorConfiguration($scope.editConnectorConfiguration);
-	  }
-	};
+
+  $scope.selectedConnectorConfiguration = null;
+
+  $scope.defaultConfigurations = ConnectorConfiguration.queryDefaults();
+
+  // cached custom properties keys
+  $scope.customPropertyNames = [];
+  
+  $scope.editConnectorConfiguration = angular.extend(angular.copy($scope.currentConnectorConfiguration || {}));
+
+  $scope.connectorTest = null;
+  
+  $scope.$watch("editConnectorConfiguration", function(editConnectorConfiguration) {
+    if (!editConnectorConfiguration) {
+      return;
+    }
+    
+    angular.forEach($scope.connectorConfigurations, function(e, i) {
+      if (e.connectorId == editConnectorConfiguration.connectorId) {
+        $scope.connectorConfigurationBlueprint = e;
+      }
+    });
+  });
+  
+  // Fix for HEMERA-2965: We need to cache the keys for the configuration, 
+  // otherwise the custom fields loose focus on type
+  $scope.$watch("editConnectorConfiguration.properties", function(newValue) {
+    if (newValue) {
+      var keys = [];
+      angular.forEach(newValue, function(val, key) {
+        keys.push(key);
+      });
+      
+      $scope.customPropertyNames = keys;
+    }
+  });
+  
+  function copySettings(blueprint) {
+    var config = $scope.editConnectorConfiguration;
+
+    // make sure properties is empty
+    config.properties = {};
+
+    // remember name
+    config.connectorName = blueprint.name;
+
+    // remember class
+    config.connectorClass = blueprint.connectorClass;
+
+    // extend properties
+    angular.extend(config.properties, blueprint.properties);
+  }
+  
+  $scope.$watch("blueprint", function(newBlueprint) {
+    if (newBlueprint) {
+      copySettings(newBlueprint);
+    }
+  });
+  
+  $scope.save = function() {
+    if (!isValid()) {
+      return;
+    }
+    
+    // TODO: rename connectorId to id
+    if ($scope.editConnectorConfiguration.connectorId) {
+      $scope.updateConnectorConfiguration($scope.editConnectorConfiguration);
+    } else {
+      $scope.saveConnectorConfiguration($scope.editConnectorConfiguration);
+    }
+  };
 
   // is the dialog model valid and can be submitted?
   var isValid = $scope.isValid = function() {
@@ -726,13 +753,19 @@ function CreateNewConnectorController($scope, App) {
     var valid = !!editConnectorConfig.connectorClass && $scope.editConnectorConfigForm.$valid;
     return valid;
   };
-  
+
+  $scope.test = function() {
+    $http.post(App.uri("secured/resource/connector/configuration/test"), $scope.editConnectorConfiguration).success(function(data) {
+      $scope.connectorTest = data;
+    });
+  };
+
   $scope.currentHelpText = function(propertyKey) {
    if (propertyKey == BASE_PATH) {
      return "provide path to your file system, e.g. 'C:\\Users\\Tommy\\FoxFileSystem'";
    } else if (propertyKey == SIGNAVIO_BASE_URL) {
      return "enter the URL to your modelers loginpage, e.g. 'https://editor.signavio.com/'";
-   } else if (propertyKey == REPPO_PATH) {
+   } else if (propertyKey == REPO_PATH) {
      return "The SVN root URL to use, e.g. 'https://svn.camunda.com/fox/'";
    } else if (propertyKey == FOLDER_ROOT_PATH) {
      return "if you want to point the fox modeler to some root directory different to the normal Signavio root directory, enter the ID here, e.g. eb36d6fd27794eda95a9f7e9aa16d987";
@@ -742,4 +775,4 @@ function CreateNewConnectorController($scope, App) {
      return "A directory in the local file system which can be used to store temporary files, e.g. 'c:/temp/svn'";
    }
   };
-};
+}

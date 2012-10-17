@@ -47,6 +47,7 @@ import org.codehaus.plexus.util.IOUtil;
 import org.jboss.resteasy.client.ClientRequest;
 import org.jboss.resteasy.client.ClientRequestFactory;
 import org.jboss.resteasy.client.ClientResponse;
+import org.jboss.resteasy.client.ClientResponseFailure;
 import org.jboss.resteasy.client.core.BaseClientResponse;
 import org.jboss.resteasy.client.core.executors.ApacheHttpClient4Executor;
 import org.jboss.resteasy.plugins.providers.RegisterBuiltin;
@@ -199,35 +200,174 @@ public class SignavioConnector extends Connector {
     }
   }
 
-  @Secured
   @Override
-  public List<ConnectorNode> getChildren(ConnectorNode parent) {
-    List<ConnectorNode> nodes = new ArrayList<ConnectorNode>();
-    try {
-      String result = signavioClient.getChildren(parent.getId());
-      JSONArray jsonArray = new JSONArray(result);
-      for (int i = 0; i < jsonArray.length(); i++) {
-        JSONObject jsonObj = jsonArray.getJSONObject(i);
-        
-        ConnectorNode newNode = null;
-        String relProp = jsonObj.getString(JSON_REL_PROP);
-        if (relProp.equals(JSON_DIR_VALUE)) {
-          newNode = createFolderNode(jsonObj);
-          nodes.add(newNode);
-        } else if (relProp.equals(JSON_MOD_VALUE)) {
-          newNode = createFileNode(jsonObj);
-          nodes.add(newNode);
-        }
-        if (newNode != null) {
-          newNode.setConnectorId(getConfiguration().getId());  
+  public void dispose() {
+    if (this.httpClient4Executor != null) {
+      this.httpClient4Executor.getHttpClient().getConnectionManager().shutdown();
+      this.httpClient4Executor = null;
+      this.signavioClient = null;
+      this.loggedIn = false;
+    }
+  }
+
+  // Connector API methods //////////////////////////////////////////////
+  
+  @Override
+  public void deleteNode(final ConnectorNode node) {
+    
+    executeCommand(new Command<Void>("delete node") {
+      
+      @Override
+      public Void execute() throws Exception {
+        signavioClient.delete(extractType(node), node.getId());
+        return null;
+      }
+    });
+  }
+
+  @Override
+  public ConnectorNode createNode(final String parentId, final String label, final ConnectorNodeType type) {
+    
+    return executeCommand(new Command<ConnectorNode>("create node") {
+      
+      @Override
+      public ConnectorNode execute() throws Exception {
+        InputStream emptyJson = null;
+        try {
+          String response = "";
+          ConnectorNode result = null;
+          switch (type) {
+            case FOLDER:
+              SignavioCreateFolderForm form = new SignavioCreateFolderForm(label, "", parentId);
+              response = signavioClient.createFolder(form);
+              result = createFolderNode(new JSONObject(response));
+              break;
+            case BPMN_FILE:
+              SignavioCreateModelForm newModelForm = new SignavioCreateModelForm();
+
+              newModelForm.setId(UUID.randomUUID().toString().replace("-", ""));
+              newModelForm.setName(label);
+              newModelForm.setComment("");
+              newModelForm.setDescription("");
+              newModelForm.setParent(parentId);
+
+              emptyJson = getClass().getClassLoader().getResourceAsStream("com/camunda/fox/cycle/connector/emptyProcessModelTemplate.json");
+
+              newModelForm.setJsonXml(new String(IoUtil.readInputStream(emptyJson, "emptyProcessModelTemplate.json"), UTF_8));
+              newModelForm.setSVG_XML("<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:oryx=\"http://oryx-editor.org\" id=\"sid-80D82B67-3B30-4B35-A6CB-16EEE17A719F\" width=\"50\" height=\"50\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:svg=\"http://www.w3.org/2000/svg\"><defs/><g stroke=\"black\" font-family=\"Verdana, sans-serif\" font-size-adjust=\"none\" font-style=\"normal\" font-variant=\"normal\" font-weight=\"normal\" line-heigth=\"normal\" font-size=\"12\"><g class=\"stencils\" transform=\"translate(25, 25)\"><g class=\"me\"/><g class=\"children\"/><g class=\"edge\"/></g></g></svg>");
+
+              response = signavioClient.createModel(newModelForm);
+              result = createFileNode(new JSONObject(response));
+              break;
+          }
+          
+          if (result != null) {
+            result.setConnectorId(getConfiguration().getId());
+          }
+          return result;
+        } finally {
+          IoUtil.closeSilently(emptyJson);
         }
       }
-    } catch (Exception e) {
-      throw new CycleException("Children for Signavio connector '" + this.getConfiguration().getLabel() + "' could not be loaded in repository '" + parent.getId() + "'.", e);
-    }
-    return nodes;
+    });
   }
   
+  @Secured
+  @Override
+  public List<ConnectorNode> getChildren(final ConnectorNode parent) {
+    
+    return executeCommand(new Command<List<ConnectorNode>>("get children") {
+      
+      @Override
+      public List<ConnectorNode> execute() throws Exception {
+        
+        List<ConnectorNode> nodes = new ArrayList<ConnectorNode>();
+        String result = signavioClient.getChildren(parent.getId());
+        JSONArray jsonArray = new JSONArray(result);
+        for (int i = 0; i < jsonArray.length(); i++) {
+          JSONObject jsonObj = jsonArray.getJSONObject(i);
+
+          ConnectorNode newNode = null;
+          String relProp = jsonObj.getString(JSON_REL_PROP);
+          if (relProp.equals(JSON_DIR_VALUE)) {
+            newNode = createFolderNode(jsonObj);
+            nodes.add(newNode);
+          } else if (relProp.equals(JSON_MOD_VALUE)) {
+            newNode = createFileNode(jsonObj);
+            nodes.add(newNode);
+          }
+          if (newNode != null) {
+            newNode.setConnectorId(getConfiguration().getId());  
+          }
+        }
+        
+        return nodes;
+      }
+    });
+  }
+
+  @Secured
+  @Override
+  public InputStream getContent(final ConnectorNode node) {
+    return executeCommand(new Command<InputStream>("get content information") {
+      @Override
+      public InputStream execute() throws Exception {
+        ConnectorNodeType type = node.getType();
+
+        switch (type) {
+        case PNG_FILE:
+          return wrapStream(signavioClient.getPngContent(node.getId()));
+
+        default:
+          return wrapStream(signavioClient.getContent(node.getId()));
+        }
+      }
+    });
+  }
+
+  @Secured
+  @Override
+  public ConnectorNode getRoot() {
+    ConnectorNode rootNode = new ConnectorNode(SLASH_CHAR, SLASH_CHAR);
+    rootNode.setType(ConnectorNodeType.FOLDER);
+    return rootNode;
+  }
+
+  @Secured
+  @Override
+  public ContentInformation updateContent(final ConnectorNode node, final InputStream newContent) throws Exception {
+    return executeCommand(new Command<ContentInformation>("get content information") {
+
+      @Override
+      public ContentInformation execute() throws Exception {
+        ConnectorNode privateFolder = getPrivateFolder();
+        ConnectorNode importedModel = importContent(privateFolder, IOUtil.toString(newContent, UTF_8));
+        String json = signavioClient.getJson(importedModel.getId());
+        String svg = signavioClient.getSVG(importedModel.getId());
+        deleteNode(importedModel);
+
+        ConnectorNode parent = getParent(node);
+        saveModel(parent, node.getId(), node.getLabel(), json, svg, "", "", true);
+
+        return getContentInformation(node);
+      }
+    });
+  }
+
+  @Override
+  @Secured
+  public ContentInformation getContentInformation(final ConnectorNode node) {
+    return executeCommand(new Command<ContentInformation>("get content information") {
+
+      @Override
+      public ContentInformation execute() throws Exception {
+        return new ContentInformation(isContentAvailable(node), getLastModifiedDate(node));
+      }
+    });
+  }
+
+  // private or protected utilities /////////////////////////////////////////
+
   private ConnectorNode createFolderNode(JSONObject jsonObj) throws JSONException {
     ConnectorNode node = new ConnectorNode();
     node.setType(ConnectorNodeType.FOLDER);
@@ -319,22 +459,7 @@ public class SignavioConnector extends Connector {
       return false;
     }
   }
-
-  @Secured
-  @Override
-  public InputStream getContent(ConnectorNode node) {
-    
-    ConnectorNodeType type = node.getType();
-    
-    switch (type) {
-    case PNG_FILE:
-      return wrapStream(this.signavioClient.getPngContent(node.getId()));
-
-    default:
-      return wrapStream(this.signavioClient.getContent(node.getId()));
-    }
-  }
-
+  
   private InputStream wrapStream(InputStream inputStream) {
     try {
       return new ByteArrayInputStream(IOUtils.toByteArray(inputStream));
@@ -351,36 +476,7 @@ public class SignavioConnector extends Connector {
       r.releaseConnection();
     }
   }
-
-  @Secured
-  @Override
-  public ConnectorNode getRoot() {
-    ConnectorNode rootNode = new ConnectorNode(SLASH_CHAR, SLASH_CHAR);
-    rootNode.setType(ConnectorNodeType.FOLDER);
-    return rootNode;
-  }
-
-  @Secured
-  @Override
-  public ContentInformation updateContent(ConnectorNode node, InputStream newContent) throws Exception {
-    ConnectorNode privateFolder = this.getPrivateFolder();
-    ConnectorNode importedModel = this.importContent(privateFolder, IOUtil.toString(newContent, UTF_8));
-    String json = signavioClient.getJson(importedModel.getId());
-    String svg = signavioClient.getSVG(importedModel.getId());
-    deleteNode(importedModel);
-    
-    ConnectorNode parent = getParent(node);
-    saveModel(parent, node.getId(), node.getLabel(), json, svg, "", "", true);
-    
-    return getContentInformation(node);
-  }
-
-  @Override
-  @Secured
-  public ContentInformation getContentInformation(ConnectorNode node) {
-    return new ContentInformation(isContentAvailable(node), getLastModifiedDate(node));
-  }
-
+  
   private ConnectorNode getParent(ConnectorNode node) {
     try {
       String info = this.signavioClient.getInfo(this.extractType(node), node.getId());
@@ -551,67 +647,56 @@ public class SignavioConnector extends Connector {
     throw new UnsupportedOperationException();
   }
 
-  @Override
-  public void dispose() {
-    if (this.httpClient4Executor != null) {
-      this.httpClient4Executor.getHttpClient().getConnectionManager().shutdown();
-      this.httpClient4Executor = null;
-      this.signavioClient = null;
-      this.loggedIn = false;
-    }
-  }
-
-  @Override
-  public void deleteNode(ConnectorNode node) {
-    this.signavioClient.delete(this.extractType(node), node.getId());
-  }
-
-  @Override
-  public ConnectorNode createNode(String parentId, String label, ConnectorNodeType type) {
-    InputStream emptyJson = null;
-    try {
-      String response = "";
-      ConnectorNode result = null;
-      switch (type) {
-        case FOLDER:
-          SignavioCreateFolderForm form = new SignavioCreateFolderForm(label, "", parentId);
-          response = this.signavioClient.createFolder(form);
-          result = this.createFolderNode(new JSONObject(response));
-          break;
-        case BPMN_FILE:
-          SignavioCreateModelForm newModelForm = new SignavioCreateModelForm();
-          
-          newModelForm.setId(UUID.randomUUID().toString().replace("-", ""));
-          newModelForm.setName(label);
-          newModelForm.setComment("");
-          newModelForm.setDescription("");
-          newModelForm.setParent(parentId);
-          
-          emptyJson = getClass().getClassLoader().getResourceAsStream("com/camunda/fox/cycle/connector/emptyProcessModelTemplate.json");
-          
-          newModelForm.setJsonXml(new String(IoUtil.readInputStream(emptyJson, "emptyProcessModelTemplate.json"), UTF_8));
-          newModelForm.setSVG_XML("<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:oryx=\"http://oryx-editor.org\" id=\"sid-80D82B67-3B30-4B35-A6CB-16EEE17A719F\" width=\"50\" height=\"50\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:svg=\"http://www.w3.org/2000/svg\"><defs/><g stroke=\"black\" font-family=\"Verdana, sans-serif\" font-size-adjust=\"none\" font-style=\"normal\" font-variant=\"normal\" font-weight=\"normal\" line-heigth=\"normal\" font-size=\"12\"><g class=\"stencils\" transform=\"translate(25, 25)\"><g class=\"me\"/><g class=\"children\"/><g class=\"edge\"/></g></g></svg>");
-          
-          response = this.signavioClient.createModel(newModelForm);
-          result = this.createFileNode(new JSONObject(response));
-          break;
-        default:
-          break;
-      }
-      if (result != null) {
-        result.setConnectorId(this.getConfiguration().getId());  
-      }
-      return result;
-    } catch (Exception e) {
-      logger.fine("Failed to create a new connector node '" + label + "'.");
-      throw new CycleException("Failed to create a new connector node '" + label + "'.", e);
-    } finally {
-      IoUtil.closeSilently(emptyJson);
-    }
-  }
   
   protected String getSecurityToken() {
     return securityToken;
   }
   
+  // Signavio Connector command execution ///////////////////////////////////////
+  
+  /**
+   * Execute a command and catch / process a number of specific errors
+   * 
+   * @param <T>
+   * @param command
+   * @return 
+   */
+  protected <T> T executeCommand(Command<T> command) {
+    try {
+      T result = command.execute();
+      return result;
+    } catch (ClientResponseFailure e) {
+      if (e.getResponse().getStatus() == 401) {
+        throw new CycleException("Failed to authenticate (Status 401)");
+      } else {
+        throw new CycleException("Could not execute action", e);
+      }
+    } catch (Exception e) {
+      throw new CycleException("Could not perform operation " + command.getOperation(), e);
+    }
+  }
+  
+  /**
+   * Command to be executed in {@link SignavioConnector#executeCommand(com.camunda.fox.cycle.connector.signavio.SignavioConnector.Command) }.
+   * 
+   * @param <T> 
+   */
+  protected abstract static class Command<T> {
+
+    private String operation;
+    
+    protected Command(String operation) {
+      this.operation = operation;
+    }
+
+    public String getOperation() {
+      return operation;
+    }
+
+    /**
+     * Execute a signavio action
+     * @return 
+     */
+    public abstract T execute() throws Exception;
+  }
 }

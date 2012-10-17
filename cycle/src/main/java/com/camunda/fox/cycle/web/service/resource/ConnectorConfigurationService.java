@@ -7,28 +7,38 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response;
 
 import org.springframework.transaction.annotation.Transactional;
 
-import com.camunda.fox.cycle.connector.ConnectorLoginMode;
 import com.camunda.fox.cycle.connector.ConnectorRegistry;
+import com.camunda.fox.cycle.connector.ConnectorStatus;
 import com.camunda.fox.cycle.entity.ConnectorConfiguration;
 import com.camunda.fox.cycle.repository.ConnectorConfigurationRepository;
 import com.camunda.fox.cycle.web.dto.ConnectorConfigurationDTO;
+import com.camunda.fox.cycle.web.dto.ConnectorStatusDTO;
 
 @Path("secured/resource/connector/configuration")
 public class ConnectorConfigurationService {
-  
+
   @Inject
   protected ConnectorRegistry connectorRegistry;
+
   @Inject
   protected ConnectorConfigurationRepository connectorConfigurationRepository;
-  
+
+  @GET
+  @Path("defaults")
+  public List<ConnectorConfigurationDTO> listDefaults() {
+    return ConnectorConfigurationDTO.wrapAll(connectorRegistry.getConnectorDefinitions());
+  }
+
   @GET
   public List<ConnectorConfigurationDTO> list() {
-    return ConnectorConfigurationDTO.wrapAll(connectorRegistry.getConnectorConfigurations());
+    return ConnectorConfigurationDTO.wrapAll(connectorConfigurationRepository.findAll());
   }
-  
+
   @GET
   @Path("{id}")
   public ConnectorConfigurationDTO get(@PathParam("id") long id) {
@@ -40,48 +50,71 @@ public class ConnectorConfigurationService {
   @Transactional
   public ConnectorConfigurationDTO update(ConnectorConfigurationDTO data) {
     long id = data.getConnectorId();
-    
+
     ConnectorConfiguration connectorConfiguration = connectorConfigurationRepository.findById(id);
     if (connectorConfiguration == null) {
-      throw new IllegalArgumentException("Not found");
+      throw new WebApplicationException(Response.Status.NOT_FOUND);
     }
-    
+
     update(connectorConfiguration, data);
 
     connectorConfigurationRepository.saveAndFlush(connectorConfiguration);
-    connectorRegistry.updateConnectorInCache(id);
+
+    // remove connector from cache; will be re-instantiated on demand
+    connectorRegistry.getCache().remove(id);
+
     return ConnectorConfigurationDTO.wrap(connectorConfiguration);
   }
 
   @POST
   public ConnectorConfigurationDTO create(ConnectorConfigurationDTO data) {
-    ConnectorConfiguration connectorConfiguration = new ConnectorConfiguration();
-    update(connectorConfiguration, data);
+    ConnectorConfiguration connectorConfiguration = createConfiguration(data);
     connectorConfiguration = connectorConfigurationRepository.saveAndFlush(connectorConfiguration);
-    connectorRegistry.addConnectorToCache(connectorConfiguration.getId());
+    
     return ConnectorConfigurationDTO.wrap(connectorConfiguration);
   }
-  
+
   @POST
   @Path("{id}/delete")
   @Transactional
   public void delete(@PathParam("id") long id) {
     ConnectorConfiguration connectorConfiguration = connectorConfigurationRepository.findById(id);
+
     if (connectorConfiguration == null) {
-      throw new IllegalArgumentException("Not found");
+      throw new WebApplicationException(Response.Status.NOT_FOUND);
     }
+
     connectorConfigurationRepository.delete(connectorConfiguration);
-    connectorRegistry.deleteConnectorFromCache(id);
+    connectorRegistry.getCache().remove(id);
   }
-  
-  private void update(ConnectorConfiguration connectorConfiguration, ConnectorConfigurationDTO data) {
-    connectorConfiguration.setGlobalPassword(data.getPassword());
-    connectorConfiguration.setGlobalPassword(data.getPassword());
-    connectorConfiguration.setGlobalUser(data.getUser());
-    connectorConfiguration.setLoginMode(ConnectorLoginMode.valueOf(data.getLoginMode()));
-    connectorConfiguration.setProperties(data.getProperties());
-    connectorConfiguration.setLabel(data.getName());
-    connectorConfiguration.setConnectorClass(data.getConnectorClass());
+
+  @POST
+  @Path("test")
+  public ConnectorStatusDTO test(ConnectorConfigurationDTO data) {
+    ConnectorConfiguration connectorConfiguration = createConfiguration(data);
+    
+    ConnectorStatus connectorStatus = connectorRegistry.testConnectorConfiguration(connectorConfiguration);
+    return ConnectorStatusDTO.wrap(connectorStatus);
   }
- 
+
+  private void update(ConnectorConfiguration config, ConnectorConfigurationDTO data) {
+    config.setGlobalPassword(data.getPassword());
+    config.setGlobalUser(data.getUser());
+    config.setLoginMode(data.getLoginMode());
+    config.setProperties(data.getProperties());
+    config.setName(data.getName());
+  }
+
+  private ConnectorConfiguration createConfiguration(ConnectorConfigurationDTO data) {
+    ConnectorConfiguration config = new ConnectorConfiguration();
+
+    // do not make these things configurable on update
+    config.setConnectorClass(data.getConnectorClass());
+    config.setConnectorName(data.getConnectorName());
+
+    // update the rest
+    update(config, data);
+
+    return config;
+  }
 }

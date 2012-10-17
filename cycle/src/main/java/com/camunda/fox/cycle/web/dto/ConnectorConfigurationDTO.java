@@ -16,29 +16,32 @@ public class ConnectorConfigurationDTO {
   
   private Long connectorId;
   private String name;
-  private String loginMode;
-  private String connectorName;
+  
+  private ConnectorLoginMode loginMode;
+  
   private String user;
   private String password;
-  private Map<String, String> properties;
   
+  private String connectorName;
   private String connectorClass;
+  
+  private Map<String, String> properties;
   
   public ConnectorConfigurationDTO() {
   }
   
   public ConnectorConfigurationDTO(ConnectorConfiguration connectorConfiguration) {
     this.connectorId = connectorConfiguration.getId();
-    this.name = connectorConfiguration.getLabel();
-    if (connectorConfiguration.getLoginMode() != null) {
-      this.loginMode = connectorConfiguration.getLoginMode().name();
-    } else {
-      this.loginMode = ConnectorLoginMode.LOGIN_NOT_REQUIRED.name();
-    }
-    this.connectorName = connectorConfiguration.getLabel();
+    
+    this.name = connectorConfiguration.getName();
+    this.loginMode = connectorConfiguration.getLoginMode();
+    
     this.user = connectorConfiguration.getGlobalUser();
     this.password = connectorConfiguration.getGlobalPassword();
+    
+    this.connectorName = connectorConfiguration.getConnectorName();
     this.connectorClass = connectorConfiguration.getConnectorClass();
+    
     this.properties = connectorConfiguration.getProperties();
   }
   
@@ -74,11 +77,11 @@ public class ConnectorConfigurationDTO {
     this.connectorClass = connectorClass;
   }
   
-  public String getLoginMode() {
+  public ConnectorLoginMode getLoginMode() {
     return loginMode;
   }
   
-  public void setLoginMode(String loginMode) {
+  public void setLoginMode(ConnectorLoginMode loginMode) {
     this.loginMode = loginMode;
   }
   

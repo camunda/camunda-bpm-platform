@@ -25,12 +25,12 @@ public class SvnConnectorTest extends AbstractConnectorTestBase {
     connector.setConfiguration(config);
     connector.init();
   }
-  
+
   @AfterClass
   public static void afterClass() throws Exception {
     connector.deleteNode(TMP_FOLDER);
   }
-  
+
   @Override
   public Connector getConnector() {
     return connector;
