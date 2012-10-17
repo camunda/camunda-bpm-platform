@@ -29,7 +29,7 @@ drop index ACT_IDX_HI_PROCVAR_NAME_TYPE;
 drop table ACT_HI_PROCVARIABLE;
 
 -- create new indices --
-create index ACT_IDX_HI_PROCVAR_PROC_INST on ACT_HI_VARINST(PROC_INST_ID_)
+create index ACT_IDX_HI_PROCVAR_PROC_INST on ACT_HI_VARINST(PROC_INST_ID_);
 create index ACT_IDX_HI_PROCVAR_NAME_TYPE on ACT_HI_VARINST(NAME_, VAR_TYPE_);
 
 -- not migrating --
