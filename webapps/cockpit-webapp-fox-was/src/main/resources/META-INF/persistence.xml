@@ -12,14 +12,15 @@
     <class>com.camunda.fox.cockpit.entity.InstanceFilter</class>
     <class>com.camunda.fox.cockpit.entity.VariableFilter</class>
     <class>com.camunda.fox.cockpit.entity.VariableEntry</class>
-    <properties>
-      <property name="openjpa.jdbc.SynchronizeMappings" value="buildSchema(ForeignKeys=true)" />
-      <property name="openjpa.Log" value="DefaultLevel=WARN, Runtime=INFO, Tool=INFO, SQL=TRACE" /> 
-      <property name="openjpa.RuntimeUnenhancedClasses" value="supported"/>
-      <property name="openjpa.Connection2UserName" value="root"/>
-      <property name="openjpa.Connection2Password" value="root"/>
-      <property name="openjpa.Connection2URL" value="jdbc:mysql://localhost:3306/fox-platform"/>
-      <property name="openjpa.Connection2DriverName" value="com.mysql.jdbc.Driver"/>
-    </properties>
+<!-- automatic database schema creation -->
+<!--     <properties> -->
+<!--       <property name="openjpa.jdbc.SynchronizeMappings" value="buildSchema(ForeignKeys=true)" /> -->
+<!--       <property name="openjpa.Log" value="DefaultLevel=WARN, Runtime=INFO, Tool=INFO, SQL=TRACE" />  -->
+<!--       <property name="openjpa.RuntimeUnenhancedClasses" value="supported"/> -->
+<!--       <property name="openjpa.Connection2UserName" value="root"/> -->
+<!--       <property name="openjpa.Connection2Password" value="root"/> -->
+<!--       <property name="openjpa.Connection2URL" value="jdbc:mysql://localhost:3306/fox-platform"/> -->
+<!--       <property name="openjpa.Connection2DriverName" value="com.mysql.jdbc.Driver"/> -->
+<!--     </properties> -->
   </persistence-unit>
 </persistence>
