@@ -17,7 +17,6 @@
     <facesContext.application.projectStage>Production</facesContext.application.projectStage>
   </properties>
 
-	<!--  to get this fully working we need to exclude activiti engine from our webapp libs (cockpit-webapp) -->
   <dependencies>
     <dependency>
       <groupId>com.camunda.fox.cockpit</groupId>
@@ -26,34 +25,6 @@
       <scope>provided</scope>
       <type>war</type>
     </dependency>
-		
-    <!-- shared libraries -->
-<!--     <dependency> -->
-<!--       <artifactId>bcprov-jdk16</artifactId> -->
-<!--       <groupId>org.bouncycastle</groupId> -->
-<!--     </dependency> -->
-    <dependency>
-      <groupId>org.bouncycastle</groupId>
-      <artifactId>bcpg-jdk16</artifactId>
-    </dependency>
-		
-    <!-- need openjpa for was -->
-    <dependency>
-      <groupId>com.camunda.fox.cockpit</groupId>
-      <artifactId>cockpit-core-openjpa</artifactId>
-      <version>${project.version}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.slf4j</groupId>
-          <artifactId>slf4j-api</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>com.camunda.fox.engine</groupId>
-          <artifactId>fox-engine</artifactId>
-        </exclusion>
-      </exclusions>
-    </dependency>
-    
   </dependencies>
 
   <build>
@@ -98,7 +69,8 @@
                 <exclude>**/beans.xml</exclude>
                 <exclude>**/persistence.xml</exclude>
                 <exclude>**/com/camunda/fox/cockpit/webapp/environment/**</exclude>
-                <exclude>**/lib/cockpit-core-*.jar</exclude>
+                <!-- exclude libs -->
+                <exclude>**/lib/jboss-el-*.jar</exclude>
               </excludes>
             </overlay>
             <overlay>
