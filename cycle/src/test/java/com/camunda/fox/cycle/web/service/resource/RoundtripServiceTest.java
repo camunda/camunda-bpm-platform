@@ -36,10 +36,6 @@ import com.camunda.fox.cycle.web.dto.RoundtripDTO;
  *
  * @author nico.rehwaldt
  */
-@RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(
-  locations = {"classpath:/spring/test-*.xml"}
-)
 public abstract class RoundtripServiceTest {
 
   @Inject
@@ -60,12 +56,12 @@ public abstract class RoundtripServiceTest {
   @Before
   public void before() throws FileNotFoundException, Exception {
     initConnector();
-    
+
     connector.createNode("/", "foo", ConnectorNodeType.FOLDER);
-    
+
     rightNode = connector.createNode("/foo", "Impl", ConnectorNodeType.ANY_FILE);
     connector.updateContent(rightNode, new FileInputStream(IoUtil.getFile("com/camunda/fox/cycle/roundtrip/collaboration_impl.bpmn")));
-    
+
     leftNode = connector.createNode("/foo", "Modeler", ConnectorNodeType.ANY_FILE);
     connector.updateContent(leftNode, new FileInputStream(IoUtil.getFile("com/camunda/fox/cycle/roundtrip/collaboration.bpmn")));
   }
@@ -180,6 +176,9 @@ public abstract class RoundtripServiceTest {
   protected void setConnector(Connector connector) {
     this.connector = connector;
   }
+  
+  
+  // Abstract methods ////////////////////////////////////////////
   
   protected abstract void initConnector();
 }

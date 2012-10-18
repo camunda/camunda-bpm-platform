@@ -11,6 +11,7 @@ import javax.inject.Inject;
 import javax.ws.rs.core.Response;
 
 import org.junit.After;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kubek2k.springockito.annotations.ReplaceWithMock;
@@ -31,7 +32,7 @@ import com.camunda.fox.cycle.repository.BpmnDiagramRepository;
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(
   loader = SpringockitoContextLoader.class,
-  locations = { "classpath:/spring/test-mock-context.xml", "classpath:/spring/test-persistence.xml" }
+  locations = { "classpath:/spring/mock/test-context.xml", "classpath:/spring/mock/test-persistence.xml" }
 )
 public class BpmnDiagramServiceTest {
 

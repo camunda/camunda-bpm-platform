@@ -120,7 +120,7 @@ public class SvnConnector extends Connector {
       return nodes;
     } catch (Exception e) {
       logger.log(Level.FINER, "Cannot get children for node " + parent.getId(), e);
-      throw new CycleException("Children for SVN connector '" + getConfiguration().getLabel() + "' could not be loaded in repository '" + parent.getId() + "'.", e);
+      throw new CycleException("Children for SVN connector '" + getConfiguration().getName() + "' could not be loaded in repository '" + parent.getId() + "'.", e);
     }
     
   }

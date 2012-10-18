@@ -53,7 +53,7 @@ public class SignavioConnectorTest {
     assertNotNull(config);
     
     assertTrue(config.getId() == 2);
-    assertEquals("My SignavioConnector", config.getLabel());
+    assertEquals("My SignavioConnector", config.getName());
     
     Map<String, String> prop = config.getProperties();
     assertNotNull(prop);

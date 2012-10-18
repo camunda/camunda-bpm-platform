@@ -283,7 +283,7 @@ angular
 		helpTitleVar: "&", 
 		colorInvert: "@"
     },
-    template: '<span ng-transclude></span><span class="help-toggle"><i class="icon-question-sign" ng-class="colorInvertCls()"></i></span>', 
+    template: '<span ng-transclude></span><span class="help-toggle"><i class="icon-question-sign" ng-class="colorInvertCls()"></i></span>',
     transclude: true, 		
     link: function(scope, element, attrs) {
       var help = attrs.helpText || scope.helpTextVar, 
@@ -383,6 +383,19 @@ angular
   };
 })
 
+.directive('ifAdmin', function(Credentials) {
+  return {
+    restrict: 'A',
+    scope: { }, 
+    transclude: true, 
+    template: '<span ngm-if="isAdmin" ng-transclude></span>', 
+    link: function(scope, element, attrs) {
+      scope.$watch(Credentials.watchCurrent, function(newValue) {
+        scope.isAdmin = Credentials.isAdmin();
+      });
+    }
+  };
+})
 /**
  * A directive which conditionally displays a dialog 
  * and allows it to control it via a explicitly specified model.
