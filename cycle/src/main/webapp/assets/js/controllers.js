@@ -561,7 +561,11 @@ function ListRoundtripsController($scope, $routeParams, $http, $location, Roundt
   };
   
   $scope.deleteRoundtrip = function() {
-     $scope.deleteRoundtripDialog.open();
+    if (!$scope.selectedRoundtripId) {
+      return;
+    }
+    
+    $scope.deleteRoundtripDialog.open();
   };
   
   $scope.activeClass = function(roundtrip) {
