@@ -27,7 +27,6 @@
     <dependency>
       <groupId>com.camunda.fox.engine</groupId>
       <artifactId>fox-engine-spring</artifactId>
-      <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
 
@@ -64,18 +63,5 @@
       <scope>provided</scope>
     </dependency>
   </dependencies>
-
-  <build>
-    <plugins>
-      <plugin>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>2.3.1</version>
-        <configuration>
-          <source>1.6</source>
-          <target>1.6</target>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
 
 </project>

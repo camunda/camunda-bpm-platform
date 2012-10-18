@@ -18,6 +18,7 @@ package com.camunda.fox.platform.test.util;
 import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.logging.Logger;
 
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -46,6 +47,8 @@ import com.camunda.fox.platform.api.ProcessEngineService;
 import com.camunda.fox.platform.test.util.JndiConstants;
 
 public abstract class AbstractFoxPlatformIntegrationTest {
+  
+  protected Logger logger = Logger.getLogger(AbstractFoxPlatformIntegrationTest.class.getName());
   
   public final static String PROCESS_ARCHIVE_SERVICE_NAME =
           "java:global/" +
@@ -77,8 +80,7 @@ public abstract class AbstractFoxPlatformIntegrationTest {
               .addAsLibraries(DeploymentHelper.getFoxPlatformClient())
               .addAsResource("META-INF/processes.xml", "META-INF/processes.xml")
               .addClass(AbstractFoxPlatformIntegrationTest.class)
-              .addClass(JndiConstants.class)
-              .addAsResource("appname.properties", "appname.properties");
+              .addClass(JndiConstants.class);
   }
   
   public static WebArchive initWebArchiveDeployment() {
@@ -150,6 +152,7 @@ public abstract class AbstractFoxPlatformIntegrationTest {
 
   public boolean areJobsAvailable() {
     List<Job> list = managementService.createJobQuery().executable().list();
+    logger.info("Jobs: " + list.size() + " left.");
     return !list.isEmpty();
   }
 
