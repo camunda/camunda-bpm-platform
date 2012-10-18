@@ -28,18 +28,18 @@
                   <td>{{connectorConfiguration.connectorName}}</td>
                   <td>{{connectorConfiguration.loginMode}}</td>
                   <td>
-                    <a data-ng-click="deleteConnector(connectorConfiguration)" th:text="#{delete}">delete</a>
-                    <br />
                     <a data-ng-click="editConnector(connectorConfiguration)" th:text="#{edit}">edit</a>
+                    <br />
+                    <a data-ng-click="deleteConnector(connectorConfiguration)" th:text="#{delete}">delete</a>
                   </td>
                 </tr>
               </tbody>
             </table>
             <a class="btn" data-ng-click="createNewConnector()"><span th:text="#{New}">New</span></a>
 
-            <!-- begin delete-roundtrip-dialog -->
-            <dialog model="connectorEditDialog" ng-cloak>
-              <div class="modal hide fade" data-ng-controller="EditConnectorController" data-ngm-if="connectorEditDialog.renderHtml()"> 
+            <!-- begin add/edit connector-configuration-dialog -->
+            <dialog model="editConnectorConfigurationDialog" ng-cloak>
+              <div class="modal hide fade" data-ng-controller="EditConnectorController" data-ngm-if="editConnectorConfigurationDialog.renderHtml()"> 
                 <div class="modal-header">
                   <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                   <h3 data-ng-show="connectorDialogMode == 'ADD_CONNECTOR'" th:text="#{'Add connector'}"></h3>
@@ -113,52 +113,6 @@
                       <div data-ng-show="connectorDialogMode == 'EDIT_CONNECTOR'" class="control-group">
                         <label class="control-label" for="connectors" 
                                th:text="#{'Plugin'}">Plugin</label>
-                <!-- begin delete-connector-configuration-dialog -->
-                <dialog model="deleteConnectorConfigurationDialog" ng-cloak>
-                <div class="modal hide fade" data-ng-controller="DeleteConnectorConfigurationController" ngm-if="deleteConnectorConfigurationDialog.renderHtml()"> 
-                  <div class="modal-header">
-                    <button data-ng-show="deleteConnectorConfigurationDialog.autoClosable" type="button" class="close" data-dismiss="modal">&times;</button>
-                    <h3 th:text="#{'Delete connector configuration'}"></h3>
-                  </div>
-                  <div class="modal-body">
-                  <div data-ng-switch data-on="toBeDeleted">
-                    <div data-ng-switch-when="performConnectorDeletion">
-                        <p> 
-                         <span th:text="#{'Are you sure you would like to delete the selected connector configuration?'}">
-                            Are you sure you would like to delete the selected connector configuration?
-                         </span>
-                        </p>
-                    </div>
-                    <div data-ng-switch-when="deletionSuccess">
-                        <p> 
-                         <span th:text="#{The deletion of the connector configuration was successful.}">
-                            The deletion of the connector configuration was successful.
-                         </span>
-                         </p>
-                    </div>
-                    <div data-ng-switch-when="deletionFailed">
-                        <p>
-                          <span th:text="#{The deletion of the connector configuration failed.}">
-                            The deletion of the connector failed.
-                          </span>
-                        </p>
-                    </div>
-                  </div>
-                  </div>
-                  <div class="modal-footer">
-                    <button class="btn"      
-                            data-ng-show="toBeDeleted == 'performConnectorDeletion'"
-                            data-ng-click="deleteConnectorConfigurationDialog.close()">Cancel</button>
-                    <button class="btn btn-primary"
-                            data-ng-show="toBeDeleted == 'deletionSuccess' || toBeDeleted == 'deletionFailed'" 
-                            data-ng-click="deleteConnectorConfigurationDialog.close()">OK</button>
-                    <button class="btn btn-primary"
-                            data-ng-show="toBeDeleted == 'performConnectorDeletion'" 
-                            data-ng-click="performConnectorDeletion()">Delete</button>
-                  </div>
-                </div>
-                </dialog>  
-                <!-- end delete-connector-configuration-dialog -->
                         <div class="controls" style="margin-bottom: 10px;">
                           <span style="line-height: 30px">{{editConnectorConfiguration.connectorName}}</span>
                         </div>
@@ -176,14 +130,63 @@
                   </form>
                 </div>
                 <div class="modal-footer">
-                  <button class="btn" data-ng-click="connectorEditDialog.close()" th:text="#{Cancel}">Cancel</button>
+                  <button class="btn" data-ng-click="editConnectorConfigurationDialog.close()" th:text="#{Cancel}">Cancel</button>
                   <button class="btn" data-ng-click="test()" data-ng-disabled="!isValid()" th:text="#{Test}">Test</button>
                   <button class="btn btn-primary" data-ng-click="save()" data-ng-disabled="!isValid()" th:text="#{Save}">Save</button>
                 </div>
               </div>
             </dialog>
-            <!-- end delete-roundtrip-dialog -->
-
+            <!-- end add/edit connector-configuration-dialog -->
+            
+            <!-- begin delete-connector-configuration-dialog -->
+            <dialog model="deleteConnectorConfigurationDialog" ng-cloak>
+              <div class="modal hide fade" data-ng-controller="DeleteConnectorConfigurationController" ngm-if="deleteConnectorConfigurationDialog.renderHtml()"> 
+                <div class="modal-header">
+                  <button data-ng-show="deleteConnectorConfigurationDialog.autoClosable" type="button" class="close" data-dismiss="modal">&times;</button>
+                  <h3 th:text="#{'Delete connector configuration'}"></h3>
+                </div>
+                <div class="modal-body">
+                <div data-ng-switch data-on="state">
+                  <div data-ng-switch-when="TO_BE_DONE">
+                    <p>
+                      <span th:text="#{'Are you sure you would like to delete the connector configuration'}">
+                        Are you sure you would like to delete the connector configuration</span>
+                      <strong>{{ configuration.name }} ({{ configuration.connectorName }})</strong>?
+                    </p>
+                    <p th:text="#{'This will invalidate all the connected bpmn models'}">
+                      This action invalidates the connected bpmn models, too.
+                    </p>
+                  </div>
+                  <div data-ng-switch-when="SUCCESS">
+                    <p> 
+                     <span th:text="#{The deletion of the connector configuration was successful.}">
+                        The deletion of the connector configuration was successful.
+                     </span>
+                    </p>
+                  </div>
+                  <div data-ng-switch-when="FAILURE">
+                    <p>
+                      <span th:text="#{The deletion of the connector configuration failed.}">
+                        The deletion of the connector failed.
+                      </span>
+                    </p>
+                  </div>
+                </div>
+                </div>
+                <div class="modal-footer">
+                  <button class="btn"
+                          data-ng-show="state == 'TO_BE_DONE'"
+                          data-ng-click="deleteConnectorConfigurationDialog.close()">Cancel</button>
+                  <button class="btn btn-primary"
+                          data-ng-show="state == 'TO_BE_DONE'" 
+                          data-ng-click="performConnectorDeletion()">Delete</button>
+                  <button class="btn btn-primary"
+                          data-ng-show="state == 'SUCCESS' || state == 'FAILURE'" 
+                          data-ng-click="deleteConnectorConfigurationDialog.close()">OK</button>
+                </div>
+              </div>
+            </dialog>  
+            <!-- end delete-connector-configuration-dialog -->
           </div>
         </div>
       </div>

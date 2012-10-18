@@ -618,7 +618,8 @@ function DeleteRoundtripController($scope, $routeParams, $http, $location, App) 
 };
 
 function ConnectorSetupController($scope, $http, $location, App, Event, Commons, ConnectorConfiguration) {
-  $scope.connectorEditDialog = new Dialog();
+  $scope.editConnectorConfigurationDialog = new Dialog();
+  $scope.deleteConnectorConfigurationDialog = new Dialog();
   
   $scope.$emit(Event.navigationChanged, {name:"Connector setup"});
 
@@ -627,24 +628,19 @@ function ConnectorSetupController($scope, $http, $location, App, Event, Commons,
   $scope.createNewConnector = function() {
     $scope.currentConnectorConfiguration = null;
     $scope.connectorDialogMode = "ADD_CONNECTOR";
-    $scope.connectorEditDialog.open();
+    $scope.editConnectorConfigurationDialog.open();
   };
   
   $scope.editConnector = function(connectorConfiguration) {
     $scope.connectorDialogMode = "EDIT_CONNECTOR";
      // make a copy of the connector to edit
     $scope.currentConnectorConfiguration = connectorConfiguration;
-    $scope.connectorEditDialog.open();
+    $scope.editConnectorConfigurationDialog.open();
   };
   
   $scope.deleteConnector = function(connectorConfiguration) {
-    $http.post(App.uri("secured/resource/connector/configuration/" + connectorConfiguration.connectorId + "/delete"))    
-    .success(function(data) {
-      $scope.connectorConfigurations.splice($scope.connectorConfigurations.indexOf(connectorConfiguration), 1);
-      $location.path("/Connector Setup");
-    })
-    .error(function(data) {
-    });
+    $scope.currentConnectorConfiguration = connectorConfiguration;
+    $scope.deleteConnectorConfigurationDialog.open();
   };
   
   $scope.saveConnectorConfiguration = function(editConnectorConfiguration) {
@@ -652,8 +648,8 @@ function ConnectorSetupController($scope, $http, $location, App, Event, Commons,
     
     connectorConfiguration.$save(function() {
       $scope.connectorConfigurations.push(connectorConfiguration);
-      $scope.connectorEditDialog.close();
-    });    
+      $scope.editConnectorConfigurationDialog.close();
+    });
   };
   
   $scope.updateConnectorConfiguration = function(editConnectorConfiguration) {
@@ -661,7 +657,7 @@ function ConnectorSetupController($scope, $http, $location, App, Event, Commons,
     
     angular.extend(currentConnectorConfig, editConnectorConfiguration);
     currentConnectorConfig.$save(function() {
-      $scope.connectorEditDialog.close();
+      $scope.editConnectorConfigurationDialog.close();
     });
   };
   
@@ -775,22 +771,26 @@ function EditConnectorController($scope, $http, App, ConnectorConfiguration) {
      return "A directory in the local file system which can be used to store temporary files, e.g. 'c:/temp/svn'";
    }
   };
-}function DeleteConnectorConfigurationController($scope, $location, $http, App) {
+}
 
-  var PERFORM_DEL = "performConnectorDeletion",
-      DEL_SUCCESS = "deletionSuccess",
-      DEL_FAILED = "deletionFailed";
+function DeleteConnectorConfigurationController($scope, $location, $http, App) {
 
-  $scope.toBeDeleted = PERFORM_DEL;
+  var PERFORM_DEL = "TO_BE_DONE",
+      DEL_SUCCESS = "SUCCESS",
+      DEL_FAILED = "FAILURE";
 
+  $scope.state = PERFORM_DEL;
+
+  $scope.configuration = $scope.currentConnectorConfiguration;
+  
   $scope.performConnectorDeletion = function() {
-    $http.post(App.uri("secured/resource/connector/configuration/" + $scope.toBeDeletedConnector.connectorId + "/delete"))
-    .success(function(data) {
-      $scope.toBeDeleted = DEL_SUCCESS;
+    var configuration = $scope.configuration;
+    
+    configuration.$delete(function() {
+      $scope.state = DEL_SUCCESS;
       $scope.connectorConfigurations.splice($scope.connectorConfigurations.indexOf($scope.toBeDeletedConnector), 1);
-      $location.path("/Connector Setup");
-    })
-    .error(function(data) {
-      $scope.toBeDeleted = DEL_FAILED;
+    }, function(error) {
+      $scope.state = DEL_FAILED;
     });
   };
+}

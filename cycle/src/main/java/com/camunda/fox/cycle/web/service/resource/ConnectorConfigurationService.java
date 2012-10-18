@@ -3,6 +3,7 @@ package com.camunda.fox.cycle.web.service.resource;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -74,8 +75,8 @@ public class ConnectorConfigurationService {
     return ConnectorConfigurationDTO.wrap(connectorConfiguration);
   }
 
-  @POST
-  @Path("{id}/delete")
+  @DELETE
+  @Path("{id}")
   @Transactional
   public void delete(@PathParam("id") long id) {
     ConnectorConfiguration connectorConfiguration = connectorConfigurationRepository.findById(id);
