@@ -23,7 +23,7 @@
                 </li>
                 <li class="actions">
                   <a class="btn" data-ng-click="createNew()"><span th:text="#{Create}">Create</span></a>
-                  <a class="btn" data-ng-show="selectedRoundtripId" data-ng-click="deleteRoundtrip()"><span th:text="#{Delete}">Delete</span></a>
+                  <a class="btn" data-ng-disabled="!selectedRoundtripId" data-ng-click="deleteRoundtrip()"><span th:text="#{Delete}">Delete</span></a>
                 </li>
               </ul>
               <!-- begin create-roundtrip-dialog -->
@@ -58,7 +58,7 @@
                   </div>
                   <div class="modal-footer">
                     <button class="btn" ng-click="newRoundtripDialog.close()" th:text="#{Cancel}">Cancel</button>
-                    <button href="#" id="saveRoundtripButton" class="btn btn-primary" ng-click="save()" ng-disabled="!isValid()" th:text="#{Save}">Save</button>
+                    <button class="btn btn-primary" ng-click="save()" ng-disabled="!isValid()" th:text="#{Save}">Save</button>
                   </div>
                 </div>
               </modal-dialog>
