@@ -16,6 +16,9 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    
+    <version.commonj>1.1.0</version.commonj>
+    <version.bouncycastle>1.47</version.bouncycastle>
   </properties>
 
   <dependencyManagement>
@@ -86,21 +89,25 @@
       <!-- licensing dependencies -->
       <dependency>
         <groupId>org.bouncycastle</groupId>
-        <artifactId>bcprov-jdk16</artifactId>
-        <version>1.46</version>
-      </dependency> 
-
+        <artifactId>bcprov-jdk15on</artifactId>
+        <version>${version.bouncycastle}</version>
+      </dependency>
       <dependency>
         <groupId>org.bouncycastle</groupId>
-        <artifactId>bcpg-jdk16</artifactId>
-        <version>1.46</version>
+        <artifactId>bcprov-ext-jdk15on</artifactId>
+        <version>${version.bouncycastle}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.bouncycastle</groupId>
+        <artifactId>bcpg-jdk15on</artifactId>
+        <version>${version.bouncycastle}</version>
       </dependency> 
       
       <!-- websphere dependencies -->
       <dependency>
         <groupId>com.bea.commonj</groupId>
         <artifactId>com.springsource.commonj</artifactId>
-        <version>1.1.0</version>
+        <version>${version.commonj}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

@@ -73,7 +73,28 @@
       <version>${project.version}</version>
       <type>ear</type>
     </dependency>
+    
+    <dependency>
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>bcpg-jdk15on</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>bcprov-ext-jdk15on</artifactId>
+    </dependency>
 
+    <dependency>
+      <groupId>com.camunda.fox.cockpit</groupId>
+      <artifactId>cockpit-sql-scripts</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.camunda.fox.cockpit</groupId>
+      <artifactId>cockpit-webapp-fox-was</artifactId>
+      <version>${project.version}</version>
+      <type>war</type>
+    </dependency>
   </dependencies>
 
   <build>
@@ -81,7 +102,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-assembly-plugin</artifactId>
-        <version>2.3</version>
         <executions>
           <execution>
             <id>distro</id>

@@ -9,7 +9,6 @@
   </parent>
 
   <artifactId>fox-platform-ibm-websphere</artifactId>
-  <version>6.2.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>fox platform EE - IBM Websphere</name>
@@ -22,5 +21,6 @@
     <module>distro</module>
     <module>ear</module>
     <module>service</module>
+    <module>jobexecutor-service</module>
   </modules>
 </project>

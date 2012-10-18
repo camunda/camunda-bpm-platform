@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>fox-platform-jboss-modules</artifactId>
-  <packaging>pom</packaging>
+  <packaging>jar</packaging>
   <name>fox platform EE - jBoss7 Modules</name>
 
   <parent>
@@ -39,14 +39,10 @@
       <groupId>com.camunda.fox.engine</groupId>
       <artifactId>fox-engine-cdi</artifactId>
     </dependency>
-	<dependency>
-		<groupId>org.bouncycastle</groupId>
-		<artifactId>bcprov-jdk16</artifactId>
-	</dependency>
-	<dependency>
-		<groupId>org.bouncycastle</groupId>
-		<artifactId>bcpg-jdk16</artifactId>
-	</dependency> 
+  	<dependency>
+  		<groupId>org.bouncycastle</groupId>
+  		<artifactId>bcpg-jdk15on</artifactId>
+  	</dependency> 
   </dependencies>
 
   <build>
@@ -55,7 +51,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-antrun-plugin</artifactId>
-        <version>1.7</version>
         <executions>
           <execution>
             <id>copy-dependencies</id>

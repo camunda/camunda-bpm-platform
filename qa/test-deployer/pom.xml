@@ -23,21 +23,6 @@
     <version.h2>1.2.132</version.h2>
   </properties>
   
-  <build>
-  <plugins>
-    <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>2.4</version>
-        <configuration>
-          <!-- http://maven.apache.org/plugins/maven-compiler-plugin/ -->
-          <source>1.6</source>
-          <target>1.6</target>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
-  
   <dependencyManagement>
     <dependencies>
       <dependency>

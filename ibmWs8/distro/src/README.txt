@@ -23,14 +23,21 @@ Contents:
 	modules/lib
 		Contains libraries that must be made available to both the fox platform and any 
 		process applications.
+  
+  modules/java/jre/lib/ext
+    Contains the encryption provider libraries that must be made available
+    to the jdk/jre in websphere for license checking.
+    Copy them into WAS_HOME/java/jre/lib/ext, there should be already some IBM libs present.
 				
-    sql/
-        This directory contains the create and upgrade sql script
-        for the different databases.
-        The engine create script contain the engine and history tables.
+  webapps/
+    Contains the fox platform webapps to deploy.
         
-        Execute the current upgrade script to make the database compatible
-        with the newest fox platform version.
+  sql/
+    This directory contains the create and upgrade sql script for the different databases.
+    The engine create script contain the engine and history tables.
+    
+    Execute the current upgrade script to make the database compatible
+    with the newest fox platform version.
 
 ==================		
 

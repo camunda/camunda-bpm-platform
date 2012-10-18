@@ -111,24 +111,9 @@
     </resources>
 		
     <plugins>  
-      <plugin>
-        <groupId>org.jboss.as.plugins</groupId>
-        <artifactId>jboss-as-maven-plugin</artifactId>
-        <version>7.1.0.Final</version>
-        <configuration>
-          <filename>${project.build.finalName}.war</filename>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <source>1.6</source>
-          <target>1.6</target>
-        </configuration>
-      </plugin>
       <!-- creates a jar implementing the fox-platform engine spi -->
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
         <executions>
           <execution>
@@ -159,7 +144,7 @@
             <manifestEntries>
 							<!-- SVN revision number -->
               <Implementation-Build>${buildNumber}</Implementation-Build>
-              <Dependencies>org.bouncycastle.bcprov-jdk16,org.bouncycastle.bcpg-jdk16,org.apache.commons.logging,org.jboss.logging,org.apache.log4j,org.slf4j,org.apache.commons.lang</Dependencies>
+              <Dependencies>org.bouncycastle.bcprov-jdk15on,org.bouncycastle.bcpg-jdk15on,org.apache.commons.logging,org.jboss.logging,org.apache.log4j,org.slf4j,org.apache.commons.lang</Dependencies>
             </manifestEntries>
           </archive>
           <webResources>

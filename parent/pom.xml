@@ -13,7 +13,11 @@
     <version.glassfish>3.1.2</version.glassfish>
     <version.arquillian>1.0.1.Final</version.arquillian>
     <version.arquillian.drone>1.0.0.Final</version.arquillian.drone>
+
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    
+    <version.ejb>3.1</version.ejb>
+    <version.java>1.6</version.java>
   </properties>
 
   <dependencyManagement>
@@ -43,6 +47,126 @@
     <connection>scm:git:git@bitbucket.org:camunda/fox-platform-ee.git</connection>
     <developerConnection>scm:git:git@bitbucket.org:camunda/fox-platform-ee.git</developerConnection>
   </scm>
+
+  <build>
+    <!-- 
+      Plugins defined here are mirrored in PLATFORM_HOME/core/pom.xml 
+      and should be kept in sync to use same plugin version through
+      whole platform maven build and should only be overwritten in case
+      someone needs an earlier plugin version.
+     -->
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>2.5.1</version>
+          <configuration>
+            <source>${version.java}</source>
+            <target>${version.java}</target>
+          </configuration>
+        </plugin>
+        
+        <!-- test plugins -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>2.12.4</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-failsafe-plugin</artifactId>
+          <version>2.12.4</version>
+        </plugin>
+        
+        <!-- code plugins -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-dependency-plugin</artifactId>
+          <version>2.5.1</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-source-plugin</artifactId>
+          <version>2.2</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-resources-plugin</artifactId>
+          <version>2.6</version>
+        </plugin>
+        
+        <!-- output plugins -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-jar-plugin</artifactId>
+          <version>2.4</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-ejb-plugin</artifactId>
+          <version>2.3</version>
+          <configuration>
+            <ejbVersion>${version.ejb}</ejbVersion>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-rar-plugin</artifactId>
+          <version>2.2</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-war-plugin</artifactId>
+          <version>2.3</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-ear-plugin</artifactId>
+          <version>2.8</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-shade-plugin</artifactId>
+          <version>2.0</version>
+          <executions>
+            <execution>
+              <phase>package</phase>
+              <goals>
+                <goal>shade</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-assembly-plugin</artifactId>
+          <version>2.3</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-antrun-plugin</artifactId>
+          <version>1.7</version>
+        </plugin>
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>build-helper-maven-plugin</artifactId>
+          <version>1.7</version>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+    
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+	      <configuration>
+          <source>${version.java}</source>
+          <target>${version.java}</target>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 
   <distributionManagement>
     <repository>
