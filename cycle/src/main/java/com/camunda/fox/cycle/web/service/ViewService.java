@@ -23,7 +23,7 @@ public class ViewService extends AbstractRestService {
     if (name.endsWith(".html")) {
       name = name.substring(0, name.lastIndexOf(".html"));
     }
-    return "app/" + name;
+    return "tpl:app/" + name;
   }
 
 }

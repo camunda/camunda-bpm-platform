@@ -138,7 +138,7 @@ public class ConnectorRegistry {
   private Connector instantiateConnector(long connectorId) {
     ConnectorConfiguration config = getConnectorConfiguration(connectorId);
     if (config == null) {
-      throw new CycleException("Connector configuration for connectorId " + connectorId + " not available");
+      return null;
     }
     
     return instantiateConnector(config);

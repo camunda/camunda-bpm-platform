@@ -49,7 +49,7 @@ html, body {
   min-height: 100%;
 }
 
-.breadcrumbs {
+.content-inset {
   margin-top: 60px;
 }
 
@@ -330,14 +330,4 @@ div#pictureModal.modal.hide.fade {
   -webkit-border-radius: 3px;
   -moz-border-radius: 3px;
   border-radius: 3px;
-}
-
-/** connector list table **/
-.table {
-  border: 1px solid #E5E5E5;
-  width:100%;
-}
-
-.table thead th {
-  background-color: #DDDDDD;
 }

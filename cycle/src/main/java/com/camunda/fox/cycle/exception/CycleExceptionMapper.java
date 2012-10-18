@@ -16,9 +16,8 @@ import com.camunda.fox.cycle.web.dto.ExceptionDAO;
 public class CycleExceptionMapper implements ExceptionMapper<CycleException> {
 
   @Override
-  public Response toResponse(CycleException e) {
-    Logger.getLogger(getClass().getSimpleName()).log(Level.SEVERE, "Error in cycle:", e);
-    return Response.serverError().entity(new ExceptionDAO(e)).build();
+  public Response toResponse(CycleException exception) {
+    Logger.getLogger(getClass().getSimpleName()).log(Level.SEVERE, "Exception occured during request", exception);
+    return Response.serverError().entity(new ExceptionDAO(exception)).build();
   }
-
 }

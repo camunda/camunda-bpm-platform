@@ -46,7 +46,7 @@ public class DefaultService extends AbstractRestService {
     // We do not want to allow direct access to /login. 
     // That is why we forward the request to a location which requires a logged in user
     if (isForward(request)) {
-      return "login";
+      return "tpl:login";
     } else {
       return redirectTo("secured/view/index/");
     }
@@ -56,14 +56,14 @@ public class DefaultService extends AbstractRestService {
   @Path("login/expired")
   @Produces(MediaType.TEXT_HTML)
   public String loginExpired() {
-    return "error/login-expired";
+    return "tpl:error/login-expired";
   }
   
   @POST
   @Path("login/error")
   @Produces(MediaType.TEXT_HTML)
   public String loginError() {
-    return "error/invalid-login-data";
+    return "tpl:error/invalid-login-data";
   }
   
   @GET
@@ -85,7 +85,7 @@ public class DefaultService extends AbstractRestService {
     // destroys the session for this user.
 		request.getSession().invalidate();
     
-    return "logout";
+    return "tpl:logout";
   }
 
   /**

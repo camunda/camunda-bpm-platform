@@ -318,11 +318,11 @@ function BpmnDiagramController($scope, Commons, Event, $http, App) {
   };
   
   $scope.checkContentAvailable = function(diagram) {
-    Commons.getDiagramStatus(diagram).success(function(data) {
-      $scope.diagram.syncStatus = data;
-      console.log($scope.diagram);
-      changeModelStatus(data.status);
-    });
+    Commons.getDiagramStatus(diagram)
+      .success(function(data) {
+        $scope.diagram.syncStatus = data;
+        changeModelStatus(data.status);
+      });
   };
 }
 

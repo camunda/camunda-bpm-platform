@@ -1,5 +1,6 @@
 package com.camunda.fox.cycle.web.service;
 
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.UriInfo;
@@ -21,5 +22,11 @@ public class AbstractRestService {
    */
   protected Response redirectTo(String uri) {
     return Response.seeOther(uriInfo.getBaseUriBuilder().path(uri).build()).build();
+  }
+  
+  protected WebApplicationException notFound(String message) {
+    Response response = Response.status(Response.Status.NOT_FOUND).entity(message).build();
+    
+    return new WebApplicationException(response);
   }
 }

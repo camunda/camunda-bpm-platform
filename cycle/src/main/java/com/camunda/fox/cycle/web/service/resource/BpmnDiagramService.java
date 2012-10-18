@@ -10,7 +10,6 @@ import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -27,13 +26,14 @@ import com.camunda.fox.cycle.repository.BpmnDiagramRepository;
 import com.camunda.fox.cycle.web.dto.BpmnDiagramDTO;
 import com.camunda.fox.cycle.web.dto.BpmnDiagramStatusDTO;
 import com.camunda.fox.cycle.web.dto.ConnectorNodeDTO;
+import com.camunda.fox.cycle.web.service.AbstractRestService;
 
 /**
  *
  * @author nico.rehwaldt
  */
 @Path("secured/resource/diagram")
-public class BpmnDiagramService {
+public class BpmnDiagramService extends AbstractRestService {
 
   private static Logger log = Logger.getLogger(BpmnDiagramService.class.getName());
   
@@ -54,7 +54,7 @@ public class BpmnDiagramService {
   @GET
   @Path("{id}")
   public BpmnDiagramDTO get(@PathParam("id") long id) {
-    return BpmnDiagramDTO.wrap(bpmnDiagramRepository.findById(id));
+    return BpmnDiagramDTO.wrap(getDiagramById(id));
   }
 
   @GET
@@ -63,21 +63,14 @@ public class BpmnDiagramService {
     
     // we do offer the functionality to serve images here, rather than relying on the connector service directly
     // because we need to add the out of date logic which is not the connector services' concern
-    
-    Response notFoundResponse = Response.status(Response.Status.NOT_FOUND).build();
-    
-    BpmnDiagram diagram = bpmnDiagramRepository.findById(id);
-    
-    if (diagram == null) {
-      return notFoundResponse;
-    }
 
+    BpmnDiagram diagram = getDiagramById(id);
     ConnectorNode node = diagram.getConnectorNode();
 
     ContentInformation imageInformation = connectorService.getContentInfo(node.getConnectorId(), node.getId(), ConnectorNodeType.PNG_FILE);
 
     if (!imageInformation.exists()) {
-      return notFoundResponse;
+      throw notFound("no image");
     }
 
     Date diagramLastModified = diagram.getLastModified();
@@ -88,7 +81,7 @@ public class BpmnDiagramService {
       if (imageLastModified != null) {
         if (diagramLastModifiedMs > imageLastModified.getTime()) {
           // diagram is younger than the image --> image out of date
-          return notFoundResponse;
+          throw notFound("no up to date image");
         }
       }
     }
@@ -123,10 +116,7 @@ public class BpmnDiagramService {
       diagram = new BpmnDiagram();
       diagram.setStatus(Status.UNSPECIFIED);
     } else {
-      diagram = bpmnDiagramRepository.findById(data.getId());
-      if (diagram == null) {
-        throw new IllegalArgumentException("Not found");
-      }
+      diagram = getDiagramById(data.getId());
     }
     
     update(diagram, data);
@@ -161,14 +151,16 @@ public class BpmnDiagramService {
   @Path("{id}/syncStatus")
   public BpmnDiagramStatusDTO synchronizationStatus(@PathParam("id") long id) {
 
-    BpmnDiagram diagram = bpmnDiagramRepository.findById(id);
-    if (diagram == null) {
-      throw new WebApplicationException(Response.Status.NOT_FOUND);
-    }
+    BpmnDiagram diagram = getDiagramById(id);
 
     ConnectorNode node = diagram.getConnectorNode();
     Connector connector = connectorRegistry.getConnector(node.getConnectorId());
-
+    if (connector == null) {
+      BpmnDiagramStatusDTO notFoundStatus = new BpmnDiagramStatusDTO(diagram.getId(), Status.UNAVAILABLE, null);
+      notFoundStatus.setLastUpdated(new Date());
+      return notFoundStatus;
+    }
+    
     Status status = Status.UNSPECIFIED;
     Date lastModified = null;
 
@@ -195,5 +187,14 @@ public class BpmnDiagramService {
     BpmnDiagramStatusDTO statusDTO = new BpmnDiagramStatusDTO(diagram.getId(), status, lastModified);
     statusDTO.setLastUpdated(new Date());
     return statusDTO;
+  }
+
+  protected BpmnDiagram getDiagramById(long id) {
+    BpmnDiagram diagram = bpmnDiagramRepository.findById(id);
+    if (diagram == null) {
+      throw notFound("diagram not found");
+    }
+    
+    return diagram;
   }
 }

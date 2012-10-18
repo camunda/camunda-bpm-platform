@@ -5,29 +5,14 @@
   </head>
   <body ng-controller="DefaultController">
     <div class="wrapper">
-<<<<<<< HEAD
       <div th:substituteby="fragment/common :: navigation-logged-in"></div>
-      <div class="container-fluid content-container">
-        <div class="row-fluid breadcrumbs">
-          <div class="span12">
-            <div>
-              <ul class="breadcrumb">
-                <li>
-                  <a href="#/">Home</a> 
-                </li>           
-                <li ng-repeat="breadCrumb in breadCrumbs" ng-cloak>
-                  <span class="divider">/</span> 
-                  <a href="#{{breadCrumb.href}}">{{breadCrumb.name}}</a>
-                </li>      
-              </ul>
-            </div>
+      <div class="container-fluid content-container content-inset">
+        <div th:substituteby="fragment/common :: breadcrumbs"></div>
+        <div class="errorPanel hide">
+          <div data-ng-repeat="error in appErrors()" class="alert alert-error">
+            <span th:text="#{'An error occured, try refreshing the page or relogin :'}"></span><span>{{error}}</span>
           </div>
         </div>
-          <div class="errorPanel hide">
-            <div data-ng-repeat="error in appErrors()" class="alert alert-error">
-              <span th:text="#{'An error occured, try refreshing the page or relogin :'}"></span><span>{{error}}</span>
-            </div>
-          </div>
         <div class="row-fluid content-container">
           <div class="span3" id="navigation">
             <div class="well sidebar-nav" id="roundtrip-list" ng-controller="ListRoundtripsController">

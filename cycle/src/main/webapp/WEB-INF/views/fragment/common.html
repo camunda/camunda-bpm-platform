@@ -66,19 +66,19 @@
     
     <!-- breadcrumbs -->
     <div th:fragment="breadcrumbs" class="row-fluid breadcrumbs">
-    <div class="span12">
-      <div>
-        <ul class="breadcrumb">
-          <li>
-            <a th:href="@{/app/secured/view/index/#/}">Home</a> 
-          </li>         
-          <li ng-repeat="breadCrumb in breadCrumbs" ng-cloak>
-            <span class="divider">/</span> 
-            <a href="#{{breadCrumb.href}}">{{breadCrumb.name}}</a>
-          </li>     
-        </ul>
+      <div class="span12">
+        <div>
+          <ul class="breadcrumb">
+            <li>
+              <a th:href="@{/app/secured/view/index/#/}">Home</a> 
+            </li>
+            <li ng-repeat="breadCrumb in breadCrumbs" ng-cloak>
+              <span class="divider">/</span> 
+              <a href="#{{breadCrumb.href}}">{{breadCrumb.name}}</a>
+            </li>
+          </ul>
+        </div>
       </div>
-    </div>
     </div>
     
     <!-- error panel -->
@@ -87,7 +87,6 @@
         <span th:text="#{'An error occured, try refreshing the page or relogin :'}"></span><span>{{error}}</span>
       </div>
     </div>
-    
     
     <!-- footer -->
     <footer class="content-container" th:fragment="footer">
