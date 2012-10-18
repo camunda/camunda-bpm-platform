@@ -8,6 +8,7 @@ import static org.mockito.BDDMockito.given;
 import java.util.Date;
 
 import javax.inject.Inject;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
 import org.junit.After;
@@ -24,6 +25,8 @@ import com.camunda.fox.cycle.connector.ConnectorNodeType;
 import com.camunda.fox.cycle.connector.ContentInformation;
 import com.camunda.fox.cycle.entity.BpmnDiagram;
 import com.camunda.fox.cycle.repository.BpmnDiagramRepository;
+
+import junit.framework.Assert;
 
 /**
  *
@@ -61,14 +64,16 @@ public class BpmnDiagramServiceTest {
     given(connectorService.getContentInfo(DIAGRAM_NODE.getConnectorId(), DIAGRAM_NODE.getId(), ConnectorNodeType.PNG_FILE)).willReturn(contentInformationLastModified(earlier()));
     given(connectorService.getTypedContent(DIAGRAM_NODE.getConnectorId(), DIAGRAM_NODE.getId(), ConnectorNodeType.PNG_FILE)).willReturn(Response.ok().build());
     
-    // when
-    Object result = bpmnDiagramService.getImage(diagram.getId());
-    
-    // then
-    assertThat(result, is(instanceOf(Response.class)));
-    
-    Response response = (Response) result;
-    assertThat(response.getStatus(), is(Response.Status.NOT_FOUND.getStatusCode()));
+    try {
+      // when
+      bpmnDiagramService.getImage(diagram.getId());
+      
+      Assert.fail("Expected web application exception");
+    } catch (WebApplicationException e) {
+      // then
+      Response response = e.getResponse();
+      assertThat(response.getStatus(), is(Response.Status.NOT_FOUND.getStatusCode()));
+    }
   }
   
   @Test
@@ -95,13 +100,16 @@ public class BpmnDiagramServiceTest {
     // given
     given(connectorService.getContentInfo(DIAGRAM_NODE.getConnectorId(), DIAGRAM_NODE.getId(), ConnectorNodeType.PNG_FILE)).willReturn(nonExistingContentInformation());
     
-    // when
-    Object result = bpmnDiagramService.getImage(diagram.getId());
-    
-    assertThat(result, is(instanceOf(Response.class)));
-    
-    Response response = (Response) result;
-    assertThat(response.getStatus(), is(Response.Status.NOT_FOUND.getStatusCode()));
+    try {
+      // when
+      bpmnDiagramService.getImage(diagram.getId());
+
+      Assert.fail("Expected web application exception");
+    } catch (WebApplicationException e) {
+      // then
+      Response response = e.getResponse();
+      assertThat(response.getStatus(), is(Response.Status.NOT_FOUND.getStatusCode()));
+    }
   }
   
   private BpmnDiagram diagramLastModified(Date date) {
