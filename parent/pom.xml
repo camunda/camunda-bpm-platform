@@ -3,7 +3,7 @@
 
   <groupId>com.camunda.fox.platform</groupId>
   <artifactId>fox-platform-root</artifactId>
-  <version>6.2.0-SNAPSHOT</version>
+  <version>6.2.0-alpha3</version>
   <packaging>pom</packaging>
 
   <name>fox platform EE - Parent Pom</name>
