@@ -49,13 +49,15 @@ angular
   .factory('RoundtripDetails', function($resource, App) {
     return $resource(App.uri('secured/resource/roundtrip/:id/details'), {id: "@id"}, {});
   })
+  .factory('ConnectorConfiguration', function($resource, App) {
+    return $resource(App.uri('secured/resource/connector/configuration/:id'), {id: "@connectorId"}, {
+      'queryDefaults':  {method:'GET', isArray:true, params: { id: 'defaults' }}
+    });
+  })
   .factory('Commons', function($http, HttpUtils, App) {
     return {
       getModelerNames: function() {
         return HttpUtils.makePromise($http.get(App.uri('secured/resource/diagram/modelerNames')));
-      },
-      getConnectors: function() {
-        return HttpUtils.makePromise($http.get(App.uri("secured/resource/connector/list")));
       },
       isImageAvailable : function (node) {
         var uri = "secured/resource/connector/" + node.connectorId + "/contents/info?type=PNG_FILE&nodeId=" + escape(node.id);
@@ -137,4 +139,39 @@ angular
       ngChange : "change", // jquery + angularjs event
       imageAvailable :  "image-available"
     };
-  });
+  })
+  /**
+   * Credentials (áka user management)
+   */
+  .factory('Credentials', function($http, App) {
+
+    function Credentials() {
+      this.currentCredentials = null;
+      
+      var self = this;
+      
+      // bind watchCurrent to credentials to make it directly accessible
+      // for scope.$watch(Credentials.watchCurrent)
+      self.watchCurrent = function() {
+        return self.current();
+      };
+    }
+
+    Credentials.prototype = {
+      reload: function() {
+        var self = this;
+        
+        $http.get(App.uri('currentUser')).success(function(data) {
+          self.currentCredentials = data;
+        });
+      },
+      isAdmin: function() {
+        return this.currentCredentials && this.currentCredentials.adminRole;
+      },
+      current: function() {
+        return this.currentCredentials;
+      }
+    };
+
+    return new Credentials();
+  })

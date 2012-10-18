@@ -7,6 +7,9 @@ import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.MapKeyColumn;
 import javax.persistence.Table;
@@ -19,20 +22,38 @@ public class ConnectorConfiguration extends AbstractEntity {
 
   private static final long serialVersionUID = 1L;
 
-  private String connectorClass;
-
+  @Column
   private String globalUser;
+  
+  @Column
   private String globalPassword;
   
-  private String label;
+  /**
+   * Name of the configuration
+   */
+  @Column
+  private String name;
+  
+  /**
+   * Name of the backing connector (e.g. VFS connector)
+   */
+  @Column
+  private String connectorName;
+
+  /**
+   * Class name of the backing connector (e.g. some.package.VFSConnector)
+   */
+  @Column
+  private String connectorClass;
+  
+  @Enumerated(EnumType.STRING)
   private ConnectorLoginMode loginMode;
 
-  @ElementCollection
+  @ElementCollection(fetch=FetchType.EAGER)
   @MapKeyColumn(name = "name")
   @Column(name = "value")
   @CollectionTable(name = "cy_connector_attributes", joinColumns = @JoinColumn(name = "configuration_id"))
-  private
-  Map<String, String> properties = new HashMap<String, String>();
+  private Map<String, String> properties = new HashMap<String, String>();
 
   public String getGlobalUser() {
     return globalUser;
@@ -66,12 +87,12 @@ public class ConnectorConfiguration extends AbstractEntity {
     this.properties = properties;
   }
 
-  public String getLabel() {
-    return label;
+  public String getName() {
+    return name;
   }
 
-  public void setLabel(String label) {
-    this.label = label;
+  public void setName(String name) {
+    this.name = name;
   }
   
   public ConnectorLoginMode getLoginMode() {
@@ -81,5 +102,12 @@ public class ConnectorConfiguration extends AbstractEntity {
   public void setLoginMode(ConnectorLoginMode loginMode) {
     this.loginMode = loginMode;
   }
+  
+  public void setConnectorName(String connectorName) {
+    this.connectorName = connectorName;
+  }
 
+  public String getConnectorName() {
+    return connectorName;
+  }
 }

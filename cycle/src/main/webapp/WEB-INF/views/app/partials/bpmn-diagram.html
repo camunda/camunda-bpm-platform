@@ -17,10 +17,15 @@
             <span th:text="#{'The model on this side could not be loaded and might have been moved. You may add a new model for this side.'}"></span>
           </p>
           <a class="btn btn-primary btn-large" 
-               data-ng-click="addDiagram()" 
-               data-color-invert="true" 
-               data-help-title="Find process model" 
-               data-help="You need two process models for a Roundtrip, the right side is reserved for the fox designer (the engine model)">Find process model</a>
+               data-ng-click="addDiagram()">
+            <!-- need nested span to make ng-click and 
+                 data-help work together (angular BUG) -->
+            <span data-color-invert="true" 
+                  data-help-title="Find process model" 
+                  data-help data-help-text="You need two process models for a Roundtrip, the right side is reserved for the fox designer (the engine model)">
+              Find process model
+            </span>
+          </a>
         </div>
       </div>
     </div>
@@ -52,10 +57,15 @@
         <div class="centered">
           <a class="btn btn-primary btn-large" 
              data-ng-show="!diagram || !contentAvailable" 
-             data-ng-click="addDiagram()" 
-             data-color-invert="true" 
-             data-help-title="Add a process model" 
-             data-help="You need two process models for a Roundtrip, the right side is reserved for the fox designer (the engine model)" >Add Process Model</a>
+             data-ng-click="addDiagram()">
+            <!-- need nested span to make ng-click and 
+                 data-help work together (angular BUG) -->
+            <span data-color-invert="true" 
+                  data-help-title="Add a process model" 
+                  data-help data-help-text="You need two process models for a Roundtrip, the right side is reserved for the fox designer (the engine model)" >
+              Add Process Model
+            </span>
+          </a>
         </div>
       </div>
     </div>
@@ -82,8 +92,9 @@
             <div class="control-group">
               <label class="control-label" for="modelerName" 
                      th:text="#{'Modeler Name'}" 
-                     th:attr="data-help=#{'The Name of the Modeling tool you used.'}" 
-                     data-help-title="Modeler Name">Modeler Name</label>
+                     th:attr="data-help-text=#{'The Name of the Modeling tool you used.'}" 
+                     data-help-title="Modeler Name"
+                     data-help>Modeler Name</label>
               <div class="controls">
                 <!-- display a combobox on leftside, otherwise a disabled input field -->
                 <select id="modelerName" required autofocus 
@@ -100,32 +111,40 @@
             <div class="control-group">
               <label class="control-label" for="connectors" 
                      th:text="#{Connector}" 
-                     th:attr="data-help=#{'The connector to get the model from'}" 
-                     data-help-title="Connector">Connector</label>
+                     th:attr="data-help-text=#{'The connector to get the model from'}" 
+                     data-help-title="Connector"
+                     data-help>Connector</label>
               <div class="controls">
-                <select id="connectors" class="span8" data-ng-model="connector" required ng-options="c.name for c in connectors">
-                </select>
+                <span data-ng-show="!connectors.length" style="line-height: 30px">
+                  <span>No connectors configured</span> <span data-if-admin>(<a th:href="@{/app/secured/view/connector-setup}" th:text="#{'configure'}">configure</a>)</span>.
+                </span>
+                <span data-ng-show="connectors.length">
+                  <select class="span8" data-ng-model="connector" required ng-options="c.name for c in connectors">
+                  </select>
+                </span>
               </div>
             </div>
-            
+
             <div class="control-group" ng-show="connector">
               <div data-ng-switch on="editDialogMode">
                 <div data-ng-switch-when="CREATE_NEW_DIAGRAM">
                   <label class="control-label" for="bpmnFileName"
                          th:text="#{'BPMN Model Name'}" 
-                         th:attr="data-help=#{'The name for the BPMN 2.0 file.'}" 
-                         data-help-title="BPMN File Name">BPMN File Name</label>
+                         th:attr="data-help-text=#{'The name for the BPMN 2.0 file.'}" 
+                         data-help-title="BPMN File Name"
+                         data-help>BPMN File Name</label>
                   <div class="controls" style="margin-bottom: 10px;" >
                     <input ng-model="editDiagram.label" id="bpmnFileName" name="name" type="text" class="input-xlarge" required />
                   </div>
                 </div>
-                  
+
                 <div data-ng-switch-when="ADD_DIAGRAM">
                   <label class="control-label" for="tree"
                          th:text="#{'BPMN File'}" 
-                         th:attr="data-help=#{'Select a BPMN 2.0 file from the connector contents. Note that only <code>.xml</code> and <code>.bpmn</code> files may be selected by you.'}" 
-                         data-help-title="BPMN File">BPMN File</label>
-                  <div class="controls" style="margin-bottom: 10px;" >                         
+                         th:attr="data-help-text=#{'Select a BPMN 2.0 file from the connector contents. Note that only <code>.xml</code> and <code>.bpmn</code> files may be selected by you.'}" 
+                         data-help-title="BPMN File"
+                         data-help>BPMN File</label>
+                  <div class="controls" style="margin-bottom: 10px;" >
                     <input data-ng-model="selectedNode.label" class="span8" disabled />
                   </div>
                 </div>

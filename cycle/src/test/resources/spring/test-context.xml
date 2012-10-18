@@ -10,8 +10,14 @@
           http://www.springframework.org/schema/context/spring-context.xsd
           http://www.springframework.org/schema/aop
           http://www.springframework.org/schema/aop/spring-aop.xsd">
+  
   <context:annotation-config />
 
+  <context:component-scan base-package="com.camunda.fox.cycle">
+    <context:include-filter type="annotation" expression="javax.ws.rs.Path" />
+    <context:include-filter type="annotation" expression="javax.ws.rs.ext.Provider" />
+  </context:component-scan>
+  
   <bean class="org.springframework.beans.factory.config.CustomScopeConfigurer">
     <property name="scopes">
       <map>
@@ -22,18 +28,9 @@
     </property>
   </bean>
 
-  <context:component-scan base-package="com.camunda.fox.cycle">
-    <context:include-filter type="annotation"
-                            expression="javax.ws.rs.Path" />
-    <context:include-filter type="annotation"
-                            expression="javax.ws.rs.ext.Provider" />
-  </context:component-scan>
-
   <bean name="vfsConnectorConfig" class="com.camunda.fox.cycle.entity.ConnectorConfiguration">
-    <property name="id" value="1" />
-    <property name="label" value="Test VFS Connector" />
-    <property name="connectorClass"
-              value="com.camunda.fox.cycle.connector.vfs.VfsConnector" />
+    <property name="name" value="Test VFS Connector" />
+    <property name="connectorClass" value="com.camunda.fox.cycle.connector.vfs.VfsConnector" />
     <property name="properties">
       <map>
         <entry key="BASE_PATH" value="${java.io.tmpdir}" />
@@ -42,8 +39,7 @@
   </bean>
 
   <bean name="signavioConfig" class="com.camunda.fox.cycle.entity.ConnectorConfiguration">
-    <property name="id" value="2" />
-    <property name="label" value="My SignavioConnector" />
+    <property name="name" value="My SignavioConnector" />
     <property name="connectorClass"
               value="com.camunda.fox.cycle.connector.signavio.SignavioConnector" />
     <property name="loginMode" value="GLOBAL" />
@@ -57,8 +53,7 @@
   </bean>
   
   <bean name="svnConfig" class="com.camunda.fox.cycle.entity.ConnectorConfiguration">
-    <property name="id" value="3" />
-    <property name="label" value="My Svn Connector" />
+    <property name="name" value="My Svn Connector" />
     <property name="connectorClass"
               value="com.camunda.fox.cycle.connector.svn.SvnConnector" />
     <property name="loginMode" value="LOGIN_NOT_REQUIRED" />
@@ -69,4 +64,6 @@
     </property>
   </bean>
 
+  <!-- instantiates test connector configurations for testing -->
+  <bean name="configurationProvider" class="com.camunda.fox.cycle.connector.test.util.ConnectorConfigurationProvider" />
 </beans>

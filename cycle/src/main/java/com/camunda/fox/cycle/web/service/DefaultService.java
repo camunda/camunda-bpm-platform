@@ -29,6 +29,8 @@ import com.camunda.fox.cycle.web.dto.CurrentUserDTO;
 @Path("/")
 public class DefaultService extends AbstractRestService {
   
+  private static final String ADMIN_ROLE = "admin";
+  
 //  @GET
 //  @Consumes(MediaType.APPLICATION_JSON)
 //  @Path("login")
@@ -69,8 +71,9 @@ public class DefaultService extends AbstractRestService {
   @Produces(MediaType.APPLICATION_JSON)
   public CurrentUserDTO currentUser(@Context HttpServletRequest request) {
     Principal principal = request.getUserPrincipal();
+    boolean isAdminRole = request.isUserInRole(ADMIN_ROLE);
     if (principal != null) {
-      return new CurrentUserDTO(-1, principal.getName());
+      return new CurrentUserDTO(-1, principal.getName(), isAdminRole);
     } else {
       return null;
     }

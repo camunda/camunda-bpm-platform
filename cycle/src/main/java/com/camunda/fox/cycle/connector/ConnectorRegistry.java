@@ -1,48 +1,49 @@
 package com.camunda.fox.cycle.connector;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.inject.Inject;
 
 import org.springframework.aop.aspectj.annotation.AspectJProxyFactory;
-import org.springframework.context.annotation.Scope;
-import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Component;
-import org.springframework.web.context.WebApplicationContext;
 
 import com.camunda.fox.cycle.aspect.LoginAspect;
 import com.camunda.fox.cycle.aspect.ThreadsafeAspect;
 import com.camunda.fox.cycle.entity.ConnectorConfiguration;
 import com.camunda.fox.cycle.exception.CycleException;
+import com.camunda.fox.cycle.repository.ConnectorConfigurationRepository;
 
 @Component
-@Scope(
-  value = WebApplicationContext.SCOPE_SESSION, 
-  proxyMode = ScopedProxyMode.TARGET_CLASS
-)
 public class ConnectorRegistry {
-  
+
   @Inject
   private LoginAspect loginAspect;
-  
+
   @Inject
   private ThreadsafeAspect threadsafeAspect;
+
+  @Inject
+  private ConnectorCache cache;
   
   /**
-   * Currently, connector singletons are fetched from the application context
-   * Will change to fetching from database at some point.
+   * Default connector configurations are configured in the spring application context. 
+   * They are used as blueprints for actual connectors.
    */
   @Inject
-  private List<ConnectorConfiguration> configurations;
+  private List<ConnectorConfiguration> connectorDefinitions;
+
+  @Inject
+  private ConnectorConfigurationRepository connectorConfigurationRepository;
   
   /**
-   * Connector cache 
+   * Return a list of default configurations
+   * @return 
    */
-  private Map<Long, Connector> connectorCache = new HashMap<Long, Connector>();
-  
+  public List<ConnectorConfiguration> getConnectorDefinitions() {
+    return connectorDefinitions;
+  }
+
   /**
    * Return connector configuration for given id or null
    * 
@@ -55,16 +56,25 @@ public class ConnectorRegistry {
         return c;
       }
     }
-    
     return null;
   }
-  
+
   /**
    * Returns a list of all connector configurations known to this registry
    * @return 
    */
   public List<ConnectorConfiguration> getConnectorConfigurations() {
-    return configurations;
+    return connectorConfigurationRepository.findAll();
+  }
+
+  public ConnectorConfiguration getConnectorConfiguration(Class<? extends Connector> cls) {
+    for (ConnectorConfiguration config: getConnectorConfigurations()) {
+      if (config.getConnectorClass().equals(cls.getName())) {
+        return config;
+      }
+    }
+
+    return null;
   }
 
   /**
@@ -73,12 +83,12 @@ public class ConnectorRegistry {
    * @return 
    */
   public Connector getConnector(Class<? extends Connector> cls) {
-    for (ConnectorConfiguration config: getConnectorConfigurations()) {
-      if (config.getConnectorClass().equals(cls.getName())) {
-        return getConnector(config.getId());
-      }
+    ConnectorConfiguration config = getConnectorConfiguration(cls);
+    if (config != null) {
+      return getConnector(config.getId());
+    } else {
+      return null;
     }
-    return null;
   }
 
   /**
@@ -90,13 +100,17 @@ public class ConnectorRegistry {
    * @throws CycleException if the connector is unavailable
    */
   public Connector getConnector(long connectorId) {
-    Connector connector = connectorCache.get(connectorId);
+    Connector connector = cache.get(connectorId);
     if (connector == null) {
       connector = instantiateConnector(connectorId);
-      connectorCache.put(connectorId, connector);
+      cache.put(connectorId, connector);
     }
-    
+
     return connector;
+  }
+  
+  public ConnectorCache getCache() {
+    return cache;
   }
 
   /**
@@ -109,8 +123,8 @@ public class ConnectorRegistry {
     for (ConnectorConfiguration c: getConnectorConfigurations()) {
       getConnector(c.getId());
     }
-    
-    return new ArrayList<Connector>(connectorCache.values());
+
+    return new ArrayList<Connector>(cache.values());
   }
 
   /**
@@ -152,6 +166,29 @@ public class ConnectorRegistry {
       return instance;
     } catch (Exception e) {
       throw new CycleException("Could not init connector", e);
+    }
+  }
+
+  public ConnectorStatus testConnectorConfiguration(ConnectorConfiguration config) {
+    Connector connector = null;
+
+    try {
+      connector = instantiateConnector(config);
+      ConnectorNode root = connector.getRoot();
+
+      // list children of root
+      connector.getChildren(root);
+
+      // everything ok
+      return ConnectorStatus.ok();
+    } catch (Exception e) {
+      e.printStackTrace();
+      
+      return ConnectorStatus.inError(e);
+    } finally {
+      if (connector != null) {
+        connector.dispose();
+      }
     }
   }
 }
