@@ -20,6 +20,7 @@
       <unpackOptions>
         <excludes>
           <exclude>**/standalone/configuration/standalone.xml</exclude>        
+		  <exclude>**/standalone/configuration/standalone-full.xml</exclude> 
           <exclude>**/bin/standalone.conf</exclude>
           <exclude>**/bin/standalone.conf.bat</exclude>
         </excludes>        
