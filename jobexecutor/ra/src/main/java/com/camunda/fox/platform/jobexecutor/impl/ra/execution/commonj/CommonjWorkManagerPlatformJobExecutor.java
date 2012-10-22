@@ -19,7 +19,12 @@ import commonj.work.WorkException;
 import commonj.work.WorkManager;
 import commonj.work.WorkRejectedException;
 
-
+/**
+ * {@link AbstractPlatformJobExecutor} implementation delegating to a CommonJ {@link WorkManager}.
+ * 
+ * @author Christian Lipphardt
+ * 
+ */
 public class CommonjWorkManagerPlatformJobExecutor extends PlatformJobExecutor implements Referenceable {
 
   private static Logger logger = Logger.getLogger(CommonjWorkManagerPlatformJobExecutor.class.getName());
