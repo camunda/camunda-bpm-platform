@@ -46,21 +46,21 @@
         </includes>
       </unpackOptions>
       <includes>
-        <include>com.camunda.fox.cockpit:cockpit-sql-scripts:jar:*</include>
+        <include>com.camunda.fox.cockpit:cockpit-sql-scripts-eclipselink:jar:*</include>
       </includes>
     </dependencySet>
-    <dependencySet>
-      <outputDirectory />
-      <unpack>true</unpack>
-      <unpackOptions>
-        <includes>
-          <include>**/*.sql</include>
-        </includes>
-      </unpackOptions>
-      <includes>
-        <include>com.camunda.fox.cycle:cycle-sql-scripts:jar:*</include>
-      </includes>
-    </dependencySet>
+<!--     <dependencySet> -->
+<!--       <outputDirectory /> -->
+<!--       <unpack>true</unpack> -->
+<!--       <unpackOptions> -->
+<!--         <includes> -->
+<!--           <include>**/*.sql</include> -->
+<!--         </includes> -->
+<!--       </unpackOptions> -->
+<!--       <includes> -->
+<!--         <include>com.camunda.fox.cycle:cycle-sql-scripts:jar:*</include> -->
+<!--       </includes> -->
+<!--     </dependencySet> -->
     
     <dependencySet>
   		<outputFileNameMapping>fox-tasklist-${project.version}.${artifact.extension}</outputFileNameMapping>
