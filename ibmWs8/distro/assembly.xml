@@ -71,7 +71,7 @@
         </includes>
       </unpackOptions>
       <includes>
-        <include>com.camunda.fox.cockpit:cockpit-sql-scripts:jar:*</include>
+        <include>com.camunda.fox.cockpit:cockpit-sql-scripts-openjpa:jar:*</include>
       </includes>
     </dependencySet>
     <dependencySet>
