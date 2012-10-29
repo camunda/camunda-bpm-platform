@@ -11,6 +11,12 @@
   <packaging>war</packaging>
   <name>fox cycle - app</name>
   
+  <properties>
+    <web.resources.override>src/main/webapp-default</web.resources.override>
+    <java.resources.override>src/main/resources-default</java.resources.override>
+    <netbeans.hint.deploy.server>gfv3ee6</netbeans.hint.deploy.server>
+  </properties>
+  
   <dependencies>
     <!-- Spring Framework -->
     <dependency>
@@ -40,17 +46,15 @@
     </dependency>
 
     <!-- Resteasy (JAX-RS impl) -->
+    <!-- configured in profiles -->
+    <!--
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
       <artifactId>resteasy-jaxrs</artifactId>
       <version>${version.resteasy}</version>
-      <exclusions>
-        <exclusion>
-          <artifactId>javassist</artifactId>
-          <groupId>javassist</groupId>
-        </exclusion>
-      </exclusions>
     </dependency>
+    -->
+    
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
       <artifactId>resteasy-jackson-provider</artifactId>
@@ -221,8 +225,10 @@
     </filters>
     <resources>
       <resource>
+        <directory>${java.resources.override}</directory>
+      </resource>
+      <resource>
         <directory>src/main/resources</directory>
-        <!--<filtering>true</filtering>-->
       </resource>
     </resources>
     <testResources>
@@ -266,6 +272,10 @@
           <webResources>
             <resource>
               <filtering>true</filtering>
+              <directory>${web.resources.override}</directory>
+            </resource>
+            <resource>
+              <filtering>true</filtering>
               <directory>src/main/webapp</directory>
             </resource>
           </webResources>
@@ -299,12 +309,6 @@
           <groupId>org.hibernate</groupId>
           <artifactId>hibernate-entitymanager</artifactId>
           <scope>test</scope>
-        </dependency>
-        <!-- jpa 2.0 api -->
-        <dependency>
-          <groupId>org.hibernate.javax.persistence</groupId>
-          <artifactId>hibernate-jpa-2.0-api</artifactId>
-          <scope>compile</scope>
         </dependency>
         <dependency>
           <groupId>com.h2database</groupId>
@@ -402,6 +406,18 @@
           <artifactId>hibernate-jpa-2.0-api</artifactId>
           <scope>compile</scope>
         </dependency>
+        <!-- resteasy dependencies -->
+        <dependency>
+          <groupId>org.jboss.resteasy</groupId>
+          <artifactId>resteasy-jaxrs</artifactId>
+          <version>${version.resteasy}</version>
+          <exclusions>
+            <exclusion>
+              <artifactId>javassist</artifactId>
+              <groupId>javassist</groupId>
+            </exclusion>
+          </exclusions>
+        </dependency>
       </dependencies>
       <build>
         <plugins>
@@ -435,7 +451,7 @@
                 </goals>
                 <phase>package</phase>
                 <configuration>
-                  <path>cycle-spike</path>
+                  <path>cycle</path>
                   <serverXml>src/main/tomcat/conf/server.xml</serverXml>
                 </configuration>
               </execution>
@@ -443,6 +459,60 @@
           </plugin>
         </plugins>
       </build>
+    </profile>
+    <profile>
+      <id>h2-test</id>
+      <dependencies>
+        <!-- for testing -->
+        <dependency>
+          <groupId>com.h2database</groupId>
+          <artifactId>h2</artifactId>
+          <version>${version.h2}</version>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
+      <id>glassfish</id>
+      <dependencies>
+        <!-- javax.persistence -->
+        <dependency>
+          <groupId>org.hibernate</groupId>
+          <artifactId>hibernate-entitymanager</artifactId>
+        </dependency>
+        <!-- resteasy dependencies -->
+        <dependency>
+          <groupId>org.jboss.resteasy</groupId>
+          <artifactId>resteasy-jaxrs</artifactId>
+          <version>${version.resteasy}</version>
+          <exclusions>
+            <exclusion>
+              <artifactId>javassist</artifactId>
+              <groupId>javassist</groupId>
+            </exclusion>
+          </exclusions>
+        </dependency>
+      </dependencies>
+      <properties>
+        <web.resources.override>src/main/webapp-glassfish</web.resources.override>
+        <java.resources.override>src/main/resources-glassfish</java.resources.override>
+      </properties>
+    </profile>
+    <profile>
+      <id>jboss</id>
+      <dependencies>
+        <!-- resteasy dependencies -->
+        <dependency>
+          <groupId>org.jboss.resteasy</groupId>
+          <artifactId>resteasy-jaxrs</artifactId>
+          <version>${version.resteasy}</version>
+          <scope>provided</scope>
+        </dependency>
+      </dependencies>
+      <properties>
+        <web.resources.override>src/main/webapp-jboss</web.resources.override>
+        <java.resources.override>src/main/resources-jboss</java.resources.override>
+      </properties>
     </profile>
     <profile>
       <id>default</id>
@@ -456,17 +526,23 @@
           <artifactId>hibernate-entitymanager</artifactId>
           <scope>test</scope>
         </dependency>
-        <!-- jpa 2.0 api -->
-        <dependency>
-          <groupId>org.hibernate.javax.persistence</groupId>
-          <artifactId>hibernate-jpa-2.0-api</artifactId>
-          <scope>compile</scope>
-        </dependency>
         <dependency>
           <groupId>com.h2database</groupId>
           <artifactId>h2</artifactId>
           <version>${version.h2}</version>
           <scope>test</scope>
+        </dependency>
+        <!-- resteasy dependencies -->
+        <dependency>
+          <groupId>org.jboss.resteasy</groupId>
+          <artifactId>resteasy-jaxrs</artifactId>
+          <version>${version.resteasy}</version>
+          <exclusions>
+            <exclusion>
+              <artifactId>javassist</artifactId>
+              <groupId>javassist</groupId>
+            </exclusion>
+          </exclusions>
         </dependency>
       </dependencies>
     </profile>
