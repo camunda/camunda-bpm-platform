@@ -39,7 +39,7 @@ public abstract class AbstractConnectorTestBase {
     assertThat(tmpFolder).isEqualTo(TMP_FOLDER);
     
     try {
-      ContentInformation tmpFolderInfo = connector.getContentInformation(tmpFolder);
+      connector.getContentInformation(tmpFolder);
       fail("Obtaining connector info from folder should raise error");
     } catch (IllegalArgumentException e) {
       // anticipated
@@ -52,17 +52,15 @@ public abstract class AbstractConnectorTestBase {
     Connector connector = getConnector();
     
     // not alphabetically ordered!
-    String[] filesToImport = new String[] { "collaboration_impl.bpmn", "collaboration.bpmn" };
+    String[] filesToImport = new String[] { "test-rhs.bpmn", "test-lhs.bpmn" };
     
     // when
     for (String file: filesToImport) {
-      InputStream is = getDiagramResourceAsStream(file);
-      
-      ConnectorNode fileNode = connector.createNode("//" + TMP_DIR_NAME, file, ConnectorNodeType.ANY_FILE);
-      connector.updateContent(fileNode, is);
-      
-      IoUtil.closeSilently(is);
+      importFile(connector, file, file);
     }
+    
+    // import another file with no extension
+    importFile(connector, "test-rhs.bpmn", "test-rhs");
     
     // then we should reach this point
   }
@@ -81,6 +79,45 @@ public abstract class AbstractConnectorTestBase {
   }
 
   @Test
+  public void shouldServePngImageForNoExtensionFiles() throws Exception {
+    // give
+    Connector connector = getConnector();
+    
+    // when
+    ContentInformation info = connector.getContentInformation(new ConnectorNode("//" + TMP_DIR_NAME + "/test-rhs", ConnectorNodeType.PNG_FILE));
+    
+    // then
+    assertThat(info).isNotNull();
+    assertThat(info.exists()).isFalse();
+  }
+
+  @Test
+  public void shouldServePngImage() throws Exception {
+    // give
+    Connector connector = getConnector();
+    
+    // when
+    ContentInformation info = connector.getContentInformation(new ConnectorNode("//" + TMP_DIR_NAME + "/test-rhs.bpmn", ConnectorNodeType.PNG_FILE));
+    
+    // then
+    assertThat(info).isNotNull();
+    assertThat(info.exists()).isFalse();
+  }
+
+  @Test
+  public void shouldServePngImage2() throws Exception {
+    // give
+    Connector connector = getConnector();
+    
+    // when
+    ContentInformation info = connector.getContentInformation(new ConnectorNode("//" + TMP_DIR_NAME + "/test-rhs.png"));
+    
+    // then
+    assertThat(info).isNotNull();
+    assertThat(info.exists()).isFalse();
+  }
+
+  @Test
   public void shouldListDirectoryContentsAlphabeticallyOrdered() throws Exception {
     // given
     Connector connector = getConnector();
@@ -89,12 +126,12 @@ public abstract class AbstractConnectorTestBase {
     List<ConnectorNode> nodes = connector.getChildren(TMP_FOLDER);
     
     // then
-    assertThat(nodes).hasSize(2);
+    assertThat(nodes).hasSize(3);
     
     ConnectorNode firstChildNode = nodes.get(0);
     
     // collaboration should appear first --> alphabetical order
-    assertThat(firstChildNode.getId()).isEqualTo("//" + TMP_DIR_NAME + "/collaboration.bpmn");
+    assertThat(firstChildNode.getId()).isEqualTo("//" + TMP_DIR_NAME + "/test-lhs.bpmn");
     assertThat(firstChildNode.getType()).isEqualTo(ConnectorNodeType.BPMN_FILE);
   }
 
@@ -107,11 +144,11 @@ public abstract class AbstractConnectorTestBase {
     InputStream nodeInputStream = null;
     
     try {
-      originalInputStream = getDiagramResourceAsStream("collaboration_impl.bpmn");
+      originalInputStream = getDiagramResourceAsStream("test-rhs.bpmn");
       byte[] originalBytes = IoUtil.readInputStream(originalInputStream, "class path is");
 
       // when
-      nodeInputStream = connector.getContent(new ConnectorNode("//" + TMP_DIR_NAME + "/collaboration_impl.bpmn"));
+      nodeInputStream = connector.getContent(new ConnectorNode("//" + TMP_DIR_NAME + "/test-rhs.bpmn"));
       byte[] nodeBytes = IoUtil.readInputStream(nodeInputStream, "node input stream");
 
       // then
@@ -131,10 +168,10 @@ public abstract class AbstractConnectorTestBase {
     
     
     try {
-      originalInputStream = getDiagramResourceAsStream("collaboration_impl.bpmn");
+      originalInputStream = getDiagramResourceAsStream("test-rhs.bpmn");
       byte[] inputBytes = IoUtil.readInputStream(originalInputStream, "class path is");
 
-      ConnectorNode fileNode = new ConnectorNode("//" + TMP_DIR_NAME + "/collaboration.bpmn", "collaboration.bpmn");
+      ConnectorNode fileNode = new ConnectorNode("//" + TMP_DIR_NAME + "/test-lhs.bpmn", "test-lhs.bpmn");
       
       // when
       ContentInformation updatedContentInfo = connector.updateContent(
@@ -161,6 +198,15 @@ public abstract class AbstractConnectorTestBase {
   }
 
   private InputStream getDiagramResourceAsStream(String file) {
-    return getClass().getResourceAsStream("/com/camunda/fox/cycle/roundtrip/" + file);
+    return getClass().getResourceAsStream("/com/camunda/fox/cycle/roundtrip/repository/" + file);
+  }
+
+  private void importFile(Connector connector, String file, String connectorNodeName) throws Exception {
+    InputStream is = getDiagramResourceAsStream(file);
+
+    ConnectorNode fileNode = connector.createNode("//" + TMP_DIR_NAME, connectorNodeName, ConnectorNodeType.ANY_FILE);
+    connector.updateContent(fileNode, is);
+
+    IoUtil.closeSilently(is);
   }
 }

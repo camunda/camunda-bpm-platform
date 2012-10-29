@@ -1,4 +1,4 @@
-package com.camunda.fox.cycle.connector.vfs;
+package com.camunda.fox.cycle.connector;
 
 import java.io.File;
 import org.junit.AfterClass;
@@ -6,40 +6,42 @@ import org.junit.BeforeClass;
 
 import com.camunda.fox.cycle.connector.AbstractConnectorTestBase;
 import com.camunda.fox.cycle.connector.Connector;
+import com.camunda.fox.cycle.connector.ConnectorLoginMode;
+import com.camunda.fox.cycle.connector.svn.SvnConnector;
 import com.camunda.fox.cycle.connector.test.util.RepositoryUtil;
 import com.camunda.fox.cycle.entity.ConnectorConfiguration;
 
-/**
- *
- * @author nico.rehwaldt
- */
-public class VfsConnectorTest extends AbstractConnectorTestBase {
 
-  private static VfsConnector connector;
+public class SvnConnectorTest extends AbstractConnectorTestBase {
 
-  private static final File VFS_DIRECTORY = new File("target/vfs-repository");
-
+  private static SvnConnector connector;
+  
+  private static final File SVN_DIRECTORY = new File("target/svn-repository");
+  
   @BeforeClass
   public static void beforeClass() throws Exception {
+
+    String svnUrl = RepositoryUtil.createSVNRepository(SVN_DIRECTORY);
+
     ConnectorConfiguration config = new ConnectorConfiguration();
-    
-    String url = RepositoryUtil.createVFSRepository(VFS_DIRECTORY);
-    
-    config.getProperties().put(VfsConnector.BASE_PATH_KEY, url);
-    
+
+    config.setLoginMode(ConnectorLoginMode.LOGIN_NOT_REQUIRED);
+    config.getProperties().put(SvnConnector.CONFIG_KEY_REPOSITORY_PATH, svnUrl);
+
     // NOT a spring bean!
-    connector = new VfsConnector();
+    connector = new SvnConnector();
     connector.setConfiguration(config);
     connector.init();
   }
 
   @AfterClass
   public static void afterClass() throws Exception {
-    RepositoryUtil.clean(VFS_DIRECTORY);
+    RepositoryUtil.clean(SVN_DIRECTORY);
   }
 
   @Override
   public Connector getConnector() {
     return connector;
   }
+
 }

@@ -59,7 +59,7 @@ public class BpmnDiagramService extends AbstractRestService {
 
   @GET
   @Path("{id}/image")
-  public Object getImage(@PathParam("id") long id) {
+  public Response getImage(@PathParam("id") long id) {
     
     // we do offer the functionality to serve images here, rather than relying on the connector service directly
     // because we need to add the out of date logic which is not the connector services' concern

@@ -37,6 +37,8 @@ public class SvnRoundtripServiceTest extends AbstractRoundtripServiceTest {
   @Inject
   private ConnectorRegistry connectorRegistry;
   
+  public static boolean initialized = false;
+  
   @BeforeClass
   public static void beforeClass() throws Exception {
 
@@ -54,16 +56,21 @@ public class SvnRoundtripServiceTest extends AbstractRoundtripServiceTest {
   }
 
   @Override
-  protected void initSpringWiredConnector() throws Exception {
-    List<ConnectorConfiguration> configurations = getConnectorRegistry().getConnectorConfigurations(CONNECTOR_CLS);
-    ConnectorConfiguration config = configurations.get(0);
+  protected void ensureConnectorInitialized() throws Exception {
 
-    // put mock connector to registry
-    connectorRegistry.getCache().put(config.getId(), connector);
+    if (!initialized) {
+      List<ConnectorConfiguration> configurations = getConnectorRegistry().getConnectorConfigurations(CONNECTOR_CLS);
+      ConnectorConfiguration config = configurations.get(0);
 
-    // fake some connector properties
-    connector.getConfiguration().setId(config.getId());
-    connector.getConfiguration().setConnectorClass(config.getConnectorClass());
+      // put mock connector to registry
+      connectorRegistry.getCache().put(config.getId(), connector);
+
+      // fake some connector properties
+      connector.getConfiguration().setId(config.getId());
+      connector.getConfiguration().setConnectorClass(config.getConnectorClass());
+      
+      initialized = true;
+    }
 
     setConnector(connector);
   }

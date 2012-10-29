@@ -319,7 +319,11 @@ public class VfsConnector extends Connector {
     switch (node.getType()) {
       case PNG_FILE:
         int pointIndex = path.lastIndexOf(".");
-        return path.substring(0, pointIndex) + ".png";
+        if (pointIndex != -1) {
+          return path.substring(0, pointIndex) + ".png";
+        } else {
+          return path + ".png";
+        }
       default: 
         return path;
     }

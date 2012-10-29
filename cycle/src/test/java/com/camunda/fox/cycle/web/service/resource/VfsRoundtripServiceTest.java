@@ -32,7 +32,7 @@ public class VfsRoundtripServiceTest extends AbstractRoundtripServiceTest {
   private ConnectorRegistry connectorRegistry;
 
   @Override
-  protected void initSpringWiredConnector() throws Exception {
+  protected void ensureConnectorInitialized() throws Exception {
     List<ConnectorConfiguration> configurations = getConnectorRegistry().getConnectorConfigurations(CONNECTOR_CLS);
     ConnectorConfiguration config = configurations.get(0);
 

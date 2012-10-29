@@ -19,7 +19,7 @@ public class BpmnProcessModelUtilTest {
   
   @Test
   public void testReplaceDeveloperFriendlyIds() {
-    String sourceModel = IoUtil.readFileAsString("com/camunda/fox/cycle/roundtrip/collaboration.bpmn");
+    String sourceModel = IoUtil.readFileAsString("com/camunda/fox/cycle/roundtrip/repository/test-lhs.bpmn");
         
     String resultModel = cycleRoundtripUtil.replaceDeveloperFriendlyIds(sourceModel);
     Assert.assertTrue(resultModel.contains("Process_Engine"));
@@ -27,7 +27,7 @@ public class BpmnProcessModelUtilTest {
   
   @Test
   public void testReplaceDeveloperFriendlyIdsWithReplacePoolId() {
-    String sourceModel = IoUtil.readFileAsString("com/camunda/fox/cycle/roundtrip/collaboration.bpmn");
+    String sourceModel = IoUtil.readFileAsString("com/camunda/fox/cycle/roundtrip/repository/test-lhs.bpmn");
         
     String resultModel = cycleRoundtripUtil.replaceDeveloperFriendlyIds(sourceModel,"My Custom Pool Name");
     Assert.assertTrue(resultModel.contains("My Custom Pool Name"));
@@ -35,7 +35,7 @@ public class BpmnProcessModelUtilTest {
   
   @Test
   public void testExtractPool() throws IOException {
-    InputStream sourceModel = new FileInputStream(IoUtil.getFile("com/camunda/fox/cycle/roundtrip/collaboration.bpmn"));
+    InputStream sourceModel = new FileInputStream(IoUtil.getFile("com/camunda/fox/cycle/roundtrip/repository/test-lhs.bpmn"));
         
     String resultModel = IOUtils.toString(cycleRoundtripUtil.extractExecutablePool(sourceModel), "UTF-8");
     Assert.assertFalse(resultModel.contains("Mensch"));
