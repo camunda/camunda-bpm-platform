@@ -57,7 +57,7 @@ public class BpmnDiagramServiceTest extends AbstractDiagramServiceTest {
       assertThat(response.getStatus()).isEqualTo(Response.Status.NOT_FOUND.getStatusCode());
     }
   }
-  
+
   @Test
   public void shouldServeImageIfNotOutOfDate() {
     BpmnDiagram diagram = diagramLastModified(earlier());

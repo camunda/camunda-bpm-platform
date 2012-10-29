@@ -25,7 +25,7 @@ public class ConnectorRegistry {
 
   @Inject
   private ConnectorCache cache;
-  
+
   /**
    * Default connector configurations are configured in the spring application context. 
    * They are used as blueprints for actual connectors.
@@ -35,7 +35,7 @@ public class ConnectorRegistry {
 
   @Inject
   private ConnectorConfigurationRepository connectorConfigurationRepository;
-  
+
   /**
    * Return a list of default configurations
    * @return 
@@ -67,25 +67,24 @@ public class ConnectorRegistry {
     return connectorConfigurationRepository.findAll();
   }
 
-  public ConnectorConfiguration getConnectorConfiguration(Class<? extends Connector> cls) {
-    for (ConnectorConfiguration config: getConnectorConfigurations()) {
-      if (config.getConnectorClass().equals(cls.getName())) {
-        return config;
-      }
-    }
-
-    return null;
+  /**
+   * Returns a list of connector configurations for a given connector class
+   * @param cls
+   * @return 
+   */
+  public List<ConnectorConfiguration> getConnectorConfigurations(Class<? extends Connector> cls) {
+    return connectorConfigurationRepository.findByConnectorClass(cls.getName());
   }
 
   /**
-   * Return the connector with the given class or null if none was found
+   * Return the first connector with the given class or null if none was found
    * @param cls
    * @return 
    */
   public Connector getConnector(Class<? extends Connector> cls) {
-    ConnectorConfiguration config = getConnectorConfiguration(cls);
-    if (config != null) {
-      return getConnector(config.getId());
+    List<ConnectorConfiguration> configs = getConnectorConfigurations(cls);
+    if (!configs.isEmpty()) {
+      return getConnector(configs.get(0).getId());
     } else {
       return null;
     }
@@ -108,7 +107,7 @@ public class ConnectorRegistry {
 
     return connector;
   }
-  
+
   public ConnectorCache getCache() {
     return cache;
   }
@@ -143,7 +142,7 @@ public class ConnectorRegistry {
     
     return instantiateConnector(config);
   }
-  
+
   /**
    * Initializes a connector from the given configuration and returns it
    * 

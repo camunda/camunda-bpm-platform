@@ -5,7 +5,6 @@ import static org.fest.assertions.Assertions.assertThat;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.Date;
-import java.util.List;
 
 import javax.inject.Inject;
 
@@ -13,9 +12,6 @@ import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.camunda.fox.cycle.connector.Connector;
 import com.camunda.fox.cycle.connector.ConnectorNode;
@@ -28,13 +24,12 @@ import com.camunda.fox.cycle.util.IoUtil;
 import com.camunda.fox.cycle.web.dto.BpmnDiagramDTO;
 import com.camunda.fox.cycle.web.dto.ConnectorNodeDTO;
 import com.camunda.fox.cycle.web.dto.RoundtripDTO;
-import com.camunda.fox.cycle.web.service.resource.RoundtripService;
 
 /**
  *
  * @author nico.rehwaldt
  */
-public abstract class RoundtripServiceTest {
+public abstract class AbstractRoundtripServiceTest {
 
   @Inject
   private RoundtripRepository roundtripRepository;
@@ -53,7 +48,7 @@ public abstract class RoundtripServiceTest {
   
   @Before
   public void before() throws FileNotFoundException, Exception {
-    initConnector();
+    initSpringWiredConnector();
 
     connector.createNode("/", "foo", ConnectorNodeType.FOLDER);
 
@@ -63,7 +58,7 @@ public abstract class RoundtripServiceTest {
     leftNode = connector.createNode("/foo", "Modeler", ConnectorNodeType.ANY_FILE);
     connector.updateContent(leftNode, new FileInputStream(IoUtil.getFile("com/camunda/fox/cycle/roundtrip/collaboration.bpmn")));
   }
-  
+
   @After
   public void after() {
     // Remove all entities
@@ -178,5 +173,5 @@ public abstract class RoundtripServiceTest {
   
   // Abstract methods ////////////////////////////////////////////
   
-  protected abstract void initConnector();
+  protected abstract void initSpringWiredConnector() throws Exception;
 }

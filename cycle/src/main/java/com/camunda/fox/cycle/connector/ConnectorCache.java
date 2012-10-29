@@ -66,7 +66,6 @@ public class ConnectorCache {
     for (Connector c: cache.values()) {
       c.dispose();
     }
-    
     cache = new HashMap<Long, Connector>();
   }
 }
