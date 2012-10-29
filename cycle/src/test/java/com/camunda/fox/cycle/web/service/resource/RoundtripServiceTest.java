@@ -1,9 +1,6 @@
 package com.camunda.fox.cycle.web.service.resource;
 
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
+import static org.fest.assertions.Assertions.assertThat;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -31,6 +28,7 @@ import com.camunda.fox.cycle.util.IoUtil;
 import com.camunda.fox.cycle.web.dto.BpmnDiagramDTO;
 import com.camunda.fox.cycle.web.dto.ConnectorNodeDTO;
 import com.camunda.fox.cycle.web.dto.RoundtripDTO;
+import com.camunda.fox.cycle.web.service.resource.RoundtripService;
 
 /**
  *
@@ -85,7 +83,7 @@ public abstract class RoundtripServiceTest {
     RoundtripDTO createdData = roundtripService.create(data);
    
     // then
-    assertThat(createdData.getId(), notNullValue());
+    assertThat(createdData.getId()).isNotNull();
   }
   
   private RoundtripDTO getTestRoundtrip() {
@@ -101,10 +99,10 @@ public abstract class RoundtripServiceTest {
     RoundtripDTO roundtrip = getTestRoundtrip();
     
     // then
-    assertThat(roundtrip.getLeftHandSide(), is(notNullValue()));
-    assertThat(roundtrip.getRightHandSide(), is(notNullValue()));
-    assertThat(roundtrip.getLeftHandSide().getId(), is(notNullValue()));
-    assertThat(roundtrip.getRightHandSide().getId(), is(notNullValue()));
+    assertThat(roundtrip.getLeftHandSide()).isNotNull();
+    assertThat(roundtrip.getRightHandSide()).isNotNull();
+    assertThat(roundtrip.getLeftHandSide().getId()).isNotNull();
+    assertThat(roundtrip.getRightHandSide().getId()).isNotNull();
   }
   
   @Test
@@ -112,7 +110,7 @@ public abstract class RoundtripServiceTest {
     RoundtripDTO testRoundtrip = getTestRoundtrip();
     roundtripService.doSynchronize(SyncMode.RIGHT_TO_LEFT, testRoundtrip.getId());
     
-    assertTrue(IoUtil.toString(connector.getContent(leftNode)).contains("activiti:class=\"java.lang.Object\""));
+    assertThat(IoUtil.toString(connector.getContent(leftNode))).contains("activiti:class=\"java.lang.Object\"");
   }
   
   @Test
@@ -120,7 +118,7 @@ public abstract class RoundtripServiceTest {
     RoundtripDTO testRoundtrip = getTestRoundtrip();
     roundtripService.doSynchronize(SyncMode.LEFT_TO_RIGHT, testRoundtrip.getId());
     
-    assertTrue(!IoUtil.toString(connector.getContent(rightNode)).contains("activiti:class=\"java.lang.Object\""));
+    assertThat(IoUtil.toString(connector.getContent(rightNode))).doesNotContain("activiti:class=\"java.lang.Object\"");
   }
   
   @Test

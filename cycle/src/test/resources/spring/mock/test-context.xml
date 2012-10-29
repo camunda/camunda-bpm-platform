@@ -15,4 +15,14 @@
     <context:include-filter type="annotation" expression="javax.ws.rs.Path" />
     <context:include-filter type="annotation" expression="javax.ws.rs.ext.Provider" />
   </context:component-scan>
+
+  <bean class="org.springframework.beans.factory.config.CustomScopeConfigurer">
+    <property name="scopes">
+      <map>
+        <entry key="session">
+          <bean class="org.springframework.context.support.SimpleThreadScope" />
+        </entry>
+      </map>
+    </property>
+  </bean>
 </beans>

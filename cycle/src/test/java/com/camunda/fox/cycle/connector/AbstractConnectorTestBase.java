@@ -1,10 +1,6 @@
 package com.camunda.fox.cycle.connector;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.Assert.assertThat;
+import static org.fest.assertions.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
 import java.io.ByteArrayInputStream;
@@ -40,7 +36,7 @@ public abstract class AbstractConnectorTestBase {
     Connector connector = getConnector();
     ConnectorNode tmpFolder = connector.createNode("//", TMP_DIR_NAME, ConnectorNodeType.FOLDER);
     
-    assertThat(tmpFolder, is(equalTo(TMP_FOLDER)));
+    assertThat(tmpFolder).isEqualTo(TMP_FOLDER);
     
     try {
       ContentInformation tmpFolderInfo = connector.getContentInformation(tmpFolder);
@@ -80,8 +76,8 @@ public abstract class AbstractConnectorTestBase {
     ContentInformation info = connector.getContentInformation(new ConnectorNode("some-non-existent-file"));
     
     // then
-    assertThat(info, is(notNullValue()));
-    assertThat(info.exists(), is(false));
+    assertThat(info).isNotNull();
+    assertThat(info.exists()).isFalse();
   }
 
   @Test
@@ -93,13 +89,13 @@ public abstract class AbstractConnectorTestBase {
     List<ConnectorNode> nodes = connector.getChildren(TMP_FOLDER);
     
     // then
-    assertThat(nodes, hasSize(2));
+    assertThat(nodes).hasSize(2);
     
     ConnectorNode firstChildNode = nodes.get(0);
     
     // collaboration should appear first --> alphabetical order
-    assertThat(firstChildNode.getId(), is("//" + TMP_DIR_NAME + "/collaboration.bpmn"));
-    assertThat(firstChildNode.getType(), is(ConnectorNodeType.BPMN_FILE));
+    assertThat(firstChildNode.getId()).isEqualTo("//" + TMP_DIR_NAME + "/collaboration.bpmn");
+    assertThat(firstChildNode.getType()).isEqualTo(ConnectorNodeType.BPMN_FILE);
   }
 
   @Test
@@ -119,7 +115,7 @@ public abstract class AbstractConnectorTestBase {
       byte[] nodeBytes = IoUtil.readInputStream(nodeInputStream, "node input stream");
 
       // then
-      assertThat(nodeBytes, is(equalTo(originalBytes)));
+      assertThat(nodeBytes).isEqualTo(originalBytes);
     } finally {
       IoUtil.closeSilently(originalInputStream, nodeInputStream);
     }
@@ -144,8 +140,8 @@ public abstract class AbstractConnectorTestBase {
       ContentInformation updatedContentInfo = connector.updateContent(
         fileNode, new ByteArrayInputStream(inputBytes));
       
-      assertThat(updatedContentInfo, is(notNullValue()));
-      assertThat(updatedContentInfo.exists(), is(true));
+      assertThat(updatedContentInfo).isNotNull();
+      assertThat(updatedContentInfo.exists()).isTrue();
       
       // see if updated was set
       Date now = new Date();
@@ -158,7 +154,7 @@ public abstract class AbstractConnectorTestBase {
       byte[] nodeBytes = IoUtil.readInputStream(nodeInputStream, "node input stream");
 
       // then
-      assertThat(nodeBytes, is(equalTo(inputBytes)));
+      assertThat(nodeBytes).isEqualTo(inputBytes);
     } finally {
       IoUtil.closeSilently(originalInputStream, nodeInputStream);
     }

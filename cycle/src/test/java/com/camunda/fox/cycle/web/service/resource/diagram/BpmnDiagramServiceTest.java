@@ -1,18 +1,12 @@
-package com.camunda.fox.cycle.web.service.resource;
+package com.camunda.fox.cycle.web.service.resource.diagram;
 
-import static org.hamcrest.Matchers.instanceOf;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
-
-import java.util.Date;
+import static org.fest.assertions.Assertions.assertThat;
 
 import javax.inject.Inject;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
-import org.junit.After;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kubek2k.springockito.annotations.ReplaceWithMock;
@@ -20,13 +14,13 @@ import org.kubek2k.springockito.annotations.SpringockitoContextLoader;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-import com.camunda.fox.cycle.connector.ConnectorNode;
 import com.camunda.fox.cycle.connector.ConnectorNodeType;
-import com.camunda.fox.cycle.connector.ContentInformation;
 import com.camunda.fox.cycle.entity.BpmnDiagram;
-import com.camunda.fox.cycle.repository.BpmnDiagramRepository;
+import com.camunda.fox.cycle.web.service.resource.ConnectorService;
 
-import junit.framework.Assert;
+import static org.fest.assertions.Assertions.assertThat;
+import static org.fest.assertions.Fail.fail;
+import org.junit.Ignore;
 
 /**
  *
@@ -37,25 +31,13 @@ import junit.framework.Assert;
   loader = SpringockitoContextLoader.class,
   locations = { "classpath:/spring/mock/test-context.xml", "classpath:/spring/mock/test-persistence.xml" }
 )
-public class BpmnDiagramServiceTest {
+@Ignore
+public class BpmnDiagramServiceTest extends AbstractDiagramServiceTest {
 
   @Inject
   @ReplaceWithMock
   private ConnectorService connectorService;
-  
-  @Inject
-  private BpmnDiagramService bpmnDiagramService;
-  
-  @Inject
-  private BpmnDiagramRepository bpmnDiagramRepository;
-  
-  @After
-  public void after() {
-    bpmnDiagramRepository.deleteAll();
-  }
 
-  private static ConnectorNode DIAGRAM_NODE = new ConnectorNode("//mydiagram.bpmn", "my diagram.bpmn", 1l);
-  
   @Test
   public void shouldNotServeImageIfImageIsOutOfDate() {
     BpmnDiagram diagram = diagramLastModified(now());
@@ -68,11 +50,11 @@ public class BpmnDiagramServiceTest {
       // when
       bpmnDiagramService.getImage(diagram.getId());
       
-      Assert.fail("Expected web application exception");
+      fail("Expected web application exception");
     } catch (WebApplicationException e) {
       // then
       Response response = e.getResponse();
-      assertThat(response.getStatus(), is(Response.Status.NOT_FOUND.getStatusCode()));
+      assertThat(response.getStatus()).isEqualTo(Response.Status.NOT_FOUND.getStatusCode());
     }
   }
   
@@ -87,54 +69,28 @@ public class BpmnDiagramServiceTest {
     // when
     Object result = bpmnDiagramService.getImage(diagram.getId());
     
-    assertThat(result, is(instanceOf(Response.class)));
+    assertThat(result).isInstanceOf(Response.class);
     
     Response response = (Response) result;
-    assertThat(response.getStatus(), is(Response.Status.OK.getStatusCode()));
+    assertThat(response.getStatus()).isEqualTo(Response.Status.OK.getStatusCode());
   }
 
   @Test
   public void shouldNotServeImageMissing() {
     BpmnDiagram diagram = diagramLastModified(earlier());
-    
+
     // given
     given(connectorService.getContentInfo(DIAGRAM_NODE.getConnectorId(), DIAGRAM_NODE.getId(), ConnectorNodeType.PNG_FILE)).willReturn(nonExistingContentInformation());
-    
+
     try {
       // when
       bpmnDiagramService.getImage(diagram.getId());
 
-      Assert.fail("Expected web application exception");
+      fail("Expected web application exception");
     } catch (WebApplicationException e) {
       // then
       Response response = e.getResponse();
-      assertThat(response.getStatus(), is(Response.Status.NOT_FOUND.getStatusCode()));
+      assertThat(response.getStatus()).isEqualTo(Response.Status.NOT_FOUND.getStatusCode());
     }
-  }
-  
-  private BpmnDiagram diagramLastModified(Date date) {
-    
-    BpmnDiagram diagram = new BpmnDiagram("fox modeler", DIAGRAM_NODE);
-    diagram.setLastModified(date);
-    
-    bpmnDiagramRepository.saveAndFlush(diagram);
-    
-    return diagram;
-  }
-
-  private ContentInformation nonExistingContentInformation() {
-    return new ContentInformation(false, null);
-  }
-
-  private ContentInformation contentInformationLastModified(Date date) {
-    return new ContentInformation(true, date);
-  }
-
-  private Date now() {
-    return new Date();
-  }
-
-  private Date earlier() {
-    return new Date(System.currentTimeMillis() - 20000);
   }
 }

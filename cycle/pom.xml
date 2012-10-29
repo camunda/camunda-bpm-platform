@@ -157,8 +157,8 @@
 
     <!-- testing -->
     <dependency>
-      <groupId>org.hamcrest</groupId>
-      <artifactId>hamcrest-all</artifactId>
+      <groupId>org.easytesting</groupId>
+      <artifactId>fest-assert</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -181,8 +181,9 @@
       <artifactId>aspectjweaver</artifactId>
       <version>1.7.0</version>
     </dependency>
+    
+    <!-- required for SignavioConnectorIT -->
     <dependency>
-      <!-- required for SignavioConnectorIT -->
       <groupId>xmlunit</groupId>
       <artifactId>xmlunit</artifactId>
       <version>1.3</version>
