@@ -7,6 +7,6 @@ target
 .metadata
 .LCKpom.xml~
 build.properties
-nbactions.xml
+nbactions*.xml
 nb-configuration.xml
 .idea
