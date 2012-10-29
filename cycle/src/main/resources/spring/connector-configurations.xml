@@ -34,7 +34,7 @@
     <property name="loginMode" value="LOGIN_NOT_REQUIRED" />
     <property name="properties">
       <map>
-        <entry key="repositoryPath" value="https://svn.camunda.com/sandbox"></entry>
+        <entry key="repositoryPath" value=""></entry>
       </map>
     </property>
   </bean>
