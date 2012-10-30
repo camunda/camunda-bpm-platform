@@ -32,6 +32,8 @@ import com.camunda.fox.cycle.util.IoUtil;
 import com.camunda.fox.cycle.web.dto.BpmnDiagramDTO;
 import com.camunda.fox.cycle.web.dto.ConnectorNodeDTO;
 import com.camunda.fox.cycle.web.dto.RoundtripDTO;
+import com.camunda.fox.cycle.web.dto.SynchronizationResultDTO;
+import com.camunda.fox.cycle.web.dto.SynchronizationResultDTO.SynchronizationStatus;
 import com.camunda.fox.cycle.web.service.AbstractRestService;
 
 /**
@@ -173,20 +175,23 @@ public class RoundtripService extends AbstractRestService {
   @POST
   @Path("{id}/sync")
   @Transactional
-  public RoundtripDTO doSynchronize(@QueryParam("syncMode") SyncMode syncMode, @PathParam("id") long roundtripId) {
-    Roundtrip roundtrip = roundtripRepository.findById(roundtripId);
-
-    if (roundtrip == null) {
-      throw notFound("roundtrip not found");
+  public SynchronizationResultDTO doSynchronize(@QueryParam("syncMode") SyncMode syncMode, @PathParam("id") long roundtripId) {
+    try {
+      Roundtrip roundtrip = roundtripRepository.findById(roundtripId);
+      
+      if (roundtrip == null) {
+        throw notFound("roundtrip not found");
+      }
+      
+      synchronizeModels(roundtrip.getLeftHandSide(), roundtrip.getRightHandSide(), syncMode);
+      
+      roundtrip.setLastSync(new Date());
+      roundtrip.setLastSyncMode(syncMode);
+      
+      return new SynchronizationResultDTO(SynchronizationStatus.SYNC_SUCCESS);
+    } catch (Exception e) {
+      return new SynchronizationResultDTO(SynchronizationStatus.SYNC_FAILED, e.getMessage());
     }
-
-    synchronizeModels(roundtrip.getLeftHandSide(), roundtrip.getRightHandSide(), syncMode);
-
-    roundtrip.setLastSync(new Date());
-    roundtrip.setLastSyncMode(syncMode);
-
-    RoundtripDTO roundtripDTO = new RoundtripDTO(roundtrip, roundtrip.getLeftHandSide(), roundtrip.getRightHandSide());
-    return roundtripDTO;
   }
   
   @POST
@@ -315,7 +320,10 @@ public class RoundtripService extends AbstractRestService {
       
       IoUtil.closeSilently(resultStream);
     } catch (Exception e) {
-      throw new CycleException("Synchronization failed", e);
+      if (e instanceof CycleException) {
+        throw (CycleException) e;
+      }
+      throw new CycleException("Synchronization failed: " + e.getMessage(), e);
     }
   }
 }

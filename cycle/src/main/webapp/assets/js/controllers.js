@@ -224,11 +224,13 @@ function SyncRoundtripController($scope, $http, $q, App, Event) {
       success(function(data) {
         delayed.then(function() {
           $scope.roundtrip.$get({id: $scope.roundtrip.id });
-          $scope.status = SYNC_SUCCESS;
-        });
-      }).error(function (data) {
-        delayed.then(function() {
-          $scope.status = SYNC_FAILED;
+          var status = data.status;
+          if (status == "SYNC_SUCCESS") {
+            $scope.status = SYNC_SUCCESS;
+          } else if (status == "SYNC_FAILED") {
+            $scope.status = SYNC_FAILED;
+            $scope.message = data.message;
+          }
         });
       });
   };
