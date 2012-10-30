@@ -320,6 +320,7 @@ public class RoundtripServiceTest {
 
   @AfterClass
   public static void afterClass() throws Exception {
+    connector.dispose();
     RepositoryUtil.clean(VFS_DIRECTORY);
   }
 
