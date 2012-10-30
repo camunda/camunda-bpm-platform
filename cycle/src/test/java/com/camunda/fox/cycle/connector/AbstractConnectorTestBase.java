@@ -248,8 +248,10 @@ public abstract class AbstractConnectorTestBase {
   }
 
   private void assertCorrectLastModified(Date comparisonDate, Date lastModified) {
+
     // see if updated was set
-    assertThat(lastModified).isAfterOrEqualsTo(comparisonDate);
-    assertThat(lastModified).isBeforeOrEqualsTo(new Date());
+    // compare by time to mitigate problems with time zone comparison
+    assertThat(lastModified.getTime()).isGreaterThanOrEqualTo(comparisonDate.getTime());
+    assertThat(lastModified.getTime()).isLessThanOrEqualTo(new Date().getTime());
   }
 }
