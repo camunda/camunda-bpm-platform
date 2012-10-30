@@ -15,7 +15,7 @@
         <class>com.camunda.fox.cycle.entity.User</class>
 		<properties>		
 			<property name="hibernate.hbm2ddl.auto" value="${persistence.ds.hibernate.hbm2ddl.auto}" />			
-			<property name="hibernate.show_sql" value="${persistence.ds.hibernate.show_sql}" />			
+			<property name="hibernate.show_sql" value="${persistence.ds.hibernate.show_sql}" />
 		</properties>
 	</persistence-unit>
 
