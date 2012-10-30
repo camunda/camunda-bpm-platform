@@ -605,21 +605,19 @@ function DeleteRoundtripController($scope, $routeParams, $http, $location, App) 
   }
   
   $scope.performDeletion = function() {
-  if (!$routeParams.roundtripId) {
-    return;
-  }
-  
-  var roundtrip = findRoundtripById($scope.roundtrips, $routeParams.roundtripId);
-  
-    $http.post(App.uri("secured/resource/roundtrip/" + $routeParams.roundtripId + "/delete"))    
-    .success(function(data) {
-       $scope.toBeDeleted = DEL_SUCCESS;
-       $scope.roundtrips.splice($scope.roundtrips.indexOf(roundtrip), 1);
-       $location.path("/");
-  })
-  .error(function(data) {
-    $scope.toBeDeleted = DEL_FAILED;
-  });
+    if (!$routeParams.roundtripId) {
+      return;
+    }
+
+    var roundtrip = findRoundtripById($scope.roundtrips, $routeParams.roundtripId);
+
+    roundtrip.$delete(function() {
+      $scope.toBeDeleted = DEL_SUCCESS;
+      $scope.roundtrips.splice($scope.roundtrips.indexOf(roundtrip), 1);
+      $location.path("/");
+    }, function(data) {
+      $scope.toBeDeleted = DEL_FAILED;
+    });
   };
 };
 
