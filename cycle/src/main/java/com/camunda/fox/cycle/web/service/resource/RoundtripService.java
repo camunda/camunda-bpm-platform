@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -78,7 +79,7 @@ public class RoundtripService extends AbstractRestService {
 
     Roundtrip roundtrip = roundtripRepository.findById(id);
     if (roundtrip == null) {
-      throw new IllegalArgumentException("Not found");
+      throw notFound("roundtrip not found");
     }
 
     update(roundtrip, data);
@@ -92,13 +93,13 @@ public class RoundtripService extends AbstractRestService {
     return RoundtripDTO.wrap(roundtripRepository.saveAndFlush(roundtrip));
   }
   
-  @POST
-  @Path("{id}/delete")
+  @DELETE
+  @Path("{id}")
   @Transactional
   public void delete(@PathParam("id") long id) {
     Roundtrip roundtrip = roundtripRepository.findById(id);
     if (roundtrip == null) {
-      throw new IllegalArgumentException("Not found");
+      throw notFound("roundtrip not found");
     }
     
     roundtripRepository.delete(roundtrip);
@@ -139,7 +140,7 @@ public class RoundtripService extends AbstractRestService {
 
     Roundtrip roundtrip = roundtripRepository.findById(id);
     if (roundtrip == null) {
-      throw new IllegalArgumentException("Not found");
+      throw notFound("roundtrip not found");
     }
 
     if (data.getLeftHandSide() != null) {
@@ -176,7 +177,7 @@ public class RoundtripService extends AbstractRestService {
     Roundtrip roundtrip = roundtripRepository.findById(roundtripId);
 
     if (roundtrip == null) {
-      throw new IllegalArgumentException("Roundtrip not found");
+      throw notFound("roundtrip not found");
     }
 
     synchronizeModels(roundtrip.getLeftHandSide(), roundtrip.getRightHandSide(), syncMode);
