@@ -1,7 +1,7 @@
 package com.camunda.fox.cycle.web.service.resource.diagram;
 
 import static org.mockito.BDDMockito.given;
-import static org.fest.assertions.Assertions.assertThat;
+import static org.fest.assertions.api.Assertions.*;
 
 import javax.inject.Inject;
 import javax.ws.rs.WebApplicationException;
@@ -18,8 +18,7 @@ import com.camunda.fox.cycle.connector.ConnectorNodeType;
 import com.camunda.fox.cycle.entity.BpmnDiagram;
 import com.camunda.fox.cycle.web.service.resource.ConnectorService;
 
-import static org.fest.assertions.Assertions.assertThat;
-import static org.fest.assertions.Fail.fail;
+import static org.fest.assertions.api.Assertions.*;
 import org.junit.Ignore;
 
 /**

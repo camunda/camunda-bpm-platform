@@ -51,8 +51,8 @@
       </dependency>
       <dependency>
         <groupId>org.easytesting</groupId>
-        <artifactId>fest-assert</artifactId>
-        <version>1.4</version>
+        <artifactId>fest-assert-core</artifactId>
+        <version>2.0M7</version>
       </dependency>
       <!-- spring framework -->
       <dependency>

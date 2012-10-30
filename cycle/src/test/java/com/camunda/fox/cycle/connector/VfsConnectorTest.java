@@ -4,8 +4,6 @@ import java.io.File;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
-import com.camunda.fox.cycle.connector.AbstractConnectorTestBase;
-import com.camunda.fox.cycle.connector.Connector;
 import com.camunda.fox.cycle.connector.test.util.RepositoryUtil;
 import com.camunda.fox.cycle.connector.vfs.VfsConnector;
 import com.camunda.fox.cycle.entity.ConnectorConfiguration;

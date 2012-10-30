@@ -196,13 +196,12 @@ public class RoundtripService extends AbstractRestService {
     
     Roundtrip roundtrip = roundtripRepository.findById(roundtripId);
     if (roundtrip == null) {
-      throw new IllegalArgumentException("Roundtrip not found");
+      throw notFound("Roundtrip not found");
     }
     
     if (roundtrip.getLeftHandSide() == null && roundtrip.getRightHandSide() == null) {
       throw new CycleException("No model exists in roundtrip '" + roundtrip.getName() + "'. It is not possible to create a diagram model.");
     }
-    
     
     Connector connector = connectorRegistry.getConnector(connectorId);
     if (!(connector instanceof SignavioConnector)) {

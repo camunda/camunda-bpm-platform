@@ -160,7 +160,7 @@ public class BpmnDiagramService extends AbstractRestService {
       notFoundStatus.setLastUpdated(new Date());
       return notFoundStatus;
     }
-    
+
     Status status = Status.UNSPECIFIED;
     Date lastModified = null;
 

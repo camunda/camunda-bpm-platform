@@ -1,32 +1,44 @@
 package com.camunda.fox.cycle.web.service.resource;
 
-import static org.fest.assertions.Assertions.assertThat;
-import static org.fest.assertions.Fail.fail;
+import java.io.File;
+import static org.fest.assertions.api.Assertions.*;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.util.Date;
+import java.util.List;
 
 import javax.inject.Inject;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response;
 
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.camunda.fox.cycle.connector.Connector;
 import com.camunda.fox.cycle.connector.ConnectorNode;
 import com.camunda.fox.cycle.connector.ConnectorNodeType;
 import com.camunda.fox.cycle.connector.ConnectorRegistry;
 import com.camunda.fox.cycle.connector.ContentInformation;
+import com.camunda.fox.cycle.connector.test.util.RepositoryUtil;
+import com.camunda.fox.cycle.connector.vfs.VfsConnector;
+import com.camunda.fox.cycle.entity.BpmnDiagram;
+import com.camunda.fox.cycle.entity.ConnectorConfiguration;
 import com.camunda.fox.cycle.entity.Roundtrip;
 import com.camunda.fox.cycle.entity.Roundtrip.SyncMode;
 import com.camunda.fox.cycle.repository.RoundtripRepository;
 import com.camunda.fox.cycle.util.IoUtil;
 import com.camunda.fox.cycle.web.dto.BpmnDiagramDTO;
+import com.camunda.fox.cycle.web.dto.BpmnDiagramStatusDTO;
 import com.camunda.fox.cycle.web.dto.ConnectorNodeDTO;
 import com.camunda.fox.cycle.web.dto.RoundtripDTO;
 
@@ -34,7 +46,17 @@ import com.camunda.fox.cycle.web.dto.RoundtripDTO;
  *
  * @author nico.rehwaldt
  */
-public abstract class AbstractRoundtripServiceTest {
+@RunWith(SpringJUnit4ClassRunner.class)
+@ContextConfiguration(
+  locations = {"classpath:/spring/test-*.xml"}
+)
+public class RoundtripServiceTest {
+  
+  // statically cached connector
+  private static Connector connector;
+  
+  @Inject
+  private ConnectorRegistry connectorRegistry;
 
   @Inject
   private RoundtripRepository roundtripRepository;
@@ -44,42 +66,10 @@ public abstract class AbstractRoundtripServiceTest {
   
   @Inject
   private BpmnDiagramService diagramService;
-  
-  @Inject
-  private ConnectorRegistry connectorRegistry;
 
   private ConnectorNode rightNode;
 
   private ConnectorNode leftNode;
-
-  private Connector connector;
-
-  @Before
-  public void before() throws FileNotFoundException, Exception {
-    ensureConnectorInitialized();
-
-    connector.createNode("/", "foo", ConnectorNodeType.FOLDER);
-
-    ConnectorNode rightNodeImg = connector.createNode("/foo", "Impl.png", ConnectorNodeType.PNG_FILE);
-    importNode(rightNodeImg, "com/camunda/fox/cycle/roundtrip/repository/test-rhs.png");
-
-    rightNode = connector.createNode("/foo", "Impl.bpmn", ConnectorNodeType.ANY_FILE);
-    importNode(rightNode, "com/camunda/fox/cycle/roundtrip/repository/test-rhs.bpmn");
-
-    leftNode = connector.createNode("/foo", "Modeler.bpmn", ConnectorNodeType.ANY_FILE);
-    importNode(leftNode, "com/camunda/fox/cycle/roundtrip/repository/test-lhs.bpmn");
-  }
-
-  @After
-  public void after() {
-    // Remove all entities
-    roundtripRepository.deleteAll();
-
-    connector.deleteNode(new ConnectorNode("foo/Impl.png"));
-    connector.deleteNode(new ConnectorNode("foo/Impl.bpmn"));
-    connector.deleteNode(new ConnectorNode("foo/Modeler.bpmn"));
-    connector.deleteNode(new ConnectorNode("foo"));
-  }
 
   @Test
   public void shouldCreateRoundtrip() throws Exception {
@@ -160,14 +150,15 @@ public abstract class AbstractRoundtripServiceTest {
     RoundtripDTO testRoundtrip = createAndFlushRoundtrip();
     BpmnDiagramDTO rightHandSide = testRoundtrip.getRightHandSide();
     
-    // when
     roundtripService.doSynchronize(SyncMode.RIGHT_TO_LEFT, testRoundtrip.getId());
     Response imageResponse = diagramService.getImage(rightHandSide.getId());
     
     // then
+    assertThatIsInSync(testRoundtrip.getRightHandSide());
+    assertThatIsInSync(testRoundtrip.getLeftHandSide());
+    
     assertThat(imageResponse.getStatus()).isEqualTo(200);
     assertThat(IoUtil.toString(connector.getContent(leftNode))).contains("activiti:class=\"java.lang.Object\"");
-
   }
 
   @Test
@@ -175,8 +166,10 @@ public abstract class AbstractRoundtripServiceTest {
     RoundtripDTO testRoundtrip = createAndFlushRoundtrip();
     BpmnDiagramDTO rightHandSide = testRoundtrip.getRightHandSide();
     
-    // when
     roundtripService.doSynchronize(SyncMode.LEFT_TO_RIGHT, testRoundtrip.getId());
+    
+    assertThatIsInSync(testRoundtrip.getRightHandSide());
+    assertThatIsInSync(testRoundtrip.getLeftHandSide());
     
     try {
       diagramService.getImage(rightHandSide.getId());
@@ -189,7 +182,19 @@ public abstract class AbstractRoundtripServiceTest {
     // then (2)
     assertThat(IoUtil.toString(connector.getContent(rightNode))).doesNotContain("activiti:class=\"java.lang.Object\"");
   }
-  
+
+  @Test
+  @Ignore
+  public void shouldTestCreateModelLeftToRight() {
+    fail("no test");
+  }
+
+  @Test
+  @Ignore
+  public void shouldTestCreateModelRightToLeft() {
+    fail("no test");
+  }
+
   @Test
   public void shouldDeleteRoundtrip() {
     RoundtripDTO roundtripDTO = createTestRoundtripDTO();
@@ -204,6 +209,15 @@ public abstract class AbstractRoundtripServiceTest {
     Assert.assertNull(deletedRoundtrip);
   }
 
+  // Assertions //////////////////////////////////////////////////
+  
+  private void assertThatIsInSync(BpmnDiagramDTO diagram) {
+    BpmnDiagramStatusDTO rhsAsyncSyncStatus = diagramService.synchronizationStatus(diagram.getId());
+    assertThat(rhsAsyncSyncStatus.getStatus()).isEqualTo(BpmnDiagram.Status.SYNCED);
+  }
+
+  // Test data generation //////////////////////////////////////// 
+  
   private RoundtripDTO createAndFlushRoundtrip() {
     Roundtrip r = roundtripRepository.saveAndFlush(new Roundtrip("Test Roundtrip"));
     RoundtripDTO data = createTestRoundtripDTOWithDetails();
@@ -238,24 +252,79 @@ public abstract class AbstractRoundtripServiceTest {
 
     return dto;
   }
-  
-  protected ConnectorRegistry getConnectorRegistry() {
-    return connectorRegistry;
+
+  // Test bootstraping //////////////////////////////////////// 
+
+  private static final File VFS_DIRECTORY = new File("target/vfs-repository");
+
+  private static Class<? extends Connector> CONNECTOR_CLS = VfsConnector.class;
+
+  /**
+   * For tests only, ensures that the connector is initialized and the 
+   * connector cache contains it
+   * 
+   * @throws Exception 
+   */
+  protected void ensureConnectorInitialized() throws Exception {
+    List<ConnectorConfiguration> configurations = connectorRegistry.getConnectorConfigurations(CONNECTOR_CLS);
+    ConnectorConfiguration config = configurations.get(0);
+
+    // put mock connector to registry
+    connectorRegistry.getCache().put(config.getId(), connector);
+
+    // fake some connector properties
+    connector.getConfiguration().setId(config.getId());
+    connector.getConfiguration().setConnectorClass(config.getConnectorClass());
   }
 
-  protected Connector getConnector() {
-    return connector;
-  }
-  
-  protected void setConnector(Connector connector) {
-    this.connector = connector;
-  }
-  
-  
-  // Abstract methods ////////////////////////////////////////////
-  
-  protected abstract void ensureConnectorInitialized() throws Exception;
+  @Before
+  public void before() throws FileNotFoundException, Exception {
+    ensureConnectorInitialized();
 
+    connector.createNode("/", "foo", ConnectorNodeType.FOLDER);
+
+    ConnectorNode rightNodeImg = connector.createNode("/foo", "Impl.png", ConnectorNodeType.PNG_FILE);
+    importNode(rightNodeImg, "com/camunda/fox/cycle/roundtrip/repository/test-rhs.png");
+
+    rightNode = connector.createNode("/foo", "Impl.bpmn", ConnectorNodeType.ANY_FILE);
+    importNode(rightNode, "com/camunda/fox/cycle/roundtrip/repository/test-rhs.bpmn");
+
+    leftNode = connector.createNode("/foo", "Modeler.bpmn", ConnectorNodeType.ANY_FILE);
+    importNode(leftNode, "com/camunda/fox/cycle/roundtrip/repository/test-lhs.bpmn");
+  }
+
+  @After
+  public void after() {
+    // Remove all entities
+    roundtripRepository.deleteAll();
+
+    connector.deleteNode(new ConnectorNode("foo/Impl.png"));
+    connector.deleteNode(new ConnectorNode("foo/Impl.bpmn"));
+    connector.deleteNode(new ConnectorNode("foo/Modeler.bpmn"));
+    connector.deleteNode(new ConnectorNode("foo"));
+  }
+
+  @BeforeClass
+  public static void beforeClass() throws Exception {
+    ConnectorConfiguration config = new ConnectorConfiguration();
+
+    String url = RepositoryUtil.createVFSRepository(VFS_DIRECTORY);
+
+    config.getProperties().put(VfsConnector.BASE_PATH_KEY, url);
+
+    // NOT a spring bean!
+    connector = new VfsConnector();
+    connector.setConfiguration(config);
+    connector.init();
+  }
+
+  @AfterClass
+  public static void afterClass() throws Exception {
+    RepositoryUtil.clean(VFS_DIRECTORY);
+  }
+
+  // Utility methods /////////////////////////////
+  
   protected ContentInformation importNode(ConnectorNode node, String classPathEntry) throws Exception {
     return connector.updateContent(node, new FileInputStream(IoUtil.getFile(classPathEntry)));
   }

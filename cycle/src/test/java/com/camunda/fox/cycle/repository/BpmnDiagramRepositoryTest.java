@@ -1,6 +1,6 @@
 package com.camunda.fox.cycle.repository;
 
-import static org.fest.assertions.Assertions.assertThat;
+import static org.fest.assertions.api.Assertions.*;
 
 import javax.inject.Inject;
 
