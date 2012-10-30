@@ -12,8 +12,8 @@
   <name>fox cycle - app</name>
   
   <properties>
-    <web.resources.override>src/main/webapp-default</web.resources.override>
-    <java.resources.override>src/main/resources-default</java.resources.override>
+    <web.resources.override>src/main/runtime/default/webapp</web.resources.override>
+    <java.resources.override>src/main/runtime/default/resources</java.resources.override>
     <netbeans.hint.deploy.server>gfv3ee6</netbeans.hint.deploy.server>
   </properties>
   
@@ -452,13 +452,15 @@
                 <phase>package</phase>
                 <configuration>
                   <path>cycle</path>
-                  <serverXml>src/main/tomcat/conf/server.xml</serverXml>
                 </configuration>
               </execution>
             </executions>
           </plugin>
         </plugins>
       </build>
+      <properties>
+        <maven.tomcat.additionalConfigFilesDir>${basedir}/src/main/runtime/tomcat/config</maven.tomcat.additionalConfigFilesDir>
+      </properties>
     </profile>
     <profile>
       <id>h2-test</id>
@@ -494,8 +496,8 @@
         </dependency>
       </dependencies>
       <properties>
-        <web.resources.override>src/main/webapp-glassfish</web.resources.override>
-        <java.resources.override>src/main/resources-glassfish</java.resources.override>
+        <web.resources.override>src/main/runtime/glassfish/webapp</web.resources.override>
+        <java.resources.override>src/main/runtime/glassfish/resources</java.resources.override>
       </properties>
     </profile>
     <profile>
@@ -510,8 +512,8 @@
         </dependency>
       </dependencies>
       <properties>
-        <web.resources.override>src/main/webapp-jboss</web.resources.override>
-        <java.resources.override>src/main/resources-jboss</java.resources.override>
+        <web.resources.override>src/main/runtime/jboss/webapp</web.resources.override>
+        <java.resources.override>src/main/runtime/jboss/resources</java.resources.override>
       </properties>
     </profile>
     <profile>
@@ -547,5 +549,4 @@
       </dependencies>
     </profile>
   </profiles>
-   
 </project>

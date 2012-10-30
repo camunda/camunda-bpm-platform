@@ -101,11 +101,11 @@ public class RoundtripServiceTest {
     // given
     RoundtripDTO roundtrip = createAndFlushRoundtrip();
     BpmnDiagramDTO leftHandSide = roundtrip.getLeftHandSide();
-    
+
     try {
       // when
       diagramService.getImage(leftHandSide.getId());
-      
+
       fail("expected NOT_FOUND");
     } catch (WebApplicationException e) {
       // then
