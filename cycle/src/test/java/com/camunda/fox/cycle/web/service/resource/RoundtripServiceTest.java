@@ -1,11 +1,11 @@
 package com.camunda.fox.cycle.web.service.resource;
 
-import java.io.File;
-import static org.fest.assertions.api.Assertions.*;
+import static org.fest.assertions.api.Assertions.assertThat;
+import static org.fest.assertions.api.Assertions.fail;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
 
