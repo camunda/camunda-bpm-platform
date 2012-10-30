@@ -75,11 +75,10 @@ public class BpmnDiagramService extends AbstractRestService {
 
     Date diagramLastModified = diagram.getLastModified();
     if (diagramLastModified != null) {
-      long diagramLastModifiedMs = diagramLastModified.getTime();
       
       Date imageLastModified = imageInformation.getLastModified();
       if (imageLastModified != null) {
-        if (diagramLastModifiedMs > imageLastModified.getTime()) {
+        if (imageLastModified.before(diagramLastModified)) {
           // diagram is younger than the image --> image out of date
           throw notFound("no up to date image");
         }

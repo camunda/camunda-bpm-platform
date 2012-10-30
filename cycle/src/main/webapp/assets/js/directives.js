@@ -360,9 +360,9 @@ angular
 //        }
 //      };
 
-      function updateImage(diagram, update) {
+      function updateImage(diagram) {
         scope.status = "LOADING";
-        $(element).find("img").attr("src", Commons.getImageUrl(diagram, update));
+        $(element).find("img").attr("src", Commons.getImageUrl(diagram, true));
       };
 
       scope.$watch("diagram", function (newDiagramValue) {
@@ -376,7 +376,7 @@ angular
        */
       scope.$watch("status", function (newStatus, oldStatus) {
         if (scope.diagram && newStatus == "UNKNOWN" && oldStatus) {
-          updateImage(scope.diagram, true);
+          updateImage(scope.diagram);
         }
       });
     }
