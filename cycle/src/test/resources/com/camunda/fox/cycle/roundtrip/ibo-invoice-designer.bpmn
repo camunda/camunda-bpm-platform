@@ -1,0 +1,343 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:signavio="http://www.signavio.com" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd" id="sid-67c919f3-78c4-454e-baa3-6a5a6fa34411" exporter="Signavio Process Editor, http://www.signavio.com" exporterVersion="6.3.1" targetNamespace="http://www.omg.org/spec/BPMN/20100524/MODEL">
+  <message id="sid-52200d68-5e0f-49dd-bd0f-c7b179fbe80a" name="foxMessage_en"/>
+  <collaboration id="sid-3b5d2473-9291-4c13-9400-ed7c236d02de">
+    <extensionElements/>
+    <participant id="Process_Engine_1" name="invoice receipt (fox)" processRef="fox-invoice_en">
+      <extensionElements/>
+    </participant>
+  </collaboration>
+  <process id="fox-invoice_en" name="invoice receipt (fox)" isClosed="true" isExecutable="true">
+    <extensionElements/>
+    <laneSet id="sid-8559972f-c1a9-4342-9976-fd326ef08185">
+      <lane id="Approver" name="approver">
+        <extensionElements/>
+        <flowNodeRef>approveInvoice</flowNodeRef>
+        <flowNodeRef>invoice_approved</flowNodeRef>
+        <flowNodeRef>BoundaryEvent_3</flowNodeRef>
+      </lane>
+      <lane id="teamAssistant" name="team assistant">
+        <extensionElements/>
+        <flowNodeRef>reviewSuccessful_gw</flowNodeRef>
+        <flowNodeRef>invoiceNotProcessedEnd</flowNodeRef>
+        <flowNodeRef>UserTask_1</flowNodeRef>
+        <flowNodeRef>reviewInvoice</flowNodeRef>
+        <flowNodeRef>invoiceReceived</flowNodeRef>
+        <flowNodeRef>assignApprover</flowNodeRef>
+        <flowNodeRef>ExclusiveGateway_2</flowNodeRef>
+        <flowNodeRef>ExclusiveGateway_1</flowNodeRef>
+      </lane>
+      <lane id="Accountant" name="accountant">
+        <extensionElements/>
+        <flowNodeRef>saveInvoiceToSVN</flowNodeRef>
+        <flowNodeRef>invoiceProcessedEnd</flowNodeRef>
+        <flowNodeRef>IntermediateThrowEvent_2</flowNodeRef>
+        <flowNodeRef>prepareBankTransfer</flowNodeRef>
+      </lane>
+    </laneSet>
+    <userTask id="approveInvoice" activiti:assignee="#{approver}" activiti:formKey="approveInvoice" name="approve invoice">
+      <extensionElements>
+        <activiti:executionListener class="com.camunda.fox.showcase.invoice.en.BAMExecutionListener" event="start"/>
+        <activiti:executionListener class="com.camunda.fox.showcase.invoice.en.BAMExecutionListener" event="end"/>
+        <activiti:taskListener class="com.camunda.fox.showcase.invoice.en.BAMTaskListener" event="create"/>
+      </extensionElements>
+      <incoming>SequenceFlow_8</incoming>
+      <outgoing>sequenceFlow_180</outgoing>
+    </userTask>
+    <exclusiveGateway id="invoice_approved" name="invoice approved?" gatewayDirection="Diverging">
+      <extensionElements>
+        <activiti:executionListener class="com.camunda.fox.showcase.invoice.en.BAMExecutionListener" event="start"/>
+        <activiti:executionListener class="com.camunda.fox.showcase.invoice.en.BAMExecutionListener" event="end"/>
+      </extensionElements>
+      <incoming>sequenceFlow_180</incoming>
+      <outgoing>invoiceNotApproved</outgoing>
+      <outgoing>SequenceFlow_3</outgoing>
+    </exclusiveGateway>
+    <exclusiveGateway id="reviewSuccessful_gw" name="review successful?" gatewayDirection="Diverging">
+      <extensionElements>
+        <activiti:executionListener class="com.camunda.fox.showcase.invoice.en.BAMExecutionListener" event="start"/>
+        <activiti:executionListener class="com.camunda.fox.showcase.invoice.en.BAMExecutionListener" event="end"/>
+      </extensionElements>
+      <incoming>sequenceFlow_183</incoming>
+      <outgoing>reviewNotSuccessful</outgoing>
+      <outgoing>SequenceFlow_9</outgoing>
+    </exclusiveGateway>
+    <endEvent id="invoiceNotProcessedEnd" name="invoice refused">
+      <extensionElements>
+        <activiti:executionListener class="com.camunda.fox.showcase.invoice.en.BAMExecutionListener" event="start"/>
+        <activiti:executionListener class="com.camunda.fox.showcase.invoice.en.BAMExecutionListener" event="end"/>
+      </extensionElements>
+      <incoming>reviewNotSuccessful</incoming>
+    </endEvent>
+    <userTask id="UserTask_1" activiti:assignee="courmont" activiti:formKey="escalateInvoice" name="escalate approval">
+      <extensionElements>
+        <activiti:executionListener class="com.camunda.fox.showcase.invoice.en.BAMExecutionListener" event="start"/>
+        <activiti:executionListener class="com.camunda.fox.showcase.invoice.en.BAMExecutionListener" event="end"/>
+        <activiti:taskListener class="com.camunda.fox.showcase.invoice.en.BAMTaskListener" event="create"/>
+      </extensionElements>
+      <incoming>SequenceFlow_5</incoming>
+      <outgoing>SequenceFlow_10</outgoing>
+    </userTask>
+    <serviceTask id="saveInvoiceToSVN" activiti:delegateExpression="${storePDF}" name="archive invoice">
+      <extensionElements>
+        <activiti:executionListener class="com.camunda.fox.showcase.invoice.en.BAMExecutionListener" event="start"/>
+        <activiti:executionListener class="com.camunda.fox.showcase.invoice.en.BAMExecutionListener" event="end"/>
+      </extensionElements>
+      <incoming>sequenceFlow_179</incoming>
+      <outgoing>SequenceFlow_1</outgoing>
+    </serviceTask>
+    <endEvent id="invoiceProcessedEnd" name="invoice paid">
+      <extensionElements>
+        <activiti:executionListener class="com.camunda.fox.showcase.invoice.en.BAMExecutionListener" event="start"/>
+        <activiti:executionListener class="com.camunda.fox.showcase.invoice.en.BAMExecutionListener" event="end"/>
+      </extensionElements>
+      <incoming>SequenceFlow_1</incoming>
+    </endEvent>
+    <intermediateThrowEvent id="IntermediateThrowEvent_2" name="invoice approved">
+      <extensionElements>
+        <activiti:executionListener class="com.camunda.fox.showcase.invoice.en.BAMExecutionListener" event="start"/>
+        <activiti:executionListener class="com.camunda.fox.showcase.invoice.en.BAMExecutionListener" event="end"/>
+      </extensionElements>
+      <incoming>SequenceFlow_3</incoming>
+      <outgoing>SequenceFlow_4</outgoing>
+    </intermediateThrowEvent>
+    <sequenceFlow id="invoiceNotApproved" name="no" isImmediate="true" sourceRef="invoice_approved" targetRef="reviewInvoice">
+      <extensionElements/>
+      <conditionExpression xsi:type="tFormalExpression" id="sid-d1c413e4-c16c-447a-b1df-c3c4fb37f0a4">${!approved}</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="sequenceFlow_180" name="" isImmediate="true" sourceRef="approveInvoice" targetRef="invoice_approved">
+      <extensionElements/>
+    </sequenceFlow>
+    <sequenceFlow id="SequenceFlow_1" name="" isImmediate="true" sourceRef="saveInvoiceToSVN" targetRef="invoiceProcessedEnd">
+      <extensionElements/>
+    </sequenceFlow>
+    <sequenceFlow id="reviewNotSuccessful" name="no" isImmediate="true" sourceRef="reviewSuccessful_gw" targetRef="invoiceNotProcessedEnd">
+      <extensionElements/>
+      <conditionExpression xsi:type="tFormalExpression" id="sid-77dde954-247a-4b8d-8157-5bd82a23fa8a">${clarified.equals('no')}</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="SequenceFlow_3" name="yes" isImmediate="true" sourceRef="invoice_approved" targetRef="IntermediateThrowEvent_2">
+      <extensionElements/>
+      <conditionExpression xsi:type="tFormalExpression" id="sid-a6daf0f7-027c-471a-bab0-dfa0470f79d9">${approved}</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="SequenceFlow_4" name="" isImmediate="true" sourceRef="IntermediateThrowEvent_2" targetRef="prepareBankTransfer">
+      <extensionElements/>
+    </sequenceFlow>
+    <boundaryEvent id="BoundaryEvent_3" name="deadline expired" attachedToRef="approveInvoice">
+      <outgoing>SequenceFlow_5</outgoing>
+      <timerEventDefinition id="TimerEventDefinition_1">
+        <timeDuration xsi:type="tFormalExpression" id="_FormalExpression_2">${deadline}</timeDuration>
+      </timerEventDefinition>
+    </boundaryEvent>
+    <sequenceFlow id="SequenceFlow_5" name="" sourceRef="BoundaryEvent_3" targetRef="UserTask_1"/>
+    <userTask id="prepareBankTransfer" activiti:assignee="courmont" activiti:formKey="preparePayment" name="prepare bank transfer">
+      <extensionElements>
+        <activiti:executionListener class="com.camunda.fox.showcase.invoice.en.BAMExecutionListener" event="start"/>
+        <activiti:executionListener class="com.camunda.fox.showcase.invoice.en.BAMExecutionListener" event="end"/>
+        <activiti:taskListener class="com.camunda.fox.showcase.invoice.en.BAMTaskListener" event="create"/>
+      </extensionElements>
+      <incoming>SequenceFlow_4</incoming>
+      <outgoing>sequenceFlow_179</outgoing>
+    </userTask>
+    <sequenceFlow id="sequenceFlow_179" name="" isImmediate="true" sourceRef="prepareBankTransfer" targetRef="saveInvoiceToSVN">
+      <extensionElements/>
+    </sequenceFlow>
+    <userTask id="reviewInvoice" activiti:assignee="courmont" activiti:formKey="clarifyInvoice" name="review invoice">
+      <extensionElements>
+        <activiti:executionListener class="com.camunda.fox.showcase.invoice.en.BAMExecutionListener" event="start"/>
+        <activiti:executionListener class="com.camunda.fox.showcase.invoice.en.BAMExecutionListener" event="end"/>
+        <activiti:taskListener class="com.camunda.fox.showcase.invoice.en.BAMTaskListener" event="create"/>
+      </extensionElements>
+      <incoming>invoiceNotApproved</incoming>
+      <outgoing>sequenceFlow_183</outgoing>
+    </userTask>
+    <sequenceFlow id="sequenceFlow_183" name="" isImmediate="true" sourceRef="reviewInvoice" targetRef="reviewSuccessful_gw">
+      <extensionElements/>
+    </sequenceFlow>
+    <startEvent id="invoiceReceived" activiti:formKey="startProcess" name="invoice received">
+      <extensionElements/>
+      <outgoing>sequenceFlow_187</outgoing>
+      <messageEventDefinition id="sid-3e7f5d8e-d342-4e35-a2d2-53d7bce09953" messageRef="sid-52200d68-5e0f-49dd-bd0f-c7b179fbe80a"/>
+    </startEvent>
+    <sequenceFlow id="sequenceFlow_187" name="" isImmediate="true" sourceRef="invoiceReceived" targetRef="assignApprover">
+      <extensionElements/>
+    </sequenceFlow>
+    <userTask id="assignApprover" activiti:assignee="courmont" activiti:formKey="assignApprover" name="assign approver">
+      <extensionElements>
+        <activiti:executionListener class="com.camunda.fox.showcase.invoice.en.BAMExecutionListener" event="start"/>
+        <activiti:executionListener class="com.camunda.fox.showcase.invoice.en.BAMExecutionListener" event="end"/>
+        <activiti:taskListener class="com.camunda.fox.showcase.invoice.en.BAMTaskListener" event="create"/>
+      </extensionElements>
+      <incoming>sequenceFlow_187</incoming>
+      <outgoing>SequenceFlow_7</outgoing>
+    </userTask>
+    <sequenceFlow id="SequenceFlow_7" name="" sourceRef="assignApprover" targetRef="ExclusiveGateway_2"/>
+    <sequenceFlow id="SequenceFlow_9" name="yes" sourceRef="reviewSuccessful_gw" targetRef="ExclusiveGateway_1">
+      <conditionExpression xsi:type="tFormalExpression" id="FormalExpression_1">${clarified.equals('yes')}</conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="SequenceFlow_10" name="" sourceRef="UserTask_1" targetRef="ExclusiveGateway_1"/>
+    <exclusiveGateway id="ExclusiveGateway_2" name="" gatewayDirection="Converging">
+      <extensionElements>
+        <activiti:executionListener class="com.camunda.fox.showcase.invoice.en.BAMExecutionListener" event="start"/>
+        <activiti:executionListener class="com.camunda.fox.showcase.invoice.en.BAMExecutionListener" event="end"/>
+      </extensionElements>
+      <incoming>SequenceFlow_2</incoming>
+      <incoming>SequenceFlow_7</incoming>
+      <outgoing>SequenceFlow_8</outgoing>
+    </exclusiveGateway>
+    <sequenceFlow id="SequenceFlow_8" name="" sourceRef="ExclusiveGateway_2" targetRef="approveInvoice"/>
+    <exclusiveGateway id="ExclusiveGateway_1" name="" gatewayDirection="Converging">
+      <extensionElements>
+        <activiti:executionListener class="com.camunda.fox.showcase.invoice.en.BAMExecutionListener" event="start"/>
+        <activiti:executionListener class="com.camunda.fox.showcase.invoice.en.BAMExecutionListener" event="end"/>
+      </extensionElements>
+      <incoming>SequenceFlow_9</incoming>
+      <incoming>SequenceFlow_10</incoming>
+      <outgoing>SequenceFlow_2</outgoing>
+    </exclusiveGateway>
+    <sequenceFlow id="SequenceFlow_2" name="" sourceRef="ExclusiveGateway_1" targetRef="ExclusiveGateway_2"/>
+  </process>
+  <bpmndi:BPMNDiagram id="sid-7effd9ca-8069-4855-8298-7c652b62e9b2" name="fox-invoice_en">
+    <bpmndi:BPMNPlane id="sid-700a7e14-ce6f-4217-9779-9fdc3fe16884" bpmnElement="sid-3b5d2473-9291-4c13-9400-ed7c236d02de">
+      <bpmndi:BPMNShape id="Process_Engine_1_gui" bpmnElement="Process_Engine_1" isHorizontal="true">
+        <omgdc:Bounds height="488.0" width="1126.0" x="10.0" y="6.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Approver_gui" bpmnElement="Approver" isHorizontal="true">
+        <omgdc:Bounds height="161.0" width="1096.0" x="40.0" y="189.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="teamAssistant_gui" bpmnElement="teamAssistant" isHorizontal="true">
+        <omgdc:Bounds height="183.0" width="1096.0" x="40.0" y="6.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Accountant_gui" bpmnElement="Accountant" isHorizontal="true">
+        <omgdc:Bounds height="144.0" width="1096.0" x="40.0" y="350.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="approveInvoice_gui" bpmnElement="approveInvoice">
+        <omgdc:Bounds height="80.0" width="100.0" x="363.0" y="231.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="invoice_approved_gui" bpmnElement="invoice_approved" isMarkerVisible="true">
+        <omgdc:Bounds height="40.0" width="40.0" x="580.0" y="250.0"/>
+        <bpmndi:BPMNLabel id="BPMNLabel_1">
+          <omgdc:Bounds height="22.0" width="107.0" x="609.0" y="270.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="invoiceReceived_gui" bpmnElement="invoiceReceived">
+        <omgdc:Bounds height="28.0" width="28.0" x="100.0" y="77.0"/>
+        <bpmndi:BPMNLabel id="BPMNLabel_2">
+          <omgdc:Bounds height="22.0" width="96.0" x="66.0" y="107.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="assignApprover_gui" bpmnElement="assignApprover">
+        <omgdc:Bounds height="80.0" width="100.0" x="180.0" y="51.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="reviewInvoice_gui" bpmnElement="reviewInvoice">
+        <omgdc:Bounds height="80.0" width="100.0" x="741.0" y="51.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="reviewSuccessful_gw_gui" bpmnElement="reviewSuccessful_gw" isMarkerVisible="true">
+        <omgdc:Bounds height="40.0" width="40.0" x="885.0" y="71.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="invoiceNotProcessedEnd_gui" bpmnElement="invoiceNotProcessedEnd">
+        <omgdc:Bounds height="28.0" width="28.0" x="1020.0" y="77.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="UserTask_1_gui" bpmnElement="UserTask_1">
+        <omgdc:Bounds height="80.0" width="100.0" x="458.0" y="51.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="saveInvoiceToSVN_gui" bpmnElement="saveInvoiceToSVN">
+        <omgdc:Bounds height="80.0" width="100.0" x="882.0" y="383.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="prepareBankTransfer_gui" bpmnElement="prepareBankTransfer">
+        <omgdc:Bounds height="80.0" width="100.0" x="730.0" y="383.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="invoiceProcessedEnd_gui" bpmnElement="invoiceProcessedEnd">
+        <omgdc:Bounds height="28.0" width="28.0" x="1042.0" y="409.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="IntermediateThrowEvent_2_gui" bpmnElement="IntermediateThrowEvent_2">
+        <omgdc:Bounds height="28.0" width="28.0" x="650.0" y="409.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="reviewNotSuccessful_gui" bpmnElement="reviewNotSuccessful" sourceElement="reviewSuccessful_gw_gui" targetElement="invoiceNotProcessedEnd_gui">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="926.0" y="91.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="1020.0" y="91.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sequenceFlow_180_gui" bpmnElement="sequenceFlow_180" sourceElement="approveInvoice_gui" targetElement="invoice_approved_gui">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="463.0" y="271.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="580.0" y="270.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sequenceFlow_183_gui" bpmnElement="sequenceFlow_183" sourceElement="reviewInvoice_gui" targetElement="reviewSuccessful_gw_gui">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="841.0" y="91.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="885.0" y="91.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sequenceFlow_179_gui" bpmnElement="sequenceFlow_179" sourceElement="prepareBankTransfer_gui" targetElement="saveInvoiceToSVN_gui">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="830.0" y="423.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="882.0" y="423.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_4_gui" bpmnElement="SequenceFlow_4" sourceElement="IntermediateThrowEvent_2_gui" targetElement="prepareBankTransfer_gui">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="678.0" y="423.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="730.0" y="423.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_3_gui" bpmnElement="SequenceFlow_3" sourceElement="invoice_approved_gui" targetElement="IntermediateThrowEvent_2_gui">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="600.0" y="291.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="599.0" y="423.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="650.0" y="423.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_1_gui" bpmnElement="SequenceFlow_1" sourceElement="saveInvoiceToSVN_gui" targetElement="invoiceProcessedEnd_gui">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="982.0" y="423.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="1042.0" y="423.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="invoiceNotApproved_gui" bpmnElement="invoiceNotApproved" sourceElement="invoice_approved_gui" targetElement="reviewInvoice_gui">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="621.0" y="270.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="708.0" y="270.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="708.0" y="91.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="741.0" y="91.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sequenceFlow_187_gui" bpmnElement="sequenceFlow_187" sourceElement="invoiceReceived_gui" targetElement="assignApprover_gui">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="128.0" y="91.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="180.0" y="91.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="BPMNShape_BoundaryEvent_3" bpmnElement="BoundaryEvent_3">
+        <omgdc:Bounds height="36.0" width="36.0" x="385.0" y="213.0"/>
+        <bpmndi:BPMNLabel id="BPMNLabel_5">
+          <omgdc:Bounds height="22.0" width="100.0" x="402.0" y="195.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_1" bpmnElement="SequenceFlow_5" sourceElement="BPMNShape_BoundaryEvent_3" targetElement="UserTask_1_gui">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="403.0" y="213.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="402.0" y="90.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="458.0" y="91.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="BPMNShape_ExclusiveGateway_1" bpmnElement="ExclusiveGateway_1" isMarkerVisible="true">
+        <omgdc:Bounds height="40.0" width="40.0" x="605.0" y="20.0"/>
+        <bpmndi:BPMNLabel id="BPMNLabel_3">
+          <omgdc:Bounds height="6.0" width="6.0" x="627.0" y="72.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_ExclusiveGateway_2" bpmnElement="ExclusiveGateway_2" isMarkerVisible="true">
+        <omgdc:Bounds height="40.0" width="40.0" x="315.0" y="71.0"/>
+        <bpmndi:BPMNLabel id="BPMNLabel_4">
+          <omgdc:Bounds height="6.0" width="6.0" x="337.0" y="123.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_3" bpmnElement="SequenceFlow_2" sourceElement="BPMNShape_ExclusiveGateway_1" targetElement="BPMNShape_ExclusiveGateway_2">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="605.0" y="40.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="335.0" y="39.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="335.0" y="71.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_4" bpmnElement="SequenceFlow_7" sourceElement="assignApprover_gui" targetElement="BPMNShape_ExclusiveGateway_2">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="280.0" y="91.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="315.0" y="91.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_5" bpmnElement="SequenceFlow_8" sourceElement="BPMNShape_ExclusiveGateway_2" targetElement="approveInvoice_gui">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="335.0" y="112.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="335.0" y="271.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="363.0" y="271.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_6" bpmnElement="SequenceFlow_9" sourceElement="reviewSuccessful_gw_gui" targetElement="BPMNShape_ExclusiveGateway_1">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="905.0" y="71.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="905.0" y="39.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="646.0" y="40.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_7" bpmnElement="SequenceFlow_10" sourceElement="UserTask_1_gui" targetElement="BPMNShape_ExclusiveGateway_1">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="558.0" y="91.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="626.0" y="90.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="625.0" y="61.0"/>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

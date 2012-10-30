@@ -23,7 +23,6 @@ import javax.ws.rs.ext.Provider;
 import org.springframework.context.ApplicationContext;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.IWebContext;
-import org.thymeleaf.exceptions.TemplateInputException;
 import org.thymeleaf.spring3.context.SpringWebContext;
 import org.xnap.commons.i18n.I18n;
 

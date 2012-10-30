@@ -1,17 +1,15 @@
 package com.camunda.fox.cycle.repository;
 
+import static org.fest.assertions.api.Assertions.assertThat;
+
 import javax.inject.Inject;
 
+import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kubek2k.springockito.annotations.SpringockitoContextLoader;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import static org.fest.assertions.api.Assertions.*;
-import org.junit.After;
-import static org.junit.Assume.*;
-import static org.junit.Assert.*;
 
 import com.camunda.fox.cycle.entity.Roundtrip;
 

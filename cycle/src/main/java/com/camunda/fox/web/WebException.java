@@ -9,6 +9,8 @@ import javax.ws.rs.core.Response.Status;
  */
 public class WebException extends RuntimeException {
   
+  private static final long serialVersionUID = 1L;
+  
   private final Status status;
 
   public WebException(String message) {

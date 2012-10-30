@@ -87,14 +87,19 @@
               <div class="bar" style="width: 100%;"></div>
             </div>
           </div>
-          <div ng-switch-when="synchronizationFailed">
+          <div ng-switch-when="synchronizationFailed" class="alert alert-error">
             <p>
-              <span th:text="#{The synchronization of the models failed.}">
-                The synchronization of the models failed.
+              <strong>
+                <span th:text="#{The synchronization of the models failed.}">
+                  The synchronization of the models failed.
+                </span>
+              </strong>
+              <span>
+                {{ message }}
               </span>
             </p>
           </div>
-          <div ng-switch-when="synchronizationSuccess">
+          <div ng-switch-when="synchronizationSuccess" class="alert alert-success">
             <p>
               <span th:text="#{The synchronization of the models was successful.}">
                 The synchronization of the models was successful.
