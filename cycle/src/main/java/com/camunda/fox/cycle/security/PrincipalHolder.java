@@ -4,6 +4,7 @@ import java.security.Principal;
 
 
 public class PrincipalHolder {
+  
   private static ThreadLocal<Principal> holder = new ThreadLocal<Principal>();
   
   public static void setPrincipal(Principal p) {
@@ -13,5 +14,4 @@ public class PrincipalHolder {
   public static Principal getPrincipal() {
     return holder.get();
   }
-  
 }

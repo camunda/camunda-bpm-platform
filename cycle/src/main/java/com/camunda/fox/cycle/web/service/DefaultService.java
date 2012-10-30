@@ -3,6 +3,7 @@ package com.camunda.fox.cycle.web.service;
 import java.security.Principal;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -37,34 +38,7 @@ public class DefaultService extends AbstractRestService {
 //  public String loginJSON() {
 //    throw new WebApplicationException(Response.Status.UNAUTHORIZED);
 //  }
-  
-  @GET
-  @Path("login")
-  @Produces(MediaType.TEXT_HTML)
-  public Object login(@Context UriInfo info, @Context HttpServletRequest request) {
-   
-    // We do not want to allow direct access to /login. 
-    // That is why we forward the request to a location which requires a logged in user
-    if (isForward(request)) {
-      return "tpl:login";
-    } else {
-      return redirectTo("secured/view/index/");
-    }
-  }
-  
-  @POST
-  @Path("login/expired")
-  @Produces(MediaType.TEXT_HTML)
-  public String loginExpired() {
-    return "tpl:error/login-expired";
-  }
-  
-  @POST
-  @Path("login/error")
-  @Produces(MediaType.TEXT_HTML)
-  public String loginError() {
-    return "tpl:error/invalid-login-data";
-  }
+
   
   @GET
   @Path("currentUser")
@@ -77,34 +51,5 @@ public class DefaultService extends AbstractRestService {
     } else {
       return null;
     }
-  }
-  
-  @GET
-  @Path("logout")
-  public String logout(@Context HttpServletRequest request) {
-    // destroys the session for this user.
-		request.getSession().invalidate();
-    
-    return "tpl:logout";
-  }
-
-  /**
-   * Is the given request the result of a forward?
-   * 
-   * Note to self: Request and session attributes during login forward
-   * 
-   * ==== request attributes ====
-   * javax.servlet.forward.request_uri: /cycle-spike/app/secured/view/index
-   * javax.servlet.forward.context_path: /cycle-spike
-   * javax.servlet.forward.servlet_path: /app
-   * javax.servlet.forward.path_info: /secured/view/index
-   * org.jboss.resteasy.core.ResourceMethod: org.jboss.resteasy.core.ResourceMethod@1e4651bf
-   * ==== session attributes ====
-   * 
-   * @param request
-   * @return 
-   */
-  private boolean isForward(HttpServletRequest request) {
-    return request.getAttribute("javax.servlet.forward.request_uri") != null;
   }
 }
