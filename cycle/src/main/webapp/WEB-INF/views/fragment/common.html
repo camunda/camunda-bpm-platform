@@ -54,9 +54,20 @@
             </a>
             <ul class="dropdown-menu">
               <li><a href="#"><i class="icon-edit"></i> <span th:text="#{Profile}">Profile</span></a></li>
-              <li data-ng-show="currentUser.adminRole"><a th:href="@{/app/secured/view/connector-setup}"><i class="icon-edit"></i> <span th:text="#{Connector Setup}">Connector Setup</span></a></li>
+              <li data-ng-show="currentUser.adminRole">
+                <a th:href="@{/app/secured/view/connector-setup}">
+                  <i class="icon-edit"></i> <span th:text="#{Connector Setup}">Connector Setup</span>
+                </a>
+              </li>
+              <li data-ng-show="currentUser.adminRole">
+                <a th:href="@{/app/secured/view/users}">
+                  <i class="icon-edit"></i> <span th:text="#{Manage Users}">Manage Users</span>
+                </a>
+              </li>
               <li class="divider"></li>
-              <li><a th:href="@{/app/logout}"><i class="icon-off"></i> <span th:text="#{Sign Out}">Sign Out</span></a></li>
+              <li>
+                <a th:href="@{/app/logout}"><i class="icon-off"></i> <span th:text="#{Sign Out}">Sign Out</span></a>
+              </li>
             </ul>
           </div>
           <!--/.nav-collapse -->

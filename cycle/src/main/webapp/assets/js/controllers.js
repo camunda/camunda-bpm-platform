@@ -437,32 +437,24 @@ function EditDiagramController($scope, Commons, Event, ConnectorConfiguration) {
 /**
  * Responsible for adding a new roundtrip from within the roundtrip list
  */
-function CreateNewRoundtripController($scope, $q, $http, $location, Debouncer, App, Roundtrip, Event) {
+function CreateRoundtripController($scope, $q, $http, $location, App, Roundtrip, Event) {
 
-  $scope.name = '';
-  $scope.nameChecked = false;
+  $scope.name = null;
   
   $scope.errorClass = function(form) {
     return form.$valid || !form.$dirty ? '' : 'error';
   };
-  
-  // watch the name to check its validity on change
-  $scope.$watch('name', function(newValue, oldValue) {
-    $scope.nameChecked = false;
-    $scope.newRoundtripForm.name.$setValidity("unused", true);
-    checkName(newValue, oldValue);
-  });
-  
+
   // cancel the add operation áka close the dialog
   $scope.cancel = function() {
     $scope.newRoundtripDialog.close();
   };
-  
+
   // is the dialog model valid and can be submitted?
   var isValid = $scope.isValid = function() {
-    return $scope.newRoundtripForm.$valid && $scope.nameChecked;
+    return $scope.newRoundtripForm.$valid;
   };
-  
+
   // save the dialog 
   $scope.save = function() {
     if (!isValid()) {
@@ -479,21 +471,7 @@ function CreateNewRoundtripController($scope, $q, $http, $location, Debouncer, A
       $scope.$emit(Event.roundtripAdded, roundtrip);
     });
   };
-  
-  /**
-   * Checking the name of an argument maximum every 1000ms
-   * and update the model respectively
-   */
-  var checkName = Debouncer.debounce(function(name) {
-    isNameValid(name).then(function(valid) {
-      $scope.nameChecked = true;
-      
-      if ($scope.newRoundtripForm.name) {
-        $scope.newRoundtripForm.name.$setValidity("unused", valid);
-      }
-    });
-  }, 500);
-  
+
   /**
    * Checks the validity of a name in the backend.
    * Returns a promise which is fulfilled when the check was done. 
@@ -507,7 +485,7 @@ function CreateNewRoundtripController($scope, $q, $http, $location, Debouncer, A
    * 
    * @returns promise to be fulfilled when the check was done
    */
-  function isNameValid(name) {
+  $scope.isNameValid = function(name) {
     var deferred = $q.defer();
     
     if (!name || name == "") {
@@ -621,6 +599,8 @@ function DeleteRoundtripController($scope, $routeParams, $http, $location, App) 
   };
 };
 
+// connector-setup.html ////////////////////////////////
+
 function ConnectorSetupController($scope, $http, $location, App, Event, Commons, ConnectorConfiguration) {
   $scope.editConnectorConfigurationDialog = new Dialog();
   $scope.deleteConnectorConfigurationDialog = new Dialog();
@@ -629,7 +609,7 @@ function ConnectorSetupController($scope, $http, $location, App, Event, Commons,
 
   $scope.connectorConfigurations = ConnectorConfiguration.query();
 
-  $scope.createNewConnector = function() {
+  $scope.createNew = function() {
     $scope.currentConnectorConfiguration = null;
     $scope.connectorDialogMode = "ADD_CONNECTOR";
     $scope.editConnectorConfigurationDialog.open();
@@ -793,6 +773,97 @@ function DeleteConnectorConfigurationController($scope, $location, $http, App) {
     configuration.$delete(function() {
       $scope.state = DEL_SUCCESS;
       $scope.connectorConfigurations.splice($scope.connectorConfigurations.indexOf($scope.toBeDeletedConnector), 1);
+    }, function(error) {
+      $scope.state = DEL_FAILED;
+    });
+  };
+}
+
+// user-management.html ////////////////////////////////
+
+function UsersController($scope, Event, User) {
+
+  $scope.editUserDialog = new Dialog();
+  $scope.deleteUserDialog = new Dialog();
+
+  $scope.$emit(Event.navigationChanged, { name:"User management" });
+
+  $scope.users = User.query();
+
+  $scope.editUser = function(user) {
+    $scope.mode = "EDIT";
+    $scope.selectedUser = user;
+    
+    $scope.editUserDialog.open();
+  };
+
+  $scope.deleteUser = function(user) {
+    $scope.selectedUser = user;
+    $scope.deleteUserDialog.open();
+  };
+
+  $scope.createNew = function() {
+    $scope.mode = "ADD";
+    $scope.selectedUser = null;
+    
+    $scope.editUserDialog.open();
+  };
+  
+  $scope.saveUser = function(userData, callbackFn) {
+    var isNew = !userData.id;
+    
+    var user = $scope.selectedUser || new User({});
+    
+    // copy user data
+    angular.extend(user, userData);
+    
+    user.$save(callbackFn);
+    if (isNew) {
+      $scope.users = User.query();
+    }
+  };
+};
+
+function EditUserController($scope) {
+  
+  $scope.editUser = $scope.selectedUser || {};
+  
+  $scope.save = function() {
+    if (!isValid()) {
+      return;
+    }
+    
+    $scope.saveUser($scope.editUser, function() {
+      $scope.editUserDialog.close();
+    });
+  };
+
+  // is the dialog model valid and can be submitted?
+  var isValid = $scope.isValid = function() {
+    var user = $scope.editUser;
+    if (user.password && user.password != $scope.passwordRepetition) {
+      return false;
+    }
+    return $scope.editUserForm.$valid;
+  };
+}
+
+function DeleteUserController($scope) {
+
+  var PERFORM_DEL = "TO_BE_DONE",
+      DEL_SUCCESS = "SUCCESS",
+      DEL_FAILED = "FAILURE";
+
+  $scope.state = PERFORM_DEL;
+
+  $scope.deleteUser = $scope.selectedUser;
+
+  $scope.confirmDelete = function() {
+    var user = $scope.deleteUser;
+    
+    user.$delete(function() {
+      $scope.state = DEL_SUCCESS;
+      $scope.users.splice($scope.users.indexOf(user), 1);
     }, function(error) {
       $scope.state = DEL_FAILED;
     });

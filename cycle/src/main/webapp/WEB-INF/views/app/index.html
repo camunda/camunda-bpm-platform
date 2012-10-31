@@ -28,7 +28,7 @@
               </ul>
               <!-- begin create-roundtrip-dialog -->
               <modal-dialog model="newRoundtripDialog" ng-cloak>
-                <div class="modal" ng-controller="CreateNewRoundtripController" ngm-if="newRoundtripDialog.renderHtml()">
+                <div class="modal" ng-controller="CreateRoundtripController" ngm-if="newRoundtripDialog.renderHtml()">
                   <div class="modal-header">
                     <a class="close" data-dismiss="modal">&times;</a>
                     <h3 th:text="#{Create roundtrip}">Create roundtrip</h3>
@@ -48,9 +48,9 @@
                         <div class="control-group" ng-class="errorClass(newRoundtripForm)">
                           <label class="control-label" for="roundtripName" th:text="#{Name}">Name</label>
                           <div class="controls">
-                            <input ng-model="name" id="roundtripName" name="name" type="text" class="input-xlarge" required autofocus />
+                            <input ng-model="name" id="roundtripName" name="name" type="text" class="input-xlarge" available="isNameValid(value)" required autofocus />
                             <p class="help-block" ng-show="newRoundtripForm.name.$error.required" th:text="#{Enter the name of your roundtrip}"></p>
-                            <p class="help-block" ng-show="newRoundtripForm.name.$error.unused" th:text="#{The name is already used}"></p>
+                            <p class="help-block" ng-show="newRoundtripForm.name.$error.available" th:text="#{The name is already used}"></p>
                           </div>
                         </div>
                       </fieldset>

@@ -167,6 +167,48 @@ angular
     }
   };
 })
+.directive("available", function(Debouncer) {
+  return {
+    restrict: 'A',
+    scope: {
+      available: "&"
+    }, 
+    require: 'ngModel',
+    link: function (scope, element, attrs, model) {
+      var available = scope.available;
+      
+      var validateDeferred = Debouncer.debounce(function() {
+        available({ value: model.$modelValue}).then(function(data) {
+          model.$setValidity("checked", true);
+          model.$setValidity("available", !(data == "true"));
+        });
+      }, 500);
+      
+      scope.$watch(function() { return model.$modelValue; }, function(newValue) {
+        if (newValue) {
+          model.$setValidity("checked", false);
+          validateDeferred();
+        } else {
+          model.$setValidity("available", true);
+        }
+      });
+    }
+  };
+})
+.directive("email", function() {
+  return {
+    restrict: 'A',
+    require: 'ngModel',
+    link: function (scope, element, attrs, model) {
+      scope.$watch(function() { return model.$modelValue; }, function(newValue) {
+        if (newValue) {
+          var EMAIL_REGEX = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+          model.$setValidity("email", EMAIL_REGEX.test(newValue));
+        }
+      });
+    }
+  };
+})
 .directive('ngCombobox', function(Event) {
   return {
     restrict: 'A',

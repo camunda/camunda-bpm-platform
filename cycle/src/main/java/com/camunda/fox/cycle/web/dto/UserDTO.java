@@ -14,6 +14,8 @@ public class UserDTO {
   private String name;
   private String email;
 
+  public UserDTO() { }
+  
   public UserDTO(User user) {
     this.id = user.getId();
     this.name = user.getName();

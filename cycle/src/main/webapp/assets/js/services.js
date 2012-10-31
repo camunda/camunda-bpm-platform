@@ -46,6 +46,9 @@ angular
   .factory('Roundtrip', function($resource, App) {
     return $resource(App.uri('secured/resource/roundtrip/:id'), {id: "@id"}, {});
   })
+  .factory('User', function($resource, App) {
+    return $resource(App.uri('secured/resource/user/:id'), {id: "@id"}, {});
+  })
   .factory('RoundtripDetails', function($resource, App) {
     return $resource(App.uri('secured/resource/roundtrip/:id/details'), {id: "@id"}, {});
   })

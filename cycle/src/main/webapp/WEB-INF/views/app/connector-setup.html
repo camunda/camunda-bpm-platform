@@ -14,7 +14,7 @@
             <table class="table table-bordered">
               <thead>
                 <tr>
-                  <th>Connector Id</th>
+                  <th>Id</th>
                   <th>Connector Name</th>
                   <th>Plugin Name</th>
                   <th>Login Mode</th>
@@ -35,7 +35,7 @@
                 </tr>
               </tbody>
             </table>
-            <a class="btn" data-ng-click="createNewConnector()"><span th:text="#{New}">New</span></a>
+            <a class="btn" data-ng-click="createNew()"><span th:text="#{New}">New</span></a>
 
             <!-- begin add/edit connector-configuration-dialog -->
             <modal-dialog model="editConnectorConfigurationDialog" ng-cloak>
