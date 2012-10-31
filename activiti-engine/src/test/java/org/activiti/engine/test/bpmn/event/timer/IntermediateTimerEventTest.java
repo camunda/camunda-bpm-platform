@@ -12,17 +12,17 @@
  */
 package org.activiti.engine.test.bpmn.event.timer;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+
 import org.activiti.engine.impl.test.PluggableActivitiTestCase;
 import org.activiti.engine.impl.util.ClockUtil;
 import org.activiti.engine.runtime.Job;
 import org.activiti.engine.runtime.JobQuery;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.test.Deployment;
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
 
 
 public class IntermediateTimerEventTest extends PluggableActivitiTestCase {
@@ -51,7 +51,7 @@ public class IntermediateTimerEventTest extends PluggableActivitiTestCase {
   @Deployment 
   public void testExpression() {
     // Set the clock fixed
-    Date currentTime = new Date();
+    Date currentTime = ClockUtil.getCurrentTime();
 
     HashMap<String, Object> variables1 = new HashMap<String, Object>();
     variables1.put("dueDate", currentTime);
@@ -66,8 +66,8 @@ public class IntermediateTimerEventTest extends PluggableActivitiTestCase {
     assertEquals(1, managementService.createJobQuery().processInstanceId(pi1.getId()).count());
     assertEquals(1, managementService.createJobQuery().processInstanceId(pi2.getId()).count());
 
-    // After setting the clock to 2 seconds in the future the timers should fire
-    ClockUtil.setCurrentTime(new Date(currentTime.getTime() + 2000));
+    // After setting the clock to 5 seconds in the future the timers should fire
+    ClockUtil.setCurrentTime(new Date(currentTime.getTime() + 5000));
     
     List<Job> jobs = managementService.createJobQuery().executable().list();
     for (Job job : jobs) {
