@@ -46,33 +46,42 @@
                 <div class="modal-body">
                   <form class="form-horizontal" novalidate data-ng-submit="save()" name="editUserForm">
                     <fieldset>
-                      <div class="control-group">
+                      <div class="control-group" ng-class="errorClass(editUserForm.userName)">
                         <label class="control-label" for="userName" 
                                th:text="#{'User Name'}">User Name</label>
-                        <div class="controls" style="margin-bottom: 10px;" >
-                          <input id="connectorLabel" name="userName" type="text" class="span8" required data-ng-model="editUser.name"/>
+                        <div class="controls">
+                          <input id="connectorLabel" name="userName" type="text" class="span6" available="isNameAvailable" data-ng-model="editUser.name" required autofocus />
+                          <p class="help-block" ng-show="editUserForm.userName.$error.available">Name not available</p>
                         </div>
                       </div>
-                      <div class="control-group">
+                      <div class="control-group" ng-class="errorClass(editUserForm.email)">
                         <label class="control-label" for="email" 
                                th:text="#{'Email'}">Email</label>
                         <div class="controls" style="margin-bottom: 10px;" >
-                          <input id="connectorLabel" name="email" type="text" class="span8" required email data-ng-model="editUser.email"/>
+                          <input id="email" name="email" type="text" class="span8" required email data-ng-model="editUser.email"/>
+                          <p class="help-block" ng-show="editUserForm.email.$error.email">Not a valid email address</p>
                         </div>
                       </div>
-                      <div class="control-group" ngm-if="mode == 'ADD'">
-                        <label class="control-label" for="password" 
-                               th:text="#{'Password'}">Password</label>
-                        <div class="controls" style="margin-bottom: 10px;" >
-                          <input id="password" name="password" type="password" class="span8" required data-ng-model="editUser.password"/>
+                      <div ngm-if="mode == 'ADD' || changePassword">
+                        <div class="control-group" ng-class="errorClass(editUserForm.passwordRepetition)">
+                          <label class="control-label" for="password" 
+                                 th:text="#{'Password'}">Password</label>
+                          <div class="controls">
+                            <input id="password" name="password" type="password" class="span6" data-ng-model="editUser.password" />
+                          </div>
+                        </div>
+                        <div class="control-group" ng-class="errorClass(editUserForm.passwordRepetition)">
+                          <label class="control-label" for="password-repetition" 
+                                 th:text="#{'Password (repeated)'}">Password (repeated)</label>
+                          <div class="controls">
+                            <input id="password-repetition" name="passwordRepetition" type="password" required class="span6" matches="editUser.password" data-ng-model="passwordRepetition"/>
+                            <p class="help-block" ng-show="editUserForm.passwordRepetition.$error.matches">Password and repetition do not match</p>
+                          </div>
                         </div>
                       </div>
-                      <div class="control-group" ngm-if="mode == 'ADD'">
-                        <label class="control-label" for="password-repetition" 
-                               th:text="#{'Password (repeated)'}">Password (repeated)</label>
-                        <div class="controls" style="margin-bottom: 10px;" >
-                          <input id="password-repetition" name="password" type="password" required class="span8" data-ng-model="passwordRepetition"/>
-                          <p class="help-block" ng-show="editUserForm.password.$error.no-match">Password and repetition do not match</p>
+                      <div ng-show="mode == 'EDIT' && !changePassword" class="control-group">
+                        <div class="controls">
+                          <a style="line-height: 20px" ng-click="changePassword = !changePassword">Reset password</a>
                         </div>
                       </div>
                     </fieldset>

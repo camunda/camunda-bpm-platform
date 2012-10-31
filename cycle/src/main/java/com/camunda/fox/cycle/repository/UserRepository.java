@@ -12,7 +12,7 @@ import com.camunda.fox.cycle.entity.User;
 @Repository
 public class UserRepository extends AbstractRepository<User> {
 
-  public boolean isNameValid(String name) {
+  public boolean isNameAvailable(String name) {
     return em.createQuery("SELECT COUNT(u) FROM User u WHERE u.name = :name", Long.class)
              .setParameter("name", name)
              .getSingleResult() == 0;

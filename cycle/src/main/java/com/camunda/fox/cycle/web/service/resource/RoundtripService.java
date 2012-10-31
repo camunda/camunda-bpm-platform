@@ -49,16 +49,19 @@ public class RoundtripService extends AbstractRestService {
 
   @Inject
   private RoundtripRepository roundtripRepository;
+  
   @Inject
   private ConnectorRegistry connectorRegistry;
+  
   @Inject
   private BpmnDiagramService bpmnDiagramController;
+  
   @Inject
   private SynchronizationService synchronizationService;
 
-  /**
-   * $resource specific methods
-   */
+
+  // roundtrip $resource //////////////////////////////////////////////
+  
   @GET
   public List<RoundtripDTO> list() {
     return RoundtripDTO.wrapAll(roundtripRepository.findAll());
@@ -104,9 +107,8 @@ public class RoundtripService extends AbstractRestService {
     roundtripRepository.delete(roundtrip);
   }
 
-  /**
-   * Non $resource specific methods
-   */
+  // roundtrip details $resource //////////////////////////////////////////////
+  
   @GET
   @Transactional
   @Path("{id}/details")
@@ -162,11 +164,13 @@ public class RoundtripService extends AbstractRestService {
     return new RoundtripDTO(saved, saved.getLeftHandSide(), saved.getRightHandSide());
   }
 
+  // querying ////////////////////////////////////////////////
+  
   @GET
   @Produces(MediaType.APPLICATION_JSON)
-  @Path("isNameValid")
-  public boolean isNameValid(@QueryParam("name") String name) {
-    return roundtripRepository.isNameValid(name);
+  @Path("isNameAvailable")
+  public boolean isNameAvailable(@QueryParam("name") String name) {
+    return roundtripRepository.isNameAvailable(name);
   }
 
   @POST

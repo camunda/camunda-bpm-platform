@@ -70,6 +70,22 @@
                         </div>
                       </div>
 
+                      <div data-ng-show="connectorDialogMode == 'ADD_CONNECTOR'" class="control-group">
+                        <label class="control-label" for="connectors" 
+                               th:text="#{'Plugin*'}">Plugin*</label>
+                        <div class="controls">
+                          <select class="span8" data-ng-options="c.name for c in defaultConfigurations" data-ng-model="blueprint">
+                          </select>
+                        </div>
+                      </div>
+                      <div data-ng-show="connectorDialogMode == 'EDIT_CONNECTOR'" class="control-group">
+                        <label class="control-label" for="connectors" 
+                               th:text="#{'Plugin'}">Plugin</label>
+                        <div class="controls" style="margin-bottom: 10px;">
+                          <span style="line-height: 30px">{{editConnectorConfiguration.connectorName}}</span>
+                        </div>
+                      </div>
+
                       <div class="control-group">
                         <label class="control-label" for="loginMode" 
                                th:text="#{'Login Mode*'}">Login Mode*</label>
@@ -85,13 +101,13 @@
                           </span>
                         </div>
                       </div>
-
+                      
                       <div data-ng-switch data-on="editConnectorConfiguration.loginMode">
                         <div data-ng-switch-when="GLOBAL">
                           <div class="control-group">
                             <label class="control-label" for="userName" 
                                    th:text="#{'User Name*'}">User Name*</label>
-                            <div class="controls" style="margin-bottom: 10px;" >
+                            <div class="controls">
                               <input id="userName" name="userName" type="text" class="span8" required data-ng-model="editConnectorConfiguration.user"/>
                             </div> 
                           </div>
@@ -104,27 +120,12 @@
                           </div>
                         </div>
                       </div>
-                      <div data-ng-show="connectorDialogMode == 'ADD_CONNECTOR'" class="control-group">
-                        <label class="control-label" for="connectors" 
-                               th:text="#{'Plugin*'}">Plugin*</label>
-                        <div class="controls" style="margin-bottom: 10px;">
-                          <select class="span8" data-ng-options="c.name for c in defaultConfigurations" data-ng-model="blueprint">
-                          </select>
-                        </div>
-                      </div>
-                      <div data-ng-show="connectorDialogMode == 'EDIT_CONNECTOR'" class="control-group">
-                        <label class="control-label" for="connectors" 
-                               th:text="#{'Plugin'}">Plugin</label>
-                        <div class="controls" style="margin-bottom: 10px;">
-                          <span style="line-height: 30px">{{editConnectorConfiguration.connectorName}}</span>
-                        </div>
-                      </div>
                       <div class="control-group" data-ng-repeat="propertyName in customPropertyNames">
                         <label class="control-label" for="specificField" 
                                data-help
                                data-help-text-var="currentHelpText(propertyName)"
                                data-help-title-var="propertyName">{{propertyName}}</label>
-                        <div class="controls" style="margin-bottom: 10px;" >
+                        <div class="controls">
                           <input id="specificField" name="specificField" type="text" class="span8" data-ng-model="editConnectorConfiguration.properties[propertyName]"/>
                         </div>
                       </div>

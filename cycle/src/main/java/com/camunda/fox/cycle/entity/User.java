@@ -2,7 +2,9 @@ package com.camunda.fox.cycle.entity;
 
 import java.util.List;
 
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
@@ -21,6 +23,7 @@ public class User extends AbstractEntity {
   @OneToMany
   private List<ConnectorCredentials> connectorCredentials;
 
+  @ElementCollection(fetch=FetchType.EAGER)
   private List<String> roles;
   
   public String getName() {

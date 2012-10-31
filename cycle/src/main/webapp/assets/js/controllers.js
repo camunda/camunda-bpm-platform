@@ -23,6 +23,12 @@ function DefaultController($scope, $http, $location, App, Event, Error, Credenti
     $scope.currentUser = user;
   });
   
+  // needed for form validation
+  // DO NOT REMOVE FROM DEFAULT CONTROLLER!
+  $scope.errorClass = function(form) {
+    return form.$valid || !form.$dirty ? '' : 'error';
+  };
+
   // Bread Crumb 
   var breadCrumbs = $scope.breadCrumbs = [];
 
@@ -439,11 +445,7 @@ function EditDiagramController($scope, Commons, Event, ConnectorConfiguration) {
  */
 function CreateRoundtripController($scope, $q, $http, $location, App, Roundtrip, Event) {
 
-  $scope.name = null;
-  
-  $scope.errorClass = function(form) {
-    return form.$valid || !form.$dirty ? '' : 'error';
-  };
+  $scope.newRoundtrip = { };
 
   // cancel the add operation áka close the dialog
   $scope.cancel = function() {
@@ -460,9 +462,9 @@ function CreateRoundtripController($scope, $q, $http, $location, App, Roundtrip,
     if (!isValid()) {
       return;
     }
-    
-    var roundtrip = new Roundtrip({ name: $scope.name });
-    
+
+    var roundtrip = new Roundtrip($scope.newRoundtrip);
+
     // redirect to created roundtrip after save and close dialog
     roundtrip.$save(function() {
       $scope.newRoundtripDialog.close();
@@ -477,7 +479,7 @@ function CreateRoundtripController($scope, $q, $http, $location, App, Roundtrip,
    * Returns a promise which is fulfilled when the check was done. 
    * 
    * Usage: 
-   * isNameValid("Walter").then(function(nameOk) {
+   * isNameAvailable("Walter").then(function(nameOk) {
    *   console.log("Name 'Walter' is ok? ", nameOk);
    * });
    * 
@@ -485,19 +487,19 @@ function CreateRoundtripController($scope, $q, $http, $location, App, Roundtrip,
    * 
    * @returns promise to be fulfilled when the check was done
    */
-  $scope.isNameValid = function(name) {
+  $scope.isNameAvailable = function(name) {
     var deferred = $q.defer();
     
     if (!name || name == "") {
       deferred.resolve(true);
     } else {
-      $http.get(App.uri("secured/resource/roundtrip/isNameValid?name=" + name)).success(function(data) {
+      $http.get(App.uri("secured/resource/roundtrip/isNameAvailable?name=" + name)).success(function(data) {
         deferred.resolve(data == "true");
       });
     }
     
     return deferred.promise;
-  }
+  };
 };
 
 /**
@@ -779,14 +781,14 @@ function DeleteConnectorConfigurationController($scope, $location, $http, App) {
   };
 }
 
-// user-management.html ////////////////////////////////
+// users.html ////////////////////////////////
 
 function UsersController($scope, Event, User) {
 
   $scope.editUserDialog = new Dialog();
   $scope.deleteUserDialog = new Dialog();
 
-  $scope.$emit(Event.navigationChanged, { name:"User management" });
+  $scope.$emit(Event.navigationChanged, { name: "User management" });
 
   $scope.users = User.query();
 
@@ -824,26 +826,46 @@ function UsersController($scope, Event, User) {
   };
 };
 
-function EditUserController($scope) {
+function EditUserController($scope, $q, $http, App) {
   
-  $scope.editUser = $scope.selectedUser || {};
+  $scope.editUser = angular.copy($scope.selectedUser || {});
+  $scope.oldName = $scope.editUser.name;
   
   $scope.save = function() {
     if (!isValid()) {
       return;
     }
-    
+
     $scope.saveUser($scope.editUser, function() {
       $scope.editUserDialog.close();
     });
   };
 
+  $scope.isNameAvailable = function(name) {
+    var deferred = $q.defer();
+
+    if (!name || name == $scope.oldName) {
+      deferred.resolve(true);
+      
+      // make sure result of check is resolved
+      // in the current execution thread
+      var thenFn = deferred.promise.then;
+      deferred.promise.then = function(arg) {
+        $scope.$apply(function() {
+          thenFn(arg);
+        });
+      };
+    } else {
+      $http.get(App.uri("secured/resource/user/isNameAvailable?name=" + name)).success(function(data) {
+        deferred.resolve(data == "true");
+      });
+    }
+
+    return deferred.promise;
+  };
+
   // is the dialog model valid and can be submitted?
   var isValid = $scope.isValid = function() {
-    var user = $scope.editUser;
-    if (user.password && user.password != $scope.passwordRepetition) {
-      return false;
-    }
     return $scope.editUserForm.$valid;
   };
 }

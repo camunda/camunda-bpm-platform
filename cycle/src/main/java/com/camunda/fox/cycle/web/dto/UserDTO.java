@@ -13,6 +13,8 @@ public class UserDTO {
   private Long id;
   private String name;
   private String email;
+  
+  private String password;
 
   public UserDTO() { }
   
@@ -45,7 +47,15 @@ public class UserDTO {
   public void setEmail(String email) {
     this.email = email;
   }
-  
+
+  public String getPassword() {
+    return password;
+  }
+
+  public void setPassword(String password) {
+    this.password = password;
+  }
+
   // static helpers /////////////////////////////////////////
   
   public static UserDTO wrap(User user) {

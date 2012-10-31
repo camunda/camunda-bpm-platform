@@ -12,7 +12,7 @@ import com.camunda.fox.cycle.entity.Roundtrip;
 @Repository
 public class RoundtripRepository extends AbstractRepository<Roundtrip> {
   
-  public boolean isNameValid(String name) {
+  public boolean isNameAvailable(String name) {
     long count = em.createQuery("SELECT COUNT(r) FROM Roundtrip r WHERE r.name = :name", Long.class)
                    .setParameter("name", name)
                    .getSingleResult();
