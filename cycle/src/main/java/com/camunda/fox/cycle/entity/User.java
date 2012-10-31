@@ -21,7 +21,7 @@ public class User extends AbstractEntity {
   @OneToMany
   private List<ConnectorCredentials> connectorCredentials;
 
-  private List<String> roles;
+  private boolean isAdmin;
   
   public String getName() {
     return name;
@@ -47,15 +47,6 @@ public class User extends AbstractEntity {
     this.password = password;
   }
 
-  
-  public List<String> getRoles() {
-    return roles;
-  }
-
-  public void setRoles(List<String> roles) {
-    this.roles = roles;
-  }
-
   public List<ConnectorCredentials> getConnectorCredentials() {
     return connectorCredentials;
   }
@@ -63,4 +54,13 @@ public class User extends AbstractEntity {
   public void setConnectorCredentials(List<ConnectorCredentials> connectorCredentials) {
     this.connectorCredentials = connectorCredentials;
   }
+  
+  public boolean isAdmin() {
+    return isAdmin;
+  }
+  
+  public void setAdmin(boolean isAdmin) {
+    this.isAdmin = isAdmin;
+  }
+  
 }

@@ -2,6 +2,7 @@ package com.camunda.fox.cycle.web.dto;
 
 import java.util.ArrayList;
 import java.util.List;
+
 import com.camunda.fox.cycle.entity.User;
 
 /**
@@ -13,6 +14,7 @@ public class UserDTO {
   private Long id;
   private String name;
   private String email;
+  private boolean isAdmin;
 
   public UserDTO() { }
   
@@ -20,6 +22,7 @@ public class UserDTO {
     this.id = user.getId();
     this.name = user.getName();
     this.email = user.getEmail();
+    this.isAdmin = user.isAdmin();
   }
 
   public Long getId() {
@@ -44,6 +47,14 @@ public class UserDTO {
 
   public void setEmail(String email) {
     this.email = email;
+  }
+  
+  public boolean isAdmin() {
+    return isAdmin;
+  }
+  
+  public void setAdmin(boolean isAdmin) {
+    this.isAdmin = isAdmin;
   }
   
   // static helpers /////////////////////////////////////////

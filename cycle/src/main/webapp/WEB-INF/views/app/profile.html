@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" data-ng-app="cycle">
+  <head th:substituteby="fragment/common :: head">
+
+  </head>
+  <body data-ng-controller="DefaultController">
+    <div class="wrapper">
+      <div th:substituteby="fragment/common :: navigation-logged-in"></div>
+      <div class="container-fluid content-container content-inset">
+        <div th:substituteby="fragment/common :: breadcrumbs"></div>
+        <div th:substituteby="fragment/common :: error-panel"></div>
+        <div class="row-fluid content-container">
+          <div class="span12" data-ng-controller="ProfileController">
+            <table class="table table-bordered">
+              <thead>
+                <tr>
+                  <th>Id</th>
+                  <th>Connector Name</th>
+                  <th>Plugin Name</th>
+                  <th>Login Mode</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr data-ng-repeat="connectorConfiguration in connectorConfigurations" data-ng-cloak>
+                  <td>{{connectorConfiguration.connectorId}}</td>
+                  <td>{{connectorConfiguration.name}}</td>
+                  <td>{{connectorConfiguration.connectorName}}</td>
+                  <td>{{connectorConfiguration.loginMode}}</td>
+                  <td>
+                    <a data-ng-show="!showEditAction(connectorConfiguration)" data-ng-click="editConnectorCredentials(connectorConfiguration)" th:text="#{add credentials}">add credentials</a>
+                    <a data-ng-show="showEditAction(connectorConfiguration)" data-ng-click="editConnectorCredentials(connectorConfiguration)" th:text="#{edit credentials}">edit credentials</a>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            
+            <!-- begin add/edit user-specific-connector-credentials-dialog -->
+            <modal-dialog model="connectorCredentialsDialog" ng-cloak>
+              <div class="modal hide fade" data-ng-controller="EditConnectorCredentials" data-ngm-if="connectorCredentialsDialog.renderHtml()"> 
+                <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                  <h3 data-ng-show="mode == 'ADD'" th:text="#{'Add connector credentials'}"></h3>
+                  <h3 data-ng-show="mode == 'EDIT'" th:text="#{'Edit connector credentials'}"></h3>
+                </div>
+                <div class="modal-body">
+                </div>
+                <div class="modal-footer">
+                </div>
+              </div>
+            </modal-dialog>
+            <!-- begin add/edit user-specific-connector-credentials-dialog -->
+            
+          </div>
+        </div>
+      </div>
+      <div class="push-down"><!-- // --></div> 
+    </div>
+    <footer th:substituteby="fragment/common :: footer" />
+  </body>
+</html>

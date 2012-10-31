@@ -869,3 +869,61 @@ function DeleteUserController($scope) {
     });
   };
 }
+
+// profile.html ////////////////////////////////
+
+function ProfileController($scope, $http, App, Event, Credentials, ConnectorConfiguration) {
+  
+  $scope.connectorCredentialsDialog = new Dialog();
+
+  $scope.$emit(Event.navigationChanged, {name:"Profile"});
+
+  $scope.connectorConfigurations = ConnectorConfiguration.query();
+  
+  $scope.$watch(Credentials.watchCurrent, function(newValue) {
+    $scope.currentUser = newValue;
+    if (newValue) {
+      fetchConnectorCredentials();
+    }
+  });
+  
+  function fetchConnectorCredentials() {
+    $http.get(App.uri("secured/resource/connector/credentials/fetchConnectorCredentials?userId=" + $scope.currentUser.id))
+    .success(function(data) {
+      var credentials = {};
+      angular.forEach(data, function (item) {
+        credentials[item.connectorId] = item;
+      });
+      $scope.connectorCredentialsByConnectorId = credentials;
+    });
+  }
+
+  $scope.editConnectorCredentials = function (connectorConfiguration) {
+    $scope.mode = "EDIT";
+    $scope.selectedConnectorConfiguration = connectorConfiguration;
+    $scope.connectorCredentialsDialog.open();
+  };
+
+  $scope.addConnectorCredentials = function (connectorConfiguration) {
+    $scope.mode = "ADD";
+    $scope.selectedConnectorConfiguration = connectorConfiguration;
+    $scope.connectorCredentialsDialog.open();
+  };
+
+  
+  $scope.showEditAction = function (connectorConfiguration) {
+    if (!$scope.connectorCredentialsByConnectorId) {
+      return false;
+    }
+    if (connectorConfiguration.loginMode == "USER") {
+      var connectorId = connectorConfiguration.connectorId;
+      return !!$scope.connectorCredentialsByConnectorId[connectorId];
+    }
+    return false;
+  };
+  
+}
+
+function EditConnectorCredentials($scope) {
+  $scope.editConnectorConfiguration = $scope.selectedConnectorConfiguration || {};
+}

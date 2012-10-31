@@ -53,7 +53,11 @@
               <span class="caret"></span>
             </a>
             <ul class="dropdown-menu">
-              <li><a href="#"><i class="icon-edit"></i> <span th:text="#{Profile}">Profile</span></a></li>
+              <li>
+                <a th:href="@{/app/secured/view/profile}">
+                  <i class="icon-edit"></i> <span th:text="#{Profile}">Profile</span>
+                </a>
+              </li>
               <li data-ng-show="currentUser.adminRole">
                 <a th:href="@{/app/secured/view/connector-setup}">
                   <i class="icon-edit"></i> <span th:text="#{Connector Setup}">Connector Setup</span>

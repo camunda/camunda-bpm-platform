@@ -57,6 +57,11 @@ angular
       'queryDefaults':  {method:'GET', isArray:true, params: { id: 'defaults' }}
     });
   })
+  .factory('ConnectorCredentials', function($resource, App) {
+    return $resource(App.uri('secured/resource/connector/credentials/:id'), {id: "@connectorId"}, {
+      'queryDefaults':  {method:'GET', isArray:true, params: { id: 'defaults' }}
+    });
+  })
   .factory('Commons', function($http, HttpUtils, App) {
     return {
       getModelerNames: function() {
@@ -169,7 +174,7 @@ angular
         });
       },
       isAdmin: function() {
-        return this.currentCredentials && this.currentCredentials.adminRole;
+        return this.currentCredentials && this.currentCredentials.admin;
       },
       current: function() {
         return this.currentCredentials;
