@@ -55,17 +55,17 @@
             <ul class="dropdown-menu">
               <li>
                 <a th:href="@{/app/secured/view/profile}">
-                  <i class="icon-edit"></i> <span th:text="#{Profile}">Profile</span>
+                  <i class="icon-edit"></i> <span th:text="#{My Profile}">My Profile</span>
                 </a>
               </li>
               <li data-ng-show="currentUser.admin">
-                <a th:href="@{/app/secured/view/connector-setup}">
-                  <i class="icon-edit"></i> <span th:text="#{Connector Setup}">Connector Setup</span>
+                <a th:href="@{/app/secured/view/connectors}">
+                  <i class="icon-edit"></i> <span th:text="#{Connectors}">Connectors</span>
                 </a>
               </li>
               <li data-ng-show="currentUser.admin">
                 <a th:href="@{/app/secured/view/users}">
-                  <i class="icon-edit"></i> <span th:text="#{Manage Users}">Manage Users</span>
+                  <i class="icon-edit"></i> <span th:text="#{Users}">Users</span>
                 </a>
               </li>
               <li class="divider"></li>
