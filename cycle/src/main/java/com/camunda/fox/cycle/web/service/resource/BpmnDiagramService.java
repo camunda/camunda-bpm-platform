@@ -79,7 +79,7 @@ public class BpmnDiagramService extends AbstractRestService {
       Date imageLastModified = imageInformation.getLastModified();
       if (imageLastModified != null) {
         // need to do comparison based on timestamp to ignore time zones
-        if (imageLastModified.getTime() < diagramLastModified.getTime()) {
+        if ((imageLastModified.getTime() + 5000) < diagramLastModified.getTime()) {
           // diagram is younger than the image --> image out of date
           throw notFound("no up to date image");
         }
