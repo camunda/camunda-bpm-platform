@@ -26,9 +26,9 @@
                   <td>{{user.name}}</td>
                   <td>{{user.email}}</td>
                   <td>
-                    <a data-ng-click="editUser(user)" th:text="#{edit}">edit</a>
+                    <a ng-show="!isCurrentUser(user)" data-ng-click="editUser(user)" th:text="#{edit}">edit</a>
                     <br />
-                    <a data-ng-click="deleteUser(user)" th:text="#{delete}">delete</a>
+                    <a ng-show="!isCurrentUser(user)" data-ng-click="deleteUser(user)" th:text="#{delete}">delete</a>
                   </td>
                 </tr>
               </tbody>

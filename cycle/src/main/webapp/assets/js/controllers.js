@@ -14,7 +14,7 @@ function DefaultController($scope, $http, $location, App, Event, Error, Credenti
   
   // TODO: get from cookie
   $scope.currentUser = null;
-  
+    
   $scope.$watch(Credentials.watchCurrent, function(newValue) {
     $scope.currentUser = newValue;
   });
@@ -787,7 +787,7 @@ function UsersController($scope, Event, User) {
 
   $scope.editUserDialog = new Dialog();
   $scope.deleteUserDialog = new Dialog();
-
+  
   $scope.$emit(Event.navigationChanged, { name: "Users" });
 
   $scope.users = User.query();
@@ -802,6 +802,10 @@ function UsersController($scope, Event, User) {
   $scope.deleteUser = function(user) {
     $scope.selectedUser = user;
     $scope.deleteUserDialog.open();
+  };
+  
+  $scope.isCurrentUser = function(user) {
+	  return user.name == ($scope.currentUser || {}).name;
   };
 
   $scope.createNew = function() {
