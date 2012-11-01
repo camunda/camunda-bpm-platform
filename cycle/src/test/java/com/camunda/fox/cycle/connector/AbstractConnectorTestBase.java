@@ -168,7 +168,7 @@ public abstract class AbstractConnectorTestBase {
     ConnectorNode sourceFileNode = new ConnectorNode("//" + TMP_DIR_NAME + "/test-lhs.bpmn", "test-lhs.bpmn");
 
     // now, with seconds accuracy
-    Date now = new Date(System.currentTimeMillis() * 1000 / 1000);
+    Date now = new Date((System.currentTimeMillis() / 1000) * 1000);
 
     try {
       originalInputStream = connector.getContent(sourceFileNode);
@@ -206,7 +206,7 @@ public abstract class AbstractConnectorTestBase {
     InputStream nodeInputStream = null;
 
     // now, with seconds accuracy
-    Date now = new Date(System.currentTimeMillis() * 1000 / 1000);
+    Date beforeUpdate = new Date((System.currentTimeMillis() / 1000) * 1000);
 
     try {
       originalInputStream = getDiagramResourceAsStream("test-rhs.bpmn");
@@ -221,7 +221,7 @@ public abstract class AbstractConnectorTestBase {
       assertThat(updatedContentInfo).isNotNull();
       assertThat(updatedContentInfo.exists()).isTrue();
 
-      assertCorrectLastModified(now, updatedContentInfo.getLastModified());
+      assertCorrectLastModified(beforeUpdate, updatedContentInfo.getLastModified());
 
       // see if file contents equal the new contents
       nodeInputStream = connector.getContent(fileNode);
@@ -247,11 +247,11 @@ public abstract class AbstractConnectorTestBase {
     IoUtil.closeSilently(is);
   }
 
-  private void assertCorrectLastModified(Date comparisonDate, Date lastModified) {
+  private void assertCorrectLastModified(Date beforeUpdate, Date lastModified) {
 
     // see if updated was set
     // compare by time to mitigate problems with time zone comparison
-    assertThat(lastModified.getTime()).isGreaterThanOrEqualTo(comparisonDate.getTime());
+    assertThat(lastModified.getTime()).isGreaterThanOrEqualTo(beforeUpdate.getTime());
     assertThat(lastModified.getTime()).isLessThanOrEqualTo(new Date().getTime());
   }
 }

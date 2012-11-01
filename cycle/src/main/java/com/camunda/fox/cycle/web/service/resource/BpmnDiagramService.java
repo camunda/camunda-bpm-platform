@@ -184,7 +184,7 @@ public class BpmnDiagramService extends AbstractRestService {
     // update last modified diagram status
     diagram.setLastModified(lastModified);
     
-    BpmnDiagramStatusDTO statusDTO = new BpmnDiagramStatusDTO(diagram.getId(), status, lastModified);
+    BpmnDiagramStatusDTO statusDTO = new BpmnDiagramStatusDTO(diagram.getId(), status, diagram.getLastModified());
     statusDTO.setLastUpdated(new Date());
     return statusDTO;
   }
