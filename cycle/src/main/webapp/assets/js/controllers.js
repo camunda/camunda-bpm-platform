@@ -14,7 +14,7 @@ function DefaultController($scope, $http, $location, App, Event, Error, Credenti
   
   // TODO: get from cookie
   $scope.currentUser = null;
-  
+    
   $scope.$watch(Credentials.watchCurrent, function(newValue) {
     $scope.currentUser = newValue;
   });
@@ -607,7 +607,7 @@ function ConnectorSetupController($scope, $http, $location, App, Event, Commons,
   $scope.editConnectorConfigurationDialog = new Dialog();
   $scope.deleteConnectorConfigurationDialog = new Dialog();
   
-  $scope.$emit(Event.navigationChanged, {name:"Connector setup"});
+  $scope.$emit(Event.navigationChanged, {name:"Connectors"});
 
   $scope.connectorConfigurations = ConnectorConfiguration.query();
 
@@ -787,8 +787,8 @@ function UsersController($scope, Event, User) {
 
   $scope.editUserDialog = new Dialog();
   $scope.deleteUserDialog = new Dialog();
-
-  $scope.$emit(Event.navigationChanged, { name: "User management" });
+  
+  $scope.$emit(Event.navigationChanged, { name: "Users" });
 
   $scope.users = User.query();
 
@@ -802,6 +802,10 @@ function UsersController($scope, Event, User) {
   $scope.deleteUser = function(user) {
     $scope.selectedUser = user;
     $scope.deleteUserDialog.open();
+  };
+  
+  $scope.isCurrentUser = function(user) {
+	  return user.name == ($scope.currentUser || {}).name;
   };
 
   $scope.createNew = function() {
@@ -894,7 +898,7 @@ function DeleteUserController($scope) {
 
 // profile.html ////////////////////////////////
 
-function ProfileController($scope, $http, App, Event, Credentials, ConnectorConfiguration) {
+function ProfileController($scope, $http, App, Event, Credentials, ConnectorConfiguration, ConnectorCredentials) {
   
   $scope.connectorCredentialsDialog = new Dialog();
 
@@ -910,25 +914,26 @@ function ProfileController($scope, $http, App, Event, Credentials, ConnectorConf
   });
   
   function fetchConnectorCredentials() {
-    $http.get(App.uri("secured/resource/connector/credentials/fetchConnectorCredentials?userId=" + $scope.currentUser.id))
-    .success(function(data) {
-      var credentials = {};
-      angular.forEach(data, function (item) {
-        credentials[item.connectorId] = item;
+    ConnectorCredentials.query( {userId: $scope.currentUser.id }, function (data) {
+        var credentials = {};
+        angular.forEach(data, function (item) {
+          credentials[item.connectorId] = item;
+        });
+        $scope.connectorCredentialsByConnectorId = credentials;
       });
-      $scope.connectorCredentialsByConnectorId = credentials;
-    });
   }
 
   $scope.editConnectorCredentials = function (connectorConfiguration) {
     $scope.mode = "EDIT";
-    $scope.selectedConnectorConfiguration = connectorConfiguration;
+    $scope.connectorId = connectorConfiguration.connectorId;
+    $scope.selectedConnectorCredentials = $scope.connectorCredentialsByConnectorId[connectorConfiguration.connectorId];
     $scope.connectorCredentialsDialog.open();
   };
 
   $scope.addConnectorCredentials = function (connectorConfiguration) {
     $scope.mode = "ADD";
-    $scope.selectedConnectorConfiguration = connectorConfiguration;
+    $scope.connectorId = connectorConfiguration.connectorId;
+    $scope.selectedConnectorCredentials = null;
     $scope.connectorCredentialsDialog.open();
   };
 
@@ -944,16 +949,42 @@ function ProfileController($scope, $http, App, Event, Credentials, ConnectorConf
     return false;
   };
   
+  $scope.saveConnectorCredentials = function(connectorCredentialsData, callbackFn) {
+    var isNew = !connectorCredentialsData.id;
+    
+    var connectorCredentials = $scope.selectedConnectorCredentials || new ConnectorCredentials({});
+    
+    // copy connector credentials data
+    angular.extend(connectorCredentials, connectorCredentialsData);
+    
+    connectorCredentials.$save(callbackFn);
+    if (isNew) {
+      $scope.connectorCredentialsByConnectorId[connectorCredentials.connectorId] = connectorCredentials;
+    }
+  };
+  
 }
 
-function EditConnectorCredentials($scope, User, ConnectorCredentials) {
-  $scope.editConnectorConfiguration = $scope.selectedConnectorConfiguration || {};
+function EditConnectorCredentials($scope) {
+  $scope.editCredentials = $scope.selectedConnectorCredentials || {};
   
   $scope.test = function () {
     
   };
   
+  var isValid = $scope.isValid = function () {
+    return $scope.editConnectorCredentialsForm.$valid;
+  };
+  
   $scope.save = function () {
+    if (!isValid()) {
+      return;
+    }
     
+    $scope.editCredentials.connectorId = $scope.connectorId;
+    $scope.editCredentials.userId = $scope.currentUser.id;
+    $scope.saveConnectorCredentials($scope.editCredentials, function() {
+      $scope.connectorCredentialsDialog.close();
+    });
   };
 }

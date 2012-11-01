@@ -2,9 +2,8 @@ package com.camunda.fox.cycle.entity;
 
 import java.util.List;
 
-import javax.persistence.ElementCollection;
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
@@ -20,7 +19,7 @@ public class User extends AbstractEntity {
   
   private String password;
   
-  @OneToMany
+  @OneToMany(cascade={ CascadeType.ALL }, orphanRemoval=true, mappedBy="user")
   private List<ConnectorCredentials> connectorCredentials;
 
   private boolean admin;

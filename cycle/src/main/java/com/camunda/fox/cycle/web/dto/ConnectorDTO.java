@@ -12,6 +12,8 @@ public class ConnectorDTO {
   private Long connectorId;
   private String name;
   
+  public ConnectorDTO() { }
+  
   public ConnectorDTO(Connector connector) {
     this.connectorId = connector.getConfiguration().getId();
     this.name = connector.getConfiguration().getName();

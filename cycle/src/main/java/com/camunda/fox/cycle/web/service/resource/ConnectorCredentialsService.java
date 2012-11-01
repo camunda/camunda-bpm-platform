@@ -14,7 +14,9 @@ import javax.ws.rs.core.MediaType;
 
 import org.springframework.transaction.annotation.Transactional;
 
+import com.camunda.fox.cycle.entity.ConnectorConfiguration;
 import com.camunda.fox.cycle.entity.ConnectorCredentials;
+import com.camunda.fox.cycle.entity.User;
 import com.camunda.fox.cycle.repository.ConnectorConfigurationRepository;
 import com.camunda.fox.cycle.repository.ConnectorCredentialsRepository;
 import com.camunda.fox.cycle.repository.UserRepository;
@@ -33,18 +35,17 @@ public class ConnectorCredentialsService extends AbstractRestService {
   @Inject
   private ConnectorConfigurationRepository connectorConfigurationRepository;
 
-  /**
-   * $resource specific methods
-   */
+   // $resource specific methods ///////////////////////////////////
+  
   @GET
-  public List<ConnectorCredentialsDTO> list() {
-    return ConnectorCredentialsDTO.wrapAll(connectorCredentialsRepository.findAll());
+  public List<ConnectorCredentialsDTO> list(@QueryParam("userId") Long userId) {
+    return fetchConnectorCredentialsByUserId(userId);
   }
 
   @GET
   @Path("{id}")
   public ConnectorCredentialsDTO get(@PathParam("id") long id) {
-    return ConnectorCredentialsDTO.wrap(connectorCredentialsRepository.findById(id));
+    return fetchConnectorCredentialsById(id);
   }
 
   @POST
@@ -53,12 +54,13 @@ public class ConnectorCredentialsService extends AbstractRestService {
   public ConnectorCredentialsDTO update(ConnectorCredentialsDTO data) {
     long id = data.getId();
 
-    ConnectorCredentials connectorCredentials = connectorCredentialsRepository.findById(id);
+    ConnectorCredentials connectorCredentials = connectorCredentialsRepository.fetchConnectorCredentialsById(id);
     if (connectorCredentials == null) {
       throw notFound("ConnectorCredentials not found");
     }
 
     update(connectorCredentials, data);
+    
     return ConnectorCredentialsDTO.wrap(connectorCredentials);
   }
 
@@ -66,6 +68,19 @@ public class ConnectorCredentialsService extends AbstractRestService {
   public ConnectorCredentialsDTO create(ConnectorCredentialsDTO data) {
     ConnectorCredentials connectorCredentials = new ConnectorCredentials();
     update(connectorCredentials, data);
+    
+    ConnectorConfiguration config = connectorConfigurationRepository.findById(data.getConnectorId());
+    if (config == null) {
+      throw notFound("Connector configuration with id " + data.getConnectorId() + " not found.");
+    }
+    connectorCredentials.setConnectorConfiguration(config);
+    
+    User user = userRepository.findById(data.getUserId());
+    if (user == null) {
+      throw notFound("User with id " + data.getConnectorId() + " not found.");
+    }
+    connectorCredentials.setUser(user);
+    
     return ConnectorCredentialsDTO.wrap(connectorCredentialsRepository.saveAndFlush(connectorCredentials));
   }
   
@@ -84,9 +99,26 @@ public class ConnectorCredentialsService extends AbstractRestService {
   
   @GET
   @Produces(MediaType.APPLICATION_JSON)
-  @Path("fetchConnectorCredentials")
-  public List<ConnectorCredentialsDTO> fetchConnectorCredentials(@QueryParam("userId") Long userId) {
-    return ConnectorCredentialsDTO.wrapAll(connectorCredentialsRepository.fetchConnectorCredentialsByUser(userId));
+  @Path("fetchConnectorCredentialsByUserId")
+  @Transactional
+  public List<ConnectorCredentialsDTO> fetchConnectorCredentialsByUserId(@QueryParam("userId") Long userId) {
+    return ConnectorCredentialsDTO.wrapAll(connectorCredentialsRepository.fetchConnectorCredentialsByUserId(userId));
+  }
+  
+  @GET
+  @Produces(MediaType.APPLICATION_JSON)
+  @Path("fetchConnectorCredentialsById")
+  @Transactional
+  public ConnectorCredentialsDTO fetchConnectorCredentialsById(@QueryParam("id") Long id) {
+    return ConnectorCredentialsDTO.wrap(connectorCredentialsRepository.fetchConnectorCredentialsById(id));
+  }
+  
+  @GET
+  @Produces(MediaType.APPLICATION_JSON)
+  @Path("fetchConnectorCredentialsByUserIdAndConnectorId")
+  @Transactional
+  public ConnectorCredentialsDTO fetchConnectorCredentialsByUserIdAndConnectorId(@QueryParam("userId") Long userId, @QueryParam("connectorId") Long connectorId) {
+    return ConnectorCredentialsDTO.wrap(connectorCredentialsRepository.fetchConnectorCredentialsByUserIdAndConnectorId(userId, connectorId));
   }
   
   /**
@@ -94,7 +126,8 @@ public class ConnectorCredentialsService extends AbstractRestService {
    *
    */
   private void update(ConnectorCredentials connectorCredentials, ConnectorCredentialsDTO data) {
-    connectorCredentials.setUser(data.getUser());
+    connectorCredentials.setUsername(data.getUsername());
     connectorCredentials.setPassword(data.getPassword());
   }
+  
 }

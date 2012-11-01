@@ -50,14 +50,14 @@
                         <label class="control-label" for="userName" 
                                th:text="#{'User Name*'}">User Name*</label>
                         <div class="controls">
-                          <input id="userName" name="userName" type="text" class="span8" required data-ng-model="editConnectorConfiguration.user"/>
+                          <input id="userName" name="userName" type="text" class="span8" required data-ng-model="editCredentials.username"/>
                         </div> 
                       </div>
                       <div class="control-group">
                         <label class="control-label" for="password" 
                                th:text="#{'Password*'}">Password*</label>
                         <div class="controls" style="margin-bottom: 10px;" >
-                          <input id="password" name="password" type="password" class="span8" required data-ng-model="editConnectorConfiguration.password"/>
+                          <input id="password" name="password" type="password" class="span8" required data-ng-model="editCredentials.password"/>
                         </div> 
                       </div>
                     </fieldset>

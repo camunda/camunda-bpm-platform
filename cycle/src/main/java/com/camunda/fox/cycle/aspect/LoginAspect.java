@@ -1,5 +1,7 @@
 package com.camunda.fox.cycle.aspect;
 
+import javax.inject.Inject;
+
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
@@ -9,10 +11,14 @@ import com.camunda.fox.cycle.connector.Connector;
 import com.camunda.fox.cycle.connector.ConnectorLoginMode;
 import com.camunda.fox.cycle.entity.ConnectorConfiguration;
 import com.camunda.fox.cycle.exception.CycleException;
+import com.camunda.fox.cycle.repository.ConnectorCredentialsRepository;
 
 @Component
 @Aspect
 public class LoginAspect {
+
+  @Inject
+  private ConnectorCredentialsRepository connectorCredentialsRepository;
   
   @Before("@annotation(com.camunda.fox.cycle.connector.Secured)")
   private void aroundSecured(JoinPoint jp) throws Throwable {
@@ -21,8 +27,13 @@ public class LoginAspect {
       if (con.needsLogin()) {
         ConnectorConfiguration config = con.getConfiguration();
         con.init(config);
-        if (config.getLoginMode() != null && config.getLoginMode().equals(ConnectorLoginMode.GLOBAL)) {
+        ConnectorLoginMode loginMode = config.getLoginMode();
+        if (loginMode != null && loginMode.equals(ConnectorLoginMode.GLOBAL)) {
           con.login(config.getGlobalUser(), config.getGlobalPassword());
+          return;
+        }
+        if (loginMode.equals(ConnectorLoginMode.USER)) {
+          
         }
       }
     }else{

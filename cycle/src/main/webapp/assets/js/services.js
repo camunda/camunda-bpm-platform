@@ -58,9 +58,7 @@ angular
     });
   })
   .factory('ConnectorCredentials', function($resource, App) {
-    return $resource(App.uri('secured/resource/connector/credentials/:id'), {id: "@connectorId"}, {
-      'queryDefaults':  {method:'GET', isArray:true, params: { id: 'defaults' }}
-    });
+    return $resource(App.uri('secured/resource/connector/credentials/:id'), {id: "@id"}, {});
   })
   .factory('Commons', function($http, HttpUtils, App) {
     return {
