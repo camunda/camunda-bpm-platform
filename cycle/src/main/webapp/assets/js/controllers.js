@@ -14,7 +14,7 @@ function DefaultController($scope, $http, $location, App, Event, Error, Credenti
   
   // TODO: get from cookie
   $scope.currentUser = null;
-  
+    
   $scope.$watch(Credentials.watchCurrent, function(newValue) {
     $scope.currentUser = newValue;
   });
@@ -230,11 +230,13 @@ function SyncRoundtripController($scope, $http, $q, App, Event) {
       success(function(data) {
         delayed.then(function() {
           $scope.roundtrip.$get({id: $scope.roundtrip.id });
-          $scope.status = SYNC_SUCCESS;
-        });
-      }).error(function (data) {
-        delayed.then(function() {
-          $scope.status = SYNC_FAILED;
+          var status = data.status;
+          if (status == "SYNC_SUCCESS") {
+            $scope.status = SYNC_SUCCESS;
+          } else if (status == "SYNC_FAILED") {
+            $scope.status = SYNC_FAILED;
+            $scope.message = data.message;
+          }
         });
       });
   };
@@ -583,21 +585,19 @@ function DeleteRoundtripController($scope, $routeParams, $http, $location, App) 
   }
   
   $scope.performDeletion = function() {
-  if (!$routeParams.roundtripId) {
-    return;
-  }
-  
-  var roundtrip = findRoundtripById($scope.roundtrips, $routeParams.roundtripId);
-  
-    $http.post(App.uri("secured/resource/roundtrip/" + $routeParams.roundtripId + "/delete"))    
-    .success(function(data) {
-       $scope.toBeDeleted = DEL_SUCCESS;
-       $scope.roundtrips.splice($scope.roundtrips.indexOf(roundtrip), 1);
-       $location.path("/");
-  })
-  .error(function(data) {
-    $scope.toBeDeleted = DEL_FAILED;
-  });
+    if (!$routeParams.roundtripId) {
+      return;
+    }
+
+    var roundtrip = findRoundtripById($scope.roundtrips, $routeParams.roundtripId);
+
+    roundtrip.$delete(function() {
+      $scope.toBeDeleted = DEL_SUCCESS;
+      $scope.roundtrips.splice($scope.roundtrips.indexOf(roundtrip), 1);
+      $location.path("/");
+    }, function(data) {
+      $scope.toBeDeleted = DEL_FAILED;
+    });
   };
 };
 
@@ -607,7 +607,7 @@ function ConnectorSetupController($scope, $http, $location, App, Event, Commons,
   $scope.editConnectorConfigurationDialog = new Dialog();
   $scope.deleteConnectorConfigurationDialog = new Dialog();
   
-  $scope.$emit(Event.navigationChanged, {name:"Connector setup"});
+  $scope.$emit(Event.navigationChanged, {name:"Connectors"});
 
   $scope.connectorConfigurations = ConnectorConfiguration.query();
 
@@ -787,8 +787,8 @@ function UsersController($scope, Event, User) {
 
   $scope.editUserDialog = new Dialog();
   $scope.deleteUserDialog = new Dialog();
-
-  $scope.$emit(Event.navigationChanged, { name: "User management" });
+  
+  $scope.$emit(Event.navigationChanged, { name: "Users" });
 
   $scope.users = User.query();
 
@@ -802,6 +802,10 @@ function UsersController($scope, Event, User) {
   $scope.deleteUser = function(user) {
     $scope.selectedUser = user;
     $scope.deleteUserDialog.open();
+  };
+  
+  $scope.isCurrentUser = function(user) {
+	  return user.name == ($scope.currentUser || {}).name;
   };
 
   $scope.createNew = function() {
@@ -916,5 +920,71 @@ function CreateInitialUserController($scope, $window, User, App) {
   // is the dialog model valid and can be submitted?
   var isValid = $scope.isValid = function() {
     return $scope.editUserForm.$valid;
+  };
+}
+
+// profile.html ////////////////////////////////
+
+function ProfileController($scope, $http, App, Event, Credentials, ConnectorConfiguration) {
+  
+  $scope.connectorCredentialsDialog = new Dialog();
+
+  $scope.$emit(Event.navigationChanged, {name:"Profile"});
+
+  $scope.connectorConfigurations = ConnectorConfiguration.query();
+  
+  $scope.$watch(Credentials.watchCurrent, function(newValue) {
+    $scope.currentUser = newValue;
+    if (newValue) {
+      fetchConnectorCredentials();
+    }
+  });
+  
+  function fetchConnectorCredentials() {
+    $http.get(App.uri("secured/resource/connector/credentials/fetchConnectorCredentials?userId=" + $scope.currentUser.id))
+    .success(function(data) {
+      var credentials = {};
+      angular.forEach(data, function (item) {
+        credentials[item.connectorId] = item;
+      });
+      $scope.connectorCredentialsByConnectorId = credentials;
+    });
+  }
+
+  $scope.editConnectorCredentials = function (connectorConfiguration) {
+    $scope.mode = "EDIT";
+    $scope.selectedConnectorConfiguration = connectorConfiguration;
+    $scope.connectorCredentialsDialog.open();
+  };
+
+  $scope.addConnectorCredentials = function (connectorConfiguration) {
+    $scope.mode = "ADD";
+    $scope.selectedConnectorConfiguration = connectorConfiguration;
+    $scope.connectorCredentialsDialog.open();
+  };
+
+  
+  $scope.showEditAction = function (connectorConfiguration) {
+    if (!$scope.connectorCredentialsByConnectorId) {
+      return false;
+    }
+    if (connectorConfiguration.loginMode == "USER") {
+      var connectorId = connectorConfiguration.connectorId;
+      return !!$scope.connectorCredentialsByConnectorId[connectorId];
+    }
+    return false;
+  };
+  
+}
+
+function EditConnectorCredentials($scope, User, ConnectorCredentials) {
+  $scope.editConnectorConfiguration = $scope.selectedConnectorConfiguration || {};
+  
+  $scope.test = function () {
+    
+  };
+  
+  $scope.save = function () {
+    
   };
 }

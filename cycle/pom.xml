@@ -14,6 +14,7 @@
   <properties>
     <web.resources.override>src/main/runtime/default/webapp</web.resources.override>
     <java.resources.override>src/main/runtime/default/resources</java.resources.override>
+    <properties.override>src/main/runtime/default/config.properties</properties.override>
     <netbeans.hint.deploy.server>gfv3ee6</netbeans.hint.deploy.server>
   </properties>
   
@@ -222,10 +223,12 @@
     <finalName>cycle</finalName>
     <filters>
       <filter>src/test/resources/config/test.properties</filter>
+      <filter>${properties.override}</filter>
     </filters>
     <resources>
       <resource>
         <directory>${java.resources.override}</directory>
+        <filtering>true</filtering>
       </resource>
       <resource>
         <directory>src/main/resources</directory>
@@ -514,7 +517,29 @@
       <properties>
         <web.resources.override>src/main/runtime/jboss/webapp</web.resources.override>
         <java.resources.override>src/main/runtime/jboss/resources</java.resources.override>
+        <properties.override>src/main/runtime/jboss/config/database.properties</properties.override>
       </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-war-plugin</artifactId>
+            <configuration>
+              <archive>
+                <manifest>
+                  <!-- Maven project version number -->
+                  <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                </manifest>
+                <manifestEntries>
+                  <!-- SVN revision number -->
+                  <Implementation-Build>${buildNumber}</Implementation-Build>
+                  <Dependencies>org.apache.httpcomponents</Dependencies>
+                </manifestEntries>
+              </archive>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
     </profile>
     <profile>
       <id>default</id>

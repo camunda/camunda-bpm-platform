@@ -24,6 +24,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import com.camunda.fox.cycle.exception.CycleException;
+import com.camunda.fox.cycle.util.ExceptionUtil;
 import com.camunda.fox.cycle.util.IoUtil;
 import com.camunda.fox.cycle.util.XmlUtil;
 
@@ -150,19 +151,37 @@ public class BpmnProcessModelUtil {
     
     IoUtil.writeStringToFileIfDebug(sourceModel, "source_model", MERGE_SOURCE_TECHNICAL_BPMN20_XML);
     IoUtil.writeStringToFileIfDebug(targetModel, "target_model", MERGE_SOURCE_BUSINESS_BPMN20_XML);
-    
-    String defaultEngineProcessExpression = String.format(ENGINE_PROCESS_DETECTION_EXPR, DEFAULT_ENGINEPOOL_NAME);
-    String engineProcessName = XmlUtil.getXPathResult(defaultEngineProcessExpression + NAME_DETECTION_EXPR, sourceModel);
-    String engineProcessId = XmlUtil.getXPathResult(defaultEngineProcessExpression + ID_DETECTION_EXPR, sourceModel);
-    
-    String engineProcessIdInBusinessModel = XmlUtil.getXPathResult(String.format(ENGINE_PROCESS_DETECTION_EXPR, engineProcessName) + ID_DETECTION_EXPR, targetModel);
+
+    String defaultEngineProcessExpression = null;
+    String engineProcessName = null;
+    String engineProcessId = null;
+    try {
+      defaultEngineProcessExpression = String.format(ENGINE_PROCESS_DETECTION_EXPR, DEFAULT_ENGINEPOOL_NAME);
+      engineProcessName = XmlUtil.getXPathResult(defaultEngineProcessExpression + NAME_DETECTION_EXPR, sourceModel);
+      engineProcessId = XmlUtil.getXPathResult(defaultEngineProcessExpression + ID_DETECTION_EXPR, sourceModel);
+    } catch (Exception e) {
+      throw new CycleException("Failure in source model: " + ExceptionUtil.getRootCause(e).getMessage(), e);
+    }
+      
+    String engineProcessIdInBusinessModel = null;
+    try {
+      engineProcessIdInBusinessModel = XmlUtil.getXPathResult(String.format(ENGINE_PROCESS_DETECTION_EXPR, engineProcessName) + ID_DETECTION_EXPR, targetModel);
+    } catch (Exception e) {
+      throw new CycleException("Failure in target model: " + ExceptionUtil.getRootCause(e).getMessage(), e);
+    }
     
     if (engineProcessIdInBusinessModel == null || (engineProcessIdInBusinessModel != null && engineProcessIdInBusinessModel.isEmpty())){
       throw new CycleException("Could not detect an engine pool. Please make sure that the 'isExecutable' attribute is set, or that the engine pool name matches in technical and business model.");
     }
-    
-    final String enginePoolDetectionExpression = String.format(ENGINE_POOL_DETECTION_EXPR, engineProcessIdInBusinessModel);
-    String enginePoolIdInBusinessModel = XmlUtil.getXPathResult(enginePoolDetectionExpression, targetModel);
+    String enginePoolDetectionExpression = null;
+    String enginePoolIdInBusinessModel = null;
+    try {
+      enginePoolDetectionExpression = String.format(ENGINE_POOL_DETECTION_EXPR, engineProcessIdInBusinessModel);
+      enginePoolIdInBusinessModel = XmlUtil.getXPathResult(enginePoolDetectionExpression, targetModel);
+      
+    } catch (Exception e) {
+      throw new CycleException("Failure in target model: " + ExceptionUtil.getRootCause(e), e);
+    }
     
     // if id changed, replace in business model
     if (engineProcessName != null && !engineProcessName.isEmpty() && 
@@ -204,7 +223,7 @@ public class BpmnProcessModelUtil {
               .toString(UTF_8);
       technicalModel = this.getDocumentFromXmlString(techXml);
     } catch (Exception e) {
-      throw new CycleException("Error while parsing the technical model, which is to be imported.", e);
+      throw new CycleException("Error while parsing the source model, which is to be imported.", e);
     }
     
     NodeList processes = businessModel.getElementsByTagNameNS(NAMESPACE_URI_BPMN_20, PROCESS);

@@ -8,11 +8,11 @@
           http://www.springframework.org/schema/beans 
           http://www.springframework.org/schema/beans/spring-beans.xsd
           http://www.springframework.org/schema/context 
-          http://www.springframework.org/schema/context/spring-context.xsd
-          http://www.springframework.org/schema/aop
-          http://www.springframework.org/schema/aop/spring-aop.xsd">
+          http://www.springframework.org/schema/context/spring-context.xsd">
 
-  <bean class="com.camunda.fox.cycle.configuration.CycleConfiguration">
-    <property name="useUserManagement" value="false"></property>
+  
+  <bean id="cycleConfiguration" class="com.camunda.fox.cycle.configuration.CycleConfiguration">
+    <property name="useJaas" value="false"></property>
   </bean>
+  
 </beans>

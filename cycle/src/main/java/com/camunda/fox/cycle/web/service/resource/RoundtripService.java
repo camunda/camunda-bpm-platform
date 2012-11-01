@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 import javax.inject.Inject;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -31,6 +32,8 @@ import com.camunda.fox.cycle.util.IoUtil;
 import com.camunda.fox.cycle.web.dto.BpmnDiagramDTO;
 import com.camunda.fox.cycle.web.dto.ConnectorNodeDTO;
 import com.camunda.fox.cycle.web.dto.RoundtripDTO;
+import com.camunda.fox.cycle.web.dto.SynchronizationResultDTO;
+import com.camunda.fox.cycle.web.dto.SynchronizationResultDTO.SynchronizationStatus;
 import com.camunda.fox.cycle.web.service.AbstractRestService;
 
 /**
@@ -81,7 +84,7 @@ public class RoundtripService extends AbstractRestService {
 
     Roundtrip roundtrip = roundtripRepository.findById(id);
     if (roundtrip == null) {
-      throw new IllegalArgumentException("Not found");
+      throw notFound("roundtrip not found");
     }
 
     update(roundtrip, data);
@@ -95,13 +98,13 @@ public class RoundtripService extends AbstractRestService {
     return RoundtripDTO.wrap(roundtripRepository.saveAndFlush(roundtrip));
   }
   
-  @POST
-  @Path("{id}/delete")
+  @DELETE
+  @Path("{id}")
   @Transactional
   public void delete(@PathParam("id") long id) {
     Roundtrip roundtrip = roundtripRepository.findById(id);
     if (roundtrip == null) {
-      throw new IllegalArgumentException("Not found");
+      throw notFound("roundtrip not found");
     }
     
     roundtripRepository.delete(roundtrip);
@@ -141,7 +144,7 @@ public class RoundtripService extends AbstractRestService {
 
     Roundtrip roundtrip = roundtripRepository.findById(id);
     if (roundtrip == null) {
-      throw new IllegalArgumentException("Not found");
+      throw notFound("roundtrip not found");
     }
 
     if (data.getLeftHandSide() != null) {
@@ -176,20 +179,23 @@ public class RoundtripService extends AbstractRestService {
   @POST
   @Path("{id}/sync")
   @Transactional
-  public RoundtripDTO doSynchronize(@QueryParam("syncMode") SyncMode syncMode, @PathParam("id") long roundtripId) {
-    Roundtrip roundtrip = roundtripRepository.findById(roundtripId);
-
-    if (roundtrip == null) {
-      throw new IllegalArgumentException("Roundtrip not found");
+  public SynchronizationResultDTO doSynchronize(@QueryParam("syncMode") SyncMode syncMode, @PathParam("id") long roundtripId) {
+    try {
+      Roundtrip roundtrip = roundtripRepository.findById(roundtripId);
+      
+      if (roundtrip == null) {
+        throw notFound("roundtrip not found");
+      }
+      
+      synchronizeModels(roundtrip.getLeftHandSide(), roundtrip.getRightHandSide(), syncMode);
+      
+      roundtrip.setLastSync(new Date());
+      roundtrip.setLastSyncMode(syncMode);
+      
+      return new SynchronizationResultDTO(SynchronizationStatus.SYNC_SUCCESS);
+    } catch (Exception e) {
+      return new SynchronizationResultDTO(SynchronizationStatus.SYNC_FAILED, e.getMessage());
     }
-
-    synchronizeModels(roundtrip.getLeftHandSide(), roundtrip.getRightHandSide(), syncMode);
-
-    roundtrip.setLastSync(new Date());
-    roundtrip.setLastSyncMode(syncMode);
-
-    RoundtripDTO roundtripDTO = new RoundtripDTO(roundtrip, roundtrip.getLeftHandSide(), roundtrip.getRightHandSide());
-    return roundtripDTO;
   }
   
   @POST
@@ -318,7 +324,10 @@ public class RoundtripService extends AbstractRestService {
       
       IoUtil.closeSilently(resultStream);
     } catch (Exception e) {
-      throw new CycleException("Synchronization failed", e);
+      if (e instanceof CycleException) {
+        throw (CycleException) e;
+      }
+      throw new CycleException("Synchronization failed: " + e.getMessage(), e);
     }
   }
 }

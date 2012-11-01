@@ -1,8 +1,11 @@
 package com.camunda.fox.cycle.configuration;
 
+import javax.annotation.PostConstruct;
 import javax.inject.Inject;
+
 import org.springframework.stereotype.Component;
 
+import com.camunda.fox.cycle.entity.User;
 import com.camunda.fox.cycle.repository.UserRepository;
 
 /**
@@ -13,17 +16,31 @@ import com.camunda.fox.cycle.repository.UserRepository;
 @Component
 public class CycleConfiguration {
 
-  private boolean useUserManagement = false;
-
   @Inject
   private UserRepository userRepository;
   
-  public boolean isUseUserManagement() {
-    return useUserManagement;
+  private boolean useJaas = false;
+
+  
+  public boolean isUseJaas() {
+    return useJaas;
   }
 
-  public void setUseUserManagement(boolean useUserManagement) {
-    this.useUserManagement = useUserManagement;
+  public void setUseJaas(boolean useJaas) {
+    this.useJaas = useJaas;
+  }
+  
+  @PostConstruct
+  public void initInitialUser() {
+    if (userRepository.findAll().isEmpty()) {
+      User newUser = new User();
+      newUser.setName("admin");
+      newUser.setPassword("admin");
+      newUser.setEmail("admin@camunda.com");
+      newUser.setAdmin(true);
+      
+      userRepository.saveAndFlush(newUser);
+    }
   }
 
   /**
@@ -31,6 +48,6 @@ public class CycleConfiguration {
    * @return 
    */
   public boolean isNotConfigured() {
-    return userRepository.countAll() == 0 && useUserManagement;
+    return userRepository.countAll() == 0 && !useJaas;
   }
 }

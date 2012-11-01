@@ -52,7 +52,7 @@ public class XmlUtil {
 		try {
 			return getXPathResult(expression, new InputSource(new ByteArrayInputStream(sourceXml.getBytes("UTF-8"))));
 		} catch (UnsupportedEncodingException e) {
-			throw new RuntimeException(e);
+			throw new CycleException(e);
 		}
 	}
 
@@ -65,7 +65,7 @@ public class XmlUtil {
 				return xPathExpression.evaluate(item);
 			}
 		} catch (XPathExpressionException e) {
-			throw new RuntimeException(e);
+			throw new CycleException(e);
 		}
 	}
 	
@@ -116,9 +116,9 @@ public class XmlUtil {
       XPathExpression xPathExpression = xPath.compile(expression);
       return xPathExpression;
     } catch (XPathExpressionException e) {
-      throw new RuntimeException("Error during evaluation of XPath expression '" + expression + "'.", e);
+      throw new CycleException("Error during evaluation of XPath expression '" + expression + "'.", e);
     } catch (XPathFactoryConfigurationException e) {
-      throw new RuntimeException(e);
+      throw new CycleException(e);
     }
   }
 }
