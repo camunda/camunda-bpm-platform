@@ -1,14 +1,14 @@
 package com.camunda.fox.cycle.web.dto;
 
 
-public class ExceptionDAO {
+public class ExceptionDTO {
 
   private String message;
   private String exceptionType;
 
-  public ExceptionDAO() {} 
+  public ExceptionDTO() {} 
   
-  public ExceptionDAO(Exception e) {
+  public ExceptionDTO(Exception e) {
     this.message = e.getMessage();
     this.exceptionType = e.getClass().getName();
   }

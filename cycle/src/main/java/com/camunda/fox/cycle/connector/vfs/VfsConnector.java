@@ -15,6 +15,7 @@ import java.util.logging.Logger;
 
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.vfs2.FileContent;
+import org.apache.commons.vfs2.FileNotFolderException;
 import org.apache.commons.vfs2.FileObject;
 import org.apache.commons.vfs2.FileSystemException;
 import org.apache.commons.vfs2.FileSystemManager;
@@ -47,7 +48,7 @@ public class VfsConnector extends Connector {
     
     try {
       FileObject fileObject = getFileObject(node);
-      
+
       if (fileObject.getType() == FileType.FILE) {
         return Collections.<ConnectorNode>emptyList();
       }
@@ -55,20 +56,22 @@ public class VfsConnector extends Connector {
       FileObject[] children = fileObject.getChildren();
       
       for (FileObject file: children) {
-        String baseName = file.getName().getBaseName();
-        ConnectorNode child = new ConnectorNode(node.getId() + "/" + baseName, baseName, getId());
-        child.setType(extractFileType(file));
-
-        /**
-         * it's not possible to get last modified date from symlinks
-         */
-        try {
-          child.setLastModified(new Date(file.getContent().getLastModifiedTime()));
-        } catch (Exception exception) {
-          logger.fine("Could not set last modified time");
+        if (canAddFile(file)) {
+          String baseName = file.getName().getBaseName();
+          ConnectorNode child = new ConnectorNode(node.getId() + "/" + baseName, baseName, getId());
+          child.setType(extractFileType(file));
+          
+          /**
+           * it's not possible to get last modified date from symlinks
+           */
+          try {
+            child.setLastModified(new Date(file.getContent().getLastModifiedTime()));
+          } catch (Exception exception) {
+            logger.fine("Could not set last modified time");
+          }
+          
+          nodes.add(child);
         }
-
-        nodes.add(child);
       }
 
       // Sort
@@ -77,6 +80,29 @@ public class VfsConnector extends Connector {
     } catch (FileSystemException e) {
       throw new CycleException(e);
     }
+  }
+  
+  /**
+   * If <code>file.getType() == FILE</code>, then the file can be added to list of
+   * childs.<br>
+   * If <code>file.getType() == FOLDER</code>, then it will check whether the children
+   * of the assigned <code>file</code> can be loaded, when not <code>false</code> will
+   * be returned otherwise <code>true</code>.
+   */
+  private boolean canAddFile(FileObject file) throws FileSystemException {
+    FileType fileType = file.getType();
+    if (fileType == FileType.FILE) {
+      return true;
+    }
+    if (fileType == FileType.FOLDER) {
+      try {
+        file.getChildren();
+        return true;
+      } catch (FileNotFolderException e) {
+        return false;
+      }
+    }
+    return false;
   }
 
   @Secured
