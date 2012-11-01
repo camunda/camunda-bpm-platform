@@ -19,14 +19,14 @@ public class CycleConfiguration {
   @Inject
   private UserRepository userRepository;
   
-  private boolean useUserManagement = false;
+  private boolean useJaas = false;
 
-  public boolean isUseUserManagement() {
-    return useUserManagement;
+  public boolean isUseJaas() {
+    return useJaas;
   }
 
-  public void setUseUserManagement(boolean useUserManagement) {
-    this.useUserManagement = useUserManagement;
+  public void setUseJaas(boolean useJaas) {
+    this.useJaas = useJaas;
   }
   
   @PostConstruct
