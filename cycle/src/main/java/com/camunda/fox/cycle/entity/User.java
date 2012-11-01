@@ -2,7 +2,9 @@ package com.camunda.fox.cycle.entity;
 
 import java.util.List;
 
+import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
@@ -21,7 +23,7 @@ public class User extends AbstractEntity {
   @OneToMany
   private List<ConnectorCredentials> connectorCredentials;
 
-  private boolean isAdmin;
+  private boolean admin;
   
   public String getName() {
     return name;
@@ -47,6 +49,14 @@ public class User extends AbstractEntity {
     this.password = password;
   }
 
+  public boolean isAdmin() {
+    return admin;
+  }
+
+  public void setAdmin(boolean admin) {
+    this.admin = admin;
+  }
+
   public List<ConnectorCredentials> getConnectorCredentials() {
     return connectorCredentials;
   }
@@ -54,13 +64,4 @@ public class User extends AbstractEntity {
   public void setConnectorCredentials(List<ConnectorCredentials> connectorCredentials) {
     this.connectorCredentials = connectorCredentials;
   }
-  
-  public boolean isAdmin() {
-    return isAdmin;
-  }
-  
-  public void setAdmin(boolean isAdmin) {
-    this.isAdmin = isAdmin;
-  }
-  
 }

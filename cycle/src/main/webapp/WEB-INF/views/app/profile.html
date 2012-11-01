@@ -28,7 +28,7 @@
                   <td>{{connectorConfiguration.connectorName}}</td>
                   <td>{{connectorConfiguration.loginMode}}</td>
                   <td>
-                    <a data-ng-show="!showEditAction(connectorConfiguration)" data-ng-click="editConnectorCredentials(connectorConfiguration)" th:text="#{add credentials}">add credentials</a>
+                    <a data-ng-show="!showEditAction(connectorConfiguration) && connectorConfiguration.loginMode == 'USER'" data-ng-click="addConnectorCredentials(connectorConfiguration)" th:text="#{add credentials}">add credentials</a>
                     <a data-ng-show="showEditAction(connectorConfiguration)" data-ng-click="editConnectorCredentials(connectorConfiguration)" th:text="#{edit credentials}">edit credentials</a>
                   </td>
                 </tr>
@@ -44,8 +44,29 @@
                   <h3 data-ng-show="mode == 'EDIT'" th:text="#{'Edit connector credentials'}"></h3>
                 </div>
                 <div class="modal-body">
+                  <form class="form-horizontal" novalidate data-ng-submit="save()" name="editConnectorCredentialsForm">
+                    <fieldset>
+                      <div class="control-group">
+                        <label class="control-label" for="userName" 
+                               th:text="#{'User Name*'}">User Name*</label>
+                        <div class="controls">
+                          <input id="userName" name="userName" type="text" class="span8" required data-ng-model="editConnectorConfiguration.user"/>
+                        </div> 
+                      </div>
+                      <div class="control-group">
+                        <label class="control-label" for="password" 
+                               th:text="#{'Password*'}">Password*</label>
+                        <div class="controls" style="margin-bottom: 10px;" >
+                          <input id="password" name="password" type="password" class="span8" required data-ng-model="editConnectorConfiguration.password"/>
+                        </div> 
+                      </div>
+                    </fieldset>
+                  </form>
                 </div>
                 <div class="modal-footer">
+                  <button class="btn" data-ng-click="connectorCredentialsDialog.close()" th:text="#{Cancel}">Cancel</button>
+                  <button class="btn" data-ng-click="test()" data-ng-disabled="!isValid()" th:text="#{Test}">Test</button>
+                  <button class="btn btn-primary" data-ng-click="save()" data-ng-disabled="!isValid()" th:text="#{Save}">Save</button>
                 </div>
               </div>
             </modal-dialog>

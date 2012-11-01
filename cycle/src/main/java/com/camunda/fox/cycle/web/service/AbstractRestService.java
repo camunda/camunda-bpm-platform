@@ -24,9 +24,26 @@ public class AbstractRestService {
     return Response.seeOther(uriInfo.getBaseUriBuilder().path(uri).build()).build();
   }
   
+  /**
+   * Issue a not found response with the given reason
+   * 
+   * @param message
+   * @return 
+   */
   protected WebApplicationException notFound(String message) {
     Response response = Response.status(Response.Status.NOT_FOUND).entity(message).build();
     
+    return new WebApplicationException(response);
+  }
+
+  /**
+   * Issue a not found response with the given reason
+   * 
+   * @param message
+   * @return 
+   */
+  protected WebApplicationException notAllowed(String message) {
+    Response response = Response.status(Response.Status.FORBIDDEN).entity(message).build();
     return new WebApplicationException(response);
   }
 }

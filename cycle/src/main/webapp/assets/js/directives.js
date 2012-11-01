@@ -170,17 +170,20 @@ angular
 .directive("available", function(Debouncer) {
   return {
     restrict: 'A',
-    scope: {
-      available: "&"
-    }, 
     require: 'ngModel',
     link: function (scope, element, attrs, model) {
-      var available = scope.available;
+      var checkAvailable = scope[attrs.available];
+      
+      if (!checkAvailable) {
+        throw new Error("No availability check #" + attrs.available);
+      }
       
       var validateDeferred = Debouncer.debounce(function() {
-        available({ value: model.$modelValue}).then(function(data) {
+        var promise = checkAvailable(model.$modelValue);
+        
+        promise.then(function(available) {
           model.$setValidity("checked", true);
-          model.$setValidity("available", !(data == "true"));
+          model.$setValidity("available", available);
         });
       }, 500);
       
@@ -188,22 +191,51 @@ angular
         if (newValue) {
           model.$setValidity("checked", false);
           validateDeferred();
-        } else {
-          model.$setValidity("available", true);
         }
       });
     }
   };
 })
+.directive("matches", function() {
+  return {
+    restrict: 'A',
+    require: 'ngModel',
+    link: function (scope, element, attrs, model) {
+      
+      var match = attrs["matches"];
+
+      function validateMatch(a, b) {
+        model.$setValidity("matches", a == b);
+      }
+
+      scope.$watch(function() { return model.$modelValue; }, function(newValue) {
+        validateMatch(newValue, scope.$eval(match));
+      });
+
+      scope.$watch(match, function(newValue) {
+        validateMatch(model.$modelValue, newValue);
+      });
+    }
+  };
+})
+/**
+ * Email validation via email attribute
+ */
 .directive("email", function() {
   return {
     restrict: 'A',
     require: 'ngModel',
     link: function (scope, element, attrs, model) {
-      scope.$watch(function() { return model.$modelValue; }, function(newValue) {
-        if (newValue) {
-          var EMAIL_REGEX = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-          model.$setValidity("email", EMAIL_REGEX.test(newValue));
+      
+      var EMAIL_REGEX = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+      
+      model.$parsers.unshift(function(viewValue) {
+        if (EMAIL_REGEX.test(viewValue)) {
+          model.$setValidity('email', true);
+          return viewValue;
+        } else {
+          model.$setValidity('email', false);
+          return null;
         }
       });
     }
