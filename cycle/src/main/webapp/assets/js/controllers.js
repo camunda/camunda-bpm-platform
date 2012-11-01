@@ -891,3 +891,30 @@ function DeleteUserController($scope) {
     });
   };
 }
+
+// create-initial-user.html ///////////////////////////////////////
+
+function CreateInitialUserController($scope, $window, User, App) {
+
+  $scope.editUser = {};
+
+  $scope.save = function() {
+    if (!isValid()) {
+      return;
+    }
+
+    $scope.saveUser($scope.editUser, function() {
+      $window.location.href = App.uri("secured/view/index");
+    });
+  };
+
+  $scope.saveUser = function(userData, callbackFn) {
+    var user = new User(userData);
+    user.$save(callbackFn);
+  };
+  
+  // is the dialog model valid and can be submitted?
+  var isValid = $scope.isValid = function() {
+    return $scope.editUserForm.$valid;
+  };
+}

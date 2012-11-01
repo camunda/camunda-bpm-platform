@@ -47,9 +47,11 @@ public class AbstractRepositoryTest {
     roundtripRepository.saveAndFlush(r2);
     roundtripRepository.saveAndFlush(r3);
     
+    long count = roundtripRepository.countAll();
     int deleted = roundtripRepository.deleteAll();
     
     // then
+    assertThat(count).isEqualTo(3);
     assertThat(deleted).isEqualTo(3);
     assertThat(roundtripRepository.findAll()).isEmpty();
   }
