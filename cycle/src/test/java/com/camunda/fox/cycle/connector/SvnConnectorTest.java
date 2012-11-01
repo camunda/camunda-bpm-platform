@@ -36,6 +36,7 @@ public class SvnConnectorTest extends AbstractConnectorTestBase {
 
   @AfterClass
   public static void afterClass() throws Exception {
+    connector.dispose();
     RepositoryUtil.clean(SVN_DIRECTORY);
   }
 

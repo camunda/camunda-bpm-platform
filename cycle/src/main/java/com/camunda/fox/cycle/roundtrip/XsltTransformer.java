@@ -13,6 +13,9 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
+import com.camunda.fox.cycle.exception.CycleException;
+import com.camunda.fox.cycle.util.ExceptionUtil;
+
 public class XsltTransformer {
 
   private static final String NET_SF_SAXON_TRANSFORMER_FACTORY_IMPL = "net.sf.saxon.TransformerFactoryImpl";
@@ -89,10 +92,11 @@ public class XsltTransformer {
       t.transform(new StreamSource(bpmn), new StreamResult(resultStream));
       return resultStream;
     } catch (Exception e) {
-      throw new RuntimeException("Could not extract pool from BPMN", e);
+      Throwable t = ExceptionUtil.getRootCause(e);
+      throw new CycleException("Could not extract pool from BPMN: " + t.getMessage(), e);
     }
   }
-
+  
   private Transformer createTransformer(String xsl) throws TransformerConfigurationException {
     
     // Input stream for the transformation stylesheet

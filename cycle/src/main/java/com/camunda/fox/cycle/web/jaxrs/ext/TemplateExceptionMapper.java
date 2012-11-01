@@ -3,17 +3,11 @@ package com.camunda.fox.cycle.web.jaxrs.ext;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.HttpHeaders;
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
 import org.thymeleaf.exceptions.TemplateInputException;
-
-import com.camunda.fox.cycle.web.dto.ExceptionDAO;
 
 /**
  * Maps thymeleaf generated exceptions to their respective http error codes

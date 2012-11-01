@@ -1,6 +1,6 @@
 package com.camunda.fox.cycle.connector;
 
-import static org.fest.assertions.api.Assertions.*;
+import static org.fest.assertions.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
 import java.io.ByteArrayInputStream;
@@ -8,7 +8,6 @@ import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
 
-import org.junit.Assert;
 import org.junit.Test;
 
 import com.camunda.fox.cycle.util.IoUtil;
@@ -249,8 +248,10 @@ public abstract class AbstractConnectorTestBase {
   }
 
   private void assertCorrectLastModified(Date comparisonDate, Date lastModified) {
+
     // see if updated was set
-    assertThat(lastModified).isAfterOrEqualsTo(comparisonDate);
-    assertThat(lastModified).isBeforeOrEqualsTo(new Date());
+    // compare by time to mitigate problems with time zone comparison
+    assertThat(lastModified.getTime()).isGreaterThanOrEqualTo(comparisonDate.getTime());
+    assertThat(lastModified.getTime()).isLessThanOrEqualTo(new Date().getTime());
   }
 }
