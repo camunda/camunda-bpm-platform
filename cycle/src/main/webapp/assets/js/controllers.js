@@ -607,7 +607,7 @@ function ConnectorSetupController($scope, $http, $location, App, Event, Commons,
   $scope.editConnectorConfigurationDialog = new Dialog();
   $scope.deleteConnectorConfigurationDialog = new Dialog();
   
-  $scope.$emit(Event.navigationChanged, {name:"Connector setup"});
+  $scope.$emit(Event.navigationChanged, {name:"Connectors"});
 
   $scope.connectorConfigurations = ConnectorConfiguration.query();
 
@@ -788,7 +788,7 @@ function UsersController($scope, Event, User) {
   $scope.editUserDialog = new Dialog();
   $scope.deleteUserDialog = new Dialog();
 
-  $scope.$emit(Event.navigationChanged, { name: "User management" });
+  $scope.$emit(Event.navigationChanged, { name: "Users" });
 
   $scope.users = User.query();
 
