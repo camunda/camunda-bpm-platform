@@ -52,6 +52,7 @@ public class UserServiceTest {
     assertThat(databaseUser).isNotNull();
 
     assertThat(databaseUser.getName()).isEqualTo(user.getName());
+    assertThat(databaseUser.isAdmin()).isFalse();
     assertThat(databaseUser.getEmail()).isEqualTo(user.getEmail());
     assertThat(databaseUser.getPassword()).isEqualTo(user.getPassword());
   }
@@ -96,6 +97,7 @@ public class UserServiceTest {
     UserDTO user = createFlushedUserDTO();
     User originalDatabaseUser = userRepository.findById(user.getId());
     
+    user.setAdmin(true);
     user.setName("Achim");
     user.setEmail("my@mail.com");
     
@@ -108,6 +110,7 @@ public class UserServiceTest {
     
     assertThat(afterUpdateDatabaseUser.getName()).isEqualTo(user.getName());
     assertThat(afterUpdateDatabaseUser.getEmail()).isEqualTo(user.getEmail());
+    assertThat(afterUpdateDatabaseUser.isAdmin()).isTrue();
     
     assertThat(afterUpdateDatabaseUser.getPassword()).isEqualTo(originalDatabaseUser.getPassword());
   }

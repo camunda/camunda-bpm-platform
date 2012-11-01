@@ -15,6 +15,8 @@ public class UserDTO {
   private String email;
   
   private String password;
+  
+  private boolean admin;
 
   public UserDTO() { }
   
@@ -22,6 +24,8 @@ public class UserDTO {
     this.id = user.getId();
     this.name = user.getName();
     this.email = user.getEmail();
+    
+    this.admin = user.isAdmin();
   }
 
   public Long getId() {
@@ -54,6 +58,14 @@ public class UserDTO {
 
   public void setPassword(String password) {
     this.password = password;
+  }
+
+  public boolean isAdmin() {
+    return admin;
+  }
+
+  public void setAdmin(boolean admin) {
+    this.admin = admin;
   }
 
   // static helpers /////////////////////////////////////////

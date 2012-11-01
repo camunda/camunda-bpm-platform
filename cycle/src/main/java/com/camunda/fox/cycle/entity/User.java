@@ -23,8 +23,7 @@ public class User extends AbstractEntity {
   @OneToMany
   private List<ConnectorCredentials> connectorCredentials;
 
-  @ElementCollection(fetch=FetchType.EAGER)
-  private List<String> roles;
+  private boolean admin;
   
   public String getName() {
     return name;
@@ -50,13 +49,12 @@ public class User extends AbstractEntity {
     this.password = password;
   }
 
-  
-  public List<String> getRoles() {
-    return roles;
+  public boolean isAdmin() {
+    return admin;
   }
 
-  public void setRoles(List<String> roles) {
-    this.roles = roles;
+  public void setAdmin(boolean admin) {
+    this.admin = admin;
   }
 
   public List<ConnectorCredentials> getConnectorCredentials() {

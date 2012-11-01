@@ -57,9 +57,16 @@
                       <div class="control-group" ng-class="errorClass(editUserForm.email)">
                         <label class="control-label" for="email" 
                                th:text="#{'Email'}">Email</label>
-                        <div class="controls" style="margin-bottom: 10px;" >
+                        <div class="controls">
                           <input id="email" name="email" type="text" class="span8" required email data-ng-model="editUser.email"/>
                           <p class="help-block" ng-show="editUserForm.email.$error.email">Not a valid email address</p>
+                        </div>
+                      </div>
+                      <div class="control-group">
+                        <div class="controls">
+                          <label class="checkbox">
+                            <input type="checkbox" name="admin" ng-model="editUser.admin" /> Is admin?
+                          </label>
                         </div>
                       </div>
                       <div ngm-if="mode == 'ADD' || changePassword">

@@ -137,6 +137,8 @@ public class UserService extends AbstractRestService {
     user.setName(data.getName());
     user.setEmail(data.getEmail());
     
+    user.setAdmin(data.isAdmin());
+    
     // TODO: encrypt password
     if (data.getPassword() != null) {
       user.setPassword(data.getPassword());
