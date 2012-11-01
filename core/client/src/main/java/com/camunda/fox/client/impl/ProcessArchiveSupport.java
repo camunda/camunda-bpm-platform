@@ -173,12 +173,17 @@ public class ProcessArchiveSupport {
     String appName = (String) sessionContext.lookup("java:app/AppName");
     String moduleName = (String) sessionContext.lookup("java:module/ModuleName");
     
+    String detectedName = null;
     if(moduleName != null && !moduleName.equals(appName)) {
       // make sure that if an EAR carries multiple PAs, they are correctly identified by appName + moduleName
-      return appName + "/" + moduleName;
+      detectedName = appName + "/" + moduleName;
     } else {
-      return appName;
+      detectedName = appName;
     }
+    
+    log.info("No name specified for process archive in '"+PROCESSES_XML_FILE_LOCATION+"'. Using Java EE application name '"+detectedName+"'.");
+    
+    return detectedName;
   }
     
   public Map<ProcessArchive, ProcessEngine> getInstalledProcessArchives() {

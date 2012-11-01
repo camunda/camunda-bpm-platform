@@ -11,4 +11,10 @@
       <process-engine>tenant2</process-engine>
     </configuration>        
   </process-archive>   
+  <process-archive>
+    <name>ProcessArchive3</name>
+    <configuration>
+      <process-engine>tenant3</process-engine>
+    </configuration>        
+  </process-archive>   
 </process-archives>
