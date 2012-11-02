@@ -28,8 +28,8 @@
                   <td>{{connectorConfiguration.connectorName}}</td>
                   <td>{{connectorConfiguration.loginMode}}</td>
                   <td>
-                    <a data-ng-show="!showEditAction(connectorConfiguration) && connectorConfiguration.loginMode == 'USER'" data-ng-click="addConnectorCredentials(connectorConfiguration)" th:text="#{add credentials}">add credentials</a>
-                    <a data-ng-show="showEditAction(connectorConfiguration)" data-ng-click="editConnectorCredentials(connectorConfiguration)" th:text="#{edit credentials}">edit credentials</a>
+                    <a data-ng-show="connectorConfiguration.loginMode == 'USER' && !showEditAction(connectorConfiguration)" data-ng-click="addConnectorCredentials(connectorConfiguration)" th:text="#{add credentials}">add credentials</a>
+                    <a data-ng-show="connectorConfiguration.loginMode == 'USER' && showEditAction(connectorConfiguration)" data-ng-click="editConnectorCredentials(connectorConfiguration)" th:text="#{edit credentials}">edit credentials</a>
                   </td>
                 </tr>
               </tbody>

@@ -21,17 +21,17 @@ public class ConnectorCredentialsRepository extends AbstractRepository<Connector
             .getSingleResult();
   }
 
-  public ConnectorCredentials fetchConnectorCredentialsByUserIdAndConnectorConfigId(Long userId, Long connectorConfigId) {
-    return em.createQuery("SELECT c FROM ConnectorCredentials c JOIN FETCH c.user JOIN FETCH c.connectorConfiguration WHERE c.user.id = :userId AND c.connectorConfiguration.id = :connectorConfigId", ConnectorCredentials.class)
+  public ConnectorCredentials fetchConnectorCredentialsByUserIdAndConnectorId(Long userId, Long connectorId) {
+    return em.createQuery("SELECT c FROM ConnectorCredentials c JOIN FETCH c.user JOIN FETCH c.connectorConfiguration WHERE c.user.id = :userId AND c.connectorConfiguration.id = :connectorId", ConnectorCredentials.class)
             .setParameter("userId", userId)
-            .setParameter("connectorConfigId", connectorConfigId)
+            .setParameter("connectorId", connectorId)
             .getSingleResult();
   }
   
-  public ConnectorCredentials fetchConnectorCredentialsByUsernameAndConnectorConfigId(String username, Long connectorConfigId) {
-    return em.createQuery("SELECT c FROM ConnectorCredentials c JOIN FETCH c.user JOIN FETCH c.connectorConfiguration WHERE c.user.name = :username AND c.connectorConfiguration.id = :connectorConfigId", ConnectorCredentials.class)
+  public ConnectorCredentials fetchConnectorCredentialsByUsernameAndConnectorId(String username, Long connectorId) {
+    return em.createQuery("SELECT c FROM ConnectorCredentials c JOIN FETCH c.user JOIN FETCH c.connectorConfiguration WHERE c.user.name = :username AND c.connectorConfiguration.id = :connectorId", ConnectorCredentials.class)
             .setParameter("username", username)
-            .setParameter("connectorConfigId", connectorConfigId)
+            .setParameter("connectorId", connectorId)
             .getSingleResult();
   }
 

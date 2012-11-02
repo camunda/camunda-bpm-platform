@@ -43,7 +43,7 @@ public class LoginAspect {
           Long connectorConfigId = con.getConfiguration().getId();
           ConnectorCredentials connectorCredentials = null;
           try {
-            connectorCredentials = connectorCredentialsRepository.fetchConnectorCredentialsByUsernameAndConnectorConfigId(username, connectorConfigId);
+            connectorCredentials = connectorCredentialsRepository.fetchConnectorCredentialsByUsernameAndConnectorId(username, connectorConfigId);
           } catch (Exception e) {
             throw new CycleMissingCredentialsException("The user credentials for connector " + con.getConfiguration().getName() + " are not set.", e);
           }

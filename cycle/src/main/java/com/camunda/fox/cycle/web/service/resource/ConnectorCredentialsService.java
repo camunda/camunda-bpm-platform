@@ -22,7 +22,6 @@ import com.camunda.fox.cycle.entity.User;
 import com.camunda.fox.cycle.repository.ConnectorConfigurationRepository;
 import com.camunda.fox.cycle.repository.ConnectorCredentialsRepository;
 import com.camunda.fox.cycle.repository.UserRepository;
-import com.camunda.fox.cycle.web.dto.ConnectorConfigurationDTO;
 import com.camunda.fox.cycle.web.dto.ConnectorCredentialsDTO;
 import com.camunda.fox.cycle.web.dto.ConnectorStatusDTO;
 import com.camunda.fox.cycle.web.service.AbstractRestService;
@@ -139,27 +138,6 @@ public class ConnectorCredentialsService extends AbstractRestService {
   private void update(ConnectorCredentials connectorCredentials, ConnectorCredentialsDTO data) {
     connectorCredentials.setUsername(data.getUsername());
     connectorCredentials.setPassword(data.getPassword());
-  }
-  
-  private void update(ConnectorConfiguration config, ConnectorConfigurationDTO data) {
-    config.setGlobalPassword(data.getPassword());
-    config.setGlobalUser(data.getUser());
-    config.setLoginMode(data.getLoginMode());
-    config.setProperties(data.getProperties());
-    config.setName(data.getName());
-  }
-
-  private ConnectorConfiguration createConfiguration(ConnectorConfigurationDTO data) {
-    ConnectorConfiguration config = new ConnectorConfiguration();
-
-    // do not make these things configurable on update
-    config.setConnectorClass(data.getConnectorClass());
-    config.setConnectorName(data.getConnectorName());
-
-    // update the rest
-    update(config, data);
-
-    return config;
   }
   
 }

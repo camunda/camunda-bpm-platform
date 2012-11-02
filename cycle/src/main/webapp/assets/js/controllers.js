@@ -942,11 +942,8 @@ function ProfileController($scope, $http, App, Event, Credentials, ConnectorConf
     if (!$scope.connectorCredentialsByConnectorId) {
       return false;
     }
-    if (connectorConfiguration.loginMode == "USER") {
-      var connectorId = connectorConfiguration.connectorId;
-      return !!$scope.connectorCredentialsByConnectorId[connectorId];
-    }
-    return false;
+    var connectorId = connectorConfiguration.connectorId;
+    return !!$scope.connectorCredentialsByConnectorId[connectorId];
   };
   
   $scope.saveConnectorCredentials = function(connectorCredentialsData, callbackFn) {
