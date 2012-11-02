@@ -5,17 +5,34 @@ import java.util.List;
 import org.springframework.stereotype.Repository;
 
 import com.camunda.fox.cycle.entity.ConnectorCredentials;
-import com.camunda.fox.cycle.entity.User;
 
 @Repository
 public class ConnectorCredentialsRepository extends AbstractRepository<ConnectorCredentials> {
   
-  public List<ConnectorCredentials> fetchConnectorCredentialsByUser(Long userId) {
-    User user = em.createQuery("SELECT u FROM User u LEFT JOIN FETCH u.connectorCredentials WHERE u.id = :userId", User.class)
+  public List<ConnectorCredentials> fetchConnectorCredentialsByUserId(Long userId) {
+    return em.createQuery("SELECT c FROM ConnectorCredentials c JOIN FETCH c.user JOIN FETCH c.connectorConfiguration WHERE c.user.id = :userId", ConnectorCredentials.class)
             .setParameter("userId", userId)
+            .getResultList();
+  }
+
+  public ConnectorCredentials fetchConnectorCredentialsById(Long id) {
+    return em.createQuery("SELECT c FROM ConnectorCredentials c JOIN FETCH c.user JOIN FETCH c.connectorConfiguration WHERE c.id = :id", ConnectorCredentials.class)
+            .setParameter("id", id)
             .getSingleResult();
-    return user.getConnectorCredentials();
+  }
+
+  public ConnectorCredentials fetchConnectorCredentialsByUserIdAndConnectorId(Long userId, Long connectorId) {
+    return em.createQuery("SELECT c FROM ConnectorCredentials c JOIN FETCH c.user JOIN FETCH c.connectorConfiguration WHERE c.user.id = :userId AND c.connectorConfiguration.id = :connectorId", ConnectorCredentials.class)
+            .setParameter("userId", userId)
+            .setParameter("connectorId", connectorId)
+            .getSingleResult();
   }
   
+  public ConnectorCredentials fetchConnectorCredentialsByUsernameAndConnectorId(String username, Long connectorId) {
+    return em.createQuery("SELECT c FROM ConnectorCredentials c JOIN FETCH c.user JOIN FETCH c.connectorConfiguration WHERE c.user.name = :username AND c.connectorConfiguration.id = :connectorId", ConnectorCredentials.class)
+            .setParameter("username", username)
+            .setParameter("connectorId", connectorId)
+            .getSingleResult();
+  }
 
 }

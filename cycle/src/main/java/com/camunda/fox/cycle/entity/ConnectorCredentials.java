@@ -10,18 +10,21 @@ public class ConnectorCredentials extends AbstractEntity {
   
   private static final long serialVersionUID = 1L;
   
-  private String user;
+  private String username;
   private String password;
   
   @ManyToOne
   private ConnectorConfiguration connectorConfiguration;
   
-  public String getUser() {
-    return user;
+  @ManyToOne
+  private User user;
+  
+  public String getUsername() {
+    return username;
   }
   
-  public void setUser(String user) {
-    this.user = user;
+  public void setUsername(String username) {
+    this.username = username;
   }
   
   public String getPassword() {
@@ -38,6 +41,14 @@ public class ConnectorCredentials extends AbstractEntity {
   
   public void setConnectorConfiguration(ConnectorConfiguration connectorConfiguration) {
     this.connectorConfiguration = connectorConfiguration;
+  }
+  
+  public User getUser() {
+    return user;
+  }
+  
+  public void setUser(User user) {
+    this.user = user;
   }
   
 }

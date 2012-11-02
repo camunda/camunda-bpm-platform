@@ -925,7 +925,7 @@ function CreateInitialUserController($scope, $window, User, App) {
 
 // profile.html ////////////////////////////////
 
-function ProfileController($scope, $http, App, Event, Credentials, ConnectorConfiguration) {
+function ProfileController($scope, $http, App, Event, Credentials, ConnectorConfiguration, ConnectorCredentials) {
   
   $scope.connectorCredentialsDialog = new Dialog();
 
@@ -941,25 +941,26 @@ function ProfileController($scope, $http, App, Event, Credentials, ConnectorConf
   });
   
   function fetchConnectorCredentials() {
-    $http.get(App.uri("secured/resource/connector/credentials/fetchConnectorCredentials?userId=" + $scope.currentUser.id))
-    .success(function(data) {
-      var credentials = {};
-      angular.forEach(data, function (item) {
-        credentials[item.connectorId] = item;
+    ConnectorCredentials.query( {userId: $scope.currentUser.id }, function (data) {
+        var credentials = {};
+        angular.forEach(data, function (item) {
+          credentials[item.connectorId] = item;
+        });
+        $scope.connectorCredentialsByConnectorId = credentials;
       });
-      $scope.connectorCredentialsByConnectorId = credentials;
-    });
   }
 
   $scope.editConnectorCredentials = function (connectorConfiguration) {
     $scope.mode = "EDIT";
-    $scope.selectedConnectorConfiguration = connectorConfiguration;
+    $scope.connectorConfiguration = connectorConfiguration;
+    $scope.selectedConnectorCredentials = $scope.connectorCredentialsByConnectorId[connectorConfiguration.connectorId];
     $scope.connectorCredentialsDialog.open();
   };
 
   $scope.addConnectorCredentials = function (connectorConfiguration) {
     $scope.mode = "ADD";
-    $scope.selectedConnectorConfiguration = connectorConfiguration;
+    $scope.connectorConfiguration = connectorConfiguration;
+    $scope.selectedConnectorCredentials = null;
     $scope.connectorCredentialsDialog.open();
   };
 
@@ -968,23 +969,51 @@ function ProfileController($scope, $http, App, Event, Credentials, ConnectorConf
     if (!$scope.connectorCredentialsByConnectorId) {
       return false;
     }
-    if (connectorConfiguration.loginMode == "USER") {
-      var connectorId = connectorConfiguration.connectorId;
-      return !!$scope.connectorCredentialsByConnectorId[connectorId];
+    var connectorId = connectorConfiguration.connectorId;
+    return !!$scope.connectorCredentialsByConnectorId[connectorId];
+  };
+  
+  $scope.saveConnectorCredentials = function(connectorCredentialsData, callbackFn) {
+    var isNew = !connectorCredentialsData.id;
+    
+    var connectorCredentials = $scope.selectedConnectorCredentials || new ConnectorCredentials({});
+    
+    // copy connector credentials data
+    angular.extend(connectorCredentials, connectorCredentialsData);
+    
+    connectorCredentials.$save(callbackFn);
+    if (isNew) {
+      $scope.connectorCredentialsByConnectorId[connectorCredentials.connectorId] = connectorCredentials;
     }
-    return false;
   };
   
 }
 
-function EditConnectorCredentials($scope, User, ConnectorCredentials) {
-  $scope.editConnectorConfiguration = $scope.selectedConnectorConfiguration || {};
+function EditConnectorCredentials($scope, $http, App) {
+  $scope.editCredentials = $scope.selectedConnectorCredentials || {};
   
   $scope.test = function () {
-    
+    $scope.editCredentials.connectorId = $scope.connectorConfiguration.connectorId;
+    $scope.editCredentials.userId = $scope.currentUser.id;
+    $http.post(App.uri("secured/resource/connector/credentials/test"), $scope.editCredentials)
+      .success(function(data) {
+        $scope.credentialsTest = data;
+    });
+  };
+  
+  var isValid = $scope.isValid = function () {
+    return $scope.editConnectorCredentialsForm.$valid;
   };
   
   $scope.save = function () {
+    if (!isValid()) {
+      return;
+    }
     
+    $scope.editCredentials.connectorId = $scope.connectorConfiguration.connectorId;
+    $scope.editCredentials.userId = $scope.currentUser.id;
+    $scope.saveConnectorCredentials($scope.editCredentials, function() {
+      $scope.connectorCredentialsDialog.close();
+    });
   };
 }
