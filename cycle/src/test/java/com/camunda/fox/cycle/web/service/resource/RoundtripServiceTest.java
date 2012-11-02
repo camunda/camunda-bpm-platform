@@ -166,6 +166,8 @@ public class RoundtripServiceTest {
     RoundtripDTO testRoundtrip = createAndFlushRoundtrip();
     BpmnDiagramDTO rightHandSide = testRoundtrip.getRightHandSide();
     
+    Thread.sleep(6000);
+    
     roundtripService.doSynchronize(SyncMode.LEFT_TO_RIGHT, testRoundtrip.getId());
     
     assertThatIsInSync(testRoundtrip.getRightHandSide());
