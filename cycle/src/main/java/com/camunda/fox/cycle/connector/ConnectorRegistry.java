@@ -190,4 +190,41 @@ public class ConnectorRegistry {
       }
     }
   }
+  
+  public ConnectorStatus testConnectorConfiguration(ConnectorConfiguration config, String username, String password) {
+    Connector connector = null;
+    try {
+      connector = instantiateConnectorToTestUserConnectorCredentials(config);
+      connector.login(username, password);
+      
+      ConnectorNode root = connector.getRoot();
+      connector.getChildren(root);
+      
+      // everything ok
+      return ConnectorStatus.ok();
+    } catch (Exception e) {
+      e.printStackTrace();
+      return ConnectorStatus.inError(e);
+    } finally {
+      if (connector != null) {
+        connector.dispose();
+      }
+    }
+  }
+  
+  private Connector instantiateConnectorToTestUserConnectorCredentials(ConnectorConfiguration config) {
+    try {
+      AspectJProxyFactory factory = new AspectJProxyFactory(Class.forName(config.getConnectorClass()).newInstance());
+      factory.addAspect(threadsafeAspect);
+      Connector instance = factory.getProxy();
+
+      // TODO: set name / configuration from user configuration entities
+      instance.setConfiguration(config);
+      instance.init();
+
+      return instance;
+    } catch (Exception e) {
+      throw new CycleException("Could not init connector", e);
+    }
+  }
 }

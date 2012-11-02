@@ -925,14 +925,14 @@ function ProfileController($scope, $http, App, Event, Credentials, ConnectorConf
 
   $scope.editConnectorCredentials = function (connectorConfiguration) {
     $scope.mode = "EDIT";
-    $scope.connectorId = connectorConfiguration.connectorId;
+    $scope.connectorConfiguration = connectorConfiguration;
     $scope.selectedConnectorCredentials = $scope.connectorCredentialsByConnectorId[connectorConfiguration.connectorId];
     $scope.connectorCredentialsDialog.open();
   };
 
   $scope.addConnectorCredentials = function (connectorConfiguration) {
     $scope.mode = "ADD";
-    $scope.connectorId = connectorConfiguration.connectorId;
+    $scope.connectorConfiguration = connectorConfiguration;
     $scope.selectedConnectorCredentials = null;
     $scope.connectorCredentialsDialog.open();
   };
@@ -965,11 +965,16 @@ function ProfileController($scope, $http, App, Event, Credentials, ConnectorConf
   
 }
 
-function EditConnectorCredentials($scope) {
+function EditConnectorCredentials($scope, $http, App) {
   $scope.editCredentials = $scope.selectedConnectorCredentials || {};
   
   $scope.test = function () {
-    
+    $scope.editCredentials.connectorId = $scope.connectorConfiguration.connectorId;
+    $scope.editCredentials.userId = $scope.currentUser.id;
+    $http.post(App.uri("secured/resource/connector/credentials/test"), $scope.editCredentials)
+      .success(function(data) {
+        $scope.credentialsTest = data;
+    });
   };
   
   var isValid = $scope.isValid = function () {
@@ -981,7 +986,7 @@ function EditConnectorCredentials($scope) {
       return;
     }
     
-    $scope.editCredentials.connectorId = $scope.connectorId;
+    $scope.editCredentials.connectorId = $scope.connectorConfiguration.connectorId;
     $scope.editCredentials.userId = $scope.currentUser.id;
     $scope.saveConnectorCredentials($scope.editCredentials, function() {
       $scope.connectorCredentialsDialog.close();

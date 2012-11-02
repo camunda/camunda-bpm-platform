@@ -44,6 +44,20 @@
                   <h3 data-ng-show="mode == 'EDIT'" th:text="#{'Edit connector credentials'}"></h3>
                 </div>
                 <div class="modal-body">
+                  <div class="alert alert-error" data-ng-show="credentialsTest.state == 'IN_ERROR'">
+                    <button type="button" class="close" data-ng-click="credentialsTest = null">&times;</button>
+                    <span>
+                      <strong th:text="#{Invalid Credentials:}"></strong>
+                      {{ credentialsTest.message }}
+                    </span>
+                  </div>
+                  <div class="alert alert-success" data-ng-show="connectorTest.state == 'OK'">
+                    <button type="button" class="close" data-ng-click="connectorTest = null">&times;</button>
+                    <span>
+                      <strong th:text="#{Valid Credentials:}"></strong>
+                      Using the connector worked
+                    </span>
+                  </div>
                   <form class="form-horizontal" novalidate data-ng-submit="save()" name="editConnectorCredentialsForm">
                     <fieldset>
                       <div class="control-group">

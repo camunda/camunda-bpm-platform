@@ -14,13 +14,17 @@ import javax.ws.rs.core.MediaType;
 
 import org.springframework.transaction.annotation.Transactional;
 
+import com.camunda.fox.cycle.connector.ConnectorRegistry;
+import com.camunda.fox.cycle.connector.ConnectorStatus;
 import com.camunda.fox.cycle.entity.ConnectorConfiguration;
 import com.camunda.fox.cycle.entity.ConnectorCredentials;
 import com.camunda.fox.cycle.entity.User;
 import com.camunda.fox.cycle.repository.ConnectorConfigurationRepository;
 import com.camunda.fox.cycle.repository.ConnectorCredentialsRepository;
 import com.camunda.fox.cycle.repository.UserRepository;
+import com.camunda.fox.cycle.web.dto.ConnectorConfigurationDTO;
 import com.camunda.fox.cycle.web.dto.ConnectorCredentialsDTO;
+import com.camunda.fox.cycle.web.dto.ConnectorStatusDTO;
 import com.camunda.fox.cycle.web.service.AbstractRestService;
 
 @Path("secured/resource/connector/credentials")
@@ -34,6 +38,9 @@ public class ConnectorCredentialsService extends AbstractRestService {
   
   @Inject
   private ConnectorConfigurationRepository connectorConfigurationRepository;
+  
+  @Inject
+  private ConnectorRegistry connectorRegistry;
 
    // $resource specific methods ///////////////////////////////////
   
@@ -95,6 +102,18 @@ public class ConnectorCredentialsService extends AbstractRestService {
     connectorCredentialsRepository.delete(connectorCredentials);
   }
   
+  @POST
+  @Path("test")
+  public ConnectorStatusDTO test(ConnectorCredentialsDTO data) {
+    ConnectorConfiguration config = connectorConfigurationRepository.findById(data.getConnectorId());
+    if (config == null) {
+      throw notFound("Connector configuration with id " + data.getConnectorId() + " not found.");
+    }
+    
+    ConnectorStatus connectorStatus = connectorRegistry.testConnectorConfiguration(config, data.getUsername(), data.getPassword());
+    return ConnectorStatusDTO.wrap(connectorStatus);
+  }
+  
   // querying /////////////////////////////////////////////////////
   
   @GET
@@ -128,6 +147,27 @@ public class ConnectorCredentialsService extends AbstractRestService {
   private void update(ConnectorCredentials connectorCredentials, ConnectorCredentialsDTO data) {
     connectorCredentials.setUsername(data.getUsername());
     connectorCredentials.setPassword(data.getPassword());
+  }
+  
+  private void update(ConnectorConfiguration config, ConnectorConfigurationDTO data) {
+    config.setGlobalPassword(data.getPassword());
+    config.setGlobalUser(data.getUser());
+    config.setLoginMode(data.getLoginMode());
+    config.setProperties(data.getProperties());
+    config.setName(data.getName());
+  }
+
+  private ConnectorConfiguration createConfiguration(ConnectorConfigurationDTO data) {
+    ConnectorConfiguration config = new ConnectorConfiguration();
+
+    // do not make these things configurable on update
+    config.setConnectorClass(data.getConnectorClass());
+    config.setConnectorName(data.getConnectorName());
+
+    // update the rest
+    update(config, data);
+
+    return config;
   }
   
 }

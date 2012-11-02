@@ -33,7 +33,6 @@ public class LoginAspect {
           return;
         }
         if (loginMode.equals(ConnectorLoginMode.USER)) {
-          
         }
       }
     }else{
