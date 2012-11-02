@@ -17,4 +17,16 @@ public class UserRepository extends AbstractRepository<User> {
              .setParameter("name", name)
              .getSingleResult() == 0;
   }
+
+  /**
+   * Return user with the given name
+   * 
+   * @param name
+   * @return 
+   */
+  public User findByName(String name) {
+    return em.createQuery("SELECT u FROM User u WHERE u.name = :name", User.class)
+             .setParameter("name", name)
+             .getSingleResult();
+  }
 }
