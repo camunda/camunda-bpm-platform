@@ -152,9 +152,16 @@ public class ConnectorRegistry {
    * @return the newly instantiated connector
    */
   Connector instantiateConnector(ConnectorConfiguration config) {
+    return instantiateConnector(config, true);
+  }
+
+  private Connector instantiateConnector(ConnectorConfiguration config, boolean setLoginAspect) {
     try {
       AspectJProxyFactory factory = new AspectJProxyFactory(Class.forName(config.getConnectorClass()).newInstance());
-      factory.addAspect(loginAspect);
+      
+      if (setLoginAspect) {
+        factory.addAspect(loginAspect);
+      }
       factory.addAspect(threadsafeAspect);
       Connector instance = factory.getProxy();
 
@@ -167,19 +174,15 @@ public class ConnectorRegistry {
       throw new CycleException("Could not init connector", e);
     }
   }
+  
 
   public ConnectorStatus testConnectorConfiguration(ConnectorConfiguration config) {
     Connector connector = null;
 
     try {
-      connector = instantiateConnector(config);
-      ConnectorNode root = connector.getRoot();
+      connector = instantiateConnector(config, true);
 
-      // list children of root
-      connector.getChildren(root);
-
-      // everything ok
-      return ConnectorStatus.ok();
+      return executeTest(connector);
     } catch (Exception e) {
       e.printStackTrace();
       
@@ -194,14 +197,10 @@ public class ConnectorRegistry {
   public ConnectorStatus testConnectorConfiguration(ConnectorConfiguration config, String username, String password) {
     Connector connector = null;
     try {
-      connector = instantiateConnectorToTestUserConnectorCredentials(config);
+      connector = instantiateConnector(config, false);
       connector.login(username, password);
       
-      ConnectorNode root = connector.getRoot();
-      connector.getChildren(root);
-      
-      // everything ok
-      return ConnectorStatus.ok();
+      return executeTest(connector);
     } catch (Exception e) {
       e.printStackTrace();
       return ConnectorStatus.inError(e);
@@ -212,19 +211,18 @@ public class ConnectorRegistry {
     }
   }
   
-  private Connector instantiateConnectorToTestUserConnectorCredentials(ConnectorConfiguration config) {
+  private ConnectorStatus executeTest(Connector connector) {
     try {
-      AspectJProxyFactory factory = new AspectJProxyFactory(Class.forName(config.getConnectorClass()).newInstance());
-      factory.addAspect(threadsafeAspect);
-      Connector instance = factory.getProxy();
+      
+      ConnectorNode root = connector.getRoot();
+      // list children of root
+      connector.getChildren(root);
 
-      // TODO: set name / configuration from user configuration entities
-      instance.setConfiguration(config);
-      instance.init();
-
-      return instance;
+      // everything ok
+      return ConnectorStatus.ok();
     } catch (Exception e) {
-      throw new CycleException("Could not init connector", e);
+      e.printStackTrace();
+      return ConnectorStatus.inError(e);
     }
   }
 }

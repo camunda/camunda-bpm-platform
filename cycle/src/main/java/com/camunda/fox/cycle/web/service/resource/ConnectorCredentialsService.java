@@ -132,14 +132,6 @@ public class ConnectorCredentialsService extends AbstractRestService {
     return ConnectorCredentialsDTO.wrap(connectorCredentialsRepository.fetchConnectorCredentialsById(id));
   }
   
-  @GET
-  @Produces(MediaType.APPLICATION_JSON)
-  @Path("fetchConnectorCredentialsByUserIdAndConnectorId")
-  @Transactional
-  public ConnectorCredentialsDTO fetchConnectorCredentialsByUserIdAndConnectorId(@QueryParam("userId") Long userId, @QueryParam("connectorId") Long connectorId) {
-    return ConnectorCredentialsDTO.wrap(connectorCredentialsRepository.fetchConnectorCredentialsByUserIdAndConnectorId(userId, connectorId));
-  }
-  
   /**
    * Updates the connector-credential with the given data
    *

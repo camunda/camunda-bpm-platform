@@ -1,5 +1,7 @@
 package com.camunda.fox.cycle.aspect;
 
+import java.security.Principal;
+
 import javax.inject.Inject;
 
 import org.aspectj.lang.JoinPoint;
@@ -10,8 +12,11 @@ import org.springframework.stereotype.Component;
 import com.camunda.fox.cycle.connector.Connector;
 import com.camunda.fox.cycle.connector.ConnectorLoginMode;
 import com.camunda.fox.cycle.entity.ConnectorConfiguration;
+import com.camunda.fox.cycle.entity.ConnectorCredentials;
 import com.camunda.fox.cycle.exception.CycleException;
+import com.camunda.fox.cycle.exception.CycleMissingCredentialsException;
 import com.camunda.fox.cycle.repository.ConnectorCredentialsRepository;
+import com.camunda.fox.cycle.security.PrincipalHolder;
 
 @Component
 @Aspect
@@ -33,6 +38,16 @@ public class LoginAspect {
           return;
         }
         if (loginMode.equals(ConnectorLoginMode.USER)) {
+          Principal principal = PrincipalHolder.getPrincipal();
+          String username = principal.getName();
+          Long connectorConfigId = con.getConfiguration().getId();
+          ConnectorCredentials connectorCredentials = null;
+          try {
+            connectorCredentials = connectorCredentialsRepository.fetchConnectorCredentialsByUsernameAndConnectorConfigId(username, connectorConfigId);
+          } catch (Exception e) {
+            throw new CycleMissingCredentialsException("The user credentials for connector " + con.getConfiguration().getName() + " are not set.", e);
+          }
+          con.login(connectorCredentials.getUsername(), connectorCredentials.getPassword());
         }
       }
     }else{

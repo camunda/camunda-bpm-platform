@@ -40,8 +40,8 @@
               <div class="modal hide fade" data-ng-controller="EditConnectorCredentials" data-ngm-if="connectorCredentialsDialog.renderHtml()"> 
                 <div class="modal-header">
                   <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                  <h3 data-ng-show="mode == 'ADD'" th:text="#{'Add connector credentials'}"></h3>
-                  <h3 data-ng-show="mode == 'EDIT'" th:text="#{'Edit connector credentials'}"></h3>
+                  <h3 data-ng-show="mode == 'ADD'" th:text="#{'Add user credentials'}"></h3>
+                  <h3 data-ng-show="mode == 'EDIT'" th:text="#{'Edit user credentials'}"></h3>
                 </div>
                 <div class="modal-body">
                   <div class="alert alert-error" data-ng-show="credentialsTest.state == 'IN_ERROR'">
@@ -51,8 +51,8 @@
                       {{ credentialsTest.message }}
                     </span>
                   </div>
-                  <div class="alert alert-success" data-ng-show="connectorTest.state == 'OK'">
-                    <button type="button" class="close" data-ng-click="connectorTest = null">&times;</button>
+                  <div class="alert alert-success" data-ng-show="credentialsTest.state == 'OK'">
+                    <button type="button" class="close" data-ng-click="credentialsTest = null">&times;</button>
                     <span>
                       <strong th:text="#{Valid Credentials:}"></strong>
                       Using the connector worked
