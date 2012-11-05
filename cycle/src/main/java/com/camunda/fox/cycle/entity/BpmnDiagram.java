@@ -5,6 +5,7 @@ import java.util.Date;
 import javax.persistence.Entity;
 import javax.persistence.EnumType;
 import javax.persistence.Enumerated;
+import javax.persistence.Table;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 
@@ -17,6 +18,7 @@ import com.camunda.fox.cycle.connector.ConnectorNodeType;
  * @author nico.rehwaldt
  */
 @Entity
+@Table(name="cy_bpmn_diagram")
 public class BpmnDiagram extends AbstractEntity {
   
   private static final long serialVersionUID = 1L;

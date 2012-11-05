@@ -20,7 +20,7 @@ public abstract class AbstractEntity implements Serializable {
   
   @Id
   @GeneratedValue(strategy=GenerationType.TABLE, generator="cycleIdGenerator")  
-  @TableGenerator(name="cycleIdGenerator", table="TableID",  
+  @TableGenerator(name="cycleIdGenerator", table="cy_id_table",  
                   pkColumnName="tablename", // TableID.TableName (value = table_name, test_table, etc.)  
                   valueColumnName="id", // TableID.ID (value = 1,2,3,etc.)  
                   allocationSize=1 // flush every 1 insert  
