@@ -10,6 +10,7 @@
         <div th:substituteby="fragment/common :: breadcrumbs"></div>
         <div class="errorPanel hide">
           <div data-ng-repeat="error in appErrors()" class="alert alert-error">
+            <button type="button" class="close" data-dismiss="alert">&times;</button>
             <span th:text="#{'An error occured, try refreshing the page or relogin :'}"></span><span>{{error}}</span>
           </div>
         </div>
