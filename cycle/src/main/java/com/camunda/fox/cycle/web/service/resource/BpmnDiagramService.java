@@ -35,6 +35,8 @@ import com.camunda.fox.cycle.web.service.AbstractRestService;
 @Path("secured/resource/diagram")
 public class BpmnDiagramService extends AbstractRestService {
 
+  private static final int OFFSET = 5000;
+
   private static Logger log = Logger.getLogger(BpmnDiagramService.class.getName());
   
   @Inject
@@ -79,7 +81,7 @@ public class BpmnDiagramService extends AbstractRestService {
       Date imageLastModified = imageInformation.getLastModified();
       if (imageLastModified != null) {
         // need to do comparison based on timestamp to ignore time zones
-        if ((imageLastModified.getTime() + 5000) < diagramLastModified.getTime()) {
+        if ((imageLastModified.getTime() + OFFSET) < diagramLastModified.getTime()) {
           // diagram is younger than the image --> image out of date
           throw notFound("no up to date image");
         }
