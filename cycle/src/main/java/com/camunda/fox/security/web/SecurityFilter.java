@@ -14,6 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
+import com.camunda.fox.cycle.security.IdentityHolder;
 import com.camunda.fox.security.UserIdentity;
 import com.camunda.fox.security.service.SecurityService;
 
@@ -25,8 +26,8 @@ public class SecurityFilter implements Filter {
 
   private WebApplicationContext context;
  
-  static final String IDENTITY_SESSION_KEY = "com.camunda.fox.SecurityFilter.SESSION_KEY";
-  static final String PRE_AUTHENTICATION_URL = "com.camunda.fox.SecurityFilter.LAST_REQUEST_URI";
+  public static final String IDENTITY_SESSION_KEY = "com.camunda.fox.SecurityFilter.SESSION_KEY";
+  public static final String PRE_AUTHENTICATION_URL = "com.camunda.fox.SecurityFilter.LAST_REQUEST_URI";
   
   @Override
   public void init(FilterConfig config) throws ServletException {
@@ -54,6 +55,7 @@ public class SecurityFilter implements Filter {
     // if yes, make that information available
     if (identity != null) {
       request = wrapAuthenticated(request, identity);
+      IdentityHolder.setIdentity(null);
     } 
     // if not, perform security check which may result in a redirect
     else {
@@ -93,6 +95,7 @@ public class SecurityFilter implements Filter {
     } else
     if (isLogoutRequest(request)) {
       logout(request);
+      return "app:app/login/loggedOut";
     }
     
     return null;

@@ -1,5 +1,6 @@
 package com.camunda.fox.cycle.web.service;
 
+import java.security.Principal;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.GET;
@@ -8,6 +9,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
+import com.camunda.fox.cycle.entity.User;
 import com.camunda.fox.cycle.repository.UserRepository;
 import com.camunda.fox.cycle.web.dto.UserDTO;
 
@@ -27,31 +29,24 @@ import com.camunda.fox.cycle.web.dto.UserDTO;
 @Path("/")
 public class DefaultService extends AbstractRestService {
   
-  private static final String ADMIN_ROLE = "admin";
-  
   @Inject
   private UserRepository userRepository;
-  
-//  @GET
-//  @Consumes(MediaType.APPLICATION_JSON)
-//  @Path("login")
-//  public String loginJSON() {
-//    throw new WebApplicationException(Response.Status.UNAUTHORIZED);
-//  }
 
-  
   @GET
   @Path("currentUser")
   @Produces(MediaType.APPLICATION_JSON)
   public UserDTO currentUser(@Context HttpServletRequest request) {
-    return new UserDTO(userRepository.findAll().get(0));
     
-//    Principal principal = request.getUserPrincipal();
-//    boolean isAdminRole = request.isUserInRole(ADMIN_ROLE);
-//    if (principal != null) {
-//      return new CurrentUserDTO(-1, principal.getName(), isAdminRole);
-//    } else {
-//      return null;
-//    }
+    Principal principal = request.getUserPrincipal();
+    if (principal != null) {
+      User user = userRepository.findByName(principal.getName());
+      if (user != null) {
+        return new UserDTO(user);
+      } else {
+        return null;
+      }
+    }
+    
+    return null;
   }
 }

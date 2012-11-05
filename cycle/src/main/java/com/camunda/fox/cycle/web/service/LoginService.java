@@ -16,6 +16,13 @@ import javax.ws.rs.core.MediaType;
 @Path("login")
 public class LoginService extends AbstractRestService {
   
+//  @GET
+//  @Consumes(MediaType.APPLICATION_JSON)
+//  @Path("login")
+//  public String loginJSON() {
+//    throw new WebApplicationException(Response.Status.UNAUTHORIZED);
+//  }
+  
   @GET
   @Produces(MediaType.TEXT_HTML)
   public Object login(@Context HttpServletRequest request) {

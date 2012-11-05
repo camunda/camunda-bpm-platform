@@ -16,11 +16,8 @@ import com.camunda.fox.cycle.web.service.resource.UserService;
  *
  * @author nico.rehwaldt
  */
-@Path("secured/view/create-initial-user")
+@Path("first-time-setup")
 public class InitialConfigurationService extends AbstractRestService {
-  
-  @Inject
-  private UserRepository userRepository;
   
   @Inject
   private CycleConfiguration configuration;
@@ -31,17 +28,16 @@ public class InitialConfigurationService extends AbstractRestService {
   @GET
   @Produces(MediaType.TEXT_HTML)
   public Object createInitialUser() {
-    if (!canCreateInitialUser()) {
+    if (isConfigured()) {
       return redirectTo("secured/view/index");
     }
     
-    return "tpl:app/create-initial-user";
+    return "tpl:app/first-time-setup";
   }
 
   @POST
-  @Produces(MediaType.TEXT_HTML)
-  public UserDTO createInitialUser(UserDTO data) {
-    if (!canCreateInitialUser()) {
+  public String createInitialUser(UserDTO data) {
+    if (isConfigured()) {
       throw notAllowed("already configured");
     }
     
@@ -50,10 +46,12 @@ public class InitialConfigurationService extends AbstractRestService {
     }
     
     data.setAdmin(true);
-    return userService.create(data);
+    UserDTO user = userService.create(data);
+    
+    return "Ok [id=" + user.getId() + "]";
   }
-  
-  private boolean canCreateInitialUser() {
-    return !configuration.isUseJaas() && userRepository.countAll() == 0;
+
+  private boolean isConfigured() {
+    return configuration.isConfigured();
   }
 }

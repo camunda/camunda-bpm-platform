@@ -13,8 +13,9 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.camunda.fox.cycle.entity.User;
 import com.camunda.fox.cycle.repository.UserRepository;
-import com.camunda.fox.cycle.security.PrincipalHolder;
+import com.camunda.fox.cycle.security.IdentityHolder;
 import com.camunda.fox.cycle.web.dto.UserDTO;
+import com.camunda.fox.security.UserIdentity;
 import com.sun.security.auth.UserPrincipal;
 
 /**
@@ -121,7 +122,7 @@ public class UserServiceTest {
     UserDTO user = createFlushedUserDTO();
     
     // assume principal set
-    PrincipalHolder.setPrincipal(new UserPrincipal(user.getName()));
+    IdentityHolder.setIdentity(new UserIdentity(user.getName()));
     
     // when
     userService.changePassword(user.getId(), "ASDF", "FOOBAR");
@@ -137,7 +138,7 @@ public class UserServiceTest {
     UserDTO user = createFlushedUserDTO();
     
     // assume principal set
-    PrincipalHolder.setPrincipal(null);
+    IdentityHolder.setIdentity(null);
     
     // when
     try {

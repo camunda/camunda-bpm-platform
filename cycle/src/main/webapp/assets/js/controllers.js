@@ -898,7 +898,7 @@ function DeleteUserController($scope) {
 
 // create-initial-user.html ///////////////////////////////////////
 
-function CreateInitialUserController($scope, $window, User, App) {
+function CreateInitialUserController($scope, $window, $http, App) {
 
   $scope.editUser = {};
 
@@ -913,8 +913,7 @@ function CreateInitialUserController($scope, $window, User, App) {
   };
 
   $scope.saveUser = function(userData, callbackFn) {
-    var user = new User(userData);
-    user.$save(callbackFn);
+    $http.post(App.uri("first-time-setup"), userData).success(callbackFn);
   };
   
   // is the dialog model valid and can be submitted?

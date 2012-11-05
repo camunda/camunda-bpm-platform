@@ -1,13 +1,13 @@
 package com.camunda.fox.security;
 
-import com.camunda.fox.cycle.security.PrincipalHolder;
-import java.security.Principal;
+import com.camunda.fox.cycle.security.IdentityHolder;
 
 import org.springframework.stereotype.Component;
 
 @Component
 public class SecurityContext {
-  public Principal getPrincipal() {
-    return PrincipalHolder.getPrincipal();
+  
+  public UserIdentity getUserIdentity() {
+    return IdentityHolder.getIdentity();
   }
 }

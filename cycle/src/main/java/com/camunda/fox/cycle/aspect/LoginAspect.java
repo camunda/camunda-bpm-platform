@@ -1,6 +1,5 @@
 package com.camunda.fox.cycle.aspect;
 
-import java.security.Principal;
 
 import javax.inject.Inject;
 
@@ -16,7 +15,8 @@ import com.camunda.fox.cycle.entity.ConnectorCredentials;
 import com.camunda.fox.cycle.exception.CycleException;
 import com.camunda.fox.cycle.exception.CycleMissingCredentialsException;
 import com.camunda.fox.cycle.repository.ConnectorCredentialsRepository;
-import com.camunda.fox.cycle.security.PrincipalHolder;
+import com.camunda.fox.cycle.security.IdentityHolder;
+import com.camunda.fox.security.UserIdentity;
 
 @Component
 @Aspect
@@ -28,26 +28,28 @@ public class LoginAspect {
   @Before("@annotation(com.camunda.fox.cycle.connector.Secured)")
   private void aroundSecured(JoinPoint jp) throws Throwable {
     if (jp.getTarget() instanceof Connector) {
-      Connector con = (Connector) jp.getTarget();
-      if (con.needsLogin()) {
-        ConnectorConfiguration config = con.getConfiguration();
-        con.init(config);
+      Connector connector = (Connector) jp.getTarget();
+      if (connector.needsLogin()) {
+        ConnectorConfiguration config = connector.getConfiguration();
+        connector.init(config);
         ConnectorLoginMode loginMode = config.getLoginMode();
         if (loginMode != null && loginMode.equals(ConnectorLoginMode.GLOBAL)) {
-          con.login(config.getGlobalUser(), config.getGlobalPassword());
+          connector.login(config.getGlobalUser(), config.getGlobalPassword());
           return;
         }
         if (loginMode.equals(ConnectorLoginMode.USER)) {
-          Principal principal = PrincipalHolder.getPrincipal();
-          String username = principal.getName();
-          Long connectorConfigId = con.getConfiguration().getId();
-          ConnectorCredentials connectorCredentials = null;
-          try {
-            connectorCredentials = connectorCredentialsRepository.fetchConnectorCredentialsByUsernameAndConnectorId(username, connectorConfigId);
-          } catch (Exception e) {
-            throw new CycleMissingCredentialsException("The user credentials for connector " + con.getConfiguration().getName() + " are not set.", e);
+          UserIdentity identity = IdentityHolder.getIdentity();
+          if (identity != null) {
+            String username = identity.getName();
+            Long connectorConfigId = connector.getConfiguration().getId();
+            ConnectorCredentials connectorCredentials = null;
+            try {
+              connectorCredentials = connectorCredentialsRepository.fetchConnectorCredentialsByUsernameAndConnectorId(username, connectorConfigId);
+            } catch (Exception e) {
+              throw new CycleMissingCredentialsException("The user credentials for connector " + connector.getConfiguration().getName() + " are not set.", e);
+            }
+            connector.login(connectorCredentials.getUsername(), connectorCredentials.getPassword());
           }
-          con.login(connectorCredentials.getUsername(), connectorCredentials.getPassword());
         }
       }
     }else{

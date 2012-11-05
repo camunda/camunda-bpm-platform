@@ -244,7 +244,7 @@ public class SecurityFilterTest {
   @Test
   public void shouldLogin() throws Exception {
     
-    UserIdentity identity = new UserIdentity(null);
+    UserIdentity identity = new UserIdentity("klaus");
     
     // given
     givenRequest("j_security_check", "POST");
@@ -270,7 +270,7 @@ public class SecurityFilterTest {
   @Test
   public void shouldLoginAndRedirectToPreLoginPage() throws Exception {
     
-    UserIdentity identity = new UserIdentity(null);
+    UserIdentity identity = new UserIdentity("klaus");
     
     // given
     givenRequest("j_security_check", "POST");

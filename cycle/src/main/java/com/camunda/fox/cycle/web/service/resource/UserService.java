@@ -19,9 +19,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.camunda.fox.cycle.entity.User;
 import com.camunda.fox.cycle.repository.UserRepository;
-import com.camunda.fox.cycle.security.PrincipalHolder;
+import com.camunda.fox.cycle.security.IdentityHolder;
 import com.camunda.fox.cycle.web.dto.UserDTO;
 import com.camunda.fox.cycle.web.service.AbstractRestService;
+import com.camunda.fox.security.UserIdentity;
 
 /**
  * This is the user rest controller which exposes user
@@ -110,7 +111,7 @@ public class UserService extends AbstractRestService {
       @FormParam("oldPassword") String oldPassword, 
       @FormParam("newPassword") String newPassword) {
     
-    Principal principal = PrincipalHolder.getPrincipal();
+    UserIdentity principal = IdentityHolder.getIdentity();
     User user = getUserById(userId);
     
     if (principal != null && principal.getName().equals(user.getName())) {

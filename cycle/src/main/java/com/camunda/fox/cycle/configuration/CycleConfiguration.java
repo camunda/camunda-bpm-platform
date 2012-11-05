@@ -29,25 +29,12 @@ public class CycleConfiguration {
   public void setUseJaas(boolean useJaas) {
     this.useJaas = useJaas;
   }
-  
-  @PostConstruct
-  public void initInitialUser() {
-    if (userRepository.findAll().isEmpty()) {
-      User newUser = new User();
-      newUser.setName("admin");
-      newUser.setPassword("admin");
-      newUser.setEmail("admin@camunda.com");
-      newUser.setAdmin(true);
-      
-      userRepository.saveAndFlush(newUser);
-    }
-  }
 
   /**
    * Returns true if users may be configured
    * @return 
    */
-  public boolean isNotConfigured() {
-    return userRepository.countAll() == 0 && !useJaas;
+  public boolean isConfigured() {
+    return useJaas || userRepository.countAll() > 0;
   }
 }

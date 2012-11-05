@@ -40,11 +40,10 @@ public class SecurityService {
 
   private UserIdentity loginViaJaas(String userName, String password) {
     try {
-      
       // login via jaas
-      LoginContext lc = new LoginContext("cycleLogin", new PassiveCallbackHandler(userName, password));
+      LoginContext lc = new LoginContext("cycleRealm", new PassiveCallbackHandler(userName, password));
       lc.login();
-      
+
       // get logged in subject
       Subject subject = lc.getSubject();
       
