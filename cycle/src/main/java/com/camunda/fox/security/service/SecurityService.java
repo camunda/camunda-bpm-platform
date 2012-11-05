@@ -1,4 +1,4 @@
-package com.camunda.fox.cycle.security;
+package com.camunda.fox.security.service;
 
 import javax.inject.Inject;
 import javax.security.auth.Subject;
@@ -9,8 +9,9 @@ import org.springframework.stereotype.Component;
 import com.camunda.fox.cycle.configuration.CycleConfiguration;
 import com.camunda.fox.cycle.entity.User;
 import com.camunda.fox.cycle.repository.UserRepository;
-import com.camunda.fox.cycle.security.UserIdentity;
-import com.camunda.fox.cycle.security.jaas.PassiveCallbackHandler;
+import com.camunda.fox.security.UserIdentity;
+import com.camunda.fox.security.UserIdentity;
+import com.camunda.fox.security.jaas.PassiveCallbackHandler;
 
 /**
  *
@@ -57,6 +58,10 @@ public class SecurityService {
 
   private UserIdentity loginViaUserManagement(String userName, String password) {
     User user = userRepository.findByName(userName);
+    
+    if (user == null) {
+      return null;
+    }
     
     // todo: encrypt
     if (user.getPassword().equals(password)) {

@@ -1,4 +1,4 @@
-package com.camunda.fox.cycle.security;
+package com.camunda.fox.security;
 
 
 import com.camunda.fox.cycle.entity.User;

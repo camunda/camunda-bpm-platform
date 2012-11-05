@@ -1,5 +1,6 @@
-package com.camunda.fox.cycle.security;
+package com.camunda.fox.security;
 
+import com.camunda.fox.cycle.security.PrincipalHolder;
 import java.security.Principal;
 
 import org.springframework.stereotype.Component;

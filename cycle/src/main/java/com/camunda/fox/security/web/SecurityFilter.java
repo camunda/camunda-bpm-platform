@@ -1,7 +1,7 @@
-package com.camunda.fox.cycle.web.security.filter;
+package com.camunda.fox.security.web;
 
-import com.camunda.fox.cycle.security.SecurityService;
 import java.io.IOException;
+
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -14,7 +14,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
-import com.camunda.fox.cycle.security.UserIdentity;
+import com.camunda.fox.security.UserIdentity;
+import com.camunda.fox.security.service.SecurityService;
 
 /**
  *
@@ -23,9 +24,9 @@ import com.camunda.fox.cycle.security.UserIdentity;
 public class SecurityFilter implements Filter {
 
   private WebApplicationContext context;
-
-  private static final String IDENTITY_SESSION_KEY = "com.camunda.fox.SecurityFilter.SESSION_KEY";
-  private static final String PRE_AUTHENTICATION_URL = "com.camunda.fox.SecurityFilter.LAST_REQUEST_URI";
+ 
+  static final String IDENTITY_SESSION_KEY = "com.camunda.fox.SecurityFilter.SESSION_KEY";
+  static final String PRE_AUTHENTICATION_URL = "com.camunda.fox.SecurityFilter.LAST_REQUEST_URI";
   
   @Override
   public void init(FilterConfig config) throws ServletException {
@@ -37,45 +38,64 @@ public class SecurityFilter implements Filter {
     
   }
 
-  @Override
-  public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-    performSecurityCheck((HttpServletRequest) request, (HttpServletResponse) response, chain);
+  void setWebApplicationContext(WebApplicationContext context) {
+    this.context = context;
   }
 
-  private void performSecurityCheck(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
-    
+  @Override
+  public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+    doFilterSecure((HttpServletRequest) request, (HttpServletResponse) response, chain);
+  }
+  
+  void doFilterSecure(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
     UserIdentity identity = getAuthenticatedIdentity(request);
     
+    // is the current user authenticated?
+    // if yes, make that information available
     if (identity != null) {
       request = wrapAuthenticated(request, identity);
-    } else
-    if (requiresAuthentication(request)) {
+    } 
+    // if not, perform security check which may result in a redirect
+    else {
+      String uri = performSecurityCheck(request.getRequestURI(), request, response);
+      if (uri != null) {
+        if (uri.startsWith("app:")) {
+          uri = uri.substring("app:".length());
+          sendRedirect(request, response, uri);
+        } else {
+          response.sendRedirect(uri);
+        }
+        
+        return;
+      }
+    }
+    chain.doFilter(request, response);
+  }
+
+  private String performSecurityCheck(String requestUri, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+    if (requiresAuthentication(requestUri)) {
       if (isGET(request)) {
         request.getSession().setAttribute(PRE_AUTHENTICATION_URL, request.getRequestURI());
       }
-      sendRedirect(request, response, "app/login");
-      return;
+      return "app:app/login";
     } else
     if (isLoginRequest(request)) {
       if (login(request)) {
         String preLoginUrl = (String) request.getSession().getAttribute(PRE_AUTHENTICATION_URL);
         if (preLoginUrl != null) {
-          response.sendRedirect(preLoginUrl);
+          return preLoginUrl;
         } else {
-          sendRedirect(request, response, "app/view/secured/index");
+          return "app:app/secured/view/index";
         }
       } else {
-        sendRedirect(request, response, "app/view/login/error");
+        return "app:app/login/error";
       }
-      
-      return;
     } else
     if (isLogoutRequest(request)) {
       logout(request);
     }
     
-    // no redirect ...
-    chain.doFilter(request, response);
+    return null;
   }
   
   protected UserIdentity getAuthenticatedIdentity(HttpServletRequest request) {
@@ -106,6 +126,10 @@ public class SecurityFilter implements Filter {
     String userName = request.getParameter("j_username");
     String password = request.getParameter("j_password");
     
+    if (userName == null || password == null) {
+      return false;
+    }
+    
     SecurityService securityService = context.getBean(SecurityService.class);
     UserIdentity identity = securityService.login(userName, password);
     if (identity != null) {
@@ -120,8 +144,8 @@ public class SecurityFilter implements Filter {
     request.getSession().invalidate();
   }
 
-  private boolean requiresAuthentication(HttpServletRequest request) {
-    return requestUriMatches(request, "app/secured/.*");
+  private boolean requiresAuthentication(String uri) {
+    return uri.matches(".*/app/secured/.*");
   }
 
   private HttpServletRequest wrapAuthenticated(HttpServletRequest request, UserIdentity identity) {

@@ -22,11 +22,8 @@ public class LoginService extends AbstractRestService {
 
     // We do not want to allow direct access to login. 
     // That is why we forward the request to a location which requires a logged in user
-    if (isForward(request)) {
-      return "tpl:login";
-    } else {
-      return redirectTo("secured/view/index/");
-    }
+
+    return "tpl:login";
   }
 
   @POST
@@ -36,7 +33,7 @@ public class LoginService extends AbstractRestService {
     return "tpl:error/login-expired";
   }
 
-  @POST
+  @GET
   @Path("error")
   @Produces(MediaType.TEXT_HTML)
   public String loginError() {

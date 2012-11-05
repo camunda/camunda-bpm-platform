@@ -1,11 +1,11 @@
-package com.camunda.fox.cycle.web.security.filter;
+package com.camunda.fox.security.web;
 
 import java.security.Principal;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
 
-import com.camunda.fox.cycle.security.UserIdentity;
+import com.camunda.fox.security.UserIdentity;
 
 /**
  *
@@ -27,6 +27,10 @@ public class SecurityWrappedRequest extends HttpServletRequestWrapper {
 
   @Override
   public boolean isUserInRole(String role) {
+    if ("user".equals(role)) {
+      return true;
+    }
+    
     if ("admin".equals(role)) {
       return identity.isAdmin();
     } else {

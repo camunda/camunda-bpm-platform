@@ -1,4 +1,4 @@
-package com.camunda.fox.cycle.security.jaas;
+package com.camunda.fox.security.jaas;
 
 import java.io.IOException;
 

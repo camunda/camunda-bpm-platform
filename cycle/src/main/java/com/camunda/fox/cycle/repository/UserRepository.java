@@ -1,6 +1,7 @@
 package com.camunda.fox.cycle.repository;
 
 
+import javax.persistence.NoResultException;
 import org.springframework.stereotype.Repository;
 
 import com.camunda.fox.cycle.entity.User;
@@ -25,8 +26,12 @@ public class UserRepository extends AbstractRepository<User> {
    * @return 
    */
   public User findByName(String name) {
-    return em.createQuery("SELECT u FROM User u WHERE u.name = :name", User.class)
-             .setParameter("name", name)
-             .getSingleResult();
+    try {
+      return em.createQuery("SELECT u FROM User u WHERE u.name = :name", User.class)
+               .setParameter("name", name)
+               .getSingleResult();
+    } catch (NoResultException e) {
+      return null;
+    }
   }
 }
