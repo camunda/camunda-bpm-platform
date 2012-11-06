@@ -1,0 +1,102 @@
+package com.camunda.fox.cycle.service.mail;
+
+import java.util.Arrays;
+
+import javax.inject.Inject;
+import javax.mail.Address;
+import javax.mail.Message;
+import javax.mail.MessagingException;
+import javax.mail.Session;
+import javax.mail.Transport;
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
+
+import org.springframework.stereotype.Component;
+
+import com.camunda.fox.cycle.configuration.CycleConfiguration;
+import com.camunda.fox.cycle.exception.CycleException;
+import com.camunda.fox.cycle.service.mail.spi.MailServiceProvider;
+
+/**
+ * 
+ * @author Daniel Meyer
+ */
+@Component
+public class DefaultMailServiceProvider implements MailServiceProvider {
+
+  @Inject
+  private CycleConfiguration configuration;
+
+  /* (non-Javadoc)
+   * @see com.camunda.fox.cycle.service.MailServiceProvider#lookupMailSession()
+   */
+  @Override
+  public Session lookupMailSession() {
+    String mailSessionName = configuration.getMailSessionName();
+
+    if (mailSessionName == null) {
+      return tryAutoDetectMailSession();
+
+    } else {
+      return performLookup(mailSessionName);
+
+    }
+
+  }
+  
+  protected Session performLookup(String mailSessionName) {
+    try {
+      return InitialContext.doLookup(mailSessionName);
+    } catch (NamingException e) {
+      throw new CycleException("Could not lookup mail session with name '"+mailSessionName+"'");
+    }
+  }
+
+  protected Session tryAutoDetectMailSession() {
+
+    String[] mailSessionNames = getKnownDefaultMailSessionNames();
+    
+    for (int i = 0; i < mailSessionNames.length; i++) {
+      String mailSessionName = mailSessionNames[i];
+      
+      try {
+        Session session = performLookup(mailSessionName);
+        configuration.setMailSessionName(mailSessionName);
+        return session;
+
+      } catch (CycleException e) {
+        // ignore (we try all names)
+      }      
+    }
+    
+    throw new CycleException("No mail session URL configured and could not autodect mail session using names "+Arrays.toString(mailSessionNames));
+   
+  }
+
+  protected String[] getKnownDefaultMailSessionNames() {
+    
+    String mailSessionNames[] = { 
+      "java:comp/env/mail/Session", 
+      "java:jboss/mail/Default" 
+    };
+    
+    return mailSessionNames;
+  }
+
+  @Override
+  public void sendMail(Message msg, Session session) {
+    try {
+      msg.saveChanges();
+      
+      Transport transport = session.getTransport();
+      Address[] recipients = msg.getAllRecipients();
+      
+      transport.connect();      
+      transport.sendMessage(msg, recipients);
+      
+    } catch (MessagingException e) {
+      throw new CycleException("Could not send message using the default Transport", e);
+    }
+  }
+  
+}

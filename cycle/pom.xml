@@ -217,6 +217,15 @@
       <artifactId>svnkit-javahl</artifactId>
       <version>1.3.4</version>
     </dependency>
+    
+    <!-- for testing the email service -->
+    <dependency>
+      <groupId>org.subethamail</groupId>
+      <artifactId>subethasmtp-wiser</artifactId>
+      <version>1.2</version>
+      <scope>test</scope>
+    </dependency>
+    
   </dependencies>
 
   <build>
