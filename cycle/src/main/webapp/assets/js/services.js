@@ -46,6 +46,9 @@ angular
   .factory('Roundtrip', function($resource, App) {
     return $resource(App.uri('secured/resource/roundtrip/:id'), {id: "@id"}, {});
   })
+  .factory('User', function($resource, App) {
+    return $resource(App.uri('secured/resource/user/:id'), {id: "@id"}, {});
+  })
   .factory('RoundtripDetails', function($resource, App) {
     return $resource(App.uri('secured/resource/roundtrip/:id/details'), {id: "@id"}, {});
   })
@@ -53,6 +56,9 @@ angular
     return $resource(App.uri('secured/resource/connector/configuration/:id'), {id: "@connectorId"}, {
       'queryDefaults':  {method:'GET', isArray:true, params: { id: 'defaults' }}
     });
+  })
+  .factory('ConnectorCredentials', function($resource, App) {
+    return $resource(App.uri('secured/resource/connector/credentials/:id'), {id: "@id"}, {});
   })
   .factory('Commons', function($http, HttpUtils, App) {
     return {
@@ -114,11 +120,14 @@ angular
         clearTimeout(blockTime);
         $.unblockUI();
         return promise;
-      }, function (response)  {
+      }, function (response) {
         clearTimeout(blockTime);
         $.unblockUI();
         console.log("error", response);
-        Error.addError({ "status" : response.status , "config" :  response.config });
+        if (parseInt(response.status) == 500) {
+          Error.addError({ "status" : response.status , "config" :  response.config });
+        }
+        
         return $q.reject(response);
       });
     };
@@ -166,7 +175,7 @@ angular
         });
       },
       isAdmin: function() {
-        return this.currentCredentials && this.currentCredentials.adminRole;
+        return this.currentCredentials && this.currentCredentials.admin;
       },
       current: function() {
         return this.currentCredentials;

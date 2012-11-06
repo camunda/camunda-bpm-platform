@@ -59,4 +59,8 @@ public class WebExceptionDTO {
     return new WebExceptionDTO(exception.getStatus(), exception.getMessage(), exception.getCause());
   }
   
+  public static WebExceptionDTO wrap(Exception exception, Status status) {
+    return new WebExceptionDTO(status, exception.getMessage(), exception.getCause());
+  }
+  
 }

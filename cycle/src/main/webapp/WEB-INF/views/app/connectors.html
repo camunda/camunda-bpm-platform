@@ -14,7 +14,7 @@
             <table class="table table-bordered">
               <thead>
                 <tr>
-                  <th>Connector Id</th>
+                  <th>Id</th>
                   <th>Connector Name</th>
                   <th>Plugin Name</th>
                   <th>Login Mode</th>
@@ -35,11 +35,11 @@
                 </tr>
               </tbody>
             </table>
-            <a class="btn" data-ng-click="createNewConnector()"><span th:text="#{New}">New</span></a>
+            <a class="btn" data-ng-click="createNew()"><span th:text="#{New}">New</span></a>
 
             <!-- begin add/edit connector-configuration-dialog -->
             <modal-dialog model="editConnectorConfigurationDialog" ng-cloak>
-              <div class="modal hide fade" data-ng-controller="EditConnectorController" data-ngm-if="editConnectorConfigurationDialog.renderHtml()"> 
+              <div class="modal hide" data-ng-controller="EditConnectorController" data-ngm-if="editConnectorConfigurationDialog.renderHtml()"> 
                 <div class="modal-header">
                   <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                   <h3 data-ng-show="connectorDialogMode == 'ADD_CONNECTOR'" th:text="#{'Add connector'}"></h3>
@@ -70,6 +70,22 @@
                         </div>
                       </div>
 
+                      <div data-ng-show="connectorDialogMode == 'ADD_CONNECTOR'" class="control-group">
+                        <label class="control-label" for="connectors" 
+                               th:text="#{'Plugin*'}">Plugin*</label>
+                        <div class="controls">
+                          <select class="span8" data-ng-options="c.name for c in defaultConfigurations" data-ng-model="blueprint">
+                          </select>
+                        </div>
+                      </div>
+                      <div data-ng-show="connectorDialogMode == 'EDIT_CONNECTOR'" class="control-group">
+                        <label class="control-label" for="connectors" 
+                               th:text="#{'Plugin'}">Plugin</label>
+                        <div class="controls" style="margin-bottom: 10px;">
+                          <span style="line-height: 30px">{{editConnectorConfiguration.connectorName}}</span>
+                        </div>
+                      </div>
+
                       <div class="control-group">
                         <label class="control-label" for="loginMode" 
                                th:text="#{'Login Mode*'}">Login Mode*</label>
@@ -78,20 +94,18 @@
                             <select id="loginMode" class="span8" data-required data-ng-model="editConnectorConfiguration.loginMode">
                               <option value="LOGIN_NOT_REQUIRED">no login required</option>
                               <option value="GLOBAL">credentials provided globally</option>
-                              <!-- excluded until supported 
-                                <option value="USER">credentials provided by user</option>
-                              -->
+                              <option value="USER">credentials provided by user</option>
                             </select>
                           </span>
                         </div>
                       </div>
-
+                      
                       <div data-ng-switch data-on="editConnectorConfiguration.loginMode">
                         <div data-ng-switch-when="GLOBAL">
                           <div class="control-group">
                             <label class="control-label" for="userName" 
                                    th:text="#{'User Name*'}">User Name*</label>
-                            <div class="controls" style="margin-bottom: 10px;" >
+                            <div class="controls">
                               <input id="userName" name="userName" type="text" class="span8" required data-ng-model="editConnectorConfiguration.user"/>
                             </div> 
                           </div>
@@ -104,27 +118,12 @@
                           </div>
                         </div>
                       </div>
-                      <div data-ng-show="connectorDialogMode == 'ADD_CONNECTOR'" class="control-group">
-                        <label class="control-label" for="connectors" 
-                               th:text="#{'Plugin*'}">Plugin*</label>
-                        <div class="controls" style="margin-bottom: 10px;">
-                          <select class="span8" data-ng-options="c.name for c in defaultConfigurations" data-ng-model="blueprint">
-                          </select>
-                        </div>
-                      </div>
-                      <div data-ng-show="connectorDialogMode == 'EDIT_CONNECTOR'" class="control-group">
-                        <label class="control-label" for="connectors" 
-                               th:text="#{'Plugin'}">Plugin</label>
-                        <div class="controls" style="margin-bottom: 10px;">
-                          <span style="line-height: 30px">{{editConnectorConfiguration.connectorName}}</span>
-                        </div>
-                      </div>
                       <div class="control-group" data-ng-repeat="propertyName in customPropertyNames">
                         <label class="control-label" for="specificField" 
                                data-help
                                data-help-text-var="currentHelpText(propertyName)"
                                data-help-title-var="propertyName">{{propertyName}}</label>
-                        <div class="controls" style="margin-bottom: 10px;" >
+                        <div class="controls">
                           <input id="specificField" name="specificField" type="text" class="span8" data-ng-model="editConnectorConfiguration.properties[propertyName]"/>
                         </div>
                       </div>
@@ -142,7 +141,7 @@
             
             <!-- begin delete-connector-configuration-dialog -->
             <modal-dialog model="deleteConnectorConfigurationDialog" ng-cloak>
-              <div class="modal hide fade" data-ng-controller="DeleteConnectorConfigurationController" ngm-if="deleteConnectorConfigurationDialog.renderHtml()"> 
+              <div class="modal hide" data-ng-controller="DeleteConnectorConfigurationController" ngm-if="deleteConnectorConfigurationDialog.renderHtml()"> 
                 <div class="modal-header">
                   <button data-ng-show="deleteConnectorConfigurationDialog.autoClosable" type="button" class="close" data-dismiss="modal">&times;</button>
                   <h3 th:text="#{'Delete connector configuration'}"></h3>
