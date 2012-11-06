@@ -26,16 +26,21 @@ public class SecurityExceptionMapper implements ExceptionMapper<com.camunda.fox.
   @Override
   public Response toResponse(SecurityException exception) {
     Status status = Status.NOT_FOUND;
-
+    String errorPage = null;
+    
     if (exception instanceof MissingPrivilegesException) {
       status = Status.FORBIDDEN;
+      errorPage = "tpl:error/forbidden";
     } else if (exception instanceof UnauthorizedException) {
+      errorPage = "tpl:error/forbidden";
       status = Status.UNAUTHORIZED;
     }
     
     Response.ResponseBuilder builder = Response.status(status);
     if (WebUtil.isAjax(request)) {
       builder.entity(WebExceptionDTO.wrap(exception, status));
+    } else {
+      builder.entity(errorPage);
     }
 
     return builder.build();

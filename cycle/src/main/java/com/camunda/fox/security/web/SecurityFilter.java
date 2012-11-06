@@ -64,7 +64,6 @@ public class SecurityFilter implements Filter {
     else {
       String uri = performSecurityCheck(request.getRequestURI(), request, response);
       if (uri != null) {
-        boolean forward = false;
 
         // handle special do nothing actions
         // needed in case of ajax requests where only a 
@@ -72,6 +71,8 @@ public class SecurityFilter implements Filter {
         if (uri.equals(NOP)) {
           return;
         }
+
+        boolean forward = false;
 
         if (uri.startsWith("forward:")) {
           uri = uri.substring("forward:".length());
@@ -90,7 +91,7 @@ public class SecurityFilter implements Filter {
     chain.doFilter(request, response);
   }
 
-  private String performSecurityCheck(String requestUri, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+  String performSecurityCheck(String requestUri, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
     if (requiresAuthentication(requestUri)) {
       if (isAjax(request)) {
         response.sendError(401, "Authorization required");

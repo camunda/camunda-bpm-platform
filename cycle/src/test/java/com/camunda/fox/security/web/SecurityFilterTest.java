@@ -9,6 +9,10 @@ import java.util.List;
 import java.util.Map;
 
 import javax.servlet.FilterChain;
+import javax.servlet.RequestDispatcher;
+import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -58,13 +62,18 @@ public class SecurityFilterTest {
   @Mock
   private HttpSession session;
   
+  @Mock
+  private RequestDispatcher requestDispatcher;
+  
   private Map<String, Object> sessionVars = new HashMap<String, Object>();
   
   private Map<String, String> requestHeaders = new HashMap<String, String>();
   
   private Map<Class, Object> beans = new HashMap<Class, Object>();
   
-  private String redirectUrl;
+  private String redirectUri;
+  
+  private String dispatchUri;
   
   // the filter to test
   private SecurityFilter securityFilter = new SecurityFilter();
@@ -84,6 +93,15 @@ public class SecurityFilterTest {
     
     when(request.getContextPath()).thenReturn(CTX_PATH);
     
+    doAnswer(new Answer<RequestDispatcher>() {
+
+      @Override
+      public RequestDispatcher answer(InvocationOnMock invocation) throws Throwable {
+        dispatchUri = (String) invocation.getArguments()[0];
+        return requestDispatcher;
+      }
+    }).when(request).getRequestDispatcher(anyString());
+    
     doAnswer(new Answer<Void>() {
       @Override
       public Void answer(InvocationOnMock invocation) throws Throwable {
@@ -97,7 +115,7 @@ public class SecurityFilterTest {
       @Override
       public Void answer(InvocationOnMock invocation) throws Throwable {
         
-        redirectUrl = (String) invocation.getArguments()[0];
+        redirectUri = (String) invocation.getArguments()[0];
         return null;
       }
     }).when(response).sendRedirect(anyString());
@@ -134,32 +152,30 @@ public class SecurityFilterTest {
     assertThat(request.getSession()).isEqualTo(session);
     assertThat(request.getSession().getAttribute("foo")).isEqualTo("bar");
     
-    assertThat(redirectUrl).isEqualTo("asf");
+    assertThat(redirectUri).isEqualTo("asf");
     
     assertThat(webApplicationContext.getBean(SecurityService.class)).isEqualTo(securityService);
   }
   
-  @Ignore // FIXME
   @Test
   public void shouldNotStorePreLoginUrlOnPost() throws Exception {
     // given
     givenRequest("app/secured/bla", "POST");
     
     // when
-    securityFilter.doFilterSecure(request, response, filterChain);
+    securityFilter.performSecurityCheck(appUri("app/secured/bla"), request, response);
     
     // then
     assertThat(sessionVars).doesNotContainKey(SecurityFilter.PRE_AUTHENTICATION_URL);
   }
 
-  @Ignore // FIXME
   @Test
   public void shouldStorePreLoginUrlOnGet() throws Exception {
     // given
     givenRequest("app/secured/bla", "GET");
     
     // when
-    securityFilter.doFilterSecure(request, response, filterChain);
+    securityFilter.performSecurityCheck(appUri("app/secured/bla"), request, response);
     
     // then
     assertThat(sessionVars).containsKey(SecurityFilter.PRE_AUTHENTICATION_URL);
@@ -298,16 +314,16 @@ public class SecurityFilterTest {
     verifyZeroInteractions(filterChain);
   }
   
-  @Ignore // FIXME
   @Test
-  public void shouldRedirectToLoginPage() throws Exception {
+  public void shouldForwardToLoginPage() throws Exception {
+    
     // given
     givenRequest("app/secured/bla", "GET");
     
     // when
     securityFilter.doFilterSecure(request, response, filterChain);
     
-    assertIsRedirect("app/login");
+    assertIsForward("/app/login");
     
     // filter chain should not have been called
     verifyZeroInteractions(filterChain);
@@ -347,9 +363,14 @@ public class SecurityFilterTest {
   }
   
   private void assertIsRedirect(String uri) {
-    assertThat(redirectUrl).isEqualTo(appUri(uri));
+    assertThat(appUri(uri)).isEqualTo(redirectUri);
   }
   
+  private void assertIsForward(String uri) throws ServletException, IOException {
+    assertThat(uri).isEqualTo(dispatchUri);
+    verify(requestDispatcher).forward(any(ServletRequest.class), any(ServletResponse.class));
+  }
+
   // matching of wrapped request ////////////////////////////////////
   
   private Matcher<HttpServletRequest> reflectsCredentials(User user) {
