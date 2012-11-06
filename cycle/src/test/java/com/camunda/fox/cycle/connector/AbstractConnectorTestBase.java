@@ -10,6 +10,7 @@ import java.util.List;
 
 import org.junit.Test;
 
+import com.camunda.fox.cycle.util.DateUtil;
 import com.camunda.fox.cycle.util.IoUtil;
 
 /**
@@ -168,7 +169,7 @@ public abstract class AbstractConnectorTestBase {
     ConnectorNode sourceFileNode = new ConnectorNode("//" + TMP_DIR_NAME + "/test-lhs.bpmn", "test-lhs.bpmn");
 
     // now, with seconds accuracy
-    Date now = new Date((System.currentTimeMillis() / 1000) * 1000);
+    Date now = DateUtil.getNormalizedDate(System.currentTimeMillis());
 
     try {
       originalInputStream = connector.getContent(sourceFileNode);
@@ -206,7 +207,7 @@ public abstract class AbstractConnectorTestBase {
     InputStream nodeInputStream = null;
 
     // now, with seconds accuracy
-    Date beforeUpdate = new Date((System.currentTimeMillis() / 1000) * 1000);
+    Date beforeUpdate = DateUtil.getNormalizedDate(System.currentTimeMillis());
 
     try {
       originalInputStream = getDiagramResourceAsStream("test-rhs.bpmn");
