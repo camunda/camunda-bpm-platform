@@ -20,8 +20,7 @@ public class CycleConfiguration {
   
   private boolean useJaas = false;
   
-  private String mailSessionUrl;
-
+  private String mailSessionName;
   
   public boolean isUseJaas() {
     return useJaas;
@@ -39,11 +38,16 @@ public class CycleConfiguration {
     return useJaas || userRepository.countAll() > 0;
   }
 
+  /**
+   * The mail session name is used for looking up a mail session in JNDI
+   * 
+   * @return the JNDI name for looking up a mail session
+   */
   public String getMailSessionName() {
-    return mailSessionUrl;    
+    return mailSessionName;    
   }
   
   public void setMailSessionName(String mailSessionUrl) {
-    this.mailSessionUrl = mailSessionUrl;
+    this.mailSessionName = mailSessionUrl;
   }
 }
