@@ -15,7 +15,7 @@ import javax.mail.internet.MimeMessage;
 import org.springframework.stereotype.Service;
 
 import com.camunda.fox.cycle.exception.CycleException;
-import com.camunda.fox.cycle.service.mail.spi.MailServiceProvider;
+import com.camunda.fox.cycle.service.mail.spi.MailSessionProvider;
 import com.camunda.fox.cycle.util.IoUtil;
 
 /**
@@ -31,7 +31,7 @@ public class MailService {
   private static String PASSWORD_CONFIRM_TEMPLATE_CACHED;
 
   @Inject
-  MailServiceProvider mailServiceProvider;
+  MailSessionProvider mailSessionProvider;
 
   public void sendPasswordConfirmationMail(String username, String password, String from, String receiver) {
     
@@ -39,7 +39,7 @@ public class MailService {
     
     String foxType = "cycle"; 
 
-    Session mailSession = mailServiceProvider.lookupMailSession();
+    Session mailSession = mailSessionProvider.lookupMailSession();
     Message msg = new MimeMessage(mailSession);
     
     setFrom(msg, from, PASSWORD_CONFIRM_NAME);
@@ -57,7 +57,7 @@ public class MailService {
     
     setText(msg, PASSWORD_CONFIRM_TEMPLATE_CACHED, replacements, PASSWORD_CONFIRM_NAME);
 
-    mailServiceProvider.sendMail(msg, mailSession);
+    mailSessionProvider.sendMail(msg, mailSession);
 
   }
 

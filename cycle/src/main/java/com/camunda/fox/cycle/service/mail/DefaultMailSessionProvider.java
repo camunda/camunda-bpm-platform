@@ -15,14 +15,19 @@ import org.springframework.stereotype.Component;
 
 import com.camunda.fox.cycle.configuration.CycleConfiguration;
 import com.camunda.fox.cycle.exception.CycleException;
-import com.camunda.fox.cycle.service.mail.spi.MailServiceProvider;
+import com.camunda.fox.cycle.service.mail.spi.MailSessionProvider;
 
 /**
+ * <p>Default implementation of the {@link MailSessionProvider} SPI.</p>
+ * 
+ * <p>This implemenation looks up a mail session in JNDI using the name configured in {@link CycleConfiguration#getMailSessionName()}.</p>
+ * 
+ * <p>If that name is null, a set of default mail session names is used in order to autodetect a mail session.</p> 
  * 
  * @author Daniel Meyer
  */
 @Component
-public class DefaultMailServiceProvider implements MailServiceProvider {
+public class DefaultMailSessionProvider implements MailSessionProvider {
 
   @Inject
   private CycleConfiguration configuration;
