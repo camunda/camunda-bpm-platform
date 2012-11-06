@@ -166,6 +166,8 @@ public class RoundtripServiceTest {
     RoundtripDTO testRoundtrip = createAndFlushRoundtrip();
     BpmnDiagramDTO rightHandSide = testRoundtrip.getRightHandSide();
     
+    // needs to be here because invoke of diagramService.getImage(...), expects
+    // the image date to be 'now' + 5 secs. 'now' is set in roundtripService.doSynchronize(...)
     Thread.sleep(6000);
     
     roundtripService.doSynchronize(SyncMode.LEFT_TO_RIGHT, testRoundtrip.getId());
