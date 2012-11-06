@@ -11,7 +11,7 @@ import com.camunda.fox.cycle.exception.CycleException;
  * @author Daniel Meyer
  *
  */
-public interface MailServiceProvider {
+public interface MailSessionProvider {
 
   /**
    * Looks up the mail session using the configured name in {@link CycleConfiguration#getMailSessionName()}. 
@@ -23,7 +23,7 @@ public interface MailServiceProvider {
   public abstract Session lookupMailSession();
 
   /**
-   * Ends the message using a transport at the discretion of the {@link MailServiceProvider}.
+   * Ends the message using a transport at the discretion of the {@link MailSessionProvider}.
    * @param mailSession 
    * 
    * @param the message

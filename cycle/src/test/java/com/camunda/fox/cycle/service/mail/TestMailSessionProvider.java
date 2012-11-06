@@ -4,19 +4,19 @@ import java.util.Properties;
 
 import javax.mail.Session;
 
-import com.camunda.fox.cycle.service.mail.spi.MailServiceProvider;
+import com.camunda.fox.cycle.service.mail.spi.MailSessionProvider;
 
 /**
- * SPI-Implementation of {@link MailServiceProvider} for unittesting. 
+ * SPI-Implementation of {@link MailSessionProvider} for unit-testing. 
  * 
  * @author Daniel Meyer
  *
  */
-public class TestMailServiceProvider extends DefaultMailServiceProvider {
+public class TestMailSessionProvider extends DefaultMailSessionProvider {
   
   protected Properties mailServerProperties;
 
-  public TestMailServiceProvider(Properties mailServerProperties) {
+  public TestMailSessionProvider(Properties mailServerProperties) {
     this.mailServerProperties = mailServerProperties;
   }
 

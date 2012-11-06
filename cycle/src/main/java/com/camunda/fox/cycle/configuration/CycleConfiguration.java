@@ -19,8 +19,8 @@ public class CycleConfiguration extends SecurityConfiguration {
   @Inject
   private UserRepository userRepository;
   
-  private String mailSessionUrl;
-
+  private String mailSessionName;
+  
   /**
    * Returns true if users may be configured
    * @return 
@@ -29,11 +29,16 @@ public class CycleConfiguration extends SecurityConfiguration {
     return isUseJaas() || userRepository.countAll() > 0;
   }
 
+  /**
+   * The mail session name is used for looking up a mail session in JNDI
+   * 
+   * @return the JNDI name for looking up a mail session
+   */
   public String getMailSessionName() {
-    return mailSessionUrl;
+    return mailSessionName;
   }
   
   public void setMailSessionName(String mailSessionUrl) {
-    this.mailSessionUrl = mailSessionUrl;
+    this.mailSessionName = mailSessionUrl;
   }
 }

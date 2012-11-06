@@ -51,9 +51,9 @@ public class MailServiceTest {
     // setup the mail service
     
     Properties mailServerProperties = getMailServerProperties();      
-    TestMailServiceProvider testMailServiceProvider = new TestMailServiceProvider(mailServerProperties);
+    TestMailSessionProvider testMailServiceProvider = new TestMailSessionProvider(mailServerProperties);
     mailService = new MailService();
-    mailService.mailServiceProvider = testMailServiceProvider;
+    mailService.mailSessionProvider = testMailServiceProvider;
     
   }
   
