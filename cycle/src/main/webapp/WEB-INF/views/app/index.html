@@ -29,7 +29,7 @@
               </ul>
               <!-- begin create-roundtrip-dialog -->
               <modal-dialog model="newRoundtripDialog" ng-cloak>
-                <div class="modal" ng-controller="CreateNewRoundtripController" ngm-if="newRoundtripDialog.renderHtml()">
+                <div class="modal" ng-controller="CreateRoundtripController" ngm-if="newRoundtripDialog.renderHtml()">
                   <div class="modal-header">
                     <a class="close" data-dismiss="modal">&times;</a>
                     <h3 th:text="#{Create roundtrip}">Create roundtrip</h3>
@@ -46,12 +46,12 @@
                     </div>
                     <form class="form-horizontal" novalidate ng-submit="save()" name="newRoundtripForm">
                       <fieldset>
-                        <div class="control-group" ng-class="errorClass(newRoundtripForm)">
-                          <label class="control-label" for="roundtripName" th:text="#{Name}">Name</label>
+                        <div class="control-group" ng-class="errorClass(newRoundtripForm.name)">
+                          <label class="control-label" for="roundtrip-name" th:text="#{Name}">Name</label>
                           <div class="controls">
-                            <input ng-model="name" id="roundtripName" name="name" type="text" class="input-xlarge" required autofocus />
+                            <input ng-model="newRoundtrip.name" id="roundtrip-name" name="name" type="text" class="input-xlarge" available="isNameAvailable" required autofocus />
                             <p class="help-block" ng-show="newRoundtripForm.name.$error.required" th:text="#{Enter the name of your roundtrip}"></p>
-                            <p class="help-block" ng-show="newRoundtripForm.name.$error.unused" th:text="#{The name is already used}"></p>
+                            <p class="help-block" ng-show="newRoundtripForm.name.$error.available" th:text="#{The name is already used}"></p>
                           </div>
                         </div>
                       </fieldset>
@@ -66,7 +66,7 @@
               <!-- end create-roundtrip-dialog -->
               <!-- begin delete-roundtrip-dialog -->
               <modal-dialog model="deleteRoundtripDialog" ng-cloak>
-                <div class="modal hide fade" data-ng-controller="DeleteRoundtripController" ngm-if="deleteRoundtripDialog.renderHtml()"> 
+                <div class="modal hide" data-ng-controller="DeleteRoundtripController" ngm-if="deleteRoundtripDialog.renderHtml()"> 
                   <div class="modal-header">
                     <button ng-show="deleteRoundtripDialog.autoClosable" type="button" class="close" data-dismiss="modal">&times;</button>
                     <h3 th:text="#{'Delete roundtrip'}"></h3>

@@ -9,6 +9,8 @@
     <class>com.camunda.fox.cycle.entity.BpmnDiagram</class>
     <class>com.camunda.fox.cycle.entity.Roundtrip</class>
     <class>com.camunda.fox.cycle.entity.ConnectorConfiguration</class>
+    <class>com.camunda.fox.cycle.entity.User</class>
+    <class>com.camunda.fox.cycle.entity.ConnectorCredentials</class>
     <properties>
       <property name="hibernate.hbm2ddl.auto" value="create-drop"/>
     </properties>

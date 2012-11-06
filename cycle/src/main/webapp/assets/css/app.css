@@ -49,6 +49,10 @@ html, body {
   min-height: 100%;
 }
 
+.offset-paragraph {
+  margin-bottom: 30px;
+}
+
 .content-inset {
   margin-top: 60px;
 }

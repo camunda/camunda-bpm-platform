@@ -167,6 +167,80 @@ angular
     }
   };
 })
+.directive("available", function(Debouncer) {
+  return {
+    restrict: 'A',
+    require: 'ngModel',
+    link: function (scope, element, attrs, model) {
+      var checkAvailable = scope[attrs.available];
+      
+      if (!checkAvailable) {
+        throw new Error("No availability check #" + attrs.available);
+      }
+      
+      var validateDeferred = Debouncer.debounce(function() {
+        var promise = checkAvailable(model.$modelValue);
+        
+        promise.then(function(available) {
+          model.$setValidity("checked", true);
+          model.$setValidity("available", available);
+        });
+      }, 500);
+      
+      scope.$watch(function() { return model.$modelValue; }, function(newValue) {
+        if (newValue) {
+          model.$setValidity("checked", false);
+          validateDeferred();
+        }
+      });
+    }
+  };
+})
+.directive("matches", function() {
+  return {
+    restrict: 'A',
+    require: 'ngModel',
+    link: function (scope, element, attrs, model) {
+      
+      var match = attrs["matches"];
+
+      function validateMatch(a, b) {
+        model.$setValidity("matches", a == b);
+      }
+
+      scope.$watch(function() { return model.$modelValue; }, function(newValue) {
+        validateMatch(newValue, scope.$eval(match));
+      });
+
+      scope.$watch(match, function(newValue) {
+        validateMatch(model.$modelValue, newValue);
+      });
+    }
+  };
+})
+/**
+ * Email validation via email attribute
+ */
+.directive("email", function() {
+  return {
+    restrict: 'A',
+    require: 'ngModel',
+    link: function (scope, element, attrs, model) {
+      
+      var EMAIL_REGEX = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+      
+      model.$parsers.unshift(function(viewValue) {
+        if (EMAIL_REGEX.test(viewValue)) {
+          model.$setValidity('email', true);
+          return viewValue;
+        } else {
+          model.$setValidity('email', false);
+          return null;
+        }
+      });
+    }
+  };
+})
 .directive('ngCombobox', function(Event) {
   return {
     restrict: 'A',
@@ -526,7 +600,6 @@ Dialog.prototype = {
   },
 
   setStatus: function(status) {
-    console.log("new status: " + status);
     this.status = status;
   }, 
   

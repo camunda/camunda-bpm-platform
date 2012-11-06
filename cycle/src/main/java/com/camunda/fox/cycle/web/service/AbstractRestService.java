@@ -24,9 +24,39 @@ public class AbstractRestService {
     return Response.seeOther(uriInfo.getBaseUriBuilder().path(uri).build()).build();
   }
   
+  /**
+   * Issue a not found response with the given reason
+   * 
+   * @param message
+   * @return 
+   */
   protected WebApplicationException notFound(String message) {
-    Response response = Response.status(Response.Status.NOT_FOUND).entity(message).build();
     
+    return createWebApplicationException(message, Response.Status.NOT_FOUND);
+  }
+
+  /**
+   * Issue a bad request exception with the given reson
+   * 
+   * @param message
+   * @return 
+   */
+  protected WebApplicationException badRequest(String message) {
+    return createWebApplicationException(message, Response.Status.BAD_REQUEST);
+  }
+  
+  /**
+   * Issue a not found response with the given reason
+   * 
+   * @param message
+   * @return 
+   */
+  protected WebApplicationException notAllowed(String message) {
+    return createWebApplicationException(message, Response.Status.FORBIDDEN);
+  }
+
+  private WebApplicationException createWebApplicationException(String message, Response.Status status) {
+    Response response = Response.status(status).entity(message).build();
     return new WebApplicationException(response);
   }
 }

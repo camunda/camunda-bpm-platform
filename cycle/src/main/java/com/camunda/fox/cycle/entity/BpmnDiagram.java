@@ -23,12 +23,33 @@ public class BpmnDiagram extends AbstractEntity {
   
   private static final long serialVersionUID = 1L;
   
+  /**
+   * This enum represents the status of a
+   * BPMN 2.0 diagram from the perspective of the application. 
+   * 
+   * A diagram may have the following states
+   * 
+   * UNSPECIFIED: 
+   *    the status is not currently known, because it 
+   *    was never checked or is about to be checked#
+   * 
+   * UNAVAILABLE: 
+   *    the status is unavailable because the connector is not available, 
+   *    the connection to the connector cannot be established or the 
+   *    diagram is missing in the connector
+   * 
+   * OUT_OF_SYNC:
+   *    the diagram is available but out of sync, that is 
+   *    changed since it was last handled by cycle
+   * 
+   * SYNCHED: 
+   *    the diagram is totally fine and thus is cycle
+   */
   public static enum Status {
     UNSPECIFIED,
     UNAVAILABLE, 
     OUT_OF_SYNC, 
-    SYNCED, 
-    WARNING
+    SYNCED
   }
   
   private String modeler;
