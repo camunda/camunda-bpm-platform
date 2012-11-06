@@ -14,7 +14,6 @@ import javax.mail.internet.MimeMessage;
 
 import org.springframework.stereotype.Service;
 
-import com.camunda.fox.cycle.exception.CycleException;
 import com.camunda.fox.cycle.service.mail.spi.MailSessionProvider;
 import com.camunda.fox.cycle.util.IoUtil;
 
@@ -26,36 +25,36 @@ import com.camunda.fox.cycle.util.IoUtil;
 @Service
 public class MailService {
 
-  private static final String PASSWORD_CONFIRM_TEMPLATE = "passwordConfirmationEmailTemplate.txt";
-  private static final String PASSWORD_CONFIRM_NAME = "password confirmation email";
-  private static String PASSWORD_CONFIRM_TEMPLATE_CACHED;
+  private static final String WELCOME_EMAIL_TEMPLATE = "welcomeEmailTemplate.txt";
+  private static final String WELCOME_EMAIL_NAME = "welcome email";
+  private static String WELCOME_EMAIL_TEMPLATE_CACHED;
 
   @Inject
   MailSessionProvider mailSessionProvider;
 
-  public void sendPasswordConfirmationMail(String username, String password, String from, String receiver) {
+  public void sendWelcomeEmail(String username, String password, String from, String receiver) {
     
-    validateParameters(username, password, from, receiver, PASSWORD_CONFIRM_NAME);
+    validateParameters(username, password, from, receiver, WELCOME_EMAIL_NAME);
     
     String foxType = "cycle"; 
 
     Session mailSession = mailSessionProvider.lookupMailSession();
     Message msg = new MimeMessage(mailSession);
     
-    setFrom(msg, from, PASSWORD_CONFIRM_NAME);
-    setRecipients(msg, receiver, PASSWORD_CONFIRM_NAME);
-    setSubject(msg, foxType, PASSWORD_CONFIRM_NAME);
+    setFrom(msg, from, WELCOME_EMAIL_NAME);
+    setRecipients(msg, receiver, WELCOME_EMAIL_NAME);
+    setSubject(msg, foxType, WELCOME_EMAIL_NAME);
     
     Map<String, String> replacements = new HashMap<String, String>();
     replacements.put("\\$\\{username\\}", username);
     replacements.put("\\$\\{password\\}", password);
     replacements.put("\\$\\{foxType\\}", foxType);
     
-    if(PASSWORD_CONFIRM_TEMPLATE_CACHED == null) {
-      PASSWORD_CONFIRM_TEMPLATE_CACHED = readEmailTemplate(PASSWORD_CONFIRM_NAME, PASSWORD_CONFIRM_TEMPLATE);
+    if(WELCOME_EMAIL_TEMPLATE_CACHED == null) {
+      WELCOME_EMAIL_TEMPLATE_CACHED = readEmailTemplate(WELCOME_EMAIL_NAME, WELCOME_EMAIL_TEMPLATE);
     }
     
-    setText(msg, PASSWORD_CONFIRM_TEMPLATE_CACHED, replacements, PASSWORD_CONFIRM_NAME);
+    setText(msg, WELCOME_EMAIL_TEMPLATE_CACHED, replacements, WELCOME_EMAIL_NAME);
 
     mailSessionProvider.sendMail(msg, mailSession);
 
@@ -63,16 +62,16 @@ public class MailService {
 
   protected void validateParameters(String username, String password, String from, String receiver, String emailName) {
     if(username == null) {
-      throw new CycleException("Cannot send "+emailName+ "; username is null");
+      throw new MailServiceException("Cannot send "+emailName+ "; username is null");
     }
     if(password == null) {
-      throw new CycleException("Cannot send "+password+ "; username is null");
+      throw new MailServiceException("Cannot send "+password+ "; username is null");
     }
     if(from == null) {
-      throw new CycleException("Cannot send "+from+ "; username is null");
+      throw new MailServiceException("Cannot send "+from+ "; username is null");
     }
     if(receiver == null) {
-      throw new CycleException("Cannot send "+receiver+ "; username is null");
+      throw new MailServiceException("Cannot send "+receiver+ "; username is null");
     }
   }
 
@@ -87,7 +86,7 @@ public class MailService {
     try {
       msg.setText(templateInstance);
     } catch (MessagingException e) {
-      throw new CycleException("Could not set 'text' field in "+emailName+": "+e.getMessage(), e);
+      throw new MailServiceException("Could not set 'text' field in "+emailName+": "+e.getMessage(), e);
     }
     
   }
@@ -96,7 +95,7 @@ public class MailService {
     try {
       msg.setSubject("Welcome to camunda fox " + foxType);
     } catch (MessagingException e) {
-      throw new CycleException("Could not set 'subject' field in "+emailName+": "+e.getMessage(), e);
+      throw new MailServiceException("Could not set 'subject' field in "+emailName+": "+e.getMessage(), e);
     }
     
   }
@@ -105,7 +104,7 @@ public class MailService {
     try {
       msg.setRecipients(Message.RecipientType.TO, InternetAddress.parse(receiver, false));
     } catch (Exception e) {
-      throw new CycleException("Could not set 'recipients' field in "+emailName+": "+e.getMessage(), e);
+      throw new MailServiceException("Could not set 'recipients' field in "+emailName+": "+e.getMessage(), e);
     }
     
   }
@@ -114,7 +113,7 @@ public class MailService {
     try {
       msg.setFrom(new InternetAddress(from));
     } catch (Exception e) {
-      throw new CycleException("Could not set 'from' field in "+emailName+": "+e.getMessage(), e);
+      throw new MailServiceException("Could not set 'from' field in "+emailName+": "+e.getMessage(), e);
     }
   }
 
@@ -125,7 +124,7 @@ public class MailService {
       return new String(IoUtil.readInputStream(resourceAsStream, emailName), "utf-8");
       
     } catch (Exception e) {
-      throw new CycleException("Could not load "+emailName+": " + e.getMessage(), e);
+      throw new MailServiceException("Could not load "+emailName+": " + e.getMessage(), e);
       
     } finally {
       IoUtil.closeSilently(resourceAsStream);

@@ -14,7 +14,6 @@ import org.junit.Test;
 import org.subethamail.wiser.Wiser;
 import org.subethamail.wiser.WiserMessage;
 
-import com.camunda.fox.cycle.exception.CycleException;
 
 
 /**
@@ -66,7 +65,7 @@ public class MailServiceTest {
   }
   
   @Test
-  public void testSendPasswordConfirmationMail() throws Exception {
+  public void testSendWelcomeEmail() throws Exception {
 
     String from = "test@fox.camunda.com";
     String username = "testUserName";
@@ -74,7 +73,7 @@ public class MailServiceTest {
     String recipient = "testUser@camunda.com";
 
     // send the email
-    mailService.sendPasswordConfirmationMail(username, password, from, recipient);
+    mailService.sendWelcomeEmail(username, password, from, recipient);
 
     // make sure it was received by the mail 
     List<WiserMessage> messages = wiser.getMessages();
@@ -102,7 +101,7 @@ public class MailServiceTest {
   }
   
   @Test
-  public void testSendPasswordConfirmationMail_invalidParameters() {
+  public void testSendWelcomeEmail_invalidParameters() {
     
     String from = "test@fox.camunda.com";
     String username = "testUserName";
@@ -110,27 +109,27 @@ public class MailServiceTest {
     String recipient = "testUser@camunda.com";
     
     try {
-      mailService.sendPasswordConfirmationMail(null, password, from, recipient);
+      mailService.sendWelcomeEmail(null, password, from, recipient);
       Assert.fail("Exception expected");
-    }catch (CycleException e) {
+    }catch (MailServiceException e) {
       // expected
     }
     try {
-      mailService.sendPasswordConfirmationMail(username, null, from, recipient);
+      mailService.sendWelcomeEmail(username, null, from, recipient);
       Assert.fail("Exception expected");
-    }catch (CycleException e) {
+    }catch (MailServiceException e) {
       // expected
     }
     try {
-      mailService.sendPasswordConfirmationMail(username, password, null, recipient);
+      mailService.sendWelcomeEmail(username, password, null, recipient);
       Assert.fail("Exception expected");
-    }catch (CycleException e) {
+    }catch (MailServiceException e) {
       // expected
     }
     try {
-      mailService.sendPasswordConfirmationMail(username, password, from, null);
+      mailService.sendWelcomeEmail(username, password, from, null);
       Assert.fail("Exception expected");
-    }catch (CycleException e) {
+    }catch (MailServiceException e) {
       // expected
     }
     

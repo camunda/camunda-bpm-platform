@@ -12,7 +12,14 @@
 
   
   <bean id="cycleConfiguration" class="com.camunda.fox.cycle.configuration.CycleConfiguration">
-    <property name="useJaas" value="false"></property>
+    
+    <!-- cycle security service configuration -->
+    <property name="useJaas" value="false" />
+    
+    <!-- cycle email service configuration -->
+    <property name="emailFrom" value="cycle@localhost" />
+    <!-- <property name="mailSessionName" value="" /> -->
+    
   </bean>
   
 </beans>
