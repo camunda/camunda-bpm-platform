@@ -23,6 +23,14 @@ public class User extends AbstractEntity {
   private List<ConnectorCredentials> connectorCredentials;
 
   private boolean admin;
+
+  public User() {
+  }
+
+  public User(String name, boolean admin) {
+    this.name = name;
+    this.admin = admin;
+  }
   
   public String getName() {
     return name;

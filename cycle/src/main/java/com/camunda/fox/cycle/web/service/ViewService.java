@@ -1,6 +1,7 @@
 package com.camunda.fox.cycle.web.service;
 
 
+import javax.annotation.security.RolesAllowed;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -25,5 +26,19 @@ public class ViewService extends AbstractRestService {
       name = name.substring(0, name.lastIndexOf(".html"));
     }
     return "tpl:app/" + name;
+  }
+  
+  @GET
+  @Path("users")
+  @RolesAllowed("admin")
+  public String listUsers() {
+    return "tpl:app/users";
+  }
+  
+  @GET
+  @Path("connectors")
+  @RolesAllowed("admin")
+  public String listConnectors() {
+    return "tpl:app/connectors";
   }
 }

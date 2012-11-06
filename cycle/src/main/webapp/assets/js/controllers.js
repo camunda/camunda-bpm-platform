@@ -927,6 +927,7 @@ function CreateInitialUserController($scope, $window, $http, App) {
 function ProfileController($scope, $http, App, Event, Credentials, ConnectorConfiguration, ConnectorCredentials) {
   
   $scope.connectorCredentialsDialog = new Dialog();
+  $scope.changePasswordDialog = new Dialog();
 
   $scope.$emit(Event.navigationChanged, {name:"Profile"});
 
@@ -963,6 +964,9 @@ function ProfileController($scope, $http, App, Event, Credentials, ConnectorConf
     $scope.connectorCredentialsDialog.open();
   };
 
+  $scope.changePassword = function() {
+    $scope.changePasswordDialog.open();
+  };
   
   $scope.showEditAction = function (connectorConfiguration) {
     if (!$scope.connectorCredentialsByConnectorId) {
@@ -1014,5 +1018,46 @@ function EditConnectorCredentials($scope, $http, App) {
     $scope.saveConnectorCredentials($scope.editCredentials, function() {
       $scope.connectorCredentialsDialog.close();
     });
+  };
+}
+
+function ChangePasswordController($scope, $http, App) {
+  
+  var MODEL = { data: {}, newPasswordRepetition: null, state: null};
+  
+  $scope.passwordChange = angular.copy(MODEL);
+  
+  $scope.isValid = function (form) {
+    return form && form.$valid;
+  };
+  
+  function isValid() {
+    return $scope.isValid($scope.changePasswordForm);
+  }
+  
+  // needed for form validation
+  // DO NOT REMOVE FROM CONTROLLER!
+  $scope.errorClass = function(form) {
+    return (!form || form.$valid || !form.$dirty) ? '' : 'error';
+  };
+  
+  $scope.save = function () {
+    if (!isValid()) {
+      return;
+    }
+    
+    var data = angular.copy($scope.passwordChange.data);
+    
+    $http.post(App.uri("secured/resource/user/" + $scope.currentUser.id + "/changePassword"), data)
+      .success(function() {
+        $scope.passwordChange.state = "SUCCESS";
+        $scope.passwordChange.data = {};
+        $scope.passwordChange.newPasswordRepetition = null;
+      })
+      .error(function() {
+        $scope.passwordChange.state = "ERROR";
+        $scope.passwordChange.data = {};
+        $scope.passwordChange.newPasswordRepetition = null;
+      });
   };
 }

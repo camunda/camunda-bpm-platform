@@ -22,7 +22,6 @@ public class ConnectorCredentialsDTO {
   public ConnectorCredentialsDTO(ConnectorCredentials connectorCredentials) {
     this.id = connectorCredentials.getId();
     this.username = connectorCredentials.getUsername();
-    this.password = connectorCredentials.getPassword();
     this.connectorId = connectorCredentials.getConnectorConfiguration().getId();
     this.userId = connectorCredentials.getUser().getId();
   }

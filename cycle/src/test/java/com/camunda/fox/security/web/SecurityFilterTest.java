@@ -59,6 +59,8 @@ public class SecurityFilterTest {
   
   private Map<String, Object> sessionVars = new HashMap<String, Object>();
   
+  private Map<String, String> requestHeaders = new HashMap<String, String>();
+  
   private Map<Class, Object> beans = new HashMap<Class, Object>();
   
   private String redirectUrl;

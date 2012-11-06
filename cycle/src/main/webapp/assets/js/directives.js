@@ -600,7 +600,6 @@ Dialog.prototype = {
   },
 
   setStatus: function(status) {
-    console.log("new status: " + status);
     this.status = status;
   }, 
   
