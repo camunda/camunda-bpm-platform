@@ -35,9 +35,11 @@ public class BpmnDiagramServiceSyncStatusTest extends AbstractDiagramServiceTest
   @Inject
   @ReplaceWithMock
   private ConnectorRegistry registry;
+  
   @Inject
   @ReplaceWithMock
   private ConnectorCache connectorCache;
+  
   @Inject
   @ReplaceWithMock
   private DummyConnector connector;

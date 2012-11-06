@@ -32,7 +32,7 @@ public class AbstractRestService {
    */
   protected WebApplicationException notFound(String message) {
     
-    return createWebApplicationException(message, Response.Status.FORBIDDEN);
+    return createWebApplicationException(message, Response.Status.NOT_FOUND);
   }
 
   /**

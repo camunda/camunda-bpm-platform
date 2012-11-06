@@ -22,7 +22,7 @@ import com.camunda.fox.cycle.connector.ConnectorNodeType;
 public class BpmnDiagram extends AbstractEntity {
   
   private static final long serialVersionUID = 1L;
-  
+  // FIXME what is what?
   public static enum Status {
     UNSPECIFIED,
     UNAVAILABLE, 
