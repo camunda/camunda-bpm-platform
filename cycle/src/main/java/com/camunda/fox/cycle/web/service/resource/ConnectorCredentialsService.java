@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.camunda.fox.cycle.connector.ConnectorRegistry;
 import com.camunda.fox.cycle.connector.ConnectorStatus;
+import com.camunda.fox.cycle.connector.crypt.EncryptionService;
 import com.camunda.fox.cycle.entity.ConnectorConfiguration;
 import com.camunda.fox.cycle.entity.ConnectorCredentials;
 import com.camunda.fox.cycle.entity.User;
@@ -32,6 +33,9 @@ import com.camunda.fox.cycle.web.service.AbstractRestService;
  */
 @Path("secured/resource/connector/credentials")
 public class ConnectorCredentialsService extends AbstractRestService {
+  
+  @Inject
+  EncryptionService encryptionService;
   
   @Inject
   private ConnectorCredentialsRepository connectorCredentialsRepository;
@@ -89,6 +93,10 @@ public class ConnectorCredentialsService extends AbstractRestService {
     if (user == null) {
       throw notFound("User with id " + data.getConnectorId() + " not found.");
     }
+    
+    if (user.getPassword()!=null) {
+      user.setPassword(encryptionService.encrypt(user.getPassword()));
+    }
     connectorCredentials.setUser(user);
     
     return ConnectorCredentialsDTO.wrap(connectorCredentialsRepository.saveAndFlush(connectorCredentials));
@@ -141,7 +149,7 @@ public class ConnectorCredentialsService extends AbstractRestService {
    */
   private void update(ConnectorCredentials connectorCredentials, ConnectorCredentialsDTO data) {
     connectorCredentials.setUsername(data.getUsername());
-    connectorCredentials.setPassword(data.getPassword());
+    connectorCredentials.setPassword(encryptionService.encrypt(data.getPassword()));
   }
   
 }

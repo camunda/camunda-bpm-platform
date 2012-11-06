@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.jasypt.util.text.BasicTextEncryptor;
@@ -11,8 +12,6 @@ import org.springframework.stereotype.Component;
 
 @Component
 public class EncryptionServiceImpl implements EncryptionService {
-
-  private static final long serialVersionUID = 1L;
 
   BasicTextEncryptor textEncryptor;
   
@@ -60,13 +59,21 @@ public class EncryptionServiceImpl implements EncryptionService {
   }
 
   public String getEncryptionPassword() {
-    if (encryptionPassword == null) {
+    File passwordFile = new File(getPasswordFilePath());
+    
+    if (encryptionPassword == null && passwordFile.exists()) {
         try {
-          encryptionPassword = new Scanner(new FileInputStream(new File(getPasswordFilePath()))).useDelimiter("\\A").next();
-        } catch (FileNotFoundException e) {
-          log.warning(String.format("Could not read the encryption password from specified path %s, using default password", getPasswordFilePath()));
+          FileInputStream passwordFileStream = new FileInputStream(passwordFile);
+          Scanner scanner = new Scanner(passwordFileStream);
+          encryptionPassword = scanner.useDelimiter("\\A").next().replace("\n", "");
+          passwordFileStream.close();
+          scanner.close();
+        } catch (Exception e) {
+          log.log(Level.WARNING, String.format("Could not read the encryption password from specified path %s, using default password", getPasswordFilePath()), e);
           encryptionPassword = DEFAULT_PASSWORD;
         }
+    }else if (encryptionPassword == null) {
+      encryptionPassword = DEFAULT_PASSWORD;
     }
 
     return encryptionPassword;
@@ -81,6 +88,7 @@ public class EncryptionServiceImpl implements EncryptionService {
     }
     System.out.println("Enter the text / password to encrypt:");
     String text = scanner.nextLine();
+    scanner.close();
     System.out.println("Encrypted Result: "+ new EncryptionServiceImpl(password).encrypt(text) );
   }
 

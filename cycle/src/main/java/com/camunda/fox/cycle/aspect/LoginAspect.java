@@ -64,7 +64,9 @@ public class LoginAspect {
         }
       }
   }
-
-
+  
+  public void setConnectorCredentialsRepository(ConnectorCredentialsRepository connectorCredentialsRepository) {
+    this.connectorCredentialsRepository = connectorCredentialsRepository;
+  }
   
 }
