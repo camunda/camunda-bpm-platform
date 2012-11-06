@@ -39,7 +39,7 @@
 
             <!-- begin add/edit connector-configuration-dialog -->
             <modal-dialog model="editConnectorConfigurationDialog" ng-cloak>
-              <div class="modal hide fade" data-ng-controller="EditConnectorController" data-ngm-if="editConnectorConfigurationDialog.renderHtml()"> 
+              <div class="modal hide" data-ng-controller="EditConnectorController" data-ngm-if="editConnectorConfigurationDialog.renderHtml()"> 
                 <div class="modal-header">
                   <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                   <h3 data-ng-show="connectorDialogMode == 'ADD_CONNECTOR'" th:text="#{'Add connector'}"></h3>
@@ -141,7 +141,7 @@
             
             <!-- begin delete-connector-configuration-dialog -->
             <modal-dialog model="deleteConnectorConfigurationDialog" ng-cloak>
-              <div class="modal hide fade" data-ng-controller="DeleteConnectorConfigurationController" ngm-if="deleteConnectorConfigurationDialog.renderHtml()"> 
+              <div class="modal hide" data-ng-controller="DeleteConnectorConfigurationController" ngm-if="deleteConnectorConfigurationDialog.renderHtml()"> 
                 <div class="modal-header">
                   <button data-ng-show="deleteConnectorConfigurationDialog.autoClosable" type="button" class="close" data-dismiss="modal">&times;</button>
                   <h3 th:text="#{'Delete connector configuration'}"></h3>

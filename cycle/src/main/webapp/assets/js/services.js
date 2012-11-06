@@ -120,11 +120,14 @@ angular
         clearTimeout(blockTime);
         $.unblockUI();
         return promise;
-      }, function (response)  {
+      }, function (response) {
         clearTimeout(blockTime);
         $.unblockUI();
         console.log("error", response);
-        Error.addError({ "status" : response.status , "config" :  response.config });
+        if (parseInt(response.status) == 500) {
+          Error.addError({ "status" : response.status , "config" :  response.config });
+        }
+        
         return $q.reject(response);
       });
     };

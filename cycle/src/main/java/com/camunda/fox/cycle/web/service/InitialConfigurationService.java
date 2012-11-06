@@ -8,9 +8,13 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import com.camunda.fox.cycle.configuration.CycleConfiguration;
+import com.camunda.fox.cycle.entity.User;
 import com.camunda.fox.cycle.repository.UserRepository;
+import com.camunda.fox.cycle.security.IdentityHolder;
 import com.camunda.fox.cycle.web.dto.UserDTO;
 import com.camunda.fox.cycle.web.service.resource.UserService;
+import com.camunda.fox.security.SecurityContext;
+import com.camunda.fox.security.UserIdentity;
 
 /**
  *
@@ -18,6 +22,8 @@ import com.camunda.fox.cycle.web.service.resource.UserService;
  */
 @Path("first-time-setup")
 public class InitialConfigurationService extends AbstractRestService {
+  
+  private static UserIdentity TEMP_AUTHORIZED_IDENTITY = new UserIdentity(new User("temp-user", true));
   
   @Inject
   private CycleConfiguration configuration;
@@ -46,7 +52,16 @@ public class InitialConfigurationService extends AbstractRestService {
     }
     
     data.setAdmin(true);
-    UserDTO user = userService.create(data);
+    
+    UserDTO user = null;
+    
+    // temporary overload to allow user creation
+    try {
+      IdentityHolder.setIdentity(TEMP_AUTHORIZED_IDENTITY);
+      user = userService.create(data);
+    } finally {
+      IdentityHolder.setIdentity(null);
+    }
     
     return "Ok [id=" + user.getId() + "]";
   }

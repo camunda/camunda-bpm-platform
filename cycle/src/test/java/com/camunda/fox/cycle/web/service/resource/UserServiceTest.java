@@ -14,9 +14,9 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 import com.camunda.fox.cycle.entity.User;
 import com.camunda.fox.cycle.repository.UserRepository;
 import com.camunda.fox.cycle.security.IdentityHolder;
+import com.camunda.fox.cycle.web.dto.PasswordChangeDTO;
 import com.camunda.fox.cycle.web.dto.UserDTO;
 import com.camunda.fox.security.UserIdentity;
-import com.sun.security.auth.UserPrincipal;
 
 /**
  *
@@ -125,7 +125,7 @@ public class UserServiceTest {
     IdentityHolder.setIdentity(new UserIdentity(user.getName()));
     
     // when
-    userService.changePassword(user.getId(), "ASDF", "FOOBAR");
+    userService.changePassword(user.getId(), new PasswordChangeDTO("ASDF", "FOOBAR"));
     User userAfterUpdate = userRepository.findById(user.getId());
     
     // then
@@ -142,7 +142,7 @@ public class UserServiceTest {
     
     // when
     try {
-      userService.changePassword(user.getId(), "ASDF", "FOOBAR");
+      userService.changePassword(user.getId(), new PasswordChangeDTO("ASDF", "FOOBAR"));
       fail("expected exception");
     } catch (WebApplicationException e) {
       assertThat(e.getResponse().getStatus()).isEqualTo(403);
@@ -157,7 +157,7 @@ public class UserServiceTest {
   @Test
   public void shouldNotChangePasswordOnMissingUser() throws Exception {
     try {
-      userService.changePassword(-10, "ASDF", "FOOBAR");
+      userService.changePassword(-10, new PasswordChangeDTO("ASDF", "FOOBAR"));
       fail("expected exception");
     } catch (WebApplicationException e) {
       assertThat(e.getResponse().getStatus()).isEqualTo(404);

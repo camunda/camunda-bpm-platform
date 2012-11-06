@@ -6,11 +6,10 @@ import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
 import org.springframework.stereotype.Component;
 
-import com.camunda.fox.cycle.configuration.CycleConfiguration;
 import com.camunda.fox.cycle.entity.User;
-import com.camunda.fox.cycle.repository.UserRepository;
+import com.camunda.fox.security.SecurityConfiguration;
 import com.camunda.fox.security.UserIdentity;
-import com.camunda.fox.security.UserIdentity;
+import com.camunda.fox.security.UserLookup;
 import com.camunda.fox.security.jaas.PassiveCallbackHandler;
 
 /**
@@ -21,10 +20,10 @@ import com.camunda.fox.security.jaas.PassiveCallbackHandler;
 public class SecurityService {
 
   @Inject
-  private CycleConfiguration config;
+  private SecurityConfiguration config;
   
   @Inject
-  private UserRepository userRepository;
+  private UserLookup userLookup;
   
   public UserIdentity login(String userName, String password) {
     if (userName == null || password == null) {
@@ -56,7 +55,7 @@ public class SecurityService {
   }
 
   private UserIdentity loginViaUserManagement(String userName, String password) {
-    User user = userRepository.findByName(userName);
+    User user = userLookup.findByName(userName);
     
     if (user == null) {
       return null;

@@ -37,7 +37,7 @@
 
             <!-- begin add/edit user-dialog -->
             <modal-dialog model="editUserDialog" ng-cloak>
-              <div class="modal hide fade" data-ng-controller="EditUserController" data-ngm-if="editUserDialog.renderHtml()"> 
+              <div class="modal hide" data-ng-controller="EditUserController" data-ngm-if="editUserDialog.renderHtml()"> 
                 <div class="modal-header">
                   <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                   <h3 data-ng-show="mode == 'ADD'" th:text="#{'Add user'}"></h3>
@@ -104,7 +104,7 @@
             
             <!-- begin delete-user-dialog -->
             <modal-dialog model="deleteUserDialog" ng-cloak>
-              <div class="modal hide fade" data-ng-controller="DeleteUserController" ngm-if="deleteUserDialog.renderHtml()"> 
+              <div class="modal hide" data-ng-controller="DeleteUserController" ngm-if="deleteUserDialog.renderHtml()"> 
                 <div class="modal-header">
                   <button data-ng-show="deleteUserDialog.autoClosable" type="button" class="close" data-dismiss="modal">&times;</button>
                   <h3 th:text="#{'Delete user'}"></h3>

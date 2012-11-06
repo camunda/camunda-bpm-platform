@@ -17,6 +17,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 import com.camunda.fox.cycle.security.IdentityHolder;
 import com.camunda.fox.security.UserIdentity;
 import com.camunda.fox.security.service.SecurityService;
+import static com.camunda.fox.security.web.util.WebUtil.*;
 
 /**
  *
@@ -28,6 +29,8 @@ public class SecurityFilter implements Filter {
  
   public static final String IDENTITY_SESSION_KEY = "com.camunda.fox.SecurityFilter.SESSION_KEY";
   public static final String PRE_AUTHENTICATION_URL = "com.camunda.fox.SecurityFilter.LAST_REQUEST_URI";
+  
+  static final String NOP = "NOP";
   
   @Override
   public void init(FilterConfig config) throws ServletException {
@@ -61,13 +64,26 @@ public class SecurityFilter implements Filter {
     else {
       String uri = performSecurityCheck(request.getRequestURI(), request, response);
       if (uri != null) {
-        if (uri.startsWith("app:")) {
-          uri = uri.substring("app:".length());
-          sendRedirect(request, response, uri);
+        boolean forward = false;
+
+        // handle special do nothing actions
+        // needed in case of ajax requests where only a 
+        // response status is returned
+        if (uri.equals(NOP)) {
+          return;
+        }
+
+        if (uri.startsWith("forward:")) {
+          uri = uri.substring("forward:".length());
+          forward = true;
+        }
+
+        uri = uri.replace("app:", request.getContextPath() + "/");
+        if (forward) {
+          request.getRequestDispatcher(uri).forward(request, response);
         } else {
           response.sendRedirect(uri);
         }
-        
         return;
       }
     }
@@ -76,10 +92,15 @@ public class SecurityFilter implements Filter {
 
   private String performSecurityCheck(String requestUri, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
     if (requiresAuthentication(requestUri)) {
-      if (isGET(request)) {
-        request.getSession().setAttribute(PRE_AUTHENTICATION_URL, request.getRequestURI());
+      if (isAjax(request)) {
+        response.sendError(401, "Authorization required");
+        return NOP;
+      } else {
+        if (isGET(request)) {
+          request.getSession().setAttribute(PRE_AUTHENTICATION_URL, request.getRequestURI());
+        }
+        return "forward:/app/login";
       }
-      return "app:app/login";
     } else
     if (isLoginRequest(request)) {
       if (login(request)) {
@@ -107,14 +128,6 @@ public class SecurityFilter implements Filter {
 
   protected void setAuthenticatedIdentity(HttpServletRequest request, UserIdentity identity) {
     request.getSession().setAttribute(IDENTITY_SESSION_KEY, identity);
-  }
-  
-  private boolean isGET(HttpServletRequest request) {
-    return "GET".equals(request.getMethod());
-  }
-  
-  private boolean isPOST(HttpServletRequest request) {
-    return "POST".equals(request.getMethod());
   }
   
   protected boolean isLoginRequest(HttpServletRequest request) {
@@ -158,9 +171,4 @@ public class SecurityFilter implements Filter {
   private boolean requestUriMatches(HttpServletRequest request, String uri) {
     return request.getRequestURI().matches(request.getContextPath() + "/" + uri);
   }
-
-  private void sendRedirect(HttpServletRequest request, HttpServletResponse response, String uri) throws IOException {
-    response.sendRedirect(request.getContextPath() + "/" + uri);
-  }
-  
 }

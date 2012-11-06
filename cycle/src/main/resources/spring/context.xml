@@ -14,6 +14,9 @@
 
   <context:annotation-config/>
   
+  <!-- enable aspects via @Aspect -->
+  <aop:aspectj-autoproxy/>
+
   <!-- 
     configured to pick up @Path and @Provider annotated classes as spring beans, too 
     so that there is no need for additional annotations

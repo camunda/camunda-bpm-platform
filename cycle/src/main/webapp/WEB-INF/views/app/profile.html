@@ -32,12 +32,19 @@
                     <a data-ng-show="connectorConfiguration.loginMode == 'USER' && showEditAction(connectorConfiguration)" data-ng-click="editConnectorCredentials(connectorConfiguration)" th:text="#{edit credentials}">edit credentials</a>
                   </td>
                 </tr>
+                <tr ng-show="!connectorConfigurations.length">
+                  <td colspan="5">
+                    No connectors configured
+                  </td>
+                </tr>
               </tbody>
             </table>
-            
+
+            <a class="btn" data-ng-click="changePassword()"><span th:text="#{Change Account Password}">Change Account Password</span></a>
+
             <!-- begin add/edit user-specific-connector-credentials-dialog -->
             <modal-dialog model="connectorCredentialsDialog" ng-cloak>
-              <div class="modal hide fade" data-ng-controller="EditConnectorCredentials" data-ngm-if="connectorCredentialsDialog.renderHtml()"> 
+              <div class="modal hide" data-ng-controller="EditConnectorCredentials" data-ngm-if="connectorCredentialsDialog.renderHtml()"> 
                 <div class="modal-header">
                   <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
                   <h3 data-ng-show="mode == 'ADD'" th:text="#{'Add user credentials'}"></h3>
@@ -84,8 +91,63 @@
                 </div>
               </div>
             </modal-dialog>
-            <!-- begin add/edit user-specific-connector-credentials-dialog -->
-            
+            <!-- end add/edit user-specific-connector-credentials-dialog -->
+
+            <!-- begin change-password-dialog -->
+            <modal-dialog model="changePasswordDialog" ng-cloak>
+              <div class="modal hide" data-ng-controller="ChangePasswordController" data-ngm-if="changePasswordDialog.renderHtml()"> 
+                <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                  <h3 th:text="#{'Change Password'}"></h3>
+                </div>
+                <div class="modal-body">
+                  <div class="alert alert-error" data-ng-show="passwordChange.state == 'ERROR'">
+                    <button type="button" class="close" data-ng-click="passwordChange.state = null">&times;</button>
+                    <span>
+                      <strong th:text="#{Changing the password failed}"></strong>
+                      Your credentials could not be changed. Please try again.
+                    </span>
+                  </div>
+                  <div class="alert alert-success" data-ng-show="passwordChange.state == 'SUCCESS'">
+                    <span>
+                      <strong th:text="#{Password changed}"></strong>
+                      Your new credentials are now valid.
+                    </span>
+                  </div>
+                  <form ng-show="!passwordChange.state" class="form-horizontal" novalidate data-ng-submit="save()" name="changePasswordForm">
+                    <fieldset>
+                      <div class="control-group" ng-class="errorClass(changePasswordForm.oldPassword)">
+                        <label class="control-label" for="oldPassword" 
+                               th:text="#{'Old Password'}">Old Password</label>
+                        <div class="controls">
+                          <input id="oldPassword" name="oldPassword" required type="password" class="span6" data-ng-model="passwordChange.data.oldPassword" />
+                        </div>
+                      </div>
+                      <div class="control-group" ng-class="errorClass(changePasswordForm.repetition)">
+                        <label class="control-label" for="password" 
+                               th:text="#{'New Password'}">New Password</label>
+                        <div class="controls">
+                          <input id="password" name="password" type="password" class="span6" data-ng-model="passwordChange.data.newPassword" />
+                        </div>
+                      </div>
+                      <div class="control-group" ng-class="errorClass(changePasswordForm.repetition)">
+                        <label class="control-label" for="password-repetition" 
+                               th:text="#{'New Password (repeated)'}">New Password (repeated)</label>
+                        <div class="controls">
+                          <input id="password-repetition" name="repetition" type="password" required class="span6" matches="passwordChange.data.newPassword" data-ng-model="passwordChange.newPasswordRepetition"/>
+                          <p class="help-block" ng-show="changePasswordForm.repetition.$error.matches">Password and repetition do not match</p>
+                        </div>
+                      </div>
+                    </fieldset>
+                  </form>
+                </div>
+                <div class="modal-footer">
+                  <button class="btn" data-ng-click="changePasswordDialog.close()" th:text="#{Close}">Close</button>
+                  <button class="btn btn-primary" data-ng-click="save()" data-ng-disabled="!isValid(changePasswordForm)" th:text="#{Change}">Change</button>
+                </div>
+              </div>
+            </modal-dialog>
+            <!-- end change-password-dialog -->
           </div>
         </div>
       </div>

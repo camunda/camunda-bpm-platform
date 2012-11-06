@@ -1,12 +1,10 @@
 package com.camunda.fox.cycle.web.service.resource;
 
-import java.security.Principal;
 import java.util.List;
 
 import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
 import javax.ws.rs.DELETE;
-import javax.ws.rs.FormParam;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -20,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import com.camunda.fox.cycle.entity.User;
 import com.camunda.fox.cycle.repository.UserRepository;
 import com.camunda.fox.cycle.security.IdentityHolder;
+import com.camunda.fox.cycle.web.dto.PasswordChangeDTO;
 import com.camunda.fox.cycle.web.dto.UserDTO;
 import com.camunda.fox.cycle.web.service.AbstractRestService;
 import com.camunda.fox.security.UserIdentity;
@@ -107,9 +106,7 @@ public class UserService extends AbstractRestService {
   @Path("{id}/changePassword")
   @Transactional
   public String changePassword(
-      @PathParam("id") long userId, 
-      @FormParam("oldPassword") String oldPassword, 
-      @FormParam("newPassword") String newPassword) {
+      @PathParam("id") long userId, PasswordChangeDTO data) {
     
     UserIdentity principal = IdentityHolder.getIdentity();
     User user = getUserById(userId);
@@ -117,10 +114,9 @@ public class UserService extends AbstractRestService {
     if (principal != null && principal.getName().equals(user.getName())) {
       
       // TODO: decrypt password
-      if (oldPassword.equals(user.getPassword())) {
+      if (data.getOldPassword().equals(user.getPassword())) {
         // TODO: encrypt password
-        user.setPassword(newPassword);
-        
+        user.setPassword(data.getNewPassword());
         return "Ok";
       }
     }
