@@ -108,6 +108,12 @@ footer {
 .nav-list li {
   word-wrap: break-word;
 }
+
+/* a container with a max width */
+.fixed-box2 {
+	max-width:600px;
+}
+
 /** end usability tweeks */
 
 
