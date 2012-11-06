@@ -22,6 +22,10 @@ import com.camunda.fox.cycle.connector.Connector;
 import com.camunda.fox.cycle.connector.ConnectorLoginMode;
 import com.camunda.fox.cycle.connector.test.util.RepositoryUtil;
 import com.camunda.fox.cycle.entity.ConnectorConfiguration;
+import com.camunda.fox.cycle.entity.ConnectorCredentials;
+import com.camunda.fox.cycle.repository.ConnectorCredentialsRepository;
+import com.camunda.fox.cycle.security.IdentityHolder;
+import com.camunda.fox.security.UserIdentity;
 
 /**
  * 
@@ -67,7 +71,7 @@ public class EncryptionServiceTest {
 	}
 	
 	@Test
-	public void testLoginAspectUsesEncryption () throws NoSuchMethodException, SecurityException {
+	public void testGlobalLoginAspectUsesEncryption () throws NoSuchMethodException, SecurityException {
 	  ArgumentCaptor<String> passwordArgument = ArgumentCaptor.forClass(String.class);
 	  ArgumentCaptor<String> userArgument = ArgumentCaptor.forClass(String.class);
 	  
@@ -85,6 +89,40 @@ public class EncryptionServiceTest {
     Mockito.verify(connectorMock).login(userArgument.capture(), passwordArgument.capture());
 	  assertEquals("test", passwordArgument.getValue());
 	}
+	
+	 @Test
+	  public void testUserLoginAspectUsesEncryption () throws NoSuchMethodException, SecurityException {
+	    ArgumentCaptor<String> passwordArgument = ArgumentCaptor.forClass(String.class);
+	    ArgumentCaptor<String> userArgument = ArgumentCaptor.forClass(String.class);
+	    
+	    final String testPassword = "ddPPbfzgkl3XtVLRZo2hzA==";
+	    
+	    ConnectorConfiguration configuration = new ConnectorConfiguration();
+	    configuration.setId(1L);
+	    configuration.setGlobalPassword(testPassword); // "test" with default password
+	    configuration.setGlobalUser("test");
+	    configuration.setLoginMode(ConnectorLoginMode.USER);
+	    
+	    Connector connectorMock = Mockito.mock(Connector.class);
+	    Mockito.when(connectorMock.needsLogin()).thenReturn(true);
+	    Mockito.when(connectorMock.getConfiguration()).thenReturn(configuration);
+	    
+	    UserIdentity identity = new UserIdentity("testUser");
+      IdentityHolder.setIdentity(identity);
+	    
+	    ConnectorCredentialsRepository credentialsRepository = Mockito.mock(ConnectorCredentialsRepository.class);
+	    ConnectorCredentials credentials = new ConnectorCredentials();
+	    credentials.setUsername("testUser");
+	    credentials.setPassword(testPassword);
+	    
+      Mockito.when(credentialsRepository.fetchConnectorCredentialsByUsernameAndConnectorId(identity.getName(), configuration.getId())).thenReturn(credentials);
+	    
+	    loginAspect.setConnectorCredentialsRepository(credentialsRepository);
+      loginAspect.doLogin(connectorMock);
+	    
+	    Mockito.verify(connectorMock).login(userArgument.capture(), passwordArgument.capture());
+	    assertEquals("test", passwordArgument.getValue());
+	  }
 	
   @Before
   public void before() throws Exception {
