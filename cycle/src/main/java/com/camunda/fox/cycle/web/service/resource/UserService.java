@@ -1,6 +1,8 @@
 package com.camunda.fox.cycle.web.service.resource;
 
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.annotation.security.RolesAllowed;
 import javax.inject.Inject;
@@ -15,9 +17,12 @@ import javax.ws.rs.core.MediaType;
 
 import org.springframework.transaction.annotation.Transactional;
 
+import com.camunda.fox.cycle.configuration.CycleConfiguration;
 import com.camunda.fox.cycle.entity.User;
 import com.camunda.fox.cycle.repository.UserRepository;
 import com.camunda.fox.cycle.security.IdentityHolder;
+import com.camunda.fox.cycle.service.mail.MailService;
+import com.camunda.fox.cycle.service.mail.MailServiceException;
 import com.camunda.fox.cycle.web.dto.PasswordChangeDTO;
 import com.camunda.fox.cycle.web.dto.UserDTO;
 import com.camunda.fox.cycle.web.service.AbstractRestService;
@@ -36,9 +41,17 @@ import com.camunda.fox.security.UserIdentity;
  */
 @Path("secured/resource/user")
 public class UserService extends AbstractRestService {
+  
+  private Logger log = Logger.getLogger(UserService.class.getName());
 
   @Inject
   private UserRepository userRepository;
+  
+  @Inject
+  private MailService mailService;
+  
+  @Inject
+  private CycleConfiguration configuration;
 
   /**
    * $resource specific methods
@@ -75,6 +88,10 @@ public class UserService extends AbstractRestService {
   public UserDTO create(UserDTO data) {
     User user = new User();
     update(user, data);
+    
+    String sendEmailResult = sendWelcomeEmail(user);
+    // TODO: add email operation status result to response
+    
     return UserDTO.wrap(userRepository.saveAndFlush(user));
   }
   
@@ -140,6 +157,40 @@ public class UserService extends AbstractRestService {
     if (data.getPassword() != null) {
       user.setPassword(data.getPassword());
     }
+  }
+  
+  /**
+   * Sends a welcome email to the user. If the email can be sent sucessfully,
+   * this method returns the string "success". Otherwise this method returns an
+   * exception message.
+   * 
+   * @param user
+   *          the new user
+   * @return a string indicating the outcome of the email sending operation
+   */
+  protected String sendWelcomeEmail(User user) {
+    
+    String emailFrom = configuration.getEmailFrom();
+    
+    String email = user.getEmail();
+    String password = user.getPassword();
+    
+    try {
+      
+      mailService.sendWelcomeEmail(email, password, emailFrom, email);
+      return "success";
+      
+    } catch (MailServiceException e) {
+      log.log(Level.WARNING, e.getMessage(), e);
+      return e.getMessage();
+      
+    } catch (Exception e) {
+      log.log(Level.SEVERE, "An unexpected exception occured while trying to send an email", e);
+      return "An unexpected exception occured while trying to send an email: "+e.getMessage();
+      
+    }
+    
+    
   }
 
   // internal accessing ///////////////////////////////////////////

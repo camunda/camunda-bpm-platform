@@ -20,6 +20,7 @@ public class CycleConfiguration extends SecurityConfiguration {
   private UserRepository userRepository;
   
   private String mailSessionName;
+  private String emailFrom = "cycle@localhost";
   
   /**
    * Returns true if users may be configured
@@ -40,5 +41,16 @@ public class CycleConfiguration extends SecurityConfiguration {
   
   public void setMailSessionName(String mailSessionUrl) {
     this.mailSessionName = mailSessionUrl;
+  }
+
+  /**
+   * The name that is used by cycle to send emails.
+   */
+  public String getEmailFrom() {
+    return emailFrom;    
+  }
+  
+  public void setEmailFrom(String emailFrom) {
+    this.emailFrom = emailFrom;
   }
 }

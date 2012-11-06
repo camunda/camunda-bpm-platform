@@ -14,7 +14,6 @@ import javax.naming.NamingException;
 import org.springframework.stereotype.Component;
 
 import com.camunda.fox.cycle.configuration.CycleConfiguration;
-import com.camunda.fox.cycle.exception.CycleException;
 import com.camunda.fox.cycle.service.mail.spi.MailSessionProvider;
 
 /**
@@ -53,7 +52,7 @@ public class DefaultMailSessionProvider implements MailSessionProvider {
     try {
       return InitialContext.doLookup(mailSessionName);
     } catch (NamingException e) {
-      throw new CycleException("Could not lookup mail session with name '"+mailSessionName+"'");
+      throw new MailServiceException("Could not lookup mail session with name '"+mailSessionName+"'");
     }
   }
 
@@ -69,12 +68,12 @@ public class DefaultMailSessionProvider implements MailSessionProvider {
         configuration.setMailSessionName(mailSessionName);
         return session;
 
-      } catch (CycleException e) {
+      } catch (MailServiceException e) {
         // ignore (we try all names)
       }      
     }
     
-    throw new CycleException("No mail session URL configured and could not autodect mail session using names "+Arrays.toString(mailSessionNames));
+    throw new MailServiceException("No mail session URL configured and could not autodect mail session using names "+Arrays.toString(mailSessionNames));
    
   }
 
@@ -100,7 +99,7 @@ public class DefaultMailSessionProvider implements MailSessionProvider {
       transport.sendMessage(msg, recipients);
       
     } catch (MessagingException e) {
-      throw new CycleException("Could not send message using the default Transport", e);
+      throw new MailServiceException("Could not send message using the default Transport", e);
     }
   }
   
