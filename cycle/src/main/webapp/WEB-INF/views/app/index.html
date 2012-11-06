@@ -43,7 +43,7 @@
                         <strong ng-switch-default th:text="#{A problem occured}"></strong>
                       </span> {{error.message}}
                     </div>
-                    <form class="form-horizontal" novalidate ng-submit="save()" name="newRoundtripForm">
+                    <form class="form-horizontal" novalidate data-ng-submit="save()" name="newRoundtripForm">
                       <fieldset>
                         <div class="control-group" ng-class="errorClass(newRoundtripForm)">
                           <label class="control-label" for="roundtripName" th:text="#{Name}">Name</label>
@@ -58,7 +58,7 @@
                   </div>
                   <div class="modal-footer">
                     <button class="btn" ng-click="newRoundtripDialog.close()" th:text="#{Cancel}">Cancel</button>
-                    <button class="btn btn-primary" ng-click="save()" ng-disabled="!isValid()" th:text="#{Save}">Save</button>
+                    <button id="saveRoundtripButton" class="btn btn-primary" data-ng-click="save()" ng-disabled="!isValid()" th:text="#{Save}">Save</button>
                   </div>
                 </div>
               </modal-dialog>
