@@ -339,3 +339,7 @@ div#pictureModal.modal.hide.fade {
   -moz-border-radius: 3px;
   border-radius: 3px;
 }
+
+thead tr {
+  background-color: #eee;
+}
