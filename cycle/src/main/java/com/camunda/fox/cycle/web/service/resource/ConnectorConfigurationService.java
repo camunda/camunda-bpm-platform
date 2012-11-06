@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.camunda.fox.cycle.connector.ConnectorRegistry;
 import com.camunda.fox.cycle.connector.ConnectorStatus;
+import com.camunda.fox.cycle.connector.crypt.EncryptionService;
 import com.camunda.fox.cycle.entity.ConnectorConfiguration;
 import com.camunda.fox.cycle.repository.ConnectorConfigurationRepository;
 import com.camunda.fox.cycle.web.dto.ConnectorConfigurationDTO;
@@ -24,6 +25,9 @@ public class ConnectorConfigurationService extends AbstractRestService {
 
   @Inject
   protected ConnectorRegistry connectorRegistry;
+  
+  @Inject
+  protected EncryptionService encryptionService;
 
   @Inject
   protected ConnectorConfigurationRepository connectorConfigurationRepository;
@@ -91,7 +95,7 @@ public class ConnectorConfigurationService extends AbstractRestService {
   }
 
   private void update(ConnectorConfiguration config, ConnectorConfigurationDTO data) {
-    config.setGlobalPassword(data.getPassword());
+    config.setGlobalPassword(encryptionService.encrypt(data.getPassword()));
     config.setGlobalUser(data.getUser());
     config.setLoginMode(data.getLoginMode());
     config.setProperties(data.getProperties());

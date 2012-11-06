@@ -217,6 +217,15 @@
       <artifactId>svnkit-javahl</artifactId>
       <version>1.3.4</version>
     </dependency>
+    
+    <!-- encryption library -->
+     <dependency>
+      <groupId>org.jasypt</groupId>
+      <artifactId>jasypt</artifactId>
+      <version>1.8</version>
+      <scope>compile</scope>
+    </dependency>
+    
   </dependencies>
 
   <build>
