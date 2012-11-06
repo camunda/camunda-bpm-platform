@@ -678,7 +678,7 @@ public class SignavioConnector extends Connector {
   
   /**
    * Command to be executed in {@link SignavioConnector#executeCommand(com.camunda.fox.cycle.connector.signavio.SignavioConnector.Command) }.
-   * 
+   * TODO do we want this for all connectors? thinking about future connectors like git
    * @param <T> 
    */
   protected abstract static class Command<T> {

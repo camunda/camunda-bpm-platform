@@ -391,6 +391,9 @@ public class SecurityFilterTest {
         if (!request.getUserPrincipal().getName().equals(name)) {
           fail("request has unexpected principal <" + request.getUserPrincipal().getName() + ">; should have had <" + name + ">");
         }
+      } 
+      else {
+        return false;
       }
       
       return true;

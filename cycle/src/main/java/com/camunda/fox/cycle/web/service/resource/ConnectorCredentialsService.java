@@ -26,6 +26,10 @@ import com.camunda.fox.cycle.web.dto.ConnectorCredentialsDTO;
 import com.camunda.fox.cycle.web.dto.ConnectorStatusDTO;
 import com.camunda.fox.cycle.web.service.AbstractRestService;
 
+/**
+ * FIXME this class is untested!
+ *
+ */
 @Path("secured/resource/connector/credentials")
 public class ConnectorCredentialsService extends AbstractRestService {
   

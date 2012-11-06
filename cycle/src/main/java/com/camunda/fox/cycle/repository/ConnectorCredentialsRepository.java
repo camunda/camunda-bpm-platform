@@ -6,6 +6,10 @@ import org.springframework.stereotype.Repository;
 
 import com.camunda.fox.cycle.entity.ConnectorCredentials;
 
+/**
+ * FIXME this class is untested! 
+ *
+ */
 @Repository
 public class ConnectorCredentialsRepository extends AbstractRepository<ConnectorCredentials> {
   
