@@ -29,6 +29,7 @@ import com.camunda.fox.cycle.connector.ConnectorNode;
 import com.camunda.fox.cycle.connector.ConnectorNodeType;
 import com.camunda.fox.cycle.connector.ConnectorRegistry;
 import com.camunda.fox.cycle.connector.ContentInformation;
+import com.camunda.fox.cycle.connector.test.util.ConnectorConfigurationProvider;
 import com.camunda.fox.cycle.connector.test.util.RepositoryUtil;
 import com.camunda.fox.cycle.connector.vfs.VfsConnector;
 import com.camunda.fox.cycle.entity.BpmnDiagram;
@@ -54,6 +55,9 @@ public class RoundtripServiceTest {
   
   // statically cached connector
   private static Connector connector;
+  
+  @Inject
+  private ConnectorConfigurationProvider configurationProvider;
   
   @Inject
   private ConnectorRegistry connectorRegistry;
@@ -271,6 +275,10 @@ public class RoundtripServiceTest {
    */
   protected void ensureConnectorInitialized() throws Exception {
     List<ConnectorConfiguration> configurations = connectorRegistry.getConnectorConfigurations(CONNECTOR_CLS);
+    if (configurations.isEmpty()) {
+      throw new RuntimeException("No connector configured for " + CONNECTOR_CLS);
+    }
+
     ConnectorConfiguration config = configurations.get(0);
 
     // put mock connector to registry
@@ -283,8 +291,9 @@ public class RoundtripServiceTest {
 
   @Before
   public void before() throws FileNotFoundException, Exception {
+    configurationProvider.ensurePersisted();
     ensureConnectorInitialized();
-
+    
     connector.createNode("/", "foo", ConnectorNodeType.FOLDER);
 
     ConnectorNode rightNodeImg = connector.createNode("/foo", "Impl.png", ConnectorNodeType.PNG_FILE);

@@ -18,6 +18,16 @@ public class ConnectorCredentials extends AbstractEntity {
   
   @ManyToOne
   private User user;
+
+  public ConnectorCredentials() {
+  }
+
+  public ConnectorCredentials(String username, String password, ConnectorConfiguration configuration, User user) {
+    this.username = username;
+    this.password = password;
+    this.connectorConfiguration = configuration;
+    this.user = user;
+  }
   
   public String getUsername() {
     return username;
