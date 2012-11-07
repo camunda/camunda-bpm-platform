@@ -5,7 +5,7 @@
 describe('cycle', function() {
 
   beforeEach(function() {
-    browser().navigateTo('../../app/secured/view/index');
+    browser().navigateTo('../app/secured/view/index');
   });
   
   it('should be on view/index page after navigation', function() {
@@ -25,15 +25,16 @@ describe('cycle', function() {
   });
   
   describe('add-roundtrip', function() {
+    var addButtonSelect = 'a.btn[data-ng-click="createNew()"]';
     
     it('should contain add roundtrip button', function() {
-      expect(element('a.btn[ng-click="createNew()"]').count()).toBe(1);
+      expect(element(addButtonSelect).count()).toBe(1);
     });
     
     it('should add a new roundtrip to the list when clicking on button', function() {
       var testRoundtripName="Roundtrip " +Math.floor(Math.random()*10000);
       
-      element('a.btn[ng-click="createNew()"]').click();
+      element(addButtonSelect).click();
       input('name').enter(testRoundtripName);
       sleep(2);
       element('#saveRoundtripButton').click();

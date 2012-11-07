@@ -10,6 +10,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 
 import org.springframework.transaction.annotation.Transactional;
@@ -53,13 +54,13 @@ public class ConnectorCredentialsService extends AbstractRestService {
   
   @GET
   public List<ConnectorCredentialsDTO> list(@QueryParam("userId") Long userId) {
-    return fetchConnectorCredentialsByUserId(userId);
+    return getConnectorCredentialsByUserId(userId);
   }
 
   @GET
   @Path("{id}")
   public ConnectorCredentialsDTO get(@PathParam("id") long id) {
-    return fetchConnectorCredentialsById(id);
+    return ConnectorCredentialsDTO.wrap(getAndFetchConnectorCredentialsById(id));
   }
 
   @POST
@@ -67,11 +68,7 @@ public class ConnectorCredentialsService extends AbstractRestService {
   @Transactional
   public ConnectorCredentialsDTO update(ConnectorCredentialsDTO data) {
     long id = data.getId();
-
-    ConnectorCredentials connectorCredentials = connectorCredentialsRepository.fetchConnectorCredentialsById(id);
-    if (connectorCredentials == null) {
-      throw notFound("ConnectorCredentials not found");
-    }
+    ConnectorCredentials connectorCredentials = getById(id);
 
     update(connectorCredentials, data);
     
@@ -80,18 +77,19 @@ public class ConnectorCredentialsService extends AbstractRestService {
 
   @POST
   public ConnectorCredentialsDTO create(ConnectorCredentialsDTO data) {
+    
+    validate(data);
+    
     ConnectorCredentials connectorCredentials = new ConnectorCredentials();
     update(connectorCredentials, data);
     
-    ConnectorConfiguration config = connectorConfigurationRepository.findById(data.getConnectorId());
-    if (config == null) {
-      throw notFound("Connector configuration with id " + data.getConnectorId() + " not found.");
-    }
+    ConnectorConfiguration config = getConnectorConfigurationById(data.getConnectorId());
+    
     connectorCredentials.setConnectorConfiguration(config);
     
     User user = userRepository.findById(data.getUserId());
     if (user == null) {
-      throw notFound("User with id " + data.getConnectorId() + " not found.");
+      throw notFound("user with id " + data.getConnectorId() + " not found");
     }
     
     if (user.getPassword()!=null) {
@@ -106,20 +104,13 @@ public class ConnectorCredentialsService extends AbstractRestService {
   @Path("{id}")
   @Transactional
   public void delete(@PathParam("id") long id) {
-    ConnectorCredentials connectorCredentials = connectorCredentialsRepository.findById(id);
-    if (connectorCredentials == null) {
-      throw notFound("ConnectorCredential not found");
-    }
-    connectorCredentialsRepository.delete(connectorCredentials);
+    connectorCredentialsRepository.delete(id);
   }
   
   @POST
   @Path("test")
   public ConnectorStatusDTO test(ConnectorCredentialsDTO data) {
-    ConnectorConfiguration config = connectorConfigurationRepository.findById(data.getConnectorId());
-    if (config == null) {
-      throw notFound("Connector configuration with id " + data.getConnectorId() + " not found.");
-    }
+    ConnectorConfiguration config = getConnectorConfigurationById(data.getConnectorId());
     
     ConnectorStatus connectorStatus = connectorRegistry.testConnectorConfiguration(config, data.getUsername(), data.getPassword());
     return ConnectorStatusDTO.wrap(connectorStatus);
@@ -127,22 +118,35 @@ public class ConnectorCredentialsService extends AbstractRestService {
   
   // querying /////////////////////////////////////////////////////
   
-  @GET
-  @Produces(MediaType.APPLICATION_JSON)
-  @Path("fetchConnectorCredentialsByUserId")
-  @Transactional
-  public List<ConnectorCredentialsDTO> fetchConnectorCredentialsByUserId(@QueryParam("userId") Long userId) {
-    return ConnectorCredentialsDTO.wrapAll(connectorCredentialsRepository.fetchConnectorCredentialsByUserId(userId));
+  protected List<ConnectorCredentialsDTO> getConnectorCredentialsByUserId(@QueryParam("userId") Long userId) {
+    return ConnectorCredentialsDTO.wrapAll(connectorCredentialsRepository.findFetchConfigurationByUserId(userId));
   }
   
-  @GET
-  @Produces(MediaType.APPLICATION_JSON)
-  @Path("fetchConnectorCredentialsById")
-  @Transactional
-  public ConnectorCredentialsDTO fetchConnectorCredentialsById(@QueryParam("id") Long id) {
-    return ConnectorCredentialsDTO.wrap(connectorCredentialsRepository.fetchConnectorCredentialsById(id));
+  protected ConnectorCredentials getAndFetchConnectorCredentialsById(@QueryParam("id") Long id) {
+    ConnectorCredentials credentials = connectorCredentialsRepository.findFetchConfigurationById(id);
+    if (credentials == null) {
+      throw notFound("credentials not found");
+    }
+    return credentials;
+  }
+
+  protected ConnectorConfiguration getConnectorConfigurationById(long configurationId) {
+    ConnectorConfiguration config = connectorConfigurationRepository.findById(configurationId);
+    if (config == null) {
+      throw notFound("configuration with id " + configurationId + " not found");
+    }
+    
+    return config;
   }
   
+  protected ConnectorCredentials getById(long id) throws WebApplicationException {
+    ConnectorCredentials connectorCredentials = connectorCredentialsRepository.findById(id);
+    if (connectorCredentials == null) {
+      throw notFound("credentials not found");
+    }
+    return connectorCredentials;
+  }
+
   /**
    * Updates the connector-credential with the given data
    *
@@ -150,6 +154,17 @@ public class ConnectorCredentialsService extends AbstractRestService {
   private void update(ConnectorCredentials connectorCredentials, ConnectorCredentialsDTO data) {
     connectorCredentials.setUsername(data.getUsername());
     connectorCredentials.setPassword(encryptionService.encrypt(data.getPassword()));
+  }
+
+  // validation //////////////////////////////////////////////
+  
+  private void validate(ConnectorCredentialsDTO data) {
+    if (data.getConnectorId() == -1) {
+      throw badRequest("no connector id given");
+    }
+    if (data.getUserId() == -1) {
+      throw badRequest("no user id given");
+    }
   }
   
 }

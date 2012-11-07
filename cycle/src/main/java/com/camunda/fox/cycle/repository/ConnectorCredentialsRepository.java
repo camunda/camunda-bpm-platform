@@ -13,30 +13,29 @@ import com.camunda.fox.cycle.entity.ConnectorCredentials;
 @Repository
 public class ConnectorCredentialsRepository extends AbstractRepository<ConnectorCredentials> {
   
-  public List<ConnectorCredentials> fetchConnectorCredentialsByUserId(Long userId) {
+  public List<ConnectorCredentials> findFetchConfigurationByUserId(Long userId) {
     return em.createQuery("SELECT c FROM ConnectorCredentials c JOIN FETCH c.user JOIN FETCH c.connectorConfiguration WHERE c.user.id = :userId", ConnectorCredentials.class)
             .setParameter("userId", userId)
             .getResultList();
   }
 
-  public ConnectorCredentials fetchConnectorCredentialsById(Long id) {
+  public ConnectorCredentials findFetchConfigurationById(Long id) {
     return em.createQuery("SELECT c FROM ConnectorCredentials c JOIN FETCH c.user JOIN FETCH c.connectorConfiguration WHERE c.id = :id", ConnectorCredentials.class)
             .setParameter("id", id)
             .getSingleResult();
   }
 
-  public ConnectorCredentials fetchConnectorCredentialsByUserIdAndConnectorId(Long userId, Long connectorId) {
+  public ConnectorCredentials findFetchAllByUserIdAndConnectorId(long userId, long connectorId) {
     return em.createQuery("SELECT c FROM ConnectorCredentials c JOIN FETCH c.user JOIN FETCH c.connectorConfiguration WHERE c.user.id = :userId AND c.connectorConfiguration.id = :connectorId", ConnectorCredentials.class)
             .setParameter("userId", userId)
             .setParameter("connectorId", connectorId)
             .getSingleResult();
   }
   
-  public ConnectorCredentials fetchConnectorCredentialsByUsernameAndConnectorId(String username, Long connectorId) {
+  public ConnectorCredentials findFetchAllByUsernameAndConnectorId(String username, long connectorId) {
     return em.createQuery("SELECT c FROM ConnectorCredentials c JOIN FETCH c.user JOIN FETCH c.connectorConfiguration WHERE c.user.name = :username AND c.connectorConfiguration.id = :connectorId", ConnectorCredentials.class)
             .setParameter("username", username)
             .setParameter("connectorId", connectorId)
             .getSingleResult();
   }
-
 }

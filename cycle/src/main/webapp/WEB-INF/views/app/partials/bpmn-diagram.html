@@ -119,7 +119,7 @@
                      data-help>Connector</label>
               <div class="controls">
                 <span data-ng-show="!connectors.length" style="line-height: 30px">
-                  <span>No connectors configured</span> <span data-if-admin>(<a th:href="@{/app/secured/view/connector-setup}" th:text="#{'configure'}">configure</a>)</span>.
+                  <span>No connectors configured</span> <span data-if-admin>(<a th:href="@{/app/secured/view/connectors}" th:text="#{'configure'}">configure</a>)</span>.
                 </span>
                 <span data-ng-show="connectors.length">
                   <select class="span8" data-ng-model="connector" required ng-options="c.name for c in connectors">

@@ -45,6 +45,23 @@ public class ConnectorRegistry {
   }
 
   /**
+   * Returns the connector definition for the given connector class
+   * or <code>null</code> if no definition was found.
+   * 
+   * @param cls
+   * @return 
+   */
+  public ConnectorConfiguration getConnectorDefinition(Class<? extends Connector> cls) {
+    for (ConnectorConfiguration definition : connectorDefinitions) {
+      if (definition.getConnectorClass().equals(cls.getName())) {
+        return definition;
+      }
+    }
+    
+    return null;
+  }
+  
+  /**
    * Return connector configuration for given id or null
    * 
    * @param connectorId
@@ -155,13 +172,14 @@ public class ConnectorRegistry {
     return instantiateConnector(config, true);
   }
 
-  private Connector instantiateConnector(ConnectorConfiguration config, boolean setLoginAspect) {
+  private Connector instantiateConnector(ConnectorConfiguration config, boolean addLoginAspect) {
     try {
       AspectJProxyFactory factory = new AspectJProxyFactory(Class.forName(config.getConnectorClass()).newInstance());
       
-      if (setLoginAspect) {
+      if (addLoginAspect) {
         factory.addAspect(loginAspect);
       }
+      
       factory.addAspect(threadsafeAspect);
       Connector instance = factory.getProxy();
 
