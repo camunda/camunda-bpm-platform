@@ -33,7 +33,7 @@
     
     <dependency>
       <groupId>com.camunda.fox.cockpit</groupId>
-      <artifactId>cockpit-sql-scripts</artifactId>
+      <artifactId>cockpit-sql-scripts-hibernate</artifactId>
       <version>${project.version}</version>
     </dependency>
     
