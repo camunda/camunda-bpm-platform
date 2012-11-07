@@ -261,9 +261,8 @@ public class SvnConnector extends Connector {
       
       stopTransaction();
       
-      ContentInformation result = new ContentInformation(true, new Date(file.lastModified())); 
       deleteRecursively(temporaryFileStore);
-      return result;
+      return getContentInformation(node);
     } catch (Exception e) {
       stopTransaction();
       logger.log(Level.FINER, "Error while updating file '" + node.getLabel() + "' in '" + extractParentFolder(node) + "'.", e);
