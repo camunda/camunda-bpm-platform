@@ -554,6 +554,23 @@
         </dependency>
       </dependencies>
     </profile>
+	
+	<profile>
+      <id>oracle10g</id>
+      <activation>
+        <property>
+          <name>database</name>
+          <value>oracle10g</value>
+        </property>
+      </activation>
+      <dependencies>
+        <dependency>
+          <groupId>com.oracle.jdbc</groupId>
+          <artifactId>ojdbc14</artifactId>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+    </profile>
     
     <profile>
       <id>db2</id>
