@@ -22,6 +22,7 @@ import org.junit.Test;
 import com.camunda.fox.client.impl.parser.DefaultProcessesXmlParser;
 import com.camunda.fox.client.impl.parser.spi.ProcessesXmlParser;
 import com.camunda.fox.client.impl.schema.ProcessesXml;
+import com.camunda.fox.client.impl.schema.ProcessesXml.ProcessArchiveXml;
 
 /**
  * 
@@ -79,7 +80,19 @@ public class TestDefaultProcessesXmlParser {
     ProcessesXml processesXml = parser.parseProcessesXml("com/camunda/fox/processarchive/parser/multipleProcessArchives.xml").get(0);
     Assert.assertNotNull(processesXml);
     Assert.assertNotNull(processesXml.processArchives);
-    Assert.assertEquals(2, processesXml.processArchives.size());    
+    Assert.assertEquals(3, processesXml.processArchives.size());    
+    
+    ProcessArchiveXml processArchiveXml1 = processesXml.processArchives.get(0);
+    Assert.assertEquals("ProcessArchive1", processArchiveXml1.name);
+    Assert.assertEquals("tenant1", processArchiveXml1.configuration.processEngineName);
+    
+    ProcessArchiveXml processArchiveXml2 = processesXml.processArchives.get(1);
+    Assert.assertEquals("ProcessArchive2", processArchiveXml2.name);
+    Assert.assertEquals("tenant2", processArchiveXml2.configuration.processEngineName);
+    
+    ProcessArchiveXml processArchiveXml3 = processesXml.processArchives.get(2);
+    Assert.assertEquals("ProcessArchive3", processArchiveXml3.name);
+    Assert.assertEquals("tenant3", processArchiveXml3.configuration.processEngineName);
   }
   
   @Test
