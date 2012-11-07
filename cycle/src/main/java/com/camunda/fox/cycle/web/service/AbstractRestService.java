@@ -36,7 +36,7 @@ public class AbstractRestService {
   }
 
   /**
-   * Issue a bad request exception with the given reson
+   * Issue a bad request exception with the given reason
    * 
    * @param message
    * @return 
