@@ -11,11 +11,13 @@ import com.camunda.fox.cycle.entity.ConnectorCredentials;
  */
 public class ConnectorCredentialsDTO {
   
-  private Long id;
+  private long id;
+  
   private String username;
   private String password;
-  private Long connectorId;
-  private Long userId;
+  
+  private long connectorId = -1;
+  private long userId = -1;
 
   public ConnectorCredentialsDTO() { }
   
@@ -26,11 +28,11 @@ public class ConnectorCredentialsDTO {
     this.userId = connectorCredentials.getUser().getId();
   }
   
-  public Long getId() {
+  public long getId() {
     return id;
   }
 
-  public void setId(Long id) {
+  public void setId(long id) {
     this.id = id;
   }
   
@@ -50,19 +52,19 @@ public class ConnectorCredentialsDTO {
     this.password = password;
   }
   
-  public Long getConnectorId() {
+  public long getConnectorId() {
     return connectorId;
   }
 
-  public void setConnectorId(Long connectorId) {
+  public void setConnectorId(long connectorId) {
     this.connectorId = connectorId;
   }
   
-  public Long getUserId() {
+  public long getUserId() {
     return userId;
   }
   
-  public void setUserId(Long userId) {
+  public void setUserId(long userId) {
     this.userId = userId;
   }
   

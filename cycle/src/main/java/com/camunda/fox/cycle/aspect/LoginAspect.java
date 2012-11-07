@@ -2,6 +2,7 @@ package com.camunda.fox.cycle.aspect;
 
 
 import javax.inject.Inject;
+import javax.persistence.NoResultException;
 
 import org.aspectj.lang.JoinPoint;
 import org.aspectj.lang.annotation.Aspect;
@@ -40,33 +41,62 @@ public class LoginAspect {
   }
 
   public void doLogin(Connector connector) {
-      if (connector.needsLogin()) {
-        ConnectorConfiguration config = connector.getConfiguration();
-        connector.init(config);
-        ConnectorLoginMode loginMode = config.getLoginMode();
-        if (loginMode != null && loginMode.equals(ConnectorLoginMode.GLOBAL)) {
-          connector.login(config.getGlobalUser(), encryptionService.decrypt(config.getGlobalPassword()));
-          return;
-        }
-        if (loginMode.equals(ConnectorLoginMode.USER)) {
-          UserIdentity identity = IdentityHolder.getIdentity();
-          if (identity != null) {
-            String username = identity.getName();
-            Long connectorConfigId = connector.getConfiguration().getId();
-            ConnectorCredentials connectorCredentials = null;
-            try {
-              connectorCredentials = connectorCredentialsRepository.fetchConnectorCredentialsByUsernameAndConnectorId(username, connectorConfigId);
-            } catch (Exception e) {
-              throw new CycleMissingCredentialsException("The user credentials for connector " + connector.getConfiguration().getName() + " are not set.", e);
-            }
-            connector.login(connectorCredentials.getUsername(), encryptionService.decrypt(connectorCredentials.getPassword()));
-          }
-        }
-      }
+    if (connector.needsLogin()) {
+      ConnectorConfiguration config = connector.getConfiguration();
+      connector.init(config);
+
+      loginConnector(connector, config, config.getLoginMode());
+    }
   }
-  
+
   public void setConnectorCredentialsRepository(ConnectorCredentialsRepository connectorCredentialsRepository) {
     this.connectorCredentialsRepository = connectorCredentialsRepository;
   }
+
+  private void loginConnector(Connector connector, ConnectorConfiguration config, ConnectorLoginMode loginMode) {
+    if (loginMode == null) {
+      return;
+    }
+
+    switch (loginMode) {
+      case LOGIN_NOT_REQUIRED: 
+        break;
+      case GLOBAL:
+        loginConnector(connector, config.getGlobalUser(), config.getGlobalPassword());
+        break;
+      case USER:
+        loginWithUserCredentials(connector);
+        break;
+    }
+  }
+
+  private void loginConnector(Connector connector, String username, String password) {
+    connector.login(username, encryptionService.decrypt(password));
+  }
+
+  private void loginWithUserCredentials(Connector connector) {
+    UserIdentity identity = IdentityHolder.getIdentity();
+    
+    if (identity == null) {
+      throw missingCredentials("No user identity", null);
+    }
+    
+    String username = identity.getName();
+    Long connectorConfigId = connector.getConfiguration().getId();
+    
+    if (connectorConfigId == null) {
+      throw missingCredentials("No user specific credentials configured", null);
+    }
+    
+    try {
+      ConnectorCredentials credentials = connectorCredentialsRepository.findFetchAllByUsernameAndConnectorId(username, connectorConfigId);
+      loginConnector(connector, credentials.getUsername(), credentials.getPassword());
+    } catch (NoResultException e) {
+      throw missingCredentials("No user specific credentials configured", e);
+    }
+  }
   
+  private CycleMissingCredentialsException missingCredentials(String message, Throwable cause) {
+    return new CycleMissingCredentialsException("Missing credentials: " + message, cause);
+  }
 }
