@@ -823,10 +823,13 @@ function UsersController($scope, Event, User) {
     // copy user data
     angular.extend(user, userData);
     
-    user.$save(callbackFn);
-    if (isNew) {
-      $scope.users = User.query();
-    }
+    user.$save(function () {
+      callbackFn.apply(arguments);
+      
+      if (isNew) {
+        $scope.users = User.query();
+      }
+    });
   };
 };
 

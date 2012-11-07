@@ -23,8 +23,8 @@
               <tbody>
                 <tr data-ng-repeat="user in users" data-ng-cloak>
                   <td>{{user.id}}</td>
-                  <td>{{user.name}}</td>
-                  <td>{{user.email}}</td>
+                  <td>{{user.name}} <span class="badge badge-important" data-ng-show="user.admin" th:text="#{'Administrator'}">Administrator</span></td>
+                  <td>{{user.email}} </td>
                   <td>
                     <a ng-show="!isCurrentUser(user)" data-ng-click="editUser(user)" th:text="#{edit}">edit</a>
                     <br />
