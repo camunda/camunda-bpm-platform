@@ -1,7 +1,6 @@
 package com.camunda.fox.cycle.repository;
 
-import static org.hamcrest.Matchers.hasSize;
-import static org.junit.Assert.assertThat;
+import static org.fest.assertions.api.Assertions.*;
 
 import javax.inject.Inject;
 
@@ -60,15 +59,15 @@ public class BpmnDiagramRepositoryTest {
     roundtripRepository.saveAndFlush(r2);
     roundtripRepository.saveAndFlush(r3);
     
-    assertThat(bpmnDiagramRepository.findAllModelerNames(), hasSize(3));
+    assertThat(bpmnDiagramRepository.findAllModelerNames()).hasSize(3);
 
     roundtripRepository.delete(r1);
     roundtripRepository.delete(r2);
     roundtripRepository.delete(r3);
     
     // then
-    assertThat(roundtripRepository.findAll(), hasSize(0));
-    assertThat(bpmnDiagramRepository.findAll(), hasSize(0));
+    assertThat(roundtripRepository.findAll()).isEmpty();
+    assertThat(bpmnDiagramRepository.findAll()).isEmpty();
   }
 
 }

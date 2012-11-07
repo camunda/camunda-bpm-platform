@@ -9,7 +9,7 @@
           http://www.springframework.org/schema/context/spring-context.xsd">
 
   <bean name="vfsConnectorDefinition" class="com.camunda.fox.cycle.entity.ConnectorConfiguration">
-    <property name="name" value="VFS Connector"/>
+    <property name="name" value="File System Connector"/>
     <property name="connectorClass" value="com.camunda.fox.cycle.connector.vfs.VfsConnector"/>
     <property name="properties">
       <map>
@@ -34,7 +34,7 @@
     <property name="loginMode" value="LOGIN_NOT_REQUIRED" />
     <property name="properties">
       <map>
-        <entry key="repositoryPath" value="https://svn.camunda.com/sandbox"></entry>
+        <entry key="repositoryPath" value=""></entry>
       </map>
     </property>
   </bean>

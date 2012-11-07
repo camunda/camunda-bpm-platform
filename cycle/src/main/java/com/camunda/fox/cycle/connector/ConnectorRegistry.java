@@ -25,7 +25,7 @@ public class ConnectorRegistry {
 
   @Inject
   private ConnectorCache cache;
-  
+
   /**
    * Default connector configurations are configured in the spring application context. 
    * They are used as blueprints for actual connectors.
@@ -35,7 +35,7 @@ public class ConnectorRegistry {
 
   @Inject
   private ConnectorConfigurationRepository connectorConfigurationRepository;
-  
+
   /**
    * Return a list of default configurations
    * @return 
@@ -44,6 +44,23 @@ public class ConnectorRegistry {
     return connectorDefinitions;
   }
 
+  /**
+   * Returns the connector definition for the given connector class
+   * or <code>null</code> if no definition was found.
+   * 
+   * @param cls
+   * @return 
+   */
+  public ConnectorConfiguration getConnectorDefinition(Class<? extends Connector> cls) {
+    for (ConnectorConfiguration definition : connectorDefinitions) {
+      if (definition.getConnectorClass().equals(cls.getName())) {
+        return definition;
+      }
+    }
+    
+    return null;
+  }
+  
   /**
    * Return connector configuration for given id or null
    * 
@@ -67,25 +84,24 @@ public class ConnectorRegistry {
     return connectorConfigurationRepository.findAll();
   }
 
-  public ConnectorConfiguration getConnectorConfiguration(Class<? extends Connector> cls) {
-    for (ConnectorConfiguration config: getConnectorConfigurations()) {
-      if (config.getConnectorClass().equals(cls.getName())) {
-        return config;
-      }
-    }
-
-    return null;
+  /**
+   * Returns a list of connector configurations for a given connector class
+   * @param cls
+   * @return 
+   */
+  public List<ConnectorConfiguration> getConnectorConfigurations(Class<? extends Connector> cls) {
+    return connectorConfigurationRepository.findByConnectorClass(cls.getName());
   }
 
   /**
-   * Return the connector with the given class or null if none was found
+   * Return the first connector with the given class or null if none was found
    * @param cls
    * @return 
    */
   public Connector getConnector(Class<? extends Connector> cls) {
-    ConnectorConfiguration config = getConnectorConfiguration(cls);
-    if (config != null) {
-      return getConnector(config.getId());
+    List<ConnectorConfiguration> configs = getConnectorConfigurations(cls);
+    if (!configs.isEmpty()) {
+      return getConnector(configs.get(0).getId());
     } else {
       return null;
     }
@@ -108,7 +124,7 @@ public class ConnectorRegistry {
 
     return connector;
   }
-  
+
   public ConnectorCache getCache() {
     return cache;
   }
@@ -138,12 +154,12 @@ public class ConnectorRegistry {
   private Connector instantiateConnector(long connectorId) {
     ConnectorConfiguration config = getConnectorConfiguration(connectorId);
     if (config == null) {
-      throw new CycleException("Connector configuration for connectorId " + connectorId + " not available");
+      return null;
     }
     
     return instantiateConnector(config);
   }
-  
+
   /**
    * Initializes a connector from the given configuration and returns it
    * 
@@ -153,9 +169,17 @@ public class ConnectorRegistry {
    * @return the newly instantiated connector
    */
   Connector instantiateConnector(ConnectorConfiguration config) {
+    return instantiateConnector(config, true);
+  }
+
+  private Connector instantiateConnector(ConnectorConfiguration config, boolean addLoginAspect) {
     try {
       AspectJProxyFactory factory = new AspectJProxyFactory(Class.forName(config.getConnectorClass()).newInstance());
-      factory.addAspect(loginAspect);
+      
+      if (addLoginAspect) {
+        factory.addAspect(loginAspect);
+      }
+      
       factory.addAspect(threadsafeAspect);
       Connector instance = factory.getProxy();
 
@@ -168,19 +192,15 @@ public class ConnectorRegistry {
       throw new CycleException("Could not init connector", e);
     }
   }
+  
 
   public ConnectorStatus testConnectorConfiguration(ConnectorConfiguration config) {
     Connector connector = null;
 
     try {
-      connector = instantiateConnector(config);
-      ConnectorNode root = connector.getRoot();
+      connector = instantiateConnector(config, true);
 
-      // list children of root
-      connector.getChildren(root);
-
-      // everything ok
-      return ConnectorStatus.ok();
+      return executeTest(connector);
     } catch (Exception e) {
       e.printStackTrace();
       
@@ -189,6 +209,38 @@ public class ConnectorRegistry {
       if (connector != null) {
         connector.dispose();
       }
+    }
+  }
+  
+  public ConnectorStatus testConnectorConfiguration(ConnectorConfiguration config, String username, String password) {
+    Connector connector = null;
+    try {
+      connector = instantiateConnector(config, false);
+      connector.login(username, password);
+      
+      return executeTest(connector);
+    } catch (Exception e) {
+      e.printStackTrace();
+      return ConnectorStatus.inError(e);
+    } finally {
+      if (connector != null) {
+        connector.dispose();
+      }
+    }
+  }
+  
+  private ConnectorStatus executeTest(Connector connector) {
+    try {
+      
+      ConnectorNode root = connector.getRoot();
+      // list children of root
+      connector.getChildren(root);
+
+      // everything ok
+      return ConnectorStatus.ok();
+    } catch (Exception e) {
+      e.printStackTrace();
+      return ConnectorStatus.inError(e);
     }
   }
 }

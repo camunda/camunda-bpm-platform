@@ -91,6 +91,14 @@ public class AbstractRepository<T extends AbstractEntity> {
   }
   
   /**
+   * Returns the number of all entities in the database
+   * @return 
+   */
+  public long countAll() {
+    return em.createQuery("SELECT COUNT(e) FROM " + entityClass.getSimpleName() + " e", Long.class).getSingleResult();
+  }
+  
+  /**
    * Delete all entities
    * BEWARE: It doesn't trigger cascade or removeOrphan functionality for the deleted entites, 
    *         because it is an JQL statement, not an @{link EntityManager} method. 

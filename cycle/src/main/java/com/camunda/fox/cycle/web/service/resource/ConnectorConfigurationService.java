@@ -8,23 +8,26 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Response;
 
 import org.springframework.transaction.annotation.Transactional;
 
 import com.camunda.fox.cycle.connector.ConnectorRegistry;
 import com.camunda.fox.cycle.connector.ConnectorStatus;
+import com.camunda.fox.cycle.connector.crypt.EncryptionService;
 import com.camunda.fox.cycle.entity.ConnectorConfiguration;
 import com.camunda.fox.cycle.repository.ConnectorConfigurationRepository;
 import com.camunda.fox.cycle.web.dto.ConnectorConfigurationDTO;
 import com.camunda.fox.cycle.web.dto.ConnectorStatusDTO;
+import com.camunda.fox.cycle.web.service.AbstractRestService;
 
 @Path("secured/resource/connector/configuration")
-public class ConnectorConfigurationService {
+public class ConnectorConfigurationService extends AbstractRestService {
 
   @Inject
   protected ConnectorRegistry connectorRegistry;
+  
+  @Inject
+  protected EncryptionService encryptionService;
 
   @Inject
   protected ConnectorConfigurationRepository connectorConfigurationRepository;
@@ -43,7 +46,7 @@ public class ConnectorConfigurationService {
   @GET
   @Path("{id}")
   public ConnectorConfigurationDTO get(@PathParam("id") long id) {
-    return ConnectorConfigurationDTO.wrap(connectorConfigurationRepository.findById(id));
+    return ConnectorConfigurationDTO.wrap(findConfigurationById(id));
   }
 
   @POST
@@ -52,10 +55,7 @@ public class ConnectorConfigurationService {
   public ConnectorConfigurationDTO update(ConnectorConfigurationDTO data) {
     long id = data.getConnectorId();
 
-    ConnectorConfiguration connectorConfiguration = connectorConfigurationRepository.findById(id);
-    if (connectorConfiguration == null) {
-      throw new WebApplicationException(Response.Status.NOT_FOUND);
-    }
+    ConnectorConfiguration connectorConfiguration = findConfigurationById(id);
 
     update(connectorConfiguration, data);
 
@@ -79,11 +79,7 @@ public class ConnectorConfigurationService {
   @Path("{id}")
   @Transactional
   public void delete(@PathParam("id") long id) {
-    ConnectorConfiguration connectorConfiguration = connectorConfigurationRepository.findById(id);
-
-    if (connectorConfiguration == null) {
-      throw new WebApplicationException(Response.Status.NOT_FOUND);
-    }
+    ConnectorConfiguration connectorConfiguration = findConfigurationById(id);
 
     connectorConfigurationRepository.delete(connectorConfiguration);
     connectorRegistry.getCache().remove(id);
@@ -99,7 +95,7 @@ public class ConnectorConfigurationService {
   }
 
   private void update(ConnectorConfiguration config, ConnectorConfigurationDTO data) {
-    config.setGlobalPassword(data.getPassword());
+    config.setGlobalPassword(encryptionService.encrypt(data.getPassword()));
     config.setGlobalUser(data.getUser());
     config.setLoginMode(data.getLoginMode());
     config.setProperties(data.getProperties());
@@ -117,5 +113,15 @@ public class ConnectorConfigurationService {
     update(config, data);
 
     return config;
+  }
+
+  protected ConnectorConfiguration findConfigurationById(long id) {
+    ConnectorConfiguration configuration = connectorConfigurationRepository.findById(id);
+    
+    if (configuration == null) {
+      throw notFound("connector configuration not found");
+    }
+    
+    return configuration;
   }
 }

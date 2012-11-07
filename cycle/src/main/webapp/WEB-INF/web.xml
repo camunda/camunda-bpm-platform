@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd" version="3.0">
+<web-app version="3.0" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
   <display-name>fox cycle</display-name>
   <context-param>
     <param-name>resteasy.servlet.mapping.prefix</param-name>
@@ -22,6 +22,10 @@
   <listener>
     <listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>
   </listener>
+  
+  <!-- 
+    jaxrs servlet definition / mapping 
+  -->
   <servlet>
     <servlet-name>Resteasy</servlet-name>
     <servlet-class>org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher</servlet-class>
@@ -30,48 +34,49 @@
     <servlet-name>Resteasy</servlet-name>
     <url-pattern>/app/*</url-pattern>
   </servlet-mapping>
+  
+  <!-- 
+    filter definitions / mapping 
+  -->
+  <filter>
+    <filter-name>SecurityFilter</filter-name>
+    <filter-class>com.camunda.fox.security.web.SecurityFilter</filter-class>
+  </filter>
+  <filter>
+    <filter-name>InitialConfigurationFilter</filter-name>
+    <filter-class>com.camunda.fox.cycle.web.filter.InitialConfigurationFilter</filter-class>
+  </filter>
   <filter>
     <filter-name>SlashUriFilter</filter-name>
     <filter-class>com.camunda.fox.cycle.web.filter.SlashUriFilter</filter-class>
   </filter>
- <filter>
-    <filter-name>PrincipalHolderFilter</filter-name>
-    <filter-class>com.camunda.fox.cycle.web.filter.PrincipalHolderFilter</filter-class>
+  <filter>
+    <filter-name>IdentityHolderFilter</filter-name>
+    <filter-class>com.camunda.fox.cycle.web.filter.IdentityHolderFilter</filter-class>
   </filter>
   <filter-mapping>
-    <filter-name>PrincipalHolderFilter</filter-name>
+    <filter-name>InitialConfigurationFilter</filter-name>
+    <url-pattern>/app/secured/view/index</url-pattern>
+  </filter-mapping>
+  <filter-mapping>
+    <filter-name>SecurityFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+  <filter-mapping>
+    <filter-name>IdentityHolderFilter</filter-name>
     <url-pattern>/*</url-pattern>
   </filter-mapping>
   <filter-mapping>
     <filter-name>SlashUriFilter</filter-name>
     <url-pattern>/app/secured/view/*</url-pattern>
   </filter-mapping>
-  <security-constraint>
-    <web-resource-collection>
-      <web-resource-name>Resteasy</web-resource-name>
-      <url-pattern>/app/secured/*</url-pattern>
-    </web-resource-collection>
-    <auth-constraint>
-      <role-name>admin</role-name>
-      <role-name>user</role-name>
-    </auth-constraint>
-  </security-constraint>
-  <login-config>
-    <auth-method>FORM</auth-method>
-    <form-login-config>
-      <form-login-page>/app/login</form-login-page>
-      <form-error-page>/app/login/error</form-error-page>
-    </form-login-config>
-  </login-config>
-  <security-role>
-    <role-name>admin</role-name>
-  </security-role>
-  <security-role>
-    <role-name>user</role-name>
-  </security-role>
+    
+  <!-- 
+    error page definitions 
+  -->
   <error-page>
-    <error-code>408</error-code>
-    <location>/app/login/expired</location>
+    <error-code>404</error-code>
+    <location>/app/error/not-found</location>
   </error-page>
   <session-config>
     <session-timeout>60</session-timeout>

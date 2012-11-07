@@ -74,7 +74,7 @@ public class SvnConnector extends Connector {
     }
     baseUrl = getConfiguration().getProperties().get(CONFIG_KEY_REPOSITORY_PATH);
   }
-  
+
   @Threadsafe
   @Override
   public void login(String userName, String password) {
@@ -261,9 +261,8 @@ public class SvnConnector extends Connector {
       
       stopTransaction();
       
-      ContentInformation result = new ContentInformation(true, new Date(file.lastModified())); 
       deleteRecursively(temporaryFileStore);
-      return result;
+      return getContentInformation(node);
     } catch (Exception e) {
       stopTransaction();
       logger.log(Level.FINER, "Error while updating file '" + node.getLabel() + "' in '" + extractParentFolder(node) + "'.", e);
@@ -340,7 +339,7 @@ public class SvnConnector extends Connector {
   @Override
   public InputStream getContent(ConnectorNode node) {
     try {
-      return svnClientAdapter.getContent(createSvnUrl(getPath(node)), SVNRevision.HEAD);
+      return svnClientAdapter.getContent(createSvnUrl(getTypedNodeSpecificPath(node)), SVNRevision.HEAD);
     } catch (Exception e) {
       if (node.getType() == ConnectorNodeType.PNG_FILE) {
         return null;
@@ -349,14 +348,25 @@ public class SvnConnector extends Connector {
     }
   }
   
-  private String getPath(ConnectorNode node) {
+  /**
+   * Returns a file path specific to the given node type.
+   * May override the current file name with something apropriate.
+   * 
+   * @param node
+   * @return 
+   */
+  private String getTypedNodeSpecificPath(ConnectorNode node) {
     String path = node.getId();
     switch (node.getType()) {
-    case PNG_FILE:
-      int pointIndex = path.lastIndexOf(".");
-      return path.substring(0, pointIndex) + ".png";
-    default: 
-      return path;
+      case PNG_FILE:
+        int pointIndex = path.lastIndexOf(".");
+        if (pointIndex != -1) {
+          return path.substring(0, pointIndex) + ".png";
+        } else {
+          return path + ".png";
+        }
+      default: 
+        return path;
     }
   }
   
@@ -367,16 +377,19 @@ public class SvnConnector extends Connector {
     ConnectorNode reloadedNode = null;
     try {
       // Try to load the current state (last modified date etc.) of the assigned node.
-      reloadedNode = getNode(node.getId());
+      reloadedNode = getNode(getTypedNodeSpecificPath(node));
     } catch (Exception e) {
       return ContentInformation.notFound();
     }
+    
     if (reloadedNode == null) {
       return ContentInformation.notFound();
     }
+    
     if (reloadedNode.getType() == ConnectorNodeType.FOLDER) {
       throw new IllegalArgumentException("Can only get content information from files"); 
     }
+    
     return new ContentInformation(true, reloadedNode.getLastModified());
   }
 }

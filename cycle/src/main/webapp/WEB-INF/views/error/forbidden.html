@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head th:substituteby="fragment/common :: head " />
+  <body>
+    <div class="wrapper">
+      <div th:substituteby="fragment/common :: navigation-default"></div>
+      <div class="container-fluid content-inset">
+        <div class="row-fluid">
+          <div class="span12">
+            <div class="alert alert-error">
+              <strong>Forbidden</strong> You are not allowed to access this resource
+            </div>
+            <p><a th:href="@{/app/secured/view/index}" th:text="#{Return to main page}">Return to main page</a>.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <footer th:substituteby="fragment/common :: footer" />
+  </body>
+</html>

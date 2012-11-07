@@ -3,6 +3,8 @@ package com.camunda.fox.cycle.connector;
 import java.io.Serializable;
 import java.util.Date;
 
+import com.camunda.fox.cycle.util.DateUtil;
+
 
 public class ContentInformation implements Serializable {
   private static final long serialVersionUID = 1L;
@@ -23,9 +25,12 @@ public class ContentInformation implements Serializable {
   public void setAvailable(boolean isAvailable) {
     this.isAvailable = isAvailable;
   }
-  
+
+  /**
+   * Returns last modified date normalized to seconds accuracy.
+   */
   public Date getLastModified() {
-    return lastModified;
+    return DateUtil.getNormalizedDate(lastModified);
   }
   
   public void setLastModified(Date lastModified) {

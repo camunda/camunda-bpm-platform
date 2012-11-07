@@ -11,6 +11,13 @@
   <packaging>war</packaging>
   <name>fox cycle - app</name>
   
+  <properties>
+    <web.resources.override>src/main/runtime/default/webapp</web.resources.override>
+    <java.resources.override>src/main/runtime/default/resources</java.resources.override>
+    <properties.override>src/main/runtime/default/config.properties</properties.override>
+    <netbeans.hint.deploy.server>gfv3ee6</netbeans.hint.deploy.server>
+  </properties>
+  
   <dependencies>
     <!-- Spring Framework -->
     <dependency>
@@ -40,17 +47,15 @@
     </dependency>
 
     <!-- Resteasy (JAX-RS impl) -->
+    <!-- configured in profiles -->
+    <!--
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
       <artifactId>resteasy-jaxrs</artifactId>
       <version>${version.resteasy}</version>
-      <exclusions>
-        <exclusion>
-          <artifactId>javassist</artifactId>
-          <groupId>javassist</groupId>
-        </exclusion>
-      </exclusions>
     </dependency>
+    -->
+    
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
       <artifactId>resteasy-jackson-provider</artifactId>
@@ -157,8 +162,8 @@
 
     <!-- testing -->
     <dependency>
-      <groupId>org.hamcrest</groupId>
-      <artifactId>hamcrest-all</artifactId>
+      <groupId>org.easytesting</groupId>
+      <artifactId>fest-assert-core</artifactId>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -181,8 +186,9 @@
       <artifactId>aspectjweaver</artifactId>
       <version>1.7.0</version>
     </dependency>
+    
+    <!-- required for SignavioConnectorIT -->
     <dependency>
-      <!-- required for SignavioConnectorIT -->
       <groupId>xmlunit</groupId>
       <artifactId>xmlunit</artifactId>
       <version>1.3</version>
@@ -211,17 +217,38 @@
       <artifactId>svnkit-javahl</artifactId>
       <version>1.3.4</version>
     </dependency>
+    
+    <!-- for testing the email service -->
+    <dependency>
+      <groupId>org.subethamail</groupId>
+      <artifactId>subethasmtp-wiser</artifactId>
+      <version>1.2</version>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- encryption library -->
+    <dependency>
+      <groupId>org.jasypt</groupId>
+      <artifactId>jasypt</artifactId>
+      <version>1.8</version>
+      <scope>compile</scope>
+    </dependency>
+    
   </dependencies>
 
   <build>
     <finalName>cycle</finalName>
     <filters>
       <filter>src/test/resources/config/test.properties</filter>
+      <filter>${properties.override}</filter>
     </filters>
     <resources>
       <resource>
+        <directory>${java.resources.override}</directory>
+        <filtering>true</filtering>
+      </resource>
+      <resource>
         <directory>src/main/resources</directory>
-        <!--<filtering>true</filtering>-->
       </resource>
     </resources>
     <testResources>
@@ -265,6 +292,10 @@
           <webResources>
             <resource>
               <filtering>true</filtering>
+              <directory>${web.resources.override}</directory>
+            </resource>
+            <resource>
+              <filtering>true</filtering>
               <directory>src/main/webapp</directory>
             </resource>
           </webResources>
@@ -298,12 +329,6 @@
           <groupId>org.hibernate</groupId>
           <artifactId>hibernate-entitymanager</artifactId>
           <scope>test</scope>
-        </dependency>
-        <!-- jpa 2.0 api -->
-        <dependency>
-          <groupId>org.hibernate.javax.persistence</groupId>
-          <artifactId>hibernate-jpa-2.0-api</artifactId>
-          <scope>compile</scope>
         </dependency>
         <dependency>
           <groupId>com.h2database</groupId>
@@ -401,6 +426,18 @@
           <artifactId>hibernate-jpa-2.0-api</artifactId>
           <scope>compile</scope>
         </dependency>
+        <!-- resteasy dependencies -->
+        <dependency>
+          <groupId>org.jboss.resteasy</groupId>
+          <artifactId>resteasy-jaxrs</artifactId>
+          <version>${version.resteasy}</version>
+          <exclusions>
+            <exclusion>
+              <artifactId>javassist</artifactId>
+              <groupId>javassist</groupId>
+            </exclusion>
+          </exclusions>
+        </dependency>
       </dependencies>
       <build>
         <plugins>
@@ -434,11 +471,89 @@
                 </goals>
                 <phase>package</phase>
                 <configuration>
-                  <path>cycle-spike</path>
-                  <serverXml>src/main/tomcat/conf/server.xml</serverXml>
+                  <path>cycle</path>
                 </configuration>
               </execution>
             </executions>
+          </plugin>
+        </plugins>
+      </build>
+      <properties>
+        <maven.tomcat.additionalConfigFilesDir>${basedir}/src/main/runtime/tomcat/config</maven.tomcat.additionalConfigFilesDir>
+      </properties>
+    </profile>
+    <profile>
+      <id>h2-test</id>
+      <dependencies>
+        <!-- for testing -->
+        <dependency>
+          <groupId>com.h2database</groupId>
+          <artifactId>h2</artifactId>
+          <version>${version.h2}</version>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
+      <id>glassfish</id>
+      <dependencies>
+        <!-- javax.persistence -->
+        <dependency>
+          <groupId>org.hibernate</groupId>
+          <artifactId>hibernate-entitymanager</artifactId>
+        </dependency>
+        <!-- resteasy dependencies -->
+        <dependency>
+          <groupId>org.jboss.resteasy</groupId>
+          <artifactId>resteasy-jaxrs</artifactId>
+          <version>${version.resteasy}</version>
+          <exclusions>
+            <exclusion>
+              <artifactId>javassist</artifactId>
+              <groupId>javassist</groupId>
+            </exclusion>
+          </exclusions>
+        </dependency>
+      </dependencies>
+      <properties>
+        <web.resources.override>src/main/runtime/glassfish/webapp</web.resources.override>
+        <java.resources.override>src/main/runtime/glassfish/resources</java.resources.override>
+      </properties>
+    </profile>
+    <profile>
+      <id>jboss</id>
+      <dependencies>
+        <!-- resteasy dependencies -->
+        <dependency>
+          <groupId>org.jboss.resteasy</groupId>
+          <artifactId>resteasy-jaxrs</artifactId>
+          <version>${version.resteasy}</version>
+          <scope>provided</scope>
+        </dependency>
+      </dependencies>
+      <properties>
+        <web.resources.override>src/main/runtime/jboss/webapp</web.resources.override>
+        <java.resources.override>src/main/runtime/jboss/resources</java.resources.override>
+        <properties.override>src/main/runtime/jboss/config/database.properties</properties.override>
+      </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-war-plugin</artifactId>
+            <configuration>
+              <archive>
+                <manifest>
+                  <!-- Maven project version number -->
+                  <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                </manifest>
+                <manifestEntries>
+                  <!-- SVN revision number -->
+                  <Implementation-Build>${buildNumber}</Implementation-Build>
+                  <Dependencies>org.apache.httpcomponents</Dependencies>
+                </manifestEntries>
+              </archive>
+            </configuration>
           </plugin>
         </plugins>
       </build>
@@ -455,20 +570,25 @@
           <artifactId>hibernate-entitymanager</artifactId>
           <scope>test</scope>
         </dependency>
-        <!-- jpa 2.0 api -->
-        <dependency>
-          <groupId>org.hibernate.javax.persistence</groupId>
-          <artifactId>hibernate-jpa-2.0-api</artifactId>
-          <scope>compile</scope>
-        </dependency>
         <dependency>
           <groupId>com.h2database</groupId>
           <artifactId>h2</artifactId>
           <version>${version.h2}</version>
           <scope>test</scope>
         </dependency>
+        <!-- resteasy dependencies -->
+        <dependency>
+          <groupId>org.jboss.resteasy</groupId>
+          <artifactId>resteasy-jaxrs</artifactId>
+          <version>${version.resteasy}</version>
+          <exclusions>
+            <exclusion>
+              <artifactId>javassist</artifactId>
+              <groupId>javassist</groupId>
+            </exclusion>
+          </exclusions>
+        </dependency>
       </dependencies>
     </profile>
   </profiles>
-   
 </project>

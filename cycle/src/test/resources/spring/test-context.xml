@@ -13,11 +13,12 @@
   
   <context:annotation-config />
 
-  <context:component-scan base-package="com.camunda.fox.cycle">
+  <context:component-scan base-package="com.camunda.fox">
     <context:include-filter type="annotation" expression="javax.ws.rs.Path" />
     <context:include-filter type="annotation" expression="javax.ws.rs.ext.Provider" />
   </context:component-scan>
   
+  <!-- used to mock spring session scope -->
   <bean class="org.springframework.beans.factory.config.CustomScopeConfigurer">
     <property name="scopes">
       <map>
@@ -27,43 +28,4 @@
       </map>
     </property>
   </bean>
-
-  <bean name="vfsConnectorConfig" class="com.camunda.fox.cycle.entity.ConnectorConfiguration">
-    <property name="name" value="Test VFS Connector" />
-    <property name="connectorClass" value="com.camunda.fox.cycle.connector.vfs.VfsConnector" />
-    <property name="properties">
-      <map>
-        <entry key="BASE_PATH" value="${java.io.tmpdir}" />
-      </map>
-    </property>
-  </bean>
-
-  <bean name="signavioConfig" class="com.camunda.fox.cycle.entity.ConnectorConfiguration">
-    <property name="name" value="My SignavioConnector" />
-    <property name="connectorClass"
-              value="com.camunda.fox.cycle.connector.signavio.SignavioConnector" />
-    <property name="loginMode" value="GLOBAL" />
-    <property name="globalUser" value="test@camunda.com" />
-    <property name="globalPassword" value="testtest" />
-    <property name="properties">
-      <map>
-        <entry key="signavioBaseUrl" value="http://vm2.camunda.com:8080"></entry>
-      </map>
-    </property>
-  </bean>
-  
-  <bean name="svnConfig" class="com.camunda.fox.cycle.entity.ConnectorConfiguration">
-    <property name="name" value="My Svn Connector" />
-    <property name="connectorClass"
-              value="com.camunda.fox.cycle.connector.svn.SvnConnector" />
-    <property name="loginMode" value="LOGIN_NOT_REQUIRED" />
-    <property name="properties">
-      <map>
-        <entry key="repositoryPath" value="https://svn.camunda.com/sandbox" />
-      </map>
-    </property>
-  </bean>
-
-  <!-- instantiates test connector configurations for testing -->
-  <bean name="configurationProvider" class="com.camunda.fox.cycle.connector.test.util.ConnectorConfigurationProvider" />
 </beans>

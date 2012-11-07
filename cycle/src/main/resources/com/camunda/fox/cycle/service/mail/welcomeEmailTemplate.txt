@@ -1,0 +1,9 @@
+Dear ${foxType} user,
+
+
+welcome to camunda fox ${foxType}. Your account information is as follows:
+
+
+Username: ${username}
+
+Password: ${password}

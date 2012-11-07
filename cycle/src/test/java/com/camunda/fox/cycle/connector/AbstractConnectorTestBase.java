@@ -1,10 +1,6 @@
 package com.camunda.fox.cycle.connector;
 
-import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.hasSize;
-import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.junit.Assert.assertThat;
+import static org.fest.assertions.api.Assertions.assertThat;
 import static org.junit.Assert.fail;
 
 import java.io.ByteArrayInputStream;
@@ -12,9 +8,9 @@ import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
 
-import org.junit.Assert;
 import org.junit.Test;
 
+import com.camunda.fox.cycle.util.DateUtil;
 import com.camunda.fox.cycle.util.IoUtil;
 
 /**
@@ -24,26 +20,26 @@ import com.camunda.fox.cycle.util.IoUtil;
 public abstract class AbstractConnectorTestBase {
 
   public static final String TMP_DIR_NAME = "connector-test-tmp-dir";
-
-  public static final ConnectorNode TMP_FOLDER = 
+  public static final ConnectorNode TMP_FOLDER =
     new ConnectorNode("//" + TMP_DIR_NAME, TMP_DIR_NAME, ConnectorNodeType.FOLDER);
 
   /**
    * Returns the connector to be tested
-   * @return 
+   *
+   * @return
    */
   public abstract Connector getConnector();
 
   @Test
   public void shouldCreateDirectory() throws Exception {
-    
+
     Connector connector = getConnector();
     ConnectorNode tmpFolder = connector.createNode("//", TMP_DIR_NAME, ConnectorNodeType.FOLDER);
-    
-    assertThat(tmpFolder, is(equalTo(TMP_FOLDER)));
-    
+
+    assertThat(tmpFolder).isEqualTo(TMP_FOLDER);
+
     try {
-      ContentInformation tmpFolderInfo = connector.getContentInformation(tmpFolder);
+      connector.getContentInformation(tmpFolder);
       fail("Obtaining connector info from folder should raise error");
     } catch (IllegalArgumentException e) {
       // anticipated
@@ -54,20 +50,18 @@ public abstract class AbstractConnectorTestBase {
   public void shouldImportDirectoryContents() throws Exception {
     // given
     Connector connector = getConnector();
-    
+
     // not alphabetically ordered!
-    String[] filesToImport = new String[] { "collaboration_impl.bpmn", "collaboration.bpmn" };
-    
+    String[] filesToImport = new String[]{"test-rhs.bpmn", "test-lhs.bpmn"};
+
     // when
-    for (String file: filesToImport) {
-      InputStream is = getDiagramResourceAsStream(file);
-      
-      ConnectorNode fileNode = connector.createNode("//" + TMP_DIR_NAME, file, ConnectorNodeType.ANY_FILE);
-      connector.updateContent(fileNode, is);
-      
-      IoUtil.closeSilently(is);
+    for (String file : filesToImport) {
+      importFile(connector, file, file);
     }
-    
+
+    // import another file with no extension
+    importFile(connector, "test-rhs.bpmn", "test-rhs");
+
     // then we should reach this point
   }
 
@@ -75,51 +69,130 @@ public abstract class AbstractConnectorTestBase {
   public void shouldNotThrowExceptionWhenObtainingContentInfoOfNonExistentFile() throws Exception {
     // give
     Connector connector = getConnector();
-    
+
     // when
     ContentInformation info = connector.getContentInformation(new ConnectorNode("some-non-existent-file"));
-    
+
     // then
-    assertThat(info, is(notNullValue()));
-    assertThat(info.exists(), is(false));
+    assertThat(info).isNotNull();
+    assertThat(info.exists()).isFalse();
+  }
+
+  @Test
+  public void shouldServePngImageForNoExtensionFiles() throws Exception {
+    // give
+    Connector connector = getConnector();
+
+    // when
+    ContentInformation info = connector.getContentInformation(new ConnectorNode("//" + TMP_DIR_NAME + "/test-rhs", ConnectorNodeType.PNG_FILE));
+
+    // then
+    assertThat(info).isNotNull();
+    assertThat(info.exists()).isFalse();
+  }
+
+  @Test
+  public void shouldServePngImage() throws Exception {
+    // give
+    Connector connector = getConnector();
+
+    // when
+    ContentInformation info = connector.getContentInformation(new ConnectorNode("//" + TMP_DIR_NAME + "/test-rhs.bpmn", ConnectorNodeType.PNG_FILE));
+
+    // then
+    assertThat(info).isNotNull();
+    assertThat(info.exists()).isFalse();
+  }
+
+  @Test
+  public void shouldServePngImage2() throws Exception {
+    // give
+    Connector connector = getConnector();
+
+    // when
+    ContentInformation info = connector.getContentInformation(new ConnectorNode("//" + TMP_DIR_NAME + "/test-rhs.png"));
+
+    // then
+    assertThat(info).isNotNull();
+    assertThat(info.exists()).isFalse();
   }
 
   @Test
   public void shouldListDirectoryContentsAlphabeticallyOrdered() throws Exception {
     // given
     Connector connector = getConnector();
-    
+
     // when
     List<ConnectorNode> nodes = connector.getChildren(TMP_FOLDER);
-    
+
     // then
-    assertThat(nodes, hasSize(2));
-    
+    assertThat(nodes).hasSize(3);
+
     ConnectorNode firstChildNode = nodes.get(0);
-    
+
     // collaboration should appear first --> alphabetical order
-    assertThat(firstChildNode.getId(), is("//" + TMP_DIR_NAME + "/collaboration.bpmn"));
-    assertThat(firstChildNode.getType(), is(ConnectorNodeType.BPMN_FILE));
+    assertThat(firstChildNode.getId()).isEqualTo("//" + TMP_DIR_NAME + "/test-lhs.bpmn");
+    assertThat(firstChildNode.getType()).isEqualTo(ConnectorNodeType.BPMN_FILE);
   }
 
   @Test
   public void shouldGetSingleFileContents() throws Exception {
     // given 
     Connector connector = getConnector();
-    
+
     InputStream originalInputStream = null;
     InputStream nodeInputStream = null;
-    
+
     try {
-      originalInputStream = getDiagramResourceAsStream("collaboration_impl.bpmn");
+      originalInputStream = getDiagramResourceAsStream("test-rhs.bpmn");
       byte[] originalBytes = IoUtil.readInputStream(originalInputStream, "class path is");
 
       // when
-      nodeInputStream = connector.getContent(new ConnectorNode("//" + TMP_DIR_NAME + "/collaboration_impl.bpmn"));
+      nodeInputStream = connector.getContent(new ConnectorNode("//" + TMP_DIR_NAME + "/test-rhs.bpmn"));
       byte[] nodeBytes = IoUtil.readInputStream(nodeInputStream, "node input stream");
 
       // then
-      assertThat(nodeBytes, is(equalTo(originalBytes)));
+      assertThat(nodeBytes).isEqualTo(originalBytes);
+    } finally {
+      IoUtil.closeSilently(originalInputStream, nodeInputStream);
+    }
+  }
+
+  @Test
+  public void shouldUpdateSingleFileContentFromConnector() throws Exception {
+    // given 
+    Connector connector = getConnector();
+
+    InputStream originalInputStream = null;
+    InputStream nodeInputStream = null;
+
+    ConnectorNode sourceFileNode = new ConnectorNode("//" + TMP_DIR_NAME + "/test-lhs.bpmn", "test-lhs.bpmn");
+
+    // now, with seconds accuracy
+    Date now = DateUtil.getNormalizedDate(System.currentTimeMillis());
+
+    try {
+      originalInputStream = connector.getContent(sourceFileNode);
+      byte[] inputBytes = IoUtil.readInputStream(originalInputStream, "connector is is");
+
+      ConnectorNode destFileNode = connector.createNode("//" + TMP_DIR_NAME, "/test-lhs-copy.bpmn", ConnectorNodeType.ANY_FILE);
+
+
+      // when
+      ContentInformation updatedContentInfo = connector.updateContent(
+        destFileNode, new ByteArrayInputStream(inputBytes));
+
+      assertThat(updatedContentInfo).isNotNull();
+      assertThat(updatedContentInfo.exists()).isTrue();
+
+      assertCorrectLastModified(now, updatedContentInfo.getLastModified());
+
+      // see if file contents equal the new contents
+      nodeInputStream = connector.getContent(destFileNode);
+      byte[] nodeBytes = IoUtil.readInputStream(nodeInputStream, "node input stream");
+
+      // then
+      assertThat(nodeBytes).isEqualTo(inputBytes);
     } finally {
       IoUtil.closeSilently(originalInputStream, nodeInputStream);
     }
@@ -129,42 +202,57 @@ public abstract class AbstractConnectorTestBase {
   public void shouldUpdateSingleFileContents() throws Exception {
     // given 
     Connector connector = getConnector();
-    
+
     InputStream originalInputStream = null;
     InputStream nodeInputStream = null;
-    
-    
+
+    // now, with seconds accuracy
+    Date beforeUpdate = DateUtil.getNormalizedDate(System.currentTimeMillis());
+
     try {
-      originalInputStream = getDiagramResourceAsStream("collaboration_impl.bpmn");
+      originalInputStream = getDiagramResourceAsStream("test-rhs.bpmn");
       byte[] inputBytes = IoUtil.readInputStream(originalInputStream, "class path is");
 
-      ConnectorNode fileNode = new ConnectorNode("//" + TMP_DIR_NAME + "/collaboration.bpmn", "collaboration.bpmn");
-      
+      ConnectorNode fileNode = new ConnectorNode("//" + TMP_DIR_NAME + "/test-lhs.bpmn", "test-lhs.bpmn");
+
       // when
       ContentInformation updatedContentInfo = connector.updateContent(
         fileNode, new ByteArrayInputStream(inputBytes));
-      
-      assertThat(updatedContentInfo, is(notNullValue()));
-      assertThat(updatedContentInfo.exists(), is(true));
-      
-      // see if updated was set
-      Date now = new Date();
-      Assert.assertTrue(updatedContentInfo.getLastModified().getTime() <= now.getTime());
-//      assertFalse(new Date().before(updatedContentInfo.getLastModified()));
-//      assertFalse(now.getTime() <= updatedContentInfo.getLastModified().getTime());
-      
+
+      assertThat(updatedContentInfo).isNotNull();
+      assertThat(updatedContentInfo.exists()).isTrue();
+
+      assertCorrectLastModified(beforeUpdate, updatedContentInfo.getLastModified());
+
       // see if file contents equal the new contents
       nodeInputStream = connector.getContent(fileNode);
       byte[] nodeBytes = IoUtil.readInputStream(nodeInputStream, "node input stream");
 
       // then
-      assertThat(nodeBytes, is(equalTo(inputBytes)));
+      assertThat(nodeBytes).isEqualTo(inputBytes);
     } finally {
       IoUtil.closeSilently(originalInputStream, nodeInputStream);
     }
   }
 
   private InputStream getDiagramResourceAsStream(String file) {
-    return getClass().getResourceAsStream("/com/camunda/fox/cycle/roundtrip/" + file);
+    return getClass().getResourceAsStream("/com/camunda/fox/cycle/roundtrip/repository/" + file);
+  }
+
+  private void importFile(Connector connector, String file, String connectorNodeName) throws Exception {
+    InputStream is = getDiagramResourceAsStream(file);
+
+    ConnectorNode fileNode = connector.createNode("//" + TMP_DIR_NAME, connectorNodeName, ConnectorNodeType.ANY_FILE);
+    connector.updateContent(fileNode, is);
+
+    IoUtil.closeSilently(is);
+  }
+
+  private void assertCorrectLastModified(Date beforeUpdate, Date lastModified) {
+
+    // see if updated was set
+    // compare by time to mitigate problems with time zone comparison
+    assertThat(lastModified.getTime()).isGreaterThanOrEqualTo(beforeUpdate.getTime());
+    assertThat(lastModified.getTime()).isLessThanOrEqualTo(new Date().getTime());
   }
 }

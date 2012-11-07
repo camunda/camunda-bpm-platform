@@ -41,6 +41,8 @@ import org.xnap.commons.i18n.I18n;
 @Produces({"text/html", "application/xhtml+xml"})
 public class TemplateMessageBodyWriter implements MessageBodyWriter<String> {
 
+  private static final String TPL_PREFIX = "tpl:";
+  
   @Inject
   private TemplateEngine templateEngine;
   
@@ -48,7 +50,7 @@ public class TemplateMessageBodyWriter implements MessageBodyWriter<String> {
   private ApplicationContext applicationContext;
   
   @Inject
-  I18n i18n;
+  private I18n i18n;
   
   @Context
   private HttpServletRequest request;
@@ -65,6 +67,7 @@ public class TemplateMessageBodyWriter implements MessageBodyWriter<String> {
    * @param mediaType
    * @return
    */
+  @Override
   public boolean isWriteable(Class<?> type, Type t, Annotation[] annotations, MediaType mediaType) {
     if (type.isAssignableFrom(String.class) && mediaType.isCompatible(MediaType.TEXT_HTML_TYPE)) {
       return true;
@@ -82,14 +85,26 @@ public class TemplateMessageBodyWriter implements MessageBodyWriter<String> {
    * @param mt
    * @return
    */
+  @Override
   public long getSize(String t, Class<?> type, Type type1, Annotation[] antns, MediaType mt) {
     return -1l;
   }
 
+  @Override
   public void writeTo(String t, Class<?> type, Type type1, Annotation[] antns, MediaType mt, MultivaluedMap<String, Object> mm, OutputStream out) throws IOException, WebApplicationException {
-    writeTemplate((String) t, new HashMap<String, Object>(), new OutputStreamWriter(out));
+    if (t.startsWith(TPL_PREFIX)) {
+      String templateName = t.replaceFirst(TPL_PREFIX, "");
+      writeTemplate(templateName, new HashMap<String, Object>(), new OutputStreamWriter(out));
+    } else {
+      writeString(t, new OutputStreamWriter(out));
+    }
   }
-
+  
+  private void writeString(String s, OutputStreamWriter writer) throws IOException {
+    writer.write(s, 0, s.length());
+    writer.flush();
+  }
+  
   private void writeTemplate(String name, Map<String, Object> model, OutputStreamWriter writer) throws IOException {
     
     // Always expose current url to model
@@ -106,8 +121,9 @@ public class TemplateMessageBodyWriter implements MessageBodyWriter<String> {
       locale,
       model,
       applicationContext);
-    
+
     templateEngine.process(name, context, writer);
+
     writer.flush();
   }
   

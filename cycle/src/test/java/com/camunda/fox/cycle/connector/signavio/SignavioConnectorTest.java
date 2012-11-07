@@ -180,7 +180,7 @@ public class SignavioConnectorTest {
   }
   
   @Test
-  public void testGetChildren_ContainingOneFolderAndOneModel() {
+  public void testGetChildren_ContainingOneFolderAndOneModel() throws Exception {
     ConnectorConfiguration config = this.getSignavioConnector().getConfiguration();
     this.getSignavioConnector().login(config.getGlobalUser(), config.getGlobalPassword());
     ConnectorNode createdRootNode = null;
@@ -220,7 +220,8 @@ public class SignavioConnectorTest {
       if (createdRootNode != null) {
         this.getSignavioConnector().deleteNode(createdRootNode);
       }
-      fail("An exception has been thrown: " + e.getMessage());
+      
+      throw e;
     }
   }
   

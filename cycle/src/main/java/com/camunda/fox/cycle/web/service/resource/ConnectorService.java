@@ -22,9 +22,10 @@ import com.camunda.fox.cycle.connector.ContentInformation;
 import com.camunda.fox.cycle.util.IoUtil;
 import com.camunda.fox.cycle.web.dto.ConnectorDTO;
 import com.camunda.fox.cycle.web.dto.ConnectorNodeDTO;
+import com.camunda.fox.cycle.web.service.AbstractRestService;
 
 @Path("secured/resource/connector")
-public class ConnectorService {
+public class ConnectorService extends AbstractRestService {
   
   @Inject
   protected ConnectorRegistry connectorRegistry;
@@ -44,7 +45,8 @@ public class ConnectorService {
   @Path("{connectorId}/root")
   @Produces("application/json")
   public List<ConnectorNodeDTO> root(@PathParam("connectorId") long connectorId) {
-    Connector connector = connectorRegistry.getConnector(connectorId);
+    Connector connector = getConnector(connectorId);
+    
     List<ConnectorNode> rootList = new ArrayList<ConnectorNode>();
     rootList.add(connector.getRoot());
     return ConnectorNodeDTO.wrapAll(rootList);
@@ -54,7 +56,7 @@ public class ConnectorService {
   @Path("{connectorId}/children")
   @Produces("application/json")
   public List<ConnectorNodeDTO> children(@PathParam("connectorId") long connectorId, @QueryParam("nodeId") String nodeId, @QueryParam("type") List<ConnectorNodeType> connectorNodeTypes) {
-    Connector connector = connectorRegistry.getConnector(connectorId);
+    Connector connector = getConnector(connectorId);
     
     // Filter by content type
     List<ConnectorNode> children = connector.getChildren(new ConnectorNode(nodeId));
@@ -72,7 +74,7 @@ public class ConnectorService {
   @Path("{connectorId}/contents")
   @Produces("application/xml")
   public String getXmlContent(@PathParam("connectorId") long connectorId, @QueryParam("nodeId") String nodeId) {
-    Connector connector = connectorRegistry.getConnector(connectorId);
+    Connector connector = getConnector(connectorId);
     try {
       return new java.util.Scanner(connector.getContent(new ConnectorNode(nodeId))).useDelimiter("\\A").next();
     } catch (java.util.NoSuchElementException e) {
@@ -83,7 +85,7 @@ public class ConnectorService {
   @GET
   @Path("{connectorId}/contents")
   public Response getTypedContent(@PathParam("connectorId") long connectorId, @QueryParam("nodeId") String nodeId, @QueryParam("type") ConnectorNodeType type) {
-    Connector connector = connectorRegistry.getConnector(connectorId);
+    Connector connector = getConnector(connectorId);
     InputStream content = connector.getContent(new ConnectorNode(nodeId, null, type));
     
     if (content == null) {
@@ -107,7 +109,17 @@ public class ConnectorService {
     @QueryParam("nodeId") String nodeId, 
     @QueryParam("type") @DefaultValue("ANY_FILE") ConnectorNodeType type) {
     
-    Connector connector = connectorRegistry.getConnector(connectorId);
+    Connector connector = getConnector(connectorId);
     return connector.getContentInformation(new ConnectorNode(nodeId, null, type));
+  }
+
+  protected Connector getConnector(long connectorId) {
+    Connector connector = connectorRegistry.getConnector(connectorId);
+    
+    if (connector == null) {
+      throw notFound("connector not found");
+    }
+    
+    return connector;
   }
 }

@@ -1,35 +1,40 @@
 package com.camunda.fox.cycle.entity;
 
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 @Entity
 @Table(name="cy_connector_cred")
-public class ConnectorCredentials {
-  @Id
-  @GeneratedValue(strategy=GenerationType.AUTO)
-  private long id;
+public class ConnectorCredentials extends AbstractEntity {
   
-  private String user;
+  private static final long serialVersionUID = 1L;
+  
+  private String username;
   private String password;
   
-  public long getId() {
-    return id;
-  }
+  @ManyToOne
+  private ConnectorConfiguration connectorConfiguration;
   
-  public void setId(long id) {
-    this.id = id;
+  @ManyToOne
+  private User user;
+
+  public ConnectorCredentials() {
   }
-  
-  public String getUser() {
-    return user;
-  }
-  
-  public void setUser(String user) {
+
+  public ConnectorCredentials(String username, String password, ConnectorConfiguration configuration, User user) {
+    this.username = username;
+    this.password = password;
+    this.connectorConfiguration = configuration;
     this.user = user;
+  }
+  
+  public String getUsername() {
+    return username;
+  }
+  
+  public void setUsername(String username) {
+    this.username = username;
   }
   
   public String getPassword() {
@@ -39,4 +44,21 @@ public class ConnectorCredentials {
   public void setPassword(String password) {
     this.password = password;
   }
+  
+  public ConnectorConfiguration getConnectorConfiguration() {
+    return connectorConfiguration;
+  }
+  
+  public void setConnectorConfiguration(ConnectorConfiguration connectorConfiguration) {
+    this.connectorConfiguration = connectorConfiguration;
+  }
+  
+  public User getUser() {
+    return user;
+  }
+  
+  public void setUser(User user) {
+    this.user = user;
+  }
+  
 }

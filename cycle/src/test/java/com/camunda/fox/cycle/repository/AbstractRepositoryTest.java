@@ -1,17 +1,15 @@
 package com.camunda.fox.cycle.repository;
 
+import static org.fest.assertions.api.Assertions.assertThat;
+
 import javax.inject.Inject;
 
+import org.junit.After;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.kubek2k.springockito.annotations.SpringockitoContextLoader;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import static org.hamcrest.Matchers.*;
-import org.junit.After;
-import static org.junit.Assume.*;
-import static org.junit.Assert.*;
 
 import com.camunda.fox.cycle.entity.Roundtrip;
 
@@ -47,11 +45,13 @@ public class AbstractRepositoryTest {
     roundtripRepository.saveAndFlush(r2);
     roundtripRepository.saveAndFlush(r3);
     
+    long count = roundtripRepository.countAll();
     int deleted = roundtripRepository.deleteAll();
     
     // then
-    assertThat(deleted, is(3));
-    assertThat(roundtripRepository.findAll(), hasSize(0));
+    assertThat(count).isEqualTo(3);
+    assertThat(deleted).isEqualTo(3);
+    assertThat(roundtripRepository.findAll()).isEmpty();
   }
 
   @Test
@@ -59,15 +59,13 @@ public class AbstractRepositoryTest {
     // given
     Roundtrip newRoundtrip = new Roundtrip("TestRoundtrip");
     
-    assumeThat(roundtripRepository.findAll(), hasSize(0));
-    
     // when
     newRoundtrip = roundtripRepository.saveAndFlush(newRoundtrip);
     Roundtrip roundtripFromDB = roundtripRepository.findById(newRoundtrip.getId());
     
     // then
-    assertThat(roundtripRepository.findAll(), hasSize(1));
-    assertThat(roundtripFromDB.getName(), is(newRoundtrip.getName()));
+    assertThat(roundtripRepository.findAll()).hasSize(1);
+    assertThat(roundtripFromDB.getName()).isEqualTo(newRoundtrip.getName());
   }
 
   @Test
@@ -80,6 +78,6 @@ public class AbstractRepositoryTest {
     roundtripRepository.delete(newRoundtrip);
     
     // then
-    assertThat(roundtripRepository.findAll(), hasSize(0));
+    assertThat(roundtripRepository.findAll()).isEmpty();
   }
 }
