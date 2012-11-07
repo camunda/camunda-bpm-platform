@@ -90,13 +90,8 @@ public class DefaultMailSessionProvider implements MailSessionProvider {
   @Override
   public void sendMail(Message msg, Session session) {
     try {
-      msg.saveChanges();
-      
-      Transport transport = session.getTransport();
-      Address[] recipients = msg.getAllRecipients();
-      
-      transport.connect();      
-      transport.sendMessage(msg, recipients);
+       
+      Transport.send(msg);
       
     } catch (MessagingException e) {
       throw new MailServiceException("Could not send message using the default Transport", e);
