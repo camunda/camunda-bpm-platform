@@ -20,6 +20,7 @@ public class ProcessArchiveService implements Service<ProcessArchiveService> {
   private final ProcessArchive processArchive;
   
   private ProcessArchiveInstallation processArchiveInstallation;
+  private FoxPlatformException exception;
   
   public ProcessArchiveService(ProcessArchive processArchive) {
     this.processArchive = processArchive;
@@ -31,7 +32,11 @@ public class ProcessArchiveService implements Service<ProcessArchiveService> {
 
   public void start(StartContext arg0) throws StartException {
     ContainerPlatformService containerPlatformService = containerPlatformServiceInjector.getOptionalValue();
-    processArchiveInstallation = containerPlatformService.installProcessArchiveInternal(processArchive);
+    try {
+      processArchiveInstallation = containerPlatformService.installProcessArchiveInternal(processArchive);
+    } catch(FoxPlatformException e) {
+      this.exception = e;
+    }
   }
 
   public void stop(StopContext arg0) {
@@ -57,5 +62,9 @@ public class ProcessArchiveService implements Service<ProcessArchiveService> {
   
   public ProcessArchiveInstallation getProcessArchiveInstallation() {
     return processArchiveInstallation;
+  }
+  
+  public FoxPlatformException getException() {
+    return exception;
   }
 }

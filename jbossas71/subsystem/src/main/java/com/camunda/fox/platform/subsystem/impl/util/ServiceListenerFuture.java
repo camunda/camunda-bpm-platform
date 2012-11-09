@@ -42,6 +42,7 @@ public abstract class ServiceListenerFuture<S, V> extends AbstractServiceListene
   
   protected V value;
   boolean cancelled;
+  boolean failed;
   
   @Override
   public void transition(ServiceController< ? extends S> controller, Transition transition) {
@@ -51,11 +52,16 @@ public abstract class ServiceListenerFuture<S, V> extends AbstractServiceListene
         this.notifyAll();
       }
     } else if(transition.getAfter().equals(Substate.CANCELLED)){
-      cancelled = true;
       synchronized(this)  {
+        cancelled = true;
         this.notifyAll();
       }
-    }    
+    } else if(transition.getAfter().equals(Substate.START_FAILED)) {
+      synchronized (this) {
+        failed = true;
+        this.notifyAll();
+      }
+    }
   }
   
   protected abstract void serviceAvailable();
