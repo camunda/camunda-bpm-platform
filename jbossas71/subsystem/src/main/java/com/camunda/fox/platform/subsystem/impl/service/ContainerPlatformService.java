@@ -17,8 +17,6 @@ package com.camunda.fox.platform.subsystem.impl.service;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import java.util.logging.Logger;
 
 import javax.transaction.TransactionManager;
@@ -189,6 +187,9 @@ public class ContainerPlatformService extends PlatformService implements Service
   }
   
   public ProcessArchiveInstallation installProcessArchive(ProcessArchive processArchive) {
+    
+    // the ProcessArchiveService is started asynchronously but we make it appear sychronously here.
+    
       ProcessArchiveService processArchiveService = new ProcessArchiveService(processArchive);
       ServiceName serviceName = ProcessArchiveService.getServiceName(processArchive.getName());
       
@@ -209,15 +210,23 @@ public class ContainerPlatformService extends PlatformService implements Service
         .install();
       
       try {
-        // wait for 60 seconds for the installation to succeed.
-        return listener.get(60, TimeUnit.SECONDS);
+        
+        ProcessArchiveInstallation processArchiveInstallation = listener.get();
+        FoxPlatformException exception = processArchiveService.getException();
+        if(exception != null) {
+          serviceContainer.getService(serviceName).setMode(Mode.REMOVE);
+          throw exception;
+        
+        } else {
+          return processArchiveInstallation;
+          
+        }
+        
       } catch (InterruptedException e) {
         throw new FoxPlatformException("Interrupted while waiting for Process archive installation", e);
       } catch (ExecutionException e) {
         throw new FoxPlatformException("Exception while waiting for Process archive installation", e);
-      } catch (TimeoutException e) {
-        throw new FoxPlatformException("Timeout while waiting for Process archive installation", e);
-      }
+      } 
       
   }
   
