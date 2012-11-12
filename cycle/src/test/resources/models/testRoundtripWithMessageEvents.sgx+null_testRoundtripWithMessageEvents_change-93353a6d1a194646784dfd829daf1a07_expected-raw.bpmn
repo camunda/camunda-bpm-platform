@@ -1,145 +1,150 @@
-<?xml version="1.0" encoding="UTF-8"?><definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:signavio="http://www.signavio.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" exporter="Signavio Process Editor, http://www.signavio.com" exporterVersion="6.1.0" id="sid-5353de70-fe99-4c2f-ab5c-dac7f89345bb" targetNamespace="http://www.signavio.com/bpmn20" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/2.0/20100501/BPMN20.xsd">
-   <message id="sid-cedf74ca-4c6e-43ae-99c5-5924c050e077" name=""/>
-   <collaboration id="sid-9650dc1f-fb89-41f4-bc6c-2318ebe942cb">
-      <participant id="Mensch_3" name="Mensch" processRef="Mensch_7"/>
-      <participant id="Process_Engine_2" name="Process Engine" processRef="testRoundtripWithMessageEvents_"/>
-      <messageFlow id="messageFlow_4" name="" sourceRef="test_21" targetRef="startEvent_49"/>
-      <messageFlow id="messageFlow_5" name="" sourceRef="Process_Engine_2" targetRef="intermediateCatchEvent_30"/>
+<?xml version="1.0" encoding="UTF-8"?><definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:signavio="http://www.signavio.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" exporter="Signavio Process Editor, http://www.signavio.com" exporterVersion="6.4.0" expressionLanguage="http://www.w3.org/1999/XPath" id="sid-6d936ea6-33d4-4ad2-b9eb-e6502d34549b" targetNamespace="http://www.signavio.com/bpmn20" typeLanguage="http://www.w3.org/2001/XMLSchema" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/2.0/20100501/BPMN20.xsd">
+   <message id="sid-f2ba3545-a911-4075-9ba7-c9b5fa8a141e" name=""/>
+   <collaboration id="sid-db74d19d-b99f-4592-8df9-6954782980b7">
+      <participant id="Mensch_5" name="Mensch" processRef="Mensch_11">
+         <extensionElements/>
+      </participant>
+      <participant id="Process_Engine_2" name="Process Engine" processRef="testRoundtripWithMessageEvents_">
+         <extensionElements/>
+      </participant>
+      <messageFlow id="messageFlow_8" name="" sourceRef="test_24" targetRef="startEvent_51"/>
+      <messageFlow id="messageFlow_9" name="" sourceRef="Process_Engine_2" targetRef="intermediateCatchEvent_33"/>
    </collaboration>
-   <process id="Mensch_7" isClosed="true" isExecutable="false" name="Mensch">
-      <laneSet id="sid-331f51c9-b045-4f83-a0af-5754c175ae8f">
-         <lane id="lane_9">
+   <process id="Mensch_11" isClosed="false" isExecutable="false" name="Mensch" processType="None">
+      <extensionElements/>
+      <laneSet id="sid-c6377b4d-7a07-46b2-bdfa-41e1b36e7ed1">
+         <lane id="lane_12">
             <extensionElements>
                <signavio:signavioMetaData metaKey="bgcolor" metaValue=""/>
             </extensionElements>
-            <flowNodeRef>startEvent_17</flowNodeRef>
-            <flowNodeRef>test_21</flowNodeRef>
-            <flowNodeRef>endEvent_26</flowNodeRef>
-            <flowNodeRef>intermediateCatchEvent_30</flowNodeRef>
+            <flowNodeRef>startEvent_20</flowNodeRef>
+            <flowNodeRef>test_24</flowNodeRef>
+            <flowNodeRef>endEvent_29</flowNodeRef>
+            <flowNodeRef>intermediateCatchEvent_33</flowNodeRef>
          </lane>
       </laneSet>
-      <startEvent id="startEvent_17" name="">
+      <startEvent id="startEvent_20" name="">
          <extensionElements>
             <signavio:signavioMetaData metaKey="bgcolor" metaValue="#ffffff"/>
          </extensionElements>
-         <outgoing>sequenceFlow_36</outgoing>
+         <outgoing>sequenceFlow_39</outgoing>
       </startEvent>
-      <task completionQuantity="1" id="test_21" isForCompensation="false" name="test" startQuantity="1">
+      <task completionQuantity="1" id="test_24" isForCompensation="false" name="test" startQuantity="1">
          <extensionElements>
             <signavio:signavioMetaData metaKey="bgcolor" metaValue="#ffffcc"/>
          </extensionElements>
-         <incoming>sequenceFlow_36</incoming>
-         <outgoing>sequenceFlow_37</outgoing>
+         <incoming>sequenceFlow_39</incoming>
+         <outgoing>sequenceFlow_40</outgoing>
       </task>
-      <endEvent id="endEvent_26" name="">
+      <endEvent id="endEvent_29" name="">
          <extensionElements>
             <signavio:signavioMetaData metaKey="bgcolor" metaValue="#ffffff"/>
          </extensionElements>
-         <incoming>sequenceFlow_38</incoming>
+         <incoming>sequenceFlow_41</incoming>
       </endEvent>
-      <intermediateCatchEvent id="intermediateCatchEvent_30" name="">
+      <intermediateCatchEvent id="intermediateCatchEvent_33" name="">
          <extensionElements>
             <signavio:signavioMetaData metaKey="bgcolor" metaValue="#ffffff"/>
          </extensionElements>
-         <incoming>sequenceFlow_37</incoming>
-         <outgoing>sequenceFlow_38</outgoing>
-         <messageEventDefinition id="sid-90a63a39-a180-478f-bf63-efdaf73741b7"/>
+         <incoming>sequenceFlow_40</incoming>
+         <outgoing>sequenceFlow_41</outgoing>
+         <messageEventDefinition id="sid-efb4e2c9-e838-42fd-908a-fe622cd3c7ec"/>
       </intermediateCatchEvent>
-      <sequenceFlow id="sequenceFlow_38" isImmediate="true" name="" sourceRef="intermediateCatchEvent_30" targetRef="endEvent_26"/>
-      <sequenceFlow id="sequenceFlow_37" isImmediate="true" name="" sourceRef="test_21" targetRef="intermediateCatchEvent_30"/>
-      <sequenceFlow id="sequenceFlow_36" isImmediate="true" name="" sourceRef="startEvent_17" targetRef="test_21"/>
-	  
+      <sequenceFlow id="sequenceFlow_41" isImmediate="true" name="" sourceRef="intermediateCatchEvent_33" targetRef="endEvent_29"/>
+      <sequenceFlow id="sequenceFlow_40" isImmediate="true" name="" sourceRef="test_24" targetRef="intermediateCatchEvent_33"/>
+      <sequenceFlow id="sequenceFlow_39" isImmediate="true" name="" sourceRef="startEvent_20" targetRef="test_24"/>
    </process>
-   <process id="testRoundtripWithMessageEvents_" isClosed="true" isExecutable="true" name="Process Engine">
-      <laneSet id="sid-20044ed8-cee0-4fd1-974e-77868d2a32db">
-         <lane id="lane_42">
-            <flowNodeRef>startEvent_49</flowNodeRef>
+   <process id="testRoundtripWithMessageEvents_" isClosed="false" isExecutable="true" name="Process Engine" processType="None">
+      <extensionElements/>
+      <laneSet id="sid-33c1f0f3-3eb5-4556-865d-f4e7a1566558">
+         <lane id="lane_44">
+            <flowNodeRef>startEvent_51</flowNodeRef>
             <flowNodeRef>testTwitter</flowNodeRef>
-            <flowNodeRef>endEvent_59</flowNodeRef>
+            <flowNodeRef>endEvent_61</flowNodeRef>
          </lane>
       </laneSet>
-      <startEvent id="startEvent_49" name="">
-         <outgoing>sequenceFlow_63</outgoing>
-         <messageEventDefinition id="sid-0f648032-59a9-42f2-81d2-58573b3b03b5" messageRef="sid-cedf74ca-4c6e-43ae-99c5-5924c050e077"/>
+      <startEvent id="startEvent_51" name="">
+         <outgoing>sequenceFlow_65</outgoing>
+         <messageEventDefinition id="sid-6c45a8b4-7aeb-48bb-81fc-8a9fc01d09a5" messageRef="sid-f2ba3545-a911-4075-9ba7-c9b5fa8a141e"/>
       </startEvent>
       <serviceTask activiti:class="com.camunda.fox.demo.twitter.TweetContentDelegate" completionQuantity="1" id="testTwitter" isForCompensation="false" name="testTwitter" startQuantity="1">
-         <incoming>sequenceFlow_63</incoming>
-         <outgoing>sequenceFlow_64</outgoing>
+         <incoming>sequenceFlow_65</incoming>
+         <outgoing>sequenceFlow_66</outgoing>
       </serviceTask>
-      <endEvent id="endEvent_59" name="">
-         <incoming>sequenceFlow_64</incoming>
+      <endEvent id="endEvent_61" name="">
+         <incoming>sequenceFlow_66</incoming>
       </endEvent>
-      <sequenceFlow id="sequenceFlow_63" isImmediate="true" name="" sourceRef="startEvent_49" targetRef="testTwitter"/>
-      <sequenceFlow id="sequenceFlow_64" isImmediate="true" name="" sourceRef="testTwitter" targetRef="endEvent_59"/>
+      <sequenceFlow id="sequenceFlow_65" isImmediate="true" name="" sourceRef="startEvent_51" targetRef="testTwitter"/>
+      <sequenceFlow id="sequenceFlow_66" isImmediate="true" name="" sourceRef="testTwitter" targetRef="endEvent_61"/>
    </process>
-   <bpmndi:BPMNDiagram id="sid-aa744754-6eff-46b9-abfa-9a9e1c0744a3">
-      <bpmndi:BPMNPlane bpmnElement="sid-9650dc1f-fb89-41f4-bc6c-2318ebe942cb" id="sid-30b434b0-b1e4-44a7-941c-998c31b074f1">
-         <bpmndi:BPMNShape bpmnElement="Mensch_3" id="Mensch_3_gui" isHorizontal="true">
+   <bpmndi:BPMNDiagram id="sid-d8f90c16-7f20-4eb9-a114-32cfc3ebf6f7">
+      <bpmndi:BPMNPlane bpmnElement="sid-db74d19d-b99f-4592-8df9-6954782980b7" id="sid-b8959f88-a29c-4f33-8512-ab0058f157f4">
+         <bpmndi:BPMNShape bpmnElement="Mensch_5" id="Mensch_5_gui" isHorizontal="true">
             <omgdc:Bounds height="250.0" width="600.0" x="75.0" y="45.0"/>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="Process_Engine_2" id="Process_Engine_2_gui" isHorizontal="true">
             <omgdc:Bounds height="250.0" width="600.0" x="75.0" y="345.0"/>
          </bpmndi:BPMNShape>
-         <bpmndi:BPMNShape bpmnElement="lane_9" id="lane_9_gui" isHorizontal="true">
+         <bpmndi:BPMNShape bpmnElement="lane_12" id="lane_12_gui" isHorizontal="true">
             <omgdc:Bounds height="250.0" width="570.0" x="105.0" y="45.0"/>
          </bpmndi:BPMNShape>
-         <bpmndi:BPMNShape bpmnElement="startEvent_17" id="startEvent_17_gui">
+         <bpmndi:BPMNShape bpmnElement="startEvent_20" id="startEvent_20_gui">
             <omgdc:Bounds height="28.0" width="28.0" x="151.0" y="156.0"/>
          </bpmndi:BPMNShape>
-         <bpmndi:BPMNShape bpmnElement="test_21" id="test_21_gui">
+         <bpmndi:BPMNShape bpmnElement="test_24" id="test_24_gui">
             <omgdc:Bounds height="80.0" width="100.0" x="225.0" y="130.0"/>
          </bpmndi:BPMNShape>
-         <bpmndi:BPMNShape bpmnElement="endEvent_26" id="endEvent_26_gui">
+         <bpmndi:BPMNShape bpmnElement="endEvent_29" id="endEvent_29_gui">
             <omgdc:Bounds height="28.0" width="28.0" x="435.0" y="156.0"/>
          </bpmndi:BPMNShape>
-         <bpmndi:BPMNShape bpmnElement="intermediateCatchEvent_30" id="intermediateCatchEvent_30_gui">
+         <bpmndi:BPMNShape bpmnElement="intermediateCatchEvent_33" id="intermediateCatchEvent_33_gui">
             <omgdc:Bounds height="28.0" width="28.0" x="376.0" y="156.0"/>
          </bpmndi:BPMNShape>
-         <bpmndi:BPMNShape bpmnElement="lane_42" id="lane_42_gui" isHorizontal="true">
+         <bpmndi:BPMNShape bpmnElement="lane_44" id="lane_44_gui" isHorizontal="true">
             <omgdc:Bounds height="250.0" width="570.0" x="105.0" y="345.0"/>
          </bpmndi:BPMNShape>
-         <bpmndi:BPMNShape bpmnElement="startEvent_49" id="startEvent_49_gui">
+         <bpmndi:BPMNShape bpmnElement="startEvent_51" id="startEvent_51_gui">
             <omgdc:Bounds height="28.0" width="28.0" x="151.0" y="456.0"/>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="testTwitter" id="testTwitter_gui">
             <omgdc:Bounds height="80.0" width="100.0" x="225.0" y="430.0"/>
          </bpmndi:BPMNShape>
-         <bpmndi:BPMNShape bpmnElement="endEvent_59" id="endEvent_59_gui">
+         <bpmndi:BPMNShape bpmnElement="endEvent_61" id="endEvent_61_gui">
             <omgdc:Bounds height="28.0" width="28.0" x="370.0" y="456.0"/>
          </bpmndi:BPMNShape>
-         <bpmndi:BPMNEdge bpmnElement="sequenceFlow_36" id="sequenceFlow_36_gui">
+         <bpmndi:BPMNEdge bpmnElement="sequenceFlow_66" id="sequenceFlow_66_gui">
+            <omgdi:waypoint x="325.0" y="470.0"/>
+            <omgdi:waypoint x="370.0" y="470.0"/>
+         </bpmndi:BPMNEdge>
+         <bpmndi:BPMNEdge bpmnElement="sequenceFlow_39" id="sequenceFlow_39_gui">
             <omgdi:waypoint x="179.0" y="170.0"/>
             <omgdi:waypoint x="225.0" y="170.0"/>
          </bpmndi:BPMNEdge>
-         <bpmndi:BPMNEdge bpmnElement="sequenceFlow_38" id="sequenceFlow_38_gui">
-            <omgdi:waypoint x="404.0" y="170.0"/>
-            <omgdi:waypoint x="435.0" y="170.0"/>
+         <bpmndi:BPMNEdge bpmnElement="sequenceFlow_65" id="sequenceFlow_65_gui">
+            <omgdi:waypoint x="179.0" y="470.0"/>
+            <omgdi:waypoint x="225.0" y="470.0"/>
          </bpmndi:BPMNEdge>
-         <bpmndi:BPMNEdge bpmnElement="sequenceFlow_37" id="sequenceFlow_37_gui">
-            <omgdi:waypoint x="325.0" y="170.0"/>
-            <omgdi:waypoint x="376.0" y="170.0"/>
-         </bpmndi:BPMNEdge>
-         <bpmndi:BPMNEdge bpmnElement="messageFlow_4" id="messageFlow_4_gui">
+         <bpmndi:BPMNEdge bpmnElement="messageFlow_8" id="messageFlow_8_gui">
             <omgdi:waypoint x="275.0" y="210.0"/>
             <omgdi:waypoint x="275.0" y="332.5"/>
             <omgdi:waypoint x="165.0" y="332.5"/>
             <omgdi:waypoint x="165.0" y="456.0"/>
          </bpmndi:BPMNEdge>
-         <bpmndi:BPMNEdge bpmnElement="sequenceFlow_63" id="sequenceFlow_63_gui">
-            <omgdi:waypoint x="179.0" y="470.0"/>
-            <omgdi:waypoint x="225.0" y="470.0"/>
+         <bpmndi:BPMNEdge bpmnElement="sequenceFlow_40" id="sequenceFlow_40_gui">
+            <omgdi:waypoint x="325.0" y="170.0"/>
+            <omgdi:waypoint x="376.0" y="170.0"/>
          </bpmndi:BPMNEdge>
-         <bpmndi:BPMNEdge bpmnElement="messageFlow_5" id="messageFlow_5_gui">
+         <bpmndi:BPMNEdge bpmnElement="sequenceFlow_41" id="sequenceFlow_41_gui">
+            <omgdi:waypoint x="404.0" y="170.0"/>
+            <omgdi:waypoint x="435.0" y="170.0"/>
+         </bpmndi:BPMNEdge>
+         <bpmndi:BPMNEdge bpmnElement="messageFlow_9" id="messageFlow_9_gui">
             <omgdi:waypoint x="275.0" y="385.0"/>
             <omgdi:waypoint x="275.0" y="385.0"/>
             <omgdi:waypoint x="350.0" y="385.0"/>
             <omgdi:waypoint x="350.0" y="312.0"/>
             <omgdi:waypoint x="390.0" y="312.0"/>
             <omgdi:waypoint x="390.0" y="184.0"/>
-         </bpmndi:BPMNEdge>
-         <bpmndi:BPMNEdge bpmnElement="sequenceFlow_64" id="sequenceFlow_64_gui">
-            <omgdi:waypoint x="325.0" y="470.0"/>
-            <omgdi:waypoint x="370.0" y="470.0"/>
          </bpmndi:BPMNEdge>
       </bpmndi:BPMNPlane>
    </bpmndi:BPMNDiagram>

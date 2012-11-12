@@ -1,5 +1,5 @@
-<?xml version="1.0" encoding="UTF-8"?><definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:signavio="http://www.signavio.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" exporter="Signavio Process Editor, http://www.signavio.com" exporterVersion="5.4.1" id="sid-c9c42c80-aedb-47d4-bfe6-fe04f2149d48" targetNamespace="http://www.signavio.com/bpmn20" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/2.0/20100501/BPMN20.xsd">
-   <process id="MyProcess2" isExecutable="false">
+<?xml version="1.0" encoding="UTF-8"?><definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:signavio="http://www.signavio.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" exporter="Signavio Process Editor, http://www.signavio.com" exporterVersion="6.4.0" expressionLanguage="http://www.w3.org/1999/XPath" id="sid-af674292-a1eb-408e-9cda-9fb1ca31265a" targetNamespace="http://www.omg.org/spec/BPMN/20100524/MODEL" typeLanguage="http://www.w3.org/2001/XMLSchema" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/2.0/20100501/BPMN20.xsd">
+   <process id="MyProcess2" isClosed="false" isExecutable="true" name="MyProcess2" processType="None">
       <startEvent id="startevent1" name="Start">
          <outgoing>flow1</outgoing>
       </startEvent>
@@ -39,8 +39,8 @@
       <sequenceFlow id="flow9" isImmediate="true" name="" sourceRef="exclusivegateway2" targetRef="servicetask1"/>
       <sequenceFlow id="flow8" isImmediate="true" name="" sourceRef="usertask1" targetRef="exclusivegateway2"/>
    </process>
-   <bpmndi:BPMNDiagram id="sid-e697fb74-f5ec-4a6f-85f9-f8334ac8f526">
-      <bpmndi:BPMNPlane bpmnElement="MyProcess2" id="sid-504cf6ca-80da-46f7-8e60-5e267295837b">
+   <bpmndi:BPMNDiagram id="sid-c5c73491-ffc2-433b-9379-918b81843f26">
+      <bpmndi:BPMNPlane bpmnElement="MyProcess2" id="sid-392acfdf-7c62-4002-903e-9ac55bdfacda">
          <bpmndi:BPMNShape bpmnElement="startevent1" id="startevent1_gui">
             <omgdc:Bounds height="28.0" width="28.0" x="53.5" y="83.5"/>
          </bpmndi:BPMNShape>
