@@ -805,7 +805,7 @@ function UsersController($scope, Event, User) {
   };
   
   $scope.isCurrentUser = function(user) {
-	  return user.name == ($scope.currentUser || {}).name;
+    return user.name == ($scope.currentUser || {}).name;
   };
 
   $scope.createNew = function() {
@@ -939,12 +939,12 @@ function ProfileController($scope, $http, App, Event, Credentials, ConnectorConf
   $scope.$watch(Credentials.watchCurrent, function(newValue) {
     $scope.currentUser = newValue;
     if (newValue) {
-      fetchConnectorCredentials(newValue);
+      fetchConnectorCredentials();
     }
   });
   
-  function fetchConnectorCredentials(user) {
-    ConnectorCredentials.query( { userId: user.id }, function (data) {
+  function fetchConnectorCredentials() {
+    ConnectorCredentials.query( {userId: $scope.currentUser.id }, function (data) {
         var credentials = {};
         angular.forEach(data, function (item) {
           credentials[item.connectorId] = item;
@@ -1004,7 +1004,7 @@ function EditConnectorCredentials($scope, $http, App) {
     $http.post(App.uri("secured/resource/connector/credentials/test"), $scope.editCredentials)
       .success(function(data) {
         $scope.credentialsTest = data;
-      });
+    });
   };
   
   var isValid = $scope.isValid = function () {
