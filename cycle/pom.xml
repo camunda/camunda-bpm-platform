@@ -297,9 +297,9 @@
             <resource>
               <filtering>true</filtering>
               <directory>src/main/webapp</directory>
-              <!-- no filtering for images because linux destroys images (favicon) through carriage return -->
+              <!-- no filtering for favicon because linux destroys images through carriage return -->
               <excludes>
-                <exclude>/assets/img</exclude>
+                <exclude>assets/img/favicon.ico</exclude>
               </excludes>
             </resource>
           </webResources>
