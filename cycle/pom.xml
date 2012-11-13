@@ -297,6 +297,10 @@
             <resource>
               <filtering>true</filtering>
               <directory>src/main/webapp</directory>
+              <!-- no filtering for images because linux destroys images (favicon) through carriage return -->
+              <excludes>
+                <exclude>/assets/img</exclude>
+              </excludes>
             </resource>
           </webResources>
         </configuration>
