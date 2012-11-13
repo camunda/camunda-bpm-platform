@@ -37,6 +37,7 @@ import org.custommonkey.xmlunit.SimpleNamespaceContext;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
@@ -260,6 +261,7 @@ public class SignavioConnectorIT {
     bpmnSimplePoolExtractionRoundtripWithDevFriendlyEngineDeploy("HEMERA-1942.sgx");
   }
   
+  @Ignore(value="Disabled because of HEMERA-3125")
   @Test
   public void test_ErrorBoundaryEventsInSubProcess() throws Exception {
     bpmnPoolExtractionRoundtrip("SubprocessBoundaryEventBug.sgx", false, null, null, true, null);
