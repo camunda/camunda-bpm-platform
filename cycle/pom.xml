@@ -297,6 +297,10 @@
             <resource>
               <filtering>true</filtering>
               <directory>src/main/webapp</directory>
+              <!-- no filtering for favicon because linux destroys images through carriage return -->
+              <excludes>
+                <exclude>assets/img/favicon.ico</exclude>
+              </excludes>
             </resource>
           </webResources>
         </configuration>
@@ -528,7 +532,7 @@
           <groupId>org.jboss.resteasy</groupId>
           <artifactId>resteasy-jaxrs</artifactId>
           <version>${version.resteasy}</version>
-          <scope>provided</scope>
+<!--           <scope>provided</scope> -->
         </dependency>
       </dependencies>
       <properties>
