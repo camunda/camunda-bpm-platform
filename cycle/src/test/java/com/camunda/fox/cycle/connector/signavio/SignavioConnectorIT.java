@@ -9,13 +9,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.Charset;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
-import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -32,13 +30,6 @@ import org.activiti.engine.impl.persistence.entity.DeploymentEntity;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.entity.mime.HttpMultipartMode;
-import org.apache.http.entity.mime.MultipartEntity;
-import org.apache.http.entity.mime.content.FileBody;
-import org.apache.http.entity.mime.content.StringBody;
-import org.apache.http.util.EntityUtils;
 import org.custommonkey.xmlunit.DetailedDiff;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.ElementNameAndAttributeQualifier;
@@ -67,12 +58,26 @@ import com.camunda.fox.cycle.util.XmlUtil;
 @ContextConfiguration(locations = { "classpath:/spring/test/signavio-connector-xml-config.xml" })
 public class SignavioConnectorIT {
 
+  /**
+   * Files generated for each test are: 
+   * initial-raw ->
+   * technical -> 
+   * changed-technical (only when you replace something) ->
+   * before-deploy-technical (only when you deploy to engine) ->
+   * merge-source-technical ->
+   * merge-source-business ->
+   * merge-result ->
+   * actual-raw ->
+   * expected-raw ->
+   * xml-diff
+   */
+  
   private static final String INITIAL_RAW_BPMN20_XML = "initial-raw.bpmn";
-  private static final String EXPECTED_RAW_BPMN20_XML = "expected-raw.bpmn";
   private static final String TECHNICAL_BPMN20_XML = "technical.bpmn";
   private static final String CHANGED_TECHNICAL_BPMN20_XML = "changed-technical.bpmn";
   private static final String BEFORE_DEPLOY_TECHNICAL_BPMN20_XML = "before-deploy-technical.bpmn";
   private static final String ACTUAL_RAW_BPMN20_XML = "actual-raw.bpmn";
+  private static final String EXPECTED_RAW_BPMN20_XML = "expected-raw.bpmn";
   private static final String XML_DIFF_TXT = "xml-diff.txt";
   
   private static final String MODEL_FOLDER = "models";
@@ -255,6 +260,14 @@ public class SignavioConnectorIT {
     bpmnSimplePoolExtractionRoundtripWithDevFriendlyEngineDeploy("HEMERA-1942.sgx");
   }
   
+  @Test
+  public void test_ErrorBoundaryEventsInSubProcess() throws Exception {
+    bpmnPoolExtractionRoundtrip("SubprocessBoundaryEventBug.sgx", false, null, null, true, null);
+  }
+  
+  
+// -------------------------------- CONVIENCE METHODS ------------------------------ //
+  
   private void bpmnSimplePoolExtractionRoundtripWithDevFriendlyEngineDeploy(String filename) throws Exception {
     bpmnPoolExtractionRoundtripWithEngineDeploy(filename, true, null, null);
   }
@@ -309,9 +322,9 @@ public class SignavioConnectorIT {
 
       // upload model
       if (filename.endsWith(".sgx")) {
-        this.importSignavioArchive(folder, TEST_RESOURCES_PATH + filename);
+        getSignavioConnector().importSignavioArchive(folder, TEST_RESOURCES_PATH + filename);
       } else if (filename.endsWith(".bpmn")) {
-        this.getSignavioConnector().importContent(folder, readModel(filename), filename.substring(0, filename.indexOf(".")));
+        getSignavioConnector().importContent(folder, readModel(filename), filename.substring(0, filename.indexOf(".")));
       } else {
         fail("Unable to determine type of file to upload! [File=" + filename + "]");
       }
@@ -499,29 +512,6 @@ public class SignavioConnectorIT {
       technicalModel = definitionsPattern.matcher(technicalModel).replaceFirst("<definitions xmlns:activiti=\"http://activiti.org/bpmn\"");
     }
     return technicalModel;
-  }
-  
-  private void importSignavioArchive(ConnectorNode folder, String signavioArchive) throws Exception {
-    HttpClient httpClient = this.signavioConnector.getHttpClient4Executor().getHttpClient();
-    String signavioURL = this.signavioConnector.getConfiguration().getProperties().get("signavioBaseUrl");
-    if (signavioURL.endsWith("/")) {
-      signavioURL = signavioURL + "p/";
-    } else {
-      signavioURL = signavioURL + "/" + "p/";
-    }
-    HttpPost post = new HttpPost(signavioURL + "zip-import");
-    post.addHeader("x-signavio-id", this.signavioConnector.getSecurityToken());
-    
-    MultipartEntity entity = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE);
-    
-    entity.addPart("file", new FileBody(new File(signavioArchive)));
-    
-    String parentFolderId = folder.getId();
-    entity.addPart("directory", new StringBody("/directory" + parentFolderId , Charset.forName("UTF-8")));
-    entity.addPart("signavio-id", new StringBody(UUID.randomUUID().toString(), Charset.forName("UTF-8")));
-    post.setEntity(entity);
-    
-    EntityUtils.toString(httpClient.execute(post).getEntity(), "UTF-8");
   }
 
   private SignavioConnector getSignavioConnector() {

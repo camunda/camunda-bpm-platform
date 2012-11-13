@@ -94,6 +94,7 @@ public class SignavioConnector extends Connector {
   private static final String MODEL_URL_SUFFIX = "model";
   private static final String DIRECTORY_URL_SUFFIX = "directory";
   private static final String BPMN2_0_IMPORT_SUFFIX = "bpmn2_0-import";
+  private static final String SGX_IMPORT_SUFFIX = "zip-import";
   
   private static final String SLASH_CHAR = "/";
   private static final String MODEL_NAME_TEMPLATE = "cycle-import_";
@@ -145,12 +146,7 @@ public class SignavioConnector extends Connector {
       ResteasyProviderFactory providerFactory = ResteasyProviderFactory.getInstance();
       RegisterBuiltin.register(providerFactory);
 
-      String signavioURL = (String) config.getProperties().get(CONFIG_KEY_SIGNAVIO_BASE_URL);
-      if (signavioURL.endsWith(SLASH_CHAR)) {
-        signavioURL = signavioURL + REPOSITORY_BACKEND_URL_SUFFIX; 
-      } else {
-        signavioURL = signavioURL + SLASH_CHAR + REPOSITORY_BACKEND_URL_SUFFIX;
-      }
+      String signavioURL = constructSignavioUrl(REPOSITORY_BACKEND_URL_SUFFIX);
       
       // Use Thread safe connection manager, prevents abortion of ctx.proceed in interceptor if multiple requests are done at once
       DefaultHttpClient client = new DefaultHttpClient();
@@ -491,7 +487,8 @@ public class SignavioConnector extends Connector {
     }
   }
   
-  protected ConnectorNode getPrivateFolder() {
+  @Secured
+  public ConnectorNode getPrivateFolder() {
     try {
       String children = signavioClient.getChildren(this.getRoot().getId());
       JSONArray jsonArray = new JSONArray(children);
@@ -528,12 +525,7 @@ public class SignavioConnector extends Connector {
   
   protected ConnectorNode importContent(ConnectorNode parent, String content, final String modelName) throws Exception {
     HttpClient httpClient = this.httpClient4Executor.getHttpClient();
-    String signavioURL = this.getConfiguration().getProperties().get(CONFIG_KEY_SIGNAVIO_BASE_URL);
-    if (signavioURL.endsWith(SLASH_CHAR)) {
-      signavioURL = signavioURL + REPOSITORY_BACKEND_URL_SUFFIX;
-    } else {
-      signavioURL = signavioURL + SLASH_CHAR + REPOSITORY_BACKEND_URL_SUFFIX;
-    }
+    String signavioURL  = constructSignavioUrl(REPOSITORY_BACKEND_URL_SUFFIX);
     HttpPost post = new HttpPost(signavioURL + BPMN2_0_IMPORT_SUFFIX);
     post.addHeader(X_SIGNAVIO_ID_PROP, this.securityToken);
     
@@ -568,6 +560,44 @@ public class SignavioConnector extends Connector {
     }
 
     return this.getChildNodeByName(parent, modelName);
+  }
+  
+  @Secured
+  public List<ConnectorNode> importSignavioArchive(ConnectorNode parentFolder, String signavioArchive) throws Exception {
+    HttpClient httpClient = getHttpClient4Executor().getHttpClient();
+    String signavioURL = constructSignavioUrl(REPOSITORY_BACKEND_URL_SUFFIX);
+    HttpPost post = new HttpPost(signavioURL + SGX_IMPORT_SUFFIX);
+    post.addHeader(X_SIGNAVIO_ID_PROP, getSecurityToken());
+    
+    MultipartEntity entity = new MultipartEntity(HttpMultipartMode.BROWSER_COMPATIBLE);
+    
+    entity.addPart("file", new FileBody(new File(signavioArchive)));
+    
+    String parentFolderId = parentFolder.getId();
+    entity.addPart("directory", new StringBody("/directory" + parentFolderId , Charset.forName("UTF-8")));
+    entity.addPart("signavio-id", new StringBody(UUID.randomUUID().toString(), Charset.forName("UTF-8")));
+    post.setEntity(entity);
+    
+    HttpResponse postResponse = httpClient.execute(post);
+    // check if something went wrong on Signavio side
+    if (postResponse.getStatusLine().getStatusCode() >= 400) {
+      logger.severe("Import of BPMN XML failed in Signavio.");
+      logger.severe("Error response from server: " + EntityUtils.toString(postResponse.getEntity(), "UTF-8"));
+      throw new CycleException("BPMN XML could not be imported: " + signavioArchive);
+    }
+    
+    return getChildren(parentFolder);
+  }
+  
+  private String constructSignavioUrl(String urlSuffix) {
+    String signavioURL = (String) getConfiguration().getProperties().get(CONFIG_KEY_SIGNAVIO_BASE_URL);
+    if (signavioURL.endsWith(SLASH_CHAR)) {
+      signavioURL = signavioURL + urlSuffix; 
+    } else {
+      signavioURL = signavioURL + SLASH_CHAR + urlSuffix;
+    }
+    
+    return signavioURL;
   }
   
   private ConnectorNode getChildNodeByName(ConnectorNode parent, String nodeName) {
