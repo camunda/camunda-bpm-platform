@@ -145,7 +145,7 @@ public class SvnConnector extends Connector {
         return decorateConnectorNode(node, entry);
       }
     } catch (Exception e) {
-      logger.log(Level.FINER, "Cannot get node '" + id + "' in Svn '" + getConfiguration().getId() + "'.", e);
+      logger.log(Level.FINER, "Cannot get node '" + id + "' in Svn '" + getId() + "'.", e);
     }
     return null;
   }
@@ -153,7 +153,7 @@ public class SvnConnector extends Connector {
   private ConnectorNode decorateConnectorNode(ConnectorNode node, ISVNDirEntry entry) {
     node.setLabel(entry.getPath());
     node.setLastModified(entry.getLastChangedDate());
-    node.setConnectorId(getConfiguration().getId());
+    node.setConnectorId(getId());
     node.setType(extractFileType(entry));
     
     return node;
@@ -215,7 +215,7 @@ public class SvnConnector extends Connector {
       
       deleteRecursively(temporaryFileStore);
       
-      return new ConnectorNode(id, label, type);
+      return new ConnectorNode(id, label, getId() , type);
     } catch (Exception e) {
       logger.log(Level.FINER, "Error while creating node '" + label + "'.", e);
       throw new CycleException(e);

@@ -258,7 +258,7 @@ public class SignavioConnector extends Connector {
           }
           
           if (result != null) {
-            result.setConnectorId(getConfiguration().getId());
+            result.setConnectorId(getId());
           }
           return result;
         } finally {
@@ -293,7 +293,7 @@ public class SignavioConnector extends Connector {
             nodes.add(newNode);
           }
           if (newNode != null) {
-            newNode.setConnectorId(getConfiguration().getId());  
+            newNode.setConnectorId(getId());  
           }
         }
         
