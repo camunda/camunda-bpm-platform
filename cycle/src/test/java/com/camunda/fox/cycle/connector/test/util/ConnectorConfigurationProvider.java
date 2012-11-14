@@ -7,6 +7,7 @@ import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.inject.Inject;
 
+import com.camunda.fox.cycle.connector.crypt.EncryptionService;
 import com.camunda.fox.cycle.entity.ConnectorConfiguration;
 import com.camunda.fox.cycle.repository.ConnectorConfigurationRepository;
 
@@ -22,6 +23,9 @@ public class ConnectorConfigurationProvider {
 
   @Inject
   private List<ConnectorConfiguration> defaultConfigurations;
+  
+  @Inject
+  private EncryptionService encryptionService;
 
   @PostConstruct
   public void persist() {
@@ -46,7 +50,7 @@ public class ConnectorConfigurationProvider {
     ConnectorConfiguration copy = new ConnectorConfiguration();
     copy.setConnectorClass(config.getConnectorClass());
     copy.setConnectorName(config.getConnectorName());
-    copy.setGlobalPassword(config.getGlobalPassword());
+    copy.setGlobalPassword(encryptionService.encrypt(config.getGlobalPassword()));
     copy.setGlobalUser(config.getGlobalUser());
     copy.setLoginMode(config.getLoginMode());
     copy.setName(config.getName());
