@@ -82,6 +82,15 @@ public class IoUtil {
     }
     return new String(buffer);
   }
+  
+  public static InputStream readFileAsInputStream(String absoluteClassPath) {
+    InputStream inputStream = null;
+    inputStream = IoUtil.class.getClass().getResourceAsStream(absoluteClassPath);
+    if (inputStream == null) {
+      throw new CycleException("Unable to read " + absoluteClassPath + " as inputstream.");
+    }
+    return inputStream;
+  }
 
   public static File getFile(String filePath) {
     URL url = IoUtil.class.getClassLoader().getResource(filePath);

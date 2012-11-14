@@ -103,6 +103,15 @@ public class RoundtripDTO {
   }
   
   /**
+   * Wraps a roundtrip as a data object including 
+   * @param roundtrip
+   * @return 
+   */
+  public static RoundtripDTO wrapIncludeDiagrams(Roundtrip roundtrip) {
+    return new RoundtripDTO(roundtrip, roundtrip.getLeftHandSide(), roundtrip.getRightHandSide());
+  }
+  
+  /**
    * Wraps a list of roundtrips as a list of the respective roundtrip data objects
    * 
    * @param trackers
