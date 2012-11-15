@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?><definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:signavio="http://www.signavio.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" exporter="Signavio Process Editor, http://www.signavio.com" exporterVersion="6.4.0" expressionLanguage="http://www.w3.org/1999/XPath" id="sid-d532a0e2-8d9d-46f3-87dd-9bfaf61548f3" targetNamespace="http://www.omg.org/spec/BPMN/20100524/MODEL" typeLanguage="http://www.w3.org/2001/XMLSchema" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/2.0/20100501/BPMN20.xsd">
+<?xml version="1.0" encoding="UTF-8"?><definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:signavio="http://www.signavio.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" exporter="Signavio Process Editor, http://www.signavio.com" exporterVersion="6.4.0" expressionLanguage="http://www.w3.org/1999/XPath" id="sid-56873650-28e0-450b-9c0a-8a26480ffd01" targetNamespace="http://www.omg.org/spec/BPMN/20100524/MODEL" typeLanguage="http://www.w3.org/2001/XMLSchema" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/2.0/20100501/BPMN20.xsd">
    <process id="test-engine-pool" isClosed="false" isExecutable="true" processType="None">
       <startEvent id="StartNoneEvent" name="">
          <outgoing>SequenceFlow</outgoing>
@@ -36,8 +36,8 @@
       <sequenceFlow id="SequenceFlow_2" isImmediate="true" name="" sourceRef="Exclusive_Databased_Gateway_2" targetRef="Task"/>
       <sequenceFlow id="SequenceFlow_3" isImmediate="true" name="" sourceRef="Task_2" targetRef="Exclusive_Databased_Gateway_2"/>
    </process>
-   <bpmndi:BPMNDiagram id="sid-dd729c2d-416a-4596-90df-dccd1c86855e">
-      <bpmndi:BPMNPlane bpmnElement="test-engine-pool" id="sid-14ff8890-0981-4ac0-9190-0f716862622b">
+   <bpmndi:BPMNDiagram id="sid-6e832f5b-90a7-4d55-a4b6-772a6390b66f">
+      <bpmndi:BPMNPlane bpmnElement="test-engine-pool" id="sid-beb0bad8-7de3-4ff1-809e-332aae424aed">
          <bpmndi:BPMNShape bpmnElement="StartNoneEvent" id="StartNoneEvent_gui">
             <omgdc:Bounds height="28.0" width="28.0" x="107.0" y="217.0"/>
          </bpmndi:BPMNShape>
