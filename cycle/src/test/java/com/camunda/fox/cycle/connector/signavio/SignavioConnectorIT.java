@@ -261,7 +261,7 @@ public class SignavioConnectorIT {
     bpmnSimplePoolExtractionRoundtripWithDevFriendlyEngineDeploy("HEMERA-1942.sgx");
   }
   
-  @Ignore(value="Disabled because of HEMERA-3125")
+  //@Ignore(value="Disabled because of HEMERA-3125")
   @Test
   public void test_ErrorBoundaryEventsInSubProcess() throws Exception {
     bpmnPoolExtractionRoundtrip("SubprocessBoundaryEventBug.sgx", false, null, null, true, null);
