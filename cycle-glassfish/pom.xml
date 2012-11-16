@@ -1,19 +1,15 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <name>fox cycle - JBoss</name>
+  <name>fox cycle - Glassfish</name>
   <parent>
     <groupId>com.camunda.fox.cycle</groupId>
     <artifactId>cycle-root</artifactId>
     <version>6.2.0-SNAPSHOT</version>
   </parent>
-
-  <artifactId>cycle-jboss</artifactId>
+  
+  <artifactId>cycle-glassfish</artifactId>
   <packaging>war</packaging>
-
-  <properties>
-    <jboss.el.version>2.0.0.GA</jboss.el.version>
-  </properties>
-
+  
   <dependencies>
     <dependency>
       <groupId>com.camunda.fox.cycle</groupId>
@@ -23,51 +19,24 @@
       <scope>runtime</scope>
     </dependency>
 
+    <!-- javax.persistence -->
     <dependency>
-      <groupId>org.jboss.spec</groupId>
-      <artifactId>jboss-javaee-web-6.0</artifactId>
-      <type>pom</type>
-      <scope>provided</scope>
-      <version>3.0.0.Final</version>
-      <exclusions>
-        <exclusion>
-          <artifactId>xalan</artifactId>
-          <groupId>org.apache.xalan</groupId>
-        </exclusion>
-      </exclusions>
+      <groupId>org.hibernate</groupId>
+      <artifactId>hibernate-entitymanager</artifactId>
     </dependency>
-    
-    <dependency>
-      <groupId>org.jboss.resteasy</groupId>
-      <artifactId>resteasy-spring</artifactId>
-      <version>${version.resteasy}</version>
-      <exclusions>
-        <exclusion>
-          <groupId>org.jboss.resteasy</groupId>
-          <artifactId>resteasy-jaxrs</artifactId>
-        </exclusion>
-        <exclusion>
-          <artifactId>resteasy-jaxb-provider</artifactId>
-          <groupId>org.jboss.resteasy</groupId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.jboss.resteasy</groupId>
-          <artifactId>resteasy-jettison-provider</artifactId>            
-        </exclusion>
-        <exclusion>
-          <artifactId>jaxrs-api</artifactId>
-          <groupId>org.jboss.resteasy</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>jsr250-api</artifactId>
-          <groupId>javax.annotation</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>commons-httpclient</artifactId>
-          <groupId>commons-httpclient</groupId>
-        </exclusion>            
-      </exclusions>
-    </dependency>
+
+<!--     resteasy dependencies -->
+<!--     <dependency> -->
+<!--       <groupId>org.jboss.resteasy</groupId> -->
+<!--       <artifactId>resteasy-jaxrs</artifactId> -->
+<!--       <version>${version.resteasy}</version> -->
+<!--       <exclusions> -->
+<!--         <exclusion> -->
+<!--           <artifactId>javassist</artifactId> -->
+<!--           <groupId>javassist</groupId> -->
+<!--         </exclusion> -->
+<!--       </exclusions> -->
+<!--     </dependency>     -->
 
   </dependencies>
 
@@ -76,14 +45,10 @@
 
     <resources>
       <resource>
-        <directory>../cycle/src/main/runtime/jboss/resources</directory>
+        <directory>../cycle/src/main/runtime/glassfish/resources</directory>
         <filtering>true</filtering>
       </resource>
     </resources>
-
-    <filters>
-      <filter>../cycle/src/main/runtime/jboss/config/database.properties</filter>
-    </filters>
 
     <plugins>
       <plugin>
@@ -98,12 +63,11 @@
             <manifestEntries>
               <!-- SVN revision number -->
               <Implementation-Build>${buildNumber}</Implementation-Build>
-              <Dependencies>org.apache.httpcomponents, org.codehaus.jettison, org.apache.xerces, org.apache.commons.io</Dependencies>
             </manifestEntries>
           </archive>
           <webResources>
             <resource>
-              <directory>../cycle/src/main/runtime/jboss/webapp</directory>
+              <directory>../cycle/src/main/runtime/glassfish/webapp</directory>
             </resource>
           </webResources>
 <!--           <overlays> -->
@@ -122,6 +86,6 @@
         </configuration>
       </plugin>
     </plugins>
-  </build>
-
+  </build>  
+  
 </project>

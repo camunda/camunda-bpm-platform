@@ -45,37 +45,36 @@
       <artifactId>aspectjrt</artifactId>
       <version>1.7.0</version>
     </dependency>
-
-    <!-- Resteasy (JAX-RS impl) -->
-    <!-- configured in profiles -->
-    <!--
-    <dependency>
-      <groupId>org.jboss.resteasy</groupId>
-      <artifactId>resteasy-jaxrs</artifactId>
-      <version>${version.resteasy}</version>
-    </dependency>
-    -->
     
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
       <artifactId>resteasy-jackson-provider</artifactId>
       <version>${version.resteasy}</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
       <artifactId>resteasy-multipart-provider</artifactId>
       <version>${version.resteasy}</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
       <artifactId>resteasy-spring</artifactId>
       <version>${version.resteasy}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.jboss.resteasy</groupId>
+      <artifactId>resteasy-jettison-provider</artifactId>
+      <version>${version.resteasy}</version>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>
       <groupId>org.apache.httpcomponents</groupId>
       <artifactId>httpmime</artifactId>
-      <version>4.1.2</version>
+      <scope>provided</scope>
     </dependency>
 
     <!-- apis -->
@@ -119,7 +118,12 @@
     <dependency>
       <groupId>net.sourceforge.nekohtml</groupId>
       <artifactId>nekohtml</artifactId>
-      <version>1.9.16</version>
+      <exclusions>
+        <exclusion>
+          <artifactId>xercesImpl</artifactId>
+          <groupId>xerces</groupId>
+        </exclusion>
+      </exclusions>      
     </dependency>
     <!-- required for i18n with GNU gettext -->
     <dependency>
@@ -157,7 +161,7 @@
     <dependency>
       <groupId>commons-io</groupId>
       <artifactId>commons-io</artifactId>
-      <version>2.1</version>
+      <scope>provided</scope>
     </dependency>
 
     <!-- testing -->
@@ -430,6 +434,29 @@
           <artifactId>hibernate-jpa-2.0-api</artifactId>
           <scope>compile</scope>
         </dependency>
+        <!-- jettison -->
+        <dependency>
+          <groupId>org.codehaus.jettison</groupId>
+          <artifactId>jettison</artifactId>
+          <scope>compile</scope>
+        </dependency>
+        <!-- apache commons -->
+        <dependency>
+          <groupId>commons-io</groupId>
+          <artifactId>commons-io</artifactId>
+          <scope>compile</scope>
+        </dependency>
+        <!-- apache httpcomponents -->
+        <dependency>
+          <groupId>org.apache.httpcomponents</groupId>
+          <artifactId>httpmime</artifactId>
+          <scope>compile</scope>
+        </dependency>
+        <!-- nekohtml -->
+        <dependency>
+          <groupId>net.sourceforge.nekohtml</groupId>
+          <artifactId>nekohtml</artifactId>
+        </dependency>   
         <!-- resteasy dependencies -->
         <dependency>
           <groupId>org.jboss.resteasy</groupId>
@@ -442,6 +469,21 @@
             </exclusion>
           </exclusions>
         </dependency>
+        <dependency>
+          <groupId>org.jboss.resteasy</groupId>
+          <artifactId>resteasy-spring</artifactId>
+          <version>${version.resteasy}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.jboss.resteasy</groupId>
+          <artifactId>resteasy-jackson-provider</artifactId>
+          <version>${version.resteasy}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.jboss.resteasy</groupId>
+          <artifactId>resteasy-multipart-provider</artifactId>
+          <version>${version.resteasy}</version>
+        </dependency>                
       </dependencies>
       <build>
         <plugins>
@@ -506,18 +548,6 @@
           <groupId>org.hibernate</groupId>
           <artifactId>hibernate-entitymanager</artifactId>
         </dependency>
-        <!-- resteasy dependencies -->
-        <dependency>
-          <groupId>org.jboss.resteasy</groupId>
-          <artifactId>resteasy-jaxrs</artifactId>
-          <version>${version.resteasy}</version>
-          <exclusions>
-            <exclusion>
-              <artifactId>javassist</artifactId>
-              <groupId>javassist</groupId>
-            </exclusion>
-          </exclusions>
-        </dependency>
       </dependencies>
       <properties>
         <web.resources.override>src/main/runtime/glassfish/webapp</web.resources.override>
@@ -527,12 +557,36 @@
     <profile>
       <id>jboss</id>
       <dependencies>
-        <!-- resteasy dependencies -->
         <dependency>
           <groupId>org.jboss.resteasy</groupId>
-          <artifactId>resteasy-jaxrs</artifactId>
+          <artifactId>resteasy-spring</artifactId>
           <version>${version.resteasy}</version>
-<!--           <scope>provided</scope> -->
+          <exclusions>
+            <exclusion>
+              <artifactId>resteasy-jaxrs</artifactId>
+              <groupId>org.jboss.resteasy</groupId>
+            </exclusion>
+            <exclusion>
+              <artifactId>resteasy-jaxb-provider</artifactId>
+              <groupId>org.jboss.resteasy</groupId>
+            </exclusion>
+            <exclusion>
+              <groupId>org.jboss.resteasy</groupId>
+              <artifactId>resteasy-jettison-provider</artifactId>            
+            </exclusion>  
+            <exclusion>
+              <artifactId>jaxrs-api</artifactId>
+              <groupId>org.jboss.resteasy</groupId>
+            </exclusion>
+            <exclusion>
+              <artifactId>jsr250-api</artifactId>
+              <groupId>javax.annotation</groupId>
+            </exclusion>
+            <exclusion>
+              <artifactId>commons-httpclient</artifactId>
+              <groupId>commons-httpclient</groupId>
+            </exclusion>
+          </exclusions>          
         </dependency>
       </dependencies>
       <properties>
@@ -554,7 +608,7 @@
                 <manifestEntries>
                   <!-- SVN revision number -->
                   <Implementation-Build>${buildNumber}</Implementation-Build>
-                  <Dependencies>org.apache.httpcomponents</Dependencies>
+                  <Dependencies>org.apache.httpcomponents, org.codehaus.jettison, org.apache.xerces, org.apache.commons.io</Dependencies>
                 </manifestEntries>
               </archive>
             </configuration>
@@ -581,17 +635,22 @@
           <scope>test</scope>
         </dependency>
         <!-- resteasy dependencies -->
-        <dependency>
-          <groupId>org.jboss.resteasy</groupId>
-          <artifactId>resteasy-jaxrs</artifactId>
-          <version>${version.resteasy}</version>
-          <exclusions>
-            <exclusion>
-              <artifactId>javassist</artifactId>
-              <groupId>javassist</groupId>
-            </exclusion>
-          </exclusions>
-        </dependency>
+<!--         <dependency> -->
+<!--           <groupId>org.jboss.resteasy</groupId> -->
+<!--           <artifactId>resteasy-jaxrs</artifactId> -->
+<!--           <version>${version.resteasy}</version> -->
+<!--           <exclusions> -->
+<!--             <exclusion> -->
+<!--               <artifactId>javassist</artifactId> -->
+<!--               <groupId>javassist</groupId> -->
+<!--             </exclusion> -->
+<!--           </exclusions> -->
+<!--         </dependency> -->
+<!--         <dependency> -->
+<!--           <groupId>org.jboss.resteasy</groupId> -->
+<!--           <artifactId>resteasy-spring</artifactId> -->
+<!--           <version>${version.resteasy}</version> -->
+<!--         </dependency>           -->
       </dependencies>
     </profile>
   </profiles>
