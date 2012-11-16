@@ -190,6 +190,17 @@
       <artifactId>aspectjweaver</artifactId>
       <version>1.7.0</version>
     </dependency>
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <version>${version.h2}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.hibernate</groupId>
+      <artifactId>hibernate-entitymanager</artifactId>
+      <scope>test</scope>
+    </dependency>
     
     <!-- required for SignavioConnectorIT -->
     <dependency>
