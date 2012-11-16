@@ -287,11 +287,6 @@ li.actions .btn:last-child {
   right: 10px;
 }
 
-/** override 'background-color' with 'background' to fix the white vertical line in the middle of the button **/
-.btn:hover {
-  background: #e6e6e6;
-}
-
 .sync-options {
   margin-top: 60px;
   text-align: center;
@@ -309,6 +304,11 @@ li.actions .btn:last-child {
   -webkit-box-sizing: border-box;
   -moz-box-sizing: border-box;
   box-sizing: border-box;
+}
+
+/** override 'background-color' with 'background' to fix the white vertical line in the middle of the button **/
+.sync-btn:hover {
+  background: #e6e6e6;
 }
 /** end roundtrip view */
 
