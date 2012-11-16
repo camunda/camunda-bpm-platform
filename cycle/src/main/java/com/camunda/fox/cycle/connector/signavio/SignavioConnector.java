@@ -452,6 +452,7 @@ public class SignavioConnector extends Connector {
       IoUtil.closeSilently(stream);
       return result;
     } catch (Exception e) {
+      logger.log(Level.WARNING, "No content available for " + node, e);
       return false;
     }
   }
