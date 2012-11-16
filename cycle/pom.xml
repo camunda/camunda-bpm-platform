@@ -416,6 +416,9 @@
     </profile>
     <profile>
       <id>tomcat</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
       <dependencies>
         <!-- database -->
         <dependency>
@@ -615,43 +618,6 @@
           </plugin>
         </plugins>
       </build>
-    </profile>
-    <profile>
-      <id>default</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <dependencies>
-        <!-- javax.persistence -->
-        <dependency>
-          <groupId>org.hibernate</groupId>
-          <artifactId>hibernate-entitymanager</artifactId>
-          <scope>test</scope>
-        </dependency>
-        <dependency>
-          <groupId>com.h2database</groupId>
-          <artifactId>h2</artifactId>
-          <version>${version.h2}</version>
-          <scope>test</scope>
-        </dependency>
-        <!-- resteasy dependencies -->
-<!--         <dependency> -->
-<!--           <groupId>org.jboss.resteasy</groupId> -->
-<!--           <artifactId>resteasy-jaxrs</artifactId> -->
-<!--           <version>${version.resteasy}</version> -->
-<!--           <exclusions> -->
-<!--             <exclusion> -->
-<!--               <artifactId>javassist</artifactId> -->
-<!--               <groupId>javassist</groupId> -->
-<!--             </exclusion> -->
-<!--           </exclusions> -->
-<!--         </dependency> -->
-<!--         <dependency> -->
-<!--           <groupId>org.jboss.resteasy</groupId> -->
-<!--           <artifactId>resteasy-spring</artifactId> -->
-<!--           <version>${version.resteasy}</version> -->
-<!--         </dependency>           -->
-      </dependencies>
     </profile>
   </profiles>
 </project>
