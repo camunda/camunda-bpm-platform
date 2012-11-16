@@ -416,9 +416,6 @@
     </profile>
     <profile>
       <id>tomcat</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
       <dependencies>
         <!-- database -->
         <dependency>
