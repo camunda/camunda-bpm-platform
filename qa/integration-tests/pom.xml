@@ -313,6 +313,9 @@
                 <exclude>**/ejb/local/*</exclude>
                 <!-- HEMERA -->
                 <excludes>**/TestFoxPlatformClientAsEjbModule**</excludes>
+                <!-- not supported by arquillian connector -->
+                <excludes>**/TestWarDeploymentWithBrokenBpmnXml.java</excludes>
+                <excludes>**/TestDeploymentWithDroolsTaskFails.java</excludes>
               </excludes>
             </configuration>
           </plugin>
@@ -495,6 +498,9 @@
                 <exclude>**/CallActivityContextSwitchTest.java</exclude>
                 <!-- HEMERA-2980 -->
                 <exclude>**/TestFoxPlatformClientAsEjbModule_pasAsEjbModule.java</exclude>
+                <!-- not supported by arquillian connector -->
+                <excludes>**/TestWarDeploymentWithBrokenBpmnXml.java</excludes>
+                <excludes>**/TestDeploymentWithDroolsTaskFails.java</excludes>
               </excludes>
             </configuration>
           </plugin>
