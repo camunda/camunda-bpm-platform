@@ -111,12 +111,16 @@ public class ProcessArchiveSupport {
     List<ProcessesXml> processesXmls = parser.parseProcessesXml(PROCESSES_XML_FILE_LOCATION);
 
     if (processesXmls.size() > 0) {
-      List<ProcessArchive> processArchives = getConfiguredProcessArchives(processesXmls);
-      for (ProcessArchive processArchive : processArchives) {
-        ProcessArchiveInstallation installation = processArchiveService.installProcessArchive(processArchive);
-        installedProcessArchives.put(processArchive, installation.getProcessEngine());
+      try {
+        List<ProcessArchive> processArchives = getConfiguredProcessArchives(processesXmls);
+        for (ProcessArchive processArchive : processArchives) {
+          ProcessArchiveInstallation installation = processArchiveService.installProcessArchive(processArchive);
+          installedProcessArchives.put(processArchive, installation.getProcessEngine());
+        }
+      } catch(RuntimeException e) {
+        uninstallProcessArchives();
+        throw e;          
       }
-
     } else {
       log.log(Level.INFO, "No " + PROCESSES_XML_FILE_LOCATION + " found. Not creating a process archive installation.");
     }
@@ -124,7 +128,11 @@ public class ProcessArchiveSupport {
 
   protected void uninstallProcessArchives() { 
     for (ProcessArchive processArchive : installedProcessArchives.keySet()) {
-      processArchiveService.unInstallProcessArchive(processArchive);
+      try {
+        processArchiveService.unInstallProcessArchive(processArchive);
+      }catch (Exception e) {
+        log.log(Level.WARNING, "Exception while uninstalling process archive '"+processArchive.getName(), e);
+      }
     }
   }
 

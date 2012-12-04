@@ -91,46 +91,44 @@ public abstract class PlatformService implements ProcessEngineService, ProcessAr
     return installProcessArchiveInternal(processArchive);
   }
   
-  public ProcessArchiveInstallation installProcessArchiveInternal(ProcessArchive processArchive) {
-    if (processArchive.getName() == null) {
+  public synchronized ProcessArchiveInstallation installProcessArchiveInternal(ProcessArchive processArchive) {
+    String paName = processArchive.getName();
+    if (paName == null) {
       throw new FoxPlatformException("Cannot install process archive: name is null");
     }
-
-    final ProcessEngineController processEngine = getProcessEngineSerivce(processArchive);
     
-    fireBeforeProcessArchiveInstalled(processArchive, processEngine);
-
-    synchronized (this) {
-      ProcessEngineController platformProcessEngine = processEnginesByProcessArchiveName.get(processArchive.getName());
-      if (platformProcessEngine != null) {
-        throw new FoxPlatformException("Cannot install process archive with name '" + processArchive.getName()
-                + "': process archive with same name already installed to process engine '" + platformProcessEngine.getProcessEngineName() + "'.");
-      } else {
-        processEnginesByProcessArchiveName.put(processArchive.getName(), processEngine);
-      }
+    // check whether a process archive with the same name is already installed
+    ProcessEngineController processEngineController = processEnginesByProcessArchiveName.get(paName);
+    if (processEngineController != null) {
+      throw new FoxPlatformException("Cannot install process archive with name '" + paName
+              + "': process archive with same name already installed to process engine '" + processEngineController.getProcessEngineName() + "'.");
     }
-
+    
+    // get the process engine controller for this installation.
+    processEngineController = getProcessEngineSerivce(processArchive);
+    
+    // start the installation process
     try {
+      fireBeforeProcessArchiveInstalled(processArchive, processEngineController);
+   
+      ProcessEngine processEngine = processEngineController.installProcessArchive(processArchive);
 
-      final ProcessEngine processEngineHandle = processEngine.installProcessArchive(processArchive);
-
-      final Deployment deployment = processEngine.getInstalledProcessArchivesByName().get(processArchive.getName()).getActivitiDeployment();
+      Deployment deployment = processEngineController.getProcessArchiveContextByName(paName).getActivitiDeployment();
 
       String deploymentId = null;
       if (deployment != null) {
         deploymentId = deployment.getId();
       }
 
-      processEnginesByProcessArchiveName.put(processArchive.getName(), processEngine);
+      processEnginesByProcessArchiveName.put(paName, processEngineController);
       
-      fireAfterProcessArchiveInstalled(processArchive, processEngine, deploymentId);
+      fireAfterProcessArchiveInstalled(processArchive, processEngineController, deploymentId);
 
-      return new ProcessArchiveInstallationImpl(processEngineHandle, deploymentId);
+      return new ProcessArchiveInstallationImpl(processEngine, deploymentId);
 
-    } catch (Exception e) {
-      synchronized (this) {
-        processEnginesByProcessArchiveName.remove(processArchive.getName());        
-      }
+    } catch (Exception e) {     
+      processEnginesByProcessArchiveName.remove(paName);           
+      processEngineController.unInstallProcessArchive(processArchive);
       throw new FoxPlatformException("Exception while intalling process archive",e);
     }
   }
@@ -161,34 +159,30 @@ public abstract class PlatformService implements ProcessEngineService, ProcessAr
     unInstallProcessArchiveInternal(processArchiveName);
   }
   
-  public void unInstallProcessArchiveInternal(String processArchiveName) {
+  public synchronized void unInstallProcessArchiveInternal(String paName) {
+    try {
+      final ProcessEngineController processEngine = processEnginesByProcessArchiveName.get(paName);
+  
+      if (processEngine == null) {
+        throw new FoxPlatformException("Cannot uninstall process archive with name '" + paName + "': no such process archive");
+  
+      } else {
+        final ProcessArchiveContext processArchiveContext = processEngine.getProcessArchiveContextByName(paName);
 
-    final ProcessEngineController processEngine = processEnginesByProcessArchiveName.get(processArchiveName);
-
-    if (processEngine == null) {
-      throw new FoxPlatformException("Cannot uninstall process archive with name '" + processArchiveName + "': no such process archive");
-
-    } else {
-      final ProcessArchiveContext processArchiveContext = processEngine
-              .getInstalledProcessArchivesByName()
-              .get(processArchiveName);
-      /*
-       *  FIXME adrobisch: this is called during PreDrestroy of ProcessArchiveSupport,
-       *  it seems, "somebody" else did uninstall the process archive before. maybe we should
-       *  check the uninstalls
-       */
-      if (processArchiveContext == null) {
-        log.info("Cannot uninstall process archive with name '" + processArchiveName + "': no process archive context found");
-        return;
+        fireBeforeProcessArchiveUninstalled(processArchiveContext.getProcessArchive(), processEngine);
+               
+        // perform the uninstall operation
+        processEngine.unInstallProcessArchive(processArchiveContext.getProcessArchive());
+          
+        fireAfterProcessArchiveUninstalled(processArchiveContext.getProcessArchive(), processEngine);
       }
-      
-      fireBeforeProcessArchiveUninstalled(processArchiveContext.getProcessArchive(), processEngine);
-      
-      processEngine.unInstallProcessArchive(processArchiveContext.getProcessArchive());
-
-      processEnginesByProcessArchiveName.remove(processArchiveName);
-      
-      fireAfterProcessArchiveUninstalled(processArchiveContext.getProcessArchive(), processEngine);
+    } catch (Throwable t) {
+      log.log(Level.WARNING, "Exception while uninstalling process archive '"+paName+"'", t);
+    
+    } finally {      
+      // always remove reference
+      processEnginesByProcessArchiveName.remove(paName);
+    
     }
 
   }
@@ -216,7 +210,7 @@ public abstract class PlatformService implements ProcessEngineService, ProcessAr
       if(processEngineService == null) {
         throw new FoxPlatformException("Cannot retreive list of process archives for process engine: process engine with name '"+processEngineName+"' is not managed by the fox platform.");
       }    
-      return processEngineService.getCachedProcessArchives();
+      return new ArrayList<ProcessArchive>(processEngineService.getCachedProcessArchives());
     }
   }
   
@@ -362,7 +356,7 @@ public abstract class PlatformService implements ProcessEngineService, ProcessAr
       try {
         platformServiceExtension.beforeProcessArchiveUninstalled(processArchive, processEngine);
       }catch (Exception e) {
-        throw new FoxPlatformException("Exception while invoking 'beforeProcessArchiveUninstalled' for PlatformServiceExtension "+platformServiceExtension.getClass(), e);
+        log.log(Level.SEVERE, "Exception while invoking 'fireBeforeProcessArchiveUninstalled' for PlatformServiceExtension "+platformServiceExtension.getClass(), e);
       }
     }
   }
