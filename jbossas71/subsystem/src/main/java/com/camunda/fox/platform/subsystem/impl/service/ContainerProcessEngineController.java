@@ -104,8 +104,4 @@ public class ContainerProcessEngineController extends ProcessEngineController im
     return containerJobExecutorInjector;
   }
   
-  public ProcessArchiveContext getProcessArchiveContextByName(String processArchiveName) {
-    return installedProcessArchivesByName.get(processArchiveName);
-  }
-
 }
