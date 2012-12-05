@@ -77,9 +77,9 @@ public class TestPlatformJobexecutorServiceApi {
     ProcessEngine engine = standaloneProcessEngineConfiguration.buildProcessEngine();
     try {
       platformJobExecutor.unregisterProcessEngine(standaloneProcessEngineConfiguration, "unexisting");
-      Assert.fail();
-    } catch (FoxPlatformException e) {
       // expected
+    } catch (FoxPlatformException e) {
+      Assert.fail();
     }
     engine.close();
   }
@@ -183,12 +183,12 @@ public class TestPlatformJobexecutorServiceApi {
   }
   
   @Test
-  public void testRemoveUnexistingJobAcquisitionFails() {
+  public void testRemoveUnexistingJobAcquisitionFailsSilently() {
     try {
       platformJobExecutor.stopJobAcquisition("unexisting");  
-      Assert.fail();      
-    }catch (FoxPlatformException e) {
       // expected
+    }catch (FoxPlatformException e) {
+      Assert.fail();   
     }       
   }
   
