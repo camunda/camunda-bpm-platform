@@ -153,7 +153,12 @@ public class TaskList implements Serializable {
   public String getStartFormUrl(ProcessDefinition processDefinition) {
     StartFormData startFormData = null;
     try {
-      startFormData = formService.getStartFormData(processDefinition.getId());
+      String key = processDefinition.getKey();
+      ProcessDefinition latestProcessDefinition = repositoryService.createProcessDefinitionQuery()
+        .processDefinitionKey(key)
+        .latestVersion()
+        .singleResult();
+      startFormData = formService.getStartFormData(latestProcessDefinition.getId());
     } catch (Exception ex) {
       // TODO: Improve to be able to query start forms without causing an
       // exception which is logged
