@@ -1,5 +1,5 @@
-<?xml version="1.0" encoding="UTF-8"?><definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:signavio="http://www.signavio.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" exporter="Signavio Process Editor, http://www.signavio.com" exporterVersion="6.4.0" expressionLanguage="http://www.w3.org/1999/XPath" id="sid-26e57909-213a-4bbd-9836-536ba3460966" targetNamespace="http://www.signavio.com/bpmn20" typeLanguage="http://www.w3.org/2001/XMLSchema" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/2.0/20100501/BPMN20.xsd">
-   <collaboration id="sid-014bcd42-3159-458d-b847-1b0bc50df067">
+<?xml version="1.0" encoding="UTF-8"?><definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:signavio="http://www.signavio.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" exporter="Signavio Process Editor, http://www.signavio.com" exporterVersion="6.4.0" expressionLanguage="http://www.w3.org/1999/XPath" id="sid-4289dca9-b8e0-4f94-a6bd-3cfbd02b2717" targetNamespace="http://www.signavio.com/bpmn20" typeLanguage="http://www.w3.org/2001/XMLSchema" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/2.0/20100501/BPMN20.xsd">
+   <collaboration id="sid-2a1b07ba-e878-42b3-8a24-d3c2067b7125">
       <participant id="Process_Engine_1" name="change-processname-Process Engine" processRef="changed-processid-HEMERA-1791-blub-Collaboration_">
          <extensionElements/>
       </participant>
@@ -11,7 +11,7 @@
    </collaboration>
    <process id="My_Collab_43" isClosed="false" isExecutable="false" name="My Collab" processType="None">
       <extensionElements/>
-      <laneSet id="sid-90ac80fe-840f-4d79-8428-9a92c7b65472">
+      <laneSet id="sid-f33996cf-9bc9-4b1c-88e2-2165ae434e45">
          <lane id="lane_44">
             <extensionElements>
                <signavio:signavioMetaData metaKey="bgcolor" metaValue=""/>
@@ -45,7 +45,7 @@
    </process>
    <process id="changed-processid-HEMERA-1791-blub-Collaboration_" isClosed="false" isExecutable="true" name="change-processname-Process Engine" processType="None">
       <extensionElements/>
-      <laneSet id="sid-41d07fdb-de5f-4df7-97cd-5a0d34d46007">
+      <laneSet id="sid-5bd1ad1a-ccce-4735-91d3-b8353e99843e">
          <lane id="lane_9">
             <flowNodeRef>order_position_changed_18</flowNodeRef>
             <flowNodeRef>mark_order_position_as_ready_for_pickup_22</flowNodeRef>
@@ -69,16 +69,16 @@
       </endEvent>
       <boundaryEvent attachedToRef="mark_order_position_as_ready_for_pickup_22" cancelActivity="false" id="every_6_hours_35" name="every 6 hours" parallelMultiple="false">
          <outgoing>sequenceFlow_39</outgoing>
-         <timerEventDefinition id="sid-19dbeaeb-e5ac-4eb9-9107-21142d01686d">
-            <timeCycle id="sid-f2434f9b-8a53-4af9-8c1a-75b68c10d5be" xsi:type="tFormalExpression">PT6H</timeCycle>
+         <timerEventDefinition id="sid-7611c763-7b65-48da-bd41-b16310eebc24">
+            <timeCycle id="sid-4d42d8be-4df5-46f4-8236-a91815264899" xsi:type="tFormalExpression">PT6H</timeCycle>
          </timerEventDefinition>
       </boundaryEvent>
       <sequenceFlow id="sequenceFlow_39" isImmediate="true" name="" sourceRef="every_6_hours_35" targetRef="kaputt_27"/>
       <sequenceFlow id="sequenceFlow_41" isImmediate="true" name="" sourceRef="mark_order_position_as_ready_for_pickup_22" targetRef="ganz_31"/>
       <sequenceFlow id="sequenceFlow_40" isImmediate="true" name="" sourceRef="order_position_changed_18" targetRef="mark_order_position_as_ready_for_pickup_22"/>
    </process>
-   <bpmndi:BPMNDiagram id="sid-d678d3fd-a1ee-458e-b5a4-6f773a59f3e1">
-      <bpmndi:BPMNPlane bpmnElement="sid-014bcd42-3159-458d-b847-1b0bc50df067" id="sid-d3e99cad-33df-4749-8e50-9d4783a7a44e">
+   <bpmndi:BPMNDiagram id="sid-6ac8e582-63f8-481a-be7f-f5abc79b2905">
+      <bpmndi:BPMNPlane bpmnElement="sid-2a1b07ba-e878-42b3-8a24-d3c2067b7125" id="sid-fb3a5931-91d8-4638-920a-97c5460835f4">
          <bpmndi:BPMNShape bpmnElement="Process_Engine_1" id="Process_Engine_1_gui" isHorizontal="true">
             <omgdc:Bounds height="250.0" width="600.0" x="90.0" y="300.0"/>
          </bpmndi:BPMNShape>
