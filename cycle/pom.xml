@@ -291,9 +291,13 @@
               <classifier>core</classifier>
               <includes>
                 <include>**/com/camunda/fox/cycle/**</include>
+                <include>**/com/camunda/fox/cycle/web/dto/*</include>
               </includes>
               <excludes>
-                <exclude>**/com/camunda/fox/cycle/web/**</exclude>
+                <exclude>**/com/camunda/fox/cycle/web/*</exclude>
+                <exclude>**/com/camunda/fox/cycle/web/filter/**</exclude>
+                <exclude>**/com/camunda/fox/cycle/web/jaxrs/**</exclude>
+                <exclude>**/com/camunda/fox/cycle/web/service/**</exclude>
               </excludes>
             </configuration>
           </execution>
