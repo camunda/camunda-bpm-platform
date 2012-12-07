@@ -656,7 +656,8 @@ function EditConnectorController($scope, $http, App, ConnectorConfiguration) {
       REPO_PATH = "repositoryPath",
       FOLDER_ROOT_PATH = "folderRootPath",
       ALLOW_ALL_SSL_HOSTNAMES = "allowAllSSLHostnames",
-      TEMPORARY_FILE_STORE = "temporaryFileStore";
+      TEMPORARY_FILE_STORE = "temporaryFileStore",
+      PROXY_URL = "proxyUrl";
 
   $scope.selectedConnectorConfiguration = null;
 
@@ -755,6 +756,8 @@ function EditConnectorController($scope, $http, App, ConnectorConfiguration) {
      return "enter 'true' to allow changes in SSL-Hostnames of modeler, otherwise enter 'false'";
    } else if (propertyKey == TEMPORARY_FILE_STORE) {
      return "A directory in the local file system which can be used to store temporary files, e.g. 'c:/temp/svn'";
+   } else if (propertyKey == PROXY_URL) {
+     return "enter the proxy url if you use one, e.g. 'https://192.168.0.1:3582'";
    }
   };
 }

@@ -38,37 +38,35 @@
     </dependency>
     
     <dependency>
-      <groupId>org.jboss.resteasy</groupId>
-      <artifactId>resteasy-spring</artifactId>
-      <version>${version.resteasy}</version>
+      <groupId>com.sun.jersey</groupId>
+      <artifactId>jersey-json</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.sun.jersey.contribs</groupId>
+      <artifactId>jersey-spring</artifactId>
       <exclusions>
         <exclusion>
-          <groupId>org.jboss.resteasy</groupId>
-          <artifactId>resteasy-jaxrs</artifactId>
+          <artifactId>spring-core</artifactId>
+          <groupId>org.springframework</groupId>
         </exclusion>
         <exclusion>
-          <artifactId>resteasy-jaxb-provider</artifactId>
-          <groupId>org.jboss.resteasy</groupId>
+          <artifactId>spring-beans</artifactId>
+          <groupId>org.springframework</groupId>
         </exclusion>
         <exclusion>
-          <groupId>org.jboss.resteasy</groupId>
-          <artifactId>resteasy-jettison-provider</artifactId>            
+          <artifactId>spring-context</artifactId>
+          <groupId>org.springframework</groupId>
         </exclusion>
         <exclusion>
-          <artifactId>jaxrs-api</artifactId>
-          <groupId>org.jboss.resteasy</groupId>
+          <artifactId>spring-web</artifactId>
+          <groupId>org.springframework</groupId>
         </exclusion>
         <exclusion>
-          <artifactId>jsr250-api</artifactId>
-          <groupId>javax.annotation</groupId>
+          <artifactId>spring-aop</artifactId>
+          <groupId>org.springframework</groupId>
         </exclusion>
-        <exclusion>
-          <artifactId>commons-httpclient</artifactId>
-          <groupId>commons-httpclient</groupId>
-        </exclusion>            
       </exclusions>
     </dependency>
-
   </dependencies>
 
   <build>
@@ -96,9 +94,7 @@
               <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
             </manifest>
             <manifestEntries>
-              <!-- SVN revision number -->
-              <Implementation-Build>${buildNumber}</Implementation-Build>
-              <Dependencies>org.apache.httpcomponents, org.codehaus.jettison, org.apache.xerces, org.apache.commons.io</Dependencies>
+              <Dependencies>org.apache.xerces, org.apache.commons.io</Dependencies>
             </manifestEntries>
           </archive>
           <webResources>
@@ -106,19 +102,6 @@
               <directory>../cycle/src/main/runtime/jboss/webapp</directory>
             </resource>
           </webResources>
-<!--           <overlays> -->
-<!--             <overlay> -->
-<!--               <id>cycle-core</id> -->
-<!--               <groupId>com.camunda.fox.cycle</groupId> -->
-<!--               <artifactId>cycle</artifactId> -->
-<!--               <excludes> -->
-<!--                 <exclude>**/persistence.xml</exclude> -->
-<!--               </excludes> -->
-<!--             </overlay> -->
-<!--             <overlay> -->
-<!--               empty groupId/artifactId represents the current build -->
-<!--             </overlay> -->
-<!--           </overlays> -->
         </configuration>
       </plugin>
     </plugins>

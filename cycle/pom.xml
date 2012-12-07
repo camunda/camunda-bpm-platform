@@ -28,7 +28,6 @@
       <groupId>org.springframework</groupId>
       <artifactId>spring-orm</artifactId>
     </dependency>
-
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-aop</artifactId>
@@ -39,6 +38,7 @@
       <groupId>cglib</groupId>
       <artifactId>cglib</artifactId>
       <version>2.2.2</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.aspectj</groupId>
@@ -46,37 +46,51 @@
       <version>1.7.0</version>
     </dependency>
     
+    <!-- libs needed for jax-rs stuff -->
     <dependency>
-      <groupId>org.jboss.resteasy</groupId>
-      <artifactId>resteasy-jackson-provider</artifactId>
-      <version>${version.resteasy}</version>
+      <groupId>com.sun.jersey</groupId>
+      <artifactId>jersey-json</artifactId>
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.jboss.resteasy</groupId>
-      <artifactId>resteasy-multipart-provider</artifactId>
-      <version>${version.resteasy}</version>
+      <groupId>com.sun.jersey.contribs</groupId>
+      <artifactId>jersey-spring</artifactId>
       <scope>provided</scope>
+      <exclusions>
+        <exclusion>
+          <artifactId>spring-core</artifactId>
+          <groupId>org.springframework</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>spring-beans</artifactId>
+          <groupId>org.springframework</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>spring-context</artifactId>
+          <groupId>org.springframework</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>spring-web</artifactId>
+          <groupId>org.springframework</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>spring-aop</artifactId>
+          <groupId>org.springframework</groupId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
-      <groupId>org.jboss.resteasy</groupId>
-      <artifactId>resteasy-spring</artifactId>
-      <version>${version.resteasy}</version>
+      <groupId>org.glassfish</groupId>
+      <artifactId>javax.annotation</artifactId>
       <scope>provided</scope>
     </dependency>
+    
     <dependency>
-      <groupId>org.jboss.resteasy</groupId>
-      <artifactId>resteasy-jettison-provider</artifactId>
-      <version>${version.resteasy}</version>
+      <groupId>javax.mail</groupId>
+      <artifactId>mail</artifactId>
       <scope>provided</scope>
     </dependency>
-
-    <dependency>
-      <groupId>org.apache.httpcomponents</groupId>
-      <artifactId>httpmime</artifactId>
-      <scope>provided</scope>
-    </dependency>
-
+    
     <!-- apis -->
     <dependency>
       <groupId>javax.servlet</groupId>
@@ -202,6 +216,16 @@
       <scope>test</scope>
     </dependency>
     
+    <!-- required for SignavioClient -->
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>fluent-hc</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpmime</artifactId>
+    </dependency>
+    
     <!-- required for SignavioConnectorIT -->
     <dependency>
       <groupId>xmlunit</groupId>
@@ -214,6 +238,12 @@
       <artifactId>fox-engine</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <artifactId>spring-beans</artifactId>
+          <groupId>org.springframework</groupId>
+        </exclusion>
+      </exclusions>
     </dependency>
     
     <!-- required for SvnConnector -->
@@ -445,11 +475,10 @@
           <artifactId>hibernate-jpa-2.0-api</artifactId>
           <scope>compile</scope>
         </dependency>
-        <!-- jettison -->
         <dependency>
-          <groupId>org.codehaus.jettison</groupId>
-          <artifactId>jettison</artifactId>
-          <scope>compile</scope>
+          <groupId>cglib</groupId>
+          <artifactId>cglib</artifactId>
+          <scope>provided</scope>
         </dependency>
         <!-- apache commons -->
         <dependency>
@@ -457,44 +486,54 @@
           <artifactId>commons-io</artifactId>
           <scope>compile</scope>
         </dependency>
-        <!-- apache httpcomponents -->
-        <dependency>
-          <groupId>org.apache.httpcomponents</groupId>
-          <artifactId>httpmime</artifactId>
-          <scope>compile</scope>
-        </dependency>
         <!-- nekohtml -->
         <dependency>
           <groupId>net.sourceforge.nekohtml</groupId>
           <artifactId>nekohtml</artifactId>
         </dependency>   
-        <!-- resteasy dependencies -->
         <dependency>
-          <groupId>org.jboss.resteasy</groupId>
-          <artifactId>resteasy-jaxrs</artifactId>
-          <version>${version.resteasy}</version>
+          <groupId>com.sun.jersey</groupId>
+          <artifactId>jersey-json</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>com.sun.jersey.contribs</groupId>
+          <artifactId>jersey-spring</artifactId>
           <exclusions>
             <exclusion>
-              <artifactId>javassist</artifactId>
-              <groupId>javassist</groupId>
+              <artifactId>spring-core</artifactId>
+              <groupId>org.springframework</groupId>
+            </exclusion>
+            <exclusion>
+              <artifactId>spring-beans</artifactId>
+              <groupId>org.springframework</groupId>
+            </exclusion>
+            <exclusion>
+              <artifactId>spring-context</artifactId>
+              <groupId>org.springframework</groupId>
+            </exclusion>
+            <exclusion>
+              <artifactId>spring-web</artifactId>
+              <groupId>org.springframework</groupId>
+            </exclusion>
+            <exclusion>
+              <artifactId>spring-aop</artifactId>
+              <groupId>org.springframework</groupId>
+            </exclusion>
+            <exclusion>
+              <artifactId>asm</artifactId>
+              <groupId>asm</groupId>
             </exclusion>
           </exclusions>
         </dependency>
         <dependency>
-          <groupId>org.jboss.resteasy</groupId>
-          <artifactId>resteasy-spring</artifactId>
-          <version>${version.resteasy}</version>
+          <groupId>org.glassfish</groupId>
+          <artifactId>javax.annotation</artifactId>
         </dependency>
+        
         <dependency>
-          <groupId>org.jboss.resteasy</groupId>
-          <artifactId>resteasy-jackson-provider</artifactId>
-          <version>${version.resteasy}</version>
+          <groupId>javax.mail</groupId>
+          <artifactId>mail</artifactId>
         </dependency>
-        <dependency>
-          <groupId>org.jboss.resteasy</groupId>
-          <artifactId>resteasy-multipart-provider</artifactId>
-          <version>${version.resteasy}</version>
-        </dependency>                
       </dependencies>
       <build>
         <plugins>
@@ -559,6 +598,10 @@
           <groupId>org.hibernate</groupId>
           <artifactId>hibernate-entitymanager</artifactId>
         </dependency>
+        <dependency>
+          <groupId>cglib</groupId>
+          <artifactId>cglib</artifactId>
+        </dependency>
       </dependencies>
       <properties>
         <web.resources.override>src/main/runtime/glassfish/webapp</web.resources.override>
@@ -569,35 +612,42 @@
       <id>jboss</id>
       <dependencies>
         <dependency>
-          <groupId>org.jboss.resteasy</groupId>
-          <artifactId>resteasy-spring</artifactId>
-          <version>${version.resteasy}</version>
+          <groupId>cglib</groupId>
+          <artifactId>cglib</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>com.sun.jersey</groupId>
+          <artifactId>jersey-json</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>com.sun.jersey.contribs</groupId>
+          <artifactId>jersey-spring</artifactId>
           <exclusions>
             <exclusion>
-              <artifactId>resteasy-jaxrs</artifactId>
-              <groupId>org.jboss.resteasy</groupId>
+              <artifactId>spring-core</artifactId>
+              <groupId>org.springframework</groupId>
             </exclusion>
             <exclusion>
-              <artifactId>resteasy-jaxb-provider</artifactId>
-              <groupId>org.jboss.resteasy</groupId>
+              <artifactId>spring-beans</artifactId>
+              <groupId>org.springframework</groupId>
             </exclusion>
             <exclusion>
-              <groupId>org.jboss.resteasy</groupId>
-              <artifactId>resteasy-jettison-provider</artifactId>            
-            </exclusion>  
-            <exclusion>
-              <artifactId>jaxrs-api</artifactId>
-              <groupId>org.jboss.resteasy</groupId>
+              <artifactId>spring-context</artifactId>
+              <groupId>org.springframework</groupId>
             </exclusion>
             <exclusion>
-              <artifactId>jsr250-api</artifactId>
-              <groupId>javax.annotation</groupId>
+              <artifactId>spring-web</artifactId>
+              <groupId>org.springframework</groupId>
             </exclusion>
             <exclusion>
-              <artifactId>commons-httpclient</artifactId>
-              <groupId>commons-httpclient</groupId>
+              <artifactId>spring-aop</artifactId>
+              <groupId>org.springframework</groupId>
             </exclusion>
-          </exclusions>          
+            <exclusion>
+              <artifactId>asm</artifactId>
+              <groupId>asm</groupId>
+            </exclusion>
+          </exclusions>
         </dependency>
       </dependencies>
       <properties>
@@ -617,10 +667,38 @@
                   <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
                 </manifest>
                 <manifestEntries>
-                  <!-- SVN revision number -->
-                  <Implementation-Build>${buildNumber}</Implementation-Build>
-                  <Dependencies>org.apache.httpcomponents, org.codehaus.jettison, org.apache.xerces, org.apache.commons.io</Dependencies>
+                  <Dependencies>org.apache.xerces, org.apache.commons.io</Dependencies>
                 </manifestEntries>
+              </archive>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>was</id>
+      <dependencies>
+        <dependency>
+          <groupId>cglib</groupId>
+          <artifactId>cglib-nodep</artifactId>
+        </dependency>
+      </dependencies>
+      <properties>
+        <web.resources.override>src/main/runtime/jboss/webapp</web.resources.override>
+        <java.resources.override>src/main/runtime/jboss/resources</java.resources.override>
+        <properties.override>src/main/runtime/jboss/config/database.properties</properties.override>
+      </properties>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-war-plugin</artifactId>
+            <configuration>
+              <archive>
+                <manifest>
+                  <!-- Maven project version number -->
+                  <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                </manifest>
               </archive>
             </configuration>
           </plugin>
