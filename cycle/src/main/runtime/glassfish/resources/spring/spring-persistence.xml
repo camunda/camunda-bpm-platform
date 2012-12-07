@@ -7,14 +7,10 @@
           http://www.springframework.org/schema/tx
           http://www.springframework.org/schema/tx/spring-tx.xsd">
 
-  <tx:jta-transaction-manager />
-  
   <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
-    <property name="jpaVendorAdapter">
-      <bean id="jpaAdaptor" class="org.springframework.orm.jpa.vendor.EclipseLinkJpaVendorAdapter"></bean>
-    </property>
     <property name="persistenceUnitName" value="cyclePU" />
   </bean>
-
+  
+  <tx:jta-transaction-manager />
   <tx:annotation-driven proxy-target-class="true" />
 </beans>
