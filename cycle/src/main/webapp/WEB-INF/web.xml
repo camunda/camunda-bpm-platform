@@ -1,23 +1,33 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app version="3.0" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
   <display-name>fox cycle</display-name>
-  <context-param>
-    <param-name>resteasy.servlet.mapping.prefix</param-name>
-    <param-value>/app/</param-value>
-  </context-param>
+  
+  <!-- disable resteasy scanning for JBoss deployment -->
   <context-param>
     <param-name>resteasy.scan</param-name>
     <param-value>false</param-value>
   </context-param>
   <context-param>
+      <param-name>resteasy.scan.providers</param-name>
+      <param-value>false</param-value>
+  </context-param>
+  <context-param>
+      <param-name>resteasy.scan.resources</param-name>
+      <param-value>false</param-value>
+  </context-param>
+  
+  <context-param>
     <param-name>contextConfigLocation</param-name>
     <param-value>classpath:spring/*.xml</param-value>
   </context-param>
+<!--   <listener> -->
+<!--     <listener-class>org.jboss.resteasy.plugins.server.servlet.ResteasyBootstrap</listener-class> -->
+<!--   </listener> -->
+<!--   <listener> -->
+<!--     <listener-class>org.jboss.resteasy.plugins.spring.SpringContextLoaderListener</listener-class> -->
+<!--   </listener> -->
   <listener>
-    <listener-class>org.jboss.resteasy.plugins.server.servlet.ResteasyBootstrap</listener-class>
-  </listener>
-  <listener>
-    <listener-class>org.jboss.resteasy.plugins.spring.SpringContextLoaderListener</listener-class>
+    <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
   </listener>
   <listener>
     <listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>
@@ -27,11 +37,16 @@
     jaxrs servlet definition / mapping 
   -->
   <servlet>
-    <servlet-name>Resteasy</servlet-name>
-    <servlet-class>org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher</servlet-class>
+    <servlet-name>Jersey</servlet-name>
+    <servlet-class>com.sun.jersey.spi.spring.container.servlet.SpringServlet</servlet-class>
+    <init-param>
+      <param-name>com.sun.jersey.api.json.POJOMappingFeature</param-name>
+      <param-value>true</param-value>
+    </init-param>
+    <load-on-startup>1</load-on-startup>
   </servlet>
   <servlet-mapping>
-    <servlet-name>Resteasy</servlet-name>
+    <servlet-name>Jersey</servlet-name>
     <url-pattern>/app/*</url-pattern>
   </servlet-mapping>
   

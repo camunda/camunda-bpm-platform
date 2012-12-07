@@ -94,10 +94,18 @@ public class TemplateMessageBodyWriter implements MessageBodyWriter<String> {
   public void writeTo(String t, Class<?> type, Type type1, Annotation[] antns, MediaType mt, MultivaluedMap<String, Object> mm, OutputStream out) throws IOException, WebApplicationException {
     if (t.startsWith(TPL_PREFIX)) {
       String templateName = t.replaceFirst(TPL_PREFIX, "");
+      templateName = removeEndSlash(templateName);
       writeTemplate(templateName, new HashMap<String, Object>(), new OutputStreamWriter(out));
     } else {
       writeString(t, new OutputStreamWriter(out));
     }
+  }
+  
+  private String removeEndSlash(String templateName) {
+    if (templateName.endsWith("/")) {
+      return templateName.substring(0, templateName.length() - 1);
+    }
+    return templateName; 
   }
   
   private void writeString(String s, OutputStreamWriter writer) throws IOException {

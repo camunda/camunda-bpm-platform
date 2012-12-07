@@ -7,7 +7,7 @@
     <version>6.2.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>cycle-jboss</artifactId>
+  <artifactId>cycle-was</artifactId>
   <packaging>war</packaging>
 
   <properties>
@@ -37,6 +37,19 @@
       </exclusions>
     </dependency>
     
+    <!-- javax.persistence -->
+    <dependency>
+      <groupId>org.hibernate</groupId>
+      <artifactId>hibernate-entitymanager</artifactId>
+    </dependency>
+    
+    <dependency>
+      <groupId>cglib</groupId>
+      <artifactId>cglib-nodep</artifactId>
+      <version>2.2.2</version>
+    </dependency>
+    
+    <!-- jax-rs -->
     <dependency>
       <groupId>com.sun.jersey</groupId>
       <artifactId>jersey-json</artifactId>
@@ -65,7 +78,16 @@
           <artifactId>spring-aop</artifactId>
           <groupId>org.springframework</groupId>
         </exclusion>
+        <exclusion>
+          <groupId>asm</groupId>
+          <artifactId>asm</artifactId>
+        </exclusion>
       </exclusions>
+    </dependency>
+    
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
     </dependency>
   </dependencies>
 
@@ -74,13 +96,13 @@
 
     <resources>
       <resource>
-        <directory>../cycle/src/main/runtime/jboss/resources</directory>
+        <directory>../cycle/src/main/runtime/was/resources</directory>
         <filtering>true</filtering>
       </resource>
     </resources>
 
     <filters>
-      <filter>../cycle/src/main/runtime/jboss/config/database.properties</filter>
+      <filter>../cycle/src/main/runtime/was/config/database.properties</filter>
     </filters>
 
     <plugins>
@@ -93,13 +115,10 @@
               <!-- Maven project version number -->
               <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
             </manifest>
-            <manifestEntries>
-              <Dependencies>org.apache.xerces, org.apache.commons.io</Dependencies>
-            </manifestEntries>
           </archive>
           <webResources>
             <resource>
-              <directory>../cycle/src/main/runtime/jboss/webapp</directory>
+              <directory>../cycle/src/main/runtime/was/webapp</directory>
             </resource>
           </webResources>
         </configuration>

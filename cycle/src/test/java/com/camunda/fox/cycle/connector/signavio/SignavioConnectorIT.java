@@ -37,7 +37,6 @@ import org.custommonkey.xmlunit.SimpleNamespaceContext;
 import org.custommonkey.xmlunit.XMLUnit;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
@@ -103,14 +102,14 @@ public class SignavioConnectorIT {
     XMLUnit.setIgnoreAttributeOrder(true);
     XMLUnit.setXpathNamespaceContext(new SimpleNamespaceContext(new BpmnNamespaceContext().getNamespaces()));
     
-    ConnectorConfiguration config = this.getSignavioConnector().getConfiguration();
-    this.getSignavioConnector().init(config);
-    this.getSignavioConnector().login(config.getGlobalUser(), config.getGlobalPassword());
+    ConnectorConfiguration config = getSignavioConnector().getConfiguration();
+    getSignavioConnector().init(config);
+    getSignavioConnector().login(config.getGlobalUser(), config.getGlobalPassword());
   }
   
   @After
   public void tearDown() throws Exception {
-    this.getSignavioConnector().dispose();
+    getSignavioConnector().dispose();
   }
 
   @Test
@@ -129,7 +128,7 @@ public class SignavioConnectorIT {
       String actualXml = IOUtils.toString(actualXmlInputStream, "UTF-8");
       actualXmlInputStream.close();
       
-      this.getSignavioConnector().deleteNode(importedNode);
+      getSignavioConnector().deleteNode(importedNode);
       assertXpathEvaluatesTo(expectedElementCount, ACT_ELEMENT_COUNT, actualXml);
       assertXpathEvaluatesTo(expectedAttributeCount, ACT_ATTRIBUTE_COUNT, actualXml);
     }
@@ -320,7 +319,7 @@ public class SignavioConnectorIT {
     try {
       // create directory
       String folderName = "Cycle: SignavioConnectorIT.testBpmnPoolExtractionRoundtrip " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
-      folder = this.getSignavioConnector().createNode(this.getSignavioConnector().getPrivateFolder().getId(), folderName, ConnectorNodeType.FOLDER);
+      folder = getSignavioConnector().createNode(getSignavioConnector().getPrivateFolder().getId(), folderName, ConnectorNodeType.FOLDER);
 
       // upload model
       if (filename.endsWith(".sgx")) {
@@ -331,20 +330,19 @@ public class SignavioConnectorIT {
         fail("Unable to determine type of file to upload! [File=" + filename + "]");
       }
 
-      List<ConnectorNode> models = this.getSignavioConnector().getChildren(folder);
+      List<ConnectorNode> models = getSignavioConnector().getChildren(folder);
+      assertTrue("No models were imported!", models.size() > 0);
       for (ConnectorNode node : models) {
         assertTrue(node instanceof ConnectorNode);
         ConnectorNode model = (ConnectorNode) node;
         System.out.println("Testing Pool Extraction Roundtrip with model '" + model.getLabel() + "'...");
 
         
-        initialRawBpmn20XmlInputStream = this.getSignavioConnector().getContent(model);
+        initialRawBpmn20XmlInputStream = getSignavioConnector().getContent(model);
         initialRawBpmn20Xml = IOUtils.toString(initialRawBpmn20XmlInputStream, "UTF-8");
         IoUtil.closeSilently(initialRawBpmn20XmlInputStream);
         IoUtil.writeStringToFileIfDebug(initialRawBpmn20Xml, "initial_raw_model", INITIAL_RAW_BPMN20_XML);
         
-//        ActivitiCompliantBpmn20Provider.writeStringToFileIfDebug(model, initialRawBpmn20Xml, INITIAL_RAW_BPMN20_XML);
-
         // export (developer-friendly) BPMN 2.0 XML of Engine Pool
         if (importXmlFile == null) {
           if (devFriendly) {
@@ -356,10 +354,9 @@ public class SignavioConnectorIT {
             IoUtil.closeSilently(devFriendlyOutput);
           }
           initialRawBpmn20XmlInputStream = IOUtils.toInputStream(initialRawBpmn20Xml, "UTF-8");
-          technicalModelInputStream = this.bpmnProcessModelUtil.extractExecutablePool(initialRawBpmn20XmlInputStream);
+          technicalModelInputStream = bpmnProcessModelUtil.extractExecutablePool(initialRawBpmn20XmlInputStream);
           technicalModel = IOUtils.toString(technicalModelInputStream, "UTF-8");
-          IoUtil.closeSilently(technicalModelInputStream);
-          IoUtil.closeSilently(initialRawBpmn20XmlInputStream);
+          IoUtil.closeSilently(technicalModelInputStream, initialRawBpmn20XmlInputStream);
         } else {
           technicalModel = readModel(importXmlFile);
         }
@@ -379,11 +376,11 @@ public class SignavioConnectorIT {
         }
 
         // import Engine Pool back into collaboration
-        actualRawBpmn20Xml = this.bpmnProcessModelUtil.importChangesFromExecutableBpmnModel(technicalModel, initialRawBpmn20Xml);
+        actualRawBpmn20Xml = bpmnProcessModelUtil.importChangesFromExecutableBpmnModel(technicalModel, initialRawBpmn20Xml);
         actualRawBpmn20XmlInputStream = IOUtils.toInputStream(actualRawBpmn20Xml, "UTF-8");
-        this.getSignavioConnector().updateContent(model, actualRawBpmn20XmlInputStream);
+        getSignavioConnector().updateContent(model, actualRawBpmn20XmlInputStream);
         IoUtil.closeSilently(actualRawBpmn20XmlInputStream);
-        actualRawBpmn20XmlInputStream = this.getSignavioConnector().getContent(model);
+        actualRawBpmn20XmlInputStream = getSignavioConnector().getContent(model);
         actualRawBpmn20Xml = IOUtils.toString(actualRawBpmn20XmlInputStream, "UTF-8");
         IoUtil.closeSilently(actualRawBpmn20XmlInputStream);
         
@@ -396,7 +393,7 @@ public class SignavioConnectorIT {
     } finally {
       if (folder != null) {
         // delete folder
-        this.getSignavioConnector().deleteNode(folder);
+        getSignavioConnector().deleteNode(folder);
       }
     }
 
@@ -517,7 +514,7 @@ public class SignavioConnectorIT {
   }
 
   private SignavioConnector getSignavioConnector() {
-    return this.signavioConnector;
+    return signavioConnector;
   }
   
 }

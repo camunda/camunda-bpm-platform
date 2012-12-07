@@ -1,6 +1,6 @@
-<?xml version="1.0" encoding="UTF-8"?><definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:signavio="http://www.signavio.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" exporter="Signavio Process Editor, http://www.signavio.com" exporterVersion="6.4.0" expressionLanguage="http://www.w3.org/1999/XPath" id="sid-5d784960-7e2f-489f-90f1-ae5299355650" targetNamespace="http://www.signavio.com/bpmn20" typeLanguage="http://www.w3.org/2001/XMLSchema" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/2.0/20100501/BPMN20.xsd">
-   <message id="sid-690adeb7-e434-421c-81fc-3d27ac799f36" name=""/>
-   <collaboration id="sid-0aa6c522-6c3c-4d3c-8467-783828b68549">
+<?xml version="1.0" encoding="UTF-8"?><definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:signavio="http://www.signavio.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" exporter="Signavio Process Editor, http://www.signavio.com" exporterVersion="6.4.0" expressionLanguage="http://www.w3.org/1999/XPath" id="sid-d248e1bc-c6a7-43cc-a1cd-36b1813583f7" targetNamespace="http://www.signavio.com/bpmn20" typeLanguage="http://www.w3.org/2001/XMLSchema" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/2.0/20100501/BPMN20.xsd">
+   <message id="sid-5e956158-28a7-41e0-8b17-a2837e00899d" name=""/>
+   <collaboration id="sid-1491c668-a674-488e-884b-9ad6b9a08f9a">
       <participant id="Mensch_5" name="Mensch" processRef="Mensch_11">
          <extensionElements/>
       </participant>
@@ -12,7 +12,7 @@
    </collaboration>
    <process id="Mensch_11" isClosed="false" isExecutable="false" name="Mensch" processType="None">
       <extensionElements/>
-      <laneSet id="sid-63acc243-157c-4ada-baf1-a3a43f30b336">
+      <laneSet id="sid-8bfe4f9d-8c99-4089-b2e8-888e1de64247">
          <lane id="lane_12">
             <extensionElements>
                <signavio:signavioMetaData metaKey="bgcolor" metaValue=""/>
@@ -48,7 +48,7 @@
          </extensionElements>
          <incoming>sequenceFlow_40</incoming>
          <outgoing>sequenceFlow_41</outgoing>
-         <messageEventDefinition id="sid-145e19d0-31f8-458b-a16d-c9c828a99e67"/>
+         <messageEventDefinition id="sid-1184f38e-64aa-44a9-9dd5-962fb0ace443"/>
       </intermediateCatchEvent>
       <sequenceFlow id="sequenceFlow_41" isImmediate="true" name="" sourceRef="intermediateCatchEvent_33" targetRef="endEvent_29"/>
       <sequenceFlow id="sequenceFlow_40" isImmediate="true" name="" sourceRef="test_24" targetRef="intermediateCatchEvent_33"/>
@@ -56,7 +56,7 @@
    </process>
    <process id="testRoundtripWithMessageEvents_" isClosed="false" isExecutable="true" name="Process Engine" processType="None">
       <extensionElements/>
-      <laneSet id="sid-a8130a88-63e2-4f95-95a1-5a693aa8e77a">
+      <laneSet id="sid-f828c2e6-77c4-4c75-8bd1-b91e446f66b6">
          <lane id="lane_44">
             <flowNodeRef>startEvent_51</flowNodeRef>
             <flowNodeRef>testTwitter</flowNodeRef>
@@ -65,7 +65,7 @@
       </laneSet>
       <startEvent id="startEvent_51" name="">
          <outgoing>sequenceFlow_65</outgoing>
-         <messageEventDefinition id="sid-7430e0e5-bff5-408f-ac0b-586d029dcca6" messageRef="sid-690adeb7-e434-421c-81fc-3d27ac799f36"/>
+         <messageEventDefinition id="sid-177e1be8-aef5-4457-b0ad-7b573bf4e285" messageRef="sid-5e956158-28a7-41e0-8b17-a2837e00899d"/>
       </startEvent>
       <serviceTask activiti:class="com.camunda.fox.demo.twitter.TweetContentDelegate" completionQuantity="1" id="testTwitter" isForCompensation="false" name="testTwitter" startQuantity="1">
          <incoming>sequenceFlow_65</incoming>
@@ -77,8 +77,8 @@
       <sequenceFlow id="sequenceFlow_65" isImmediate="true" name="" sourceRef="startEvent_51" targetRef="testTwitter"/>
       <sequenceFlow id="sequenceFlow_66" isImmediate="true" name="" sourceRef="testTwitter" targetRef="endEvent_61"/>
    </process>
-   <bpmndi:BPMNDiagram id="sid-7afd80bc-8255-4f08-a47d-5e506597ebf5">
-      <bpmndi:BPMNPlane bpmnElement="sid-0aa6c522-6c3c-4d3c-8467-783828b68549" id="sid-52e36983-c2a2-4cc2-ba6e-683ccd860dc4">
+   <bpmndi:BPMNDiagram id="sid-b3da86df-601b-4b5a-9b28-d458978b520a">
+      <bpmndi:BPMNPlane bpmnElement="sid-1491c668-a674-488e-884b-9ad6b9a08f9a" id="sid-2da5dd05-7da6-4ea4-964c-1ea16d3a8f35">
          <bpmndi:BPMNShape bpmnElement="Mensch_5" id="Mensch_5_gui" isHorizontal="true">
             <omgdc:Bounds height="250.0" width="600.0" x="75.0" y="45.0"/>
          </bpmndi:BPMNShape>
