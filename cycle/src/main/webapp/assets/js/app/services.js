@@ -183,4 +183,4 @@ angular
     };
 
     return new Credentials();
-  })
+  });
