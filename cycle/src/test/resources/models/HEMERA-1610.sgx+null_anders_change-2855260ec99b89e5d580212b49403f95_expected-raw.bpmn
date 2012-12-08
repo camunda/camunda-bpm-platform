@@ -1,7 +1,7 @@
-<?xml version="1.0" encoding="UTF-8"?><definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:signavio="http://www.signavio.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" exporter="Signavio Process Editor, http://www.signavio.com" exporterVersion="6.4.0" expressionLanguage="http://www.w3.org/1999/XPath" id="sid-696256be-ac3c-474e-aa00-d8767f41c763" targetNamespace="http://www.signavio.com/bpmn20" typeLanguage="http://www.w3.org/2001/XMLSchema" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/2.0/20100501/BPMN20.xsd">
-   <dataStore capacity="0" id="sid-424e5acf-ac83-4b98-97dd-6533d3382c3a" isUnlimited="false" name="Überweisungs-&#10;vorlagen"/>
-   <message id="sid-9bd3446a-a845-4f91-b841-be33f9b207cc" name=""/>
-   <collaboration id="sid-5d96ac79-c49e-42d7-b8b7-8d12c1499b64">
+<?xml version="1.0" encoding="UTF-8"?><definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:signavio="http://www.signavio.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" exporter="Signavio Process Editor, http://www.signavio.com" exporterVersion="6.4.0" expressionLanguage="http://www.w3.org/1999/XPath" id="sid-21383f98-07b7-4417-9223-d19141775684" targetNamespace="http://www.signavio.com/bpmn20" typeLanguage="http://www.w3.org/2001/XMLSchema" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/2.0/20100501/BPMN20.xsd">
+   <dataStore capacity="0" id="sid-c5322bcd-4867-49ce-8ab1-3daa42e8e1a6" isUnlimited="false" name="Überweisungs-&#10;vorlagen"/>
+   <message id="sid-92c33ba7-c55e-493f-a7f6-a567d08a34f5" name=""/>
+   <collaboration id="sid-021fedd3-76f5-47ae-82ae-3d52666a152e">
       <participant id="Team-Assistenz_9" name="Team-Assistenz" processRef="Team-Assistenz_18">
          <extensionElements/>
       </participant>
@@ -19,7 +19,7 @@
    </collaboration>
    <process id="Gesch_ftsf_hrung_195" isClosed="false" isExecutable="false" name="Geschäftsführung" processType="None">
       <extensionElements/>
-      <laneSet id="sid-59c25d04-9bf5-4559-91a0-23e961d67bc0">
+      <laneSet id="sid-276af89c-acc3-4070-b9a3-d0c23dc2fe3f">
          <lane id="lane_196">
             <extensionElements>
                <signavio:signavioMetaData metaKey="bgcolor" metaValue=""/>
@@ -35,7 +35,7 @@
             <signavio:signavioMetaData metaKey="bgcolor" metaValue="#ffffff"/>
          </extensionElements>
          <outgoing>sequenceFlow_221</outgoing>
-         <timerEventDefinition id="sid-4dcc36fa-b828-4568-beca-33d3a6768eee"/>
+         <timerEventDefinition id="sid-cbdcae9c-0f16-4ce0-bb74-6331808eef6f"/>
       </startEvent>
       <task completionQuantity="1" id="zber-weisungen_ausf_hren_209" isForCompensation="false" name="Über-weisungen ausführen" startQuantity="1">
          <extensionElements>
@@ -50,7 +50,7 @@
          </extensionElements>
          <incoming>sequenceFlow_222</incoming>
       </endEvent>
-      <dataStoreReference dataStoreRef="sid-424e5acf-ac83-4b98-97dd-6533d3382c3a" id="zberweisungs-_vorlagen_218" name="Überweisungs-&#10;vorlagen">
+      <dataStoreReference dataStoreRef="sid-c5322bcd-4867-49ce-8ab1-3daa42e8e1a6" id="zberweisungs-_vorlagen_218" name="Überweisungs-&#10;vorlagen">
          <extensionElements>
             <signavio:signavioMetaData metaKey="bgcolor" metaValue="#ffffff"/>
          </extensionElements>
@@ -61,7 +61,7 @@
    </process>
    <process id="Team-Assistenz_18" isClosed="false" isExecutable="false" name="Team-Assistenz" processType="None">
       <extensionElements/>
-      <laneSet id="sid-86d5af9b-7802-470d-ba57-01a98e1d5179">
+      <laneSet id="sid-ded2d8e2-e02c-4e4c-a452-e0c9655b2177">
          <lane id="lane_19">
             <extensionElements>
                <signavio:signavioMetaData metaKey="bgcolor" metaValue=""/>
@@ -85,7 +85,7 @@
             <signavio:signavioMetaData metaKey="bgcolor" metaValue="#ffffff"/>
          </extensionElements>
          <outgoing>sequenceFlow_95</outgoing>
-         <messageEventDefinition id="sid-9491356a-9953-4b55-a8dc-ca16b2772958"/>
+         <messageEventDefinition id="sid-082d1e50-9144-4009-b8bf-65583c8e8675"/>
       </startEvent>
       <task completionQuantity="1" id="Rechnung_scannen_und_mailen_40" isForCompensation="false" name="Rechnung scannen und mailen" startQuantity="1">
          <extensionElements>
@@ -114,7 +114,7 @@
          </extensionElements>
          <incoming>sequenceFlow_96</incoming>
          <outgoing>sequenceFlow_98</outgoing>
-         <messageEventDefinition id="sid-6a845f6f-7a1e-4024-8c07-9bea49460df4"/>
+         <messageEventDefinition id="sid-257674fc-5198-4ea9-899b-66cb047cdefa"/>
       </intermediateCatchEvent>
       <task completionQuantity="1" id="Freigebenden_zuordnen_61" isForCompensation="false" name="Freigebenden zuordnen" startQuantity="1">
          <extensionElements>
@@ -138,7 +138,7 @@
          </extensionElements>
          <incoming>sequenceFlow_101</incoming>
          <outgoing>sequenceFlow_102</outgoing>
-         <messageEventDefinition id="sid-1e39d3f5-8f7f-414b-8e91-2408dd419d9a"/>
+         <messageEventDefinition id="sid-44f288da-3fac-4dba-9752-880e355983cd"/>
       </intermediateCatchEvent>
       <task completionQuantity="1" id="Kl_ren_und_Ergebnis_festhalten_79" isForCompensation="false" name="Klären und Ergebnis festhalten" startQuantity="1">
          <extensionElements>
@@ -154,7 +154,7 @@
          </extensionElements>
          <incoming>sequenceFlow_100</incoming>
          <outgoing>sequenceFlow_103</outgoing>
-         <timerEventDefinition id="sid-62e8f100-37b6-448c-b73e-aba342855d9f"/>
+         <timerEventDefinition id="sid-482d2407-58f1-4a02-9515-a925255f11bb"/>
       </intermediateCatchEvent>
       <endEvent id="endEvent_91" name="">
          <extensionElements>
@@ -179,7 +179,7 @@
    </process>
    <process id="anders_" isClosed="false" isExecutable="true" name="Process Engine" processType="None">
       <extensionElements/>
-      <laneSet id="sid-74ac2815-c9c1-47d1-9ffd-dde29cf28f1b">
+      <laneSet id="sid-3b5adbaf-b31e-484e-b66c-ef6321c73591">
          <lane id="Freigebender_110" name="Freigebender">
             <flowNodeRef>Rechnung_freigeben_130</flowNodeRef>
             <flowNodeRef>Freigabe_erfolgt__136</flowNodeRef>
@@ -209,7 +209,7 @@
       </exclusiveGateway>
       <startEvent id="Rechnung_eingegangen_143" name="Rechnung&#10;eingegangen">
          <outgoing>sequenceFlow_191</outgoing>
-         <messageEventDefinition id="sid-a4bfdb20-a128-4573-926a-6541e438deed" messageRef="sid-9bd3446a-a845-4f91-b841-be33f9b207cc"/>
+         <messageEventDefinition id="sid-db57e918-05b3-4a88-ac6f-c8c7fbf66190" messageRef="sid-92c33ba7-c55e-493f-a7f6-a567d08a34f5"/>
       </startEvent>
       <userTask completionQuantity="1" id="Freigebenden_zuordnen_148" isForCompensation="false" name="Freigebenden zuordnen" startQuantity="1">
          <incoming>sequenceFlow_191</incoming>
@@ -249,8 +249,8 @@
       <sequenceFlow id="sequenceFlow_183" isImmediate="true" name="" sourceRef="Freigebenden_zuordnen_148" targetRef="Rechnung_freigeben_130"/>
       <sequenceFlow id="Nein_187" isImmediate="true" name="Nein" sourceRef="Freigabe_erfolgt__136" targetRef="Rechnung_kl_ren_153"/>
    </process>
-   <bpmndi:BPMNDiagram id="sid-ff96368e-ca6e-464a-9140-53568f4ccd87">
-      <bpmndi:BPMNPlane bpmnElement="sid-5d96ac79-c49e-42d7-b8b7-8d12c1499b64" id="sid-67537eb3-4698-4acc-b194-a117acd377e6">
+   <bpmndi:BPMNDiagram id="sid-22fc2168-504e-4e1c-a1e5-ff889aa2dc91">
+      <bpmndi:BPMNPlane bpmnElement="sid-021fedd3-76f5-47ae-82ae-3d52666a152e" id="sid-8386bc38-fe05-4cc0-96a8-fdfd463692d4">
          <bpmndi:BPMNShape bpmnElement="Team-Assistenz_9" id="Team-Assistenz_9_gui" isHorizontal="true">
             <omgdc:Bounds height="205.0" width="998.5" x="54.5" y="26.0"/>
          </bpmndi:BPMNShape>

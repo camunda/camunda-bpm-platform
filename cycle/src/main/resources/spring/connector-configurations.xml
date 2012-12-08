@@ -24,6 +24,7 @@
     <property name="properties">
       <map>
         <entry key="signavioBaseUrl" value="https://editor.signavio.com/"></entry>
+        <entry key="proxyUrl" value=""></entry>
       </map>
     </property>
   </bean>

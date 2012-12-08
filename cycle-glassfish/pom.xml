@@ -24,19 +24,11 @@
       <groupId>org.hibernate</groupId>
       <artifactId>hibernate-entitymanager</artifactId>
     </dependency>
-
-<!--     resteasy dependencies -->
-<!--     <dependency> -->
-<!--       <groupId>org.jboss.resteasy</groupId> -->
-<!--       <artifactId>resteasy-jaxrs</artifactId> -->
-<!--       <version>${version.resteasy}</version> -->
-<!--       <exclusions> -->
-<!--         <exclusion> -->
-<!--           <artifactId>javassist</artifactId> -->
-<!--           <groupId>javassist</groupId> -->
-<!--         </exclusion> -->
-<!--       </exclusions> -->
-<!--     </dependency>     -->
+    
+    <dependency>
+      <groupId>cglib</groupId>
+      <artifactId>cglib</artifactId>
+    </dependency>
 
   </dependencies>
 
@@ -60,29 +52,12 @@
               <!-- Maven project version number -->
               <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
             </manifest>
-            <manifestEntries>
-              <!-- SVN revision number -->
-              <Implementation-Build>${buildNumber}</Implementation-Build>
-            </manifestEntries>
           </archive>
           <webResources>
             <resource>
               <directory>../cycle/src/main/runtime/glassfish/webapp</directory>
             </resource>
           </webResources>
-<!--           <overlays> -->
-<!--             <overlay> -->
-<!--               <id>cycle-core</id> -->
-<!--               <groupId>com.camunda.fox.cycle</groupId> -->
-<!--               <artifactId>cycle</artifactId> -->
-<!--               <excludes> -->
-<!--                 <exclude>**/persistence.xml</exclude> -->
-<!--               </excludes> -->
-<!--             </overlay> -->
-<!--             <overlay> -->
-<!--               empty groupId/artifactId represents the current build -->
-<!--             </overlay> -->
-<!--           </overlays> -->
         </configuration>
       </plugin>
     </plugins>

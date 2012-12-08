@@ -1,9 +1,9 @@
-<?xml version="1.0" encoding="UTF-8"?><definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:signavio="http://www.signavio.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" exporter="Signavio Process Editor, http://www.signavio.com" exporterVersion="6.4.0" expressionLanguage="http://www.w3.org/1999/XPath" id="sid-33580d3d-5b4d-4a7e-a9a8-c54d553fc65e" targetNamespace="http://www.signavio.com/bpmn20" typeLanguage="http://www.w3.org/2001/XMLSchema" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/2.0/20100501/BPMN20.xsd">
-   <dataStore capacity="0" id="sid-9167ac16-5cde-4ea9-9378-47ac900d48c2" isUnlimited="false" name="Speicherort X"/>
-   <message id="sid-2691ccdc-64dc-4e82-8606-f5f440691b20" name="AutomatedAcquisition"/>
-   <message id="sid-2ffa074f-d7ce-4ba1-a1c5-3ea9f83c6365" name="ManualAcquisition"/>
-   <error id="sid-ec086bf3-1673-499e-84df-38bee42c5361"/>
-   <collaboration id="sid-873ac4fa-b06a-4a7d-8e39-8c5f934d1892">
+<?xml version="1.0" encoding="UTF-8"?><definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:signavio="http://www.signavio.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" exporter="Signavio Process Editor, http://www.signavio.com" exporterVersion="6.4.0" expressionLanguage="http://www.w3.org/1999/XPath" id="sid-6c54966b-9ea6-4aab-92fc-3e474f6bc745" targetNamespace="http://www.signavio.com/bpmn20" typeLanguage="http://www.w3.org/2001/XMLSchema" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/2.0/20100501/BPMN20.xsd">
+   <error id="sid-409761d8-372b-4bca-946f-45c86d634cb8"/>
+   <dataStore capacity="0" id="sid-ec9d9041-6bd3-4bc5-852e-758bf7521358" isUnlimited="false" name="Speicherort X"/>
+   <message id="sid-fcf86f34-102c-4099-9420-52900523433a" name="AutomatedAcquisition"/>
+   <message id="sid-2acee5da-2840-4dab-983f-8239bc865fbc" name="ManualAcquisition"/>
+   <collaboration id="sid-2a69efbd-55a1-4754-b003-bcb19ecc05c6">
       <participant id="Prozess_Engine_Akquise_Prozess_15" name="Prozess Engine&#10;Akquise Prozess" processRef="CC-Akquise_">
          <extensionElements/>
       </participant>
@@ -55,7 +55,7 @@
    </collaboration>
    <process id="sid-8F910D12-126A-4FB0-90D0-9EEE4C676B2F" isClosed="false" isExecutable="false" name="Batch Prozess" processType="None">
       <extensionElements/>
-      <laneSet id="sid-02d57244-2d96-4059-a18f-37216cbb8c44">
+      <laneSet id="sid-5c75b1b6-fca5-43eb-94ec-c755849edb85">
          <lane id="sid-A69F434F-CBCB-48BB-8AE2-7A1C04B9A695">
             <extensionElements>
                <signavio:signavioMetaData metaKey="bgcolor" metaValue=""/>
@@ -71,7 +71,7 @@
             <signavio:signavioMetaData metaKey="bgcolor" metaValue="#ffffff"/>
          </extensionElements>
          <outgoing>sid-806885CB-AA54-4F14-AC74-166CBB0C9879</outgoing>
-         <timerEventDefinition id="sid-b27d9ef6-b60d-400a-b975-fc5a7d5a3022"/>
+         <timerEventDefinition id="sid-8b733dc3-b6f6-4f65-8737-4b569edd1a80"/>
       </startEvent>
       <task completionQuantity="1" id="sid-B4E09B22-4468-4220-998C-76426E821809" isForCompensation="false" name="Daten ermitteln" startQuantity="1">
          <extensionElements>
@@ -99,7 +99,7 @@
    </process>
    <process id="GUI__JSF2__183" isClosed="true" isExecutable="false" name="GUI (JSF2)" processType="None">
       <extensionElements/>
-      <laneSet id="sid-3288de2f-e29c-4d1d-83c9-14953dfcb781">
+      <laneSet id="sid-69f95f95-a01c-4609-9954-edb7023fbe8a">
          <lane id="lane_183">
             <extensionElements>
                <signavio:signavioMetaData metaKey="bgcolor" metaValue=""/>
@@ -220,7 +220,7 @@
          </extensionElements>
          <incoming>sequenceFlow_538</incoming>
          <outgoing>sequenceFlow_511</outgoing>
-         <messageEventDefinition id="sid-9f7a7564-b82e-43df-9f30-8e9b997b7a60"/>
+         <messageEventDefinition id="sid-6dc86c07-a2d7-4876-9837-5f0b4f4f6163"/>
       </intermediateThrowEvent>
       <task completionQuantity="1" id="GP-Suche_308" isForCompensation="false" name="GP suchen und auswählen&#10;[F-2]" startQuantity="1">
          <extensionElements>
@@ -258,7 +258,7 @@
          </extensionElements>
          <incoming>sequenceFlow_501</incoming>
          <outgoing>sequenceFlow_512</outgoing>
-         <messageEventDefinition id="sid-97ee9ec8-c307-4352-bcbc-de9e4498afaa"/>
+         <messageEventDefinition id="sid-8e2f9873-afa9-4001-a099-0cfecb3f0b27"/>
       </intermediateThrowEvent>
       <exclusiveGateway gatewayDirection="Converging" id="exclusiveGateway_414" name="">
          <extensionElements>
@@ -289,7 +289,7 @@
          </extensionElements>
          <incoming>sequenceFlow_516</incoming>
          <outgoing>sequenceFlow_515</outgoing>
-         <messageEventDefinition id="sid-6e6bab19-9914-48ea-810d-f152c36515c7"/>
+         <messageEventDefinition id="sid-d3bc8312-abf3-4c74-a00f-737a027113c7"/>
       </intermediateCatchEvent>
       <intermediateCatchEvent id="Fehler_bei__technische__Stammdaten__anlegen_438" name="Fehler bei &#10;technische &#10;Stammdaten &#10;anlegen">
          <extensionElements>
@@ -298,7 +298,7 @@
          </extensionElements>
          <incoming>sequenceFlow_517</incoming>
          <outgoing>sequenceFlow_519</outgoing>
-         <messageEventDefinition id="sid-ab2e74f1-57f4-48bd-aedb-06e6039d29a6"/>
+         <messageEventDefinition id="sid-6682babb-7efb-4116-bf07-a2f9edaf9c3f"/>
       </intermediateCatchEvent>
       <eventBasedGateway eventGatewayType="Exclusive" gatewayDirection="Diverging" id="eventBasedGateway_446" instantiate="false" name="">
          <extensionElements>
@@ -315,7 +315,7 @@
          </extensionElements>
          <incoming>sequenceFlow_525</incoming>
          <outgoing>sequenceFlow_530</outgoing>
-         <messageEventDefinition id="sid-811fd963-44c8-4b50-986c-6357b46a204d"/>
+         <messageEventDefinition id="sid-36014806-fac4-440d-8ca9-639fa23b34fd"/>
       </intermediateCatchEvent>
       <intermediateCatchEvent id="Kontakt_geschrieben_460" name="Kontakt&#10;geschrieben">
          <extensionElements>
@@ -323,7 +323,7 @@
          </extensionElements>
          <incoming>sequenceFlow_524</incoming>
          <outgoing>sequenceFlow_523</outgoing>
-         <messageEventDefinition id="sid-58e55fed-0db1-4c9b-8c35-55a36721326c"/>
+         <messageEventDefinition id="sid-430c59b0-c6d5-4278-a656-2b2088982aa6"/>
       </intermediateCatchEvent>
       <intermediateThrowEvent id="GP_identifiziert___angelegt__467" name="GP identifiziert &#10;(angelegt)">
          <extensionElements>
@@ -332,8 +332,8 @@
          </extensionElements>
          <incoming>sid-BD800F1D-CF41-4855-BE75-507CFA8E5668</incoming>
          <outgoing>sequenceFlow_535</outgoing>
-         <cancelEventDefinition id="sid-fdcb8fad-20ae-4b56-b87b-030f68e0b42c"/>
-         <terminateEventDefinition id="sid-524b5e0e-747e-4ccd-8ad9-df733d315a34"/>
+         <cancelEventDefinition id="sid-7e7178e9-efed-45f6-910d-dabdd5465249"/>
+         <terminateEventDefinition id="sid-f1687050-a693-413e-a9c4-0ccd3701e1f1"/>
       </intermediateThrowEvent>
       <task completionQuantity="1" id="Akquise_Metadaten_erfassen_474" isForCompensation="false" name="Akquise Metadaten erfassen&#10;[F-7]" startQuantity="1">
          <extensionElements>
@@ -355,7 +355,7 @@
          </extensionElements>
          <incoming>sid-0748D121-3E77-4C0D-9AA7-5B3EBD3BE19C</incoming>
          <outgoing>sid-529534D6-C76E-476E-BF93-9ACC3F44F608</outgoing>
-         <messageEventDefinition id="sid-c0e3fcc8-a4c5-4b1c-b4dc-639b71d0c338"/>
+         <messageEventDefinition id="sid-bd97c8db-140d-4036-8939-ce58c07929cb"/>
       </intermediateThrowEvent>
       <exclusiveGateway gatewayDirection="Diverging" id="sid-CA67E836-B3BE-4DA4-97A0-18B7AAE00547" name="">
          <extensionElements>
@@ -457,7 +457,7 @@ Weiterleitungen
    </process>
    <process id="CC-Akquise_" isClosed="true" isExecutable="true" name="Prozess Engine&#10;Akquise Prozess" processType="None">
       <extensionElements/>
-      <laneSet id="sid-5e8ba3e3-bd70-4ae8-b389-e91703a0510f">
+      <laneSet id="sid-bcaaae49-fbe9-433c-b972-2189b524e62b">
          <lane id="lane_32">
             <flowNodeRef>GP_identifizieren_62</flowNodeRef>
             <flowNodeRef>Akquisedaten_erfassen_69</flowNodeRef>
@@ -477,13 +477,13 @@ Weiterleitungen
          </lane>
       </laneSet>
       <userTask activiti:assignee="#{userService.getUserId()}" activiti:formKey="content/businessPartnerIdentification/identifyBusinessPartner" completionQuantity="1" id="GP_identifizieren_62" isForCompensation="false" name="Identifikation eines Geschäftspartners" startQuantity="1">
-         <documentation id="sid-8fb36d7c-85c4-45ce-b7ff-24a8429a1ff6">Geschäftspartner identifizieren</documentation>
+         <documentation id="sid-6a7305aa-c68a-4bbb-a879-c5a68c8a50ec">Geschäftspartner identifizieren</documentation>
          <incoming>sid-E156F180-515A-4AC1-A569-102492F85DD1</incoming>
          <incoming>sid-354B1DA1-3E86-4E84-8E3E-989A97C3204C</incoming>
          <outgoing>sequenceFlow_127</outgoing>
       </userTask>
       <userTask activiti:assignee="#{userService.getUserId()}" activiti:formKey="content/premiseLookup/listPremises" completionQuantity="1" id="Akquisedaten_erfassen_69" isForCompensation="false" name="Akquisedaten erfassen" startQuantity="1">
-         <documentation id="sid-84c2105b-3c9d-4a8d-8e06-54111befb69b">Akquisedaten erfassen</documentation>
+         <documentation id="sid-b230884c-5148-4ca3-a371-5376f655466e">Akquisedaten erfassen</documentation>
          <incoming>sid-0B758BD1-91CC-484D-81E6-87F04264A2A9</incoming>
          <incoming>sequenceFlow_126</incoming>
          <outgoing>sequenceFlow_133</outgoing>
@@ -502,7 +502,7 @@ Weiterleitungen
          <outgoing>SequenceFlow_1</outgoing>
       </intermediateThrowEvent>
       <serviceTask activiti:class="com.camunda.training.delegate.SysoutDelegate" completionQuantity="1" id="SAP_Kontakt_schreiben_109" isForCompensation="false" name="SAP Kontakt schreiben" startQuantity="1">
-         <documentation id="sid-49699117-0002-4f26-af47-870a217d30a3">SAP Kontakt schreiben</documentation>
+         <documentation id="sid-df1f7b1c-cfcf-4de3-9eff-2474762eff77">SAP Kontakt schreiben</documentation>
          <incoming>SequenceFlow_1</incoming>
          <outgoing>sequenceFlow_135</outgoing>
       </serviceTask>
@@ -511,18 +511,18 @@ Weiterleitungen
       </endEvent>
       <startEvent id="Automatische_Akquise_56" name="Automatisierte&#10;Akquise">
          <outgoing>sid-E156F180-515A-4AC1-A569-102492F85DD1</outgoing>
-         <messageEventDefinition id="sid-d1676137-0225-4fee-825a-8faa1bc54c72" messageRef="sid-2691ccdc-64dc-4e82-8606-f5f440691b20"/>
+         <messageEventDefinition id="sid-46ca8c40-2d1e-49b5-a2f6-584c4c36fba1" messageRef="sid-fcf86f34-102c-4099-9420-52900523433a"/>
       </startEvent>
       <startEvent id="Manuelle_Akquise_95" name="Manuelle Akquise">
          <outgoing>sequenceFlow_131</outgoing>
-         <messageEventDefinition id="sid-c6767ab0-30e9-4b1b-a314-ba1c3b62f4c4" messageRef="sid-2ffa074f-d7ce-4ba1-a1c5-3ea9f83c6365"/>
+         <messageEventDefinition id="sid-902af2af-84a3-4471-b643-5a713de4f2d1" messageRef="sid-2acee5da-2840-4dab-983f-8239bc865fbc"/>
       </startEvent>
       <boundaryEvent attachedToRef="SAP_Kontakt_schreiben_109" cancelActivity="true" id="sid-B39EF6E5-1092-4217-8DEF-9E0E345DF1C2" name="" parallelMultiple="false">
-         <errorEventDefinition errorRef="sid-ec086bf3-1673-499e-84df-38bee42c5361" id="sid-62d2172a-f24f-4749-bbb0-265efb0f957f"/>
+         <errorEventDefinition errorRef="sid-409761d8-372b-4bca-946f-45c86d634cb8" id="sid-fccd63f0-23e3-45a8-9d00-d8609163f72a"/>
       </boundaryEvent>
       <boundaryEvent attachedToRef="Technische_Stammdaten_anlegen_77" cancelActivity="true" id="sid-E9D4B6B6-11FC-4739-85EC-C50F7E46452A" name="" parallelMultiple="false">
          <outgoing>sid-0B758BD1-91CC-484D-81E6-87F04264A2A9</outgoing>
-         <errorEventDefinition errorRef="sid-ec086bf3-1673-499e-84df-38bee42c5361" id="sid-a7f4c88e-7b68-4a09-bc31-1e6bbf30e193"/>
+         <errorEventDefinition errorRef="sid-409761d8-372b-4bca-946f-45c86d634cb8" id="sid-1b7bf0da-ccc1-45df-83f9-411adf1e9d75"/>
       </boundaryEvent>
       <startEvent id="sid-E1D26D5A-651B-48C2-B7D0-DE1F07E22610" name="Blanko Start">
          <outgoing>sid-354B1DA1-3E86-4E84-8E3E-989A97C3204C</outgoing>
@@ -549,11 +549,11 @@ Weiterleitungen
       <sequenceFlow id="SequenceFlow_1" isImmediate="true" name="" sourceRef="Akquisedaten_erfasst_90" targetRef="SAP_Kontakt_schreiben_109"/>
       <sequenceFlow id="SequenceFlow_3" isImmediate="true" name="" sourceRef="UserTask_2" targetRef="Technische_Stammdaten_anlegen_77"/>
       <sequenceFlow id="SequenceFlow_4" isImmediate="true" name="" sourceRef="BoundaryEvent_1" targetRef="EndEvent_1"/>
-      <dataStoreReference dataStoreRef="sid-9167ac16-5cde-4ea9-9378-47ac900d48c2" id="sid-27BC024B-3DAD-4A71-BAE4-00D66B9628C1" name="Speicherort X"/>
+      <dataStoreReference dataStoreRef="sid-ec9d9041-6bd3-4bc5-852e-758bf7521358" id="sid-27BC024B-3DAD-4A71-BAE4-00D66B9628C1" name="Speicherort X"/>
       <association associationDirection="None" id="sid-CF081184-611E-4826-8411-C2FEA011597D" sourceRef="SAP_Kontakt_schreiben_109" targetRef="sid-27BC024B-3DAD-4A71-BAE4-00D66B9628C1"/>
    </process>
-   <bpmndi:BPMNDiagram id="sid-e4d64ded-d328-49c6-9582-608e19993ab4">
-      <bpmndi:BPMNPlane bpmnElement="sid-873ac4fa-b06a-4a7d-8e39-8c5f934d1892" id="sid-f7679ba6-a221-4586-a112-cc8712054feb">
+   <bpmndi:BPMNDiagram id="sid-5d48e53e-8390-487b-891d-866c7d8f7090">
+      <bpmndi:BPMNPlane bpmnElement="sid-2a69efbd-55a1-4754-b003-bcb19ecc05c6" id="sid-d962e326-be20-44ad-a5af-e3eb1ae11b6e">
          <bpmndi:BPMNShape bpmnElement="Prozess_Engine_Akquise_Prozess_15" id="Prozess_Engine_Akquise_Prozess_15_gui" isHorizontal="true">
             <omgdc:Bounds height="260.0" width="1405.0" x="766.8185630326076" y="757.7866165430252"/>
          </bpmndi:BPMNShape>
