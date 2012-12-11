@@ -470,6 +470,37 @@ angular
     }
   };
 })
+.directive('reqAware', function(RequestStatus) {
+  return {
+    link: function(scope, element, attrs) {
+    	
+      scope.$watch(RequestStatus.watchCurrent, function(newValue) {
+        scope.isBusy = newValue;
+        if(scope.isBusy) { 
+        	$(element).attr("disabled", "disabled");
+        	$(element).addClass("disabled");
+        } else {
+        	$(element).removeAttr("disabled");
+        	$(element).removeClass("disabled");
+        	var children = $(element).children();
+        	angular.forEach(children, function(e, i) {
+        		if($(e).hasClass("icon-loading")) {
+        		  $(e).remove();
+        		}
+        	});
+        }
+      });   
+      
+      $(element)
+      .bind({    
+        click: function() {
+        	$(element).append("<i class=\"icon-loading\" style=\"margin-left:5px\"></i>");
+        }
+      });
+        
+    }
+  };
+})
 /**
  * A directive which conditionally displays a dialog 
  * and allows it to control it via a explicitly specified model.

@@ -109,12 +109,24 @@
                               <input id="userName" name="userName" type="text" class="span8" required data-ng-model="editConnectorConfiguration.user"/>
                             </div> 
                           </div>
-                          <div class="control-group">
-                            <label class="control-label" for="password" 
-                                   th:text="#{'Password*'}">Password*</label>
-                            <div class="controls" style="margin-bottom: 10px;" >
-                              <input id="password" name="password" type="password" class="span8" required data-ng-model="editConnectorConfiguration.password"/>
-                            </div> 
+                          <div ng-switch on="passwordRequired">
+                            <div class="control-group" data-ng-switch-when="true">
+                              <label class="control-label" for="password" 
+                                     th:text="#{'Password*'}">Password*</label>
+                              <div class="controls" style="margin-bottom: 10px;" >
+                                <input id="password" name="password" type="password" class="span8" required data-ng-model="editConnectorConfiguration.password"/>
+                              </div> 
+                            </div>
+                            <div class="control-group" ng-switch-when="false">
+                              <label class="control-label" for="password" 
+                                     data-help  
+                                     data-help-text-var="editPasswordText"
+                                     data-help-title-var="editPasswordTitle"                                
+                                     th:text="#{'Password'}">Password</label>
+                              <div class="controls" style="margin-bottom: 10px;" >
+                                <input id="password" name="password" type="password" class="span8" data-ng-model="editConnectorConfiguration.password"/>
+                              </div> 
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -132,8 +144,8 @@
                 </div>
                 <div class="modal-footer">
                   <button class="btn" data-ng-click="editConnectorConfigurationDialog.close()" th:text="#{Cancel}">Cancel</button>
-                  <button class="btn" data-ng-click="test()" data-ng-disabled="!isValid()" th:text="#{Test}">Test</button>
-                  <button class="btn btn-primary" data-ng-click="save()" data-ng-disabled="!isValid()" th:text="#{Save}">Save</button>
+                  <button class="btn" data-ng-click="test()" data-ng-disabled="!isValid()" data-req-aware>Test</button>
+                  <button class="btn btn-primary" data-ng-click="save()" data-ng-disabled="!isValid()" th:text="#{Save}" data-req-aware>Save</button>
                 </div>
               </div>
             </modal-dialog>

@@ -109,21 +109,14 @@ angular
       }
     };
   })
-  .factory('cycleHttpInterceptor', function($q, Error) {
+  .factory('cycleHttpInterceptor', function($q, Error, RequestStatus) {
     return function(promise) {
-      
-      var blockTime = setTimeout(function() {
-        $.blockUI({ message: '<h1>...</h1>'});
-      }, 1300);
-      
+      RequestStatus.setBusy(true);  	
       return promise.then(function (response, arg1, arg2)  {
-        clearTimeout(blockTime);
-        $.unblockUI();
+    	RequestStatus.setBusy(false);
         return promise;
       }, function (response) {
-        clearTimeout(blockTime);
-        $.unblockUI();
-        console.log("error", response);
+    	RequestStatus.setBusy(false);
         if (parseInt(response.status) == 500) {
           Error.addError({ "status" : response.status , "config" :  response.config });
         }
@@ -183,4 +176,31 @@ angular
     };
 
     return new Credentials();
+  })
+  /**
+   * RequestStatus isBusy=true -> cycle is processing an AJAX request
+   */
+  .factory('RequestStatus', function() {
+
+    function RequestStatus() {
+      
+      var self = this;
+      
+      // bind watchCurrent to credentials to make it directly accessible
+      // for scope.$watch(RequestQueue.watchCurrent)
+      self.watchCurrent = function() {
+        return self.busy;
+      };
+    }
+
+    RequestStatus.prototype = {
+      isBusy: function() {
+        return busy;
+      },
+      setBusy: function(busy) {
+    	this.busy = busy; 
+      }
+    };
+
+    return new RequestStatus();
   });
