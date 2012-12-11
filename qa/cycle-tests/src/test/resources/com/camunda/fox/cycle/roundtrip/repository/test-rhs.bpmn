@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:signavio="http://www.signavio.com" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd" id="sid-48555263-d164-40df-b173-a2c8bfd64d77" exporter="Signavio Process Editor, http://www.signavio.com" exporterVersion="5.0.2" targetNamespace="http://www.signavio.com/bpmn20">
+  <collaboration id="sid-a3910c32-d1de-40c6-8814-b4dbc0cc2328">
+    <participant id="Process_Engine" name="Process Engine" processRef="sid-6536fc32-7a01-41df-95d4-6979a8fd20ad"/>
+    <participant id="Mensch" name="Mensch" processRef="sid-062b5a42-bdea-463c-907e-cd675f7dfa04"/>
+    <messageFlow id="MessageFlow" name="" sourceRef="test" targetRef="StartMessageEvent"/>
+    <messageFlow id="MessageFlow_2" name="" sourceRef="test_2" targetRef="IntermediateMessageEventCatching"/>
+  </collaboration>
+  <process id="sid-6536fc32-7a01-41df-95d4-6979a8fd20ad" name="Process Engine" isClosed="true">
+    <laneSet id="sid-b7d76b1f-f4c7-4811-89e2-3071db554bcc">
+      <lane id="Lane_2">
+        <flowNodeRef>StartMessageEvent</flowNodeRef>
+        <flowNodeRef>test_2</flowNodeRef>
+        <flowNodeRef>EndNoneEvent_2</flowNodeRef>
+      </lane>
+    </laneSet>
+    <startEvent id="StartMessageEvent" name="">
+      <outgoing>SequenceFlow_3</outgoing>
+    </startEvent>
+    <serviceTask id="test_2" activiti:class="java.lang.Object" name="test">
+      <incoming>SequenceFlow_3</incoming>
+      <outgoing>SequenceFlow_5</outgoing>
+    </serviceTask>
+    <endEvent id="EndNoneEvent_2" name="">
+      <incoming>SequenceFlow_5</incoming>
+    </endEvent>
+    <sequenceFlow id="SequenceFlow_5" name="" isImmediate="true" sourceRef="test_2" targetRef="EndNoneEvent_2"/>
+    <sequenceFlow id="SequenceFlow_3" name="" isImmediate="true" sourceRef="StartMessageEvent" targetRef="test_2"/>
+  </process>
+  <process id="sid-062b5a42-bdea-463c-907e-cd675f7dfa04" name="Mensch" isClosed="true">
+    <laneSet id="sid-65a5cd3e-b57d-4d3b-952a-88dead6f569f">
+      <lane id="Lane">
+        <flowNodeRef>StartNoneEvent</flowNodeRef>
+        <flowNodeRef>test</flowNodeRef>
+        <flowNodeRef>EndNoneEvent</flowNodeRef>
+        <flowNodeRef>IntermediateMessageEventCatching</flowNodeRef>
+      </lane>
+    </laneSet>
+    <startEvent id="StartNoneEvent" name="">
+      <outgoing>SequenceFlow_4</outgoing>
+    </startEvent>
+    <task id="test" name="test">
+      <incoming>SequenceFlow_4</incoming>
+      <outgoing>SequenceFlow</outgoing>
+    </task>
+    <endEvent id="EndNoneEvent" name="">
+      <incoming>SequenceFlow_2</incoming>
+    </endEvent>
+    <intermediateCatchEvent id="IntermediateMessageEventCatching" name="">
+      <incoming>SequenceFlow</incoming>
+      <outgoing>SequenceFlow_2</outgoing>
+      <messageEventDefinition id="sid-890bb0da-510a-48c0-9643-768ac619e7f3"/>
+    </intermediateCatchEvent>
+    <sequenceFlow id="SequenceFlow" name="" isImmediate="true" sourceRef="test" targetRef="IntermediateMessageEventCatching"/>
+    <sequenceFlow id="SequenceFlow_4" name="" isImmediate="true" sourceRef="StartNoneEvent" targetRef="test"/>
+    <sequenceFlow id="SequenceFlow_2" name="" isImmediate="true" sourceRef="IntermediateMessageEventCatching" targetRef="EndNoneEvent"/>
+  </process>
+  <bpmndi:BPMNDiagram id="sid-29544484-21ce-45d9-8363-162befa650f2">
+    <bpmndi:BPMNPlane id="sid-3079d3b5-c33d-4081-86e4-adee45a6a54f" bpmnElement="sid-062b5a42-bdea-463c-907e-cd675f7dfa04">
+      <bpmndi:BPMNShape id="Process_Engine_gui" bpmnElement="Process_Engine" isHorizontal="true">
+        <omgdc:Bounds height="250.0" width="600.0" x="75.0" y="345.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Mensch_gui" bpmnElement="Mensch" isHorizontal="true">
+        <omgdc:Bounds height="250.0" width="600.0" x="75.0" y="45.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_2_gui" bpmnElement="Lane_2" isHorizontal="true">
+        <omgdc:Bounds height="250.0" width="570.0" x="105.0" y="345.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="StartMessageEvent_gui" bpmnElement="StartMessageEvent">
+        <omgdc:Bounds height="28.0" width="28.0" x="151.0" y="456.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="test_2_gui" bpmnElement="test_2">
+        <omgdc:Bounds height="80.0" width="100.0" x="225.0" y="430.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndNoneEvent_2_gui" bpmnElement="EndNoneEvent_2">
+        <omgdc:Bounds height="28.0" width="28.0" x="370.0" y="456.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Lane_gui" bpmnElement="Lane" isHorizontal="true">
+        <omgdc:Bounds height="250.0" width="570.0" x="105.0" y="45.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="StartNoneEvent_gui" bpmnElement="StartNoneEvent">
+        <omgdc:Bounds height="28.0" width="28.0" x="151.0" y="156.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="test_gui" bpmnElement="test">
+        <omgdc:Bounds height="80.0" width="100.0" x="225.0" y="130.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="EndNoneEvent_gui" bpmnElement="EndNoneEvent">
+        <omgdc:Bounds height="28.0" width="28.0" x="435.0" y="156.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="IntermediateMessageEventCatching_gui" bpmnElement="IntermediateMessageEventCatching">
+        <omgdc:Bounds height="28.0" width="28.0" x="376.0" y="156.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="MessageFlow_gui" bpmnElement="MessageFlow" sourceElement="test_gui" targetElement="StartMessageEvent_gui">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="275.0" y="210.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="275.0" y="332.5"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="165.0" y="332.5"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="165.0" y="456.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="MessageFlow_2_gui" bpmnElement="MessageFlow_2" sourceElement="test_2_gui" targetElement="IntermediateMessageEventCatching_gui">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="275.0" y="430.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="275.0" y="385.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="350.0" y="385.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="350.0" y="312.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="390.0" y="312.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="390.0" y="184.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_gui" bpmnElement="SequenceFlow" sourceElement="test_gui" targetElement="IntermediateMessageEventCatching_gui">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="325.0" y="170.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="376.0" y="170.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_4_gui" bpmnElement="SequenceFlow_4" sourceElement="StartNoneEvent_gui" targetElement="test_gui">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="179.0" y="170.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="225.0" y="170.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_5_gui" bpmnElement="SequenceFlow_5" sourceElement="test_2_gui" targetElement="EndNoneEvent_2_gui">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="325.0" y="470.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="370.0" y="470.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_2_gui" bpmnElement="SequenceFlow_2" sourceElement="IntermediateMessageEventCatching_gui" targetElement="EndNoneEvent_gui">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="404.0" y="170.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="435.0" y="170.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="SequenceFlow_3_gui" bpmnElement="SequenceFlow_3" sourceElement="StartMessageEvent_gui" targetElement="test_2_gui">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="179.0" y="470.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="225.0" y="470.0"/>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

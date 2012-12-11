@@ -1,0 +1,545 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <artifactId>cycle-tests</artifactId>
+  <name>fox platform EE - Cycle tests</name>
+
+  <parent>
+    <groupId>com.camunda.fox.platform</groupId>
+    <artifactId>fox-platform-qa</artifactId>
+    <version>6.2.0-SNAPSHOT</version>
+  </parent>
+  
+  <dependencies>
+    <dependency>
+      <groupId>org.jboss.spec</groupId>
+      <artifactId>jboss-javaee-6.0</artifactId>
+      <type>pom</type>
+      <scope>provided</scope>
+      <version>3.0.0.Beta1</version>
+      <exclusions>
+        <exclusion>
+          <artifactId>xalan</artifactId>
+          <groupId>org.apache.xalan</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.jboss.arquillian.junit</groupId>
+      <artifactId>arquillian-junit-container</artifactId>
+      <version>${version.arquillian}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+        <groupId>com.sun.jersey.contribs</groupId>
+        <artifactId>jersey-apache-client4</artifactId>
+        <version>1.15</version>
+        <scope>test</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>com.sun.jersey</groupId>
+      <artifactId>jersey-json</artifactId>
+      <version>1.15</version>
+      <scope>test</scope>
+    </dependency>
+    
+    <dependency>
+        <groupId>commons-io</groupId>
+        <artifactId>commons-io</artifactId>
+        <scope>test</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>com.camunda.fox.cycle</groupId>
+      <artifactId>cycle</artifactId>
+      <version>${project.version}</version>
+      <scope>test</scope>
+      <classifier>core</classifier>
+    </dependency>
+
+  </dependencies>
+  
+  
+  <profiles>
+  	<profile>
+  		<id>jboss</id>
+     	<activation>
+	      <activeByDefault>true</activeByDefault>
+	    </activation>
+	    <properties>
+    		<jboss.assembly.location>../../jbossas71/assembly/target/camunda-fox-ce-${project.version}/camunda-fox-ce-${project.version}/server</jboss.assembly.location>
+  		</properties>  		
+		<dependencies>
+		  <dependency>
+		    <!-- make sure it comes after assembly in the build -->
+		     <groupId>com.camunda.fox.platform</groupId>
+		     <artifactId>fox-platform-jboss-assembly</artifactId>
+		     <version>${project.version}</version>
+		     <type>pom</type>
+		   </dependency>
+   		   <dependency>
+			 <groupId>org.jboss.as</groupId>
+			 <artifactId>jboss-as-arquillian-container-managed</artifactId>
+			 <version>${version.jboss.as}</version>
+			 <scope>test</scope>
+		   </dependency>
+    	   <dependency>
+			 <groupId>org.jboss.arquillian.protocol</groupId>
+			 <artifactId>arquillian-protocol-servlet</artifactId>
+			 <scope>test</scope>
+             <version>${version.arquillian}</version>
+		    </dependency>    		     		   
+		   <dependency>
+		     <groupId>com.camunda.fox.cycle</groupId>
+		     <artifactId>cycle-jboss</artifactId>
+		     <version>${project.version}</version>
+		     <type>war</type>
+		     <scope>test</scope>
+		   </dependency>
+		 </dependencies>
+		
+		 <build>
+		   <resources>
+		     <resource>
+		       <directory>src/main/standalone</directory>
+		       <filtering>true</filtering>
+		     </resource>
+		   </resources>
+           <testResources>
+             <testResource>
+               <directory>src/test/resources-jboss</directory>
+               <filtering>true</filtering>
+             </testResource>
+           </testResources>
+		   <plugins>
+		     <plugin>
+		       <groupId>org.apache.maven.plugins</groupId>
+		       <artifactId>maven-antrun-plugin</artifactId>
+		       <executions>
+		         <execution>
+		           <id>copy-distro</id>
+		           <phase>test-compile</phase>
+		           <goals>
+		             <goal>run</goal>
+		           </goals>
+		           <configuration>
+		             <target unless="maven.test.skip">
+		               <copy todir="target">
+		                 <fileset dir="${jboss.assembly.location}" />
+		               </copy>
+		               
+		              <!-- processing of src/main/standalone replaced by resource filtering (see below) -->
+		              <copy todir="target/jboss-as-${version.jboss.as}/standalone/configuration/blueprint" overwrite="true">
+		                <fileset dir="src/main/standalone/configuration" />
+		              </copy>
+		              <echo>After copy jboss</echo>
+		              <!-- remove activiti test classes from engine, made it maven 2 and 3 compatible -->
+		              <unzip dest="target/fox-engine">
+		                <fileset dir="target/jboss-as-${version.jboss.as}/modules/com/camunda/fox/engine/fox-engine/main/">
+		                  <include name="*.jar" />
+		                </fileset>
+		                <patternset>
+		                  <exclude name="org/activiti/engine/impl/test/**" />
+		                </patternset>
+		              </unzip>
+				
+		              <delete>
+		                <fileset dir="target/jboss-as-${version.jboss.as}/modules/com/camunda/fox/engine/fox-engine/main/">
+		                  <include name="*.jar" />
+		                </fileset>
+		              </delete>
+		              
+		              <zip destfile="target/jboss-as-${version.jboss.as}/modules/com/camunda/fox/engine/fox-engine/main/fox-engine-${project.version}.jar" basedir="target/fox-engine" />
+		            </target>
+		          </configuration>
+		        </execution>
+		        <execution>
+		          <id>copy-test-dependencies</id>
+		          <phase>test-compile</phase>
+		          <goals>
+		            <goal>run</goal>
+		          </goals>
+		          <configuration>
+		            <target unless="maven.test.skip">
+		              <dependencyfilesets scopes="test" types="war"/>
+                      
+		              <copy todir="target/jboss-as-${version.jboss.as}/standalone/deployments">
+		                <fileset refid="maven.project.dependencies" />
+                        <regexpmapper from="^(.*)/([^/]+)/([^/]*)$$" to="\3" handledirsep="yes" />
+		              </copy>
+		                                                         
+		            </target>
+		          </configuration>
+		        </execution>
+		      </executions>
+		    </plugin>
+		    <!-- copy filtered configuration resources -->
+		    <plugin>
+		      <groupId>org.apache.maven.plugins</groupId>
+		      <artifactId>maven-resources-plugin</artifactId>
+		      <configuration>
+		        <delimiters>
+		          <delimiter>${*}</delimiter>          
+		        </delimiters>
+		        <useDefaultDelimiters>false</useDefaultDelimiters>
+		      </configuration>
+		      <executions>
+		        <execution>
+		          <id>copy-resources</id>
+		          <phase>test-compile</phase>
+		          <goals>
+		            <goal>resources</goal>
+		          </goals>
+		          <configuration>
+		            <override>true</override>
+		            <outputDirectory>target/jboss-as-${version.jboss.as}/standalone</outputDirectory>
+		          </configuration>
+		        </execution>
+		      </executions>
+		    </plugin>
+		  </plugins>
+		</build>
+  		
+  	</profile>
+  	<profile>
+  		<id>glassfish</id>
+		<properties>
+		  <glassfish.server.location>../../gf31/assembly/target/camunda-fox-ce-${project.version}/camunda-fox-ce-${project.version}/server</glassfish.server.location>
+		</properties>
+  		
+  	    <dependencies>	
+		  <dependency>
+		    <!-- make sure it comes after assembly in the build -->
+			<groupId>com.camunda.fox.platform</groupId>
+		    <artifactId>fox-platform-glassfish-assembly</artifactId>
+		   	<version>${project.version}</version>
+		    <type>pom</type>
+		  </dependency>
+ 		  <dependency>
+		    <groupId>com.camunda.fox.cycle</groupId>
+		    <artifactId>cycle-glassfish</artifactId>
+		    <version>${project.version}</version>
+		    <type>war</type>
+		    <scope>test</scope>
+		  </dependency>
+		  
+		</dependencies>
+		
+		<build>
+		  <plugins>
+		    <plugin>
+		      <groupId>org.apache.maven.plugins</groupId>
+		      <artifactId>maven-antrun-plugin</artifactId>
+		      <executions>
+		        <execution>
+		          <id>copy-distro</id>
+		          <phase>test-compile</phase>
+		          <goals>
+		            <goal>run</goal>
+		          </goals>
+		          <configuration>
+		            <target unless="maven.test.skip">
+		              <copy todir="target">
+		                <fileset dir="${glassfish.server.location}" />
+		              </copy>
+		            </target>
+		          </configuration>
+		        </execution>
+		        <execution>
+		          <id>copy-test-dependencies</id>
+		          <phase>test-compile</phase>
+		          <goals>
+		            <goal>run</goal>
+		          </goals>
+		          <configuration>
+		            <target unless="maven.test.skip">
+		              <dependencyfilesets scopes="test" />
+		              
+		              <copy todir="target/glassfish3/glassfish/domains/domain1/autodeploy">
+		                <fileset refid="maven.project.dependencies" />
+		                <regexpmapper from="^(.*)/([^/]+)/([^/]*)$$" to="\3" handledirsep="yes" />
+		              </copy>
+		                                                         
+		            </target>
+		          </configuration>
+		        </execution>
+		      </executions>
+		    </plugin>
+		    <plugin>
+		      <artifactId>maven-resources-plugin</artifactId>
+		      <executions>
+		        <execution>
+		          <id>copy-resources</id>
+		          <phase>test-compile</phase>
+		          <goals>
+		            <goal>copy-resources</goal>
+		          </goals>
+		          <configuration>
+		            <outputDirectory>${project.build.directory}/glassfish3/glassfish/domains</outputDirectory>
+		            <resources>          
+		              <resource>
+		                <directory>src/main/domains</directory>
+		                <filtering>true</filtering>
+		              </resource>
+		            </resources>              
+		          </configuration>            
+		        </execution>
+		      </executions>
+		    </plugin>
+		  </plugins>
+		</build>  		
+  	</profile>
+  	<profile>
+  		<id>was</id>
+		<dependencies>
+		  <dependency>
+		    <groupId>com.camunda.fox.engine</groupId>
+		    <artifactId>fox-engine</artifactId>
+		  </dependency>
+		  <dependency>
+		    <groupId>com.camunda.fox.platform</groupId>
+		    <artifactId>fox-platform-api</artifactId>
+		  </dependency>
+		  <dependency>
+		    <groupId>com.camunda.fox.platform</groupId>
+		    <artifactId>fox-platform-jobexecutor-api</artifactId>
+		    <version>${project.version}</version>
+		  </dependency>
+		  <dependency>
+		    <groupId>org.mybatis</groupId>
+		    <artifactId>mybatis</artifactId>
+		  </dependency>
+		  <dependency>
+		    <groupId>com.fasterxml.uuid</groupId>
+		    <artifactId>java-uuid-generator</artifactId>
+		  </dependency>
+		
+		  <dependency>
+		    <groupId>com.camunda.fox.platform</groupId>
+		    <artifactId>fox-platform-ibm-websphere-ear</artifactId>
+		    <version>${project.version}</version>
+		    <type>ear</type>
+		  </dependency>
+		  <dependency>
+		    <groupId>com.camunda.fox.platform</groupId>
+		    <artifactId>fox-platform-jobexecutor-rar</artifactId>
+		    <version>${project.version}</version>
+		    <type>rar</type>
+		  </dependency>
+		  
+ 		  <dependency>
+		    <groupId>com.camunda.fox.cycle</groupId>
+		    <artifactId>cycle-was</artifactId>
+		    <version>${project.version}</version>
+		    <type>war</type>
+		    <scope>test</scope>
+		  </dependency>
+		</dependencies>
+		
+		<build>
+		  <plugins>
+		
+		    <plugin>
+		      <groupId>org.apache.maven.plugins</groupId>
+		      <artifactId>maven-dependency-plugin</artifactId>
+		      <executions>
+		        <execution>
+		          <id>unpack</id>
+		          <phase>test-compile</phase>
+		          <goals>
+		            <goal>unpack</goal>
+		          </goals>
+		          <configuration>
+		            <artifactItems>
+		              <artifactItem>
+		                <groupId>com.camunda.fox.platform</groupId>
+		                <artifactId>fox-platform-ibm-websphere-ear</artifactId>
+		                <version>${project.version}</version>
+		                <type>ear</type>
+		                <overWrite>false</overWrite>
+		                <outputDirectory>${project.build.directory}/camunda-fox-platform.ear</outputDirectory>
+		                <destFileName>camunda-fox-platform.ear</destFileName>
+		              </artifactItem>
+		              <artifactItem>
+		                <groupId>com.camunda.fox.platform</groupId>
+		                <artifactId>fox-platform-jobexecutor-rar</artifactId>
+		                <version>${project.version}</version>
+		                <type>rar</type>
+		                <overWrite>false</overWrite>
+		                <outputDirectory>${project.build.directory}/fox-platform-jobexecutor-rar.rar</outputDirectory>
+		                <destFileName>fox-platform-jobexecutor-rar.rar</destFileName>
+		              </artifactItem>
+		            </artifactItems>
+		          </configuration>
+		        </execution>
+		        <execution>
+		          <id>copy</id>
+		          <phase>test-compile</phase>
+		          <goals>
+		            <goal>copy-dependencies</goal>
+		          </goals>
+		          <configuration>
+		            <artifactItems>
+		              <artifactItem>
+		                <groupId>com.camunda.fox.engine</groupId>
+		                <artifactId>fox-engine</artifactId>
+		              </artifactItem>
+		              <artifactItem>
+		                <groupId>com.camunda.fox.platform</groupId>
+		                <artifactId>fox-platform-api</artifactId>
+		              </artifactItem>
+		              <artifactItem>
+		                <groupId>com.camunda.fox.platform</groupId>
+		                <artifactId>fox-platform-jobexecutor-api</artifactId>
+		              </artifactItem>
+		              <artifactItem>
+		                <groupId>org.mybatis</groupId>
+		                <artifactId>mybatis</artifactId>
+		              </artifactItem>
+		              <artifactItem>
+		                <groupId>com.fasterxml.uuid</groupId>
+		                <artifactId>java-uuid-generator</artifactId>
+		              </artifactItem>
+		            </artifactItems>
+		            <excludeTypes>ear,rar</excludeTypes>
+		            <excludeTransitive>true</excludeTransitive>
+		            <outputDirectory>target/libs</outputDirectory>
+		          </configuration>
+		        </execution>
+		      </executions>
+		    </plugin>
+		
+		    <plugin>
+		      <groupId>org.apache.maven.plugins</groupId>
+		      <artifactId>maven-antrun-plugin</artifactId>
+		      <executions>
+		        <execution>
+		          <id>compile</id>
+		          <phase>test-compile</phase>
+		          <configuration>
+		            <target>
+
+			          <!-- stop the server-->
+			          <exec executable="${was_profile}/bin/stopServer.bat"
+			            osfamily="windows" failonerror="false"
+			            failifexecutionfails="false">
+			            <arg value="server1" />
+			          </exec>
+
+			          <exec executable="${was_profile}/bin/stopServer.sh"
+			            osfamily="unix" failonerror="false"
+			            failifexecutionfails="false">
+			            <arg value="server1" />
+			          </exec>
+
+			          <!-- replace fox platform deployments -->
+
+			          <delete>
+			            <fileset
+			              dir="${was_profile}/installedApps/${was_scope}/camunda-fox-platform.ear" />
+			            <fileset
+			              dir="${was_profile}/installedConnectors/fox-platform-jobexecutor-rar.rar" />
+			            <fileset dir="${was_home}/lib/ext" />
+			          </delete>
+
+			          <copy
+			            todir="${was_profile}/installedApps/${was_scope}/camunda-fox-platform.ear"
+			            overwrite="true">
+			            <fileset
+			              dir="${project.build.directory}/camunda-fox-platform.ear" />
+			          </copy>
+			
+			          <copy
+			            todir="${was_profile}/installedConnectors/fox-platform-jobexecutor-rar.rar"
+			            overwrite="true">
+			            <fileset
+			              dir="${project.build.directory}/fox-platform-jobexecutor-rar.rar" />
+			          </copy>
+			           
+			          <copy
+			            todir="${was_home}/lib/ext">
+			            <fileset
+			              dir="target/libs" />
+			          </copy>
+			          
+  		              <copy todir="t${was_profile}/installedApps/${was.scope}">
+		                <fileset refid="maven.project.dependencies" />
+		                <regexpmapper from="^(.*)/([^/]+)/([^/]*)$$" to="\3" handledirsep="yes" />
+		              </copy>
+		
+		           	  <!-- start the server -->
+		              <exec executable="${was_profile}/bin/startServer.bat"
+		                osfamily="windows">
+		                <arg value="server1" />
+		              </exec>
+		              <exec executable="${was_profile}/bin/startServer.sh"
+		                osfamily="unix">
+		                <arg value="server1" />
+		              </exec>
+		
+		            </target>
+		          </configuration>
+		          <goals>
+		            <goal>run</goal>
+		          </goals>
+		        </execution>
+		      </executions>
+		    </plugin>
+		  </plugins>
+		</build>  		
+  	</profile>
+  </profiles>
+
+  <build>
+      <testResources>
+        <testResource>
+          <directory>src/test/resources</directory>
+        </testResource>
+      </testResources>
+  
+      <pluginManagement>
+          <plugins>
+              <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+              <plugin>
+                  <groupId>org.eclipse.m2e</groupId>
+                  <artifactId>lifecycle-mapping</artifactId>
+                  <version>1.0.0</version>
+                  <configuration>
+                      <lifecycleMappingMetadata>
+                          <pluginExecutions>
+                              <pluginExecution>
+                                  <pluginExecutionFilter>
+                                      <groupId>
+                                          org.apache.maven.plugins
+                                      </groupId>
+                                      <artifactId>
+                                          maven-antrun-plugin
+                                      </artifactId>
+                                      <versionRange>
+                                          [1.7,)
+                                      </versionRange>
+                                      <goals>
+                                          <goal>run</goal>
+                                      </goals>
+                                  </pluginExecutionFilter>
+                                  <action>
+                                      <ignore></ignore>
+                                  </action>
+                              </pluginExecution>
+                          </pluginExecutions>
+                      </lifecycleMappingMetadata>
+                  </configuration>
+              </plugin>
+          </plugins>
+      </pluginManagement>
+  </build>
+</project>

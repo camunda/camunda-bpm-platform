@@ -25,6 +25,7 @@
       <modules>
         <module>websphere-runtime</module>
         <module>integration-tests</module>
+        <module>cycle-tests</module>
       </modules>
     </profile>
     <profile>
@@ -34,6 +35,7 @@
         <module>integration-tests</module>
         <module>tasklist-gui-tests</module>
         <module>test-process-application</module>
+        <module>cycle-tests</module>
         <!-- see HEMERA-2709 - disabled because not supported on gf yet
         <module>test-deployer</module>
         <module>cockpit-tests</module>
@@ -52,6 +54,7 @@
         <module>test-process-application</module>
         <module>test-deployer</module>
         <module>cockpit-tests</module>
+        <module>cycle-tests</module>
       </modules>
     </profile>    
   </profiles>
