@@ -1,6 +1,7 @@
 package com.camunda.fox.cycle.test;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 
 import javax.ws.rs.core.MediaType;
@@ -8,7 +9,9 @@ import javax.ws.rs.core.Response.Status;
 
 import junit.framework.Assert;
 
+import org.apache.commons.io.FileUtils;
 import org.jboss.arquillian.junit.Arquillian;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -42,20 +45,27 @@ public class TestCycleRoundtrip {
   private static final String TMP_DIR_NAME = "cycle-integration-test";
   private static final String LHS_PROCESS_DIAGRAM = "/com/camunda/fox/cycle/roundtrip/repository/test-lhs.bpmn";
   private static final String RHS_PROCESS_DIAGRAM = "/com/camunda/fox/cycle/roundtrip/repository/test-rhs.bpmn";
+  
+  private static String httpPort = "19099";
 
   private static int count = 0;
   private static Client client;
   
   private static VfsConnector vfsConnector;
-  private static RoundtripDTO roundtripDTO; 
+  private static RoundtripDTO roundtripDTO;
   
   @BeforeClass
   public static void testCycleDeployment() throws Exception {
+    String property = System.getProperty("HTTP_LISTENER_PORT");
+    if (property != null && !property.isEmpty()) {
+      httpPort = property;
+    }
+    
     ClientConfig clientConfig = new DefaultApacheHttpClient4Config();
     clientConfig.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
     client = ApacheHttpClient4.create(clientConfig); 
 
-    WebResource webResource = client.resource("http://localhost:19099/cycle/");
+    WebResource webResource = client.resource("http://localhost:"+httpPort+"/cycle/");
     ClientResponse clientResponse = webResource.get(ClientResponse.class);
     int status = clientResponse.getStatus();
     clientResponse.close();
@@ -77,11 +87,11 @@ public class TestCycleRoundtrip {
   
   @Test
   public void testLeftToRightSynchronisation() throws Exception {
-    WebResource webResource = client.resource("http://localhost:19099/cycle/app/secured/resource/roundtrip/"+roundtripDTO.getId()+"/sync?syncMode=LEFT_TO_RIGHT");
+    WebResource webResource = client.resource("http://localhost:"+httpPort+"/cycle/app/secured/resource/roundtrip/"+roundtripDTO.getId()+"/sync?syncMode=LEFT_TO_RIGHT");
       
     ClientResponse clientResponse = webResource.accept(MediaType.APPLICATION_JSON).type(MediaType.APPLICATION_JSON).post(ClientResponse.class);
     SynchronizationStatus synchronizationStatus = clientResponse.getEntity(SynchronizationResultDTO.class).getStatus();
-    Assert.assertEquals("SYNC_SUCCESS", synchronizationStatus.SYNC_SUCCESS.toString());
+    Assert.assertEquals(SynchronizationStatus.SYNC_SUCCESS, synchronizationStatus.SYNC_SUCCESS);
     int status = clientResponse.getStatus();
     clientResponse.close();
     Assert.assertEquals(Status.OK.getStatusCode(), status);
@@ -89,11 +99,11 @@ public class TestCycleRoundtrip {
   
   @Test
   public void testRightToLeftSynchronisation() throws Exception {
-    WebResource webResource = client.resource("http://localhost:19099/cycle/app/secured/resource/roundtrip/"+roundtripDTO.getId()+"/sync?syncMode=RIGHT_TO_LEFT");
+    WebResource webResource = client.resource("http://localhost:"+httpPort+"/cycle/app/secured/resource/roundtrip/"+roundtripDTO.getId()+"/sync?syncMode=RIGHT_TO_LEFT");
       
     ClientResponse clientResponse = webResource.accept(MediaType.APPLICATION_JSON).type(MediaType.APPLICATION_JSON).post(ClientResponse.class);
     SynchronizationStatus synchronizationStatus = clientResponse.getEntity(SynchronizationResultDTO.class).getStatus();
-    Assert.assertEquals("SYNC_SUCCESS", synchronizationStatus.SYNC_SUCCESS.toString());
+    Assert.assertEquals(SynchronizationStatus.SYNC_SUCCESS, synchronizationStatus.SYNC_SUCCESS);
     int status = clientResponse.getStatus();
     clientResponse.close();
     Assert.assertEquals(Status.OK.getStatusCode(), status);
@@ -101,7 +111,7 @@ public class TestCycleRoundtrip {
   
   private static void testCreateInitialUserAndLogin() {
     // create initial user
-    WebResource webResource = client.resource("http://localhost:19099/cycle/app/first-time-setup");
+    WebResource webResource = client.resource("http://localhost:"+httpPort+"/cycle/app/first-time-setup");
     
     UserDTO userDTO = new UserDTO();
     userDTO.setName("test");
@@ -127,7 +137,7 @@ public class TestCycleRoundtrip {
   }
   
   private static void testCreateVfsConnector() {
-    WebResource webResource = client.resource("http://localhost:19099/cycle/app/secured/resource/connector/configuration");
+    WebResource webResource = client.resource("http://localhost:"+httpPort+"/cycle/app/secured/resource/connector/configuration");
     
     ConnectorConfiguration connectorConfiguration = new ConnectorConfiguration();
     connectorConfiguration.setConnectorName("FileSystemConnector");
@@ -146,7 +156,7 @@ public class TestCycleRoundtrip {
   }
   
   private static void testCreateRoundtripWithDetails() throws Exception {
-    WebResource webResource = client.resource("http://localhost:19099/cycle/app/secured/resource/roundtrip");
+    WebResource webResource = client.resource("http://localhost:"+httpPort+"/cycle/app/secured/resource/roundtrip");
 
     // create roundtrip
     roundtripDTO = new RoundtripDTO();
@@ -160,7 +170,7 @@ public class TestCycleRoundtrip {
     Assert.assertEquals(Status.OK.getStatusCode(), status);
 
     // update roundtrip details LHS
-    webResource = client.resource("http://localhost:19099/cycle/app/secured/resource/roundtrip/"+roundtripDTO.getId()+"/details");
+    webResource = client.resource("http://localhost:"+httpPort+"/cycle/app/secured/resource/roundtrip/"+roundtripDTO.getId()+"/details");
     
     BpmnDiagramDTO leftHandSide = new BpmnDiagramDTO();
     leftHandSide.setModeler("lhs-modeler");
@@ -197,6 +207,25 @@ public class TestCycleRoundtrip {
     String label = processDiagramPath.substring(processDiagramPath.lastIndexOf("/") + 1, processDiagramPath.length());
     ConnectorNode connectorNode = vfsConnector.createNode(connectorNodeParentFolder.getId(), label, ConnectorNodeType.BPMN_FILE);
     vfsConnector.updateContent(connectorNode, modelInputStream);
+  }
+  
+  private static void cleanVfsTargetDirectory(File directory) throws IOException {
+    if (directory.exists()) {
+      if (directory.isDirectory()) {
+        FileUtils.deleteDirectory(directory);
+      } else {
+        throw new IllegalArgumentException("Not a directory: " + directory);
+      }
+    }
+    if (!directory.mkdirs()) {
+      throw new IllegalArgumentException("Could not clean: " + directory);
+    }
+  }
+  
+  @AfterClass
+  public static void cleanUp() throws IOException {
+    vfsConnector.dispose();
+    cleanVfsTargetDirectory(VFS_DIRECTORY);
   }
   
 }
