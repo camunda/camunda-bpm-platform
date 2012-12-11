@@ -736,7 +736,7 @@
                   <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
                 </manifest>
                 <manifestEntries>
-                  <Dependencies>org.apache.xerces, org.apache.commons.io</Dependencies>
+                  <Dependencies>org.apache.xerces, org.apache.commons.io, org.bouncycastle.bcprov-jdk15on, org.bouncycastle.bcpg-jdk15on</Dependencies>
                 </manifestEntries>
               </archive>
             </configuration>
