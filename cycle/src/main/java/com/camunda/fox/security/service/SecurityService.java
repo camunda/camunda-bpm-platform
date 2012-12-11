@@ -7,7 +7,6 @@ import javax.security.auth.login.LoginException;
 
 import org.springframework.stereotype.Component;
 
-import com.camunda.fox.cycle.configuration.CycleConfiguration;
 import com.camunda.fox.cycle.entity.User;
 import com.camunda.fox.license.FoxLicenseService;
 import com.camunda.fox.license.entity.FoxComponent;
@@ -30,10 +29,7 @@ public class SecurityService {
   
   @Inject
   private UserLookup userLookup;
-  
-  @Inject
-  private CycleConfiguration cycleConfiguration;
-  
+    
   public UserIdentity login(String userName, String password) throws FoxLicenseException, FoxLicenseNotFoundException {
     if (userName == null || password == null) {
       return null;
@@ -49,7 +45,7 @@ public class SecurityService {
   }
 
   protected void checkLicense() throws FoxLicenseException, FoxLicenseNotFoundException {
-    FoxLicenseService foxLicenseService = cycleConfiguration.getFoxLicenseService();
+    FoxLicenseService foxLicenseService = config.getFoxLicenseService();
     foxLicenseService.checkLicenseFor(FoxComponent.FOX_CYCLE);      
   }
 
