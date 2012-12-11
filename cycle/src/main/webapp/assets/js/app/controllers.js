@@ -657,7 +657,9 @@ function EditConnectorController($scope, $http, App, ConnectorConfiguration) {
       FOLDER_ROOT_PATH = "folderRootPath",
       ALLOW_ALL_SSL_HOSTNAMES = "allowAllSSLHostnames",
       TEMPORARY_FILE_STORE = "temporaryFileStore",
-      PROXY_URL = "proxyUrl";
+      PROXY_URL = "proxyUrl",
+      PROXY_USERNAME = "proxyUsername",
+      PROXY_PASSWORD = "proxyPassword";
 
   $scope.selectedConnectorConfiguration = null;
 
@@ -743,6 +745,13 @@ function EditConnectorController($scope, $http, App, ConnectorConfiguration) {
     });
   };
 
+  $scope.isPropertyPassword = function(propertyKey) {
+    if (/.*password.*/i.test(propertyKey)) {
+      return true;
+    }
+    return false;
+  };
+
   $scope.currentHelpText = function(propertyKey) {
    if (propertyKey == BASE_PATH) {
      return "provide path to your file system, e.g. 'C:\\Users\\Tommy\\FoxFileSystem'";
@@ -758,6 +767,10 @@ function EditConnectorController($scope, $http, App, ConnectorConfiguration) {
      return "A directory in the local file system which can be used to store temporary files, e.g. 'c:/temp/svn'";
    } else if (propertyKey == PROXY_URL) {
      return "enter the proxy url if you use one, e.g. 'https://192.168.0.1:3582'";
+   } else if (propertyKey == PROXY_USERNAME) {
+     return "enter proxy username if your proxy requires one, otherwise ignore it.";
+   } else if (propertyKey == PROXY_PASSWORD) {
+     return "enter proxy password if your proxy requires one, otherwise ignore it.";
    }
   };
 }

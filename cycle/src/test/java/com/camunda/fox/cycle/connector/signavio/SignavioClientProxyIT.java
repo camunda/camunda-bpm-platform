@@ -38,7 +38,7 @@ import com.camunda.fox.cycle.util.IoUtil;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations = { "classpath:/spring/test/signavio-connector-xml-config.xml" })
-public class SignavioClientIT {
+public class SignavioClientProxyIT {
 
   private static final String CREATE_FOLDER_NAME = "CreateFolder";
 
@@ -50,7 +50,7 @@ public class SignavioClientIT {
   
   @Before
   public void setUp() throws Exception {
-    configuration = connectorConfiguration.get(0);
+    configuration = connectorConfiguration.get(1);
     signavioClient = 
             new SignavioClient(configuration.getProperties().get(SignavioConnector.CONFIG_KEY_SIGNAVIO_BASE_URL),
                                configuration.getProperties().get(SignavioConnector.CONFIG_KEY_PROXY_URL),

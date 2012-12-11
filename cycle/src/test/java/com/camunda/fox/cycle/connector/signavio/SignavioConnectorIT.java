@@ -122,9 +122,9 @@ public class SignavioConnectorIT {
       String expectedElementCount = XmlUtil.getXPathResult(ACT_ELEMENT_COUNT, new InputSource(IOUtils.toInputStream(expectedXml, "UTF-8")));
       String expectedAttributeCount = XmlUtil.getXPathResult(ACT_ATTRIBUTE_COUNT, new InputSource(IOUtils.toInputStream(expectedXml, "UTF-8")));
 
-      ConnectorNode importedNode = this.getSignavioConnector().importContent(this.getSignavioConnector().getPrivateFolder(), expectedXml);
+      ConnectorNode importedNode = getSignavioConnector().importContent(getSignavioConnector().getPrivateFolder(), expectedXml);
 
-      InputStream actualXmlInputStream = this.getSignavioConnector().getContent(importedNode);
+      InputStream actualXmlInputStream = getSignavioConnector().getContent(importedNode);
       String actualXml = IOUtils.toString(actualXmlInputStream, "UTF-8");
       actualXmlInputStream.close();
       
