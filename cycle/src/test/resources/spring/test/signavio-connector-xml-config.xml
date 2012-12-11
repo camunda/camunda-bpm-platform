@@ -23,11 +23,11 @@
     <property name="name" value="My SignavioConnector" />
     <property name="connectorClass" value="com.camunda.fox.cycle.connector.signavio.SignavioConnector" />
     <property name="loginMode" value="GLOBAL" />
-    <property name="globalUser" value="training@camunda.com" />
-    <property name="globalPassword" value="cam123" />
+    <property name="globalUser" value="${test.signavioConnector.globalUser}" />
+    <property name="globalPassword" value="${test.signavioConnector.globalPassword}" />
     <property name="properties">
       <map>
-        <entry key="signavioBaseUrl" value="https://editor.signavio.com"></entry>
+        <entry key="signavioBaseUrl" value="${test.signavioConnector.baseUrl}"></entry>
       </map>
     </property>
   </bean>
