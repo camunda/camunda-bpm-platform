@@ -95,14 +95,7 @@
         </div>
       </div>
     </div>
-    
-    <!-- error panel -->
-    <div th:fragment="error-panel" class="errorPanel hide">
-      <div data-ng-repeat="error in appErrors()" class="alert alert-error">
-        <span th:text="#{'An error occured, try refreshing the page or relogin :'}"></span><span>{{error}}</span>
-      </div>
-    </div>
-    
+     
     <!-- footer -->
     <footer class="content-container" th:fragment="footer">
       <div class="container-fluid">

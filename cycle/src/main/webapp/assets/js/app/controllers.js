@@ -5,9 +5,13 @@ angular.module('cycle.controllers', []);
 
 window.credentials = null;
 
-function DefaultController($scope, $http, $location, App, Event, Error, Credentials) {
+function DefaultController($scope, $http, $location, App, Event, Error, Credentials, $element) {
   $scope.appErrors = function () {
     return Error.errors;
+  };
+  
+  $scope.removeError = function (error) {
+	Error.removeError(error);
   };
   
   Credentials.reload();
@@ -21,7 +25,7 @@ function DefaultController($scope, $http, $location, App, Event, Error, Credenti
     
   $scope.$on(Event.userChanged, function(event, user) {
     $scope.currentUser = user;
-  });
+  }); 
     
   // needed for form validation
   // DO NOT REMOVE FROM DEFAULT CONTROLLER!

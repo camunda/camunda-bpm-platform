@@ -474,7 +474,7 @@ angular
   return {
     link: function(scope, element, attrs) {
     	
-      scope.$watch(RequestStatus.watchCurrent, function(newValue) {
+      scope.$watch(RequestStatus.watchBusy, function(newValue) {
         scope.isBusy = newValue;
         if(scope.isBusy) { 
         	if($(element).is("form")) {
@@ -509,6 +509,36 @@ angular
     }
   };
 })
+.directive('errorPanel', function(Error) {
+  return {
+    link: function(scope, element, attrs, $destroy) {
+
+      $(element).addClass("errorPanel");
+    	
+      var errorConsumer = function(error) {
+    	var html = "<div class=\"alert alert-error\">";
+    	html += "<button type=\"button\" class=\"close\" data-dismiss=\"alert\">&times;</button>";
+      	
+      	if(error.status && error.config) {
+      		html += "<strong>"+error.status+":</strong> ";
+      		html += "<span>"+error.config+"</span>";
+      	} else {
+      		html += "An error occured, try refreshing the page or relogin.";
+      	}
+      	
+      	html += "</div>";
+      	  
+      	element.append(html);
+      };
+      
+      Error.registerErrorConsumer(errorConsumer);      
+      scope.$on($destroy, function() {
+        Error.unregisterErrorConsumer(errorConsumer);
+      });
+      
+    }
+  };
+})
 /**
  * A directive which conditionally displays a dialog 
  * and allows it to control it via a explicitly specified model.
@@ -528,7 +558,7 @@ angular
  *   $model.close();
  * </script>
  */
-.directive('modalDialog', function($http, $timeout) {
+.directive('modalDialog', function($http, $timeout, Error) {
   return {
     restrict: 'E',
     scope: {
@@ -578,7 +608,7 @@ angular
             }
           })
           .on('shown', function() {
-            model().setStatus("open");
+            model().setStatus("open");            
           })
           // and show modal
           .modal(options);
@@ -594,7 +624,7 @@ angular
       
       /**
        * Watch the $model.status property in order to map it to the 
-       * bootstrap modal dialog live cycle. The HTML has to be rendered first, 
+       * bootstrap modal dialog life cycle. The HTML has to be rendered first, 
        * for the dialog to appear and actual stuff can be done with the dialog.
        */
       scope.$watch("$model.status", function(newValue , oldValue) {
@@ -612,7 +642,7 @@ angular
             break;
           case "closing": 
             hide();
-            break;
+            break;          
         }
       });
     }
