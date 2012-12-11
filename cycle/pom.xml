@@ -275,7 +275,6 @@
       <groupId>org.jasypt</groupId>
       <artifactId>jasypt</artifactId>
       <version>1.8</version>
-      <scope>compile</scope>
     </dependency>
     
   </dependencies>
@@ -365,6 +364,48 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-failsafe-plugin</artifactId>
+            <configuration>
+              <excludes>
+                <exclude>**/SignavioClientProxyIT.java</exclude>
+              </excludes>
+            </configuration>
+            <executions>
+              <execution>
+                <goals>
+                  <goal>integration-test</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+      <dependencies>
+        <!-- javax.persistence -->
+        <dependency>
+          <groupId>org.hibernate</groupId>
+          <artifactId>hibernate-entitymanager</artifactId>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>com.h2database</groupId>
+          <artifactId>h2</artifactId>
+          <version>${version.h2}</version>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+    </profile>
+    <profile>
+      <id>proxy</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <configuration>
+              <includes>
+                <include>**/SignavioClientProxyIT.java</include>
+              </includes>
+            </configuration>
             <executions>
               <execution>
                 <goals>
@@ -476,18 +517,15 @@
         <dependency>
           <groupId>org.hibernate.javax.persistence</groupId>
           <artifactId>hibernate-jpa-2.0-api</artifactId>
-          <scope>compile</scope>
         </dependency>
         <dependency>
           <groupId>cglib</groupId>
           <artifactId>cglib</artifactId>
-          <scope>provided</scope>
         </dependency>
         <!-- apache commons -->
         <dependency>
           <groupId>commons-io</groupId>
           <artifactId>commons-io</artifactId>
-          <scope>compile</scope>
         </dependency>
         <!-- nekohtml -->
         <dependency>
@@ -532,7 +570,7 @@
           <groupId>org.glassfish</groupId>
           <artifactId>javax.annotation</artifactId>
         </dependency>
-        
+        <!-- mail functionality -->
         <dependency>
           <groupId>javax.mail</groupId>
           <artifactId>mail</artifactId>
@@ -684,6 +722,40 @@
         <dependency>
           <groupId>cglib</groupId>
           <artifactId>cglib-nodep</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>com.sun.jersey</groupId>
+          <artifactId>jersey-json</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>com.sun.jersey.contribs</groupId>
+          <artifactId>jersey-spring</artifactId>
+          <exclusions>
+            <exclusion>
+              <artifactId>spring-core</artifactId>
+              <groupId>org.springframework</groupId>
+            </exclusion>
+            <exclusion>
+              <artifactId>spring-beans</artifactId>
+              <groupId>org.springframework</groupId>
+            </exclusion>
+            <exclusion>
+              <artifactId>spring-context</artifactId>
+              <groupId>org.springframework</groupId>
+            </exclusion>
+            <exclusion>
+              <artifactId>spring-web</artifactId>
+              <groupId>org.springframework</groupId>
+            </exclusion>
+            <exclusion>
+              <artifactId>spring-aop</artifactId>
+              <groupId>org.springframework</groupId>
+            </exclusion>
+            <exclusion>
+              <artifactId>asm</artifactId>
+              <groupId>asm</groupId>
+            </exclusion>
+          </exclusions>
         </dependency>
       </dependencies>
       <properties>
