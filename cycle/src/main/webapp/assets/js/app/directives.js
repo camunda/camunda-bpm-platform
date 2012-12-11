@@ -642,7 +642,7 @@ angular
             break;
           case "closing": 
             hide();
-            break;          
+            break;    
         }
       });
     }

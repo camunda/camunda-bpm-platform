@@ -44,6 +44,7 @@
                   <h3 data-ng-show="mode == 'EDIT'" th:text="#{'Edit user'}"></h3>
                 </div>
                 <div class="modal-body">
+                  <div data-error-panel></div>
                   <form class="form-horizontal" novalidate data-ng-submit="save()" name="editUserForm">
                     <fieldset>
                       <div class="control-group" ng-class="errorClass(editUserForm.userName)">
@@ -110,6 +111,7 @@
                   <h3 th:text="#{'Delete user'}"></h3>
                 </div>
                 <div class="modal-body">
+                  <div data-error-panel></div>
                 <div data-ng-switch data-on="state">
                   <div data-ng-switch-when="TO_BE_DONE">
                     <p>

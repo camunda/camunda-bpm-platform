@@ -51,6 +51,7 @@
                   <h3 data-ng-show="mode == 'EDIT'" th:text="#{'Edit user credentials'}"></h3>
                 </div>
                 <div class="modal-body">
+                  <div data-error-panel></div>
                   <div class="alert alert-error" data-ng-show="credentialsTest.state == 'IN_ERROR'">
                     <button type="button" class="close" data-ng-click="credentialsTest = null">&times;</button>
                     <span>
@@ -101,6 +102,7 @@
                   <h3 th:text="#{'Change Password'}"></h3>
                 </div>
                 <div class="modal-body">
+                  <div data-error-panel></div>
                   <div class="alert alert-error" data-ng-show="passwordChange.state == 'ERROR'">
                     <button type="button" class="close" data-ng-click="passwordChange.state = null">&times;</button>
                     <span>
