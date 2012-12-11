@@ -46,6 +46,20 @@ public class LoginService extends AbstractRestService {
   public String loginError() {
     return "tpl:error/invalid-login-data";
   }
+  
+  @GET
+  @Path("error/license")
+  @Produces(MediaType.TEXT_HTML)
+  public String loginErrorLicense() {
+    return "tpl:error/license-error";
+  }
+  
+  @GET
+  @Path("error/license/notfound")
+  @Produces(MediaType.TEXT_HTML)
+  public String loginErrorLicenseNotFound() {
+    return "tpl:error/license-not-found";
+  }
 
   @GET
   @Path("logout")

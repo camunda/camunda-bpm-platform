@@ -4,9 +4,15 @@ import javax.inject.Inject;
 import javax.security.auth.Subject;
 import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
+
 import org.springframework.stereotype.Component;
 
+import com.camunda.fox.cycle.configuration.CycleConfiguration;
 import com.camunda.fox.cycle.entity.User;
+import com.camunda.fox.license.FoxLicenseService;
+import com.camunda.fox.license.entity.FoxComponent;
+import com.camunda.fox.license.impl.FoxLicenseException;
+import com.camunda.fox.license.impl.FoxLicenseNotFoundException;
 import com.camunda.fox.security.SecurityConfiguration;
 import com.camunda.fox.security.UserIdentity;
 import com.camunda.fox.security.UserLookup;
@@ -25,16 +31,26 @@ public class SecurityService {
   @Inject
   private UserLookup userLookup;
   
-  public UserIdentity login(String userName, String password) {
+  @Inject
+  private CycleConfiguration cycleConfiguration;
+  
+  public UserIdentity login(String userName, String password) throws FoxLicenseException, FoxLicenseNotFoundException {
     if (userName == null || password == null) {
       return null;
     }
+    
+    checkLicense();
 
     if (config.isUseJaas()) {
       return loginViaJaas(userName, password);
     } else {
       return loginViaUserManagement(userName, password);
     }
+  }
+
+  protected void checkLicense() throws FoxLicenseException, FoxLicenseNotFoundException {
+    FoxLicenseService foxLicenseService = cycleConfiguration.getFoxLicenseService();
+    foxLicenseService.checkLicenseFor(FoxComponent.FOX_CYCLE);      
   }
 
   private UserIdentity loginViaJaas(String userName, String password) {

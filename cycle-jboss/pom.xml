@@ -99,7 +99,7 @@
               <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
             </manifest>
             <manifestEntries>
-              <Dependencies>org.apache.xerces, org.apache.commons.io</Dependencies>
+              <Dependencies>org.apache.xerces, org.apache.commons.io, org.bouncycastle.bcprov-jdk16, org.bouncycastle.bcpg-jdk16</Dependencies>
             </manifestEntries>
           </archive>
           <webResources>

@@ -1,6 +1,8 @@
 package com.camunda.fox.security.web;
 
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -15,6 +17,8 @@ import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import com.camunda.fox.cycle.security.IdentityHolder;
+import com.camunda.fox.license.impl.FoxLicenseException;
+import com.camunda.fox.license.impl.FoxLicenseNotFoundException;
 import com.camunda.fox.security.UserIdentity;
 import com.camunda.fox.security.service.SecurityService;
 import static com.camunda.fox.security.web.util.WebUtil.*;
@@ -24,6 +28,8 @@ import static com.camunda.fox.security.web.util.WebUtil.*;
  * @author nico.rehwaldt
  */
 public class SecurityFilter implements Filter {
+  
+  private static Logger log = Logger.getLogger(SecurityFilter.class.getName());
 
   private WebApplicationContext context;
  
@@ -104,15 +110,23 @@ public class SecurityFilter implements Filter {
       }
     } else
     if (isLoginRequest(request)) {
-      if (login(request)) {
-        String preLoginUrl = (String) request.getSession().getAttribute(PRE_AUTHENTICATION_URL);
-        if (preLoginUrl != null) {
-          return preLoginUrl;
+      try {
+        if (login(request,response)) {
+          String preLoginUrl = (String) request.getSession().getAttribute(PRE_AUTHENTICATION_URL);
+          if (preLoginUrl != null) {
+            return preLoginUrl;
+          } else {
+            return "app:app/secured/view/index";
+          }
         } else {
-          return "app:app/secured/view/index";
+          return "app:app/login/error";
         }
-      } else {
-        return "app:app/login/error";
+      } catch(FoxLicenseException e) {
+        log.log(Level.SEVERE, e.getMessage(), e);
+        return "app:app/login/error/license";
+      } catch(FoxLicenseNotFoundException e) {
+        log.log(Level.SEVERE, e.getMessage(), e);
+        return "app:app/login/error/license/notfound";
       }
     } else
     if (isLogoutRequest(request)) {
@@ -139,16 +153,17 @@ public class SecurityFilter implements Filter {
     return requestUriMatches(request, "app/login/logout");
   }
 
-  protected boolean login(HttpServletRequest request) {
+  protected boolean login(HttpServletRequest request, HttpServletResponse response) throws FoxLicenseException, FoxLicenseNotFoundException  {
     String userName = request.getParameter("j_username");
     String password = request.getParameter("j_password");
-    
+
     if (userName == null || password == null) {
       return false;
     }
     
     SecurityService securityService = context.getBean(SecurityService.class);
     UserIdentity identity = securityService.login(userName, password);
+    
     if (identity != null) {
       setAuthenticatedIdentity(request, identity);
       return true;

@@ -16,6 +16,7 @@
     <java.resources.override>src/main/runtime/default/resources</java.resources.override>
     <properties.override>src/main/runtime/default/config.properties</properties.override>
     <netbeans.hint.deploy.server>gfv3ee6</netbeans.hint.deploy.server>
+    <bouncycastle.version>1.47</bouncycastle.version>
   </properties>
   
   <dependencies>
@@ -275,6 +276,13 @@
       <groupId>org.jasypt</groupId>
       <artifactId>jasypt</artifactId>
       <version>1.8</version>
+    </dependency>
+    
+      
+    <dependency>
+      <groupId>com.camunda.fox.commons</groupId>
+      <artifactId>commons-licensing</artifactId>
+      <version>${project.version}</version>
     </dependency>
     
   </dependencies>
@@ -566,6 +574,12 @@
             </exclusion>
           </exclusions>
         </dependency>
+
+        <dependency>
+          <groupId>cglib</groupId>
+          <artifactId>cglib</artifactId>
+        </dependency>
+        
         <dependency>
           <groupId>org.glassfish</groupId>
           <artifactId>javax.annotation</artifactId>
@@ -575,6 +589,13 @@
           <groupId>javax.mail</groupId>
           <artifactId>mail</artifactId>
         </dependency>
+        
+        <dependency>
+          <groupId>org.bouncycastle</groupId>
+          <artifactId>bcpg-jdk15on</artifactId>
+          <version>${bouncycastle.version}</version>
+        </dependency>
+        
       </dependencies>
       <build>
         <plugins>
@@ -642,6 +663,11 @@
         <dependency>
           <groupId>cglib</groupId>
           <artifactId>cglib</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>org.bouncycastle</groupId>
+          <artifactId>bcpg-jdk15on</artifactId>
+          <version>${bouncycastle.version}</version>
         </dependency>
       </dependencies>
       <properties>
