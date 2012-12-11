@@ -7,6 +7,8 @@ public class SynchronizationResultDTO {
   
   private String message;
   
+  public SynchronizationResultDTO() { }
+  
   public SynchronizationResultDTO(SynchronizationStatus status) {
     this.status = status;
   }

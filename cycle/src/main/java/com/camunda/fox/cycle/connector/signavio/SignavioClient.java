@@ -19,6 +19,7 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.net.ssl.KeyManager;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
@@ -30,13 +31,17 @@ import org.apache.http.HttpRequestInterceptor;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpResponseInterceptor;
 import org.apache.http.ParseException;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpRequestRetryHandler;
 import org.apache.http.client.fluent.Content;
 import org.apache.http.client.fluent.Executor;
 import org.apache.http.client.fluent.Form;
 import org.apache.http.client.fluent.Request;
 import org.apache.http.client.utils.HttpClientUtils;
 import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.conn.ConnectTimeoutException;
 import org.apache.http.conn.params.ConnRoutePNames;
 import org.apache.http.conn.scheme.Scheme;
 import org.apache.http.conn.scheme.SchemeRegistry;
@@ -79,6 +84,7 @@ public class SignavioClient {
   private static final int CONNECTION_IDLE_CLOSE = 2000;
   private static final int CONNECTION_TIMEOUT = 3000;
   private static final int CONNECTION_TTL = 5000;
+  private static final int RETRIES_CONNECTION_EXCEPTION = 1;
 
   private static final String WARNING_SNIPPET = "<div id=\"warning\">([^<]+)</div>";
   
@@ -93,6 +99,8 @@ public class SignavioClient {
   
   private String signavioBaseUrl;
   private String proxyUrl;
+  private String proxyUsername;
+  private String proxyPassword;
   
   private DefaultHttpClient apacheHttpClient;
   private Executor requestExecutor;
@@ -100,9 +108,11 @@ public class SignavioClient {
   private String securityToken;
 
   
-  public SignavioClient(String signavioBaseUrl, String proxyUrl) throws URISyntaxException {
+  public SignavioClient(String signavioBaseUrl, String proxyUrl, String proxyUsername, String proxyPassword) throws URISyntaxException {
     this.signavioBaseUrl = signavioBaseUrl;
     this.proxyUrl = proxyUrl;
+    this.proxyUsername = proxyUsername;
+    this.proxyPassword = proxyPassword;
     initHttpClient();
   }
   
@@ -348,27 +358,20 @@ public class SignavioClient {
     try {
       SSLContext sslContext = SSLContext.getInstance("SSL");
 
-       // set up a TrustManager that trusts everything
-       sslContext.init(null, new TrustManager[] {
-               new X509TrustManager() {
-                   @Override
-                   public X509Certificate[] getAcceptedIssuers() {
-                     // nop
-                     return null;
-                   }
-          
-                   @Override
-                   public void checkClientTrusted(X509Certificate[] certs,
-                                   String authType) {
-                     // nop
-                   }
-                   @Override
-                   public void checkServerTrusted(X509Certificate[] certs,
-                                   String authType) {
-                     // nop
-                   }
-               }
-      }, new SecureRandom());
+      X509TrustManager trustAllManager = new X509TrustManager() {
+        @Override
+        public X509Certificate[] getAcceptedIssuers() {
+          return null;
+        }
+        @Override
+        public void checkClientTrusted(X509Certificate[] certs, String authType) {}
+        @Override
+        public void checkServerTrusted(X509Certificate[] certs, String authType) {}
+      };
+      
+      // set up a TrustManager that trusts everything
+      sslContext.init(new KeyManager[0], new TrustManager[] { trustAllManager }, new SecureRandom());
+      SSLContext.setDefault(sslContext);
       
       SSLSocketFactory sslSF = new SSLSocketFactory(sslContext, SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
       schemeRegistry.register(new Scheme("https", 443, sslSF));
@@ -383,14 +386,6 @@ public class SignavioClient {
     HttpConnectionParams.setStaleCheckingEnabled(params, true);
     HttpConnectionParams.setLinger(params, 5000);
     
-    // configure proxy
-    if (proxyUrl != null && !proxyUrl.isEmpty()) {
-      logger.fine("Configuring signavio proxy url: " + proxyUrl);
-      URI proxyURI = new URI(proxyUrl);
-      params.setParameter(ConnRoutePNames.DEFAULT_PROXY, 
-              new HttpHost(proxyURI.getHost(), proxyURI.getPort(), proxyURI.getScheme()));
-    }
-    
     // configure thread-safe client connection management
     final PoolingClientConnectionManager connectionManager = 
             new PoolingClientConnectionManager(schemeRegistry, CONNECTION_TTL, TimeUnit.MILLISECONDS);
@@ -400,12 +395,30 @@ public class SignavioClient {
     // configure and initialize apache httpclient
     apacheHttpClient = new DefaultHttpClient(connectionManager, params);
     
-    // enable usage of jvm specified proxy settings
-//    ProxySelectorRoutePlanner routePlanner = new ProxySelectorRoutePlanner(
-//            apacheHttpClient.getConnectionManager().getSchemeRegistry(),
-//            ProxySelector.getDefault());  
-//    apacheHttpClient.setRoutePlanner(routePlanner);
+    // configure proxy stuff
+    configureProxy();
+    
+    apacheHttpClient.setHttpRequestRetryHandler(new HttpRequestRetryHandler() {
+      private int retries = RETRIES_CONNECTION_EXCEPTION;
+      
+      @Override
+      public boolean retryRequest(IOException exception, int executionCount, HttpContext context) {
+        if (exception == null) {
+          throw new IllegalArgumentException("Exception parameter may not be null");
+        }
+        if (context == null) {
+          throw new IllegalArgumentException("HTTP context may not be null");
+        }
+        if (exception instanceof ConnectTimeoutException && retries > 0) {
+          // Timeout
+          retries--;
+          return true;
+        }
 
+        return false;
+      }
+    });
+    
     // close expired / idle connections and add securityToken header for each request
     apacheHttpClient.addRequestInterceptor(new HttpRequestInterceptor() {
       @Override
@@ -433,6 +446,29 @@ public class SignavioClient {
     apacheHttpClient.setReuseStrategy(new NoConnectionReuseStrategy());
     
     requestExecutor = Executor.newInstance(apacheHttpClient);
+  }
+  
+  private void configureProxy() throws URISyntaxException {
+    if (proxyUrl != null && !proxyUrl.isEmpty()) {
+      URI proxyURI = new URI(proxyUrl);
+      String proxyHost = proxyURI.getHost();
+      int proxyPort = proxyURI.getPort();
+      apacheHttpClient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY,
+              new HttpHost(proxyHost, proxyPort, proxyURI.getScheme()));
+      
+      if (proxyUsername != null && !proxyUsername.isEmpty() && proxyPassword != null && !proxyPassword.isEmpty()) {
+        apacheHttpClient.getCredentialsProvider().setCredentials(
+                new AuthScope(proxyHost, proxyPort),
+                new UsernamePasswordCredentials(proxyUsername, proxyPassword));
+      }
+      logger.fine("Configured signavio client with proxy settings: url: " + proxyUrl + ", proxyUsername: " + proxyUsername);
+    }
+    
+    // enable usage of jvm specified proxy settings, e.g. -Dhttp.proxyHost=<my proxy> -Dhttp.proxyPort=<my proxy port>
+//    ProxySelectorRoutePlanner routePlanner = new ProxySelectorRoutePlanner(
+//            apacheHttpClient.getConnectionManager().getSchemeRegistry(),
+//            ProxySelector.getDefault());  
+//    apacheHttpClient.setRoutePlanner(routePlanner);
   }
   
   protected Content executeAndGetContent(Request request) {

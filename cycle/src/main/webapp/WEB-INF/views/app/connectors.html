@@ -136,7 +136,8 @@
                                data-help-text-var="currentHelpText(propertyName)"
                                data-help-title-var="propertyName">{{propertyName}}</label>
                         <div class="controls">
-                          <input id="specificField" name="specificField" type="text" class="span8" data-ng-model="editConnectorConfiguration.properties[propertyName]"/>
+                          <input data-ng-hide="isPropertyPassword(propertyName)" id="specificField" name="specificField" type="text" class="span8" data-ng-model="editConnectorConfiguration.properties[propertyName]"/>
+                          <input data-ng-show="isPropertyPassword(propertyName)" id="specificField" name="specificField" type="password" class="span8" data-ng-model="editConnectorConfiguration.properties[propertyName]"/>
                         </div>
                       </div>
                     </fieldset>

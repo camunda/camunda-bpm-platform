@@ -30,6 +30,8 @@ public class SignavioConnector extends Connector {
   // custom config properties
   public final static String CONFIG_KEY_SIGNAVIO_BASE_URL = "signavioBaseUrl";
   public final static String CONFIG_KEY_PROXY_URL = "proxyUrl";
+  public final static String CONFIG_KEY_PROXY_USERNAME = "proxyUsername";
+  public final static String CONFIG_KEY_PROXY_PASSWORD = "proxyPassword";
   
   // JSON properties/objects
   private static final String JSON_REL_PROP = "rel";
@@ -63,7 +65,9 @@ public class SignavioConnector extends Connector {
     try {
       if (signavioClient == null) {
         signavioClient = new SignavioClient(getConfiguration().getProperties().get(CONFIG_KEY_SIGNAVIO_BASE_URL),
-                                            getConfiguration().getProperties().get(CONFIG_KEY_PROXY_URL));
+                                            getConfiguration().getProperties().get(CONFIG_KEY_PROXY_URL),
+                                            getConfiguration().getProperties().get(CONFIG_KEY_PROXY_USERNAME),
+                                            getConfiguration().getProperties().get(CONFIG_KEY_PROXY_PASSWORD));
       }
     } catch (URISyntaxException e) {
       throw new CycleException("Unable to initialize Signavio REST client!", e);
