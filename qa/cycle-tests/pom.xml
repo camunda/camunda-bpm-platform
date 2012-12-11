@@ -98,13 +98,19 @@
 			 <scope>test</scope>
              <version>${version.arquillian}</version>
 		    </dependency>    		     		   
-		   <dependency>
+            <dependency>
+              <groupId>org.bouncycastle</groupId>
+              <artifactId>bcpg-jdk16</artifactId>
+              <version>1.46</version>
+              <scope>provided</scope>
+            </dependency>
+            <dependency>
 		     <groupId>com.camunda.fox.cycle</groupId>
 		     <artifactId>cycle-jboss</artifactId>
 		     <version>${project.version}</version>
 		     <type>war</type>
 		     <scope>test</scope>
-		   </dependency>
+		    </dependency>
 		 </dependencies>
 		
 		 <build>
@@ -133,15 +139,10 @@
 		           </goals>
 		           <configuration>
 		             <target unless="maven.test.skip">
-		               <copy todir="target">
+		              <copy todir="target">
 		                 <fileset dir="${jboss.assembly.location}" />
-		               </copy>
-		               
-		              <!-- processing of src/main/standalone replaced by resource filtering (see below) -->
-		              <copy todir="target/jboss-as-${version.jboss.as}/standalone/configuration/blueprint" overwrite="true">
-		                <fileset dir="src/main/standalone/configuration" />
 		              </copy>
-		              <echo>After copy jboss</echo>
+                       
 		              <!-- remove activiti test classes from engine, made it maven 2 and 3 compatible -->
 		              <unzip dest="target/fox-engine">
 		                <fileset dir="target/jboss-as-${version.jboss.as}/modules/com/camunda/fox/engine/fox-engine/main/">
@@ -224,6 +225,19 @@
 		   	<version>${project.version}</version>
 		    <type>pom</type>
 		  </dependency>
+          <!-- see we can upgrade this to latest arquillian -->
+          <dependency>
+            <groupId>org.jboss.arquillian.container</groupId>
+            <artifactId>arquillian-glassfish-managed-3.1</artifactId>
+            <version>1.0.0.CR3</version>
+            <scope>test</scope>
+          </dependency>
+          <dependency>
+            <groupId>org.jboss.arquillian.protocol</groupId>
+            <artifactId>arquillian-protocol-servlet</artifactId>
+            <version>1.0.0.CR7</version>
+            <scope>test</scope>
+          </dependency>                         
  		  <dependency>
 		    <groupId>com.camunda.fox.cycle</groupId>
 		    <artifactId>cycle-glassfish</artifactId>
@@ -235,6 +249,18 @@
 		</dependencies>
 		
 		<build>
+          <resources>
+            <resource>
+              <directory>src/main/domains</directory>
+              <filtering>true</filtering>
+            </resource>
+          </resources>
+          <testResources>
+             <testResource>
+               <directory>src/test/resources-glassfish</directory>
+               <filtering>true</filtering>
+             </testResource>
+           </testResources>
 		  <plugins>
 		    <plugin>
 		      <groupId>org.apache.maven.plugins</groupId>
@@ -262,7 +288,7 @@
 		          </goals>
 		          <configuration>
 		            <target unless="maven.test.skip">
-		              <dependencyfilesets scopes="test" />
+		              <dependencyfilesets scopes="test" types="war"/>
 		              
 		              <copy todir="target/glassfish3/glassfish/domains/domain1/autodeploy">
 		                <fileset refid="maven.project.dependencies" />
