@@ -581,11 +581,6 @@
             </exclusion>
           </exclusions>
         </dependency>
-
-        <dependency>
-          <groupId>cglib</groupId>
-          <artifactId>cglib</artifactId>
-        </dependency>
         
         <dependency>
           <groupId>org.glassfish</groupId>
@@ -741,7 +736,7 @@
                   <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
                 </manifest>
                 <manifestEntries>
-                  <Dependencies>org.apache.xerces, org.apache.commons.io</Dependencies>
+                  <Dependencies>org.apache.xerces, org.apache.commons.io, org.bouncycastle.bcprov-jdk15on, org.bouncycastle.bcpg-jdk15on</Dependencies>
                 </manifestEntries>
               </archive>
             </configuration>
