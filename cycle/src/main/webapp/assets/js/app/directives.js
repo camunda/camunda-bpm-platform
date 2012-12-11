@@ -477,26 +477,34 @@ angular
       scope.$watch(RequestStatus.watchCurrent, function(newValue) {
         scope.isBusy = newValue;
         if(scope.isBusy) { 
-        	$(element).attr("disabled", "disabled");
-        	$(element).addClass("disabled");
+        	if($(element).is("form")) {
+        	  $(":input",element).attr("disabled", "disabled");  		
+        	} else if ($(element).is("button")) {
+        	  $(element).attr("disabled", "disabled");        		
+        	} else if($(element).is("a")) {
+        	  $(element).addClass("disabled");
+        	}
         } else {
-        	$(element).removeAttr("disabled");
-        	$(element).removeClass("disabled");
-        	var children = $(element).children();
-        	angular.forEach(children, function(e, i) {
-        		if($(e).hasClass("icon-loading")) {
-        		  $(e).remove();
-        		}
-        	});
+        	if($(element).is("form")) {
+          	  $(":input",element).removeAttr("disabled");  		
+          	} else if ($(element).is("button")) {
+          	  $(element).removeAttr("disabled");    
+          	  $(".icon-loading", element).remove();	         
+          	} else if($(element).is("a")) {
+          	  $(element).removeClass("disabled");
+          	  $(".icon-loading", element).remove();	   
+          	}
         }
       });   
       
-      $(element)
-      .bind({    
-        click: function() {
-        	$(element).append("<i class=\"icon-loading\" style=\"margin-left:5px\"></i>");
-        }
-      });
+      if($(element).is("button") || $(element).is("a")) {
+        $(element)
+        .bind({    
+          click: function() {
+            $(element).append("<i class=\"icon-loading\" style=\"margin-left:5px\"></i>");
+          }
+        });
+      }
         
     }
   };
