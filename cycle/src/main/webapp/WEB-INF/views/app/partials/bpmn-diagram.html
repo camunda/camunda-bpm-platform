@@ -80,6 +80,7 @@
         <h3 data-ng-show="editDialogMode == 'CREATE_NEW_DIAGRAM'" th:text="#{Create Process Model}"></h3>
       </div>
       <div class="modal-body">
+        <div data-error-panel></div>
         <div class="alert alert-error" ng-show="error">
           <button type="button" class="close" data-dismiss="alert">&times;</button>
           <span>
@@ -90,7 +91,7 @@
           	(<a style="color: #827AA2;" th:href="@{/app/secured/view/profile}" th:text="#{'add connector credentials'}">add user credentials</a>)
           </span>
         </div>
-        <form class="form-horizontal" novalidate ng-submit="save()" name="addModelForm">
+        <form class="form-horizontal" novalidate ng-submit="save()" name="addModelForm" data-req-aware>
           <fieldset>
             <div class="control-group">
               <label class="control-label" for="modelerName" 
@@ -161,8 +162,8 @@
       </div>
       <div class="modal-footer">
         <button class="btn" ng-click="cancel()" th:text="#{Cancel}">Cancel</button>
-        <button href="#" data-ng-show="editDialogMode == 'ADD_DIAGRAM'" class="btn btn-primary" data-ng-click="save()" data-ng-disabled="!isValid()" th:text="#{Add}">Add</button>
-        <button href="#" data-ng-show="editDialogMode == 'CREATE_NEW_DIAGRAM'" class="btn btn-primary" data-ng-click="create()" data-ng-disabled="!isValidAndFolder()" th:text="#{Create}">Create</button>
+        <button href="#" data-ng-show="editDialogMode == 'ADD_DIAGRAM'" class="btn btn-primary" data-ng-click="save()" data-ng-disabled="!isValid()" th:text="#{Add}" data-req-aware>Add</button>
+        <button href="#" data-ng-show="editDialogMode == 'CREATE_NEW_DIAGRAM'" class="btn btn-primary" data-ng-click="create()" data-ng-disabled="!isValidAndFolder()" th:text="#{Create}" data-req-aware>Create</button>
       </div>
     </div>
   </modal-dialog>

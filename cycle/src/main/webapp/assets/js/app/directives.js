@@ -470,6 +470,7 @@ angular
     }
   };
 })
+
 .directive('reqAware', function(RequestStatus) {
   return {
     link: function(scope, element, attrs) {
@@ -477,27 +478,41 @@ angular
       scope.$watch(RequestStatus.watchBusy, function(newValue) {
         scope.isBusy = newValue;
         if(scope.isBusy) { 
+        	
         	if($(element).is("form")) {
-        	  $(":input",element).attr("disabled", "disabled");  		
-        	} else if ($(element).is("button")) {
-        	  $(element).attr("disabled", "disabled");        		
-        	} else if($(element).is("a")) {
-        	  $(element).addClass("disabled");
-        	}
+        	  $(":input",element).attr("disabled", "disabled");      
+        	  scope.form = scope[$(element).attr("name")];
+        	  if(scope.form != undefined) {
+        	    scope.form.$setValidity("request", false);
+        	  }
+        	  
+            } else if ($(element).is("button")) {
+              if(scope.form == undefined) {
+                $(element).attr("disabled", "disabled");	  
+              }
+          	  $(".icon-loading", element).remove();	          
+          	  
+          	}
         } else {
+        	
         	if($(element).is("form")) {
           	  $(":input",element).removeAttr("disabled");  		
+          	  scope.form = scope[$(element).attr("name")];
+          	  if(scope.form != undefined) {
+          	    scope.form.$setValidity("request", true);
+          	  }
+          	  
           	} else if ($(element).is("button")) {
-          	  $(element).removeAttr("disabled");    
-          	  $(".icon-loading", element).remove();	         
-          	} else if($(element).is("a")) {
-          	  $(element).removeClass("disabled");
-          	  $(".icon-loading", element).remove();	   
-          	}
+          	  if(scope.form == undefined) {
+                $(element).removeAattr("disabled", "disabled");	  
+              }
+          	  $(".icon-loading", element).remove();	  
+          	  
+          	} 
         }
       });   
       
-      if($(element).is("button") || $(element).is("a")) {
+      if($(element).is("button")) {
         $(element)
         .bind({    
           click: function() {

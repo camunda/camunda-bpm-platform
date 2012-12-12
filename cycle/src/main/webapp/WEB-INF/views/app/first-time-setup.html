@@ -26,7 +26,7 @@
                 You can use this user in order to login into cycle and add additional users.
               </p>
               <!-- user create form -->
-              <form class="form-horizontal" novalidate data-ng-submit="save()" name="editUserForm" ng-cloak data-ng-controller="CreateInitialUserController">
+              <form class="form-horizontal" novalidate data-ng-submit="save()" name="editUserForm" ng-cloak data-ng-controller="CreateInitialUserController" data-req-aware>
                 <fieldset>
                   <div class="control-group" ng-class="errorClass(editUserForm.userName)">
                     <label class="control-label" for="userName" th:text="#{'User Name'}">User Name</label>
@@ -64,7 +64,7 @@
                   </div>
                   <div class="control-group">
                     <div class="controls">
-                      <input class="btn" type="submit" data-ng-disabled="!isValid()" value="Create user" />
+                      <button class="btn" data-ng-disabled="!isValid()" data-ng-click="save()" data-req-aware>Create user</button>
                     </div>
                   </div>
                 </fieldset>

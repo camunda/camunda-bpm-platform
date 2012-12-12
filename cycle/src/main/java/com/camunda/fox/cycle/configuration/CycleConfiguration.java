@@ -5,8 +5,6 @@ import javax.inject.Inject;
 import org.springframework.stereotype.Component;
 
 import com.camunda.fox.cycle.repository.UserRepository;
-import com.camunda.fox.license.FoxLicenseService;
-import com.camunda.fox.license.impl.FoxLicenseServiceImpl;
 import com.camunda.fox.security.SecurityConfiguration;
 
 /**

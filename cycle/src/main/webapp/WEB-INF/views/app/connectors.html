@@ -194,9 +194,11 @@
                           data-ng-show="state == 'TO_BE_DONE'"
                           data-ng-click="deleteConnectorConfigurationDialog.close()">Cancel</button>
                   <button class="btn btn-primary"
+                          data-req-aware
                           data-ng-show="state == 'TO_BE_DONE'" 
                           data-ng-click="performConnectorDeletion()">Delete</button>
                   <button class="btn btn-primary"
+                          data-req-aware
                           data-ng-show="state == 'SUCCESS' || state == 'FAILURE'" 
                           data-ng-click="deleteConnectorConfigurationDialog.close()">OK</button>
                 </div>
