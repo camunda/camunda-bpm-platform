@@ -16,7 +16,6 @@
     <java.resources.override>src/main/runtime/default/resources</java.resources.override>
     <properties.override>src/main/runtime/default/config.properties</properties.override>
     <netbeans.hint.deploy.server>gfv3ee6</netbeans.hint.deploy.server>
-    <bouncycastle.version>1.47</bouncycastle.version>
   </properties>
   
   <dependencies>

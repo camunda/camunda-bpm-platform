@@ -17,6 +17,7 @@
     <version.saxon>9.1.0.8</version.saxon>
     <version.wro4j>1.4.8.1</version.wro4j>
     <version.cglib>2.2.2</version.cglib>
+    <version.bouncycastle>1.47</version.bouncycastle>
 
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
@@ -27,7 +28,7 @@
     <module>cycle-jboss</module>
     <module>cycle-glassfish</module>
     <module>cycle-was</module>
-<!--     <module>cycle-tomcat</module> -->
+    <module>cycle-tomcat</module>
   </modules>
   
   <dependencyManagement>
@@ -135,6 +136,12 @@
         <groupId>javax.mail</groupId>
         <artifactId>mail</artifactId>
         <version>1.4.5</version>
+      </dependency>
+      
+      <dependency>
+        <groupId>org.bouncycastle</groupId>
+        <artifactId>bcpg-jdk15on</artifactId>
+        <version>${version.bouncycastle}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>
