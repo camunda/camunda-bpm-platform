@@ -10,11 +10,9 @@ import javax.ws.rs.core.Response.Status;
 import junit.framework.Assert;
 
 import org.apache.commons.io.FileUtils;
-import org.jboss.arquillian.junit.Arquillian;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
 import com.camunda.fox.cycle.connector.ConnectorLoginMode;
 import com.camunda.fox.cycle.connector.ConnectorNode;
@@ -38,7 +36,6 @@ import com.sun.jersey.api.representation.Form;
 import com.sun.jersey.client.apache4.ApacheHttpClient4;
 import com.sun.jersey.client.apache4.config.DefaultApacheHttpClient4Config;
 
-@RunWith(Arquillian.class)
 public class TestCycleRoundtrip {
   
   private static final File VFS_DIRECTORY = new File("target/vfs-repository");
@@ -46,9 +43,8 @@ public class TestCycleRoundtrip {
   private static final String LHS_PROCESS_DIAGRAM = "/com/camunda/fox/cycle/roundtrip/repository/test-lhs.bpmn";
   private static final String RHS_PROCESS_DIAGRAM = "/com/camunda/fox/cycle/roundtrip/repository/test-rhs.bpmn";
   
-  private static String httpPort = "19099";
+  private static String httpPort = "8080";
 
-  private static int count = 0;
   private static Client client;
   
   private static VfsConnector vfsConnector;
@@ -56,32 +52,47 @@ public class TestCycleRoundtrip {
   
   @BeforeClass
   public static void testCycleDeployment() throws Exception {
-    String property = System.getProperty("HTTP_LISTENER_PORT");
-    if (property != null && !property.isEmpty()) {
-      httpPort = property;
-    }
+//    String profile = System.getProperty("profile");
+//    if (profile != null && !profile.isEmpty()) {
+//      if (profile.equals("glassfish")) {
+//        httpPort = "28080";
+//      } else if (profile.equals("jboss")) {
+//        httpPort = "19099";
+//      } else if (profile.equals("was")) {
+//        // TODO
+//      }
+//      System.out.println("******************HTTP PORT: " + httpPort);
+//    }
     
     ClientConfig clientConfig = new DefaultApacheHttpClient4Config();
     clientConfig.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
-    client = ApacheHttpClient4.create(clientConfig); 
-
-    WebResource webResource = client.resource("http://localhost:"+httpPort+"/cycle/");
-    ClientResponse clientResponse = webResource.get(ClientResponse.class);
-    int status = clientResponse.getStatus();
-    clientResponse.close();
+    client = ApacheHttpClient4.create(clientConfig);
     
-    if (status == Status.NOT_FOUND.getStatusCode()) {
-      if (count == 20) {
-        Assert.fail("Cycle is not available. Please check if the deployment was successfully!");
+    boolean success = false;
+    for (int i = 0; i <= 30; i++) {
+      try {
+        WebResource webResource = client.resource("http://localhost:"+httpPort+"/cycle/");
+        ClientResponse clientResponse = webResource.get(ClientResponse.class);
+        int status = clientResponse.getStatus();
+        clientResponse.close();
+        if (status == Status.OK.getStatusCode()) {
+          success = true;
+          break;
+        }
+      } catch (Exception e) {
+        e.printStackTrace();
+        // do nothing
       }
+      
       Thread.sleep(2000);
-      testCycleDeployment();
-      count++;
-    } else {
-      Assert.assertEquals(Status.OK.getStatusCode(), status);
+    }
+    
+    if (success) {
       testCreateInitialUserAndLogin();
       testCreateVfsConnector();
       testCreateRoundtripWithDetails();
+    } else {
+      Assert.fail("Cycle is not available! Check cycle deployment.");
     }
   }
   
@@ -125,7 +136,7 @@ public class TestCycleRoundtrip {
     Assert.assertEquals(Status.OK.getStatusCode(), status);
     
     // login with created user
-    webResource = client.resource("http://localhost:19099/cycle/j_security_check");
+    webResource = client.resource("http://localhost:"+httpPort+"/cycle/j_security_check");
     Form loginForm = new Form();
     loginForm.add("j_username", "test");
     loginForm.add("j_password", "test");
@@ -224,7 +235,9 @@ public class TestCycleRoundtrip {
   
   @AfterClass
   public static void cleanUp() throws IOException {
-    vfsConnector.dispose();
+    if (vfsConnector != null) {
+      vfsConnector.dispose();
+    }
     cleanVfsTargetDirectory(VFS_DIRECTORY);
   }
   
