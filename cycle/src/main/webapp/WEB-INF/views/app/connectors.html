@@ -61,7 +61,7 @@
                       Using the connector worked
                     </span>
                   </div>
-                  <form class="form-horizontal" novalidate data-ng-submit="save()" name="editConnectorConfigForm" data-req-aware>
+                  <form class="form-horizontal" novalidate data-ng-submit="save()" name="editConnectorConfigForm">
                     <fieldset>
                       <div class="control-group">
                         <label class="control-label" for="connectorLabel" 
@@ -146,8 +146,8 @@
                 </div>
                 <div class="modal-footer">
                   <button class="btn" data-ng-click="editConnectorConfigurationDialog.close()" th:text="#{Cancel}">Cancel</button>
-                  <button class="btn" data-ng-click="test()" data-ng-disabled="!isValid()" data-req-aware>Test</button>
-                  <button class="btn btn-primary" data-ng-click="save()" data-ng-disabled="!isValid()" th:text="#{Save}" data-req-aware>Save</button>
+                  <button class="btn" data-ng-click="test()" data-ng-disabled="!isValid()" data-req-aware="editConnectorConfigForm">Test</button>
+                  <button class="btn btn-primary" data-ng-click="save()" data-ng-disabled="!isValid()" th:text="#{Save}" data-req-aware="editConnectorConfigForm">Save</button>
                 </div>
               </div>
             </modal-dialog>

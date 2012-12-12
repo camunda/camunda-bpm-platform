@@ -472,43 +472,56 @@ angular
 })
 
 .directive('reqAware', function(RequestStatus) {
-  return {
+  	
+  return {	  
     link: function(scope, element, attrs) {
+      
+      var formName = attrs.reqAware;
+      
+      function setFormValidity(valid) {
+          var form  = scope[formName];
+          if(!!form) {
+            form.$setValidity("request", valid);
+          }     
+        }
+                   
+      function setFormFieldsDisabled(disable) {
+        var formElement = $('form[name="'+formName+'"]');
+      	if(disable) {
+      	  $(":input", formElement).attr("disabled", "disabled");     	  
+      	} else {
+      	  $(":input", formElement).removeAttr("disabled");	
+      	}
+      }
     	
       scope.$watch(RequestStatus.watchBusy, function(newValue) {
         scope.isBusy = newValue;
         if(scope.isBusy) { 
         	
-        	if($(element).is("form")) {
-        	  $(":input",element).attr("disabled", "disabled");      
-        	  scope.form = scope[$(element).attr("name")];
-        	  if(scope.form != undefined) {
-        	    scope.form.$setValidity("request", false);
-        	  }
-        	  
-            } else if ($(element).is("button")) {
-              if(scope.form == undefined) {
-                $(element).attr("disabled", "disabled");	  
-              }
-          	  $(".icon-loading", element).remove();	          
-          	  
-          	}
+      	  if(!!formName) {
+            setFormValidity(false);       
+            setFormFieldsDisabled(true);           
+          }
+        	
+          if ($(element).is("button")) {
+            if(!formName) {
+              $(element).attr("disabled", "disabled");	  
+            }
+          }
+        
         } else {
         	
-        	if($(element).is("form")) {
-          	  $(":input",element).removeAttr("disabled");  		
-          	  scope.form = scope[$(element).attr("name")];
-          	  if(scope.form != undefined) {
-          	    scope.form.$setValidity("request", true);
-          	  }
+          if(!!formName) {
+        	setFormValidity(true);       
+        	setFormFieldsDisabled(false);  
+          }
           	  
-          	} else if ($(element).is("button")) {
-          	  if(scope.form == undefined) {
-                $(element).removeAattr("disabled", "disabled");	  
-              }
-          	  $(".icon-loading", element).remove();	  
-          	  
-          	} 
+          if ($(element).is("button")) {
+            if(!formName) {
+              $(element).removeAttr("disabled");	  
+            }
+          	$(".icon-loading", element).remove();	  
+          } 
         }
       });   
       
@@ -520,7 +533,6 @@ angular
           }
         });
       }
-        
     }
   };
 })

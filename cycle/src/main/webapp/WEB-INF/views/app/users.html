@@ -45,7 +45,7 @@
                 </div>
                 <div class="modal-body">
                   <div data-error-panel></div>
-                  <form class="form-horizontal" novalidate data-ng-submit="save()" name="editUserForm" data-req-aware>
+                  <form class="form-horizontal" novalidate data-ng-submit="save()" name="editUserForm">
                     <fieldset>
                       <div class="control-group" ng-class="errorClass(editUserForm.userName)">
                         <label class="control-label" for="userName" 
@@ -97,7 +97,7 @@
                 </div>
                 <div class="modal-footer">
                   <button class="btn" data-ng-click="editUserDialog.close()" th:text="#{Cancel}">Cancel</button>
-                  <button class="btn btn-primary" data-ng-click="save()" data-ng-disabled="!isValid()" th:text="#{Save}" data-req-aware>Save</button>
+                  <button class="btn btn-primary" data-ng-click="save()" data-ng-disabled="!isValid()" th:text="#{Save}" data-req-aware="editUserForm">Save</button>
                 </div>
               </div>
             </modal-dialog>

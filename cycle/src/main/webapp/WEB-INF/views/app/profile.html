@@ -66,7 +66,7 @@
                       Using the connector worked
                     </span>
                   </div>
-                  <form class="form-horizontal" novalidate data-ng-submit="save()" name="editConnectorCredentialsForm" data-req-aware>
+                  <form class="form-horizontal" novalidate data-ng-submit="save()" name="editConnectorCredentialsForm">
                     <fieldset>
                       <div class="control-group">
                         <label class="control-label" for="userName" 
@@ -87,8 +87,8 @@
                 </div>
                 <div class="modal-footer">
                   <button class="btn" data-ng-click="connectorCredentialsDialog.close()" th:text="#{Cancel}">Cancel</button>
-                  <button class="btn" data-ng-click="test()" data-ng-disabled="!isValid()" th:text="#{Test}" data-req-aware>Test</button>
-                  <button class="btn btn-primary" data-ng-click="save()" data-ng-disabled="!isValid()" th:text="#{Save}" data-req-aware>Save</button>
+                  <button class="btn" data-ng-click="test()" data-ng-disabled="!isValid()" th:text="#{Test}" data-req-aware="editConnectorCredentialsForm">Test</button>
+                  <button class="btn btn-primary" data-ng-click="save()" data-ng-disabled="!isValid()" th:text="#{Save}" data-req-aware="editConnectorCredentialsForm">Save</button>
                 </div>
               </div>
             </modal-dialog>
@@ -116,7 +116,7 @@
                       Your new credentials are now valid.
                     </span>
                   </div>
-                  <form ng-show="!passwordChange.state" class="form-horizontal" novalidate data-ng-submit="save()" name="changePasswordForm" data-req-aware>
+                  <form ng-show="!passwordChange.state" class="form-horizontal" novalidate data-ng-submit="save()" name="changePasswordForm">
                     <fieldset>
                       <div class="control-group" ng-class="errorClass(changePasswordForm.oldPassword)">
                         <label class="control-label" for="oldPassword" 
@@ -145,7 +145,7 @@
                 </div>
                 <div class="modal-footer">
                   <button class="btn" data-ng-click="changePasswordDialog.close()" th:text="#{Cancel}">Cancel</button>
-                  <button class="btn btn-primary" data-ng-click="save()" data-ng-disabled="!isValid(changePasswordForm)" th:text="#{Change}" data-req-aware>Change</button>
+                  <button class="btn btn-primary" data-ng-click="save()" data-ng-disabled="!isValid(changePasswordForm)" th:text="#{Change}" data-req-aware="changePasswordForm">Change</button>
                 </div>
               </div>
             </modal-dialog>
