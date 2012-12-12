@@ -7,7 +7,7 @@
     <div class="wrapper">
       <div th:substituteby="fragment/common :: navigation-default"></div>
       <div class="container-fluid content-container content-inset">
-        <div th:substituteby="fragment/common :: error-panel"></div>
+        <div data-error-panel></div>
         <div class="row content-container">
           <div class="span4 well">
             <h1>fox cycle Setup </h1>
@@ -64,7 +64,7 @@
                   </div>
                   <div class="control-group">
                     <div class="controls">
-                      <input class="btn" type="submit" data-ng-disabled="!isValid()" value="Create user" />
+                      <button class="btn" data-ng-disabled="!isValid()" data-ng-click="save()" data-req-aware="editUserForm">Create user</button>
                     </div>
                   </div>
                 </fieldset>

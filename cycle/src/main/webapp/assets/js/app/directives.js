@@ -470,6 +470,102 @@ angular
     }
   };
 })
+
+.directive('reqAware', function(RequestStatus) {
+  	
+  return {	  
+    link: function(scope, element, attrs) {
+      
+      var formName = attrs.reqAware;
+      
+      function setFormValidity(valid) {
+          var form  = scope[formName];
+          if(!!form) {
+            form.$setValidity("request", valid);
+          }     
+        }
+                   
+      function setFormFieldsDisabled(disable) {
+        var formElement = $('form[name="'+formName+'"]');
+      	if(disable) {
+      	  $(":input", formElement).attr("disabled", "disabled");     	  
+      	} else {
+      	  $(":input", formElement).removeAttr("disabled");	
+      	}
+      }
+    	
+      scope.$watch(RequestStatus.watchBusy, function(newValue) {
+        scope.isBusy = newValue;
+        if(scope.isBusy) { 
+        	
+      	  if(!!formName) {
+            setFormValidity(false);       
+            setFormFieldsDisabled(true);           
+          }
+        	
+          if ($(element).is("button")) {
+            if(!formName) {
+              $(element).attr("disabled", "disabled");	  
+            }
+          }
+        
+        } else {
+        	
+          if(!!formName) {
+        	setFormValidity(true);       
+        	setFormFieldsDisabled(false);  
+          }
+          	  
+          if ($(element).is("button")) {
+            if(!formName) {
+              $(element).removeAttr("disabled");	  
+            }
+          	$(".icon-loading", element).remove();	  
+          } 
+        }
+      });   
+      
+      if($(element).is("button")) {
+        $(element)
+        .bind({    
+          click: function() {
+            $(element).append("<i class=\"icon-loading\" style=\"margin-left:5px\"></i>");
+          }
+        });
+      }
+    }
+  };
+})
+.directive('errorPanel', function(Error) {
+  return {
+    link: function(scope, element, attrs, $destroy) {
+
+      $(element).addClass("errorPanel");
+    	
+      var errorConsumer = function(error) {
+    	var html = "<div class=\"alert alert-error\">";
+    	html += "<button type=\"button\" class=\"close\" data-dismiss=\"alert\">&times;</button>";
+      	
+      	if(error.status && error.config) {
+      		html += "<strong>"+error.status+":</strong> ";
+      		html += "<span>"+error.config+"</span>";
+      	} else {
+      		html += "An error occured, try refreshing the page or relogin.";
+      	}
+      	
+      	html += "</div>";
+      	  
+      	element.append(html);
+      };
+      
+      Error.registerErrorConsumer(errorConsumer);      
+      scope.$on($destroy, function() {
+        Error.unregisterErrorConsumer(errorConsumer);
+      });
+      
+    }
+  };
+})
 /**
  * A directive which conditionally displays a dialog 
  * and allows it to control it via a explicitly specified model.
@@ -489,7 +585,7 @@ angular
  *   $model.close();
  * </script>
  */
-.directive('modalDialog', function($http, $timeout) {
+.directive('modalDialog', function($http, $timeout, Error) {
   return {
     restrict: 'E',
     scope: {
@@ -538,8 +634,8 @@ angular
               });
             }
           })
-          .on('shown', function() {
-            model().setStatus("open");
+          .on('shown', function() {        		 
+            model().setStatus("open");            
           })
           // and show modal
           .modal(options);
@@ -552,10 +648,10 @@ angular
       function hide() {
         dialog().modal("hide");
       }
-      
+            
       /**
        * Watch the $model.status property in order to map it to the 
-       * bootstrap modal dialog live cycle. The HTML has to be rendered first, 
+       * bootstrap modal dialog life cycle. The HTML has to be rendered first, 
        * for the dialog to appear and actual stuff can be done with the dialog.
        */
       scope.$watch("$model.status", function(newValue , oldValue) {
@@ -573,9 +669,22 @@ angular
             break;
           case "closing": 
             hide();
-            break;
+            break;    
         }
       });
+     
+      // <!>Daniel's master HACK to make sure dialog is positioned in 
+      // the middle of the screen at all times. 
+      scope.$watch(function() {
+    	  return $(dialog()).outerHeight();
+      	}, function(after, before) {
+	      if(after > before) {
+	        var modal = $(dialog());
+			    modal.css('margin-top', (modal.outerHeight() / 2) * -1)
+	 		         .css('margin-left', (modal.outerWidth() / 2) * -1);
+	    }
+      });
+      
     }
   };
 });

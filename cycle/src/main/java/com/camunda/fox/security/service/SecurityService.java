@@ -1,5 +1,8 @@
 package com.camunda.fox.security.service;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import javax.inject.Inject;
 import javax.security.auth.Subject;
 import javax.security.auth.login.LoginContext;
@@ -7,7 +10,6 @@ import javax.security.auth.login.LoginException;
 
 import org.springframework.stereotype.Component;
 
-import com.camunda.fox.cycle.configuration.CycleConfiguration;
 import com.camunda.fox.cycle.entity.User;
 import com.camunda.fox.license.FoxLicenseService;
 import com.camunda.fox.license.entity.FoxComponent;
@@ -25,15 +27,14 @@ import com.camunda.fox.security.jaas.PassiveCallbackHandler;
 @Component
 public class SecurityService {
 
+  private static final Logger logger = Logger.getLogger(SecurityService.class.getSimpleName());
+  
   @Inject
   private SecurityConfiguration config;
   
   @Inject
   private UserLookup userLookup;
-  
-  @Inject
-  private CycleConfiguration cycleConfiguration;
-  
+    
   public UserIdentity login(String userName, String password) throws FoxLicenseException, FoxLicenseNotFoundException {
     if (userName == null || password == null) {
       return null;
@@ -49,7 +50,7 @@ public class SecurityService {
   }
 
   protected void checkLicense() throws FoxLicenseException, FoxLicenseNotFoundException {
-    FoxLicenseService foxLicenseService = cycleConfiguration.getFoxLicenseService();
+    FoxLicenseService foxLicenseService = config.getFoxLicenseService();
     foxLicenseService.checkLicenseFor(FoxComponent.FOX_CYCLE);      
   }
 
@@ -65,7 +66,7 @@ public class SecurityService {
       // return principal
       return getOrCreateCycleIdentity(subject);
     } catch (LoginException e) {
-      e.printStackTrace();
+      logger.log(Level.WARNING, "Unable to login via JAAS.", e);
       return null;
     }
   }

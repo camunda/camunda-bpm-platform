@@ -5,24 +5,28 @@ angular.module('cycle.controllers', []);
 
 window.credentials = null;
 
-function DefaultController($scope, $http, $location, App, Event, Error, Credentials) {
+function DefaultController($scope, $http, $location, App, Event, Error, Credentials, $element) {
   $scope.appErrors = function () {
     return Error.errors;
   };
   
-  Credentials.reload();
+  $scope.removeError = function (error) {
+	Error.removeError(error);
+  };
   
+  Credentials.reload();
+    
   // TODO: get from cookie
   $scope.currentUser = null;
     
   $scope.$watch(Credentials.watchCurrent, function(newValue) {
     $scope.currentUser = newValue;
   });
-  
+    
   $scope.$on(Event.userChanged, function(event, user) {
     $scope.currentUser = user;
-  });
-  
+  }); 
+    
   // needed for form validation
   // DO NOT REMOVE FROM DEFAULT CONTROLLER!
   $scope.errorClass = function(form) {
@@ -290,13 +294,12 @@ function BpmnDiagramController($scope, Commons, Event, $http, App) {
     .success(function(data) {
         $scope.roundtrip.$get({id: $scope.roundtrip.id });
         $scope.status = SYNC_SUCCESS;
+        $scope.editDiagramDialog.close();
     })
     .error(function (data) {
         $scope.status = SYNC_FAILED;
     });
   
-  $scope.editDiagramDialog.close();
-
   };
 
   $scope.diagramClass = function(diagram) {
@@ -672,6 +675,8 @@ function EditConnectorController($scope, $http, App, ConnectorConfiguration) {
 
   $scope.connectorTest = null;
   
+  $scope.passwordRequired = !(($scope.connectorDialogMode == "EDIT_CONNECTOR") && ($scope.editConnectorConfiguration.loginMode == "GLOBAL"));
+  
   $scope.$watch("editConnectorConfiguration", function(editConnectorConfiguration) {
     if (!editConnectorConfiguration) {
       return;
@@ -773,6 +778,9 @@ function EditConnectorController($scope, $http, App, ConnectorConfiguration) {
      return "enter proxy password if your proxy requires one, otherwise ignore it.";
    }
   };
+  
+  $scope.editPasswordText = "Input a new password to override the existing password. If left blank, the password is unchanged.";
+  $scope.editPasswordTitle = "Password";
 }
 
 function DeleteConnectorConfigurationController($scope, $location, $http, App) {

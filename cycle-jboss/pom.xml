@@ -99,7 +99,7 @@
               <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
             </manifest>
             <manifestEntries>
-              <Dependencies>org.apache.xerces, org.apache.commons.io, org.bouncycastle.bcprov-jdk15on, org.bouncycastle.bcpg-jdk15on</Dependencies>
+              <Dependencies>org.hibernate,org.hibernate.envers,org.hibernate.validator,org.apache.xerces,org.apache.commons.io,org.bouncycastle.bcprov-jdk15on,org.bouncycastle.bcpg-jdk15on</Dependencies>
             </manifestEntries>
           </archive>
           <webResources>
@@ -107,6 +107,15 @@
               <directory>../cycle/src/main/runtime/jboss/webapp</directory>
             </resource>
           </webResources>
+          <overlays>
+            <overlay>
+              <groupId>com.camunda.fox.cycle</groupId>
+              <artifactId>cycle</artifactId>
+              <excludes>
+                <exclude>**/persistence.xml</exclude>
+              </excludes>
+            </overlay>
+          </overlays>
         </configuration>
       </plugin>
     </plugins>
