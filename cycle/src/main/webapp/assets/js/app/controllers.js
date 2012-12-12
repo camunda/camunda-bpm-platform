@@ -335,6 +335,7 @@ function BpmnDiagramController($scope, Commons, Event, $http, App) {
         changeModelStatus(data.status);
       });
   };
+    
 }
 
 /**

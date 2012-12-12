@@ -341,6 +341,7 @@ angular
     controller: 'BpmnDiagramController', 
     link: function(scope, element, attrs) {
       scope.identifier = attrs.identifier;
+      
       if (attrs.handle) {
     	  scope.$parent[attrs.handle] = scope;
    	  }
@@ -368,7 +369,12 @@ angular
     	  return (colorInvert ? 'icon-white' : '');
       };
       
-      $(element).find(".help-toggle").popover({content: help, title: helpTitle, delay: { show: 0, hide: 0 }});
+      var p = "right";
+      if(attrs.helpPlacement) {
+        p = scope.$eval(attrs.helpPlacement);
+      }
+            
+      $(element).find(".help-toggle").popover({content: help, title: helpTitle, delay: { show: 0, hide: 0 }, placement: p});
     }
   };
 })
