@@ -22,4 +22,5 @@
   <bean class="com.camunda.fox.security.test.SecuredTestBean"></bean>
   <bean class="com.camunda.fox.security.test.FakeUserLookup"></bean>
   <bean class="com.camunda.fox.security.SecurityConfiguration"></bean>
+      
 </beans>

@@ -89,10 +89,21 @@ angular
   .service('Error', function () {
     return {
       errors : [],
+      errorConsumers : [],  
       addError: function (error) {
-        this.errors.push(error);
-        $('.errorPanel').removeClass("hide");
-      }
+        this.errors.push(error); 
+        this.errorConsumers[this.errorConsumers.length-1](error);
+      },
+      removeError: function(error) {
+    	var idx = this.errors.indexOf(error);
+    	this.errors.splice(idx,1);  
+      },
+      registerErrorConsumer: function(callback) {
+    	this.errorConsumers.push(callback);  
+      },
+      unregisterErrorConsumer: function(callback) {
+    	this.errorConsumers.splice(this.errorConsumers.indexOf(callback),1);
+      }      
     };
   })
   .service('HttpUtils', function($q) {
@@ -109,25 +120,28 @@ angular
       }
     };
   })
-  .factory('cycleHttpInterceptor', function($q, Error) {
+  .factory('cycleHttpInterceptor', function($q, Error, RequestStatus) {
     return function(promise) {
-      
-      var blockTime = setTimeout(function() {
-        $.blockUI({ message: '<h1>...</h1>'});
-      }, 1300);
+    	
+      RequestStatus.setBusy(true);  
       
       return promise.then(function (response, arg1, arg2)  {
-        clearTimeout(blockTime);
-        $.unblockUI();
+    	RequestStatus.setBusy(false);
         return promise;
-      }, function (response) {
-        clearTimeout(blockTime);
-        $.unblockUI();
-        console.log("error", response);
-        if (parseInt(response.status) == 500) {
-          Error.addError({ "status" : response.status , "config" :  response.config });
-        }
         
+      }, function (response) {    	  
+    	RequestStatus.setBusy(false);
+    	
+        if (parseInt(response.status) == 500) {
+          Error.addError({ "status" : "Error" , "config" :  response.config });     
+          
+        } else if (parseInt(response.status) == 0) {
+          Error.addError({ "status" : "Request Timeout" , "config" :  "Your request timed out. Try refreshing the page." });
+          
+        } else if (parseInt(response.status) == 401) {
+          Error.addError({ "status" : "Unauthorized" , "config" :  "Your session has probably expired. Try refreshing the page and login again." });
+          
+        }          
         return $q.reject(response);
       });
     };
@@ -183,4 +197,31 @@ angular
     };
 
     return new Credentials();
+  })
+  /**
+   * RequestStatus isBusy=true -> cycle is processing an AJAX request
+   */
+  .factory('RequestStatus', function() {
+
+    function RequestStatus() {
+      
+      var self = this;
+      
+      // bind watchCurrent to credentials to make it directly accessible
+      // for scope.$watch(RequestStatus.watchBusy)
+      self.watchBusy = function() {
+        return self.busy;
+      };      
+    }
+
+    RequestStatus.prototype = {
+      isBusy: function() {
+        return busy;
+      },
+      setBusy: function(busy) {
+    	this.busy = busy; 
+      }    
+    };
+
+    return new RequestStatus();
   });

@@ -5,8 +5,6 @@ import javax.inject.Inject;
 import org.springframework.stereotype.Component;
 
 import com.camunda.fox.cycle.repository.UserRepository;
-import com.camunda.fox.license.FoxLicenseService;
-import com.camunda.fox.license.impl.FoxLicenseServiceImpl;
 import com.camunda.fox.security.SecurityConfiguration;
 
 /**
@@ -23,7 +21,6 @@ public class CycleConfiguration extends SecurityConfiguration {
   
   private String mailSessionName;
   private String emailFrom = "cycle@localhost";
-  private FoxLicenseService foxLicenseService;
   
   /**
    * Returns true if users may be configured
@@ -56,19 +53,5 @@ public class CycleConfiguration extends SecurityConfiguration {
   public void setEmailFrom(String emailFrom) {
     this.emailFrom = emailFrom;
   }
-  
-  public FoxLicenseService getFoxLicenseService() {
-    if(foxLicenseService == null) {
-      initFoxLicenseService();
-    }
-    return foxLicenseService;
-  }
-  
-  protected void initFoxLicenseService() {
-    foxLicenseService = new FoxLicenseServiceImpl();
-  }
 
-  public void setFoxLicenseService(FoxLicenseService foxLicenseService) {
-    this.foxLicenseService = foxLicenseService;
-  }
 }

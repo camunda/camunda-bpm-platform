@@ -37,7 +37,6 @@ public class ConnectorConfigurationDTO {
     this.loginMode = connectorConfiguration.getLoginMode();
     
     this.user = connectorConfiguration.getGlobalUser();
-    this.password = connectorConfiguration.getGlobalPassword();
     
     this.connectorName = connectorConfiguration.getConnectorName();
     this.connectorClass = connectorConfiguration.getConnectorClass();

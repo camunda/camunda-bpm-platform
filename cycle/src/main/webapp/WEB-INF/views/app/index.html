@@ -8,12 +8,7 @@
       <div th:substituteby="fragment/common :: navigation-logged-in"></div>
       <div class="container-fluid content-container content-inset">
         <div th:substituteby="fragment/common :: breadcrumbs"></div>
-        <div class="errorPanel hide">
-          <div data-ng-repeat="error in appErrors()" class="alert alert-error">
-            <button type="button" class="close" data-dismiss="alert">&times;</button>
-            <span th:text="#{'An error occured, try refreshing the page or relogin :'}"></span><span>{{error}}</span>
-          </div>
-        </div>
+        <div data-error-panel></div>
         <div class="row-fluid content-container">
           <div class="span3" id="navigation">
             <div class="well sidebar-nav" id="roundtrip-list" ng-controller="ListRoundtripsController">
@@ -35,6 +30,7 @@
                     <h3 th:text="#{Create roundtrip}">Create roundtrip</h3>
                   </div>
                   <div class="modal-body">
+                    <div data-error-panel></div>
                     <div class="alert alert-error" ng-show="error">
                       <button type="button" class="close" data-dismiss="alert">&times;</button>
                       <span ng-switch ng-switch-on="error.component"> 
@@ -59,7 +55,7 @@
                   </div>
                   <div class="modal-footer">
                     <button class="btn" ng-click="newRoundtripDialog.close()" th:text="#{Cancel}">Cancel</button>
-                    <button id="saveRoundtripButton" class="btn btn-primary" data-ng-click="save()" ng-disabled="!isValid()" th:text="#{Save}">Save</button>
+                    <button id="saveRoundtripButton" class="btn btn-primary" data-ng-click="save()" ng-disabled="!isValid()" th:text="#{Save}" data-req-aware="newRoundtripForm">Save</button>
                   </div>
                 </div>
               </modal-dialog>
@@ -72,6 +68,7 @@
                     <h3 th:text="#{'Delete roundtrip'}"></h3>
                   </div>
                   <div class="modal-body" data-ng-switch data-on="toBeDeleted">
+                    <div data-error-panel></div>
                     <div data-ng-switch-when="performRoundtripDeletion">
                       <p> 
                         <span th:text="#{'Are you sure you would like to delete the selected roundtrip?'}">
@@ -103,7 +100,7 @@
                             data-ng-click="deleteRoundtripDialog.close()" th:text="#{'Close'}">Close</button>
                     <button class="btn btn-primary"
                             data-ng-show="toBeDeleted == 'performRoundtripDeletion'" 
-                            data-ng-click="performDeletion()" th:text="#{'Delete'}">Delete</button>
+                            data-ng-click="performDeletion()" th:text="#{'Delete'}" data-req-aware>Delete</button>
                   </div>
                 </div>
               </modal-dialog>  
