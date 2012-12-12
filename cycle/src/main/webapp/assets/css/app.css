@@ -398,3 +398,11 @@ div#pictureModal.modal.hide.fade {
 thead tr {
   background-color: #eee;
 }
+
+/** make sure that if screen res is 600px high or below, modal dialoges are scrollable */
+@media screen and (max-height: 600px){
+  .modal {
+  	position:relative;
+  } 
+}
+

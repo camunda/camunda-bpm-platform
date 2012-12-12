@@ -634,7 +634,7 @@ angular
               });
             }
           })
-          .on('shown', function() {
+          .on('shown', function() {        		 
             model().setStatus("open");            
           })
           // and show modal
@@ -648,7 +648,7 @@ angular
       function hide() {
         dialog().modal("hide");
       }
-      
+            
       /**
        * Watch the $model.status property in order to map it to the 
        * bootstrap modal dialog life cycle. The HTML has to be rendered first, 
@@ -672,6 +672,19 @@ angular
             break;    
         }
       });
+     
+      // <!>Daniel's master HACK to make sure dialog is positioned in 
+      // the middle of the screen at all times. 
+      scope.$watch(function() {
+    	  return $(dialog()).outerHeight();
+      	}, function(after, before) {
+	      if(after > before) {
+	        var modal = $(dialog());
+			    modal.css('margin-top', (modal.outerHeight() / 2) * -1)
+	 		         .css('margin-left', (modal.outerWidth() / 2) * -1);
+	    }
+      });
+      
     }
   };
 });
