@@ -1,5 +1,8 @@
 package com.camunda.fox.security.service;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import javax.inject.Inject;
 import javax.security.auth.Subject;
 import javax.security.auth.login.LoginContext;
@@ -25,6 +28,8 @@ import com.camunda.fox.security.jaas.PassiveCallbackHandler;
 @Component
 public class SecurityService {
 
+  private static final Logger logger = Logger.getLogger(SecurityService.class.getSimpleName());
+  
   @Inject
   private SecurityConfiguration config;
   
@@ -65,7 +70,7 @@ public class SecurityService {
       // return principal
       return getOrCreateCycleIdentity(subject);
     } catch (LoginException e) {
-      e.printStackTrace();
+      logger.log(Level.WARNING, "Unable to login via JAAS.", e);
       return null;
     }
   }

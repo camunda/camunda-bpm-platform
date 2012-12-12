@@ -454,7 +454,7 @@ public class SignavioClient {
       String proxyHost = proxyURI.getHost();
       int proxyPort = proxyURI.getPort();
       apacheHttpClient.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY,
-              new HttpHost(proxyHost, proxyPort, proxyURI.getScheme()));
+              new HttpHost(proxyHost, proxyPort));
       
       if (proxyUsername != null && !proxyUsername.isEmpty() && proxyPassword != null && !proxyPassword.isEmpty()) {
         apacheHttpClient.getCredentialsProvider().setCredentials(
