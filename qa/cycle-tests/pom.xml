@@ -32,13 +32,6 @@
     </dependency>
     
     <dependency>
-      <groupId>org.jboss.arquillian.junit</groupId>
-      <artifactId>arquillian-junit-container</artifactId>
-      <version>${version.arquillian}</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
         <groupId>com.sun.jersey.contribs</groupId>
         <artifactId>jersey-apache-client4</artifactId>
         <version>1.15</version>
@@ -86,24 +79,6 @@
 		     <version>${project.version}</version>
 		     <type>pom</type>
 		   </dependency>
-   		   <dependency>
-			 <groupId>org.jboss.as</groupId>
-			 <artifactId>jboss-as-arquillian-container-managed</artifactId>
-			 <version>${version.jboss.as}</version>
-			 <scope>test</scope>
-		   </dependency>
-    	   <dependency>
-			 <groupId>org.jboss.arquillian.protocol</groupId>
-			 <artifactId>arquillian-protocol-servlet</artifactId>
-			 <scope>test</scope>
-             <version>${version.arquillian}</version>
-		    </dependency>    		     		   
-            <dependency>
-              <groupId>org.bouncycastle</groupId>
-              <artifactId>bcpg-jdk16</artifactId>
-              <version>1.46</version>
-              <scope>provided</scope>
-            </dependency>
             <dependency>
 		     <groupId>com.camunda.fox.cycle</groupId>
 		     <artifactId>cycle-jboss</artifactId>
@@ -120,12 +95,6 @@
 		       <filtering>true</filtering>
 		     </resource>
 		   </resources>
-           <testResources>
-             <testResource>
-               <directory>src/test/resources-jboss</directory>
-               <filtering>true</filtering>
-             </testResource>
-           </testResources>
 		   <plugins>
 		     <plugin>
 		       <groupId>org.apache.maven.plugins</groupId>
@@ -207,9 +176,43 @@
 		        </execution>
 		      </executions>
 		    </plugin>
+            
+            <plugin>
+              <groupId>org.codehaus.cargo</groupId>
+              <artifactId>cargo-maven2-plugin</artifactId>
+              <executions>
+                <execution>
+                  <id>start-container</id>
+                  <phase>test-compile</phase>
+                  <goals>
+                    <goal>start</goal>
+                  </goals>
+                </execution>
+                <execution>
+                  <id>stop-container</id>
+                  <phase>post-integration-test</phase>
+                  <goals>
+                    <goal>stop</goal>
+                  </goals>
+                </execution>
+              </executions>
+              <configuration>
+                <!-- Container configuration -->
+                  <container>
+                    <type>installed</type>
+                    <containerId>jboss71x</containerId>
+                    <append>false</append>
+                    <home>${project.build.directory}/jboss-as-${version.jboss.as}</home>
+                  </container>
+                  <configuration>
+                    <type>standalone</type>
+                    <home>${project.build.directory}/config-jboss</home>
+                  </configuration>
+                  <wait>false</wait>
+              </configuration>
+            </plugin>            
 		  </plugins>
 		</build>
-  		
   	</profile>
   	<profile>
   		<id>glassfish</id>
@@ -225,19 +228,6 @@
 		   	<version>${project.version}</version>
 		    <type>pom</type>
 		  </dependency>
-          <!-- see we can upgrade this to latest arquillian -->
-          <dependency>
-            <groupId>org.jboss.arquillian.container</groupId>
-            <artifactId>arquillian-glassfish-managed-3.1</artifactId>
-            <version>1.0.0.CR3</version>
-            <scope>test</scope>
-          </dependency>
-          <dependency>
-            <groupId>org.jboss.arquillian.protocol</groupId>
-            <artifactId>arquillian-protocol-servlet</artifactId>
-            <version>1.0.0.CR7</version>
-            <scope>test</scope>
-          </dependency>                         
  		  <dependency>
 		    <groupId>com.camunda.fox.cycle</groupId>
 		    <artifactId>cycle-glassfish</artifactId>
@@ -255,12 +245,6 @@
               <filtering>true</filtering>
             </resource>
           </resources>
-          <testResources>
-             <testResource>
-               <directory>src/test/resources-glassfish</directory>
-               <filtering>true</filtering>
-             </testResource>
-           </testResources>
 		  <plugins>
 		    <plugin>
 		      <groupId>org.apache.maven.plugins</groupId>
@@ -321,6 +305,47 @@
 		        </execution>
 		      </executions>
 		    </plugin>
+            <plugin>
+              <groupId>org.codehaus.cargo</groupId>
+              <artifactId>cargo-maven2-plugin</artifactId>
+              <executions>
+                <execution>
+                  <id>start-container</id>
+                  <phase>test-compile</phase>
+                  <goals>
+                    <goal>start</goal>
+                  </goals>
+                </execution>
+                <execution>
+                  <id>stop-container</id>
+                  <phase>post-integration-test</phase>
+                  <goals>
+                    <goal>stop</goal>
+                  </goals>
+                </execution>
+              </executions>
+              <configuration>
+                <!-- Container configuration -->
+                  <container>
+                    <type>installed</type>
+                    <containerId>glassfish3x</containerId>
+                    <append>false</append>
+                    <home>${project.build.directory}/glassfish3</home>
+                  </container>
+                  <configuration>
+                    <type>existing</type>
+                    <home>${project.build.directory}/glassfish3/glassfish/domains</home>
+                    <properties>
+                        <cargo.glassfish.servlet>8080</cargo.glassfish.servlet>
+                        <cargo.glassfish.adminPort>4848</cargo.glassfish.adminPort>
+                        <cargo.glassfish.domain.name>domain1</cargo.glassfish.domain.name>
+                        <cargo.remote.username>admin</cargo.remote.username>
+                        <cargo.remote.password></cargo.remote.password>
+                    </properties>
+                  </configuration>
+                  <wait>false</wait>
+              </configuration>
+            </plugin> 
 		  </plugins>
 		</build>  		
   	</profile>
