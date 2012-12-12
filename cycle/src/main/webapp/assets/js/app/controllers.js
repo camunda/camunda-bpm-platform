@@ -294,13 +294,12 @@ function BpmnDiagramController($scope, Commons, Event, $http, App) {
     .success(function(data) {
         $scope.roundtrip.$get({id: $scope.roundtrip.id });
         $scope.status = SYNC_SUCCESS;
+        $scope.editDiagramDialog.close();
     })
     .error(function (data) {
         $scope.status = SYNC_FAILED;
     });
   
-  $scope.editDiagramDialog.close();
-
   };
 
   $scope.diagramClass = function(diagram) {
