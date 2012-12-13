@@ -16,7 +16,6 @@
     <java.resources.override>src/main/runtime/default/resources</java.resources.override>
     <properties.override>src/main/runtime/default/config.properties</properties.override>
     <netbeans.hint.deploy.server>gfv3ee6</netbeans.hint.deploy.server>
-    <bouncycastle.version>1.47</bouncycastle.version>
   </properties>
   
   <dependencies>
@@ -51,6 +50,12 @@
       <groupId>com.sun.jersey</groupId>
       <artifactId>jersey-json</artifactId>
       <scope>provided</scope>
+      <exclusions>
+        <exclusion>
+          <artifactId>jaxb-api</artifactId>
+          <groupId>javax.xml.bind</groupId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>com.sun.jersey.contribs</groupId>
@@ -283,6 +288,12 @@
       <groupId>com.camunda.fox.commons</groupId>
       <artifactId>commons-licensing</artifactId>
       <version>${project.version}</version>
+      <exclusions>
+        <exclusion>
+          <artifactId>jaxb-api</artifactId>
+          <groupId>javax.xml.bind</groupId>
+        </exclusion>
+      </exclusions>
     </dependency>
     
   </dependencies>
@@ -595,7 +606,6 @@
         <dependency>
           <groupId>org.bouncycastle</groupId>
           <artifactId>bcpg-jdk15on</artifactId>
-          <version>${version.bouncycastle}</version>
         </dependency>
         
       </dependencies>
@@ -675,7 +685,6 @@
         <dependency>
           <groupId>org.bouncycastle</groupId>
           <artifactId>bcpg-jdk15on</artifactId>
-          <version>${version.bouncycastle}</version>
         </dependency>
         <dependency>
           <groupId>com.sun.jersey.contribs</groupId>
