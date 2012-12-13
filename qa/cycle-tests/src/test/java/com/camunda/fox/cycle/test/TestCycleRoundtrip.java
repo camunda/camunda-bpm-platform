@@ -4,7 +4,9 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
@@ -51,12 +53,15 @@ public class TestCycleRoundtrip {
   
   private static final String USER_ID = "1";
   
+  private static final String HOST_NAME = "localhost";
   private static String httpPort = "8080";
+  private static final String CYCLE_BASE_PATH = "http://" + HOST_NAME + ":"+httpPort+"/cycle/";
 
   private static ApacheHttpClient4 client;
   private static VfsConnector vfsConnector;
   private static RoundtripDTO roundtripDTO;
   private static DefaultHttpClient defaultHttpClient;
+  private static Long vfsConnectorId;
   
   @BeforeClass
   public static void testCycleDeployment() throws Exception {
@@ -83,7 +88,7 @@ public class TestCycleRoundtrip {
     boolean success = false;
     for (int i = 0; i <= 30; i++) {
       try {
-        WebResource webResource = client.resource("http://localhost:"+httpPort+"/cycle/");
+        WebResource webResource = client.resource(CYCLE_BASE_PATH);
         ClientResponse clientResponse = webResource.get(ClientResponse.class);
         int status = clientResponse.getStatus();
         clientResponse.close();
@@ -109,11 +114,11 @@ public class TestCycleRoundtrip {
   
   @Test
   public void testLeftToRightSynchronisation() throws Exception {
-    WebResource webResource = client.resource("http://localhost:"+httpPort+"/cycle/app/secured/resource/roundtrip/"+roundtripDTO.getId()+"/sync?syncMode=LEFT_TO_RIGHT");
+    WebResource webResource = client.resource(CYCLE_BASE_PATH+"app/secured/resource/roundtrip/"+roundtripDTO.getId()+"/sync?syncMode=LEFT_TO_RIGHT");
       
     ClientResponse clientResponse = webResource.accept(MediaType.APPLICATION_JSON).type(MediaType.APPLICATION_JSON).post(ClientResponse.class);
     SynchronizationStatus synchronizationStatus = clientResponse.getEntity(SynchronizationResultDTO.class).getStatus();
-    Assert.assertEquals(SynchronizationStatus.SYNC_SUCCESS, synchronizationStatus.SYNC_SUCCESS);
+    Assert.assertEquals(SynchronizationStatus.SYNC_SUCCESS, synchronizationStatus);
     int status = clientResponse.getStatus();
     clientResponse.close();
     Assert.assertEquals(Status.OK.getStatusCode(), status);
@@ -121,11 +126,11 @@ public class TestCycleRoundtrip {
   
   @Test
   public void testRightToLeftSynchronisation() throws Exception {
-    WebResource webResource = client.resource("http://localhost:"+httpPort+"/cycle/app/secured/resource/roundtrip/"+roundtripDTO.getId()+"/sync?syncMode=RIGHT_TO_LEFT");
+    WebResource webResource = client.resource(CYCLE_BASE_PATH+"app/secured/resource/roundtrip/"+roundtripDTO.getId()+"/sync?syncMode=RIGHT_TO_LEFT");
       
     ClientResponse clientResponse = webResource.accept(MediaType.APPLICATION_JSON).type(MediaType.APPLICATION_JSON).post(ClientResponse.class);
     SynchronizationStatus synchronizationStatus = clientResponse.getEntity(SynchronizationResultDTO.class).getStatus();
-    Assert.assertEquals(SynchronizationStatus.SYNC_SUCCESS, synchronizationStatus.SYNC_SUCCESS);
+    Assert.assertEquals(SynchronizationStatus.SYNC_SUCCESS, synchronizationStatus);
     int status = clientResponse.getStatus();
     clientResponse.close();
     Assert.assertEquals(Status.OK.getStatusCode(), status);
@@ -137,9 +142,6 @@ public class TestCycleRoundtrip {
     executeCycleLogin();
     deleteRoundtrip();
     deleteConnector();
-    if (vfsConnector != null) {
-      vfsConnector.dispose();
-    }
     deleteUser();
     cleanVfsTargetDirectory(VFS_DIRECTORY);
     defaultHttpClient.getConnectionManager().shutdown();
@@ -147,7 +149,7 @@ public class TestCycleRoundtrip {
   
   // *********************************** private methods *************************************//
   private static int executeCycleLogin() throws Exception {
-    HttpPost httpPost = new HttpPost("http://localhost:"+httpPort+"/cycle/j_security_check");
+    HttpPost httpPost = new HttpPost(CYCLE_BASE_PATH+"j_security_check");
     List<NameValuePair> parameterList = new ArrayList<NameValuePair>();
     parameterList.add(new BasicNameValuePair("j_username", "test"));
     parameterList.add(new BasicNameValuePair("j_password", "test"));
@@ -161,7 +163,7 @@ public class TestCycleRoundtrip {
   
   private static void createInitialUserAndLogin() throws Exception {
     // create initial user
-    WebResource webResource = client.resource("http://localhost:"+httpPort+"/cycle/app/first-time-setup");
+    WebResource webResource = client.resource(CYCLE_BASE_PATH+"app/first-time-setup");
 
     UserDTO userDTO = new UserDTO();
     userDTO.setName("test");
@@ -180,27 +182,35 @@ public class TestCycleRoundtrip {
   }
   
   private static void createVfsConnector() {
-    WebResource webResource = client.resource("http://localhost:"+httpPort+"/cycle/app/secured/resource/connector/configuration");
+    WebResource webResource = client.resource(CYCLE_BASE_PATH+"app/secured/resource/connector/configuration");
     
     ConnectorConfiguration connectorConfiguration = new ConnectorConfiguration();
     connectorConfiguration.setConnectorName("FileSystemConnector");
     connectorConfiguration.setName("FileSystemConnector");
     connectorConfiguration.setLoginMode(ConnectorLoginMode.LOGIN_NOT_REQUIRED);
     connectorConfiguration.getProperties().put(VfsConnector.BASE_PATH_KEY, VFS_DIRECTORY.getAbsolutePath());
-    connectorConfiguration.setConnectorClass(VfsConnector.class.getSimpleName());
+    connectorConfiguration.setConnectorClass(VfsConnector.class.getName());
     
     ClientResponse clientResponse = webResource.accept(MediaType.APPLICATION_JSON).type(MediaType.APPLICATION_JSON).post(ClientResponse.class, ConnectorConfigurationDTO.wrap(connectorConfiguration));
+    ConnectorConfigurationDTO entity = clientResponse.getEntity(ConnectorConfigurationDTO.class);
+    
+    vfsConnectorId = entity.getConnectorId();
+    Assert.assertNotNull(vfsConnectorId);
+
     int status = clientResponse.getStatus();
     clientResponse.close();
     Assert.assertEquals(Status.OK.getStatusCode(), status);
     
+    // init local instance of VfsConnector 
+    // (required for creating connector nodes in VFS_DIRECTORY)
     vfsConnector = new VfsConnector();
     vfsConnector.setConfiguration(connectorConfiguration);
     vfsConnector.init();
+    
   }
   
   private static void createRoundtripWithDetails() throws Exception {
-    WebResource webResource = client.resource("http://localhost:"+httpPort+"/cycle/app/secured/resource/roundtrip");
+    WebResource webResource = client.resource(CYCLE_BASE_PATH+"app/secured/resource/roundtrip");
 
     // create roundtrip
     roundtripDTO = new RoundtripDTO();
@@ -214,7 +224,7 @@ public class TestCycleRoundtrip {
     Assert.assertEquals(Status.OK.getStatusCode(), status);
 
     // update roundtrip details LHS
-    webResource = client.resource("http://localhost:"+httpPort+"/cycle/app/secured/resource/roundtrip/"+roundtripDTO.getId()+"/details");
+    webResource = client.resource(CYCLE_BASE_PATH+"app/secured/resource/roundtrip/"+roundtripDTO.getId()+"/details");
     
     BpmnDiagramDTO leftHandSide = new BpmnDiagramDTO();
     leftHandSide.setModeler("lhs-modeler");
@@ -242,6 +252,7 @@ public class TestCycleRoundtrip {
   
   private static ConnectorNodeDTO createConnectorNodeParentFolder() {
     ConnectorNode connectorParentNode = vfsConnector.createNode(vfsConnector.getRoot().getId(), TMP_DIR_NAME, ConnectorNodeType.FOLDER);
+    connectorParentNode.setConnectorId(vfsConnectorId);
     ConnectorNodeDTO connectorParentNodeDTO = new ConnectorNodeDTO(connectorParentNode);
     return connectorParentNodeDTO;
   }
@@ -250,6 +261,7 @@ public class TestCycleRoundtrip {
     InputStream modelInputStream = IoUtil.readFileAsInputStream(processDiagramPath);
     String label = processDiagramPath.substring(processDiagramPath.lastIndexOf("/") + 1, processDiagramPath.length());
     ConnectorNode connectorNode = vfsConnector.createNode(connectorNodeParentFolder.getId(), label, ConnectorNodeType.BPMN_FILE);
+    connectorNode.setConnectorId(vfsConnectorId);
     vfsConnector.updateContent(connectorNode, modelInputStream);
   }
   
@@ -267,20 +279,48 @@ public class TestCycleRoundtrip {
   }
   
   private static void deleteUser() throws Exception {
-    WebResource webResource = client.resource("http://localhost:"+httpPort+"/cycle/app/secured/resource/user/"+USER_ID);
+    WebResource webResource = client.resource(CYCLE_BASE_PATH+"app/secured/resource/user");
+    ClientResponse response = webResource.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+    List<Map> users = response.getEntity(List.class);
+    response.close();
+    for (Map userDTO : users) {
+      webResource = client.resource(CYCLE_BASE_PATH+"app/secured/resource/user"+userDTO.get("id"));
+      ClientResponse clientResponse = webResource.delete(ClientResponse.class);
+      clientResponse.close();
+    }
+    
     ClientResponse clientResponse = webResource.delete(ClientResponse.class);
     clientResponse.close();
   }
   
   private static void deleteRoundtrip() {
-    WebResource webResource = client.resource("http://localhost:"+httpPort+"/cycle/app/secured/resource/roundtrip/"+roundtripDTO.getId());
-    ClientResponse clientResponse = webResource.delete(ClientResponse.class);
-    clientResponse.close();
+    WebResource webResource = client.resource(CYCLE_BASE_PATH+"app/secured/resource/roundtrip");
+    ClientResponse response = webResource.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+    List<Map> roundtrips = response.getEntity(List.class);
+    response.close();
+    for (Map roundtripDTO : roundtrips) {
+      webResource = client.resource(CYCLE_BASE_PATH+"app/secured/resource/roundtrip/"+roundtripDTO.get("id"));
+      ClientResponse clientResponse = webResource.delete(ClientResponse.class);
+      clientResponse.close();
+    }
+    
+    
   }
   
   private static void deleteConnector() {
-    WebResource webResource = client.resource("http://localhost:"+httpPort+"/cycle/app/secured/resource/connector/configuration"+vfsConnector.getId());
-    ClientResponse clientResponse = webResource.delete(ClientResponse.class);
-    clientResponse.close();
+    
+    WebResource webResource = client.resource(CYCLE_BASE_PATH+"app/secured/resource/connector/configuration");
+    ClientResponse response = webResource.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
+    List<Map> entity = response.getEntity(List.class);
+    response.close();
+    for (Map<String,Object> connectorConfigurationDTO : entity) {
+      webResource = client.resource(CYCLE_BASE_PATH+"app/secured/resource/connector/configuration"+connectorConfigurationDTO.get("connectorId"));
+      ClientResponse clientResponse = webResource.delete(ClientResponse.class);
+      clientResponse.close();
+    }
+    
+    if(vfsConnector != null) {
+      vfsConnector.dispose();
+    }
   }
 }
