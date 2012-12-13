@@ -3,6 +3,8 @@ package com.camunda.fox.cycle.test;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
@@ -10,6 +12,12 @@ import javax.ws.rs.core.Response.Status;
 import junit.framework.Assert;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.NameValuePair;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -27,12 +35,10 @@ import com.camunda.fox.cycle.web.dto.RoundtripDTO;
 import com.camunda.fox.cycle.web.dto.SynchronizationResultDTO;
 import com.camunda.fox.cycle.web.dto.SynchronizationResultDTO.SynchronizationStatus;
 import com.camunda.fox.cycle.web.dto.UserDTO;
-import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.json.JSONConfiguration;
-import com.sun.jersey.api.representation.Form;
 import com.sun.jersey.client.apache4.ApacheHttpClient4;
 import com.sun.jersey.client.apache4.config.DefaultApacheHttpClient4Config;
 
@@ -43,12 +49,14 @@ public class TestCycleRoundtrip {
   private static final String LHS_PROCESS_DIAGRAM = "/com/camunda/fox/cycle/roundtrip/repository/test-lhs.bpmn";
   private static final String RHS_PROCESS_DIAGRAM = "/com/camunda/fox/cycle/roundtrip/repository/test-rhs.bpmn";
   
+  private static final String USER_ID = "1";
+  
   private static String httpPort = "8080";
 
-  private static Client client;
-  
+  private static ApacheHttpClient4 client;
   private static VfsConnector vfsConnector;
   private static RoundtripDTO roundtripDTO;
+  private static DefaultHttpClient defaultHttpClient;
   
   @BeforeClass
   public static void testCycleDeployment() throws Exception {
@@ -68,6 +76,10 @@ public class TestCycleRoundtrip {
     clientConfig.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
     client = ApacheHttpClient4.create(clientConfig);
     
+    defaultHttpClient = (DefaultHttpClient) client.getClientHandler().getHttpClient();
+    
+//    cleanUp();
+    
     boolean success = false;
     for (int i = 0; i <= 30; i++) {
       try {
@@ -80,7 +92,6 @@ public class TestCycleRoundtrip {
           break;
         }
       } catch (Exception e) {
-        e.printStackTrace();
         // do nothing
       }
       
@@ -88,9 +99,9 @@ public class TestCycleRoundtrip {
     }
     
     if (success) {
-      testCreateInitialUserAndLogin();
-      testCreateVfsConnector();
-      testCreateRoundtripWithDetails();
+      createInitialUserAndLogin();
+      createVfsConnector();
+      createRoundtripWithDetails();
     } else {
       Assert.fail("Cycle is not available! Check cycle deployment.");
     }
@@ -118,40 +129,62 @@ public class TestCycleRoundtrip {
     int status = clientResponse.getStatus();
     clientResponse.close();
     Assert.assertEquals(Status.OK.getStatusCode(), status);
-  }  
+  }
   
-  private static void testCreateInitialUserAndLogin() {
+  @AfterClass
+  public static void cleanUp() throws Exception {
+    // login with created user
+    executeCycleLogin();
+    deleteRoundtrip();
+    deleteConnector();
+    if (vfsConnector != null) {
+      vfsConnector.dispose();
+    }
+    deleteUser();
+    cleanVfsTargetDirectory(VFS_DIRECTORY);
+    defaultHttpClient.getConnectionManager().shutdown();
+  }
+  
+  // *********************************** private methods *************************************//
+  private static int executeCycleLogin() throws Exception {
+    HttpPost httpPost = new HttpPost("http://localhost:"+httpPort+"/cycle/j_security_check");
+    List<NameValuePair> parameterList = new ArrayList<NameValuePair>();
+    parameterList.add(new BasicNameValuePair("j_username", "test"));
+    parameterList.add(new BasicNameValuePair("j_password", "test"));
+
+    httpPost.setEntity(new UrlEncodedFormEntity(parameterList, "UTF-8"));
+    HttpResponse httpResponse = defaultHttpClient.execute(httpPost);
+    int status = httpResponse.getStatusLine().getStatusCode();
+    httpResponse.getEntity().getContent().close();
+    return status;
+  }
+  
+  private static void createInitialUserAndLogin() throws Exception {
     // create initial user
     WebResource webResource = client.resource("http://localhost:"+httpPort+"/cycle/app/first-time-setup");
-    
+
     UserDTO userDTO = new UserDTO();
     userDTO.setName("test");
     userDTO.setPassword("test");
     userDTO.setEmail("test@camunda.com");
     userDTO.setAdmin(true);
     
-    ClientResponse clientResponse = webResource.type(MediaType.APPLICATION_JSON).post(ClientResponse.class, userDTO);
+    ClientResponse clientResponse = webResource.accept(MediaType.APPLICATION_JSON).type(MediaType.APPLICATION_JSON).post(ClientResponse.class, userDTO);
     int status = clientResponse.getStatus();
     clientResponse.close();
     Assert.assertEquals(Status.OK.getStatusCode(), status);
     
     // login with created user
-    webResource = client.resource("http://localhost:"+httpPort+"/cycle/j_security_check");
-    Form loginForm = new Form();
-    loginForm.add("j_username", "test");
-    loginForm.add("j_password", "test");
-    
-    clientResponse = webResource.type(MediaType.APPLICATION_FORM_URLENCODED).post(ClientResponse.class, loginForm);
-    status = clientResponse.getStatus();
-    clientResponse.close();
+    status = executeCycleLogin();
     Assert.assertEquals(302, status);
   }
   
-  private static void testCreateVfsConnector() {
+  private static void createVfsConnector() {
     WebResource webResource = client.resource("http://localhost:"+httpPort+"/cycle/app/secured/resource/connector/configuration");
     
     ConnectorConfiguration connectorConfiguration = new ConnectorConfiguration();
     connectorConfiguration.setConnectorName("FileSystemConnector");
+    connectorConfiguration.setName("FileSystemConnector");
     connectorConfiguration.setLoginMode(ConnectorLoginMode.LOGIN_NOT_REQUIRED);
     connectorConfiguration.getProperties().put(VfsConnector.BASE_PATH_KEY, VFS_DIRECTORY.getAbsolutePath());
     connectorConfiguration.setConnectorClass(VfsConnector.class.getSimpleName());
@@ -166,7 +199,7 @@ public class TestCycleRoundtrip {
     vfsConnector.init();
   }
   
-  private static void testCreateRoundtripWithDetails() throws Exception {
+  private static void createRoundtripWithDetails() throws Exception {
     WebResource webResource = client.resource("http://localhost:"+httpPort+"/cycle/app/secured/resource/roundtrip");
 
     // create roundtrip
@@ -233,12 +266,21 @@ public class TestCycleRoundtrip {
     }
   }
   
-  @AfterClass
-  public static void cleanUp() throws IOException {
-    if (vfsConnector != null) {
-      vfsConnector.dispose();
-    }
-    cleanVfsTargetDirectory(VFS_DIRECTORY);
+  private static void deleteUser() throws Exception {
+    WebResource webResource = client.resource("http://localhost:"+httpPort+"/cycle/app/secured/resource/user/"+USER_ID);
+    ClientResponse clientResponse = webResource.delete(ClientResponse.class);
+    clientResponse.close();
   }
   
+  private static void deleteRoundtrip() {
+    WebResource webResource = client.resource("http://localhost:"+httpPort+"/cycle/app/secured/resource/roundtrip/"+roundtripDTO.getId());
+    ClientResponse clientResponse = webResource.delete(ClientResponse.class);
+    clientResponse.close();
+  }
+  
+  private static void deleteConnector() {
+    WebResource webResource = client.resource("http://localhost:"+httpPort+"/cycle/app/secured/resource/connector/configuration"+vfsConnector.getId());
+    ClientResponse clientResponse = webResource.delete(ClientResponse.class);
+    clientResponse.close();
+  }
 }
