@@ -37,6 +37,12 @@
     </dependency>
     
     <dependency>
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>bcpg-jdk15on</artifactId>
+      <version>${version.bouncycastle}</version>
+    </dependency>    
+    
+    <dependency>
       <groupId>com.sun.jersey.contribs</groupId>
       <artifactId>jersey-spring</artifactId>
       <exclusions>
