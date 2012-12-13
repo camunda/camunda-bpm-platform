@@ -594,7 +594,7 @@
         <dependency>
           <groupId>org.bouncycastle</groupId>
           <artifactId>bcpg-jdk15on</artifactId>
-          <version>${bouncycastle.version}</version>
+          <version>${version.bouncycastle}</version>
         </dependency>
         
       </dependencies>
@@ -674,7 +674,7 @@
         <dependency>
           <groupId>org.bouncycastle</groupId>
           <artifactId>bcpg-jdk15on</artifactId>
-          <version>${bouncycastle.version}</version>
+          <version>${version.bouncycastle}</version>
         </dependency>
         <dependency>
           <groupId>com.sun.jersey.contribs</groupId>
