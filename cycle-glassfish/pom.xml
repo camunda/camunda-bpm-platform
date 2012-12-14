@@ -39,7 +39,6 @@
     <dependency>
       <groupId>org.bouncycastle</groupId>
       <artifactId>bcpg-jdk15on</artifactId>
-      <version>${version.bouncycastle}</version>
     </dependency>    
     
     <dependency>
@@ -87,7 +86,12 @@
           <artifactId>xml-apis</artifactId>          
         </exclusion>
       </exclusions>
-    </dependency>   
+    </dependency>
+    
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+    </dependency>
 
   </dependencies>
 

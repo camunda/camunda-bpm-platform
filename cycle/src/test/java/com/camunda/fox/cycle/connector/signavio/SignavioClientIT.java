@@ -13,7 +13,7 @@ import java.util.Scanner;
 
 import javax.inject.Inject;
 
-import org.apache.http.ParseException;
+import com.camunda.fox.cycle.http.ParseException;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
 import org.custommonkey.xmlunit.DetailedDiff;

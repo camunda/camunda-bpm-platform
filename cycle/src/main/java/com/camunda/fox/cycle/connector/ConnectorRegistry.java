@@ -119,7 +119,7 @@ public class ConnectorRegistry {
    * 
    * @throws CycleException if the connector is unavailable
    */
-  public Connector getConnector(long connectorId) {
+  public synchronized Connector getConnector(long connectorId) {
     Connector connector = cache.get(connectorId);
     if (connector == null) {
       connector = instantiateConnector(connectorId);

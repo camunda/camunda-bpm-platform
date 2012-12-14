@@ -1,6 +1,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <name>fox cycle - JBoss</name>
+  <name>fox cycle - Websphere</name>
   <parent>
     <groupId>com.camunda.fox.cycle</groupId>
     <artifactId>cycle-root</artifactId>
@@ -22,31 +22,26 @@
       <type>war</type>
       <scope>runtime</scope>
     </dependency>
-
-    <dependency>
-      <groupId>org.jboss.spec</groupId>
-      <artifactId>jboss-javaee-web-6.0</artifactId>
-      <type>pom</type>
-      <scope>provided</scope>
-      <version>3.0.0.Final</version>
-      <exclusions>
-        <exclusion>
-          <artifactId>xalan</artifactId>
-          <groupId>org.apache.xalan</groupId>
-        </exclusion>
-      </exclusions>
-    </dependency>
     
     <!-- javax.persistence -->
     <dependency>
       <groupId>org.hibernate</groupId>
       <artifactId>hibernate-entitymanager</artifactId>
+      <exclusions>
+        <exclusion>
+          <artifactId>hibernate-jpa-2.0-api</artifactId>
+          <groupId>org.hibernate.javax.persistence</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>javassist</artifactId>
+          <groupId>org.javassist</groupId>
+        </exclusion>
+      </exclusions>
     </dependency>
     
     <dependency>
       <groupId>cglib</groupId>
       <artifactId>cglib-nodep</artifactId>
-      <version>2.2.2</version>
     </dependency>
     
     <!-- jax-rs -->
