@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.apache.http.client.HttpResponseException;
+import com.camunda.fox.cycle.http.client.HttpResponseException;
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 import org.springframework.stereotype.Component;
@@ -51,6 +51,10 @@ public class SignavioConnector extends Connector {
 
   @Override
   public void login(String username, String password) {
+    if (getSignavioClient() == null) {
+      ConnectorConfiguration connectorConfiguration = getConfiguration();
+      init(connectorConfiguration);
+    }
     getSignavioClient().login(username, password);
     loggedIn = true;
   }
@@ -63,7 +67,7 @@ public class SignavioConnector extends Connector {
   @Override
   public void init(ConnectorConfiguration config) {
     try {
-      if (signavioClient == null) {
+      if (getSignavioClient() == null) {
         signavioClient = new SignavioClient(getConfiguration().getProperties().get(CONFIG_KEY_SIGNAVIO_BASE_URL),
                                             getConfiguration().getProperties().get(CONFIG_KEY_PROXY_URL),
                                             getConfiguration().getProperties().get(CONFIG_KEY_PROXY_USERNAME),
