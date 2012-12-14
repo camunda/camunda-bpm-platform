@@ -732,7 +732,11 @@
               <artifactId>xml-apis</artifactId>          
             </exclusion>
           </exclusions>
-        </dependency>   
+        </dependency>
+        <dependency>
+          <groupId>commons-io</groupId>
+          <artifactId>commons-io</artifactId>
+        </dependency>
       </dependencies>
       <properties>
         <web.resources.override>src/main/runtime/glassfish/webapp</web.resources.override>
