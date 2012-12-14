@@ -183,7 +183,7 @@
               <executions>
                 <execution>
                   <id>start-container</id>
-                  <phase>test-compile</phase>
+                  <phase>pre-integration-test</phase>
                   <goals>
                     <goal>start</goal>
                   </goals>
@@ -210,7 +210,8 @@
                   </configuration>
                   <wait>false</wait>
               </configuration>
-            </plugin>            
+            </plugin>
+            
 		  </plugins>
 		</build>
   	</profile>
@@ -311,7 +312,7 @@
               <executions>
                 <execution>
                   <id>start-container</id>
-                  <phase>test-compile</phase>
+                  <phase>pre-integration-test</phase>
                   <goals>
                     <goal>start</goal>
                   </goals>
@@ -556,6 +557,28 @@
           <directory>src/test/resources</directory>
         </testResource>
       </testResources>
+
+      <plugins>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <configuration>
+            <skipTests>true</skipTests>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-failsafe-plugin</artifactId>
+          <version>2.12</version>
+          <executions>
+            <execution>
+              <goals>
+                <goal>integration-test</goal>
+              </goals>
+            </execution>
+          </executions>
+        </plugin>
+      </plugins>
   
       <pluginManagement>
           <plugins>
