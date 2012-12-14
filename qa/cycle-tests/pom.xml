@@ -69,7 +69,8 @@
 	      <activeByDefault>true</activeByDefault>
 	    </activation>
 	    <properties>
-    		<jboss.assembly.location>../../jbossas71/assembly/target/camunda-fox-ce-${project.version}/camunda-fox-ce-${project.version}/server</jboss.assembly.location>
+    		<jboss.assembly.location>../jboss7-runtime/target/jboss-as-${version.jboss.as}</jboss.assembly.location>
+            <jboss.standalone.xml>standalone-h2.xml</jboss.standalone.xml>
   		</properties>  		
 		<dependencies>
 		  <dependency>
@@ -108,75 +109,33 @@
 		           </goals>
 		           <configuration>
 		             <target unless="maven.test.skip">
-		              <copy todir="target">
+
+                      <!-- copy jboss server runtime -->
+                      <mkdir dir="target/jboss-as-${version.jboss.as}"/>                      
+		              <copy todir="target/jboss-as-${version.jboss.as}" >
 		                 <fileset dir="${jboss.assembly.location}" />
 		              </copy>
                        
-		              <!-- remove activiti test classes from engine, made it maven 2 and 3 compatible -->
-		              <unzip dest="target/fox-engine">
-		                <fileset dir="target/jboss-as-${version.jboss.as}/modules/com/camunda/fox/engine/fox-engine/main/">
-		                  <include name="*.jar" />
-		                </fileset>
-		                <patternset>
-		                  <exclude name="org/activiti/engine/impl/test/**" />
-		                </patternset>
-		              </unzip>
-				
-		              <delete>
-		                <fileset dir="target/jboss-as-${version.jboss.as}/modules/com/camunda/fox/engine/fox-engine/main/">
-		                  <include name="*.jar" />
-		                </fileset>
-		              </delete>
-		              
-		              <zip destfile="target/jboss-as-${version.jboss.as}/modules/com/camunda/fox/engine/fox-engine/main/fox-engine-${project.version}.jar" basedir="target/fox-engine" />
-		            </target>
-		          </configuration>
-		        </execution>
-		        <execution>
-		          <id>copy-test-dependencies</id>
-		          <phase>test-compile</phase>
-		          <goals>
-		            <goal>run</goal>
-		          </goals>
-		          <configuration>
-		            <target unless="maven.test.skip">
+                      <!-- add cycle.war to jboss deployments directory -->
 		              <dependencyfilesets scopes="test" types="war"/>
                       
 		              <copy todir="target/jboss-as-${version.jboss.as}/standalone/deployments">
 		                <fileset refid="maven.project.dependencies" />
                         <regexpmapper from="^(.*)/([^/]+)/([^/]*)$$" to="\3" handledirsep="yes" />
 		              </copy>
-		                                                         
+                                      
+                      <!-- we copy the correct configuraiton file to standalone.xml -->
+                      <copy file="target/jboss-as-${version.jboss.as}/standalone/configuration/${jboss.standalone.xml}" 
+                            tofile="target/jboss-as-${version.jboss.as}/standalone/configuration/standalone.xml"
+                            overwrite="true" />
+                                                  
+                                                 
 		            </target>
 		          </configuration>
 		        </execution>
 		      </executions>
 		    </plugin>
-		    <!-- copy filtered configuration resources -->
-		    <plugin>
-		      <groupId>org.apache.maven.plugins</groupId>
-		      <artifactId>maven-resources-plugin</artifactId>
-		      <configuration>
-		        <delimiters>
-		          <delimiter>${*}</delimiter>          
-		        </delimiters>
-		        <useDefaultDelimiters>false</useDefaultDelimiters>
-		      </configuration>
-		      <executions>
-		        <execution>
-		          <id>copy-resources</id>
-		          <phase>test-compile</phase>
-		          <goals>
-		            <goal>resources</goal>
-		          </goals>
-		          <configuration>
-		            <override>true</override>
-		            <outputDirectory>target/jboss-as-${version.jboss.as}/standalone</outputDirectory>
-		          </configuration>
-		        </execution>
-		      </executions>
-		    </plugin>
-            
+		                
             <plugin>
               <groupId>org.codehaus.cargo</groupId>
               <artifactId>cargo-maven2-plugin</artifactId>
@@ -207,6 +166,9 @@
                   <configuration>
                     <type>standalone</type>
                     <home>${project.build.directory}/config-jboss</home>
+                    <properties>
+                      <cargo.servlet.port>38080</cargo.servlet.port>
+                    </properties>
                   </configuration>
                   <wait>false</wait>
               </configuration>
@@ -337,8 +299,7 @@
                     <type>existing</type>
                     <home>${project.build.directory}/glassfish3/glassfish/domains</home>
                     <properties>
-                        <cargo.glassfish.servlet>8080</cargo.glassfish.servlet>
-                        <cargo.glassfish.adminPort>4848</cargo.glassfish.adminPort>
+                        <cargo.glassfish.adminPort>24848</cargo.glassfish.adminPort>
                         <cargo.glassfish.domain.name>domain1</cargo.glassfish.domain.name>
                         <cargo.remote.username>admin</cargo.remote.username>
                         <cargo.remote.password></cargo.remote.password>

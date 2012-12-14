@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
@@ -45,6 +46,8 @@ import com.sun.jersey.client.apache4.config.DefaultApacheHttpClient4Config;
 
 public class TestCycleRoundtripIT {
   
+  private final static Logger log = Logger.getLogger(TestCycleRoundtripIT.class.getName());
+  
   private static final File VFS_DIRECTORY = new File("target/vfs-repository");
   private static final String TMP_DIR_NAME = "cycle-integration-test";
   private static final String LHS_PROCESS_DIAGRAM = "/com/camunda/fox/cycle/roundtrip/repository/test-lhs.bpmn";
@@ -52,7 +55,7 @@ public class TestCycleRoundtripIT {
   
   private static final String HOST_NAME = "localhost";
   private static String httpPort = "8080";
-  private static final String CYCLE_BASE_PATH = "http://" + HOST_NAME + ":"+httpPort+"/cycle/";
+  private static String CYCLE_BASE_PATH;
 
   private static ApacheHttpClient4 client;
   private static VfsConnector vfsConnector;
@@ -62,17 +65,23 @@ public class TestCycleRoundtripIT {
   
   @BeforeClass
   public static void testCycleDeployment() throws Exception {
-//    String profile = System.getProperty("profile");
-//    if (profile != null && !profile.isEmpty()) {
-//      if (profile.equals("glassfish")) {
-//        httpPort = "28080";
-//      } else if (profile.equals("jboss")) {
-//        httpPort = "19099";
-//      } else if (profile.equals("was")) {
-//        // TODO
-//      }
-//      System.out.println("******************HTTP PORT: " + httpPort);
-//    }
+    
+    String serverName = System.getProperty("test.server.name");
+    if(serverName == null) {
+      httpPort = "38080";
+    } else {
+      if("jboss".equals(serverName)) {
+        httpPort = "38080";    
+      } else if("glassfish".equals(serverName)) {
+        httpPort = "28080";
+      } else if ("websphere".equals(serverName)) {
+        // TODO!
+        httpPort = "9080";
+      }
+    }
+    
+    CYCLE_BASE_PATH = "http://" + HOST_NAME + ":"+httpPort+"/cycle/";
+    log.info("Connecting to cycle at "+CYCLE_BASE_PATH);
     
     ClientConfig clientConfig = new DefaultApacheHttpClient4Config();
     clientConfig.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
