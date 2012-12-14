@@ -4,7 +4,6 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -51,8 +50,6 @@ public class TestCycleRoundtrip {
   private static final String LHS_PROCESS_DIAGRAM = "/com/camunda/fox/cycle/roundtrip/repository/test-lhs.bpmn";
   private static final String RHS_PROCESS_DIAGRAM = "/com/camunda/fox/cycle/roundtrip/repository/test-rhs.bpmn";
   
-  private static final String USER_ID = "1";
-  
   private static final String HOST_NAME = "localhost";
   private static String httpPort = "8080";
   private static final String CYCLE_BASE_PATH = "http://" + HOST_NAME + ":"+httpPort+"/cycle/";
@@ -83,8 +80,6 @@ public class TestCycleRoundtrip {
     
     defaultHttpClient = (DefaultHttpClient) client.getClientHandler().getHttpClient();
     
-//    cleanUp();
-    
     boolean success = false;
     for (int i = 0; i <= 30; i++) {
       try {
@@ -112,6 +107,11 @@ public class TestCycleRoundtrip {
     }
   }
   
+  @AfterClass
+  public static void afterClass() throws Exception {
+    cleanUp();
+  }
+  
   @Test
   public void testLeftToRightSynchronisation() throws Exception {
     WebResource webResource = client.resource(CYCLE_BASE_PATH+"app/secured/resource/roundtrip/"+roundtripDTO.getId()+"/sync?syncMode=LEFT_TO_RIGHT");
@@ -135,8 +135,7 @@ public class TestCycleRoundtrip {
     clientResponse.close();
     Assert.assertEquals(Status.OK.getStatusCode(), status);
   }
-  
-  @AfterClass
+    
   public static void cleanUp() throws Exception {
     // login with created user
     executeCycleLogin();
@@ -229,17 +228,17 @@ public class TestCycleRoundtrip {
     BpmnDiagramDTO leftHandSide = new BpmnDiagramDTO();
     leftHandSide.setModeler("lhs-modeler");
     ConnectorNodeDTO lhsConnectorNodeParentFolder = createConnectorNodeParentFolder();
-    leftHandSide.setConnectorNode(lhsConnectorNodeParentFolder);
     
-    createConnectorNode(lhsConnectorNodeParentFolder, LHS_PROCESS_DIAGRAM);
+    ConnectorNode diagramNode = createConnectorNode(lhsConnectorNodeParentFolder, LHS_PROCESS_DIAGRAM);
+    leftHandSide.setConnectorNode(new ConnectorNodeDTO(diagramNode));
     
     // update roundtrip details RHS
     BpmnDiagramDTO rightHandSide = new BpmnDiagramDTO();
     rightHandSide.setModeler("rhs-modeler");
     ConnectorNodeDTO rhsConnectorNodeParentFolder = createConnectorNodeParentFolder();
-    rightHandSide.setConnectorNode(rhsConnectorNodeParentFolder);
     
-    createConnectorNode(rhsConnectorNodeParentFolder, RHS_PROCESS_DIAGRAM);
+    diagramNode = createConnectorNode(rhsConnectorNodeParentFolder, RHS_PROCESS_DIAGRAM);
+    rightHandSide.setConnectorNode(new ConnectorNodeDTO(diagramNode)); 
     
     roundtripDTO.setLeftHandSide(leftHandSide);
     roundtripDTO.setRightHandSide(rightHandSide);
@@ -257,12 +256,13 @@ public class TestCycleRoundtrip {
     return connectorParentNodeDTO;
   }
   
-  private static void createConnectorNode(ConnectorNodeDTO connectorNodeParentFolder, String processDiagramPath) throws Exception {
+  private static ConnectorNode createConnectorNode(ConnectorNodeDTO connectorNodeParentFolder, String processDiagramPath) throws Exception {
     InputStream modelInputStream = IoUtil.readFileAsInputStream(processDiagramPath);
     String label = processDiagramPath.substring(processDiagramPath.lastIndexOf("/") + 1, processDiagramPath.length());
     ConnectorNode connectorNode = vfsConnector.createNode(connectorNodeParentFolder.getId(), label, ConnectorNodeType.BPMN_FILE);
     connectorNode.setConnectorId(vfsConnectorId);
     vfsConnector.updateContent(connectorNode, modelInputStream);
+    return connectorNode;
   }
   
   private static void cleanVfsTargetDirectory(File directory) throws IOException {
@@ -284,7 +284,7 @@ public class TestCycleRoundtrip {
     List<Map> users = response.getEntity(List.class);
     response.close();
     for (Map userDTO : users) {
-      webResource = client.resource(CYCLE_BASE_PATH+"app/secured/resource/user"+userDTO.get("id"));
+      webResource = client.resource(CYCLE_BASE_PATH+"app/secured/resource/user/"+userDTO.get("id"));
       ClientResponse clientResponse = webResource.delete(ClientResponse.class);
       clientResponse.close();
     }
@@ -294,7 +294,7 @@ public class TestCycleRoundtrip {
   }
   
   private static void deleteRoundtrip() {
-    WebResource webResource = client.resource(CYCLE_BASE_PATH+"app/secured/resource/roundtrip");
+    WebResource webResource = client.resource(CYCLE_BASE_PATH+"app/secured/resource/roundtrip/");
     ClientResponse response = webResource.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
     List<Map> roundtrips = response.getEntity(List.class);
     response.close();
