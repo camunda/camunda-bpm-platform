@@ -43,7 +43,7 @@ import com.sun.jersey.api.json.JSONConfiguration;
 import com.sun.jersey.client.apache4.ApacheHttpClient4;
 import com.sun.jersey.client.apache4.config.DefaultApacheHttpClient4Config;
 
-public class TestCycleRoundtrip {
+public class TestCycleRoundtripIT {
   
   private static final File VFS_DIRECTORY = new File("target/vfs-repository");
   private static final String TMP_DIR_NAME = "cycle-integration-test";
