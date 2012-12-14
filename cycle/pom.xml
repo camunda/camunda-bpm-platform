@@ -308,11 +308,11 @@
     </filters>
     <resources>
       <resource>
-        <directory>${java.resources.override}</directory>
-        <filtering>true</filtering>
+        <directory>src/main/resources</directory>
       </resource>
       <resource>
-        <directory>src/main/resources</directory>
+        <directory>${java.resources.override}</directory>
+        <filtering>true</filtering>
       </resource>
     </resources>
     <testResources>
@@ -371,6 +371,12 @@
               </excludes>
             </resource>
           </webResources>
+          <archive>
+            <manifest>
+              <!-- Maven project version number -->
+              <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+            </manifest>
+          </archive>
         </configuration>
       </plugin>
     </plugins>
@@ -655,18 +661,6 @@
       </properties>
     </profile>
     <profile>
-      <id>h2-test</id>
-      <dependencies>
-        <!-- for testing -->
-        <dependency>
-          <groupId>com.h2database</groupId>
-          <artifactId>h2</artifactId>
-          <version>${version.h2}</version>
-          <scope>test</scope>
-        </dependency>
-      </dependencies>
-    </profile>
-    <profile>
       <id>glassfish</id>
       <dependencies>
         <!-- javax.persistence -->
@@ -813,10 +807,32 @@
     <profile>
       <id>was</id>
       <dependencies>
+        <!-- javax.persistence -->
+        <dependency>
+          <groupId>org.hibernate</groupId>
+          <artifactId>hibernate-entitymanager</artifactId>
+          <exclusions>
+            <exclusion>
+              <artifactId>hibernate-jpa-2.0-api</artifactId>
+              <groupId>org.hibernate.javax.persistence</groupId>
+            </exclusion>
+            <exclusion>
+              <artifactId>javassist</artifactId>
+              <groupId>org.javassist</groupId>
+            </exclusion>
+            <exclusion>
+              <artifactId>jboss-transaction-api_1.1_spec</artifactId>
+              <groupId>org.jboss.spec.javax.transaction</groupId>
+            </exclusion>
+          </exclusions>
+        </dependency>
+        
         <dependency>
           <groupId>cglib</groupId>
           <artifactId>cglib-nodep</artifactId>
         </dependency>
+        
+        <!-- jax-rs -->
         <dependency>
           <groupId>com.sun.jersey</groupId>
           <artifactId>jersey-json</artifactId>
@@ -846,33 +862,22 @@
               <groupId>org.springframework</groupId>
             </exclusion>
             <exclusion>
-              <artifactId>asm</artifactId>
               <groupId>asm</groupId>
+              <artifactId>asm</artifactId>
             </exclusion>
           </exclusions>
         </dependency>
+    
+        <dependency>
+          <groupId>commons-io</groupId>
+          <artifactId>commons-io</artifactId>
+        </dependency>
       </dependencies>
       <properties>
-        <web.resources.override>src/main/runtime/jboss/webapp</web.resources.override>
-        <java.resources.override>src/main/runtime/jboss/resources</java.resources.override>
-        <properties.override>src/main/runtime/jboss/config/database.properties</properties.override>
+        <web.resources.override>src/main/runtime/was/webapp</web.resources.override>
+        <java.resources.override>src/main/runtime/was/resources</java.resources.override>
+        <properties.override>src/main/runtime/was/config/database.properties</properties.override>
       </properties>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-war-plugin</artifactId>
-            <configuration>
-              <archive>
-                <manifest>
-                  <!-- Maven project version number -->
-                  <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-                </manifest>
-              </archive>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
     </profile>
   </profiles>
 </project>

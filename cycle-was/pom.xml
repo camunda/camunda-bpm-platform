@@ -1,6 +1,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <name>fox cycle - JBoss</name>
+  <name>fox cycle - Websphere</name>
   <parent>
     <groupId>com.camunda.fox.cycle</groupId>
     <artifactId>cycle-root</artifactId>
@@ -21,24 +21,6 @@
       <version>${project.version}</version>
       <type>war</type>
       <scope>runtime</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.jboss.spec</groupId>
-      <artifactId>jboss-javaee-web-6.0</artifactId>
-      <type>pom</type>
-      <scope>provided</scope>
-      <version>3.0.0.Final</version>
-      <exclusions>
-        <exclusion>
-          <artifactId>xalan</artifactId>
-          <groupId>org.apache.xalan</groupId>
-        </exclusion>
-        <exclusion>
-          <artifactId>hibernate-jpa-2.0-api</artifactId>
-          <groupId>org.hibernate.javax.persistence</groupId>
-        </exclusion>
-      </exclusions>
     </dependency>
     
     <!-- javax.persistence -->
