@@ -180,7 +180,7 @@
   	<profile>
   		<id>glassfish</id>
 		<properties>
-		  <glassfish.server.location>../../gf31/assembly/target/camunda-fox-ce-${project.version}/camunda-fox-ce-${project.version}/server</glassfish.server.location>
+		  <glassfish.server.location>../gf31-runtime/target/glassfish3</glassfish.server.location>
 		</properties>
   		
   	    <dependencies>	
@@ -221,7 +221,7 @@
 		          </goals>
 		          <configuration>
 		            <target unless="maven.test.skip">
-		              <copy todir="target">
+		              <copy todir="target/glassfish3">
 		                <fileset dir="${glassfish.server.location}" />
 		              </copy>
 		            </target>
@@ -299,7 +299,8 @@
                     <type>existing</type>
                     <home>${project.build.directory}/glassfish3/glassfish/domains</home>
                     <properties>
-                        <cargo.glassfish.adminPort>24848</cargo.glassfish.adminPort>
+                        <cargo.servlet.port>38080</cargo.servlet.port>
+                        <cargo.glassfish.adminPort>34848</cargo.glassfish.adminPort>
                         <cargo.glassfish.domain.name>domain1</cargo.glassfish.domain.name>
                         <cargo.remote.username>admin</cargo.remote.username>
                         <cargo.remote.password></cargo.remote.password>
