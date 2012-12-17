@@ -73,10 +73,10 @@ public class TestCycleRoundtripIT {
       if("jboss".equals(serverName)) {
         httpPort = "38080";    
       } else if("glassfish".equals(serverName)) {
-        httpPort = "28080";
+        httpPort = "38080";
       } else if ("websphere".equals(serverName)) {
         // TODO!
-        httpPort = "9080";
+        httpPort = "9082";
       }
     }
     
@@ -112,7 +112,7 @@ public class TestCycleRoundtripIT {
       createVfsConnector();
       createRoundtripWithDetails();
     } else {
-      Assert.fail("Cycle is not available! Check cycle deployment.");
+      throw new RuntimeException("Cycle is not available! Check cycle deployment.");
     }
   }
   
