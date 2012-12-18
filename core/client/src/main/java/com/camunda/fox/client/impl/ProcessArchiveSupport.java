@@ -38,7 +38,6 @@ import javax.ejb.TransactionManagementType;
 
 import org.activiti.engine.ProcessEngine;
 
-import com.camunda.fox.client.impl.executor.FoxApplicationException;
 import com.camunda.fox.client.impl.executor.ProcessArchiveContextExecutor;
 import com.camunda.fox.client.impl.parser.DefaultProcessesXmlParser;
 import com.camunda.fox.client.impl.parser.spi.ProcessesXmlParser;
@@ -93,7 +92,7 @@ public class ProcessArchiveSupport {
   protected Map<ProcessArchive, ProcessEngine> installedProcessArchives = new HashMap<ProcessArchive, ProcessEngine>();
     
   @PostConstruct
-  public void start() throws FoxApplicationException {
+  public void start() {
     fireBeforeProcessArchiveStart();
     installProcessArchives();
     fireAfterProcessArchiveStart();
@@ -106,7 +105,7 @@ public class ProcessArchiveSupport {
     fireAfterProcessArchiveStop();
   }
   
-  protected void installProcessArchives() throws FoxApplicationException {
+  protected void installProcessArchives() {
     
     final ProcessesXmlParser parser = getProcessesXmlParser();
     List<ProcessesXml> processesXmls = parser.parseProcessesXml(PROCESSES_XML_FILE_LOCATION);
@@ -120,7 +119,7 @@ public class ProcessArchiveSupport {
         }
       } catch(RuntimeException e) {
         uninstallProcessArchives();
-        throw new FoxApplicationException("Could not deploy process archives", e);          
+        throw new FoxPlatformException("Could not deploy process archives", e);          
       }
     } else {
       log.log(Level.INFO, "No " + PROCESSES_XML_FILE_LOCATION + " found. Not creating a process archive installation.");
