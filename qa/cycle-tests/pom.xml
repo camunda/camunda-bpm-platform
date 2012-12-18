@@ -375,60 +375,17 @@
 		          <configuration>
 		            <artifactItems>
 		              <artifactItem>
-		                <groupId>com.camunda.fox.platform</groupId>
-		                <artifactId>fox-platform-ibm-websphere-ear</artifactId>
-		                <version>${project.version}</version>
-		                <type>ear</type>
+		                <groupId>com.camunda.fox.cycle</groupId>
+            		    <artifactId>cycle-was</artifactId>
+            		    <version>${project.version}</version>
+            		    <type>war</type>
 		                <overWrite>false</overWrite>
-		                <outputDirectory>${project.build.directory}/camunda-fox-platform.ear</outputDirectory>
-		                <destFileName>camunda-fox-platform.ear</destFileName>
-		              </artifactItem>
-		              <artifactItem>
-		                <groupId>com.camunda.fox.platform</groupId>
-		                <artifactId>fox-platform-jobexecutor-rar</artifactId>
-		                <version>${project.version}</version>
-		                <type>rar</type>
-		                <overWrite>false</overWrite>
-		                <outputDirectory>${project.build.directory}/fox-platform-jobexecutor-rar.rar</outputDirectory>
-		                <destFileName>fox-platform-jobexecutor-rar.rar</destFileName>
-		              </artifactItem>
+		                <outputDirectory>${project.build.directory}/cycle-was.war</outputDirectory>
+		                <destFileName>cycle-was.war</destFileName>
+		              </artifactItem>		            
 		            </artifactItems>
 		          </configuration>
-		        </execution>
-		        <execution>
-		          <id>copy</id>
-		          <phase>test-compile</phase>
-		          <goals>
-		            <goal>copy-dependencies</goal>
-		          </goals>
-		          <configuration>
-		            <artifactItems>
-		              <artifactItem>
-		                <groupId>com.camunda.fox.engine</groupId>
-		                <artifactId>fox-engine</artifactId>
-		              </artifactItem>
-		              <artifactItem>
-		                <groupId>com.camunda.fox.platform</groupId>
-		                <artifactId>fox-platform-api</artifactId>
-		              </artifactItem>
-		              <artifactItem>
-		                <groupId>com.camunda.fox.platform</groupId>
-		                <artifactId>fox-platform-jobexecutor-api</artifactId>
-		              </artifactItem>
-		              <artifactItem>
-		                <groupId>org.mybatis</groupId>
-		                <artifactId>mybatis</artifactId>
-		              </artifactItem>
-		              <artifactItem>
-		                <groupId>com.fasterxml.uuid</groupId>
-		                <artifactId>java-uuid-generator</artifactId>
-		              </artifactItem>
-		            </artifactItems>
-		            <excludeTypes>ear,rar</excludeTypes>
-		            <excludeTransitive>true</excludeTransitive>
-		            <outputDirectory>target/libs</outputDirectory>
-		          </configuration>
-		        </execution>
+		        </execution>		        
 		      </executions>
 		    </plugin>
 		
@@ -455,41 +412,20 @@
 			            <arg value="server1" />
 			          </exec>
 
-			          <!-- replace fox platform deployments -->
+			          <!-- replace fox cycle deployment -->
 
 			          <delete>
 			            <fileset
-			              dir="${was_profile}/installedApps/${was_scope}/camunda-fox-platform.ear" />
-			            <fileset
-			              dir="${was_profile}/installedConnectors/fox-platform-jobexecutor-rar.rar" />
-			            <fileset dir="${was_home}/lib/ext" />
+			              dir="${was_profile}/installedApps/${was_scope}/cycle-was.ear/cycle-was.war" />
 			          </delete>
 
 			          <copy
-			            todir="${was_profile}/installedApps/${was_scope}/camunda-fox-platform.ear"
+			            todir="${was_profile}/installedApps/${was_scope}/cycle-was.ear/cycle-was.war"
 			            overwrite="true">
 			            <fileset
-			              dir="${project.build.directory}/camunda-fox-platform.ear" />
+			              dir="${project.build.directory}/cycle-was.war" />
 			          </copy>
-			
-			          <copy
-			            todir="${was_profile}/installedConnectors/fox-platform-jobexecutor-rar.rar"
-			            overwrite="true">
-			            <fileset
-			              dir="${project.build.directory}/fox-platform-jobexecutor-rar.rar" />
-			          </copy>
-			           
-			          <copy
-			            todir="${was_home}/lib/ext">
-			            <fileset
-			              dir="target/libs" />
-			          </copy>
-			          
-  		              <copy todir="t${was_profile}/installedApps/${was.scope}">
-		                <fileset refid="maven.project.dependencies" />
-		                <regexpmapper from="^(.*)/([^/]+)/([^/]*)$$" to="\3" handledirsep="yes" />
-		              </copy>
-		
+					
 		           	  <!-- start the server -->
 		              <exec executable="${was_profile}/bin/startServer.bat"
 		                osfamily="windows">

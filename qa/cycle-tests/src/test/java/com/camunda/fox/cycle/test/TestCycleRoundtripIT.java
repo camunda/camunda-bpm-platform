@@ -75,8 +75,7 @@ public class TestCycleRoundtripIT {
       } else if("glassfish".equals(serverName)) {
         httpPort = "38080";
       } else if ("websphere".equals(serverName)) {
-        // TODO!
-        httpPort = "9082";
+        httpPort = "9080";
       }
     }
     
