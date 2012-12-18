@@ -22,7 +22,7 @@
       <id>was</id>
       <modules>
         <module>websphere-runtime</module>
-        <module>integration-tests</module>
+       <!--  <module>integration-tests</module> -->
         <module>cycle-tests</module>
       </modules>
     </profile>

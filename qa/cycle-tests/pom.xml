@@ -191,9 +191,9 @@
   		
   	    <dependencies>	
 		  <dependency>
-		    <!-- make sure it comes after assembly in the build -->
+		    <!-- make sure it comes after the test runtime in the build -->
 			<groupId>com.camunda.fox.platform</groupId>
-		    <artifactId>fox-platform-glassfish-assembly</artifactId>
+		    <artifactId>fox-platform-qa-glassfish-runtime</artifactId>
 		   	<version>${project.version}</version>
 		    <type>pom</type>
 		  </dependency>
@@ -363,95 +363,19 @@
 		    <type>war</type>
 		    <scope>test</scope>
 		  </dependency>
+      
+          <dependency>
+            <!-- make sure it comes after the test runtime in the build -->
+            <groupId>com.camunda.fox.platform</groupId>
+            <artifactId>fox-platform-qa-websphere-runtime</artifactId>
+            <version>${project.version}</version>
+            <type>pom</type>
+          </dependency>
+          
 		</dependencies>
 		
-		<build>
-		  <plugins>
-		
-		    <plugin>
-		      <groupId>org.apache.maven.plugins</groupId>
-		      <artifactId>maven-dependency-plugin</artifactId>
-		      <executions>
-		        <execution>
-		          <id>unpack</id>
-		          <phase>test-compile</phase>
-		          <goals>
-		            <goal>unpack</goal>
-		          </goals>
-		          <configuration>
-		            <artifactItems>
-		              <artifactItem>
-		                <groupId>com.camunda.fox.cycle</groupId>
-            		    <artifactId>cycle-was</artifactId>
-            		    <version>${project.version}</version>
-            		    <type>war</type>
-		                <overWrite>false</overWrite>
-		                <outputDirectory>${project.build.directory}/cycle-was.war</outputDirectory>
-		                <destFileName>cycle-was.war</destFileName>
-		              </artifactItem>		            
-		            </artifactItems>
-		          </configuration>
-		        </execution>		        
-		      </executions>
-		    </plugin>
-		
-		    <plugin>
-		      <groupId>org.apache.maven.plugins</groupId>
-		      <artifactId>maven-antrun-plugin</artifactId>
-		      <executions>
-		        <execution>
-		          <id>compile</id>
-		          <phase>test-compile</phase>
-		          <configuration>
-		            <target>
-
-			          <!-- stop the server-->
-			          <exec executable="${was_profile}/bin/stopServer.bat"
-			            osfamily="windows" failonerror="false"
-			            failifexecutionfails="false">
-			            <arg value="server1" />
-			          </exec>
-
-			          <exec executable="${was_profile}/bin/stopServer.sh"
-			            osfamily="unix" failonerror="false"
-			            failifexecutionfails="false">
-			            <arg value="server1" />
-			          </exec>
-
-			          <!-- replace fox cycle deployment -->
-
-			          <delete>
-			            <fileset
-			              dir="${was_profile}/installedApps/${was_scope}/cycle-was.ear/cycle-was.war" />
-			          </delete>
-
-			          <copy
-			            todir="${was_profile}/installedApps/${was_scope}/cycle-was.ear/cycle-was.war"
-			            overwrite="true">
-			            <fileset
-			              dir="${project.build.directory}/cycle-was.war" />
-			          </copy>
-					
-		           	  <!-- start the server -->
-		              <exec executable="${was_profile}/bin/startServer.bat"
-		                osfamily="windows">
-		                <arg value="server1" />
-		              </exec>
-		              <exec executable="${was_profile}/bin/startServer.sh"
-		                osfamily="unix">
-		                <arg value="server1" />
-		              </exec>
-		
-		            </target>
-		          </configuration>
-		          <goals>
-		            <goal>run</goal>
-		          </goals>
-		        </execution>
-		      </executions>
-		    </plugin>
-		  </plugins>
-		</build>  		
+        <!-- on WAS, cycle is already deployed as part of the websphere test runtime. -->
+			
   	</profile>
   </profiles>
 
