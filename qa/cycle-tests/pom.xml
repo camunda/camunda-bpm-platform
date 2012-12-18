@@ -10,6 +10,12 @@
     <version>6.2.0-SNAPSHOT</version>
   </parent>
   
+  <properties>
+    <was_home>${WAS8_HOME}</was_home>
+    <was_profile>${WAS8_PROFILE}</was_profile>
+    <was_scope>${WAS8_SCOPE}</was_scope> <!-- eq. ca-meyerNode03Cell -->
+  </properties>
+  
   <dependencies>
     <dependency>
       <groupId>org.jboss.spec</groupId>
