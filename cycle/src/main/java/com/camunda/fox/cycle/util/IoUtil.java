@@ -64,7 +64,7 @@ public class IoUtil {
         bytesRead = inputStream.read(buffer);
       }
     } catch (Exception e) {
-      throw new CycleException("couldn't read input stream "+inputStreamName, e);
+      throw new CycleException("Couldn't read input stream " + inputStreamName, e);
     }
     return outputStream.toByteArray();
   }
@@ -81,6 +81,15 @@ public class IoUtil {
       IoUtil.closeSilently(inputStream);
     }
     return new String(buffer);
+  }
+  
+  public static InputStream readFileAsInputStream(String absoluteClassPath) {
+    InputStream inputStream = null;
+    inputStream = IoUtil.class.getClass().getResourceAsStream(absoluteClassPath);
+    if (inputStream == null) {
+      throw new CycleException("Unable to read " + absoluteClassPath + " as inputstream.");
+    }
+    return inputStream;
   }
 
   public static File getFile(String filePath) {

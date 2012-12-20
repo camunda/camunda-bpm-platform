@@ -60,11 +60,12 @@
              data-ng-click="addDiagram()">
             <!-- need nested span to make ng-click and 
                  data-help work together (angular BUG) -->
-            <span data-color-invert="true" 
-                  data-help-title="Add a process model" 
+            <span data-help-placement="'left'"
+                  data-color-invert="true" 
+                  data-help-title="Add a process model"                  
                   data-help data-help-text="You need two process models for a Roundtrip, the right side is reserved for the fox designer (the engine model)" >
               Add Process Model
-            </span>
+            </span>   
           </a>
         </div>
       </div>
@@ -76,10 +77,11 @@
     <div class="modal" ng-controller="EditDiagramController" ngm-if="editDiagramDialog.renderHtml()">
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal">&times;</button>
-        <h3 data-ng-show="editDialogMode == 'ADD_DIAGRAM'" th:text="#{Add Diagram}"></h3>
-        <h3 data-ng-show="editDialogMode == 'CREATE_NEW_DIAGRAM'" th:text="#{Create Diagram}"></h3>
+        <h3 data-ng-show="editDialogMode == 'ADD_DIAGRAM'" th:text="#{Add Process Model}"></h3>
+        <h3 data-ng-show="editDialogMode == 'CREATE_NEW_DIAGRAM'" th:text="#{Create Process Model}"></h3>
       </div>
       <div class="modal-body">
+        <div data-error-panel></div>
         <div class="alert alert-error" ng-show="error">
           <button type="button" class="close" data-dismiss="alert">&times;</button>
           <span>
@@ -95,18 +97,16 @@
             <div class="control-group">
               <label class="control-label" for="modelerName" 
                      th:text="#{'Modeler Name'}" 
-                     th:attr="data-help-text=#{'The Name of the Modeling tool you used.'}" 
+                     th:attr="data-help-text=#{'The name of your modeling tool. Examples: &quot;Fox Modeler&quot; or &quot;Signavio&quot; or &quot;Adonis&quot;.'}" 
                      data-help-title="Modeler Name"
                      data-help>Modeler Name</label>
               <div class="controls">
                 <!-- display a combobox on leftside, otherwise a disabled input field -->
-                <select id="modelerName" required autofocus 
+                <input id="modelerName" required autofocus 
                         ngm-if="canEditModeler()" 
-                        ng-model="editDiagram.modeler" 
-                        ng-combobox values="modelerNames"
-                        ng-options="modeler for modeler in modelerNames" 
-                        th:attr="data-placeholder=#{Enter the name of your modeler}">
-                  <option value=""></option>
+                        ng-model="editDiagram.modeler"                    
+                        th:attr="data-placeholder=#{Enter the name of your modeler}"
+                        type="text">            
                 </select>
                 <span ngm-if="!canEditModeler()" id="modelerName" name="modelerName" required class="uneditable-input" type="text">{{editDiagram.modeler}}</span>
               </div>
@@ -163,8 +163,8 @@
       </div>
       <div class="modal-footer">
         <button class="btn" ng-click="cancel()" th:text="#{Cancel}">Cancel</button>
-        <button href="#" data-ng-show="editDialogMode == 'ADD_DIAGRAM'" class="btn btn-primary" data-ng-click="save()" data-ng-disabled="!isValid()" th:text="#{Add}">Add</button>
-        <button href="#" data-ng-show="editDialogMode == 'CREATE_NEW_DIAGRAM'" class="btn btn-primary" data-ng-click="create()" data-ng-disabled="!isValidAndFolder()" th:text="#{Create}">Create</button>
+        <button href="#" data-ng-show="editDialogMode == 'ADD_DIAGRAM'" class="btn btn-primary" data-ng-click="save()" data-ng-disabled="!isValid()" th:text="#{Add}" data-req-aware="addModelForm">Add</button>
+        <button href="#" data-ng-show="editDialogMode == 'CREATE_NEW_DIAGRAM'" class="btn btn-primary" data-ng-click="create()" data-ng-disabled="!isValidAndFolder()" th:text="#{Create}" data-req-aware="addModelForm">Create</button>
       </div>
     </div>
   </modal-dialog>

@@ -1,5 +1,5 @@
-<?xml version="1.0" encoding="UTF-8"?><definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:signavio="http://www.signavio.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" exporter="Signavio Process Editor, http://www.signavio.com" exporterVersion="5.4.1" id="sid-8f4c7980-3bec-46bd-8d56-7ccebb0f7569" targetNamespace="http://www.signavio.com/bpmn20" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/2.0/20100501/BPMN20.xsd">
-   <process id="test-engine-pool" isExecutable="false">
+<?xml version="1.0" encoding="UTF-8"?><definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:signavio="http://www.signavio.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" exporter="Signavio Process Editor, http://www.signavio.com" exporterVersion="6.4.0" expressionLanguage="http://www.w3.org/1999/XPath" id="sid-44b5d25c-0ab3-41d2-af49-3865001a888d" targetNamespace="http://www.omg.org/spec/BPMN/20100524/MODEL" typeLanguage="http://www.w3.org/2001/XMLSchema" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/2.0/20100501/BPMN20.xsd">
+   <process id="test-engine-pool" isClosed="false" isExecutable="true" processType="None">
       <startEvent id="StartNoneEvent" name="">
          <outgoing>SequenceFlow</outgoing>
       </startEvent>
@@ -36,8 +36,8 @@
       <sequenceFlow id="SequenceFlow_2" isImmediate="true" name="" sourceRef="Exclusive_Databased_Gateway_2" targetRef="Task"/>
       <sequenceFlow id="SequenceFlow_3" isImmediate="true" name="" sourceRef="Task_2" targetRef="Exclusive_Databased_Gateway_2"/>
    </process>
-   <bpmndi:BPMNDiagram id="sid-f04bc6ae-a64f-431d-b8de-cdf725af229b">
-      <bpmndi:BPMNPlane bpmnElement="test-engine-pool" id="sid-b556965c-5197-4984-9763-da40e1a16267">
+   <bpmndi:BPMNDiagram id="sid-e4627f65-d2d4-49cc-bd5f-b40b4346fe09">
+      <bpmndi:BPMNPlane bpmnElement="test-engine-pool" id="sid-de40662b-1e26-4868-9557-afdad84081c8">
          <bpmndi:BPMNShape bpmnElement="StartNoneEvent" id="StartNoneEvent_gui">
             <omgdc:Bounds height="28.0" width="28.0" x="107.0" y="217.0"/>
          </bpmndi:BPMNShape>
@@ -59,15 +59,15 @@
          <bpmndi:BPMNShape bpmnElement="EndNoneEvent" id="EndNoneEvent_gui">
             <omgdc:Bounds height="28.0" width="28.0" x="1020.0" y="281.0"/>
          </bpmndi:BPMNShape>
-         <bpmndi:BPMNEdge bpmnElement="sequenceFlow_42" id="sequenceFlow_42_gui">
-            <omgdi:waypoint x="667.0" y="295.0"/>
-            <omgdi:waypoint x="855.0" y="295.0"/>
-         </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="SequenceFlow_8" id="SequenceFlow_8_gui">
             <omgdi:waypoint x="220.0" y="210.0"/>
             <omgdi:waypoint x="220.5" y="135.0"/>
             <omgdi:waypoint x="487.5" y="135.0"/>
             <omgdi:waypoint x="487.0" y="210.0"/>
+         </bpmndi:BPMNEdge>
+         <bpmndi:BPMNEdge bpmnElement="sequenceFlow_42" id="sequenceFlow_42_gui">
+            <omgdi:waypoint x="667.0" y="295.0"/>
+            <omgdi:waypoint x="855.0" y="295.0"/>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="SequenceFlow" id="SequenceFlow_gui">
             <omgdi:waypoint x="135.0" y="231.0"/>

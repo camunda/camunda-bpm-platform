@@ -1,18 +1,26 @@
-<?xml version="1.0" encoding="UTF-8"?><definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:signavio="http://www.signavio.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" exporter="Signavio Process Editor, http://www.signavio.com" exporterVersion="5.4.1" id="sid-61bbe5e3-c8d4-4732-b8eb-615cee3156fd" targetNamespace="http://www.signavio.com/bpmn20" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/2.0/20100501/BPMN20.xsd">
-   <message id="sid-5d3ebb03-019a-4b0c-aaa7-5906171edf39" name="manual"/>
-   <message id="sid-f4631112-cf02-423a-b5a4-6e5106052a2b" name="automatic"/>
-   <error id="sid-84bb6c5d-6245-4298-a790-e007b9f83bb0" name="SAPWriteContactError"/>
-   <error id="sid-0f83e869-d7f0-463c-b1ad-63c7969f477b" name="TechnicalMasterDataCreationError"/>
-   <collaboration id="sid-22073345-acd4-4494-9941-454e7ee59fdc">
+<?xml version="1.0" encoding="UTF-8"?><definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:signavio="http://www.signavio.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" exporter="Signavio Process Editor, http://www.signavio.com" exporterVersion="6.4.0" expressionLanguage="http://www.w3.org/1999/XPath" id="sid-c262c682-a7ea-4b5d-8920-98c1284f0dc0" targetNamespace="http://www.signavio.com/bpmn20" typeLanguage="http://www.w3.org/2001/XMLSchema" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/2.0/20100501/BPMN20.xsd">
+   <error id="sid-e90199c4-be07-47c6-9678-f8a0e0ff1617" name="SAPWriteContactError"/>
+   <error id="sid-17a1eba0-9a27-44f5-b423-ebd775501072" name="TechnicalMasterDataCreationError"/>
+   <message id="sid-3b6f1d3e-6568-4c5c-974b-e7c5c74c585c" name="manual"/>
+   <message id="sid-ff92c2f1-e934-426a-b3d7-0afac6516ac5" name="automatic"/>
+   <collaboration id="sid-da62acb5-3f68-476a-be31-c5b546fa94d8">
       <participant id="UI_Mediator_6" name="UI Mediator">
          <extensionElements>
             <signavio:signavioMetaData metaKey="bgcolor" metaValue="#ffffff"/>
          </extensionElements>
       </participant>
-      <participant id="Usersicht_Akquise_Prozess_12" name="Usersicht Akquise Prozess" processRef="Usersicht_Akquise_Prozess_572"/>
-      <participant id="GUI__JSF2__9" name="GUI (JSF2)" processRef="GUI__JSF2__183"/>
-      <participant id="Prozess_Engine_Akquise_Prozess_15" name="Prozess Engine&#10;Akquise Prozess" processRef="CC-Akquise_"/>
-      <participant id="Webservice-Aufrufe____SOA__3" name="Webservice-Aufrufe / &quot;SOA&quot;" processRef="Webservice-Aufrufe____SOA__148"/>
+      <participant id="Usersicht_Akquise_Prozess_12" name="Usersicht Akquise Prozess" processRef="Usersicht_Akquise_Prozess_572">
+         <extensionElements/>
+      </participant>
+      <participant id="GUI__JSF2__9" name="GUI (JSF2)" processRef="GUI__JSF2__183">
+         <extensionElements/>
+      </participant>
+      <participant id="Prozess_Engine_Akquise_Prozess_15" name="Prozess Engine&#10;Akquise Prozess" processRef="CC-Akquise_">
+         <extensionElements/>
+      </participant>
+      <participant id="Webservice-Aufrufe____SOA__3" name="Webservice-Aufrufe / &quot;SOA&quot;" processRef="Webservice-Aufrufe____SOA__148">
+         <extensionElements/>
+      </participant>
       <messageFlow id="Akquisetyp__manuell_23" name="Akquisetyp: manuell" sourceRef="GP_identifiziert___angelegt__467" targetRef="Manuelle_Akquise_95"/>
       <messageFlow id="Akquisetyp__automatisch_21" name="Akquisetyp: automatisch" sourceRef="GP_identifiziert___angelegt__467" targetRef="GP_identifizieren_62"/>
       <messageFlow id="messageFlow_18" name="" sourceRef="N_chsten_Akquise_Fall_claimen_49" targetRef="N_chsten_Akquise_Fall_claimen_357"/>
@@ -29,8 +37,9 @@
       </textAnnotation>
       <association associationDirection="None" id="association_30" sourceRef="UI_Mediator_6" targetRef="textAnnotation_28"/>
    </collaboration>
-   <process id="Usersicht_Akquise_Prozess_572" isClosed="true" isExecutable="false" name="Usersicht Akquise Prozess">
-      <laneSet id="sid-0b9fbd01-fdb4-4239-8826-1a18b3c88430">
+   <process id="Usersicht_Akquise_Prozess_572" isClosed="true" isExecutable="false" name="Usersicht Akquise Prozess" processType="None">
+      <extensionElements/>
+      <laneSet id="sid-739c0d4e-7147-4049-8d47-ddead4332cc1">
          <lane id="lane_572">
             <extensionElements>
                <signavio:signavioMetaData metaKey="bgcolor" metaValue=""/>
@@ -181,8 +190,9 @@ Schufa bei manueller Akquise?</text>
          <text>manuell vs. automatisiert</text>
       </textAnnotation>
    </process>
-   <process id="GUI__JSF2__183" isClosed="true" isExecutable="false" name="GUI (JSF2)">
-      <laneSet id="sid-c0840e88-a0cf-495c-a23b-bee30171f4dd">
+   <process id="GUI__JSF2__183" isClosed="true" isExecutable="false" name="GUI (JSF2)" processType="None">
+      <extensionElements/>
+      <laneSet id="sid-13483d24-8c45-4cad-936c-767fb181627b">
          <lane id="lane_183">
             <extensionElements>
                <signavio:signavioMetaData metaKey="bgcolor" metaValue=""/>
@@ -314,7 +324,7 @@ Schufa bei manueller Akquise?</text>
          </extensionElements>
          <incoming>sequenceFlow_538</incoming>
          <outgoing>sequenceFlow_511</outgoing>
-         <messageEventDefinition id="sid-4730cb04-eec4-441d-9efa-58a84effc786"/>
+         <messageEventDefinition id="sid-f8c3f764-c05e-4b76-a0dd-fe2487af67a5"/>
       </intermediateThrowEvent>
       <task completionQuantity="1" id="GP-Suche_308" isForCompensation="false" name="GP-Suche" startQuantity="1">
          <extensionElements>
@@ -440,7 +450,7 @@ Schufa bei manueller Akquise?</text>
          </extensionElements>
          <incoming>sequenceFlow_501</incoming>
          <outgoing>sequenceFlow_512</outgoing>
-         <messageEventDefinition id="sid-55daea00-007a-4ef1-9fa6-6f0c32dcec5f"/>
+         <messageEventDefinition id="sid-2ce7c737-acf3-44cb-9fa3-e7963ab77afd"/>
       </intermediateThrowEvent>
       <exclusiveGateway gatewayDirection="Converging" id="exclusiveGateway_414" name="">
          <extensionElements>
@@ -471,7 +481,7 @@ Schufa bei manueller Akquise?</text>
          </extensionElements>
          <incoming>sequenceFlow_516</incoming>
          <outgoing>sequenceFlow_515</outgoing>
-         <messageEventDefinition id="sid-53940815-bdb7-4cb9-91c1-fd4d1c9ad25a"/>
+         <messageEventDefinition id="sid-3a3e6ce7-f227-4beb-b35c-202fc390cafa"/>
       </intermediateCatchEvent>
       <intermediateCatchEvent id="Fehler_bei__technische__Stammdaten__anlegen_438" name="Fehler bei &#10;technische &#10;Stammdaten &#10;anlegen">
          <extensionElements>
@@ -480,7 +490,7 @@ Schufa bei manueller Akquise?</text>
          </extensionElements>
          <incoming>sequenceFlow_517</incoming>
          <outgoing>sequenceFlow_519</outgoing>
-         <messageEventDefinition id="sid-1ebb5fc3-a012-449f-8256-901884072b77"/>
+         <messageEventDefinition id="sid-ac1ac860-fae5-4464-ab9b-fd31bc87e2a8"/>
       </intermediateCatchEvent>
       <eventBasedGateway eventGatewayType="Exclusive" gatewayDirection="Diverging" id="eventBasedGateway_446" instantiate="false" name="">
          <extensionElements>
@@ -497,7 +507,7 @@ Schufa bei manueller Akquise?</text>
          </extensionElements>
          <incoming>sequenceFlow_525</incoming>
          <outgoing>sequenceFlow_530</outgoing>
-         <messageEventDefinition id="sid-cfaf2c4a-4044-40b0-8808-09cfb4b45511"/>
+         <messageEventDefinition id="sid-a537e5d9-8353-4c08-8833-e38b8ecdce9a"/>
       </intermediateCatchEvent>
       <intermediateCatchEvent id="Kontakt_geschrieben_460" name="Kontakt&#10;geschrieben">
          <extensionElements>
@@ -505,7 +515,7 @@ Schufa bei manueller Akquise?</text>
          </extensionElements>
          <incoming>sequenceFlow_524</incoming>
          <outgoing>sequenceFlow_523</outgoing>
-         <messageEventDefinition id="sid-5dc3ff2f-b642-4070-bf6b-f181ff0c6472"/>
+         <messageEventDefinition id="sid-7630f81f-0999-452a-8b6e-f3338b40c9c4"/>
       </intermediateCatchEvent>
       <intermediateThrowEvent id="GP_identifiziert___angelegt__467" name="GP identifiziert &#10;(angelegt)">
          <extensionElements>
@@ -513,8 +523,8 @@ Schufa bei manueller Akquise?</text>
          </extensionElements>
          <incoming>sequenceFlow_509</incoming>
          <outgoing>sequenceFlow_535</outgoing>
-         <cancelEventDefinition id="sid-3472922f-79b4-47a6-82aa-7f8d2b01b685"/>
-         <terminateEventDefinition id="sid-b57b6426-f25f-45e6-8fe7-7b721559d577"/>
+         <cancelEventDefinition id="sid-8d42daa8-79d7-4b30-9591-623641c77c11"/>
+         <terminateEventDefinition id="sid-f11427c5-3175-424e-92e5-a7fc42328977"/>
       </intermediateThrowEvent>
       <task completionQuantity="1" id="Akquise_Metadaten_erfassen_474" isForCompensation="false" name="Akquise Metadaten erfassen" startQuantity="1">
          <extensionElements>
@@ -638,8 +648,9 @@ Weiterleitungen
 (+ Persistenz)</text>
       </textAnnotation>
    </process>
-   <process id="Webservice-Aufrufe____SOA__148" isClosed="true" isExecutable="false" name="Webservice-Aufrufe / &quot;SOA&quot;">
-      <laneSet id="sid-802f19c4-8c73-43be-ad5e-f4461b6a42d0">
+   <process id="Webservice-Aufrufe____SOA__148" isClosed="true" isExecutable="false" name="Webservice-Aufrufe / &quot;SOA&quot;" processType="None">
+      <extensionElements/>
+      <laneSet id="sid-8a3cfc04-7cd4-4ff2-b441-b69d39b76260">
          <lane id="lane_148">
             <extensionElements>
                <signavio:signavioMetaData metaKey="bgcolor" metaValue=""/>
@@ -677,8 +688,9 @@ Weiterleitungen
          </extensionElements>
       </serviceTask>
    </process>
-   <process id="CC-Akquise_" isClosed="true" isExecutable="true" name="Prozess Engine&#10;Akquise Prozess">
-      <laneSet id="sid-b166de33-e3f8-46bb-8464-92530a9b971c">
+   <process id="CC-Akquise_" isClosed="true" isExecutable="true" name="Prozess Engine&#10;Akquise Prozess" processType="None">
+      <extensionElements/>
+      <laneSet id="sid-457ea92a-c80a-43fe-9fec-0f81101804ab">
          <lane id="lane_32">
             <flowNodeRef>N_chsten_Akquise_Fall_claimen_49</flowNodeRef>
             <flowNodeRef>Automatische_Akquise_56</flowNodeRef>
@@ -701,7 +713,7 @@ Weiterleitungen
       </serviceTask>
       <startEvent id="Automatische_Akquise_56" name="Automatische Akquise">
          <outgoing>sequenceFlow_128</outgoing>
-         <messageEventDefinition id="sid-fba982c7-ba6f-4472-a69d-47b92d8ce847" messageRef="sid-f4631112-cf02-423a-b5a4-6e5106052a2b"/>
+         <messageEventDefinition id="sid-1314841f-7c45-44b0-bf56-a2aa5d584368" messageRef="sid-ff92c2f1-e934-426a-b3d7-0afac6516ac5"/>
       </startEvent>
       <userTask completionQuantity="1" id="GP_identifizieren_62" isForCompensation="false" name="GP identifizieren" startQuantity="1">
          <incoming>sequenceFlow_132</incoming>
@@ -727,7 +739,7 @@ Weiterleitungen
       </intermediateThrowEvent>
       <startEvent id="Manuelle_Akquise_95" name="Manuelle Akquise">
          <outgoing>sequenceFlow_131</outgoing>
-         <messageEventDefinition id="sid-a0c32b07-9f45-4356-8e24-51e7a832fa45" messageRef="sid-5d3ebb03-019a-4b0c-aaa7-5906171edf39"/>
+         <messageEventDefinition id="sid-025fb1bc-b601-4521-ad64-c3f370120416" messageRef="sid-3b6f1d3e-6568-4c5c-974b-e7c5c74c585c"/>
       </startEvent>
       <userTask completionQuantity="1" id="Kontakt_abschlie_en_101" isForCompensation="false" name="Kontakt abschließen" startQuantity="1">
          <incoming>sequenceFlow_136</incoming>
@@ -743,11 +755,11 @@ Weiterleitungen
       </endEvent>
       <boundaryEvent attachedToRef="Technische_Stammdaten_anlegen_77" cancelActivity="true" id="boundaryEvent_120" name="" parallelMultiple="false">
          <outgoing>sequenceFlow_134</outgoing>
-         <errorEventDefinition errorRef="sid-0f83e869-d7f0-463c-b1ad-63c7969f477b" id="sid-ea650041-a211-4c7a-b934-a8ff8ac5759f"/>
+         <errorEventDefinition errorRef="sid-17a1eba0-9a27-44f5-b423-ebd775501072" id="sid-2621c5f4-53f6-4b95-a1a3-e5a83c88b888"/>
       </boundaryEvent>
       <boundaryEvent attachedToRef="SAP_Kontakt_schreiben_109" cancelActivity="true" id="boundaryEvent_123" name="" parallelMultiple="false">
          <outgoing>sequenceFlow_137</outgoing>
-         <errorEventDefinition errorRef="sid-84bb6c5d-6245-4298-a790-e007b9f83bb0" id="sid-4a2c9816-f06d-4dd6-b5bb-7fbe86cf1385"/>
+         <errorEventDefinition errorRef="sid-e90199c4-be07-47c6-9678-f8a0e0ff1617" id="sid-390a4bc3-12f1-4255-9d88-a02ef55057aa"/>
       </boundaryEvent>
       <sequenceFlow id="sequenceFlow_132" isImmediate="true" name="" sourceRef="N_chsten_Akquise_Fall_claimen_49" targetRef="GP_identifizieren_62"/>
       <sequenceFlow id="sequenceFlow_133" isImmediate="true" name="" sourceRef="Akquisedaten_erfassen_69" targetRef="Akquisedaten_erfasst_90"/>
@@ -775,8 +787,8 @@ erfasst</text>
          <text>Wirklich direkt ohne Prozess?</text>
       </textAnnotation>
    </process>
-   <bpmndi:BPMNDiagram id="sid-32f630cd-42a0-4182-9780-aa180df1e41a">
-      <bpmndi:BPMNPlane bpmnElement="sid-22073345-acd4-4494-9941-454e7ee59fdc" id="sid-171e6926-26ff-4b84-9a17-03a637a9c47f">
+   <bpmndi:BPMNDiagram id="sid-4ecae6da-9a35-4dee-9955-4c7e91b63f6b">
+      <bpmndi:BPMNPlane bpmnElement="sid-da62acb5-3f68-476a-be31-c5b546fa94d8" id="sid-23644814-e0d5-4136-be23-aeb7ff2d4d3b">
          <bpmndi:BPMNShape bpmnElement="UI_Mediator_6" id="UI_Mediator_6_gui" isHorizontal="true">
             <omgdc:Bounds height="60.0" width="361.0" x="59.0" y="1433.0"/>
          </bpmndi:BPMNShape>
@@ -1435,14 +1447,14 @@ erfasst</text>
             <omgdi:waypoint x="3665.0" y="1218.0"/>
             <omgdi:waypoint x="3667.0" y="1311.0"/>
          </bpmndi:BPMNEdge>
+         <bpmndi:BPMNEdge bpmnElement="sequenceFlow_129" id="sequenceFlow_129_gui">
+            <omgdi:waypoint x="3401.0" y="1697.0"/>
+            <omgdi:waypoint x="3484.0" y="1695.0"/>
+         </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="z_497" id="z_497_gui">
             <omgdi:waypoint x="1340.0" y="1178.0"/>
             <omgdi:waypoint x="1340.500768959114" y="1023.0"/>
             <omgdi:waypoint x="1682.0" y="1023.0"/>
-         </bpmndi:BPMNEdge>
-         <bpmndi:BPMNEdge bpmnElement="sequenceFlow_129" id="sequenceFlow_129_gui">
-            <omgdi:waypoint x="3401.0" y="1697.0"/>
-            <omgdi:waypoint x="3484.0" y="1695.0"/>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="ja_508" id="ja_508_gui">
             <omgdi:waypoint x="955.0" y="1198.0"/>

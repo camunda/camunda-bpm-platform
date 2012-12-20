@@ -305,6 +305,11 @@ li.actions .btn:last-child {
   -moz-box-sizing: border-box;
   box-sizing: border-box;
 }
+
+/** override 'background-color' with 'background' to fix the white vertical line in the middle of the button **/
+.sync-btn:hover {
+  background: #e6e6e6;
+}
 /** end roundtrip view */
 
 /** sync dialog */
@@ -389,3 +394,15 @@ div#pictureModal.modal.hide.fade {
   -moz-border-radius: 3px;
   border-radius: 3px;
 }
+
+thead tr {
+  background-color: #eee;
+}
+
+/** make sure that if screen res is 600px high or below, modal dialoges are scrollable */
+@media screen and (max-height: 600px){
+  .modal {
+  	position:absolute;
+  } 
+}
+

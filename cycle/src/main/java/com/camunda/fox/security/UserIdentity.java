@@ -1,6 +1,8 @@
 package com.camunda.fox.security;
 
 
+import java.io.Serializable;
+
 import com.camunda.fox.cycle.entity.User;
 
 /**
@@ -8,7 +10,9 @@ import com.camunda.fox.cycle.entity.User;
  * 
  * @author nico.rehwaldt
  */
-public class UserIdentity {
+public class UserIdentity implements Serializable {
+  
+  private static final long serialVersionUID = 1L;
   
   private String name;
   private Long id;

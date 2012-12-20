@@ -262,7 +262,7 @@ public class RoundtripService extends AbstractRestService {
     roundtrip.setLastSync(new Date());
     roundtrip.setLastSyncMode(syncMode);
     
-    RoundtripDTO roundtripDTO = RoundtripDTO.wrap(roundtrip);
+    RoundtripDTO roundtripDTO = RoundtripDTO.wrapIncludeDiagrams(roundtrip);
     
     return roundtripDTO;
   }

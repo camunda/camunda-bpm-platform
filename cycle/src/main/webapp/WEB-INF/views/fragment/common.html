@@ -95,22 +95,14 @@
         </div>
       </div>
     </div>
-    
-    <!-- error panel -->
-    <div th:fragment="error-panel" class="errorPanel hide">
-      <div data-ng-repeat="error in appErrors()" class="alert alert-error">
-        <span th:text="#{'An error occured, try refreshing the page or relogin :'}"></span><span>{{error}}</span>
-      </div>
-    </div>
-    
+     
     <!-- footer -->
     <footer class="content-container" th:fragment="footer">
       <div class="container-fluid">
         <p><a th:href="@{/app/secured/view/index}">camunda fox cycle</a> / version ${project.version}</p>
       </div>
 
-      <script th:src="@{/assets/js/lib/jquery-1.7.2.min.js}"></script>
-      <script th:src="@{/assets/js/lib/jquery.blockUI.js}"></script>
+      <script th:src="@{/assets/js/lib/jquery-1.7.2.min.js}"></script>      
       <script th:src="@{/assets/js/lib/bootstrap/bootstrap.js}"></script>
       <script th:src="@{/assets/js/lib/bootstrap/bootstrap-combobox.js}"></script>
       <script th:src="@{/assets/js/lib/angular/angular.js}"></script>
@@ -121,12 +113,12 @@
       <script th:src="@{'assets/js/lib/angular/i18n/angular-locale-' + ${locale} + '.js'}"></script>
       -->
       
-      <script th:src="@{/assets/js/extensions.js}"></script>
-      <script th:src="@{/assets/js/directives.js}"></script>
-      <script th:src="@{/assets/js/app.js}"></script>
-      <script th:src="@{/assets/js/filters.js}"></script>
-      <script th:src="@{/assets/js/services.js}"></script>
-      <script th:src="@{/assets/js/controllers.js}"></script>
+      <script th:src="@{/assets/js/app/extensions.js}"></script>
+      <script th:src="@{/assets/js/app/directives.js}"></script>
+      <script th:src="@{/assets/js/app/app.js}"></script>
+      <script th:src="@{/assets/js/app/filters.js}"></script>
+      <script th:src="@{/assets/js/app/services.js}"></script>
+      <script th:src="@{/assets/js/app/controllers.js}"></script>
     </footer>
   </body>
 </html>

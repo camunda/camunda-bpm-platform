@@ -128,14 +128,20 @@
       <div class="modal-header">
         <button type="button" class="close" data-dismiss="modal"
           aria-hidden="true">&times;</button>
-        <h3 th:text="#{'Model View'}"></h3>
+        <h3 th:text="#{'Process Model'}"></h3>
       </div>
       <div class="modal-body">
         <div id="myCarousel" class="carousel slide" data-interval="false">
           <!-- Carousel items -->
           <div class="carousel-inner">
+            <div class="item leftHandSide" ng-class="activeClass('leftHandSide')" data-ng-show="roundtrip.leftHandSide && lhsImageStatus == 'LOADING'">
+              <i class="icon-loading"></i> Loading the image
+            </div>
             <div class="item leftHandSide" ng-class="activeClass('leftHandSide')" data-ng-show="roundtrip.leftHandSide && lhsImageStatus == 'LOADED'">
               <diagram-image data-diagram="roundtrip.leftHandSide" data-status="lhsImageStatus"/>
+            </div>
+            <div class="item rightHandSide" ng-class="activeClass('rightHandSide')" data-ng-show="roundtrip.rightHandSide && rhsImageStatus == 'LOADING'">
+              <i class="icon-loading"></i> Loading the image
             </div>
             <div class="item rightHandSide" ng-class="activeClass('rightHandSide')" data-ng-show="roundtrip.rightHandSide && rhsImageStatus == 'LOADED'">
               <diagram-image data-diagram="roundtrip.rightHandSide" data-status="rhsImageStatus" />
@@ -143,9 +149,9 @@
           </div>
           <!-- Carousel nav -->
           <a class="carousel-control left" 
-            href="#myCarousel" data-slide="prev" data-ng-show="roundtrip.leftHandSide && lhsImageStatus == 'LOADED' && currentPicture == 'rightHandSide'" data-ng-click="delayedSetCurrentPicture('leftHandSide')">&lsaquo;</a> 
+            href="#myCarousel" data-slide="prev" data-ng-show="roundtrip.leftHandSide && currentPicture == 'rightHandSide'" data-ng-click="delayedSetCurrentPicture('leftHandSide')">&lsaquo;</a> 
           <a class="carousel-control right"
-            href="#myCarousel" data-slide="next" data-ng-show="roundtrip.rightHandSide && rhsImageStatus == 'LOADED' && currentPicture == 'leftHandSide'" data-ng-click="delayedSetCurrentPicture('rightHandSide')" >&rsaquo;</a>
+            href="#myCarousel" data-slide="next" data-ng-show="roundtrip.rightHandSide && currentPicture == 'leftHandSide'" data-ng-click="delayedSetCurrentPicture('rightHandSide')" >&rsaquo;</a>
         </div>
       </div>
       <div class="modal-footer">

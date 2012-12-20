@@ -24,6 +24,11 @@
     </dependency>
 
     <dependency>
+      <groupId>cglib</groupId>
+      <artifactId>cglib</artifactId>
+    </dependency>
+
+    <dependency>
       <groupId>org.jboss.spec</groupId>
       <artifactId>jboss-javaee-web-6.0</artifactId>
       <type>pom</type>
@@ -36,7 +41,37 @@
         </exclusion>
       </exclusions>
     </dependency>
-
+    
+    <dependency>
+      <groupId>com.sun.jersey</groupId>
+      <artifactId>jersey-json</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.sun.jersey.contribs</groupId>
+      <artifactId>jersey-spring</artifactId>
+      <exclusions>
+        <exclusion>
+          <artifactId>spring-core</artifactId>
+          <groupId>org.springframework</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>spring-beans</artifactId>
+          <groupId>org.springframework</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>spring-context</artifactId>
+          <groupId>org.springframework</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>spring-web</artifactId>
+          <groupId>org.springframework</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>spring-aop</artifactId>
+          <groupId>org.springframework</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
   </dependencies>
 
   <build>
@@ -44,13 +79,13 @@
 
     <resources>
       <resource>
-        <directory>src/main/resources</directory>
+        <directory>../cycle/src/main/runtime/jboss/resources</directory>
         <filtering>true</filtering>
       </resource>
     </resources>
 
     <filters>
-      <filter>src/config/database.properties</filter>
+      <filter>../cycle/src/main/runtime/jboss/config/database.properties</filter>
     </filters>
 
     <plugins>
@@ -64,28 +99,21 @@
               <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
             </manifest>
             <manifestEntries>
-              <!-- SVN revision number -->
-              <Implementation-Build>${buildNumber}</Implementation-Build>
-              <Dependencies>org.apache.httpcomponents</Dependencies>
+              <Dependencies>org.hibernate,org.hibernate.envers,org.hibernate.validator,org.apache.xerces,org.apache.commons.io,org.bouncycastle.bcprov-jdk15on,org.bouncycastle.bcpg-jdk15on</Dependencies>
             </manifestEntries>
           </archive>
           <webResources>
             <resource>
-              <directory>src/main/webapp</directory>
-              <filtering>true</filtering>
+              <directory>../cycle/src/main/runtime/jboss/webapp</directory>
             </resource>
           </webResources>
           <overlays>
             <overlay>
-              <id>cycle-core</id>
               <groupId>com.camunda.fox.cycle</groupId>
               <artifactId>cycle</artifactId>
               <excludes>
                 <exclude>**/persistence.xml</exclude>
               </excludes>
-            </overlay>
-            <overlay>
-              <!-- empty groupId/artifactId represents the current build -->
             </overlay>
           </overlays>
         </configuration>

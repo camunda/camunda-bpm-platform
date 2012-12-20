@@ -1,12 +1,20 @@
 package com.camunda.fox.security.service;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 import javax.inject.Inject;
 import javax.security.auth.Subject;
 import javax.security.auth.login.LoginContext;
 import javax.security.auth.login.LoginException;
+
 import org.springframework.stereotype.Component;
 
 import com.camunda.fox.cycle.entity.User;
+import com.camunda.fox.license.FoxLicenseService;
+import com.camunda.fox.license.entity.FoxComponent;
+import com.camunda.fox.license.impl.FoxLicenseException;
+import com.camunda.fox.license.impl.FoxLicenseNotFoundException;
 import com.camunda.fox.security.SecurityConfiguration;
 import com.camunda.fox.security.UserIdentity;
 import com.camunda.fox.security.UserLookup;
@@ -19,22 +27,31 @@ import com.camunda.fox.security.jaas.PassiveCallbackHandler;
 @Component
 public class SecurityService {
 
+  private static final Logger logger = Logger.getLogger(SecurityService.class.getSimpleName());
+  
   @Inject
   private SecurityConfiguration config;
   
   @Inject
   private UserLookup userLookup;
-  
-  public UserIdentity login(String userName, String password) {
+    
+  public UserIdentity login(String userName, String password) throws FoxLicenseException, FoxLicenseNotFoundException {
     if (userName == null || password == null) {
       return null;
     }
+    
+    checkLicense();
 
     if (config.isUseJaas()) {
       return loginViaJaas(userName, password);
     } else {
       return loginViaUserManagement(userName, password);
     }
+  }
+
+  protected void checkLicense() throws FoxLicenseException, FoxLicenseNotFoundException {
+    FoxLicenseService foxLicenseService = config.getFoxLicenseService();
+    foxLicenseService.checkLicenseFor(FoxComponent.FOX_CYCLE);      
   }
 
   private UserIdentity loginViaJaas(String userName, String password) {
@@ -49,7 +66,7 @@ public class SecurityService {
       // return principal
       return getOrCreateCycleIdentity(subject);
     } catch (LoginException e) {
-      e.printStackTrace();
+      logger.log(Level.WARNING, "Unable to login via JAAS.", e);
       return null;
     }
   }

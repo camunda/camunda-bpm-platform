@@ -2,6 +2,8 @@ package com.camunda.fox.cycle.connector;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.inject.Inject;
 
@@ -17,6 +19,8 @@ import com.camunda.fox.cycle.repository.ConnectorConfigurationRepository;
 @Component
 public class ConnectorRegistry {
 
+  private static final Logger logger = Logger.getLogger(ConnectorRegistry.class.getSimpleName());
+  
   @Inject
   private LoginAspect loginAspect;
 
@@ -115,7 +119,7 @@ public class ConnectorRegistry {
    * 
    * @throws CycleException if the connector is unavailable
    */
-  public Connector getConnector(long connectorId) {
+  public synchronized Connector getConnector(long connectorId) {
     Connector connector = cache.get(connectorId);
     if (connector == null) {
       connector = instantiateConnector(connectorId);
@@ -202,8 +206,7 @@ public class ConnectorRegistry {
 
       return executeTest(connector);
     } catch (Exception e) {
-      e.printStackTrace();
-      
+      logger.log(Level.WARNING, "Error while testing connector configuration: " + config.getName(), e);
       return ConnectorStatus.inError(e);
     } finally {
       if (connector != null) {
@@ -220,7 +223,7 @@ public class ConnectorRegistry {
       
       return executeTest(connector);
     } catch (Exception e) {
-      e.printStackTrace();
+      logger.log(Level.WARNING, "Error while testing connector configuration: " + config.getName(), e);
       return ConnectorStatus.inError(e);
     } finally {
       if (connector != null) {
@@ -239,7 +242,7 @@ public class ConnectorRegistry {
       // everything ok
       return ConnectorStatus.ok();
     } catch (Exception e) {
-      e.printStackTrace();
+      logger.log(Level.WARNING, "Error while testing connector configuration: " + connector.getConfiguration().getName(), e);
       return ConnectorStatus.inError(e);
     }
   }

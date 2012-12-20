@@ -1,8 +1,10 @@
 package com.camunda.fox.cycle.entity;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import javax.persistence.CascadeType;
 import javax.persistence.CollectionTable;
 import javax.persistence.Column;
 import javax.persistence.ElementCollection;
@@ -12,6 +14,7 @@ import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.JoinColumn;
 import javax.persistence.MapKeyColumn;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import com.camunda.fox.cycle.connector.ConnectorLoginMode;
@@ -55,6 +58,9 @@ public class ConnectorConfiguration extends AbstractEntity {
   @CollectionTable(name = "cy_connector_attributes", joinColumns = @JoinColumn(name = "configuration_id"))
   private Map<String, String> properties = new HashMap<String, String>();
 
+  @OneToMany(cascade={ CascadeType.PERSIST, CascadeType.REMOVE }, mappedBy="connectorConfiguration")
+  private List<ConnectorCredentials> credentials;
+  
   public String getGlobalUser() {
     return globalUser;
   }

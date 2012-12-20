@@ -10,6 +10,11 @@ import com.camunda.fox.cycle.connector.ConnectorNode;
 import com.camunda.fox.cycle.connector.ConnectorNodeType;
 import com.camunda.fox.cycle.connector.ContentInformation;
 
+/**
+ * For testing / mocking purposes.
+ * 
+ * @author christian.lipphardt@camunda.com
+ */
 @Component
 public class DummyConnector extends Connector {
 

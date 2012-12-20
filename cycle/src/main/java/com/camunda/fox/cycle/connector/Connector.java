@@ -15,7 +15,7 @@ public abstract class Connector {
   public abstract ConnectorNode getRoot();
   
   /**
-   * Returns a {@link ConnectorNode} to the assigned <code>id</code>. Iff
+   * Returns a {@link ConnectorNode} to the assigned <code>id</code>. If
    * a {@link ConnectorNode} could not be found, the value <code>null</code>
    * will be returned. 
    * @param id Represents the id of a {@link ConnectorNode} to search.

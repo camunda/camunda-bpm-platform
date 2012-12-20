@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xmlns:p="http://www.springframework.org/schema/p" xmlns:context="http://www.springframework.org/schema/context"
+<beans xmlns="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:p="http://www.springframework.org/schema/p"
+  xmlns:context="http://www.springframework.org/schema/context"
   xmlns:aop="http://www.springframework.org/schema/aop"
   xsi:schemaLocation="
           http://www.springframework.org/schema/beans 
@@ -26,6 +28,23 @@
     <property name="properties">
       <map>
         <entry key="signavioBaseUrl" value="${test.signavioConnector.baseUrl}"></entry>
+      </map>
+    </property>
+  </bean>
+
+  <bean name="signavioConfigProxy" class="com.camunda.fox.cycle.entity.ConnectorConfiguration">
+    <property name="id" value="3" />
+    <property name="name" value="My SignavioConnector with Proxy" />
+    <property name="connectorClass" value="com.camunda.fox.cycle.connector.signavio.SignavioConnector" />
+    <property name="loginMode" value="GLOBAL" />
+    <property name="globalUser" value="${test.signavioConnector.globalUser}" />
+    <property name="globalPassword" value="${test.signavioConnector.globalPassword}" />
+    <property name="properties">
+      <map>
+        <entry key="signavioBaseUrl" value="${test.signavioConnector.baseUrl}"></entry>
+        <entry key="proxyUrl" value="${test.signavioConnector.proxyUrl}"></entry>
+        <entry key="proxyUsername" value="${test.signavioConnector.proxyUsername}"></entry>
+        <entry key="proxyPassword" value="${test.signavioConnector.proxyPassword}"></entry>
       </map>
     </property>
   </bean>

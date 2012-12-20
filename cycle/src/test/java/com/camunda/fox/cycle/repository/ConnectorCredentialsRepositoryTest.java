@@ -116,6 +116,24 @@ public class ConnectorCredentialsRepositoryTest {
   }
   
   @Test
+  public void shouldRemoveCredentialsWhenRemovingConnector() {
+    
+    // given
+    ConnectorCredentials credentials1 = new ConnectorCredentials("Asd", "sdf", config1, testUser);
+    credentialsRepository.saveAndFlush(credentials1);
+    
+    // when
+    connectorRepository.delete(config1);
+    
+    ConnectorConfiguration deletedConfiguration = connectorRepository.findById(config1.getId());
+    ConnectorCredentials deletedCredentials = credentialsRepository.findById(credentials1.getId());
+    
+    // then
+    assertThat(deletedConfiguration).isNull();
+    assertThat(deletedCredentials).isNull();
+  }
+  
+  @Test
   public void findFetchAllByUserIdAndConnectorId() {
     
     // given

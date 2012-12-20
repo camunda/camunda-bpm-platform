@@ -1,0 +1,7 @@
+<web-ext
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="http://websphere.ibm.com/xml/ns/javaee"
+  xsi:schemaLocation="http://websphere.ibm.com/xml/ns/javaee http://websphere.ibm.com/xml/ns/javaee/ibm-web-ext_1_0.xsd"
+  version="1.0">
+  <context-root uri="/cycle"/>
+</web-ext>

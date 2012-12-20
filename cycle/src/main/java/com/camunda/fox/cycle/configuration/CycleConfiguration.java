@@ -53,4 +53,5 @@ public class CycleConfiguration extends SecurityConfiguration {
   public void setEmailFrom(String emailFrom) {
     this.emailFrom = emailFrom;
   }
+
 }
