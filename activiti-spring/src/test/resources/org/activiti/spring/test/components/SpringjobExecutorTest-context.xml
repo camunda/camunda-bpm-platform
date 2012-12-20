@@ -29,13 +29,7 @@
         <property name="transactionManager" ref="transactionManager"/>
         <property name="databaseSchemaUpdate" value="true"/>
         <property name="jobExecutorActivate" value="true"/>
-        <property name="jobExecutor" ref="springJobExecutor" />
-		<property name="deploymentResources">
-            <list>
-                <value>classpath:/org/activiti/spring/test/components/SpringTimersProcess.bpmn20.xml</value>
-                <value>classpath:/org/activiti/spring/test/components/SpringJobExecutorRollBack.bpmn20.xml</value>
-            </list>
-        </property>	
+        <property name="jobExecutor" ref="springJobExecutor" />		
     </bean>
 
     <bean id="processEngine" class="org.activiti.spring.ProcessEngineFactoryBean">
