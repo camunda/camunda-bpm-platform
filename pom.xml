@@ -20,6 +20,7 @@
     <module>jbossas71</module>
     <module>gf31</module>
     <module>ibmWs8</module>
+    <module>tomcat6</module>
     <module>webapps/h2-webapp</module>
     <module>webapps/cockpit-webapp-fox</module>
     <module>webapps/cockpit-webapp-fox-glassfish</module>

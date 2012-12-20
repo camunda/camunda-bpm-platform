@@ -26,6 +26,9 @@ import org.jboss.as.naming.ManagedReferenceFactory;
 import org.jboss.as.naming.ServiceBasedNamingStore;
 import org.jboss.as.naming.deployment.ContextNames;
 import org.jboss.as.naming.service.BinderService;
+import org.jboss.as.server.moduleservice.ServiceModuleLoader;
+import org.jboss.modules.Module;
+import org.jboss.modules.ModuleIdentifier;
 import org.jboss.msc.service.AbstractServiceListener;
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.ServiceBuilder;
@@ -191,7 +194,7 @@ public class ContainerPlatformService extends PlatformService implements Service
     // the ProcessArchiveService is started asynchronously but we make it appear sychronously here.
     
       ProcessArchiveService processArchiveService = new ProcessArchiveService(processArchive);
-      ServiceName serviceName = ProcessArchiveService.getServiceName(processArchive.getName());
+      final ServiceName serviceName = ProcessArchiveService.getServiceName(processArchive.getName());
       
       final ServiceListenerFuture<ProcessArchiveService, ProcessArchiveInstallation> listener = new ServiceListenerFuture<ProcessArchiveService, ProcessArchiveInstallation>(processArchiveService) {
         protected void serviceAvailable() {
@@ -201,6 +204,24 @@ public class ContainerPlatformService extends PlatformService implements Service
       
       String processEngineName = processArchive.getProcessEngineName();   
       ServiceName processEngineServiceName = ContainerProcessEngineController.createServiceName(processEngineName);
+      
+      // we add a dependency to the module service for the module of the process archice classloader.
+      // this makes sure that if the deployment module is removed, all process archive services 
+      // registered by that deployment are removed as well, even if the process archive does not remove them explicitly.
+      ClassLoader classLoader = processArchive.getClassLoader();      
+      Module module = Module.forClassLoader(classLoader, true);
+      ModuleIdentifier moduleIdentifier = module.getIdentifier();
+      ServiceName moduleServiceName = ServiceModuleLoader.moduleServiceName(moduleIdentifier);
+      
+      serviceContainer.getRequiredService(moduleServiceName).addListener(new AbstractServiceListener<Object>() {
+        public void serviceRemoveRequested(ServiceController< ? extends Object> controller) {
+          ServiceController< ? > processArchiveService = serviceContainer.getService(serviceName);
+          if(processArchiveService != null) {
+            processArchiveService.setMode(Mode.REMOVE);
+            
+          }
+        }
+      });
       
       serviceContainer.addService(serviceName, processArchiveService)
         .addDependency(processEngineServiceName, ContainerProcessEngineController.class, processArchiveService.getProcessEngineControllerInjector())
@@ -212,10 +233,14 @@ public class ContainerPlatformService extends PlatformService implements Service
       try {
         
         ProcessArchiveInstallation processArchiveInstallation = listener.get();
-        FoxPlatformException exception = processArchiveService.getException();
+        Throwable exception = processArchiveService.getException();
         if(exception != null) {
           serviceContainer.getService(serviceName).setMode(Mode.REMOVE);
-          throw exception;
+          if(exception instanceof RuntimeException) {
+            throw (RuntimeException) exception;
+          } else  {
+            throw new FoxPlatformException("Exception while starting process archive", exception);
+          }
         
         } else {
           return processArchiveInstallation;
@@ -232,13 +257,15 @@ public class ContainerPlatformService extends PlatformService implements Service
   
   @SuppressWarnings("unchecked")
   public void unInstallProcessArchive(String processArchiveName) {
-    
-    unInstallProcessArchiveInternal(processArchiveName);
 
+    unInstallProcessArchiveInternal(processArchiveName);
+       
     // remove the process archive service asynchronously.
     ServiceName serviceName = ProcessArchiveService.getServiceName(processArchiveName);
     ServiceController<ProcessArchiveService> service = (ServiceController<ProcessArchiveService>) serviceContainer.getService(serviceName);
-    service.setMode(Mode.REMOVE);    
+    if(service != null) {
+      service.setMode(Mode.REMOVE);
+    }
   }
    
   private boolean isDown(Substate state) {

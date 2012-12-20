@@ -15,10 +15,12 @@
  */
 package com.camunda.fox.platform.deployer.impl;
 
+import java.lang.ref.WeakReference;
 import java.net.URL;
 import java.util.EmptyStackException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.impl.context.Context;
@@ -35,10 +37,12 @@ import org.activiti.engine.impl.persistence.deploy.DeploymentCache;
  */
 public class ProcessArchiveClassLoader extends ClassLoader {
 
-  protected Map<String, ClassLoader> deploymentClassloaderMap = new HashMap<String, ClassLoader>();
+  protected Map<String, WeakReference<ClassLoader>> deploymentClassloaderMap = new HashMap<String, WeakReference<ClassLoader>>();
     
   public ProcessArchiveClassLoader(Map<String, ClassLoader> map) {
-    deploymentClassloaderMap.putAll(map); 
+    for (Entry<String, ClassLoader> entry : map.entrySet()) {
+      deploymentClassloaderMap.put(entry.getKey(), new WeakReference<ClassLoader>(entry.getValue()));
+    }    
   }
     
   public ProcessArchiveClassLoader() {    
@@ -49,7 +53,7 @@ public class ProcessArchiveClassLoader extends ClassLoader {
     if (processDefinitionKey == null || cl == null) {
       throw new ActivitiException("processDefinitionKey and classloader must not be null.");
     }
-    deploymentClassloaderMap.put(processDefinitionKey, cl);
+    deploymentClassloaderMap.put(processDefinitionKey, new WeakReference<ClassLoader>(cl));
   }
 
   public void unregisterProcessDefinition(String processDefinitionKey) {
@@ -113,8 +117,10 @@ public class ProcessArchiveClassLoader extends ClassLoader {
         String processDefinitionKey = executionContext.getProcessDefinition().getKey();      
   
         // look up the classloader for that processDefinition:
-        return deploymentClassloaderMap.get(processDefinitionKey);
-       
+        WeakReference<ClassLoader> reference = deploymentClassloaderMap.get(processDefinitionKey);
+        if(reference != null) {
+          return reference.get();
+        }
       } 
     }
     
@@ -132,7 +138,11 @@ public class ProcessArchiveClassLoader extends ClassLoader {
   
   
   public Map<String, ClassLoader> getDeploymentClassloaderMap() {
-    return deploymentClassloaderMap;
+    Map<String, ClassLoader> result = new HashMap<String, ClassLoader>();
+    for (Entry<String, WeakReference<ClassLoader>> entry : deploymentClassloaderMap.entrySet()) {
+      result.put(entry.getKey(), entry.getValue().get());
+    }
+    return result;
   }
 
 }
