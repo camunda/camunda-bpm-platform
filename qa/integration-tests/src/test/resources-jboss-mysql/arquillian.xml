@@ -7,7 +7,7 @@
   <container qualifier="jboss" default="true">
     <configuration>
       <property name="jbossHome">${jboss.runtime.location}</property>
-      <property name="managementPort">21009</property>
+      <property name="managementPort">${jboss.management-native.port}</property>
       <property name="serverConfig">standalone-mysql.xml</property>
     </configuration>
   </container>

@@ -6,6 +6,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.logging.Logger;
 
 import javax.ws.rs.core.MediaType;
@@ -54,7 +55,7 @@ public class TestCycleRoundtripIT {
   private static final String RHS_PROCESS_DIAGRAM = "/com/camunda/fox/cycle/roundtrip/repository/test-rhs.bpmn";
   
   private static final String HOST_NAME = "localhost";
-  private static String httpPort = "8080";
+  private static String httpPort;
   private static String CYCLE_BASE_PATH;
 
   private static ApacheHttpClient4 client;
@@ -66,17 +67,15 @@ public class TestCycleRoundtripIT {
   @BeforeClass
   public static void testCycleDeployment() throws Exception {
     
-    String serverName = System.getProperty("test.server.name");
-    if(serverName == null) {
-      httpPort = "38080";
-    } else {
-      if("jboss".equals(serverName)) {
-        httpPort = "38080";    
-      } else if("glassfish".equals(serverName)) {
-        httpPort = "38080";
-      } else if ("websphere".equals(serverName)) {
-        httpPort = "9080";
-      }
+    Properties properties = new Properties();
+
+    InputStream propertiesStream = null;
+    try {
+      propertiesStream = TestCycleRoundtripIT.class.getResourceAsStream("testconfig.properties");
+      properties.load(propertiesStream);
+      httpPort = (String) properties.get("cycle.http.port");
+    } finally {
+      IoUtil.closeSilently(propertiesStream);
     }
     
     CYCLE_BASE_PATH = "http://" + HOST_NAME + ":"+httpPort+"/cycle/";
@@ -88,6 +87,7 @@ public class TestCycleRoundtripIT {
     
     defaultHttpClient = (DefaultHttpClient) client.getClientHandler().getHttpClient();
     
+    // waiting for cycle webapp to become available
     boolean success = false;
     for (int i = 0; i <= 30; i++) {
       try {

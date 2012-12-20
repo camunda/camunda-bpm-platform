@@ -10,12 +10,6 @@
     <version>6.2.0-SNAPSHOT</version>
   </parent>
   
-  <properties>
-    <was_home>${WAS8_HOME}</was_home>
-    <was_profile>${WAS8_PROFILE}</was_profile>
-    <was_scope>${WAS8_SCOPE}</was_scope> <!-- eq. ca-meyerNode03Cell -->
-  </properties>
-  
   <dependencies>
     <dependency>
       <groupId>org.jboss.spec</groupId>
@@ -77,6 +71,7 @@
 	    <properties>
     		<jboss.assembly.location>../jboss7-runtime/target/jboss-as-${version.jboss.as}</jboss.assembly.location>
             <jboss.standalone.xml>standalone-h2.xml</jboss.standalone.xml>
+            <cycle.http.port>${jboss.http.port}</cycle.http.port>
   		</properties>  		
 		<dependencies>
 		  <dependency>
@@ -173,7 +168,7 @@
                     <type>standalone</type>
                     <home>${project.build.directory}/config-jboss</home>
                     <properties>
-                      <cargo.servlet.port>38080</cargo.servlet.port>
+                      <cargo.servlet.port>${jboss.http.port}</cargo.servlet.port>
                     </properties>
                   </configuration>
                   <wait>false</wait>
@@ -187,6 +182,7 @@
   		<id>glassfish</id>
 		<properties>
 		  <glassfish.server.location>../gf31-runtime/target/glassfish3</glassfish.server.location>
+          <cycle.http.port>${glassfish.http.port}</cycle.http.port>
 		</properties>
   		
   	    <dependencies>	
@@ -305,8 +301,8 @@
                     <type>existing</type>
                     <home>${project.build.directory}/glassfish3/glassfish/domains</home>
                     <properties>
-                        <cargo.servlet.port>38080</cargo.servlet.port>
-                        <cargo.glassfish.adminPort>34848</cargo.glassfish.adminPort>
+                        <cargo.servlet.port>${glassfish.http.port}</cargo.servlet.port>
+                        <cargo.glassfish.adminPort>${glassfish.admin.port}</cargo.glassfish.adminPort>
                         <cargo.glassfish.domain.name>domain1</cargo.glassfish.domain.name>
                         <cargo.remote.username>admin</cargo.remote.username>
                         <cargo.remote.password></cargo.remote.password>
@@ -320,7 +316,10 @@
   	</profile>
   	<profile>
   		<id>was</id>
-		<dependencies>
+        <properties>
+          <cycle.http.port>${was.http.port}</cycle.http.port>
+        </properties>
+        <dependencies>
 		  <dependency>
 		    <groupId>com.camunda.fox.engine</groupId>
 		    <artifactId>fox-engine</artifactId>
@@ -383,6 +382,7 @@
       <testResources>
         <testResource>
           <directory>src/test/resources</directory>
+          <filtering>true</filtering>
         </testResource>
       </testResources>
 
