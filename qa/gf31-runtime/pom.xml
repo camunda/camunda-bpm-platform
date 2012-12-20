@@ -6,10 +6,6 @@
 
   <name>fox platform EE - QA Glassfish 3.1.x Test Runtime</name>
   
-  <properties>
-    <glassfish.server.location>../../gf31/assembly/target/camunda-fox-ce-${project.version}/camunda-fox-ce-${project.version}/server</glassfish.server.location>
-  </properties>
-
   <parent>
     <groupId>com.camunda.fox.platform</groupId>
     <artifactId>fox-platform-qa</artifactId>

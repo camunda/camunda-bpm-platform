@@ -14,7 +14,48 @@
   </parent>
 
   <properties>
+    <!-- 
+      all maven properties used in QA/CI 
+    -->
+    
+    <!-- jboss -->
     <jboss.runtime.location>../jboss7-runtime/target/jboss-as-${version.jboss.as}/</jboss.runtime.location>
+    <jboss.http.port>38080</jboss.http.port>
+    <jboss.ajp.port>38009</jboss.ajp.port>
+    <jboss.https.port>38443</jboss.https.port>
+    <jboss.management-native.port>39999</jboss.management-native.port>
+    <jboss.management-http.port>39990</jboss.management-http.port>
+    <jboss.management-https.port>39443</jboss.management-https.port>
+    <jboss.osgi-http.port>38090</jboss.osgi-http.port>    
+    <jboss.remoting.port>34447</jboss.remoting.port>
+    <jboss.txn-recovery-environment.port>34712</jboss.txn-recovery-environment.port>
+    <jboss.txn-status-manager.port>34713</jboss.txn-status-manager.port>
+    <jboss.mail-smtp.port>25</jboss.mail-smtp.port>
+    
+    <!-- glassfish properties -->
+    <glassfish.server.location>../../gf31/assembly/target/camunda-fox-ce-${project.version}/camunda-fox-ce-${project.version}/server</glassfish.server.location>
+    
+    <glassfish.http.port>28080</glassfish.http.port>
+    <glassfish.admin.port>24848</glassfish.admin.port>
+    <glassfish.ASADMIN_LISTENER_PORT>24848</glassfish.ASADMIN_LISTENER_PORT>
+    <glassfish.HTTP_SSL_LISTENER_PORT>28181</glassfish.HTTP_SSL_LISTENER_PORT>
+    <glassfish.JMS_PROVIDER_PORT>27676</glassfish.JMS_PROVIDER_PORT>
+    <glassfish.IIOP_LISTENER_PORT>23700</glassfish.IIOP_LISTENER_PORT>
+    <glassfish.IIOP_SSL_LISTENER_PORT>23820</glassfish.IIOP_SSL_LISTENER_PORT>
+    <glassfish.IIOP_SSL_MUTUALAUTH_PORT>23920</glassfish.IIOP_SSL_MUTUALAUTH_PORT>
+    <glassfish.JMX_SYSTEM_CONNECTOR_PORT>28686</glassfish.JMX_SYSTEM_CONNECTOR_PORT>
+    <glassfish.OSGI_SHELL_TELNET_PORT>26666</glassfish.OSGI_SHELL_TELNET_PORT>
+    <glassfish.JAVA_DEBUGGER_PORT>29009</glassfish.JAVA_DEBUGGER_PORT>
+    
+    
+    <!-- websphere -->
+    <was.home>${WAS8_HOME}</was.home>
+    <was.profile>${WAS8_PROFILE}</was.profile>
+    <was.scope>${WAS8_SCOPE}</was.scope> <!-- eq. ca-meyerNode03Cell -->
+    <was.http.port>9080</was.http.port>
+    <was_remoteServerAddress>localhost</was_remoteServerAddress>
+    <was_remoteServerSoapPort>${WAS8_REMOTE_SERVER_SOAP_PORT}</was_remoteServerSoapPort>
+    
   </properties>
 
   <profiles>

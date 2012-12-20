@@ -7,12 +7,6 @@
 
   <name>fox platform EE - QA IBM Websphere 8.5 Test Runtime</name>
 
-  <properties>
-    <was_home>${WAS8_HOME}</was_home>
-    <was_profile>${WAS8_PROFILE}</was_profile>
-    <was_scope>${WAS8_SCOPE}</was_scope> <!-- eq. ca-meyerNode03Cell -->
-  </properties>
-
   <parent>
     <groupId>com.camunda.fox.platform</groupId>
     <artifactId>fox-platform-qa</artifactId>
@@ -156,13 +150,13 @@
               <target>
 
                 <!-- stop the server-->
-                <exec executable="${was_profile}/bin/stopServer.bat"
+                <exec executable="${was.profile}/bin/stopServer.bat"
                   osfamily="windows" failonerror="false"
                   failifexecutionfails="false">
                   <arg value="server1" />
                 </exec>
 
-                <exec executable="${was_profile}/bin/stopServer.sh"
+                <exec executable="${was.profile}/bin/stopServer.sh"
                   osfamily="unix" failonerror="false"
                   failifexecutionfails="false">
                   <arg value="server1" />
@@ -172,47 +166,47 @@
 
                 <delete>
                   <fileset
-                    dir="${was_profile}/installedApps/${was_scope}/camunda-fox-platform.ear" />
+                    dir="${was.profile}/installedApps/${was.scope}/camunda-fox-platform.ear" />
                   <fileset
-                    dir="${was_profile}/installedConnectors/fox-platform-jobexecutor-rar.rar" />
-                  <fileset dir="${was_home}/lib/ext" />
+                    dir="${was.profile}/installedConnectors/fox-platform-jobexecutor-rar.rar" />
+                  <fileset dir="${was.home}/lib/ext" />
                   <fileset
-                    dir="${was_profile}/installedApps/${was_scope}/cycle-was.ear/cycle-was.war" />
+                    dir="${was.profile}/installedApps/${was.scope}/cycle-was.ear/cycle-was.war" />
                 </delete>
 
                 <copy
-                  todir="${was_profile}/installedApps/${was_scope}/camunda-fox-platform.ear"
+                  todir="${was.profile}/installedApps/${was.scope}/camunda-fox-platform.ear"
                   overwrite="true">
                   <fileset
                     dir="${project.build.directory}/camunda-fox-platform.ear" />
                 </copy>
 
                 <copy
-                  todir="${was_profile}/installedConnectors/fox-platform-jobexecutor-rar.rar"
+                  todir="${was.profile}/installedConnectors/fox-platform-jobexecutor-rar.rar"
                   overwrite="true">
                   <fileset
                     dir="${project.build.directory}/fox-platform-jobexecutor-rar.rar" />
                 </copy>
                 
                 <copy
-                  todir="${was_home}/lib/ext">
+                  todir="${was.home}/lib/ext">
                   <fileset
                     dir="target/libs" />
                 </copy>
                 
                 <copy
-                  todir="${was_profile}/installedApps/${was_scope}/cycle-was.ear/cycle-was.war"
+                  todir="${was.profile}/installedApps/${was.scope}/cycle-was.ear/cycle-was.war"
                   overwrite="true">
                   <fileset
                     dir="${project.build.directory}/cycle-was.war" />
                 </copy>
 
                 <!-- start the server -->
-                <exec executable="${was_profile}/bin/startServer.bat"
+                <exec executable="${was.profile}/bin/startServer.bat"
                   osfamily="windows">
                   <arg value="server1" />
                 </exec>
-                <exec executable="${was_profile}/bin/startServer.sh"
+                <exec executable="${was.profile}/bin/startServer.sh"
                   osfamily="unix">
                   <arg value="server1" />
                 </exec>

@@ -248,9 +248,9 @@
           </protocol>
         </protocols>
         <network-listeners>
-          <network-listener port="38080" protocol="http-listener-1" transport="tcp" name="http-listener-1" thread-pool="http-thread-pool"></network-listener>
-          <network-listener port="38181" protocol="http-listener-2" transport="tcp" name="http-listener-2" thread-pool="http-thread-pool"></network-listener>
-          <network-listener port="34848" protocol="admin-listener" transport="tcp" name="admin-listener" thread-pool="admin-thread-pool"></network-listener>
+          <network-listener port="${glassfish.http.port}" protocol="http-listener-1" transport="tcp" name="http-listener-1" thread-pool="http-thread-pool"></network-listener>
+          <network-listener port="${glassfish.HTTP_SSL_LISTENER_PORT}" protocol="http-listener-2" transport="tcp" name="http-listener-2" thread-pool="http-thread-pool"></network-listener>
+          <network-listener port="${glassfish.admin.port}" protocol="admin-listener" transport="tcp" name="admin-listener" thread-pool="admin-thread-pool"></network-listener>
         </network-listeners>
         <transports>
           <transport name="tcp"></transport>
@@ -437,16 +437,17 @@
         <failure-detection></failure-detection>
       </group-management-service>
       <management-rules></management-rules>
-      <system-property name="ASADMIN_LISTENER_PORT" value="24848"></system-property>
-      <system-property name="HTTP_LISTENER_PORT" value="28080"></system-property>
-      <system-property name="HTTP_SSL_LISTENER_PORT" value="28181"></system-property>
-      <system-property name="JMS_PROVIDER_PORT" value="27676"></system-property>
-      <system-property name="IIOP_LISTENER_PORT" value="23700"></system-property>
-      <system-property name="IIOP_SSL_LISTENER_PORT" value="23820"></system-property>
-      <system-property name="IIOP_SSL_MUTUALAUTH_PORT" value="23920"></system-property>
-      <system-property name="JMX_SYSTEM_CONNECTOR_PORT" value="28686"></system-property>
-      <system-property name="OSGI_SHELL_TELNET_PORT" value="26666"></system-property>
-      <system-property name="JAVA_DEBUGGER_PORT" value="29009"></system-property>
+      <system-property name="ASADMIN_LISTENER_PORT" value="${glassfish.admin.port}"></system-property>
+      <system-property name="HTTP_LISTENER_PORT" value="${glassfish.http.port}"></system-property>
+      <system-property name="HTTP_SSL_LISTENER_PORT" value="${glassfish.HTTP_SSL_LISTENER_PORT}"></system-property>
+      <system-property name="JMS_PROVIDER_PORT" value="${glassfish.JMS_PROVIDER_PORT}"></system-property>
+      <system-property name="IIOP_LISTENER_PORT" value="${glassfish.IIOP_LISTENER_PORT}"></system-property>
+      <system-property name="IIOP_SSL_LISTENER_PORT" value="${glassfish.IIOP_SSL_LISTENER_PORT}"></system-property>
+      <system-property name="IIOP_SSL_MUTUALAUTH_PORT" value="${glassfish.IIOP_SSL_MUTUALAUTH_PORT}"></system-property>
+      <system-property name="JMX_SYSTEM_CONNECTOR_PORT" value="${glassfish.JMX_SYSTEM_CONNECTOR_PORT}"></system-property>
+      <system-property name="OSGI_SHELL_TELNET_PORT" value="${glassfish.OSGI_SHELL_TELNET_PORT}"></system-property>
+      <system-property name="JAVA_DEBUGGER_PORT" value="${glassfish.JAVA_DEBUGGER_PORT}"></system-property>
+      
       <monitoring-service>
         <module-monitoring-levels></module-monitoring-levels>
       </monitoring-service>

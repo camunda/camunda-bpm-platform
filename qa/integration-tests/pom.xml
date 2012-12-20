@@ -334,11 +334,8 @@
     <profile>
       <id>was</id>
       <properties>
-        <was_home>${WAS8_HOME}</was_home>
         <!-- currently the arquillian websphere connector is not compatible with 1.0.1.Final -->
         <version.arquillian>1.0.0.Final</version.arquillian>
-        <was_remoteServerAddress>localhost</was_remoteServerAddress>
-        <was_remoteServerSoapPort>${WAS8_REMOTE_SERVER_SOAP_PORT}</was_remoteServerSoapPort>
       </properties>
       
       <dependencyManagement>
@@ -424,7 +421,7 @@
             <artifactId>was-public</artifactId>
             <version>8.5.0</version>
             <scope>system</scope>
-            <systemPath>${was_home}/dev/was_public.jar</systemPath>
+            <systemPath>${was.home}/dev/was_public.jar</systemPath>
         </dependency>
         
         <dependency>
@@ -432,7 +429,7 @@
             <artifactId>ws-admin-client</artifactId>
             <version>8.5.0</version>
             <scope>system</scope>
-            <systemPath>${was_home}/runtimes/com.ibm.ws.admin.client_8.5.0.jar</systemPath>
+            <systemPath>${was.home}/runtimes/com.ibm.ws.admin.client_8.5.0.jar</systemPath>
         </dependency>
         
         <dependency>
@@ -440,7 +437,7 @@
             <artifactId>ws-orb</artifactId>
             <version>8.5.0</version>
             <scope>system</scope>
-            <systemPath>${was_home}/runtimes/com.ibm.ws.orb_8.5.0.jar</systemPath>
+            <systemPath>${was.home}/runtimes/com.ibm.ws.orb_8.5.0.jar</systemPath>
         </dependency>
 
         <dependency>
@@ -448,7 +445,7 @@
             <artifactId>jgss-provider</artifactId>
             <version>8.5.0</version>
             <scope>system</scope>
-            <systemPath>${was_home}/java/jre/lib/ibmjgssprovider.jar</systemPath>
+            <systemPath>${was.home}/java/jre/lib/ibmjgssprovider.jar</systemPath>
         </dependency>
 
         <dependency>
