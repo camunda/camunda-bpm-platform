@@ -7,7 +7,7 @@
   <parent>
     <groupId>com.camunda.fox.platform</groupId>
     <artifactId>fox-platform-qa</artifactId>
-    <version>6.2.0-SNAPSHOT</version>
+    <version>6.2.0-alpha5</version>
   </parent>
   
   <dependencies>
@@ -112,13 +112,13 @@
 		             <target unless="maven.test.skip">
 
                       <!-- copy jboss server runtime -->
-                      <mkdir dir="target/jboss-as-${version.jboss.as}"/>                      
-		              <copy todir="target/jboss-as-${version.jboss.as}" >
+                      <mkdir dir="target/jboss-as-${version.jboss.as}" />                      
+		              <copy todir="target/jboss-as-${version.jboss.as}">
 		                 <fileset dir="${jboss.assembly.location}" />
 		              </copy>
                        
                       <!-- add cycle.war to jboss deployments directory -->
-		              <dependencyfilesets scopes="test" types="war"/>
+		              <dependencyfilesets scopes="test" types="war" />
                       
 		              <copy todir="target/jboss-as-${version.jboss.as}/standalone/deployments">
 		                <fileset refid="maven.project.dependencies" />
@@ -126,9 +126,7 @@
 		              </copy>
                                       
                       <!-- we copy the correct configuraiton file to standalone.xml -->
-                      <copy file="target/jboss-as-${version.jboss.as}/standalone/configuration/${jboss.standalone.xml}" 
-                            tofile="target/jboss-as-${version.jboss.as}/standalone/configuration/standalone.xml"
-                            overwrite="true" />
+                      <copy file="target/jboss-as-${version.jboss.as}/standalone/configuration/${jboss.standalone.xml}" tofile="target/jboss-as-${version.jboss.as}/standalone/configuration/standalone.xml" overwrite="true" />
                                                   
                                                  
 		            </target>
@@ -237,7 +235,7 @@
 		          </goals>
 		          <configuration>
 		            <target unless="maven.test.skip">
-		              <dependencyfilesets scopes="test" types="war"/>
+		              <dependencyfilesets scopes="test" types="war" />
 		              
 		              <copy todir="target/glassfish3/glassfish/domains/domain1/autodeploy">
 		                <fileset refid="maven.project.dependencies" />
@@ -305,7 +303,7 @@
                         <cargo.glassfish.adminPort>${glassfish.admin.port}</cargo.glassfish.adminPort>
                         <cargo.glassfish.domain.name>domain1</cargo.glassfish.domain.name>
                         <cargo.remote.username>admin</cargo.remote.username>
-                        <cargo.remote.password></cargo.remote.password>
+                        <cargo.remote.password />
                     </properties>
                   </configuration>
                   <wait>false</wait>
@@ -434,7 +432,7 @@
                                       </goals>
                                   </pluginExecutionFilter>
                                   <action>
-                                      <ignore></ignore>
+                                      <ignore />
                                   </action>
                               </pluginExecution>
                           </pluginExecutions>
