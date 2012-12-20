@@ -20,6 +20,7 @@
       <unpackOptions>
       	<excludes>
       		<exclude>**/domains/domain1/config/domain.xml</exclude>
+            <exclude>**/domains/domain1/config/default-web.xml</exclude>
       	</excludes>
       </unpackOptions>      
     </dependencySet>
@@ -101,6 +102,11 @@
       <source>src/domain.xml</source>
       <filtered>true</filtered>
       <outputDirectory>server/glassfish3/glassfish/domains/domain1/config</outputDirectory>
-    </file>   
+    </file>
+    <file>
+      <source>src/default-web.xml</source>
+      <filtered>false</filtered>
+      <outputDirectory>server/glassfish3/glassfish/domains/domain1/config</outputDirectory>
+    </file>      
   </files>
 </assembly>

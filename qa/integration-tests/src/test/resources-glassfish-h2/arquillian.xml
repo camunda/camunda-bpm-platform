@@ -11,9 +11,9 @@
   <container qualifier="glassfish" default="true">
     <configuration>
       <property name="glassFishHome">../gf31-runtime/target/glassfish3/</property>
-      <property name="adminPort">34848</property>
+      <property name="adminPort">${glassfish.admin.port}</property>
       <property name="debug">true</property>
-      <outputToConsole>true</outputToConsole>      
+      <property name="outputToConsole">true</property>      
     </configuration>
   </container>
 </arquillian>

@@ -23,11 +23,13 @@ import com.camunda.fox.platform.test.util.DeploymentHelper;
  */
 @RunWith(Arquillian.class)
 public class TestWarDeploymentWithBrokenBpmnXml {
+  
+  private static final String DEPLOYMENT = "deployment";
 
   @ArquillianResource
   private Deployer deployer;
   
-  @Deployment(managed=false, name="deployment")
+  @Deployment(managed=false, name=DEPLOYMENT)
   public static WebArchive processArchive() {    
     
     return  ShrinkWrap.create(WebArchive.class, "test.war")
@@ -41,11 +43,11 @@ public class TestWarDeploymentWithBrokenBpmnXml {
   @RunAsClient
   public void testXmlInvalid() {
     try {
-      deployer.deploy("deployment");
+      deployer.deploy(DEPLOYMENT);
       Assert.fail("exception expected");
     }catch (Exception e) {
       // expected
-    }
+    } 
   }
 
 }

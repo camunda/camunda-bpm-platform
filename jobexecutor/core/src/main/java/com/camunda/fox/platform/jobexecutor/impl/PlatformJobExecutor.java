@@ -101,7 +101,7 @@ public abstract class PlatformJobExecutor implements PlatformJobExecutorService 
   public synchronized void stopJobAcquisition(String jobAcquisitionName) {
     JobAcquisition jobAcquisition = jobAcquisitionsByName.get(jobAcquisitionName);
     if (jobAcquisition == null) {
-      throw new FoxPlatformException("acquisition with name '" + jobAcquisitionName + "' not found.");
+      return;
     }
     jobAcquisition.shutdown();  
     jobAcquisitionsByName.remove(jobAcquisitionName);
@@ -127,7 +127,7 @@ public abstract class PlatformJobExecutor implements PlatformJobExecutorService 
   public synchronized void unregisterProcessEngine(ProcessEngineConfigurationImpl processEngineConfiguration, String acquisitionName) {
     JobAcquisition jobAcquisition = jobAcquisitionsByName.get(acquisitionName);
     if (jobAcquisition == null) {
-      throw new FoxPlatformException("Cannot unregister process engine with PlatformJobExecutor: acquisition with name '" + acquisitionName + "' not found.");
+      return;
     }
     
     jobAcquisition.unregisterProcessEngine(processEngineConfiguration);

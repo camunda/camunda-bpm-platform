@@ -88,13 +88,27 @@
       <artifactId>cockpit-sql-scripts-openjpa</artifactId>
       <version>${project.version}</version>
     </dependency>
-
+    
     <dependency>
-      <groupId>com.camunda.fox.cockpit</groupId>
-      <artifactId>cockpit-webapp-fox-was</artifactId>
-      <version>${project.version}</version>
+       <groupId>com.camunda.fox.cockpit</groupId>
+       <artifactId>cockpit-webapp-fox-was</artifactId>
+       <version>${project.version}</version>
+       <type>war</type>
+    </dependency>
+
+    <!-- cycle -->
+    <dependency>
+      <groupId>com.camunda.fox.cycle</groupId>
+      <artifactId>cycle-was</artifactId>
+      <version>${project.version}</version>    
       <type>war</type>
     </dependency>
+    <dependency>
+      <groupId>com.camunda.fox.cycle</groupId>
+      <artifactId>cycle-sql-scripts</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    
   </dependencies>
 
   <build>

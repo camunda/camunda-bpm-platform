@@ -118,6 +118,14 @@
                         <password>sa</password>
                     </security>                   
                 </datasource>
+                <datasource jndi-name="java:jboss/datasources/CycleDS" enabled="true" use-java-context="true" jta="true" use-ccm="true" pool-name="CycleDS">
+                    <connection-url>jdbc:h2:mem:cycle;DB_CLOSE_DELAY=-1;MVCC=TRUE;DB_CLOSE_ON_EXIT=FALSE</connection-url>
+                    <driver>h2</driver>
+                    <security>
+                        <user-name>sa</user-name>
+                        <password>sa</password>
+                    </security>                   
+                </datasource>
                 <drivers>
                     <driver name="h2" module="com.h2database.h2">
                         <xa-datasource-class>org.h2.jdbcx.JdbcDataSource</xa-datasource-class>
@@ -346,18 +354,20 @@
         </interface>
     </interfaces>
 
-    <socket-binding-group name="standard-sockets" default-interface="public" port-offset="${jboss.runtime.port-offset}">
-        <socket-binding name="http" port="8080"/>
-        <socket-binding name="https" port="8443"/>
-        <socket-binding name="management-native" interface="management" port="${jboss.management.native.port:9999}"/>
-        <socket-binding name="management-http" interface="management" port="${jboss.management.http.port:9990}"/>
-        <socket-binding name="management-https" interface="management" port="${jboss.management.https.port:9443}"/>
-        <socket-binding name="osgi-http" interface="management" port="8090"/>
-        <socket-binding name="remoting" port="4447"/>
-        <socket-binding name="txn-recovery-environment" port="4712"/>
-        <socket-binding name="txn-status-manager" port="4713"/>
+<socket-binding-group name="standard-sockets" default-interface="public" port-offset="0">
+        <socket-binding name="http" port="${jboss.http.port}"/>
+		<socket-binding name="ajp" port="${jboss.ajp.port}"/>
+        <socket-binding name="https" port="${jboss.https.port}"/>
+        <socket-binding name="management-native" interface="management" port="${jboss.management-native.port}"/>
+        <socket-binding name="management-http" interface="management" port="${jboss.management-http.port}"/>
+        <socket-binding name="management-https" interface="management" port="${jboss.management-https.port}"/>
+        <socket-binding name="osgi-http" interface="management" port="${jboss.osgi-http.port}"/>
+        <socket-binding name="remoting" port="${jboss.remoting.port}"/>
+        <socket-binding name="txn-recovery-environment" port="${jboss.txn-recovery-environment.port}"/>
+        <socket-binding name="txn-status-manager" port="${jboss.txn-status-manager.port}"/>
         <outbound-socket-binding name="mail-smtp">
-            <remote-destination host="localhost" port="25"/>
+            <remote-destination host="localhost" port="${jboss.mail-smtp.port}"/>
         </outbound-socket-binding>
-    </socket-binding-group>
+  </socket-binding-group>
+  
 </server>

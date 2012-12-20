@@ -204,7 +204,25 @@ public class DeployIfChangedCmd implements Command<String>, Serializable {
    * Would be nice to have the same behaviour everywhere (especially in OSGI and Java EE)
    */
   protected boolean hasChanged(Entry<String, byte[]> resourceEntry, Deployment deployment) {
-    byte[] existingProcessDefinitionBytes = commandContext.getDeploymentManager().findDeploymentById(deployment.getId()).getResource(resourceEntry.getKey()).getBytes();
+    
+    if(resourceEntry == null || resourceEntry.getKey() == null) {
+      return true;
+    }
+    
+    String deploymentId = deployment.getId();
+    String resourceName = resourceEntry.getKey();
+    
+    DeploymentEntity deploymentEntity = commandContext.getDeploymentManager().findDeploymentById(deploymentId);
+    if(deploymentEntity == null || deploymentEntity.getResource(resourceName) == null) {
+      return true;
+    }
+    
+    ResourceEntity resourceEntity = deploymentEntity.getResource(resourceName);
+    byte[] existingProcessDefinitionBytes = resourceEntity.getBytes();
+    
+    if(existingProcessDefinitionBytes == null) {
+      return true;
+    }
 
     try {
       String existingProcessDefinitionXml = new String(existingProcessDefinitionBytes, "UTF8");

@@ -20,8 +20,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -59,9 +61,7 @@ public class ProcessEngineController {
 
   ///////////////////////////////// state
     
-  protected Map<String, ProcessArchiveContext> installedProcessArchivesByName = new HashMap<String, ProcessArchiveContext>();
-  protected Map<String, ProcessArchiveContext> installedProcessArchivesByProcessDefinitionKey = new HashMap<String, ProcessArchiveContext>();
-  protected List<ProcessArchive> cachedProcessArchives = Collections.emptyList();
+  protected Map<String, ProcessArchiveContext> installedProcessArchives = new HashMap<String, ProcessArchiveContext>();
 
   protected ProcessEngineConfigurationImpl processEngineConfiguration;
   
@@ -121,15 +121,14 @@ public class ProcessEngineController {
     fireBeforeProcessEngineControllerStop(this);    
     closeProcessEngine();       
 
-    Collection<ProcessArchiveContext> installedProcessArchives = new ArrayList<ProcessArchiveContext>(installedProcessArchivesByName.values());
+    Collection<ProcessArchiveContext> installedProcessArchives = new HashSet<ProcessArchiveContext>(this.installedProcessArchives.values());
     for (ProcessArchiveContext processArchive : installedProcessArchives) {
       unInstallProcessArchive(processArchive.getProcessArchive());      
     }
 
     processEngineRegistry.processEngineUninstalled(this);
 
-    installedProcessArchivesByName.clear();
-    installedProcessArchivesByProcessDefinitionKey.clear();
+    installedProcessArchives.clear();
     activitiProcessEngine = null;
     processEngineConfiguration = null;    
     isActive = false;
@@ -225,7 +224,7 @@ public class ProcessEngineController {
       throw new FoxPlatformException("Cannot install process archive with name "+paName+": ProcessEngineService is not active.");
     }
     
-    if(installedProcessArchivesByName.containsKey(paName)) {
+    if(getProcessArchiveContextByName(paName) != null) {
       throw new FoxPlatformException("Cannot install process archive with name '"+paName+"': process archive with same name already installed.");
     }
     
@@ -234,21 +233,17 @@ public class ProcessEngineController {
     
     ProcessArchiveContext processArchiveContext = new ProcessArchiveContext(deployment, processArchive);
     processArchiveContext.setActive(true);
-    installedProcessArchivesByName.put(processArchive.getName(), processArchiveContext);
-
-    ArrayList<ProcessArchive> processArchives = new ArrayList<ProcessArchive>(cachedProcessArchives);
-    processArchives.add(processArchive);
-    cachedProcessArchives = Collections.unmodifiableList(processArchives);
+    installedProcessArchives.put(processArchive.getName(), processArchiveContext);
 
     if (deployment != null) {
       List<ProcessDefinition> processDefinitionsForThisDeployment = activitiProcessEngine.getRepositoryService().createProcessDefinitionQuery()
               .deploymentId(deployment.getId()).list();
       for (ProcessDefinition processDefinition : processDefinitionsForThisDeployment) {
-        installedProcessArchivesByProcessDefinitionKey.put(processDefinition.getKey(), processArchiveContext);
+        installedProcessArchives.put(processDefinition.getKey(), processArchiveContext);
       }
       log.info("Installed process archive '" + paName + "' to process engine '"+processEngineName+"'.");
       return activitiProcessEngine;
-    } else {      
+    } else {
       log.info("Installed empty process archive '"+paName+"'. Process archive will have access to process engine with name '"+processEngineName+"'.");
       return activitiProcessEngine;
     }
@@ -272,7 +267,7 @@ public class ProcessEngineController {
   protected void performUndeployment(ProcessArchive processArchive) {    
     final String paName = processArchive.getName();
   
-    ProcessArchiveContext processArchiveContext = installedProcessArchivesByName.get(paName);
+    ProcessArchiveContext processArchiveContext = getProcessArchiveContextByName(paName);
     if(processArchiveContext == null) {
       return;
     }
@@ -285,24 +280,18 @@ public class ProcessEngineController {
     } finally {
       processArchiveContext.setUndelploying(false);      
       processArchiveContext.setActive(false);
-      
-      installedProcessArchivesByName.remove(paName);
-      
-      ArrayList<ProcessArchive> processArchives = new ArrayList<ProcessArchive>(cachedProcessArchives);
-      processArchives.remove(processArchive);
-      cachedProcessArchives = Collections.unmodifiableList(processArchives);
-      
-      if(processArchiveContext.getActivitiDeployment() != null) {
-        String activitiDeploymentId = processArchiveContext.getActivitiDeployment().getId();
-        List<ProcessDefinition> processDefinitions = activitiProcessEngine.getRepositoryService()
-          .createProcessDefinitionQuery()
-          .deploymentId(activitiDeploymentId)
-          .list();
-        for (ProcessDefinition processDefinition : processDefinitions) {
-          installedProcessArchivesByProcessDefinitionKey.remove(processDefinition.getKey());
+      ArrayList<String> keys = new ArrayList<String>(installedProcessArchives.keySet());
+      for (String key : keys) {
+        ProcessArchiveContext context = installedProcessArchives.get(key);
+        if(context != null && context.getProcessArchive().getName().equals(paName)) {
+          installedProcessArchives.remove(key);
         }
       }
     }    
+  }
+  
+  public ProcessArchiveContext getProcessArchiveContextByName(String name) {    
+    return installedProcessArchives.get(name);
   }
 
   protected void performEngineUndeployment(ProcessArchive processArchive) {
@@ -322,7 +311,7 @@ public class ProcessEngineController {
   }
   
   public ProcessArchiveContext getProcessArchiveContext(String processDefinitionKey) {
-    return installedProcessArchivesByProcessDefinitionKey.get(processDefinitionKey);
+    return installedProcessArchives.get(processDefinitionKey);
   }
   
   public ProcessArchive getProcessArchiveByProcessDefinitionId(final String processDefinitionId) {
@@ -353,7 +342,7 @@ public class ProcessEngineController {
   }
   
   public ProcessArchive getProcessArchiveByProcessDefinitionKey(String processDefinitionKey) {
-    ProcessArchiveContext processArchiveContext = installedProcessArchivesByProcessDefinitionKey.get(processDefinitionKey);
+    ProcessArchiveContext processArchiveContext = installedProcessArchives.get(processDefinitionKey);
     if(processArchiveContext == null) {
       throw new FoxPlatformException("No process archive installed for key '"+processDefinitionKey+"', on process engine '"+processEngineName+"'.");
     }
@@ -366,13 +355,9 @@ public class ProcessEngineController {
   public ProcessEngine getProcessEngine() {
     return activitiProcessEngine;
   }
-  
-  public Map<String, ProcessArchiveContext> getInstalledProcessArchivesByName() {
-    return new HashMap<String, ProcessArchiveContext>(installedProcessArchivesByName);
-  }
-  
+    
   public Map<String, ProcessArchiveContext> getInstalledProcessArchivesByProcessDefinitionKey() {
-    return new HashMap<String, ProcessArchiveContext>(installedProcessArchivesByProcessDefinitionKey);
+    return new HashMap<String, ProcessArchiveContext>(installedProcessArchives);
   }
 
   public ProcessEngineConfigurationImpl getProcessEngineConfiguration() {
@@ -483,8 +468,13 @@ public class ProcessEngineController {
     return processEngineName;
   }
     
-  public List<ProcessArchive> getCachedProcessArchives() {
-    return cachedProcessArchives;
+  public Set<ProcessArchive> getCachedProcessArchives() {
+    Collection<ProcessArchiveContext> values = installedProcessArchives.values();
+    Set<ProcessArchive> result = new HashSet<ProcessArchive>();
+    for (ProcessArchiveContext processArchiveContext : values) {
+      result.add(processArchiveContext.getProcessArchive());
+    }
+    return result;
   }
   
   public void setProcessEngineRegistry(ProcessEngineRegistry processEngineRegistry) {
