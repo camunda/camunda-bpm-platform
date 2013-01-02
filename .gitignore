@@ -10,3 +10,4 @@ build.properties
 nbactions*.xml
 nb-configuration.xml
 .idea
+cycle-httpclient/dependency-reduced-pom.xml
