@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+	xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+	xmlns:activiti="http://activiti.org/bpmn"
+	xmlns:fox="http://www.camunda.com/fox"
+	targetNamespace="Examples">
+
+	<process id="failedSendTask">
+
+		<startEvent id="theStart" />
+		<sequenceFlow id="flow1" sourceRef="theStart" targetRef="failingSendTask" />
+
+		<sendTask id="failingSendTask" activiti:type="mail" activiti:async="true">
+			<extensionElements>
+	       		<fox:failedJobRetryTimeCycle>R5/PT5M</fox:failedJobRetryTimeCycle>
+	       		<activiti:field name="to">
+					<activiti:string>Hello Kermit!</activiti:string>
+				</activiti:field>
+				<activiti:field name="subject">
+					<activiti:string>Hello Kermit!</activiti:string>
+				</activiti:field>
+				<activiti:field name="text">
+					<activiti:string>This a text only e-mail.</activiti:string>
+				</activiti:field>
+			</extensionElements>
+		</sendTask>
+		
+		<sequenceFlow id="flow2" sourceRef="failingSendTask" targetRef="theEnd" />
+		
+		<endEvent id="theEnd" />
+
+	</process>
+	
+</definitions>
