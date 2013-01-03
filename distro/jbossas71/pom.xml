@@ -1,0 +1,26 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+	<parent>
+		<groupId>com.camunda.fox.platform</groupId>
+		<artifactId>fox-platform</artifactId>
+		<relativePath>../..</relativePath>
+		<version>6.2.0-SNAPSHOT</version>
+	</parent>
+  
+  <artifactId>fox-platform-jboss</artifactId>
+  <packaging>pom</packaging>
+
+  <name>fox platform EE - jBoss7</name>
+  
+  <description>
+    This pom defines the modules for the JBoss distribution which is shipped as Fox Platform Comunity Edition (CE)
+  </description>
+
+  <modules>
+    <module>assembly</module>
+    <module>distro</module>
+    <module>modules</module>
+    <module>subsystem</module>
+  </modules>
+</project>

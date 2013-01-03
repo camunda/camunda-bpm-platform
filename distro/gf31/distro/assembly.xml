@@ -1,0 +1,91 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<assembly xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+          xmlns="urn:maven:assembly:1.1.2">
+  
+  <id>distro</id>
+  
+  <formats>
+    <format>zip</format>
+    <format>tar.gz</format>
+  </formats>
+
+  <includeBaseDirectory>false</includeBaseDirectory>
+
+  <fileSets>
+    <fileSet>
+      <directory>../assembly/target/camunda-fox-ce-${project.version}/camunda-fox-ce-${project.version}</directory>
+      <outputDirectory />
+      <excludes>
+        <exclude>**/*.sh</exclude>      
+      </excludes>
+    </fileSet>
+    <fileSet>
+      <directory>../assembly/target/camunda-fox-ce-${project.version}/camunda-fox-ce-${project.version}</directory>
+      <outputDirectory />
+      <includes>
+        <include>**/*.sh</include>
+      </includes>
+      <fileMode>0755</fileMode>
+    </fileSet>
+    <fileSet>
+      <directory>../../sql-script/target</directory>
+      <outputDirectory />
+      <includes>
+        <include>sql/</include>
+      </includes>
+    </fileSet>    
+  </fileSets>
+  
+  <dependencySets>
+    <dependencySet>
+      <outputDirectory />
+      <unpack>true</unpack>
+      <unpackOptions>
+        <includes>
+          <include>**/*.sql</include>
+        </includes>
+      </unpackOptions>
+      <includes>
+        <include>com.camunda.fox.cockpit:cockpit-sql-scripts-eclipselink:jar:*</include>
+		<include>com.camunda.fox.cycle:cycle-sql-scripts:jar:*</include>
+      </includes>
+    </dependencySet>
+<!--     <dependencySet> -->
+<!--       <outputDirectory /> -->
+<!--       <unpack>true</unpack> -->
+<!--       <unpackOptions> -->
+<!--         <includes> -->
+<!--           <include>**/*.sql</include> -->
+<!--         </includes> -->
+<!--       </unpackOptions> -->
+<!--       <includes> -->
+<!--         <include>com.camunda.fox.cycle:cycle-sql-scripts:jar:*</include> -->
+<!--       </includes> -->
+<!--     </dependencySet> -->
+    
+    <dependencySet>
+  		<outputFileNameMapping>fox-tasklist-${project.version}.${artifact.extension}</outputFileNameMapping>
+  		<includes>
+  			<include>com.camunda.fox.tasklist:tasklist-webapp:war:*</include>
+  		</includes>
+  		<outputDirectory>server/glassfish3/glassfish/domains/domain1/autodeploy</outputDirectory>
+  	</dependencySet>    
+    
+    <dependencySet>
+      <outputFileNameMapping>fox-cockpit-glassfish-${project.version}.${artifact.extension}</outputFileNameMapping>
+      <includes>
+        <include>com.camunda.fox.cockpit:cockpit-webapp-fox-glassfish:war:*</include>
+      </includes>
+      <outputDirectory>server/glassfish3/glassfish/domains/domain1/autodeploy</outputDirectory>
+    </dependencySet>
+    
+	<dependencySet>
+      <outputFileNameMapping>fox-cycle-glassfish-${project.version}.${artifact.extension}</outputFileNameMapping>
+      <includes>
+        <include>com.camunda.fox.cycle:cycle-glassfish:war:*</include>
+      </includes>
+      <outputDirectory>server/glassfish3/glassfish/domains/domain1/autodeploy</outputDirectory>
+    </dependencySet>           
+  </dependencySets>
+
+</assembly>

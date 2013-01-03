@@ -1,0 +1,45 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>fox-platform-glassfish-service</artifactId>
+  <packaging>jar</packaging>
+  <name>fox platform EE - Glassfish 3.1.x Service</name>
+
+  <parent>
+    <groupId>com.camunda.fox.platform</groupId>
+    <artifactId>fox-platform-glassfish</artifactId>
+    <version>6.2.0-SNAPSHOT</version>
+  </parent>
+
+  <dependencies>
+
+    <dependency>
+      <groupId>com.camunda.fox.platform</groupId>
+      <artifactId>fox-platform-ejb-service</artifactId>
+      <version>${project.version}</version>
+      <type>ejb</type>
+    </dependency>
+
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-ejb-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+      </plugin>
+<!--       <plugin> -->
+<!--         <artifactId>maven-jar-plugin</artifactId> -->
+<!--         <configuration> -->
+<!--           <archive> -->
+<!--             <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile> -->
+<!--           </archive> -->
+<!--         </configuration> -->
+<!--       </plugin> -->
+    </plugins>
+  </build>
+
+</project>
