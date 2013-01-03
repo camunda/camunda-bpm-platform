@@ -15,7 +15,6 @@
     <dependency>
       <groupId>com.camunda.fox.engine</groupId>
       <artifactId>fox-engine</artifactId>
-      <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
