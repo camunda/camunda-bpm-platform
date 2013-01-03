@@ -1,0 +1,151 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>fox-platform-ibm-websphere-ear</artifactId>
+  <name>fox platform EE - IBM Websphere EAR</name>
+  <packaging>ear</packaging>
+
+  <parent>
+    <groupId>com.camunda.fox.platform</groupId>
+    <artifactId>fox-platform-ibm-websphere</artifactId>
+    <version>6.2.0-SNAPSHOT</version>
+  </parent>
+
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-ear-plugin</artifactId>
+        <configuration>
+          <version>6</version>
+          <defaultLibBundleDir>lib</defaultLibBundleDir>
+          <applicationName>camunda-fox-platform</applicationName>
+          <initializeInOrder>true</initializeInOrder>
+          <modules>
+            <ejbModule>
+              <groupId>com.camunda.fox.platform</groupId>
+              <artifactId>fox-platform-ibm-websphere-jobexecutor-service</artifactId>
+            </ejbModule>
+            <ejbModule>
+              <groupId>com.camunda.fox.platform</groupId>
+              <artifactId>fox-platform-ibm-websphere-service</artifactId>
+            </ejbModule>
+          </modules>
+          <filtering>true</filtering>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>remove-beans-xml</id>
+            <phase>pre-integration-test</phase>
+            <goals>
+              <goal>run</goal>
+            </goals>
+            <configuration>
+              <target>
+                <unzip src="target/fox-platform-ibm-websphere-ear-${project.version}.ear" dest="target/temp-ear" />
+                <jar destfile="target/fox-engine-cdi-${project.version}.jar" filesetmanifest="merge">
+                  <zipfileset src="target/temp-ear/lib/fox-engine-cdi-${project.version}.jar" excludes="**/beans.xml" />
+                </jar>
+                <copy todir="target/temp-ear/lib/" overwrite="true">
+                  <fileset file="target/fox-engine-cdi-${project.version}.jar" />
+                </copy>
+                <delete file="target/fox-platform-ibm-websphere-ear-${project.version}.ear" />
+                <zip file="target/fox-platform-ibm-websphere-ear-${project.version}.ear">
+                  <zipfileset dir="target/temp-ear/" />
+                </zip>
+              </target>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+  <dependencies>
+    <dependency>
+      <groupId>com.camunda.fox.engine</groupId>
+      <artifactId>fox-engine-cdi</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.camunda.fox.platform</groupId>
+      <artifactId>fox-platform-deployer</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.camunda.fox.platform</groupId>
+      <artifactId>fox-platform-service</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.camunda.fox.platform</groupId>
+      <artifactId>fox-platform-service-ext</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.camunda.fox.platform</groupId>
+      <artifactId>fox-platform-ext-config</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.camunda.fox.platform</groupId>
+      <artifactId>fox-platform-jobexecutor-ext-config</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.camunda.fox.platform</groupId>
+      <artifactId>fox-platform-ibm-websphere-jobexecutor-service</artifactId>
+      <version>${project.version}</version>
+      <type>ejb</type>
+    </dependency>
+
+    <dependency>
+      <groupId>com.camunda.fox.platform</groupId>
+      <artifactId>fox-platform-ibm-websphere-service</artifactId>
+      <version>${project.version}</version>
+      <type>ejb</type>
+    </dependency>
+
+    <dependency>
+      <groupId>com.camunda.fox.engine</groupId>
+      <artifactId>fox-engine-spring</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <!-- exclude engine from ear -->
+    <dependency>
+      <groupId>com.camunda.fox.engine</groupId>
+      <artifactId>fox-engine</artifactId>
+      <scope>provided</scope>
+      <version>${project.version}</version>
+    </dependency>
+    <!-- exclude platform api from ear -->
+    <dependency>
+      <groupId>com.camunda.fox.platform</groupId>
+      <artifactId>fox-platform-api</artifactId>
+      <scope>provided</scope>
+      <version>${project.version}</version>
+    </dependency>
+    <!-- exclude jobexecutor api from ear -->
+    <dependency>
+      <groupId>com.camunda.fox.platform</groupId>
+      <artifactId>fox-platform-jobexecutor-api</artifactId>
+      <version>${project.version}</version>
+      <scope>provided</scope>
+    </dependency>    
+    <!-- exclude EJB service from ear-->
+    <dependency>
+      <groupId>com.camunda.fox.platform</groupId>
+      <artifactId>fox-platform-ejb-service</artifactId>
+      <version>${project.version}</version>
+      <scope>provided</scope>
+    </dependency>
+
+  </dependencies>
+
+</project>

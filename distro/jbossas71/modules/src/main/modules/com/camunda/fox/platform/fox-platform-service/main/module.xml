@@ -1,0 +1,27 @@
+<module xmlns="urn:jboss:module:1.0" name="com.camunda.fox.platform.fox-platform-service">
+  <resources>
+    <resource-root path="fox-platform-service-@project.version@.jar" />
+  </resources>
+
+  <dependencies>
+    
+    <module name="javax.api" />
+    <module name="javax.transaction.api" />
+    <module name="javax.enterprise.api" />
+    <module name="javax.inject.api" />
+    
+    <module name="org.jboss.staxmapper" />
+    <module name="org.jboss.as.controller" />
+    <module name="org.jboss.as.server" />
+    <module name="org.jboss.modules" />
+    <module name="org.jboss.msc" />
+    <module name="org.jboss.logging" />
+    <module name="org.jboss.vfs" />
+        
+    <module name="com.camunda.fox.engine.fox-engine" />
+    <module name="com.camunda.fox.engine.fox-engine-cdi" />
+    <module name="com.camunda.fox.platform.fox-platform-api" />
+    <module name="com.camunda.fox.platform.fox-platform-deployer" />
+    
+  </dependencies>
+</module>

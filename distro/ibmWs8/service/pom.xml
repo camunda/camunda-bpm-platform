@@ -1,0 +1,37 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>fox-platform-ibm-websphere-service</artifactId>
+  <packaging>ejb</packaging>
+  <name>fox platform EE - IBM WebSphere 8 Service</name>
+
+  <parent>
+    <groupId>com.camunda.fox.platform</groupId>
+    <artifactId>fox-platform-ibm-websphere</artifactId>
+    <version>6.2.0-SNAPSHOT</version>
+  </parent>
+
+  <dependencies>
+
+    <dependency>
+      <groupId>com.camunda.fox.platform</groupId>
+      <artifactId>fox-platform-ejb-service</artifactId>
+      <version>${project.version}</version>
+      <type>ejb</type>
+    </dependency>
+
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-ejb-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>

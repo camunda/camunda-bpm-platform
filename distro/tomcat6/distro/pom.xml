@@ -1,0 +1,88 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <artifactId>fox-platform-enterprise-edition-tomcat6</artifactId>
+  <packaging>pom</packaging>
+
+  <parent>
+    <groupId>com.camunda.fox.platform</groupId>
+    <artifactId>fox-platform-tomcat6</artifactId>
+    <version>6.2.0-SNAPSHOT</version>
+  </parent>
+
+  <name>fox platform EE - tomcat6 Distro</name>
+
+  <dependencies>
+    
+    <dependency>
+	  <groupId>com.camunda.fox.platform</groupId>
+	  <artifactId>fox-platform-sql-script</artifactId>
+	  <version>${project.version}</version>
+	  <type>pom</type>
+	  <scope>provided</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>com.camunda.fox.cockpit</groupId>
+      <artifactId>cockpit-sql-scripts-openjpa</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>com.camunda.fox.cycle</groupId>
+      <artifactId>cycle-sql-scripts</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.camunda.fox.cockpit</groupId>
+      <artifactId>cockpit-webapp-servlet</artifactId>
+      <version>${project.version}</version>
+      <type>war</type>
+    </dependency>
+
+    <!--dependency>
+      <groupId>com.camunda.fox.cycle</groupId>
+      <artifactId>cycle-webapp-servlet</artifactId>
+      <version>${project.version}</version>
+      <type>war</type>
+    </dependency-->
+    
+  </dependencies>
+  
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <version>2.3</version>
+        <executions>
+          <execution>
+            <id>distro</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <configuration>
+              <descriptors>
+                <descriptor>assembly.xml</descriptor>
+              </descriptors>
+              <finalName>fox-platform-ee-tomcat6-${project.version}</finalName>
+              <attach>true</attach>
+              <appendAssemblyId>false</appendAssemblyId>
+              <outputDirectory>target/</outputDirectory>
+              <workDirectory>target/assembly/work</workDirectory>
+              <tarLongFileMode>gnu</tarLongFileMode>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+  
+  <scm>
+   <connection>scm:git:git@bitbucket.org:camunda/fox-platform-ee.git</connection>
+   <developerConnection>scm:git:git@bitbucket.org:camunda/fox-platform-ee.git</developerConnection>
+  </scm>
+  
+</project>

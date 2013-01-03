@@ -1,0 +1,181 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <description>
+    Assembles the fox platform and makes it ready for qa. 
+    The assembly is installed to maven later in the reactor, if the integration tests pass sucessfully
+  </description>
+
+  <artifactId>fox-platform-glassfish-assembly</artifactId>
+  <packaging>pom</packaging>
+
+  <parent>
+    <groupId>com.camunda.fox.platform</groupId>
+    <artifactId>fox-platform-glassfish</artifactId>
+    <version>6.2.0-SNAPSHOT</version>
+  </parent>
+
+  <name>fox platform EE - Glassfish 3.1.x Assembly</name>
+
+  <dependencies>
+
+	<dependency>
+		<groupId>org.glassfish.main.distributions</groupId>
+		<artifactId>glassfish</artifactId>
+		<version>${version.glassfish}</version>
+		<type>zip</type>
+		<exclusions>
+        
+        <!-- This keeps maven from downloading a bunch of poms we do not need. 
+             We just need the glassfish zip distribution. 
+             For some reason the pom for that depends on all these other poms which again
+             transitively pull in every pom used in the appserver.
+             
+             NOTE: if you do an upgrade to a new glassfish version, check the
+             org.glassfish.distributions:glassfish pom for new dependencies and if
+             they added some, exclude these as well. (DM)  -->
+        
+        <exclusion>
+          <groupId>org.glassfish.distributions</groupId>
+          <artifactId>web</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.glassfish.packager</groupId>
+          <artifactId>glassfish-common-full</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.glassfish.packager</groupId>
+          <artifactId>glassfish-ejb</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.glassfish.packager</groupId>
+          <artifactId>glassfish-cmp</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.glassfish.packager</groupId>
+          <artifactId>glassfish-corba</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.glassfish.packager</groupId>
+          <artifactId>metro</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.glassfish.packager</groupId>
+          <artifactId>glassfish-appclient</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.glassfish.packager</groupId>
+          <artifactId>glassfish-jms</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.glassfish.packager</groupId>
+          <artifactId>mq</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.glassfish.registration</groupId>
+          <artifactId>servicetag-registry</artifactId>
+        </exclusion>
+        <exclusion>
+          <groupId>org.glassfish.packager</groupId>
+          <artifactId>legal-fragment</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>com.camunda.fox.platform</groupId>
+      <artifactId>fox-platform-client</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+      <groupId>com.camunda.fox.platform</groupId>
+      <artifactId>fox-platform-glassfish-ear</artifactId>
+      <version>${project.version}</version>
+      <type>ear</type>
+    </dependency>
+
+    <dependency>
+      <groupId>com.camunda.fox.platform</groupId>
+      <artifactId>fox-platform-glassfish-service</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>com.camunda.fox.platform</groupId>
+      <artifactId>fox-platform-jobexecutor-service</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    
+     <dependency>
+      <groupId>com.camunda.fox.platform</groupId>
+      <artifactId>fox-platform-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    
+     <dependency>
+      <groupId>com.camunda.fox.engine</groupId>
+      <artifactId>fox-engine</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.mybatis</groupId>
+      <artifactId>mybatis</artifactId>
+    </dependency>
+        
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>        
+    </dependency>
+
+    <dependency>
+      <groupId>com.fasterxml.uuid</groupId>
+      <artifactId>java-uuid-generator</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>com.camunda.fox.platform</groupId>
+      <artifactId>fox-platform-jobexecutor-api</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <dependency>
+    	<groupId>com.camunda.fox.platform</groupId>
+    	<artifactId>fox-platform-jobexecutor-rar</artifactId>
+    	<version>${project.version}</version>
+    	<type>rar</type>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>assemble</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <configuration>
+              <descriptors>
+                <descriptor>assembly.xml</descriptor>
+              </descriptors>
+              <!-- do not attach to the build -->
+              <finalName>camunda-fox-ce-${project.version}</finalName>
+              <attach>false</attach>
+              <appendAssemblyId>false</appendAssemblyId>
+              <outputDirectory>target/</outputDirectory>
+              <workDirectory>target/assembly/work</workDirectory>
+              <tarLongFileMode>gnu</tarLongFileMode>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>

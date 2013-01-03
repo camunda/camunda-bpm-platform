@@ -1,0 +1,79 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <description>
+    Assembles the fox platform and makes it ready for qa. 
+    The assembly is installed to maven later in the reactor, if the integration tests pass successfully
+  </description>
+
+  <artifactId>fox-platform-jboss-assembly</artifactId>
+  <packaging>pom</packaging>
+
+  <parent>
+    <groupId>com.camunda.fox.platform</groupId>
+    <artifactId>fox-platform-jboss</artifactId>
+    <version>6.2.0-SNAPSHOT</version>
+  </parent>
+
+  <name>fox platform EE - jBoss7 Assembly</name>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.jboss.as</groupId>
+      <artifactId>jboss-as-dist</artifactId>
+      <version>${version.jboss.as}</version>
+      <type>tar.gz</type>
+      <exclusions>
+        <exclusion>
+          <groupId>org.jboss.as</groupId>
+          <artifactId>jboss-as-build-config</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+
+    <dependency>
+      <groupId>com.camunda.fox.platform</groupId>
+      <artifactId>fox-platform-client</artifactId>
+    </dependency>
+
+    <dependency>
+      <!-- this dependency is to make sure that we are executed after fox-platform-modules 
+        in the reactor -->
+      <groupId>com.camunda.fox.platform</groupId>
+      <artifactId>fox-platform-jboss-modules</artifactId>
+      <version>${project.version}</version>
+      <scope>provided</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-assembly-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>assemble</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <configuration>
+              <descriptors>
+                <descriptor>assembly.xml</descriptor>
+              </descriptors>
+              <!--  do not attach to the build -->
+              <finalName>camunda-fox-ce-${project.version}</finalName>
+              <attach>false</attach>
+              <appendAssemblyId>false</appendAssemblyId>
+              <outputDirectory>target/</outputDirectory>
+              <workDirectory>target/assembly/work</workDirectory>
+              <tarLongFileMode>gnu</tarLongFileMode>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>
