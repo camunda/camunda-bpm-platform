@@ -64,7 +64,6 @@ public class PlatformServiceBean extends PlatformService implements ProcessEngin
         
   }
 
-  @Override
   public void stopProcessEngine(String name) {
     ProcessEngineController processEngineController = processEngineRegistry.getProcessEngineController(name);
     if(processEngineController == null) {

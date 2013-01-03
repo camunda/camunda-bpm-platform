@@ -67,6 +67,7 @@
       <groupId>com.camunda.fox.engine</groupId>
       <artifactId>fox-engine-cdi</artifactId>
       <scope>compile</scope>
+      <version>${project.version}</version>
     </dependency>
     
     <dependency>
@@ -115,7 +116,8 @@
 
     <dependency>
       <groupId>com.camunda.fox.platform</groupId>
-      <artifactId>fox-platform-api</artifactId>      
+      <artifactId>fox-platform-api</artifactId>
+      <version>${project.version}</version>      
     </dependency>
     
     <dependency>

@@ -4,48 +4,53 @@
   <packaging>ejb</packaging>
   <name>fox platform EE - EJB Service</name>
 
-  <parent>
-    <groupId>com.camunda.fox.platform</groupId>
-    <artifactId>fox-platform-root</artifactId>
-    <version>6.2.0-SNAPSHOT</version>
-    <relativePath>../parent</relativePath>
-  </parent>
+	<parent>
+		<groupId>com.camunda.fox.platform</groupId>
+		<artifactId>fox-platform</artifactId>
+		<version>6.2.0-SNAPSHOT</version>
+	</parent>
 
   <dependencies>
     <dependency>
       <groupId>com.camunda.fox.platform</groupId>
       <artifactId>fox-platform-service</artifactId>
       <scope>provided</scope>
+      <version>${project.version}</version>
     </dependency>
     
     <dependency>
       <groupId>com.camunda.fox.platform</groupId>
       <artifactId>fox-platform-client</artifactId>
       <scope>provided</scope>
+      <version>${project.version}</version>
     </dependency>
     
     <dependency>
       <groupId>com.camunda.fox.platform</groupId>
       <artifactId>fox-platform-service-ext</artifactId>
       <scope>provided</scope>
+      <version>${project.version}</version>
     </dependency>
 
     <dependency>
       <groupId>com.camunda.fox.platform</groupId>
       <artifactId>fox-platform-api</artifactId>
       <scope>provided</scope>
+      <version>${project.version}</version>
     </dependency>
 
     <dependency>
       <groupId>com.camunda.fox.platform</groupId>
       <artifactId>fox-platform-deployer</artifactId>
       <scope>provided</scope>
+      <version>${project.version}</version>
     </dependency>
 
     <dependency>
       <groupId>com.camunda.fox.engine</groupId>
       <artifactId>fox-engine</artifactId>
       <scope>provided</scope>
+      <version>${project.version}</version>
     </dependency>
 
     <dependency>

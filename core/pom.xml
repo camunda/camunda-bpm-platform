@@ -7,12 +7,11 @@
 
   <name>fox platform EE - Core</name>
 
-  <parent>
-    <groupId>com.camunda.fox.engine</groupId>
-    <artifactId>fox-engine-root</artifactId>
-    <version>6.2.0-SNAPSHOT</version>
-    <relativePath>../../fox-engine-ee/pom.xml</relativePath>
-  </parent>
+	<parent>
+		<groupId>com.camunda.fox.platform</groupId>
+		<artifactId>fox-platform</artifactId>
+		<version>6.2.0-SNAPSHOT</version>
+	</parent>
 
   <properties>
     <spring.framework.version>3.0.3.RELEASE</spring.framework.version>
