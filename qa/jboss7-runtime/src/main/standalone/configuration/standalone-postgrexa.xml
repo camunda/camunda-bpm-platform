@@ -166,7 +166,6 @@
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:ee:1.0">
             <global-modules>
-                <module name="com.camunda.fox.platform.fox-platform-api" slot="main"/>
                 <module name="com.camunda.fox.engine.fox-engine" slot="main"/>
             </global-modules>
         </subsystem>

@@ -17,11 +17,7 @@
     <dependency>
       <groupId>com.camunda.fox.engine</groupId>
       <artifactId>fox-engine</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>com.camunda.fox.platform</groupId>
-      <artifactId>fox-platform-api</artifactId>
-    </dependency>
+    </dependency>   
     <dependency>
       <groupId>com.camunda.fox.platform</groupId>
       <artifactId>fox-platform-jobexecutor-api</artifactId>
@@ -113,11 +109,7 @@
                 <artifactItem>
                   <groupId>com.camunda.fox.engine</groupId>
                   <artifactId>fox-engine</artifactId>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>com.camunda.fox.platform</groupId>
-                  <artifactId>fox-platform-api</artifactId>
-                </artifactItem>
+                </artifactItem>                
                 <artifactItem>
                   <groupId>com.camunda.fox.platform</groupId>
                   <artifactId>fox-platform-jobexecutor-api</artifactId>

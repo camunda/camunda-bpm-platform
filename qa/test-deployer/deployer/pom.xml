@@ -113,12 +113,6 @@
       <artifactId>arquillian-test-spi</artifactId>
       <scope>provided</scope>
     </dependency>
-
-    <dependency>
-      <groupId>com.camunda.fox.platform</groupId>
-      <artifactId>fox-platform-api</artifactId>
-      <version>${project.version}</version>      
-    </dependency>
     
     <dependency>
       <groupId>org.jboss.arquillian.config</groupId>

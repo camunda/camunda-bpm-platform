@@ -106,13 +106,7 @@
       <artifactId>fox-platform-jobexecutor-service</artifactId>
       <version>${project.version}</version>
     </dependency>
-    
-     <dependency>
-      <groupId>com.camunda.fox.platform</groupId>
-      <artifactId>fox-platform-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    
+        
      <dependency>
       <groupId>com.camunda.fox.engine</groupId>
       <artifactId>fox-engine</artifactId>

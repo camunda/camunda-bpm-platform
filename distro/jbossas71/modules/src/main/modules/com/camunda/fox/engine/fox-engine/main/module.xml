@@ -7,6 +7,10 @@
     
     <module name="javax.api" />
     <module name="javax.transaction.api"/>
+    <module name="javax.enterprise.api" />
+    <module name="javax.inject.api" />
+    
+    <module name="org.jboss.vfs" />
   
 	<module name="org.mybatis.mybatis" />	
     <module name="com.fasterxml.uuid.java-uuid-generator"/>
