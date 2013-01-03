@@ -43,11 +43,7 @@
   </dependencyManagement>
 
   <dependencies>
-    <dependency>
-      <groupId>com.camunda.fox.platform</groupId>
-      <artifactId>fox-platform-service</artifactId>
-    </dependency>
-
+    
   	<dependency>
   	  <groupId>com.camunda.fox.platform</groupId>
   	  <artifactId>fox-platform-jobexecutor-core</artifactId>

@@ -10,12 +10,7 @@
     <version>6.2.0-SNAPSHOT</version>
   </parent>
 
-  <dependencies>
-    <dependency>
-      <groupId>com.camunda.fox.platform</groupId>
-      <artifactId>fox-platform-api</artifactId>
-      <scope>provided</scope>
-    </dependency>
+  <dependencies>  
     <dependency>
       <groupId>com.camunda.fox.platform</groupId>
       <artifactId>fox-platform-jobexecutor-api</artifactId>

@@ -34,11 +34,7 @@
           <artifactId>commons-lang</artifactId>
         </exclusion>
       </exclusions>
-    </dependency>
-    <dependency>
-      <groupId>com.camunda.fox.engine</groupId>
-      <artifactId>fox-engine-cdi</artifactId>
-    </dependency>
+    </dependency>   
   	<dependency>
   		<groupId>org.bouncycastle</groupId>
   		<artifactId>bcpg-jdk15on</artifactId>

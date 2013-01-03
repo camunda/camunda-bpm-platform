@@ -27,8 +27,8 @@
     <dependency>
       <groupId>com.camunda.fox.engine</groupId>
       <artifactId>fox-engine-spring</artifactId>
-      <scope>provided</scope>
       <version>${project.version}</version>
+      <scope>provided</scope>
     </dependency>
 
     <!-- jboss as7 dependencies -->

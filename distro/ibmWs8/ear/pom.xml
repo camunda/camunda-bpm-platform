@@ -65,30 +65,15 @@
     </plugins>
   </build>
 
-  <dependencies>
-    <dependency>
-      <groupId>com.camunda.fox.engine</groupId>
-      <artifactId>fox-engine-cdi</artifactId>
-      <version>${project.version}</version>
-    </dependency>
+  <dependencies>    
     <dependency>
       <groupId>com.camunda.fox.platform</groupId>
-      <artifactId>fox-platform-deployer</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.camunda.fox.platform</groupId>
-      <artifactId>fox-platform-service</artifactId>
+      <artifactId>fox-platform-ext-config</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
       <groupId>com.camunda.fox.platform</groupId>
       <artifactId>fox-platform-service-ext</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    <dependency>
-      <groupId>com.camunda.fox.platform</groupId>
-      <artifactId>fox-platform-ext-config</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -123,14 +108,7 @@
       <artifactId>fox-engine</artifactId>
       <scope>provided</scope>
       <version>${project.version}</version>
-    </dependency>
-    <!-- exclude platform api from ear -->
-    <dependency>
-      <groupId>com.camunda.fox.platform</groupId>
-      <artifactId>fox-platform-api</artifactId>
-      <scope>provided</scope>
-      <version>${project.version}</version>
-    </dependency>
+    </dependency>   
     <!-- exclude jobexecutor api from ear -->
     <dependency>
       <groupId>com.camunda.fox.platform</groupId>

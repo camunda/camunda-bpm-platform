@@ -87,15 +87,11 @@
     </repository>
   </repositories>
 
-  <modules>
-    <module>bom</module>
-    <module>api</module>
-    <module>service</module>
+  <modules>   
     <module>client</module>
-    <module>deployer</module>
-    <module>ext-service</module>
     <module>ext-config</module>
     <module>jobexecutor-ext-config</module>
+	<module>ext-service</module>
   </modules>
   
   <build>
