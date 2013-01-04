@@ -4,23 +4,45 @@ import java.util.Iterator;
 import java.util.ServiceLoader;
 
 import org.activiti.engine.ProcessEngine;
+import org.apache.cxf.endpoint.Server;
+import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
+import org.apache.cxf.jaxrs.provider.json.JSONProvider;
+import org.camunda.bpm.engine.rest.impl.ProcessDefinitionServiceImpl;
 import org.camunda.bpm.engine.rest.spi.ProcessEngineProvider;
 import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
-import org.junit.runner.RunWith;
 
-@RunWith(Arquillian.class)
 public abstract class AbstractRestServiceTest {
   
+  private static final int PORT = 8080;
+  protected static final String SERVER_ADDRESS = "http://localhost:" + PORT;
+  
   protected static ProcessEngine processEngine;
+  protected static Server server;
   
   @BeforeClass
   public static void initialize() {
     
     loadProcessEngineService();
+    setupServer();
+  }
+  
+  @AfterClass
+  public static void tearDown() {
+    server.stop();
+    server.destroy();
+  }
+
+  private static void setupServer() {
+    JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
+    sf.setResourceClasses(ProcessDefinitionServiceImpl.class);
+    sf.setProvider(JSONProvider.class);
+    sf.setAddress(SERVER_ADDRESS);
+    server = sf.create();
+    
   }
 
   private static void loadProcessEngineService() {
