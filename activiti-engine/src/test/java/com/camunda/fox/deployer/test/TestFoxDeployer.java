@@ -27,7 +27,7 @@ import org.activiti.engine.repository.Deployment;
 /**
  * 
  * @author Daniel Meyer
- *
+// 
  */
 public class TestFoxDeployer extends FoxDeployerTestcase {
 
@@ -293,12 +293,14 @@ public class TestFoxDeployer extends FoxDeployerTestcase {
 
     // capture messages in System.err from the XML parser in DeployIfChangedCmd#getExistingProcessDefinition(String, byte[])
     ByteArrayOutputStream errContent = new ByteArrayOutputStream();
+    
+    PrintStream systemErr = System.err;  
     System.setErr(new PrintStream(errContent));
 
     deployer.deploy(name, resources, cl);
 
     assertEquals("System.err is not empty.", "", errContent.toString());
-    System.setErr(null); // reset System.err
+    System.setErr(systemErr); // reset System.err
 
     assertNotNull(repositoryService.createDeploymentQuery().deploymentName(name).singleResult());
     assertNull(repositoryService.createProcessDefinitionQuery().singleResult());
@@ -319,12 +321,14 @@ public class TestFoxDeployer extends FoxDeployerTestcase {
     resources.put("collaboration_with_non_executable_process.bpmn", process.getBytes());
     
     ByteArrayOutputStream errContent = new ByteArrayOutputStream();
+    
+    PrintStream systemErr = System.err;
     System.setErr(new PrintStream(errContent));
 
     String deploymentId = deployer.deploy(name, resources, cl);
     
     assertEquals("System.err is not empty.", "", errContent.toString());
-    System.setErr(null); // reset System.err
+    System.setErr(systemErr); // reset System.err
     
     assertNotNull(deploymentId);
     
@@ -346,12 +350,14 @@ public class TestFoxDeployer extends FoxDeployerTestcase {
     resources.put("collaboration_with_non_executable_processes.bpmn", process.getBytes());
     
     ByteArrayOutputStream errContent = new ByteArrayOutputStream();
+    
+    PrintStream systemErr = System.err;  
     System.setErr(new PrintStream(errContent));
 
     String deploymentId = deployer.deploy(name, resources, cl);
     
     assertEquals("System.err is not empty.", "", errContent.toString());
-    System.setErr(null); // reset System.err
+    System.setErr(systemErr); // reset System.err
     
     assertNotNull(deploymentId);
     
