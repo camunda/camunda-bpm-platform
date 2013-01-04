@@ -58,7 +58,7 @@ public class SignavioConnector extends Connector {
     getSignavioClient().login(username, password);
     loggedIn = true;
   }
-  
+
   @Override
   public boolean needsLogin() {
     return !loggedIn;
