@@ -3,35 +3,84 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>camunda-engine-rest</groupId>
 	<artifactId>camunda-engine-rest</artifactId>
-	<version>6.2.0-SNAPSHOT</version>
 	<name>camunda engine REST API</name>
+
+  <parent>
+    <groupId>com.camunda.fox.platform</groupId>
+    <artifactId>fox-platform</artifactId>
+    <version>6.2.0-SNAPSHOT</version>
+  </parent>
 
 	<dependencies>
 		<dependency>
 			<groupId>com.camunda.fox.engine</groupId>
 			<artifactId>fox-engine</artifactId>
-			<version>${project.version}</version>
 			<scope>provided</scope>
 		</dependency>
+		
+		<dependency>
+      <groupId>org.apache.cxf</groupId>
+      <artifactId>cxf-bundle-jaxrs</artifactId>
+      <version>2.6.2</version>
+      <scope>test</scope>
+    </dependency>
+		
+		
 		<dependency>
 			<groupId>javax</groupId>
 			<artifactId>javaee-api</artifactId>
 			<version>6.0</version>
 			<scope>provided</scope>
 		</dependency>
+		
+		<!-- test -->
+		<dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jboss.arquillian.junit</groupId>
+      <artifactId>arquillian-junit-container</artifactId>
+      <version>1.0.1.Final</version>
+      <scope>test</scope>
+    </dependency>
+
+    
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <scope>test</scope>
+    </dependency>
 	</dependencies>
 
-	<build>
+	<!-- <build>
 		<sourceDirectory>src</sourceDirectory>
 		<plugins>
 			<plugin>
 				<artifactId>maven-compiler-plugin</artifactId>
-				<version>2.3.2</version>
 				<configuration>
 					<source />
 					<target />
 				</configuration>
 			</plugin>
 		</plugins>
-	</build>
+	</build> -->
+	
+	<profiles>
+    <profile>
+      <id>embedded-rest</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <build>
+        <resources>
+          <resource>
+            <directory>src/test/embedded-resources</directory>
+          </resource>
+        </resources>
+      </build>
+    </profile>
+  </profiles>
 </project>
