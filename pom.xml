@@ -636,4 +636,13 @@
     </pluginRepository>
   </pluginRepositories>
   
+  <repositories>
+    <!-- DO NOT REMOVE, otherwise no snapshots are downloaded via nexus! -->
+    <repository>
+      <id>camunda-fox-ee</id>
+      <name>camunda-fox-ee</name>
+      <url>myDummyRepoForSnapshotAccess</url>
+    </repository>
+  </repositories>
+  
 </project>
