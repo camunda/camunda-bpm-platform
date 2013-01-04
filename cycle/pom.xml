@@ -107,6 +107,7 @@
       <groupId>javax.inject</groupId>
       <artifactId>javax.inject</artifactId>
       <version>1</version>
+      <scope>provided</scope>
     </dependency>
 
     <!-- jpa 2.0 api -->
@@ -614,6 +615,12 @@
         <dependency>
           <groupId>org.bouncycastle</groupId>
           <artifactId>bcpg-jdk15on</artifactId>
+        </dependency>
+        
+        <dependency>
+          <groupId>javax.inject</groupId>
+          <artifactId>javax.inject</artifactId>
+          <version>1</version>
         </dependency>
         
       </dependencies>
