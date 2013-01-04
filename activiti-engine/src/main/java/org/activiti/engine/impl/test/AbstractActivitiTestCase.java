@@ -54,7 +54,7 @@ public abstract class AbstractActivitiTestCase extends PvmTestCase {
 
   static {
     // this ensures that mybatis uses the jdk logging
-    LogFactory.useJdkLogging();
+    //    LogFactory.useJdkLogging();
     // with an upgrade of mybatis, this might have to become org.mybatis.generator.logging.LogFactory.forceJavaLogging();
   }
   
