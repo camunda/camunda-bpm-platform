@@ -9,9 +9,6 @@ import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.provider.json.JSONProvider;
 import org.camunda.bpm.engine.rest.impl.ProcessDefinitionServiceImpl;
 import org.camunda.bpm.engine.rest.spi.ProcessEngineProvider;
-import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
@@ -53,12 +50,5 @@ public abstract class AbstractRestServiceTest {
       ProcessEngineProvider provider = iterator.next();
       processEngine = provider.getProcessEngine();      
     }
-  }
-
-  @Deployment
-  public static JavaArchive createDeployment() {
-    return ShrinkWrap.create(JavaArchive.class, "test.jar")
-        .addPackages(true, "org.camunda.bpm.engine.rest")
-        .addAsResource("META-INF/services/org.camunda.bpm.engine.rest.spi.ProcessEngineProvider");
   }
 }
