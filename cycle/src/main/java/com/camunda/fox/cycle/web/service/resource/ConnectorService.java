@@ -13,6 +13,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import com.camunda.fox.cycle.connector.Connector;
 import com.camunda.fox.cycle.connector.ConnectorNode;
@@ -94,14 +95,14 @@ public class ConnectorService extends AbstractRestService {
     
     // nre: TODO: Why not guess by extension?
     try {
-      return Response.ok(IoUtil.readInputStream(content, connectorId + "-" + nodeId + "-content-stream"))
+      return createResponse().status(Status.OK).entity(IoUtil.readInputStream(content, connectorId + "-" + nodeId + "-content-stream"))
               .header("Content-Type", type.getMimeType())
               .build();
     } finally {
       IoUtil.closeSilently(content);
     }
   }
-  
+
   @GET
   @Path("{connectorId}/contents/info")
   public ContentInformation getContentInfo(
