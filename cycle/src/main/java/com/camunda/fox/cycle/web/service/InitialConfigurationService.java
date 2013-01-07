@@ -9,11 +9,9 @@ import javax.ws.rs.core.MediaType;
 
 import com.camunda.fox.cycle.configuration.CycleConfiguration;
 import com.camunda.fox.cycle.entity.User;
-import com.camunda.fox.cycle.repository.UserRepository;
 import com.camunda.fox.cycle.security.IdentityHolder;
 import com.camunda.fox.cycle.web.dto.UserDTO;
 import com.camunda.fox.cycle.web.service.resource.UserService;
-import com.camunda.fox.security.SecurityContext;
 import com.camunda.fox.security.UserIdentity;
 
 /**

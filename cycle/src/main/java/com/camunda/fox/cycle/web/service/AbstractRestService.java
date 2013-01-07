@@ -3,9 +3,10 @@ package com.camunda.fox.cycle.web.service;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
-import com.sun.jersey.core.spi.factory.ResponseBuilderImpl;
+import com.camunda.fox.cycle.web.jaxrs.ext.JaxRsUtil;
 
 /**
  * This is the base class used by all rest controllers and encapsulates shared behavior.
@@ -23,7 +24,7 @@ public class AbstractRestService {
    * @return 
    */
   protected Response redirectTo(String uri) {
-    return Response.seeOther(uriInfo.getBaseUriBuilder().path(uri).build()).build();
+    return JaxRsUtil.createResponse().status(Status.SEE_OTHER).location(uriInfo.getBaseUriBuilder().path(uri).build()).build();
   }
   
   /**
@@ -58,12 +59,8 @@ public class AbstractRestService {
   }
 
   private WebApplicationException createWebApplicationException(String message, Response.Status status) {
-    Response response = Response.status(status).entity(message).build();
+    Response response = JaxRsUtil.createResponse().status(status).entity(message).build();
     return new WebApplicationException(response);
   }
   
-  protected ResponseBuilderImpl createResponse() {
-    // automatic detection of the JAX-RS implementation is broken on WAS 8.5.
-    return new ResponseBuilderImpl();
-  }
 }

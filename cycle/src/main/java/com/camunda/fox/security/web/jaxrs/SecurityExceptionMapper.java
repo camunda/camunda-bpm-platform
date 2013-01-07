@@ -8,6 +8,7 @@ import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
 import com.camunda.fox.cycle.web.dto.WebExceptionDTO;
+import com.camunda.fox.cycle.web.jaxrs.ext.JaxRsUtil;
 import com.camunda.fox.security.MissingPrivilegesException;
 import com.camunda.fox.security.SecurityException;
 import com.camunda.fox.security.UnauthorizedException;
@@ -36,7 +37,7 @@ public class SecurityExceptionMapper implements ExceptionMapper<com.camunda.fox.
       status = Status.UNAUTHORIZED;
     }
     
-    Response.ResponseBuilder builder = Response.status(status);
+    Response.ResponseBuilder builder = JaxRsUtil.createResponse().status(status);
     if (WebUtil.isAjax(request)) {
       builder.entity(WebExceptionDTO.wrap(exception, status));
     } else {

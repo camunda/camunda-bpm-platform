@@ -23,7 +23,7 @@ public class WebExceptionMapper implements ExceptionMapper<WebException> {
   
   @Override
   public Response toResponse(WebException exception) {
-    ResponseBuilder builder = Response.status(exception.getStatus());
+    ResponseBuilder builder = JaxRsUtil.createResponse().status(exception.getStatus());
     if (WebUtil.isAjax(request)) {
       builder.entity(WebExceptionDTO.wrap(exception));
     }
