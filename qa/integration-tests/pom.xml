@@ -321,7 +321,189 @@
       </build>
     </profile>
     <profile>
-      <id>was</id>
+      <id>was80</id>
+      <properties>
+        <!-- currently the arquillian websphere connector is not compatible with 1.0.1.Final -->
+        <version.arquillian>1.0.0.Final</version.arquillian>
+      </properties>
+      
+      <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.jboss.arquillian</groupId>
+                <artifactId>arquillian-bom</artifactId>
+                <version>${version.arquillian}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.arquillian</groupId>
+                <artifactId>arquillian-build</artifactId>
+                <version>${version.arquillian}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+      
+      
+      <dependencies>    
+      
+        <dependency>
+          <groupId>com.camunda.fox.platform</groupId>
+          <artifactId>fox-platform-qa-websphere-runtime</artifactId>
+          <version>${project.version}</version>
+          <type>pom</type>
+        </dependency>
+        
+        <dependency>
+          <groupId>org.jboss.arquillian.container</groupId>
+          <artifactId>arquillian-was-remote-8</artifactId>
+          <version>1.0.0-SNAPSHOT</version>
+          <scope>test</scope>
+        </dependency>
+        
+         <!-- org.jboss.arquillian -->
+        <dependency>
+            <groupId>org.jboss.arquillian.container</groupId>
+            <artifactId>arquillian-container-spi</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.arquillian.container</groupId>
+            <artifactId>arquillian-container-test-spi</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.arquillian.protocol</groupId>
+            <artifactId>arquillian-protocol-servlet</artifactId>
+        </dependency>
+
+        <dependency>
+           <groupId>org.jboss.arquillian.testenricher</groupId>
+           <artifactId>arquillian-testenricher-cdi</artifactId>
+        </dependency>
+    
+        <dependency>
+            <groupId>org.jboss.arquillian.testenricher</groupId>
+            <artifactId>arquillian-testenricher-ejb</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.arquillian.testenricher</groupId>
+            <artifactId>arquillian-testenricher-resource</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.arquillian.testenricher</groupId>
+            <artifactId>arquillian-testenricher-initialcontext</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.jboss.shrinkwrap.descriptors</groupId>
+            <artifactId>shrinkwrap-descriptors-api-javaee</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.shrinkwrap.descriptors</groupId>
+            <artifactId>shrinkwrap-descriptors-impl-javaee</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        
+        <dependency>
+            <groupId>com.ibm.websphere</groupId>
+            <artifactId>was-public</artifactId>
+            <version>8.0.0</version>
+            <scope>system</scope>
+            <systemPath>${was.home}/dev/was_public.jar</systemPath>
+        </dependency>
+        
+        <dependency>
+            <groupId>com.ibm.websphere</groupId>
+            <artifactId>ws-admin-client</artifactId>
+            <version>8.0.0</version>
+            <scope>system</scope>
+            <systemPath>${was.home}/runtimes/com.ibm.ws.admin.client_8.0.0.jar</systemPath>
+        </dependency>
+        
+        <dependency>
+            <groupId>com.ibm.websphere</groupId>
+            <artifactId>ws-orb</artifactId>
+            <version>8.0.0</version>
+            <scope>system</scope>
+            <systemPath>${was.home}/runtimes/com.ibm.ws.orb_8.0.0.jar</systemPath>
+        </dependency>
+
+        <dependency>
+            <groupId>com.ibm.websphere</groupId>
+            <artifactId>jgss-provider</artifactId>
+            <version>8.0.0</version>
+            <scope>system</scope>
+            <systemPath>${was.home}/java/jre/lib/ibmjgssprovider.jar</systemPath>
+        </dependency>
+
+        <dependency>
+          <groupId>org.jboss.shrinkwrap.resolver</groupId>
+          <artifactId>shrinkwrap-resolver-impl-maven</artifactId>
+          <scope>test</scope>    
+        </dependency>        
+        <dependency>
+          <groupId>org.jboss.shrinkwrap</groupId>
+          <artifactId>shrinkwrap-api</artifactId>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+      
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>build-helper-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>add-test-source</id>
+                <phase>generate-test-sources</phase>
+                <goals>
+                  <goal>add-test-source</goal>
+                </goals>
+                <configuration>
+                  <sources>
+                    <source>src/test/java-was</source>
+                  </sources>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <excludes>
+                <!-- NOT Implemented -->
+                <exclude>**/JobExecutorRequestContextLocalInvocationTest.java</exclude>
+                <!-- NOT Implemented -->
+                <exclude>**/ejb/local/*</exclude>                          
+                <!-- HEMERA-2887 -->
+                <exclude>**/TestProcessEnginesXmlFails.java</exclude>
+                <!-- HEMERA-2888 -->
+                <exclude>**/CallActivityContextSwitchTest.java</exclude>
+                <!-- HEMERA-2980 -->
+                <exclude>**/TestFoxPlatformClientAsEjbModule_pasAsEjbModule.java</exclude>
+                <!-- not supported by arquillian connector -->
+                <excludes>**/TestWarDeploymentWithBrokenBpmnXml.java</excludes>
+                <excludes>**/TestDeploymentWithDroolsTaskFails.java</excludes>
+              </excludes>
+            </configuration>
+          </plugin>
+        </plugins>
+        <testResources>
+          <testResource>
+            <directory>src/test/resources-was</directory>
+            <filtering>true</filtering>
+            <includes>
+              <include>**/*.xml</include>
+            </includes> 
+          </testResource>
+        </testResources>
+      </build>
+    </profile>
+    <profile>
+      <id>was85</id>
       <properties>
         <!-- currently the arquillian websphere connector is not compatible with 1.0.1.Final -->
         <version.arquillian>1.0.0.Final</version.arquillian>

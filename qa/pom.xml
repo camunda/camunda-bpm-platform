@@ -58,10 +58,18 @@
 
   <profiles>
     <profile>
-      <id>was</id>
+      <id>was80</id>
       <modules>
         <module>websphere-runtime</module>
-       <!--  <module>integration-tests</module> -->
+        <module>integration-tests</module>
+        <module>cycle-tests</module>
+      </modules>
+    </profile>
+    <profile>
+      <id>was85</id>
+      <modules>
+        <module>websphere-runtime</module>
+        <module>integration-tests</module>
         <module>cycle-tests</module>
       </modules>
     </profile>
