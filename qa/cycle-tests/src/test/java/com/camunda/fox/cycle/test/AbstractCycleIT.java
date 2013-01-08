@@ -19,7 +19,6 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 
-import com.camunda.fox.cycle.connector.Connector;
 import com.camunda.fox.cycle.util.IoUtil;
 import com.camunda.fox.cycle.web.dto.UserDTO;
 import com.sun.jersey.api.client.ClientResponse;
@@ -40,9 +39,8 @@ public abstract class AbstractCycleIT {
   
   public ApacheHttpClient4 client;
   public DefaultHttpClient defaultHttpClient;
-  public Connector connector;
-  
-  public void init() throws Exception {
+    
+  public void connectToCycleService() throws Exception {
     Properties properties = new Properties();
     
     InputStream propertiesStream = null;
@@ -82,33 +80,34 @@ public abstract class AbstractCycleIT {
       Thread.sleep(2000);
     }
     
-    if (success) {
-      createInitialUserAndLogin();
-    } else {
-      throw new RuntimeException("Cycle is not available! Check cycle deployment.");
+    if (!success) {      
+      Assert.fail("Could not connect to cycle service at "+CYCLE_BASE_PATH+". Did cycle not deploy correctly? Check application server logs for details.");
     }
   }
   
-  public int executeCycleLogin() throws Exception {
+  public void login(String username, String password) throws Exception {
     HttpPost httpPost = new HttpPost(CYCLE_BASE_PATH+"j_security_check");
     List<NameValuePair> parameterList = new ArrayList<NameValuePair>();
-    parameterList.add(new BasicNameValuePair("j_username", "test"));
-    parameterList.add(new BasicNameValuePair("j_password", "test"));
+    parameterList.add(new BasicNameValuePair("j_username", username));
+    parameterList.add(new BasicNameValuePair("j_password", password));
 
     httpPost.setEntity(new UrlEncodedFormEntity(parameterList, "UTF-8"));
     HttpResponse httpResponse = defaultHttpClient.execute(httpPost);
     int status = httpResponse.getStatusLine().getStatusCode();
     httpResponse.getEntity().getContent().close();
-    return status;
+    
+    Assert.assertEquals(302, status);        
   }
   
   public void createInitialUserAndLogin() throws Exception {
     // create initial user
     WebResource webResource = client.resource(CYCLE_BASE_PATH+"app/first-time-setup");
+    String username = "test";
+    String password = "test";
 
     UserDTO userDTO = new UserDTO();
-    userDTO.setName("test");
-    userDTO.setPassword("test");
+    userDTO.setName(username);
+    userDTO.setPassword(password);
     userDTO.setEmail("test@camunda.com");
     userDTO.setAdmin(true);
     
@@ -118,50 +117,56 @@ public abstract class AbstractCycleIT {
     Assert.assertEquals(Status.OK.getStatusCode(), status);
     
     // login with created user
-    status = executeCycleLogin();
-    Assert.assertEquals(302, status);
+    login(username, password);
   }
   
-  public void deleteUser() throws Exception {
+  public void deleteAllUsers() throws Exception {
     WebResource webResource = client.resource(CYCLE_BASE_PATH+"app/secured/resource/user");
     ClientResponse response = webResource.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
     List<Map> users = response.getEntity(List.class);
     response.close();
     for (Map userDTO : users) {
-      webResource = client.resource(CYCLE_BASE_PATH+"app/secured/resource/user/"+userDTO.get("id"));
-      ClientResponse clientResponse = webResource.delete(ClientResponse.class);
-      clientResponse.close();
-    }
-    
+      deleteUser((String) userDTO.get("id"));
+    }    
+  }
+
+  public void deleteUser(String userId) {
+    WebResource webResource = client.resource(CYCLE_BASE_PATH+"app/secured/resource/user/"+userId);
     ClientResponse clientResponse = webResource.delete(ClientResponse.class);
     clientResponse.close();
   }
   
-  public void deleteRoundtrip() {
+  public void deleteAllRoundtrips() {
     WebResource webResource = client.resource(CYCLE_BASE_PATH+"app/secured/resource/roundtrip/");
     ClientResponse response = webResource.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
     List<Map> roundtrips = response.getEntity(List.class);
     response.close();
     for (Map roundtripDTO : roundtrips) {
-      webResource = client.resource(CYCLE_BASE_PATH+"app/secured/resource/roundtrip/"+roundtripDTO.get("id"));
-      ClientResponse clientResponse = webResource.delete(ClientResponse.class);
-      clientResponse.close();
+      deleteRoundtrip((String) roundtripDTO.get("id"));
     }
   }
+
+  public void deleteRoundtrip(String roundtripId) {
+    WebResource webResource;
+    webResource = client.resource(CYCLE_BASE_PATH+"app/secured/resource/roundtrip/"+roundtripId);
+    ClientResponse clientResponse = webResource.delete(ClientResponse.class);
+    clientResponse.close();
+  }
   
-  public void deleteConnector() {
+  public void deleteAllConnectors() {
     WebResource webResource = client.resource(CYCLE_BASE_PATH+"app/secured/resource/connector/configuration");
     ClientResponse response = webResource.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
     List<Map> entity = response.getEntity(List.class);
     response.close();
     for (Map<String,Object> connectorConfigurationDTO : entity) {
-      webResource = client.resource(CYCLE_BASE_PATH+"app/secured/resource/connector/configuration"+connectorConfigurationDTO.get("connectorId"));
-      ClientResponse clientResponse = webResource.delete(ClientResponse.class);
-      clientResponse.close();
-    }
-    
-    if(connector != null) {
-      connector.dispose();
-    }
+      deleteConnector((String) connectorConfigurationDTO.get("connectorId"));
+    }    
+  }
+
+  public void deleteConnector(String connectorId) {
+    WebResource webResource;
+    webResource = client.resource(CYCLE_BASE_PATH+"app/secured/resource/connector/configuration"+connectorId);
+    ClientResponse clientResponse = webResource.delete(ClientResponse.class);
+    clientResponse.close();
   }  
 }
