@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans 
+          http://www.springframework.org/schema/beans/spring-beans.xsd
+          http://www.springframework.org/schema/tx
+          http://www.springframework.org/schema/tx/spring-tx.xsd">
+
+  <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+    <property name="jpaVendorAdapter">
+      <bean id="jpaAdaptor" class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter"></bean>
+    </property>
+    <property name="persistenceUnitName" value="cyclePU" />
+    <property name="persistenceXmlLocation" value="classpath:/META-INF/cycle-persistence.xml" />
+  </bean>
+  
+  <tx:jta-transaction-manager />
+  <tx:annotation-driven proxy-target-class="true" />
+</beans>
