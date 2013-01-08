@@ -48,7 +48,8 @@ public class TestCycleRoundtripIT extends AbstractCycleIT {
   
   private ConnectorConfiguration connectorConfiguration;
   
-  
+  private Connector connector;
+    
   public TestCycleRoundtripIT(ConnectorConfiguration connectorConfiguration, Connector connector) {
     this.connectorConfiguration = connectorConfiguration;
     this.connector = connector;
@@ -69,8 +70,9 @@ public class TestCycleRoundtripIT extends AbstractCycleIT {
   }
   
   @Before
-  public void testCycleDeployment() throws Exception {
-    init();
+  public void init() throws Exception {
+    connectToCycleService();
+    createInitialUserAndLogin();
     createConnector();
     createRoundtripWithDetails();
   }
@@ -100,8 +102,17 @@ public class TestCycleRoundtripIT extends AbstractCycleIT {
   }
   
   @After
-  public void afterEveryTest() throws Exception {
-    cleanUp();
+  public void cleanup() throws Exception {    
+    deleteAllRoundtrips();
+    deleteAllConnectors();
+    
+    if(connector != null) {
+      connector.dispose();
+    }
+    
+    deleteAllUsers();
+    cleanTargetDirectory(TARGET_DIRECTORY);
+    defaultHttpClient.getConnectionManager().shutdown();
   }
   
   // *********************************** private methods *************************************//
@@ -195,13 +206,4 @@ public class TestCycleRoundtripIT extends AbstractCycleIT {
     }
   }  
   
-  private void cleanUp() throws Exception {
-    // login with created user
-    executeCycleLogin();
-    deleteRoundtrip();
-    deleteConnector();
-    deleteUser();
-    cleanTargetDirectory(TARGET_DIRECTORY);
-    defaultHttpClient.getConnectionManager().shutdown();
-  }
 }
