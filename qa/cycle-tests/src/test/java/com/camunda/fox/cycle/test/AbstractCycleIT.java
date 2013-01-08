@@ -126,7 +126,7 @@ public abstract class AbstractCycleIT {
     List<Map> users = response.getEntity(List.class);
     response.close();
     for (Map userDTO : users) {
-      deleteUser((String) userDTO.get("id"));
+      deleteUser(String.valueOf(userDTO.get("id")));
     }    
   }
 
@@ -142,7 +142,7 @@ public abstract class AbstractCycleIT {
     List<Map> roundtrips = response.getEntity(List.class);
     response.close();
     for (Map roundtripDTO : roundtrips) {
-      deleteRoundtrip((String) roundtripDTO.get("id"));
+      deleteRoundtrip(String.valueOf(roundtripDTO.get("id")));
     }
   }
 
@@ -159,7 +159,7 @@ public abstract class AbstractCycleIT {
     List<Map> entity = response.getEntity(List.class);
     response.close();
     for (Map<String,Object> connectorConfigurationDTO : entity) {
-      deleteConnector((String) connectorConfigurationDTO.get("connectorId"));
+      deleteConnector(String.valueOf(connectorConfigurationDTO.get("connectorId")));
     }    
   }
 
