@@ -23,7 +23,6 @@ import org.tigris.subversion.svnclientadapter.svnkit.SvnKitClientAdapter;
 import org.tigris.subversion.svnclientadapter.svnkit.SvnKitClientAdapterFactory;
 
 import com.camunda.fox.cycle.connector.Connector;
-import com.camunda.fox.cycle.connector.ConnectorLoginMode;
 import com.camunda.fox.cycle.connector.ConnectorNode;
 import com.camunda.fox.cycle.connector.ConnectorNodeType;
 import com.camunda.fox.cycle.connector.ContentInformation;
@@ -104,11 +103,7 @@ public class SvnConnector extends Connector {
 
   @Override
   public boolean needsLogin() {
-    if (loggedIn || getConfiguration().getLoginMode().equals(ConnectorLoginMode.LOGIN_NOT_REQUIRED)) {
-      return false;
-    }
-    
-    return loggedIn = true;
+    return !loggedIn;
   }
   
   @Threadsafe
@@ -116,6 +111,7 @@ public class SvnConnector extends Connector {
   public void login(String userName, String password) {
     svnClientAdapter.setUsername(userName);
     svnClientAdapter.setPassword(password);
+    loggedIn = true;
   }
   
   private SVNUrl createSvnUrl(ConnectorNode node) throws Exception {
