@@ -66,4 +66,10 @@ public class DummyConnector extends Connector {
     return null;
   }
 
+  @Override
+  public boolean needsLogin() {
+    // TODO Auto-generated method stub
+    return false;
+  }
+
 }

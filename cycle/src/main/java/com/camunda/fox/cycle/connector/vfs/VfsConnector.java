@@ -354,4 +354,9 @@ public class VfsConnector extends Connector {
         return path;
     }
   }
+
+  @Override
+  public boolean needsLogin() {
+    return false;
+  }
 }

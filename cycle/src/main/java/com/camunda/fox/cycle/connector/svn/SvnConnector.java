@@ -14,12 +14,16 @@ import java.util.logging.Logger;
 import org.apache.commons.io.IOUtils;
 import org.tigris.subversion.svnclientadapter.ISVNClientAdapter;
 import org.tigris.subversion.svnclientadapter.ISVNDirEntry;
+import org.tigris.subversion.svnclientadapter.SVNClientException;
 import org.tigris.subversion.svnclientadapter.SVNNodeKind;
 import org.tigris.subversion.svnclientadapter.SVNRevision;
 import org.tigris.subversion.svnclientadapter.SVNUrl;
+import org.tigris.subversion.svnclientadapter.commandline.CmdLineClientAdapterFactory;
 import org.tigris.subversion.svnclientadapter.svnkit.SvnKitClientAdapter;
+import org.tigris.subversion.svnclientadapter.svnkit.SvnKitClientAdapterFactory;
 
 import com.camunda.fox.cycle.connector.Connector;
+import com.camunda.fox.cycle.connector.ConnectorLoginMode;
 import com.camunda.fox.cycle.connector.ConnectorNode;
 import com.camunda.fox.cycle.connector.ConnectorNodeType;
 import com.camunda.fox.cycle.connector.ContentInformation;
@@ -45,6 +49,30 @@ public class SvnConnector extends Connector {
   private ISVNClientAdapter svnClientAdapter;
   private ReentrantLock transactionLock = new ReentrantLock();
 
+  private boolean loggedIn;
+  
+  static {
+    setupFactories();
+  }
+  
+  private static void setupFactories() {
+    boolean initialized = false;
+    try {
+      SvnKitClientAdapterFactory.setup();
+      initialized = true;
+    } catch (SVNClientException e) {
+      logger.log(Level.INFO, "Cannot initialize the SvnKitClientAdapterFactory.");
+    }
+
+    if (!initialized) {
+      try {
+        CmdLineClientAdapterFactory.setup();
+      } catch (SVNClientException e) {
+        logger.log(Level.INFO, "Cannot initialize the CmdLineClientAdapterFactory.");
+      }
+    }
+  }
+  
   @Override
   public void init(ConnectorConfiguration config) {
     if (svnClientAdapter == null) {
@@ -74,6 +102,15 @@ public class SvnConnector extends Connector {
     baseUrl = getConfiguration().getProperties().get(CONFIG_KEY_REPOSITORY_PATH);
   }
 
+  @Override
+  public boolean needsLogin() {
+    if (loggedIn || getConfiguration().getLoginMode().equals(ConnectorLoginMode.LOGIN_NOT_REQUIRED)) {
+      return false;
+    }
+    
+    return loggedIn = true;
+  }
+  
   @Threadsafe
   @Override
   public void login(String userName, String password) {
@@ -390,5 +427,14 @@ public class SvnConnector extends Connector {
     }
     
     return new ContentInformation(true, reloadedNode.getLastModified());
+  }
+  
+  @Override
+  public void dispose() {
+    if (svnClientAdapter != null) {
+      svnClientAdapter.dispose();
+      svnClientAdapter = null;
+    }
+    loggedIn = false;
   }
 }

@@ -57,9 +57,7 @@ public abstract class Connector {
   public void dispose() {
   }
 
-  public boolean needsLogin() {
-    return false;
-  }
+  public abstract boolean needsLogin();
 
   public ConnectorConfiguration getConfiguration() {
     return configuration;
