@@ -30,7 +30,7 @@
     <jdbc-resource pool-name="__TimerPool" jndi-name="jdbc/__TimerPool" object-type="system-admin"></jdbc-resource>
     <jdbc-resource pool-name="DerbyPool" jndi-name="jdbc/__default"></jdbc-resource>
     <jdbc-resource pool-name="FoxEnginePool" jndi-name="jdbc/FoxEngine" enabled="true"></jdbc-resource>
-    <jdbc-resource pool-name="FoxCyclePool" jndi-name="jdbc/Cycle" enabled="true"></jdbc-resource>
+    <jdbc-resource pool-name="FoxCyclePool" jndi-name="jdbc/CycleDS" enabled="true"></jdbc-resource>
     
     <jdbc-connection-pool datasource-classname="org.apache.derby.jdbc.EmbeddedXADataSource" res-type="javax.sql.XADataSource" name="__TimerPool">
       <property name="databaseName" value="${com.sun.aas.instanceRoot}/lib/databases/ejbtimer"></property>
@@ -86,7 +86,7 @@
       <resource-ref ref="jdbc/__TimerPool"></resource-ref>
       <resource-ref ref="jdbc/__default"></resource-ref>
       <resource-ref ref="jdbc/FoxEngine"></resource-ref>
-      <resource-ref ref="jdbc/Cycle"></resource-ref>
+      <resource-ref ref="jdbc/CycleDS"></resource-ref>
       <resource-ref ref="eis/PlatformJobExecutorConnectionFactory"></resource-ref>
     </server>
   </servers>
