@@ -37,19 +37,20 @@
   </fileSets>
 
   <dependencySets>
+  
     <dependencySet>
       <outputDirectory />
       <unpack>true</unpack>
       <unpackOptions>
         <includes>
-          <include>**/*.sql</include>
+          <include>**/*_tomcat.sql</include>
         </includes>
       </unpackOptions>
       <includes>
         <include>com.camunda.fox.cockpit:cockpit-sql-scripts-openjpa:jar:*</include>
       </includes>
     </dependencySet>
-    <!-- 
+	
     <dependencySet>
       <outputDirectory />
       <unpack>true</unpack>
@@ -59,10 +60,10 @@
         </includes>
       </unpackOptions>
       <includes>
-        <include>com.camunda.fox.cycle:cycle-sql-scripts-openjpa:jar:*</include>
+        <include>com.camunda.fox.cycle:cycle-sql-scripts:jar:*</include>
       </includes>
     </dependencySet>
-    -->
+	
   	<dependencySet>
   		<includes>
   			<include>com.camunda.fox.cockpit:cockpit-webapp-servlet:war:*</include>
@@ -70,14 +71,14 @@
   		<outputDirectory>server/apache-tomcat-${tomcat6.version}/webapps/cockpit</outputDirectory>
         <unpack>true</unpack>
   	</dependencySet>
-      <!--
-  	<dependencySet>
+	
+	<dependencySet>
   		<includes>
-  			<include>com.camunda.fox.cycle:cycle-webapp-servlet:war:*</include>
+  			<include>com.camunda.fox.cycle:cycle-tomcat:war:*</include>
   		</includes>
   		<outputDirectory>server/apache-tomcat-${tomcat6.version}/webapps/cycle</outputDirectory>
         <unpack>true</unpack>
-  	</dependencySet>    
-    -->
+  	</dependencySet>
+		
   </dependencySets>
 </assembly>
