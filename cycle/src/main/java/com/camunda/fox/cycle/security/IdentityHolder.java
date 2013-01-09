@@ -15,4 +15,8 @@ public class IdentityHolder {
   public static UserIdentity getIdentity() {
     return holder.get();
   }
+
+  public static void clear() {
+    holder.remove();    
+  }
 }
