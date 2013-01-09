@@ -1,5 +1,6 @@
 package com.camunda.fox.cycle.connector;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -24,12 +25,14 @@ import org.springframework.web.context.WebApplicationContext;
   value = WebApplicationContext.SCOPE_SESSION, 
   proxyMode = ScopedProxyMode.TARGET_CLASS
 )
-public class ConnectorCache {
+public class ConnectorCache implements Serializable {
 
+  private static final long serialVersionUID = 1L;
+  
   /**
    * the internal cache
-   */
-  private Map<Long, Connector> cache = new HashMap<Long, Connector>();
+   */  
+  private transient Map<Long, Connector> cache = new HashMap<Long, Connector>();
 
   public boolean contains(long id) {
     return cache.containsKey(id);
