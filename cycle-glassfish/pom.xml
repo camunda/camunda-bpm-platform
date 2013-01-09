@@ -50,8 +50,12 @@
           <artifactId>jersey-core</artifactId>
         </exclusion>
         <exclusion>
-          <groupId>asm</groupId>
+          <groupId>com.sun.jersey</groupId>
+          <artifactId>jersey-servlet</artifactId>
+        </exclusion>
+        <exclusion>
           <artifactId>asm</artifactId>
+          <groupId>asm</groupId>
         </exclusion>        
         <exclusion>
           <artifactId>spring-core</artifactId>
