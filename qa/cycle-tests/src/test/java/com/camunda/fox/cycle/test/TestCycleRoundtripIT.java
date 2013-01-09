@@ -23,6 +23,8 @@ import com.camunda.fox.cycle.connector.Connector;
 import com.camunda.fox.cycle.connector.ConnectorLoginMode;
 import com.camunda.fox.cycle.connector.ConnectorNode;
 import com.camunda.fox.cycle.connector.ConnectorNodeType;
+import com.camunda.fox.cycle.connector.signavio.SignavioConnector;
+import com.camunda.fox.cycle.connector.svn.SvnConnector;
 import com.camunda.fox.cycle.connector.vfs.VfsConnector;
 import com.camunda.fox.cycle.entity.ConnectorConfiguration;
 import com.camunda.fox.cycle.util.IoUtil;
@@ -40,6 +42,17 @@ public class TestCycleRoundtripIT extends AbstractCycleIT {
   
   private static final File TARGET_DIRECTORY = new File("target/cycle-repository");
   private static final String TMP_DIR_NAME = "cycle-integration-test";
+  
+  // signavio connector configuration
+  private static final String SIGNAVIO_BASE_URL = "http://vm2.camunda.com:8080";
+  private static final String SIGNAVIO_GLOBAL_USER = "test@camunda.com";
+  private static final String SIGNAVIO_GLOBAL_PWD = "testtest";
+  
+  // svn connector configuration
+  private static final String SVN_REPOSITORY_PATH = "https://svn.camunda.com/sandbox2";
+  private static final String SVN_GLOBAL_USER = "hudson-test";
+  private static final String SVN_GLOBAL_PWD = "2KamD3Lo";
+  
   private static final String LHS_PROCESS_DIAGRAM = "/com/camunda/fox/cycle/roundtrip/repository/test-lhs.bpmn";
   private static final String RHS_PROCESS_DIAGRAM = "/com/camunda/fox/cycle/roundtrip/repository/test-rhs.bpmn";
   
@@ -47,8 +60,8 @@ public class TestCycleRoundtripIT extends AbstractCycleIT {
   private Long connectorId;
   
   private ConnectorConfiguration connectorConfiguration;
-  
   private Connector connector;
+  private ConnectorNodeDTO connectorNodeParentFolder;
     
   public TestCycleRoundtripIT(ConnectorConfiguration connectorConfiguration, Connector connector) {
     this.connectorConfiguration = connectorConfiguration;
@@ -64,8 +77,28 @@ public class TestCycleRoundtripIT extends AbstractCycleIT {
     vfsConnectorConfiguration.getProperties().put(VfsConnector.BASE_PATH_KEY, TARGET_DIRECTORY.getAbsolutePath());
     vfsConnectorConfiguration.setConnectorClass(VfsConnector.class.getName());
     
+    ConnectorConfiguration signavioConnectorConfiguration = new ConnectorConfiguration();
+    signavioConnectorConfiguration.setConnectorName("SignavioConnector");
+    signavioConnectorConfiguration.setName("SignavioConnector");
+    signavioConnectorConfiguration.setLoginMode(ConnectorLoginMode.GLOBAL);
+    signavioConnectorConfiguration.setGlobalUser(SIGNAVIO_GLOBAL_USER);
+    signavioConnectorConfiguration.setGlobalPassword(SIGNAVIO_GLOBAL_PWD);
+    signavioConnectorConfiguration.getProperties().put(SignavioConnector.CONFIG_KEY_SIGNAVIO_BASE_URL, SIGNAVIO_BASE_URL);
+    signavioConnectorConfiguration.setConnectorClass(SignavioConnector.class.getName());
+    
+    ConnectorConfiguration svnConnectorConfiguration = new ConnectorConfiguration();
+    svnConnectorConfiguration.setConnectorName("SvnConnector");
+    svnConnectorConfiguration.setName("SvnConnector");
+    svnConnectorConfiguration.setLoginMode(ConnectorLoginMode.GLOBAL);
+    svnConnectorConfiguration.setGlobalUser(SVN_GLOBAL_USER);
+    svnConnectorConfiguration.setGlobalPassword(SVN_GLOBAL_PWD);
+    svnConnectorConfiguration.getProperties().put(SvnConnector.CONFIG_KEY_REPOSITORY_PATH, SVN_REPOSITORY_PATH);
+    svnConnectorConfiguration.setConnectorClass(SvnConnector.class.getName());
+    
     return Arrays.asList(new Object[][] {
-            { vfsConnectorConfiguration, new VfsConnector() }
+            { vfsConnectorConfiguration, new VfsConnector() },
+            { signavioConnectorConfiguration, new SignavioConnector() },
+            { svnConnectorConfiguration, new SvnConnector() }
     });
   }
   
@@ -106,12 +139,14 @@ public class TestCycleRoundtripIT extends AbstractCycleIT {
     deleteAllRoundtrips();
     deleteAllConnectors();
     
+    deleteNode();
+    
     if(connector != null) {
       connector.dispose();
     }
     
     deleteAllUsers();
-    cleanTargetDirectory(TARGET_DIRECTORY);
+    //cleanTargetDirectory(TARGET_DIRECTORY);
     defaultHttpClient.getConnectionManager().shutdown();
   }
   
@@ -119,7 +154,10 @@ public class TestCycleRoundtripIT extends AbstractCycleIT {
   private void createConnector() {
     WebResource webResource = client.resource(CYCLE_BASE_PATH+"app/secured/resource/connector/configuration");
     
-    ClientResponse clientResponse = webResource.accept(MediaType.APPLICATION_JSON).type(MediaType.APPLICATION_JSON).post(ClientResponse.class, ConnectorConfigurationDTO.wrap(connectorConfiguration));
+    ConnectorConfigurationDTO connectorConfigurationDTO = ConnectorConfigurationDTO.wrap(connectorConfiguration);
+    connectorConfigurationDTO.setPassword(connectorConfiguration.getGlobalPassword());
+    
+    ClientResponse clientResponse = webResource.accept(MediaType.APPLICATION_JSON).type(MediaType.APPLICATION_JSON).post(ClientResponse.class, connectorConfigurationDTO);
     ConnectorConfigurationDTO entity = clientResponse.getEntity(ConnectorConfigurationDTO.class);
     
     connectorId = entity.getConnectorId();
@@ -129,10 +167,18 @@ public class TestCycleRoundtripIT extends AbstractCycleIT {
     clientResponse.close();
     Assert.assertEquals(Status.OK.getStatusCode(), status);
     
-    // init local instance of VfsConnector 
-    // (required for creating connector nodes in VFS_DIRECTORY)
+    // init local instance of current connector 
+    // (required for creating connector nodes in TARGET_DIRECTORY)
     connector.setConfiguration(connectorConfiguration);
     connector.init();
+    
+    if (connector.needsLogin()) {
+      if (connector instanceof SignavioConnector) {
+        connector.login(SIGNAVIO_GLOBAL_USER, SIGNAVIO_GLOBAL_PWD);
+      } else if (connector instanceof SvnConnector) {
+        connector.login(SVN_GLOBAL_USER, SVN_GLOBAL_PWD);
+      }
+    }
     
   }
   
@@ -155,17 +201,16 @@ public class TestCycleRoundtripIT extends AbstractCycleIT {
     
     BpmnDiagramDTO leftHandSide = new BpmnDiagramDTO();
     leftHandSide.setModeler("lhs-modeler");
-    ConnectorNodeDTO lhsConnectorNodeParentFolder = createConnectorNodeParentFolder();
+    connectorNodeParentFolder = createConnectorNodeParentFolder();
     
-    ConnectorNode diagramNode = createConnectorNode(lhsConnectorNodeParentFolder, LHS_PROCESS_DIAGRAM);
+    ConnectorNode diagramNode = createConnectorNode(connectorNodeParentFolder, LHS_PROCESS_DIAGRAM);
     leftHandSide.setConnectorNode(new ConnectorNodeDTO(diagramNode));
     
     // update roundtrip details RHS
     BpmnDiagramDTO rightHandSide = new BpmnDiagramDTO();
     rightHandSide.setModeler("rhs-modeler");
-    ConnectorNodeDTO rhsConnectorNodeParentFolder = createConnectorNodeParentFolder();
     
-    diagramNode = createConnectorNode(rhsConnectorNodeParentFolder, RHS_PROCESS_DIAGRAM);
+    diagramNode = createConnectorNode(connectorNodeParentFolder, RHS_PROCESS_DIAGRAM);
     rightHandSide.setConnectorNode(new ConnectorNodeDTO(diagramNode)); 
     
     roundtripDTO.setLeftHandSide(leftHandSide);
@@ -178,7 +223,13 @@ public class TestCycleRoundtripIT extends AbstractCycleIT {
   }
   
   private ConnectorNodeDTO createConnectorNodeParentFolder() {
-    ConnectorNode connectorParentNode = connector.createNode(connector.getRoot().getId(), TMP_DIR_NAME, ConnectorNodeType.FOLDER);
+    ConnectorNode connectorParentNode;
+    if (connector instanceof SignavioConnector) {
+      SignavioConnector signavioConnector = (SignavioConnector) connector;
+      connectorParentNode = connector.createNode(signavioConnector.getPrivateFolder().getId(), TMP_DIR_NAME, ConnectorNodeType.FOLDER);
+    } else {
+      connectorParentNode = connector.createNode(connector.getRoot().getId(), TMP_DIR_NAME, ConnectorNodeType.FOLDER);
+    }
     connectorParentNode.setConnectorId(connectorId);
     ConnectorNodeDTO connectorParentNodeDTO = new ConnectorNodeDTO(connectorParentNode);
     return connectorParentNodeDTO;
@@ -193,6 +244,12 @@ public class TestCycleRoundtripIT extends AbstractCycleIT {
     return connectorNode;
   }
   
+  private void deleteNode() {
+      if (connectorNodeParentFolder != null) {
+        connector.deleteNode(connectorNodeParentFolder.toConnectorNode());
+      }
+  }
+  
   private void cleanTargetDirectory(File directory) throws IOException {
     if (directory.exists()) {
       if (directory.isDirectory()) {
@@ -204,6 +261,6 @@ public class TestCycleRoundtripIT extends AbstractCycleIT {
     if (!directory.mkdirs()) {
       throw new IllegalArgumentException("Could not clean: " + directory);
     }
-  }  
+  }
   
 }

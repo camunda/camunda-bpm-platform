@@ -147,8 +147,7 @@ public abstract class AbstractCycleIT {
   }
 
   public void deleteRoundtrip(String roundtripId) {
-    WebResource webResource;
-    webResource = client.resource(CYCLE_BASE_PATH+"app/secured/resource/roundtrip/"+roundtripId);
+    WebResource webResource = client.resource(CYCLE_BASE_PATH+"app/secured/resource/roundtrip/"+roundtripId);
     ClientResponse clientResponse = webResource.delete(ClientResponse.class);
     clientResponse.close();
   }
@@ -164,9 +163,8 @@ public abstract class AbstractCycleIT {
   }
 
   public void deleteConnector(String connectorId) {
-    WebResource webResource;
-    webResource = client.resource(CYCLE_BASE_PATH+"app/secured/resource/connector/configuration"+connectorId);
+    WebResource webResource = client.resource(CYCLE_BASE_PATH+"app/secured/resource/connector/configuration"+connectorId);
     ClientResponse clientResponse = webResource.delete(ClientResponse.class);
     clientResponse.close();
-  }  
+  }
 }
