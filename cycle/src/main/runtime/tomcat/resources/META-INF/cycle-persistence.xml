@@ -6,7 +6,7 @@
  	<persistence-unit name="cyclePU" transaction-type="RESOURCE_LOCAL">
         <provider>org.hibernate.ejb.HibernatePersistence</provider>
 		
-        <non-jta-data-source>java:${persistence.ds.name}</non-jta-data-source>
+        <non-jta-data-source>${persistence.ds.name}</non-jta-data-source>
 		
         <class>com.camunda.fox.cycle.entity.AbstractEntity</class>
         <class>com.camunda.fox.cycle.entity.BpmnDiagram</class>
