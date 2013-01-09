@@ -53,6 +53,13 @@
     <was.http.port>9080</was.http.port>
     <was_remoteServerAddress>localhost</was_remoteServerAddress>
     <was_remoteServerSoapPort>${WAS8_REMOTE_SERVER_SOAP_PORT}</was_remoteServerSoapPort>
+	
+	<!-- tomcat -->
+	<tomcat6.connector.http.port>48080</tomcat6.connector.http.port>
+	<tomcat6.connector.http.redirectPort>48443</tomcat6.connector.http.redirectPort>
+	<tomcat6.connector.ajp.port>48009</tomcat6.connector.ajp.port>
+	<tomcat6.connector.ajp.redirectPort>48443</tomcat6.connector.ajp.redirectPort>
+	<tomcat6.assembly.location>../../tomcat6/assembly/target/assembly/server/apache-tomcat-6.0.36</tomcat6.assembly.location>
     
   </properties>
 
@@ -101,6 +108,15 @@
         <module>cockpit-tests</module>
         <module>cycle-tests</module>
       </modules>
-    </profile>    
+    </profile>  
+	
+	<profile>
+      <id>tomcat6</id>      
+      <modules>
+        <module>tomcat6-runtime</module>        
+        <module>cycle-tests</module>
+      </modules>
+    </profile>  
+  	
   </profiles>
 </project>
