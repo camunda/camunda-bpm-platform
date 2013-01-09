@@ -427,6 +427,114 @@
         <!-- on WAS, cycle is already deployed as part of the websphere test runtime. -->
       
     </profile>
+	
+	
+	<profile>
+  		<id>tomcat6</id>
+     	<activation>
+	      <activeByDefault>true</activeByDefault>
+	    </activation>
+	    <properties>
+    		<tomcat6.assembly.location>../tomcat6-runtime/target/apache-tomcat-6.0.36</tomcat6.assembly.location>
+            <cycle.http.port>${tomcat6.connector.http.port}</cycle.http.port>
+  		</properties>  		
+		<dependencies>
+		  <dependency>
+		    <!-- make sure it comes after assembly in the build -->
+		     <groupId>com.camunda.fox.platform</groupId>
+		     <artifactId>fox-platform-tomcat6-assembly</artifactId>
+		     <version>${project.version}</version>
+		     <type>pom</type>
+		   </dependency>
+            <dependency>
+		     <groupId>com.camunda.fox.cycle</groupId>
+		     <artifactId>cycle-tomcat</artifactId>
+		     <version>${project.version}</version>
+		     <type>war</type>
+		     <scope>test</scope>
+		    </dependency>
+		 </dependencies>
+		
+		 <build>		   
+		   <plugins>
+		     <plugin>
+		       <groupId>org.apache.maven.plugins</groupId>
+		       <artifactId>maven-antrun-plugin</artifactId>
+		       <executions>
+		         <execution>
+		           <id>copy-distro</id>
+		           <phase>test-compile</phase>
+		           <goals>
+		             <goal>run</goal>
+		           </goals>
+		           <configuration>
+		             <target unless="maven.test.skip">
+
+                      <!-- copy jboss server runtime -->
+                      <mkdir dir="target/apache-tomcat-6.0.36"/>                      
+		              <copy todir="target/apache-tomcat-6.0.36" >
+		                 <fileset dir="${tomcat6.assembly.location}" />
+		              </copy>
+                       
+		            </target>
+		          </configuration>
+		        </execution>
+		      </executions>
+		    </plugin>
+		                
+            <plugin>
+              <groupId>org.codehaus.cargo</groupId>
+              <artifactId>cargo-maven2-plugin</artifactId>
+              <executions>
+                <execution>
+                  <id>start-container</id>
+                  <phase>pre-integration-test</phase>
+                  <goals>
+                    <goal>start</goal>
+                  </goals>
+                </execution>
+                <execution>
+                  <id>stop-container</id>
+                  <phase>post-integration-test</phase>
+                  <goals>
+                    <goal>stop</goal>
+                  </goals>
+                </execution>
+              </executions>
+              <configuration>
+                <!-- Container configuration -->
+                  <container>
+                    <type>installed</type>
+                    <containerId>tomcat6x</containerId>
+                    <append>false</append>
+                    <home>${project.build.directory}/apache-tomcat-6.0.36</home>
+                  </container>
+                  <configuration>
+                    <type>standalone</type>
+                    <home>${project.build.directory}/config-tomcat</home>
+                    <properties>
+                      <cargo.servlet.port>${tomcat6.connector.http.port}</cargo.servlet.port>
+					  <cargo.tomcat.ajp.port>${tomcat6.connector.ajp.port}</cargo.tomcat.ajp.port>
+                    </properties>
+                  </configuration>
+				  <deployables>
+					<deployable>
+					 <groupId>com.camunda.fox.cycle</groupId>
+					 <artifactId>cycle-tomcat</artifactId>
+					 <type>war</type>
+					  <properties>
+						<context>cycle</context>
+					  </properties>
+					</deployable>
+				  </deployables>
+                  <wait>false</wait>
+              </configuration>
+            </plugin>
+            
+		  </plugins>
+		</build>
+  	</profile>
+	
   </profiles>
 
   <build>

@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<assembly xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns="urn:maven:assembly:1.1.0-SNAPSHOT">
+  
+  <id>assemble</id>
+  
+  <formats>
+    <format>dir</format>
+    <format>tar.gz</format>
+  </formats>
+
+  <includeBaseDirectory>false</includeBaseDirectory>
+  
+  <fileSets>
+    <fileSet>
+      <directory>target/jboss-as-${version.jboss.as}</directory>
+      <outputDirectory></outputDirectory>
+    </fileSet>
+  </fileSets>
+  
+  <!-- ####################################################################################### -->
+  <!-- WARNING: This file is currently not used, have a look at copy-distro profile in pom.xml -->
+  <!-- ####################################################################################### -->
+</assembly>
