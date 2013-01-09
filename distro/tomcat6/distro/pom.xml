@@ -40,14 +40,14 @@
       <version>${project.version}</version>
       <type>war</type>
     </dependency>
-
-    <!--dependency>
+	
+	<dependency>
       <groupId>com.camunda.fox.cycle</groupId>
-      <artifactId>cycle-webapp-servlet</artifactId>
+      <artifactId>cycle-tomcat</artifactId>
       <version>${project.version}</version>
       <type>war</type>
-    </dependency-->
-    
+    </dependency>
+
   </dependencies>
   
   <build>
