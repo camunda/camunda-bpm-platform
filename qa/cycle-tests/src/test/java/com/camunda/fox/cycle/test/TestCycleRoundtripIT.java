@@ -1,17 +1,16 @@
 package com.camunda.fox.cycle.test;
 
 import java.io.File;
-import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
 import junit.framework.Assert;
 
-import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -41,7 +40,7 @@ import com.sun.jersey.api.client.WebResource;
 public class TestCycleRoundtripIT extends AbstractCycleIT {
   
   private static final File TARGET_DIRECTORY = new File("target/cycle-repository");
-  private static final String TMP_DIR_NAME = "cycle-integration-test";
+  private static final String TMP_DIR_BASE = "cycle-integration-test";
   
   // signavio connector configuration
   private static final String SIGNAVIO_BASE_URL = "http://vm2.camunda.com:8080";
@@ -62,6 +61,7 @@ public class TestCycleRoundtripIT extends AbstractCycleIT {
   private ConnectorConfiguration connectorConfiguration;
   private Connector connector;
   private ConnectorNodeDTO connectorNodeParentFolder;
+  private String tmpDirName;
     
   public TestCycleRoundtripIT(ConnectorConfiguration connectorConfiguration, Connector connector) {
     this.connectorConfiguration = connectorConfiguration;
@@ -104,12 +104,13 @@ public class TestCycleRoundtripIT extends AbstractCycleIT {
   
   @Before
   public void init() throws Exception {
+    initTmpDir();
     connectToCycleService();
     createInitialUserAndLogin();
     createConnector();
     createRoundtripWithDetails();
   }
-  
+
   @Test
   public void testLeftToRightSynchronisation() throws Exception {
     WebResource webResource = client.resource(CYCLE_BASE_PATH+"app/secured/resource/roundtrip/"+roundtripDTO.getId()+"/sync?syncMode=LEFT_TO_RIGHT");
@@ -139,18 +140,18 @@ public class TestCycleRoundtripIT extends AbstractCycleIT {
     deleteAllRoundtrips();
     deleteAllConnectors();
     
-    deleteNode();
+    deleteConnectorParentFolder();
     
     if(connector != null) {
       connector.dispose();
     }
     
     deleteAllUsers();
-    //cleanTargetDirectory(TARGET_DIRECTORY);
     defaultHttpClient.getConnectionManager().shutdown();
   }
   
   // *********************************** private methods *************************************//
+    
   private void createConnector() {
     WebResource webResource = client.resource(CYCLE_BASE_PATH+"app/secured/resource/connector/configuration");
     
@@ -173,11 +174,7 @@ public class TestCycleRoundtripIT extends AbstractCycleIT {
     connector.init();
     
     if (connector.needsLogin()) {
-      if (connector instanceof SignavioConnector) {
-        connector.login(SIGNAVIO_GLOBAL_USER, SIGNAVIO_GLOBAL_PWD);
-      } else if (connector instanceof SvnConnector) {
-        connector.login(SVN_GLOBAL_USER, SVN_GLOBAL_PWD);
-      }
+      connector.login(connectorConfiguration.getGlobalUser(), connectorConfiguration.getGlobalPassword());
     }
     
   }
@@ -226,9 +223,9 @@ public class TestCycleRoundtripIT extends AbstractCycleIT {
     ConnectorNode connectorParentNode;
     if (connector instanceof SignavioConnector) {
       SignavioConnector signavioConnector = (SignavioConnector) connector;
-      connectorParentNode = connector.createNode(signavioConnector.getPrivateFolder().getId(), TMP_DIR_NAME, ConnectorNodeType.FOLDER);
+      connectorParentNode = connector.createNode(signavioConnector.getPrivateFolder().getId(), tmpDirName, ConnectorNodeType.FOLDER);
     } else {
-      connectorParentNode = connector.createNode(connector.getRoot().getId(), TMP_DIR_NAME, ConnectorNodeType.FOLDER);
+      connectorParentNode = connector.createNode(connector.getRoot().getId(), tmpDirName, ConnectorNodeType.FOLDER);
     }
     connectorParentNode.setConnectorId(connectorId);
     ConnectorNodeDTO connectorParentNodeDTO = new ConnectorNodeDTO(connectorParentNode);
@@ -244,23 +241,14 @@ public class TestCycleRoundtripIT extends AbstractCycleIT {
     return connectorNode;
   }
   
-  private void deleteNode() {
+  private void deleteConnectorParentFolder() {
       if (connectorNodeParentFolder != null) {
         connector.deleteNode(connectorNodeParentFolder.toConnectorNode());
       }
   }
   
-  private void cleanTargetDirectory(File directory) throws IOException {
-    if (directory.exists()) {
-      if (directory.isDirectory()) {
-        FileUtils.deleteDirectory(directory);
-      } else {
-        throw new IllegalArgumentException("Not a directory: " + directory);
-      }
-    }
-    if (!directory.mkdirs()) {
-      throw new IllegalArgumentException("Could not clean: " + directory);
-    }
+  private void initTmpDir() {
+    tmpDirName = TMP_DIR_BASE + UUID.randomUUID().toString();    
   }
   
 }

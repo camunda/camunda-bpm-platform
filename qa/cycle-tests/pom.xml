@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>cycle-tests</artifactId>
-  <name>fox platform EE - Cycle tests</name>
+  <name>fox platform EE - QA Cycle tests</name>
 
   <parent>
     <groupId>com.camunda.fox.platform</groupId>
@@ -65,9 +65,6 @@
   <profiles>
   	<profile>
   		<id>jboss</id>
-     	<activation>
-	      <activeByDefault>true</activeByDefault>
-	    </activation>
 	    <properties>
     		<jboss.assembly.location>../jboss7-runtime/target/jboss-as-${version.jboss.as}</jboss.assembly.location>
             <jboss.standalone.xml>standalone-h2.xml</jboss.standalone.xml>
@@ -77,7 +74,7 @@
 		  <dependency>
 		    <!-- make sure it comes after assembly in the build -->
 		     <groupId>com.camunda.fox.platform</groupId>
-		     <artifactId>fox-platform-jboss-assembly</artifactId>
+		     <artifactId>fox-platform-qa-jboss-runtime</artifactId>
 		     <version>${project.version}</version>
 		     <type>pom</type>
 		   </dependency>
@@ -442,7 +439,7 @@
 		  <dependency>
 		    <!-- make sure it comes after assembly in the build -->
 		     <groupId>com.camunda.fox.platform</groupId>
-		     <artifactId>fox-platform-tomcat6-assembly</artifactId>
+		     <artifactId>fox-platform-qa-tomcat6-runtime</artifactId>
 		     <version>${project.version}</version>
 		     <type>pom</type>
 		   </dependency>

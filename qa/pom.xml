@@ -62,51 +62,54 @@
 	<tomcat6.assembly.location>../../tomcat6/assembly/target/assembly/server/apache-tomcat-6.0.36</tomcat6.assembly.location>
     
   </properties>
+  
+  <modules>
+	<module>jboss7-runtime</module>
+  </modules>
 
   <profiles>
     <profile>
       <id>was80</id>
       <modules>
+		<module>cycle-tests</module>
         <module>websphere-runtime</module>
-        <module>integration-tests</module>
-        <module>cycle-tests</module>
+        <module>integration-tests</module>        
       </modules>
     </profile>
+	
     <profile>
       <id>was85</id>
       <modules>
+		<module>cycle-tests</module>
         <module>websphere-runtime</module>
-        <module>integration-tests</module>
-        <module>cycle-tests</module>
+        <module>integration-tests</module>        
       </modules>
     </profile>
+	
     <profile>
       <id>glassfish</id>
       <modules>
+		<module>cycle-tests</module>
         <module>gf31-runtime</module>
         <module>integration-tests</module>
         <module>tasklist-gui-tests</module>
-        <module>test-process-application</module>
-        <module>cycle-tests</module>
+        <module>test-process-application</module>        
         <!-- see HEMERA-2709 - disabled because not supported on gf yet
         <module>test-deployer</module>
         <module>cockpit-tests</module>
         -->
       </modules>
     </profile>
+	
     <profile>
-      <id>jboss</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <modules>
-        <module>jboss7-runtime</module>
+      <id>jboss</id>   
+      <modules>       
+		<module>cycle-tests</module>
         <module>integration-tests</module>
         <module>tasklist-gui-tests</module>
         <module>test-process-application</module>
         <module>test-deployer</module>
-        <module>cockpit-tests</module>
-        <module>cycle-tests</module>
+        <module>cockpit-tests</module>        
       </modules>
     </profile>  
 	
