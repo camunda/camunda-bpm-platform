@@ -1,11 +1,11 @@
 package org.camunda.bpm.engine.rest;
 
+import static com.jayway.restassured.RestAssured.given;
+import static com.jayway.restassured.path.json.JsonPath.from;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
-import static com.jayway.restassured.RestAssured.given;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,22 +13,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.repository.ProcessDefinitionQuery;
-import org.apache.cxf.jaxrs.client.WebClient;
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
 
+import com.jayway.restassured.response.Response;
 import com.jayway.restassured.specification.RequestSpecification;
 
 public class ProcessDefinitionServiceTest extends AbstractRestServiceTest {
@@ -39,7 +34,6 @@ public class ProcessDefinitionServiceTest extends AbstractRestServiceTest {
   private static final String PROCESS_DEFINITION_QUERY_URL = "/process-definition/query";
   
   private ProcessDefinitionQuery mockedQuery;
-  private WebClient client;
   
   private ProcessDefinitionQuery setUpMockDefinitionQuery(List<ProcessDefinition> mockedDefinitions) {
     ProcessDefinitionQuery sampleDefinitionsQuery = mock(ProcessDefinitionQuery.class);
@@ -61,50 +55,37 @@ public class ProcessDefinitionServiceTest extends AbstractRestServiceTest {
     List<ProcessDefinition> definitions = new ArrayList<ProcessDefinition>();
     definitions.add(createMockDefinition(EXAMPLE_DEFINITION_ID, EXAMPLE_DEFINITION_KEY));
     mockedQuery = setUpMockDefinitionQuery(definitions);
-    
-    client = WebClient.create(SERVER_ADDRESS);
-    client.accept(MediaType.APPLICATION_JSON);
-    client.path(PROCESS_DEFINITION_QUERY_URL);
   }
   
   @Test
-  public void testProcessDefinitionRetrieval() throws JSONException {
-    
+  public void testProcessDefinitionRetrieval() {
     InOrder inOrder = Mockito.inOrder(mockedQuery);
     
     String queryKey = "Key";
-    client.query("keyLike", queryKey);
-    
-    String content = client.get(String.class);
-
-    System.out.println(content);
+    Response response = given().queryParam("keyLike", queryKey)
+        .expect().statusCode(Status.OK.getStatusCode())
+        .get(PROCESS_DEFINITION_QUERY_URL);
     
     // assert query invocation
     inOrder.verify(mockedQuery).processDefinitionKeyLike(queryKey);
     inOrder.verify(mockedQuery).list();
     
-    Response response = client.getResponse();
-    Assert.assertEquals(Status.OK.getStatusCode(), response.getStatus());
+    String content = response.asString();
+    List<String> definitions = from(content).getList("data");
+    Assert.assertEquals("There should be one process definition returned.", 1, definitions.size());
+    
+    String returnedDefinitionKey = from(content).getString("data[0].key");
+    String returnedDefinitionId = from(content).getString("data[0].id");
 
-    JSONObject jsonResponse = new JSONObject(content);
-    JSONArray jsonDefinitions = jsonResponse.getJSONArray("data");
-    Assert.assertEquals("There should be one process definition returned.", 1, jsonDefinitions.length());
-    
-    JSONObject jsonDefinition = jsonDefinitions.getJSONObject(0);
-    String jsonDefId = jsonDefinition.getString("id");
-    String jsonDefKey = jsonDefinition.getString("key");
-    
-    Assert.assertEquals(EXAMPLE_DEFINITION_ID, jsonDefId);
-    Assert.assertEquals(EXAMPLE_DEFINITION_KEY, jsonDefKey);
+    Assert.assertEquals(EXAMPLE_DEFINITION_ID, returnedDefinitionId);
+    Assert.assertEquals(EXAMPLE_DEFINITION_KEY, returnedDefinitionKey);
   }
   
   @Test
-  public void testEmptyQuery() throws JSONException {
+  public void testEmptyQuery() {
     String queryKey = "";
-    client.query("keyLike", queryKey);
-    
-    Response response = client.get();
-    Assert.assertEquals("Querying with an empty query string should be valid.", Status.OK.getStatusCode(), response.getStatus());
+    Response response = given().queryParam("keyLike", queryKey).get(PROCESS_DEFINITION_QUERY_URL);
+    Assert.assertEquals("Querying with an empty query string should be valid.", Status.OK.getStatusCode(), response.getStatusCode());
   }
   
   @Test
@@ -117,7 +98,7 @@ public class ProcessDefinitionServiceTest extends AbstractRestServiceTest {
       spec.queryParam(queryParam.getKey(), queryParam.getValue());
     }
     
-    spec.expect().statusCode(Status.OK.getStatusCode()).get("/process-definition/query");
+    spec.expect().statusCode(Status.OK.getStatusCode()).get(PROCESS_DEFINITION_QUERY_URL);
     
     // assert query invocation
     verify(mockedQuery).processDefinitionCategory(queryParameters.get("category"));

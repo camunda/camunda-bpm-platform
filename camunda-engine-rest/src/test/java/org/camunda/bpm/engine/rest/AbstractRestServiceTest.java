@@ -39,16 +39,14 @@ public abstract class AbstractRestServiceTest {
   private static void setupServer() {
     JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
     sf.setResourceClasses(ProcessDefinitionServiceImpl.class);
+    
     List<Object> providers = new ArrayList<Object>();
-//    providers.add(JSONProvider.class);
-//    providers.add(InvalidRequestExceptionMapper.class);
     providers.add(new JSONProvider());
     providers.add(new ProcessDefinitionQueryDtoReader());
-//    sf.setProvider(JSONProvider.class);
     sf.setProviders(providers);
+    
     sf.setAddress(SERVER_ADDRESS);
     server = sf.create();
-    
   }
 
   private static void loadProcessEngineService() {
