@@ -18,6 +18,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
@@ -26,6 +27,8 @@ public class ProcessDefinitionServiceTest extends AbstractRestServiceTest {
   
   private static final String EXAMPLE_DEFINITION_KEY = "aKey";
   private static final String EXAMPLE_DEFINITION_ID = "anId";
+  
+  private ProcessDefinitionQuery mockedQuery;
   
   private ProcessDefinitionQuery setUpMockDefinitionQuery(List<ProcessDefinition> mockedDefinitions) {
     ProcessDefinitionQuery sampleDefinitionsQuery = mock(ProcessDefinitionQuery.class);
@@ -42,11 +45,16 @@ public class ProcessDefinitionServiceTest extends AbstractRestServiceTest {
     return mockDefinition;
   }
   
-  @Test
-  public void testProcessDefinitionRetrieval() throws JSONException {
+  @Before
+  public void injectMockedQuery() {
     List<ProcessDefinition> definitions = new ArrayList<ProcessDefinition>();
     definitions.add(createMockDefinition(EXAMPLE_DEFINITION_ID, EXAMPLE_DEFINITION_KEY));
-    ProcessDefinitionQuery mockedQuery = setUpMockDefinitionQuery(definitions);
+    mockedQuery = setUpMockDefinitionQuery(definitions);
+  }
+  
+  @Test
+  public void testProcessDefinitionRetrieval() throws JSONException {
+    
     InOrder inOrder = Mockito.inOrder(mockedQuery);
     
     String queryKey = "Key";
@@ -80,10 +88,6 @@ public class ProcessDefinitionServiceTest extends AbstractRestServiceTest {
   
   @Test
   public void testEmptyQuery() throws JSONException {
-    List<ProcessDefinition> definitions = new ArrayList<ProcessDefinition>();
-    definitions.add(createMockDefinition(EXAMPLE_DEFINITION_ID, EXAMPLE_DEFINITION_KEY));
-    setUpMockDefinitionQuery(definitions);
-    
     String queryKey = "";
     WebClient client = WebClient.create(SERVER_ADDRESS);
     client.accept(MediaType.APPLICATION_JSON);
@@ -99,10 +103,6 @@ public class ProcessDefinitionServiceTest extends AbstractRestServiceTest {
    */
   @Test
   public void testNonExistingQueryParameters() {
-    List<ProcessDefinition> definitions = new ArrayList<ProcessDefinition>();
-    definitions.add(createMockDefinition(EXAMPLE_DEFINITION_ID, EXAMPLE_DEFINITION_KEY));
-    setUpMockDefinitionQuery(definitions);
-    
     WebClient client = WebClient.create(SERVER_ADDRESS);
     client.accept(MediaType.APPLICATION_JSON);
     client.path("/process-definition/query");
@@ -113,7 +113,6 @@ public class ProcessDefinitionServiceTest extends AbstractRestServiceTest {
   
   @Test
   public void testAdditionalParameters() {
-    
   }
   
   
