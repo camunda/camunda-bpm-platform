@@ -1,6 +1,6 @@
 package org.camunda.bpm.engine.rest.exception;
 
-public class InvalidRequestException extends RestException {
+public class InvalidRequestException extends RuntimeException {
 
   private static final long serialVersionUID = 1L;
 

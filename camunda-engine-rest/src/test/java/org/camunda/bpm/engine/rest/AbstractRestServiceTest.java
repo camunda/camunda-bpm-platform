@@ -10,7 +10,7 @@ import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.provider.json.JSONProvider;
 import org.camunda.bpm.engine.rest.impl.ProcessDefinitionServiceImpl;
-import org.camunda.bpm.engine.rest.mapper.InvalidRequestExceptionMapper;
+import org.camunda.bpm.engine.rest.mapper.ProcessDefinitionQueryDtoReader;
 import org.camunda.bpm.engine.rest.spi.ProcessEngineProvider;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -43,7 +43,7 @@ public abstract class AbstractRestServiceTest {
 //    providers.add(JSONProvider.class);
 //    providers.add(InvalidRequestExceptionMapper.class);
     providers.add(new JSONProvider());
-    providers.add(new InvalidRequestExceptionMapper());
+    providers.add(new ProcessDefinitionQueryDtoReader());
 //    sf.setProvider(JSONProvider.class);
     sf.setProviders(providers);
     sf.setAddress(SERVER_ADDRESS);
