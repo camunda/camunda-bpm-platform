@@ -59,6 +59,13 @@
 <!-- 		  <version>20090211</version> -->
 		  <scope>test</scope>
 		</dependency>
+		
+		<dependency>
+		  <groupId>com.jayway.restassured</groupId>
+		  <artifactId>rest-assured</artifactId>
+		  <version>1.7.2</version>
+		  <scope>test</scope>
+		</dependency>
 
     
     <dependency>

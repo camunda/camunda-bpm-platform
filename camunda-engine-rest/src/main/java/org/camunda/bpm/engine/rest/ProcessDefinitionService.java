@@ -16,5 +16,5 @@ public interface ProcessDefinitionService {
 
 	@GET
 	@Path("/query")
-	List<ProcessDefinitionDto> getProcessDefinitions(@QueryParam("key") String processDefinitionKeyFragment);
+	List<ProcessDefinitionDto> getProcessDefinitions(@QueryParam("keyLike") String processDefinitionKeyFragment);
 }
