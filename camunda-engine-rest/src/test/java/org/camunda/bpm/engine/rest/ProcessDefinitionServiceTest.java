@@ -2,10 +2,16 @@ package org.camunda.bpm.engine.rest;
 
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import static com.jayway.restassured.RestAssured.given;
+
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -22,6 +28,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
+
+import com.jayway.restassured.specification.RequestSpecification;
 
 public class ProcessDefinitionServiceTest extends AbstractRestServiceTest {
   
@@ -65,7 +73,7 @@ public class ProcessDefinitionServiceTest extends AbstractRestServiceTest {
     InOrder inOrder = Mockito.inOrder(mockedQuery);
     
     String queryKey = "Key";
-    client.query("key", queryKey);
+    client.query("keyLike", queryKey);
     
     String content = client.get(String.class);
 
@@ -93,14 +101,14 @@ public class ProcessDefinitionServiceTest extends AbstractRestServiceTest {
   @Test
   public void testEmptyQuery() throws JSONException {
     String queryKey = "";
-    client.query("key", queryKey);
+    client.query("keyLike", queryKey);
     
     Response response = client.get();
     Assert.assertEquals("Querying with an empty query string should be valid.", Status.OK.getStatusCode(), response.getStatus());
   }
   
   /**
-   * Test the behavior when not setting the "pid" parameter at all.
+   * Test the behavior when not setting the "keyLike" parameter at all.
    */
   @Test
   public void testNonExistingQueryParameters() {
@@ -110,6 +118,53 @@ public class ProcessDefinitionServiceTest extends AbstractRestServiceTest {
   
   @Test
   public void testAdditionalParameters() {
+
+    Map<String, String> queryParameters = getCompleteQueryParameters();
+    
+    RequestSpecification spec = given();
+    for (Entry<String, String> queryParam : queryParameters.entrySet()) {
+      spec.param(queryParam.getKey(), queryParam.getValue());
+    }
+    
+    client.get();
+    
+    // assert query invocation
+    verify(mockedQuery).processDefinitionCategory(queryParameters.get("category"));
+    verify(mockedQuery).processDefinitionCategoryLike(queryParameters.get("categoryLike"));
+    verify(mockedQuery).processDefinitionName(queryParameters.get("name"));
+    verify(mockedQuery).processDefinitionNameLike(queryParameters.get("namelike"));
+    verify(mockedQuery).deploymentId(queryParameters.get("deploymentId"));
+    verify(mockedQuery).processDefinitionKey(queryParameters.get("key"));
+    verify(mockedQuery).processDefinitionKeyLike(queryParameters.get("keyLike"));
+    verify(mockedQuery).processDefinitionVersion(Integer.parseInt(queryParameters.get("ver")));
+    verify(mockedQuery).latestVersion();
+    verify(mockedQuery).processDefinitionResourceName(queryParameters.get("resourceName"));
+    verify(mockedQuery).processDefinitionResourceNameLike(queryParameters.get("resourceNameLike"));
+    verify(mockedQuery).startableByUser(queryParameters.get("startableBy"));
+    verify(mockedQuery).active();
+    verify(mockedQuery).suspended();
+    verify(mockedQuery).list();
+  }
+  
+  private Map<String, String> getCompleteQueryParameters() {
+    Map<String, String> parameters = new HashMap<String, String>();
+    
+    parameters.put("category", "cat");
+    parameters.put("categoryLike", "catlike");
+    parameters.put("name", "name");
+    parameters.put("nameLike", "namelike");
+    parameters.put("deploymentId", "depId");
+    parameters.put("key", "key");
+    parameters.put("keyLike", "keylike");
+    parameters.put("ver", "ver");
+    parameters.put("latest", "true");
+    parameters.put("resourceName", "res");
+    parameters.put("resourceNameLike", "resLike");
+    parameters.put("startableBy", "kermit");
+    parameters.put("suspended", "true");
+    parameters.put("active", "true");
+    
+    return parameters;
   }
   
   
