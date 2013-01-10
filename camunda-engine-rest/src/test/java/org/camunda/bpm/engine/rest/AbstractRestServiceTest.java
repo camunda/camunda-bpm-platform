@@ -1,6 +1,8 @@
 package org.camunda.bpm.engine.rest;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.ServiceLoader;
 
 import org.activiti.engine.ProcessEngine;
@@ -8,6 +10,7 @@ import org.apache.cxf.endpoint.Server;
 import org.apache.cxf.jaxrs.JAXRSServerFactoryBean;
 import org.apache.cxf.jaxrs.provider.json.JSONProvider;
 import org.camunda.bpm.engine.rest.impl.ProcessDefinitionServiceImpl;
+import org.camunda.bpm.engine.rest.mapper.InvalidRequestExceptionMapper;
 import org.camunda.bpm.engine.rest.spi.ProcessEngineProvider;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
@@ -36,7 +39,13 @@ public abstract class AbstractRestServiceTest {
   private static void setupServer() {
     JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
     sf.setResourceClasses(ProcessDefinitionServiceImpl.class);
-    sf.setProvider(JSONProvider.class);
+    List<Object> providers = new ArrayList<Object>();
+//    providers.add(JSONProvider.class);
+//    providers.add(InvalidRequestExceptionMapper.class);
+    providers.add(new JSONProvider());
+    providers.add(new InvalidRequestExceptionMapper());
+//    sf.setProvider(JSONProvider.class);
+    sf.setProviders(providers);
     sf.setAddress(SERVER_ADDRESS);
     server = sf.create();
     
@@ -51,4 +60,5 @@ public abstract class AbstractRestServiceTest {
       processEngine = provider.getProcessEngine();      
     }
   }
+  
 }

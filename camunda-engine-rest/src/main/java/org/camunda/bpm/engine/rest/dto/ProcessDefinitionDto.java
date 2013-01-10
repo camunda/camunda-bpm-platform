@@ -5,7 +5,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import org.activiti.engine.repository.ProcessDefinition;
 
-@XmlRootElement(name = "definition")
+@XmlRootElement(name = "data")
 public class ProcessDefinitionDto {
 
   @XmlElement

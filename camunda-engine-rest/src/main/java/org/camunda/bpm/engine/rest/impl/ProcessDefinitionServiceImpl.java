@@ -8,6 +8,7 @@ import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.repository.ProcessDefinitionQuery;
 import org.camunda.bpm.engine.rest.ProcessDefinitionService;
 import org.camunda.bpm.engine.rest.dto.ProcessDefinitionDto;
+import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 
 public class ProcessDefinitionServiceImpl extends AbstractEngineService implements ProcessDefinitionService {
 
@@ -16,11 +17,15 @@ public class ProcessDefinitionServiceImpl extends AbstractEngineService implemen
   }
   
 	@Override
-	public List<ProcessDefinitionDto> getProcessDefinitions(String processDefinitionIdFragment) {
+	public List<ProcessDefinitionDto> getProcessDefinitions(String processDefinitionKeyFragment) {
+	  if (processDefinitionKeyFragment == null) {
+	    throw new InvalidRequestException("The query misses a processDefinitionKey.");
+	  }
+	  
 	  List<ProcessDefinitionDto> definitions = new ArrayList<ProcessDefinitionDto>();
 	  
 	  RepositoryService repoService = processEngine.getRepositoryService();
-	  ProcessDefinitionQuery query = repoService.createProcessDefinitionQuery().processDefinitionKeyLike(processDefinitionIdFragment);
+    ProcessDefinitionQuery query = repoService.createProcessDefinitionQuery().processDefinitionKeyLike(processDefinitionKeyFragment);
 	  
 	  List<ProcessDefinition> matchingDefinitions = query.list();
 	  
