@@ -28,7 +28,10 @@ public class ProcessDefinitionServiceTest extends AbstractRestServiceTest {
   private static final String EXAMPLE_DEFINITION_KEY = "aKey";
   private static final String EXAMPLE_DEFINITION_ID = "anId";
   
+  private static final String PROCESS_DEFINITION_QUERY_URL = "/process-definition/query";
+  
   private ProcessDefinitionQuery mockedQuery;
+  private WebClient client;
   
   private ProcessDefinitionQuery setUpMockDefinitionQuery(List<ProcessDefinition> mockedDefinitions) {
     ProcessDefinitionQuery sampleDefinitionsQuery = mock(ProcessDefinitionQuery.class);
@@ -50,6 +53,10 @@ public class ProcessDefinitionServiceTest extends AbstractRestServiceTest {
     List<ProcessDefinition> definitions = new ArrayList<ProcessDefinition>();
     definitions.add(createMockDefinition(EXAMPLE_DEFINITION_ID, EXAMPLE_DEFINITION_KEY));
     mockedQuery = setUpMockDefinitionQuery(definitions);
+    
+    client = WebClient.create(SERVER_ADDRESS);
+    client.accept(MediaType.APPLICATION_JSON);
+    client.path(PROCESS_DEFINITION_QUERY_URL);
   }
   
   @Test
@@ -58,9 +65,6 @@ public class ProcessDefinitionServiceTest extends AbstractRestServiceTest {
     InOrder inOrder = Mockito.inOrder(mockedQuery);
     
     String queryKey = "Key";
-    WebClient client = WebClient.create(SERVER_ADDRESS);
-    client.accept(MediaType.APPLICATION_JSON);
-    client.path("/process-definition/query");
     client.query("key", queryKey);
     
     String content = client.get(String.class);
@@ -89,9 +93,6 @@ public class ProcessDefinitionServiceTest extends AbstractRestServiceTest {
   @Test
   public void testEmptyQuery() throws JSONException {
     String queryKey = "";
-    WebClient client = WebClient.create(SERVER_ADDRESS);
-    client.accept(MediaType.APPLICATION_JSON);
-    client.path("/process-definition/query");
     client.query("key", queryKey);
     
     Response response = client.get();
@@ -103,10 +104,6 @@ public class ProcessDefinitionServiceTest extends AbstractRestServiceTest {
    */
   @Test
   public void testNonExistingQueryParameters() {
-    WebClient client = WebClient.create(SERVER_ADDRESS);
-    client.accept(MediaType.APPLICATION_JSON);
-    client.path("/process-definition/query");
-    
     Response response = client.get();
     Assert.assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
   }
