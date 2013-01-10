@@ -53,7 +53,7 @@ public class ProcessDefinitionServiceTest extends AbstractRestServiceTest {
     WebClient client = WebClient.create(SERVER_ADDRESS);
     client.accept(MediaType.APPLICATION_JSON);
     client.path("/process-definition/query");
-    client.query("pid", queryKey);
+    client.query("key", queryKey);
     
     String content = client.get(String.class);
 
@@ -88,7 +88,7 @@ public class ProcessDefinitionServiceTest extends AbstractRestServiceTest {
     WebClient client = WebClient.create(SERVER_ADDRESS);
     client.accept(MediaType.APPLICATION_JSON);
     client.path("/process-definition/query");
-    client.query("pid", queryKey);
+    client.query("key", queryKey);
     
     Response response = client.get();
     Assert.assertEquals("Querying with an empty query string should be valid.", Status.OK.getStatusCode(), response.getStatus());
@@ -109,6 +109,11 @@ public class ProcessDefinitionServiceTest extends AbstractRestServiceTest {
     
     Response response = client.get();
     Assert.assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
+  }
+  
+  @Test
+  public void testAdditionalParameters() {
+    
   }
   
   
