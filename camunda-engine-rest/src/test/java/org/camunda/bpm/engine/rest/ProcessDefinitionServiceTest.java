@@ -107,15 +107,6 @@ public class ProcessDefinitionServiceTest extends AbstractRestServiceTest {
     Assert.assertEquals("Querying with an empty query string should be valid.", Status.OK.getStatusCode(), response.getStatus());
   }
   
-  /**
-   * Test the behavior when not setting the "keyLike" parameter at all.
-   */
-  @Test
-  public void testNonExistingQueryParameters() {
-    Response response = client.get();
-    Assert.assertEquals(Status.BAD_REQUEST.getStatusCode(), response.getStatus());
-  }
-  
   @Test
   public void testAdditionalParameters() {
 
@@ -123,16 +114,16 @@ public class ProcessDefinitionServiceTest extends AbstractRestServiceTest {
     
     RequestSpecification spec = given();
     for (Entry<String, String> queryParam : queryParameters.entrySet()) {
-      spec.param(queryParam.getKey(), queryParam.getValue());
+      spec.queryParam(queryParam.getKey(), queryParam.getValue());
     }
     
-    client.get();
+    spec.expect().statusCode(Status.OK.getStatusCode()).get("/process-definition/query");
     
     // assert query invocation
     verify(mockedQuery).processDefinitionCategory(queryParameters.get("category"));
     verify(mockedQuery).processDefinitionCategoryLike(queryParameters.get("categoryLike"));
     verify(mockedQuery).processDefinitionName(queryParameters.get("name"));
-    verify(mockedQuery).processDefinitionNameLike(queryParameters.get("namelike"));
+    verify(mockedQuery).processDefinitionNameLike(queryParameters.get("nameLike"));
     verify(mockedQuery).deploymentId(queryParameters.get("deploymentId"));
     verify(mockedQuery).processDefinitionKey(queryParameters.get("key"));
     verify(mockedQuery).processDefinitionKeyLike(queryParameters.get("keyLike"));
@@ -156,7 +147,7 @@ public class ProcessDefinitionServiceTest extends AbstractRestServiceTest {
     parameters.put("deploymentId", "depId");
     parameters.put("key", "key");
     parameters.put("keyLike", "keylike");
-    parameters.put("ver", "ver");
+    parameters.put("ver", "0");
     parameters.put("latest", "true");
     parameters.put("resourceName", "res");
     parameters.put("resourceNameLike", "resLike");
