@@ -9,6 +9,8 @@
     <module name="javax.transaction.api"/>
     <module name="javax.enterprise.api" />
     <module name="javax.inject.api" />
+    <module name="javax.ejb.api" />
+    <module name="javax.xml.bind.api" /> 
     
     <module name="org.jboss.vfs" />
   

@@ -6,7 +6,7 @@ import javax.inject.Inject;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
-import com.camunda.fox.client.impl.ProcessArchiveSupport;
+import com.camunda.fox.client.impl.ProcessApplication;
 import com.camunda.fox.platform.spi.ProcessArchive;
 
 /**
@@ -19,7 +19,7 @@ import com.camunda.fox.platform.spi.ProcessArchive;
 public class ProcessArchiveServletContextListener implements ServletContextListener {
 
   @Inject
-  private ProcessArchiveSupport processArchiveSupport;
+  private ProcessApplication processArchiveSupport;
 
   public void contextInitialized(ServletContextEvent contextEvent) {
 

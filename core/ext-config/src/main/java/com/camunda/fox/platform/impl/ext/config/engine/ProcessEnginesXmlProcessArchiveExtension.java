@@ -1,7 +1,7 @@
 package com.camunda.fox.platform.impl.ext.config.engine;
 
+import com.camunda.fox.client.impl.ProcessApplication;
 import com.camunda.fox.client.impl.ProcessArchiveExtensionAdapter;
-import com.camunda.fox.client.impl.ProcessArchiveSupport;
 import com.camunda.fox.platform.impl.ext.config.engine.spi.ProcessEnginesXmlSupport;
 import com.camunda.fox.platform.impl.ext.util.ServiceLoaderUtil;
 
@@ -16,12 +16,12 @@ public class ProcessEnginesXmlProcessArchiveExtension extends ProcessArchiveExte
 
   protected ProcessEnginesXmlSupport processEnginesXmlSupport;
 
-  public void beforeProcessArchiveStart(ProcessArchiveSupport processArchiveSupport) {
+  public void beforeProcessArchiveStart(ProcessApplication processArchiveSupport) {
     processEnginesXmlSupport = ServiceLoaderUtil.loadService(ProcessEnginesXmlSupport.class, ProcessEnginesXmlSupportImpl.class);
     processEnginesXmlSupport.startProcessEngines(processArchiveSupport.getProcessEngineService());
   }
 
-  public void afterProcessArchiveStop(ProcessArchiveSupport processArchiveSupport) {
+  public void afterProcessArchiveStop(ProcessApplication processArchiveSupport) {
     processEnginesXmlSupport.stopProcessEngines(processArchiveSupport.getProcessEngineService());
   }
 }

@@ -27,6 +27,7 @@ import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
+import org.camunda.bpm.application.ejb.EjbProcessApplication;
 
 import com.camunda.fox.client.ProcessEngineName;
 import com.camunda.fox.platform.FoxPlatformException;
@@ -45,7 +46,7 @@ import com.camunda.fox.platform.api.ProcessEngineService;
  */
 public class NamedActivitiServicesProducer {
   
-  @EJB(lookup=ProcessArchiveSupport.PROCESS_ENGINE_SERVICE_NAME)
+  @EJB(lookup=EjbProcessApplication.PROCESS_ENGINE_SERVICE_NAME)
   private ProcessEngineService processEngineService;
   
   @Produces @ProcessEngineName("") 

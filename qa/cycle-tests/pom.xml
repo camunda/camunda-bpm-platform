@@ -321,12 +321,7 @@
 		  <dependency>
 		    <groupId>com.camunda.fox.engine</groupId>
 		    <artifactId>fox-engine</artifactId>
-		  </dependency>
-		  <dependency>
-		    <groupId>com.camunda.fox.platform</groupId>
-		    <artifactId>fox-platform-jobexecutor-api</artifactId>
-		    <version>${project.version}</version>
-		  </dependency>
+		  </dependency>		  
 		  <dependency>
 		    <groupId>org.mybatis</groupId>
 		    <artifactId>mybatis</artifactId>

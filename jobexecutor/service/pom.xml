@@ -27,12 +27,6 @@
 
     <dependency>
       <groupId>com.camunda.fox.platform</groupId>
-      <artifactId>fox-platform-jobexecutor-api</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>com.camunda.fox.platform</groupId>
       <artifactId>fox-platform-jobexecutor-ra</artifactId>
       <version>${project.version}</version>
       <scope>provided</scope>

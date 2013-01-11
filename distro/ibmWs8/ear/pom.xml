@@ -80,14 +80,7 @@
       <artifactId>fox-engine</artifactId>
       <scope>provided</scope>
       <version>${project.version}</version>
-    </dependency>   
-    <!-- exclude jobexecutor api from ear -->
-    <dependency>
-      <groupId>com.camunda.fox.platform</groupId>
-      <artifactId>fox-platform-jobexecutor-api</artifactId>
-      <version>${project.version}</version>
-      <scope>provided</scope>
-    </dependency>    
+    </dependency>      
     <!-- exclude EJB service from ear-->
     <dependency>
       <groupId>com.camunda.fox.platform</groupId>

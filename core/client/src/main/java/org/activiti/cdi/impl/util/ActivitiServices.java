@@ -29,8 +29,8 @@ import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
+import org.camunda.bpm.application.ejb.EjbProcessApplication;
 
-import com.camunda.fox.client.impl.ProcessArchiveSupport;
 import com.camunda.fox.platform.api.ProcessEngineService;
 
 /**
@@ -46,7 +46,7 @@ import com.camunda.fox.platform.api.ProcessEngineService;
 @Dependent
 public class ActivitiServices {
   
-  @EJB(lookup=ProcessArchiveSupport.PROCESS_ENGINE_SERVICE_NAME)
+  @EJB(lookup=EjbProcessApplication.PROCESS_ENGINE_SERVICE_NAME)
   private ProcessEngineService processEngineService;
   
   public void setProcessEngine(ProcessEngine processEngine) {
