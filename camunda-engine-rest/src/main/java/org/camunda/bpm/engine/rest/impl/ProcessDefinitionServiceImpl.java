@@ -3,12 +3,16 @@ package org.camunda.bpm.engine.rest.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response.Status;
+
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.repository.ProcessDefinitionQuery;
 import org.camunda.bpm.engine.rest.ProcessDefinitionService;
 import org.camunda.bpm.engine.rest.dto.ProcessDefinitionDto;
 import org.camunda.bpm.engine.rest.dto.ProcessDefinitionQueryDto;
+import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 
 public class ProcessDefinitionServiceImpl extends AbstractEngineService implements ProcessDefinitionService {
 
@@ -22,7 +26,13 @@ public class ProcessDefinitionServiceImpl extends AbstractEngineService implemen
 	  List<ProcessDefinitionDto> definitions = new ArrayList<ProcessDefinitionDto>();
 	  
 	  RepositoryService repoService = processEngine.getRepositoryService();
-	  ProcessDefinitionQuery query = queryDto.toQuery(repoService);
+	  
+	  ProcessDefinitionQuery query;
+	  try {
+	     query = queryDto.toQuery(repoService);
+	  } catch (InvalidRequestException e) {
+	    throw new WebApplicationException(Status.BAD_REQUEST.getStatusCode());
+	  }
 	  
 	  List<ProcessDefinition> matchingDefinitions = null;
 	  

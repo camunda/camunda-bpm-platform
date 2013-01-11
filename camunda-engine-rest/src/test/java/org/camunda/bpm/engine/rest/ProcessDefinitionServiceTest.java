@@ -215,6 +215,20 @@ public class ProcessDefinitionServiceTest extends AbstractRestServiceTest {
     executeAndVerifySorting("category", "anInvalidSortOrderOption", Status.BAD_REQUEST);
   }
   
+  @Test
+  public void testSortByParameterOnly() {
+    given().queryParam("sortBy", "category")
+      .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
+      .when().get(PROCESS_DEFINITION_QUERY_URL);
+  }
+  
+  @Test
+  public void testSortOrderParameterOnly() {
+    given().queryParam("sortOrder", "asc")
+      .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
+      .when().get(PROCESS_DEFINITION_QUERY_URL);
+  }
+  
   private void executeAndVerifySorting(String sortBy, String sortOrder, Status expectedStatus) {
     given().queryParam("sortBy", sortBy).queryParam("sortOrder", sortOrder)
       .then().expect().statusCode(expectedStatus.getStatusCode())
@@ -233,7 +247,7 @@ public class ProcessDefinitionServiceTest extends AbstractRestServiceTest {
   }
   
   /**
-   * If parameter "firstResult" is missing, we set it to 0 as default.
+   * If parameter "firstResult" is missing, we expect 0 as default.
    */
   @Test
   public void testMissingFirstResultParameter() {
@@ -246,7 +260,7 @@ public class ProcessDefinitionServiceTest extends AbstractRestServiceTest {
   }
   
   /**
-   * If parameter "maxResults" is missing, we set it to Integer.MAX_VALUE as default.
+   * If parameter "maxResults" is missing, we expect Integer.MAX_VALUE as default.
    */
   @Test
   public void testMissingMaxResultsParameter() {

@@ -256,6 +256,10 @@ public class ProcessDefinitionQueryDto extends AbstractQueryParameterDto {
       query.suspended();
     }
     
+    if (!sortOptionsValid()) {
+      throw new InvalidRequestException("Cannot specify a single sorting parameter.");
+    }
+    
     if (sortBy != null) {
       if (sortBy.equals(SORT_BY_CATEGORY_VALUE)) {
         query.orderByProcessDefinitionCategory();
@@ -281,7 +285,10 @@ public class ProcessDefinitionQueryDto extends AbstractQueryParameterDto {
     }
     
     return query;
-    
+  }
+  
+  private boolean sortOptionsValid() {
+    return (sortBy != null && sortOrder != null) || (sortBy == null && sortOrder == null);
   }
   
   @Override
