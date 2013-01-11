@@ -173,35 +173,40 @@ public class ProcessDefinitionServiceTest extends AbstractRestServiceTest {
 
   @Test
   public void testSortingParameters() {
+    InOrder inOrder = Mockito.inOrder(mockedQuery);
     executeAndVerifySorting("category", "asc", Status.OK);
-    verify(mockedQuery).orderByProcessDefinitionCategory();
-    verify(mockedQuery).asc();
+    inOrder.verify(mockedQuery).orderByProcessDefinitionCategory();
+    inOrder.verify(mockedQuery).asc();
     injectNewMockedQuery();
     
+    inOrder = Mockito.inOrder(mockedQuery);
     executeAndVerifySorting("key", "desc", Status.OK);
-    verify(mockedQuery).orderByProcessDefinitionKey();
-    verify(mockedQuery).desc();
+    inOrder.verify(mockedQuery).orderByProcessDefinitionKey();
+    inOrder.verify(mockedQuery).desc();
     injectNewMockedQuery();
     
+    inOrder = Mockito.inOrder(mockedQuery);
     executeAndVerifySorting("id", "asc", Status.OK);
-    verify(mockedQuery).orderByProcessDefinitionId();
-    verify(mockedQuery).asc();
+    inOrder.verify(mockedQuery).orderByProcessDefinitionId();
+    inOrder.verify(mockedQuery).asc();
     injectNewMockedQuery();
     
+    inOrder = Mockito.inOrder(mockedQuery);
     executeAndVerifySorting("version", "desc", Status.OK);
-    verify(mockedQuery).orderByProcessDefinitionVersion();
-    verify(mockedQuery).desc();
+    inOrder.verify(mockedQuery).orderByProcessDefinitionVersion();
+    inOrder.verify(mockedQuery).desc();
     injectNewMockedQuery();
     
+    inOrder = Mockito.inOrder(mockedQuery);
     executeAndVerifySorting("name", "asc", Status.OK);
-    verify(mockedQuery).orderByProcessDefinitionName();
-    verify(mockedQuery).asc();
+    inOrder.verify(mockedQuery).orderByProcessDefinitionName();
+    inOrder.verify(mockedQuery).asc();
     injectNewMockedQuery();
     
+    inOrder = Mockito.inOrder(mockedQuery);
     executeAndVerifySorting("deploymentId", "desc", Status.OK);
-    verify(mockedQuery).orderByDeploymentId();
-    verify(mockedQuery).desc();
-    injectNewMockedQuery();
+    inOrder.verify(mockedQuery).orderByDeploymentId();
+    inOrder.verify(mockedQuery).desc();
   }
   
   @Test
@@ -214,6 +219,43 @@ public class ProcessDefinitionServiceTest extends AbstractRestServiceTest {
     given().queryParam("sortBy", sortBy).queryParam("sortOrder", sortOrder)
       .then().expect().statusCode(expectedStatus.getStatusCode())
       .when().get(PROCESS_DEFINITION_QUERY_URL);
+  }
+
+  @Test
+  public void testSuccessfulPagination() {
+    int firstResult = 0;
+    int maxResults = 10;
+    given().queryParam("firstResult", firstResult).queryParam("maxResults", maxResults)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .when().get(PROCESS_DEFINITION_QUERY_URL);
+    
+    verify(mockedQuery).listPage(firstResult, maxResults);
+  }
+  
+  /**
+   * If parameter "firstResult" is missing, we set it to 0 as default.
+   */
+  @Test
+  public void testMissingFirstResultParameter() {
+    int maxResults = 10;
+    given().queryParam("maxResults", maxResults)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .when().get(PROCESS_DEFINITION_QUERY_URL);
+    
+    verify(mockedQuery).listPage(0, maxResults);
+  }
+  
+  /**
+   * If parameter "maxResults" is missing, we set it to Integer.MAX_VALUE as default.
+   */
+  @Test
+  public void testMissingMaxResultsParameter() {
+    int firstResult = 10;
+    given().queryParam("firstResult", firstResult)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .when().get(PROCESS_DEFINITION_QUERY_URL);
+    
+    verify(mockedQuery).listPage(firstResult, Integer.MAX_VALUE);
   }
   
 }
