@@ -32,7 +32,7 @@ import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
 
-import com.camunda.fox.client.impl.ProcessArchiveSupport;
+import com.camunda.fox.client.impl.ProcessApplication;
 import com.camunda.fox.platform.spi.ProcessArchive;
 
 @Specializes
@@ -42,7 +42,7 @@ public class TenantAwareActivitiServices extends ActivitiServices {
    private MockPrincipal principal;
    
    @Inject
-   private ProcessArchiveSupport processArchiveSupport;
+   private ProcessApplication processArchiveSupport;
    
    @Specializes @Produces @RequestScoped public ProcessEngine processEngine() { 
      

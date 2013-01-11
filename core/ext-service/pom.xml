@@ -10,12 +10,7 @@
     <version>6.2.0-SNAPSHOT</version>
   </parent>
 
-  <dependencies>
-    <dependency>
-      <groupId>com.camunda.fox.platform</groupId>
-      <artifactId>fox-platform-service</artifactId>
-      <version>${project.version}</version>
-    </dependency>
+  <dependencies>   
 
     <dependency>
       <groupId>org.jboss.spec</groupId>
@@ -50,13 +45,7 @@
       <version>7.1.0.Final</version>
       <scope>provided</scope>
     </dependency>
-
-    <dependency>
-      <groupId>com.camunda.fox.platform</groupId>
-      <artifactId>fox-platform-jobexecutor-api</artifactId>
-      <version>${project.version}</version>
-      <scope>provided</scope>
-    </dependency>
+   
     <dependency>
       <groupId>com.camunda.fox.platform</groupId>
       <artifactId>fox-platform-jobexecutor-core</artifactId>

@@ -28,7 +28,6 @@
     <module name="org.jboss.as.connector" />
         
     <module name="com.camunda.fox.engine.fox-engine" />
-    <module name="com.camunda.fox.platform.fox-platform-jobexecutor-api"/>
     <module name="com.camunda.fox.platform.fox-platform-jobexecutor-core"/>
     
     <module name="org.livetribe.livetribe-jsr223" />  

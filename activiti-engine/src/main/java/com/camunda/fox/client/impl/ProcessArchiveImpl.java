@@ -19,7 +19,6 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.camunda.fox.client.impl.executor.ProcessArchiveContextExecutor;
 import com.camunda.fox.client.impl.schema.ProcessesXml.ProcessArchiveXml;
 import com.camunda.fox.client.impl.util.BpmnResourceLoader;
 import com.camunda.fox.platform.spi.ProcessArchive;
@@ -32,29 +31,18 @@ import com.camunda.fox.platform.spi.ProcessArchiveCallback;
  */
 public class ProcessArchiveImpl implements ProcessArchive {
 
-  protected final ClassLoader classLoader;
-  protected final ProcessArchiveContextExecutor executor;
   protected final ProcessArchiveXml processArchiveXml;
   protected final Map<String, Object> properties;
+  private ProcessApplication processApplication;
     
-  public ProcessArchiveImpl(ProcessArchiveXml processArchiveXml, URL metaFileUrl, ProcessArchiveContextExecutor executor) {
+  public ProcessArchiveImpl(ProcessArchiveXml processArchiveXml, URL metaFileUrl, ProcessApplication processApplication) {
     this.processArchiveXml = processArchiveXml;
-    this.executor = executor;
-    this.classLoader = getClassloader();    
+    this.processApplication = processApplication; 
     properties = new HashMap<String, Object>();
     properties.put(PROP_IS_DELETE_UPON_UNDEPLOY, processArchiveXml.configuration.undeployment.delete);
     properties.put(PROP_IS_SCAN_FOR_PROCESS_DEFINITIONS, true);
     properties.put(PROP_META_FILE_URL, metaFileUrl);
     properties.put(PROP_RESOURCE_ROOT_PATH, processArchiveXml.configuration.resourceRootPath);
-  }
-
-  protected ClassLoader getClassloader() {
-    ClassLoader tcl = Thread.currentThread().getContextClassLoader();
-    if(tcl != null) {
-      return tcl;
-    } else {
-      return getClass().getClassLoader();
-    }
   }
   
   public String getName() {
@@ -71,11 +59,11 @@ public class ProcessArchiveImpl implements ProcessArchive {
   }
    
   public ClassLoader getClassLoader() {
-    return classLoader;
+    return processApplication.getProcessApplicationClassloader();
   }
 
   public <T> T executeWithinContext(ProcessArchiveCallback<T> callback) throws Exception {
-    return executor.executeWithinContext(callback);
+    return processApplication.getReference().executeWithinContext(callback);
  }
 
   public String getProcessEngineName() {

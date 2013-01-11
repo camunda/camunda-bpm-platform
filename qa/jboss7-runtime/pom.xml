@@ -95,23 +95,6 @@
                   <fileset dir="src/main/standalone/configuration" />
                 </copy>
                 
-                <!-- remove activiti test classes from engine, made it maven 2 and 3 compatible -->
-                <unzip dest="target/fox-engine">
-                  <fileset dir="target/jboss-as-${version.jboss.as}/modules/com/camunda/fox/engine/fox-engine/main/">
-                    <include name="*.jar" />
-                  </fileset>
-                  <patternset>
-                    <exclude name="org/activiti/engine/impl/test/**" />
-                  </patternset>
-                </unzip>
-				
-                <delete>
-                  <fileset dir="target/jboss-as-${version.jboss.as}/modules/com/camunda/fox/engine/fox-engine/main/">
-                    <include name="*.jar" />
-                  </fileset>
-                </delete>
-                
-                <zip destfile="target/jboss-as-${version.jboss.as}/modules/com/camunda/fox/engine/fox-engine/main/fox-engine-${project.version}.jar" basedir="target/fox-engine" />
               </target>
             </configuration>
           </execution>

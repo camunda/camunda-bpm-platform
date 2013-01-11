@@ -10,13 +10,7 @@
     <version>6.2.0-SNAPSHOT</version>
   </parent>
 
-  <dependencies>  
-    <dependency>
-      <groupId>com.camunda.fox.platform</groupId>
-      <artifactId>fox-platform-jobexecutor-api</artifactId>
-      <version>${project.version}</version>
-      <scope>provided</scope>
-    </dependency>
+  <dependencies>    
     <dependency>
       <groupId>com.camunda.fox.engine</groupId>
       <artifactId>fox-engine</artifactId>

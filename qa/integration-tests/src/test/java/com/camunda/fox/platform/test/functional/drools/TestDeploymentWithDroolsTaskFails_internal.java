@@ -18,7 +18,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import com.camunda.fox.client.impl.ProcessArchiveImpl;
-import com.camunda.fox.client.impl.executor.ProcessArchiveContextExecutor;
+import com.camunda.fox.client.impl.ProcessArchiveSupport;
 import com.camunda.fox.client.impl.schema.ProcessesXml.ProcessArchiveXml;
 import com.camunda.fox.platform.spi.ProcessArchive;
 import com.camunda.fox.platform.test.util.AbstractFoxPlatformIntegrationTest;
@@ -48,7 +48,7 @@ public class TestDeploymentWithDroolsTaskFails_internal extends AbstractFoxPlatf
   }
   
   @Inject
-  private ProcessArchiveContextExecutor executor;
+  private ProcessArchiveSupport processApplication;
   
   @Test
   public void testXmlInvalid() {
@@ -62,7 +62,7 @@ public class TestDeploymentWithDroolsTaskFails_internal extends AbstractFoxPlatf
     final byte[] process = IoUtil.readInputStream(resourceAsStream, resourceName);
     IoUtil.closeSilently(resourceAsStream);
 
-    ProcessArchiveImpl pa = new ProcessArchiveImpl(processArchiveXml, null, executor) {
+    ProcessArchiveImpl pa = new ProcessArchiveImpl(processArchiveXml, null, processApplication) {
       public Map<String, byte[]> getProcessResources() {
         HashMap<String, byte[]> map = new HashMap<String, byte[]>();
         map.put(resourceName, process);

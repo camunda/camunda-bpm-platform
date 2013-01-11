@@ -44,7 +44,18 @@ import com.camunda.fox.platform.FoxPlatformException;
 public class DefaultProcessesXmlParser implements ProcessesXmlParser {
   
   private static Logger log = Logger.getLogger(DefaultProcessesXmlParser.class.getName());
+  private ClassLoader processApplicationClassloader;
   
+  /**
+   * @param processApplication
+   */
+  public DefaultProcessesXmlParser(ClassLoader processApplicationClassloader) {
+    this.processApplicationClassloader = processApplicationClassloader;
+  }
+  
+  public DefaultProcessesXmlParser() {
+  }
+
   public List<ProcessesXml> parseProcessesXml(String processesXmlLocation) {
 
     List<ProcessesXml> processesXmls = new ArrayList<ProcessesXml>();
@@ -150,9 +161,8 @@ public class DefaultProcessesXmlParser implements ProcessesXmlParser {
   }
 
   protected ClassLoader getClassloader() {
-    ClassLoader tcl = Thread.currentThread().getContextClassLoader();
-    if(tcl != null) {
-      return tcl;
+    if(processApplicationClassloader != null) {
+      return processApplicationClassloader;
     } else {
       return getClass().getClassLoader();
     }
