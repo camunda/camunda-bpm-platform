@@ -1,13 +1,13 @@
 package org.camunda.bpm.engine.rest;
 
-import static com.jayway.restassured.RestAssured.given;
 import static com.jayway.restassured.RestAssured.expect;
+import static com.jayway.restassured.RestAssured.given;
 import static com.jayway.restassured.path.json.JsonPath.from;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -53,7 +53,7 @@ public class ProcessDefinitionServiceTest extends AbstractRestServiceTest {
   }
   
   @Before
-  public void injectMockedQuery() {
+  public void injectNewMockedQuery() {
     List<ProcessDefinition> definitions = new ArrayList<ProcessDefinition>();
     definitions.add(createMockDefinition(EXAMPLE_DEFINITION_ID, EXAMPLE_DEFINITION_KEY));
     mockedQuery = setUpMockDefinitionQuery(definitions);
@@ -170,5 +170,44 @@ public class ProcessDefinitionServiceTest extends AbstractRestServiceTest {
     return parameters;
   }
   
+
+  @Test
+  public void testSortingParameters() {
+    executeAndVerifySorting("category", "asc");
+    verify(mockedQuery).orderByProcessDefinitionCategory();
+    verify(mockedQuery).asc();
+    injectNewMockedQuery();
+    
+    executeAndVerifySorting("key", "desc");
+    verify(mockedQuery).orderByProcessDefinitionKey();
+    verify(mockedQuery).desc();
+    injectNewMockedQuery();
+    
+    executeAndVerifySorting("id", "asc");
+    verify(mockedQuery).orderByProcessDefinitionId();
+    verify(mockedQuery).asc();
+    injectNewMockedQuery();
+    
+    executeAndVerifySorting("version", "desc");
+    verify(mockedQuery).orderByProcessDefinitionVersion();
+    verify(mockedQuery).desc();
+    injectNewMockedQuery();
+    
+    executeAndVerifySorting("name", "asc");
+    verify(mockedQuery).orderByProcessDefinitionName();
+    verify(mockedQuery).asc();
+    injectNewMockedQuery();
+    
+    executeAndVerifySorting("deploymentId", "desc");
+    verify(mockedQuery).orderByDeploymentId();
+    verify(mockedQuery).desc();
+    injectNewMockedQuery();
+  }
+  
+  private void executeAndVerifySorting(String sortBy, String sortOrder) {
+    given().queryParam("sortBy", sortBy).queryParam("sortOrder", sortOrder)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .when().get(PROCESS_DEFINITION_QUERY_URL);
+  }
   
 }
