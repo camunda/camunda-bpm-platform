@@ -6,6 +6,7 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -86,6 +87,34 @@ public class ProcessDefinitionServiceTest extends AbstractRestServiceTest {
     String queryKey = "";
     Response response = given().queryParam("keyLike", queryKey).get(PROCESS_DEFINITION_QUERY_URL);
     Assert.assertEquals("Querying with an empty query string should be valid.", Status.OK.getStatusCode(), response.getStatusCode());
+  }
+  
+  @Test
+  public void testNoParametersQuery() {
+    given().expect().statusCode(Status.OK.getStatusCode()).get(PROCESS_DEFINITION_QUERY_URL);
+    
+    verify(mockedQuery).list();
+    verifyNoMoreInteractions(mockedQuery);
+  }
+  
+  @Test
+  public void testInvalidNumericParameter() {
+    String anInvalidIntegerQueryParam = "aString";
+    given().queryParam("ver", anInvalidIntegerQueryParam)
+      .expect().statusCode(Status.BAD_REQUEST.getStatusCode())
+      .get(PROCESS_DEFINITION_QUERY_URL);
+  }
+  
+  /**
+   * We assume that boolean query parameters that are not "true"
+   * or "false" are evaluated to "false" and don't cause a 400 error.
+   */
+  @Test
+  public void testInvalidBooleanParameter() {
+    String anInvalidBooleanQueryParam = "neitherTrueNorFalse";
+    given().queryParam("active", anInvalidBooleanQueryParam)
+      .expect().statusCode(Status.OK.getStatusCode())
+      .get(PROCESS_DEFINITION_QUERY_URL);
   }
   
   @Test
