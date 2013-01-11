@@ -1,11 +1,13 @@
 package org.camunda.bpm.engine.rest;
 
 import static com.jayway.restassured.RestAssured.given;
+import static com.jayway.restassured.RestAssured.expect;
 import static com.jayway.restassured.path.json.JsonPath.from;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -63,8 +65,8 @@ public class ProcessDefinitionServiceTest extends AbstractRestServiceTest {
     
     String queryKey = "Key";
     Response response = given().queryParam("keyLike", queryKey)
-        .expect().statusCode(Status.OK.getStatusCode())
-        .get(PROCESS_DEFINITION_QUERY_URL);
+        .then().expect().statusCode(Status.OK.getStatusCode())
+        .when().get(PROCESS_DEFINITION_QUERY_URL);
     
     // assert query invocation
     inOrder.verify(mockedQuery).processDefinitionKeyLike(queryKey);
@@ -84,8 +86,37 @@ public class ProcessDefinitionServiceTest extends AbstractRestServiceTest {
   @Test
   public void testEmptyQuery() {
     String queryKey = "";
-    Response response = given().queryParam("keyLike", queryKey).get(PROCESS_DEFINITION_QUERY_URL);
-    Assert.assertEquals("Querying with an empty query string should be valid.", Status.OK.getStatusCode(), response.getStatusCode());
+    given().queryParam("keyLike", queryKey)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .when().get(PROCESS_DEFINITION_QUERY_URL);
+  }
+  
+  @Test
+  public void testNoParametersQuery() {
+    expect().statusCode(Status.OK.getStatusCode()).when().get(PROCESS_DEFINITION_QUERY_URL);
+    
+    verify(mockedQuery).list();
+    verifyNoMoreInteractions(mockedQuery);
+  }
+  
+  @Test
+  public void testInvalidNumericParameter() {
+    String anInvalidIntegerQueryParam = "aString";
+    given().queryParam("ver", anInvalidIntegerQueryParam)
+      .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
+      .when().get(PROCESS_DEFINITION_QUERY_URL);
+  }
+  
+  /**
+   * We assume that boolean query parameters that are not "true"
+   * or "false" are evaluated to "false" and don't cause a 400 error.
+   */
+  @Test
+  public void testInvalidBooleanParameter() {
+    String anInvalidBooleanQueryParam = "neitherTrueNorFalse";
+    given().queryParam("active", anInvalidBooleanQueryParam)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .when().get(PROCESS_DEFINITION_QUERY_URL);
   }
   
   @Test
@@ -98,7 +129,7 @@ public class ProcessDefinitionServiceTest extends AbstractRestServiceTest {
       spec.queryParam(queryParam.getKey(), queryParam.getValue());
     }
     
-    spec.expect().statusCode(Status.OK.getStatusCode()).get(PROCESS_DEFINITION_QUERY_URL);
+    spec.expect().statusCode(Status.OK.getStatusCode()).when().get(PROCESS_DEFINITION_QUERY_URL);
     
     // assert query invocation
     verify(mockedQuery).processDefinitionCategory(queryParameters.get("category"));
