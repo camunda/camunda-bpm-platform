@@ -173,40 +173,46 @@ public class ProcessDefinitionServiceTest extends AbstractRestServiceTest {
 
   @Test
   public void testSortingParameters() {
-    executeAndVerifySorting("category", "asc");
+    executeAndVerifySorting("category", "asc", Status.OK);
     verify(mockedQuery).orderByProcessDefinitionCategory();
     verify(mockedQuery).asc();
     injectNewMockedQuery();
     
-    executeAndVerifySorting("key", "desc");
+    executeAndVerifySorting("key", "desc", Status.OK);
     verify(mockedQuery).orderByProcessDefinitionKey();
     verify(mockedQuery).desc();
     injectNewMockedQuery();
     
-    executeAndVerifySorting("id", "asc");
+    executeAndVerifySorting("id", "asc", Status.OK);
     verify(mockedQuery).orderByProcessDefinitionId();
     verify(mockedQuery).asc();
     injectNewMockedQuery();
     
-    executeAndVerifySorting("version", "desc");
+    executeAndVerifySorting("version", "desc", Status.OK);
     verify(mockedQuery).orderByProcessDefinitionVersion();
     verify(mockedQuery).desc();
     injectNewMockedQuery();
     
-    executeAndVerifySorting("name", "asc");
+    executeAndVerifySorting("name", "asc", Status.OK);
     verify(mockedQuery).orderByProcessDefinitionName();
     verify(mockedQuery).asc();
     injectNewMockedQuery();
     
-    executeAndVerifySorting("deploymentId", "desc");
+    executeAndVerifySorting("deploymentId", "desc", Status.OK);
     verify(mockedQuery).orderByDeploymentId();
     verify(mockedQuery).desc();
     injectNewMockedQuery();
   }
   
-  private void executeAndVerifySorting(String sortBy, String sortOrder) {
+  @Test
+  public void testInvalidSortingOptions() {
+    executeAndVerifySorting("anInvalidSortByOption", "asc", Status.BAD_REQUEST);
+    executeAndVerifySorting("category", "anInvalidSortOrderOption", Status.BAD_REQUEST);
+  }
+  
+  private void executeAndVerifySorting(String sortBy, String sortOrder, Status expectedStatus) {
     given().queryParam("sortBy", sortBy).queryParam("sortOrder", sortOrder)
-      .then().expect().statusCode(Status.OK.getStatusCode())
+      .then().expect().statusCode(expectedStatus.getStatusCode())
       .when().get(PROCESS_DEFINITION_QUERY_URL);
   }
   

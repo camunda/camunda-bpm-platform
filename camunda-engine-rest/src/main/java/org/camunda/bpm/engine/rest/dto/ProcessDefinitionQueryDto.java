@@ -1,6 +1,8 @@
 package org.camunda.bpm.engine.rest.dto;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.repository.ProcessDefinitionQuery;
@@ -9,6 +11,34 @@ import org.camunda.bpm.engine.rest.exception.RestException;
 
 public class ProcessDefinitionQueryDto extends AbstractQueryParameterDto {
 
+  private static final String SORT_ORDER_ASC_VALUE = "asc";
+  private static final String SORT_ORDER_DESC_VALUE = "desc";
+  
+  private static final List<String> VALID_SORT_ORDER_VALUES;
+  static {
+    VALID_SORT_ORDER_VALUES = new ArrayList<String>();
+    VALID_SORT_ORDER_VALUES.add(SORT_ORDER_ASC_VALUE);
+    VALID_SORT_ORDER_VALUES.add(SORT_ORDER_DESC_VALUE);
+  }
+  
+  private static final String SORT_BY_CATEGORY_VALUE = "category";
+  private static final String SORT_BY_KEY_VALUE = "key";
+  private static final String SORT_BY_ID_VALUE = "id";
+  private static final String SORT_BY_NAME_VALUE = "name";
+  private static final String SORT_BY_VERSION_VALUE = "version";
+  private static final String SORT_BY_DEPLOYMENT_ID_VALUE = "deploymentId";
+  
+  private static final List<String> VALID_SORT_BY_VALUES;
+  static {
+    VALID_SORT_BY_VALUES = new ArrayList<String>();
+    VALID_SORT_BY_VALUES.add(SORT_BY_CATEGORY_VALUE);
+    VALID_SORT_BY_VALUES.add(SORT_BY_KEY_VALUE);
+    VALID_SORT_BY_VALUES.add(SORT_BY_ID_VALUE);
+    VALID_SORT_BY_VALUES.add(SORT_BY_NAME_VALUE);
+    VALID_SORT_BY_VALUES.add(SORT_BY_VERSION_VALUE);
+    VALID_SORT_BY_VALUES.add(SORT_BY_DEPLOYMENT_ID_VALUE);
+  }
+  
   private String category;
   private String categoryLike;
   private String name;
@@ -23,6 +53,9 @@ public class ProcessDefinitionQueryDto extends AbstractQueryParameterDto {
   private String startableBy;
   private Boolean active;
   private Boolean suspended;
+  
+  private String sortBy;
+  private String sortOrder;
   
   public String getCategory() {
     return category;
@@ -149,6 +182,30 @@ public class ProcessDefinitionQueryDto extends AbstractQueryParameterDto {
     this.suspended = suspended;
   }
   
+  public String getSortBy() {
+    return sortBy;
+  }
+
+  @CamundaQueryParam("sortBy")
+  public void setSortBy(String sortBy) {
+    if (!VALID_SORT_BY_VALUES.contains(sortBy)) {
+      throw new InvalidRequestException("sortBy parameter has invalid value.");
+    }
+    this.sortBy = sortBy;
+  }
+  
+  public String getSortOrder() {
+    return sortOrder;
+  }
+
+  @CamundaQueryParam("sortOrder")
+  public void setSortOrder(String sortOrder) {
+    if (!VALID_SORT_ORDER_VALUES.contains(sortOrder)) {
+      throw new InvalidRequestException("sortOrder parameter has invalid value.");
+    }
+    this.sortOrder = sortOrder;
+  }
+
   /**
    * Creates a {@link ProcessDefinitionQuery} against the given {@link RepositoryService}.
    * @param repositoryService
@@ -199,6 +256,30 @@ public class ProcessDefinitionQueryDto extends AbstractQueryParameterDto {
       query.suspended();
     }
     
+    if (sortBy != null) {
+      if (sortBy.equals(SORT_BY_CATEGORY_VALUE)) {
+        query.orderByProcessDefinitionCategory();
+      } else if (sortBy.equals(SORT_BY_KEY_VALUE)) {
+        query.orderByProcessDefinitionKey();
+      } else if (sortBy.equals(SORT_BY_ID_VALUE)) {
+        query.orderByProcessDefinitionId();
+      } else if (sortBy.equals(SORT_BY_VERSION_VALUE)) {
+        query.orderByProcessDefinitionVersion();
+      } else if (sortBy.equals(SORT_BY_NAME_VALUE)) {
+        query.orderByProcessDefinitionName();
+      } else if (sortBy.equals(SORT_BY_DEPLOYMENT_ID_VALUE)) {
+        query.orderByDeploymentId();
+      }
+    }
+    
+    if (sortOrder != null) {
+      if (sortOrder.equals(SORT_ORDER_ASC_VALUE)) {
+        query.asc();
+      } else if (sortOrder.equals(SORT_ORDER_DESC_VALUE)) {
+        query.desc();
+      }
+    }
+    
     return query;
     
   }
@@ -220,7 +301,7 @@ public class ProcessDefinitionQueryDto extends AbstractQueryParameterDto {
     } catch (IllegalAccessException e) {
       throw new RestException("Cannot set parameter.");
     } catch (InvocationTargetException e) {
-      throw new RestException("Cannot set parameter.");
+      throw new InvalidRequestException(e.getTargetException().getMessage());
     }
   }
 }
