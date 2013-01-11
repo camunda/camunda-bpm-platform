@@ -664,6 +664,8 @@ function EditConnectorController($scope, $http, App, ConnectorConfiguration) {
       PROXY_URL = "proxyUrl",
       PROXY_USERNAME = "proxyUsername",
       PROXY_PASSWORD = "proxyPassword";
+  
+  var REQUIRED_PROPERTIES = [BASE_PATH, SIGNAVIO_BASE_URL, REPO_PATH];
 
   $scope.selectedConnectorConfiguration = null;
 
@@ -756,6 +758,14 @@ function EditConnectorController($scope, $http, App, ConnectorConfiguration) {
       return true;
     }
     return false;
+  };
+  
+  $scope.isPropertyRequired = function(propertyKey) {	
+    return REQUIRED_PROPERTIES.indexOf(propertyKey) > -1;
+  };
+  
+  $scope.propertyNameText = function(propertyKey) {
+	return propertyKey + ($scope.isPropertyRequired(propertyKey)?"*":"");
   };
 
   $scope.currentHelpText = function(propertyKey) {
