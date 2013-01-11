@@ -22,14 +22,7 @@
       <artifactId>fox-engine</artifactId>
       <scope>provided</scope>
     </dependency>
-       
-    <dependency>
-      <groupId>com.camunda.fox.platform</groupId>
-      <artifactId>fox-platform-jobexecutor-core</artifactId>
-      <version>${project.version}</version>
-      <scope>provided</scope>
-    </dependency>
-    
+           
     <dependency>
       <groupId>org.jboss.ironjacamar</groupId>
       <artifactId>ironjacamar-spec-api</artifactId>

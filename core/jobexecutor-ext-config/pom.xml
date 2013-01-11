@@ -22,13 +22,6 @@
     </dependency>
 
     <dependency>
-      <groupId>com.camunda.fox.platform</groupId>
-      <artifactId>fox-platform-jobexecutor-core</artifactId>
-      <version>${project.version}</version>
-      <scope>provided</scope>
-    </dependency>
-
-    <dependency>
       <groupId>org.jboss.spec</groupId>
       <artifactId>jboss-javaee-web-6.0</artifactId>
       <type>pom</type>
