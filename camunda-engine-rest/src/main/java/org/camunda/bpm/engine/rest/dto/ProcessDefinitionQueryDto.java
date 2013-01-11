@@ -257,7 +257,7 @@ public class ProcessDefinitionQueryDto extends AbstractQueryParameterDto {
     }
     
     if (!sortOptionsValid()) {
-      throw new InvalidRequestException("Cannot specify a single sorting parameter.");
+      throw new InvalidRequestException("You may not specify a single sorting parameter.");
     }
     
     if (sortBy != null) {

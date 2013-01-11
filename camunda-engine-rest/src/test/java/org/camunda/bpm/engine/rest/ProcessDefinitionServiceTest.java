@@ -19,6 +19,7 @@ import javax.ws.rs.core.Response.Status;
 
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.repository.ProcessDefinitionQuery;
+import org.camunda.bpm.engine.rest.helper.MockDefinitionBuilder;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -31,7 +32,15 @@ import com.jayway.restassured.specification.RequestSpecification;
 public class ProcessDefinitionServiceTest extends AbstractRestServiceTest {
   
   private static final String EXAMPLE_DEFINITION_KEY = "aKey";
+  private static final String EXAMPLE_CATEGORY = "aCategory";
+  private static final String EXAMPLE_DEFINITION_NAME = "aName";
   private static final String EXAMPLE_DEFINITION_ID = "anId";
+  private static final String EXAMPLE_DEFINITION_DESCRIPTION = "aDesc";
+  private static final Integer EXAMPLE_VERSION = 42;
+  private static final String EXAMPLE_RESOURCE_NAME = "aResourceName";
+  private static final String EXAMPLE_DEPLOYMENT_ID = "aDeployment";
+  private static final String EXAMPLE_DIAGRAM_RESOURCE_NAME = "aDiagram";
+  private static final Boolean EXAMPLE_IS_SUSPENDED = false;
   
   private static final String PROCESS_DEFINITION_QUERY_URL = "/process-definition/query";
   
@@ -45,18 +54,26 @@ public class ProcessDefinitionServiceTest extends AbstractRestServiceTest {
     return sampleDefinitionsQuery;
   }
   
-  private ProcessDefinition createMockDefinition(String id, String key) {
-    ProcessDefinition mockDefinition = mock(ProcessDefinition.class);
-    when(mockDefinition.getId()).thenReturn(id);
-    when(mockDefinition.getKey()).thenReturn(key);
+  private ProcessDefinition createMockDefinition() {
+    MockDefinitionBuilder builder = new MockDefinitionBuilder();
+    ProcessDefinition mockDefinition = 
+        builder.id(EXAMPLE_DEFINITION_ID).category(EXAMPLE_CATEGORY).name(EXAMPLE_DEFINITION_NAME)
+          .key(EXAMPLE_DEFINITION_KEY).description(EXAMPLE_DEFINITION_DESCRIPTION)
+          .version(EXAMPLE_VERSION).resource(EXAMPLE_RESOURCE_NAME)
+          .deploymentId(EXAMPLE_DEPLOYMENT_ID).diagram(EXAMPLE_DIAGRAM_RESOURCE_NAME)
+          .suspended(EXAMPLE_IS_SUSPENDED).build();
     return mockDefinition;
   }
   
-  @Before
-  public void injectNewMockedQuery() {
+  private void injectMockedQuery(ProcessDefinition mockedDefinition) {
     List<ProcessDefinition> definitions = new ArrayList<ProcessDefinition>();
-    definitions.add(createMockDefinition(EXAMPLE_DEFINITION_ID, EXAMPLE_DEFINITION_KEY));
+    definitions.add(mockedDefinition);
     mockedQuery = setUpMockDefinitionQuery(definitions);
+  }
+  
+  @Before
+  public void setUpMockedQuery() {
+    injectMockedQuery(createMockDefinition());
   }
   
   @Test
@@ -78,9 +95,46 @@ public class ProcessDefinitionServiceTest extends AbstractRestServiceTest {
     
     String returnedDefinitionKey = from(content).getString("data[0].key");
     String returnedDefinitionId = from(content).getString("data[0].id");
+    String returnedCategory = from(content).getString("data[0].category");
+    String returnedDefinitionName = from(content).getString("data[0].name");
+    String returnedDescription = from(content).getString("data[0].description");
+    Integer returnedVersion = from(content).getInt("data[0].version");
+    String returnedResourceName = from(content).getString("data[0].resource");
+    String returnedDeploymentId  = from(content).getString("data[0].deploymentId");
+    String returnedDiagramResourceName = from(content).getString("data[0].diagram");
+    Boolean returnedIsSuspended = from(content).getBoolean("data[0].suspended");
 
     Assert.assertEquals(EXAMPLE_DEFINITION_ID, returnedDefinitionId);
     Assert.assertEquals(EXAMPLE_DEFINITION_KEY, returnedDefinitionKey);
+    Assert.assertEquals(EXAMPLE_CATEGORY, returnedCategory);
+    Assert.assertEquals(EXAMPLE_DEFINITION_NAME, returnedDefinitionName);
+    Assert.assertEquals(EXAMPLE_DEFINITION_DESCRIPTION, returnedDescription);
+    Assert.assertEquals(EXAMPLE_VERSION, returnedVersion);
+    Assert.assertEquals(EXAMPLE_RESOURCE_NAME, returnedResourceName);
+    Assert.assertEquals(EXAMPLE_DEPLOYMENT_ID, returnedDeploymentId);
+    Assert.assertEquals(EXAMPLE_DIAGRAM_RESOURCE_NAME, returnedDiagramResourceName);
+    Assert.assertEquals(EXAMPLE_IS_SUSPENDED, returnedIsSuspended);
+  }
+  
+  @Test
+  public void testIncompleteProcessDefinition() {
+    injectMockedQuery(createIncompleteMockDefinition());
+    Response response = expect().statusCode(Status.OK.getStatusCode())
+        .when().get(PROCESS_DEFINITION_QUERY_URL);
+    
+    String content = response.asString();
+    String returnedResourceName = from(content).getString("data[0].resource");
+    Assert.assertNull("Should be null, as it is also null in the original process definition on the server.", 
+        returnedResourceName);
+  }
+  
+  private ProcessDefinition createIncompleteMockDefinition() {
+    MockDefinitionBuilder builder = new MockDefinitionBuilder();
+    ProcessDefinition mockDefinition = 
+        builder.id(EXAMPLE_DEFINITION_ID).category(EXAMPLE_CATEGORY)
+          .name(EXAMPLE_DEFINITION_NAME).key(EXAMPLE_DEFINITION_KEY)
+          .suspended(EXAMPLE_IS_SUSPENDED).version(EXAMPLE_VERSION).build();
+    return mockDefinition;
   }
   
   @Test
@@ -177,31 +231,31 @@ public class ProcessDefinitionServiceTest extends AbstractRestServiceTest {
     executeAndVerifySorting("category", "asc", Status.OK);
     inOrder.verify(mockedQuery).orderByProcessDefinitionCategory();
     inOrder.verify(mockedQuery).asc();
-    injectNewMockedQuery();
+    setUpMockedQuery();
     
     inOrder = Mockito.inOrder(mockedQuery);
     executeAndVerifySorting("key", "desc", Status.OK);
     inOrder.verify(mockedQuery).orderByProcessDefinitionKey();
     inOrder.verify(mockedQuery).desc();
-    injectNewMockedQuery();
+    setUpMockedQuery();
     
     inOrder = Mockito.inOrder(mockedQuery);
     executeAndVerifySorting("id", "asc", Status.OK);
     inOrder.verify(mockedQuery).orderByProcessDefinitionId();
     inOrder.verify(mockedQuery).asc();
-    injectNewMockedQuery();
+    setUpMockedQuery();
     
     inOrder = Mockito.inOrder(mockedQuery);
     executeAndVerifySorting("version", "desc", Status.OK);
     inOrder.verify(mockedQuery).orderByProcessDefinitionVersion();
     inOrder.verify(mockedQuery).desc();
-    injectNewMockedQuery();
+    setUpMockedQuery();
     
     inOrder = Mockito.inOrder(mockedQuery);
     executeAndVerifySorting("name", "asc", Status.OK);
     inOrder.verify(mockedQuery).orderByProcessDefinitionName();
     inOrder.verify(mockedQuery).asc();
-    injectNewMockedQuery();
+    setUpMockedQuery();
     
     inOrder = Mockito.inOrder(mockedQuery);
     executeAndVerifySorting("deploymentId", "desc", Status.OK);
@@ -213,6 +267,12 @@ public class ProcessDefinitionServiceTest extends AbstractRestServiceTest {
   public void testInvalidSortingOptions() {
     executeAndVerifySorting("anInvalidSortByOption", "asc", Status.BAD_REQUEST);
     executeAndVerifySorting("category", "anInvalidSortOrderOption", Status.BAD_REQUEST);
+  }
+
+  private void executeAndVerifySorting(String sortBy, String sortOrder, Status expectedStatus) {
+    given().queryParam("sortBy", sortBy).queryParam("sortOrder", sortOrder)
+      .then().expect().statusCode(expectedStatus.getStatusCode())
+      .when().get(PROCESS_DEFINITION_QUERY_URL);
   }
   
   @Test
@@ -226,12 +286,6 @@ public class ProcessDefinitionServiceTest extends AbstractRestServiceTest {
   public void testSortOrderParameterOnly() {
     given().queryParam("sortOrder", "asc")
       .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
-      .when().get(PROCESS_DEFINITION_QUERY_URL);
-  }
-  
-  private void executeAndVerifySorting(String sortBy, String sortOrder, Status expectedStatus) {
-    given().queryParam("sortBy", sortBy).queryParam("sortOrder", sortOrder)
-      .then().expect().statusCode(expectedStatus.getStatusCode())
       .when().get(PROCESS_DEFINITION_QUERY_URL);
   }
 
