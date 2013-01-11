@@ -2,7 +2,7 @@
 
 /* http://docs.angularjs.org/guide/dev_guide.e2e-testing */
 
-describe('cycle', function() {
+describe('cycle roundtrips', function() {
 
   beforeEach(function() {
     browser().navigateTo('../app/secured/view/index');
@@ -44,4 +44,5 @@ describe('cycle', function() {
     });
     
   });
+   
 });
