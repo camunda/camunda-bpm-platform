@@ -43,13 +43,7 @@
   </dependencyManagement>
 
   <dependencies>
-    
-  	<dependency>
-  	  <groupId>com.camunda.fox.platform</groupId>
-  	  <artifactId>fox-platform-jobexecutor-core</artifactId>
-  	  <version>${project.version}</version>
-  	</dependency>
-  
+      
     <dependency>
     	<groupId>org.jboss.as</groupId>
     	<artifactId>jboss-as-threads</artifactId>

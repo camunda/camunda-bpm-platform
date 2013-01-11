@@ -72,6 +72,8 @@ public class TestPlatformJobExecutorFunctional {
   public void testExecuteJobsForSingleEngine() {
     // configure and build a process engine
     StandaloneProcessEngineConfiguration standaloneProcessEngineConfiguration = new StandaloneInMemProcessEngineConfiguration();
+    standaloneProcessEngineConfiguration.setProcessEngineName(getClass().getName() + "-engine1");
+    standaloneProcessEngineConfiguration.setJdbcUrl("jdbc:h2:mem:jobexecutor-test-engine");
     standaloneProcessEngineConfiguration.setJobExecutorActivate(false);
     ProcessEngine engine = standaloneProcessEngineConfiguration.buildProcessEngine();
     
@@ -110,14 +112,14 @@ public class TestPlatformJobExecutorFunctional {
   public void testExecuteJobsForTwoEnginesSameAcquisition() {
     // configure and build a process engine
     StandaloneProcessEngineConfiguration engineConfiguration1 = new StandaloneInMemProcessEngineConfiguration();
-    engineConfiguration1.setProcessEngineName("engine1");
+    engineConfiguration1.setProcessEngineName(getClass().getName() + "-engine1");
     engineConfiguration1.setJdbcUrl("jdbc:h2:mem:activiti1");
     engineConfiguration1.setJobExecutorActivate(false);
     ProcessEngine engine1 = engineConfiguration1.buildProcessEngine();
     
     // and a second one
     StandaloneProcessEngineConfiguration engineConfiguration2 = new StandaloneInMemProcessEngineConfiguration();
-    engineConfiguration2.setProcessEngineName("engine2");
+    engineConfiguration2.setProcessEngineName(getClass().getName() + "engine2");
     engineConfiguration2.setJdbcUrl("jdbc:h2:mem:activiti2");
     engineConfiguration2.setJobExecutorActivate(false);
     ProcessEngine engine2 = engineConfiguration2.buildProcessEngine();
@@ -179,14 +181,14 @@ public class TestPlatformJobExecutorFunctional {
   public void testJobAddedGuardForTwoEnginesSameAcquisition() throws InterruptedException {
     // configure and build a process engine
     StandaloneProcessEngineConfiguration engineConfiguration1 = new StandaloneInMemProcessEngineConfiguration();
-    engineConfiguration1.setProcessEngineName("engine1");
+    engineConfiguration1.setProcessEngineName(getClass().getName() + "engine1");
     engineConfiguration1.setJdbcUrl("jdbc:h2:mem:activiti1");
     engineConfiguration1.setJobExecutorActivate(false);
     ProcessEngine engine1 = engineConfiguration1.buildProcessEngine();
     
     // and a second one
     StandaloneProcessEngineConfiguration engineConfiguration2 = new StandaloneInMemProcessEngineConfiguration();
-    engineConfiguration2.setProcessEngineName("engine2");
+    engineConfiguration2.setProcessEngineName(getClass().getName() + "engine2");
     engineConfiguration2.setJdbcUrl("jdbc:h2:mem:activiti2");
     engineConfiguration2.setJobExecutorActivate(false);
     ProcessEngine engine2 = engineConfiguration2.buildProcessEngine();

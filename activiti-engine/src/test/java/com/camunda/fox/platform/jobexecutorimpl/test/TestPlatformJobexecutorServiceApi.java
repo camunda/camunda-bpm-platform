@@ -52,6 +52,8 @@ public class TestPlatformJobexecutorServiceApi {
   public void testRegisterSingleProcessEngine() {
     // configure and build a process engine
     StandaloneProcessEngineConfiguration standaloneProcessEngineConfiguration = new StandaloneInMemProcessEngineConfiguration();
+    standaloneProcessEngineConfiguration.setProcessEngineName(getClass().getName()+"-enine");
+    standaloneProcessEngineConfiguration.setJdbcUrl("jdbc:h2:mem:jobexecutor-test-engine");
     standaloneProcessEngineConfiguration.setJobExecutorActivate(false);
     ProcessEngine engine = standaloneProcessEngineConfiguration.buildProcessEngine();
     
@@ -73,6 +75,8 @@ public class TestPlatformJobexecutorServiceApi {
   public void testUnregisterForUnexistingAcquisitionFails() {
     // configure and build a process engine
     StandaloneProcessEngineConfiguration standaloneProcessEngineConfiguration = new StandaloneInMemProcessEngineConfiguration();
+    standaloneProcessEngineConfiguration.setProcessEngineName(getClass().getName()+"-enine");
+    standaloneProcessEngineConfiguration.setJdbcUrl("jdbc:h2:mem:jobexecutor-test-engine");
     standaloneProcessEngineConfiguration.setJobExecutorActivate(false);
     ProcessEngine engine = standaloneProcessEngineConfiguration.buildProcessEngine();
     try {
@@ -88,6 +92,8 @@ public class TestPlatformJobexecutorServiceApi {
   public void testRegisterForUnexistingAcquisitionFails() {
     // configure and build a process engine
     StandaloneProcessEngineConfiguration standaloneProcessEngineConfiguration = new StandaloneInMemProcessEngineConfiguration();
+    standaloneProcessEngineConfiguration.setProcessEngineName(getClass().getName()+"-enine");
+    standaloneProcessEngineConfiguration.setJdbcUrl("jdbc:h2:mem:jobexecutor-test-engine");
     standaloneProcessEngineConfiguration.setJobExecutorActivate(false);
     ProcessEngine engine = standaloneProcessEngineConfiguration.buildProcessEngine();
     try {
@@ -103,6 +109,8 @@ public class TestPlatformJobexecutorServiceApi {
   public void testRegisterTwiceFails() {
     // configure and build a process engine
     StandaloneProcessEngineConfiguration standaloneProcessEngineConfiguration = new StandaloneInMemProcessEngineConfiguration();
+    standaloneProcessEngineConfiguration.setProcessEngineName(getClass().getName()+"-enine");
+    standaloneProcessEngineConfiguration.setJdbcUrl("jdbc:h2:mem:jobexecutor-test-engine");
     standaloneProcessEngineConfiguration.setJobExecutorActivate(false);
     ProcessEngine engine = standaloneProcessEngineConfiguration.buildProcessEngine();
     
@@ -124,6 +132,8 @@ public class TestPlatformJobexecutorServiceApi {
   public void testUnRegisterUnexistingFails() {
     // configure and build a process engine
     StandaloneProcessEngineConfiguration standaloneProcessEngineConfiguration = new StandaloneInMemProcessEngineConfiguration();
+    standaloneProcessEngineConfiguration.setProcessEngineName(getClass().getName()+"-enine");
+    standaloneProcessEngineConfiguration.setJdbcUrl("jdbc:h2:mem:jobexecutor-test-engine");
     standaloneProcessEngineConfiguration.setJobExecutorActivate(false);
     ProcessEngine engine = standaloneProcessEngineConfiguration.buildProcessEngine();
     
@@ -141,7 +151,7 @@ public class TestPlatformJobexecutorServiceApi {
   public void testRegisterTwoEngines() {
     // configure and build a process engine
     StandaloneProcessEngineConfiguration engineConfiguration1 = new StandaloneInMemProcessEngineConfiguration();
-    engineConfiguration1.setProcessEngineName("engine1");
+    engineConfiguration1.setProcessEngineName(getClass().getName()+"engine1");    
     engineConfiguration1.setJdbcUrl("jdbc:h2:mem:activiti1");
     engineConfiguration1.setJobExecutorActivate(false);
     ProcessEngine engine1 = engineConfiguration1.buildProcessEngine();
