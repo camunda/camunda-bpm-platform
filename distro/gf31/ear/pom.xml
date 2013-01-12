@@ -24,12 +24,7 @@
     </plugins>
   </build>
 
-  <dependencies>       
-    <dependency>
-      <groupId>com.camunda.fox.platform</groupId>
-      <artifactId>fox-platform-service-ext</artifactId>
-      <version>${project.version}</version>
-    </dependency>   
+  <dependencies>     
     <dependency>
       <groupId>com.camunda.fox.platform</groupId>
       <artifactId>fox-platform-glassfish-service</artifactId>
