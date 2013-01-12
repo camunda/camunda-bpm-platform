@@ -89,7 +89,6 @@
 
   <modules>   
     <module>client</module>
-	<module>ext-service</module>
   </modules>
   
   <build>
