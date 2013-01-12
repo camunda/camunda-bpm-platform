@@ -1,14 +1,20 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>fox-platform-jobexecutor-service</artifactId>
-  <packaging>ejb</packaging>
-  <name>fox platform EE - Job Executor Service</name>
+  <artifactId>fox-platform-jobexecutor-ra</artifactId>
+  <packaging>jar</packaging>
+  <name>fox platform EE - Job Executor RA</name>
 
   <parent>
     <groupId>com.camunda.fox.platform</groupId>
-    <artifactId>fox-platform-jobexecutor</artifactId>
+    <artifactId>fox-platform</artifactId>
+    <relativePath>../..</relativePath>
     <version>6.2.0-SNAPSHOT</version>
   </parent>
+
+  <properties>
+    <!-- TODO: move to parent -->
+    <version.org.jboss.ironjacamar>1.0.10.Final</version.org.jboss.ironjacamar>
+  </properties>
 
   <dependencies>
     
@@ -17,21 +23,20 @@
       <artifactId>fox-engine</artifactId>
       <scope>provided</scope>
     </dependency>
-    
+           
     <dependency>
-      <groupId>com.camunda.fox.platform</groupId>
-      <artifactId>fox-platform-jobexecutor-ra</artifactId>
-      <version>${project.version}</version>
-      <scope>provided</scope>
-    </dependency>
-        
-    <dependency>
-      <groupId>org.jboss.spec</groupId>
-      <artifactId>jboss-javaee-web-6.0</artifactId>
-      <type>pom</type>
+      <groupId>org.jboss.ironjacamar</groupId>
+      <artifactId>ironjacamar-spec-api</artifactId>
+      <version>${version.org.jboss.ironjacamar}</version>
       <scope>provided</scope>
     </dependency>
     
+    <dependency>
+      <groupId>com.bea.commonj</groupId>
+      <artifactId>com.springsource.commonj</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>

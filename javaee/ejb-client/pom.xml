@@ -6,8 +6,9 @@
 
 	<parent>
 		<groupId>com.camunda.fox.platform</groupId>
-		<artifactId>fox-platform-core</artifactId>
-		<version>6.2.0-SNAPSHOT</version>		
+		<artifactId>fox-platform</artifactId>
+		<relativePath>../..</relativePath>
+		<version>6.2.0-SNAPSHOT</version>
 	</parent>
 
 	<dependencies>
