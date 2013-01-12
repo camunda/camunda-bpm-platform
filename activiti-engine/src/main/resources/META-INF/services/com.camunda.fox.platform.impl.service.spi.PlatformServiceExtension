@@ -1,0 +1,3 @@
+com.camunda.fox.platform.impl.ext.config.engine.ProcessEnginesXmlPlatformServiceExtension
+com.camunda.fox.platform.impl.jobexecutor.ext.config.JobExecutorXmlPlatformServiceExtension
+com.camunda.fox.platform.impl.ext.PlatformJobExecutorExtension

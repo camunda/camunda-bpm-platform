@@ -300,9 +300,20 @@ public abstract class PlatformService implements ProcessEngineService, ProcessAr
   
   // extensions support //////////////////////////////////////////////////////
   
+  protected ClassLoader getPlatformServiceExtensionClassloader() {
+    // TODO: use security manager / privileged action
+    if(Thread.currentThread().getContextClassLoader() != null) {
+      return Thread.currentThread().getContextClassLoader();
+    } else {
+      // return the classloader that loaded the implementation subclass of this class.
+      return getClass().getClassLoader();
+    }
+  }
+  
 
   protected void fireOnPlatformServiceStart() {
     PlatformServiceExtensionHelper.clearCachedExtensions();
+    PlatformServiceExtensionHelper.platformServiceExtensionClassloader = getPlatformServiceExtensionClassloader();
     List<PlatformServiceExtension> loadableExtensions = PlatformServiceExtensionHelper.getLoadableExtensions();
     for (PlatformServiceExtension platformServiceExtension : loadableExtensions) {
       try {
