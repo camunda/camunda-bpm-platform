@@ -66,26 +66,34 @@
   </properties>
 
   <modules>
-    <module>core</module>
-    <module>qa</module>
-    <module>ejb-service</module>
+  
+    <module>qa</module>    
+	
     <module>webapps/h2-webapp</module>
     <module>webapps/cockpit-webapp-fox</module>
     <module>webapps/cockpit-webapp-fox-glassfish</module>
     <module>webapps/cockpit-webapp-fox-was</module>
     <module>webapps/tasklist</module>
-    <module>jobexecutor</module>
-    <module>sql-script</module>
 	
+    <module>javaee/ejb-service</module>
+	<module>javaee/ejb-client</module>
+	<module>javaee/jobexecutor-ra</module>
+	<module>javaee/jobexecutor-rar</module>
+	<module>javaee/jobexecutor-ejb-service</module>
+	  
 	<module>activiti-engine</module>
 	<module>activiti-cdi</module>
 	<module>activiti-osgi</module>
 	<module>activiti-spring</module>
 	
+	<module>camunda-engine-rest</module>
+	
 	<module>distro/jbossas71</module>
     <module>distro/gf31</module>
     <module>distro/ibmWs8</module>
     <module>distro/tomcat6</module>
+	<module>distro/sql-script</module>
+	
   </modules>
   
   <dependencyManagement>
