@@ -24,11 +24,7 @@ public class TestMultipleProcessEnginesXmlsInLibrary extends AbstractFoxPlatform
   @Deployment
   public static WebArchive processArchive() {    
     
-    
-    MavenDependencyResolver resolver = DependencyResolvers.use(MavenDependencyResolver.class).goOffline().loadMetadataFromPom("pom.xml");
-    
     return initWebArchiveDeployment()
-            .addAsLibraries(resolver.artifact("com.camunda.fox.platform:fox-platform-ext-config").resolveAsFiles())
             .addAsLibraries(
               ShrinkWrap.create(JavaArchive.class, "engine1.jar")
                     .addAsResource("singleEngine.xml", "META-INF/process-engines.xml"),

@@ -384,13 +384,7 @@
         <artifactId>subethasmtp-wiser</artifactId>
         <version>1.2</version>
         <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>postgresql</groupId>
-        <artifactId>postgresql</artifactId>
-        <version>8.4-701.jdbc4</version>
-        <scope>test</scope>
-      </dependency>
+      </dependency>     
       <dependency>
         <groupId>wsdl4j</groupId>
         <artifactId>wsdl4j</artifactId>
@@ -435,17 +429,7 @@
 		<artifactId>sqljdbc4</artifactId>
 	    <version>4.0</version>
 	  </dependency>
-	  
-      <dependency>
-        <groupId>com.camunda.fox.platform</groupId>
-        <artifactId>fox-platform-ext-config</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>com.camunda.fox.platform</groupId>
-        <artifactId>fox-platform-jobexecutor-ext-config</artifactId>
-        <version>${project.version}</version>
-      </dependency>     
+	     
       <dependency>
         <groupId>com.camunda.fox.platform</groupId>
         <artifactId>fox-platform-client</artifactId>
@@ -607,8 +591,8 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
-  <version>2.5.1</version>
-  <configuration>
+        <version>2.5.1</version>
+        <configuration>
             <source>${version.java}</source>
             <target>${version.java}</target>
           </configuration>

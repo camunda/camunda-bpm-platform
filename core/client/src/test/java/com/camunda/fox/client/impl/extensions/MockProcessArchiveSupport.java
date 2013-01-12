@@ -38,6 +38,20 @@ public class MockProcessArchiveSupport extends ProcessArchiveSupport {
   }
   
   @Override
+  protected String autodetectApplicationName() {    
+    return "mock";
+  }
+  
+  @Override
+  protected void lookupProcessEngineService() {
+   
+  }
+  
+  @Override
+  protected void lookupArchiveService() {
+  }
+  
+  @Override
   protected void uninstallProcessArchives() {
      installedProcessArchives.clear();
   }

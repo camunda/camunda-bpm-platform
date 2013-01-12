@@ -18,10 +18,12 @@ public class PlatformServiceExtensionHelper {
   
   protected static List<PlatformServiceExtension> cachedProviders;
   
+  public static ClassLoader platformServiceExtensionClassloader;
+  
   public static List<PlatformServiceExtension> getLoadableExtensions() {
     if(cachedProviders == null) {
       cachedProviders = new ArrayList<PlatformServiceExtension>();
-      ServiceLoader<PlatformServiceExtension> cachedLoader = ServiceLoader.load(PlatformServiceExtension.class);
+      ServiceLoader<PlatformServiceExtension> cachedLoader = ServiceLoader.load(PlatformServiceExtension.class, platformServiceExtensionClassloader);
       Iterator<PlatformServiceExtension> iterator = cachedLoader.iterator();
       while (iterator.hasNext()) {
         PlatformServiceExtension platformServiceExtension = (PlatformServiceExtension) iterator.next();

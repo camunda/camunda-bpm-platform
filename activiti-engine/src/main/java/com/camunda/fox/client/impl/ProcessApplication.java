@@ -28,6 +28,7 @@ import com.camunda.fox.client.impl.parser.spi.ProcessesXmlParser;
 import com.camunda.fox.client.impl.schema.ProcessesXml;
 import com.camunda.fox.client.impl.schema.ProcessesXml.ProcessArchiveXml;
 import com.camunda.fox.client.impl.spi.ProcessApplicationExtension;
+import com.camunda.fox.client.impl.spi.ProcessArchiveExtension;
 import com.camunda.fox.platform.FoxPlatformException;
 import com.camunda.fox.platform.api.ProcessArchiveService;
 import com.camunda.fox.platform.api.ProcessArchiveService.ProcessArchiveInstallation;
@@ -145,9 +146,18 @@ public abstract class ProcessApplication {
   public ClassLoader getProcessApplicationClassloader() {
     return getClass().getClassLoader();
   }
+  
+  protected ClassLoader getProcessApplicationExtensionClassloader() {
+    // TODO: use SecutiryManager / Priviledged action
+    if(Thread.currentThread().getContextClassLoader() != null) {
+     return Thread.currentThread().getContextClassLoader(); 
+    } else {
+      return getClass().getClassLoader();
+    }
+  }
 
   protected ProcessesXmlParser getProcessesXmlParser() {
-    ServiceLoader<ProcessesXmlParser> parserLoader = ServiceLoader.load(ProcessesXmlParser.class, getProcessApplicationClassloader());
+    ServiceLoader<ProcessesXmlParser> parserLoader = ServiceLoader.load(ProcessesXmlParser.class, getProcessApplicationExtensionClassloader());
     Iterator<ProcessesXmlParser> iterator = parserLoader.iterator();
     if(iterator.hasNext()) {
       return iterator.next();
@@ -177,10 +187,17 @@ public abstract class ProcessApplication {
   }
 
   private void initProcessApplicationExtensions() {
-    ServiceLoader<ProcessApplicationExtension> processArchiveExtensionLoader = ServiceLoader.load(ProcessApplicationExtension.class, getProcessApplicationClassloader());
-    Iterator<ProcessApplicationExtension> loadableExtensions = processArchiveExtensionLoader.iterator();
+    ServiceLoader<ProcessArchiveExtension> processArchiveExtensionLoader = ServiceLoader.load(ProcessArchiveExtension.class, getProcessApplicationClassloader());
+    Iterator<ProcessArchiveExtension> loadableExtensions = processArchiveExtensionLoader.iterator();
     while (loadableExtensions.hasNext()) {
-      ProcessApplicationExtension processArchiveExtension = (ProcessApplicationExtension) loadableExtensions.next();
+      ProcessArchiveExtension processArchiveExtension = (ProcessArchiveExtension) loadableExtensions.next();
+      processApplicationExtensions.add(processArchiveExtension);
+    }
+    
+    ServiceLoader<ProcessApplicationExtension> processApplicationExtensionLoader = ServiceLoader.load(ProcessApplicationExtension.class, getProcessApplicationClassloader());
+    Iterator<ProcessApplicationExtension> extensions = processApplicationExtensionLoader.iterator();
+    while (extensions.hasNext()) {
+      ProcessApplicationExtension processArchiveExtension = (ProcessApplicationExtension) extensions.next();
       processApplicationExtensions.add(processArchiveExtension);
     }
     

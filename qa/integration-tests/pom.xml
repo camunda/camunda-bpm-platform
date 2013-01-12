@@ -53,13 +53,8 @@
       <groupId>com.camunda.fox.engine</groupId>
       <artifactId>fox-engine</artifactId>
       <scope>provided</scope>
-    </dependency>
-    
-    <dependency>
-      <groupId>com.camunda.fox.platform</groupId>
-      <artifactId>fox-platform-ext-config</artifactId>
-      <scope>provided</scope>
-    </dependency>
+    </dependency>    
+   
   </dependencies>
 
   <build>
