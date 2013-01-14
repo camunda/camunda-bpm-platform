@@ -287,6 +287,12 @@ li.actions .btn:last-child {
   right: 10px;
 }
 
+.commit-message {
+  height: 65px;
+  width: 385px;
+  margin-left: -25px;
+}
+
 .sync-options {
   margin-top: 60px;
   text-align: center;

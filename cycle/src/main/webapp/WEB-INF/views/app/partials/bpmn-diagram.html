@@ -106,8 +106,7 @@
                         ngm-if="canEditModeler()" 
                         ng-model="editDiagram.modeler"                    
                         th:attr="data-placeholder=#{Enter the name of your modeler}"
-                        type="text">            
-                </select>
+                        type="text" />            
                 <span ngm-if="!canEditModeler()" id="modelerName" name="modelerName" required class="uneditable-input" type="text">{{editDiagram.modeler}}</span>
               </div>
             </div>

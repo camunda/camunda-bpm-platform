@@ -206,6 +206,12 @@ function SyncRoundtripController($scope, $http, $q, App, Event) {
   
   $scope.status = BEFORE_SYNC;
   
+  $scope.commitMessage = "Model updated using camunda cycle.";
+  
+  $scope.showCommitMessageForm = function() {
+    return $scope.status == BEFORE_SYNC || $scope.status == PERFORM_SYNC;
+  };
+  
   $scope.cancel = function () {
     $scope.syncDialog.close();
   };
@@ -216,6 +222,7 @@ function SyncRoundtripController($scope, $http, $q, App, Event) {
   
   $scope.performSync = function() {
     $scope.status = PERFORM_SYNC;
+    $("#commitMessage").attr("disabled", "disabled");
     
     var Delay = function(delayMs) {
       var deferred = $q.defer();
@@ -230,10 +237,11 @@ function SyncRoundtripController($scope, $http, $q, App, Event) {
     
     var delayed = new Delay(2000);
     
-    $http.post(App.uri('secured/resource/roundtrip/' + $scope.roundtrip.id + '/sync?syncMode=' + $scope.syncMode)).
+    $http.post(App.uri('secured/resource/roundtrip/' + $scope.roundtrip.id + '/sync?syncMode=' + $scope.syncMode+"&message="+encodeURIComponent($scope.commitMessage))).
       success(function(data) {
         delayed.then(function() {
           $scope.roundtrip.$get({id: $scope.roundtrip.id });
+          $("#commitMessage").removeAttr("disabled");
           var status = data.status;
           if (status == "SYNC_SUCCESS") {
             $scope.status = SYNC_SUCCESS;
