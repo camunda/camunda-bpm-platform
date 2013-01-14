@@ -24,6 +24,10 @@
       <artifactId>mybatis</artifactId>
     </dependency>
     <dependency>
+      <groupId>joda-time</groupId>
+      <artifactId>joda-time</artifactId>
+    </dependency>
+    <dependency>
       <groupId>com.fasterxml.uuid</groupId>
       <artifactId>java-uuid-generator</artifactId>
     </dependency>
@@ -113,6 +117,10 @@
                 <artifactItem>
                   <groupId>com.fasterxml.uuid</groupId>
                   <artifactId>java-uuid-generator</artifactId>
+                </artifactItem>
+                <artifactItem>
+                  <groupId>joda-time</groupId>
+                  <artifactId>joda-time</artifactId>
                 </artifactItem>
               </artifactItems>
               <excludeTypes>ear,rar</excludeTypes>
