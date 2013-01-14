@@ -90,7 +90,8 @@ public class SignavioConnector extends Connector {
   // Connector API methods //////////////////////////////////////////////
   
   @Override
-  public void deleteNode(final ConnectorNode node) {
+  public void deleteNode(final ConnectorNode node, String message) {
+    // message is ignored by signavio connector
     
     executeCommand(new Command<Void>("delete node") {
       
@@ -103,7 +104,7 @@ public class SignavioConnector extends Connector {
   }
 
   @Override
-  public ConnectorNode createNode(final String parentId, final String label, final ConnectorNodeType type) {
+  public ConnectorNode createNode(final String parentId, final String label, final ConnectorNodeType type, final String message) {
     
     return executeCommand(new Command<ConnectorNode>("create node") {
       
@@ -115,11 +116,11 @@ public class SignavioConnector extends Connector {
           ConnectorNode result = null;
           switch (type) {
             case FOLDER:
-              response = getSignavioClient().createFolder(label, parentId, "");
+              response = getSignavioClient().createFolder(label, parentId);
               result = createFolderNode(new JSONObject(response));
               break;
             case BPMN_FILE:
-              response = getSignavioClient().createModel(parentId, label);
+              response = getSignavioClient().createModel(parentId, label, message);
               result = createFileNode(new JSONObject(response));
               break;
           }
@@ -197,7 +198,7 @@ public class SignavioConnector extends Connector {
 
   @Secured
   @Override
-  public ContentInformation updateContent(final ConnectorNode node, final InputStream newContent) throws Exception {
+  public ContentInformation updateContent(final ConnectorNode node, final InputStream newContent, final String message) throws Exception {
     return executeCommand(new Command<ContentInformation>("get content information") {
 
       @Override
@@ -206,11 +207,11 @@ public class SignavioConnector extends Connector {
         ConnectorNode importedModel = importContent(privateFolder, IoUtil.toString(newContent, UTF_8));
         String json = getSignavioClient().getModelAsJson(importedModel.getId());
         String svg = getSignavioClient().getModelAsSVG(importedModel.getId());
-        deleteNode(importedModel);
+        deleteNode(importedModel, null);
 
         ConnectorNode parent = getParent(node);
         
-        getSignavioClient().updateModel(node.getId(), node.getLabel(), json, svg, parent.getId());
+        getSignavioClient().updateModel(node.getId(), node.getLabel(), json, svg, parent.getId(), message);
 
         return getContentInformation(node);
       }
@@ -245,6 +246,7 @@ public class SignavioConnector extends Connector {
     node.setLabel(SignavioJson.extractNodeName(jsonObj));
     node.setId(SignavioJson.extractModelId(jsonObj));
     node.setType(SignavioJson.extractModelContentType(jsonObj));
+    node.setMessage(SignavioJson.extractModelComment(jsonObj));
     
     return node;
   }
@@ -367,6 +369,10 @@ public class SignavioConnector extends Connector {
   @Override
   public ConnectorNode getNode(String id) {
     throw new UnsupportedOperationException();
+  }
+  
+  public boolean isSupportsCommitMessage() {
+    return true;
   }
 
   // Signavio Connector command execution ///////////////////////////////////////

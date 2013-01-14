@@ -84,12 +84,12 @@ public abstract class AbstractConnectorInteractionITBase {
   @After
   public void cleanup() {
     try {
-      getLhsConnector().deleteNode(lhsConnectorNodeParent);
+      getLhsConnector().deleteNode(lhsConnectorNodeParent, null);
     } catch (Exception e) {
       log.log(Level.WARNING, "Unable to free used resources (" + lhsConnectorNodeParent.getLabel() + ") from connector (" + getLhsConnector().getClass() + ").", e);
     }
     try {
-      getRhsConnector().deleteNode(rhsConnectorNodeParent);
+      getRhsConnector().deleteNode(rhsConnectorNodeParent, null);
     } catch (Exception e) {
       log.log(Level.WARNING, "Unable to free used resources (" + rhsConnectorNodeParent.getLabel() + ") from connector (" + getRhsConnector().getClass() + ").", e);
     }
@@ -123,7 +123,7 @@ public abstract class AbstractConnectorInteractionITBase {
     RoundtripDTO roundtrip = testHelper.createTestRoundtripWithBothSides(lhsConnectorNode, rhsConnectorNode);
     
     // when
-    SynchronizationResultDTO synchronizationResultDTO = roundtripService.doSynchronize(SyncMode.LEFT_TO_RIGHT, roundtrip.getId());
+    SynchronizationResultDTO synchronizationResultDTO = roundtripService.doSynchronize(SyncMode.LEFT_TO_RIGHT, roundtrip.getId(), null);
     
     // then
     assertEquals(SynchronizationStatus.SYNC_SUCCESS, synchronizationResultDTO.getStatus());
@@ -142,7 +142,7 @@ public abstract class AbstractConnectorInteractionITBase {
     RoundtripDTO roundtrip = testHelper.createTestRoundtripWithBothSides(lhsConnectorNode, rhsConnectorNode);
     
     // when
-    SynchronizationResultDTO synchronizationResultDTO = roundtripService.doSynchronize(SyncMode.RIGHT_TO_LEFT, roundtrip.getId());
+    SynchronizationResultDTO synchronizationResultDTO = roundtripService.doSynchronize(SyncMode.RIGHT_TO_LEFT, roundtrip.getId(), null);
     
     // then
     assertEquals(SynchronizationStatus.SYNC_SUCCESS, synchronizationResultDTO.getStatus());
@@ -166,7 +166,8 @@ public abstract class AbstractConnectorInteractionITBase {
             SyncMode.LEFT_TO_RIGHT,
             "RHS",
             getRhsConnector().getId(),
-            rhsConnectorNodeParent.getId());
+            rhsConnectorNodeParent.getId(),
+            null);
     
     // then
     assertThatIsInSync(roundtrip.getRightHandSide());
@@ -188,7 +189,8 @@ public abstract class AbstractConnectorInteractionITBase {
             SyncMode.RIGHT_TO_LEFT,
             "LHS",
             getLhsConnector().getId(),
-            lhsConnectorNodeParent.getId());
+            lhsConnectorNodeParent.getId(),
+            null);
     
     // then
     assertThatIsInSync(roundtrip.getRightHandSide());

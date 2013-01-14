@@ -128,7 +128,7 @@ public class SignavioConnectorIT {
       String actualXml = IOUtils.toString(actualXmlInputStream, "UTF-8");
       actualXmlInputStream.close();
       
-      getSignavioConnector().deleteNode(importedNode);
+      getSignavioConnector().deleteNode(importedNode, null);
       assertXpathEvaluatesTo(expectedElementCount, ACT_ELEMENT_COUNT, actualXml);
       assertXpathEvaluatesTo(expectedAttributeCount, ACT_ATTRIBUTE_COUNT, actualXml);
     }
@@ -319,7 +319,7 @@ public class SignavioConnectorIT {
     try {
       // create directory
       String folderName = "Cycle: SignavioConnectorIT.testBpmnPoolExtractionRoundtrip " + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date());
-      folder = getSignavioConnector().createNode(getSignavioConnector().getPrivateFolder().getId(), folderName, ConnectorNodeType.FOLDER);
+      folder = getSignavioConnector().createNode(getSignavioConnector().getPrivateFolder().getId(), folderName, ConnectorNodeType.FOLDER, null);
 
       // upload model
       if (filename.endsWith(".sgx")) {
@@ -378,7 +378,7 @@ public class SignavioConnectorIT {
         // import Engine Pool back into collaboration
         actualRawBpmn20Xml = bpmnProcessModelUtil.importChangesFromExecutableBpmnModel(technicalModel, initialRawBpmn20Xml);
         actualRawBpmn20XmlInputStream = IOUtils.toInputStream(actualRawBpmn20Xml, "UTF-8");
-        getSignavioConnector().updateContent(model, actualRawBpmn20XmlInputStream);
+        getSignavioConnector().updateContent(model, actualRawBpmn20XmlInputStream, "update");
         IoUtil.closeSilently(actualRawBpmn20XmlInputStream);
         actualRawBpmn20XmlInputStream = getSignavioConnector().getContent(model);
         actualRawBpmn20Xml = IOUtils.toString(actualRawBpmn20XmlInputStream, "UTF-8");
@@ -393,7 +393,7 @@ public class SignavioConnectorIT {
     } finally {
       if (folder != null) {
         // delete folder
-        getSignavioConnector().deleteNode(folder);
+        getSignavioConnector().deleteNode(folder, null);
       }
     }
 

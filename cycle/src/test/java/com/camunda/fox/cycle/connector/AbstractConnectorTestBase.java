@@ -34,9 +34,18 @@ public abstract class AbstractConnectorTestBase {
   public void shouldCreateDirectory() throws Exception {
 
     Connector connector = getConnector();
-    ConnectorNode tmpFolder = connector.createNode("//", TMP_DIR_NAME, ConnectorNodeType.FOLDER);
+    String message = "create folder";
+    ConnectorNode tmpFolder = connector.createNode("//", TMP_DIR_NAME, ConnectorNodeType.FOLDER, message);
+    if(connector.isSupportsCommitMessage()) {
+      assertThat(tmpFolder.getMessage()).isEqualTo(message);
+    }
 
     assertThat(tmpFolder).isEqualTo(TMP_FOLDER);
+    
+    ConnectorNode tmpNode = connector.getNode(tmpFolder.getId());
+    if(connector.isSupportsCommitMessage()) {
+      assertThat(tmpNode.getMessage()).isEqualTo(message);
+    }
 
     try {
       connector.getContentInformation(tmpFolder);
@@ -175,12 +184,11 @@ public abstract class AbstractConnectorTestBase {
       originalInputStream = connector.getContent(sourceFileNode);
       byte[] inputBytes = IoUtil.readInputStream(originalInputStream, "connector is is");
 
-      ConnectorNode destFileNode = connector.createNode("//" + TMP_DIR_NAME, "/test-lhs-copy.bpmn", ConnectorNodeType.ANY_FILE);
-
+      ConnectorNode destFileNode = connector.createNode("//" + TMP_DIR_NAME, "/test-lhs-copy.bpmn", ConnectorNodeType.ANY_FILE, null);
 
       // when
       ContentInformation updatedContentInfo = connector.updateContent(
-        destFileNode, new ByteArrayInputStream(inputBytes));
+        destFileNode, new ByteArrayInputStream(inputBytes), null);
 
       assertThat(updatedContentInfo).isNotNull();
       assertThat(updatedContentInfo.exists()).isTrue();
@@ -195,6 +203,48 @@ public abstract class AbstractConnectorTestBase {
       assertThat(nodeBytes).isEqualTo(inputBytes);
     } finally {
       IoUtil.closeSilently(originalInputStream, nodeInputStream);
+    }
+  }
+  
+  @Test
+  public void shouldSetCreateAndUpdateMessage() throws Exception {
+    Connector connector = getConnector();
+    if(connector.isSupportsCommitMessage()) {
+      // given
+  
+      String createMessage = "initial create";
+      ConnectorNode destFileNode = connector.createNode("//" + TMP_DIR_NAME, "/test-lhs-copy2.bpmn", ConnectorNodeType.ANY_FILE, createMessage);
+      
+      destFileNode = connector.getNode(destFileNode.getId());
+      assertThat(destFileNode.getMessage()).isEqualTo(createMessage);
+  
+      // when
+      String updateMessage = "updating node ...";
+      connector.updateContent(destFileNode, new ByteArrayInputStream("Test".getBytes()), updateMessage);
+  
+      // now the message is equal to the update message
+      destFileNode = connector.getNode(destFileNode.getId());
+      assertThat(destFileNode.getMessage()).isEqualTo(updateMessage);
+    }
+  }
+  
+  @Test
+  public void shouldSetDeleteMessage() throws Exception {
+    Connector connector = getConnector();
+    if(connector.isSupportsCommitMessage()) {
+      // given
+  
+      String createMessage = "initial create";
+      ConnectorNode destFileNode = connector.createNode("//" + TMP_DIR_NAME, "/test-lhs-copy3.bpmn", ConnectorNodeType.ANY_FILE, createMessage);
+      
+      destFileNode = connector.getNode(destFileNode.getId());
+      assertThat(destFileNode.getMessage()).isEqualTo(createMessage);
+      
+      String deleteMessage = "deleting node ...";
+      connector.deleteNode(destFileNode, deleteMessage);
+      
+      ConnectorNode parentNode = connector.getNode("//" + TMP_DIR_NAME);
+      assertThat(parentNode.getMessage()).isEqualTo(deleteMessage);
     }
   }
 
@@ -217,7 +267,7 @@ public abstract class AbstractConnectorTestBase {
 
       // when
       ContentInformation updatedContentInfo = connector.updateContent(
-        fileNode, new ByteArrayInputStream(inputBytes));
+        fileNode, new ByteArrayInputStream(inputBytes), null);
 
       assertThat(updatedContentInfo).isNotNull();
       assertThat(updatedContentInfo.exists()).isTrue();
@@ -242,8 +292,8 @@ public abstract class AbstractConnectorTestBase {
   private void importFile(Connector connector, String file, String connectorNodeName) throws Exception {
     InputStream is = getDiagramResourceAsStream(file);
 
-    ConnectorNode fileNode = connector.createNode("//" + TMP_DIR_NAME, connectorNodeName, ConnectorNodeType.ANY_FILE);
-    connector.updateContent(fileNode, is);
+    ConnectorNode fileNode = connector.createNode("//" + TMP_DIR_NAME, connectorNodeName, ConnectorNodeType.ANY_FILE, null);
+    connector.updateContent(fileNode, is, null);
 
     IoUtil.closeSilently(is);
   }

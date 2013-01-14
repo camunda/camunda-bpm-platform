@@ -44,22 +44,27 @@ public class DummyConnector extends Connector {
   }
 
   @Override
-  public ConnectorNode createNode(String parentId, String label, ConnectorNodeType type) {
+  public ConnectorNode createNode(String parentId, String label, ConnectorNodeType type, String message) {
     return null;
   }
 
   @Override
-  public void deleteNode(ConnectorNode node) {
+  public void deleteNode(ConnectorNode node, String message) {
     
   }
 
   @Override
-  public ContentInformation updateContent(ConnectorNode node, InputStream newContent) throws Exception {
+  public ContentInformation updateContent(ConnectorNode node, InputStream newContent, String message) throws Exception {
     return null;
   }
 
   @Override
   public boolean needsLogin() {
+    return false;
+  }
+
+  @Override
+  public boolean isSupportsCommitMessage() {
     return false;
   }
 

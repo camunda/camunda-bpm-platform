@@ -13,6 +13,8 @@ import java.util.Scanner;
 
 import javax.inject.Inject;
 
+import junit.framework.Assert;
+
 import com.camunda.fox.cycle.http.ParseException;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
@@ -106,9 +108,10 @@ public class SignavioClientProxyIT {
     try {
       // create empty model
       String label = "CreateModel-" + new Date();
-      String createdModel = signavioClient.createModel(folderId, label);
+      String createdModel = signavioClient.createModel(folderId, label, "create empty model");
       assertThat(createdModel).contains(label);
       String modelId = SignavioJson.extractModelId(new JSONObject(createdModel));
+      Assert.assertEquals("create empty model", SignavioJson.extractModelComment(new JSONObject(createdModel)));
       
       // import new model content
       String modelName = "HEMERA-2219";
@@ -123,7 +126,8 @@ public class SignavioClientProxyIT {
       String importedModelSvg = signavioClient.getModelAsSVG(importedModelId);
       
       // update model
-      signavioClient.updateModel(modelId, label, importedModelJson, importedModelSvg, folderId);
+      String updatedModel = signavioClient.updateModel(modelId, label, importedModelJson, importedModelSvg, folderId, "update model");
+      Assert.assertEquals("update model", SignavioJson.extractModelComment(new JSONObject(updatedModel)));
       
       // compare model contents
       InputStream newXmlContentStream = signavioClient.getXmlContent(modelId);
@@ -149,7 +153,7 @@ public class SignavioClientProxyIT {
     try {
       // create
       String label = "CreateModel-" + new Date();
-      String createdModel = signavioClient.createModel(folderId, label);
+      String createdModel = signavioClient.createModel(folderId, label, null);
       assertThat(createdModel).contains(label);
       
       // delete
@@ -202,7 +206,7 @@ public class SignavioClientProxyIT {
     // create folder
     String name = CREATE_FOLDER_NAME + "-" + new Date();
     String parentId = SignavioJson.extractPrivateFolderId(signavioClient.getChildren(""));
-    String newFolder = signavioClient.createFolder(name, parentId, null);
+    String newFolder = signavioClient.createFolder(name, parentId);
     assertThat(newFolder).contains(name);
     assertThat(newFolder).contains(parentId);
     

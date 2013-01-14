@@ -45,11 +45,11 @@ public abstract class Connector {
    */
   public abstract ContentInformation getContentInformation(ConnectorNode node);
   
-  public abstract ConnectorNode createNode(String parentId, String label, ConnectorNodeType type);
+  public abstract ConnectorNode createNode(String parentId, String label, ConnectorNodeType type, String message);
   
-  public abstract void deleteNode(ConnectorNode node);
+  public abstract void deleteNode(ConnectorNode node, String message);
   
-  public abstract ContentInformation updateContent(ConnectorNode node, InputStream newContent) throws Exception;
+  public abstract ContentInformation updateContent(ConnectorNode node, InputStream newContent, String message) throws Exception;
   
   public void login(String userName, String password) {
   }
@@ -76,4 +76,6 @@ public abstract class Connector {
   public Long getId() {
     return getConfiguration().getId();
   }
+  
+  public abstract boolean isSupportsCommitMessage();
 }

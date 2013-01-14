@@ -201,8 +201,11 @@ public class SignavioClient {
     return extractResponseResult(response);
   }
   
-  public String createModel(String parentId, String label) {
-    Form createModelForm = constructModelForm(constructCreateModelParams(parentId, label));
+  public String createModel(String parentId, String label, String message) {
+    if(message == null) {
+      message = "";
+    }
+    Form createModelForm = constructModelForm(constructCreateModelParams(parentId, label, message));
     Request request = Request.Post(requestUrl(MODEL_URL_SUFFIX))
                              .addHeader("accept", ContentType.APPLICATION_JSON.getMimeType())
                              .bodyForm(createModelForm.build(), Charset.forName(UTF_8));
@@ -210,8 +213,11 @@ public class SignavioClient {
     return extractResponseResult(response);
   }
   
-  public String updateModel(String id, String label, String json, String svg, String parentId) throws JSONException {
-    Form updateModelForm = constructModelForm(constructUpdateModelParams(id, label, json, svg, parentId));
+  public String updateModel(String id, String label, String json, String svg, String parentId, String message) throws JSONException {
+    if(message == null) {
+      message = "";
+    }
+    Form updateModelForm = constructModelForm(constructUpdateModelParams(id, label, json, svg, parentId, message));
     Request request = Request.Put(requestUrl(MODEL_URL_SUFFIX, id))
             .addHeader("accept", ContentType.APPLICATION_JSON.getMimeType())
             .bodyForm(updateModelForm.build(), Charset.forName(UTF_8));
@@ -219,14 +225,14 @@ public class SignavioClient {
     return extractResponseResult(response);
   }
   
-  private Map<String,String> constructCreateModelParams(String parentId, String label) {
+  private Map<String,String> constructCreateModelParams(String parentId, String label, String message) {
     HashMap<String, String> createModelParams = new HashMap<String, String>();
     InputStream emptyJson = null;
     
     try {
       createModelParams.put("id", UUID.randomUUID().toString().replace("-", ""));
       createModelParams.put("name", label);
-      createModelParams.put("comment", "");
+      createModelParams.put("comment", message);
       createModelParams.put("description", "");
       createModelParams.put("parent", parentId);
   
@@ -245,7 +251,7 @@ public class SignavioClient {
     return createModelParams;
   }
   
-  private Map<String, String> constructUpdateModelParams(String id, String name, String json, String svg, String parentId) throws JSONException {
+  private Map<String, String> constructUpdateModelParams(String id, String name, String json, String svg, String parentId, String message) throws JSONException {
     HashMap<String, String> updateModelParams = new HashMap<String, String>();
     
     if (id.startsWith(SLASH_CHAR)) {
@@ -261,7 +267,7 @@ public class SignavioClient {
       svg = "<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:oryx=\"http://oryx-editor.org\" id=\"sid-80D82B67-3B30-4B35-A6CB-16EEE17A719F\" width=\"50\" height=\"50\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" xmlns:svg=\"http://www.w3.org/2000/svg\"><defs/><g stroke=\"black\" font-family=\"Verdana, sans-serif\" font-size-adjust=\"none\" font-style=\"normal\" font-variant=\"normal\" font-weight=\"normal\" line-heigth=\"normal\" font-size=\"12\"><g class=\"stencils\" transform=\"translate(25, 25)\"><g class=\"me\"/><g class=\"children\"/><g class=\"edge\"/></g></g></svg>";
     }
     updateModelParams.put("svg_xml", svg);
-    updateModelParams.put("comment", "");
+    updateModelParams.put("comment", message);
     updateModelParams.put("description", "");
     updateModelParams.put("parent", parentId);
     
@@ -289,11 +295,11 @@ public class SignavioClient {
     return createModelForm;
   }
 
-  public String createFolder(String name, String parent, String description) {
+  public String createFolder(String name, String parent) {
     Form createFolderForm = Form.form();
     createFolderForm.add("name", name);
     createFolderForm.add("parent", SLASH_CHAR + DIRECTORY_URL_SUFFIX + parent);
-    createFolderForm.add("description", description);
+    createFolderForm.add("description", "");
     
     Request request = Request.Post(requestUrl(DIRECTORY_URL_SUFFIX))
                              .addHeader("accept", ContentType.APPLICATION_JSON.getMimeType())

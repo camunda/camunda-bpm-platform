@@ -14,6 +14,7 @@ import java.util.logging.Logger;
 import org.apache.commons.io.IOUtils;
 import org.tigris.subversion.svnclientadapter.ISVNClientAdapter;
 import org.tigris.subversion.svnclientadapter.ISVNDirEntry;
+import org.tigris.subversion.svnclientadapter.ISVNProperty;
 import org.tigris.subversion.svnclientadapter.SVNClientException;
 import org.tigris.subversion.svnclientadapter.SVNNodeKind;
 import org.tigris.subversion.svnclientadapter.SVNRevision;
@@ -175,10 +176,22 @@ public class SvnConnector extends Connector {
       
       if (entry != null) {
         ConnectorNode node = new ConnectorNode(id);
+        node.setMessage(extractCommitMessage(svnUrl, entry));
         return decorateConnectorNode(node, entry);
       }
     } catch (Exception e) {
       logger.log(Level.FINER, "Cannot get node '" + id + "' in Svn '" + getId() + "'.", e);
+    }
+    return null;
+  }
+
+  protected String extractCommitMessage(SVNUrl svnUrl, ISVNDirEntry entry) throws SVNClientException {
+    ISVNProperty[] properties = svnClientAdapter.getRevProperties(svnUrl, entry.getLastChangedRevision());
+    for (int i = 0; i < properties.length; i++) {
+      ISVNProperty prop = properties[i];
+      if("svn:log".equals(prop.getName())) {
+        return prop.getValue();
+      }
     }
     return null;
   }
@@ -187,7 +200,7 @@ public class SvnConnector extends Connector {
     node.setLabel(entry.getPath());
     node.setLastModified(entry.getLastChangedDate());
     node.setConnectorId(getId());
-    node.setType(extractFileType(entry));
+    node.setType(extractFileType(entry));    
     
     return node;
   }
@@ -212,7 +225,7 @@ public class SvnConnector extends Connector {
   @Threadsafe
   @Secured
   @Override
-  public ConnectorNode createNode(String parentId, String label, ConnectorNodeType type) {
+  public ConnectorNode createNode(String parentId, String label, ConnectorNodeType type, String message) {
     try {
       
       if (type == null || type == ConnectorNodeType.UNSPECIFIED) {
@@ -242,13 +255,18 @@ public class SvnConnector extends Connector {
         svnClientAdapter.addDirectory(newFile, true);
       }
       
-      commit(new File[] {temporaryFileStore}, "Created node '" + label + "' in '" + parentFolder + "' using camunda fox cycle.");
+      String defaultMessage = "Created node '" + label + "' in '" + parentFolder + "' using camunda fox cycle.";
+      if(message == null || message.length()==0) {
+        message = defaultMessage;
+      }
+      
+      commit(new File[] {temporaryFileStore}, message);
       
       stopTransaction();
       
       deleteRecursively(temporaryFileStore);
       
-      return new ConnectorNode(id, label, getId() , type);
+      return new ConnectorNode(id, label, getId() , type, message);
     } catch (Exception e) {
       logger.log(Level.FINER, "Error while creating node '" + label + "'.", e);
       throw new CycleException(e);
@@ -258,11 +276,15 @@ public class SvnConnector extends Connector {
   @Threadsafe
   @Secured
   @Override
-  public void deleteNode(ConnectorNode node) {
+  public void deleteNode(ConnectorNode node, String message) {
     String id = node.getId();
     try {
       SVNUrl svnUrl = createSvnUrl(id);
-      svnClientAdapter.remove(new SVNUrl[] {svnUrl}, "Removed '" + id + "' using camunda fox cycle.");
+      String defaultMessage = "Removed '" + id + "' using camunda fox cycle.";
+      if(message == null || message.length()==0) {
+        message = defaultMessage;
+      }
+      svnClientAdapter.remove(new SVNUrl[] {svnUrl}, message);
     } catch (Exception e) {
       logger.log(Level.FINER, "Error while deleting node '" + id + "'.", e);
       throw new CycleException(e);
@@ -272,7 +294,7 @@ public class SvnConnector extends Connector {
   @Threadsafe
   @Secured
   @Override
-  public ContentInformation updateContent(ConnectorNode node, InputStream newContent) {
+  public ContentInformation updateContent(ConnectorNode node, InputStream newContent, String message) {
     try {
       beginTransaction();
       
@@ -289,7 +311,12 @@ public class SvnConnector extends Connector {
       bos.flush();
       bos.close();
       
-      commit(new File[] {temporaryFileStore}, "Updated file '" + node.getLabel() + "' in '" + parentFolderId + "' using camunda fox cycle");
+      String defaultMessage = "Updated file '" + node.getLabel() + "' in '" + parentFolderId + "' using camunda fox cycle";
+      if(message == null || message.length()==0) {
+        message = defaultMessage;
+      }
+      
+      commit(new File[] {temporaryFileStore}, message);
       
       stopTransaction();
       
@@ -432,5 +459,10 @@ public class SvnConnector extends Connector {
       svnClientAdapter = null;
     }
     loggedIn = false;
+  }
+  
+  @Override
+  public boolean isSupportsCommitMessage() {
+    return true;
   }
 }

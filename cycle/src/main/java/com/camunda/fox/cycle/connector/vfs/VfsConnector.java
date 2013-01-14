@@ -164,7 +164,9 @@ public class VfsConnector extends Connector {
 
   @Secured
   @Override
-  public ContentInformation updateContent(ConnectorNode node, InputStream newContent)  throws Exception {
+  public ContentInformation updateContent(ConnectorNode node, InputStream newContent, String message)  throws Exception {
+    
+    // message is ignored    
     
     try {
       FileObject fileObject = getFileObject(node);
@@ -211,7 +213,8 @@ public class VfsConnector extends Connector {
   }
 
   @Override
-  public ConnectorNode createNode(String parentId, String label, ConnectorNodeType type) {
+  public ConnectorNode createNode(String parentId, String label, ConnectorNodeType type, String message) {
+    // message is ignored
     
     if (type == null || type == ConnectorNodeType.UNSPECIFIED) {
       throw new IllegalArgumentException("Must specify a valid node type");
@@ -240,7 +243,9 @@ public class VfsConnector extends Connector {
   }
 
   @Override
-  public void deleteNode(ConnectorNode node) {
+  public void deleteNode(ConnectorNode node, String message) {
+    // message is ignored
+    
     try {
       FileSystemManager fsManager = VFS.getManager();
       FileObject fileObject;
@@ -357,6 +362,11 @@ public class VfsConnector extends Connector {
 
   @Override
   public boolean needsLogin() {
+    return false;
+  }
+  
+  @Override
+  public boolean isSupportsCommitMessage() {
     return false;
   }
 }

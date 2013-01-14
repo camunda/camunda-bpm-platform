@@ -16,6 +16,8 @@ public class ConnectorNode implements Serializable {
 
   private Date created;
   private Date lastModified;
+  
+  private String message;
 
   private ConnectorNodeType type = ConnectorNodeType.UNSPECIFIED;
 
@@ -57,6 +59,11 @@ public class ConnectorNode implements Serializable {
     this.type = type;
   }
   
+  public ConnectorNode(String id, String label, Long connectorId, ConnectorNodeType type, String message) {
+    this(id, label, connectorId, type);
+    this.message = message;
+  }
+
   /**
    * Return the id of this node. May contain different representations, 
    * depending on the corresponding connector
@@ -113,6 +120,17 @@ public class ConnectorNode implements Serializable {
 
   public void setConnectorId(Long connectorId) {
     this.connectorId = connectorId;
+  }
+  
+  /**
+   * @return commit message
+   */
+  public String getMessage() {
+    return message;
+  }
+  
+  public void setMessage(String message) {
+    this.message = message;
   }
 
   @Override
