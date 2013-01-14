@@ -10,11 +10,13 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.camunda.fox.cycle.http.client.HttpResponseException;
+import javax.inject.Inject;
+
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 import org.springframework.stereotype.Component;
 
+import com.camunda.fox.cycle.configuration.CycleConfiguration;
 import com.camunda.fox.cycle.connector.Connector;
 import com.camunda.fox.cycle.connector.ConnectorNode;
 import com.camunda.fox.cycle.connector.ConnectorNodeType;
@@ -22,6 +24,7 @@ import com.camunda.fox.cycle.connector.ContentInformation;
 import com.camunda.fox.cycle.connector.Secured;
 import com.camunda.fox.cycle.entity.ConnectorConfiguration;
 import com.camunda.fox.cycle.exception.CycleException;
+import com.camunda.fox.cycle.http.client.HttpResponseException;
 import com.camunda.fox.cycle.util.IoUtil;
 
 @Component
@@ -48,6 +51,9 @@ public class SignavioConnector extends Connector {
   
   private SignavioClient signavioClient;
   private boolean loggedIn = false;
+  
+  @Inject 
+  private CycleConfiguration cycleConfiguration;
 
   @Override
   public void login(String username, String password) {
@@ -68,13 +74,25 @@ public class SignavioConnector extends Connector {
   public void init(ConnectorConfiguration config) {
     try {
       if (getSignavioClient() == null) {
+        
+        String defaultCommitMessage = getDefaultCommitMessage();
+        
         signavioClient = new SignavioClient(getConfiguration().getProperties().get(CONFIG_KEY_SIGNAVIO_BASE_URL),
                                             getConfiguration().getProperties().get(CONFIG_KEY_PROXY_URL),
                                             getConfiguration().getProperties().get(CONFIG_KEY_PROXY_USERNAME),
-                                            getConfiguration().getProperties().get(CONFIG_KEY_PROXY_PASSWORD));
+                                            getConfiguration().getProperties().get(CONFIG_KEY_PROXY_PASSWORD),
+                                            defaultCommitMessage);
       }
     } catch (URISyntaxException e) {
       throw new CycleException("Unable to initialize Signavio REST client!", e);
+    }
+  }
+
+  protected String getDefaultCommitMessage() {
+    if(cycleConfiguration != null) {
+      return cycleConfiguration.getDefaultCommitMessage();
+    } else {
+      return "";
     }
   }
 

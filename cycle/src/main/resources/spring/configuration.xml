@@ -17,8 +17,10 @@
     <property name="useJaas" value="false" />
     
     <!-- cycle email service configuration -->
-    <property name="emailFrom" value="cycle@localhost" />
+    <property name="emailFrom" value="cycle@localhost" />  
     <!-- <property name="mailSessionName" value="" /> -->
+    
+    <property name="defaultCommitMessage" value="Changed using camunda fox cycle" />
     
   </bean>
   

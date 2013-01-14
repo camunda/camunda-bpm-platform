@@ -11,6 +11,8 @@ import java.util.concurrent.locks.ReentrantLock;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.inject.Inject;
+
 import org.apache.commons.io.IOUtils;
 import org.tigris.subversion.svnclientadapter.ISVNClientAdapter;
 import org.tigris.subversion.svnclientadapter.ISVNDirEntry;
@@ -23,6 +25,7 @@ import org.tigris.subversion.svnclientadapter.commandline.CmdLineClientAdapterFa
 import org.tigris.subversion.svnclientadapter.svnkit.SvnKitClientAdapter;
 import org.tigris.subversion.svnclientadapter.svnkit.SvnKitClientAdapterFactory;
 
+import com.camunda.fox.cycle.configuration.CycleConfiguration;
 import com.camunda.fox.cycle.connector.Connector;
 import com.camunda.fox.cycle.connector.ConnectorNode;
 import com.camunda.fox.cycle.connector.ConnectorNodeType;
@@ -50,6 +53,9 @@ public class SvnConnector extends Connector {
   private ReentrantLock transactionLock = new ReentrantLock();
 
   private boolean loggedIn;
+  
+  @Inject
+  private CycleConfiguration cycleConfiguration;
   
   static {
     setupFactories();
@@ -255,7 +261,7 @@ public class SvnConnector extends Connector {
         svnClientAdapter.addDirectory(newFile, true);
       }
       
-      String defaultMessage = "Created node '" + label + "' in '" + parentFolder + "' using camunda fox cycle.";
+      String defaultMessage = getDefaultCommitMessage("Created node '" + label + "' in '" + parentFolder + "' using camunda fox cycle.");
       if(message == null || message.length()==0) {
         message = defaultMessage;
       }
@@ -280,7 +286,7 @@ public class SvnConnector extends Connector {
     String id = node.getId();
     try {
       SVNUrl svnUrl = createSvnUrl(id);
-      String defaultMessage = "Removed '" + id + "' using camunda fox cycle.";
+      String defaultMessage = getDefaultCommitMessage("Removed '" + id + "' using camunda fox cycle.");
       if(message == null || message.length()==0) {
         message = defaultMessage;
       }
@@ -288,6 +294,14 @@ public class SvnConnector extends Connector {
     } catch (Exception e) {
       logger.log(Level.FINER, "Error while deleting node '" + id + "'.", e);
       throw new CycleException(e);
+    }
+  }
+
+  protected String getDefaultCommitMessage(String string) {
+    if(cycleConfiguration != null) {
+      return cycleConfiguration.getDefaultCommitMessage();
+    } else {
+      return string;
     }
   }
 
@@ -311,7 +325,7 @@ public class SvnConnector extends Connector {
       bos.flush();
       bos.close();
       
-      String defaultMessage = "Updated file '" + node.getLabel() + "' in '" + parentFolderId + "' using camunda fox cycle";
+      String defaultMessage = getDefaultCommitMessage("Updated file '" + node.getLabel() + "' in '" + parentFolderId + "' using camunda fox cycle");
       if(message == null || message.length()==0) {
         message = defaultMessage;
       }

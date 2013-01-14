@@ -59,4 +59,10 @@
     <property name="databaseSchemaUpdate" value="true" />
     <property name="jobExecutorActivate" value="false" />
   </bean>
+  
+  <bean id="cycleConfiguration" class="com.camunda.fox.cycle.configuration.CycleConfiguration">
+
+    <property name="defaultCommitMessage" value="Changed using camunda fox cycle" />
+    
+  </bean>
 </beans>

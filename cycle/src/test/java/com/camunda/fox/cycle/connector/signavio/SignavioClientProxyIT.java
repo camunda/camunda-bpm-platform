@@ -57,7 +57,8 @@ public class SignavioClientProxyIT {
             new SignavioClient(configuration.getProperties().get(SignavioConnector.CONFIG_KEY_SIGNAVIO_BASE_URL),
                                configuration.getProperties().get(SignavioConnector.CONFIG_KEY_PROXY_URL),
                                configuration.getProperties().get(SignavioConnector.CONFIG_KEY_PROXY_USERNAME),
-                               configuration.getProperties().get(SignavioConnector.CONFIG_KEY_PROXY_PASSWORD));
+                               configuration.getProperties().get(SignavioConnector.CONFIG_KEY_PROXY_PASSWORD),
+                               "");
     assertTrue("Failed to login.", signavioClient.login(configuration.getGlobalUser(), configuration.getGlobalPassword()));
   }
 

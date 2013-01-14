@@ -1,6 +1,7 @@
 package com.camunda.fox.cycle.web.filter;
 
 import java.io.IOException;
+
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
 import javax.servlet.FilterConfig;
@@ -13,7 +14,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
-import com.camunda.fox.cycle.configuration.CycleConfiguration;
+import com.camunda.fox.cycle.repository.UserRepository;
 
 /**
  *
@@ -22,10 +23,13 @@ import com.camunda.fox.cycle.configuration.CycleConfiguration;
 public class InitialConfigurationFilter implements Filter {
 
   private WebApplicationContext context;
+  
+  private UserRepository userRepository;
 
   @Override
   public void init(FilterConfig config) throws ServletException {
     context = WebApplicationContextUtils.getWebApplicationContext(config.getServletContext());
+    userRepository = context.getBean(UserRepository.class);
   }
 
   @Override
@@ -38,12 +42,15 @@ public class InitialConfigurationFilter implements Filter {
   }
 
   void filterInitialConfiguration(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
-    CycleConfiguration config = context.getBean(CycleConfiguration.class);
-    if (!config.isConfigured() && !isConfigurationPage(request)) {
+    if (!isAtLeastOneUserConfigured() && !isConfigurationPage(request)) {
       redirectToConfigurationPage(request, response);
     } else {
       chain.doFilter(request, response);
     }
+  }
+
+  protected boolean isAtLeastOneUserConfigured() {
+    return userRepository.countAll()>0;
   }
 
   private void redirectToConfigurationPage(HttpServletRequest request, HttpServletResponse response) throws IOException {

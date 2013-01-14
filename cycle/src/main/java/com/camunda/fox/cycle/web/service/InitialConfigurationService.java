@@ -9,6 +9,7 @@ import javax.ws.rs.core.MediaType;
 
 import com.camunda.fox.cycle.configuration.CycleConfiguration;
 import com.camunda.fox.cycle.entity.User;
+import com.camunda.fox.cycle.repository.UserRepository;
 import com.camunda.fox.cycle.security.IdentityHolder;
 import com.camunda.fox.cycle.web.dto.UserDTO;
 import com.camunda.fox.cycle.web.service.resource.UserService;
@@ -28,6 +29,9 @@ public class InitialConfigurationService extends AbstractRestService {
   
   @Inject
   private UserService userService;
+  
+  @Inject
+  private UserRepository userRepository;
   
   @GET
   @Produces(MediaType.TEXT_HTML)
@@ -65,6 +69,6 @@ public class InitialConfigurationService extends AbstractRestService {
   }
 
   private boolean isConfigured() {
-    return configuration.isConfigured();
+    return configuration.isUseJaas() || (userRepository.countAll() > 0);
   }
 }

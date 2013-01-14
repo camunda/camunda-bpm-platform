@@ -107,12 +107,15 @@ public class SignavioClient {
   
   private String securityToken;
 
+  private String defaultCommitMessage;
+
   
-  public SignavioClient(String signavioBaseUrl, String proxyUrl, String proxyUsername, String proxyPassword) throws URISyntaxException {
+  public SignavioClient(String signavioBaseUrl, String proxyUrl, String proxyUsername, String proxyPassword, String defaultCommitMessage) throws URISyntaxException {
     this.signavioBaseUrl = signavioBaseUrl;
     this.proxyUrl = proxyUrl;
     this.proxyUsername = proxyUsername;
     this.proxyPassword = proxyPassword;
+    this.defaultCommitMessage = defaultCommitMessage;
     initHttpClient();
   }
   
@@ -202,8 +205,8 @@ public class SignavioClient {
   }
   
   public String createModel(String parentId, String label, String message) {
-    if(message == null) {
-      message = "";
+    if(message == null || message.length() == 0) {
+      message = defaultCommitMessage;
     }
     Form createModelForm = constructModelForm(constructCreateModelParams(parentId, label, message));
     Request request = Request.Post(requestUrl(MODEL_URL_SUFFIX))
@@ -214,8 +217,8 @@ public class SignavioClient {
   }
   
   public String updateModel(String id, String label, String json, String svg, String parentId, String message) throws JSONException {
-    if(message == null) {
-      message = "";
+    if(message == null || message.length() == 0) {
+      message = defaultCommitMessage;
     }
     Form updateModelForm = constructModelForm(constructUpdateModelParams(id, label, json, svg, parentId, message));
     Request request = Request.Put(requestUrl(MODEL_URL_SUFFIX, id))
