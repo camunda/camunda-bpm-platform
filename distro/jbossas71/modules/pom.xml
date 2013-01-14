@@ -33,12 +33,17 @@
           <groupId>commons-lang</groupId>
           <artifactId>commons-lang</artifactId>
         </exclusion>
+        <exclusion>
+          <groupId>joda-time</groupId>
+          <artifactId>joda-time</artifactId>
+        </exclusion>
       </exclusions>
     </dependency>   
   	<dependency>
   		<groupId>org.bouncycastle</groupId>
   		<artifactId>bcpg-jdk15on</artifactId>
   	</dependency> 
+      
   </dependencies>
 
   <build>
@@ -87,6 +92,28 @@
                   <include name="**/module.xml" />
                 </replace>                
               </target>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>copy</id>
+            <phase>package</phase>
+            <goals>
+              <goal>copy</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>joda-time</groupId>
+                  <artifactId>joda-time</artifactId>                  
+                  <outputDirectory>${project.build.directory}/modules/org/joda/time/2.1/</outputDirectory>
+                </artifactItem>
+              </artifactItems>
             </configuration>
           </execution>
         </executions>

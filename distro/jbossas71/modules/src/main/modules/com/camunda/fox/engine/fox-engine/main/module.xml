@@ -16,7 +16,8 @@
   
 	<module name="org.mybatis.mybatis" />	
     <module name="com.fasterxml.uuid.java-uuid-generator"/>
-    <module name="org.livetribe.livetribe-jsr223" />    
+    <module name="org.livetribe.livetribe-jsr223" />
+    <module name="org.joda.time" slot="2.1" />        
         
   </dependencies>
 </module>
