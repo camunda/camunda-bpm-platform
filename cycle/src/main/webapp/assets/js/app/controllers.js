@@ -222,7 +222,7 @@ function SyncRoundtripController($scope, $http, $q, App, Event) {
   
   $scope.performSync = function() {
     $scope.status = PERFORM_SYNC;
-    $("#commitMessage").attr("disabled", "disabled");
+    $("#commitMessageSync").attr("disabled", "disabled");
     
     var Delay = function(delayMs) {
       var deferred = $q.defer();
@@ -241,7 +241,7 @@ function SyncRoundtripController($scope, $http, $q, App, Event) {
       success(function(data) {
         delayed.then(function() {
           $scope.roundtrip.$get({id: $scope.roundtrip.id });
-          $("#commitMessage").removeAttr("disabled");
+          $("#commitMessageSync").removeAttr("disabled");
           var status = data.status;
           if (status == "SYNC_SUCCESS") {
             $scope.status = SYNC_SUCCESS;
@@ -289,7 +289,7 @@ function BpmnDiagramController($scope, Commons, Event, $http, App) {
     });
   };
   
-  $scope.createDiagram = function(diagram) {
+  $scope.createDiagram = function(diagram, commitMessage) {
     switch ($scope.handle) {
     case "rightDiagram":
       $scope.syncMode = "LEFT_TO_RIGHT";
@@ -298,7 +298,7 @@ function BpmnDiagramController($scope, Commons, Event, $http, App) {
       $scope.syncMode = "RIGHT_TO_LEFT";
     }
     
-    $http.post(App.uri('secured/resource/roundtrip/' + $scope.roundtrip.id + '/create/?diagramlabel=' + diagram.label + '&syncMode=' + $scope.syncMode + '&modeler=' + diagram.modeler + '&connectorId=' + diagram.connectorNode.connectorId + '&parentFolderId=' + diagram.connectorNode.id))
+    $http.post(App.uri('secured/resource/roundtrip/' + $scope.roundtrip.id + '/create/?diagramlabel=' + diagram.label + '&syncMode=' + $scope.syncMode + '&modeler=' + diagram.modeler + '&connectorId=' + diagram.connectorNode.connectorId + '&parentFolderId=' + diagram.connectorNode.id +'&message='+encodeURIComponent(commitMessage)))
     .success(function(data) {
         $scope.roundtrip.$get({id: $scope.roundtrip.id });
         $scope.status = SYNC_SUCCESS;
@@ -357,6 +357,8 @@ function EditDiagramController($scope, Commons, Event, ConnectorConfiguration) {
   // Error to be displayed in dialog
   $scope.error = null;
   
+  $scope.commitMessage = "Model created using camunda cycle.";
+  
   $scope.modelerNames = [];
   $scope.connectors = ConnectorConfiguration.query();
 
@@ -366,6 +368,10 @@ function EditDiagramController($scope, Commons, Event, ConnectorConfiguration) {
   // Can the modeler name be edited?
   var canEditModeler = $scope.canEditModeler = function() {
     return !!($scope.identifier != RIGHT_HAND_SIDE || ($scope.editDiagram.modeler && $scope.editDiagram.modeler != FOX_DESIGNER));
+  };
+  
+  $scope.showCommitMessageInput = function() {
+    return $scope.editDialogMode == "CREATE_NEW_DIAGRAM";
   };
     
   // is the dialog model valid and can be submitted?
@@ -404,7 +410,7 @@ function EditDiagramController($scope, Commons, Event, ConnectorConfiguration) {
   };
   
   $scope.create = function() {
-      $scope.createDiagram($scope.editDiagram);
+      $scope.createDiagram($scope.editDiagram, $scope.commitMessage);
   };
 
   // Watch for component error  
