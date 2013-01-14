@@ -79,7 +79,6 @@ import org.activiti.engine.impl.form.LongFormType;
 import org.activiti.engine.impl.form.StringFormType;
 import org.activiti.engine.impl.history.handler.HistoryParseListener;
 import org.activiti.engine.impl.interceptor.CommandContextFactory;
-import org.activiti.engine.impl.interceptor.CommandContextInterceptor;
 import org.activiti.engine.impl.interceptor.CommandExecutor;
 import org.activiti.engine.impl.interceptor.CommandExecutorImpl;
 import org.activiti.engine.impl.interceptor.CommandInterceptor;
@@ -110,8 +109,8 @@ import org.activiti.engine.impl.persistence.entity.GroupManager;
 import org.activiti.engine.impl.persistence.entity.HistoricActivityInstanceManager;
 import org.activiti.engine.impl.persistence.entity.HistoricDetailManager;
 import org.activiti.engine.impl.persistence.entity.HistoricProcessInstanceManager;
-import org.activiti.engine.impl.persistence.entity.HistoricVariableInstanceManager;
 import org.activiti.engine.impl.persistence.entity.HistoricTaskInstanceManager;
+import org.activiti.engine.impl.persistence.entity.HistoricVariableInstanceManager;
 import org.activiti.engine.impl.persistence.entity.IdentityInfoManager;
 import org.activiti.engine.impl.persistence.entity.IdentityLinkManager;
 import org.activiti.engine.impl.persistence.entity.JobManager;
@@ -157,6 +156,7 @@ import org.apache.ibatis.transaction.TransactionFactory;
 import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
 import org.apache.ibatis.transaction.managed.ManagedTransactionFactory;
 import org.apache.ibatis.type.JdbcType;
+import org.camunda.bpm.engine.impl.application.ProcessApplicationManager;
 
 
 /**
@@ -299,6 +299,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   
   protected boolean isCreateDiagramOnDeploy = true;
   
+  protected ProcessApplicationManager processApplicationManager;
+  
   // buildProcessEngine ///////////////////////////////////////////////////////
   
   public ProcessEngine buildProcessEngine() {
@@ -333,6 +335,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initDelegateInterceptor();
     initEventHandlers();
     initFailedJobCommandFactory();
+    initProcessApplicationManager();
   }
 
   // failedJobCommandFactory ////////////////////////////////////////////////////////
@@ -954,6 +957,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected void initBeans() {
     if (beans == null) {
       beans = new HashMap<Object, Object>();
+    }
+  }
+  
+  protected void initProcessApplicationManager() {
+    if(processApplicationManager == null) {
+      processApplicationManager = new ProcessApplicationManager();
     }
   }
 
@@ -1710,5 +1719,13 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public void setIdGeneratorDataSourceJndiName(String idGeneratorDataSourceJndiName) {
     this.idGeneratorDataSourceJndiName = idGeneratorDataSourceJndiName;
+  }
+  
+  public ProcessApplicationManager getProcessApplicationManager() {
+    return processApplicationManager;
+  }
+  
+  public void setProcessApplicationManager(ProcessApplicationManager processApplicationManager) {
+    this.processApplicationManager = processApplicationManager;
   }
 }

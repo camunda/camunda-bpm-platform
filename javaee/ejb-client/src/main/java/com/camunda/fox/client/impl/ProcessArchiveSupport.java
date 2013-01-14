@@ -25,7 +25,7 @@ import javax.ejb.Startup;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 
-import org.camunda.bpm.application.ejb.EjbProcessApplication;
+import org.camunda.bpm.application.spi.EjbProcessApplication;
 
 
 /**

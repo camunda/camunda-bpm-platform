@@ -1,5 +1,7 @@
 package com.camunda.fox.client.impl.spi;
 
+import org.camunda.bpm.application.spi.ProcessApplicationExtension;
+
 
 /**
  * <p>SPI interface for implementing process archive extensions</p>

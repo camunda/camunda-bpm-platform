@@ -1,5 +1,7 @@
 package com.camunda.fox.client.impl;
 
+import org.camunda.bpm.application.spi.ProcessApplication;
+
 import com.camunda.fox.client.impl.spi.ProcessArchiveExtension;
 
 /**

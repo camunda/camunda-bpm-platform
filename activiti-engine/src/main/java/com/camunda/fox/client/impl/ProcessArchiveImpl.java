@@ -18,9 +18,15 @@ package com.camunda.fox.client.impl;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Callable;
+
+import org.camunda.bpm.application.ProcessApplicationUnavailableException;
+import org.camunda.bpm.application.spi.ProcessApplication;
+import org.camunda.bpm.application.spi.ProcessApplicationReference;
 
 import com.camunda.fox.client.impl.schema.ProcessesXml.ProcessArchiveXml;
 import com.camunda.fox.client.impl.util.BpmnResourceLoader;
+import com.camunda.fox.platform.FoxPlatformException;
 import com.camunda.fox.platform.spi.ProcessArchive;
 import com.camunda.fox.platform.spi.ProcessArchiveCallback;
 
@@ -33,16 +39,19 @@ public class ProcessArchiveImpl implements ProcessArchive {
 
   protected final ProcessArchiveXml processArchiveXml;
   protected final Map<String, Object> properties;
+  protected final ProcessApplicationReference processApplicationReference;
   private ProcessApplication processApplication;
     
-  public ProcessArchiveImpl(ProcessArchiveXml processArchiveXml, URL metaFileUrl, ProcessApplication processApplication) {
+  public ProcessArchiveImpl(ProcessArchiveXml processArchiveXml, URL metaFileUrl, ProcessApplicationReference processApplicationReference, ProcessApplication processApplication) {
     this.processArchiveXml = processArchiveXml;
-    this.processApplication = processApplication; 
+    this.processApplicationReference = processApplicationReference;
+    this.processApplication = processApplication;
     properties = new HashMap<String, Object>();
     properties.put(PROP_IS_DELETE_UPON_UNDEPLOY, processArchiveXml.configuration.undeployment.delete);
     properties.put(PROP_IS_SCAN_FOR_PROCESS_DEFINITIONS, true);
     properties.put(PROP_META_FILE_URL, metaFileUrl);
     properties.put(PROP_RESOURCE_ROOT_PATH, processArchiveXml.configuration.resourceRootPath);
+    properties.put(PROP_PROCESS_APPLICATION_REFERENCE, processApplicationReference);
   }
   
   public String getName() {
@@ -62,8 +71,13 @@ public class ProcessArchiveImpl implements ProcessArchive {
     return processApplication.getProcessApplicationClassloader();
   }
 
-  public <T> T executeWithinContext(ProcessArchiveCallback<T> callback) throws Exception {
-    return processApplication.getReference().executeWithinContext(callback);
+  public <T> T executeWithinContext(final ProcessArchiveCallback<T> callback) throws Exception {
+    // wrap deprecated ProcessArchiveCallback as Callable
+    return processApplicationReference.getProcessApplication().execute(new Callable<T>() {
+      public T call() throws Exception {
+        return callback.execute(); 
+      }
+    });
  }
 
   public String getProcessEngineName() {
@@ -73,6 +87,5 @@ public class ProcessArchiveImpl implements ProcessArchive {
   public Map<String, Object> getProperties() {
     return properties;
   }
-
   
 }

@@ -23,13 +23,9 @@ import javax.naming.InitialContext;
 import javax.naming.NamingException;
 import javax.persistence.EntityManagerFactory;
 
-import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
-import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
-
 import com.camunda.fox.platform.FoxPlatformException;
 import com.camunda.fox.platform.impl.context.spi.ProcessArchiveServices;
 import com.camunda.fox.platform.impl.service.ProcessEngineController;
-import com.camunda.fox.platform.spi.ProcessArchiveCallback;
 
 /**
  * @author Daniel Meyer
@@ -45,16 +41,7 @@ public class DefaultProcessArchiveServices implements ProcessArchiveServices {
   }
 
   public BeanManager getBeanManager() {
-    if(ProcessArchiveContext.getCurrentContext() == null) {
-      return null;
-    } else {
-      return ProcessArchiveContext.executeWithinCurrentContext(new ProcessArchiveCallback<BeanManager>() {    
-        public BeanManager execute() {
-          InitialContext initialContext = getInitialContext();          
-          return lookupBeanManagerInJndi(initialContext);
-        }      
-      });    
-    }
+    return lookupBeanManagerInJndi(getInitialContext());
   }
 
  
@@ -80,16 +67,7 @@ public class DefaultProcessArchiveServices implements ProcessArchiveServices {
       return null;
     }
   }
-
-  public ProcessArchiveContext getProcessArchiveContext(String processDefinitionKey) {
-    return processEngineServiceController.getProcessArchiveContext(processDefinitionKey);
-  }
   
-  public ProcessArchiveContext getProcessArchiveContextForExecution(ExecutionEntity executionEntity) {
-    ProcessDefinitionEntity processDefinitionEntity = (ProcessDefinitionEntity) executionEntity.getProcessDefinition();    
-    return getProcessArchiveContext(processDefinitionEntity.getKey());
-  }
-
   @Override
   public ProcessEngineController getProcessEngineController() {
     return processEngineServiceController;

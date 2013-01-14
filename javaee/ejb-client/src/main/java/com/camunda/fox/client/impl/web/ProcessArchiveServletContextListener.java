@@ -6,7 +6,8 @@ import javax.inject.Inject;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
-import com.camunda.fox.client.impl.ProcessApplication;
+import org.camunda.bpm.application.spi.ProcessApplication;
+
 import com.camunda.fox.platform.spi.ProcessArchive;
 
 /**

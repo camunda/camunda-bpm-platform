@@ -36,6 +36,9 @@ import org.activiti.engine.impl.jobexecutor.JobExecutor;
 import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.repository.ProcessDefinition;
+import org.camunda.bpm.application.spi.ProcessApplicationReference;
+import org.camunda.bpm.engine.application.ProcessApplicationRegistration;
+import org.camunda.bpm.engine.impl.application.ProcessApplicationManager;
 
 import com.camunda.fox.platform.FoxPlatformException;
 import com.camunda.fox.platform.impl.configuration.spi.ProcessEngineConfigurationFactory;
@@ -241,6 +244,13 @@ public class ProcessEngineController {
       for (ProcessDefinition processDefinition : processDefinitionsForThisDeployment) {
         installedProcessArchives.put(processDefinition.getKey(), processArchiveContext);
       }
+      
+      ProcessApplicationManager processApplicationManager = processEngineConfiguration.getProcessApplicationManager();
+      ProcessApplicationReference reference = (ProcessApplicationReference) processArchive.getProperties().get(ProcessArchive.PROP_PROCESS_APPLICATION_REFERENCE);
+      ProcessApplicationRegistration registration = processApplicationManager.registerProcessApplicationForDeployment(deployment.getId(), reference);
+      processArchiveContext.setProcessApplicationReference(reference);
+      processArchiveContext.setProcessApplicationRegistration(registration);      
+      
       log.info("Installed process archive '" + paName + "' to process engine '"+processEngineName+"'.");
       return activitiProcessEngine;
     } else {
@@ -287,6 +297,10 @@ public class ProcessEngineController {
           installedProcessArchives.remove(key);
         }
       }
+      ProcessApplicationRegistration processApplicationRegistration = processArchiveContext.getProcessApplicationRegistration();      
+      if(processApplicationRegistration != null) {
+        processApplicationRegistration.unregister();
+      }
     }    
   }
   
@@ -299,10 +313,14 @@ public class ProcessEngineController {
   }
 
   protected Deployment performEngineDeployment(ProcessArchive processArchive) {
+    
     String deploymentId = activitiDeployer.processArchiveDeployed(processArchive);   
+    
     if(deploymentId == null) {
       return null;
-    } else {
+      
+    } else {      
+      
       return activitiProcessEngine.getRepositoryService()
               .createDeploymentQuery()
               .deploymentId(deploymentId)

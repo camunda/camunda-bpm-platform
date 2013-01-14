@@ -19,6 +19,8 @@ import java.util.Map;
 
 import javax.naming.InitialContext;
 
+import org.camunda.bpm.application.spi.ProcessApplicationReference;
+
 /**
  * <p>A process archive represents a deployment to the fox platform</p>
  * 
@@ -90,6 +92,9 @@ public interface ProcessArchive {
   /** The servlet context path of the process archive. (only available if the process archive is a web archive) */
   public static final String PROP_SERVLET_CONTEXT_PATH = "servletContextPath";
     
+  /** the {@link ProcessApplicationReference} */
+  public static final String PROP_PROCESS_APPLICATION_REFERENCE = "processApplicationReference";
+  
   /**
    * @return the name of the process archive (must be unique for a given process engine)
    */

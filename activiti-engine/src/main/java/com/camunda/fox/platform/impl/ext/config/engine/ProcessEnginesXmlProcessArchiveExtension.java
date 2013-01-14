@@ -1,6 +1,7 @@
 package com.camunda.fox.platform.impl.ext.config.engine;
 
-import com.camunda.fox.client.impl.ProcessApplication;
+import org.camunda.bpm.application.spi.ProcessApplication;
+
 import com.camunda.fox.client.impl.ProcessArchiveExtensionAdapter;
 import com.camunda.fox.platform.impl.ext.config.engine.spi.ProcessEnginesXmlSupport;
 import com.camunda.fox.platform.impl.ext.util.ServiceLoaderUtil;

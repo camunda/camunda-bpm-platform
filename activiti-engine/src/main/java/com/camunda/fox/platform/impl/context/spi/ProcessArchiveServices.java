@@ -18,9 +18,6 @@ package com.camunda.fox.platform.impl.context.spi;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.persistence.EntityManagerFactory;
 
-import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
-
-import com.camunda.fox.platform.impl.context.ProcessArchiveContext;
 import com.camunda.fox.platform.impl.service.ProcessEngineController;
 
 public interface ProcessArchiveServices {
@@ -34,18 +31,9 @@ public interface ProcessArchiveServices {
 
   public EntityManagerFactory getEntityManagerFactory();
 
-  public ProcessArchiveContext getProcessArchiveContext(String processDefinitionKey);
-
   public ProcessEngineController getProcessEngineController();
   
   public void setProcessEngineController(ProcessEngineController processEngineServiceBean);
 
-  /**
-   * This method assumes it it called from an activiti command 
-   * 
-   * @param executionEntity
-   * @return
-   */
-  public ProcessArchiveContext getProcessArchiveContextForExecution(ExecutionEntity executionEntity);
   
 }

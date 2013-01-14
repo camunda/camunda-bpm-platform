@@ -31,8 +31,8 @@ import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
+import org.camunda.bpm.application.spi.ProcessApplication;
 
-import com.camunda.fox.client.impl.ProcessApplication;
 import com.camunda.fox.platform.spi.ProcessArchive;
 
 @Specializes

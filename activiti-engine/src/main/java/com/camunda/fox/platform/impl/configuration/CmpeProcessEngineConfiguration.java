@@ -40,9 +40,7 @@ import com.camunda.fox.engine.impl.jobexecutor.FoxFailedJobCommandFactory;
 import com.camunda.fox.platform.impl.context.DefaultProcessArchiveServices;
 import com.camunda.fox.platform.impl.context.ProcessArchiveServicesSupport;
 import com.camunda.fox.platform.impl.context.spi.ProcessArchiveServices;
-import com.camunda.fox.platform.impl.jobexecutor.spi.JobExecutorFactory;
 import com.camunda.fox.platform.impl.service.ProcessEngineController;
-import com.camunda.fox.platform.impl.util.Services;
 
 /**
  * <p>Configuration for a CMPE (Container-Managed Process Engine) running in a Java EE 6+ 
@@ -90,20 +88,7 @@ public abstract class CmpeProcessEngineConfiguration extends ProcessEngineConfig
       processArchiveServices.setProcessEngineController(cmpeProcessEngine);
     }
   }
- 
-  @Override
-  public void initJobExecutor() {
-      if(jobExecutor == null) {
-        JobExecutorFactory jobExecutorFactory = Services.getService(JobExecutorFactory.class);
-        jobExecutor = jobExecutorFactory.getJobExecutor();
-      }   
-      if (jobExecutor instanceof ProcessArchiveServicesSupport) {
-        ProcessArchiveServicesSupport support = (ProcessArchiveServicesSupport) jobExecutor;
-        support.setProcessArchiveServices(processArchiveServices);        
-      }
-      super.initJobExecutor();
-  }
-  
+    
   @Override
   protected void initIdGenerator() {
     if(idGenerator == null) {
@@ -117,19 +102,7 @@ public abstract class CmpeProcessEngineConfiguration extends ProcessEngineConfig
   protected void initExpressionManager() {
     expressionManager = new CmpeExpressionManager(processArchiveServices);    
   }
-  
-  @Override
-  protected void initCommandContextFactory() {
-    if(commandContextFactory == null) {
-      commandContextFactory = new CmpeCommandContextFactory();
-      commandContextFactory.setProcessEngineConfiguration(this);      
-    }
-    if (commandContextFactory instanceof ProcessArchiveServicesSupport) {
-      ProcessArchiveServicesSupport support = (ProcessArchiveServicesSupport) commandContextFactory;
-      support.setProcessArchiveServices(processArchiveServices);        
-    }
-  }
-    
+      
   public void setProcessArchiveServices(ProcessArchiveServices paServices) {
     this.processArchiveServices = paServices;
   }

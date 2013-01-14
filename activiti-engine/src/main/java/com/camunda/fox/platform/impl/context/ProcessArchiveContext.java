@@ -16,10 +16,10 @@
 package com.camunda.fox.platform.impl.context;
 
 import org.activiti.engine.repository.Deployment;
+import org.camunda.bpm.application.spi.ProcessApplicationReference;
+import org.camunda.bpm.engine.application.ProcessApplicationRegistration;
 
-import com.camunda.fox.platform.FoxPlatformException;
 import com.camunda.fox.platform.spi.ProcessArchive;
-import com.camunda.fox.platform.spi.ProcessArchiveCallback;
 
 /**
  * 
@@ -33,6 +33,8 @@ public class ProcessArchiveContext {
   private final ProcessArchive processArchive;
   private boolean isActive;
   private boolean isUndelploying;
+  private ProcessApplicationRegistration processApplicationRegistration;
+  private ProcessApplicationReference processApplicationReference;
   
   public ProcessArchive getProcessArchive() {
     return processArchive;
@@ -62,85 +64,22 @@ public class ProcessArchiveContext {
   public void setUndelploying(boolean isUndelploying) {
     this.isUndelploying = isUndelploying;
   }
-  
-  ///////////////////  static
-
-  private static ThreadLocal<ProcessArchiveContext> currentProcessArchiveContext = new ThreadLocal<ProcessArchiveContext>();
-  
-
-  public static ProcessArchiveContext getCurrentContext() {
-    return currentProcessArchiveContext.get();
-  }
-
-  private static void setCurrentContext(ProcessArchiveContext processArchiveContext) {
-    currentProcessArchiveContext.set(processArchiveContext);
+    
+  public void setProcessApplicationRegistration(ProcessApplicationRegistration registration) {
+    this.processApplicationRegistration = registration;
   }
   
-  private static ThreadLocal<Boolean> isWithinProcessArchive = new ThreadLocal<Boolean>() {
-    protected Boolean initialValue() {
-      return false;
-    }
-  };
-  
-  public static boolean isWithinProcessArchive() {
-    return isWithinProcessArchive.get();
-  }
-  
-  public static boolean isWithinProcessArchive(ProcessArchiveContext processArchiveContext) {
-    return isWithinProcessArchive.get() && processArchiveContext.equals(getCurrentContext());
+  public ProcessApplicationRegistration getProcessApplicationRegistration() {
+    return processApplicationRegistration;
   }
 
-  private static void setWithinProcessArchive(boolean b) {
-    isWithinProcessArchive.set(b);
-  }
-
-  public static <T> T executeWithinContext(ProcessArchiveCallback<T> callback, ProcessArchiveContext processArchiveContext) {
-    ProcessArchiveContext contextBefore = getCurrentContext();
-    try {      
-      if(!processArchiveContext.equals(contextBefore))  {        
-        setCurrentContext(processArchiveContext);        
-        return performContextSwitch(callback);        
-      } else {
-        return callback.execute();
-      }      
-    }finally {      
-      if(!processArchiveContext.equals(contextBefore))  {
-        setCurrentContext(contextBefore);             
-      }      
-    }
+  public void setProcessApplicationReference(ProcessApplicationReference processApplicationReference) {
+    this.processApplicationReference = processApplicationReference;
   }
   
-  public static <T> T executeWithinCurrentContext(ProcessArchiveCallback<T> callback) {
-    if(!isWithinProcessArchive()) {
-      return performContextSwitch(callback);
-    } else {
-      return callback.execute();
-    }  
+  public ProcessApplicationReference getProcessApplicationReference() {
+    return processApplicationReference;
   }
-
-  private static <T> T performContextSwitch(ProcessArchiveCallback<T> callback) {
-    try {
-      setWithinProcessArchive(true);
-      ProcessArchiveContext processArchiveContext = ProcessArchiveContext.getCurrentContext();         
-      if(processArchiveContext != null) {
-        try {
-          return processArchiveContext
-            .getProcessArchive()              
-            .executeWithinContext(callback);        
-        }catch (Exception e) {
-          // unwrap exception
-          if(e.getCause() != null && e.getCause() instanceof RuntimeException) {
-            throw (RuntimeException) e.getCause();
-          }else {
-            throw new FoxPlatformException("Unexpected exeption while executing in process archive context ", e);
-          }
-        }
-      } else {
-        throw new FoxPlatformException("Could not determine current process archive.");
-      }
-    } finally {
-      setWithinProcessArchive(false);        
-    }
-  }
+  
   
 }

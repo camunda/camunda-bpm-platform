@@ -25,8 +25,6 @@ import com.camunda.fox.platform.impl.configuration.JtaCmpeProcessEngineConfigura
 import com.camunda.fox.platform.impl.configuration.spi.ProcessEngineConfigurationFactory;
 import com.camunda.fox.platform.impl.deployment.ClassPathScanner;
 import com.camunda.fox.platform.impl.deployment.spi.ProcessArchiveScanner;
-import com.camunda.fox.platform.impl.jobexecutor.simple.SimpleJobExecutorFactory;
-import com.camunda.fox.platform.impl.jobexecutor.spi.JobExecutorFactory;
 
 /**
  * A simple service registry delegating to a {@link java.util.ServiceLoader}
@@ -43,7 +41,6 @@ public class Services {
     // register default implementations    
     defaultImplementations.put(ProcessEngineConfigurationFactory.class, JtaCmpeProcessEngineConfigurationFactory.class);
     defaultImplementations.put(ProcessArchiveScanner.class, ClassPathScanner.class);
-    defaultImplementations.put(JobExecutorFactory.class, SimpleJobExecutorFactory.class);    
 //    defaultImplementations.put(ProcessArchiveServices.class, DefaultProcessArchiveServices.class);
   }
   
