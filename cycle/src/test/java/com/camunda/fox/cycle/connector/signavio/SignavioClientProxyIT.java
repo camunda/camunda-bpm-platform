@@ -127,8 +127,9 @@ public class SignavioClientProxyIT {
       String importedModelSvg = signavioClient.getModelAsSVG(importedModelId);
       
       // update model
-      String updatedModel = signavioClient.updateModel(modelId, label, importedModelJson, importedModelSvg, folderId, "update model");
-      Assert.assertEquals("update model", SignavioJson.extractModelComment(new JSONObject(updatedModel)));
+      String comment = "updating model...";
+      String updatedModel = signavioClient.updateModel(modelId, label, importedModelJson, importedModelSvg, folderId, comment);
+      assertThat(updatedModel).contains(comment);
       
       // compare model contents
       InputStream newXmlContentStream = signavioClient.getXmlContent(modelId);
