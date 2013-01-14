@@ -223,9 +223,9 @@ public class TestCycleRoundtripIT extends AbstractCycleIT {
     ConnectorNode connectorParentNode;
     if (connector instanceof SignavioConnector) {
       SignavioConnector signavioConnector = (SignavioConnector) connector;
-      connectorParentNode = connector.createNode(signavioConnector.getPrivateFolder().getId(), tmpDirName, ConnectorNodeType.FOLDER);
+      connectorParentNode = connector.createNode(signavioConnector.getPrivateFolder().getId(), tmpDirName, ConnectorNodeType.FOLDER, null);
     } else {
-      connectorParentNode = connector.createNode(connector.getRoot().getId(), tmpDirName, ConnectorNodeType.FOLDER);
+      connectorParentNode = connector.createNode(connector.getRoot().getId(), tmpDirName, ConnectorNodeType.FOLDER, null);
     }
     connectorParentNode.setConnectorId(connectorId);
     ConnectorNodeDTO connectorParentNodeDTO = new ConnectorNodeDTO(connectorParentNode);
@@ -235,15 +235,15 @@ public class TestCycleRoundtripIT extends AbstractCycleIT {
   private ConnectorNode createConnectorNode(ConnectorNodeDTO connectorNodeParentFolder, String processDiagramPath) throws Exception {
     InputStream modelInputStream = IoUtil.readFileAsInputStream(processDiagramPath);
     String label = processDiagramPath.substring(processDiagramPath.lastIndexOf("/") + 1, processDiagramPath.length());
-    ConnectorNode connectorNode = connector.createNode(connectorNodeParentFolder.getId(), label, ConnectorNodeType.BPMN_FILE);
+    ConnectorNode connectorNode = connector.createNode(connectorNodeParentFolder.getId(), label, ConnectorNodeType.BPMN_FILE, null);
     connectorNode.setConnectorId(connectorId);
-    connector.updateContent(connectorNode, modelInputStream);
+    connector.updateContent(connectorNode, modelInputStream, null);
     return connectorNode;
   }
   
   private void deleteConnectorParentFolder() {
       if (connectorNodeParentFolder != null) {
-        connector.deleteNode(connectorNodeParentFolder.toConnectorNode());
+        connector.deleteNode(connectorNodeParentFolder.toConnectorNode(), null);
       }
   }
   
