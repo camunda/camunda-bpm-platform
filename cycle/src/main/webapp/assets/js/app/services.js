@@ -48,7 +48,7 @@ angular
   })
   .factory('User', function($resource, App) {
     return $resource(App.uri('secured/resource/user/:id'), {id: "@id"}, {});
-  })
+  })  
   .factory('RoundtripDetails', function($resource, App) {
     return $resource(App.uri('secured/resource/roundtrip/:id/details'), {id: "@id"}, {});
   })
@@ -85,6 +85,29 @@ angular
         return uri;
       }
     };
+  })
+  .service('Connector', function($http, App) {
+	  var connectors;
+	  return {	  
+		  ensureInitialized : function() {
+			  if(!connectors) {
+				  $http.get(App.uri("secured/resource/connector/list")).success(function(data) {
+				      connectors = data;
+				  });
+			  }
+		  },		  
+		  supportsCommitMessages : function(connectorId) {
+			  this.ensureInitialized();
+			  for(var i =0; i<connectors.length; i++) {
+				  var instance = connectors[i];
+				  if(instance.connectorId == connectorId) {
+					  return instance.supportsCommitMessage;
+				  }
+			  }	
+			  return false;
+		  }	  
+	  };
+	  
   })
   .service('Error', function () {
     return {

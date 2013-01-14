@@ -197,7 +197,7 @@ function RoundtripDetailsController($scope, $routeParams, RoundtripDetails, Comm
   };
 }
 
-function SyncRoundtripController($scope, $http, $q, App, Event) {
+function SyncRoundtripController($scope, $http, $q, App, Event, Connector) {
   
   var SYNC_SUCCESS = "synchronizationSuccess",
       SYNC_FAILED = "synchronizationFailed",
@@ -209,7 +209,15 @@ function SyncRoundtripController($scope, $http, $q, App, Event) {
   $scope.commitMessage = "Model updated using camunda cycle.";
   
   $scope.showCommitMessageForm = function() {
-    return $scope.status == BEFORE_SYNC || $scope.status == PERFORM_SYNC;
+    return ($scope.status == BEFORE_SYNC || $scope.status == PERFORM_SYNC) && $scope.targetConnectorSupportsCommitMessage();
+  };
+  
+  $scope.targetConnectorSupportsCommitMessage = function() {
+	if($scope.syncMode == "LEFT_TO_RIGHT") {
+		return Connector.supportsCommitMessages($scope.roundtrip.rightHandSide.connectorNode.connectorId);
+	} else if($scope.syncMode == "RIGHT_TO_LEFT") {
+		return Connector.supportsCommitMessages($scope.roundtrip.leftHandSide.connectorNode.connectorId);
+	}    
   };
   
   $scope.cancel = function () {
@@ -349,7 +357,7 @@ function BpmnDiagramController($scope, Commons, Event, $http, App) {
 /**
  * Realizes the edit operation of a bpmn diagram inside the respective dialog.
  */
-function EditDiagramController($scope, Commons, Event, ConnectorConfiguration) {
+function EditDiagramController($scope, Commons, Event, ConnectorConfiguration, Connector) {
   
   var FOX_DESIGNER = "fox designer", 
       RIGHT_HAND_SIDE = "rightHandSide";
@@ -370,10 +378,10 @@ function EditDiagramController($scope, Commons, Event, ConnectorConfiguration) {
     return !!($scope.identifier != RIGHT_HAND_SIDE || ($scope.editDiagram.modeler && $scope.editDiagram.modeler != FOX_DESIGNER));
   };
   
-  $scope.showCommitMessageInput = function() {
-    return $scope.editDialogMode == "CREATE_NEW_DIAGRAM";
+  $scope.showCommitMessageInput = function() {	  
+    return $scope.editDialogMode == "CREATE_NEW_DIAGRAM" && Connector.supportsCommitMessages($scope.connector.connectorId);
   };
-    
+
   // is the dialog model valid and can be submitted?
   var isValid = $scope.isValid = function() {
     var editDiagram = $scope.editDiagram;
