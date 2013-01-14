@@ -26,7 +26,7 @@ import com.camunda.fox.platform.subsystem.impl.service.ContainerPlatformService;
  * 
  * <p>This command attempts to locate the process archive for the current job.
  * <ul> 
- *   <li>If the process archive can be found, we make a single context swich, before executing the job.</li>
+ *   <li>If the process archive can be found, we make a single context switch, before executing the job.</li>
  *   <li>If the process archive cannot be found, we attempt executing the job anyway.</li>
  * </ul>
  * </p>
@@ -68,7 +68,7 @@ public class ContainerExecuteJobCmd implements Command<Void> {
       ProcessArchiveContext processArchiveContext = platformService.getProcessArchiveContext(processArchive.getName(), getProcessEngineName());
 
       // let this throw an exception, so that  the command fails and the transaction rolls back.
-      ProcessArchiveContext.executeWithinContext(new JobRequestContextInterceptor(commandContext, executeJobsCmd), processArchiveContext);
+      Context.executeWithinProcessApplication(new JobRequestContextInterceptor(commandContext, executeJobsCmd), processArchiveContext.getProcessApplicationReference());
       
     } else {
       

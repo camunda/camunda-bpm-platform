@@ -14,11 +14,16 @@
 package org.activiti.engine.impl.context;
 
 import java.util.Stack;
+import java.util.concurrent.Callable;
 
+import org.activiti.engine.ActivitiException;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.jobexecutor.JobExecutorContext;
 import org.activiti.engine.impl.pvm.runtime.InterpretableExecution;
+import org.camunda.bpm.application.ProcessApplicationUnavailableException;
+import org.camunda.bpm.application.spi.ProcessApplication;
+import org.camunda.bpm.application.spi.ProcessApplicationReference;
 
 
 /**
@@ -31,6 +36,7 @@ public class Context {
   protected static ThreadLocal<Stack<ProcessEngineConfigurationImpl>> processEngineConfigurationStackThreadLocal = new ThreadLocal<Stack<ProcessEngineConfigurationImpl>>();
   protected static ThreadLocal<Stack<ExecutionContext>> executionContextStackThreadLocal = new ThreadLocal<Stack<ExecutionContext>>();
   protected static ThreadLocal<JobExecutorContext> jobExecutorContextThreadLocal = new ThreadLocal<JobExecutorContext>();
+  protected static ThreadLocal<Stack<String>> processApplicationContext = new ThreadLocal<Stack<String>>();
 
   public static CommandContext getCommandContext() {
     Stack<CommandContext> stack = getStack(commandContextThreadLocal);
@@ -95,5 +101,58 @@ public class Context {
   
   public static void removeJobExecutorContext() {
     jobExecutorContextThreadLocal.remove();
+  }
+  
+
+  public static String getCurrentProcessApplication() {
+    Stack<String> stack = getStack(processApplicationContext);
+    if(stack.isEmpty()) {
+      return null;
+    } else {
+      return stack.peek();
+    }
+  }
+  
+  public static void setCurrentProcessApplication(String name) {
+    Stack<String> stack = getStack(processApplicationContext);
+    stack.push(name);
+  }
+  
+  public static void removeCurrentProcessApplication() {
+    Stack<String> stack = getStack(processApplicationContext);
+    stack.pop();
+  }
+
+  /**
+   * @param callback
+   * @param processApplicationReference
+   */
+  public static <T> T executeWithinProcessApplication(Callable<T> callback, ProcessApplicationReference processApplicationReference) {
+    String paName = processApplicationReference.getName();
+    try {
+      ProcessApplication processApplication = processApplicationReference.getProcessApplication();      
+      setCurrentProcessApplication(paName);
+
+      try {
+        
+        return processApplication.execute(callback);
+        
+      } catch (Exception e) {
+        
+        // unwrap exception
+        if(e.getCause() != null && e.getCause() instanceof RuntimeException) {
+          throw (RuntimeException) e.getCause();
+        }else {
+          throw new ActivitiException("Unexpected exeption while executing within process application ", e);
+        }
+        
+      } finally {
+        removeCurrentProcessApplication();
+      }
+      
+      
+    } catch (ProcessApplicationUnavailableException e) {
+      throw new ActivitiException("Cannot switch to process application '"+paName+"' for execution: "+e.getMessage(), e);
+    }
   }
 }

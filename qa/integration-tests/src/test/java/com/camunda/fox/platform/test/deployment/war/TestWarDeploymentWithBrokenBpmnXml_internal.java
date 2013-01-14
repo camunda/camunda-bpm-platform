@@ -62,7 +62,7 @@ public class TestWarDeploymentWithBrokenBpmnXml_internal extends AbstractFoxPlat
     final byte[] process = IoUtil.readInputStream(resourceAsStream, resourceName);
     IoUtil.closeSilently(resourceAsStream);
 
-    ProcessArchiveImpl pa = new ProcessArchiveImpl(processArchiveXml, null, processApplication) {
+    ProcessArchiveImpl pa = new ProcessArchiveImpl(processArchiveXml, null, processApplication.getReference(), processApplication) {
       public Map<String, byte[]> getProcessResources() {
         HashMap<String, byte[]> map = new HashMap<String, byte[]>();
         map.put(resourceName, process);

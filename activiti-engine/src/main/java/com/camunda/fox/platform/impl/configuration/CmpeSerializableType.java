@@ -29,8 +29,10 @@ import org.activiti.engine.impl.util.IoUtil;
 import org.activiti.engine.impl.variable.ByteArrayType;
 import org.activiti.engine.impl.variable.SerializableType;
 import org.activiti.engine.impl.variable.ValueFields;
+import org.camunda.bpm.application.ProcessApplicationUnavailableException;
+import org.camunda.bpm.application.spi.ProcessApplicationReference;
+import org.camunda.bpm.engine.impl.application.ProcessApplicationManager;
 
-import com.camunda.fox.platform.impl.context.ProcessArchiveContext;
 import com.camunda.fox.platform.impl.context.spi.ProcessArchiveServices;
 
 /**
@@ -95,7 +97,11 @@ public class CmpeSerializableType extends SerializableType {
   }
 
   protected ClassLoader getClassLoader(ValueFields valueFields) {
-    ProcessArchiveContext processArchiveContext = null;
+    
+    ProcessEngineConfigurationImpl processEngineConfiguration = processArchiveServices.getProcessEngineController().getProcessEngineConfiguration();
+    ProcessApplicationManager processApplicationManager = processEngineConfiguration.getProcessApplicationManager();
+
+    ProcessApplicationReference processApplicationReference = null;
     
     if (valueFields instanceof VariableInstanceEntity) {
       String executionId = ((VariableInstanceEntity)valueFields).getExecutionId();
@@ -104,26 +110,29 @@ public class CmpeSerializableType extends SerializableType {
               .getExecutionManager()
               .findExecutionById(executionId);
       
-      processArchiveContext = processArchiveServices.getProcessArchiveContextForExecution(executionEntity);
+      processApplicationReference = processApplicationManager.getProcessApplicationForDeployment(executionEntity.getProcessDefinition().getDeploymentId());
     } else if (valueFields instanceof HistoricVariableInstance) {
       HistoricVariableInstance historicVar = (HistoricVariableInstance) valueFields;
-      ProcessEngineConfigurationImpl processEngineController = processArchiveServices.getProcessEngineController().getProcessEngineConfiguration();
       
       String processInstanceId = historicVar.getProcessInstanceId();
-      String processDefId = processEngineController.getHistoryService().createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).singleResult().getProcessDefinitionId();
-      String processDefKey = processEngineController.getRepositoryService().createProcessDefinitionQuery().processDefinitionId(processDefId).singleResult().getKey();
+      String processDefId = processEngineConfiguration.getHistoryService().createHistoricProcessInstanceQuery().processInstanceId(processInstanceId).singleResult().getProcessDefinitionId();
+      String deploymentId = processEngineConfiguration.getRepositoryService().createProcessDefinitionQuery().processDefinitionId(processDefId).singleResult().getDeploymentId();
       
-      processArchiveContext = processArchiveServices.getProcessArchiveContext(processDefKey);
+      processApplicationReference = processApplicationManager.getProcessApplicationForDeployment(deploymentId);
     }
           
-    if(processArchiveContext == null) {
+    if(processApplicationReference == null) {
      
       // use this classloader
       return getClass().getClassLoader();
       
     } else {
     
-      return processArchiveContext.getProcessArchive().getClassLoader();
+      try {
+        return processApplicationReference.getProcessApplication().getProcessApplicationClassloader();
+      } catch (ProcessApplicationUnavailableException e) {
+        throw new ActivitiException("Process application with name '"+processApplicationReference.getName()+"' unavailable ", e);
+      }
       
     }
   }

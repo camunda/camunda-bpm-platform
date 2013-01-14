@@ -15,6 +15,7 @@ package org.activiti.engine.impl.interceptor;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
+import java.util.concurrent.Callable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -34,8 +35,8 @@ import org.activiti.engine.impl.persistence.entity.GroupManager;
 import org.activiti.engine.impl.persistence.entity.HistoricActivityInstanceManager;
 import org.activiti.engine.impl.persistence.entity.HistoricDetailManager;
 import org.activiti.engine.impl.persistence.entity.HistoricProcessInstanceManager;
-import org.activiti.engine.impl.persistence.entity.HistoricVariableInstanceManager;
 import org.activiti.engine.impl.persistence.entity.HistoricTaskInstanceManager;
+import org.activiti.engine.impl.persistence.entity.HistoricVariableInstanceManager;
 import org.activiti.engine.impl.persistence.entity.IdentityInfoManager;
 import org.activiti.engine.impl.persistence.entity.IdentityLinkManager;
 import org.activiti.engine.impl.persistence.entity.JobManager;
@@ -49,10 +50,13 @@ import org.activiti.engine.impl.persistence.entity.UserManager;
 import org.activiti.engine.impl.persistence.entity.VariableInstanceManager;
 import org.activiti.engine.impl.pvm.runtime.AtomicOperation;
 import org.activiti.engine.impl.pvm.runtime.InterpretableExecution;
+import org.camunda.bpm.application.spi.ProcessApplicationReference;
+import org.camunda.bpm.engine.impl.application.ProcessApplicationManager;
 
 /**
  * @author Tom Baeyens
  * @author Agim Emruli
+ * @author Daniel Meyer
  */
 public class CommandContext {
 
@@ -67,25 +71,6 @@ public class CommandContext {
   protected ProcessEngineConfigurationImpl processEngineConfiguration;
   protected FailedJobCommandFactory failedJobCommandFactory;
 
-  
-  public void performOperation(AtomicOperation executionOperation, InterpretableExecution execution) {
-    nextOperations.add(executionOperation);
-    if (nextOperations.size()==1) {
-      try {
-        Context.setExecutionContext(execution);
-        while (!nextOperations.isEmpty()) {
-          AtomicOperation currentOperation = nextOperations.removeFirst();
-          if (log.isLoggable(Level.FINEST)) {
-            log.finest("AtomicOperation: " + currentOperation + " on " + this);
-          }
-          currentOperation.execute(execution);
-        }
-      } finally {
-        Context.removeExecutionContext();
-      }
-    }
-  }
-
   public CommandContext(Command<?> command, ProcessEngineConfigurationImpl processEngineConfiguration) {
     this.command = command;
     this.processEngineConfiguration = processEngineConfiguration;
@@ -94,6 +79,54 @@ public class CommandContext {
     this.transactionContext = processEngineConfiguration
       .getTransactionContextFactory()
       .openTransactionContext(this);
+  }
+  
+  public void performOperation(final AtomicOperation executionOperation, final InterpretableExecution execution) {
+    
+    ProcessApplicationReference targetProcessApplication = getTargetProcessApplication(execution);
+    
+    if(requiresContextSwitch(executionOperation, targetProcessApplication)) {
+            
+      Context.executeWithinProcessApplication(new Callable<Void>() {
+        public Void call() throws Exception {          
+          performOperation(executionOperation, execution);
+          return null;
+        }
+      
+      }, targetProcessApplication);
+      
+    } else {      
+      nextOperations.add(executionOperation);
+      if (nextOperations.size()==1) {
+        try {
+          Context.setExecutionContext(execution);
+          while (!nextOperations.isEmpty()) {
+            AtomicOperation currentOperation = nextOperations.removeFirst();
+            if (log.isLoggable(Level.FINEST)) {
+              log.finest("AtomicOperation: " + currentOperation + " on " + this);
+            }
+            currentOperation.execute(execution);
+          }
+        } finally {
+          Context.removeExecutionContext();
+        }
+      }     
+      
+    }   
+    
+  }
+  
+  protected ProcessApplicationReference getTargetProcessApplication(InterpretableExecution execution) {
+    
+    String deploymentId = execution.getProcessDefinition().getDeploymentId();
+    ProcessApplicationManager processApplicationManager = processEngineConfiguration.getProcessApplicationManager();
+    
+    return processApplicationManager.getProcessApplicationForDeployment(deploymentId);
+  }
+  
+  protected boolean requiresContextSwitch(final AtomicOperation executionOperation, ProcessApplicationReference processApplicationReference) {
+    return processApplicationReference != null
+      && (processApplicationReference.getName() != Context.getCurrentProcessApplication());
   }
 
   public void close() {

@@ -12,7 +12,8 @@
  */
 package com.camunda.fox.client.impl;
 
-import com.camunda.fox.client.impl.spi.ProcessApplicationExtension;
+import org.camunda.bpm.application.spi.ProcessApplication;
+import org.camunda.bpm.application.spi.ProcessApplicationExtension;
 
 /**
  * @author Daniel Meyer

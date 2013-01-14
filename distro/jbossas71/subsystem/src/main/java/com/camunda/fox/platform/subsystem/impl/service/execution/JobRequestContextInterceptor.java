@@ -3,6 +3,7 @@ package com.camunda.fox.platform.subsystem.impl.service.execution;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.Callable;
 
 import javax.enterprise.context.ContextNotActiveException;
 import javax.enterprise.context.RequestScoped;
@@ -18,8 +19,6 @@ import org.activiti.engine.impl.interceptor.CommandContext;
 import org.jboss.weld.context.ejb.EjbLiteral;
 import org.jboss.weld.context.ejb.EjbRequestContext;
 
-import com.camunda.fox.platform.spi.ProcessArchiveCallback;
-
 /**
  * <p>ProcessArchiveCallback allowing us to execute a job in the context of 
  * the owning ProcessArchive while activating the CDI RequestScope.</p>
@@ -29,7 +28,7 @@ import com.camunda.fox.platform.spi.ProcessArchiveCallback;
  * @author Daniel Meyer
  *
  */
-public class JobRequestContextInterceptor implements ProcessArchiveCallback<Void> {
+public class JobRequestContextInterceptor implements Callable<Void> {
   
   protected final CommandContext commandContext;
   protected final Command<?> executeJobCommand;
@@ -39,7 +38,7 @@ public class JobRequestContextInterceptor implements ProcessArchiveCallback<Void
     this.executeJobCommand = executeJobCommand;
   }
 
-  public Void execute() {
+  public Void call() {
     try {
     
       // attempt looking up the bean manager

@@ -29,7 +29,7 @@ import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
-import org.camunda.bpm.application.ejb.EjbProcessApplication;
+import org.camunda.bpm.application.spi.EjbProcessApplication;
 
 import com.camunda.fox.platform.api.ProcessEngineService;
 
