@@ -333,17 +333,6 @@ function BpmnDiagramController($scope, Commons, Event, $http, App) {
     }
   });
 
- /**
-  * Refresh status of the selected diagram. 
-  * That includes: 
-  *  * Check image availability
-  *  * Check synchronization status
-  */
-  $scope.refreshStatus = function(diagram) {
-    $scope.imageStatus = "UNKNOWN";
-    $scope.checkContentAvailable(diagram);
-  };
-  
   $scope.checkContentAvailable = function(diagram) {
     Commons.getDiagramStatus(diagram)
       .success(function(data) {

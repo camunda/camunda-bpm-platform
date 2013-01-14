@@ -2,9 +2,6 @@
   <div class="bpmn-model thumbnail" data-ng-show="diagram" data-ng-class="diagramClass(diagram)">
     <h3>
       {{diagram.modeler}} 
-      <a class="pull-right btn sync-status-refresh">
-        <i class="icon-refresh" th:title="#{'Refresh model status'}" ng-click="refreshStatus(diagram)"></i>
-      </a>
     </h3>
     <div class="holder">
       <div class="diagram" ng-show="modelStatus != 'UNAVAILABLE'">
