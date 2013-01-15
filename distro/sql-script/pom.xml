@@ -29,6 +29,13 @@
   			<include>*.sql</include>
   		</includes>
   	</resource>
+  	<resource>
+  		<targetPath>sql/drop</targetPath>
+  		<directory>target/sql/drop</directory>
+  		<includes>
+  			<include>*.sql</include>
+  		</includes>
+  	</resource>
   </resources>
   
   	<plugins>
@@ -54,6 +61,7 @@
                 </artifactItem>
               </artifactItems>
               <includes>**/create/*.sql</includes>
+              <includes>**/drop/*.sql</includes>
             </configuration>
           </execution>
         </executions>
@@ -70,6 +78,8 @@
             </goals>
             <configuration>
               <target>
+              
+              	<!-- create -->
                 
                 <mkdir dir="target/sql/create" />
                 
@@ -102,6 +112,43 @@
                   <mapper>
                     <chainedmapper>
                       <regexpmapper from="^(activiti.)([A-Za-z0-9]*)(.create.identity.sql)" to="\2_identity_${project.version}.sql" handledirsep="yes" />
+                    </chainedmapper>
+                  </mapper>
+                </copy>
+                
+                <!-- drop -->
+                
+                <mkdir dir="target/sql/drop" />
+                
+                <concat destfile="target/sql/drop/db2_engine_${project.version}.sql" fixlastline="yes">
+                	<filelist dir="target/fox-engine-${project.version}/org/activiti/db/drop" files="activiti.db2.drop.engine.sql activiti.db2.drop.history.sql" />
+                </concat>
+
+                <concat destfile="target/sql/drop/h2_engine_${project.version}.sql" fixlastline="yes">
+                	<filelist dir="target/fox-engine-${project.version}/org/activiti/db/drop" files="activiti.h2.drop.engine.sql activiti.h2.drop.history.sql" />
+                </concat>
+
+                <concat destfile="target/sql/drop/mssql_engine_${project.version}.sql" fixlastline="yes">
+                	<filelist dir="target/fox-engine-${project.version}/org/activiti/db/drop" files="activiti.mssql.drop.engine.sql activiti.mssql.drop.history.sql" />
+                </concat>
+
+                <concat destfile="target/sql/drop/mysql_engine_${project.version}.sql" fixlastline="yes">
+                	<filelist dir="target/fox-engine-${project.version}/org/activiti/db/drop" files="activiti.mysql.drop.engine.sql activiti.mysql.drop.history.sql" />
+                </concat>
+
+                <concat destfile="target/sql/drop/oracle_engine_${project.version}.sql" fixlastline="yes">
+                	<filelist dir="target/fox-engine-${project.version}/org/activiti/db/drop" files="activiti.oracle.drop.engine.sql activiti.oracle.drop.history.sql" />
+                </concat>
+                
+                <concat destfile="target/sql/drop/postgres_engine_${project.version}.sql" fixlastline="yes">
+                	<filelist dir="target/fox-engine-${project.version}/org/activiti/db/drop" files="activiti.postgres.drop.engine.sql activiti.postgres.drop.history.sql" />
+                </concat>
+                
+                <copy todir="target/sql/drop" flatten="false">
+                  <fileset dir="target/fox-engine-${project.version}/org/activiti/db/drop" />
+                  <mapper>
+                    <chainedmapper>
+                      <regexpmapper from="^(activiti.)([A-Za-z0-9]*)(.drop.identity.sql)" to="\2_identity_${project.version}.sql" handledirsep="yes" />
                     </chainedmapper>
                   </mapper>
                 </copy>

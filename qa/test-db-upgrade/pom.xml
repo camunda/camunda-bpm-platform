@@ -3,14 +3,8 @@
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>fox-platform-qa-db-upgrade</artifactId>
-  <packaging>pom</packaging>
+  <packaging>jar</packaging>
   <name>fox platform EE - QA</name>
-  
-  <properties>
-    <test.version.initial>6.1.11</test.version.initial>
-    <test.version.target>${project.version}</test.version.target>
-    
-  </properties>
 
   <parent>
     <groupId>com.camunda.fox.platform</groupId>
@@ -18,23 +12,185 @@
     <version>6.2.0-SNAPSHOT</version>
   </parent>
 
+  <properties>
+    <test.version.old>6.1.11</test.version.old>
+    <test.version.old.major>6.1</test.version.old.major>
+    <test.version.current>${project.version}</test.version.current>
+    <test.version.current.major>6.2</test.version.current.major>
+
+    <test.db.name>h2</test.db.name>
+    <test.db.driver>org.h2.Driver</test.db.driver>
+    <test.db.url>jdbc:h2:${project.build.directory}/dbs/fox-engine;MVCC=TRUE</test.db.url>
+    <test.db.username>sa</test.db.username>
+    <test.db.password>sa</test.db.password>
+  </properties>
+
   <dependencies>
+
     <dependency>
       <groupId>com.camunda.fox.platform</groupId>
       <artifactId>fox-platform-sql-script</artifactId>
-      <version>${test.version.target}</version>
+      <version>${test.version.current}</version>
     </dependency>
+
+    <dependency>
+      <groupId>com.camunda.fox.engine</groupId>
+      <artifactId>fox-engine</artifactId>
+      <version>${test.version.current}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.openjpa</groupId>
+      <artifactId>openjpa</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.subethamail</groupId>
+      <artifactId>subethasmtp-wiser</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.codehaus.groovy</groupId>
+      <artifactId>groovy</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.drools</groupId>
+      <artifactId>drools-core</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.drools</groupId>
+      <artifactId>drools-compiler</artifactId>
+    </dependency>
+
+
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>mysql</groupId>
+      <artifactId>mysql-connector-java</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.oracle.jdbc</groupId>
+      <artifactId>ojdbc6</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.oracle.jdbc</groupId>
+      <artifactId>ojdbc14</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.ibm.db2.jcc</groupId>
+      <artifactId>db2jcc4</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.microsoft.sqlserver</groupId>
+      <artifactId>sqljdbc4</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+
   </dependencies>
 
   <build>
+    <testSourceDirectory>${project.build.directory}/engine-test-sources</testSourceDirectory>
+    <testResources>
+      <testResource>
+        <directory>${project.build.directory}/engine-test-sources</directory>
+        <excludes>
+          <exclude>**/*.java</exclude>
+          <exclude>activiti.cfg.xml</exclude>
+        </excludes>
+      </testResource>
+      <testResource>
+        <directory>config</directory>
+        <filtering>true</filtering>
+      </testResource>
+    </testResources>
     <plugins>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-antrun-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>compile</id>
+            <phase>generate-test-sources</phase>
+            <configuration>
+              <target>
+
+                <!-- create the SQL scripts so that the files existi even 
+                  if they do not exist in the distribution. (this can be the case if there 
+                  are no db upgrades (yet) for a particular release ) -->
+
+                <mkdir
+                  dir="${project.build.directory}/scripts-current/sql/upgrade/"></mkdir>
+                <touch
+                  file="${project.build.directory}/scripts-current/sql/upgrade/${test.db.name}_engine_${test.version.old.major}_to_${test.version.current.major}.sql" />
+                <touch
+                  file="${project.build.directory}/scripts-current/sql/upgrade/${test.db.name}_identity_${test.version.old.major}_to_${test.version.current.major}.sql" />
+
+              </target>
+            </configuration>
+            <goals>
+              <goal>run</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
+
         <executions>
           <execution>
-            <id>unpack</id>
-            <phase>package</phase>
+            <id>unpack-engine-tests</id>
+            <phase>generate-test-sources</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>com.camunda.fox.engine</groupId>
+                  <artifactId>fox-engine</artifactId>
+                  <version>${test.version.current}</version>
+                  <classifier>test-sources</classifier>
+                  <outputDirectory>${project.build.directory}/engine-test-sources</outputDirectory>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+          <execution>
+            <id>unpack-old-scripts</id>
+            <phase>generate-test-resources</phase>
             <goals>
               <goal>unpack</goal>
             </goals>
@@ -43,16 +199,147 @@
                 <artifactItem>
                   <groupId>com.camunda.fox.platform</groupId>
                   <artifactId>fox-platform-sql-script</artifactId>
-                  <version>${test.version.initial}</version>
-                  <type>jar</type>
+                  <version>${test.version.old}</version>
+                  <outputDirectory>${project.build.directory}/scripts-old</outputDirectory>
                   <overWrite>true</overWrite>
-                  <outputDirectory>${project.build.directory}/sql-scripts-${test.version.initial}</outputDirectory>                  
                 </artifactItem>
-              </artifactItems>              
+                <artifactItem>
+                  <groupId>com.camunda.fox.platform</groupId>
+                  <artifactId>fox-platform-sql-script</artifactId>
+                  <version>${test.version.current}</version>
+                  <outputDirectory>${project.build.directory}/scripts-current</outputDirectory>
+                  <overWrite>true</overWrite>
+                </artifactItem>
+              </artifactItems>
             </configuration>
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>sql-maven-plugin</artifactId>
+        <version>1.5</version>
+        <dependencies>
+          <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>5.1.21</version>
+          </dependency>
+          <dependency>
+            <groupId>com.oracle.jdbc</groupId>
+            <artifactId>ojdbc6</artifactId>
+            <version>11.2.0.3</version>
+          </dependency>
+          <dependency>
+            <groupId>com.oracle.jdbc</groupId>
+            <artifactId>ojdbc14</artifactId>
+            <version>10.2.0.5</version>
+          </dependency>
+          <dependency>
+            <groupId>com.ibm.db2.jcc</groupId>
+            <artifactId>db2jcc4</artifactId>
+            <version>9.7</version>
+          </dependency>
+          <dependency>
+            <groupId>com.microsoft.sqlserver</groupId>
+            <artifactId>sqljdbc4</artifactId>
+            <version>4.0</version>
+          </dependency>
+          <dependency>
+            <groupId>postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>9.1-902.jdbc4</version>
+          </dependency>
+          <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>1.3.168</version>
+          </dependency>
+        </dependencies>
+        <configuration>
+          <driver>${test.db.driver}</driver>
+          <url>${test.db.url}</url>
+          <username>${test.db.username}</username>
+          <password>${test.db.password}</password>
+        </configuration>
+        <executions>
+          <execution>
+            <id>drop-db-if-present</id>
+            <phase>generate-test-resources</phase>
+            <goals>
+              <goal>execute</goal>
+            </goals>
+            <configuration>
+              <srcFiles>
+                <!-- first: try dropping the DB -->
+                <srcFile>${project.build.directory}/scripts-current/sql/drop/${test.db.name}_engine_${test.version.current}.sql</srcFile>
+                <srcFile>${project.build.directory}/scripts-current/sql/drop/${test.db.name}_identity_${test.version.current}.sql</srcFile>
+              </srcFiles>
+              <onError>continue</onError>
+            </configuration>            
+          </execution>
+           <execution>
+            <id>create-and-upgrade-db</id>
+            <phase>generate-test-resources</phase>
+            <goals>
+              <goal>execute</goal>
+            </goals>
+            <configuration>
+              <srcFiles>       
+                <!-- now create old version of the schema -->
+                <srcFile>${project.build.directory}/scripts-old/sql/create/${test.db.name}_engine_${test.version.old}.sql</srcFile>
+                <srcFile>${project.build.directory}/scripts-old/sql/create/${test.db.name}_identity_${test.version.old}.sql</srcFile>
+
+                <!-- now perform the schema migrations -->
+                <srcFile>${project.build.directory}/scripts-current/sql/upgrade/${test.db.name}_engine_${test.version.old.major}_to_${test.version.current.major}.sql</srcFile>
+                <srcFile>${project.build.directory}/scripts-current/sql/upgrade/${test.db.name}_identity_${test.version.old.major}_to_${test.version.current.major}.sql</srcFile>
+              </srcFiles>
+            </configuration>            
+          </execution>
+          <execution>
+            <id>drop-db</id>
+            <phase>post-integration-test</phase>
+            <goals>
+              <goal>execute</goal>
+            </goals>
+            <configuration>
+              <srcFiles>
+                <!-- finally drop db -->
+                <srcFile>${project.build.directory}/scripts-current/sql/drop/${test.db.name}_engine_${test.version.current}.sql</srcFile>
+                <srcFile>${project.build.directory}/scripts-current/sql/drop/${test.db.name}_identity_${test.version.current}.sql</srcFile>
+              </srcFiles>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <!-- http://maven.apache.org/plugins/maven-compiler-plugin/ -->
+          <source>1.6</source>
+          <target>1.6</target>
+        </configuration>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <excludes>
+            <exclude>**/*TestCase.java</exclude>
+
+            <exclude>**/WSDLImporterTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-315 -->
+            <exclude>**/JobExecutorTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-427 -->
+            <exclude>**/HistoricTaskInstanceUpdateTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-485 -->
+            <exclude>**/RepeatingServiceTaskTest.java</exclude>
+            <exclude>**/ProcessDiagramRetrievalTest.java</exclude> <!-- fixme -->
+            <!--<exclude>**/ManagementServiceTest.java</exclude> -->
+          </excludes>
+          <testFailureIgnore>true</testFailureIgnore>
+        </configuration>
+      </plugin>
+
     </plugins>
   </build>
 
