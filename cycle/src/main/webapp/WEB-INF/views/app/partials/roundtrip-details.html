@@ -134,7 +134,7 @@
                 ng-show="status == 'synchronizationFailed' || status == 'synchronizationSuccess'">OK</button>
         <button href="#" class="btn btn-primary" ng-click="performSync()" th:text="#{Synchronize}"
                 ng-disabled="status == 'performSynchronize'"
-                ng-hide="status == 'synchronizationFailed' || status == 'synchronizationSuccess'" >Synchronize</button>
+                ng-hide="status == 'synchronizationFailed' || status == 'synchronizationSuccess'" data-req-aware="synchronizeModelsForm, disableAjaxLoader">Synchronize</button>
       </div>
     </div>
   </modal-dialog>

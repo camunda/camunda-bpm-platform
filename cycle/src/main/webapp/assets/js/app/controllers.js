@@ -93,8 +93,8 @@ function RoundtripDetailsController($scope, $routeParams, RoundtripDetails, Comm
     }
     
     if (roundtrip.rightHandSide && roundtrip.leftHandSide) {
-      lhsModeSyncStatus = roundtrip.leftHandSide.syncStatus.status || "UNAVAILABLE";
-      rhsModeSyncStatus = roundtrip.rightHandSide.syncStatus.status || "UNAVAILABLE";
+      roundtrip.leftHandSide.syncStatus ? lhsModeSyncStatus = roundtrip.leftHandSide.syncStatus.status : lhsModeSyncStatus = "UNAVAILABLE";
+      roundtrip.rightHandSide.syncStatus ? rhsModeSyncStatus = roundtrip.rightHandSide.syncStatus.status : rhsModeSyncStatus = "UNAVAILABLE";
       return lhsModeSyncStatus != "UNAVAILABLE" && rhsModeSyncStatus != "UNAVAILABLE"; 
     }
     
@@ -230,7 +230,6 @@ function SyncRoundtripController($scope, $http, $q, App, Event, Connector) {
   
   $scope.performSync = function() {
     $scope.status = PERFORM_SYNC;
-    $("#commitMessageSync").attr("disabled", "disabled");
     
     var Delay = function(delayMs) {
       var deferred = $q.defer();
@@ -249,7 +248,6 @@ function SyncRoundtripController($scope, $http, $q, App, Event, Connector) {
       success(function(data) {
         delayed.then(function() {
           $scope.roundtrip.$get({id: $scope.roundtrip.id });
-          $("#commitMessageSync").removeAttr("disabled");
           var status = data.status;
           if (status == "SYNC_SUCCESS") {
             $scope.status = SYNC_SUCCESS;
