@@ -60,8 +60,7 @@
                   <outputDirectory>target/fox-engine-${project.version}</outputDirectory>
                 </artifactItem>
               </artifactItems>
-              <includes>**/create/*.sql</includes>
-              <includes>**/drop/*.sql</includes>
+              <includes>**/create/*.sql, **/drop/*.sql</includes>
             </configuration>
           </execution>
         </executions>
