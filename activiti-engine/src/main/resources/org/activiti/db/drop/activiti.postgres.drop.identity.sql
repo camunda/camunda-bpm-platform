@@ -1,3 +1,6 @@
+drop index ACT_IDX_MEMB_GROUP;
+drop index ACT_IDX_MEMB_USER;
+
 alter table ACT_ID_MEMBERSHIP 
     drop constraint ACT_FK_MEMB_GROUP;
     
