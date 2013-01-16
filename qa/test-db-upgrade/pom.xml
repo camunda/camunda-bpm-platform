@@ -46,7 +46,7 @@
       <id>mysql</id>
       <properties>
         <test.db.name>mysql</test.db.name>
-        <test.db.driver>com.mysql.jdbc.jdbc2.optional.MysqlXADataSource</test.db.driver>
+        <test.db.driver>com.mysql.jdbc.Driver</test.db.driver>
         <test.db.url>jdbc:mysql://${test.db.host}:3306/${test.db.database}</test.db.url>
       </properties>
     </profile>
