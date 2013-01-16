@@ -16,14 +16,81 @@
     <test.version.old>6.1.11</test.version.old>
     <test.version.old.major>6.1</test.version.old.major>
     <test.version.current>${project.version}</test.version.current>
-    <test.version.current.major>6.2</test.version.current.major>
 
-    <test.db.name>h2</test.db.name>
-    <test.db.driver>org.h2.Driver</test.db.driver>
-    <test.db.url>jdbc:h2:${project.build.directory}/dbs/fox-engine;MVCC=TRUE</test.db.url>
+    <test.db.host>${project.build.directory}</test.db.host>
+    <test.db.database>fox-engine</test.db.database>
     <test.db.username>sa</test.db.username>
     <test.db.password>sa</test.db.password>
   </properties>
+  
+  <profiles>
+    <profile>
+      <id>62</id>
+        <activation>
+          <activeByDefault>true</activeByDefault>
+        </activation>
+        <properties>
+          <test.version.current>${project.version}</test.version.current>
+          <test.version.current.major>6.2</test.version.current.major>
+        </properties>      
+    </profile>
+    <profile>
+      <id>h2</id>
+      <properties>
+        <test.db.name>h2</test.db.name>
+        <test.db.driver>org.h2.Driver</test.db.driver>
+        <test.db.url>jdbc:h2:${test.db.host}/dbs/${test.db.database};MVCC=TRUE</test.db.url>
+      </properties>
+    </profile>
+    <profile>
+      <id>mysql</id>
+      <properties>
+        <test.db.name>mysql</test.db.name>
+        <test.db.driver>com.mysql.jdbc.jdbc2.optional.MysqlXADataSource</test.db.driver>
+        <test.db.url>jdbc:mysql://${test.db.host}:3306/${test.db.database}</test.db.url>
+      </properties>
+    </profile>
+    <profile>
+      <id>mssql</id>
+      <properties>
+        <test.db.name>mssql</test.db.name>
+        <test.db.driver>com.microsoft.sqlserver.jdbc.SQLServerDriver</test.db.driver>
+        <test.db.url>jdbc:sqlserver://${test.db.host}:1433;DatabaseName=${test.db.database}</test.db.url>
+      </properties>
+    </profile>
+    <profile>
+      <id>db2</id>
+      <properties>
+        <test.db.name>db2</test.db.name>
+        <test.db.driver>com.ibm.db2.jcc.DB2Driver</test.db.driver>
+        <test.db.url>jdbc:db2://${test.db.host}:50000/${test.db.database}</test.db.url>
+      </properties>
+    </profile>
+    <profile>
+      <id>postgres</id>
+      <properties>
+        <test.db.name>postgres</test.db.name>
+        <test.db.driver>org.postgresql.Driver</test.db.driver>
+        <test.db.url>jdbc:postgresql://${test.db.host}:5432/${test.db.database}</test.db.url>
+      </properties>
+    </profile>
+    <profile>
+      <id>oracle10g</id>
+      <properties>
+        <test.db.name>oracle</test.db.name>
+        <test.db.driver>oracle.jdbc.OracleDriver</test.db.driver>
+        <test.db.url>jdbc:oracle:thin:@${test.db.host}:1521:xe</test.db.url>
+      </properties>
+    </profile>
+    <profile>
+      <id>oracle11g</id>
+      <properties>
+        <test.db.name>oracle</test.db.name>
+        <test.db.driver>oracle.jdbc.OracleDriver</test.db.driver>
+        <test.db.url>jdbc:oracle:thin:@${test.db.host}:1521:xe</test.db.url>
+      </properties>
+    </profile>
+  </profiles>
 
   <dependencies>
 
@@ -114,7 +181,6 @@
       <artifactId>postgresql</artifactId>
       <scope>test</scope>
     </dependency>
-
 
   </dependencies>
 
