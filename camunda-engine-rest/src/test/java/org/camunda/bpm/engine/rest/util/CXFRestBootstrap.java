@@ -33,12 +33,15 @@ public class CXFRestBootstrap {
     JAXRSServerFactoryBean sf = new JAXRSServerFactoryBean();
     sf.setResourceClasses(ProcessDefinitionServiceImpl.class);
     
+//    TestWebApplication app = new TestWebApplication();
+//    sf.setApplication(app);
+    
     List<Object> providers = new ArrayList<Object>();
     providers.add(new JSONProvider());
     providers.add(new ProcessDefinitionQueryDtoReader());
     sf.setProviders(providers);
     
-    sf.setAddress(SERVER_ADDRESS);
+    sf.setAddress(SERVER_ADDRESS + "/rest-test");
     server = sf.create();
     
   }

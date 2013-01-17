@@ -42,7 +42,7 @@ public class ProcessDefinitionServiceTest extends AbstractRestServiceTest {
   private static final String EXAMPLE_DIAGRAM_RESOURCE_NAME = "aDiagram";
   private static final Boolean EXAMPLE_IS_SUSPENDED = false;
   
-  private static final String PROCESS_DEFINITION_QUERY_URL = "/process-definition/query";
+  private static final String PROCESS_DEFINITION_QUERY_URL = "/rest-test/process-definition/query";
   
   private ProcessDefinitionQuery mockedQuery;
   
@@ -73,11 +73,13 @@ public class ProcessDefinitionServiceTest extends AbstractRestServiceTest {
   
   @Before
   public void setUpMockedQuery() {
+    loadProcessEngineService();
     injectMockedQuery(createMockDefinition());
   }
   
   @Test
   public void testProcessDefinitionRetrieval() {
+    setUpMockedQuery();
     InOrder inOrder = Mockito.inOrder(mockedQuery);
     
     String queryKey = "Key";
@@ -118,6 +120,7 @@ public class ProcessDefinitionServiceTest extends AbstractRestServiceTest {
   
   @Test
   public void testIncompleteProcessDefinition() {
+    setUpMockedQuery();
     injectMockedQuery(createIncompleteMockDefinition());
     Response response = expect().statusCode(Status.OK.getStatusCode())
         .when().get(PROCESS_DEFINITION_QUERY_URL);
@@ -139,6 +142,7 @@ public class ProcessDefinitionServiceTest extends AbstractRestServiceTest {
   
   @Test
   public void testEmptyQuery() {
+    setUpMockedQuery();
     String queryKey = "";
     given().queryParam("keyLike", queryKey)
       .then().expect().statusCode(Status.OK.getStatusCode())
@@ -147,6 +151,7 @@ public class ProcessDefinitionServiceTest extends AbstractRestServiceTest {
   
   @Test
   public void testNoParametersQuery() {
+    setUpMockedQuery();
     expect().statusCode(Status.OK.getStatusCode()).when().get(PROCESS_DEFINITION_QUERY_URL);
     
     verify(mockedQuery).list();
@@ -155,6 +160,7 @@ public class ProcessDefinitionServiceTest extends AbstractRestServiceTest {
   
   @Test
   public void testInvalidNumericParameter() {
+    setUpMockedQuery();
     String anInvalidIntegerQueryParam = "aString";
     given().queryParam("ver", anInvalidIntegerQueryParam)
       .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
@@ -167,6 +173,7 @@ public class ProcessDefinitionServiceTest extends AbstractRestServiceTest {
    */
   @Test
   public void testInvalidBooleanParameter() {
+    setUpMockedQuery();
     String anInvalidBooleanQueryParam = "neitherTrueNorFalse";
     given().queryParam("active", anInvalidBooleanQueryParam)
       .then().expect().statusCode(Status.OK.getStatusCode())
@@ -175,6 +182,7 @@ public class ProcessDefinitionServiceTest extends AbstractRestServiceTest {
   
   @Test
   public void testAdditionalParameters() {
+    setUpMockedQuery();
 
     Map<String, String> queryParameters = getCompleteQueryParameters();
     
@@ -227,6 +235,8 @@ public class ProcessDefinitionServiceTest extends AbstractRestServiceTest {
 
   @Test
   public void testSortingParameters() {
+    setUpMockedQuery();
+    
     InOrder inOrder = Mockito.inOrder(mockedQuery);
     executeAndVerifySorting("category", "asc", Status.OK);
     inOrder.verify(mockedQuery).orderByProcessDefinitionCategory();
@@ -265,6 +275,7 @@ public class ProcessDefinitionServiceTest extends AbstractRestServiceTest {
   
   @Test
   public void testInvalidSortingOptions() {
+    setUpMockedQuery();
     executeAndVerifySorting("anInvalidSortByOption", "asc", Status.BAD_REQUEST);
     executeAndVerifySorting("category", "anInvalidSortOrderOption", Status.BAD_REQUEST);
   }
@@ -277,6 +288,7 @@ public class ProcessDefinitionServiceTest extends AbstractRestServiceTest {
   
   @Test
   public void testSortByParameterOnly() {
+    setUpMockedQuery();
     given().queryParam("sortBy", "category")
       .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
       .when().get(PROCESS_DEFINITION_QUERY_URL);
@@ -284,6 +296,7 @@ public class ProcessDefinitionServiceTest extends AbstractRestServiceTest {
   
   @Test
   public void testSortOrderParameterOnly() {
+    setUpMockedQuery();
     given().queryParam("sortOrder", "asc")
       .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
       .when().get(PROCESS_DEFINITION_QUERY_URL);
@@ -291,6 +304,8 @@ public class ProcessDefinitionServiceTest extends AbstractRestServiceTest {
 
   @Test
   public void testSuccessfulPagination() {
+    setUpMockedQuery();
+    
     int firstResult = 0;
     int maxResults = 10;
     given().queryParam("firstResult", firstResult).queryParam("maxResults", maxResults)
@@ -305,6 +320,7 @@ public class ProcessDefinitionServiceTest extends AbstractRestServiceTest {
    */
   @Test
   public void testMissingFirstResultParameter() {
+    setUpMockedQuery();
     int maxResults = 10;
     given().queryParam("maxResults", maxResults)
       .then().expect().statusCode(Status.OK.getStatusCode())
@@ -318,6 +334,7 @@ public class ProcessDefinitionServiceTest extends AbstractRestServiceTest {
    */
   @Test
   public void testMissingMaxResultsParameter() {
+    setUpMockedQuery();
     int firstResult = 10;
     given().queryParam("firstResult", firstResult)
       .then().expect().statusCode(Status.OK.getStatusCode())
