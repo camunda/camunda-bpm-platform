@@ -16,6 +16,9 @@ Contents:
 			server/apache-tomcat-${tomcat6.version}/bin/startup.{bat/sh} 
 		script to start up the the server.
 		
+		Set CATALINA_OPTS in
+		    server/apache-tomcat-${tomcat6.version}/bin/setenv.{bat/sh}
+		
 		You can access camunda fox cockpit under:
 		
 		http://localhost:8080/cockpit 
