@@ -33,6 +33,14 @@
       <source>src/README.txt</source>
       <filtered>true</filtered>
       <outputDirectory></outputDirectory>
-    </file>   
+    </file>
+    <file>
+      <source>src/tomcat6/setenv.bat</source>
+      <outputDirectory>server/apache-tomcat-${tomcat6.version}/bin/</outputDirectory>
+    </file>
+    <file>
+      <source>src/tomcat6/setenv.sh</source>
+      <outputDirectory>server/apache-tomcat-${tomcat6.version}/bin/</outputDirectory>
+    </file>
   </files>
 </assembly>
