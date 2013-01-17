@@ -8,35 +8,69 @@ import org.activiti.engine.repository.ProcessDefinition;
 @XmlRootElement(name = "data")
 public class ProcessDefinitionDto {
 
-  @XmlElement
   private String id;
-  
-  @XmlElement
   private String key;
-  
-  @XmlElement
   private String category;
-  
-  @XmlElement
   private String description;
-  
-  @XmlElement
   private String name;
-  
-  @XmlElement
   private int version;
-  
-  @XmlElement
   private String resource;
-  
-  @XmlElement
   private String deploymentId;
-  
-  @XmlElement
   private String diagram;
+  private boolean suspended;
+  
   
   @XmlElement
-  private boolean suspended;
+  public String getId() {
+    return id;
+  }
+
+  @XmlElement
+  public String getKey() {
+    return key;
+  }
+
+  @XmlElement
+  public String getCategory() {
+    return category;
+  }
+
+  @XmlElement
+  public String getDescription() {
+    return description;
+  }
+
+  @XmlElement
+  public String getName() {
+    return name;
+  }
+
+  @XmlElement
+  public int getVersion() {
+    return version;
+  }
+
+  @XmlElement
+  public String getResource() {
+    return resource;
+  }
+
+  @XmlElement
+  public String getDeploymentId() {
+    return deploymentId;
+  }
+
+  @XmlElement
+  public String getDiagram() {
+    return diagram;
+  }
+
+  @XmlElement
+  public boolean isSuspended() {
+    return suspended;
+  }
+
+
 
   public static ProcessDefinitionDto fromProcessDefinition(ProcessDefinition definition) {
     ProcessDefinitionDto dto = new ProcessDefinitionDto();

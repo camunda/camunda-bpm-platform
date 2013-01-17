@@ -14,11 +14,13 @@ import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.MessageBodyReader;
+import javax.ws.rs.ext.Provider;
 
 import org.camunda.bpm.engine.rest.dto.ProcessDefinitionQueryDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 
+@Provider
 public class ProcessDefinitionQueryDtoReader implements
     MessageBodyReader<ProcessDefinitionQueryDto> {
 
