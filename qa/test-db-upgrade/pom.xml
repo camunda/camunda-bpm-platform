@@ -341,6 +341,7 @@
                 <srcFile>${project.build.directory}/scripts-current/sql/drop/${test.db.name}_engine_${test.version.current}.sql</srcFile>
                 <srcFile>${project.build.directory}/scripts-current/sql/drop/${test.db.name}_identity_${test.version.current}.sql</srcFile>
               </srcFiles>
+              <autocommit>true</autocommit>
               <onError>continue</onError>
             </configuration>            
           </execution>
