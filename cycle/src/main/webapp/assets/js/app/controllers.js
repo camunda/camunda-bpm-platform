@@ -710,6 +710,8 @@ function EditConnectorController($scope, $http, App, ConnectorConfiguration) {
         keys.push(key);
       });
       
+      // sort the array and than reverse the sorted order
+      keys.sort().reverse();
       $scope.customPropertyNames = keys;
     }
   });
