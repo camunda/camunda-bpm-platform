@@ -42,7 +42,7 @@ public class ProcessDefinitionServiceTest extends AbstractRestServiceTest {
   private static final String EXAMPLE_DIAGRAM_RESOURCE_NAME = "aDiagram";
   private static final Boolean EXAMPLE_IS_SUSPENDED = false;
   
-  private static final String PROCESS_DEFINITION_QUERY_URL = "/rest-test/process-definition";
+  private static final String PROCESS_DEFINITION_QUERY_URL = TEST_RESOURCE_ROOT_PATH + "/process-definition";
   
   private ProcessDefinitionQuery mockedQuery;
   
@@ -50,7 +50,6 @@ public class ProcessDefinitionServiceTest extends AbstractRestServiceTest {
     ProcessDefinitionQuery sampleDefinitionsQuery = mock(ProcessDefinitionQuery.class);
     when(sampleDefinitionsQuery.list()).thenReturn(mockedDefinitions);
     when(processEngine.getRepositoryService().createProcessDefinitionQuery()).thenReturn(sampleDefinitionsQuery);
-    when(sampleDefinitionsQuery.processDefinitionKeyLike(any(String.class))).thenReturn(sampleDefinitionsQuery);
     return sampleDefinitionsQuery;
   }
   
@@ -71,7 +70,7 @@ public class ProcessDefinitionServiceTest extends AbstractRestServiceTest {
     mockedQuery = setUpMockDefinitionQuery(definitions);
   }
   
-  @Before
+//  @Before
   public void setUpMockedQuery() {
     loadProcessEngineService();
     injectMockedQuery(createMockDefinition());
