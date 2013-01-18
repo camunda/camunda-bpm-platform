@@ -92,19 +92,20 @@ public class ProcessDefinitionServiceTest extends AbstractRestServiceTest {
     inOrder.verify(mockedQuery).list();
     
     String content = response.asString();
-    List<String> definitions = from(content).getList("data");
+    List<String> definitions = from(content).getList("");
     Assert.assertEquals("There should be one process definition returned.", 1, definitions.size());
+    Assert.assertNotNull("There should be one process definition returned", definitions.get(0));
     
-    String returnedDefinitionKey = from(content).getString("data[0].key");
-    String returnedDefinitionId = from(content).getString("data[0].id");
-    String returnedCategory = from(content).getString("data[0].category");
-    String returnedDefinitionName = from(content).getString("data[0].name");
-    String returnedDescription = from(content).getString("data[0].description");
-    Integer returnedVersion = from(content).getInt("data[0].version");
-    String returnedResourceName = from(content).getString("data[0].resource");
-    String returnedDeploymentId  = from(content).getString("data[0].deploymentId");
-    String returnedDiagramResourceName = from(content).getString("data[0].diagram");
-    Boolean returnedIsSuspended = from(content).getBoolean("data[0].suspended");
+    String returnedDefinitionKey = from(content).getString("[0].key");
+    String returnedDefinitionId = from(content).getString("[0].id");
+    String returnedCategory = from(content).getString("[0].category");
+    String returnedDefinitionName = from(content).getString("[0].name");
+    String returnedDescription = from(content).getString("[0].description");
+    Integer returnedVersion = from(content).getInt("[0].version");
+    String returnedResourceName = from(content).getString("[0].resource");
+    String returnedDeploymentId  = from(content).getString("[0].deploymentId");
+    String returnedDiagramResourceName = from(content).getString("[0].diagram");
+    Boolean returnedIsSuspended = from(content).getBoolean("[0].suspended");
 
     Assert.assertEquals(EXAMPLE_DEFINITION_ID, returnedDefinitionId);
     Assert.assertEquals(EXAMPLE_DEFINITION_KEY, returnedDefinitionKey);
@@ -126,7 +127,7 @@ public class ProcessDefinitionServiceTest extends AbstractRestServiceTest {
         .when().get(PROCESS_DEFINITION_QUERY_URL);
     
     String content = response.asString();
-    String returnedResourceName = from(content).getString("data[0].resource");
+    String returnedResourceName = from(content).getString("[0].resource");
     Assert.assertNull("Should be null, as it is also null in the original process definition on the server.", 
         returnedResourceName);
   }

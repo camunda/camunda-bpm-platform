@@ -14,6 +14,8 @@
   <properties>
     <jboss.management-native.port>39999</jboss.management-native.port>
     <jboss.runtime.location>../qa/jboss7-runtime/target/jboss-as-7.1.0.Final</jboss.runtime.location>
+    
+    <resteasy.version>2.3.5.Final</resteasy.version>
   </properties>
   
 	<dependencies>
@@ -23,22 +25,48 @@
 			<scope>provided</scope>
 		</dependency>
 		
-		<!-- cxf has to be included before javaee-api -->
     <dependency>
-      <groupId>org.apache.cxf</groupId>
-      <artifactId>cxf-bundle-jaxrs</artifactId>
-      <version>2.6.2</version>
-      <scope>test</scope>
-    </dependency>
-		
-		<dependency>
-			<groupId>javax</groupId>
-			<artifactId>javaee-api</artifactId>
-			<version>6.0</version>
-			<scope>provided</scope>
+      <groupId>org.jboss.spec</groupId>
+      <artifactId>jboss-javaee-6.0</artifactId>
+      <type>pom</type>
+      <scope>provided</scope>
+      <version>3.0.0.Beta1</version>
+      <exclusions>
+        <exclusion>
+          <artifactId>xalan</artifactId>
+          <groupId>org.apache.xalan</groupId>
+        </exclusion>
+      </exclusions>
 		</dependency>
 		
 		<!-- test -->
+    <dependency>
+      <groupId>org.jboss.resteasy</groupId>
+      <artifactId>resteasy-jaxrs</artifactId>
+      <version>${resteasy.version}</version>
+      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <artifactId>httpclient</artifactId>
+          <groupId>org.apache.httpcomponents</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.jboss.resteasy</groupId>
+      <artifactId>resteasy-jackson-provider</artifactId>
+      <version>${resteasy.version}</version>
+      <scope>test</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.jboss.resteasy</groupId>
+      <artifactId>tjws</artifactId>
+      <version>${resteasy.version}</version>
+      <scope>test</scope>
+    </dependency>
+    
 		<dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
