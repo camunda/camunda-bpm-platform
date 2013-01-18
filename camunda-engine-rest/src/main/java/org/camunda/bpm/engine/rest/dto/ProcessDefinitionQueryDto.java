@@ -9,18 +9,8 @@ import org.activiti.engine.repository.ProcessDefinitionQuery;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 
-public class ProcessDefinitionQueryDto extends AbstractQueryParameterDto {
+public class ProcessDefinitionQueryDto extends SortableParameterizedQueryDto {
 
-  private static final String SORT_ORDER_ASC_VALUE = "asc";
-  private static final String SORT_ORDER_DESC_VALUE = "desc";
-  
-  private static final List<String> VALID_SORT_ORDER_VALUES;
-  static {
-    VALID_SORT_ORDER_VALUES = new ArrayList<String>();
-    VALID_SORT_ORDER_VALUES.add(SORT_ORDER_ASC_VALUE);
-    VALID_SORT_ORDER_VALUES.add(SORT_ORDER_DESC_VALUE);
-  }
-  
   private static final String SORT_BY_CATEGORY_VALUE = "category";
   private static final String SORT_BY_KEY_VALUE = "key";
   private static final String SORT_BY_ID_VALUE = "id";
@@ -54,28 +44,14 @@ public class ProcessDefinitionQueryDto extends AbstractQueryParameterDto {
   private Boolean active;
   private Boolean suspended;
   
-  private String sortBy;
-  private String sortOrder;
-  
-  public String getCategory() {
-    return category;
-  }
-  
   @CamundaQueryParam("category")
   public void setCategory(String category) {
     this.category = category;
   }
   
-  public String getCategoryLike() {
-    return categoryLike;
-  }
-  
   @CamundaQueryParam("categoryLike")
   public void setCategoryLike(String categoryLike) {
     this.categoryLike = categoryLike;
-  }
-  public String getName() {
-    return name;
   }
   
   @CamundaQueryParam("name")
@@ -83,17 +59,9 @@ public class ProcessDefinitionQueryDto extends AbstractQueryParameterDto {
     this.name = name;
   }
   
-  public String getNameLike() {
-    return nameLike;
-  }
-  
   @CamundaQueryParam("nameLike")
   public void setNameLike(String nameLike) {
     this.nameLike = nameLike;
-  }
-  
-  public String getDeploymentId() {
-    return deploymentId;
   }
   
   @CamundaQueryParam("deploymentId")
@@ -101,17 +69,9 @@ public class ProcessDefinitionQueryDto extends AbstractQueryParameterDto {
     this.deploymentId = deploymentId;
   }
   
-  public String getKey() {
-    return key;
-  }
-  
   @CamundaQueryParam("key")
   public void setKey(String key) {
     this.key = key;
-  }
-  
-  public String getKeyLike() {
-    return keyLike;
   }
   
   @CamundaQueryParam("keyLike")
@@ -119,17 +79,9 @@ public class ProcessDefinitionQueryDto extends AbstractQueryParameterDto {
     this.keyLike = keyLike;
   }
   
-  public Integer getVersion() {
-    return version;
-  }
-  
   @CamundaQueryParam("ver")
   public void setVersion(Integer version) {
     this.version = version;
-  }
-  
-  public boolean isLatestVersion() {
-    return latestVersion;
   }
   
   @CamundaQueryParam("latest")
@@ -137,17 +89,9 @@ public class ProcessDefinitionQueryDto extends AbstractQueryParameterDto {
     this.latestVersion = latestVersion;
   }
   
-  public String getResourceName() {
-    return resourceName;
-  }
-  
   @CamundaQueryParam("resourceName")
   public void setResourceName(String resourceName) {
     this.resourceName = resourceName;
-  }
-  
-  public String getResourceNameLike() {
-    return resourceNameLike;
   }
   
   @CamundaQueryParam("resourceNameLike")
@@ -155,17 +99,9 @@ public class ProcessDefinitionQueryDto extends AbstractQueryParameterDto {
     this.resourceNameLike = resourceNameLike;
   }
   
-  public String getStartableBy() {
-    return startableBy;
-  }
-  
   @CamundaQueryParam("startableBy")
   public void setStartableBy(String startableBy) {
     this.startableBy = startableBy;
-  }
-  
-  public Boolean isActive() {
-    return active;
   }
   
   @CamundaQueryParam("active")
@@ -173,39 +109,16 @@ public class ProcessDefinitionQueryDto extends AbstractQueryParameterDto {
     this.active = active;
   }
   
-  public boolean isSuspended() {
-    return suspended;
-  }
-  
   @CamundaQueryParam("suspended")
   public void setSuspended(Boolean suspended) {
     this.suspended = suspended;
   }
-  
-  public String getSortBy() {
-    return sortBy;
-  }
 
-  @CamundaQueryParam("sortBy")
-  public void setSortBy(String sortBy) {
-    if (!VALID_SORT_BY_VALUES.contains(sortBy)) {
-      throw new InvalidRequestException("sortBy parameter has invalid value.");
-    }
-    this.sortBy = sortBy;
+  @Override
+  protected boolean isValidSortByValue(String value) {
+    return VALID_SORT_BY_VALUES.contains(value);
   }
   
-  public String getSortOrder() {
-    return sortOrder;
-  }
-
-  @CamundaQueryParam("sortOrder")
-  public void setSortOrder(String sortOrder) {
-    if (!VALID_SORT_ORDER_VALUES.contains(sortOrder)) {
-      throw new InvalidRequestException("sortOrder parameter has invalid value.");
-    }
-    this.sortOrder = sortOrder;
-  }
-
   /**
    * Creates a {@link ProcessDefinitionQuery} against the given {@link RepositoryService}.
    * @param repositoryService
@@ -287,10 +200,6 @@ public class ProcessDefinitionQueryDto extends AbstractQueryParameterDto {
     return query;
   }
   
-  private boolean sortOptionsValid() {
-    return (sortBy != null && sortOrder != null) || (sortBy == null && sortOrder == null);
-  }
-  
   @Override
   public void setPropertyFromParameterPair(String key, String value) {
     try {
@@ -311,4 +220,5 @@ public class ProcessDefinitionQueryDto extends AbstractQueryParameterDto {
       throw new InvalidRequestException(e.getTargetException().getMessage());
     }
   }
+
 }

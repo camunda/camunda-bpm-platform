@@ -16,15 +16,15 @@ import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.Provider;
 
-import org.camunda.bpm.engine.rest.dto.AbstractQueryParameterDto;
+import org.camunda.bpm.engine.rest.dto.SortableParameterizedQueryDto;
 import org.camunda.bpm.engine.rest.dto.ProcessDefinitionQueryDto;
 import org.camunda.bpm.engine.rest.dto.ProcessInstanceQueryDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 
 @Provider
-public class ProcessDefinitionQueryDtoReader implements
-    MessageBodyReader<AbstractQueryParameterDto> {
+public class EngineQueryDtoReader implements
+    MessageBodyReader<SortableParameterizedQueryDto> {
 
   @Context
   private UriInfo context;
@@ -42,13 +42,13 @@ public class ProcessDefinitionQueryDtoReader implements
   }
 
   @Override
-  public AbstractQueryParameterDto readFrom(
-      Class<AbstractQueryParameterDto> clazz, Type genericType, Annotation[] annotations,
+  public SortableParameterizedQueryDto readFrom(
+      Class<SortableParameterizedQueryDto> clazz, Type genericType, Annotation[] annotations,
       MediaType mediaType, MultivaluedMap<String, String> httpHeaders, InputStream entityStream)
       throws IOException, WebApplicationException {
     
     MultivaluedMap<String, String> queryParameters = context.getQueryParameters();
-    AbstractQueryParameterDto queryDto;
+    SortableParameterizedQueryDto queryDto;
     try {
        queryDto = clazz.newInstance();
     } catch (InstantiationException e) {

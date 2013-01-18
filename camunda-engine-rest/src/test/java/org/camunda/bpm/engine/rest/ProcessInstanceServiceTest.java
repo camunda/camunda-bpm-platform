@@ -1,23 +1,32 @@
 package org.camunda.bpm.engine.rest;
 
+import static com.jayway.restassured.RestAssured.expect;
 import static com.jayway.restassured.RestAssured.given;
 import static com.jayway.restassured.path.json.JsonPath.from;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.ws.rs.core.Response.Status;
 
+import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.runtime.ProcessInstanceQuery;
+import org.camunda.bpm.engine.rest.helper.MockDefinitionBuilder;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
 
 import com.jayway.restassured.response.Response;
+import com.jayway.restassured.specification.RequestSpecification;
 
 public class ProcessInstanceServiceTest extends AbstractRestServiceTest {
   
@@ -75,10 +84,9 @@ public class ProcessInstanceServiceTest extends AbstractRestServiceTest {
     inOrder.verify(mockedQuery).list();
     
     String content = response.asString();
-    System.out.println(content);
-    List<String> definitions = from(content).getList("");
-    Assert.assertEquals("There should be one process definition returned.", 1, definitions.size());
-    Assert.assertNotNull("There should be one process definition returned", definitions.get(0));
+    List<String> instances = from(content).getList("");
+    Assert.assertEquals("There should be one process definition returned.", 1, instances.size());
+    Assert.assertNotNull("There should be one process definition returned", instances.get(0));
     
     String returnedInstanceId = from(content).getString("[0].id");
     Boolean returnedIsEnded = from(content).getBoolean("[0].ended");
@@ -91,6 +99,120 @@ public class ProcessInstanceServiceTest extends AbstractRestServiceTest {
     Assert.assertEquals(EXAMPLE_PROCESS_DEFINITION_ID, returnedDefinitionId);
     Assert.assertEquals(EXAMPLE_BUSINESS_KEY, returnedBusinessKey);
     Assert.assertEquals(EXAMPLE_IS_SUSPENDED, returnedIsSuspended);
+  }
+  
+  @Test
+  public void testIncompleteProcessInstance() {
+    setUpMockedQuery();
+    injectMockedQuery(createIncompleteMockInstance());
+    Response response = expect().statusCode(Status.OK.getStatusCode())
+        .when().get(PROCESS_INSTANCE_QUERY_URL);
+    
+    String content = response.asString();
+    String returnedBusinessKey = from(content).getString("[0].businessKey");
+    Assert.assertNull("Should be null, as it is also null in the original process instance on the server.", 
+        returnedBusinessKey);
+  }
+  
+  private ProcessInstance createIncompleteMockInstance() {
+    ProcessInstance mockInstance = mock(ProcessInstance.class);
+    when(mockInstance.getId()).thenReturn(EXAMPLE_ID);
+    return mockInstance;
+  }
+  
+  @Test
+  public void testEmptyQuery() {
+    setUpMockedQuery();
+    String queryKey = "";
+    given().queryParam("processDefinitionKey", queryKey)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .when().get(PROCESS_INSTANCE_QUERY_URL);
+  }
+  
+  @Test
+  public void testNoParametersQuery() {
+    setUpMockedQuery();
+    expect().statusCode(Status.OK.getStatusCode()).when().get(PROCESS_INSTANCE_QUERY_URL);
+    
+    verify(mockedQuery).list();
+    verifyNoMoreInteractions(mockedQuery);
+  }
+  
+  @Test
+  public void testAdditionalParametersExcludingVariables() {
+    setUpMockedQuery();
+
+    Map<String, String> queryParameters = getCompleteQueryParameters();
+    
+    given().queryParams(queryParameters)
+      .expect().statusCode(Status.OK.getStatusCode())
+      .when().get(PROCESS_INSTANCE_QUERY_URL);
+    
+    verify(mockedQuery).processInstanceBusinessKey(queryParameters.get("businessKey"));
+    verify(mockedQuery).processDefinitionKey(queryParameters.get("processDefinitionKey"));
+    verify(mockedQuery).processDefinitionId(queryParameters.get("processDefinitionId"));
+    verify(mockedQuery).superProcessInstanceId(queryParameters.get("super"));
+    verify(mockedQuery).subProcessInstanceId(queryParameters.get("sub"));
+    verify(mockedQuery).suspended();
+    verify(mockedQuery).active();
+    verify(mockedQuery).list();
+  }
+  
+  
+  
+  private Map<String, String> getCompleteQueryParameters() {
+    Map<String, String> parameters = new HashMap<String, String>();
+    
+    parameters.put("businessKey", "aBusinessKey");
+    parameters.put("processDefinitionKey", "aProcDefKey");
+    parameters.put("processDefinitionId", "aProcDefId");
+    parameters.put("super", "aSuperProcInstId");
+    parameters.put("sub", "aSubProcInstId");
+    parameters.put("suspended", "true");
+    parameters.put("active", "true");
+    
+    
+    return parameters;
+  }
+  
+  public void testVariableParameters() {
+    // TODO implement
+  }
+  
+  @Test
+  public void testSortingParameters() {
+    setUpMockedQuery();
+    
+    InOrder inOrder = Mockito.inOrder(mockedQuery);
+    executeAndVerifySorting("instanceId", "asc", Status.OK);
+    inOrder.verify(mockedQuery).orderByProcessInstanceId();
+    inOrder.verify(mockedQuery).asc();
+    setUpMockedQuery();
+    
+    inOrder = Mockito.inOrder(mockedQuery);
+    executeAndVerifySorting("definitionKey", "desc", Status.OK);
+    inOrder.verify(mockedQuery).orderByProcessDefinitionKey();
+    inOrder.verify(mockedQuery).desc();
+    setUpMockedQuery();
+    
+    inOrder = Mockito.inOrder(mockedQuery);
+    executeAndVerifySorting("definitionId", "asc", Status.OK);
+    inOrder.verify(mockedQuery).orderByProcessDefinitionId();
+    inOrder.verify(mockedQuery).asc();
+    setUpMockedQuery();
+  }
+  
+  @Test
+  public void testInvalidSortingOptions() {
+    setUpMockedQuery();
+    executeAndVerifySorting("anInvalidSortByOption", "asc", Status.BAD_REQUEST);
+    executeAndVerifySorting("definitionId", "anInvalidSortOrderOption", Status.BAD_REQUEST);
+  }
+
+  private void executeAndVerifySorting(String sortBy, String sortOrder, Status expectedStatus) {
+    given().queryParam("sortBy", sortBy).queryParam("sortOrder", sortOrder)
+      .then().expect().statusCode(expectedStatus.getStatusCode())
+      .when().get(PROCESS_INSTANCE_QUERY_URL);
   }
   
 }
