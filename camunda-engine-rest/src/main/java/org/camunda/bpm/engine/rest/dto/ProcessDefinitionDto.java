@@ -70,8 +70,6 @@ public class ProcessDefinitionDto {
     return suspended;
   }
 
-
-
   public static ProcessDefinitionDto fromProcessDefinition(ProcessDefinition definition) {
     ProcessDefinitionDto dto = new ProcessDefinitionDto();
     dto.id = definition.getId();

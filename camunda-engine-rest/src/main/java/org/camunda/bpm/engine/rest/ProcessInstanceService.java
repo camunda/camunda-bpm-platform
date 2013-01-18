@@ -8,6 +8,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
+import org.activiti.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.rest.dto.ProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.ProcessInstanceQueryDto;
 
@@ -15,6 +16,13 @@ import org.camunda.bpm.engine.rest.dto.ProcessInstanceQueryDto;
 @Produces(MediaType.APPLICATION_JSON)
 public interface ProcessInstanceService {
 
+  /**
+   * Exposes the {@link ProcessInstanceQuery} interface as a REST service.
+   * @param query
+   * @param firstResult
+   * @param maxResults
+   * @return
+   */
   @GET
   @Path("/")
   List<ProcessInstanceDto> getProcessInstances(ProcessInstanceQueryDto query, 
