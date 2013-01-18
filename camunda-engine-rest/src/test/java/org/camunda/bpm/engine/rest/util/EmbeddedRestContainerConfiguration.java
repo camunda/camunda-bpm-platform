@@ -10,5 +10,4 @@ public class EmbeddedRestContainerConfiguration implements
   public void validate() throws ConfigurationException {
 
   }
-
 }

@@ -16,12 +16,20 @@ import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.Provider;
 
+import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
 import org.camunda.bpm.engine.rest.dto.SortableParameterizedQueryDto;
 import org.camunda.bpm.engine.rest.dto.ProcessDefinitionQueryDto;
 import org.camunda.bpm.engine.rest.dto.ProcessInstanceQueryDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 
+/**
+ * A {@link MessageBodyReader} that populates subclasses of {@link SortableParameterizedQueryDto} from query parameters.
+ * Parameters are matched to setter methods in the class that are annotated with {@link CamundaQueryParam}.
+ * 
+ * @author Thorben Lindhauer
+ *
+ */
 @Provider
 public class EngineQueryDtoReader implements
     MessageBodyReader<SortableParameterizedQueryDto> {
