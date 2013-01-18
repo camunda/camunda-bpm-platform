@@ -227,4 +227,45 @@ public class ProcessInstanceServiceTest extends AbstractRestServiceTest {
       .when().get(PROCESS_INSTANCE_QUERY_URL);
   }
   
+  @Test
+  public void testSuccessfulPagination() {
+    setUpMockedQuery();
+    
+    int firstResult = 0;
+    int maxResults = 10;
+    given().queryParam("firstResult", firstResult).queryParam("maxResults", maxResults)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .when().get(PROCESS_INSTANCE_QUERY_URL);
+    
+    verify(mockedQuery).listPage(firstResult, maxResults);
+  }
+  
+  /**
+   * If parameter "firstResult" is missing, we expect 0 as default.
+   */
+  @Test
+  public void testMissingFirstResultParameter() {
+    setUpMockedQuery();
+    int maxResults = 10;
+    given().queryParam("maxResults", maxResults)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .when().get(PROCESS_INSTANCE_QUERY_URL);
+    
+    verify(mockedQuery).listPage(0, maxResults);
+  }
+  
+  /**
+   * If parameter "maxResults" is missing, we expect Integer.MAX_VALUE as default.
+   */
+  @Test
+  public void testMissingMaxResultsParameter() {
+    setUpMockedQuery();
+    int firstResult = 10;
+    given().queryParam("firstResult", firstResult)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .when().get(PROCESS_INSTANCE_QUERY_URL);
+    
+    verify(mockedQuery).listPage(firstResult, Integer.MAX_VALUE);
+  }
+  
 }
