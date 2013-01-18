@@ -16,7 +16,7 @@ import org.camunda.bpm.engine.rest.dto.ProcessDefinitionQueryDto;
 public interface ProcessDefinitionService {
 
 	@GET
-	@Path("/query")
+	@Path("/")
 	List<ProcessDefinitionDto> getProcessDefinitions(ProcessDefinitionQueryDto query, 
 	    @QueryParam("firstResult") Integer firstResult, @QueryParam("maxResults") Integer maxResults);
 }

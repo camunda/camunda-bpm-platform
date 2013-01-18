@@ -42,7 +42,7 @@ public class ProcessDefinitionServiceTest extends AbstractRestServiceTest {
   private static final String EXAMPLE_DIAGRAM_RESOURCE_NAME = "aDiagram";
   private static final Boolean EXAMPLE_IS_SUSPENDED = false;
   
-  private static final String PROCESS_DEFINITION_QUERY_URL = "/rest-test/process-definition/query";
+  private static final String PROCESS_DEFINITION_QUERY_URL = "/rest-test/process-definition";
   
   private ProcessDefinitionQuery mockedQuery;
   
