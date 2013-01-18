@@ -14,8 +14,8 @@ import org.jboss.shrinkwrap.descriptor.api.Descriptor;
 public class EmbeddedRestDeployableContainer implements DeployableContainer<EmbeddedRestContainerConfiguration> {
 
   @Inject @ContainerScoped
-  private InstanceProducer<CXFRestBootstrap> embeddedRestInstanceProducer;
-  private CXFRestBootstrap bootstrap;
+  private InstanceProducer<ResteasyServerBootstrap> embeddedRestInstanceProducer;
+  private ResteasyServerBootstrap bootstrap;
   
   @Override
   public ProtocolMetaData deploy(Archive<?> archive) throws DeploymentException {
@@ -44,7 +44,7 @@ public class EmbeddedRestDeployableContainer implements DeployableContainer<Embe
 
   @Override
   public void start() throws LifecycleException {
-    bootstrap = new CXFRestBootstrap();
+    bootstrap = new ResteasyServerBootstrap();
     bootstrap.start();
     
     embeddedRestInstanceProducer.set(bootstrap);
