@@ -186,12 +186,9 @@ public class ProcessDefinitionServiceTest extends AbstractRestServiceTest {
 
     Map<String, String> queryParameters = getCompleteQueryParameters();
     
-    RequestSpecification spec = given();
-    for (Entry<String, String> queryParam : queryParameters.entrySet()) {
-      spec.queryParam(queryParam.getKey(), queryParam.getValue());
-    }
-    
-    spec.expect().statusCode(Status.OK.getStatusCode()).when().get(PROCESS_DEFINITION_QUERY_URL);
+    given().queryParams(queryParameters)
+      .expect().statusCode(Status.OK.getStatusCode())
+      .when().get(PROCESS_DEFINITION_QUERY_URL);
     
     // assert query invocation
     verify(mockedQuery).processDefinitionCategory(queryParameters.get("category"));
