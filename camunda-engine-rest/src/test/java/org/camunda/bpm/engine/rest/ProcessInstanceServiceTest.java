@@ -12,21 +12,17 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import javax.ws.rs.core.Response.Status;
 
-import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.runtime.ProcessInstanceQuery;
-import org.camunda.bpm.engine.rest.helper.MockDefinitionBuilder;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
 
 import com.jayway.restassured.response.Response;
-import com.jayway.restassured.specification.RequestSpecification;
 
 public class ProcessInstanceServiceTest extends AbstractRestServiceTest {
   
@@ -212,6 +208,22 @@ public class ProcessInstanceServiceTest extends AbstractRestServiceTest {
   private void executeAndVerifySorting(String sortBy, String sortOrder, Status expectedStatus) {
     given().queryParam("sortBy", sortBy).queryParam("sortOrder", sortOrder)
       .then().expect().statusCode(expectedStatus.getStatusCode())
+      .when().get(PROCESS_INSTANCE_QUERY_URL);
+  }
+  
+  @Test
+  public void testSortByParameterOnly() {
+    setUpMockedQuery();
+    given().queryParam("sortBy", "definitionId")
+      .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
+      .when().get(PROCESS_INSTANCE_QUERY_URL);
+  }
+  
+  @Test
+  public void testSortOrderParameterOnly() {
+    setUpMockedQuery();
+    given().queryParam("sortOrder", "asc")
+      .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
       .when().get(PROCESS_INSTANCE_QUERY_URL);
   }
   
