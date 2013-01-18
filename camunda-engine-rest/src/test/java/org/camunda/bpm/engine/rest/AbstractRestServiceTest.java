@@ -18,6 +18,7 @@ import org.junit.runner.RunWith;
 public abstract class AbstractRestServiceTest {
 
   protected static ProcessEngine processEngine;
+  protected static final String TEST_RESOURCE_ROOT_PATH = "/rest-test";
 
 //  @BeforeClass
 //  public static void initialize() {
