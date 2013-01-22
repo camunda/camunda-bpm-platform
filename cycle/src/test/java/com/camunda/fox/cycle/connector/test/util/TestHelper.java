@@ -90,9 +90,9 @@ public class TestHelper {
     ConnectorNode connectorNodeParent = null;
     
     if (connector instanceof SignavioConnector) {
-      connectorNodeParent = connector.createNode(((SignavioConnector) connector).getPrivateFolder().getId(), name, ConnectorNodeType.FOLDER);
+      connectorNodeParent = connector.createNode(((SignavioConnector) connector).getPrivateFolder().getId(), name, ConnectorNodeType.FOLDER, null);
     } else {
-      connectorNodeParent = connector.createNode(connector.getRoot().getId(), name, ConnectorNodeType.FOLDER);
+      connectorNodeParent = connector.createNode(connector.getRoot().getId(), name, ConnectorNodeType.FOLDER, null);
     }
     
     return connectorNodeParent;
@@ -111,8 +111,8 @@ public class TestHelper {
       } else {
         modelInputStream = IoUtil.readFileAsInputStream(model);
         String label = model.substring(model.lastIndexOf("/") + 1, model.length());
-        connectorNode = connector.createNode(connectorNodeParent.getId(), label, ConnectorNodeType.BPMN_FILE);
-        connector.updateContent(connectorNode, modelInputStream);
+        connectorNode = connector.createNode(connectorNodeParent.getId(), label, ConnectorNodeType.BPMN_FILE, null);
+        connector.updateContent(connectorNode, modelInputStream, null);
       }
       
       return connectorNode;

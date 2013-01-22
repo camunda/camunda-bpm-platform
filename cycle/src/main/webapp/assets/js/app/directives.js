@@ -482,7 +482,18 @@ angular
   return {	  
     link: function(scope, element, attrs) {
       
-      var formName = attrs.reqAware;
+      var DISABLE_AJAX_LOADER = "disableAjaxLoader";
+      
+      var formName;
+      var showAjaxLoader = true;
+      
+      if (attrs.reqAware) {
+        var params = attrs.reqAware.split(",");
+        formName = $.trim(params[0]);
+        if (params[1] && $.trim(params[1]) == DISABLE_AJAX_LOADER) {
+          showAjaxLoader = false;
+        }
+      };
       
       function setFormValidity(valid) {
           var form  = scope[formName];
@@ -526,12 +537,14 @@ angular
             if(!formName) {
               $(element).removeAttr("disabled");	  
             }
-          	$(".icon-loading", element).remove();	  
+            if (showAjaxLoader) {
+          	  $(".icon-loading", element).remove();
+            }
           } 
         }
       });   
       
-      if($(element).is("button")) {
+      if($(element).is("button") && showAjaxLoader) {
         $(element)
         .bind({    
           click: function() {

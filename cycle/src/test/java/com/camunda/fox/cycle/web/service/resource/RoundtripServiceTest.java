@@ -154,7 +154,7 @@ public class RoundtripServiceTest {
     RoundtripDTO testRoundtrip = createAndFlushRoundtrip();
     BpmnDiagramDTO rightHandSide = testRoundtrip.getRightHandSide();
     
-    roundtripService.doSynchronize(SyncMode.RIGHT_TO_LEFT, testRoundtrip.getId());
+    roundtripService.doSynchronize(SyncMode.RIGHT_TO_LEFT, testRoundtrip.getId(), null);
     Response imageResponse = diagramService.getImage(rightHandSide.getId());
     
     // then
@@ -174,7 +174,7 @@ public class RoundtripServiceTest {
     // the image date to be 'now' + 5 secs. 'now' is set in roundtripService.doSynchronize(...)
     Thread.sleep(6000);
     
-    roundtripService.doSynchronize(SyncMode.LEFT_TO_RIGHT, testRoundtrip.getId());
+    roundtripService.doSynchronize(SyncMode.LEFT_TO_RIGHT, testRoundtrip.getId(), null);
     
     assertThatIsInSync(testRoundtrip.getRightHandSide());
     assertThatIsInSync(testRoundtrip.getLeftHandSide());
@@ -294,15 +294,15 @@ public class RoundtripServiceTest {
     configurationProvider.ensurePersisted();
     ensureConnectorInitialized();
     
-    connector.createNode("/", "foo", ConnectorNodeType.FOLDER);
+    connector.createNode("/", "foo", ConnectorNodeType.FOLDER, null);
 
-    ConnectorNode rightNodeImg = connector.createNode("/foo", "Impl.png", ConnectorNodeType.PNG_FILE);
+    ConnectorNode rightNodeImg = connector.createNode("/foo", "Impl.png", ConnectorNodeType.PNG_FILE, null);
     importNode(rightNodeImg, "com/camunda/fox/cycle/roundtrip/repository/test-rhs.png");
 
-    rightNode = connector.createNode("/foo", "Impl.bpmn", ConnectorNodeType.ANY_FILE);
+    rightNode = connector.createNode("/foo", "Impl.bpmn", ConnectorNodeType.ANY_FILE, null);
     importNode(rightNode, "com/camunda/fox/cycle/roundtrip/repository/test-rhs.bpmn");
 
-    leftNode = connector.createNode("/foo", "Modeler.bpmn", ConnectorNodeType.ANY_FILE);
+    leftNode = connector.createNode("/foo", "Modeler.bpmn", ConnectorNodeType.ANY_FILE, null);
     importNode(leftNode, "com/camunda/fox/cycle/roundtrip/repository/test-lhs.bpmn");
   }
 
@@ -311,10 +311,10 @@ public class RoundtripServiceTest {
     // Remove all entities
     roundtripRepository.deleteAll();
 
-    connector.deleteNode(new ConnectorNode("foo/Impl.png"));
-    connector.deleteNode(new ConnectorNode("foo/Impl.bpmn"));
-    connector.deleteNode(new ConnectorNode("foo/Modeler.bpmn"));
-    connector.deleteNode(new ConnectorNode("foo"));
+    connector.deleteNode(new ConnectorNode("foo/Impl.png"),null);
+    connector.deleteNode(new ConnectorNode("foo/Impl.bpmn"),null);
+    connector.deleteNode(new ConnectorNode("foo/Modeler.bpmn"),null);
+    connector.deleteNode(new ConnectorNode("foo"),null);
   }
 
   @BeforeClass
@@ -340,6 +340,6 @@ public class RoundtripServiceTest {
   // Utility methods /////////////////////////////
   
   protected ContentInformation importNode(ConnectorNode node, String classPathEntry) throws Exception {
-    return connector.updateContent(node, new FileInputStream(IoUtil.getFile(classPathEntry)));
+    return connector.updateContent(node, new FileInputStream(IoUtil.getFile(classPathEntry)),null);
   }
 }

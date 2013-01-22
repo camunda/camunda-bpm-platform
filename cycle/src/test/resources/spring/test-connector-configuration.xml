@@ -45,4 +45,10 @@
 
   <!-- instantiates test connector configurations for testing -->
   <bean name="configurationProvider" class="com.camunda.fox.cycle.connector.test.util.ConnectorConfigurationProvider" />
+  
+  <bean id="cycleConfiguration" class="com.camunda.fox.cycle.configuration.CycleConfiguration">
+
+    <property name="defaultCommitMessage" value="Changed using camunda fox cycle" />
+    
+  </bean>
 </beans>

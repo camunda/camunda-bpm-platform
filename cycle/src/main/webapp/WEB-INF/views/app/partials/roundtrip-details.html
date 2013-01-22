@@ -79,7 +79,7 @@
             </p>
             <p>
               <span th:text="#{'Are you sure you would like to continue?'}" />
-            </p>
+            </p>            
           </div>
           <div ng-switch-when="performSynchronize">
             <p th:text="#{Synchronization in progress}">Synchronization is in progress.</p>
@@ -107,6 +107,24 @@
             </p>
           </div>
         </div>
+      
+        <div data-ng-show="showCommitMessageForm()">
+         <form class="form-horizontal" novalidate ng-submit="performSync()" name="synchronizeModelsForm">
+              <fieldset>
+                <div class="control-group">
+                  <label class="control-label" for="commitMessageSync" style="text-align:left" 
+                         th:text="#{'Commit Message'}" 
+                         th:attr="data-help-text=#{'The message to be used as commit message.'}" 
+                         data-help-title="Commit Message"
+                         data-help>Commit Message</label>
+                  <div class="controls">
+                    <!-- display a combobox on leftside, otherwise a disabled input field -->
+                    <textarea id="commitMessageSync" ng-model="commitMessage" />                      
+                  </div>
+                </div>
+              </fieldset>
+          </form>
+        </div>          
       </div>
       <div class="modal-footer">
         <button class="btn" ng-click="cancel()" th:text="#{Cancel}"
@@ -116,7 +134,7 @@
                 ng-show="status == 'synchronizationFailed' || status == 'synchronizationSuccess'">OK</button>
         <button href="#" class="btn btn-primary" ng-click="performSync()" th:text="#{Synchronize}"
                 ng-disabled="status == 'performSynchronize'"
-                ng-hide="status == 'synchronizationFailed' || status == 'synchronizationSuccess'">Synchronize</button>
+                ng-hide="status == 'synchronizationFailed' || status == 'synchronizationSuccess'" data-req-aware="synchronizeModelsForm, disableAjaxLoader">Synchronize</button>
       </div>
     </div>
   </modal-dialog>

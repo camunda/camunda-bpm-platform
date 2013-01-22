@@ -21,7 +21,7 @@ public class TemplateExceptionMapper implements ExceptionMapper<TemplateInputExc
   public Response toResponse(TemplateInputException exception) {
     Logger.getLogger(getClass().getSimpleName()).log(Level.SEVERE, "Exception occured during request", exception);
     if (isNotFound(exception)) {
-      return Response.status(Response.Status.NOT_FOUND).entity("tpl:error/not-found").build();
+      return JaxRsUtil.createResponse().status(Response.Status.NOT_FOUND).entity("tpl:error/not-found").build();
     } else {
       // rethrow
       throw exception;

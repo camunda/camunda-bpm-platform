@@ -24,6 +24,7 @@ public class SignavioJson {
   private static final String JSON_PARENT_NAME_PROP = "parentName";
   private static final String JSON_TYPE_PROP = "type";
   private static final String JSON_UPDATED_PROP = "updated";
+  private static final String JSON_COMMENT_PROP = "comment";
 
   // JSON values
   private static final String JSON_DIR_VALUE = "dir";
@@ -171,6 +172,19 @@ public class SignavioJson {
     }
     
     throw new RuntimeException("Unable to get id for model named: " + modelName);
+  }
+
+  public static String extractModelComment(JSONObject jsonObj) {    
+    try {
+      String comment = "";
+      JSONObject repJsonObj = jsonObj.getJSONObject(JSON_REP_OBJ);
+      if (repJsonObj.has(JSON_COMMENT_PROP)) {
+        comment = repJsonObj.getString(JSON_COMMENT_PROP);
+      }
+      return comment;
+    } catch (JSONException e) {
+      throw new RuntimeException("Unable to extract comment.", e);
+    }
   }
     
 }

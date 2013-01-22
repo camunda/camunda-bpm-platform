@@ -29,10 +29,18 @@ public class IdentityHolderFilter implements Filter {
   }
   
   public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
-    setIdentity((HttpServletRequest) request, (HttpServletResponse) response);
-    chain.doFilter(request, response);
+    try {
+      setIdentity((HttpServletRequest) request, (HttpServletResponse) response);
+      chain.doFilter(request, response);
+    } finally {
+      clearIdentity();
+    }
   }
 
+
+  protected void clearIdentity() {
+    IdentityHolder.clear();    
+  }
 
   private void setIdentity(HttpServletRequest request, HttpServletResponse response) {
     IdentityHolder.setIdentity((UserIdentity) request.getSession().getAttribute(SecurityFilter.IDENTITY_SESSION_KEY));

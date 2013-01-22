@@ -20,50 +20,52 @@ public class DummyConnector extends Connector {
 
   @Override
   public List<ConnectorNode> getChildren(ConnectorNode parent) {
-    // TODO Auto-generated method stub
     return null;
   }
 
   @Override
   public ConnectorNode getRoot() {
-    // TODO Auto-generated method stub
     return null;
   }
 
   @Override
   public ConnectorNode getNode(String id) {
-    // TODO Auto-generated method stub
     return null;
   }
 
   @Override
   public InputStream getContent(ConnectorNode node) {
-    // TODO Auto-generated method stub
     return null;
   }
 
   @Override
   public ContentInformation getContentInformation(ConnectorNode node) {
-    // TODO Auto-generated method stub
     return null;
   }
 
   @Override
-  public ConnectorNode createNode(String parentId, String label, ConnectorNodeType type) {
-    // TODO Auto-generated method stub
+  public ConnectorNode createNode(String parentId, String label, ConnectorNodeType type, String message) {
     return null;
   }
 
   @Override
-  public void deleteNode(ConnectorNode node) {
-    // TODO Auto-generated method stub
+  public void deleteNode(ConnectorNode node, String message) {
     
   }
 
   @Override
-  public ContentInformation updateContent(ConnectorNode node, InputStream newContent) throws Exception {
-    // TODO Auto-generated method stub
+  public ContentInformation updateContent(ConnectorNode node, InputStream newContent, String message) throws Exception {
     return null;
+  }
+
+  @Override
+  public boolean needsLogin() {
+    return false;
+  }
+
+  @Override
+  public boolean isSupportsCommitMessage() {
+    return false;
   }
 
 }

@@ -2,7 +2,7 @@
 
 /* http://docs.angularjs.org/guide/dev_guide.e2e-testing */
 
-describe('cycle', function() {
+describe('cycle roundtrips', function() {
 
   beforeEach(function() {
     browser().navigateTo('../app/secured/view/index');
@@ -19,7 +19,7 @@ describe('cycle', function() {
     });
 
     it('should render no-roundtrips-view when user navigates to /', function() {
-      expect(element('[ng-view] h1').text()).toMatch(/No roundtrip selected/);
+      expect(element('[data-ng-view] h1').text()).toMatch(/No roundtrip selected/);
     });
 
   });
@@ -35,7 +35,7 @@ describe('cycle', function() {
       var testRoundtripName="Roundtrip " +Math.floor(Math.random()*10000);
       
       element(addButtonSelect).click();
-      input('name').enter(testRoundtripName);
+      input('newRoundtrip.name').enter(testRoundtripName);
       sleep(2);
       element('#saveRoundtripButton').click();
       sleep(2);
@@ -44,4 +44,5 @@ describe('cycle', function() {
     });
     
   });
+   
 });

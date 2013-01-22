@@ -75,7 +75,7 @@
                         <label class="control-label" for="connectors" 
                                th:text="#{'Plugin*'}">Plugin*</label>
                         <div class="controls">
-                          <select class="span8" data-ng-options="c.name for c in defaultConfigurations" data-ng-model="blueprint">
+                          <select class="span8" data-ng-options="c.name for c in defaultConfigurations" ng-model="blueprint">
                           </select>
                         </div>
                       </div>
@@ -135,10 +135,10 @@
                         <label class="control-label" for="specificField" 
                                data-help
                                data-help-text-var="currentHelpText(propertyName)"
-                               data-help-title-var="propertyName">{{propertyName}}</label>
+                               data-help-title-var="propertyName">{{propertyNameText(propertyName)}}</label>
                         <div class="controls">
-                          <input data-ng-hide="isPropertyPassword(propertyName)" id="specificField" name="specificField" type="text" class="span8" data-ng-model="editConnectorConfiguration.properties[propertyName]"/>
-                          <input data-ng-show="isPropertyPassword(propertyName)" id="specificField" name="specificField" type="password" class="span8" data-ng-model="editConnectorConfiguration.properties[propertyName]"/>
+                          <input data-ng-hide="isPropertyPassword(propertyName)" data-ng-required="isPropertyRequired(propertyName)" id="{{propertyName}}" name="specificField" type="text" class="span8" data-ng-model="editConnectorConfiguration.properties[propertyName]" />
+                          <input data-ng-show="isPropertyPassword(propertyName)" data-ng-required="isPropertyRequired(propertyName)" id="{{propertyName}}" name="specificField" type="password" class="span8" data-ng-model="editConnectorConfiguration.properties[propertyName]"/>
                         </div>
                       </div>
                     </fieldset>

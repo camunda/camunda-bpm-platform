@@ -10,11 +10,13 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import com.camunda.fox.cycle.http.client.HttpResponseException;
+import javax.inject.Inject;
+
 import org.codehaus.jettison.json.JSONArray;
 import org.codehaus.jettison.json.JSONObject;
 import org.springframework.stereotype.Component;
 
+import com.camunda.fox.cycle.configuration.CycleConfiguration;
 import com.camunda.fox.cycle.connector.Connector;
 import com.camunda.fox.cycle.connector.ConnectorNode;
 import com.camunda.fox.cycle.connector.ConnectorNodeType;
@@ -22,6 +24,7 @@ import com.camunda.fox.cycle.connector.ContentInformation;
 import com.camunda.fox.cycle.connector.Secured;
 import com.camunda.fox.cycle.entity.ConnectorConfiguration;
 import com.camunda.fox.cycle.exception.CycleException;
+import com.camunda.fox.cycle.http.client.HttpResponseException;
 import com.camunda.fox.cycle.util.IoUtil;
 
 @Component
@@ -48,6 +51,9 @@ public class SignavioConnector extends Connector {
   
   private SignavioClient signavioClient;
   private boolean loggedIn = false;
+  
+  @Inject 
+  private CycleConfiguration cycleConfiguration;
 
   @Override
   public void login(String username, String password) {
@@ -58,7 +64,7 @@ public class SignavioConnector extends Connector {
     getSignavioClient().login(username, password);
     loggedIn = true;
   }
-  
+
   @Override
   public boolean needsLogin() {
     return !loggedIn;
@@ -68,13 +74,25 @@ public class SignavioConnector extends Connector {
   public void init(ConnectorConfiguration config) {
     try {
       if (getSignavioClient() == null) {
+        
+        String defaultCommitMessage = getDefaultCommitMessage();
+        
         signavioClient = new SignavioClient(getConfiguration().getProperties().get(CONFIG_KEY_SIGNAVIO_BASE_URL),
                                             getConfiguration().getProperties().get(CONFIG_KEY_PROXY_URL),
                                             getConfiguration().getProperties().get(CONFIG_KEY_PROXY_USERNAME),
-                                            getConfiguration().getProperties().get(CONFIG_KEY_PROXY_PASSWORD));
+                                            getConfiguration().getProperties().get(CONFIG_KEY_PROXY_PASSWORD),
+                                            defaultCommitMessage);
       }
     } catch (URISyntaxException e) {
       throw new CycleException("Unable to initialize Signavio REST client!", e);
+    }
+  }
+
+  protected String getDefaultCommitMessage() {
+    if(cycleConfiguration != null) {
+      return cycleConfiguration.getDefaultCommitMessage();
+    } else {
+      return "";
     }
   }
 
@@ -90,7 +108,8 @@ public class SignavioConnector extends Connector {
   // Connector API methods //////////////////////////////////////////////
   
   @Override
-  public void deleteNode(final ConnectorNode node) {
+  public void deleteNode(final ConnectorNode node, String message) {
+    // message is ignored by signavio connector
     
     executeCommand(new Command<Void>("delete node") {
       
@@ -103,7 +122,7 @@ public class SignavioConnector extends Connector {
   }
 
   @Override
-  public ConnectorNode createNode(final String parentId, final String label, final ConnectorNodeType type) {
+  public ConnectorNode createNode(final String parentId, final String label, final ConnectorNodeType type, final String message) {
     
     return executeCommand(new Command<ConnectorNode>("create node") {
       
@@ -115,11 +134,11 @@ public class SignavioConnector extends Connector {
           ConnectorNode result = null;
           switch (type) {
             case FOLDER:
-              response = getSignavioClient().createFolder(label, parentId, "");
+              response = getSignavioClient().createFolder(label, parentId);
               result = createFolderNode(new JSONObject(response));
               break;
             case BPMN_FILE:
-              response = getSignavioClient().createModel(parentId, label);
+              response = getSignavioClient().createModel(parentId, label, message);
               result = createFileNode(new JSONObject(response));
               break;
           }
@@ -197,7 +216,7 @@ public class SignavioConnector extends Connector {
 
   @Secured
   @Override
-  public ContentInformation updateContent(final ConnectorNode node, final InputStream newContent) throws Exception {
+  public ContentInformation updateContent(final ConnectorNode node, final InputStream newContent, final String message) throws Exception {
     return executeCommand(new Command<ContentInformation>("get content information") {
 
       @Override
@@ -206,11 +225,11 @@ public class SignavioConnector extends Connector {
         ConnectorNode importedModel = importContent(privateFolder, IoUtil.toString(newContent, UTF_8));
         String json = getSignavioClient().getModelAsJson(importedModel.getId());
         String svg = getSignavioClient().getModelAsSVG(importedModel.getId());
-        deleteNode(importedModel);
+        deleteNode(importedModel, null);
 
         ConnectorNode parent = getParent(node);
         
-        getSignavioClient().updateModel(node.getId(), node.getLabel(), json, svg, parent.getId());
+        getSignavioClient().updateModel(node.getId(), node.getLabel(), json, svg, parent.getId(), message);
 
         return getContentInformation(node);
       }
@@ -245,6 +264,7 @@ public class SignavioConnector extends Connector {
     node.setLabel(SignavioJson.extractNodeName(jsonObj));
     node.setId(SignavioJson.extractModelId(jsonObj));
     node.setType(SignavioJson.extractModelContentType(jsonObj));
+    node.setMessage(SignavioJson.extractModelComment(jsonObj));
     
     return node;
   }
@@ -367,6 +387,10 @@ public class SignavioConnector extends Connector {
   @Override
   public ConnectorNode getNode(String id) {
     throw new UnsupportedOperationException();
+  }
+  
+  public boolean isSupportsCommitMessage() {
+    return true;
   }
 
   // Signavio Connector command execution ///////////////////////////////////////

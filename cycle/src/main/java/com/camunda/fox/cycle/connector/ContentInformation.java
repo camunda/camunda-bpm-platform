@@ -30,7 +30,11 @@ public class ContentInformation implements Serializable {
    * Returns last modified date normalized to seconds accuracy.
    */
   public Date getLastModified() {
-    return DateUtil.getNormalizedDate(lastModified);
+    if(lastModified != null) {
+      return DateUtil.getNormalizedDate(lastModified);
+    } else {
+      return null;
+    }
   }
   
   public void setLastModified(Date lastModified) {

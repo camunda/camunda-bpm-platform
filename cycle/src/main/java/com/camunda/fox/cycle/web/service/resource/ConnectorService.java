@@ -13,6 +13,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import com.camunda.fox.cycle.connector.Connector;
 import com.camunda.fox.cycle.connector.ConnectorNode;
@@ -22,6 +23,7 @@ import com.camunda.fox.cycle.connector.ContentInformation;
 import com.camunda.fox.cycle.util.IoUtil;
 import com.camunda.fox.cycle.web.dto.ConnectorDTO;
 import com.camunda.fox.cycle.web.dto.ConnectorNodeDTO;
+import com.camunda.fox.cycle.web.jaxrs.ext.JaxRsUtil;
 import com.camunda.fox.cycle.web.service.AbstractRestService;
 
 @Path("secured/resource/connector")
@@ -89,19 +91,19 @@ public class ConnectorService extends AbstractRestService {
     InputStream content = connector.getContent(new ConnectorNode(nodeId, null, type));
     
     if (content == null) {
-      return Response.status(Response.Status.NOT_FOUND).build();
+      return JaxRsUtil.createResponse().status(Response.Status.NOT_FOUND).build();
     }
     
     // nre: TODO: Why not guess by extension?
     try {
-      return Response.ok(IoUtil.readInputStream(content, connectorId + "-" + nodeId + "-content-stream"))
+      return JaxRsUtil.createResponse().status(Status.OK).entity(IoUtil.readInputStream(content, connectorId + "-" + nodeId + "-content-stream"))
               .header("Content-Type", type.getMimeType())
               .build();
     } finally {
       IoUtil.closeSilently(content);
     }
   }
-  
+
   @GET
   @Path("{connectorId}/contents/info")
   public ContentInformation getContentInfo(

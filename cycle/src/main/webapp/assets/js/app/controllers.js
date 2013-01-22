@@ -93,8 +93,8 @@ function RoundtripDetailsController($scope, $routeParams, RoundtripDetails, Comm
     }
     
     if (roundtrip.rightHandSide && roundtrip.leftHandSide) {
-      lhsModeSyncStatus = roundtrip.leftHandSide.syncStatus.status || "UNAVAILABLE";
-      rhsModeSyncStatus = roundtrip.rightHandSide.syncStatus.status || "UNAVAILABLE";
+      roundtrip.leftHandSide.syncStatus ? lhsModeSyncStatus = roundtrip.leftHandSide.syncStatus.status : lhsModeSyncStatus = "UNAVAILABLE";
+      roundtrip.rightHandSide.syncStatus ? rhsModeSyncStatus = roundtrip.rightHandSide.syncStatus.status : rhsModeSyncStatus = "UNAVAILABLE";
       return lhsModeSyncStatus != "UNAVAILABLE" && rhsModeSyncStatus != "UNAVAILABLE"; 
     }
     
@@ -197,7 +197,7 @@ function RoundtripDetailsController($scope, $routeParams, RoundtripDetails, Comm
   };
 }
 
-function SyncRoundtripController($scope, $http, $q, App, Event) {
+function SyncRoundtripController($scope, $http, $q, App, Event, Connector) {
   
   var SYNC_SUCCESS = "synchronizationSuccess",
       SYNC_FAILED = "synchronizationFailed",
@@ -205,6 +205,20 @@ function SyncRoundtripController($scope, $http, $q, App, Event) {
       BEFORE_SYNC = "beforeStart";
   
   $scope.status = BEFORE_SYNC;
+  
+  $scope.commitMessage = "Model updated using camunda cycle.";
+  
+  $scope.showCommitMessageForm = function() {
+    return ($scope.status == BEFORE_SYNC || $scope.status == PERFORM_SYNC) && $scope.targetConnectorSupportsCommitMessage();
+  };
+  
+  $scope.targetConnectorSupportsCommitMessage = function() {
+	if($scope.syncMode == "LEFT_TO_RIGHT") {
+		return Connector.supportsCommitMessages($scope.roundtrip.rightHandSide.connectorNode.connectorId);
+	} else if($scope.syncMode == "RIGHT_TO_LEFT") {
+		return Connector.supportsCommitMessages($scope.roundtrip.leftHandSide.connectorNode.connectorId);
+	}    
+  };
   
   $scope.cancel = function () {
     $scope.syncDialog.close();
@@ -230,7 +244,7 @@ function SyncRoundtripController($scope, $http, $q, App, Event) {
     
     var delayed = new Delay(2000);
     
-    $http.post(App.uri('secured/resource/roundtrip/' + $scope.roundtrip.id + '/sync?syncMode=' + $scope.syncMode)).
+    $http.post(App.uri('secured/resource/roundtrip/' + $scope.roundtrip.id + '/sync?syncMode=' + $scope.syncMode+"&message="+encodeURIComponent($scope.commitMessage))).
       success(function(data) {
         delayed.then(function() {
           $scope.roundtrip.$get({id: $scope.roundtrip.id });
@@ -281,7 +295,7 @@ function BpmnDiagramController($scope, Commons, Event, $http, App) {
     });
   };
   
-  $scope.createDiagram = function(diagram) {
+  $scope.createDiagram = function(diagram, commitMessage) {
     switch ($scope.handle) {
     case "rightDiagram":
       $scope.syncMode = "LEFT_TO_RIGHT";
@@ -290,7 +304,7 @@ function BpmnDiagramController($scope, Commons, Event, $http, App) {
       $scope.syncMode = "RIGHT_TO_LEFT";
     }
     
-    $http.post(App.uri('secured/resource/roundtrip/' + $scope.roundtrip.id + '/create/?diagramlabel=' + diagram.label + '&syncMode=' + $scope.syncMode + '&modeler=' + diagram.modeler + '&connectorId=' + diagram.connectorNode.connectorId + '&parentFolderId=' + diagram.connectorNode.id))
+    $http.post(App.uri('secured/resource/roundtrip/' + $scope.roundtrip.id + '/create/?diagramlabel=' + diagram.label + '&syncMode=' + $scope.syncMode + '&modeler=' + diagram.modeler + '&connectorId=' + diagram.connectorNode.connectorId + '&parentFolderId=' + diagram.connectorNode.id +'&message='+encodeURIComponent(commitMessage)))
     .success(function(data) {
         $scope.roundtrip.$get({id: $scope.roundtrip.id });
         $scope.status = SYNC_SUCCESS;
@@ -317,17 +331,6 @@ function BpmnDiagramController($scope, Commons, Event, $http, App) {
     }
   });
 
- /**
-  * Refresh status of the selected diagram. 
-  * That includes: 
-  *  * Check image availability
-  *  * Check synchronization status
-  */
-  $scope.refreshStatus = function(diagram) {
-    $scope.imageStatus = "UNKNOWN";
-    $scope.checkContentAvailable(diagram);
-  };
-  
   $scope.checkContentAvailable = function(diagram) {
     Commons.getDiagramStatus(diagram)
       .success(function(data) {
@@ -341,13 +344,15 @@ function BpmnDiagramController($scope, Commons, Event, $http, App) {
 /**
  * Realizes the edit operation of a bpmn diagram inside the respective dialog.
  */
-function EditDiagramController($scope, Commons, Event, ConnectorConfiguration) {
+function EditDiagramController($scope, Commons, Event, ConnectorConfiguration, Connector) {
   
   var FOX_DESIGNER = "fox designer", 
       RIGHT_HAND_SIDE = "rightHandSide";
   
   // Error to be displayed in dialog
   $scope.error = null;
+  
+  $scope.commitMessage = "Model created using camunda cycle.";
   
   $scope.modelerNames = [];
   $scope.connectors = ConnectorConfiguration.query();
@@ -359,7 +364,11 @@ function EditDiagramController($scope, Commons, Event, ConnectorConfiguration) {
   var canEditModeler = $scope.canEditModeler = function() {
     return !!($scope.identifier != RIGHT_HAND_SIDE || ($scope.editDiagram.modeler && $scope.editDiagram.modeler != FOX_DESIGNER));
   };
-    
+  
+  $scope.showCommitMessageInput = function() {	  
+    return $scope.editDialogMode == "CREATE_NEW_DIAGRAM" && Connector.supportsCommitMessages($scope.connector.connectorId);
+  };
+
   // is the dialog model valid and can be submitted?
   var isValid = $scope.isValid = function() {
     var editDiagram = $scope.editDiagram;
@@ -396,7 +405,7 @@ function EditDiagramController($scope, Commons, Event, ConnectorConfiguration) {
   };
   
   $scope.create = function() {
-      $scope.createDiagram($scope.editDiagram);
+      $scope.createDiagram($scope.editDiagram, $scope.commitMessage);
   };
 
   // Watch for component error  
@@ -664,6 +673,8 @@ function EditConnectorController($scope, $http, App, ConnectorConfiguration) {
       PROXY_URL = "proxyUrl",
       PROXY_USERNAME = "proxyUsername",
       PROXY_PASSWORD = "proxyPassword";
+  
+  var REQUIRED_PROPERTIES = [BASE_PATH, SIGNAVIO_BASE_URL, REPO_PATH];
 
   $scope.selectedConnectorConfiguration = null;
 
@@ -756,6 +767,14 @@ function EditConnectorController($scope, $http, App, ConnectorConfiguration) {
       return true;
     }
     return false;
+  };
+  
+  $scope.isPropertyRequired = function(propertyKey) {	
+    return REQUIRED_PROPERTIES.indexOf(propertyKey) > -1;
+  };
+  
+  $scope.propertyNameText = function(propertyKey) {
+	return propertyKey + ($scope.isPropertyRequired(propertyKey)?"*":"");
   };
 
   $scope.currentHelpText = function(propertyKey) {

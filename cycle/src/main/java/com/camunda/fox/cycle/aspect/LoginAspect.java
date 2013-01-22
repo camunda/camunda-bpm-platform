@@ -41,11 +41,15 @@ public class LoginAspect {
   }
 
   public void doLogin(Connector connector) {
-    if (connector.needsLogin()) {
-      ConnectorConfiguration config = connector.getConfiguration();
-      connector.init(config);
-
-      loginConnector(connector, config, config.getLoginMode());
+    synchronized (connector) {
+      // TODO: better would be a single method and doing the 
+      // synchronization in the connector.
+      if (connector.needsLogin()) {
+        ConnectorConfiguration config = connector.getConfiguration();
+        connector.init(config);
+  
+        loginConnector(connector, config, config.getLoginMode());
+      }
     }
   }
 

@@ -13,6 +13,8 @@ import java.util.Scanner;
 
 import javax.inject.Inject;
 
+import junit.framework.Assert;
+
 import com.camunda.fox.cycle.http.ParseException;
 import org.codehaus.jettison.json.JSONException;
 import org.codehaus.jettison.json.JSONObject;
@@ -55,7 +57,8 @@ public class SignavioClientIT {
             new SignavioClient(configuration.getProperties().get(SignavioConnector.CONFIG_KEY_SIGNAVIO_BASE_URL),
                                configuration.getProperties().get(SignavioConnector.CONFIG_KEY_PROXY_URL),
                                configuration.getProperties().get(SignavioConnector.CONFIG_KEY_PROXY_USERNAME),
-                               configuration.getProperties().get(SignavioConnector.CONFIG_KEY_PROXY_PASSWORD));
+                               configuration.getProperties().get(SignavioConnector.CONFIG_KEY_PROXY_PASSWORD),
+                               "");
     assertTrue("Failed to login.", signavioClient.login(configuration.getGlobalUser(), configuration.getGlobalPassword()));
   }
 
@@ -106,9 +109,10 @@ public class SignavioClientIT {
     try {
       // create empty model
       String label = "CreateModel-" + new Date();
-      String createdModel = signavioClient.createModel(folderId, label);
+      String createdModel = signavioClient.createModel(folderId, label, "create empty model");
       assertThat(createdModel).contains(label);
       String modelId = SignavioJson.extractModelId(new JSONObject(createdModel));
+      Assert.assertEquals("create empty model", SignavioJson.extractModelComment(new JSONObject(createdModel)));
       
       // import new model content
       String modelName = "HEMERA-2219";
@@ -123,7 +127,9 @@ public class SignavioClientIT {
       String importedModelSvg = signavioClient.getModelAsSVG(importedModelId);
       
       // update model
-      signavioClient.updateModel(modelId, label, importedModelJson, importedModelSvg, folderId);
+      String comment = "updating model...";
+      String updatedModel = signavioClient.updateModel(modelId, label, importedModelJson, importedModelSvg, folderId, comment);
+      assertThat(updatedModel).contains(comment);
       
       // compare model contents
       InputStream newXmlContentStream = signavioClient.getXmlContent(modelId);
@@ -149,8 +155,10 @@ public class SignavioClientIT {
     try {
       // create
       String label = "CreateModel-" + new Date();
-      String createdModel = signavioClient.createModel(folderId, label);
+      String comment = "create empty model";
+      String createdModel = signavioClient.createModel(folderId, label, comment);
       assertThat(createdModel).contains(label);
+      assertThat(createdModel).contains(comment);
       
       // delete
       String deleteResponse = signavioClient.delete(SignavioClient.MODEL_URL_SUFFIX, 
@@ -202,7 +210,7 @@ public class SignavioClientIT {
     // create folder
     String name = CREATE_FOLDER_NAME + "-" + new Date();
     String parentId = SignavioJson.extractPrivateFolderId(signavioClient.getChildren(""));
-    String newFolder = signavioClient.createFolder(name, parentId, null);
+    String newFolder = signavioClient.createFolder(name, parentId);
     assertThat(newFolder).contains(name);
     assertThat(newFolder).contains(parentId);
     

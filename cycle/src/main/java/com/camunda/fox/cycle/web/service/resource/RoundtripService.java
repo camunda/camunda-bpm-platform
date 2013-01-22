@@ -179,7 +179,7 @@ public class RoundtripService extends AbstractRestService {
   @POST
   @Path("{id}/sync")
   @Transactional
-  public SynchronizationResultDTO doSynchronize(@QueryParam("syncMode") SyncMode syncMode, @PathParam("id") long roundtripId) {
+  public SynchronizationResultDTO doSynchronize(@QueryParam("syncMode") SyncMode syncMode, @PathParam("id") long roundtripId, @QueryParam("message") String message) {
     try {
       Roundtrip roundtrip = roundtripRepository.findById(roundtripId);
       
@@ -187,7 +187,7 @@ public class RoundtripService extends AbstractRestService {
         throw notFound("roundtrip not found");
       }
       
-      synchronizeModels(roundtrip.getLeftHandSide(), roundtrip.getRightHandSide(), syncMode);
+      synchronizeModels(roundtrip.getLeftHandSide(), roundtrip.getRightHandSide(), syncMode, message);
       
       roundtrip.setLastSync(new Date());
       roundtrip.setLastSyncMode(syncMode);
@@ -202,7 +202,8 @@ public class RoundtripService extends AbstractRestService {
   @Path("{id}/create")
   @Transactional
   public RoundtripDTO create(@PathParam("id") long roundtripId, @QueryParam("diagramlabel") String diagramLabel, @QueryParam("syncMode") SyncMode syncMode, 
-                             @QueryParam("modeler") String modeler, @QueryParam("connectorId") Long connectorId, @QueryParam("parentFolderId") String parentFolderId) {
+                             @QueryParam("modeler") String modeler, @QueryParam("connectorId") Long connectorId, @QueryParam("parentFolderId") String parentFolderId,
+                             @QueryParam("message") String message) {
     
     Roundtrip roundtrip = roundtripRepository.findById(roundtripId);
     if (roundtrip == null) {
@@ -224,7 +225,7 @@ public class RoundtripService extends AbstractRestService {
     bpmnDiagramDTO.setLabel(diagramLabel);
     bpmnDiagramDTO.setModeler(modeler);
     
-    ConnectorNode newConnectorNode = connector.createNode(parentFolderId, diagramLabel, ConnectorNodeType.BPMN_FILE);
+    ConnectorNode newConnectorNode = connector.createNode(parentFolderId, diagramLabel, ConnectorNodeType.BPMN_FILE, message);
     bpmnDiagramDTO.setConnectorNode(new ConnectorNodeDTO(newConnectorNode));
 
     BpmnDiagram bpmnDiagram = bpmnDiagramController.createOrUpdate(bpmnDiagramDTO);
@@ -233,7 +234,7 @@ public class RoundtripService extends AbstractRestService {
     
     switch (syncMode) {
     case LEFT_TO_RIGHT:
-      synchronizeModels(roundtrip.getLeftHandSide(), bpmnDiagram, SyncMode.LEFT_TO_RIGHT);
+      synchronizeModels(roundtrip.getLeftHandSide(), bpmnDiagram, SyncMode.LEFT_TO_RIGHT, message);
       roundtrip.setRightHandSide(bpmnDiagram);
       break;
     case RIGHT_TO_LEFT:
@@ -244,7 +245,7 @@ public class RoundtripService extends AbstractRestService {
       InputStream rhsInputStream = rhsConnector.getContent(rhsNode);
       
       try {
-        ContentInformation contentInformation = connector.updateContent(newConnectorNode, rhsInputStream);
+        ContentInformation contentInformation = connector.updateContent(newConnectorNode, rhsInputStream, message);
         bpmnDiagram.setLastSync(contentInformation.getLastModified());
         IoUtil.closeSilently(rhsInputStream);
         
@@ -277,7 +278,7 @@ public class RoundtripService extends AbstractRestService {
     roundtrip.setName(data.getName());
   }
 
-  private void synchronizeModels(BpmnDiagram lhs, BpmnDiagram rhs, SyncMode syncMode) {
+  private void synchronizeModels(BpmnDiagram lhs, BpmnDiagram rhs, SyncMode syncMode, String message) {
 
     if (lhs == null) {
       throw new IllegalArgumentException("Left hand side model is null");
@@ -305,7 +306,7 @@ public class RoundtripService extends AbstractRestService {
         case LEFT_TO_RIGHT:
           resultStream = synchronizationService.syncLeftToRight(lhsInputStream, rhsInputStream);
           IoUtil.closeSilently(lhsInputStream, rhsInputStream);
-          resultInfo = rhsConnector.updateContent(rhsNode, resultStream);
+          resultInfo = rhsConnector.updateContent(rhsNode, resultStream, message);
           rhs.setLastSync(resultInfo.getLastModified());
           
           otherSideInfo = lhsConnector.getContentInformation(lhsNode);
@@ -314,7 +315,7 @@ public class RoundtripService extends AbstractRestService {
         case RIGHT_TO_LEFT:
           resultStream = synchronizationService.syncRightToLeft(lhsInputStream, rhsInputStream);
           IoUtil.closeSilently(lhsInputStream, rhsInputStream);
-          resultInfo = lhsConnector.updateContent(lhsNode, resultStream);
+          resultInfo = lhsConnector.updateContent(lhsNode, resultStream, message);
           lhs.setLastSync(resultInfo.getLastModified());
           
           otherSideInfo = rhsConnector.getContentInformation(rhsNode);

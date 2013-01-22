@@ -20,7 +20,7 @@
       <artifactId>cycle</artifactId>
       <version>${project.version}</version>
       <type>war</type>
-      <scope>runtime</scope>
+      <scope>runtime</scope>     
     </dependency>
     
     <!-- javax.persistence -->
@@ -36,6 +36,10 @@
           <artifactId>javassist</artifactId>
           <groupId>org.javassist</groupId>
         </exclusion>
+        <exclusion>
+          <artifactId>xml-apis</artifactId>
+          <groupId>xml-apis</groupId>
+        </exclusion>
       </exclusions>
     </dependency>
     
@@ -48,6 +52,12 @@
     <dependency>
       <groupId>com.sun.jersey</groupId>
       <artifactId>jersey-json</artifactId>
+      <exclusions>
+        <exclusion>
+          <artifactId>jaxb-impl</artifactId>
+          <groupId>com.sun.xml.bind</groupId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>com.sun.jersey.contribs</groupId>

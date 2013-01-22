@@ -2,9 +2,6 @@
   <div class="bpmn-model thumbnail" data-ng-show="diagram" data-ng-class="diagramClass(diagram)">
     <h3>
       {{diagram.modeler}} 
-      <a class="pull-right btn sync-status-refresh">
-        <i class="icon-refresh" th:title="#{'Refresh model status'}" ng-click="refreshStatus(diagram)"></i>
-      </a>
     </h3>
     <div class="holder">
       <div class="diagram" ng-show="modelStatus != 'UNAVAILABLE'">
@@ -106,8 +103,7 @@
                         ngm-if="canEditModeler()" 
                         ng-model="editDiagram.modeler"                    
                         th:attr="data-placeholder=#{Enter the name of your modeler}"
-                        type="text">            
-                </select>
+                        type="text" />            
                 <span ngm-if="!canEditModeler()" id="modelerName" name="modelerName" required class="uneditable-input" type="text">{{editDiagram.modeler}}</span>
               </div>
             </div>
@@ -157,6 +153,19 @@
                 <div class="claro tree" data-cycle-tree data-selected="selectedNode" data-id="connectorTree" data-connector="connector" data-filter="acceptedChildTypes()">
                 </div>
               </div>
+              
+              <div class="control-group" data-ng-show="showCommitMessageInput()">
+                  <label class="control-label" for="commitMessageCreate" 
+                         th:text="#{'Commit Message'}" 
+                         th:attr="data-help-text=#{'The message to be used as commit message.'}" 
+                         data-help-title="Commit Message"
+                         data-help>Commit Message</label>
+                  <div class="controls">
+                    <!-- display a combobox on leftside, otherwise a disabled input field -->
+                    <textarea id="commitMessageCreate"  ng-model="commitMessage" />                      
+                  </div>
+                </div>
+              
             </div>
           </fieldset>
         </form>
