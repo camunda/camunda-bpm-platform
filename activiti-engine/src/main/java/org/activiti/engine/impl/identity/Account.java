@@ -19,7 +19,6 @@ import java.util.Map;
 /**
  * @author Tom Baeyens
  * 
- * @deprecated Will be removed in Activiti 5.12
  */
 public interface Account {
 
