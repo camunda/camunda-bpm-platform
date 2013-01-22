@@ -97,8 +97,8 @@
       <outputDirectory></outputDirectory>
     </file>
     <file>
-      <source>src/domain.xml</source>
-      <filtered>true</filtered>
+      <source>target/filtered-resources/domain.xml</source>
+      <filtered>false</filtered>
       <outputDirectory>server/glassfish3/glassfish/domains/domain1/config</outputDirectory>
     </file>
     <file>

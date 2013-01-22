@@ -138,6 +138,38 @@
 
   <build>
     <plugins>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-resources-plugin</artifactId>
+        <version>2.5</version>
+        <executions>
+          <execution>
+            <id>copy-resources</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <configuration>
+              <outputDirectory>target/filtered-resources</outputDirectory>
+              <resources>
+                <resource>                  
+                  <directory>src/</directory>
+                  <filtering>true</filtering>
+                  <includes>
+                    <include>domain.xml</include>
+                  </includes>
+                </resource>
+              </resources>
+              <useDefaultDelimiters>false</useDefaultDelimiters>
+              <delimiters>
+                <delimiter>#{*}</delimiter>
+              </delimiters>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+        
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-assembly-plugin</artifactId>
