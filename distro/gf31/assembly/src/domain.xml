@@ -16,11 +16,11 @@
     <application location="${com.sun.aas.instanceRootURI}/applications/camunda-fox-platform/" name="camunda-fox-platform" object-type="user">
       <property name="isComposite" value="true"></property>
       <engine sniffer="ear"></engine>
-      <module name="fox-platform-glassfish-service-${project.version}.jar">
+      <module name="fox-platform-glassfish-service-#{project.version}.jar">
         <engine sniffer="ejb"></engine>
         <engine sniffer="security"></engine>
       </module>
-      <module name="fox-platform-jobexecutor-service-${project.version}.jar">
+      <module name="fox-platform-jobexecutor-service-#{project.version}.jar">
         <engine sniffer="ejb"></engine>
         <engine sniffer="security"></engine>
       </module>
