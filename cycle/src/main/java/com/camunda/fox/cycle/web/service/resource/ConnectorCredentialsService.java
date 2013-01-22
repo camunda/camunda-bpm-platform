@@ -93,7 +93,7 @@ public class ConnectorCredentialsService extends AbstractRestService {
     }
     
     if (user.getPassword()!=null) {
-      user.setPassword(encryptionService.encrypt(user.getPassword()));
+      user.setPassword(encryptionService.encryptConnectorPassword(user.getPassword()));
     }
     connectorCredentials.setUser(user);
     
@@ -153,7 +153,7 @@ public class ConnectorCredentialsService extends AbstractRestService {
    */
   private void update(ConnectorCredentials connectorCredentials, ConnectorCredentialsDTO data) {
     connectorCredentials.setUsername(data.getUsername());
-    connectorCredentials.setPassword(encryptionService.encrypt(data.getPassword()));
+    connectorCredentials.setPassword(encryptionService.encryptConnectorPassword(data.getPassword()));
   }
 
   // validation //////////////////////////////////////////////

@@ -11,6 +11,7 @@ import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
+import com.camunda.fox.cycle.connector.crypt.EncryptionService;
 import com.camunda.fox.cycle.entity.User;
 import com.camunda.fox.cycle.repository.UserRepository;
 import com.camunda.fox.cycle.security.IdentityHolder;
@@ -30,9 +31,10 @@ public class UserServiceTest {
 
   @Inject
   private UserRepository userRepository;
-
   @Inject
   private UserService userService;
+  @Inject
+  private EncryptionService encryptionService;
 
   @Test
   public void shouldCreateUser() throws Exception {
@@ -89,7 +91,7 @@ public class UserServiceTest {
     
     // then
     assertThat(databaseUser).isNotNull();
-    assertThat(databaseUser.getPassword()).isEqualTo(user.getPassword());
+    assertThat(encryptionService.checkUserPassword(user.getPassword(), databaseUser.getPassword())).isTrue();
   }
 
   @Test
@@ -129,7 +131,7 @@ public class UserServiceTest {
     User userAfterUpdate = userRepository.findById(user.getId());
     
     // then
-    assertThat(userAfterUpdate.getPassword()).isEqualTo("FOOBAR");
+    assertThat(encryptionService.checkUserPassword("FOOBAR", userAfterUpdate.getPassword())).isTrue();
   }
 
   @Test
@@ -151,7 +153,7 @@ public class UserServiceTest {
     User userAfterUpdateAttempt = userRepository.findById(user.getId());
     
     // then
-    assertThat(userAfterUpdateAttempt.getPassword()).isEqualTo("ASDF");
+    assertThat(encryptionService.checkUserPassword("ASDF", userAfterUpdateAttempt.getPassword())).isTrue();
   }
 
   @Test
@@ -174,7 +176,7 @@ public class UserServiceTest {
   private User createUser() {
     User user = new User();
     user.setName("Walter");
-    user.setPassword("ASDF");
+    user.setPassword(encryptionService.encryptUserPassword("ASDF"));
     user.setEmail("asdf@mail.com");
     
     return user;

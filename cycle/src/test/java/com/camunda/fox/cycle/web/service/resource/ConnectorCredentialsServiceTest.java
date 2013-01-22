@@ -107,7 +107,7 @@ public class ConnectorCredentialsServiceTest {
     // then
     assertThat(credentialsDTO).isNotNull();
     assertThat(credentialsDTO.getId()).isNotNull();
-    assertThat(encryptionService.decrypt(credentialsFromDB.getPassword())).isEqualTo("***");
+    assertThat(encryptionService.decryptConnectorPassword(credentialsFromDB.getPassword())).isEqualTo("***");
     assertThat(credentialsFromDB).isNotNull();
   }
   
@@ -163,7 +163,7 @@ public class ConnectorCredentialsServiceTest {
     assertThat(credentialsDTO.getUsername()).isEqualTo(updateDTO.getUsername());
     
     // but password changed in database
-    assertThat(encryptionService.decrypt(credentialsFromDB.getPassword())).isEqualTo(updateDTO.getPassword());
+    assertThat(encryptionService.decryptConnectorPassword(credentialsFromDB.getPassword())).isEqualTo(updateDTO.getPassword());
     
     // user and connector remain unchanged
     assertThat(credentialsDTO.getConnectorId()).isEqualTo(credentials.getConnectorConfiguration().getId());

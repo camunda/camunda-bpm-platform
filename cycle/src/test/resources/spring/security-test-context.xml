@@ -17,6 +17,7 @@
 
   <context:annotation-config />
   <context:component-scan base-package="com.camunda.fox.security" />
+  <context:component-scan base-package="com.camunda.fox.cycle.connector.crypt" />
   
   <bean class="com.camunda.fox.security.aspect.SecurityAspect"></bean>
   <bean class="com.camunda.fox.security.test.SecuredTestBean"></bean>

@@ -96,7 +96,7 @@ public class ConnectorConfigurationService extends AbstractRestService {
 
   private void update(ConnectorConfiguration config, ConnectorConfigurationDTO data) {
     if(data.getPassword() != null && !data.getPassword().isEmpty()) {
-      config.setGlobalPassword(encryptionService.encrypt(data.getPassword()));
+      config.setGlobalPassword(encryptionService.encryptConnectorPassword(data.getPassword()));
     }
     config.setGlobalUser(data.getUser());
     config.setLoginMode(data.getLoginMode());

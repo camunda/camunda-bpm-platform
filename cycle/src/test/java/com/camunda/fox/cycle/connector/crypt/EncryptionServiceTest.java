@@ -53,13 +53,13 @@ public class EncryptionServiceTest {
    */
   @Test
   public void testEncryption() {
-    String testText = new EncryptionServiceImpl(TEST_PASSWORD).encrypt(TEST_TEXT);
-    assertEquals(TEST_TEXT, new EncryptionServiceImpl(TEST_PASSWORD).decrypt(testText));
+    String testText = new EncryptionServiceImpl(TEST_PASSWORD).encryptConnectorPassword(TEST_TEXT);
+    assertEquals(TEST_TEXT, new EncryptionServiceImpl(TEST_PASSWORD).decryptConnectorPassword(testText));
   }
 
   @Test(expected = EncryptionException.class)
   public void testReadingFromFile() {
-    String testText = new EncryptionServiceImpl(TEST_PASSWORD).encrypt(TEST_TEXT);
+    String testText = new EncryptionServiceImpl(TEST_PASSWORD).encryptConnectorPassword(TEST_TEXT);
 
     EncryptionServiceImpl service = new EncryptionServiceImpl();
     service.setPasswordFilePath(passwordFile.getPath());
@@ -67,7 +67,7 @@ public class EncryptionServiceTest {
     assertEquals(TEST_PASSWORD_FILE, service.getEncryptionPassword());
     assertFalse(service.getEncryptionPassword().isEmpty());
 
-    assertNotSame(TEST_TEXT, service.decrypt(testText));
+    assertNotSame(TEST_TEXT, service.decryptConnectorPassword(testText));
   }
 
   @Test

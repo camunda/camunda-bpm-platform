@@ -75,7 +75,7 @@ public class LoginAspect {
   }
 
   private void loginConnector(Connector connector, String username, String password) {
-    connector.login(username, encryptionService.decrypt(password));
+    connector.login(username, encryptionService.decryptConnectorPassword(password));
   }
 
   private void loginWithUserCredentials(Connector connector) {
