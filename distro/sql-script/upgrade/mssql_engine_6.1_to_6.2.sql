@@ -121,3 +121,8 @@ drop index ACT_IDX_HI_DETAIL_TIME on ACT_HI_DETAIL;
 alter table ACT_HI_DETAIL ALTER COLUMN TIME_ datetime2 not null;
 create index ACT_IDX_HI_DETAIL_TIME on ACT_HI_DETAIL(TIME_);
 alter table ACT_HI_COMMENT ALTER COLUMN TIME_ datetime2 not null;
+
+-----------------------------------------------
+-- Additional index on PROC_INST_ID_ and ACT_ID_ for historic activity
+
+create index ACT_IDX_HI_ACT_INST_PROCINST on ACT_HI_ACTINST(PROC_INST_ID_, ACT_ID_);
