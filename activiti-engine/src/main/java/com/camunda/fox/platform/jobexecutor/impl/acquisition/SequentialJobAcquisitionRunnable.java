@@ -21,7 +21,7 @@ public class SequentialJobAcquisitionRunnable extends AcquireJobsRunnable {
   private static Logger log = Logger.getLogger(AcquireJobsRunnable.class.getName());
 
   protected final JobAcquisition jobAcquisition;
-
+  
   public SequentialJobAcquisitionRunnable(JobExecutor jobAcquisition) {
     super(jobAcquisition);
     this.jobAcquisition = (JobAcquisition) jobAcquisition;
@@ -32,10 +32,12 @@ public class SequentialJobAcquisitionRunnable extends AcquireJobsRunnable {
 
     int processEngineLoopCounter = 0;
     List<String> idleEngines = new ArrayList<String>();
+    boolean jobExecutionFailed = false;
 
     while (!isInterrupted) {
       ProcessEngineConfigurationImpl currentProcessEngine = null;
-      int maxJobsPerAcquisition = jobExecutor.getMaxJobsPerAcquisition();
+      int maxJobsPerAcquisition = jobExecutor.getMaxJobsPerAcquisition();  
+           
       try {
 
         List<ProcessEngineConfigurationImpl> registeredProcessEngines = jobAcquisition.getRegisteredProcessEngines();
@@ -45,7 +47,7 @@ public class SequentialJobAcquisitionRunnable extends AcquireJobsRunnable {
             if (registeredProcessEngines.size() <= processEngineLoopCounter) {
               processEngineLoopCounter = 0;
               isJobAdded = false;
-              idleEngines.clear();
+              idleEngines.clear();              
             }
             currentProcessEngine = registeredProcessEngines.get(processEngineLoopCounter);
             processEngineLoopCounter++;
@@ -56,7 +58,10 @@ public class SequentialJobAcquisitionRunnable extends AcquireJobsRunnable {
         log.log(Level.SEVERE, "exception while determining next process engine: " + e.getMessage(), e);
       }
 
+      jobExecutionFailed = false;
+
       if (currentProcessEngine != null) {
+        
         try {
           final CommandExecutor commandExecutor = currentProcessEngine.getCommandExecutorTxRequired();
 
@@ -72,16 +77,34 @@ public class SequentialJobAcquisitionRunnable extends AcquireJobsRunnable {
           } 
           
         } catch (Exception e) {
-          log.log(Level.SEVERE, "exception during job acquisition: " + e.getMessage(), e);       
+          log.log(Level.SEVERE, "exception during job acquisition: " + e.getMessage(), e);
+          
+          jobExecutionFailed = true;
+          
+          // if one of the engines fails: increase the wait time
+          if(millisToWait == 0) {
+            millisToWait = jobExecutor.getWaitTimeInMillis();
+          } else {
+            millisToWait *= waitIncreaseFactor;
+            if (millisToWait > maxWait) {
+              millisToWait = maxWait;
+            }   
+          }        
         }
       }
       
       int numOfEngines = jobAcquisition.getRegisteredProcessEngines().size();
-      if ((numOfEngines == processEngineLoopCounter) 
-              && (idleEngines.size() == numOfEngines) 
-              && (!isJobAdded)) {
+      if(idleEngines.size() == numOfEngines) {
+        // if we have determined that none of the registered engines currently have jobs -> wait
+        millisToWait = jobExecutor.getWaitTimeInMillis();
+      } else {
+        if(!jobExecutionFailed) {
+          millisToWait = 0;
+        }
+      }
+      
+      if (millisToWait > 0 && (!isJobAdded)) {
         
-        long millisToWait = jobExecutor.getWaitTimeInMillis();
         try {
           log.fine("job acquisition thread sleeping for " + millisToWait + " millis");
           synchronized (MONITOR) {
