@@ -58,9 +58,14 @@ public abstract class AbstractRestServiceTest {
                 .artifact("com.jayway.restassured:rest-assured:1.7.2")
             .resolveAsFiles());
     
+    addDirectoryContentsAsWebInfResources(war, "WEB-INF");
 
+    return war;
+  }
+  
+  private static void addDirectoryContentsAsWebInfResources(WebArchive war, String directoryInClasspath) {
     ClassLoader classLoader = AbstractRestServiceTest.class.getClassLoader();
-    URL resource = classLoader.getResource("WEB-INF");
+    URL resource = classLoader.getResource(directoryInClasspath);
     if (resource != null) {
       File file = new File(resource.getFile());
       if (file.exists() && file.isDirectory()) {
@@ -72,10 +77,7 @@ public abstract class AbstractRestServiceTest {
           }
         }
       }
-
     }
-
-    return war;
   }
 
 }
