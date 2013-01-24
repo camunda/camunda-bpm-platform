@@ -17,9 +17,10 @@ import javax.ws.rs.ext.MessageBodyReader;
 import javax.ws.rs.ext.Provider;
 
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
-import org.camunda.bpm.engine.rest.dto.SortableParameterizedQueryDto;
 import org.camunda.bpm.engine.rest.dto.ProcessDefinitionQueryDto;
 import org.camunda.bpm.engine.rest.dto.ProcessInstanceQueryDto;
+import org.camunda.bpm.engine.rest.dto.SortableParameterizedQueryDto;
+import org.camunda.bpm.engine.rest.dto.TaskQueryDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 
@@ -44,6 +45,9 @@ public class EngineQueryDtoReader implements
       return true;
     }
     if (clazz == ProcessInstanceQueryDto.class) {
+      return true;
+    }
+    if (clazz == TaskQueryDto.class) {
       return true;
     }
     return false;

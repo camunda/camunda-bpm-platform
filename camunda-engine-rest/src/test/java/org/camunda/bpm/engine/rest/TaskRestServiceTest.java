@@ -19,7 +19,7 @@ import org.mockito.InOrder;
 
 import com.jayway.restassured.response.Response;
 
-public class TaskServiceTest extends AbstractRestServiceTest {
+public class TaskRestServiceTest extends AbstractRestServiceTest {
   
   private static final String EXAMPLE_TASK_ID = "anId";
   private static final String EXAMPLE_TASK_NAME = "aName";
@@ -53,6 +53,7 @@ public class TaskServiceTest extends AbstractRestServiceTest {
   
   @Test
   public void testSimpleTaskQuery() {
+    setUpMockedQuery();
     String queryName = "name";
     
     Response response = given().queryParam("name", queryName)
@@ -60,7 +61,7 @@ public class TaskServiceTest extends AbstractRestServiceTest {
       .when().get(TASK_QUERY_URL);
     
     InOrder inOrder = inOrder(mockQuery);
-    inOrder.verify(mockQuery).taskName(EXAMPLE_TASK_NAME);
+    inOrder.verify(mockQuery).taskName(queryName);
     inOrder.verify(mockQuery).list();
     
     String content = response.asString();
