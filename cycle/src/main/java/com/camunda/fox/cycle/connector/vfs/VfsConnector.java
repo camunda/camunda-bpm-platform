@@ -127,8 +127,6 @@ public class VfsConnector extends Connector {
       IOUtils.closeQuietly(is);
       
       return new ByteArrayInputStream(os.toByteArray());
-    } catch (FileSystemException e) {
-      throw new CycleException(e);
     } catch (IOException e) {
       throw new CycleException(e);
     }

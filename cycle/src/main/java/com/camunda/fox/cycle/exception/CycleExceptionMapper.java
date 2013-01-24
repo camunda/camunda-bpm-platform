@@ -14,12 +14,16 @@ import com.camunda.fox.cycle.web.dto.ExceptionDTO;
 import com.camunda.fox.cycle.web.jaxrs.ext.JaxRsUtil;
 
 @Provider
-@Produces(MediaType.APPLICATION_JSON)
+@Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_OCTET_STREAM})
 public class CycleExceptionMapper implements ExceptionMapper<CycleException> {
 
   @Override
   public Response toResponse(CycleException exception) {
     Logger.getLogger(getClass().getSimpleName()).log(Level.SEVERE, "Exception occured during request", exception);
-    return JaxRsUtil.createResponse().status(Status.INTERNAL_SERVER_ERROR).entity(new ExceptionDTO(exception)).build();
+    return JaxRsUtil.createResponse()
+            .status(Status.INTERNAL_SERVER_ERROR)
+            .entity(new ExceptionDTO(exception))
+            .type(MediaType.APPLICATION_JSON)
+            .build();
   }
 }

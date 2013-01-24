@@ -24,6 +24,11 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
+import org.codehaus.jettison.json.JSONArray;
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
+
+import com.camunda.fox.cycle.exception.CycleException;
 import com.camunda.fox.cycle.http.HttpException;
 import com.camunda.fox.cycle.http.HttpHost;
 import com.camunda.fox.cycle.http.HttpRequest;
@@ -33,7 +38,6 @@ import com.camunda.fox.cycle.http.HttpResponseInterceptor;
 import com.camunda.fox.cycle.http.ParseException;
 import com.camunda.fox.cycle.http.auth.AuthScope;
 import com.camunda.fox.cycle.http.auth.UsernamePasswordCredentials;
-import com.camunda.fox.cycle.http.client.ClientProtocolException;
 import com.camunda.fox.cycle.http.client.HttpRequestRetryHandler;
 import com.camunda.fox.cycle.http.client.fluent.Content;
 import com.camunda.fox.cycle.http.client.fluent.Executor;
@@ -60,11 +64,6 @@ import com.camunda.fox.cycle.http.params.HttpConnectionParams;
 import com.camunda.fox.cycle.http.params.SyncBasicHttpParams;
 import com.camunda.fox.cycle.http.protocol.HttpContext;
 import com.camunda.fox.cycle.http.util.EntityUtils;
-import org.codehaus.jettison.json.JSONArray;
-import org.codehaus.jettison.json.JSONException;
-import org.codehaus.jettison.json.JSONObject;
-
-import com.camunda.fox.cycle.exception.CycleException;
 import com.camunda.fox.cycle.util.IoUtil;
 
 /**
@@ -483,20 +482,16 @@ public class SignavioClient {
   protected Content executeAndGetContent(Request request) {
     try {
       return requestExecutor.execute(request).returnContent();
-    } catch (ClientProtocolException e) {
-      throw new RuntimeException(e);
     } catch (IOException e) {
-      throw new RuntimeException(e);
+      throw new CycleException(e);
     }
   }
   
   protected HttpResponse executeAndGetResponse(Request request) {
     try {
       return requestExecutor.execute(request).returnResponse();
-    } catch (ClientProtocolException e) {
-      throw new RuntimeException(e);
     } catch (IOException e) {
-      throw new RuntimeException(e);
+      throw new CycleException(e);
     }
   }
   
@@ -522,7 +517,7 @@ public class SignavioClient {
       logger.fine(requestURI.toString());
       return requestURI;
     } catch (URISyntaxException e) {
-      throw new RuntimeException("Failed to construct url for signavio request.", e);
+      throw new CycleException("Failed to construct url for signavio request.", e);
     }
   }
   

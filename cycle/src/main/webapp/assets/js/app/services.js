@@ -132,13 +132,13 @@ angular
       },
       removeError: function(error) {
     	var idx = this.errors.indexOf(error);
-    	this.errors.splice(idx,1);  
+    	  this.errors.splice(idx,1);  
       },
       registerErrorConsumer: function(callback) {
-    	this.errorConsumers.push(callback);  
+        this.errorConsumers.push(callback);  
       },
       unregisterErrorConsumer: function(callback) {
-    	this.errorConsumers.splice(this.errorConsumers.indexOf(callback),1);
+        this.errorConsumers.splice(this.errorConsumers.indexOf(callback),1);
       }      
     };
   })
@@ -162,14 +162,20 @@ angular
       RequestStatus.setBusy(true);  
       
       return promise.then(function (response, arg1, arg2)  {
-    	RequestStatus.setBusy(false);
+        RequestStatus.setBusy(false);
         return promise;
         
       }, function (response) {    	  
-    	RequestStatus.setBusy(false);
+        RequestStatus.setBusy(false);
     	
         if (parseInt(response.status) == 500) {
-          Error.addError({ "status" : "Error" , "config" :  response.config });     
+          if (response.data) {
+            if (response.data.message) {
+              Error.addError({ "status" : "Error" , "config" :  response.data.message });
+            }
+          } else {
+            Error.addError({ "status" : "Error" , "config" :  "Request " + response.config.method + " " + response.config.url + " failed. See server stacktrace for details." });     
+          }
           
         } else if (parseInt(response.status) == 0) {
           Error.addError({ "status" : "Request Timeout" , "config" :  "Your request timed out. Try refreshing the page." });
@@ -177,7 +183,9 @@ angular
         } else if (parseInt(response.status) == 401) {
           Error.addError({ "status" : "Unauthorized" , "config" :  "Your session has probably expired. Try refreshing the page and login again." });
           
-        }          
+        } else {
+          Error.addError({ "status" : "Error" , "config" :  "Request " + response.config.method + " " + response.config.url + " failed. See server stacktrace for details." });
+        }         
         return $q.reject(response);
       });
     };

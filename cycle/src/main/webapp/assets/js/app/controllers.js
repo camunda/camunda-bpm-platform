@@ -11,7 +11,7 @@ function DefaultController($scope, $http, $location, App, Event, Error, Credenti
   };
   
   $scope.removeError = function (error) {
-	Error.removeError(error);
+    Error.removeError(error);
   };
   
   Credentials.reload();
