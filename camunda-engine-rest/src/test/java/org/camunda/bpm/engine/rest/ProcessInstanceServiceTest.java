@@ -42,7 +42,9 @@ public class ProcessInstanceServiceTest extends AbstractRestServiceTest {
     return sampleInstanceQuery;
   }
   
-  private ProcessInstance createMockInstance() {
+  private List<ProcessInstance> createMockInstances() {
+    List<ProcessInstance> mocks = new ArrayList<ProcessInstance>();
+    
     ProcessInstance mockInstance = mock(ProcessInstance.class);
     when(mockInstance.getBusinessKey()).thenReturn(EXAMPLE_BUSINESS_KEY);
     when(mockInstance.getId()).thenReturn(EXAMPLE_ID);
@@ -50,25 +52,20 @@ public class ProcessInstanceServiceTest extends AbstractRestServiceTest {
     when(mockInstance.getProcessInstanceId()).thenReturn(EXAMPLE_ID);
     when(mockInstance.isSuspended()).thenReturn(EXAMPLE_IS_SUSPENDED);
     when(mockInstance.isEnded()).thenReturn(EXAMPLE_IS_ENDED);
-    return mockInstance;
-  }
-  
-  private void injectMockedQuery(ProcessInstance mockedInstance) {
-    List<ProcessInstance> instances = new ArrayList<ProcessInstance>();
-    instances.add(mockedInstance);
-    mockedQuery = setUpMockInstanceQuery(instances);
+    
+    mocks.add(mockInstance);
+    return mocks;
   }
   
 //  @Before
   public void setUpMockedQuery() {
     loadProcessEngineService();
-    injectMockedQuery(createMockInstance());
+    mockedQuery = setUpMockInstanceQuery(createMockInstances());
   }
   
   @Test
   public void testInstanceRetrieval() {
     setUpMockedQuery();
-    InOrder inOrder = Mockito.inOrder(mockedQuery);
     
     String queryKey = "key";
     Response response = given().queryParam("processDefinitionKey", queryKey)
@@ -76,6 +73,7 @@ public class ProcessInstanceServiceTest extends AbstractRestServiceTest {
         .when().get(PROCESS_INSTANCE_QUERY_URL);
     
     // assert query invocation
+    InOrder inOrder = Mockito.inOrder(mockedQuery);
     inOrder.verify(mockedQuery).processDefinitionKey(queryKey);
     inOrder.verify(mockedQuery).list();
     
@@ -99,8 +97,7 @@ public class ProcessInstanceServiceTest extends AbstractRestServiceTest {
   
   @Test
   public void testIncompleteProcessInstance() {
-    setUpMockedQuery();
-    injectMockedQuery(createIncompleteMockInstance());
+    setUpMockInstanceQuery(createIncompleteMockInstances());
     Response response = expect().statusCode(Status.OK.getStatusCode())
         .when().get(PROCESS_INSTANCE_QUERY_URL);
     
@@ -110,10 +107,13 @@ public class ProcessInstanceServiceTest extends AbstractRestServiceTest {
         returnedBusinessKey);
   }
   
-  private ProcessInstance createIncompleteMockInstance() {
+  private List<ProcessInstance> createIncompleteMockInstances() {
+    List<ProcessInstance> mocks = new ArrayList<ProcessInstance>();
     ProcessInstance mockInstance = mock(ProcessInstance.class);
     when(mockInstance.getId()).thenReturn(EXAMPLE_ID);
-    return mockInstance;
+    
+    mocks.add(mockInstance);
+    return mocks;
   }
   
   @Test

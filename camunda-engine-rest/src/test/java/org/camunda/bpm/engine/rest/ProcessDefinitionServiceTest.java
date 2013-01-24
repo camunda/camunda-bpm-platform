@@ -49,7 +49,9 @@ public class ProcessDefinitionServiceTest extends AbstractRestServiceTest {
     return sampleDefinitionsQuery;
   }
   
-  private ProcessDefinition createMockDefinition() {
+  private List<ProcessDefinition> createMockDefinitions() {
+    List<ProcessDefinition> mocks = new ArrayList<ProcessDefinition>();
+    
     MockDefinitionBuilder builder = new MockDefinitionBuilder();
     ProcessDefinition mockDefinition = 
         builder.id(EXAMPLE_DEFINITION_ID).category(EXAMPLE_CATEGORY).name(EXAMPLE_DEFINITION_NAME)
@@ -57,19 +59,15 @@ public class ProcessDefinitionServiceTest extends AbstractRestServiceTest {
           .version(EXAMPLE_VERSION).resource(EXAMPLE_RESOURCE_NAME)
           .deploymentId(EXAMPLE_DEPLOYMENT_ID).diagram(EXAMPLE_DIAGRAM_RESOURCE_NAME)
           .suspended(EXAMPLE_IS_SUSPENDED).build();
-    return mockDefinition;
-  }
-  
-  private void injectMockedQuery(ProcessDefinition mockedDefinition) {
-    List<ProcessDefinition> definitions = new ArrayList<ProcessDefinition>();
-    definitions.add(mockedDefinition);
-    mockedQuery = setUpMockDefinitionQuery(definitions);
+    
+    mocks.add(mockDefinition);
+    return mocks;
   }
   
 //  @Before
   public void setUpMockedQuery() {
     loadProcessEngineService();
-    injectMockedQuery(createMockDefinition());
+    mockedQuery = setUpMockDefinitionQuery(createMockDefinitions());
   }
   
   @Test
@@ -116,8 +114,7 @@ public class ProcessDefinitionServiceTest extends AbstractRestServiceTest {
   
   @Test
   public void testIncompleteProcessDefinition() {
-    setUpMockedQuery();
-    injectMockedQuery(createIncompleteMockDefinition());
+    setUpMockDefinitionQuery(createIncompleteMockDefinitions());
     Response response = expect().statusCode(Status.OK.getStatusCode())
         .when().get(PROCESS_DEFINITION_QUERY_URL);
     
@@ -127,13 +124,17 @@ public class ProcessDefinitionServiceTest extends AbstractRestServiceTest {
         returnedResourceName);
   }
   
-  private ProcessDefinition createIncompleteMockDefinition() {
+  private List<ProcessDefinition> createIncompleteMockDefinitions() {
+    List<ProcessDefinition> mocks = new ArrayList<ProcessDefinition>();
+    
     MockDefinitionBuilder builder = new MockDefinitionBuilder();
     ProcessDefinition mockDefinition = 
         builder.id(EXAMPLE_DEFINITION_ID).category(EXAMPLE_CATEGORY)
           .name(EXAMPLE_DEFINITION_NAME).key(EXAMPLE_DEFINITION_KEY)
           .suspended(EXAMPLE_IS_SUSPENDED).version(EXAMPLE_VERSION).build();
-    return mockDefinition;
+    
+    mocks.add(mockDefinition);
+    return mocks;
   }
   
   @Test
