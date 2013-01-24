@@ -19,5 +19,13 @@ public class CycleException extends RuntimeException {
   public CycleException(Throwable cause) {
     super(cause);
   }
-
+  
+  @Override
+  public String getMessage() {
+    if(getCause() != null) {
+      return getCause().getMessage();
+    } else {
+      return super.getMessage();
+    }
+  }
 }
