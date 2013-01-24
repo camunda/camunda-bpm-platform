@@ -171,6 +171,7 @@
         <testResources>
           <testResource>
             <directory>src/test/resources-jboss-integration</directory>
+            <filtering>true</filtering>
           </testResource>
         </testResources>
         <plugins>

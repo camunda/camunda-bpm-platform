@@ -1,5 +1,7 @@
 package org.camunda.bpm.engine.rest;
 
+import java.io.File;
+import java.net.URL;
 import java.util.Iterator;
 import java.util.ServiceLoader;
 
@@ -51,14 +53,27 @@ public abstract class AbstractRestServiceTest {
         .addAsLibrary(jar)
         .addAsLibraries(
             DependencyResolvers.use(MavenDependencyResolver.class)
-                .goOffline()
-                .artifact("org.mockito:mockito-all:1.8.2")
-                .artifact("com.jayway.restassured:rest-assured:1.7.2").resolveAsFiles());
+            .goOffline()
+                .artifact("org.mockito:mockito-core:1.8.2")
+                .artifact("com.jayway.restassured:rest-assured:1.7.2")
+            .resolveAsFiles());
     
-    // the following resources are jboss specific.
-//                .addAsWebInfResource("WEB-INF/web.xml")
-//                .addAsWebInfResource("WEB-INF/jboss-web.xml")
-//                .addAsWebInfResource("WEB-INF/jboss-deployment-structure.xml");
+
+    ClassLoader classLoader = AbstractRestServiceTest.class.getClassLoader();
+    URL resource = classLoader.getResource("WEB-INF");
+    if (resource != null) {
+      File file = new File(resource.getFile());
+      if (file.exists() && file.isDirectory()) {
+        File[] list = file.listFiles();
+        for (int i = 0; i < list.length; i++) {
+          File child = list[i];
+          if (child.isFile()) {
+            war.addAsWebInfResource(child);
+          }
+        }
+      }
+
+    }
 
     return war;
   }
