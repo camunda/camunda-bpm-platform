@@ -319,4 +319,26 @@ public class TaskRestServiceTest extends AbstractRestServiceTest {
       .then().expect().statusCode(expectedStatus.getStatusCode())
       .when().get(TASK_QUERY_URL);
   }
+  
+  @Test
+  public void testSortByParameterOnly() {
+    // TODO inspect
+    setUpMockedQuery();
+    given().queryParam("sortBy", "definitionId")
+      .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
+      .when().get(TASK_QUERY_URL);
+  }
+  
+  @Test
+  public void testSuccessfulPagination() {
+    setUpMockedQuery();
+    
+    int firstResult = 0;
+    int maxResults = 10;
+    given().queryParam("firstResult", firstResult).queryParam("maxResults", maxResults)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .when().get(TASK_QUERY_URL);
+    
+    verify(mockQuery).listPage(firstResult, maxResults);
+  }
 }
