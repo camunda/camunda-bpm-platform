@@ -20,6 +20,12 @@
   
 	<dependencies>
 		<dependency>
+		  <groupId>org.codehaus.jackson</groupId>
+		  <artifactId>jackson-jaxrs</artifactId>
+		  <version>1.9.11</version>
+		</dependency>
+	
+		<dependency>
 			<groupId>com.camunda.fox.engine</groupId>
 			<artifactId>fox-engine</artifactId>
 			<scope>provided</scope>
