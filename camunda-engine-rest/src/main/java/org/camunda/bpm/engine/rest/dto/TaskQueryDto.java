@@ -1,9 +1,12 @@
 package org.camunda.bpm.engine.rest.dto;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 
 import org.activiti.engine.TaskService;
+import org.activiti.engine.task.DelegationState;
 import org.activiti.engine.task.TaskQuery;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
@@ -38,6 +41,10 @@ public class TaskQueryDto extends SortableParameterizedQueryDto {
   private Date createdAfter;
   private Date createdBefore;
   private Date createdOn;
+  
+  private DelegationState delegationState;
+  
+  private List<String> candidateGroups;
   
   @CamundaQueryParam("processInstanceBusinessKey")
   public void setProcessInstanceBusinessKey(String businessKey) {
@@ -174,6 +181,16 @@ public class TaskQueryDto extends SortableParameterizedQueryDto {
     this.createdOn = createdOn;
   }
 
+  @CamundaQueryParam("delegationState")
+  public void setDelegationState(DelegationState taskDelegationState) {
+    this.delegationState = taskDelegationState;
+  }
+
+  @CamundaQueryParam("candidateGroups")
+  public void setCandidateGroups(List<String> candidateGroups) {
+    this.candidateGroups = candidateGroups;
+  }
+
   @Override
   protected boolean isValidSortByValue(String value) {
     // TODO Auto-generated method stub
@@ -264,6 +281,12 @@ public class TaskQueryDto extends SortableParameterizedQueryDto {
     if (createdOn != null) {
       query.taskCreatedOn(createdOn);
     }
+    if (delegationState != null) {
+      query.taskDelegationState(delegationState);
+    }
+    if (candidateGroups != null) {
+      query.taskCandidateGroupIn(candidateGroups);
+    }
     
     return query;
   }
@@ -280,6 +303,12 @@ public class TaskQueryDto extends SortableParameterizedQueryDto {
       } else if (key.startsWith("due") || key.startsWith("created")) {
         Date dateValue = DateTime.parse(value).toDate();
         setValueBasedOnAnnotation(key, dateValue);
+      } else if (key.equals("delegationState")) {
+        DelegationState state = DelegationState.valueOf(value.toUpperCase());
+        setValueBasedOnAnnotation(key, state);
+      } else if (key.equals("candidateGroups")) {
+        List<String> candidateGroups = Arrays.asList(value.split(","));
+        setValueBasedOnAnnotation(key, candidateGroups);
       } else {
         setValueBasedOnAnnotation(key, value);
       }

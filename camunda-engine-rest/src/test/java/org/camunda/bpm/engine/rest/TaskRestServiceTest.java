@@ -4,6 +4,7 @@ import static com.jayway.restassured.RestAssured.expect;
 import static com.jayway.restassured.RestAssured.given;
 import static com.jayway.restassured.path.json.JsonPath.from;
 import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.argThat;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -18,8 +19,10 @@ import java.util.Map;
 
 import javax.ws.rs.core.Response.Status;
 
+import org.activiti.engine.task.DelegationState;
 import org.activiti.engine.task.Task;
 import org.activiti.engine.task.TaskQuery;
+import org.camunda.bpm.engine.rest.helper.EqualsList;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.InOrder;
@@ -201,15 +204,54 @@ public class TaskRestServiceTest extends AbstractRestServiceTest {
     return parameters;
   }
   
+  @Test
   public void testInvalidDateParameter() {
-    // TODO implement
+    given().queryParams("due", "anInvalidDate")
+      .expect().statusCode(Status.BAD_REQUEST.getStatusCode())
+      .when().get(TASK_QUERY_URL);
   }
   
+  @Test
   public void testCandidateGroupInList() {
-    // TODO implement
+    setUpMockedQuery();
+   
+    List<String> candidateGroups = new ArrayList<String>();
+    candidateGroups.add("boss");
+    candidateGroups.add("worker");
+    String queryParam = candidateGroups.get(0) + "," + candidateGroups.get(1);
+    
+    given().queryParams("candidateGroups", queryParam)
+      .expect().statusCode(Status.OK.getStatusCode())
+      .when().get(TASK_QUERY_URL);
+    
+    verify(mockQuery).taskCandidateGroupIn(argThat(new EqualsList(candidateGroups)));
   }
   
+  @Test
   public void testDelegationState() {
-    // TODO implement
+    setUpMockedQuery();
+    
+    given().queryParams("delegationState", "PENDING")
+      .expect().statusCode(Status.OK.getStatusCode())
+      .when().get(TASK_QUERY_URL);
+    
+    verify(mockQuery).taskDelegationState(DelegationState.PENDING);
+    
+    given().queryParams("delegationState", "RESOLVED")
+    .expect().statusCode(Status.OK.getStatusCode())
+    .when().get(TASK_QUERY_URL);
+  
+    verify(mockQuery).taskDelegationState(DelegationState.RESOLVED);
+  }
+  
+  @Test
+  public void testLowerCaseDelegationStateParam() {
+    setUpMockedQuery();
+
+    given().queryParams("delegationState", "resolved")
+    .expect().statusCode(Status.OK.getStatusCode())
+    .when().get(TASK_QUERY_URL);
+  
+    verify(mockQuery).taskDelegationState(DelegationState.RESOLVED);
   }
 }
