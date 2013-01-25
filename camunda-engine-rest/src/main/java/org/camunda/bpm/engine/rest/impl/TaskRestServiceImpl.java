@@ -3,14 +3,16 @@ package org.camunda.bpm.engine.rest.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Response.Status;
+
 import org.activiti.engine.TaskService;
-import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.runtime.ProcessInstanceQuery;
 import org.activiti.engine.task.Task;
 import org.activiti.engine.task.TaskQuery;
 import org.camunda.bpm.engine.rest.TaskRestService;
 import org.camunda.bpm.engine.rest.dto.TaskDto;
 import org.camunda.bpm.engine.rest.dto.TaskQueryDto;
+import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 
 public class TaskRestServiceImpl extends AbstractEngineService implements TaskRestService {
 
@@ -18,7 +20,13 @@ public class TaskRestServiceImpl extends AbstractEngineService implements TaskRe
   public List<TaskDto> getTasks(TaskQueryDto queryDto,
       Integer firstResult, Integer maxResults) {
     TaskService taskService = processEngine.getTaskService();
-    TaskQuery query = queryDto.toQuery(taskService);
+    
+    TaskQuery query;
+    try {
+      query = queryDto.toQuery(taskService);
+    } catch (InvalidRequestException e) {
+      throw new WebApplicationException(Status.BAD_REQUEST.getStatusCode());
+    }
     
     List<Task> matchingTasks;
     if (firstResult != null || maxResults != null) {

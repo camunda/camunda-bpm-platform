@@ -322,9 +322,16 @@ public class TaskRestServiceTest extends AbstractRestServiceTest {
   
   @Test
   public void testSortByParameterOnly() {
-    // TODO inspect
     setUpMockedQuery();
-    given().queryParam("sortBy", "definitionId")
+    given().queryParam("sortBy", "dueDate")
+      .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
+      .when().get(TASK_QUERY_URL);
+  }
+  
+  @Test
+  public void testSortOrderParameterOnly() {
+    setUpMockedQuery();
+    given().queryParam("sortOrder", "asc")
       .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
       .when().get(TASK_QUERY_URL);
   }
