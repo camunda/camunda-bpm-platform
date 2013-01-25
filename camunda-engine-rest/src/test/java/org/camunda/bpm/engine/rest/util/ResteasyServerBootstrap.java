@@ -19,12 +19,10 @@ public class ResteasyServerBootstrap {
   }
   
   public void start() {
-    System.out.println("started container");
     server.start();
   }
   
   public void stop() {
-    System.out.println("stopping container");
     server.stop();
   }
   
