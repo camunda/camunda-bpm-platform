@@ -1,6 +1,7 @@
 package org.camunda.bpm.engine.rest.dto;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
@@ -13,6 +14,32 @@ import org.camunda.bpm.engine.rest.exception.RestException;
 import org.joda.time.DateTime;
 
 public class TaskQueryDto extends SortableParameterizedQueryDto {
+  
+  private static final String SORT_BY_PROCESS_INSTANCE_ID_VALUE = "instanceId";
+  private static final String SORT_BY_DUE_DATE_VALUE = "dueDate";
+  private static final String SORT_BY_EXECUTION_ID_VALUE = "executionId";
+  private static final String SORT_BY_ASSIGNEE_VALUE = "assignee";
+  private static final String SORT_BY_CREATE_TIME_VALUE = "created";
+  private static final String SORT_BY_DESCRIPTION_VALUE = "description";
+  private static final String SORT_BY_ID_VALUE = "id";
+  private static final String SORT_BY_NAME_VALUE = "name";
+  private static final String SORT_BY_PRIORITY_VALUE = "priority";
+  
+  
+  private static final List<String> VALID_SORT_BY_VALUES;
+  static {
+    VALID_SORT_BY_VALUES = new ArrayList<String>();
+    VALID_SORT_BY_VALUES.add(SORT_BY_PROCESS_INSTANCE_ID_VALUE);
+    VALID_SORT_BY_VALUES.add(SORT_BY_DUE_DATE_VALUE);
+    VALID_SORT_BY_VALUES.add(SORT_BY_EXECUTION_ID_VALUE);
+    VALID_SORT_BY_VALUES.add(SORT_BY_ASSIGNEE_VALUE);
+    VALID_SORT_BY_VALUES.add(SORT_BY_CREATE_TIME_VALUE);
+    VALID_SORT_BY_VALUES.add(SORT_BY_DESCRIPTION_VALUE);
+    VALID_SORT_BY_VALUES.add(SORT_BY_ID_VALUE);
+    VALID_SORT_BY_VALUES.add(SORT_BY_NAME_VALUE);
+    VALID_SORT_BY_VALUES.add(SORT_BY_PRIORITY_VALUE);
+  }
+  
   private String processInstanceBusinessKey;
   private String processDefinitionKey;
   private String processDefinitionId;
@@ -193,8 +220,7 @@ public class TaskQueryDto extends SortableParameterizedQueryDto {
 
   @Override
   protected boolean isValidSortByValue(String value) {
-    // TODO Auto-generated method stub
-    return false;
+    return VALID_SORT_BY_VALUES.contains(value);
   }
   
   public TaskQuery toQuery(TaskService taskService) {
@@ -286,6 +312,36 @@ public class TaskQueryDto extends SortableParameterizedQueryDto {
     }
     if (candidateGroups != null) {
       query.taskCandidateGroupIn(candidateGroups);
+    }
+    
+    if (sortBy != null) {
+      if (sortBy.equals(SORT_BY_PROCESS_INSTANCE_ID_VALUE)) {
+        query.orderByProcessInstanceId();
+      } else if (sortBy.equals(SORT_BY_DUE_DATE_VALUE)) {
+        query.orderByDueDate();
+      } else if (sortBy.equals(SORT_BY_EXECUTION_ID_VALUE)) {
+        query.orderByExecutionId();
+      } else if (sortBy.equals(SORT_BY_ASSIGNEE_VALUE)) {
+        query.orderByTaskAssignee();
+      } else if (sortBy.equals(SORT_BY_CREATE_TIME_VALUE)) {
+        query.orderByTaskCreateTime();
+      } else if (sortBy.equals(SORT_BY_DESCRIPTION_VALUE)) {
+        query.orderByTaskDescription();
+      } else if (sortBy.equals(SORT_BY_ID_VALUE)) {
+        query.orderByTaskId();
+      } else if (sortBy.equals(SORT_BY_NAME_VALUE)) {
+        query.orderByTaskName();
+      } else if (sortBy.equals(SORT_BY_PRIORITY_VALUE)) {
+        query.orderByTaskPriority();
+      }
+    }
+    
+    if (sortOrder != null) {
+      if (sortOrder.equals(SORT_ORDER_ASC_VALUE)) {
+        query.asc();
+      } else if (sortOrder.equals(SORT_ORDER_DESC_VALUE)) {
+        query.desc();
+      }
     }
     
     return query;

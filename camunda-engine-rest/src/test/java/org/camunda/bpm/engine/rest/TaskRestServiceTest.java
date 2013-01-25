@@ -26,6 +26,7 @@ import org.camunda.bpm.engine.rest.helper.EqualsList;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.InOrder;
+import org.mockito.Mockito;
 
 import com.jayway.restassured.response.Response;
 
@@ -253,5 +254,69 @@ public class TaskRestServiceTest extends AbstractRestServiceTest {
     .when().get(TASK_QUERY_URL);
   
     verify(mockQuery).taskDelegationState(DelegationState.RESOLVED);
+  }
+  
+  @Test
+  public void testSortingParameters() {
+    setUpMockedQuery();
+    
+    InOrder inOrder = Mockito.inOrder(mockQuery);
+    executeAndVerifySorting("dueDate", "desc", Status.OK);
+    inOrder.verify(mockQuery).orderByDueDate();
+    inOrder.verify(mockQuery).desc();
+    setUpMockedQuery();
+    
+    inOrder = Mockito.inOrder(mockQuery);
+    executeAndVerifySorting("executionId", "asc", Status.OK);
+    inOrder.verify(mockQuery).orderByExecutionId();
+    inOrder.verify(mockQuery).asc();
+    setUpMockedQuery();
+    
+    inOrder = Mockito.inOrder(mockQuery);
+    executeAndVerifySorting("instanceId", "desc", Status.OK);
+    inOrder.verify(mockQuery).orderByProcessInstanceId();
+    inOrder.verify(mockQuery).desc();
+    setUpMockedQuery();
+    
+    inOrder = Mockito.inOrder(mockQuery);
+    executeAndVerifySorting("assignee", "asc", Status.OK);
+    inOrder.verify(mockQuery).orderByTaskAssignee();
+    inOrder.verify(mockQuery).asc();
+    setUpMockedQuery();
+    
+    inOrder = Mockito.inOrder(mockQuery);
+    executeAndVerifySorting("created", "desc", Status.OK);
+    inOrder.verify(mockQuery).orderByTaskCreateTime();
+    inOrder.verify(mockQuery).desc();
+    setUpMockedQuery();
+    
+    inOrder = Mockito.inOrder(mockQuery);
+    executeAndVerifySorting("description", "asc", Status.OK);
+    inOrder.verify(mockQuery).orderByTaskDescription();
+    inOrder.verify(mockQuery).asc();
+    setUpMockedQuery();
+    
+    inOrder = Mockito.inOrder(mockQuery);
+    executeAndVerifySorting("id", "desc", Status.OK);
+    inOrder.verify(mockQuery).orderByTaskId();
+    inOrder.verify(mockQuery).desc();
+    setUpMockedQuery();
+    
+    inOrder = Mockito.inOrder(mockQuery);
+    executeAndVerifySorting("name", "asc", Status.OK);
+    inOrder.verify(mockQuery).orderByTaskName();
+    inOrder.verify(mockQuery).asc();
+    setUpMockedQuery();
+    
+    inOrder = Mockito.inOrder(mockQuery);
+    executeAndVerifySorting("priority", "desc", Status.OK);
+    inOrder.verify(mockQuery).orderByTaskPriority();
+    inOrder.verify(mockQuery).desc();
+  }
+  
+  private void executeAndVerifySorting(String sortBy, String sortOrder, Status expectedStatus) {
+    given().queryParam("sortBy", sortBy).queryParam("sortOrder", sortOrder)
+      .then().expect().statusCode(expectedStatus.getStatusCode())
+      .when().get(TASK_QUERY_URL);
   }
 }
