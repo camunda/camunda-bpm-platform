@@ -3,6 +3,7 @@
     <deployment>
         <dependencies>
             <module name="org.codehaus.jackson.jackson-jaxrs"/>
+            <module name="org.codehaus.jackson.jackson-mapper-asl"/>
 <!--             <module name="joda-time.joda-time-2.1"/> -->
         </dependencies>
     </deployment>
