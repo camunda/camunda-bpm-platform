@@ -23,6 +23,7 @@ import org.activiti.engine.task.DelegationState;
 import org.activiti.engine.task.Task;
 import org.activiti.engine.task.TaskQuery;
 import org.camunda.bpm.engine.rest.helper.EqualsList;
+import org.joda.time.DateTime;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.InOrder;
@@ -32,8 +33,20 @@ import com.jayway.restassured.response.Response;
 
 public class TaskRestServiceTest extends AbstractRestServiceTest {
   
-  private static final String EXAMPLE_TASK_ID = "anId";
-  private static final String EXAMPLE_TASK_NAME = "aName";
+  private static final String EXAMPLE_ID = "anId";
+  private static final String EXAMPLE_NAME = "aName";
+  private static final String EXAMPLE_ASSIGNEE_NAME = "anAssignee";
+  private static final String EXAMPLE_CREATE_TIME = "2013-01-23T13:42:42";
+  private static final String EXAMPLE_DUE_DATE = "2013-01-23T13:42:43";
+  private static final DelegationState EXAMPLE_DELEGATION_STATE = DelegationState.RESOLVED;
+  private static final String EXAMPLE_DESCRIPTION = "aDescription";
+  private static final String EXAMPLE_EXECUTION_ID = "anExecution";
+  private static final String EXAMPLE_OWNER = "kermit";
+  private static final String EXAMPLE_PARENT_TASK_ID = "aParentId";
+  private static final int EXAMPLE_PRIORITY = 42;
+  private static final String EXAMPLE_PROCESS_DEFINITION_ID = "aProcDefId";
+  private static final String EXAMPLE_PROCESS_INSTANCE_ID = "aProcInstId";
+  private static final String EXAMPLE_TASK_DEFINITION_KEY = "aTaskDefinitionKey";
 
   private static final String TASK_QUERY_URL = TEST_RESOURCE_ROOT_PATH + "/task";
   
@@ -50,8 +63,20 @@ public class TaskRestServiceTest extends AbstractRestServiceTest {
     List<Task> mocks = new ArrayList<Task>();
     
     Task mockTask = mock(Task.class);
-    when(mockTask.getId()).thenReturn(EXAMPLE_TASK_ID);
-    when(mockTask.getName()).thenReturn(EXAMPLE_TASK_NAME);
+    when(mockTask.getId()).thenReturn(EXAMPLE_ID);
+    when(mockTask.getName()).thenReturn(EXAMPLE_NAME);
+    when(mockTask.getAssignee()).thenReturn(EXAMPLE_ASSIGNEE_NAME);
+    when(mockTask.getCreateTime()).thenReturn(DateTime.parse(EXAMPLE_CREATE_TIME).toDate());  
+    when(mockTask.getDueDate()).thenReturn(DateTime.parse(EXAMPLE_DUE_DATE).toDate()); 
+    when(mockTask.getDelegationState()).thenReturn(EXAMPLE_DELEGATION_STATE); 
+    when(mockTask.getDescription()).thenReturn(EXAMPLE_DESCRIPTION); 
+    when(mockTask.getExecutionId()).thenReturn(EXAMPLE_EXECUTION_ID); 
+    when(mockTask.getOwner()).thenReturn(EXAMPLE_OWNER); 
+    when(mockTask.getParentTaskId()).thenReturn(EXAMPLE_PARENT_TASK_ID); 
+    when(mockTask.getPriority()).thenReturn(EXAMPLE_PRIORITY); 
+    when(mockTask.getProcessDefinitionId()).thenReturn(EXAMPLE_PROCESS_DEFINITION_ID); 
+    when(mockTask.getProcessInstanceId()).thenReturn(EXAMPLE_PROCESS_INSTANCE_ID);
+    when(mockTask.getTaskDefinitionKey()).thenReturn(EXAMPLE_TASK_DEFINITION_KEY);
     
     mocks.add(mockTask);
     return mocks;
@@ -81,8 +106,35 @@ public class TaskRestServiceTest extends AbstractRestServiceTest {
     Assert.assertNotNull("The returned task should not be null.", instances.get(0));
     
     String returnedTaskName = from(content).getString("[0].name");
+    String returnedId = from(content).getString("[0].id");
+    String returendAssignee = from(content).getString("[0].assignee");
+    String returnedCreateTime = from(content).getString("[0].created");
+    String returnedDueDate = from(content).getString("[0].due");
+    String returnedDelegationState = from(content).getString("[0].delegationState");
+    String returnedDescription = from(content).getString("[0].description");
+    String returnedExecutionId = from(content).getString("[0].executionId");
+    String returnedOwner = from(content).getString("[0].owner");
+    String returnedParentTaskId = from(content).getString("[0].parentTaskId");
+    int returnedPriority = from(content).getInt("[0].priority");
+    String returnedProcessDefinitionId = from(content).getString("[0].processDefinitionId");
+    String returnedProcessInstanceId = from(content).getString("[0].processInstanceId");
+    String returnedTaskDefinitionKey = from(content).getString("[0].taskDefinitionKey");
     
-    Assert.assertEquals(EXAMPLE_TASK_NAME, returnedTaskName);
+    Assert.assertEquals(EXAMPLE_NAME, returnedTaskName);
+    Assert.assertEquals(EXAMPLE_ID, returnedId);
+    Assert.assertEquals(EXAMPLE_ASSIGNEE_NAME, returendAssignee);
+    Assert.assertEquals(EXAMPLE_CREATE_TIME, returnedCreateTime);
+    Assert.assertEquals(EXAMPLE_DUE_DATE, returnedDueDate);
+    Assert.assertEquals(EXAMPLE_DELEGATION_STATE.toString(), returnedDelegationState);
+    Assert.assertEquals(EXAMPLE_DESCRIPTION, returnedDescription);
+    Assert.assertEquals(EXAMPLE_EXECUTION_ID, returnedExecutionId);
+    Assert.assertEquals(EXAMPLE_OWNER, returnedOwner);
+    Assert.assertEquals(EXAMPLE_PARENT_TASK_ID, returnedParentTaskId);
+    Assert.assertEquals(EXAMPLE_PRIORITY, returnedPriority);
+    Assert.assertEquals(EXAMPLE_PROCESS_DEFINITION_ID, returnedProcessDefinitionId);
+    Assert.assertEquals(EXAMPLE_PROCESS_INSTANCE_ID, returnedProcessInstanceId);
+    Assert.assertEquals(EXAMPLE_TASK_DEFINITION_KEY, returnedTaskDefinitionKey);
+    
   }
 
   @Test
