@@ -56,6 +56,7 @@ public abstract class AbstractRestServiceTest {
             .goOffline()
                 .artifact("org.mockito:mockito-core:1.8.2")
                 .artifact("com.jayway.restassured:rest-assured:1.7.2")
+                .artifact("joda-time:joda-time:2.1")
             .resolveAsFiles());
     
     addDirectoryContentsAsWebInfResources(war, "WEB-INF");
