@@ -72,3 +72,7 @@ alter table ACT_RU_JOB ALTER COLUMN DUEDATE_ TYPE timestamp;
 -- revert introduction of new history level --
 
 update ACT_GE_PROPERTY set VALUE_ = CAST ( VALUE_ AS integer )- 1, REV_ = REV_ + 1 where NAME_ = 'historyLevel' and CAST (VALUE_ as integer) >= 2;
+
+-- --------------------------------------------
+-- Additional index on PROC_INST_ID_ and ACT_ID_ for historic activity --
+create index ACT_IDX_HI_ACT_INST_PROCINST on ACT_HI_ACTINST(PROC_INST_ID_, ACT_ID_);
