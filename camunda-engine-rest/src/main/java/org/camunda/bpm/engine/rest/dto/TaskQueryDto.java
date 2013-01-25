@@ -313,6 +313,10 @@ public class TaskQueryDto extends SortableParameterizedQueryDto {
     if (candidateGroups != null) {
       query.taskCandidateGroupIn(candidateGroups);
     }
+
+    if (!sortOptionsValid()) {
+      throw new InvalidRequestException("You may not specify a single sorting parameter.");
+    }
     
     if (sortBy != null) {
       if (sortBy.equals(SORT_BY_PROCESS_INSTANCE_ID_VALUE)) {
