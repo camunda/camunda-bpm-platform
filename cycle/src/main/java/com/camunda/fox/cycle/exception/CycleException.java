@@ -23,7 +23,7 @@ public class CycleException extends RuntimeException {
   @Override
   public String getMessage() {
     if(getCause() != null) {
-      return getCause().getMessage();
+      return super.getMessage() + " - " + getCause().getMessage();
     } else {
       return super.getMessage();
     }

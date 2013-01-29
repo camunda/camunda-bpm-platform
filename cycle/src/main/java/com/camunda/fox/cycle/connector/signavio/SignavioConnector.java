@@ -77,14 +77,15 @@ public class SignavioConnector extends Connector {
         
         String defaultCommitMessage = getDefaultCommitMessage();
         
-        signavioClient = new SignavioClient(getConfiguration().getProperties().get(CONFIG_KEY_SIGNAVIO_BASE_URL),
+        signavioClient = new SignavioClient(getConfiguration().getName(),
+                                            getConfiguration().getProperties().get(CONFIG_KEY_SIGNAVIO_BASE_URL),
                                             getConfiguration().getProperties().get(CONFIG_KEY_PROXY_URL),
                                             getConfiguration().getProperties().get(CONFIG_KEY_PROXY_USERNAME),
                                             getConfiguration().getProperties().get(CONFIG_KEY_PROXY_PASSWORD),
                                             defaultCommitMessage);
       }
     } catch (URISyntaxException e) {
-      throw new CycleException("Unable to initialize Signavio REST client!", e);
+      throw new CycleException("Unable to initialize Signavio REST client for connector '" + getConfiguration().getName() + "'!", e);
     }
   }
 

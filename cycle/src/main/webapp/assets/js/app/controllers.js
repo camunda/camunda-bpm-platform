@@ -344,13 +344,10 @@ function BpmnDiagramController($scope, Commons, Event, $http, App) {
 /**
  * Realizes the edit operation of a bpmn diagram inside the respective dialog.
  */
-function EditDiagramController($scope, Commons, Event, ConnectorConfiguration, Connector) {
+function EditDiagramController($scope, Commons, Event, ConnectorConfiguration, Connector, Error) {
   
   var FOX_DESIGNER = "fox designer", 
       RIGHT_HAND_SIDE = "rightHandSide";
-  
-  // Error to be displayed in dialog
-  $scope.error = null;
   
   $scope.commitMessage = "Model created using camunda cycle.";
   
@@ -408,14 +405,9 @@ function EditDiagramController($scope, Commons, Event, ConnectorConfiguration, C
       $scope.createDiagram($scope.editDiagram, $scope.commitMessage);
   };
 
-  // Watch for component error  
-  $scope.$on(Event.componentError, function(event, error) {
-    $scope.error = error;
-  });
-  
   $scope.$on(Event.selectedConnectorChanged, function(event) {
-    if ($scope.error) {
-      $scope.error = null;
+    if (Error.errors.length > 0) {
+      Error.removeAllErrors();
     }
     $scope.selectedNode = null;
   });

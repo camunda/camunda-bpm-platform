@@ -19,7 +19,7 @@ public class CycleExceptionMapper implements ExceptionMapper<CycleException> {
 
   @Override
   public Response toResponse(CycleException exception) {
-    Logger.getLogger(getClass().getSimpleName()).log(Level.SEVERE, "Exception occured during request", exception);
+    Logger.getLogger(getClass().getSimpleName()).log(Level.SEVERE, "Exception occurred during request", exception);
     return JaxRsUtil.createResponse()
             .status(Status.INTERNAL_SERVER_ERROR)
             .entity(new ExceptionDTO(exception))
