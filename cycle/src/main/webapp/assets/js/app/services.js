@@ -134,6 +134,10 @@ angular
     	var idx = this.errors.indexOf(error);
     	  this.errors.splice(idx,1);  
       },
+      removeAllErrors: function() {
+        // not assigning a new [], because it still can be referenced somewhere => memory leak
+        this.errors.length = 0;
+      },
       registerErrorConsumer: function(callback) {
         this.errorConsumers.push(callback);  
       },
@@ -169,12 +173,10 @@ angular
         RequestStatus.setBusy(false);
     	
         if (parseInt(response.status) == 500) {
-          if (response.data) {
-            if (response.data.message) {
-              Error.addError({ "status" : "Error" , "config" :  response.data.message });
-            }
+          if (response.data && response.data.message) {
+            Error.addError({ "status" : "Error" , "config" :  response.data.message , "type" : response.data.exceptionType });
           } else {
-            Error.addError({ "status" : "Error" , "config" :  "Request " + response.config.method + " " + response.config.url + " failed. See server stacktrace for details." });     
+            Error.addError({ "status" : "Error" , "config" :  "A problem occurred: try logging out of cycle and logging back in. If the problem persists, contact your administrator." });     
           }
           
         } else if (parseInt(response.status) == 0) {
@@ -184,7 +186,7 @@ angular
           Error.addError({ "status" : "Unauthorized" , "config" :  "Your session has probably expired. Try refreshing the page and login again." });
           
         } else {
-          Error.addError({ "status" : "Error" , "config" :  "Request " + response.config.method + " " + response.config.url + " failed. See server stacktrace for details." });
+          Error.addError({ "status" : "Error" , "config" :  "A problem occurred: try logging out of cycle and logging back in. If the problem persists, contact your administrator." });
         }         
         return $q.reject(response);
       });

@@ -79,16 +79,6 @@
       </div>
       <div class="modal-body">
         <div data-error-panel></div>
-        <div class="alert alert-error" ng-show="error">
-          <button type="button" class="close" data-dismiss="alert">&times;</button>
-          <span>
-            <strong th:text="#{A problem occured:}"></strong>
-            {{error.message}}
-          </span>
-          <span data-ng-show="error.exceptionType == 'com.camunda.fox.cycle.exception.CycleMissingCredentialsException'">
-          	(<a style="color: #827AA2;" th:href="@{/app/secured/view/profile}" th:text="#{'add connector credentials'}">add user credentials</a>)
-          </span>
-        </div>
         <form class="form-horizontal" novalidate ng-submit="save()" name="addModelForm">
           <fieldset>
             <div class="control-group">
@@ -118,7 +108,7 @@
                   <span>No connectors configured</span> <span data-if-admin>(<a th:href="@{/app/secured/view/connectors}" th:text="#{'configure'}">configure</a>)</span>.
                 </span>
                 <span data-ng-show="connectors.length">
-                  <select class="span8" data-ng-model="connector" required ng-options="c.name for c in connectors">
+                  <select class="span8" ng-model="connector" required data-ng-options="c.name for c in connectors">
                   </select>
                 </span>
               </div>
