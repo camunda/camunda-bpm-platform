@@ -383,12 +383,37 @@ li.actions .btn:last-child {
     max-height: 480px;
 }
 
+div#pictureModal .modal-body {
+  max-height: 80%;
+  overflow: auto;
+}
+
+div#pictureModal {
+  min-width: 30%;
+  width: auto;
+  max-width: 80%;
+}
+
+div#pictureModal .carousel-inner {
+  overflow: inherit;
+}
+
 div#pictureModal.modal.hide.fade {
   width: 85%;
   max-width: 75%;
   max-height: 95%;
   top: 40%;
   left: 33%;
+}
+
+div#myCarousel .carousel-control.right {
+  position: fixed;
+  right: 12%;
+}
+
+div#myCarousel .carousel-control.left {
+  position: fixed;
+  left: 12%;
 }
 
 /** popover styles */
@@ -416,5 +441,10 @@ thead tr {
   .modal {
   	position:absolute;
   } 
+}
+
+/** override img{ max-width: 100%} in boostrap.css to see the bpmn model diagram in a normal size **/
+img {
+  max-width: none;
 }
 
