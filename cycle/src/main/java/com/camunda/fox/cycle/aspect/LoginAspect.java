@@ -82,25 +82,25 @@ public class LoginAspect {
     UserIdentity identity = IdentityHolder.getIdentity();
     
     if (identity == null) {
-      throw missingCredentials("No user identity", null);
+      throw missingCredentials("No user identity found. Please relogin into cycle.");
     }
     
     String username = identity.getName();
     Long connectorConfigId = connector.getConfiguration().getId();
     
     if (connectorConfigId == null) {
-      throw missingCredentials("No user specific credentials configured", null);
+      throw missingCredentials("No user specific credentials configured for connector '" + connector.getConfiguration().getName() + "'.");
     }
     
     try {
       ConnectorCredentials credentials = connectorCredentialsRepository.findFetchAllByUsernameAndConnectorId(username, connectorConfigId);
       loginConnector(connector, credentials.getUsername(), credentials.getPassword());
     } catch (NoResultException e) {
-      throw missingCredentials("No user specific credentials configured", e);
+      throw missingCredentials("No user specific credentials configured for connector '" + connector.getConfiguration().getName() + "'.");
     }
   }
   
-  private CycleMissingCredentialsException missingCredentials(String message, Throwable cause) {
-    return new CycleMissingCredentialsException("Missing credentials: " + message, cause);
+  private CycleMissingCredentialsException missingCredentials(String message) {
+    return new CycleMissingCredentialsException("Missing credentials: " + message);
   }
 }

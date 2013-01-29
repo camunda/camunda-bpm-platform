@@ -35,10 +35,12 @@ public class ConnectorCache implements Serializable {
   private transient Map<Long, Connector> cache = new HashMap<Long, Connector>();
 
   public boolean contains(long id) {
+    ensureInitialized();
     return cache.containsKey(id);
   }
   
   public Connector remove(long id) {
+    ensureInitialized();
     Connector oldConnector = cache.remove(id);
     if (oldConnector != null) {
       oldConnector.dispose();
@@ -47,10 +49,12 @@ public class ConnectorCache implements Serializable {
   }
 
   public Connector get(long id) {
+    ensureInitialized();
     return cache.get(id);
   }
 
   public Connector put(long id, Connector connector) {
+    ensureInitialized();
     Connector oldConnector = cache.put(id, connector);
 
     if (oldConnector != null) {
@@ -61,14 +65,22 @@ public class ConnectorCache implements Serializable {
   }
 
   public Collection<Connector> values() {
+    ensureInitialized();
     return cache.values();
   }
   
   @PreDestroy
   public void dispose() {
+    ensureInitialized();
     for (Connector c: cache.values()) {
       c.dispose();
     }
     cache = new HashMap<Long, Connector>();
+  }
+  
+  private void ensureInitialized() {
+    if (cache == null) {
+      cache = new HashMap<Long, Connector>();
+    }
   }
 }
