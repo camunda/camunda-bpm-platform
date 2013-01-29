@@ -39,33 +39,33 @@ describe('cycle connectors', function() {
 
   describe('new Signavio connector dialog', function() {
 
-	beforeEach(function() {
-		select('blueprint').option(1);
-	});
-
-	it('should show the signavioBaseUrl input field', function() {
-		expect(element('span:contains(signavioBaseUrl*)').count()).toBe(2);
-		expect(element('#signavioBaseUrl').val()).toBe('https://editor.signavio.com/');
-		expect(element('#signavioBaseUrl').attr("required")).toBe('required');
-	});
-
-	it('should show the proxyUrl input field', function() {
-		expect(element('span:contains(proxyUrl)').count()).toBe(2);
-		expect(element('#proxyUrl').val()).toBe('');
-		expect(element('#proxyUrl').attr("required")).toBe(undefined);
-	});
-	
-	it('should show the proxyUsername input field', function() {
-		expect(element('span:contains(proxyUsername)').count()).toBe(2);
-		expect(element('#proxyUsername').val()).toBe('');
-		expect(element('#proxyUsername').attr("required")).toBe(undefined);
-	});
-	
-	it('should show the proxyPassword input field', function() {
-		expect(element('span:contains(proxyPassword)').count()).toBe(2);
-		expect(element('#proxyPassword').val()).toBe('');
-		expect(element('#proxyPassword').attr("required")).toBe(undefined);
-	});
+  	beforeEach(function() {
+  		select('blueprint').option(1);
+  	});
+  
+  	it('should show the signavioBaseUrl input field', function() {
+  		expect(element('span:contains(signavioBaseUrl*)').count()).toBe(2);
+  		expect(element('#signavioBaseUrl').val()).toBe('https://editor.signavio.com/');
+  		expect(element('#signavioBaseUrl').attr("required")).toBe('required');
+  	});
+  
+  	it('should show the proxyUrl input field', function() {
+  		expect(element('span:contains(proxyUrl)').count()).toBe(2);
+  		expect(element('#proxyUrl').val()).toBe('');
+  		expect(element('#proxyUrl').attr("required")).toBe(undefined);
+  	});
+  	
+  	it('should show the proxyUsername input field', function() {
+  		expect(element('span:contains(proxyUsername)').count()).toBe(2);
+  		expect(element('#proxyUsername').val()).toBe('');
+  		expect(element('#proxyUsername').attr("required")).toBe(undefined);
+  	});
+  	
+  	it('should show the proxyPassword input field', function() {
+  		expect(element('span:contains(proxyPassword)').count()).toBe(2);
+  		expect(element('#proxyPassword').val()).toBe('');
+  		expect(element('#proxyPassword').attr("required")).toBe(undefined);
+  	});
 
   });
   

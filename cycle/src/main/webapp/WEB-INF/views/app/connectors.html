@@ -22,7 +22,7 @@
                 </tr>
               </thead>
               <tbody>
-                <tr data-ng-repeat="connectorConfiguration in connectorConfigurations" data-ng-cloak>
+                <tr ng-repeat="connectorConfiguration in connectorConfigurations" data-ng-cloak>
                   <td>{{connectorConfiguration.connectorId}}</td>
                   <td>{{connectorConfiguration.name}}</td>
                   <td>{{connectorConfiguration.connectorName}}</td>
@@ -67,7 +67,7 @@
                         <label class="control-label" for="connectorLabel" 
                                th:text="#{'Connector Name*'}">Connector Name*</label>
                         <div class="controls" style="margin-bottom: 10px;" >
-                          <input id="connectorLabel" name="connectorLabel" type="text" class="span8" required data-ng-model="editConnectorConfiguration.name"/>
+                          <input id="connectorLabel" name="connectorLabel" type="text" class="span8" required ng-model="editConnectorConfiguration.name"/>
                         </div>
                       </div>
 
@@ -92,7 +92,7 @@
                                th:text="#{'Login Mode*'}">Login Mode*</label>
                         <div class="controls" style="margin-bottom: 10px;" >
                           <span class="nullable">
-                            <select id="loginMode" class="span8" data-required data-ng-model="editConnectorConfiguration.loginMode">
+                            <select id="loginMode" class="span8" data-required ng-model="editConnectorConfiguration.loginMode">
                               <option value="LOGIN_NOT_REQUIRED">no login required</option>
                               <option value="GLOBAL">credentials provided globally</option>
                               <option value="USER">credentials provided by user</option>
@@ -107,7 +107,7 @@
                             <label class="control-label" for="userName" 
                                    th:text="#{'User Name*'}">User Name*</label>
                             <div class="controls">
-                              <input id="userName" name="userName" type="text" class="span8" required data-ng-model="editConnectorConfiguration.user"/>
+                              <input id="userName" name="userName" type="text" class="span8" required ng-model="editConnectorConfiguration.user"/>
                             </div> 
                           </div>
                           <div ng-switch on="passwordRequired">
@@ -115,7 +115,7 @@
                               <label class="control-label" for="password" 
                                      th:text="#{'Password*'}">Password*</label>
                               <div class="controls" style="margin-bottom: 10px;" >
-                                <input id="password" name="password" type="password" class="span8" required data-ng-model="editConnectorConfiguration.password"/>
+                                <input id="password" name="password" type="password" class="span8" required ng-model="editConnectorConfiguration.password"/>
                               </div> 
                             </div>
                             <div class="control-group" ng-switch-when="false">
@@ -125,7 +125,7 @@
                                      data-help-title-var="editPasswordTitle"                                
                                      th:text="#{'Password'}">Password</label>
                               <div class="controls" style="margin-bottom: 10px;" >
-                                <input id="password" name="password" type="password" class="span8" data-ng-model="editConnectorConfiguration.password"/>
+                                <input id="password" name="password" type="password" class="span8" ng-model="editConnectorConfiguration.password"/>
                               </div> 
                             </div>
                           </div>
@@ -137,8 +137,8 @@
                                data-help-text-var="currentHelpText(propertyName)"
                                data-help-title-var="propertyName">{{propertyNameText(propertyName)}}</label>
                         <div class="controls">
-                          <input data-ng-hide="isPropertyPassword(propertyName)" data-ng-required="isPropertyRequired(propertyName)" id="{{propertyName}}" name="specificField" type="text" class="span8" data-ng-model="editConnectorConfiguration.properties[propertyName]" />
-                          <input data-ng-show="isPropertyPassword(propertyName)" data-ng-required="isPropertyRequired(propertyName)" id="{{propertyName}}" name="specificField" type="password" class="span8" data-ng-model="editConnectorConfiguration.properties[propertyName]"/>
+                          <input data-ng-hide="isPropertyPassword(propertyName)" data-ng-required="isPropertyRequired(propertyName)" id="{{propertyName}}" name="specificField" type="text" class="span8" ng-model="editConnectorConfiguration.properties[propertyName]" />
+                          <input data-ng-show="isPropertyPassword(propertyName)" data-ng-required="isPropertyRequired(propertyName)" id="{{propertyName}}" name="specificField" type="password" class="span8" ng-model="editConnectorConfiguration.properties[propertyName]"/>
                         </div>
                       </div>
                     </fieldset>
