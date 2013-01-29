@@ -29,6 +29,7 @@ import org.activiti.engine.impl.persistence.entity.JobEntity;
 
 /**
  * @author Tom Baeyens
+ * @author Daniel Meyer
  */
 public class ExecuteJobsCmd implements Command<Object>, Serializable {
 
@@ -58,30 +59,59 @@ public class ExecuteJobsCmd implements Command<Object>, Serializable {
       throw new ActivitiException("No job found with id '" + jobId + "'");
     }
     
-    JobExecutorContext jobExecutorContext = Context.getJobExecutorContext();
+    final CommandExecutor commandExecutor = Context.getProcessEngineConfiguration().getCommandExecutorTxRequiresNew();    
+    final JobExecutorContext jobExecutorContext = Context.getJobExecutorContext();
+    
     if(jobExecutorContext != null) { // if null, then we are not called by the job executor     
       jobExecutorContext.setCurrentJob(job);
     }
-    
+
     try { 
       job.execute(commandContext);
-    } catch (RuntimeException exception) {
-      // When transaction is rolled back, decrement retries
-      CommandExecutor commandExecutor = Context
-        .getProcessEngineConfiguration()
-        .getCommandExecutorTxRequiresNew();
+      return null;
       
-      commandContext.getTransactionContext().addTransactionListener(
-        TransactionState.ROLLED_BACK, 
-        new FailedJobListener(commandExecutor, jobId, exception));
-       
+    } catch (RuntimeException exception) {
+     
+      // the failed job listener is responsible for decrementing the retries and logging the exception to the DB.
+      FailedJobListener failedJobListener = createFailedJobListener(exception, commandExecutor);
+      
+      try {
+        
+        commandContext.getTransactionContext().addTransactionListener(
+                TransactionState.ROLLED_BACK,
+                failedJobListener);
+        
+      } catch(Exception ex) {        
+        // if the TX has already been rolled back, the listener cannot be registered. 
+        log.log(Level.FINE, "Could not register transaction synchronization. Probably the TX has already been rolled back by application code.", ex);
+
+        // Execute the listener in new TX, here.
+        executeCmdInNewTx(commandContext, failedJobListener);
+        
+      }
+        
       // throw the original exception to indicate the ExecuteJobCmd failed
       throw exception;
+      
     } finally {
       if(jobExecutorContext != null) {
         jobExecutorContext.setCurrentJob(null);
       }
     }
-    return null;
+    
+  }
+
+  protected void executeCmdInNewTx(CommandContext commandContext, FailedJobListener failedJobListener) {
+    try {
+      
+      failedJobListener.execute(commandContext);
+      
+    } catch(Exception ex) {
+      log.log(Level.SEVERE, "Could not execute the FailedJobListener: "+ex.getMessage(), ex);
+    }
+  }
+
+  protected FailedJobListener createFailedJobListener(RuntimeException exception, CommandExecutor commandExecutor) {
+    return new FailedJobListener(commandExecutor, jobId, exception);
   }
 }
