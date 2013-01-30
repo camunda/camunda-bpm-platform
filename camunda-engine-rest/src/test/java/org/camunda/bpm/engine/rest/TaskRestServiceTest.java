@@ -400,4 +400,42 @@ public class TaskRestServiceTest extends AbstractRestServiceTest {
     
     verify(mockQuery).listPage(firstResult, maxResults);
   }
+  
+  @Test
+  public void testTaskVariableParameters() {
+    setUpMockedQuery();
+    String variableName = "varName";
+    String variableValue = "varValue";
+    String queryValue = variableName + "_eq_" + variableValue;    
+    given().queryParam("taskVariables", queryValue)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .when().get(TASK_QUERY_URL);    
+    verify(mockQuery).taskVariableValueEquals(variableName, variableValue);
+    
+    setUpMockedQuery();
+    queryValue = variableName + "_neq_" + variableValue;    
+    given().queryParam("taskVariables", queryValue)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .when().get(TASK_QUERY_URL);    
+    verify(mockQuery).taskVariableValueNotEquals(variableName, variableValue);
+  }
+  
+  @Test
+  public void testProcessVariableParameters() {
+    setUpMockedQuery();
+    String variableName = "varName";
+    String variableValue = "varValue";
+    String queryValue = variableName + "_eq_" + variableValue;    
+    given().queryParam("processVariables", queryValue)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .when().get(TASK_QUERY_URL);    
+    verify(mockQuery).processVariableValueEquals(variableName, variableValue);
+    
+    setUpMockedQuery();
+    queryValue = variableName + "_neq_" + variableValue;    
+    given().queryParam("processVariables", queryValue)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .when().get(TASK_QUERY_URL);    
+    verify(mockQuery).processVariableValueNotEquals(variableName, variableValue);
+  }
 }
