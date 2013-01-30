@@ -2,26 +2,28 @@ package com.camunda.fox.cycle.connector.crypt;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.jasypt.util.password.ConfigurablePasswordEncryptor;
 import org.jasypt.util.text.BasicTextEncryptor;
 import org.springframework.stereotype.Component;
 
 @Component
 public class EncryptionServiceImpl implements EncryptionService {
 
+  private static final Logger log = Logger.getLogger(EncryptionServiceImpl.class.getName());
+  
+  public final static String DEFAULT_PASSWORD = "change_the_cycle_password";
+  
   BasicTextEncryptor textEncryptor;
   
-  Logger log = Logger.getLogger(EncryptionServiceImpl.class.getName());
-
-  public final static String DEFAULT_PASSWORD = "change_the_cycle_password";
-
   private String encryptionPassword = null;
   
   private String passwordFilePath = System.getProperty("user.home") + File.separatorChar + "cycle.password";
+  
+  ConfigurablePasswordEncryptor userPasswordEncryptor;
   
   public EncryptionServiceImpl() {}
   
@@ -35,16 +37,21 @@ public class EncryptionServiceImpl implements EncryptionService {
       textEncryptor = new BasicTextEncryptor();
       textEncryptor.setPassword(getEncryptionPassword());
     }
+    if (userPasswordEncryptor == null) {
+      userPasswordEncryptor = new ConfigurablePasswordEncryptor();
+      userPasswordEncryptor.setAlgorithm("SHA-1");
+      userPasswordEncryptor.setPlainDigest(false);
+    }
   }
 
   @Override
-  public String encrypt(String input) {
+  public String encryptConnectorPassword(String input) {
     check();
     return textEncryptor.encrypt(input);
   }
 
   @Override
-  public String decrypt(String input) {
+  public String decryptConnectorPassword(String input) {
     check();
     
     if (input == null){
@@ -89,7 +96,7 @@ public class EncryptionServiceImpl implements EncryptionService {
     System.out.println("Enter the text / password to encrypt:");
     String text = scanner.nextLine();
     scanner.close();
-    System.out.println("Encrypted Result: "+ new EncryptionServiceImpl(password).encrypt(text) );
+    System.out.println("Encrypted Result: "+ new EncryptionServiceImpl(password).encryptConnectorPassword(text) );
   }
 
   public String getPasswordFilePath() {
@@ -102,6 +109,18 @@ public class EncryptionServiceImpl implements EncryptionService {
 
   public void setEncryptionPassword(String encryptionPassword) {
     this.encryptionPassword = encryptionPassword;
+  }
+
+  @Override
+  public String encryptUserPassword(String input) {
+    check();
+    return userPasswordEncryptor.encryptPassword(input);
+  }
+
+  @Override
+  public boolean checkUserPassword(String plain, String digest) {
+    check();
+    return userPasswordEncryptor.checkPassword(plain, digest);
   }
 
 }

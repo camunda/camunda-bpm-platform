@@ -24,6 +24,11 @@ import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
+import org.codehaus.jettison.json.JSONArray;
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
+
+import com.camunda.fox.cycle.exception.CycleException;
 import com.camunda.fox.cycle.http.HttpException;
 import com.camunda.fox.cycle.http.HttpHost;
 import com.camunda.fox.cycle.http.HttpRequest;
@@ -33,7 +38,6 @@ import com.camunda.fox.cycle.http.HttpResponseInterceptor;
 import com.camunda.fox.cycle.http.ParseException;
 import com.camunda.fox.cycle.http.auth.AuthScope;
 import com.camunda.fox.cycle.http.auth.UsernamePasswordCredentials;
-import com.camunda.fox.cycle.http.client.ClientProtocolException;
 import com.camunda.fox.cycle.http.client.HttpRequestRetryHandler;
 import com.camunda.fox.cycle.http.client.fluent.Content;
 import com.camunda.fox.cycle.http.client.fluent.Executor;
@@ -60,11 +64,6 @@ import com.camunda.fox.cycle.http.params.HttpConnectionParams;
 import com.camunda.fox.cycle.http.params.SyncBasicHttpParams;
 import com.camunda.fox.cycle.http.protocol.HttpContext;
 import com.camunda.fox.cycle.http.util.EntityUtils;
-import org.codehaus.jettison.json.JSONArray;
-import org.codehaus.jettison.json.JSONException;
-import org.codehaus.jettison.json.JSONObject;
-
-import com.camunda.fox.cycle.exception.CycleException;
 import com.camunda.fox.cycle.util.IoUtil;
 
 /**
@@ -74,7 +73,7 @@ import com.camunda.fox.cycle.util.IoUtil;
  */
 public class SignavioClient {
 
-  private static Logger logger = Logger.getLogger(SignavioClient.class.getName());
+  private static final Logger logger = Logger.getLogger(SignavioClient.class.getName());
   
   static final String SLASH_CHAR = "/";
   private static final String UTF_8 = "UTF-8";
@@ -97,6 +96,7 @@ public class SignavioClient {
   
   private static final String HEADER_SIGNAVIO_SECURITY_TOKEN = "x-signavio-id";
   
+  private String configurationName;
   private String signavioBaseUrl;
   private String proxyUrl;
   private String proxyUsername;
@@ -110,7 +110,8 @@ public class SignavioClient {
   private String defaultCommitMessage;
 
   
-  public SignavioClient(String signavioBaseUrl, String proxyUrl, String proxyUsername, String proxyPassword, String defaultCommitMessage) throws URISyntaxException {
+  public SignavioClient(String configurationName, String signavioBaseUrl, String proxyUrl, String proxyUsername, String proxyPassword, String defaultCommitMessage) throws URISyntaxException {
+    this.configurationName = configurationName;
     this.signavioBaseUrl = signavioBaseUrl;
     this.proxyUrl = proxyUrl;
     this.proxyUsername = proxyUsername;
@@ -131,12 +132,12 @@ public class SignavioClient {
     
     String responseResult = extractResponseResult(response);
     if (responseResult == null || responseResult.equals("")) {
-      throw new CycleException("Failed to login to connector. The user name and/or password might be incorrect.");
+      throw new CycleException("Could not login into connector '" + configurationName + "'. The user name and/or password might be incorrect.");
     }
     Matcher matcher = Pattern.compile(WARNING_SNIPPET).matcher(responseResult);
     if (matcher.find()) {
       String errorMessage = matcher.group(1);
-      throw new CycleException(errorMessage);
+      throw new CycleException("Could not login into connector '" + configurationName + "'. " + errorMessage);
     }
     
     if (responseResult.matches("[a-f0-9]{32}")) {
@@ -483,20 +484,16 @@ public class SignavioClient {
   protected Content executeAndGetContent(Request request) {
     try {
       return requestExecutor.execute(request).returnContent();
-    } catch (ClientProtocolException e) {
-      throw new RuntimeException(e);
-    } catch (IOException e) {
-      throw new RuntimeException(e);
+    } catch (Exception e) {
+      throw new CycleException("Connector '" + configurationName + "'", e);
     }
   }
   
   protected HttpResponse executeAndGetResponse(Request request) {
     try {
       return requestExecutor.execute(request).returnResponse();
-    } catch (ClientProtocolException e) {
-      throw new RuntimeException(e);
-    } catch (IOException e) {
-      throw new RuntimeException(e);
+    } catch (Exception e) {
+      throw new CycleException("Connector '" + configurationName + "'", e);
     }
   }
   
@@ -522,7 +519,7 @@ public class SignavioClient {
       logger.fine(requestURI.toString());
       return requestURI;
     } catch (URISyntaxException e) {
-      throw new RuntimeException("Failed to construct url for signavio request.", e);
+      throw new CycleException("Failed to construct url for signavio request.", e);
     }
   }
   
@@ -533,7 +530,11 @@ public class SignavioClient {
   
   private String extractResponseResult(HttpResponse response) {
     try {
-      return EntityUtils.toString(response.getEntity(), Charset.forName(UTF_8));
+      String payload = EntityUtils.toString(response.getEntity(), Charset.forName(UTF_8));
+      if (payload.contains("An error occurred (unauthorized)")) {
+        throw new CycleException("Could not login into connector '" + configurationName + "'. The user name and/or password might be incorrect.");
+      }
+      return payload;
     } catch (IOException e) {
       throw new CycleException(e.getMessage(), e);
     } finally {

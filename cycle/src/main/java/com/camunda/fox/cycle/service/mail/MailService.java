@@ -65,13 +65,13 @@ public class MailService {
       throw new MailServiceException("Cannot send "+emailName+ "; username is null");
     }
     if(password == null) {
-      throw new MailServiceException("Cannot send "+password+ "; username is null");
+      throw new MailServiceException("Cannot send "+password+ "; password is null");
     }
     if(from == null) {
-      throw new MailServiceException("Cannot send "+from+ "; username is null");
+      throw new MailServiceException("Cannot send "+from+ "; sender is null");
     }
     if(receiver == null) {
-      throw new MailServiceException("Cannot send "+receiver+ "; username is null");
+      throw new MailServiceException("Cannot send "+receiver+ "; recipient is null");
     }
   }
 

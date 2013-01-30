@@ -10,6 +10,7 @@ import javax.security.auth.login.LoginException;
 
 import org.springframework.stereotype.Component;
 
+import com.camunda.fox.cycle.connector.crypt.EncryptionService;
 import com.camunda.fox.cycle.entity.User;
 import com.camunda.fox.license.FoxLicenseService;
 import com.camunda.fox.license.entity.FoxComponent;
@@ -31,9 +32,11 @@ public class SecurityService {
   
   @Inject
   private SecurityConfiguration config;
-  
   @Inject
   private UserLookup userLookup;
+  @Inject
+  private EncryptionService encryptionService;
+  
     
   public UserIdentity login(String userName, String password) throws FoxLicenseException, FoxLicenseNotFoundException {
     if (userName == null || password == null) {
@@ -78,8 +81,7 @@ public class SecurityService {
       return null;
     }
     
-    // todo: encrypt
-    if (user.getPassword().equals(password)) {
+    if (encryptionService.checkUserPassword(password, user.getPassword())) {
       return new UserIdentity(user);
     }
 

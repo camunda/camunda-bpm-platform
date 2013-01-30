@@ -3,7 +3,6 @@ package com.camunda.fox.cycle.service.mail;
 import java.util.Arrays;
 
 import javax.inject.Inject;
-import javax.mail.Address;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Session;
@@ -40,12 +39,9 @@ public class DefaultMailSessionProvider implements MailSessionProvider {
 
     if (mailSessionName == null) {
       return tryAutoDetectMailSession();
-
     } else {
       return performLookup(mailSessionName);
-
     }
-
   }
   
   protected Session performLookup(String mailSessionName) {
@@ -73,7 +69,7 @@ public class DefaultMailSessionProvider implements MailSessionProvider {
       }      
     }
     
-    throw new MailServiceException("No mail session URL configured and could not autodect mail session using names "+Arrays.toString(mailSessionNames));
+    throw new MailServiceException("No mail session URL configured and could not autodetect mail session using names "+Arrays.toString(mailSessionNames));
    
   }
 
@@ -90,9 +86,7 @@ public class DefaultMailSessionProvider implements MailSessionProvider {
   @Override
   public void sendMail(Message msg, Session session) {
     try {
-       
       Transport.send(msg);
-      
     } catch (MessagingException e) {
       throw new MailServiceException("Could not send message using the default Transport", e);
     }

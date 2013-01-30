@@ -132,13 +132,17 @@ angular
       },
       removeError: function(error) {
     	var idx = this.errors.indexOf(error);
-    	this.errors.splice(idx,1);  
+    	  this.errors.splice(idx,1);  
+      },
+      removeAllErrors: function() {
+        // not assigning a new [], because it still can be referenced somewhere => memory leak
+        this.errors.length = 0;
       },
       registerErrorConsumer: function(callback) {
-    	this.errorConsumers.push(callback);  
+        this.errorConsumers.push(callback);  
       },
       unregisterErrorConsumer: function(callback) {
-    	this.errorConsumers.splice(this.errorConsumers.indexOf(callback),1);
+        this.errorConsumers.splice(this.errorConsumers.indexOf(callback),1);
       }      
     };
   })
@@ -162,14 +166,18 @@ angular
       RequestStatus.setBusy(true);  
       
       return promise.then(function (response, arg1, arg2)  {
-    	RequestStatus.setBusy(false);
+        RequestStatus.setBusy(false);
         return promise;
         
       }, function (response) {    	  
-    	RequestStatus.setBusy(false);
+        RequestStatus.setBusy(false);
     	
         if (parseInt(response.status) == 500) {
-          Error.addError({ "status" : "Error" , "config" :  response.config });     
+          if (response.data && response.data.message) {
+            Error.addError({ "status" : "Error" , "config" :  response.data.message , "type" : response.data.exceptionType });
+          } else {
+            Error.addError({ "status" : "Error" , "config" :  "A problem occurred: try logging out of cycle and logging back in. If the problem persists, contact your administrator." });     
+          }
           
         } else if (parseInt(response.status) == 0) {
           Error.addError({ "status" : "Request Timeout" , "config" :  "Your request timed out. Try refreshing the page." });
@@ -177,7 +185,9 @@ angular
         } else if (parseInt(response.status) == 401) {
           Error.addError({ "status" : "Unauthorized" , "config" :  "Your session has probably expired. Try refreshing the page and login again." });
           
-        }          
+        } else {
+          Error.addError({ "status" : "Error" , "config" :  "A problem occurred: try logging out of cycle and logging back in. If the problem persists, contact your administrator." });
+        }         
         return $q.reject(response);
       });
     };

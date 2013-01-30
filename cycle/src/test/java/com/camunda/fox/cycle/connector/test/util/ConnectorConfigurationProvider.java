@@ -50,7 +50,7 @@ public class ConnectorConfigurationProvider {
     ConnectorConfiguration copy = new ConnectorConfiguration();
     copy.setConnectorClass(config.getConnectorClass());
     copy.setConnectorName(config.getConnectorName());
-    copy.setGlobalPassword(encryptionService.encrypt(config.getGlobalPassword()));
+    copy.setGlobalPassword(encryptionService.encryptConnectorPassword(config.getGlobalPassword()));
     copy.setGlobalUser(config.getGlobalUser());
     copy.setLoginMode(config.getLoginMode());
     copy.setName(config.getName());

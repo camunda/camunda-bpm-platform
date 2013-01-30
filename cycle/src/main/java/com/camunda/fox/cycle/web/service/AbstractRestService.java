@@ -3,6 +3,7 @@ package com.camunda.fox.cycle.web.service;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
@@ -34,7 +35,6 @@ public class AbstractRestService {
    * @return 
    */
   protected WebApplicationException notFound(String message) {
-    
     return createWebApplicationException(message, Response.Status.NOT_FOUND);
   }
 
@@ -57,9 +57,23 @@ public class AbstractRestService {
   protected WebApplicationException notAllowed(String message) {
     return createWebApplicationException(message, Response.Status.FORBIDDEN);
   }
+  
+  /**
+   * Issue a internal server error response with the given reason
+   * 
+   * @param message
+   * @return 
+   */
+  protected WebApplicationException internalServerError(String message) {
+    return createWebApplicationException(message, Response.Status.INTERNAL_SERVER_ERROR);
+  }
 
   private WebApplicationException createWebApplicationException(String message, Response.Status status) {
-    Response response = JaxRsUtil.createResponse().status(status).entity(message).build();
+    ResponseBuilder responseBuilder = JaxRsUtil.createResponse().status(status);
+    if (message == null) {
+      responseBuilder.entity(message);
+    }
+    Response response = responseBuilder.build();
     return new WebApplicationException(response);
   }
   

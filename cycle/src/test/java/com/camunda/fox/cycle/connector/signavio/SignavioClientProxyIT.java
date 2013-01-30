@@ -34,6 +34,7 @@ import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
 import com.camunda.fox.cycle.entity.ConnectorConfiguration;
+import com.camunda.fox.cycle.exception.CycleException;
 import com.camunda.fox.cycle.util.BpmnNamespaceContext;
 import com.camunda.fox.cycle.util.IoUtil;
 
@@ -54,7 +55,8 @@ public class SignavioClientProxyIT {
   public void setUp() throws Exception {
     configuration = connectorConfiguration.get(1);
     signavioClient = 
-            new SignavioClient(configuration.getProperties().get(SignavioConnector.CONFIG_KEY_SIGNAVIO_BASE_URL),
+            new SignavioClient(configuration.getName(),
+                               configuration.getProperties().get(SignavioConnector.CONFIG_KEY_SIGNAVIO_BASE_URL),
                                configuration.getProperties().get(SignavioConnector.CONFIG_KEY_PROXY_URL),
                                configuration.getProperties().get(SignavioConnector.CONFIG_KEY_PROXY_USERNAME),
                                configuration.getProperties().get(SignavioConnector.CONFIG_KEY_PROXY_PASSWORD),
@@ -197,7 +199,7 @@ public class SignavioClientProxyIT {
     }
   }
 
-  @Test(expected=NullPointerException.class)
+  @Test(expected=CycleException.class)
   public void testDispose() {
     signavioClient.dispose();
     // should throw NPE

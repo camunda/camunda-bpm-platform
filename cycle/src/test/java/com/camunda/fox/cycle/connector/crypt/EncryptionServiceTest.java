@@ -3,6 +3,7 @@ package com.camunda.fox.cycle.connector.crypt;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotSame;
+import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -14,6 +15,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
+import org.springframework.test.AssertThrows;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -53,13 +55,13 @@ public class EncryptionServiceTest {
    */
   @Test
   public void testEncryption() {
-    String testText = new EncryptionServiceImpl(TEST_PASSWORD).encrypt(TEST_TEXT);
-    assertEquals(TEST_TEXT, new EncryptionServiceImpl(TEST_PASSWORD).decrypt(testText));
+    String testText = new EncryptionServiceImpl(TEST_PASSWORD).encryptConnectorPassword(TEST_TEXT);
+    assertEquals(TEST_TEXT, new EncryptionServiceImpl(TEST_PASSWORD).decryptConnectorPassword(testText));
   }
 
   @Test(expected = EncryptionException.class)
   public void testReadingFromFile() {
-    String testText = new EncryptionServiceImpl(TEST_PASSWORD).encrypt(TEST_TEXT);
+    String testText = new EncryptionServiceImpl(TEST_PASSWORD).encryptConnectorPassword(TEST_TEXT);
 
     EncryptionServiceImpl service = new EncryptionServiceImpl();
     service.setPasswordFilePath(passwordFile.getPath());
@@ -67,7 +69,7 @@ public class EncryptionServiceTest {
     assertEquals(TEST_PASSWORD_FILE, service.getEncryptionPassword());
     assertFalse(service.getEncryptionPassword().isEmpty());
 
-    assertNotSame(TEST_TEXT, service.decrypt(testText));
+    assertNotSame(TEST_TEXT, service.decryptConnectorPassword(testText));
   }
 
   @Test
@@ -122,6 +124,15 @@ public class EncryptionServiceTest {
 
     Mockito.verify(connectorMock).login(userArgument.capture(), passwordArgument.capture());
     assertEquals("test", passwordArgument.getValue());
+  }
+  
+  @Test
+  public void testUserPasswordEncryption() {
+    String plain = "mypassword";
+    
+    EncryptionService service = new EncryptionServiceImpl();
+    String digest = service.encryptUserPassword(plain);
+    assertTrue(service.checkUserPassword(plain, digest));
   }
 
   @Before

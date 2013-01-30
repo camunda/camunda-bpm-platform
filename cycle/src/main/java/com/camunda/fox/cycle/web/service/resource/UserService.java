@@ -18,6 +18,7 @@ import javax.ws.rs.core.MediaType;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.camunda.fox.cycle.configuration.CycleConfiguration;
+import com.camunda.fox.cycle.connector.crypt.EncryptionService;
 import com.camunda.fox.cycle.entity.User;
 import com.camunda.fox.cycle.repository.UserRepository;
 import com.camunda.fox.cycle.security.IdentityHolder;
@@ -46,12 +47,12 @@ public class UserService extends AbstractRestService {
 
   @Inject
   private UserRepository userRepository;
-  
   @Inject
   private MailService mailService;
-  
   @Inject
   private CycleConfiguration configuration;
+  @Inject
+  private EncryptionService encryptionService;
 
   /**
    * $resource specific methods
@@ -89,7 +90,7 @@ public class UserService extends AbstractRestService {
     User user = new User();
     update(user, data);
     
-    String sendEmailResult = sendWelcomeEmail(user);
+    String sendEmailResult = sendWelcomeEmail(user, data.getPassword());
     // TODO: add email operation status result to response
     
     return UserDTO.wrap(userRepository.saveAndFlush(user));
@@ -122,18 +123,14 @@ public class UserService extends AbstractRestService {
   @Produces(MediaType.APPLICATION_JSON)
   @Path("{id}/changePassword")
   @Transactional
-  public String changePassword(
-      @PathParam("id") long userId, PasswordChangeDTO data) {
+  public String changePassword(@PathParam("id") long userId, PasswordChangeDTO data) {
     
     UserIdentity principal = IdentityHolder.getIdentity();
     User user = getUserById(userId);
     
     if (principal != null && principal.getName().equals(user.getName())) {
-      
-      // TODO: decrypt password
-      if (data.getOldPassword().equals(user.getPassword())) {
-        // TODO: encrypt password
-        user.setPassword(data.getNewPassword());
+      if (encryptionService.checkUserPassword(data.getOldPassword(), user.getPassword())) {
+        user.setPassword(encryptionService.encryptUserPassword(data.getNewPassword()));
         return "Ok";
       }
     }
@@ -153,14 +150,13 @@ public class UserService extends AbstractRestService {
     
     user.setAdmin(data.isAdmin());
     
-    // TODO: encrypt password
     if (data.getPassword() != null) {
-      user.setPassword(data.getPassword());
+      user.setPassword(encryptionService.encryptUserPassword(data.getPassword()));
     }
   }
   
   /**
-   * Sends a welcome email to the user. If the email can be sent sucessfully,
+   * Sends a welcome email to the user. If the email can be sent successfully,
    * this method returns the string "success". Otherwise this method returns an
    * exception message.
    * 
@@ -168,12 +164,11 @@ public class UserService extends AbstractRestService {
    *          the new user
    * @return a string indicating the outcome of the email sending operation
    */
-  protected String sendWelcomeEmail(User user) {
+  protected String sendWelcomeEmail(User user, String password) {
     
     String emailFrom = configuration.getEmailFrom();
     
     String email = user.getEmail();
-    String password = user.getPassword();
     
     try {
       
