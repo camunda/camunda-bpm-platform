@@ -4,7 +4,7 @@ import static com.jayway.restassured.RestAssured.expect;
 import static com.jayway.restassured.RestAssured.given;
 import static com.jayway.restassured.path.json.JsonPath.from;
 import static org.mockito.Matchers.any;
-import static org.mockito.Mockito.argThat;
+import static org.mockito.Matchers.argThat;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -17,7 +17,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
 import org.activiti.engine.impl.util.json.JSONArray;
@@ -480,7 +479,7 @@ public class TaskRestServiceTest extends AbstractRestServiceTest {
     
     String body = json.toString();
     
-    given().contentType(MediaType.APPLICATION_JSON).body(body)
+    given().contentType(POST_JSON_CONTENT_TYPE).body(body)
       .then().expect().statusCode(Status.OK.getStatusCode())
       .when().post(TASK_QUERY_URL);
     
@@ -505,7 +504,7 @@ public class TaskRestServiceTest extends AbstractRestServiceTest {
     
     queryParameters.put("candidateGroups", candidateGroups);
     
-    given().contentType(MediaType.APPLICATION_JSON).body(queryParameters)
+    given().contentType(POST_JSON_CONTENT_TYPE).body(queryParameters)
       .expect().statusCode(Status.OK.getStatusCode())
       .when().post(TASK_QUERY_URL);
     

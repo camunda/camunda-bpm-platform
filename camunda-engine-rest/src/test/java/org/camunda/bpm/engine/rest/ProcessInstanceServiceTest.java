@@ -270,7 +270,7 @@ public class ProcessInstanceServiceTest extends AbstractRestServiceTest {
     
     String body = json.toString();
     
-    given().contentType(MediaType.APPLICATION_JSON).body(body)
+    given().contentType(POST_JSON_CONTENT_TYPE).body(body)
       .then().expect().statusCode(Status.OK.getStatusCode())
       .when().post(PROCESS_INSTANCE_QUERY_URL);
     
@@ -285,7 +285,7 @@ public class ProcessInstanceServiceTest extends AbstractRestServiceTest {
     
     Map<String, String> queryParameters = getCompleteQueryParameters();
     
-    given().contentType(MediaType.APPLICATION_JSON).body(queryParameters)
+    given().contentType(POST_JSON_CONTENT_TYPE).body(queryParameters)
       .expect().statusCode(Status.OK.getStatusCode())
       .when().post(PROCESS_INSTANCE_QUERY_URL);
     
