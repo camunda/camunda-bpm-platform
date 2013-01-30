@@ -77,7 +77,28 @@ public abstract class SortableParameterizedQueryDto {
           if (parameterAnnotation.value().equals(key)) {
             Class<? extends StringToTypeConverter<?>> converterClass = ((CamundaQueryParam) annotation).converter();
             StringToTypeConverter<?> converter = converterClass.newInstance();
-            Object convertedValue = converter.convertToType(value);
+            Object convertedValue = converter.convertQueryParameterToType(value);
+            method.invoke(this, convertedValue);
+          }
+        }
+      }
+    }
+  }
+  
+  public void setJSONValueBasedOnAnnotation(String key, String value) throws IllegalArgumentException, IllegalAccessException, InvocationTargetException, InstantiationException {
+    Method[] methods = this.getClass().getMethods();
+    for (int i = 0; i < methods.length; i++) {
+      Method method = methods[i];
+      Annotation[] methodAnnotations = method.getAnnotations();
+      
+      for (int j = 0; j < methodAnnotations.length; j++) {
+        Annotation annotation = methodAnnotations[j];
+        if (annotation instanceof CamundaQueryParam) {
+          CamundaQueryParam parameterAnnotation = (CamundaQueryParam) annotation;
+          if (parameterAnnotation.value().equals(key)) {
+            Class<? extends StringToTypeConverter<?>> converterClass = ((CamundaQueryParam) annotation).converter();
+            StringToTypeConverter<?> converter = converterClass.newInstance();
+            Object convertedValue = converter.convertFromJsonToType(value);
             method.invoke(this, convertedValue);
           }
         }

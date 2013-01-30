@@ -53,4 +53,10 @@ public class ProcessInstanceServiceImpl extends AbstractEngineService implements
     return query.listPage(firstResult, maxResults); 
   }
 
+  @Override
+  public List<ProcessInstanceDto> queryProcessInstances(
+      ProcessInstanceQueryDto query, Integer firstResult, Integer maxResults) {
+    return getProcessInstances(query, firstResult, maxResults);
+  }
+
 }

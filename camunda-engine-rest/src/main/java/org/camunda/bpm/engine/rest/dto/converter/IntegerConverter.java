@@ -3,7 +3,12 @@ package org.camunda.bpm.engine.rest.dto.converter;
 public class IntegerConverter implements StringToTypeConverter<Integer> {
 
   @Override
-  public Integer convertToType(String value) {
+  public Integer convertQueryParameterToType(String value) {
+    return new Integer(value);
+  }
+
+  @Override
+  public Integer convertFromJsonToType(String value) {
     return new Integer(value);
   }
 

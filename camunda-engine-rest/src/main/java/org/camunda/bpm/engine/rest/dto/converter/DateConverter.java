@@ -7,7 +7,12 @@ import org.joda.time.DateTime;
 public class DateConverter implements StringToTypeConverter<Date> {
 
   @Override
-  public Date convertToType(String value) {
+  public Date convertQueryParameterToType(String value) {
+    return DateTime.parse(value).toDate();
+  }
+
+  @Override
+  public Date convertFromJsonToType(String value) {
     return DateTime.parse(value).toDate();
   }
 

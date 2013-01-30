@@ -54,4 +54,10 @@ public class TaskRestServiceImpl extends AbstractEngineService implements TaskRe
     return query.listPage(firstResult, maxResults); 
   }
 
+  @Override
+  public List<TaskDto> queryTasks(TaskQueryDto query, Integer firstResult,
+      Integer maxResults) {
+    return getTasks(query, firstResult, maxResults);
+  }
+
 }

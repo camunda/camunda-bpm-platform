@@ -8,5 +8,7 @@ package org.camunda.bpm.engine.rest.dto.converter;
  */
 public interface StringToTypeConverter<T> {
 
-  T convertToType(String value);
+  T convertQueryParameterToType(String value);
+  
+  T convertFromJsonToType(String value);
 }

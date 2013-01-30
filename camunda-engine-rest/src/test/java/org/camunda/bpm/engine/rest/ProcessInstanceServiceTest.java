@@ -13,8 +13,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
+import org.activiti.engine.impl.util.json.JSONArray;
+import org.activiti.engine.impl.util.json.JSONObject;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.runtime.ProcessInstanceQuery;
 import org.junit.Assert;
@@ -154,8 +157,6 @@ public class ProcessInstanceServiceTest extends AbstractRestServiceTest {
     verify(mockedQuery).list();
   }
   
-  
-  
   private Map<String, String> getCompleteQueryParameters() {
     Map<String, String> parameters = new HashMap<String, String>();
     
@@ -166,7 +167,6 @@ public class ProcessInstanceServiceTest extends AbstractRestServiceTest {
     parameters.put("sub", "aSubProcInstId");
     parameters.put("suspended", "true");
     parameters.put("active", "true");
-    
     
     return parameters;
   }
@@ -241,6 +241,62 @@ public class ProcessInstanceServiceTest extends AbstractRestServiceTest {
     given().queryParam("variables", queryValue)
       .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
       .when().get(PROCESS_INSTANCE_QUERY_URL);
+  }
+  
+  @Test
+  public void testMultipleVariableParametersAsPost() {
+    setUpMockedQuery();
+    
+    String variableName = "varName";
+    String variableValue = "varValue";
+    JSONObject queryVariable = new JSONObject();
+    queryVariable.put("name", variableName);
+    queryVariable.put("operator", "eq");
+    queryVariable.put("value", variableValue);
+    
+    String anotherVariableName = "anotherVarName";
+    Integer anotherVariableValue = 30;
+    JSONObject anotherQueryVariable = new JSONObject();
+    anotherQueryVariable.put("name", anotherVariableName);
+    anotherQueryVariable.put("operator", "neq");
+    anotherQueryVariable.put("value", anotherVariableValue);
+    
+    JSONObject json = new JSONObject();
+    JSONArray queryVariables = new JSONArray();
+    queryVariables.put(queryVariable);
+    queryVariables.put(anotherQueryVariable);
+    
+    json.put("variables", queryVariables);
+    
+    String body = json.toString();
+    
+    given().contentType(MediaType.APPLICATION_JSON).body(body)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .when().post(PROCESS_INSTANCE_QUERY_URL);
+    
+    verify(mockedQuery).variableValueEquals(variableName, variableValue);
+    verify(mockedQuery).variableValueNotEquals(anotherVariableName, anotherVariableValue);
+    
+  }
+  
+  @Test
+  public void testCompletePostParameters() {
+    setUpMockedQuery();
+    
+    Map<String, String> queryParameters = getCompleteQueryParameters();
+    
+    given().contentType(MediaType.APPLICATION_JSON).body(queryParameters)
+      .expect().statusCode(Status.OK.getStatusCode())
+      .when().post(PROCESS_INSTANCE_QUERY_URL);
+    
+    verify(mockedQuery).processInstanceBusinessKey(queryParameters.get("businessKey"));
+    verify(mockedQuery).processDefinitionKey(queryParameters.get("processDefinitionKey"));
+    verify(mockedQuery).processDefinitionId(queryParameters.get("processDefinitionId"));
+    verify(mockedQuery).superProcessInstanceId(queryParameters.get("super"));
+    verify(mockedQuery).subProcessInstanceId(queryParameters.get("sub"));
+    verify(mockedQuery).suspended();
+    verify(mockedQuery).active();
+    verify(mockedQuery).list();
   }
   
   @Test
