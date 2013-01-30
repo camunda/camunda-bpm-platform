@@ -1,13 +1,13 @@
 package org.camunda.bpm.engine.rest.dto;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.repository.ProcessDefinitionQuery;
+import org.camunda.bpm.engine.rest.dto.converter.BooleanConverter;
+import org.camunda.bpm.engine.rest.dto.converter.IntegerConverter;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
-import org.camunda.bpm.engine.rest.exception.RestException;
 
 public class ProcessDefinitionQueryDto extends SortableParameterizedQueryDto {
 
@@ -79,12 +79,12 @@ public class ProcessDefinitionQueryDto extends SortableParameterizedQueryDto {
     this.keyLike = keyLike;
   }
   
-  @CamundaQueryParam("ver")
+  @CamundaQueryParam(value = "ver", converter = IntegerConverter.class)
   public void setVersion(Integer version) {
     this.version = version;
   }
   
-  @CamundaQueryParam("latest")
+  @CamundaQueryParam(value = "latest", converter = BooleanConverter.class)
   public void setLatestVersion(Boolean latestVersion) {
     this.latestVersion = latestVersion;
   }
@@ -104,12 +104,12 @@ public class ProcessDefinitionQueryDto extends SortableParameterizedQueryDto {
     this.startableBy = startableBy;
   }
   
-  @CamundaQueryParam("active")
+  @CamundaQueryParam(value = "active", converter = BooleanConverter.class)
   public void setActive(Boolean active) {
     this.active = active;
   }
   
-  @CamundaQueryParam("suspended")
+  @CamundaQueryParam(value = "suspended", converter = BooleanConverter.class)
   public void setSuspended(Boolean suspended) {
     this.suspended = suspended;
   }
@@ -199,26 +199,4 @@ public class ProcessDefinitionQueryDto extends SortableParameterizedQueryDto {
     
     return query;
   }
-  
-  @Override
-  public void setPropertyFromParameterPair(String key, String value) {
-    try {
-      if (key.equals("active") || key.equals("suspended") || key.equals("latest")) {
-        Boolean booleanValue = new Boolean(value);
-        setValueBasedOnAnnotation(key, booleanValue);
-      } else if (key.equals("ver")) {
-        Integer intValue = new Integer(value);
-        setValueBasedOnAnnotation(key, intValue);
-      } else {
-        setValueBasedOnAnnotation(key, value);
-      }
-    } catch (IllegalArgumentException e) {
-      throw new InvalidRequestException("Cannot set parameter.");
-    } catch (IllegalAccessException e) {
-      throw new RestException("Cannot set parameter.");
-    } catch (InvocationTargetException e) {
-      throw new InvalidRequestException(e.getTargetException().getMessage());
-    }
-  }
-
 }

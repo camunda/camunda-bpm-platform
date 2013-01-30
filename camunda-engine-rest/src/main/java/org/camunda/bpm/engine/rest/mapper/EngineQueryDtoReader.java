@@ -3,6 +3,7 @@ package org.camunda.bpm.engine.rest.mapper;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map.Entry;
@@ -25,11 +26,13 @@ import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 
 /**
- * A {@link MessageBodyReader} that populates subclasses of {@link SortableParameterizedQueryDto} from query parameters.
- * Parameters are matched to setter methods in the class that are annotated with {@link CamundaQueryParam}.
+ * A {@link MessageBodyReader} that populates subclasses of
+ * {@link SortableParameterizedQueryDto} from query parameters. Parameters are
+ * matched to setter methods in the class that are annotated with
+ * {@link CamundaQueryParam}.
  * 
  * @author Thorben Lindhauer
- *
+ * 
  */
 @Provider
 public class EngineQueryDtoReader implements
@@ -39,8 +42,8 @@ public class EngineQueryDtoReader implements
   private UriInfo context;
 
   @Override
-  public boolean isReadable(Class<?> clazz, Type genericType, Annotation[] annotations,
-      MediaType mediaType) {
+  public boolean isReadable(Class<?> clazz, Type genericType,
+      Annotation[] annotations, MediaType mediaType) {
     if (clazz == ProcessDefinitionQueryDto.class) {
       return true;
     }
@@ -55,33 +58,41 @@ public class EngineQueryDtoReader implements
 
   @Override
   public SortableParameterizedQueryDto readFrom(
-      Class<SortableParameterizedQueryDto> clazz, Type genericType, Annotation[] annotations,
-      MediaType mediaType, MultivaluedMap<String, String> httpHeaders, InputStream entityStream)
+      Class<SortableParameterizedQueryDto> clazz, Type genericType,
+      Annotation[] annotations, MediaType mediaType,
+      MultivaluedMap<String, String> httpHeaders, InputStream entityStream)
       throws IOException, WebApplicationException {
-    
-    MultivaluedMap<String, String> queryParameters = context.getQueryParameters();
+
+    MultivaluedMap<String, String> queryParameters = context
+        .getQueryParameters();
     SortableParameterizedQueryDto queryDto;
     try {
-       queryDto = clazz.newInstance();
+      queryDto = clazz.newInstance();
     } catch (InstantiationException e) {
-      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR.getStatusCode());
+      throw new WebApplicationException(
+          Status.INTERNAL_SERVER_ERROR.getStatusCode());
     } catch (IllegalAccessException e) {
-      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR.getStatusCode());
+      throw new WebApplicationException(
+          Status.INTERNAL_SERVER_ERROR.getStatusCode());
     }
-  
-     for (Entry<String, List<String>> param : queryParameters.entrySet()) {
-       String key = param.getKey();
-       String value = param.getValue().iterator().next();
-       
-       try {
-         queryDto.setPropertyFromParameterPair(key, value);
-       } catch (InvalidRequestException e) {
-         throw new WebApplicationException(Status.BAD_REQUEST.getStatusCode());
-       } catch (RestException e) {
-         throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR.getStatusCode());
-       }
-     }
-    
+
+    for (Entry<String, List<String>> param : queryParameters.entrySet()) {
+      String key = param.getKey();
+      String value = param.getValue().iterator().next();
+
+      try {
+        queryDto.setValueBasedOnAnnotation(key, value);
+      } catch (IllegalArgumentException e) {
+        throw new InvalidRequestException("Cannot set parameter.");
+      } catch (IllegalAccessException e) {
+        throw new RestException("Server error.");
+      } catch (InvocationTargetException e) {
+        throw new InvalidRequestException("Cannot set parameter.");
+      } catch (InstantiationException e) {
+        throw new RestException("Server error.");
+      }
+    }
+
     return queryDto;
   }
 

@@ -1,16 +1,14 @@
 package org.camunda.bpm.engine.rest.dto;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.impl.QueryOperator;
 import org.activiti.engine.runtime.ProcessInstanceQuery;
+import org.camunda.bpm.engine.rest.dto.converter.BooleanConverter;
+import org.camunda.bpm.engine.rest.dto.converter.VariableListConverter;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
-import org.camunda.bpm.engine.rest.exception.RestException;
-
-import com.google.common.collect.Lists;
 
 public class ProcessInstanceQueryDto extends SortableParameterizedQueryDto {
 
@@ -65,17 +63,17 @@ public class ProcessInstanceQueryDto extends SortableParameterizedQueryDto {
     this.subProcessInstanceId = subProcessInstanceId;
   }
 
-  @CamundaQueryParam("active")
+  @CamundaQueryParam(value = "active", converter = BooleanConverter.class)
   public void setActive(Boolean active) {
     this.active = active;
   }
 
-  @CamundaQueryParam("suspended")
+  @CamundaQueryParam(value = "suspended", converter = BooleanConverter.class)
   public void setSuspended(Boolean suspended) {
     this.suspended = suspended;
   }
 
-  @CamundaQueryParam("variables")
+  @CamundaQueryParam(value = "variables", converter = VariableListConverter.class)
   public void setVariables(List<VariableQueryParameterDto> variables) {
     this.variables = variables;
   }
@@ -143,35 +141,4 @@ public class ProcessInstanceQueryDto extends SortableParameterizedQueryDto {
     return query;
   }
   
-  @Override
-  public void setPropertyFromParameterPair(String key, String value) {
-    try {
-      if (key.equals("variables")) {
-        VariableQueryParameterDto queryVariable = new VariableQueryParameterDto();
-        
-        String[] valueTriple = value.split("_");
-        if (valueTriple.length != 3) {
-          throw new InvalidRequestException("variable query parameter has to have format KEY_OPERATOR_VALUE.");
-        }
-        queryVariable.setVariableKey(valueTriple[0]);
-        queryVariable.setOperator(QueryOperator.valueOf(valueTriple[1].toUpperCase()));
-        queryVariable.setVariableValue(valueTriple[2]);
-        
-        List<VariableQueryParameterDto> queryVariables = Lists.newArrayList(queryVariable);
-        setValueBasedOnAnnotation(key, queryVariables);
-      }
-      else if (key.equals("active") || key.equals("suspended")) {
-        Boolean booleanValue = new Boolean(value);
-        setValueBasedOnAnnotation(key, booleanValue);
-      } else {
-      setValueBasedOnAnnotation(key, value);
-      }
-    } catch (IllegalArgumentException e) {
-      throw new InvalidRequestException("Cannot set parameter.");
-    } catch (IllegalAccessException e) {
-      throw new RestException("Cannot set parameter.");
-    } catch (InvocationTargetException e) {
-      throw new InvalidRequestException(e.getTargetException().getMessage());
-    }
-  }
 }

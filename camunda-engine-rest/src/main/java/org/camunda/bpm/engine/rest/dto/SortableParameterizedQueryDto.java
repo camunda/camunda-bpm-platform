@@ -6,6 +6,7 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.camunda.bpm.engine.rest.dto.converter.StringToTypeConverter;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 
 /**
@@ -53,7 +54,17 @@ public abstract class SortableParameterizedQueryDto {
     return (sortBy != null && sortOrder != null) || (sortBy == null && sortOrder == null);
   }
   
-  protected void setValueBasedOnAnnotation(String key, Object value) throws IllegalArgumentException, IllegalAccessException, InvocationTargetException {
+  /**
+   * Finds the method that is annotated with a {@link CamundaQueryParam} with a value that matches the key parameter.
+   * Before invoking this method, the annotated {@link StringToTypeConverter} is used to convert the String value to the desired Java type.
+   * @param key
+   * @param value
+   * @throws IllegalArgumentException
+   * @throws IllegalAccessException
+   * @throws InvocationTargetException
+   * @throws InstantiationException
+   */
+  public void setValueBasedOnAnnotation(String key, String value) throws IllegalArgumentException, IllegalAccessException, InvocationTargetException, InstantiationException {
     Method[] methods = this.getClass().getMethods();
     for (int i = 0; i < methods.length; i++) {
       Method method = methods[i];
@@ -64,12 +75,14 @@ public abstract class SortableParameterizedQueryDto {
         if (annotation instanceof CamundaQueryParam) {
           CamundaQueryParam parameterAnnotation = (CamundaQueryParam) annotation;
           if (parameterAnnotation.value().equals(key)) {
-            method.invoke(this, value);
+            Class<? extends StringToTypeConverter<?>> converterClass = ((CamundaQueryParam) annotation).converter();
+            StringToTypeConverter<?> converter = converterClass.newInstance();
+            Object convertedValue = converter.convertToType(value);
+            method.invoke(this, convertedValue);
           }
         }
       }
     }
   }
   
-  public abstract void setPropertyFromParameterPair(String key, String value);
 }
