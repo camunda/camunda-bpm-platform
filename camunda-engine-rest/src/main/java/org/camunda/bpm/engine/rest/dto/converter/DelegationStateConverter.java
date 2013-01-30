@@ -5,7 +5,12 @@ import org.activiti.engine.task.DelegationState;
 public class DelegationStateConverter implements StringToTypeConverter<DelegationState> {
 
   @Override
-  public DelegationState convertToType(String value) {
+  public DelegationState convertQueryParameterToType(String value) {
+    return DelegationState.valueOf(value.toUpperCase());
+  }
+
+  @Override
+  public DelegationState convertFromJsonToType(String value) {
     return DelegationState.valueOf(value.toUpperCase());
   }
 

@@ -17,8 +17,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
+import org.activiti.engine.impl.util.json.JSONArray;
+import org.activiti.engine.impl.util.json.JSONObject;
 import org.activiti.engine.task.DelegationState;
 import org.activiti.engine.task.Task;
 import org.activiti.engine.task.TaskQuery;
@@ -166,30 +169,20 @@ public class TaskRestServiceTest extends AbstractRestServiceTest {
       .expect().statusCode(Status.OK.getStatusCode())
       .when().get(TASK_QUERY_URL);
     
-    verify(mockQuery).processInstanceBusinessKey(stringQueryParameters.get("processInstanceBusinessKey"));
-    verify(mockQuery).processDefinitionKey(stringQueryParameters.get("processDefinitionKey"));
-    verify(mockQuery).processDefinitionId(stringQueryParameters.get("processDefinitionId"));
-    verify(mockQuery).executionId(stringQueryParameters.get("executionId"));
-    verify(mockQuery).processDefinitionName(stringQueryParameters.get("processDefinitionName"));
-    verify(mockQuery).processInstanceId(stringQueryParameters.get("processInstanceId"));
-    verify(mockQuery).taskAssignee(stringQueryParameters.get("assignee"));
-    verify(mockQuery).taskCandidateGroup(stringQueryParameters.get("candidateGroup"));
-    verify(mockQuery).taskCandidateUser(stringQueryParameters.get("candidate"));
-    verify(mockQuery).taskDefinitionKey(stringQueryParameters.get("taskDefinitionKey"));
-    verify(mockQuery).taskDefinitionKeyLike(stringQueryParameters.get("taskDefinitionKeyLike"));
-    verify(mockQuery).taskDescription(stringQueryParameters.get("description"));
-    verify(mockQuery).taskDescriptionLike(stringQueryParameters.get("descriptionLike"));
-    verify(mockQuery).taskInvolvedUser(stringQueryParameters.get("involved"));
-    verify(mockQuery).taskMaxPriority(intQueryParameters.get("maxPriority"));
-    verify(mockQuery).taskMinPriority(intQueryParameters.get("minPriority"));
-    verify(mockQuery).taskName(stringQueryParameters.get("name"));
-    verify(mockQuery).taskNameLike(stringQueryParameters.get("nameLike"));
-    verify(mockQuery).taskOwner(stringQueryParameters.get("owner"));
-    verify(mockQuery).taskPriority(intQueryParameters.get("priority"));
+    verifyIntegerParameterQueryInvocations();
+    verifyStringParameterQueryInvocations();
     
     verify(mockQuery).taskUnassigned();
     
     verify(mockQuery).list();
+  }
+  
+  private void verifyIntegerParameterQueryInvocations() {
+    Map<String, Integer> intQueryParameters = getCompleteIntQueryParameters();
+    
+    verify(mockQuery).taskMaxPriority(intQueryParameters.get("maxPriority"));
+    verify(mockQuery).taskMinPriority(intQueryParameters.get("minPriority"));
+    verify(mockQuery).taskPriority(intQueryParameters.get("priority"));
   }
   
   private Map<String, Integer> getCompleteIntQueryParameters() {
@@ -198,7 +191,6 @@ public class TaskRestServiceTest extends AbstractRestServiceTest {
     parameters.put("maxPriority", 10);
     parameters.put("minPriority", 9);
     parameters.put("priority", 8);
-    
     
     return parameters;
   }
@@ -226,6 +218,28 @@ public class TaskRestServiceTest extends AbstractRestServiceTest {
     parameters.put("unassigned", "true");
 
     return parameters;
+  }
+  
+  private void verifyStringParameterQueryInvocations() {
+    Map<String, String> stringQueryParameters = getCompleteStringQueryParameters();
+    
+    verify(mockQuery).processInstanceBusinessKey(stringQueryParameters.get("processInstanceBusinessKey"));
+    verify(mockQuery).processDefinitionKey(stringQueryParameters.get("processDefinitionKey"));
+    verify(mockQuery).processDefinitionId(stringQueryParameters.get("processDefinitionId"));
+    verify(mockQuery).executionId(stringQueryParameters.get("executionId"));
+    verify(mockQuery).processDefinitionName(stringQueryParameters.get("processDefinitionName"));
+    verify(mockQuery).processInstanceId(stringQueryParameters.get("processInstanceId"));
+    verify(mockQuery).taskAssignee(stringQueryParameters.get("assignee"));
+    verify(mockQuery).taskCandidateGroup(stringQueryParameters.get("candidateGroup"));
+    verify(mockQuery).taskCandidateUser(stringQueryParameters.get("candidate"));
+    verify(mockQuery).taskDefinitionKey(stringQueryParameters.get("taskDefinitionKey"));
+    verify(mockQuery).taskDefinitionKeyLike(stringQueryParameters.get("taskDefinitionKeyLike"));
+    verify(mockQuery).taskDescription(stringQueryParameters.get("description"));
+    verify(mockQuery).taskDescriptionLike(stringQueryParameters.get("descriptionLike"));
+    verify(mockQuery).taskInvolvedUser(stringQueryParameters.get("involved"));
+    verify(mockQuery).taskName(stringQueryParameters.get("name"));
+    verify(mockQuery).taskNameLike(stringQueryParameters.get("nameLike"));
+    verify(mockQuery).taskOwner(stringQueryParameters.get("owner"));
   }
   
   @Test
@@ -438,4 +452,66 @@ public class TaskRestServiceTest extends AbstractRestServiceTest {
       .when().get(TASK_QUERY_URL);    
     verify(mockQuery).processVariableValueNotEquals(variableName, variableValue);
   }
+  
+  @Test
+  public void testMultipleVariableParametersAsPost() {
+    setUpMockedQuery();
+    
+    String variableName = "varName";
+    String variableValue = "varValue";
+    JSONObject queryVariable = new JSONObject();
+    queryVariable.put("name", variableName);
+    queryVariable.put("operator", "eq");
+    queryVariable.put("value", variableValue);
+    
+    String anotherVariableName = "anotherVarName";
+    Integer anotherVariableValue = 30;
+    JSONObject anotherQueryVariable = new JSONObject();
+    anotherQueryVariable.put("name", anotherVariableName);
+    anotherQueryVariable.put("operator", "neq");
+    anotherQueryVariable.put("value", anotherVariableValue);
+    
+    JSONObject json = new JSONObject();
+    JSONArray queryVariables = new JSONArray();
+    queryVariables.put(queryVariable);
+    queryVariables.put(anotherQueryVariable);
+    
+    json.put("taskVariables", queryVariables);
+    
+    String body = json.toString();
+    
+    given().contentType(MediaType.APPLICATION_JSON).body(body)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .when().post(TASK_QUERY_URL);
+    
+    verify(mockQuery).taskVariableValueEquals(variableName, variableValue);
+    verify(mockQuery).taskVariableValueNotEquals(anotherVariableName, anotherVariableValue);
+    
+  }
+  
+  @Test
+  public void testCompletePostParameters() {
+    setUpMockedQuery();
+    
+    Map<String, Object> queryParameters = new HashMap<String, Object>();
+    Map<String, String> stringQueryParameters = getCompleteStringQueryParameters();
+    Map<String, Integer> intQueryParameters = getCompleteIntQueryParameters();
+    
+    queryParameters.putAll(stringQueryParameters);
+    queryParameters.putAll(intQueryParameters);
+    List<String> candidateGroups = new ArrayList<String>();
+    candidateGroups.add("boss");
+    candidateGroups.add("worker");
+    
+    queryParameters.put("candidateGroups", candidateGroups);
+    
+    given().contentType(MediaType.APPLICATION_JSON).body(queryParameters)
+      .expect().statusCode(Status.OK.getStatusCode())
+      .when().post(TASK_QUERY_URL);
+    
+    verifyStringParameterQueryInvocations();
+    verifyIntegerParameterQueryInvocations();
+    verify(mockQuery).taskCandidateGroupIn(argThat(new EqualsList(candidateGroups)));
+  }
+  
 }

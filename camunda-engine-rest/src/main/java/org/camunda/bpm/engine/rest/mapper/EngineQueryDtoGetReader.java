@@ -8,10 +8,12 @@ import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map.Entry;
 
+import javax.ws.rs.HttpMethod;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Request;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.ext.MessageBodyReader;
@@ -35,15 +37,22 @@ import org.camunda.bpm.engine.rest.exception.RestException;
  * 
  */
 @Provider
-public class EngineQueryDtoReader implements
+public class EngineQueryDtoGetReader implements
     MessageBodyReader<SortableParameterizedQueryDto> {
 
   @Context
   private UriInfo context;
+  
+  @Context
+  private Request request;
 
   @Override
   public boolean isReadable(Class<?> clazz, Type genericType,
       Annotation[] annotations, MediaType mediaType) {
+    if (!request.getMethod().equals(HttpMethod.GET)) {
+      return false;
+    }
+    
     if (clazz == ProcessDefinitionQueryDto.class) {
       return true;
     }
