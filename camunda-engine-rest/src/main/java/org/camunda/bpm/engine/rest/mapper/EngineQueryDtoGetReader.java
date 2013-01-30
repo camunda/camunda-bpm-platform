@@ -29,7 +29,7 @@ import org.camunda.bpm.engine.rest.exception.RestException;
 
 /**
  * A {@link MessageBodyReader} that populates subclasses of
- * {@link SortableParameterizedQueryDto} from query parameters. Parameters are
+ * {@link SortableParameterizedQueryDto} from http query parameters. Parameters are
  * matched to setter methods in the class that are annotated with
  * {@link CamundaQueryParam}.
  * 
