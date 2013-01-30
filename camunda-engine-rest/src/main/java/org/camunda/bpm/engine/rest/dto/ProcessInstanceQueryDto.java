@@ -109,8 +109,24 @@ public class ProcessInstanceQueryDto extends SortableParameterizedQueryDto {
     }
     if (variables != null) {
       for (VariableQueryParameterDto variableQueryParam : variables) {
-        if (variableQueryParam.getOperator() == QueryOperator.EQUALS) {
-          query.variableValueEquals(variableQueryParam.getVariableKey(), variableQueryParam.getVariableValue());
+        String variableName = variableQueryParam.getVariableKey();
+        QueryOperator op = variableQueryParam.getOperator();
+        Object variableValue = variableQueryParam.getVariableValue();
+        
+        if (op == QueryOperator.EQUALS) {
+          query.variableValueEquals(variableName, variableValue);
+        } else if (op == QueryOperator.GREATER_THAN) {
+          query.variableValueGreaterThan(variableName, variableValue);
+        } else if (op == QueryOperator.GREATER_THAN_OR_EQUAL) {
+          query.variableValueGreaterThanOrEqual(variableName, variableValue);
+        } else if (op == QueryOperator.LESS_THAN) {
+          query.variableValueLessThan(variableName, variableValue);
+        } else if (op == QueryOperator.LESS_THAN_OR_EQUAL) {
+          query.variableValueLessThanOrEqual(variableName, variableValue);
+        } else if (op == QueryOperator.NOT_EQUALS) {
+          query.variableValueNotEquals(variableName, variableValue);
+        } else if (op == QueryOperator.LIKE) {
+          query.variableValueLike(variableName, String.valueOf(variableValue));
         }
       }
     }

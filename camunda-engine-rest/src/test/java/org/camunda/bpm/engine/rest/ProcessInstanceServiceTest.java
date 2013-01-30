@@ -174,16 +174,55 @@ public class ProcessInstanceServiceTest extends AbstractRestServiceTest {
   @Test
   public void testVariableParameters() {
     setUpMockedQuery();
-    
     String variableName = "varName";
     String variableValue = "varValue";
-    String queryValue = variableName + "_equals_" + variableValue;
-    
+    String queryValue = variableName + "_eq_" + variableValue;    
     given().queryParam("variables", queryValue)
       .then().expect().statusCode(Status.OK.getStatusCode())
-      .when().get(PROCESS_INSTANCE_QUERY_URL);
-    
+      .when().get(PROCESS_INSTANCE_QUERY_URL);    
     verify(mockedQuery).variableValueEquals(variableName, variableValue);
+    
+    setUpMockedQuery();
+    queryValue = variableName + "_gt_" + variableValue;    
+    given().queryParam("variables", queryValue)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .when().get(PROCESS_INSTANCE_QUERY_URL);    
+    verify(mockedQuery).variableValueGreaterThan(variableName, variableValue);
+    
+    setUpMockedQuery();
+    queryValue = variableName + "_gteq_" + variableValue;    
+    given().queryParam("variables", queryValue)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .when().get(PROCESS_INSTANCE_QUERY_URL);    
+    verify(mockedQuery).variableValueGreaterThanOrEqual(variableName, variableValue);
+    
+    setUpMockedQuery();
+    queryValue = variableName + "_lt_" + variableValue;    
+    given().queryParam("variables", queryValue)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .when().get(PROCESS_INSTANCE_QUERY_URL);    
+    verify(mockedQuery).variableValueLessThan(variableName, variableValue);
+    
+    setUpMockedQuery();
+    queryValue = variableName + "_lteq_" + variableValue;    
+    given().queryParam("variables", queryValue)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .when().get(PROCESS_INSTANCE_QUERY_URL);    
+    verify(mockedQuery).variableValueLessThanOrEqual(variableName, variableValue);
+
+    setUpMockedQuery();
+    queryValue = variableName + "_like_" + variableValue;    
+    given().queryParam("variables", queryValue)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .when().get(PROCESS_INSTANCE_QUERY_URL);    
+    verify(mockedQuery).variableValueLike(variableName, variableValue);
+
+    setUpMockedQuery();
+    queryValue = variableName + "_neq_" + variableValue;    
+    given().queryParam("variables", queryValue)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .when().get(PROCESS_INSTANCE_QUERY_URL);    
+    verify(mockedQuery).variableValueNotEquals(variableName, variableValue);
   }
   
   @Test
