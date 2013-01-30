@@ -226,6 +226,24 @@ public class ProcessInstanceServiceTest extends AbstractRestServiceTest {
   }
   
   @Test
+  public void testInvalidVariableRequests() {
+    // invalid comparator
+    setUpMockedQuery();
+    String variableName = "varName";
+    String variableValue = "varValue";
+    String queryValue = variableName + "_anInvalidComparator_" + variableValue;    
+    given().queryParam("variables", queryValue)
+      .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
+      .when().get(PROCESS_INSTANCE_QUERY_URL);
+    
+    // invalid format
+    queryValue = "invalidFormattedVariableQuery";    
+    given().queryParam("variables", queryValue)
+      .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
+      .when().get(PROCESS_INSTANCE_QUERY_URL);
+  }
+  
+  @Test
   public void testSortingParameters() {
     setUpMockedQuery();
     

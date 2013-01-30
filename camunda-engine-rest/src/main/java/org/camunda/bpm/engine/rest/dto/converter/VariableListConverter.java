@@ -9,7 +9,7 @@ import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 
 /**
  * Reads a list of {@link VariableQueryParameterDto}s from a single parameter in the format KEY_OPERATOR_VALUE,
- * so for example: aVariableName_equals_aValue.
+ * so for example: aVariableName_eq_aValue.
  * @author Thorben Lindhauer
  *
  */
