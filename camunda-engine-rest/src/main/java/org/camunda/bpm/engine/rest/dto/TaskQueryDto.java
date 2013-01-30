@@ -1,17 +1,18 @@
 package org.camunda.bpm.engine.rest.dto;
 
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
 import org.activiti.engine.TaskService;
 import org.activiti.engine.task.DelegationState;
 import org.activiti.engine.task.TaskQuery;
+import org.camunda.bpm.engine.rest.dto.converter.BooleanConverter;
+import org.camunda.bpm.engine.rest.dto.converter.DateConverter;
+import org.camunda.bpm.engine.rest.dto.converter.DelegationStateConverter;
+import org.camunda.bpm.engine.rest.dto.converter.IntegerConverter;
+import org.camunda.bpm.engine.rest.dto.converter.StringListConverter;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
-import org.camunda.bpm.engine.rest.exception.RestException;
-import org.joda.time.DateTime;
 
 public class TaskQueryDto extends SortableParameterizedQueryDto {
   
@@ -143,12 +144,12 @@ public class TaskQueryDto extends SortableParameterizedQueryDto {
     this.involvedUser = involvedUser;
   }
 
-  @CamundaQueryParam("maxPriority")
+  @CamundaQueryParam(value = "maxPriority", converter = IntegerConverter.class)
   public void setMaxPriority(Integer maxPriority) {
     this.maxPriority = maxPriority;
   }
 
-  @CamundaQueryParam("minPriority")
+  @CamundaQueryParam(value = "minPriority", converter = IntegerConverter.class)
   public void setMinPriority(Integer minPriority) {
     this.minPriority = minPriority;
   }
@@ -168,52 +169,52 @@ public class TaskQueryDto extends SortableParameterizedQueryDto {
     this.owner = owner;
   }
 
-  @CamundaQueryParam("priority")
+  @CamundaQueryParam(value = "priority", converter = IntegerConverter.class)
   public void setPriority(Integer priority) {
     this.priority = priority;
   }
 
-  @CamundaQueryParam("unassigned")
+  @CamundaQueryParam(value = "unassigned", converter = BooleanConverter.class)
   public void setUnassigned(Boolean unassigned) {
     this.unassigned = unassigned;
   }
 
-  @CamundaQueryParam("dueAfter")
+  @CamundaQueryParam(value = "dueAfter", converter = DateConverter.class)
   public void setDueAfter(Date dueAfter) {
     this.dueAfter = dueAfter;
   }
 
-  @CamundaQueryParam("dueBefore")
+  @CamundaQueryParam(value = "dueBefore", converter = DateConverter.class)
   public void setDueBefore(Date dueBefore) {
     this.dueBefore = dueBefore;
   }
 
-  @CamundaQueryParam("due")
+  @CamundaQueryParam(value = "due", converter = DateConverter.class)
   public void setDueDate(Date dueDate) {
     this.dueDate = dueDate;
   }
 
-  @CamundaQueryParam("createdAfter")
+  @CamundaQueryParam(value = "createdAfter", converter = DateConverter.class)
   public void setCreatedAfter(Date createdAfter) {
     this.createdAfter = createdAfter;
   }
 
-  @CamundaQueryParam("createdBefore")
+  @CamundaQueryParam(value = "createdBefore", converter = DateConverter.class)
   public void setCreatedBefore(Date createdBefore) {
     this.createdBefore = createdBefore;
   }
 
-  @CamundaQueryParam("created")
+  @CamundaQueryParam(value = "created", converter = DateConverter.class)
   public void setCreatedOn(Date createdOn) {
     this.createdOn = createdOn;
   }
 
-  @CamundaQueryParam("delegationState")
+  @CamundaQueryParam(value = "delegationState", converter = DelegationStateConverter.class)
   public void setDelegationState(DelegationState taskDelegationState) {
     this.delegationState = taskDelegationState;
   }
 
-  @CamundaQueryParam("candidateGroups")
+  @CamundaQueryParam(value = "candidateGroups", converter = StringListConverter.class)
   public void setCandidateGroups(List<String> candidateGroups) {
     this.candidateGroups = candidateGroups;
   }
@@ -351,33 +352,4 @@ public class TaskQueryDto extends SortableParameterizedQueryDto {
     return query;
   }
 
-  @Override
-  public void setPropertyFromParameterPair(String key, String value) {
-    try {
-      if (key.equals("maxPriority") || key.equals("minPriority") || key.equals("priority")) {
-        Integer intValue = new Integer(value);
-        setValueBasedOnAnnotation(key, intValue);
-      } else if (key.equals("unassigned")) {
-        Boolean booleanValue = new Boolean(value);
-        setValueBasedOnAnnotation(key, booleanValue);
-      } else if (key.startsWith("due") || key.startsWith("created")) {
-        Date dateValue = DateTime.parse(value).toDate();
-        setValueBasedOnAnnotation(key, dateValue);
-      } else if (key.equals("delegationState")) {
-        DelegationState state = DelegationState.valueOf(value.toUpperCase());
-        setValueBasedOnAnnotation(key, state);
-      } else if (key.equals("candidateGroups")) {
-        List<String> candidateGroups = Arrays.asList(value.split(","));
-        setValueBasedOnAnnotation(key, candidateGroups);
-      } else {
-        setValueBasedOnAnnotation(key, value);
-      }
-    } catch (IllegalArgumentException e) {
-      throw new InvalidRequestException("Cannot set parameter.");
-    } catch (IllegalAccessException e) {
-      throw new RestException("Cannot set parameter.");
-    } catch (InvocationTargetException e) {
-      throw new InvalidRequestException(e.getTargetException().getMessage());
-    }
-  }
 }
