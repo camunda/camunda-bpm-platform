@@ -5,6 +5,7 @@ import java.util.Date;
 import java.util.List;
 
 import org.activiti.engine.TaskService;
+import org.activiti.engine.impl.QueryOperator;
 import org.activiti.engine.task.DelegationState;
 import org.activiti.engine.task.TaskQuery;
 import org.camunda.bpm.engine.rest.dto.converter.BooleanConverter;
@@ -12,6 +13,7 @@ import org.camunda.bpm.engine.rest.dto.converter.DateConverter;
 import org.camunda.bpm.engine.rest.dto.converter.DelegationStateConverter;
 import org.camunda.bpm.engine.rest.dto.converter.IntegerConverter;
 import org.camunda.bpm.engine.rest.dto.converter.StringListConverter;
+import org.camunda.bpm.engine.rest.dto.converter.VariableListConverter;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 
 public class TaskQueryDto extends SortableParameterizedQueryDto {
@@ -73,6 +75,9 @@ public class TaskQueryDto extends SortableParameterizedQueryDto {
   private DelegationState delegationState;
   
   private List<String> candidateGroups;
+  
+  private List<VariableQueryParameterDto> taskVariables;
+  private List<VariableQueryParameterDto> processVariables;
   
   @CamundaQueryParam("processInstanceBusinessKey")
   public void setProcessInstanceBusinessKey(String businessKey) {
@@ -218,6 +223,16 @@ public class TaskQueryDto extends SortableParameterizedQueryDto {
   public void setCandidateGroups(List<String> candidateGroups) {
     this.candidateGroups = candidateGroups;
   }
+  
+  @CamundaQueryParam(value = "taskVariables", converter = VariableListConverter.class)
+  public void setTaskVariables(List<VariableQueryParameterDto> taskVariables) {
+    this.taskVariables = taskVariables;
+  }
+
+  @CamundaQueryParam(value = "processVariables", converter = VariableListConverter.class)
+  public void setProcessVariables(List<VariableQueryParameterDto> processVariables) {
+    this.processVariables = processVariables;
+  }
 
   @Override
   protected boolean isValidSortByValue(String value) {
@@ -313,6 +328,34 @@ public class TaskQueryDto extends SortableParameterizedQueryDto {
     }
     if (candidateGroups != null) {
       query.taskCandidateGroupIn(candidateGroups);
+    }
+    
+    if (taskVariables != null) {
+      for (VariableQueryParameterDto variableQueryParam : taskVariables) {
+        String variableName = variableQueryParam.getVariableKey();
+        QueryOperator op = variableQueryParam.getOperator();
+        Object variableValue = variableQueryParam.getVariableValue();
+        
+        if (op == QueryOperator.EQUALS) {
+          query.taskVariableValueEquals(variableName, variableValue);
+        } else if (op == QueryOperator.NOT_EQUALS) {
+          query.taskVariableValueNotEquals(variableName, variableValue);
+        }
+      }
+    }
+    
+    if (processVariables != null) {
+      for (VariableQueryParameterDto variableQueryParam : processVariables) {
+        String variableName = variableQueryParam.getVariableKey();
+        QueryOperator op = variableQueryParam.getOperator();
+        Object variableValue = variableQueryParam.getVariableValue();
+        
+        if (op == QueryOperator.EQUALS) {
+          query.processVariableValueEquals(variableName, variableValue);
+        } else if (op == QueryOperator.NOT_EQUALS) {
+          query.processVariableValueNotEquals(variableName, variableValue);
+        }
+      }
     }
 
     if (!sortOptionsValid()) {

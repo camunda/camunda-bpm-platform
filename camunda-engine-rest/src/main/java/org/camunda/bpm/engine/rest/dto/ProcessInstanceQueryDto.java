@@ -131,7 +131,6 @@ public class ProcessInstanceQueryDto extends SortableParameterizedQueryDto {
       }
     }
     
-    
     if (!sortOptionsValid()) {
       throw new InvalidRequestException("You may not specify a single sorting parameter.");
     }
