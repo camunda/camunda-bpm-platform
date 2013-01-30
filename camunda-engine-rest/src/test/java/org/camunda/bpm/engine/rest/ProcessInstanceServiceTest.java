@@ -171,8 +171,19 @@ public class ProcessInstanceServiceTest extends AbstractRestServiceTest {
     return parameters;
   }
   
+  @Test
   public void testVariableParameters() {
-    // TODO implement
+    setUpMockedQuery();
+    
+    String variableName = "varName";
+    String variableValue = "varValue";
+    String queryValue = variableName + "_eq_" + variableValue;
+    
+    given().queryParam("variables", queryValue)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .when().get(PROCESS_INSTANCE_QUERY_URL);
+    
+    verify(mockedQuery).variableValueEquals(variableName, variableValue);
   }
   
   @Test
