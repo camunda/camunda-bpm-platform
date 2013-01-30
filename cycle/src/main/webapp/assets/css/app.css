@@ -380,11 +380,10 @@ li.actions .btn:last-child {
 }
 
 .modal-body {
-    max-height: 480px;
+  max-height: 480px;
 }
 
 div#pictureModal .modal-body {
-  max-height: 80%;
   overflow: auto;
 }
 
@@ -444,7 +443,7 @@ thead tr {
 }
 
 /** override img{ max-width: 100%} in boostrap.css to see the bpmn model diagram in a normal size **/
-img {
+.carousel-inner img {
   max-width: none;
 }
 
