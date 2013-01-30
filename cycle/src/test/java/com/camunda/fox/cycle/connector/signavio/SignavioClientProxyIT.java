@@ -34,6 +34,7 @@ import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
 
 import com.camunda.fox.cycle.entity.ConnectorConfiguration;
+import com.camunda.fox.cycle.exception.CycleException;
 import com.camunda.fox.cycle.util.BpmnNamespaceContext;
 import com.camunda.fox.cycle.util.IoUtil;
 
@@ -198,7 +199,7 @@ public class SignavioClientProxyIT {
     }
   }
 
-  @Test(expected=NullPointerException.class)
+  @Test(expected=CycleException.class)
   public void testDispose() {
     signavioClient.dispose();
     // should throw NPE
