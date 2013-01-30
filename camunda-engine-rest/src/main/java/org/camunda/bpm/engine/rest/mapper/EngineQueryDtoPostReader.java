@@ -27,6 +27,11 @@ import org.camunda.bpm.engine.rest.dto.TaskQueryDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 
+/**
+ * Reads {@link SortableParameterizedQueryDto} objects from json message bodies, supplied in POST requests.
+ * @author Thorben Lindhauer
+ *
+ */
 @Provider
 @Consumes(MediaType.APPLICATION_JSON)
 public class EngineQueryDtoPostReader implements
@@ -42,7 +47,6 @@ public class EngineQueryDtoPostReader implements
     if (!request.getMethod().equals(HttpMethod.POST)) {
       return false;
     }
-    
     if (clazz == ProcessDefinitionQueryDto.class) {
       return true;
     }

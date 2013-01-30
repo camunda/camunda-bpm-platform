@@ -12,7 +12,7 @@ import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 /**
  * Defines common query sorting options and validation.
  * Also allows to set its setter methods based on {@link CamundaQueryParam} annotations which is
- * used for processing Http query parameters.
+ * used for processing Http query parameters and queries encoded in json objects.
  * 
  * @author Thorben Lindhauer
  *
@@ -55,8 +55,8 @@ public abstract class SortableParameterizedQueryDto {
   }
   
   /**
-   * Finds the method that is annotated with a {@link CamundaQueryParam} with a value that matches the key parameter.
-   * Before invoking this method, the annotated {@link StringToTypeConverter} is used to convert the String value to the desired Java type.
+   * Finds the methods that are annotated with a {@link CamundaQueryParam} with a value that matches the key parameter.
+   * Before invoking these methods, the annotated {@link StringToTypeConverter} is used to convert the String value to the desired Java type.
    * @param key
    * @param value
    * @throws IllegalArgumentException
@@ -65,27 +65,45 @@ public abstract class SortableParameterizedQueryDto {
    * @throws InstantiationException
    */
   public void setValueBasedOnAnnotation(String key, String value) throws IllegalArgumentException, IllegalAccessException, InvocationTargetException, InstantiationException {
-    Method[] methods = this.getClass().getMethods();
-    for (int i = 0; i < methods.length; i++) {
-      Method method = methods[i];
-      Annotation[] methodAnnotations = method.getAnnotations();
-      
-      for (int j = 0; j < methodAnnotations.length; j++) {
-        Annotation annotation = methodAnnotations[j];
-        if (annotation instanceof CamundaQueryParam) {
-          CamundaQueryParam parameterAnnotation = (CamundaQueryParam) annotation;
-          if (parameterAnnotation.value().equals(key)) {
-            Class<? extends StringToTypeConverter<?>> converterClass = ((CamundaQueryParam) annotation).converter();
-            StringToTypeConverter<?> converter = converterClass.newInstance();
-            Object convertedValue = converter.convertQueryParameterToType(value);
-            method.invoke(this, convertedValue);
-          }
-        }
+    List<Method> matchingMethods = findMatchingAnnotatedMethods(key);
+    for (Method method : matchingMethods) {
+      Class<? extends StringToTypeConverter<?>> converterClass = findAnnotatedTypeConverter(method);
+      if (converterClass == null) {
+        continue;
       }
+      
+      StringToTypeConverter<?> converter = converterClass.newInstance();
+      Object convertedValue = converter.convertQueryParameterToType(value);
+      method.invoke(this, convertedValue);
     }
   }
   
+  /**
+   * Similar to {@link SortableParameterizedQueryDto#setValueBasedOnAnnotation(String, String)}, 
+   * but invokes {@link StringToTypeConverter#convertFromJsonToType(String)} on the matching methods.
+   * @param key
+   * @param value
+   * @throws IllegalArgumentException
+   * @throws IllegalAccessException
+   * @throws InvocationTargetException
+   * @throws InstantiationException
+   */
   public void setJSONValueBasedOnAnnotation(String key, String value) throws IllegalArgumentException, IllegalAccessException, InvocationTargetException, InstantiationException {
+    List<Method> matchingMethods = findMatchingAnnotatedMethods(key);
+    for (Method method : matchingMethods) {
+      Class<? extends StringToTypeConverter<?>> converterClass = findAnnotatedTypeConverter(method);
+      if (converterClass == null) {
+        continue;
+      }
+      
+      StringToTypeConverter<?> converter = converterClass.newInstance();
+      Object convertedValue = converter.convertFromJsonToType(value);
+      method.invoke(this, convertedValue);
+    }
+  }
+  
+  private List<Method> findMatchingAnnotatedMethods(String parameterName) {
+    List<Method> result = new ArrayList<Method>();
     Method[] methods = this.getClass().getMethods();
     for (int i = 0; i < methods.length; i++) {
       Method method = methods[i];
@@ -95,15 +113,25 @@ public abstract class SortableParameterizedQueryDto {
         Annotation annotation = methodAnnotations[j];
         if (annotation instanceof CamundaQueryParam) {
           CamundaQueryParam parameterAnnotation = (CamundaQueryParam) annotation;
-          if (parameterAnnotation.value().equals(key)) {
-            Class<? extends StringToTypeConverter<?>> converterClass = ((CamundaQueryParam) annotation).converter();
-            StringToTypeConverter<?> converter = converterClass.newInstance();
-            Object convertedValue = converter.convertFromJsonToType(value);
-            method.invoke(this, convertedValue);
+          if (parameterAnnotation.value().equals(parameterName)) {
+            result.add(method);
           }
         }
       }
     }
+    return result;
   }
   
+  private Class<? extends StringToTypeConverter<?>> findAnnotatedTypeConverter(Method method) {
+    Annotation[] methodAnnotations = method.getAnnotations();
+    
+    for (int j = 0; j < methodAnnotations.length; j++) {
+      Annotation annotation = methodAnnotations[j];
+      if (annotation instanceof CamundaQueryParam) {
+        CamundaQueryParam parameterAnnotation = (CamundaQueryParam) annotation;
+        return parameterAnnotation.converter();
+      }
+    }
+    return null;
+  }
 }
