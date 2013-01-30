@@ -5,7 +5,10 @@ import java.net.URL;
 import java.util.Iterator;
 import java.util.ServiceLoader;
 
+import javax.ws.rs.core.MediaType;
+
 import org.activiti.engine.ProcessEngine;
+import org.apache.http.entity.ContentType;
 import org.camunda.bpm.engine.rest.spi.ProcessEngineProvider;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
@@ -21,6 +24,8 @@ public abstract class AbstractRestServiceTest {
 
   protected static ProcessEngine processEngine;
   protected static final String TEST_RESOURCE_ROOT_PATH = "/rest-test";
+  
+  protected static final String POST_JSON_CONTENT_TYPE = ContentType.create(MediaType.APPLICATION_JSON, "UTF-8").toString();
 
 //  @BeforeClass
 //  public static void initialize() {

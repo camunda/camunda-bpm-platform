@@ -37,6 +37,7 @@ import org.camunda.bpm.engine.rest.exception.RestException;
 public class EngineQueryDtoPostReader implements
     MessageBodyReader<SortableParameterizedQueryDto> {
 
+  private static final String ACCEPTED_CHARSET = "UTF-8";
   
   @Context
   private Request request;
@@ -104,7 +105,7 @@ public class EngineQueryDtoPostReader implements
   
   private String streamToString(InputStream stream) {
     String result = "";
-    Scanner s = new Scanner(stream).useDelimiter("\\A");
+    Scanner s = new Scanner(stream, ACCEPTED_CHARSET).useDelimiter("\\A");
     if (s.hasNext()) {
       result = s.next();
     }
