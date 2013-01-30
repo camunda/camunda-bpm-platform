@@ -177,7 +177,7 @@ public class ProcessInstanceServiceTest extends AbstractRestServiceTest {
     
     String variableName = "varName";
     String variableValue = "varValue";
-    String queryValue = variableName + "_eq_" + variableValue;
+    String queryValue = variableName + "_equals_" + variableValue;
     
     given().queryParam("variables", queryValue)
       .then().expect().statusCode(Status.OK.getStatusCode())

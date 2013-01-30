@@ -5,9 +5,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.activiti.engine.RuntimeService;
+import org.activiti.engine.impl.QueryOperator;
 import org.activiti.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
+
+import com.google.common.collect.Lists;
 
 public class ProcessInstanceQueryDto extends SortableParameterizedQueryDto {
 
@@ -30,6 +33,8 @@ public class ProcessInstanceQueryDto extends SortableParameterizedQueryDto {
   private String subProcessInstanceId;
   private Boolean active;
   private Boolean suspended;
+  
+  private List<VariableQueryParameterDto> variables;
 
   public String getProcessDefinitionKey() {
     return processDefinitionKey;
@@ -69,6 +74,11 @@ public class ProcessInstanceQueryDto extends SortableParameterizedQueryDto {
   public void setSuspended(Boolean suspended) {
     this.suspended = suspended;
   }
+
+  @CamundaQueryParam("variables")
+  public void setVariables(List<VariableQueryParameterDto> variables) {
+    this.variables = variables;
+  }
   
   @Override
   protected boolean isValidSortByValue(String value) {
@@ -99,6 +109,14 @@ public class ProcessInstanceQueryDto extends SortableParameterizedQueryDto {
     if (suspended != null && suspended == true) {
       query.suspended();
     }
+    if (variables != null) {
+      for (VariableQueryParameterDto variableQueryParam : variables) {
+        if (variableQueryParam.getOperator() == QueryOperator.EQUALS) {
+          query.variableValueEquals(variableQueryParam.getVariableKey(), variableQueryParam.getVariableValue());
+        }
+      }
+    }
+    
     
     if (!sortOptionsValid()) {
       throw new InvalidRequestException("You may not specify a single sorting parameter.");
@@ -128,7 +146,21 @@ public class ProcessInstanceQueryDto extends SortableParameterizedQueryDto {
   @Override
   public void setPropertyFromParameterPair(String key, String value) {
     try {
-      if (key.equals("active") || key.equals("suspended")) {
+      if (key.equals("variables")) {
+        VariableQueryParameterDto queryVariable = new VariableQueryParameterDto();
+        
+        String[] valueTriple = value.split("_");
+        if (valueTriple.length != 3) {
+          throw new InvalidRequestException("variable query parameter has to have format KEY_OPERATOR_VALUE.");
+        }
+        queryVariable.setVariableKey(valueTriple[0]);
+        queryVariable.setOperator(QueryOperator.valueOf(valueTriple[1].toUpperCase()));
+        queryVariable.setVariableValue(valueTriple[2]);
+        
+        List<VariableQueryParameterDto> queryVariables = Lists.newArrayList(queryVariable);
+        setValueBasedOnAnnotation(key, queryVariables);
+      }
+      else if (key.equals("active") || key.equals("suspended")) {
         Boolean booleanValue = new Boolean(value);
         setValueBasedOnAnnotation(key, booleanValue);
       } else {
