@@ -134,12 +134,12 @@ public class ProcessEngineAdd extends AbstractAddStepHandler implements Descript
 
     ProcessEngineConfiguration processEngineConfiguration = transformConfiguration(context, engineName, model);
     
-    ServiceController<ContainerProcessEngineController> controller = extracted(context, verificationHandler, processEngineConfiguration);
+    ServiceController<ContainerProcessEngineController> controller = installService(context, verificationHandler, processEngineConfiguration);
         
     newControllers.add(controller);
   }
 
-  private ServiceController<ContainerProcessEngineController> extracted(OperationContext context, ServiceVerificationHandler verificationHandler,
+  protected ServiceController<ContainerProcessEngineController> installService(OperationContext context, ServiceVerificationHandler verificationHandler,
           ProcessEngineConfiguration processEngineConfiguration) {
     
     ContainerProcessEngineController service = new ContainerProcessEngineController(processEngineConfiguration);        
