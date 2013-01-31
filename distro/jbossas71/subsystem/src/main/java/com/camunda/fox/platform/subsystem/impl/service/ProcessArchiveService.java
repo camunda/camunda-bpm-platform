@@ -37,6 +37,7 @@ public class ProcessArchiveService implements Service<ProcessArchiveService> {
       processArchiveInstallation = containerPlatformService.installProcessArchiveInternal(processArchive);
     } catch(Throwable e) {
       this.exception = e;
+      throw new StartException(e);
     }
   }
 
