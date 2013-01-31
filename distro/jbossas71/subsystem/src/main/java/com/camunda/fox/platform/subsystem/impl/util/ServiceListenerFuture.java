@@ -81,9 +81,9 @@ public abstract class ServiceListenerFuture<S, V> extends AbstractServiceListene
   }
 
   public V get() throws InterruptedException, ExecutionException {
-    if (value == null) {
+    if (!failed && !cancelled && value == null) {
       synchronized (this) {
-        if (value == null) {
+        if (!failed && !cancelled && value == null) {
           this.wait();          
         }
       }
@@ -92,13 +92,13 @@ public abstract class ServiceListenerFuture<S, V> extends AbstractServiceListene
   }
 
   public V get(long timeout, TimeUnit unit) throws InterruptedException, ExecutionException, TimeoutException {
-    if (value == null) {
+    if (!failed && !cancelled && value == null) {
       synchronized (this) {
-        if (value == null) {
+        if (!failed && !cancelled && value == null) {
           this.wait(unit.convert(timeout, TimeUnit.MILLISECONDS));
         }
         synchronized (this) {
-          if (cancelled || value == null) {
+          if (value == null) {
             throw new TimeoutException();
           }
         }
