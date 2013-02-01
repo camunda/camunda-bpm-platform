@@ -10,10 +10,4 @@ public class DateConverter implements StringToTypeConverter<Date> {
   public Date convertQueryParameterToType(String value) {
     return DateTime.parse(value).toDate();
   }
-
-  @Override
-  public Date convertFromJsonToType(String value) {
-    return DateTime.parse(value).toDate();
-  }
-
 }

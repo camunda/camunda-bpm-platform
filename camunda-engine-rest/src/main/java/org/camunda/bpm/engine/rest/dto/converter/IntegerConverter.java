@@ -6,10 +6,4 @@ public class IntegerConverter implements StringToTypeConverter<Integer> {
   public Integer convertQueryParameterToType(String value) {
     return new Integer(value);
   }
-
-  @Override
-  public Integer convertFromJsonToType(String value) {
-    return new Integer(value);
-  }
-
 }

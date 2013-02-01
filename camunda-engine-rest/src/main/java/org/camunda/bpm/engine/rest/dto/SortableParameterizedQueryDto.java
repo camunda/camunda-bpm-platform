@@ -78,30 +78,6 @@ public abstract class SortableParameterizedQueryDto {
     }
   }
   
-  /**
-   * Similar to {@link SortableParameterizedQueryDto#setValueBasedOnAnnotation(String, String)}, 
-   * but invokes {@link StringToTypeConverter#convertFromJsonToType(String)} on the matching methods.
-   * @param key
-   * @param value
-   * @throws IllegalArgumentException
-   * @throws IllegalAccessException
-   * @throws InvocationTargetException
-   * @throws InstantiationException
-   */
-  public void setJSONValueBasedOnAnnotation(String key, String value) throws IllegalArgumentException, IllegalAccessException, InvocationTargetException, InstantiationException {
-    List<Method> matchingMethods = findMatchingAnnotatedMethods(key);
-    for (Method method : matchingMethods) {
-      Class<? extends StringToTypeConverter<?>> converterClass = findAnnotatedTypeConverter(method);
-      if (converterClass == null) {
-        continue;
-      }
-      
-      StringToTypeConverter<?> converter = converterClass.newInstance();
-      Object convertedValue = converter.convertFromJsonToType(value);
-      method.invoke(this, convertedValue);
-    }
-  }
-  
   private List<Method> findMatchingAnnotatedMethods(String parameterName) {
     List<Method> result = new ArrayList<Method>();
     Method[] methods = this.getClass().getMethods();

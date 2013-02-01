@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.activiti.engine.RuntimeService;
-import org.activiti.engine.impl.QueryOperator;
 import org.activiti.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.rest.dto.converter.BooleanConverter;
 import org.camunda.bpm.engine.rest.dto.converter.VariableListConverter;
@@ -27,8 +26,8 @@ public class ProcessInstanceQueryDto extends SortableParameterizedQueryDto {
   private String processDefinitionKey;
   private String businessKey;
   private String processDefinitionId;
-  private String superProcessInstanceId;
-  private String subProcessInstanceId;
+  private String superProcessInstance;
+  private String subProcessInstance;
   private Boolean active;
   private Boolean suspended;
   
@@ -53,14 +52,14 @@ public class ProcessInstanceQueryDto extends SortableParameterizedQueryDto {
     this.processDefinitionId = processDefinitionId;
   }
 
-  @CamundaQueryParam("super")
-  public void setSuperProcessInstanceId(String superProcessInstanceId) {
-    this.superProcessInstanceId = superProcessInstanceId;
+  @CamundaQueryParam("superProcessInstance")
+  public void setSuperProcessInstance(String superProcessInstance) {
+    this.superProcessInstance = superProcessInstance;
   }
 
-  @CamundaQueryParam("sub")
-  public void setSubProcessInstanceId(String subProcessInstanceId) {
-    this.subProcessInstanceId = subProcessInstanceId;
+  @CamundaQueryParam("subProcessInstance")
+  public void setSubProcessInstance(String subProcessInstance) {
+    this.subProcessInstance = subProcessInstance;
   }
 
   @CamundaQueryParam(value = "active", converter = BooleanConverter.class)
@@ -95,11 +94,11 @@ public class ProcessInstanceQueryDto extends SortableParameterizedQueryDto {
     if (processDefinitionId != null) {
       query.processDefinitionId(processDefinitionId);
     }
-    if (superProcessInstanceId != null) {
-      query.superProcessInstanceId(superProcessInstanceId);
+    if (superProcessInstance != null) {
+      query.superProcessInstanceId(superProcessInstance);
     }
-    if (subProcessInstanceId != null) {
-      query.subProcessInstanceId(subProcessInstanceId);
+    if (subProcessInstance != null) {
+      query.subProcessInstanceId(subProcessInstance);
     }
     if (active != null && active == true) {
       query.active();
@@ -109,24 +108,26 @@ public class ProcessInstanceQueryDto extends SortableParameterizedQueryDto {
     }
     if (variables != null) {
       for (VariableQueryParameterDto variableQueryParam : variables) {
-        String variableName = variableQueryParam.getVariableKey();
-        QueryOperator op = variableQueryParam.getOperator();
-        Object variableValue = variableQueryParam.getVariableValue();
+        String variableName = variableQueryParam.getName();
+        String op = variableQueryParam.getOperator();
+        Object variableValue = variableQueryParam.getValue();
         
-        if (op == QueryOperator.EQUALS) {
+        if (op.equals(VariableQueryParameterDto.EQUALS_OPERATOR_NAME)) {
           query.variableValueEquals(variableName, variableValue);
-        } else if (op == QueryOperator.GREATER_THAN) {
+        } else if (op.equals(VariableQueryParameterDto.GREATER_THAN_OPERATOR_NAME)) {
           query.variableValueGreaterThan(variableName, variableValue);
-        } else if (op == QueryOperator.GREATER_THAN_OR_EQUAL) {
+        } else if (op.equals(VariableQueryParameterDto.GREATER_THAN_OR_EQUALS_OPERATOR_NAME)) {
           query.variableValueGreaterThanOrEqual(variableName, variableValue);
-        } else if (op == QueryOperator.LESS_THAN) {
+        } else if (op.equals(VariableQueryParameterDto.LESS_THAN_OPERATOR_NAME)) {
           query.variableValueLessThan(variableName, variableValue);
-        } else if (op == QueryOperator.LESS_THAN_OR_EQUAL) {
+        } else if (op.equals(VariableQueryParameterDto.LESS_THAN_OR_EQUALS_OPERATOR_NAME)) {
           query.variableValueLessThanOrEqual(variableName, variableValue);
-        } else if (op == QueryOperator.NOT_EQUALS) {
+        } else if (op.equals(VariableQueryParameterDto.NOT_EQUALS_OPERATOR_NAME)) {
           query.variableValueNotEquals(variableName, variableValue);
-        } else if (op == QueryOperator.LIKE) {
+        } else if (op.equals(VariableQueryParameterDto.LIKE_OPERATOR_NAME)) {
           query.variableValueLike(variableName, String.valueOf(variableValue));
+        } else {
+          throw new InvalidRequestException("You have specified an invalid variable comparator.");
         }
       }
     }

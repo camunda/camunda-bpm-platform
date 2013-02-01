@@ -6,10 +6,4 @@ public class StringConverter implements StringToTypeConverter<String> {
   public String convertQueryParameterToType(String value) {
     return value;
   }
-
-  @Override
-  public String convertFromJsonToType(String value) {
-    return value;
-  }
-
 }
