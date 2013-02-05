@@ -123,10 +123,6 @@ public abstract class ProcessApplication {
           processArchiveNamesSeen.add(processArchiveXml.name);
         }
         
-        if(processArchiveXml.configuration.processEngineName == null) {
-          processArchiveXml.configuration.processEngineName = processEngineService.getDefaultProcessEngine().getName();
-        }
-        
         processArchives.add(new ProcessArchiveImpl(processArchiveXml, processesXml.metaFileUrl, getReference(), this));      
       }    
     }
