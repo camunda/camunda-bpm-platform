@@ -92,6 +92,11 @@ public class TaskManager extends AbstractManager {
   }
   
   @SuppressWarnings("unchecked")
+  public List<TaskEntity> findTasksByProcessInstanceId(String processInstanceId) {
+    return getDbSqlSession().selectList("selectTasksByProcessInstanceId", processInstanceId);
+  }
+  
+  
   @Deprecated
   public List<Task> findTasksByQueryCriteria(TaskQueryImpl taskQuery, Page page) {
     taskQuery.setFirstResult(page.getFirstResult());
@@ -123,15 +128,19 @@ public class TaskManager extends AbstractManager {
     return getDbSqlSession().selectList("selectTasksByParentTaskId", parentTaskId);
   }
 
-  public void deleteTask(String taskId, boolean cascade) {
+  public void deleteTask(String taskId, String deleteReason, boolean cascade) {
     TaskEntity task = Context
       .getCommandContext()
       .getTaskManager()
       .findTaskById(taskId);
     
     if (task!=null) {
-      deleteTask(task, TaskEntity.DELETE_REASON_DELETED, cascade);
-
+      if(task.getExecutionId() != null) {
+        throw new ActivitiException("The task cannot be deleted because is part of a running process");
+      }
+      
+      String reason = (deleteReason == null || deleteReason.length() == 0) ? TaskEntity.DELETE_REASON_DELETED : deleteReason;
+      deleteTask(task, reason, cascade);
     } else if (cascade) {
       Context
         .getCommandContext()
