@@ -22,10 +22,14 @@ import junit.framework.Assert;
 import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.PathElement;
 import org.jboss.as.controller.descriptions.ModelDescriptionConstants;
+import org.jboss.as.naming.NamingContext;
+import org.jboss.as.naming.deployment.ContextNames;
 import org.jboss.as.subsystem.test.AbstractSubsystemTest;
 import org.jboss.as.subsystem.test.KernelServices;
 import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.Property;
+import org.jboss.msc.service.ServiceContainer;
+import org.jboss.msc.service.ServiceName;
 import org.junit.Test;
 
 import com.camunda.fox.platform.FoxPlatformException;
@@ -49,11 +53,26 @@ public class JBossSubsystemXMLTest extends AbstractSubsystemTest {
   public static final String SUBSYSTEM_WITH_JOB_EXECUTOR = "subsystemWithJobExecutor.xml";
   public static final String SUBSYSTEM_WITH_PROCESS_ENGINES_AND_JOB_EXECUTOR = "subsystemWithProcessEnginesAndJobExecutor.xml";
   public static final String SUBSYSTEM_WITH_JOB_EXECUTOR_AND_PROPERTIES = "subsystemWithJobExecutorAndProperties.xml";
-
+  
+  public static final ServiceName PLATFORM_SERVICE_NAME = ServiceName.of("foxPlatform").append("platformService");
+  public static final ServiceName PLATFORM_JOBEXECUTOR_SERVICE_NAME = ServiceName.of("foxPlatform").append("containerJobExecutorService");
+  public static final ServiceName PROCESS_ENGINE_CONTROLLER_SERVICE_NAME = ServiceName.of("foxPlatform").append("processEngineController");
+    
+  public static final ServiceName processEngineServiceBindingServiceName = ContextNames.GLOBAL_CONTEXT_SERVICE_NAME            
+    .append("camunda-fox-platform")
+    .append("process-engine")
+    .append("PlatformService!com.camunda.fox.platform.api.ProcessEngineService");
+  
+  public static final ServiceName processArchiveServiceBindingServiceName = ContextNames.GLOBAL_CONTEXT_SERVICE_NAME
+    .append("camunda-fox-platform")
+    .append("process-engine")
+    .append("PlatformService!com.camunda.fox.platform.api.ProcessArchiveService");
+    
+  
   public JBossSubsystemXMLTest() {
     super(ModelConstants.SUBSYSTEM_NAME, new FoxPlatformExtension());
   }
-
+  
   @Test
   public void testParseSubsystemXml() throws Exception {
     String subsystemXml = FileUtils.readFile(SUBSYSTEM_WITH_PROCESS_ENGINES_ELEMENT_ONLY);
@@ -90,7 +109,12 @@ public class JBossSubsystemXMLTest extends AbstractSubsystemTest {
     System.out.println(normalizeXML(subsystemXml));
     KernelServices services = installInController(subsystemXml);
 //    services.getContainer().dumpServices();
-    Assert.assertEquals(4, services.getContainer().getServiceNames().size());
+    
+    ServiceContainer container = services.getContainer();
+    Assert.assertNotNull("platform service should be installed", container.getService(PLATFORM_SERVICE_NAME));
+    Assert.assertNotNull("process engine service should be bound in JNDI", container.getService(processEngineServiceBindingServiceName));
+    Assert.assertNotNull("process archive service should be bound in JNDI", container.getService(processArchiveServiceBindingServiceName));
+        
   }
   
   @Test
@@ -99,7 +123,14 @@ public class JBossSubsystemXMLTest extends AbstractSubsystemTest {
     System.out.println(normalizeXML(subsystemXml));
     KernelServices services = installInController(subsystemXml);
 //    services.getContainer().dumpServices();
-    Assert.assertEquals(6, services.getContainer().getServiceNames().size());
+    
+    ServiceContainer container = services.getContainer();
+    Assert.assertNotNull("platform service should be installed", container.getService(PLATFORM_SERVICE_NAME));
+    Assert.assertNotNull("process engine service should be bound in JNDI", container.getService(processEngineServiceBindingServiceName));
+    Assert.assertNotNull("process archive service should be bound in JNDI", container.getService(processArchiveServiceBindingServiceName));
+    
+    Assert.assertNotNull("process engine controller for engine __default is installed ", container.getService(PROCESS_ENGINE_CONTROLLER_SERVICE_NAME.append("__default")));
+    Assert.assertNotNull("process engine controller for engine __test is installed ", container.getService(PROCESS_ENGINE_CONTROLLER_SERVICE_NAME.append("__test")));
   }
   
   @Test
@@ -107,8 +138,17 @@ public class JBossSubsystemXMLTest extends AbstractSubsystemTest {
     String subsystemXml = FileUtils.readFile(SUBSYSTEM_WITH_ENGINES_AND_PROPERTIES);
     System.out.println(normalizeXML(subsystemXml));
     KernelServices services = installInController(subsystemXml);
-//    services.getContainer().dumpServices();
-    Assert.assertEquals(8, services.getContainer().getServiceNames().size());
+    ServiceContainer container = services.getContainer();
+//    container.dumpServices();
+    
+    Assert.assertNotNull("platform service should be installed", container.getService(PLATFORM_SERVICE_NAME));
+    Assert.assertNotNull("process engine service should be bound in JNDI", container.getService(processEngineServiceBindingServiceName));
+    Assert.assertNotNull("process archive service should be bound in JNDI", container.getService(processArchiveServiceBindingServiceName));
+    
+    Assert.assertNotNull("process engine controller for engine __default is installed ", container.getService(PROCESS_ENGINE_CONTROLLER_SERVICE_NAME.append("__default")));
+    Assert.assertNotNull("process engine controller for engine __test is installed ", container.getService(PROCESS_ENGINE_CONTROLLER_SERVICE_NAME.append("__test")));
+    Assert.assertNotNull("process engine controller for engine __emptyPropertiesTag is installed ", container.getService(PROCESS_ENGINE_CONTROLLER_SERVICE_NAME.append("__emptyPropertiesTag")));
+    Assert.assertNotNull("process engine controller for engine __noPropertiesTag is installed ", container.getService(PROCESS_ENGINE_CONTROLLER_SERVICE_NAME.append("__noPropertiesTag")));
   }
   
   @Test
@@ -128,8 +168,16 @@ public class JBossSubsystemXMLTest extends AbstractSubsystemTest {
     String subsystemXml = FileUtils.readFile(SUBSYSTEM_WITH_SINGLE_ENGINE);
     System.out.println(normalizeXML(subsystemXml));
     KernelServices services = installInController(subsystemXml);
-//    services.getContainer().dumpServices();
-    Assert.assertEquals(5, services.getContainer().getServiceNames().size());
+    ServiceContainer container = services.getContainer();
+
+    //    container.dumpServices();
+    
+    Assert.assertNotNull("platform service should be installed", container.getService(PLATFORM_SERVICE_NAME));
+    Assert.assertNotNull("process engine service should be bound in JNDI", container.getService(processEngineServiceBindingServiceName));
+    Assert.assertNotNull("process archive service should be bound in JNDI", container.getService(processArchiveServiceBindingServiceName));
+    
+    Assert.assertNotNull("process engine controller for engine __default is installed ", container.getService(PROCESS_ENGINE_CONTROLLER_SERVICE_NAME.append("__default")));
+    
     String persistedSubsystemXml = services.getPersistedSubsystemXml();
     compareXml(null, subsystemXml, persistedSubsystemXml);
   }
@@ -172,8 +220,15 @@ public class JBossSubsystemXMLTest extends AbstractSubsystemTest {
     String subsystemXml = FileUtils.readFile(SUBSYSTEM_WITH_JOB_EXECUTOR);
     System.out.println(normalizeXML(subsystemXml));
     KernelServices services = installInController(subsystemXml);
-    //services.getContainer().dumpServices();
-    Assert.assertEquals(5, services.getContainer().getServiceNames().size());
+    ServiceContainer container = services.getContainer();
+//    container.dumpServices();
+    
+    Assert.assertNotNull("platform service should be installed", container.getService(PLATFORM_SERVICE_NAME));
+    Assert.assertNotNull("process engine service should be bound in JNDI", container.getService(processEngineServiceBindingServiceName));
+    Assert.assertNotNull("process archive service should be bound in JNDI", container.getService(processArchiveServiceBindingServiceName));
+    
+    Assert.assertNotNull("platform jobexecutor service should be installed", container.getService(PLATFORM_JOBEXECUTOR_SERVICE_NAME));
+    
   }
   
   @Test
@@ -190,8 +245,14 @@ public class JBossSubsystemXMLTest extends AbstractSubsystemTest {
     String subsystemXml = FileUtils.readFile(SUBSYSTEM_WITH_JOB_EXECUTOR_AND_PROPERTIES);
     System.out.println(normalizeXML(subsystemXml));
     KernelServices services = installInController(subsystemXml);
-    //services.getContainer().dumpServices();
-    Assert.assertEquals(5, services.getContainer().getServiceNames().size());
+    ServiceContainer container = services.getContainer();
+//    container.dumpServices();
+
+    Assert.assertNotNull("platform service should be installed", container.getService(PLATFORM_SERVICE_NAME));
+    Assert.assertNotNull("process engine service should be bound in JNDI", container.getService(processEngineServiceBindingServiceName));
+    Assert.assertNotNull("process archive service should be bound in JNDI", container.getService(processArchiveServiceBindingServiceName));
+    
+    Assert.assertNotNull("platform jobexecutor service should be installed", container.getService(PLATFORM_JOBEXECUTOR_SERVICE_NAME));
   }
   
   
@@ -207,13 +268,22 @@ public class JBossSubsystemXMLTest extends AbstractSubsystemTest {
   @Test
   public void testInstallSubsystemXmlWithEnginesAndJobExecutor() throws Exception {
     String subsystemXml = FileUtils.readFile(SUBSYSTEM_WITH_PROCESS_ENGINES_AND_JOB_EXECUTOR);
-    System.out.println(normalizeXML(subsystemXml));
+//    System.out.println(normalizeXML(subsystemXml));
     KernelServices services = installInController(subsystemXml);
-    //services.getContainer().dumpServices();
-    Assert.assertEquals(7, services.getContainer().getServiceNames().size());
+    ServiceContainer container = services.getContainer();
+//    container.dumpServices();
+    
+    Assert.assertNotNull("platform service should be installed", container.getService(PLATFORM_SERVICE_NAME));
+    Assert.assertNotNull("platform jobexecutor service should be installed", container.getService(PLATFORM_JOBEXECUTOR_SERVICE_NAME));
+    Assert.assertNotNull("process engine service should be bound in JNDI", container.getService(processEngineServiceBindingServiceName));
+    Assert.assertNotNull("process archive service should be bound in JNDI", container.getService(processArchiveServiceBindingServiceName));
+    
+    Assert.assertNotNull("process engine controller for engine __default is installed ", container.getService(PROCESS_ENGINE_CONTROLLER_SERVICE_NAME.append("__default")));
+    Assert.assertNotNull("process engine controller for engine __test is installed ", container.getService(PROCESS_ENGINE_CONTROLLER_SERVICE_NAME.append("__test")));
+
     
     String persistedSubsystemXml = services.getPersistedSubsystemXml();
-    System.out.println(persistedSubsystemXml);
+//    System.out.println(persistedSubsystemXml);
     compareXml(null, subsystemXml, persistedSubsystemXml);
   }
   

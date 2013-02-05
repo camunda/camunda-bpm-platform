@@ -66,6 +66,10 @@
       <resource>
         <directory>src/main/standalone</directory>
         <filtering>true</filtering>
+        <includes>
+          <include>configuration/standalone.xml</include>
+          <include>deployments/${jboss.datasource.filename}</include>
+        </includes>        
       </resource>
     </resources>
     <plugins>
@@ -88,11 +92,6 @@
                 <!-- processing of src/main/standalone replaced by resource filtering (see below) -->
                 <copy todir="target/jboss-as-${version.jboss.as}/modules" overwrite="true">
                   <fileset dir="src/main/modules" />
-                </copy>
-                
-                <!-- processing of src/main/standalone replaced by resource filtering (see below) -->
-                <copy todir="target/jboss-as-${version.jboss.as}/standalone/configuration/blueprint" overwrite="true">
-                  <fileset dir="src/main/standalone/configuration" />
                 </copy>
                 
               </target>

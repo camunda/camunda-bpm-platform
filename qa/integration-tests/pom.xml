@@ -53,8 +53,7 @@
       <groupId>com.camunda.fox.engine</groupId>
       <artifactId>fox-engine</artifactId>
       <scope>provided</scope>
-    </dependency>    
-   
+    </dependency>
   </dependencies>
 
   <build>
@@ -123,6 +122,12 @@
         </dependency>
       </dependencies>
       <build>
+        <resources>
+          <resource>
+            <directory>src/test/resources-jboss</directory>
+            <filtering>true</filtering>
+          </resource>          
+        </resources>      
         <plugins>
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
@@ -683,98 +688,7 @@
           </testResource>
         </testResources>
       </build>
-    </profile>
-    <profile>
-      <id>h2</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <build>
-        <testResources>
-          <testResource>
-            <directory>src/test/resources</directory>
-            <filtering>true</filtering>
-            <includes>
-              <include>**/*.xml</include>
-              <include>**/*.properties</include>
-            </includes>
-          </testResource>
-          <testResource>
-            <directory>src/test/resources-jboss-h2</directory>
-            <filtering>true</filtering>
-            <includes>
-              <include>**/*.xml</include>
-            </includes>
-          </testResource>
-        </testResources>
-      </build>
-    </profile>
-    <profile>
-      <id>mysql</id>
-      <build>
-        <testResources>
-          <testResource>
-            <directory>src/test/resources</directory>
-            <filtering>true</filtering>
-            <includes>
-              <include>**/*.xml</include>
-              <include>**/*.properties</include>
-            </includes>
-          </testResource>
-          <testResource>
-            <directory>src/test/resources-jboss-mysql</directory>
-            <filtering>true</filtering>
-            <includes>
-              <include>**/*.xml</include>
-            </includes>
-          </testResource>
-        </testResources>
-      </build>
-    </profile>
-    <profile>
-      <id>db2</id>
-      <build>
-        <testResources>
-          <testResource>
-            <directory>src/test/resources</directory>
-            <filtering>true</filtering>
-            <includes>
-              <include>**/*.xml</include>
-              <include>**/*.properties</include>
-            </includes>
-          </testResource>
-          <testResource>
-            <directory>src/test/resources-jboss-db2</directory>
-            <filtering>true</filtering>
-            <includes>
-              <include>**/*.xml</include>
-            </includes>
-          </testResource>
-        </testResources>
-      </build>
-    </profile>
-    <profile>
-      <id>integration</id>
-      <build>
-        <testResources>
-          <testResource>
-            <directory>src/test/resources</directory>
-            <filtering>true</filtering>
-            <includes>
-              <include>**/*.xml</include>
-              <include>**/*.properties</include>
-            </includes>
-          </testResource>
-          <testResource>
-            <directory>src/test/resources-jboss-integration</directory>
-            <filtering>true</filtering>
-            <includes>
-              <include>**/*.xml</include>
-            </includes>
-          </testResource>
-        </testResources>
-      </build>
-    </profile>
+    </profile>    
     <profile>
       <id>default</id>
       <activation>

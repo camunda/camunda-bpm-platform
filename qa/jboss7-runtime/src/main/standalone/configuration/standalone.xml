@@ -95,36 +95,26 @@
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:configadmin:1.0"/>
         <subsystem xmlns="urn:jboss:domain:datasources:1.1">
-            <datasources>
-                <datasource jndi-name="java:jboss/datasources/ExampleDS" pool-name="ExampleDS" enabled="true" use-java-context="true">
-                    <connection-url>jdbc:h2:mem:test;DB_CLOSE_DELAY=-1</connection-url>
-                    <driver>h2</driver>
-                    <security>
-                        <user-name>sa</user-name>
-                        <password>sa</password>
-                    </security>
-                </datasource>
-                <datasource jta="true" jndi-name="java:jboss/datasources/FoxEngineDS" pool-name="FoxEngineDS" enabled="true" use-java-context="true" use-ccm="true">
-                    <connection-url>jdbc:h2:./fox-h2-dbs/fox-engine;DB_CLOSE_DELAY=-1;MVCC=TRUE;DB_CLOSE_ON_EXIT=FALSE</connection-url>
-                    <driver>h2</driver>
-                    <security>
-                        <user-name>sa</user-name>
-                        <password>sa</password>
-                    </security>                   
-                </datasource>               
-                <datasource jta="true" jndi-name="java:jboss/datasources/CycleDS" pool-name="CycleDS" enabled="true" use-java-context="true" use-ccm="true">
-                    <connection-url>jdbc:h2:./fox-h2-dbs/cycle;DB_CLOSE_DELAY=-1;MVCC=TRUE;DB_CLOSE_ON_EXIT=FALSE</connection-url>
-                    <driver>h2</driver>
-                    <pool></pool>
-                    <security>
-                        <user-name>sa</user-name>
-                        <password>sa</password>
-                    </security>
-                </datasource>
+             <datasources>           
                 <drivers>
+                    <!-- all drivers needed in QA are listed here -->
+                    <!-- datasource definitions are deployed as *-ds.xml files -->
                     <driver name="h2" module="com.h2database.h2">
-                        <xa-datasource-class>org.h2.jdbcx.JdbcDataSource</xa-datasource-class>
-                    </driver>
+                      <xa-datasource-class>org.h2.jdbcx.JdbcDataSource</xa-datasource-class>
+                    </driver>                   
+					<driver name="db2" module="com.ibm.db2.jcc.db2jcc4">
+                      <xa-datasource-class>com.ibm.db2.jcc.DB2XADataSource</xa-datasource-class>
+                    </driver>					
+					<driver name="com.microsoft.sqlserver" module="com.microsoft.sqlserver.sqljdbc4">
+                      <xa-datasource-class>com.microsoft.sqlserver.jdbc.SQLServerXADataSource</xa-datasource-class>
+                    </driver>						
+					<driver name="com.mysql" module="mysql.mysql-connector-java">
+                      <xa-datasource-class>com.mysql.jdbc.jdbc2.optional.MysqlXADataSource</xa-datasource-class>
+                    </driver>                        
+					<driver name="com.oracle" module="com.oracle.jdbc.ojdbc6">
+                      <xa-datasource-class>oracle.jdbc.xa.client.OracleXADataSource</xa-datasource-class>
+                    </driver>                        
+					<driver name="postgresql" module="postgresql.postgresql" />                        
                 </drivers>
             </datasources>
         </subsystem>
@@ -349,19 +339,19 @@
             <inet-address value="${jboss.bind.address.unsecure:127.0.0.1}"/>
         </interface>
     </interfaces>
-    <socket-binding-group name="standard-sockets" default-interface="public" port-offset="${jboss.socket.binding.port-offset:0}">
-        <socket-binding name="management-native" interface="management" port="${jboss.management.native.port:9999}"/>
-        <socket-binding name="management-http" interface="management" port="${jboss.management.http.port:9990}"/>
-        <socket-binding name="management-https" interface="management" port="${jboss.management.https.port:9443}"/>
-        <socket-binding name="ajp" port="8009"/>
-        <socket-binding name="http" port="8080"/>
-        <socket-binding name="https" port="8443"/>
-        <socket-binding name="osgi-http" interface="management" port="8090"/>
-        <socket-binding name="remoting" port="4447"/>
-        <socket-binding name="txn-recovery-environment" port="4712"/>
-        <socket-binding name="txn-status-manager" port="4713"/>
+    <socket-binding-group name="standard-sockets" default-interface="public" port-offset="0">
+        <socket-binding name="http" port="${jboss.http.port}"/>
+		<socket-binding name="ajp" port="${jboss.ajp.port}"/>
+        <socket-binding name="https" port="${jboss.https.port}"/>
+        <socket-binding name="management-native" interface="management" port="${jboss.management-native.port}"/>
+        <socket-binding name="management-http" interface="management" port="${jboss.management-http.port}"/>
+        <socket-binding name="management-https" interface="management" port="${jboss.management-https.port}"/>
+        <socket-binding name="osgi-http" interface="management" port="${jboss.osgi-http.port}"/>
+        <socket-binding name="remoting" port="${jboss.remoting.port}"/>
+        <socket-binding name="txn-recovery-environment" port="${jboss.txn-recovery-environment.port}"/>
+        <socket-binding name="txn-status-manager" port="${jboss.txn-status-manager.port}"/>
         <outbound-socket-binding name="mail-smtp">
-            <remote-destination host="localhost" port="25"/>
+            <remote-destination host="localhost" port="${jboss.mail-smtp.port}"/>
         </outbound-socket-binding>
-    </socket-binding-group>
+  </socket-binding-group>
 </server>
