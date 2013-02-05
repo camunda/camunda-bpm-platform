@@ -653,6 +653,24 @@
 		  </dependency>
 	   </dependencies>
 	</profile>
+	
+	<profile>
+      <id>postgresql</id>
+        <activation>
+        <property>
+          <name>database</name>
+          <value>postgresql</value>
+        </property>
+      </activation>
+      <dependencies>
+        <dependency>
+          <groupId>postgresql</groupId>
+          <artifactId>postgresql</artifactId>
+          <scope>test</scope>
+        </dependency>
+       </dependencies>
+    </profile>
+	
   </profiles>
 
 </project>
