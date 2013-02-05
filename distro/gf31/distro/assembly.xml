@@ -46,23 +46,10 @@
         </includes>
       </unpackOptions>
       <includes>
-        <include>com.camunda.fox.cockpit:cockpit-sql-scripts-eclipselink:jar:*</include>
 		<include>com.camunda.fox.cycle:cycle-sql-scripts:jar:*</include>
       </includes>
     </dependencySet>
-<!--     <dependencySet> -->
-<!--       <outputDirectory /> -->
-<!--       <unpack>true</unpack> -->
-<!--       <unpackOptions> -->
-<!--         <includes> -->
-<!--           <include>**/*.sql</include> -->
-<!--         </includes> -->
-<!--       </unpackOptions> -->
-<!--       <includes> -->
-<!--         <include>com.camunda.fox.cycle:cycle-sql-scripts:jar:*</include> -->
-<!--       </includes> -->
-<!--     </dependencySet> -->
-    
+
     <dependencySet>
   		<outputFileNameMapping>fox-tasklist-${project.version}.${artifact.extension}</outputFileNameMapping>
   		<includes>
@@ -70,14 +57,6 @@
   		</includes>
   		<outputDirectory>server/glassfish3/glassfish/domains/domain1/autodeploy</outputDirectory>
   	</dependencySet>    
-    
-    <dependencySet>
-      <outputFileNameMapping>fox-cockpit-glassfish-${project.version}.${artifact.extension}</outputFileNameMapping>
-      <includes>
-        <include>com.camunda.fox.cockpit:cockpit-webapp-fox-glassfish:war:*</include>
-      </includes>
-      <outputDirectory>server/glassfish3/glassfish/domains/domain1/autodeploy</outputDirectory>
-    </dependencySet>
     
 	<dependencySet>
       <outputFileNameMapping>fox-cycle-glassfish-${project.version}.${artifact.extension}</outputFileNameMapping>

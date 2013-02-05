@@ -32,32 +32,20 @@
     </dependency>    
     
     <dependency>
-      <groupId>com.camunda.fox.cockpit</groupId>
-      <artifactId>cockpit-sql-scripts-eclipselink</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    
-    <dependency>
       <groupId>com.camunda.fox.tasklist</groupId>
       <artifactId>tasklist-webapp</artifactId>
       <version>${project.version}</version>
       <type>war</type>
     </dependency>
 
-    <dependency>
-      <groupId>com.camunda.fox.cockpit</groupId>
-      <artifactId>cockpit-webapp-fox-glassfish</artifactId>
-      <version>${project.version}</version>
-      <type>war</type>
-    </dependency>
-	
-	 <!-- cycle -->
+	<!-- cycle -->
     <dependency>
       <groupId>com.camunda.fox.cycle</groupId>
       <artifactId>cycle-glassfish</artifactId>
       <version>${project.version}</version>    
       <type>war</type>
     </dependency>
+	
     <dependency>
       <groupId>com.camunda.fox.cycle</groupId>
       <artifactId>cycle-sql-scripts</artifactId>

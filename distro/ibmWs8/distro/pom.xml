@@ -74,19 +74,6 @@
       <artifactId>bcprov-ext-jdk15on</artifactId>
     </dependency>
 
-    <dependency>
-      <groupId>com.camunda.fox.cockpit</groupId>
-      <artifactId>cockpit-sql-scripts-openjpa</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    
-    <dependency>
-       <groupId>com.camunda.fox.cockpit</groupId>
-       <artifactId>cockpit-webapp-fox-was</artifactId>
-       <version>${project.version}</version>
-       <type>war</type>
-    </dependency>
-
     <!-- cycle -->
     <dependency>
       <groupId>com.camunda.fox.cycle</groupId>

@@ -1,5 +1,0 @@
-target/
-tmp/
-fox-deployer/jboss/
-fox-deployer-integration-test/jboss/
-fox-deployer/fox.properties
