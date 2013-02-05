@@ -27,6 +27,7 @@ import org.activiti.engine.task.Event;
 
 /**
  * @author Tom Baeyens
+ * @author Joram Barrez
  */
 public class DeleteAttachmentCmd implements Command<Object>, Serializable {
 
@@ -45,7 +46,13 @@ public class DeleteAttachmentCmd implements Command<Object>, Serializable {
     commandContext
       .getDbSqlSession()
       .delete(AttachmentEntity.class, attachmentId);
-    
+	  
+    if (attachment.getContentId() != null) {
+      commandContext
+        .getByteArrayManager()
+        .deleteByteArrayById(attachment.getContentId());
+    }
+        
     if (attachment.getTaskId()!=null) {
       CommentManager commentManager = commandContext.getCommentManager();
       if (commentManager.isHistoryEnabled()) {
