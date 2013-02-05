@@ -2292,10 +2292,10 @@ public class BpmnParse extends Parse {
             TaskListener taskListener = parseTaskListener(taskListenerElement);
             taskDefinition.addTaskListener(eventName, taskListener);
           } else {
-            addError("Invalid eventName for taskListener: choose 'create' | 'assignment' | 'complete'", userTaskElement);
+            addError("Attribute 'event' must be one of {create|assignment|complete}", userTaskElement);
           }
         } else {
-          addError("Event is mandatory on taskListener", userTaskElement);
+          addError("Attribute 'event' is mandatory on taskListener", userTaskElement);
         }
       }
     }
@@ -3051,10 +3051,10 @@ public class BpmnParse extends Parse {
       if ("start".equals(eventName) || "end".equals(eventName)) {
         return true;
       } else {
-        addError("Attribute 'eventName' must be one of {start|end}", listenerElement);
+        addError("Attribute 'event' must be one of {start|end}", listenerElement);
       }
     } else {
-      addError("Attribute 'eventName' is mandatory on listener", listenerElement);
+      addError("Attribute 'event' is mandatory on listener", listenerElement);
     }
     return false;
   }
@@ -3067,7 +3067,7 @@ public class BpmnParse extends Parse {
         ExecutionListener listener = parseExecutionListener(listenerElement);
         if (listener != null) {
           // Since a transition only fires event 'take', we don't parse the
-          // eventName, it is ignored
+          // event attribute, it is ignored
           activity.addExecutionListener(listener);
         }
       }
