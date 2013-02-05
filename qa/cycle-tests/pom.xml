@@ -1,4 +1,5 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>cycle-tests</artifactId>
@@ -9,7 +10,14 @@
     <artifactId>fox-platform-qa</artifactId>
     <version>6.2.0-SNAPSHOT</version>
   </parent>
-  
+
+  <properties>
+    <database.host>${project.build.directory}</database.host>
+    <database.name>fox-engine</database.name>
+    <database.user>sa</database.user>
+    <database.password>sa</database.password>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.jboss.spec</groupId>
@@ -24,33 +32,33 @@
         </exclusion>
       </exclusions>
     </dependency>
-    
+
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
       <scope>test</scope>
     </dependency>
-    
+
     <dependency>
-        <groupId>com.sun.jersey.contribs</groupId>
-        <artifactId>jersey-apache-client4</artifactId>
-        <version>1.15</version>
-        <scope>test</scope>
+      <groupId>com.sun.jersey.contribs</groupId>
+      <artifactId>jersey-apache-client4</artifactId>
+      <version>1.15</version>
+      <scope>test</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>com.sun.jersey</groupId>
       <artifactId>jersey-json</artifactId>
       <version>1.15</version>
       <scope>test</scope>
     </dependency>
-    
+
     <dependency>
-        <groupId>commons-io</groupId>
-        <artifactId>commons-io</artifactId>
-        <scope>test</scope>
+      <groupId>commons-io</groupId>
+      <artifactId>commons-io</artifactId>
+      <scope>test</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>com.camunda.fox.cycle</groupId>
       <artifactId>cycle</artifactId>
@@ -59,510 +67,749 @@
       <classifier>core</classifier>
     </dependency>
 
+    <dependency>
+      <groupId>com.camunda.fox.cycle</groupId>
+      <artifactId>cycle-sql-scripts</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+
+    <!-- db drivers for maven sql -->
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>mysql</groupId>
+      <artifactId>mysql-connector-java</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.oracle.jdbc</groupId>
+      <artifactId>ojdbc6</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.oracle.jdbc</groupId>
+      <artifactId>ojdbc14</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.ibm.db2.jcc</groupId>
+      <artifactId>db2jcc4</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.microsoft.sqlserver</groupId>
+      <artifactId>sqljdbc4</artifactId>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <scope>test</scope>
+    </dependency>
+
   </dependencies>
-  
-  
+
+
   <profiles>
-  	<profile>
-  		<id>jboss</id>
-	    <properties>
-    		<jboss.assembly.location>${basedir}/${jboss.runtime.location}</jboss.assembly.location>
-            <cycle.http.port>${jboss.http.port}</cycle.http.port>
-  		</properties>  		
-		<dependencies>
-		  <dependency>
-		    <!-- make sure it comes after assembly in the build -->
-		     <groupId>com.camunda.fox.platform</groupId>
-		     <artifactId>fox-platform-qa-jboss-runtime</artifactId>
-		     <version>${project.version}</version>
-		     <type>pom</type>
-		   </dependency>
-            <dependency>
-		     <groupId>com.camunda.fox.cycle</groupId>
-		     <artifactId>cycle-jboss</artifactId>
-		     <version>${project.version}</version>
-		     <type>war</type>
-		     <scope>test</scope>
-		    </dependency>
-		 </dependencies>
-		
-		 <build>		 
-		   <plugins>       
-            <plugin>
-              <groupId>org.codehaus.cargo</groupId>
-              <artifactId>cargo-maven2-plugin</artifactId>
-              <executions>
-                <execution>
-                  <id>start-container</id>
-                  <phase>pre-integration-test</phase>
-                  <goals>
-                    <goal>start</goal>
-                  </goals>
-                </execution>
-                <execution>
-                  <id>stop-container</id>
-                  <phase>post-integration-test</phase>
-                  <goals>
-                    <goal>stop</goal>
-                  </goals>
-                </execution>
-              </executions>
+    <profile>
+      <id>jboss</id>
+      <properties>
+        <jboss.assembly.location>${basedir}/${jboss.runtime.location}</jboss.assembly.location>
+        <cycle.http.port>${jboss.http.port}</cycle.http.port>
+      </properties>
+      <dependencies>
+        <dependency>
+          <!-- make sure it comes after assembly in the build -->
+          <groupId>com.camunda.fox.platform</groupId>
+          <artifactId>fox-platform-qa-jboss-runtime</artifactId>
+          <version>${project.version}</version>
+          <type>pom</type>
+        </dependency>
+        <dependency>
+          <groupId>com.camunda.fox.cycle</groupId>
+          <artifactId>cycle-jboss</artifactId>
+          <version>${project.version}</version>
+          <type>war</type>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.cargo</groupId>
+            <artifactId>cargo-maven2-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>start-container</id>
+                <phase>pre-integration-test</phase>
+                <goals>
+                  <goal>start</goal>
+                </goals>
+              </execution>
+              <execution>
+                <id>stop-container</id>
+                <phase>post-integration-test</phase>
+                <goals>
+                  <goal>stop</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <!-- Container configuration -->
+              <container>
+                <type>installed</type>
+                <containerId>jboss71x</containerId>
+                <append>false</append>
+                <home>${jboss.assembly.location}</home>
+              </container>
               <configuration>
-                <!-- Container configuration -->
-                  <container>
-                    <type>installed</type>
-                    <containerId>jboss71x</containerId>
-                    <append>false</append>
-                    <home>${jboss.assembly.location}</home>
-                  </container>
-                  <configuration>
-                    <type>standalone</type>
-                    <home>${project.build.directory}/config-jboss</home>
-                    <properties>
-                      <cargo.servlet.port>${jboss.http.port}</cargo.servlet.port>
-                    </properties>
-                  </configuration>
-                  <deployables>
-					<deployable>
-					 <groupId>com.camunda.fox.cycle</groupId>
-					 <artifactId>cycle-jboss</artifactId>
-					 <type>war</type>
-					  <properties>
-						<context>cycle</context>
-					  </properties>
-					</deployable>
-				  </deployables>
-                  <wait>false</wait>
+                <type>standalone</type>
+                <home>${project.build.directory}/config-jboss</home>
+                <properties>
+                  <cargo.servlet.port>${jboss.http.port}</cargo.servlet.port>
+                </properties>
               </configuration>
-            </plugin>            
-		  </plugins>
-		</build>
-  	</profile>
-  	<profile>
-  		<id>glassfish</id>
-		<properties>
-		  <glassfish.server.location>../gf31-runtime/target/glassfish3</glassfish.server.location>
-          <cycle.http.port>${glassfish.http.port}</cycle.http.port>
-		</properties>
-  		
-  	    <dependencies>	
-		  <dependency>
-		    <!-- make sure it comes after the test runtime in the build -->
-			<groupId>com.camunda.fox.platform</groupId>
-		    <artifactId>fox-platform-qa-glassfish-runtime</artifactId>
-		   	<version>${project.version}</version>
-		    <type>pom</type>
-		  </dependency>
- 		  <dependency>
-		    <groupId>com.camunda.fox.cycle</groupId>
-		    <artifactId>cycle-glassfish</artifactId>
-		    <version>${project.version}</version>
-		    <type>war</type>
-		    <scope>test</scope>
-		  </dependency>
-		  
-		</dependencies>
-		
-		<build>
-          <resources>
-            <resource>
-              <directory>src/main/domains</directory>
-              <filtering>true</filtering>
-            </resource>
-          </resources>
-		  <plugins>
-		    <plugin>
-		      <groupId>org.apache.maven.plugins</groupId>
-		      <artifactId>maven-antrun-plugin</artifactId>
-		      <executions>
-		        <execution>
-		          <id>copy-distro</id>
-		          <phase>test-compile</phase>
-		          <goals>
-		            <goal>run</goal>
-		          </goals>
-		          <configuration>
-		            <target unless="maven.test.skip">
-		              <copy todir="target/glassfish3">
-		                <fileset dir="${glassfish.server.location}" />
-		              </copy>
-		            </target>
-		          </configuration>
-		        </execution>
-		        <execution>
-		          <id>copy-test-dependencies</id>
-		          <phase>test-compile</phase>
-		          <goals>
-		            <goal>run</goal>
-		          </goals>
-		          <configuration>
-		            <target unless="maven.test.skip">
-		              <dependencyfilesets scopes="test" types="war" />
-		              
-		              <copy todir="target/glassfish3/glassfish/domains/domain1/autodeploy">
-		                <fileset refid="maven.project.dependencies" />
-		                <regexpmapper from="^(.*)/([^/]+)/([^/]*)$$" to="\3" handledirsep="yes" />
-		              </copy>
-		                                                         
-		            </target>
-		          </configuration>
-		        </execution>
-		      </executions>
-		    </plugin>
-		    <plugin>
-		      <artifactId>maven-resources-plugin</artifactId>
-		      <executions>
-		        <execution>
-		          <id>copy-resources</id>
-		          <phase>test-compile</phase>
-		          <goals>
-		            <goal>copy-resources</goal>
-		          </goals>
-		          <configuration>
-		            <outputDirectory>${project.build.directory}/glassfish3/glassfish/domains</outputDirectory>
-		            <resources>          
-		              <resource>
-		                <directory>src/main/domains</directory>
-		                <filtering>true</filtering>
-		              </resource>
-		            </resources>              
-		          </configuration>            
-		        </execution>
-		      </executions>
-		    </plugin>
-            <plugin>
-              <groupId>org.codehaus.cargo</groupId>
-              <artifactId>cargo-maven2-plugin</artifactId>
-              <executions>
-                <execution>
-                  <id>start-container</id>
-                  <phase>pre-integration-test</phase>
-                  <goals>
-                    <goal>start</goal>
-                  </goals>
-                </execution>
-                <execution>
-                  <id>stop-container</id>
-                  <phase>post-integration-test</phase>
-                  <goals>
-                    <goal>stop</goal>
-                  </goals>
-                </execution>
-              </executions>
+              <deployables>
+                <deployable>
+                  <groupId>com.camunda.fox.cycle</groupId>
+                  <artifactId>cycle-jboss</artifactId>
+                  <type>war</type>
+                  <properties>
+                    <context>cycle</context>
+                  </properties>
+                </deployable>
+              </deployables>
+              <wait>false</wait>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>glassfish</id>
+      <properties>
+        <glassfish.server.location>../gf31-runtime/target/glassfish3</glassfish.server.location>
+        <cycle.http.port>${glassfish.http.port}</cycle.http.port>
+      </properties>
+
+      <dependencies>
+        <dependency>
+          <!-- make sure it comes after the test runtime in the build -->
+          <groupId>com.camunda.fox.platform</groupId>
+          <artifactId>fox-platform-qa-glassfish-runtime</artifactId>
+          <version>${project.version}</version>
+          <type>pom</type>
+        </dependency>
+        <dependency>
+          <groupId>com.camunda.fox.cycle</groupId>
+          <artifactId>cycle-glassfish</artifactId>
+          <version>${project.version}</version>
+          <type>war</type>
+          <scope>test</scope>
+        </dependency>
+
+      </dependencies>
+
+      <build>
+        <resources>
+          <resource>
+            <directory>src/main/domains</directory>
+            <filtering>true</filtering>
+          </resource>
+        </resources>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>copy-distro</id>
+                <phase>test-compile</phase>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <configuration>
+                  <target unless="maven.test.skip">
+                    <copy todir="target/glassfish3">
+                      <fileset dir="${glassfish.server.location}" />
+                    </copy>
+                  </target>
+                </configuration>
+              </execution>
+              <execution>
+                <id>copy-test-dependencies</id>
+                <phase>test-compile</phase>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <configuration>
+                  <target unless="maven.test.skip">
+                    <dependencyfilesets scopes="test" types="war" />
+
+                    <copy todir="target/glassfish3/glassfish/domains/domain1/autodeploy">
+                      <fileset refid="maven.project.dependencies" />
+                      <regexpmapper from="^(.*)/([^/]+)/([^/]*)$$" to="\3" handledirsep="yes" />
+                    </copy>
+
+                  </target>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <artifactId>maven-resources-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>copy-resources</id>
+                <phase>test-compile</phase>
+                <goals>
+                  <goal>copy-resources</goal>
+                </goals>
+                <configuration>
+                  <outputDirectory>${project.build.directory}/glassfish3/glassfish/domains</outputDirectory>
+                  <resources>
+                    <resource>
+                      <directory>src/main/domains</directory>
+                      <filtering>true</filtering>
+                    </resource>
+                  </resources>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.codehaus.cargo</groupId>
+            <artifactId>cargo-maven2-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>start-container</id>
+                <phase>pre-integration-test</phase>
+                <goals>
+                  <goal>start</goal>
+                </goals>
+              </execution>
+              <execution>
+                <id>stop-container</id>
+                <phase>post-integration-test</phase>
+                <goals>
+                  <goal>stop</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <!-- Container configuration -->
+              <container>
+                <type>installed</type>
+                <containerId>glassfish3x</containerId>
+                <append>false</append>
+                <home>${project.build.directory}/glassfish3</home>
+              </container>
               <configuration>
-                <!-- Container configuration -->
-                  <container>
-                    <type>installed</type>
-                    <containerId>glassfish3x</containerId>
-                    <append>false</append>
-                    <home>${project.build.directory}/glassfish3</home>
-                  </container>
-                  <configuration>
-                    <type>existing</type>
-                    <home>${project.build.directory}/glassfish3/glassfish/domains</home>
-                    <properties>
-                        <cargo.servlet.port>${glassfish.http.port}</cargo.servlet.port>
-                        <cargo.glassfish.adminPort>${glassfish.admin.port}</cargo.glassfish.adminPort>
-                        <cargo.glassfish.domain.name>domain1</cargo.glassfish.domain.name>
-                        <cargo.remote.username>admin</cargo.remote.username>
-                        <cargo.remote.password />
-                    </properties>
-                  </configuration>
-                  <wait>false</wait>
+                <type>existing</type>
+                <home>${project.build.directory}/glassfish3/glassfish/domains</home>
+                <properties>
+                  <cargo.servlet.port>${glassfish.http.port}</cargo.servlet.port>
+                  <cargo.glassfish.adminPort>${glassfish.admin.port}</cargo.glassfish.adminPort>
+                  <cargo.glassfish.domain.name>domain1</cargo.glassfish.domain.name>
+                  <cargo.remote.username>admin</cargo.remote.username>
+                  <cargo.remote.password />
+                </properties>
               </configuration>
-            </plugin> 
-		  </plugins>
-		</build>  		
-  	</profile>
-  	<profile>
-  		<id>was80</id>
-        <properties>
-          <cycle.http.port>${was.http.port}</cycle.http.port>
-        </properties>
-        <dependencies>
-		  <dependency>
-		    <groupId>com.camunda.fox.engine</groupId>
-		    <artifactId>fox-engine</artifactId>
-		  </dependency>
-		  <dependency>		    
-		    <groupId>org.mybatis</groupId>
-		    <artifactId>mybatis</artifactId>
-		  </dependency>
-		  <dependency>
-		    <groupId>com.fasterxml.uuid</groupId>
-		    <artifactId>java-uuid-generator</artifactId>
-		  </dependency>
-		
-		  <dependency>
-		    <groupId>com.camunda.fox.platform</groupId>
-		    <artifactId>fox-platform-ibm-websphere-ear</artifactId>
-		    <version>${project.version}</version>
-		    <type>ear</type>
-		  </dependency>
-		  <dependency>
-		    <groupId>com.camunda.fox.platform</groupId>
-		    <artifactId>fox-platform-jobexecutor-rar</artifactId>
-		    <version>${project.version}</version>
-		    <type>rar</type>
-		  </dependency>
-		  
- 		  <dependency>
-		    <groupId>com.camunda.fox.cycle</groupId>
-		    <artifactId>cycle-was</artifactId>
-		    <version>${project.version}</version>
-		    <type>war</type>
-		    <scope>test</scope>
-		  </dependency>
-      
-          <dependency>
-            <!-- make sure it comes after the test runtime in the build -->
-            <groupId>com.camunda.fox.platform</groupId>
-            <artifactId>fox-platform-qa-websphere-runtime</artifactId>
-            <version>${project.version}</version>
-            <type>pom</type>
-          </dependency>
-          
-		</dependencies>
-		
-        <!-- on WAS, cycle is already deployed as part of the websphere test runtime. -->
-			
-  	</profile>
+              <wait>false</wait>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>was80</id>
+      <properties>
+        <cycle.http.port>${was.http.port}</cycle.http.port>
+      </properties>
+      <dependencies>
+        <dependency>
+          <groupId>com.camunda.fox.engine</groupId>
+          <artifactId>fox-engine</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>com.camunda.fox.platform</groupId>
+          <artifactId>fox-platform-api</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>com.camunda.fox.platform</groupId>
+          <artifactId>fox-platform-jobexecutor-api</artifactId>
+          <version>${project.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.mybatis</groupId>
+          <artifactId>mybatis</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>com.fasterxml.uuid</groupId>
+          <artifactId>java-uuid-generator</artifactId>
+        </dependency>
+
+        <dependency>
+          <groupId>com.camunda.fox.platform</groupId>
+          <artifactId>fox-platform-ibm-websphere-ear</artifactId>
+          <version>${project.version}</version>
+          <type>ear</type>
+        </dependency>
+        <dependency>
+          <groupId>com.camunda.fox.platform</groupId>
+          <artifactId>fox-platform-jobexecutor-rar</artifactId>
+          <version>${project.version}</version>
+          <type>rar</type>
+        </dependency>
+
+        <dependency>
+          <groupId>com.camunda.fox.cycle</groupId>
+          <artifactId>cycle-was</artifactId>
+          <version>${project.version}</version>
+          <type>war</type>
+          <scope>test</scope>
+        </dependency>
+
+        <dependency>
+          <!-- make sure it comes after the test runtime in the build -->
+          <groupId>com.camunda.fox.platform</groupId>
+          <artifactId>fox-platform-qa-websphere-runtime</artifactId>
+          <version>${project.version}</version>
+          <type>pom</type>
+        </dependency>
+
+      </dependencies>
+
+      <!-- on WAS, cycle is already deployed as part of the websphere test runtime. -->
+
+    </profile>
     <profile>
       <id>was85</id>
-        <properties>
-          <cycle.http.port>${was.http.port}</cycle.http.port>
-        </properties>
-        <dependencies>
-      <dependency>
-        <groupId>com.camunda.fox.engine</groupId>
-        <artifactId>fox-engine</artifactId>
-      </dependency>
-      <dependency>
-        <groupId>com.camunda.fox.platform</groupId>
-        <artifactId>fox-platform-api</artifactId>
-      </dependency>
-      <dependency>
-        <groupId>com.camunda.fox.platform</groupId>
-        <artifactId>fox-platform-jobexecutor-api</artifactId>
-        <version>${project.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.mybatis</groupId>
-        <artifactId>mybatis</artifactId>
-      </dependency>
-      <dependency>
-        <groupId>com.fasterxml.uuid</groupId>
-        <artifactId>java-uuid-generator</artifactId>
-      </dependency>
-    
-      <dependency>
-        <groupId>com.camunda.fox.platform</groupId>
-        <artifactId>fox-platform-ibm-websphere-ear</artifactId>
-        <version>${project.version}</version>
-        <type>ear</type>
-      </dependency>
-      <dependency>
-        <groupId>com.camunda.fox.platform</groupId>
-        <artifactId>fox-platform-jobexecutor-rar</artifactId>
-        <version>${project.version}</version>
-        <type>rar</type>
-      </dependency>
-      
-      <dependency>
-        <groupId>com.camunda.fox.cycle</groupId>
-        <artifactId>cycle-was</artifactId>
-        <version>${project.version}</version>
-        <type>war</type>
-        <scope>test</scope>
-      </dependency>
-      
-          <dependency>
-            <!-- make sure it comes after the test runtime in the build -->
-            <groupId>com.camunda.fox.platform</groupId>
-            <artifactId>fox-platform-qa-websphere-runtime</artifactId>
-            <version>${project.version}</version>
-            <type>pom</type>
-          </dependency>
-          
-    </dependencies>
-    
-        <!-- on WAS, cycle is already deployed as part of the websphere test runtime. -->
-      
-    </profile>
-	
-	
-	<profile>
-  		<id>tomcat6</id>
-     	<activation>
-	      <activeByDefault>true</activeByDefault>
-	    </activation>
-	    <properties>
-    		<tomcat6.assembly.location>../tomcat6-runtime/target/apache-tomcat-6.0.36</tomcat6.assembly.location>
-            <cycle.http.port>${tomcat6.connector.http.port}</cycle.http.port>
-  		</properties>  		
-		<dependencies>
-		  <dependency>
-		    <!-- make sure it comes after assembly in the build -->
-		     <groupId>com.camunda.fox.platform</groupId>
-		     <artifactId>fox-platform-qa-tomcat6-runtime</artifactId>
-		     <version>${project.version}</version>
-		     <type>pom</type>
-		   </dependency>
-            <dependency>
-		     <groupId>com.camunda.fox.cycle</groupId>
-		     <artifactId>cycle-tomcat</artifactId>
-		     <version>${project.version}</version>
-		     <type>war</type>
-		     <scope>test</scope>
-		    </dependency>
-		 </dependencies>
-		
-		 <build>		   
-		   <plugins>
-		     <plugin>
-		       <groupId>org.apache.maven.plugins</groupId>
-		       <artifactId>maven-antrun-plugin</artifactId>
-		       <executions>
-		         <execution>
-		           <id>copy-distro</id>
-		           <phase>test-compile</phase>
-		           <goals>
-		             <goal>run</goal>
-		           </goals>
-		           <configuration>
-		             <target unless="maven.test.skip">
+      <properties>
+        <cycle.http.port>${was.http.port}</cycle.http.port>
+      </properties>
+      <dependencies>
+        <dependency>
+          <groupId>com.camunda.fox.engine</groupId>
+          <artifactId>fox-engine</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>com.camunda.fox.platform</groupId>
+          <artifactId>fox-platform-api</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>com.camunda.fox.platform</groupId>
+          <artifactId>fox-platform-jobexecutor-api</artifactId>
+          <version>${project.version}</version>
+        </dependency>
+        <dependency>
+          <groupId>org.mybatis</groupId>
+          <artifactId>mybatis</artifactId>
+        </dependency>
+        <dependency>
+          <groupId>com.fasterxml.uuid</groupId>
+          <artifactId>java-uuid-generator</artifactId>
+        </dependency>
 
-                      <!-- copy jboss server runtime -->
-                      <mkdir dir="target/apache-tomcat-6.0.36"/>                      
-		              <copy todir="target/apache-tomcat-6.0.36" >
-		                 <fileset dir="${tomcat6.assembly.location}" />
-		              </copy>
-                       
-		            </target>
-		          </configuration>
-		        </execution>
-		      </executions>
-		    </plugin>
-		                
-            <plugin>
-              <groupId>org.codehaus.cargo</groupId>
-              <artifactId>cargo-maven2-plugin</artifactId>
-              <executions>
-                <execution>
-                  <id>start-container</id>
-                  <phase>pre-integration-test</phase>
-                  <goals>
-                    <goal>start</goal>
-                  </goals>
-                </execution>
-                <execution>
-                  <id>stop-container</id>
-                  <phase>post-integration-test</phase>
-                  <goals>
-                    <goal>stop</goal>
-                  </goals>
-                </execution>
-              </executions>
+        <dependency>
+          <groupId>com.camunda.fox.platform</groupId>
+          <artifactId>fox-platform-ibm-websphere-ear</artifactId>
+          <version>${project.version}</version>
+          <type>ear</type>
+        </dependency>
+        <dependency>
+          <groupId>com.camunda.fox.platform</groupId>
+          <artifactId>fox-platform-jobexecutor-rar</artifactId>
+          <version>${project.version}</version>
+          <type>rar</type>
+        </dependency>
+
+        <dependency>
+          <groupId>com.camunda.fox.cycle</groupId>
+          <artifactId>cycle-was</artifactId>
+          <version>${project.version}</version>
+          <type>war</type>
+          <scope>test</scope>
+        </dependency>
+
+        <dependency>
+          <!-- make sure it comes after the test runtime in the build -->
+          <groupId>com.camunda.fox.platform</groupId>
+          <artifactId>fox-platform-qa-websphere-runtime</artifactId>
+          <version>${project.version}</version>
+          <type>pom</type>
+        </dependency>
+
+      </dependencies>
+
+      <!-- on WAS, cycle is already deployed as part of the websphere test runtime. -->
+
+    </profile>
+
+
+    <profile>
+      <id>tomcat6</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <properties>
+        <tomcat6.assembly.location>../tomcat6-runtime/target/apache-tomcat-6.0.36</tomcat6.assembly.location>
+        <cycle.http.port>${tomcat6.connector.http.port}</cycle.http.port>
+      </properties>
+      <dependencies>
+        <dependency>
+          <!-- make sure it comes after assembly in the build -->
+          <groupId>com.camunda.fox.platform</groupId>
+          <artifactId>fox-platform-qa-tomcat6-runtime</artifactId>
+          <version>${project.version}</version>
+          <type>pom</type>
+        </dependency>
+        <dependency>
+          <groupId>com.camunda.fox.cycle</groupId>
+          <artifactId>cycle-tomcat</artifactId>
+          <version>${project.version}</version>
+          <type>war</type>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>copy-distro</id>
+                <phase>test-compile</phase>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <configuration>
+                  <target unless="maven.test.skip">
+
+                    <!-- copy jboss server runtime -->
+                    <mkdir dir="target/apache-tomcat-6.0.36" />
+                    <copy todir="target/apache-tomcat-6.0.36">
+                      <fileset dir="${tomcat6.assembly.location}" />
+                    </copy>
+
+                  </target>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+
+          <plugin>
+            <groupId>org.codehaus.cargo</groupId>
+            <artifactId>cargo-maven2-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>start-container</id>
+                <phase>pre-integration-test</phase>
+                <goals>
+                  <goal>start</goal>
+                </goals>
+              </execution>
+              <execution>
+                <id>stop-container</id>
+                <phase>post-integration-test</phase>
+                <goals>
+                  <goal>stop</goal>
+                </goals>
+              </execution>
+            </executions>
+            <configuration>
+              <!-- Container configuration -->
+              <container>
+                <type>installed</type>
+                <containerId>tomcat6x</containerId>
+                <append>false</append>
+                <home>${project.build.directory}/apache-tomcat-6.0.36</home>
+              </container>
               <configuration>
-                <!-- Container configuration -->
-                  <container>
-                    <type>installed</type>
-                    <containerId>tomcat6x</containerId>
-                    <append>false</append>
-                    <home>${project.build.directory}/apache-tomcat-6.0.36</home>
-                  </container>
-                  <configuration>
-                    <type>standalone</type>
-                    <home>${project.build.directory}/config-tomcat</home>
-                    <properties>
-                      <cargo.servlet.port>${tomcat6.connector.http.port}</cargo.servlet.port>
-					  <cargo.tomcat.ajp.port>${tomcat6.connector.ajp.port}</cargo.tomcat.ajp.port>
-                    </properties>
-                  </configuration>
-				  <deployables>
-					<deployable>
-					 <groupId>com.camunda.fox.cycle</groupId>
-					 <artifactId>cycle-tomcat</artifactId>
-					 <type>war</type>
-					  <properties>
-						<context>cycle</context>
-					  </properties>
-					</deployable>
-				  </deployables>
-                  <wait>false</wait>
+                <type>standalone</type>
+                <home>${project.build.directory}/config-tomcat</home>
+                <properties>
+                  <cargo.servlet.port>${tomcat6.connector.http.port}</cargo.servlet.port>
+                  <cargo.tomcat.ajp.port>${tomcat6.connector.ajp.port}</cargo.tomcat.ajp.port>
+                </properties>
               </configuration>
-            </plugin>
-            
-		  </plugins>
-		</build>
-  	</profile>
-	
+              <deployables>
+                <deployable>
+                  <groupId>com.camunda.fox.cycle</groupId>
+                  <artifactId>cycle-tomcat</artifactId>
+                  <type>war</type>
+                  <properties>
+                    <context>cycle</context>
+                  </properties>
+                </deployable>
+              </deployables>
+              <wait>false</wait>
+            </configuration>
+          </plugin>
+
+        </plugins>
+      </build>
+    </profile>
+
+    <!-- database properties for maven sql -->
+    <profile>
+      <id>h2</id>
+      <properties>
+        <test.db.name>h2</test.db.name>
+        <test.db.driver>org.h2.Driver</test.db.driver>
+        <test.db.url>jdbc:h2:${database.host}/dbs/${database.name};MVCC=TRUE</test.db.url>
+      </properties>
+    </profile>
+    <profile>
+      <id>h2-xa</id>
+      <properties>
+        <test.db.name>h2</test.db.name>
+        <test.db.driver>org.h2.Driver</test.db.driver>
+        <test.db.url>jdbc:h2:${database.host}/dbs/${database.name};MVCC=TRUE</test.db.url>
+      </properties>
+    </profile>
+    <profile>
+      <id>mysql</id>
+      <properties>
+        <test.db.name>mysql</test.db.name>
+        <test.db.driver>com.mysql.jdbc.Driver</test.db.driver>
+        <test.db.url>jdbc:mysql://${database.host}:3306/${database.name}</test.db.url>
+      </properties>
+    </profile>
+    <profile>
+      <id>mysql-xa</id>
+      <properties>
+        <test.db.name>mysql</test.db.name>
+        <test.db.driver>com.mysql.jdbc.Driver</test.db.driver>
+        <test.db.url>jdbc:mysql://${database.host}:3306/${database.name}</test.db.url>
+      </properties>
+    </profile>
+    <profile>
+      <id>mssql</id>
+      <properties>
+        <test.db.name>mssql</test.db.name>
+        <test.db.driver>com.microsoft.sqlserver.jdbc.SQLServerDriver</test.db.driver>
+        <test.db.url>jdbc:sqlserver://${database.host}:1433;DatabaseName=${database.name}</test.db.url>
+      </properties>
+    </profile>
+    <profile>
+      <id>mssql-xa</id>
+      <properties>
+        <test.db.name>mssql</test.db.name>
+        <test.db.driver>com.microsoft.sqlserver.jdbc.SQLServerDriver</test.db.driver>
+        <test.db.url>jdbc:sqlserver://${database.host}:1433;DatabaseName=${database.name}</test.db.url>
+      </properties>
+    </profile>
+    <profile>
+      <id>db2</id>
+      <properties>
+        <test.db.name>db2</test.db.name>
+        <test.db.driver>com.ibm.db2.jcc.DB2Driver</test.db.driver>
+        <test.db.url>jdbc:db2://${database.host}:50000/${database.name}</test.db.url>
+      </properties>
+    </profile>
+    <profile>
+      <id>db2-xa</id>
+      <properties>
+        <test.db.name>db2</test.db.name>
+        <test.db.driver>com.ibm.db2.jcc.DB2Driver</test.db.driver>
+        <test.db.url>jdbc:db2://${database.host}:50000/${database.name}</test.db.url>
+      </properties>
+    </profile>
+    <profile>
+      <id>postgres</id>
+      <properties>
+        <test.db.name>postgres</test.db.name>
+        <test.db.driver>org.postgresql.Driver</test.db.driver>
+        <test.db.url>jdbc:postgresql://${database.host}:5432/${database.name}</test.db.url>
+      </properties>
+    </profile>
+    <profile>
+      <id>postgres-xa</id>
+      <properties>
+        <test.db.name>postgres</test.db.name>
+        <test.db.driver>org.postgresql.Driver</test.db.driver>
+        <test.db.url>jdbc:postgresql://${database.host}:5432/${database.name}</test.db.url>
+      </properties>
+    </profile>
+    <profile>
+      <id>oracle</id>
+      <properties>
+        <test.db.name>oracle</test.db.name>
+        <test.db.driver>oracle.jdbc.OracleDriver</test.db.driver>
+        <test.db.url>jdbc:oracle:thin:@${database.host}:1521:xe</test.db.url>
+      </properties>
+    </profile>
+    <profile>
+      <id>oracle-xa</id>
+      <properties>
+        <test.db.name>oracle</test.db.name>
+        <test.db.driver>oracle.jdbc.OracleDriver</test.db.driver>
+        <test.db.url>jdbc:oracle:thin:@${database.host}:1521:xe</test.db.url>
+      </properties>
+    </profile>
   </profiles>
 
   <build>
-      <testResources>
-        <testResource>
-          <directory>src/test/resources</directory>
-          <filtering>true</filtering>
-        </testResource>
-      </testResources>
+    <testResources>
+      <testResource>
+        <directory>src/test/resources</directory>
+        <filtering>true</filtering>
+      </testResource>
+    </testResources>
 
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <skipTests>true</skipTests>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-failsafe-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>integration-test</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-dependency-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>unpack-sql-scripts</id>
+            <phase>generate-test-sources</phase>
+            <goals>
+              <goal>unpack</goal>
+            </goals>
+            <configuration>
+              <artifactItems>
+                <artifactItem>
+                  <groupId>com.camunda.fox.cycle</groupId>
+                  <artifactId>cycle-sql-scripts</artifactId>
+                  <outputDirectory>${project.build.directory}/sql-scripts</outputDirectory>
+                  <overWrite>true</overWrite>
+                </artifactItem>
+              </artifactItems>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>sql-maven-plugin</artifactId>
+        <version>1.5</version>
+        <dependencies>
+          <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <version>5.1.21</version>
+          </dependency>
+          <dependency>
+            <groupId>com.oracle.jdbc</groupId>
+            <artifactId>ojdbc6</artifactId>
+            <version>11.2.0.3</version>
+          </dependency>
+          <dependency>
+            <groupId>com.oracle.jdbc</groupId>
+            <artifactId>ojdbc14</artifactId>
+            <version>10.2.0.5</version>
+          </dependency>
+          <dependency>
+            <groupId>com.ibm.db2.jcc</groupId>
+            <artifactId>db2jcc4</artifactId>
+            <version>9.7</version>
+          </dependency>
+          <dependency>
+            <groupId>com.microsoft.sqlserver</groupId>
+            <artifactId>sqljdbc4</artifactId>
+            <version>4.0</version>
+          </dependency>
+          <dependency>
+            <groupId>postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>9.1-902.jdbc4</version>
+          </dependency>
+          <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>1.3.168</version>
+          </dependency>
+        </dependencies>
+        <configuration>
+          <driver>${test.db.driver}</driver>
+          <url>${test.db.url}</url>
+          <username>${database.user}</username>
+          <password>${database.password}</password>
+        </configuration>
+        <executions>
+          <execution>
+            <id>drop-db-if-present</id>
+            <phase>generate-test-resources</phase>
+            <goals>
+              <goal>execute</goal>
+            </goals>
+            <configuration>
+              <srcFiles>
+                <!-- try dropping the DB -->
+                <srcFile>${project.build.directory}/sql-scripts/sql/drop/${test.db.name}_cycle_${project.version}.sql</srcFile>
+              </srcFiles>
+              <autocommit>true</autocommit>
+              <onError>continue</onError>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+
+    </plugins>
+
+    <pluginManagement>
       <plugins>
+        <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build 
+          itself. -->
         <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-surefire-plugin</artifactId>
+          <groupId>org.eclipse.m2e</groupId>
+          <artifactId>lifecycle-mapping</artifactId>
+          <version>1.0.0</version>
           <configuration>
-            <skipTests>true</skipTests>
+            <lifecycleMappingMetadata>
+              <pluginExecutions>
+                <pluginExecution>
+                  <pluginExecutionFilter>
+                    <groupId>
+                      org.apache.maven.plugins
+                    </groupId>
+                    <artifactId>
+                      maven-antrun-plugin
+                    </artifactId>
+                    <versionRange>
+                      [1.7,)
+                    </versionRange>
+                    <goals>
+                      <goal>run</goal>
+                    </goals>
+                  </pluginExecutionFilter>
+                  <action>
+                    <ignore />
+                  </action>
+                </pluginExecution>
+              </pluginExecutions>
+            </lifecycleMappingMetadata>
           </configuration>
         </plugin>
-        <plugin>
-          <groupId>org.apache.maven.plugins</groupId>
-          <artifactId>maven-failsafe-plugin</artifactId>
-          <version>2.12</version>
-          <executions>
-            <execution>
-              <goals>
-                <goal>integration-test</goal>
-              </goals>
-            </execution>
-          </executions>
-        </plugin>
       </plugins>
-  
-      <pluginManagement>
-          <plugins>
-              <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
-              <plugin>
-                  <groupId>org.eclipse.m2e</groupId>
-                  <artifactId>lifecycle-mapping</artifactId>
-                  <version>1.0.0</version>
-                  <configuration>
-                      <lifecycleMappingMetadata>
-                          <pluginExecutions>
-                              <pluginExecution>
-                                  <pluginExecutionFilter>
-                                      <groupId>
-                                          org.apache.maven.plugins
-                                      </groupId>
-                                      <artifactId>
-                                          maven-antrun-plugin
-                                      </artifactId>
-                                      <versionRange>
-                                          [1.7,)
-                                      </versionRange>
-                                      <goals>
-                                          <goal>run</goal>
-                                      </goals>
-                                  </pluginExecutionFilter>
-                                  <action>
-                                      <ignore />
-                                  </action>
-                              </pluginExecution>
-                          </pluginExecutions>
-                      </lifecycleMappingMetadata>
-                  </configuration>
-              </plugin>
-          </plugins>
-      </pluginManagement>
+    </pluginManagement>
   </build>
 </project>
