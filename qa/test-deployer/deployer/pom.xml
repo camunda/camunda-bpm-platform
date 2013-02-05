@@ -67,7 +67,6 @@
       <groupId>com.camunda.fox.engine</groupId>
       <artifactId>fox-engine-cdi</artifactId>
       <scope>compile</scope>
-      <version>${project.version}</version>
     </dependency>
     
     <dependency>
@@ -113,7 +112,7 @@
       <artifactId>arquillian-test-spi</artifactId>
       <scope>provided</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>org.jboss.arquillian.config</groupId>
       <artifactId>arquillian-config-api</artifactId>
@@ -140,7 +139,7 @@
   
   <profiles>
     <profile>
-      <id>jboss-h2</id>
+      <id>jboss</id>
       <activation>
         <activeByDefault>true</activeByDefault>
       </activation>
@@ -170,48 +169,12 @@
             <filtering>true</filtering>
           </testResource>
           <testResource>
-            <directory>src/test/resources-jboss-h2</directory>
+            <directory>src/test/resources-jboss</directory>
             <filtering>true</filtering>
           </testResource>
         </testResources>
       </build>
-    </profile>
-    <profile>
-      <id>jboss-remote</id>
-      <dependencies>
-        <dependency>
-          <!-- make sure this comes after runtime in the reactor build -->
-          <groupId>com.camunda.fox.platform</groupId>
-          <artifactId>fox-platform-qa-jboss-runtime</artifactId>
-          <version>${project.version}</version>
-          <scope>provided</scope>
-          <type>pom</type>
-        </dependency>
-        <dependency>
-          <groupId>org.jboss.as</groupId>
-          <artifactId>jboss-as-arquillian-container-remote</artifactId>
-          <version>${version.jboss.as}</version>
-          <scope>test</scope>
-        </dependency>
-        <dependency>
-          <groupId>org.jboss.arquillian.protocol</groupId>
-          <artifactId>arquillian-protocol-servlet</artifactId>
-          <scope>test</scope>
-        </dependency>
-      </dependencies>
-      <build>
-        <testResources>
-          <testResource>
-            <directory>src/test/resources</directory>
-            <filtering>true</filtering>
-          </testResource>
-          <testResource>
-            <directory>src/test/resources-jboss-remote</directory>
-            <filtering>true</filtering>
-          </testResource>
-        </testResources>
-      </build>
-    </profile>
+    </profile>   
     <profile>
       <id>glassfish</id>
       <dependencies>

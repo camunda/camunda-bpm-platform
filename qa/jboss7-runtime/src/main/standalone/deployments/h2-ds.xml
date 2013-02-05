@@ -1,0 +1,34 @@
+<datasources>
+		<datasource jndi-name="java:jboss/datasources/ExampleDS" pool-name="ExampleDS" enabled="true" use-java-context="true">
+			<connection-url>jdbc:h2:mem:test;DB_CLOSE_DELAY=-1</connection-url>
+			<driver>h2</driver>
+			<security>
+				<user-name>sa</user-name>
+				<password>sa</password>
+			</security>
+		</datasource>
+		<datasource jndi-name="java:jboss/datasources/FoxEngineDS" enabled="true" use-java-context="true" jta="true" use-ccm="true" pool-name="FoxEngineDS">
+			<connection-url>jdbc:h2:mem:foxEngine;DB_CLOSE_DELAY=-1;MVCC=TRUE;DB_CLOSE_ON_EXIT=FALSE</connection-url>
+			<driver>h2</driver>
+			<security>
+				<user-name>sa</user-name>
+				<password>sa</password>
+			</security>                   
+		</datasource>
+		<datasource jndi-name="java:jboss/datasources/CockpitDS" enabled="true" use-java-context="true" jta="true" use-ccm="true" pool-name="CockpitDS">
+			<connection-url>jdbc:h2:mem:cockpit;DB_CLOSE_DELAY=-1;MVCC=TRUE;DB_CLOSE_ON_EXIT=FALSE</connection-url>
+			<driver>h2</driver>
+			<security>
+				<user-name>sa</user-name>
+				<password>sa</password>
+			</security>                   
+		</datasource>
+		<datasource jndi-name="java:jboss/datasources/CycleDS" enabled="true" use-java-context="true" jta="true" use-ccm="true" pool-name="CycleDS">
+			<connection-url>jdbc:h2:mem:cycle;DB_CLOSE_DELAY=-1;MVCC=TRUE;DB_CLOSE_ON_EXIT=FALSE</connection-url>
+			<driver>h2</driver>
+			<security>
+				<user-name>sa</user-name>
+				<password>sa</password>
+			</security>                   
+		</datasource>		
+</datasources>

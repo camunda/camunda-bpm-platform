@@ -18,6 +18,7 @@
     
     <!-- jboss -->
     <jboss.runtime.location>../jboss7-runtime/target/jboss-as-${version.jboss.as}/</jboss.runtime.location>
+    <jboss.datasource.filename>h2-ds.xml</jboss.datasource.filename>
     <jboss.http.port>38080</jboss.http.port>
     <jboss.ajp.port>38009</jboss.ajp.port>
     <jboss.https.port>38443</jboss.https.port>

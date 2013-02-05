@@ -54,7 +54,7 @@
 	  
 	  <version.commonj>1.1.0</version.commonj>
 	  <version.bouncycastle>1.47</version.bouncycastle>
-	   <version.jboss.as>7.1.0.Final</version.jboss.as>
+	   <version.jboss.as>7.1.3.Final</version.jboss.as>
 		<version.glassfish>3.1.2</version.glassfish>
 		<version.arquillian>1.0.1.Final</version.arquillian>
 		<version.arquillian.drone>1.0.0.Final</version.arquillian.drone>
@@ -70,9 +70,6 @@
     <module>qa</module>    
 	
     <module>webapps/h2-webapp</module>
-    <module>webapps/cockpit-webapp-fox</module>
-    <module>webapps/cockpit-webapp-fox-glassfish</module>
-    <module>webapps/cockpit-webapp-fox-was</module>
     <module>webapps/tasklist</module>
 	
     <module>javaee/ejb-service</module>

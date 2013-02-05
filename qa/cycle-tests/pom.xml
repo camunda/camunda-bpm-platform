@@ -66,8 +66,7 @@
   	<profile>
   		<id>jboss</id>
 	    <properties>
-    		<jboss.assembly.location>../jboss7-runtime/target/jboss-as-${version.jboss.as}</jboss.assembly.location>
-            <jboss.standalone.xml>standalone-h2.xml</jboss.standalone.xml>
+    		<jboss.assembly.location>${basedir}/${jboss.runtime.location}</jboss.assembly.location>
             <cycle.http.port>${jboss.http.port}</cycle.http.port>
   		</properties>  		
 		<dependencies>
@@ -87,51 +86,8 @@
 		    </dependency>
 		 </dependencies>
 		
-		 <build>
-		   <resources>
-		     <resource>
-		       <directory>src/main/standalone</directory>
-		       <filtering>true</filtering>
-		     </resource>
-		   </resources>
-		   <plugins>
-		     <plugin>
-		       <groupId>org.apache.maven.plugins</groupId>
-		       <artifactId>maven-antrun-plugin</artifactId>
-		       <executions>
-		         <execution>
-		           <id>copy-distro</id>
-		           <phase>test-compile</phase>
-		           <goals>
-		             <goal>run</goal>
-		           </goals>
-		           <configuration>
-		             <target unless="maven.test.skip">
-
-                      <!-- copy jboss server runtime -->
-                      <mkdir dir="target/jboss-as-${version.jboss.as}" />                      
-		              <copy todir="target/jboss-as-${version.jboss.as}">
-		                 <fileset dir="${jboss.assembly.location}" />
-		              </copy>
-                       
-                      <!-- add cycle.war to jboss deployments directory -->
-		              <dependencyfilesets scopes="test" types="war" />
-                      
-		              <copy todir="target/jboss-as-${version.jboss.as}/standalone/deployments">
-		                <fileset refid="maven.project.dependencies" />
-                        <regexpmapper from="^(.*)/([^/]+)/([^/]*)$$" to="\3" handledirsep="yes" />
-		              </copy>
-                                      
-                      <!-- we copy the correct configuraiton file to standalone.xml -->
-                      <copy file="target/jboss-as-${version.jboss.as}/standalone/configuration/${jboss.standalone.xml}" tofile="target/jboss-as-${version.jboss.as}/standalone/configuration/standalone.xml" overwrite="true" />
-                                                  
-                                                 
-		            </target>
-		          </configuration>
-		        </execution>
-		      </executions>
-		    </plugin>
-		                
+		 <build>		 
+		   <plugins>       
             <plugin>
               <groupId>org.codehaus.cargo</groupId>
               <artifactId>cargo-maven2-plugin</artifactId>
@@ -157,7 +113,7 @@
                     <type>installed</type>
                     <containerId>jboss71x</containerId>
                     <append>false</append>
-                    <home>${project.build.directory}/jboss-as-${version.jboss.as}</home>
+                    <home>${jboss.assembly.location}</home>
                   </container>
                   <configuration>
                     <type>standalone</type>
@@ -166,10 +122,19 @@
                       <cargo.servlet.port>${jboss.http.port}</cargo.servlet.port>
                     </properties>
                   </configuration>
+                  <deployables>
+					<deployable>
+					 <groupId>com.camunda.fox.cycle</groupId>
+					 <artifactId>cycle-jboss</artifactId>
+					 <type>war</type>
+					  <properties>
+						<context>cycle</context>
+					  </properties>
+					</deployable>
+				  </deployables>
                   <wait>false</wait>
               </configuration>
-            </plugin>
-            
+            </plugin>            
 		  </plugins>
 		</build>
   	</profile>
@@ -318,8 +283,8 @@
 		  <dependency>
 		    <groupId>com.camunda.fox.engine</groupId>
 		    <artifactId>fox-engine</artifactId>
-		  </dependency>		  
-		  <dependency>
+		  </dependency>
+		  <dependency>		    
 		    <groupId>org.mybatis</groupId>
 		    <artifactId>mybatis</artifactId>
 		  </dependency>

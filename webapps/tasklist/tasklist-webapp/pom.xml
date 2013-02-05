@@ -84,7 +84,7 @@
     <dependency>
       <groupId>org.jboss.as</groupId>
       <artifactId>jboss-as-arquillian-container-remote</artifactId>
-      <version>7.1.0.Final</version>
+      <version>7.1.3.Final</version>
       <scope>test</scope>
     </dependency>
 
