@@ -37,19 +37,6 @@
   </fileSets>
 
   <dependencySets>
-  
-    <dependencySet>
-      <outputDirectory />
-      <unpack>true</unpack>
-      <unpackOptions>
-        <includes>
-          <include>**/*_tomcat.sql</include>
-        </includes>
-      </unpackOptions>
-      <includes>
-        <include>com.camunda.fox.cockpit:cockpit-sql-scripts-openjpa:jar:*</include>
-      </includes>
-    </dependencySet>
 	
     <dependencySet>
       <outputDirectory />
@@ -63,15 +50,7 @@
         <include>com.camunda.fox.cycle:cycle-sql-scripts:jar:*</include>
       </includes>
     </dependencySet>
-	
-  	<dependencySet>
-  		<includes>
-  			<include>com.camunda.fox.cockpit:cockpit-webapp-servlet:war:*</include>
-  		</includes>
-  		<outputDirectory>server/apache-tomcat-${tomcat6.version}/webapps/cockpit</outputDirectory>
-        <unpack>true</unpack>
-  	</dependencySet>
-	
+		
 	<dependencySet>
   		<includes>
   			<include>com.camunda.fox.cycle:cycle-tomcat:war:*</include>

@@ -5,11 +5,11 @@
   <packaging>pom</packaging>
   <name>fox platform EE - QA</name>
 
-	<parent>
-		<groupId>com.camunda.fox.platform</groupId>
-		<artifactId>fox-platform</artifactId>
-		<version>6.2.0-SNAPSHOT</version>
-	</parent>
+  <parent>
+    <groupId>com.camunda.fox.platform</groupId>
+    <artifactId>fox-platform</artifactId>
+    <version>6.2.0-SNAPSHOT</version>
+  </parent>
 
   <properties>
     <!-- 
@@ -101,11 +101,6 @@
         <module>gf31-runtime</module>
         <module>integration-tests</module>
         <module>tasklist-gui-tests</module>
-        <module>test-process-application</module>        
-        <!-- see HEMERA-2709 - disabled because not supported on gf yet
-        <module>test-deployer</module>
-        <module>cockpit-tests</module>
-        -->
       </modules>
     </profile>
 	
@@ -115,10 +110,7 @@
 		<module>jboss7-runtime</module>
 		<module>cycle-tests</module>
         <module>integration-tests</module>
-        <module>tasklist-gui-tests</module>
-        <module>test-process-application</module>
-        <module>test-deployer</module>
-        <module>cockpit-tests</module>        
+        <module>tasklist-gui-tests</module>     
       </modules>
     </profile>  
 	
