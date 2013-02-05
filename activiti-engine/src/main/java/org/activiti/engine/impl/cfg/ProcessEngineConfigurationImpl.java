@@ -890,7 +890,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   protected void initExpressionManager() {
     if (expressionManager==null) {
-      expressionManager = new ExpressionManager();
+      expressionManager = new ExpressionManager(beans);
     }
   }
 
