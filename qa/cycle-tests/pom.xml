@@ -453,9 +453,6 @@
 
     <profile>
       <id>tomcat6</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
       <properties>
         <tomcat6.assembly.location>../tomcat6-runtime/target/apache-tomcat-6.0.36</tomcat6.assembly.location>
         <cycle.http.port>${tomcat6.connector.http.port}</cycle.http.port>
