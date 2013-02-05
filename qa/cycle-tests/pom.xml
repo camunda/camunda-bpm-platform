@@ -767,6 +767,19 @@
               <onError>continue</onError>
             </configuration>
           </execution>
+          <execution>
+            <id>create-db</id>
+            <phase>generate-test-resources</phase>
+            <goals>
+              <goal>execute</goal>
+            </goals>
+            <configuration>
+              <srcFiles>       
+                <!-- try creating schema -->
+                <srcFile>${project.build.directory}/scripts-old/sql/create/${test.db.name}_cycle_${project.version}.sql</srcFile>
+              </srcFiles>
+            </configuration>            
+          </execution>
         </executions>
       </plugin>
 
