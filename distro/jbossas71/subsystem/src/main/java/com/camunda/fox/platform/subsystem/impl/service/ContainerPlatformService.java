@@ -203,9 +203,17 @@ public class ContainerPlatformService extends PlatformService implements Service
       };
       
       String processEngineName = processArchive.getProcessEngineName();   
-      ServiceName processEngineServiceName = ContainerProcessEngineController.createServiceName(processEngineName);
+      ServiceName processEngineServiceName = null;
       
-      // we add a dependency to the module service for the module of the process archice classloader.
+      if(processEngineName == null) {
+        processEngineServiceName = ContainerProcessEngineController.createServiceNameForDefaultEngine();
+        
+      } else {
+        processEngineServiceName = ContainerProcessEngineController.createServiceName(processEngineName);
+        
+      }
+      
+      // we add a dependency to the module service for the module of the process archive classloader.
       // this makes sure that if the deployment module is removed, all process archive services 
       // registered by that deployment are removed as well, even if the process archive does not remove them explicitly.
       ClassLoader classLoader = processArchive.getClassLoader();      
@@ -256,10 +264,7 @@ public class ContainerPlatformService extends PlatformService implements Service
   }
   
   @SuppressWarnings("unchecked")
-  public void unInstallProcessArchive(String processArchiveName) {
-
-    unInstallProcessArchiveInternal(processArchiveName);
-       
+  public void unInstallProcessArchive(String processArchiveName) {           
     // remove the process archive service asynchronously.
     ServiceName serviceName = ProcessArchiveService.getServiceName(processArchiveName);
     ServiceController<ProcessArchiveService> service = (ServiceController<ProcessArchiveService>) serviceContainer.getService(serviceName);

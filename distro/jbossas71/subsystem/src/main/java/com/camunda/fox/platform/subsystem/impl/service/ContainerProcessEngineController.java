@@ -28,7 +28,6 @@ import org.jboss.msc.service.StopContext;
 import org.jboss.msc.value.InjectedValue;
 
 import com.camunda.fox.platform.impl.configuration.JtaCmpeProcessEngineConfiguration;
-import com.camunda.fox.platform.impl.context.ProcessArchiveContext;
 import com.camunda.fox.platform.impl.service.ProcessEngineController;
 import com.camunda.fox.platform.spi.ProcessEngineConfiguration;
 import com.camunda.fox.platform.subsystem.impl.util.Tccl;
@@ -52,6 +51,10 @@ public class ContainerProcessEngineController extends ProcessEngineController im
   
   public static ServiceName createServiceName(String engineName) {
     return ServiceName.of("foxPlatform", "processEngineController", engineName);
+  }
+  
+  public static ServiceName createServiceNameForDefaultEngine() {
+    return ServiceName.of("foxPlatform", "processEngineController", "$default$");
   }
 
   public ContainerProcessEngineController getValue() throws IllegalStateException, IllegalArgumentException {

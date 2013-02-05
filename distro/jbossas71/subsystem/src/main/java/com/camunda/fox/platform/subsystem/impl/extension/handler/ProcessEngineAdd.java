@@ -47,6 +47,7 @@ import org.jboss.as.naming.deployment.ContextNames;
 import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.ModelType;
 import org.jboss.dmr.Property;
+import org.jboss.msc.service.ServiceBuilder;
 import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceController.Mode;
 import org.jboss.msc.service.ServiceName;
@@ -143,16 +144,28 @@ public class ProcessEngineAdd extends AbstractAddStepHandler implements Descript
     ServiceName name = ContainerProcessEngineController.createServiceName(processEngineConfiguration.getProcessEngineName());    
     ContextNames.BindInfo datasourceBindInfo = ContextNames.bindInfoFor(processEngineConfiguration.getDatasourceJndiName());
     
-    ServiceController<ContainerProcessEngineController> controller = context.getServiceTarget()           
-            .addService(name, service)
+    ServiceBuilder<ContainerProcessEngineController> serviceBuilder = context.getServiceTarget()           
+            .addService(name, service)            
             .addDependency(ServiceName.JBOSS.append("txn").append("TransactionManager"), TransactionManager.class, service.getTransactionManagerInjector())
             .addDependency(datasourceBindInfo.getBinderServiceName(), DataSourceReferenceFactoryService.class, service.getDatasourceBinderServiceInjector())
             .addDependency(ContainerPlatformService.getServiceName(), ContainerPlatformService.class, service.getContainerPlatformServiceInjector())
             .addDependency(ContainerJobExecutorService.getServiceName(), ContainerJobExecutorService.class, service.getContainerJobExecutorInjector())
             .addListener(verificationHandler)
-            .setInitialMode(Mode.ACTIVE)
-            .install();
+            .setInitialMode(Mode.ACTIVE);
     
+    if(processEngineConfiguration.isDefault()) {
+      
+      // add a constant alias name for the default process engine: this allows as to set
+      // a declarative dependency to the default process engine servcie when registering
+      // process archive services whithout knowing the name of the default
+      // engine. It can be a constant since there can be only one default engine.
+      serviceBuilder.addAliases(ContainerProcessEngineController.createServiceNameForDefaultEngine());
+      
+    }
+    
+    ServiceController<ContainerProcessEngineController> controller = serviceBuilder
+            .install();
+        
     newControllers.add(controller);
   }
 

@@ -32,6 +32,7 @@ public class ProcessArchiveService implements Service<ProcessArchiveService> {
 
   public void start(StartContext arg0) throws StartException {
     ContainerPlatformService containerPlatformService = containerPlatformServiceInjector.getOptionalValue();
+    
     try {
       processArchiveInstallation = containerPlatformService.installProcessArchiveInternal(processArchive);
     } catch(Throwable e) {
