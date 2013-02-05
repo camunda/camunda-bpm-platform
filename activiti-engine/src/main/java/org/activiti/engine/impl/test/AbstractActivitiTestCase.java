@@ -54,7 +54,7 @@ public abstract class AbstractActivitiTestCase extends PvmTestCase {
 
   static {
     // this ensures that mybatis uses the jdk logging
-    //    LogFactory.useJdkLogging();
+    LogFactory.useJdkLogging();
     // with an upgrade of mybatis, this might have to become org.mybatis.generator.logging.LogFactory.forceJavaLogging();
   }
   
@@ -78,6 +78,10 @@ public abstract class AbstractActivitiTestCase extends PvmTestCase {
   protected ManagementService managementService;
   
   protected abstract void initializeProcessEngine();
+  
+  // Default: do nothing
+  protected void closeDownProcessEngine() {
+  }
   
   @Override
   public void runBare() throws Throwable {
@@ -110,6 +114,9 @@ public abstract class AbstractActivitiTestCase extends PvmTestCase {
       TestHelper.annotationDeploymentTearDown(processEngine, deploymentId, getClass(), getName());
       assertAndEnsureCleanDb();
       ClockUtil.reset();
+      
+      // Can't do this in the teardown, as the teardown will be called as part of the super.runBare
+      closeDownProcessEngine();
     }
   }
 
@@ -193,7 +200,12 @@ public abstract class AbstractActivitiTestCase extends PvmTestCase {
       try {
         while (areJobsAvailable && !task.isTimeLimitExceeded()) {
           Thread.sleep(intervalMillis);
-          areJobsAvailable = areJobsAvailable();
+          try {
+            areJobsAvailable = areJobsAvailable();
+          } catch(Throwable t) {
+            // Ignore, possible that exception occurs due to locking/updating of table on MSSQL when
+            // isolation level doesn't allow READ of the table
+          }
         }
       } catch (InterruptedException e) {
       } finally {
