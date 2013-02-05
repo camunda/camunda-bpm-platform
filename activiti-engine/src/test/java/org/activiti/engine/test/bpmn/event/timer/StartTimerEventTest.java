@@ -241,7 +241,7 @@ public class StartTimerEventTest extends PluggableActivitiTestCase {
     cleanDB();
     repositoryService.deleteDeployment(secondDeploymentId, true);
   }
-  
+      
   private void cleanDB() {
     String jobId = managementService.createJobQuery().singleResult().getId();
     CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutorTxRequired();
