@@ -129,7 +129,92 @@
         <module>cycle-tests</module>
       </modules>
     </profile>  
-	
-  	
+    
+    <!-- db profiles -->
+    
+    <profile>
+      <id>db2</id>
+      <properties>
+          <jboss.datasource.filename>db2-ds.xml</jboss.datasource.filename>
+      </properties>
+    </profile>
+    
+    <profile>
+      <id>db2-xa</id>
+      <properties>
+          <jboss.datasource.filename>db2-xa-ds.xml</jboss.datasource.filename>
+      </properties>
+    </profile>
+    
+    <profile>
+      <id>h2</id>
+      <properties>
+          <jboss.datasource.filename>h2-ds.xml</jboss.datasource.filename>
+      </properties>
+    </profile>
+    
+    <profile>
+      <id>h2-xa</id>
+      <properties>
+          <jboss.datasource.filename>h2-xa-ds.xml</jboss.datasource.filename>
+      </properties>
+    </profile>
+    
+    <profile>
+      <id>mssql</id>
+      <properties>
+          <jboss.datasource.filename>mssql-ds.xml</jboss.datasource.filename>
+      </properties>
+    </profile>
+    
+    <profile>
+      <id>mssql-xa</id>
+      <properties>
+          <jboss.datasource.filename>mssql-xa-ds.xml</jboss.datasource.filename>
+      </properties>
+    </profile>
+    
+    <profile>
+      <id>oracle</id>
+      <properties>
+          <jboss.datasource.filename>oracle-ds.xml</jboss.datasource.filename>
+      </properties>
+    </profile>
+    
+    <profile>
+      <id>oracle-xa</id>
+      <properties>
+          <jboss.datasource.filename>oracle-xa-ds.xml</jboss.datasource.filename>
+      </properties>
+    </profile>
+    
+    <profile>
+      <id>postgres</id>
+      <properties>
+          <jboss.datasource.filename>postgres-ds.xml</jboss.datasource.filename>
+      </properties>
+    </profile>
+    
+    <profile>
+      <id>postgres-xa</id>
+      <properties>
+          <jboss.datasource.filename>postgres-xa-ds.xml</jboss.datasource.filename>
+      </properties>
+    </profile>
+    
+    <profile>
+      <id>mysql</id>
+      <properties>
+          <jboss.datasource.filename>mysql-ds.xml</jboss.datasource.filename>
+      </properties>
+    </profile>
+    
+    <profile>
+      <id>mysql-xa</id>
+      <properties>
+          <jboss.datasource.filename>mysql-xa-ds.xml</jboss.datasource.filename>
+      </properties>
+    </profile>
+   	
   </profiles>
 </project>
