@@ -33,9 +33,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-import javax.transaction.TransactionManager;
 
-import org.jboss.as.connector.subsystems.datasources.DataSourceReferenceFactoryService;
 import org.jboss.as.controller.AbstractAddStepHandler;
 import org.jboss.as.controller.OperationContext;
 import org.jboss.as.controller.OperationFailedException;
@@ -43,19 +41,15 @@ import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.ServiceVerificationHandler;
 import org.jboss.as.controller.descriptions.DescriptionProvider;
 import org.jboss.as.controller.descriptions.ModelDescriptionConstants;
-import org.jboss.as.naming.deployment.ContextNames;
 import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.ModelType;
 import org.jboss.dmr.Property;
 import org.jboss.msc.service.ServiceBuilder;
 import org.jboss.msc.service.ServiceController;
-import org.jboss.msc.service.ServiceController.Mode;
 import org.jboss.msc.service.ServiceName;
 
 import com.camunda.fox.platform.spi.ProcessEngineConfiguration;
 import com.camunda.fox.platform.subsystem.impl.extension.Element;
-import com.camunda.fox.platform.subsystem.impl.service.ContainerJobExecutorService;
-import com.camunda.fox.platform.subsystem.impl.service.ContainerPlatformService;
 import com.camunda.fox.platform.subsystem.impl.service.ContainerProcessEngineController;
 import com.camunda.fox.platform.subsystem.impl.util.ProcessEngineConfigurationImpl;
 
@@ -139,34 +133,24 @@ public class ProcessEngineAdd extends AbstractAddStepHandler implements Descript
     String engineName = PathAddress.pathAddress(operation.get(ModelDescriptionConstants.ADDRESS)).getLastElement().getValue();
 
     ProcessEngineConfiguration processEngineConfiguration = transformConfiguration(context, engineName, model);
-    ContainerProcessEngineController service = new ContainerProcessEngineController(processEngineConfiguration);
-        
-    ServiceName name = ContainerProcessEngineController.createServiceName(processEngineConfiguration.getProcessEngineName());    
-    ContextNames.BindInfo datasourceBindInfo = ContextNames.bindInfoFor(processEngineConfiguration.getDatasourceJndiName());
     
-    ServiceBuilder<ContainerProcessEngineController> serviceBuilder = context.getServiceTarget()           
-            .addService(name, service)            
-            .addDependency(ServiceName.JBOSS.append("txn").append("TransactionManager"), TransactionManager.class, service.getTransactionManagerInjector())
-            .addDependency(datasourceBindInfo.getBinderServiceName(), DataSourceReferenceFactoryService.class, service.getDatasourceBinderServiceInjector())
-            .addDependency(ContainerPlatformService.getServiceName(), ContainerPlatformService.class, service.getContainerPlatformServiceInjector())
-            .addDependency(ContainerJobExecutorService.getServiceName(), ContainerJobExecutorService.class, service.getContainerJobExecutorInjector())
-            .addListener(verificationHandler)
-            .setInitialMode(Mode.ACTIVE);
-    
-    if(processEngineConfiguration.isDefault()) {
-      
-      // add a constant alias name for the default process engine: this allows as to set
-      // a declarative dependency to the default process engine servcie when registering
-      // process archive services whithout knowing the name of the default
-      // engine. It can be a constant since there can be only one default engine.
-      serviceBuilder.addAliases(ContainerProcessEngineController.createServiceNameForDefaultEngine());
-      
-    }
-    
-    ServiceController<ContainerProcessEngineController> controller = serviceBuilder
-            .install();
+    ServiceController<ContainerProcessEngineController> controller = extracted(context, verificationHandler, processEngineConfiguration);
         
     newControllers.add(controller);
+  }
+
+  private ServiceController<ContainerProcessEngineController> extracted(OperationContext context, ServiceVerificationHandler verificationHandler,
+          ProcessEngineConfiguration processEngineConfiguration) {
+    
+    ContainerProcessEngineController service = new ContainerProcessEngineController(processEngineConfiguration);        
+    ServiceName name = ContainerProcessEngineController.createServiceName(processEngineConfiguration.getProcessEngineName());    
+    
+    ServiceBuilder<ContainerProcessEngineController> serviceBuilder = context.getServiceTarget().addService(name, service);
+    
+    ContainerProcessEngineController.initializeServiceBuilder(processEngineConfiguration, service, serviceBuilder);
+    
+    serviceBuilder.addListener(verificationHandler);    
+    return serviceBuilder.install();
   }
 
   protected ProcessEngineConfiguration transformConfiguration(final OperationContext context, String engineName, final ModelNode model) {

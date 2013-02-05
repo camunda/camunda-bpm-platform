@@ -163,10 +163,8 @@ public abstract class PlatformService implements ProcessEngineService, ProcessAr
     try {
       final ProcessEngineController processEngine = processEnginesByProcessArchiveName.get(paName);
   
-      if (processEngine == null) {
-        throw new FoxPlatformException("Cannot uninstall process archive with name '" + paName + "': no such process archive");
-  
-      } else {
+      if (processEngine != null) {
+          
         final ProcessArchiveContext processArchiveContext = processEngine.getProcessArchiveContextByName(paName);
 
         fireBeforeProcessArchiveUninstalled(processArchiveContext.getProcessArchive(), processEngine);

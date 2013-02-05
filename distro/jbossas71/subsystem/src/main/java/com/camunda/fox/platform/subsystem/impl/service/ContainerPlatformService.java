@@ -17,11 +17,9 @@ package com.camunda.fox.platform.subsystem.impl.service;
 
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.transaction.TransactionManager;
-
-import org.jboss.as.connector.subsystems.datasources.DataSourceReferenceFactoryService;
 import org.jboss.as.naming.ManagedReferenceFactory;
 import org.jboss.as.naming.ServiceBasedNamingStore;
 import org.jboss.as.naming.deployment.ContextNames;
@@ -134,7 +132,6 @@ public class ContainerPlatformService extends PlatformService implements Service
   public Future<ProcessEngineStartOperation> startProcessEngine(ProcessEngineConfiguration processEngineConfiguration) {    
   
     final ContainerProcessEngineController processEngineController = new ContainerProcessEngineController(processEngineConfiguration);    
-    final ContextNames.BindInfo datasourceBindInfo = ContextNames.bindInfoFor(processEngineConfiguration.getDatasourceJndiName());
    
     final ServiceListenerFuture<ContainerProcessEngineController, ProcessEngineStartOperation> listener = new ServiceListenerFuture<ContainerProcessEngineController, ProcessEngineStartOperation>(processEngineController) {
       protected void serviceAvailable() {
@@ -142,14 +139,14 @@ public class ContainerPlatformService extends PlatformService implements Service
       }      
     };
     
-    serviceContainer.addService(ContainerProcessEngineController.createServiceName(processEngineConfiguration.getProcessEngineName()), processEngineController)
-      .addDependency(ServiceName.JBOSS.append("txn").append("TransactionManager"), TransactionManager.class, processEngineController.getTransactionManagerInjector())
-      .addDependency(datasourceBindInfo.getBinderServiceName(), DataSourceReferenceFactoryService.class, processEngineController.getDatasourceBinderServiceInjector())
-      .addDependency(getServiceName(), ContainerPlatformService.class, processEngineController.getContainerPlatformServiceInjector())
-      .addDependency(ContainerJobExecutorService.getServiceName(), ContainerJobExecutorService.class, processEngineController.getContainerJobExecutorInjector())
-      .setInitialMode(Mode.ACTIVE)
-      .addListener(listener)
-      .install();
+    ServiceName serviceName = ContainerProcessEngineController.createServiceName(processEngineConfiguration.getProcessEngineName());
+    
+    ServiceBuilder<ContainerProcessEngineController> serviceBuilder = serviceContainer.addService(serviceName, processEngineController);
+    
+    ContainerProcessEngineController.initializeServiceBuilder(processEngineConfiguration, processEngineController, serviceBuilder);
+    
+    serviceBuilder.addListener(listener);    
+    serviceBuilder.install();
     
     return listener;
   }
@@ -264,7 +261,10 @@ public class ContainerPlatformService extends PlatformService implements Service
   }
   
   @SuppressWarnings("unchecked")
-  public void unInstallProcessArchive(String processArchiveName) {           
+  public void unInstallProcessArchive(String processArchiveName) {       
+    
+    unInstallProcessArchiveInternal(processArchiveName);
+      
     // remove the process archive service asynchronously.
     ServiceName serviceName = ProcessArchiveService.getServiceName(processArchiveName);
     ServiceController<ProcessArchiveService> service = (ServiceController<ProcessArchiveService>) serviceContainer.getService(serviceName);

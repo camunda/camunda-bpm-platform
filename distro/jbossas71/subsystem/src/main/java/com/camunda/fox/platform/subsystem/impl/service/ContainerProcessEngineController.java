@@ -19,8 +19,11 @@ import javax.sql.DataSource;
 import javax.transaction.TransactionManager;
 
 import org.jboss.as.connector.subsystems.datasources.DataSourceReferenceFactoryService;
+import org.jboss.as.naming.deployment.ContextNames;
 import org.jboss.msc.inject.Injector;
 import org.jboss.msc.service.Service;
+import org.jboss.msc.service.ServiceBuilder;
+import org.jboss.msc.service.ServiceController.Mode;
 import org.jboss.msc.service.ServiceName;
 import org.jboss.msc.service.StartContext;
 import org.jboss.msc.service.StartException;
@@ -105,6 +108,27 @@ public class ContainerProcessEngineController extends ProcessEngineController im
   
   public InjectedValue<ContainerJobExecutorService> getContainerJobExecutorInjector() {
     return containerJobExecutorInjector;
+  }
+
+  public static void initializeServiceBuilder(ProcessEngineConfiguration processEngineConfiguration, ContainerProcessEngineController service,
+          ServiceBuilder<ContainerProcessEngineController> serviceBuilder) {
+    
+    ContextNames.BindInfo datasourceBindInfo = ContextNames.bindInfoFor(processEngineConfiguration.getDatasourceJndiName());
+    serviceBuilder.addDependency(ServiceName.JBOSS.append("txn").append("TransactionManager"), TransactionManager.class, service.getTransactionManagerInjector())
+            .addDependency(datasourceBindInfo.getBinderServiceName(), DataSourceReferenceFactoryService.class, service.getDatasourceBinderServiceInjector())
+            .addDependency(ContainerPlatformService.getServiceName(), ContainerPlatformService.class, service.getContainerPlatformServiceInjector())
+            .addDependency(ContainerJobExecutorService.getServiceName(), ContainerJobExecutorService.class, service.getContainerJobExecutorInjector())            
+            .setInitialMode(Mode.ACTIVE);
+    
+    if(processEngineConfiguration.isDefault()) {
+      
+      // add a constant alias name for the default process engine: this allows as to set
+      // a declarative dependency to the default process engine servcie when registering
+      // process archive services whithout knowing the name of the default
+      // engine. It can be a constant since there can be only one default engine.
+      serviceBuilder.addAliases(createServiceNameForDefaultEngine());
+      
+    }
   }
   
 }
