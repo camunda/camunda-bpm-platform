@@ -230,7 +230,7 @@ public class BpmnParse extends Parse {
       LOGGER.log(Level.SEVERE, "Unknown exception", e);
       
       // ALL unexpected exceptions should bubble up since they are not handled
-      // accordingly by onderlying parse-methods and can't be deployed
+      // accordingly by underlying parse-methods and the process can't be deployed
       throw new ActivitiException("Error while parsing process: " + e.getMessage(), e);
       
     } finally {
@@ -2292,10 +2292,10 @@ public class BpmnParse extends Parse {
             TaskListener taskListener = parseTaskListener(taskListenerElement);
             taskDefinition.addTaskListener(eventName, taskListener);
           } else {
-            addError("Invalid eventName for taskListener: choose 'create' | 'assignment' | 'complete'", userTaskElement);
+            addError("Attribute 'event' must be one of {create|assignment|complete}", userTaskElement);
           }
         } else {
-          addError("Event is mandatory on taskListener", userTaskElement);
+          addError("Attribute 'event' is mandatory on taskListener", userTaskElement);
         }
       }
     }
@@ -3051,10 +3051,10 @@ public class BpmnParse extends Parse {
       if ("start".equals(eventName) || "end".equals(eventName)) {
         return true;
       } else {
-        addError("Attribute 'eventName' must be one of {start|end}", listenerElement);
+        addError("Attribute 'event' must be one of {start|end}", listenerElement);
       }
     } else {
-      addError("Attribute 'eventName' is mandatory on listener", listenerElement);
+      addError("Attribute 'event' is mandatory on listener", listenerElement);
     }
     return false;
   }
@@ -3067,7 +3067,7 @@ public class BpmnParse extends Parse {
         ExecutionListener listener = parseExecutionListener(listenerElement);
         if (listener != null) {
           // Since a transition only fires event 'take', we don't parse the
-          // eventName, it is ignored
+          // event attribute, it is ignored
           activity.addExecutionListener(listener);
         }
       }
