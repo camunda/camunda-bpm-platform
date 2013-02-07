@@ -33,7 +33,7 @@ import org.mockito.Mockito;
 
 import com.jayway.restassured.response.Response;
 
-public class TaskRestServiceTest extends AbstractRestServiceTest {
+public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
   
   private static final String EXAMPLE_ID = "anId";
   private static final String EXAMPLE_NAME = "aName";

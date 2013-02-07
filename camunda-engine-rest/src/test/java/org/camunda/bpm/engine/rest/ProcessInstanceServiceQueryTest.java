@@ -26,7 +26,7 @@ import org.mockito.Mockito;
 
 import com.jayway.restassured.response.Response;
 
-public class ProcessInstanceServiceTest extends AbstractRestServiceTest {
+public class ProcessInstanceServiceQueryTest extends AbstractRestServiceTest {
   
   private static final String EXAMPLE_BUSINESS_KEY = "aKey";
   private static final String EXAMPLE_ID = "anId";
