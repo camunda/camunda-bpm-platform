@@ -11,8 +11,8 @@ import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 
 /**
  * Defines common query sorting options and validation.
- * Also allows to set its setter methods based on {@link CamundaQueryParam} annotations which is
- * used for processing Http query parameters and queries encoded in json objects.
+ * Also allows to access its setter methods based on {@link CamundaQueryParam} annotations which is
+ * used for processing Http query parameters.
  * 
  * @author Thorben Lindhauer
  *
