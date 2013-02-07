@@ -8,10 +8,4 @@ public class DelegationStateConverter implements StringToTypeConverter<Delegatio
   public DelegationState convertQueryParameterToType(String value) {
     return DelegationState.valueOf(value.toUpperCase());
   }
-
-  @Override
-  public DelegationState convertFromJsonToType(String value) {
-    return DelegationState.valueOf(value.toUpperCase());
-  }
-
 }

@@ -13,7 +13,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
 import org.activiti.engine.impl.util.json.JSONArray;
@@ -150,8 +149,8 @@ public class ProcessInstanceServiceTest extends AbstractRestServiceTest {
     verify(mockedQuery).processInstanceBusinessKey(queryParameters.get("businessKey"));
     verify(mockedQuery).processDefinitionKey(queryParameters.get("processDefinitionKey"));
     verify(mockedQuery).processDefinitionId(queryParameters.get("processDefinitionId"));
-    verify(mockedQuery).superProcessInstanceId(queryParameters.get("super"));
-    verify(mockedQuery).subProcessInstanceId(queryParameters.get("sub"));
+    verify(mockedQuery).superProcessInstanceId(queryParameters.get("superProcessInstance"));
+    verify(mockedQuery).subProcessInstanceId(queryParameters.get("subProcessInstance"));
     verify(mockedQuery).suspended();
     verify(mockedQuery).active();
     verify(mockedQuery).list();
@@ -163,8 +162,8 @@ public class ProcessInstanceServiceTest extends AbstractRestServiceTest {
     parameters.put("businessKey", "aBusinessKey");
     parameters.put("processDefinitionKey", "aProcDefKey");
     parameters.put("processDefinitionId", "aProcDefId");
-    parameters.put("super", "aSuperProcInstId");
-    parameters.put("sub", "aSubProcInstId");
+    parameters.put("superProcessInstance", "aSuperProcInstId");
+    parameters.put("subProcessInstance", "aSubProcInstId");
     parameters.put("suspended", "true");
     parameters.put("active", "true");
     
@@ -292,8 +291,8 @@ public class ProcessInstanceServiceTest extends AbstractRestServiceTest {
     verify(mockedQuery).processInstanceBusinessKey(queryParameters.get("businessKey"));
     verify(mockedQuery).processDefinitionKey(queryParameters.get("processDefinitionKey"));
     verify(mockedQuery).processDefinitionId(queryParameters.get("processDefinitionId"));
-    verify(mockedQuery).superProcessInstanceId(queryParameters.get("super"));
-    verify(mockedQuery).subProcessInstanceId(queryParameters.get("sub"));
+    verify(mockedQuery).superProcessInstanceId(queryParameters.get("superProcessInstance"));
+    verify(mockedQuery).subProcessInstanceId(queryParameters.get("subProcessInstance"));
     verify(mockedQuery).suspended();
     verify(mockedQuery).active();
     verify(mockedQuery).list();

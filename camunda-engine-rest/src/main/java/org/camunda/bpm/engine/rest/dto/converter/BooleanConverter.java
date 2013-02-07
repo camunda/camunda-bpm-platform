@@ -6,10 +6,4 @@ public class BooleanConverter implements StringToTypeConverter<Boolean> {
   public Boolean convertQueryParameterToType(String value) {
     return Boolean.valueOf(value);
   }
-
-  @Override
-  public Boolean convertFromJsonToType(String value) {
-    return Boolean.valueOf(value);
-  }
-
 }

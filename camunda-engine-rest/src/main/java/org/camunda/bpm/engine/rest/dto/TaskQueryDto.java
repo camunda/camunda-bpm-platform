@@ -5,7 +5,6 @@ import java.util.Date;
 import java.util.List;
 
 import org.activiti.engine.TaskService;
-import org.activiti.engine.impl.QueryOperator;
 import org.activiti.engine.task.DelegationState;
 import org.activiti.engine.task.TaskQuery;
 import org.camunda.bpm.engine.rest.dto.converter.BooleanConverter;
@@ -119,7 +118,7 @@ public class TaskQueryDto extends SortableParameterizedQueryDto {
     this.candidateGroup = candidateGroup;
   }
 
-  @CamundaQueryParam("candidate")
+  @CamundaQueryParam("candidateUser")
   public void setCandidateUser(String candidateUser) {
     this.candidateUser = candidateUser;
   }
@@ -144,7 +143,7 @@ public class TaskQueryDto extends SortableParameterizedQueryDto {
     this.descriptionLike = descriptionLike;
   }
 
-  @CamundaQueryParam("involved")
+  @CamundaQueryParam("involvedUser")
   public void setInvolvedUser(String involvedUser) {
     this.involvedUser = involvedUser;
   }
@@ -332,28 +331,33 @@ public class TaskQueryDto extends SortableParameterizedQueryDto {
     
     if (taskVariables != null) {
       for (VariableQueryParameterDto variableQueryParam : taskVariables) {
-        String variableName = variableQueryParam.getVariableKey();
-        QueryOperator op = variableQueryParam.getOperator();
-        Object variableValue = variableQueryParam.getVariableValue();
+        String variableName = variableQueryParam.getName();
+        String op = variableQueryParam.getOperator();
+        Object variableValue = variableQueryParam.getValue();
         
-        if (op == QueryOperator.EQUALS) {
+        if (op.equals(VariableQueryParameterDto.EQUALS_OPERATOR_NAME)) {
           query.taskVariableValueEquals(variableName, variableValue);
-        } else if (op == QueryOperator.NOT_EQUALS) {
+        } else if (op.equals(VariableQueryParameterDto.NOT_EQUALS_OPERATOR_NAME)) {
           query.taskVariableValueNotEquals(variableName, variableValue);
+        } else {
+          throw new InvalidRequestException("You have specified an invalid task variable comparator.");
         }
+        
       }
     }
     
     if (processVariables != null) {
       for (VariableQueryParameterDto variableQueryParam : processVariables) {
-        String variableName = variableQueryParam.getVariableKey();
-        QueryOperator op = variableQueryParam.getOperator();
-        Object variableValue = variableQueryParam.getVariableValue();
+        String variableName = variableQueryParam.getName();
+        String op = variableQueryParam.getOperator();
+        Object variableValue = variableQueryParam.getValue();
         
-        if (op == QueryOperator.EQUALS) {
+        if (op.equals(VariableQueryParameterDto.EQUALS_OPERATOR_NAME)) {
           query.processVariableValueEquals(variableName, variableValue);
-        } else if (op == QueryOperator.NOT_EQUALS) {
+        } else if (op.equals(VariableQueryParameterDto.NOT_EQUALS_OPERATOR_NAME)) {
           query.processVariableValueNotEquals(variableName, variableValue);
+        } else {
+          throw new InvalidRequestException("You have specified an invalid process variable comparator.");
         }
       }
     }

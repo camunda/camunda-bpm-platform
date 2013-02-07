@@ -11,8 +11,8 @@ import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 
 /**
  * Defines common query sorting options and validation.
- * Also allows to set its setter methods based on {@link CamundaQueryParam} annotations which is
- * used for processing Http query parameters and queries encoded in json objects.
+ * Also allows to access its setter methods based on {@link CamundaQueryParam} annotations which is
+ * used for processing Http query parameters.
  * 
  * @author Thorben Lindhauer
  *
@@ -74,30 +74,6 @@ public abstract class SortableParameterizedQueryDto {
       
       StringToTypeConverter<?> converter = converterClass.newInstance();
       Object convertedValue = converter.convertQueryParameterToType(value);
-      method.invoke(this, convertedValue);
-    }
-  }
-  
-  /**
-   * Similar to {@link SortableParameterizedQueryDto#setValueBasedOnAnnotation(String, String)}, 
-   * but invokes {@link StringToTypeConverter#convertFromJsonToType(String)} on the matching methods.
-   * @param key
-   * @param value
-   * @throws IllegalArgumentException
-   * @throws IllegalAccessException
-   * @throws InvocationTargetException
-   * @throws InstantiationException
-   */
-  public void setJSONValueBasedOnAnnotation(String key, String value) throws IllegalArgumentException, IllegalAccessException, InvocationTargetException, InstantiationException {
-    List<Method> matchingMethods = findMatchingAnnotatedMethods(key);
-    for (Method method : matchingMethods) {
-      Class<? extends StringToTypeConverter<?>> converterClass = findAnnotatedTypeConverter(method);
-      if (converterClass == null) {
-        continue;
-      }
-      
-      StringToTypeConverter<?> converter = converterClass.newInstance();
-      Object convertedValue = converter.convertFromJsonToType(value);
       method.invoke(this, convertedValue);
     }
   }
