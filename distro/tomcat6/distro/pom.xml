@@ -23,25 +23,12 @@
     </dependency>
     
     <dependency>
-      <groupId>com.camunda.fox.cockpit</groupId>
-      <artifactId>cockpit-sql-scripts-openjpa</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-    
-    <dependency>
       <groupId>com.camunda.fox.cycle</groupId>
       <artifactId>cycle-sql-scripts</artifactId>
       <version>${project.version}</version>
     </dependency>
 
     <dependency>
-      <groupId>com.camunda.fox.cockpit</groupId>
-      <artifactId>cockpit-webapp-servlet</artifactId>
-      <version>${project.version}</version>
-      <type>war</type>
-    </dependency>
-	
-	<dependency>
       <groupId>com.camunda.fox.cycle</groupId>
       <artifactId>cycle-tomcat</artifactId>
       <version>${project.version}</version>
