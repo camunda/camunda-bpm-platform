@@ -6,10 +6,13 @@ import java.util.List;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response.Status;
 
+import org.activiti.engine.ActivitiException;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.task.Task;
 import org.activiti.engine.task.TaskQuery;
 import org.camunda.bpm.engine.rest.TaskRestService;
+import org.camunda.bpm.engine.rest.dto.ClaimTaskDto;
+import org.camunda.bpm.engine.rest.dto.CompleteTaskDto;
 import org.camunda.bpm.engine.rest.dto.TaskDto;
 import org.camunda.bpm.engine.rest.dto.TaskQueryDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
@@ -58,6 +61,28 @@ public class TaskRestServiceImpl extends AbstractEngineService implements TaskRe
   public List<TaskDto> queryTasks(TaskQueryDto query, Integer firstResult,
       Integer maxResults) {
     return getTasks(query, firstResult, maxResults);
+  }
+
+  @Override
+  public void claim(String taskId, ClaimTaskDto dto) {
+    TaskService taskService = processEngine.getTaskService();
+    
+    try {
+      taskService.claim(taskId, dto.getUserId());
+    } catch (ActivitiException e) {
+      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  @Override
+  public void complete(String taskId, CompleteTaskDto dto) {
+    TaskService taskService = processEngine.getTaskService();
+    
+    try {
+      taskService.complete(taskId, dto.getVariables());
+    } catch (ActivitiException e) {
+      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+    }
   }
 
 }

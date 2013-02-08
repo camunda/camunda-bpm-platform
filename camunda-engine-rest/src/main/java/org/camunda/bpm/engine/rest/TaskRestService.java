@@ -6,10 +6,13 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
+import org.camunda.bpm.engine.rest.dto.ClaimTaskDto;
+import org.camunda.bpm.engine.rest.dto.CompleteTaskDto;
 import org.camunda.bpm.engine.rest.dto.TaskDto;
 import org.camunda.bpm.engine.rest.dto.TaskQueryDto;
 
@@ -35,4 +38,14 @@ public interface TaskRestService {
   @Consumes(MediaType.APPLICATION_JSON)
   List<TaskDto> queryTasks(TaskQueryDto query,
       @QueryParam("firstResult") Integer firstResult, @QueryParam("maxResults") Integer maxResults);
+  
+  @POST
+  @Path("/{id}/claim")
+  @Consumes(MediaType.APPLICATION_JSON)
+  void claim(@PathParam("id") String taskId, ClaimTaskDto dto);
+  
+  @POST
+  @Path("/{id}/complete")
+  @Consumes(MediaType.APPLICATION_JSON)
+  void complete(@PathParam("id") String taskId, CompleteTaskDto dto);
 }
