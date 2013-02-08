@@ -5,13 +5,19 @@ import java.util.List;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriInfo;
 
+import org.activiti.engine.ActivitiException;
 import org.activiti.engine.RepositoryService;
+import org.activiti.engine.RuntimeService;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.repository.ProcessDefinitionQuery;
+import org.activiti.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.rest.ProcessDefinitionService;
 import org.camunda.bpm.engine.rest.dto.ProcessDefinitionDto;
 import org.camunda.bpm.engine.rest.dto.ProcessDefinitionQueryDto;
+import org.camunda.bpm.engine.rest.dto.ProcessInstanceDto;
+import org.camunda.bpm.engine.rest.dto.StartProcessInstanceDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 
 public class ProcessDefinitionServiceImpl extends AbstractEngineService implements ProcessDefinitionService {
@@ -58,5 +64,21 @@ public class ProcessDefinitionServiceImpl extends AbstractEngineService implemen
 	  }
 	  return query.listPage(firstResult, maxResults); 
 	}
+
+  @Override
+  public ProcessInstanceDto startProcessInstance(UriInfo context, String processDefinitionId, StartProcessInstanceDto parameters) {
+    RuntimeService runtimeService = processEngine.getRuntimeService();
+    
+    ProcessInstance instance = null;
+    try {
+      instance = runtimeService.startProcessInstanceById(processDefinitionId, parameters.getVariables());
+    } catch (ActivitiException e) {
+      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+    }
+    
+    ProcessInstanceDto result = ProcessInstanceDto.fromProcessInstance(instance);
+    result.addReflexiveLink(context, null, "self");
+    return result;
+  }
 
 }

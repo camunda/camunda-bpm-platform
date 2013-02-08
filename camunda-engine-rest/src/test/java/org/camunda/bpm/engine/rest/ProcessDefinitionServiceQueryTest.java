@@ -25,7 +25,7 @@ import org.mockito.Mockito;
 
 import com.jayway.restassured.response.Response;
 
-public class ProcessDefinitionServiceTest extends AbstractRestServiceTest {
+public class ProcessDefinitionServiceQueryTest extends AbstractRestServiceTest {
   
   private static final String EXAMPLE_DEFINITION_KEY = "aKey";
   private static final String EXAMPLE_CATEGORY = "aCategory";

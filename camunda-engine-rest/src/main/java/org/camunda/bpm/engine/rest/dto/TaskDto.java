@@ -2,13 +2,9 @@ package org.camunda.bpm.engine.rest.dto;
 
 import java.util.Date;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-
 import org.activiti.engine.task.DelegationState;
 import org.activiti.engine.task.Task;
 
-@XmlRootElement(name = "data")
 public class TaskDto {
 
   private String id;
@@ -26,72 +22,58 @@ public class TaskDto {
   private String processInstanceId;
   private String taskDefinitionKey;
 
-  @XmlElement
   public String getId() {
     return id;
   }
 
-  @XmlElement
   public String getName() {
     return name;
   }
   
-  @XmlElement
   public String getAssignee() {
     return assignee;
   }
 
-  @XmlElement
   public Date getCreated() {
     return created;
   }
 
-  @XmlElement
   public Date getDue() {
     return due;
   }
 
-  @XmlElement
   public DelegationState getDelegationState() {
     return delegationState;
   }
 
-  @XmlElement
   public String getDescription() {
     return description;
   }
 
-  @XmlElement
   public String getExecutionId() {
     return executionId;
   }
 
-  @XmlElement
   public String getOwner() {
     return owner;
   }
 
-  @XmlElement
   public String getParentTaskId() {
     return parentTaskId;
   }
 
-  @XmlElement
   public int getPriority() {
     return priority;
   }
 
-  @XmlElement
   public String getProcessDefinitionId() {
     return processDefinitionId;
   }
 
-  @XmlElement
   public String getProcessInstanceId() {
     return processInstanceId;
   }
 
-  @XmlElement
   public String getTaskDefinitionKey() {
     return taskDefinitionKey;
   }
