@@ -118,15 +118,12 @@ public class ProcessDefinitionServiceInteractionTest extends
     
     String fullInstanceUrl = "http://localhost:8080" + TEST_RESOURCE_ROOT_PATH + "/process-instance/" + EXAMPLE_INSTANCE_ID;
     
-    Response response = given().pathParam("id", EXAMPLE_PROCESS_DEFINITION_ID)
-    .contentType(POST_JSON_CONTENT_TYPE).body(EMPTY_JSON_OBJECT)
-    .then().expect()
-      .statusCode(Status.OK.getStatusCode())
-      .body("links[0].href", equalTo(fullInstanceUrl))
-    .when().post(START_PROCESS_INSTANCE_URL);
-    
-    System.out.println(response.asString());
-    
+    given().pathParam("id", EXAMPLE_PROCESS_DEFINITION_ID)
+      .contentType(POST_JSON_CONTENT_TYPE).body(EMPTY_JSON_OBJECT)
+      .then().expect()
+        .statusCode(Status.OK.getStatusCode())
+        .body("links[0].href", equalTo(fullInstanceUrl))
+      .when().post(START_PROCESS_INSTANCE_URL);
     
   }
   
