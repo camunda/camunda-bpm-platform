@@ -7,13 +7,13 @@
   <name>fox platform EE - QA jBoss7 Test Runtime</name>
   
   <properties>
-    <jboss.assembly.location>../../distro/jbossas71/assembly/target/camunda-fox-ce-${project.version}/camunda-fox-ce-${project.version}/server</jboss.assembly.location>
+    <jboss.assembly.location>../../distro/jbossas71/assembly/target/assembly-${project.version}/assembly-${project.version}/server</jboss.assembly.location>
   </properties>
 
   <parent>
     <groupId>com.camunda.fox.platform</groupId>
     <artifactId>fox-platform-qa</artifactId>
-    <version>6.2.0-SNAPSHOT</version>
+    <version>7.0.0-SNAPSHOT</version>
   </parent>
 
   <dependencies>

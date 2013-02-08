@@ -13,14 +13,14 @@
 
   <fileSets>
     <fileSet>
-      <directory>../assembly/target/camunda-fox-ce-${project.version}/camunda-fox-ce-${project.version}</directory>
+      <directory>../assembly/target/assembly-${project.version}/assembly-${project.version}</directory>
       <outputDirectory />
       <excludes>
         <exclude>**/*.sh</exclude>      
       </excludes>
     </fileSet>
     <fileSet>
-      <directory>../assembly/target/camunda-fox-ce-${project.version}/camunda-fox-ce-${project.version}</directory>
+      <directory>../assembly/target/assembly-${project.version}/assembly-${project.version}</directory>
       <outputDirectory />
       <includes>
         <include>**/*.sh</include>
