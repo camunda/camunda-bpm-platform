@@ -2,6 +2,7 @@ package org.camunda.bpm.engine.rest;
 
 import static com.jayway.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
@@ -19,6 +20,8 @@ import org.activiti.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.rest.helper.EqualsMap;
 import org.junit.Test;
 import org.mockito.Matchers;
+
+import com.jayway.restassured.response.Response;
 
 public class ProcessDefinitionServiceInteractionTest extends
     AbstractRestServiceTest {
@@ -108,6 +111,24 @@ public class ProcessDefinitionServiceInteractionTest extends
       .then().expect()
         .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
       .when().post(START_PROCESS_INSTANCE_URL);
+  }
+  
+  @Test
+  public void testInstanceResourceLinkResult() {
+    setupMockInstance();
+    
+    String fullInstanceUrl = "http://localhost:8080" + TEST_RESOURCE_ROOT_PATH + "/process-instance/" + EXAMPLE_INSTANCE_ID;
+    
+    Response response = given().pathParam("id", EXAMPLE_PROCESS_DEFINITION_ID)
+    .contentType(POST_JSON_CONTENT_TYPE).body(EMPTY_JSON_OBJECT)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+      .body("links[0].href", equalTo(fullInstanceUrl))
+    .when().post(START_PROCESS_INSTANCE_URL);
+    
+    System.out.println(response.asString());
+    
+    
   }
   
 }

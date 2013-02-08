@@ -9,7 +9,9 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.UriInfo;
 
 import org.activiti.engine.repository.ProcessDefinitionQuery;
 import org.camunda.bpm.engine.rest.dto.ProcessDefinitionDto;
@@ -36,5 +38,5 @@ public interface ProcessDefinitionService {
 	@POST
 	@Path("/{id}/start")
 	@Consumes(MediaType.APPLICATION_JSON)
-	ProcessInstanceDto startProcessInstance(@PathParam("id") String processDefinitionId, StartProcessInstanceDto parameters);
+	ProcessInstanceDto startProcessInstance(@Context UriInfo context, @PathParam("id") String processDefinitionId, StartProcessInstanceDto parameters);
 }

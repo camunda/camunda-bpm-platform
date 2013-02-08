@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriInfo;
 
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.RepositoryService;
@@ -65,7 +66,7 @@ public class ProcessDefinitionServiceImpl extends AbstractEngineService implemen
 	}
 
   @Override
-  public ProcessInstanceDto startProcessInstance(String processDefinitionId, StartProcessInstanceDto parameters) {
+  public ProcessInstanceDto startProcessInstance(UriInfo context, String processDefinitionId, StartProcessInstanceDto parameters) {
     RuntimeService runtimeService = processEngine.getRuntimeService();
     
     ProcessInstance instance = null;
@@ -76,6 +77,7 @@ public class ProcessDefinitionServiceImpl extends AbstractEngineService implemen
     }
     
     ProcessInstanceDto result = ProcessInstanceDto.fromProcessInstance(instance);
+    result.addLink(context, null, "self");
     return result;
   }
 
