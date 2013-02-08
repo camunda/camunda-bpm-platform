@@ -30,7 +30,7 @@ public class AtomLink {
     this.rel = rel;
   }
   
-  public void linkTo(ResponseDto object, String relationName) {
+  public void linkTo(LinkableDto object, String relationName) {
     
   }
   

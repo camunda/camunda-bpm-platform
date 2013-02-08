@@ -77,7 +77,7 @@ public class ProcessDefinitionServiceImpl extends AbstractEngineService implemen
     }
     
     ProcessInstanceDto result = ProcessInstanceDto.fromProcessInstance(instance);
-    result.addLink(context, null, "self");
+    result.addReflexiveLink(context, null, "self");
     return result;
   }
 

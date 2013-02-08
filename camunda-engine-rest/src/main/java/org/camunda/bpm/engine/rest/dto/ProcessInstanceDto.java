@@ -8,7 +8,7 @@ import javax.ws.rs.core.UriInfo;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.rest.ProcessInstanceService;
 
-public class ProcessInstanceDto extends ResponseDto {
+public class ProcessInstanceDto extends LinkableDto {
   
   private String id;  
   private String definitionId;
@@ -47,7 +47,7 @@ public class ProcessInstanceDto extends ResponseDto {
   }
 
   @Override
-  public void addLink(UriInfo context, String action, String relation) {
+  public AtomLink generateLink(UriInfo context, String action, String relation) {
     URI baseUri = context.getBaseUri();
     UriBuilder builder = UriBuilder.fromUri(baseUri).path(ProcessInstanceService.class).path("{id}");
     if (action != null) {
@@ -56,6 +56,6 @@ public class ProcessInstanceDto extends ResponseDto {
     
     URI linkUri = builder.build(id);
     AtomLink link = new AtomLink(relation, linkUri.toString());
-    links.add(link);
+    return link;
   }
 }
