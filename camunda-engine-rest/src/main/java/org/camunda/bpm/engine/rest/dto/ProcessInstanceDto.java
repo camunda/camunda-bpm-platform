@@ -4,13 +4,10 @@ import java.net.URI;
 
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
 
 import org.activiti.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.rest.ProcessInstanceService;
 
-@XmlRootElement(name = "data")
 public class ProcessInstanceDto extends ResponseDto {
   
   private String id;  
@@ -19,27 +16,22 @@ public class ProcessInstanceDto extends ResponseDto {
   private boolean ended;
   private boolean suspended;
 
-  @XmlElement
   public String getId() {
     return id;
   }
   
-  @XmlElement
   public String getDefinitionId() {
     return definitionId;
   }
   
-  @XmlElement
   public String getBusinessKey() {
     return businessKey;
   }
   
-  @XmlElement
   public boolean isEnded() {
     return ended;
   }
   
-  @XmlElement
   public boolean isSuspended() {
     return suspended;
   }

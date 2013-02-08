@@ -24,7 +24,7 @@
 		  <artifactId>jackson-jaxrs</artifactId>
 		  <version>1.9.11</version>
 		</dependency>
-	
+
 		<dependency>
 			<groupId>com.camunda.fox.engine</groupId>
 			<artifactId>fox-engine</artifactId>
@@ -57,13 +57,6 @@
           <groupId>org.apache.httpcomponents</groupId>
         </exclusion>
       </exclusions>
-    </dependency>
-    
-    <dependency>
-      <groupId>org.jboss.resteasy</groupId>
-      <artifactId>resteasy-jackson-provider</artifactId>
-      <version>${resteasy.version}</version>
-      <scope>test</scope>
     </dependency>
     
     <dependency>

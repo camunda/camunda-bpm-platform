@@ -1,11 +1,7 @@
 package org.camunda.bpm.engine.rest.dto;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-
 import org.activiti.engine.repository.ProcessDefinition;
 
-@XmlRootElement(name = "data")
 public class ProcessDefinitionDto {
 
   private String id;
@@ -19,53 +15,42 @@ public class ProcessDefinitionDto {
   private String diagram;
   private boolean suspended;
   
-  
-  @XmlElement
   public String getId() {
     return id;
   }
 
-  @XmlElement
   public String getKey() {
     return key;
   }
 
-  @XmlElement
   public String getCategory() {
     return category;
   }
 
-  @XmlElement
   public String getDescription() {
     return description;
   }
 
-  @XmlElement
   public String getName() {
     return name;
   }
 
-  @XmlElement
   public int getVersion() {
     return version;
   }
 
-  @XmlElement
   public String getResource() {
     return resource;
   }
 
-  @XmlElement
   public String getDeploymentId() {
     return deploymentId;
   }
 
-  @XmlElement
   public String getDiagram() {
     return diagram;
   }
 
-  @XmlElement
   public boolean isSuspended() {
     return suspended;
   }
