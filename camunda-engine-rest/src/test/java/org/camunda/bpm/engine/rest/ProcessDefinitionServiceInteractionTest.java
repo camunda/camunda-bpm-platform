@@ -20,8 +20,6 @@ import org.camunda.bpm.engine.rest.helper.EqualsMap;
 import org.junit.Test;
 import org.mockito.Matchers;
 
-import com.jayway.restassured.response.Response;
-
 public class ProcessDefinitionServiceInteractionTest extends
     AbstractRestServiceTest {
 
@@ -30,8 +28,6 @@ public class ProcessDefinitionServiceInteractionTest extends
   
   private static final String PROCESS_DEFINITION_URL = TEST_RESOURCE_ROOT_PATH + "/process-definition";
   private static final String START_PROCESS_INSTANCE_URL = PROCESS_DEFINITION_URL + "/{id}/start";
-  
-  private static final String EMPTY_JSON_OBJECT = "{}";
   
   private ProcessInstance mockInstance;
   private RuntimeService runtimeServiceMock;

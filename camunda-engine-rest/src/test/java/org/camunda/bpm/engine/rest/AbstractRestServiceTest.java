@@ -26,6 +26,8 @@ public abstract class AbstractRestServiceTest {
   protected static final String TEST_RESOURCE_ROOT_PATH = "/rest-test";
   
   protected static final String POST_JSON_CONTENT_TYPE = ContentType.create(MediaType.APPLICATION_JSON, "UTF-8").toString();
+  
+  protected static final String EMPTY_JSON_OBJECT = "{}";
 
 //  @BeforeClass
 //  public static void initialize() {
