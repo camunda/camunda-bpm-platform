@@ -15,8 +15,6 @@ import java.util.Map;
 
 import javax.ws.rs.core.Response.Status;
 
-import org.activiti.engine.impl.util.json.JSONArray;
-import org.activiti.engine.impl.util.json.JSONObject;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.runtime.ProcessInstanceQuery;
 import org.junit.Assert;
@@ -248,28 +246,27 @@ public class ProcessInstanceServiceQueryTest extends AbstractRestServiceTest {
     
     String variableName = "varName";
     String variableValue = "varValue";
-    JSONObject queryVariable = new JSONObject();
-    queryVariable.put("name", variableName);
-    queryVariable.put("operator", "eq");
-    queryVariable.put("value", variableValue);
-    
     String anotherVariableName = "anotherVarName";
     Integer anotherVariableValue = 30;
-    JSONObject anotherQueryVariable = new JSONObject();
-    anotherQueryVariable.put("name", anotherVariableName);
-    anotherQueryVariable.put("operator", "neq");
-    anotherQueryVariable.put("value", anotherVariableValue);
     
-    JSONObject json = new JSONObject();
-    JSONArray queryVariables = new JSONArray();
-    queryVariables.put(queryVariable);
-    queryVariables.put(anotherQueryVariable);
+    Map<String, Object> variableJson = new HashMap<String, Object>();
+    variableJson.put("name", variableName);
+    variableJson.put("operator", "eq");
+    variableJson.put("value", variableValue);
     
-    json.put("variables", queryVariables);
+    Map<String, Object> anotherVariableJson = new HashMap<String, Object>();
+    anotherVariableJson.put("name", anotherVariableName);
+    anotherVariableJson.put("operator", "neq");
+    anotherVariableJson.put("value", anotherVariableValue);
     
-    String body = json.toString();
+    List<Map<String, Object>> variables = new ArrayList<Map<String, Object>>();
+    variables.add(variableJson);
+    variables.add(anotherVariableJson);
     
-    given().contentType(POST_JSON_CONTENT_TYPE).body(body)
+    Map<String, Object> json = new HashMap<String, Object>();
+    json.put("variables", variables);
+    
+    given().contentType(POST_JSON_CONTENT_TYPE).body(json)
       .then().expect().statusCode(Status.OK.getStatusCode())
       .when().post(PROCESS_INSTANCE_QUERY_URL);
     
