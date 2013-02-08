@@ -32,7 +32,7 @@
     <jboss.mail-smtp.port>25</jboss.mail-smtp.port>
     
     <!-- glassfish properties -->
-    <glassfish.server.location>../../distro/gf31/assembly/target/camunda-fox-ce-${project.version}/camunda-fox-ce-${project.version}/server</glassfish.server.location>
+    <glassfish.server.location>../../distro/gf31/assembly/target/assembly-${project.version}/assembly-${project.version}/server</glassfish.server.location>
     
     <glassfish.http.port>28080</glassfish.http.port>
     <glassfish.admin.port>24848</glassfish.admin.port>

@@ -63,7 +63,7 @@
                 <descriptor>assembly.xml</descriptor>
               </descriptors>
               <!--  do not attach to the build -->
-              <finalName>camunda-fox-ce-${project.version}</finalName>
+              <finalName>assembly-${project.version}</finalName>
               <attach>false</attach>
               <appendAssemblyId>false</appendAssemblyId>
               <outputDirectory>target/</outputDirectory>

@@ -13,7 +13,7 @@
   
   <fileSets>
     <fileSet>
-      <directory>../assembly/target/camunda-fox-ce-${project.version}/camunda-fox-ce-${project.version}</directory>
+      <directory>../assembly/target/assembly-${project.version}/assembly-${project.version}</directory>
       <outputDirectory />
       <excludes>
         <exclude>**/*.sh</exclude>
@@ -23,7 +23,7 @@
       </excludes>
     </fileSet>
     <fileSet>
-      <directory>../assembly/target/camunda-fox-ce-${project.version}/camunda-fox-ce-${project.version}</directory>
+      <directory>../assembly/target/assembly-${project.version}/assembly-${project.version}</directory>
       <outputDirectory />
       <includes>
         <include>**/jboss-*/**/*.sh</include>
@@ -31,7 +31,7 @@
       <fileMode>0755</fileMode>
     </fileSet>
     <fileSet>
-      <directory>../assembly/target/camunda-fox-ce-${project.version}/camunda-fox-ce-${project.version}</directory>
+      <directory>../assembly/target/assembly-${project.version}/assembly-${project.version}</directory>
       <outputDirectory />
       <includes>
         <include>**/*-users.properties</include>
@@ -39,7 +39,7 @@
       <fileMode>0600</fileMode>
     </fileSet>
     <fileSet>
-      <directory>../assembly/target/camunda-fox-ce-${project.version}/camunda-fox-ce-${project.version}</directory>
+      <directory>../assembly/target/assembly-${project.version}/assembly-${project.version}</directory>
       <outputDirectory />
       <includes>
         <include>**/jboss-*/domain/tmp/auth</include>
@@ -48,7 +48,7 @@
       <directoryMode>0700</directoryMode>
     </fileSet>
     <fileSet>
-      <directory>../assembly/target/camunda-fox-ce-${project.version}/camunda-fox-ce-${project.version}</directory>
+      <directory>../assembly/target/assembly-${project.version}/assembly-${project.version}</directory>
       <outputDirectory />
       <includes>
         <include>**/jboss-*/domain/tmp/auth</include>
