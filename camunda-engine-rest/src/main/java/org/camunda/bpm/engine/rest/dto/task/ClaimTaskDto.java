@@ -1,4 +1,4 @@
-package org.camunda.bpm.engine.rest.dto;
+package org.camunda.bpm.engine.rest.dto.task;
 
 public class ClaimTaskDto {
 

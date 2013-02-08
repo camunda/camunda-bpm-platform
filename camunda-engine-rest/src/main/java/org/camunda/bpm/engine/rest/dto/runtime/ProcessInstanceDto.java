@@ -1,4 +1,4 @@
-package org.camunda.bpm.engine.rest.dto;
+package org.camunda.bpm.engine.rest.dto.runtime;
 
 import java.net.URI;
 
@@ -7,6 +7,8 @@ import javax.ws.rs.core.UriInfo;
 
 import org.activiti.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.rest.ProcessInstanceService;
+import org.camunda.bpm.engine.rest.dto.AtomLink;
+import org.camunda.bpm.engine.rest.dto.LinkableDto;
 
 public class ProcessInstanceDto extends LinkableDto {
   

@@ -1,4 +1,4 @@
-package org.camunda.bpm.engine.rest.dto;
+package org.camunda.bpm.engine.rest.dto.task;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -7,6 +7,9 @@ import java.util.List;
 import org.activiti.engine.TaskService;
 import org.activiti.engine.task.DelegationState;
 import org.activiti.engine.task.TaskQuery;
+import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
+import org.camunda.bpm.engine.rest.dto.SortableParameterizedQueryDto;
+import org.camunda.bpm.engine.rest.dto.VariableQueryParameterDto;
 import org.camunda.bpm.engine.rest.dto.converter.BooleanConverter;
 import org.camunda.bpm.engine.rest.dto.converter.DateConverter;
 import org.camunda.bpm.engine.rest.dto.converter.DelegationStateConverter;

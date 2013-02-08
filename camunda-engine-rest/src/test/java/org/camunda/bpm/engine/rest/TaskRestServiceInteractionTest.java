@@ -76,8 +76,6 @@ public class TaskRestServiceInteractionTest extends AbstractRestServiceTest {
     
     doThrow(new ActivitiException("expected exception")).when(taskServiceMock).claim(any(String.class), any(String.class));
     
-    // TODO not sure if Conflict is the correct status code we should assume here, as there could also be other reasons for the ActivitiException.
-    // perhaps 500 is better?
     given().pathParam("id", EXAMPLE_TASK_ID)
       .contentType(POST_JSON_CONTENT_TYPE).body(EMPTY_JSON_OBJECT)
       .then().expect()

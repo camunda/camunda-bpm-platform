@@ -10,8 +10,8 @@ import org.activiti.engine.RuntimeService;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.rest.ProcessInstanceService;
-import org.camunda.bpm.engine.rest.dto.ProcessInstanceDto;
-import org.camunda.bpm.engine.rest.dto.ProcessInstanceQueryDto;
+import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
+import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceQueryDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 
 public class ProcessInstanceServiceImpl extends AbstractEngineService implements

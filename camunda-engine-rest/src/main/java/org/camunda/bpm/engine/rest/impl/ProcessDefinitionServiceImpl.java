@@ -14,10 +14,10 @@ import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.repository.ProcessDefinitionQuery;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.rest.ProcessDefinitionService;
-import org.camunda.bpm.engine.rest.dto.ProcessDefinitionDto;
-import org.camunda.bpm.engine.rest.dto.ProcessDefinitionQueryDto;
-import org.camunda.bpm.engine.rest.dto.ProcessInstanceDto;
-import org.camunda.bpm.engine.rest.dto.StartProcessInstanceDto;
+import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDto;
+import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionQueryDto;
+import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
+import org.camunda.bpm.engine.rest.dto.runtime.StartProcessInstanceDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 
 public class ProcessDefinitionServiceImpl extends AbstractEngineService implements ProcessDefinitionService {

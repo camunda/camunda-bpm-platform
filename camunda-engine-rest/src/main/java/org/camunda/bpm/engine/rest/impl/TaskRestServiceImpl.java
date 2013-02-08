@@ -11,10 +11,10 @@ import org.activiti.engine.TaskService;
 import org.activiti.engine.task.Task;
 import org.activiti.engine.task.TaskQuery;
 import org.camunda.bpm.engine.rest.TaskRestService;
-import org.camunda.bpm.engine.rest.dto.ClaimTaskDto;
-import org.camunda.bpm.engine.rest.dto.CompleteTaskDto;
-import org.camunda.bpm.engine.rest.dto.TaskDto;
-import org.camunda.bpm.engine.rest.dto.TaskQueryDto;
+import org.camunda.bpm.engine.rest.dto.task.ClaimTaskDto;
+import org.camunda.bpm.engine.rest.dto.task.CompleteTaskDto;
+import org.camunda.bpm.engine.rest.dto.task.TaskDto;
+import org.camunda.bpm.engine.rest.dto.task.TaskQueryDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 
 public class TaskRestServiceImpl extends AbstractEngineService implements TaskRestService {

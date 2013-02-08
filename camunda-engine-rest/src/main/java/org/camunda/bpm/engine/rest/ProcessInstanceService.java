@@ -11,8 +11,8 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 import org.activiti.engine.runtime.ProcessInstanceQuery;
-import org.camunda.bpm.engine.rest.dto.ProcessInstanceDto;
-import org.camunda.bpm.engine.rest.dto.ProcessInstanceQueryDto;
+import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
+import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceQueryDto;
 
 @Path("/process-instance")
 @Produces(MediaType.APPLICATION_JSON)

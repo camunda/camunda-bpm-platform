@@ -11,10 +11,10 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
-import org.camunda.bpm.engine.rest.dto.ClaimTaskDto;
-import org.camunda.bpm.engine.rest.dto.CompleteTaskDto;
-import org.camunda.bpm.engine.rest.dto.TaskDto;
-import org.camunda.bpm.engine.rest.dto.TaskQueryDto;
+import org.camunda.bpm.engine.rest.dto.task.ClaimTaskDto;
+import org.camunda.bpm.engine.rest.dto.task.CompleteTaskDto;
+import org.camunda.bpm.engine.rest.dto.task.TaskDto;
+import org.camunda.bpm.engine.rest.dto.task.TaskQueryDto;
 
 @Path("/task")
 @Produces(MediaType.APPLICATION_JSON)

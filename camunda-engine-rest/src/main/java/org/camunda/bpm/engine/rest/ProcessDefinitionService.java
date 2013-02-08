@@ -14,10 +14,10 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 
 import org.activiti.engine.repository.ProcessDefinitionQuery;
-import org.camunda.bpm.engine.rest.dto.ProcessDefinitionDto;
-import org.camunda.bpm.engine.rest.dto.ProcessDefinitionQueryDto;
-import org.camunda.bpm.engine.rest.dto.ProcessInstanceDto;
-import org.camunda.bpm.engine.rest.dto.StartProcessInstanceDto;
+import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDto;
+import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionQueryDto;
+import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
+import org.camunda.bpm.engine.rest.dto.runtime.StartProcessInstanceDto;
 
 @Path("/process-definition")
 @Produces(MediaType.APPLICATION_JSON)

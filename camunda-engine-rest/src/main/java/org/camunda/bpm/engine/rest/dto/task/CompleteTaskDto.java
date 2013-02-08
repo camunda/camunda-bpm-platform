@@ -1,8 +1,8 @@
-package org.camunda.bpm.engine.rest.dto;
+package org.camunda.bpm.engine.rest.dto.task;
 
 import java.util.Map;
 
-public class StartProcessInstanceDto {
+public class CompleteTaskDto {
 
   private Map<String, Object> variables;
 
