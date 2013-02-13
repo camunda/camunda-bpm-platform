@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="
+          http://www.springframework.org/schema/beans 
+          http://www.springframework.org/schema/beans/spring-beans.xsd
+          http://www.springframework.org/schema/context 
+          http://www.springframework.org/schema/context/spring-context.xsd">
+
+  <bean name="vfsConnectorDefinition" class="com.camunda.fox.cycle.entity.ConnectorConfiguration">
+    <property name="name" value="File System Connector"/>
+    <property name="connectorClass" value="com.camunda.fox.cycle.connector.vfs.VfsConnector"/>
+    <property name="properties">
+      <map>
+        <entry key="BASE_PATH" value="${user.home}"/>
+      </map>
+    </property>
+  </bean>
+  
+  <bean name="signavioConnectorDefinition" class="com.camunda.fox.cycle.entity.ConnectorConfiguration">
+    <property name="name" value="Signavio Connector"/>
+    <property name="connectorClass" value="com.camunda.fox.cycle.connector.signavio.SignavioConnector"/>
+    <property name="properties">
+      <map>
+        <entry key="signavioBaseUrl" value="https://editor.signavio.com/"></entry>
+        <entry key="proxyUrl" value=""></entry>
+        <entry key="proxyUsername" value=""></entry>
+        <entry key="proxyPassword" value=""></entry>
+      </map>
+    </property>
+  </bean>
+  
+  <bean name="svnConnectorDefinition" class="com.camunda.fox.cycle.entity.ConnectorConfiguration">
+    <property name="name" value="Subversion Connector"/>
+    <property name="connectorClass" value="com.camunda.fox.cycle.connector.svn.SvnConnector"/>
+    <property name="loginMode" value="LOGIN_NOT_REQUIRED" />
+    <property name="properties">
+      <map>
+        <entry key="repositoryPath" value=""></entry>
+      </map>
+    </property>
+  </bean>
+</beans>

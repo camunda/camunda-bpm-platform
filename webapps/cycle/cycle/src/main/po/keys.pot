@@ -1,0 +1,174 @@
+#: ../webapp/WEB-INF/views/app/index.html:29
+msgid "My Roundtrips"
+msgstr ""
+
+#: ../webapp/WEB-INF/views/app/index.html:33
+msgid "Create"
+msgstr ""
+
+#: ../webapp/WEB-INF/views/app/index.html:40
+msgid "Create roundtrip"
+msgstr ""
+
+#: ../webapp/WEB-INF/views/app/index.html:47
+msgid "A problem occured when trying to check your input"
+msgstr ""
+
+#: ../webapp/WEB-INF/views/app/index.html:49
+#: ../webapp/WEB-INF/views/app/partials/bpmn-diagram.html:41
+msgid "A problem occured"
+msgstr ""
+
+#: ../webapp/WEB-INF/views/app/index.html:55
+msgid "Name"
+msgstr ""
+
+#: ../webapp/WEB-INF/views/app/index.html:58
+msgid "Enter the name of your roundtrip"
+msgstr ""
+
+#: ../webapp/WEB-INF/views/app/index.html:59
+msgid "The name is already used"
+msgstr ""
+
+#: ../webapp/WEB-INF/views/app/index.html:66
+#: ../webapp/WEB-INF/views/app/partials/bpmn-diagram.html:75
+#: ../webapp/WEB-INF/views/app/partials/roundtrip-details.html:82
+msgid "Cancel"
+msgstr ""
+
+#: ../webapp/WEB-INF/views/app/index.html:67
+msgid "Save"
+msgstr ""
+
+#: ../webapp/WEB-INF/views/app/partials/bpmn-diagram.html:14
+msgid "Your modeler"
+msgstr ""
+
+#: ../webapp/WEB-INF/views/app/partials/bpmn-diagram.html:33
+msgid "Add Diagram"
+msgstr ""
+
+#: ../webapp/WEB-INF/views/app/partials/bpmn-diagram.html:40
+msgid "A problem occured when updating the tree"
+msgstr ""
+
+#: ../webapp/WEB-INF/views/app/partials/bpmn-diagram.html:47
+msgid "'Modeler Name'"
+msgstr ""
+
+#: ../webapp/WEB-INF/views/app/partials/bpmn-diagram.html:47
+msgid "'The Name of the Modeling tool you used.'"
+msgstr ""
+
+#: ../webapp/WEB-INF/views/app/partials/bpmn-diagram.html:51
+msgid "Enter the name of your modeler"
+msgstr ""
+
+#: ../webapp/WEB-INF/views/app/partials/bpmn-diagram.html:58
+msgid "Select Connector"
+msgstr ""
+
+#: ../webapp/WEB-INF/views/app/partials/bpmn-diagram.html:65
+msgid "'Select BPMN File'"
+msgstr ""
+
+#: ../webapp/WEB-INF/views/app/partials/bpmn-diagram.html:76
+msgid "Add"
+msgstr ""
+
+#: ../webapp/WEB-INF/views/app/partials/no-roundtrip-selected.html:2
+msgid "No roundtrip selected"
+msgstr ""
+
+#: ../webapp/WEB-INF/views/app/partials/no-roundtrip-selected.html:3
+msgid "'Please select one!'"
+msgstr ""
+
+#: ../webapp/WEB-INF/views/app/partials/roundtrip-details.html:46
+msgid "Synchronize models"
+msgstr ""
+
+#: ../webapp/WEB-INF/views/app/partials/roundtrip-details.html:52
+msgid ""
+"The synchronization will perform from left to right and the model at the "
+"right hand side will be overwritten."
+msgstr ""
+
+#: ../webapp/WEB-INF/views/app/partials/roundtrip-details.html:53
+msgid ""
+"The synchronization will perform from right to left and the model at the "
+"left hand side will be merged with changes from the left hand side model."
+msgstr ""
+
+#: ../webapp/WEB-INF/views/app/partials/roundtrip-details.html:56
+msgid "'Are you sure to synchronize the models?'"
+msgstr ""
+
+#: ../webapp/WEB-INF/views/app/partials/roundtrip-details.html:60
+msgid "Synchronization in progress"
+msgstr ""
+
+#: ../webapp/WEB-INF/views/app/partials/roundtrip-details.html:67
+msgid "The synchronization of the models failed."
+msgstr ""
+
+#: ../webapp/WEB-INF/views/app/partials/roundtrip-details.html:74
+msgid "The synchronization of the models was successful."
+msgstr ""
+
+#: ../webapp/WEB-INF/views/app/partials/roundtrip-details.html:85
+msgid "OK"
+msgstr ""
+
+#: ../webapp/WEB-INF/views/app/partials/roundtrip-details.html:87
+msgid "Synchronize"
+msgstr ""
+
+#: ../webapp/WEB-INF/views/app/partials/roundtrip-details.html:100
+msgid "'Model View'"
+msgstr ""
+
+#: ../webapp/WEB-INF/views/error/invalid-login-data.html:11
+#: ../webapp/WEB-INF/views/error/login-expired.html:11
+#: ../webapp/WEB-INF/views/login.html:11
+msgid "Login"
+msgstr ""
+
+#: ../webapp/WEB-INF/views/error/invalid-login-data.html:17
+#: ../webapp/WEB-INF/views/error/login-expired.html:17
+#: ../webapp/WEB-INF/views/login.html:13
+msgid "User Name"
+msgstr ""
+
+#: ../webapp/WEB-INF/views/error/invalid-login-data.html:21
+#: ../webapp/WEB-INF/views/error/login-expired.html:21
+#: ../webapp/WEB-INF/views/login.html:17
+msgid "Password"
+msgstr ""
+
+#: ../webapp/WEB-INF/views/error/invalid-login-data.html:25
+#: ../webapp/WEB-INF/views/error/login-expired.html:25
+#: ../webapp/WEB-INF/views/login.html:21
+msgid "Sign in"
+msgstr ""
+
+#: ../webapp/WEB-INF/views/error/not-found.html:13
+msgid "Return to main page"
+msgstr ""
+
+#: ../webapp/WEB-INF/views/fragment/common.html:58
+msgid "Profile"
+msgstr ""
+
+#: ../webapp/WEB-INF/views/fragment/common.html:60
+msgid "Sign Out"
+msgstr ""
+
+#: ../webapp/WEB-INF/views/logout.html:11
+msgid "You have been logged out"
+msgstr ""
+
+#: ../webapp/WEB-INF/views/logout.html:12
+msgid "Back to start"
+msgstr ""

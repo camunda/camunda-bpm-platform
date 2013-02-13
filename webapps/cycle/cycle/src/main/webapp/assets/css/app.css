@@ -1,0 +1,449 @@
+/** 
+ * loaded to remove angular template flicker on site load
+ * @see http://docs.angularjs.org/api/ng.directive:ngCloak
+ */
+[ng\:cloak], [ng-cloak], .ng-cloak {
+    display: none;
+}
+
+/** loading icon integration */
+.icon-loading {
+  background-image: url(../img/ajax-loader.gif);
+  width: 16px; 
+  height: 16px;
+  line-height: 16px;
+  background-position: 0px 0px;
+  opacity: 1.0;
+}
+
+
+/* Bootstrap code examples
+-------------------------------------------------- */
+
+/* Base class */
+.f-box {
+  position: relative;
+  margin: 15px 0;
+  padding: 39px 19px 14px;
+  *padding-top: 19px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  -webkit-border-radius: 4px;
+     -moz-border-radius: 4px;
+          border-radius: 4px;
+}
+
+/* Echo out a label for the example */
+.f-box:after {
+  content: "Task";
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  padding: 3px 7px;
+  font-size: 12px;
+  font-weight: bold;
+  background-color: #f5f5f5;
+  border: 1px solid #ddd;
+  color: #9da0a4;
+  -webkit-border-radius: 4px 0 4px 0;
+     -moz-border-radius: 4px 0 4px 0;
+          border-radius: 4px 0 4px 0;
+}
+
+.f-box p:first-child {
+  margin-bottom: 20px;
+}
+
+/* Tweak examples
+------------------------- */
+.f-box > p:last-child {
+  margin-bottom: 0;
+}
+
+/** help system */
+.help-toggle {
+  display: inline-block;
+  margin-left: 5px;
+  
+  cursor: help;
+  opacity: 0.6;
+}
+
+.help-toggle:hover {
+  opacity: 1;
+}
+/** end help system */
+
+/** utilities */
+/** for image replacement */
+.ir {
+  display: block;
+  text-indent: -999em;
+  overflow: hidden;
+  background-repeat: no-repeat;
+  text-align: left;
+  direction: ltr;
+}
+/** end utilities */
+
+/**
+ * shared style declarations
+ */
+html, body {
+  height:100%;
+  min-height: 100%;
+}
+
+.offset-paragraph {
+  margin-bottom: 30px;
+}
+
+.content-inset {
+  margin-top: 60px;
+}
+
+/**
+ * sidebar-nav tweak (My Roundtrips)
+ */
+div.sidebar-nav > ul.nav.nav-list > li.nav-header {
+  font-size: 13px;
+  padding: 3px 0px;
+}
+
+footer {
+  padding: 6px 0;
+  border-top: 1px solid #E5E5E5;
+  background-color: whiteSmoke;
+  width: 100%;
+}
+
+.wrapper {
+  min-height: 100%;
+  height: auto !important; /* ie7 fix */
+  height: 100%;
+  margin: 0 auto -43px;
+}
+
+.push-down {
+  height: 60px;
+}
+
+/**
+ * Logo styling
+ */
+.navbar .brand {
+   display: block;
+   float: left;
+   
+   background: no-repeat url('../img/cycle-logo.png');
+   width: 130px;
+   height: 39px;
+   padding: 0;
+}
+
+/** usability tweeks */
+.content-container {
+  min-width: 950px;
+}
+
+#navigation {
+  min-width: 220px;
+}
+
+.nav-list li {
+  word-wrap: break-word;
+}
+
+/* a container with a max width */
+.fixed-box2 {
+	max-width:600px;
+}
+
+/** end usability tweeks */
+
+
+/**
+ * form styling
+ */
+form input.ng-dirty.ng-invalid {
+  background-color: #FFDEDE;
+  color: #000;
+}
+
+input.ng-invalid-required {
+  border-color: #f00;
+}
+
+/**
+ * roundtrip list
+ */
+li.actions .btn {
+  margin-top: 30px; 
+  margin-right: 30px;
+  display: inline-block;
+}
+
+li.actions .btn:last-child {
+  margin-right: 0px;
+}
+
+/**
+ * roundtrip view
+ */
+.bpmn-model, .bpmn-model * {
+  border: none 1px #DDD;
+}
+
+.bpmn-model.error, .bpmn-model.error * {
+  border-color: #D9564B;
+}
+
+.bpmn-model {
+  padding: 0px;
+  border-style: solid;
+}
+
+.bpmn-model .sync-status-refresh {
+  vertical-align: top;
+  line-height: 40px;
+  padding: 0px 15px;
+  border-style: none;
+  border-radius: 0 3px 0 0;
+}
+
+.bpmn-model h3 {
+  text-align: center;
+  line-height: 40px;
+  background: #DDD;
+  margin: 0px;
+  
+  border-top-left-radius: 3px;
+  border-top-right-radius: 3px;
+  border-bottom-style: solid;
+}
+
+/*.bpmn-model:hover h3 {
+  background: #BBB;
+}*/
+
+.bpmn-model .holder {
+  text-align: center;
+  position: relative;
+  padding: 4px;
+}
+
+.bpmn-model .centered {
+  margin-top: 50px;
+  padding: 20px;
+  font-size: 2em;
+}
+
+.bpmn-model .info {
+  line-height: 30px;
+  height: 30px;
+  padding-left: 10px;
+  border-top-style: solid;
+}
+
+.bpmn-model .filename {
+  
+}
+
+.bpmn-model .info .filename {
+  line-height: 20px;
+}
+
+.bpmn-model .info .status {
+  line-height: 30px;
+  padding: 0px 10px 0 10px;
+  border-radius: 0;
+  border-bottom-right-radius: 3px;
+  border-style: none;
+  border-left-style: solid;
+  vertical-align: top;
+}
+
+.bpmn-model .diagram {
+  text-align: center;
+  line-height: 100px;
+  min-height: 350px;
+  max-height: 350px;
+  overflow: hidden;
+}
+
+.bpmn-model .diagram img {
+  max-width: 100%;
+  max-height: 100%;
+  vertical-align: baseline;
+  cursor: pointer;
+}
+
+.bpmn-model .diagram .name {
+  display: block;
+}
+
+.bpmn-model .actions {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+}
+
+#commitMessageSync {
+  height: 65px;
+  width: 385px;
+  margin-left: -25px;
+}
+
+#commitMessageCreate {
+  width: 343px;
+  height: 60px;
+}
+
+.sync-options {
+  margin-top: 60px;
+  text-align: center;
+}
+
+.sync-options .actions {
+  line-height: 140px;
+}
+
+.sync-btn {
+  font-weight: bold;
+  width: 100%;
+  padding-right: 0;
+  padding-left: 0;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+/** override 'background-color' with 'background' to fix the white vertical line in the middle of the button **/
+.sync-btn:hover {
+  background: #e6e6e6;
+}
+/** end roundtrip view */
+
+/** sync dialog */
+.sync-note {
+  text-align: center;
+  padding: 10px 0 30px 0;
+}
+
+.sync-note > div {
+  height: 130px;
+  width: 330px;
+  background-image: url('../img/sync-visualization.png');
+  margin: auto;
+}
+
+.sync-note .ltr {
+  background-position: 0px -130px;
+}
+
+.tree {
+  border: 1px solid #DDDDDD;
+  overflow: auto;
+}
+
+/**
+ * Tree
+ */
+.controls .tree {
+  width: 343px;
+  height: 220px;
+  overflow: auto;
+  -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+  -moz-box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+  box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.075);
+  -webkit-transition: border linear 0.2s, box-shadow linear 0.2s;
+  -moz-transition: border linear 0.2s, box-shadow linear 0.2s;
+  -ms-transition: border linear 0.2s, box-shadow linear 0.2s;
+  -o-transition: border linear 0.2s, box-shadow linear 0.2s;
+  transition: border linear 0.2s, box-shadow linear 0.2s;
+  display: inline-block;
+  padding: 4px;
+  margin-bottom: 9px;
+  font-size: 13px;
+  line-height: 18px;
+  color: #555;
+  background-color: white;
+  border: 1px solid #CCC;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+}
+
+.controls .tree .dijitTree {
+  overflow: auto;
+  min-height: 220px;
+}
+
+.modal-body {
+  max-height: 480px;
+}
+
+div#pictureModal .modal-body {
+  overflow: auto;
+}
+
+div#pictureModal {
+  min-width: 30%;
+  width: auto;
+  max-width: 80%;
+}
+
+div#pictureModal .carousel-inner {
+  overflow: inherit;
+}
+
+div#pictureModal.modal.hide.fade {
+  width: 85%;
+  max-width: 75%;
+  max-height: 95%;
+  top: 40%;
+  left: 33%;
+}
+
+div#myCarousel .carousel-control.right {
+  position: fixed;
+  right: 12%;
+}
+
+div#myCarousel .carousel-control.left {
+  position: fixed;
+  left: 12%;
+}
+
+/** popover styles */
+.popover-inner {
+  padding: 0px;
+  border: 1px solid #ccc;
+  border-radius: 0px;
+  background-color: #fff;
+}
+
+/** combo box styles */
+.combobox-container input,.typeahead.dropdown-menu, span#modelerName {
+  width: 233px;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+}
+
+thead tr {
+  background-color: #eee;
+}
+
+/** make sure that if screen res is 600px high or below, modal dialoges are scrollable */
+@media screen and (max-height: 600px){
+  .modal {
+  	position:absolute;
+  } 
+}
+
+/** override img{ max-width: 100%} in boostrap.css to see the bpmn model diagram in a normal size **/
+.carousel-inner img {
+  max-width: none;
+}
+

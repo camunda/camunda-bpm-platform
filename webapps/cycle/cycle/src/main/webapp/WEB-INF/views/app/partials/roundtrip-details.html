@@ -1,0 +1,180 @@
+<div data-ng-cloak>
+  <div class="page-header">
+    <h1>{{roundtrip.name}}</h1>
+  </div>
+
+  <div class="row-fluid" data-ng-hide="!roundtrip.id">
+    <div class="span5">
+      <bpmn-diagram handle="leftDiagram" roundtrip="roundtrip" diagram="roundtrip.leftHandSide" identifier="leftHandSide" />
+    </div>
+
+    <div class="span2">
+      <div class="sync-options">
+        <div class="actions">
+          <button class="btn btn-large sync-btn"
+                  data-ng-disabled="!canSync()"
+                  data-ng-hide="canCreate('LEFT_TO_RIGHT')"
+                  data-ng-click="openSyncDialog('LEFT_TO_RIGHT')">sync &rarr;</button>
+          <button class="btn btn-large sync-btn"
+                  data-ng-show="canCreate('LEFT_TO_RIGHT')"
+                  data-ng-click="createNewDiagram(rightDiagram)">create &rarr;</button>
+        </div>
+        <div>
+          <span data-ng-show="roundtrip.lastSync">
+            Last sync <br/> {{roundtrip.lastSync | date:'yyyy-MM-dd @ HH:mm:ss'}}
+          </span>
+          <p data-ng-show="roundtrip.lastSyncMode=='LEFT_TO_RIGHT'" class="sync-mode-arr">&rarr;</p>
+          <p data-ng-show="roundtrip.lastSyncMode=='RIGHT_TO_LEFT'" class="sync-mode-arr">&larr;</p>
+          <span data-ng-hide="roundtrip.lastSync">
+            Not synced yet
+          </span>
+        </div>
+        <div class="actions">
+          <button class="btn btn-large sync-btn"
+                  data-ng-disabled="!canSync()"
+                  data-ng-hide="canCreate('RIGHT_TO_LEFT')"
+                  data-ng-click="openSyncDialog('RIGHT_TO_LEFT')">&larr; sync</button>
+          <button class="btn btn-large sync-btn"
+                  data-ng-show="canCreate('RIGHT_TO_LEFT')"
+                  data-ng-click="createNewDiagram(leftDiagram)">&larr; create</button>
+        </div>
+      </div>
+    </div>
+    
+    <div class="span5">
+      <bpmn-diagram handle="rightDiagram" roundtrip="roundtrip" diagram="roundtrip.rightHandSide" identifier="rightHandSide" />
+    </div>
+  </div>
+
+  <!-- begin sync-roundtrip-dialog -->
+  <modal-dialog model="syncDialog" ng-cloak>
+    <div class="modal" ng-controller="SyncRoundtripController" ngm-if="syncDialog.renderHtml()">
+      <div class="modal-header">
+        <button ng-show="syncDialog.autoClosable" type="button" class="close" data-dismiss="modal">&times;</button>
+        <h3 th:text="#{Synchronize models}">Synchronize models</h3>
+      </div>
+      <div class="modal-body">
+        <div class="sync-note">
+          <div ng-class="syncNoteCls(syncMode)">
+        </div>
+        
+        </div>
+        <div ng-switch on="status">
+          <div ng-switch-when="beforeStart">
+            <p ng-switch on="syncMode">
+              <span ng-switch-when="LEFT_TO_RIGHT">
+                <span th:text="#{'Synchronizing from'}"></span>
+                <strong th:text="#{'left'}"></strong>
+                <span th:text="#{'to'}"></span>
+                <strong th:text="#{'right'}"></strong>
+                <span th:text="#{'will override the right hand side model.'}"></span>
+              </span>
+              <span ng-switch-when="RIGHT_TO_LEFT">
+                <span th:text="#{'Synchronizing from'}"></span>
+                <strong th:text="#{'right'}"></strong>
+                <span th:text="#{'to'}"></span>
+                <strong th:text="#{'left'}"></strong>
+                <span th:text="#{'will override the left hand side model.'}"></span>
+              </span>
+            </p>
+            <p>
+              <span th:text="#{'Are you sure you would like to continue?'}" />
+            </p>            
+          </div>
+          <div ng-switch-when="performSynchronize">
+            <p th:text="#{Synchronization in progress}">Synchronization is in progress.</p>
+            <div class="progress progress-striped active">
+              <div class="bar" style="width: 100%;"></div>
+            </div>
+          </div>
+          <div ng-switch-when="synchronizationFailed" class="alert alert-error">
+            <p>
+              <strong>
+                <span th:text="#{The synchronization of the models failed.}">
+                  The synchronization of the models failed.
+                </span>
+              </strong>
+              <span>
+                {{ message }}
+              </span>
+            </p>
+          </div>
+          <div ng-switch-when="synchronizationSuccess" class="alert alert-success">
+            <p>
+              <span th:text="#{The synchronization of the models was successful.}">
+                The synchronization of the models was successful.
+              </span>
+            </p>
+          </div>
+        </div>
+      
+        <div data-ng-show="showCommitMessageForm()">
+         <form class="form-horizontal" novalidate ng-submit="performSync()" name="synchronizeModelsForm">
+              <fieldset>
+                <div class="control-group">
+                  <label class="control-label" for="commitMessageSync" style="text-align:left" 
+                         th:text="#{'Commit Message'}" 
+                         th:attr="data-help-text=#{'The message to be used as commit message.'}" 
+                         data-help-title="Commit Message"
+                         data-help>Commit Message</label>
+                  <div class="controls">
+                    <!-- display a combobox on leftside, otherwise a disabled input field -->
+                    <textarea id="commitMessageSync" ng-model="commitMessage" />                      
+                  </div>
+                </div>
+              </fieldset>
+          </form>
+        </div>          
+      </div>
+      <div class="modal-footer">
+        <button class="btn" ng-click="cancel()" th:text="#{Cancel}"
+                ng-disabled="status == 'performSynchronize'"
+                ng-hide="status == 'synchronizationFailed' || status == 'synchronizationSuccess'">Cancel</button>
+        <button href="#" class="btn btn-primary" ng-click="cancel()" th:text="#{OK}"
+                ng-show="status == 'synchronizationFailed' || status == 'synchronizationSuccess'">OK</button>
+        <button href="#" class="btn btn-primary" ng-click="performSync()" th:text="#{Synchronize}"
+                ng-disabled="status == 'performSynchronize'"
+                ng-hide="status == 'synchronizationFailed' || status == 'synchronizationSuccess'" data-req-aware="synchronizeModelsForm, disableAjaxLoader">Synchronize</button>
+      </div>
+    </div>
+  </modal-dialog>
+  <!-- end sync-roundtrip-dialog -->
+
+  <!-- begin diagram-details-dialog -->
+  <modal-dialog model="diagramDetailsDialog" ng-cloak>
+    <div class="modal hide" id="pictureModal" ngm-if="diagramDetailsDialog.renderHtml()"> 
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal"
+          aria-hidden="true">&times;</button>
+        <h3 th:text="#{'Process Model'}"></h3>
+      </div>
+      <div class="modal-body">
+        <div id="myCarousel" class="carousel slide" data-interval="false">
+          <!-- Carousel items -->
+          <div class="carousel-inner">
+            <div class="item leftHandSide" ng-class="activeClass('leftHandSide')" data-ng-show="roundtrip.leftHandSide && lhsImageStatus == 'LOADING'">
+              <i class="icon-loading"></i> Loading the image
+            </div>
+            <div class="item leftHandSide" ng-class="activeClass('leftHandSide')" data-ng-show="roundtrip.leftHandSide && lhsImageStatus == 'LOADED'">
+              <diagram-image data-diagram="roundtrip.leftHandSide" data-status="lhsImageStatus"/>
+            </div>
+            <div class="item rightHandSide" ng-class="activeClass('rightHandSide')" data-ng-show="roundtrip.rightHandSide && rhsImageStatus == 'LOADING'">
+              <i class="icon-loading"></i> Loading the image
+            </div>
+            <div class="item rightHandSide" ng-class="activeClass('rightHandSide')" data-ng-show="roundtrip.rightHandSide && rhsImageStatus == 'LOADED'">
+              <diagram-image data-diagram="roundtrip.rightHandSide" data-status="rhsImageStatus" />
+            </div>
+          </div>
+          <!-- Carousel nav -->
+          <a class="carousel-control left" 
+            href="#myCarousel" data-slide="prev" data-ng-show="roundtrip.leftHandSide && currentPicture == 'rightHandSide' && lhsImageStatus == 'LOADED'" data-ng-click="delayedSetCurrentPicture('leftHandSide')">&lsaquo;</a> 
+          <a class="carousel-control right"
+            href="#myCarousel" data-slide="next" data-ng-show="roundtrip.rightHandSide && currentPicture == 'leftHandSide' && rhsImageStatus == 'LOADED'" data-ng-click="delayedSetCurrentPicture('rightHandSide')" >&rsaquo;</a>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button data-dismiss="modal" class="btn">Close</button>
+      </div>
+    </div>
+  </modal-dialog>
+</div>

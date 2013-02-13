@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?><definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:signavio="http://www.signavio.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" exporter="Signavio Process Editor, http://www.signavio.com" exporterVersion="6.4.0" expressionLanguage="http://www.w3.org/1999/XPath" id="sid-06528502-6a33-4271-8d52-4a9b1eda4aff" targetNamespace="http://www.omg.org/spec/BPMN/20100524/MODEL" typeLanguage="http://www.w3.org/2001/XMLSchema" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/2.0/20100501/BPMN20.xsd">
+   <collaboration id="sid-d2852c7f-e79c-4352-a361-abf231c13804">
+      <participant id="TestLane_1" name="TestLane" processRef="CollaborationDropTest_">
+         <extensionElements/>
+      </participant>
+   </collaboration>
+   <process id="CollaborationDropTest_" isClosed="false" isExecutable="true" name="TestLane" processType="None">
+      <extensionElements/>
+      <laneSet id="sid-80102520-ce53-4d8e-aec5-1e2bc16276fb">
+         <lane id="lane_5">
+            <flowNodeRef>startEvent_12</flowNodeRef>
+            <flowNodeRef>Task1_16</flowNodeRef>
+            <flowNodeRef>endEvent_23</flowNodeRef>
+         </lane>
+      </laneSet>
+      <startEvent id="startEvent_12" name="">
+         <outgoing>sequenceFlow_27</outgoing>
+      </startEvent>
+      <task completionQuantity="1" id="Task1_16" isForCompensation="false" name="Task1" startQuantity="1">
+         <incoming>sequenceFlow_27</incoming>
+         <outgoing>sequenceFlow_28</outgoing>
+      </task>
+      <endEvent id="endEvent_23" name="">
+         <incoming>sequenceFlow_28</incoming>
+      </endEvent>
+      <sequenceFlow id="sequenceFlow_28" isImmediate="true" name="" sourceRef="Task1_16" targetRef="endEvent_23"/>
+      <sequenceFlow id="sequenceFlow_27" isImmediate="true" name="" sourceRef="startEvent_12" targetRef="Task1_16"/>
+   </process>
+   <bpmndi:BPMNDiagram id="sid-2143a63b-7576-42e9-9e30-6c0d71ca8ee4">
+      <bpmndi:BPMNPlane bpmnElement="sid-d2852c7f-e79c-4352-a361-abf231c13804" id="sid-f2a00822-7d0d-42e7-b5a0-071bcc2702ea">
+         <bpmndi:BPMNShape bpmnElement="TestLane_1" id="TestLane_1_gui" isHorizontal="true">
+            <omgdc:Bounds height="250.0" width="600.0" x="0.0" y="0.0"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape bpmnElement="lane_5" id="lane_5_gui" isHorizontal="true">
+            <omgdc:Bounds height="250.0" width="570.0" x="30.0" y="0.0"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape bpmnElement="startEvent_12" id="startEvent_12_gui">
+            <omgdc:Bounds height="28.0" width="28.0" x="76.0" y="91.0"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape bpmnElement="Task1_16" id="Task1_16_gui">
+            <omgdc:Bounds height="80.0" width="100.0" x="150.0" y="65.0"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape bpmnElement="endEvent_23" id="endEvent_23_gui">
+            <omgdc:Bounds height="28.0" width="28.0" x="295.0" y="91.0"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNEdge bpmnElement="sequenceFlow_28" id="sequenceFlow_28_gui">
+            <omgdi:waypoint x="250.0" y="105.0"/>
+            <omgdi:waypoint x="295.0" y="105.0"/>
+         </bpmndi:BPMNEdge>
+         <bpmndi:BPMNEdge bpmnElement="sequenceFlow_27" id="sequenceFlow_27_gui">
+            <omgdi:waypoint x="104.0" y="105.0"/>
+            <omgdi:waypoint x="150.0" y="105.0"/>
+         </bpmndi:BPMNEdge>
+      </bpmndi:BPMNPlane>
+   </bpmndi:BPMNDiagram>
+</definitions>

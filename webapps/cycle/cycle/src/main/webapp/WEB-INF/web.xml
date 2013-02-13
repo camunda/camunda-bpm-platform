@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<web-app version="2.4" 
+  xmlns="http://java.sun.com/xml/ns/j2ee" 
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+  xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
+  
+  <display-name>fox cycle</display-name>
+  
+  <!-- disable resteasy scanning for JBoss deployment -->
+  <context-param>
+    <param-name>resteasy.scan</param-name>
+    <param-value>false</param-value>
+  </context-param>
+  <context-param>
+      <param-name>resteasy.scan.providers</param-name>
+      <param-value>false</param-value>
+  </context-param>
+  <context-param>
+      <param-name>resteasy.scan.resources</param-name>
+      <param-value>false</param-value>
+  </context-param>
+  
+  <context-param>
+    <param-name>contextConfigLocation</param-name>
+    <param-value>classpath:spring/*.xml</param-value>
+  </context-param>
+  <listener>
+    <listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+  </listener>
+  <listener>
+    <listener-class>org.springframework.web.context.request.RequestContextListener</listener-class>
+  </listener>
+  
+  <!-- 
+    jaxrs servlet definition / mapping 
+  -->
+  <servlet>
+    <servlet-name>Jersey</servlet-name>
+    <servlet-class>com.sun.jersey.spi.spring.container.servlet.SpringServlet</servlet-class>
+    <init-param>
+      <param-name>com.sun.jersey.api.json.POJOMappingFeature</param-name>
+      <param-value>true</param-value>
+    </init-param>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>Jersey</servlet-name>
+    <url-pattern>/app/*</url-pattern>
+  </servlet-mapping>
+  
+  <!-- 
+    filter definitions / mapping 
+  -->
+  <filter>
+    <filter-name>SecurityFilter</filter-name>
+    <filter-class>com.camunda.fox.security.web.SecurityFilter</filter-class>
+  </filter>
+  <filter>
+    <filter-name>InitialConfigurationFilter</filter-name>
+    <filter-class>com.camunda.fox.cycle.web.filter.InitialConfigurationFilter</filter-class>
+  </filter>
+  <filter>
+    <filter-name>SlashUriFilter</filter-name>
+    <filter-class>com.camunda.fox.cycle.web.filter.SlashUriFilter</filter-class>
+  </filter>
+  <filter>
+    <filter-name>IdentityHolderFilter</filter-name>
+    <filter-class>com.camunda.fox.cycle.web.filter.IdentityHolderFilter</filter-class>
+  </filter>
+  <filter-mapping>
+    <filter-name>InitialConfigurationFilter</filter-name>
+    <url-pattern>/app/secured/view/index</url-pattern>
+  </filter-mapping>
+  <filter-mapping>
+    <filter-name>SecurityFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+  <filter-mapping>
+    <filter-name>IdentityHolderFilter</filter-name>
+    <url-pattern>/*</url-pattern>
+  </filter-mapping>
+  <filter-mapping>
+    <filter-name>SlashUriFilter</filter-name>
+    <url-pattern>/app/secured/view/*</url-pattern>
+  </filter-mapping>
+    
+  <!-- 
+    error page definitions 
+  -->
+  <error-page>
+    <error-code>404</error-code>
+    <location>/app/error/not-found</location>
+  </error-page>
+  <session-config>
+    <session-timeout>60</session-timeout>
+  </session-config>
+</web-app>

@@ -1,0 +1,13 @@
+.settings
+.externalToolBuilders
+.classpath
+.project
+bin
+target
+.metadata
+.LCKpom.xml~
+build.properties
+nbactions*.xml
+nb-configuration.xml
+.idea
+cycle-httpclient/dependency-reduced-pom.xml

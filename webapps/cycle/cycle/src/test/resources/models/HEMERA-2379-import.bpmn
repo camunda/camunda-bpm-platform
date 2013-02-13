@@ -1,0 +1,226 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:signavio="http://www.signavio.com" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd" id="sid-1078a3e8-caa1-46ac-9515-ef549f75568b" exporter="Signavio Process Editor, http://www.signavio.com" exporterVersion="5.4.1" targetNamespace="http://www.omg.org/spec/BPMN/20100524/MODEL">
+  <message id="sid-473d1675-f4cd-43e0-9ce4-bd924e62af2e" name="AutomatedAcquisition"/>
+  <message id="sid-0183ede6-c1cf-4874-9a0f-a71bb0464a38" name="ManualAcquisition"/>
+  <error id="sid-b3d7ca38-9be8-4d46-add2-6b4f7bbdb658"/>
+  <collaboration id="sid-25ed49cc-a47a-4727-8f35-17c269ba20cb">
+    <participant id="Prozess_Engine_Akquise_Prozess_15" name="Prozess Engine&#xA;Akquise Prozess" processRef="CC-Akquise_"/>
+    <participant id="UI_Mediator_6" name="UI Mediator"/>
+    <participant id="sid-157F1C83-2948-4441-A569-681981442BBC" name="SOA Services"/>
+    <textAnnotation id="textAnnotation_28">
+      <text>Nicht modelliert
+-> Übernimmt Kommunikation zw. GUI und Prozess</text>
+    </textAnnotation>
+  </collaboration>
+  <process id="CC-Akquise_" name="Prozess Engine&#xA;Akquise Prozess" isClosed="true" isExecutable="true">
+    <laneSet id="sid-f047f43d-f2cd-43e4-b386-2e9f1f8c2334">
+      <lane id="lane_32">
+        <flowNodeRef>GP_identifizieren_62</flowNodeRef>
+        <flowNodeRef>Akquisedaten_erfassen_69</flowNodeRef>
+        <flowNodeRef>GP_identifiziert___angelegt_84</flowNodeRef>
+        <flowNodeRef>SAP_Kontakt_schreiben_109</flowNodeRef>
+        <flowNodeRef>endEvent_116</flowNodeRef>
+        <flowNodeRef>Automatische_Akquise_56</flowNodeRef>
+        <flowNodeRef>Manuelle_Akquise_95</flowNodeRef>
+        <flowNodeRef>sid-B39EF6E5-1092-4217-8DEF-9E0E345DF1C2</flowNodeRef>
+        <flowNodeRef>sid-E1D26D5A-651B-48C2-B7D0-DE1F07E22610</flowNodeRef>
+        <flowNodeRef>Technische_Stammdaten_anlegen_77</flowNodeRef>
+        <flowNodeRef>sid-E9D4B6B6-11FC-4739-85EC-C50F7E46452A</flowNodeRef>
+        <flowNodeRef>Akquisedaten_erfasst_90</flowNodeRef>
+        <flowNodeRef>UserTask_2</flowNodeRef>
+        <flowNodeRef>BoundaryEvent_1</flowNodeRef>
+        <flowNodeRef>EndEvent_1</flowNodeRef>
+      </lane>
+    </laneSet>
+    <userTask id="GP_identifizieren_62" activiti:assignee="#{userService.getUserId()}" activiti:formKey="content/businessPartnerIdentification/identifyBusinessPartner" name="Identifikation eines Geschäftspartners" implementation="webService">
+      <documentation id="sid-76fbe406-50fd-48d2-8750-73ee3090e4ae">Geschäftspartner identifizieren</documentation>
+      <incoming>sid-E156F180-515A-4AC1-A569-102492F85DD1</incoming>
+      <incoming>sid-354B1DA1-3E86-4E84-8E3E-989A97C3204C</incoming>
+      <outgoing>sequenceFlow_127</outgoing>
+    </userTask>
+    <userTask id="Akquisedaten_erfassen_69" activiti:assignee="#{userService.getUserId()}" activiti:formKey="content/premiseLookup/listPremises" name="Akquisedaten erfassen" implementation="webService">
+      <documentation id="sid-ec339197-1c21-42b3-91fe-cbdf0c9bc950">Akquisedaten erfassen</documentation>
+      <incoming>sequenceFlow_126</incoming>
+      <incoming>sid-0B758BD1-91CC-484D-81E6-87F04264A2A9</incoming>
+      <outgoing>sequenceFlow_133</outgoing>
+    </userTask>
+    <intermediateThrowEvent id="GP_identifiziert___angelegt_84" name="GP identifiziert&#xA;bzw. angelegt">
+      <incoming>sequenceFlow_131</incoming>
+      <incoming>sequenceFlow_127</incoming>
+      <outgoing>sequenceFlow_126</outgoing>
+    </intermediateThrowEvent>
+    <serviceTask id="SAP_Kontakt_schreiben_109" activiti:class="com.camunda.training.delegate.SysoutDelegate" name="SAP Kontakt schreiben" implementation="webService">
+      <documentation id="sid-86f5300b-9d8c-4df1-b1b4-71e3dfead9e3">SAP Kontakt schreiben</documentation>
+      <incoming>SequenceFlow_1</incoming>
+      <outgoing>sequenceFlow_135</outgoing>
+    </serviceTask>
+    <endEvent id="endEvent_116" name="">
+      <incoming>sequenceFlow_135</incoming>
+    </endEvent>
+    <startEvent id="Automatische_Akquise_56" name="Automatisierte&#xA;Akquise">
+      <outgoing>sid-E156F180-515A-4AC1-A569-102492F85DD1</outgoing>
+      <messageEventDefinition id="sid-3f230efe-b9a0-4e6e-ae7b-b3c270f21e32" messageRef="sid-473d1675-f4cd-43e0-9ce4-bd924e62af2e"/>
+    </startEvent>
+    <startEvent id="Manuelle_Akquise_95" name="Manuelle Akquise">
+      <outgoing>sequenceFlow_131</outgoing>
+      <messageEventDefinition id="sid-bf109994-7261-4c63-9016-d3c6b3ba45a3" messageRef="sid-0183ede6-c1cf-4874-9a0f-a71bb0464a38"/>
+    </startEvent>
+    <boundaryEvent id="sid-B39EF6E5-1092-4217-8DEF-9E0E345DF1C2" name="" attachedToRef="SAP_Kontakt_schreiben_109">
+      <errorEventDefinition id="sid-7ec284e0-76a8-4484-94d0-8ce8c6bf11d7" errorRef="sid-b3d7ca38-9be8-4d46-add2-6b4f7bbdb658"/>
+    </boundaryEvent>
+    <startEvent id="sid-E1D26D5A-651B-48C2-B7D0-DE1F07E22610" name="Blanko Start">
+      <outgoing>sid-354B1DA1-3E86-4E84-8E3E-989A97C3204C</outgoing>
+    </startEvent>
+    <dataStoreReference id="sid-27BC024B-3DAD-4A71-BAE4-00D66B9628C1" name="Speicherort X" dataStoreRef="sid-385faa86-e776-4046-aad8-7a6eb6ebed67"/>
+    <sequenceFlow id="sequenceFlow_131" name="" isImmediate="true" sourceRef="Manuelle_Akquise_95" targetRef="GP_identifiziert___angelegt_84"/>
+    <sequenceFlow id="sequenceFlow_133" name="" isImmediate="true" sourceRef="Akquisedaten_erfassen_69" targetRef="UserTask_2"/>
+    <sequenceFlow id="sequenceFlow_135" name="" isImmediate="true" sourceRef="SAP_Kontakt_schreiben_109" targetRef="endEvent_116"/>
+    <sequenceFlow id="sequenceFlow_127" name="" isImmediate="true" sourceRef="GP_identifizieren_62" targetRef="GP_identifiziert___angelegt_84"/>
+    <sequenceFlow id="sequenceFlow_126" name="" isImmediate="true" sourceRef="GP_identifiziert___angelegt_84" targetRef="Akquisedaten_erfassen_69"/>
+    <sequenceFlow id="sid-E156F180-515A-4AC1-A569-102492F85DD1" name="" isImmediate="true" sourceRef="Automatische_Akquise_56" targetRef="GP_identifizieren_62"/>
+    <sequenceFlow id="sid-354B1DA1-3E86-4E84-8E3E-989A97C3204C" name="" sourceRef="sid-E1D26D5A-651B-48C2-B7D0-DE1F07E22610" targetRef="GP_identifizieren_62"/>
+    <serviceTask id="Technische_Stammdaten_anlegen_77" activiti:class="com.camunda.training.delegate.SysoutDelegate" name="Techn. Stammdaten in SAP anlegen" implementation="webService">
+      <incoming>SequenceFlow_3</incoming>
+      <outgoing>sequenceFlow_136</outgoing>
+    </serviceTask>
+    <sequenceFlow id="sequenceFlow_136" name="" isImmediate="true" sourceRef="Technische_Stammdaten_anlegen_77" targetRef="Akquisedaten_erfasst_90"/>
+    <boundaryEvent id="sid-E9D4B6B6-11FC-4739-85EC-C50F7E46452A" name="" attachedToRef="Technische_Stammdaten_anlegen_77">
+      <outgoing>sid-0B758BD1-91CC-484D-81E6-87F04264A2A9</outgoing>
+      <errorEventDefinition id="sid-e0f1c69e-45bd-408c-8951-d9eab5dbf1c6" errorRef="sid-b3d7ca38-9be8-4d46-add2-6b4f7bbdb658"/>
+    </boundaryEvent>
+    <sequenceFlow id="sid-0B758BD1-91CC-484D-81E6-87F04264A2A9" name="" sourceRef="sid-E9D4B6B6-11FC-4739-85EC-C50F7E46452A" targetRef="Akquisedaten_erfassen_69"/>
+    <intermediateThrowEvent id="Akquisedaten_erfasst_90" name="Akquisedaten erfasst">
+      <incoming>sequenceFlow_136</incoming>
+      <outgoing>SequenceFlow_1</outgoing>
+    </intermediateThrowEvent>
+    <sequenceFlow id="SequenceFlow_1" name="" sourceRef="Akquisedaten_erfasst_90" targetRef="SAP_Kontakt_schreiben_109"/>
+    <userTask id="UserTask_2" name="User Task">
+      <incoming>sequenceFlow_133</incoming>
+      <outgoing>SequenceFlow_3</outgoing>
+    </userTask>
+    <sequenceFlow id="SequenceFlow_3" name="" sourceRef="UserTask_2" targetRef="Technische_Stammdaten_anlegen_77"/>
+    <boundaryEvent id="BoundaryEvent_1" name="Boundary event" attachedToRef="UserTask_2">
+      <outgoing>SequenceFlow_4</outgoing>
+    </boundaryEvent>
+    <endEvent id="EndEvent_1">
+      <incoming>SequenceFlow_4</incoming>
+    </endEvent>
+    <sequenceFlow id="SequenceFlow_4" name="" sourceRef="BoundaryEvent_1" targetRef="EndEvent_1"/>
+    <association id="sid-CF081184-611E-4826-8411-C2FEA011597D" sourceRef="SAP_Kontakt_schreiben_109" targetRef="sid-27BC024B-3DAD-4A71-BAE4-00D66B9628C1"/>
+  </process>
+  <bpmndi:BPMNDiagram id="sid-ff213161-4bfc-4b34-b39a-a1b0658ed1ab">
+    <bpmndi:BPMNPlane id="sid-5c9ac33d-9e6d-4ee1-b3dc-dd51794b3e9a" bpmnElement="sid-25ed49cc-a47a-4727-8f35-17c269ba20cb">
+      <bpmndi:BPMNShape id="Prozess_Engine_Akquise_Prozess_15_gui" bpmnElement="Prozess_Engine_Akquise_Prozess_15" isHorizontal="true">
+        <omgdc:Bounds height="260.0" width="1405.0" x="0.0" y="0.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="lane_32_gui" bpmnElement="lane_32" isHorizontal="true">
+        <omgdc:Bounds height="260.02567" width="1375.1814" x="30.0" y="0.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="GP_identifizieren_62_gui" bpmnElement="GP_identifizieren_62" isHorizontal="true">
+        <omgdc:Bounds height="80.0" width="100.0" x="163.0" y="95.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Akquisedaten_erfassen_69_gui" bpmnElement="Akquisedaten_erfassen_69" isHorizontal="true">
+        <omgdc:Bounds height="80.0" width="100.0" x="535.0" y="95.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Technische_Stammdaten_anlegen_77_gui" bpmnElement="Technische_Stammdaten_anlegen_77" isHorizontal="true">
+        <omgdc:Bounds height="80.0" width="100.0" x="840.0" y="95.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="GP_identifiziert___angelegt_84_gui" bpmnElement="GP_identifiziert___angelegt_84" isHorizontal="true">
+        <omgdc:Bounds height="30.0" width="30.0" x="409.028" y="120.02566"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Akquisedaten_erfasst_90_gui" bpmnElement="Akquisedaten_erfasst_90" isHorizontal="true">
+        <omgdc:Bounds height="30.0" width="30.0" x="1029.0" y="120.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="SAP_Kontakt_schreiben_109_gui" bpmnElement="SAP_Kontakt_schreiben_109" isHorizontal="true">
+        <omgdc:Bounds height="80.0" width="100.0" x="1172.0" y="95.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="endEvent_116_gui" bpmnElement="endEvent_116" isHorizontal="true">
+        <omgdc:Bounds height="28.0" width="28.0" x="1358.9218" y="121.02566"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Automatische_Akquise_56_gui" bpmnElement="Automatische_Akquise_56" isHorizontal="true">
+        <omgdc:Bounds height="30.0" width="30.0" x="65.181435" y="120.02566"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="Manuelle_Akquise_95_gui" bpmnElement="Manuelle_Akquise_95" isHorizontal="true">
+        <omgdc:Bounds height="30.0" width="30.0" x="448.18143" y="39.415836"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="sid-B39EF6E5-1092-4217-8DEF-9E0E345DF1C2_gui" bpmnElement="sid-B39EF6E5-1092-4217-8DEF-9E0E345DF1C2" isHorizontal="true">
+        <omgdc:Bounds height="30.0" width="30.0" x="1178.2462" y="160.02567"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="sid-E9D4B6B6-11FC-4739-85EC-C50F7E46452A_gui" bpmnElement="sid-E9D4B6B6-11FC-4739-85EC-C50F7E46452A" isHorizontal="true">
+        <omgdc:Bounds height="30.0" width="30.0" x="845.0" y="160.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="sid-E1D26D5A-651B-48C2-B7D0-DE1F07E22610_gui" bpmnElement="sid-E1D26D5A-651B-48C2-B7D0-DE1F07E22610" isHorizontal="true">
+        <omgdc:Bounds height="30.0" width="30.0" x="103.181435" y="202.21338"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="sid-27BC024B-3DAD-4A71-BAE4-00D66B9628C1_gui" bpmnElement="sid-27BC024B-3DAD-4A71-BAE4-00D66B9628C1" isHorizontal="true">
+        <omgdc:Bounds height="60.173" width="62.001" x="1308.1814" y="24.415838"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_UserTask_2" bpmnElement="UserTask_2">
+        <omgdc:Bounds height="80.0" width="100.0" x="690.0" y="95.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_BoundaryEvent_1" bpmnElement="BoundaryEvent_1">
+        <omgdc:Bounds height="30.0" width="30.0" x="735.0" y="150.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="BPMNShape_EndEvent_1" bpmnElement="EndEvent_1">
+        <omgdc:Bounds height="30.0" width="30.0" x="890.0" y="211.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="sid-E156F180-515A-4AC1-A569-102492F85DD1_gui" bpmnElement="sid-E156F180-515A-4AC1-A569-102492F85DD1" sourceElement="Automatische_Akquise_56_gui" targetElement="GP_identifizieren_62_gui">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="95.181435" y="134.21338"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="163.18144" y="134.21338"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sid-354B1DA1-3E86-4E84-8E3E-989A97C3204C_gui" bpmnElement="sid-354B1DA1-3E86-4E84-8E3E-989A97C3204C" sourceElement="sid-E1D26D5A-651B-48C2-B7D0-DE1F07E22610_gui" targetElement="GP_identifizieren_62_gui">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="133.18144" y="217.21338"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="213.18144" y="217.21338"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="213.18144" y="174.21338"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sequenceFlow_133_gui" bpmnElement="sequenceFlow_133" sourceElement="Akquisedaten_erfassen_69_gui" targetElement="BPMNShape_UserTask_2">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="635.0" y="135.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="690.0" y="135.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sequenceFlow_135_gui" bpmnElement="sequenceFlow_135" sourceElement="SAP_Kontakt_schreiben_109_gui" targetElement="endEvent_116_gui">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="1272.1814" y="134.21338"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="1358.1814" y="134.21338"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sequenceFlow_136_gui" bpmnElement="sequenceFlow_136" sourceElement="Technische_Stammdaten_anlegen_77_gui" targetElement="Akquisedaten_erfasst_90_gui">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="940.0" y="135.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="1029.0" y="135.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sid-0B758BD1-91CC-484D-81E6-87F04264A2A9_gui" bpmnElement="sid-0B758BD1-91CC-484D-81E6-87F04264A2A9" sourceElement="sid-E9D4B6B6-11FC-4739-85EC-C50F7E46452A_gui" targetElement="Akquisedaten_erfassen_69_gui">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="860.0" y="190.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="860.0" y="216.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="736.0" y="216.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="585.0" y="216.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="585.0" y="175.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sid-CF081184-611E-4826-8411-C2FEA011597D_gui" bpmnElement="sid-CF081184-611E-4826-8411-C2FEA011597D" sourceElement="SAP_Kontakt_schreiben_109_gui" targetElement="sid-27BC024B-3DAD-4A71-BAE4-00D66B9628C1_gui">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="1272.1814" y="100.21339"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="1308.1814" y="74.21339"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sequenceFlow_127_gui" bpmnElement="sequenceFlow_127" sourceElement="GP_identifizieren_62_gui" targetElement="GP_identifiziert___angelegt_84_gui">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="263.18143" y="134.21338"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="408.18143" y="134.21338"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sequenceFlow_126_gui" bpmnElement="sequenceFlow_126" sourceElement="GP_identifiziert___angelegt_84_gui" targetElement="Akquisedaten_erfassen_69_gui">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="439.0" y="135.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="535.0" y="135.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="sequenceFlow_131_gui" bpmnElement="sequenceFlow_131" sourceElement="Manuelle_Akquise_95_gui" targetElement="GP_identifiziert___angelegt_84_gui">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="448.18143" y="54.213383"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="424.028" y="54.415836"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="423.18143" y="119.21339"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_1" bpmnElement="SequenceFlow_1" sourceElement="Akquisedaten_erfasst_90_gui" targetElement="SAP_Kontakt_schreiben_109_gui">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="1059.0" y="135.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="1172.0" y="135.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_3" bpmnElement="SequenceFlow_3" sourceElement="BPMNShape_UserTask_2" targetElement="Technische_Stammdaten_anlegen_77_gui">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="790.0" y="135.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="840.0" y="135.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_4" bpmnElement="SequenceFlow_4" sourceElement="BPMNShape_BoundaryEvent_1" targetElement="BPMNShape_EndEvent_1">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="756.0" y="176.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="890.0" y="226.0"/>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

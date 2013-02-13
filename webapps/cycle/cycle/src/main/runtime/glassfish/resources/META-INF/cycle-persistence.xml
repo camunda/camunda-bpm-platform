@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="1.0" xmlns="http://java.sun.com/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/persistence http://java.sun.com/xml/ns/persistence/persistence_1_0.xsd">
+  <persistence-unit name="cyclePU" transaction-type="JTA">
+    <provider>org.hibernate.ejb.HibernatePersistence</provider>
+    <jta-data-source>jdbc/CycleDS</jta-data-source>
+    <class>com.camunda.fox.cycle.entity.AbstractEntity</class>
+    <class>com.camunda.fox.cycle.entity.BpmnDiagram</class>
+    <class>com.camunda.fox.cycle.entity.ConnectorConfiguration</class>
+    <class>com.camunda.fox.cycle.entity.ConnectorCredentials</class>
+    <class>com.camunda.fox.cycle.entity.Roundtrip</class>
+    <class>com.camunda.fox.cycle.entity.User</class>
+    <properties>
+      <property name="hibernate.hbm2ddl.auto" value="update" />
+      <property name="hibernate.show_sql" value="false" />
+      
+      <property name="hibernate.transaction.jta.platform" value="org.hibernate.service.jta.platform.internal.SunOneJtaPlatform" />
+      <property name="hibernate.transaction.factory_class" value="org.hibernate.engine.transaction.internal.jta.CMTTransactionFactory" />
+    </properties>
+  </persistence-unit>
+</persistence>

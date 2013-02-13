@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+  <head th:substituteby="fragment/common :: head " />
+  <body>
+    <div class="wrapper">
+	    <div th:substituteby="fragment/common :: navigation-default"></div>
+	    <div class="container-fluid">
+	      <div class="row-fluid">
+	        <div class="span12" style="padding-top: 50px;">
+	          <p>
+	            <span th:text="#{You have been logged out}">You have been logged out.</span>
+	            <a th:href="@{/app/secured/view/index}" th:text="#{Back to start}">Back to start</a>.
+	          </p>
+	        </div>
+	      </div>
+	    </div>
+    </div>
+    <footer th:substituteby="fragment/common :: footer" />
+  </body>
+</html>

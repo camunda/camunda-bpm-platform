@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:p="http://www.springframework.org/schema/p"
+  xmlns:context="http://www.springframework.org/schema/context"
+  xmlns:aop="http://www.springframework.org/schema/aop"
+  xsi:schemaLocation="
+          http://www.springframework.org/schema/beans 
+          http://www.springframework.org/schema/beans/spring-beans.xsd
+          http://www.springframework.org/schema/context 
+          http://www.springframework.org/schema/context/spring-context.xsd
+          http://www.springframework.org/schema/aop
+          http://www.springframework.org/schema/aop/spring-aop.xsd">
+
+  <context:annotation-config />
+
+  <bean name="signavioConnector" class="com.camunda.fox.cycle.connector.signavio.SignavioConnector">
+    <property name="configuration" ref="signavioConfig" />
+  </bean>
+
+  <bean name="signavioConfig" class="com.camunda.fox.cycle.entity.ConnectorConfiguration">
+    <property name="id" value="2" />
+    <property name="name" value="My SignavioConnector" />
+    <property name="connectorClass" value="com.camunda.fox.cycle.connector.signavio.SignavioConnector" />
+    <property name="loginMode" value="GLOBAL" />
+    <property name="globalUser" value="${test.signavioConnector.globalUser}" />
+    <property name="globalPassword" value="${test.signavioConnector.globalPassword}" />
+    <property name="properties">
+      <map>
+        <entry key="signavioBaseUrl" value="${test.signavioConnector.baseUrl}"></entry>
+      </map>
+    </property>
+  </bean>
+
+  <bean name="signavioConfigProxy" class="com.camunda.fox.cycle.entity.ConnectorConfiguration">
+    <property name="id" value="3" />
+    <property name="name" value="My SignavioConnector with Proxy" />
+    <property name="connectorClass" value="com.camunda.fox.cycle.connector.signavio.SignavioConnector" />
+    <property name="loginMode" value="GLOBAL" />
+    <property name="globalUser" value="${test.signavioConnector.globalUser}" />
+    <property name="globalPassword" value="${test.signavioConnector.globalPassword}" />
+    <property name="properties">
+      <map>
+        <entry key="signavioBaseUrl" value="${test.signavioConnector.baseUrl}"></entry>
+        <entry key="proxyUrl" value="${test.signavioConnector.proxyUrl}"></entry>
+        <entry key="proxyUsername" value="${test.signavioConnector.proxyUsername}"></entry>
+        <entry key="proxyPassword" value="${test.signavioConnector.proxyPassword}"></entry>
+      </map>
+    </property>
+  </bean>
+
+  <bean id="processEngineConfiguration"
+        class="org.activiti.engine.impl.cfg.StandaloneProcessEngineConfiguration">
+    
+    <property name="jdbcUrl" value="jdbc:h2:mem:activiti;DB_CLOSE_DELAY=1000" />
+    <property name="jdbcDriver" value="org.h2.Driver" />
+    <property name="jdbcUsername" value="sa" />
+    <property name="jdbcPassword" value="" />
+    <property name="databaseSchemaUpdate" value="true" />
+    <property name="jobExecutorActivate" value="false" />
+  </bean>
+  
+  <bean id="cycleConfiguration" class="com.camunda.fox.cycle.configuration.CycleConfiguration">
+
+    <property name="defaultCommitMessage" value="Changed using camunda fox cycle" />
+    
+  </bean>
+</beans>

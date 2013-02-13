@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" data-ng-app="cycle">
+  <head th:substituteby="fragment/common :: head">
+
+  </head>
+  <body data-ng-controller="DefaultController">
+    <div class="wrapper">
+      <div th:substituteby="fragment/common :: navigation-default"></div>
+      <div class="container-fluid content-container content-inset">
+        <div data-error-panel></div>
+        <div class="row content-container">
+          <div class="span4 well">
+            <h1>fox cycle Setup </h1>
+            <p class="offset-paragraph">
+              This seems to be a new fox cycle installation. Before you can use fox cycle, you have to perform the initial setup.  
+            </p>
+            <p class="offset-paragraph">
+              If you have trouble setting up cycle, please contact camunda support.
+            </p>
+          </div>
+          <div class="span8">
+            <h1>Create initial User</h1>
+            <div class="f-box">
+              <p>
+                You have to configure an initial user.
+                You can use this user in order to login into cycle and add additional users.
+              </p>
+              <!-- user create form -->
+              <form class="form-horizontal" novalidate data-ng-submit="save()" name="editUserForm" ng-cloak data-ng-controller="CreateInitialUserController">
+                <fieldset>
+                  <div class="control-group" ng-class="errorClass(editUserForm.userName)">
+                    <label class="control-label" for="userName" th:text="#{'User Name'}">User Name</label>
+                    <div class="controls">
+                      <input id="userName" name="userName" type="text" class="input-medium" data-ng-model="editUser.name" required autofocus />
+                    </div>
+                  </div>
+                  <div class="control-group" ng-class="errorClass(editUserForm.email)">
+                    <label class="control-label" for="email" 
+                           th:text="#{'Email'}">Email</label>
+                    <div class="controls">
+                      <input id="email" name="email" type="text" class="input-large" required email data-ng-model="editUser.email"/>
+                      <p class="help-block" ng-show="editUserForm.email.$error.email">Not a valid email address</p>
+                    </div>
+                  </div>
+                  <div class="control-group" ng-class="errorClass(editUserForm.passwordRepetition)">
+                    <label class="control-label" for="password" 
+                           th:text="#{'Password'}">Password</label>
+                    <div class="controls">
+                      <input id="password" name="password" type="password" class="input-medium" data-ng-model="editUser.password" />
+                    </div>
+                  </div>
+                  <div class="control-group" ng-class="errorClass(editUserForm.passwordRepetition)">
+                    <label class="control-label" for="password-repetition" 
+                           th:text="#{'Password (repeated)'}">Password (repeated)</label>
+                    <div class="controls">
+                      <input id="password-repetition" name="passwordRepetition" type="password" required class="input-medium" matches="editUser.password" data-ng-model="passwordRepetition"/>
+                      <p class="help-block" ng-show="editUserForm.passwordRepetition.$error.matches">Password and repetition do not match</p>
+                    </div>
+                  </div>
+                  <div class="control-group">
+                    <div class="controls">
+                      <p class="help-block">The created user will be granted admin rights.</p>
+                    </div>
+                  </div>
+                  <div class="control-group">
+                    <div class="controls">
+                      <button class="btn" data-ng-disabled="!isValid()" data-ng-click="save()" data-req-aware="editUserForm">Create user</button>
+                    </div>
+                  </div>
+                </fieldset>
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="push-down"><!-- // --></div> 
+    </div>
+    <footer th:substituteby="fragment/common :: footer" />
+  </body>
+</html>

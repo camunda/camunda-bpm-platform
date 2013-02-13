@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+  xmlns:context="http://www.springframework.org/schema/context"
+  xmlns:aop="http://www.springframework.org/schema/aop"
+  xsi:schemaLocation="
+          http://www.springframework.org/schema/beans 
+          http://www.springframework.org/schema/beans/spring-beans.xsd">
+  
+  <bean name="vfsConnectorConfig" class="com.camunda.fox.cycle.entity.ConnectorConfiguration">
+    <property name="name" value="Test VFS Connector" />
+    <property name="connectorClass" value="com.camunda.fox.cycle.connector.vfs.VfsConnector" />
+    <property name="properties">
+      <map>
+        <entry key="BASE_PATH" value="file://target/vfs-repository" />
+      </map>
+    </property>
+  </bean>
+
+  <bean name="signavioConfig" class="com.camunda.fox.cycle.entity.ConnectorConfiguration">
+    <property name="name" value="My SignavioConnector" />
+    <property name="connectorClass"
+              value="com.camunda.fox.cycle.connector.signavio.SignavioConnector" />
+    <property name="loginMode" value="GLOBAL" />
+    <property name="globalUser" value="test@camunda.com" />
+    <property name="globalPassword" value="testtest" />
+    <property name="properties">
+      <map>
+        <entry key="signavioBaseUrl" value="http://vm2.camunda.com:8080"></entry>
+      </map>
+    </property>
+  </bean>
+  
+  <bean name="svnConfig" class="com.camunda.fox.cycle.entity.ConnectorConfiguration">
+    <property name="name" value="My Svn Connector" />
+    <property name="connectorClass"
+              value="com.camunda.fox.cycle.connector.svn.SvnConnector" />
+    <property name="loginMode" value="LOGIN_NOT_REQUIRED" />
+    <property name="properties">
+      <map>
+        <entry key="repositoryPath" value="file://target/svn-repository" />
+      </map>
+    </property>
+  </bean>
+
+  <!-- instantiates test connector configurations for testing -->
+  <bean name="configurationProvider" class="com.camunda.fox.cycle.connector.test.util.ConnectorConfigurationProvider" />
+  
+  <bean id="cycleConfiguration" class="com.camunda.fox.cycle.configuration.CycleConfiguration">
+
+    <property name="defaultCommitMessage" value="Changed using camunda fox cycle" />
+    
+  </bean>
+</beans>

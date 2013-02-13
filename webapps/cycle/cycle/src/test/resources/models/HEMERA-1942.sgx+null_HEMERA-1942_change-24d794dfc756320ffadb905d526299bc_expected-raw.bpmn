@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="UTF-8"?><definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:signavio="http://www.signavio.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" exporter="Signavio Process Editor, http://www.signavio.com" exporterVersion="6.4.0" expressionLanguage="http://www.w3.org/1999/XPath" id="sid-30fe15c3-6dc3-4be4-baa4-0b48ef6778d2" targetNamespace="http://www.signavio.com/bpmn20" typeLanguage="http://www.w3.org/2001/XMLSchema" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/2.0/20100501/BPMN20.xsd">
+   <message id="message_1"/>
+   <message id="sid-44bd2a3a-7814-44fe-a062-80c7827070da" name=""/>
+   <collaboration id="sid-e838bd00-3f26-4db0-a099-13a3e9abd837">
+      <participant id="User_5" name="User" processRef="User_10">
+         <extensionElements/>
+      </participant>
+      <participant id="Process_Engine_2" name="Process Engine" processRef="HEMERA-1942_">
+         <extensionElements/>
+      </participant>
+      <messageFlow id="messageFlow_8" messageRef="message_1" name="" sourceRef="userTask_22" targetRef="startEvent_45"/>
+   </collaboration>
+   <process id="User_10" isClosed="false" isExecutable="false" name="User" processType="None">
+      <extensionElements/>
+      <laneSet id="sid-72d8a769-fe8f-4c78-a408-a780ce14a491">
+         <lane id="lane_11">
+            <extensionElements>
+               <signavio:signavioMetaData metaKey="bgcolor" metaValue=""/>
+            </extensionElements>
+            <flowNodeRef>startEvent_18</flowNodeRef>
+            <flowNodeRef>userTask_22</flowNodeRef>
+            <flowNodeRef>endEvent_27</flowNodeRef>
+         </lane>
+      </laneSet>
+      <startEvent id="startEvent_18" name="">
+         <extensionElements>
+            <signavio:signavioMetaData metaKey="bgcolor" metaValue="#ffffff"/>
+         </extensionElements>
+         <outgoing>sequenceFlow_31</outgoing>
+      </startEvent>
+      <userTask completionQuantity="1" id="userTask_22" isForCompensation="false" name="" startQuantity="1">
+         <extensionElements>
+            <signavio:signavioMetaData metaKey="bgcolor" metaValue="#ffffcc"/>
+         </extensionElements>
+         <incoming>sequenceFlow_31</incoming>
+         <outgoing>sequenceFlow_32</outgoing>
+      </userTask>
+      <endEvent id="endEvent_27" name="">
+         <extensionElements>
+            <signavio:signavioMetaData metaKey="bgcolor" metaValue="#ffffff"/>
+         </extensionElements>
+         <incoming>sequenceFlow_32</incoming>
+      </endEvent>
+      <sequenceFlow id="sequenceFlow_32" isImmediate="true" name="" sourceRef="userTask_22" targetRef="endEvent_27"/>
+      <sequenceFlow id="sequenceFlow_31" isImmediate="true" name="" sourceRef="startEvent_18" targetRef="userTask_22"/>
+   </process>
+   <process id="HEMERA-1942_" isClosed="false" isExecutable="true" name="Process Engine" processType="None">
+      <extensionElements/>
+      <laneSet id="sid-8e16011f-0553-414d-af1c-bdae6d61b522">
+         <lane id="lane_35">
+            <flowNodeRef>startEvent_45</flowNodeRef>
+            <flowNodeRef>userTask_50</flowNodeRef>
+            <flowNodeRef>endEvent_55</flowNodeRef>
+            <flowNodeRef>boundaryEvent_59</flowNodeRef>
+            <flowNodeRef>userTask_62</flowNodeRef>
+            <flowNodeRef>endEvent_67</flowNodeRef>
+         </lane>
+      </laneSet>
+      <startEvent id="startEvent_45" name="">
+         <outgoing>sequenceFlow_71</outgoing>
+         <messageEventDefinition id="sid-933298aa-ee22-497f-a8ed-8c1cb984b7e2" messageRef="sid-44bd2a3a-7814-44fe-a062-80c7827070da"/>
+      </startEvent>
+      <userTask completionQuantity="1" id="userTask_50" isForCompensation="false" name="" startQuantity="1">
+         <incoming>sequenceFlow_71</incoming>
+         <outgoing>sequenceFlow_72</outgoing>
+      </userTask>
+      <endEvent id="endEvent_55" name="">
+         <incoming>sequenceFlow_72</incoming>
+      </endEvent>
+      <boundaryEvent attachedToRef="userTask_50" cancelActivity="true" id="boundaryEvent_59" name="" parallelMultiple="false">
+         <outgoing>sequenceFlow_73</outgoing>
+         <messageEventDefinition id="sid-b4dda38b-2b8b-43e5-a32b-63980e621265" messageRef="sid-44bd2a3a-7814-44fe-a062-80c7827070da"/>
+      </boundaryEvent>
+      <userTask completionQuantity="1" id="userTask_62" isForCompensation="false" name="" startQuantity="1">
+         <incoming>sequenceFlow_73</incoming>
+         <outgoing>sequenceFlow_74</outgoing>
+      </userTask>
+      <endEvent id="endEvent_67" name="">
+         <incoming>sequenceFlow_74</incoming>
+      </endEvent>
+      <sequenceFlow id="sequenceFlow_72" isImmediate="true" name="" sourceRef="userTask_50" targetRef="endEvent_55"/>
+      <sequenceFlow id="sequenceFlow_71" isImmediate="true" name="" sourceRef="startEvent_45" targetRef="userTask_50"/>
+      <sequenceFlow id="sequenceFlow_74" isImmediate="true" name="" sourceRef="userTask_62" targetRef="endEvent_67"/>
+      <sequenceFlow id="sequenceFlow_73" isImmediate="true" name="" sourceRef="boundaryEvent_59" targetRef="userTask_62"/>
+   </process>
+   <bpmndi:BPMNDiagram id="sid-515a7b97-1a10-460b-9c2d-bd7de8dfbbad">
+      <bpmndi:BPMNPlane bpmnElement="sid-e838bd00-3f26-4db0-a099-13a3e9abd837" id="sid-29044b65-0e37-4588-9e06-fd86168d6b75">
+         <bpmndi:BPMNShape bpmnElement="User_5" id="User_5_gui" isHorizontal="true">
+            <omgdc:Bounds height="250.0" width="600.0" x="120.0" y="75.0"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape bpmnElement="Process_Engine_2" id="Process_Engine_2_gui" isHorizontal="true">
+            <omgdc:Bounds height="330.0" width="600.0" x="120.0" y="375.0"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape bpmnElement="lane_11" id="lane_11_gui" isHorizontal="true">
+            <omgdc:Bounds height="250.0" width="570.0" x="150.0" y="75.0"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape bpmnElement="startEvent_18" id="startEvent_18_gui">
+            <omgdc:Bounds height="28.0" width="28.0" x="181.0" y="186.0"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape bpmnElement="userTask_22" id="userTask_22_gui">
+            <omgdc:Bounds height="80.0" width="100.0" x="255.0" y="160.0"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape bpmnElement="endEvent_27" id="endEvent_27_gui">
+            <omgdc:Bounds height="28.0" width="28.0" x="400.0" y="186.0"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape bpmnElement="lane_35" id="lane_35_gui" isHorizontal="true">
+            <omgdc:Bounds height="330.0" width="570.0" x="150.0" y="375.0"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape bpmnElement="startEvent_45" id="startEvent_45_gui">
+            <omgdc:Bounds height="28.0" width="28.0" x="181.0" y="486.0"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape bpmnElement="userTask_50" id="userTask_50_gui">
+            <omgdc:Bounds height="80.0" width="100.0" x="255.0" y="460.0"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape bpmnElement="endEvent_55" id="endEvent_55_gui">
+            <omgdc:Bounds height="28.0" width="28.0" x="515.0" y="486.0"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape bpmnElement="boundaryEvent_59" id="boundaryEvent_59_gui">
+            <omgdc:Bounds height="28.0" width="28.0" x="301.0" y="526.0"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape bpmnElement="userTask_62" id="userTask_62_gui">
+            <omgdc:Bounds height="80.0" width="100.0" x="370.0" y="570.0"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape bpmnElement="endEvent_67" id="endEvent_67_gui">
+            <omgdc:Bounds height="28.0" width="28.0" x="515.0" y="596.0"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNEdge bpmnElement="messageFlow_8" id="messageFlow_8_gui" messageVisibleKind="initiating">
+            <omgdi:waypoint x="305.0" y="240.0"/>
+            <omgdi:waypoint x="305.0" y="362.5"/>
+            <omgdi:waypoint x="195.0" y="362.5"/>
+            <omgdi:waypoint x="195.0" y="486.0"/>
+         </bpmndi:BPMNEdge>
+         <bpmndi:BPMNEdge bpmnElement="sequenceFlow_31" id="sequenceFlow_31_gui">
+            <omgdi:waypoint x="209.0" y="200.0"/>
+            <omgdi:waypoint x="255.0" y="200.0"/>
+         </bpmndi:BPMNEdge>
+         <bpmndi:BPMNEdge bpmnElement="sequenceFlow_32" id="sequenceFlow_32_gui">
+            <omgdi:waypoint x="355.0" y="200.0"/>
+            <omgdi:waypoint x="400.0" y="200.0"/>
+         </bpmndi:BPMNEdge>
+         <bpmndi:BPMNEdge bpmnElement="sequenceFlow_72" id="sequenceFlow_72_gui">
+            <omgdi:waypoint x="355.0" y="500.0"/>
+            <omgdi:waypoint x="515.0" y="500.0"/>
+         </bpmndi:BPMNEdge>
+         <bpmndi:BPMNEdge bpmnElement="sequenceFlow_71" id="sequenceFlow_71_gui">
+            <omgdi:waypoint x="209.0" y="500.0"/>
+            <omgdi:waypoint x="255.0" y="500.0"/>
+         </bpmndi:BPMNEdge>
+         <bpmndi:BPMNEdge bpmnElement="sequenceFlow_74" id="sequenceFlow_74_gui">
+            <omgdi:waypoint x="470.0" y="610.0"/>
+            <omgdi:waypoint x="515.0" y="610.0"/>
+         </bpmndi:BPMNEdge>
+         <bpmndi:BPMNEdge bpmnElement="sequenceFlow_73" id="sequenceFlow_73_gui">
+            <omgdi:waypoint x="315.0" y="554.0"/>
+            <omgdi:waypoint x="315.0" y="610.0"/>
+            <omgdi:waypoint x="370.0" y="610.0"/>
+         </bpmndi:BPMNEdge>
+      </bpmndi:BPMNPlane>
+   </bpmndi:BPMNDiagram>
+</definitions>

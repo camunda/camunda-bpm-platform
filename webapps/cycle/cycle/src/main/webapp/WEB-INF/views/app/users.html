@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" data-ng-app="cycle">
+  <head th:substituteby="fragment/common :: head">
+
+  </head>
+  <body data-ng-controller="DefaultController">
+    <div class="wrapper">
+      <div th:substituteby="fragment/common :: navigation-logged-in"></div>
+      <div class="container-fluid content-container content-inset">
+        <div th:substituteby="fragment/common :: breadcrumbs"></div>
+        <div data-error-panel></div>
+        <div class="row-fluid content-container">
+          <div class="span12" data-ng-controller="UsersController">
+            <table class="table table-bordered">
+              <thead>
+                <tr>
+                  <th>Id</th>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr data-ng-repeat="user in users" data-ng-cloak>
+                  <td>{{user.id}}</td>
+                  <td>{{user.name}} <span class="badge badge-important" data-ng-show="user.admin" th:text="#{'Administrator'}">Administrator</span></td>
+                  <td>{{user.email}} </td>
+                  <td>
+                    <a ng-show="!isCurrentUser(user)" data-ng-click="editUser(user)" th:text="#{edit}">edit</a>
+                    <br />
+                    <a ng-show="!isCurrentUser(user)" data-ng-click="deleteUser(user)" th:text="#{delete}">delete</a>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <a class="btn" data-ng-click="createNew()"><span th:text="#{New}">New</span></a>
+
+            <!-- begin add/edit user-dialog -->
+            <modal-dialog model="editUserDialog" ng-cloak>
+              <div class="modal hide" data-ng-controller="EditUserController" data-ngm-if="editUserDialog.renderHtml()"> 
+                <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                  <h3 data-ng-show="mode == 'ADD'" th:text="#{'Add user'}"></h3>
+                  <h3 data-ng-show="mode == 'EDIT'" th:text="#{'Edit user'}"></h3>
+                </div>
+                <div class="modal-body">
+                  <div data-error-panel></div>
+                  <form class="form-horizontal" novalidate data-ng-submit="save()" name="editUserForm">
+                    <fieldset>
+                      <div class="control-group" ng-class="errorClass(editUserForm.userName)">
+                        <label class="control-label" for="userName" 
+                               th:text="#{'User Name'}">User Name</label>
+                        <div class="controls">
+                          <input id="connectorLabel" name="userName" type="text" class="span6" available="isNameAvailable" data-ng-model="editUser.name" required autofocus />
+                          <p class="help-block" ng-show="editUserForm.userName.$error.available">Name not available</p>
+                        </div>
+                      </div>
+                      <div class="control-group" ng-class="errorClass(editUserForm.email)">
+                        <label class="control-label" for="email" 
+                               th:text="#{'Email'}">Email</label>
+                        <div class="controls">
+                          <input id="email" name="email" type="text" class="span8" required email data-ng-model="editUser.email"/>
+                          <p class="help-block" ng-show="editUserForm.email.$error.email">Not a valid email address</p>
+                        </div>
+                      </div>
+                      <div class="control-group">
+                        <div class="controls">
+                          <label class="checkbox">
+                            <input type="checkbox" name="admin" ng-model="editUser.admin" /> Is admin?
+                          </label>
+                        </div>
+                      </div>
+                      <div ngm-if="mode == 'ADD' || changePassword">
+                        <div class="control-group" ng-class="errorClass(editUserForm.passwordRepetition)">
+                          <label class="control-label" for="password" 
+                                 th:text="#{'Password'}">Password</label>
+                          <div class="controls">
+                            <input id="password" name="password" type="password" class="span6" data-ng-model="editUser.password" />
+                          </div>
+                        </div>
+                        <div class="control-group" ng-class="errorClass(editUserForm.passwordRepetition)">
+                          <label class="control-label" for="password-repetition" 
+                                 th:text="#{'Password (repeated)'}">Password (repeated)</label>
+                          <div class="controls">
+                            <input id="password-repetition" name="passwordRepetition" type="password" required class="span6" matches="editUser.password" data-ng-model="passwordRepetition"/>
+                            <p class="help-block" ng-show="editUserForm.passwordRepetition.$error.matches">Password and repetition do not match</p>
+                          </div>
+                        </div>
+                      </div>
+                      <div ng-show="mode == 'EDIT' && !changePassword" class="control-group">
+                        <div class="controls">
+                          <a style="line-height: 20px" ng-click="changePassword = !changePassword">Reset password</a>
+                        </div>
+                      </div>
+                    </fieldset>
+                  </form>
+                </div>
+                <div class="modal-footer">
+                  <button class="btn" data-ng-click="editUserDialog.close()" th:text="#{Cancel}">Cancel</button>
+                  <button class="btn btn-primary" data-ng-click="save()" data-ng-disabled="!isValid()" th:text="#{Save}" data-req-aware="editUserForm">Save</button>
+                </div>
+              </div>
+            </modal-dialog>
+            <!-- end add/edit connector-configuration-dialog -->
+            
+            <!-- begin delete-user-dialog -->
+            <modal-dialog model="deleteUserDialog" ng-cloak>
+              <div class="modal hide" data-ng-controller="DeleteUserController" ngm-if="deleteUserDialog.renderHtml()"> 
+                <div class="modal-header">
+                  <button data-ng-show="deleteUserDialog.autoClosable" type="button" class="close" data-dismiss="modal">&times;</button>
+                  <h3 th:text="#{'Delete user'}"></h3>
+                </div>
+                <div class="modal-body">
+                  <div data-error-panel></div>
+                <div data-ng-switch data-on="state">
+                  <div data-ng-switch-when="TO_BE_DONE">
+                    <p>
+                      <span th:text="#{'Are you sure you would like to delete the user'}">
+                        Are you sure you would like to delete the user</span>
+                      <strong>{{ user.name }}</strong>?
+                    </p>
+                  </div>
+                  <div data-ng-switch-when="SUCCESS">
+                    <p> 
+                     <span th:text="#{The user was deleted.}">
+                        The user was deleted.
+                     </span>
+                    </p>
+                  </div>
+                  <div data-ng-switch-when="FAILURE">
+                    <p>
+                      <span th:text="#{The user could not be deleted.}">
+                        The user could not be deleted.
+                      </span>
+                    </p>
+                  </div>
+                </div>
+                </div>
+                <div class="modal-footer">
+                  <button class="btn"
+                          data-ng-show="state == 'TO_BE_DONE'"
+                          data-ng-click="deleteUserDialog.close()">Cancel</button>
+                  <button class="btn btn-primary"
+                          data-ng-show="state == 'TO_BE_DONE'" 
+                          data-ng-click="confirmDelete()" data-req-aware>Delete</button>
+                  <button class="btn btn-primary"
+                          data-ng-show="state == 'SUCCESS' || state == 'FAILURE'" 
+                          data-ng-click="deleteUserDialog.close()" data-req-aware>OK</button>
+                </div>
+              </div>
+            </modal-dialog>  
+            <!-- end delete-user-dialog -->
+          </div>
+        </div>
+      </div>
+      <div class="push-down"><!-- // --></div> 
+    </div>
+    <footer th:substituteby="fragment/common :: footer" />
+  </body>
+</html>

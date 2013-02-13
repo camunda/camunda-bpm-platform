@@ -1,0 +1,149 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <name>fox cycle - Tomcat</name>
+  <parent>
+    <groupId>com.camunda.fox.cycle</groupId>
+    <artifactId>cycle-root</artifactId>
+    <version>6.3.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>cycle-tomcat</artifactId>
+  <packaging>war</packaging>
+
+  <properties>
+    <jboss.el.version>2.0.0.GA</jboss.el.version>
+  </properties>
+
+  <dependencies>
+  
+    <dependency>
+      <groupId>com.camunda.fox.cycle</groupId>
+      <artifactId>cycle</artifactId>
+      <version>${project.version}</version>
+      <type>war</type>
+      <scope>runtime</scope>
+    </dependency>
+
+	<!-- Java EE APIs not provided on tomcat -->
+	<dependency>
+	  <groupId>org.hibernate.javax.persistence</groupId>
+	  <artifactId>hibernate-jpa-2.0-api</artifactId>
+	</dependency>
+	
+	<dependency>
+	  <groupId>org.glassfish</groupId>
+	  <artifactId>javax.annotation</artifactId>
+	</dependency>
+	
+	<dependency>
+	  <groupId>javax.inject</groupId>
+	  <artifactId>javax.inject</artifactId>
+	  <version>1</version>
+	</dependency>
+	
+	<dependency>
+	  <groupId>org.hibernate</groupId>
+	  <artifactId>hibernate-entitymanager</artifactId>
+	</dependency>
+	
+	<dependency>
+	  <groupId>cglib</groupId>
+	  <artifactId>cglib</artifactId>
+	</dependency>
+	<!-- apache commons -->
+	<dependency>
+	  <groupId>commons-io</groupId>
+	  <artifactId>commons-io</artifactId>
+	</dependency>
+	<!-- nekohtml -->
+	<dependency>
+	  <groupId>net.sourceforge.nekohtml</groupId>
+	  <artifactId>nekohtml</artifactId>
+	</dependency>   
+	<dependency>
+	  <groupId>com.sun.jersey</groupId>
+	  <artifactId>jersey-json</artifactId>
+	</dependency>
+	<dependency>
+	  <groupId>com.sun.jersey.contribs</groupId>
+	  <artifactId>jersey-spring</artifactId>
+	  <exclusions>
+		<exclusion>
+		  <artifactId>spring-core</artifactId>
+		  <groupId>org.springframework</groupId>
+		</exclusion>
+		<exclusion>
+		  <artifactId>spring-beans</artifactId>
+		  <groupId>org.springframework</groupId>
+		</exclusion>
+		<exclusion>
+		  <artifactId>spring-context</artifactId>
+		  <groupId>org.springframework</groupId>
+		</exclusion>
+		<exclusion>
+		  <artifactId>spring-web</artifactId>
+		  <groupId>org.springframework</groupId>
+		</exclusion>
+		<exclusion>
+		  <artifactId>spring-aop</artifactId>
+		  <groupId>org.springframework</groupId>
+		</exclusion>
+		<exclusion>
+		  <artifactId>asm</artifactId>
+		  <groupId>asm</groupId>
+		</exclusion>
+	  </exclusions>
+	</dependency>
+		  
+	<dependency>
+	  <groupId>org.bouncycastle</groupId>
+	  <artifactId>bcpg-jdk15on</artifactId>
+	</dependency>
+
+  </dependencies>
+
+  <build>
+    <finalName>cycle</finalName>
+	
+	<resources>
+      <resource>
+        <directory>../cycle/src/main/runtime/tomcat/resources</directory>
+        <filtering>true</filtering>
+      </resource>
+    </resources>
+	
+	<filters>
+      <filter>../cycle/src/main/runtime/tomcat/config/database.properties</filter>
+    </filters>
+
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-war-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifest>
+              <!-- Maven project version number -->
+              <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+            </manifest>
+          </archive>
+		  <webResources>
+            <resource>
+              <directory>../cycle/src/main/runtime/tomcat/webapp</directory>
+            </resource>
+          </webResources>
+          <overlays>
+            <overlay>
+              <groupId>com.camunda.fox.cycle</groupId>
+              <artifactId>cycle</artifactId>
+              <excludes>
+                <exclude>**/cycle-persistence.xml</exclude>
+              </excludes>
+            </overlay>
+          </overlays>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>

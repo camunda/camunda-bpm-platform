@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+  <head th:fragment="head">
+    <title>fox cycle</title>
+    
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- 
+    <meta name="description" content="" />
+    -->
+    <meta name="author" content="camunda services GmbH" />
+    
+    <!-- Styles -->
+    <link th:href="@{/assets/css/bootstrap.css}" rel="stylesheet" />
+    <link th:href="@{/assets/css/bootstrap-combobox.css}" rel="stylesheet" />
+    <link th:href="@{/assets/css/app.css}" rel="stylesheet" />
+    <link th:href="@{/assets/css/tree.css}" rel="stylesheet" />
+    
+    <!-- For IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    
+    <!-- Favicon -->
+    <link rel="shortcut icon" type="image/x-icon" th:href="@{/assets/img/favicon.ico}" />
+    
+    <base th:href="${currentUrl}" th:attr="app-base=@{/app/}" />
+  </head>
+  <body>
+    <!-- logo -->
+    <a th:fragment="logo" class="brand ir" th:href="@{/app/secured/view/index}">
+      fox cycle
+    </a>
+    
+    <!-- default navigation -->
+    <div th:fragment="navigation-default" class="navbar navbar-fixed-top content-container">
+      <div class="navbar-inner">
+        <div class="container-fluid">
+          <a th:substituteby="fragment/common :: logo"></a>
+          <!--/.nav-collapse -->
+        </div>
+      </div>
+    </div>
+    
+    <!-- logged in navigation -->
+    <div th:fragment="navigation-logged-in" class="navbar navbar-fixed-top content-container">
+      <div class="navbar-inner">
+        <div class="container-fluid">
+          <a th:substituteby="fragment/common :: logo"></a>
+          <div class="btn-group pull-right" ng-show="currentUser" ng-cloak>
+            <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+              <i class="icon-user"></i> {{currentUser.name}}
+              <span class="caret"></span>
+            </a>
+            <ul class="dropdown-menu">
+              <li>
+                <a th:href="@{/app/secured/view/profile}">
+                  <i class="icon-edit"></i> <span th:text="#{My Profile}">My Profile</span>
+                </a>
+              </li>
+              <li data-ng-show="currentUser.admin">
+                <a th:href="@{/app/secured/view/connectors}">
+                  <i class="icon-edit"></i> <span th:text="#{Connectors}">Connectors</span>
+                </a>
+              </li>
+              <li data-ng-show="currentUser.admin">
+                <a th:href="@{/app/secured/view/users}">
+                  <i class="icon-edit"></i> <span th:text="#{Users}">Users</span>
+                </a>
+              </li>
+              <li class="divider"></li>
+              <li>
+                <a th:href="@{/app/login/logout}"><i class="icon-off"></i> <span th:text="#{Sign Out}">Sign Out</span></a>
+              </li>
+            </ul>
+          </div>
+          <!--/.nav-collapse -->
+        </div>
+      </div>
+    </div>
+    
+    <!-- breadcrumbs -->
+    <div th:fragment="breadcrumbs" class="row-fluid breadcrumbs">
+      <div class="span12">
+        <div>
+          <ul class="breadcrumb">
+            <li>
+              <a th:href="@{/app/secured/view/index/#/}">Home</a> 
+            </li>
+            <li ng-repeat="breadCrumb in breadCrumbs" ng-cloak>
+              <span class="divider">/</span> 
+              <a href="#{{breadCrumb.href}}">{{breadCrumb.name}}</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+     
+    <!-- footer -->
+    <footer class="content-container" th:fragment="footer">
+      <div class="container-fluid">
+        <p><a th:href="@{/app/secured/view/index}">camunda fox cycle</a> / version ${project.version}</p>
+      </div>
+
+      <script th:src="@{/assets/js/lib/jquery-1.7.2.min.js}"></script>      
+      <script th:src="@{/assets/js/lib/bootstrap/bootstrap.js}"></script>
+      <script th:src="@{/assets/js/lib/bootstrap/bootstrap-combobox.js}"></script>
+      <script th:src="@{/assets/js/lib/angular/angular.js}"></script>
+      <script th:src="@{/assets/js/lib/angular/angular-resource.js}"></script>
+      <script th:src="@{/assets/js/lib/dojo/dojo/dojo.js}"></script>
+      
+      <!-- 
+      <script th:src="@{'assets/js/lib/angular/i18n/angular-locale-' + ${locale} + '.js'}"></script>
+      -->
+      
+      <script th:src="@{/assets/js/app/extensions.js}"></script>
+      <script th:src="@{/assets/js/app/directives.js}"></script>
+      <script th:src="@{/assets/js/app/app.js}"></script>
+      <script th:src="@{/assets/js/app/filters.js}"></script>
+      <script th:src="@{/assets/js/app/services.js}"></script>
+      <script th:src="@{/assets/js/app/controllers.js}"></script>
+    </footer>
+  </body>
+</html>

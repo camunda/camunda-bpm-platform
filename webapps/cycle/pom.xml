@@ -1,0 +1,173 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.camunda.fox.cycle</groupId>
+  <artifactId>cycle-root</artifactId>
+  <version>6.3.0-SNAPSHOT</version>
+  <packaging>pom</packaging>
+  <name>fox cycle - root</name>
+  
+  <properties>
+    <!-- versions -->
+    <version.springframework>3.1.2.RELEASE</version.springframework>
+    <version.hibernate>4.0.1.Final</version.hibernate>
+    <version.jersey>1.11</version.jersey>
+    <version.apache.httpclient>4.2.2</version.apache.httpclient>
+    <version.h2>1.3.160</version.h2>
+    <version.saxon>9.1.0.8</version.saxon>
+    <version.wro4j>1.4.8.1</version.wro4j>
+    <version.cglib>2.2.2</version.cglib>
+    <version.bouncycastle>1.47</version.bouncycastle>
+
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+  </properties>
+  
+  <modules>
+    <module>cycle</module>
+    <module>cycle-sql</module>
+    <module>cycle-jboss</module>
+    <module>cycle-glassfish</module>
+    <module>cycle-was</module>
+    <module>cycle-tomcat</module>
+	<module>cycle-httpclient</module>
+  </modules>
+  
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>cglib</groupId>
+        <artifactId>cglib</artifactId>
+        <version>${version.cglib}</version>
+      </dependency>
+      <dependency>
+        <groupId>cglib</groupId>
+        <artifactId>cglib-nodep</artifactId>
+        <version>${version.cglib}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.hibernate</groupId>
+        <artifactId>hibernate-entitymanager</artifactId>
+        <version>${version.hibernate}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.hibernate.javax.persistence</groupId>
+        <artifactId>hibernate-jpa-2.0-api</artifactId>
+        <version>1.0.1.Final</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.httpcomponents</groupId>
+        <artifactId>fluent-hc</artifactId>
+        <version>${version.apache.httpclient}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.httpcomponents</groupId>
+        <artifactId>httpmime</artifactId>
+        <version>${version.apache.httpclient}</version>
+      </dependency>
+      <dependency>
+        <groupId>net.sourceforge.nekohtml</groupId>
+        <artifactId>nekohtml</artifactId>
+        <version>1.9.16</version>
+      </dependency>
+      <dependency>
+        <groupId>commons-io</groupId>
+        <artifactId>commons-io</artifactId>
+        <version>2.1</version>
+      </dependency>
+      <!-- testing -->
+      <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit-dep</artifactId>
+        <version>4.10</version>
+      </dependency>
+      <dependency>
+        <groupId>org.kubek2k</groupId>
+        <artifactId>springockito-annotations</artifactId>
+        <version>1.0.4</version>
+      </dependency>
+      <dependency>
+        <groupId>org.easytesting</groupId>
+        <artifactId>fest-assert-core</artifactId>
+        <version>2.0M7</version>
+      </dependency>
+      <!-- spring framework -->
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-web</artifactId>
+        <version>${version.springframework}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-orm</artifactId>
+        <version>${version.springframework}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-aop</artifactId>
+        <version>${version.springframework}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-security-web</artifactId>
+        <version>${version.springframework}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.springframework</groupId>
+        <artifactId>spring-test</artifactId>
+        <version>${version.springframework}</version>
+      </dependency>
+      <!-- jersey framework -->
+      <dependency>
+        <groupId>com.sun.jersey</groupId>
+        <artifactId>jersey-json</artifactId>
+        <version>${version.jersey}</version>
+      </dependency>
+      <dependency>
+        <groupId>com.sun.jersey.contribs</groupId>
+        <artifactId>jersey-spring</artifactId>
+        <version>${version.jersey}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.glassfish</groupId>
+        <artifactId>javax.annotation</artifactId>
+        <version>3.1</version>
+      </dependency>
+      
+      <dependency>
+        <groupId>javax.mail</groupId>
+        <artifactId>mail</artifactId>
+        <version>1.4.5</version>
+      </dependency>
+      
+      <dependency>
+        <groupId>org.bouncycastle</groupId>
+        <artifactId>bcpg-jdk15on</artifactId>
+        <version>${version.bouncycastle}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+  
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <configuration>
+          <source>1.6</source>
+          <target>1.6</target>
+        </configuration>
+      </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+  
+  <repositories>
+    <!-- DO NOT REMOVE, otherwise no snapshots are downloaded via nexus! -->
+    <repository>
+      <id>camunda-fox-ee</id>
+      <name>camunda-fox-ee</name>
+      <url>myDummyRepoForSnapshotAccess</url>
+    </repository>
+  </repositories>
+</project>

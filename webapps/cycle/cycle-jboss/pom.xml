@@ -1,0 +1,124 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <name>fox cycle - JBoss</name>
+  <parent>
+    <groupId>com.camunda.fox.cycle</groupId>
+    <artifactId>cycle-root</artifactId>
+    <version>6.3.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>cycle-jboss</artifactId>
+  <packaging>war</packaging>
+
+  <properties>
+    <jboss.el.version>2.0.0.GA</jboss.el.version>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>com.camunda.fox.cycle</groupId>
+      <artifactId>cycle</artifactId>
+      <version>${project.version}</version>
+      <type>war</type>
+      <scope>runtime</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>cglib</groupId>
+      <artifactId>cglib</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.jboss.spec</groupId>
+      <artifactId>jboss-javaee-web-6.0</artifactId>
+      <type>pom</type>
+      <scope>provided</scope>
+      <version>3.0.0.Final</version>
+      <exclusions>
+        <exclusion>
+          <artifactId>xalan</artifactId>
+          <groupId>org.apache.xalan</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    
+    <dependency>
+      <groupId>com.sun.jersey</groupId>
+      <artifactId>jersey-json</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>com.sun.jersey.contribs</groupId>
+      <artifactId>jersey-spring</artifactId>
+      <exclusions>
+        <exclusion>
+          <artifactId>spring-core</artifactId>
+          <groupId>org.springframework</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>spring-beans</artifactId>
+          <groupId>org.springframework</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>spring-context</artifactId>
+          <groupId>org.springframework</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>spring-web</artifactId>
+          <groupId>org.springframework</groupId>
+        </exclusion>
+        <exclusion>
+          <artifactId>spring-aop</artifactId>
+          <groupId>org.springframework</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <finalName>cycle</finalName>
+
+    <resources>
+      <resource>
+        <directory>../cycle/src/main/runtime/jboss/resources</directory>
+        <filtering>true</filtering>
+      </resource>
+    </resources>
+
+    <filters>
+      <filter>../cycle/src/main/runtime/jboss/config/database.properties</filter>
+    </filters>
+
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-war-plugin</artifactId>
+        <configuration>
+          <archive>
+            <manifest>
+              <!-- Maven project version number -->
+              <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+            </manifest>
+            <manifestEntries>
+              <Dependencies>org.hibernate,org.hibernate.envers,org.hibernate.validator,org.apache.xerces,org.apache.commons.io,org.bouncycastle.bcprov-jdk15on,org.bouncycastle.bcpg-jdk15on</Dependencies>
+            </manifestEntries>
+          </archive>
+          <webResources>
+            <resource>
+              <directory>../cycle/src/main/runtime/jboss/webapp</directory>
+            </resource>
+          </webResources>
+          <overlays>
+            <overlay>
+              <groupId>com.camunda.fox.cycle</groupId>
+              <artifactId>cycle</artifactId>
+              <excludes>
+                <exclude>**/persistence.xml</exclude>
+              </excludes>
+            </overlay>
+          </overlays>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>
