@@ -1,6 +1,5 @@
 package org.camunda.bpm.engine.rest.dto;
 
-import javax.xml.bind.annotation.XmlElement;
 
 public class AtomLink {
 
@@ -12,7 +11,6 @@ public class AtomLink {
     this.rel = rel;
   }
   
-  @XmlElement
   public String getHref() {
     return href;
   }
@@ -21,7 +19,6 @@ public class AtomLink {
     this.href = href;
   }
   
-  @XmlElement
   public String getRel() {
     return rel;
   }
@@ -29,10 +26,5 @@ public class AtomLink {
   public void setRel(String rel) {
     this.rel = rel;
   }
-  
-  public void linkTo(LinkableDto object, String relationName) {
-    
-  }
-  
   
 }
