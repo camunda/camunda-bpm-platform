@@ -1,5 +1,10 @@
 package org.camunda.bpm.engine.rest.util;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.Properties;
+
+import org.camunda.bpm.engine.rest.AbstractRestServiceTest;
 import org.camunda.bpm.engine.rest.impl.ProcessDefinitionServiceImpl;
 import org.camunda.bpm.engine.rest.impl.ProcessInstanceServiceImpl;
 import org.camunda.bpm.engine.rest.impl.TaskRestServiceImpl;
@@ -10,8 +15,10 @@ import org.jboss.resteasy.plugins.server.tjws.TJWSEmbeddedJaxrsServer;
 
 public class ResteasyServerBootstrap {
 
-  private static final int PORT = 8080;
+  private static final String PORT_PROPERTY = "rest.http.port";
   private static final String ROOT_RESOURCE_PATH = "/rest-test";
+  
+  private static final String PROPERTIES_FILE = "/testconfig.properties";
   
   private TJWSEmbeddedJaxrsServer server;
   
@@ -28,9 +35,13 @@ public class ResteasyServerBootstrap {
   }
   
   private void setupServer() {
+    Properties serverProperties = readProperties();
+    int port = Integer.parseInt(serverProperties.getProperty(PORT_PROPERTY));
+    
     server = new TJWSEmbeddedJaxrsServer();
     server.setRootResourcePath(ROOT_RESOURCE_PATH);
-    server.setPort(PORT);
+    
+    server.setPort(port);
     server.getDeployment().getActualResourceClasses().add(ProcessDefinitionServiceImpl.class);
     server.getDeployment().getActualResourceClasses().add(ProcessInstanceServiceImpl.class);
     server.getDeployment().getActualResourceClasses().add(TaskRestServiceImpl.class);
@@ -39,5 +50,25 @@ public class ResteasyServerBootstrap {
     server.getDeployment().getActualProviderClasses().add(JacksonConfigurator.class);
     
     server.getDeployment().getActualProviderClasses().add(JacksonJsonProvider.class);
+  }
+  
+  private Properties readProperties() {
+    InputStream propStream = null;
+    Properties properties = new Properties();
+    
+    try {
+      propStream = AbstractRestServiceTest.class.getResourceAsStream(PROPERTIES_FILE);
+      properties.load(propStream);
+    } catch (IOException e) {
+      e.printStackTrace();
+    } finally {
+      try {
+        propStream.close();
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+    }
+    
+    return properties;
   }
 }

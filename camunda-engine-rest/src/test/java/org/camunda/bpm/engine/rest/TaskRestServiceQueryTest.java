@@ -11,6 +11,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -82,13 +83,13 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     return mocks;
   }
   
-  public void setUpMockedQuery() {
-    loadProcessEngineService();
+  public void setUpMockedQuery() throws IOException {
+    setupTestScenario();
     mockQuery = setUpMockTaskQuery(createMockTasks());
   }
   
   @Test
-  public void testSimpleTaskQuery() {
+  public void testSimpleTaskQuery() throws IOException {
     setUpMockedQuery();
     String queryName = "name";
     
@@ -138,7 +139,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
   }
 
   @Test
-  public void testEmptyQuery() {
+  public void testEmptyQuery() throws IOException {
     setUpMockedQuery();
     String queryKey = "";
     given().queryParam("name", queryKey)
@@ -147,7 +148,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
   }
   
   @Test
-  public void testNoParametersQuery() {
+  public void testNoParametersQuery() throws IOException {
     setUpMockedQuery();
     expect().statusCode(Status.OK.getStatusCode()).when().get(TASK_QUERY_URL);
     
@@ -156,7 +157,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
   }
   
   @Test
-  public void testAdditionalParametersExcludingVariables() {
+  public void testAdditionalParametersExcludingVariables() throws IOException {
     setUpMockedQuery();
 
     Map<String, String> stringQueryParameters = getCompleteStringQueryParameters();
@@ -240,7 +241,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
   }
   
   @Test
-  public void testDateParameters() {
+  public void testDateParameters() throws IOException {
     setUpMockedQuery();
     
     Map<String, String> queryParameters = getDateParameters();
@@ -276,7 +277,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
   }
   
   @Test
-  public void testCandidateGroupInList() {
+  public void testCandidateGroupInList() throws IOException {
     setUpMockedQuery();
    
     List<String> candidateGroups = new ArrayList<String>();
@@ -292,7 +293,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
   }
   
   @Test
-  public void testDelegationState() {
+  public void testDelegationState() throws IOException {
     setUpMockedQuery();
     
     given().queryParams("delegationState", "PENDING")
@@ -309,7 +310,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
   }
   
   @Test
-  public void testLowerCaseDelegationStateParam() {
+  public void testLowerCaseDelegationStateParam() throws IOException {
     setUpMockedQuery();
 
     given().queryParams("delegationState", "resolved")
@@ -320,7 +321,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
   }
   
   @Test
-  public void testSortingParameters() {
+  public void testSortingParameters() throws IOException {
     setUpMockedQuery();
     
     InOrder inOrder = Mockito.inOrder(mockQuery);
@@ -384,7 +385,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
   }
   
   @Test
-  public void testSortByParameterOnly() {
+  public void testSortByParameterOnly() throws IOException {
     setUpMockedQuery();
     given().queryParam("sortBy", "dueDate")
       .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
@@ -392,7 +393,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
   }
   
   @Test
-  public void testSortOrderParameterOnly() {
+  public void testSortOrderParameterOnly() throws IOException {
     setUpMockedQuery();
     given().queryParam("sortOrder", "asc")
       .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
@@ -400,7 +401,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
   }
   
   @Test
-  public void testSuccessfulPagination() {
+  public void testSuccessfulPagination() throws IOException {
     setUpMockedQuery();
     
     int firstResult = 0;
@@ -413,7 +414,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
   }
   
   @Test
-  public void testTaskVariableParameters() {
+  public void testTaskVariableParameters() throws IOException {
     setUpMockedQuery();
     String variableName = "varName";
     String variableValue = "varValue";
@@ -432,7 +433,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
   }
   
   @Test
-  public void testProcessVariableParameters() {
+  public void testProcessVariableParameters() throws IOException {
     setUpMockedQuery();
     String variableName = "varName";
     String variableValue = "varValue";
@@ -451,7 +452,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
   }
   
   @Test
-  public void testMultipleVariableParametersAsPost() {
+  public void testMultipleVariableParametersAsPost() throws IOException {
     setUpMockedQuery();
     
     String variableName = "varName";
@@ -486,7 +487,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
   }
   
   @Test
-  public void testCompletePostParameters() {
+  public void testCompletePostParameters() throws IOException {
     setUpMockedQuery();
     
     Map<String, Object> queryParameters = new HashMap<String, Object>();

@@ -8,6 +8,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -32,8 +33,8 @@ public class ProcessDefinitionServiceInteractionTest extends
   private ProcessInstance mockInstance;
   private RuntimeService runtimeServiceMock;
   
-  public void setupMockInstance() {
-    loadProcessEngineService();
+  public void setupMockInstance() throws IOException {
+    setupTestScenario();
     mockInstance = createMockInstance();
     
     // we replace this mock with every test in order to have a clean one (in terms of invocations) for verification
@@ -51,7 +52,7 @@ public class ProcessDefinitionServiceInteractionTest extends
   }
   
   @Test
-  public void testSimpleProcessInstantiation() {
+  public void testSimpleProcessInstantiation() throws IOException {
     setupMockInstance();
     
     given().pathParam("id", EXAMPLE_PROCESS_DEFINITION_ID)
@@ -63,7 +64,7 @@ public class ProcessDefinitionServiceInteractionTest extends
   }
   
   @Test
-  public void testProcessInstantiationWithParameters() {
+  public void testProcessInstantiationWithParameters() throws IOException {
     setupMockInstance();
     
     Map<String, Object> parameters = getInstanceVariablesParameters();
@@ -95,7 +96,7 @@ public class ProcessDefinitionServiceInteractionTest extends
    * {@link RuntimeService#startProcessInstanceById(String, Map)} throws an {@link ActivitiException}, if a definition with the given id does not exist.
    */
   @Test
-  public void testUnsuccessfulInstantiation() {
+  public void testUnsuccessfulInstantiation() throws IOException {
     setupMockInstance();
     
     when(runtimeServiceMock.startProcessInstanceById(eq(EXAMPLE_PROCESS_DEFINITION_ID), Matchers.<Map<String, Object>>any()))
@@ -109,10 +110,10 @@ public class ProcessDefinitionServiceInteractionTest extends
   }
   
   @Test
-  public void testInstanceResourceLinkResult() {
+  public void testInstanceResourceLinkResult() throws IOException {
     setupMockInstance();
     
-    String fullInstanceUrl = "http://localhost:8080" + TEST_RESOURCE_ROOT_PATH + "/process-instance/" + EXAMPLE_INSTANCE_ID;
+    String fullInstanceUrl = "http://localhost:" + PORT + TEST_RESOURCE_ROOT_PATH + "/process-instance/" + EXAMPLE_INSTANCE_ID;
     
     given().pathParam("id", EXAMPLE_PROCESS_DEFINITION_ID)
       .contentType(POST_JSON_CONTENT_TYPE).body(EMPTY_JSON_OBJECT)

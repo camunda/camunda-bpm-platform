@@ -1,8 +1,11 @@
 package org.camunda.bpm.engine.rest;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.Iterator;
+import java.util.Properties;
 import java.util.ServiceLoader;
 
 import javax.ws.rs.core.MediaType;
@@ -19,23 +22,37 @@ import org.jboss.shrinkwrap.resolver.api.DependencyResolvers;
 import org.jboss.shrinkwrap.resolver.api.maven.MavenDependencyResolver;
 import org.junit.runner.RunWith;
 
+import com.jayway.restassured.RestAssured;
+
 @RunWith(Arquillian.class)
 public abstract class AbstractRestServiceTest {
 
   protected static ProcessEngine processEngine;
   protected static final String TEST_RESOURCE_ROOT_PATH = "/rest-test";
+  protected static int PORT;
   
   protected static final String POST_JSON_CONTENT_TYPE = ContentType.create(MediaType.APPLICATION_JSON, "UTF-8").toString();
   
   protected static final String EMPTY_JSON_OBJECT = "{}";
-
+  
+  private static final String PROPERTIES_FILE_PATH = "/testconfig.properties";
+  private static final String PROPERTIES_FILE_RESOURCE = "testconfig.properties";
+  private static final String PORT_PROPERTY = "rest.http.port";
+  
+  private static Properties connectionProperties = null;
+  
+  
+  
+  
 //  @BeforeClass
 //  public static void initialize() {
 //
 //    loadProcessEngineService();
 //  }
 
-  protected static void loadProcessEngineService() {
+  protected static void setupTestScenario() throws IOException {
+    setupRestAssured();
+    
     ServiceLoader<ProcessEngineProvider> serviceLoader = ServiceLoader
         .load(ProcessEngineProvider.class);
     Iterator<ProcessEngineProvider> iterator = serviceLoader.iterator();
@@ -46,17 +63,34 @@ public abstract class AbstractRestServiceTest {
     }
   }
 
-  @Deployment(testable = true)
-  public static WebArchive createDeployment() {
+  private static void setupRestAssured() throws IOException {
+    if (connectionProperties == null) {
+      InputStream propStream = null;
+      try {
+        propStream = AbstractRestServiceTest.class.getResourceAsStream(PROPERTIES_FILE_PATH);
+        connectionProperties = new Properties();
+        connectionProperties.load(propStream);
+      } finally {
+        propStream.close();
+      }
+    }
     
+    PORT = Integer.parseInt(connectionProperties.getProperty(PORT_PROPERTY));
+    RestAssured.port = PORT;
+  }
+  
+  @Deployment//(testable = true)
+  public static WebArchive createDeployment() {
     JavaArchive jar = ShrinkWrap
         .create(JavaArchive.class, "rest-test.jar")
         .addPackages(true, "org.camunda.bpm.engine.rest")
         .addAsResource(
             "META-INF/services/org.camunda.bpm.engine.rest.spi.ProcessEngineProvider");
+        
 
     WebArchive war = ShrinkWrap
         .create(WebArchive.class, "rest-test-webapp.war")
+        .addAsResource(PROPERTIES_FILE_RESOURCE)
         .addAsLibrary(jar)
         .addAsLibraries(
             DependencyResolvers.use(MavenDependencyResolver.class)
