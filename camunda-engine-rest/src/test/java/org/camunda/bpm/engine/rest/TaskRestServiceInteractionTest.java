@@ -9,6 +9,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,15 +32,15 @@ public class TaskRestServiceInteractionTest extends AbstractRestServiceTest {
   
   private TaskService taskServiceMock;
   
-  public void setupMockTaskService() {
-    loadProcessEngineService();
+  public void setupMockTaskService() throws IOException {
+    setupTestScenario();
     
     taskServiceMock = mock(TaskService.class);
     when(processEngine.getTaskService()).thenReturn(taskServiceMock);
   }
   
   @Test
-  public void testClaimTask() {
+  public void testClaimTask() throws IOException {
     setupMockTaskService();
     
     Map<String, Object> json = new HashMap<String, Object>();
@@ -55,7 +56,7 @@ public class TaskRestServiceInteractionTest extends AbstractRestServiceTest {
   }
   
   @Test
-  public void testMissingUserId() {
+  public void testMissingUserId() throws IOException {
   setupMockTaskService();
     
     Map<String, Object> json = new HashMap<String, Object>();
@@ -71,7 +72,7 @@ public class TaskRestServiceInteractionTest extends AbstractRestServiceTest {
   }
   
   @Test
-  public void testUnsuccessfulClaimTask() {
+  public void testUnsuccessfulClaimTask() throws IOException {
     setupMockTaskService();
     
     doThrow(new ActivitiException("expected exception")).when(taskServiceMock).claim(any(String.class), any(String.class));
@@ -84,7 +85,7 @@ public class TaskRestServiceInteractionTest extends AbstractRestServiceTest {
   }
   
   @Test
-  public void testCompleteTask() {
+  public void testCompleteTask() throws IOException {
     setupMockTaskService();
     
     given().pathParam("id", EXAMPLE_TASK_ID)
@@ -97,7 +98,7 @@ public class TaskRestServiceInteractionTest extends AbstractRestServiceTest {
   }
   
   @Test
-  public void testCompleteWithParameters() {
+  public void testCompleteWithParameters() throws IOException {
     setupMockTaskService();
     
     Map<String, Object> variables = new HashMap<String, Object>();
@@ -118,7 +119,7 @@ public class TaskRestServiceInteractionTest extends AbstractRestServiceTest {
   }
   
   @Test
-  public void testUnsuccessfulCompleteTask() {
+  public void testUnsuccessfulCompleteTask() throws IOException {
     setupMockTaskService();
     
     doThrow(new ActivitiException("expected exception")).when(taskServiceMock).complete(any(String.class), Matchers.<Map<String, Object>>any());

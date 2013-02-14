@@ -8,6 +8,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -65,13 +66,13 @@ public class ProcessDefinitionServiceQueryTest extends AbstractRestServiceTest {
   }
   
 //  @Before
-  public void setUpMockedQuery() {
-    loadProcessEngineService();
+  public void setUpMockedQuery() throws IOException {
+    setupTestScenario();
     mockedQuery = setUpMockDefinitionQuery(createMockDefinitions());
   }
   
   @Test
-  public void testProcessDefinitionRetrieval() {
+  public void testProcessDefinitionRetrieval() throws IOException {
     setUpMockedQuery();
     InOrder inOrder = Mockito.inOrder(mockedQuery);
     
@@ -138,7 +139,7 @@ public class ProcessDefinitionServiceQueryTest extends AbstractRestServiceTest {
   }
   
   @Test
-  public void testEmptyQuery() {
+  public void testEmptyQuery() throws IOException {
     setUpMockedQuery();
     String queryKey = "";
     given().queryParam("keyLike", queryKey)
@@ -147,7 +148,7 @@ public class ProcessDefinitionServiceQueryTest extends AbstractRestServiceTest {
   }
   
   @Test
-  public void testNoParametersQuery() {
+  public void testNoParametersQuery() throws IOException {
     setUpMockedQuery();
     expect().statusCode(Status.OK.getStatusCode()).when().get(PROCESS_DEFINITION_QUERY_URL);
     
@@ -156,7 +157,7 @@ public class ProcessDefinitionServiceQueryTest extends AbstractRestServiceTest {
   }
   
   @Test
-  public void testInvalidNumericParameter() {
+  public void testInvalidNumericParameter() throws IOException {
     setUpMockedQuery();
     String anInvalidIntegerQueryParam = "aString";
     given().queryParam("ver", anInvalidIntegerQueryParam)
@@ -169,7 +170,7 @@ public class ProcessDefinitionServiceQueryTest extends AbstractRestServiceTest {
    * or "false" are evaluated to "false" and don't cause a 400 error.
    */
   @Test
-  public void testInvalidBooleanParameter() {
+  public void testInvalidBooleanParameter() throws IOException {
     setUpMockedQuery();
     String anInvalidBooleanQueryParam = "neitherTrueNorFalse";
     given().queryParam("active", anInvalidBooleanQueryParam)
@@ -178,7 +179,7 @@ public class ProcessDefinitionServiceQueryTest extends AbstractRestServiceTest {
   }
   
   @Test
-  public void testAdditionalParameters() {
+  public void testAdditionalParameters() throws IOException {
     setUpMockedQuery();
 
     Map<String, String> queryParameters = getCompleteQueryParameters();
@@ -228,7 +229,7 @@ public class ProcessDefinitionServiceQueryTest extends AbstractRestServiceTest {
   
 
   @Test
-  public void testSortingParameters() {
+  public void testSortingParameters() throws IOException {
     setUpMockedQuery();
     
     InOrder inOrder = Mockito.inOrder(mockedQuery);
@@ -268,7 +269,7 @@ public class ProcessDefinitionServiceQueryTest extends AbstractRestServiceTest {
   }
   
   @Test
-  public void testInvalidSortingOptions() {
+  public void testInvalidSortingOptions() throws IOException {
     setUpMockedQuery();
     executeAndVerifySorting("anInvalidSortByOption", "asc", Status.BAD_REQUEST);
     executeAndVerifySorting("category", "anInvalidSortOrderOption", Status.BAD_REQUEST);
@@ -281,7 +282,7 @@ public class ProcessDefinitionServiceQueryTest extends AbstractRestServiceTest {
   }
   
   @Test
-  public void testSortByParameterOnly() {
+  public void testSortByParameterOnly() throws IOException {
     setUpMockedQuery();
     given().queryParam("sortBy", "category")
       .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
@@ -289,7 +290,7 @@ public class ProcessDefinitionServiceQueryTest extends AbstractRestServiceTest {
   }
   
   @Test
-  public void testSortOrderParameterOnly() {
+  public void testSortOrderParameterOnly() throws IOException {
     setUpMockedQuery();
     given().queryParam("sortOrder", "asc")
       .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
@@ -297,7 +298,7 @@ public class ProcessDefinitionServiceQueryTest extends AbstractRestServiceTest {
   }
 
   @Test
-  public void testSuccessfulPagination() {
+  public void testSuccessfulPagination() throws IOException {
     setUpMockedQuery();
     
     int firstResult = 0;
@@ -313,7 +314,7 @@ public class ProcessDefinitionServiceQueryTest extends AbstractRestServiceTest {
    * If parameter "firstResult" is missing, we expect 0 as default.
    */
   @Test
-  public void testMissingFirstResultParameter() {
+  public void testMissingFirstResultParameter() throws IOException {
     setUpMockedQuery();
     int maxResults = 10;
     given().queryParam("maxResults", maxResults)
@@ -327,7 +328,7 @@ public class ProcessDefinitionServiceQueryTest extends AbstractRestServiceTest {
    * If parameter "maxResults" is missing, we expect Integer.MAX_VALUE as default.
    */
   @Test
-  public void testMissingMaxResultsParameter() {
+  public void testMissingMaxResultsParameter() throws IOException {
     setUpMockedQuery();
     int firstResult = 10;
     given().queryParam("firstResult", firstResult)
