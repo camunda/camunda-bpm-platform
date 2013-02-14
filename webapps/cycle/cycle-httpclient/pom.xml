@@ -4,7 +4,7 @@
   <parent>
     <artifactId>cycle-root</artifactId>
     <groupId>com.camunda.fox.cycle</groupId>
-    <version>6.3.0-SNAPSHOT</version>
+    <version>7.0.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>cycle-httpclient</artifactId>

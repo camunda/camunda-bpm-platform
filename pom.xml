@@ -71,6 +71,7 @@
 	
     <module>webapps/h2-webapp</module>
     <module>webapps/tasklist</module>
+    <module>webapps/cycle</module>
 	
     <module>javaee/ejb-service</module>
 	<module>javaee/ejb-client</module>
@@ -626,11 +627,10 @@
   </pluginRepositories>
   
   <repositories>
-    <!-- DO NOT REMOVE, otherwise no snapshots are downloaded via nexus! -->
     <repository>
-      <id>camunda-fox-ee</id>
-      <name>camunda-fox-ee</name>
-      <url>myDummyRepoForSnapshotAccess</url>
+      <id>camunda-bpm-nexus</id>
+      <name>camunda-bpm-nexus</name>
+      <url>https://app.camunda.com/nexus/content/groups/public</url>
     </repository>
   </repositories>
   

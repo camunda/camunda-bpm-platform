@@ -12,10 +12,6 @@ import org.springframework.stereotype.Component;
 
 import com.camunda.fox.cycle.connector.crypt.EncryptionService;
 import com.camunda.fox.cycle.entity.User;
-import com.camunda.fox.license.FoxLicenseService;
-import com.camunda.fox.license.entity.FoxComponent;
-import com.camunda.fox.license.impl.FoxLicenseException;
-import com.camunda.fox.license.impl.FoxLicenseNotFoundException;
 import com.camunda.fox.security.SecurityConfiguration;
 import com.camunda.fox.security.UserIdentity;
 import com.camunda.fox.security.UserLookup;
@@ -38,23 +34,16 @@ public class SecurityService {
   private EncryptionService encryptionService;
   
     
-  public UserIdentity login(String userName, String password) throws FoxLicenseException, FoxLicenseNotFoundException {
+  public UserIdentity login(String userName, String password) {
     if (userName == null || password == null) {
       return null;
     }
     
-    checkLicense();
-
     if (config.isUseJaas()) {
       return loginViaJaas(userName, password);
     } else {
       return loginViaUserManagement(userName, password);
     }
-  }
-
-  protected void checkLicense() throws FoxLicenseException, FoxLicenseNotFoundException {
-    FoxLicenseService foxLicenseService = config.getFoxLicenseService();
-    foxLicenseService.checkLicenseFor(FoxComponent.FOX_CYCLE);      
   }
 
   private UserIdentity loginViaJaas(String userName, String password) {

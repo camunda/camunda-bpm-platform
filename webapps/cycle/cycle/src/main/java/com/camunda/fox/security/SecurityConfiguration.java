@@ -1,7 +1,5 @@
 package com.camunda.fox.security;
 
-import com.camunda.fox.license.FoxLicenseService;
-import com.camunda.fox.license.impl.FoxLicenseServiceImpl;
 
 /**
  *
@@ -12,8 +10,6 @@ public class SecurityConfiguration {
 
   private boolean useJaas = false;
   
-  private FoxLicenseService foxLicenseService;
-  
   public boolean isUseJaas() {
     return useJaas;
   }
@@ -22,18 +18,4 @@ public class SecurityConfiguration {
     this.useJaas = useJaas;
   }
 
-  public FoxLicenseService getFoxLicenseService() {
-    if(foxLicenseService == null) {
-      initFoxLicenseService();
-    }
-    return foxLicenseService;
-  }
-  
-  protected void initFoxLicenseService() {
-    foxLicenseService = new FoxLicenseServiceImpl();
-  }
-
-  public void setFoxLicenseService(FoxLicenseService foxLicenseService) {
-    this.foxLicenseService = foxLicenseService;
-  }
 }
