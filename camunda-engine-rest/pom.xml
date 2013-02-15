@@ -69,8 +69,16 @@
     
 		<dependency>
       <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
+      <artifactId>junit-dep</artifactId>
+      <version>4.8.1</version>
       <scope>test</scope>
+      <exclusions>
+        <!-- collides with rest-assured -->
+        <exclusion>
+          <groupId>org.hamcrest</groupId>
+          <artifactId>hamcrest-core</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     
     <dependency>
@@ -78,6 +86,7 @@
       <artifactId>mockito-core</artifactId>
       <scope>test</scope>
       <exclusions>
+        
         <exclusion>
 	        <groupId>org.hamcrest</groupId>
 	        <artifactId>hamcrest-core</artifactId>

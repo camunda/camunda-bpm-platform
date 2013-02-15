@@ -14,6 +14,7 @@ import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.repository.ProcessDefinitionQuery;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.rest.ProcessDefinitionService;
+import org.camunda.bpm.engine.rest.dto.StatisticsResultDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionQueryDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
@@ -22,6 +23,12 @@ import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 
 public class ProcessDefinitionServiceImpl extends AbstractEngineService implements ProcessDefinitionService {
 
+  // stub data for the statistics query while not implemented in the engine
+  private static final String EXAMPLE_PROCESS_DEFINITION_ID = "processDefinition1";
+  private static final int EXAMPLE_PROCESS_INSTANCES = 42;  
+  private static final String ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID = "processDefinition2";
+  private static final int ANOTHER_EXAMPLE_PROCESS_INSTANCES = 123;
+  
   public ProcessDefinitionServiceImpl() {
     super();
   }
@@ -79,6 +86,59 @@ public class ProcessDefinitionServiceImpl extends AbstractEngineService implemen
     ProcessInstanceDto result = ProcessInstanceDto.fromProcessInstance(instance);
     result.addReflexiveLink(context, null, "self");
     return result;
+  }
+
+  @Override
+  public List<StatisticsResultDto> getStatistics(String groupBy) {
+    if (groupBy.equals("definition")) {
+      return getStubDataPerDefinition();
+    } else if (groupBy.equals("version")) {
+      return getStubDataPerDefinitionVersion();
+    } else {
+      throw new WebApplicationException(Status.BAD_REQUEST);
+    }
+  }
+  
+  private List<StatisticsResultDto> getStubDataPerDefinition() {
+    List<StatisticsResultDto> results = new ArrayList<StatisticsResultDto>();
+    
+    StatisticsResultDto dto = new StatisticsResultDto();
+    dto.setId(EXAMPLE_PROCESS_DEFINITION_ID);
+    dto.setInstances(EXAMPLE_PROCESS_INSTANCES);
+    results.add(dto);
+    
+    dto = new StatisticsResultDto();
+    dto.setId(ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID);
+    dto.setInstances(ANOTHER_EXAMPLE_PROCESS_INSTANCES);
+    results.add(dto);
+    
+    return results;
+  }
+  
+  private List<StatisticsResultDto> getStubDataPerDefinitionVersion() {
+    List<StatisticsResultDto> results = new ArrayList<StatisticsResultDto>();
+    
+    StatisticsResultDto dto = new StatisticsResultDto();
+    dto.setId(EXAMPLE_PROCESS_DEFINITION_ID + ":1");
+    dto.setInstances(EXAMPLE_PROCESS_INSTANCES);
+    results.add(dto);
+    
+    dto = new StatisticsResultDto();
+    dto.setId(EXAMPLE_PROCESS_DEFINITION_ID + ":2");
+    dto.setInstances(EXAMPLE_PROCESS_INSTANCES);
+    results.add(dto);
+    
+    dto = new StatisticsResultDto();
+    dto.setId(ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID + ":1");
+    dto.setInstances(ANOTHER_EXAMPLE_PROCESS_INSTANCES);
+    results.add(dto);
+    
+    dto = new StatisticsResultDto();
+    dto.setId(ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID + ":2");
+    dto.setInstances(ANOTHER_EXAMPLE_PROCESS_INSTANCES);
+    results.add(dto);
+    
+    return results;
   }
 
 }
