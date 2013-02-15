@@ -13,5 +13,6 @@
   </container>
   <engine>
     <property name="deploymentExportPath">target/deployments</property>
+    <property name="maxTestClassesBeforeRestart">3</property>
   </engine>
 </arquillian>
