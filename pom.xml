@@ -87,9 +87,8 @@
 	<module>camunda-engine-rest</module>
 	
 	<module>distro/jbossas71</module>
-    <module>distro/gf31</module>
-    <module>distro/ibmWs8</module>
-    <module>distro/tomcat6</module>
+  <module>distro/gf31</module>
+  <module>distro/tomcat6</module>
 	<module>distro/sql-script</module>
 	
   </modules>
