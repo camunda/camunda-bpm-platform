@@ -42,6 +42,6 @@ public interface ProcessDefinitionService {
 	ProcessInstanceDto startProcessInstance(@Context UriInfo context, @PathParam("id") String processDefinitionId, StartProcessInstanceDto parameters);
 
 	@GET
-	@Path("statistics")
-	List<StatisticsResultDto> getStatistics(@QueryParam("groupBy") String groupBy);
+	@Path("/statistics")
+	List<StatisticsResultDto> getStatistics(@QueryParam("groupBy") String groupBy, @QueryParam("failedJobs") Boolean includeFailedJobs);
 }

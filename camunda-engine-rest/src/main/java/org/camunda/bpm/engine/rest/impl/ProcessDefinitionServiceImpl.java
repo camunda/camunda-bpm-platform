@@ -20,14 +20,17 @@ import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionQueryDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.runtime.StartProcessInstanceDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+import org.camunda.bpm.engine.rest.impl.stub.StubStatisticsBuilder;
 
 public class ProcessDefinitionServiceImpl extends AbstractEngineService implements ProcessDefinitionService {
 
   // stub data for the statistics query while not implemented in the engine
   private static final String EXAMPLE_PROCESS_DEFINITION_ID = "processDefinition1";
   private static final int EXAMPLE_PROCESS_INSTANCES = 42;  
+  private static final int EXAMPLE_FAILED_JOBS = 47;  
   private static final String ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID = "processDefinition2";
   private static final int ANOTHER_EXAMPLE_PROCESS_INSTANCES = 123;
+  private static final int ANOTHER_EXAMPLE_FAILED_JOBS = 125;  
   
   public ProcessDefinitionServiceImpl() {
     super();
@@ -88,57 +91,78 @@ public class ProcessDefinitionServiceImpl extends AbstractEngineService implemen
     return result;
   }
 
+  /**
+   * For the time being this is a stub implementation that returns a fixed data set.
+   */
   @Override
-  public List<StatisticsResultDto> getStatistics(String groupBy) {
-    if (groupBy.equals("definition")) {
-      return getStubDataPerDefinition();
+  public List<StatisticsResultDto> getStatistics(String groupBy, Boolean includeFailedJobs) {
+    if (groupBy == null || groupBy.equals("definition")) {
+      if (includeFailedJobs != null && includeFailedJobs) {
+        return getStubDataPerDefinitionWithFailedJobs();
+      } else {
+        return getStubDataPerDefinition();
+      }
     } else if (groupBy.equals("version")) {
-      return getStubDataPerDefinitionVersion();
-    } else {
-      throw new WebApplicationException(Status.BAD_REQUEST);
+      if (includeFailedJobs != null && includeFailedJobs) {
+        return getStubDataPerDefinitionVersionWithFailedJobs();
+      } else {
+        return getStubDataPerDefinitionVersion();
+      }
     }
+    throw new WebApplicationException(Status.BAD_REQUEST);
+  }
+ 
+
+  private List<StatisticsResultDto> getStubDataPerDefinition() {
+    return StubStatisticsBuilder
+        .addResult().id(EXAMPLE_PROCESS_DEFINITION_ID).instances(EXAMPLE_PROCESS_INSTANCES)
+        .nextResult().id(ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID).instances(ANOTHER_EXAMPLE_PROCESS_INSTANCES)
+        .build();
   }
   
-  private List<StatisticsResultDto> getStubDataPerDefinition() {
-    List<StatisticsResultDto> results = new ArrayList<StatisticsResultDto>();
-    
-    StatisticsResultDto dto = new StatisticsResultDto();
-    dto.setId(EXAMPLE_PROCESS_DEFINITION_ID);
-    dto.setInstances(EXAMPLE_PROCESS_INSTANCES);
-    results.add(dto);
-    
-    dto = new StatisticsResultDto();
-    dto.setId(ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID);
-    dto.setInstances(ANOTHER_EXAMPLE_PROCESS_INSTANCES);
-    results.add(dto);
-    
-    return results;
+  private List<StatisticsResultDto> getStubDataPerDefinitionWithFailedJobs() {
+    return StubStatisticsBuilder
+        .addResult().id(EXAMPLE_PROCESS_DEFINITION_ID)
+          .instances(EXAMPLE_PROCESS_INSTANCES)
+          .failedJobs(EXAMPLE_FAILED_JOBS)
+        .nextResult().id(ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID)
+          .instances(ANOTHER_EXAMPLE_PROCESS_INSTANCES)
+          .failedJobs(ANOTHER_EXAMPLE_FAILED_JOBS)
+        .build();
   }
   
   private List<StatisticsResultDto> getStubDataPerDefinitionVersion() {
-    List<StatisticsResultDto> results = new ArrayList<StatisticsResultDto>();
-    
-    StatisticsResultDto dto = new StatisticsResultDto();
-    dto.setId(EXAMPLE_PROCESS_DEFINITION_ID + ":1");
-    dto.setInstances(EXAMPLE_PROCESS_INSTANCES);
-    results.add(dto);
-    
-    dto = new StatisticsResultDto();
-    dto.setId(EXAMPLE_PROCESS_DEFINITION_ID + ":2");
-    dto.setInstances(EXAMPLE_PROCESS_INSTANCES);
-    results.add(dto);
-    
-    dto = new StatisticsResultDto();
-    dto.setId(ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID + ":1");
-    dto.setInstances(ANOTHER_EXAMPLE_PROCESS_INSTANCES);
-    results.add(dto);
-    
-    dto = new StatisticsResultDto();
-    dto.setId(ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID + ":2");
-    dto.setInstances(ANOTHER_EXAMPLE_PROCESS_INSTANCES);
-    results.add(dto);
-    
-    return results;
+    return StubStatisticsBuilder
+         .addResult().id(EXAMPLE_PROCESS_DEFINITION_ID + ":1").instances(EXAMPLE_PROCESS_INSTANCES)
+         .nextResult().id(EXAMPLE_PROCESS_DEFINITION_ID + ":2").instances(EXAMPLE_PROCESS_INSTANCES)
+         .nextResult()
+           .id(ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID + ":1")
+           .instances(ANOTHER_EXAMPLE_PROCESS_INSTANCES)
+         .nextResult()
+           .id(ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID + ":2")
+           .instances(ANOTHER_EXAMPLE_PROCESS_INSTANCES)
+         .build();
+  }
+  
+  private List<StatisticsResultDto> getStubDataPerDefinitionVersionWithFailedJobs() {
+    return StubStatisticsBuilder
+         .addResult()
+           .id(EXAMPLE_PROCESS_DEFINITION_ID + ":1")
+           .instances(EXAMPLE_PROCESS_INSTANCES)
+           .failedJobs(EXAMPLE_FAILED_JOBS)
+         .nextResult()
+           .id(EXAMPLE_PROCESS_DEFINITION_ID + ":2")
+           .instances(EXAMPLE_PROCESS_INSTANCES)
+           .failedJobs(EXAMPLE_FAILED_JOBS)
+         .nextResult()
+           .id(ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID + ":1")
+           .instances(ANOTHER_EXAMPLE_PROCESS_INSTANCES)
+           .failedJobs(ANOTHER_EXAMPLE_FAILED_JOBS)
+         .nextResult()
+           .id(ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID + ":2")
+           .instances(ANOTHER_EXAMPLE_PROCESS_INSTANCES)
+           .failedJobs(ANOTHER_EXAMPLE_FAILED_JOBS)
+         .build();
   }
 
 }

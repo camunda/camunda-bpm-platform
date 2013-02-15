@@ -3,7 +3,8 @@ package org.camunda.bpm.engine.rest.dto;
 public class StatisticsResultDto {
 
   private String id;
-  private int instances;
+  private Integer instances;
+  private Integer failedJobs;
   
   public String getId() {
     return id;
@@ -11,10 +12,17 @@ public class StatisticsResultDto {
   public void setId(String id) {
     this.id = id;
   }
-  public int getInstances() {
+  public Integer getInstances() {
     return instances;
   }
-  public void setInstances(int instances) {
+  public void setInstances(Integer instances) {
     this.instances = instances;
   }
+  public Integer getFailedJobs() {
+    return failedJobs;
+  }
+  public void setFailedJobs(Integer failedJobs) {
+    this.failedJobs = failedJobs;
+  }
+  
 }
