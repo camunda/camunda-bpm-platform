@@ -26,10 +26,10 @@
   </head>
   <body ng-controller="DefaultController">
 
-    <!-- Header -->
-    <div ng-include="'app/common/header.html'"></div>
-
     <div class="wrapper">
+      <!-- Header -->
+      <div ng-include="'app/common/header.html'"></div>
+
       <div class="container-fluid content-container content-inset">
         <div class="row-fluid content-container">
           <!-- actual view body is rendered here whenever the url changes -->
@@ -43,7 +43,7 @@
     <!-- footer -->
     <footer class="content-container">
       <div class="container-fluid">
-        <p><a href="views/app/index.html">camunda BPM - cockpit</a> / version ${project.version}</p>
+        <p><a href="http://camunda.org">powered by camunda BPM</a> / version ${project.version}</p>
       </div>
 
       <script src="assets/js/loader.js" type="text/javascript"></script>
