@@ -20,9 +20,9 @@ $script([
 			], function() {
 			
 				$script([
-				  'lib/angular/angular-resource.min.js',
-          '../../app/app.js',
-          '../../app/dashboard/dashboard.js',
+				    'lib/angular/angular-resource.min.js',
+          		    '../../app/app.js',
+          		    '../../app/dashboard/dashboard.js',
 					'../../common/extensions/ngmIf.js',
 					'../../common/directives/directives.js',
 					'../../common/directives/errorPanel.js',
