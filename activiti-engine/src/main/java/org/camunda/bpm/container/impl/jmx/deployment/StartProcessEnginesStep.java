@@ -5,8 +5,8 @@ import static org.camunda.bpm.container.impl.jmx.deployment.Attachments.PROCESSE
 import java.net.URL;
 import java.util.Map;
 
-import org.camunda.bpm.application.impl.deployment.spi.ProcessEngineXml;
-import org.camunda.bpm.application.impl.deployment.spi.ProcessesXml;
+import org.camunda.bpm.application.impl.deployment.metadata.spi.ProcessEngineXml;
+import org.camunda.bpm.application.impl.deployment.metadata.spi.ProcessesXml;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanDeploymentOperation;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanDeploymentOperationStep;
 

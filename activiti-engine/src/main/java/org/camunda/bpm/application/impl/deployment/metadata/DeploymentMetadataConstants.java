@@ -1,4 +1,4 @@
-package org.camunda.bpm.application.impl.deployment.parser;
+package org.camunda.bpm.application.impl.deployment.metadata;
 
 /**
  * <p>Collection of constant string values used by the parsers.</p> 
@@ -15,6 +15,10 @@ public class DeploymentMetadataConstants {
   
   public static final String PROCESS_APPLICATION = "process-application";
   
+  public static final String JOB_EXECUTOR = "job-executor";
+  public static final String JOB_ACQUISITION = "job-acquisition";
+  public static final String ACQUISITION_STRATEGY = "acquisition-strategy";
+    
   public static final String PROCESS_ENGINE = "process-engine";
   public static final String CONFIGURATION = "configuration";
   public static final String DATASOURCE = "datasource";

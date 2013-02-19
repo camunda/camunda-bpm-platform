@@ -18,8 +18,8 @@ import java.net.URL;
 
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.impl.util.IoUtil;
+import org.camunda.bpm.application.impl.deployment.metadata.spi.ProcessesXml;
 import org.camunda.bpm.application.impl.deployment.parser.ProcessesXmlParser;
-import org.camunda.bpm.application.impl.deployment.spi.ProcessesXml;
 import org.jboss.as.server.deployment.Attachments;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;

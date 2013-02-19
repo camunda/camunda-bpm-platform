@@ -3,8 +3,8 @@ package org.camunda.bpm.container.impl.jmx.deployment;
 import java.util.Map;
 
 import org.activiti.engine.ProcessEngine;
-import org.camunda.bpm.application.impl.deployment.parser.PropertyHelper;
-import org.camunda.bpm.application.impl.deployment.spi.ProcessArchiveXml;
+import org.camunda.bpm.application.impl.deployment.metadata.PropertyHelper;
+import org.camunda.bpm.application.impl.deployment.metadata.spi.ProcessArchiveXml;
 import org.camunda.bpm.container.impl.jmx.JmxRuntimeContainerDelegate.ServiceTypes;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanDeploymentOperation;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanDeploymentOperationStep;

@@ -2,9 +2,10 @@
 <process-application
   xmlns="http://www.camunda.org/schema/1.0/ProcessApplication"
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://www.camunda.org/schema/1.0/ProcessApplication ProcessApplication.xsd ">
+  xsi:schemaLocation="http://www.camunda.org/schema/1.0/ProcessApplication">
 
   <process-engine name="engine1">
+    <job-acquisition>default</job-acquisition>
     <configuration>configuration</configuration>
     <datasource>datasource</datasource>
     <properties>
@@ -14,6 +15,7 @@
   </process-engine>
   
   <process-engine name="engine2">
+    <job-acquisition>default</job-acquisition>
     <configuration>configuration</configuration>
     <datasource>datasource</datasource>   
   </process-engine>

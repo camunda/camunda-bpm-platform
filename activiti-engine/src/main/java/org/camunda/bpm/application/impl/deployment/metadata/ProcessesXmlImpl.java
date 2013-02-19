@@ -1,10 +1,10 @@
-package org.camunda.bpm.application.impl.deployment.parser;
+package org.camunda.bpm.application.impl.deployment.metadata;
 
 import java.util.List;
 
-import org.camunda.bpm.application.impl.deployment.spi.ProcessArchiveXml;
-import org.camunda.bpm.application.impl.deployment.spi.ProcessEngineXml;
-import org.camunda.bpm.application.impl.deployment.spi.ProcessesXml;
+import org.camunda.bpm.application.impl.deployment.metadata.spi.ProcessArchiveXml;
+import org.camunda.bpm.application.impl.deployment.metadata.spi.ProcessEngineXml;
+import org.camunda.bpm.application.impl.deployment.metadata.spi.ProcessesXml;
 
 /**
  * @author Daniel Meyer

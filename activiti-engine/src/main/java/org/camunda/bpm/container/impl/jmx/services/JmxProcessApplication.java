@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.application.ProcessApplicationReference;
-import org.camunda.bpm.application.impl.deployment.spi.ProcessesXml;
+import org.camunda.bpm.application.impl.deployment.metadata.spi.ProcessesXml;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanServiceContainer;
 import org.camunda.bpm.container.impl.jmx.kernel.MbeanService;
 import org.camunda.bpm.engine.application.ProcessApplicationRegistration;

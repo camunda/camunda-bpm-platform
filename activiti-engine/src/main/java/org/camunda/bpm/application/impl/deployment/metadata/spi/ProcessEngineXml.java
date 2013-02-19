@@ -1,4 +1,4 @@
-package org.camunda.bpm.application.impl.deployment.spi;
+package org.camunda.bpm.application.impl.deployment.metadata.spi;
 
 import java.util.Map;
 
@@ -46,5 +46,10 @@ public interface ProcessEngineXml {
    *         {@link String}.
    */
   public Map<String, String> getProperties();
+  
+  /**
+   * @return the name of the job acquisition to be used.
+   */
+  public String getJobAcquisitionName();
 
 }

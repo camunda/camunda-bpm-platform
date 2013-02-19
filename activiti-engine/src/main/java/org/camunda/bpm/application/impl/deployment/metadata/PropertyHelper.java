@@ -1,4 +1,4 @@
-package org.camunda.bpm.application.impl.deployment.parser;
+package org.camunda.bpm.application.impl.deployment.metadata;
 
 import java.util.Map;
 

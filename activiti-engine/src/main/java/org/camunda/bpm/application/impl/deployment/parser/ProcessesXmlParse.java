@@ -1,10 +1,10 @@
 package org.camunda.bpm.application.impl.deployment.parser;
 
-import static org.camunda.bpm.application.impl.deployment.parser.DeploymentMetadataConstants.NAME;
-import static org.camunda.bpm.application.impl.deployment.parser.DeploymentMetadataConstants.PROCESS;
-import static org.camunda.bpm.application.impl.deployment.parser.DeploymentMetadataConstants.PROCESS_ARCHIVE;
-import static org.camunda.bpm.application.impl.deployment.parser.DeploymentMetadataConstants.PROCESS_ENGINE;
-import static org.camunda.bpm.application.impl.deployment.parser.DeploymentMetadataConstants.PROPERTIES;
+import static org.camunda.bpm.application.impl.deployment.metadata.DeploymentMetadataConstants.NAME;
+import static org.camunda.bpm.application.impl.deployment.metadata.DeploymentMetadataConstants.PROCESS;
+import static org.camunda.bpm.application.impl.deployment.metadata.DeploymentMetadataConstants.PROCESS_ARCHIVE;
+import static org.camunda.bpm.application.impl.deployment.metadata.DeploymentMetadataConstants.PROCESS_ENGINE;
+import static org.camunda.bpm.application.impl.deployment.metadata.DeploymentMetadataConstants.PROPERTIES;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -12,14 +12,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.engine.impl.bpmn.parser.BpmnParser;
-import org.activiti.engine.impl.util.ReflectUtil;
 import org.activiti.engine.impl.util.xml.Element;
 import org.activiti.engine.impl.util.xml.Parse;
 import org.activiti.engine.impl.util.xml.Parser;
-import org.camunda.bpm.application.impl.deployment.spi.ProcessArchiveXml;
-import org.camunda.bpm.application.impl.deployment.spi.ProcessEngineXml;
-import org.camunda.bpm.application.impl.deployment.spi.ProcessesXml;
+import org.camunda.bpm.application.impl.deployment.metadata.ProcessArchiveXmlImpl;
+import org.camunda.bpm.application.impl.deployment.metadata.ProcessesXmlImpl;
+import org.camunda.bpm.application.impl.deployment.metadata.spi.ProcessArchiveXml;
+import org.camunda.bpm.application.impl.deployment.metadata.spi.ProcessEngineXml;
+import org.camunda.bpm.application.impl.deployment.metadata.spi.ProcessesXml;
 
 /**
  * <p>{@link Parse} object for the <code>processes.xml</code> file.</p>

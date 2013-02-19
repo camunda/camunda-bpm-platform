@@ -15,8 +15,8 @@ package com.camunda.fox.platform.subsystem.impl.deployment.marker;
 import java.util.Map;
 
 import org.camunda.bpm.application.ProcessApplication;
-import org.camunda.bpm.application.impl.deployment.spi.ProcessArchiveXml;
-import org.camunda.bpm.application.impl.deployment.spi.ProcessesXml;
+import org.camunda.bpm.application.impl.deployment.metadata.spi.ProcessArchiveXml;
+import org.camunda.bpm.application.impl.deployment.metadata.spi.ProcessesXml;
 import org.jboss.as.ee.component.ComponentDescription;
 import org.jboss.as.server.deployment.AttachmentKey;
 import org.jboss.as.server.deployment.DeploymentUnit;

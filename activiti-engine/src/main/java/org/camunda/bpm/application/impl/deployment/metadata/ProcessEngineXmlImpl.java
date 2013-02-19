@@ -1,8 +1,8 @@
-package org.camunda.bpm.application.impl.deployment.parser;
+package org.camunda.bpm.application.impl.deployment.metadata;
 
 import java.util.Map;
 
-import org.camunda.bpm.application.impl.deployment.spi.ProcessEngineXml;
+import org.camunda.bpm.application.impl.deployment.metadata.spi.ProcessEngineXml;
 
 /**
  * <p>Implementation of the {@link ProcessEngineXml} descriptor.</p>
@@ -14,6 +14,7 @@ public class ProcessEngineXmlImpl implements ProcessEngineXml {
   private String name;
   private boolean isDefault;
   private String configurationClass;
+  private String jobAcquisitionName;
   private String datasource;
   private Map<String, String> properties;
   
@@ -55,6 +56,14 @@ public class ProcessEngineXmlImpl implements ProcessEngineXml {
   
   public void setDatasource(String datasource) {
     this.datasource = datasource;
+  }
+  
+  public String getJobAcquisitionName() {
+    return jobAcquisitionName;
+  }
+  
+  public void setJobAcquisitionName(String jobAcquisitionName) {
+    this.jobAcquisitionName = jobAcquisitionName;
   }
 
 }

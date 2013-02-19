@@ -15,8 +15,8 @@ package com.camunda.fox.platform.subsystem.impl.deployment.processor;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.camunda.bpm.application.impl.deployment.spi.ProcessArchiveXml;
-import org.camunda.bpm.application.impl.deployment.spi.ProcessesXml;
+import org.camunda.bpm.application.impl.deployment.metadata.spi.ProcessArchiveXml;
+import org.camunda.bpm.application.impl.deployment.metadata.spi.ProcessesXml;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.server.deployment.DeploymentUnitProcessingException;

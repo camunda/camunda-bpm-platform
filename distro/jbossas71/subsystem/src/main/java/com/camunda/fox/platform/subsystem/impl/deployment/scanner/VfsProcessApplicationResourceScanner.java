@@ -27,11 +27,11 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.activiti.engine.impl.util.IoUtil;
+import org.camunda.bpm.application.impl.deployment.metadata.PropertyHelper;
+import org.camunda.bpm.application.impl.deployment.metadata.spi.ProcessArchiveXml;
+import org.camunda.bpm.application.impl.deployment.metadata.spi.ProcessesXml;
 import org.camunda.bpm.application.impl.deployment.parser.ProcessesXmlParser;
-import org.camunda.bpm.application.impl.deployment.parser.PropertyHelper;
 import org.camunda.bpm.application.impl.deployment.scanner.ScanningUtil;
-import org.camunda.bpm.application.impl.deployment.spi.ProcessArchiveXml;
-import org.camunda.bpm.application.impl.deployment.spi.ProcessesXml;
 import org.jboss.as.server.deployment.Attachments;
 import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.vfs.VFS;

@@ -7,9 +7,9 @@ import java.util.Map;
 import junit.framework.TestCase;
 
 import org.activiti.engine.ActivitiException;
-import org.camunda.bpm.application.impl.deployment.spi.ProcessArchiveXml;
-import org.camunda.bpm.application.impl.deployment.spi.ProcessEngineXml;
-import org.camunda.bpm.application.impl.deployment.spi.ProcessesXml;
+import org.camunda.bpm.application.impl.deployment.metadata.spi.ProcessArchiveXml;
+import org.camunda.bpm.application.impl.deployment.metadata.spi.ProcessEngineXml;
+import org.camunda.bpm.application.impl.deployment.metadata.spi.ProcessesXml;
 
 /**
  * <p>The testcases for the {@link ProcessesXmlParser}</p>
@@ -44,6 +44,7 @@ public class ProcessesXmlParserTest extends TestCase {
     
     ProcessEngineXml engineXml = processesXml.getProcessEngines().get(0);
     assertEquals("default", engineXml.getName());
+    assertEquals("default", engineXml.getJobAcquisitionName());
     assertEquals("configuration", engineXml.getConfigurationClass());
     assertEquals("datasource", engineXml.getDatasource());
     

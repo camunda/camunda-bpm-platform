@@ -6,6 +6,7 @@
   xsi:schemaLocation="http://www.camunda.org/schema/1.0/ProcessApplication http://www.camunda.org/schema/1.0/ProcessApplication ">
   
   <camunda:process-engine name="engine1">
+    <camunda:job-acquisition>default</camunda:job-acquisition>
     <camunda:configuration>configuration</camunda:configuration>
     <camunda:datasource>datasource</camunda:datasource>
     <camunda:properties />

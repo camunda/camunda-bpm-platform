@@ -1,6 +1,6 @@
 package org.camunda.bpm.application.impl.deployment.parser;
 
-import static org.camunda.bpm.application.impl.deployment.parser.DeploymentMetadataConstants.*;
+import static org.camunda.bpm.application.impl.deployment.metadata.DeploymentMetadataConstants.*;
 
 import java.util.HashMap;
 import java.util.List;
@@ -12,7 +12,8 @@ import org.activiti.engine.ActivitiException;
 import org.activiti.engine.impl.util.xml.Element;
 import org.activiti.engine.impl.util.xml.Parse;
 import org.activiti.engine.impl.util.xml.Parser;
-import org.camunda.bpm.application.impl.deployment.spi.ProcessEngineXml;
+import org.camunda.bpm.application.impl.deployment.metadata.ProcessEngineXmlImpl;
+import org.camunda.bpm.application.impl.deployment.metadata.spi.ProcessEngineXml;
 
 /**
  * <p>{@link Parse} implementation for Deployment Metadata.</p>
@@ -38,9 +39,7 @@ public abstract class DeploymentMetadataParse extends Parse {
 
     } catch (Exception e) {
       LOGGER.log(Level.SEVERE, "Unknown exception", e);
-      
-      // ALL unexpected exceptions should bubble up since they are not handled
-      // accordingly by underlying parse-methods and the process can't be deployed
+
       throw new ActivitiException("Error while parsing deployment descriptor: " + e.getMessage(), e);
       
     } finally {
@@ -86,6 +85,9 @@ public abstract class DeploymentMetadataParse extends Parse {
         
       } else if(DATASOURCE.equals(childElement.getTagName())) {
         processEngine.setDatasource(childElement.getText());
+        
+      } else if(JOB_ACQUISITION.equals(childElement.getTagName())) {
+        processEngine.setJobAcquisitionName(childElement.getText());
         
       } else if(PROPERTIES.equals(childElement.getTagName())) {
         parseProperties(childElement, properties);

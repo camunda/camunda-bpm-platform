@@ -1,9 +1,9 @@
-package org.camunda.bpm.application.impl.deployment.parser;
+package org.camunda.bpm.application.impl.deployment.metadata;
 
 import java.util.List;
 import java.util.Map;
 
-import org.camunda.bpm.application.impl.deployment.spi.ProcessArchiveXml;
+import org.camunda.bpm.application.impl.deployment.metadata.spi.ProcessArchiveXml;
 
 public class ProcessArchiveXmlImpl implements ProcessArchiveXml {
   

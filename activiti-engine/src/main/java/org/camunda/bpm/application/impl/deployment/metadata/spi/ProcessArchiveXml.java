@@ -1,4 +1,4 @@
-package org.camunda.bpm.application.impl.deployment.spi;
+package org.camunda.bpm.application.impl.deployment.metadata.spi;
 
 import java.util.List;
 import java.util.Map;
