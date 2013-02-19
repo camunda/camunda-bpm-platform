@@ -3,16 +3,16 @@
 angular.module('cockpit', [
     'ng',
     'dashboard',
-    'cockpit.filters',
     'cockpit.services',
-    'cockpit.directives'])
+    'cockpit.directives',
+    'cockpit.resources'
+    ])
 
-.config(['$routeProvider', '$locationProvider', '$httpProvider', 'AppProvider', function($routeProvider, $locationProvider, $httpProvider, AppProvider) {
+.config(['$routeProvider', '$locationProvider', '$httpProvider', function($routeProvider, $locationProvider, $httpProvider) {
 
-    $locationProvider.html5Mode(true);
     $httpProvider.responseInterceptors.push('cockpitHttpInterceptor');
 
-    $routeProvider.otherwise({redirectTo: AppProvider.root() + '/dashboard'});
+    $routeProvider.otherwise({redirectTo: '/dashboard'});
 }])
 
 .controller('DefaultController', ['$scope', 'Error', function ($scope, Error) {

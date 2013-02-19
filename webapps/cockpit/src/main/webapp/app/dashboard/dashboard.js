@@ -2,13 +2,16 @@
 
 angular.module('dashboard', ['cockpit.services'])
 
-.config(['$routeProvider', 'AppProvider', function ($routeProvider, AppProvider) {
-  $routeProvider.when(AppProvider.root() + '/dashboard', {
+.config(['$routeProvider', function ($routeProvider) {
+  $routeProvider.when('/dashboard', {
     templateUrl:'app/dashboard/dashboard.html',
-    controller:'DashboardCtrl'
+    controller: 'DashboardCtrl'
   });
 }])
 
-.controller('DashboardCtrl', ['$scope', function($scope) {
-  var test = null;
+.controller('DashboardCtrl', ['$scope', 'ProcessDefinition', function($scope, ProcessDefinition) {
+  $scope.helloWorld = "Hello World";
+  
+  $scope.processDefinitions = ProcessDefinition.query();
+  
 }]);

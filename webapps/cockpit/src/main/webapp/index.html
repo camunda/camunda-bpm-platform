@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-ng-app="cockpit">
+<html lang="en">
   <head>
     <title>camunda BPM - cockpit</title>
     
@@ -11,12 +11,11 @@
     <meta name="author" content="camunda services GmbH" />
 
     <!-- settings the base path for relative links -->
-    <base href="." app-base="/cockpit" />
+    <base href="." app-base="/cockpit/" rest-base="/camunda-engine-rest/" />
 
     <!-- Styles -->
-    <link href="assets/lib/bootstrap/css/bootstrap.css" rel="stylesheet" />
-    <link href="assets/css/app.css" rel="stylesheet" />
-    
+    <link href="assets/css/loader.css" rel="stylesheet" />
+        
     <!-- For IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
       <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
@@ -26,6 +25,9 @@
     <link rel="shortcut icon" type="image/x-icon" href="assets/img/favicon.ico" />
   </head>
   <body ng-controller="DefaultController">
+
+    <!-- Header -->
+    <div ng-include="'app/common/header.html'"></div>
 
     <div class="wrapper">
       <div class="container-fluid content-container content-inset">
@@ -38,24 +40,14 @@
       <div class="push-down"><!-- // --></div>
     </div>
 
-      <!-- footer -->
+    <!-- footer -->
     <footer class="content-container">
       <div class="container-fluid">
         <p><a href="views/app/index.html">camunda BPM - cockpit</a> / version ${project.version}</p>
       </div>
 
-      <script src="assets/js/lib/jquery-1.7.2.min.js"></script>
-      <script src="assets/lib/bootstrap/js/bootstrap.js"></script>
-      <script src="assets/js/lib/angular/angular.js"></script>
-      <script src="assets/js/lib/angular/angular-resource.js"></script>
-
-      <script src="assets/js/app/extensions.js"></script>
-      <script src="assets/js/app/directives.js"></script>
-      <script src="app/app.js"></script>
-      <script src="assets/js/app/filters.js"></script>
-      <script src="assets/js/app/services.js"></script>
-      <script src="assets/js/app/customRouteProvider.js"></script>
-      <script src="app/dashboard/dashboard.js"></script>
+      <script src="assets/js/loader.js" type="text/javascript"></script>
+      
     </footer>
   </body>
 </html>
