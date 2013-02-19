@@ -12,7 +12,7 @@
  */
 package org.camunda.bpm.engine.impl.application;
 
-import org.camunda.bpm.application.spi.ProcessApplicationReference;
+import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.engine.application.ProcessApplicationRegistration;
 
 /**
@@ -41,6 +41,10 @@ public class DefaultProcessApplicationRegistration implements ProcessApplication
   
   public ProcessApplicationReference getProcessApplicationReference() {
     return processApplicationReference;
+  }
+  
+  public String getDeploymentId() {
+    return deploymentId;
   }
 
 }

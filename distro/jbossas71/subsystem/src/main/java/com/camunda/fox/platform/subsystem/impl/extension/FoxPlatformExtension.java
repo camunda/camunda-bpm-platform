@@ -57,18 +57,13 @@ public class FoxPlatformExtension implements Extension {
     rootRegistration.registerOperationHandler(DESCRIBE, FoxPlatformSubsystemDescribe.INSTANCE, FoxPlatformSubsystemDescribe.INSTANCE, false, OperationEntry.EntryType.PRIVATE);
     
     // Process Engine
-    final ManagementResourceRegistration processEnginesRegistration = rootRegistration.registerSubModel(new ProcessEnginesResourceDefinition());
+    rootRegistration.registerSubModel(new ProcessEnginesResourceDefinition());
     
-    final ManagementResourceRegistration jobExecutorRegistration = rootRegistration.registerSubModel(new JobExecutorResourceDefinition());
-    
+    // Job Executor
+    ManagementResourceRegistration jobExecutorRegistration = rootRegistration.registerSubModel(new JobExecutorResourceDefinition());
     //Job acquisition
-    final ManagementResourceRegistration jobAcquisitionRegistration = jobExecutorRegistration.registerSubModel(new JobAcquisitionResourceDefinition());
+    jobExecutorRegistration.registerSubModel(new JobAcquisitionResourceDefinition());
     
-    // THINK: here we could add handlers for additional read-write attributes. They would react to a change in the model. 
-    // A process engine is mostly read only. However, I could imagine values like the locktime of the jobexecutor to be configurable here.
-    // a change to such a value through one of the management interfaces would be persisted in the configuration (Storage.CONFIGURATION) 
-    // and distributed across a cluster / domain
-    // Example: processEngineChild.registerReadWriteAttribute("jobExecututorLockTime", null, JobExecutorLockTimeHandler.INSTANCE, Storage.CONFIGURATION);
   }
 
   public void initializeParsers(ExtensionParsingContext context) {

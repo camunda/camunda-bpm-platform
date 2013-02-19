@@ -25,7 +25,6 @@ public class ContainerJobExecutorService extends PlatformJobExecutor implements 
   private static Logger log = Logger.getLogger(ContainerJobExecutorService.class.getName());
   
   private final InjectedValue<ManagedQueueExecutorService> managedQueueInjector = new InjectedValue<ManagedQueueExecutorService>();
-  private final InjectedValue<ContainerPlatformService> containerPlatformServiceInjector = new InjectedValue<ContainerPlatformService>();
   
   private long lastWarningLogged = System.currentTimeMillis();
 
@@ -51,13 +50,12 @@ public class ContainerJobExecutorService extends PlatformJobExecutor implements 
 
   public void executeJobs(List<String> jobIds, CommandExecutor commandExecutor) {
     final ManagedQueueExecutorService managedQueueExecutorService = managedQueueInjector.getValue();
-    final ContainerPlatformService containerPlatformService = containerPlatformServiceInjector.getValue();
 
     boolean rejected = false;
     try {
       
       // wait for 2 seconds for the job to be accepted by the pool.
-      managedQueueExecutorService.executeBlocking(new ContainerExecuteJobsRunnable(jobIds, commandExecutor, containerPlatformService), 2, TimeUnit.SECONDS);
+      managedQueueExecutorService.executeBlocking(new ContainerExecuteJobsRunnable(jobIds, commandExecutor), 2, TimeUnit.SECONDS);
       
     } catch (InterruptedException e) {
       // the acquisition thread is interrupted, this probably means the app server is turning the lights off -> ignore          
@@ -79,7 +77,7 @@ public class ContainerJobExecutorService extends PlatformJobExecutor implements 
     if(rejected) {
       // if the job is rejected, execute in the caller thread (Acquisition Thread)
       // TODO: check rejectedExecutionException policy, see DefaultPlatformJobExecutor.class
-      new ContainerExecuteJobsRunnable(jobIds, commandExecutor, containerPlatformService).run();
+      new ContainerExecuteJobsRunnable(jobIds, commandExecutor).run();
     }
   }
 
@@ -108,9 +106,5 @@ public class ContainerJobExecutorService extends PlatformJobExecutor implements 
   public InjectedValue<ManagedQueueExecutorService> getManagedQueueInjector() {
     return managedQueueInjector;
   }
-  
-  public InjectedValue<ContainerPlatformService> getContainerPlatformServiceInjector() {
-    return containerPlatformServiceInjector;
-  }
-  
+    
 }

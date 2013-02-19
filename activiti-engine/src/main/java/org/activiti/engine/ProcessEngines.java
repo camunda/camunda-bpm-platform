@@ -58,6 +58,7 @@ import org.activiti.engine.impl.util.ReflectUtil;
  * @author Tom Baeyens
  * @author Joram Barrez
  */
+@Deprecated
 public abstract class ProcessEngines {
   
   private static Logger log = Logger.getLogger(ProcessEngines.class.getName());

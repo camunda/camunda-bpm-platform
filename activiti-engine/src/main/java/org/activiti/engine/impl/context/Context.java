@@ -21,9 +21,9 @@ import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.jobexecutor.JobExecutorContext;
 import org.activiti.engine.impl.pvm.runtime.InterpretableExecution;
+import org.camunda.bpm.application.ProcessApplication;
+import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.application.ProcessApplicationUnavailableException;
-import org.camunda.bpm.application.spi.ProcessApplication;
-import org.camunda.bpm.application.spi.ProcessApplicationReference;
 
 
 /**

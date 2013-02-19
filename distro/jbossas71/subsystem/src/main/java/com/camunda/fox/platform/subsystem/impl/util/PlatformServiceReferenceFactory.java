@@ -18,7 +18,7 @@ package com.camunda.fox.platform.subsystem.impl.util;
 import org.jboss.as.naming.ManagedReference;
 import org.jboss.as.naming.ManagedReferenceFactory;
 
-import com.camunda.fox.platform.subsystem.impl.service.ContainerPlatformService;
+import com.camunda.fox.platform.subsystem.impl.service.ContainerProcessEngineService;
 
 
 /**
@@ -28,9 +28,9 @@ import com.camunda.fox.platform.subsystem.impl.service.ContainerPlatformService;
  */
 public class PlatformServiceReferenceFactory implements ManagedReferenceFactory {
 
-  private final ContainerPlatformService service;
+  private final ContainerProcessEngineService service;
 
-  public PlatformServiceReferenceFactory(ContainerPlatformService service) {
+  public PlatformServiceReferenceFactory(ContainerProcessEngineService service) {
     this.service = service;
   }
 

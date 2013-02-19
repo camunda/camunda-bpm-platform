@@ -7,6 +7,8 @@ import javax.ejb.EJB;
 import javax.naming.NamingException;
 
 import org.activiti.engine.ProcessEngine;
+import org.camunda.bpm.ProcessEngineService;
+import org.camunda.bpm.ProcessEngineService.ProcessEngineStartOperation;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
@@ -16,8 +18,6 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import com.camunda.fox.platform.api.ProcessEngineService;
-import com.camunda.fox.platform.api.ProcessEngineService.ProcessEngineStartOperation;
 import com.camunda.fox.platform.impl.test.DummyProcessEngineConfiguration;
 import com.camunda.fox.platform.impl.test.H2Datasource;
 import com.camunda.fox.platform.spi.ProcessEngineConfiguration;
@@ -33,7 +33,7 @@ public class TestPlatformProcessEngineServiceBean {
   public static WebArchive createDeployment() {
     return ShrinkWrap.create(WebArchive.class, "test.war")
             .addClass(H2Datasource.class)
-            .addClass(PlatformServiceBean.class)
+            .addClass(BpmPlatformBootstrap.class)
             .addClass(DummyProcessEngineConfiguration.class)            
             .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml");            
   }
@@ -47,7 +47,7 @@ public class TestPlatformProcessEngineServiceBean {
     
     Assert.assertEquals(0, processEngineService.getProcessEngines().size());
     
-    Future<ProcessEngineStartOperation> startProcessEngine = processEngineService.startProcessEngine(configuration);
+    Future<ProcessEngineStartOperation> startProcessEngine = processEngineService.registerProcessEngine(configuration);
     ProcessEngineStartOperation processEngineStartOperation = startProcessEngine.get();
     ProcessEngine processEngine = processEngineStartOperation.getProcessenEngine();
     

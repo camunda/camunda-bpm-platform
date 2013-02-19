@@ -16,6 +16,7 @@ import java.sql.Connection;
 import java.util.Map;
 
 import org.activiti.engine.ManagementService;
+import org.activiti.engine.impl.cmd.ActivateDeploymentForApplicationCmd;
 import org.activiti.engine.impl.cmd.DeleteJobCmd;
 import org.activiti.engine.impl.cmd.ExecuteJobsCmd;
 import org.activiti.engine.impl.cmd.GetJobExceptionStacktraceCmd;
@@ -31,6 +32,8 @@ import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.management.TableMetaData;
 import org.activiti.engine.management.TablePageQuery;
 import org.activiti.engine.runtime.JobQuery;
+import org.camunda.bpm.application.ProcessApplicationReference;
+import org.camunda.bpm.engine.application.ProcessApplicationRegistration;
 
 
 /**
@@ -40,6 +43,10 @@ import org.activiti.engine.runtime.JobQuery;
  * @author Saeid Mizaei
  */
 public class ManagementServiceImpl extends ServiceImpl implements ManagementService {
+  
+  public ProcessApplicationRegistration activateDeploymentForApplication(String deploymentId, ProcessApplicationReference reference) {    
+    return commandExecutor.execute(new ActivateDeploymentForApplicationCmd(deploymentId, reference));
+  }
 
   public Map<String, Long> getTableCount() {
     return commandExecutor.execute(new GetTableCountCmd());

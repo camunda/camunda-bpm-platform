@@ -21,7 +21,6 @@ import javax.enterprise.inject.spi.BeanManager;
 
 import org.activiti.cdi.BusinessProcess;
 import org.activiti.cdi.impl.util.ProgrammaticBeanLookup;
-import org.activiti.cdi.test.util.ProcessEngineLookupForTestsuite;
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.FormService;
 import org.activiti.engine.HistoryService;

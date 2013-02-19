@@ -36,6 +36,7 @@ import org.activiti.engine.impl.ProcessEngineImpl;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.jobexecutor.JobExecutor;
 import org.activiti.engine.runtime.Job;
+import org.camunda.bpm.ProcessEngineService;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
@@ -43,7 +44,6 @@ import org.junit.Assert;
 import org.junit.Before;
 
 import com.camunda.fox.platform.api.ProcessArchiveService;
-import com.camunda.fox.platform.api.ProcessEngineService;
 import com.camunda.fox.platform.test.util.JndiConstants;
 
 public abstract class AbstractFoxPlatformIntegrationTest {

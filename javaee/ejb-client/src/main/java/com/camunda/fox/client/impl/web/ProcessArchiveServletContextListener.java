@@ -1,35 +1,29 @@
 package com.camunda.fox.client.impl.web;
 
-import java.util.Map;
-
-import javax.inject.Inject;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
-import org.camunda.bpm.application.spi.ProcessApplication;
+import org.camunda.bpm.application.ProcessApplicationDeployment;
+import org.camunda.bpm.application.impl.deployment.metadata.ProcessesXmlParser;
 
-import com.camunda.fox.platform.spi.ProcessArchive;
 
 /**
- * Sets the {@link ProcessArchive#PROP_SERVLET_CONTEXT_PATH} for each
- * {@link ProcessArchive} we install
+ * Sets the {@link ProcessesXmlParser#PROP_SERVLET_CONTEXT_PATH} for each
+ * {@link ProcessApplicationDeployment} we install
  * 
  * @author Daniel Meyer
  * 
  */
 public class ProcessArchiveServletContextListener implements ServletContextListener {
 
-  @Inject
-  private ProcessApplication processArchiveSupport;
-
   public void contextInitialized(ServletContextEvent contextEvent) {
 
     String contextPath = contextEvent.getServletContext().getContextPath();
-    
-    for (ProcessArchive pa : processArchiveSupport.getInstalledProcessArchives().keySet()) {
-      Map<String, Object> properties = pa.getProperties();
-      properties.put(ProcessArchive.PROP_SERVLET_CONTEXT_PATH, contextPath);
-    }
+//    
+//    for (ProcessApplicationDeployment pa : processArchiveSupport.getInstalledProcessArchives().keySet()) {
+//      Map<String, Object> properties = pa.getProperties();
+//      properties.put(ProcessesXmlParser.PROP_SERVLET_CONTEXT_PATH, contextPath);
+//    }
     
   }
 

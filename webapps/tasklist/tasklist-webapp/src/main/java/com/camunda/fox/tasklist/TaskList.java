@@ -25,10 +25,11 @@ import org.activiti.engine.form.TaskFormData;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.task.Task;
 import org.activiti.engine.task.TaskQuery;
+import org.camunda.bpm.application.ProcessApplicationDeployment;
+import org.camunda.bpm.application.impl.deployment.metadata.ProcessesXmlParser;
 
 import com.camunda.fox.client.impl.ProcessArchiveSupport;
 import com.camunda.fox.platform.api.ProcessArchiveService;
-import com.camunda.fox.platform.spi.ProcessArchive;
 import com.camunda.fox.tasklist.api.TaskListIdentity;
 import com.camunda.fox.tasklist.api.TaskNavigationLink;
 import com.camunda.fox.tasklist.api.TasklistIdentityService;
@@ -173,8 +174,8 @@ public class TaskList implements Serializable {
 
   private String getFormUrl(String processDefinitionId, String formKey, String urlParameters) {
     try {
-      ProcessArchive processArchive = processArchiveService.getProcessArchiveByProcessDefinitionId(processDefinitionId, processEngine.getName());
-      String contextPath = (String) processArchive.getProperties().get(ProcessArchive.PROP_SERVLET_CONTEXT_PATH);
+      ProcessApplicationDeployment processArchive = processArchiveService.getProcessArchiveByProcessDefinitionId(processDefinitionId, processEngine.getName());
+      String contextPath = (String) processArchive.getProperties().get(ProcessesXmlParser.PROP_SERVLET_CONTEXT_PATH);
       String callbackUrl = getRequestURL();
       return "../.." + contextPath + "/" + getTaskFormKeyWithSuffix(formKey) + "?" + urlParameters + "&callbackUrl=" + callbackUrl;
     } catch (Exception ex) {

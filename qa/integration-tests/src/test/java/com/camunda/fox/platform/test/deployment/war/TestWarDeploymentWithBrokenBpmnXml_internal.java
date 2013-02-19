@@ -9,6 +9,7 @@ import javax.inject.Inject;
 import junit.framework.Assert;
 
 import org.activiti.engine.impl.util.IoUtil;
+import org.camunda.bpm.application.impl.deployment.metadata.ProcessesXmlParser;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
@@ -20,7 +21,6 @@ import org.junit.runner.RunWith;
 import com.camunda.fox.client.impl.ProcessArchiveImpl;
 import com.camunda.fox.client.impl.ProcessArchiveSupport;
 import com.camunda.fox.client.impl.schema.ProcessesXml.ProcessArchiveXml;
-import com.camunda.fox.platform.spi.ProcessArchive;
 import com.camunda.fox.platform.test.util.AbstractFoxPlatformIntegrationTest;
 import com.camunda.fox.platform.test.util.DeploymentHelper;
 import com.camunda.fox.platform.test.util.JndiConstants;
@@ -70,8 +70,8 @@ public class TestWarDeploymentWithBrokenBpmnXml_internal extends AbstractFoxPlat
       }
       public Map<String, Object> getProperties() {
         HashMap<String, Object> map = new HashMap<String, Object>();
-        map.put(ProcessArchive.PROP_IS_SCAN_FOR_PROCESS_DEFINITIONS, false);
-        map.put(ProcessArchive.PROP_IS_DELETE_UPON_UNDEPLOY, true);
+        map.put(ProcessesXmlParser.PROP_IS_SCAN_FOR_PROCESS_DEFINITIONS, false);
+        map.put(ProcessesXmlParser.PROP_IS_DELETE_UPON_UNDEPLOY, true);
         return map;
       }
     };    

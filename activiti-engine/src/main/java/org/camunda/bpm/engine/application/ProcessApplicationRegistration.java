@@ -12,8 +12,12 @@
  */
 package org.camunda.bpm.engine.application;
 
+import org.activiti.engine.repository.Deployment;
+
 
 /**
+ * 
+ * 
  * @author Daniel Meyer
  *
  */
@@ -21,8 +25,13 @@ public interface ProcessApplicationRegistration {
   
   /**
    * The process application must call this method in order to unregister with the process engine.
-   * 
    */
   public void unregister();
+  
+  /**
+   * @return the id of the {@link Deployment} for which the registration was created
+   */
+  public String getDeploymentId(); 
+  
   
 }

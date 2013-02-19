@@ -15,9 +15,9 @@ package org.camunda.bpm.application.impl;
 import java.lang.ref.WeakReference;
 
 import org.activiti.engine.ProcessEngine;
+import org.camunda.bpm.application.ProcessApplication;
+import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.application.ProcessApplicationUnavailableException;
-import org.camunda.bpm.application.spi.ProcessApplication;
-import org.camunda.bpm.application.spi.ProcessApplicationReference;
 
 /**
  * <p>A {@link ProcessApplicationReference} implementation using
@@ -62,8 +62,7 @@ public class ProcessApplicationReferenceImpl implements ProcessApplicationRefere
   }
 
   public void processEngineStopping(ProcessEngine processEngine) throws ProcessApplicationUnavailableException {
-    ProcessApplication processApplication = getProcessApplication();
-    processApplication.processEngineStopping(processEngine);
+    // do nothing
   }
 
   public void clear() {

@@ -17,16 +17,25 @@ package com.camunda.fox.platform.subsystem.impl.extension.handler;
 
 import java.util.List;
 
+import org.camunda.bpm.ProcessEngineService;
 import org.jboss.as.controller.AbstractBoottimeAddStepHandler;
 import org.jboss.as.controller.OperationContext;
 import org.jboss.as.controller.OperationFailedException;
 import org.jboss.as.controller.ServiceVerificationHandler;
+import org.jboss.as.server.AbstractDeploymentChainStep;
+import org.jboss.as.server.DeploymentProcessorTarget;
+import org.jboss.as.server.deployment.Phase;
 import org.jboss.dmr.ModelNode;
 import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceController.Mode;
 
+import com.camunda.fox.platform.subsystem.impl.deployment.processor.ModuleDependencyProcessor;
+import com.camunda.fox.platform.subsystem.impl.deployment.processor.ProcessEngineClientProcessor;
+import com.camunda.fox.platform.subsystem.impl.deployment.processor.ProcessEngineDependencyProcessor;
+import com.camunda.fox.platform.subsystem.impl.deployment.processor.ProcessEngineDeploymentProcessor;
+import com.camunda.fox.platform.subsystem.impl.deployment.processor.ProcessesXmlProcessor;
 import com.camunda.fox.platform.subsystem.impl.extension.ModelConstants;
-import com.camunda.fox.platform.subsystem.impl.service.ContainerPlatformService;
+import com.camunda.fox.platform.subsystem.impl.service.ContainerProcessEngineService;
 
 /**
  * Provides the description and the implementation of the subsystem#add operation.
@@ -51,10 +60,22 @@ public class FoxPlatformSubsystemAdd extends AbstractBoottimeAddStepHandler {
   protected void performBoottime(OperationContext context, ModelNode operation, ModelNode model, ServiceVerificationHandler verificationHandler,
           List<ServiceController< ? >> newControllers) throws OperationFailedException {
     
-    final ContainerPlatformService containerPlatformService = new ContainerPlatformService();
+    // add deployment processors
+    context.addStep(new AbstractDeploymentChainStep() {
+      public void execute(DeploymentProcessorTarget processorTarget) {
+        processorTarget.addDeploymentProcessor(ModelConstants.SUBSYSTEM_NAME, Phase.PARSE, ProcessesXmlProcessor.PRIORITY, new ProcessesXmlProcessor());
+        processorTarget.addDeploymentProcessor(ModelConstants.SUBSYSTEM_NAME, Phase.PARSE, ProcessEngineClientProcessor.PRIORITY, new ProcessEngineClientProcessor());
+        processorTarget.addDeploymentProcessor(ModelConstants.SUBSYSTEM_NAME, Phase.DEPENDENCIES, ModuleDependencyProcessor.PRIORITY, new ModuleDependencyProcessor());
+        processorTarget.addDeploymentProcessor(ModelConstants.SUBSYSTEM_NAME, Phase.DEPENDENCIES, ProcessEngineDependencyProcessor.PRIORITY, new ProcessEngineDependencyProcessor());
+        processorTarget.addDeploymentProcessor(ModelConstants.SUBSYSTEM_NAME, Phase.INSTALL, ProcessEngineDeploymentProcessor.PRIORITY, new ProcessEngineDeploymentProcessor());
+      }
+    }, OperationContext.Stage.RUNTIME);
+
+    // create and register DefaultProcessEngineService
+    final ContainerProcessEngineService processEngineService = new ContainerProcessEngineService();
     
-    final ServiceController<ContainerPlatformService> controller = context.getServiceTarget()           
-            .addService(ContainerPlatformService.getServiceName(), containerPlatformService)
+    final ServiceController<ProcessEngineService> controller = context.getServiceTarget()           
+            .addService(ContainerProcessEngineService.getServiceName(), processEngineService)
             .addListener(verificationHandler)
             .setInitialMode(Mode.ACTIVE)
             .install();

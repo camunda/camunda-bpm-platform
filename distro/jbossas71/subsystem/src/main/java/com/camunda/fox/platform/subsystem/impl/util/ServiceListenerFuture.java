@@ -27,7 +27,7 @@ import org.jboss.msc.service.ServiceController.Substate;
 import org.jboss.msc.service.ServiceController.Transition;
 
 /**
- * <p>A future implementation backed by a {@link ServiceListener}</p>
+ * <p>A {@link Future} implementation backed by a {@link ServiceListener}</p>
  * 
  * @author Daniel Meyer
  * 

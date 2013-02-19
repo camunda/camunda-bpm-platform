@@ -19,7 +19,8 @@ import org.activiti.engine.management.TableMetaData;
 import org.activiti.engine.management.TablePage;
 import org.activiti.engine.management.TablePageQuery;
 import org.activiti.engine.runtime.JobQuery;
-import org.activiti.engine.task.Task;
+import org.camunda.bpm.application.ProcessApplicationReference;
+import org.camunda.bpm.engine.application.ProcessApplicationRegistration;
 
 
 
@@ -34,6 +35,23 @@ import org.activiti.engine.task.Task;
  * @author Falko Menge
  */
 public interface ManagementService {
+  
+  /**
+   * Activate a deployment for a given ProcessApplicaiton. The effect of this
+   * method is twofold:
+   * <ol>
+   * <li>The process engine will execute atomic operations within the context of
+   * that ProcessApplication</li>
+   * <li>The job executor will start acquiring jobs from that deployment</li>
+   * </ol>
+   * 
+   * @param deploymentId
+   *          the Id of the deployment to activate
+   * @param reference
+   *          the reference to the process application
+   * @return a new {@link ProcessApplicationRegistration}
+   */
+  ProcessApplicationRegistration activateDeploymentForApplication(String deploymentId, ProcessApplicationReference reference);
 
   /**
    * Get the mapping containing {table name, row count} entries of the

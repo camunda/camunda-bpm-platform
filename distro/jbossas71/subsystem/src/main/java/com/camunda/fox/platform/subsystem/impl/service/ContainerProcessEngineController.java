@@ -15,9 +15,12 @@
  */
 package com.camunda.fox.platform.subsystem.impl.service;
 
+import java.util.Map;
+
 import javax.sql.DataSource;
 import javax.transaction.TransactionManager;
 
+import org.activiti.engine.impl.jobexecutor.JobExecutor;
 import org.jboss.as.connector.subsystems.datasources.DataSourceReferenceFactoryService;
 import org.jboss.as.naming.deployment.ContextNames;
 import org.jboss.msc.inject.Injector;
@@ -32,6 +35,7 @@ import org.jboss.msc.value.InjectedValue;
 
 import com.camunda.fox.platform.impl.configuration.JtaCmpeProcessEngineConfiguration;
 import com.camunda.fox.platform.impl.service.ProcessEngineController;
+import com.camunda.fox.platform.impl.util.PropertyHelper;
 import com.camunda.fox.platform.spi.ProcessEngineConfiguration;
 import com.camunda.fox.platform.subsystem.impl.util.Tccl;
 import com.camunda.fox.platform.subsystem.impl.util.Tccl.Operation;
@@ -39,13 +43,13 @@ import com.camunda.fox.platform.subsystem.impl.util.Tccl.Operation;
 /**
  * @author Daniel Meyer
  */
-public class ContainerProcessEngineController extends ProcessEngineController implements Service<ContainerProcessEngineController> {
+public class ContainerProcessEngineController implements Service<ContainerProcessEngineController> {
     
   // Injecting these values makes the MSC aware of our dependencies on these resources.
   // This ensures that they are available when this service is started
   private final InjectedValue<TransactionManager> transactionManagerInjector = new InjectedValue<TransactionManager>();
   private final InjectedValue<DataSourceReferenceFactoryService> datasourceBinderServiceInjector = new InjectedValue<DataSourceReferenceFactoryService>();
-  private final InjectedValue<ContainerPlatformService> containerPlatformServiceInjector = new InjectedValue<ContainerPlatformService>();
+  private final InjectedValue<ContainerProcessEngineService> containerPlatformServiceInjector = new InjectedValue<ContainerProcessEngineService>();
   private final InjectedValue<ContainerJobExecutorService> containerJobExecutorInjector = new InjectedValue<ContainerJobExecutorService>();
   
   public ContainerProcessEngineController(ProcessEngineConfiguration processEngineConfiguration) {
@@ -65,10 +69,7 @@ public class ContainerProcessEngineController extends ProcessEngineController im
   }
   
   public void start(StartContext context) throws StartException {
-    
-    processEngineRegistry = containerPlatformServiceInjector.getValue().getProcessEngineRegistry();
-    processEngineRegistry.startInstallingNewProcessEngine(processEngineUserConfiguration);
-    
+        
     // setting the TCCL to the Classloader of this module.
     // this exploits a hack in MyBatis allowing it to use the TCCL to load the 
     // mapping files from the process engine module
@@ -78,8 +79,12 @@ public class ContainerProcessEngineController extends ProcessEngineController im
         return null;
       }
     }, ContainerProcessEngineController.class.getClassLoader());   
+    
+    setJobExecutorDelegate();
+    
+    containerPlatformServiceInjector.getValue().registerProcessEngine(getProcessEngine());
   }
-  
+
   protected void initProcessEngineConfiguration() {
     super.initProcessEngineConfiguration();
     JtaCmpeProcessEngineConfiguration processEngineConfiguration = (JtaCmpeProcessEngineConfiguration) this.processEngineConfiguration;
@@ -91,7 +96,9 @@ public class ContainerProcessEngineController extends ProcessEngineController im
 
   @Override
   public void stop(StopContext context) {
+    containerPlatformServiceInjector.getValue().removeProcessEngine(getProcessEngine());
     super.stop();
+    releaseJobExecutorDelegate();
   }
 
   public Injector<TransactionManager> getTransactionManagerInjector() {
@@ -102,7 +109,7 @@ public class ContainerProcessEngineController extends ProcessEngineController im
     return datasourceBinderServiceInjector;
   }
     
-  public InjectedValue<ContainerPlatformService> getContainerPlatformServiceInjector() {
+  public InjectedValue<ContainerProcessEngineService> getContainerPlatformServiceInjector() {
     return containerPlatformServiceInjector;
   }
   
@@ -116,19 +123,45 @@ public class ContainerProcessEngineController extends ProcessEngineController im
     ContextNames.BindInfo datasourceBindInfo = ContextNames.bindInfoFor(processEngineConfiguration.getDatasourceJndiName());
     serviceBuilder.addDependency(ServiceName.JBOSS.append("txn").append("TransactionManager"), TransactionManager.class, service.getTransactionManagerInjector())
             .addDependency(datasourceBindInfo.getBinderServiceName(), DataSourceReferenceFactoryService.class, service.getDatasourceBinderServiceInjector())
-            .addDependency(ContainerPlatformService.getServiceName(), ContainerPlatformService.class, service.getContainerPlatformServiceInjector())
+            .addDependency(ContainerProcessEngineService.getServiceName(), ContainerProcessEngineService.class, service.getContainerPlatformServiceInjector())
             .addDependency(ContainerJobExecutorService.getServiceName(), ContainerJobExecutorService.class, service.getContainerJobExecutorInjector())            
             .setInitialMode(Mode.ACTIVE);
     
     if(processEngineConfiguration.isDefault()) {
       
       // add a constant alias name for the default process engine: this allows as to set
-      // a declarative dependency to the default process engine servcie when registering
-      // process archive services whithout knowing the name of the default
-      // engine. It can be a constant since there can be only one default engine.
+      // a declarative dependency to the default process engine service without knowing 
+      // the name of the default engine. It can be a constant since there can be only 
+      // one default engine.
       serviceBuilder.addAliases(createServiceNameForDefaultEngine());
       
     }
+  }
+
+  protected void setJobExecutorDelegate() {
+
+    Map<String, Object> configProperties = processEngineUserConfiguration.getProperties();
+    String jobAcquisitionName = PropertyHelper.getProperty(configProperties, ProcessEngineConfiguration.PROP_JOB_EXECUTOR_ACQUISITION_NAME, null);
+    
+    if (jobAcquisitionName != null) {
+      // register the process engine
+      JobExecutor jobExecutorDelegate = containerJobExecutorInjector.getValue().registerProcessEngine(processEngineConfiguration, jobAcquisitionName);
+      processEngineConfiguration.setJobExecutor(jobExecutorDelegate);
+    }
+
+  }
+  
+  protected void releaseJobExecutorDelegate() {
+
+    Map<String, Object> configProperties = processEngineUserConfiguration.getProperties();
+    String jobAcquisitionName = PropertyHelper.getProperty(configProperties, ProcessEngineConfiguration.PROP_JOB_EXECUTOR_ACQUISITION_NAME, null);
+    
+    if (jobAcquisitionName != null) {
+      // register the process engine
+      containerJobExecutorInjector.getValue().unregisterProcessEngine(processEngineConfiguration, jobAcquisitionName);
+      processEngineConfiguration.setJobExecutor(null);
+    }
+
   }
   
 }

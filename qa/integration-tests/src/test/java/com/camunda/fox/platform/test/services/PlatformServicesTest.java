@@ -20,6 +20,7 @@ import java.util.concurrent.Future;
 import junit.framework.Assert;
 
 import org.activiti.engine.impl.ProcessEngineImpl;
+import org.camunda.bpm.ProcessEngineService.ProcessEngineStartOperation;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
@@ -28,7 +29,6 @@ import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import com.camunda.fox.platform.api.ProcessEngineService.ProcessEngineStartOperation;
 import com.camunda.fox.platform.test.services.util.ProcessEngineConfigurationImpl;
 import com.camunda.fox.platform.test.util.AbstractFoxPlatformIntegrationTest;
 
@@ -54,7 +54,7 @@ public class PlatformServicesTest extends AbstractFoxPlatformIntegrationTest {
     String dataSourceJndiName = defaultEngineConfig.getDataSourceJndiName();
     
     ProcessEngineConfigurationImpl configurationImpl = new ProcessEngineConfigurationImpl(false, "testEngine1", dataSourceJndiName, "full", true, false);
-    Future<ProcessEngineStartOperation> startProcessEngine = processEngineService.startProcessEngine(configurationImpl);
+    Future<ProcessEngineStartOperation> startProcessEngine = processEngineService.registerProcessEngine(configurationImpl);
     ProcessEngineStartOperation processEngineStartOperation = startProcessEngine.get();
     
     Assert.assertEquals(2, processEngineService.getProcessEngines().size());

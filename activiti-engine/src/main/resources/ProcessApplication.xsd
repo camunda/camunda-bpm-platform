@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xsd:schema version="1.0" 
+  targetNamespace="http://www.camunda.org/schema/1.0/ProcessApplication" 
+  xmlns:tns="http://www.camunda.org/schema/1.0/ProcessApplication"
+  xmlns:xsd="http://www.w3.org/2001/XMLSchema" 
+  elementFormDefault="qualified" 
+  attributeFormDefault="unqualified">
+
+  <xsd:element name="process-application">
+    <xsd:complexType>
+      <xsd:sequence>
+
+        <xsd:element name="process-engine" minOccurs="0" maxOccurs="unbounded">
+
+          <xsd:complexType>
+            <xsd:sequence>
+              <xsd:element name="configuration" type="xsd:string" minOccurs="0" maxOccurs="1" />
+              <xsd:element name="datasource" type="xsd:string" minOccurs="0" maxOccurs="1"/>
+              <xsd:element name="properties" type="tns:Properties" minOccurs="0" maxOccurs="1" />
+            </xsd:sequence>
+            
+            <xsd:attribute name="name" type="xsd:string" use="required" />
+
+          </xsd:complexType>
+
+        </xsd:element>
+
+        <xsd:element name="process-archive" minOccurs="0" maxOccurs="unbounded">
+
+          <xsd:complexType>
+            <xsd:sequence>
+              <xsd:element name="process-engine" type="xsd:string" minOccurs="0" />
+              <xsd:element name="process" type="xsd:string" minOccurs="0" maxOccurs="unbounded" />
+              <xsd:element name="properties" type="tns:Properties" minOccurs="0" maxOccurs="1" />
+            </xsd:sequence>
+            <xsd:attribute name="name" type="xsd:string" use="required" />
+          </xsd:complexType>
+
+        </xsd:element>
+      </xsd:sequence>
+
+    </xsd:complexType>
+  </xsd:element>
+
+
+  <xsd:complexType name="Properties">
+    <xsd:sequence>
+      <xsd:element name="property" type="tns:Property" minOccurs="0" maxOccurs="unbounded" />
+    </xsd:sequence>
+  </xsd:complexType>
+
+  <xsd:complexType name="Property">
+    <xsd:simpleContent>
+      <xsd:extension base="xsd:string">
+        <xsd:attribute name="name" type="xsd:string" use="required" />
+      </xsd:extension>
+    </xsd:simpleContent>
+  </xsd:complexType>
+
+</xsd:schema>
