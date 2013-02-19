@@ -3,14 +3,20 @@
 
 
 // base path, that will be used to resolve files and exclude
-basePath = '../../../';
+basePath = '.';
 
 
 // list of files / patterns to load in the browser
 files = [
   JASMINE,
   JASMINE_ADAPTER,
-  'test/*/*js',
+  ANGULAR_SCENARIO,
+  ANGULAR_SCENARIO_ADAPTER,
+  '../../main/webapp/assets/js/lib/jquery*js',
+  '../../main/webapp/assets/js/lib/angular/angular.js',
+  '../../main/webapp/assets/js/lib/angular/angular-resource.js',
+  '../../main/webapp/common/**/*js',
+  '../../main/webapp/app/**/*js',
   'src/*js',
   'lib/*js',
 ];
