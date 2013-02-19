@@ -7,6 +7,8 @@ import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.ProcessEngineConfiguration;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
+import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.activiti.engine.impl.persistence.StrongUuidGenerator;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.rest.impl.ProcessDefinitionServiceImpl;
 import org.camunda.bpm.engine.rest.impl.ProcessInstanceServiceImpl;
@@ -35,7 +37,11 @@ public class DevEnvironmentSetup implements ProcessEngineProvider {
   }
   
   protected static void createProcessEngine() {
-    processEngine = ProcessEngineConfiguration.createStandaloneInMemProcessEngineConfiguration().buildProcessEngine();
+    ProcessEngineConfiguration processEngineConfiguration = 
+        ProcessEngineConfiguration.createStandaloneInMemProcessEngineConfiguration();
+    // use UUIDs
+    ((ProcessEngineConfigurationImpl)processEngineConfiguration).setIdGenerator(new StrongUuidGenerator());
+    processEngine = processEngineConfiguration.buildProcessEngine();
   }
 
 
@@ -45,6 +51,7 @@ public class DevEnvironmentSetup implements ProcessEngineProvider {
     repositoryService
       .createDeployment()
       .addClasspathResource("processes/fox-invoice_en.bpmn")
+      .addClasspathResource("processes/fox-invoice_en_long_id.bpmn")
       .deploy();
     
     RuntimeService runtimeService = processEngine.getRuntimeService();

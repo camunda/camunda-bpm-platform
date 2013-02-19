@@ -25,6 +25,12 @@
       <artifactId>fox-engine</artifactId>
       <scope>test</scope>
     </dependency>
+    
+    <dependency>
+      <groupId>com.fasterxml.uuid</groupId>
+      <artifactId>java-uuid-generator</artifactId>
+      <scope>test</scope>
+    </dependency>
 
     <dependency>
       <groupId>com.camunda.fox.platform</groupId>
