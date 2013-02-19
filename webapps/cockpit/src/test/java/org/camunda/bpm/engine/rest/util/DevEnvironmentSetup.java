@@ -1,9 +1,13 @@
 package org.camunda.bpm.engine.rest.util;
 
 import java.io.File;
+import java.util.List;
 
 import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.ProcessEngineConfiguration;
+import org.activiti.engine.RepositoryService;
+import org.activiti.engine.RuntimeService;
+import org.activiti.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.rest.impl.ProcessDefinitionServiceImpl;
 import org.camunda.bpm.engine.rest.impl.ProcessInstanceServiceImpl;
 import org.camunda.bpm.engine.rest.impl.TaskRestServiceImpl;
@@ -21,6 +25,7 @@ import org.jboss.resteasy.plugins.server.tjws.TJWSEmbeddedJaxrsServer;
  */
 public class DevEnvironmentSetup implements ProcessEngineProvider {
 
+  private static final int numOfProcessesPerDefinition = 10;
   private static ProcessEngine processEngine;
 
   public static void main(String[] args) {
@@ -35,7 +40,20 @@ public class DevEnvironmentSetup implements ProcessEngineProvider {
 
 
   private static void createDemoData() {
-   // TODO
+    RepositoryService repositoryService = processEngine.getRepositoryService();
+    
+    repositoryService
+      .createDeployment()
+      .addClasspathResource("processes/fox-invoice_en.bpmn")
+      .deploy();
+    
+    RuntimeService runtimeService = processEngine.getRuntimeService();
+    List<ProcessDefinition> pds = repositoryService.createProcessDefinitionQuery().list();
+    for (ProcessDefinition pd : pds) {
+      for (int i = 0; i < numOfProcessesPerDefinition; i++) {
+        runtimeService.startProcessInstanceById(pd.getId());
+      }
+    }
   }
 
   private static void startEmbeddedHttpServer() {
