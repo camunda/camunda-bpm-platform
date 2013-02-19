@@ -1,1 +1,61 @@
-Hallo Welt
+<!DOCTYPE html>
+<html lang="en" data-ng-app="cockpit">
+  <head>
+    <title>camunda BPM - cockpit</title>
+    
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- 
+    <meta name="description" content="" />
+    -->
+    <meta name="author" content="camunda services GmbH" />
+
+    <!-- settings the base path for relative links -->
+    <base href="." app-base="/cockpit" />
+
+    <!-- Styles -->
+    <link href="assets/lib/bootstrap/css/bootstrap.css" rel="stylesheet" />
+    <link href="assets/css/app.css" rel="stylesheet" />
+    
+    <!-- For IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    
+    <!-- Favicon -->
+    <link rel="shortcut icon" type="image/x-icon" href="assets/img/favicon.ico" />
+  </head>
+  <body ng-controller="DefaultController">
+
+    <div class="wrapper">
+      <div class="container-fluid content-container content-inset">
+        <div class="row-fluid content-container">
+          <!-- actual view body is rendered here whenever the url changes -->
+          <div data-ng-view class="span9">
+          </div>
+        </div>
+      </div>
+      <div class="push-down"><!-- // --></div>
+    </div>
+
+      <!-- footer -->
+    <footer class="content-container">
+      <div class="container-fluid">
+        <p><a href="views/app/index.html">camunda BPM - cockpit</a> / version ${project.version}</p>
+      </div>
+
+      <script src="assets/js/lib/jquery-1.7.2.min.js"></script>
+      <script src="assets/lib/bootstrap/js/bootstrap.js"></script>
+      <script src="assets/js/lib/angular/angular.js"></script>
+      <script src="assets/js/lib/angular/angular-resource.js"></script>
+
+      <script src="assets/js/app/extensions.js"></script>
+      <script src="assets/js/app/directives.js"></script>
+      <script src="app/app.js"></script>
+      <script src="assets/js/app/filters.js"></script>
+      <script src="assets/js/app/services.js"></script>
+      <script src="assets/js/app/customRouteProvider.js"></script>
+      <script src="app/dashboard/dashboard.js"></script>
+    </footer>
+  </body>
+</html>
