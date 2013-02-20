@@ -15,138 +15,82 @@ package org.camunda.bpm.container.impl.tomcat;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.naming.Context;
-import javax.naming.NamingException;
-
 import org.activiti.engine.ProcessEngine;
-import org.activiti.engine.ProcessEngineConfiguration;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.core.StandardServer;
-import org.camunda.bpm.BpmPlatform;
 import org.camunda.bpm.container.impl.RuntimeContainerConfiguration;
-
-import com.camunda.fox.platform.jobexecutor.impl.DefaultPlatformJobExecutor;
+import org.camunda.bpm.container.impl.jmx.JmxRuntimeContainerDelegate;
+import org.camunda.bpm.container.impl.jmx.deployment.PlatformXmlStartProcessEnginesStep;
+import org.camunda.bpm.container.impl.jmx.deployment.StopProcessApplicationsStep;
+import org.camunda.bpm.container.impl.jmx.deployment.StopProcessEnginesStep;
+import org.camunda.bpm.container.impl.tomcat.deployment.TomcatAttachments;
+import org.camunda.bpm.container.impl.tomcat.deployment.TomcatCreateJndiBindingsStep;
+import org.camunda.bpm.container.impl.tomcat.deployment.TomcatParseBpmPlatformXmlStep;
 
 /**
- * Apache tomcat server listener responsible for starting and stopping configured process engines 
- * upon starting and stopping of the servlet container. 
+ * <p>Apache Tomcat server listener responsible for starting and stopping configured process engines 
+ * upon starting and stopping of the servlet container.</p> 
  * 
  * @author Daniel Meyer
  *
  */
 public class CamundaEngineServerListener implements LifecycleListener {
   
-  private final static Logger log = Logger.getLogger(CamundaEngineServerListener.class.getName());
+  private final static Logger LOGGER = Logger.getLogger(CamundaEngineServerListener.class.getName());
   
-  protected DefaultPlatformJobExecutor platformJobExecutorService;
   protected RuntimeContainerConfiguration runtimeContainerConfiguration;
 
   protected ProcessEngine processEngine;
+
+  protected JmxRuntimeContainerDelegate containerDelegate;
     
   public void lifecycleEvent(LifecycleEvent event) {
 
     if (Lifecycle.START_EVENT.equals(event.getType())) {
-
-      runtimeContainerConfiguration = RuntimeContainerConfiguration.getINSTANCE();
       
-      startPlatformJobexecutorService(event);
-      startProcessEngineService(event);
+      runtimeContainerConfiguration = RuntimeContainerConfiguration.getINSTANCE();
+      containerDelegate = (JmxRuntimeContainerDelegate) runtimeContainerConfiguration.getContainerDelegate();
+      
+      deployBpmPlatform(event);
       
     } else if (Lifecycle.STOP_EVENT.equals(event.getType())) {
       
-      processEngine.close();
+      undeployBpmPlatform(event);
       
     }
    
   }
 
-  protected void startPlatformJobexecutorService(LifecycleEvent event) {
+  protected void deployBpmPlatform(LifecycleEvent event) {
     
-    platformJobExecutorService = new DefaultPlatformJobExecutor();
-    platformJobExecutorService.start();
+    final StandardServer server = (StandardServer) event.getSource();   
     
-    bindContainerJobexecutorService(event);
+    containerDelegate.getServiceContainer().createDeploymentOperation("deploy BPM platform")
+      .addAttachment(TomcatAttachments.SERVER, server)
+      .addStep(new TomcatParseBpmPlatformXmlStep())
+      .addStep(new PlatformXmlStartProcessEnginesStep())
+      .addStep(new TomcatCreateJndiBindingsStep())      
+      .execute();
     
-  }
-  
-  protected void startProcessEngineService(LifecycleEvent event) {
-    
-    StandardServer server = (StandardServer) event.getSource();    
-    runtimeContainerConfiguration.setRuntimeContainerName(server.getServerInfo());
-    log.info("camunda BPM platform running in container "+runtimeContainerConfiguration.getRuntimeContainerName());
-        
-    // create JNDI bindings
-    bindProcessEngineService(event);
-    
-    // start in-memory process engine:
-    processEngine = ProcessEngineConfiguration.createStandaloneInMemProcessEngineConfiguration().buildProcessEngine();
+    LOGGER.log(Level.INFO, "camunda BPM platform" + " sucessfully started on "+server.getServerInfo()+".");
     
   }
   
-  protected void bindContainerJobexecutorService(LifecycleEvent event) {
-    
-    final String jobExecutorBeanName = "PlatformJobExecutorBean!com.camunda.fox.platform.jobexecutor.api.JobExecutorService";
-    
-    try {      
-      
-      StandardServer server = (StandardServer) event.getSource();
-      Context bindingContext = server.getGlobalNamingContext();
-      
-      // lookup the context
-      bindingContext = getOrCreateSubContext(bindingContext, "global");
-      bindingContext = getOrCreateSubContext(bindingContext, "camunda-fox-platform");
-      bindingContext = getOrCreateSubContext(bindingContext, "job-executor");           
-            
-      // bind the jobexecutor service 
-      bindingContext.bind(jobExecutorBeanName, platformJobExecutorService);
-            
-    } catch (NamingException e) {
-      log.log(Level.SEVERE, "Unable to bind platform job executor service in global naming context.", e);
-      
-    }    
-    
-  }
-  
-  protected void bindProcessEngineService(LifecycleEvent event) {
-    
-    final String processEngineServiceName = "DefaultProcessEngineService!com.camunda.fox.platform.api.ProcessEngineService";   
-        
-    try {      
-      
-      StandardServer server = (StandardServer) event.getSource();
-      Context bindingContext = server.getGlobalNamingContext();
-      
-      // lookup the context
-      bindingContext = getOrCreateSubContext(bindingContext, "global");
-      bindingContext = getOrCreateSubContext(bindingContext, "camunda-fox-platform");
-      bindingContext = getOrCreateSubContext(bindingContext, "process-engine");           
-            
-      // bind the services 
-      bindingContext.bind(processEngineServiceName, BpmPlatform.getProcessEngineService());
-      
-      log.info("the legacy bindings for the fox platform services are as follows: \n\n"
-          + "        java:global/camunda-fox-platform/process-engine/"
-          + processEngineServiceName + "\n");
-      
-    } catch (NamingException e) {
-      log.log(Level.SEVERE, "Unable to bind platform services in global naming context.", e);
-      
-    }
-    
-  }
 
-  protected Context getOrCreateSubContext(Context rootNamingContext, String name) throws NamingException {
-    Context context;
-    try {
-      // check whether the context already exists
-      context = (Context) rootNamingContext.lookup(name);
-    } catch (NamingException e) {
-      // this means that the context does not exist
-      context = rootNamingContext.createSubcontext(name);        
-    }
-    return context;
+  protected void undeployBpmPlatform(LifecycleEvent event) {
+    
+    final StandardServer server = (StandardServer) event.getSource();   
+    
+    containerDelegate.getServiceContainer().createUndeploymentOperation("undeploy BPM platform")
+      .addAttachment(TomcatAttachments.SERVER, server)
+      .addStep(new StopProcessApplicationsStep())
+      .addStep(new StopProcessEnginesStep())
+      .execute();
+    
+    LOGGER.log(Level.INFO, "camunda BPM platform stopped.");
+    
   }
 
 }

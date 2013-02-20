@@ -37,14 +37,26 @@ public class StartProcessEngineStep extends MBeanDeploymentOperationStep {
 
   public void performOperationStep(MBeanDeploymentOperation operationContext) {
     
-    final ProcessApplication processApplication = operationContext.getAttachment(PROCESS_APPLICATION);    
-    final ClassLoader processApplicationClassloader = processApplication.getProcessApplicationClassloader();
+    final ProcessApplication processApplication = operationContext.getAttachment(PROCESS_APPLICATION);
+    
+    ClassLoader configurationClassloader = null;
+    
+    if(processApplication != null) {
+      configurationClassloader = processApplication.getProcessApplicationClassloader();
+      
+    } else {
+      configurationClassloader = ProcessEngineConfiguration.class.getClassLoader();
+      
+    }
     
     String processEngineConfigurationClassName = parsedProcessEngine.getConfigurationClass();
     
     // create & instantiate configuration class    
-    Class<? extends ProcessEngineConfiguration> configurationClass = loadProcessEngineConfigurationClass(processApplicationClassloader, processEngineConfigurationClassName);
+    Class<? extends ProcessEngineConfiguration> configurationClass = loadProcessEngineConfigurationClass(configurationClassloader, processEngineConfigurationClassName);
     ProcessEngineConfiguration configuration = instantiateConfiguration(configurationClass);
+    
+    // engine started through the container infrastructure are always container-managed
+    configuration.setContainerManaged(true);
     
     // set configuration values
     String name = parsedProcessEngine.getName();
@@ -53,7 +65,7 @@ public class StartProcessEngineStep extends MBeanDeploymentOperationStep {
     String datasourceJndiName = parsedProcessEngine.getDatasource();
     configuration.setDataSourceJndiName(datasourceJndiName);
     
-     Map<String, String> properties = parsedProcessEngine.getProperties();
+    Map<String, String> properties = parsedProcessEngine.getProperties();
     for (Entry<String, String> property : properties.entrySet()) {
       
       Method setter = ReflectUtil.getSetter(property.getKey(), configurationClass, String.class);

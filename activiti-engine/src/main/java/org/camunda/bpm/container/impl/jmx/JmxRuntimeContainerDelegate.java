@@ -28,10 +28,10 @@ import org.camunda.bpm.application.ProcessApplication;
 import org.camunda.bpm.container.impl.jmx.deployment.Attachments;
 import org.camunda.bpm.container.impl.jmx.deployment.DeployProcessArchivesStep;
 import org.camunda.bpm.container.impl.jmx.deployment.ParseProcessesXmlStep;
+import org.camunda.bpm.container.impl.jmx.deployment.ProcessesXmlStartProcessEnginesStep;
+import org.camunda.bpm.container.impl.jmx.deployment.ProcessesXmlStopProcessEnginesStep;
 import org.camunda.bpm.container.impl.jmx.deployment.StartProcessApplicationServiceStep;
-import org.camunda.bpm.container.impl.jmx.deployment.StartProcessEnginesStep;
 import org.camunda.bpm.container.impl.jmx.deployment.StopProcessApplicationServiceStep;
-import org.camunda.bpm.container.impl.jmx.deployment.StopProcessEnginesStep;
 import org.camunda.bpm.container.impl.jmx.deployment.UndeployProcessArchivesStep;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanServiceContainer;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanServiceContainer.ServiceType;
@@ -135,25 +135,39 @@ public class JmxRuntimeContainerDelegate implements RuntimeContainerDelegate, Pr
 
   public void deployProcessApplication(ProcessApplication processApplication) {
     
+    if(processApplication == null) {
+      throw new ActivitiException("Process application cannot be null");
+    }
+    
     final String operationName = "Deployment of Process Application "+processApplication.getName();
     
     serviceContainer.createDeploymentOperation(operationName)
       .addAttachment(Attachments.PROCESS_APPLICATION, processApplication)
       .addStep(new ParseProcessesXmlStep())
-      .addStep(new StartProcessEnginesStep())
+      .addStep(new ProcessesXmlStartProcessEnginesStep())
       .addStep(new DeployProcessArchivesStep())
       .addStep(new StartProcessApplicationServiceStep())
       .execute();
-    	  
+    
   }
 
   public void undeployProcessApplication(ProcessApplication processApplication) {
+
+    if(processApplication == null) {
+      throw new ActivitiException("Process application cannot be null");
+    }
+    
+    // if the process application is not deployed, ignore the request.
+    if(serviceContainer.getService(ServiceTypes.PROCESS_APPLICATION, processApplication.getName()) == null) {
+      return;
+    }
     
     final String operationName = "Undeployment of Process Application "+processApplication.getName();
     
+    // perform the undeployment
     serviceContainer.createUndeploymentOperation(operationName)
       .addAttachment(Attachments.PROCESS_APPLICATION, processApplication)
-      .addStep(new StopProcessEnginesStep())
+      .addStep(new ProcessesXmlStopProcessEnginesStep())
       .addStep(new UndeployProcessArchivesStep())
       .addStep(new StopProcessApplicationServiceStep())
       .execute();
@@ -203,6 +217,12 @@ public class JmxRuntimeContainerDelegate implements RuntimeContainerDelegate, Pr
 
   public List<JobExecutor> getJobAcquisitions() {
     return serviceContainer.getServiceValuesByType(ServiceTypes.JOB_ACQUISITION);
+  }
+  
+  // Getter / Setter ////////////////////////////////////////////////////////////
+  
+  public MBeanServiceContainer getServiceContainer() {
+    return serviceContainer;
   }
 
  

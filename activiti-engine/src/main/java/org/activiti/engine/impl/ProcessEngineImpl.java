@@ -86,10 +86,12 @@ public class ProcessEngineImpl implements ProcessEngine {
     // register with deprecated ProcessEngines class
     ProcessEngines.registerProcessEngine(this);
     
-    // register with runtime container integration subsystem
-    RuntimeContainerConfiguration.getINSTANCE()
-      .getContainerDelegate()
-      .registerProcessEngine(this);
+    if(processEngineConfiguration.isContainerManaged()) {
+      // register with runtime container integration subsystem
+      RuntimeContainerConfiguration.getINSTANCE()
+        .getContainerDelegate()
+        .registerProcessEngine(this);
+    }
 
     if ((jobExecutor != null) && (jobExecutor.isAutoActivate())) {
       jobExecutor.start();
@@ -98,10 +100,12 @@ public class ProcessEngineImpl implements ProcessEngine {
   
   public void close() {
     
-    // un-register with runtime container integration subsystem
-    RuntimeContainerConfiguration.getINSTANCE()
-      .getContainerDelegate()
-      .unregisterProcessEngine(this);
+    if(processEngineConfiguration.isContainerManaged()) {
+      // un-register with runtime container integration subsystem
+      RuntimeContainerConfiguration.getINSTANCE()
+        .getContainerDelegate()
+        .unregisterProcessEngine(this);
+    }
     
     // unregister with deprecated ProcessEngines class  
     ProcessEngines.unregister(this);

@@ -50,6 +50,11 @@
       <source>src/conf/server.xml</source>
       <outputDirectory>server/apache-tomcat-${tomcat6.version}/conf/</outputDirectory>      
     </file>
+    
+    <file>
+      <source>src/conf/bpm-platform.xml</source>
+      <outputDirectory>server/apache-tomcat-${tomcat6.version}/conf/</outputDirectory>      
+    </file>
       
     <file>
       <source>src/tomcat6/setenv.bat</source>
