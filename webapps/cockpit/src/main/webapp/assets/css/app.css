@@ -99,7 +99,7 @@ html, body {
 }
 
 .content-inset {
-  padding-top: 60px;
+  padding-top: 50px;
 }
 
 /**
@@ -135,7 +135,7 @@ footer {
    display: block;
    float: left;
    
-   background: no-repeat url('../img/cycle-logo.png');
+   background: no-repeat url('../img/cockpit-logo.png');
    width: 130px;
    height: 39px;
    padding: 0;
@@ -187,131 +187,8 @@ li.actions .btn:last-child {
   margin-right: 0px;
 }
 
-/**
- * roundtrip view
- */
-.bpmn-model, .bpmn-model * {
-  border: none 1px #DDD;
-}
-
-.bpmn-model.error, .bpmn-model.error * {
-  border-color: #D9564B;
-}
-
-.bpmn-model {
-  padding: 0px;
-  border-style: solid;
-}
-
-.bpmn-model .sync-status-refresh {
-  vertical-align: top;
-  line-height: 40px;
-  padding: 0px 15px;
-  border-style: none;
-  border-radius: 0 3px 0 0;
-}
-
-.bpmn-model h3 {
-  text-align: center;
-  line-height: 40px;
-  background: #DDD;
-  margin: 0px;
-  
-  border-top-left-radius: 3px;
-  border-top-right-radius: 3px;
-  border-bottom-style: solid;
-}
-
-/*.bpmn-model:hover h3 {
-  background: #BBB;
-}*/
-
-.bpmn-model .holder {
-  text-align: center;
-  position: relative;
-  padding: 4px;
-}
-
-.bpmn-model .centered {
-  margin-top: 50px;
-  padding: 20px;
-  font-size: 2em;
-}
-
-.bpmn-model .info {
-  line-height: 30px;
-  height: 30px;
-  padding-left: 10px;
-  border-top-style: solid;
-}
-
-.bpmn-model .filename {
-  
-}
-
-.bpmn-model .info .filename {
-  line-height: 20px;
-}
-
-.bpmn-model .info .status {
-  line-height: 30px;
-  padding: 0px 10px 0 10px;
-  border-radius: 0;
-  border-bottom-right-radius: 3px;
-  border-style: none;
-  border-left-style: solid;
-  vertical-align: top;
-}
-
-.bpmn-model .diagram {
-  text-align: center;
-  line-height: 100px;
-  min-height: 350px;
-  max-height: 350px;
-  overflow: hidden;
-}
-
-.bpmn-model .diagram img {
-  max-width: 100%;
-  max-height: 100%;
-  vertical-align: baseline;
-  cursor: pointer;
-}
-
-.bpmn-model .diagram .name {
-  display: block;
-}
-
-.bpmn-model .actions {
-  position: absolute;
-  bottom: 10px;
-  right: 10px;
-}
-
 .modal-body {
   max-height: 480px;
-}
-
-div#pictureModal .modal-body {
-  overflow: auto;
-}
-
-div#pictureModal {
-  min-width: 30%;
-  width: auto;
-  max-width: 80%;
-}
-
-div#pictureModal .carousel-inner {
-  overflow: inherit;
-}
-
-div#pictureModal.modal.hide.fade {
-  width: 85%;
-  max-width: 75%;
-  max-height: 95%;
-  top: 40%;
-  left: 33%;
 }
 
 div#myCarousel .carousel-control.right {
@@ -356,3 +233,78 @@ thead tr {
   max-width: none;
 }
 
+/**----------------------------------------
+Workaround to fix thumbnails in bootstrap,
+when there are more than one row to display
+-------------------------------------------**/
+
+ul.thumbnails li.span4:nth-child(3n + 4) {
+  margin-left : 0px;
+}
+
+ul.thumbnails li.span3:nth-child(4n + 5) {
+  margin-left : 0px;
+}
+
+ul.thumbnails li.span12 + li {
+  margin-left : 0px;
+}
+
+/**---------------------------------------
+Style of the content of a tile
+------------------------------------------**/
+
+.tile {
+  border-radius: 4px;
+  border: 1px solid #DDD;
+  display: block;
+  float: left;
+  width: 400px;
+  height: 300px;
+  cursor: pointer;
+  margin: 0 10px 10px 0;
+  position: relative;
+}
+
+.tile_header { 
+  margin: 0px;
+  font-size: 18px;
+  font-weight: bold;
+  text-align: center;
+  line-height: 40px;
+  background: #DDD;
+  border-top-left-radius: 2px;
+  border-top-right-radius: 2px;
+}
+
+.tile_body {
+  padding: 2px;
+  height: 218px;
+}
+ 
+.tile_footer {
+  margin: 0px;
+  line-height: 30px;
+  background: #DDD;
+  font-size: 16px;
+  text-align: left;
+  padding: 4px;
+  border-bottom-left-radius: 2px;
+  border-bottom-right-radius: 2px;
+}
+
+div.tile:hover,
+div.tile:focus {
+  border-color: #0088cc;
+  -webkit-box-shadow: 0 1px 4px rgba(0, 105, 214, 0.25);
+  -moz-box-shadow: 0 1px 4px rgba(0, 105, 214, 0.25);
+  box-shadow: 0 1px 4px rgba(0, 105, 214, 0.25);
+}
+
+/**----------------
+Headlines
+-------------------**/
+
+h1 {
+  font-size: 30px;
+}
