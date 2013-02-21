@@ -9,8 +9,8 @@
 $script.path('assets/js/');
 
 $script([
-	'lib/raphaeljs/raphael.js',
 	'lib/jquery-1.7.2.min.js',
+	'lib/raphaeljs/raphael.js',
 	'lib/cabpmn.js',
 	'bpmnRenderer.js'],  function() {
 
@@ -42,6 +42,11 @@ $script([
 
 				], function() {
 					 angular.bootstrap(document, ['cockpit']);
+					 
+					 // Due to a bug in the scenario runner
+					 // (see: https://groups.google.com/forum/#!msg/angular/yslVnZh9Yjk/MLi3VGXZLeMJ)
+					 // we add "ng-app" as class at the html-element
+					 $("html").addClass("ng-app");
 				});
 		});
 
