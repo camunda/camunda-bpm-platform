@@ -3,5 +3,5 @@
 /* Services */
 
 angular.module('cockpit.resources', [
-                                    'cockpit.resource.process.defintion'
+                                    'cockpit.resource.process.definition'
                                     ]);
