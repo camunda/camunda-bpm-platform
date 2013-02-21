@@ -31,7 +31,7 @@ $script([
 					'../../common/directives/requestAware.js',
           '../../common/directives/processDiagram.js',
 					'../../common/resources/resources.js',
-					'../../common/resources/processDefinition.js',
+					'../../common/resources/processDefinitionResource.js',
 					'../../common/services/services.js',
 					'../../common/services/uri.js',
 					'../../common/services/cockpitHttpInterceptor.js',

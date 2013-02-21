@@ -9,7 +9,7 @@ angular.module('dashboard', [])
   });
 }])
 
-.controller('DashboardCtrl', ['$scope', '$location', 'ProcessDefinition', function ($scope, $location, ProcessDefinition) {
+.controller('DashboardCtrl', ['$scope', '$location', 'ProcessDefinition', function ($scope, $location, ProcessDefinitionResource) {
 
   var stubProcessDefinition = [{"id": "1", "name": "Order Process", "key": "order_process_key", "version": 1, "instances": 5, "failedJobs": null},
    {"id": "2", "name": "Order Process", "key": "order_process_key", "version": 2, "instances": 10, "failedJobs": null},
@@ -24,8 +24,8 @@ angular.module('dashboard', [])
 
   $scope.orderByPredicate = 'name';
   $scope.orderByReverse = false;
-  
-  ProcessDefinition.queryStatistics(function(data){
+
+    ProcessDefinitionResource.queryStatistics(function(data){
 //    $scope.processDefinitonStatisticsResults = getStatisticsResult(data);
     $scope.processDefinitions = getStatisticsResult(stubProcessDefinition);
   });
