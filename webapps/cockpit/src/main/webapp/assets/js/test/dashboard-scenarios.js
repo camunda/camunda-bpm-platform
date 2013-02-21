@@ -6,17 +6,19 @@ describe('cockpit dashboard', function() {
 
   beforeEach(function() {
     browser().navigateTo('/cockpit/#/dashboard');
+    sleep(1);
   });
   
   it('should redirect to #/dashboard', function() {
-
-    expect(browser().window().path()).toBe("/cockpit/#/dashboard");
-
+    expect(browser().window().hash()).toBe("/dashboard");
   });
 
-  it('should show name of process 1', function() {
-    expect(repeater('process-definition-tiles p', 'process definition tiles').column('processDefinition.name')).toContain('invoice receipt (fox)');
+  it('should show name of process invoice receipt (fox)', function() {
+    expect(repeater('.tile-grid', 'process definition tiles').column('processDefinition.name')).toContain('invoice receipt (fox)');
   });
-
+  
+  it('should contain a shortcut process definition name', function() {
+    expect(repeater('.tile-grid', 'process definition tiles').column('extractProcessDefinitionName(processDefinition)')).toContain('Loan applicant, with a ve...');
+  });
    
 });
