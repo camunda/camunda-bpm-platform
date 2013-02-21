@@ -1,6 +1,6 @@
 angular
-.module('cockpit.service.app', [])
- .factory('App', function() {
+.module('cockpit.service.uri', [])
+ .factory('Uri', function() {
     function appRoot() {
       return $("base").attr("app-base");
     }

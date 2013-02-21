@@ -2,15 +2,15 @@
 
 angular
 .module('cockpit.directive.help', [])
-.directive("help", function(App) {
+.directive("help", function() {
   return {
     restrict: 'A',    
     scope : {
-    helpText: "@",
-    helpTitle: "@", 
-    helpTextVar: "&",
-    helpTitleVar: "&", 
-    colorInvert: "@"
+      helpText: "@",
+      helpTitle: "@",
+      helpTextVar: "&",
+      helpTitleVar: "&",
+      colorInvert: "@"
     },
     template: '<span ng-transclude></span><span class="help-toggle"><i class="icon-question-sign" ng-class="colorInvertCls()"></i></span>',
     transclude: true,     

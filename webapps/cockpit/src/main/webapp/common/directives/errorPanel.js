@@ -2,7 +2,7 @@
 
 angular
 .module('cockpit.directive.error.panel', [])
-.directive('errorPanel', function(Error, App) {
+.directive('errorPanel', function(Error, Uri) {
   return {
     link: function(scope, element, attrs, $destroy) {
 
@@ -16,7 +16,7 @@ angular
           html += "<strong>"+error.status+":</strong> ";
           html += "<span>"+error.config+"</span>";
           if (error.type == 'com.camunda.fox.cycle.exception.CycleMissingCredentialsException') {
-            html += "<span>(<a style=\"color: #827AA2;\" href=\"" + App.uri("secured/view/profile") + "\">add user credentials</a>)</span>";
+            html += "<span>(<a style=\"color: #827AA2;\" href=\"" + Uri.uri("secured/view/profile") + "\">add user credentials</a>)</span>";
           }
         } else {
           html += "An error occured, try refreshing the page or relogin.";
