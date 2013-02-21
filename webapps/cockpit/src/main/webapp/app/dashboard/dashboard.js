@@ -18,10 +18,25 @@ angular.module('dashboard', [])
    {"id": "4", "name": "invoice receipt", "key": "fox_invoice", "version": 1, "instances": 5, "failedJobs": null},
    {"id": "5", "name": "invoice receipt (fox)", "key": "fox_invoice", "version": 2, "instances": 3, "failedJobs": null},
    
-   {"id": "6", "name": "Kreditantrag", "key": "kreditantrag_process", "version": 1, "instances": 4, "failedJobs": null},
-   {"id": "7", "name": "Kreditantrag", "key": "kreditantrag_process", "version": 2, "instances": 8, "failedJobs": null},
-   {"id": "8", "name": null, "key": "kreditantrag_process", "version": 3, "instances": 2, "failedJobs": null}];
-
+   {"id": "6", "name": "Loan applicant", "key": "loan_applicant_process", "version": 1, "instances": 4, "failedJobs": null},
+   {"id": "7", "name": "Loan applicant", "key": "loan_applicant_process", "version": 2, "instances": 8, "failedJobs": null},
+   {"id": "8", "name": null, "key": "loan_applicant_process", "version": 3, "instances": 2, "failedJobs": null},
+   
+   {"id": "9", "name": "Loan applicant, with a very long process definition name", "key": "loan_applicant_process_long_name", "version": 1, "instances": 100, "failedJobs": null},
+   
+   {"id": "10", "name": "Order Process, the second one", "key": "order_process_key_1", "version": 1, "instances": 5, "failedJobs": null},
+   {"id": "11", "name": "Order Process, the second one", "key": "order_process_key_1", "version": 2, "instances": 10, "failedJobs": null},
+   {"id": "12", "name": "Order Process, the second one", "key": "order_process_key_1", "version": 3, "instances": 2, "failedJobs": null},
+  
+   {"id": "13", "name": "invoice receipt new", "key": "fox_invoice_1", "version": 1, "instances": 5, "failedJobs": null},
+   {"id": "14", "name": "invoice receipt (fox) new", "key": "fox_invoice_1", "version": 2, "instances": 3, "failedJobs": null},
+  
+   {"id": "15", "name": "Loan applicant 2", "key": "loan_applicant_process_1", "version": 1, "instances": 4, "failedJobs": null},
+   {"id": "16", "name": "Loan applicant 2", "key": "loan_applicant_process_1", "version": 2, "instances": 8, "failedJobs": null},
+   {"id": "17", "name": null, "key": "loan_applicant_process_1", "version": 3, "instances": 2, "failedJobs": null},
+  
+   {"id": "18", "name": "Loan applicant, with a very long process definition name 1", "key": "loan_applicant_process_long_name_1", "version": 1, "instances": 100, "failedJobs": null}];
+  
   $scope.orderByPredicate = 'name';
   $scope.orderByReverse = false;
 
@@ -37,44 +52,43 @@ angular.module('dashboard', [])
     angular.forEach(processDefinitions, function(processDefinition) {
       var statistics = statisticsResult[processDefinition.key];
       if (!statistics) {
-        statistics = {};
-        copyStatistics(statistics, processDefinition);
-        statistics.instances = processDefinition.instances;
+        statistics = angular.copy(processDefinition);
+        if (!statistics.name) {
+          statistics.name = statistics.key;
+        }
         statisticsResult[processDefinition.key] = statistics;
         result.push(statistics);
       } else {
-        statistics.instances += processDefinition.instances;
+        var instances = statistics.instances + processDefinition.instances;
+        
         if (processDefinition.version > statistics.version) {
-          copyStatistics(statistics, processDefinition);
+          angular.copy(processDefinition, statistics);
+          if (!statistics.name) {
+            statistics.name = statistics.key;
+          }
         }
+        
+        statistics.instances = instances;
       }
     });
     
     return result;
   };
-  
-  var copyStatistics = function(source, target) {
-    source.id = target.id;
-    source.key = target.key;
-    source.version = target.version;
-    
-    if (!!target.name) {
-      source.name = target.name;
-    } else {
-      source.name = target.key;
-    }    
-  };
-  
-  $scope.processDefinitionSelected = function (path) {
+
+  $scope.selectProcessDefinition = function (path) {
     $location.path(path);
   };
   
   $scope.extractProcessDefinitionName = function (processDefinition) {
     var name = processDefinition.name;
-    if (name.length > 25) {
-      return name.substring(0, 25) + "...";
+    return name.substring(0, 25) + "...";
+  };
+  
+  $scope.isLongProcessDefinitionName = function (processDefinition) {
+    if (processDefinition.name.length > 25) {
+      return true;
     }
-    return name;
+    return false;
   };
   
 }]);
