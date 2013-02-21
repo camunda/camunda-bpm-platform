@@ -1,5 +1,5 @@
 /**
- * @license AngularJS v1.1.2
+ * @license AngularJS v1.1.3
  * (c) 2010-2012 Google, Inc. http://angularjs.org
  * License: MIT
  */
@@ -10,10 +10,10 @@ var directive = {};
 var service = { value: {} };
 
 var DEPENDENCIES = {
-  'angular.js': 'http://code.angularjs.org/' + angular.version.full + 'angular.min.js',
-  'angular-resource.js': 'http://code.angularjs.org/' + angular.version.full + 'angular-resource.min.js',
-  'angular-sanitize.js': 'http://code.angularjs.org/' + angular.version.full + 'angular-sanitize.min.js',
-  'angular-cookies.js': 'http://code.angularjs.org/' + angular.version.full + 'angular-cookies.min.js'
+  'angular.js': 'http://code.angularjs.org/' + angular.version.full + '/angular.min.js',
+  'angular-resource.js': 'http://code.angularjs.org/' + angular.version.full + '/angular-resource.min.js',
+  'angular-sanitize.js': 'http://code.angularjs.org/' + angular.version.full + '/angular-sanitize.min.js',
+  'angular-cookies.js': 'http://code.angularjs.org/' + angular.version.full + '/angular-cookies.min.js'
 };
 
 
