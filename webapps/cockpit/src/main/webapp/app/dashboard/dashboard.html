@@ -1,6 +1,27 @@
-<h3>{{ helloWorld }}</h3>
-<div id="process-definition-tiles">
-  <p ng-repeat="processDefinition in processDefinitions">
-    Process definition id: {{ processDefinition.id }}, Process definition name: {{ processDefinition.name }}
-  </p>
+<div>
+
+  <div class="page-header">
+    <h1>Deployed Processes</h1>
+  </div>
+
+  <div class="tile-grid">
+    <div ng-repeat="processDefinition in processDefinitions | orderBy:orderByPredicate:orderByReverse"
+         ng-cloak class="tile linkable-tile" ng-click="selectProcessDefinition('/process-definition/' + processDefinition.id)">
+      <div class="tile-header">
+        <span ngm-if="isLongProcessDefinitionName(processDefinition)" title="{{ processDefinition.name }}">
+          {{ extractProcessDefinitionName(processDefinition) }}
+        </span>
+        <span ngm-if="!isLongProcessDefinitionName(processDefinition)">
+          {{ processDefinition.name }}
+        </span>
+      </div>
+      <div class="tile-body">
+      
+      </div>
+      <div class="tile-footer">
+        Running Instances: {{ processDefinition.instances }}
+      </div>
+    </div>
+  </div>
+  
 </div>

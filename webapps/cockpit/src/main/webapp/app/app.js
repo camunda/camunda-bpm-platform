@@ -3,6 +3,7 @@
 angular.module('cockpit', [
     'ng',
     'dashboard',
+    'process.definition',
     'cockpit.services',
     'cockpit.directives',
     'cockpit.resources'
