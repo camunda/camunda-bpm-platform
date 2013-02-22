@@ -21,7 +21,8 @@ $script([
 			
 				$script([
 				  'lib/angular/angular-resource.min.js',
-  		    '../../app/app.js',
+				  'lib/angular/angular-mocks.js',
+				  '../../app/app.js',
   		    '../../app/dashboard/dashboard.js',
   		    '../../app/process-definition/processDefinition.js',
 					'../../common/extensions/ngmIf.js',
