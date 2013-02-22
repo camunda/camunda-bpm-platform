@@ -34,16 +34,14 @@ angular.module('dashboard', [])
         result.push(statistic);
         
       } else {
-        var instances = statistic.instances + currentStatistic.instances;
-        
+//        var instances = statistic.instances + currentStatistic.instances;
         if (currentStatistic.definition.version > statistic.definition.version) {
           angular.copy(currentStatistic, statistic);
           if (!statistic.definition.name) {
             statistic.definition.name = statistic.definition.key;
           }
         }
-        
-        statistic.instances = instances;
+//        statistic.instances = instances;
       }
     });
     
