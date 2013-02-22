@@ -16,11 +16,11 @@ $script([
 
 		$script([
 			'../bootstrap/js/bootstrap.min.js',
-			'lib/angular/angular.min.js'
+			'lib/angular/angular.js'
 			], function() {
 			
 				$script([
-				  'lib/angular/angular-resource.min.js',
+				  'lib/angular/angular-resource.js',
   		    '../../app/app.js',
   		    '../../app/dashboard/dashboard.js',
   		    '../../app/process-definition/processDefinition.js',
@@ -32,6 +32,7 @@ $script([
           '../../common/directives/processDiagram.js',
 					'../../common/resources/resources.js',
 					'../../common/resources/processDefinitionResource.js',
+          '../../common/resources/processDefinitionDiagramResource.js',
 					'../../common/services/services.js',
 					'../../common/services/uri.js',
 					'../../common/services/cockpitHttpInterceptor.js',
