@@ -24,7 +24,6 @@ import javax.transaction.TransactionManager;
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.impl.cfg.JtaProcessEngineConfiguration;
-import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.jobexecutor.JobExecutor;
 import org.activiti.engine.impl.persistence.StrongUuidGenerator;
 import org.jboss.as.connector.subsystems.datasources.DataSourceReferenceFactoryService;
@@ -44,7 +43,7 @@ import com.camunda.fox.platform.subsystem.impl.util.Tccl;
 import com.camunda.fox.platform.subsystem.impl.util.Tccl.Operation;
 
 /**
- * <p>Service responsible for 
+ * <p>Service responsible for starting / stopping a managed process engine</p>
  * 
  * @author Daniel Meyer
  */
