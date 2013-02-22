@@ -21,6 +21,10 @@ describe('cockpit dashboard', function() {
     expect(repeater('.tile-grid', 'process definition tiles').column('shortcutProcessDefinitionName(statistic.definition.name)')).toContain('Loan applicant, with a ve...');
   });
   
+  it('should show the number of running instances for a process definition', function () {
+    expect(repeater('.tile:first').column('statistic.instances')).toBe(3);
+  });
+  
   it('should navigate to process definition site', function () {
     element('.tile:first').click();
     expect(browser().window().hash()).toBe("/process-definition/5");
