@@ -5,8 +5,10 @@ angular
       errors : [],
       errorConsumers : [],  
       addError: function (error) {
-        this.errors.push(error); 
-        this.errorConsumers[this.errorConsumers.length-1](error);
+        this.errors.push(error);
+        if (this.errorConsumers.length > 0 ) {
+          this.errorConsumers[this.errorConsumers.length-1](error);
+        }
       },
       removeError: function(error) {
       var idx = this.errors.indexOf(error);
