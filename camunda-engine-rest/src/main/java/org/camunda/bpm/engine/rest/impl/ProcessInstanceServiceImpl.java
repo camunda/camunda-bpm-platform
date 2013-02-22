@@ -78,4 +78,9 @@ public class ProcessInstanceServiceImpl extends AbstractEngineService implements
     return result;
   }
 
+  @Override
+  public CountResultDto queryProcessInstancesCount(ProcessInstanceQueryDto queryDto) {
+    return getProcessInstancesCount(queryDto);
+  }
+
 }

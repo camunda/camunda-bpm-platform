@@ -32,10 +32,6 @@ public interface ProcessInstanceService {
   List<ProcessInstanceDto> getProcessInstances(ProcessInstanceQueryDto query,
       @QueryParam("firstResult") Integer firstResult,
       @QueryParam("maxResults") Integer maxResults);
-  
-  @GET
-  @Path("/count")
-  CountResultDto getProcessInstancesCount(ProcessInstanceQueryDto query);
 
   /**
    * Expects the same parameters as
@@ -53,4 +49,13 @@ public interface ProcessInstanceService {
   List<ProcessInstanceDto> queryProcessInstances(ProcessInstanceQueryDto query,
       @QueryParam("firstResult") Integer firstResult,
       @QueryParam("maxResults") Integer maxResults);
+
+  @GET
+  @Path("/count")
+  CountResultDto getProcessInstancesCount(ProcessInstanceQueryDto query);
+  
+  @POST
+  @Path("/count")
+  @Consumes(MediaType.APPLICATION_JSON)
+  CountResultDto queryProcessInstancesCount(ProcessInstanceQueryDto query);
 }

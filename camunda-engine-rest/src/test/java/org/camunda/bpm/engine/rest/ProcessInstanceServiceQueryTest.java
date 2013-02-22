@@ -401,4 +401,16 @@ public class ProcessInstanceServiceQueryTest extends AbstractRestServiceTest {
     
     verify(mockedQuery).count();
   }
+  
+  @Test
+  public void testQueryCountForPost() throws IOException {
+    setUpMockedQuery();
+    
+    given().contentType(POST_JSON_CONTENT_TYPE).body(EMPTY_JSON_OBJECT)
+    .expect().statusCode(Status.OK.getStatusCode())
+      .body("count", equalTo(1))
+      .when().post(PROCESS_INSTANCE_COUNT_QUERY_URL);
+    
+    verify(mockedQuery).count();
+  }
 }

@@ -14,6 +14,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 
 import org.activiti.engine.repository.ProcessDefinitionQuery;
+import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionQueryDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionStatisticsResultDto;
@@ -35,6 +36,10 @@ public interface ProcessDefinitionService {
 	@Path("/")
 	List<ProcessDefinitionDto> getProcessDefinitions(ProcessDefinitionQueryDto query, 
 	    @QueryParam("firstResult") Integer firstResult, @QueryParam("maxResults") Integer maxResults);
+	
+	@GET
+  @Path("/count")
+  CountResultDto getProcessDefinitionsCount(ProcessDefinitionQueryDto query);
 	
 	@POST
 	@Path("/{id}/start")

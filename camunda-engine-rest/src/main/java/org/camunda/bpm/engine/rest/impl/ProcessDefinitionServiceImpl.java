@@ -14,6 +14,7 @@ import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.repository.ProcessDefinitionQuery;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.rest.ProcessDefinitionService;
+import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionQueryDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionStatisticsResultDto;
@@ -66,6 +67,23 @@ public class ProcessDefinitionServiceImpl extends AbstractEngineService implemen
 	  }
 	  return query.listPage(firstResult, maxResults); 
 	}
+	
+	@Override
+  public CountResultDto getProcessDefinitionsCount(ProcessDefinitionQueryDto queryDto) {
+    RepositoryService repoService = processEngine.getRepositoryService();
+    
+    ProcessDefinitionQuery query;
+    try {
+       query = queryDto.toQuery(repoService);
+    } catch (InvalidRequestException e) {
+      throw new WebApplicationException(Status.BAD_REQUEST.getStatusCode());
+    }
+    
+    long count = query.count();
+    CountResultDto result = new CountResultDto();
+    result.setCount(count);
+    return result;
+  }
 
   @Override
   public ProcessInstanceDto startProcessInstance(UriInfo context, String processDefinitionId, StartProcessInstanceDto parameters) {
