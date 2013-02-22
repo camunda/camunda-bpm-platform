@@ -4,6 +4,7 @@ import static com.jayway.restassured.RestAssured.expect;
 import static com.jayway.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.hamcrest.Matchers.nullValue;
 
 import java.io.IOException;
@@ -11,8 +12,6 @@ import java.io.IOException;
 import javax.ws.rs.core.Response.Status;
 
 import org.junit.Test;
-
-import com.jayway.restassured.response.Response;
 
 /**
  * This test only tests the REST interface, but no interaction with the engine as it assumes a stubbed 
@@ -24,45 +23,29 @@ public class ProcessDefinitionStatisticsStubTest extends AbstractRestServiceTest
 
   private static final String PROCESS_DEFINITION_STATISTICS_URL = TEST_RESOURCE_ROOT_PATH + "/process-definition/statistics";
   
-  private static final String EXAMPLE_PROCESS_DEFINITION_ID = "processDefinition1";
-  private static final int EXAMPLE_PROCESS_INSTANCES = 42;
-  private static final int EXAMPLE_FAILED_JOBS = 47;
-  
-  private static final String ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID = "processDefinition2";
-  private static final int ANOTHER_EXAMPLE_PROCESS_INSTANCES = 123;
-  private static final int ANOTHER_EXAMPLE_FAILED_JOBS = 125;
-  
   @Test
   public void testStatisticsRetrievalPerProcessDefinition() throws IOException {
     setupTestScenario();
     
-    Response r = given().queryParam("groupBy", "definition")
+    given().queryParam("groupBy", "definition")
     .then().expect()
       .statusCode(Status.OK.getStatusCode())
-      .body("$.size()", is(2))
-      .body("id", hasItems(EXAMPLE_PROCESS_DEFINITION_ID, ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID))
-      .body("instances", hasItems(EXAMPLE_PROCESS_INSTANCES, ANOTHER_EXAMPLE_PROCESS_INSTANCES))
+      .body("$.size()", is(8))
       .body("[0].failedJobs", nullValue())
+      .body("definition.key", hasItems(getStubProcessDefinitionKeys()))
     .when().get(PROCESS_DEFINITION_STATISTICS_URL);
-    
-    System.out.println(r.asString());
   }
   
   @Test
   public void testStatisticsRetrievalPerProcessDefinitionVersion() throws IOException {
     setupTestScenario();
     
-    String firstExampleProcessDefinitionId = EXAMPLE_PROCESS_DEFINITION_ID + ":1";
-    String secondExampleProcessDefinitionId = EXAMPLE_PROCESS_DEFINITION_ID + ":2";
-    String firstAnotherExampleProcessDefinitionId = EXAMPLE_PROCESS_DEFINITION_ID + ":1";
-    String secondAnotherExampleProcessDefinitionId = EXAMPLE_PROCESS_DEFINITION_ID + ":2";
-    
     given().queryParam("groupBy", "version")
     .then().expect()
       .statusCode(Status.OK.getStatusCode())
-      .body("$.size()", is(4))
-      .body("id", hasItems(firstExampleProcessDefinitionId, secondExampleProcessDefinitionId,
-          firstAnotherExampleProcessDefinitionId, secondAnotherExampleProcessDefinitionId))
+      .body("$.size()", is(18))
+      .body("definition.size()", is(18))
+      .body("definition.key", hasItems(getStubProcessDefinitionKeys()))
     .when().get(PROCESS_DEFINITION_STATISTICS_URL);
   }
   
@@ -83,13 +66,13 @@ public class ProcessDefinitionStatisticsStubTest extends AbstractRestServiceTest
     given().queryParam("groupBy", "definition").queryParam("failedJobs", "true")
     .then().expect()
       .statusCode(Status.OK.getStatusCode())
-      .body("$.size()", is(2))
-      .body("failedJobs", hasItems(EXAMPLE_FAILED_JOBS, ANOTHER_EXAMPLE_FAILED_JOBS))
+      .body("$.size()", is(8))
+      .body("[0].failedJobs", notNullValue())
     .when().get(PROCESS_DEFINITION_STATISTICS_URL);
   }
   
   /**
-   * We expect grouping by process definitions (so aggregating all versions), if
+   * We expect grouping by process definition versions, if
    * no groupBy query parameter is specified.
    */
   @Test
@@ -98,8 +81,16 @@ public class ProcessDefinitionStatisticsStubTest extends AbstractRestServiceTest
     
     expect()
       .statusCode(Status.OK.getStatusCode())
-      .body("$.size()", is(2))
-      .body("id", hasItems(EXAMPLE_PROCESS_DEFINITION_ID, ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID))
+      .body("$.size()", is(18))
     .when().get(PROCESS_DEFINITION_STATISTICS_URL);
+  }
+  
+  private String[] getStubProcessDefinitionKeys() {
+    String[] definitionKeys = new String[] {
+        "order_process_key", "fox_invoice", "loan_applicant_process",
+        "loan_applicant_process_long_name", "order_process_key_1",
+        "fox_invoice_1", "loan_applicant_process_1", "loan_applicant_process_long_name_1"
+    };
+    return definitionKeys;
   }
 }

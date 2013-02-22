@@ -21,7 +21,8 @@ $script([
 			
 				$script([
 				  'lib/angular/angular-resource.js',
-  		    '../../app/app.js',
+				  'lib/angular/angular-mocks.js',
+				  '../../app/app.js',
   		    '../../app/dashboard/dashboard.js',
   		    '../../app/process-definition/processDefinition.js',
 					'../../common/extensions/ngmIf.js',
@@ -46,7 +47,7 @@ $script([
 					 
 					 // Due to a bug in the scenario runner
 					 // (see: https://groups.google.com/forum/#!msg/angular/yslVnZh9Yjk/MLi3VGXZLeMJ)
-					 // we add "ng-app" as class at the html-element
+					 // we need to add "ng-app" as class at the html-element
 					 $("html").addClass("ng-app");
 				});
 		});

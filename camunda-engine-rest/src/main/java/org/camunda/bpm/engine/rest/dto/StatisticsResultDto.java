@@ -1,6 +1,6 @@
 package org.camunda.bpm.engine.rest.dto;
 
-public class StatisticsResultDto {
+public abstract class StatisticsResultDto {
 
   private String id;
   private Integer instances;

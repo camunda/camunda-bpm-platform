@@ -3,6 +3,7 @@ package org.camunda.bpm.engine.rest;
 import static com.jayway.restassured.RestAssured.expect;
 import static com.jayway.restassured.RestAssured.given;
 import static com.jayway.restassured.path.json.JsonPath.from;
+import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Mockito.inOrder;
@@ -50,12 +51,14 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
   private static final String EXAMPLE_TASK_DEFINITION_KEY = "aTaskDefinitionKey";
 
   private static final String TASK_QUERY_URL = TEST_RESOURCE_ROOT_PATH + "/task";
+  private static final String TASK_COUNT_QUERY_URL = TASK_QUERY_URL + "/count";
   
   private TaskQuery mockQuery;
   
   private TaskQuery setUpMockTaskQuery(List<Task> mockedTasks) {
     TaskQuery sampleTaskQuery = mock(TaskQuery.class);
     when(sampleTaskQuery.list()).thenReturn(mockedTasks);
+    when(sampleTaskQuery.count()).thenReturn((long) mockedTasks.size());
     when(processEngine.getTaskService().createTaskQuery()).thenReturn(sampleTaskQuery);
     return sampleTaskQuery;
   }
@@ -509,6 +512,27 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     verifyStringParameterQueryInvocations();
     verifyIntegerParameterQueryInvocations();
     verify(mockQuery).taskCandidateGroupIn(argThat(new EqualsList(candidateGroups)));
+  }
+  
+  @Test
+  public void testQueryCount() throws IOException {
+    setUpMockedQuery();
+    expect().statusCode(Status.OK.getStatusCode())
+      .body("count", equalTo(1))
+      .when().get(TASK_COUNT_QUERY_URL);
+    
+    verify(mockQuery).count();
+  }
+  
+  @Test
+  public void testQueryCountForPost() throws IOException {
+    setUpMockedQuery();
+    given().contentType(POST_JSON_CONTENT_TYPE).body(EMPTY_JSON_OBJECT)
+    .expect().statusCode(Status.OK.getStatusCode())
+      .body("count", equalTo(1))
+      .when().post(TASK_COUNT_QUERY_URL);
+    
+    verify(mockQuery).count();
   }
   
 }
