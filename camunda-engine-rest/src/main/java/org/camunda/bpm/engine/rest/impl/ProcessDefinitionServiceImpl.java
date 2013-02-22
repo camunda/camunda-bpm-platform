@@ -86,6 +86,22 @@ public class ProcessDefinitionServiceImpl extends AbstractEngineService implemen
   }
 
   @Override
+  public ProcessDefinitionDto getProcessDefinition(String processDefinitionId) {
+    RepositoryService repoService = processEngine.getRepositoryService();
+    
+    ProcessDefinition definition;
+    try {
+      definition = repoService.getProcessDefinition(processDefinitionId);
+    } catch (ActivitiException e) {
+      throw new WebApplicationException(Status.BAD_REQUEST.getStatusCode());
+    }
+    
+    ProcessDefinitionDto result = ProcessDefinitionDto.fromProcessDefinition(definition);
+    
+    return result;
+  }
+	
+  @Override
   public ProcessInstanceDto startProcessInstance(UriInfo context, String processDefinitionId, StartProcessInstanceDto parameters) {
     RuntimeService runtimeService = processEngine.getRuntimeService();
     

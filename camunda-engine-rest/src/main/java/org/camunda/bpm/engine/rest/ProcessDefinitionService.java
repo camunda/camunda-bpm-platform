@@ -41,6 +41,10 @@ public interface ProcessDefinitionService {
   @Path("/count")
   CountResultDto getProcessDefinitionsCount(ProcessDefinitionQueryDto query);
 	
+	@GET
+	@Path("/{id}")
+	ProcessDefinitionDto getProcessDefinition(@PathParam("id") String processDefinitionId);
+	
 	@POST
 	@Path("/{id}/start")
 	@Consumes(MediaType.APPLICATION_JSON)
