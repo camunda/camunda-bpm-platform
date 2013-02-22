@@ -20,5 +20,10 @@ describe('cockpit dashboard', function() {
   it('should contain a shortcut process definition name', function() {
     expect(repeater('.tile-grid', 'process definition tiles').column('extractProcessDefinitionName(processDefinition)')).toContain('Loan applicant, with a ve...');
   });
-   
+  
+  it('should navigate to process definition site', function () {
+    element('.tile:first').click();
+    expect(browser().window().hash()).toBe("/process-definition/5");
+  });
+  
 });

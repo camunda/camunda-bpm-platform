@@ -5,23 +5,23 @@
   </div>
 
   <div class="tile-grid">
-    <div ng-repeat="processDefinition in processDefinitions | orderBy:orderByPredicate:orderByReverse"
-         ng-cloak class="tile linkable-tile" ng-click="selectProcessDefinition('/process-definition/' + processDefinition.id)">
-      <div class="tile-header">
-        <span ngm-if="isLongProcessDefinitionName(processDefinition)" title="{{ processDefinition.name }}">
-          {{ extractProcessDefinitionName(processDefinition) }}
+    <a ng-repeat="statistic in statistics | orderBy:orderByPredicate:orderByReverse"
+         ng-cloak class="tile linkable-tile" href="#/process-definition/{{statistic.definition.id}}">
+      <span class="tile-header">
+        <span ngm-if="isProcessDefinitionNameLong(statistic.definition.name)" title="{{ statistic.definition.name }}">
+          {{ shortcutProcessDefinitionName(statistic.definition.name) }}
         </span>
-        <span ngm-if="!isLongProcessDefinitionName(processDefinition)">
-          {{ processDefinition.name }}
+        <span ngm-if="!isProcessDefinitionNameLong(statistic.definition.name)">
+          {{ statistic.definition.name }}
         </span>
-      </div>
-      <div class="tile-body">
+      </span>
+      <span class="tile-body">
       
-      </div>
-      <div class="tile-footer">
-        Running Instances: {{ processDefinition.instances }}
-      </div>
-    </div>
+      </span>
+      <span class="tile-footer">
+        Running Instances: {{ statistic.instances }}
+      </span>
+    </a>
   </div>
   
 </div>
