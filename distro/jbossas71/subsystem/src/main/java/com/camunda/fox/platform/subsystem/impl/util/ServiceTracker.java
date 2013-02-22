@@ -10,7 +10,7 @@ import org.jboss.msc.service.ServiceName;
 
 /**
  * <p>Service Listener that adds / removes services to / from a collection as they
- * areadded / removed to the service controller.</p>
+ * are added / removed to the service controller.</p>
  * 
  * @author Daniel Meyer
  * 
