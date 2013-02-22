@@ -31,9 +31,9 @@ public final class BpmPlatform {
     return getRuntimeContainerDelegate().getProcessEngineService();
   }
   
-  public static ProcessApplicationService getProcessApplicationService() {
-    return getRuntimeContainerDelegate().getProcessApplicationService();
-  }
+//  public static ProcessApplicationService getProcessApplicationService() {
+//    return getRuntimeContainerDelegate().getProcessApplicationService();
+//  }
 
   private static RuntimeContainerDelegate getRuntimeContainerDelegate() {
     return RuntimeContainerConfiguration.getINSTANCE().getContainerDelegate();

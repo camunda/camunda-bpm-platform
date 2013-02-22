@@ -27,19 +27,12 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.activiti.engine.impl.util.IoUtil;
-import org.camunda.bpm.application.impl.deployment.metadata.PropertyHelper;
-import org.camunda.bpm.application.impl.deployment.metadata.spi.ProcessArchiveXml;
-import org.camunda.bpm.application.impl.deployment.metadata.spi.ProcessesXml;
-import org.camunda.bpm.application.impl.deployment.parser.ProcessesXmlParser;
 import org.camunda.bpm.application.impl.deployment.scanner.ScanningUtil;
-import org.jboss.as.server.deployment.Attachments;
-import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.vfs.VFS;
 import org.jboss.vfs.VirtualFile;
 import org.jboss.vfs.VirtualFileFilter;
 
 import com.camunda.fox.platform.FoxPlatformException;
-import com.camunda.fox.platform.subsystem.impl.deployment.processor.ProcessesXmlProcessor;
 
 /**
  * <p>A {@link ProcessArchiveScanner} which uses Jboss VFS for
@@ -54,16 +47,11 @@ public class VfsProcessApplicationResourceScanner {
 
   private static Logger log = Logger.getLogger(VfsProcessApplicationResourceScanner.class.getName());
 
-  public Map<String, byte[]> findResources(ProcessesXml.ParsedProcessArchive processArchive, DeploymentUnit deploymentUnit) {
+  public Map<String, byte[]> findResources(ClassLoader classLoader, String resourceRootPath, VirtualFile processesXml) {   
 
     // the map in which we collect the resources
     final Map<String, byte[]> resources = new HashMap<String, byte[]>();
     
-    // must exist, else we would'nt be here.
-    final VirtualFile processes_xml = deploymentUnit.getAttachment(Attachments.DEPLOYMENT_ROOT).getRoot().getChild(ProcessesXmlProcessor.PROCESSES_XML);    
-    final String resourceRootPath = PropertyHelper.getProperty(processArchive.getProperties(), ProcessArchiveXml.PROP_RESOURCE_ROOT_PATH);
-    final ClassLoader classLoader = deploymentUnit.getAttachment(Attachments.MODULE).getClassLoader();
-
     if(resourceRootPath != null && !resourceRootPath.startsWith("pa:")) {
       
         //  1. CASE: paResourceRootPath specified AND it is a "classpath:" resource root
@@ -84,10 +72,10 @@ public class VfsProcessApplicationResourceScanner {
     } else {
       
       // 2nd. CASE: no paResourceRootPath specified OR paResourceRootPath is PA-local
-      if (processes_xml != null) {
+      if (processesXml != null) {
 
         // use the parent resource of the META-INF folder
-        VirtualFile resourceRoot = processes_xml.getParent().getParent();
+        VirtualFile resourceRoot = processesXml.getParent().getParent();
 
         if (resourceRootPath != null) { // pa-local path provided
           String strippedPath = resourceRootPath.replace("pa:", "");

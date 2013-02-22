@@ -25,8 +25,9 @@ import org.jboss.as.controller.descriptions.StandardResourceDescriptionResolver;
 import org.jboss.as.controller.parsing.ExtensionParsingContext;
 import org.jboss.as.controller.registry.ManagementResourceRegistration;
 import org.jboss.as.controller.registry.OperationEntry;
+import org.jboss.msc.service.ServiceName;
 
-import com.camunda.fox.platform.subsystem.impl.extension.handler.FoxPlatformSubsystemDescribe;
+import com.camunda.fox.platform.subsystem.impl.extension.handler.BpmPlatformSubsystemDescribe;
 import com.camunda.fox.platform.subsystem.impl.extension.resource.FoxPlatformSubsystemRootResourceDefinition;
 import com.camunda.fox.platform.subsystem.impl.extension.resource.JobAcquisitionResourceDefinition;
 import com.camunda.fox.platform.subsystem.impl.extension.resource.JobExecutorResourceDefinition;
@@ -54,7 +55,7 @@ public class FoxPlatformExtension implements Extension {
     
     // Root resource
     final ManagementResourceRegistration rootRegistration = subsystem.registerSubsystemModel(FoxPlatformSubsystemRootResourceDefinition.INSTANCE);
-    rootRegistration.registerOperationHandler(DESCRIBE, FoxPlatformSubsystemDescribe.INSTANCE, FoxPlatformSubsystemDescribe.INSTANCE, false, OperationEntry.EntryType.PRIVATE);
+    rootRegistration.registerOperationHandler(DESCRIBE, BpmPlatformSubsystemDescribe.INSTANCE, BpmPlatformSubsystemDescribe.INSTANCE, false, OperationEntry.EntryType.PRIVATE);
     
     // Process Engine
     rootRegistration.registerSubModel(new ProcessEnginesResourceDefinition());
@@ -69,6 +70,10 @@ public class FoxPlatformExtension implements Extension {
   public void initializeParsers(ExtensionParsingContext context) {
     context.setSubsystemXmlMapping(ModelConstants.SUBSYSTEM_NAME, Namespace.FOX_PLATFORM_1_0.getUriString(), parser);
     context.setSubsystemXmlMapping(ModelConstants.SUBSYSTEM_NAME, Namespace.FOX_PLATFORM_1_1.getUriString(), parser);
+  }
+
+  public static ServiceName getPlatformServiceType() {
+    return ServiceName.of("org").append("camunda").append("bpm").append("platform");
   }
 
   public static ResourceDescriptionResolver getResourceDescriptionResolver(String keyPrefix) {

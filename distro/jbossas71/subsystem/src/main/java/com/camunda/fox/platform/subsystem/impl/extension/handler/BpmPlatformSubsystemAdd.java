@@ -17,7 +17,6 @@ package com.camunda.fox.platform.subsystem.impl.extension.handler;
 
 import java.util.List;
 
-import org.camunda.bpm.ProcessEngineService;
 import org.jboss.as.controller.AbstractBoottimeAddStepHandler;
 import org.jboss.as.controller.OperationContext;
 import org.jboss.as.controller.OperationFailedException;
@@ -30,23 +29,23 @@ import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceController.Mode;
 
 import com.camunda.fox.platform.subsystem.impl.deployment.processor.ModuleDependencyProcessor;
-import com.camunda.fox.platform.subsystem.impl.deployment.processor.ProcessEngineClientProcessor;
+import com.camunda.fox.platform.subsystem.impl.deployment.processor.ProcessApplicationComponentProcessor;
 import com.camunda.fox.platform.subsystem.impl.deployment.processor.ProcessEngineDependencyProcessor;
 import com.camunda.fox.platform.subsystem.impl.deployment.processor.ProcessEngineDeploymentProcessor;
 import com.camunda.fox.platform.subsystem.impl.deployment.processor.ProcessesXmlProcessor;
 import com.camunda.fox.platform.subsystem.impl.extension.ModelConstants;
-import com.camunda.fox.platform.subsystem.impl.service.ContainerProcessEngineService;
+import com.camunda.fox.platform.subsystem.impl.service.MscRuntimeContainerDelegate;
 
 /**
  * Provides the description and the implementation of the subsystem#add operation.
  * 
  * @author Daniel Meyer
  */
-public class FoxPlatformSubsystemAdd extends AbstractBoottimeAddStepHandler {
+public class BpmPlatformSubsystemAdd extends AbstractBoottimeAddStepHandler {
   
-  public static final FoxPlatformSubsystemAdd INSTANCE = new FoxPlatformSubsystemAdd();
+  public static final BpmPlatformSubsystemAdd INSTANCE = new BpmPlatformSubsystemAdd();
   
-  private FoxPlatformSubsystemAdd() {
+  private BpmPlatformSubsystemAdd() {
   }
   
   /** {@inheritDoc} */
@@ -64,18 +63,18 @@ public class FoxPlatformSubsystemAdd extends AbstractBoottimeAddStepHandler {
     context.addStep(new AbstractDeploymentChainStep() {
       public void execute(DeploymentProcessorTarget processorTarget) {
         processorTarget.addDeploymentProcessor(ModelConstants.SUBSYSTEM_NAME, Phase.PARSE, ProcessesXmlProcessor.PRIORITY, new ProcessesXmlProcessor());
-        processorTarget.addDeploymentProcessor(ModelConstants.SUBSYSTEM_NAME, Phase.PARSE, ProcessEngineClientProcessor.PRIORITY, new ProcessEngineClientProcessor());
+        processorTarget.addDeploymentProcessor(ModelConstants.SUBSYSTEM_NAME, Phase.PARSE, ProcessApplicationComponentProcessor.PRIORITY, new ProcessApplicationComponentProcessor());
         processorTarget.addDeploymentProcessor(ModelConstants.SUBSYSTEM_NAME, Phase.DEPENDENCIES, ModuleDependencyProcessor.PRIORITY, new ModuleDependencyProcessor());
         processorTarget.addDeploymentProcessor(ModelConstants.SUBSYSTEM_NAME, Phase.DEPENDENCIES, ProcessEngineDependencyProcessor.PRIORITY, new ProcessEngineDependencyProcessor());
         processorTarget.addDeploymentProcessor(ModelConstants.SUBSYSTEM_NAME, Phase.INSTALL, ProcessEngineDeploymentProcessor.PRIORITY, new ProcessEngineDeploymentProcessor());
       }
     }, OperationContext.Stage.RUNTIME);
 
-    // create and register DefaultProcessEngineService
-    final ContainerProcessEngineService processEngineService = new ContainerProcessEngineService();
+    // create and register the MSC container delegate.
+    final MscRuntimeContainerDelegate processEngineService = new MscRuntimeContainerDelegate();
     
-    final ServiceController<ProcessEngineService> controller = context.getServiceTarget()           
-            .addService(ContainerProcessEngineService.getServiceName(), processEngineService)
+    final ServiceController<MscRuntimeContainerDelegate> controller = context.getServiceTarget()           
+            .addService(MscRuntimeContainerDelegate.getServiceName(), processEngineService)
             .addListener(verificationHandler)
             .setInitialMode(Mode.ACTIVE)
             .install();

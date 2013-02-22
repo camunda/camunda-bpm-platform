@@ -13,6 +13,7 @@
 package com.camunda.fox.platform.subsystem.impl.service;
 
 import org.activiti.engine.ManagementService;
+import org.activiti.engine.ProcessEngine;
 import org.camunda.bpm.application.ProcessApplication;
 import org.camunda.bpm.engine.application.ProcessApplicationRegistration;
 import org.jboss.as.ee.component.ComponentView;
@@ -36,7 +37,7 @@ import org.jboss.msc.value.InjectedValue;
  */
 public class ProcessApplicationRegistrationService implements Service<ProcessApplicationRegistrationService> {
   
-  protected InjectedValue<ContainerProcessEngineController> processEngineInjector = new InjectedValue<ContainerProcessEngineController>();
+  protected InjectedValue<ProcessEngine> processEngineInjector = new InjectedValue<ProcessEngine>();
   protected InjectedValue<ComponentView> processApplicationInjector = new InjectedValue<ComponentView>();
   
   protected final String deploymentId;
@@ -52,7 +53,6 @@ public class ProcessApplicationRegistrationService implements Service<ProcessApp
 
   public void start(StartContext context) throws StartException {
     
-    final ContainerProcessEngineController processEngineController = processEngineInjector.getValue();
     final ComponentView processApplicationComponentView = processApplicationInjector.getValue();
     
     ManagedReference reference = null;    
@@ -61,7 +61,7 @@ public class ProcessApplicationRegistrationService implements Service<ProcessApp
       reference = processApplicationComponentView.createInstance();      
       
       ProcessApplication processApplication = (ProcessApplication) reference.getInstance();      
-      ManagementService managementService = processEngineController.getProcessEngine().getManagementService();      
+      ManagementService managementService = processEngineInjector.getValue().getManagementService();      
       registration = managementService.activateDeploymentForApplication(deploymentId, processApplication.getReference());
       
     } catch (Exception e) {
@@ -81,10 +81,10 @@ public class ProcessApplicationRegistrationService implements Service<ProcessApp
   }
 
   public ServiceName getServiceName() {
-    return ContainerProcessEngineService.getServiceName().append("process-application-registration").append(deploymentId);
+    return MscRuntimeContainerDelegate.getServiceName().append("process-application-registration").append(deploymentId);
   }
   
-  public InjectedValue<ContainerProcessEngineController> getProcessEngineInjector() {
+  public InjectedValue<ProcessEngine> getProcessEngineInjector() {
     return processEngineInjector;
   }
   

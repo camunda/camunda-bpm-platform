@@ -58,6 +58,6 @@ public class BeanManagerLookup {
     }
 
     throw new ActivitiException(
-            "Could not lookup beanmanager in jndi. If no jndi is avalable, set the beanmanger to the 'localInstance' property of this class.");
+            "Could not lookup beanmanager in jndi. If no jndi is available, set the beanmanger to the 'localInstance' property of this class.");
   }
 }

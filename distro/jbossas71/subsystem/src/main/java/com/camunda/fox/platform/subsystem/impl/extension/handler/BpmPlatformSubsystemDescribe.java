@@ -38,9 +38,9 @@ import org.jboss.dmr.Property;
  * is used in domain mode to query the profile being used, in order to get the
  * steps needed to create the servers
  */
-public class FoxPlatformSubsystemDescribe implements OperationStepHandler, DescriptionProvider {
+public class BpmPlatformSubsystemDescribe implements OperationStepHandler, DescriptionProvider {
 
-  public static final FoxPlatformSubsystemDescribe INSTANCE = new FoxPlatformSubsystemDescribe();
+  public static final BpmPlatformSubsystemDescribe INSTANCE = new BpmPlatformSubsystemDescribe();
 
   /** {@inheritDoc} */
   @Override

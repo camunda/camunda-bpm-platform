@@ -20,9 +20,6 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Logger;
 
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
-
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.FormService;
 import org.activiti.engine.HistoryService;
@@ -36,34 +33,19 @@ import org.activiti.engine.impl.ProcessEngineImpl;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.jobexecutor.JobExecutor;
 import org.activiti.engine.runtime.Job;
+import org.camunda.bpm.BpmPlatform;
 import org.camunda.bpm.ProcessEngineService;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
-import org.junit.Assert;
 import org.junit.Before;
-
-import com.camunda.fox.platform.api.ProcessArchiveService;
-import com.camunda.fox.platform.test.util.JndiConstants;
 
 public abstract class AbstractFoxPlatformIntegrationTest {
   
   protected Logger logger = Logger.getLogger(AbstractFoxPlatformIntegrationTest.class.getName());
-  
-  public final static String PROCESS_ARCHIVE_SERVICE_NAME =
-          "java:global/" +
-          "camunda-fox-platform/" +
-          "process-engine/" +
-          "PlatformService!com.camunda.fox.platform.api.ProcessArchiveService";
-  
-  public final static String PROCESS_ENGINE_SERVICE_NAME =
-          "java:global/" +
-          "camunda-fox-platform/" +
-          "process-engine/" +
-          "PlatformService!com.camunda.fox.platform.api.ProcessEngineService";
 
   protected ProcessEngineService processEngineService;
-  protected ProcessArchiveService processArchiveService;
+//  protected ProcessArchiveService processArchiveService;
   protected ProcessEngine processEngine;
   protected ProcessEngineConfigurationImpl processEngineConfiguration;
   protected FormService formService;
@@ -86,31 +68,12 @@ public abstract class AbstractFoxPlatformIntegrationTest {
   public static WebArchive initWebArchiveDeployment() {
     return initWebArchiveDeployment("test.war");
   }
-  
-  public static ProcessEngineService getProcessEngineService() {
-    try {
-      return InitialContext.doLookup(PROCESS_ENGINE_SERVICE_NAME);
-    } catch (NamingException e) {
-      Assert.fail("Exception while looking up process engine service: "+e.getMessage());
-      e.printStackTrace();
-      return null;
-    }
-  }
-  
-  public static ProcessArchiveService getProcessArchiveService() {
-    try {
-      return InitialContext.doLookup(PROCESS_ARCHIVE_SERVICE_NAME);
-    } catch (NamingException e) {
-      Assert.fail("Exception while looking up process archive service: "+e.getMessage());
-      e.printStackTrace();
-      return null;
-    }
-  }
+
 
   @Before
   public void setupBeforeTest() {
-    processEngineService = getProcessEngineService();
-    processArchiveService = getProcessArchiveService();
+    processEngineService = BpmPlatform.getProcessEngineService();
+//    processArchiveService = getProcessArchiveService();
     processEngine = processEngineService.getDefaultProcessEngine();
     processEngineConfiguration = ((ProcessEngineImpl)processEngine).getProcessEngineConfiguration();
     processEngineConfiguration.getJobExecutor().shutdown(); // make sure the job executor is down

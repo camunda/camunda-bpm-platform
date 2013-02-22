@@ -13,21 +13,16 @@
 package org.camunda.bpm.container.spi;
 
 import org.activiti.engine.ProcessEngine;
-import org.activiti.engine.impl.ProcessEngineImpl;
-import org.camunda.bpm.ProcessApplicationService;
 import org.camunda.bpm.ProcessEngineService;
 import org.camunda.bpm.application.ProcessApplication;
-
-import com.camunda.fox.platform.jobexecutor.JobExecutorService;
-import com.camunda.fox.platform.jobexecutor.impl.acquisition.JobAcquisition;
 
 /**
  * <p>The {@link RuntimeContainerDelegate} allows the process engine to integrate with the
  * runtime container in which it is deployed. Examples of "runtime containers" are
  * <ul> 
  *  <li>JBoss AS 7 (Module Service Container),</li>
+ *  <li>The JMX Container,</li>
  *  <li>An OSGi Runtime,</li>
- *  <li>An JMX Container,</li>
  *  <li>...</li>
  * </ul>
  * The {@link RuntimeContainerDelegate} allows the process engine to leverage container-provided infrastructure such as 
@@ -43,25 +38,38 @@ public interface RuntimeContainerDelegate {
   /**
    * Register a {@link ProcessEngine} instance with the RuntimeContainer.
    * 
-   * Note that the {@link ProcessEngineImpl} class calls this method. 
-   * 
    */
   public void registerProcessEngine(ProcessEngine processEngine);
   
+  /**
+   * Unregister a {@link ProcessEngine} instance with the RuntimeContainer.
+   * 
+   */
   public void unregisterProcessEngine(ProcessEngine processEngine);
+  
+//  public void registerJobAcquisition(JobAcquisition jobAcquisitionConfiguration);
 
-  public void registerJobAcquisition(JobAcquisition jobAcquisitionConfiguration);
+//  public void unregisterJobAcquisition(JobAcquisition jobAcquisitionConfiguration);
   
-  public void unregisterJobAcquisition(JobAcquisition jobAcquisitionConfiguration);
-  
+  /**
+   * Deploy a {@link ProcessApplication} into the runtime container.
+   * 
+   */
   public void deployProcessApplication(ProcessApplication processApplication);
   
+  /**
+   * Undeploy a {@link ProcessApplication} from the runtime container.
+   * 
+   */
   public void undeployProcessApplication(ProcessApplication processApplication);
 
+  /**
+   * @return the Container {@link ProcessEngineService} implementation. 
+   */
   public ProcessEngineService getProcessEngineService();
   
-  public JobExecutorService getJobExecutorService();
+//  public JobExecutorService getJobExecutorService();
 
-  public ProcessApplicationService getProcessApplicationService();
+//  public ProcessApplicationService getProcessApplicationService();
 
 }

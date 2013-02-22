@@ -27,7 +27,7 @@ import org.activiti.engine.impl.util.IoUtil;
 import org.activiti.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.application.impl.deployment.metadata.PropertyHelper;
 import org.camunda.bpm.application.impl.deployment.metadata.spi.ProcessArchiveXml;
-import org.camunda.bpm.application.impl.deployment.parser.ProcessesXmlParser;
+import org.camunda.bpm.application.impl.deployment.metadata.spi.ProcessesXml;
 import org.jboss.as.ee.component.ComponentDescription;
 import org.jboss.as.ee.component.ComponentView;
 import org.jboss.as.server.deployment.Attachments;
@@ -36,15 +36,18 @@ import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
 import org.jboss.as.server.deployment.DeploymentUnitProcessor;
 import org.jboss.modules.Module;
+import org.jboss.modules.ModuleClassLoader;
 import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceController.Mode;
 import org.jboss.msc.service.ServiceName;
 import org.jboss.msc.service.ServiceRegistry;
+import org.jboss.vfs.VirtualFile;
 
 import com.camunda.fox.platform.subsystem.impl.deployment.marker.ProcessApplicationAttachments;
 import com.camunda.fox.platform.subsystem.impl.deployment.scanner.VfsProcessApplicationResourceScanner;
-import com.camunda.fox.platform.subsystem.impl.service.ContainerProcessEngineController;
+import com.camunda.fox.platform.subsystem.impl.service.ManagedProcessEngineController;
 import com.camunda.fox.platform.subsystem.impl.service.ProcessApplicationRegistrationService;
+import com.camunda.fox.platform.subsystem.impl.util.ProcessesXmlWrapper;
 
 /**
  * <p>This processor
@@ -60,6 +63,7 @@ import com.camunda.fox.platform.subsystem.impl.service.ProcessApplicationRegistr
 public class ProcessEngineDeploymentProcessor implements DeploymentUnitProcessor {
   
   private final static Logger log = Logger.getLogger(ProcessEngineDeploymentProcessor.class.getName());
+  
   public static final int PRIORITY = 0x2051;
 
   public void deploy(DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {
@@ -73,11 +77,13 @@ public class ProcessEngineDeploymentProcessor implements DeploymentUnitProcessor
     final Map<ProcessArchiveXml, String> deploymentMap = new HashMap<ProcessArchiveXml, String>();        
 
     // deploy all process archives
-    for (ProcessArchiveXml processArchive : ProcessApplicationAttachments.getProcessesXml(deploymentUnit).getProcessArchives()) {
+    ProcessesXmlWrapper processesXmlWrapper = ProcessApplicationAttachments.getProcessesXml(deploymentUnit);
+    ProcessesXml processesXml = processesXmlWrapper.getProcessesXml();
+    for (ProcessArchiveXml processArchive : processesXml.getProcessArchives()) {
 
       ServiceName processEngineServiceName = getProcessEngineServiceName(processArchive);
       ProcessEngine processEngine = getProcessEngineForArchive(processEngineServiceName, phaseContext.getServiceRegistry());
-      Map<String, byte[]> deploymentResources = getDeploymentResources(processArchive, deploymentUnit);
+      Map<String, byte[]> deploymentResources = getDeploymentResources(processArchive, deploymentUnit, processesXmlWrapper.getProcessesXmlFile());
       
       if(deploymentResources.isEmpty()) {
         
@@ -92,10 +98,10 @@ public class ProcessEngineDeploymentProcessor implements DeploymentUnitProcessor
         // add registration service
         ProcessApplicationRegistrationService registrationService = new ProcessApplicationRegistrationService(engineDeploymentId);
         phaseContext.getServiceTarget().addService(registrationService.getServiceName(), registrationService)
-        .addDependency(processEngineServiceName, ContainerProcessEngineController.class, registrationService.getProcessEngineInjector())
-        .addDependency(getProcessApplicationViewServiceName(deploymentUnit), ComponentView.class, registrationService.getProcessApplicationInjector())
-        .setInitialMode(Mode.ACTIVE)
-        .install();
+          .addDependency(processEngineServiceName, ProcessEngine.class, registrationService.getProcessEngineInjector())
+          .addDependency(getProcessApplicationViewServiceName(deploymentUnit), ComponentView.class, registrationService.getProcessApplicationInjector())
+          .setInitialMode(Mode.ACTIVE)
+          .install();
         
         deploymentMap.put(processArchive, engineDeploymentId);
         
@@ -150,7 +156,8 @@ public class ProcessEngineDeploymentProcessor implements DeploymentUnitProcessor
     builder.append("Deployment summary for process archive '"+processArchive.getName()+"': \n");
     builder.append("\n");
     for (String resourceName : deploymentResources.keySet()) {
-      builder.append("        "+resourceName);          
+      builder.append("        "+resourceName);
+      builder.append("\n");
     }
     builder.append("\n");
     
@@ -180,21 +187,21 @@ public class ProcessEngineDeploymentProcessor implements DeploymentUnitProcessor
 
   @SuppressWarnings("unchecked")
   protected ProcessEngine getProcessEngineForArchive(ServiceName serviceName, ServiceRegistry serviceRegistry) {
-    ServiceController<ContainerProcessEngineController> processEngineServiceController = (ServiceController<ContainerProcessEngineController>) serviceRegistry.getRequiredService(serviceName);
-    return processEngineServiceController.getValue().getProcessEngine();
+    ServiceController<ProcessEngine> processEngineServiceController = (ServiceController<ProcessEngine>) serviceRegistry.getRequiredService(serviceName);
+    return processEngineServiceController.getValue();
   }
 
   protected ServiceName getProcessEngineServiceName(ProcessArchiveXml processArchive) {
     ServiceName serviceName = null;
     if(processArchive.getProcessEngineName() == null || processArchive.getProcessEngineName().length() == 0) {
-      serviceName = ContainerProcessEngineController.createServiceNameForDefaultEngine();
+      serviceName = ManagedProcessEngineController.createServiceNameForDefaultEngine();
     } else {
-      serviceName = ContainerProcessEngineController.createServiceName(processArchive.getProcessEngineName());
+      serviceName = ManagedProcessEngineController.createServiceName(processArchive.getProcessEngineName());
     }
     return serviceName;
   }
 
-  protected Map<String, byte[]> getDeploymentResources(ProcessArchiveXml processArchive, DeploymentUnit deploymentUnit) {
+  protected Map<String, byte[]> getDeploymentResources(ProcessArchiveXml processArchive, DeploymentUnit deploymentUnit, VirtualFile processesXmlFile) {
 
     final Module module = deploymentUnit.getAttachment(Attachments.MODULE);
     
@@ -202,10 +209,12 @@ public class ProcessEngineDeploymentProcessor implements DeploymentUnitProcessor
 
     // first, add all resources listed in the processe.xml
     List<String> process = processArchive.getProcessResourceNames();
+    ModuleClassLoader classLoader = module.getClassLoader();
+    
     for (String resource : process) {      
       InputStream inputStream = null;
       try {
-        inputStream = module.getClassLoader().getResourceAsStream(resource);
+        inputStream = classLoader.getResourceAsStream(resource);
         resources.put(resource, IoUtil.readInputStream(inputStream, resource));
       } finally {
         IoUtil.closeSilently(inputStream);
@@ -215,7 +224,10 @@ public class ProcessEngineDeploymentProcessor implements DeploymentUnitProcessor
     // scan for process definitions
     if(PropertyHelper.getBooleanProperty(processArchive.getProperties(), ProcessArchiveXml.PROP_IS_SCAN_FOR_PROCESS_DEFINITIONS, process.isEmpty())) {
       final VfsProcessApplicationResourceScanner scanner = new VfsProcessApplicationResourceScanner();
-      resources.putAll(scanner.findResources(processArchive, deploymentUnit));
+      
+      String resourceRootPath = processArchive.getProperties().get(ProcessArchiveXml.PROP_RESOURCE_ROOT_PATH);
+      resources.putAll(scanner.findResources(classLoader, resourceRootPath, processesXmlFile));
+      
     }
     
     return resources;  

@@ -36,6 +36,7 @@ import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
 import org.jboss.as.server.deployment.DeploymentUnitProcessor;
+import org.jboss.as.server.deployment.annotation.CompositeIndex;
 import org.jboss.as.server.deployment.module.ResourceRoot;
 import org.jboss.jandex.AnnotationInstance;
 import org.jboss.jandex.AnnotationTarget;
@@ -53,17 +54,17 @@ import org.jboss.metadata.ejb.spec.SessionType;
 import com.camunda.fox.platform.subsystem.impl.deployment.marker.ProcessApplicationAttachments;
 
 /**
- * This processor either looks up a user-provided @ProcessEngineClient component or 
+ * This processor either looks up a user-provided <code>@ProcessEngineClient</code> component or 
  * or synthesizes a new component using default values. 
  * 
  * @author Daniel Meyer
  * 
  */
-public class ProcessEngineClientProcessor implements DeploymentUnitProcessor {
+public class ProcessApplicationComponentProcessor implements DeploymentUnitProcessor {
   
-  private final static Logger log = Logger.getLogger(ProcessEngineClientProcessor.class.getName());
+  private final static Logger log = Logger.getLogger(ProcessApplicationComponentProcessor.class.getName());
 
-  public static final int PRIORITY = 0x1150;
+  public static final int PRIORITY = 0x1151;
 
   public void deploy(DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {
     final DeploymentUnit deploymentUnit = phaseContext.getDeploymentUnit();
@@ -97,8 +98,17 @@ public class ProcessEngineClientProcessor implements DeploymentUnitProcessor {
     final EEModuleDescription eeModuleDescription = deploymentUnit.getAttachment(Attachments.EE_MODULE_DESCRIPTION);
     final ResourceRoot deploymentRoot = deploymentUnit.getAttachment(org.jboss.as.server.deployment.Attachments.DEPLOYMENT_ROOT);
     final Index annotationIndex = deploymentRoot.getAttachment(org.jboss.as.server.deployment.Attachments.ANNOTATION_INDEX);
+    final CompositeIndex compositeIndex = deploymentUnit.getAttachment(org.jboss.as.server.deployment.Attachments.COMPOSITE_ANNOTATION_INDEX);
     
-    List<AnnotationInstance> annotations = annotationIndex.getAnnotations(DotName.createSimple(ProcessEngineClient.class.getName()));
+    List<AnnotationInstance> annotations = null;    
+    if(compositeIndex != null) {
+      annotations = compositeIndex.getAnnotations(DotName.createSimple(ProcessEngineClient.class.getName()));
+      
+    } else {   
+      annotations = annotationIndex.getAnnotations(DotName.createSimple(ProcessEngineClient.class.getName()));
+      
+    }
+    
     if(annotations.isEmpty()) {
       return null; // no component found
       
@@ -135,6 +145,9 @@ public class ProcessEngineClientProcessor implements DeploymentUnitProcessor {
     }
   }
 
+  /**
+   * TODO: should we rally do this?
+   */
   protected SingletonComponentDescription synthesizeClientComponent(final DeploymentUnit deploymentUnit) {
     // create a synthetic ProcessApplication component. 
     EEModuleDescription eeModuleDescription = deploymentUnit.getAttachment(Attachments.EE_MODULE_DESCRIPTION);

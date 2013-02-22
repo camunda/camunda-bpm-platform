@@ -33,6 +33,18 @@ public class ClassLoaderUtil {
     }
   }
   
+  public static ClassLoader getClassloader(final Class<?> clazz) {
+    if(System.getSecurityManager() != null) {
+      return AccessController.doPrivileged(new PrivilegedAction<ClassLoader>() {
+        public ClassLoader run() {
+          return clazz.getClassLoader();
+        }
+      });
+    } else {
+      return clazz.getClassLoader();
+    }
+  }
+  
   public static void setContextClassloader(final ClassLoader classLoader) {
     if(System.getSecurityManager() != null) {
       AccessController.doPrivileged(new PrivilegedAction<Void>() {

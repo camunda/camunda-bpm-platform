@@ -18,19 +18,19 @@ package com.camunda.fox.platform.subsystem.impl.util;
 import org.jboss.as.naming.ManagedReference;
 import org.jboss.as.naming.ManagedReferenceFactory;
 
-import com.camunda.fox.platform.subsystem.impl.service.ContainerProcessEngineService;
+import com.camunda.fox.platform.subsystem.impl.service.MscRuntimeContainerDelegate;
 
 
 /**
- * Used by the {@link ContainerProcessEngineService} to create the jndi bindings
+ * Used by the {@link MscRuntimeContainerDelegate} to create the jndi bindings
  * 
  * @author Daniel Meyer
  */
 public class PlatformServiceReferenceFactory implements ManagedReferenceFactory {
 
-  private final ContainerProcessEngineService service;
+  private final MscRuntimeContainerDelegate service;
 
-  public PlatformServiceReferenceFactory(ContainerProcessEngineService service) {
+  public PlatformServiceReferenceFactory(MscRuntimeContainerDelegate service) {
     this.service = service;
   }
 

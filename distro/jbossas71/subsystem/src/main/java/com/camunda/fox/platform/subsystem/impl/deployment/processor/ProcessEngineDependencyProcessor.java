@@ -24,10 +24,10 @@ import org.jboss.as.server.deployment.DeploymentUnitProcessor;
 
 import com.camunda.fox.platform.subsystem.impl.deployment.marker.ProcessApplicationAttachments;
 import com.camunda.fox.platform.subsystem.impl.deployment.marker.ProcessEngineDependencyAttachements;
-import com.camunda.fox.platform.subsystem.impl.service.ContainerProcessEngineController;
+import com.camunda.fox.platform.subsystem.impl.service.ManagedProcessEngineController;
 
 /**
- * <p>This processor adds the service dependencies to the process engines declared in the processes.xml file.</p>  
+ * <p>This processor adds the service dependencies to the process engines declared in the <code>processes.xml</code> file.</p>  
  * 
  * @author Daniel Meyer
  *
@@ -44,7 +44,7 @@ public class ProcessEngineDependencyProcessor implements DeploymentUnitProcessor
       return;
     }
     
-    final ProcessesXml processesXml = ProcessApplicationAttachments.getProcessesXml(deploymentUnit);
+    final ProcessesXml processesXml = ProcessApplicationAttachments.getProcessesXml(deploymentUnit).getProcessesXml();
     
     boolean isDefaultEngineReferenced = false;
     Set<String> referencedProcessEngines = new HashSet<String>();
@@ -60,13 +60,13 @@ public class ProcessEngineDependencyProcessor implements DeploymentUnitProcessor
     
     if(isDefaultEngineReferenced) {
       // add dependency to the default engine
-      phaseContext.addDeploymentDependency(ContainerProcessEngineController.createServiceNameForDefaultEngine(), 
+      phaseContext.addDeploymentDependency(ManagedProcessEngineController.createServiceNameForDefaultEngine(), 
           ProcessEngineDependencyAttachements.getDefaultEngineKey());
     }
     
     for (String engineName : referencedProcessEngines) {
       // add dependencies to the services representing the process engines. 
-      phaseContext.addDeploymentDependency(ContainerProcessEngineController.createServiceName(engineName), 
+      phaseContext.addDeploymentDependency(ManagedProcessEngineController.createServiceName(engineName), 
           ProcessEngineDependencyAttachements.getDependentEnginesKey());
     }
     

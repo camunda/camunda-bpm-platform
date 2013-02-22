@@ -7,6 +7,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.activiti.engine.impl.interceptor.CommandExecutor;
+import org.activiti.engine.impl.jobexecutor.JobExecutor;
 import org.jboss.as.threads.ManagedQueueExecutorService;
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.ServiceName;
@@ -105,6 +106,16 @@ public class ContainerJobExecutorService extends PlatformJobExecutor implements 
 
   public InjectedValue<ManagedQueueExecutorService> getManagedQueueInjector() {
     return managedQueueInjector;
+  }
+
+  /**
+   * @param processEngineMetadata
+   * @param jobAcquisitionName
+   * @return
+   */
+  public JobExecutor registerProcessEngine(ManagedProcessEngineConfiguration processEngineMetadata, String jobAcquisitionName) {
+    // TODO Auto-generated method stub
+    return null;
   }
     
 }

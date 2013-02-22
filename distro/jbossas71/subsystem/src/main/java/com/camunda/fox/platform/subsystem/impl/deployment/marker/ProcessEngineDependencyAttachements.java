@@ -12,10 +12,9 @@
  */
 package com.camunda.fox.platform.subsystem.impl.deployment.marker;
 
+import org.activiti.engine.ProcessEngine;
 import org.jboss.as.server.deployment.AttachmentKey;
 import org.jboss.as.server.deployment.AttachmentList;
-
-import com.camunda.fox.platform.subsystem.impl.service.ContainerProcessEngineController;
 
 /**
  * @author Daniel Meyer
@@ -23,14 +22,14 @@ import com.camunda.fox.platform.subsystem.impl.service.ContainerProcessEngineCon
  */
 public class ProcessEngineDependencyAttachements {
 
-  private static AttachmentKey<ContainerProcessEngineController> defaultEngine = AttachmentKey.create(ContainerProcessEngineController.class);
-  private static AttachmentKey<AttachmentList<ContainerProcessEngineController>> engines = AttachmentKey.createList(ContainerProcessEngineController.class);
+  private static AttachmentKey<ProcessEngine> defaultEngine = AttachmentKey.create(ProcessEngine.class);
+  private static AttachmentKey<AttachmentList<ProcessEngine>> engines = AttachmentKey.createList(ProcessEngine.class);
   
-  public static AttachmentKey<AttachmentList<ContainerProcessEngineController>> getDependentEnginesKey() {
+  public static AttachmentKey<AttachmentList<ProcessEngine>> getDependentEnginesKey() {
     return engines;
   }
   
-  public static AttachmentKey<ContainerProcessEngineController> getDefaultEngineKey() {
+  public static AttachmentKey<ProcessEngine> getDefaultEngineKey() {
     return defaultEngine;
   }
   

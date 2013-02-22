@@ -13,7 +13,7 @@
 
 package org.activiti.cdi.impl;
 
-import javax.enterprise.context.RequestScoped;
+import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.inject.Produces;
 import javax.inject.Named;
 
@@ -34,23 +34,23 @@ import org.camunda.bpm.ProcessEngineService;
  * @author Daniel Meyer
  * @author Falko Menge
  */
-public class ProcessEngineServiceProducer {
+public class ProcessEngineServicesProducer {
   
-  @Produces @Named @RequestScoped public ProcessEngine processEngine() { return getProcessEngineService().getDefaultProcessEngine(); }
+  @Produces @Named @ApplicationScoped public ProcessEngine processEngine() { return getProcessEngineService().getDefaultProcessEngine(); }
 
-  @Produces @Named @RequestScoped public RuntimeService runtimeService() { return processEngine().getRuntimeService(); }
+  @Produces @Named @ApplicationScoped public RuntimeService runtimeService() { return processEngine().getRuntimeService(); }
 
-  @Produces @Named @RequestScoped public TaskService taskService() { return processEngine().getTaskService(); }
+  @Produces @Named @ApplicationScoped public TaskService taskService() { return processEngine().getTaskService(); }
 
-  @Produces @Named @RequestScoped public RepositoryService repositoryService() { return processEngine().getRepositoryService(); }
+  @Produces @Named @ApplicationScoped public RepositoryService repositoryService() { return processEngine().getRepositoryService(); }
 
-  @Produces @Named @RequestScoped public FormService formService() { return processEngine().getFormService(); }
+  @Produces @Named @ApplicationScoped public FormService formService() { return processEngine().getFormService(); }
 
-  @Produces @Named @RequestScoped public HistoryService historyService() { return processEngine().getHistoryService(); }
+  @Produces @Named @ApplicationScoped public HistoryService historyService() { return processEngine().getHistoryService(); }
 
-  @Produces @Named @RequestScoped public IdentityService identityService() { return processEngine().getIdentityService(); }
+  @Produces @Named @ApplicationScoped public IdentityService identityService() { return processEngine().getIdentityService(); }
 
-  @Produces @Named @RequestScoped public ManagementService managementService() { return processEngine().getManagementService(); }
+  @Produces @Named @ApplicationScoped public ManagementService managementService() { return processEngine().getManagementService(); }
   
   private ProcessEngineService getProcessEngineService() {
     return BpmPlatform.getProcessEngineService();

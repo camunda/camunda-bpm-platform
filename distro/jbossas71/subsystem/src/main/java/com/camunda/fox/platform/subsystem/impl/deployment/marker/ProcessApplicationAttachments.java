@@ -21,6 +21,8 @@ import org.jboss.as.ee.component.ComponentDescription;
 import org.jboss.as.server.deployment.AttachmentKey;
 import org.jboss.as.server.deployment.DeploymentUnit;
 
+import com.camunda.fox.platform.subsystem.impl.util.ProcessesXmlWrapper;
+
 /**
  * 
  * @author Daniel Meyer
@@ -31,21 +33,21 @@ public class ProcessApplicationAttachments {
   private static final AttachmentKey<Boolean> MARKER = AttachmentKey.create(Boolean.class);
   private static final AttachmentKey<ComponentDescription> PA_COMPONENT = AttachmentKey.create(ComponentDescription.class);
   private static final AttachmentKey<Map<ProcessArchiveXml, String>> DEPLOYMENT_MAP = AttachmentKey.create(Map.class);
-  private static final AttachmentKey<ProcessesXml> PROCESSES_XML = AttachmentKey.create(ProcessesXml.class);
+  private static final AttachmentKey<ProcessesXmlWrapper> PROCESSES_XML = AttachmentKey.create(ProcessesXmlWrapper.class);
 
   /**
    * Attach the parsed ProcessesXml file to a deployment unit.
    *  
    */
-  public static void attachProcessesXml(DeploymentUnit unit, ProcessesXml processesXml) {
-      unit.putAttachment(PROCESSES_XML, processesXml);
+  public static void attachProcessesXml(DeploymentUnit unit, ProcessesXmlWrapper processesXmlWrapper) {
+      unit.putAttachment(PROCESSES_XML, processesXmlWrapper);
   }
 
   /**
    * Returns the attached {@link ProcessesXml} marker or null;
    *  
    */
-  public static ProcessesXml getProcessesXml(DeploymentUnit deploymentUnit) {
+  public static ProcessesXmlWrapper getProcessesXml(DeploymentUnit deploymentUnit) {
     return deploymentUnit.getAttachment(PROCESSES_XML);
   }
 

@@ -10,11 +10,11 @@
   <process-engine name="default">
     <job-acquisition>default</job-acquisition>
     <configuration>org.activiti.engine.impl.cfg.StandaloneProcessEngineConfiguration</configuration>
-    <datasource>jdbc/ProcessEngine</datasource>
+    <datasource>java:jdbc/ProcessEngine</datasource>
 
     <properties>
         <property name="history">full</property>
-        <property name="databaseSchemaUpdate">update</property>
+        <property name="databaseSchemaUpdate">true</property>
     </properties>
 
   </process-engine>

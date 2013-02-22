@@ -59,9 +59,11 @@ public class ModuleDependencyProcessor implements DeploymentUnitProcessor {
         final ModuleSpecification moduleSpecification = subdeploymentUnit.getAttachment(Attachments.MODULE_SPECIFICATION);
         moduleSpecification.addSystemDependency(new ModuleDependency(moduleLoader, MODULE_IDENTIFYER_PROCESS_ENGINE, false, false, false, false));    
       }
+      
     } else {    
       final ModuleSpecification moduleSpecification = parent.getAttachment(Attachments.MODULE_SPECIFICATION);
       moduleSpecification.addSystemDependency(new ModuleDependency(moduleLoader, MODULE_IDENTIFYER_PROCESS_ENGINE, false, false, false, false));   
+      
     }
     
   }

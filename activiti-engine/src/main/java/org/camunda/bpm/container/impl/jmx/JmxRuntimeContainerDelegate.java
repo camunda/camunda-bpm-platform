@@ -21,6 +21,7 @@ import javax.management.ObjectName;
 
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.ProcessEngine;
+import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.jobexecutor.JobExecutor;
 import org.camunda.bpm.ProcessApplicationService;
 import org.camunda.bpm.ProcessEngineService;
@@ -41,21 +42,14 @@ import org.camunda.bpm.container.spi.RuntimeContainerDelegate;
 import com.camunda.fox.platform.FoxPlatformException;
 import com.camunda.fox.platform.jobexecutor.JobExecutorService;
 import com.camunda.fox.platform.jobexecutor.impl.acquisition.JobAcquisition;
+import com.camunda.fox.platform.jobexecutor.spi.JobAcquisitionConfiguration;
 
 /**
  * <p>This is the default {@link RuntimeContainerDelegate} implementation that delegates
  * to the local {@link MBeanServer} infrastructure. The MBeanServer is available
  * as per the Java Virtual Machine and allows the process engine to expose
  * Management Resources.</p>
- * 
- * <p>Many container implementations such as JBoss Application Server 5/6 (and before) 
- * provide a custom MBean Server implementation. Using the MBeanServer as our default 
- * Container allows us to register the process engine resources along other management 
- * resources provided by those containers.</p>
- * 
- * <p>Note that this implementation does not maintain any internal state but rather 
- * delegates all state management to the {@link MBeanServer}.</p>
- * 
+ *
  * @author Daniel Meyer
  * 
  */
@@ -217,6 +211,20 @@ public class JmxRuntimeContainerDelegate implements RuntimeContainerDelegate, Pr
 
   public List<JobExecutor> getJobAcquisitions() {
     return serviceContainer.getServiceValuesByType(ServiceTypes.JOB_ACQUISITION);
+  }
+  
+  public JobExecutor registerProcessEngine(ProcessEngineConfigurationImpl processEngineConfiguration, String acquisitionName) {
+    return null;
+  }
+  
+  public JobExecutor startJobAcquisition(JobAcquisitionConfiguration configuration) {
+    return null;
+  }
+  
+  public void stopJobAcquisition(String jobAcquisitionName) {
+  }
+  
+  public void unregisterProcessEngine(ProcessEngineConfigurationImpl processEngineConfiguration, String acquisitionName) {
   }
   
   // Getter / Setter ////////////////////////////////////////////////////////////

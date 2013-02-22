@@ -17,12 +17,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Stack;
 import java.util.concurrent.ConcurrentHashMap;
 
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
-import org.activiti.engine.ActivitiException;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanDeploymentOperation.MBeanDeploymentOperationBuilder;
 
 import com.camunda.fox.platform.FoxPlatformException;
@@ -40,7 +40,7 @@ public class MBeanServiceContainer {
   protected Map<ObjectName, MbeanService<?>> servicesByName = new ConcurrentHashMap<ObjectName, MbeanService<?>>();
 
   /** set if the current thread is performing a composite deployment operation */
-  protected ThreadLocal<MBeanDeploymentOperation> operationContext = new ThreadLocal<MBeanDeploymentOperation>();
+  protected ThreadLocal<Stack<MBeanDeploymentOperation>> operationContext = new ThreadLocal<Stack<MBeanDeploymentOperation>>();
   
   public synchronized <S> void startService(ServiceType serviceType, String localName, MbeanService<S> service) {
     
@@ -63,9 +63,9 @@ public class MBeanServiceContainer {
       beanServer.registerMBean(service, serviceName);
       servicesByName.put(serviceName, service);
 
-      MBeanDeploymentOperation currentOperationContext = operationContext.get();
+      Stack<MBeanDeploymentOperation> currentOperationContext = operationContext.get();
       if (currentOperationContext != null) {
-        currentOperationContext.serviceAdded(serviceName);
+        currentOperationContext.peek().serviceAdded(serviceName);
       }
 
     } catch (Exception e) {
@@ -119,16 +119,22 @@ public class MBeanServiceContainer {
   
   protected void executeDeploymentOperation(MBeanDeploymentOperation operation) {
 
-    if (operationContext.get() != null) {
-      throw new ActivitiException("Cannot start deployment operation " + operation.name + "', already performing operation '" + operationContext.get().name);
+    Stack<MBeanDeploymentOperation> currentOperationContext = operationContext.get();
+    if(currentOperationContext == null) {
+      currentOperationContext = new Stack<MBeanDeploymentOperation>();      
+      operationContext.set(currentOperationContext);
     }
 
     try {
-      operationContext.set(operation);
+      currentOperationContext.push(operation);
       // execute the operation
       operation.execute();
+      
     } finally {
-      operationContext.remove();
+      currentOperationContext.pop();
+      if(currentOperationContext.isEmpty()) {
+        operationContext.remove();
+      }
     }
   }
   
@@ -136,7 +142,7 @@ public class MBeanServiceContainer {
    * get a specific service by name or null if no such Service exists. 
    * 
    */
-  public <S> MbeanService<S> getService(ServiceType type, String localName) {
+  public <S> S getService(ServiceType type, String localName) {
     ObjectName serviceName = type.getServiceName(localName);
     return getService(serviceName);
   }
@@ -146,8 +152,8 @@ public class MBeanServiceContainer {
    * 
    */
   @SuppressWarnings("unchecked")
-  protected <S> MbeanService<S> getService(ObjectName name) {
-    return (MbeanService<S>) servicesByName.get(name);
+  protected <S> S getService(ObjectName name) {
+    return (S) servicesByName.get(name);
   }
   
   /**
