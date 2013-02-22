@@ -11,7 +11,7 @@ angular.module('dashboard', [])
 
 .controller('DashboardCtrl', ['$scope', 'ProcessDefinitionResource', function ($scope, ProcessDefinitionResource) {
 
-  $scope.orderByPredicate = 'name';
+  $scope.orderByPredicate = 'definition.name';
   $scope.orderByReverse = false;
 
   ProcessDefinitionResource.queryStatistics(function(data){

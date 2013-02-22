@@ -8,17 +8,18 @@ basePath = '.';
 
 // list of files / patterns to load in the browser
 files = [
-  JASMINE,
-  JASMINE_ADAPTER,
+//  JASMINE,
+//  JASMINE_ADAPTER,
   ANGULAR_SCENARIO,
   ANGULAR_SCENARIO_ADAPTER,
-  '../../main/webapp/assets/js/lib/jquery*js',
-  '../../main/webapp/assets/js/lib/angular/angular.js',
-  '../../main/webapp/assets/js/lib/angular/angular-resource.js',
-  '../../main/webapp/common/**/*js',
-  '../../main/webapp/app/**/*js',
-  'src/*js',
-  'lib/*js',
+  'src/**/*-scenarios.js'
+//  '../../main/webapp/assets/js/lib/jquery*js',
+//  '../../main/webapp/assets/js/lib/angular/angular.js',
+//  '../../main/webapp/assets/js/lib/angular/angular-resource.js',
+//  '../../main/webapp/common/**/*js',
+//  '../../main/webapp/app/**/*js',
+//  'src/*js',
+//  'lib/*js',
 ];
 
 
@@ -48,15 +49,12 @@ runnerPort = 9100;
 // enable / disable colors in the output (reporters and logs)
 colors = true;
 
-
 // level of logging
 // possible values: LOG_DISABLE || LOG_ERROR || LOG_WARN || LOG_INFO || LOG_DEBUG
-logLevel = LOG_INFO;
-
+logLevel = LOG_DEBUG;
 
 // enable / disable watching file and executing tests whenever any file changes
 autoWatch = true;
-
 
 // Start these browsers, currently available:
 // - Chrome
@@ -68,16 +66,10 @@ autoWatch = true;
 // - IE (only Windows)
 browsers = ['Chrome'];
 
+urlRoot = '/__testacular/'; 
 
-// If browser does not capture in given timeout [ms], kill it
-captureTimeout = 5000;
-
-
-// Continuous Integration mode
-// if true, it capture browsers, run tests and exit
-singleRun = false;
-
-// report which specs are slower than 500ms
-// CLI --report-slower-than 500
-reportSlowerThan = 500;
-
+proxies = {
+  '/': 'http://localhost:8081/cockpit/',
+  '/cockpit/': 'http://localhost:8081/cockpit/',
+  '/camunda-engine-rest/': 'http://localhost:8081/camunda-engine-rest/'
+};
