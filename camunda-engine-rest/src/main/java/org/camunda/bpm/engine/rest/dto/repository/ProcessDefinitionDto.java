@@ -4,16 +4,16 @@ import org.activiti.engine.repository.ProcessDefinition;
 
 public class ProcessDefinitionDto {
 
-  private String id;
-  private String key;
-  private String category;
-  private String description;
-  private String name;
-  private int version;
-  private String resource;
-  private String deploymentId;
-  private String diagram;
-  private boolean suspended;
+  protected String id;
+  protected String key;
+  protected String category;
+  protected String description;
+  protected String name;
+  protected int version;
+  protected String resource;
+  protected String deploymentId;
+  protected String diagram;
+  protected boolean suspended;
   
   public String getId() {
     return id;
