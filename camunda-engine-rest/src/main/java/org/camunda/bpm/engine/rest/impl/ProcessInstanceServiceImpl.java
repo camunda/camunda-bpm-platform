@@ -10,6 +10,7 @@ import org.activiti.engine.RuntimeService;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.rest.ProcessInstanceService;
+import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceQueryDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
@@ -57,6 +58,24 @@ public class ProcessInstanceServiceImpl extends AbstractEngineService implements
   public List<ProcessInstanceDto> queryProcessInstances(
       ProcessInstanceQueryDto query, Integer firstResult, Integer maxResults) {
     return getProcessInstances(query, firstResult, maxResults);
+  }
+
+  @Override
+  public CountResultDto getProcessInstancesCount(
+      ProcessInstanceQueryDto queryDto) {
+    RuntimeService runtimeService = processEngine.getRuntimeService();
+    ProcessInstanceQuery query;
+    try {
+      query = queryDto.toQuery(runtimeService);
+    } catch (InvalidRequestException e) {
+      throw new WebApplicationException(Status.BAD_REQUEST.getStatusCode());
+    }
+    
+    long count = query.count();
+    CountResultDto result = new CountResultDto();
+    result.setCount(count);
+    
+    return result;
   }
 
 }

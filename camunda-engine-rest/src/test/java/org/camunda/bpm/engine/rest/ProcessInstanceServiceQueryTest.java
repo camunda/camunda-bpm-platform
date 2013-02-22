@@ -3,6 +3,7 @@ package org.camunda.bpm.engine.rest;
 import static com.jayway.restassured.RestAssured.expect;
 import static com.jayway.restassured.RestAssured.given;
 import static com.jayway.restassured.path.json.JsonPath.from;
+import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -34,11 +35,13 @@ public class ProcessInstanceServiceQueryTest extends AbstractRestServiceTest {
   private static final boolean EXAMPLE_IS_ENDED = false;
 
   private static final String PROCESS_INSTANCE_QUERY_URL = TEST_RESOURCE_ROOT_PATH + "/process-instance";
+  private static final String PROCESS_INSTANCE_COUNT_QUERY_URL = PROCESS_INSTANCE_QUERY_URL + "/count";
   private ProcessInstanceQuery mockedQuery;
   
   private ProcessInstanceQuery setUpMockInstanceQuery(List<ProcessInstance> mockedInstances) {
     ProcessInstanceQuery sampleInstanceQuery = mock(ProcessInstanceQuery.class);
     when(sampleInstanceQuery.list()).thenReturn(mockedInstances);
+    when(sampleInstanceQuery.count()).thenReturn((long) mockedInstances.size());
     when(processEngine.getRuntimeService().createProcessInstanceQuery()).thenReturn(sampleInstanceQuery);
     return sampleInstanceQuery;
   }
@@ -389,4 +392,13 @@ public class ProcessInstanceServiceQueryTest extends AbstractRestServiceTest {
     verify(mockedQuery).listPage(firstResult, Integer.MAX_VALUE);
   }
   
+  @Test
+  public void testQueryCount() throws IOException {
+    setUpMockedQuery();
+    expect().statusCode(Status.OK.getStatusCode())
+      .body("count", equalTo(1))
+      .when().get(PROCESS_INSTANCE_COUNT_QUERY_URL);
+    
+    verify(mockedQuery).count();
+  }
 }

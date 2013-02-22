@@ -11,6 +11,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 import org.activiti.engine.runtime.ProcessInstanceQuery;
+import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceQueryDto;
 
@@ -31,6 +32,10 @@ public interface ProcessInstanceService {
   List<ProcessInstanceDto> getProcessInstances(ProcessInstanceQueryDto query,
       @QueryParam("firstResult") Integer firstResult,
       @QueryParam("maxResults") Integer maxResults);
+  
+  @GET
+  @Path("/count")
+  CountResultDto getProcessInstancesCount(ProcessInstanceQueryDto query);
 
   /**
    * Expects the same parameters as
