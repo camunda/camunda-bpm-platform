@@ -34,13 +34,11 @@
       <groupId>com.camunda.fox.platform</groupId>
       <artifactId>camunda-engine-rest</artifactId>
       <version>${project.version}</version>
-      <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
       <artifactId>resteasy-jaxrs</artifactId>
-      <scope>test</scope>
       <exclusions>
         <exclusion>
           <artifactId>httpclient</artifactId>
@@ -72,7 +70,6 @@
     <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
-      <scope>test</scope>
     </dependency>
 
   </dependencies>
@@ -85,6 +82,11 @@
         <configuration>
           <failOnMissingWebXml>false</failOnMissingWebXml>
         </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.tomcat.maven</groupId>
+        <artifactId>tomcat6-maven-plugin</artifactId>
+        <version>2.0</version>
       </plugin>
     </plugins>
   </build>
