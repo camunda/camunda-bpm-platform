@@ -16,18 +16,14 @@
   <name>camunda BPM - tasklist</name>
 
   <dependencies>
-    <!-- test -->
-    
     <dependency>
       <groupId>com.camunda.fox.engine</groupId>
       <artifactId>fox-engine</artifactId>
-      <scope>test</scope>
     </dependency>
 
     <dependency>
       <groupId>com.fasterxml.uuid</groupId>
       <artifactId>java-uuid-generator</artifactId>
-      <scope>test</scope>
     </dependency>
 
     <dependency>
@@ -57,7 +53,7 @@
       <groupId>org.jboss.spec</groupId>
       <artifactId>jboss-javaee-6.0</artifactId>
       <type>pom</type>
-      <scope>test</scope>
+      <scope>provided</scope>
       <version>3.0.0.Beta1</version>
       <exclusions>
         <exclusion>
