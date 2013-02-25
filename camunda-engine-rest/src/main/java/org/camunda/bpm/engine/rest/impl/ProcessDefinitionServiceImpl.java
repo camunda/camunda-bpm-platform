@@ -17,13 +17,14 @@ import org.activiti.engine.repository.ProcessDefinitionQuery;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.rest.ProcessDefinitionService;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
+import org.camunda.bpm.engine.rest.dto.StatisticsResultDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDiagramDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionQueryDto;
-import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionStatisticsResultDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.runtime.StartProcessInstanceDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+import org.camunda.bpm.engine.rest.impl.stub.ActivityStubStatisticsBuilder;
 import org.camunda.bpm.engine.rest.impl.stub.ProcessDefinitionStubStatisticsBuilder;
 
 public class ProcessDefinitionServiceImpl extends AbstractEngineService implements ProcessDefinitionService {
@@ -124,7 +125,7 @@ public class ProcessDefinitionServiceImpl extends AbstractEngineService implemen
    * For the time being this is a stub implementation that returns a fixed data set.
    */
   @Override
-  public List<ProcessDefinitionStatisticsResultDto> getStatistics(String groupBy, Boolean includeFailedJobs) {
+  public List<StatisticsResultDto> getStatistics(String groupBy, Boolean includeFailedJobs, String processDefinitionId) {
     if (groupBy == null || groupBy.equals("version")) {
       if (includeFailedJobs != null && includeFailedJobs) {
         return getStubDataPerDefinitionVersionWithFailedJobs();
@@ -137,12 +138,37 @@ public class ProcessDefinitionServiceImpl extends AbstractEngineService implemen
       } else {
         return getStubDataPerDefinition();
       }
+    } else if (groupBy.equals("activity") && processDefinitionId != null && !processDefinitionId.isEmpty()) {
+      return getStubDataPerActivity(processDefinitionId);
     }
     throw new WebApplicationException(Status.BAD_REQUEST);
   }
- 
 
-  private List<ProcessDefinitionStatisticsResultDto> getStubDataPerDefinition() {
+  private List<StatisticsResultDto> getStubDataPerActivity(String processDefinitionId) {
+    return ActivityStubStatisticsBuilder
+        .addResult()
+          .id("assignApprover")
+          .instances(10)
+          .activityName("Assign Approver")
+        .nextResult()
+          .id("approveInvoice")
+          .instances(1010)
+          .activityName("Approve Invoice")
+        .nextResult()
+          .id("reviewInvoice")
+          .instances(0)
+          .activityName("Review Invoice")
+        .nextResult()
+          .id("prepareBankTransfer")
+          .instances(130077)
+          .activityName("Prepare Bank Transfer")
+         .nextResult()
+          .id("saveInvoiceToSVN")
+          .activityName("Save Invoice To SVN")
+        .build();    
+  }
+
+  private List<StatisticsResultDto> getStubDataPerDefinition() {
     return ProcessDefinitionStubStatisticsBuilder
         .addResult()
           .id("order_process_key").instances(17).definitionId("3")
@@ -176,7 +202,7 @@ public class ProcessDefinitionServiceImpl extends AbstractEngineService implemen
         .build();
   }
   
-  private List<ProcessDefinitionStatisticsResultDto> getStubDataPerDefinitionWithFailedJobs() {
+  private List<StatisticsResultDto> getStubDataPerDefinitionWithFailedJobs() {
     return ProcessDefinitionStubStatisticsBuilder
         .addResult()
           .id("order_process_key").instances(17).failedJobs(36).definitionId("3")
@@ -210,7 +236,7 @@ public class ProcessDefinitionServiceImpl extends AbstractEngineService implemen
         .build();
   }
   
-  private List<ProcessDefinitionStatisticsResultDto> getStubDataPerDefinitionVersion() {
+  private List<StatisticsResultDto> getStubDataPerDefinitionVersion() {
     return ProcessDefinitionStubStatisticsBuilder
         .addResult()
           .id("1").instances(5).definitionId("1")
@@ -279,7 +305,7 @@ public class ProcessDefinitionServiceImpl extends AbstractEngineService implemen
         .build();
   }
   
-  private List<ProcessDefinitionStatisticsResultDto> getStubDataPerDefinitionVersionWithFailedJobs() {
+  private List<StatisticsResultDto> getStubDataPerDefinitionVersionWithFailedJobs() {
     return ProcessDefinitionStubStatisticsBuilder
          .addResult()
            .id("1").instances(5).failedJobs(12).definitionId("1")

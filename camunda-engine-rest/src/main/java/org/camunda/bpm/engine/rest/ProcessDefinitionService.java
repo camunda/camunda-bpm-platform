@@ -15,10 +15,10 @@ import javax.ws.rs.core.UriInfo;
 
 import org.activiti.engine.repository.ProcessDefinitionQuery;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
+import org.camunda.bpm.engine.rest.dto.StatisticsResultDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDiagramDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionQueryDto;
-import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionStatisticsResultDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.runtime.StartProcessInstanceDto;
 
@@ -62,6 +62,6 @@ public interface ProcessDefinitionService {
 	
 	@GET
 	@Path("/statistics")
-	List<ProcessDefinitionStatisticsResultDto> getStatistics(@QueryParam("groupBy") String groupBy, @QueryParam("failedJobs") Boolean includeFailedJobs);
+	List<StatisticsResultDto> getStatistics(@QueryParam("groupBy") String groupBy, @QueryParam("failedJobs") Boolean includeFailedJobs, @QueryParam("processDefinitionId") String processDefinitionId);
 	
 }

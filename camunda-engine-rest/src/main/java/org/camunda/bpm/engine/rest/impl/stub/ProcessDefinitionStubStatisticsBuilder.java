@@ -3,19 +3,20 @@ package org.camunda.bpm.engine.rest.impl.stub;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.camunda.bpm.engine.rest.dto.StatisticsResultDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionStatisticsResultDto;
 import org.camunda.bpm.engine.rest.dto.repository.StubProcessDefinitionDto;
 
 public class ProcessDefinitionStubStatisticsBuilder {
 
   private ProcessDefinitionStatisticsResultDto currentStatisticsEntity;
-  private List<ProcessDefinitionStatisticsResultDto> collectedResults;
+  private List<StatisticsResultDto> collectedResults;
   private StubProcessDefinitionDto processDefinition;
   
   private ProcessDefinitionStubStatisticsBuilder() {
     currentStatisticsEntity = new ProcessDefinitionStatisticsResultDto();
     processDefinition = new StubProcessDefinitionDto();
-    collectedResults = new ArrayList<ProcessDefinitionStatisticsResultDto>();
+    collectedResults = new ArrayList<StatisticsResultDto>();
   }
   
   public static ProcessDefinitionStubStatisticsBuilder addResult() {
@@ -64,7 +65,7 @@ public class ProcessDefinitionStubStatisticsBuilder {
     return this;
   }
   
-  public List<ProcessDefinitionStatisticsResultDto> build() {
+  public List<StatisticsResultDto> build() {
     currentStatisticsEntity.setDefinition(processDefinition);
     collectedResults.add(currentStatisticsEntity);
     return collectedResults;

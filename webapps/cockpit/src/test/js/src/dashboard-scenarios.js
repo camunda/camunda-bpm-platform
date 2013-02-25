@@ -26,7 +26,7 @@ describe('cockpit dashboard', function() {
   });
   
   it('should show the number of running instances for a process definition', function () {
-    expect(repeater('.tile:first').column('statistic.instances')).toBe(3);
+    expect(repeater('.tile:first').column('statistic.instances')).toContain("3");
   });
   
   it('should navigate to process definition site', function () {
