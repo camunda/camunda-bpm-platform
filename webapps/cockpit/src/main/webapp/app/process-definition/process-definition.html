@@ -1,7 +1,25 @@
 <div class="page-header">
-  <h1>{{ processDefinition.name }}</h1>
-
+  <h1 ngm-if="!!processDefinition.name">{{ processDefinition.name }}</h1>
+  <h1 ngm-if="!processDefinition.name">{{ processDefinition.key }}</h1>
 </div>
 
+<div>
+  <table>
+    <tbody>
+      <tr>
+        <td><strong>Version: </strong></td>
+        <td>{{ processDefinition.version }}</td>
+      </tr>
+      <tr>
+        <td><strong>Running instances: </strong></td>
+        <td>{{ processDefinitionLatestVersionCount.count }}</td>
+      </tr>
+      <tr>
+        <td><strong>Total running instances: </strong></td>
+        <td>{{ processDefinitionTotalCount.count }}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
 
-<div process-diagram></div>
+<div process-diagram id="processDiagram"></div>

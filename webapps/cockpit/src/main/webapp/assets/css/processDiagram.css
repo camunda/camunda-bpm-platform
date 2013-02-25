@@ -1,0 +1,6 @@
+div#processDiagram {
+  margin-top : 20px;
+  min-width: 100%;
+  min-height: 100%;
+  overflow: auto;
+}

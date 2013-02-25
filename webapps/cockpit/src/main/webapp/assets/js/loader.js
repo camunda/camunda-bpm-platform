@@ -33,6 +33,7 @@ $script([
           '../../common/directives/processDiagram.js',
 					'../../common/resources/resources.js',
 					'../../common/resources/processDefinitionResource.js',
+          '../../common/resources/processInstanceResource.js',
           '../../common/resources/processDefinitionDiagramResource.js',
 					'../../common/services/services.js',
 					'../../common/services/uri.js',

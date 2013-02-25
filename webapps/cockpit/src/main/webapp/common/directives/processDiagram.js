@@ -5,11 +5,11 @@ angular
   .directive('processDiagram', function() {
     return {
       restrict: 'A',
-      template: '<div id="processDiagram""></div>',
+      replace : true,
       link: function(scope, element, attrs, $destroy) {
 
         var renderer = BpmnRenderer;
-        renderer.render(scope.processDiagramXml.bpmn20_xml, element);
+        renderer.render(scope.processDiagramXml.bpmn20Xml, element);
 
         scope.$on($destroy, function() {
           renderer = null;
