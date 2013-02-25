@@ -1,9 +1,5 @@
 package org.camunda.bpm.tasklist;
 
-import com.camunda.fox.platform.spi.ProcessEngineConfiguration;
-import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.activiti.engine.impl.persistence.StrongUuidGenerator;
-
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
