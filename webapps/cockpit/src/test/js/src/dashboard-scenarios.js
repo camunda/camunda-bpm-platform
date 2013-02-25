@@ -21,6 +21,10 @@ describe('cockpit dashboard', function() {
     expect(repeater('.tile-grid', 'process definition tiles').column('shortcutProcessDefinitionName(statistic.definition.name)')).toContain('Loan applicant, with a ve...');
   });
   
+  it('should contain the process definition key as process definition name', function() {
+    expect(repeater('.tile-grid', 'process definition tiles').column('statistic.definition.name')).toContain('loan_applicant_process');
+  });
+  
   it('should show the number of running instances for a process definition', function () {
     expect(repeater('.tile:first').column('statistic.instances')).toBe(3);
   });
