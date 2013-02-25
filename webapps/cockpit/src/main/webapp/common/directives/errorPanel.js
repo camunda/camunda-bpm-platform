@@ -15,11 +15,8 @@ angular
         if (error.status && error.config) {
           html += "<strong>"+error.status+":</strong> ";
           html += "<span>"+error.config+"</span>";
-          if (error.type == 'com.camunda.fox.cycle.exception.CycleMissingCredentialsException') {
-            html += "<span>(<a style=\"color: #827AA2;\" href=\"" + Uri.uri("secured/view/profile") + "\">add user credentials</a>)</span>";
-          }
         } else {
-          html += "An error occured, try refreshing the page or relogin.";
+          html += "An error occured, try refreshing the page.";
         }
         
         html += "</div>";
