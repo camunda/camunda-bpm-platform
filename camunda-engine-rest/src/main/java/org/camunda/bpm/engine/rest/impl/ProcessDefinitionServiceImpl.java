@@ -1,5 +1,6 @@
 package org.camunda.bpm.engine.rest.impl;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,11 +11,13 @@ import javax.ws.rs.core.UriInfo;
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
+import org.activiti.engine.impl.util.IoUtil;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.repository.ProcessDefinitionQuery;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.rest.ProcessDefinitionService;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
+import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDiagramDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionQueryDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionStatisticsResultDto;
@@ -343,5 +346,19 @@ public class ProcessDefinitionServiceImpl extends AbstractEngineService implemen
            .definitionName("Loan applicant, with a very long process definition name 1").definitionKey("loan_applicant_process_long_name_1")
            .definitionVersion(1)        
          .build();
+  }
+  
+  @Override
+  public ProcessDefinitionDiagramDto getProcessDefinitionBpmn20Xml(String processDefinitionId) {
+    InputStream processModelIn = null;
+    try {
+      processModelIn = processEngine.getRepositoryService().getProcessModel(processDefinitionId);
+      byte[] processModel = IoUtil.readInputStream(processModelIn, "processModelBpmn20Xml");
+      return ProcessDefinitionDiagramDto.create(processDefinitionId + "DEFAULT", new String(processModel, "UTF-8"));
+    } catch (Exception e) {
+      throw new WebApplicationException(e, Status.BAD_REQUEST);
+    } finally {
+      IoUtil.closeSilently(processModelIn);
+    }
   }
 }
