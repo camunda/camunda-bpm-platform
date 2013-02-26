@@ -9,7 +9,7 @@ angular.module('cockpit', [
     'cockpit.resources'
     ])
 
-.config(['$routeProvider', '$locationProvider', '$httpProvider', function($routeProvider, $locationProvider, $httpProvider) {
+.config(['$routeProvider', '$httpProvider', function($routeProvider,$httpProvider) {
 
     $httpProvider.responseInterceptors.push('cockpitHttpInterceptor');
 

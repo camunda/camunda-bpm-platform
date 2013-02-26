@@ -7,13 +7,9 @@ angular
           throw "ProcessDefinitionId is not set.";
         }
 
-        var httpConfig = {
-          method: 'GET',
-          url: Uri.restUri('/process-definition/' + processDefinitionId),
-          headers: { 'Content-Type': 'application/bpmn20+xml' },
-          data: {}
-        };
-        return HttpUtils.makePromise($http(httpConfig));
+        return HttpUtils.makePromise(
+          $http.get(Uri.restUri('/process-definition/' + processDefinitionId) + '/xml')
+        );
       }
     }
   });

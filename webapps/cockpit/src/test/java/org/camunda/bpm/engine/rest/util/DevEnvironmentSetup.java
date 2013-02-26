@@ -10,6 +10,7 @@ import org.activiti.engine.RuntimeService;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.persistence.StrongUuidGenerator;
 import org.activiti.engine.repository.ProcessDefinition;
+import org.activiti.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.rest.impl.ProcessDefinitionServiceImpl;
 import org.camunda.bpm.engine.rest.impl.ProcessInstanceServiceImpl;
 import org.camunda.bpm.engine.rest.impl.TaskRestServiceImpl;
@@ -57,8 +58,10 @@ public class DevEnvironmentSetup implements ProcessEngineProvider {
     RuntimeService runtimeService = processEngine.getRuntimeService();
     List<ProcessDefinition> pds = repositoryService.createProcessDefinitionQuery().list();
     for (ProcessDefinition pd : pds) {
+      System.out.println("ProcessDefinition - id: " + pd.getId() +  ", key: " + pd.getKey() + ", name: " + pd.getName());
       for (int i = 0; i < numOfProcessesPerDefinition; i++) {
-        runtimeService.startProcessInstanceById(pd.getId());
+        ProcessInstance pi = runtimeService.startProcessInstanceById(pd.getId());
+        System.out.println("ProcessInstance - id: " + pi.getId());
       }
     }
   }
