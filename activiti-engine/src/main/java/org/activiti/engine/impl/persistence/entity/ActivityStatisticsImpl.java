@@ -1,8 +1,8 @@
 package org.activiti.engine.impl.persistence.entity;
 
-import org.activiti.engine.management.ActivityStatisticsResult;
+import org.activiti.engine.management.ActivityStatistics;
 
-public class ActivityStatisticsResultImpl implements ActivityStatisticsResult {
+public class ActivityStatisticsImpl implements ActivityStatistics {
 
   private String id;
   private int instances;

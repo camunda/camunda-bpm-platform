@@ -28,8 +28,8 @@ import org.activiti.engine.impl.db.DbSqlSession;
 import org.activiti.engine.impl.db.DbSqlSessionFactory;
 import org.activiti.engine.impl.interceptor.Command;
 import org.activiti.engine.impl.interceptor.CommandContext;
-import org.activiti.engine.management.ActivityRuntimeStatisticsQuery;
-import org.activiti.engine.management.ProcessDefinitionRuntimeStatisticsQuery;
+import org.activiti.engine.management.ActivityStatisticsQuery;
+import org.activiti.engine.management.ProcessDefinitionStatisticsQuery;
 import org.activiti.engine.management.TableMetaData;
 import org.activiti.engine.management.TablePageQuery;
 import org.activiti.engine.runtime.JobQuery;
@@ -94,12 +94,12 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
     });
   }
 
-  public ProcessDefinitionRuntimeStatisticsQuery createProcessDefinitionRuntimeStatisticsQuery() {
-    return new ProcessDefinitionRuntimeStatisticsQueryImpl(commandExecutor);
+  public ProcessDefinitionStatisticsQuery createProcessDefinitionRuntimeStatisticsQuery() {
+    return new ProcessDefinitionStatisticsQueryImpl(commandExecutor);
   }
   
-  public ActivityRuntimeStatisticsQuery createActivityRuntimeStatisticsQuery(String processDefinitionId) {
-    return new ActivityRuntimeStatisticsQueryImpl(processDefinitionId, commandExecutor);
+  public ActivityStatisticsQuery createActivityRuntimeStatisticsQuery(String processDefinitionId) {
+    return new ActivityStatisticsQueryImpl(processDefinitionId, commandExecutor);
   }
 
 }

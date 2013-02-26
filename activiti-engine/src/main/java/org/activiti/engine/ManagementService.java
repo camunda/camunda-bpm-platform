@@ -15,8 +15,8 @@ package org.activiti.engine;
 import java.sql.Connection;
 import java.util.Map;
 
-import org.activiti.engine.management.ActivityRuntimeStatisticsQuery;
-import org.activiti.engine.management.ProcessDefinitionRuntimeStatisticsQuery;
+import org.activiti.engine.management.ActivityStatisticsQuery;
+import org.activiti.engine.management.ProcessDefinitionStatisticsQuery;
 import org.activiti.engine.management.TableMetaData;
 import org.activiti.engine.management.TablePage;
 import org.activiti.engine.management.TablePageQuery;
@@ -105,7 +105,7 @@ public interface ManagementService {
   /** programmatic schema update on a given connection returning feedback about what happened */
   String databaseSchemaUpgrade(Connection connection, String catalog, String schema);
   
-  ProcessDefinitionRuntimeStatisticsQuery createProcessDefinitionRuntimeStatisticsQuery();
+  ProcessDefinitionStatisticsQuery createProcessDefinitionRuntimeStatisticsQuery();
   
-  ActivityRuntimeStatisticsQuery createActivityRuntimeStatisticsQuery(String processDefinitionId);
+  ActivityStatisticsQuery createActivityRuntimeStatisticsQuery(String processDefinitionId);
 }

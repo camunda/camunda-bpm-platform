@@ -4,16 +4,16 @@ import java.util.List;
 
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.interceptor.CommandExecutor;
-import org.activiti.engine.management.ProcessDefinitionRuntimeStatisticsQuery;
-import org.activiti.engine.management.ProcessDefinitionStatisticsResult;
+import org.activiti.engine.management.ProcessDefinitionStatisticsQuery;
+import org.activiti.engine.management.ProcessDefinitionStatistics;
 
-public class ProcessDefinitionRuntimeStatisticsQueryImpl extends AbstractQuery<ProcessDefinitionRuntimeStatisticsQuery, ProcessDefinitionStatisticsResult>  
-  implements ProcessDefinitionRuntimeStatisticsQuery {
+public class ProcessDefinitionStatisticsQueryImpl extends AbstractQuery<ProcessDefinitionStatisticsQuery, ProcessDefinitionStatistics>  
+  implements ProcessDefinitionStatisticsQuery {
 
   private static final long serialVersionUID = 1L;
   private boolean includeFailedJobs = false;
 
-  public ProcessDefinitionRuntimeStatisticsQueryImpl(CommandExecutor commandExecutor) {
+  public ProcessDefinitionStatisticsQueryImpl(CommandExecutor commandExecutor) {
     super(commandExecutor);
   }
 
@@ -28,16 +28,16 @@ public class ProcessDefinitionRuntimeStatisticsQueryImpl extends AbstractQuery<P
   }
 
   @Override
-  public List<ProcessDefinitionStatisticsResult> executeList(CommandContext commandContext,
+  public List<ProcessDefinitionStatistics> executeList(CommandContext commandContext,
       Page page) {
     checkQueryOk();
     return 
       commandContext
-        .getRuntimeStatisticsManager()
-        .getRuntimeStatisticsGroupedByProcessDefinitionVersion(this, page);
+        .getStatisticsManager()
+        .getStatisticsGroupedByProcessDefinitionVersion(this, page);
   }
 
-  public ProcessDefinitionRuntimeStatisticsQuery includeFailedJobs() {
+  public ProcessDefinitionStatisticsQuery includeFailedJobs() {
     includeFailedJobs = true;
     return this;
   }

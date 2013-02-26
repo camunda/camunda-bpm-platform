@@ -2,7 +2,7 @@ package org.activiti.engine.management;
 
 import org.activiti.engine.repository.ProcessDefinition;
 
-public interface ProcessDefinitionStatisticsResult extends ProcessDefinition {
+public interface ProcessDefinitionStatistics extends ProcessDefinition {
 
   int getInstances();
   

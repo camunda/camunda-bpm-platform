@@ -1,6 +1,6 @@
 package org.activiti.engine.management;
 
-public interface ActivityStatisticsResult {
+public interface ActivityStatistics {
 
   String getId();
   

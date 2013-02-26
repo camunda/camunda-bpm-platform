@@ -22,14 +22,15 @@
     <result property="suspensionState" column="SUSPENSION_STATE_" jdbcType="INTEGER"/>
   </resultMap>
   
-  <resultMap id="activityStatisticsResultMap" type="org.activiti.engine.impl.persistence.entity.ActivityStatisticsResultImpl">
+  <resultMap id="activityStatisticsResultMap" type="org.activiti.engine.impl.persistence.entity.ActivityStatisticsImpl">
     <id property="id" column="ID_" jdbcType="VARCHAR" />
     <result property="instances" column="instance_count" jdbcType="INTEGER" />
     <result property="failedJobs" column="failed_jobs_count" jdbcType="INTEGER" />
   </resultMap>
   
   <!-- SELECT -->  
-  <select id ="selectProcessDefinitionRuntimeStatistics" resultMap="processDefinitionStatisticsResultMap">
+  <select id ="selectProcessDefinitionStatistics" resultMap="processDefinitionStatisticsResultMap" 
+    parameterType="org.activiti.engine.impl.ProcessDefinitionStatisticsQueryImpl">
     select * from ${prefix}ACT_RE_PROCDEF, 
     ( select instance.PROC_DEF_ID_ as PROC_DEF_ID_,
       instance_count
@@ -58,7 +59,8 @@
   </select>
 
 
-  <select id ="selectActivityRuntimeStatistics" resultMap="activityStatisticsResultMap" parameterType="org.activiti.engine.impl.ActivityRuntimeStatisticsQueryImpl">
+  <select id ="selectActivityStatistics" resultMap="activityStatisticsResultMap" 
+    parameterType="org.activiti.engine.impl.ActivityStatisticsQueryImpl">
     select * from
     ( select instance.act_id_ as ID_,
       instance_count
@@ -88,23 +90,4 @@
     </if>
     ) statistics
   </select>
- 
-<!--  <sql id="selectRuntimeStatistics"> -->
-<!--    select instance.PROC_DEF_ID_ as PROC_DEF_ID_, -->
-<!--      instance_count, -->
-<!--      failed_jobs_count -->
-     
-<!--    from -->
-<!--    (select PROC_DEF_ID_, count(PROC_INST_ID_) as instance_count from  -->
-<!--      ( select distinct PROC_INST_ID_, PROC_DEF_ID_ from ${prefix}ACT_RU_EXECUTION as execution -->
-<!--      left outer join ${prefix}ACT_RU_JOB as job on execution.id_ = job.execution_id_ ) instance -->
-<!--    group by instance.proc_def_id_) instance left outer join -->
-   
-<!--    (select PROC_DEF_ID_, count(id_) as failed_jobs_count from  -->
-<!--      ( select job.id_, PROC_DEF_ID_ from ${prefix}ACT_RU_EXECUTION as execution -->
-<!--      left outer join ${prefix}ACT_RU_JOB as job on execution.id_ = job.execution_id_ where job.RETRIES_ = 0) job -->
-<!--    group by job.proc_def_id_) job -->
-   
-<!--    on job.PROC_DEF_ID_ = instance.PROC_DEF_ID_ -->
-<!--  </sql> -->
 </mapper>

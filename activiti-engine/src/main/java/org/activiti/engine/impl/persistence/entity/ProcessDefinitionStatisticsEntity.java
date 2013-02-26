@@ -1,8 +1,8 @@
 package org.activiti.engine.impl.persistence.entity;
 
-import org.activiti.engine.management.ProcessDefinitionStatisticsResult;
+import org.activiti.engine.management.ProcessDefinitionStatistics;
 
-public class ProcessDefinitionStatisticsEntity extends ProcessDefinitionEntity implements ProcessDefinitionStatisticsResult {
+public class ProcessDefinitionStatisticsEntity extends ProcessDefinitionEntity implements ProcessDefinitionStatistics {
 
   private static final long serialVersionUID = 1L;
   private int instances;

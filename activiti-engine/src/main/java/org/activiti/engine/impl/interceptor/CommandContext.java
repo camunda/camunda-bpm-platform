@@ -45,7 +45,7 @@ import org.activiti.engine.impl.persistence.entity.MembershipManager;
 import org.activiti.engine.impl.persistence.entity.ProcessDefinitionManager;
 import org.activiti.engine.impl.persistence.entity.PropertyManager;
 import org.activiti.engine.impl.persistence.entity.ResourceManager;
-import org.activiti.engine.impl.persistence.entity.RuntimeStatisticsManager;
+import org.activiti.engine.impl.persistence.entity.StatisticsManager;
 import org.activiti.engine.impl.persistence.entity.TableDataManager;
 import org.activiti.engine.impl.persistence.entity.TaskManager;
 import org.activiti.engine.impl.persistence.entity.UserManager;
@@ -327,8 +327,8 @@ public class CommandContext {
     return getSession(PropertyManager.class);
   }
   
-  public RuntimeStatisticsManager getRuntimeStatisticsManager() {
-    return getSession(RuntimeStatisticsManager.class);
+  public StatisticsManager getStatisticsManager() {
+    return getSession(StatisticsManager.class);
   }
 
   // getters and setters //////////////////////////////////////////////////////
