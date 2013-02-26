@@ -22,6 +22,7 @@ import org.junit.Test;
 public class ProcessDefinitionStatisticsStubTest extends AbstractRestServiceTest {
 
   private static final String PROCESS_DEFINITION_STATISTICS_URL = TEST_RESOURCE_ROOT_PATH + "/process-definition/statistics";
+  private static final String ACTIVITY_STATISTICS_URL = TEST_RESOURCE_ROOT_PATH + "/process-definition/{id}/statistics";
   
   @Test
   public void testStatisticsRetrievalPerProcessDefinition() throws IOException {
@@ -92,5 +93,26 @@ public class ProcessDefinitionStatisticsStubTest extends AbstractRestServiceTest
         "fox_invoice_1", "loan_applicant_process_1", "loan_applicant_process_long_name_1"
     };
     return definitionKeys;
+  }
+  
+  @Test
+  public void testActivityStatisticsRetrieval() throws IOException {
+    setupTestScenario();
+    
+    given().pathParam("id", "aDefinitionId")
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+      .body("$.size()", is(5))
+      .body("[0].failedJobs", nullValue())
+      .body("name", hasItems(getStubActivityNames()))
+    .when().get(ACTIVITY_STATISTICS_URL);
+  }
+  
+  private String[] getStubActivityNames() {
+    String[] activityNames = new String[] {
+        "Assign Approver", "Approve Invoice", "Review Invoice",
+        "Prepare Bank Transfer", "Save Invoice To SVN"
+    };
+    return activityNames;
   }
 }

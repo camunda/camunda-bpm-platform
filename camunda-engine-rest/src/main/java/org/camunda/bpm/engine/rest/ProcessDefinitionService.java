@@ -62,6 +62,9 @@ public interface ProcessDefinitionService {
 	
 	@GET
 	@Path("/statistics")
-	List<StatisticsResultDto> getStatistics(@QueryParam("groupBy") String groupBy, @QueryParam("failedJobs") Boolean includeFailedJobs, @QueryParam("processDefinitionId") String processDefinitionId);
+	List<StatisticsResultDto> getStatistics(@QueryParam("groupBy") String groupBy, @QueryParam("failedJobs") Boolean includeFailedJobs);
 	
+	@GET
+	@Path("/{id}/statistics")
+	List<StatisticsResultDto> getActivityStatistics(@PathParam("id") String processDefinitionId);
 }

@@ -125,7 +125,7 @@ public class ProcessDefinitionServiceImpl extends AbstractEngineService implemen
    * For the time being this is a stub implementation that returns a fixed data set.
    */
   @Override
-  public List<StatisticsResultDto> getStatistics(String groupBy, Boolean includeFailedJobs, String processDefinitionId) {
+  public List<StatisticsResultDto> getStatistics(String groupBy, Boolean includeFailedJobs) {
     if (groupBy == null || groupBy.equals("version")) {
       if (includeFailedJobs != null && includeFailedJobs) {
         return getStubDataPerDefinitionVersionWithFailedJobs();
@@ -138,7 +138,13 @@ public class ProcessDefinitionServiceImpl extends AbstractEngineService implemen
       } else {
         return getStubDataPerDefinition();
       }
-    } else if (groupBy.equals("activity") && processDefinitionId != null && !processDefinitionId.isEmpty()) {
+    }
+    throw new WebApplicationException(Status.BAD_REQUEST);
+  }
+  
+  @Override
+  public List<StatisticsResultDto> getActivityStatistics(String processDefinitionId) {
+    if (processDefinitionId != null && !processDefinitionId.isEmpty()) {
       return getStubDataPerActivity(processDefinitionId);
     }
     throw new WebApplicationException(Status.BAD_REQUEST);
