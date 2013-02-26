@@ -1,8 +1,8 @@
 package org.camunda.bpm.engine.rest;
 
 import static com.jayway.restassured.RestAssured.given;
+import static com.jayway.restassured.path.json.JsonPath.from;
 import static org.hamcrest.Matchers.equalTo;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
@@ -22,17 +22,14 @@ import org.activiti.engine.RuntimeService;
 import org.activiti.engine.impl.util.ReflectUtil;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.ResponseHandler;
-import org.apache.http.client.methods.HttpGet;
 import org.apache.http.entity.ContentType;
-import org.apache.http.impl.client.BasicResponseHandler;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.camunda.bpm.engine.rest.helper.EqualsMap;
 import org.camunda.bpm.engine.rest.helper.MockDefinitionBuilder;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Matchers;
+
+import com.jayway.restassured.response.Response;
 
 public class ProcessDefinitionServiceInteractionTest extends
     AbstractRestServiceTest {
@@ -56,6 +53,7 @@ public class ProcessDefinitionServiceInteractionTest extends
   
   private static final String SINGLE_PROCESS_DEFINITION_URL = TEST_RESOURCE_ROOT_PATH + "/process-definition/{id}";
   private static final String START_PROCESS_INSTANCE_URL = SINGLE_PROCESS_DEFINITION_URL + "/start";
+  private static final String XML_DEFINITION_URL = SINGLE_PROCESS_DEFINITION_URL + "/xml";
   
   private RuntimeService runtimeServiceMock;
   private RepositoryService repositoryServiceMock;
@@ -214,28 +212,19 @@ public class ProcessDefinitionServiceInteractionTest extends
   public void testProcessDefinitionBpmn20XmlRetrieval() throws IOException {
     setupMocks();
     
-    String processDefinitionXmlUrl = "http://localhost:" + PORT + TEST_RESOURCE_ROOT_PATH + "/process-definition/" + EXAMPLE_PROCESS_DEFINITION_ID;
+    // Rest-assured has problems with extracting json with escaped quotation marks, i.e. the xml content in our case
     
-    HttpClient client = new DefaultHttpClient();
-    HttpGet get = new HttpGet(processDefinitionXmlUrl);
-    get.addHeader("Content-Type", APPLICATION_BPMN20_XML_TYPE);
-    
-    ResponseHandler<String> responseHandler = new BasicResponseHandler();
-    String responseBody = client.execute(get, responseHandler);
-    assertTrue(responseBody.contains("id"));
-    assertTrue(responseBody.contains("bpmn20Xml"));
-    assertTrue(responseBody.contains("<?xml"));
-    
-    // RESTassured does not allow changing content-type for GET request
-    
-//    given().log().all().pathParam("id", EXAMPLE_PROCESS_DEFINITION_ID)
-//      .contentType(APPLICATION_BPMN20_XML_TYPE)
-//    .then()
-////      .expect()
-////      .statusCode(Status.OK.getStatusCode())
-////      .body("id", equalTo(EXAMPLE_PROCESS_DEFINITION_ID))
-////      .body("bpmn20Xml", startsWith("<?xml"))
-//    .when().log().all().get(SINGLE_PROCESS_DEFINITION_URL);
+    Response response = given().pathParam("id", EXAMPLE_PROCESS_DEFINITION_ID)
+    .then()
+      .expect()
+      .statusCode(Status.OK.getStatusCode())
+//      .body("id", equalTo(EXAMPLE_PROCESS_DEFINITION_ID))
+//      .body("bpmn20Xml", startsWith("<?xml"))
+    .when().get(XML_DEFINITION_URL);
+
+    String responseContent = response.asString();
+    Assert.assertTrue(responseContent.contains(EXAMPLE_PROCESS_DEFINITION_ID));
+    Assert.assertTrue(responseContent.contains("<?xml"));
   }
   
   @Test
@@ -245,11 +234,11 @@ public class ProcessDefinitionServiceInteractionTest extends
     String nonExistingId = "aNonExistingDefinitionId";
     when(repositoryServiceMock.getProcessModel(eq(nonExistingId))).thenThrow(new ActivitiException("no matching process definition found."));
     
-    given().log().all().pathParam("id", nonExistingId)
+    given().pathParam("id", nonExistingId)
       .header("Content-Type", APPLICATION_BPMN20_XML_TYPE)
     .then().expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode())
-    .when().log().all().get(SINGLE_PROCESS_DEFINITION_URL);
+    .when().get(XML_DEFINITION_URL);
   }
   
 }

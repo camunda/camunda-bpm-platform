@@ -386,7 +386,7 @@ public class ProcessDefinitionServiceImpl extends AbstractEngineService implemen
     try {
       processModelIn = processEngine.getRepositoryService().getProcessModel(processDefinitionId);
       byte[] processModel = IoUtil.readInputStream(processModelIn, "processModelBpmn20Xml");
-      return ProcessDefinitionDiagramDto.create(processDefinitionId + "DEFAULT", new String(processModel, "UTF-8"));
+      return ProcessDefinitionDiagramDto.create(processDefinitionId, new String(processModel, "UTF-8"));
     } catch (Exception e) {
       throw new WebApplicationException(e, Status.BAD_REQUEST);
     } finally {

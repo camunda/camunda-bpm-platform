@@ -51,8 +51,7 @@ public interface ProcessDefinitionService {
 	ProcessDefinitionDto getProcessDefinition(@PathParam("id") String processDefinitionId);
 	
 	@GET
-	@Path("/{id}")
-	@Consumes(APPLICATION_BPMN20_XML)
+	@Path("/{id}/xml")
 	ProcessDefinitionDiagramDto getProcessDefinitionBpmn20Xml(@PathParam("id") String processDefinitionId);
 	
 	@POST
