@@ -5,7 +5,7 @@
   </dataStore>
   <message id="foxMessage_en" name="foxMessage_en_long_id"/>
   <collaboration id="collaboration_3">
-    <participant id="Process_Engine_1" name="invoice receipt (fox)" processRef="fox-invoice_en"/>
+    <participant id="Process_Engine_1" name="invoice receipt (fox)" processRef="invoice_en_process__has_an_long_id_attribute"/>
   </collaboration>
   <process id="fox-invoice_en_process__has_an_long_id_attribute" name="invoice receipt (fox)" isExecutable="true">
     <laneSet id="laneSet_5">

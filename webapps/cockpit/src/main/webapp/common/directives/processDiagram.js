@@ -7,19 +7,19 @@ angular
       restrict: 'A',
       replace : true,
       link: function(scope, element, attrs, $destroy) {
+        if (!!scope.processDefinitionId) {
+          var renderer = BpmnRenderer;
 
-        var renderer = BpmnRenderer;
+          ProcessDefinitionDiagramService.getBpmn20Xml(scope.processDefinitionId).then(
+            function(data) {
+              renderer.render(data.bpmn20Xml, element);
+            }
+          );
 
-        ProcessDefinitionDiagramService.getBpmn20Xml(scope.processDefinitionId).then(
-          function(data) {
-            renderer.render(data.bpmn20Xml, element);
-          }
-        );
-
-        scope.$on($destroy, function() {
-          renderer = null;
-        })
-
+          scope.$on($destroy, function() {
+            renderer = null;
+          })
+        }
       }
     };
   });
