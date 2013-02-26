@@ -1,5 +1,6 @@
 package org.camunda.bpm.tasklist.resources;
 
+import org.camunda.bpm.tasklist.AuthenticationFilter;
 import org.camunda.bpm.tasklist.TasklistProcessEngineProvider;
 import org.camunda.bpm.tasklist.dto.AuthenticationResponse;
 
@@ -27,16 +28,23 @@ public class AuthenticationResource {
   public AuthenticationResponse login(@PathParam("user") String userId, @PathParam("password") String password) {
     boolean validLogin = TasklistProcessEngineProvider.getStaticEngine().getIdentityService().checkPassword(userId, password);
     if (validLogin) {
-      httpRequest.getSession(true).setAttribute("authenticatedUser", userId);
+      httpRequest.getSession(true).setAttribute(AuthenticationFilter.AUTH_USER, userId);
     }
     return new AuthenticationResponse(validLogin, userId);
+  }
+
+  @GET
+  @Path("logout")
+  public String logout() {
+    httpRequest.getSession(true).setAttribute(AuthenticationFilter.AUTH_USER, null);
+    return "logged out";
   }
 
   @GET
   @Path("user")
   @Produces(MediaType.APPLICATION_JSON)
   public String getCurrentUser() {
-    return (String) httpRequest.getSession().getAttribute("authenticatedUser");
+    return (String) httpRequest.getSession().getAttribute(AuthenticationFilter.AUTH_USER);
   }
 
 }

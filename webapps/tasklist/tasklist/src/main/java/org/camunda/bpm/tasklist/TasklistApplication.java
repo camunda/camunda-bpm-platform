@@ -15,23 +15,13 @@ import java.util.Set;
 /**
  * @author: drobisch
  */
-public class Api extends Application {
+public class TasklistApplication extends Application {
 
   @Override
   public Set<Class<?>> getClasses() {
     Set<Class<?>> classes = new HashSet<Class<?>>();
-
-    classes.add(ProcessDefinitionServiceImpl.class);
-    classes.add(ProcessInstanceServiceImpl.class);
-    classes.add(TaskRestServiceImpl.class);
-
-    classes.add(EngineQueryDtoGetReader.class);
-    classes.add(JacksonConfigurator.class);
-    classes.add(JacksonJsonProvider.class);
-    classes.add(JacksonJsonProvider.class);
-
     classes.add(AuthenticationResource.class);
-
     return classes;
   }
+
 }
