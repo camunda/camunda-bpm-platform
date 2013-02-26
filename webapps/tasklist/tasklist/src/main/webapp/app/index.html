@@ -1,39 +1,40 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>camunda BPM - cockpit</title>
-    
+    <title>tasklist - camunda BPM</title>
+
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- 
-    <meta name="description" content="" />
-    -->
+
+    <meta name="description" content="camunda BPM tasklist" />
+
     <meta name="author" content="camunda services GmbH" />
 
     <!-- settings the base path for relative links -->
-    <base href="." app-base="/cockpit/" rest-base="/camunda-engine-rest/" />
+    <base href="." app-base="/tasklist/" rest-base="/camunda-engine-rest/" />
 
     <!-- Styles -->
-    <!-- <link href="assets/css/loader.css" rel="stylesheet" /> -->
-    
-    <link href="assets/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
-    <link href="assets/bootstrap/css/bootstrap-responsive.min.css" rel="stylesheet" />
-    <link href="assets/css/app.css" rel="stylesheet" />
-    <link href="assets/css/tile-responsive.css" rel="stylesheet" />
-    
+    <link href="../assets/css/loader.css" rel="stylesheet" />
+
     <!-- For IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
       <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
-    
+
     <!-- Favicon -->
     <link rel="shortcut icon" type="image/x-icon" href="assets/img/favicon.ico" />
+
+    <!-- scripts -->
+    <script src="../assets/js/lib/require/require.js"></script>
+
+    <script src="bootstrap.js"></script>
   </head>
+
   <body ng-controller="DefaultController">
 
     <div class="wrapper">
       <!-- Header -->
-      <div ng-include="'app/common/header.html'"></div>
+      <div ng-include="'common/header.html'"></div>
 
       <div class="container-fluid content-container content-inset">
         <div error-panel></div>
@@ -52,41 +53,6 @@
         <p><a href="http://camunda.org">powered by camunda BPM</a> / version ${project.version}</p>
       </div>
 
-<!--       <script src="assets/js/lib/jquery-1.7.2.min.js"></script>
-      
-      <script src="assets/js/lib/raphaeljs/raphael.js"></script>
-      <script src="assets/js/lib/cabpmn.js"></script>
-      <script src="assets/js/bpmnRenderer.js"></script>
-      
-      <script src="assets/bootstrap/js/bootstrap.min.js"></script>
-      
-      <script src="assets/js/lib/angular/angular.min.js"></script>
-      <script src="assets/js/lib/angular/angular-resource.min.js"></script>
-      
-      <script src="common/extensions/ngmIf.js" ></script>
-      
-      <script src="common/directives/directives.js" ></script>
-      <script src="common/directives/errorPanel.js" ></script>
-      <script src="common/directives/help.js" ></script>
-      <script src="common/directives/requestAware.js" ></script>
-      
-      <script src="app/app.js" ></script>
-      <script src="app/dashboard/dashboard.js" ></script>
-      <script src="app/process-definition/processDefinition.js" ></script>
-      
-      <script src="common/services/services.js" ></script>
-      <script src="common/services/app.js" ></script>
-      <script src="common/services/cockpitHttpInterceptor.js" ></script>
-      <script src="common/services/debouncer.js" ></script>
-      <script src="common/services/error.js" ></script>
-      <script src="common/services/httpUtils.js" ></script>
-      <script src="common/services/requestStatus.js" ></script>
-
-      <script src="common/resources/resources.js" ></script>
-      <script src="common/resources/processDefinition.js" ></script> -->
-      
-      <script src="assets/js/loader.js"></script>
-      
     </footer>
   </body>
 </html>
