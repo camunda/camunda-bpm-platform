@@ -25,7 +25,7 @@ public class AuthenticationFilter implements Filter {
     StatusExposingServletResponse response = new StatusExposingServletResponse((HttpServletResponse)servletResponse);
 
     if ( authUser == null) {
-      response.setStatus(403);
+      response.setStatus(401);
     }else {
       filterChain.doFilter(servletRequest, response);
     }

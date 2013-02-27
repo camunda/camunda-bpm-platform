@@ -30,8 +30,6 @@ public class EngineApiApplication extends Application {
     classes.add(JacksonJsonProvider.class);
     classes.add(JacksonJsonProvider.class);
 
-    classes.add(AuthenticationResource.class);
-
     return classes;
   }
 }

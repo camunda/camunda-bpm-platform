@@ -4,7 +4,7 @@
 
   var module = angular.module("common.services");
 
-  module.factory("httpStatusInterceptor", function($q, Error, RequestStatus) {
+  module.factory("httpStatusInterceptor", function($rootScope, $q, Error, RequestStatus) {
     return function(promise) {
 
       RequestStatus.setBusy(true);
@@ -31,7 +31,7 @@
         } else
         if (status === 401) {
           Error.addError({ "status" : "Unauthorized" , "config" :  "Your session has probably expired. Try refreshing the page and login again." });
-
+          $rootScope.$emit("unauthorized");
         } else {
           Error.addError({ "status" : "Error" , "config" :  "A problem occurred: try logging out of cockpit and logging back in. If the problem persists, contact your administrator." });
         }

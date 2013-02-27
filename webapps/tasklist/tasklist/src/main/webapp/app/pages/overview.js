@@ -4,7 +4,7 @@ define(["angular"], function(angular) {
 
   var module = angular.module("tasklist.pages");
 
-  var Controller = function($scope, $location) {
+  var Controller = function($scope, $location, EngineApi) {
 
     var allTasks = {
       "mytasks": [
@@ -21,9 +21,11 @@ define(["angular"], function(angular) {
     };
 
     function loadTasks(filter, search) {
-      $scope.taskList.tasks = allTasks[filter + (search ? "-" + search : "")];
+      EngineApi.getTasklist();
+
+      /*$scope.taskList.tasks = allTasks[filter + (search ? "-" + search : "")];
       $scope.taskList.view = { filter: filter, search: search };
-      $scope.taskList.selection = {};
+      $scope.taskList.selection = {};*/
     }
 
     $scope.$watch(function() { return $location.search(); }, function(newValue) {
@@ -48,7 +50,7 @@ define(["angular"], function(angular) {
     };
   };
 
-  Controller.$inject = ["$scope", "$location"];
+  Controller.$inject = ["$scope", "$location", "EngineApi"];
 
   var RouteConfig = function($routeProvider) {
     $routeProvider.when("/overview", {

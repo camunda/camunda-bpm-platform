@@ -20,7 +20,7 @@ define([ "angular", "angularReady" ], function(angular, angularReady) {
     }
   };
 
-  var INTERNAL = /^(ng)$/;
+  var INTERNAL = /^ng/;
   var REQUIRE_EVENT = /^(.*!)$/;
 
   var angularModule = function(name, dependencies) {
@@ -31,7 +31,7 @@ define([ "angular", "angularReady" ], function(angular, angularReady) {
     each(deps, function(e) {
       var module, file;
 
-      if (isModule(e)) {
+      if (isModule(e) || INTERNAL.test(e)) {
         file = asFileName(e);
         module = e;
 

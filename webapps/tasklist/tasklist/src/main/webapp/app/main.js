@@ -5,13 +5,15 @@ define([ "angularModule" ], function(angularModule) {
   var module =
     angularModule("tasklist", [
       "ng",
+      "ngResource",
       "tasklist.pages",
+      "tasklist.services",
       'common.directives',
       'common.extensions',
       'common.resources',
       'common.services' ]);
 
-  var DefaultController = function($scope, Error) {
+  var DefaultController = function($scope, Error, $location) {
     $scope.appErrors = function () {
       return Error.errors;
     };
@@ -25,9 +27,14 @@ define([ "angularModule" ], function(angularModule) {
     $scope.errorClass = function(form) {
       return form.$valid || !form.$dirty ? '' : 'error';
     };
+
+    $scope.$watch("unauthorized", function () {
+      alert("401");
+      $location.path("/login");
+    });
   };
 
-  DefaultController.$inject = ['$scope', 'Error'];
+  DefaultController.$inject = ['$scope', 'Error', '$location'];
 
   var ModuleConfig = function($routeProvider, $locationProvider, $httpProvider) {
     $httpProvider.responseInterceptors.push('httpStatusInterceptor');
