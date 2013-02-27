@@ -2,10 +2,11 @@ package org.activiti.engine.impl;
 
 import java.util.List;
 
+import org.activiti.engine.ActivitiException;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.interceptor.CommandExecutor;
-import org.activiti.engine.management.ActivityStatisticsQuery;
 import org.activiti.engine.management.ActivityStatistics;
+import org.activiti.engine.management.ActivityStatisticsQuery;
 
 public class ActivityStatisticsQueryImpl extends
     AbstractQuery<ActivityStatisticsQuery, ActivityStatistics> implements ActivityStatisticsQuery{
@@ -19,17 +20,14 @@ public class ActivityStatisticsQueryImpl extends
     this.processDefinitionId = processDefinitionId;
   }
   
-  @Override
   public long executeCount(CommandContext commandContext) {
     checkQueryOk();
-//  return 
-//      commandContext
-//        .getRuntimeStatisticsManager()
-//        .getRuntimeStatisticsGroupedByProcessDefinitionVersion();
-  return 0;
+    return 
+      commandContext
+        .getStatisticsManager()
+        .getStatisticsCountGroupedByActivity(this);
   }
 
-  @Override
   public List<ActivityStatistics> executeList(
       CommandContext commandContext, Page page) {
     checkQueryOk();
@@ -38,8 +36,14 @@ public class ActivityStatisticsQueryImpl extends
         .getStatisticsManager()
         .getStatisticsGroupedByActivity(this, page);
   }
+  
+  protected void checkQueryOk() {
+    super.checkQueryOk();
+    if (processDefinitionId == null) {
+      throw new ActivitiException("No valid process definition id supplied.");
+    }
+  }
 
-  @Override
   public ActivityStatisticsQuery includeFailedJobs() {
     includeFailedJobs = true;
     return this;

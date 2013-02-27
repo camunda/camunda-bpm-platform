@@ -37,6 +37,19 @@ public class ProcessDefinitionStatisticsTest extends PluggableActivitiTestCase {
   }
   
   @Test
+  @Deployment(resources = "org/activiti/engine/test/api/mgmt/StatisticsTest.testProcessDefinitionStatisticsQueryWithFailedJobs.bpmn20.xml")
+  public void testProcessDefinitionStatisticsQueryCount() {
+    runtimeService.startProcessInstanceByKey("ExampleProcess");
+    
+    waitForJobExecutorToProcessAllJobs(6000, 500);
+    
+    long count = 
+        managementService.createProcessDefinitionStatisticsQuery().includeFailedJobs().count();
+    
+    Assert.assertEquals(1, count);
+  }
+  
+  @Test
   @Deployment(resources = "org/activiti/engine/test/api/mgmt/StatisticsTest.testMultiInstanceActivityStatisticsQuery.bpmn20.xml")
   public void testMultiInstanceProcessDefinitionStatisticsQuery() {
     runtimeService.startProcessInstanceByKey("ExampleProcess");

@@ -4,6 +4,7 @@ import java.util.List;
 
 import junit.framework.Assert;
 
+import org.activiti.engine.ActivitiException;
 import org.activiti.engine.impl.test.PluggableActivitiTestCase;
 import org.activiti.engine.management.ActivityStatistics;
 import org.activiti.engine.repository.ProcessDefinition;
@@ -50,6 +51,19 @@ public class ActivityStatisticsTest extends PluggableActivitiTestCase {
     Assert.assertEquals(1, activityResult.getInstances());
     Assert.assertEquals("theTask", activityResult.getId());
     Assert.assertEquals(0, activityResult.getFailedJobs());
+  }
+  
+  @Test
+  @Deployment(resources = "org/activiti/engine/test/api/mgmt/StatisticsTest.testProcessDefinitionStatisticsQuery.bpmn20.xml")
+  public void testActivityStatisticsQueryCount() {
+    runtimeService.startProcessInstanceByKey("ExampleProcess");
+    ProcessDefinition definition = repositoryService.createProcessDefinitionQuery()
+        .processDefinitionKey("ExampleProcess").singleResult();
+    
+    long count = 
+        managementService.createActivityRuntimeStatisticsQuery(definition.getId()).includeFailedJobs().count();
+    
+    Assert.assertEquals(1, count);
   }
   
   @Test
@@ -156,5 +170,15 @@ public class ActivityStatisticsTest extends PluggableActivitiTestCase {
     Assert.assertEquals(1, activityResult.getInstances());
     Assert.assertEquals("theTimer", activityResult.getId());
     Assert.assertEquals(0, activityResult.getFailedJobs());
+  }
+  
+  @Test
+  public void testNullProcessDefinitionParameter() {
+    try {
+      managementService.createActivityRuntimeStatisticsQuery(null).list();
+      Assert.fail();
+    } catch (ActivitiException e) {
+      // expected
+    }
   }
 }

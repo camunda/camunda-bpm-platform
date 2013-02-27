@@ -20,11 +20,10 @@ public class ProcessDefinitionStatisticsQueryImpl extends AbstractQuery<ProcessD
   @Override
   public long executeCount(CommandContext commandContext) {
     checkQueryOk();
-//    return 
-//        commandContext
-//          .getRuntimeStatisticsManager()
-//          .getRuntimeStatisticsGroupedByProcessDefinitionVersion();
-    return 0;
+    return 
+      commandContext
+        .getStatisticsManager()
+        .getStatisticsCountGroupedByProcessDefinitionVersion(this);
   }
 
   @Override

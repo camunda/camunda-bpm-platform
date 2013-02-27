@@ -31,7 +31,18 @@
   <!-- SELECT -->  
   <select id ="selectProcessDefinitionStatistics" resultMap="processDefinitionStatisticsResultMap" 
     parameterType="org.activiti.engine.impl.ProcessDefinitionStatisticsQueryImpl">
-    select * from ${prefix}ACT_RE_PROCDEF, 
+    select * 
+    <include refid="selectProcessDefinitionStatisticsByQueryCriteriaSql"/>
+  </select>
+  
+  <select id ="selectProcessDefinitionStatisticsCount" resultType="long" 
+    parameterType="org.activiti.engine.impl.ProcessDefinitionStatisticsQueryImpl">
+    select count(*) 
+    <include refid="selectProcessDefinitionStatisticsByQueryCriteriaSql"/>
+  </select>
+  
+  <sql id="selectProcessDefinitionStatisticsByQueryCriteriaSql">
+    from ${prefix}ACT_RE_PROCDEF, 
     ( select instance.PROC_DEF_ID_ as PROC_DEF_ID_,
       instance_count
       <if test="failedJobsToInclude">
@@ -57,38 +68,49 @@
     </if>
     ) statistics
     where ID_ = statistics.PROC_DEF_ID_
-  </select>
+  </sql>
+ 
 
 
   <select id ="selectActivityStatistics" resultMap="activityStatisticsResultMap" 
     parameterType="org.activiti.engine.impl.ActivityStatisticsQueryImpl">
-    select * from
-    ( select instance.act_id_ as ID_,
-      instance_count
-      <if test="failedJobsToInclude">
-      ,
-      failed_jobs_count
-      </if>
-      
-      
-    from
-    (select act_id_, count(PROC_INST_ID_) as instance_count 
-    from ${prefix}ACT_RU_EXECUTION
-    where proc_def_id_ = #{processDefinitionId} and is_active_ = true
-    group by act_id_) instance
-    
-    <if test="failedJobsToInclude">
-    left outer join
-    
-    (select act_id_, count(id_) as failed_jobs_count from 
-      ( select job.id_, act_id_ from ${prefix}ACT_RU_EXECUTION as execution
-      left outer join ${prefix}ACT_RU_JOB as job on execution.id_ = job.execution_id_ where job.RETRIES_ = 0
-      and proc_def_id_ = #{processDefinitionId}
-      ) job
-    group by job.act_id_) job
-    
-    on job.act_id_ = instance.act_id_
-    </if>
-    ) statistics
+    select *
+    <include refid="selectActivityStatisticsByQueryCriteriaSql"/>
   </select>
+  
+  <select id ="selectActivityStatisticsCount" resultType="long" 
+    parameterType="org.activiti.engine.impl.ActivityStatisticsQueryImpl">
+    select count(*)
+    <include refid="selectActivityStatisticsByQueryCriteriaSql"/>
+  </select>
+   
+  <sql id="selectActivityStatisticsByQueryCriteriaSql">
+	  from ( select instance.act_id_ as ID_,
+	      instance_count
+	      <if test="failedJobsToInclude">
+	      ,
+	      failed_jobs_count
+	      </if>
+	      
+	      
+	    from
+	    (select act_id_, count(PROC_INST_ID_) as instance_count 
+	    from ${prefix}ACT_RU_EXECUTION
+	    where proc_def_id_ = #{processDefinitionId} and is_active_ = true
+	    group by act_id_) instance
+	    
+	    <if test="failedJobsToInclude">
+	    left outer join
+	    
+	    (select act_id_, count(id_) as failed_jobs_count from 
+	      ( select job.id_, act_id_ from ${prefix}ACT_RU_EXECUTION as execution
+	      left outer join ${prefix}ACT_RU_JOB as job on execution.id_ = job.execution_id_ where job.RETRIES_ = 0
+	      and proc_def_id_ = #{processDefinitionId}
+	      ) job
+	    group by job.act_id_) job
+	    
+	    on job.act_id_ = instance.act_id_
+	    </if>
+	    ) statistics
+  </sql>
 </mapper>

@@ -17,8 +17,16 @@ public class StatisticsManager extends AbstractManager {
     return getDbSqlSession().selectList("selectProcessDefinitionStatistics", query, page);
   }
   
+  public long getStatisticsCountGroupedByProcessDefinitionVersion(ProcessDefinitionStatisticsQueryImpl query) {
+    return (Long) getDbSqlSession().selectOne("selectProcessDefinitionStatisticsCount", query);
+  }
+  
   @SuppressWarnings("unchecked")
   public List<ActivityStatistics> getStatisticsGroupedByActivity(ActivityStatisticsQueryImpl query, Page page) {
     return getDbSqlSession().selectList("selectActivityStatistics", query, page);
+  }
+  
+  public long getStatisticsCountGroupedByActivity(ActivityStatisticsQueryImpl query) {
+    return (Long) getDbSqlSession().selectOne("selectActivityStatisticsCount", query);
   }
 }
