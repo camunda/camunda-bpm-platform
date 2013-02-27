@@ -10,7 +10,7 @@ define(["angular"], function(angular) {
 
       EngineApi.prototype.getTasklist = function () {
         var Task = $resource(Uri.restUri("task"));
-        return Task.get();
+        return Task.query();
       }
 
       return new EngineApi();
