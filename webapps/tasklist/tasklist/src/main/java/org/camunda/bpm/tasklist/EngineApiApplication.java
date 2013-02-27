@@ -28,7 +28,6 @@ public class EngineApiApplication extends Application {
     classes.add(EngineQueryDtoGetReader.class);
     classes.add(JacksonConfigurator.class);
     classes.add(JacksonJsonProvider.class);
-    classes.add(JacksonJsonProvider.class);
 
     return classes;
   }

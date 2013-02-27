@@ -20,7 +20,11 @@ public class TasklistApplication extends Application {
   @Override
   public Set<Class<?>> getClasses() {
     Set<Class<?>> classes = new HashSet<Class<?>>();
+
     classes.add(AuthenticationResource.class);
+    classes.add(JacksonConfigurator.class);
+    classes.add(JacksonJsonProvider.class);
+
     return classes;
   }
 
