@@ -129,4 +129,27 @@ public class ProcessDefinitionStatisticsTest extends PluggableActivitiTestCase {
     repositoryService.deleteDeployment(deployment.getId(), true);
   }
   
+  @Test
+  @Deployment(resources = "org/activiti/engine/test/api/mgmt/StatisticsTest.testProcessDefinitionStatisticsQueryWithFailedJobs.bpmn20.xml")
+  public void testProcessDefinitionStatisticsQueryPagination() {
+    org.activiti.engine.repository.Deployment deployment = 
+        repositoryService.createDeployment()
+          .addClasspathResource("org/activiti/engine/test/api/mgmt/StatisticsTest.testProcessDefinitionStatisticsQuery.bpmn20.xml")
+          .deploy();
+    
+    List<ProcessDefinition> definitions = 
+        repositoryService.createProcessDefinitionQuery().processDefinitionKey("ExampleProcess").list();
+    
+    for (ProcessDefinition definition : definitions) {
+      runtimeService.startProcessInstanceById(definition.getId());
+    }
+    
+    List<ProcessDefinitionStatistics> statistics = 
+        managementService.createProcessDefinitionStatisticsQuery().includeFailedJobs().listPage(0, 1);
+    
+    Assert.assertEquals(1, statistics.size());
+    
+    repositoryService.deleteDeployment(deployment.getId(), true);
+  }
+  
 }

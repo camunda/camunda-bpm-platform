@@ -181,4 +181,18 @@ public class ActivityStatisticsTest extends PluggableActivitiTestCase {
       // expected
     }
   }
+  
+  @Test
+  @Deployment(resources = "org/activiti/engine/test/api/mgmt/StatisticsTest.testActivityStatisticsQueryPagination.bpmn20.xml")
+  public void testActivityStatisticsQueryPagination() {
+    
+    ProcessDefinition definition = 
+        repositoryService.createProcessDefinitionQuery().processDefinitionKey("ExampleProcess").singleResult();
+    runtimeService.startProcessInstanceById(definition.getId());
+    
+    List<ActivityStatistics> statistics = 
+        managementService.createActivityRuntimeStatisticsQuery(definition.getId()).includeFailedJobs().listPage(0, 1);
+    
+    Assert.assertEquals(1, statistics.size());
+  }
 }

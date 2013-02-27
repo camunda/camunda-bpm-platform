@@ -31,8 +31,11 @@
   <!-- SELECT -->  
   <select id ="selectProcessDefinitionStatistics" resultMap="processDefinitionStatisticsResultMap" 
     parameterType="org.activiti.engine.impl.ProcessDefinitionStatisticsQueryImpl">
-    select * 
+    ${limitBefore}
+    select * ${limitBetween}
     <include refid="selectProcessDefinitionStatisticsByQueryCriteriaSql"/>
+    ${orderBy}
+    ${limitAfter}
   </select>
   
   <select id ="selectProcessDefinitionStatisticsCount" resultType="long" 
@@ -42,8 +45,8 @@
   </select>
   
   <sql id="selectProcessDefinitionStatisticsByQueryCriteriaSql">
-    from ${prefix}ACT_RE_PROCDEF, 
-    ( select instance.PROC_DEF_ID_ as PROC_DEF_ID_,
+    from ${prefix}ACT_RE_PROCDEF procdef, 
+    ( select instance.PROC_DEF_ID_ as ID_,
       instance_count
       <if test="failedJobsToInclude">
       ,
@@ -66,16 +69,19 @@
     
     on job.PROC_DEF_ID_ = instance.PROC_DEF_ID_ 
     </if>
-    ) statistics
-    where ID_ = statistics.PROC_DEF_ID_
+    ) res
+    where procdef.ID_ = res.ID_
   </sql>
  
 
 
   <select id ="selectActivityStatistics" resultMap="activityStatisticsResultMap" 
     parameterType="org.activiti.engine.impl.ActivityStatisticsQueryImpl">
-    select *
+    ${limitBefore}
+    select * ${limitBetween}
     <include refid="selectActivityStatisticsByQueryCriteriaSql"/>
+    ${orderBy}
+    ${limitAfter}
   </select>
   
   <select id ="selectActivityStatisticsCount" resultType="long" 
@@ -91,7 +97,6 @@
 	      ,
 	      failed_jobs_count
 	      </if>
-	      
 	      
 	    from
 	    (select act_id_, count(PROC_INST_ID_) as instance_count 
@@ -111,6 +116,6 @@
 	    
 	    on job.act_id_ = instance.act_id_
 	    </if>
-	    ) statistics
+	    ) res
   </sql>
 </mapper>
