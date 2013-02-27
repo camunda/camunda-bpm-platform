@@ -7,7 +7,10 @@ import org.activiti.engine.delegate.JavaDelegate;
 public class FailingDelegate implements JavaDelegate {
 
   public void execute(DelegateExecution execution) throws Exception {
-    throw new ActivitiException("Expected exception");
+    Boolean fail = (Boolean) execution.getVariable("fail");
+    if (fail != false) {
+      throw new ActivitiException("Expected exception");
+    }
   }
 
 }

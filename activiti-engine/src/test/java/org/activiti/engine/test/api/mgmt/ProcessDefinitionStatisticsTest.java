@@ -1,6 +1,8 @@
 package org.activiti.engine.test.api.mgmt;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import junit.framework.Assert;
 
@@ -17,6 +19,10 @@ public class ProcessDefinitionStatisticsTest extends PluggableActivitiTestCase {
   @Deployment(resources = "org/activiti/engine/test/api/mgmt/StatisticsTest.testProcessDefinitionStatisticsQueryWithFailedJobs.bpmn20.xml")
   public void testProcessDefinitionStatisticsQueryWithFailedJobs() {
     runtimeService.startProcessInstanceByKey("ExampleProcess");
+    
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("fail", false);
+    runtimeService.startProcessInstanceByKey("ExampleProcess", parameters);
 
     waitForJobExecutorToProcessAllJobs(6000, 500);
     
@@ -26,7 +32,7 @@ public class ProcessDefinitionStatisticsTest extends PluggableActivitiTestCase {
     Assert.assertEquals(1, statistics.size());
     
     ProcessDefinitionStatistics definitionResult = statistics.get(0);
-    Assert.assertEquals(1, definitionResult.getInstances());
+    Assert.assertEquals(2, definitionResult.getInstances());
     Assert.assertEquals(1, definitionResult.getFailedJobs());
   }
   

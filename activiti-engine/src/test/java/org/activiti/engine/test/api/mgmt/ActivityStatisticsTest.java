@@ -6,11 +6,9 @@ import junit.framework.Assert;
 
 import org.activiti.engine.impl.test.PluggableActivitiTestCase;
 import org.activiti.engine.management.ActivityStatistics;
-import org.activiti.engine.management.ProcessDefinitionStatistics;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.test.Deployment;
 import org.junit.Test;
-
 
 public class ActivityStatisticsTest extends PluggableActivitiTestCase {
 
@@ -32,7 +30,7 @@ public class ActivityStatisticsTest extends PluggableActivitiTestCase {
     
     ActivityStatistics activityResult = statistics.get(0);
     Assert.assertEquals(1, activityResult.getInstances());
-    Assert.assertEquals("theTask", activityResult.getId());
+    Assert.assertEquals("theServiceTask", activityResult.getId());
     Assert.assertEquals(0, activityResult.getFailedJobs());
   }
   
@@ -140,5 +138,23 @@ public class ActivityStatisticsTest extends PluggableActivitiTestCase {
     result = callSubProcessStatistics.get(0);
     Assert.assertEquals(1, result.getInstances());
     Assert.assertEquals(0, result.getFailedJobs());
+  }
+  
+  @Test
+  @Deployment(resources = "org/activiti/engine/test/api/mgmt/StatisticsTest.testActivityStatisticsQueryWithIntermediateTimer.bpmn20.xml")
+  public void testActivityStatisticsQueryWithIntermediateTimer() {
+    runtimeService.startProcessInstanceByKey("ExampleProcess");
+    ProcessDefinition definition = repositoryService.createProcessDefinitionQuery()
+        .processDefinitionKey("ExampleProcess").singleResult();
+    
+    List<ActivityStatistics> statistics = 
+        managementService.createActivityRuntimeStatisticsQuery(definition.getId()).includeFailedJobs().list();
+    
+    Assert.assertEquals(1, statistics.size());
+    
+    ActivityStatistics activityResult = statistics.get(0);
+    Assert.assertEquals(1, activityResult.getInstances());
+    Assert.assertEquals("theTimer", activityResult.getId());
+    Assert.assertEquals(0, activityResult.getFailedJobs());
   }
 }
