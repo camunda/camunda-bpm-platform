@@ -15,11 +15,12 @@ package org.activiti.engine;
 import java.sql.Connection;
 import java.util.Map;
 
+import org.activiti.engine.management.ActivityStatisticsQuery;
+import org.activiti.engine.management.ProcessDefinitionStatisticsQuery;
 import org.activiti.engine.management.TableMetaData;
 import org.activiti.engine.management.TablePage;
 import org.activiti.engine.management.TablePageQuery;
 import org.activiti.engine.runtime.JobQuery;
-import org.activiti.engine.task.Task;
 
 
 
@@ -103,4 +104,8 @@ public interface ManagementService {
   
   /** programmatic schema update on a given connection returning feedback about what happened */
   String databaseSchemaUpgrade(Connection connection, String catalog, String schema);
+  
+  ProcessDefinitionStatisticsQuery createProcessDefinitionStatisticsQuery();
+  
+  ActivityStatisticsQuery createActivityRuntimeStatisticsQuery(String processDefinitionId);
 }
