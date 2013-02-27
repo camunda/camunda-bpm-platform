@@ -23,9 +23,9 @@ define(["angular"], function(angular) {
     function loadTasks(filter, search) {
       EngineApi.getTasklist();
 
-      /*$scope.taskList.tasks = allTasks[filter + (search ? "-" + search : "")];
+      $scope.taskList.tasks = allTasks[filter + (search ? "-" + search : "")];
       $scope.taskList.view = { filter: filter, search: search };
-      $scope.taskList.selection = {};*/
+      $scope.taskList.selection = [];
     }
 
     $scope.$watch(function() { return $location.search(); }, function(newValue) {
@@ -42,6 +42,18 @@ define(["angular"], function(angular) {
 
     $scope.delegateTask = function(task) {
 
+    };
+
+    $scope.isSelected = function(task) {
+      return $scope.taskList.selection.indexOf(task) != -1;
+    };
+
+    $scope.selectAllTasks = function(task) {
+      return $scope.taskList.selection.indexOf(task) != -1;
+    };
+
+    $scope.deselectAllTasks = function(task) {
+      return $scope.taskList.selection = [];
     };
 
     $scope.taskList = {
@@ -61,58 +73,7 @@ define(["angular"], function(angular) {
 
   RouteConfig.$inject = [ "$routeProvider"];
 
-  function MultiSelectController($scope) {
-
-    $scope.selection = [];
-
-    this.select = function(item) {
-      var idx = $scope.selection.indexOf(item);
-      if (idx == -1) {
-        $scope.selection.push(item);
-      }
-    }
-
-    this.toggleSelection = function(item) {
-      var idx = $scope.selection.indexOf(item);
-      if (idx == -1) {
-        this.select(item);
-      } else {
-        this.deselect(item);
-      }
-    }
-
-    this.deselect = function(item) {
-      var idx = $scope.selection.indexOf(item);
-      if (idx != -1) {
-        $scope.selection.splice(idx, 1);
-      }
-    }
-  }
-
-  module.directive("multiSelect", function() {
-    return {
-      restrict: "A",
-      controller: "^MultiSelectController",
-      link: function(scope, element, attributes, multiSelectController) {
-        var selection = scope.$eval(attributes["multiSelection"]);
-        $scope.selection = selection;
-      }
-    };
-  });
-
-  module.directive("select", function() {
-    return {
-      restrict: "A",
-      require: [ "MultiSelectController" ],
-      link: function(scope, element, attributes) {
-        var element = scope.$eval(attributes["select"]);
-
-      }
-    };
-  });
-
   module
     .config(RouteConfig)
-    .controller("OverviewController", Controller)
-    .controller("MultiSelectController", MultiSelectController);
+    .controller("OverviewController", Controller);
 });

@@ -28,8 +28,8 @@ define([ "angularModule" ], function(angularModule) {
       return form.$valid || !form.$dirty ? '' : 'error';
     };
 
-    $scope.$watch("unauthorized", function () {
-      alert("401");
+    $scope.$on("response-error", function(event, responseError) {
+      console.log(responseError);
       $location.path("/login");
     });
   };

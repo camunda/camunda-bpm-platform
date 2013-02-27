@@ -1,12 +1,12 @@
 <!-- task list -->
-<table class="table table-hover task-table" multiSelect="taskList.selection">
+<table class="table table-hover task-table" multi-select="taskList.selection">
   <thead>
     <tr>
       <th>Name</th>
       <th>Process</th>
       <th>Created</th>
       <th>Due</th>
-      <th>Actions</th>
+      <th width="200">Actions</th>
     </tr>
   </thead>
   <tbody>
@@ -17,7 +17,7 @@
       <td>-</td>
       <td>-</td>
     </tr>
-    <tr ng-repeat="task in taskList.tasks" ng-class="{ selected: isSelected(task) }">
+    <tr ng-repeat="task in taskList.tasks" ng-class="{ selected: isSelected(task) }" select="task">
       <td>{{ task.name }}</td>
       <td>{{ task.process }}</td>
       <td>{{ task.created }}</td>
@@ -47,12 +47,14 @@
   <tfoot>
     <tr>
       <td colspan="4">
-        <small style="font-size: 85%"><code style="font-size: 85%">SHIFT</code>-Click on tasks to select them</small>
+        <small>
+          <a href="#" ng-click="selectAll()">Select</a> / <a href="#" ng-click="deselectAll()">deselect</a> all tasks or use <code>ctrl + click</code> on tasks to select multiple.
+        </small>
       </td>
       <td>
         <div class="btn-group" ng-show="taskList.selection.length">
           <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
-            Perform actions
+            Selected Tasks
             <span class="caret"></span>
           </a>
           <ul class="dropdown-menu">

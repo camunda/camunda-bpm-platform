@@ -201,6 +201,18 @@ li.actions .btn:last-child {
   vertical-align: middle;
 }
 
+.task-table tr {
+  height: 43px;
+}
+
+table tr.selected > td {
+  background: rgba(218, 234, 247, 0.60);
+}
+
+.table-hover tbody tr.selected:hover > td, .table-hover tbody tr.selected:hover > th {
+  background-color: #DAEAF7;
+}
+
 .modal-body {
   max-height: 480px;
 }

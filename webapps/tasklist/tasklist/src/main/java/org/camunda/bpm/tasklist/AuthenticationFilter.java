@@ -26,6 +26,8 @@ public class AuthenticationFilter implements Filter {
 
     if ( authUser == null) {
       response.setStatus(401);
+      response.getWriter().print("{}");
+      response.getWriter().flush();
     }else {
       filterChain.doFilter(servletRequest, response);
     }

@@ -31,7 +31,7 @@
         } else
         if (status === 401) {
           Error.addError({ "status" : "Unauthorized" , "config" :  "Your session has probably expired. Try refreshing the page and login again." });
-          $rootScope.$emit("unauthorized");
+          $rootScope.$broadcast("response-error", { status: status, data: response.data });
         } else {
           Error.addError({ "status" : "Error" , "config" :  "A problem occurred: try logging out of cockpit and logging back in. If the problem persists, contact your administrator." });
         }

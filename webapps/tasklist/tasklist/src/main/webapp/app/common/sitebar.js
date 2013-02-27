@@ -24,7 +24,7 @@ define(["angular"], function(angular) {
 
     $scope.isActive = function(filter, search) {
       var params = $location.search();
-      return params.filter == filter && params.search == search;
+      return (params.filter || "mytasks") == filter && params.search == search;
     };
   };
 
