@@ -48,11 +48,19 @@ define(["angular"], function(angular) {
       return $scope.taskList.selection.indexOf(task) != -1;
     };
 
-    $scope.selectAllTasks = function(task) {
-      return $scope.taskList.selection.indexOf(task) != -1;
+    $scope.selectAllTasks = function() {
+
+      $scope.deselectAllTasks();
+
+      var selection = $scope.taskList.selection,
+          tasks = $scope.taskList.tasks;
+
+      angular.forEach(tasks, function(task) {
+        selection.push(task);
+      });
     };
 
-    $scope.deselectAllTasks = function(task) {
+    $scope.deselectAllTasks = function() {
       return $scope.taskList.selection = [];
     };
 
