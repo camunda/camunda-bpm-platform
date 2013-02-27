@@ -6,26 +6,14 @@ define(["angular"], function(angular) {
 
   var Controller = function($scope, $location, EngineApi) {
 
-    var allTasks = {
-      "mytasks": [
-        { id: 1, name: "ASD", process: "asdf", created: "sadf", due: "asdsd"}],
-      "unassigned": [
-        { id: 1, name: "ASD", process: "asdf", created: "sadf", due: "asdsd"},
-        { id: 1, name: "erer", process: "tzz", created: "sadf", due: "asdsd"},
-        { id: 1, name: "ASD", process: "werw", created: "sadf", due: "asdsd"}],
-      "colleague-klaus": [],
-      "group-my-group": [
-        { id: 1, name: "asd", process: "werwe", created: "sadf", due: "asdsd"},
-        { id: 1, name: "g", process: "asdwerewrf", created: "sadf", due: "asdsd"}],
-      "group-other-group": []
-    };
+    $scope.taskList = {};
 
     function loadTasks(filter, search) {
-      EngineApi.getTasklist();
+      $scope.taskList.tasks = EngineApi.getTasklist();
 
-      $scope.taskList.tasks = allTasks[filter + (search ? "-" + search : "")];
+      /*$scope.taskList.tasks = allTasks[filter + (search ? "-" + search : "")];
       $scope.taskList.view = { filter: filter, search: search };
-      $scope.taskList.selection = [];
+      $scope.taskList.selection = [];*/
     }
 
     $scope.$watch(function() { return $location.search(); }, function(newValue) {

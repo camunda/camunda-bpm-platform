@@ -49,6 +49,7 @@ public class TasklistProcessEngineProvider implements ProcessEngineProvider {
       User user = processEngine.getIdentityService().newUser("demo");
       user.setPassword("demo");
       user.setEmail("demo@camunda.org");
+
       processEngine.getIdentityService().saveUser(user);
     }
 

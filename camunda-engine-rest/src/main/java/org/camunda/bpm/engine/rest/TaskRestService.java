@@ -12,10 +12,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
-import org.camunda.bpm.engine.rest.dto.task.ClaimTaskDto;
-import org.camunda.bpm.engine.rest.dto.task.CompleteTaskDto;
-import org.camunda.bpm.engine.rest.dto.task.TaskDto;
-import org.camunda.bpm.engine.rest.dto.task.TaskQueryDto;
+import org.camunda.bpm.engine.rest.dto.task.*;
 
 @Path("/task")
 @Produces(MediaType.APPLICATION_JSON)
@@ -52,10 +49,14 @@ public interface TaskRestService {
   @POST
   @Path("/{id}/claim")
   @Consumes(MediaType.APPLICATION_JSON)
-  void claim(@PathParam("id") String taskId, ClaimTaskDto dto);
+  void claim(@PathParam("id") String taskId, UserIdDto dto);
   
   @POST
   @Path("/{id}/complete")
   @Consumes(MediaType.APPLICATION_JSON)
   void complete(@PathParam("id") String taskId, CompleteTaskDto dto);
+
+  @GET
+  @Path("/groups")
+  GroupInfoDto getGroups();
 }

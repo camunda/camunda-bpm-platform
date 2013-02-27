@@ -12,7 +12,7 @@ import org.activiti.engine.task.Task;
 import org.activiti.engine.task.TaskQuery;
 import org.camunda.bpm.engine.rest.TaskRestService;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
-import org.camunda.bpm.engine.rest.dto.task.ClaimTaskDto;
+import org.camunda.bpm.engine.rest.dto.task.UserIdDto;
 import org.camunda.bpm.engine.rest.dto.task.CompleteTaskDto;
 import org.camunda.bpm.engine.rest.dto.task.TaskDto;
 import org.camunda.bpm.engine.rest.dto.task.TaskQueryDto;
@@ -65,7 +65,7 @@ public class TaskRestServiceImpl extends AbstractEngineService implements TaskRe
   }
 
   @Override
-  public void claim(String taskId, ClaimTaskDto dto) {
+  public void claim(String taskId, UserIdDto dto) {
     TaskService taskService = processEngine.getTaskService();
     
     try {

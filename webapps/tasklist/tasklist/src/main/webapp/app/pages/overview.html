@@ -19,7 +19,7 @@
     </tr>
     <tr ng-repeat="task in taskList.tasks" ng-class="{ selected: isSelected(task) }" select="task">
       <td>{{ task.name }}</td>
-      <td>{{ task.process }}</td>
+      <td>{{ task.processDefinitionId }}</td>
       <td>{{ task.created }}</td>
       <td>{{ task.due }}</td>
 
