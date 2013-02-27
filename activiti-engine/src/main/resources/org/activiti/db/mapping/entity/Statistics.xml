@@ -42,6 +42,7 @@
     from
     (select PROC_DEF_ID_, count(PROC_INST_ID_) as instance_count 
     from ${prefix}ACT_RU_EXECUTION
+    where ID_ = PROC_INST_ID_
     group by proc_def_id_) instance
     
     <if test="failedJobsToInclude">
@@ -73,7 +74,7 @@
     from
     (select act_id_, count(PROC_INST_ID_) as instance_count 
     from ${prefix}ACT_RU_EXECUTION
-    where proc_def_id_ = #{processDefinitionId}
+    where proc_def_id_ = #{processDefinitionId} and is_active_ = true
     group by act_id_) instance
     
     <if test="failedJobsToInclude">

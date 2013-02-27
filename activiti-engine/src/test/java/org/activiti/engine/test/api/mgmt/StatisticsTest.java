@@ -32,6 +32,19 @@ public class StatisticsTest extends PluggableActivitiTestCase {
   }
   
   @Test
+  @Deployment(resources = "org/activiti/engine/test/api/mgmt/StatisticsTest.testMultiInstanceActivityStatisticsQuery.bpmn20.xml")
+  public void testMultiInstanceProcessDefinitionStatisticsQuery() {
+    runtimeService.startProcessInstanceByKey("ExampleProcess");
+    List<ProcessDefinitionStatistics> statistics = 
+        managementService.createProcessDefinitionRuntimeStatisticsQuery().list();
+    
+    Assert.assertEquals(1, statistics.size());
+    
+    ProcessDefinitionStatistics result = statistics.get(0);
+    Assert.assertEquals(1, result.getInstances());
+  }
+  
+  @Test
   @Deployment(resources = "org/activiti/engine/test/api/mgmt/StatisticsTest.testProcessDefinitionStatisticsQueryWithFailedJobs.bpmn20.xml")
   public void testActivityStatisticsQueryWithoutFailedJobs() {
     runtimeService.startProcessInstanceByKey("ExampleProcess");
@@ -83,7 +96,7 @@ public class StatisticsTest extends PluggableActivitiTestCase {
     Assert.assertEquals(1, statistics.size());
     
     ActivityStatistics activityResult = statistics.get(0);
-    Assert.assertEquals(3, activityResult.getInstances());
+    Assert.assertEquals(4, activityResult.getInstances());
     Assert.assertEquals("theTask", activityResult.getId());
     Assert.assertEquals(0, activityResult.getFailedJobs());
   }
