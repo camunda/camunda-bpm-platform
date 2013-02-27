@@ -16,7 +16,7 @@ import org.junit.Test;
 public class ProcessDefinitionStatisticsTest extends PluggableActivitiTestCase {
 
   @Test
-  @Deployment(resources = "org/activiti/engine/test/api/mgmt/StatisticsTest.testProcessDefinitionStatisticsQueryWithFailedJobs.bpmn20.xml")
+  @Deployment(resources = "org/activiti/engine/test/api/mgmt/StatisticsTest.testStatisticsQueryWithFailedJobs.bpmn20.xml")
   public void testProcessDefinitionStatisticsQueryWithFailedJobs() {
     runtimeService.startProcessInstanceByKey("ExampleProcess");
     
@@ -37,7 +37,7 @@ public class ProcessDefinitionStatisticsTest extends PluggableActivitiTestCase {
   }
   
   @Test
-  @Deployment(resources = "org/activiti/engine/test/api/mgmt/StatisticsTest.testProcessDefinitionStatisticsQueryWithFailedJobs.bpmn20.xml")
+  @Deployment(resources = "org/activiti/engine/test/api/mgmt/StatisticsTest.testStatisticsQueryWithFailedJobs.bpmn20.xml")
   public void testProcessDefinitionStatisticsQueryCount() {
     runtimeService.startProcessInstanceByKey("ExampleProcess");
     
@@ -50,7 +50,7 @@ public class ProcessDefinitionStatisticsTest extends PluggableActivitiTestCase {
   }
   
   @Test
-  @Deployment(resources = "org/activiti/engine/test/api/mgmt/StatisticsTest.testMultiInstanceActivityStatisticsQuery.bpmn20.xml")
+  @Deployment(resources = "org/activiti/engine/test/api/mgmt/StatisticsTest.testMultiInstanceStatisticsQuery.bpmn20.xml")
   public void testMultiInstanceProcessDefinitionStatisticsQuery() {
     runtimeService.startProcessInstanceByKey("ExampleProcess");
     List<ProcessDefinitionStatistics> statistics = 
@@ -63,7 +63,7 @@ public class ProcessDefinitionStatisticsTest extends PluggableActivitiTestCase {
   }
   
   @Test
-  @Deployment(resources = "org/activiti/engine/test/api/mgmt/StatisticsTest.testSubprocessProcessDefinitionStatistics.bpmn20.xml")
+  @Deployment(resources = "org/activiti/engine/test/api/mgmt/StatisticsTest.testSubprocessStatisticsQuery.bpmn20.xml")
   public void testSubprocessProcessDefinitionStatisticsQuery() {
     runtimeService.startProcessInstanceByKey("ExampleProcess");
     List<ProcessDefinitionStatistics> statistics = 
@@ -77,8 +77,8 @@ public class ProcessDefinitionStatisticsTest extends PluggableActivitiTestCase {
   
   @Test
   @Deployment(resources = {
-      "org/activiti/engine/test/api/mgmt/StatisticsTest.testCallActivityProcessDefinitionStatisticsQuery.bpmn20.xml",
-      "org/activiti/engine/test/api/mgmt/StatisticsTest.testProcessDefinitionStatisticsQueryWithFailedJobs.bpmn20.xml"})
+      "org/activiti/engine/test/api/mgmt/StatisticsTest.testCallActivityStatisticsQuery.bpmn20.xml",
+      "org/activiti/engine/test/api/mgmt/StatisticsTest.testStatisticsQueryWithFailedJobs.bpmn20.xml"})
   public void testCallActivityProcessDefinitionStatisticsQuery() {
     runtimeService.startProcessInstanceByKey("callExampleSubProcess");
     
@@ -101,11 +101,11 @@ public class ProcessDefinitionStatisticsTest extends PluggableActivitiTestCase {
   }
   
   @Test
-  @Deployment(resources = "org/activiti/engine/test/api/mgmt/StatisticsTest.testProcessDefinitionStatisticsQueryWithFailedJobs.bpmn20.xml")
+  @Deployment(resources = "org/activiti/engine/test/api/mgmt/StatisticsTest.testStatisticsQueryWithFailedJobs.bpmn20.xml")
   public void testProcessDefinitionStatisticsQueryForMultipleVersions() {
     org.activiti.engine.repository.Deployment deployment = 
         repositoryService.createDeployment()
-          .addClasspathResource("org/activiti/engine/test/api/mgmt/StatisticsTest.testProcessDefinitionStatisticsQueryWithFailedJobs.bpmn20.xml")
+          .addClasspathResource("org/activiti/engine/test/api/mgmt/StatisticsTest.testStatisticsQueryWithFailedJobs.bpmn20.xml")
           .deploy();
     
     List<ProcessDefinition> definitions = 
@@ -130,11 +130,11 @@ public class ProcessDefinitionStatisticsTest extends PluggableActivitiTestCase {
   }
   
   @Test
-  @Deployment(resources = "org/activiti/engine/test/api/mgmt/StatisticsTest.testProcessDefinitionStatisticsQueryWithFailedJobs.bpmn20.xml")
+  @Deployment(resources = "org/activiti/engine/test/api/mgmt/StatisticsTest.testStatisticsQueryWithFailedJobs.bpmn20.xml")
   public void testProcessDefinitionStatisticsQueryPagination() {
     org.activiti.engine.repository.Deployment deployment = 
         repositoryService.createDeployment()
-          .addClasspathResource("org/activiti/engine/test/api/mgmt/StatisticsTest.testProcessDefinitionStatisticsQuery.bpmn20.xml")
+          .addClasspathResource("org/activiti/engine/test/api/mgmt/StatisticsTest.testStatisticsQuery.bpmn20.xml")
           .deploy();
     
     List<ProcessDefinition> definitions = 

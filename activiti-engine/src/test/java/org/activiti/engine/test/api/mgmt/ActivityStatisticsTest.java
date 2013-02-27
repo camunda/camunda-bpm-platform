@@ -15,7 +15,7 @@ public class ActivityStatisticsTest extends PluggableActivitiTestCase {
 
   
   @Test
-  @Deployment(resources = "org/activiti/engine/test/api/mgmt/StatisticsTest.testProcessDefinitionStatisticsQueryWithFailedJobs.bpmn20.xml")
+  @Deployment(resources = "org/activiti/engine/test/api/mgmt/StatisticsTest.testStatisticsQueryWithFailedJobs.bpmn20.xml")
   public void testActivityStatisticsQueryWithoutFailedJobs() {
     runtimeService.startProcessInstanceByKey("ExampleProcess");
     
@@ -36,7 +36,7 @@ public class ActivityStatisticsTest extends PluggableActivitiTestCase {
   }
   
   @Test
-  @Deployment(resources = "org/activiti/engine/test/api/mgmt/StatisticsTest.testProcessDefinitionStatisticsQuery.bpmn20.xml")
+  @Deployment(resources = "org/activiti/engine/test/api/mgmt/StatisticsTest.testStatisticsQuery.bpmn20.xml")
   public void testActivityStatisticsQuery() {
     runtimeService.startProcessInstanceByKey("ExampleProcess");
     ProcessDefinition definition = repositoryService.createProcessDefinitionQuery()
@@ -54,7 +54,7 @@ public class ActivityStatisticsTest extends PluggableActivitiTestCase {
   }
   
   @Test
-  @Deployment(resources = "org/activiti/engine/test/api/mgmt/StatisticsTest.testProcessDefinitionStatisticsQuery.bpmn20.xml")
+  @Deployment(resources = "org/activiti/engine/test/api/mgmt/StatisticsTest.testStatisticsQuery.bpmn20.xml")
   public void testActivityStatisticsQueryCount() {
     runtimeService.startProcessInstanceByKey("ExampleProcess");
     ProcessDefinition definition = repositoryService.createProcessDefinitionQuery()
@@ -67,7 +67,7 @@ public class ActivityStatisticsTest extends PluggableActivitiTestCase {
   }
   
   @Test
-  @Deployment(resources = "org/activiti/engine/test/api/mgmt/StatisticsTest.testProcessDefinitionStatisticsQuery.bpmn20.xml")
+  @Deployment(resources = "org/activiti/engine/test/api/mgmt/StatisticsTest.testStatisticsQuery.bpmn20.xml")
   public void testManyInstancesActivityStatisticsQuery() {
     runtimeService.startProcessInstanceByKey("ExampleProcess");
     runtimeService.startProcessInstanceByKey("ExampleProcess");
@@ -88,7 +88,7 @@ public class ActivityStatisticsTest extends PluggableActivitiTestCase {
   }
   
   @Test
-  @Deployment(resources = "org/activiti/engine/test/api/mgmt/StatisticsTest.testMultiInstanceActivityStatisticsQuery.bpmn20.xml")
+  @Deployment(resources = "org/activiti/engine/test/api/mgmt/StatisticsTest.testMultiInstanceStatisticsQuery.bpmn20.xml")
   public void testMultiInstanceActivityStatisticsQuery() {
     runtimeService.startProcessInstanceByKey("ExampleProcess");
     ProcessDefinition definition = repositoryService.createProcessDefinitionQuery()
@@ -106,7 +106,7 @@ public class ActivityStatisticsTest extends PluggableActivitiTestCase {
   }
   
   @Test
-  @Deployment(resources = "org/activiti/engine/test/api/mgmt/StatisticsTest.testSubprocessProcessDefinitionStatistics.bpmn20.xml")
+  @Deployment(resources = "org/activiti/engine/test/api/mgmt/StatisticsTest.testSubprocessStatisticsQuery.bpmn20.xml")
   public void testSubprocessActivityStatisticsQuery() {
     runtimeService.startProcessInstanceByKey("ExampleProcess");
     
@@ -124,8 +124,8 @@ public class ActivityStatisticsTest extends PluggableActivitiTestCase {
   
   @Test
   @Deployment(resources = {
-      "org/activiti/engine/test/api/mgmt/StatisticsTest.testCallActivityProcessDefinitionStatisticsQuery.bpmn20.xml",
-      "org/activiti/engine/test/api/mgmt/StatisticsTest.testProcessDefinitionStatisticsQueryWithFailedJobs.bpmn20.xml"})
+      "org/activiti/engine/test/api/mgmt/StatisticsTest.testCallActivityStatisticsQuery.bpmn20.xml",
+      "org/activiti/engine/test/api/mgmt/StatisticsTest.testStatisticsQueryWithFailedJobs.bpmn20.xml"})
   public void testCallActivityActivityStatisticsQuery() {
     runtimeService.startProcessInstanceByKey("callExampleSubProcess");
     
