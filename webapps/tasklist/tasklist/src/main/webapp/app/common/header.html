@@ -2,9 +2,53 @@
 <div class="navbar navbar-fixed-top content-container">
   <div class="navbar-inner">
     <div class="container-fluid">
-      <a class="brand ir" href="../../index.html">
-        fox cockpit
+      <a class="btn btn-navbar"
+         data-toggle="collapse"
+         data-target=".nav-collapse">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
       </a>
+
+      <a class="brand ir" href="../index.html" alt="camunda - tasklist">
+        camunda tasklist
+      </a>
+
+      <div ngm-if="login">
+        <div class="btn-group pull-right">
+          <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+            <i class="icon-user"></i> {{ login.name }}
+            <span class="caret"></span>
+          </a>
+          <ul class="dropdown-menu">
+            <li><a ng-click="logout()">Sign out</a></li>
+          </ul>
+        </div>
+        <div class="btn-group pull-right">
+          <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+            <i class="icon-play"></i> Start Process
+            <span class="caret"></span>
+          </a>
+          
+          <ul class="dropdown-menu">
+            <ui:repeat value="#{processStarter.deployedProcesses}"
+              var="item">
+              <li><h:form style="margin:0;">
+                  <h:outputLink value="#{taskList.getStartFormUrl(item)}"
+                    rendered="#{taskList.getStartFormUrl(item) != null}">#{item.name} &#187;</h:outputLink>
+                  <h:commandLink
+                    rendered="#{taskList.getStartFormUrl(item) == null}"
+                    id="processStarterLink"
+                    action="#{processStarter.startProcess(item)}"
+                    value="#{item.name}" />
+                  <h:message for="processStarterLink" />
+                </h:form></li>
+            </ui:repeat>
+          </ul>
+        </div>
+      </div>
+
+      <!-- /Top Navigation Bar -->
     </div>
   </div>
 </div>

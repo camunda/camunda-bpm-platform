@@ -10,6 +10,7 @@
       angular : "assets/js/lib/angular/angular",
       resource : "assets/js/lib/angular/angular-resource",
       jquery: "assets/js/lib/jquery-1.7.2.min",
+      bootstrap: "assets/bootstrap/js/bootstrap",
       angularReady : "common/util/angularReady",
       angularModule : "common/util/angularModule"
     },
@@ -18,7 +19,8 @@
     },
     priority: [
       "jquery",
-      "angular"
+      "angular",
+      "bootstrap"
     ],
     baseUrl: "../",
     packages: [
@@ -27,17 +29,17 @@
     ]
   });
 
-  require([ "angular", "jquery", "domReady!" ], function(angular, jquery) {
-    if (!angular) {
-      throw new Error("[dep] angular not loaded");
-    }
+//  require([ "angular", "jquery", "domReady!" ], function(angular, jquery) {
+//    if (!angular) {
+//      throw new Error("[dep] angular not loaded");
+//    }
+//
+//    if (!jquery) {
+//      throw new Error("[dep] jquery not loaded");
+//    }
+//  });
 
-    if (!jquery) {
-      throw new Error("[dep] jquery not loaded");
-    }
-  });
-  
-  require([ "angular", "tasklist", "angularReady!" ], function(angular) {
+  require([ "jquery", "bootstrap", "angular", "tasklist", "angularReady!" ], function(bs, $, angular) {
     angular.bootstrap(document, ['tasklist']);
   });
 })(document, require);

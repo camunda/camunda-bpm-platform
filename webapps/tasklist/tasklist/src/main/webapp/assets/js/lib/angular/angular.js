@@ -64,7 +64,7 @@ var /** holds major version number for IE or NaN for real browsers */
     toString          = Object.prototype.toString,
 
 
-    _angular          = window.angular, 
+    _angular          = window.angular,
     /** @name angular */
     angular           = window.angular || (window.angular = {}),
     angularModule,
@@ -5659,7 +5659,7 @@ function $LocationProvider(){
 function $LogProvider(){
   var debug = true,
       self = this;
-  
+
   /**
    * @ngdoc property
    * @name ng.$logProvider#debugEnabled
@@ -5676,7 +5676,7 @@ function $LogProvider(){
 		  return debug;
 	  }
   };
-  
+
   this.$get = ['$window', function($window){
     return {
       /**
@@ -5718,18 +5718,18 @@ function $LogProvider(){
        * Write an error message
        */
       error: consoleLog('error'),
-      
+
       /**
        * @ngdoc method
        * @name ng.$log#debug
        * @methodOf ng.$log
-       * 
+       *
        * @description
        * Write a debug message
        */
       debug: (function () {
     	var fn = consoleLog('debug');
-    	
+
     	return function() {
     		if (debug) {
     			fn.apply(self, arguments);
@@ -6801,25 +6801,25 @@ function $ParseProvider() {
  *   you can treat promises attached to a scope as if they were the resulting values.
  * - Q has many more features that $q, but that comes at a cost of bytes. $q is tiny, but contains
  *   all the important functionality needed for common async tasks.
- * 
+ *
  *  # Testing
- * 
+ *
  *  <pre>
  *    it('should simulate promise', inject(function($q, $rootScope) {
  *      var deferred = $q.defer();
  *      var promise = deferred.promise;
  *      var resolvedValue;
- * 
+ *
  *      promise.then(function(value) { resolvedValue = value; });
  *      expect(resolvedValue).toBeUndefined();
- * 
+ *
  *      // Simulate resolving of promise
  *      deferred.resolve(123);
  *      // Note that the 'then' function does not get called synchronously.
  *      // This is because we want the promise API to always be async, whether or not
  *      // it got called synchronously or asynchronously.
  *      expect(resolvedValue).toBeUndefined();
- * 
+ *
  *      // Propagate promise resolution to 'then' functions using $apply().
  *      $rootScope.$apply();
  *      expect(resolvedValue).toEqual(123);
@@ -10212,7 +10212,7 @@ var DATE_FORMATS = {
      m: dateGetter('Minutes', 1),
     ss: dateGetter('Seconds', 2),
      s: dateGetter('Seconds', 1),
-     // while ISO 8601 requires fractions to be prefixed with `.` or `,` 
+     // while ISO 8601 requires fractions to be prefixed with `.` or `,`
      // we can be just safely rely on using `sss` since we currently don't support single or two digit fractions
    sss: dateGetter('Milliseconds', 3),
   EEEE: dateStrGetter('Day'),
@@ -10447,9 +10447,9 @@ var uppercaseFilter = valueFn(uppercase);
  * {@link ng.$filter} for more information about Angular arrays.
  *
  * @param {Array|string} input Source array or string to be limited.
- * @param {string|number} limit The length of the returned array or string. If the `limit` number 
+ * @param {string|number} limit The length of the returned array or string. If the `limit` number
  *     is positive, `limit` number of items from the beginning of the source array/string are copied.
- *     If the number is negative, `limit` number  of items from the end of the source array/string 
+ *     If the number is negative, `limit` number  of items from the end of the source array/string
  *     are copied. The `limit` will be trimmed if it exceeds `array.length`
  * @returns {Array|string} A new sub-array or substring of length `limit` or less if input array
  *     had less than `limit` elements.
@@ -10499,7 +10499,7 @@ var uppercaseFilter = valueFn(uppercase);
 function limitToFilter(){
   return function(input, limit) {
     if (!isArray(input) && !isString(input)) return input;
-    
+
     limit = int(limit);
 
     if (isString(input)) {

@@ -34,22 +34,18 @@ define([ "angular", "angularReady" ], function(angular, angularReady) {
       if (isModule(e)) {
         file = asFileName(e);
         module = e;
-      } else {
-        file = e;
-        module = extractModuleName(e);
-      }
 
-      var internal = INTERNAL.test(module);
-      var event = REQUIRE_EVENT.test(file);
-
-      if (!internal && !event) {
-        files.push(file);
-      }
-
-      if (!event) {
-        if (module != name && modules.indexOf(module) == -1) {
+        if (modules.indexOf(module) == -1) {
           modules.push(module);
         }
+      } else {
+        file = e;
+      }
+
+      var internal = file && INTERNAL.test(file);
+      
+      if (!internal && file) {
+        files.push(file);
       }
     });
 

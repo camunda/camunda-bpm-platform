@@ -1,0 +1,73 @@
+<!-- task list -->
+<table class="table table-hover task-table" multiSelect="taskList.selection">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Process</th>
+      <th>Created</th>
+      <th>Due</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr ng-show="!taskList.tasks.length">
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+      <td>-</td>
+    </tr>
+    <tr ng-repeat="task in taskList.tasks" ng-class="{ selected: isSelected(task) }">
+      <td>{{ task.name }}</td>
+      <td>{{ task.process }}</td>
+      <td>{{ task.created }}</td>
+      <td>{{ task.due }}</td>
+
+      <td>
+        <div class="btn-group">
+          <button class="btn btn-small" title="Start to work on task" ng-click="startTask(task)"><i class="icon-play"></i></button>
+          <button class="btn btn-small dropdown-toggle" data-toggle="dropdown">
+            <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu">
+            <li ng-show="taskList.view.filter == 'mytasks'">
+              <a href="#" ng-click="delegateTask(task)" title="Delegate task to someone else">Delegate</a>
+            </li>
+            <li ng-show="taskList.view.filter == 'mytasks'">
+              <a href="#" ng-click="unassignTask(task)" title="Unassign this task from me">Unassign</a>
+            </li>
+            <li ng-show="taskList.view.filter != 'mytasks'">
+              <a href="#" title="Claim task to work on it later" ng-click="claimTask(task)">Claim</a>
+            </li>
+          </ul>
+        </div>
+      </td>
+    </tr>
+  </tbody>
+  <tfoot>
+    <tr>
+      <td colspan="4">
+        <small style="font-size: 85%"><code style="font-size: 85%">SHIFT</code>-Click on tasks to select them</small>
+      </td>
+      <td>
+        <div class="btn-group" ng-show="taskList.selection.length">
+          <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+            Perform actions
+            <span class="caret"></span>
+          </a>
+          <ul class="dropdown-menu">
+            <li ng-show="taskList.view.filter == 'mytasks'">
+              <a href="#" ng-click="delegateTasks()" title="Delegate selected tasks">Delegate</a>
+            </li>
+            <li ng-show="taskList.view.filter == 'mytasks'">
+              <a href="#" ng-click="unassignTasks()" title="Unassign selected tasks">Unassign</a>
+            </li>
+            <li ng-show="taskList.view.filter != 'mytasks'">
+              <a href="#" title="Claim selected tasks to work on them later" ng-click="claimTasks()">Claim</a>
+            </li>
+          </ul>
+        </div>
+      </td>
+    </tr>
+  </tfoot>
+</table>

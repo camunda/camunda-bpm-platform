@@ -1,6 +1,6 @@
 "use strict";
 
-(function() {
+define([ "angular", "jquery" ], function(angular, $) {
   var module = angular.module("common.directives");
 
   module.directive("errorPanel", function(Error, Uri) {
@@ -36,4 +36,6 @@
       }
     };
   });
-})();
+
+  return module;
+});

@@ -1,0 +1,26 @@
+<ul class="nav nav-list" ng-controller="SitebarController">
+  <li class="nav-header">Tasks</li>
+  <li ng-class="{active: isActive('mytasks')}">
+    <a href="#/overview?filter=mytasks">
+      My Tasks ({{ tasks.assigned.count }})
+    </a>
+  </li>
+  <li ng-show="tasks.unassigned.count" ng-class="{active: isActive('unassigned')}">
+    <a href="#/overview?filter=unassigned">
+      Unassigned tasks ({{ tasks.unassigned.count }})
+    </a>
+  </li>
+  <li ng-show="tasks.unassigned.count" ng-class="{active: isActive('search')}">
+    <a href="#/overview?filter=search">
+      Search
+    </a>
+  </li>
+  <li class="nav-header">Group Tasks</li>
+  <li ng-repeat="group in tasks.groups" ng-class="{active: isActive('group', group.id)}">
+    <a href="#/overview?filter=group&search={{group.id}}">{{group.name}} ({{ group.count }})</a>
+  </li>
+  <li class="nav-header">Colleagues</li>
+  <li ng-repeat="colleague in tasks.colleagues" ng-class="{active: isActive('colleague', colleague.id)}">
+    <a href="#/overview?filter=colleague&search={{colleague.id}}">{{colleague.name}} ({{ colleague.count }})</a>
+  </li>
+</ul>
