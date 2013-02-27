@@ -105,7 +105,7 @@ public interface ManagementService {
   /** programmatic schema update on a given connection returning feedback about what happened */
   String databaseSchemaUpgrade(Connection connection, String catalog, String schema);
   
-  ProcessDefinitionStatisticsQuery createProcessDefinitionRuntimeStatisticsQuery();
+  ProcessDefinitionStatisticsQuery createProcessDefinitionStatisticsQuery();
   
   ActivityStatisticsQuery createActivityRuntimeStatisticsQuery(String processDefinitionId);
 }

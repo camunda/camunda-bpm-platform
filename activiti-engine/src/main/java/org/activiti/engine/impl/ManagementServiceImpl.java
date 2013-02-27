@@ -94,7 +94,7 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
     });
   }
 
-  public ProcessDefinitionStatisticsQuery createProcessDefinitionRuntimeStatisticsQuery() {
+  public ProcessDefinitionStatisticsQuery createProcessDefinitionStatisticsQuery() {
     return new ProcessDefinitionStatisticsQueryImpl(commandExecutor);
   }
   

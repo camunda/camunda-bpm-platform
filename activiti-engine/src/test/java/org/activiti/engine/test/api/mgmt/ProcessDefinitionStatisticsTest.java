@@ -6,6 +6,7 @@ import junit.framework.Assert;
 
 import org.activiti.engine.impl.test.PluggableActivitiTestCase;
 import org.activiti.engine.management.ProcessDefinitionStatistics;
+import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.test.Deployment;
 import org.junit.Test;
 
@@ -20,7 +21,7 @@ public class ProcessDefinitionStatisticsTest extends PluggableActivitiTestCase {
     waitForJobExecutorToProcessAllJobs(6000, 500);
     
     List<ProcessDefinitionStatistics> statistics = 
-        managementService.createProcessDefinitionRuntimeStatisticsQuery().includeFailedJobs().list();
+        managementService.createProcessDefinitionStatisticsQuery().includeFailedJobs().list();
     
     Assert.assertEquals(1, statistics.size());
     
@@ -34,7 +35,7 @@ public class ProcessDefinitionStatisticsTest extends PluggableActivitiTestCase {
   public void testMultiInstanceProcessDefinitionStatisticsQuery() {
     runtimeService.startProcessInstanceByKey("ExampleProcess");
     List<ProcessDefinitionStatistics> statistics = 
-        managementService.createProcessDefinitionRuntimeStatisticsQuery().list();
+        managementService.createProcessDefinitionStatisticsQuery().list();
     
     Assert.assertEquals(1, statistics.size());
     
@@ -47,7 +48,7 @@ public class ProcessDefinitionStatisticsTest extends PluggableActivitiTestCase {
   public void testSubprocessProcessDefinitionStatisticsQuery() {
     runtimeService.startProcessInstanceByKey("ExampleProcess");
     List<ProcessDefinitionStatistics> statistics = 
-        managementService.createProcessDefinitionRuntimeStatisticsQuery().list();
+        managementService.createProcessDefinitionStatisticsQuery().list();
     
     Assert.assertEquals(1, statistics.size());
     
@@ -65,7 +66,7 @@ public class ProcessDefinitionStatisticsTest extends PluggableActivitiTestCase {
     waitForJobExecutorToProcessAllJobs(6000, 500);
     
     List<ProcessDefinitionStatistics> statistics = 
-        managementService.createProcessDefinitionRuntimeStatisticsQuery().includeFailedJobs().list();
+        managementService.createProcessDefinitionStatisticsQuery().includeFailedJobs().list();
     
     Assert.assertEquals(2, statistics.size());
     
@@ -78,6 +79,35 @@ public class ProcessDefinitionStatisticsTest extends PluggableActivitiTestCase {
         Assert.assertEquals(0, result.getFailedJobs());
       }
     }
+  }
+  
+  @Test
+  @Deployment(resources = "org/activiti/engine/test/api/mgmt/StatisticsTest.testProcessDefinitionStatisticsQueryWithFailedJobs.bpmn20.xml")
+  public void testProcessDefinitionStatisticsQueryForMultipleVersions() {
+    org.activiti.engine.repository.Deployment deployment = 
+        repositoryService.createDeployment()
+          .addClasspathResource("org/activiti/engine/test/api/mgmt/StatisticsTest.testProcessDefinitionStatisticsQueryWithFailedJobs.bpmn20.xml")
+          .deploy();
+    
+    List<ProcessDefinition> definitions = 
+        repositoryService.createProcessDefinitionQuery().processDefinitionKey("ExampleProcess").list();
+    
+    for (ProcessDefinition definition : definitions) {
+      runtimeService.startProcessInstanceById(definition.getId());
+    }
+    
+    waitForJobExecutorToProcessAllJobs(6000, 500);
+    
+    List<ProcessDefinitionStatistics> statistics = 
+        managementService.createProcessDefinitionStatisticsQuery().includeFailedJobs().list();
+    
+    Assert.assertEquals(2, statistics.size());
+    
+    ProcessDefinitionStatistics definitionResult = statistics.get(0);
+    Assert.assertEquals(1, definitionResult.getInstances());
+    Assert.assertEquals(1, definitionResult.getFailedJobs());
+    
+    repositoryService.deleteDeployment(deployment.getId(), true);
   }
   
 }
