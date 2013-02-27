@@ -45,6 +45,44 @@ public class StatisticsTest extends PluggableActivitiTestCase {
   }
   
   @Test
+  @Deployment(resources = "org/activiti/engine/test/api/mgmt/StatisticsTest.testSubprocessProcessDefinitionStatistics.bpmn20.xml")
+  public void testSubprocessProcessDefinitionStatisticsQuery() {
+    runtimeService.startProcessInstanceByKey("ExampleProcess");
+    List<ProcessDefinitionStatistics> statistics = 
+        managementService.createProcessDefinitionRuntimeStatisticsQuery().list();
+    
+    Assert.assertEquals(1, statistics.size());
+    
+    ProcessDefinitionStatistics result = statistics.get(0);
+    Assert.assertEquals(1, result.getInstances());
+  }
+  
+  @Test
+  @Deployment(resources = {
+      "org/activiti/engine/test/api/mgmt/StatisticsTest.testCallActivityProcessDefinitionStatisticsQuery.bpmn20.xml",
+      "org/activiti/engine/test/api/mgmt/StatisticsTest.testProcessDefinitionStatisticsQueryWithFailedJobs.bpmn20.xml"})
+  public void testCallActivityProcessDefinitionStatisticsQuery() {
+    runtimeService.startProcessInstanceByKey("callExampleSubProcess");
+    
+    waitForJobExecutorToProcessAllJobs(6000, 500);
+    
+    List<ProcessDefinitionStatistics> statistics = 
+        managementService.createProcessDefinitionRuntimeStatisticsQuery().includeFailedJobs().list();
+    
+    Assert.assertEquals(2, statistics.size());
+    
+    for (ProcessDefinitionStatistics result : statistics) {
+      if (result.getKey().equals("ExampleSubProcess")) {
+        Assert.assertEquals(1, result.getInstances());
+        Assert.assertEquals(1, result.getFailedJobs());
+      } else if (result.getKey().equals("callExampleSubProcess")) {
+        Assert.assertEquals(1, result.getInstances());
+        Assert.assertEquals(0, result.getFailedJobs());
+      }
+    }
+  }
+  
+  @Test
   @Deployment(resources = "org/activiti/engine/test/api/mgmt/StatisticsTest.testProcessDefinitionStatisticsQueryWithFailedJobs.bpmn20.xml")
   public void testActivityStatisticsQueryWithoutFailedJobs() {
     runtimeService.startProcessInstanceByKey("ExampleProcess");
