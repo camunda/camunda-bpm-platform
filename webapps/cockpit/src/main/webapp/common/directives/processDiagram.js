@@ -12,6 +12,18 @@ angular
           var currentActivityCssClass = 'currentActivity';
           var currentActivityCountCssClass = 'currentActivityCount';
 
+          var setupZoomSlider = function() {
+            $('#zoomSlider').slider({
+              max : 5,
+              step : 0.1,
+              value: 1
+            }).on('slide', function(event) {
+                scope.$apply(function() {
+                  scope.zoomLevel = event.value;
+                })
+              });
+          }();
+
           var getActivityStatisticsResult = function(activityStatistics) {
             var activityStatisticsResult = [];
 
@@ -63,16 +75,16 @@ angular
             });
           };
 
-          var updateZoomLevel = function(zoomLevel) {
-            Debouncer.debounce(function() {
-              bpmnRenderer.zoom(parseFloat(zoomLevel));
-            }, 1000)();
+          var updateZoomLevel = function(zoomLevel, renderer) {
+            //if (zoomLevel && renderer) {
+            //  Debouncer.debounce(function() {
+                renderer.zoom(parseFloat(zoomLevel));
+            //  }, 1000)();
+            //}
           };
 
           scope.$watch('zoomLevel', function(newValue) {
-            if (newValue && bpmnRenderer) {
-              updateZoomLevel(newValue);
-            }
+            updateZoomLevel(newValue, bpmnRenderer);
           });
 
           scope.$watch(function() { return scope.processDefinition }, function(processDefinition) {

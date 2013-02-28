@@ -1,3 +1,8 @@
+div#processDiagramWrapper .slider {
+  margin-top : 20px;
+  width: 150px;
+}
+
 div#processDiagramWrapper {
   min-width: 100%;
   min-height: 100%;

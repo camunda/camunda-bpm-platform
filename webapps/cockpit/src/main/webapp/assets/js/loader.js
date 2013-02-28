@@ -14,6 +14,7 @@ $script([
 
 		$script([
 			'../bootstrap/js/bootstrap.min.js',
+      '../bootstrap-slider/bootstrap-slider.js',
 			'lib/angular/angular.js'
 			], function() {
 			
