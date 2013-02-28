@@ -22,9 +22,9 @@ public interface TaskRestService {
   @Path("/")
   List<TaskDto> getTasks(TaskQueryDto query,
       @QueryParam("firstResult") Integer firstResult, @QueryParam("maxResults") Integer maxResults);
-  
+
   /**
-   * Expects the same parameters as {@link TaskRestService#getTasks(TaskQueryDto, Integer, Integer)} (as 
+   * Expects the same parameters as {@link TaskRestService#getTasks(TaskQueryDto, Integer, Integer)} (as
    * JSON message body) and allows more than one variable check.
    * @param query
    * @param firstResult
@@ -40,17 +40,17 @@ public interface TaskRestService {
   @GET
   @Path("/count")
   CountResultDto getTasksCount(TaskQueryDto query);
-  
+
   @POST
   @Path("/count")
   @Consumes(MediaType.APPLICATION_JSON)
   CountResultDto queryTasksCount(TaskQueryDto query);
-  
+
   @POST
   @Path("/{id}/claim")
   @Consumes(MediaType.APPLICATION_JSON)
   void claim(@PathParam("id") String taskId, UserIdDto dto);
-  
+
   @POST
   @Path("/{id}/complete")
   @Consumes(MediaType.APPLICATION_JSON)
@@ -58,5 +58,6 @@ public interface TaskRestService {
 
   @GET
   @Path("/groups")
-  GroupInfoDto getGroups();
+  // FIXME discussion : move this into a group resource?
+  GroupInfoDto getGroupInfo(@QueryParam("userId") String userId);
 }

@@ -13,6 +13,11 @@ define(["angular"], function(angular) {
         return Task.query();
       }
 
+      EngineApi.prototype.getGroups = function (userId) {
+        var Task = $resource(Uri.restUri("task/groups"));
+        return Task.query({});
+      }
+
       return new EngineApi();
     }
   );
