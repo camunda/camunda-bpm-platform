@@ -98,22 +98,41 @@ html, body {
 }
 
 .content-inset {
-  padding-top: 50px;
+  padding-top: 60px;
 }
 
-/**
- * sidebar-nav tweak (My Roundtrips)
- */
-div.sidebar-nav > ul.nav.nav-list > li.nav-header {
-  font-size: 13px;
-  padding: 3px 0px;
+.dropdown-menu.left {
+  right: 0;
+  left: inherit;
+}
+
+/** responsive tweeks */
+@media (max-width: 979px) {
+  .content-inset {
+    padding-top: 0px;
+  }
+}
+@media (max-width: 979px) {
+  footer {
+    position: static;
+
+    margin-right: -20px;
+    margin-left: -20px;
+  }
+
+  footer .container-fluid {
+    padding-left: 20px;
+    padding-right: 20px;
+  }
 }
 
 footer {
   padding-top: 11px;
   border-top: 1px solid #E5E5E5;
   background-color: whiteSmoke;
-  width: 100%;
+
+  right: 0;
+  left: 0;
 }
 
 .wrapper {
@@ -141,9 +160,6 @@ footer {
 }
 
 /** usability tweeks */
-.content-container {
-  min-width: 950px;
-}
 
 #navigation {
   min-width: 220px;
