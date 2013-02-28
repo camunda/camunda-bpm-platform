@@ -4,16 +4,27 @@
 
   var module = angular.module("cockpit.resources");
   
-  var Resource = function ($resource, Uri) {
+  var ProcessDefinitionResource = function ($resource, Uri) {
     return $resource(Uri.restUri('/process-definition/:id'), {id: '@id'}, {
       'queryStatistics':  {method:'GET', isArray:true, params: { id: 'statistics' }}
     });
   };
   
-  Resource.$inject = ["$resource", "Uri"];
+  ProcessDefinitionResource.$inject = ["$resource", "Uri"];
   
   module
-    .factory("ProcessDefinitionResource", Resource);
+  .factory("ProcessDefinitionResource", ProcessDefinitionResource);
+  
+  var ProcessDefinitionActivityStatisticsResource = function ($resource, Uri) {
+    return $resource(Uri.restUri('/process-definition/:id/statistics'), {id: '@id'}, {
+      'queryStatistics':  {method:'GET', isArray:true, params: { id: 'statistics' }}
+    });
+  };
+  
+  ProcessDefinitionActivityStatisticsResource.$inject = ["$resource", "Uri"];
+  
+  module
+  .factory("ProcessDefinitionActivityStatisticsResource", ProcessDefinitionActivityStatisticsResource);
 
 })();
   

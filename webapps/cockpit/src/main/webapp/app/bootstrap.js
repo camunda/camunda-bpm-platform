@@ -27,7 +27,8 @@
       { name: "angular", location : "assets/js/lib/angular", main: "angular" },
       { name: "bpmn", location : "assets/js/lib/bpmn" },
       { name: "dojo", location : "assets/js/lib/dojo/dojo" },
-      { name: "dojox", location : "assets/js/lib/dojo/dojox" }
+      { name: "dojox", location : "assets/js/lib/dojo/dojox" },
+      { name: "bootstrap-slider", location : "assets/bootstrap-slider" }
     ]
   });
 

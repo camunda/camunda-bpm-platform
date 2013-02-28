@@ -4,16 +4,11 @@ div#processDiagramWrapper .slider {
 }
 
 div#processDiagramWrapper {
-  min-width: 100%;
-  min-height: 100%;
-
   position: relative;
 }
 
 div#processDiagram {
   margin-top : 20px;
-  width: 90%;
-  height: 90%;
   overflow: auto;
 }
 
@@ -37,3 +32,18 @@ div#processDiagram {
 
   background-color: #4169e1;
 }
+
+@media only screen and (min-height: 979px ) {
+  
+  div#processDiagram {
+    max-height: 630px;
+  }
+}
+
+@media only screen and (min-height: 720px ) and (max-height: 978) {
+  
+  div#processDiagram {
+    height: 200px;
+  }
+} 
+
