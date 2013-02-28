@@ -37,19 +37,19 @@ public class MBeanServiceContainer {
 
   protected MBeanServer mBeanServer;
   
-  protected Map<ObjectName, MbeanService<?>> servicesByName = new ConcurrentHashMap<ObjectName, MbeanService<?>>();
+  protected Map<ObjectName, MBeanService<?>> servicesByName = new ConcurrentHashMap<ObjectName, MBeanService<?>>();
 
   /** set if the current thread is performing a composite deployment operation */
   protected ThreadLocal<Stack<MBeanDeploymentOperation>> operationContext = new ThreadLocal<Stack<MBeanDeploymentOperation>>();
   
-  public synchronized <S> void startService(ServiceType serviceType, String localName, MbeanService<S> service) {
+  public synchronized <S> void startService(ServiceType serviceType, String localName, MBeanService<S> service) {
     
     ObjectName serviceName = serviceType.getServiceName(localName);
     startService(serviceName, service);
     
   }
   
-  public synchronized <S> void startService(ObjectName serviceName, MbeanService<S> service) {
+  public synchronized <S> void startService(ObjectName serviceName, MBeanService<S> service) {
 
     if (getService(serviceName) != null) {
       throw new FoxPlatformException("Cannot register service " + serviceName + " with MBeans Container, service with same name already registered.");
@@ -85,7 +85,7 @@ public class MBeanServiceContainer {
   public synchronized void stopService(ObjectName serviceName) {
     
     final MBeanServer mBeanServer = getmBeanServer();        
-    final MbeanService<Object> service = getService(serviceName);
+    final MBeanService<Object> service = getService(serviceName);
     
     if(service == null) {
       throw new FoxPlatformException("Cannot stop service "+serviceName+": no such service registered.");      
@@ -162,7 +162,7 @@ public class MBeanServiceContainer {
    * 
    */
   protected <S> S getServiceValue(ObjectName name) {
-    MbeanService<S> service = getService(name);
+    MBeanService<S> service = getService(name);
     if(service != null) {
       return service.getValue();
     } else {
@@ -184,14 +184,14 @@ public class MBeanServiceContainer {
    * @return all services for a specific {@link ServiceType}
    */
   @SuppressWarnings("unchecked")
-  public <S> List<MbeanService<S>> getServicesByType(ServiceType type) {
+  public <S> List<MBeanService<S>> getServicesByType(ServiceType type) {
     
     // query the MBeanServer for all services of the given type
     Set<ObjectName> serviceNames = getServiceNames(type);
     
-    List<MbeanService<S>> res = new ArrayList<MbeanService<S>>();
+    List<MBeanService<S>> res = new ArrayList<MBeanService<S>>();
     for (ObjectName serviceName : serviceNames) {
-      res.add((MbeanService<S>) servicesByName.get(serviceName));
+      res.add((MBeanService<S>) servicesByName.get(serviceName));
     }
     
     return res;
@@ -215,7 +215,7 @@ public class MBeanServiceContainer {
 
     List<S> res = new ArrayList<S>();
     for (ObjectName serviceName : serviceNames) {
-      MbeanService<S> mbeanService = (MbeanService<S>) servicesByName.get(serviceName);
+      MBeanService<S> mbeanService = (MBeanService<S>) servicesByName.get(serviceName);
       if (mbeanService != null) {
         res.add(mbeanService.getValue());
       }

@@ -5,7 +5,6 @@ import javax.ejb.Startup;
 import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.RuntimeService;
 import org.camunda.bpm.BpmPlatform;
-import org.camunda.bpm.ProcessEngineService;
 
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,8 +29,8 @@ public class Starter {
   
   @PostConstruct
   public void start() {
-    ProcessEngineService processEngineService = BpmPlatform.getProcessEngineService();
-    ProcessEngine defaultProcessEngine = processEngineService.getDefaultProcessEngine();
+    
+    ProcessEngine defaultProcessEngine = BpmPlatform.getDefaultProcessEngine();
     
     RuntimeService runtimeService = defaultProcessEngine.getRuntimeService();
     runtimeService.startProcessInstanceByKey("startToEnd");

@@ -12,14 +12,23 @@
  */
 package org.camunda.bpm.example.servlet;
 
-import org.camunda.bpm.application.ProcessEngineClient;
+import java.util.concurrent.Callable;
+
+import org.camunda.bpm.application.ProcessApplication;
+import org.camunda.bpm.application.ProcessApplicationExecutionException;
 import org.camunda.bpm.application.impl.ServletProcessApplication;
 
 /**
  * @author Daniel Meyer
  *
  */
-@ProcessEngineClient("MyApp1")
+@ProcessApplication("MyApp1")
 public class MyServlet25ProcessApplication extends ServletProcessApplication {
 
+  public <T> T execute(Callable<T> callable) throws ProcessApplicationExecutionException {
+    
+    // TODO Auto-generated method stub
+    return super.execute(callable);
+  }
+  
 }

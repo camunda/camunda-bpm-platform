@@ -31,11 +31,11 @@ public interface ProcessApplicationReference {
   /**
    * Get the process application.
    * 
-   * @return the {@link ProcessApplication}
+   * @return the {@link AbstractProcessApplication}
    * @throws ProcessApplicationUnavailableException
    *           if the process application is unavailable
    */
-  public ProcessApplication getProcessApplication() throws ProcessApplicationUnavailableException;
+  public AbstractProcessApplication getProcessApplication() throws ProcessApplicationUnavailableException;
 
   /**
    * Called by the process engine when the process engine is stopped and

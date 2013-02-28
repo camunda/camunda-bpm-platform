@@ -25,7 +25,7 @@ import javax.ejb.Startup;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 
-import org.camunda.bpm.application.ProcessEngineClient;
+import org.camunda.bpm.application.ProcessApplication;
 import org.camunda.bpm.application.impl.EjbProcessApplication;
 
 
@@ -35,12 +35,11 @@ import org.camunda.bpm.application.impl.EjbProcessApplication;
  * 
  */
 //singleton bean guarantees maximum efficiency
-@ProcessEngineClient
+@ProcessApplication
 @Singleton
 @Startup
 @ConcurrencyManagement(ConcurrencyManagementType.BEAN) 
 @TransactionAttribute(TransactionAttributeType.SUPPORTS)
-@Deprecated
 public class ProcessArchiveSupport extends EjbProcessApplication {
   
   @PostConstruct

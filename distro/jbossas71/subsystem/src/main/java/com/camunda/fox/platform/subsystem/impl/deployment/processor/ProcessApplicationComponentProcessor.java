@@ -21,7 +21,7 @@ import javax.ejb.TransactionAttributeType;
 import javax.ejb.TransactionManagementType;
 
 import org.camunda.bpm.application.ProcessApplicationExecutionException;
-import org.camunda.bpm.application.ProcessEngineClient;
+import org.camunda.bpm.application.ProcessApplication;
 import org.camunda.bpm.application.impl.EjbProcessApplication;
 import org.jboss.as.ee.component.Attachments;
 import org.jboss.as.ee.component.ComponentDescription;
@@ -77,11 +77,11 @@ public class ProcessApplicationComponentProcessor implements DeploymentUnitProce
     SingletonComponentDescription clientComponent = detectExistingClientComponent(deploymentUnit); 
 
     if(clientComponent == null) {
-      log.log(Level.INFO, "Could not detect @ProcessEngineClient component. Adding session bean with default configuration.");
+      log.log(Level.INFO, "Could not detect @"+ProcessApplication.class.getSimpleName()+" component. Adding session bean with default configuration.");
       clientComponent = synthesizeClientComponent(deploymentUnit);      
 
     } else {
-      log.log(Level.INFO, "Detected user-provided @ProcessEngineClient component with name '"+clientComponent.getComponentName()+"'.");
+      log.log(Level.INFO, "Detected user-provided @"+ProcessApplication.class.getSimpleName()+" component with name '"+clientComponent.getComponentName()+"'.");
 
     }
 
@@ -91,7 +91,7 @@ public class ProcessApplicationComponentProcessor implements DeploymentUnitProce
   }
 
   /** 
-   * Detect an existing {@link ProcessEngineClient} component.  
+   * Detect an existing {@link ProcessApplication} component.  
    */
   protected SingletonComponentDescription detectExistingClientComponent(DeploymentUnit deploymentUnit) throws DeploymentUnitProcessingException {
     
@@ -102,10 +102,10 @@ public class ProcessApplicationComponentProcessor implements DeploymentUnitProce
     
     List<AnnotationInstance> annotations = null;    
     if(compositeIndex != null) {
-      annotations = compositeIndex.getAnnotations(DotName.createSimple(ProcessEngineClient.class.getName()));
+      annotations = compositeIndex.getAnnotations(DotName.createSimple(ProcessApplication.class.getName()));
       
     } else {   
-      annotations = annotationIndex.getAnnotations(DotName.createSimple(ProcessEngineClient.class.getName()));
+      annotations = annotationIndex.getAnnotations(DotName.createSimple(ProcessApplication.class.getName()));
       
     }
     
@@ -113,7 +113,7 @@ public class ProcessApplicationComponentProcessor implements DeploymentUnitProce
       return null; // no component found
       
     } else if(annotations.size() > 1) {
-      throw new DeploymentUnitProcessingException("Detected more than one class annotated with @" + ProcessEngineClient.class.getSimpleName()
+      throw new DeploymentUnitProcessingException("Detected more than one class annotated with @" + ProcessApplication.class.getSimpleName()
           + ". A process application can only carry a single process engine client.");
       
     } else {
@@ -121,7 +121,7 @@ public class ProcessApplicationComponentProcessor implements DeploymentUnitProce
       AnnotationTarget target = annotationInstance.target();
       
       if( !(target instanceof ClassInfo) ) {
-        throw new DeploymentUnitProcessingException("@"+ProcessEngineClient.class.getSimpleName()+" annotation must be placed on a Type.");
+        throw new DeploymentUnitProcessingException("@"+ProcessApplication.class.getSimpleName()+" annotation must be placed on a Type.");
       }
       
       ClassInfo clientComponentClassInfo = (ClassInfo) target;      
@@ -129,7 +129,7 @@ public class ProcessApplicationComponentProcessor implements DeploymentUnitProce
       
       List<ComponentDescription> componentsByClassName = eeModuleDescription.getComponentsByClassName(clientComponentClassName);
       if(componentsByClassName.isEmpty()) {
-        throw new DeploymentUnitProcessingException("Class " + clientComponentClassName + " is annotated with @" + ProcessEngineClient.class.getSimpleName()
+        throw new DeploymentUnitProcessingException("Class " + clientComponentClassName + " is annotated with @" + ProcessApplication.class.getSimpleName()
             + " but is not a @Singleton session bean.");
       } else {
         ComponentDescription componentDescription = componentsByClassName.get(0);
@@ -137,7 +137,7 @@ public class ProcessApplicationComponentProcessor implements DeploymentUnitProce
           return (SingletonComponentDescription) componentDescription;
           
         } else {
-          throw new DeploymentUnitProcessingException("Class " + clientComponentClassName + " is annotated with @" + ProcessEngineClient.class.getSimpleName()
+          throw new DeploymentUnitProcessingException("Class " + clientComponentClassName + " is annotated with @" + ProcessApplication.class.getSimpleName()
               + " but is not a @Singleton session bean.");
           
         }
@@ -146,7 +146,7 @@ public class ProcessApplicationComponentProcessor implements DeploymentUnitProce
   }
 
   /**
-   * TODO: should we rally do this?
+   * TODO: should we really do this?
    */
   protected SingletonComponentDescription synthesizeClientComponent(final DeploymentUnit deploymentUnit) {
     // create a synthetic ProcessApplication component. 

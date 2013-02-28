@@ -24,7 +24,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import org.activiti.engine.ProcessEngine;
 import org.camunda.bpm.ProcessApplicationService;
 import org.camunda.bpm.ProcessEngineService;
-import org.camunda.bpm.application.ProcessApplication;
+import org.camunda.bpm.application.AbstractProcessApplication;
 import org.camunda.bpm.container.impl.RuntimeContainerConfiguration;
 import org.camunda.bpm.container.spi.RuntimeContainerDelegate;
 import org.jboss.as.naming.ManagedReferenceFactory;
@@ -66,7 +66,7 @@ public class MscRuntimeContainerDelegate implements Service<MscRuntimeContainerD
     addServiceTrackers(serviceContainer);
     createJndiBindings(context);
     
-    RuntimeContainerConfiguration containerConfiguration = RuntimeContainerConfiguration.getINSTANCE();
+    RuntimeContainerConfiguration containerConfiguration = RuntimeContainerConfiguration.getInstance();
     containerConfiguration.setContainerDelegate(this);
     containerConfiguration.setRuntimeContainerName("JBoss AS 7");
   }
@@ -121,12 +121,12 @@ public class MscRuntimeContainerDelegate implements Service<MscRuntimeContainerD
         
   }
   
-  public void deployProcessApplication(ProcessApplication processApplication) {
+  public void deployProcessApplication(AbstractProcessApplication processApplication) {
     // on JBoss AS 7, process applications are deployed using the deployment processors subsystem at application deployment time. 
     // a subsequent call to deployProcessApplication() can thus be ignored, if the application is already registered. 
   }
   
-  public void undeployProcessApplication(ProcessApplication processApplication) {
+  public void undeployProcessApplication(AbstractProcessApplication processApplication) {
     // on JBoss AS 7, process applications are undeployed using the deployment processors subsystem at application undeployment time. 
     // a subsequent call to undeployProcessApplication() can thus be ignored.
   }

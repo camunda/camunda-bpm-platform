@@ -17,7 +17,7 @@ import java.util.logging.Logger;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
-import org.camunda.bpm.application.ProcessApplication;
+import org.camunda.bpm.application.AbstractProcessApplication;
 import org.camunda.bpm.application.ProcessApplicationReference;
 
 import com.camunda.fox.platform.FoxPlatformException;
@@ -26,7 +26,7 @@ import com.camunda.fox.platform.FoxPlatformException;
  * @author Daniel Meyer
  * 
  */
-public class EjbProcessApplication extends ProcessApplication {
+public class EjbProcessApplication extends AbstractProcessApplication {
 
   private static final Logger log = Logger.getLogger(EjbProcessApplication.class.getName());
 

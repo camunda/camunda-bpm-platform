@@ -24,7 +24,7 @@ import java.util.Map;
 
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.impl.util.IoUtil;
-import org.camunda.bpm.application.ProcessApplication;
+import org.camunda.bpm.application.AbstractProcessApplication;
 import org.camunda.bpm.application.impl.deployment.metadata.spi.ProcessesXml;
 import org.camunda.bpm.application.impl.deployment.parser.ProcessesXmlParser;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanDeploymentOperation;
@@ -48,7 +48,7 @@ public class ParseProcessesXmlStep extends MBeanDeploymentOperationStep {
 
   public void performOperationStep(MBeanDeploymentOperation operationContext) {
 
-    final ProcessApplication processApplication = operationContext.getAttachment(PROCESS_APPLICATION);
+    final AbstractProcessApplication processApplication = operationContext.getAttachment(PROCESS_APPLICATION);
     final ClassLoader processApplicationClassloader = processApplication.getProcessApplicationClassloader();
       
     // load all marker files using the classloader of the process application

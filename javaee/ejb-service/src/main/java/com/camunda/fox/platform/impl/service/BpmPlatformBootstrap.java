@@ -68,7 +68,7 @@ public class BpmPlatformBootstrap {
   }
   
   protected JmxRuntimeContainerDelegate getContainerDelegate() {
-    return (JmxRuntimeContainerDelegate) RuntimeContainerConfiguration.getINSTANCE().getContainerDelegate();
+    return (JmxRuntimeContainerDelegate) RuntimeContainerConfiguration.getInstance().getContainerDelegate();
   }
 
 }

@@ -15,7 +15,7 @@ import javax.ejb.ConcurrencyManagement;
 import javax.ejb.ConcurrencyManagementType;
 import javax.ejb.Singleton;
 
-import org.camunda.bpm.application.ProcessEngineClient;
+import org.camunda.bpm.application.ProcessApplication;
 import org.camunda.bpm.application.impl.EjbProcessApplication;
 
 /**
@@ -23,7 +23,7 @@ import org.camunda.bpm.application.impl.EjbProcessApplication;
  * @author Daniel Meyer
  * 
  */
-@ProcessEngineClient
+@ProcessApplication
 @Singleton
 @ConcurrencyManagement(ConcurrencyManagementType.BEAN) 
 public class MyEjbProcessApplication extends EjbProcessApplication {

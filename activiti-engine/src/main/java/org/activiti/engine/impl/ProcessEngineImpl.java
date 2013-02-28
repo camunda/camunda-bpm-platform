@@ -88,7 +88,7 @@ public class ProcessEngineImpl implements ProcessEngine {
     
     if(processEngineConfiguration.isContainerManaged()) {
       // register with runtime container integration subsystem
-      RuntimeContainerConfiguration.getINSTANCE()
+      RuntimeContainerConfiguration.getInstance()
         .getContainerDelegate()
         .registerProcessEngine(this);
     }
@@ -102,7 +102,7 @@ public class ProcessEngineImpl implements ProcessEngine {
     
     if(processEngineConfiguration.isContainerManaged()) {
       // un-register with runtime container integration subsystem
-      RuntimeContainerConfiguration.getINSTANCE()
+      RuntimeContainerConfiguration.getInstance()
         .getContainerDelegate()
         .unregisterProcessEngine(this);
     }

@@ -14,13 +14,13 @@ package org.camunda.bpm.container.impl.jmx.services;
 
 import org.activiti.engine.ProcessEngine;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanServiceContainer;
-import org.camunda.bpm.container.impl.jmx.kernel.MbeanService;
+import org.camunda.bpm.container.impl.jmx.kernel.MBeanService;
 
 /**
  * @author Daniel Meyer
  *
  */
-public class JmxProcessEngine extends MbeanService<ProcessEngine> implements JmxProcessEngineMBean {
+public class JmxProcessEngine extends MBeanService<ProcessEngine> implements JmxProcessEngineMBean {
   
   protected ProcessEngine processEngine;
   protected boolean isDefault;

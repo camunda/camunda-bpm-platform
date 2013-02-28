@@ -16,7 +16,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.camunda.bpm.application.ProcessApplication;
+import org.camunda.bpm.application.AbstractProcessApplication;
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.container.impl.jmx.JmxRuntimeContainerDelegate.ServiceTypes;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanDeploymentOperation;
@@ -59,7 +59,7 @@ public class StopProcessApplicationsStep extends MBeanDeploymentOperationStep {
       // unless the user has overridden the stop behavior, 
       // this causes the process application to remove its services 
       // (triggers nested undeployment operation)
-      ProcessApplication processApplication = processApplicationReference.getProcessApplication();
+      AbstractProcessApplication processApplication = processApplicationReference.getProcessApplication();
       processApplication.stop();
       
     } catch(Throwable t) {

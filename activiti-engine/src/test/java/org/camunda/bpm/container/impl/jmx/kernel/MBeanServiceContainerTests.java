@@ -109,10 +109,10 @@ public class MBeanServiceContainerTests extends TestCase {
     serviceContainer.startService(service1Name, service1);
     serviceContainer.startService(service2Name, service2);
     
-    List<MbeanService<TestService>> servicesByType1 = serviceContainer.getServicesByType(TestServiceType.TYPE1);
+    List<MBeanService<TestService>> servicesByType1 = serviceContainer.getServicesByType(TestServiceType.TYPE1);
     assertEquals(2, servicesByType1.size());
     
-    List<MbeanService<TestService>> servicesByType2 = serviceContainer.getServicesByType(TestServiceType.TYPE2);
+    List<MBeanService<TestService>> servicesByType2 = serviceContainer.getServicesByType(TestServiceType.TYPE2);
     assertEquals(0, servicesByType2.size());
     
     serviceContainer.startService(service3Name, service3);
@@ -132,12 +132,12 @@ public class MBeanServiceContainerTests extends TestCase {
     serviceContainer.startService(service1Name, service1);
     serviceContainer.startService(service2Name, service2);
     
-    List<MbeanService<TestService>> servicesByType1 = serviceContainer.getServiceValuesByType(TestServiceType.TYPE1);
+    List<MBeanService<TestService>> servicesByType1 = serviceContainer.getServiceValuesByType(TestServiceType.TYPE1);
     assertEquals(2, servicesByType1.size());
     assertTrue(servicesByType1.contains(service1));
     assertTrue(servicesByType1.contains(service2));
     
-    List<MbeanService<TestService>> servicesByType2 = serviceContainer.getServicesByType(TestServiceType.TYPE2);
+    List<MBeanService<TestService>> servicesByType2 = serviceContainer.getServicesByType(TestServiceType.TYPE2);
     assertEquals(0, servicesByType2.size());
     
     // start more services

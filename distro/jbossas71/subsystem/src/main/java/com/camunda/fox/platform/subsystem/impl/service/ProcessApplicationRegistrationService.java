@@ -14,7 +14,7 @@ package com.camunda.fox.platform.subsystem.impl.service;
 
 import org.activiti.engine.ManagementService;
 import org.activiti.engine.ProcessEngine;
-import org.camunda.bpm.application.ProcessApplication;
+import org.camunda.bpm.application.AbstractProcessApplication;
 import org.camunda.bpm.engine.application.ProcessApplicationRegistration;
 import org.jboss.as.ee.component.ComponentView;
 import org.jboss.as.naming.ManagedReference;
@@ -60,7 +60,7 @@ public class ProcessApplicationRegistrationService implements Service<ProcessApp
       
       reference = processApplicationComponentView.createInstance();      
       
-      ProcessApplication processApplication = (ProcessApplication) reference.getInstance();      
+      AbstractProcessApplication processApplication = (AbstractProcessApplication) reference.getInstance();      
       ManagementService managementService = processEngineInjector.getValue().getManagementService();      
       registration = managementService.activateDeploymentForApplication(deploymentId, processApplication.getReference());
       

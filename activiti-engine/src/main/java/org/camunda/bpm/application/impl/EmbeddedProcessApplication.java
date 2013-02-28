@@ -12,7 +12,7 @@
  */
 package org.camunda.bpm.application.impl;
 
-import org.camunda.bpm.application.ProcessApplication;
+import org.camunda.bpm.application.AbstractProcessApplication;
 import org.camunda.bpm.application.ProcessApplicationReference;
 
 /**
@@ -25,7 +25,7 @@ import org.camunda.bpm.application.ProcessApplicationReference;
  * @author Daniel Meyer
  * 
  */
-public class EmbeddedProcessApplication extends ProcessApplication {
+public class EmbeddedProcessApplication extends AbstractProcessApplication {
 
   protected String autodetectProcessApplicationName() {
     return "Process Application";

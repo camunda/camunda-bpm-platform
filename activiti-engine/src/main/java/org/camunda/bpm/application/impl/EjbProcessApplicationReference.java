@@ -15,7 +15,7 @@ package org.camunda.bpm.application.impl;
 import javax.naming.InitialContext;
 
 import org.activiti.engine.ProcessEngine;
-import org.camunda.bpm.application.ProcessApplication;
+import org.camunda.bpm.application.AbstractProcessApplication;
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.application.ProcessApplicationUnavailableException;
 
@@ -42,8 +42,9 @@ public class EjbProcessApplicationReference implements ProcessApplicationReferen
     return processApplicationName;
   }
 
-  public ProcessApplication getProcessApplication() throws ProcessApplicationUnavailableException {
+  public AbstractProcessApplication getProcessApplication() throws ProcessApplicationUnavailableException {
     try {
+      // TODO: do lookup once and cache EJB proxy
       return InitialContext.doLookup(processApplicationSessionObjectName);
     } catch (Exception e) {
       throw new ProcessApplicationUnavailableException("Could not lookup process application using JNDI name '"+processApplicationSessionObjectName+"'", e);

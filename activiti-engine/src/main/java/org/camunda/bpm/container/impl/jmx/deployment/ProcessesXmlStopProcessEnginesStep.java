@@ -18,7 +18,7 @@ import java.util.logging.Logger;
 
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.ProcessEngine;
-import org.camunda.bpm.application.ProcessApplication;
+import org.camunda.bpm.application.AbstractProcessApplication;
 import org.camunda.bpm.application.impl.deployment.metadata.spi.ProcessEngineXml;
 import org.camunda.bpm.application.impl.deployment.metadata.spi.ProcessesXml;
 import org.camunda.bpm.container.impl.jmx.JmxRuntimeContainerDelegate.ServiceTypes;
@@ -44,7 +44,7 @@ public class ProcessesXmlStopProcessEnginesStep extends MBeanDeploymentOperation
   public void performOperationStep(MBeanDeploymentOperation operationContext) {
     
     final MBeanServiceContainer serviceContainer = operationContext.getServiceContainer();
-    final ProcessApplication processApplication = operationContext.getAttachment(Attachments.PROCESS_APPLICATION);    
+    final AbstractProcessApplication processApplication = operationContext.getAttachment(Attachments.PROCESS_APPLICATION);    
     final JmxProcessApplication deployedProcessApplication = serviceContainer.getService(ServiceTypes.PROCESS_APPLICATION, processApplication.getName());
     
     if(deployedProcessApplication == null) {

@@ -25,7 +25,7 @@ import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.jobexecutor.JobExecutor;
 import org.camunda.bpm.ProcessApplicationService;
 import org.camunda.bpm.ProcessEngineService;
-import org.camunda.bpm.application.ProcessApplication;
+import org.camunda.bpm.application.AbstractProcessApplication;
 import org.camunda.bpm.container.impl.jmx.deployment.Attachments;
 import org.camunda.bpm.container.impl.jmx.deployment.DeployProcessArchivesStep;
 import org.camunda.bpm.container.impl.jmx.deployment.ParseProcessesXmlStep;
@@ -127,7 +127,7 @@ public class JmxRuntimeContainerDelegate implements RuntimeContainerDelegate, Pr
     
   }
 
-  public void deployProcessApplication(ProcessApplication processApplication) {
+  public void deployProcessApplication(AbstractProcessApplication processApplication) {
     
     if(processApplication == null) {
       throw new ActivitiException("Process application cannot be null");
@@ -145,7 +145,7 @@ public class JmxRuntimeContainerDelegate implements RuntimeContainerDelegate, Pr
     
   }
 
-  public void undeployProcessApplication(ProcessApplication processApplication) {
+  public void undeployProcessApplication(AbstractProcessApplication processApplication) {
 
     if(processApplication == null) {
       throw new ActivitiException("Process application cannot be null");

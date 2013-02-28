@@ -51,7 +51,7 @@ public class RuntimeContainerConfiguration {
     this.runtimeContainerName = runtimeContainerName;
   }
   
-  public static RuntimeContainerConfiguration getINSTANCE() {
+  public static RuntimeContainerConfiguration getInstance() {
     return INSTANCE;
   }
 

@@ -37,7 +37,7 @@ import org.camunda.bpm.engine.application.ProcessApplicationRegistration;
 public interface ManagementService {
   
   /**
-   * Activate a deployment for a given ProcessApplicaiton. The effect of this
+   * Activate a deployment for a given ProcessApplication. The effect of this
    * method is twofold:
    * <ol>
    * <li>The process engine will execute atomic operations within the context of

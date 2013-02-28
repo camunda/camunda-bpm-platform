@@ -28,7 +28,7 @@ import org.activiti.engine.RepositoryService;
 import org.activiti.engine.impl.util.IoUtil;
 import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.repository.DeploymentBuilder;
-import org.camunda.bpm.application.ProcessApplication;
+import org.camunda.bpm.application.AbstractProcessApplication;
 import org.camunda.bpm.application.impl.deployment.metadata.PropertyHelper;
 import org.camunda.bpm.application.impl.deployment.metadata.spi.ProcessArchiveXml;
 import org.camunda.bpm.container.impl.jmx.JmxRuntimeContainerDelegate.ServiceTypes;
@@ -66,7 +66,7 @@ public class DeployProcessArchiveStep extends MBeanDeploymentOperationStep {
   public void performOperationStep(MBeanDeploymentOperation operationContext) {
     
     final MBeanServiceContainer serviceContainer = operationContext.getServiceContainer();
-    final ProcessApplication processApplication = operationContext.getAttachment(Attachments.PROCESS_APPLICATION);
+    final AbstractProcessApplication processApplication = operationContext.getAttachment(Attachments.PROCESS_APPLICATION);
     final ClassLoader processApplicationClassloader = processApplication.getProcessApplicationClassloader();            
     
     ProcessEngine processEngine = getProcessEngine(serviceContainer);

@@ -21,7 +21,7 @@ import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.impl.jobexecutor.JobExecutorContext;
 import org.activiti.engine.impl.pvm.runtime.InterpretableExecution;
-import org.camunda.bpm.application.ProcessApplication;
+import org.camunda.bpm.application.AbstractProcessApplication;
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.application.ProcessApplicationUnavailableException;
 
@@ -130,7 +130,7 @@ public class Context {
   public static <T> T executeWithinProcessApplication(Callable<T> callback, ProcessApplicationReference processApplicationReference) {
     String paName = processApplicationReference.getName();
     try {
-      ProcessApplication processApplication = processApplicationReference.getProcessApplication();      
+      AbstractProcessApplication processApplication = processApplicationReference.getProcessApplication();      
       setCurrentProcessApplication(paName);
 
       try {

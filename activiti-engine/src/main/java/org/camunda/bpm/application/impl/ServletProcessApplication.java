@@ -15,17 +15,17 @@ package org.camunda.bpm.application.impl;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
-import org.camunda.bpm.application.ProcessApplication;
+import org.camunda.bpm.application.AbstractProcessApplication;
 import org.camunda.bpm.application.ProcessApplicationReference;
 
 /**
- * <p>A {@link ProcessApplication} Implementation to be used in a Servlet container environment.</p>
+ * <p>A {@link AbstractProcessApplication} Implementation to be used in a Servlet container environment.</p>
  * 
  * @author Daniel Meyer
  * @author Thorben Lindhauer
  * 
  */
-public class ServletProcessApplication extends ProcessApplication implements ServletContextListener {
+public class ServletProcessApplication extends AbstractProcessApplication implements ServletContextListener {
 
   protected String servletContextName;
   

@@ -19,7 +19,7 @@ import java.util.Map;
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.application.impl.deployment.metadata.spi.ProcessesXml;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanServiceContainer;
-import org.camunda.bpm.container.impl.jmx.kernel.MbeanService;
+import org.camunda.bpm.container.impl.jmx.kernel.MBeanService;
 import org.camunda.bpm.engine.application.ProcessApplicationRegistration;
 
 /**
@@ -27,7 +27,7 @@ import org.camunda.bpm.engine.application.ProcessApplicationRegistration;
  * @author Daniel Meyer
  *
  */
-public class JmxProcessApplication extends MbeanService<ProcessApplicationReference> implements JmxProcessApplicationMBean {
+public class JmxProcessApplication extends MBeanService<ProcessApplicationReference> implements JmxProcessApplicationMBean {
 	
 	protected final ProcessApplicationReference processApplicationReference;
   protected List<ProcessesXml> processesXmls;

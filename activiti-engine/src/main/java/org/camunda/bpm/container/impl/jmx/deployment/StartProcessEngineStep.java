@@ -25,7 +25,7 @@ import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.cfg.StandaloneProcessEngineConfiguration;
 import org.activiti.engine.impl.persistence.StrongUuidGenerator;
 import org.activiti.engine.impl.util.ReflectUtil;
-import org.camunda.bpm.application.ProcessApplication;
+import org.camunda.bpm.application.AbstractProcessApplication;
 import org.camunda.bpm.application.impl.deployment.metadata.spi.ProcessEngineXml;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanDeploymentOperation;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanDeploymentOperationStep;
@@ -52,7 +52,7 @@ public class StartProcessEngineStep extends MBeanDeploymentOperationStep {
 
   public void performOperationStep(MBeanDeploymentOperation operationContext) {
     
-    final ProcessApplication processApplication = operationContext.getAttachment(PROCESS_APPLICATION);
+    final AbstractProcessApplication processApplication = operationContext.getAttachment(PROCESS_APPLICATION);
     
     ClassLoader configurationClassloader = null;
     

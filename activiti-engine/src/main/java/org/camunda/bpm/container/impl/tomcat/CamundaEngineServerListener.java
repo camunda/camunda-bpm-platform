@@ -50,7 +50,7 @@ public class CamundaEngineServerListener implements LifecycleListener {
 
     if (Lifecycle.START_EVENT.equals(event.getType())) {
       
-      runtimeContainerConfiguration = RuntimeContainerConfiguration.getINSTANCE();
+      runtimeContainerConfiguration = RuntimeContainerConfiguration.getInstance();
       containerDelegate = (JmxRuntimeContainerDelegate) runtimeContainerConfiguration.getContainerDelegate();
       
       deployBpmPlatform(event);

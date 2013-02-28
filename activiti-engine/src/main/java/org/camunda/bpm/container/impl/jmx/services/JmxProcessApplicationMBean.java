@@ -14,10 +14,10 @@ package org.camunda.bpm.container.impl.jmx.services;
 
 import java.util.List;
 
-import org.camunda.bpm.application.ProcessApplication;
+import org.camunda.bpm.application.AbstractProcessApplication;
 
 /**
- * MBean interface for {@link ProcessApplication ProcessApplications}. This
+ * MBean interface for {@link AbstractProcessApplication ProcessApplications}. This
  * interface allows retrieving management information about process
  * applications.
  * 

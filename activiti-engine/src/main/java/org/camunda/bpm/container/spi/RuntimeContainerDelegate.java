@@ -14,7 +14,7 @@ package org.camunda.bpm.container.spi;
 
 import org.activiti.engine.ProcessEngine;
 import org.camunda.bpm.ProcessEngineService;
-import org.camunda.bpm.application.ProcessApplication;
+import org.camunda.bpm.application.AbstractProcessApplication;
 
 /**
  * <p>The {@link RuntimeContainerDelegate} allows the process engine to integrate with the
@@ -52,16 +52,16 @@ public interface RuntimeContainerDelegate {
 //  public void unregisterJobAcquisition(JobAcquisition jobAcquisitionConfiguration);
   
   /**
-   * Deploy a {@link ProcessApplication} into the runtime container.
+   * Deploy a {@link AbstractProcessApplication} into the runtime container.
    * 
    */
-  public void deployProcessApplication(ProcessApplication processApplication);
+  public void deployProcessApplication(AbstractProcessApplication processApplication);
   
   /**
-   * Undeploy a {@link ProcessApplication} from the runtime container.
+   * Undeploy a {@link AbstractProcessApplication} from the runtime container.
    * 
    */
-  public void undeployProcessApplication(ProcessApplication processApplication);
+  public void undeployProcessApplication(AbstractProcessApplication processApplication);
 
   /**
    * @return the Container {@link ProcessEngineService} implementation. 

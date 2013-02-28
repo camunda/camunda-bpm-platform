@@ -14,7 +14,7 @@ package com.camunda.fox.platform.subsystem.impl.deployment.marker;
 
 import java.util.Map;
 
-import org.camunda.bpm.application.ProcessApplication;
+import org.camunda.bpm.application.AbstractProcessApplication;
 import org.camunda.bpm.application.impl.deployment.metadata.spi.ProcessArchiveXml;
 import org.camunda.bpm.application.impl.deployment.metadata.spi.ProcessesXml;
 import org.jboss.as.ee.component.ComponentDescription;
@@ -77,14 +77,14 @@ public class ProcessApplicationAttachments {
   }
   
   /**
-   * Returns the {@link ComponentDescription} for the {@link ProcessApplication} component
+   * Returns the {@link ComponentDescription} for the {@link AbstractProcessApplication} component
    */
   public static ComponentDescription getProcessApplicationComponent(DeploymentUnit deploymentUnit) {
     return deploymentUnit.getAttachment(PA_COMPONENT);
   }
   
   /**
-   * Attach the {@link ComponentDescription} for the {@link ProcessApplication} component   
+   * Attach the {@link ComponentDescription} for the {@link AbstractProcessApplication} component   
    */
   public static void attachProcessEngineClientComponent(DeploymentUnit deploymentUnit, ComponentDescription componentDescription){
     deploymentUnit.putAttachment(PA_COMPONENT, componentDescription);

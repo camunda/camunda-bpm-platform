@@ -1,9 +1,9 @@
 package org.camunda.bpm.container.impl.jmx.kernel.util;
 
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanServiceContainer;
-import org.camunda.bpm.container.impl.jmx.kernel.MbeanService;
+import org.camunda.bpm.container.impl.jmx.kernel.MBeanService;
 
-public class TestService extends MbeanService<TestService> implements TestServiceMBean {
+public class TestService extends MBeanService<TestService> implements TestServiceMBean {
 
   public void start(MBeanServiceContainer mBeanServiceContainer) {
 

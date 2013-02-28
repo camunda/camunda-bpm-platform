@@ -12,7 +12,7 @@
  */
 package org.camunda.bpm.container.impl.jmx.deployment;
 
-import org.camunda.bpm.application.ProcessApplication;
+import org.camunda.bpm.application.AbstractProcessApplication;
 import org.camunda.bpm.container.impl.jmx.JmxRuntimeContainerDelegate.ServiceTypes;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanDeploymentOperation;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanDeploymentOperationStep;
@@ -34,7 +34,7 @@ public class StopProcessApplicationServiceStep extends MBeanDeploymentOperationS
   public void performOperationStep(MBeanDeploymentOperation operationContext) {
     
     final MBeanServiceContainer serviceContainer = operationContext.getServiceContainer();
-    final ProcessApplication processApplication = operationContext.getAttachment(Attachments.PROCESS_APPLICATION);    
+    final AbstractProcessApplication processApplication = operationContext.getAttachment(Attachments.PROCESS_APPLICATION);    
     
     // remove the service
     serviceContainer.stopService(ServiceTypes.PROCESS_APPLICATION, processApplication.getName());
