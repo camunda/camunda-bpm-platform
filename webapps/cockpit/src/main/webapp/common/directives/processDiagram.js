@@ -12,33 +12,6 @@ angular
           var currentActivityCssClass = 'currentActivity';
           var currentActivityCountCssClass = 'currentActivityCount';
 
-          // get dependencies
-          require({
-            baseUrl: "./",
-            packages: [
-              { name: "dojo", location: "assets/js/lib/dojo/dojo" },
-              { name: "dojox", location: "assets/js/lib/dojo/dojox"},
-              { name: "bpmn", location: "assets/js/lib/bpmn"}]
-          });
-
-          require(["bpmn/Bpmn", "dojo/domReady!"], function(Bpmn) {
-
-            ProcessDefinitionDiagramService.getBpmn20Xml(scope.processDefinitionId).then(
-              function(data) {
-                bpmnRenderer = new Bpmn();
-                bpmnRenderer.render(data.bpmn20Xml, {
-                  diagramElement : containerElement,
-                  overlayHtml : '<div></div>'
-                });
-
-                ProcessDefinitionActivityStatisticsResource.queryStatistics({ id : scope.processDefinitionId }).$then(function(result) {
-                  scope.activityStatistics = getActivityStatisticsResult(result);
-                  renderActivityStatistics(scope.activityStatistics, bpmnRenderer);
-                });
-              }
-            );
-          });
-
           var getActivityStatisticsResult = function(activityStatistics) {
             var activityStatisticsResult = [];
 
@@ -82,7 +55,7 @@ angular
                 // leave it alone because it is under 1000
                 break;
             }
-          }
+          };
 
           var renderActivityStatistics = function(activityStatistics, renderer) {
             angular.forEach(activityStatistics, function (currentActivity) {
@@ -103,14 +76,46 @@ angular
           });
 
           scope.$watch(function() { return scope.processDefinition }, function(processDefinition) {
-            if (processDefinition) {
-              // id to scroll to is the process definition key
-              var processId = '#' + processDefinition.key;
-              // scroll to selected process if it is a collaboration
-              $('#' + containerElement).animate({
-                scrollTop: $(processId).offset().top,
-                scrollLeft: $(processId).offset().left
-              }, 500);
+            if (processDefinition && processDefinition.$resolved) {
+
+              // get dependencies
+              require({
+                baseUrl: "./",
+                packages: [
+                  { name: "dojo", location: "assets/js/lib/dojo/dojo" },
+                  { name: "dojox", location: "assets/js/lib/dojo/dojox"},
+                  { name: "bpmn", location: "assets/js/lib/bpmn"}]
+              });
+
+              require(["bpmn/Bpmn", "dojo/domReady!"], function(Bpmn) {
+
+                ProcessDefinitionDiagramService.getBpmn20Xml(scope.processDefinitionId).then(
+                  function(data) {
+                    bpmnRenderer = new Bpmn();
+                    bpmnRenderer.render(data.bpmn20Xml, {
+                      diagramElement : containerElement,
+                      overlayHtml : '<div></div>'
+                    });
+
+                    // id to scroll to is the process definition key
+                    var processId = '#' + processDefinition.key;
+                    // scroll to selected process if it is a collaboration
+
+                    console.log("scrolling to point (" + $(processId).offset().top + "," + $(processId).offset().left + ")" );
+
+                    $('#' + containerElement).animate({
+                      scrollTop: $(processId).offset().top,
+                      scrollLeft: $(processId).offset().left
+                    }, 500);
+
+                    ProcessDefinitionActivityStatisticsResource.queryStatistics({ id : scope.processDefinitionId }).$then(function(result) {
+                      scope.activityStatistics = getActivityStatisticsResult(result);
+                      renderActivityStatistics(scope.activityStatistics, bpmnRenderer);
+                    });
+                  }
+                );
+              });
+
             }
           });
 

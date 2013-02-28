@@ -16,7 +16,7 @@ angular.module('process.definition', [])
   // redirect when no processDefinitionId is set
   if (!$routeParams.processDefinitionId) {
     $location.path('/dashboard').replace();
-    Error.addError({ "status" : "Error" , "config" :  "No process defintion id was provided. Auto-redirecting to main site." });
+    Error.addError({ "status" : "Error" , "config" :  "No process definition id was provided. Auto-redirecting to main site." });
   }
 
   $scope.processDefinitionId = $routeParams.processDefinitionId;
