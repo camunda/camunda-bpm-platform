@@ -1,10 +1,16 @@
 <div class="control-group">
-  <form data-ng-submit="submitForm()">
-    <fieldset>
-      <label><strong>Field:</strong></label>
-      <input type="text" data-ng-model="variables.field1" />
+    <form>
+        <div data-ng-show="variables.length == 0" class="alert alert-info">
+            Click on add variable to add variables which will be submitted for the task completion.
+        </div>
+        <div data-ng-repeat="variable in variables">
+            <h3>Variable {{$index +1}}</h3>
+            <input data-ng-model="variable.key" type="text"/>
+            <input data-ng-model="variable.value" type="text"/>
+            <button class="btn btn-danger" data-ng-click="removeVariable($index)">Remove Variable</button>
+        </div>
 
-      <button type="submit" class="btn btn-primary">Sign In</button>
-    </fieldset>
-  </form>
+        <button class="btn btn-primary" data-ng-click="submitForm()">Submit</button>
+        <button class="btn btn-info" data-ng-click="addVariable()">Add Variable</button>
+    </form>
 </div>

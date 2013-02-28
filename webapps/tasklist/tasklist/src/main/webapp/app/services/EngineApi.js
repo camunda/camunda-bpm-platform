@@ -11,7 +11,8 @@ define(["angular"], function(angular) {
     function EngineApi() {
 
       this.taskList = $resource(Uri.build(baseUri, "task/:taskId/:op"), {taskId: "@id"} , {
-        claim : {method:'POST', params : {op:"claim"}}
+        claim : {method:'POST', params : {op:"claim"}},
+        complete : {method:'POST', params : {op:"complete"}}
       });
 
       this.taskCount = $resource(Uri.build(baseUri, "task/count"));

@@ -44,7 +44,7 @@ define(["angular"], function(angular) {
     });
 
     $scope.startTask = function(task) {
-
+      $location.path("/form/"+task.id);
     };
 
     $scope.claimTask = function(task) {
