@@ -4,13 +4,13 @@ define(["angular"], function(angular) {
 
   var module = angular.module("tasklist.pages");
 
-  var Controller = function($scope, $location) {
+  var Controller = function($scope, $location, EngineApi, Authentication) {
 
     function setActive(filter) {
       $scope.tasks.active = filter;
     }
 
-    $scope.tasks = {
+    /*$scope.tasks = {
       unassigned: { count: 10 },
       assigned: { count: 10 },
       groups: [
@@ -20,15 +20,18 @@ define(["angular"], function(angular) {
       colleagues: [
         { id: "klaus", name: "klaus", count: 10 }
       ]
-    };
+    };*/
 
     $scope.isActive = function(filter, search) {
       var params = $location.search();
       return (params.filter || "mytasks") == filter && params.search == search;
     };
+
+    $scope.groups = EngineApi.getGroups("demo"); //Authentication.current().user);
+
   };
 
-  Controller.$inject = ["$scope", "$location"];
+  Controller.$inject = ["$scope", "$location", "EngineApi", "Authentication"];
 
   var RouteConfig = function($routeProvider) {
     $routeProvider.when("/overview", {

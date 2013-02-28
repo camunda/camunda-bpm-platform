@@ -1,5 +1,6 @@
 <ul class="nav nav-list" ng-controller="SitebarController">
   <li class="nav-header">Tasks</li>
+    {{groups}}
   <li ng-class="{active: isActive('mytasks')}">
     <a href="#/overview?filter=mytasks">
       My Tasks ({{ tasks.assigned.count }})

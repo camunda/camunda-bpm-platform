@@ -14,8 +14,8 @@ define(["angular"], function(angular) {
       }
 
       EngineApi.prototype.getGroups = function (userId) {
-        var Task = $resource(Uri.restUri("task/groups"));
-        return Task.query({});
+        var Groups = $resource(Uri.restUri("task/groups"));
+        return Groups.get({"userId": userId});
       }
 
       return new EngineApi();
