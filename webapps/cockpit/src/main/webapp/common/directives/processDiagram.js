@@ -35,15 +35,6 @@ angular
                   scope.activityStatistics = getActivityStatisticsResult(result);
                   renderActivityStatistics(scope.activityStatistics, bpmnRenderer);
                 });
-
-                // id to scroll to is the process definition key
-                var processId = '#saveInvoiceToSVN';
-                // scroll to selected process if it is a collaboration
-                $('#' + containerElement).animate({
-                  scrollTop: $(processId).offset().top,
-                  scrollLeft: $(processId).offset().left
-                }, 500);
-
               }
             );
           });
@@ -108,6 +99,18 @@ angular
           scope.$watch('zoomLevel', function(newValue) {
             if (newValue && bpmnRenderer) {
               updateZoomLevel(newValue);
+            }
+          });
+
+          scope.$watch(function() { return scope.processDefinition }, function(processDefinition) {
+            if (processDefinition) {
+              // id to scroll to is the process definition key
+              var processId = '#' + processDefinition.key;
+              // scroll to selected process if it is a collaboration
+              $('#' + containerElement).animate({
+                scrollTop: $(processId).offset().top,
+                scrollLeft: $(processId).offset().left
+              }, 500);
             }
           });
 
