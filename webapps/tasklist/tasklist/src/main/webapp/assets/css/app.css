@@ -93,10 +93,6 @@ html, body {
   min-height: 100%;
 }
 
-.offset-paragraph {
-  margin-bottom: 30px;
-}
-
 .content-inset {
   padding-top: 60px;
 }
@@ -159,19 +155,6 @@ footer {
    padding: 0;
 }
 
-/** usability tweeks */
-
-#navigation {
-  min-width: 220px;
-}
-
-.nav-list li {
-  word-wrap: break-word;
-}
-
-/** end usability tweeks */
-
-
 /**
  * form styling
  */
@@ -184,33 +167,12 @@ input.ng-invalid-required {
   border-color: #f00;
 }
 
-/**
- * roundtrip list
- */
-li.actions .btn {
-  margin-top: 30px;
-  margin-right: 30px;
-  display: inline-block;
-}
-
-li.actions .btn:last-child {
-  margin-right: 0px;
-}
-
 /** popover styles */
 .popover-inner {
   padding: 0px;
   border: 1px solid #ccc;
   border-radius: 0px;
   background-color: #fff;
-}
-
-/** combo box styles */
-.combobox-container input,.typeahead.dropdown-menu, span#modelerName {
-  width: 233px;
-  -webkit-border-radius: 3px;
-  -moz-border-radius: 3px;
-  border-radius: 3px;
 }
 
 .task-table td {
@@ -221,6 +183,14 @@ li.actions .btn:last-child {
   height: 43px;
 }
 
+/** navbar button tweeks */
+.navbar .btn-group, .navbar .btn {
+  margin-left: 10px;
+}
+
+/** end navbar button tweeks */
+
+/** table selection */
 table tr.selected > td {
   background: rgba(218, 234, 247, 0.60);
 }
@@ -228,6 +198,7 @@ table tr.selected > td {
 .table-hover tbody tr.selected:hover > td, .table-hover tbody tr.selected:hover > th {
   background-color: #DAEAF7;
 }
+/** end table selection */
 
 .modal-body {
   max-height: 480px;
@@ -239,3 +210,4 @@ table tr.selected > td {
   	position: absolute;
   }
 }
+

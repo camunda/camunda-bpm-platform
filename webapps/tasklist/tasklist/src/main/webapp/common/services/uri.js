@@ -13,7 +13,7 @@
       return $("base").attr("rest-base");
     }
 
-    function buildUri (context, str) {
+    function buildUri(context, str) {
       return context + (str.indexOf("/") === 0 ? str.substring(1, str.length) : str);
     }
 
@@ -25,7 +25,8 @@
       },
       restUri: function (str) {
         return buildUri(restRoot(), str);
-      }
+      },
+      build: buildUri
     };
   });
 })();

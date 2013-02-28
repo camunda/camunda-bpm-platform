@@ -4,6 +4,12 @@ define(["angular"], function(angular) {
 
   var module = angular.module("tasklist.pages");
 
+  var ProcessDefinitionsController = function($scope, EngineApi) {
+    $scope.processDefinitions = EngineApi.getProcessDefinitions().query();
+  };
+
+  ProcessDefinitionsController.$inject = ["$scope", "EngineApi"];
+
   var LogoutController = function($scope, $location, Authentication) {
 
     $scope.logout = function() {
@@ -16,5 +22,6 @@ define(["angular"], function(angular) {
   LogoutController.$inject = ["$scope", "$location", "Authentication"];
 
   module
-    .controller("LogoutController", LogoutController);
+    .controller("LogoutController", LogoutController)
+    .controller("ProcessDefinitionsController", ProcessDefinitionsController);
 });

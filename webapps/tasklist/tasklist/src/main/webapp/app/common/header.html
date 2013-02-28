@@ -16,7 +16,7 @@
 
       <div ngm-if="auth.current">
         <div class="btn-group pull-right" ng-controller="LogoutController">
-          <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
+          <a class="btn btn-user dropdown-toggle" data-toggle="dropdown" href="#">
             <i class="icon-user"></i> {{ current }}
             <span class="caret"></span>
           </a>
@@ -24,26 +24,17 @@
             <li><a ng-click="logout()">Sign out</a></li>
           </ul>
         </div>
-        <div class="btn-group pull-right">
-          <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
-            <i class="icon-play"></i> Start Process
+
+        <div class="btn-group pull-right" ng-controller="ProcessDefinitionsController">
+          <a class="btn btn-user dropdown-toggle" data-toggle="dropdown" href="#">
+            <i class="icon-tasks"></i> Start a Process
             <span class="caret"></span>
           </a>
 
           <ul class="dropdown-menu">
-            <ui:repeat value="#{processStarter.deployedProcesses}"
-              var="item">
-              <li><h:form style="margin:0;">
-                  <h:outputLink value="#{taskList.getStartFormUrl(item)}"
-                    rendered="#{taskList.getStartFormUrl(item) != null}">#{item.name} &#187;</h:outputLink>
-                  <h:commandLink
-                    rendered="#{taskList.getStartFormUrl(item) == null}"
-                    id="processStarterLink"
-                    action="#{processStarter.startProcess(item)}"
-                    value="#{item.name}" />
-                  <h:message for="processStarterLink" />
-                </h:form></li>
-            </ui:repeat>
+            <li ng-repeat="definition in processDefinitions">
+              <a href="#/start?id={{definition.id}}">{{ definition.name }}</a>
+            </li>
           </ul>
         </div>
       </div>
