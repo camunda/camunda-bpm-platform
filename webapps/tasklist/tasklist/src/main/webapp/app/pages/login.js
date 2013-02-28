@@ -4,7 +4,7 @@ define(["angular"], function(angular) {
 
   var module = angular.module("tasklist.pages");
 
-  var Controller = function($scope, $location, Errors, Authentication) {
+  var Controller = function($rootScope, $scope, $location, Errors, Authentication) {
 
     if (Authentication.current()) {
       $location.path("/overview");
@@ -17,6 +17,7 @@ define(["angular"], function(angular) {
 
         if (success) {
           $location.path("/overview");
+          $rootScope.$broadcast("tasklist.reload");
         } else {
           Errors.add({ status: "Login Failed", message: "Username / password are incorrect" });
         }
@@ -24,7 +25,7 @@ define(["angular"], function(angular) {
     }
   };
 
-  Controller.$inject = ["$scope", "$location", "Errors", "Authentication"];
+  Controller.$inject = ["$rootScope", "$scope", "$location", "Errors", "Authentication"];
 
   var RouteConfig = function($routeProvider) {
     $routeProvider.when("/login", {

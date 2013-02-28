@@ -25,7 +25,7 @@ define(["angular"], function(angular) {
       $scope.loadGroupInfo();
     });
 
-    $scope.loadGroupInfo();
+    if (currentUser) $scope.loadGroupInfo();
   };
 
   Controller.$inject = ["$scope", "$location", "EngineApi", "Authentication"];
