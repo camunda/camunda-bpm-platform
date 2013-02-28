@@ -1,7 +1,6 @@
 package org.camunda.bpm.engine.rest;
 
 import static com.jayway.restassured.RestAssured.given;
-import static com.jayway.restassured.path.json.JsonPath.from;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
