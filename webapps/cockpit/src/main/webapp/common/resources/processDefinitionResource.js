@@ -4,4 +4,9 @@ angular
   return $resource(Uri.restUri('/process-definition/:id'), {id: '@id'}, {
     'queryStatistics':  {method:'GET', isArray:true, params: { id: 'statistics' }}
   });
+})
+.factory('ProcessDefinitionActivityStatisticsResource', function($resource, Uri) {
+  return $resource(Uri.restUri('/process-definition/:id/statistics'), {id: '@id'}, {
+    'queryStatistics':  {method:'GET', isArray:true}
+  });
 });
