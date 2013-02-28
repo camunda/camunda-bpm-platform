@@ -94,10 +94,10 @@ public class TaskRestServiceImpl extends AbstractEngineService implements TaskRe
     Map<String, Long> groupCounts = new HashMap<String, Long>();
 
     GroupQuery query = identityService.createGroupQuery();
-    List<Group> userGroups = query.groupMember(userId).list();
+    List<Group> userGroups = query.groupMember(userId).orderByGroupName().asc().list();
 
     Set<UserDto> allGroupUsers = new HashSet<UserDto>();
-    Set<GroupDto> allGroups = new HashSet<GroupDto>();
+    List<GroupDto> allGroups = new ArrayList<GroupDto>();
 
     for (Group group : userGroups) {
       long groupTaskCount = taskService.createTaskQuery().taskCandidateGroup(group.getId()).count();

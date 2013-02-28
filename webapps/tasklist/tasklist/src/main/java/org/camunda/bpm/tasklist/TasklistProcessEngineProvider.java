@@ -70,13 +70,16 @@ public class TasklistProcessEngineProvider implements ProcessEngineProvider {
 
       processEngine.getIdentityService().saveUser(user4);
 
-      Group salesGroup = processEngine.getIdentityService().newGroup("sales");;
+      Group salesGroup = processEngine.getIdentityService().newGroup("sales");
+      salesGroup.setName("Sales");
       processEngine.getIdentityService().saveGroup(salesGroup);
 
       Group accountingGroup = processEngine.getIdentityService().newGroup("accounting");;
+      accountingGroup.setName("Accounting");
       processEngine.getIdentityService().saveGroup(accountingGroup);
 
       Group managementGroup = processEngine.getIdentityService().newGroup("management");;
+      managementGroup.setName("Management");
       processEngine.getIdentityService().saveGroup(managementGroup);
 
       processEngine.getIdentityService().createMembership("demo", "sales");

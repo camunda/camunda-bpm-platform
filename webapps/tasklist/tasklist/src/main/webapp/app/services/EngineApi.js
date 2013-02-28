@@ -4,31 +4,43 @@ define(["angular"], function(angular) {
 
   var module = angular.module("tasklist.services");
 
-  module.factory("EngineApi", function ($resource, Uri) {
-      function EngineApi() {
-      };
+  var EngineApiFactory = function($resource, Uri) {
 
-      EngineApi.prototype.getTasklist = function () {
-        var Tasklist = $resource(Uri.restUri("task/:id/:op"), {}, {
-          claim: {method:'POST', params : {op : "claim"}}
-        });
+    var baseUri = Uri.restRoot();
 
-        return Tasklist;
-      };
+    function EngineApi() {
 
-      EngineApi.prototype.getTaskCount = function () {
-        var Count = $resource(Uri.restUri("task/count"));
-        return Count;
-      };
+      this.taskList = $resource(Uri.build(baseUri, "task/:taskId/:op"), {taskId: "@id"} , {
+        claim : {method:'POST', params : {op:"claim"}}
+      });
 
-      EngineApi.prototype.getGroups = function (userId) {
-        var Groups = $resource(Uri.restUri("task/groups"));
-        return Groups.get({"userId": userId});
-      };
+      this.taskCount = $resource(Uri.build(baseUri, "task/count"));
+      this.processDefinitions = $resource(Uri.build(baseUri, "process-definition"));
+      this.groups = $resource(Uri.build(baseUri, "task/groups"));
+    };
 
-      return new EngineApi();
-    }
-  );
+    EngineApi.prototype.getProcessDefinitions = function() {
+      return this.processDefinitions;
+    };
+
+    EngineApi.prototype.getTasklist = function () {
+      return this.taskList;
+    };
+
+    EngineApi.prototype.getTaskCount = function () {
+      return this.taskCount;
+    };
+
+    EngineApi.prototype.getGroups = function(userId) {
+      return this.groups.get({ userId: userId });
+    };
+
+    return new EngineApi();
+  };
+
+  EngineApiFactory.$inject = ["$resource", "Uri"];
+
+  module.factory("EngineApi", EngineApiFactory);
 
   return module;
 });

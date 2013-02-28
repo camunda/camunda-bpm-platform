@@ -4,16 +4,21 @@ define(["angular"], function(angular) {
 
   var module = angular.module("tasklist.pages");
 
-  var Controller = function($scope, $location, EngineApi, Authentication) {
+  var Controller = function($rootScope, $scope, $location, EngineApi, Authentication) {
 
     $scope.taskList = {};
 
-    function loadTasks(filter, search) {
+    $scope.loadTasks = function (filter, search) {
       if (!Authentication.current()) {
         return;
       }
 
+      $scope.currentFilter = filter;
+      $scope.currentSearch = search;
+
       var queryObject = {};
+
+      queryObject.userId = Authentication.current();
 
       switch (filter) {
         case "mytasks":
@@ -28,14 +33,14 @@ define(["angular"], function(angular) {
       }
 
       $scope.taskList.tasks = EngineApi.getTasklist().query(queryObject);
-
-      /*$scope.taskList.tasks = allTasks[filter + (search ? "-" + search : "")];
-      $scope.taskList.view = { filter: filter, search: search };
-      $scope.taskList.selection = [];*/
     }
 
     $scope.$watch(function() { return $location.search(); }, function(newValue) {
-      loadTasks(newValue.filter || "mytasks", newValue.search);
+      $scope.loadTasks(newValue.filter || "mytasks", newValue.search);
+    });
+
+    $scope.$on("tasklist.reload", function () {
+      $scope.loadTasks($scope.currentFilter, $scope.currentSearch);
     });
 
     $scope.startTask = function(task) {
@@ -43,11 +48,19 @@ define(["angular"], function(angular) {
     };
 
     $scope.claimTask = function(task) {
-      EngineApi.getTasklist().$claim({id: task.id});
+      EngineApi.getTasklist().claim( { taskId : task.id}, { userId: Authentication.current() }).$then(function () {
+        $rootScope.$broadcast("tasklist.reload");
+      });
+    };
+
+    $scope.claimTasks = function (selection) {
+      for (var index in selection) {
+        var task = selection[index];
+        $scope.claimTask(task);
+      }
     };
 
     $scope.delegateTask = function(task) {
-
     };
 
     $scope.isSelected = function(task) {
@@ -76,7 +89,7 @@ define(["angular"], function(angular) {
     };
   };
 
-  Controller.$inject = ["$scope", "$location", "EngineApi", "Authentication"];
+  Controller.$inject = ["$rootScope", "$scope", "$location", "EngineApi", "Authentication"];
 
   var RouteConfig = function($routeProvider) {
     $routeProvider.when("/overview", {

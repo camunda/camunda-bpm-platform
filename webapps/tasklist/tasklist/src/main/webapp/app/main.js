@@ -12,7 +12,6 @@ define([ "angularModule" ], function(angularModule) {
       "tasklist.services",
       'common.directives',
       'common.extensions',
-      'common.resources',
       'common.services' ]);
 
   var ResponseErrorHandler = function(Errors, Authentication, $location) {
@@ -41,7 +40,7 @@ define([ "angularModule" ], function(angularModule) {
 
         Authentication.set(null);
         $location.path("/login");
-        
+
         break;
       default:
         Errors.add({ status: "Error", message :  "A problem occurred: Try to refresh the view or login and out of the application. If the problem persists, contact your administrator." });

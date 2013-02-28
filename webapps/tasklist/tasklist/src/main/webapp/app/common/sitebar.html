@@ -17,7 +17,7 @@
   </li>
   <li class="nav-header">Group Tasks</li>
   <li ng-repeat="group in groupInfo.groups" ng-class="{active: isActive('group', group.id)}">
-    <a href="#/overview?filter=group&search={{group.id}}">{{group.id}} ({{ groupInfo.groupCounts[group.id] }})</a>
+    <a href="#/overview?filter=group&search={{group.id}}">{{group.name}} ({{ groupInfo.groupCounts[group.id] }})</a>
   </li>
   <li class="nav-header">Colleagues</li>
   <li ng-repeat="colleague in groupInfo.groupUsers" ng-class="{active: isActive('colleague', colleague.id)}">
