@@ -5,11 +5,16 @@ define(["angular"], function(angular) {
   var module = angular.module("tasklist.pages");
 
   var Controller = function($scope, $location, Errors, Authentication) {
+
+    if (Authentication.current()) {
+      $location.path("/overview");
+    }
+
     $scope.login = function () {
       Authentication.login($scope.username, $scope.password).then(function(success) {
         Errors.clear("Unauthorized");
         Errors.clear("Login Failed");
-        
+
         if (success) {
           $location.path("/overview");
         } else {

@@ -14,10 +14,10 @@
         camunda tasklist
       </a>
 
-      <div ngm-if="login">
+      <div ngm-if="auth.current">
         <div class="btn-group pull-right">
           <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
-            <i class="icon-user"></i> {{ login.name }}
+            <i class="icon-user"></i> {{ current }}
             <span class="caret"></span>
           </a>
           <ul class="dropdown-menu">
@@ -29,7 +29,7 @@
             <i class="icon-play"></i> Start Process
             <span class="caret"></span>
           </a>
-          
+
           <ul class="dropdown-menu">
             <ui:repeat value="#{processStarter.deployedProcesses}"
               var="item">

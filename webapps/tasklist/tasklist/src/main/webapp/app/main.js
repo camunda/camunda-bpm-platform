@@ -7,6 +7,7 @@ define([ "angularModule" ], function(angularModule) {
       "ng",
       "ngResource",
       "ngSanitize",
+      "ngCookies",
       "tasklist.pages",
       "tasklist.services",
       'common.directives',
@@ -14,7 +15,7 @@ define([ "angularModule" ], function(angularModule) {
       'common.resources',
       'common.services' ]);
 
-  var ResponseErrorHandler = function(Errors, $location) {
+  var ResponseErrorHandler = function(Errors, Authentication, $location) {
 
     this.handlerFn = function(event, responseError) {
       var status = responseError.status,
@@ -33,6 +34,7 @@ define([ "angularModule" ], function(angularModule) {
         break;
       case 401:
         Errors.add({ status: "Unauthorized", message:  "Your session may have expired. Please login again." });
+        Authentication.set(null);
         $location.path("/login");
 
         break;
@@ -46,15 +48,13 @@ define([ "angularModule" ], function(angularModule) {
 
     $scope.auth = Authentication.auth;
 
-    console.log($scope.auth);
-    
     // needed for form validation
     // DO NOT REMOVE FROM DEFAULT CONTROLLER!
     $scope.errorClass = function(form) {
       return form.$valid || !form.$dirty ? "" : "error";
     };
 
-    $scope.$on("responseError", new ResponseErrorHandler(Errors, $location).handlerFn);
+    $scope.$on("responseError", new ResponseErrorHandler(Errors, Authentication, $location).handlerFn);
   };
 
   DefaultController.$inject = ["$scope", "Errors", "Authentication", "$location"];

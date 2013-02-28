@@ -1,14 +1,16 @@
 <div class="control-group">
 
-  <div error-panel></div>
-
   <form data-ng-submit="login()">
-      <label for="loginName"><strong>Username:</strong></label>
-      <input type="text" id="loginName" data-ng-model="username" placeholder="Your Login" />
+    <fieldset>
+      <label><strong>Username:</strong></label>
+      <input type="text" data-ng-model="username" placeholder="Your Login" />
 
-      <label for="loginPassword"><strong>Password:</strong></label>
-      <input type="password" id="password" data-ng-model="password"/>
+      <label><strong>Password:</strong></label>
+      <input type="password" data-ng-model="password" />
+
+      <br/>
 
       <button type="submit" class="btn btn-primary">Sign In</button>
+    </fieldset>
   </form>
 </div>
