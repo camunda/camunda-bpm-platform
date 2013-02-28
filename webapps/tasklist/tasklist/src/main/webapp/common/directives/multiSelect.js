@@ -4,6 +4,11 @@ define(["angular", "jquery"], function(angular, $) {
 
   var module = angular.module("common.directives");
 
+  /**
+   * The main controller for a multi selection context.
+   *
+   * @param $scope {Scope}
+   */
   function MultiSelectController($scope) {
 
     $scope.selection = [];
@@ -24,7 +29,7 @@ define(["angular", "jquery"], function(angular, $) {
       return idx !== -1;
     };
 
-    this.select = function(item, exclusive) {
+    this.select = function(item, exclusive, event) {
       if (exclusive) {
         this.deselectAll();
       }
@@ -37,10 +42,10 @@ define(["angular", "jquery"], function(angular, $) {
     };
 
     this.toggleSelection = function(item, exclusive) {
-      if (!this.isSelected(item)) {
-        this.select(item, exclusive);
-      } else {
+      if (this.isSelected(item)) {
         this.deselect(item);
+      } else {
+        this.select(item, exclusive);
       }
     }
 
@@ -76,7 +81,7 @@ define(["angular", "jquery"], function(angular, $) {
         var selection = scope.$eval(attributes["select"]);
 
         function select(e) {
-          toggleSelection(e);
+          toggleSelection(false);
         };
 
         var enableSelection = function(e) {
@@ -97,15 +102,8 @@ define(["angular", "jquery"], function(angular, $) {
           });
         }
 
-        $(element).hover(function() {
-          $(document).on('keydown', enableSelection);
-          $(document).on('keyup', disableSelection);
-        }, function(e) {
-          $(document).off('keydown', enableSelection);
-          $(document).off('keyup', disableSelection);
-
-          disableSelection(e);
-        });
+        $(document).on("keydown", enableSelection);
+        $(document).on("keyup", disableSelection);
       }
     };
   };

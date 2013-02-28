@@ -361,6 +361,16 @@
 
       if (!isActive) {
         $parent.toggleClass('open')
+
+        var dropDown = $('.dropdown-menu', $parent);
+        dropDown.removeClass("left");
+
+        var documentWidth = $('html').width();
+        var offsetRight = dropDown.offset().left + dropDown.width();
+
+        if (offsetRight > documentWidth) {
+          dropDown.addClass("left");
+        }
       }
 
       $this.focus()

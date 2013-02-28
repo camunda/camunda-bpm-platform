@@ -6,6 +6,7 @@ define([ "angularModule" ], function(angularModule) {
     angularModule("tasklist", [
       "ng",
       "ngResource",
+      "ngSanitize",
       "tasklist.pages",
       "tasklist.services",
       'common.directives',
@@ -13,28 +14,50 @@ define([ "angularModule" ], function(angularModule) {
       'common.resources',
       'common.services' ]);
 
-  var DefaultController = function($scope, Error, $location) {
-    $scope.appErrors = function () {
-      return Error.errors;
-    };
+  var ResponseErrorHandler = function(Errors, $location) {
 
-    $scope.removeError = function (error) {
-      Error.removeError(error);
-    };
+    this.handlerFn = function(event, responseError) {
+      var status = responseError.status,
+          data = responseError.data;
 
+      switch (status) {
+      case 500:
+        if (data && data.message) {
+          Errors.add({ status: "Error", message:  data.message, type: data.exceptionType });
+        } else {
+          Errors.add({ status: "Error", message: "A problem occurred: Try to refresh the view or login and out of the application. If the problem persists, contact your administrator." });
+        }
+        break;
+      case 0:
+        Errors.add({ status: "Request Timeout", message:  "Your request timed out. Try refreshing the page." });
+        break;
+      case 401:
+        Errors.add({ status: "Unauthorized", message:  "Your session may have expired. Please login again." });
+        $location.path("/login");
+
+        break;
+      default:
+        Errors.add({ status: "Error", message :  "A problem occurred: Try to refresh the view or login and out of the application. If the problem persists, contact your administrator." });
+      }
+    };
+  };
+
+  var DefaultController = function($scope, Errors, Authentication, $location) {
+
+    $scope.auth = Authentication.auth;
+
+    console.log($scope.auth);
+    
     // needed for form validation
     // DO NOT REMOVE FROM DEFAULT CONTROLLER!
     $scope.errorClass = function(form) {
-      return form.$valid || !form.$dirty ? '' : 'error';
+      return form.$valid || !form.$dirty ? "" : "error";
     };
 
-    $scope.$on("response-error", function(event, responseError) {
-      console.log(responseError);
-      $location.path("/login");
-    });
+    $scope.$on("responseError", new ResponseErrorHandler(Errors, $location).handlerFn);
   };
 
-  DefaultController.$inject = ['$scope', 'Error', '$location'];
+  DefaultController.$inject = ["$scope", "Errors", "Authentication", "$location"];
 
   var ModuleConfig = function($routeProvider, $locationProvider, $httpProvider) {
     $httpProvider.responseInterceptors.push('httpStatusInterceptor');
@@ -45,7 +68,7 @@ define([ "angularModule" ], function(angularModule) {
 
   module
     .config(ModuleConfig)
-    .controller('DefaultController', DefaultController);
+    .controller("DefaultController", DefaultController);
 
   return module;
 });
