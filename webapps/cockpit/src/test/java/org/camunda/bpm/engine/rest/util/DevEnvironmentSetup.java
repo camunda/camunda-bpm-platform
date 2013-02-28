@@ -61,7 +61,6 @@ public class DevEnvironmentSetup implements ProcessEngineProvider {
       System.out.println("ProcessDefinition - id: " + pd.getId() +  ", key: " + pd.getKey() + ", name: " + pd.getName());
       for (int i = 0; i < numOfProcessesPerDefinition; i++) {
         ProcessInstance pi = runtimeService.startProcessInstanceById(pd.getId());
-        System.out.println("ProcessInstance - id: " + pi.getId());
       }
     }
   }
