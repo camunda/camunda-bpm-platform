@@ -1,21 +1,21 @@
 package org.camunda.bpm.engine.rest.impl;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response.Status;
 
 import org.activiti.engine.ActivitiException;
+import org.activiti.engine.IdentityService;
 import org.activiti.engine.TaskService;
+import org.activiti.engine.identity.Group;
+import org.activiti.engine.identity.GroupQuery;
+import org.activiti.engine.identity.User;
 import org.activiti.engine.task.Task;
 import org.activiti.engine.task.TaskQuery;
 import org.camunda.bpm.engine.rest.TaskRestService;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
-import org.camunda.bpm.engine.rest.dto.task.UserIdDto;
-import org.camunda.bpm.engine.rest.dto.task.CompleteTaskDto;
-import org.camunda.bpm.engine.rest.dto.task.TaskDto;
-import org.camunda.bpm.engine.rest.dto.task.TaskQueryDto;
+import org.camunda.bpm.engine.rest.dto.task.*;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 
 public class TaskRestServiceImpl extends AbstractEngineService implements TaskRestService {
@@ -84,6 +84,32 @@ public class TaskRestServiceImpl extends AbstractEngineService implements TaskRe
     } catch (ActivitiException e) {
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     }
+  }
+
+  @Override
+  public GroupInfoDto getGroupInfo(String userId) {
+    TaskService taskService = processEngine.getTaskService();
+    IdentityService identityService = processEngine.getIdentityService();
+
+    Map<String, Long> groupCounts = new HashMap<String, Long>();
+
+    GroupQuery query = identityService.createGroupQuery();
+    List<Group> userGroups = query.groupMember(userId).list();
+
+    Set<UserDto> allGroupUsers = new HashSet<UserDto>();
+    Set<GroupDto> allGroups = new HashSet<GroupDto>();
+
+    for (Group group : userGroups) {
+      long groupTaskCount = taskService.createTaskQuery().taskCandidateGroup(group.getId()).count();
+      groupCounts.put(group.getId(), groupTaskCount);
+      List<User> groupUsers = identityService.createUserQuery().memberOfGroup(group.getId()).list();
+      for (User user: groupUsers) {
+        allGroupUsers.add(new UserDto(user.getId(), user.getFirstName(), user.getLastName()));
+      }
+      allGroups.add(new GroupDto(group.getId(), group.getName()));
+    }
+
+    return new GroupInfoDto(groupCounts, allGroups, allGroupUsers);
   }
 
   @Override
