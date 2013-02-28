@@ -17,7 +17,7 @@ define(["angular"], function(angular) {
     };
 
     $scope.groupInfo = EngineApi.getGroups(currentUser);
-    $scope.assigned = EngineApi.getTasklist().query({"assignee" : currentUser});
+    $scope.assignedCount = EngineApi.getTaskCount().get({"assignee" : currentUser});
   };
 
   Controller.$inject = ["$scope", "$location", "EngineApi", "Authentication"];

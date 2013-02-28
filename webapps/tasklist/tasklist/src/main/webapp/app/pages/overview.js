@@ -13,14 +13,21 @@ define(["angular"], function(angular) {
         return;
       }
 
-      if (filter == "mytask") {
-        $scope.taskList.tasks = EngineApi.getTasklist().query({"assignee" : Authentication.current()});
-        return;
+      var queryObject = {};
+
+      switch (filter) {
+        case "mytasks":
+          queryObject.assignee = Authentication.current();
+          break;
+        case "colleague":
+          queryObject.assignee = search;
+          break;
+        case "group":
+          queryObject.candidateGroup = search;
+          break;
       }
 
-      if (search) {
-        $scope.taskList.tasks = EngineApi.getTasklist().query({"candidateGroup" : search});
-      }
+      $scope.taskList.tasks = EngineApi.getTasklist().query(queryObject);
 
       /*$scope.taskList.tasks = allTasks[filter + (search ? "-" + search : "")];
       $scope.taskList.view = { filter: filter, search: search };
@@ -36,7 +43,7 @@ define(["angular"], function(angular) {
     };
 
     $scope.claimTask = function(task) {
-
+      EngineApi.getTasklist().$claim({id: task.id});
     };
 
     $scope.delegateTask = function(task) {

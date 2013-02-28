@@ -2,7 +2,7 @@
   <li class="nav-header">Tasks</li>
   <li ng-class="{active: isActive('mytasks')}">
     <a href="#/overview?filter=mytasks">
-      My Tasks ({{ assigned.length }})
+      My Tasks ({{ assignedCount.count }})
     </a>
   </li>
   <li ng-show="tasks.unassigned.count" ng-class="{active: isActive('unassigned')}">

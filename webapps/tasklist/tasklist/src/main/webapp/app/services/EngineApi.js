@@ -9,14 +9,22 @@ define(["angular"], function(angular) {
       };
 
       EngineApi.prototype.getTasklist = function () {
-        var Tasklist = $resource(Uri.restUri("task"));
+        var Tasklist = $resource(Uri.restUri("task/:id/:op"), {}, {
+          claim: {method:'POST', params : {op : "claim"}}
+        });
+
         return Tasklist;
-      }
+      };
+
+      EngineApi.prototype.getTaskCount = function () {
+        var Count = $resource(Uri.restUri("task/count"));
+        return Count;
+      };
 
       EngineApi.prototype.getGroups = function (userId) {
         var Groups = $resource(Uri.restUri("task/groups"));
         return Groups.get({"userId": userId});
-      }
+      };
 
       return new EngineApi();
     }
