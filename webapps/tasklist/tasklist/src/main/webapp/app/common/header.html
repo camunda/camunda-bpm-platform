@@ -15,7 +15,7 @@
       </a>
 
       <div ngm-if="auth.current">
-        <div class="btn-group pull-right">
+        <div class="btn-group pull-right" ng-controller="LogoutController">
           <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
             <i class="icon-user"></i> {{ current }}
             <span class="caret"></span>
