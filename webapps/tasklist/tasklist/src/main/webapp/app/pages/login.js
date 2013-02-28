@@ -4,15 +4,22 @@ define(["angular"], function(angular) {
 
   var module = angular.module("tasklist.pages");
 
-  var Controller = function($scope, $location, Authentication) {
+  var Controller = function($scope, $location, Errors, Authentication) {
     $scope.login = function () {
-      Authentication.login($scope.username, $scope.password).success(function () {
-        $location.path("/overview");
+      Authentication.login($scope.username, $scope.password).then(function(success) {
+        Errors.clear("Unauthorized");
+        Errors.clear("Login Failed");
+        
+        if (success) {
+          $location.path("/overview");
+        } else {
+          Errors.add({ status: "Login Failed", message: "Username / password are incorrect" });
+        }
       });
     }
   };
 
-  Controller.$inject = ["$scope", "$location", "Authentication"];
+  Controller.$inject = ["$scope", "$location", "Errors", "Authentication"];
 
   var RouteConfig = function($routeProvider) {
     $routeProvider.when("/login", {

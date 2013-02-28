@@ -7,6 +7,6 @@ define([ "angularModule" ], function(angularModule) {
     "common/services/uri",
     "common/services/requestStatus",
     "common/services/httpStatusInterceptor",
-    "common/services/error"
+    "common/services/errors"
   ]);
 });

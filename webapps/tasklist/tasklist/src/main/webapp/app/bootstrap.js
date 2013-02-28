@@ -29,7 +29,7 @@
   });
 
   require([ "jquery", "angular", "tasklist", "angularReady!" ], function($, angular) {
-    require(["bootstrap", "angular/angular-resource"], function () {
+    require(["bootstrap", "angular/angular-resource", "angular/angular-sanitize"], function () {
       angular.bootstrap(document, ['tasklist']);
     });
   });
