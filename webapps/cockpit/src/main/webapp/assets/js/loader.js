@@ -10,9 +10,7 @@ $script.path('assets/js/');
 
 $script([
 	'lib/jquery-1.7.2.min.js',
-	'lib/raphaeljs/raphael.js',
-	'lib/cabpmn.js',
-	'bpmnRenderer.js'],  function() {
+  ],  function() {
 
 		$script([
 			'../bootstrap/js/bootstrap.min.js',

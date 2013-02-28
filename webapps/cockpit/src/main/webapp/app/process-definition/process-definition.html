@@ -22,4 +22,12 @@
   </table>
 </div>
 
-<div process-diagram id="processDiagram"></div>
+<input id="zoom" ng-model="zoomLevel">
+
+<div id="processDiagramWrapper">
+  <div process-diagram id="processDiagram"></div>
+</div>
+
+<script src="assets/js/lib/dojo/dojo/dojo.js"
+        data-dojo-config="async: true, parseOnLoad: true, forceGfxRenderer: 'svg'">
+</script>
