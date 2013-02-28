@@ -1,9 +1,8 @@
-<ul class="nav nav-list" ng-controller="SitebarController">
+<ul class="nav nav-list" data-ng-controller="SitebarController">
   <li class="nav-header">Tasks</li>
-    {{groups}}
   <li ng-class="{active: isActive('mytasks')}">
     <a href="#/overview?filter=mytasks">
-      My Tasks ({{ tasks.assigned.count }})
+      My Tasks ({{ assigned.length }})
     </a>
   </li>
   <li ng-show="tasks.unassigned.count" ng-class="{active: isActive('unassigned')}">
@@ -17,11 +16,11 @@
     </a>
   </li>
   <li class="nav-header">Group Tasks</li>
-  <li ng-repeat="group in tasks.groups" ng-class="{active: isActive('group', group.id)}">
-    <a href="#/overview?filter=group&search={{group.id}}">{{group.name}} ({{ group.count }})</a>
+  <li ng-repeat="group in groupInfo.groups" ng-class="{active: isActive('group', group.id)}">
+    <a href="#/overview?filter=group&search={{group.id}}">{{group.id}} ({{ groupInfo.groupCounts[group.id] }})</a>
   </li>
   <li class="nav-header">Colleagues</li>
-  <li ng-repeat="colleague in tasks.colleagues" ng-class="{active: isActive('colleague', colleague.id)}">
-    <a href="#/overview?filter=colleague&search={{colleague.id}}">{{colleague.name}} ({{ colleague.count }})</a>
+  <li ng-repeat="colleague in groupInfo.groupUsers" ng-class="{active: isActive('colleague', colleague.id)}">
+    <a href="#/overview?filter=colleague&search={{colleague.id}}">{{colleague.displayName}}</a>
   </li>
 </ul>

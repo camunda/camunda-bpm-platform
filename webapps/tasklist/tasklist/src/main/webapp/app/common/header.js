@@ -8,7 +8,7 @@ define(["angular"], function(angular) {
 
     $scope.logout = function() {
       Authentication.logout().then(function(success) {
-        $location.path("");
+        $location.path("/login");
       });
     };
   };

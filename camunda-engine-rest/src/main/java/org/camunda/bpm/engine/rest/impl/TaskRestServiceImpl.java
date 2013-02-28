@@ -104,7 +104,9 @@ public class TaskRestServiceImpl extends AbstractEngineService implements TaskRe
       groupCounts.put(group.getId(), groupTaskCount);
       List<User> groupUsers = identityService.createUserQuery().memberOfGroup(group.getId()).list();
       for (User user: groupUsers) {
-        allGroupUsers.add(new UserDto(user.getId(), user.getFirstName(), user.getLastName()));
+        if (user.getId() != userId) {
+          allGroupUsers.add(new UserDto(user.getId(), user.getFirstName(), user.getLastName()));
+        }
       }
       allGroups.add(new GroupDto(group.getId(), group.getName()));
     }

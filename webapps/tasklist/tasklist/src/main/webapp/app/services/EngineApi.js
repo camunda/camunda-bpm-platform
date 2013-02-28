@@ -9,8 +9,8 @@ define(["angular"], function(angular) {
       };
 
       EngineApi.prototype.getTasklist = function () {
-        var Task = $resource(Uri.restUri("task"));
-        return Task.query();
+        var Tasklist = $resource(Uri.restUri("task"));
+        return Tasklist;
       }
 
       EngineApi.prototype.getGroups = function (userId) {

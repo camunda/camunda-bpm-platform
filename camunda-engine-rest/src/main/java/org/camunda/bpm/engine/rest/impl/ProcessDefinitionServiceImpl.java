@@ -3,6 +3,7 @@ package org.camunda.bpm.engine.rest.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.ws.rs.PathParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
@@ -137,7 +138,11 @@ public class ProcessDefinitionServiceImpl extends AbstractEngineService implemen
     }
     throw new WebApplicationException(Status.BAD_REQUEST);
   }
- 
+
+  @Override
+  public String getStartForm(@PathParam("id") String processDefinitionId) {
+    return processEngine.getFormService().getStartFormKey(processDefinitionId);
+  }
 
   private List<ProcessDefinitionStatisticsResultDto> getStubDataPerDefinition() {
     return ProcessDefinitionStubStatisticsBuilder

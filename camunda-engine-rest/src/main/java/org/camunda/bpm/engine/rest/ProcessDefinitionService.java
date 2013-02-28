@@ -53,5 +53,9 @@ public interface ProcessDefinitionService {
 	@GET
 	@Path("/statistics")
 	List<ProcessDefinitionStatisticsResultDto> getStatistics(@QueryParam("groupBy") String groupBy, @QueryParam("failedJobs") Boolean includeFailedJobs);
-	
+
+  @GET
+  @Path("/{id}/startForm")
+  String getStartForm(@PathParam("id") String processDefinitionId);
+
 }

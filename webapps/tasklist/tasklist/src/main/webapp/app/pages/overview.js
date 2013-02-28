@@ -4,12 +4,23 @@ define(["angular"], function(angular) {
 
   var module = angular.module("tasklist.pages");
 
-  var Controller = function($scope, $location, EngineApi) {
+  var Controller = function($scope, $location, EngineApi, Authentication) {
 
     $scope.taskList = {};
 
     function loadTasks(filter, search) {
-      $scope.taskList.tasks = EngineApi.getTasklist();
+      if (!Authentication.current()) {
+        return;
+      }
+
+      if (filter == "mytask") {
+        $scope.taskList.tasks = EngineApi.getTasklist().query({"assignee" : Authentication.current()});
+        return;
+      }
+
+      if (search) {
+        $scope.taskList.tasks = EngineApi.getTasklist().query({"candidateGroup" : search});
+      }
 
       /*$scope.taskList.tasks = allTasks[filter + (search ? "-" + search : "")];
       $scope.taskList.view = { filter: filter, search: search };
@@ -58,7 +69,7 @@ define(["angular"], function(angular) {
     };
   };
 
-  Controller.$inject = ["$scope", "$location", "EngineApi"];
+  Controller.$inject = ["$scope", "$location", "EngineApi", "Authentication"];
 
   var RouteConfig = function($routeProvider) {
     $routeProvider.when("/overview", {
