@@ -1,6 +1,10 @@
-angular
-.module('cockpit.service.http.utils', [])
-.service('HttpUtils', function($q) {
+"use strict";
+
+(function() {
+
+  var module = angular.module("common.services");
+  
+  var Service = function ($q) {
     return {
       makePromise: function(http) {
         var deferred = $q.defer();
@@ -13,4 +17,11 @@ angular
         return deferred.promise;
       }
     };
-  });
+  };
+  
+  Service.$inject = ["$q"];
+  
+  module
+    .service('HttpUtils', Service);
+  
+})();
