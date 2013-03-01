@@ -145,6 +145,10 @@
 			</properties>
 			<build>
 				<testResources>
+				  <testResource>
+            <directory>src/test/resources</directory>
+            <filtering>true</filtering>
+          </testResource>
 					<testResource>
 						<directory>src/test/embedded-resources</directory>
 						<filtering>true</filtering>
@@ -184,12 +188,11 @@
 				</dependency>
 			</dependencies>
 			<build>
-				<!-- <resources> -->
-				<!-- <resource> -->
-				<!-- <directory>src/test/resources-jboss-integration</directory> -->
-				<!-- </resource> -->
-				<!-- </resources> -->
 				<testResources>
+				  <testResource>
+            <directory>src/test/resources</directory>
+            <filtering>true</filtering>
+          </testResource>
 					<testResource>
 						<directory>src/test/resources-jboss-integration</directory>
 						<filtering>true</filtering>

@@ -85,7 +85,9 @@ public abstract class AbstractRestServiceTest {
         .create(JavaArchive.class, "rest-test.jar")
         .addPackages(true, "org.camunda.bpm.engine.rest")
         .addAsResource(
-            "META-INF/services/org.camunda.bpm.engine.rest.spi.ProcessEngineProvider");
+            "META-INF/services/org.camunda.bpm.engine.rest.spi.ProcessEngineProvider")
+        .addAsResource("processes/fox-invoice_en.bpmn")
+        .addAsResource("processes/fox-invoice_en_long_id.bpmn");
         
 
     WebArchive war = ShrinkWrap
