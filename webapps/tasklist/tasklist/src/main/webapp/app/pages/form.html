@@ -13,29 +13,7 @@
   </p>
 
   <form>
-    <table class="table" style="width: 550px">
-      <thead>
-        <tr>
-          <th>key</th>
-          <th>value</th>
-          <th style="width: 50px; text-align: right">
-            <button class="btn btn-mini" data-ng-click="addVariable()"><i class="icon-plus"></i></button>
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr data-ng-repeat="variable in variables">
-          <td><input data-ng-model="variable.key" type="text"/></td>
-          <td><input data-ng-model="variable.value" type="text"/></td>
-          <td style="text-align: right; vertical-align: middle">
-            <button class="btn btn-mini" data-ng-click="removeVariable($index)"><i class="icon-trash"></i></button>
-          </td>
-        </tr>
-        <tr data-ng-show="!variables.length">
-          <td colspan="3">No variables defined</td>
-        </tr>
-      </tbody>
-    </table>
+    <div ng-include="'common/form/generic-variables.html'"></div>
 
     <button class="btn btn-primary" data-ng-click="submitForm()">Complete Task</button>
   </form>
