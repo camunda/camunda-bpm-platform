@@ -1,6 +1,6 @@
 "use strict";
 
-define(["angular"], function(angular) {
+define(["angular", "bpmn/Bpmn"], function(angular, Bpmn) {
 
   var module = angular.module("tasklist.pages");
 
@@ -99,6 +99,10 @@ define(["angular"], function(angular) {
       return $scope.taskList.selection.indexOf(task) != -1;
     };
 
+    $scope.select= function (task) {
+      $scope.taskList.selection.push(task);
+    };
+
     $scope.selectAllTasks = function() {
 
       $scope.deselectAllTasks();
@@ -118,6 +122,24 @@ define(["angular"], function(angular) {
     $scope.taskList = {
       tasks: [],
       selection: []
+    };
+
+    $scope.showDiagram = function (task, index) {
+      EngineApi.getProcessDefinitions().xml({id : task.processDefinitionId}).$then( function (result) {
+        var bpmnXml = result.data.bpmn20Xml;
+
+        if ($scope.bpmn) {
+          $scope.bpmn.clear();
+          $scope.bpmn = null;
+        }
+
+        $scope.bpmn = new Bpmn().render(bpmnXml, {
+          diagramElement : "diagram"
+        });
+
+        $scope.bpmn.annotate(task.taskDefinitionKey, "", ["bpmnHighlight"]);
+        $scope.select(task);
+      });
     };
   };
 

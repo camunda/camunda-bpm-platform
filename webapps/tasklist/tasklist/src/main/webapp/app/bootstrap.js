@@ -24,7 +24,10 @@
     packages: [
       { name: "tasklist", location: "app" },
       { name: "common", location: "common" },
-      { name: "angular", location : "assets/js/lib/angular", main: "angular"}
+      { name: "angular", location : "assets/js/lib/angular", main: "angular"},
+      { name: "bpmn", location : "assets/js/lib/bpmn/src/bpmn"},
+      { name: "dojo", location : "assets/js/lib/bpmn/lib/dojo/dojo"},
+      { name: "dojox", location : "assets/js/lib/bpmn/lib/dojo/dojox"}
     ]
   });
 

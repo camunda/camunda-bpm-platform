@@ -18,7 +18,9 @@ define(["angular"], function(angular) {
       });
 
       this.taskCount = $resource(Uri.build(baseUri, "task/count"));
-      this.processDefinitions = $resource(Uri.build(baseUri, "process-definition/:id/:operation"), { id: "@id" });
+      this.processDefinitions = $resource(Uri.build(baseUri, "process-definition/:id/:operation"), { id: "@id" }, {
+          xml : { method: 'GET', params : { operation: "xml" }}
+      });
 
       this.processDefinitions.getStartForm = function(data, fn) {
         data = angular.extend(data, { operation : "startForm" });
