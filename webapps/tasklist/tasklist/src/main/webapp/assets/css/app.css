@@ -224,8 +224,8 @@ table tr.selected > td {
 }
 
 .bpmnDiagram {
-    max-width: 100%;
-    overflow: auto;
-    clear: left;
+  background-color: #ffffff;
+  max-height: 33%;
+  width : 100%;
+  overflow: auto;
 }
-

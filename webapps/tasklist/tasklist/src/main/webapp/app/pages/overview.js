@@ -5,7 +5,6 @@ define(["angular", "bpmn/Bpmn"], function(angular, Bpmn) {
   var module = angular.module("tasklist.pages");
 
   var Controller = function($rootScope, $scope, $location, EngineApi, Authentication) {
-
     $scope.taskList = {};
 
     $scope.groupInfo = EngineApi.getGroups(Authentication.current());
@@ -100,6 +99,7 @@ define(["angular", "bpmn/Bpmn"], function(angular, Bpmn) {
     };
 
     $scope.select= function (task) {
+      $scope.taskList.selection = [];
       $scope.taskList.selection.push(task);
     };
 
