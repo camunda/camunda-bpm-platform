@@ -27,7 +27,12 @@
               <li><a href ng-click="setType(variable, 'string')">string</a></li>
             </ul>
           </div>
-          <input data-ng-model="variable.value" type="text" placeholder="value" />
+          <span data-ng-switch="variable.type">
+            <input data-ng-switch-when="string" data-ng-model="variable.value" type="text" placeholder="value" />
+            <input data-ng-switch-when="number" data-ng-model="variable.value" type="number" placeholder="value" />
+            <label data-ng-switch-when="boolean" style="left: 10px"><input name="variable.key" data-ng-model="variable.value" type="checkbox" /> {{variable.key}}</label>
+            <input data-ng-switch-when="date" data-ng-model="variable.value" type="datetime" placeholder="value" />
+          </span>
         </div>
       </td>
       <td style="text-align: right; vertical-align: middle">

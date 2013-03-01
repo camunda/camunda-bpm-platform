@@ -144,4 +144,14 @@ public class TaskRestServiceImpl extends AbstractEngineService implements TaskRe
     Task task = taskService.createTaskQuery().taskId(id).singleResult();
     return TaskDto.fromTask(task);
   }
+
+  @Override
+  public TaskDto getTask(String id) {
+    TaskService taskService = processEngine.getTaskService().set
+
+    Task task = taskService.createTaskQuery().taskId(id).singleResult();
+    return TaskDto.fromTask(task);
+  }
+
+
 }

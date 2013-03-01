@@ -15,7 +15,7 @@ define(["angular"], function(angular) {
 
         for (var index in variables) {
           var variable = variables[index];
-          $scope.variables.push({key:variable.name, value : variable.value, type: variable});
+          $scope.variables.push({key:variable.name, value : variable.value, type: variable.type.toLowerCase()});
         }
 
         console.log(variables);
@@ -41,7 +41,7 @@ define(["angular"], function(angular) {
     };
     
     $scope.addVariable = function() {
-      $scope.variables.push({ key : "key", value: "value" });
+      $scope.variables.push({ key : "key", value: "value", type: "string" });
     };
 
     $scope.removeVariable = function (index) {
