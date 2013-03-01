@@ -4,38 +4,48 @@ define([ "angular", "jquery" ], function(angular, $) {
   
   var module = angular.module("common.directives");
   
-  var Directive = function (Error, Uri) {
-    return {
-      link: function(scope, element, attrs, $destroy) {
+  var errorPanelTpl =
+    '<div class="errorPanel">' +
+    '  <div ng-repeat="error in errors" class="alert alert-error">' +
+    '    <button type="button" class="close" ng-click="removeError(error)">&times;</button>' +
+    '    <strong>{{ error.status }}:</strong> <span ng-bind-html="error.message"></span>' +
+    '  </div>' +
+    '</div>';
   
-        $(element).addClass("errorPanel");
-        
-        var errorConsumer = function(error) {
-        var html = "<div class=\"alert alert-error\">";
-        html += "<button type=\"button\" class=\"close\" data-dismiss=\"alert\">&times;</button>";
-          
-          if (error.status && error.config) {
-            html += "<strong>"+error.status+":</strong> ";
-            html += "<span>"+error.config+"</span>";
-          } else {
-            html += "An error occured, try refreshing the page.";
+  var Directive = function (Errors, Uri) {
+    return {
+      scope: true,
+      template: errorPanelTpl,
+      link: function(scope, element, attrs, $destroy) {
+
+        var errors = scope.errors = scope.errors || [];
+
+        var consumer = {
+          add: function(error) {
+            errors.push(error);
+          },
+          remove: function(error) {
+            var idx = errors.indexOf(error);
+            if (idx != -1) {
+              errors.splice(idx, 1);
+            }
           }
-          
-          html += "</div>";
-            
-          element.append(html);
         };
-        
-        Error.registerErrorConsumer(errorConsumer);      
+
+        Errors.registerConsumer(consumer);
+
+        scope.removeError = function(error) {
+          errors.splice(errors.indexOf(error), 1);
+        };
+
         scope.$on($destroy, function() {
-          Error.unregisterErrorConsumer(errorConsumer);
+          Errors.registerConsumer(consumer);
         });
-        
       }
     };
   };
 
-  Directive.$inject = ["Error", "Uri"];
+  Directive.$inject = ["Errors", "Uri"];
   
   module
     .directive("errorPanel", Directive);

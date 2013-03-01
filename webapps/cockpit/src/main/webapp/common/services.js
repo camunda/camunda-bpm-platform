@@ -4,7 +4,7 @@ define([ "angularModule" ], function(angularModule) {
 
   return angularModule("common.services", [
     "common/services/debouncer",
-    "common/services/error",
+    "common/services/errors",
     "common/services/httpStatusInterceptor",
     "common/services/httpUtils",
     "common/services/requestStatus",
