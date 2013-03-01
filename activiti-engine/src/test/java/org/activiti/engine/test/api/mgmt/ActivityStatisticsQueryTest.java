@@ -25,7 +25,6 @@ import org.activiti.engine.test.Deployment;
 import org.junit.Test;
 
 public class ActivityStatisticsQueryTest extends PluggableActivitiTestCase {
-
   
   @Test
   @Deployment(resources = "org/activiti/engine/test/api/mgmt/StatisticsTest.testStatisticsQueryWithFailedJobs.bpmn20.xml")
@@ -38,7 +37,7 @@ public class ActivityStatisticsQueryTest extends PluggableActivitiTestCase {
         .processDefinitionKey("ExampleProcess").singleResult();
     
     List<ActivityStatistics> statistics = 
-        managementService.createActivityRuntimeStatisticsQuery(definition.getId()).list();
+        managementService.createActivityStatisticsQuery(definition.getId()).list();
     
     Assert.assertEquals(1, statistics.size());
     
@@ -56,7 +55,7 @@ public class ActivityStatisticsQueryTest extends PluggableActivitiTestCase {
         .processDefinitionKey("ExampleProcess").singleResult();
     
     List<ActivityStatistics> statistics = 
-        managementService.createActivityRuntimeStatisticsQuery(definition.getId()).includeFailedJobs().list();
+        managementService.createActivityStatisticsQuery(definition.getId()).includeFailedJobs().list();
     
     Assert.assertEquals(1, statistics.size());
     
@@ -74,7 +73,7 @@ public class ActivityStatisticsQueryTest extends PluggableActivitiTestCase {
         .processDefinitionKey("ExampleProcess").singleResult();
     
     long count = 
-        managementService.createActivityRuntimeStatisticsQuery(definition.getId()).includeFailedJobs().count();
+        managementService.createActivityStatisticsQuery(definition.getId()).includeFailedJobs().count();
     
     Assert.assertEquals(1, count);
   }
@@ -90,7 +89,7 @@ public class ActivityStatisticsQueryTest extends PluggableActivitiTestCase {
         .processDefinitionKey("ExampleProcess").singleResult();
     
     List<ActivityStatistics> statistics = 
-        managementService.createActivityRuntimeStatisticsQuery(definition.getId()).includeFailedJobs().list();
+        managementService.createActivityStatisticsQuery(definition.getId()).includeFailedJobs().list();
     
     Assert.assertEquals(1, statistics.size());
     
@@ -103,12 +102,12 @@ public class ActivityStatisticsQueryTest extends PluggableActivitiTestCase {
   @Test
   @Deployment(resources = "org/activiti/engine/test/api/mgmt/StatisticsTest.testMultiInstanceStatisticsQuery.bpmn20.xml")
   public void failing_testMultiInstanceActivityStatisticsQuery() {
-    runtimeService.startProcessInstanceByKey("ExampleProcess");
+    runtimeService.startProcessInstanceByKey("MIExampleProcess");
     ProcessDefinition definition = repositoryService.createProcessDefinitionQuery()
         .processDefinitionKey("ExampleProcess").singleResult();
     
     List<ActivityStatistics> statistics = 
-        managementService.createActivityRuntimeStatisticsQuery(definition.getId()).includeFailedJobs().list();
+        managementService.createActivityStatisticsQuery(definition.getId()).includeFailedJobs().list();
     
     Assert.assertEquals(1, statistics.size());
     
@@ -126,7 +125,7 @@ public class ActivityStatisticsQueryTest extends PluggableActivitiTestCase {
     ProcessDefinition definition = repositoryService.createProcessDefinitionQuery()
         .processDefinitionKey("ExampleProcess").singleResult();
     List<ActivityStatistics> statistics = 
-        managementService.createActivityRuntimeStatisticsQuery(definition.getId()).list();
+        managementService.createActivityStatisticsQuery(definition.getId()).list();
     
     Assert.assertEquals(1, statistics.size());
     
@@ -147,7 +146,7 @@ public class ActivityStatisticsQueryTest extends PluggableActivitiTestCase {
     ProcessDefinition definition = repositoryService.createProcessDefinitionQuery()
         .processDefinitionKey("ExampleProcess").singleResult();
     List<ActivityStatistics> statistics = 
-        managementService.createActivityRuntimeStatisticsQuery(definition.getId()).includeFailedJobs().list();
+        managementService.createActivityStatisticsQuery(definition.getId()).includeFailedJobs().list();
     
     Assert.assertEquals(1, statistics.size());
     
@@ -158,7 +157,7 @@ public class ActivityStatisticsQueryTest extends PluggableActivitiTestCase {
     ProcessDefinition callSubProcessDefinition = repositoryService.createProcessDefinitionQuery()
         .processDefinitionKey("callExampleSubProcess").singleResult();
     List<ActivityStatistics> callSubProcessStatistics = 
-        managementService.createActivityRuntimeStatisticsQuery(callSubProcessDefinition.getId()).includeFailedJobs().list();
+        managementService.createActivityStatisticsQuery(callSubProcessDefinition.getId()).includeFailedJobs().list();
     
     Assert.assertEquals(1, callSubProcessStatistics.size());
     
@@ -175,7 +174,7 @@ public class ActivityStatisticsQueryTest extends PluggableActivitiTestCase {
         .processDefinitionKey("ExampleProcess").singleResult();
     
     List<ActivityStatistics> statistics = 
-        managementService.createActivityRuntimeStatisticsQuery(definition.getId()).includeFailedJobs().list();
+        managementService.createActivityStatisticsQuery(definition.getId()).includeFailedJobs().list();
     
     Assert.assertEquals(1, statistics.size());
     
@@ -188,7 +187,7 @@ public class ActivityStatisticsQueryTest extends PluggableActivitiTestCase {
   @Test
   public void testNullProcessDefinitionParameter() {
     try {
-      managementService.createActivityRuntimeStatisticsQuery(null).list();
+      managementService.createActivityStatisticsQuery(null).list();
       Assert.fail();
     } catch (ActivitiException e) {
       // expected
@@ -200,11 +199,11 @@ public class ActivityStatisticsQueryTest extends PluggableActivitiTestCase {
   public void testActivityStatisticsQueryPagination() {
     
     ProcessDefinition definition = 
-        repositoryService.createProcessDefinitionQuery().processDefinitionKey("ExampleProcess").singleResult();
+        repositoryService.createProcessDefinitionQuery().processDefinitionKey("ParGatewayExampleProcess").singleResult();
     runtimeService.startProcessInstanceById(definition.getId());
     
     List<ActivityStatistics> statistics = 
-        managementService.createActivityRuntimeStatisticsQuery(definition.getId()).includeFailedJobs().listPage(0, 1);
+        managementService.createActivityStatisticsQuery(definition.getId()).includeFailedJobs().listPage(0, 1);
     
     Assert.assertEquals(1, statistics.size());
   }
@@ -214,11 +213,11 @@ public class ActivityStatisticsQueryTest extends PluggableActivitiTestCase {
   public void testParallelGatewayActivityStatisticsQuery() {
     
     ProcessDefinition definition = 
-        repositoryService.createProcessDefinitionQuery().processDefinitionKey("ExampleProcess").singleResult();
+        repositoryService.createProcessDefinitionQuery().processDefinitionKey("ParGatewayExampleProcess").singleResult();
     runtimeService.startProcessInstanceById(definition.getId());
     
     List<ActivityStatistics> statistics = 
-        managementService.createActivityRuntimeStatisticsQuery(definition.getId()).list();
+        managementService.createActivityStatisticsQuery(definition.getId()).list();
     
     Assert.assertEquals(2, statistics.size());
     

@@ -151,7 +151,7 @@ public class ProcessDefinitionServiceImpl extends AbstractEngineService implemen
   @Override
   public List<StatisticsResultDto> getActivityStatistics(String processDefinitionId, Boolean includeFailedJobs) {
     ManagementService mgmtService = processEngine.getManagementService();
-    ActivityStatisticsQuery query = mgmtService.createActivityRuntimeStatisticsQuery(processDefinitionId);
+    ActivityStatisticsQuery query = mgmtService.createActivityStatisticsQuery(processDefinitionId);
     if (includeFailedJobs != null && includeFailedJobs) {
       query.includeFailedJobs();
     }

@@ -71,7 +71,7 @@ public class StatisticsRestTest extends AbstractRestServiceTest {
     
     activityQueryMock = mock(ActivityStatisticsQuery.class);
     when(activityQueryMock.list()).thenReturn(activityResults);
-    when(processEngine.getManagementService().createActivityRuntimeStatisticsQuery(any(String.class))).thenReturn(activityQueryMock);
+    when(processEngine.getManagementService().createActivityStatisticsQuery(any(String.class))).thenReturn(activityQueryMock);
   }
   
   private void setupProcessDefinitionStatisticsMock() {
