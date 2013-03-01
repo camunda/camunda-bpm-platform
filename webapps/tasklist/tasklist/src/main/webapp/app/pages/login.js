@@ -16,8 +16,8 @@ define(["angular"], function(angular) {
         Errors.clear("Login Failed");
 
         if (success) {
-          $location.path("/overview");
           $rootScope.$broadcast("tasklist.reload");
+          $location.path("/overview");
         } else {
           Errors.add({ status: "Login Failed", message: "Username / password are incorrect" });
         }

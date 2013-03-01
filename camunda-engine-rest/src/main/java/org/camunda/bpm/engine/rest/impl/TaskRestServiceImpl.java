@@ -6,9 +6,11 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response.Status;
 
-import org.activiti.engine.ActivitiException;
+import org.activiti.engine.FormService;
 import org.activiti.engine.IdentityService;
+import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
+import org.activiti.engine.form.FormData;
 import org.activiti.engine.identity.Group;
 import org.activiti.engine.identity.GroupQuery;
 import org.activiti.engine.identity.User;
@@ -22,13 +24,15 @@ import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 public class TaskRestServiceImpl extends AbstractEngineService implements TaskRestService {
 
   @Override
-  public List<TaskDto> getTasks(TaskQueryDto queryDto,
-      Integer firstResult, Integer maxResults) {
+  public List<TaskDto> getTasks(TaskQueryDto queryDto, Integer firstResult, Integer maxResults) {
+
     TaskService taskService = processEngine.getTaskService();
+    IdentityService identityService = processEngine.getIdentityService();
 
     TaskQuery query;
+
     try {
-      query = queryDto.toQuery(taskService);
+      query = queryDto.toQuery(taskService, identityService);
     } catch (InvalidRequestException e) {
       throw new WebApplicationException(Status.BAD_REQUEST.getStatusCode());
     }
@@ -69,11 +73,7 @@ public class TaskRestServiceImpl extends AbstractEngineService implements TaskRe
   public void claim(String taskId, UserIdDto dto) {
     TaskService taskService = processEngine.getTaskService();
 
-    try {
-      taskService.claim(taskId, dto.getUserId());
-    } catch (ActivitiException e) {
-      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
-    }
+    taskService.claim(taskId, dto.getUserId());
   }
 
   @Override
@@ -85,11 +85,7 @@ public class TaskRestServiceImpl extends AbstractEngineService implements TaskRe
   public void complete(String taskId, CompleteTaskDto dto) {
     TaskService taskService = processEngine.getTaskService();
 
-    try {
-      taskService.complete(taskId, dto.getVariables());
-    } catch (ActivitiException e) {
-      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
-    }
+    taskService.complete(taskId, dto.getVariables());
   }
 
   @Override
@@ -128,10 +124,11 @@ public class TaskRestServiceImpl extends AbstractEngineService implements TaskRe
   @Override
   public CountResultDto getTasksCount(TaskQueryDto queryDto) {
     TaskService taskService = processEngine.getTaskService();
+    IdentityService identityService = processEngine.getIdentityService();
 
     TaskQuery query;
     try {
-      query = queryDto.toQuery(taskService);
+      query = queryDto.toQuery(taskService, identityService);
     } catch (InvalidRequestException e) {
       throw new WebApplicationException(Status.BAD_REQUEST.getStatusCode());
     }
@@ -150,11 +147,39 @@ public class TaskRestServiceImpl extends AbstractEngineService implements TaskRe
 
   @Override
   public TaskDto getTask(String id) {
-    TaskService taskService = processEngine.getTaskService();
-    
-    Task task = taskService.createTaskQuery().taskId(id).singleResult();
+    Task task = getTaskById(id);
     return TaskDto.fromTask(task);
   }
 
+  @Override
+  public FormDto getForm(String id) {
+    FormService formService = processEngine.getFormService();
 
+    FormData formData = formService.getTaskFormData(id);
+    return FormDto.fromFormData(formData);
+  }
+
+  @Override
+  public void resolve(String taskId, CompleteTaskDto dto) {
+    TaskService taskService = processEngine.getTaskService();
+    RuntimeService runtimeService = processEngine.getRuntimeService();
+
+    // FIXME: atomicity of operation
+
+    Task task = getTaskById(taskId);
+    String executionId = task.getExecutionId();
+
+    runtimeService.setVariables(executionId, dto.getVariables());
+    taskService.resolveTask(taskId);
+  }
+
+  /**
+   * Returns the task with the given id
+   *
+   * @param id
+   * @return
+   */
+  private Task getTaskById(String id) {
+    return processEngine.getTaskService().createTaskQuery().taskId(id).singleResult();
+  }
 }

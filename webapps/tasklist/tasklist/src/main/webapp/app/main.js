@@ -10,6 +10,7 @@ define([ "angularModule" ], function(angularModule) {
       "ngCookies",
       "tasklist.pages",
       "tasklist.services",
+      "tasklist.directives",
       'common.directives',
       'common.extensions',
       'common.services' ]);
@@ -23,7 +24,7 @@ define([ "angularModule" ], function(angularModule) {
       switch (status) {
       case 500:
         if (data && data.message) {
-          Errors.add({ status: "Error", message:  data.message, type: data.exceptionType });
+          Errors.add({ status: "Error", message: data.message, type: data.exceptionType });
         } else {
           Errors.add({ status: "Error", message: "A problem occurred: Try to refresh the view or login and out of the application. If the problem persists, contact your administrator." });
         }
@@ -33,7 +34,7 @@ define([ "angularModule" ], function(angularModule) {
         break;
       case 401:
         Errors.clear("Unauthorized");
-        
+
         if (Authentication.current()) {
           Errors.add({ status: "Unauthorized", message:  "Your session has expired. Please login again." });
         } else {

@@ -7,21 +7,46 @@ define(["angular"], function(angular) {
   var Controller = function($rootScope, $scope, $location, $routeParams, EngineApi) {
     $scope.variables = [];
 
-    EngineApi.getTaskList().get({ id: $routeParams.id }).$then(function (result) {
-      $scope.task = result.data;
+    var form = $scope.form = {
+      generic: $location.hash() == 'generic'
+    };
 
-      EngineApi.getProcessInstance().variables({id : $scope.task.processInstanceId}).$then(function (result) {
+    EngineApi.getTaskList().get({ id: $routeParams.id }).$then(function (result) {
+      var task = $scope.task = result.resource;
+
+      EngineApi.getProcessInstance().variables({ id : task.processInstanceId }).$then(function (result) {
         var variables = result.data.variables;
 
         for (var index in variables) {
           var variable = variables[index];
-          $scope.variables.push({key:variable.name, value : variable.value, type: variable.type.toLowerCase()});
+          $scope.variables.push({ key: variable.name, value: variable.value, type: variable.type.toLowerCase() });
         }
-
-        console.log(variables);
       });
-
     });
+
+    form.data = EngineApi.getTaskList().getForm({ id: $routeParams.id }).$then(function(response) {
+      var data = response.resource,
+                 key = data.key,
+                 EMBEDDED_KEY = "embedded:";
+
+      if (key && key.indexOf(EMBEDDED_KEY) == 0) {
+        key = key.substring(EMBEDDED_KEY.length);
+        form.embedded = true;
+      }
+
+      form.key = key;
+      form.loaded = true;
+    });
+
+    $scope.enableGenericForm = function() {
+      $location.hash('generic');
+      form.generic = true;
+    };
+
+    $scope.cancel = function() {
+      $location.hash('');
+      $location.path("/overview");
+    };
 
     $scope.submitForm = function() {
       var variablesObject = {};
@@ -30,22 +55,11 @@ define(["angular"], function(angular) {
         variablesObject[variable.key] = variable.value;
       }
 
-      EngineApi.getTaskList().complete({ id: $routeParams.id}, { variables : variablesObject }).$then(function() {
+      EngineApi.getTaskList().complete({ id: $routeParams.id }, { variables : variablesObject }).$then(function() {
         $rootScope.$broadcast("tasklist.reload");
+        $location.hash('');
         $location.path("/overview");
       });
-    };
-
-    $scope.setType = function(variable, type) {
-      variable.type = type;
-    };
-    
-    $scope.addVariable = function() {
-      $scope.variables.push({ key : "key", value: "value", type: "string" });
-    };
-
-    $scope.removeVariable = function (index) {
-      $scope.variables.splice(index, 1);
     };
   };
 

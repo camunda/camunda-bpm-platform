@@ -37,6 +37,7 @@ public class TasklistProcessEngineProvider implements ProcessEngineProvider {
       repositoryService
           .createDeployment()
           .addClasspathResource("processes/fox-invoice_en.bpmn")
+          .addClasspathResource("processes/fox-invoice-start-form.bpmn")
           .deploy();
 
       RuntimeService runtimeService = processEngine.getRuntimeService();

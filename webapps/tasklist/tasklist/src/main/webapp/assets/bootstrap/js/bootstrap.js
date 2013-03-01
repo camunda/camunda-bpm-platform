@@ -362,7 +362,7 @@
       if (!isActive) {
         $parent.toggleClass('open')
 
-        var dropDown = $('.dropdown-menu', $parent);
+        var dropDown = $('.dropdown-menu, .dropdown-submenu', $parent);
         dropDown.removeClass("left");
 
         var documentWidth = $('html').width();

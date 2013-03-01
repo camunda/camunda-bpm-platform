@@ -27,6 +27,10 @@ public interface TaskRestService {
   @Path("/{id}")
   TaskDto getTask(@PathParam("id") String id);
 
+  @GET
+  @Path("/{id}/form")
+  FormDto getForm(@PathParam("id") String id);
+
   /**
    * Expects the same parameters as {@link TaskRestService#getTasks(TaskQueryDto, Integer, Integer)} (as
    * JSON message body) and allows more than one variable check.
@@ -65,6 +69,11 @@ public interface TaskRestService {
   @Consumes(MediaType.APPLICATION_JSON)
   void complete(@PathParam("id") String taskId, CompleteTaskDto dto);
 
+  @POST
+  @Path("/{id}/resolve")
+  @Consumes(MediaType.APPLICATION_JSON)
+  void resolve(@PathParam("id") String taskId, CompleteTaskDto dto);
+  
   @POST
   @Path("/{id}/delegate")
   @Consumes(MediaType.APPLICATION_JSON)

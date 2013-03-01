@@ -4,25 +4,52 @@ define(["angular", "bpmn/Bpmn"], function(angular, Bpmn) {
 
   var module = angular.module("tasklist.pages");
 
-  var Controller = function($rootScope, $scope, $location, EngineApi, Authentication) {
-    $scope.taskList = {};
+  var Controller = function($rootScope, $scope, $location, debounce, EngineApi, Authentication) {
 
-    $scope.groupInfo = EngineApi.getGroups(Authentication.current());
+    var fireTaskListChanged = debounce(function() {
+      $rootScope.$broadcast("tasklist.reload");
+    }, 300);
 
-    $scope.loadTasks = function(filter, search) {
+    var reloadTasks = debounce(function() {
+      var view = $scope.taskList.view;
+
+      $scope.loadTasks(view);
+    }, 300);
+
+    $scope.taskList = {
+      sort: {
+        by: "created",
+        order: "desc"
+      },
+      selection: []
+    };
+
+    $scope.$on("sortChanged", function() {
+      reloadTasks();
+    });
+
+    $scope.loadTasks = function(view) {
+      var filter = view.filter,
+          search = view.search;
+
       if (!Authentication.current()) {
         return;
       }
 
       $scope.taskList.view = { filter: filter, search: search };
 
-      var queryObject = {};
+      var queryObject = {},
+          user = Authentication.current(),
+          sort = $scope.taskList.sort;
 
-      queryObject.userId = Authentication.current();
+      queryObject.userId = user;
 
       switch (filter) {
         case "mytasks":
-          queryObject.assignee = Authentication.current();
+          queryObject.assignee = user;
+          break;
+        case "unassigned":
+          queryObject.assignableTo = user;
           break;
         case "colleague":
           queryObject.assignee = search;
@@ -32,11 +59,17 @@ define(["angular", "bpmn/Bpmn"], function(angular, Bpmn) {
           break;
       }
 
-      $scope.taskList.tasks = EngineApi.getTaskList().query(queryObject);
+      queryObject.sortBy = sort.by;
+      queryObject.sortOrder = sort.order;
+
+      EngineApi.getTaskList().query(queryObject).$then(function(response) {
+        $scope.taskList.tasks = response.resource;
+      });
     };
 
     $scope.$watch(function() { return $location.search(); }, function(newValue) {
-      $scope.loadTasks(newValue.filter || "mytasks", newValue.search);
+      var view = angular.extend({ filter: "mytasks" }, newValue);
+      $scope.loadTasks(view);
     });
 
     $scope.startTask = function(task) {
@@ -46,8 +79,8 @@ define(["angular", "bpmn/Bpmn"], function(angular, Bpmn) {
     $scope.claimTask = function(task) {
 
       EngineApi.getTaskList().claim( { id : task.id}, { userId: Authentication.current() }).$then(function () {
-        var tasks = $scope.taskList.tasks;
-        var view = $scope.taskList.view;
+        var tasks = $scope.taskList.tasks,
+            view = $scope.taskList.view;
 
         if (view.filter == "mytasks") {
           $scope.addTask(task);
@@ -55,15 +88,15 @@ define(["angular", "bpmn/Bpmn"], function(angular, Bpmn) {
           $scope.removeTask(task);
         }
 
-        $rootScope.$broadcast("tasklist.reload");
+        fireTaskListChanged();
       });
     };
 
-
     $scope.unclaimTask = function(task) {
-      EngineApi.getTaskList().unclaim( { id : task.id}, { userId: Authentication.current() }).$then(function () {
+      EngineApi.getTaskList().unclaim({ id : task.id }, { userId: Authentication.current() }).$then(function () {
         $scope.removeTask(task);
-        $rootScope.$broadcast("tasklist.reload");
+
+        fireTaskListChanged();
       });
     };
 
@@ -80,6 +113,14 @@ define(["angular", "bpmn/Bpmn"], function(angular, Bpmn) {
       }
     };
 
+    $scope.delegateTask = function(task, user) {
+      EngineApi.getTaskList().delegate( { id : task.id}, { userId: user.id }).$then(function () {
+        $scope.removeTask(task);
+
+        fireTaskListChanged();
+      });
+    };
+
     $scope.claimTasks = function (selection) {
       for (var index in selection) {
         var task = selection[index];
@@ -87,18 +128,11 @@ define(["angular", "bpmn/Bpmn"], function(angular, Bpmn) {
       }
     };
 
-    $scope.delegateTask = function(task, user) {
-      EngineApi.getTaskList().delegate( { id : task.id}, { userId: user.id}).$then(function () {
-        $scope.removeTask(task);
-        $rootScope.$broadcast("tasklist.reload");
-      });
-    };
-
     $scope.isSelected = function(task) {
       return $scope.taskList.selection.indexOf(task) != -1;
     };
 
-    $scope.select= function (task) {
+    $scope.select = function (task) {
       $scope.taskList.selection = [];
       $scope.taskList.selection.push(task);
     };
@@ -119,11 +153,6 @@ define(["angular", "bpmn/Bpmn"], function(angular, Bpmn) {
       return $scope.taskList.selection = [];
     };
 
-    $scope.taskList = {
-      tasks: [],
-      selection: []
-    };
-
     $scope.showDiagram = function (task, index) {
       EngineApi.getProcessDefinitions().xml({id : task.processDefinitionId}).$then( function (result) {
         var bpmnXml = result.data.bpmn20Xml;
@@ -137,13 +166,13 @@ define(["angular", "bpmn/Bpmn"], function(angular, Bpmn) {
           diagramElement : "diagram"
         });
 
-        $scope.bpmn.annotate(task.taskDefinitionKey, "", ["bpmnHighlight"]);
+        $scope.bpmn.annotate(task.taskDefinitionKey, "", [ "bpmnHighlight" ]);
         $scope.select(task);
       });
     };
   };
 
-  Controller.$inject = ["$rootScope", "$scope", "$location", "EngineApi", "Authentication"];
+  Controller.$inject = ["$rootScope", "$scope", "$location", "debounce", "EngineApi", "Authentication"];
 
   var RouteConfig = function($routeProvider) {
     $routeProvider.when("/overview", {

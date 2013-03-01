@@ -10,17 +10,28 @@ define(["angular"], function(angular) {
     $scope.processDefinition = EngineApi.getProcessDefinitions().get({ id: processDefinitionId });
 
     $scope.variables = [];
-    $scope.generic = $location.search().generic;
 
-    $scope.startForm = {};
+    var form = $scope.form = {
+      generic: $location.hash() == 'generic'
+    };
 
-    $scope.startForm.form = EngineApi.getProcessDefinitions().getStartForm({ id: processDefinitionId }).$then(function() {
-      $scope.startForm.loaded = true;
+    form.data = EngineApi.getProcessDefinitions().getStartForm({ id: processDefinitionId }).$then(function(response) {
+      var data = response.resource,
+                 key = data.key,
+                 EMBEDDED_KEY = "embedded:";
+
+      if (key && key.indexOf(EMBEDDED_KEY) == 0) {
+        key = key.substring(EMBEDDED_KEY.length);
+        form.embedded = true;
+      }
+
+      form.key = key;
+      form.loaded = true;
     });
 
     $scope.enableGenericForm = function() {
-      $location.search("generic");
-      $scope.generic = true;
+      $location.hash('generic');
+      form.generic = true;
     };
 
     $scope.submitForm = function() {
@@ -32,20 +43,14 @@ define(["angular"], function(angular) {
 
       EngineApi.getProcessDefinitions().startInstance({ id: $routeParams.id}, { variables : variablesObject }).$then(function() {
         $rootScope.$broadcast("tasklist.reload");
+        $location.hash('');
         $location.path("/overview");
       });
     };
 
-    $scope.setType = function(variable, type) {
-      variable.type = type;
-    };
-
-    $scope.addVariable = function() {
-      $scope.variables.push({ key : "key", value: "value" });
-    };
-
-    $scope.removeVariable = function (index) {
-      $scope.variables.splice(index, 1);
+    $scope.cancel = function() {
+      $location.hash('');
+      $location.path("/overview");
     };
   };
 

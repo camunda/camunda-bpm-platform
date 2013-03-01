@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -20,11 +20,11 @@ describe('Renderer tests', function() {
 		var processDefinition = CAM.transform(
 		    '<?xml version="1.0" encoding="UTF-8"?>' +
 		    '<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"   xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"  xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:signavio="http://www.signavio.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" exporter="Signavio Process Editor, http://www.signavio.com" exporterVersion="6.5.0" expressionLanguage="http://www.w3.org/1999/XPath" id="sid-c921f33b-76e6-41cc-a3b9-a995d90bc725" name="saassd" targetNamespace="http://www.signavio.com/bpmn20" typeLanguage="http://www.w3.org/2001/XMLSchema" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/2.0/20100501/BPMN20.xsd">' +
-		    
+
 		      '<process id="theProcess">' +
-		    
-		        '<startEvent id="theStart" />'+		       
-		      
+
+		        '<startEvent id="theStart" />'+
+
 		      '</process>'+
 
 		   	  '<bpmndi:BPMNDiagram id="sid-bcc9a5d3-f737-43ee-84ae-e3177a3e5a6d">' +
@@ -53,16 +53,15 @@ describe('Renderer tests', function() {
 		expect(circle.getAttribute("cy")).toBe('0');
 		expect(circle.getAttribute("r")).toBe('15');
 
-
-		<!-- the second time around the start event coordinates are different -->
+		// <!-- the second time around the start event coordinates are different -->
 		var processDefinition2 = CAM.transform(
 		    '<?xml version="1.0" encoding="UTF-8"?>' +
 		    '<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"   xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"  xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:signavio="http://www.signavio.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" exporter="Signavio Process Editor, http://www.signavio.com" exporterVersion="6.5.0" expressionLanguage="http://www.w3.org/1999/XPath" id="sid-c921f33b-76e6-41cc-a3b9-a995d90bc725" name="saassd" targetNamespace="http://www.signavio.com/bpmn20" typeLanguage="http://www.w3.org/2001/XMLSchema" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/2.0/20100501/BPMN20.xsd">' +
-		    
+
 		      '<process id="theProcess">' +
-		    
-		        '<startEvent id="theStart" />'+		       
-		      
+
+		        '<startEvent id="theStart" />'+
+
 		      '</process>'+
 
 		   	  '<bpmndi:BPMNDiagram id="sid-bcc9a5d3-f737-43ee-84ae-e3177a3e5a6d">' +
@@ -74,7 +73,7 @@ describe('Renderer tests', function() {
 
 		    	'</bpmndi:BPMNPlane>' +
 		      '</bpmndi:BPMNDiagram>' +
-		      
+
 		    '</definitions>')[0];
 
 
@@ -98,13 +97,13 @@ describe('Renderer tests', function() {
 		var processDefinition = CAM.transform(
 		    '<?xml version="1.0" encoding="UTF-8"?>' +
 		    '<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"   xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"  xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:signavio="http://www.signavio.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" exporter="Signavio Process Editor, http://www.signavio.com" exporterVersion="6.5.0" expressionLanguage="http://www.w3.org/1999/XPath" id="sid-c921f33b-76e6-41cc-a3b9-a995d90bc725" name="saassd" targetNamespace="http://www.signavio.com/bpmn20" typeLanguage="http://www.w3.org/2001/XMLSchema" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/2.0/20100501/BPMN20.xsd">' +
-		    
+
 		      '<process id="theProcess">' +
-		    
-		        '<startEvent id="theStart">'+		       
+
+		        '<startEvent id="theStart">'+
 		        	'<messageEventDefinition />'+
 		        '</startEvent>'+
-		      
+
 		      '</process>'+
 
 		   	  '<bpmndi:BPMNDiagram id="sid-bcc9a5d3-f737-43ee-84ae-e3177a3e5a6d">' +

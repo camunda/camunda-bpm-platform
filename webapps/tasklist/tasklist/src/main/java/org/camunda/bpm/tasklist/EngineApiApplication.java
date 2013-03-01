@@ -12,6 +12,8 @@ import javax.ws.rs.core.Application;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.camunda.bpm.engine.rest.exception.ExceptionHandler;
+
 /**
  * @author: drobisch
  */
@@ -28,6 +30,7 @@ public class EngineApiApplication extends Application {
     classes.add(EngineQueryDtoGetReader.class);
     classes.add(JacksonConfigurator.class);
     classes.add(JacksonJsonProvider.class);
+    classes.add(ExceptionHandler.class);
 
     return classes;
   }

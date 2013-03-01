@@ -14,8 +14,15 @@ define(["angular"], function(angular) {
         claim : { method: 'POST', params : { operation: "claim" }},
         unclaim : { method: 'POST', params : { operation: "unclaim" }},
         delegate : { method: 'POST', params : { operation: "delegate" }},
+        resolve : { method: 'POST', params : { operation: "resolve" }},
         complete : { method: 'POST', params : { operation: "complete" }}
       });
+
+      this.taskList.getForm = function(data, fn) {
+        data = angular.extend(data, { operation : "form" });
+
+        return this.get(data, fn);
+      };
 
       this.taskCount = $resource(Uri.build(baseUri, "task/count"));
       this.processDefinitions = $resource(Uri.build(baseUri, "process-definition/:id/:operation"), { id: "@id" }, {

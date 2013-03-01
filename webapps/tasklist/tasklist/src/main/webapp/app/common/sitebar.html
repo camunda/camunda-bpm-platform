@@ -2,17 +2,12 @@
   <li class="nav-header">Tasks</li>
   <li ng-class="{active: isActive('mytasks')}">
     <a href="#/overview?filter=mytasks">
-      My Tasks ({{ assignedCount.count }})
+      My Tasks ({{ tasks.mytasks.count }})
     </a>
   </li>
   <li ng-show="tasks.unassigned.count" ng-class="{active: isActive('unassigned')}">
     <a href="#/overview?filter=unassigned">
-      Unassigned tasks ({{ tasks.unassigned.count }})
-    </a>
-  </li>
-  <li ng-show="tasks.unassigned.count" ng-class="{active: isActive('search')}">
-    <a href="#/overview?filter=search">
-      Search
+      Inbox ({{ tasks.unassigned.count }})
     </a>
   </li>
   <li class="nav-header">Unclaimed Group Tasks</li>

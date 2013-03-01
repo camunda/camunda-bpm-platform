@@ -7,12 +7,18 @@ define(["angular"], function(angular) {
   var Controller = function($scope, $location, EngineApi, Authentication) {
     var currentUser = Authentication.current();
 
-    function setActive(filter) {
-      //$scope.tasks.active = filter;
+    if (!currentUser) {
+      return;
     }
 
+    var tasks;
+
     $scope.loadGroupInfo = function () {
-      $scope.assignedCount = EngineApi.getTaskCount().get({"assignee" : currentUser});
+      tasks = $scope.tasks = {
+        mytasks: EngineApi.getTaskCount().get({ "assignee" : currentUser }),
+        unassigned: EngineApi.getTaskCount().get({ "assignableTo" : currentUser })
+      };
+
       $scope.groupInfo = EngineApi.getGroups(currentUser);
     };
 
@@ -25,7 +31,7 @@ define(["angular"], function(angular) {
       $scope.loadGroupInfo();
     });
 
-    if (currentUser) $scope.loadGroupInfo();
+    $scope.loadGroupInfo();
   };
 
   Controller.$inject = ["$scope", "$location", "EngineApi", "Authentication"];

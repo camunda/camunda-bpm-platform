@@ -3,11 +3,11 @@
 <!-- task list -->
 <table class="table table-hover task-table" multi-select="taskList.selection">
   <thead>
-    <tr>
-      <th>Name</th>
-      <th>Process</th>
-      <th>Created</th>
-      <th>Due</th>
+    <tr sortable="taskList.sort">
+      <th><span sort-by="name">Name</span></th>
+      <th><span>Process</span></th>
+      <th><span sort-by="created">Created</span></th>
+      <th><span sort-by="dueDate">Due</span></th>
       <th style="width: 120px">Actions</th>
     </tr>
   </thead>
@@ -39,16 +39,16 @@
               <a href title="Claim task to work on it later" ng-click="claimTask(task)">Claim</a>
             </li>
             <li class="dropdown-submenu">
-                <a tabindex="-1" href="#">Delegate</a>
-                <ul class="dropdown-menu">
-                    <li data-ng-repeat="user in groupInfo.groupUsers">
-                        <a href ng-click="delegateTask(task, user)" title="Delegate task to someone else">{{user.displayName}}</a>
-                    </li>
-                </ul>
+              <a tabindex="-1" href>Delegate</a>
+              <ul class="dropdown-menu">
+                <li data-ng-repeat="user in groupInfo.groupUsers">
+                  <a href ng-click="delegateTask(task, user)" title="Delegate task to someone else">{{user.displayName}}</a>
+                </li>
+              </ul>
             </li>
           </ul>
         </div>
-        <button data-ng-click="showDiagram(task, $index)"><i class="icon-search"></i></button>
+        <button class="btn btn-small" data-ng-click="showDiagram(task, $index)"><i class="icon-search"></i></button>
       </td>
     </tr>
   </tbody>
