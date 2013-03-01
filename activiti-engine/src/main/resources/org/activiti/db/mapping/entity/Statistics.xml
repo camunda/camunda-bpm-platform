@@ -48,7 +48,7 @@
   
   <select id ="selectProcessDefinitionStatisticsCount" resultType="long" 
     parameterType="org.activiti.engine.impl.ProcessDefinitionStatisticsQueryImpl">
-    select count(RES.*) 
+    select count(RES.ID_) 
     <include refid="selectProcessDefinitionStatisticsByQueryCriteriaSql"/>
   </select>
   
@@ -104,7 +104,7 @@
   
   <select id ="selectDeploymentStatisticsCount" resultType="long" 
     parameterType="org.activiti.engine.impl.DeploymentStatisticsQueryImpl">
-    select count(RES.*) 
+    select count(RES.ID_) 
     <include refid="selectDeploymentStatisticsByQueryCriteriaSql"/>
   </select>
   
@@ -167,7 +167,7 @@
   
   <select id ="selectActivityStatisticsCount" resultType="long" 
     parameterType="org.activiti.engine.impl.ActivityStatisticsQueryImpl">
-    select count(RES.*)
+    select count(RES.ID_)
     <include refid="selectActivityStatisticsByQueryCriteriaSql"/>
   </select>
    
