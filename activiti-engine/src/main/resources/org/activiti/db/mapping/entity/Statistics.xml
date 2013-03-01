@@ -45,36 +45,43 @@
   </select>
   
   <sql id="selectProcessDefinitionStatisticsByQueryCriteriaSql">
+    from (
+    select PROCDEF.*, AGG.INSTANCE_COUNT
+    <if test="failedJobsToInclude">
+    , AGG.FAILED_JOBS_COUNT
+    </if>
+    
     <!-- Join process definitions with data about running instances and failed jobs -->
     from ${prefix}ACT_RE_PROCDEF PROCDEF, 
     ( select INSTANCE.PROC_DEF_ID_ as ID_,
       INSTANCE_COUNT
       <if test="failedJobsToInclude">
-      ,
-      FAILED_JOBS_COUNT
+      , FAILED_JOBS_COUNT
       </if>
       
-    from
-    
-    <!-- Count and group all process instances (executions that have ID_ = PROC_INST_ID_) by process definition -->
-    (select PROC_DEF_ID_, count(PROC_INST_ID_) as INSTANCE_COUNT 
-    from ${prefix}ACT_RU_EXECUTION
-    where ID_ = PROC_INST_ID_
-    group by PROC_DEF_ID_) INSTANCE
-    
-    <if test="failedJobsToInclude">
-    left outer join
-    
-    <!-- Sum all failed jobs grouped by process definition -->
-    (select PROC_DEF_ID_, count(JOB.ID_) as FAILED_JOBS_COUNT from 
-      <!-- Select all executions and their failed jobs (i.e. RETRIES_ = 0) -->
-      ( select JOB.ID_, PROC_DEF_ID_ from ${prefix}ACT_RU_EXECUTION EXECUTION,
-      ${prefix}ACT_RU_JOB JOB where EXECUTION.ID_ = JOB.EXECUTION_ID_ and JOB.RETRIES_ = 0) JOB
-    group by JOB.PROC_DEF_ID_) JOB
-    on JOB.PROC_DEF_ID_ = INSTANCE.PROC_DEF_ID_ 
-    </if>
+	    from
+	    
+	    <!-- Count and group all process instances (executions that have ID_ = PROC_INST_ID_) by process definition -->
+	    (select PROC_DEF_ID_, count(PROC_INST_ID_) as INSTANCE_COUNT 
+	    from ${prefix}ACT_RU_EXECUTION
+	    where ID_ = PROC_INST_ID_
+	    group by PROC_DEF_ID_) INSTANCE
+	    
+	    <if test="failedJobsToInclude">
+	    left outer join
+	    
+	    <!-- Sum all failed jobs grouped by process definition -->
+	    (select PROC_DEF_ID_, count(JOB.ID_) as FAILED_JOBS_COUNT from 
+	      <!-- Select all executions and their failed jobs (i.e. RETRIES_ = 0) -->
+	      ( select JOB.ID_, PROC_DEF_ID_ 
+	      from ${prefix}ACT_RU_EXECUTION EXECUTION, ${prefix}ACT_RU_JOB JOB 
+	      where EXECUTION.ID_ = JOB.EXECUTION_ID_ and JOB.RETRIES_ = 0) JOB
+	    group by JOB.PROC_DEF_ID_) JOB
+      on JOB.PROC_DEF_ID_ = INSTANCE.PROC_DEF_ID_ 
+      </if>
+      ) AGG
+    where PROCDEF.ID_ = AGG.ID_
     ) RES
-    where PROCDEF.ID_ = RES.ID_
   </sql>
  
 
@@ -117,8 +124,9 @@
 	    <!-- Sum all failed jobs grouped by activity id -->
 	    (select ACT_ID_, count(JOB.ID_) as FAILED_JOBS_COUNT from 
 	      <!-- Select all executions and their failed jobs (i.e. RETRIES_ = 0) of the given process definition -->
-	      ( select JOB.ID_, ACT_ID_ from ${prefix}ACT_RU_EXECUTION EXECUTION,
-	      ${prefix}ACT_RU_JOB JOB where EXECUTION.ID_ = JOB.EXECUTION_ID_ and JOB.RETRIES_ = 0
+	      ( select JOB.ID_, ACT_ID_ 
+	      from ${prefix}ACT_RU_EXECUTION EXECUTION, ${prefix}ACT_RU_JOB JOB 
+	      where EXECUTION.ID_ = JOB.EXECUTION_ID_ and JOB.RETRIES_ = 0
 	      and PROC_DEF_ID_ = #{processDefinitionId}
 	      ) JOB
 	    group by JOB.ACT_ID_) JOB
