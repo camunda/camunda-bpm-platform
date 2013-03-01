@@ -168,8 +168,9 @@
 				);
 				this.tooltip[0].style[this.stylePos] = this.size * (this.percentage[0] + (this.percentage[1] - this.percentage[0])/2)/100 - (this.orientation === 'vertical' ? this.tooltip.outerHeight()/2 : this.tooltip.outerWidth()/2) +'px';
 			} else {
+        var value = (this.min + Math.round((this.diff * this.percentage[0]/100)/this.step)*this.step);
 				this.tooltipInner.text(
-					(this.min + Math.round((this.diff * this.percentage[0]/100)/this.step)*this.step)
+					Math.round(value * 10) / 10
 				);
 				this.tooltip[0].style[this.stylePos] = this.size * this.percentage[0]/100 - (this.orientation === 'vertical' ? this.tooltip.outerHeight()/2 : this.tooltip.outerWidth()/2) +'px';
 			}
@@ -276,9 +277,9 @@
 
 		getValue: function() {
 			if (this.range) {
-				return this.value;
+        return this.value;
 			}
-			return this.value[0];
+      return this.value[0];
 		},
 
 		setValue: function(val) {
