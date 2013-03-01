@@ -17,14 +17,14 @@ define([ "angularModule" ], function(angularModule) {
       'cockpit.resources']);
 
 
-  var Controller = function ($scope, Error) {
+  var Controller = function ($scope, Errors) {
     
     $scope.appErrors = function () {
-      return Error.errors;
+      return Errors.errors;
     };
     
     $scope.removeError = function (error) {
-      Error.removeError(error);
+      Errors.clear(error);
     };
     
     // needed for form validation
@@ -35,7 +35,7 @@ define([ "angularModule" ], function(angularModule) {
     
   };
   
-  Controller.$inject = ["$scope", "Error"];
+  Controller.$inject = ["$scope", "Errors"];
   
   var ModuleConfig = function($routeProvider, $httpProvider) {
     $httpProvider.responseInterceptors.push('httpStatusInterceptor');
