@@ -1,27 +1,33 @@
 package org.camunda.bpm.engine.rest.impl;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.ws.rs.PathParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
 import org.activiti.engine.ActivitiException;
+import org.activiti.engine.ManagementService;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
+import org.activiti.engine.impl.util.IoUtil;
+import org.activiti.engine.management.ActivityStatistics;
+import org.activiti.engine.management.ActivityStatisticsQuery;
+import org.activiti.engine.management.ProcessDefinitionStatistics;
+import org.activiti.engine.management.ProcessDefinitionStatisticsQuery;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.repository.ProcessDefinitionQuery;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.rest.ProcessDefinitionService;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
-import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDto;
-import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionQueryDto;
-import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionStatisticsResultDto;
+import org.camunda.bpm.engine.rest.dto.StatisticsResultDto;
+import org.camunda.bpm.engine.rest.dto.repository.*;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.runtime.StartProcessInstanceDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
-import org.camunda.bpm.engine.rest.impl.stub.ProcessDefinitionStubStatisticsBuilder;
 
 public class ProcessDefinitionServiceImpl extends AbstractEngineService implements ProcessDefinitionService {
 
@@ -171,4 +177,10 @@ public class ProcessDefinitionServiceImpl extends AbstractEngineService implemen
       IoUtil.closeSilently(processModelIn);
     }
   }
+
+  @Override
+  public String getStartForm(@PathParam("id") String processDefinitionId) {
+    return processEngine.getFormService().getStartFormKey(processDefinitionId);
+  }
+
 }
