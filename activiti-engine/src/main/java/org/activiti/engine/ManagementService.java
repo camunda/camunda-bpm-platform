@@ -33,6 +33,7 @@ import org.activiti.engine.runtime.JobQuery;
  * @author Tom Baeyens
  * @author Joram Barrez
  * @author Falko Menge
+ * @author Thorben Lindhauer
  */
 public interface ManagementService {
 
@@ -105,7 +106,13 @@ public interface ManagementService {
   /** programmatic schema update on a given connection returning feedback about what happened */
   String databaseSchemaUpgrade(Connection connection, String catalog, String schema);
   
+  /**
+   * Query for the number of process instances aggregated by process definitions.
+   */
   ProcessDefinitionStatisticsQuery createProcessDefinitionStatisticsQuery();
   
+  /**
+   * Query for the number of activity instances aggregated by activities of a single process definition.
+   */
   ActivityStatisticsQuery createActivityRuntimeStatisticsQuery(String processDefinitionId);
 }
