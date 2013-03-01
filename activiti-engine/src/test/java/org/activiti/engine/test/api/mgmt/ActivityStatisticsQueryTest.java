@@ -196,7 +196,7 @@ public class ActivityStatisticsQueryTest extends PluggableActivitiTestCase {
   }
   
   @Test
-  @Deployment(resources = "org/activiti/engine/test/api/mgmt/StatisticsTest.testActivityStatisticsQueryPagination.bpmn20.xml")
+  @Deployment(resources = "org/activiti/engine/test/api/mgmt/StatisticsTest.testParallelGatewayStatisticsQuery.bpmn20.xml")
   public void testActivityStatisticsQueryPagination() {
     
     ProcessDefinition definition = 
@@ -207,5 +207,23 @@ public class ActivityStatisticsQueryTest extends PluggableActivitiTestCase {
         managementService.createActivityRuntimeStatisticsQuery(definition.getId()).includeFailedJobs().listPage(0, 1);
     
     Assert.assertEquals(1, statistics.size());
+  }
+  
+  @Test
+  @Deployment(resources = "org/activiti/engine/test/api/mgmt/StatisticsTest.testParallelGatewayStatisticsQuery.bpmn20.xml")
+  public void testParallelGatewayActivityStatisticsQuery() {
+    
+    ProcessDefinition definition = 
+        repositoryService.createProcessDefinitionQuery().processDefinitionKey("ExampleProcess").singleResult();
+    runtimeService.startProcessInstanceById(definition.getId());
+    
+    List<ActivityStatistics> statistics = 
+        managementService.createActivityRuntimeStatisticsQuery(definition.getId()).list();
+    
+    Assert.assertEquals(2, statistics.size());
+    
+    for (ActivityStatistics result : statistics) {
+      Assert.assertEquals(1, result.getInstances());
+    }
   }
 }

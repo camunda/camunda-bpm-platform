@@ -164,5 +164,4 @@ public class ProcessDefinitionStatisticsQueryTest extends PluggableActivitiTestC
     
     repositoryService.deleteDeployment(deployment.getId(), true);
   }
-  
 }
