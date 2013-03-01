@@ -1,6 +1,9 @@
-angular
-.module('cockpit.service.uri', [])
- .factory('Uri', function() {
+"use strict";
+
+(function() {
+  var module = angular.module("common.services");
+  
+  var Service = function () {
     function appRoot() {
       return $("base").attr("app-base");
     }
@@ -10,11 +13,11 @@ angular
     }
     
     function buildUri (context, str) {
-      return context + (str.indexOf("/") == 0 ? str.substring(1, str.length) : str);
+      return context + (str.indexOf("/") === 0 ? str.substring(1, str.length) : str);
     }
     
     return {
-      appRoot: appRoot, 
+      appRoot: appRoot,
       restRoot: restRoot,
       appUri: function(str) {
         return buildUri(appRoot(), str);;
@@ -23,4 +26,9 @@ angular
         return buildUri(restRoot(), str);
       }
     };
-  });
+  };
+
+  module
+    .factory("Uri", Service);
+  
+})();

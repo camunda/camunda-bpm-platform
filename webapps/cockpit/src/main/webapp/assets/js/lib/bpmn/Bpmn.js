@@ -35,15 +35,22 @@ define(["bpmn/Transformer", "bpmn/Renderer", "dojo/request", "dojo/Deferred", "d
   },
 
   Bpmn.prototype.zoom = function (factor) {
+    var transform = this.definitionRenderer.gfxGroup.getTransform();
+    
+    var oldFactor = 1;
+    if (!!transform) {
+      oldFactor = transform.xx;
+    }
+    
     this.definitionRenderer.gfxGroup.setTransform({xx:factor, yy:factor});
     var currentDimension = this.definitionRenderer.getSurface().getDimensions();
-    this.definitionRenderer.getSurface().setDimensions(+currentDimension.width*factor, +currentDimension.height*factor);
+    this.definitionRenderer.getSurface().setDimensions(+currentDimension.width/oldFactor * factor, +currentDimension.height/oldFactor * factor);
 
     array.forEach(query(".bpmnElement"), function(element) {
-      element.style.left = element.style.left.split("px")[0] * factor + "px";
-      element.style.top = element.style.top.split("px")[0] * factor + "px";
-      element.style.width = element.style.width.split("px")[0] * factor + "px";
-      element.style.height = element.style.height.split("px")[0] * factor + "px";
+      element.style.left = element.style.left.split("px")[0]/oldFactor * factor + "px";
+      element.style.top = element.style.top.split("px")[0]/oldFactor * factor + "px";
+      element.style.width = element.style.width.split("px")[0]/oldFactor * factor + "px";
+      element.style.height = element.style.height.split("px")[0]/oldFactor * factor + "px";
     });
 
     return this;

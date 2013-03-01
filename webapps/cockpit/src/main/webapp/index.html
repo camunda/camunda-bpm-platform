@@ -1,55 +1,13 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE HTML>
+<html>
   <head>
-    <title>camunda BPM - cockpit</title>
+    <title>camunda fox cycle</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="refresh" content="0;URL='app/index.html'">
     
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- 
-    <meta name="description" content="" />
-    -->
-    <meta name="author" content="camunda services GmbH" />
-
-    <!-- settings the base path for relative links -->
-    <base href="." app-base="/cockpit/" rest-base="/camunda-engine-rest/" />
-
-    <!-- Styles -->
-    <!-- <link href="assets/css/loader.css" rel="stylesheet" /> -->
-    <link href="assets/css/loader.css" rel="stylesheet" />
-    
-    <!-- For IE6-8 support of HTML5 elements -->
-    <!--[if lt IE 9]>
-      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-    
-    <!-- Favicon -->
-    <link rel="shortcut icon" type="image/x-icon" href="assets/img/favicon.ico" />
+    <link rel="shortcut icon" href="assets/img/favicon.ico" />
   </head>
-  <body ng-controller="DefaultController">
-
-    <div class="wrapper">
-      <!-- Header -->
-      <div ng-include="'app/common/header.html'"></div>
-
-      <div class="container-fluid content-container content-inset">
-        <div error-panel></div>
-        <div class="row-fluid content-container">
-          <!-- actual view body is rendered here whenever the url changes -->
-          <div ng-view class="span12">
-          </div>
-        </div>
-      </div>
-      <div class="push-down"><!-- // --></div>
-    </div>
-
-    <!-- footer -->
-    <footer class="content-container">
-      <div class="container-fluid">
-        <p><a href="http://camunda.org">powered by camunda BPM</a> / version ${project.version}</p>
-      </div>
-      
-      <script src="assets/js/loader.js"></script>
-      
-    </footer>
+  <body>
+    
   </body>
 </html>
