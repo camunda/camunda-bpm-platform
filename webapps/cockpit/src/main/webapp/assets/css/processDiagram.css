@@ -20,16 +20,12 @@ div#processDiagram {
 
 .currentActivityCount {
   position: absolute;
-  top: 85%;
-
+  top: 100%;
   padding: 8px;
-
   border-radius: 5px;
-
   font-size: 24px;
   font-weight: bold;
   color: #ffffff;
-
   background-color: #4169e1;
 }
 
@@ -40,10 +36,9 @@ div#processDiagram {
   }
 }
 
-@media only screen and (min-height: 720px ) and (max-height: 978) {
+@media only screen and (min-height: 839px ) and (max-height: 978) {
   
   div#processDiagram {
     height: 200px;
   }
 } 
-

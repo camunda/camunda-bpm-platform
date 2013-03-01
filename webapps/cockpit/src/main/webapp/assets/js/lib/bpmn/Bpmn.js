@@ -51,6 +51,12 @@ define(["bpmn/Transformer", "bpmn/Renderer", "dojo/request", "dojo/Deferred", "d
       element.style.top = element.style.top.split("px")[0]/oldFactor * factor + "px";
       element.style.width = element.style.width.split("px")[0]/oldFactor * factor + "px";
       element.style.height = element.style.height.split("px")[0]/oldFactor * factor + "px";
+      
+      if (!!element.innerHTML) {
+        var inner = element.innerHtml;
+        var innerElement = $(inner);
+      }
+      
     });
 
     return this;
@@ -64,7 +70,9 @@ define(["bpmn/Transformer", "bpmn/Renderer", "dojo/request", "dojo/Deferred", "d
 
     element.innerHTML = innerHTML;
 
-    domClass.add(element, classesArray.join(" "));
+    if (!!classesArray) {
+      domClass.add(element, classesArray.join(" "));
+    }
 
     return this;
   };

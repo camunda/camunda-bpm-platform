@@ -11,7 +11,7 @@ define([ "angular", "jquery", "bpmn/Bpmn", "dojo/domReady!", "bootstrap-slider/b
         if (!!scope.processDefinitionId) {
           var containerElement = 'processDiagram';
           var bpmnRenderer;
-          var currentActivityCssClass = 'currentActivity';
+//          var currentActivityCssClass = 'currentActivity';
           var currentActivityCountCssClass = 'currentActivityCount';
 
           var setupZoomSlider = function() {
@@ -22,7 +22,7 @@ define([ "angular", "jquery", "bpmn/Bpmn", "dojo/domReady!", "bootstrap-slider/b
             }).on('slide', function(event) {
                 scope.$apply(function() {
                   scope.zoomLevel = event.value;
-                })
+                });
               });
           }();
 
@@ -35,7 +35,7 @@ define([ "angular", "jquery", "bpmn/Bpmn", "dojo/domReady!", "bootstrap-slider/b
             });
 
             return activityStatisticsResult;
-          }
+          };
 
           var convertActivityStatisticNumber = function(activityStatistic) {
             var instances = activityStatistic.instances;
@@ -73,7 +73,7 @@ define([ "angular", "jquery", "bpmn/Bpmn", "dojo/domReady!", "bootstrap-slider/b
 
           var renderActivityStatistics = function(activityStatistics, renderer) {
             angular.forEach(activityStatistics, function (currentActivity) {
-              renderer.annotate(currentActivity.id, '<p class="' + currentActivityCountCssClass + '">' + currentActivity.instances + '</p>', ["' + currentActivityCssClass + '"]);
+              renderer.annotate(currentActivity.id, '<p class="' + currentActivityCountCssClass + '">' + currentActivity.instances + '</p>');
             });
           };
 
@@ -89,7 +89,7 @@ define([ "angular", "jquery", "bpmn/Bpmn", "dojo/domReady!", "bootstrap-slider/b
             updateZoomLevel(newValue, bpmnRenderer);
           });
 
-          scope.$watch(function() { return scope.processDefinition }, function(processDefinition) {
+          scope.$watch(function() { return scope.processDefinition; }, function(processDefinition) {
             if (processDefinition && processDefinition.$resolved) {
 
               ProcessDefinitionDiagramService.getBpmn20Xml(scope.processDefinitionId).then(
