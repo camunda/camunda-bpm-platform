@@ -8,8 +8,8 @@
 
   <resultMap id="processDefinitionStatisticsResultMap" type="org.activiti.engine.impl.persistence.entity.ProcessDefinitionStatisticsEntity">
     <id property="id" column="ID_" jdbcType="VARCHAR" />
-    <result property="instances" column="instance_count" jdbcType="INTEGER" />
-    <result property="failedJobs" column="failed_jobs_count" jdbcType="INTEGER" />
+    <result property="instances" column="INSTANCE_COUNT" jdbcType="INTEGER" />
+    <result property="failedJobs" column="FAILED_JOBS_COUNT" jdbcType="INTEGER" />
     <result property="revision" column="REV_" />
     <result property="category" column="CATEGORY_" />
     <result property="name" column="NAME_" />
@@ -24,8 +24,8 @@
   
   <resultMap id="activityStatisticsResultMap" type="org.activiti.engine.impl.persistence.entity.ActivityStatisticsImpl">
     <id property="id" column="ID_" jdbcType="VARCHAR" />
-    <result property="instances" column="instance_count" jdbcType="INTEGER" />
-    <result property="failedJobs" column="failed_jobs_count" jdbcType="INTEGER" />
+    <result property="instances" column="INSTANCE_COUNT" jdbcType="INTEGER" />
+    <result property="failedJobs" column="FAILED_JOBS_COUNT" jdbcType="INTEGER" />
   </resultMap>
   
   <!-- SELECT -->  
@@ -45,32 +45,32 @@
   </select>
   
   <sql id="selectProcessDefinitionStatisticsByQueryCriteriaSql">
-    from ${prefix}ACT_RE_PROCDEF procdef, 
-    ( select instance.PROC_DEF_ID_ as ID_,
-      instance_count
+    from ${prefix}ACT_RE_PROCDEF PROCDEF, 
+    ( select INSTANCE.PROC_DEF_ID_ as ID_,
+      INSTANCE_COUNT
       <if test="failedJobsToInclude">
       ,
-      failed_jobs_count
+      FAILED_JOBS_COUNT
       </if>
       
     from
-    (select PROC_DEF_ID_, count(PROC_INST_ID_) as instance_count 
+    (select PROC_DEF_ID_, count(PROC_INST_ID_) as INSTANCE_COUNT 
     from ${prefix}ACT_RU_EXECUTION
     where ID_ = PROC_INST_ID_
-    group by proc_def_id_) instance
+    group by PROC_DEF_ID_) INSTANCE
     
     <if test="failedJobsToInclude">
     left outer join
     
-    (select PROC_DEF_ID_, count(id_) as failed_jobs_count from 
-      ( select job.id_, PROC_DEF_ID_ from ${prefix}ACT_RU_EXECUTION as execution
-      left outer join ${prefix}ACT_RU_JOB as job on execution.id_ = job.execution_id_ where job.RETRIES_ = 0) job
-    group by job.proc_def_id_) job
+    (select PROC_DEF_ID_, count(id_) as FAILED_JOBS_COUNT from 
+      ( select JOB.ID_, PROC_DEF_ID_ from ${prefix}ACT_RU_EXECUTION as EXECUTION
+      left outer join ${prefix}ACT_RU_JOB as JOB on EXECUTION.ID_ = JOB.EXECUTION_ID_ where JOB.RETRIES_ = 0) JOB
+    group by JOB.PROC_DEF_ID_) JOB
     
-    on job.PROC_DEF_ID_ = instance.PROC_DEF_ID_ 
+    on JOB.PROC_DEF_ID_ = INSTANCE.PROC_DEF_ID_ 
     </if>
-    ) res
-    where procdef.ID_ = res.ID_
+    ) RES
+    where PROCDEF.ID_ = RES.ID_
   </sql>
  
 
@@ -91,31 +91,31 @@
   </select>
    
   <sql id="selectActivityStatisticsByQueryCriteriaSql">
-	  from ( select instance.act_id_ as ID_,
-	      instance_count
+	  from ( select INSTANCE.ACT_ID_ as ID_,
+	      INSTANCE_COUNT
 	      <if test="failedJobsToInclude">
 	      ,
-	      failed_jobs_count
+	      FAILED_JOBS_COUNT
 	      </if>
 	      
 	    from
-	    (select act_id_, count(PROC_INST_ID_) as instance_count 
+	    (select ACT_ID_, count(PROC_INST_ID_) as INSTANCE_COUNT 
 	    from ${prefix}ACT_RU_EXECUTION
-	    where proc_def_id_ = #{processDefinitionId} and is_active_ = true
-	    group by act_id_) instance
+	    where PROC_DEF_ID_ = #{processDefinitionId} and IS_ACTIVE_ = true
+	    group by ACT_ID_) INSTANCE
 	    
 	    <if test="failedJobsToInclude">
 	    left outer join
 	    
-	    (select act_id_, count(id_) as failed_jobs_count from 
-	      ( select job.id_, act_id_ from ${prefix}ACT_RU_EXECUTION as execution
-	      left outer join ${prefix}ACT_RU_JOB as job on execution.id_ = job.execution_id_ where job.RETRIES_ = 0
-	      and proc_def_id_ = #{processDefinitionId}
-	      ) job
-	    group by job.act_id_) job
+	    (select ACT_ID_, count(ID_) as FAILED_JOBS_COUNT from 
+	      ( select JOB.ID_, ACT_ID_ from ${prefix}ACT_RU_EXECUTION as EXECUTION
+	      left outer join ${prefix}ACT_RU_JOB as JOB on EXECUTION.ID_ = JOB.EXECUTION_ID_ where JOB.RETRIES_ = 0
+	      and PROC_DEF_ID_ = #{processDefinitionId}
+	      ) JOB
+	    group by JOB.ACT_ID_) JOB
 	    
-	    on job.act_id_ = instance.act_id_
+	    on JOB.ACT_ID_ = INSTANCE.ACT_ID_
 	    </if>
-	    ) res
+	    ) RES
   </sql>
 </mapper>
