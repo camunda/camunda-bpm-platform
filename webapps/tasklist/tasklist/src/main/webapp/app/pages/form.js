@@ -7,7 +7,21 @@ define(["angular"], function(angular) {
   var Controller = function($rootScope, $scope, $location, $routeParams, EngineApi) {
     $scope.variables = [];
 
-    $scope.task = EngineApi.getTaskList().get({ id: $routeParams.id });
+    EngineApi.getTaskList().get({ id: $routeParams.id }).$then(function (result) {
+      $scope.task = result.data;
+
+      EngineApi.getProcessInstance().variables({id : $scope.task.processInstanceId}).$then(function (result) {
+        var variables = result.data.variables;
+
+        for (var index in variables) {
+          var variable = variables[index];
+          $scope.variables.push({key:variable.name, value : variable.value, type: variable});
+        }
+
+        console.log(variables);
+      });
+
+    });
 
     $scope.submitForm = function() {
       var variablesObject = {};

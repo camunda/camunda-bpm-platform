@@ -31,6 +31,11 @@ define(["angular"], function(angular) {
       };
 
       this.groups = $resource(Uri.build(baseUri, "task/groups"));
+
+      this.processInstance = $resource(Uri.build(baseUri, "process-instance/:id/:operation"), { id: "@id" } , {
+        variables : { method: 'GET', params : { operation: "variables" }}
+      });
+
     };
 
     EngineApi.prototype.getProcessDefinitions = function() {
@@ -47,6 +52,10 @@ define(["angular"], function(angular) {
 
     EngineApi.prototype.getGroups = function(userId) {
       return this.groups.get({ userId: userId });
+    };
+
+    EngineApi.prototype.getProcessInstance = function() {
+      return this.processInstance;
     };
 
     return new EngineApi();
