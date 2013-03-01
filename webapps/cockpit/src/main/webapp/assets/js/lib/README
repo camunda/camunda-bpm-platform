@@ -1,0 +1,2 @@
+The dojo folder currently includes the unminified version of the required files from the dojo toolkit.
+For canvas support, the most recent version should be taken, currently this is version 1.8.3.

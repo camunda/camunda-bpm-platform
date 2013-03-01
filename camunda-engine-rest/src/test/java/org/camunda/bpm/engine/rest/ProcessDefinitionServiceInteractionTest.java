@@ -9,6 +9,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -17,16 +18,24 @@ import javax.ws.rs.core.Response.Status;
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
+import org.activiti.engine.impl.util.ReflectUtil;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.runtime.ProcessInstance;
+import org.apache.http.entity.ContentType;
 import org.camunda.bpm.engine.rest.helper.EqualsMap;
 import org.camunda.bpm.engine.rest.helper.MockDefinitionBuilder;
+import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Matchers;
+
+import com.jayway.restassured.response.Response;
 
 public class ProcessDefinitionServiceInteractionTest extends
     AbstractRestServiceTest {
 
+  private static final String APPLICATION_BPMN20_XML_TYPE = 
+      ContentType.create(ProcessDefinitionService.APPLICATION_BPMN20_XML, "UTF-8").toString();
+  
   private static final String EXAMPLE_PROCESS_DEFINITION_ID = "aProcessDefinitionId";
   private static final String EXAMPLE_CATEGORY = "aCategory";
   private static final String EXAMPLE_DEFINITION_NAME = "aName";
@@ -43,6 +52,7 @@ public class ProcessDefinitionServiceInteractionTest extends
   
   private static final String SINGLE_PROCESS_DEFINITION_URL = TEST_RESOURCE_ROOT_PATH + "/process-definition/{id}";
   private static final String START_PROCESS_INSTANCE_URL = SINGLE_PROCESS_DEFINITION_URL + "/start";
+  private static final String XML_DEFINITION_URL = SINGLE_PROCESS_DEFINITION_URL + "/xml";
   
   private RuntimeService runtimeServiceMock;
   private RepositoryService repositoryServiceMock;
@@ -60,6 +70,7 @@ public class ProcessDefinitionServiceInteractionTest extends
     repositoryServiceMock = mock(RepositoryService.class);
     when(processEngine.getRepositoryService()).thenReturn(repositoryServiceMock);
     when(repositoryServiceMock.getProcessDefinition(eq(EXAMPLE_PROCESS_DEFINITION_ID))).thenReturn(mockDefinition);
+    when(repositoryServiceMock.getProcessModel(eq(EXAMPLE_PROCESS_DEFINITION_ID))).thenReturn(createMockProcessDefinionBpmn20Xml());
   }
   
   private ProcessInstance createMockInstance() {
@@ -79,6 +90,14 @@ public class ProcessDefinitionServiceInteractionTest extends
           .deploymentId(EXAMPLE_DEPLOYMENT_ID).diagram(EXAMPLE_DIAGRAM_RESOURCE_NAME)
           .suspended(EXAMPLE_IS_SUSPENDED).build();
     return definition;
+  }
+  
+  private InputStream createMockProcessDefinionBpmn20Xml() {
+    // do not close the input stream, will be done in implementation
+    InputStream bpmn20XmlIn = null;
+    bpmn20XmlIn = ReflectUtil.getResourceAsStream("processes/fox-invoice_en_long_id.bpmn");
+    Assert.assertNotNull(bpmn20XmlIn);
+    return bpmn20XmlIn;
   }
   
   @Test
@@ -186,6 +205,39 @@ public class ProcessDefinitionServiceInteractionTest extends
     .then().expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode())
     .when().get(SINGLE_PROCESS_DEFINITION_URL);
+  }
+  
+  @Test
+  public void testProcessDefinitionBpmn20XmlRetrieval() throws IOException {
+    setupMocks();
+    
+    // Rest-assured has problems with extracting json with escaped quotation marks, i.e. the xml content in our case
+    
+    Response response = given().pathParam("id", EXAMPLE_PROCESS_DEFINITION_ID)
+    .then()
+      .expect()
+      .statusCode(Status.OK.getStatusCode())
+//      .body("id", equalTo(EXAMPLE_PROCESS_DEFINITION_ID))
+//      .body("bpmn20Xml", startsWith("<?xml"))
+    .when().get(XML_DEFINITION_URL);
+
+    String responseContent = response.asString();
+    Assert.assertTrue(responseContent.contains(EXAMPLE_PROCESS_DEFINITION_ID));
+    Assert.assertTrue(responseContent.contains("<?xml"));
+  }
+  
+  @Test
+  public void testNonExistingProcessDefinitionBpmn20XmlRetrieval() throws IOException {
+    setupMocks();
+    
+    String nonExistingId = "aNonExistingDefinitionId";
+    when(repositoryServiceMock.getProcessModel(eq(nonExistingId))).thenThrow(new ActivitiException("no matching process definition found."));
+    
+    given().pathParam("id", nonExistingId)
+      .header("Content-Type", APPLICATION_BPMN20_XML_TYPE)
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+    .when().get(XML_DEFINITION_URL);
   }
   
 }
