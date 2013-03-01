@@ -105,11 +105,11 @@ define([ "angular", "jquery", "bpmn/Bpmn", "dojo/domReady!", "bootstrap-slider/b
                   var processId = '#' + processDefinition.key;
                   // scroll to selected process if it is a collaboration
 
-                  console.log("scrolling to point (" + $(processId).offset().top + "," + $(processId).offset().left + ")" );
+                  console.log("scrolling to point (" + $(processId).position().top + "," + $(processId).position().left + ")" );
 
                   $('#' + containerElement).animate({
-                    scrollTop: $(processId).offset().top,
-                    scrollLeft: $(processId).offset().left
+                    scrollTop: $(processId).position().top,
+                    scrollLeft: $(processId).position().left
                   }, 500);
 
                   ProcessDefinitionActivityStatisticsResource.queryStatistics({ id : scope.processDefinitionId }).$then(function(result) {
