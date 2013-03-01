@@ -332,7 +332,7 @@
       <id>database</id>
       
       <properties>
-        <db.properties.file>${user.home}/.camunda/jdbc/</db.properties.file>
+        <db.properties.file>${user.home}/.camunda/jdbc/engine.${database}.properties</db.properties.file>
       </properties>
       
       <activation>
@@ -360,7 +360,7 @@
                   <tasks>
                     <echo message="updating activiti configuration to db ${database}" />
                     <copy file="${basedir}/src/test/resources/activiti.cfg.db.xml" tofile="target/test-classes/activiti.cfg.xml" overwrite="true">
-                      <filterset filtersfile="${db.properties.file}/engine.${database}.properties" />
+                      <filterset filtersfile="${db.properties.file}" />
                     </copy>
                   </tasks>
                 </configuration>
