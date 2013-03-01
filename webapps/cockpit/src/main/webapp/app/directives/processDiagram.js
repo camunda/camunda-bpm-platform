@@ -21,7 +21,7 @@ define([ "angular", "jquery", "bpmn/Bpmn", "dojo/domReady!", "bootstrap-slider/b
               value: 1
             }).on('slide', function(event) {
                 scope.$apply(function() {
-                  scope.zoomLevel = event.value;
+                  scope.zoomLevel = Math.round(event.value * 10) / 10;
                 });
               });
           }();
@@ -79,6 +79,7 @@ define([ "angular", "jquery", "bpmn/Bpmn", "dojo/domReady!", "bootstrap-slider/b
 
           var updateZoomLevel = function(zoomLevel, renderer) {
             if (zoomLevel && renderer) {
+              console.log("ZoomLevel: " + zoomLevel);
               Debouncer.debounce(function() {
                 renderer.zoom(parseFloat(zoomLevel));
               }, 1000)();
