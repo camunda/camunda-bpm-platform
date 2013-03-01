@@ -40,7 +40,7 @@
   <select id ="selectProcessDefinitionStatistics" resultMap="processDefinitionStatisticsResultMap" 
     parameterType="org.activiti.engine.impl.ProcessDefinitionStatisticsQueryImpl">
     ${limitBefore}
-    select * ${limitBetween}
+    select RES.* ${limitBetween}
     <include refid="selectProcessDefinitionStatisticsByQueryCriteriaSql"/>
     ${orderBy}
     ${limitAfter}
@@ -48,7 +48,7 @@
   
   <select id ="selectProcessDefinitionStatisticsCount" resultType="long" 
     parameterType="org.activiti.engine.impl.ProcessDefinitionStatisticsQueryImpl">
-    select count(*) 
+    select count(RES.*) 
     <include refid="selectProcessDefinitionStatisticsByQueryCriteriaSql"/>
   </select>
   
@@ -96,7 +96,7 @@
   <select id ="selectDeploymentStatistics" resultMap="deploymentStatisticsResultMap" 
     parameterType="org.activiti.engine.impl.DeploymentStatisticsQueryImpl">
     ${limitBefore}
-    select * ${limitBetween}
+    select RES.* ${limitBetween}
     <include refid="selectDeploymentStatisticsByQueryCriteriaSql"/>
     ${orderBy}
     ${limitAfter}
@@ -104,7 +104,7 @@
   
   <select id ="selectDeploymentStatisticsCount" resultType="long" 
     parameterType="org.activiti.engine.impl.DeploymentStatisticsQueryImpl">
-    select count(*) 
+    select count(RES.*) 
     <include refid="selectDeploymentStatisticsByQueryCriteriaSql"/>
   </select>
   
@@ -159,7 +159,7 @@
   <select id ="selectActivityStatistics" resultMap="activityStatisticsResultMap" 
     parameterType="org.activiti.engine.impl.ActivityStatisticsQueryImpl">
     ${limitBefore}
-    select * ${limitBetween}
+    select RES.* ${limitBetween}
     <include refid="selectActivityStatisticsByQueryCriteriaSql"/>
     ${orderBy}
     ${limitAfter}
@@ -167,7 +167,7 @@
   
   <select id ="selectActivityStatisticsCount" resultType="long" 
     parameterType="org.activiti.engine.impl.ActivityStatisticsQueryImpl">
-    select count(*)
+    select count(RES.*)
     <include refid="selectActivityStatisticsByQueryCriteriaSql"/>
   </select>
    

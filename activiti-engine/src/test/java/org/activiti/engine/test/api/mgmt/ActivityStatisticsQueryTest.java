@@ -225,4 +225,22 @@ public class ActivityStatisticsQueryTest extends PluggableActivitiTestCase {
       Assert.assertEquals(1, result.getInstances());
     }
   }
+  
+  @Test
+  @Deployment(resources = "org/activiti/engine/test/api/mgmt/StatisticsTest.testStatisticsQuery.bpmn20.xml")
+  public void failing_testActivityStatisticsQueryWithNoInstances() {
+    
+    ProcessDefinition definition = 
+        repositoryService.createProcessDefinitionQuery().processDefinitionKey("ExampleProcess").singleResult();
+    
+    List<ActivityStatistics> statistics = 
+        managementService.createActivityStatisticsQuery(definition.getId()).list();
+    
+    Assert.assertEquals(1, statistics.size());
+    ActivityStatistics result = statistics.get(0);
+    Assert.assertEquals("theTask", result.getId());
+    Assert.assertEquals(0, result.getInstances());
+    Assert.assertEquals(0, result.getFailedJobs());
+    
+  }
 }
