@@ -51,6 +51,19 @@ public class ProcessDefinitionStatisticsQueryTest extends PluggableActivitiTestC
   
   @Test
   @Deployment(resources = "org/activiti/engine/test/api/mgmt/StatisticsTest.testStatisticsQueryWithFailedJobs.bpmn20.xml")
+  public void testProcessDefinitionStatisticsQueryWithoutRunningInstances() {
+    List<ProcessDefinitionStatistics> statistics = 
+        managementService.createProcessDefinitionStatisticsQuery().includeFailedJobs().list();
+    
+    Assert.assertEquals(1, statistics.size());
+    
+    ProcessDefinitionStatistics definitionResult = statistics.get(0);
+    Assert.assertEquals(0, definitionResult.getInstances());
+    Assert.assertEquals(0, definitionResult.getFailedJobs());
+  }
+  
+  @Test
+  @Deployment(resources = "org/activiti/engine/test/api/mgmt/StatisticsTest.testStatisticsQueryWithFailedJobs.bpmn20.xml")
   public void testProcessDefinitionStatisticsQueryCount() {
     runtimeService.startProcessInstanceByKey("ExampleProcess");
     
@@ -65,7 +78,7 @@ public class ProcessDefinitionStatisticsQueryTest extends PluggableActivitiTestC
   @Test
   @Deployment(resources = "org/activiti/engine/test/api/mgmt/StatisticsTest.testMultiInstanceStatisticsQuery.bpmn20.xml")
   public void testMultiInstanceProcessDefinitionStatisticsQuery() {
-    runtimeService.startProcessInstanceByKey("ExampleProcess");
+    runtimeService.startProcessInstanceByKey("MIExampleProcess");
     List<ProcessDefinitionStatistics> statistics = 
         managementService.createProcessDefinitionStatisticsQuery().list();
     
@@ -164,4 +177,6 @@ public class ProcessDefinitionStatisticsQueryTest extends PluggableActivitiTestC
     
     repositoryService.deleteDeployment(deployment.getId(), true);
   }
+  
+  // TODO test for results, if no instances are running for a process definition
 }

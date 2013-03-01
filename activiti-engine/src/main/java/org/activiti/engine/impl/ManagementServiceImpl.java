@@ -29,6 +29,7 @@ import org.activiti.engine.impl.db.DbSqlSessionFactory;
 import org.activiti.engine.impl.interceptor.Command;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.management.ActivityStatisticsQuery;
+import org.activiti.engine.management.DeploymentStatisticsQuery;
 import org.activiti.engine.management.ProcessDefinitionStatisticsQuery;
 import org.activiti.engine.management.TableMetaData;
 import org.activiti.engine.management.TablePageQuery;
@@ -98,8 +99,12 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
     return new ProcessDefinitionStatisticsQueryImpl(commandExecutor);
   }
   
-  public ActivityStatisticsQuery createActivityRuntimeStatisticsQuery(String processDefinitionId) {
+  public ActivityStatisticsQuery createActivityStatisticsQuery(String processDefinitionId) {
     return new ActivityStatisticsQueryImpl(processDefinitionId, commandExecutor);
+  }
+  
+  public DeploymentStatisticsQuery createDeploymentStatisticsQuery() {
+    return new DeploymentStatisticsQueryImpl(commandExecutor);
   }
 
 }
