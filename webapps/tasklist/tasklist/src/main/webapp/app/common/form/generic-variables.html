@@ -1,0 +1,41 @@
+<table class="table" style="max-width: 600px">
+  <thead>
+    <tr>
+      <th>key</th>
+      <th>value</th>
+      <th style="max-width: 50px; text-align: right">
+        <button class="btn btn-mini" data-ng-click="addVariable()"><i class="icon-plus"></i></button>
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr data-ng-repeat="variable in variables">
+      <td>
+        <input data-ng-model="variable.key" type="text" placeholder="key" />
+      </td>
+      <td>
+        <div class="input-prepend">
+          <div class="btn-group">
+            <button class="btn dropdown-toggle" data-toggle="dropdown">
+              {{ variable.type }}
+              <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu">
+              <li><a href ng-click="setType(variable, 'number')">number</a></li>
+              <li><a href ng-click="setType(variable, 'date')">date</a></li>
+              <li><a href ng-click="setType(variable, 'boolean')">boolean</a></li>
+              <li><a href ng-click="setType(variable, 'string')">string</a></li>
+            </ul>
+          </div>
+          <input data-ng-model="variable.value" type="text" placeholder="value" />
+        </div>
+      </td>
+      <td style="text-align: right; vertical-align: middle">
+        <button class="btn btn-mini" data-ng-click="removeVariable($index)"><i class="icon-trash"></i></button>
+      </td>
+    </tr>
+    <tr data-ng-show="!variables.length">
+      <td colspan="3">No variables defined</td>
+    </tr>
+  </tbody>
+</table>

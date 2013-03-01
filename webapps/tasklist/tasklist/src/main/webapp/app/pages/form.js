@@ -22,6 +22,10 @@ define(["angular"], function(angular) {
       });
     };
 
+    $scope.setType = function(variable, type) {
+      variable.type = type;
+    };
+    
     $scope.addVariable = function() {
       $scope.variables.push({ key : "key", value: "value" });
     };
