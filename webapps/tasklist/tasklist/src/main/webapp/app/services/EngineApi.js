@@ -12,6 +12,8 @@ define(["angular"], function(angular) {
 
       this.taskList = $resource(Uri.build(baseUri, "task/:id/:operation"), { id: "@id" } , {
         claim : { method: 'POST', params : { operation: "claim" }},
+        unclaim : { method: 'POST', params : { operation: "unclaim" }},
+        delegate : { method: 'POST', params : { operation: "delegate" }},
         complete : { method: 'POST', params : { operation: "complete" }}
       });
 

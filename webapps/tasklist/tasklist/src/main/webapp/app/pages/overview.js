@@ -8,6 +8,8 @@ define(["angular"], function(angular) {
 
     $scope.taskList = {};
 
+    $scope.groupInfo = EngineApi.getGroups(Authentication.current());
+
     $scope.loadTasks = function(filter, search) {
       if (!Authentication.current()) {
         return;
@@ -49,16 +51,34 @@ define(["angular"], function(angular) {
         var view = $scope.taskList.view;
 
         if (view.filter == "mytasks") {
-          tasks.push(task);
+          $scope.addTask(task);
         } else {
-          var idx = tasks.indexOf(task);
-          if (idx != -1) {
-            tasks.splice(idx, 1);
-          }
+          $scope.removeTask(task);
         }
 
         $rootScope.$broadcast("tasklist.reload");
       });
+    };
+
+
+    $scope.unclaimTask = function(task) {
+      EngineApi.getTaskList().unclaim( { id : task.id}, { userId: Authentication.current() }).$then(function () {
+        $scope.removeTask(task);
+        $rootScope.$broadcast("tasklist.reload");
+      });
+    };
+
+    $scope.addTask = function (task) {
+      $scope.taskList.tasks.push(task);
+    };
+
+    $scope.removeTask = function (task) {
+      var tasks = $scope.taskList.tasks;
+
+      var idx = tasks.indexOf(task);
+      if (idx != -1) {
+        tasks.splice(idx, 1);
+      }
     };
 
     $scope.claimTasks = function (selection) {
@@ -68,7 +88,11 @@ define(["angular"], function(angular) {
       }
     };
 
-    $scope.delegateTask = function(task) {
+    $scope.delegateTask = function(task, user) {
+      EngineApi.getTaskList().delegate( { id : task.id}, { userId: user.id}).$then(function () {
+        $scope.removeTask(task);
+        $rootScope.$broadcast("tasklist.reload");
+      });
     };
 
     $scope.isSelected = function(task) {

@@ -56,9 +56,19 @@ public interface TaskRestService {
   void claim(@PathParam("id") String taskId, UserIdDto dto);
 
   @POST
+  @Path("/{id}/unclaim")
+  @Consumes(MediaType.APPLICATION_JSON)
+  void unclaim(@PathParam("id") String taskId, UserIdDto dto);
+
+  @POST
   @Path("/{id}/complete")
   @Consumes(MediaType.APPLICATION_JSON)
   void complete(@PathParam("id") String taskId, CompleteTaskDto dto);
+
+  @POST
+  @Path("/{id}/delegate")
+  @Consumes(MediaType.APPLICATION_JSON)
+  void delegate(@PathParam("id") String taskId, UserIdDto delegatedUser);
 
   @GET
   @Path("/groups")

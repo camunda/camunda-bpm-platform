@@ -2,6 +2,7 @@ package org.camunda.bpm.engine.rest.impl;
 
 import java.util.*;
 
+import javax.ws.rs.PathParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response.Status;
 
@@ -76,6 +77,11 @@ public class TaskRestServiceImpl extends AbstractEngineService implements TaskRe
   }
 
   @Override
+  public void unclaim(@PathParam("id") String taskId, UserIdDto dto) {
+    processEngine.getTaskService().setAssignee(taskId, null);
+  }
+
+  @Override
   public void complete(String taskId, CompleteTaskDto dto) {
     TaskService taskService = processEngine.getTaskService();
 
@@ -84,6 +90,11 @@ public class TaskRestServiceImpl extends AbstractEngineService implements TaskRe
     } catch (ActivitiException e) {
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     }
+  }
+
+  @Override
+  public void delegate(@PathParam("id") String taskId, UserIdDto delegatedUser) {
+    processEngine.getTaskService().delegateTask(taskId, delegatedUser.getUserId());
   }
 
   @Override
@@ -104,7 +115,7 @@ public class TaskRestServiceImpl extends AbstractEngineService implements TaskRe
       groupCounts.put(group.getId(), groupTaskCount);
       List<User> groupUsers = identityService.createUserQuery().memberOfGroup(group.getId()).list();
       for (User user: groupUsers) {
-        if (user.getId() != userId) {
+        if (!user.getId().equals(userId)) {
           allGroupUsers.add(new UserDto(user.getId(), user.getFirstName(), user.getLastName()));
         }
       }
@@ -141,14 +152,6 @@ public class TaskRestServiceImpl extends AbstractEngineService implements TaskRe
   public TaskDto getTask(String id) {
     TaskService taskService = processEngine.getTaskService();
     
-    Task task = taskService.createTaskQuery().taskId(id).singleResult();
-    return TaskDto.fromTask(task);
-  }
-
-  @Override
-  public TaskDto getTask(String id) {
-    TaskService taskService = processEngine.getTaskService().set
-
     Task task = taskService.createTaskQuery().taskId(id).singleResult();
     return TaskDto.fromTask(task);
   }
