@@ -8,13 +8,12 @@ define(["angular"], function(angular) {
 
     $scope.taskList = {};
 
-    $scope.loadTasks = function (filter, search) {
+    $scope.loadTasks = function(filter, search) {
       if (!Authentication.current()) {
         return;
       }
 
-      $scope.currentFilter = filter;
-      $scope.currentSearch = search;
+      $scope.taskList.view = { filter: filter, search: search };
 
       var queryObject = {};
 
@@ -32,23 +31,32 @@ define(["angular"], function(angular) {
           break;
       }
 
-      $scope.taskList.tasks = EngineApi.getTasklist().query(queryObject);
-    }
+      $scope.taskList.tasks = EngineApi.getTaskList().query(queryObject);
+    };
 
     $scope.$watch(function() { return $location.search(); }, function(newValue) {
       $scope.loadTasks(newValue.filter || "mytasks", newValue.search);
     });
 
-    $scope.$on("tasklist.reload", function () {
-      $scope.loadTasks($scope.currentFilter, $scope.currentSearch);
-    });
-
     $scope.startTask = function(task) {
-      $location.path("/form/"+task.id);
+      $location.path("/form/" + task.id);
     };
 
     $scope.claimTask = function(task) {
-      EngineApi.getTasklist().claim( { taskId : task.id}, { userId: Authentication.current() }).$then(function () {
+
+      EngineApi.getTaskList().claim( { id : task.id}, { userId: Authentication.current() }).$then(function () {
+        var tasks = $scope.taskList.tasks;
+        var view = $scope.taskList.view;
+
+        if (view.filter == "mytasks") {
+          tasks.push(task);
+        } else {
+          var idx = tasks.indexOf(task);
+          if (idx != -1) {
+            tasks.splice(idx, 1);
+          }
+        }
+
         $rootScope.$broadcast("tasklist.reload");
       });
     };

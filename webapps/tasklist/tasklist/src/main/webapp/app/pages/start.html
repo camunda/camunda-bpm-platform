@@ -1,0 +1,52 @@
+<div>
+  <h5>Start Process Instance</h5>
+  <h3>{{ processDefinition.name }}</h3>
+
+  <div ng-show="startForm.loaded && !startForm.form && !generic">
+    <p>
+      It looks as if no start form has been defined for the process definition.
+    </p>
+
+    <button class="btn" ng-click="enableGenericForm()">Start using generic form</button>
+  </div>
+  <div ng-show="startForm.loaded && !startForm.form && generic">
+
+    <h5>Variables</h5>
+
+    <p>
+      Use the form below to add variables that will be be passed onto the process instance upon process start.
+    </p>
+
+    <form>
+      <table class="table" style="width: 550px">
+        <thead>
+          <tr>
+            <th>key</th>
+            <th>value</th>
+            <th style="width: 50px; text-align: right">
+              <button class="btn btn-mini" data-ng-click="addVariable()"><i class="icon-plus"></i></button>
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr data-ng-repeat="variable in variables">
+            <td><input data-ng-model="variable.key" type="text" placeholder="key" /></td>
+            <td>
+              <input data-ng-model="variable.value" type="text" placeholder="value" />
+            </td>
+            <td style="text-align: right; vertical-align: middle">
+              <button class="btn btn-mini" data-ng-click="removeVariable($index)"><i class="icon-trash"></i></button>
+            </td>
+          </tr>
+          <tr data-ng-show="!variables.length">
+            <td colspan="3">No variables defined</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <button class="btn btn-primary" data-ng-click="submitForm()">Start Process</button>
+    </form>
+  </div>
+
+  <div ng-include="startForm.form"></div>
+</div>

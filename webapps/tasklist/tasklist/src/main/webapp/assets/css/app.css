@@ -183,6 +183,10 @@ input.ng-invalid-required {
   height: 43px;
 }
 
+.table td input[type="text"] {
+  margin-bottom: 0;
+}
+
 /** navbar button tweeks */
 .navbar .btn-group, .navbar .btn {
   margin-left: 10px;

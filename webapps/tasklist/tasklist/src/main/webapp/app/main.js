@@ -32,6 +32,8 @@ define([ "angularModule" ], function(angularModule) {
         Errors.add({ status: "Request Timeout", message:  "Your request timed out. Try refreshing the page." });
         break;
       case 401:
+        Errors.clear("Unauthorized");
+        
         if (Authentication.current()) {
           Errors.add({ status: "Unauthorized", message:  "Your session has expired. Please login again." });
         } else {
