@@ -23,6 +23,10 @@ public interface TaskRestService {
   List<TaskDto> getTasks(TaskQueryDto query,
       @QueryParam("firstResult") Integer firstResult, @QueryParam("maxResults") Integer maxResults);
 
+  @GET
+  @Path("/{id}")
+  TaskDto getTask(@PathParam("id") String id);
+
   /**
    * Expects the same parameters as {@link TaskRestService#getTasks(TaskQueryDto, Integer, Integer)} (as
    * JSON message body) and allows more than one variable check.
