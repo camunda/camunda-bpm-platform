@@ -36,9 +36,9 @@ div#processDiagram {
   }
 }
 
-@media only screen and (min-height: 839px ) and (max-height: 978) {
+@media only screen and (min-height: 839px ) and (max-height: 978px ) {
   
   div#processDiagram {
-    height: 200px;
+    max-height: 500px;
   }
-} 
+}
