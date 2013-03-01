@@ -19,7 +19,7 @@ import junit.framework.Assert;
 
 import org.activiti.engine.impl.test.PluggableActivitiTestCase;
 import org.activiti.engine.management.DeploymentStatistics;
-import org.activiti.engine.repository.Deployment;
+import org.activiti.engine.test.Deployment;
 import org.junit.Test;
 
 public class DeploymentStatisticsQueryTest extends PluggableActivitiTestCase {
@@ -28,7 +28,7 @@ public class DeploymentStatisticsQueryTest extends PluggableActivitiTestCase {
   public void testDeploymentStatisticsQuery() {
     String deploymentName = "my deployment";
     
-    Deployment deployment = repositoryService.createDeployment()
+    org.activiti.engine.repository.Deployment deployment = repositoryService.createDeployment()
         .addClasspathResource("org/activiti/engine/test/api/mgmt/StatisticsTest.testMultiInstanceStatisticsQuery.bpmn20.xml")
         .addClasspathResource("org/activiti/engine/test/api/mgmt/StatisticsTest.testParallelGatewayStatisticsQuery.bpmn20.xml")
         .name(deploymentName)
@@ -54,7 +54,7 @@ public class DeploymentStatisticsQueryTest extends PluggableActivitiTestCase {
   
   @Test
   public void testDeploymentStatisticsQueryCountAndPaging() {
-    Deployment deployment = repositoryService.createDeployment()
+    org.activiti.engine.repository.Deployment deployment = repositoryService.createDeployment()
         .addClasspathResource("org/activiti/engine/test/api/mgmt/StatisticsTest.testMultiInstanceStatisticsQuery.bpmn20.xml")
         .addClasspathResource("org/activiti/engine/test/api/mgmt/StatisticsTest.testParallelGatewayStatisticsQuery.bpmn20.xml")
         .deploy();
@@ -62,7 +62,7 @@ public class DeploymentStatisticsQueryTest extends PluggableActivitiTestCase {
     runtimeService.startProcessInstanceByKey("MIExampleProcess");
     runtimeService.startProcessInstanceByKey("ParGatewayExampleProcess");
     
-    Deployment anotherDeployment = repositoryService.createDeployment()
+    org.activiti.engine.repository.Deployment anotherDeployment = repositoryService.createDeployment()
         .addClasspathResource("org/activiti/engine/test/api/mgmt/StatisticsTest.testMultiInstanceStatisticsQuery.bpmn20.xml")
         .addClasspathResource("org/activiti/engine/test/api/mgmt/StatisticsTest.testParallelGatewayStatisticsQuery.bpmn20.xml")
         .deploy();
@@ -82,13 +82,25 @@ public class DeploymentStatisticsQueryTest extends PluggableActivitiTestCase {
   }
   
   @Test
+  @Deployment(resources = {"org/activiti/engine/test/api/mgmt/StatisticsTest.testMultiInstanceStatisticsQuery.bpmn20.xml",
+  "org/activiti/engine/test/api/mgmt/StatisticsTest.testStatisticsQueryWithFailedJobs.bpmn20.xml"})
+  public void testDeploymentStatisticsQueryWithFailedJobs() {
+    runtimeService.startProcessInstanceByKey("MIExampleProcess");
+    runtimeService.startProcessInstanceByKey("ExampleProcess");
+    
+    waitForJobExecutorToProcessAllJobs(6000, 500);
+    
+    List<DeploymentStatistics> statistics = 
+        managementService.createDeploymentStatisticsQuery().includeFailedJobs().list();
+    
+    DeploymentStatistics result = statistics.get(0);
+    Assert.assertEquals(1, result.getFailedJobs());
+  }
+  
+  @Test
+  @Deployment(resources = {"org/activiti/engine/test/api/mgmt/StatisticsTest.testMultiInstanceStatisticsQuery.bpmn20.xml",
+      "org/activiti/engine/test/api/mgmt/StatisticsTest.testParallelGatewayStatisticsQuery.bpmn20.xml"})
   public void testDeploymentStatisticsQueryWithoutRunningInstances() {
-    
-    Deployment deployment = repositoryService.createDeployment()
-        .addClasspathResource("org/activiti/engine/test/api/mgmt/StatisticsTest.testMultiInstanceStatisticsQuery.bpmn20.xml")
-        .addClasspathResource("org/activiti/engine/test/api/mgmt/StatisticsTest.testParallelGatewayStatisticsQuery.bpmn20.xml")
-        .deploy();
-    
     List<DeploymentStatistics> statistics = 
         managementService.createDeploymentStatisticsQuery().includeFailedJobs().list();
     
@@ -97,7 +109,5 @@ public class DeploymentStatisticsQueryTest extends PluggableActivitiTestCase {
     DeploymentStatistics result = statistics.get(0);
     Assert.assertEquals(0, result.getInstances());
     Assert.assertEquals(0, result.getFailedJobs());
-    
-    repositoryService.deleteDeployment(deployment.getId(), true);
   }
 }

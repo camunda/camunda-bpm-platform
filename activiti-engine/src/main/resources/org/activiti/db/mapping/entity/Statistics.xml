@@ -144,7 +144,8 @@
         ( select JOB.ID_, PROC_DEF_ID_ 
         from ${prefix}ACT_RU_EXECUTION EXECUTION, ${prefix}ACT_RU_JOB JOB 
         where EXECUTION.ID_ = JOB.EXECUTION_ID_ and JOB.RETRIES_ = 0) JOB
-      where PROCDEF.DEPLOYMENT_ID_ = DEPLOYMENT.ID_
+      where JOB.PROC_DEF_ID_ = PROCDEF.ID_
+      and PROCDEF.DEPLOYMENT_ID_ = DEPLOYMENT.ID_
       group by DEPLOYMENT.ID_) JOB
       on JOB.DEPLOYMENT_ID_ = INSTANCE.DEPLOYMENT_ID_
       </if>
