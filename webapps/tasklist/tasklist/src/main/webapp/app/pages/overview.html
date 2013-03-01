@@ -6,7 +6,7 @@
       <th>Process</th>
       <th>Created</th>
       <th>Due</th>
-      <th width="200">Actions</th>
+      <th style="width: 120px">Actions</th>
     </tr>
   </thead>
   <tbody>
@@ -20,8 +20,8 @@
     <tr ng-repeat="task in taskList.tasks" ng-class="{ selected: isSelected(task) }" select="task">
       <td>{{ task.name }}</td>
       <td>{{ task.processDefinitionId }}</td>
-      <td>{{ task.created }}</td>
-      <td>{{ task.due }}</td>
+      <td>{{ task.created | date:'medium' }}</td>
+      <td>{{ task.due | date:'medium' }}</td>
 
       <td>
         <div class="btn-group">
@@ -48,13 +48,13 @@
     <tr>
       <td colspan="4">
         <small>
-          <a href ng-click="selectAllTasks()">select all</a> / <a href ng-click="deselectAllTasks()">deselect all</a> tasks or use <code>ctrl + click</code> on tasks to select multiple.
+          <a href ng-click="selectAllTasks()">select all</a> / <a href ng-click="deselectAllTasks()">deselect all</a> tasks or use <code>ctrl + click</code> to select multiple.
         </small>
       </td>
       <td>
         <div class="btn-group" ng-show="taskList.selection.length">
           <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
-            Selected Tasks
+            All Selected
             <span class="caret"></span>
           </a>
           <ul class="dropdown-menu">

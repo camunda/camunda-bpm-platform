@@ -7,6 +7,8 @@ define(["angular"], function(angular) {
   var Controller = function($rootScope, $scope, $location, $routeParams, EngineApi) {
     $scope.variables = [];
 
+    $scope.task = EngineApi.getTaskList().get({ id: $routeParams.id });
+
     $scope.submitForm = function() {
       var variablesObject = {};
       for (var index in $scope.variables) {
@@ -14,19 +16,19 @@ define(["angular"], function(angular) {
         variablesObject[variable.key] = variable.value;
       }
 
-      EngineApi.getTasklist().complete({taskId: $routeParams.id}, {variables : variablesObject}).$then(function() {
+      EngineApi.getTaskList().complete({ id: $routeParams.id}, { variables : variablesObject }).$then(function() {
         $rootScope.$broadcast("tasklist.reload");
         $location.path("/overview");
       });
     };
 
     $scope.addVariable = function() {
-      $scope.variables.push({key : "key", value: "value"});
+      $scope.variables.push({ key : "key", value: "value" });
     };
 
     $scope.removeVariable = function (index) {
       $scope.variables.splice(index, 1);
-    }
+    };
   };
 
   Controller.$inject = ["$rootScope", "$scope", "$location", "$routeParams", "EngineApi"];

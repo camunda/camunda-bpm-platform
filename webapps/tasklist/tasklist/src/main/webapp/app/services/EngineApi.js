@@ -10,13 +10,26 @@ define(["angular"], function(angular) {
 
     function EngineApi() {
 
-      this.taskList = $resource(Uri.build(baseUri, "task/:taskId/:op"), {taskId: "@id"} , {
-        claim : {method:'POST', params : {op:"claim"}},
-        complete : {method:'POST', params : {op:"complete"}}
+      this.taskList = $resource(Uri.build(baseUri, "task/:id/:operation"), { id: "@id" } , {
+        claim : { method: 'POST', params : { operation: "claim" }},
+        complete : { method: 'POST', params : { operation: "complete" }}
       });
 
       this.taskCount = $resource(Uri.build(baseUri, "task/count"));
-      this.processDefinitions = $resource(Uri.build(baseUri, "process-definition"));
+      this.processDefinitions = $resource(Uri.build(baseUri, "process-definition/:id/:operation"), { id: "@id" });
+
+      this.processDefinitions.getStartForm = function(data, fn) {
+        data = angular.extend(data, { operation : "startForm" });
+
+        return this.get(data, fn);
+      };
+
+      this.processDefinitions.startInstance = function(data, fn) {
+        data = angular.extend(data, { operation : "start" });
+
+        return this.save(data, fn);
+      };
+
       this.groups = $resource(Uri.build(baseUri, "task/groups"));
     };
 
@@ -24,7 +37,7 @@ define(["angular"], function(angular) {
       return this.processDefinitions;
     };
 
-    EngineApi.prototype.getTasklist = function () {
+    EngineApi.prototype.getTaskList = function () {
       return this.taskList;
     };
 

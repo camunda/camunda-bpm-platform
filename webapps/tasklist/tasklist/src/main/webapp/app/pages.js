@@ -7,6 +7,7 @@ define([ "angularModule" ], function(angularModule) {
     "tasklist/common/header",
     "tasklist/pages/login",
     "tasklist/pages/overview",
-    "tasklist/pages/form"
+    "tasklist/pages/form",
+    "tasklist/pages/start"
   ]);
 });

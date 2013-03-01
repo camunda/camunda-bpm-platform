@@ -1,16 +1,42 @@
 <div class="control-group">
-    <form>
-        <div data-ng-show="variables.length == 0" class="alert alert-info">
-            Click on add variable to add variables which will be submitted for the task completion.
-        </div>
-        <div data-ng-repeat="variable in variables">
-            <h3>Variable {{$index +1}}</h3>
-            <input data-ng-model="variable.key" type="text"/>
-            <input data-ng-model="variable.value" type="text"/>
-            <button class="btn btn-danger" data-ng-click="removeVariable($index)">Remove Variable</button>
-        </div>
+  <h5>Complete Task</h5>
+  <h3>{{ task.name }}</h3>
 
-        <button class="btn btn-primary" data-ng-click="submitForm()">Submit</button>
-        <button class="btn btn-info" data-ng-click="addVariable()">Add Variable</button>
-    </form>
+  <p>
+    <strong>Created:</strong> {{ task.created | date:'medium'}}
+  </p>
+
+  <h5>Variables</h5>
+
+  <p>
+    Use the form below to add variables that will be be passed onto the process instance upon task completion.
+  </p>
+
+  <form>
+    <table class="table" style="width: 550px">
+      <thead>
+        <tr>
+          <th>key</th>
+          <th>value</th>
+          <th style="width: 50px; text-align: right">
+            <button class="btn btn-mini" data-ng-click="addVariable()"><i class="icon-plus"></i></button>
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr data-ng-repeat="variable in variables">
+          <td><input data-ng-model="variable.key" type="text"/></td>
+          <td><input data-ng-model="variable.value" type="text"/></td>
+          <td style="text-align: right; vertical-align: middle">
+            <button class="btn btn-mini" data-ng-click="removeVariable($index)"><i class="icon-trash"></i></button>
+          </td>
+        </tr>
+        <tr data-ng-show="!variables.length">
+          <td colspan="3">No variables defined</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <button class="btn btn-primary" data-ng-click="submitForm()">Complete Task</button>
+  </form>
 </div>
