@@ -13,10 +13,10 @@ define(["angular"], function(angular) {
 
     var tasks;
 
-    $scope.loadGroupInfo = function () {
+    $scope.loadSitebar = function () {
       tasks = $scope.tasks = {
         mytasks: EngineApi.getTaskCount().get({ "assignee" : currentUser }),
-        unassigned: EngineApi.getTaskCount().get({ "assignableTo" : currentUser })
+        unassigned: EngineApi.getTaskCount().get({ "candidateUser" : currentUser })
       };
 
       $scope.groupInfo = EngineApi.getGroups(currentUser);
@@ -28,10 +28,10 @@ define(["angular"], function(angular) {
     };
 
     $scope.$on("tasklist.reload", function () {
-      $scope.loadGroupInfo();
+      $scope.loadSitebar();
     });
 
-    $scope.loadGroupInfo();
+    $scope.loadSitebar();
   };
 
   Controller.$inject = ["$scope", "$location", "EngineApi", "Authentication"];

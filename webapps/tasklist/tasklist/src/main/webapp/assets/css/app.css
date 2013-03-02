@@ -195,6 +195,37 @@ input.ng-invalid-required {
   margin-bottom: 0;
 }
 
+/** sortable (sort-by) styles */
+
+.sort-by {
+  cursor: pointer;
+}
+
+.sort-by i.order {
+  margin-left: 5px;
+}
+
+.sort-by:hover i.asc, .sort-by.asc i.asc, .sort-by.desc i.desc {
+  display: inline-block;
+  opacity: 0.2;
+}
+
+.sort-by.asc:hover i.asc, .sort-by.desc:hover i.desc {
+  opacity: 0.8;
+}
+
+.sort-by.desc:hover i.asc, .sort-by i.order {
+  display: none;
+}
+
+.sort-by.asc i.asc {
+  display: inline-block;
+}
+
+.sort-by:hover i {
+  opacity: 0.8;
+}
+
 /** navbar button tweeks */
 .navbar .btn-group, .navbar .btn {
   margin-left: 10px;

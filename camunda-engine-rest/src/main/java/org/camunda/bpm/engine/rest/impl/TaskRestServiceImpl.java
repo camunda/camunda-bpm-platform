@@ -27,12 +27,11 @@ public class TaskRestServiceImpl extends AbstractEngineService implements TaskRe
   public List<TaskDto> getTasks(TaskQueryDto queryDto, Integer firstResult, Integer maxResults) {
 
     TaskService taskService = processEngine.getTaskService();
-    IdentityService identityService = processEngine.getIdentityService();
 
     TaskQuery query;
 
     try {
-      query = queryDto.toQuery(taskService, identityService);
+      query = queryDto.toQuery(taskService);
     } catch (InvalidRequestException e) {
       throw new WebApplicationException(Status.BAD_REQUEST.getStatusCode());
     }
@@ -124,11 +123,10 @@ public class TaskRestServiceImpl extends AbstractEngineService implements TaskRe
   @Override
   public CountResultDto getTasksCount(TaskQueryDto queryDto) {
     TaskService taskService = processEngine.getTaskService();
-    IdentityService identityService = processEngine.getIdentityService();
 
     TaskQuery query;
     try {
-      query = queryDto.toQuery(taskService, identityService);
+      query = queryDto.toQuery(taskService);
     } catch (InvalidRequestException e) {
       throw new WebApplicationException(Status.BAD_REQUEST.getStatusCode());
     }

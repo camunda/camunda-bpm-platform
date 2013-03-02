@@ -4,11 +4,15 @@ define(["angular", "bpmn/Bpmn"], function(angular, Bpmn) {
 
   var module = angular.module("tasklist.pages");
 
-  var Controller = function($rootScope, $scope, $location, debounce, EngineApi, Authentication) {
+  var Controller = function($rootScope, $scope, $location, debounce, EngineApi, Notifications, Authentication) {
 
     var fireTaskListChanged = debounce(function() {
       $rootScope.$broadcast("tasklist.reload");
     }, 300);
+
+    var notifyScopeChange = function(message) {
+      Notifications.addMessage({ status: "Scope change", message: message, exclusive: [ "status" ], duration: 5000 });
+    };
 
     var reloadTasks = debounce(function() {
       var view = $scope.taskList.view;
@@ -30,11 +34,14 @@ define(["angular", "bpmn/Bpmn"], function(angular, Bpmn) {
 
     $scope.loadTasks = function(view) {
       var filter = view.filter,
-          search = view.search;
+          search = view.search,
+          user = Authentication.current();
 
-      if (!Authentication.current()) {
+      if (!user) {
         return;
       }
+
+      $scope.groupInfo = EngineApi.getGroups(user);
 
       $scope.taskList.view = { filter: filter, search: search };
 
@@ -49,7 +56,7 @@ define(["angular", "bpmn/Bpmn"], function(angular, Bpmn) {
           queryObject.assignee = user;
           break;
         case "unassigned":
-          queryObject.assignableTo = user;
+          queryObject.candidateUser = user;
           break;
         case "colleague":
           queryObject.assignee = search;
@@ -78,7 +85,7 @@ define(["angular", "bpmn/Bpmn"], function(angular, Bpmn) {
 
     $scope.claimTask = function(task) {
 
-      EngineApi.getTaskList().claim( { id : task.id}, { userId: Authentication.current() }).$then(function () {
+      return EngineApi.getTaskList().claim( { id : task.id}, { userId: Authentication.current() }).$then(function () {
         var tasks = $scope.taskList.tasks,
             view = $scope.taskList.view;
 
@@ -88,13 +95,17 @@ define(["angular", "bpmn/Bpmn"], function(angular, Bpmn) {
           $scope.removeTask(task);
         }
 
+        notifyScopeChange("Claimed task");
+
         fireTaskListChanged();
       });
     };
 
     $scope.unclaimTask = function(task) {
-      EngineApi.getTaskList().unclaim({ id : task.id }, { userId: Authentication.current() }).$then(function () {
+      return EngineApi.getTaskList().unclaim({ id : task.id }, { userId: Authentication.current() }).$then(function () {
         $scope.removeTask(task);
+
+        notifyScopeChange("Unclaimed task");
 
         fireTaskListChanged();
       });
@@ -114,9 +125,10 @@ define(["angular", "bpmn/Bpmn"], function(angular, Bpmn) {
     };
 
     $scope.delegateTask = function(task, user) {
-      EngineApi.getTaskList().delegate( { id : task.id}, { userId: user.id }).$then(function () {
+      return EngineApi.getTaskList().delegate( { id : task.id}, { userId: user.id }).$then(function () {
         $scope.removeTask(task);
 
+        notifyScopeChange("Delegated task");
         fireTaskListChanged();
       });
     };
@@ -126,6 +138,17 @@ define(["angular", "bpmn/Bpmn"], function(angular, Bpmn) {
         var task = selection[index];
         $scope.claimTask(task);
       }
+
+      notifyScopeChange("Claimed " + selection.length + " tasks");
+    };
+
+    $scope.delegateTasks = function (selection) {
+      for (var index in selection) {
+        var task = selection[index];
+        $scope.delegateTask(task);
+      }
+
+      notifyScopeChange("Delegated " + selection.length + " tasks");
     };
 
     $scope.isSelected = function(task) {
@@ -172,7 +195,7 @@ define(["angular", "bpmn/Bpmn"], function(angular, Bpmn) {
     };
   };
 
-  Controller.$inject = ["$rootScope", "$scope", "$location", "debounce", "EngineApi", "Authentication"];
+  Controller.$inject = ["$rootScope", "$scope", "$location", "debounce", "EngineApi", "Notifications", "Authentication"];
 
   var RouteConfig = function($routeProvider) {
     $routeProvider.when("/overview", {

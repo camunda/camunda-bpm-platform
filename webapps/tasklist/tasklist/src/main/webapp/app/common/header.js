@@ -10,16 +10,18 @@ define(["angular"], function(angular) {
 
   ProcessDefinitionsController.$inject = ["$scope", "EngineApi"];
 
-  var LogoutController = function($scope, $location, Authentication) {
+  var LogoutController = function($scope, $location, Notifications, Authentication) {
 
     $scope.logout = function() {
       Authentication.logout().then(function(success) {
+        Notifications.clearAll();
+        Notifications.addMessage({ status: "Logout", message: "You have been logged out" });
         $location.path("/login");
       });
     };
   };
 
-  LogoutController.$inject = ["$scope", "$location", "Authentication"];
+  LogoutController.$inject = ["$scope", "$location", "Notifications", "Authentication"];
 
   module
     .controller("LogoutController", LogoutController)

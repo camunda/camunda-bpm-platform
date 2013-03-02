@@ -58,7 +58,7 @@ define(["angular", "jquery"], function(angular, $) {
       scope: true,
       require: "^sortable",
       transclude: true,
-      template: '<span style="cursor: pointer" ng-click="toggleSort()"><span ng-transclude></span><i style="margin-left: 10px" ng-show="sortActive()" ng-class="{ \'icon-chevron-up\': sortDesc(), \'icon-chevron-down\': sortAsc()}"></i></span>',
+      template: '<span class="sort-by" ng-click="toggleSort()" ng-class="sortCls()"><span ng-transclude></span><i class="order desc icon-arrow-up"></i><i class="order asc icon-arrow-down"></i></span>',
       link: function(scope, element, attributes, sortable) {
 
         var sort = attributes["sortBy"];
@@ -66,16 +66,8 @@ define(["angular", "jquery"], function(angular, $) {
           throw new Error("sortBy must be defined");
         }
 
-        scope.sortActive = function() {
-          return sortable.isActive(sort);
-        };
-
-        scope.sortDesc = function() {
-          return sortable.isActive(sort, "desc");
-        };
-
-        scope.sortAsc = function() {
-          return sortable.isActive(sort, "asc");
+        scope.sortCls = function() {
+          return sortable.isActive(sort) ? sortable.sort.order : null;
         };
 
         scope.toggleSort = function() {

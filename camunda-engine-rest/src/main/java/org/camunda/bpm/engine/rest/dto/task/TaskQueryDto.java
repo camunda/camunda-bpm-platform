@@ -54,7 +54,6 @@ public class TaskQueryDto extends SortableParameterizedQueryDto {
   private String processDefinitionName;
   private String processInstanceId;
   private String assignee;
-  private String assignableTo;
   private String candidateGroup;
   private String candidateUser;
   private String taskDefinitionKey;
@@ -244,7 +243,7 @@ public class TaskQueryDto extends SortableParameterizedQueryDto {
     return VALID_SORT_BY_VALUES.contains(value);
   }
 
-  public TaskQuery toQuery(TaskService taskService, IdentityService identityService) {
+  public TaskQuery toQuery(TaskService taskService) {
     TaskQuery query = taskService.createTaskQuery();
 
     if (processInstanceBusinessKey != null) {
@@ -333,28 +332,6 @@ public class TaskQueryDto extends SortableParameterizedQueryDto {
     }
     if (candidateGroups != null) {
       query.taskCandidateGroupIn(candidateGroups);
-    }
-
-    if (assignableTo != null) {
-
-      if (candidateGroup != null ||
-          candidateGroups != null ||
-          candidateUser != null) {
-
-        throw new ActivitiException("Parameters assignableTo and [candidateGroup, candidateGroups, candidateUser] are exclusive");
-      }
-
-      List<Group> groups = identityService.createGroupQuery().groupMember(assignableTo).list();
-      List<String> groupNames = new ArrayList<String>();
-
-      for (Group group: groups) {
-        groupNames.add(group.getName());
-      }
-
-      query
-        .taskCandidateGroupIn(groupNames)
-        .taskCandidateUser(candidateUser)
-        .taskUnassigned();
     }
 
     if (taskVariables != null) {
