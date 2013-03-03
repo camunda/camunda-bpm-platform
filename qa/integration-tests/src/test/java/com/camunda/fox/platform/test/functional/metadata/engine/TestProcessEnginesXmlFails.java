@@ -1,4 +1,4 @@
-package com.camunda.fox.platform.test.functional.extensions.config;
+package com.camunda.fox.platform.test.functional.metadata.engine;
 
 import org.jboss.arquillian.container.test.api.Deployer;
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -35,10 +35,10 @@ public class TestProcessEnginesXmlFails {
             .addAsResource("META-INF/processes.xml", "META-INF/processes.xml")
             .addAsLibraries(
               ShrinkWrap.create(JavaArchive.class, "engine1.jar")
-                    .addAsResource("singleEngine.xml", "META-INF/process-engines.xml"),
+                    .addAsResource("singleEngine.xml", "META-INF/processes.xml"),
               ShrinkWrap.create(JavaArchive.class, "engine2.jar")
                     // we add the same process engine configuration multiple times -> fails
-                   .addAsResource("singleEngine.xml", "META-INF/process-engines.xml")
+                   .addAsResource("singleEngine.xml", "META-INF/processes.xml")
          );
   }
   

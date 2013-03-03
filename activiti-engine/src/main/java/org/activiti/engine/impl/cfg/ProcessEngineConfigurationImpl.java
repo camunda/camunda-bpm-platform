@@ -298,7 +298,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
    */
   protected String databaseSchema = null;
   
-  protected boolean isCreateDiagramOnDeploy = true;
+  protected boolean isCreateDiagramOnDeploy = false;
   
   protected ProcessApplicationManager processApplicationManager;
   

@@ -115,10 +115,7 @@ public class ProcessApplicationElResolverDelegate extends ELResolver {
   public void setValue(ELContext context, Object base, Object property, Object value) {
     context.setPropertyResolved(false);
     ELResolver delegate = getProcessApplicationElResolverDelegate();
-    if(delegate == null) {
-      throw new ActivitiException("Cannot set value through ProcessApplicationElResolverDelegate: " +
-      		"outside of process application context or process application does not provide any ElResolver.");
-    } else {
+    if(delegate != null) {      
       delegate.setValue(context, base, property, value);
     }
   }
