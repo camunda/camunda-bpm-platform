@@ -19,12 +19,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.camunda.bpm.application.impl.deployment.metadata.spi.ProcessEngineXml;
-import org.camunda.bpm.application.impl.deployment.metadata.spi.ProcessesXml;
+import org.camunda.bpm.application.impl.metadata.spi.ProcessesXml;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanDeploymentOperation;
+import org.camunda.bpm.container.impl.metadata.spi.ProcessEngineXml;
 
 /**
- * <p> Retrieves the List of ProcessEngines frm an attached {@link ProcessesXml}.</p>
+ * <p> Retrieves the List of ProcessEngines from an attached {@link ProcessesXml}.</p>
  * 
  * @see AbstractParseBpmPlatformXmlStep 
  *  

@@ -15,7 +15,6 @@
  */
 package com.camunda.fox.client.impl;
 
-
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.ejb.ConcurrencyManagement;
@@ -35,21 +34,21 @@ import org.camunda.bpm.application.impl.EjbProcessApplication;
  * 
  */
 //singleton bean guarantees maximum efficiency
-@ProcessApplication
 @Singleton
 @Startup
 @ConcurrencyManagement(ConcurrencyManagementType.BEAN) 
 @TransactionAttribute(TransactionAttributeType.SUPPORTS)
+@ProcessApplication
 public class ProcessArchiveSupport extends EjbProcessApplication {
   
   @PostConstruct
-  public void start() {
-    super.start();
+  public void deploy() {
+    super.deploy();
   }
 
   @PreDestroy
-  public void stop() {
-    super.stop();
+  public void undeploy() {
+    super.undeploy();
   }
     
 }

@@ -13,8 +13,7 @@
 package org.camunda.bpm;
 
 import org.activiti.engine.ProcessEngine;
-import org.camunda.bpm.container.impl.RuntimeContainerConfiguration;
-import org.camunda.bpm.container.spi.RuntimeContainerDelegate;
+import org.camunda.bpm.container.RuntimeContainerDelegate;
 
 
 /**
@@ -25,23 +24,16 @@ import org.camunda.bpm.container.spi.RuntimeContainerDelegate;
  */
 public final class BpmPlatform {
   
-  /**
-   * @return an instance of the {@link ProcessEngineService}.  
-   */
   public static ProcessEngineService getProcessEngineService() {
-    return getRuntimeContainerDelegate().getProcessEngineService();
+    return RuntimeContainerDelegate.INSTANCE.get().getProcessEngineService();
+  }
+  
+  public static ProcessApplicationService getProcessApplicationService() {
+    return RuntimeContainerDelegate.INSTANCE.get().getProcessApplicationService();
   }
   
   public static ProcessEngine getDefaultProcessEngine() {
     return getProcessEngineService().getDefaultProcessEngine();
   }
   
-//  public static ProcessApplicationService getProcessApplicationService() {
-//    return getRuntimeContainerDelegate().getProcessApplicationService();
-//  }
-
-  private static RuntimeContainerDelegate getRuntimeContainerDelegate() {
-    return RuntimeContainerConfiguration.getInstance().getContainerDelegate();
-  }
-
 }

@@ -17,7 +17,7 @@ package org.camunda.bpm.container.impl.jmx.kernel;
  * @author Daniel Meyer
  *
  */
-public abstract class MBeanService<S> {
+public interface MBeanService<S> {
   
   public abstract void start(MBeanServiceContainer mBeanServiceContainer);
 

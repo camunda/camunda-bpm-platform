@@ -14,10 +14,10 @@ package org.camunda.bpm.container.impl.jmx.deployment;
 
 import java.net.URL;
 
-import org.camunda.bpm.application.impl.deployment.metadata.spi.BpmPlatformXml;
-import org.camunda.bpm.application.impl.deployment.parser.BpmPlatformXmlParser;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanDeploymentOperation;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanDeploymentOperationStep;
+import org.camunda.bpm.container.impl.metadata.BpmPlatformXmlParser;
+import org.camunda.bpm.container.impl.metadata.spi.BpmPlatformXml;
 
 /**
  * <p>Deployment operation step responsible for parsing and attaching the bpm-platform.xml file.</p>

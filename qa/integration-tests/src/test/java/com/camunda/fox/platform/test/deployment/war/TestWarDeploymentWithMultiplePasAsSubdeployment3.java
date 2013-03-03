@@ -18,6 +18,8 @@ package com.camunda.fox.platform.test.deployment.war;
 
 import junit.framework.Assert;
 
+import org.activiti.engine.repository.DeploymentQuery;
+import org.activiti.engine.repository.ProcessDefinition;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
@@ -52,16 +54,18 @@ import com.camunda.fox.platform.test.util.TestHelper;
 @RunWith(Arquillian.class)
 public class TestWarDeploymentWithMultiplePasAsSubdeployment3 extends AbstractFoxPlatformIntegrationTest {
   
-  public final static String PROCESSES_XML = 
-    "<process-archives>" +
-      "<process-archive>" +
-      "<name>PA_NAME</name>" +
-        "<configuration>" +
-          "<resource-root-path>classpath:directory/</resource-root-path>" +
-          "<undeployment delete=\"true\" />" +
-        "</configuration>" +
+  public final static String PROCESSES_XML =       
+    "<process-application xmlns=\"http://www.camunda.org/schema/1.0/ProcessApplication\">" +
+          
+      "<process-archive name=\"PA_NAME\">" +
+        "<properties>" +        
+          "<property name=\"isDeleteUponUndeploy\">true</property>" +
+          "<property name=\"resourceRootPath\">classpath:directory/</property>" +
+        "</properties>" +  
       "</process-archive>" +
-    "</process-archives>"; 
+  
+    "</process-application>";  
+   
   
   @Deployment
   public static WebArchive processArchive() {    
@@ -91,18 +95,38 @@ public class TestWarDeploymentWithMultiplePasAsSubdeployment3 extends AbstractFo
   
   @Test
   public void testDeployProcessArchive() {
-    Assert.assertEquals("PA2", processArchiveService.getProcessArchiveByProcessDefinitionKey("process-1", "default").getName());
     
-    Assert.assertEquals(0, repositoryService.createProcessDefinitionQuery().processDefinitionKey("process-0").count());
-    Assert.assertEquals(1, repositoryService.createProcessDefinitionQuery().processDefinitionKey("process-1").count());
-    Assert.assertEquals(0, repositoryService.createProcessDefinitionQuery().processDefinitionKey("process-2").count());
-    Assert.assertEquals(0, repositoryService.createProcessDefinitionQuery().processDefinitionKey("process-3").count());
-    Assert.assertEquals(0, repositoryService.createProcessDefinitionQuery().processDefinitionKey("process-4").count());
-    Assert.assertEquals(0, repositoryService.createProcessDefinitionQuery().processDefinitionKey("process-5").count());
-    Assert.assertEquals(0, repositoryService.createProcessDefinitionQuery().processDefinitionKey("process-6").count());
-    Assert.assertEquals(0, repositoryService.createProcessDefinitionQuery().processDefinitionKey("process-7").count());
-    Assert.assertEquals(0, repositoryService.createProcessDefinitionQuery().processDefinitionKey("process-8").count());
-  
+    assertProcessNotDeployed("process-0");
+    assertProcessDeployed   ("process-1", "PA2");
+    assertProcessNotDeployed("process-2");
+      
   }
 
+ protected void assertProcessNotDeployed(String processKey) {
+    
+    long count = repositoryService
+        .createProcessDefinitionQuery()
+        .latestVersion()
+        .processDefinitionKey(processKey)
+        .count();
+    
+    Assert.assertEquals("Process with key "+processKey+ " should not be deployed", 0, count);
+  }
+
+  protected void assertProcessDeployed(String processKey, String expectedDeploymentName) {
+    
+    ProcessDefinition processDefinition = repositoryService
+        .createProcessDefinitionQuery()
+        .latestVersion()
+        .processDefinitionKey(processKey)
+        .singleResult();    
+    
+    DeploymentQuery deploymentQuery = repositoryService
+        .createDeploymentQuery()
+        .deploymentId(processDefinition.getDeploymentId());
+    
+    Assert.assertEquals(expectedDeploymentName, deploymentQuery.singleResult().getName());
+    
+  }
+  
 }

@@ -27,7 +27,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.activiti.engine.impl.util.IoUtil;
-import org.camunda.bpm.application.impl.deployment.scanner.ScanningUtil;
+import org.camunda.bpm.container.impl.jmx.deployment.util.ScanningUtil;
 import org.jboss.vfs.VFS;
 import org.jboss.vfs.VirtualFile;
 import org.jboss.vfs.VirtualFileFilter;

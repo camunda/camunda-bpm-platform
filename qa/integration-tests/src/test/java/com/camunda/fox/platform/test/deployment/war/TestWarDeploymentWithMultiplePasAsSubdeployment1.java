@@ -18,6 +18,8 @@ package com.camunda.fox.platform.test.deployment.war;
 
 import junit.framework.Assert;
 
+import org.activiti.engine.repository.DeploymentQuery;
+import org.activiti.engine.repository.ProcessDefinition;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
@@ -66,14 +68,16 @@ import com.camunda.fox.platform.test.util.TestHelper;
 public class TestWarDeploymentWithMultiplePasAsSubdeployment1 extends AbstractFoxPlatformIntegrationTest {
   
   public final static String PROCESSES_XML = 
-          "<process-archives>" +
-            "<process-archive>" +
-              "<name>PA_NAME</name>" +
-              "<configuration>" +
-                "<undeployment delete=\"true\" />" +
-              "</configuration>" +
-            "</process-archive>" +
-          "</process-archives>";  
+    "<process-application xmlns=\"http://www.camunda.org/schema/1.0/ProcessApplication\">" +
+  
+      "<process-archive name=\"PA_NAME\">" +
+        "<properties>" +        
+          "<property name=\"isDeleteUponUndeploy\">true</property>" +
+        "</properties>" +  
+      "</process-archive>" +
+  
+    "</process-application>";
+  
   
   @Deployment
   public static WebArchive processArchive() {    
@@ -121,25 +125,35 @@ public class TestWarDeploymentWithMultiplePasAsSubdeployment1 extends AbstractFo
   
   @Test
   public void testDeployProcessArchive() {
-    Assert.assertEquals("PA1", processArchiveService.getProcessArchiveByProcessDefinitionKey("process-0", "default").getName());
-    Assert.assertEquals("PA1", processArchiveService.getProcessArchiveByProcessDefinitionKey("process-1", "default").getName());
-    Assert.assertEquals("PA1", processArchiveService.getProcessArchiveByProcessDefinitionKey("process-2", "default").getName());
-    Assert.assertEquals("PA2", processArchiveService.getProcessArchiveByProcessDefinitionKey("process-3", "default").getName());
-    Assert.assertEquals("PA2", processArchiveService.getProcessArchiveByProcessDefinitionKey("process-4", "default").getName());
-    Assert.assertEquals("PA2", processArchiveService.getProcessArchiveByProcessDefinitionKey("process-5", "default").getName());
-    Assert.assertEquals("PA3", processArchiveService.getProcessArchiveByProcessDefinitionKey("process-6", "default").getName());
-    Assert.assertEquals("PA3", processArchiveService.getProcessArchiveByProcessDefinitionKey("process-7", "default").getName());
-    Assert.assertEquals("PA3", processArchiveService.getProcessArchiveByProcessDefinitionKey("process-8", "default").getName());
     
-    Assert.assertEquals(1, repositoryService.createProcessDefinitionQuery().processDefinitionKey("process-0").count());
-    Assert.assertEquals(1, repositoryService.createProcessDefinitionQuery().processDefinitionKey("process-1").count());
-    Assert.assertEquals(1, repositoryService.createProcessDefinitionQuery().processDefinitionKey("process-2").count());
-    Assert.assertEquals(1, repositoryService.createProcessDefinitionQuery().processDefinitionKey("process-3").count());
-    Assert.assertEquals(1, repositoryService.createProcessDefinitionQuery().processDefinitionKey("process-4").count());
-    Assert.assertEquals(1, repositoryService.createProcessDefinitionQuery().processDefinitionKey("process-5").count());
-    Assert.assertEquals(1, repositoryService.createProcessDefinitionQuery().processDefinitionKey("process-6").count());
-    Assert.assertEquals(1, repositoryService.createProcessDefinitionQuery().processDefinitionKey("process-7").count());
-    Assert.assertEquals(1, repositoryService.createProcessDefinitionQuery().processDefinitionKey("process-8").count());
+    assertProcessDeployed("process-0", "PA1");
+    assertProcessDeployed("process-1", "PA1");
+    assertProcessDeployed("process-2", "PA1");
+    
+    assertProcessDeployed("process-3", "PA2");
+    assertProcessDeployed("process-4", "PA2");
+    assertProcessDeployed("process-5", "PA2");
+    
+    assertProcessDeployed("process-6", "PA3");    
+    assertProcessDeployed("process-7", "PA3");
+    assertProcessDeployed("process-8", "PA3");
+    
+  }
+  
+  protected void assertProcessDeployed(String processKey, String expectedDeploymentName) {
+    
+    ProcessDefinition processDefinition = repositoryService
+        .createProcessDefinitionQuery()
+        .latestVersion()
+        .processDefinitionKey(processKey)
+        .singleResult();    
+    
+    DeploymentQuery deploymentQuery = repositoryService
+        .createDeploymentQuery()
+        .deploymentId(processDefinition.getDeploymentId());
+    
+    Assert.assertEquals(expectedDeploymentName, deploymentQuery.singleResult().getName());
+    
   }
 
 }

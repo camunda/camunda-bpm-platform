@@ -19,52 +19,54 @@ import java.util.Map;
 import java.util.Map.Entry;
 
 import org.activiti.engine.ActivitiException;
-import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.ProcessEngineConfiguration;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.cfg.StandaloneProcessEngineConfiguration;
 import org.activiti.engine.impl.persistence.StrongUuidGenerator;
 import org.activiti.engine.impl.util.ReflectUtil;
 import org.camunda.bpm.application.AbstractProcessApplication;
-import org.camunda.bpm.application.impl.deployment.metadata.spi.ProcessEngineXml;
+import org.camunda.bpm.container.impl.jmx.JmxRuntimeContainerDelegate.ServiceTypes;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanDeploymentOperation;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanDeploymentOperationStep;
+import org.camunda.bpm.container.impl.jmx.kernel.MBeanServiceContainer;
+import org.camunda.bpm.container.impl.jmx.services.JmxManagedProcessEngine;
+import org.camunda.bpm.container.impl.jmx.services.JmxManagedProcessEngineController;
+import org.camunda.bpm.container.impl.metadata.spi.ProcessEngineXml;
 
 /**
- * <p>Deployment operation step responsible for starting a process engine.</p> 
+ * <p>Deployment operation step responsible for starting a managed process engine 
+ * inside the runtime container.</p> 
  * 
  * @author Daniel Meyer
  *
  */
 public class StartProcessEngineStep extends MBeanDeploymentOperationStep {
   
-  protected final ProcessEngineXml parsedProcessEngine;
+  /** the process engine Xml configuration passed in as a parameter to the operation step */
+  protected final ProcessEngineXml processEngineXml;  
   
-  protected ProcessEngine createdEngine;
-
-  public StartProcessEngineStep(ProcessEngineXml parsedProcessEngine) {
-    this.parsedProcessEngine = parsedProcessEngine;
+  public StartProcessEngineStep(ProcessEngineXml processEngineXml) {
+    this.processEngineXml = processEngineXml;
   }
 
   public String getName() {    
-    return "Start process engine " + parsedProcessEngine.getName();
+    return "Start process engine " + processEngineXml.getName();
   }
 
   public void performOperationStep(MBeanDeploymentOperation operationContext) {
     
+    final MBeanServiceContainer serviceContainer = operationContext.getServiceContainer();
     final AbstractProcessApplication processApplication = operationContext.getAttachment(PROCESS_APPLICATION);
     
     ClassLoader configurationClassloader = null;
     
     if(processApplication != null) {
-      configurationClassloader = processApplication.getProcessApplicationClassloader();
-      
+      configurationClassloader = processApplication.getProcessApplicationClassloader();      
     } else {
-      configurationClassloader = ProcessEngineConfiguration.class.getClassLoader();
-      
+      configurationClassloader = ProcessEngineConfiguration.class.getClassLoader();      
     }
     
-    String configurationClassName = parsedProcessEngine.getConfigurationClass();
+    String configurationClassName = processEngineXml.getConfigurationClass();
     
     if(configurationClassName == null || configurationClassName.isEmpty()) {
       configurationClassName = StandaloneProcessEngineConfiguration.class.getName();
@@ -74,21 +76,18 @@ public class StartProcessEngineStep extends MBeanDeploymentOperationStep {
     Class<? extends ProcessEngineConfiguration> configurationClass = loadProcessEngineConfigurationClass(configurationClassloader, configurationClassName);
     ProcessEngineConfiguration configuration = instantiateConfiguration(configurationClass);
     
-    // engine started through the container infrastructure are always container-managed
-    configuration.setContainerManaged(true);
-    
     // set UUid generator
     // TODO: move this to configuration and use as default?
     ((ProcessEngineConfigurationImpl)configuration).setIdGenerator(new StrongUuidGenerator());
     
     // set configuration values
-    String name = parsedProcessEngine.getName();
+    String name = processEngineXml.getName();
     configuration.setProcessEngineName(name);
     
-    String datasourceJndiName = parsedProcessEngine.getDatasource();
+    String datasourceJndiName = processEngineXml.getDatasource();
     configuration.setDataSourceJndiName(datasourceJndiName);
     
-    Map<String, String> properties = parsedProcessEngine.getProperties();
+    Map<String, String> properties = processEngineXml.getProperties();
     for (Entry<String, String> property : properties.entrySet()) {
       
       Method setter = ReflectUtil.getSetter(property.getKey(), configurationClass, String.class);
@@ -104,8 +103,10 @@ public class StartProcessEngineStep extends MBeanDeploymentOperationStep {
       
     }
     
-    // finally build process engine    
-    createdEngine = configuration.buildProcessEngine();    
+    // start the process engine inside the container.
+    JmxManagedProcessEngine managedProcessEngineService = new JmxManagedProcessEngineController(configuration);
+    serviceContainer.startService(ServiceTypes.PROCESS_ENGINE, configuration.getProcessEngineName(), managedProcessEngineService);
+    
   }
 
   protected ProcessEngineConfiguration instantiateConfiguration(Class<? extends ProcessEngineConfiguration> configurationClass) {
@@ -129,10 +130,11 @@ public class StartProcessEngineStep extends MBeanDeploymentOperationStep {
   }
 
   public void cancelOperationStep(MBeanDeploymentOperation operationContext) {
-    // if this process engine was successfully created, close it.
-    if(createdEngine != null) {
-      createdEngine.close();
-    }
+    
+    // stop the process engine
+    operationContext.getServiceContainer()
+      .stopService(ServiceTypes.PROCESS_ENGINE.getServiceName(processEngineXml.getName()));
+    
   }
 
 }

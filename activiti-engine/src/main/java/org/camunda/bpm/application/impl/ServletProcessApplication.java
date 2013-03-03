@@ -12,10 +12,14 @@
  */
 package org.camunda.bpm.application.impl;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 import org.camunda.bpm.application.AbstractProcessApplication;
+import org.camunda.bpm.application.ProcessApplicationInfo;
 import org.camunda.bpm.application.ProcessApplicationReference;
 
 /**
@@ -28,13 +32,15 @@ import org.camunda.bpm.application.ProcessApplicationReference;
 public class ServletProcessApplication extends AbstractProcessApplication implements ServletContextListener {
 
   protected String servletContextName;
+  protected String servletContextPath;
   
   protected ProcessApplicationReferenceImpl reference;
 
   protected ClassLoader processApplicationClassloader;
 
+
   protected String autodetectProcessApplicationName() {
-    return servletContextName;
+    return servletContextName != null ? servletContextName : servletContextPath;
   }
 
   public ProcessApplicationReference getReference() {
@@ -45,14 +51,13 @@ public class ServletProcessApplication extends AbstractProcessApplication implem
   }
 
   public void contextInitialized(ServletContextEvent sce) {
+    servletContextPath = sce.getServletContext().getContextPath();
     servletContextName = sce.getServletContext().getServletContextName();
-    if(servletContextName == null) {
-      servletContextName = sce.getServletContext().getContextPath();
-    }
+    
     processApplicationClassloader = initProcessApplicationClassloader(sce);    
     
     // perform lifecycle start
-    start();
+    deploy();
   }
 
   protected ClassLoader initProcessApplicationClassloader(ServletContextEvent sce) {
@@ -76,13 +81,22 @@ public class ServletProcessApplication extends AbstractProcessApplication implem
   public void contextDestroyed(ServletContextEvent sce) {
     
     // perform lifecycle stop
-    stop();
+    undeploy();
     
     // clear the reference
     if(reference != null) {
       reference.clear();
     }
     reference = null;
+  }
+
+  public Map<String, String> getProperties() {
+    Map<String, String> properties = new HashMap<String, String>();
+    
+    // set the servlet context path as property
+    properties.put(ProcessApplicationInfo.PROP_SERVLET_CONTEXT_PATH, servletContextPath);
+    
+    return properties;
   }
 
 }

@@ -12,11 +12,13 @@
  */
 package org.camunda.bpm.application;
 
+import java.util.Collections;
+import java.util.Map;
 import java.util.concurrent.Callable;
 
 import org.activiti.engine.repository.DeploymentBuilder;
-import org.camunda.bpm.container.impl.RuntimeContainerConfiguration;
-import org.camunda.bpm.container.spi.RuntimeContainerDelegate;
+import org.camunda.bpm.ProcessApplicationService;
+import org.camunda.bpm.container.RuntimeContainerDelegate;
 import org.camunda.bpm.engine.impl.util.ClassLoaderUtil;
 
 
@@ -29,30 +31,23 @@ import org.camunda.bpm.engine.impl.util.ClassLoaderUtil;
  */
 public abstract class AbstractProcessApplication {
               
-  // lifecycle /////////////////////////////////////////////////////
+  // deployment /////////////////////////////////////////////////////
 
   /**
-   * Start this {@link AbstractProcessApplication}. 
+   * Deploy this process application into the runtime container.
    */
-  public void start() {
-    // delegate starting of the process application to the runtime container.
-    getRuntimeContainerDelegate().deployProcessApplication(this);   
+  public void deploy() {
+    RuntimeContainerDelegate.INSTANCE.get().deployProcessApplication(this);   
   }
   
   /**
-   * Stop this {@link AbstractProcessApplication}
+   * Undeploy this process application from the runtime container.
    */
-  public void stop() {
+  public void undeploy() {
     // delegate stopping of the process application to the runtime container.
-    getRuntimeContainerDelegate().undeployProcessApplication(this);
+    RuntimeContainerDelegate.INSTANCE.get().undeployProcessApplication(this);
   }
-
-  private RuntimeContainerDelegate getRuntimeContainerDelegate() {
-    return RuntimeContainerConfiguration.getInstance().getContainerDelegate();
-  }
-  
-  // Deployment //////////////////////////////////////////////////
-  
+    
   /**
    * <p>Override this method in order to programmatically add resources to the
    * deployment created by this process application.</p>
@@ -146,6 +141,18 @@ public abstract class AbstractProcessApplication {
     // the default implementation uses the classloader that loaded 
     // the application-provided subclass of this class.    
     return getClass().getClassLoader();
+  }
+  
+  /** 
+   * <p>override this method in order to provide a map of properties.</p>
+   * 
+   * <p>The properties are made available globally through the {@link ProcessApplicationService}</p>
+   * 
+   * @see ProcessApplicationService
+   * @see ProcessApplicationInfo#getProperties()
+   */
+  public Map<String, String> getProperties() {
+    return Collections.unmodifiableMap( Collections.<String, String>emptyMap() );
   }
   
 }

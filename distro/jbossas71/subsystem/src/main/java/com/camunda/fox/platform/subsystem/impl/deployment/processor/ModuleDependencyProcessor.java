@@ -45,7 +45,7 @@ public class ModuleDependencyProcessor implements DeploymentUnitProcessor {
     
     final DeploymentUnit deploymentUnit = phaseContext.getDeploymentUnit();
     
-    if(!ProcessApplicationAttachments.isPartOfProcessApplication(deploymentUnit)) {
+    if(!ProcessApplicationAttachments.isProcessApplication(deploymentUnit)) {
       return;
     }
     

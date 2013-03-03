@@ -12,7 +12,6 @@
  */
 package org.camunda.bpm.application;
 
-import org.activiti.engine.ProcessEngine;
 
 /**
  * A reference to a process application.
@@ -36,15 +35,5 @@ public interface ProcessApplicationReference {
    *           if the process application is unavailable
    */
   public AbstractProcessApplication getProcessApplication() throws ProcessApplicationUnavailableException;
-
-  /**
-   * Called by the process engine when the process engine is stopped and
-   * releases the reference to the process application before the process
-   * application is stopped.
-   * 
-   * @throws ProcessApplicationUnavailableException
-   *           if the process application is unavailable
-   */
-  public void processEngineStopping(ProcessEngine processEngine) throws ProcessApplicationUnavailableException;
 
 }

@@ -16,8 +16,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.activiti.engine.ActivitiException;
+import org.activiti.engine.impl.context.Context;
 import org.camunda.bpm.application.ProcessApplicationReference;
-import org.camunda.bpm.engine.application.ProcessApplicationRegistration;
+import org.camunda.bpm.application.ProcessApplicationRegistration;
 
 /**
  * @author Daniel Meyer
@@ -30,7 +31,7 @@ public class ProcessApplicationManager {
   public ProcessApplicationReference getProcessApplicationForDeployment(String deploymentId) {
     DefaultProcessApplicationRegistration registration = registrationsByDeploymentId.get(deploymentId);
     if (registration != null) {
-      return registration.getProcessApplicationReference();
+      return registration.getReference();
     } else {
       return null;
     }
@@ -45,28 +46,18 @@ public class ProcessApplicationManager {
    */
   public ProcessApplicationRegistration registerProcessApplicationForDeployment(String deploymentId, ProcessApplicationReference reference) {
 
-    String paName = reference.getName();
-
-    DefaultProcessApplicationRegistration registration = registrationsByDeploymentId.get(paName);
-
-    if (registration != null && paName.equals(registration.getProcessApplicationReference().getName())) {
-      // already registered -> return existing registration
-      return registration;
-
-    } else if (registration != null && !paName.equals(registration.getProcessApplicationReference().getName())) {
-      // deployment already registered for different PA -> fail
-      throw new ActivitiException("cannot register deployment with id '" + deploymentId + "' for process application '" + paName
-          + "'. Deployment already registered for application '" + registration.getProcessApplicationReference().getName());
-
-    } else { // registration = null
-
-      // create new registration
-
-      registration = new DefaultProcessApplicationRegistration(this, reference, deploymentId);
-
+    DefaultProcessApplicationRegistration registration = registrationsByDeploymentId.get(deploymentId);
+    
+    if(registration == null) {
+      String processEngineName = Context.getProcessEngineConfiguration().getProcessEngineName();
+      registration = new DefaultProcessApplicationRegistration(this, reference, deploymentId, processEngineName);
       registrationsByDeploymentId.put(deploymentId, registration);
-
       return registration;
+      
+    } else {
+      throw new ActivitiException("Cannot register process application for deploymentId '" + deploymentId
+          + "' there already is a registration for the same deployment.");
+
     }
   }
 
@@ -79,10 +70,8 @@ public class ProcessApplicationManager {
   }
 
   public boolean removeProcessApplication(String deploymentId) {
-
     // remove reference
     return registrationsByDeploymentId.remove(deploymentId) != null;
-
   }
 
 }

@@ -60,7 +60,7 @@ public class StopProcessApplicationsStep extends MBeanDeploymentOperationStep {
       // this causes the process application to remove its services 
       // (triggers nested undeployment operation)
       AbstractProcessApplication processApplication = processApplicationReference.getProcessApplication();
-      processApplication.stop();
+      processApplication.undeploy();
       
     } catch(Throwable t) {
       LOGGER.log(Level.WARNING, "Exception while stopping ProcessApplication ", t);

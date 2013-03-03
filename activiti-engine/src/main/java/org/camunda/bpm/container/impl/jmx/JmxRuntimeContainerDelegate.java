@@ -26,6 +26,8 @@ import org.activiti.engine.impl.jobexecutor.JobExecutor;
 import org.camunda.bpm.ProcessApplicationService;
 import org.camunda.bpm.ProcessEngineService;
 import org.camunda.bpm.application.AbstractProcessApplication;
+import org.camunda.bpm.application.ProcessApplicationInfo;
+import org.camunda.bpm.container.RuntimeContainerDelegate;
 import org.camunda.bpm.container.impl.jmx.deployment.Attachments;
 import org.camunda.bpm.container.impl.jmx.deployment.DeployProcessArchivesStep;
 import org.camunda.bpm.container.impl.jmx.deployment.ParseProcessesXmlStep;
@@ -36,12 +38,11 @@ import org.camunda.bpm.container.impl.jmx.deployment.StopProcessApplicationServi
 import org.camunda.bpm.container.impl.jmx.deployment.UndeployProcessArchivesStep;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanServiceContainer;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanServiceContainer.ServiceType;
-import org.camunda.bpm.container.impl.jmx.services.JmxProcessEngine;
-import org.camunda.bpm.container.spi.RuntimeContainerDelegate;
+import org.camunda.bpm.container.impl.jmx.services.JmxManagedProcessApplication;
+import org.camunda.bpm.container.impl.jmx.services.JmxManagedProcessEngine;
 
 import com.camunda.fox.platform.FoxPlatformException;
 import com.camunda.fox.platform.jobexecutor.JobExecutorService;
-import com.camunda.fox.platform.jobexecutor.impl.acquisition.JobAcquisition;
 import com.camunda.fox.platform.jobexecutor.spi.JobAcquisitionConfiguration;
 
 /**
@@ -96,37 +97,32 @@ public class JmxRuntimeContainerDelegate implements RuntimeContainerDelegate, Pr
                 
   }
   
-  // Container delegate implementation ///////////////////////////////////////////////
+  // runtime container delegate implementation ///////////////////////////////////////////////
   
   public void registerProcessEngine(ProcessEngine processEngine) {
     
     if(processEngine == null) {
-      throw new ActivitiException("Cannot register process engine with MBeans Container: process engine 'null'");
+      throw new ActivitiException("Cannot register process engine in Jmx Runtime Container: process engine is 'null'");
     }
     
-    JmxProcessEngine processEngineMBeanImpl = new JmxProcessEngine(processEngine, true);
-    serviceContainer.startService(ServiceTypes.PROCESS_ENGINE, processEngine.getName(), processEngineMBeanImpl);
-        
+    String processEngineName = processEngine.getName();
+    
+    // build and start the service.
+    JmxManagedProcessEngine managedProcessEngine = new JmxManagedProcessEngine(processEngine);    
+    serviceContainer.startService(ServiceTypes.PROCESS_ENGINE, processEngineName, managedProcessEngine);
+            
   }
   
   public void unregisterProcessEngine(ProcessEngine processEngine) {
     
     if(processEngine == null) {
-      throw new ActivitiException("Cannot unregister process engine with MBeans Container: process engine 'null'");
+      throw new ActivitiException("Cannot unregister process engine in Jmx Runtime Container: process engine is 'null'");
     }
     
     serviceContainer.stopService(ServiceTypes.PROCESS_ENGINE, processEngine.getName());
     
   }
   
-  public void registerJobAcquisition(JobAcquisition jobAcquisitionConfiguration) {
-    
-  }
-  
-  public void unregisterJobAcquisition(JobAcquisition jobAcquisitionConfiguration) {
-    
-  }
-
   public void deployProcessApplication(AbstractProcessApplication processApplication) {
     
     if(processApplication == null) {
@@ -225,6 +221,28 @@ public class JmxRuntimeContainerDelegate implements RuntimeContainerDelegate, Pr
   }
   
   public void unregisterProcessEngine(ProcessEngineConfigurationImpl processEngineConfiguration, String acquisitionName) {
+  }
+  
+  // process application service implementation /////////////////////////////////
+  
+  public Set<String> getProcessApplicationNames() {
+    List<JmxManagedProcessApplication> processApplications = serviceContainer.getServiceValuesByType(ServiceTypes.PROCESS_APPLICATION);
+    Set<String> processApplicationNames = new HashSet<String>();
+    for (JmxManagedProcessApplication jmxManagedProcessApplication : processApplications) {
+      processApplicationNames.add(jmxManagedProcessApplication.getProcessApplicationName());
+    }
+    return processApplicationNames;
+  }
+  
+  public ProcessApplicationInfo getProcessApplicationInfo(String processApplicationName) {
+    
+    JmxManagedProcessApplication processApplicationService = serviceContainer.getServiceValue(ServiceTypes.PROCESS_APPLICATION, processApplicationName);
+    
+    if(processApplicationService == null) {
+      return null;      
+    } else {    
+      return processApplicationService.getProcessApplicationInfo();      
+    }
   }
   
   // Getter / Setter ////////////////////////////////////////////////////////////

@@ -18,7 +18,7 @@ import java.util.Set;
 import org.activiti.engine.ProcessEngine;
 
 /**
- * <p>Returns the process engine service</p>
+ * <p>The {@link ProcessEngineService} provides access to the list of Managed Process Engines.</p>
  * 
  * <p>Users of this class may look up an instance of the service through a lookup strategy
  * appropriate for the platform they are using (Examples: Jndi, OSGi Service Registry ...)</p>

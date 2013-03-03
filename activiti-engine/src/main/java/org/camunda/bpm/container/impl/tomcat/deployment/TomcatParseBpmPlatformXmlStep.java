@@ -23,6 +23,8 @@ import org.camunda.bpm.container.impl.jmx.kernel.MBeanDeploymentOperation;
 /**
  * <p>This deployment operation step is responsible for parsing and attaching the bpm-platform.xml file on tomcat.</p>
  * 
+ * <p>We assume that the bpm-platform.xml file is located under <code>$CATALINA_HOME/conf/bpm-platform.xml</code>.</p>
+ * 
  * @author Daniel Meyer
  *
  */

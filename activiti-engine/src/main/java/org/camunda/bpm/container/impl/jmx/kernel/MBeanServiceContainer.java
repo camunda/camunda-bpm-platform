@@ -28,7 +28,7 @@ import org.camunda.bpm.container.impl.jmx.kernel.MBeanDeploymentOperation.MBeanD
 import com.camunda.fox.platform.FoxPlatformException;
 
 /**
- * <p>A simple Service Container that delegates to the {@link MBeanServer}.</p>
+ * <p>A simple Service Container that delegates to the JVM's {@link MBeanServer}.</p>
  * 
  * @author Daniel Meyer
  *
@@ -40,7 +40,7 @@ public class MBeanServiceContainer {
   protected Map<ObjectName, MBeanService<?>> servicesByName = new ConcurrentHashMap<ObjectName, MBeanService<?>>();
 
   /** set if the current thread is performing a composite deployment operation */
-  protected ThreadLocal<Stack<MBeanDeploymentOperation>> operationContext = new ThreadLocal<Stack<MBeanDeploymentOperation>>();
+  protected ThreadLocal<Stack<MBeanDeploymentOperation>> activeDeploymentOperations = new ThreadLocal<Stack<MBeanDeploymentOperation>>();
   
   public synchronized <S> void startService(ServiceType serviceType, String localName, MBeanService<S> service) {
     
@@ -63,16 +63,14 @@ public class MBeanServiceContainer {
       beanServer.registerMBean(service, serviceName);
       servicesByName.put(serviceName, service);
 
-      Stack<MBeanDeploymentOperation> currentOperationContext = operationContext.get();
+      Stack<MBeanDeploymentOperation> currentOperationContext = activeDeploymentOperations.get();
       if (currentOperationContext != null) {
         currentOperationContext.peek().serviceAdded(serviceName);
       }
 
     } catch (Exception e) {
       throw new FoxPlatformException("Could not register service " + serviceName + " with the MBean server", e);
-
     }
-
   }
   
   public synchronized void stopService(ServiceType serviceType, String localName) {
@@ -119,10 +117,10 @@ public class MBeanServiceContainer {
   
   protected void executeDeploymentOperation(MBeanDeploymentOperation operation) {
 
-    Stack<MBeanDeploymentOperation> currentOperationContext = operationContext.get();
+    Stack<MBeanDeploymentOperation> currentOperationContext = activeDeploymentOperations.get();
     if(currentOperationContext == null) {
       currentOperationContext = new Stack<MBeanDeploymentOperation>();      
-      operationContext.set(currentOperationContext);
+      activeDeploymentOperations.set(currentOperationContext);
     }
 
     try {
@@ -133,7 +131,7 @@ public class MBeanServiceContainer {
     } finally {
       currentOperationContext.pop();
       if(currentOperationContext.isEmpty()) {
-        operationContext.remove();
+        activeDeploymentOperations.remove();
       }
     }
   }

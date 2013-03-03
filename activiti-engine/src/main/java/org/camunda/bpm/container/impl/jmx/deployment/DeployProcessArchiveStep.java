@@ -29,14 +29,14 @@ import org.activiti.engine.impl.util.IoUtil;
 import org.activiti.engine.repository.Deployment;
 import org.activiti.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.application.AbstractProcessApplication;
-import org.camunda.bpm.application.impl.deployment.metadata.PropertyHelper;
-import org.camunda.bpm.application.impl.deployment.metadata.spi.ProcessArchiveXml;
+import org.camunda.bpm.application.ProcessApplicationRegistration;
+import org.camunda.bpm.application.impl.metadata.spi.ProcessArchiveXml;
 import org.camunda.bpm.container.impl.jmx.JmxRuntimeContainerDelegate.ServiceTypes;
 import org.camunda.bpm.container.impl.jmx.deployment.util.ClassPathScanner;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanDeploymentOperation;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanDeploymentOperationStep;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanServiceContainer;
-import org.camunda.bpm.engine.application.ProcessApplicationRegistration;
+import org.camunda.bpm.container.impl.metadata.PropertyHelper;
 
 
 /**
@@ -123,8 +123,8 @@ public class DeployProcessArchiveStep extends MBeanDeploymentOperationStep {
     deployment = deploymentBuilder.deploy();
     
     // register the deployment 
-    // TODO: think about turning the registration into a seperate step.
-    registration = processEngine.getManagementService().activateDeploymentForApplication(deployment.getId(), processApplication.getReference());
+    // TODO: think about turning the registration into a separate step.
+    registration = processEngine.getManagementService().registerProcessApplication(deployment.getId(), processApplication.getReference());
     
     // add attachment
     Map<String, ProcessApplicationRegistration> processArchiveDeploymentMap = operationContext.getAttachment(Attachments.PROCESS_ARCHIVE_DEPLOYMENT_MAP);

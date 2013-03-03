@@ -12,8 +12,6 @@
  */
 package org.camunda.bpm.application.impl;
 
-import java.util.logging.Logger;
-
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
@@ -28,18 +26,15 @@ import com.camunda.fox.platform.FoxPlatformException;
  */
 public class EjbProcessApplication extends AbstractProcessApplication {
 
-  private static final Logger log = Logger.getLogger(EjbProcessApplication.class.getName());
-
-  private String javaEeApplicationName;
-
   private String sessionObjectName;
+  private String eeModulePath;
 
   private EjbProcessApplicationReference ejbProcessApplicationReference;
   
   @Override
-  public void start() {
+  public void deploy() {
     ensureInitialized();
-    super.start();
+    super.deploy();
   }
   
   public ProcessApplicationReference getReference() {    
@@ -47,23 +42,22 @@ public class EjbProcessApplication extends AbstractProcessApplication {
     return ejbProcessApplicationReference;
   }
 
-  private void ensureInitialized() {
-    if(javaEeApplicationName == null) {
-      javaEeApplicationName = getJavaEEApplicationName();
-    }
+  protected void ensureInitialized() {    
     if(sessionObjectName == null) {
       sessionObjectName = composeSessionObjectName();
     }
     if(ejbProcessApplicationReference == null) {
-      ejbProcessApplicationReference = new EjbProcessApplicationReference(javaEeApplicationName, sessionObjectName);      
+      ejbProcessApplicationReference = new EjbProcessApplicationReference(eeModulePath, sessionObjectName);      
     }
   }
   
   protected String autodetectProcessApplicationName() {
-    return javaEeApplicationName;
+    ensureInitialized();
+    return eeModulePath;
   }
-
-  protected String getJavaEEApplicationName() {
+  
+  protected String composeSessionObjectName() {
+    
     try {
 
       InitialContext initialContext = new InitialContext();
@@ -71,25 +65,22 @@ public class EjbProcessApplication extends AbstractProcessApplication {
       String appName = (String) initialContext.lookup("java:app/AppName");
       String moduleName = (String) initialContext.lookup("java:module/ModuleName");
 
-      String detectedName = null;
       if (moduleName != null && !moduleName.equals(appName)) {
         // make sure that if an EAR carries multiple PAs, they are correctly
         // identified by appName + moduleName
-        detectedName = appName + "/" + moduleName;
+        eeModulePath = appName + "/" + moduleName;
       } else {
-        detectedName = appName;
+        eeModulePath = appName;
       }
 
-      return detectedName;
+      Class<? extends EjbProcessApplication> applicationClass = getClass();
+      return "java:global/" + eeModulePath + "/" + applicationClass.getSimpleName() + "!" + applicationClass.getName();  
 
     } catch (NamingException e) {
       throw new FoxPlatformException("Could not autodetect EjbProcessApplicationName: "+e.getMessage(), e);
     }
-  }
-  
-  protected String composeSessionObjectName() {
-    Class<? extends EjbProcessApplication> applicationClass = getClass();
-    return "java:global/" + javaEeApplicationName + "/" + applicationClass.getSimpleName() + "!" + applicationClass.getName();  
+    
+    
   }
   
 }

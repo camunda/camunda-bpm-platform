@@ -19,13 +19,13 @@ import java.util.logging.Logger;
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.ProcessEngine;
 import org.camunda.bpm.application.AbstractProcessApplication;
-import org.camunda.bpm.application.impl.deployment.metadata.spi.ProcessEngineXml;
-import org.camunda.bpm.application.impl.deployment.metadata.spi.ProcessesXml;
+import org.camunda.bpm.application.impl.metadata.spi.ProcessesXml;
 import org.camunda.bpm.container.impl.jmx.JmxRuntimeContainerDelegate.ServiceTypes;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanDeploymentOperation;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanDeploymentOperationStep;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanServiceContainer;
-import org.camunda.bpm.container.impl.jmx.services.JmxProcessApplication;
+import org.camunda.bpm.container.impl.jmx.services.JmxManagedProcessApplication;
+import org.camunda.bpm.container.impl.metadata.spi.ProcessEngineXml;
 
 /**
  * <p>Deployment operation responsible for stopping all process engines started by the deployment.</p>
@@ -45,7 +45,7 @@ public class ProcessesXmlStopProcessEnginesStep extends MBeanDeploymentOperation
     
     final MBeanServiceContainer serviceContainer = operationContext.getServiceContainer();
     final AbstractProcessApplication processApplication = operationContext.getAttachment(Attachments.PROCESS_APPLICATION);    
-    final JmxProcessApplication deployedProcessApplication = serviceContainer.getService(ServiceTypes.PROCESS_APPLICATION, processApplication.getName());
+    final JmxManagedProcessApplication deployedProcessApplication = serviceContainer.getService(ServiceTypes.PROCESS_APPLICATION, processApplication.getName());
     
     if(deployedProcessApplication == null) {
       throw new ActivitiException("Cannot find process application with name "+processApplication.getName()+".");

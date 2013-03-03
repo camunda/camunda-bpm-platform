@@ -7,9 +7,10 @@ import java.util.Map;
 import junit.framework.TestCase;
 
 import org.activiti.engine.ActivitiException;
-import org.camunda.bpm.application.impl.deployment.metadata.spi.ProcessArchiveXml;
-import org.camunda.bpm.application.impl.deployment.metadata.spi.ProcessEngineXml;
-import org.camunda.bpm.application.impl.deployment.metadata.spi.ProcessesXml;
+import org.camunda.bpm.application.impl.metadata.ProcessesXmlParser;
+import org.camunda.bpm.application.impl.metadata.spi.ProcessArchiveXml;
+import org.camunda.bpm.application.impl.metadata.spi.ProcessesXml;
+import org.camunda.bpm.container.impl.metadata.spi.ProcessEngineXml;
 
 /**
  * <p>The testcases for the {@link ProcessesXmlParser}</p>

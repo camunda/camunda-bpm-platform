@@ -12,7 +12,7 @@
  */
 package com.camunda.fox.platform.subsystem.impl.util;
 
-import org.camunda.bpm.application.impl.deployment.metadata.spi.ProcessesXml;
+import org.camunda.bpm.application.impl.metadata.spi.ProcessesXml;
 import org.jboss.vfs.VirtualFile;
 
 /**

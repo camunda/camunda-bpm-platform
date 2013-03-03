@@ -3,7 +3,7 @@ package com.camunda.fox.client.impl.web;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
-import org.camunda.bpm.application.impl.deployment.parser.ProcessesXmlParser;
+import org.camunda.bpm.application.impl.metadata.ProcessesXmlParser;
 
 
 /**

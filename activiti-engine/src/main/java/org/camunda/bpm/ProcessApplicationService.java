@@ -12,8 +12,31 @@
  */
 package org.camunda.bpm;
 
+import java.util.Set;
+
+import org.camunda.bpm.application.ProcessApplicationInfo;
+
+/**
+ * <p>The process application service provides access to all deployed process applications.</p>
+ * 
+ * @author Daniel Meyer
+ *
+ */
 public interface ProcessApplicationService {
   
-  // TO BE DEFINED
+  /** 
+   * @returns the names of all deployed process applications 
+   * */
+  public Set<String> getProcessApplicationNames();
+  
+  /**
+   * <p>Provides information about a deployed process application</p> 
+   * 
+   * @param processApplicationName
+   * 
+   * @return the {@link ProcessApplicationInfo} object or null if no such process application is deployed. 
+   */
+  public ProcessApplicationInfo getProcessApplicationInfo(String processApplicationName);
+  
 
 }

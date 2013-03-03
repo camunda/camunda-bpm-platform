@@ -19,6 +19,7 @@ import org.jboss.threads.ExecutionTimedOutException;
 
 import com.camunda.fox.platform.FoxPlatformException;
 import com.camunda.fox.platform.jobexecutor.impl.PlatformJobExecutor;
+import com.camunda.fox.platform.subsystem.impl.metadata.ManagedProcessEngineMetadata;
 import com.camunda.fox.platform.subsystem.impl.service.execution.ContainerExecuteJobsRunnable;
 
 public class ContainerJobExecutorService extends PlatformJobExecutor implements Service<ContainerJobExecutorService> {
@@ -113,7 +114,7 @@ public class ContainerJobExecutorService extends PlatformJobExecutor implements 
    * @param jobAcquisitionName
    * @return
    */
-  public JobExecutor registerProcessEngine(ManagedProcessEngineConfiguration processEngineMetadata, String jobAcquisitionName) {
+  public JobExecutor registerProcessEngine(ManagedProcessEngineMetadata processEngineMetadata, String jobAcquisitionName) {
     // TODO Auto-generated method stub
     return null;
   }

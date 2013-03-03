@@ -49,8 +49,9 @@ import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceName;
 
 import com.camunda.fox.platform.subsystem.impl.extension.Element;
-import com.camunda.fox.platform.subsystem.impl.service.ManagedProcessEngineConfiguration;
-import com.camunda.fox.platform.subsystem.impl.service.ManagedProcessEngineController;
+import com.camunda.fox.platform.subsystem.impl.metadata.ManagedProcessEngineMetadata;
+import com.camunda.fox.platform.subsystem.impl.service.MscManagedProcessEngineController;
+import com.camunda.fox.platform.subsystem.impl.service.ServiceNames;
 
 /**
  * Provides the description and the implementation of the process-engine#add operation.
@@ -131,7 +132,7 @@ public class ProcessEngineAdd extends AbstractAddStepHandler implements Descript
     
     String engineName = PathAddress.pathAddress(operation.get(ModelDescriptionConstants.ADDRESS)).getLastElement().getValue();
 
-    ManagedProcessEngineConfiguration processEngineConfiguration = transformConfiguration(context, engineName, model);
+    ManagedProcessEngineMetadata processEngineConfiguration = transformConfiguration(context, engineName, model);
     
     ServiceController<ProcessEngine> controller = installService(context, verificationHandler, processEngineConfiguration);
         
@@ -139,20 +140,20 @@ public class ProcessEngineAdd extends AbstractAddStepHandler implements Descript
   }
 
   protected ServiceController<ProcessEngine> installService(OperationContext context, ServiceVerificationHandler verificationHandler,
-      ManagedProcessEngineConfiguration processEngineConfiguration) {
+      ManagedProcessEngineMetadata processEngineConfiguration) {
     
-    ManagedProcessEngineController service = new ManagedProcessEngineController(processEngineConfiguration);        
-    ServiceName name = ManagedProcessEngineController.createServiceName(processEngineConfiguration.getEngineName());    
+    MscManagedProcessEngineController service = new MscManagedProcessEngineController(processEngineConfiguration);        
+    ServiceName name = ServiceNames.forManagedProcessEngine(processEngineConfiguration.getEngineName());    
     
     ServiceBuilder<ProcessEngine> serviceBuilder = context.getServiceTarget().addService(name, service);
     
-    ManagedProcessEngineController.initializeServiceBuilder(processEngineConfiguration, service, serviceBuilder);
+    MscManagedProcessEngineController.initializeServiceBuilder(processEngineConfiguration, service, serviceBuilder);
     
     serviceBuilder.addListener(verificationHandler);    
     return serviceBuilder.install();
   }
 
-  protected ManagedProcessEngineConfiguration transformConfiguration(final OperationContext context, String engineName, final ModelNode model) {
+  protected ManagedProcessEngineMetadata transformConfiguration(final OperationContext context, String engineName, final ModelNode model) {
     String datasourceJndiName = model.get(DATASOURCE).asString();   
     String historyLevel = model.get(HISTORY_LEVEL).asString();
     boolean isDefault = model.get(DEFAULT).asBoolean();
@@ -168,7 +169,7 @@ public class ProcessEngineAdd extends AbstractAddStepHandler implements Descript
       }
     }
         
-    return new ManagedProcessEngineConfiguration(isDefault, engineName, datasourceJndiName, historyLevel, properties);
+    return new ManagedProcessEngineMetadata(isDefault, engineName, datasourceJndiName, historyLevel, properties);
   }
   
 }

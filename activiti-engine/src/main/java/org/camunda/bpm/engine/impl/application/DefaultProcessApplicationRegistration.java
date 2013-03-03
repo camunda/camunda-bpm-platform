@@ -13,7 +13,7 @@
 package org.camunda.bpm.engine.impl.application;
 
 import org.camunda.bpm.application.ProcessApplicationReference;
-import org.camunda.bpm.engine.application.ProcessApplicationRegistration;
+import org.camunda.bpm.application.ProcessApplicationRegistration;
 
 /**
  * @author Daniel Meyer
@@ -22,29 +22,36 @@ import org.camunda.bpm.engine.application.ProcessApplicationRegistration;
 public class DefaultProcessApplicationRegistration implements ProcessApplicationRegistration {
 
   protected ProcessApplicationManager processApplicationManager;
-  protected ProcessApplicationReference processApplicationReference;
   protected String deploymentId;
+  protected String processEngineName;
+  protected ProcessApplicationReference reference;
 
   /**
    * @param processApplicationManager
+   * @param reference 
    */
-  public DefaultProcessApplicationRegistration(ProcessApplicationManager processApplicationManager, ProcessApplicationReference processApplicationReference, String deploymentId) {
+  public DefaultProcessApplicationRegistration(ProcessApplicationManager processApplicationManager, ProcessApplicationReference reference, String deploymentId, String processEnginenName) {
     this.processApplicationManager = processApplicationManager;
-    this.processApplicationReference = processApplicationReference;
+    this.reference = reference;
     this.deploymentId = deploymentId;
+    this.processEngineName = processEnginenName;
   }
 
   // called by the pa
   public void unregister() {
     processApplicationManager.removeProcessApplication(deploymentId);
   }
-  
-  public ProcessApplicationReference getProcessApplicationReference() {
-    return processApplicationReference;
-  }
-  
+    
   public String getDeploymentId() {
     return deploymentId;
+  }
+  
+  public String getProcessEngineName() {
+    return processEngineName;
+  }
+  
+  public ProcessApplicationReference getReference() {
+    return reference;
   }
 
 }

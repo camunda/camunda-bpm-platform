@@ -4,7 +4,7 @@ import java.util.Collection;
 
 import org.jboss.msc.service.AbstractServiceListener;
 import org.jboss.msc.service.ServiceController;
-import org.jboss.msc.service.ServiceController.Substate;
+import org.jboss.msc.service.ServiceController.State;
 import org.jboss.msc.service.ServiceController.Transition;
 import org.jboss.msc.service.ServiceName;
 
@@ -34,12 +34,10 @@ public class ServiceTracker<S> extends AbstractServiceListener<Object> {
       return;
     }
     
-    if(transition.getAfter().equals(Substate.UP)) {
+    if(transition.getAfter().getState().equals(State.UP)) {
       serviceCollection.add((S) controller.getValue());
-      
-    } else if(transition.getAfter().equals(Substate.CANCELLED) || transition.getAfter().equals(Substate.START_FAILED)){
-      serviceCollection.remove(controller.getValue());
-      
+    } else  {
+      serviceCollection.remove(controller.getValue());      
     }
     
   }

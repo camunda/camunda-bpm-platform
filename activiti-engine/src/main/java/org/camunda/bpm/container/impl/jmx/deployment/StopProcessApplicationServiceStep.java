@@ -17,10 +17,10 @@ import org.camunda.bpm.container.impl.jmx.JmxRuntimeContainerDelegate.ServiceTyp
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanDeploymentOperation;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanDeploymentOperationStep;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanServiceContainer;
-import org.camunda.bpm.container.impl.jmx.services.JmxProcessApplication;
+import org.camunda.bpm.container.impl.jmx.services.JmxManagedProcessApplication;
 
 /**
- * <p>Deployment operations step responsible for removing the {@link JmxProcessApplication} service.</p>
+ * <p>Deployment operations step responsible for removing the {@link JmxManagedProcessApplication} service.</p>
  * 
  * @author Daniel Meyer
  *

@@ -12,11 +12,11 @@
  */
 package com.camunda.fox.platform.subsystem.impl.deployment.processor;
 
+import java.util.List;
 import java.util.Map;
 
 import org.activiti.engine.ProcessEngine;
-import org.camunda.bpm.application.impl.deployment.metadata.spi.ProcessEngineXml;
-import org.camunda.bpm.application.impl.deployment.metadata.spi.ProcessesXml;
+import org.camunda.bpm.container.impl.metadata.spi.ProcessEngineXml;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
@@ -29,17 +29,22 @@ import org.jboss.msc.service.ServiceRegistry;
 import org.jboss.msc.service.ServiceTarget;
 
 import com.camunda.fox.platform.subsystem.impl.deployment.marker.ProcessApplicationAttachments;
-import com.camunda.fox.platform.subsystem.impl.service.ManagedProcessEngineConfiguration;
-import com.camunda.fox.platform.subsystem.impl.service.ManagedProcessEngineController;
+import com.camunda.fox.platform.subsystem.impl.metadata.ManagedProcessEngineMetadata;
+import com.camunda.fox.platform.subsystem.impl.service.MscManagedProcessEngineController;
+import com.camunda.fox.platform.subsystem.impl.service.ServiceNames;
+import com.camunda.fox.platform.subsystem.impl.util.ProcessesXmlWrapper;
 
 /**
  * <p>Deployment Unit Processor that creates process engine services for each 
- * process engine configured in the <code>processes.xml</code> file</p>
+ * process engine configured in a <code>processes.xml</code> file</p>
  * 
  * @author Daniel Meyer
  *
  */
 public class ProcessEngineStartProcessor implements DeploymentUnitProcessor {
+  
+  // this can happen early in the phase
+  public static final int PRIORITY = 0x0001; 
 
   public void deploy(DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {
     
@@ -49,10 +54,11 @@ public class ProcessEngineStartProcessor implements DeploymentUnitProcessor {
       return;
     }
     
-    ProcessesXml processesXml = ProcessApplicationAttachments.getProcessesXml(deploymentUnit).getProcessesXml();
-    
-    for (ProcessEngineXml processEngineXml : processesXml.getProcessEngines()) {
-      startProcessEngine(processEngineXml, phaseContext);      
+    List<ProcessesXmlWrapper> processesXmls = ProcessApplicationAttachments.getProcessesXmls(deploymentUnit);
+    for (ProcessesXmlWrapper wrapper : processesXmls) {            
+      for (ProcessEngineXml processEngineXml : wrapper.getProcessesXml().getProcessEngines()) {
+        startProcessEngine(processEngineXml, phaseContext);      
+      }
     }
     
   }
@@ -62,19 +68,22 @@ public class ProcessEngineStartProcessor implements DeploymentUnitProcessor {
     final ServiceTarget serviceTarget = phaseContext.getServiceTarget();
     
     // transform configuration
-    ManagedProcessEngineConfiguration configuration = transformConfiguration(processEngineXml);
+    ManagedProcessEngineMetadata configuration = transformConfiguration(processEngineXml);
     
     // create service instance
-    ManagedProcessEngineController service = new ManagedProcessEngineController(configuration);
+    MscManagedProcessEngineController service = new MscManagedProcessEngineController(configuration);
     
     // get the service name for the process engine
-    ServiceName serviceName = ManagedProcessEngineController.createServiceName(processEngineXml.getName());
+    ServiceName serviceName = ServiceNames.forManagedProcessEngine(processEngineXml.getName());
     
     // get service builder
     ServiceBuilder<ProcessEngine> serviceBuilder = serviceTarget.addService(serviceName, service);
     
+    // make this service depend on the current phase -> makes sure it is removed with the phase service at undeployment
+    serviceBuilder.addDependency(phaseContext.getPhaseServiceName());
+    
     // add Service dependencies
-    ManagedProcessEngineController.initializeServiceBuilder(configuration, service, serviceBuilder);
+    MscManagedProcessEngineController.initializeServiceBuilder(configuration, service, serviceBuilder);
     
     // install the service
     serviceBuilder.install();
@@ -82,47 +91,35 @@ public class ProcessEngineStartProcessor implements DeploymentUnitProcessor {
   }
 
   /** transforms the configuration as provided via the {@link ProcessEngineXml} 
-   * into a {@link ManagedProcessEngineConfiguration} */
+   * into a {@link ManagedProcessEngineMetadata} */
   @SuppressWarnings({ "unchecked", "rawtypes" })
-  protected ManagedProcessEngineConfiguration transformConfiguration(ProcessEngineXml processEngineXml) {
+  protected ManagedProcessEngineMetadata transformConfiguration(ProcessEngineXml processEngineXml) {
     
     boolean isDefault = processEngineXml.getName().equals("default");
     String engineName = processEngineXml.getName();
     String datasourceJndiName = processEngineXml.getDatasource();
     String historyLevel = processEngineXml.getProperties().get("history");
     
-    return new ManagedProcessEngineConfiguration(isDefault, engineName, datasourceJndiName, historyLevel, (Map) processEngineXml.getProperties());
+    return new ManagedProcessEngineMetadata(isDefault, engineName, datasourceJndiName, historyLevel, (Map) processEngineXml.getProperties());
         
   }
 
   public void undeploy(DeploymentUnit deploymentUnit) {
-    
-    // remove all process engines listed in the processes.xml
         
-    if(!ProcessApplicationAttachments.isProcessApplication(deploymentUnit)) {
-      return;
-    }
-    
-    ProcessesXml processesXml = ProcessApplicationAttachments.getProcessesXml(deploymentUnit).getProcessesXml();
-    
-    for (ProcessEngineXml processEngineXml : processesXml.getProcessEngines()) {
-      stopProcessEngine(processEngineXml, deploymentUnit);      
-    }
-    
   }
 
   protected void stopProcessEngine(ProcessEngineXml processEngineXml, DeploymentUnit deploymentUnit) {
 
     final ServiceRegistry serviceRegistry = deploymentUnit.getServiceRegistry();
     
-    // get the service name for the process engine
-    ServiceName serviceName = ManagedProcessEngineController.createServiceName(processEngineXml.getName());
+    // get the service name for the process engine controller
+    ServiceName serviceName = ServiceNames.forManagedProcessEngine(processEngineXml.getName());
     
     // find the service
     ServiceController<?> service = serviceRegistry.getService(serviceName);
     
     if(service != null) {
-      // remoce the service
+      // remove the service
       service.setMode(Mode.REMOVE);
     }
   }

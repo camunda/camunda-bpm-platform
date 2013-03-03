@@ -15,14 +15,14 @@ package org.camunda.bpm.container.impl.jmx.deployment;
 import java.util.Map;
 
 import org.activiti.engine.ProcessEngine;
-import org.camunda.bpm.application.impl.deployment.metadata.PropertyHelper;
-import org.camunda.bpm.application.impl.deployment.metadata.spi.ProcessArchiveXml;
+import org.camunda.bpm.application.ProcessApplicationRegistration;
+import org.camunda.bpm.application.impl.metadata.spi.ProcessArchiveXml;
 import org.camunda.bpm.container.impl.jmx.JmxRuntimeContainerDelegate.ServiceTypes;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanDeploymentOperation;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanDeploymentOperationStep;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanServiceContainer;
-import org.camunda.bpm.container.impl.jmx.services.JmxProcessApplication;
-import org.camunda.bpm.engine.application.ProcessApplicationRegistration;
+import org.camunda.bpm.container.impl.jmx.services.JmxManagedProcessApplication;
+import org.camunda.bpm.container.impl.metadata.PropertyHelper;
 
 /**
  * <p>Deployment operation step responsible for performing the undeployment of a
@@ -34,10 +34,10 @@ import org.camunda.bpm.engine.application.ProcessApplicationRegistration;
 public class UndeployProcessArchiveStep extends MBeanDeploymentOperationStep {
 
   protected String processArchvieName;
-  protected JmxProcessApplication deployedProcessApplication;
+  protected JmxManagedProcessApplication deployedProcessApplication;
   protected ProcessArchiveXml processArchive;
 
-  public UndeployProcessArchiveStep(JmxProcessApplication deployedProcessApplication, ProcessArchiveXml processArchive) {
+  public UndeployProcessArchiveStep(JmxManagedProcessApplication deployedProcessApplication, ProcessArchiveXml processArchive) {
     this.deployedProcessApplication = deployedProcessApplication;
     this.processArchive = processArchive;
   }

@@ -18,8 +18,8 @@ import java.net.URL;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.camunda.bpm.application.impl.deployment.metadata.spi.ProcessArchiveXml;
-import org.camunda.bpm.application.impl.deployment.metadata.spi.ProcessesXml;
+import org.camunda.bpm.application.impl.metadata.spi.ProcessArchiveXml;
+import org.camunda.bpm.application.impl.metadata.spi.ProcessesXml;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanDeploymentOperation;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanDeploymentOperationStep;
 

@@ -5,10 +5,11 @@ import java.util.Map;
 
 import junit.framework.TestCase;
 
-import org.camunda.bpm.application.impl.deployment.metadata.spi.BpmPlatformXml;
-import org.camunda.bpm.application.impl.deployment.metadata.spi.JobAcquisitionXml;
-import org.camunda.bpm.application.impl.deployment.metadata.spi.JobExecutorXml;
-import org.camunda.bpm.application.impl.deployment.metadata.spi.ProcessEngineXml;
+import org.camunda.bpm.container.impl.metadata.BpmPlatformXmlParser;
+import org.camunda.bpm.container.impl.metadata.spi.BpmPlatformXml;
+import org.camunda.bpm.container.impl.metadata.spi.JobAcquisitionXml;
+import org.camunda.bpm.container.impl.metadata.spi.JobExecutorXml;
+import org.camunda.bpm.container.impl.metadata.spi.ProcessEngineXml;
 
 /**
  * <p>The testcases for the {@link BpmPlatformXmlParser}</p>

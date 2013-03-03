@@ -20,6 +20,7 @@ import org.activiti.engine.impl.cmd.ActivateDeploymentForApplicationCmd;
 import org.activiti.engine.impl.cmd.DeleteJobCmd;
 import org.activiti.engine.impl.cmd.ExecuteJobsCmd;
 import org.activiti.engine.impl.cmd.GetJobExceptionStacktraceCmd;
+import org.activiti.engine.impl.cmd.GetProcessApplicationForDeployment;
 import org.activiti.engine.impl.cmd.GetPropertiesCmd;
 import org.activiti.engine.impl.cmd.GetTableCountCmd;
 import org.activiti.engine.impl.cmd.GetTableMetaDataCmd;
@@ -33,7 +34,7 @@ import org.activiti.engine.management.TableMetaData;
 import org.activiti.engine.management.TablePageQuery;
 import org.activiti.engine.runtime.JobQuery;
 import org.camunda.bpm.application.ProcessApplicationReference;
-import org.camunda.bpm.engine.application.ProcessApplicationRegistration;
+import org.camunda.bpm.application.ProcessApplicationRegistration;
 
 
 /**
@@ -44,8 +45,12 @@ import org.camunda.bpm.engine.application.ProcessApplicationRegistration;
  */
 public class ManagementServiceImpl extends ServiceImpl implements ManagementService {
   
-  public ProcessApplicationRegistration activateDeploymentForApplication(String deploymentId, ProcessApplicationReference reference) {    
+  public ProcessApplicationRegistration registerProcessApplication(String deploymentId, ProcessApplicationReference reference) {    
     return commandExecutor.execute(new ActivateDeploymentForApplicationCmd(deploymentId, reference));
+  }
+  
+  public String getProcessApplicationForDeployment(String deploymentId) {
+    return commandExecutor.execute(new GetProcessApplicationForDeployment(deploymentId));
   }
 
   public Map<String, Long> getTableCount() {

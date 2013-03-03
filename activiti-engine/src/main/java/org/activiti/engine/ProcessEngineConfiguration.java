@@ -20,7 +20,6 @@ import javax.sql.DataSource;
 import org.activiti.engine.impl.cfg.BeansConfigurationHelper;
 import org.activiti.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
 import org.activiti.engine.impl.cfg.StandaloneProcessEngineConfiguration;
-import org.camunda.bpm.container.impl.RuntimeContainerConfiguration;
 
 
 /** Configuration information from which a process engine can be build.
@@ -143,8 +142,6 @@ public abstract class ProcessEngineConfiguration {
   protected boolean jpaCloseEntityManager;
   
   protected ClassLoader classLoader;
-  
-  protected boolean containerManaged = false;
 
   /** use one of the static createXxxx methods instead */
   protected ProcessEngineConfiguration() {
@@ -511,25 +508,4 @@ public abstract class ProcessEngineConfiguration {
     this.dataSourceJndiName = dataSourceJndiName;
   }
   
-  /** 
-   * set whether the process engine is managed by the application or whether it should be registered with the Runtime Container.
-   * 
-   * @param applicationManaged indicates whether the process engine should be application managed. 
-   * @see RuntimeContainerConfiguration
-   */
-  public ProcessEngineConfiguration setContainerManaged(boolean containerManaged) {
-    this.containerManaged = containerManaged;
-    return this;
-  }
-  
-  /** 
-   * indicates whether the process engine is managed by the application or whether it should be registered with the Runtime Container.
-   * 
-   * @param applicationManaged indicates whether the process engine should be application managed. 
-   * @see RuntimeContainerConfiguration
-   */
-  public boolean isContainerManaged() {
-    return containerManaged;
-  }
-
 }

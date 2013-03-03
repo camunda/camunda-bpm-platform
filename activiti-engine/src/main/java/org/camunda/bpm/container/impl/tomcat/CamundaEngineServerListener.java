@@ -20,7 +20,7 @@ import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.core.StandardServer;
-import org.camunda.bpm.container.impl.RuntimeContainerConfiguration;
+import org.camunda.bpm.container.RuntimeContainerDelegate;
 import org.camunda.bpm.container.impl.jmx.JmxRuntimeContainerDelegate;
 import org.camunda.bpm.container.impl.jmx.deployment.PlatformXmlStartProcessEnginesStep;
 import org.camunda.bpm.container.impl.jmx.deployment.StopProcessApplicationsStep;
@@ -30,8 +30,7 @@ import org.camunda.bpm.container.impl.tomcat.deployment.TomcatCreateJndiBindings
 import org.camunda.bpm.container.impl.tomcat.deployment.TomcatParseBpmPlatformXmlStep;
 
 /**
- * <p>Apache Tomcat server listener responsible for starting and stopping configured process engines 
- * upon starting and stopping of the servlet container.</p> 
+ * <p>Apache Tomcat server listener responsible for deploying the bpm platform.</p> 
  * 
  * @author Daniel Meyer
  *
@@ -40,8 +39,6 @@ public class CamundaEngineServerListener implements LifecycleListener {
   
   private final static Logger LOGGER = Logger.getLogger(CamundaEngineServerListener.class.getName());
   
-  protected RuntimeContainerConfiguration runtimeContainerConfiguration;
-
   protected ProcessEngine processEngine;
 
   protected JmxRuntimeContainerDelegate containerDelegate;
@@ -50,9 +47,9 @@ public class CamundaEngineServerListener implements LifecycleListener {
 
     if (Lifecycle.START_EVENT.equals(event.getType())) {
       
-      runtimeContainerConfiguration = RuntimeContainerConfiguration.getInstance();
-      containerDelegate = (JmxRuntimeContainerDelegate) runtimeContainerConfiguration.getContainerDelegate();
-      
+      // the Apache Tomcat integration uses the Jmx Container for managing process engines and applications.
+      containerDelegate = (JmxRuntimeContainerDelegate) RuntimeContainerDelegate.INSTANCE.get();
+            
       deployBpmPlatform(event);
       
     } else if (Lifecycle.STOP_EVENT.equals(event.getType())) {

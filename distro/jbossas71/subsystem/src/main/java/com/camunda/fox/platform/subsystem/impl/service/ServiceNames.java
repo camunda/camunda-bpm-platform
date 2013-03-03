@@ -15,26 +15,91 @@ package com.camunda.fox.platform.subsystem.impl.service;
 import org.jboss.msc.service.ServiceName;
 
 /**
- * <p>Class with service names</p>
+ * <p>All ServiceName references run through here.</p>
  * 
  * @author Daniel Meyer
  *
  */
 public class ServiceNames {
   
-  public final static ServiceName PLATFORM_SERVICE_ROOT = ServiceName.of("org", "camunda", "bpm", "platform");
+  private final static ServiceName BPM_PLATFORM = ServiceName.of("org", "camunda", "bpm", "platform");
   
-  public final static ServiceName MANAGED_PROCESS_ENGINE = PLATFORM_SERVICE_ROOT.append("process-engine");
-  public final static ServiceName DEFAULT_PROCESS_ENGINE = MANAGED_PROCESS_ENGINE.append("default");
+  private final static ServiceName PROCESS_ENGINE = BPM_PLATFORM.append("process-engine");
+  private final static ServiceName DEFAULT_PROCESS_ENGINE = PROCESS_ENGINE.append("default");
   
-  public final static ServiceName MSC_RUNTIME_CONTAINER_DELEGATE = PLATFORM_SERVICE_ROOT.append("container");
+  private final static ServiceName MSC_RUNTIME_CONTAINER_DELEGATE = BPM_PLATFORM.append("runtime-container");
   
-  public static ServiceName getManagedProcessEngineName(String processEngineName) {
-    return MANAGED_PROCESS_ENGINE.append(processEngineName);
+  private final static ServiceName PROCESS_APPLICATION = BPM_PLATFORM.append("process-application");  
+  
+  /**
+   * Returns the service name for a {@link MscManagedProcessEngine}. 
+   * 
+   * @param the
+   *          name of the process engine
+   * @return the composed service name
+   */
+  public static ServiceName forManagedProcessEngine(String processEngineName) {
+    return PROCESS_ENGINE.append(processEngineName);
   }
   
-  public static ServiceName getManagedProcessEngineStartName(String processEngineName) {
-    return MANAGED_PROCESS_ENGINE.append("start-"+processEngineName);
+  /**
+   * @return the {@link ServiceName} for the default
+   *         {@link MscManagedProcessEngine}. This is a constant name since
+   *         there can only be one default process engine.
+   */
+  public static ServiceName forDefaultProcessEngine() {
+    return DEFAULT_PROCESS_ENGINE;
   }
+  
+  /**
+   * @return the {@link ServiceName} for the {@link MscRuntimeContainerDelegate}
+   */
+  public static ServiceName forMscRuntimeContainerDelegate() {
+    return MSC_RUNTIME_CONTAINER_DELEGATE;
+  }
+  
+  /**
+   * <p>Returns the name for a {@link ProcessApplicationDeploymentService} given
+   * the name of the deployment unit and the name of the deployment.</p>
+   * 
+   * @param processApplicationName
+   * @param deploymentId
+   */
+  public static ServiceName forProcessApplicationDeploymentService(String deploymentUnitName, String deploymentName) {
+    return PROCESS_APPLICATION.append(deploymentUnitName).append(deploymentName);
+  }
+
+  /**
+   * @return the {@link ServiceName} that is the longest common prefix of all 
+   * ServiceNames used for {@link MscManagedProcessEngine}.
+   */
+  public static ServiceName forManagedProcessEngines() {
+    return PROCESS_ENGINE;
+  }
+  
+  /**
+   * @return the {@link ServiceName} that is the longest common prefix of all 
+   * ServiceNames used for {@link MscManagedProcessApplication}.
+   */
+  public static ServiceName forManagedProcessApplications() {
+    return PROCESS_APPLICATION;
+  }
+  
+  /**
+   * @param applicationName
+   * @return the name to be used for an {@link MscManagedProcessApplication} service.
+   */
+  public static ServiceName forManagedProcessApplication(String applicationName) {
+    return PROCESS_APPLICATION.append(applicationName);
+  }
+  
+  /**
+   * @param applicationName
+   * @return the name to be used for an {@link MscManagedProcessApplication} service.
+   */
+  public static ServiceName forProcessApplicationStartService(String deploymentUnitName) {
+    return PROCESS_APPLICATION.append("start").append(deploymentUnitName);
+  }
+  
   
 }

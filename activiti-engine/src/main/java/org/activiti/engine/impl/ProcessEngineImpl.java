@@ -32,7 +32,6 @@ import org.activiti.engine.impl.el.ExpressionManager;
 import org.activiti.engine.impl.interceptor.CommandExecutor;
 import org.activiti.engine.impl.interceptor.SessionFactory;
 import org.activiti.engine.impl.jobexecutor.JobExecutor;
-import org.camunda.bpm.container.impl.RuntimeContainerConfiguration;
 
 /**
  * @author Tom Baeyens
@@ -83,16 +82,8 @@ public class ProcessEngineImpl implements ProcessEngine {
       log.info("ProcessEngine " + name + " created");
     }
     
-    // register with deprecated ProcessEngines class
     ProcessEngines.registerProcessEngine(this);
     
-    if(processEngineConfiguration.isContainerManaged()) {
-      // register with runtime container integration subsystem
-      RuntimeContainerConfiguration.getInstance()
-        .getContainerDelegate()
-        .registerProcessEngine(this);
-    }
-
     if ((jobExecutor != null) && (jobExecutor.isAutoActivate())) {
       jobExecutor.start();
     }
@@ -100,14 +91,6 @@ public class ProcessEngineImpl implements ProcessEngine {
   
   public void close() {
     
-    if(processEngineConfiguration.isContainerManaged()) {
-      // un-register with runtime container integration subsystem
-      RuntimeContainerConfiguration.getInstance()
-        .getContainerDelegate()
-        .unregisterProcessEngine(this);
-    }
-    
-    // unregister with deprecated ProcessEngines class  
     ProcessEngines.unregister(this);
     
     if ((jobExecutor != null) && (jobExecutor.isActive())) {

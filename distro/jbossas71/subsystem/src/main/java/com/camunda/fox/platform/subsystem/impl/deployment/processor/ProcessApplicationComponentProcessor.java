@@ -16,22 +16,11 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import javax.ejb.ConcurrencyManagementType;
-import javax.ejb.TransactionAttributeType;
-import javax.ejb.TransactionManagementType;
-
-import org.camunda.bpm.application.ProcessApplicationExecutionException;
 import org.camunda.bpm.application.ProcessApplication;
-import org.camunda.bpm.application.impl.EjbProcessApplication;
 import org.jboss.as.ee.component.Attachments;
 import org.jboss.as.ee.component.ComponentDescription;
-import org.jboss.as.ee.component.EEApplicationClasses;
 import org.jboss.as.ee.component.EEModuleDescription;
 import org.jboss.as.ejb3.component.singleton.SingletonComponentDescription;
-import org.jboss.as.ejb3.deployment.ApplicationExceptionDescriptions;
-import org.jboss.as.ejb3.deployment.EjbDeploymentAttachmentKeys;
-import org.jboss.as.ejb3.deployment.EjbDeploymentMarker;
-import org.jboss.as.ejb3.deployment.EjbJarDescription;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
@@ -43,19 +32,14 @@ import org.jboss.jandex.AnnotationTarget;
 import org.jboss.jandex.ClassInfo;
 import org.jboss.jandex.DotName;
 import org.jboss.jandex.Index;
-import org.jboss.metadata.ejb.jboss.ejb3.JBossEnterpriseBeansMetaData;
-import org.jboss.metadata.ejb.spec.ContainerTransactionMetaData;
-import org.jboss.metadata.ejb.spec.EjbJarMetaData;
-import org.jboss.metadata.ejb.spec.EjbJarVersion;
-import org.jboss.metadata.ejb.spec.EjbType;
-import org.jboss.metadata.ejb.spec.GenericBeanMetaData;
-import org.jboss.metadata.ejb.spec.SessionType;
 
 import com.camunda.fox.platform.subsystem.impl.deployment.marker.ProcessApplicationAttachments;
 
 /**
- * This processor either looks up a user-provided <code>@ProcessEngineClient</code> component or 
- * or synthesizes a new component using default values. 
+ * <p>This processor detects a user-provided component annotated with the {@link ProcessApplication}-annotation.</p>
+ * 
+ * <p>If no such component is found but the deployment unit carries a META-INF/processes.xml file, a 
+ * Singleton Session Bean component is synthesized.</p>
  * 
  * @author Daniel Meyer
  * 
@@ -67,33 +51,32 @@ public class ProcessApplicationComponentProcessor implements DeploymentUnitProce
   public static final int PRIORITY = 0x1151;
 
   public void deploy(DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {
-    final DeploymentUnit deploymentUnit = phaseContext.getDeploymentUnit();
-
-    if(!ProcessApplicationAttachments.isProcessApplication(deploymentUnit)) {
+    final DeploymentUnit deploymentUnit = phaseContext.getDeploymentUnit();    
+    final EEModuleDescription eeModuleDescription = deploymentUnit.getAttachment(Attachments.EE_MODULE_DESCRIPTION);
+    
+    // must be EE Module
+    if(eeModuleDescription == null) {
       return;
     }
 
     // discover user-provided component
-    SingletonComponentDescription clientComponent = detectExistingClientComponent(deploymentUnit); 
+    SingletonComponentDescription clientComponent = detectExistingComponent(deploymentUnit); 
 
-    if(clientComponent == null) {
-      log.log(Level.INFO, "Could not detect @"+ProcessApplication.class.getSimpleName()+" component. Adding session bean with default configuration.");
-      clientComponent = synthesizeClientComponent(deploymentUnit);      
-
-    } else {
+    if(clientComponent != null) {      
       log.log(Level.INFO, "Detected user-provided @"+ProcessApplication.class.getSimpleName()+" component with name '"+clientComponent.getComponentName()+"'.");
-
+      
+      // mark this to be a process application
+      ProcessApplicationAttachments.mark(deploymentUnit);
+      ProcessApplicationAttachments.markPartOfProcessApplication(deploymentUnit);
+      // attach description to the deployment unit
+      ProcessApplicationAttachments.attachProcessApplicationComponent(deploymentUnit, clientComponent);
     }
-
-    // attach the component such that it can be referenced later.
-    ProcessApplicationAttachments.attachProcessEngineClientComponent(deploymentUnit, clientComponent);
-       
   }
 
   /** 
    * Detect an existing {@link ProcessApplication} component.  
    */
-  protected SingletonComponentDescription detectExistingClientComponent(DeploymentUnit deploymentUnit) throws DeploymentUnitProcessingException {
+  protected SingletonComponentDescription detectExistingComponent(DeploymentUnit deploymentUnit) throws DeploymentUnitProcessingException {
     
     final EEModuleDescription eeModuleDescription = deploymentUnit.getAttachment(Attachments.EE_MODULE_DESCRIPTION);
     final ResourceRoot deploymentRoot = deploymentUnit.getAttachment(org.jboss.as.server.deployment.Attachments.DEPLOYMENT_ROOT);
@@ -143,62 +126,6 @@ public class ProcessApplicationComponentProcessor implements DeploymentUnitProce
         }
       }      
     }
-  }
-
-  /**
-   * TODO: should we really do this?
-   */
-  protected SingletonComponentDescription synthesizeClientComponent(final DeploymentUnit deploymentUnit) {
-    // create a synthetic ProcessApplication component. 
-    EEModuleDescription eeModuleDescription = deploymentUnit.getAttachment(Attachments.EE_MODULE_DESCRIPTION);
-    EEApplicationClasses applicationClassesDescription = deploymentUnit.getAttachment(Attachments.EE_APPLICATION_CLASSES_DESCRIPTION);
-    EjbJarMetaData ejbJarMetaData = deploymentUnit.getAttachment(EjbDeploymentAttachmentKeys.EJB_JAR_METADATA);
-    EjbJarDescription ejbJarDescription = deploymentUnit.getAttachment(EjbDeploymentAttachmentKeys.EJB_JAR_DESCRIPTION);
-    ApplicationExceptionDescriptions applicationExceptionDescriptions = deploymentUnit.getAttachment(EjbDeploymentAttachmentKeys.APPLICATION_EXCEPTION_DESCRIPTIONS);
-    
-    if(ejbJarMetaData == null) {
-      ejbJarMetaData = new EjbJarMetaData(EjbJarVersion.EJB_3_1);
-      deploymentUnit.putAttachment(EjbDeploymentAttachmentKeys.EJB_JAR_METADATA, ejbJarMetaData);
-    }
-    
-    // turn this into an EJB Jar!
-    if(ejbJarDescription == null) {
-      ejbJarDescription = new EjbJarDescription(eeModuleDescription, applicationClassesDescription, deploymentUnit.getName().endsWith(".war"));
-      deploymentUnit.putAttachment(EjbDeploymentAttachmentKeys.EJB_JAR_DESCRIPTION, ejbJarDescription);
-      EjbDeploymentMarker.mark(deploymentUnit);
-    }
-    
-    if(applicationExceptionDescriptions == null) {
-      applicationExceptionDescriptions = new ApplicationExceptionDescriptions();
-      deploymentUnit.putAttachment(EjbDeploymentAttachmentKeys.APPLICATION_EXCEPTION_DESCRIPTIONS, applicationExceptionDescriptions);
-    }
-    
-    GenericBeanMetaData sessionBean = new GenericBeanMetaData(EjbType.SESSION);
-    
-    JBossEnterpriseBeansMetaData enterpriseBeansMetaData = new JBossEnterpriseBeansMetaData();
-    enterpriseBeansMetaData.setEjbJarMetaData(ejbJarMetaData);
-    sessionBean.setEnterpriseBeansMetaData(enterpriseBeansMetaData);
-    
-    sessionBean.setConcurrencyManagementType(ConcurrencyManagementType.BEAN);
-    sessionBean.setSessionType(SessionType.Singleton);
-    sessionBean.setEjbClass(EjbProcessApplication.class.getName());
-    // transactions (TransactionAttribute.SUPPORTS)
-    sessionBean.setTransactionType(TransactionManagementType.CONTAINER);
-    ContainerTransactionMetaData containerTransactionMetaData = new ContainerTransactionMetaData();
-    containerTransactionMetaData.setTransAttribute(TransactionAttributeType.SUPPORTS);
-    
-    SingletonComponentDescription processApplicationComponent = new SingletonComponentDescription("EjbProcessApplication", 
-        EjbProcessApplication.class.getName(), 
-        ejbJarDescription, deploymentUnit.getServiceName(), sessionBean);
-    
-    // add the process application component
-    eeModuleDescription.addComponent(processApplicationComponent);
-    
-    // turn ProcessApplicationExecutionException into an EJB ApplicationExection
-    // to make sure the container does not rollback the transaction prematurely
-    applicationExceptionDescriptions.addApplicationException(ProcessApplicationExecutionException.class.getName(), false, true);
-    
-    return processApplicationComponent;
   }
 
   @Override

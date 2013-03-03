@@ -26,7 +26,7 @@ import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.task.Task;
 import org.activiti.engine.task.TaskQuery;
 import org.camunda.bpm.application.ProcessApplicationDeployment;
-import org.camunda.bpm.application.impl.deployment.metadata.ProcessesXmlParser;
+import org.camunda.bpm.application.impl.metadata.ProcessesXmlParser;
 
 import com.camunda.fox.client.impl.ProcessArchiveSupport;
 import com.camunda.fox.platform.api.ProcessArchiveService;

@@ -29,12 +29,14 @@ import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceController.Mode;
 
 import com.camunda.fox.platform.subsystem.impl.deployment.processor.ModuleDependencyProcessor;
+import com.camunda.fox.platform.subsystem.impl.deployment.processor.ProcessApplicationComponentAddProcessor;
 import com.camunda.fox.platform.subsystem.impl.deployment.processor.ProcessApplicationComponentProcessor;
-import com.camunda.fox.platform.subsystem.impl.deployment.processor.ProcessEngineDependencyProcessor;
 import com.camunda.fox.platform.subsystem.impl.deployment.processor.ProcessEngineDeploymentProcessor;
+import com.camunda.fox.platform.subsystem.impl.deployment.processor.ProcessEngineStartProcessor;
 import com.camunda.fox.platform.subsystem.impl.deployment.processor.ProcessesXmlProcessor;
 import com.camunda.fox.platform.subsystem.impl.extension.ModelConstants;
 import com.camunda.fox.platform.subsystem.impl.service.MscRuntimeContainerDelegate;
+import com.camunda.fox.platform.subsystem.impl.service.ServiceNames;
 
 /**
  * Provides the description and the implementation of the subsystem#add operation.
@@ -62,10 +64,11 @@ public class BpmPlatformSubsystemAdd extends AbstractBoottimeAddStepHandler {
     // add deployment processors
     context.addStep(new AbstractDeploymentChainStep() {
       public void execute(DeploymentProcessorTarget processorTarget) {
-        processorTarget.addDeploymentProcessor(ModelConstants.SUBSYSTEM_NAME, Phase.PARSE, ProcessesXmlProcessor.PRIORITY, new ProcessesXmlProcessor());
         processorTarget.addDeploymentProcessor(ModelConstants.SUBSYSTEM_NAME, Phase.PARSE, ProcessApplicationComponentProcessor.PRIORITY, new ProcessApplicationComponentProcessor());
+//        processorTarget.addDeploymentProcessor(ModelConstants.SUBSYSTEM_NAME, Phase.PARSE, ProcessApplicationComponentAddProcessor.PRIORITY, new ProcessApplicationComponentAddProcessor(false));
         processorTarget.addDeploymentProcessor(ModelConstants.SUBSYSTEM_NAME, Phase.DEPENDENCIES, ModuleDependencyProcessor.PRIORITY, new ModuleDependencyProcessor());
-        processorTarget.addDeploymentProcessor(ModelConstants.SUBSYSTEM_NAME, Phase.DEPENDENCIES, ProcessEngineDependencyProcessor.PRIORITY, new ProcessEngineDependencyProcessor());
+        processorTarget.addDeploymentProcessor(ModelConstants.SUBSYSTEM_NAME, Phase.POST_MODULE, ProcessesXmlProcessor.PRIORITY, new ProcessesXmlProcessor());
+        processorTarget.addDeploymentProcessor(ModelConstants.SUBSYSTEM_NAME, Phase.INSTALL, ProcessEngineStartProcessor.PRIORITY, new ProcessEngineStartProcessor());
         processorTarget.addDeploymentProcessor(ModelConstants.SUBSYSTEM_NAME, Phase.INSTALL, ProcessEngineDeploymentProcessor.PRIORITY, new ProcessEngineDeploymentProcessor());
       }
     }, OperationContext.Stage.RUNTIME);
@@ -74,7 +77,7 @@ public class BpmPlatformSubsystemAdd extends AbstractBoottimeAddStepHandler {
     final MscRuntimeContainerDelegate processEngineService = new MscRuntimeContainerDelegate();
     
     final ServiceController<MscRuntimeContainerDelegate> controller = context.getServiceTarget()           
-            .addService(MscRuntimeContainerDelegate.getServiceName(), processEngineService)
+            .addService(ServiceNames.forMscRuntimeContainerDelegate(), processEngineService)
             .addListener(verificationHandler)
             .setInitialMode(Mode.ACTIVE)
             .install();

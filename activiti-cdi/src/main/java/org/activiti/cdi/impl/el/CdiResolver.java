@@ -27,7 +27,7 @@ import org.activiti.engine.impl.javax.el.ELResolver;
 
 /**
  * Resolver wrapping an instance of javax.el.ELResolver obtained from the
- * {@link BeanManager}. Allows activiti-engine to resolve Cdi-Beans.
+ * {@link BeanManager}. Allows the process engine to resolve Cdi-Beans.
  * 
  * @author Daniel Meyer
  */

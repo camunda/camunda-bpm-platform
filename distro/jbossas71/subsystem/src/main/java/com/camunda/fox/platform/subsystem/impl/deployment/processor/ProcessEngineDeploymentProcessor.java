@@ -12,22 +12,17 @@
  */
 package com.camunda.fox.platform.subsystem.impl.deployment.processor;
 
-import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.activiti.engine.ProcessEngine;
-import org.activiti.engine.RepositoryService;
 import org.activiti.engine.impl.util.IoUtil;
-import org.activiti.engine.repository.DeploymentBuilder;
-import org.camunda.bpm.application.impl.deployment.metadata.PropertyHelper;
-import org.camunda.bpm.application.impl.deployment.metadata.spi.ProcessArchiveXml;
-import org.camunda.bpm.application.impl.deployment.metadata.spi.ProcessesXml;
+import org.camunda.bpm.application.impl.metadata.spi.ProcessArchiveXml;
+import org.camunda.bpm.application.impl.metadata.spi.ProcessesXml;
+import org.camunda.bpm.container.impl.metadata.PropertyHelper;
 import org.jboss.as.ee.component.ComponentDescription;
 import org.jboss.as.ee.component.ComponentView;
 import org.jboss.as.server.deployment.Attachments;
@@ -45,26 +40,26 @@ import org.jboss.vfs.VirtualFile;
 
 import com.camunda.fox.platform.subsystem.impl.deployment.marker.ProcessApplicationAttachments;
 import com.camunda.fox.platform.subsystem.impl.deployment.scanner.VfsProcessApplicationResourceScanner;
-import com.camunda.fox.platform.subsystem.impl.service.ManagedProcessEngineController;
-import com.camunda.fox.platform.subsystem.impl.service.ProcessApplicationRegistrationService;
+import com.camunda.fox.platform.subsystem.impl.service.MscManagedProcessApplication;
+import com.camunda.fox.platform.subsystem.impl.service.ProcessApplicationDeploymentService;
+import com.camunda.fox.platform.subsystem.impl.service.ProcessApplicationStartService;
+import com.camunda.fox.platform.subsystem.impl.service.ServiceNames;
 import com.camunda.fox.platform.subsystem.impl.util.ProcessesXmlWrapper;
 
 /**
- * <p>This processor
- * <ul>
- *  <li>scans the process application for process resources (BPMN 2.0 files)</li>
- *  <li>constructs or resumes a process engine deployment</li>
- *  <li>registers the process application with the process engine</li>
- * </ul>
+ * <p>This processor installs the process application into the container.</p> 
+ *  
+ * <p>First, we initialize the deployments for all process archives declared by the process application. 
+ * It then registers a {@link MscProcessApplicationDeploymentService} for each process archive to be deployed.
+ * Finally it registers the {@link MscManagedProcessApplication} service which depends on all the deployment services 
+ * to have completed deployment</p> 
  * 
  * @author Daniel Meyer
  * 
  */
 public class ProcessEngineDeploymentProcessor implements DeploymentUnitProcessor {
   
-  private final static Logger log = Logger.getLogger(ProcessEngineDeploymentProcessor.class.getName());
-  
-  public static final int PRIORITY = 0x2051;
+  public static final int PRIORITY = 0x0000; // this can happen at the beginning of the phase
 
   public void deploy(DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {
     
@@ -73,72 +68,51 @@ public class ProcessEngineDeploymentProcessor implements DeploymentUnitProcessor
     if(!ProcessApplicationAttachments.isProcessApplication(deploymentUnit)) {
       return;
     }
-    
-    final Map<ProcessArchiveXml, String> deploymentMap = new HashMap<ProcessArchiveXml, String>();        
+
+    // the service name of the process application component's view
+    ServiceName paComponentViewServiceName = getProcessApplicationViewServiceName(deploymentUnit);
+          
+    List<ServiceName> deploymentServiceNames = new ArrayList<ServiceName>();
 
     // deploy all process archives
-    ProcessesXmlWrapper processesXmlWrapper = ProcessApplicationAttachments.getProcessesXml(deploymentUnit);
-    ProcessesXml processesXml = processesXmlWrapper.getProcessesXml();
-    for (ProcessArchiveXml processArchive : processesXml.getProcessArchives()) {
-
-      ServiceName processEngineServiceName = getProcessEngineServiceName(processArchive);
-      ProcessEngine processEngine = getProcessEngineForArchive(processEngineServiceName, phaseContext.getServiceRegistry());
-      Map<String, byte[]> deploymentResources = getDeploymentResources(processArchive, deploymentUnit, processesXmlWrapper.getProcessesXmlFile());
+    List<ProcessesXmlWrapper> processesXmlWrappers = ProcessApplicationAttachments.getProcessesXmls(deploymentUnit);
+    for (ProcessesXmlWrapper processesXmlWrapper : processesXmlWrappers) {   
       
-      if(deploymentResources.isEmpty()) {
-        
-        log.log(
-            Level.INFO,
-            "Process archive does not contain any deployment resources.");
-        
-      } else {
-        
-        String engineDeploymentId = performEngineDeployment(processEngine, deploymentResources, processArchive, deploymentUnit);
-        
-        // add registration service
-        ProcessApplicationRegistrationService registrationService = new ProcessApplicationRegistrationService(engineDeploymentId);
-        phaseContext.getServiceTarget().addService(registrationService.getServiceName(), registrationService)
-          .addDependency(processEngineServiceName, ProcessEngine.class, registrationService.getProcessEngineInjector())
-          .addDependency(getProcessApplicationViewServiceName(deploymentUnit), ComponentView.class, registrationService.getProcessApplicationInjector())
+      ProcessesXml processesXml = processesXmlWrapper.getProcessesXml();
+      for (ProcessArchiveXml processArchive : processesXml.getProcessArchives()) {
+  
+        ServiceName processEngineServiceName = getProcessEngineServiceName(processArchive);
+        Map<String, byte[]> deploymentResources = getDeploymentResources(processArchive, deploymentUnit, processesXmlWrapper.getProcessesXmlFile());
+          
+        // add the deployment service for each process archive we deploy.
+        ServiceName deploymentServiceName = ServiceNames.forProcessApplicationDeploymentService(deploymentUnit.getName(), processArchive.getName());        
+        ProcessApplicationDeploymentService deploymentService = new ProcessApplicationDeploymentService(deploymentResources, processArchive);
+        phaseContext.getServiceTarget().addService(deploymentServiceName, deploymentService)
+          .addDependency(phaseContext.getPhaseServiceName())
+          .addDependency(processEngineServiceName, ProcessEngine.class, deploymentService.getProcessEngineInjector())
+          .addDependency(paComponentViewServiceName, ComponentView.class, deploymentService.getProcessApplicationInjector())
           .setInitialMode(Mode.ACTIVE)
           .install();
         
-        deploymentMap.put(processArchive, engineDeploymentId);
+        deploymentServiceNames.add(deploymentServiceName);
         
       }
     }
     
-    // attach the deployment map
-    ProcessApplicationAttachments.attachDeploymentMap(deploymentUnit, deploymentMap);    
-    
+    // register the managed process application start service    
+    ProcessApplicationStartService paStartService = new ProcessApplicationStartService(deploymentServiceNames);
+    ServiceName paStartServiceName = ServiceNames.forProcessApplicationStartService(deploymentUnit.getName());
+    phaseContext.getServiceTarget().addService(paStartServiceName, paStartService)
+      .addDependency(phaseContext.getPhaseServiceName())
+      .addDependency(paComponentViewServiceName, ComponentView.class, paStartService.getProcessApplicationInjector())
+      .addDependencies(deploymentServiceNames)
+      .setInitialMode(Mode.ACTIVE)
+      .install();
+        
   }
 
   public void undeploy(DeploymentUnit deploymentUnit) {
     
-    if(!ProcessApplicationAttachments.isProcessApplication(deploymentUnit)) {
-      return;
-    }
-    
-    Map<ProcessArchiveXml, String> deploymentMap = ProcessApplicationAttachments.getDeploymentMap(deploymentUnit);
-    if(deploymentMap != null) {
-      for (Entry<ProcessArchiveXml, String> deployment : deploymentMap.entrySet()) {
-        
-        ProcessArchiveXml processArchive = deployment.getKey();
-        
-        // delete the deployment
-        if(PropertyHelper.getBooleanProperty(processArchive.getProperties(), ProcessArchiveXml.PROP_IS_DELETE_UPON_UNDEPLOY, false)) {
-          
-          ProcessEngine processEngine = getProcessEngineForArchive(getProcessEngineServiceName(processArchive), deploymentUnit.getServiceRegistry());
-          try {
-            processEngine.getRepositoryService().deleteDeployment(deployment.getValue(), true);
-          } catch (Exception e) {
-            log.log(Level.WARNING, "Exception while deleting process engine deployment", e);
-          }
-          
-        }
-        
-      }
-    }
   }
 
   protected ServiceName getProcessApplicationViewServiceName(DeploymentUnit deploymentUnit) {
@@ -150,41 +124,6 @@ public class ProcessEngineDeploymentProcessor implements DeploymentUnitProcessor
     return paComponentDescription;
   }
 
-  protected String performEngineDeployment(ProcessEngine processEngine, Map<String, byte[]> deploymentResources, ProcessArchiveXml processArchive, DeploymentUnit deploymentUnit) {
-    
-    StringBuilder builder = new StringBuilder();
-    builder.append("Deployment summary for process archive '"+processArchive.getName()+"': \n");
-    builder.append("\n");
-    for (String resourceName : deploymentResources.keySet()) {
-      builder.append("        "+resourceName);
-      builder.append("\n");
-    }
-    builder.append("\n");
-    
-    log.log(Level.INFO, builder.toString());
-    
-    final RepositoryService repositoryService = processEngine.getRepositoryService();
-    
-    DeploymentBuilder deployment = repositoryService.createDeployment();
-
-    // enable duplicate filtering
-    deployment.enableDuplicateFiltering();
-
-    // set deployment name    
-    deployment.name(processArchive.getName()); 
-    
-    // add deployment resources    
-    for (Entry<String, byte[]> resource : deploymentResources.entrySet()) {
-      deployment.addInputStream(resource.getKey(), new ByteArrayInputStream(resource.getValue()));
-    }
-    
-    // perform deployment    
-    String id = deployment.deploy().getId();
-    log.log(Level.INFO, "Process engine deploymentId for process archive '"+processArchive.getName()+"' is '"+id+"'");
-    
-    return id;
-  }
-
   @SuppressWarnings("unchecked")
   protected ProcessEngine getProcessEngineForArchive(ServiceName serviceName, ServiceRegistry serviceRegistry) {
     ServiceController<ProcessEngine> processEngineServiceController = (ServiceController<ProcessEngine>) serviceRegistry.getRequiredService(serviceName);
@@ -194,9 +133,9 @@ public class ProcessEngineDeploymentProcessor implements DeploymentUnitProcessor
   protected ServiceName getProcessEngineServiceName(ProcessArchiveXml processArchive) {
     ServiceName serviceName = null;
     if(processArchive.getProcessEngineName() == null || processArchive.getProcessEngineName().length() == 0) {
-      serviceName = ManagedProcessEngineController.createServiceNameForDefaultEngine();
+      serviceName = ServiceNames.forDefaultProcessEngine();
     } else {
-      serviceName = ManagedProcessEngineController.createServiceName(processArchive.getProcessEngineName());
+      serviceName = ServiceNames.forManagedProcessEngine(processArchive.getProcessEngineName());
     }
     return serviceName;
   }

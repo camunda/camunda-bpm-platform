@@ -5,7 +5,6 @@ import java.util.concurrent.ExecutionException;
 import javax.naming.NamingException;
 
 import org.camunda.bpm.BpmPlatform;
-import org.camunda.bpm.ProcessEngineService;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
@@ -30,7 +29,7 @@ public class TestBpmPlatformBootstrap {
   public static WebArchive createDeployment() {
     return ShrinkWrap.create(WebArchive.class, "test.war")
       .addClass(H2Datasource.class)
-      .addClass(BpmPlatformBootstrap.class)
+      .addClass(BpmPlatformBootstrapBean.class)
       .addClass(EjbJarAttachments.class)
       .addClass(EjbJarParsePlatformXmlStep.class)
       .addAsWebInfResource("META-INF/bpm-platform.xml", "classes/META-INF/bppm-platform.xml")
@@ -39,11 +38,9 @@ public class TestBpmPlatformBootstrap {
   
     
   @Test
-  public void testProcessEngineServiceEjb() throws NamingException, InterruptedException, ExecutionException {
+  public void testDefaultProcessEngineAvailable() throws NamingException, InterruptedException, ExecutionException {
     
-    ProcessEngineService processEngineService = BpmPlatform.getProcessEngineService();
-    
-    Assert.assertNotNull(processEngineService.getDefaultProcessEngine());
+    Assert.assertNotNull(BpmPlatform.getDefaultProcessEngine());
    
   }
     

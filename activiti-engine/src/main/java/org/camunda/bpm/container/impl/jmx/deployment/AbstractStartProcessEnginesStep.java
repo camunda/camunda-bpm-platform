@@ -14,9 +14,9 @@ package org.camunda.bpm.container.impl.jmx.deployment;
 
 import java.util.List;
 
-import org.camunda.bpm.application.impl.deployment.metadata.spi.ProcessEngineXml;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanDeploymentOperation;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanDeploymentOperationStep;
+import org.camunda.bpm.container.impl.metadata.spi.ProcessEngineXml;
 
 /**
  * <p>Deployment operation step that is responsible for starting all process

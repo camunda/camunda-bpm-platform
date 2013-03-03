@@ -12,13 +12,13 @@
  */
 package com.camunda.fox.platform.subsystem.impl.deployment.marker;
 
-import java.util.Map;
+import java.util.List;
 
 import org.camunda.bpm.application.AbstractProcessApplication;
-import org.camunda.bpm.application.impl.deployment.metadata.spi.ProcessArchiveXml;
-import org.camunda.bpm.application.impl.deployment.metadata.spi.ProcessesXml;
+import org.camunda.bpm.application.impl.metadata.spi.ProcessesXml;
 import org.jboss.as.ee.component.ComponentDescription;
 import org.jboss.as.server.deployment.AttachmentKey;
+import org.jboss.as.server.deployment.AttachmentList;
 import org.jboss.as.server.deployment.DeploymentUnit;
 
 import com.camunda.fox.platform.subsystem.impl.util.ProcessesXmlWrapper;
@@ -31,32 +31,55 @@ import com.camunda.fox.platform.subsystem.impl.util.ProcessesXmlWrapper;
 public class ProcessApplicationAttachments {
 
   private static final AttachmentKey<Boolean> MARKER = AttachmentKey.create(Boolean.class);
+  private static final AttachmentKey<Boolean> PART_OF_MARKER = AttachmentKey.create(Boolean.class);
+  private static final AttachmentKey<AttachmentList<ProcessesXmlWrapper>> PROCESSES_XML_LIST = AttachmentKey.createList(ProcessesXmlWrapper.class);
   private static final AttachmentKey<ComponentDescription> PA_COMPONENT = AttachmentKey.create(ComponentDescription.class);
-  private static final AttachmentKey<Map<ProcessArchiveXml, String>> DEPLOYMENT_MAP = AttachmentKey.create(Map.class);
-  private static final AttachmentKey<ProcessesXmlWrapper> PROCESSES_XML = AttachmentKey.create(ProcessesXmlWrapper.class);
 
   /**
    * Attach the parsed ProcessesXml file to a deployment unit.
    *  
    */
-  public static void attachProcessesXml(DeploymentUnit unit, ProcessesXmlWrapper processesXmlWrapper) {
-      unit.putAttachment(PROCESSES_XML, processesXmlWrapper);
+  public static void addProcessesXml(DeploymentUnit unit, ProcessesXmlWrapper processesXmlWrapper) {
+    unit.addToAttachmentList(PROCESSES_XML_LIST, processesXmlWrapper);
   }
 
   /**
    * Returns the attached {@link ProcessesXml} marker or null;
    *  
    */
-  public static ProcessesXmlWrapper getProcessesXml(DeploymentUnit deploymentUnit) {
-    return deploymentUnit.getAttachment(PROCESSES_XML);
+  public static List<ProcessesXmlWrapper> getProcessesXmls(DeploymentUnit deploymentUnit) {
+    return deploymentUnit.getAttachmentList(PROCESSES_XML_LIST);
   }
 
   /** 
    * marks a a {@link DeploymentUnit} as a process application 
    */
   public static void mark(DeploymentUnit unit) {
-      unit.putAttachment(MARKER, Boolean.TRUE);
+    unit.putAttachment(MARKER, Boolean.TRUE);    
   }
+  
+  /** 
+   * marks a a {@link DeploymentUnit} as part of a process application 
+   */
+  public static void markPartOfProcessApplication(DeploymentUnit unit) {
+    if(unit.getParent() != null && unit.getParent() != unit) {
+      unit.getParent().putAttachment(PART_OF_MARKER, Boolean.TRUE);
+    }      
+  }
+  
+  /**
+   * return true if the deployment unit is either itself a process 
+   * application or part of a process application.
+   */
+  public static boolean isPartOfProcessApplication(DeploymentUnit unit) {
+    if(isProcessApplication(unit)) {
+      return true;
+    }
+    if(unit.getParent() != null && unit.getParent() != unit) {
+      return unit.getParent().hasAttachment(PART_OF_MARKER);
+    }
+    return false;
+  }       
   
   /**
    * Returns true if the {@link DeploymentUnit} itself is a process application (carries a processes.xml)
@@ -64,16 +87,6 @@ public class ProcessApplicationAttachments {
    */
   public static boolean isProcessApplication(DeploymentUnit deploymentUnit) {
     return deploymentUnit.hasAttachment(MARKER);
-  }
-
-  /**
-   * Returns true if the {@link DeploymentUnit} is a process application or part
-   * of a process application.
-   * 
-   */
-  public static boolean isPartOfProcessApplication(DeploymentUnit deploymentUnit) {
-    return isProcessApplication(deploymentUnit) ||
-       ( deploymentUnit.getParent() != null && deploymentUnit.getParent().hasAttachment(MARKER) );
   }
   
   /**
@@ -86,22 +99,8 @@ public class ProcessApplicationAttachments {
   /**
    * Attach the {@link ComponentDescription} for the {@link AbstractProcessApplication} component   
    */
-  public static void attachProcessEngineClientComponent(DeploymentUnit deploymentUnit, ComponentDescription componentDescription){
+  public static void attachProcessApplicationComponent(DeploymentUnit deploymentUnit, ComponentDescription componentDescription){
     deploymentUnit.putAttachment(PA_COMPONENT, componentDescription);
-  }
-  
-  /**
-   * Attach a {@link Map<ParsedProcessArchive, ProcessApplicationRegistration>} to the deployment
-   */
-  public static void attachDeploymentMap(DeploymentUnit deploymentUnit, Map<ProcessArchiveXml, String> deploymentMap) {
-    deploymentUnit.putAttachment(DEPLOYMENT_MAP, deploymentMap);
-  }
-
-  /**
-   * Returns the deployment map for the {@link DeploymentUnit}
-   */
-  public static Map<ProcessArchiveXml, String> getDeploymentMap(DeploymentUnit deploymentUnit) {
-    return deploymentUnit.getAttachment(DEPLOYMENT_MAP);    
   }
   
   private ProcessApplicationAttachments() {

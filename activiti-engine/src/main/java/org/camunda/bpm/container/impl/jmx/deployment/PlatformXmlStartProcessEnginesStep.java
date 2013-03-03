@@ -16,13 +16,13 @@ import static org.camunda.bpm.container.impl.jmx.deployment.Attachments.BPM_PLAT
 
 import java.util.List;
 
-import org.camunda.bpm.application.impl.deployment.metadata.spi.BpmPlatformXml;
-import org.camunda.bpm.application.impl.deployment.metadata.spi.ProcessEngineXml;
-import org.camunda.bpm.application.impl.deployment.metadata.spi.ProcessesXml;
+import org.camunda.bpm.application.impl.metadata.spi.ProcessesXml;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanDeploymentOperation;
+import org.camunda.bpm.container.impl.metadata.spi.BpmPlatformXml;
+import org.camunda.bpm.container.impl.metadata.spi.ProcessEngineXml;
 
 /**
- * <p> Retrieves the List of ProcessEngines frm an attached {@link ProcessesXml}.</p>
+ * <p> Retrieves the List of ProcessEngines from an attached {@link ProcessesXml}.</p>
  * 
  * @see AbstractParseBpmPlatformXmlStep 
  *  

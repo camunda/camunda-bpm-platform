@@ -13,6 +13,9 @@
 package org.camunda.bpm.application;
 
 /**
+ * <p>Checked exception thrown by a {@link ProcessApplicationReference} if the referenced 
+ * process application is unavailable.</p> 
+ * 
  * @author Daniel Meyer
  *
  */

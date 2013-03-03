@@ -23,7 +23,7 @@ import org.camunda.bpm.container.impl.jmx.kernel.MBeanDeploymentOperationStep;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanServiceContainer;
 
 /**
- * <p>Deployment operation step that stop all process engines.</p>
+ * <p>Deployment operation step that stops all process engines.</p>
  * 
  * @author Daniel Meyer
  *

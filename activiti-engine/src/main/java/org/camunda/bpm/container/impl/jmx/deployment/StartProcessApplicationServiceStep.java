@@ -21,14 +21,14 @@ import java.util.ArrayList;
 import java.util.Map;
 
 import org.camunda.bpm.application.AbstractProcessApplication;
-import org.camunda.bpm.application.impl.deployment.metadata.spi.ProcessesXml;
+import org.camunda.bpm.application.ProcessApplicationRegistration;
+import org.camunda.bpm.application.impl.metadata.spi.ProcessesXml;
 import org.camunda.bpm.container.impl.jmx.JmxRuntimeContainerDelegate.ServiceTypes;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanDeploymentOperation;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanDeploymentOperationStep;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanServiceContainer;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanService;
-import org.camunda.bpm.container.impl.jmx.services.JmxProcessApplication;
-import org.camunda.bpm.engine.application.ProcessApplicationRegistration;
+import org.camunda.bpm.container.impl.jmx.services.JmxManagedProcessApplication;
 
 /**
  * <p>This deployment operation step starts an {@link MBeanService} for the process application.</p>
@@ -50,7 +50,7 @@ public class StartProcessApplicationServiceStep extends MBeanDeploymentOperation
     final MBeanServiceContainer serviceContainer = operationContext.getServiceContainer();
     
     // create service
-    JmxProcessApplication mbean = new JmxProcessApplication(processApplication.getReference());    
+    JmxManagedProcessApplication mbean = new JmxManagedProcessApplication(processApplication.getReference());    
     mbean.setProcessesXmls(new ArrayList<ProcessesXml>(processesXmls.values()));
     mbean.setDeploymentMap(processArchiveDeploymentMap);
     
