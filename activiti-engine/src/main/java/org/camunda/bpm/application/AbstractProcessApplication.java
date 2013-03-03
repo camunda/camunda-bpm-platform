@@ -12,12 +12,18 @@
  */
 package org.camunda.bpm.application;
 
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Map;
+import java.util.ServiceLoader;
 import java.util.concurrent.Callable;
 
+import org.activiti.engine.impl.javax.el.CompositeELResolver;
+import org.activiti.engine.impl.javax.el.ELResolver;
 import org.activiti.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.ProcessApplicationService;
+import org.camunda.bpm.application.impl.DefaultElResolverLookup;
 import org.camunda.bpm.container.RuntimeContainerDelegate;
 import org.camunda.bpm.engine.impl.util.ClassLoaderUtil;
 
@@ -30,6 +36,8 @@ import org.camunda.bpm.engine.impl.util.ClassLoaderUtil;
  *
  */
 public abstract class AbstractProcessApplication {
+  
+  protected ELResolver processApplicationElResolver;
               
   // deployment /////////////////////////////////////////////////////
 
@@ -37,9 +45,12 @@ public abstract class AbstractProcessApplication {
    * Deploy this process application into the runtime container.
    */
   public void deploy() {
+    // initialize el resolver
+    processApplicationElResolver = initProcessApplicationElResolver();
+    // deploy the application
     RuntimeContainerDelegate.INSTANCE.get().deployProcessApplication(this);   
   }
-  
+
   /**
    * Undeploy this process application from the runtime container.
    */
@@ -153,6 +164,39 @@ public abstract class AbstractProcessApplication {
    */
   public Map<String, String> getProperties() {
     return Collections.unmodifiableMap( Collections.<String, String>emptyMap() );
+  }
+
+  /**
+   * <p>This allows the process application to provide a custom ElResolver to the process engine.</p>
+   * 
+   * <p>The process engine will use this ElResolver whenever it is executing a 
+   * process in the context of this process application.</p>
+   * 
+   * <p>The process engine must only call this method form Callable implementations passed 
+   * to {@link #execute(Callable)}</p>
+   */
+  public ELResolver getElResolver() {
+    
+    return processApplicationElResolver;
+    
+  }
+
+  /**
+   * <p>Initializes the process application provided ElResolver. This implementation uses the
+   * Java SE {@link ServiceLoader} facilities for resolving implementations of {@link ProcessApplicationElResolver}.</p>
+   * 
+   * <p>If you want to provide a custom implementation in your application, place a file named 
+   * <code>META-INF/org.camunda.bpm.application.ProcessApplicationElResolver</code> inside your application
+   * which contains the fully qualified classname of your implementation.</p>
+   * 
+   * <p>Override this method in order to implement a custom resolving scheme.</p>
+   *  
+   * @return the process application ElResolver. 
+   */
+  protected ELResolver initProcessApplicationElResolver() {
+
+    return DefaultElResolverLookup.lookupResolver(this);
+    
   }
   
 }

@@ -36,7 +36,7 @@ public class Context {
   protected static ThreadLocal<Stack<ProcessEngineConfigurationImpl>> processEngineConfigurationStackThreadLocal = new ThreadLocal<Stack<ProcessEngineConfigurationImpl>>();
   protected static ThreadLocal<Stack<ExecutionContext>> executionContextStackThreadLocal = new ThreadLocal<Stack<ExecutionContext>>();
   protected static ThreadLocal<JobExecutorContext> jobExecutorContextThreadLocal = new ThreadLocal<JobExecutorContext>();
-  protected static ThreadLocal<Stack<String>> processApplicationContext = new ThreadLocal<Stack<String>>();
+  protected static ThreadLocal<Stack<ProcessApplicationReference>> processApplicationContext = new ThreadLocal<Stack<ProcessApplicationReference>>();
 
   public static CommandContext getCommandContext() {
     Stack<CommandContext> stack = getStack(commandContextThreadLocal);
@@ -104,8 +104,8 @@ public class Context {
   }
   
 
-  public static String getCurrentProcessApplication() {
-    Stack<String> stack = getStack(processApplicationContext);
+  public static ProcessApplicationReference getCurrentProcessApplication() {
+    Stack<ProcessApplicationReference> stack = getStack(processApplicationContext);
     if(stack.isEmpty()) {
       return null;
     } else {
@@ -113,13 +113,13 @@ public class Context {
     }
   }
   
-  public static void setCurrentProcessApplication(String name) {
-    Stack<String> stack = getStack(processApplicationContext);
-    stack.push(name);
+  public static void setCurrentProcessApplication(ProcessApplicationReference reference) {
+    Stack<ProcessApplicationReference> stack = getStack(processApplicationContext);
+    stack.push(reference);
   }
   
   public static void removeCurrentProcessApplication() {
-    Stack<String> stack = getStack(processApplicationContext);
+    Stack<ProcessApplicationReference> stack = getStack(processApplicationContext);
     stack.pop();
   }
 
@@ -131,7 +131,7 @@ public class Context {
     String paName = processApplicationReference.getName();
     try {
       AbstractProcessApplication processApplication = processApplicationReference.getProcessApplication();      
-      setCurrentProcessApplication(paName);
+      setCurrentProcessApplication(processApplicationReference);
 
       try {
         

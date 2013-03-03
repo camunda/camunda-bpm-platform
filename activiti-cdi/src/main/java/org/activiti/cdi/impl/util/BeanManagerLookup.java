@@ -27,10 +27,20 @@ public class BeanManagerLookup {
   public static String jndiName;
 
   public static BeanManager getBeanManager() {
-    if (localInstance != null) {
-      return localInstance;
+    
+    BeanManager beanManager = lookupBeanManagerInJndi();
+    
+    if(beanManager != null) {
+      return beanManager;
+      
+    } else {
+      if (localInstance != null) {
+        return localInstance;
+      } else {
+        throw new ActivitiException(
+            "Could not lookup beanmanager in jndi. If no jndi is available, set the beanmanger to the 'localInstance' property of this class.");
+      }
     }
-    return lookupBeanManagerInJndi();
   }
 
   private static BeanManager lookupBeanManagerInJndi() {
@@ -56,8 +66,8 @@ public class BeanManagerLookup {
     } catch (NamingException e) {
       // silently ignore
     }
-
-    throw new ActivitiException(
-            "Could not lookup beanmanager in jndi. If no jndi is available, set the beanmanger to the 'localInstance' property of this class.");
+    
+    return null;
+   
   }
 }

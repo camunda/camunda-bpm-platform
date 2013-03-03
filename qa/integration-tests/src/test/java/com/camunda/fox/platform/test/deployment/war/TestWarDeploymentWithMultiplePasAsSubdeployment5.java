@@ -18,6 +18,7 @@ package com.camunda.fox.platform.test.deployment.war;
 
 import junit.framework.Assert;
 
+import org.activiti.engine.repository.DeploymentQuery;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.repository.ProcessDefinitionQuery;
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -112,17 +113,43 @@ public class TestWarDeploymentWithMultiplePasAsSubdeployment5 extends AbstractFo
   @Test
   public void testDeployProcessArchive() {
     
-    ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery().latestVersion();
-        
-    ProcessDefinition processDefinition = query.processDefinitionKey("process-0").singleResult();    
-    Assert.assertEquals("PA1", managementService.getProcessApplicationForDeployment(processDefinition.getDeploymentId()));
+    assertProcessDeployed("process-0", "PA1");
+    assertProcessDeployed("process-1", "PA1");
+    assertProcessDeployed("process-2", "PA1");
+    assertProcessNotDeployed("process-3");
+    assertProcessNotDeployed("process-4");
+    assertProcessNotDeployed("process-5");
+    assertProcessNotDeployed("process-6");
+    assertProcessNotDeployed("process-7");
+    assertProcessNotDeployed("process-8");
     
-    processDefinition = query.processDefinitionKey("process-1").singleResult();
-    Assert.assertEquals("PA1", managementService.getProcessApplicationForDeployment(processDefinition.getDeploymentId()));
+  }
+  
+  protected void assertProcessDeployed(String processKey, String expectedDeploymentName) {
     
-    processDefinition = query.processDefinitionKey("process-2").singleResult();
-    Assert.assertEquals("PA1", managementService.getProcessApplicationForDeployment(processDefinition.getDeploymentId()));
+    ProcessDefinition processDefinition = repositoryService
+        .createProcessDefinitionQuery()
+        .latestVersion()
+        .processDefinitionKey(processKey)
+        .singleResult();    
     
+    DeploymentQuery deploymentQuery = repositoryService
+        .createDeploymentQuery()
+        .deploymentId(processDefinition.getDeploymentId());
+    
+    Assert.assertEquals(expectedDeploymentName, deploymentQuery.singleResult().getName());
+    
+  }
+  
+  protected void assertProcessNotDeployed(String processKey) {
+    
+    long count = repositoryService
+        .createProcessDefinitionQuery()
+        .latestVersion()
+        .processDefinitionKey(processKey)
+        .count();
+    
+    Assert.assertEquals("Process with key "+processKey+ " should not be deployed", 0, count);
   }
 
 }

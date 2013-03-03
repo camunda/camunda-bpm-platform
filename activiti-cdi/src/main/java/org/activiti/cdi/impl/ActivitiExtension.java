@@ -35,6 +35,7 @@ import javax.enterprise.inject.spi.Extension;
 
 import org.activiti.cdi.annotation.BusinessProcessScoped;
 import org.activiti.cdi.impl.context.BusinessProcessContext;
+import org.activiti.cdi.impl.util.BeanManagerLookup;
 
 /**
  * 
@@ -43,8 +44,10 @@ import org.activiti.cdi.impl.context.BusinessProcessContext;
  */
 public class ActivitiExtension implements Extension {
 
-  public void beforeBeanDiscovery(@Observes final BeforeBeanDiscovery event) {
+  public void beforeBeanDiscovery(@Observes final BeforeBeanDiscovery event, BeanManager manager) {
     event.addScope(BusinessProcessScoped.class, true, true);
+    
+    BeanManagerLookup.localInstance = manager;
   }
 
   public void afterBeanDiscovery(@Observes AfterBeanDiscovery event, BeanManager manager) {       

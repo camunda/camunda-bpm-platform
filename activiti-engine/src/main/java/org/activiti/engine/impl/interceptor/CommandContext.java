@@ -126,8 +126,12 @@ public class CommandContext {
   }
   
   protected boolean requiresContextSwitch(final AtomicOperation executionOperation, ProcessApplicationReference processApplicationReference) {
-    return processApplicationReference != null
-      && (processApplicationReference.getName() != Context.getCurrentProcessApplication());
+    
+    final ProcessApplicationReference currentProcessApplication = Context.getCurrentProcessApplication();
+    
+    return processApplicationReference != null 
+      && ( currentProcessApplication == null || !processApplicationReference.getName().equals(currentProcessApplication.getName()) );
+    
   }
 
   public void close() {
