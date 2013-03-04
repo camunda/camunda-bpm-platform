@@ -14,7 +14,9 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 
 import org.activiti.engine.repository.ProcessDefinitionQuery;
+import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.StatisticsResultDto;
+import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDiagramDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionQueryDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
@@ -24,6 +26,10 @@ import org.camunda.bpm.engine.rest.dto.runtime.StartProcessInstanceDto;
 @Produces(MediaType.APPLICATION_JSON)
 public interface ProcessDefinitionService {
 
+  public static final String APPLICATION_BPMN20_XML = "application/bpmn20+xml";
+  public static final MediaType APPLICATION_BPMN20_XML_TYPE =
+      new MediaType("application", "bpmn20+xml");
+  
   /**
    * Exposes the {@link ProcessDefinitionQuery} interface as a REST service.
    * @param query
@@ -36,12 +42,28 @@ public interface ProcessDefinitionService {
 	List<ProcessDefinitionDto> getProcessDefinitions(ProcessDefinitionQueryDto query, 
 	    @QueryParam("firstResult") Integer firstResult, @QueryParam("maxResults") Integer maxResults);
 	
+	@GET
+  @Path("/count")
+  CountResultDto getProcessDefinitionsCount(ProcessDefinitionQueryDto query);
+	
+	@GET
+	@Path("/{id}")
+	ProcessDefinitionDto getProcessDefinition(@PathParam("id") String processDefinitionId);
+	
+	@GET
+	@Path("/{id}/xml")
+	ProcessDefinitionDiagramDto getProcessDefinitionBpmn20Xml(@PathParam("id") String processDefinitionId);
+	
 	@POST
 	@Path("/{id}/start")
 	@Consumes(MediaType.APPLICATION_JSON)
 	ProcessInstanceDto startProcessInstance(@Context UriInfo context, @PathParam("id") String processDefinitionId, StartProcessInstanceDto parameters);
-
+	
 	@GET
 	@Path("/statistics")
-	List<StatisticsResultDto> getStatistics(@QueryParam("groupBy") String groupBy, @QueryParam("failedJobs") Boolean includeFailedJobs);
+	List<StatisticsResultDto> getStatistics(@QueryParam("failedJobs") Boolean includeFailedJobs);
+	
+	@GET
+	@Path("/{id}/statistics")
+	List<StatisticsResultDto> getActivityStatistics(@PathParam("id") String processDefinitionId, @QueryParam("failedJobs") Boolean includeFailedJobs);
 }

@@ -1,10 +1,10 @@
 package org.camunda.bpm.engine.rest.dto;
 
-public class StatisticsResultDto {
+public abstract class StatisticsResultDto {
 
-  private String id;
-  private Integer instances;
-  private Integer failedJobs;
+  protected String id;
+  protected Integer instances;
+  protected Integer failedJobs;
   
   public String getId() {
     return id;

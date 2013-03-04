@@ -3,6 +3,7 @@ package org.camunda.bpm.engine.rest;
 import static com.jayway.restassured.RestAssured.expect;
 import static com.jayway.restassured.RestAssured.given;
 import static com.jayway.restassured.path.json.JsonPath.from;
+import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -40,12 +41,14 @@ public class ProcessDefinitionServiceQueryTest extends AbstractRestServiceTest {
   private static final Boolean EXAMPLE_IS_SUSPENDED = false;
   
   private static final String PROCESS_DEFINITION_QUERY_URL = TEST_RESOURCE_ROOT_PATH + "/process-definition";
+  private static final String PROCESS_DEFINITION_COUNT_QUERY_URL = PROCESS_DEFINITION_QUERY_URL + "/count";
   
   private ProcessDefinitionQuery mockedQuery;
   
   private ProcessDefinitionQuery setUpMockDefinitionQuery(List<ProcessDefinition> mockedDefinitions) {
     ProcessDefinitionQuery sampleDefinitionsQuery = mock(ProcessDefinitionQuery.class);
     when(sampleDefinitionsQuery.list()).thenReturn(mockedDefinitions);
+    when(sampleDefinitionsQuery.count()).thenReturn((long) mockedDefinitions.size());
     when(processEngine.getRepositoryService().createProcessDefinitionQuery()).thenReturn(sampleDefinitionsQuery);
     return sampleDefinitionsQuery;
   }
@@ -336,6 +339,16 @@ public class ProcessDefinitionServiceQueryTest extends AbstractRestServiceTest {
       .when().get(PROCESS_DEFINITION_QUERY_URL);
     
     verify(mockedQuery).listPage(firstResult, Integer.MAX_VALUE);
+  }
+  
+  @Test
+  public void testQueryCount() throws IOException {
+    setUpMockedQuery();
+    expect().statusCode(Status.OK.getStatusCode())
+      .body("count", equalTo(1))
+      .when().get(PROCESS_DEFINITION_COUNT_QUERY_URL);
+    
+    verify(mockedQuery).count();
   }
   
 }

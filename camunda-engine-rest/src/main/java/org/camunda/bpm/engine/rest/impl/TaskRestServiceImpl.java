@@ -11,6 +11,7 @@ import org.activiti.engine.TaskService;
 import org.activiti.engine.task.Task;
 import org.activiti.engine.task.TaskQuery;
 import org.camunda.bpm.engine.rest.TaskRestService;
+import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.task.ClaimTaskDto;
 import org.camunda.bpm.engine.rest.dto.task.CompleteTaskDto;
 import org.camunda.bpm.engine.rest.dto.task.TaskDto;
@@ -83,6 +84,29 @@ public class TaskRestServiceImpl extends AbstractEngineService implements TaskRe
     } catch (ActivitiException e) {
       throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
     }
+  }
+
+  @Override
+  public CountResultDto getTasksCount(TaskQueryDto queryDto) {
+    TaskService taskService = processEngine.getTaskService();
+    
+    TaskQuery query;
+    try {
+      query = queryDto.toQuery(taskService);
+    } catch (InvalidRequestException e) {
+      throw new WebApplicationException(Status.BAD_REQUEST.getStatusCode());
+    }
+    
+    long count = query.count();
+    CountResultDto result = new CountResultDto();
+    result.setCount(count);
+    
+    return result;
+  }
+
+  @Override
+  public CountResultDto queryTasksCount(TaskQueryDto queryDto) {
+    return getTasksCount(queryDto);
   }
 
 }

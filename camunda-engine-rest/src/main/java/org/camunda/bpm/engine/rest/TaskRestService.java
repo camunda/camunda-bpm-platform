@@ -11,6 +11,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
+import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.task.ClaimTaskDto;
 import org.camunda.bpm.engine.rest.dto.task.CompleteTaskDto;
 import org.camunda.bpm.engine.rest.dto.task.TaskDto;
@@ -38,6 +39,15 @@ public interface TaskRestService {
   @Consumes(MediaType.APPLICATION_JSON)
   List<TaskDto> queryTasks(TaskQueryDto query,
       @QueryParam("firstResult") Integer firstResult, @QueryParam("maxResults") Integer maxResults);
+
+  @GET
+  @Path("/count")
+  CountResultDto getTasksCount(TaskQueryDto query);
+  
+  @POST
+  @Path("/count")
+  @Consumes(MediaType.APPLICATION_JSON)
+  CountResultDto queryTasksCount(TaskQueryDto query);
   
   @POST
   @Path("/{id}/claim")

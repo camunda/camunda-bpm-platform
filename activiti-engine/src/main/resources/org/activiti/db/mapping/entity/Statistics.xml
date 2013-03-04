@@ -1,0 +1,208 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+  
+<mapper namespace="org.activiti.engine.impl.persistence.entity.ProcessDefinitionStatisticsEntity">
+
+  <!-- RESULTMAP -->
+
+  <resultMap id="processDefinitionStatisticsResultMap" type="org.activiti.engine.impl.persistence.entity.ProcessDefinitionStatisticsEntity">
+    <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <result property="instances" column="INSTANCE_COUNT" jdbcType="INTEGER" />
+    <result property="failedJobs" column="FAILED_JOBS_COUNT" jdbcType="INTEGER" />
+    <result property="revision" column="REV_" />
+    <result property="category" column="CATEGORY_" />
+    <result property="name" column="NAME_" />
+    <result property="key" column="KEY_" jdbcType="VARCHAR" />
+    <result property="version" column="VERSION_" jdbcType="INTEGER"/>
+    <result property="deploymentId" column="DEPLOYMENT_ID_" jdbcType="VARCHAR"/>
+    <result property="resourceName" column="RESOURCE_NAME_" jdbcType="VARCHAR"/>
+    <result property="diagramResourceName" column="DGRM_RESOURCE_NAME_" jdbcType="VARCHAR"/>
+    <result property="hasStartFormKey" column="HAS_START_FORM_KEY_" jdbcType="BOOLEAN"/>
+    <result property="suspensionState" column="SUSPENSION_STATE_" jdbcType="INTEGER"/>
+  </resultMap>
+  
+  <resultMap id="deploymentStatisticsResultMap" type="org.activiti.engine.impl.persistence.entity.DeploymentStatisticsEntity">
+    <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <result property="name" column="NAME_" jdbcType="VARCHAR" />
+    <result property="deploymentTime" column="DEPLOY_TIME_" jdbcType="TIMESTAMP"/>
+    <result property="instances" column="INSTANCE_COUNT" jdbcType="INTEGER" />
+    <result property="failedJobs" column="FAILED_JOBS_COUNT" jdbcType="INTEGER" />
+  </resultMap>
+  
+  <resultMap id="activityStatisticsResultMap" type="org.activiti.engine.impl.persistence.entity.ActivityStatisticsImpl">
+    <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <result property="instances" column="INSTANCE_COUNT" jdbcType="INTEGER" />
+    <result property="failedJobs" column="FAILED_JOBS_COUNT" jdbcType="INTEGER" />
+  </resultMap>
+  
+  <!-- Process Definition Statistics -->  
+  <select id ="selectProcessDefinitionStatistics" resultMap="processDefinitionStatisticsResultMap" 
+    parameterType="org.activiti.engine.impl.ProcessDefinitionStatisticsQueryImpl">
+    ${limitBefore}
+    select RES.* ${limitBetween}
+    <include refid="selectProcessDefinitionStatisticsByQueryCriteriaSql"/>
+    ${orderBy}
+    ${limitAfter}
+  </select>
+  
+  <select id ="selectProcessDefinitionStatisticsCount" resultType="long" 
+    parameterType="org.activiti.engine.impl.ProcessDefinitionStatisticsQueryImpl">
+    select count(RES.ID_) 
+    <include refid="selectProcessDefinitionStatisticsByQueryCriteriaSql"/>
+  </select>
+  
+  <sql id="selectProcessDefinitionStatisticsByQueryCriteriaSql">
+    from (
+    select PROCDEF.*, AGG.INSTANCE_COUNT
+    <if test="failedJobsToInclude">
+    , AGG.FAILED_JOBS_COUNT
+    </if>
+    
+    <!-- Join process definitions with data about running instances and failed jobs -->
+    from ${prefix}ACT_RE_PROCDEF PROCDEF left outer join 
+    ( select INSTANCE.PROC_DEF_ID_ as ID_,
+      INSTANCE_COUNT
+      <if test="failedJobsToInclude">
+      , FAILED_JOBS_COUNT
+      </if>
+      
+      from
+      
+      <!-- Count and group all process instances (executions that have ID_ = PROC_INST_ID_) by process definition -->
+      (select PROC_DEF_ID_, count(PROC_INST_ID_) as INSTANCE_COUNT 
+      from ${prefix}ACT_RU_EXECUTION
+      where ID_ = PROC_INST_ID_
+      group by PROC_DEF_ID_) INSTANCE
+      
+      <if test="failedJobsToInclude">
+      left outer join
+      
+      <!-- Sum all failed jobs grouped by process definition -->
+      (select PROC_DEF_ID_, count(JOB.ID_) as FAILED_JOBS_COUNT from 
+        <!-- Select all executions and their failed jobs (i.e. RETRIES_ = 0) -->
+        ( select JOB.ID_, PROC_DEF_ID_ 
+        from ${prefix}ACT_RU_EXECUTION EXECUTION, ${prefix}ACT_RU_JOB JOB 
+        where EXECUTION.ID_ = JOB.EXECUTION_ID_ and JOB.RETRIES_ = 0) JOB
+      group by JOB.PROC_DEF_ID_) JOB
+      on JOB.PROC_DEF_ID_ = INSTANCE.PROC_DEF_ID_ 
+      </if>
+      ) AGG
+    on PROCDEF.ID_ = AGG.ID_
+    ) RES
+  </sql>
+ 
+  <!-- Deployment statistics -->
+  <select id ="selectDeploymentStatistics" resultMap="deploymentStatisticsResultMap" 
+    parameterType="org.activiti.engine.impl.DeploymentStatisticsQueryImpl">
+    ${limitBefore}
+    select RES.* ${limitBetween}
+    <include refid="selectDeploymentStatisticsByQueryCriteriaSql"/>
+    ${orderBy}
+    ${limitAfter}
+  </select>
+  
+  <select id ="selectDeploymentStatisticsCount" resultType="long" 
+    parameterType="org.activiti.engine.impl.DeploymentStatisticsQueryImpl">
+    select count(RES.ID_) 
+    <include refid="selectDeploymentStatisticsByQueryCriteriaSql"/>
+  </select>
+  
+  <sql id="selectDeploymentStatisticsByQueryCriteriaSql">
+    from (
+    <!-- filter out AGG.ID_ column to avoid a collision with PROCDEF.ID_ -->
+    select DEPLOYMENT.*, AGG.INSTANCE_COUNT
+    <if test="failedJobsToInclude">
+    , AGG.FAILED_JOBS_COUNT
+    </if>
+    
+    <!-- Join process definitions with data about running instances and failed jobs -->
+    from ${prefix}ACT_RE_DEPLOYMENT DEPLOYMENT left outer join 
+    ( select INSTANCE.DEPLOYMENT_ID_ as ID_,
+      INSTANCE_COUNT
+      <if test="failedJobsToInclude">
+      , FAILED_JOBS_COUNT
+      </if>
+      
+      from
+      
+      <!-- Count and group all process instances (executions that have ID_ = PROC_INST_ID_) by deployment -->
+      (select DEPLOYMENT.ID_ as DEPLOYMENT_ID_, count(EXECUTION.PROC_INST_ID_) as INSTANCE_COUNT 
+      from ${prefix}ACT_RU_EXECUTION EXECUTION, ${prefix}ACT_RE_PROCDEF PROCDEF, ${prefix}ACT_RE_DEPLOYMENT DEPLOYMENT
+      where EXECUTION.ID_ = EXECUTION.PROC_INST_ID_
+      and EXECUTION.PROC_DEF_ID_ = PROCDEF.ID_
+      and PROCDEF.DEPLOYMENT_ID_ = DEPLOYMENT.ID_
+      group by DEPLOYMENT.ID_) INSTANCE
+      
+      <if test="failedJobsToInclude">
+      left outer join
+      
+      <!-- Sum all failed jobs grouped by deployment -->
+      (select DEPLOYMENT.ID_ AS DEPLOYMENT_ID_, count(JOB.ID_) as FAILED_JOBS_COUNT from 
+        ${prefix}ACT_RE_PROCDEF PROCDEF, ${prefix}ACT_RE_DEPLOYMENT DEPLOYMENT,
+        <!-- Select all executions and their failed jobs (i.e. RETRIES_ = 0) -->
+        ( select JOB.ID_, PROC_DEF_ID_ 
+        from ${prefix}ACT_RU_EXECUTION EXECUTION, ${prefix}ACT_RU_JOB JOB 
+        where EXECUTION.ID_ = JOB.EXECUTION_ID_ and JOB.RETRIES_ = 0) JOB
+      where JOB.PROC_DEF_ID_ = PROCDEF.ID_
+      and PROCDEF.DEPLOYMENT_ID_ = DEPLOYMENT.ID_
+      group by DEPLOYMENT.ID_) JOB
+      on JOB.DEPLOYMENT_ID_ = INSTANCE.DEPLOYMENT_ID_
+      </if>
+      ) AGG
+    on DEPLOYMENT.ID_ = AGG.ID_
+    ) RES
+  </sql>
+
+  <!-- Activity statistics -->
+
+  <select id ="selectActivityStatistics" resultMap="activityStatisticsResultMap" 
+    parameterType="org.activiti.engine.impl.ActivityStatisticsQueryImpl">
+    ${limitBefore}
+    select RES.* ${limitBetween}
+    <include refid="selectActivityStatisticsByQueryCriteriaSql"/>
+    ${orderBy}
+    ${limitAfter}
+  </select>
+  
+  <select id ="selectActivityStatisticsCount" resultType="long" 
+    parameterType="org.activiti.engine.impl.ActivityStatisticsQueryImpl">
+    select count(RES.ID_)
+    <include refid="selectActivityStatisticsByQueryCriteriaSql"/>
+  </select>
+   
+  <sql id="selectActivityStatisticsByQueryCriteriaSql">
+	  from ( select INSTANCE.ACT_ID_ as ID_,
+      INSTANCE_COUNT
+      <if test="failedJobsToInclude">
+      ,
+      FAILED_JOBS_COUNT
+      </if>
+	    
+	    <!-- Count and group all activity instances by activity ids.
+	    The executions that are actual activity instances can be found with the IS_ACTIVE_.
+	    This will not count parent executions such as the process instance itself. -->  
+	    from
+	    (select ACT_ID_, count(PROC_INST_ID_) as INSTANCE_COUNT 
+	    from ${prefix}ACT_RU_EXECUTION
+	    where PROC_DEF_ID_ = #{processDefinitionId} and IS_ACTIVE_ = 1
+	    group by ACT_ID_) INSTANCE
+	    
+	    <if test="failedJobsToInclude">
+	    left outer join
+	    
+	    <!-- Sum all failed jobs grouped by activity id -->
+	    (select ACT_ID_, count(JOB.ID_) as FAILED_JOBS_COUNT from 
+	      <!-- Select all executions and their failed jobs (i.e. RETRIES_ = 0) of the given process definition -->
+	      ( select JOB.ID_, ACT_ID_ 
+	      from ${prefix}ACT_RU_EXECUTION EXECUTION, ${prefix}ACT_RU_JOB JOB 
+	      where EXECUTION.ID_ = JOB.EXECUTION_ID_ and JOB.RETRIES_ = 0
+	      and PROC_DEF_ID_ = #{processDefinitionId}
+	      ) JOB
+	    group by JOB.ACT_ID_) JOB
+	    
+	    on JOB.ACT_ID_ = INSTANCE.ACT_ID_
+	    </if>
+	    ) RES
+  </sql>
+</mapper>

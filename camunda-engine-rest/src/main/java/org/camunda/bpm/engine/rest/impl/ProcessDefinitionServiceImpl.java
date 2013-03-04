@@ -1,5 +1,6 @@
 package org.camunda.bpm.engine.rest.impl;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,30 +9,31 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
 import org.activiti.engine.ActivitiException;
+import org.activiti.engine.ManagementService;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
+import org.activiti.engine.impl.util.IoUtil;
+import org.activiti.engine.management.ActivityStatistics;
+import org.activiti.engine.management.ActivityStatisticsQuery;
+import org.activiti.engine.management.ProcessDefinitionStatistics;
+import org.activiti.engine.management.ProcessDefinitionStatisticsQuery;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.repository.ProcessDefinitionQuery;
 import org.activiti.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.rest.ProcessDefinitionService;
+import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.StatisticsResultDto;
+import org.camunda.bpm.engine.rest.dto.repository.ActivityStatisticsResultDto;
+import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDiagramDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionQueryDto;
+import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionStatisticsResultDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.runtime.StartProcessInstanceDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
-import org.camunda.bpm.engine.rest.impl.stub.StubStatisticsBuilder;
 
 public class ProcessDefinitionServiceImpl extends AbstractEngineService implements ProcessDefinitionService {
 
-  // stub data for the statistics query while not implemented in the engine
-  private static final String EXAMPLE_PROCESS_DEFINITION_ID = "processDefinition1";
-  private static final int EXAMPLE_PROCESS_INSTANCES = 42;  
-  private static final int EXAMPLE_FAILED_JOBS = 47;  
-  private static final String ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID = "processDefinition2";
-  private static final int ANOTHER_EXAMPLE_PROCESS_INSTANCES = 123;
-  private static final int ANOTHER_EXAMPLE_FAILED_JOBS = 125;  
-  
   public ProcessDefinitionServiceImpl() {
     super();
   }
@@ -74,7 +76,40 @@ public class ProcessDefinitionServiceImpl extends AbstractEngineService implemen
 	  }
 	  return query.listPage(firstResult, maxResults); 
 	}
+	
+	@Override
+  public CountResultDto getProcessDefinitionsCount(ProcessDefinitionQueryDto queryDto) {
+    RepositoryService repoService = processEngine.getRepositoryService();
+    
+    ProcessDefinitionQuery query;
+    try {
+       query = queryDto.toQuery(repoService);
+    } catch (InvalidRequestException e) {
+      throw new WebApplicationException(Status.BAD_REQUEST.getStatusCode());
+    }
+    
+    long count = query.count();
+    CountResultDto result = new CountResultDto();
+    result.setCount(count);
+    return result;
+  }
 
+  @Override
+  public ProcessDefinitionDto getProcessDefinition(String processDefinitionId) {
+    RepositoryService repoService = processEngine.getRepositoryService();
+    
+    ProcessDefinition definition;
+    try {
+      definition = repoService.getProcessDefinition(processDefinitionId);
+    } catch (ActivitiException e) {
+      throw new WebApplicationException(Status.BAD_REQUEST.getStatusCode());
+    }
+    
+    ProcessDefinitionDto result = ProcessDefinitionDto.fromProcessDefinition(definition);
+    
+    return result;
+  }
+	
   @Override
   public ProcessInstanceDto startProcessInstance(UriInfo context, String processDefinitionId, StartProcessInstanceDto parameters) {
     RuntimeService runtimeService = processEngine.getRuntimeService();
@@ -95,74 +130,54 @@ public class ProcessDefinitionServiceImpl extends AbstractEngineService implemen
    * For the time being this is a stub implementation that returns a fixed data set.
    */
   @Override
-  public List<StatisticsResultDto> getStatistics(String groupBy, Boolean includeFailedJobs) {
-    if (groupBy == null || groupBy.equals("definition")) {
-      if (includeFailedJobs != null && includeFailedJobs) {
-        return getStubDataPerDefinitionWithFailedJobs();
-      } else {
-        return getStubDataPerDefinition();
-      }
-    } else if (groupBy.equals("version")) {
-      if (includeFailedJobs != null && includeFailedJobs) {
-        return getStubDataPerDefinitionVersionWithFailedJobs();
-      } else {
-        return getStubDataPerDefinitionVersion();
-      }
+  public List<StatisticsResultDto> getStatistics(Boolean includeFailedJobs) {
+    ManagementService mgmtService = processEngine.getManagementService();
+    ProcessDefinitionStatisticsQuery query = mgmtService.createProcessDefinitionStatisticsQuery();
+    if (includeFailedJobs != null && includeFailedJobs) {
+      query.includeFailedJobs();
     }
-    throw new WebApplicationException(Status.BAD_REQUEST);
-  }
- 
-
-  private List<StatisticsResultDto> getStubDataPerDefinition() {
-    return StubStatisticsBuilder
-        .addResult().id(EXAMPLE_PROCESS_DEFINITION_ID).instances(EXAMPLE_PROCESS_INSTANCES)
-        .nextResult().id(ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID).instances(ANOTHER_EXAMPLE_PROCESS_INSTANCES)
-        .build();
-  }
-  
-  private List<StatisticsResultDto> getStubDataPerDefinitionWithFailedJobs() {
-    return StubStatisticsBuilder
-        .addResult().id(EXAMPLE_PROCESS_DEFINITION_ID)
-          .instances(EXAMPLE_PROCESS_INSTANCES)
-          .failedJobs(EXAMPLE_FAILED_JOBS)
-        .nextResult().id(ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID)
-          .instances(ANOTHER_EXAMPLE_PROCESS_INSTANCES)
-          .failedJobs(ANOTHER_EXAMPLE_FAILED_JOBS)
-        .build();
+    
+    List<ProcessDefinitionStatistics> queryResults = query.list();
+    
+    List<StatisticsResultDto> results = new ArrayList<StatisticsResultDto>();
+    for (ProcessDefinitionStatistics queryResult : queryResults) {
+      StatisticsResultDto dto = ProcessDefinitionStatisticsResultDto.fromProcessDefinitionStatistics(queryResult);
+      results.add(dto);
+    }
+    
+    return results;
   }
   
-  private List<StatisticsResultDto> getStubDataPerDefinitionVersion() {
-    return StubStatisticsBuilder
-         .addResult().id(EXAMPLE_PROCESS_DEFINITION_ID + ":1").instances(EXAMPLE_PROCESS_INSTANCES)
-         .nextResult().id(EXAMPLE_PROCESS_DEFINITION_ID + ":2").instances(EXAMPLE_PROCESS_INSTANCES)
-         .nextResult()
-           .id(ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID + ":1")
-           .instances(ANOTHER_EXAMPLE_PROCESS_INSTANCES)
-         .nextResult()
-           .id(ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID + ":2")
-           .instances(ANOTHER_EXAMPLE_PROCESS_INSTANCES)
-         .build();
-  }
-  
-  private List<StatisticsResultDto> getStubDataPerDefinitionVersionWithFailedJobs() {
-    return StubStatisticsBuilder
-         .addResult()
-           .id(EXAMPLE_PROCESS_DEFINITION_ID + ":1")
-           .instances(EXAMPLE_PROCESS_INSTANCES)
-           .failedJobs(EXAMPLE_FAILED_JOBS)
-         .nextResult()
-           .id(EXAMPLE_PROCESS_DEFINITION_ID + ":2")
-           .instances(EXAMPLE_PROCESS_INSTANCES)
-           .failedJobs(EXAMPLE_FAILED_JOBS)
-         .nextResult()
-           .id(ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID + ":1")
-           .instances(ANOTHER_EXAMPLE_PROCESS_INSTANCES)
-           .failedJobs(ANOTHER_EXAMPLE_FAILED_JOBS)
-         .nextResult()
-           .id(ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID + ":2")
-           .instances(ANOTHER_EXAMPLE_PROCESS_INSTANCES)
-           .failedJobs(ANOTHER_EXAMPLE_FAILED_JOBS)
-         .build();
+  @Override
+  public List<StatisticsResultDto> getActivityStatistics(String processDefinitionId, Boolean includeFailedJobs) {
+    ManagementService mgmtService = processEngine.getManagementService();
+    ActivityStatisticsQuery query = mgmtService.createActivityStatisticsQuery(processDefinitionId);
+    if (includeFailedJobs != null && includeFailedJobs) {
+      query.includeFailedJobs();
+    }
+    
+    List<ActivityStatistics> queryResults = query.list();
+    
+    List<StatisticsResultDto> results = new ArrayList<StatisticsResultDto>();
+    for (ActivityStatistics queryResult : queryResults) {
+      StatisticsResultDto dto = ActivityStatisticsResultDto.fromActivityStatistics(queryResult);
+      results.add(dto);
+    }
+    
+    return results;
   }
 
+  @Override
+  public ProcessDefinitionDiagramDto getProcessDefinitionBpmn20Xml(String processDefinitionId) {
+    InputStream processModelIn = null;
+    try {
+      processModelIn = processEngine.getRepositoryService().getProcessModel(processDefinitionId);
+      byte[] processModel = IoUtil.readInputStream(processModelIn, "processModelBpmn20Xml");
+      return ProcessDefinitionDiagramDto.create(processDefinitionId, new String(processModel, "UTF-8"));
+    } catch (Exception e) {
+      throw new WebApplicationException(e, Status.BAD_REQUEST);
+    } finally {
+      IoUtil.closeSilently(processModelIn);
+    }
+  }
 }

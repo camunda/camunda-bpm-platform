@@ -1,0 +1,44 @@
+div#processDiagramWrapper .slider {
+  margin-top : 20px;
+  width: 150px;
+}
+
+div#processDiagramWrapper {
+  position: relative;
+}
+
+div#processDiagram {
+  margin-top : 20px;
+  overflow: auto;
+}
+
+.currentActivity  {
+  -webkit-box-shadow: 0px 0px 35px 5px rgba(65,105,225, 1); /* WebKit */
+  -moz-box-shadow: 0px 0px 35px 5px rgba(65,105,225, 1); /* Firefox */
+  box-shadow: 0px 0px 35px 5px rgba(65,105,225, 1); /* Standard */
+}
+
+.currentActivityCount {
+  position: absolute;
+  top: 100%;
+  padding: 8px;
+  border-radius: 5px;
+  font-size: 24px;
+  font-weight: bold;
+  color: #ffffff;
+  background-color: #4169e1;
+}
+
+@media only screen and (min-height: 979px ) {
+  
+  div#processDiagram {
+    max-height: 630px;
+  }
+}
+
+@media only screen and (min-height: 839px ) and (max-height: 978px ) {
+  
+  div#processDiagram {
+    max-height: 500px;
+  }
+}
