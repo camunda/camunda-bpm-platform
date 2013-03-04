@@ -71,30 +71,33 @@
     <profile>
       <id>glassfish</id>
       <modules>
-		<module>cycle-tests</module>
         <module>gf31-runtime</module>
         <module>integration-tests</module>
-        <module>tasklist-gui-tests</module>
       </modules>
     </profile>
 	
     <profile>
       <id>jboss</id>   
       <modules>       
-		<module>jboss7-runtime</module>
-		<module>cycle-tests</module>
-        <module>integration-tests</module>
-        <module>tasklist-gui-tests</module>     
+  		  <module>jboss7-runtime</module>
+        <module>integration-tests</module>   
       </modules>
     </profile>  
 	
-	<profile>
+	  <profile>
       <id>tomcat6</id>      
       <modules>
-        <module>tomcat6-runtime</module>        
-        <module>cycle-tests</module>
+        <module>tomcat6-runtime</module>                
+        <module>integration-tests</module>
       </modules>
     </profile>  
+
+    <profile>
+      <id>cycle</id>
+      <modules>
+        <module>cycle-tests</module>
+      </modules>
+    </profile>
     
     <!-- db profiles -->
     

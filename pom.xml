@@ -84,14 +84,7 @@
   	<module>activiti-cdi</module>
   	<module>activiti-osgi</module>
   	<module>activiti-spring</module>
-  	
-  	<module>camunda-engine-rest</module>
-  	
-  	<module>distro/jbossas71</module>
-    <module>distro/gf31</module>
-    <module>distro/tomcat6</module>
-  	<module>distro/sql-script</module>
-	
+  		
 	<module>camunda-engine-rest</module>
 
     <module>distro/jbossas71</module>
