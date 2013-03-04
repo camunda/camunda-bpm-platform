@@ -1,15 +1,16 @@
-.process-definition-page {
+.panel-page {
   width: 100%;
   overflow: hidden;
 }
 
-div.process-definition-page {
+div.panel-page {
   margin: 0;
   padding: 0;
 }
 
 .left-panel {
   z-index: 3;
+  white-space: wrap;
   width: 341px;
   border: 1px solid #DDD;
   position: absolute;
@@ -21,7 +22,7 @@ div.process-definition-page {
   border-radius: 0px;
 }
 
-.right-diagram-panel {
+.right-panel {
   z-index: 1;
   left: 381px;
   position: absolute;
@@ -31,16 +32,19 @@ div.process-definition-page {
 
 .arrow-button {
   float: right;
-  background: transparent;
-  padding: 0;
-  border: 0;
-  opacity: 0.2;
-  filter: alpha(opacity=20);
-  line-height: 20px;
-  font-weight: bold;
   font-size: 20px;
-  float: right;
+  font-weight: bold;
+  line-height: 20px;
   text-shadow: 0 1px 0 #ffffff;
+  opacity: 0.4;
+  filter: alpha(opacity=20);
+}
+
+button.arrow-button {
+  padding: 0;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
   -webkit-appearance: none;
 }
 
@@ -49,6 +53,6 @@ div.process-definition-page {
   color: #000000;
   text-decoration: none;
   cursor: pointer;
-  opacity: 0.4;
+  opacity: 0.6;
   filter: alpha(opacity=40);
 }

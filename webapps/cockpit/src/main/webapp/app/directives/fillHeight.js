@@ -7,7 +7,7 @@ define([ "angular", "jquery"], function(angular, $) {
   var Directive = function () {
     return {
       restrict: 'A',
-      link: function(scope, element, attrs, $destroy) {
+      link: function(scope, element, attrs) {
         
         scope.getWindowHeight = function() {
           return $(window).height();
@@ -16,7 +16,7 @@ define([ "angular", "jquery"], function(angular, $) {
         window.onresize = function () {
           scope.$apply();
         };
-        
+
         scope.$watch(function () {
           return scope.getWindowHeight();
         }, function(newValue, oldValue) {
@@ -42,6 +42,6 @@ define([ "angular", "jquery"], function(angular, $) {
   
   
   module
-    .directive('adjustHeightOnResize', Directive);
+    .directive('fillHeight', Directive);
   
 });

@@ -3,8 +3,9 @@
 define([ "angularModule" ], function(angularModule) {
 
   return angularModule("cockpit.directives", [
+    "cockpit/directives/fillHeight",
+    "cockpit/directives/hidePanel",
+    "cockpit/directives/pageOverflowHidden",
     "cockpit/directives/processDiagram",
-    "cockpit/directives/adjustHeightOnResize",
-    "cockpit/directives/hideElement"
   ]);
 });

@@ -9,14 +9,11 @@ define([ "angular", "jquery"], function(angular, $) {
                            '    <i class="icon-chevron-left"></i>' +
                            '  </button>' + 
                            '</div>' + 
-                           '<div id="showRightPanel">' + 
+                           '<div id="showLeftPanel">' + 
                            '  <button type="button" class="arrow-button" ng-click="showDiv()">' + 
                            '    <i class="icon-chevron-right"></i>' +
                            '  </button>' + 
                            '</div>';
-  
-  
-
   
   var Directive = function () {
     return {
@@ -27,13 +24,12 @@ define([ "angular", "jquery"], function(angular, $) {
         var leftPanelElement = $(".left-panel");
         var leftPanelWidth = leftPanelElement.outerWidth(false);
         
-        var rightPanelElement = $(".right-diagram-panel");
+        var rightPanelElement = $(".right-panel");
         
-        var showRightPanelElement = $("#showRightPanel");
-        showRightPanelElement.css("top", "19px");
+        var showRightPanelElement = $("#showLeftPanel");
+        showRightPanelElement.css("top", leftPanelElement.css("padding-top"));
         showRightPanelElement.css("position", "absolute");
         showRightPanelElement.hide();
-        
         
         scope.hideDiv = function () {
           leftPanelElement
@@ -71,8 +67,7 @@ define([ "angular", "jquery"], function(angular, $) {
     };
   };
   
-  
   module
-    .directive('hideElement', Directive);
+    .directive('hidePanel', Directive);
   
 });
