@@ -19,8 +19,6 @@ public class TestContainer {
       .addAsManifestResource("context.xml")
       .addAsLibraries(com.camunda.fox.platform.test.util.DeploymentHelper.getWeld())
       .addClass(IntegrationTestProcessApplication.class);
-      
-        
   }
   
 }

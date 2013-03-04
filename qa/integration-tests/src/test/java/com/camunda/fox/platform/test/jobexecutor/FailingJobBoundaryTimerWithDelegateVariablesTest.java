@@ -47,8 +47,7 @@ public class FailingJobBoundaryTimerWithDelegateVariablesTest extends AbstractFo
     return initWebArchiveDeployment()
             .addClass(DemoDelegate.class)
             .addClass(DemoVariableClass.class)
-            .addAsResource("com/camunda/fox/platform/test/jobexecutor/ImmediatelyFailing.bpmn20.xml")
-            .addAsWebInfResource("persistence.xml", "classes/META-INF/persistence.xml");
+            .addAsResource("com/camunda/fox/platform/test/jobexecutor/ImmediatelyFailing.bpmn20.xml");
   }
 
   @Inject

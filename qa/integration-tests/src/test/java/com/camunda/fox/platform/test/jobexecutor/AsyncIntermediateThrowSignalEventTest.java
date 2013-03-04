@@ -18,8 +18,7 @@ public class AsyncIntermediateThrowSignalEventTest extends AbstractFoxPlatformIn
   public static WebArchive processArchive() {
     return initWebArchiveDeployment()
             .addAsResource("com/camunda/fox/platform/test/jobexecutor/AsyncIntermediateThrowSignalEventTest.catchAlertSignalBoundaryWithBoundarySignalEvent.bpmn20.xml")
-            .addAsResource("com/camunda/fox/platform/test/jobexecutor/AsyncIntermediateThrowSignalEventTest.throwAlertSignalWithIntermediateCatchSignalEvent.bpmn20.xml")
-            .addAsWebInfResource("persistence.xml", "classes/META-INF/persistence.xml");
+            .addAsResource("com/camunda/fox/platform/test/jobexecutor/AsyncIntermediateThrowSignalEventTest.throwAlertSignalWithIntermediateCatchSignalEvent.bpmn20.xml");
   }
   
   @Test

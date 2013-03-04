@@ -445,9 +445,13 @@
                 <exclude>**/ejb/**</exclude>
                 <exclude>**/transactions/**</exclude>                
                 <!-- requires EL 2.2 -->
-                <exclude>**/CdiBeanResolutionTest/**</exclude>
+                <exclude>**/CdiBeanResolutionTest.java</exclude>
                 <!-- No EJB RequestContext available -->
-                <exclude>**/JobExecutorRequestContextTest/**</exclude>
+                <exclude>**/JobExecutorRequestContextTest.java</exclude>
+                <!-- Not supported by arquillian tomcat container -->
+                <exclude>**/TestWarDeploymentWithBrokenBpmnXml.java</exclude>
+                <exclude>**/TestDeploymentWithDroolsTaskFails.java</exclude>
+                <exclude>**/TestProcessEnginesXmlFails.java</exclude>
               </excludes>
             </configuration>
           </plugin>

@@ -59,7 +59,11 @@ public class UndeployProcessArchiveStep extends MBeanDeploymentOperationStep {
 
     // delete the deployment if not disabled
     if (PropertyHelper.getBooleanProperty(processArchive.getProperties(), ProcessArchiveXml.PROP_IS_DELETE_UPON_UNDEPLOY, false)) {
-      ProcessEngine processEngine = serviceContainer.getServiceValue(ServiceTypes.PROCESS_ENGINE, processArchive.getProcessEngineName());
+      String processEngineName = processArchive.getProcessEngineName();
+      if(processEngineName == null) {
+        processEngineName = "default";
+      }
+      ProcessEngine processEngine = serviceContainer.getServiceValue(ServiceTypes.PROCESS_ENGINE, processEngineName);
       if (processEngine != null) {
         processEngine.getRepositoryService().deleteDeployment(engineDeploymentId, true);
       }
