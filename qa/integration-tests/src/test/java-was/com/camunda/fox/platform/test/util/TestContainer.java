@@ -1,12 +1,15 @@
 package com.camunda.fox.platform.test.util;
 
+import org.jboss.shrinkwrap.api.spec.WebArchive;
+
 
 
 /**
+ * 
  * @author christian.lipphardt
  */
-public class JndiConstants {
+public class TestContainer {
   
   public final static String APP_NAME = "service/";
-  
+    
 }
