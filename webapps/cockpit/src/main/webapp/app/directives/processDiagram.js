@@ -9,17 +9,18 @@ define([ "angular", "jquery", "bpmn/Bpmn", "dojo/domReady!", "bootstrap-slider/b
       restrict: 'A',
       link: function(scope, element, attrs, $destroy) {
         if (!!scope.processDefinitionId) {
-          var containerElement = 'processDiagram';
+          var containerName = 'processDiagram';
+          var container = $('#' + containerName);
+
           var bpmnRenderer;
 //          var currentActivityCssClass = 'currentActivity';
           var currentActivityCountCssClass = 'currentActivityCount';
 
+          // initial zoom level
           scope.zoomLevel = 1;
 
-          $('#' + containerElement).mousewheel(function(event, delta) {
-            console.log(delta);
+          container.mousewheel(function(event, delta) {
             scope.$apply(function() {
-              // calculate zoom level
               scope.zoomLevel = calculateZoomLevel(delta);
 
             });
@@ -48,6 +49,68 @@ define([ "angular", "jquery", "bpmn/Bpmn", "dojo/domReady!", "bootstrap-slider/b
             }
           });
 
+          // initial dragging value
+          var dragging;
+
+          // register handlers
+          container.mousedown(function(event) {
+            if (event.button !== 0) {
+              return;
+            }
+
+            dragging = {
+              x: event.clientX,
+              y: event.clientY
+            };
+
+            //$('#' + containerElement).addClass('drag');
+            console.log("Start dragging: " + event);
+
+            // bind mousemove
+            container.mousemove(function(event) {
+              if (!dragging) {
+                return;
+              }
+
+              var delta = ({x: event.clientX - dragging.x, y: event.clientY - dragging.y});
+              dragging.x = event.clientX;
+              dragging.y = event.clientY;
+
+              var currentLeft = parseInt(container.css('left'));
+              var currentTop = parseInt(container.css('top'));
+
+              if (!currentLeft || isNaN(currentLeft)) {
+                currentLeft = 0;
+              }
+              if (!currentTop || isNaN(currentTop)) {
+                currentTop = 0;
+              }
+
+              console.log("Delta (" + delta.x + "," + delta.y + ") - current (" + currentLeft + "," + currentTop + ")");
+
+              var newLeft = currentLeft + delta.x + 'px';
+              var newTop = currentTop + delta.y + 'px';
+
+              console.log("New (" + newLeft + "," + newTop + ")");
+
+              container.css('left', newLeft);
+              container.css('top', newTop);
+            })
+          });
+
+          container.mouseup(function(event) {
+            if (!dragging) {
+              return;
+            }
+
+            console.log("Stop dragging: " + event);
+
+            dragging = null;
+            //$('#' + containerElement).removeClass('drag');
+            // unbind mousemove
+            container.unbind('mousemove');
+          });
+
           // on mousedown in svg start moving operation
           //
 
@@ -68,27 +131,27 @@ define([ "angular", "jquery", "bpmn/Bpmn", "dojo/domReady!", "bootstrap-slider/b
             switch (numberLength) {
               case 4:
                 // make it 1K
-                activityStatistic.instances = instances / 1000 + 'K';
+                activityStatistic.instances = Math.floor(instances / 1000) + 'K';
                 break;
               case 5:
                 // make it 10K
-                activityStatistic.instances = instances / 1000 + 'K';
+                activityStatistic.instances = Math.floor(instances / 1000) + 'K';
                 break;
               case 6:
                 // make it 100K
-                activityStatistic.instances = instances / 1000 + 'K';
+                activityStatistic.instances = Math.floor(instances / 1000) + 'K';
                 break;
               case 7:
                 // make it 1mn
-                activityStatistic.instances = instances / 1000000 + 'mn';
+                activityStatistic.instances = Math.floor(instances / 1000000) + 'mn';
                 break;
               case 8:
                 // make it 10mn
-                activityStatistic.instances = instances / 1000000 + 'mn';
+                activityStatistic.instances = Math.floor(instances / 1000000) + 'mn';
                 break;
               case 9:
                 // make it 100mn
-                activityStatistic.instances = instances / 1000000 + 'mn';
+                activityStatistic.instances = Math.floor(instances / 1000000) + 'mn';
                 break;
               default:
                 // leave it alone because it is under 1000
@@ -109,7 +172,7 @@ define([ "angular", "jquery", "bpmn/Bpmn", "dojo/domReady!", "bootstrap-slider/b
                 function(data) {
                   bpmnRenderer = new Bpmn();
                   bpmnRenderer.render(data.bpmn20Xml, {
-                    diagramElement : containerElement,
+                    diagramElement : containerName,
                     overlayHtml : '<div></div>'
                   });
 
@@ -119,7 +182,7 @@ define([ "angular", "jquery", "bpmn/Bpmn", "dojo/domReady!", "bootstrap-slider/b
 
                   console.log("scrolling to point (" + $(processId).position().top + "," + $(processId).position().left + ")" );
 
-                  $('#' + containerElement).animate({
+                  container.animate({
                     scrollTop: $(processId).position().top,
                     scrollLeft: $(processId).position().left
                   }, 500);
