@@ -25,6 +25,7 @@ define([ "angular", "jquery"], function(angular, $) {
           }
           var height = parseInt($(element).css("height"));
           var newHeight = height + newValue - oldValue;
+          
           $(element).css("height", newHeight + "px");
         });
         

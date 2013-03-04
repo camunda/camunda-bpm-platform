@@ -44,6 +44,10 @@ define([ "angular", "jquery"], function(angular, $) {
               },
               "slow");
           
+          $("#processDiagram").removeOverscroll();
+          rightPanelElement.css("width", "+=" + leftPanelWidth + "px");
+          $("#processDiagram").overscroll({captureWheel:false});
+          
           showRightPanelElement.css("left", leftPanelWidth + "px");
           showRightPanelElement.show();
         };
@@ -60,6 +64,10 @@ define([ "angular", "jquery"], function(angular, $) {
               left: "+=" + leftPanelWidth + "px"
               },
               "slow");
+          
+          $("#processDiagram").removeOverscroll();
+          rightPanelElement.css("width", "-=" + leftPanelWidth + "px");
+          $("#processDiagram").overscroll({captureWheel:false});
           
           showRightPanelElement.hide();
         };
