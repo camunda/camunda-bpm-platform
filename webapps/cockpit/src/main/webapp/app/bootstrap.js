@@ -8,6 +8,7 @@
     paths: {
       domReady : "assets/js/lib/require/domReady",
       jquery: "assets/js/lib/jquery-1.7.2.min",
+      jqueryMousewheel : "assets/js/lib/jquery.mousewheel",
       bootstrap: "assets/bootstrap/js/bootstrap",
       angularReady : "common/util/angularReady",
       angularModule : "common/util/angularModule"

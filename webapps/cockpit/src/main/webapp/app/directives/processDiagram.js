@@ -1,6 +1,6 @@
 "use strict";
 
-define([ "angular", "jquery", "bpmn/Bpmn", "dojo/domReady!", "bootstrap-slider/bootstrap-slider" ], function(angular, $, Bpmn, Slider) {
+define([ "angular", "jquery", "bpmn/Bpmn", "dojo/domReady!", "bootstrap-slider/bootstrap-slider", "jqueryMousewheel" ], function(angular, $, Bpmn, Slider) {
   
   var module = angular.module("cockpit.directives");
   
@@ -14,17 +14,42 @@ define([ "angular", "jquery", "bpmn/Bpmn", "dojo/domReady!", "bootstrap-slider/b
 //          var currentActivityCssClass = 'currentActivity';
           var currentActivityCountCssClass = 'currentActivityCount';
 
-          var setupZoomSlider = function() {
-            $('#zoomSlider').slider({
-              max : 5,
-              step : 0.1,
-              value: 1
-            }).on('slide', function(event) {
-                scope.$apply(function() {
-                  scope.zoomLevel = Math.round(event.value * 10) / 10;
-                });
-              });
-          }();
+          scope.zoomLevel = 1;
+
+          $('#' + containerElement).mousewheel(function(event, delta) {
+            console.log(delta);
+            scope.$apply(function() {
+              // calculate zoom level
+              scope.zoomLevel = calculateZoomLevel(delta);
+
+            });
+          });
+
+          var calculateZoomLevel = function(zoomDelta) {
+            var minZoomLevelMin = 0.1;
+            var maxZoomLevelMax = 5;
+            var zoomSteps = 10;
+
+            var newZoomLevel = scope.zoomLevel + Math.round((zoomDelta * 100)/ zoomSteps) / 100;
+
+            if (newZoomLevel > maxZoomLevelMax) {
+              newZoomLevel = maxZoomLevelMax;
+            } else if (newZoomLevel < minZoomLevelMin) {
+              newZoomLevel = minZoomLevelMin;
+            }
+
+            return newZoomLevel;
+          }
+
+          scope.$watch('zoomLevel', function(newZoomLevel) {
+            if (newZoomLevel && bpmnRenderer) {
+              console.log("New ZoomLevel: " + newZoomLevel);
+              bpmnRenderer.zoom(newZoomLevel);
+            }
+          });
+
+          // on mousedown in svg start moving operation
+          //
 
           var getActivityStatisticsResult = function(activityStatistics) {
             var activityStatisticsResult = [];
@@ -76,19 +101,6 @@ define([ "angular", "jquery", "bpmn/Bpmn", "dojo/domReady!", "bootstrap-slider/b
               renderer.annotate(currentActivity.id, '<p class="' + currentActivityCountCssClass + '">' + currentActivity.instances + '</p>');
             });
           };
-
-          var updateZoomLevel = function(zoomLevel, renderer) {
-            if (zoomLevel && renderer) {
-              console.log("ZoomLevel: " + zoomLevel);
-              Debouncer.debounce(function() {
-                renderer.zoom(parseFloat(zoomLevel));
-              }, 1000)();
-            }
-          };
-
-          scope.$watch('zoomLevel', function(newValue) {
-            updateZoomLevel(newValue, bpmnRenderer);
-          });
 
           scope.$watch(function() { return scope.processDefinition; }, function(processDefinition) {
             if (processDefinition && processDefinition.$resolved) {
