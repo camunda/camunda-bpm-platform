@@ -1,6 +1,6 @@
 "use strict";
 
-define([ "angular", "jquery", "bpmn/Bpmn", "dojo/domReady!", "bootstrap-slider/bootstrap-slider", "jqueryMousewheel" ], function(angular, $, Bpmn, Slider) {
+define([ "angular", "jquery", "bpmn/Bpmn", "dojo/domReady!", "bootstrap-slider/bootstrap-slider", "jquery.overscroll/jquery.overscroll", "jqueryMousewheel" ], function(angular, $, Bpmn, Slider) {
   
   var module = angular.module("cockpit.directives");
   
@@ -43,13 +43,15 @@ define([ "angular", "jquery", "bpmn/Bpmn", "dojo/domReady!", "bootstrap-slider/b
           }
 
           scope.$watch('zoomLevel', function(newZoomLevel) {
+            container.removeOverscroll();
             if (newZoomLevel && bpmnRenderer) {
               console.log("New ZoomLevel: " + newZoomLevel);
               bpmnRenderer.zoom(newZoomLevel);
             }
+            container.overscroll({captureWheel:false});
           });
 
-          // initial dragging value
+/*          // initial dragging value
           var dragging;
 
           // register handlers
@@ -112,7 +114,7 @@ define([ "angular", "jquery", "bpmn/Bpmn", "dojo/domReady!", "bootstrap-slider/b
           });
 
           // on mousedown in svg start moving operation
-          //
+          //*/
 
           var getActivityStatisticsResult = function(activityStatistics) {
             var activityStatisticsResult = [];
@@ -175,6 +177,8 @@ define([ "angular", "jquery", "bpmn/Bpmn", "dojo/domReady!", "bootstrap-slider/b
                     diagramElement : containerName,
                     overlayHtml : '<div></div>'
                   });
+                  
+                  container.overscroll({captureWheel:false});
 
                   // id to scroll to is the process definition key
                   var processId = '#' + processDefinition.key;
