@@ -1,0 +1,54 @@
+.process-definition-page {
+  width: 100%;
+  overflow: hidden;
+}
+
+div.process-definition-page {
+  margin: 0;
+  padding: 0;
+}
+
+.left-panel {
+  z-index: 3;
+  width: 341px;
+  border: 1px solid #DDD;
+  position: absolute;
+  left: 0px;
+  top: 41px;
+  margin: 0px;
+  -webkit-border-radius: 0px;
+  -moz-border-radius: 0px;
+  border-radius: 0px;
+}
+
+.right-diagram-panel {
+  z-index: 1;
+  left: 381px;
+  position: absolute;
+  top: 41px;
+  padding: 19px;
+}
+
+.arrow-button {
+  float: right;
+  background: transparent;
+  padding: 0;
+  border: 0;
+  opacity: 0.2;
+  filter: alpha(opacity=20);
+  line-height: 20px;
+  font-weight: bold;
+  font-size: 20px;
+  float: right;
+  text-shadow: 0 1px 0 #ffffff;
+  -webkit-appearance: none;
+}
+
+.arrow-button:hover,
+.arrow-button:focus {
+  color: #000000;
+  text-decoration: none;
+  cursor: pointer;
+  opacity: 0.4;
+  filter: alpha(opacity=40);
+}
