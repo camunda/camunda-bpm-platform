@@ -70,12 +70,6 @@ public class DeployProcessArchiveStep extends MBeanDeploymentOperationStep {
     final ClassLoader processApplicationClassloader = processApplication.getProcessApplicationClassloader();            
     
     ProcessEngine processEngine = getProcessEngine(serviceContainer);
-    
-    if(processEngine == null) {
-      String processEngineName = processArchive.getProcessEngineName();
-      throw new ActivitiException("Cannot deploy process archive '" + processArchive.getName() + "' to process engine '" + processEngineName
-          + "' no such process engine exists.");
-    }
 
     // start building deployment map    
     Map<String, byte[]> deploymentMap = new HashMap<String, byte[]>();
@@ -142,9 +136,7 @@ public class DeployProcessArchiveStep extends MBeanDeploymentOperationStep {
     for (String resourceName : deploymentMap.keySet()) {
       builder.append("        "+resourceName);
       builder.append("\n");
-    }
-    builder.append("\n");
-    
+    }    
     LOGGER.log(Level.INFO, builder.toString());
   }
 
@@ -169,8 +161,20 @@ public class DeployProcessArchiveStep extends MBeanDeploymentOperationStep {
 
   protected ProcessEngine getProcessEngine(final MBeanServiceContainer serviceContainer) {
     String processEngineName = processArchive.getProcessEngineName();
-    ProcessEngine processEngine = serviceContainer.getServiceValue(ServiceTypes.PROCESS_ENGINE, processEngineName);
-    return processEngine;
+    if(processEngineName != null) {
+      ProcessEngine processEngine = serviceContainer.getServiceValue(ServiceTypes.PROCESS_ENGINE, processEngineName);
+      if(processEngine == null) {        
+        throw new ActivitiException("Cannot deploy process archive '" + processArchive.getName() + "' to process engine '"+processEngineName+"' no such process engine exists.");
+      }      
+      return processEngine;
+      
+    } else {
+      ProcessEngine processEngine = serviceContainer.getServiceValue(ServiceTypes.PROCESS_ENGINE, "default");      
+      if(processEngine == null) {        
+        throw new ActivitiException("Cannot deploy process archive '" + processArchive.getName() + "' to default process: no such process engine exists.");
+      }      
+      return processEngine;
+    }
   }
 
 }

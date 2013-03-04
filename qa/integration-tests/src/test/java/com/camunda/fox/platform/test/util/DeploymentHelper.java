@@ -25,6 +25,7 @@ import org.jboss.shrinkwrap.resolver.api.maven.MavenDependencyResolver;
 public class DeploymentHelper {
   
   private static JavaArchive CACHED_CLIENT_ASSET;
+  private static Collection<JavaArchive> CACHED_WELD_ASSETS;
 
   public static JavaArchive getFoxPlatformClient() {
     if(CACHED_CLIENT_ASSET != null) {
@@ -38,6 +39,23 @@ public class DeploymentHelper {
       } else {    
         CACHED_CLIENT_ASSET = resolvedArchives.iterator().next();
         return CACHED_CLIENT_ASSET;
+      }
+    }
+    
+  }
+  
+  public static Collection<JavaArchive> getWeld() {
+    if(CACHED_WELD_ASSETS != null) {
+      return CACHED_WELD_ASSETS;
+    } else {
+      MavenDependencyResolver resolver = DependencyResolvers.use(MavenDependencyResolver.class).goOffline().loadMetadataFromPom("pom.xml");
+      Collection<JavaArchive> resolvedArchives = resolver.artifact("org.jboss.weld.servlet:weld-servlet").resolveAs(JavaArchive.class);
+      
+      if(resolvedArchives.size()==0) {
+        throw new RuntimeException("could not resolve org.jboss.weld.servlet:weld-servlet");
+      } else {    
+        CACHED_WELD_ASSETS = resolvedArchives;
+        return CACHED_WELD_ASSETS;
       }
     }
     

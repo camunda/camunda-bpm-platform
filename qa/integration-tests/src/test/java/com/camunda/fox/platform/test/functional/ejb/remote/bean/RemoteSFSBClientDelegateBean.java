@@ -6,7 +6,7 @@ import javax.inject.Named;
 import org.activiti.engine.delegate.DelegateExecution;
 import org.activiti.engine.delegate.JavaDelegate;
 
-import com.camunda.fox.platform.test.util.JndiConstants;
+import com.camunda.fox.platform.test.util.TestContainer;
 
 /**
  * A CDI bean delegating to the remote business 
@@ -19,7 +19,7 @@ import com.camunda.fox.platform.test.util.JndiConstants;
 public class RemoteSFSBClientDelegateBean implements JavaDelegate {
   
   @EJB(lookup="java:global/" +
-          JndiConstants.APP_NAME +
+          TestContainer.APP_NAME +
           "service/" +
           "RemoteSFSBean!com.camunda.fox.platform.test.functional.ejb.remote.bean.BusinessInterface")
   private BusinessInterface businessInterface;

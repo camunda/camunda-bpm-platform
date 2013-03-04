@@ -35,7 +35,7 @@ import org.jboss.msc.value.InjectedValue;
 /**
  * <p>This service is responsible for starting the {@link MscManagedProcessApplication} service.</p>
  * 
- * <p>We need this as an extra step since we need a declarative dependency on the the 
+ * <p>We need this as an extra step since we need a declarative dependency on the 
  * ProcessApplicationComponent in order to call the getName() method on the ProcessApplication. 
  * The name of the process application is subsequently used for composing the name of the 
  * {@link MscManagedProcessApplication} service which means that it must be available when 

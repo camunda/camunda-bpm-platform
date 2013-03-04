@@ -47,12 +47,12 @@
     <glassfish.JAVA_DEBUGGER_PORT>29009</glassfish.JAVA_DEBUGGER_PORT>
     
     	
-	  <!-- tomcat -->
-	  <tomcat6.connector.http.port>48080</tomcat6.connector.http.port>
-	  <tomcat6.connector.http.redirectPort>48443</tomcat6.connector.http.redirectPort>
-	  <tomcat6.connector.ajp.port>48009</tomcat6.connector.ajp.port>
-	  <tomcat6.connector.ajp.redirectPort>48443</tomcat6.connector.ajp.redirectPort>
-	  <tomcat6.assembly.location>../../tomcat6/assembly/target/assembly/server/apache-tomcat-6.0.36</tomcat6.assembly.location>
+	<!-- tomcat -->
+	<tomcat6.connector.http.port>48080</tomcat6.connector.http.port>
+	<tomcat6.connector.http.redirectPort>48443</tomcat6.connector.http.redirectPort>
+	<tomcat6.connector.ajp.port>48009</tomcat6.connector.ajp.port>
+	<tomcat6.connector.ajp.redirectPort>48443</tomcat6.connector.ajp.redirectPort>
+	<tomcat6.assembly.location>../../distro/tomcat6/assembly/target/assembly/server/apache-tomcat-6.0.36</tomcat6.assembly.location>
     
   </properties>
   

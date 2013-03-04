@@ -57,12 +57,16 @@ public abstract class AbstractFoxPlatformIntegrationTest {
   protected TaskService taskService;
   
   public static WebArchive initWebArchiveDeployment(String name) {
-    return ShrinkWrap.create(WebArchive.class, name)
+    WebArchive archive = ShrinkWrap.create(WebArchive.class, name)
               .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
               .addAsLibraries(DeploymentHelper.getFoxPlatformClient())
               .addAsResource("META-INF/processes.xml", "META-INF/processes.xml")
               .addClass(AbstractFoxPlatformIntegrationTest.class)
-              .addClass(JndiConstants.class);
+              .addClass(TestContainer.class);
+    
+    TestContainer.addContainerSpecificResources(archive);
+    
+    return archive;
   }
   
   public static WebArchive initWebArchiveDeployment() {
@@ -73,7 +77,6 @@ public abstract class AbstractFoxPlatformIntegrationTest {
   @Before
   public void setupBeforeTest() {
     processEngineService = BpmPlatform.getProcessEngineService();
-//    processArchiveService = getProcessArchiveService();
     processEngine = processEngineService.getDefaultProcessEngine();
     processEngineConfiguration = ((ProcessEngineImpl)processEngine).getProcessEngineConfiguration();
     processEngineConfiguration.getJobExecutor().shutdown(); // make sure the job executor is down
