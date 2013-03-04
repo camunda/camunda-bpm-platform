@@ -8,8 +8,7 @@ div#processDiagramWrapper {
 }
 
 div#processDiagram {
-  margin-top : 20px;
-  overflow: auto;
+  overflow: hidden;
 }
 
 .currentActivity  {
