@@ -163,7 +163,7 @@ public abstract class AbstractProcessApplication {
    * @see ProcessApplicationInfo#getProperties()
    */
   public Map<String, String> getProperties() {
-    return Collections.unmodifiableMap( Collections.<String, String>emptyMap() );
+    return Collections.<String, String>emptyMap();
   }
 
   /**

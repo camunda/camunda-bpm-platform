@@ -15,6 +15,9 @@
  */
 package com.camunda.fox.client.impl;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.ejb.ConcurrencyManagement;
@@ -33,13 +36,14 @@ import org.camunda.bpm.application.impl.EjbProcessApplication;
  * @author Daniel Meyer
  * 
  */
-//singleton bean guarantees maximum efficiency
 @Singleton
 @Startup
 @ConcurrencyManagement(ConcurrencyManagementType.BEAN) 
 @TransactionAttribute(TransactionAttributeType.SUPPORTS)
 @ProcessApplication
 public class ProcessArchiveSupport extends EjbProcessApplication {
+  
+  protected Map<String, String> properties = new HashMap<String, String>();
   
   @PostConstruct
   public void deploy() {
@@ -49,6 +53,10 @@ public class ProcessArchiveSupport extends EjbProcessApplication {
   @PreDestroy
   public void undeploy() {
     super.undeploy();
+  }
+  
+  public Map<String, String> getProperties() {
+    return properties;
   }
     
 }
