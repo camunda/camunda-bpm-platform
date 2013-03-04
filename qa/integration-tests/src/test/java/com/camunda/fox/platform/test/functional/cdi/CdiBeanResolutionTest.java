@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 package com.camunda.fox.platform.test.functional.cdi;
-import javax.transaction.SystemException;
 
 import org.activiti.cdi.impl.util.BeanManagerLookup;
 import org.activiti.cdi.impl.util.ProgrammaticBeanLookup;
@@ -30,6 +29,7 @@ import org.junit.runner.RunWith;
 
 import com.camunda.fox.platform.test.functional.cdi.beans.ExampleBean;
 import com.camunda.fox.platform.test.util.AbstractFoxPlatformIntegrationTest;
+import com.camunda.fox.platform.test.util.TestContainer;
 
 /**
  * <p>Deploys two different applications, a process archive and a cleint application.</p>
@@ -54,11 +54,15 @@ public class CdiBeanResolutionTest extends AbstractFoxPlatformIntegrationTest {
   
   @Deployment(name="clientDeployment")
   public static WebArchive clientDeployment() {    
-    return ShrinkWrap.create(WebArchive.class, "client.war")
+    WebArchive deployment = ShrinkWrap.create(WebArchive.class, "client.war")
             .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
             .addClass(ProgrammaticBeanLookup.class)
             .addClass(BeanManagerLookup.class)
             .addClass(AbstractFoxPlatformIntegrationTest.class);
+    
+    TestContainer.addContainerSpecificResources(deployment);
+    
+    return deployment;
   }
     
   @Test
@@ -81,13 +85,13 @@ public class CdiBeanResolutionTest extends AbstractFoxPlatformIntegrationTest {
   
   @Test
   @OperateOnDeployment("clientDeployment")
-  public void testResolveBeanFromJobExecutor() throws InterruptedException, SystemException {
+  public void testResolveBeanFromJobExecutor() {
    
     Assert.assertEquals(0,runtimeService.createProcessInstanceQuery().count());
     runtimeService.startProcessInstanceByKey("testResolveBeanFromJobExecutor");
     Assert.assertEquals(1,runtimeService.createProcessInstanceQuery().count());
     
-    waitForJobExecutorToProcessAllJobs(16000, 100);    
+    waitForJobExecutorToProcessAllJobs(16000, 500);    
     
     Assert.assertEquals(0,runtimeService.createProcessInstanceQuery().count());    
     

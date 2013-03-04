@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.logging.Logger;
 
 import org.activiti.engine.ActivitiException;
 import org.camunda.bpm.application.AbstractProcessApplication;
@@ -35,6 +36,8 @@ import org.camunda.bpm.container.impl.jmx.kernel.MBeanService;
  *
  */
 public class JmxManagedProcessApplication implements MBeanService<JmxManagedProcessApplication>, JmxManagedProcessApplicationMBean {
+  
+  private final Logger LOGGER = Logger.getLogger(JmxManagedProcessApplication.class.getName());
 	
 	protected ProcessApplicationReference processApplicationReference;
   protected List<ProcessesXml> processesXmls;
@@ -66,23 +69,26 @@ public class JmxManagedProcessApplication implements MBeanService<JmxManagedProc
     }
 	  
 	  // create deployment infos
-	  List<ProcessApplicationDeploymentInfo> deploymentInfoList = new ArrayList<ProcessApplicationDeploymentInfo>();	  
-	  for (Entry<String, ProcessApplicationRegistration> deployment : deploymentMap.entrySet()) {
-	    
-      ProcessApplicationDeploymentInfoImpl deploymentInfo = new ProcessApplicationDeploymentInfoImpl();
-      deploymentInfo.setDeploymentId(deployment.getValue().getDeploymentId());
-      deploymentInfo.setDeploymentName(deployment.getKey());
-      deploymentInfo.setProcessEngineName(deployment.getValue().getProcessEngineName());
-      
-      deploymentInfoList.add(deploymentInfo);
-      
-    }
+	  List<ProcessApplicationDeploymentInfo> deploymentInfoList = new ArrayList<ProcessApplicationDeploymentInfo>();	
+	  if(deploymentMap != null) {
+  	  for (Entry<String, ProcessApplicationRegistration> deployment : deploymentMap.entrySet()) {
+  	    
+        ProcessApplicationDeploymentInfoImpl deploymentInfo = new ProcessApplicationDeploymentInfoImpl();
+        deploymentInfo.setDeploymentId(deployment.getValue().getDeploymentId());
+        deploymentInfo.setDeploymentName(deployment.getKey());
+        deploymentInfo.setProcessEngineName(deployment.getValue().getProcessEngineName());
+        
+        deploymentInfoList.add(deploymentInfo);
+        
+      }
+	  }
 	  
 	  processApplicationInfo.setDeploymentInfo(deploymentInfoList);
 	  
 	  // clear reference
 	  processApplicationReference = null;
-	  	  
+	  
+	  LOGGER.info("Process Application "+processApplicationInfo.getName()+" sucessfully deployed.");	  	  
 	}
 
 	public void stop(MBeanServiceContainer mBeanServiceContainer) {	  

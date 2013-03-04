@@ -33,6 +33,7 @@ import org.junit.runner.RunWith;
 import com.camunda.fox.platform.test.util.AbstractFoxPlatformIntegrationTest;
 import com.camunda.fox.platform.test.util.DeploymentHelper;
 import com.camunda.fox.platform.test.util.TestHelper;
+import com.camunda.fox.platform.test.util.TestContainer;
 
 /**
  * 
@@ -80,7 +81,7 @@ public class TestWarDeploymentWithMultiplePasAsSubdeployment3 extends AbstractFo
     JavaArchive pa2 = ShrinkWrap.create(JavaArchive.class, "pa2.jar")
             .addAsResource(pa2ProcessesXml, "META-INF/processes.xml");
        
-    return ShrinkWrap.create(WebArchive.class, "test.war")
+    WebArchive deployment = ShrinkWrap.create(WebArchive.class, "test.war")
             .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
             .addAsLibraries(DeploymentHelper.getFoxPlatformClient())
             
@@ -90,7 +91,12 @@ public class TestWarDeploymentWithMultiplePasAsSubdeployment3 extends AbstractFo
             .addAsResource(processAssets[1], "directory/process1.bpmn")
             .addAsResource(processAssets[2], "alternateDirectory/process2.bpmn")
             
-            .addClass(AbstractFoxPlatformIntegrationTest.class);    
+            .addClass(AbstractFoxPlatformIntegrationTest.class);
+    
+    TestContainer.addContainerSpecificResources(deployment);
+    
+    return deployment;
+    
   }
   
   @Test

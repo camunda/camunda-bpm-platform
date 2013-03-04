@@ -444,6 +444,10 @@
                 <exclude>**/ear/**</exclude>
                 <exclude>**/ejb/**</exclude>
                 <exclude>**/transactions/**</exclude>                
+                <!-- requires EL 2.2 -->
+                <exclude>**/CdiBeanResolutionTest/**</exclude>
+                <!-- No EJB RequestContext available -->
+                <exclude>**/JobExecutorRequestContextTest/**</exclude>
               </excludes>
             </configuration>
           </plugin>

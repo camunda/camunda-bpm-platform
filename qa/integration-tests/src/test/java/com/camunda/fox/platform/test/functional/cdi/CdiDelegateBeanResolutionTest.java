@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 package com.camunda.fox.platform.test.functional.cdi;
-import javax.transaction.SystemException;
-
 import org.activiti.cdi.impl.util.BeanManagerLookup;
 import org.activiti.cdi.impl.util.ProgrammaticBeanLookup;
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -68,7 +66,7 @@ public class CdiDelegateBeanResolutionTest extends AbstractFoxPlatformIntegratio
       // assert that we cannot resolve the bean here:
       ProgrammaticBeanLookup.lookup("exampleDelegateBean");
       Assert.fail("exception expected");
-    }catch (Exception e) {
+    }catch (Throwable e) {
       // expected
     }
     
@@ -81,7 +79,7 @@ public class CdiDelegateBeanResolutionTest extends AbstractFoxPlatformIntegratio
   
   @Test
   @OperateOnDeployment("clientDeployment")
-  public void testResolveBeanFromJobExecutor() throws InterruptedException, SystemException {
+  public void testResolveBeanFromJobExecutor() {
    
     Assert.assertEquals(0,runtimeService.createProcessInstanceQuery().count());
     runtimeService.startProcessInstanceByKey("testResolveBeanFromJobExecutor");

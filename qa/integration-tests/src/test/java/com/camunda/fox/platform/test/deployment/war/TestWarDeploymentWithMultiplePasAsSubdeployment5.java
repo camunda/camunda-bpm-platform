@@ -20,7 +20,6 @@ import junit.framework.Assert;
 
 import org.activiti.engine.repository.DeploymentQuery;
 import org.activiti.engine.repository.ProcessDefinition;
-import org.activiti.engine.repository.ProcessDefinitionQuery;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
@@ -34,6 +33,7 @@ import org.junit.runner.RunWith;
 import com.camunda.fox.platform.test.util.AbstractFoxPlatformIntegrationTest;
 import com.camunda.fox.platform.test.util.DeploymentHelper;
 import com.camunda.fox.platform.test.util.TestHelper;
+import com.camunda.fox.platform.test.util.TestContainer;
 
 /**
  * <p>This test verifies that a WAR deployment can process multiple subdeployments that define process archives</p>
@@ -95,7 +95,7 @@ public class TestWarDeploymentWithMultiplePasAsSubdeployment5 extends AbstractFo
             .addAsResource(processAssets[7], "directory/process7.bpmn")
             .addAsResource(processAssets[8], "alternateDirectory/process8.bpmn");
     
-    return ShrinkWrap.create(WebArchive.class, "test.war")
+    WebArchive deployment = ShrinkWrap.create(WebArchive.class, "test.war")
             .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
             .addAsLibraries(DeploymentHelper.getFoxPlatformClient())
             
@@ -108,6 +108,10 @@ public class TestWarDeploymentWithMultiplePasAsSubdeployment5 extends AbstractFo
             .addAsResource(processAssets[2], "alternateDirectory/process2.bpmn")
             
             .addClass(AbstractFoxPlatformIntegrationTest.class);    
+    
+    TestContainer.addContainerSpecificResources(deployment);
+    
+    return deployment;
   }
   
   @Test

@@ -117,11 +117,22 @@ public class MBeanDeploymentOperation {
         successfulSteps.add(currentStep);
 
       } catch (Exception e) {
-        log.log(Level.SEVERE, "Exception while performing operation step '" + currentStep.getName() + "': " + e.getMessage(), e);
         
         if(isRollbackOnFailure) {
-          rollbackOperation();
+          
+          try {
+            rollbackOperation();     
+            
+          } catch(Exception e2) {
+            log.log(Level.SEVERE, "Exception while rolling back operation " + e2.getMessage(), e2);
+          }   
+          
+          // re-throw the original exception
           throw new ActivitiException("Exception while performing '" + name+"'", e);
+          
+        } else {
+          log.log(Level.SEVERE, "Exception while performing operation step '" + currentStep.getName() + "': " + e.getMessage(), e);
+          
         }
         
       }

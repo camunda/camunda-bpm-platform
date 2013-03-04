@@ -21,6 +21,7 @@ import java.net.URL;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Logger;
 
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.impl.util.IoUtil;
@@ -39,6 +40,8 @@ import org.camunda.bpm.container.impl.jmx.kernel.MBeanDeploymentOperationStep;
  *
  */
 public class ParseProcessesXmlStep extends MBeanDeploymentOperationStep {
+  
+  private final static Logger LOGGER = Logger.getLogger(ParseProcessesXmlStep.class.getName());
 
   private static final String META_INF_PROCESSES_XML = "META-INF/processes.xml";
 
@@ -66,11 +69,16 @@ public class ParseProcessesXmlStep extends MBeanDeploymentOperationStep {
       URL url = (URL) processesXmlFileLocations.nextElement();    
       if(isEmptyFile(url)) {
         parsedFiles.put(url, ProcessesXml.EMPTY_PROCESSES_XML);
+        LOGGER.info("Using default values for empty META-INF/processes.xml file found at "+url.toString());
         
       } else {
         parsedFiles.put(url, parseProcessesXml(url));
-        
+        LOGGER.info("Found META-INF/processes.xml file at "+url.toString());        
       }
+    }
+    
+    if(parsedFiles.isEmpty()) {
+      LOGGER.info("No META-INF/processes.xml file found in process application "+processApplication.getName());
     }
     
     // attach parsed metadata

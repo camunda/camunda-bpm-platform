@@ -16,7 +16,7 @@ public class TestContainer {
   public static void addContainerSpecificResources(WebArchive archive) {
     
     archive.addAsWebInfResource("web.xml")
-      .addAsResource("context.xml", "META-INF/context.xml")
+      .addAsManifestResource("context.xml")
       .addAsLibraries(com.camunda.fox.platform.test.util.DeploymentHelper.getWeld())
       .addClass(IntegrationTestProcessApplication.class);
       
