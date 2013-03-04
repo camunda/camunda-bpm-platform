@@ -7,7 +7,7 @@ define([ "angular", "jquery"], function(angular, $) {
   var Directive = function () {
     return {
       restrict: 'A',
-      link: function(scope, element, attrs, $destroy) {
+      link: function(scope, element, attrs) {
         
         scope.getWindowHeight = function() {
           return $(window).height();
@@ -16,7 +16,7 @@ define([ "angular", "jquery"], function(angular, $) {
         window.onresize = function () {
           scope.$apply();
         };
-        
+
         scope.$watch(function () {
           return scope.getWindowHeight();
         }, function(newValue, oldValue) {
@@ -28,13 +28,20 @@ define([ "angular", "jquery"], function(angular, $) {
           $(element).css("height", newHeight + "px");
         });
         
-        $(element).css("height", (scope.getWindowHeight() - 82 - 31) + "px");
+        var headerHeight = $('.navbar-fixed-top').outerHeight(false);
+        var footerHeight = $('footer').outerHeight(false);
+        var paddingTop = parseInt($(element).css("padding-top"));
+        var paddingBottom = parseInt($(element).css("padding-Bottom"));
+        var borderTop = parseInt($(element).css("border-top"));
+        var borderBottom = parseInt($(element).css("border-Bottom"));
+        
+        $(element).css("height", (scope.getWindowHeight() - headerHeight - footerHeight - paddingTop - paddingBottom - borderTop - borderBottom) + "px");
       }
     };
   };
   
   
   module
-    .directive('adjustHeightOnResize', Directive);
+    .directive('fillHeight', Directive);
   
 });

@@ -8,6 +8,8 @@ div#processDiagramWrapper {
 }
 
 div#processDiagram {
+  min-height: 200px;
+  height: 100%;
   overflow: hidden;
   cursor: pointer;
 
@@ -39,18 +41,4 @@ div#processDiagram .drag {
   font-weight: bold;
   color: #ffffff;
   background-color: #4169e1;
-}
-
-@media only screen and (min-height: 979px ) {
-  
-  div#processDiagram {
-    max-height: 630px;
-  }
-}
-
-@media only screen and (min-height: 839px ) and (max-height: 978px ) {
-  
-  div#processDiagram {
-    max-height: 500px;
-  }
 }

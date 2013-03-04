@@ -1,5 +1,5 @@
 .tile-grid {
-   overflow: hidden;
+   overflow: auto;
 }
 
 .tile {

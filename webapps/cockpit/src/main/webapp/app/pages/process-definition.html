@@ -1,10 +1,14 @@
-<div style="width: 100%">
+<div class="panel-page" page-overflow-hidden>
 
-  <div style="z-index: 3; width: 381px; border-right: 1px solid #DDD; position: absolute; left: 0px; top:40px; padding: 15px;-webkit-border-radius: 0px;-moz-border-radius: 0px;border-radius: 0px;" class="well" adjust-height-on-resize>
+  <div class="left-panel well" fill-height>
+  
+    <div hide-panel></div>
+    
     <div class="page-header">
       <h1 ngm-if="!!processDefinition.name">{{ processDefinition.name }}</h1>
       <h1 ngm-if="!processDefinition.name">{{ processDefinition.key }}</h1>
     </div>
+    
     <div>
       <table>
         <tbody>
@@ -25,7 +29,8 @@
     </div>
   </div>
   
-  <div style="z-index: 1; position: relative; left: 397px;">
+  <div class="right-panel" fill-height>
     <div process-diagram id="processDiagram"></div>
   </div>
+
 </div>
