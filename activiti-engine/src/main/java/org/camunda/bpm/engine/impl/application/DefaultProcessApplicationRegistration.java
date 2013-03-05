@@ -21,7 +21,6 @@ import org.camunda.bpm.application.ProcessApplicationRegistration;
  */
 public class DefaultProcessApplicationRegistration implements ProcessApplicationRegistration {
 
-  protected ProcessApplicationManager processApplicationManager;
   protected String deploymentId;
   protected String processEngineName;
   protected ProcessApplicationReference reference;
@@ -30,16 +29,10 @@ public class DefaultProcessApplicationRegistration implements ProcessApplication
    * @param processApplicationManager
    * @param reference 
    */
-  public DefaultProcessApplicationRegistration(ProcessApplicationManager processApplicationManager, ProcessApplicationReference reference, String deploymentId, String processEnginenName) {
-    this.processApplicationManager = processApplicationManager;
+  public DefaultProcessApplicationRegistration(ProcessApplicationReference reference, String deploymentId, String processEnginenName) {
     this.reference = reference;
     this.deploymentId = deploymentId;
     this.processEngineName = processEnginenName;
-  }
-
-  // called by the pa
-  public void unregister() {
-    processApplicationManager.removeProcessApplication(deploymentId);
   }
     
   public String getDeploymentId() {
@@ -53,5 +46,5 @@ public class DefaultProcessApplicationRegistration implements ProcessApplication
   public ProcessApplicationReference getReference() {
     return reference;
   }
-
+  
 }

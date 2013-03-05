@@ -26,6 +26,7 @@ import org.activiti.engine.impl.cmd.GetTableCountCmd;
 import org.activiti.engine.impl.cmd.GetTableMetaDataCmd;
 import org.activiti.engine.impl.cmd.GetTableNameCmd;
 import org.activiti.engine.impl.cmd.SetJobRetriesCmd;
+import org.activiti.engine.impl.cmd.UnregisterProcessApplication;
 import org.activiti.engine.impl.db.DbSqlSession;
 import org.activiti.engine.impl.db.DbSqlSessionFactory;
 import org.activiti.engine.impl.interceptor.Command;
@@ -50,6 +51,10 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
   
   public ProcessApplicationRegistration registerProcessApplication(String deploymentId, ProcessApplicationReference reference) {    
     return commandExecutor.execute(new ActivateDeploymentForApplicationCmd(deploymentId, reference));
+  }
+  
+  public boolean unregisterProcessApplication(String deploymentId, boolean removeProcessesFromCache) {
+    return commandExecutor.execute(new UnregisterProcessApplication(deploymentId, removeProcessesFromCache));        
   }
   
   public String getProcessApplicationForDeployment(String deploymentId) {

@@ -36,10 +36,12 @@ public class UndeployProcessArchiveStep extends MBeanDeploymentOperationStep {
   protected String processArchvieName;
   protected JmxManagedProcessApplication deployedProcessApplication;
   protected ProcessArchiveXml processArchive;
+  protected String processEngineName;
 
-  public UndeployProcessArchiveStep(JmxManagedProcessApplication deployedProcessApplication, ProcessArchiveXml processArchive) {
+  public UndeployProcessArchiveStep(JmxManagedProcessApplication deployedProcessApplication, ProcessArchiveXml processArchive, String processEngineName) {
     this.deployedProcessApplication = deployedProcessApplication;
     this.processArchive = processArchive;
+    this.processEngineName = processEngineName;
   }
   
   public String getName() {
@@ -54,16 +56,13 @@ public class UndeployProcessArchiveStep extends MBeanDeploymentOperationStep {
     final ProcessApplicationRegistration processApplicationRegistration = processArchiveDeploymentMap.get(processArchive.getName());
     final String engineDeploymentId = processApplicationRegistration.getDeploymentId();
     
-    // unregister the process application
-    processApplicationRegistration.unregister();
+    ProcessEngine processEngine = serviceContainer.getServiceValue(ServiceTypes.PROCESS_ENGINE, processEngineName);
+    
+    // unregrister with the process engine.
+    processEngine.getManagementService().unregisterProcessApplication(engineDeploymentId, true);
 
     // delete the deployment if not disabled
     if (PropertyHelper.getBooleanProperty(processArchive.getProperties(), ProcessArchiveXml.PROP_IS_DELETE_UPON_UNDEPLOY, false)) {
-      String processEngineName = processArchive.getProcessEngineName();
-      if(processEngineName == null) {
-        processEngineName = "default";
-      }
-      ProcessEngine processEngine = serviceContainer.getServiceValue(ServiceTypes.PROCESS_ENGINE, processEngineName);
       if (processEngine != null) {
         processEngine.getRepositoryService().deleteDeployment(engineDeploymentId, true);
       }

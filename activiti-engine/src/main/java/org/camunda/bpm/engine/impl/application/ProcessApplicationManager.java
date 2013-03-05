@@ -14,6 +14,8 @@ package org.camunda.bpm.engine.impl.application;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.impl.context.Context;
@@ -25,6 +27,8 @@ import org.camunda.bpm.application.ProcessApplicationRegistration;
  * 
  */
 public class ProcessApplicationManager {
+  
+  private Logger LOGGER = Logger.getLogger(ProcessApplicationManager.class.getName());
 
   protected Map<String, DefaultProcessApplicationRegistration> registrationsByDeploymentId = new HashMap<String, DefaultProcessApplicationRegistration>();
 
@@ -50,7 +54,7 @@ public class ProcessApplicationManager {
     
     if(registration == null) {
       String processEngineName = Context.getProcessEngineConfiguration().getProcessEngineName();
-      registration = new DefaultProcessApplicationRegistration(this, reference, deploymentId, processEngineName);
+      registration = new DefaultProcessApplicationRegistration(reference, deploymentId, processEngineName);
       registrationsByDeploymentId.put(deploymentId, registration);
       return registration;
       
@@ -69,8 +73,21 @@ public class ProcessApplicationManager {
     return registrationsByDeploymentId.keySet().toArray(new String[0]);
   }
 
-  public boolean removeProcessApplication(String deploymentId) {
-    // remove reference
+  public boolean unregisterProcessApplicationForDeployment(String deploymentId, boolean removeProcessesFromCache) {
+    
+    if(removeProcessesFromCache) {
+      try {
+        
+        Context.getProcessEngineConfiguration()
+          .getDeploymentCache()
+          .removeDeployment(deploymentId);
+        
+      } catch(Exception e) {
+        LOGGER.log(Level.WARNING, "unregistering process application for deployment but could not remove process definitions from deployment cache. ", e);
+      }
+    }
+    
+    // always remove the reference.
     return registrationsByDeploymentId.remove(deploymentId) != null;
   }
 

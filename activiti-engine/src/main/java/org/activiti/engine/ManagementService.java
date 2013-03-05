@@ -58,6 +58,19 @@ public interface ManagementService {
   ProcessApplicationRegistration registerProcessApplication(String deploymentId, ProcessApplicationReference reference);
   
   /**
+   * Deactivate a deployment for a given ProcessApplication. This removes the association 
+   * between the process engine and the process application and optionally removes the associated
+   * process definitions from the cache.
+   * 
+   * @param deploymentId
+   *          the Id of the deployment to deactivate
+   * @param removeProcessDefinitionsFromCache
+   *          indicates whether the process definitions should be removed from the deployment cache
+   * @return true if the registration was cleared
+   */
+  boolean unregisterProcessApplication(String deploymentId, boolean removeProcessDefinitionsFromCache);
+  
+  /**
    * @return the name of the process application that is currently registered for
    *         the given deployment or 'null' if no process application is
    *         currently registered.
@@ -147,4 +160,5 @@ public interface ManagementService {
    * Query for the number of activity instances aggregated by activities of a single process definition.
    */
   ActivityStatisticsQuery createActivityStatisticsQuery(String processDefinitionId);
+
 }

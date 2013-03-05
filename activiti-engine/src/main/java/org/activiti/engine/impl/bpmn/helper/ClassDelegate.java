@@ -49,9 +49,6 @@ public class ClassDelegate extends AbstractBpmnActivityBehavior implements TaskL
   
   protected String className;
   protected List<FieldDeclaration> fieldDeclarations;
-  protected ExecutionListener executionListenerInstance;
-  protected TaskListener taskListenerInstance;
-  protected ActivityBehavior activityBehaviorInstance;
   
   public ClassDelegate(String className, List<FieldDeclaration> fieldDeclarations) {
     this.className = className;
@@ -64,9 +61,7 @@ public class ClassDelegate extends AbstractBpmnActivityBehavior implements TaskL
 
   // Execution listener
   public void notify(DelegateExecution execution) throws Exception {
-    if (executionListenerInstance == null) {
-      executionListenerInstance = getExecutionListenerInstance();
-    }
+    ExecutionListener executionListenerInstance = getExecutionListenerInstance();
     Context.getProcessEngineConfiguration()
       .getDelegateInterceptor()
       .handleInvocation(new ExecutionListenerInvocation(executionListenerInstance, execution));
@@ -85,9 +80,7 @@ public class ClassDelegate extends AbstractBpmnActivityBehavior implements TaskL
   
   // Task listener
   public void notify(DelegateTask delegateTask) {
-    if (taskListenerInstance == null) {
-      taskListenerInstance = getTaskListenerInstance();
-    }
+    TaskListener taskListenerInstance = getTaskListenerInstance();
     try {
       Context.getProcessEngineConfiguration()
         .getDelegateInterceptor()
@@ -108,9 +101,8 @@ public class ClassDelegate extends AbstractBpmnActivityBehavior implements TaskL
 
   // Activity Behavior
   public void execute(ActivityExecution execution) throws Exception {
-    if (activityBehaviorInstance == null) {
-      activityBehaviorInstance = getActivityBehaviorInstance(execution);
-    }
+    
+    ActivityBehavior activityBehaviorInstance = getActivityBehaviorInstance(execution);    
     try {
       activityBehaviorInstance.execute(execution);
     } catch (BpmnError error) {
@@ -120,9 +112,8 @@ public class ClassDelegate extends AbstractBpmnActivityBehavior implements TaskL
 
   // Signallable activity behavior
   public void signal(ActivityExecution execution, String signalName, Object signalData) throws Exception {
-    if (activityBehaviorInstance == null) {
-      activityBehaviorInstance = getActivityBehaviorInstance(execution);
-    }
+    
+    ActivityBehavior activityBehaviorInstance = getActivityBehaviorInstance(execution);    
     
     if (activityBehaviorInstance instanceof SignallableActivityBehavior) {
       ((SignallableActivityBehavior) activityBehaviorInstance).signal(execution, signalName, signalData);

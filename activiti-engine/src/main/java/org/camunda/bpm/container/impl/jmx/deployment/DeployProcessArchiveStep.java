@@ -142,16 +142,17 @@ public class DeployProcessArchiveStep extends MBeanDeploymentOperationStep {
 
   public void cancelOperationStep(MBeanDeploymentOperation operationContext) {   
     
-    final MBeanServiceContainer serviceContainer = operationContext.getServiceContainer();    
+    final MBeanServiceContainer serviceContainer = operationContext.getServiceContainer();
+    
+    ProcessEngine processEngine = getProcessEngine(serviceContainer);      
 
     // if a registration was performed, remove it.
     if(registration != null) {
-      registration.unregister();
+      processEngine.getManagementService().unregisterProcessApplication(deployment.getId(), true);
     }
     
     // delete deployment if we were able to create one AND if isDeleteUponUndeploy is set.
-    if(deployment != null && PropertyHelper.getBooleanProperty(processArchive.getProperties(), ProcessArchiveXml.PROP_IS_DELETE_UPON_UNDEPLOY, false)) {      
-      ProcessEngine processEngine = getProcessEngine(serviceContainer);      
+    if(deployment != null && PropertyHelper.getBooleanProperty(processArchive.getProperties(), ProcessArchiveXml.PROP_IS_DELETE_UPON_UNDEPLOY, false)) {          
       if(processEngine != null) {
         processEngine.getRepositoryService().deleteDeployment(deployment.getId(), true);
       }

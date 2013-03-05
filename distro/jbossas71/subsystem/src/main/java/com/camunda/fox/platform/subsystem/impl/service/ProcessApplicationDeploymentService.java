@@ -145,10 +145,12 @@ public class ProcessApplicationDeploymentService implements Service<ProcessAppli
   }
 
   public void stop(StopContext context) {
+
+    final ProcessEngine processEngine = processEngineInjector.getValue();
     
     try {
       // always unregister
-      registration.unregister();
+      processEngine.getManagementService().unregisterProcessApplication(deployment.getId(), true);
     } catch(Exception e) {
       LOGGER.log(Level.SEVERE, "Exception while unregistering process application with the process engine.");
     }
@@ -158,7 +160,7 @@ public class ProcessApplicationDeploymentService implements Service<ProcessAppli
             
       try {
         LOGGER.info("Deleting cascade deployment with name '"+deployment.getName()+"/"+deployment.getId()+"'.");
-        processEngineInjector.getValue().getRepositoryService().deleteDeployment(deployment.getId(), true);
+        processEngine.getRepositoryService().deleteDeployment(deployment.getId(), true);
         
       } catch (Exception e) {
         LOGGER.log(Level.WARNING, "Exception while deleting process engine deployment", e);

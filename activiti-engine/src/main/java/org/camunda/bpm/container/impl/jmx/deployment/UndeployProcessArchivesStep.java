@@ -13,10 +13,12 @@
 package org.camunda.bpm.container.impl.jmx.deployment;
 
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 
 import org.activiti.engine.ActivitiException;
 import org.camunda.bpm.application.AbstractProcessApplication;
+import org.camunda.bpm.application.ProcessApplicationRegistration;
 import org.camunda.bpm.application.impl.metadata.spi.ProcessArchiveXml;
 import org.camunda.bpm.application.impl.metadata.spi.ProcessesXml;
 import org.camunda.bpm.container.impl.jmx.JmxRuntimeContainerDelegate.ServiceTypes;
@@ -49,10 +51,12 @@ public class UndeployProcessArchivesStep extends MBeanDeploymentOperationStep {
       throw new ActivitiException("Cannot find process application with name "+processApplication.getName()+".");
     }
     
+    Map<String, ProcessApplicationRegistration> deploymentMap = deployedProcessApplication.getProcessArchiveDeploymentMap();
+    
     List<ProcessesXml> processesXmls = deployedProcessApplication.getProcessesXmls();
     for (ProcessesXml processesXml : processesXmls) {
       for (ProcessArchiveXml parsedProcessArchive : processesXml.getProcessArchives()) {
-        operationContext.addStep(new UndeployProcessArchiveStep(deployedProcessApplication, parsedProcessArchive));        
+        operationContext.addStep(new UndeployProcessArchiveStep(deployedProcessApplication, parsedProcessArchive, deploymentMap.get(parsedProcessArchive.getName()).getProcessEngineName()));        
       }      
     }
     

@@ -16,11 +16,15 @@ package org.activiti.engine.impl.persistence.deploy;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.activiti.engine.ActivitiException;
+import org.activiti.engine.impl.ProcessDefinitionQueryImpl;
 import org.activiti.engine.impl.context.Context;
 import org.activiti.engine.impl.persistence.entity.DeploymentEntity;
 import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.activiti.engine.repository.ProcessDefinition;
 
 
 /**
@@ -28,6 +32,8 @@ import org.activiti.engine.impl.persistence.entity.ProcessDefinitionEntity;
  * @author Falko Menge
  */
 public class DeploymentCache {
+  
+  private Logger LOGGER = Logger.getLogger(DeploymentCache.class.getName());
 
   protected Map<String, ProcessDefinitionEntity> processDefinitionCache = new HashMap<String, ProcessDefinitionEntity>(); 
   protected Map<String, Object> knowledgeBaseCache = new HashMap<String, Object>(); 
@@ -145,5 +151,23 @@ public class DeploymentCache {
   
   public void setDeployers(List<Deployer> deployers) {
     this.deployers = deployers;
+  }
+
+  public void removeDeployment(String deploymentId) {
+    // remove all process definitions for a specific deployment
+    List<ProcessDefinition> allDefinitionsForDeployment = new ProcessDefinitionQueryImpl(Context.getCommandContext())
+      .deploymentId(deploymentId)
+      .list();
+    for (ProcessDefinition processDefinition : allDefinitionsForDeployment) {
+      try {
+        removeProcessDefinition(processDefinition.getId());
+        
+      } catch(Exception e) {
+        LOGGER.log(Level.WARNING, "Could not remove process definition with id '"+processDefinition.getId()+"' from the cache.", e);
+        
+      }
+    }
+      
+    
   }
 }
