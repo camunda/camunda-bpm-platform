@@ -13,6 +13,7 @@
 
 package org.activiti.engine.test.api.mgmt;
 
+import java.util.Calendar;
 import java.util.List;
 
 import junit.framework.Assert;
@@ -47,7 +48,17 @@ public class DeploymentStatisticsQueryTest extends PluggableActivitiTestCase {
 
     Assert.assertEquals(deployment.getId(), result.getId());
     Assert.assertEquals(deploymentName, result.getName());
-    Assert.assertEquals(deployment.getDeploymentTime(), result.getDeploymentTime());
+    
+    // only compare time on second level (i.e. drop milliseconds)
+    Calendar cal1 = Calendar.getInstance();
+    cal1.setTime(deployment.getDeploymentTime());
+    cal1.set(Calendar.MILLISECOND, 0);
+    
+    Calendar cal2 = Calendar.getInstance();
+    cal2.setTime(result.getDeploymentTime());
+    cal2.set(Calendar.MILLISECOND, 0);
+    
+    Assert.assertTrue(cal1.equals(cal2));
     
     repositoryService.deleteDeployment(deployment.getId(), true);
   }
