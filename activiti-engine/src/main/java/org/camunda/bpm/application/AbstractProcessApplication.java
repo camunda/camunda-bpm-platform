@@ -12,14 +12,11 @@
  */
 package org.camunda.bpm.application;
 
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.concurrent.Callable;
 
-import org.activiti.engine.impl.javax.el.CompositeELResolver;
 import org.activiti.engine.impl.javax.el.ELResolver;
 import org.activiti.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.ProcessApplicationService;
@@ -155,7 +152,7 @@ public abstract class AbstractProcessApplication {
 
   /**
    * <p>Override this method to provide an environment-specific {@link ClassLoader} to be used by the process 
-   * engine for loading resources from the process applicaiton</p>
+   * engine for loading resources from the process application</p>
    * 
    * <p><strong>NOTE: the process engine must <em>never</em> cache any references to this {@link ClassLoader} 
    * or to classes obtained through this {@link ClassLoader}.</strong></p>
@@ -165,7 +162,7 @@ public abstract class AbstractProcessApplication {
   public ClassLoader getProcessApplicationClassloader() {
     // the default implementation uses the classloader that loaded 
     // the application-provided subclass of this class.    
-    return getClass().getClassLoader();
+    return ClassLoaderUtil.getClassloader(getClass());
   }
   
   /** 

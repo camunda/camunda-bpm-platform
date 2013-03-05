@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.application.impl;
 
+import java.security.AccessController;
+import java.security.PrivilegedAction;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -21,6 +23,7 @@ import javax.servlet.ServletContextListener;
 import org.camunda.bpm.application.AbstractProcessApplication;
 import org.camunda.bpm.application.ProcessApplicationInfo;
 import org.camunda.bpm.application.ProcessApplicationReference;
+import org.camunda.bpm.engine.impl.util.ClassLoaderUtil;
 
 /**
  * <p>A {@link AbstractProcessApplication} Implementation to be used in a Servlet container environment.</p>
@@ -63,9 +66,11 @@ public class ServletProcessApplication extends AbstractProcessApplication implem
   protected ClassLoader initProcessApplicationClassloader(ServletContextEvent sce) {
     
     if(isServlet30ApiPresent(sce)) {      
-      return sce.getServletContext().getClassLoader();      
+      return ClassLoaderUtil.getServletContextClassloader(sce);
+      
     }else {
-      return getClass().getClassLoader();      
+      return ClassLoaderUtil.getClassloader(getClass());
+      
     }
     
   }
