@@ -9,12 +9,9 @@ public class FormDto {
   private String formKey;
   private String applicationContextPath;
 
-  private String formSuffix;
-
-  public FormDto(String formKey, String applicationContextPath, String formSuffix) {
+  public FormDto(String formKey, String applicationContextPath) {
     this.formKey = formKey;
     this.applicationContextPath = applicationContextPath;
-    this.formSuffix = formSuffix;
   }
 
   public String getFormKey() {
@@ -31,13 +28,5 @@ public class FormDto {
 
   public void setApplicationContextPath(String applicationContextPath) {
     this.applicationContextPath = applicationContextPath;
-  }
-
-  public String getFormSuffix() {
-    return formSuffix;
-  }
-
-  public void setFormSuffix(String formSuffix) {
-    this.formSuffix = formSuffix;
   }
 }

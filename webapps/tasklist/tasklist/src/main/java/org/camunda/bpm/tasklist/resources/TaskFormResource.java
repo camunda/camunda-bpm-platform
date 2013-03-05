@@ -36,7 +36,7 @@ public class TaskFormResource {
 
     String formKey = formData != null ? formData.getFormKey() : null;
 
-    return new FormDto(formKey, getApplicationPath(task.getProcessDefinitionId()), getFormSuffix());
+    return new FormDto(formKey, getApplicationPath(task.getProcessDefinitionId()));
   }
 
   @GET
@@ -50,7 +50,7 @@ public class TaskFormResource {
 
     String formKey = formData != null ? formData.getFormKey() : null;
 
-    return new FormDto(formKey, getApplicationPath(processDefinitionId), getFormSuffix());
+    return new FormDto(formKey, getApplicationPath(processDefinitionId));
   }
 
   private String getApplicationPath(String processDefinitionId) {
@@ -73,10 +73,6 @@ public class TaskFormResource {
 
       return contextPath;
     }
-  }
-
-  private String getFormSuffix() {
-    return null;
   }
 
   private ProcessEngine getProcessEngine() {

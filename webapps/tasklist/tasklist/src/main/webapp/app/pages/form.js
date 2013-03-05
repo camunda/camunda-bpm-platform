@@ -12,7 +12,7 @@ define(["angular"], function(angular) {
         EMBEDDED_KEY = "embedded:",
         APP_KEY = "app:";
 
-      // structure may be [embedded:][app:]formKey[.suffix
+      // structure may be [embedded:][app:]formKey
 
       if (!key) {
         return;
@@ -26,10 +26,6 @@ define(["angular"], function(angular) {
       if (key.indexOf(APP_KEY) == 0) {
         if (applicationContextPath) {
           key = applicationContextPath + "/" + key.substring(APP_KEY.length);
-
-          if (data.formSuffix) {
-            key += data.formSuffix;
-          }
         }
       }
 
