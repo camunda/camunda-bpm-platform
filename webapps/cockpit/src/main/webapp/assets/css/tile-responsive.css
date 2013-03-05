@@ -1,11 +1,11 @@
 .tile-grid {
-   overflow: auto;
+   overflow: hidden;
 }
 
 .tile {
   float: left;
   width: 24%;
-  /* min-width: 400px; */
+  min-width: 400px;
   border-radius: 4px;
   border: 1px solid #DDD;
   display: block;
@@ -27,6 +27,7 @@
 .tile-body {
   padding: 2px;
   height: 218px;
+  min-width: inherit;
 }
 
 .tile-footer {

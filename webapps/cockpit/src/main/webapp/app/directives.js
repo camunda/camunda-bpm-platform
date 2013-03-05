@@ -8,5 +8,6 @@ define([ "angularModule" ], function(angularModule) {
     "cockpit/directives/hidePanel",
     "cockpit/directives/pageOverflowHidden",
     "cockpit/directives/processDiagram",
+    "cockpit/directives/miniatureProcessDiagram",
   ]);
 });

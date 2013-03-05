@@ -6,7 +6,7 @@
 
   <div class="tile-grid">
     <a ng-repeat="statistic in statistics | orderBy:orderByPredicate:orderByReverse"
-         ng-cloak class="tile linkable-tile" href="#/process-definition/{{statistic.definition.id}}">
+         ng-cloak class="tile linkable-tile" href="#/process-definition/{{ statistic.definition.id }}">
       <span class="tile-header">
         <span ngm-if="isProcessDefinitionNameLong(statistic.definition.name)" title="{{ statistic.definition.name }}">
           {{ shortcutProcessDefinitionName(statistic.definition.name) }}
@@ -16,7 +16,7 @@
         </span>
       </span>
       <span class="tile-body">
-      
+        <span process-definition-id="{{ statistic.definition.id }}" miniature-process-diagram></span>
       </span>
       <span class="tile-footer">
         Running Instances: {{ statistic.instances }}
