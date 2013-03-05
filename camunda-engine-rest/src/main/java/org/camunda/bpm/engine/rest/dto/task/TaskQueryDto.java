@@ -4,7 +4,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.activiti.engine.ActivitiException;
+import org.activiti.engine.IdentityService;
 import org.activiti.engine.TaskService;
+import org.activiti.engine.identity.Group;
 import org.activiti.engine.task.DelegationState;
 import org.activiti.engine.task.TaskQuery;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
@@ -19,7 +22,7 @@ import org.camunda.bpm.engine.rest.dto.converter.VariableListConverter;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 
 public class TaskQueryDto extends SortableParameterizedQueryDto {
-  
+
   private static final String SORT_BY_PROCESS_INSTANCE_ID_VALUE = "instanceId";
   private static final String SORT_BY_DUE_DATE_VALUE = "dueDate";
   private static final String SORT_BY_EXECUTION_ID_VALUE = "executionId";
@@ -29,8 +32,7 @@ public class TaskQueryDto extends SortableParameterizedQueryDto {
   private static final String SORT_BY_ID_VALUE = "id";
   private static final String SORT_BY_NAME_VALUE = "name";
   private static final String SORT_BY_PRIORITY_VALUE = "priority";
-  
-  
+
   private static final List<String> VALID_SORT_BY_VALUES;
   static {
     VALID_SORT_BY_VALUES = new ArrayList<String>();
@@ -44,7 +46,7 @@ public class TaskQueryDto extends SortableParameterizedQueryDto {
     VALID_SORT_BY_VALUES.add(SORT_BY_NAME_VALUE);
     VALID_SORT_BY_VALUES.add(SORT_BY_PRIORITY_VALUE);
   }
-  
+
   private String processInstanceBusinessKey;
   private String processDefinitionKey;
   private String processDefinitionId;
@@ -66,21 +68,21 @@ public class TaskQueryDto extends SortableParameterizedQueryDto {
   private String owner;
   private Integer priority;
   private Boolean unassigned;
-  
+
   private Date dueAfter;
   private Date dueBefore;
   private Date dueDate;
   private Date createdAfter;
   private Date createdBefore;
   private Date createdOn;
-  
+
   private DelegationState delegationState;
-  
+
   private List<String> candidateGroups;
-  
+
   private List<VariableQueryParameterDto> taskVariables;
   private List<VariableQueryParameterDto> processVariables;
-  
+
   @CamundaQueryParam("processInstanceBusinessKey")
   public void setProcessInstanceBusinessKey(String businessKey) {
     this.processInstanceBusinessKey = businessKey;
@@ -135,7 +137,7 @@ public class TaskQueryDto extends SortableParameterizedQueryDto {
   public void setTaskDefinitionKeyLike(String taskDefinitionKeyLike) {
     this.taskDefinitionKeyLike = taskDefinitionKeyLike;
   }
-  
+
   @CamundaQueryParam("description")
   public void setDescription(String description) {
     this.description = description;
@@ -225,7 +227,7 @@ public class TaskQueryDto extends SortableParameterizedQueryDto {
   public void setCandidateGroups(List<String> candidateGroups) {
     this.candidateGroups = candidateGroups;
   }
-  
+
   @CamundaQueryParam(value = "taskVariables", converter = VariableListConverter.class)
   public void setTaskVariables(List<VariableQueryParameterDto> taskVariables) {
     this.taskVariables = taskVariables;
@@ -240,10 +242,10 @@ public class TaskQueryDto extends SortableParameterizedQueryDto {
   protected boolean isValidSortByValue(String value) {
     return VALID_SORT_BY_VALUES.contains(value);
   }
-  
+
   public TaskQuery toQuery(TaskService taskService) {
     TaskQuery query = taskService.createTaskQuery();
-    
+
     if (processInstanceBusinessKey != null) {
       query.processInstanceBusinessKey(processInstanceBusinessKey);
     }
@@ -331,13 +333,13 @@ public class TaskQueryDto extends SortableParameterizedQueryDto {
     if (candidateGroups != null) {
       query.taskCandidateGroupIn(candidateGroups);
     }
-    
+
     if (taskVariables != null) {
       for (VariableQueryParameterDto variableQueryParam : taskVariables) {
         String variableName = variableQueryParam.getName();
         String op = variableQueryParam.getOperator();
         Object variableValue = variableQueryParam.getValue();
-        
+
         if (op.equals(VariableQueryParameterDto.EQUALS_OPERATOR_NAME)) {
           query.taskVariableValueEquals(variableName, variableValue);
         } else if (op.equals(VariableQueryParameterDto.NOT_EQUALS_OPERATOR_NAME)) {
@@ -345,16 +347,16 @@ public class TaskQueryDto extends SortableParameterizedQueryDto {
         } else {
           throw new InvalidRequestException("You have specified an invalid task variable comparator.");
         }
-        
+
       }
     }
-    
+
     if (processVariables != null) {
       for (VariableQueryParameterDto variableQueryParam : processVariables) {
         String variableName = variableQueryParam.getName();
         String op = variableQueryParam.getOperator();
         Object variableValue = variableQueryParam.getValue();
-        
+
         if (op.equals(VariableQueryParameterDto.EQUALS_OPERATOR_NAME)) {
           query.processVariableValueEquals(variableName, variableValue);
         } else if (op.equals(VariableQueryParameterDto.NOT_EQUALS_OPERATOR_NAME)) {
@@ -368,7 +370,7 @@ public class TaskQueryDto extends SortableParameterizedQueryDto {
     if (!sortOptionsValid()) {
       throw new InvalidRequestException("You may not specify a single sorting parameter.");
     }
-    
+
     if (sortBy != null) {
       if (sortBy.equals(SORT_BY_PROCESS_INSTANCE_ID_VALUE)) {
         query.orderByProcessInstanceId();
@@ -390,7 +392,7 @@ public class TaskQueryDto extends SortableParameterizedQueryDto {
         query.orderByTaskPriority();
       }
     }
-    
+
     if (sortOrder != null) {
       if (sortOrder.equals(SORT_ORDER_ASC_VALUE)) {
         query.asc();
@@ -398,7 +400,7 @@ public class TaskQueryDto extends SortableParameterizedQueryDto {
         query.desc();
       }
     }
-    
+
     return query;
   }
 

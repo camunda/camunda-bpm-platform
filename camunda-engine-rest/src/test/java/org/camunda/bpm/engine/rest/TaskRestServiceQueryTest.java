@@ -5,6 +5,7 @@ import static com.jayway.restassured.RestAssured.given;
 import static com.jayway.restassured.path.json.JsonPath.from;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
@@ -21,6 +22,10 @@ import java.util.Map;
 
 import javax.ws.rs.core.Response.Status;
 
+import org.activiti.engine.identity.Group;
+import org.activiti.engine.identity.GroupQuery;
+import org.activiti.engine.identity.User;
+import org.activiti.engine.identity.UserQuery;
 import org.activiti.engine.task.DelegationState;
 import org.activiti.engine.task.Task;
 import org.activiti.engine.task.TaskQuery;
@@ -34,7 +39,7 @@ import org.mockito.Mockito;
 import com.jayway.restassured.response.Response;
 
 public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
-  
+
   private static final String EXAMPLE_ID = "anId";
   private static final String EXAMPLE_NAME = "aName";
   private static final String EXAMPLE_ASSIGNEE_NAME = "anAssignee";
@@ -50,16 +55,52 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
   private static final String EXAMPLE_PROCESS_INSTANCE_ID = "aProcInstId";
   private static final String EXAMPLE_TASK_DEFINITION_KEY = "aTaskDefinitionKey";
 
+  private static final String EXAMPLE_GROUP_ID = "group1Id";
+  private static final String EXAMPLE_GROUP_NAME = "group1";
+
   private static final String TASK_QUERY_URL = TEST_RESOURCE_ROOT_PATH + "/task";
+  private static final String TASK_GROUPS_URL = TASK_QUERY_URL + "/groups";
   private static final String TASK_COUNT_QUERY_URL = TASK_QUERY_URL + "/count";
   
   private TaskQuery mockQuery;
   
   private TaskQuery setUpMockTaskQuery(List<Task> mockedTasks) {
+    UserQuery sampleUserQuery = mock(UserQuery.class);
+
+    List<User> mockUsers = new ArrayList<User>();
+
+    User mockUser = mock(User.class);
+    when(mockUser.getId()).thenReturn("userId");
+    when(mockUser.getFirstName()).thenReturn("firstName");
+    when(mockUser.getLastName()).thenReturn("lastName");
+    mockUsers.add(mockUser);
+
+    when(sampleUserQuery.list()).thenReturn(mockUsers);
+    when(sampleUserQuery.memberOfGroup(anyString())).thenReturn(sampleUserQuery);
+    when(sampleUserQuery.count()).thenReturn((long) mockedTasks.size());
+
+
+    GroupQuery sampleGroupQuery = mock(GroupQuery.class);
+    List<Group> mockGroups = new ArrayList<Group>();
+    Group mockGroup = mock(Group.class);
+    when(mockGroup.getId()).thenReturn(EXAMPLE_GROUP_ID);
+    when(mockGroup.getName()).thenReturn(EXAMPLE_GROUP_NAME);
+    mockGroups.add(mockGroup);
+
+    when(sampleGroupQuery.list()).thenReturn(mockGroups);
+    when(sampleGroupQuery.groupMember(anyString())).thenReturn(sampleGroupQuery);
+    when(sampleGroupQuery.count()).thenReturn((long) mockedTasks.size());
+
+    when(processEngine.getIdentityService().createGroupQuery()).thenReturn(sampleGroupQuery);
+
     TaskQuery sampleTaskQuery = mock(TaskQuery.class);
     when(sampleTaskQuery.list()).thenReturn(mockedTasks);
     when(sampleTaskQuery.count()).thenReturn((long) mockedTasks.size());
+    when(sampleTaskQuery.taskCandidateGroup(anyString())).thenReturn(sampleTaskQuery);
+
     when(processEngine.getTaskService().createTaskQuery()).thenReturn(sampleTaskQuery);
+    when(processEngine.getIdentityService().createUserQuery()).thenReturn(sampleUserQuery);
+
     return sampleTaskQuery;
   }
   
@@ -533,6 +574,19 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
       .when().post(TASK_COUNT_QUERY_URL);
     
     verify(mockQuery).count();
+  }
+
+  @Test
+  public void testGroupInfoQuery() throws IOException {
+    setUpMockedQuery();
+
+    Response response = given().queryParam("userId", "name")
+        .then().expect().statusCode(Status.OK.getStatusCode())
+        .when()
+        .get(TASK_GROUPS_URL);
+
+    System.out.println(response.asString());
+    // TODO check groups result
   }
   
 }

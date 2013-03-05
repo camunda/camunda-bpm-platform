@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpmn2:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd" id="_l1jCIHHXEeK-d9X8LxH7pQ" targetNamespace="http://activiti.org/bpmn">
+  <bpmn2:process id="Process_1">
+    <bpmn2:ioSpecification id="InputOutputSpecification_1">
+      <bpmn2:dataOutput id="DataOutput_1" name="Data Output 1"/>
+    </bpmn2:ioSpecification>
+    <bpmn2:startEvent id="StartEvent_1" name="Start Event 1"/>
+    <bpmn2:inclusiveGateway id="InclusiveGateway_1" name="A very very longish text with&#xD;&#xA;a line break in between"/>
+    <bpmn2:dataStoreReference id="_DataStoreReference_3" name="Data Store 1" dataStoreRef="DataStore_1"/>
+    <bpmn2:subProcess id="SubProcess_1" name="Sub Process 1">
+      <bpmn2:dataObject id="DataObject_1" name="Data Object 1"/>
+      <bpmn2:task id="Task_3" name="Task 3"/>
+      <bpmn2:boundaryEvent id="BoundaryEvent_3" name="Boundary 3" attachedToRef="Task_3"/>
+    </bpmn2:subProcess>
+    <bpmn2:task id="Task_1" name="Task 1"/>
+    <bpmn2:boundaryEvent id="BoundaryEvent_1" name="Boundary 1" attachedToRef="Task_1"/>
+    <bpmn2:task id="Task_2" name="Task 2"/>
+    <bpmn2:boundaryEvent id="BoundaryEvent_2" name="Boundary 2" attachedToRef="Task_2"/>
+  </bpmn2:process>
+  <bpmn2:dataStore id="DataStore_1" name="Data Store 1"/>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_1">
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_3" bpmnElement="StartEvent_1">
+        <dc:Bounds height="36.0" width="36.0" x="182.0" y="132.0"/>
+        <bpmndi:BPMNLabel id="BPMNLabel_1">
+          <dc:Bounds height="22.0" width="81.0" x="110.0" y="190.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="_BPMNShape_InclusiveGateway_3" bpmnElement="InclusiveGateway_1">
+        <dc:Bounds height="50.0" width="50.0" x="325.0" y="125.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="_BPMNShape_DataStoreReference_3" bpmnElement="_DataStoreReference_3">
+        <dc:Bounds height="50.0" width="50.0" x="475.0" y="125.0"/>
+        <bpmndi:BPMNLabel id="BPMNLabel_3">
+          <dc:Bounds height="22.0" width="80.0" x="460.0" y="175.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="_BPMNShape_SubProcess_3" bpmnElement="SubProcess_1" isExpanded="true">
+        <dc:Bounds height="300.0" width="300.0" x="600.0" y="100.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="_BPMNShape_DataObject_2" bpmnElement="DataObject_1">
+        <dc:Bounds height="50.0" width="36.0" x="660.0" y="200.0"/>
+        <bpmndi:BPMNLabel id="BPMNLabel_4">
+          <dc:Bounds height="22.0" width="86.0" x="635.0" y="260.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="_BPMNShape_DataOutput_2" bpmnElement="DataOutput_1">
+        <dc:Bounds height="50.0" width="36.0" x="780.0" y="170.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="_BPMNShape_Task_3" bpmnElement="Task_1">
+        <dc:Bounds height="80.0" width="100.0" x="100.0" y="270.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="_BPMNShape_BoundaryEvent_2" bpmnElement="BoundaryEvent_1">
+        <dc:Bounds height="36.0" width="36.0" x="150.0" y="330.0"/>
+        <bpmndi:BPMNLabel>
+          <dc:Bounds height="22.0" width="72.0" x="130.0" y="370.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="_BPMNShape_Task_4" bpmnElement="Task_2">
+        <dc:Bounds height="80.0" width="100.0" x="275.0" y="270.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="_BPMNShape_BoundaryEvent_3" bpmnElement="BoundaryEvent_2">
+        <dc:Bounds height="36.0" width="36.0" x="320.0" y="330.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="_BPMNShape_Task_5" bpmnElement="Task_3">
+        <dc:Bounds height="80.0" width="100.0" x="749.0" y="270.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="_BPMNShape_BoundaryEvent_4" bpmnElement="BoundaryEvent_3">
+        <dc:Bounds height="36.0" width="36.0" x="800.0" y="330.0"/>
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</bpmn2:definitions>

@@ -1,6 +1,6 @@
 package org.camunda.bpm.engine.rest.dto.task;
 
-public class ClaimTaskDto {
+public class UserIdDto {
 
   private String userId;
 

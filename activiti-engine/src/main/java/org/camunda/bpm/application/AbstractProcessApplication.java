@@ -48,15 +48,29 @@ public abstract class AbstractProcessApplication {
     // initialize el resolver
     processApplicationElResolver = initProcessApplicationElResolver();
     // deploy the application
-    RuntimeContainerDelegate.INSTANCE.get().deployProcessApplication(this);   
+    RuntimeContainerDelegate.INSTANCE.get().deployProcessApplication(this);
+    postDeploy();
   }
 
   /**
    * Undeploy this process application from the runtime container.
    */
   public void undeploy() {
+    preUndeploy();
     // delegate stopping of the process application to the runtime container.
     RuntimeContainerDelegate.INSTANCE.get().undeployProcessApplication(this);
+  }
+
+  /**
+   * Called after deployment of the process application
+   */
+  public void postDeploy() {
+  }
+
+  /**
+   * Called before undeployment of the process application
+   */
+  public void preUndeploy() {
   }
     
   /**

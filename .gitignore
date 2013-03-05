@@ -1,3 +1,4 @@
+.idea
 target
 .classpath
 .project
@@ -12,3 +13,4 @@ nb-configuration.xml
 dependency-reduced-pom.xml
 faces-config.NavData
 dependency-reduced-pom.xml
+*.iml

@@ -1,0 +1,27 @@
+<table class="table" style="max-width: 600px" task-variables="variables">
+  <thead>
+    <tr>
+      <th>key</th>
+      <th>value</th>
+      <th style="max-width: 50px; text-align: right">
+        <button class="btn btn-mini" data-ng-click="addVariable()"><i class="icon-plus"></i></button>
+      </th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr data-ng-repeat="variable in variables">
+      <td>
+        <input data-ng-model="variable.key" type="text" placeholder="key" />
+      </td>
+      <td>
+        <input form-field variable="variable" type-switch="true" />
+      </td>
+      <td style="text-align: right; vertical-align: middle">
+        <button class="btn btn-mini" data-ng-click="removeVariable(variable)"><i class="icon-trash"></i></button>
+      </td>
+    </tr>
+    <tr data-ng-show="!variables.length">
+      <td colspan="3">No variables defined</td>
+    </tr>
+  </tbody>
+</table>

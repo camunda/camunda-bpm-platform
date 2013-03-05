@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?><definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:signavio="http://www.signavio.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" exporter="Signavio Process Editor, http://www.signavio.com" exporterVersion="6.5.0" expressionLanguage="http://www.w3.org/1999/XPath" id="sid-75db753e-d4b6-4ad9-881e-3e03148eb0b9" targetNamespace="http://www.signavio.com/bpmn20" typeLanguage="http://www.w3.org/2001/XMLSchema" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/2.0/20100501/BPMN20.xsd">
+   <process id="sid-03caf6c2-d6ac-41f4-a5a8-df527aedaf30" isClosed="false" isExecutable="false" processType="None">
+      <startEvent id="sid-1D1F84FC-6EAD-494C-85A5-CBF535106CF7" isInterrupting="true" name="time for &#10;dinner">
+         <extensionElements>
+            <signavio:signavioMetaData metaKey="bgcolor" metaValue="#ffffff"/>
+            <signavio:signavioMetaData metaKey="userstory" metaValue="[]"/>
+         </extensionElements>
+         <outgoing>sid-062E1EBC-11F4-41D4-8AA2-26A0AA030F6B</outgoing>
+         <timerEventDefinition id="sid-c54fad29-d82a-49b2-bc27-82a850ece8ee"/>
+      </startEvent>
+      <task completionQuantity="1" id="sid-486DA107-0F30-48A1-8024-63564AC40782" isForCompensation="false" name="suggest dish&#10;" startQuantity="1">
+         <extensionElements>
+            <signavio:signavioMetaData metaKey="bgcolor" metaValue="#ffffcc"/>
+            <signavio:signavioMetaData metaKey="adaptereventtype" metaValue=""/>
+            <signavio:signavioMetaData metaKey="documentationlink" metaValue="[]"/>
+            <signavio:signavioMetaData metaKey="test" metaValue=""/>
+            <signavio:signavioMetaData metaKey="adaptertype" metaValue=""/>
+            <signavio:signavioMetaData metaKey="userstory" metaValue="[]"/>
+            <signavio:signavioMetaData metaKey="adapterconfiguration" metaValue=""/>
+            <signavio:signavioMetaData metaKey="adapterclassname" metaValue=""/>
+            <signavio:signavioMetaData metaKey="servicereferenz" metaValue=""/>
+            <signavio:signavioMetaData metaKey="risiko" metaValue=""/>
+            <signavio:signavioMetaData metaKey="erteiltfreigabe" metaValue=""/>
+         </extensionElements>
+         <incoming>sid-062E1EBC-11F4-41D4-8AA2-26A0AA030F6B</incoming>
+         <outgoing>sid-10586969-9D48-4F1A-94A9-31CC039BBFCB</outgoing>
+         <standardLoopCharacteristics id="sid-2cc22530-b5c0-494f-a202-0ac0da67aa66" testBefore="false"/>
+      </task>
+      <task completionQuantity="1" id="sid-C7031B1A-7F7E-4846-B046-73C638547449" isForCompensation="false" name="prepare meal" startQuantity="1">
+         <extensionElements>
+            <signavio:signavioMetaData metaKey="bgcolor" metaValue="#ffffcc"/>
+            <signavio:signavioMetaData metaKey="adaptereventtype" metaValue=""/>
+            <signavio:signavioMetaData metaKey="documentationlink" metaValue="[]"/>
+            <signavio:signavioMetaData metaKey="test" metaValue=""/>
+            <signavio:signavioMetaData metaKey="adaptertype" metaValue=""/>
+            <signavio:signavioMetaData metaKey="userstory" metaValue="[]"/>
+            <signavio:signavioMetaData metaKey="adapterconfiguration" metaValue=""/>
+            <signavio:signavioMetaData metaKey="adapterclassname" metaValue=""/>
+            <signavio:signavioMetaData metaKey="servicereferenz" metaValue=""/>
+            <signavio:signavioMetaData metaKey="risiko" metaValue=""/>
+            <signavio:signavioMetaData metaKey="erteiltfreigabe" metaValue=""/>
+         </extensionElements>
+         <incoming>sid-10586969-9D48-4F1A-94A9-31CC039BBFCB</incoming>
+         <outgoing>sid-DE7608A7-8495-43F6-936B-BE25BA6305B5</outgoing>
+      </task>
+      <endEvent id="sid-C9FB774C-C1C7-4953-9A75-9A0D26F8649F" name="meal&#10;prepared">
+         <extensionElements>
+            <signavio:signavioMetaData metaKey="bgcolor" metaValue="#ffffff"/>
+            <signavio:signavioMetaData metaKey="userstory" metaValue="[]"/>
+         </extensionElements>
+         <incoming>sid-DE7608A7-8495-43F6-936B-BE25BA6305B5</incoming>
+      </endEvent>
+      <sequenceFlow id="sid-062E1EBC-11F4-41D4-8AA2-26A0AA030F6B" sourceRef="sid-1D1F84FC-6EAD-494C-85A5-CBF535106CF7" targetRef="sid-486DA107-0F30-48A1-8024-63564AC40782">
+         <extensionElements>
+            <signavio:signavioMetaData metaKey="userstory" metaValue="[]"/>
+         </extensionElements>
+      </sequenceFlow>
+      <sequenceFlow id="sid-10586969-9D48-4F1A-94A9-31CC039BBFCB" sourceRef="sid-486DA107-0F30-48A1-8024-63564AC40782" targetRef="sid-C7031B1A-7F7E-4846-B046-73C638547449">
+         <extensionElements>
+            <signavio:signavioMetaData metaKey="userstory" metaValue="[]"/>
+         </extensionElements>
+      </sequenceFlow>
+      <sequenceFlow id="sid-DE7608A7-8495-43F6-936B-BE25BA6305B5" sourceRef="sid-C7031B1A-7F7E-4846-B046-73C638547449" targetRef="sid-C9FB774C-C1C7-4953-9A75-9A0D26F8649F">
+         <extensionElements>
+            <signavio:signavioMetaData metaKey="userstory" metaValue="[]"/>
+         </extensionElements>
+      </sequenceFlow>
+      <association associationDirection="None" id="sid-E6E352A9-1322-4E22-9742-0973CDBE6455" targetRef="sid-31394AAC-A3DB-4DBA-90D0-6B2E0B229F36">
+         <extensionElements>
+            <signavio:signavioMetaData metaKey="userstory" metaValue="[]"/>
+         </extensionElements>
+      </association>
+      <textAnnotation id="sid-31394AAC-A3DB-4DBA-90D0-6B2E0B229F36" textFormat="text/plain">
+         <extensionElements>
+            <signavio:signavioMetaData metaKey="userstory" metaValue="[]"/>
+         </extensionElements>
+         <text>until everyone
+         agrees</text>
+      </textAnnotation>
+   </process>
+   <bpmndi:BPMNDiagram id="sid-477973dd-d2b1-47cb-a0f4-71786a8a99e9">
+      <bpmndi:BPMNPlane bpmnElement="sid-03caf6c2-d6ac-41f4-a5a8-df527aedaf30" id="sid-f8a6a8bd-3f57-460b-a0cb-088fffba15c5">
+         <bpmndi:BPMNShape bpmnElement="sid-1D1F84FC-6EAD-494C-85A5-CBF535106CF7" id="sid-1D1F84FC-6EAD-494C-85A5-CBF535106CF7_gui">
+            <omgdc:Bounds height="30.0" width="30.0" x="18.0" y="103.0"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape bpmnElement="sid-486DA107-0F30-48A1-8024-63564AC40782" id="sid-486DA107-0F30-48A1-8024-63564AC40782_gui">
+            <omgdc:Bounds height="80.0" width="100.0" x="88.0" y="78.0"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape bpmnElement="sid-C7031B1A-7F7E-4846-B046-73C638547449" id="sid-C7031B1A-7F7E-4846-B046-73C638547449_gui">
+            <omgdc:Bounds height="80.0" width="100.0" x="233.0" y="78.0"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape bpmnElement="sid-C9FB774C-C1C7-4953-9A75-9A0D26F8649F" id="sid-C9FB774C-C1C7-4953-9A75-9A0D26F8649F_gui">
+            <omgdc:Bounds height="28.0" width="28.0" x="363.0" y="104.0"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNShape bpmnElement="sid-31394AAC-A3DB-4DBA-90D0-6B2E0B229F36" id="sid-31394AAC-A3DB-4DBA-90D0-6B2E0B229F36_gui">
+            <omgdc:Bounds height="35.0" width="100.0" x="168.0" y="18.0"/>
+         </bpmndi:BPMNShape>
+         <bpmndi:BPMNEdge bpmnElement="sid-DE7608A7-8495-43F6-936B-BE25BA6305B5" id="sid-DE7608A7-8495-43F6-936B-BE25BA6305B5_gui">
+            <omgdi:waypoint x="333.0" y="118.0"/>
+            <omgdi:waypoint x="363.0" y="118.0"/>
+         </bpmndi:BPMNEdge>
+         <bpmndi:BPMNEdge bpmnElement="sid-10586969-9D48-4F1A-94A9-31CC039BBFCB" id="sid-10586969-9D48-4F1A-94A9-31CC039BBFCB_gui">
+            <omgdi:waypoint x="188.0" y="118.0"/>
+            <omgdi:waypoint x="233.0" y="118.0"/>
+         </bpmndi:BPMNEdge>
+         <bpmndi:BPMNEdge bpmnElement="sid-E6E352A9-1322-4E22-9742-0973CDBE6455" id="sid-E6E352A9-1322-4E22-9742-0973CDBE6455_gui">
+            <omgdi:waypoint x="152.36932533059104" y="78.33036020154296"/>
+            <omgdi:waypoint x="168.0" y="36.0"/>
+         </bpmndi:BPMNEdge>
+         <bpmndi:BPMNEdge bpmnElement="sid-062E1EBC-11F4-41D4-8AA2-26A0AA030F6B" id="sid-062E1EBC-11F4-41D4-8AA2-26A0AA030F6B_gui">
+            <omgdi:waypoint x="48.0" y="118.0"/>
+            <omgdi:waypoint x="88.0" y="118.0"/>
+         </bpmndi:BPMNEdge>
+      </bpmndi:BPMNPlane>
+   </bpmndi:BPMNDiagram>
+</definitions>
