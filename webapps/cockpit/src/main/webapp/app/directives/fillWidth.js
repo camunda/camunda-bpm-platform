@@ -4,18 +4,20 @@ define([ "angular", "jquery"], function(angular, $) {
   
   var module = angular.module("cockpit.directives");
   
-  var Directive = function () {
+  var Directive = function ($window) {
     return {
       restrict: 'A',
       link: function(scope, element, attrs) {
         
+        var w = angular.element($window);
+        
         scope.getWindowWidth = function() {
-          return $(window).width();
+          return w.width();
         };
         
-        window.onresize = function () {
+        w.bind('resize', function () {
           scope.$apply();
-        };
+        });
 
         scope.$watch(function () {
           return scope.getWindowWidth();
@@ -23,7 +25,7 @@ define([ "angular", "jquery"], function(angular, $) {
           if (newValue === oldValue) {
             return;
           }
-          var width = parseInt($(element).css("width"));
+          var width = $(element).width();
           var newWidth = width + newValue - oldValue;
           
           $("#processDiagram").removeOverscroll();
@@ -42,6 +44,7 @@ define([ "angular", "jquery"], function(angular, $) {
     };
   };
   
+  Directive.$inject = ["$window"];
   
   module
     .directive('fillWidth', Directive);

@@ -4,18 +4,20 @@ define([ "angular", "jquery"], function(angular, $) {
   
   var module = angular.module("cockpit.directives");
   
-  var Directive = function () {
+  var Directive = function ($window) {
     return {
       restrict: 'A',
       link: function(scope, element, attrs) {
         
+        var w = angular.element($window);
+        
         scope.getWindowHeight = function() {
-          return $(window).height();
+          return w.height();
         };
         
-        window.onresize = function () {
+        w.bind('resize', function () {
           scope.$apply();
-        };
+        });
 
         scope.$watch(function () {
           return scope.getWindowHeight();
@@ -32,14 +34,16 @@ define([ "angular", "jquery"], function(angular, $) {
         var headerHeight = $('.navbar-fixed-top').outerHeight(false);
         var footerHeight = $('footer').outerHeight(false);
         var paddingTop = parseInt($(element).css("padding-top"));
-        var paddingBottom = parseInt($(element).css("padding-Bottom"));
-        var borderTop = parseInt($(element).css("border-top"));
-        var borderBottom = parseInt($(element).css("border-Bottom"));
+        var paddingBottom = parseInt($(element).css("padding-bottom"));
+        var borderTop = parseInt($(element).css("border-top-width"));
+        var borderBottom = parseInt($(element).css("border-bottom-width"));
         
         $(element).css("height", (scope.getWindowHeight() - headerHeight - footerHeight - paddingTop - paddingBottom - borderTop - borderBottom) + "px");
       }
     };
   };
+  
+  module.$inject = ["$window"];
   
   
   module

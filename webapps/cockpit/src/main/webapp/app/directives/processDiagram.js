@@ -41,7 +41,7 @@ define([ "angular", "jquery", "bpmn/Bpmn", "dojo/domReady!", "bootstrap-slider/b
             }
 
             return newZoomLevel;
-          }
+          };
 
           scope.$watch('zoomLevel', function(newZoomLevel) {
             container.removeOverscroll();
