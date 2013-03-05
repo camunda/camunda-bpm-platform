@@ -23,6 +23,7 @@ public class SignavioJson {
   private static final String JSON_PARENT_PROP = "parent";
   private static final String JSON_PARENT_NAME_PROP = "parentName";
   private static final String JSON_TYPE_PROP = "type";
+  private static final String JSON_NAMESPACE_PROP = "namespace";
   private static final String JSON_UPDATED_PROP = "updated";
   private static final String JSON_COMMENT_PROP = "comment";
 
@@ -31,6 +32,7 @@ public class SignavioJson {
   private static final String JSON_MOD_VALUE = "mod";
   private static final String JSON_PRIVATE_VALUE = "private";
   private static final String JSON_TYPE_BPMN20_VALUE = "BPMN 2.0";
+  private static final String JSON_NAMESPACE_BPMN20_VALUE = "bpmn2.0";
 
   public static String extractNodeName(String json) {
     try {
@@ -79,7 +81,8 @@ public class SignavioJson {
     try {
       JSONObject repJsonObj = jsonObj.getJSONObject(JSON_REP_OBJ);
       
-      if (repJsonObj.has(JSON_TYPE_PROP) && JSON_TYPE_BPMN20_VALUE.equals(repJsonObj.getString(JSON_TYPE_PROP))) {
+      if ((repJsonObj.has(JSON_TYPE_PROP) && JSON_TYPE_BPMN20_VALUE.equals(repJsonObj.getString(JSON_TYPE_PROP))) ||
+          (repJsonObj.has(JSON_NAMESPACE_PROP) && repJsonObj.getString(JSON_NAMESPACE_PROP).contains(JSON_NAMESPACE_BPMN20_VALUE))) {
         return ConnectorNodeType.BPMN_FILE;
       } else {
         return ConnectorNodeType.ANY_FILE;
