@@ -4,7 +4,7 @@ define(["angular"], function(angular) {
 
   var module = angular.module("tasklist.services");
 
-  function AuthenticationFactory($http, $cookies, Uri) {
+  function AuthenticationFactory($http, $cookies, $q, Uri) {
 
     function Authentication() {
       this.auth = { current: $cookies.user };
@@ -20,7 +20,7 @@ define(["angular"], function(angular) {
 
     Authentication.prototype.login = function(username, password) {
       var self = this,
-          promise = $http.get(Uri.appUri("api/auth/login/" + username + "/" + password));
+          promise = $http.post(Uri.appUri("api/auth/login"), { username: username, password: password });
 
       return promise.then(function(response) {
         var data = response.data;
@@ -46,7 +46,7 @@ define(["angular"], function(angular) {
     return new Authentication();
   };
 
-  AuthenticationFactory.$inject = ["$http", "$cookies", "Uri"];
+  AuthenticationFactory.$inject = ["$http", "$cookies", "$q", "Uri"];
 
   module.factory("Authentication", AuthenticationFactory);
 

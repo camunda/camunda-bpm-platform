@@ -36,15 +36,21 @@
       <!-- Header -->
       <div ng-include="'common/header.html'"></div>
 
-      <div class="container-fluid content-inset">
+      <div class="container-fluid content-inset" ng-cloak>
         <div notifications-panel></div>
-        <div class="row-fluid">
+        <div class="row-fluid" ngm-if="auth.current">
           <div class="span3">
-            <!-- Sitebar -->
+            <!-- sitebar -->
             <div ng-include="'common/sitebar.html'"></div>
           </div>
-          <!-- actual view body is rendered here whenever the url changes -->
+          <!-- view body -->
           <div ng-view class="span9">
+
+          </div>
+        </div>
+        <div class="row-fluid" ngm-if="!auth.current">
+          <!-- view body -->
+          <div ng-view class="span12">
 
           </div>
         </div>

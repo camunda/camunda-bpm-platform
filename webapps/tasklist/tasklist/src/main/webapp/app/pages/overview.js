@@ -95,7 +95,7 @@ define(["angular", "bpmn/Bpmn"], function(angular, Bpmn) {
           $scope.removeTask(task);
         }
 
-        notifyScopeChange("Claimed task");
+        notifyScopeChange("Claimed task <a href='#/overview?filter=mytasks&selection=" + task.id + "'>" + task.name + "</a>");
 
         fireTaskListChanged();
       });
@@ -105,7 +105,7 @@ define(["angular", "bpmn/Bpmn"], function(angular, Bpmn) {
       return EngineApi.getTaskList().unclaim({ id : task.id }, { userId: Authentication.current() }).$then(function () {
         $scope.removeTask(task);
 
-        notifyScopeChange("Unclaimed task");
+        notifyScopeChange("Unclaimed task <a href='#/overview?filter=unassigned&selection=" + task.id + "'>" + task.name + "</a>");
 
         fireTaskListChanged();
       });
@@ -176,21 +176,49 @@ define(["angular", "bpmn/Bpmn"], function(angular, Bpmn) {
       return $scope.taskList.selection = [];
     };
 
-    $scope.showDiagram = function (task, index) {
-      EngineApi.getProcessDefinitions().xml({id : task.processDefinitionId}).$then( function (result) {
-        var bpmnXml = result.data.bpmn20Xml;
+    $scope.bpmn = { };
 
-        if ($scope.bpmn) {
-          $scope.bpmn.clear();
-          $scope.bpmn = null;
+    $scope.isDiagramActive = function(task) {
+      return $scope.bpmn.task == task;
+    };
+
+    $scope.toggleShowDiagram = function (task, index) {
+      var diagram = $scope.bpmn.diagram,
+          oldTask = $scope.bpmn.task;
+      
+      $scope.bpmn = {};
+
+      if (diagram) {
+        // destroy old diagram
+        diagram.clear();
+
+        if (task == oldTask) {
+          return;
+        }
+      }
+
+      $scope.bpmn.task = task;
+
+      EngineApi.getProcessDefinitions().xml({ id : task.processDefinitionId }).$then(function (result) {
+        var diagram = $scope.bpmn.diagram,
+            xml = result.data.bpmn20Xml;
+
+        if (diagram) {
+          diagram.clear();
         }
 
-        $scope.bpmn = new Bpmn().render(bpmnXml, {
-          diagramElement : "diagram"
+        var width = $("#diagram").width();
+        var height = $("#diagram").height();
+
+        diagram = new Bpmn().render(xml, {
+          diagramElement : "diagram",
+          width: width,
+          height: 400
         });
 
-        $scope.bpmn.annotate(task.taskDefinitionKey, "", [ "bpmnHighlight" ]);
-        $scope.select(task);
+        diagram.annotate(task.taskDefinitionKey, "", [ "bpmn-highlight" ]);
+
+        $scope.bpmn.diagram = diagram;
       });
     };
   };

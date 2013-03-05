@@ -21,6 +21,8 @@ define([ "angularModule" ], function(angularModule) {
       var status = responseError.status,
           data = responseError.data;
 
+      Notifications.clear({ type: "error" });
+
       switch (status) {
       case 500:
         if (data && data.message) {
@@ -33,8 +35,6 @@ define([ "angularModule" ], function(angularModule) {
         Notifications.addError({ status: "Request Timeout", message:  "Your request timed out. Try refreshing the page." });
         break;
       case 401:
-        Notifications.clear("Unauthorized");
-
         if (Authentication.current()) {
           Notifications.addError({ status: "Unauthorized", message:  "Your session has expired. Please login again." });
         } else {

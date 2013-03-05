@@ -1,7 +1,4 @@
-<div id="diagram" class="bpmnDiagram">
-</div>
-
-<div notifications-panel notifications-filter="{ status: 'Scope change' }" />
+<div notifications-panel />
 
 <!-- task list -->
 <table class="table table-hover task-table" multi-select="taskList.selection">
@@ -14,15 +11,17 @@
       <th style="width: 120px">Actions</th>
     </tr>
   </thead>
-  <tbody>
-    <tr ng-show="!taskList.tasks.length">
+  <tbody ngm-if="!taskList.tasks.length">
+    <tr>
       <td>-</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
       <td>-</td>
     </tr>
-    <tr ng-repeat="task in taskList.tasks" ng-class="{ selected: isSelected(task) }" select="task">
+  </tbody>
+  <tbody class="task" ng-repeat="task in taskList.tasks" ng-class="{ selected: isSelected(task) }" select="task">
+    <tr class="entry">
       <td>{{ task.name }}</td>
       <td>{{ task.processDefinitionId }}</td>
       <td>{{ task.created | date:'medium' }}</td>
@@ -51,7 +50,13 @@
             </li>
           </ul>
         </div>
-        <button class="btn btn-small" data-ng-click="showDiagram(task, $index)"><i class="icon-search"></i></button>
+        <button class="btn btn-small" ng-class="{ 'btn-info': isDiagramActive(task)}" data-ng-click="toggleShowDiagram(task, $index)"><i class="icon-search"></i></button>
+      </td>
+    </tr>
+    <tr ngm-if="isDiagramActive(task)">
+      <td colspan="6">
+        <div id="diagram" class="bpmn-diagram">
+        </div>
       </td>
     </tr>
   </tbody>

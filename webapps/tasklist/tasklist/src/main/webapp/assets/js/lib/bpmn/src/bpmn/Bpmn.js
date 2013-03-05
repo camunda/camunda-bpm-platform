@@ -21,9 +21,8 @@ define(["bpmn/Transformer", "bpmn/Renderer", "dojo/request", "dojo/Deferred", "d
     return deferred;
   };
 
-  Bpmn.prototype.render = function (bpmnXml, options) {
+  Bpmn.prototype.render = function(bpmnXml, options) {
     var processDefinition = new Transformer().transform(bpmnXml);
-    console.log(processDefinition);
 
     var definitionRenderer = new Renderer(processDefinition);
     definitionRenderer.render(options);
@@ -31,6 +30,17 @@ define(["bpmn/Transformer", "bpmn/Renderer", "dojo/request", "dojo/Deferred", "d
     this.definitionRenderer = definitionRenderer;
     this.bpmnXml = bpmnXml;
     this.options = options;
+
+    // zoom the diagram to suite the bounds specified on options if any;
+    var bounds = definitionRenderer.getBounds(),
+        bwidth = parseFloat(bounds.width),
+        bheight = parseFloat(bounds.height);
+
+    var scale = Math.min(
+          (options.width || bwidth) / bwidth,
+          (options.height || bheight) / bheight);
+    
+    this.zoom(scale);
 
     return this;
   },

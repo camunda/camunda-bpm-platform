@@ -3,11 +3,11 @@ package org.camunda.bpm.tasklist.dto;
 /**
  * @author : drobisch
  */
-public class AuthenticationResponse {
+public class AuthenticationResponseDto {
   boolean success;
   String user;
 
-  public AuthenticationResponse(boolean success, String user) {
+  public AuthenticationResponseDto(boolean success, String user) {
     this.success = success;
     this.user = user;
   }
