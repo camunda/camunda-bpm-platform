@@ -93,7 +93,11 @@ public class BpmnParseTest extends PluggableActivitiTestCase {
     
     // Check if diagram has been created based on Diagram Interchange when it's not a headless instance
     List<String> resourceNames = repositoryService.getDeploymentResourceNames(processDefinitionEntity.getDeploymentId());
-    assertEquals(2, resourceNames.size());
+    if(processEngineConfiguration.isCreateDiagramOnDeploy()) {
+      assertEquals(2, resourceNames.size());
+    } else {
+      assertEquals(1, resourceNames.size());
+    }
     
     for (ActivityImpl activity : processDefinitionEntity.getActivities()) {
       
