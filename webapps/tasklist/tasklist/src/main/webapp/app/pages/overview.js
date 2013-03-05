@@ -37,10 +37,6 @@ define(["angular", "bpmn/Bpmn"], function(angular, Bpmn) {
           search = view.search,
           user = Authentication.current();
 
-      if (!user) {
-        return;
-      }
-
       $scope.groupInfo = EngineApi.getGroups(user);
 
       $scope.taskList.view = { filter: filter, search: search };
