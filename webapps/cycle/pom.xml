@@ -27,7 +27,6 @@
     <module>cycle-sql</module>
     <module>cycle-jboss</module>
     <module>cycle-glassfish</module>
-    <module>cycle-was</module>
     <module>cycle-tomcat</module>
 	<module>cycle-httpclient</module>
   </modules>
