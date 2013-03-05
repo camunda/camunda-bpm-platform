@@ -10,8 +10,6 @@ public class StartUpListener implements ServletContextListener {
 
   @Override
   public void contextInitialized(ServletContextEvent servletContextEvent) {
-    TasklistProcessEngineProvider.createProcessEngine();
-    TasklistProcessEngineProvider.createDemoData();
   }
 
   @Override

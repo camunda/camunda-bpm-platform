@@ -5,6 +5,37 @@ define(["angular"], function(angular) {
   var module = angular.module("tasklist.pages");
 
   var Controller = function($rootScope, $scope, $location, $routeParams, EngineApi) {
+
+    function parseFormData(data, form) {
+      var key = data.formKey,
+        applicationContextPath = data.applicationContextPath,
+        EMBEDDED_KEY = "embedded:",
+        APP_KEY = "app:";
+
+      // structure may be [embedded:][app:]formKey[.suffix
+
+      if (!key) {
+        return;
+      }
+
+      if (key.indexOf(EMBEDDED_KEY) == 0) {
+        key = key.substring(EMBEDDED_KEY.length);
+        form.embedded = true;
+      }
+
+      if (key.indexOf(APP_KEY) == 0) {
+        if (applicationContextPath) {
+          key = applicationContextPath + "/" + key.substring(APP_KEY.length);
+
+          if (data.formSuffix) {
+            key += data.formSuffix;
+          }
+        }
+      }
+
+      form.key = key;
+    }
+
     $scope.variables = [];
 
     var form = $scope.form = {
@@ -25,16 +56,16 @@ define(["angular"], function(angular) {
     });
 
     form.data = EngineApi.getTaskList().getForm({ id: $routeParams.id }).$then(function(response) {
-      var data = response.resource,
-                 key = data.key,
-                 EMBEDDED_KEY = "embedded:";
+      var data = response.resource;
 
-      if (key && key.indexOf(EMBEDDED_KEY) == 0) {
-        key = key.substring(EMBEDDED_KEY.length);
-        form.embedded = true;
+      parseFormData(data, form);
+
+      if (!form.embedded) {
+        var externalUrl = encodeURI(form.key + "?taskId=" + $scope.task.id + "&callbackUrl=" + $location.absUrl() + "/complete");
+
+        window.location.href = externalUrl;
       }
 
-      form.key = key;
       form.loaded = true;
     });
 

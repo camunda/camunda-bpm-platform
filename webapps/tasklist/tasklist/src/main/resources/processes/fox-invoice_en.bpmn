@@ -26,7 +26,7 @@
         <flowNodeRef>invoiceProcessed</flowNodeRef>
       </lane>
     </laneSet>
-    <userTask id="approveInvoice" activiti:expression="${true}" name="approve invoice" activiti:candidateGroups="management">
+    <userTask id="approveInvoice" activiti:formKey="app:invoice/approve.html" activiti:expression="${true}" name="approve invoice" activiti:candidateGroups="management">
       <incoming>sequenceFlow_178</incoming>
       <incoming>reviewSuccessful</incoming>
       <outgoing>sequenceFlow_180</outgoing>
@@ -81,7 +81,7 @@
     <endEvent id="invoiceProcessed" name="invoice processed">
       <incoming>SequenceFlow_1</incoming>
     </endEvent>
-    <userTask id="assignApprover" activiti:formKey="assignApprover" activiti:candidateGroups="management" name="assign approver">
+    <userTask id="assignApprover" activiti:formKey="app:invoice/assign-approver.html" activiti:candidateGroups="management" name="assign approver">
       <incoming>sequenceFlow_187</incoming>
       <outgoing>sequenceFlow_178</outgoing>
     </userTask>

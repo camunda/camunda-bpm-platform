@@ -1,6 +1,9 @@
 package org.camunda.bpm.tasklist.resources;
 
+import org.activiti.engine.ProcessEngine;
+import org.camunda.bpm.BpmPlatform;
 import org.camunda.bpm.tasklist.AuthenticationFilter;
+import org.camunda.bpm.tasklist.TasklistDemoData;
 import org.camunda.bpm.tasklist.TasklistProcessEngineProvider;
 import org.camunda.bpm.tasklist.dto.AuthenticationResponseDto;
 
@@ -18,7 +21,7 @@ import org.camunda.bpm.tasklist.dto.LoginDto;
  * 
  * @author drobisch
  */
-@Path("/auth")
+@Path("auth")
 public class AuthenticationResource {
 
   @Context
@@ -31,7 +34,7 @@ public class AuthenticationResource {
     String user = loginDto.getUsername();
     String password = loginDto.getPassword();
 
-    boolean validLogin = TasklistProcessEngineProvider.getStaticEngine().getIdentityService().checkPassword(user, password);
+    boolean validLogin = getProcessEngine().getIdentityService().checkPassword(user, password);
     if (validLogin) {
       httpRequest.getSession(true).setAttribute(AuthenticationFilter.AUTH_USER, user);
     }
@@ -54,4 +57,7 @@ public class AuthenticationResource {
     return (String) httpRequest.getSession().getAttribute(AuthenticationFilter.AUTH_USER);
   }
 
+  private ProcessEngine getProcessEngine() {
+    return TasklistProcessEngineProvider.getStaticProcessEngine();
+  }
 }

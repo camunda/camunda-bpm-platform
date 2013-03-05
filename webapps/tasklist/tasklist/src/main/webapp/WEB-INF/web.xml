@@ -12,7 +12,7 @@
   </filter-mapping>
 
   <listener>
-    <listener-class>org.camunda.bpm.tasklist.StartUpListener</listener-class>
+    <listener-class>org.camunda.bpm.tasklist.TasklistProcessApplication</listener-class>
   </listener>
 
   <servlet>

@@ -7,6 +7,7 @@ define(["angular"], function(angular) {
   var EngineApiFactory = function($resource, Uri) {
 
     var baseUri = Uri.restRoot();
+    var apiUri = Uri.appRoot() + "api/";
 
     function EngineApi() {
 
@@ -18,10 +19,13 @@ define(["angular"], function(angular) {
         complete : { method: 'POST', params : { operation: "complete" }}
       });
 
-      this.taskList.getForm = function(data, fn) {
-        data = angular.extend(data, { operation : "form" });
+      var forms = $resource(Uri.build(apiUri, "forms/:context/:id"), { id: "@id" } , {
+        startForm : { method: 'GET', params : { context: "process-definition" }},
+        taskForm : { method: 'GET', params : { context: "task" }}
+      });
 
-        return this.get(data, fn);
+      this.taskList.getForm = function(data, fn) {
+        return forms.taskForm(data, fn);
       };
 
       this.taskCount = $resource(Uri.build(baseUri, "task/count"));
@@ -30,9 +34,7 @@ define(["angular"], function(angular) {
       });
 
       this.processDefinitions.getStartForm = function(data, fn) {
-        data = angular.extend(data, { operation : "startForm" });
-
-        return this.get(data, fn);
+        return forms.startForm(data, fn);
       };
 
       this.processDefinitions.startInstance = function(data, fn) {
