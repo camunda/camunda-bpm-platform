@@ -1,6 +1,6 @@
 <div ng-class="{ 'input-prepend': typeSwitch }">
   <div class="btn-group" ngm-if="typeSwitch">
-    <button class="btn dropdown-toggle" data-toggle="dropdown">
+    <button class="btn dropdown-toggle" toggle="dropdown">
       {{ variable.type }}
       <span class="caret"></span>
     </button>
@@ -11,10 +11,10 @@
       <li><a href ng-click="setType('string')">string</a></li>
     </ul>
   </div>
-  <span data-ng-switch="variable.type">
-    <input data-ng-switch-when="number" data-ng-model="variable.value" type="number" placeholder="value" />
-    <label data-ng-switch-when="boolean"class="checkbox inline"><input style="margin-left: 10px; margin-right: 5px;" name="variable.key" data-ng-model="variable.value" type="checkbox" /> {{ variable.key }}</label>
-    <input data-ng-switch-when="date" data-ng-model="variable.value" type="datetime" placeholder="value" />
-    <input data-ng-switch-default data-ng-model="variable.value" type="text" placeholder="value" />
+  <span ng-switch="variable.type">
+    <input ng-switch-when="number" ng-readonly="variable.readOnly" ng-model="variable.value" type="number" placeholder="value" />
+    <label ng-switch-when="boolean" class="checkbox inline"><input ng-readonly="variable.readOnly" style="margin-left: 10px; margin-right: 5px;" name="variable.key" ng-model="variable.value" type="checkbox" /> {{ variable.key }}</label>
+    <input ng-switch-when="date" ng-readonly="variable.readOnly" ng-model="variable.value" type="datetime" placeholder="value" />
+    <input ng-switch-default ng-readonly="variable.readOnly" ng-model="variable.value" type="text" placeholder="value" />
   </span>
 </div>

@@ -28,8 +28,8 @@
       <td>{{ task.due | date:'medium' }}</td>
 
       <td>
-        <div class="btn-group">
-          <button class="btn btn-small" title="Start to work on task" ng-click="startTask(task)"><i class="icon-play"></i></button>
+        <div class="btn-group" ngm-if="taskList.view.filter != 'colleague'">
+          <a class="btn btn-small" title="Start to work on task" href="#/task/{{task.id}}"><i class="icon-play"></i></a>
           <button class="btn btn-small dropdown-toggle" data-toggle="dropdown">
             <span class="caret"></span>
           </button>
@@ -37,7 +37,7 @@
             <li ng-show="taskList.view.filter == 'mytasks'">
               <a href ng-click="unclaimTask(task)" title="Unassign this task from me">Unclaim</a>
             </li>
-            <li ng-show="taskList.view.filter == 'unassigned'">
+            <li ng-show="taskList.view.filter != 'mytasks' && taskList.view.filter != 'colleague'">
               <a href title="Claim task to work on it later" ng-click="claimTask(task)">Claim</a>
             </li>
             <li class="dropdown-submenu" ng-show="taskList.view.filter == 'mytasks'">
@@ -68,7 +68,7 @@
         </small>
       </td>
       <td>
-        <div class="btn-group" ng-show="taskList.selection.length">
+        <div class="btn-group" ngm-if="taskList.view.filter != 'colleague'" ng-show="taskList.selection.length">
           <a class="btn dropdown-toggle" data-toggle="dropdown" href="#">
             All Selected
             <span class="caret"></span>
