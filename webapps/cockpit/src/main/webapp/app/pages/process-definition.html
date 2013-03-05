@@ -1,28 +1,36 @@
-<div class="page-header">
-  <h1 ngm-if="!!processDefinition.name">{{ processDefinition.name }}</h1>
-  <h1 ngm-if="!processDefinition.name">{{ processDefinition.key }}</h1>
-</div>
+<div class="panel-page" page-overflow-hidden>
 
-<div>
-  <table>
-    <tbody>
-      <tr>
-        <td><strong>Version: </strong></td>
-        <td>{{ processDefinition.version }}</td>
-      </tr>
-      <tr>
-        <td><strong>Running instances: </strong></td>
-        <td>{{ processDefinitionLatestVersionCount.count }}</td>
-      </tr>
-      <tr>
-        <td><strong>Total running instances: </strong></td>
-        <td>{{ processDefinitionTotalCount.count }}</td>
-      </tr>
-    </tbody>
-  </table>
-</div>
+  <div class="left-panel well" fill-height>
+  
+    <div hide-panel></div>
+    
+    <div class="page-header">
+      <h1 ngm-if="!!processDefinition.name">{{ processDefinition.name }}</h1>
+      <h1 ngm-if="!processDefinition.name">{{ processDefinition.key }}</h1>
+    </div>
+    
+    <div>
+      <table>
+        <tbody>
+          <tr>
+            <td><strong>Version: </strong></td>
+            <td>{{ processDefinition.version }}</td>
+          </tr>
+          <tr>
+            <td><strong>Running instances (latest version): </strong></td>
+            <td>{{ processDefinitionLatestVersionCount.count }}</td>
+          </tr>
+          <tr>
+            <td><strong>Running instances (all versions): </strong></td>
+            <td>{{ processDefinitionTotalCount.count }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  
+  <div class="right-panel" fill-height fill-width>
+    <div process-diagram id="processDiagram"></div>
+  </div>
 
-<div id="processDiagramWrapper">
-  <div id="zoomSlider">Zoom level</div>
-  <div process-diagram id="processDiagram"></div>
 </div>

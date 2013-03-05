@@ -8,6 +8,7 @@
     paths: {
       domReady : "assets/js/lib/require/domReady",
       jquery: "assets/js/lib/jquery-1.7.2.min",
+      jqueryMousewheel : "assets/js/lib/jquery.mousewheel",
       bootstrap: "assets/bootstrap/js/bootstrap",
       angularReady : "common/util/angularReady",
       angularModule : "common/util/angularModule"
@@ -28,6 +29,7 @@
       { name: "bpmn", location : "assets/js/lib/bpmn" },
       { name: "dojo", location : "assets/js/lib/dojo/dojo" },
       { name: "dojox", location : "assets/js/lib/dojo/dojox" },
+      { name: "jquery.overscroll", location : "assets/js/lib" },
       { name: "bootstrap-slider", location : "assets/bootstrap-slider" }
     ]
   });
