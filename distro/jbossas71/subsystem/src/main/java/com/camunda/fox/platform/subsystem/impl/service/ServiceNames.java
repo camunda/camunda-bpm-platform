@@ -66,7 +66,7 @@ public class ServiceNames {
    * @param deploymentId
    */
   public static ServiceName forProcessApplicationDeploymentService(String deploymentUnitName, String deploymentName) {
-    return PROCESS_APPLICATION.append(deploymentUnitName).append(deploymentName);
+    return PROCESS_APPLICATION.append("deployment").append(deploymentUnitName).append(deploymentName);
   }
 
   /**
@@ -82,7 +82,7 @@ public class ServiceNames {
    * ServiceNames used for {@link MscManagedProcessApplication}.
    */
   public static ServiceName forManagedProcessApplications() {
-    return PROCESS_APPLICATION;
+    return PROCESS_APPLICATION.append("runtime");
   }
   
   /**
@@ -90,7 +90,7 @@ public class ServiceNames {
    * @return the name to be used for an {@link MscManagedProcessApplication} service.
    */
   public static ServiceName forManagedProcessApplication(String applicationName) {
-    return PROCESS_APPLICATION.append(applicationName);
+    return PROCESS_APPLICATION.append("runtime").append(applicationName);
   }
   
   /**
