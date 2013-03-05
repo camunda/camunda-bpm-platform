@@ -15,6 +15,8 @@ package org.camunda.bpm.engine.impl.util;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
 
+import javax.servlet.ServletContextEvent;
+
 /**
  * @author Daniel Meyer
  * 
@@ -56,6 +58,18 @@ public class ClassLoaderUtil {
     } else {
       Thread.currentThread().setContextClassLoader(classLoader);
     }
+  }
+
+  public static ClassLoader getServletContextClassloader(final ServletContextEvent sce) {
+    if(System.getSecurityManager() != null) {
+      return AccessController.doPrivileged(new PrivilegedAction<ClassLoader>() {
+        public ClassLoader run() {
+          return sce.getServletContext().getClassLoader();
+        }
+      });
+    } else {
+      return sce.getServletContext().getClassLoader();
+    }   
   }
 
 }
