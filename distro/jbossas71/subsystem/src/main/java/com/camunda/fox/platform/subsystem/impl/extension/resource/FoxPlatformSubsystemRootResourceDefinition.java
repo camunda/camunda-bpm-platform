@@ -23,7 +23,7 @@ import org.jboss.as.controller.SimpleResourceDefinition;
 
 import com.camunda.fox.platform.subsystem.impl.extension.FoxPlatformExtension;
 import com.camunda.fox.platform.subsystem.impl.extension.ModelConstants;
-import com.camunda.fox.platform.subsystem.impl.extension.handler.FoxPlatformSubsystemAdd;
+import com.camunda.fox.platform.subsystem.impl.extension.handler.BpmPlatformSubsystemAdd;
 
 
 public class FoxPlatformSubsystemRootResourceDefinition extends SimpleResourceDefinition {
@@ -34,7 +34,7 @@ public class FoxPlatformSubsystemRootResourceDefinition extends SimpleResourceDe
 
   private FoxPlatformSubsystemRootResourceDefinition() {
       super(SUBSYSTEM_PATH, FoxPlatformExtension.getResourceDescriptionResolver(ModelConstants.SUBSYSTEM_NAME),
-              FoxPlatformSubsystemAdd.INSTANCE, ReloadRequiredRemoveStepHandler.INSTANCE);
+              BpmPlatformSubsystemAdd.INSTANCE, ReloadRequiredRemoveStepHandler.INSTANCE);
   }
   
 }

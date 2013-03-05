@@ -16,11 +16,14 @@ import java.sql.Connection;
 import java.util.Map;
 
 import org.activiti.engine.management.ActivityStatisticsQuery;
+import org.activiti.engine.management.DeploymentStatisticsQuery;
 import org.activiti.engine.management.ProcessDefinitionStatisticsQuery;
 import org.activiti.engine.management.TableMetaData;
 import org.activiti.engine.management.TablePage;
 import org.activiti.engine.management.TablePageQuery;
 import org.activiti.engine.runtime.JobQuery;
+import org.camunda.bpm.application.ProcessApplicationReference;
+import org.camunda.bpm.application.ProcessApplicationRegistration;
 
 
 
@@ -33,8 +36,33 @@ import org.activiti.engine.runtime.JobQuery;
  * @author Tom Baeyens
  * @author Joram Barrez
  * @author Falko Menge
+ * @author Thorben Lindhauer
  */
 public interface ManagementService {
+  
+  /**
+   * Activate a deployment for a given ProcessApplication. The effect of this
+   * method is twofold:
+   * <ol>
+   *   <li>The process engine will execute atomic operations within the context of
+   *       that ProcessApplication</li>
+   *   <li>The job executor will start acquiring jobs from that deployment</li>
+   * </ol>
+   * 
+   * @param deploymentId
+   *          the Id of the deployment to activate
+   * @param reference
+   *          the reference to the process application
+   * @return a new {@link ProcessApplicationRegistration}
+   */
+  ProcessApplicationRegistration registerProcessApplication(String deploymentId, ProcessApplicationReference reference);
+  
+  /**
+   * @return the name of the process application that is currently registered for
+   *         the given deployment or 'null' if no process application is
+   *         currently registered.
+   */
+  String getProcessApplicationForDeployment(String deploymentId);
 
   /**
    * Get the mapping containing {table name, row count} entries of the
@@ -105,7 +133,18 @@ public interface ManagementService {
   /** programmatic schema update on a given connection returning feedback about what happened */
   String databaseSchemaUpgrade(Connection connection, String catalog, String schema);
   
+  /**
+   * Query for the number of process instances aggregated by process definitions.
+   */
   ProcessDefinitionStatisticsQuery createProcessDefinitionStatisticsQuery();
   
-  ActivityStatisticsQuery createActivityRuntimeStatisticsQuery(String processDefinitionId);
+  /**
+   * Query for the number of process instances aggregated by deployments.
+   */
+  DeploymentStatisticsQuery createDeploymentStatisticsQuery();
+  
+  /**
+   * Query for the number of activity instances aggregated by activities of a single process definition.
+   */
+  ActivityStatisticsQuery createActivityStatisticsQuery(String processDefinitionId);
 }

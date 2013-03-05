@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+<definitions id="taskAssigneeExample" 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:activiti="http://activiti.org/bpmn"
+  targetNamespace="Examples">
+  
+  <process id="ParGatewayExampleProcess">
+  
+    <startEvent id="start"/>
+    
+    <sequenceFlow id="flow1" sourceRef="start" targetRef="gateway1" />
+    
+    <parallelGateway id="gateway1" name="" />
+		<sequenceFlow id="flow2" sourceRef="gateway1" targetRef="theTask1" />
+		<sequenceFlow id="flow3" sourceRef="gateway1" targetRef="theTask2" />
+		
+    <userTask id="theTask1" name="my task"/>
+    
+    <sequenceFlow id="flow4" sourceRef="theTask1" targetRef="gateway2" />
+    
+    <userTask id="theTask2" name="my task"/>
+    
+    <sequenceFlow id="flow5" sourceRef="theTask2" targetRef="gateway2" />
+    
+    <parallelGateway id="gateway2" name="" />
+    
+    <sequenceFlow id="flow6" sourceRef="gateway2" targetRef="theEnd" />
+    
+    <endEvent id="theEnd" />
+    
+  </process>
+</definitions>

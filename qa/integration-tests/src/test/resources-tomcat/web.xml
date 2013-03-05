@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
+
+
+  <listener>
+    <listener-class>org.jboss.weld.environment.servlet.Listener</listener-class>
+  </listener>
+
+
+  <listener>
+    <listener-class>com.camunda.fox.platform.test.util.IntegrationTestProcessApplication</listener-class>
+  </listener>
+
+  <!-- for CDI support -->
+  <resource-env-ref>
+    <resource-env-ref-name>BeanManager</resource-env-ref-name>
+    <resource-env-ref-type>javax.enterprise.inject.spi.BeanManager</resource-env-ref-type>
+  </resource-env-ref>
+
+  <!-- for accessing the process engine datasource -->
+  <resource-ref>
+    <description>Process Engine DS</description>
+    <res-ref-name>jdbc/ProcessEngine</res-ref-name>
+    <res-type>javax.sql.DataSource</res-type>    
+    <res-auth>Container</res-auth>
+  </resource-ref>
+
+</web-app>

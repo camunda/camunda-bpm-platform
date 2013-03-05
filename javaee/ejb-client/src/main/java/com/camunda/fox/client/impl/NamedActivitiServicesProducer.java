@@ -15,7 +15,6 @@
  */
 package com.camunda.fox.client.impl;
 
-import javax.ejb.EJB;
 import javax.enterprise.inject.Produces;
 import javax.enterprise.inject.spi.InjectionPoint;
 
@@ -27,11 +26,11 @@ import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
 import org.activiti.engine.TaskService;
-import org.camunda.bpm.application.spi.EjbProcessApplication;
+import org.camunda.bpm.BpmPlatform;
+import org.camunda.bpm.ProcessEngineService;
 
 import com.camunda.fox.client.ProcessEngineName;
 import com.camunda.fox.platform.FoxPlatformException;
-import com.camunda.fox.platform.api.ProcessEngineService;
 
 /**
  * This bean provides producers for the activiti services such 
@@ -46,9 +45,6 @@ import com.camunda.fox.platform.api.ProcessEngineService;
  */
 public class NamedActivitiServicesProducer {
   
-  @EJB(lookup=EjbProcessApplication.PROCESS_ENGINE_SERVICE_NAME)
-  private ProcessEngineService processEngineService;
-  
   @Produces @ProcessEngineName("") 
   public ProcessEngine processEngine(InjectionPoint ip) { 
     
@@ -58,6 +54,7 @@ public class NamedActivitiServicesProducer {
      throw new FoxPlatformException("Cannot determine which process engine to inject: @ProcessEngineName must specify the name of a process engine."); 
     }    
     try {
+      ProcessEngineService processEngineService = BpmPlatform.getProcessEngineService();
       return processEngineService.getProcessEngine(processEngineName);
     }catch (Exception e) {
       throw new FoxPlatformException("Cannot find process engine named '"+processEngineName+"' specified using @ProcessEngineName: "+e.getMessage(), e);

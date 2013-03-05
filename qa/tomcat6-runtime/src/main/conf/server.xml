@@ -27,9 +27,13 @@
   <Listener className="org.apache.catalina.core.JasperListener" />
   <!-- Prevent memory leaks due to use of particular java/javax APIs-->
   <Listener className="org.apache.catalina.core.JreMemoryLeakPreventionListener" />
+  
+  <Listener className="org.camunda.bpm.container.impl.tomcat.CamundaEngineServerListener" />
+  
   <!-- JMX Support for the Tomcat server. Documentation at /docs/non-existent.html -->
   <Listener className="org.apache.catalina.mbeans.ServerLifecycleListener" />
   <Listener className="org.apache.catalina.mbeans.GlobalResourcesLifecycleListener" />
+ 
 
   <!-- Global JNDI resources
        Documentation at /docs/jndi-resources-howto.html
@@ -43,6 +47,19 @@
               description="User database that can be updated and saved"
               factory="org.apache.catalina.users.MemoryUserDatabaseFactory"
               pathname="conf/tomcat-users.xml" />
+              
+    <Resource name="jdbc/ProcessEngine"
+              auth="Container"
+              type="javax.sql.DataSource" 
+              factory="org.apache.tomcat.jdbc.pool.DataSourceFactory"
+              uniqueResourceName="process-engine"
+              driverClassName="org.h2.Driver" 
+              url="jdbc:h2:mem:camunda-engine;MVCC=TRUE;TRACE_LEVEL_FILE=0"
+              username="sa"  
+              password=""  
+              maxPoolSize="20"  
+              minPoolSize="5" />
+        
   </GlobalNamingResources>
 
   <!-- A "Service" is a collection of one or more "Connectors" that share
@@ -57,7 +74,6 @@
     <Executor name="tomcatThreadPool" namePrefix="catalina-exec-" 
         maxThreads="150" minSpareThreads="4"/>
     -->
-    
     
     <!-- A "Connector" represents an endpoint by which requests are received
          and responses are returned. Documentation at :

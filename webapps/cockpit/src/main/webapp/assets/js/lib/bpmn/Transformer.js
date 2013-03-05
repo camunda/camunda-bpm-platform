@@ -73,6 +73,12 @@ define([], function () {
         bpmnObject[attribute.nodeName] = attribute.nodeValue;
       }
 
+      // TODO an we do this better?
+      if (bpmnObject.type == "textAnnotation") {
+        var text = element.getElementsByTagName("text")[0].firstChild.data;
+        bpmnObject["text"] = text;
+      }
+
       var bpmnDiObject = bpmnDiElementIndex[bpmnObject.id];
       if(!!bpmnDiObject) {
         bpmnObject.bpmndi = bpmnDiObject;
@@ -168,7 +174,7 @@ define([], function () {
       var child = element.firstChild;
       if(!!child) {
         do {
-          if(child.nodeName == "messageEventDefinition") {
+          if(child.nodeName.indexOf("EventDefinition") != -1) {
             eventObject.eventDefinitions.push({
               type : child.nodeName
             });
@@ -320,9 +326,10 @@ define([], function () {
         } else if(elementType == "laneSet") {
           bpmnObject = transformLaneSet(element, scopeActivity, bpmnDiElementIndex);
 
+        } else if(elementType == "subProcess") {
+          bpmnObject = transformElementsContainer(element, scopeActivity, sequenceFlows, bpmnDiElementIndex);
         } else if(!!element && element.nodeName != "sequenceFlow") {
           bpmnObject = createBpmnObject(element, scopeActivity, bpmnDiElementIndex);
-
         }
 
         if(!!bpmnObject) {
@@ -349,6 +356,17 @@ define([], function () {
       generatedElements.push(bpmnObject);
 
       invokeParseListeners(bpmnObject, processElement);
+    };
+
+    function transformElementsContainer(containerElement, scope, sequenceFlows, bpmnDiElementIndex) {
+      var containerObject = createFlowElement(containerElement, scope, sequenceFlows, bpmnDiElementIndex);
+
+      // transform a scope
+      transformScope(containerElement, containerObject, bpmnDiElementIndex);
+
+      generatedElements.push(containerObject);
+
+      invokeParseListeners(containerObject, containerElement);
     };
 
     function transformDiElementToObject(element, object) {

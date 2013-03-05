@@ -16,9 +16,11 @@ import java.sql.Connection;
 import java.util.Map;
 
 import org.activiti.engine.ManagementService;
+import org.activiti.engine.impl.cmd.ActivateDeploymentForApplicationCmd;
 import org.activiti.engine.impl.cmd.DeleteJobCmd;
 import org.activiti.engine.impl.cmd.ExecuteJobsCmd;
 import org.activiti.engine.impl.cmd.GetJobExceptionStacktraceCmd;
+import org.activiti.engine.impl.cmd.GetProcessApplicationForDeployment;
 import org.activiti.engine.impl.cmd.GetPropertiesCmd;
 import org.activiti.engine.impl.cmd.GetTableCountCmd;
 import org.activiti.engine.impl.cmd.GetTableMetaDataCmd;
@@ -29,10 +31,13 @@ import org.activiti.engine.impl.db.DbSqlSessionFactory;
 import org.activiti.engine.impl.interceptor.Command;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.management.ActivityStatisticsQuery;
+import org.activiti.engine.management.DeploymentStatisticsQuery;
 import org.activiti.engine.management.ProcessDefinitionStatisticsQuery;
 import org.activiti.engine.management.TableMetaData;
 import org.activiti.engine.management.TablePageQuery;
 import org.activiti.engine.runtime.JobQuery;
+import org.camunda.bpm.application.ProcessApplicationReference;
+import org.camunda.bpm.application.ProcessApplicationRegistration;
 
 
 /**
@@ -42,6 +47,14 @@ import org.activiti.engine.runtime.JobQuery;
  * @author Saeid Mizaei
  */
 public class ManagementServiceImpl extends ServiceImpl implements ManagementService {
+  
+  public ProcessApplicationRegistration registerProcessApplication(String deploymentId, ProcessApplicationReference reference) {    
+    return commandExecutor.execute(new ActivateDeploymentForApplicationCmd(deploymentId, reference));
+  }
+  
+  public String getProcessApplicationForDeployment(String deploymentId) {
+    return commandExecutor.execute(new GetProcessApplicationForDeployment(deploymentId));
+  }
 
   public Map<String, Long> getTableCount() {
     return commandExecutor.execute(new GetTableCountCmd());
@@ -98,8 +111,12 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
     return new ProcessDefinitionStatisticsQueryImpl(commandExecutor);
   }
   
-  public ActivityStatisticsQuery createActivityRuntimeStatisticsQuery(String processDefinitionId) {
+  public ActivityStatisticsQuery createActivityStatisticsQuery(String processDefinitionId) {
     return new ActivityStatisticsQueryImpl(processDefinitionId, commandExecutor);
+  }
+  
+  public DeploymentStatisticsQuery createDeploymentStatisticsQuery() {
+    return new DeploymentStatisticsQueryImpl(commandExecutor);
   }
 
 }

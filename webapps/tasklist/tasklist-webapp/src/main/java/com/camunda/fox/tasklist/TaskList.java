@@ -8,7 +8,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.annotation.PostConstruct;
-import javax.ejb.EJB;
 import javax.enterprise.event.Observes;
 import javax.faces.bean.ViewScoped;
 import javax.faces.context.FacesContext;
@@ -17,6 +16,7 @@ import javax.inject.Named;
 import javax.servlet.http.HttpServletRequest;
 
 import org.activiti.engine.FormService;
+import org.activiti.engine.ManagementService;
 import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.TaskService;
@@ -25,10 +25,10 @@ import org.activiti.engine.form.TaskFormData;
 import org.activiti.engine.repository.ProcessDefinition;
 import org.activiti.engine.task.Task;
 import org.activiti.engine.task.TaskQuery;
+import org.camunda.bpm.BpmPlatform;
+import org.camunda.bpm.ProcessApplicationService;
+import org.camunda.bpm.application.ProcessApplicationInfo;
 
-import com.camunda.fox.client.impl.ProcessArchiveSupport;
-import com.camunda.fox.platform.api.ProcessArchiveService;
-import com.camunda.fox.platform.spi.ProcessArchive;
 import com.camunda.fox.tasklist.api.TaskListIdentity;
 import com.camunda.fox.tasklist.api.TaskNavigationLink;
 import com.camunda.fox.tasklist.api.TasklistIdentityService;
@@ -49,12 +49,12 @@ public class TaskList implements Serializable {
 
   @Inject
   private RepositoryService repositoryService;
+  
+  @Inject
+  private ManagementService managementService;
 
   @Inject
   private FormService formService;
-
-  @EJB(lookup = ProcessArchiveSupport.PROCESS_ARCHIVE_SERVICE_NAME)
-  private ProcessArchiveService processArchiveService;
 
   @Inject
   private ProcessEngine processEngine;
@@ -146,7 +146,10 @@ public class TaskList implements Serializable {
     if (taskFormData == null || taskFormData.getFormKey() == null) {
       return null;
     } else {
-      return getFormUrl(task.getProcessDefinitionId(), taskFormData.getFormKey(), "taskId=" + task.getId());
+      
+      ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().processDefinitionId(task.getProcessDefinitionId()).singleResult();
+      
+      return getFormUrl(processDefinition, taskFormData.getFormKey(), "taskId=" + task.getId());
     }
   }
 
@@ -167,19 +170,37 @@ public class TaskList implements Serializable {
     if (startFormData == null || startFormData.getFormKey() == null) {
       return null;
     } else {
-      return getFormUrl(processDefinition.getId(), startFormData.getFormKey(), "processDefinitionKey=" + processDefinition.getKey());
+      return getFormUrl(processDefinition, startFormData.getFormKey(), "processDefinitionKey=" + processDefinition.getKey());
     }
   }
 
-  private String getFormUrl(String processDefinitionId, String formKey, String urlParameters) {
+  private String getFormUrl(ProcessDefinition processDefinition, String formKey, String urlParameters) {
     try {
-      ProcessArchive processArchive = processArchiveService.getProcessArchiveByProcessDefinitionId(processDefinitionId, processEngine.getName());
-      String contextPath = (String) processArchive.getProperties().get(ProcessArchive.PROP_SERVLET_CONTEXT_PATH);
-      String callbackUrl = getRequestURL();
-      return "../.." + contextPath + "/" + getTaskFormKeyWithSuffix(formKey) + "?" + urlParameters + "&callbackUrl=" + callbackUrl;
+            
+      // get the name of the process application that made the deployment
+      String processApplicationName = managementService.getProcessApplicationForDeployment(processDefinition.getDeploymentId());
+      
+      if(processApplicationName == null) {
+        // no a process application deployment
+        return null;
+      } else {
+        ProcessApplicationService processApplicationService = BpmPlatform.getProcessApplicationService();
+        ProcessApplicationInfo processApplicationInfo = processApplicationService.getProcessApplicationInfo(processApplicationName);
+      
+        String contextPath = processApplicationInfo.getProperties().get(ProcessApplicationInfo.PROP_SERVLET_CONTEXT_PATH);
+        
+        if(contextPath == null) {
+          // this process application does not publish its context path
+          return null;
+          
+        } else {
+          String callbackUrl = getRequestURL();
+          return "../.." + contextPath + "/" + getTaskFormKeyWithSuffix(formKey) + "?" + urlParameters + "&callbackUrl=" + callbackUrl;
+        }
+      }
     } catch (Exception ex) {
-      log.log(Level.INFO, "Could not resolve context path for process definition " + processDefinitionId);
-      log.log(Level.FINER, "Could not resolve context path for process definition " + processDefinitionId, ex);
+      log.log(Level.INFO, "Could not resolve context path for process definition " + processDefinition);
+      log.log(Level.FINER, "Could not resolve context path for process definition " + processDefinition, ex);
       return null;
     }
 

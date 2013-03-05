@@ -40,10 +40,9 @@ import org.jboss.msc.service.ServiceController.Mode;
 
 import com.camunda.fox.platform.FoxPlatformException;
 import com.camunda.fox.platform.subsystem.impl.service.ContainerJobExecutorService;
-import com.camunda.fox.platform.subsystem.impl.service.ContainerPlatformService;
 
 /**
- * Provides the description and the implementation of the process-engine#add operation.
+ * Installs the JobExecutor service into the container.
  * 
  */
 public class JobExecutorAdd extends AbstractAddStepHandler implements DescriptionProvider {
@@ -87,7 +86,6 @@ public class JobExecutorAdd extends AbstractAddStepHandler implements Descriptio
     ContainerJobExecutorService service = new ContainerJobExecutorService();
     ServiceController<ContainerJobExecutorService> serviceController = context.getServiceTarget().addService(ContainerJobExecutorService.getServiceName(), service)
         .addDependency(ThreadsServices.EXECUTOR.append(jobExecutorThreadPoolName), ManagedQueueExecutorService.class, service.getManagedQueueInjector())
-        .addDependency(ContainerPlatformService.getServiceName(), ContainerPlatformService.class, service.getContainerPlatformServiceInjector())
         .addListener(verificationHandler)
         .setInitialMode(Mode.ACTIVE)
         .install();

@@ -53,6 +53,7 @@ public class DevEnvironmentSetup implements ProcessEngineProvider {
       .createDeployment()
       .addClasspathResource("processes/fox-invoice_en.bpmn")
       .addClasspathResource("processes/fox-invoice_en_long_id.bpmn")
+      .addClasspathResource("processes/collaboration_scroll.bpmn")
       .deploy();
     
     RuntimeService runtimeService = processEngine.getRuntimeService();

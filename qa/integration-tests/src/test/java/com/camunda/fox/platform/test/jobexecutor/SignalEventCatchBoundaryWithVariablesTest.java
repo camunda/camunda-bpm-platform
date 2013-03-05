@@ -37,8 +37,7 @@ public class SignalEventCatchBoundaryWithVariablesTest extends AbstractFoxPlatfo
             .addClass(SendSignalDelegate.class)
             .addClass(SignalReceivedDelegate.class)
             .addAsResource("com/camunda/fox/platform/test/jobexecutor/SignalEventCatchBoundaryWithVariablesTest.catchAlertSignalBoundaryWithReceiveTask.bpmn20.xml")
-            .addAsResource("com/camunda/fox/platform/test/jobexecutor/SignalEventCatchBoundaryWithVariablesTest.throwAlertSignalWithDelegate.bpmn20.xml")
-            .addAsWebInfResource("persistence.xml", "classes/META-INF/persistence.xml");
+            .addAsResource("com/camunda/fox/platform/test/jobexecutor/SignalEventCatchBoundaryWithVariablesTest.throwAlertSignalWithDelegate.bpmn20.xml");
   }
 
   @Inject

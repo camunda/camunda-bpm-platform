@@ -2,7 +2,6 @@ package com.camunda.fox.platform.test.deployment.war;
 
 import org.jboss.arquillian.container.test.api.Deployer;
 import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.container.test.api.RunAsClient;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.arquillian.test.api.ArquillianResource;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
@@ -13,6 +12,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import com.camunda.fox.platform.test.util.DeploymentHelper;
+import com.camunda.fox.platform.test.util.TestContainer;
 
 /**
  * In this test we make sure that if a user deploys a WAR file with a broken
@@ -32,15 +32,18 @@ public class TestWarDeploymentWithBrokenBpmnXml {
   @Deployment(managed=false, name=DEPLOYMENT)
   public static WebArchive processArchive() {    
     
-    return  ShrinkWrap.create(WebArchive.class, "test.war")
+    WebArchive deployment = ShrinkWrap.create(WebArchive.class, "test.war")
       .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
       .addAsLibraries(DeploymentHelper.getFoxPlatformClient())
       .addAsResource("META-INF/processes.xml", "META-INF/processes.xml")
-      .addAsResource("com/camunda/fox/platform/test/deployment/war/TestWarDeploymentWithBrokenBpmnXml.testXmlInvalid.bpmn20.xml");           
+      .addAsResource("com/camunda/fox/platform/test/deployment/war/TestWarDeploymentWithBrokenBpmnXml.testXmlInvalid.bpmn20.xml");
+    
+    TestContainer.addContainerSpecificResources(deployment);
+    
+    return deployment;
   }
   
   @Test
-  @RunAsClient
   public void testXmlInvalid() {
     try {
       deployer.deploy(DEPLOYMENT);

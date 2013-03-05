@@ -507,5 +507,5 @@ public abstract class ProcessEngineConfiguration {
   public void setDataSourceJndiName(String dataSourceJndiName) {
     this.dataSourceJndiName = dataSourceJndiName;
   }
-
+  
 }

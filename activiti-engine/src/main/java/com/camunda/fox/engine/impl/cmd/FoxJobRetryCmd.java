@@ -2,8 +2,6 @@ package com.camunda.fox.engine.impl.cmd;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
-import java.util.Arrays;
-import java.util.List;
 
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.impl.calendar.DurationHelper;

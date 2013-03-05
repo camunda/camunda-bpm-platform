@@ -12,7 +12,7 @@ import org.activiti.engine.impl.interceptor.CommandExecutor;
 import org.activiti.engine.impl.jobexecutor.JobExecutor;
 
 import com.camunda.fox.platform.FoxPlatformException;
-import com.camunda.fox.platform.jobexecutor.api.PlatformJobExecutorService;
+import com.camunda.fox.platform.jobexecutor.JobExecutorService;
 import com.camunda.fox.platform.jobexecutor.impl.acquisition.JobAcquisition;
 import com.camunda.fox.platform.jobexecutor.impl.acquisition.PlatformJobExecutorDelegate;
 import com.camunda.fox.platform.jobexecutor.impl.acquisition.SequentialJobAcquisition;
@@ -20,13 +20,13 @@ import com.camunda.fox.platform.jobexecutor.spi.JobAcquisitionConfiguration;
 import com.camunda.fox.platform.jobexecutor.spi.JobAcquisitionStrategy;
 
 /**
- * <p>Abstract implementation of the {@link PlatformJobExecutorService} API</p>
+ * <p>Abstract implementation of the {@link JobExecutorService} API</p>
  * 
  * <p>Actual thread management is delegated to subclasses</p>
  * 
  * @author Daniel Meyer
  */
-public abstract class PlatformJobExecutor implements PlatformJobExecutorService {
+public abstract class PlatformJobExecutor implements JobExecutorService {
 
   protected Map<String, JobAcquisition> jobAcquisitionsByName = new HashMap<String, JobAcquisition>();
   
@@ -68,7 +68,6 @@ public abstract class PlatformJobExecutor implements PlatformJobExecutorService 
     discoveredStrategies = null;
   }
   
-  @Override
   public synchronized JobAcquisition startJobAcquisition(JobAcquisitionConfiguration configuration) {
     String acquisitionName = configuration.getAcquisitionName();
     JobAcquisition jobAcquisition = jobAcquisitionsByName.get(acquisitionName);
@@ -97,7 +96,6 @@ public abstract class PlatformJobExecutor implements PlatformJobExecutorService 
     return acquisition;
   }
 
-  @Override
   public synchronized void stopJobAcquisition(String jobAcquisitionName) {
     JobAcquisition jobAcquisition = jobAcquisitionsByName.get(jobAcquisitionName);
     if (jobAcquisition == null) {
@@ -108,7 +106,6 @@ public abstract class PlatformJobExecutor implements PlatformJobExecutorService 
   }
 
 
-  @Override
   public synchronized JobExecutor registerProcessEngine(ProcessEngineConfigurationImpl processEngineConfiguration, String acquisitionName) {
     JobAcquisition jobAcquisition = jobAcquisitionsByName.get(acquisitionName);
     if (jobAcquisition == null) {
@@ -123,7 +120,6 @@ public abstract class PlatformJobExecutor implements PlatformJobExecutorService 
     return new PlatformJobExecutorDelegate(this, acquisitionName);
   }
 
-  @Override
   public synchronized void unregisterProcessEngine(ProcessEngineConfigurationImpl processEngineConfiguration, String acquisitionName) {
     JobAcquisition jobAcquisition = jobAcquisitionsByName.get(acquisitionName);
     if (jobAcquisition == null) {

@@ -7,6 +7,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.activiti.engine.impl.interceptor.CommandExecutor;
+import org.activiti.engine.impl.jobexecutor.JobExecutor;
 import org.jboss.as.threads.ManagedQueueExecutorService;
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.ServiceName;
@@ -18,6 +19,7 @@ import org.jboss.threads.ExecutionTimedOutException;
 
 import com.camunda.fox.platform.FoxPlatformException;
 import com.camunda.fox.platform.jobexecutor.impl.PlatformJobExecutor;
+import com.camunda.fox.platform.subsystem.impl.metadata.ManagedProcessEngineMetadata;
 import com.camunda.fox.platform.subsystem.impl.service.execution.ContainerExecuteJobsRunnable;
 
 public class ContainerJobExecutorService extends PlatformJobExecutor implements Service<ContainerJobExecutorService> {
@@ -25,7 +27,6 @@ public class ContainerJobExecutorService extends PlatformJobExecutor implements 
   private static Logger log = Logger.getLogger(ContainerJobExecutorService.class.getName());
   
   private final InjectedValue<ManagedQueueExecutorService> managedQueueInjector = new InjectedValue<ManagedQueueExecutorService>();
-  private final InjectedValue<ContainerPlatformService> containerPlatformServiceInjector = new InjectedValue<ContainerPlatformService>();
   
   private long lastWarningLogged = System.currentTimeMillis();
 
@@ -51,13 +52,12 @@ public class ContainerJobExecutorService extends PlatformJobExecutor implements 
 
   public void executeJobs(List<String> jobIds, CommandExecutor commandExecutor) {
     final ManagedQueueExecutorService managedQueueExecutorService = managedQueueInjector.getValue();
-    final ContainerPlatformService containerPlatformService = containerPlatformServiceInjector.getValue();
 
     boolean rejected = false;
     try {
       
       // wait for 2 seconds for the job to be accepted by the pool.
-      managedQueueExecutorService.executeBlocking(new ContainerExecuteJobsRunnable(jobIds, commandExecutor, containerPlatformService), 2, TimeUnit.SECONDS);
+      managedQueueExecutorService.executeBlocking(new ContainerExecuteJobsRunnable(jobIds, commandExecutor), 2, TimeUnit.SECONDS);
       
     } catch (InterruptedException e) {
       // the acquisition thread is interrupted, this probably means the app server is turning the lights off -> ignore          
@@ -79,7 +79,7 @@ public class ContainerJobExecutorService extends PlatformJobExecutor implements 
     if(rejected) {
       // if the job is rejected, execute in the caller thread (Acquisition Thread)
       // TODO: check rejectedExecutionException policy, see DefaultPlatformJobExecutor.class
-      new ContainerExecuteJobsRunnable(jobIds, commandExecutor, containerPlatformService).run();
+      new ContainerExecuteJobsRunnable(jobIds, commandExecutor).run();
     }
   }
 
@@ -108,9 +108,15 @@ public class ContainerJobExecutorService extends PlatformJobExecutor implements 
   public InjectedValue<ManagedQueueExecutorService> getManagedQueueInjector() {
     return managedQueueInjector;
   }
-  
-  public InjectedValue<ContainerPlatformService> getContainerPlatformServiceInjector() {
-    return containerPlatformServiceInjector;
+
+  /**
+   * @param processEngineMetadata
+   * @param jobAcquisitionName
+   * @return
+   */
+  public JobExecutor registerProcessEngine(ManagedProcessEngineMetadata processEngineMetadata, String jobAcquisitionName) {
+    // TODO Auto-generated method stub
+    return null;
   }
-  
+    
 }

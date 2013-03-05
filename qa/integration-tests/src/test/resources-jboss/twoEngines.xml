@@ -1,27 +1,23 @@
-<process-engines>
+<?xml version="1.0" encoding="UTF-8"?>
+<process-application
+  xmlns="http://www.camunda.org/schema/1.0/ProcessApplication"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.camunda.org/schema/1.0/ProcessApplication http://www.camunda.org/schema/1.0/ProcessApplication ">
 
-  <process-engine name="engine2" default="false">
-
+  <process-engine name="engine2">
+    <job-acquisition>default</job-acquisition>
     <datasource>java:jboss/datasources/FoxEngineDS</datasource>
-    <history-level>full</history-level>
-    
     <properties>
-      <!--property name="isAutoSchemaUpdate">false</property-->
-      <property name="isActivateJobExecutor">false</property>
+      <property name="history">full</property>
     </properties>
-    
-  </process-engine>
-  
-    <process-engine name="engine3" default="false">
-
-    <datasource>java:jboss/datasources/FoxEngineDS</datasource>
-    <history-level>full</history-level>
-    
-    <properties>
-      <!--property name="isAutoSchemaUpdate">false</property-->
-      <property name="isActivateJobExecutor">false</property>
-    </properties>
-    
   </process-engine>
 
-</process-engines>
+  <process-engine name="engine3">
+    <job-acquisition>default</job-acquisition>
+    <datasource>java:jboss/datasources/FoxEngineDS</datasource>
+    <properties>
+      <property name="history">full</property>
+    </properties>
+  </process-engine>
+
+</process-application>

@@ -14,85 +14,64 @@ package org.camunda.bpm.engine.impl.application;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.locks.ReentrantLock;
 
 import org.activiti.engine.ActivitiException;
-import org.camunda.bpm.application.spi.ProcessApplicationReference;
-import org.camunda.bpm.engine.application.ProcessApplicationRegistration;
+import org.activiti.engine.impl.context.Context;
+import org.camunda.bpm.application.ProcessApplicationReference;
+import org.camunda.bpm.application.ProcessApplicationRegistration;
 
 /**
  * @author Daniel Meyer
- *
+ * 
  */
 public class ProcessApplicationManager {
-  
-    protected ReentrantLock lock = new ReentrantLock();
 
-    protected Map<String, DefaultProcessApplicationRegistration> registrationsByDeploymentId = new HashMap<String, DefaultProcessApplicationRegistration>();
-    
-    public ProcessApplicationReference getProcessApplicationForDeployment(String deploymentId) {
-      DefaultProcessApplicationRegistration registration = registrationsByDeploymentId.get(deploymentId);
-      if(registration != null) {
-        return registration.getProcessApplicationReference();
-      } else {
-        return null;
-      }
+  protected Map<String, DefaultProcessApplicationRegistration> registrationsByDeploymentId = new HashMap<String, DefaultProcessApplicationRegistration>();
+
+  public ProcessApplicationReference getProcessApplicationForDeployment(String deploymentId) {
+    DefaultProcessApplicationRegistration registration = registrationsByDeploymentId.get(deploymentId);
+    if (registration != null) {
+      return registration.getReference();
+    } else {
+      return null;
     }
-    
-    /**
-     * Register a deployment for a given {@link ProcessApplicationReference}.
-     * 
-     * @param deploymentId
-     * @param reference
-     * @return
-     */
-    public ProcessApplicationRegistration registerProcessApplicationForDeployment(String deploymentId, ProcessApplicationReference reference) {
+  }
 
-      String paName = reference.getName();
+  /**
+   * Register a deployment for a given {@link ProcessApplicationReference}.
+   * 
+   * @param deploymentId
+   * @param reference
+   * @return
+   */
+  public ProcessApplicationRegistration registerProcessApplicationForDeployment(String deploymentId, ProcessApplicationReference reference) {
+
+    DefaultProcessApplicationRegistration registration = registrationsByDeploymentId.get(deploymentId);
+    
+    if(registration == null) {
+      String processEngineName = Context.getProcessEngineConfiguration().getProcessEngineName();
+      registration = new DefaultProcessApplicationRegistration(this, reference, deploymentId, processEngineName);
+      registrationsByDeploymentId.put(deploymentId, registration);
+      return registration;
       
-      DefaultProcessApplicationRegistration registration = registrationsByDeploymentId.get(paName);
-      
-      if(registration != null && paName.equals(registration.getProcessApplicationReference().getName())) {
-        // already registered -> return existing registration
-        return registration;
-        
-      } else if(registration != null && !paName.equals(registration.getProcessApplicationReference().getName())) {
-        // deployment already registered for different PA -> fail
-        throw new ActivitiException("cannot register deployment with id '" + deploymentId + "' for process application '" + paName
-            + "'. Deployment already registered for application '" + registration.getProcessApplicationReference().getName());
-      
-      } else { // registration = null 
+    } else {
+      throw new ActivitiException("Cannot register process application for deploymentId '" + deploymentId
+          + "' there already is a registration for the same deployment.");
 
-        // create new registration
+    }
+  }
 
-        registration = new DefaultProcessApplicationRegistration(this, reference, deploymentId);
+  /**
+   * @return the IDs of all deployments that are currently associated with a
+   *         process application
+   */
+  public String[] getActiveDeploymentIds() {
+    return registrationsByDeploymentId.keySet().toArray(new String[0]);
+  }
 
-        registrationsByDeploymentId.put(deploymentId, registration);
-        
-        return registration;
-      }
-    }
-    
-    /**
-     * @return the IDs of all deployments that are currently associated with a process application
-     */
-    public String[] getActiveDeploymentIds() {
-      return registrationsByDeploymentId.keySet().toArray(new String[0]);
-    }
+  public boolean removeProcessApplication(String deploymentId) {
+    // remove reference
+    return registrationsByDeploymentId.remove(deploymentId) != null;
+  }
 
-    public boolean removeProcessApplication(String deploymentId) {
-            
-      // remove reference
-      return registrationsByDeploymentId.remove(deploymentId) != null;
-      
-    }
-    
-    public void arquireLock() {
-      lock.lock();
-    }
-    
-    public void releaseLock() {
-      lock.unlock();
-    }
-    
 }

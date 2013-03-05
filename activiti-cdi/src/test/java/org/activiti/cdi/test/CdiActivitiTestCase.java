@@ -21,7 +21,6 @@ import javax.enterprise.inject.spi.BeanManager;
 
 import org.activiti.cdi.BusinessProcess;
 import org.activiti.cdi.impl.util.ProgrammaticBeanLookup;
-import org.activiti.cdi.test.util.ProcessEngineLookupForTestsuite;
 import org.activiti.engine.ActivitiException;
 import org.activiti.engine.FormService;
 import org.activiti.engine.HistoryService;
@@ -35,6 +34,8 @@ import org.activiti.engine.impl.ProcessEngineImpl;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.jobexecutor.JobExecutor;
 import org.activiti.engine.test.ActivitiRule;
+import org.camunda.bpm.BpmPlatform;
+import org.camunda.bpm.container.RuntimeContainerDelegate;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
@@ -63,7 +64,7 @@ public abstract class CdiActivitiTestCase {
   }
   
   @Rule
-  public ActivitiRule activitiRule = new ActivitiRule(getBeanInstance(ProcessEngine.class));
+  public ActivitiRule activitiRule = new ActivitiRule();
 
   protected BeanManager beanManager;
   
@@ -78,11 +79,15 @@ public abstract class CdiActivitiTestCase {
   protected ProcessEngineConfigurationImpl processEngineConfiguration;
 
   @Before
-  public void setUp() throws Exception {    
+  public void setUp() throws Exception { 
+    
+    if(BpmPlatform.getProcessEngineService().getDefaultProcessEngine() == null) {
+      RuntimeContainerDelegate.INSTANCE.get().registerProcessEngine(activitiRule.getProcessEngine());
+    }
     
     beanManager = ProgrammaticBeanLookup.lookup(BeanManager.class);
     processEngine = ProgrammaticBeanLookup.lookup(ProcessEngine.class);
-    processEngineConfiguration = ((ProcessEngineImpl)ProcessEngineLookupForTestsuite.processEngine).getProcessEngineConfiguration();
+    processEngineConfiguration = ((ProcessEngineImpl)BpmPlatform.getProcessEngineService().getDefaultProcessEngine()).getProcessEngineConfiguration();
     formService = processEngine.getFormService();
     historyService = processEngine.getHistoryService();
     identityService = processEngine.getIdentityService();
@@ -91,7 +96,7 @@ public abstract class CdiActivitiTestCase {
     runtimeService = processEngine.getRuntimeService();
     taskService = processEngine.getTaskService();        
   }
-  
+
   protected void endConversationAndBeginNew(String processInstanceId) {
     getBeanInstance(BusinessProcess.class).associateExecutionById(processInstanceId);
   }

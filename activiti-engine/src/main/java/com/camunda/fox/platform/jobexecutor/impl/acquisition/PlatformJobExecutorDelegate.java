@@ -8,7 +8,8 @@ import org.activiti.engine.impl.jobexecutor.AcquiredJobs;
 import org.activiti.engine.impl.jobexecutor.JobExecutor;
 import org.activiti.engine.impl.jobexecutor.RejectedJobsHandler;
 
-import com.camunda.fox.platform.jobexecutor.api.PlatformJobExecutorService;
+import com.camunda.fox.platform.jobexecutor.JobExecutorService;
+
 
 /**
  * <p>Delegates to a {@link JobAcquisition}. This delegate JobExecutor is passed to
@@ -22,10 +23,10 @@ import com.camunda.fox.platform.jobexecutor.api.PlatformJobExecutorService;
  */
 public class PlatformJobExecutorDelegate extends JobExecutor {
 
-  protected final PlatformJobExecutorService platformJobExecutor;
+  protected final JobExecutorService platformJobExecutor;
   protected final String acquisitionName;
   
-  public PlatformJobExecutorDelegate(PlatformJobExecutorService platformJobExecutor, String acquisitionName) {
+  public PlatformJobExecutorDelegate(JobExecutorService platformJobExecutor, String acquisitionName) {
     this.platformJobExecutor = platformJobExecutor;
     this.acquisitionName = acquisitionName;
   }

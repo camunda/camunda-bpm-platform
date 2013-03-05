@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<process-application
+  xmlns="http://www.camunda.org/schema/1.0/ProcessApplication"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.camunda.org/schema/1.0/ProcessApplication">
+
+  <process-engine name="engine1">
+    <job-acquisition>default</job-acquisition>
+    <configuration>configuration</configuration>
+    <datasource>datasource</datasource>
+    <properties>
+        <property name="prop1">value1</property>
+        <property name="prop2">value2</property>
+    </properties>
+  </process-engine>
+  
+  <process-engine name="engine2">
+    <job-acquisition>default</job-acquisition>
+    <configuration>configuration</configuration>
+    <datasource>datasource</datasource>   
+  </process-engine>
+
+</process-application>

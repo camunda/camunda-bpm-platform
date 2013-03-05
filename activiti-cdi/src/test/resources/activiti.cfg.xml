@@ -6,8 +6,8 @@
 
 	<bean id="processEngineConfiguration"
 		class="org.activiti.cdi.CdiStandaloneProcessEngineConfiguration">
-
-		<property name="jdbcUrl" value="jdbc:h2:mem:activiti" />
+    
+        <property name="jdbcUrl" value="jdbc:h2:mem:activiti" />
 		<property name="databaseSchemaUpdate" value="true" />				
 		<property name="jobExecutorActivate" value="false" />
 		<property name="mailServerPort" value="5025" />

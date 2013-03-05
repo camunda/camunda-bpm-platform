@@ -28,8 +28,12 @@ import java.io.InputStream;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
 import java.nio.channels.ReadableByteChannel;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.impl.bpmn.diagram.ProcessDiagramLayoutFactory;
@@ -218,7 +222,11 @@ public class ProcessDiagramRetrievalTest {
     html.append("  <body>\n");
     html.append("    <div style=\"position: relative\">\n");
     html.append("      <img src=\"" + imageUrl + "\" />\n");
-    for (DiagramNode node : processDiagramLayout.getNodes()) {
+    
+    List<DiagramNode> nodes = new ArrayList<DiagramNode>(processDiagramLayout.getNodes());
+    // sort the nodes according to their ID property.
+    Collections.sort(nodes, new DiagramNodeComparator());    
+    for (DiagramNode node : nodes) {
       html.append("      <div");
       html.append(" class=\"BPMNElement\"");
       html.append(" id=\"" + node.getId() + "\"");
@@ -280,6 +288,20 @@ public class ProcessDiagramRetrievalTest {
     }
     is.close();
     out.close();
+  }
+  
+  /**
+   * sorts {@link DiagramNode DiagramNodes} by ID 
+   */
+  public static class DiagramNodeComparator implements Comparator<DiagramNode> {
+
+    public int compare(DiagramNode o1, DiagramNode o2) {
+      if(o1.getId() == null)  {
+        return 0;
+      }
+      return o1.getId().compareTo(o2.getId());
+    }
+    
   }
 
 }

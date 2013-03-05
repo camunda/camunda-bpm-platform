@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 package com.camunda.fox.platform.test.functional.cdi;
-import javax.transaction.SystemException;
-
 import org.activiti.cdi.impl.util.BeanManagerLookup;
 import org.activiti.cdi.impl.util.ProgrammaticBeanLookup;
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -30,6 +28,7 @@ import org.junit.runner.RunWith;
 
 import com.camunda.fox.platform.test.functional.cdi.beans.ExampleDelegateBean;
 import com.camunda.fox.platform.test.util.AbstractFoxPlatformIntegrationTest;
+import com.camunda.fox.platform.test.util.TestContainer;
 
 /**
  * <p>Deploys two different applications, a process archive and a cleint application.</p>
@@ -54,11 +53,15 @@ public class CdiDelegateBeanResolutionTest extends AbstractFoxPlatformIntegratio
   
   @Deployment(name="clientDeployment")
   public static WebArchive clientDeployment() {    
-    return ShrinkWrap.create(WebArchive.class, "client.war")
+     WebArchive webArchive = ShrinkWrap.create(WebArchive.class, "client.war")
             .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
             .addClass(ProgrammaticBeanLookup.class)
             .addClass(BeanManagerLookup.class)
             .addClass(AbstractFoxPlatformIntegrationTest.class);
+     
+     TestContainer.addContainerSpecificResources(webArchive);
+     
+     return webArchive;
   }
     
   @Test
@@ -68,7 +71,7 @@ public class CdiDelegateBeanResolutionTest extends AbstractFoxPlatformIntegratio
       // assert that we cannot resolve the bean here:
       ProgrammaticBeanLookup.lookup("exampleDelegateBean");
       Assert.fail("exception expected");
-    }catch (Exception e) {
+    }catch (Throwable e) {
       // expected
     }
     
@@ -81,7 +84,7 @@ public class CdiDelegateBeanResolutionTest extends AbstractFoxPlatformIntegratio
   
   @Test
   @OperateOnDeployment("clientDeployment")
-  public void testResolveBeanFromJobExecutor() throws InterruptedException, SystemException {
+  public void testResolveBeanFromJobExecutor() {
    
     Assert.assertEquals(0,runtimeService.createProcessInstanceQuery().count());
     runtimeService.startProcessInstanceByKey("testResolveBeanFromJobExecutor");

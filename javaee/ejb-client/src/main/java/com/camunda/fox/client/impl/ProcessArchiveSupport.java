@@ -15,6 +15,8 @@
  */
 package com.camunda.fox.client.impl;
 
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
@@ -25,7 +27,8 @@ import javax.ejb.Startup;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 
-import org.camunda.bpm.application.spi.EjbProcessApplication;
+import org.camunda.bpm.application.ProcessApplication;
+import org.camunda.bpm.application.impl.EjbProcessApplication;
 
 
 /**
@@ -33,27 +36,27 @@ import org.camunda.bpm.application.spi.EjbProcessApplication;
  * @author Daniel Meyer
  * 
  */
-//singleton bean guarantees maximum efficiency
 @Singleton
 @Startup
-//make sure the container does not synchronize access to this bean
 @ConcurrencyManagement(ConcurrencyManagementType.BEAN) 
 @TransactionAttribute(TransactionAttributeType.SUPPORTS)
-@Deprecated
+@ProcessApplication
 public class ProcessArchiveSupport extends EjbProcessApplication {
   
-  public static final String PROCESS_ARCHIVE_SERVICE_NAME = EjbProcessApplication.PROCESS_ENGINE_SERVICE_NAME;
-
-  public static final String PROCESS_ENGINE_SERVICE_NAME = EjbProcessApplication.PROCESS_ARCHIVE_SERVICE_NAME;
+  protected Map<String, String> properties = new HashMap<String, String>();
   
   @PostConstruct
-  public void start() {
-    super.start();
+  public void deploy() {
+    super.deploy();
   }
 
   @PreDestroy
-  public void stop() {
-    super.stop();
+  public void undeploy() {
+    super.undeploy();
+  }
+  
+  public Map<String, String> getProperties() {
+    return properties;
   }
     
 }

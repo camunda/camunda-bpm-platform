@@ -26,6 +26,9 @@
     <module name="org.jboss.as.weld" />
     <module name="org.jboss.as.naming" />
     <module name="org.jboss.as.connector" />
+    <module name="org.jboss.as.ee" />
+    <module name="org.jboss.as.ejb3" />
+    <module name="org.jboss.metadata" />
         
     <module name="com.camunda.fox.engine.fox-engine" />
     

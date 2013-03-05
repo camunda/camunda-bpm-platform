@@ -84,13 +84,13 @@
   	<module>activiti-cdi</module>
   	<module>activiti-osgi</module>
   	<module>activiti-spring</module>
-  	
-  	<module>camunda-engine-rest</module>
-  	
-  	<module>distro/jbossas71</module>
+  		
+	<module>camunda-engine-rest</module>
+
+    <module>distro/jbossas71</module>
     <module>distro/gf31</module>
     <module>distro/tomcat6</module>
-  	<module>distro/sql-script</module>
+    <module>distro/sql-script</module>
 	
   </modules>
   
@@ -480,13 +480,12 @@
         <groupId>org.bouncycastle</groupId>
         <artifactId>bcpg-jdk15on</artifactId>
         <version>${version.bouncycastle}</version>
-      </dependency> 
-      
-      <!-- websphere dependencies -->
+      </dependency>
+
       <dependency>
-        <groupId>com.bea.commonj</groupId>
-        <artifactId>com.springsource.commonj</artifactId>
-        <version>${version.commonj}</version>
+        <groupId>org.apache.tomcat</groupId>
+        <artifactId>catalina</artifactId>
+        <version>6.0.36</version>
       </dependency>
 
       <dependency>

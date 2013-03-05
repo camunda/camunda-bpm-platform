@@ -52,7 +52,7 @@ import org.activiti.engine.impl.persistence.entity.UserManager;
 import org.activiti.engine.impl.persistence.entity.VariableInstanceManager;
 import org.activiti.engine.impl.pvm.runtime.AtomicOperation;
 import org.activiti.engine.impl.pvm.runtime.InterpretableExecution;
-import org.camunda.bpm.application.spi.ProcessApplicationReference;
+import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.engine.impl.application.ProcessApplicationManager;
 
 /**
@@ -127,8 +127,12 @@ public class CommandContext {
   }
   
   protected boolean requiresContextSwitch(final AtomicOperation executionOperation, ProcessApplicationReference processApplicationReference) {
-    return processApplicationReference != null
-      && (processApplicationReference.getName() != Context.getCurrentProcessApplication());
+    
+    final ProcessApplicationReference currentProcessApplication = Context.getCurrentProcessApplication();
+    
+    return processApplicationReference != null 
+      && ( currentProcessApplication == null || !processApplicationReference.getName().equals(currentProcessApplication.getName()) );
+    
   }
 
   public void close() {

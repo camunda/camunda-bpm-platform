@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<process-application
+  xmlns="http://www.camunda.org/schema/1.0/ProcessApplication"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.camunda.org/schema/1.0/ProcessApplication http://www.camunda.org/schema/1.0/ProcessApplication ">
+
+  <process-engine name="engine1">
+    <job-acquisition>default</job-acquisition>
+    <configuration>configuration</configuration>
+    <datasource>datasource</datasource>
+    <properties>
+      <property name="prop1">value1</property>
+      <property name="prop2">value2</property>
+    </properties>
+  </process-engine>
+
+  <process-engine name="engine2">
+    <job-acquisition>default</job-acquisition>
+    <configuration>configuration</configuration>
+    <datasource>datasource</datasource>
+  </process-engine>
+
+  <process-archive name="pa1">
+    <process-engine>default</process-engine>
+    <process>process1.bpmn</process>
+    <process>process2.bpmn</process>
+    <properties>
+      <property name="prop1">value1</property>
+      <property name="prop2">value2</property>
+    </properties>
+  </process-archive>
+
+  <process-archive name="pa2">
+    <process-engine>default</process-engine>
+    <process>process1.bpmn</process>
+    <process>process2.bpmn</process>
+  </process-archive>
+
+</process-application>

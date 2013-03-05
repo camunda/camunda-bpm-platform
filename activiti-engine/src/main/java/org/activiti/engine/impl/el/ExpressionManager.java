@@ -110,6 +110,8 @@ public class ExpressionManager {
       elResolver.add(new ReadOnlyMapELResolver(beans));
     }
     
+    elResolver.add(new ProcessApplicationElResolverDelegate());
+        
     elResolver.add(new ArrayELResolver());
     elResolver.add(new ListELResolver());
     elResolver.add(new MapELResolver());

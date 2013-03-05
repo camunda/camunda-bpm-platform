@@ -25,8 +25,9 @@ import org.jboss.as.controller.descriptions.StandardResourceDescriptionResolver;
 import org.jboss.as.controller.parsing.ExtensionParsingContext;
 import org.jboss.as.controller.registry.ManagementResourceRegistration;
 import org.jboss.as.controller.registry.OperationEntry;
+import org.jboss.msc.service.ServiceName;
 
-import com.camunda.fox.platform.subsystem.impl.extension.handler.FoxPlatformSubsystemDescribe;
+import com.camunda.fox.platform.subsystem.impl.extension.handler.BpmPlatformSubsystemDescribe;
 import com.camunda.fox.platform.subsystem.impl.extension.resource.FoxPlatformSubsystemRootResourceDefinition;
 import com.camunda.fox.platform.subsystem.impl.extension.resource.JobAcquisitionResourceDefinition;
 import com.camunda.fox.platform.subsystem.impl.extension.resource.JobExecutorResourceDefinition;
@@ -54,26 +55,25 @@ public class FoxPlatformExtension implements Extension {
     
     // Root resource
     final ManagementResourceRegistration rootRegistration = subsystem.registerSubsystemModel(FoxPlatformSubsystemRootResourceDefinition.INSTANCE);
-    rootRegistration.registerOperationHandler(DESCRIBE, FoxPlatformSubsystemDescribe.INSTANCE, FoxPlatformSubsystemDescribe.INSTANCE, false, OperationEntry.EntryType.PRIVATE);
+    rootRegistration.registerOperationHandler(DESCRIBE, BpmPlatformSubsystemDescribe.INSTANCE, BpmPlatformSubsystemDescribe.INSTANCE, false, OperationEntry.EntryType.PRIVATE);
     
     // Process Engine
-    final ManagementResourceRegistration processEnginesRegistration = rootRegistration.registerSubModel(new ProcessEnginesResourceDefinition());
+    rootRegistration.registerSubModel(new ProcessEnginesResourceDefinition());
     
-    final ManagementResourceRegistration jobExecutorRegistration = rootRegistration.registerSubModel(new JobExecutorResourceDefinition());
-    
+    // Job Executor
+    ManagementResourceRegistration jobExecutorRegistration = rootRegistration.registerSubModel(new JobExecutorResourceDefinition());
     //Job acquisition
-    final ManagementResourceRegistration jobAcquisitionRegistration = jobExecutorRegistration.registerSubModel(new JobAcquisitionResourceDefinition());
+    jobExecutorRegistration.registerSubModel(new JobAcquisitionResourceDefinition());
     
-    // THINK: here we could add handlers for additional read-write attributes. They would react to a change in the model. 
-    // A process engine is mostly read only. However, I could imagine values like the locktime of the jobexecutor to be configurable here.
-    // a change to such a value through one of the management interfaces would be persisted in the configuration (Storage.CONFIGURATION) 
-    // and distributed across a cluster / domain
-    // Example: processEngineChild.registerReadWriteAttribute("jobExecututorLockTime", null, JobExecutorLockTimeHandler.INSTANCE, Storage.CONFIGURATION);
   }
 
   public void initializeParsers(ExtensionParsingContext context) {
     context.setSubsystemXmlMapping(ModelConstants.SUBSYSTEM_NAME, Namespace.FOX_PLATFORM_1_0.getUriString(), parser);
     context.setSubsystemXmlMapping(ModelConstants.SUBSYSTEM_NAME, Namespace.FOX_PLATFORM_1_1.getUriString(), parser);
+  }
+
+  public static ServiceName getPlatformServiceType() {
+    return ServiceName.of("org").append("camunda").append("bpm").append("platform");
   }
 
   public static ResourceDescriptionResolver getResourceDescriptionResolver(String keyPrefix) {

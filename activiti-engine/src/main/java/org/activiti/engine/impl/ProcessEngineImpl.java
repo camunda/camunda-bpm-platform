@@ -83,14 +83,16 @@ public class ProcessEngineImpl implements ProcessEngine {
     }
     
     ProcessEngines.registerProcessEngine(this);
-
+    
     if ((jobExecutor != null) && (jobExecutor.isAutoActivate())) {
       jobExecutor.start();
     }
   }
   
   public void close() {
+    
     ProcessEngines.unregister(this);
+    
     if ((jobExecutor != null) && (jobExecutor.isActive())) {
       jobExecutor.shutdown();
     }

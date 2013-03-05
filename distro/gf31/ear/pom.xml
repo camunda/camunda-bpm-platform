@@ -43,7 +43,6 @@
       <groupId>com.camunda.fox.engine</groupId>
       <artifactId>fox-engine</artifactId>
       <scope>provided</scope>
-      <version>${project.version}</version>
     </dependency>      
   </dependencies>
 

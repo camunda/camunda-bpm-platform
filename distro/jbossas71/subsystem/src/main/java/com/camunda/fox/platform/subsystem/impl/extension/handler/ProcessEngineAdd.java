@@ -33,7 +33,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-
+import org.activiti.engine.ProcessEngine;
 import org.jboss.as.controller.AbstractAddStepHandler;
 import org.jboss.as.controller.OperationContext;
 import org.jboss.as.controller.OperationFailedException;
@@ -48,10 +48,10 @@ import org.jboss.msc.service.ServiceBuilder;
 import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceName;
 
-import com.camunda.fox.platform.spi.ProcessEngineConfiguration;
 import com.camunda.fox.platform.subsystem.impl.extension.Element;
-import com.camunda.fox.platform.subsystem.impl.service.ContainerProcessEngineController;
-import com.camunda.fox.platform.subsystem.impl.util.ProcessEngineConfigurationImpl;
+import com.camunda.fox.platform.subsystem.impl.metadata.ManagedProcessEngineMetadata;
+import com.camunda.fox.platform.subsystem.impl.service.MscManagedProcessEngineController;
+import com.camunda.fox.platform.subsystem.impl.service.ServiceNames;
 
 /**
  * Provides the description and the implementation of the process-engine#add operation.
@@ -132,28 +132,28 @@ public class ProcessEngineAdd extends AbstractAddStepHandler implements Descript
     
     String engineName = PathAddress.pathAddress(operation.get(ModelDescriptionConstants.ADDRESS)).getLastElement().getValue();
 
-    ProcessEngineConfiguration processEngineConfiguration = transformConfiguration(context, engineName, model);
+    ManagedProcessEngineMetadata processEngineConfiguration = transformConfiguration(context, engineName, model);
     
-    ServiceController<ContainerProcessEngineController> controller = installService(context, verificationHandler, processEngineConfiguration);
+    ServiceController<ProcessEngine> controller = installService(context, verificationHandler, processEngineConfiguration);
         
     newControllers.add(controller);
   }
 
-  protected ServiceController<ContainerProcessEngineController> installService(OperationContext context, ServiceVerificationHandler verificationHandler,
-          ProcessEngineConfiguration processEngineConfiguration) {
+  protected ServiceController<ProcessEngine> installService(OperationContext context, ServiceVerificationHandler verificationHandler,
+      ManagedProcessEngineMetadata processEngineConfiguration) {
     
-    ContainerProcessEngineController service = new ContainerProcessEngineController(processEngineConfiguration);        
-    ServiceName name = ContainerProcessEngineController.createServiceName(processEngineConfiguration.getProcessEngineName());    
+    MscManagedProcessEngineController service = new MscManagedProcessEngineController(processEngineConfiguration);        
+    ServiceName name = ServiceNames.forManagedProcessEngine(processEngineConfiguration.getEngineName());    
     
-    ServiceBuilder<ContainerProcessEngineController> serviceBuilder = context.getServiceTarget().addService(name, service);
+    ServiceBuilder<ProcessEngine> serviceBuilder = context.getServiceTarget().addService(name, service);
     
-    ContainerProcessEngineController.initializeServiceBuilder(processEngineConfiguration, service, serviceBuilder);
+    MscManagedProcessEngineController.initializeServiceBuilder(processEngineConfiguration, service, serviceBuilder);
     
     serviceBuilder.addListener(verificationHandler);    
     return serviceBuilder.install();
   }
 
-  protected ProcessEngineConfiguration transformConfiguration(final OperationContext context, String engineName, final ModelNode model) {
+  protected ManagedProcessEngineMetadata transformConfiguration(final OperationContext context, String engineName, final ModelNode model) {
     String datasourceJndiName = model.get(DATASOURCE).asString();   
     String historyLevel = model.get(HISTORY_LEVEL).asString();
     boolean isDefault = model.get(DEFAULT).asBoolean();
@@ -169,10 +169,7 @@ public class ProcessEngineAdd extends AbstractAddStepHandler implements Descript
       }
     }
         
-    ProcessEngineConfiguration processEngineConfiguration = 
-            new ProcessEngineConfigurationImpl(isDefault, engineName, datasourceJndiName, historyLevel, properties);
-    
-    return processEngineConfiguration;
+    return new ManagedProcessEngineMetadata(isDefault, engineName, datasourceJndiName, historyLevel, properties);
   }
   
 }

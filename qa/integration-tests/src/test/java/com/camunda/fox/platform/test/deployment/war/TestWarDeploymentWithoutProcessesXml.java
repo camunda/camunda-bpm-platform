@@ -27,6 +27,7 @@ import org.junit.runner.RunWith;
 
 import com.camunda.fox.platform.test.util.AbstractFoxPlatformIntegrationTest;
 import com.camunda.fox.platform.test.util.DeploymentHelper;
+import com.camunda.fox.platform.test.util.TestContainer;
 
 /**
  * Assert that we can deploy a WAR which bundles 
@@ -38,10 +39,15 @@ public class TestWarDeploymentWithoutProcessesXml extends AbstractFoxPlatformInt
 
   @Deployment
   public static WebArchive processArchive() {    
-    return ShrinkWrap.create(WebArchive.class, "test.war")
+    WebArchive deployment = ShrinkWrap.create(WebArchive.class, "test.war")
             .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
             .addAsLibraries(DeploymentHelper.getFoxPlatformClient())
-            .addClass(AbstractFoxPlatformIntegrationTest.class);    
+            .addClass(AbstractFoxPlatformIntegrationTest.class);
+    
+    TestContainer.addContainerSpecificResources(deployment);
+    
+    return deployment;
+    
   }
   
   @Test

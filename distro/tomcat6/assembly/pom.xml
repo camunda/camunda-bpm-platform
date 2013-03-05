@@ -39,7 +39,23 @@
       <groupId>javax.mail</groupId>
       <artifactId>mail</artifactId>
       <version>1.4.1</version>
-    </dependency>        
+    </dependency>   
+    
+    <dependency>
+      <groupId>org.mybatis</groupId>
+      <artifactId>mybatis</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>com.fasterxml.uuid</groupId>
+      <artifactId>java-uuid-generator</artifactId>
+    </dependency>
+    
+    <dependency>
+      <groupId>com.camunda.fox.engine</groupId>
+      <artifactId>fox-engine</artifactId>
+      <version>${project.version}</version>
+    </dependency>     
   </dependencies>
 
   <build>

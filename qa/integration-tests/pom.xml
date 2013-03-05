@@ -54,6 +54,13 @@
       <artifactId>fox-engine</artifactId>
       <scope>provided</scope>
     </dependency>
+    
+     <!-- weld for CDI support on tomcat-->
+    <dependency>
+      <groupId>org.jboss.weld.servlet</groupId>
+      <artifactId>weld-servlet</artifactId>
+      <version>1.1.10.Final</version>
+    </dependency>
   </dependencies>
 
   <build>
@@ -323,6 +330,135 @@
         </testResources>
       </build>
     </profile>
+    
+    <profile>
+      <id>tomcat</id>
+      <dependencyManagement>
+        <dependencies>
+          <dependency>
+            <groupId>org.jboss.bom</groupId>
+            <artifactId>jboss-javaee-6.0-with-tools</artifactId>
+            <version>1.0.4.Final</version>
+            <scope>import</scope>
+            <type>pom</type>
+          </dependency>
+        </dependencies>
+      </dependencyManagement>      
+      <dependencies>
+        <dependency>
+          <!-- make sure this comes after runtime in the reactor build -->
+          <groupId>com.camunda.fox.platform</groupId>
+          <artifactId>fox-platform-qa-tomcat6-runtime</artifactId>
+          <version>${project.version}</version>
+          <scope>provided</scope>
+          <type>pom</type>
+        </dependency>
+        
+        <dependency>
+          <groupId>org.jboss.arquillian.junit</groupId>
+          <artifactId>arquillian-junit-container</artifactId>
+          <scope>test</scope>
+        </dependency>
+        
+        <dependency>
+          <groupId>org.jboss.arquillian.container</groupId>
+          <artifactId>arquillian-tomcat-managed-6</artifactId>
+          <version>1.0.0.CR4</version>
+          <scope>test</scope>
+        </dependency>
+        
+        <dependency>
+          <groupId>org.jboss.arquillian.protocol</groupId>
+          <artifactId>arquillian-protocol-servlet</artifactId>
+          <scope>test</scope>
+        </dependency>
+        
+        <dependency>
+          <groupId>org.jboss.shrinkwrap.resolver</groupId>
+          <artifactId>shrinkwrap-resolver-impl-maven</artifactId>
+          <scope>test</scope>    
+        </dependency>
+
+      </dependencies>
+      <build>
+        <resources>
+          <resource>
+            <directory>src/test/resources-tomcat</directory>
+            <filtering>true</filtering>
+          </resource>          
+        </resources>      
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>build-helper-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>add-test-source</id>
+                <phase>generate-test-sources</phase>
+                <goals>
+                  <goal>add-test-source</goal>
+                </goals>
+                <configuration>
+                  <sources>
+                    <source>src/test/java-tomcat</source>
+                  </sources>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-resources-plugin</artifactId>
+            <configuration>
+              <delimiters>
+                <delimiter>${*}</delimiter>          
+              </delimiters>
+              <useDefaultDelimiters>false</useDefaultDelimiters>
+            </configuration>
+            <executions>
+              <execution>
+                <id>configure-jboss</id>
+                <phase>process-test-resources</phase>
+                <goals>
+                  <goal>copy-resources</goal>
+                </goals>
+                <configuration>
+                  <resources>
+                    <resource>
+                      <directory>${jboss.runtime.location}/standalone/configuration/blueprint</directory>
+                      <filtering>true</filtering>
+                    </resource>
+                  </resources>
+                  <outputDirectory>${jboss.runtime.location}/standalone/configuration</outputDirectory>
+                  <overwrite>true</overwrite>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <excludes>
+                <!-- no EE stuff on tomcat :) -->
+                <exclude>**/ear/**</exclude>
+                <exclude>**/ejb/**</exclude>
+                <exclude>**/transactions/**</exclude>                
+                <!-- requires EL 2.2 -->
+                <exclude>**/CdiBeanResolutionTest.java</exclude>
+                <!-- No EJB RequestContext available -->
+                <exclude>**/JobExecutorRequestContextTest.java</exclude>
+                <!-- Not supported by arquillian tomcat container -->
+                <exclude>**/TestWarDeploymentWithBrokenBpmnXml.java</exclude>
+                <exclude>**/TestDeploymentWithDroolsTaskFails.java</exclude>
+                <exclude>**/TestProcessEnginesXmlFails.java</exclude>
+              </excludes>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    
     <profile>
       <id>was80</id>
       <properties>
