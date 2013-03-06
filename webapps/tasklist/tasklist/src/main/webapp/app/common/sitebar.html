@@ -12,6 +12,9 @@
           Inbox ({{ tasks.unassigned.count }})
         </a>
       </li>
+      <li ng-show="isActive('search')" ng-class="{ active: isActive('search') }">
+        <a href >Search</a>
+      </li>
       <li class="nav-header">Unclaimed Group Tasks</li>
       <li ng-repeat="group in groupInfo.groups" ng-class="{active: isActive('group', group.id)}">
         <a href="#/overview?filter=group&search={{group.id}}">{{group.name}} ({{ groupInfo.groupCounts[group.id] }})</a>

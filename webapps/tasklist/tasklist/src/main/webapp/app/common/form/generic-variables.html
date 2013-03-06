@@ -4,7 +4,7 @@
       <th>key</th>
       <th>value</th>
       <th style="max-width: 50px; text-align: right">
-        <button class="btn btn-mini" data-ng-click="addVariable()"><i class="icon-plus"></i></button>
+        <a class="btn btn-mini" data-ng-click="addVariable()"><i class="icon-plus"></i></a>
       </th>
     </tr>
   </thead>
@@ -17,7 +17,7 @@
         <input form-field variable="variable" type-switch="true" />
       </td>
       <td style="text-align: right; vertical-align: middle">
-        <button class="btn btn-mini" data-ng-click="removeVariable(variable)"><i class="icon-trash"></i></button>
+        <a class="btn btn-mini" data-ng-click="removeVariable(variable)"><i class="icon-trash"></i></a>
       </td>
     </tr>
     <tr data-ng-show="!variables.length">

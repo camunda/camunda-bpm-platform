@@ -14,6 +14,18 @@ define(["angular", "bpmn/Bpmn"], function(angular, Bpmn) {
       Notifications.addMessage({ status: "Scope change", message: message, exclusive: [ "status" ], duration: 5000 });
     };
 
+    function searchQuery(query, view) {
+      angular.forEach(view, function(value, key) {
+        if (key == "filter" || key == "search") {
+          return;
+        }
+
+        query[key] = value;
+      });
+
+      return query;
+    };
+
     var reloadTasks = debounce(function() {
       var view = $scope.taskList.view;
 
@@ -60,6 +72,9 @@ define(["angular", "bpmn/Bpmn"], function(angular, Bpmn) {
         case "group":
           queryObject.candidateGroup = search;
           break;
+        case "search":
+          searchQuery(queryObject, view);
+          break;
       }
 
       queryObject.sortBy = sort.by;
@@ -75,13 +90,9 @@ define(["angular", "bpmn/Bpmn"], function(angular, Bpmn) {
       $scope.loadTasks(view);
     });
 
-    $scope.startTask = function(task) {
-      $location.path("/form/" + task.id);
-    };
-
     $scope.claimTask = function(task) {
 
-      return EngineApi.getTaskList().claim( { id : task.id}, { userId: Authentication.current() }).$then(function () {
+      return EngineApi.getTaskList().claim({ id : task.id }, { userId: Authentication.current() }).$then(function () {
         var tasks = $scope.taskList.tasks,
             view = $scope.taskList.view;
 
@@ -181,7 +192,7 @@ define(["angular", "bpmn/Bpmn"], function(angular, Bpmn) {
     $scope.toggleShowDiagram = function (task, index) {
       var diagram = $scope.bpmn.diagram,
           oldTask = $scope.bpmn.task;
-      
+
       $scope.bpmn = {};
 
       if (diagram) {

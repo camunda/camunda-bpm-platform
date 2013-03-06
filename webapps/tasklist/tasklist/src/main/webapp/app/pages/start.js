@@ -4,92 +4,79 @@ define(["angular"], function(angular) {
 
   var module = angular.module("tasklist.pages");
 
-  var Controller = function($scope, $routeParams, $location, $rootScope, EngineApi) {
+  var Controller = function($scope, $routeParams, $location, $rootScope, Forms, EngineApi) {
 
-    function parseFormData(data, form) {
-      var key = data.formKey,
-          applicationContextPath = data.applicationContextPath,
-          EMBEDDED_KEY = "embedded:",
-          APP_KEY = "app:";
-
-      // structure may be [embedded:][app:]formKey[.suffix
-
-      if (!key) {
-        return;
-      }
-
-      if (key.indexOf(EMBEDDED_KEY) == 0) {
-        key = key.substring(EMBEDDED_KEY.length);
-        form.embedded = true;
-      }
-
-      if (key.indexOf(APP_KEY) == 0) {
-        if (applicationContextPath) {
-          key = applicationContextPath + "/" + key.substring(APP_KEY.length);
-
-          if (data.formSuffix) {
-            key += data.formSuffix;
-          }
-        }
-      }
-
-      form.key = key;
-    }
-
-    var processDefinitionId = $routeParams.id;
-
-    $scope.processDefinition = EngineApi.getProcessDefinitions().get({ id: processDefinitionId });
-
-    $scope.variables = [];
+    var processDefinitionId = $routeParams.id,
+        variables = $scope.variables = [];
 
     var form = $scope.form = {
       generic: $location.hash() == "generic"
     };
 
-    form.data = EngineApi.getProcessDefinitions().getStartForm({ id: processDefinitionId }).$then(function(response) {
-      var data = response.resource;
+    var processDefinition = $scope.processDefinition = EngineApi.getProcessDefinitions().get({ id: processDefinitionId });
 
-      parseFormData(data, form);
+    processDefinition.$then(function() {
+      form.data = EngineApi.getProcessDefinitions().getStartForm({ id: processDefinitionId }).$then(function(response) {
+        var data = response.resource;
 
-      if (!form.embedded) {
-        var externalUrl = form.key + "?processDefinitionKey=" + $scope.processDefinition.key + "&callbackUrl=" + $location.absUrl() + "/complete";
-        console.log(externalUrl);
-      }
+        Forms.parseFormData(data, form);
 
-      form.loaded = true;
+        if (form.external) {
+          var externalUrl = encodeURI(form.key + "?processDefinitionKey=" + processDefinition.key + "&callbackUrl=" + $location.absUrl() + "/complete");
+          window.location.href = externalUrl;
+        }
+
+        form.loaded = true;
+      });
     });
 
-    $scope.enableGenericForm = function() {
+    $scope.activateGeneric = function() {
       $location.hash('generic');
       form.generic = true;
     };
 
-    $scope.submitForm = function() {
-      var variablesObject = {};
-      for (var index in $scope.variables) {
-        var variable = $scope.variables[index];
-        variablesObject[variable.key] = variable.value;
-      }
+    $scope.submit = function() {
+      var variablesMap = Forms.variablesToMap(variables);
 
-      EngineApi.getProcessDefinitions().startInstance({ id: $routeParams.id}, { variables : variablesObject }).$then(function() {
+      EngineApi.getProcessDefinitions().startInstance({ id: processDefinitionId }, { variables : variablesMap }).$then(function() {
         $rootScope.$broadcast("tasklist.reload");
-        $location.hash('');
-        $location.path("/overview");
+        $location.url("/process-definition/" + processDefinitionId + "/complete");
       });
     };
 
     $scope.cancel = function() {
-      $location.hash('');
-      $location.path("/overview");
+      $location.url("/overview");
     };
   };
 
-  Controller.$inject = ["$scope", "$routeParams", "$location", "$rootScope", "EngineApi"];
+  Controller.$inject = ["$scope", "$routeParams", "$location", "$rootScope", "Forms", "EngineApi"];
+
+  var CompleteController = function($scope, $location, $routeParams, Notifications, EngineApi) {
+
+    var processDefinitionId = $routeParams.id;
+
+    EngineApi.getProcessDefinitions().get({ id: processDefinitionId }).$then(function(response) {
+      var processDefinition = response.resource;
+
+      Notifications.addMessage({ status: "Completed", message: "Instance of <a>" + processDefinition.name + "</a> has been started", duration: 5000 });
+      $location.url("/overview");
+    });
+  };
+
+  CompleteController.$inject = ["$scope", "$location", "$routeParams", "Notifications", "EngineApi"];
 
   var RouteConfig = function($routeProvider) {
-    $routeProvider.when("/processDefinition/:id/start", {
+
+    $routeProvider.when("/process-definition/:id", {
       templateUrl: "pages/start.html",
       controller: Controller
+    });
+
+    // controller which handles process instance start completion
+
+    $routeProvider.when("/process-definition/:id/complete", {
+      controller: CompleteController,
+      templateUrl: "pages/complete.html"
     });
   };
 
@@ -97,5 +84,6 @@ define(["angular"], function(angular) {
 
   module
     .config(RouteConfig)
-    .controller("StartProcessInstanceController", Controller);
+    .controller("StartProcessInstanceController", Controller)
+    .controller("StartProcessInstanceCompleteController", CompleteController);
 });
