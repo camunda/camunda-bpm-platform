@@ -1,6 +1,11 @@
 package org.camunda.bpm.engine.rest.impl;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.ws.rs.PathParam;
 import javax.ws.rs.WebApplicationException;
@@ -8,6 +13,7 @@ import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.FormService;
 import org.camunda.bpm.engine.IdentityService;
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.form.FormData;
@@ -16,7 +22,14 @@ import org.camunda.bpm.engine.identity.GroupQuery;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.rest.TaskRestService;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
-import org.camunda.bpm.engine.rest.dto.task.*;
+import org.camunda.bpm.engine.rest.dto.task.CompleteTaskDto;
+import org.camunda.bpm.engine.rest.dto.task.FormDto;
+import org.camunda.bpm.engine.rest.dto.task.GroupDto;
+import org.camunda.bpm.engine.rest.dto.task.GroupInfoDto;
+import org.camunda.bpm.engine.rest.dto.task.TaskDto;
+import org.camunda.bpm.engine.rest.dto.task.TaskQueryDto;
+import org.camunda.bpm.engine.rest.dto.task.UserDto;
+import org.camunda.bpm.engine.rest.dto.task.UserIdDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
@@ -146,6 +159,10 @@ public class TaskRestServiceImpl extends AbstractEngineService implements TaskRe
   @Override
   public TaskDto getTask(String id) {
     Task task = getTaskById(id);
+    if (task == null) {
+      throw new WebApplicationException(Status.BAD_REQUEST.getStatusCode());
+    }
+    
     return TaskDto.fromTask(task);
   }
 
@@ -153,7 +170,13 @@ public class TaskRestServiceImpl extends AbstractEngineService implements TaskRe
   public FormDto getForm(String id) {
     FormService formService = processEngine.getFormService();
 
-    FormData formData = formService.getTaskFormData(id);
+    FormData formData;
+    try {
+      formData = formService.getTaskFormData(id);
+    } catch (ProcessEngineException e) {
+      throw new WebApplicationException(Status.BAD_REQUEST.getStatusCode());
+    }
+    
     return FormDto.fromFormData(formData);
   }
 

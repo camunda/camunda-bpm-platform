@@ -92,7 +92,7 @@ public class ProcessInstanceServiceImpl extends AbstractEngineService implements
     List<VariableValueDto> values = new ArrayList<VariableValueDto>();
 
     for (Map.Entry<String, Object> entry : processEngine.getRuntimeService().getVariables(processInstanceId).entrySet()) {
-      values.add(new VariableValueDto(entry.getKey(), entry.getValue(),entry.getValue().getClass().getSimpleName()));
+      values.add(new VariableValueDto(entry.getKey(), entry.getValue(), entry.getValue().getClass().getSimpleName()));
     }
 
     return new VariableListDto(values);

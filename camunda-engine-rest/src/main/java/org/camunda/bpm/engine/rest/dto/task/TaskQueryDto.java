@@ -4,10 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.TaskService;
-import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
 import org.camunda.bpm.engine.rest.dto.SortableParameterizedQueryDto;
 import org.camunda.bpm.engine.rest.dto.VariableQueryParameterDto;
