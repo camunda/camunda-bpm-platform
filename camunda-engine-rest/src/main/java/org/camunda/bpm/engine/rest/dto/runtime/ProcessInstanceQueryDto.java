@@ -3,14 +3,14 @@ package org.camunda.bpm.engine.rest.dto.runtime;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.activiti.engine.RuntimeService;
-import org.activiti.engine.runtime.ProcessInstanceQuery;
+import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
 import org.camunda.bpm.engine.rest.dto.SortableParameterizedQueryDto;
 import org.camunda.bpm.engine.rest.dto.VariableQueryParameterDto;
 import org.camunda.bpm.engine.rest.dto.converter.BooleanConverter;
 import org.camunda.bpm.engine.rest.dto.converter.VariableListConverter;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 
 public class ProcessInstanceQueryDto extends SortableParameterizedQueryDto {
 

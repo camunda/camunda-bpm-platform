@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 package com.camunda.fox.platform.test.deployment.war;
-import org.activiti.cdi.impl.util.ProgrammaticBeanLookup;
-import org.activiti.engine.ProcessEngine;
+import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.cdi.impl.util.ProgrammaticBeanLookup;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.spec.WebArchive;

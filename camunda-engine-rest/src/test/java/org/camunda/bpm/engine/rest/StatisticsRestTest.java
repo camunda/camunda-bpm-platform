@@ -13,10 +13,10 @@ import java.util.List;
 
 import javax.ws.rs.core.Response.Status;
 
-import org.activiti.engine.management.ActivityStatistics;
-import org.activiti.engine.management.ActivityStatisticsQuery;
-import org.activiti.engine.management.ProcessDefinitionStatistics;
-import org.activiti.engine.management.ProcessDefinitionStatisticsQuery;
+import org.camunda.bpm.engine.management.ActivityStatistics;
+import org.camunda.bpm.engine.management.ActivityStatisticsQuery;
+import org.camunda.bpm.engine.management.ProcessDefinitionStatistics;
+import org.camunda.bpm.engine.management.ProcessDefinitionStatisticsQuery;
 import org.junit.Test;
 import org.mockito.InOrder;
 import org.mockito.Mockito;

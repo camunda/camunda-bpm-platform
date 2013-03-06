@@ -2,11 +2,11 @@ package com.camunda.fox.platform.jobexecutor.impl.ra.outbound;
 
 import java.util.List;
 
-import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.activiti.engine.impl.jobexecutor.JobExecutor;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
+import org.camunda.bpm.engine.impl.jobexecutor.tobemerged.ra.outbound.PlatformJobExecutorConnection;
+import org.camunda.bpm.engine.impl.jobexecutor.tobemerged.spi.JobAcquisitionConfiguration;
 
-import com.camunda.fox.platform.jobexecutor.ra.outbound.PlatformJobExecutorConnection;
-import com.camunda.fox.platform.jobexecutor.spi.JobAcquisitionConfiguration;
 
 
 /**

@@ -9,12 +9,12 @@ import javax.resource.ResourceException;
 import javax.resource.spi.UnavailableException;
 import javax.resource.spi.endpoint.MessageEndpoint;
 
-import org.activiti.engine.impl.interceptor.CommandExecutor;
+import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
+import org.camunda.bpm.engine.impl.jobexecutor.tobemerged.impl.PlatformExecuteJobsRunnable;
+import org.camunda.bpm.engine.impl.jobexecutor.tobemerged.ra.inflow.JobExecutionHandler;
 
-import com.camunda.fox.platform.jobexecutor.impl.PlatformExecuteJobsRunnable;
 import com.camunda.fox.platform.jobexecutor.impl.ra.PlatformJobExecutorConnector;
 import com.camunda.fox.platform.jobexecutor.impl.ra.inflow.JobExecutionHandlerActivation;
-import com.camunda.fox.platform.jobexecutor.ra.inflow.JobExecutionHandler;
 
 /**
  * 

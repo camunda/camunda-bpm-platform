@@ -1,7 +1,0 @@
-<process-archives>
-  <process-archive>
-    <name>ProcessArchive1</name>
-    <process resourceName="test1.bpmn" />
-    <process resourceName="test2.bpmn" />
-  </process-archive>
-</process-archives>

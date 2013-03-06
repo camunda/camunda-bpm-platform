@@ -14,8 +14,8 @@ package org.camunda.bpm.container.impl.metadata.spi;
 
 import java.util.Map;
 
-import org.activiti.engine.ProcessEngineConfiguration;
-import org.activiti.engine.impl.cfg.StandaloneProcessEngineConfiguration;
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
+import org.camunda.bpm.engine.impl.cfg.StandaloneProcessEngineConfiguration;
 
 /**
  * <p>Java API representation of a ProcessEngine definition inside an XML

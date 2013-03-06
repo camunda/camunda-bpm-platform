@@ -17,8 +17,8 @@ package com.camunda.fox.platform.test.functional.cdi.beans;
 
 import javax.inject.Named;
 
-import org.activiti.engine.delegate.DelegateExecution;
-import org.activiti.engine.delegate.JavaDelegate;
+import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.bpm.engine.delegate.JavaDelegate;
 
 @Named
 public class ExampleDelegateBean implements JavaDelegate {

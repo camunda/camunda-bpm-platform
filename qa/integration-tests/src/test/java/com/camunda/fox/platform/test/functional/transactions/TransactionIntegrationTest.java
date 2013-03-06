@@ -20,8 +20,8 @@ import javax.persistence.PersistenceContext;
 import javax.transaction.Status;
 import javax.transaction.UserTransaction;
 
-import org.activiti.engine.RuntimeService;
-import org.activiti.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.spec.WebArchive;

@@ -15,7 +15,7 @@ package org.camunda.bpm.application;
 import java.util.Comparator;
 import java.util.ServiceLoader;
 
-import org.activiti.engine.impl.javax.el.ELResolver;
+import org.camunda.bpm.engine.impl.javax.el.ELResolver;
 
 /**
  * <p>SPI interface that allows providing a custom ElResolver implementation.</p>

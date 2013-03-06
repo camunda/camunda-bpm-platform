@@ -15,7 +15,6 @@ package org.camunda.bpm.container.impl.tomcat;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.activiti.engine.ProcessEngine;
 import org.apache.catalina.Lifecycle;
 import org.apache.catalina.LifecycleEvent;
 import org.apache.catalina.LifecycleListener;
@@ -28,6 +27,7 @@ import org.camunda.bpm.container.impl.jmx.deployment.StopProcessEnginesStep;
 import org.camunda.bpm.container.impl.tomcat.deployment.TomcatAttachments;
 import org.camunda.bpm.container.impl.tomcat.deployment.TomcatCreateJndiBindingsStep;
 import org.camunda.bpm.container.impl.tomcat.deployment.TomcatParseBpmPlatformXmlStep;
+import org.camunda.bpm.engine.ProcessEngine;
 
 /**
  * <p>Apache Tomcat server listener responsible for deploying the bpm platform.</p> 

@@ -16,9 +16,9 @@ import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-import org.activiti.engine.ActivitiException;
 import org.camunda.bpm.container.impl.jmx.deployment.AbstractParseBpmPlatformXmlStep;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanDeploymentOperation;
+import org.camunda.bpm.engine.ProcessEngineException;
 
 /**
  * <p>This deployment operation step is responsible for parsing and attaching the bpm-platform.xml file on tomcat.</p>
@@ -43,12 +43,12 @@ public class TomcatParseBpmPlatformXmlStep extends AbstractParseBpmPlatformXmlSt
         return bpmPlatformFile.toURI().toURL();
         
       } catch (MalformedURLException e) {
-        throw new ActivitiException("Cannot construct URL for "+bpmPlatformFile, e);
+        throw new ProcessEngineException("Cannot construct URL for "+bpmPlatformFile, e);
         
       }
       
     } else {
-      throw new ActivitiException(bpmPlatformFileLocation + " does not exist. This file is necessary for deploying the camunda BPM platform");
+      throw new ProcessEngineException(bpmPlatformFileLocation + " does not exist. This file is necessary for deploying the camunda BPM platform");
       
     }
   }

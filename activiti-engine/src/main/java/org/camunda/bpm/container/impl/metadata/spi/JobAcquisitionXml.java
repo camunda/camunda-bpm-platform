@@ -14,7 +14,8 @@ package org.camunda.bpm.container.impl.metadata.spi;
 
 import java.util.Map;
 
-import com.camunda.fox.platform.jobexecutor.spi.JobAcquisitionStrategy;
+import org.camunda.bpm.engine.impl.jobexecutor.tobemerged.spi.JobAcquisitionStrategy;
+
 
 /**
  * <p>Java API to the JobAcquisition deployment metadata</p>

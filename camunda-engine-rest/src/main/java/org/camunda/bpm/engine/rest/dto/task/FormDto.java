@@ -1,6 +1,6 @@
 package org.camunda.bpm.engine.rest.dto.task;
 
-import org.activiti.engine.form.FormData;
+import org.camunda.bpm.engine.form.FormData;
 
 /**
  *

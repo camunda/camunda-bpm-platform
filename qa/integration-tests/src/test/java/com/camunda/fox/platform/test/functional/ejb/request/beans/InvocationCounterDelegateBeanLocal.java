@@ -3,8 +3,8 @@ package com.camunda.fox.platform.test.functional.ejb.request.beans;
 import javax.ejb.EJB;
 import javax.inject.Named;
 
-import org.activiti.engine.delegate.DelegateExecution;
-import org.activiti.engine.delegate.JavaDelegate;
+import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.bpm.engine.delegate.JavaDelegate;
 
 /**
  * 

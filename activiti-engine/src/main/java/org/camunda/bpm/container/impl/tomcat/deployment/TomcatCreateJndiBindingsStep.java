@@ -18,12 +18,12 @@ import java.util.logging.Logger;
 import javax.naming.Context;
 import javax.naming.NamingException;
 
-import org.activiti.engine.ActivitiException;
 import org.apache.catalina.core.StandardServer;
 import org.camunda.bpm.BpmPlatform;
 import org.camunda.bpm.ProcessEngineService;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanDeploymentOperation;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanDeploymentOperationStep;
+import org.camunda.bpm.engine.ProcessEngineException;
 
 /**
  * <p>Deployment operation step responsible for creating the platform JNDI bindings on apache tomcat</p>
@@ -65,7 +65,7 @@ public class TomcatCreateJndiBindingsStep extends MBeanDeploymentOperationStep {
           + PROCESS_ENGINE_SERVICE_NAME + "\n");
       
     } catch (NamingException e) {
-      throw new ActivitiException("Unable to bind platform service in global naming context.", e);      
+      throw new ProcessEngineException("Unable to bind platform service in global naming context.", e);      
     }
     
   }

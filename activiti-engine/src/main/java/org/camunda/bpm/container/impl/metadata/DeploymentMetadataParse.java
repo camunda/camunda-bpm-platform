@@ -12,7 +12,13 @@
  */
 package org.camunda.bpm.container.impl.metadata;
 
-import static org.camunda.bpm.container.impl.metadata.DeploymentMetadataConstants.*;
+import static org.camunda.bpm.container.impl.metadata.DeploymentMetadataConstants.CONFIGURATION;
+import static org.camunda.bpm.container.impl.metadata.DeploymentMetadataConstants.DATASOURCE;
+import static org.camunda.bpm.container.impl.metadata.DeploymentMetadataConstants.DEFAULT;
+import static org.camunda.bpm.container.impl.metadata.DeploymentMetadataConstants.JOB_ACQUISITION;
+import static org.camunda.bpm.container.impl.metadata.DeploymentMetadataConstants.NAME;
+import static org.camunda.bpm.container.impl.metadata.DeploymentMetadataConstants.PROPERTIES;
+import static org.camunda.bpm.container.impl.metadata.DeploymentMetadataConstants.PROPERTY;
 
 import java.util.HashMap;
 import java.util.List;
@@ -20,11 +26,11 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.impl.util.xml.Element;
-import org.activiti.engine.impl.util.xml.Parse;
-import org.activiti.engine.impl.util.xml.Parser;
 import org.camunda.bpm.container.impl.metadata.spi.ProcessEngineXml;
+import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.util.xml.Element;
+import org.camunda.bpm.engine.impl.util.xml.Parse;
+import org.camunda.bpm.engine.impl.util.xml.Parser;
 
 /**
  * <p>{@link Parse} implementation for Deployment Metadata.</p>
@@ -51,7 +57,7 @@ public abstract class DeploymentMetadataParse extends Parse {
     } catch (Exception e) {
       LOGGER.log(Level.SEVERE, "Unknown exception", e);
 
-      throw new ActivitiException("Error while parsing deployment descriptor: " + e.getMessage(), e);
+      throw new ProcessEngineException("Error while parsing deployment descriptor: " + e.getMessage(), e);
       
     } finally {
       if (hasWarnings()) {

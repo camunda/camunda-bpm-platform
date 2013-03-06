@@ -14,10 +14,10 @@ package org.camunda.bpm.application.impl;
 
 import javax.naming.InitialContext;
 
-import org.activiti.engine.ProcessEngine;
 import org.camunda.bpm.application.AbstractProcessApplication;
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.application.ProcessApplicationUnavailableException;
+import org.camunda.bpm.engine.ProcessEngine;
 
 /**
  * <p>A reference to an EJB process application.</p>

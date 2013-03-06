@@ -6,12 +6,12 @@ import static org.mockito.Mockito.when;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.activiti.engine.form.FormProperty;
-import org.activiti.engine.form.FormType;
-import org.activiti.engine.form.TaskFormData;
-import org.activiti.engine.task.DelegationState;
-import org.activiti.engine.task.Task;
+import org.camunda.bpm.engine.form.FormProperty;
+import org.camunda.bpm.engine.form.FormType;
+import org.camunda.bpm.engine.form.TaskFormData;
 import org.camunda.bpm.engine.rest.helper.MockTaskBuilder;
+import org.camunda.bpm.engine.task.DelegationState;
+import org.camunda.bpm.engine.task.Task;
 import org.joda.time.DateTime;
 
 public abstract class AbstractTaskRestServiceTest extends AbstractRestServiceTest {

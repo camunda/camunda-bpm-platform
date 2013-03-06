@@ -17,14 +17,14 @@ import java.util.Map;
 
 import javax.ws.rs.core.Response.Status;
 
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.FormService;
-import org.activiti.engine.RuntimeService;
-import org.activiti.engine.TaskService;
-import org.activiti.engine.form.TaskFormData;
-import org.activiti.engine.task.Task;
-import org.activiti.engine.task.TaskQuery;
+import org.camunda.bpm.engine.FormService;
+import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.form.TaskFormData;
 import org.camunda.bpm.engine.rest.helper.EqualsMap;
+import org.camunda.bpm.engine.task.Task;
+import org.camunda.bpm.engine.task.TaskQuery;
 import org.junit.Test;
 import org.mockito.Matchers;
 
@@ -99,7 +99,7 @@ public class TaskRestServiceInteractionTest extends AbstractTaskRestServiceTest 
   public void testUnsuccessfulClaimTask() throws IOException {
     setupMockTaskService();
     
-    doThrow(new ActivitiException("expected exception")).when(taskServiceMock).claim(any(String.class), any(String.class));
+    doThrow(new ProcessEngineException("expected exception")).when(taskServiceMock).claim(any(String.class), any(String.class));
     
     given().pathParam("id", EXAMPLE_ID)
       .contentType(POST_JSON_CONTENT_TYPE).body(EMPTY_JSON_OBJECT)
@@ -128,7 +128,7 @@ public class TaskRestServiceInteractionTest extends AbstractTaskRestServiceTest 
   public void testUnsuccessfulUnclaimTask() throws IOException {
     setupMockTaskService();
     
-    doThrow(new ActivitiException("expected exception")).when(taskServiceMock).setAssignee(any(String.class), any(String.class));
+    doThrow(new ProcessEngineException("expected exception")).when(taskServiceMock).setAssignee(any(String.class), any(String.class));
     
     Map<String, Object> json = new HashMap<String, Object>();
     json.put("userId", EXAMPLE_USER_ID);
@@ -180,7 +180,7 @@ public class TaskRestServiceInteractionTest extends AbstractTaskRestServiceTest 
   public void testUnsuccessfulCompleteTask() throws IOException {
     setupMockTaskService();
     
-    doThrow(new ActivitiException("expected exception")).when(taskServiceMock).complete(any(String.class), Matchers.<Map<String, Object>>any());
+    doThrow(new ProcessEngineException("expected exception")).when(taskServiceMock).complete(any(String.class), Matchers.<Map<String, Object>>any());
     
     given().pathParam("id", EXAMPLE_ID)
       .contentType(POST_JSON_CONTENT_TYPE).body(EMPTY_JSON_OBJECT)
@@ -217,7 +217,7 @@ public class TaskRestServiceInteractionTest extends AbstractTaskRestServiceTest 
   public void testUnsuccessfulResolving() throws IOException {
     setupMockTaskService();
     
-    doThrow(new ActivitiException("expected exception")).when(taskServiceMock).resolveTask(any(String.class));
+    doThrow(new ProcessEngineException("expected exception")).when(taskServiceMock).resolveTask(any(String.class));
     
     given().pathParam("id", EXAMPLE_ID)
     .contentType(POST_JSON_CONTENT_TYPE).body(EMPTY_JSON_OBJECT)
@@ -274,7 +274,7 @@ public class TaskRestServiceInteractionTest extends AbstractTaskRestServiceTest 
   public void testGetNonExistingForm() throws IOException {
     setupMockTaskService();
     
-    when(formServiceMock.getTaskFormData(anyString())).thenThrow(new ActivitiException("Expected exception: task does not exist."));
+    when(formServiceMock.getTaskFormData(anyString())).thenThrow(new ProcessEngineException("Expected exception: task does not exist."));
     
     given().pathParam("id", "aNonExistingTaskId")
       .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
@@ -301,7 +301,7 @@ public class TaskRestServiceInteractionTest extends AbstractTaskRestServiceTest 
   public void testUnsuccessfulDelegateTask() throws IOException {
     setupMockTaskService();
     
-    doThrow(new ActivitiException("expected exception")).when(taskServiceMock).delegateTask(any(String.class), any(String.class));
+    doThrow(new ProcessEngineException("expected exception")).when(taskServiceMock).delegateTask(any(String.class), any(String.class));
     
     Map<String, Object> json = new HashMap<String, Object>();
     json.put("userId", EXAMPLE_USER_ID);

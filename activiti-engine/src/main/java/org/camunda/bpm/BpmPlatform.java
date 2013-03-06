@@ -12,8 +12,8 @@
  */
 package org.camunda.bpm;
 
-import org.activiti.engine.ProcessEngine;
 import org.camunda.bpm.container.RuntimeContainerDelegate;
+import org.camunda.bpm.engine.ProcessEngine;
 
 
 /**

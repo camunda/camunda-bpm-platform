@@ -18,12 +18,6 @@ import java.lang.reflect.Method;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.ProcessEngineConfiguration;
-import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.activiti.engine.impl.cfg.StandaloneProcessEngineConfiguration;
-import org.activiti.engine.impl.persistence.StrongUuidGenerator;
-import org.activiti.engine.impl.util.ReflectUtil;
 import org.camunda.bpm.application.AbstractProcessApplication;
 import org.camunda.bpm.container.impl.jmx.JmxRuntimeContainerDelegate.ServiceTypes;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanDeploymentOperation;
@@ -32,6 +26,12 @@ import org.camunda.bpm.container.impl.jmx.kernel.MBeanServiceContainer;
 import org.camunda.bpm.container.impl.jmx.services.JmxManagedProcessEngine;
 import org.camunda.bpm.container.impl.jmx.services.JmxManagedProcessEngineController;
 import org.camunda.bpm.container.impl.metadata.spi.ProcessEngineXml;
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
+import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.cfg.StandaloneProcessEngineConfiguration;
+import org.camunda.bpm.engine.impl.persistence.StrongUuidGenerator;
+import org.camunda.bpm.engine.impl.util.ReflectUtil;
 
 /**
  * <p>Deployment operation step responsible for starting a managed process engine 
@@ -95,10 +95,10 @@ public class StartProcessEngineStep extends MBeanDeploymentOperationStep {
         try {
           setter.invoke(configuration, property.getValue());
         } catch (Exception e) {
-          throw new ActivitiException("Could not set value for property '"+property.getKey(), e);
+          throw new ProcessEngineException("Could not set value for property '"+property.getKey(), e);
         }
       } else {
-        throw new ActivitiException("Could not find setter for property '"+property.getKey());
+        throw new ProcessEngineException("Could not find setter for property '"+property.getKey());
       }
       
     }
@@ -114,9 +114,9 @@ public class StartProcessEngineStep extends MBeanDeploymentOperationStep {
       return configurationClass.newInstance();
       
     } catch (InstantiationException e) {
-      throw new ActivitiException("Could not instantiate configuration class", e);
+      throw new ProcessEngineException("Could not instantiate configuration class", e);
     } catch (IllegalAccessException e) {
-      throw new ActivitiException("IllegalAccessException while instantiating configuration class", e);
+      throw new ProcessEngineException("IllegalAccessException while instantiating configuration class", e);
     }
   }
 
@@ -125,7 +125,7 @@ public class StartProcessEngineStep extends MBeanDeploymentOperationStep {
     try {
       return (Class<? extends ProcessEngineConfiguration>) processApplicationClassloader.loadClass(processEngineConfigurationClassName);
     } catch (ClassNotFoundException e) {
-      throw new ActivitiException("Could not load process engine configuration class",e);
+      throw new ProcessEngineException("Could not load process engine configuration class",e);
     }
   }
 

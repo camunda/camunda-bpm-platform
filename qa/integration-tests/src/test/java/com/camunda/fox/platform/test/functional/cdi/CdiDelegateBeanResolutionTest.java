@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 package com.camunda.fox.platform.test.functional.cdi;
-import org.activiti.cdi.impl.util.BeanManagerLookup;
-import org.activiti.cdi.impl.util.ProgrammaticBeanLookup;
+import org.camunda.bpm.engine.cdi.impl.util.BeanManagerLookup;
+import org.camunda.bpm.engine.cdi.impl.util.ProgrammaticBeanLookup;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.junit.Arquillian;

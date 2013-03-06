@@ -3,7 +3,7 @@ package org.camunda.bpm.engine.rest.helper;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import org.activiti.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.repository.ProcessDefinition;
 
 public class MockDefinitionBuilder {
 

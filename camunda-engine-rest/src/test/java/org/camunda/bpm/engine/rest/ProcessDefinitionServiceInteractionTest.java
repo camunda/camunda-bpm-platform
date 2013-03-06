@@ -15,15 +15,15 @@ import java.util.Map;
 
 import javax.ws.rs.core.Response.Status;
 
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.RepositoryService;
-import org.activiti.engine.RuntimeService;
-import org.activiti.engine.impl.util.ReflectUtil;
-import org.activiti.engine.repository.ProcessDefinition;
-import org.activiti.engine.runtime.ProcessInstance;
 import org.apache.http.entity.ContentType;
+import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.RepositoryService;
+import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.impl.util.ReflectUtil;
+import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.rest.helper.EqualsMap;
 import org.camunda.bpm.engine.rest.helper.MockDefinitionBuilder;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.Matchers;
@@ -142,14 +142,14 @@ public class ProcessDefinitionServiceInteractionTest extends
   }
   
   /**
-   * {@link RuntimeService#startProcessInstanceById(String, Map)} throws an {@link ActivitiException}, if a definition with the given id does not exist.
+   * {@link RuntimeService#startProcessInstanceById(String, Map)} throws an {@link ProcessEngineException}, if a definition with the given id does not exist.
    */
   @Test
   public void testUnsuccessfulInstantiation() throws IOException {
     setupMocks();
     
     when(runtimeServiceMock.startProcessInstanceById(eq(EXAMPLE_PROCESS_DEFINITION_ID), Matchers.<Map<String, Object>>any()))
-      .thenThrow(new ActivitiException("expected exception"));
+      .thenThrow(new ProcessEngineException("expected exception"));
     
     given().pathParam("id", EXAMPLE_PROCESS_DEFINITION_ID)
       .contentType(POST_JSON_CONTENT_TYPE).body(EMPTY_JSON_OBJECT)
@@ -199,7 +199,7 @@ public class ProcessDefinitionServiceInteractionTest extends
     setupMocks();
     
     String nonExistingId = "aNonExistingDefinitionId";
-    when(repositoryServiceMock.getProcessDefinition(eq(nonExistingId))).thenThrow(new ActivitiException("no matching definition"));
+    when(repositoryServiceMock.getProcessDefinition(eq(nonExistingId))).thenThrow(new ProcessEngineException("no matching definition"));
     
     given().pathParam("id", "aNonExistingDefinitionId")
     .then().expect()
@@ -231,7 +231,7 @@ public class ProcessDefinitionServiceInteractionTest extends
     setupMocks();
     
     String nonExistingId = "aNonExistingDefinitionId";
-    when(repositoryServiceMock.getProcessModel(eq(nonExistingId))).thenThrow(new ActivitiException("no matching process definition found."));
+    when(repositoryServiceMock.getProcessModel(eq(nonExistingId))).thenThrow(new ProcessEngineException("no matching process definition found."));
     
     given().pathParam("id", nonExistingId)
       .header("Content-Type", APPLICATION_BPMN20_XML_TYPE)

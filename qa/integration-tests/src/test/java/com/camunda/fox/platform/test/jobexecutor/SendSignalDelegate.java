@@ -5,13 +5,13 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.activiti.cdi.BusinessProcess;
-import org.activiti.engine.RuntimeService;
-import org.activiti.engine.delegate.DelegateExecution;
-import org.activiti.engine.delegate.JavaDelegate;
-import org.activiti.engine.impl.context.Context;
-import org.activiti.engine.impl.interceptor.CommandContext;
-import org.activiti.engine.impl.persistence.entity.SignalEventSubscriptionEntity;
+import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.cdi.BusinessProcess;
+import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.bpm.engine.delegate.JavaDelegate;
+import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.entity.SignalEventSubscriptionEntity;
 
 @Named
 public class SendSignalDelegate implements JavaDelegate {

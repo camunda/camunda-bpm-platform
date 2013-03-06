@@ -12,7 +12,7 @@
  */
 package org.camunda.bpm.container.impl.jmx.deployment.util;
 
-import org.activiti.engine.impl.bpmn.deployer.BpmnDeployer;
+import org.camunda.bpm.engine.impl.bpmn.deployer.BpmnDeployer;
 
 public class ScanningUtil {
   

@@ -2,10 +2,10 @@ package com.camunda.fox.platform.subsystem.impl.service.execution;
 
 import java.util.List;
 
-import org.activiti.engine.impl.cmd.ExecuteJobsCmd;
-import org.activiti.engine.impl.interceptor.CommandExecutor;
+import org.camunda.bpm.engine.impl.cmd.ExecuteJobsCmd;
+import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
+import org.camunda.bpm.engine.impl.jobexecutor.tobemerged.impl.PlatformExecuteJobsRunnable;
 
-import com.camunda.fox.platform.jobexecutor.impl.PlatformExecuteJobsRunnable;
 
 /**
  * Custom Runnable delegating to the {@link ContainerExecuteJobCmd}

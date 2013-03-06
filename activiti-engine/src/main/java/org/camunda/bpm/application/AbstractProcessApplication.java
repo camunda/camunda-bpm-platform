@@ -17,12 +17,12 @@ import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.concurrent.Callable;
 
-import org.activiti.engine.impl.javax.el.ELResolver;
-import org.activiti.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.ProcessApplicationService;
 import org.camunda.bpm.application.impl.DefaultElResolverLookup;
 import org.camunda.bpm.container.RuntimeContainerDelegate;
+import org.camunda.bpm.engine.impl.javax.el.ELResolver;
 import org.camunda.bpm.engine.impl.util.ClassLoaderUtil;
+import org.camunda.bpm.engine.repository.DeploymentBuilder;
 
 
 /**

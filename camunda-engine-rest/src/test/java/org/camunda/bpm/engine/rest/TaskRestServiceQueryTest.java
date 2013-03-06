@@ -23,14 +23,14 @@ import java.util.Map;
 
 import javax.ws.rs.core.Response.Status;
 
-import org.activiti.engine.identity.Group;
-import org.activiti.engine.identity.GroupQuery;
-import org.activiti.engine.identity.User;
-import org.activiti.engine.identity.UserQuery;
-import org.activiti.engine.task.DelegationState;
-import org.activiti.engine.task.Task;
-import org.activiti.engine.task.TaskQuery;
+import org.camunda.bpm.engine.identity.Group;
+import org.camunda.bpm.engine.identity.GroupQuery;
+import org.camunda.bpm.engine.identity.User;
+import org.camunda.bpm.engine.identity.UserQuery;
 import org.camunda.bpm.engine.rest.helper.EqualsList;
+import org.camunda.bpm.engine.task.DelegationState;
+import org.camunda.bpm.engine.task.Task;
+import org.camunda.bpm.engine.task.TaskQuery;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.InOrder;

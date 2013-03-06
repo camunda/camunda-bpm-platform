@@ -10,8 +10,8 @@ import java.util.ServiceLoader;
 
 import javax.ws.rs.core.MediaType;
 
-import org.activiti.engine.ProcessEngine;
 import org.apache.http.entity.ContentType;
+import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.rest.spi.ProcessEngineProvider;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;

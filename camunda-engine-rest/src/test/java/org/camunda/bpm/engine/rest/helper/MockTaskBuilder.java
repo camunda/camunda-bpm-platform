@@ -5,9 +5,8 @@ import static org.mockito.Mockito.when;
 
 import java.util.Date;
 
-import org.activiti.engine.task.DelegationState;
-import org.activiti.engine.task.Task;
-import org.joda.time.DateTime;
+import org.camunda.bpm.engine.task.DelegationState;
+import org.camunda.bpm.engine.task.Task;
 
 public class MockTaskBuilder {
 

@@ -19,10 +19,6 @@ import java.util.Set;
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.ProcessEngine;
-import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.activiti.engine.impl.jobexecutor.JobExecutor;
 import org.camunda.bpm.ProcessApplicationService;
 import org.camunda.bpm.ProcessEngineService;
 import org.camunda.bpm.application.AbstractProcessApplication;
@@ -40,10 +36,12 @@ import org.camunda.bpm.container.impl.jmx.kernel.MBeanServiceContainer;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanServiceContainer.ServiceType;
 import org.camunda.bpm.container.impl.jmx.services.JmxManagedProcessApplication;
 import org.camunda.bpm.container.impl.jmx.services.JmxManagedProcessEngine;
-
-import com.camunda.fox.platform.FoxPlatformException;
-import com.camunda.fox.platform.jobexecutor.JobExecutorService;
-import com.camunda.fox.platform.jobexecutor.spi.JobAcquisitionConfiguration;
+import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
+import org.camunda.bpm.engine.impl.jobexecutor.tobemerged.JobExecutorService;
+import org.camunda.bpm.engine.impl.jobexecutor.tobemerged.spi.JobAcquisitionConfiguration;
 
 /**
  * <p>This is the default {@link RuntimeContainerDelegate} implementation that delegates
@@ -83,7 +81,7 @@ public class JmxRuntimeContainerDelegate implements RuntimeContainerDelegate, Pr
       try {
         return new ObjectName(serviceRealm+":type=" + localName);
       } catch (Exception e) {
-        throw new FoxPlatformException("Could not compose name for ProcessEngineMBean", e);
+        throw new ProcessEngineException("Could not compose name for ProcessEngineMBean", e);
       }
     }
     
@@ -91,7 +89,7 @@ public class JmxRuntimeContainerDelegate implements RuntimeContainerDelegate, Pr
       try {
         return new ObjectName(serviceRealm + ":type=*");
       } catch (Exception e) {
-        throw new FoxPlatformException("Could not compose name for ProcessEngineMBean", e);
+        throw new ProcessEngineException("Could not compose name for ProcessEngineMBean", e);
       }
     }
                 
@@ -102,7 +100,7 @@ public class JmxRuntimeContainerDelegate implements RuntimeContainerDelegate, Pr
   public void registerProcessEngine(ProcessEngine processEngine) {
     
     if(processEngine == null) {
-      throw new ActivitiException("Cannot register process engine in Jmx Runtime Container: process engine is 'null'");
+      throw new ProcessEngineException("Cannot register process engine in Jmx Runtime Container: process engine is 'null'");
     }
     
     String processEngineName = processEngine.getName();
@@ -116,7 +114,7 @@ public class JmxRuntimeContainerDelegate implements RuntimeContainerDelegate, Pr
   public void unregisterProcessEngine(ProcessEngine processEngine) {
     
     if(processEngine == null) {
-      throw new ActivitiException("Cannot unregister process engine in Jmx Runtime Container: process engine is 'null'");
+      throw new ProcessEngineException("Cannot unregister process engine in Jmx Runtime Container: process engine is 'null'");
     }
     
     serviceContainer.stopService(ServiceTypes.PROCESS_ENGINE, processEngine.getName());
@@ -126,7 +124,7 @@ public class JmxRuntimeContainerDelegate implements RuntimeContainerDelegate, Pr
   public void deployProcessApplication(AbstractProcessApplication processApplication) {
     
     if(processApplication == null) {
-      throw new ActivitiException("Process application cannot be null");
+      throw new ProcessEngineException("Process application cannot be null");
     }
     
     final String operationName = "Deployment of Process Application "+processApplication.getName();
@@ -144,7 +142,7 @@ public class JmxRuntimeContainerDelegate implements RuntimeContainerDelegate, Pr
   public void undeployProcessApplication(AbstractProcessApplication processApplication) {
 
     if(processApplication == null) {
-      throw new ActivitiException("Process application cannot be null");
+      throw new ProcessEngineException("Process application cannot be null");
     }
     
     // if the process application is not deployed, ignore the request.

@@ -1,8 +1,9 @@
 package com.camunda.fox.platform.test.jobexecutor.beans;
 
 import javax.enterprise.context.ApplicationScoped;
-import org.activiti.engine.delegate.DelegateExecution;
-import org.activiti.engine.delegate.JavaDelegate;
+
+import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.bpm.engine.delegate.JavaDelegate;
 
 /**
  *

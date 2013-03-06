@@ -12,8 +12,8 @@
  */
 package org.camunda.bpm.application;
 
-import org.activiti.engine.ManagementService;
-import org.activiti.engine.repository.Deployment;
+import org.camunda.bpm.engine.ManagementService;
+import org.camunda.bpm.engine.repository.Deployment;
 
 
 /**

@@ -2,7 +2,7 @@ package com.camunda.fox.platform.test.jobexecutor;
 
 import static org.junit.Assert.assertEquals;
 
-import org.activiti.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.spec.WebArchive;

@@ -13,8 +13,8 @@ import java.util.Map;
 
 import javax.ws.rs.core.Response.Status;
 
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.RuntimeService;
+import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.RuntimeService;
 import org.junit.Test;
 
 public class ProcessInstanceServiceInteractionTest extends AbstractRestServiceTest {
@@ -58,7 +58,7 @@ public class ProcessInstanceServiceInteractionTest extends AbstractRestServiceTe
   public void testGetVariablesForNonExistingProcessInstance() throws IOException {
     setupMocks();
     
-    when(runtimeServiceMock.getVariables(anyString())).thenThrow(new ActivitiException("expected exception"));
+    when(runtimeServiceMock.getVariables(anyString())).thenThrow(new ProcessEngineException("expected exception"));
     
     given().pathParam("id", "aNonExistingProcessInstanceId")
       .then().expect().statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())

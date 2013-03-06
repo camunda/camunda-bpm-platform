@@ -12,8 +12,6 @@
  */
 package org.camunda.bpm.application.impl;
 
-import java.security.AccessController;
-import java.security.PrivilegedAction;
 import java.util.HashMap;
 import java.util.Map;
 

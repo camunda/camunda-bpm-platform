@@ -21,12 +21,13 @@ import java.util.logging.Logger;
 import javax.sql.DataSource;
 import javax.transaction.TransactionManager;
 
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.ProcessEngine;
-import org.activiti.engine.impl.cfg.JtaProcessEngineConfiguration;
-import org.activiti.engine.impl.jobexecutor.JobExecutor;
-import org.activiti.engine.impl.persistence.StrongUuidGenerator;
 import org.camunda.bpm.container.impl.jmx.services.JmxManagedProcessEngineController;
+import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.cfg.JtaProcessEngineConfiguration;
+import org.camunda.bpm.engine.impl.cfg.jta.db.DbSchemaOperations;
+import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
+import org.camunda.bpm.engine.impl.persistence.StrongUuidGenerator;
 import org.jboss.as.connector.subsystems.datasources.DataSourceReferenceFactoryService;
 import org.jboss.as.naming.deployment.ContextNames;
 import org.jboss.msc.inject.Injector;
@@ -38,7 +39,6 @@ import org.jboss.msc.service.StartException;
 import org.jboss.msc.service.StopContext;
 import org.jboss.msc.value.InjectedValue;
 
-import com.camunda.fox.platform.impl.schema.DbSchemaOperations;
 import com.camunda.fox.platform.subsystem.impl.metadata.ManagedProcessEngineMetadata;
 import com.camunda.fox.platform.subsystem.impl.util.Tccl;
 import com.camunda.fox.platform.subsystem.impl.util.Tccl.Operation;
@@ -97,7 +97,7 @@ public class MscManagedProcessEngineController extends MscManagedProcessEngine {
     if(processEngineMetadata.isAutoSchemaUpdate()) {
       
       if(processEngineMetadata.getDbTablePrefix() != null) {
-        throw new ActivitiException("Cannot use '" + ManagedProcessEngineMetadata.PROP_IS_AUTO_SCHEMA_UPDATE + "=true' in combination with "
+        throw new ProcessEngineException("Cannot use '" + ManagedProcessEngineMetadata.PROP_IS_AUTO_SCHEMA_UPDATE + "=true' in combination with "
             + ManagedProcessEngineMetadata.PROP_DB_TABLE_PREFIX);
       }
       

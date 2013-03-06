@@ -11,17 +11,15 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response.Status;
 
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.FormService;
-import org.activiti.engine.IdentityService;
-import org.activiti.engine.RuntimeService;
-import org.activiti.engine.TaskService;
-import org.activiti.engine.form.FormData;
-import org.activiti.engine.identity.Group;
-import org.activiti.engine.identity.GroupQuery;
-import org.activiti.engine.identity.User;
-import org.activiti.engine.task.Task;
-import org.activiti.engine.task.TaskQuery;
+import org.camunda.bpm.engine.FormService;
+import org.camunda.bpm.engine.IdentityService;
+import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.form.FormData;
+import org.camunda.bpm.engine.identity.Group;
+import org.camunda.bpm.engine.identity.GroupQuery;
+import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.rest.TaskRestService;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.task.CompleteTaskDto;
@@ -33,6 +31,8 @@ import org.camunda.bpm.engine.rest.dto.task.TaskQueryDto;
 import org.camunda.bpm.engine.rest.dto.task.UserDto;
 import org.camunda.bpm.engine.rest.dto.task.UserIdDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+import org.camunda.bpm.engine.task.Task;
+import org.camunda.bpm.engine.task.TaskQuery;
 
 public class TaskRestServiceImpl extends AbstractEngineService implements TaskRestService {
 
@@ -173,7 +173,7 @@ public class TaskRestServiceImpl extends AbstractEngineService implements TaskRe
     FormData formData;
     try {
       formData = formService.getTaskFormData(id);
-    } catch (ActivitiException e) {
+    } catch (ProcessEngineException e) {
       throw new WebApplicationException(Status.BAD_REQUEST.getStatusCode());
     }
     

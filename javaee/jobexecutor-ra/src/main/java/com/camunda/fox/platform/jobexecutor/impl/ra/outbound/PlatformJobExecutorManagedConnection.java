@@ -16,13 +16,13 @@ import javax.resource.spi.ManagedConnectionMetaData;
 import javax.security.auth.Subject;
 import javax.transaction.xa.XAResource;
 
-import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.activiti.engine.impl.jobexecutor.JobExecutor;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
+import org.camunda.bpm.engine.impl.jobexecutor.tobemerged.JobExecutorService;
+import org.camunda.bpm.engine.impl.jobexecutor.tobemerged.ra.outbound.PlatformJobExecutorConnection;
+import org.camunda.bpm.engine.impl.jobexecutor.tobemerged.spi.JobAcquisitionConfiguration;
 
-import com.camunda.fox.platform.jobexecutor.JobExecutorService;
 import com.camunda.fox.platform.jobexecutor.impl.ra.PlatformJobExecutorConnector;
-import com.camunda.fox.platform.jobexecutor.ra.outbound.PlatformJobExecutorConnection;
-import com.camunda.fox.platform.jobexecutor.spi.JobAcquisitionConfiguration;
 
 /**
  * 

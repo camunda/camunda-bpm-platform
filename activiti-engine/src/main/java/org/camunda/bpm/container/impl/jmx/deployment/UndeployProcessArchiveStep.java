@@ -14,7 +14,6 @@ package org.camunda.bpm.container.impl.jmx.deployment;
 
 import java.util.Map;
 
-import org.activiti.engine.ProcessEngine;
 import org.camunda.bpm.application.ProcessApplicationRegistration;
 import org.camunda.bpm.application.impl.metadata.spi.ProcessArchiveXml;
 import org.camunda.bpm.container.impl.jmx.JmxRuntimeContainerDelegate.ServiceTypes;
@@ -23,6 +22,7 @@ import org.camunda.bpm.container.impl.jmx.kernel.MBeanDeploymentOperationStep;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanServiceContainer;
 import org.camunda.bpm.container.impl.jmx.services.JmxManagedProcessApplication;
 import org.camunda.bpm.container.impl.metadata.PropertyHelper;
+import org.camunda.bpm.engine.ProcessEngine;
 
 /**
  * <p>Deployment operation step responsible for performing the undeployment of a

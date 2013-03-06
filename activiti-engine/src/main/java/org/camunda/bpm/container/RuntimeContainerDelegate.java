@@ -12,11 +12,11 @@
  */
 package org.camunda.bpm.container;
 
-import org.activiti.engine.ProcessEngine;
 import org.camunda.bpm.ProcessApplicationService;
 import org.camunda.bpm.ProcessEngineService;
 import org.camunda.bpm.application.AbstractProcessApplication;
 import org.camunda.bpm.container.impl.jmx.JmxRuntimeContainerDelegate;
+import org.camunda.bpm.engine.ProcessEngine;
 
 /**
  * <p>The {@link RuntimeContainerDelegate} in an SPI that allows the process engine to integrate with the

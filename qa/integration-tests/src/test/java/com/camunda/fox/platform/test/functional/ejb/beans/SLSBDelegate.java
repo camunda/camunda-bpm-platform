@@ -3,8 +3,8 @@ package com.camunda.fox.platform.test.functional.ejb.beans;
 import javax.ejb.Stateless;
 import javax.inject.Named;
 
-import org.activiti.engine.delegate.DelegateExecution;
-import org.activiti.engine.delegate.JavaDelegate;
+import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.bpm.engine.delegate.JavaDelegate;
 
 /**
  * A SLSB acting as a {@link JavaDelegate}

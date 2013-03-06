@@ -1,3 +1,0 @@
-Manifest-Version: 1.0
-Created-By: camunda-fox
-Dependencies: com.camunda.fox.engine.fox-engine, com.camunda.fox.platform.fox-platform-api

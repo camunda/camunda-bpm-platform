@@ -12,8 +12,8 @@
  */
 package com.camunda.fox.platform.subsystem.impl.service;
 
-import org.activiti.engine.ProcessEngine;
 import org.camunda.bpm.container.impl.jmx.services.JmxManagedProcessEngine;
+import org.camunda.bpm.engine.ProcessEngine;
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.StartContext;
 import org.jboss.msc.service.StartException;

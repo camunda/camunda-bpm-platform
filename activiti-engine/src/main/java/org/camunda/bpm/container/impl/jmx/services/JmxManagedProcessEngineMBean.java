@@ -12,7 +12,7 @@
  */
 package org.camunda.bpm.container.impl.jmx.services;
 
-import org.activiti.engine.ProcessEngine;
+import org.camunda.bpm.engine.ProcessEngine;
 
 /**
  * An MBean interface for the {@link ProcessEngine}.

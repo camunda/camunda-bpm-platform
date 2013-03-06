@@ -11,14 +11,13 @@ import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 import javax.resource.ResourceException;
 
-import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.activiti.engine.impl.jobexecutor.JobExecutor;
-
-import com.camunda.fox.platform.FoxPlatformException;
-import com.camunda.fox.platform.jobexecutor.JobExecutorService;
-import com.camunda.fox.platform.jobexecutor.ra.outbound.PlatformJobExecutorConnection;
-import com.camunda.fox.platform.jobexecutor.ra.outbound.PlatformJobExecutorConnectionFactory;
-import com.camunda.fox.platform.jobexecutor.spi.JobAcquisitionConfiguration;
+import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
+import org.camunda.bpm.engine.impl.jobexecutor.tobemerged.JobExecutorService;
+import org.camunda.bpm.engine.impl.jobexecutor.tobemerged.ra.outbound.PlatformJobExecutorConnection;
+import org.camunda.bpm.engine.impl.jobexecutor.tobemerged.ra.outbound.PlatformJobExecutorConnectionFactory;
+import org.camunda.bpm.engine.impl.jobexecutor.tobemerged.spi.JobAcquisitionConfiguration;
 
 /**
  * Bean exposing the JCA implementation of the {@link JobExecutorService} as
@@ -42,7 +41,7 @@ public class PlatformJobExecutorBean implements JobExecutorService {
     try {
       platformJobExecutorConnection = platformJobExecutorConnectionFactory.getConnection();
     } catch (ResourceException e) {
-      throw new FoxPlatformException("Could not open connection to platform job executor resource ", e);
+      throw new ProcessEngineException("Could not open connection to platform job executor resource ", e);
     } 
   }
   

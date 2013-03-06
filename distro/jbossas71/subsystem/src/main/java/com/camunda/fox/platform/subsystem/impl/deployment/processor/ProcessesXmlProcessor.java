@@ -17,10 +17,10 @@ import java.io.InputStream;
 import java.net.URL;
 import java.util.Enumeration;
 
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.impl.util.IoUtil;
 import org.camunda.bpm.application.impl.metadata.ProcessesXmlParser;
 import org.camunda.bpm.application.impl.metadata.spi.ProcessesXml;
+import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.jboss.as.server.deployment.Attachments;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
@@ -102,7 +102,7 @@ public class ProcessesXmlProcessor implements DeploymentUnitProcessor {
       return inputStream.available() == 0;
       
     } catch (IOException e) {
-      throw new ActivitiException("Could not open stream for " + url, e); 
+      throw new ProcessEngineException("Could not open stream for " + url, e); 
       
     } finally {
       IoUtil.closeSilently(inputStream);

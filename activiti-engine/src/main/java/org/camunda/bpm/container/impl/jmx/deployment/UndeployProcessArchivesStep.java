@@ -16,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import org.activiti.engine.ActivitiException;
 import org.camunda.bpm.application.AbstractProcessApplication;
 import org.camunda.bpm.application.ProcessApplicationRegistration;
 import org.camunda.bpm.application.impl.metadata.spi.ProcessArchiveXml;
@@ -26,6 +25,7 @@ import org.camunda.bpm.container.impl.jmx.kernel.MBeanDeploymentOperation;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanDeploymentOperationStep;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanServiceContainer;
 import org.camunda.bpm.container.impl.jmx.services.JmxManagedProcessApplication;
+import org.camunda.bpm.engine.ProcessEngineException;
 
 /**
  * <p>Deployment operation responsible for undeploying all process archives.</p>
@@ -48,7 +48,7 @@ public class UndeployProcessArchivesStep extends MBeanDeploymentOperationStep {
     final JmxManagedProcessApplication deployedProcessApplication = serviceContainer.getService(ServiceTypes.PROCESS_APPLICATION, processApplication.getName());
     
     if(deployedProcessApplication == null) {
-      throw new ActivitiException("Cannot find process application with name "+processApplication.getName()+".");
+      throw new ProcessEngineException("Cannot find process application with name "+processApplication.getName()+".");
     }
     
     Map<String, ProcessApplicationRegistration> deploymentMap = deployedProcessApplication.getProcessArchiveDeploymentMap();

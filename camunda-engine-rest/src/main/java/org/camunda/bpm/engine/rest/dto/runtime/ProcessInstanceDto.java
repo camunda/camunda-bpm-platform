@@ -5,10 +5,10 @@ import java.net.URI;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
-import org.activiti.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.rest.ProcessInstanceService;
 import org.camunda.bpm.engine.rest.dto.AtomLink;
 import org.camunda.bpm.engine.rest.dto.LinkableDto;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 
 public class ProcessInstanceDto extends LinkableDto {
   

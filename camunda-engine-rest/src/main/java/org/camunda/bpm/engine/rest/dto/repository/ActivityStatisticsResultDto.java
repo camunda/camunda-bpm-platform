@@ -1,6 +1,6 @@
 package org.camunda.bpm.engine.rest.dto.repository;
 
-import org.activiti.engine.management.ActivityStatistics;
+import org.camunda.bpm.engine.management.ActivityStatistics;
 import org.camunda.bpm.engine.rest.dto.StatisticsResultDto;
 
 public class ActivityStatisticsResultDto extends StatisticsResultDto {

@@ -21,7 +21,7 @@ import java.util.logging.Logger;
 
 import javax.management.ObjectName;
 
-import org.activiti.engine.ActivitiException;
+import org.camunda.bpm.engine.ProcessEngineException;
 
 /**
  * <p>A DeploymentOperation allows bundling multiple deployment steps into a
@@ -128,7 +128,7 @@ public class MBeanDeploymentOperation {
           }   
           
           // re-throw the original exception
-          throw new ActivitiException("Exception while performing '" + name+"'", e);
+          throw new ProcessEngineException("Exception while performing '" + name+"'", e);
           
         } else {
           log.log(Level.SEVERE, "Exception while performing operation step '" + currentStep.getName() + "': " + e.getMessage(), e);

@@ -11,10 +11,10 @@ import javax.resource.spi.work.WorkException;
 import javax.resource.spi.work.WorkManager;
 import javax.resource.spi.work.WorkRejectedException;
 
-import org.activiti.engine.impl.interceptor.CommandExecutor;
+import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
+import org.camunda.bpm.engine.impl.jobexecutor.tobemerged.impl.PlatformExecuteJobsRunnable;
+import org.camunda.bpm.engine.impl.jobexecutor.tobemerged.impl.PlatformJobExecutor;
 
-import com.camunda.fox.platform.jobexecutor.impl.PlatformExecuteJobsRunnable;
-import com.camunda.fox.platform.jobexecutor.impl.PlatformJobExecutor;
 import com.camunda.fox.platform.jobexecutor.impl.ra.PlatformJobExecutorConnector;
 
 

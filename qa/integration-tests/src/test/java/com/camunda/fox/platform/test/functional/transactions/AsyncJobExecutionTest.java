@@ -4,7 +4,7 @@ import java.util.HashMap;
 
 import javax.inject.Inject;
 
-import org.activiti.engine.RuntimeService;
+import org.camunda.bpm.engine.RuntimeService;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.spec.WebArchive;

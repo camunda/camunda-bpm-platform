@@ -22,12 +22,6 @@ import java.util.Map.Entry;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.ProcessEngine;
-import org.activiti.engine.RepositoryService;
-import org.activiti.engine.impl.util.IoUtil;
-import org.activiti.engine.repository.Deployment;
-import org.activiti.engine.repository.DeploymentBuilder;
 import org.camunda.bpm.application.AbstractProcessApplication;
 import org.camunda.bpm.application.ProcessApplicationRegistration;
 import org.camunda.bpm.application.impl.metadata.spi.ProcessArchiveXml;
@@ -37,6 +31,12 @@ import org.camunda.bpm.container.impl.jmx.kernel.MBeanDeploymentOperation;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanDeploymentOperationStep;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanServiceContainer;
 import org.camunda.bpm.container.impl.metadata.PropertyHelper;
+import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.RepositoryService;
+import org.camunda.bpm.engine.impl.util.IoUtil;
+import org.camunda.bpm.engine.repository.Deployment;
+import org.camunda.bpm.engine.repository.DeploymentBuilder;
 
 
 /**
@@ -165,14 +165,14 @@ public class DeployProcessArchiveStep extends MBeanDeploymentOperationStep {
     if(processEngineName != null) {
       ProcessEngine processEngine = serviceContainer.getServiceValue(ServiceTypes.PROCESS_ENGINE, processEngineName);
       if(processEngine == null) {        
-        throw new ActivitiException("Cannot deploy process archive '" + processArchive.getName() + "' to process engine '"+processEngineName+"' no such process engine exists.");
+        throw new ProcessEngineException("Cannot deploy process archive '" + processArchive.getName() + "' to process engine '"+processEngineName+"' no such process engine exists.");
       }      
       return processEngine;
       
     } else {
       ProcessEngine processEngine = serviceContainer.getServiceValue(ServiceTypes.PROCESS_ENGINE, "default");      
       if(processEngine == null) {        
-        throw new ActivitiException("Cannot deploy process archive '" + processArchive.getName() + "' to default process: no such process engine exists.");
+        throw new ProcessEngineException("Cannot deploy process archive '" + processArchive.getName() + "' to default process: no such process engine exists.");
       }      
       return processEngine;
     }

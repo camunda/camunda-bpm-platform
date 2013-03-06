@@ -12,8 +12,8 @@
  */
 package org.camunda.bpm.application.impl.metadata;
 
-import org.activiti.engine.impl.util.ReflectUtil;
-import org.activiti.engine.impl.util.xml.Parser;
+import org.camunda.bpm.engine.impl.util.ReflectUtil;
+import org.camunda.bpm.engine.impl.util.xml.Parser;
 
 
 /**

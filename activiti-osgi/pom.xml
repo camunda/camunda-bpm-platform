@@ -35,7 +35,7 @@
             <Bundle-SymbolicName>${activiti.osgi.symbolic.name}</Bundle-SymbolicName>
             <Bundle-Activator>${activiti.osgi.activator}</Bundle-Activator>
             <Export-Package>${activiti.osgi.export}</Export-Package>
-            <Import-Package>org.activiti.osgi*;resolution:=optional, ${activiti.osgi.import}</Import-Package>
+            <Import-Package>org.camunda.bpm.engine.osgi*;resolution:=optional, ${activiti.osgi.import}</Import-Package>
             <DynamicImport-Package>${activiti.osgi.dynamic}</DynamicImport-Package>
             <Private-Package>${activiti.osgi.private.pkg}</Private-Package>
             <Implementation-Title>Activiti</Implementation-Title>
@@ -83,13 +83,13 @@
 
     <properties>
         <activiti.osgi.activator>
-            org.activiti.osgi.Activator
+            org.camunda.bpm.engine.osgi.Activator
         </activiti.osgi.activator>
         <activiti.osgi.import.pkg>
             org.apache.felix.fileinstall*;resolution:=optional,*
         </activiti.osgi.import.pkg>
         <activiti.artifact>
-            org.activiti.osgi
+            org.camunda.bpm.engine.osgi
         </activiti.artifact>
     </properties>
 

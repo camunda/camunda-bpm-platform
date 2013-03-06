@@ -12,8 +12,8 @@
  */
 package org.camunda.bpm.container.impl.jmx.services;
 
-import org.activiti.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanServiceContainer;
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 
 /**
  * <p>Represents a managed process engine that is started / stopped inside the {@link MBeanServiceContainer}</p>

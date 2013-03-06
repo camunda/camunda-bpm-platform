@@ -15,8 +15,8 @@ package com.camunda.fox.platform.subsystem.impl.deployment.processor;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.engine.ProcessEngine;
 import org.camunda.bpm.container.impl.metadata.spi.ProcessEngineXml;
+import org.camunda.bpm.engine.ProcessEngine;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.server.deployment.DeploymentUnitProcessingException;

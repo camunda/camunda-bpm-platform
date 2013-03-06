@@ -17,10 +17,10 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.impl.context.Context;
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.application.ProcessApplicationRegistration;
+import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.context.Context;
 
 /**
  * @author Daniel Meyer
@@ -59,7 +59,7 @@ public class ProcessApplicationManager {
       return registration;
       
     } else {
-      throw new ActivitiException("Cannot register process application for deploymentId '" + deploymentId
+      throw new ProcessEngineException("Cannot register process application for deploymentId '" + deploymentId
           + "' there already is a registration for the same deployment.");
 
     }

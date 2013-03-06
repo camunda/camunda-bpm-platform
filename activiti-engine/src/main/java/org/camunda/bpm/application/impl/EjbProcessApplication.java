@@ -17,8 +17,7 @@ import javax.naming.NamingException;
 
 import org.camunda.bpm.application.AbstractProcessApplication;
 import org.camunda.bpm.application.ProcessApplicationReference;
-
-import com.camunda.fox.platform.FoxPlatformException;
+import org.camunda.bpm.engine.ProcessEngineException;
 
 /**
  * @author Daniel Meyer
@@ -77,7 +76,7 @@ public class EjbProcessApplication extends AbstractProcessApplication {
       return "java:global/" + eeModulePath + "/" + applicationClass.getSimpleName() + "!" + applicationClass.getName();  
 
     } catch (NamingException e) {
-      throw new FoxPlatformException("Could not autodetect EjbProcessApplicationName: "+e.getMessage(), e);
+      throw new ProcessEngineException("Could not autodetect EjbProcessApplicationName: "+e.getMessage(), e);
     }
     
     
