@@ -1,4 +1,4 @@
-package org.activiti.osgi.blueprint;
+package org.camunda.bpm.engine.osgi.blueprint;
 
 import javax.sql.DataSource;
 

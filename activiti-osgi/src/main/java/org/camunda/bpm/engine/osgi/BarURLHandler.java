@@ -10,14 +10,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.activiti.osgi;
+package org.camunda.bpm.engine.osgi;
 
 import org.osgi.service.url.AbstractURLStreamHandlerService;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
@@ -25,17 +22,15 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- * A URL handler to transform a BPMN xml definition into an osgi bundle
- *
  * @author <a href="gnodet@gmail.com">Guillaume Nodet</a>
  */
-public class BpmnURLHandler extends AbstractURLStreamHandlerService {
+public class BarURLHandler extends AbstractURLStreamHandlerService {
 
-    private static Logger logger = Logger.getLogger(BpmnURLHandler.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(BarURLHandler.class.getName());
 
-    private static String SYNTAX = "bpmn: bpmn-xml-uri";
+    private static String SYNTAX = "bar: bar-xml-uri";
 
-    private URL bpmnXmlURL;
+    private URL barXmlURL;
 
     /**
      * Open the connection for the given URL.
@@ -49,14 +44,14 @@ public class BpmnURLHandler extends AbstractURLStreamHandlerService {
         if (url.getPath() == null || url.getPath().trim().length() == 0) {
             throw new MalformedURLException("Path can not be null or empty. Syntax: " + SYNTAX );
         }
-        bpmnXmlURL = new URL(url.getPath());
+        barXmlURL = new URL(url.getPath());
 
-        logger.log(Level.FINE, "BPMN xml URL is: [" + bpmnXmlURL + "]");
+        LOGGER.log(Level.FINE, "bar xml URL is: [" + barXmlURL + "]");
         return new Connection(url);
     }
 
-    public URL getBpmnXmlURL() {
-        return bpmnXmlURL;
+    public URL getBarXmlURL() {
+        return barXmlURL;
     }
 
     public class Connection extends URLConnection {
@@ -71,15 +66,28 @@ public class BpmnURLHandler extends AbstractURLStreamHandlerService {
 
         @Override
         public InputStream getInputStream() throws IOException {
-            try {
-                ByteArrayOutputStream os = new ByteArrayOutputStream();
-                BpmnTransformer.transform(bpmnXmlURL, os);
-                os.close();
-                return new ByteArrayInputStream(os.toByteArray());
-            } catch (Exception e) {
-                logger.log(Level.SEVERE, "Error opening spring xml url", e);
-                throw (IOException) new IOException("Error opening spring xml url").initCause(e);
-            }
+            final PipedInputStream pin = new PipedInputStream();
+            final PipedOutputStream pout = new PipedOutputStream( pin );
+            new Thread() {
+                public void run() {
+                    try {
+                        BarTransformer.transform(barXmlURL, pout);
+                    }
+                    catch( Exception e ) {
+                        LOGGER.log( Level.WARNING, "Bundle cannot be generated" );
+                    }
+                    finally {
+                        try {
+                            pout.close();
+                        }
+                        catch( IOException ignore ) {
+                            // if we get here something is very wrong
+                            LOGGER.log( Level.SEVERE, "Bundle cannot be generated", ignore );
+                        }
+                    }
+                }
+            }.start();
+            return pin;
         }
     }
 

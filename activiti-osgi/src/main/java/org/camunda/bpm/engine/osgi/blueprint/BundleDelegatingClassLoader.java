@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.activiti.osgi.blueprint;
+package org.camunda.bpm.engine.osgi.blueprint;
 
 import java.io.IOException;
 import java.net.URL;

@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.activiti.osgi;
+package org.camunda.bpm.engine.osgi;
 
 import java.util.ArrayList;
 import java.util.HashMap;

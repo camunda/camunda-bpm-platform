@@ -10,9 +10,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.activiti.osgi;
+package org.camunda.bpm.engine.osgi;
 
-import static org.activiti.osgi.Constants.BUNDLE_ACTIVITI_HEADER;
+import static org.camunda.bpm.engine.osgi.Constants.BUNDLE_ACTIVITI_HEADER;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -32,9 +32,9 @@ import java.util.logging.Logger;
 import javax.script.ScriptEngine;
 import javax.script.ScriptEngineFactory;
 
-import org.activiti.osgi.HeaderParser.PathElement;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RepositoryService;
+import org.camunda.bpm.engine.osgi.HeaderParser.PathElement;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleContext;

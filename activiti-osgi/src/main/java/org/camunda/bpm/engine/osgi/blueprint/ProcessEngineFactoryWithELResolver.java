@@ -1,9 +1,8 @@
-package org.activiti.osgi.blueprint;
+package org.camunda.bpm.engine.osgi.blueprint;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.activiti.osgi.OsgiScriptingEngines;
 import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
@@ -17,6 +16,7 @@ import org.camunda.bpm.engine.impl.scripting.BeansResolverFactory;
 import org.camunda.bpm.engine.impl.scripting.ResolverFactory;
 import org.camunda.bpm.engine.impl.scripting.ScriptBindingsFactory;
 import org.camunda.bpm.engine.impl.scripting.VariableScopeResolverFactory;
+import org.camunda.bpm.engine.osgi.OsgiScriptingEngines;
 
 
 public class ProcessEngineFactoryWithELResolver extends ProcessEngineFactory {

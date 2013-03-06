@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.activiti.osgi;
+package org.camunda.bpm.engine.osgi;
 
 /**
  * @author <a href="gnodet@gmail.com">Guillaume Nodet</a>

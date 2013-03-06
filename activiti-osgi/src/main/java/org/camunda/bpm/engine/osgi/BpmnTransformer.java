@@ -10,31 +10,49 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.activiti.osgi;
+package org.camunda.bpm.engine.osgi;
 
-import java.io.BufferedOutputStream;
+import static org.camunda.bpm.engine.osgi.Constants.BUNDLE_ACTIVITI_HEADER;
+import static org.osgi.framework.Constants.BUNDLE_MANIFESTVERSION;
+import static org.osgi.framework.Constants.BUNDLE_SYMBOLICNAME;
+import static org.osgi.framework.Constants.BUNDLE_VERSION;
+
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.Enumeration;
+import java.util.Properties;
 import java.util.jar.JarFile;
-import java.util.jar.JarInputStream;
 import java.util.jar.JarOutputStream;
 import java.util.jar.Manifest;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.zip.Deflater;
 import java.util.zip.ZipEntry;
 
-import static org.activiti.osgi.Constants.BUNDLE_ACTIVITI_HEADER;
-import static org.osgi.framework.Constants.*;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 /**
+ * Helper class to actually transform the BPMN xml file into a bundle.
+ *
  * @author <a href="gnodet@gmail.com">Guillaume Nodet</a>
  */
-public class BarTransformer {
+public class BpmnTransformer {
+
+    static DocumentBuilderFactory dbf;
+    static TransformerFactory tf;
 
     public static void transform(URL url, OutputStream os) throws Exception {
+        // Build dom document
+        Document doc = parse(url);
         // Heuristicly retrieve name and version
         String name = url.getPath();
         int idx = name.lastIndexOf('/');
@@ -42,79 +60,50 @@ public class BarTransformer {
             name = name.substring(idx + 1);
         }
         String[] str = extractNameVersionType(name);
-        // Build the list of folders containing resources
-        String pathHeader;
-        JarInputStream jis = new JarInputStream(url.openStream());
-        try {
-            Set<String> paths = new TreeSet<String>();
-            ZipEntry e;
-            while ((e = jis.getNextEntry()) != null) {
-                String n = e.getName();
-                int i = n.lastIndexOf('/');
-                if (-1 == i) {// Add root path if the .bpmn20.xml is in the root of the bar file and the value is example.bpmn20.xml
-                    paths.add("/"); //Extender#checkBundle calls the HeaderParser#parseHeader and it does not parse an empty string
-                } else if (i < n.length() - 1) {
-                    paths.add(n.substring(0, i + 1));
+        // Create manifest
+        Manifest m = new Manifest();
+        m.getMainAttributes().putValue("Manifest-Version", "2");
+        m.getMainAttributes().putValue(BUNDLE_MANIFESTVERSION, "2");
+        m.getMainAttributes().putValue(BUNDLE_SYMBOLICNAME, str[0]);
+        m.getMainAttributes().putValue(BUNDLE_VERSION, str[1]);
+        m.getMainAttributes().putValue(BUNDLE_ACTIVITI_HEADER, "OSGI-INF/activiti/");
+        // Extract manifest entries from the DOM
+        NodeList l = doc.getElementsByTagName("manifest");
+        if (l != null) {
+            for (int i = 0; i < l.getLength(); i++) {
+                Element e = (Element) l.item(i);
+                String text = e.getTextContent();
+                Properties props = new Properties();
+                props.load(new ByteArrayInputStream(text.trim().getBytes()));
+                Enumeration en = props.propertyNames();
+                while (en.hasMoreElements()) {
+                    String k = (String) en.nextElement();
+                    String v = props.getProperty(k);
+                    m.getMainAttributes().putValue(k, v);
                 }
+                e.getParentNode().removeChild(e);
             }
-            StringBuilder sb = new StringBuilder();
-            for (String s : paths) {
-                if (sb.length() > 0) {
-                    sb.append(",");
-                }
-                sb.append(s);
-            }
-            pathHeader = sb.toString();
-        } finally {
-            jis.close();
         }
-        // Build the stream
-        jis = new JarInputStream(url.openStream());
-        try {
-            JarOutputStream jos = new JarOutputStream(os);
-            jos.setLevel(Deflater.NO_COMPRESSION);
-            // Transform manifest
-            Manifest m = jis.getManifest();
-            if (m == null) {
-                m = new Manifest();
-                m.getMainAttributes().putValue("Manifest-Version", "2");
-            }
-            if (m.getMainAttributes().getValue(BUNDLE_MANIFESTVERSION) == null) {
-                m.getMainAttributes().putValue(BUNDLE_MANIFESTVERSION, "2");
-            }
-            if (m.getMainAttributes().getValue(BUNDLE_SYMBOLICNAME) == null) {
-                m.getMainAttributes().putValue(BUNDLE_SYMBOLICNAME, str[0]);
-            }
-            if (m.getMainAttributes().getValue(BUNDLE_VERSION) == null) {
-                m.getMainAttributes().putValue(BUNDLE_VERSION, str[1]);
-            }
-            m.getMainAttributes().putValue(BUNDLE_ACTIVITI_HEADER, pathHeader);
-            // Write manifest
-            ZipEntry e = new ZipEntry(JarFile.MANIFEST_NAME);
-            jos.putNextEntry(e);
-            m.write(jos);
-            jos.closeEntry();
-            // Write all entries
-            byte[] readBuffer = new byte[8192];
-            while ((e = jis.getNextEntry()) != null) {
-                ZipEntry e2 = new ZipEntry(e.getName());
-//                e2.setMethod(ZipEntry.STORED);
-//                e2.setSize(e.getSize());
-//                e2.setCrc(e.getCrc());
-                jos.putNextEntry(e2);
-                int bytesIn = jis.read(readBuffer);
-                while (bytesIn != -1)
-                {
-                    jos.write(readBuffer, 0, bytesIn);
-                    bytesIn = jis.read(readBuffer);
-                }
-                jos.closeEntry();
-            }
-            jos.finish();
-            jos.flush();
-        } finally {
-            jis.close();
+
+        JarOutputStream out = new JarOutputStream(os);
+        ZipEntry e = new ZipEntry(JarFile.MANIFEST_NAME);
+        out.putNextEntry(e);
+        m.write(out);
+        out.closeEntry();
+        e = new ZipEntry("OSGI-INF/");
+        out.putNextEntry(e);
+        e = new ZipEntry("OSGI-INF/activiti/");
+        out.putNextEntry(e);
+        out.closeEntry();
+        e = new ZipEntry("OSGI-INF/activiti/" + name);
+        out.putNextEntry(e);
+        // Copy the new DOM
+        if (tf == null) {
+            tf = TransformerFactory.newInstance();
         }
+        tf.newTransformer().transform(new DOMSource(doc), new StreamResult(out));
+        out.closeEntry();
+        out.close();
     }
 
     private static final String DEFAULT_VERSION = "0.0.0";
@@ -175,6 +164,24 @@ public class BarTransformer {
             if ((c >= '0' && c <= '9') || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_' || c == '-') {
                 result.append(c);
             }
+        }
+    }
+
+    protected static Document parse(URL url) throws Exception {
+        if (dbf == null) {
+            dbf = DocumentBuilderFactory.newInstance();
+            dbf.setNamespaceAware(true);
+        }
+        DocumentBuilder db = dbf.newDocumentBuilder();
+        return db.parse(url.toString());
+    }
+
+    protected static void copyInputStream(InputStream in, OutputStream out) throws Exception {
+        byte[] buffer = new byte[4096];
+        int len = in.read(buffer);
+        while (len >= 0) {
+            out.write(buffer, 0, len);
+            len = in.read(buffer);
         }
     }
 

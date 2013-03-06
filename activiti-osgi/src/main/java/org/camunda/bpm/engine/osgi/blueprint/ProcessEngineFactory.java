@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package org.activiti.osgi.blueprint;
+package org.camunda.bpm.engine.osgi.blueprint;
 
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
