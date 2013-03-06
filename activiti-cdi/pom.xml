@@ -147,7 +147,6 @@
 	</dependencies>
 
 	<build>
-		<finalName>activiti-cdi</finalName>
 		<resources>
 			<resource>
 				<directory>src/main/resources</directory>

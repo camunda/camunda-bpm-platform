@@ -33,12 +33,12 @@ import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.BeforeBeanDiscovery;
 import javax.enterprise.inject.spi.Extension;
 
-import org.activiti.cdi.annotation.BusinessProcessScoped;
-import org.activiti.cdi.impl.context.BusinessProcessContext;
-import org.activiti.cdi.impl.util.BeanManagerLookup;
+import org.camunda.bpm.engine.cdi.annotation.BusinessProcessScoped;
+import org.camunda.bpm.engine.cdi.impl.context.BusinessProcessContext;
+import org.camunda.bpm.engine.cdi.impl.util.BeanManagerLookup;
 
 /**
- * Customized version of the ActivitiExtension which does not 
+ * Customized version of the ProcessEngineExtension which does not 
  * attempt to lookup a ProcessEngine  
  *  
  * @author Daniel Meyer

@@ -12,8 +12,8 @@ import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.activiti.cdi.BusinessProcess;
 import org.camunda.bpm.engine.RepositoryService;
+import org.camunda.bpm.engine.cdi.BusinessProcess;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 
 @ConversationScoped
