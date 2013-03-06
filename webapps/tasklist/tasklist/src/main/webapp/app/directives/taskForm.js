@@ -10,13 +10,24 @@ define(["angular", "jquery"], function(angular, $) {
    */
   var TaskVariablesController = function TaskVariablesController($scope) {
 
+    this.getVariable = function(key) {
+      var variables = this.variables;
+
+      for (var i = 0, variable; !!(variable = variables[i]); i++) {
+        if (variable.key == key) {
+          return variable;
+        }
+      }
+
+      return null;
+    };
+
     this.addVariable = function(variable) {
 
       var variables = this.variables,
           idx = variables.indexOf(variable);
 
       if (idx == -1) {
-        console.log("add variable", variable);
         variables.push(variable);
       }
     };
@@ -26,7 +37,6 @@ define(["angular", "jquery"], function(angular, $) {
           idx = variables.indexOf(variable);
 
       if (idx != -1) {
-        console.log("remove variable", variable);
         variables.splice(idx, 1);
       }
     };
@@ -65,6 +75,7 @@ define(["angular", "jquery"], function(angular, $) {
 
         var type = attributes["type"],
             key = attributes["key"],
+            readOnly = (attributes["readonly"] == "readonly" || attributes["readonly"] === true),
             variable = scope.$eval(attributes["variable"]);
 
         if (variable) {
@@ -74,12 +85,20 @@ define(["angular", "jquery"], function(angular, $) {
             throw new Error("key or type not defined for form field");
           }
 
-          variable = scope.variable = { type: type, key: key }
+          variable = taskVariables.getVariable(key);
+
+          if (!variable) {
+            variable = { type: type, key: key };
+            taskVariables.addVariable(variable);
+          }
         }
 
-        scope.typeSwitch = attributes["typeSwitch"];
+        // set readonly state
+        variable.readOnly = readOnly;
 
-        taskVariables.addVariable(variable);
+        scope.variable = variable;
+
+        scope.typeSwitch = attributes["typeSwitch"];
 
         scope.setType = function(type) {
           variable.type = type;
