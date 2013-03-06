@@ -16,10 +16,10 @@ package org.activiti.spring;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 
-import org.activiti.engine.impl.interceptor.Session;
-import org.activiti.engine.impl.interceptor.SessionFactory;
-import org.activiti.engine.impl.variable.EntityManagerSession;
-import org.activiti.engine.impl.variable.EntityManagerSessionImpl;
+import org.camunda.bpm.engine.impl.interceptor.Session;
+import org.camunda.bpm.engine.impl.interceptor.SessionFactory;
+import org.camunda.bpm.engine.impl.variable.EntityManagerSession;
+import org.camunda.bpm.engine.impl.variable.EntityManagerSessionImpl;
 import org.springframework.orm.jpa.EntityManagerFactoryUtils;
 
 

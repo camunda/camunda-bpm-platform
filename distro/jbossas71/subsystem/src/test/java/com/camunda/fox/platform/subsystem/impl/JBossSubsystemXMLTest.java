@@ -19,6 +19,7 @@ import java.util.List;
 
 import junit.framework.Assert;
 
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.PathElement;
 import org.jboss.as.controller.descriptions.ModelDescriptionConstants;
@@ -30,7 +31,6 @@ import org.jboss.msc.service.ServiceContainer;
 import org.jboss.msc.service.ServiceName;
 import org.junit.Test;
 
-import com.camunda.fox.platform.FoxPlatformException;
 import com.camunda.fox.platform.subsystem.impl.extension.Attribute;
 import com.camunda.fox.platform.subsystem.impl.extension.Element;
 import com.camunda.fox.platform.subsystem.impl.extension.FoxPlatformExtension;
@@ -147,7 +147,7 @@ public class JBossSubsystemXMLTest extends AbstractSubsystemTest {
     try {
       installInController(subsystemXml);
 //    services.getContainer().dumpServices();
-    } catch (FoxPlatformException fpe) {
+    } catch (ProcessEngineException fpe) {
       Assert.assertTrue("Duplicate process engine detected!", fpe.getMessage().contains("A process engine with name '__test' already exists."));
     }
   }

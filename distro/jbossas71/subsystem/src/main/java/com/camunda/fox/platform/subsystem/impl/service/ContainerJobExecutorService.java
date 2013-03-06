@@ -6,8 +6,10 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.activiti.engine.impl.interceptor.CommandExecutor;
-import org.activiti.engine.impl.jobexecutor.JobExecutor;
+import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
+import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
+import org.camunda.bpm.engine.impl.jobexecutor.tobemerged.impl.PlatformJobExecutor;
 import org.jboss.as.threads.ManagedQueueExecutorService;
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.ServiceName;
@@ -17,8 +19,6 @@ import org.jboss.msc.service.StopContext;
 import org.jboss.msc.value.InjectedValue;
 import org.jboss.threads.ExecutionTimedOutException;
 
-import com.camunda.fox.platform.FoxPlatformException;
-import com.camunda.fox.platform.jobexecutor.impl.PlatformJobExecutor;
 import com.camunda.fox.platform.subsystem.impl.metadata.ManagedProcessEngineMetadata;
 import com.camunda.fox.platform.subsystem.impl.service.execution.ContainerExecuteJobsRunnable;
 
@@ -95,7 +95,7 @@ public class ContainerJobExecutorService extends PlatformJobExecutor implements 
       // the the acquisition thread is interrupted, this probably means the app server is turning the lights off -> ignore          
     } catch (Exception e) {      
       // we must be able to schedule this
-      throw new FoxPlatformException("Can not schedule acquisition.", e);
+      throw new ProcessEngineException("Can not schedule acquisition.", e);
     }
     
     return null;

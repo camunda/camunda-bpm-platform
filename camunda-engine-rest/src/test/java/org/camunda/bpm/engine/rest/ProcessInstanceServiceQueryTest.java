@@ -17,8 +17,8 @@ import java.util.Map;
 
 import javax.ws.rs.core.Response.Status;
 
-import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.runtime.ProcessInstanceQuery;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.InOrder;

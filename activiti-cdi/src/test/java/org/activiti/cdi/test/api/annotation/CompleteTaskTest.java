@@ -18,8 +18,8 @@ import org.activiti.cdi.BusinessProcess;
 import org.activiti.cdi.impl.annotation.CompleteTaskInterceptor;
 import org.activiti.cdi.test.CdiActivitiTestCase;
 import org.activiti.cdi.test.impl.beans.DeclarativeProcessController;
-import org.activiti.engine.task.Task;
-import org.activiti.engine.test.Deployment;
+import org.camunda.bpm.engine.task.Task;
+import org.camunda.bpm.engine.test.Deployment;
 import org.junit.Test;
 
 /**

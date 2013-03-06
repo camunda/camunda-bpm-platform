@@ -17,7 +17,7 @@ import java.lang.annotation.RetentionPolicy;
 
 import javax.inject.Qualifier;
 
-import org.activiti.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.repository.ProcessDefinition;
 
 /**
  * Can be used to qualify events with details about a {@link ProcessDefinition}:

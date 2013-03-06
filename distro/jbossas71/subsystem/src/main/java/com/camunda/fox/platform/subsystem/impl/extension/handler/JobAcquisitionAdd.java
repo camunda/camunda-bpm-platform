@@ -31,6 +31,8 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import org.camunda.bpm.engine.impl.jobexecutor.tobemerged.impl.util.JobAcquisitionConfigurationBean;
+import org.camunda.bpm.engine.impl.jobexecutor.tobemerged.spi.JobAcquisitionConfiguration;
 import org.jboss.as.controller.AbstractAddStepHandler;
 import org.jboss.as.controller.OperationContext;
 import org.jboss.as.controller.OperationFailedException;
@@ -43,8 +45,6 @@ import org.jboss.dmr.ModelType;
 import org.jboss.dmr.Property;
 import org.jboss.msc.service.ServiceController;
 
-import com.camunda.fox.platform.jobexecutor.impl.util.JobAcquisitionConfigurationBean;
-import com.camunda.fox.platform.jobexecutor.spi.JobAcquisitionConfiguration;
 import com.camunda.fox.platform.subsystem.impl.extension.Element;
 import com.camunda.fox.platform.subsystem.impl.service.ContainerJobExecutorService;
 

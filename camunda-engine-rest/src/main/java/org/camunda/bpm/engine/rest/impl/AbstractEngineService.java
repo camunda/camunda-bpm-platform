@@ -3,7 +3,7 @@ package org.camunda.bpm.engine.rest.impl;
 import java.util.Iterator;
 import java.util.ServiceLoader;
 
-import org.activiti.engine.ProcessEngine;
+import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.spi.ProcessEngineProvider;
 

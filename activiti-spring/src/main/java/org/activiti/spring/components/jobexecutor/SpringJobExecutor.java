@@ -15,8 +15,8 @@ package org.activiti.spring.components.jobexecutor;
 import java.util.List;
 import java.util.concurrent.RejectedExecutionException;
 
-import org.activiti.engine.impl.jobexecutor.ExecuteJobsRunnable;
-import org.activiti.engine.impl.jobexecutor.JobExecutor;
+import org.camunda.bpm.engine.impl.jobexecutor.ExecuteJobsRunnable;
+import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.springframework.core.task.TaskExecutor;
 
 /**

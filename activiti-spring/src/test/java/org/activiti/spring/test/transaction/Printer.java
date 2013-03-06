@@ -13,7 +13,7 @@
 
 package org.activiti.spring.test.transaction;
 
-import org.activiti.engine.impl.pvm.delegate.ActivityExecution;
+import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 
 
 /**

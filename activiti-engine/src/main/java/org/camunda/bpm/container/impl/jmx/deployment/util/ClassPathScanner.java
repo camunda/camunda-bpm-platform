@@ -27,9 +27,8 @@ import java.util.logging.Logger;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import org.activiti.engine.impl.util.IoUtil;
-
-import com.camunda.fox.platform.FoxPlatformException;
+import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.util.IoUtil;
 
 /**
  * <p>Scans for bpmn20.xml files in the classpath of the given classloader.</p>
@@ -115,7 +114,7 @@ public class ClassPathScanner  {
     try {
       urlPath = URLDecoder.decode(urlPath, "UTF-8");
     } catch (UnsupportedEncodingException e) {
-      throw new FoxPlatformException("Could not decode pathname using utf-8 decoder.", e);
+      throw new ProcessEngineException("Could not decode pathname using utf-8 decoder.", e);
     }
 
     log.log(Level.FINEST, "Rootpath is {0}", urlPath);
@@ -164,7 +163,7 @@ public class ClassPathScanner  {
       }
       zipFile.close();
     } catch (IOException e) {
-      throw new FoxPlatformException("IOException while scanning archive '"+file+"'.", e);
+      throw new ProcessEngineException("IOException while scanning archive '"+file+"'.", e);
     }
   }
 
@@ -226,7 +225,7 @@ public class ClassPathScanner  {
         try {
           inputStream = new FileInputStream((File) source);
         } catch (IOException e) {
-          throw new FoxPlatformException("Could not open file for reading "+source + ". "+e.getMessage(), e);
+          throw new ProcessEngineException("Could not open file for reading "+source + ". "+e.getMessage(), e);
         }
       } else {
         inputStream = (InputStream) source;
@@ -247,7 +246,7 @@ public class ClassPathScanner  {
     try {
       resourceRoots = classLoader.getResources(strippedPaResourceRootPath);
     } catch (IOException e) {
-      throw new FoxPlatformException("Could not load resources at '"+strippedPaResourceRootPath+"' using classloaded '"+classLoader+"'", e);
+      throw new ProcessEngineException("Could not load resources at '"+strippedPaResourceRootPath+"' using classloaded '"+classLoader+"'", e);
     }
     return resourceRoots;
   }

@@ -16,7 +16,7 @@ import javax.enterprise.inject.spi.BeanManager;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
-import org.activiti.engine.ActivitiException;
+import org.camunda.bpm.engine.ProcessEngineException;
 
 public class BeanManagerLookup {
 
@@ -37,7 +37,7 @@ public class BeanManagerLookup {
       if (localInstance != null) {
         return localInstance;
       } else {
-        throw new ActivitiException(
+        throw new ProcessEngineException(
             "Could not lookup beanmanager in jndi. If no jndi is available, set the beanmanger to the 'localInstance' property of this class.");
       }
     }
@@ -49,7 +49,7 @@ public class BeanManagerLookup {
       try {
         return (BeanManager) InitialContext.doLookup(jndiName);
       } catch (NamingException e) {
-        throw new ActivitiException("Could not lookup beanmanager in jndi using name: '" + jndiName + "'.", e);
+        throw new ProcessEngineException("Could not lookup beanmanager in jndi using name: '" + jndiName + "'.", e);
       }
     }
 

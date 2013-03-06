@@ -17,8 +17,8 @@ import java.net.URL;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.ProcessEngine;
+import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.ProcessEngine;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.GenericXmlApplicationContext;
 import org.springframework.core.io.UrlResource;
@@ -39,7 +39,7 @@ public class SpringConfigurationHelper {
     if ( (beansOfType==null)
          || (beansOfType.isEmpty())
        ) {
-      throw new ActivitiException("no "+ProcessEngine.class.getName()+" defined in the application context "+resource.toString());
+      throw new ProcessEngineException("no "+ProcessEngine.class.getName()+" defined in the application context "+resource.toString());
     }
     
     ProcessEngine processEngine = beansOfType.values().iterator().next();

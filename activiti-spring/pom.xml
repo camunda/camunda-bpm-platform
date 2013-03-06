@@ -170,7 +170,7 @@
             <artifactId>maven-surefire-plugin</artifactId>
             <configuration>
               <systemProperties>
-                <property><name>process.engine.initializer</name><value>org.activiti.spring.SpringProcessEngineInitializer</value></property>
+                <property><name>process.engine.initializer</name><value>org.camunda.bpm.engine.test.spring.SpringProcessEngineInitializer</value></property>
               </systemProperties>
               <excludes>
                 <exclude>org/activiti/standalone/**</exclude>

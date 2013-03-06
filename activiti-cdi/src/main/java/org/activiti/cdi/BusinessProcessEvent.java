@@ -14,9 +14,9 @@ package org.activiti.cdi;
 
 import java.util.Date;
 
-import org.activiti.engine.repository.ProcessDefinition;
-import org.activiti.engine.runtime.Execution;
-import org.activiti.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.runtime.Execution;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 
 /**
  * Signifies an event that is happening / has happened during the execution of a

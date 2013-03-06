@@ -15,9 +15,9 @@
  */
 package org.activiti.spring.components.config.xml;
 
-import org.activiti.engine.ProcessEngine;
 import org.activiti.spring.components.ActivitiContextUtils;
 import org.activiti.spring.components.registry.ActivitiStateHandlerRegistry;
+import org.camunda.bpm.engine.ProcessEngine;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.beans.factory.config.BeanDefinitionHolder;

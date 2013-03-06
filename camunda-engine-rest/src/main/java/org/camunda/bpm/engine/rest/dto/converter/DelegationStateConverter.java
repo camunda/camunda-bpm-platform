@@ -1,6 +1,6 @@
 package org.camunda.bpm.engine.rest.dto.converter;
 
-import org.activiti.engine.task.DelegationState;
+import org.camunda.bpm.engine.task.DelegationState;
 
 public class DelegationStateConverter implements StringToTypeConverter<DelegationState> {
 

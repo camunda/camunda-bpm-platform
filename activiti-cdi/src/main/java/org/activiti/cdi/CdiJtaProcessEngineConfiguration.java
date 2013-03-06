@@ -12,7 +12,7 @@
  */
 package org.activiti.cdi;
 
-import org.activiti.engine.impl.cfg.JtaProcessEngineConfiguration;
+import org.camunda.bpm.engine.impl.cfg.JtaProcessEngineConfiguration;
 
 /**
  * @author Daniel Meyer

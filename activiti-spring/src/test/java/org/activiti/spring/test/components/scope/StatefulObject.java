@@ -1,6 +1,6 @@
 package org.activiti.spring.test.components.scope;
 
-import org.activiti.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.util.Assert;

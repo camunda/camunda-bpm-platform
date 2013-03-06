@@ -22,9 +22,9 @@ import java.util.concurrent.TimeoutException;
 
 import org.jboss.msc.service.AbstractServiceListener;
 import org.jboss.msc.service.ServiceController;
-import org.jboss.msc.service.ServiceListener;
 import org.jboss.msc.service.ServiceController.Substate;
 import org.jboss.msc.service.ServiceController.Transition;
+import org.jboss.msc.service.ServiceListener;
 
 /**
  * <p>A {@link Future} implementation backed by a {@link ServiceListener}</p>

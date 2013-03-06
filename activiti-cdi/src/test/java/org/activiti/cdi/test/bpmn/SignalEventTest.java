@@ -21,11 +21,11 @@ import javax.inject.Named;
 
 import org.activiti.cdi.BusinessProcess;
 import org.activiti.cdi.test.CdiActivitiTestCase;
-import org.activiti.engine.RuntimeService;
-import org.activiti.engine.delegate.DelegateExecution;
-import org.activiti.engine.delegate.JavaDelegate;
-import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.test.Deployment;
+import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.bpm.engine.delegate.JavaDelegate;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.test.Deployment;
 import org.junit.Test;
 
 public class SignalEventTest extends CdiActivitiTestCase {

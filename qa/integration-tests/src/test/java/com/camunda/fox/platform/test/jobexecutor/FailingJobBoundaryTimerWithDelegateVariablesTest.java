@@ -18,10 +18,10 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import org.activiti.engine.ManagementService;
-import org.activiti.engine.RuntimeService;
-import org.activiti.engine.runtime.Job;
-import org.activiti.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.ManagementService;
+import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.runtime.Job;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.spec.WebArchive;

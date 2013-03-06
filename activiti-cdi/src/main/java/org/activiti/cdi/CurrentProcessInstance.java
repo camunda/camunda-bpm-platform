@@ -19,9 +19,9 @@ import javax.inject.Named;
 
 import org.activiti.cdi.annotation.ProcessInstanceId;
 import org.activiti.cdi.annotation.TaskId;
-import org.activiti.engine.runtime.Execution;
-import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.task.Task;
+import org.camunda.bpm.engine.runtime.Execution;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.task.Task;
 
 /**
  * Allows to access executions and tasks of a managed process instance via

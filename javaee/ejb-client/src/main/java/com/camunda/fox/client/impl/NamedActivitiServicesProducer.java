@@ -18,19 +18,19 @@ package com.camunda.fox.client.impl;
 import javax.enterprise.inject.Produces;
 import javax.enterprise.inject.spi.InjectionPoint;
 
-import org.activiti.engine.FormService;
-import org.activiti.engine.HistoryService;
-import org.activiti.engine.IdentityService;
-import org.activiti.engine.ManagementService;
-import org.activiti.engine.ProcessEngine;
-import org.activiti.engine.RepositoryService;
-import org.activiti.engine.RuntimeService;
-import org.activiti.engine.TaskService;
 import org.camunda.bpm.BpmPlatform;
 import org.camunda.bpm.ProcessEngineService;
+import org.camunda.bpm.engine.FormService;
+import org.camunda.bpm.engine.HistoryService;
+import org.camunda.bpm.engine.IdentityService;
+import org.camunda.bpm.engine.ManagementService;
+import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.RepositoryService;
+import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.TaskService;
 
 import com.camunda.fox.client.ProcessEngineName;
-import com.camunda.fox.platform.FoxPlatformException;
 
 /**
  * This bean provides producers for the activiti services such 
@@ -51,13 +51,13 @@ public class NamedActivitiServicesProducer {
     ProcessEngineName annotation = ip.getAnnotated().getAnnotation(ProcessEngineName.class);
     String processEngineName = annotation.value();
     if(processEngineName == null || processEngineName.length() == 0) {
-     throw new FoxPlatformException("Cannot determine which process engine to inject: @ProcessEngineName must specify the name of a process engine."); 
+     throw new ProcessEngineException("Cannot determine which process engine to inject: @ProcessEngineName must specify the name of a process engine."); 
     }    
     try {
       ProcessEngineService processEngineService = BpmPlatform.getProcessEngineService();
       return processEngineService.getProcessEngine(processEngineName);
     }catch (Exception e) {
-      throw new FoxPlatformException("Cannot find process engine named '"+processEngineName+"' specified using @ProcessEngineName: "+e.getMessage(), e);
+      throw new ProcessEngineException("Cannot find process engine named '"+processEngineName+"' specified using @ProcessEngineName: "+e.getMessage(), e);
     }
     
   }

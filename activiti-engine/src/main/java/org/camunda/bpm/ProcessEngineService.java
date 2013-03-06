@@ -15,7 +15,7 @@ package org.camunda.bpm;
 import java.util.List;
 import java.util.Set;
 
-import org.activiti.engine.ProcessEngine;
+import org.camunda.bpm.engine.ProcessEngine;
 
 /**
  * <p>The {@link ProcessEngineService} provides access to the list of Managed Process Engines.</p>

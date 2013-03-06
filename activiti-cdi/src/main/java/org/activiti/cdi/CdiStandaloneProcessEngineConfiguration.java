@@ -12,7 +12,7 @@
  */
 package org.activiti.cdi;
 
-import org.activiti.engine.impl.cfg.StandaloneProcessEngineConfiguration;
+import org.camunda.bpm.engine.impl.cfg.StandaloneProcessEngineConfiguration;
 
 /**
  * @author Daniel Meyer

@@ -166,8 +166,8 @@
 
   <properties>
       <activiti.artifact>
-        org.activiti.db.mapping.entity,
-        org.activiti.engine
+        org.camunda.bpm.engine.test.db.mapping.entity,
+        org.camunda.bpm.engine
       </activiti.artifact>
       <activiti.osgi.import.additional>
           junit*;resolution:=optional,
@@ -177,7 +177,7 @@
           org.apache.commons.mail;resolution:=optional,
           org.apache.tools.ant*;resolution:=optional,
           org.apache.xerces*;resolution:=optional,
-          org.activiti.osgi*;resolution:=optional,
+          org.camunda.bpm.engine.test.osgi*;resolution:=optional,
           org.springframework*;resolution:=optional,
           org.drools*;resolution:=optional,
           com.fasterxml*;resolution:=optional,
@@ -376,7 +376,7 @@
                 <configuration>
                   <tasks>
                     <echo message="dropping schema in ${database}" />
-                    <java classname="org.activiti.engine.impl.db.DbSchemaDrop" classpathref="maven.test.classpath" />
+                    <java classname="org.camunda.bpm.engine.impl.db.DbSchemaDrop" classpathref="maven.test.classpath" />
                   </tasks>
                 </configuration>
               </execution>

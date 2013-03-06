@@ -4,12 +4,10 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.IdentityService;
-import org.activiti.engine.TaskService;
-import org.activiti.engine.identity.Group;
-import org.activiti.engine.task.DelegationState;
-import org.activiti.engine.task.TaskQuery;
+import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.IdentityService;
+import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
 import org.camunda.bpm.engine.rest.dto.SortableParameterizedQueryDto;
 import org.camunda.bpm.engine.rest.dto.VariableQueryParameterDto;
@@ -20,6 +18,8 @@ import org.camunda.bpm.engine.rest.dto.converter.IntegerConverter;
 import org.camunda.bpm.engine.rest.dto.converter.StringListConverter;
 import org.camunda.bpm.engine.rest.dto.converter.VariableListConverter;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+import org.camunda.bpm.engine.task.DelegationState;
+import org.camunda.bpm.engine.task.TaskQuery;
 
 public class TaskQueryDto extends SortableParameterizedQueryDto {
 

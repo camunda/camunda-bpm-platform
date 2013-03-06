@@ -6,7 +6,7 @@
 
   <process-engine name="engine1">
     <job-acquisition>default</job-acquisition>
-    <configuration>org.activiti.engine.impl.cfg.StandaloneProcessEngineConfiguration</configuration>
+    <configuration>org.camunda.bpm.engine.impl.cfg.StandaloneProcessEngineConfiguration</configuration>
     <datasource>java:comp/env/jdbc/ProcessEngine</datasource>
     <properties>
         <property name="history">full</property>

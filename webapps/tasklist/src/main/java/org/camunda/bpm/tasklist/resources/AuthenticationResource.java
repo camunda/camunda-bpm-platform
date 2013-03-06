@@ -1,7 +1,7 @@
 package org.camunda.bpm.tasklist.resources;
 
-import org.activiti.engine.ProcessEngine;
 import org.camunda.bpm.BpmPlatform;
+import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.tasklist.AuthenticationFilter;
 import org.camunda.bpm.tasklist.TasklistDemoData;
 import org.camunda.bpm.tasklist.TasklistProcessEngineProvider;

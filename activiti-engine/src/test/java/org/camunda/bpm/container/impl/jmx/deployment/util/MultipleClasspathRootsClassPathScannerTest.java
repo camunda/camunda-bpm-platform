@@ -25,7 +25,6 @@ import java.net.URLClassLoader;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.camunda.bpm.container.impl.jmx.deployment.util.ClassPathScanner;
 import org.junit.Test;
 
 
@@ -41,9 +40,9 @@ public class MultipleClasspathRootsClassPathScannerTest {
     // define a classloader with multiple roots.
     URLClassLoader classLoader = new URLClassLoader(
       new URL[]{
-        new URL("file:src/test/resources/com/camunda/fox/platform/impl/deployment/ClassPathScannerTest.testScanClassPathWithFiles/"),
-        new URL("file:src/test/resources/com/camunda/fox/platform/impl/deployment/ClassPathScannerTest.testScanClassPathWithFilesRecursive/"),
-        new URL("file:src/test/resources/com/camunda/fox/platform/impl/deployment/ClassPathScannerTest.testScanClassPathRecursiveTwoDirectories.jar")                    
+        new URL("file:src/test/resources/org/camunda/bpm/container/impl/jmx/deployment/util/ClassPathScannerTest.testScanClassPathWithFiles/"),
+        new URL("file:src/test/resources/org/camunda/bpm/container/impl/jmx/deployment/util/ClassPathScannerTest.testScanClassPathWithFilesRecursive/"),
+        new URL("file:src/test/resources/org/camunda/bpm/container/impl/jmx/deployment/util/ClassPathScannerTest.testScanClassPathRecursiveTwoDirectories.jar")                    
       });
     
     ClassPathScanner scanner = new ClassPathScanner();
@@ -64,7 +63,7 @@ public class MultipleClasspathRootsClassPathScannerTest {
     assertEquals(4, scanResult.size());
 
     scanResult.clear();
-    scanner.scanPaResourceRootPath(classLoader, new URL("file:src/test/resources/com/camunda/fox/platform/impl/deployment/ClassPathScannerTest.testScanClassPathWithFilesRecursive/META-INF/processes.xml"), "pa:directory/", scanResult);
+    scanner.scanPaResourceRootPath(classLoader, new URL("file:src/test/resources/org/camunda/bpm/container/impl/jmx/deployment/util/ClassPathScannerTest.testScanClassPathWithFilesRecursive/META-INF/processes.xml"), "pa:directory/", scanResult);
 
     assertTrue("'testDeployProcessArchive.bpmn20.xml' not found", contains(scanResult, "testDeployProcessArchive.bpmn20.xml"));
     assertTrue("'testDeployProcessArchive.png' not found", contains(scanResult, "testDeployProcessArchive.png"));

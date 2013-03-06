@@ -12,7 +12,7 @@
  */
 package org.activiti.cdi;
 
-import org.activiti.engine.delegate.ExecutionListener;
+import org.camunda.bpm.engine.delegate.ExecutionListener;
 
 /**
  * The type of a business process event. Indicates what is happening/has

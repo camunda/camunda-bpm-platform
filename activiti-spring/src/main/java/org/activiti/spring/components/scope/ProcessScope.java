@@ -21,15 +21,15 @@ import java.lang.reflect.Method;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Logger;
 
-import org.activiti.engine.ProcessEngine;
-import org.activiti.engine.RuntimeService;
-import org.activiti.engine.impl.context.Context;
-import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
-import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.spring.components.aop.util.Scopifier;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.apache.commons.lang.exception.ExceptionUtils;
+import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.springframework.aop.framework.ProxyFactory;
 import org.springframework.aop.scope.ScopedObject;
 import org.springframework.beans.BeansException;
@@ -45,7 +45,7 @@ import org.springframework.util.Assert;
 import org.springframework.util.ClassUtils;
 
 /**
- * binds variables to a currently executing Activiti business process (a {@link org.activiti.engine.runtime.ProcessInstance}).
+ * binds variables to a currently executing Activiti business process (a {@link org.camunda.bpm.engine.runtime.ProcessInstance}).
  * <p/>
  * Parts of this code are lifted wholesale from Dave Syer's work on the Spring 3.1 RefreshScope.
  *

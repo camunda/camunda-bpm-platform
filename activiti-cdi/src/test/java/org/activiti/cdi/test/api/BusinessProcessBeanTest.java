@@ -18,10 +18,10 @@ import static org.junit.Assert.assertNull;
 
 import org.activiti.cdi.BusinessProcess;
 import org.activiti.cdi.test.CdiActivitiTestCase;
-import org.activiti.engine.runtime.Execution;
-import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.task.Task;
-import org.activiti.engine.test.Deployment;
+import org.camunda.bpm.engine.runtime.Execution;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.task.Task;
+import org.camunda.bpm.engine.test.Deployment;
 import org.junit.Test;
 
 /**

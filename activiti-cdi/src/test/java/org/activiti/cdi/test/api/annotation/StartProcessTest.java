@@ -16,7 +16,7 @@ import org.activiti.cdi.BusinessProcess;
 import org.activiti.cdi.impl.annotation.StartProcessInterceptor;
 import org.activiti.cdi.test.CdiActivitiTestCase;
 import org.activiti.cdi.test.impl.beans.DeclarativeProcessController;
-import org.activiti.engine.test.Deployment;
+import org.camunda.bpm.engine.test.Deployment;
 import org.junit.Test;
 
 import static org.junit.Assert.*;

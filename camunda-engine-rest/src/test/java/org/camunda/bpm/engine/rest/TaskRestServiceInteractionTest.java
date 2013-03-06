@@ -15,8 +15,8 @@ import java.util.Map;
 
 import javax.ws.rs.core.Response.Status;
 
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.TaskService;
+import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.rest.helper.EqualsMap;
 import org.junit.Test;
 import org.mockito.Matchers;
@@ -75,7 +75,7 @@ public class TaskRestServiceInteractionTest extends AbstractRestServiceTest {
   public void testUnsuccessfulClaimTask() throws IOException {
     setupMockTaskService();
     
-    doThrow(new ActivitiException("expected exception")).when(taskServiceMock).claim(any(String.class), any(String.class));
+    doThrow(new ProcessEngineException("expected exception")).when(taskServiceMock).claim(any(String.class), any(String.class));
     
     given().pathParam("id", EXAMPLE_TASK_ID)
       .contentType(POST_JSON_CONTENT_TYPE).body(EMPTY_JSON_OBJECT)
@@ -122,7 +122,7 @@ public class TaskRestServiceInteractionTest extends AbstractRestServiceTest {
   public void testUnsuccessfulCompleteTask() throws IOException {
     setupMockTaskService();
     
-    doThrow(new ActivitiException("expected exception")).when(taskServiceMock).complete(any(String.class), Matchers.<Map<String, Object>>any());
+    doThrow(new ProcessEngineException("expected exception")).when(taskServiceMock).complete(any(String.class), Matchers.<Map<String, Object>>any());
     
     given().pathParam("id", EXAMPLE_TASK_ID)
       .contentType(POST_JSON_CONTENT_TYPE).body(EMPTY_JSON_OBJECT)

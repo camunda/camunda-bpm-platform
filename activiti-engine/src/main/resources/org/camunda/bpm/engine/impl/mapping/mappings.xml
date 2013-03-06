@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+
+<configuration>
+	<settings>
+		<setting name="lazyLoadingEnabled" value="false" />
+	</settings>
+	<mappers>
+    <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/Attachment.xml" />
+    <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/Comment.xml" />
+    <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/Deployment.xml" />
+    <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/Execution.xml" />
+    <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/Group.xml" />
+    <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/HistoricActivityInstance.xml" />
+    <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/HistoricDetail.xml" />
+    <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/HistoricProcessInstance.xml" />
+    <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/HistoricVariableInstance.xml" />
+    <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/HistoricTaskInstance.xml" />
+    <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/IdentityInfo.xml" />
+    <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/IdentityLink.xml" />
+    <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/Job.xml" />
+    <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/Membership.xml" />
+    <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/ProcessDefinition.xml" />
+    <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/Property.xml" />
+    <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/Resource.xml" />
+    <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/TableData.xml" />
+    <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/Task.xml" />
+    <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/User.xml" />
+    <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/VariableInstance.xml" />
+    <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/EventSubscription.xml" />
+    <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/Statistics.xml" />
+	</mappers>
+</configuration>

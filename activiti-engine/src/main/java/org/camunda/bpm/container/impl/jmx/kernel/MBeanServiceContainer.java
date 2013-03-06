@@ -24,8 +24,7 @@ import javax.management.MBeanServer;
 import javax.management.ObjectName;
 
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanDeploymentOperation.MBeanDeploymentOperationBuilder;
-
-import com.camunda.fox.platform.FoxPlatformException;
+import org.camunda.bpm.engine.ProcessEngineException;
 
 /**
  * <p>A simple Service Container that delegates to the JVM's {@link MBeanServer}.</p>
@@ -52,7 +51,7 @@ public class MBeanServiceContainer {
   public synchronized <S> void startService(ObjectName serviceName, MBeanService<S> service) {
 
     if (getService(serviceName) != null) {
-      throw new FoxPlatformException("Cannot register service " + serviceName + " with MBeans Container, service with same name already registered.");
+      throw new ProcessEngineException("Cannot register service " + serviceName + " with MBeans Container, service with same name already registered.");
     }
 
     final MBeanServer beanServer = getmBeanServer();
@@ -69,7 +68,7 @@ public class MBeanServiceContainer {
       }
 
     } catch (Exception e) {
-      throw new FoxPlatformException("Could not register service " + serviceName + " with the MBean server", e);
+      throw new ProcessEngineException("Could not register service " + serviceName + " with the MBean server", e);
     }
   }
   
@@ -86,7 +85,7 @@ public class MBeanServiceContainer {
     final MBeanService<Object> service = getService(serviceName);
     
     if(service == null) {
-      throw new FoxPlatformException("Cannot stop service "+serviceName+": no such service registered.");      
+      throw new ProcessEngineException("Cannot stop service "+serviceName+": no such service registered.");      
     }
     
     try {
@@ -99,7 +98,7 @@ public class MBeanServiceContainer {
         servicesByName.remove(serviceName);
 
       } catch (Throwable t) {
-        throw new FoxPlatformException("Exception while unregistering " + serviceName.getCanonicalName() + " with the MBeanServer", t);
+        throw new ProcessEngineException("Exception while unregistering " + serviceName.getCanonicalName() + " with the MBeanServer", t);
       }
     }
     

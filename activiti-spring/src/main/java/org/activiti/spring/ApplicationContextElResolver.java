@@ -16,9 +16,9 @@ package org.activiti.spring;
 import java.beans.FeatureDescriptor;
 import java.util.Iterator;
 
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.impl.javax.el.ELContext;
-import org.activiti.engine.impl.javax.el.ELResolver;
+import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.javax.el.ELContext;
+import org.camunda.bpm.engine.impl.javax.el.ELResolver;
 import org.springframework.context.ApplicationContext;
 
 /**
@@ -55,7 +55,7 @@ public class ApplicationContextElResolver extends ELResolver {
     if(base == null) {
       String key = (String) property;
       if (applicationContext.containsBean(key)) {
-        throw new ActivitiException("Cannot set value of '" + property + 
+        throw new ProcessEngineException("Cannot set value of '" + property + 
           "', it resolves to a bean defined in the Spring application-context.");
       }
     }

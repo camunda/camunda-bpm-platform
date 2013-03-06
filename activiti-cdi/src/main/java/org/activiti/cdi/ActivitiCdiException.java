@@ -12,14 +12,14 @@
  */
 package org.activiti.cdi;
 
-import org.activiti.engine.ActivitiException;
+import org.camunda.bpm.engine.ProcessEngineException;
 
 /**
  * Represents an exception in activiti cdi.
  * 
  * @author Daniel Meyer
  */
-public class ActivitiCdiException extends ActivitiException {
+public class ActivitiCdiException extends ProcessEngineException {
 
   private static final long serialVersionUID = 1L;
 

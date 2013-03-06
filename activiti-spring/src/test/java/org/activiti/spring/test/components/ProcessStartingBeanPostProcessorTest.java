@@ -5,10 +5,10 @@ import static org.junit.Assert.assertNotNull;
 
 import java.util.logging.Logger;
 
-import org.activiti.engine.ProcessEngine;
-import org.activiti.engine.RepositoryService;
-import org.activiti.engine.repository.Deployment;
-import org.activiti.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.RepositoryService;
+import org.camunda.bpm.engine.repository.Deployment;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;

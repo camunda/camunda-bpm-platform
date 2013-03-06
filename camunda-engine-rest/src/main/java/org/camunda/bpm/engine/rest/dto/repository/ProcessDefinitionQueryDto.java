@@ -3,8 +3,8 @@ package org.camunda.bpm.engine.rest.dto.repository;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.activiti.engine.RepositoryService;
-import org.activiti.engine.repository.ProcessDefinitionQuery;
+import org.camunda.bpm.engine.RepositoryService;
+import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
 import org.camunda.bpm.engine.rest.dto.SortableParameterizedQueryDto;
 import org.camunda.bpm.engine.rest.dto.converter.BooleanConverter;

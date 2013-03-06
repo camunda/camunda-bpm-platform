@@ -21,13 +21,13 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.ProcessEngine;
 import org.camunda.bpm.ProcessApplicationService;
 import org.camunda.bpm.ProcessEngineService;
 import org.camunda.bpm.application.AbstractProcessApplication;
 import org.camunda.bpm.application.ProcessApplicationInfo;
 import org.camunda.bpm.container.RuntimeContainerDelegate;
+import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.jboss.as.naming.ManagedReferenceFactory;
 import org.jboss.as.naming.ServiceBasedNamingStore;
 import org.jboss.as.naming.deployment.ContextNames;
@@ -90,7 +90,7 @@ public class MscRuntimeContainerDelegate implements Service<MscRuntimeContainerD
   public void registerProcessEngine(ProcessEngine processEngine) {
     
     if(processEngine == null) {
-      throw new ActivitiException("Cannot register process engine with Msc Runtime Container: process engine is 'null'");
+      throw new ProcessEngineException("Cannot register process engine with Msc Runtime Container: process engine is 'null'");
     }
     
     ServiceName serviceName = ServiceNames.forManagedProcessEngine(processEngine.getName());
@@ -110,7 +110,7 @@ public class MscRuntimeContainerDelegate implements Service<MscRuntimeContainerD
   public void unregisterProcessEngine(ProcessEngine processEngine) {
     
     if(processEngine == null) {
-      throw new ActivitiException("Cannot unregister process engine with Msc Runtime Container: process engine is 'null'");
+      throw new ProcessEngineException("Cannot unregister process engine with Msc Runtime Container: process engine is 'null'");
     }
     
     ServiceName serviceName = ServiceNames.forManagedProcessEngine(processEngine.getName());

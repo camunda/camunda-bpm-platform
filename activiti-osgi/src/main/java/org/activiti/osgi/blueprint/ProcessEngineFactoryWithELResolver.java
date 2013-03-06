@@ -3,20 +3,20 @@ package org.activiti.osgi.blueprint;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.activiti.engine.delegate.VariableScope;
-import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.activiti.engine.impl.el.ExpressionManager;
-import org.activiti.engine.impl.el.VariableScopeElResolver;
-import org.activiti.engine.impl.javax.el.ArrayELResolver;
-import org.activiti.engine.impl.javax.el.CompositeELResolver;
-import org.activiti.engine.impl.javax.el.ELResolver;
-import org.activiti.engine.impl.javax.el.ListELResolver;
-import org.activiti.engine.impl.javax.el.MapELResolver;
-import org.activiti.engine.impl.scripting.BeansResolverFactory;
-import org.activiti.engine.impl.scripting.ResolverFactory;
-import org.activiti.engine.impl.scripting.ScriptBindingsFactory;
-import org.activiti.engine.impl.scripting.VariableScopeResolverFactory;
 import org.activiti.osgi.OsgiScriptingEngines;
+import org.camunda.bpm.engine.delegate.VariableScope;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.el.ExpressionManager;
+import org.camunda.bpm.engine.impl.el.VariableScopeElResolver;
+import org.camunda.bpm.engine.impl.javax.el.ArrayELResolver;
+import org.camunda.bpm.engine.impl.javax.el.CompositeELResolver;
+import org.camunda.bpm.engine.impl.javax.el.ELResolver;
+import org.camunda.bpm.engine.impl.javax.el.ListELResolver;
+import org.camunda.bpm.engine.impl.javax.el.MapELResolver;
+import org.camunda.bpm.engine.impl.scripting.BeansResolverFactory;
+import org.camunda.bpm.engine.impl.scripting.ResolverFactory;
+import org.camunda.bpm.engine.impl.scripting.ScriptBindingsFactory;
+import org.camunda.bpm.engine.impl.scripting.VariableScopeResolverFactory;
 
 
 public class ProcessEngineFactoryWithELResolver extends ProcessEngineFactory {

@@ -19,14 +19,14 @@
     <property name="dataSource" ref="dataSource" />
   </bean>
   
-  <bean id="processEngineConfiguration" class="org.activiti.spring.SpringProcessEngineConfiguration">
+  <bean id="processEngineConfiguration" class="org.camunda.bpm.engine.test.spring.SpringProcessEngineConfiguration">
     <property name="dataSource" ref="dataSource" />
     <property name="transactionManager" ref="transactionManager" />
     <property name="databaseSchemaUpdate" value="true" />
     <property name="jobExecutorActivate" value="false" />
   </bean>
   
-  <bean id="processEngine" class="org.activiti.spring.ProcessEngineFactoryBean">
+  <bean id="processEngine" class="org.camunda.bpm.engine.test.spring.ProcessEngineFactoryBean">
     <property name="processEngineConfiguration" ref="processEngineConfiguration" />
   </bean>
   
@@ -38,12 +38,12 @@
 
   <tx:annotation-driven transaction-manager="transactionManager"/>
 
-  <bean id="userBean" class="org.activiti.spring.test.transaction.UserBean">
+  <bean id="userBean" class="org.camunda.bpm.engine.test.spring.test.transaction.UserBean">
     <property name="runtimeService" ref="runtimeService" />
     <property name="taskService" ref="taskService" />
     <property name="dataSource" ref="dataSource" />
   </bean>
 
-  <bean id="printer" class="org.activiti.spring.test.transaction.Printer" />
+  <bean id="printer" class="org.camunda.bpm.engine.test.spring.test.transaction.Printer" />
 
 </beans>

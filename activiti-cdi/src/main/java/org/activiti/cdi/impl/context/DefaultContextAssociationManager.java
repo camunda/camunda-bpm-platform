@@ -30,13 +30,13 @@ import javax.inject.Scope;
 
 import org.activiti.cdi.ActivitiCdiException;
 import org.activiti.cdi.impl.util.ProgrammaticBeanLookup;
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.RuntimeService;
-import org.activiti.engine.impl.context.Context;
-import org.activiti.engine.impl.context.ExecutionContext;
-import org.activiti.engine.impl.persistence.entity.ExecutionEntity;
-import org.activiti.engine.runtime.Execution;
-import org.activiti.engine.task.Task;
+import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.context.ExecutionContext;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.runtime.Execution;
+import org.camunda.bpm.engine.task.Task;
 
 /**
  * Default implementation of the business process association manager. Uses a
@@ -108,7 +108,7 @@ public class DefaultContextAssociationManager implements ContextAssociationManag
     for (Class< ? extends ScopedAssociation> scopeType : getAvailableScopedAssociationClasses()) {
       Annotation scopeAnnotation = scopeType.getAnnotations().length > 0 ? scopeType.getAnnotations()[0] : null;
       if (scopeAnnotation == null || !beanManager.isScope(scopeAnnotation.annotationType())) {
-        throw new ActivitiException("ScopedAssociation must carry exactly one annotation and it must be a @Scope annotation");
+        throw new ProcessEngineException("ScopedAssociation must carry exactly one annotation and it must be a @Scope annotation");
       }
       try {
         beanManager.getContext(scopeAnnotation.annotationType());
@@ -117,7 +117,7 @@ public class DefaultContextAssociationManager implements ContextAssociationManag
         log.finest("Context " + scopeAnnotation.annotationType() + " not active.");            
       }
     }
-    throw new ActivitiException("Could not determine an active context to associate the current process instance / task instance with.");
+    throw new ProcessEngineException("Could not determine an active context to associate the current process instance / task instance with.");
   }
   
   /**
@@ -168,7 +168,7 @@ public class DefaultContextAssociationManager implements ContextAssociationManag
     }
     ScopedAssociation scopedAssociation = getScopedAssociation();
     if (scopedAssociation.getExecution() == null) {
-      throw new ActivitiException("Cannot dissasociate execution, no " 
+      throw new ProcessEngineException("Cannot dissasociate execution, no " 
                 + scopedAssociation.getClass().getAnnotations()[0].annotationType().getSimpleName()
                 + " execution associated. ");
     }

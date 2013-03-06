@@ -13,8 +13,8 @@
 
 package org.activiti.spring.test.taskListener;
 
-import org.activiti.engine.delegate.DelegateTask;
-import org.activiti.engine.delegate.TaskListener;
+import org.camunda.bpm.engine.delegate.DelegateTask;
+import org.camunda.bpm.engine.delegate.TaskListener;
 
 
 /**

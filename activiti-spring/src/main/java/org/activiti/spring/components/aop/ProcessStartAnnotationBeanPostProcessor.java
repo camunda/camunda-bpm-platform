@@ -15,11 +15,11 @@
  */
 package org.activiti.spring.components.aop;
 
-import org.activiti.engine.ProcessEngine;
 import org.activiti.spring.annotations.ProcessVariable;
 import org.activiti.spring.annotations.StartProcess;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.camunda.bpm.engine.ProcessEngine;
 import org.springframework.aop.framework.Advised;
 import org.springframework.aop.framework.AopInfrastructureBean;
 import org.springframework.aop.framework.ProxyConfig;
@@ -44,7 +44,7 @@ public class ProcessStartAnnotationBeanPostProcessor extends ProxyConfig impleme
 	private Log log = LogFactory.getLog(getClass()) ;
 
 	/**
-	 * the process engine as created by a {@link org.activiti.spring.ProcessEngineFactoryBean}
+	 * the process engine as created by a {@link org.camunda.bpm.engine.test.spring.ProcessEngineFactoryBean}
 	 */
 	private ProcessEngine processEngine;
 

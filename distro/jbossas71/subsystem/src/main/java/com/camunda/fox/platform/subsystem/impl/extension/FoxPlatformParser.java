@@ -34,6 +34,7 @@ import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.jboss.as.controller.PathAddress;
 import org.jboss.as.controller.PathElement;
 import org.jboss.as.controller.descriptions.ModelDescriptionConstants;
@@ -45,8 +46,6 @@ import org.jboss.staxmapper.XMLElementReader;
 import org.jboss.staxmapper.XMLElementWriter;
 import org.jboss.staxmapper.XMLExtendedStreamReader;
 import org.jboss.staxmapper.XMLExtendedStreamWriter;
-
-import com.camunda.fox.platform.FoxPlatformException;
 
 
 public class FoxPlatformParser implements XMLStreamConstants, XMLElementReader<List<ModelNode>>, XMLElementWriter<SubsystemMarshallingContext> {
@@ -144,7 +143,7 @@ public class FoxPlatformParser implements XMLStreamConstants, XMLElementReader<L
     }
     
     if(discoveredEngineNames.contains(engineName)) {
-      throw new FoxPlatformException("A process engine with name '"+engineName+"' already exists. The process engine name must be unique.");
+      throw new ProcessEngineException("A process engine with name '"+engineName+"' already exists. The process engine name must be unique.");
     } else {
       discoveredEngineNames.add(engineName);
     }

@@ -14,7 +14,7 @@ package org.activiti.cdi.test.impl.context;
 
 import org.activiti.cdi.test.CdiActivitiTestCase;
 import org.activiti.cdi.test.impl.beans.ProcessScopedMessageBean;
-import org.activiti.engine.test.Deployment;
+import org.camunda.bpm.engine.test.Deployment;
 import org.junit.Test;
 
 import static org.junit.Assert.*;

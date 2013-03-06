@@ -15,7 +15,7 @@ package org.activiti.cdi.test.api.annotation;
 import org.activiti.cdi.BusinessProcess;
 import org.activiti.cdi.impl.util.ProgrammaticBeanLookup;
 import org.activiti.cdi.test.CdiActivitiTestCase;
-import org.activiti.engine.test.Deployment;
+import org.camunda.bpm.engine.test.Deployment;
 import org.junit.Assert;
 import org.junit.Test;
 

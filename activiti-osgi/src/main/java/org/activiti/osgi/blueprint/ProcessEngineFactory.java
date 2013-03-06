@@ -13,9 +13,9 @@
 
 package org.activiti.osgi.blueprint;
 
-import org.activiti.engine.ProcessEngine;
-import org.activiti.engine.ProcessEngineConfiguration;
-import org.activiti.engine.impl.ProcessEngineImpl;
+import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
+import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.osgi.framework.Bundle;
 
 /**

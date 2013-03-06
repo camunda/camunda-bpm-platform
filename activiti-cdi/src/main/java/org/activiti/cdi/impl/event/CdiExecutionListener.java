@@ -26,12 +26,12 @@ import org.activiti.cdi.annotation.event.StartActivityLiteral;
 import org.activiti.cdi.annotation.event.TakeTransitionLiteral;
 import org.activiti.cdi.impl.util.BeanManagerLookup;
 import org.activiti.cdi.impl.util.ProgrammaticBeanLookup;
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.ProcessEngine;
-import org.activiti.engine.delegate.DelegateExecution;
-import org.activiti.engine.delegate.ExecutionListener;
-import org.activiti.engine.impl.context.Context;
-import org.activiti.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.bpm.engine.delegate.ExecutionListener;
+import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.repository.ProcessDefinition;
 
 /**
  * Generic {@link ExecutionListener} publishing events using the cdi event
@@ -81,7 +81,7 @@ public class CdiExecutionListener implements ExecutionListener, Serializable {
   protected BeanManager getBeanManager() {
     BeanManager bm = BeanManagerLookup.getBeanManager();
     if (bm == null) {
-      throw new ActivitiException("No cdi bean manager avaiable, cannot publish event.");
+      throw new ProcessEngineException("No cdi bean manager avaiable, cannot publish event.");
     }
     return bm;
   }

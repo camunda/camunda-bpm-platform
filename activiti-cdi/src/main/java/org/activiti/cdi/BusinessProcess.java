@@ -24,15 +24,15 @@ import javax.inject.Named;
 
 import org.activiti.cdi.annotation.BusinessProcessScoped;
 import org.activiti.cdi.impl.context.ContextAssociationManager;
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.ProcessEngine;
-import org.activiti.engine.RuntimeService;
-import org.activiti.engine.TaskService;
-import org.activiti.engine.impl.context.Context;
-import org.activiti.engine.repository.ProcessDefinition;
-import org.activiti.engine.runtime.Execution;
-import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.task.Task;
+import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.runtime.Execution;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.task.Task;
 
 /**
  * Bean supporting contextual business process management. This allows us to 
@@ -204,7 +204,7 @@ public class BusinessProcess implements Serializable {
     
     ProcessDefinition definition = processEngine.getRepositoryService().createProcessDefinitionQuery().processDefinitionName(string).singleResult();
     if (definition == null) {
-      throw new ActivitiException("No process definition found for name: " + string);
+      throw new ProcessEngineException("No process definition found for name: " + string);
     }
     ProcessInstance instance = processEngine.getRuntimeService().startProcessInstanceById(definition.getId(), getAndClearCachedVariables());
     setExecution(instance);
@@ -220,7 +220,7 @@ public class BusinessProcess implements Serializable {
     
     ProcessDefinition definition = processEngine.getRepositoryService().createProcessDefinitionQuery().processDefinitionName(string).singleResult();
     if (definition == null) {
-      throw new ActivitiException("No process definition found for name: " + string);
+      throw new ProcessEngineException("No process definition found for name: " + string);
     }
     Map<String, Object> cachedVariables = getAndClearCachedVariables();
     cachedVariables.putAll(variables);
@@ -266,7 +266,7 @@ public class BusinessProcess implements Serializable {
    * 
    * @throws ActivitiCdiException
    *           if no execution is currently associated
-   * @throws ActivitiException
+   * @throws ProcessEngineException
    *           if the activiti command fails
    */
   public void signalExecution() {
@@ -339,7 +339,7 @@ public class BusinessProcess implements Serializable {
    * 
    * @throws ActivitiCdiException
    *           if no task is currently associated
-   * @throws ActivitiException
+   * @throws ProcessEngineException
    *           if the activiti command fails
    */
   public void completeTask() {

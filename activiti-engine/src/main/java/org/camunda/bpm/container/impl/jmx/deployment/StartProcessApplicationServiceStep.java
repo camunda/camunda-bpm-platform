@@ -26,8 +26,8 @@ import org.camunda.bpm.application.impl.metadata.spi.ProcessesXml;
 import org.camunda.bpm.container.impl.jmx.JmxRuntimeContainerDelegate.ServiceTypes;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanDeploymentOperation;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanDeploymentOperationStep;
-import org.camunda.bpm.container.impl.jmx.kernel.MBeanServiceContainer;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanService;
+import org.camunda.bpm.container.impl.jmx.kernel.MBeanServiceContainer;
 import org.camunda.bpm.container.impl.jmx.services.JmxManagedProcessApplication;
 
 /**

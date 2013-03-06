@@ -25,11 +25,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.engine.impl.util.xml.Element;
-import org.activiti.engine.impl.util.xml.Parser;
 import org.camunda.bpm.container.impl.metadata.spi.BpmPlatformXml;
 import org.camunda.bpm.container.impl.metadata.spi.JobAcquisitionXml;
 import org.camunda.bpm.container.impl.metadata.spi.ProcessEngineXml;
+import org.camunda.bpm.engine.impl.util.xml.Element;
+import org.camunda.bpm.engine.impl.util.xml.Parser;
 
 /**
  * <p>Parse implementation for parsing the {@link BpmPlatformXml}</p>

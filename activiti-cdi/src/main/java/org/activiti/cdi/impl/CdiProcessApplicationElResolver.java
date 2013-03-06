@@ -13,9 +13,9 @@
 package org.activiti.cdi.impl;
 
 import org.activiti.cdi.impl.el.CdiResolver;
-import org.activiti.engine.impl.javax.el.ELResolver;
 import org.camunda.bpm.application.AbstractProcessApplication;
 import org.camunda.bpm.application.ProcessApplicationElResolver;
+import org.camunda.bpm.engine.impl.javax.el.ELResolver;
 
 /**
  * <p>Exposes the CdiResolver in a multiple-applications, shared process engine context.</p>

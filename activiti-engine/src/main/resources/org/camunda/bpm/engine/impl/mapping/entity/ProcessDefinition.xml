@@ -1,0 +1,159 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+  
+<mapper namespace="org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity">
+  
+  <!-- PROCESSDEFINITION INSERT -->
+
+  <insert id="insertProcessDefinition" parameterType="org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity">
+    insert into ${prefix}ACT_RE_PROCDEF(ID_, REV_, CATEGORY_, NAME_, KEY_, VERSION_, DEPLOYMENT_ID_, RESOURCE_NAME_, DGRM_RESOURCE_NAME_, HAS_START_FORM_KEY_, SUSPENSION_STATE_)
+    values (#{id, jdbcType=VARCHAR},
+    		1,
+            #{category, jdbcType=VARCHAR},
+            #{name, jdbcType=VARCHAR},
+            #{key, jdbcType=VARCHAR}, 
+            #{version, jdbcType=INTEGER},
+            #{deploymentId, jdbcType=VARCHAR},
+            #{resourceName, jdbcType=VARCHAR},
+            #{diagramResourceName, jdbcType=VARCHAR},
+            #{hasStartFormKey, jdbcType=BOOLEAN},
+            #{suspensionState, jdbcType=INTEGER})
+  </insert>
+  
+  <!-- PROCESSDEFINITION UPDATE -->
+
+  <update id="updateProcessDefinition" parameterType="org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity">
+    update ${prefix}ACT_RE_PROCDEF set
+      REV_ = #{revisionNext, jdbcType=INTEGER},    
+      SUSPENSION_STATE_ = #{suspensionState, jdbcType=INTEGER}
+    where ID_ = #{id, jdbcType=VARCHAR}
+      and REV_ = #{revision, jdbcType=INTEGER}
+  </update>
+
+  <!-- PROCESSDEFINITION DELETE -->
+
+  <delete id="deleteProcessDefinitionsByDeploymentId" parameterType="string">
+    delete from ${prefix}ACT_RE_PROCDEF where DEPLOYMENT_ID_ = #{deploymenId} 
+  </delete>
+  
+  <!-- PROCESSDEFINITION RESULTMAP -->
+
+  <resultMap id="processDefinitionResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity">
+    <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <result property="revision" column="REV_" />
+    <result property="category" column="CATEGORY_" />
+    <result property="name" column="NAME_" />
+    <result property="key" column="KEY_" jdbcType="VARCHAR" />
+    <result property="version" column="VERSION_" jdbcType="INTEGER"/>
+    <result property="deploymentId" column="DEPLOYMENT_ID_" jdbcType="VARCHAR"/>
+    <result property="resourceName" column="RESOURCE_NAME_" jdbcType="VARCHAR"/>
+    <result property="diagramResourceName" column="DGRM_RESOURCE_NAME_" jdbcType="VARCHAR"/>
+    <result property="hasStartFormKey" column="HAS_START_FORM_KEY_" jdbcType="BOOLEAN"/>
+    <result property="suspensionState" column="SUSPENSION_STATE_" jdbcType="INTEGER"/>
+  </resultMap>
+
+  <!-- PROCESSDEFINITION SELECT -->
+  
+  <select id="selectProcessDefinitionById" parameterType="string" resultMap="processDefinitionResultMap">
+    select * from ${prefix}ACT_RE_PROCDEF where ID_ = #{processDefinitionId}
+  </select>
+
+  <select id="selectProcessDefinitionsByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.ProcessDefinitionQueryImpl" resultMap="processDefinitionResultMap">
+  	${limitBefore}
+    select RES.* ${limitBetween}
+    <include refid="selectProcessDefinitionsByQueryCriteriaSql"/>
+    ${orderBy}
+    ${limitAfter}
+  </select>
+
+  <select id="selectProcessDefinitionCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.ProcessDefinitionQueryImpl" resultType="long">
+    select count(RES.ID_)
+    <include refid="selectProcessDefinitionsByQueryCriteriaSql"/>
+  </select>
+  
+  <sql id="selectProcessDefinitionsByQueryCriteriaSql">  
+    from ${prefix}ACT_RE_PROCDEF RES
+    <if test="eventSubscriptionType != null">
+    	inner join ${prefix}ACT_RU_EVENT_SUBSCR EVT on RES.ID_ = EVT.CONFIGURATION_
+    </if>
+    <where>
+      <if test="id != null">
+        RES.ID_ = #{id}
+      </if>
+      <if test="category != null">
+        and RES.CATEGORY_ = #{category}
+      </if>
+      <if test="categoryLike != null">
+        and RES.CATEGORY_ like #{categoryLike}
+      </if>
+      <if test="name != null">
+        and RES.NAME_ = #{name}
+      </if>
+      <if test="nameLike != null">
+        and RES.NAME_ like #{nameLike}
+      </if>
+      <if test="key != null">
+        and RES.KEY_ = #{key}
+      </if>
+      <if test="keyLike != null">
+        and RES.KEY_ like #{keyLike}
+      </if>
+      <if test="resourceName != null">
+        and RES.RESOURCE_NAME_ = #{resourceName}
+      </if>
+      <if test="resourceNameLike != null">
+        and RES.RESOURCE_NAME_ like #{resourceNameLike}
+      </if>
+      <if test="version != null">
+        and RES.VERSION_ = #{version}
+      </if>
+      <if test="deploymentId != null">
+        and RES.DEPLOYMENT_ID_ = #{deploymentId}
+      </if>
+      <if test="latest">
+        and RES.VERSION_ = (select max(VERSION_) from ${prefix}ACT_RE_PROCDEF where KEY_ = RES.KEY_)
+      </if>
+      <if test="suspensionState != null">
+        and (RES.SUSPENSION_STATE_ = #{suspensionState.stateCode})
+      </if>
+      <if test="eventSubscriptionType != null">
+      	and (EVT.EVENT_TYPE_ = #{eventSubscriptionType} and EVT.EVENT_NAME_ = #{eventSubscriptionName}) 
+      </if>
+      <if test="authorizationUserId != null">
+        AND (exists (select ID_  from ${prefix} ACT_RU_IDENTITYLINK  IDN where IDN.PROC_DEF_ID_ = RES.ID_ and IDN.USER_ID_ = #{authorizationUserId})
+             OR exists (select IDN.ID_  from ${prefix} ACT_RU_IDENTITYLINK  IDN,  ${prefix} ACT_ID_MEMBERSHIP MBMR where IDN.PROC_DEF_ID_ = RES.ID_ and MBMR.USER_ID_ =  #{authorizationUserId} and IDN.GROUP_ID_ = MBMR.GROUP_ID_)
+             )
+      </if>
+    </where>
+  </sql>
+    
+  <select id="selectProcessDefinitionByDeploymentAndKey" parameterType="map" resultMap="processDefinitionResultMap">
+    select * 
+    from ${prefix}ACT_RE_PROCDEF 
+    where DEPLOYMENT_ID_ = #{deploymentId}
+      and KEY_ = #{processDefinitionKey}
+  </select>
+    
+  <select id="selectLatestProcessDefinitionByKey" parameterType="string" resultMap="processDefinitionResultMap">
+    select *
+    from ${prefix}ACT_RE_PROCDEF 
+    where KEY_ = #{key} and
+          VERSION_ = (select max(VERSION_) from ${prefix}ACT_RE_PROCDEF where KEY_ = #{processDefinitionKey})
+  </select>
+
+  <!-- mysql specific sql -->
+  <select id="selectProcessDefinitionsByQueryCriteria_mysql" parameterType="org.camunda.bpm.engine.impl.ProcessDefinitionQueryImpl" resultMap="processDefinitionResultMap">
+  	${limitBefore}
+    select distinct RES.* ${limitBetween}
+    <include refid="selectProcessDefinitionsByQueryCriteriaSql"/>
+    ${orderBy}
+    ${limitAfter}
+  </select>
+
+  <!-- mysql specific sql -->
+  <select id="selectProcessDefinitionCountByQueryCriteria_mysql" parameterType="org.camunda.bpm.engine.impl.ProcessDefinitionQueryImpl" resultType="long">
+    select distinct count(RES.ID_)
+    <include refid="selectProcessDefinitionsByQueryCriteriaSql"/>
+  </select>
+</mapper>

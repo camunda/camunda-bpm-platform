@@ -1,7 +1,7 @@
 package com.camunda.fox.platform.test.functional.transactions;
 
-import org.activiti.engine.delegate.DelegateExecution;
-import org.activiti.engine.delegate.JavaDelegate;
+import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.bpm.engine.delegate.JavaDelegate;
 
 
 public class UpdateRouterConfiguration implements JavaDelegate {

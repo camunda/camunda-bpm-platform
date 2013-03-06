@@ -17,10 +17,10 @@ import javax.script.ScriptEngine;
 import javax.script.ScriptEngineManager;
 import javax.script.ScriptException;
 
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.delegate.VariableScope;
-import org.activiti.engine.impl.scripting.ScriptBindingsFactory;
-import org.activiti.engine.impl.scripting.ScriptingEngines;
+import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.delegate.VariableScope;
+import org.camunda.bpm.engine.impl.scripting.ScriptBindingsFactory;
+import org.camunda.bpm.engine.impl.scripting.ScriptingEngines;
 import org.osgi.framework.InvalidSyntaxException;
 
 /**
@@ -42,17 +42,17 @@ public class OsgiScriptingEngines extends ScriptingEngines {
     try {
       scriptEngine = Extender.resolveScriptEngine(language);
     } catch (InvalidSyntaxException e) {
-      throw new ActivitiException("problem resolving scripting engine" + e.getMessage(), e);
+      throw new ProcessEngineException("problem resolving scripting engine" + e.getMessage(), e);
     }
     
     if (scriptEngine == null) {
-      throw new ActivitiException("Can't find scripting engine for '" + language + "'");
+      throw new ProcessEngineException("Can't find scripting engine for '" + language + "'");
     }
 
     try {
       return scriptEngine.eval(script, bindings);
     } catch (ScriptException e) {
-      throw new ActivitiException("problem evaluating script: " + e.getMessage(), e);
+      throw new ProcessEngineException("problem evaluating script: " + e.getMessage(), e);
     }
   }
 }

@@ -2,11 +2,12 @@ package com.camunda.fox.platform.jobexecutor.impl.ra.execution;
 
 import java.util.logging.Logger;
 
-import com.camunda.fox.platform.jobexecutor.impl.PlatformJobExecutor;
+import org.camunda.bpm.engine.impl.jobexecutor.tobemerged.impl.PlatformJobExecutor;
+import org.camunda.bpm.engine.impl.jobexecutor.tobemerged.util.ClassUtils;
+
 import com.camunda.fox.platform.jobexecutor.impl.ra.PlatformJobExecutorConnector;
 import com.camunda.fox.platform.jobexecutor.impl.ra.execution.commonj.CommonjWorkManagerPlatformJobExecutor;
 import com.camunda.fox.platform.jobexecutor.impl.ra.execution.spi.PlatformJobExecutorFactory;
-import com.camunda.fox.platform.jobexecutor.util.ClassUtils;
 
 /**
  * Tries to auto-detect if {@link commonj.work.WorkManager} is present on the classpath.

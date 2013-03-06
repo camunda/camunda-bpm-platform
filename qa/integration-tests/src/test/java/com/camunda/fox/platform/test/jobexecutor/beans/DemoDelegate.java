@@ -5,9 +5,9 @@ import java.util.HashMap;
 import java.util.Random;
 import java.util.logging.Logger;
 
-import org.activiti.engine.delegate.DelegateExecution;
-import org.activiti.engine.delegate.Expression;
-import org.activiti.engine.delegate.JavaDelegate;
+import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.bpm.engine.delegate.Expression;
+import org.camunda.bpm.engine.delegate.JavaDelegate;
 
 public class DemoDelegate implements JavaDelegate {
 

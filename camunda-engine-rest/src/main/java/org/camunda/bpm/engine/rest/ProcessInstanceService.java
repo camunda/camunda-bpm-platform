@@ -5,11 +5,11 @@ import java.util.List;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 
-import org.activiti.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceQueryDto;
 import org.camunda.bpm.engine.rest.dto.runtime.VariableListDto;
+import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 
 @Path("/process-instance")
 @Produces(MediaType.APPLICATION_JSON)

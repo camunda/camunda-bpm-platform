@@ -12,9 +12,9 @@
  */
 package org.activiti.spring.test.taskassignment;
 
-import org.activiti.engine.impl.util.CollectionUtil;
-import org.activiti.engine.test.Deployment;
 import org.activiti.spring.impl.test.SpringActivitiTestCase;
+import org.camunda.bpm.engine.impl.util.CollectionUtil;
+import org.camunda.bpm.engine.test.Deployment;
 import org.springframework.test.context.ContextConfiguration;
 
 

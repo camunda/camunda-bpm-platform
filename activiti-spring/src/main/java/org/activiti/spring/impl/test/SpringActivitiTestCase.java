@@ -15,9 +15,9 @@ package org.activiti.spring.impl.test;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.ProcessEngine;
-import org.activiti.engine.impl.test.AbstractActivitiTestCase;
+import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.impl.test.AbstractProcessEngineTestCase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -31,7 +31,7 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
  * @author Joram Barrez
  */
 @TestExecutionListeners(DependencyInjectionTestExecutionListener.class)
-public class SpringActivitiTestCase extends AbstractActivitiTestCase implements ApplicationContextAware {
+public class SpringActivitiTestCase extends AbstractProcessEngineTestCase implements ApplicationContextAware {
 
   protected static Map<String, ProcessEngine> cachedProcessEngines = new HashMap<String, ProcessEngine>();
   
@@ -56,10 +56,10 @@ public class SpringActivitiTestCase extends AbstractActivitiTestCase implements 
     ContextConfiguration contextConfiguration = getClass().getAnnotation(ContextConfiguration.class);
     String[] value = contextConfiguration.value();
     if (value==null) {
-      throw new ActivitiException("value is mandatory in ContextConfiguration");
+      throw new ProcessEngineException("value is mandatory in ContextConfiguration");
     }
     if (value.length!=1) {
-      throw new ActivitiException("SpringActivitiTestCase requires exactly one value in annotation ContextConfiguration");
+      throw new ProcessEngineException("SpringActivitiTestCase requires exactly one value in annotation ContextConfiguration");
     }
     String configurationFile = value[0];
     processEngine = cachedProcessEngines.get(configurationFile);

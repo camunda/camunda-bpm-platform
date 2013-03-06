@@ -2,10 +2,10 @@ package org.activiti.spring.test.components.jobexecutor;
 
 import java.util.List;
 
-import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.task.Task;
-import org.activiti.engine.test.Deployment;
 import org.activiti.spring.impl.test.SpringActivitiTestCase;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.task.Task;
+import org.camunda.bpm.engine.test.Deployment;
 import org.springframework.test.context.ContextConfiguration;
 
 

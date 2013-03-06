@@ -16,8 +16,8 @@ import java.util.Date;
 
 import org.activiti.cdi.BusinessProcessEvent;
 import org.activiti.cdi.BusinessProcessEventType;
-import org.activiti.engine.delegate.DelegateExecution;
-import org.activiti.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.bpm.engine.repository.ProcessDefinition;
 
 /**
  * 

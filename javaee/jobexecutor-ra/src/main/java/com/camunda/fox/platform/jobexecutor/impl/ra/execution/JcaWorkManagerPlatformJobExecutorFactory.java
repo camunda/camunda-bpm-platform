@@ -1,6 +1,7 @@
 package com.camunda.fox.platform.jobexecutor.impl.ra.execution;
 
-import com.camunda.fox.platform.jobexecutor.impl.PlatformJobExecutor;
+import org.camunda.bpm.engine.impl.jobexecutor.tobemerged.impl.PlatformJobExecutor;
+
 import com.camunda.fox.platform.jobexecutor.impl.ra.PlatformJobExecutorConnector;
 import com.camunda.fox.platform.jobexecutor.impl.ra.execution.spi.PlatformJobExecutorFactory;
 

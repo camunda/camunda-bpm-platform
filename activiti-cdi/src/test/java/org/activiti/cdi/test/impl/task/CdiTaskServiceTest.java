@@ -1,7 +1,7 @@
 package org.activiti.cdi.test.impl.task;
 
 import org.activiti.cdi.test.CdiActivitiTestCase;
-import org.activiti.engine.task.Task;
+import org.camunda.bpm.engine.task.Task;
 import org.junit.Test;
 
 

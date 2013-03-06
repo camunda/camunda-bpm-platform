@@ -16,7 +16,7 @@ import javax.enterprise.inject.Produces;
 import javax.inject.Named;
 
 import org.activiti.cdi.annotation.BusinessKey;
-import org.activiti.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 
 /**
  * Producer for the current business key.

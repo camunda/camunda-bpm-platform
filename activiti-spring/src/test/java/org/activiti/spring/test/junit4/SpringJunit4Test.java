@@ -15,12 +15,12 @@ package org.activiti.spring.test.junit4;
 
 import static org.junit.Assert.assertEquals;
 
-import org.activiti.engine.ProcessEngine;
-import org.activiti.engine.RuntimeService;
-import org.activiti.engine.TaskService;
-import org.activiti.engine.task.Task;
-import org.activiti.engine.test.ActivitiRule;
-import org.activiti.engine.test.Deployment;
+import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.task.Task;
+import org.camunda.bpm.engine.test.ProcessEngineRule;
+import org.camunda.bpm.engine.test.Deployment;
 import org.junit.After;
 import org.junit.Rule;
 import org.junit.Test;
@@ -48,7 +48,7 @@ public class SpringJunit4Test {
   
   @Autowired
   @Rule
-  public ActivitiRule activitiSpringRule;
+  public ProcessEngineRule activitiSpringRule;
   
   @After
   public void closeProcessEngine() {

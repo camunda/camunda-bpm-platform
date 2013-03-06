@@ -1,7 +1,7 @@
 package org.activiti.spring.test.components.jobexecutor;
 
-import org.activiti.engine.delegate.DelegateExecution;
-import org.activiti.engine.delegate.ExecutionListener;
+import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.bpm.engine.delegate.ExecutionListener;
 
 /**
  * 

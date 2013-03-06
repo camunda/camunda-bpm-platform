@@ -4,7 +4,7 @@
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xsi:schemaLocation="http://www.springframework.org/schema/beans   http://www.springframework.org/schema/beans/spring-beans.xsd">
 
-  <bean id="processEngineConfiguration" class="org.activiti.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration">
+  <bean id="processEngineConfiguration" class="org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration">
   
     <property name="jdbcUrl" value="jdbc:h2:mem:activiti;DB_CLOSE_DELAY=1000" />
     <property name="jdbcDriver" value="org.h2.Driver" />
@@ -23,7 +23,7 @@
     
    	<property name="customPostBPMNParseListeners">
 		<list>
-			<bean class="com.camunda.fox.engine.impl.bpmn.parser.FoxFailedJobParseListener" />
+			<bean class="org.camunda.bpm.engine.impl.bpmn.parser.FoxFailedJobParseListener" />
 		</list>
 	</property>
 	
@@ -31,6 +31,6 @@
 	
   </bean>
   
-  <bean id="foxFailedJobCommandFactory" class="com.camunda.fox.engine.impl.jobexecutor.FoxFailedJobCommandFactory" />
+  <bean id="foxFailedJobCommandFactory" class="org.camunda.bpm.engine.impl.jobexecutor.FoxFailedJobCommandFactory" />
 
 </beans>

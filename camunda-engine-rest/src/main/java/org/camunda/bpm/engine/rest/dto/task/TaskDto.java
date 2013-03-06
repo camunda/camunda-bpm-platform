@@ -2,8 +2,8 @@ package org.camunda.bpm.engine.rest.dto.task;
 
 import java.util.Date;
 
-import org.activiti.engine.task.DelegationState;
-import org.activiti.engine.task.Task;
+import org.camunda.bpm.engine.task.DelegationState;
+import org.camunda.bpm.engine.task.Task;
 
 public class TaskDto {
 

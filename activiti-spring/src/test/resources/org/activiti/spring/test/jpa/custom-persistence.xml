@@ -6,7 +6,7 @@
   <persistence-unit name="activiti-jpa-pu">
     <provider>org.apache.openjpa.persistence.PersistenceProviderImpl</provider>
     
-    <class>org.activiti.spring.test.jpa.LoanRequest</class>    
+    <class>org.camunda.bpm.engine.test.spring.test.jpa.LoanRequest</class>    
     
     <exclude-unlisted-classes>true</exclude-unlisted-classes>
     

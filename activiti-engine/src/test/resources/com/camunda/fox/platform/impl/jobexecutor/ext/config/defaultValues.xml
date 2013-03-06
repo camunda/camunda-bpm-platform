@@ -1,9 +1,0 @@
-<job-executor>
-
-  <job-acquisition name="default">
-  
-    <acquisition-strategy>SEQUENTIAL</acquisition-strategy>
-  
-  </job-acquisition>
-
-</job-executor>

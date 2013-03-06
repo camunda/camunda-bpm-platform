@@ -43,7 +43,7 @@ import org.springframework.util.StringUtils;
 
 /**
  * the idea is that this bean post processor is responsible for registering all beans
- * that have the {@link org.activiti.engine.annotations.State} annotation.
+ * that have the {@link org.camunda.bpm.engine.annotations.State} annotation.
  *
  * @author Josh Long
  * @since 5.3

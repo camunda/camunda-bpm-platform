@@ -19,7 +19,7 @@ import java.lang.annotation.Target;
 
 import javax.inject.Qualifier;
 
-import org.activiti.engine.task.Task;
+import org.camunda.bpm.engine.task.Task;
 
 /**
  * Qualifier annotation for injecting the current taskId.

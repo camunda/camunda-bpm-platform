@@ -26,13 +26,12 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.activiti.engine.impl.util.IoUtil;
 import org.camunda.bpm.container.impl.jmx.deployment.util.ScanningUtil;
+import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.jboss.vfs.VFS;
 import org.jboss.vfs.VirtualFile;
 import org.jboss.vfs.VirtualFileFilter;
-
-import com.camunda.fox.platform.FoxPlatformException;
 
 /**
  * <p>A {@link ProcessArchiveScanner} which uses Jboss VFS for
@@ -96,7 +95,7 @@ public class VfsProcessApplicationResourceScanner {
     try {
       return  VFS.getChild(url.toURI());
     } catch (URISyntaxException e) {
-      throw new FoxPlatformException("Could not load virtual filefor url "+url, e);
+      throw new ProcessEngineException("Could not load virtual filefor url "+url, e);
     }
   }
 
@@ -141,7 +140,7 @@ public class VfsProcessApplicationResourceScanner {
     try {
       resourceRoots = classLoader.getResources(strippedPaResourceRootPath);
     } catch (IOException e) {
-      throw new FoxPlatformException("Could not load resources at '"+strippedPaResourceRootPath+"' using classloaded '"+classLoader+"'", e);
+      throw new ProcessEngineException("Could not load resources at '"+strippedPaResourceRootPath+"' using classloaded '"+classLoader+"'", e);
     }
     return resourceRoots;
   }

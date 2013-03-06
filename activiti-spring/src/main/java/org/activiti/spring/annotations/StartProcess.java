@@ -34,8 +34,8 @@ public @interface StartProcess {
 	String processKey() ;
 
 	/**
-	 * returns the ID of the {@link org.activiti.engine.runtime.ProcessInstance}. If specified, it'll only work if
-	 * the return type of the invocation is compatabile with a {@link org.activiti.engine.runtime.ProcessInstance}'s ID
+	 * returns the ID of the {@link org.camunda.bpm.engine.runtime.ProcessInstance}. If specified, it'll only work if
+	 * the return type of the invocation is compatabile with a {@link org.camunda.bpm.engine.runtime.ProcessInstance}'s ID
 	 * (which is a String, at the moment)
 	 *
 	 * @return  whether to return the process instance ID

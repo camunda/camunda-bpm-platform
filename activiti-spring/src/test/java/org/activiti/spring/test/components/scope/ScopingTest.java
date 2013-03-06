@@ -1,12 +1,12 @@
 package org.activiti.spring.test.components.scope;
 
-import org.activiti.engine.ProcessEngine;
-import org.activiti.engine.RepositoryService;
-import org.activiti.engine.TaskService;
-import org.activiti.engine.repository.Deployment;
-import org.activiti.engine.runtime.ProcessInstance;
-import org.activiti.engine.task.Task;
 import org.activiti.spring.test.components.ProcessInitiatingPojo;
+import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.RepositoryService;
+import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.repository.Deployment;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.task.Task;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;

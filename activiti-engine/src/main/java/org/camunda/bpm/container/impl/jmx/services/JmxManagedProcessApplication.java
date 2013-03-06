@@ -18,7 +18,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.logging.Logger;
 
-import org.activiti.engine.ActivitiException;
 import org.camunda.bpm.application.AbstractProcessApplication;
 import org.camunda.bpm.application.ProcessApplicationDeploymentInfo;
 import org.camunda.bpm.application.ProcessApplicationReference;
@@ -27,8 +26,9 @@ import org.camunda.bpm.application.ProcessApplicationUnavailableException;
 import org.camunda.bpm.application.impl.ProcessApplicationDeploymentInfoImpl;
 import org.camunda.bpm.application.impl.ProcessApplicationInfoImpl;
 import org.camunda.bpm.application.impl.metadata.spi.ProcessesXml;
-import org.camunda.bpm.container.impl.jmx.kernel.MBeanServiceContainer;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanService;
+import org.camunda.bpm.container.impl.jmx.kernel.MBeanServiceContainer;
+import org.camunda.bpm.engine.ProcessEngineException;
 
 /**
  * 
@@ -65,7 +65,7 @@ public class JmxManagedProcessApplication implements MBeanService<JmxManagedProc
       processApplicationInfo.setName(processApplication.getName());	  
       processApplicationInfo.setProperties(processApplication.getProperties());
     } catch (ProcessApplicationUnavailableException e) {
-      throw new ActivitiException("Exception while starting process application service");
+      throw new ProcessEngineException("Exception while starting process application service");
     }
 	  
 	  // create deployment infos

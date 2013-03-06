@@ -26,6 +26,7 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.TYP
 import java.util.List;
 import java.util.Locale;
 
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.jboss.as.controller.AbstractAddStepHandler;
 import org.jboss.as.controller.OperationContext;
 import org.jboss.as.controller.OperationFailedException;
@@ -38,7 +39,6 @@ import org.jboss.dmr.ModelType;
 import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceController.Mode;
 
-import com.camunda.fox.platform.FoxPlatformException;
 import com.camunda.fox.platform.subsystem.impl.service.ContainerJobExecutorService;
 
 /**
@@ -78,7 +78,7 @@ public class JobExecutorAdd extends AbstractAddStepHandler implements Descriptio
           throws OperationFailedException {
     
     if (!operation.hasDefined(THREAD_POOL_NAME)) {
-      throw new FoxPlatformException("Unable to configure threadpool for ContainerJobExecutorService, missing element '" + THREAD_POOL_NAME + "' in JobExecutor configuration.");
+      throw new ProcessEngineException("Unable to configure threadpool for ContainerJobExecutorService, missing element '" + THREAD_POOL_NAME + "' in JobExecutor configuration.");
     }
     
     String jobExecutorThreadPoolName = operation.get(THREAD_POOL_NAME).asString();

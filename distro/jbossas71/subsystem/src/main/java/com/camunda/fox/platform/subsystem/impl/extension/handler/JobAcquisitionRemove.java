@@ -22,7 +22,9 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.REM
 import java.util.List;
 import java.util.Locale;
 
-import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.jobexecutor.tobemerged.impl.acquisition.JobAcquisition;
 import org.jboss.as.controller.AbstractRemoveStepHandler;
 import org.jboss.as.controller.OperationContext;
 import org.jboss.as.controller.OperationFailedException;
@@ -31,8 +33,6 @@ import org.jboss.as.controller.descriptions.DescriptionProvider;
 import org.jboss.as.controller.descriptions.ModelDescriptionConstants;
 import org.jboss.dmr.ModelNode;
 
-import com.camunda.fox.platform.FoxPlatformException;
-import com.camunda.fox.platform.jobexecutor.impl.acquisition.JobAcquisition;
 import com.camunda.fox.platform.subsystem.impl.service.ContainerJobExecutorService;
 
 /**
@@ -65,7 +65,7 @@ public class JobAcquisitionRemove extends AbstractRemoveStepHandler implements D
       sb.append("]");
       int lastIndexOf = sb.lastIndexOf(",");
       sb.deleteCharAt(lastIndexOf).deleteCharAt(lastIndexOf+1);
-      throw new FoxPlatformException("Unable to remove jobAcquisition '" + jobAcquisitionName + "' because following process engines are still registered with it: " + sb.toString());
+      throw new ProcessEngineException("Unable to remove jobAcquisition '" + jobAcquisitionName + "' because following process engines are still registered with it: " + sb.toString());
     }
     service.stopJobAcquisition(jobAcquisitionName);
   }

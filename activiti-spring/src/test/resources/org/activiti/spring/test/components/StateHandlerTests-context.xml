@@ -25,7 +25,7 @@
         <property name="dataSource" ref="dataSource"/>
     </bean>
 
-    <bean id="processEngineConfiguration" class="org.activiti.spring.SpringProcessEngineConfiguration">
+    <bean id="processEngineConfiguration" class="org.camunda.bpm.engine.test.spring.SpringProcessEngineConfiguration">
         <property name="dataSource" ref="dataSource"/>
         <property name="transactionManager" ref="transactionManager"/>
         <property name="databaseSchemaUpdate" value="true"/>
@@ -38,7 +38,7 @@
         </property>
     </bean>
 
-    <bean id="processEngine" class="org.activiti.spring.ProcessEngineFactoryBean">
+    <bean id="processEngine" class="org.camunda.bpm.engine.test.spring.ProcessEngineFactoryBean">
         <property name="processEngineConfiguration" ref="processEngineConfiguration"/>
     </bean>
 

@@ -12,9 +12,9 @@
  */
 package org.activiti.spring.test.servicetask;
 
-import org.activiti.engine.delegate.DelegateTask;
-import org.activiti.engine.delegate.TaskListener;
-import org.activiti.engine.impl.el.FixedValue;
+import org.camunda.bpm.engine.delegate.DelegateTask;
+import org.camunda.bpm.engine.delegate.TaskListener;
+import org.camunda.bpm.engine.impl.el.FixedValue;
 
 
 /**

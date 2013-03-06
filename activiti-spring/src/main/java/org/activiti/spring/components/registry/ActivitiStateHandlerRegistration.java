@@ -24,8 +24,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 
 /**
- * an instance of a bean discovered to both have an {@link org.activiti.engine.annotations.ActivitiComponent}
- * and one or more {@link org.activiti.engine.annotations.ActivitiComponent} annotations present.
+ * an instance of a bean discovered to both have an {@link org.camunda.bpm.engine.annotations.ActivitiComponent}
+ * and one or more {@link org.camunda.bpm.engine.annotations.ActivitiComponent} annotations present.
  * <p/>
  * Describes the metadata extracted from the bean at configuration time
  *

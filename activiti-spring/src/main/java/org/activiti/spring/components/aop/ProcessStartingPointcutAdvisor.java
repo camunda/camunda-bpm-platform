@@ -21,11 +21,11 @@ import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.activiti.engine.ProcessEngine;
 import org.activiti.spring.annotations.StartProcess;
 import org.activiti.spring.components.aop.util.MetaAnnotationMatchingPointcut;
 import org.aopalliance.aop.Advice;
 import org.aopalliance.intercept.MethodInterceptor;
+import org.camunda.bpm.engine.ProcessEngine;
 import org.springframework.aop.Pointcut;
 import org.springframework.aop.PointcutAdvisor;
 import org.springframework.aop.support.ComposablePointcut;
@@ -36,7 +36,7 @@ import org.springframework.aop.support.ComposablePointcut;
  * Advised methods start a process after the method executes.
  *
  * Advised methods can declare a return
- * type of {@link org.activiti.engine.runtime.ProcessInstance} and then subsequently
+ * type of {@link org.camunda.bpm.engine.runtime.ProcessInstance} and then subsequently
  * return null. The real return ProcessInstance value will be given by the aspect.
  * 
  *
@@ -62,7 +62,7 @@ public class ProcessStartingPointcutAdvisor implements PointcutAdvisor, Serializ
 	protected Pointcut pointcut;
 
 	/**
-	 * the injected reference to the {@link org.activiti.engine.ProcessEngine}
+	 * the injected reference to the {@link org.camunda.bpm.engine.ProcessEngine}
 	 */
 	protected ProcessEngine processEngine;
 

@@ -3,8 +3,8 @@ package com.camunda.fox.platform.test.functional.ejb.local.bean;
 import javax.ejb.EJB;
 import javax.inject.Named;
 
-import org.activiti.engine.delegate.DelegateExecution;
-import org.activiti.engine.delegate.JavaDelegate;
+import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.bpm.engine.delegate.JavaDelegate;
 
 /**
  * A CDI bean delegating to the local business 

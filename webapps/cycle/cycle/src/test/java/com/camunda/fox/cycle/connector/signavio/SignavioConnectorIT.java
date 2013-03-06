@@ -19,17 +19,17 @@ import java.util.regex.Pattern;
 
 import javax.inject.Inject;
 
-import org.activiti.engine.impl.bpmn.parser.BpmnParse;
-import org.activiti.engine.impl.bpmn.parser.BpmnParser;
-import org.activiti.engine.impl.cfg.BpmnParseFactory;
-import org.activiti.engine.impl.cfg.DefaultBpmnParseFactory;
-import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.activiti.engine.impl.context.Context;
-import org.activiti.engine.impl.el.ExpressionManager;
-import org.activiti.engine.impl.persistence.entity.DeploymentEntity;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
+import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParser;
+import org.camunda.bpm.engine.impl.cfg.BpmnParseFactory;
+import org.camunda.bpm.engine.impl.cfg.DefaultBpmnParseFactory;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.el.ExpressionManager;
+import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
 import org.custommonkey.xmlunit.DetailedDiff;
 import org.custommonkey.xmlunit.Diff;
 import org.custommonkey.xmlunit.ElementNameAndAttributeQualifier;

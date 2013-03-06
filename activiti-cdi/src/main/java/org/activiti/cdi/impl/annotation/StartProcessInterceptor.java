@@ -26,7 +26,7 @@ import javax.interceptor.InvocationContext;
 import org.activiti.cdi.BusinessProcess;
 import org.activiti.cdi.annotation.ProcessVariable;
 import org.activiti.cdi.annotation.StartProcess;
-import org.activiti.engine.ActivitiException;
+import org.camunda.bpm.engine.ProcessEngineException;
 
 /**
  * implementation of the {@link StartProcess} annotation
@@ -68,7 +68,7 @@ public class StartProcessInterceptor implements Serializable {
         throw e;
       }
     } catch (Exception e) {
-      throw new ActivitiException("Error while starting process using @StartProcess on method  '"+ctx.getMethod()+"': " + e.getMessage(), e);
+      throw new ProcessEngineException("Error while starting process using @StartProcess on method  '"+ctx.getMethod()+"': " + e.getMessage(), e);
     }
   }
 

@@ -13,9 +13,9 @@
 
 package org.activiti.spring;
 
-import org.activiti.engine.impl.cfg.TransactionContext;
-import org.activiti.engine.impl.cfg.TransactionContextFactory;
-import org.activiti.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.cfg.TransactionContext;
+import org.camunda.bpm.engine.impl.cfg.TransactionContextFactory;
+import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.springframework.transaction.PlatformTransactionManager;
 
 

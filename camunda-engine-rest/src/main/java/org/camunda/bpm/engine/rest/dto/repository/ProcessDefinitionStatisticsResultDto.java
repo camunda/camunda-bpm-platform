@@ -1,6 +1,6 @@
 package org.camunda.bpm.engine.rest.dto.repository;
 
-import org.activiti.engine.management.ProcessDefinitionStatistics;
+import org.camunda.bpm.engine.management.ProcessDefinitionStatistics;
 import org.camunda.bpm.engine.rest.dto.StatisticsResultDto;
 
 public class ProcessDefinitionStatisticsResultDto extends StatisticsResultDto {

@@ -19,7 +19,7 @@ import java.lang.annotation.Target;
 
 import javax.inject.Qualifier;
 
-import org.activiti.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 
 /**
  * Qualifier annotation for injecting the id of the current process instance.

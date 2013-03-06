@@ -21,21 +21,21 @@ import javax.enterprise.inject.spi.BeanManager;
 
 import org.activiti.cdi.BusinessProcess;
 import org.activiti.cdi.impl.util.ProgrammaticBeanLookup;
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.FormService;
-import org.activiti.engine.HistoryService;
-import org.activiti.engine.IdentityService;
-import org.activiti.engine.ManagementService;
-import org.activiti.engine.ProcessEngine;
-import org.activiti.engine.RepositoryService;
-import org.activiti.engine.RuntimeService;
-import org.activiti.engine.TaskService;
-import org.activiti.engine.impl.ProcessEngineImpl;
-import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.activiti.engine.impl.jobexecutor.JobExecutor;
-import org.activiti.engine.test.ActivitiRule;
 import org.camunda.bpm.BpmPlatform;
 import org.camunda.bpm.container.RuntimeContainerDelegate;
+import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.FormService;
+import org.camunda.bpm.engine.HistoryService;
+import org.camunda.bpm.engine.IdentityService;
+import org.camunda.bpm.engine.ManagementService;
+import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.RepositoryService;
+import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.impl.ProcessEngineImpl;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
+import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
@@ -59,12 +59,12 @@ public abstract class CdiActivitiTestCase {
   public static JavaArchive createDeployment() {
     
     return ShrinkWrap.create(JavaArchive.class)
-      .addPackages(true, "org.activiti.cdi")
+      .addPackages(true, "org.camunda.bpm.engine.test.cdi")
       .addAsManifestResource("META-INF/beans.xml", "beans.xml");
   }
   
   @Rule
-  public ActivitiRule activitiRule = new ActivitiRule();
+  public ProcessEngineRule activitiRule = new ProcessEngineRule();
 
   protected BeanManager beanManager;
   
@@ -130,7 +130,7 @@ public abstract class CdiActivitiTestCase {
         timer.cancel();
       }
       if (areJobsAvailable) {
-        throw new ActivitiException("time limit of " + maxMillisToWait + " was exceeded");
+        throw new ProcessEngineException("time limit of " + maxMillisToWait + " was exceeded");
       }
 
     } finally {
@@ -154,12 +154,12 @@ public abstract class CdiActivitiTestCase {
         }
       } catch (InterruptedException e) {
       } catch (Exception e) {
-        throw new ActivitiException("Exception while waiting on condition: "+e.getMessage(), e);
+        throw new ProcessEngineException("Exception while waiting on condition: "+e.getMessage(), e);
       } finally {
         timer.cancel();
       }
       if (conditionIsViolated) {
-        throw new ActivitiException("time limit of " + maxMillisToWait + " was exceeded");
+        throw new ProcessEngineException("time limit of " + maxMillisToWait + " was exceeded");
       }
 
     } finally {

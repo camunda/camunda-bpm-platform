@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="taskAssigneeExample" 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:activiti="http://activiti.org/bpmn"
+  targetNamespace="Examples">
+  
+  <process id="ExampleProcess">
+  
+    <startEvent id="start"/>
+    
+    <sequenceFlow id="flow1" sourceRef="start" targetRef="theServiceTask" />
+
+    <serviceTask id="theServiceTask" name="my task" activiti:class="org.camunda.bpm.engine.test.api.mgmt.FailingDelegate" activiti:async="true"/>
+    
+    <sequenceFlow id="flow2" sourceRef="theServiceTask" targetRef="theUserTask" />
+    
+    <userTask id="theUserTask" name="my task"/>
+    
+    <sequenceFlow id="flow3" sourceRef="theUserTask" targetRef="theEnd" />
+    
+    <endEvent id="theEnd" />
+    
+  </process>
+
+</definitions>

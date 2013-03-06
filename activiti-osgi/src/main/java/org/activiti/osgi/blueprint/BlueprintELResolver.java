@@ -6,12 +6,12 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import org.activiti.engine.delegate.JavaDelegate;
-import org.activiti.engine.impl.javax.el.ELContext;
-import org.activiti.engine.impl.javax.el.ELResolver;
+import org.camunda.bpm.engine.delegate.JavaDelegate;
+import org.camunda.bpm.engine.impl.javax.el.ELContext;
+import org.camunda.bpm.engine.impl.javax.el.ELResolver;
 
 /**
- * @see org.activiti.spring.ApplicationContextElResolver
+ * @see org.camunda.bpm.engine.test.spring.ApplicationContextElResolver
  */
 public class BlueprintELResolver extends ELResolver {
 	

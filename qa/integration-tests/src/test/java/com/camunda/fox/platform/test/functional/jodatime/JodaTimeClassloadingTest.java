@@ -5,8 +5,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
-import org.activiti.engine.runtime.Job;
-import org.activiti.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.runtime.Job;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.spec.WebArchive;

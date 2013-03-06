@@ -23,13 +23,13 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Logger;
 
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.impl.util.IoUtil;
 import org.camunda.bpm.application.AbstractProcessApplication;
 import org.camunda.bpm.application.impl.metadata.ProcessesXmlParser;
 import org.camunda.bpm.application.impl.metadata.spi.ProcessesXml;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanDeploymentOperation;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanDeploymentOperationStep;
+import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.util.IoUtil;
 
 
 /**
@@ -60,7 +60,7 @@ public class ParseProcessesXmlStep extends MBeanDeploymentOperationStep {
       processesXmlFileLocations = processApplicationClassloader.getResources(META_INF_PROCESSES_XML);
             
     } catch (IOException e) {
-      throw new ActivitiException("IOException while reading "+META_INF_PROCESSES_XML);
+      throw new ProcessEngineException("IOException while reading "+META_INF_PROCESSES_XML);
     }
 
     // perform parsing
@@ -94,7 +94,7 @@ public class ParseProcessesXmlStep extends MBeanDeploymentOperationStep {
       return inputStream.available() == 0;
       
     } catch (IOException e) {
-      throw new ActivitiException("Could not open stream for " + META_INF_PROCESSES_XML, e); 
+      throw new ProcessEngineException("Could not open stream for " + META_INF_PROCESSES_XML, e); 
       
     } finally {
       IoUtil.closeSilently(inputStream);

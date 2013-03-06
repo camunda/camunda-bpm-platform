@@ -14,9 +14,9 @@ package org.activiti.cdi.impl.context;
 
 import java.util.Map;
 
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.runtime.Execution;
-import org.activiti.engine.task.Task;
+import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.runtime.Execution;
+import org.camunda.bpm.engine.task.Task;
 
 /**
  * Represents a means for associating an execution with a context.
@@ -32,7 +32,7 @@ public interface ContextAssociationManager {
   /**
    * Disassociates the current process instance with a context / scope
    * 
-   * @throws ActivitiException if no process instance is currently associated
+   * @throws ProcessEngineException if no process instance is currently associated
    */
   public void disAssociate();
     

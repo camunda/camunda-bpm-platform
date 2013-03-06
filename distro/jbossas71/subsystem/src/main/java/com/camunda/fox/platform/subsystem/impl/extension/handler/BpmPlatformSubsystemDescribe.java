@@ -15,7 +15,16 @@
  */
 package com.camunda.fox.platform.subsystem.impl.extension.handler;
 
-import static com.camunda.fox.platform.subsystem.impl.extension.ModelConstants.*;
+import static com.camunda.fox.platform.subsystem.impl.extension.ModelConstants.ACQUISITION_STRATEGY;
+import static com.camunda.fox.platform.subsystem.impl.extension.ModelConstants.DATASOURCE;
+import static com.camunda.fox.platform.subsystem.impl.extension.ModelConstants.DEFAULT;
+import static com.camunda.fox.platform.subsystem.impl.extension.ModelConstants.HISTORY_LEVEL;
+import static com.camunda.fox.platform.subsystem.impl.extension.ModelConstants.JOB_ACQUISITIONS;
+import static com.camunda.fox.platform.subsystem.impl.extension.ModelConstants.JOB_EXECUTOR;
+import static com.camunda.fox.platform.subsystem.impl.extension.ModelConstants.NAME;
+import static com.camunda.fox.platform.subsystem.impl.extension.ModelConstants.PROCESS_ENGINES;
+import static com.camunda.fox.platform.subsystem.impl.extension.ModelConstants.PROPERTIES;
+import static com.camunda.fox.platform.subsystem.impl.extension.ModelConstants.THREAD_POOL_NAME;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.ADD;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OP;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OP_ADDR;

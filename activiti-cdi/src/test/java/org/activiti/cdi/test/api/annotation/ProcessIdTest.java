@@ -14,7 +14,7 @@ package org.activiti.cdi.test.api.annotation;
 
 import org.activiti.cdi.BusinessProcess;
 import org.activiti.cdi.test.CdiActivitiTestCase;
-import org.activiti.engine.test.Deployment;
+import org.camunda.bpm.engine.test.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.junit.Assert;
 import org.junit.Test;

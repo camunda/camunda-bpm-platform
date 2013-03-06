@@ -3,8 +3,7 @@ package org.camunda.bpm.container.impl.jmx.kernel.util;
 import javax.management.ObjectName;
 
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanServiceContainer.ServiceType;
-
-import com.camunda.fox.platform.FoxPlatformException;
+import org.camunda.bpm.engine.ProcessEngineException;
 
 public enum TestServiceType implements ServiceType {
     
@@ -21,7 +20,7 @@ public enum TestServiceType implements ServiceType {
       try {
         return new ObjectName(serviceRealm+":type=" + localName);
       } catch (Exception e) {
-        throw new FoxPlatformException("Could not compose name", e);
+        throw new ProcessEngineException("Could not compose name", e);
       }
     }
     
@@ -29,7 +28,7 @@ public enum TestServiceType implements ServiceType {
       try {
         return new ObjectName(serviceRealm + ":type=*");
       } catch (Exception e) {
-        throw new FoxPlatformException("Could not compose name", e);
+        throw new ProcessEngineException("Could not compose name", e);
       }
     }
      

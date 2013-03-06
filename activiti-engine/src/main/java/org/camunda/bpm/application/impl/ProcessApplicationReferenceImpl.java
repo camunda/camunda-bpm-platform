@@ -14,10 +14,10 @@ package org.camunda.bpm.application.impl;
 
 import java.lang.ref.WeakReference;
 
-import org.activiti.engine.ProcessEngine;
 import org.camunda.bpm.application.AbstractProcessApplication;
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.application.ProcessApplicationUnavailableException;
+import org.camunda.bpm.engine.ProcessEngine;
 
 /**
  * <p>A {@link ProcessApplicationReference} implementation using

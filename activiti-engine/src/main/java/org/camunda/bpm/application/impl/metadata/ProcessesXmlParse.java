@@ -24,13 +24,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.engine.impl.util.xml.Element;
-import org.activiti.engine.impl.util.xml.Parse;
-import org.activiti.engine.impl.util.xml.Parser;
 import org.camunda.bpm.application.impl.metadata.spi.ProcessArchiveXml;
 import org.camunda.bpm.application.impl.metadata.spi.ProcessesXml;
 import org.camunda.bpm.container.impl.metadata.DeploymentMetadataParse;
 import org.camunda.bpm.container.impl.metadata.spi.ProcessEngineXml;
+import org.camunda.bpm.engine.impl.util.xml.Element;
+import org.camunda.bpm.engine.impl.util.xml.Parse;
+import org.camunda.bpm.engine.impl.util.xml.Parser;
 
 /**
  * <p>{@link Parse} object for the <code>processes.xml</code> file.</p>

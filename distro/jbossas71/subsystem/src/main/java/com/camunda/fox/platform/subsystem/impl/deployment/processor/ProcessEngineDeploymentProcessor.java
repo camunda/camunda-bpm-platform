@@ -18,11 +18,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.engine.ProcessEngine;
-import org.activiti.engine.impl.util.IoUtil;
 import org.camunda.bpm.application.impl.metadata.spi.ProcessArchiveXml;
 import org.camunda.bpm.application.impl.metadata.spi.ProcessesXml;
 import org.camunda.bpm.container.impl.metadata.PropertyHelper;
+import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.jboss.as.ee.component.ComponentDescription;
 import org.jboss.as.ee.component.ComponentView;
 import org.jboss.as.server.deployment.Attachments;

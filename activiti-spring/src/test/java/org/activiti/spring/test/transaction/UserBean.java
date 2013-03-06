@@ -15,8 +15,8 @@ package org.activiti.spring.test.transaction;
 
 import javax.sql.DataSource;
 
-import org.activiti.engine.RuntimeService;
-import org.activiti.engine.TaskService;
+import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.TaskService;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.transaction.annotation.Transactional;

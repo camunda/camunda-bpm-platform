@@ -29,7 +29,6 @@ import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceController.Mode;
 
 import com.camunda.fox.platform.subsystem.impl.deployment.processor.ModuleDependencyProcessor;
-import com.camunda.fox.platform.subsystem.impl.deployment.processor.ProcessApplicationComponentAddProcessor;
 import com.camunda.fox.platform.subsystem.impl.deployment.processor.ProcessApplicationComponentProcessor;
 import com.camunda.fox.platform.subsystem.impl.deployment.processor.ProcessEngineDeploymentProcessor;
 import com.camunda.fox.platform.subsystem.impl.deployment.processor.ProcessEngineStartProcessor;

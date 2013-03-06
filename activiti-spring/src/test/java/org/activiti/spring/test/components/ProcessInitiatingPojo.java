@@ -3,10 +3,10 @@ package org.activiti.spring.test.components;
 
 import java.util.logging.Logger;
 
-import org.activiti.engine.runtime.ProcessInstance;
 import org.activiti.spring.annotations.BusinessKey;
 import org.activiti.spring.annotations.ProcessVariable;
 import org.activiti.spring.annotations.StartProcess;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 
 /**
  * simple class that demonstrates the annotations to implicitly handle annotation-driven process managment

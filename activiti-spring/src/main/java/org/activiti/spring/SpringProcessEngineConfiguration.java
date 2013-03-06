@@ -21,16 +21,16 @@ import java.util.zip.ZipInputStream;
 
 import javax.sql.DataSource;
 
-import org.activiti.engine.ActivitiException;
-import org.activiti.engine.ProcessEngine;
-import org.activiti.engine.RepositoryService;
-import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.activiti.engine.impl.cfg.StandaloneProcessEngineConfiguration;
-import org.activiti.engine.impl.interceptor.CommandContextInterceptor;
-import org.activiti.engine.impl.interceptor.CommandInterceptor;
-import org.activiti.engine.impl.interceptor.LogInterceptor;
-import org.activiti.engine.impl.variable.EntityManagerSession;
-import org.activiti.engine.repository.DeploymentBuilder;
+import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.RepositoryService;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.cfg.StandaloneProcessEngineConfiguration;
+import org.camunda.bpm.engine.impl.interceptor.CommandContextInterceptor;
+import org.camunda.bpm.engine.impl.interceptor.CommandInterceptor;
+import org.camunda.bpm.engine.impl.interceptor.LogInterceptor;
+import org.camunda.bpm.engine.impl.variable.EntityManagerSession;
+import org.camunda.bpm.engine.repository.DeploymentBuilder;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.ContextResource;
 import org.springframework.core.io.Resource;
@@ -64,7 +64,7 @@ public class SpringProcessEngineConfiguration extends ProcessEngineConfiguration
   
   protected Collection< ? extends CommandInterceptor> getDefaultCommandInterceptorsTxRequired() {
     if (transactionManager==null) {
-      throw new ActivitiException("transactionManager is required property for SpringProcessEngineConfiguration, use "+StandaloneProcessEngineConfiguration.class.getName()+" otherwise");
+      throw new ProcessEngineException("transactionManager is required property for SpringProcessEngineConfiguration, use "+StandaloneProcessEngineConfiguration.class.getName()+" otherwise");
     }
     
     List<CommandInterceptor> defaultCommandInterceptorsTxRequired = new ArrayList<CommandInterceptor>();
@@ -135,7 +135,7 @@ public class SpringProcessEngineConfiguration extends ProcessEngineConfiguration
             deploymentBuilder.addInputStream(resourceName, resource.getInputStream());
           }
         } catch (IOException e) {
-          throw new ActivitiException("couldn't auto deploy resource '"+resource+"': "+e.getMessage(), e);
+          throw new ProcessEngineException("couldn't auto deploy resource '"+resource+"': "+e.getMessage(), e);
         }
       }
       

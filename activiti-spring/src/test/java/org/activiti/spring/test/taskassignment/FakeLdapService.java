@@ -15,7 +15,7 @@ package org.activiti.spring.test.taskassignment;
 import java.util.Arrays;
 import java.util.List;
 
-import org.activiti.engine.delegate.DelegateExecution;
+import org.camunda.bpm.engine.delegate.DelegateExecution;
 
 
 /**

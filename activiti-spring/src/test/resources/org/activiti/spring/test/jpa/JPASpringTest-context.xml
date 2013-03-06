@@ -8,7 +8,7 @@
                            http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
                            http://www.springframework.org/schema/tx      http://www.springframework.org/schema/tx/spring-tx-3.0.xsd">
 
-  <context:component-scan base-package="org.activiti.spring.test.jpa"/>
+  <context:component-scan base-package="org.camunda.bpm.engine.test.spring.test.jpa"/>
 
   <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
     <property name="driverClassName" value="org.h2.Driver" />
@@ -35,10 +35,10 @@
     </property>
   </bean>
   
-  <bean id="loanRequestBean" class="org.activiti.spring.test.jpa.LoanRequestBean">
+  <bean id="loanRequestBean" class="org.camunda.bpm.engine.test.spring.test.jpa.LoanRequestBean">
   </bean>
   
-  <bean id="processEngineConfiguration" class="org.activiti.spring.SpringProcessEngineConfiguration">
+  <bean id="processEngineConfiguration" class="org.camunda.bpm.engine.test.spring.SpringProcessEngineConfiguration">
     <property name="dataSource" ref="dataSource" />
     <property name="transactionManager" ref="transactionManager" />
     <property name="databaseSchemaUpdate" value="true" />
@@ -48,7 +48,7 @@
     <property name="jobExecutorActivate" value="false" />
   </bean>
   
-  <bean id="processEngine" class="org.activiti.spring.ProcessEngineFactoryBean">
+  <bean id="processEngine" class="org.camunda.bpm.engine.test.spring.ProcessEngineFactoryBean">
     <property name="processEngineConfiguration" ref="processEngineConfiguration" />
   </bean>
   

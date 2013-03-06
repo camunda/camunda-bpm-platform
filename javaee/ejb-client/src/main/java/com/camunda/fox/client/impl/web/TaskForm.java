@@ -13,8 +13,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.activiti.cdi.BusinessProcess;
-import org.activiti.engine.RepositoryService;
-import org.activiti.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.RepositoryService;
+import org.camunda.bpm.engine.repository.ProcessDefinition;
 
 @ConversationScoped
 @Named("fox.taskForm")

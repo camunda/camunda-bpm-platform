@@ -15,16 +15,16 @@ package org.activiti.spring;
 
 import java.util.Map;
 
-import org.activiti.engine.delegate.VariableScope;
-import org.activiti.engine.impl.el.ExpressionManager;
-import org.activiti.engine.impl.el.ReadOnlyMapELResolver;
-import org.activiti.engine.impl.el.VariableScopeElResolver;
-import org.activiti.engine.impl.javax.el.ArrayELResolver;
-import org.activiti.engine.impl.javax.el.BeanELResolver;
-import org.activiti.engine.impl.javax.el.CompositeELResolver;
-import org.activiti.engine.impl.javax.el.ELResolver;
-import org.activiti.engine.impl.javax.el.ListELResolver;
-import org.activiti.engine.impl.javax.el.MapELResolver;
+import org.camunda.bpm.engine.delegate.VariableScope;
+import org.camunda.bpm.engine.impl.el.ExpressionManager;
+import org.camunda.bpm.engine.impl.el.ReadOnlyMapELResolver;
+import org.camunda.bpm.engine.impl.el.VariableScopeElResolver;
+import org.camunda.bpm.engine.impl.javax.el.ArrayELResolver;
+import org.camunda.bpm.engine.impl.javax.el.BeanELResolver;
+import org.camunda.bpm.engine.impl.javax.el.CompositeELResolver;
+import org.camunda.bpm.engine.impl.javax.el.ELResolver;
+import org.camunda.bpm.engine.impl.javax.el.ListELResolver;
+import org.camunda.bpm.engine.impl.javax.el.MapELResolver;
 import org.springframework.context.ApplicationContext;
 
 

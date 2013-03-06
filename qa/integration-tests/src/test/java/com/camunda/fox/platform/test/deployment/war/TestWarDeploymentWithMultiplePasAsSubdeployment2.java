@@ -18,8 +18,8 @@ package com.camunda.fox.platform.test.deployment.war;
 
 import junit.framework.Assert;
 
-import org.activiti.engine.repository.DeploymentQuery;
-import org.activiti.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.repository.DeploymentQuery;
+import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
