@@ -14,6 +14,18 @@ define(["angular", "bpmn/Bpmn"], function(angular, Bpmn) {
       Notifications.addMessage({ status: "Scope change", message: message, exclusive: [ "status" ], duration: 5000 });
     };
 
+    function searchQuery(query, view) {
+      angular.forEach(view, function(value, key) {
+        if (key == "filter" || key == "search") {
+          return;
+        }
+
+        query[key] = value;
+      });
+
+      return query;
+    };
+
     var reloadTasks = debounce(function() {
       var view = $scope.taskList.view;
 
@@ -59,6 +71,9 @@ define(["angular", "bpmn/Bpmn"], function(angular, Bpmn) {
           break;
         case "group":
           queryObject.candidateGroup = search;
+          break;
+        case "search":
+          searchQuery(queryObject, view);
           break;
       }
 
