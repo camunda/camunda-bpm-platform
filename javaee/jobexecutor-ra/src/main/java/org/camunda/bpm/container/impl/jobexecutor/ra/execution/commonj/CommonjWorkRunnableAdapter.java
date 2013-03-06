@@ -1,4 +1,4 @@
-package com.camunda.fox.platform.jobexecutor.impl.ra.execution.commonj;
+package org.camunda.bpm.container.impl.jobexecutor.ra.execution.commonj;
 
 import commonj.work.Work;
 

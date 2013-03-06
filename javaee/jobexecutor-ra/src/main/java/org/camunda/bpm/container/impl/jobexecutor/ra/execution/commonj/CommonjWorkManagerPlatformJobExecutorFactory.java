@@ -1,9 +1,9 @@
-package com.camunda.fox.platform.jobexecutor.impl.ra.execution.commonj;
+package org.camunda.bpm.container.impl.jobexecutor.ra.execution.commonj;
 
+import org.camunda.bpm.container.impl.jobexecutor.ra.PlatformJobExecutorConnector;
+import org.camunda.bpm.container.impl.jobexecutor.ra.execution.spi.PlatformJobExecutorFactory;
 import org.camunda.bpm.engine.impl.jobexecutor.tobemerged.impl.PlatformJobExecutor;
 
-import com.camunda.fox.platform.jobexecutor.impl.ra.PlatformJobExecutorConnector;
-import com.camunda.fox.platform.jobexecutor.impl.ra.execution.spi.PlatformJobExecutorFactory;
 
 /**
  * Implements {@link PlatformJobExecutorFactory} to return a {@link CommonjWorkManagerPlatformJobExecutor} instance.

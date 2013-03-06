@@ -1,4 +1,4 @@
-package com.camunda.fox.platform.jobexecutor.impl.ra.outbound;
+package org.camunda.bpm.container.impl.jobexecutor.ra.outbound;
 
 import java.io.PrintWriter;
 import java.util.ArrayList;
@@ -16,13 +16,13 @@ import javax.resource.spi.ManagedConnectionMetaData;
 import javax.security.auth.Subject;
 import javax.transaction.xa.XAResource;
 
+import org.camunda.bpm.container.impl.jobexecutor.ra.PlatformJobExecutorConnector;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.tobemerged.JobExecutorService;
 import org.camunda.bpm.engine.impl.jobexecutor.tobemerged.ra.outbound.PlatformJobExecutorConnection;
 import org.camunda.bpm.engine.impl.jobexecutor.tobemerged.spi.JobAcquisitionConfiguration;
 
-import com.camunda.fox.platform.jobexecutor.impl.ra.PlatformJobExecutorConnector;
 
 /**
  * 

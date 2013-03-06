@@ -1,4 +1,4 @@
-package com.camunda.fox.platform.jobexecutor.impl.ra.inflow;
+package org.camunda.bpm.container.impl.jobexecutor.ra.inflow;
 
 import javax.resource.spi.Activation;
 import javax.resource.spi.ActivationSpec;

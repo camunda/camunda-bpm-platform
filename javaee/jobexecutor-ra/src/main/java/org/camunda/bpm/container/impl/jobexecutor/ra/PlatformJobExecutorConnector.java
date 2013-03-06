@@ -1,4 +1,4 @@
-package com.camunda.fox.platform.jobexecutor.impl.ra;
+package org.camunda.bpm.container.impl.jobexecutor.ra;
 
 import java.util.Iterator;
 import java.util.ServiceLoader;
@@ -16,13 +16,13 @@ import javax.resource.spi.endpoint.MessageEndpointFactory;
 import javax.resource.spi.work.WorkManager;
 import javax.transaction.xa.XAResource;
 
+import org.camunda.bpm.container.impl.jobexecutor.ra.execution.AutoDetectWorkManagerPlatformJobExecutorFactory;
+import org.camunda.bpm.container.impl.jobexecutor.ra.execution.spi.PlatformJobExecutorFactory;
+import org.camunda.bpm.container.impl.jobexecutor.ra.inflow.JobExecutionHandlerActivation;
+import org.camunda.bpm.container.impl.jobexecutor.ra.inflow.JobExecutionHandlerActivationSpec;
 import org.camunda.bpm.engine.impl.jobexecutor.tobemerged.impl.PlatformJobExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.tobemerged.ra.inflow.JobExecutionHandler;
 
-import com.camunda.fox.platform.jobexecutor.impl.ra.execution.AutoDetectWorkManagerPlatformJobExecutorFactory;
-import com.camunda.fox.platform.jobexecutor.impl.ra.execution.spi.PlatformJobExecutorFactory;
-import com.camunda.fox.platform.jobexecutor.impl.ra.inflow.JobExecutionHandlerActivation;
-import com.camunda.fox.platform.jobexecutor.impl.ra.inflow.JobExecutionHandlerActivationSpec;
 
 /**
  * <p>The {@link ResourceAdapter} responsible for bootstrapping the {@link PlatformJobExecutor}</p>

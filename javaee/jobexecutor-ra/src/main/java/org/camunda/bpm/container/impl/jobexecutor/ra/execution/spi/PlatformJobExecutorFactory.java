@@ -1,8 +1,8 @@
-package com.camunda.fox.platform.jobexecutor.impl.ra.execution.spi;
+package org.camunda.bpm.container.impl.jobexecutor.ra.execution.spi;
 
+import org.camunda.bpm.container.impl.jobexecutor.ra.PlatformJobExecutorConnector;
 import org.camunda.bpm.engine.impl.jobexecutor.tobemerged.impl.PlatformJobExecutor;
 
-import com.camunda.fox.platform.jobexecutor.impl.ra.PlatformJobExecutorConnector;
 
 /**
  * Allows to configure a {@link PlatformJobExecutor} instance.

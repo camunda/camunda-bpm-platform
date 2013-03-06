@@ -1,9 +1,10 @@
-package com.camunda.fox.platform.jobexecutor.impl.ra.inflow;
+package org.camunda.bpm.container.impl.jobexecutor.ra.inflow;
 
-import com.camunda.fox.platform.jobexecutor.impl.ra.PlatformJobExecutorConnector;
 
 import javax.resource.ResourceException;
 import javax.resource.spi.endpoint.MessageEndpointFactory;
+
+import org.camunda.bpm.container.impl.jobexecutor.ra.PlatformJobExecutorConnector;
 
 /**
  * Represents the activation of a {@link JobExecutionHandler}

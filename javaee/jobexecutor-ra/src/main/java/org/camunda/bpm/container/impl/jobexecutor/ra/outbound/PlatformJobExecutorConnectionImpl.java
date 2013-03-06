@@ -1,4 +1,4 @@
-package com.camunda.fox.platform.jobexecutor.impl.ra.outbound;
+package org.camunda.bpm.container.impl.jobexecutor.ra.outbound;
 
 import java.util.List;
 

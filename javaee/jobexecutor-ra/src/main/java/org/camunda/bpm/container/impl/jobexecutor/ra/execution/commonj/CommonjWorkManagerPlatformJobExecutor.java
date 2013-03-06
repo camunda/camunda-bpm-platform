@@ -1,4 +1,4 @@
-package com.camunda.fox.platform.jobexecutor.impl.ra.execution.commonj;
+package org.camunda.bpm.container.impl.jobexecutor.ra.execution.commonj;
 
 import java.util.List;
 import java.util.logging.Level;
@@ -9,12 +9,12 @@ import javax.naming.NamingException;
 import javax.naming.Reference;
 import javax.resource.Referenceable;
 
+import org.camunda.bpm.container.impl.jobexecutor.ra.PlatformJobExecutorConnector;
+import org.camunda.bpm.container.impl.jobexecutor.ra.execution.JcaInflowExecuteJobsRunnable;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.tobemerged.impl.PlatformExecuteJobsRunnable;
 import org.camunda.bpm.engine.impl.jobexecutor.tobemerged.impl.PlatformJobExecutor;
 
-import com.camunda.fox.platform.jobexecutor.impl.ra.PlatformJobExecutorConnector;
-import com.camunda.fox.platform.jobexecutor.impl.ra.execution.JcaInflowExecuteJobsRunnable;
 import commonj.work.WorkException;
 import commonj.work.WorkManager;
 import commonj.work.WorkRejectedException;
