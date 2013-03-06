@@ -1,1 +1,1 @@
-com.camunda.fox.platform.subsystem.impl.extension.FoxPlatformExtension
+org.camunda.bpm.container.impl.jboss.extension.BpmPlatformExtension

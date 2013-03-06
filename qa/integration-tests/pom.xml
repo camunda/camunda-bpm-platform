@@ -332,7 +332,7 @@
     </profile>
     
     <profile>
-      <id>tomcat</id>
+      <id>tomcat6</id>
       <dependencyManagement>
         <dependencies>
           <dependency>

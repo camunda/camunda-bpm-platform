@@ -5,7 +5,7 @@ import java.util.concurrent.ExecutionException;
 import javax.naming.NamingException;
 
 import org.camunda.bpm.BpmPlatform;
-import org.camunda.bpm.container.impl.ejb.BpmPlatformBootstrapBean;
+import org.camunda.bpm.container.impl.ejb.EjbBpmPlatformBootstrap;
 import org.camunda.bpm.container.impl.ejb.deployment.EjbJarAttachments;
 import org.camunda.bpm.container.impl.ejb.deployment.EjbJarParsePlatformXmlStep;
 import org.camunda.bpm.container.impl.test.ejb.test.H2Datasource;
@@ -30,7 +30,7 @@ public class TestBpmPlatformBootstrap {
   public static WebArchive createDeployment() {
     return ShrinkWrap.create(WebArchive.class, "test.war")
       .addClass(H2Datasource.class)
-      .addClass(BpmPlatformBootstrapBean.class)
+      .addClass(EjbBpmPlatformBootstrap.class)
       .addClass(EjbJarAttachments.class)
       .addClass(EjbJarParsePlatformXmlStep.class)
       .addAsWebInfResource("META-INF/bpm-platform.xml", "classes/META-INF/bppm-platform.xml")

@@ -9,7 +9,7 @@
 
   <process-engine name="default">
     <job-acquisition>default</job-acquisition>
-    <configuration>org.activiti.engine.impl.cfg.StandaloneProcessEngineConfiguration</configuration>
+    <configuration>org.camunda.bpm.engine.impl.cfg.StandaloneProcessEngineConfiguration</configuration>
     <datasource>java:jdbc/ProcessEngine</datasource>
 
     <properties>
