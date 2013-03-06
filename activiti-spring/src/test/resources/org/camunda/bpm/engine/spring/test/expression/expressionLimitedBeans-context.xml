@@ -14,30 +14,26 @@
     <property name="username" value="sa" />
     <property name="password" value="" />
   </bean>
-  
+
   <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
     <property name="dataSource" ref="dataSource" />
   </bean>
   
-  <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
-	  <property name="dataSource" ref="dataSource"/>
-	  <property name="jpaVendorAdapter">
-		  <bean class="org.springframework.orm.jpa.vendor.OpenJpaVendorAdapter">
-			  <property name="databasePlatform" value="org.apache.openjpa.jdbc.sql.H2Dictionary" />
-		  </bean>
-	  </property>
-  </bean>
-
- <bean id="processEngineConfiguration" class="org.camunda.bpm.engine.spring.SpringProcessEngineConfiguration">
+  <bean id="bean1" class="org.camunda.bpm.engine.spring.test.servicetask.SentenceGenerator" />
+  
+  <bean id="bean2" class="org.camunda.bpm.engine.spring.test.servicetask.SentenceGenerator" />
+  
+  <bean id="processEngineConfiguration" class="org.camunda.bpm.engine.spring.SpringProcessEngineConfiguration">
     <property name="dataSource" ref="dataSource" />
     <property name="transactionManager" ref="transactionManager" />
     <property name="databaseSchemaUpdate" value="true" />
-    <property name="mailServerHost" value="localhost" />
-    <property name="mailServerPort" value="5025" />
-    <property name="jpaEntityManagerFactory" ref="entityManagerFactory" />
-    <property name="jpaHandleTransaction" value="true" />
-    <property name="jpaCloseEntityManager" value="true" />
     <property name="jobExecutorActivate" value="false" />
+    
+    <property name="beans">
+      <map>
+        <entry key="bean1" value-ref="bean1" />
+      </map>
+    </property>
   </bean>
   
   <bean id="processEngine" class="org.camunda.bpm.engine.spring.ProcessEngineFactoryBean">

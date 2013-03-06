@@ -8,35 +8,43 @@
                            http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-2.5.xsd
                            http://www.springframework.org/schema/tx      http://www.springframework.org/schema/tx/spring-tx-3.0.xsd">
 
-  <bean id="dataSource" class="org.springframework.jdbc.datasource.SimpleDriverDataSource">
-    <property name="driverClass" value="org.h2.Driver" />
+  <context:component-scan base-package="org.camunda.bpm.engine.spring.test.jpa"/>
+
+  <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource">
+    <property name="driverClassName" value="org.h2.Driver" />
     <property name="url" value="jdbc:h2:mem:activiti;DB_CLOSE_DELAY=1000" />
     <property name="username" value="sa" />
     <property name="password" value="" />
+     <property name="defaultAutoCommit" value="false" />
   </bean>
   
-  <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
-    <property name="dataSource" ref="dataSource" />
+  <tx:annotation-driven transaction-manager="transactionManager" proxy-target-class="false"/>
+  <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+    <property name="entityManagerFactory" ref="entityManagerFactory"/>
   </bean>
   
   <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
-	  <property name="dataSource" ref="dataSource"/>
-	  <property name="jpaVendorAdapter">
-		  <bean class="org.springframework.orm.jpa.vendor.OpenJpaVendorAdapter">
-			  <property name="databasePlatform" value="org.apache.openjpa.jdbc.sql.H2Dictionary" />
-		  </bean>
-	  </property>
+    <property name="dataSource" ref="dataSource"/>
+     <property name="persistenceXmlLocation">
+      <value>classpath:/org/camunda/bpm/engine/spring/test/jpa/custom-persistence.xml</value>
+    </property>
+    <property name="jpaVendorAdapter">
+      <bean class="org.springframework.orm.jpa.vendor.OpenJpaVendorAdapter">
+        <property name="databasePlatform" value="org.apache.openjpa.jdbc.sql.H2Dictionary" />
+      </bean>
+    </property>
   </bean>
-
- <bean id="processEngineConfiguration" class="org.camunda.bpm.engine.spring.SpringProcessEngineConfiguration">
+  
+  <bean id="loanRequestBean" class="org.camunda.bpm.engine.spring.test.jpa.LoanRequestBean">
+  </bean>
+  
+  <bean id="processEngineConfiguration" class="org.camunda.bpm.engine.spring.SpringProcessEngineConfiguration">
     <property name="dataSource" ref="dataSource" />
     <property name="transactionManager" ref="transactionManager" />
     <property name="databaseSchemaUpdate" value="true" />
-    <property name="mailServerHost" value="localhost" />
-    <property name="mailServerPort" value="5025" />
     <property name="jpaEntityManagerFactory" ref="entityManagerFactory" />
-    <property name="jpaHandleTransaction" value="true" />
-    <property name="jpaCloseEntityManager" value="true" />
+    <property name="jpaHandleTransaction" value="false" />
+    <property name="jpaCloseEntityManager" value="false" />
     <property name="jobExecutorActivate" value="false" />
   </bean>
   

@@ -14,29 +14,15 @@
     <property name="username" value="sa" />
     <property name="password" value="" />
   </bean>
-  
+
   <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
     <property name="dataSource" ref="dataSource" />
   </bean>
   
-  <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
-	  <property name="dataSource" ref="dataSource"/>
-	  <property name="jpaVendorAdapter">
-		  <bean class="org.springframework.orm.jpa.vendor.OpenJpaVendorAdapter">
-			  <property name="databasePlatform" value="org.apache.openjpa.jdbc.sql.H2Dictionary" />
-		  </bean>
-	  </property>
-  </bean>
-
- <bean id="processEngineConfiguration" class="org.camunda.bpm.engine.spring.SpringProcessEngineConfiguration">
+  <bean id="processEngineConfiguration" class="org.camunda.bpm.engine.spring.SpringProcessEngineConfiguration">
     <property name="dataSource" ref="dataSource" />
     <property name="transactionManager" ref="transactionManager" />
     <property name="databaseSchemaUpdate" value="true" />
-    <property name="mailServerHost" value="localhost" />
-    <property name="mailServerPort" value="5025" />
-    <property name="jpaEntityManagerFactory" ref="entityManagerFactory" />
-    <property name="jpaHandleTransaction" value="true" />
-    <property name="jpaCloseEntityManager" value="true" />
     <property name="jobExecutorActivate" value="false" />
   </bean>
   
@@ -49,5 +35,15 @@
   <bean id="taskService" factory-bean="processEngine" factory-method="getTaskService" />
   <bean id="historyService" factory-bean="processEngine" factory-method="getHistoryService" />
   <bean id="managementService" factory-bean="processEngine" factory-method="getManagementService" />
+
+  <tx:annotation-driven transaction-manager="transactionManager"/>
+
+  <bean id="userBean" class="org.camunda.bpm.engine.spring.test.transaction.UserBean">
+    <property name="runtimeService" ref="runtimeService" />
+    <property name="taskService" ref="taskService" />
+    <property name="dataSource" ref="dataSource" />
+  </bean>
+
+  <bean id="printer" class="org.camunda.bpm.engine.spring.test.transaction.Printer" />
 
 </beans>
