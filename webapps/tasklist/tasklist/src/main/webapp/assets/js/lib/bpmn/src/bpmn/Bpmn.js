@@ -32,9 +32,12 @@ define(["bpmn/Transformer", "bpmn/Renderer", "dojo/request", "dojo/Deferred", "d
     this.options = options;
 
     // zoom the diagram to suite the bounds specified on options if any;
-    var bounds = definitionRenderer.getBounds(),
-        bwidth = parseFloat(bounds.width),
-        bheight = parseFloat(bounds.height);
+    var bounds = definitionRenderer.getBounds(), bwidth = 1, bheight = 1;
+
+    if (bounds) {
+      bwidth = parseFloat(bounds.width),
+      bheight = parseFloat(bounds.height);
+    }
 
     var scale = Math.min(
           (options.width || bwidth) / bwidth,

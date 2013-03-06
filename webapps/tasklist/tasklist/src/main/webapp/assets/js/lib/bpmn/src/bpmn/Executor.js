@@ -487,3 +487,11 @@ var CAM = {};
   CAM.activityTypes["parallelGateway"] = parallelGateway;
 
 })(CAM);
+
+try {
+  define([], function () {
+    return CAM;
+  });
+}catch (e) {
+  // could not define CAM, maybe not in a requirejs env
+}

@@ -42,7 +42,7 @@ define([], function () {
   Transformer.prototype.transform =  function(source) {
 
     var doc = getXmlObject(source);
-    var definitions = doc.getElementsByTagName("definitions");
+    var definitions = doc.getElementsByTagNameNS(NS_BPMN_SEMANTIC, "definitions");
 
     if(definitions.length == 0) {
       throw "A BPMN 2.0 XML file must contain at least one definitions element";
@@ -198,7 +198,7 @@ define([], function () {
       }
 
       // extract conditions:
-      var conditions = element.getElementsByTagName("conditionExpression");
+      var conditions = element.getElementsByTagNameNS(NS_BPMN_SEMANTIC, "conditionExpression");
       if(!!conditions && conditions.length >0) {
         var condition = conditions[0];
         sequenceFlow.condition = condition.textContent;
@@ -213,14 +213,18 @@ define([], function () {
      */
     function createSequenceFlows(element, scopeActivity, bpmnDiElementIndex) {
       element = element.firstChild;
+
       var index = {};
 
-      do {
+      if (!element) {
+        // no children
+        return index;
+      }
 
+      do {
         if(element.nodeName == "sequenceFlow" || element.localName == "sequenceFlow") {
           createSequenceFlow(element, scopeActivity, bpmnDiElementIndex, index);
         }
-
       } while(element = element.nextSibling);
 
       return index;
@@ -301,6 +305,11 @@ define([], function () {
       var sequenceFlows = createSequenceFlows(scopeElement, scopeActivity, bpmnDiElementIndex);
 
       var element = scopeElement.firstChild;
+
+      if (!element) {
+        // no children
+        return;
+      }
 
       do {
 
@@ -429,7 +438,9 @@ define([], function () {
         createBpmnDiElementIndex(bpmnDiagrams[i], bpmnDiElementIndex);
       }
 
-      var participants = definitionsElement.getElementsByTagName("participant");
+      var participants = definitionsElement.getElementsByTagNameNS(NS_BPMN_SEMANTIC, "participant");
+      var processNames = {};
+
       if (participants.length != 0) {
         for (var index = 0; index < participants.length; index++) {
           var participant = participants[index];
@@ -437,12 +448,14 @@ define([], function () {
           var participantId = participants[index].getAttribute("id");
           // map participant shape to process shape for resolution in transform process
           bpmnDiElementIndex[processRef] = bpmnDiElementIndex[participantId];
+          processNames[processRef] = participant.getAttribute("name");
         }
       }
 
-      var processes = definitionsElement.getElementsByTagName("process");
+      var processes = definitionsElement.getElementsByTagNameNS(NS_BPMN_SEMANTIC, "process");
 
-      for(var i =0; i <processes.length; i++) {
+      for(var i =0; i < processes.length; i++) {
+        processes[i].setAttributeNS(NS_BPMN_SEMANTIC, "name" , processNames[processes[i].getAttribute("id")]);
         transformProcess(processes[i], bpmnDiElementIndex);
       }
 
