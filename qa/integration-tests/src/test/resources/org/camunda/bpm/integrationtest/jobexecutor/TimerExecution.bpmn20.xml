@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" 
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" 
+             xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" 
+             xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" 
+             xmlns:signavio="http://www.signavio.com" 
+             xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+             xmlns:activiti="http://activiti.org/bpmn" 
+             expressionLanguage="http://www.w3.org/1999/XPath" 
+             id="sid-996e5db9-6d63-4134-be9c-6b810964b27e" targetNamespace="Test" typeLanguage="http://www.w3.org/2001/XMLSchema" 
+             xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/2.0/20100501/BPMN20.xsd">
+  <process id="TimerExecutionProcess" isExecutable="true">
+    <startEvent id="sid-239F9BB2-874B-492C-93F5-5CFE5DFE7850"></startEvent>
+    <intermediateCatchEvent id="sid-21E3409F-5A8A-40DD-93FA-2CB17E2BD666">
+      <timerEventDefinition id="sid-15f0ad92-1980-4111-93e0-d1ce1950e16c">
+        <timeDuration id="sid-9764525c-4649-4842-8b72-52c6452d2a9d" xsi:type="tFormalExpression">PT1S</timeDuration>
+      </timerEventDefinition>
+    </intermediateCatchEvent>
+    <serviceTask id="sid-435B3DB1-9406-42D6-92B3-E75D2255C958" isForCompensation="false" name="Some Task" activiti:class="org.camunda.bpm.integrationtest.jobexecutor.beans.SampleServiceBean"></serviceTask>
+    <endEvent id="sid-B20892A3-D34A-41F4-931F-6EDFECF6B6A6"></endEvent>
+    <sequenceFlow id="sid-387EF3D6-D24E-4E5E-AFDF-8F1BC91C0414" sourceRef="sid-239F9BB2-874B-492C-93F5-5CFE5DFE7850" targetRef="sid-21E3409F-5A8A-40DD-93FA-2CB17E2BD666"></sequenceFlow>
+    <sequenceFlow id="sid-77A13F21-D3D3-4E02-91C5-F4FB8881C20B" sourceRef="sid-21E3409F-5A8A-40DD-93FA-2CB17E2BD666" targetRef="sid-435B3DB1-9406-42D6-92B3-E75D2255C958"></sequenceFlow>
+    <sequenceFlow id="sid-CF0B3A78-C586-4A3A-97C9-D5B683162E71" sourceRef="sid-435B3DB1-9406-42D6-92B3-E75D2255C958" targetRef="sid-B20892A3-D34A-41F4-931F-6EDFECF6B6A6"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="sid-c29c22dc-8eb9-4967-b0bf-7536af413b7a">
+    <bpmndi:BPMNPlane bpmnElement="sid-402e588b-5c44-4c6b-af25-6ec06f39eaf8" id="sid-be18af09-7e46-4a4c-9683-56db9df5b15a">
+      <bpmndi:BPMNShape bpmnElement="sid-239F9BB2-874B-492C-93F5-5CFE5DFE7850" id="sid-239F9BB2-874B-492C-93F5-5CFE5DFE7850_gui">
+        <omgdc:Bounds height="30.0" width="30.0" x="180.0" y="225.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="sid-21E3409F-5A8A-40DD-93FA-2CB17E2BD666" id="sid-21E3409F-5A8A-40DD-93FA-2CB17E2BD666_gui">
+        <omgdc:Bounds height="30.0" width="30.0" x="255.0" y="225.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="sid-435B3DB1-9406-42D6-92B3-E75D2255C958" id="sid-435B3DB1-9406-42D6-92B3-E75D2255C958_gui">
+        <omgdc:Bounds height="80.0" width="100.0" x="330.0" y="200.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="sid-B20892A3-D34A-41F4-931F-6EDFECF6B6A6" id="sid-B20892A3-D34A-41F4-931F-6EDFECF6B6A6_gui">
+        <omgdc:Bounds height="28.0" width="28.0" x="475.0" y="226.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="sid-387EF3D6-D24E-4E5E-AFDF-8F1BC91C0414" id="sid-387EF3D6-D24E-4E5E-AFDF-8F1BC91C0414_gui">
+        <omgdi:waypoint x="210.0" y="240.0"/>
+        <omgdi:waypoint x="255.0" y="240.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-CF0B3A78-C586-4A3A-97C9-D5B683162E71" id="sid-CF0B3A78-C586-4A3A-97C9-D5B683162E71_gui">
+        <omgdi:waypoint x="430.0" y="240.0"/>
+        <omgdi:waypoint x="475.0" y="240.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-77A13F21-D3D3-4E02-91C5-F4FB8881C20B" id="sid-77A13F21-D3D3-4E02-91C5-F4FB8881C20B_gui">
+        <omgdi:waypoint x="285.0" y="240.0"/>
+        <omgdi:waypoint x="330.0" y="240.0"/>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

@@ -10,7 +10,7 @@
 
 
   <listener>
-    <listener-class>com.camunda.fox.platform.test.util.IntegrationTestProcessApplication</listener-class>
+    <listener-class>org.camunda.bpm.integrationtest.util.IntegrationTestProcessApplication</listener-class>
   </listener>
 
   <!-- for CDI support -->
