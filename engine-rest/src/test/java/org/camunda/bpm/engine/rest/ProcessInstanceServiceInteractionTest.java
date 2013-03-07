@@ -16,16 +16,14 @@ import javax.ws.rs.core.Response.Status;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.rest.helper.ExampleVariableObject;
+import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.junit.Test;
-
-import com.jayway.restassured.response.Response;
 
 public class ProcessInstanceServiceInteractionTest extends AbstractRestServiceTest {
   
   private static final String PROCESS_INSTANCE_URL = TEST_RESOURCE_ROOT_PATH + "/process-instance/{id}";
   private static final String PROCESS_INSTANCE_VARIABLES_URL = PROCESS_INSTANCE_URL + "/variables";
   
-  private static final String EXAMPLE_PROCESS_INSTANCE_ID = "aProcessInstanceId";
   private static final String EXAMPLE_VARIABLE_KEY = "aProcessVariableKey";
   private static final String EXAMPLE_VARIABLE_VALUE = "aProcessVariableValue";
   
@@ -40,7 +38,7 @@ public class ProcessInstanceServiceInteractionTest extends AbstractRestServiceTe
     setupTestScenario();
     
     runtimeServiceMock = mock(RuntimeService.class);
-    when(runtimeServiceMock.getVariables(anyString())).thenReturn(EXAMPLE_VARIABLES);
+    when(runtimeServiceMock.getVariables(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID)).thenReturn(EXAMPLE_VARIABLES);
     when(processEngine.getRuntimeService()).thenReturn(runtimeServiceMock);
   }
   
@@ -48,7 +46,7 @@ public class ProcessInstanceServiceInteractionTest extends AbstractRestServiceTe
   public void testGetVariables() throws IOException {
     setupMocks();
     
-    given().pathParam("id", EXAMPLE_PROCESS_INSTANCE_ID)
+    given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID)
       .then().expect().statusCode(Status.OK.getStatusCode())
       .body("variables.size()", is(1))
       .body("variables[0].name", equalTo(EXAMPLE_VARIABLE_KEY))
@@ -78,7 +76,7 @@ public class ProcessInstanceServiceInteractionTest extends AbstractRestServiceTe
     
     setupMocks();
     
-    given().pathParam("id", EXAMPLE_PROCESS_INSTANCE_ID)
+    given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID)
       .then().expect().statusCode(Status.OK.getStatusCode())
       .body("variables.size()", is(1))
       .body("variables[0].name", equalTo(EXAMPLE_VARIABLE_KEY))

@@ -17,6 +17,7 @@ import javax.enterprise.inject.Produces;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.camunda.bpm.engine.cdi.annotation.ExecutionId;
 import org.camunda.bpm.engine.cdi.annotation.ProcessInstanceId;
 import org.camunda.bpm.engine.cdi.annotation.TaskId;
 import org.camunda.bpm.engine.runtime.Execution;
@@ -80,6 +81,7 @@ public class CurrentProcessInstance {
   /* Makes the id of the current Execution available for injection */
   @Produces
   @Named
+  @ExecutionId
   public String getExecutionId() {
     return businessProcess.getExecutionId();
   }

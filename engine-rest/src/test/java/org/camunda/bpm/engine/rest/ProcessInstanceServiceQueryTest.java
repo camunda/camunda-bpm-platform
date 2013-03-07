@@ -17,6 +17,7 @@ import java.util.Map;
 
 import javax.ws.rs.core.Response.Status;
 
+import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.junit.Assert;
@@ -28,12 +29,6 @@ import com.jayway.restassured.response.Response;
 
 public class ProcessInstanceServiceQueryTest extends AbstractRestServiceTest {
   
-  private static final String EXAMPLE_BUSINESS_KEY = "aKey";
-  private static final String EXAMPLE_ID = "anId";
-  private static final String EXAMPLE_PROCESS_DEFINITION_ID = "aProcDefId";
-  private static final boolean EXAMPLE_IS_SUSPENDED = false;
-  private static final boolean EXAMPLE_IS_ENDED = false;
-
   private static final String PROCESS_INSTANCE_QUERY_URL = TEST_RESOURCE_ROOT_PATH + "/process-instance";
   private static final String PROCESS_INSTANCE_COUNT_QUERY_URL = PROCESS_INSTANCE_QUERY_URL + "/count";
   private ProcessInstanceQuery mockedQuery;
@@ -46,25 +41,17 @@ public class ProcessInstanceServiceQueryTest extends AbstractRestServiceTest {
     return sampleInstanceQuery;
   }
   
-  private List<ProcessInstance> createMockInstances() {
+  private List<ProcessInstance> createMockInstanceList() {
     List<ProcessInstance> mocks = new ArrayList<ProcessInstance>();
     
-    ProcessInstance mockInstance = mock(ProcessInstance.class);
-    when(mockInstance.getBusinessKey()).thenReturn(EXAMPLE_BUSINESS_KEY);
-    when(mockInstance.getId()).thenReturn(EXAMPLE_ID);
-    when(mockInstance.getProcessDefinitionId()).thenReturn(EXAMPLE_PROCESS_DEFINITION_ID);
-    when(mockInstance.getProcessInstanceId()).thenReturn(EXAMPLE_ID);
-    when(mockInstance.isSuspended()).thenReturn(EXAMPLE_IS_SUSPENDED);
-    when(mockInstance.isEnded()).thenReturn(EXAMPLE_IS_ENDED);
-    
-    mocks.add(mockInstance);
+    mocks.add(MockProvider.createMockInstance());
     return mocks;
   }
   
 //  @Before
   public void setUpMockedQuery() throws IOException {
     setupTestScenario();
-    mockedQuery = setUpMockInstanceQuery(createMockInstances());
+    mockedQuery = setUpMockInstanceQuery(createMockInstanceList());
   }
   
   @Test
@@ -92,11 +79,11 @@ public class ProcessInstanceServiceQueryTest extends AbstractRestServiceTest {
     String returnedBusinessKey = from(content).getString("[0].businessKey");
     Boolean returnedIsSuspended = from(content).getBoolean("[0].suspended");
 
-    Assert.assertEquals(EXAMPLE_ID, returnedInstanceId);
-    Assert.assertEquals(EXAMPLE_IS_ENDED, returnedIsEnded);
-    Assert.assertEquals(EXAMPLE_PROCESS_DEFINITION_ID, returnedDefinitionId);
-    Assert.assertEquals(EXAMPLE_BUSINESS_KEY, returnedBusinessKey);
-    Assert.assertEquals(EXAMPLE_IS_SUSPENDED, returnedIsSuspended);
+    Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID, returnedInstanceId);
+    Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_INSTANCE_IS_ENDED, returnedIsEnded);
+    Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID, returnedDefinitionId);
+    Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_INSTANCE_BUSINESS_KEY, returnedBusinessKey);
+    Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_INSTANCE_IS_SUSPENDED, returnedIsSuspended);
   }
   
   @Test
@@ -114,7 +101,7 @@ public class ProcessInstanceServiceQueryTest extends AbstractRestServiceTest {
   private List<ProcessInstance> createIncompleteMockInstances() {
     List<ProcessInstance> mocks = new ArrayList<ProcessInstance>();
     ProcessInstance mockInstance = mock(ProcessInstance.class);
-    when(mockInstance.getId()).thenReturn(EXAMPLE_ID);
+    when(mockInstance.getId()).thenReturn(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
     
     mocks.add(mockInstance);
     return mocks;
