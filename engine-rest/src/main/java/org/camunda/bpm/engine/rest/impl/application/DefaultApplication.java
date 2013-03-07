@@ -36,7 +36,7 @@ import org.camunda.bpm.engine.rest.mapper.JacksonConfigurator;
  *
  */
 @ApplicationPath("/")
-public class CamundaEngineRestApplication extends Application {
+public class DefaultApplication extends Application {
   
   @Override
   public Set<Class<?>> getClasses() {

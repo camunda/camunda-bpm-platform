@@ -26,7 +26,11 @@
         <include>**/*.sh</include>
        </includes>
         <fileMode>0755</fileMode>
-    </fileSet>     
+    </fileSet> 
+    <fileSet>
+      <directory>src/overlay</directory>
+      <outputDirectory>server/apache-tomcat-${tomcat6.version}/webapps/</outputDirectory>    
+    </fileSet>      
   </fileSets>
 
   <dependencySets>
@@ -60,9 +64,36 @@
   		<includes>
   			<include>org.camunda.bpm.cycle:camunda-cycle-tomcat:war:*</include>
   		</includes>
-  		<outputDirectory>server/apache-tomcat-${tomcat6.version}/webapps/cycle</outputDirectory>
+  		<outputDirectory>server/apache-tomcat-${tomcat6.version}/webapps/camunda-cycle</outputDirectory>
         <unpack>true</unpack>
   	</dependencySet>
+    
+    <dependencySet>
+        <includes>
+            <include>org.camunda.bpm:camunda-engine-rest:war:*</include>
+        </includes>
+        <outputDirectory>server/apache-tomcat-${tomcat6.version}/webapps/camunda-engine-rest</outputDirectory>
+        <unpack>true</unpack>
+    </dependencySet>
+    
+    <!-- adding resteasy to camunda-engine-rest -->
+    
+    <dependencySet>
+      <outputDirectory>server/apache-tomcat-${tomcat6.version}/webapps/camunda-engine-rest/WEB-INF/lib</outputDirectory>
+      <useTransitiveDependencies>true</useTransitiveDependencies>     
+      <useTransitiveFiltering>true</useTransitiveFiltering>
+      <includes>
+        <include>org.jboss.resteasy:resteasy-jaxrs:jar:*</include>
+      </includes>
+    </dependencySet>
+    
+    <dependencySet>
+        <includes>
+            <include>org.camunda.bpm.cockpit:camunda-cockpit:war:*</include>
+        </includes>
+        <outputDirectory>server/apache-tomcat-${tomcat6.version}/webapps/camunda-cockpit</outputDirectory>
+        <unpack>true</unpack>
+    </dependencySet>
 		
   </dependencySets>
 </assembly>

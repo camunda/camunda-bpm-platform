@@ -1,0 +1,3 @@
+org.codehaus.jackson.jaxrs.JacksonJsonProvider
+org.codehaus.jackson.jaxrs.JsonMappingExceptionMapper
+org.codehaus.jackson.jaxrs.JsonParseExceptionMapper

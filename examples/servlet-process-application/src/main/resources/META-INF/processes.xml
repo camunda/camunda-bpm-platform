@@ -6,6 +6,9 @@
 
   <process-archive name="pa">
     <process-engine>default</process-engine>    
+    <properties>
+        <property name="isDeleteUponUndeploy">true</property>
+    </properties> 
   </process-archive>
 
 </process-application>
