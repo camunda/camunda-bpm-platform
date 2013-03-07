@@ -28,6 +28,7 @@ import org.camunda.bpm.engine.identity.GroupQuery;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.identity.UserQuery;
 import org.camunda.bpm.engine.rest.helper.EqualsList;
+import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.task.DelegationState;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
@@ -38,11 +39,7 @@ import org.mockito.Mockito;
 
 import com.jayway.restassured.response.Response;
 
-public class TaskRestServiceQueryTest extends AbstractTaskRestServiceTest {
-
-
-  private static final String EXAMPLE_GROUP_ID = "group1Id";
-  private static final String EXAMPLE_GROUP_NAME = "group1";
+public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
 
   private static final String TASK_QUERY_URL = TEST_RESOURCE_ROOT_PATH + "/task";
   private static final String TASK_GROUPS_URL = TASK_QUERY_URL + "/groups";
@@ -54,25 +51,17 @@ public class TaskRestServiceQueryTest extends AbstractTaskRestServiceTest {
     UserQuery sampleUserQuery = mock(UserQuery.class);
 
     List<User> mockUsers = new ArrayList<User>();
-
-    User mockUser = mock(User.class);
-    when(mockUser.getId()).thenReturn("userId");
-    when(mockUser.getFirstName()).thenReturn("firstName");
-    when(mockUser.getLastName()).thenReturn("lastName");
+    
+    User mockUser = MockProvider.createMockUser();
     mockUsers.add(mockUser);
 
     when(sampleUserQuery.list()).thenReturn(mockUsers);
     when(sampleUserQuery.memberOfGroup(anyString())).thenReturn(sampleUserQuery);
     when(sampleUserQuery.count()).thenReturn((long) mockedTasks.size());
 
-
     GroupQuery sampleGroupQuery = mock(GroupQuery.class);
-    List<Group> mockGroups = new ArrayList<Group>();
-    Group mockGroup = mock(Group.class);
-    when(mockGroup.getId()).thenReturn(EXAMPLE_GROUP_ID);
-    when(mockGroup.getName()).thenReturn(EXAMPLE_GROUP_NAME);
-    mockGroups.add(mockGroup);
-
+    
+    List<Group> mockGroups = MockProvider.createMockGroups();
     when(sampleGroupQuery.list()).thenReturn(mockGroups);
     when(sampleGroupQuery.groupMember(anyString())).thenReturn(sampleGroupQuery);
     when(sampleGroupQuery.orderByGroupName()).thenReturn(sampleGroupQuery);
@@ -96,7 +85,7 @@ public class TaskRestServiceQueryTest extends AbstractTaskRestServiceTest {
   
   public void setUpMockedQuery() throws IOException {
     setupTestScenario();
-    mockQuery = setUpMockTaskQuery(createMockTasks());
+    mockQuery = setUpMockTaskQuery(MockProvider.createMockTasks());
   }
   
   @Test
@@ -132,20 +121,20 @@ public class TaskRestServiceQueryTest extends AbstractTaskRestServiceTest {
     String returnedProcessInstanceId = from(content).getString("[0].processInstanceId");
     String returnedTaskDefinitionKey = from(content).getString("[0].taskDefinitionKey");
     
-    Assert.assertEquals(EXAMPLE_NAME, returnedTaskName);
-    Assert.assertEquals(EXAMPLE_ID, returnedId);
-    Assert.assertEquals(EXAMPLE_ASSIGNEE_NAME, returendAssignee);
-    Assert.assertEquals(EXAMPLE_CREATE_TIME, returnedCreateTime);
-    Assert.assertEquals(EXAMPLE_DUE_DATE, returnedDueDate);
-    Assert.assertEquals(EXAMPLE_DELEGATION_STATE.toString(), returnedDelegationState);
-    Assert.assertEquals(EXAMPLE_DESCRIPTION, returnedDescription);
-    Assert.assertEquals(EXAMPLE_EXECUTION_ID, returnedExecutionId);
-    Assert.assertEquals(EXAMPLE_OWNER, returnedOwner);
-    Assert.assertEquals(EXAMPLE_PARENT_TASK_ID, returnedParentTaskId);
-    Assert.assertEquals(EXAMPLE_PRIORITY, returnedPriority);
-    Assert.assertEquals(EXAMPLE_PROCESS_DEFINITION_ID, returnedProcessDefinitionId);
-    Assert.assertEquals(EXAMPLE_PROCESS_INSTANCE_ID, returnedProcessInstanceId);
-    Assert.assertEquals(EXAMPLE_TASK_DEFINITION_KEY, returnedTaskDefinitionKey);
+    Assert.assertEquals(MockProvider.EXAMPLE_TASK_NAME, returnedTaskName);
+    Assert.assertEquals(MockProvider.EXAMPLE_TASK_ID, returnedId);
+    Assert.assertEquals(MockProvider.EXAMPLE_TASK_ASSIGNEE_NAME, returendAssignee);
+    Assert.assertEquals(MockProvider.EXAMPLE_TASK_CREATE_TIME, returnedCreateTime);
+    Assert.assertEquals(MockProvider.EXAMPLE_TASK_DUE_DATE, returnedDueDate);
+    Assert.assertEquals(MockProvider.EXAMPLE_TASK_DELEGATION_STATE.toString(), returnedDelegationState);
+    Assert.assertEquals(MockProvider.EXAMPLE_TASK_DESCRIPTION, returnedDescription);
+    Assert.assertEquals(MockProvider.EXAMPLE_TASK_EXECUTION_ID, returnedExecutionId);
+    Assert.assertEquals(MockProvider.EXAMPLE_TASK_OWNER, returnedOwner);
+    Assert.assertEquals(MockProvider.EXAMPLE_TASK_PARENT_TASK_ID, returnedParentTaskId);
+    Assert.assertEquals(MockProvider.EXAMPLE_TASK_PRIORITY, returnedPriority);
+    Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID, returnedProcessDefinitionId);
+    Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID, returnedProcessInstanceId);
+    Assert.assertEquals(MockProvider.EXAMPLE_TASK_DEFINITION_KEY, returnedTaskDefinitionKey);
     
   }
 
@@ -550,8 +539,8 @@ public class TaskRestServiceQueryTest extends AbstractTaskRestServiceTest {
     given().queryParam("userId", "name")
         .then().expect().statusCode(Status.OK.getStatusCode())
         .body("groups.size()", is(1))
-        .body("groups[0].id", equalTo(EXAMPLE_GROUP_ID))
-        .body("groups[0].name", equalTo(EXAMPLE_GROUP_NAME))
+        .body("groups[0].id", equalTo(MockProvider.EXAMPLE_GROUP_ID))
+        .body("groups[0].name", equalTo(MockProvider.EXAMPLE_GROUP_NAME))
         .when().get(TASK_GROUPS_URL);
   }
   

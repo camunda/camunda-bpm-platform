@@ -20,6 +20,7 @@ import javax.ws.rs.core.Response.Status;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
 import org.camunda.bpm.engine.rest.helper.MockDefinitionBuilder;
+import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.junit.Assert;
 import org.junit.Test;
 import org.mockito.InOrder;
@@ -28,17 +29,6 @@ import org.mockito.Mockito;
 import com.jayway.restassured.response.Response;
 
 public class ProcessDefinitionServiceQueryTest extends AbstractRestServiceTest {
-  
-  private static final String EXAMPLE_DEFINITION_KEY = "aKey";
-  private static final String EXAMPLE_CATEGORY = "aCategory";
-  private static final String EXAMPLE_DEFINITION_NAME = "aName";
-  private static final String EXAMPLE_DEFINITION_ID = "anId";
-  private static final String EXAMPLE_DEFINITION_DESCRIPTION = "aDesc";
-  private static final Integer EXAMPLE_VERSION = 42;
-  private static final String EXAMPLE_RESOURCE_NAME = "aResourceName";
-  private static final String EXAMPLE_DEPLOYMENT_ID = "aDeployment";
-  private static final String EXAMPLE_DIAGRAM_RESOURCE_NAME = "aDiagram";
-  private static final Boolean EXAMPLE_IS_SUSPENDED = false;
   
   private static final String PROCESS_DEFINITION_QUERY_URL = TEST_RESOURCE_ROOT_PATH + "/process-definition";
   private static final String PROCESS_DEFINITION_COUNT_QUERY_URL = PROCESS_DEFINITION_QUERY_URL + "/count";
@@ -53,25 +43,10 @@ public class ProcessDefinitionServiceQueryTest extends AbstractRestServiceTest {
     return sampleDefinitionsQuery;
   }
   
-  private List<ProcessDefinition> createMockDefinitions() {
-    List<ProcessDefinition> mocks = new ArrayList<ProcessDefinition>();
-    
-    MockDefinitionBuilder builder = new MockDefinitionBuilder();
-    ProcessDefinition mockDefinition = 
-        builder.id(EXAMPLE_DEFINITION_ID).category(EXAMPLE_CATEGORY).name(EXAMPLE_DEFINITION_NAME)
-          .key(EXAMPLE_DEFINITION_KEY).description(EXAMPLE_DEFINITION_DESCRIPTION)
-          .version(EXAMPLE_VERSION).resource(EXAMPLE_RESOURCE_NAME)
-          .deploymentId(EXAMPLE_DEPLOYMENT_ID).diagram(EXAMPLE_DIAGRAM_RESOURCE_NAME)
-          .suspended(EXAMPLE_IS_SUSPENDED).build();
-    
-    mocks.add(mockDefinition);
-    return mocks;
-  }
-  
 //  @Before
   public void setUpMockedQuery() throws IOException {
     setupTestScenario();
-    mockedQuery = setUpMockDefinitionQuery(createMockDefinitions());
+    mockedQuery = setUpMockDefinitionQuery(MockProvider.createMockDefinitions());
   }
   
   @Test
@@ -98,22 +73,22 @@ public class ProcessDefinitionServiceQueryTest extends AbstractRestServiceTest {
     String returnedCategory = from(content).getString("[0].category");
     String returnedDefinitionName = from(content).getString("[0].name");
     String returnedDescription = from(content).getString("[0].description");
-    Integer returnedVersion = from(content).getInt("[0].version");
+    int returnedVersion = from(content).getInt("[0].version");
     String returnedResourceName = from(content).getString("[0].resource");
     String returnedDeploymentId  = from(content).getString("[0].deploymentId");
     String returnedDiagramResourceName = from(content).getString("[0].diagram");
     Boolean returnedIsSuspended = from(content).getBoolean("[0].suspended");
 
-    Assert.assertEquals(EXAMPLE_DEFINITION_ID, returnedDefinitionId);
-    Assert.assertEquals(EXAMPLE_DEFINITION_KEY, returnedDefinitionKey);
-    Assert.assertEquals(EXAMPLE_CATEGORY, returnedCategory);
-    Assert.assertEquals(EXAMPLE_DEFINITION_NAME, returnedDefinitionName);
-    Assert.assertEquals(EXAMPLE_DEFINITION_DESCRIPTION, returnedDescription);
-    Assert.assertEquals(EXAMPLE_VERSION, returnedVersion);
-    Assert.assertEquals(EXAMPLE_RESOURCE_NAME, returnedResourceName);
-    Assert.assertEquals(EXAMPLE_DEPLOYMENT_ID, returnedDeploymentId);
-    Assert.assertEquals(EXAMPLE_DIAGRAM_RESOURCE_NAME, returnedDiagramResourceName);
-    Assert.assertEquals(EXAMPLE_IS_SUSPENDED, returnedIsSuspended);
+    Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID, returnedDefinitionId);
+    Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY, returnedDefinitionKey);
+    Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_CATEGORY, returnedCategory);
+    Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_NAME, returnedDefinitionName);
+    Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_DESCRIPTION, returnedDescription);
+    Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_VERSION, returnedVersion);
+    Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_RESOURCE_NAME, returnedResourceName);
+    Assert.assertEquals(MockProvider.EXAMPLE_DEPLOYMENT_ID, returnedDeploymentId);
+    Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_DIAGRAM_RESOURCE_NAME, returnedDiagramResourceName);
+    Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_IS_SUSPENDED, returnedIsSuspended);
   }
   
   @Test
@@ -133,9 +108,9 @@ public class ProcessDefinitionServiceQueryTest extends AbstractRestServiceTest {
     
     MockDefinitionBuilder builder = new MockDefinitionBuilder();
     ProcessDefinition mockDefinition = 
-        builder.id(EXAMPLE_DEFINITION_ID).category(EXAMPLE_CATEGORY)
-          .name(EXAMPLE_DEFINITION_NAME).key(EXAMPLE_DEFINITION_KEY)
-          .suspended(EXAMPLE_IS_SUSPENDED).version(EXAMPLE_VERSION).build();
+        builder.id(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID).category(MockProvider.EXAMPLE_PROCESS_DEFINITION_CATEGORY)
+          .name(MockProvider.EXAMPLE_PROCESS_DEFINITION_NAME).key(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
+          .suspended(MockProvider.EXAMPLE_PROCESS_DEFINITION_IS_SUSPENDED).version(MockProvider.EXAMPLE_PROCESS_DEFINITION_VERSION).build();
     
     mocks.add(mockDefinition);
     return mocks;
