@@ -12,11 +12,11 @@
  */
 package org.camunda.bpm.example.servlet;
 
-import java.util.concurrent.Callable;
-
+import org.camunda.bpm.BpmPlatform;
 import org.camunda.bpm.application.ProcessApplication;
-import org.camunda.bpm.application.ProcessApplicationExecutionException;
 import org.camunda.bpm.application.impl.ServletProcessApplication;
+import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.RuntimeService;
 
 /**
  * @author Daniel Meyer
@@ -24,11 +24,13 @@ import org.camunda.bpm.application.impl.ServletProcessApplication;
  */
 @ProcessApplication("MyApp1")
 public class MyServlet25ProcessApplication extends ServletProcessApplication {
-
-  public <T> T execute(Callable<T> callable) throws ProcessApplicationExecutionException {
+  
+  public void postDeploy() {
+    ProcessEngine processEngine = BpmPlatform.getDefaultProcessEngine();    
+    RuntimeService runtimeService = processEngine.getRuntimeService();
     
-    // TODO Auto-generated method stub
-    return super.execute(callable);
+    runtimeService.startProcessInstanceByKey("fox-invoice");
   }
+
   
 }

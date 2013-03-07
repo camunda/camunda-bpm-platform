@@ -86,6 +86,14 @@
         <include>org.jboss.resteasy:resteasy-jaxrs:jar:*</include>
       </includes>
     </dependencySet>
+    
+    <dependencySet>
+        <includes>
+            <include>org.camunda.bpm.cockpit:camunda-cockpit:war:*</include>
+        </includes>
+        <outputDirectory>server/apache-tomcat-${tomcat6.version}/webapps/camunda-cockpit</outputDirectory>
+        <unpack>true</unpack>
+    </dependencySet>
 		
   </dependencySets>
 </assembly>
