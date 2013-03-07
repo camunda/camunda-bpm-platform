@@ -2,6 +2,7 @@ package org.camunda.bpm.engine.rest;
 
 import static com.jayway.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
@@ -10,15 +11,20 @@ import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.core.Response.Status;
 
-import org.apache.http.entity.ContentType;
+import org.camunda.bpm.engine.FormService;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.form.FormProperty;
+import org.camunda.bpm.engine.form.FormType;
+import org.camunda.bpm.engine.form.StartFormData;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.rest.helper.EqualsMap;
@@ -33,9 +39,6 @@ import com.jayway.restassured.response.Response;
 public class ProcessDefinitionServiceInteractionTest extends
     AbstractRestServiceTest {
 
-  private static final String APPLICATION_BPMN20_XML_TYPE = 
-      ContentType.create(ProcessDefinitionService.APPLICATION_BPMN20_XML, "UTF-8").toString();
-  
   private static final String EXAMPLE_PROCESS_DEFINITION_ID = "aProcessDefinitionId";
   private static final String EXAMPLE_CATEGORY = "aCategory";
   private static final String EXAMPLE_DEFINITION_NAME = "aName";
@@ -47,15 +50,29 @@ public class ProcessDefinitionServiceInteractionTest extends
   private static final String EXAMPLE_DIAGRAM_RESOURCE_NAME = "aResourceName";
   private static final boolean EXAMPLE_IS_SUSPENDED = true;
   
+  //form data
+  private static final String EXAMPLE_FORM_KEY = "aFormKey";
+ 
+  // form property data
+  private static final String EXAMPLE_FORM_PROPERTY_ID = "aFormPropertyId";
+  private static final String EXAMPLE_FORM_PROPERTY_NAME = "aFormName";
+  private static final String EXAMPLE_FORM_PROPERTY_TYPE_NAME = "aFormPropertyTypeName";
+  private static final String EXAMPLE_FORM_PROPERTY_VALUE = "aValue";
+  private static final boolean EXAMPLE_FORM_PROPERTY_READABLE = true;
+  private static final boolean EXAMPLE_FORM_PROPERTY_WRITABLE = true;
+  private static final boolean EXAMPLE_FORM_PROPERTY_REQUIRED = true;
+  
   
   private static final String EXAMPLE_INSTANCE_ID = "anId";
   
   private static final String SINGLE_PROCESS_DEFINITION_URL = TEST_RESOURCE_ROOT_PATH + "/process-definition/{id}";
   private static final String START_PROCESS_INSTANCE_URL = SINGLE_PROCESS_DEFINITION_URL + "/start";
   private static final String XML_DEFINITION_URL = SINGLE_PROCESS_DEFINITION_URL + "/xml";
+  private static final String START_FORM_URL = SINGLE_PROCESS_DEFINITION_URL + "/startForm";
   
   private RuntimeService runtimeServiceMock;
   private RepositoryService repositoryServiceMock;
+  private FormService formServiceMock;
   
   public void setupMocks() throws IOException {
     setupTestScenario();
@@ -71,6 +88,35 @@ public class ProcessDefinitionServiceInteractionTest extends
     when(processEngine.getRepositoryService()).thenReturn(repositoryServiceMock);
     when(repositoryServiceMock.getProcessDefinition(eq(EXAMPLE_PROCESS_DEFINITION_ID))).thenReturn(mockDefinition);
     when(repositoryServiceMock.getProcessModel(eq(EXAMPLE_PROCESS_DEFINITION_ID))).thenReturn(createMockProcessDefinionBpmn20Xml());
+    
+    StartFormData formDataMock = createMockTaskFormData(mockDefinition);
+    formServiceMock = mock(FormService.class);
+    when(processEngine.getFormService()).thenReturn(formServiceMock);
+    when(formServiceMock.getStartFormData(eq(EXAMPLE_PROCESS_DEFINITION_ID))).thenReturn(formDataMock);
+  }
+  
+  private StartFormData createMockTaskFormData(ProcessDefinition definition) {
+    FormProperty mockFormProperty = mock(FormProperty.class);
+    when(mockFormProperty.getId()).thenReturn(EXAMPLE_FORM_PROPERTY_ID);
+    when(mockFormProperty.getName()).thenReturn(EXAMPLE_FORM_PROPERTY_NAME);
+    when(mockFormProperty.getValue()).thenReturn(EXAMPLE_FORM_PROPERTY_VALUE);
+    when(mockFormProperty.isReadable()).thenReturn(EXAMPLE_FORM_PROPERTY_READABLE);
+    when(mockFormProperty.isWritable()).thenReturn(EXAMPLE_FORM_PROPERTY_WRITABLE);
+    when(mockFormProperty.isRequired()).thenReturn(EXAMPLE_FORM_PROPERTY_REQUIRED);
+    
+    FormType mockFormType = mock(FormType.class);
+    when(mockFormType.getName()).thenReturn(EXAMPLE_FORM_PROPERTY_TYPE_NAME);
+    when(mockFormProperty.getType()).thenReturn(mockFormType);
+    
+    StartFormData mockFormData = mock(StartFormData.class);
+    when(mockFormData.getFormKey()).thenReturn(EXAMPLE_FORM_KEY);
+    when(mockFormData.getDeploymentId()).thenReturn(EXAMPLE_DEPLOYMENT_ID);
+    when(mockFormData.getProcessDefinition()).thenReturn(definition);
+    
+    List<FormProperty> mockFormProperties = new ArrayList<FormProperty>();
+    mockFormProperties.add(mockFormProperty);
+    when(mockFormData.getFormProperties()).thenReturn(mockFormProperties);
+    return mockFormData;
   }
   
   private ProcessInstance createMockInstance() {
@@ -234,10 +280,31 @@ public class ProcessDefinitionServiceInteractionTest extends
     when(repositoryServiceMock.getProcessModel(eq(nonExistingId))).thenThrow(new ProcessEngineException("no matching process definition found."));
     
     given().pathParam("id", nonExistingId)
-      .header("Content-Type", APPLICATION_BPMN20_XML_TYPE)
     .then().expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode())
     .when().get(XML_DEFINITION_URL);
   }
   
+  @Test
+  public void testGetStartFormData() throws IOException {
+    setupMocks();
+    
+    given().pathParam("id", EXAMPLE_PROCESS_DEFINITION_ID)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+      .body("key", equalTo(EXAMPLE_FORM_KEY))
+    .when().get(START_FORM_URL);
+  }
+  
+  @Test
+  public void testGetStartFormDataForNonExistingProcessDefinition() throws IOException {
+    setupMocks();
+    
+    when(formServiceMock.getStartFormData(anyString())).thenThrow(new ProcessEngineException("expected exception"));
+    
+    given().pathParam("id", "aNonExistingProcessDefinitionId")
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+    .when().get(START_FORM_URL);
+  }
 }
