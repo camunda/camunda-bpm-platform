@@ -36,6 +36,14 @@ import org.camunda.bpm.engine.task.TaskQuery;
 
 public class TaskRestServiceImpl extends AbstractEngineService implements TaskRestService {
 
+  public TaskRestServiceImpl() {
+    super();
+  }
+  
+  public TaskRestServiceImpl(String engineName) {
+    super(engineName);
+  }
+
   @Override
   public List<TaskDto> getTasks(TaskQueryDto queryDto, Integer firstResult, Integer maxResults) {
 

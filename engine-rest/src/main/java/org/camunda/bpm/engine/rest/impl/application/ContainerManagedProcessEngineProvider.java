@@ -24,8 +24,14 @@ import org.camunda.bpm.engine.rest.spi.ProcessEngineProvider;
  */
 public class ContainerManagedProcessEngineProvider implements ProcessEngineProvider {
 
-  public ProcessEngine getProcessEngine() {
+  @Override
+  public ProcessEngine getDefaultProcessEngine() {
     return BpmPlatform.getDefaultProcessEngine();
+  }
+
+  @Override
+  public ProcessEngine getProcessEngine(String name) {
+    return BpmPlatform.getProcessEngineService().getProcessEngine(name);
   }
 
 }

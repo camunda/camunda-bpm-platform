@@ -88,8 +88,11 @@ public class DevEnvironmentSetup implements ProcessEngineProvider {
     
   }
 
+  public ProcessEngine getDefaultProcessEngine() {
+    return processEngine;
+  }
 
-  public ProcessEngine getProcessEngine() {
+  public ProcessEngine getProcessEngine(String name) {
     return processEngine;
   }
 

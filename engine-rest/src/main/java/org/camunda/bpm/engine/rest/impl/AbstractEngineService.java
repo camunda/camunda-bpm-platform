@@ -12,21 +12,25 @@ public abstract class AbstractEngineService {
   protected ProcessEngine processEngine;
   
   public AbstractEngineService() {
-    initialize();
+    processEngine = lookupProcessEngine(null);
   }
   
-  protected void initialize() {
-    processEngine = lookupProcessEngine();
+  public AbstractEngineService(String engineName) {
+    processEngine = lookupProcessEngine(engineName);
   }
-
-  protected ProcessEngine lookupProcessEngine() {
+  
+  protected ProcessEngine lookupProcessEngine(String engineName) {
     
     ServiceLoader<ProcessEngineProvider> serviceLoader = ServiceLoader.load(ProcessEngineProvider.class);
     Iterator<ProcessEngineProvider> iterator = serviceLoader.iterator();
     
     if(iterator.hasNext()) {
       ProcessEngineProvider provider = iterator.next();
-      return provider.getProcessEngine();      
+      if (engineName == null) {
+        return provider.getDefaultProcessEngine();
+      } else {
+        return provider.getProcessEngine(engineName);
+      }
     } else {
       throw new RestException("Could not find an implementation of the "+ProcessEngineProvider.class+"- SPI");
     }

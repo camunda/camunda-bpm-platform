@@ -3,6 +3,9 @@ package org.camunda.bpm.engine.rest.spi.impl;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.camunda.bpm.engine.FormService;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.IdentityService;
@@ -15,17 +18,8 @@ import org.camunda.bpm.engine.rest.spi.ProcessEngineProvider;
 
 public class MockedProcessEngineProvider implements ProcessEngineProvider {
 
-  private static ProcessEngine cachedProcessEngine;
-  
-  @Override
-  public synchronized ProcessEngine getProcessEngine() {
-    if (cachedProcessEngine == null) {
-      cachedProcessEngine = mock(ProcessEngine.class);
-      mockServices(cachedProcessEngine);
-    }
-    
-    return cachedProcessEngine;
-  }
+  private static ProcessEngine cachedDefaultProcessEngine;
+  private static Map<String, ProcessEngine> cachedEngines = new HashMap<String, ProcessEngine>();
   
   private void mockServices(ProcessEngine engine) {
     RepositoryService repoService = mock(RepositoryService.class);
@@ -43,6 +37,27 @@ public class MockedProcessEngineProvider implements ProcessEngineProvider {
     when(engine.getFormService()).thenReturn(formService);
     when(engine.getHistoryService()).thenReturn(historyService);
     when(engine.getManagementService()).thenReturn(managementService);
+  }
+
+  @Override
+  public ProcessEngine getDefaultProcessEngine() {
+    if (cachedDefaultProcessEngine == null) {
+      cachedDefaultProcessEngine = mock(ProcessEngine.class);
+      mockServices(cachedDefaultProcessEngine);
+    }
+    
+    return cachedDefaultProcessEngine;
+  }
+
+  @Override
+  public ProcessEngine getProcessEngine(String name) {
+    if (cachedEngines.get(name) == null) {
+      ProcessEngine mock = mock(ProcessEngine.class);
+      mockServices(mock);
+      cachedEngines.put(name, mock);
+    }
+    
+    return cachedEngines.get(name);
   }
 
 }

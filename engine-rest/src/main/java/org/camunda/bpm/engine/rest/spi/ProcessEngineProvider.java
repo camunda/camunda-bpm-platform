@@ -22,6 +22,8 @@ import org.camunda.bpm.engine.ProcessEngine;
  */
 public interface ProcessEngineProvider {
 
-  public ProcessEngine getProcessEngine();
+  public ProcessEngine getDefaultProcessEngine();
+  
+  public ProcessEngine getProcessEngine(String name);
   
 }
