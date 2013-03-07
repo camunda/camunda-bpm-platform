@@ -1,12 +1,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>fox-platform-jobexecutor-ra</artifactId>
+  <artifactId>camunda-jobexecutor-ra</artifactId>
   <packaging>jar</packaging>
-  <name>fox platform EE - Job Executor RA</name>
+  <name>camunda BPM - Job Executor RA</name>
 
   <parent>
-    <groupId>com.camunda.fox.platform</groupId>
-    <artifactId>fox-platform</artifactId>
+    <groupId>org.camunda.bpm</groupId>
+    <artifactId>camunda-root</artifactId>
     <relativePath>../..</relativePath>
     <version>7.0.0-SNAPSHOT</version>
   </parent>
@@ -19,8 +19,8 @@
   <dependencies>
     
     <dependency>
-      <groupId>com.camunda.fox.engine</groupId>
-      <artifactId>fox-engine</artifactId>
+      <groupId>org.camunda.bpm</groupId>
+      <artifactId>camunda-engine</artifactId>
       <scope>provided</scope>
     </dependency>
            
@@ -46,4 +46,5 @@
 
   </dependencies>
 
+  <groupId>org.camunda.bpm.javaee</groupId>
 </project>

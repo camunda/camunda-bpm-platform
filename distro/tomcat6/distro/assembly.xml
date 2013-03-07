@@ -26,18 +26,23 @@
         <include>**/*.sh</include>
        </includes>
         <fileMode>0755</fileMode>
-    </fileSet> 
-    <fileSet>
-      <directory>../../sql-script/target</directory>
-      <outputDirectory />
-      <includes>
-        <include>sql/</include>
-      </includes>
-    </fileSet>    
+    </fileSet>     
   </fileSets>
 
   <dependencySets>
-	
+      
+    <dependencySet>
+      <unpack>true</unpack>
+      <unpackOptions>
+        <includes>
+          <include>**/*.sql</include>
+        </includes>
+      </unpackOptions>
+      <includes>
+        <include>org.camunda.bpm.distro:camunda-sql-scripts:jar:*</include>
+      </includes>
+    </dependencySet>
+  	
     <dependencySet>
       <outputDirectory />
       <unpack>true</unpack>
@@ -47,13 +52,13 @@
         </includes>
       </unpackOptions>
       <includes>
-        <include>com.camunda.fox.cycle:cycle-sql-scripts:jar:*</include>
+        <include>org.camunda.bpm.cycle:camunda-cycle-sql-scripts:jar:*</include>
       </includes>
     </dependencySet>
 		
 	<dependencySet>
   		<includes>
-  			<include>com.camunda.fox.cycle:cycle-tomcat:war:*</include>
+  			<include>org.camunda.bpm.cycle:camunda-cycle-tomcat:war:*</include>
   		</includes>
   		<outputDirectory>server/apache-tomcat-${tomcat6.version}/webapps/cycle</outputDirectory>
         <unpack>true</unpack>

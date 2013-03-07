@@ -29,7 +29,7 @@
     <dependencySet>
       <outputDirectory>client</outputDirectory>
       <includes>
-        <include>com.camunda.fox.platform:fox-platform-client:jar:${project.version}</include>
+        <include>org.camunda.bpm.javaee:camunda-ejb-client:jar:${project.version}</include>
       </includes>     
     </dependencySet>
   </dependencySets>

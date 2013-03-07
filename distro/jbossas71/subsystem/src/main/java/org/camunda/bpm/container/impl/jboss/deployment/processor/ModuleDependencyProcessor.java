@@ -39,7 +39,7 @@ public class ModuleDependencyProcessor implements DeploymentUnitProcessor {
   
   public static final int PRIORITY = 0x2300;
   
-  public static ModuleIdentifier MODULE_IDENTIFYER_PROCESS_ENGINE = ModuleIdentifier.create("com.camunda.fox.engine.fox-engine");
+  public static ModuleIdentifier MODULE_IDENTIFYER_PROCESS_ENGINE = ModuleIdentifier.create("org.camunda.bpm.camunda-engine");
 
   public void deploy(DeploymentPhaseContext phaseContext) throws DeploymentUnitProcessingException {
     

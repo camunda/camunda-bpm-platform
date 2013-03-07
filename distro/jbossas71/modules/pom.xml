@@ -1,13 +1,13 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>fox-platform-jboss-modules</artifactId>
+  <artifactId>camunda-jboss-modules</artifactId>
   <packaging>jar</packaging>
-  <name>fox platform EE - jBoss7 Modules</name>
+  <name>camunda BPM - jBoss7 Modules</name>
 
   <parent>
-    <groupId>com.camunda.fox.platform</groupId>
-    <artifactId>fox-platform-jboss</artifactId>
+    <groupId>org.camunda.bpm.jboss</groupId>
+    <artifactId>camunda-jboss</artifactId>
     <version>7.0.0-SNAPSHOT</version>
   </parent>
 
@@ -17,8 +17,8 @@
   
   <dependencies>
     <dependency>
-      <groupId>com.camunda.fox.platform</groupId>
-      <artifactId>fox-platform-jboss-subsystem</artifactId>
+      <groupId>org.camunda.bpm.jboss</groupId>
+      <artifactId>camunda-jboss-subsystem</artifactId>
       <version>${project.version}</version>
       <exclusions>
         <exclusion>
@@ -38,12 +38,7 @@
           <artifactId>joda-time</artifactId>
         </exclusion>
       </exclusions>
-    </dependency>   
-  	<dependency>
-  		<groupId>org.bouncycastle</groupId>
-  		<artifactId>bcpg-jdk15on</artifactId>
-  	</dependency> 
-      
+    </dependency>     	
   </dependencies>
 
   <build>

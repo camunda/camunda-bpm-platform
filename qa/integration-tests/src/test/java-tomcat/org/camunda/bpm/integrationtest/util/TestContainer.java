@@ -15,7 +15,7 @@ public class TestContainer {
   
   public static void addContainerSpecificResources(WebArchive archive) {
     
-    archive.addAsWebInfResource("web.xml")
+    archive.addAsWebInfResource("web.xml")    
       .addAsManifestResource("context.xml")
       .addAsLibraries(DeploymentHelper.getWeld())
       .addClass(IntegrationTestProcessApplication.class);

@@ -41,7 +41,7 @@ public class TestWarDeploymentWithoutProcessesXml extends AbstractFoxPlatformInt
   public static WebArchive processArchive() {    
     WebArchive deployment = ShrinkWrap.create(WebArchive.class, "test.war")
             .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
-            .addAsLibraries(DeploymentHelper.getFoxPlatformClient())
+            .addAsLibraries(DeploymentHelper.getEjbClient())
             .addClass(AbstractFoxPlatformIntegrationTest.class);
     
     TestContainer.addContainerSpecificResources(deployment);

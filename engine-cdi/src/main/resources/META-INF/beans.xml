@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<beans xmlns="http://java.sun.com/xml/ns/javaee" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:weld="http://jboss.org/schema/weld/beans"
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/beans_1_0.xsd
+                        http://jboss.org/schema/weld/beans http://jboss.org/schema/weld/beans_1_1.xsd">
+	<interceptors>
+		<class>org.camunda.bpm.engine.cdi.impl.annotation.CompleteTaskInterceptor</class>
+		<class>org.camunda.bpm.engine.cdi.impl.annotation.StartProcessInterceptor</class>
+	</interceptors>	
+  
+    <weld:scan>
+      <!-- remove CdiJtaProcessEngineConfiguration if javax.transaction API is not available -->
+      <weld:exclude name="org.camunda.bpm.engine.cdi.CdiJtaProcessEngineConfiguration">
+          <weld:if-class-available name="!javax.transaction.TransactionManager"/>
+      </weld:exclude>
+    
+    </weld:scan>
+</beans>

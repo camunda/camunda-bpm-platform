@@ -5,6 +5,7 @@ import org.camunda.bpm.integrationtest.functional.ejb.local.bean.BusinessInterfa
 import org.camunda.bpm.integrationtest.functional.ejb.local.bean.LocalSingletonBean;
 import org.camunda.bpm.integrationtest.functional.ejb.local.bean.LocalSingletonBeanClientDelegateBean;
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
+import org.camunda.bpm.integrationtest.util.DeploymentHelper;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.junit.Arquillian;
@@ -42,6 +43,7 @@ public class LocalSingletonBeanInvocationTest extends AbstractFoxPlatformIntegra
   @Deployment(order=1)
   public static WebArchive delegateDeployment() {    
     return ShrinkWrap.create(WebArchive.class, "service.war")
+      .addAsLibraries(DeploymentHelper.getEjbClient())
       .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
       .addClass(AbstractFoxPlatformIntegrationTest.class)
       .addClass(LocalSingletonBean.class) // the EJB 

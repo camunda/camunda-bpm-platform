@@ -34,7 +34,7 @@ public class TestWarDeploymentWithBrokenBpmnXml {
     
     WebArchive deployment = ShrinkWrap.create(WebArchive.class, "test.war")
       .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
-      .addAsLibraries(DeploymentHelper.getFoxPlatformClient())
+      .addAsLibraries(DeploymentHelper.getEjbClient())
       .addAsResource("META-INF/processes.xml", "META-INF/processes.xml")
       .addAsResource("org/camunda/bpm/integrationtest/deployment/war/TestWarDeploymentWithBrokenBpmnXml.testXmlInvalid.bpmn20.xml");
     

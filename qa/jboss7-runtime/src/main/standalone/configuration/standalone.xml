@@ -25,7 +25,7 @@
         <extension module="org.jboss.as.web"/>
         <extension module="org.jboss.as.webservices"/>
         <extension module="org.jboss.as.weld"/>
-        <extension module="com.camunda.fox.platform.fox-platform-jboss-subsystem"/>
+        <extension module="org.camunda.bpm.jboss.camunda-jboss-subsystem"/>
     </extensions>
     <management>
         <security-realms>
@@ -121,10 +121,7 @@
         <subsystem xmlns="urn:jboss:domain:deployment-scanner:1.1">
             <deployment-scanner path="deployments" relative-to="jboss.server.base.dir" scan-interval="5000"/>
         </subsystem>
-        <subsystem xmlns="urn:jboss:domain:ee:1.1">
-			<global-modules>
-                <module name="com.camunda.fox.engine.fox-engine" />
-            </global-modules>
+        <subsystem xmlns="urn:jboss:domain:ee:1.1">			
             <spec-descriptor-property-replacement>false</spec-descriptor-property-replacement>
             <jboss-descriptor-property-replacement>true</jboss-descriptor-property-replacement>
         </subsystem>
@@ -297,7 +294,7 @@
             </endpoint-config>
         </subsystem>
         <subsystem xmlns="urn:jboss:domain:weld:1.0"/>
-		<subsystem xmlns="urn:com.camunda.fox.fox-platform:1.1">
+		<subsystem xmlns="urn:org.camunda.bpm.jboss:1.1">
             <process-engines>
                 <process-engine name="default" default="true">
                     <datasource>java:jboss/datasources/FoxEngineDS</datasource>

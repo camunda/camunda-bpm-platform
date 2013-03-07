@@ -27,57 +27,57 @@
     <dependencySet>
       <outputDirectory>client</outputDirectory>
       <includes>
-        <include>com.camunda.fox.platform:fox-platform-client:jar:${project.version}</include>
+        <include>org.camunda.bpm.javaee:camunda-ejb-client:jar:${project.version}</include>
       </includes>     
     </dependencySet>
     <dependencySet>
       <outputDirectory>modules</outputDirectory>
       <includes>
-        <include>com.camunda.fox.platform:fox-platform-glassfish-ear:ear:*</include>                
-        <include>com.camunda.fox.platform:fox-platform-jobexecutor-rar:rar:*</include>
+        <include>org.camunda.bpm.glassfish:camunda-glassfish-ear:ear:*</include>                
+        <include>org.camunda.bpm.javaee:camunda-jobexecutor-rar:rar:*</include>
       </includes>     
     </dependencySet>
     <dependencySet>
       <outputDirectory>modules/lib</outputDirectory>
       <includes>
-        <include>com.camunda.fox.engine:fox-engine:jar:*</include>
+        <include>org.camunda.bpm:camunda-engine:jar:*</include>
         <include>org.mybatis:mybatis:jar:*</include>
         <include>com.fasterxml.uuid:java-uuid-generator:jar:*</include>      
         <include>joda-time:joda-time:jar:*</include>
       </includes>     
     </dependencySet>
     <dependencySet>
-      <outputDirectory>server/glassfish3/glassfish/domains/domain1/applications/camunda-fox-platform</outputDirectory>
+      <outputDirectory>server/glassfish3/glassfish/domains/domain1/applications/camunda-bpm-platform</outputDirectory>
       <includes>
-        <include>com.camunda.fox.platform:fox-platform-glassfish-ear:ear:*</include>
+        <include>org.camunda.bpm.glassfish:camunda-glassfish-ear:ear:*</include>
       </includes>
       <unpack>true</unpack>
     </dependencySet>
     <dependencySet>
-      <outputDirectory>server/glassfish3/glassfish/domains/domain1/applications/camunda-fox-platform/fox-platform-jobexecutor-service-${project.version}_jar</outputDirectory>
+      <outputDirectory>server/glassfish3/glassfish/domains/domain1/applications/camunda-bpm-platform/camunda-jobexecutor-service-${project.version}_jar</outputDirectory>
       <includes>
-    		<include>com.camunda.fox.platform:fox-platform-jobexecutor-service:jar:*</include>
+    		<include>org.camunda.bpm.javaee:camunda-jobexecutor-service:jar:*</include>
       </includes>
       <unpack>true</unpack>
     </dependencySet>
     <dependencySet>
-      <outputDirectory>server/glassfish3/glassfish/domains/domain1/applications/camunda-fox-platform/fox-platform-glassfish-service-${project.version}_jar</outputDirectory>
+      <outputDirectory>server/glassfish3/glassfish/domains/domain1/applications/camunda-bpm-platform/camunda-glassfish-service-${project.version}_jar</outputDirectory>
       <includes>
-        <include>com.camunda.fox.platform:fox-platform-glassfish-service:jar:*</include>
+        <include>org.camunda.bpm.glassfish:camunda-glassfish-service:jar:*</include>
       </includes>
       <unpack>true</unpack>
     </dependencySet>
     <dependencySet>
-      <outputDirectory>server/glassfish3/glassfish/domains/domain1/applications/fox-platform-jobexecutor-rar</outputDirectory>
+      <outputDirectory>server/glassfish3/glassfish/domains/domain1/applications/camunda-jobexecutor-rar</outputDirectory>
       <includes>
-        <include>com.camunda.fox.platform:fox-platform-jobexecutor-rar:rar:*</include>
+        <include>org.camunda.bpm.javaee:camunda-jobexecutor-rar:rar:*</include>
       </includes>
       <unpack>true</unpack>     
     </dependencySet>
     <dependencySet>
       <outputDirectory>server/glassfish3/glassfish/lib</outputDirectory>
       <includes>
-        <include>com.camunda.fox.engine:fox-engine:jar:*</include>
+        <include>org.camunda.bpm:camunda-engine:jar:*</include>
         <include>org.mybatis:mybatis:jar:*</include>
         <include>com.fasterxml.uuid:java-uuid-generator:jar:*</include>
         <include>joda-time:joda-time:jar:*</include>

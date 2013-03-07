@@ -5,20 +5,20 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>com.camunda.fox.platform</groupId>
-    <artifactId>fox-platform</artifactId>
+    <groupId>org.camunda.bpm</groupId>
+    <artifactId>camunda-root</artifactId>
     <version>7.0.0-SNAPSHOT</version>
     <relativePath>../..</relativePath>
   </parent>
 
-  <artifactId>tasklist</artifactId>
+  <artifactId>camunda-tasklist</artifactId>
   <packaging>war</packaging>
   <name>camunda BPM - tasklist</name>
 
   <dependencies>
     <dependency>
-      <groupId>com.camunda.fox.engine</groupId>
-      <artifactId>fox-engine</artifactId>
+      <groupId>org.camunda.bpm</groupId>
+      <artifactId>camunda-engine</artifactId>
     </dependency>
 
     <dependency>
@@ -27,7 +27,7 @@
     </dependency>
 
     <dependency>
-      <groupId>com.camunda.fox.platform</groupId>
+      <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine-rest</artifactId>
       <version>${project.version}</version>
     </dependency>
@@ -98,4 +98,5 @@
       </plugin>
     </plugins>
   </build>
+  <groupId>org.camunda.bpm.tasklist</groupId>
 </project>

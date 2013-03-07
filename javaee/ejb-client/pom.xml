@@ -1,12 +1,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<artifactId>fox-platform-client</artifactId>
-	<name>fox platform EE - Client</name>
+	<artifactId>camunda-ejb-client</artifactId>
+	<name>camunda BPM - Client</name>
 	<packaging>jar</packaging>
 
 	<parent>
-		<groupId>com.camunda.fox.platform</groupId>
-		<artifactId>fox-platform</artifactId>
+		<groupId>org.camunda.bpm</groupId>
+		<artifactId>camunda-root</artifactId>
 		<relativePath>../..</relativePath>
 		<version>7.0.0-SNAPSHOT</version>
 	</parent>
@@ -19,8 +19,8 @@
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
-			<groupId>com.camunda.fox.engine</groupId>
-			<artifactId>fox-engine-cdi</artifactId>
+			<groupId>org.camunda.bpm</groupId>
+			<artifactId>camunda-engine-cdi</artifactId>
 			<exclusions>
 				<exclusion>
 					<artifactId>spring-beans</artifactId>
@@ -96,7 +96,7 @@
     
 	<build>
 		<plugins>
-			<!-- package activiti-cdi -->
+			<!-- package engine-cdi -->
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-shade-plugin</artifactId>
@@ -110,18 +110,9 @@
 							<createSourcesJar>true</createSourcesJar>
 							<artifactSet>
 								<includes>
-									<include>com.camunda.fox.engine:fox-engine-cdi</include>
+									<include>org.camunda.bpm:camunda-engine-cdi</include>
 								</includes>
-							</artifactSet>		
-							<filters>
-								<filter>
-									<artifact>com.camunda.fox.engine:fox-engine-cdi</artifact>									
-									<excludes>
-										<exclude>org/activiti/cdi/impl/util/ActivitiServices.class</exclude>
-										<exclude>org/activiti/cdi/impl/ActivitiExtension.class</exclude>															
-									</excludes>                  
-								</filter>							
-							</filters>					
+							</artifactSet>	
 						</configuration>
 					</execution>
 				</executions>
@@ -137,4 +128,5 @@
 		</plugins>
 	</build>
 	
+	<groupId>org.camunda.bpm.javaee</groupId>
 </project>

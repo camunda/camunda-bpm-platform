@@ -1,14 +1,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>com.camunda.fox.cycle</groupId>
-    <artifactId>cycle-root</artifactId>
+    <groupId>org.camunda.bpm.cycle</groupId>
+    <artifactId>camunda-cycle-root</artifactId>
     <version>7.0.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>cycle-jboss</artifactId>
+  <artifactId>camunda-cycle-jboss</artifactId>
   <packaging>war</packaging>
-  <name>fox cycle - JBoss</name>
+  <name>camunda BPM - cycle - JBoss</name>
 
   <properties>
     <jboss.el.version>2.0.0.GA</jboss.el.version>
@@ -16,8 +16,8 @@
 
   <dependencies>
     <dependency>
-      <groupId>com.camunda.fox.cycle</groupId>
-      <artifactId>cycle</artifactId>
+      <groupId>org.camunda.bpm.cycle</groupId>
+      <artifactId>camunda-cycle</artifactId>
       <version>${project.version}</version>
       <type>war</type>
       <scope>runtime</scope>
@@ -99,7 +99,7 @@
               <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
             </manifest>
             <manifestEntries>
-              <Dependencies>org.hibernate,org.hibernate.envers,org.hibernate.validator,org.apache.xerces,org.apache.commons.io,org.bouncycastle.bcprov-jdk15on,org.bouncycastle.bcpg-jdk15on</Dependencies>
+              <Dependencies>org.hibernate,org.hibernate.envers,org.hibernate.validator,org.apache.xerces,org.apache.commons.io</Dependencies>
             </manifestEntries>
           </archive>
           <webResources>
@@ -109,8 +109,8 @@
           </webResources>
           <overlays>
             <overlay>
-              <groupId>com.camunda.fox.cycle</groupId>
-              <artifactId>cycle</artifactId>
+              <groupId>org.camunda.bpm.cycle</groupId>
+              <artifactId>camunda-cycle</artifactId>
               <excludes>
                 <exclude>**/persistence.xml</exclude>
               </excludes>

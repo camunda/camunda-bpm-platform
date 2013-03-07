@@ -2,18 +2,18 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>cycle-tests</artifactId>
-  <name>fox platform EE - QA Cycle tests</name>
+  <artifactId>camunda-cycle-tests</artifactId>
+  <name>camunda BPM - QA Cycle tests</name>
 
   <parent>
-    <groupId>com.camunda.fox.platform</groupId>
-    <artifactId>fox-platform-qa</artifactId>
+    <groupId>org.camunda.bpm.qa</groupId>
+    <artifactId>camunda-qa</artifactId>
     <version>7.0.0-SNAPSHOT</version>
   </parent>
 
   <properties>
     <database.host>${project.build.directory}</database.host>
-    <database.name>fox-engine</database.name>
+    <database.name>camunda-engine</database.name>
     <database.user>sa</database.user>
     <database.password>sa</database.password>
     
@@ -64,16 +64,16 @@
     </dependency>
 
     <dependency>
-      <groupId>com.camunda.fox.cycle</groupId>
-      <artifactId>cycle</artifactId>
+      <groupId>org.camunda.bpm.cycle</groupId>
+      <artifactId>camunda-cycle</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
       <classifier>core</classifier>
     </dependency>
 
     <dependency>
-      <groupId>com.camunda.fox.cycle</groupId>
-      <artifactId>cycle-sql-scripts</artifactId>
+      <groupId>org.camunda.bpm.cycle</groupId>
+      <artifactId>camunda-cycle-sql-scripts</artifactId>
       <version>${project.version}</version>
     </dependency>
 
@@ -127,14 +127,14 @@
       <dependencies>
         <dependency>
           <!-- make sure it comes after assembly in the build -->
-          <groupId>org.camunda.bpm.platform</groupId>
-          <artifactId>fox-platform-qa-jboss-runtime</artifactId>
+          <groupId>org.camunda.bpm.qa</groupId>
+          <artifactId>camunda-qa-jboss-runtime</artifactId>
           <version>${project.version}</version>
           <type>pom</type>
         </dependency>
         <dependency>
           <groupId>org.camunda.bpm.cycle</groupId>
-          <artifactId>cycle-jboss</artifactId>
+          <artifactId>camunda-cycle-jboss</artifactId>
           <version>${project.version}</version>
           <type>war</type>
           <scope>test</scope>
@@ -180,7 +180,7 @@
               <deployables>
                 <deployable>
                   <groupId>org.camunda.bpm.cycle</groupId>
-                  <artifactId>cycle-jboss</artifactId>
+                  <artifactId>camunda-cycle-jboss</artifactId>
                   <type>war</type>
                   <properties>
                     <context>cycle</context>
@@ -203,14 +203,14 @@
       <dependencies>
         <dependency>
           <!-- make sure it comes after the test runtime in the build -->
-          <groupId>org.camunda.bpm.platform</groupId>
-          <artifactId>fox-platform-qa-glassfish-runtime</artifactId>
+          <groupId>org.camunda.bpm.qa</groupId>
+          <artifactId>camunda-qa-glassfish-runtime</artifactId>
           <version>${project.version}</version>
           <type>pom</type>
         </dependency>
         <dependency>
           <groupId>org.camunda.bpm.cycle</groupId>
-          <artifactId>cycle-glassfish</artifactId>
+          <artifactId>camunda-cycle-glassfish</artifactId>
           <version>${project.version}</version>
           <type>war</type>
           <scope>test</scope>
@@ -329,132 +329,7 @@
         </plugins>
       </build>
     </profile>
-    <profile>
-      <id>was80</id>
-      <properties>
-        <cycle.http.port>${was.http.port}</cycle.http.port>
-      </properties>
-      <dependencies>
-        <dependency>
-          <groupId>org.camunda.bpm.engine</groupId>
-          <artifactId>fox-engine</artifactId>
-        </dependency>
-        <dependency>
-          <groupId>org.camunda.bpm.platform</groupId>
-          <artifactId>fox-platform-api</artifactId>
-        </dependency>
-        <dependency>
-          <groupId>org.camunda.bpm.platform</groupId>
-          <artifactId>fox-platform-jobexecutor-api</artifactId>
-          <version>${project.version}</version>
-        </dependency>
-        <dependency>
-          <groupId>org.mybatis</groupId>
-          <artifactId>mybatis</artifactId>
-        </dependency>
-        <dependency>
-          <groupId>com.fasterxml.uuid</groupId>
-          <artifactId>java-uuid-generator</artifactId>
-        </dependency>
-
-        <dependency>
-          <groupId>org.camunda.bpm.platform</groupId>
-          <artifactId>fox-platform-ibm-websphere-ear</artifactId>
-          <version>${project.version}</version>
-          <type>ear</type>
-        </dependency>
-        <dependency>
-          <groupId>org.camunda.bpm.platform</groupId>
-          <artifactId>fox-platform-jobexecutor-rar</artifactId>
-          <version>${project.version}</version>
-          <type>rar</type>
-        </dependency>
-
-        <dependency>
-          <groupId>org.camunda.bpm.cycle</groupId>
-          <artifactId>cycle-was</artifactId>
-          <version>${project.version}</version>
-          <type>war</type>
-          <scope>test</scope>
-        </dependency>
-
-        <dependency>
-          <!-- make sure it comes after the test runtime in the build -->
-          <groupId>org.camunda.bpm.platform</groupId>
-          <artifactId>fox-platform-qa-websphere-runtime</artifactId>
-          <version>${project.version}</version>
-          <type>pom</type>
-        </dependency>
-
-      </dependencies>
-
-      <!-- on WAS, cycle is already deployed as part of the websphere test runtime. -->
-
-    </profile>
-    <profile>
-      <id>was85</id>
-      <properties>
-        <cycle.http.port>${was.http.port}</cycle.http.port>
-      </properties>
-      <dependencies>
-        <dependency>
-          <groupId>org.camunda.bpm.engine</groupId>
-          <artifactId>fox-engine</artifactId>
-        </dependency>
-        <dependency>
-          <groupId>org.camunda.bpm.platform</groupId>
-          <artifactId>fox-platform-api</artifactId>
-        </dependency>
-        <dependency>
-          <groupId>org.camunda.bpm.platform</groupId>
-          <artifactId>fox-platform-jobexecutor-api</artifactId>
-          <version>${project.version}</version>
-        </dependency>
-        <dependency>
-          <groupId>org.mybatis</groupId>
-          <artifactId>mybatis</artifactId>
-        </dependency>
-        <dependency>
-          <groupId>com.fasterxml.uuid</groupId>
-          <artifactId>java-uuid-generator</artifactId>
-        </dependency>
-
-        <dependency>
-          <groupId>org.camunda.bpm.platform</groupId>
-          <artifactId>fox-platform-ibm-websphere-ear</artifactId>
-          <version>${project.version}</version>
-          <type>ear</type>
-        </dependency>
-        <dependency>
-          <groupId>org.camunda.bpm.platform</groupId>
-          <artifactId>fox-platform-jobexecutor-rar</artifactId>
-          <version>${project.version}</version>
-          <type>rar</type>
-        </dependency>
-
-        <dependency>
-          <groupId>org.camunda.bpm.cycle</groupId>
-          <artifactId>cycle-was</artifactId>
-          <version>${project.version}</version>
-          <type>war</type>
-          <scope>test</scope>
-        </dependency>
-
-        <dependency>
-          <!-- make sure it comes after the test runtime in the build -->
-          <groupId>org.camunda.bpm.platform</groupId>
-          <artifactId>fox-platform-qa-websphere-runtime</artifactId>
-          <version>${project.version}</version>
-          <type>pom</type>
-        </dependency>
-
-      </dependencies>
-
-      <!-- on WAS, cycle is already deployed as part of the websphere test runtime. -->
-
-    </profile>
-
-
+   
     <profile>
       <id>tomcat6</id>
       <properties>
@@ -464,14 +339,14 @@
       <dependencies>
         <dependency>
           <!-- make sure it comes after assembly in the build -->
-          <groupId>org.camunda.bpm.platform</groupId>
-          <artifactId>fox-platform-qa-tomcat6-runtime</artifactId>
+          <groupId>org.camunda.bpm.qa</groupId>
+          <artifactId>camunda-qa-tomcat6-runtime</artifactId>
           <version>${project.version}</version>
           <type>pom</type>
         </dependency>
         <dependency>
           <groupId>org.camunda.bpm.cycle</groupId>
-          <artifactId>cycle-tomcat</artifactId>
+          <artifactId>camunda-cycle-tomcat</artifactId>
           <version>${project.version}</version>
           <type>war</type>
           <scope>test</scope>
@@ -543,7 +418,7 @@
               <deployables>
                 <deployable>
                   <groupId>org.camunda.bpm.cycle</groupId>
-                  <artifactId>cycle-tomcat</artifactId>
+                  <artifactId>camunda-cycle-tomcat</artifactId>
                   <type>war</type>
                   <properties>
                     <context>cycle</context>
@@ -668,6 +543,26 @@
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-jar-plugin</artifactId>
+        <executions>
+          <!-- install enhanced artifact -->
+          <execution>
+            <id>create-test-jar</id>
+            <phase>package</phase>
+            <goals>
+              <goal>test-jar</goal>
+            </goals>
+            <configuration>
+              <forceCreate>true</forceCreate>
+            <!--  <includes>
+                <include>**/com/camunda/fox/platform/test/util/**/*.class</include>
+              </includes> -->
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
           <skipTests>true</skipTests>
@@ -699,7 +594,7 @@
               <artifactItems>
                 <artifactItem>
                   <groupId>org.camunda.bpm.cycle</groupId>
-                  <artifactId>cycle-sql-scripts</artifactId>
+                  <artifactId>camunda-cycle-sql-scripts</artifactId>
                   <outputDirectory>${project.build.directory}/sql-scripts</outputDirectory>
                   <overWrite>true</overWrite>
                 </artifactItem>

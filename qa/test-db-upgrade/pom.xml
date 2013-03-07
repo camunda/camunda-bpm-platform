@@ -2,13 +2,13 @@
   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>fox-platform-qa-db-upgrade</artifactId>
+  <artifactId>camunda-qa-db-upgrade</artifactId>
   <packaging>jar</packaging>
-  <name>fox platform EE - QA</name>
+  <name>camunda BPM - QA</name>
 
   <parent>
-    <groupId>com.camunda.fox.platform</groupId>
-    <artifactId>fox-platform-qa</artifactId>
+    <groupId>org.camunda.bpm.platform</groupId>
+    <artifactId>camunda-qa</artifactId>
     <version>7.0.0-SNAPSHOT</version>
   </parent>
 
@@ -18,7 +18,7 @@
     <test.version.current>${project.version}</test.version.current>
 
     <test.db.host>${project.build.directory}</test.db.host>
-    <test.db.database>fox-engine</test.db.database>
+    <test.db.database>camunda-engine</test.db.database>
     <test.db.username>sa</test.db.username>
     <test.db.password>sa</test.db.password>
   </properties>
@@ -95,14 +95,14 @@
   <dependencies>
 
     <dependency>
-      <groupId>com.camunda.fox.platform</groupId>
-      <artifactId>fox-platform-sql-script</artifactId>
+      <groupId>org.camunda.bpm.platform</groupId>
+      <artifactId>camunda-sql-script</artifactId>
       <version>${test.version.current}</version>
     </dependency>
 
     <dependency>
-      <groupId>com.camunda.fox.engine</groupId>
-      <artifactId>fox-engine</artifactId>
+      <groupId>org.camunda.bpm.engine</groupId>
+      <artifactId>camunda-engine</artifactId>
       <version>${test.version.current}</version>
       <scope>test</scope>
     </dependency>
@@ -245,8 +245,8 @@
             <configuration>
               <artifactItems>
                 <artifactItem>
-                  <groupId>com.camunda.fox.engine</groupId>
-                  <artifactId>fox-engine</artifactId>
+                  <groupId>org.camunda.bpm.engine</groupId>
+                  <artifactId>camunda-engine</artifactId>
                   <version>${test.version.current}</version>
                   <classifier>test-sources</classifier>
                   <outputDirectory>${project.build.directory}/engine-test-sources</outputDirectory>
@@ -263,15 +263,15 @@
             <configuration>
               <artifactItems>
                 <artifactItem>
-                  <groupId>com.camunda.fox.platform</groupId>
-                  <artifactId>fox-platform-sql-script</artifactId>
+                  <groupId>org.camunda.bpm.platform</groupId>
+                  <artifactId>camunda-sql-script</artifactId>
                   <version>${test.version.old}</version>
                   <outputDirectory>${project.build.directory}/scripts-old</outputDirectory>
                   <overWrite>true</overWrite>
                 </artifactItem>
                 <artifactItem>
-                  <groupId>com.camunda.fox.platform</groupId>
-                  <artifactId>fox-platform-sql-script</artifactId>
+                  <groupId>org.camunda.bpm.platform</groupId>
+                  <artifactId>camunda-sql-script</artifactId>
                   <version>${test.version.current}</version>
                   <outputDirectory>${project.build.directory}/scripts-current</outputDirectory>
                   <overWrite>true</overWrite>

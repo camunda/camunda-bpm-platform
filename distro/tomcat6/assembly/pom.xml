@@ -6,16 +6,16 @@
     The assembly is installed to maven later in the reactor, if the integration tests pass sucessfully
   </description>
 
-  <artifactId>fox-platform-tomcat6-assembly</artifactId>
+  <artifactId>camunda-tomcat6-assembly</artifactId>
   <packaging>pom</packaging>
 
   <parent>
-    <groupId>com.camunda.fox.platform</groupId>
-    <artifactId>fox-platform-tomcat6</artifactId>
+    <groupId>org.camunda.bpm.tomcat</groupId>
+    <artifactId>camunda-tomcat6</artifactId>
     <version>7.0.0-SNAPSHOT</version>
   </parent>
 
-  <name>fox platform EE - tomcat6 Assembly</name>
+  <name>camunda BPM - tomcat6 Assembly</name>
 
   <dependencies>
     <dependency>
@@ -52,8 +52,8 @@
     </dependency>
     
     <dependency>
-      <groupId>com.camunda.fox.engine</groupId>
-      <artifactId>fox-engine</artifactId>
+      <groupId>org.camunda.bpm</groupId>
+      <artifactId>camunda-engine</artifactId>
       <version>${project.version}</version>
     </dependency>     
   </dependencies>

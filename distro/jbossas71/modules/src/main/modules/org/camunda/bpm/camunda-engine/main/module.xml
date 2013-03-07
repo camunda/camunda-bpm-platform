@@ -1,0 +1,24 @@
+<module xmlns="urn:jboss:module:1.0" name="org.camunda.bpm.camunda-engine">
+  <resources>
+    <resource-root path="camunda-engine-@project.version@.jar" />
+  </resources>
+
+  <dependencies>
+    
+    <module name="javax.api" />
+    <module name="javax.transaction.api"/>
+    <module name="javax.enterprise.api" />
+    <module name="javax.inject.api" />
+    <module name="javax.ejb.api" />
+    <module name="javax.xml.bind.api" /> 
+    <module name="javax.servlet.api" />
+    
+    <module name="org.jboss.vfs" />
+  
+	<module name="org.mybatis.mybatis" />	
+    <module name="com.fasterxml.uuid.java-uuid-generator"/>
+    <module name="org.livetribe.livetribe-jsr223" />
+    <module name="org.joda.time" slot="2.1" />        
+        
+  </dependencies>
+</module>

@@ -22,7 +22,7 @@ public class TestProcessEnginesXmlInProcessApplication extends AbstractFoxPlatfo
   public static WebArchive processArchive() {    
     
     return ShrinkWrap.create(WebArchive.class, "test.war")
-      .addAsLibraries(DeploymentHelper.getFoxPlatformClient())
+      .addAsLibraries(DeploymentHelper.getEjbClient())
       .addAsResource("singleEngine.xml", "META-INF/processes.xml")
       .addClass(AbstractFoxPlatformIntegrationTest.class);
   }

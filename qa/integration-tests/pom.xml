@@ -1,12 +1,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>fox-platform-qa-integration-tests</artifactId>
-  <name>fox platform EE - QA Integrationtests</name>
+  <artifactId>camunda-qa-integration-tests</artifactId>
+  <name>camunda BPM - QA Integrationtests</name>
 
   <parent>
-    <groupId>com.camunda.fox.platform</groupId>
-    <artifactId>fox-platform-qa</artifactId>
+    <groupId>org.camunda.bpm.qa</groupId>
+    <artifactId>camunda-qa</artifactId>
     <version>7.0.0-SNAPSHOT</version>
   </parent>
   
@@ -44,14 +44,14 @@
     </dependency>
 
     <dependency>
-      <groupId>com.camunda.fox.platform</groupId>
-      <artifactId>fox-platform-client</artifactId>
+      <groupId>org.camunda.bpm.javaee</groupId>
+      <artifactId>camunda-ejb-client</artifactId>
       <scope>provided</scope>
     </dependency>
 
     <dependency>
-      <groupId>com.camunda.fox.engine</groupId>
-      <artifactId>fox-engine</artifactId>
+      <groupId>org.camunda.bpm</groupId>
+      <artifactId>camunda-engine</artifactId>
       <scope>provided</scope>
     </dependency>
     
@@ -90,9 +90,9 @@
             </goals>
             <configuration>
               <forceCreate>true</forceCreate>
-              <includes>
+            <!--  <includes>
                 <include>**/com/camunda/fox/platform/test/util/**/*.class</include>
-              </includes>
+              </includes> -->
             </configuration>
           </execution>
         </executions>
@@ -109,8 +109,8 @@
       <dependencies>
         <dependency>
           <!-- make sure this comes after runtime in the reactor build -->
-          <groupId>com.camunda.fox.platform</groupId>
-          <artifactId>fox-platform-qa-jboss-runtime</artifactId>
+          <groupId>org.camunda.bpm.qa</groupId>
+          <artifactId>camunda-qa-jboss-runtime</artifactId>
           <version>${project.version}</version>
           <scope>provided</scope>
           <type>pom</type>
@@ -203,8 +203,8 @@
       <dependencies>
         <dependency>
           <!-- make sure this comes after runtime in the reactor build -->
-          <groupId>com.camunda.fox.platform</groupId>
-          <artifactId>fox-platform-qa-jboss-runtime</artifactId>
+          <groupId>org.camunda.bpm.platform</groupId>
+          <artifactId>camunda-qa-jboss-runtime</artifactId>
           <version>${project.version}</version>
           <scope>provided</scope>
           <type>pom</type>
@@ -247,8 +247,8 @@
       <dependencies>
         <dependency>
           <!-- make sure this comes after runtime in the reactor build -->
-          <groupId>com.camunda.fox.platform</groupId>
-          <artifactId>fox-platform-qa-glassfish-runtime</artifactId>
+          <groupId>org.camunda.bpm.qa</groupId>
+          <artifactId>camunda-qa-glassfish-runtime</artifactId>
           <version>${project.version}</version>
           <scope>provided</scope>
           <type>pom</type>
@@ -347,8 +347,8 @@
       <dependencies>
         <dependency>
           <!-- make sure this comes after runtime in the reactor build -->
-          <groupId>com.camunda.fox.platform</groupId>
-          <artifactId>fox-platform-qa-tomcat6-runtime</artifactId>
+          <groupId>org.camunda.bpm.qa</groupId>
+          <artifactId>camunda-qa-tomcat6-runtime</artifactId>
           <version>${project.version}</version>
           <scope>provided</scope>
           <type>pom</type>

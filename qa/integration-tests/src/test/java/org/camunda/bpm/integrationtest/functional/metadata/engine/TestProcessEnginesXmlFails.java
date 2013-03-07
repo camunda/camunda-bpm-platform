@@ -31,7 +31,7 @@ public class TestProcessEnginesXmlFails {
     
     return  ShrinkWrap.create(WebArchive.class)
             .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
-            .addAsLibraries(DeploymentHelper.getFoxPlatformClient())
+            .addAsLibraries(DeploymentHelper.getEjbClient())
             .addAsResource("META-INF/processes.xml", "META-INF/processes.xml")
             .addAsLibraries(
               ShrinkWrap.create(JavaArchive.class, "engine1.jar")

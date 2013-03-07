@@ -1,12 +1,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <artifactId>fox-platform-glassfish-ear</artifactId>
-  <name>fox platform EE - Glassfish 3.1.x EAR</name>
+  <artifactId>camunda-glassfish-ear</artifactId>
+  <name>camunda BPM - Glassfish 3.1.x EAR</name>
   <packaging>ear</packaging>
 
   <parent>
-    <groupId>com.camunda.fox.platform</groupId>
-    <artifactId>fox-platform-glassfish</artifactId>
+    <groupId>org.camunda.bpm.glassfish</groupId>
+    <artifactId>camunda-glassfish</artifactId>
     <version>7.0.0-SNAPSHOT</version>
   </parent>
 
@@ -18,7 +18,7 @@
         <configuration>
           <version>6</version>
           <defaultLibBundleDir>lib</defaultLibBundleDir>
-          <applicationName>camunda-fox-platform</applicationName>          
+          <applicationName>camunda-camunda</applicationName>          
         </configuration>
       </plugin>      
     </plugins>
@@ -26,22 +26,22 @@
 
   <dependencies>     
     <dependency>
-      <groupId>com.camunda.fox.platform</groupId>
-      <artifactId>fox-platform-glassfish-service</artifactId>
+      <groupId>org.camunda.bpm.glassfish</groupId>
+      <artifactId>camunda-glassfish-service</artifactId>
       <version>${project.version}</version>
       <type>ejb</type>
     </dependency>
     <dependency>
-      <groupId>com.camunda.fox.platform</groupId>
-      <artifactId>fox-platform-jobexecutor-service</artifactId>
+      <groupId>org.camunda.bpm.javaee</groupId>
+      <artifactId>camunda-jobexecutor-service</artifactId>
       <version>${project.version}</version>
       <type>ejb</type>
     </dependency>
 
     <!-- exclude engine from ear -->
     <dependency>
-      <groupId>com.camunda.fox.engine</groupId>
-      <artifactId>fox-engine</artifactId>
+      <groupId>org.camunda.bpm</groupId>
+      <artifactId>camunda-engine</artifactId>
       <scope>provided</scope>
     </dependency>      
   </dependencies>

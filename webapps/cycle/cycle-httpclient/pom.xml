@@ -2,14 +2,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <artifactId>cycle-root</artifactId>
-    <groupId>com.camunda.fox.cycle</groupId>
+    <artifactId>camunda-cycle-root</artifactId>
+    <groupId>org.camunda.bpm.cycle</groupId>
     <version>7.0.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>cycle-httpclient</artifactId>
+  <artifactId>camunda-cycle-httpclient</artifactId>
   <packaging>jar</packaging>
-  <name>fox cycle - httpclient</name>
+  <name>camunda BPM - cycle - httpclient</name>
   
   <dependencies>
     <dependency>

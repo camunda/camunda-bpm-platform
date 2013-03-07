@@ -5,6 +5,7 @@ import org.camunda.bpm.integrationtest.functional.ejb.remote.bean.BusinessInterf
 import org.camunda.bpm.integrationtest.functional.ejb.remote.bean.RemoteSLSBClientDelegateBean;
 import org.camunda.bpm.integrationtest.functional.ejb.remote.bean.RemoteSLSBean;
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
+import org.camunda.bpm.integrationtest.util.DeploymentHelper;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.junit.Arquillian;
@@ -42,6 +43,7 @@ public class RemoteSLSBInvocationTest extends AbstractFoxPlatformIntegrationTest
   @Deployment(order=1)
   public static WebArchive delegateDeployment() {    
     return ShrinkWrap.create(WebArchive.class, "service.war")
+      .addAsLibraries(DeploymentHelper.getEjbClient())
       .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
       .addClass(AbstractFoxPlatformIntegrationTest.class)
       .addClass(RemoteSLSBean.class) // the EJB 

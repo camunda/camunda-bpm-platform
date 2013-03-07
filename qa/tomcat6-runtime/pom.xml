@@ -1,22 +1,22 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>fox-platform-qa-tomcat6-runtime</artifactId>
+  <artifactId>camunda-qa-tomcat6-runtime</artifactId>
   <packaging>pom</packaging>
 
-  <name>fox platform EE - QA Tomcat 6 Test Runtime</name>  
+  <name>camunda BPM - QA Tomcat 6 Test Runtime</name>  
 
   <parent>
-    <groupId>com.camunda.fox.platform</groupId>
-    <artifactId>fox-platform-qa</artifactId>
+    <groupId>org.camunda.bpm.qa</groupId>
+    <artifactId>camunda-qa</artifactId>
     <version>7.0.0-SNAPSHOT</version>
   </parent>
 
   <dependencies>
     <dependency>
       <!-- make sure it comes after assembly in the build -->
-      <groupId>com.camunda.fox.platform</groupId>
-      <artifactId>fox-platform-tomcat6-assembly</artifactId>
+      <groupId>org.camunda.bpm.tomcat</groupId>
+      <artifactId>camunda-tomcat6-assembly</artifactId>
       <version>${project.version}</version>
       <type>pom</type>
     </dependency>   

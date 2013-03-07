@@ -55,18 +55,11 @@
         <include>**/jboss-*/standalone/tmp/auth</include>
       </includes>
       <directoryMode>0700</directoryMode>
-    </fileSet>
-    <fileSet>
-      <directory>../../sql-script/target</directory>
-      <outputDirectory />
-      <includes>
-        <include>sql/</include>
-      </includes>
-    </fileSet>    
+    </fileSet>   
   </fileSets>
 
   <dependencySets>
-   
+      
     <dependencySet>
       <outputDirectory />
       <unpack>true</unpack>
@@ -76,29 +69,40 @@
         </includes>
       </unpackOptions>
       <includes>
-        <include>com.camunda.fox.cycle:cycle-sql-scripts:jar:*</include>
+        <include>org.camunda.bpm.distro:camunda-sql-scripts:jar:*</include>
+      </includes>
+    </dependencySet>
+     
+    <dependencySet>
+      <outputDirectory />
+      <unpack>true</unpack>
+      <unpackOptions>
+        <includes>
+          <include>**/*.sql</include>
+        </includes>
+      </unpackOptions>
+      <includes>
+        <include>org.camunda.bpm.cycle:camunda-cycle-sql-scripts:jar:*</include>
       </includes>
     </dependencySet>
       
   	<dependencySet>
   		<includes>
-  			<include>com.camunda.fox.platform:fox-platform-h2-webapp:war:*</include>
+  			<include>org.camunda.bpm.distro:camunda-h2-webapp:war:*</include>
   		</includes>
   		<outputDirectory>server/jboss-as-${version.jboss.as}/standalone/deployments</outputDirectory>
   	</dependencySet>
     
   	<dependencySet>
-  		<outputFileNameMapping>fox-tasklist-${project.version}.${artifact.extension}</outputFileNameMapping>
   		<includes>
-  			<include>com.camunda.fox.tasklist:tasklist-webapp:war:*</include>
+  			<include>org.camunda.bpm.tasklist:camunda-tasklist:war:*</include>
   		</includes>
   		<outputDirectory>server/jboss-as-${version.jboss.as}/standalone/deployments</outputDirectory>
   	</dependencySet>
   
   	<dependencySet>
-  		<outputFileNameMapping>fox-cycle-${project.version}.${artifact.extension}</outputFileNameMapping>
   		<includes>
-  			<include>com.camunda.fox.cycle:cycle-jboss:war:*</include>
+  			<include>org.camunda.bpm.cycle:camunda-cycle-jboss:war:*</include>
   		</includes>
   		<outputDirectory>server/jboss-as-${version.jboss.as}/standalone/deployments</outputDirectory>
   	</dependencySet>

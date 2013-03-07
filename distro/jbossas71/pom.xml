@@ -2,16 +2,16 @@
   <modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<groupId>com.camunda.fox.platform</groupId>
-		<artifactId>fox-platform</artifactId>
+		<groupId>org.camunda.bpm</groupId>
+		<artifactId>camunda-root</artifactId>
 		<relativePath>../..</relativePath>
 		<version>7.0.0-SNAPSHOT</version>
 	</parent>
   
-  <artifactId>fox-platform-jboss</artifactId>
+  <artifactId>camunda-jboss</artifactId>
   <packaging>pom</packaging>
 
-  <name>fox platform EE - jBoss7</name>
+  <name>camunda BPM - jBoss7</name>
   
   <description>
     This pom defines the modules for the JBoss distribution which is shipped as Fox Platform Comunity Edition (CE)
@@ -23,4 +23,5 @@
     <module>modules</module>
     <module>subsystem</module>
   </modules>
+  <groupId>org.camunda.bpm.jboss</groupId>
 </project>

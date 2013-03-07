@@ -4,8 +4,8 @@
   <artifactId>jboss-process-application</artifactId>
 
   <parent>
-    <groupId>com.camunda.fox.platform</groupId>
-    <artifactId>fox-platform</artifactId>
+    <groupId>org.camunda.bpm.platform</groupId>
+    <artifactId>camunda</artifactId>
     <version>7.0.0-SNAPSHOT</version>
     <relativePath>../..</relativePath>
   </parent>
@@ -13,8 +13,8 @@
   <dependencies>
 
     <dependency>
-      <groupId>com.camunda.fox.engine</groupId>
-      <artifactId>fox-engine</artifactId>
+      <groupId>org.camunda.bpm.engine</groupId>
+      <artifactId>camunda-engine</artifactId>
       <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>

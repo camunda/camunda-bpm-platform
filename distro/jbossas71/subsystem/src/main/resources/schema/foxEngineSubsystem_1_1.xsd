@@ -1,6 +1,6 @@
 <xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
-  targetNamespace="urn:com.camunda.fox.fox-platform:1.1"
-  xmlns="urn:com.camunda.fox.fox-platform:1.1"
+  targetNamespace="urn:org.camunda.bpm.jboss:1.1"
+  xmlns="urn:org.camunda.bpm.jboss:1.1"
   elementFormDefault="qualified"
   attributeFormDefault="unqualified"
   version="1.0">

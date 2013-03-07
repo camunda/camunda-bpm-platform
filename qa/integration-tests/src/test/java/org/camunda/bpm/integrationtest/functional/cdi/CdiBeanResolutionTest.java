@@ -19,6 +19,7 @@ import org.camunda.bpm.engine.cdi.impl.util.BeanManagerLookup;
 import org.camunda.bpm.engine.cdi.impl.util.ProgrammaticBeanLookup;
 import org.camunda.bpm.integrationtest.functional.cdi.beans.ExampleBean;
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
+import org.camunda.bpm.integrationtest.util.DeploymentHelper;
 import org.camunda.bpm.integrationtest.util.TestContainer;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
@@ -58,7 +59,8 @@ public class CdiBeanResolutionTest extends AbstractFoxPlatformIntegrationTest {
             .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
             .addClass(ProgrammaticBeanLookup.class)
             .addClass(BeanManagerLookup.class)
-            .addClass(AbstractFoxPlatformIntegrationTest.class);
+            .addClass(AbstractFoxPlatformIntegrationTest.class)
+            .addAsLibraries(DeploymentHelper.getEjbClient());
     
     TestContainer.addContainerSpecificResources(deployment);
     

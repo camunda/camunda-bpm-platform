@@ -2,14 +2,14 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
   <parent>
-    <artifactId>cycle-root</artifactId>
-    <groupId>com.camunda.fox.cycle</groupId>
+    <artifactId>camunda-cycle-root</artifactId>
+    <groupId>org.camunda.bpm.cycle</groupId>
     <version>7.0.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>cycle</artifactId>
+  <artifactId>camunda-cycle</artifactId>
   <packaging>war</packaging>
-  <name>fox cycle - app</name>
+  <name>camunda BPM - cycle - app</name>
   
   <properties>
     <web.resources.override>src/main/runtime/default/webapp</web.resources.override>
@@ -224,8 +224,8 @@
     
     <!-- required for SignavioClient -->
     <dependency>
-      <groupId>com.camunda.fox.cycle</groupId>
-      <artifactId>cycle-httpclient</artifactId>
+      <groupId>org.camunda.bpm.cycle</groupId>
+      <artifactId>camunda-cycle-httpclient</artifactId>
       <version>${project.version}</version>
     </dependency>
     <dependency>
@@ -242,8 +242,8 @@
       <scope>test</scope>
     </dependency>
     <dependency>
-      <groupId>com.camunda.fox.engine</groupId>
-      <artifactId>fox-engine</artifactId>
+      <groupId>org.camunda.bpm</groupId>
+      <artifactId>camunda-engine</artifactId>
       <version>${project.version}</version>
       <scope>test</scope>
       <exclusions>
@@ -367,15 +367,49 @@
           </archive>
         </configuration>
       </plugin>
+      
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <excludes>
+            <!-- skip signavio connector test in default profile -->
+            <exclude>**/SignavioConnectorTest.java</exclude>
+          </excludes>
+        </configuration>
+      </plugin>
+         
     </plugins>
   </build>
-
+  
   <profiles>
+    
     <!-- enables signavio integration test -->
     <profile>
       <id>signavio</id>
       <build>
-        <plugins>
+        <plugins>          
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <excludes>
+                 <exclude>none</exclude>
+              </excludes>
+              <includes>
+                  <include>**/SignavioConnectorTest.java</include>
+              </includes>              
+            </configuration>
+            <executions>
+              <execution>
+                <id>test-signavio-connector</id>
+                <phase>test</phase>
+                <goals>
+                  <goal>test</goal>
+                </goals>                
+              </execution>
+            </executions>
+          </plugin>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-failsafe-plugin</artifactId>
@@ -782,7 +816,7 @@
         <properties.override>src/main/runtime/jboss/config/database.properties</properties.override>
       </properties>
       <build>
-        <plugins>
+        <plugins>         
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-war-plugin</artifactId>
@@ -802,4 +836,6 @@
       </build>
     </profile>   
   </profiles>
+  
+  
 </project>

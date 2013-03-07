@@ -14,6 +14,8 @@ package org.camunda.bpm.container.impl.jboss.metadata;
 
 import java.util.Map;
 
+import org.camunda.bpm.engine.ProcessEngineException;
+
 /**
  * @author Daniel Meyer
  *
@@ -141,6 +143,28 @@ public class ManagedProcessEngineMetadata {
       return null;
     } else {
       return (String) object;
+    }
+  }
+  
+  /**
+   * validates the configuration and throws {@link ProcessEngineException} 
+   * if the configuration is invalid.
+   */
+  public void validate() {
+    StringBuilder validationErrorBuilder = new StringBuilder("Process engine configuration is invalid: \n");
+    boolean isValid = true;    
+    
+    if(datasourceJndiName == null || datasourceJndiName.length() == 0) {
+      isValid = false;
+      validationErrorBuilder.append(" property 'datasource' cannot be null \n");      
+    }
+    if(engineName == null || engineName.isEmpty()) {
+      isValid = false;
+      validationErrorBuilder.append(" property 'engineName' cannot be null \n");
+    }
+    
+    if(!isValid) {
+      throw new ProcessEngineException(validationErrorBuilder.toString());
     }
   }
 }

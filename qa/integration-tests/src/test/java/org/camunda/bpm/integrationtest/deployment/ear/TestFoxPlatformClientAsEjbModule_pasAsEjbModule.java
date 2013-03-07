@@ -70,7 +70,7 @@ public class TestFoxPlatformClientAsEjbModule_pasAsEjbModule extends AbstractFox
       .addAsResource("org/camunda/bpm/integrationtest/deployment/ear/paAsEjbModule-process.bpmn20.xml")
       .addAsResource("org/camunda/bpm/integrationtest/deployment/ear/paAsEjbModule-pa.xml", "META-INF/processes.xml");
     
-    JavaArchive foxPlatformClientJar = DeploymentHelper.getFoxPlatformClient();   
+    JavaArchive foxPlatformClientJar = DeploymentHelper.getEjbClient();   
     
     WebArchive testJar = ShrinkWrap.create(WebArchive.class, "paAsEjbModule-test.war")
       .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")

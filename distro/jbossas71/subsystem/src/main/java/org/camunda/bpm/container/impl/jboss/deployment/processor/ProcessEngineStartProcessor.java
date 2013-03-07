@@ -70,6 +70,9 @@ public class ProcessEngineStartProcessor implements DeploymentUnitProcessor {
     // transform configuration
     ManagedProcessEngineMetadata configuration = transformConfiguration(processEngineXml);
     
+    // validate the configuration
+    configuration.validate();
+    
     // create service instance
     MscManagedProcessEngineController service = new MscManagedProcessEngineController(configuration);
     

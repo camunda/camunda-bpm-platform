@@ -1,22 +1,22 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <artifactId>fox-platform-qa-glassfish-runtime</artifactId>
+  <artifactId>camunda-qa-glassfish-runtime</artifactId>
   <packaging>pom</packaging>
 
-  <name>fox platform EE - QA Glassfish 3.1.x Test Runtime</name>
+  <name>camunda BPM - QA Glassfish 3.1.x Test Runtime</name>
   
   <parent>
-    <groupId>com.camunda.fox.platform</groupId>
-    <artifactId>fox-platform-qa</artifactId>
+    <groupId>org.camunda.bpm.qa</groupId>
+    <artifactId>camunda-qa</artifactId>
     <version>7.0.0-SNAPSHOT</version>
   </parent>
 
   <dependencies>
     <dependency>
       <!-- make sure it comes after assembly in the build -->
-      <groupId>com.camunda.fox.platform</groupId>
-      <artifactId>fox-platform-glassfish-assembly</artifactId>
+      <groupId>org.camunda.bpm.glassfish</groupId>
+      <artifactId>camunda-glassfish-assembly</artifactId>
       <version>${project.version}</version>
       <type>pom</type>
     </dependency>
@@ -92,7 +92,7 @@
                   <descriptors>
                     <descriptor>assembly.xml</descriptor>
                   </descriptors>
-                  <finalName>fox-platform-qa-glassfish-runtime-${project.version}</finalName>
+                  <finalName>camunda-qa-glassfish-runtime-${project.version}</finalName>
                   <appendAssemblyId>false</appendAssemblyId>
                   <outputDirectory>target/</outputDirectory>
                   <workDirectory>target/assembly/work</workDirectory>

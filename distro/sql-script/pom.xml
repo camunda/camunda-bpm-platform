@@ -2,16 +2,17 @@
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
-    <groupId>com.camunda.fox.platform</groupId>
-    <artifactId>fox-platform</artifactId>
+    <groupId>org.camunda.bpm</groupId>
+    <artifactId>camunda-root</artifactId>
     <relativePath>../..</relativePath>
     <version>7.0.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>fox-platform-sql-script</artifactId>
+  <groupId>org.camunda.bpm.distro</groupId>
+  <artifactId>camunda-sql-scripts</artifactId>
   <packaging>jar</packaging>
 
-  <name>fox platform EE - SQL script</name>
+  <name>camunda BPM - SQL script</name>
   
   <build>
   <resources>
@@ -52,12 +53,12 @@
             <configuration>
               <artifactItems>
                 <artifactItem>
-        				  <groupId>com.camunda.fox.engine</groupId>
-        				  <artifactId>fox-engine</artifactId>
+        	      <groupId>org.camunda.bpm</groupId>
+        		  <artifactId>camunda-engine</artifactId>
                   <version>${project.version}</version>
                   <type>jar</type>
                   <overWrite>true</overWrite>
-                  <outputDirectory>target/fox-engine-${project.version}</outputDirectory>
+                  <outputDirectory>target/camunda-engine-${project.version}</outputDirectory>
                 </artifactItem>
               </artifactItems>
               <includes>**/create/*.sql, **/drop/*.sql</includes>
@@ -83,31 +84,31 @@
                 <mkdir dir="target/sql/create" />
                 
                 <concat destfile="target/sql/create/db2_engine_${project.version}.sql" fixlastline="yes">
-                	<filelist dir="target/fox-engine-${project.version}/org/activiti/db/create" files="activiti.db2.create.engine.sql activiti.db2.create.history.sql" />
+                	<filelist dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/create" files="activiti.db2.create.engine.sql activiti.db2.create.history.sql" />
                 </concat>
 
                 <concat destfile="target/sql/create/h2_engine_${project.version}.sql" fixlastline="yes">
-                	<filelist dir="target/fox-engine-${project.version}/org/activiti/db/create" files="activiti.h2.create.engine.sql activiti.h2.create.history.sql" />
+                	<filelist dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/create" files="activiti.h2.create.engine.sql activiti.h2.create.history.sql" />
                 </concat>
 
                 <concat destfile="target/sql/create/mssql_engine_${project.version}.sql" fixlastline="yes">
-                	<filelist dir="target/fox-engine-${project.version}/org/activiti/db/create" files="activiti.mssql.create.engine.sql activiti.mssql.create.history.sql" />
+                	<filelist dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/create" files="activiti.mssql.create.engine.sql activiti.mssql.create.history.sql" />
                 </concat>
 
                 <concat destfile="target/sql/create/mysql_engine_${project.version}.sql" fixlastline="yes">
-                	<filelist dir="target/fox-engine-${project.version}/org/activiti/db/create" files="activiti.mysql.create.engine.sql activiti.mysql.create.history.sql" />
+                	<filelist dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/create" files="activiti.mysql.create.engine.sql activiti.mysql.create.history.sql" />
                 </concat>
 
                 <concat destfile="target/sql/create/oracle_engine_${project.version}.sql" fixlastline="yes">
-                	<filelist dir="target/fox-engine-${project.version}/org/activiti/db/create" files="activiti.oracle.create.engine.sql activiti.oracle.create.history.sql" />
+                	<filelist dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/create" files="activiti.oracle.create.engine.sql activiti.oracle.create.history.sql" />
                 </concat>
                 
                 <concat destfile="target/sql/create/postgres_engine_${project.version}.sql" fixlastline="yes">
-                	<filelist dir="target/fox-engine-${project.version}/org/activiti/db/create" files="activiti.postgres.create.engine.sql activiti.postgres.create.history.sql" />
+                	<filelist dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/create" files="activiti.postgres.create.engine.sql activiti.postgres.create.history.sql" />
                 </concat>
                 
                 <copy todir="target/sql/create" flatten="false">
-                  <fileset dir="target/fox-engine-${project.version}/org/activiti/db/create" />
+                  <fileset dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/create" />
                   <mapper>
                     <chainedmapper>
                       <regexpmapper from="^(activiti.)([A-Za-z0-9]*)(.create.identity.sql)" to="\2_identity_${project.version}.sql" handledirsep="yes" />
@@ -120,31 +121,31 @@
                 <mkdir dir="target/sql/drop" />
                 
                 <concat destfile="target/sql/drop/db2_engine_${project.version}.sql" fixlastline="yes">
-                	<filelist dir="target/fox-engine-${project.version}/org/activiti/db/drop" files="activiti.db2.drop.engine.sql activiti.db2.drop.history.sql" />
+                	<filelist dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/drop" files="activiti.db2.drop.engine.sql activiti.db2.drop.history.sql" />
                 </concat>
 
                 <concat destfile="target/sql/drop/h2_engine_${project.version}.sql" fixlastline="yes">
-                	<filelist dir="target/fox-engine-${project.version}/org/activiti/db/drop" files="activiti.h2.drop.engine.sql activiti.h2.drop.history.sql" />
+                	<filelist dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/drop" files="activiti.h2.drop.engine.sql activiti.h2.drop.history.sql" />
                 </concat>
 
                 <concat destfile="target/sql/drop/mssql_engine_${project.version}.sql" fixlastline="yes">
-                	<filelist dir="target/fox-engine-${project.version}/org/activiti/db/drop" files="activiti.mssql.drop.engine.sql activiti.mssql.drop.history.sql" />
+                	<filelist dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/drop" files="activiti.mssql.drop.engine.sql activiti.mssql.drop.history.sql" />
                 </concat>
 
                 <concat destfile="target/sql/drop/mysql_engine_${project.version}.sql" fixlastline="yes">
-                	<filelist dir="target/fox-engine-${project.version}/org/activiti/db/drop" files="activiti.mysql.drop.engine.sql activiti.mysql.drop.history.sql" />
+                	<filelist dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/drop" files="activiti.mysql.drop.engine.sql activiti.mysql.drop.history.sql" />
                 </concat>
 
                 <concat destfile="target/sql/drop/oracle_engine_${project.version}.sql" fixlastline="yes">
-                	<filelist dir="target/fox-engine-${project.version}/org/activiti/db/drop" files="activiti.oracle.drop.engine.sql activiti.oracle.drop.history.sql" />
+                	<filelist dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/drop" files="activiti.oracle.drop.engine.sql activiti.oracle.drop.history.sql" />
                 </concat>
                 
                 <concat destfile="target/sql/drop/postgres_engine_${project.version}.sql" fixlastline="yes">
-                	<filelist dir="target/fox-engine-${project.version}/org/activiti/db/drop" files="activiti.postgres.drop.engine.sql activiti.postgres.drop.history.sql" />
+                	<filelist dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/drop" files="activiti.postgres.drop.engine.sql activiti.postgres.drop.history.sql" />
                 </concat>
                 
                 <copy todir="target/sql/drop" flatten="false">
-                  <fileset dir="target/fox-engine-${project.version}/org/activiti/db/drop" />
+                  <fileset dir="target/camunda-engine-${project.version}/org/camunda/bpm/engine/db/drop" />
                   <mapper>
                     <chainedmapper>
                       <regexpmapper from="^(activiti.)([A-Za-z0-9]*)(.drop.identity.sql)" to="\2_identity_${project.version}.sql" handledirsep="yes" />
@@ -165,5 +166,6 @@
       </plugin>
     </plugins>  
   </build>
+
 
 </project>

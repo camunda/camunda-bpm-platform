@@ -6,7 +6,7 @@ DTD GlassFish Application Server 3.1 EJB 3.1//EN"
     <ejb>
       <ejb-name>JobExecutionHandlerMDB</ejb-name>
       <mdb-resource-adapter>
-        <resource-adapter-mid>fox-platform-jobexecutor-rar</resource-adapter-mid>
+        <resource-adapter-mid>camunda-jobexecutor-rar</resource-adapter-mid>
       </mdb-resource-adapter>
     </ejb>
   </enterprise-beans>

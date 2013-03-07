@@ -24,19 +24,21 @@ import org.jboss.shrinkwrap.resolver.api.maven.MavenDependencyResolver;
 
 public class DeploymentHelper {
   
+  public static final String CAMUNDA_EJB_CLIENT = "org.camunda.bpm.javaee:camunda-ejb-client";
+
   private static MavenDependencyResolver resolver = DependencyResolvers.use(MavenDependencyResolver.class).goOffline().loadMetadataFromPom("pom.xml");
   
   private static JavaArchive CACHED_CLIENT_ASSET;
   private static Collection<JavaArchive> CACHED_WELD_ASSETS;
 
-  public static JavaArchive getFoxPlatformClient() {
+  public static JavaArchive getEjbClient() {
     if(CACHED_CLIENT_ASSET != null) {
       return CACHED_CLIENT_ASSET;
     } else {
-      Collection<JavaArchive> resolvedArchives = resolver.artifact("com.camunda.fox.platform:fox-platform-client").resolveAs(JavaArchive.class);
+      Collection<JavaArchive> resolvedArchives = resolver.artifact(CAMUNDA_EJB_CLIENT).resolveAs(JavaArchive.class);
       
       if(resolvedArchives.size() != 1) {
-        throw new RuntimeException("could not resolve com.camunda.fox.platform:fox-platform-client");
+        throw new RuntimeException("could not resolve "+CAMUNDA_EJB_CLIENT);
       } else {    
         CACHED_CLIENT_ASSET = resolvedArchives.iterator().next();
         return CACHED_CLIENT_ASSET;

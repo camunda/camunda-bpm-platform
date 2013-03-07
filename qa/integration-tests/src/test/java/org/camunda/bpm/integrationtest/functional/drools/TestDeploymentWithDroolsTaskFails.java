@@ -32,7 +32,7 @@ public class TestDeploymentWithDroolsTaskFails {
     
     return  ShrinkWrap.create(WebArchive.class, "test.war")
       .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
-      .addAsLibraries(DeploymentHelper.getFoxPlatformClient())
+      .addAsLibraries(DeploymentHelper.getEjbClient())
       .addAsResource("META-INF/processes.xml", "META-INF/processes.xml")
       .addAsResource("org/camunda/bpm/integrationtest/functional/drools/TestDeploymentWithDroolsTaskFails.testDeployDroolsFails.bpmn20.xml");           
   }

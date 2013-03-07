@@ -8,7 +8,7 @@
 		</security>
 	</datasource>
 	<xa-datasource jndi-name="java:jboss/datasources/FoxEngineDS" enabled="true" use-ccm="true" pool-name="FoxEngineDS">
-		<xa-datasource-property name="URL">jdbc:h2:./fox-h2-dbs/fox-engine;DB_CLOSE_DELAY=-1;MVCC=TRUE;DB_CLOSE_ON_EXIT=FALSE</xa-datasource-property>
+		<xa-datasource-property name="URL">jdbc:h2:./fox-h2-dbs/camunda-engine;DB_CLOSE_DELAY=-1;MVCC=TRUE;DB_CLOSE_ON_EXIT=FALSE</xa-datasource-property>
 		<driver>h2</driver>
 		<xa-datasource-property name="User">sa</xa-datasource-property>
 		<xa-datasource-property name="password">sa</xa-datasource-property>                   

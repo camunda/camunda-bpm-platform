@@ -1,11 +1,11 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>com.camunda.fox.platform</groupId>
-  <artifactId>fox-platform</artifactId>
+  <groupId>org.camunda.bpm</groupId>
+  <artifactId>camunda-root</artifactId>
   <version>7.0.0-SNAPSHOT</version>
   <packaging>pom</packaging>
-  <name>fox platform EE - Root Pom</name>
+  <name>camunda BPM - Root Pom</name>
 
   <description>
     This pom defines the modules that make up the build. 
@@ -80,12 +80,12 @@
   	<module>javaee/jobexecutor-rar</module>
   	<module>javaee/jobexecutor-ejb-service</module>
   	  
-  	<module>activiti-engine</module>
-  	<module>activiti-cdi</module>
-  	<module>activiti-osgi</module>
-  	<module>activiti-spring</module>
+  	<module>engine</module>
+  	<module>engine-cdi</module>
+  	<module>engine-osgi</module>
+  	<module>engine-spring</module>
   		
-	<module>camunda-engine-rest</module>
+	  <module>engine-rest</module>
 
     <module>distro/jbossas71</module>
     <module>distro/gf31</module>
@@ -437,19 +437,19 @@
 	  </dependency>
 	     
       <dependency>
-        <groupId>com.camunda.fox.platform</groupId>
-        <artifactId>fox-platform-client</artifactId>
+        <groupId>org.camunda.bpm.javaee</groupId>
+        <artifactId>camunda-ejb-client</artifactId>
         <version>${project.version}</version>
       </dependency>
 
       <dependency>
-        <groupId>com.camunda.fox.engine</groupId>
-        <artifactId>fox-engine</artifactId>
+        <groupId>org.camunda.bpm</groupId>
+        <artifactId>camunda-engine</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
-        <groupId>com.camunda.fox.engine</groupId>
-        <artifactId>fox-engine-cdi</artifactId>
+        <groupId>org.camunda.bpm</groupId>
+        <artifactId>camunda-engine-cdi</artifactId>
         <version>${project.version}</version>
       </dependency>     
       <dependency>
@@ -625,8 +625,8 @@
   </build>
   
   <scm>
-    <connection>scm:git:git@bitbucket.org:camunda/fox-platform-ee.git</connection>
-    <developerConnection>scm:git:git@bitbucket.org:camunda/fox-platform-ee.git</developerConnection>
+    <connection>scm:git:git@bitbucket.org:camunda/camunda-ee.git</connection>
+    <developerConnection>scm:git:git@bitbucket.org:camunda/camunda-ee.git</developerConnection>
   </scm>
 
   <distributionManagement>

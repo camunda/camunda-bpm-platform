@@ -8,19 +8,19 @@
     </application>
   </system-applications>
   <applications>
-    <application location="${com.sun.aas.instanceRootURI}/applications/fox-platform-jobexecutor-rar/" name="fox-platform-jobexecutor-rar" object-type="user">
-      <module name="fox-platform-jobexecutor-rar">
+    <application location="${com.sun.aas.instanceRootURI}/applications/camunda-jobexecutor-rar/" name="camunda-jobexecutor-rar" object-type="user">
+      <module name="camunda-jobexecutor-rar">
         <engine sniffer="connector"></engine>
       </module>
     </application>
-    <application location="${com.sun.aas.instanceRootURI}/applications/camunda-fox-platform/" name="camunda-fox-platform" object-type="user">
+    <application location="${com.sun.aas.instanceRootURI}/applications/camunda-camunda/" name="camunda-camunda" object-type="user">
       <property name="isComposite" value="true"></property>
       <engine sniffer="ear"></engine>
-      <module name="fox-platform-glassfish-service-${project.version}.jar">
+      <module name="camunda-glassfish-service-${project.version}.jar">
         <engine sniffer="ejb"></engine>
         <engine sniffer="security"></engine>
       </module>
-      <module name="fox-platform-jobexecutor-service-${project.version}.jar">
+      <module name="camunda-jobexecutor-service-${project.version}.jar">
         <engine sniffer="ejb"></engine>
         <engine sniffer="security"></engine>
       </module>
@@ -49,7 +49,7 @@
           res-type="javax.sql.DataSource" non-transactional-connections="true" 
           name="FoxEnginePool">
         <property name="Url" value="jdbc:h2:mem:foxEngine;DB_CLOSE_DELAY=-1;MVCC=TRUE;DB_CLOSE_ON_EXIT=FALSE"></property>
-<!--        <property name="Url" value="jdbc:h2:mem:fox-engine"></property> -->
+<!--        <property name="Url" value="jdbc:h2:mem:camunda-engine"></property> -->
         <property name="User" value="sa"></property>
           <property name="Password" value="sa"></property>
 <!--          <property name="connectionAttributes" value=";create=true"></property> -->
@@ -65,14 +65,14 @@
     </jdbc-connection-pool>
     <resource-adapter-config
       enabled="true" 
-      resource-adapter-name="fox-platform-jobexecutor-rar"
+      resource-adapter-name="camunda-jobexecutor-rar"
       thread-pool-ids="platform-jobexecutor-tp" >
     </resource-adapter-config>
     <connector-connection-pool
         enabled="true" 
         name="platformJobExecutorPool" 
-        resource-adapter-name="fox-platform-jobexecutor-rar" 
-        connection-definition-name="com.camunda.fox.platform.jobexecutor.impl.ra.outbound.PlatformJobExecutorConnectionFactory" 
+        resource-adapter-name="camunda-jobexecutor-rar" 
+        connection-definition-name="org.camunda.bpm.platform.jobexecutor.impl.ra.outbound.PlatformJobExecutorConnectionFactory" 
         transaction-support="NoTransaction" />
     <connector-resource
         enabled="true" 
@@ -82,8 +82,8 @@
   <servers>
     <server name="server" config-ref="server-config">
       <application-ref ref="__admingui" virtual-servers="__asadmin"></application-ref>
-      <application-ref ref="fox-platform-jobexecutor-rar" virtual-servers="server"></application-ref>
-      <application-ref ref="camunda-fox-platform" virtual-servers="server"></application-ref>
+      <application-ref ref="camunda-jobexecutor-rar" virtual-servers="server"></application-ref>
+      <application-ref ref="camunda-camunda" virtual-servers="server"></application-ref>
       <resource-ref ref="jdbc/__TimerPool"></resource-ref>
       <resource-ref ref="jdbc/__default"></resource-ref>
       <resource-ref ref="jdbc/FoxEngine"></resource-ref>

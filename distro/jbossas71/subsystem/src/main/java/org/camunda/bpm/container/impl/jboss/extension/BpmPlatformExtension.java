@@ -68,8 +68,7 @@ public class BpmPlatformExtension implements Extension {
   }
 
   public void initializeParsers(ExtensionParsingContext context) {
-    context.setSubsystemXmlMapping(ModelConstants.SUBSYSTEM_NAME, Namespace.FOX_PLATFORM_1_0.getUriString(), parser);
-    context.setSubsystemXmlMapping(ModelConstants.SUBSYSTEM_NAME, Namespace.FOX_PLATFORM_1_1.getUriString(), parser);
+    context.setSubsystemXmlMapping(ModelConstants.SUBSYSTEM_NAME, Namespace.CAMUNDA_BPM_PLATFORM_1_1.getUriString(), parser);
   }
 
   public static ServiceName getPlatformServiceType() {

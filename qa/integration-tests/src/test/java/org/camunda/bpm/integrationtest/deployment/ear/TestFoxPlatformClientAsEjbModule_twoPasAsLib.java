@@ -76,7 +76,7 @@ public class TestFoxPlatformClientAsEjbModule_twoPasAsLib extends AbstractFoxPla
       .addAsResource("org/camunda/bpm/integrationtest/deployment/ear/process2.bpmn20.xml")
       .addAsResource("org/camunda/bpm/integrationtest/deployment/ear/pa2.xml", "META-INF/processes.xml");
     
-    JavaArchive foxPlatformClientJar = DeploymentHelper.getFoxPlatformClient();
+    JavaArchive foxPlatformClientJar = DeploymentHelper.getEjbClient();
     
     WebArchive testJar = ShrinkWrap.create(WebArchive.class, "client-test.war")
       .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")

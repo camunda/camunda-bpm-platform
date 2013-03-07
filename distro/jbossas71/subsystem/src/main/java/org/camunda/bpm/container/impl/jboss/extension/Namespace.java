@@ -29,14 +29,13 @@ public enum Namespace {
    */
   UNKNOWN((String) null),
   
-  FOX_PLATFORM_1_0("urn:com.camunda.fox.fox-platform:1.0"),
-  FOX_PLATFORM_1_1("urn:com.camunda.fox.fox-platform:1.1");
+  CAMUNDA_BPM_PLATFORM_1_1("urn:org.camunda.bpm.jboss:1.1");
   
   /**
    * The current namespace version.
    */
   
-  public static final Namespace CURRENT = FOX_PLATFORM_1_1;
+  public static final Namespace CURRENT = CAMUNDA_BPM_PLATFORM_1_1;
   
   private final String name;
 

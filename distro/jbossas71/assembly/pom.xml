@@ -6,16 +6,16 @@
     The assembly is installed to maven later in the reactor, if the integration tests pass successfully
   </description>
 
-  <artifactId>fox-platform-jboss-assembly</artifactId>
+  <artifactId>camunda-jboss-assembly</artifactId>
   <packaging>pom</packaging>
 
   <parent>
-    <groupId>com.camunda.fox.platform</groupId>
-    <artifactId>fox-platform-jboss</artifactId>
+    <groupId>org.camunda.bpm.jboss</groupId>
+    <artifactId>camunda-jboss</artifactId>
     <version>7.0.0-SNAPSHOT</version>
   </parent>
 
-  <name>fox platform EE - jBoss7 Assembly</name>
+  <name>camunda BPM - jBoss7 Assembly</name>
 
   <dependencies>
     <dependency>
@@ -32,15 +32,15 @@
     </dependency>
 
     <dependency>
-      <groupId>com.camunda.fox.platform</groupId>
-      <artifactId>fox-platform-client</artifactId>
+      <groupId>org.camunda.bpm.javaee</groupId>
+      <artifactId>camunda-ejb-client</artifactId>
     </dependency>
 
     <dependency>
-      <!-- this dependency is to make sure that we are executed after fox-platform-modules 
+      <!-- this dependency is to make sure that we are executed after camunda-modules 
         in the reactor -->
-      <groupId>com.camunda.fox.platform</groupId>
-      <artifactId>fox-platform-jboss-modules</artifactId>
+      <groupId>org.camunda.bpm.jboss</groupId>
+      <artifactId>camunda-jboss-modules</artifactId>
       <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>

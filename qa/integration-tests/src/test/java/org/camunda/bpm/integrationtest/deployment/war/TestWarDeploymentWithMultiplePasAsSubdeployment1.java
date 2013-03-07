@@ -111,7 +111,7 @@ public class TestWarDeploymentWithMultiplePasAsSubdeployment1 extends AbstractFo
     
     WebArchive deployment = ShrinkWrap.create(WebArchive.class, "test.war")
             .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
-            .addAsLibraries(DeploymentHelper.getFoxPlatformClient())
+            .addAsLibraries(DeploymentHelper.getEjbClient())
             
             .addAsLibraries(pa2)
             .addAsLibraries(pa3)
