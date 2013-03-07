@@ -18,6 +18,7 @@ import java.util.Set;
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
 
+import org.camunda.bpm.engine.rest.impl.EngineServiceImpl;
 import org.camunda.bpm.engine.rest.impl.ProcessDefinitionServiceImpl;
 import org.camunda.bpm.engine.rest.impl.ProcessInstanceServiceImpl;
 import org.camunda.bpm.engine.rest.impl.TaskRestServiceImpl;
@@ -41,6 +42,7 @@ public class DefaultApplication extends Application {
   @Override
   public Set<Class<?>> getClasses() {
     Set<Class<?>> classes = new HashSet<Class<?>>();
+    classes.add(EngineServiceImpl.class);
     classes.add(ProcessDefinitionServiceImpl.class);
     classes.add(ProcessInstanceServiceImpl.class);
     classes.add(TaskRestServiceImpl.class);
