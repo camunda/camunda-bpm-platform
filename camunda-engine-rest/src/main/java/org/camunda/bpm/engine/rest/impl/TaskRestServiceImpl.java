@@ -107,6 +107,10 @@ public class TaskRestServiceImpl extends AbstractEngineService implements TaskRe
 
   @Override
   public GroupInfoDto getGroupInfo(String userId) {
+    if (userId == null) {
+      throw new WebApplicationException(Status.BAD_REQUEST.getStatusCode());
+    }
+    
     TaskService taskService = processEngine.getTaskService();
     IdentityService identityService = processEngine.getIdentityService();
 
