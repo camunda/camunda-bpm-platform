@@ -553,8 +553,13 @@ public class TaskRestServiceQueryTest extends AbstractTaskRestServiceTest {
         .body("groups[0].id", equalTo(EXAMPLE_GROUP_ID))
         .body("groups[0].name", equalTo(EXAMPLE_GROUP_NAME))
         .when().get(TASK_GROUPS_URL);
-
-    // TODO check groups result
+  }
+  
+  @Test
+  public void testGroupInfoQueryWithMissingUserParameter() throws IOException {
+    setUpMockedQuery();
+    expect().statusCode(Status.BAD_REQUEST.getStatusCode())
+    .when().get(TASK_GROUPS_URL);
   }
   
 }

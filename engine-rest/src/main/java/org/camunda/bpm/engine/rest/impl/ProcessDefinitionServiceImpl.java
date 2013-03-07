@@ -184,8 +184,13 @@ public class ProcessDefinitionServiceImpl extends AbstractEngineService implemen
   @Override
   public FormDto getStartForm(@PathParam("id") String processDefinitionId) {
     final FormService formService = processEngine.getFormService();
-
-    final StartFormData formData = formService.getStartFormData(processDefinitionId);
+    
+    final StartFormData formData;
+    try {
+      formData = formService.getStartFormData(processDefinitionId);
+    } catch (ProcessEngineException e) {
+      throw new WebApplicationException(Status.BAD_REQUEST.getStatusCode());
+    }
 
     return FormDto.fromFormData(formData);
   }

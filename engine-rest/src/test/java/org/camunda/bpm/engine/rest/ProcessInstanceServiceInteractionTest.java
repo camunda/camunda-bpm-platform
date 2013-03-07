@@ -15,7 +15,10 @@ import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.rest.helper.ExampleVariableObject;
 import org.junit.Test;
+
+import com.jayway.restassured.response.Response;
 
 public class ProcessInstanceServiceInteractionTest extends AbstractRestServiceTest {
   
@@ -62,6 +65,26 @@ public class ProcessInstanceServiceInteractionTest extends AbstractRestServiceTe
     
     given().pathParam("id", "aNonExistingProcessInstanceId")
       .then().expect().statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
+      .when().get(PROCESS_INSTANCE_VARIABLES_URL);
+  }
+  
+  @Test
+  public void testJavaObjectVariableSerialization() throws IOException {
+    ExampleVariableObject variableValue = new ExampleVariableObject();
+    variableValue.setProperty1("aPropertyValue");
+    variableValue.setProperty2(true);
+    
+    EXAMPLE_VARIABLES.put(EXAMPLE_VARIABLE_KEY, variableValue);
+    
+    setupMocks();
+    
+    given().pathParam("id", EXAMPLE_PROCESS_INSTANCE_ID)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .body("variables.size()", is(1))
+      .body("variables[0].name", equalTo(EXAMPLE_VARIABLE_KEY))
+      .body("variables[0].value.property1", equalTo("aPropertyValue"))
+      .body("variables[0].value.property2", equalTo(true))
+      .body("variables[0].type", equalTo(ExampleVariableObject.class.getSimpleName()))
       .when().get(PROCESS_INSTANCE_VARIABLES_URL);
   }
 
