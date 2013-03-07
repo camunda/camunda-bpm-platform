@@ -3,9 +3,14 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.camunda.bpm.cycle</groupId>
   <artifactId>camunda-cycle-root</artifactId>
-  <version>7.0.0-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>camunda BPM - cycle - root</name>
+  
+  <parent>
+    <groupId>org.camunda.bpm</groupId>
+    <artifactId>camunda-root</artifactId>
+    <version>7.0.0-SNAPSHOT</version>
+  </parent>
   
   <properties>
     <!-- versions -->
@@ -17,8 +22,6 @@
     <version.saxon>9.1.0.8</version.saxon>
     <version.wro4j>1.4.8.1</version.wro4j>
     <version.cglib>2.2.2</version.cglib>
-    <version.bouncycastle>1.47</version.bouncycastle>
-
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
   
@@ -130,42 +133,8 @@
         <groupId>org.glassfish</groupId>
         <artifactId>javax.annotation</artifactId>
         <version>3.1</version>
-      </dependency>
-      
-      <dependency>
-        <groupId>javax.mail</groupId>
-        <artifactId>mail</artifactId>
-        <version>1.4.5</version>
-      </dependency>
-      
-      <dependency>
-        <groupId>org.bouncycastle</groupId>
-        <artifactId>bcpg-jdk15on</artifactId>
-        <version>${version.bouncycastle}</version>
-      </dependency>
+      </dependency>      
     </dependencies>
   </dependencyManagement>
-  
-  <build>
-    <pluginManagement>
-      <plugins>
-        <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <source>1.6</source>
-          <target>1.6</target>
-        </configuration>
-      </plugin>
-      </plugins>
-    </pluginManagement>
-  </build>
-  
-  <repositories>
-    <repository>
-      <id>camunda-bpm-nexus</id>
-      <name>camunda-bpm-nexus</name>
-      <url>https://app.camunda.com/nexus/content/groups/public</url>
-    </repository>
-  </repositories>
+   
 </project>
