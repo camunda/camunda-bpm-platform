@@ -18,9 +18,9 @@ import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
+import org.camunda.bpm.cycle.util.IoUtil;
+import org.camunda.bpm.cycle.web.dto.UserDTO;
 
-import com.camunda.fox.cycle.util.IoUtil;
-import com.camunda.fox.cycle.web.dto.UserDTO;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.config.ClientConfig;

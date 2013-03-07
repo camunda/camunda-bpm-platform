@@ -54,19 +54,19 @@
   -->
   <filter>
     <filter-name>SecurityFilter</filter-name>
-    <filter-class>com.camunda.fox.security.web.SecurityFilter</filter-class>
+    <filter-class>org.camunda.bpm.security.web.SecurityFilter</filter-class>
   </filter>
   <filter>
     <filter-name>InitialConfigurationFilter</filter-name>
-    <filter-class>com.camunda.fox.cycle.web.filter.InitialConfigurationFilter</filter-class>
+    <filter-class>org.camunda.bpm.cycle.web.filter.InitialConfigurationFilter</filter-class>
   </filter>
   <filter>
     <filter-name>SlashUriFilter</filter-name>
-    <filter-class>com.camunda.fox.cycle.web.filter.SlashUriFilter</filter-class>
+    <filter-class>org.camunda.bpm.cycle.web.filter.SlashUriFilter</filter-class>
   </filter>
   <filter>
     <filter-name>IdentityHolderFilter</filter-name>
-    <filter-class>com.camunda.fox.cycle.web.filter.IdentityHolderFilter</filter-class>
+    <filter-class>org.camunda.bpm.cycle.web.filter.IdentityHolderFilter</filter-class>
   </filter>
   <filter-mapping>
     <filter-name>InitialConfigurationFilter</filter-name>

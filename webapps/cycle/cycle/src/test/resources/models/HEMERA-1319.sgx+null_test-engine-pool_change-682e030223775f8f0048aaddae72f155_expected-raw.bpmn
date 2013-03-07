@@ -21,7 +21,7 @@
          <incoming>SequenceFlow_2</incoming>
          <outgoing>sequenceFlow_42</outgoing>
       </userTask>
-      <serviceTask activiti:class="com.camunda.fox.demo.pdf.SavePdfDelegate" completionQuantity="1" id="Task_abc" isForCompensation="false" name="Task_abc" startQuantity="1">
+      <serviceTask activiti:class="org.camunda.bpm.demo.pdf.SavePdfDelegate" completionQuantity="1" id="Task_abc" isForCompensation="false" name="Task_abc" startQuantity="1">
          <incoming>sequenceFlow_42</incoming>
          <outgoing>SequenceFlow_5</outgoing>
       </serviceTask>

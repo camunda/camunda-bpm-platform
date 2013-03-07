@@ -14,14 +14,14 @@
 
   <context:annotation-config />
 
-  <bean name="signavioConnector" class="com.camunda.fox.cycle.connector.signavio.SignavioConnector">
+  <bean name="signavioConnector" class="org.camunda.bpm.cycle.connector.signavio.SignavioConnector">
     <property name="configuration" ref="signavioConfig" />
   </bean>
 
-  <bean name="signavioConfig" class="com.camunda.fox.cycle.entity.ConnectorConfiguration">
+  <bean name="signavioConfig" class="org.camunda.bpm.cycle.entity.ConnectorConfiguration">
     <property name="id" value="2" />
     <property name="name" value="My SignavioConnector" />
-    <property name="connectorClass" value="com.camunda.fox.cycle.connector.signavio.SignavioConnector" />
+    <property name="connectorClass" value="org.camunda.bpm.cycle.connector.signavio.SignavioConnector" />
     <property name="loginMode" value="GLOBAL" />
     <property name="globalUser" value="${test.signavioConnector.globalUser}" />
     <property name="globalPassword" value="${test.signavioConnector.globalPassword}" />
@@ -32,10 +32,10 @@
     </property>
   </bean>
 
-  <bean name="signavioConfigProxy" class="com.camunda.fox.cycle.entity.ConnectorConfiguration">
+  <bean name="signavioConfigProxy" class="org.camunda.bpm.cycle.entity.ConnectorConfiguration">
     <property name="id" value="3" />
     <property name="name" value="My SignavioConnector with Proxy" />
-    <property name="connectorClass" value="com.camunda.fox.cycle.connector.signavio.SignavioConnector" />
+    <property name="connectorClass" value="org.camunda.bpm.cycle.connector.signavio.SignavioConnector" />
     <property name="loginMode" value="GLOBAL" />
     <property name="globalUser" value="${test.signavioConnector.globalUser}" />
     <property name="globalPassword" value="${test.signavioConnector.globalPassword}" />
@@ -60,7 +60,7 @@
     <property name="jobExecutorActivate" value="false" />
   </bean>
   
-  <bean id="cycleConfiguration" class="com.camunda.fox.cycle.configuration.CycleConfiguration">
+  <bean id="cycleConfiguration" class="org.camunda.bpm.cycle.configuration.CycleConfiguration">
 
     <property name="defaultCommitMessage" value="Changed using camunda fox cycle" />
     

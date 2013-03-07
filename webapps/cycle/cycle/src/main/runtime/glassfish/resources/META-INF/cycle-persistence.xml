@@ -3,12 +3,12 @@
   <persistence-unit name="cyclePU" transaction-type="JTA">
     <provider>org.hibernate.ejb.HibernatePersistence</provider>
     <jta-data-source>jdbc/CycleDS</jta-data-source>
-    <class>com.camunda.fox.cycle.entity.AbstractEntity</class>
-    <class>com.camunda.fox.cycle.entity.BpmnDiagram</class>
-    <class>com.camunda.fox.cycle.entity.ConnectorConfiguration</class>
-    <class>com.camunda.fox.cycle.entity.ConnectorCredentials</class>
-    <class>com.camunda.fox.cycle.entity.Roundtrip</class>
-    <class>com.camunda.fox.cycle.entity.User</class>
+    <class>org.camunda.bpm.cycle.entity.AbstractEntity</class>
+    <class>org.camunda.bpm.cycle.entity.BpmnDiagram</class>
+    <class>org.camunda.bpm.cycle.entity.ConnectorConfiguration</class>
+    <class>org.camunda.bpm.cycle.entity.ConnectorCredentials</class>
+    <class>org.camunda.bpm.cycle.entity.Roundtrip</class>
+    <class>org.camunda.bpm.cycle.entity.User</class>
     <properties>
       <property name="hibernate.hbm2ddl.auto" value="update" />
       <property name="hibernate.show_sql" value="false" />

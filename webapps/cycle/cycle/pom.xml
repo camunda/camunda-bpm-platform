@@ -327,14 +327,14 @@
             <configuration>
               <classifier>core</classifier>
               <includes>
-                <include>**/com/camunda/fox/cycle/**</include>
-                <include>**/com/camunda/fox/cycle/web/dto/*</include>
+                <include>**/org/camunda/bpm/cycle/**</include>
+                <include>**/org/camunda/bpm/cycle/web/dto/*</include>
               </includes>
               <excludes>
-                <exclude>**/com/camunda/fox/cycle/web/*</exclude>
-                <exclude>**/com/camunda/fox/cycle/web/filter/**</exclude>
-                <exclude>**/com/camunda/fox/cycle/web/jaxrs/**</exclude>
-                <exclude>**/com/camunda/fox/cycle/web/service/**</exclude>
+                <exclude>**/org/camunda/bpm/cycle/web/*</exclude>
+                <exclude>**/org/camunda/bpm/cycle/web/filter/**</exclude>
+                <exclude>**/org/camunda/bpm/cycle/web/jaxrs/**</exclude>
+                <exclude>**/org/camunda/bpm/cycle/web/service/**</exclude>
               </excludes>
             </configuration>
           </execution>
@@ -800,81 +800,6 @@
           </plugin>
         </plugins>
       </build>
-    </profile>
-    <profile>
-      <id>was</id>
-      <dependencies>
-        <!-- javax.persistence -->
-        <dependency>
-          <groupId>org.hibernate</groupId>
-          <artifactId>hibernate-entitymanager</artifactId>
-          <exclusions>
-            <exclusion>
-              <artifactId>hibernate-jpa-2.0-api</artifactId>
-              <groupId>org.hibernate.javax.persistence</groupId>
-            </exclusion>
-            <exclusion>
-              <artifactId>javassist</artifactId>
-              <groupId>org.javassist</groupId>
-            </exclusion>
-            <exclusion>
-              <artifactId>jboss-transaction-api_1.1_spec</artifactId>
-              <groupId>org.jboss.spec.javax.transaction</groupId>
-            </exclusion>
-          </exclusions>
-        </dependency>
-        
-        <dependency>
-          <groupId>cglib</groupId>
-          <artifactId>cglib-nodep</artifactId>
-        </dependency>
-        
-        <!-- jax-rs -->
-        <dependency>
-          <groupId>com.sun.jersey</groupId>
-          <artifactId>jersey-json</artifactId>
-        </dependency>
-        <dependency>
-          <groupId>com.sun.jersey.contribs</groupId>
-          <artifactId>jersey-spring</artifactId>
-          <exclusions>
-            <exclusion>
-              <artifactId>spring-core</artifactId>
-              <groupId>org.springframework</groupId>
-            </exclusion>
-            <exclusion>
-              <artifactId>spring-beans</artifactId>
-              <groupId>org.springframework</groupId>
-            </exclusion>
-            <exclusion>
-              <artifactId>spring-context</artifactId>
-              <groupId>org.springframework</groupId>
-            </exclusion>
-            <exclusion>
-              <artifactId>spring-web</artifactId>
-              <groupId>org.springframework</groupId>
-            </exclusion>
-            <exclusion>
-              <artifactId>spring-aop</artifactId>
-              <groupId>org.springframework</groupId>
-            </exclusion>
-            <exclusion>
-              <groupId>asm</groupId>
-              <artifactId>asm</artifactId>
-            </exclusion>
-          </exclusions>
-        </dependency>
-    
-        <dependency>
-          <groupId>commons-io</groupId>
-          <artifactId>commons-io</artifactId>
-        </dependency>
-      </dependencies>
-      <properties>
-        <web.resources.override>src/main/runtime/was/webapp</web.resources.override>
-        <java.resources.override>src/main/runtime/was/resources</java.resources.override>
-        <properties.override>src/main/runtime/was/config/database.properties</properties.override>
-      </properties>
-    </profile>
+    </profile>   
   </profiles>
 </project>

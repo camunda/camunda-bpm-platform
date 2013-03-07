@@ -51,7 +51,7 @@
          <incoming>flow9</incoming>
          <outgoing>flow2</outgoing>
       </userTask>
-      <serviceTask activiti:class="com.camunda.fox.demo.twitter.CreateTweetDelegate" id="servicetask1" name="Publish on Twitter">
+      <serviceTask activiti:class="org.camunda.bpm.demo.twitter.CreateTweetDelegate" id="servicetask1" name="Publish on Twitter">
          <incoming>flow7</incoming>
          <outgoing>flow3</outgoing>
       </serviceTask>
@@ -65,7 +65,7 @@
       </endEvent>
       <sequenceFlow id="flow1" isImmediate="true" name="" sourceRef="startevent1" targetRef="businessruletask1">
          <extensionElements>
-            <activiti:executionListener class="com.camunda.fox.demo.twitter.CreateTweetObjectDelegate" event="take"/>
+            <activiti:executionListener class="org.camunda.bpm.demo.twitter.CreateTweetObjectDelegate" event="take"/>
          </extensionElements>
       </sequenceFlow>
       <sequenceFlow id="flow2" isImmediate="true" name="" sourceRef="usertask1" targetRef="exclusivegateway1"/>

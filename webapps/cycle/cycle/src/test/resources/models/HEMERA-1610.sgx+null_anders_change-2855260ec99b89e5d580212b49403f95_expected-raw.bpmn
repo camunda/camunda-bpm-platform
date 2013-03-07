@@ -234,7 +234,7 @@
       <endEvent id="Rechnungseingang_abgearbeitet_174" name="Rechnungseingang&#10;abgearbeitet">
          <incoming>sequenceFlow_192</incoming>
       </endEvent>
-      <serviceTask activiti:class="com.camunda.fox.demo.pdf.SavePdfDelegate" completionQuantity="1" id="PDF_in_SVN_ablegen_abc" isForCompensation="false" name="PDF in SVN ablegen" startQuantity="1">
+      <serviceTask activiti:class="org.camunda.bpm.demo.pdf.SavePdfDelegate" completionQuantity="1" id="PDF_in_SVN_ablegen_abc" isForCompensation="false" name="PDF in SVN ablegen" startQuantity="1">
          <incoming>sequenceFlow_184</incoming>
          <outgoing>sequenceFlow_192</outgoing>
       </serviceTask>

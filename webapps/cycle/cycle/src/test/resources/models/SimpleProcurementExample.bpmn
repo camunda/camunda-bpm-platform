@@ -10,12 +10,12 @@
 
       <sequenceFlow id="SequenceFlow" name="SequenceFlow" sourceRef="Select_articles_and_create_order_3" targetRef="send_order_3" />
       
-      <serviceTask id="send_order_3" name="send order" activiti:class="com.camunda.fox.psi.binding.activiti.ExecuteServiceAdapterDelegate">
+      <serviceTask id="send_order_3" name="send order" activiti:class="org.camunda.bpm.psi.binding.activiti.ExecuteServiceAdapterDelegate">
 	      <extensionElements>
 	      	<activiti:field name="configuration"><activiti:string>
 	      		<![CDATA[
 	      		  <config>
-					<serviceRequestAdapter class="com.camunda.fox.demo.psi.supplierorder.process.SendOrderServiceRequestAdapter" />
+					<serviceRequestAdapter class="org.camunda.bpm.demo.psi.supplierorder.process.SendOrderServiceRequestAdapter" />
 				  </config>	      	
 	      		]]>
 	      	</activiti:string></activiti:field>      
@@ -28,12 +28,12 @@
 
       <sequenceFlow id="SequenceFlow_4" name="SequenceFlow" sourceRef="Print_and_archive_order_3" targetRef="receive_order_confirmation_3" />
       
-      <serviceTask id="receive_order_confirmation_3" name="receive order confirmation" activiti:class="com.camunda.fox.psi.binding.activiti.ExecuteServiceAdapterDelegate">
+      <serviceTask id="receive_order_confirmation_3" name="receive order confirmation" activiti:class="org.camunda.bpm.psi.binding.activiti.ExecuteServiceAdapterDelegate">
 	      <extensionElements>
 	      	<activiti:field name="configuration"><activiti:expression>
 	      		<![CDATA[
 	      		  <config>
-					<serviceResponseAdapter class="com.camunda.fox.demo.psi.supplierorder.process.SendOrderServiceResponseAdapter" />
+					<serviceResponseAdapter class="org.camunda.bpm.demo.psi.supplierorder.process.SendOrderServiceResponseAdapter" />
 	      		  </config>
 	      		]]>
 	      	</activiti:expression></activiti:field>      
@@ -42,12 +42,12 @@
       
       <sequenceFlow id="SequenceFlow_2" name="SequenceFlow" sourceRef="receive_order_confirmation_3" targetRef="Insert_order_data_into_ERP_3" />
       
-      <serviceTask id="Insert_order_data_into_ERP_3" name="Insert order data into ERP" activiti:class="com.camunda.fox.psi.binding.activiti.ExecuteServiceAdapterDelegate">
+      <serviceTask id="Insert_order_data_into_ERP_3" name="Insert order data into ERP" activiti:class="org.camunda.bpm.psi.binding.activiti.ExecuteServiceAdapterDelegate">
 	      <extensionElements>
 	      	<activiti:field name="configuration"><activiti:expression>
 	      		<![CDATA[
 	      		   <config>
-					 <serviceRequestAdapter class="com.camunda.fox.demo.psi.supplierorder.process.CreateOrderInErpServiceAdapter" />
+					 <serviceRequestAdapter class="org.camunda.bpm.demo.psi.supplierorder.process.CreateOrderInErpServiceAdapter" />
 				   </config>
 	      		]]>
 	      	</activiti:expression></activiti:field>      

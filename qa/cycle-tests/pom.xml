@@ -127,13 +127,13 @@
       <dependencies>
         <dependency>
           <!-- make sure it comes after assembly in the build -->
-          <groupId>com.camunda.fox.platform</groupId>
+          <groupId>org.camunda.bpm.platform</groupId>
           <artifactId>fox-platform-qa-jboss-runtime</artifactId>
           <version>${project.version}</version>
           <type>pom</type>
         </dependency>
         <dependency>
-          <groupId>com.camunda.fox.cycle</groupId>
+          <groupId>org.camunda.bpm.cycle</groupId>
           <artifactId>cycle-jboss</artifactId>
           <version>${project.version}</version>
           <type>war</type>
@@ -179,7 +179,7 @@
               </configuration>
               <deployables>
                 <deployable>
-                  <groupId>com.camunda.fox.cycle</groupId>
+                  <groupId>org.camunda.bpm.cycle</groupId>
                   <artifactId>cycle-jboss</artifactId>
                   <type>war</type>
                   <properties>
@@ -203,13 +203,13 @@
       <dependencies>
         <dependency>
           <!-- make sure it comes after the test runtime in the build -->
-          <groupId>com.camunda.fox.platform</groupId>
+          <groupId>org.camunda.bpm.platform</groupId>
           <artifactId>fox-platform-qa-glassfish-runtime</artifactId>
           <version>${project.version}</version>
           <type>pom</type>
         </dependency>
         <dependency>
-          <groupId>com.camunda.fox.cycle</groupId>
+          <groupId>org.camunda.bpm.cycle</groupId>
           <artifactId>cycle-glassfish</artifactId>
           <version>${project.version}</version>
           <type>war</type>
@@ -336,15 +336,15 @@
       </properties>
       <dependencies>
         <dependency>
-          <groupId>com.camunda.fox.engine</groupId>
+          <groupId>org.camunda.bpm.engine</groupId>
           <artifactId>fox-engine</artifactId>
         </dependency>
         <dependency>
-          <groupId>com.camunda.fox.platform</groupId>
+          <groupId>org.camunda.bpm.platform</groupId>
           <artifactId>fox-platform-api</artifactId>
         </dependency>
         <dependency>
-          <groupId>com.camunda.fox.platform</groupId>
+          <groupId>org.camunda.bpm.platform</groupId>
           <artifactId>fox-platform-jobexecutor-api</artifactId>
           <version>${project.version}</version>
         </dependency>
@@ -358,20 +358,20 @@
         </dependency>
 
         <dependency>
-          <groupId>com.camunda.fox.platform</groupId>
+          <groupId>org.camunda.bpm.platform</groupId>
           <artifactId>fox-platform-ibm-websphere-ear</artifactId>
           <version>${project.version}</version>
           <type>ear</type>
         </dependency>
         <dependency>
-          <groupId>com.camunda.fox.platform</groupId>
+          <groupId>org.camunda.bpm.platform</groupId>
           <artifactId>fox-platform-jobexecutor-rar</artifactId>
           <version>${project.version}</version>
           <type>rar</type>
         </dependency>
 
         <dependency>
-          <groupId>com.camunda.fox.cycle</groupId>
+          <groupId>org.camunda.bpm.cycle</groupId>
           <artifactId>cycle-was</artifactId>
           <version>${project.version}</version>
           <type>war</type>
@@ -380,7 +380,7 @@
 
         <dependency>
           <!-- make sure it comes after the test runtime in the build -->
-          <groupId>com.camunda.fox.platform</groupId>
+          <groupId>org.camunda.bpm.platform</groupId>
           <artifactId>fox-platform-qa-websphere-runtime</artifactId>
           <version>${project.version}</version>
           <type>pom</type>
@@ -398,15 +398,15 @@
       </properties>
       <dependencies>
         <dependency>
-          <groupId>com.camunda.fox.engine</groupId>
+          <groupId>org.camunda.bpm.engine</groupId>
           <artifactId>fox-engine</artifactId>
         </dependency>
         <dependency>
-          <groupId>com.camunda.fox.platform</groupId>
+          <groupId>org.camunda.bpm.platform</groupId>
           <artifactId>fox-platform-api</artifactId>
         </dependency>
         <dependency>
-          <groupId>com.camunda.fox.platform</groupId>
+          <groupId>org.camunda.bpm.platform</groupId>
           <artifactId>fox-platform-jobexecutor-api</artifactId>
           <version>${project.version}</version>
         </dependency>
@@ -420,20 +420,20 @@
         </dependency>
 
         <dependency>
-          <groupId>com.camunda.fox.platform</groupId>
+          <groupId>org.camunda.bpm.platform</groupId>
           <artifactId>fox-platform-ibm-websphere-ear</artifactId>
           <version>${project.version}</version>
           <type>ear</type>
         </dependency>
         <dependency>
-          <groupId>com.camunda.fox.platform</groupId>
+          <groupId>org.camunda.bpm.platform</groupId>
           <artifactId>fox-platform-jobexecutor-rar</artifactId>
           <version>${project.version}</version>
           <type>rar</type>
         </dependency>
 
         <dependency>
-          <groupId>com.camunda.fox.cycle</groupId>
+          <groupId>org.camunda.bpm.cycle</groupId>
           <artifactId>cycle-was</artifactId>
           <version>${project.version}</version>
           <type>war</type>
@@ -442,7 +442,7 @@
 
         <dependency>
           <!-- make sure it comes after the test runtime in the build -->
-          <groupId>com.camunda.fox.platform</groupId>
+          <groupId>org.camunda.bpm.platform</groupId>
           <artifactId>fox-platform-qa-websphere-runtime</artifactId>
           <version>${project.version}</version>
           <type>pom</type>
@@ -464,13 +464,13 @@
       <dependencies>
         <dependency>
           <!-- make sure it comes after assembly in the build -->
-          <groupId>com.camunda.fox.platform</groupId>
+          <groupId>org.camunda.bpm.platform</groupId>
           <artifactId>fox-platform-qa-tomcat6-runtime</artifactId>
           <version>${project.version}</version>
           <type>pom</type>
         </dependency>
         <dependency>
-          <groupId>com.camunda.fox.cycle</groupId>
+          <groupId>org.camunda.bpm.cycle</groupId>
           <artifactId>cycle-tomcat</artifactId>
           <version>${project.version}</version>
           <type>war</type>
@@ -542,7 +542,7 @@
               </configuration>
               <deployables>
                 <deployable>
-                  <groupId>com.camunda.fox.cycle</groupId>
+                  <groupId>org.camunda.bpm.cycle</groupId>
                   <artifactId>cycle-tomcat</artifactId>
                   <type>war</type>
                   <properties>
@@ -698,7 +698,7 @@
             <configuration>
               <artifactItems>
                 <artifactItem>
-                  <groupId>com.camunda.fox.cycle</groupId>
+                  <groupId>org.camunda.bpm.cycle</groupId>
                   <artifactId>cycle-sql-scripts</artifactId>
                   <outputDirectory>${project.build.directory}/sql-scripts</outputDirectory>
                   <overWrite>true</overWrite>

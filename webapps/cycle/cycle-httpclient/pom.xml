@@ -46,7 +46,7 @@
               <relocations>
                 <relocation>
                   <pattern>org.apache.http</pattern>
-                  <shadedPattern>com.camunda.fox.cycle.http</shadedPattern>
+                  <shadedPattern>org.camunda.bpm.cycle.http</shadedPattern>
                 </relocation>
               </relocations>
             </configuration>

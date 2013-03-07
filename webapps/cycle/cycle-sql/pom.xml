@@ -50,7 +50,7 @@
               <goal>java</goal>
             </goals>
             <configuration>
-              <mainClass>com.camunda.fox.cycle.SchemaExport</mainClass>
+              <mainClass>org.camunda.bpm.cycle.SchemaExport</mainClass>
               <arguments>
                 <argument>--create</argument>
                 <argument>--drop</argument>

@@ -8,9 +8,9 @@
           http://www.springframework.org/schema/context 
           http://www.springframework.org/schema/context/spring-context.xsd">
 
-  <bean name="vfsConnectorDefinition" class="com.camunda.fox.cycle.entity.ConnectorConfiguration">
+  <bean name="vfsConnectorDefinition" class="org.camunda.bpm.cycle.entity.ConnectorConfiguration">
     <property name="name" value="File System Connector"/>
-    <property name="connectorClass" value="com.camunda.fox.cycle.connector.vfs.VfsConnector"/>
+    <property name="connectorClass" value="org.camunda.bpm.cycle.connector.vfs.VfsConnector"/>
     <property name="properties">
       <map>
         <entry key="BASE_PATH" value="${user.home}"/>
@@ -18,9 +18,9 @@
     </property>
   </bean>
   
-  <bean name="signavioConnectorDefinition" class="com.camunda.fox.cycle.entity.ConnectorConfiguration">
+  <bean name="signavioConnectorDefinition" class="org.camunda.bpm.cycle.entity.ConnectorConfiguration">
     <property name="name" value="Signavio Connector"/>
-    <property name="connectorClass" value="com.camunda.fox.cycle.connector.signavio.SignavioConnector"/>
+    <property name="connectorClass" value="org.camunda.bpm.cycle.connector.signavio.SignavioConnector"/>
     <property name="properties">
       <map>
         <entry key="signavioBaseUrl" value="https://editor.signavio.com/"></entry>
@@ -31,9 +31,9 @@
     </property>
   </bean>
   
-  <bean name="svnConnectorDefinition" class="com.camunda.fox.cycle.entity.ConnectorConfiguration">
+  <bean name="svnConnectorDefinition" class="org.camunda.bpm.cycle.entity.ConnectorConfiguration">
     <property name="name" value="Subversion Connector"/>
-    <property name="connectorClass" value="com.camunda.fox.cycle.connector.svn.SvnConnector"/>
+    <property name="connectorClass" value="org.camunda.bpm.cycle.connector.svn.SvnConnector"/>
     <property name="loginMode" value="LOGIN_NOT_REQUIRED" />
     <property name="properties">
       <map>

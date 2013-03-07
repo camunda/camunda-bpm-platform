@@ -11,7 +11,7 @@
           http://www.springframework.org/schema/context/spring-context.xsd">
 
   
-  <bean id="cycleConfiguration" class="com.camunda.fox.cycle.configuration.CycleConfiguration">
+  <bean id="cycleConfiguration" class="org.camunda.bpm.cycle.configuration.CycleConfiguration">
     
     <!-- cycle security service configuration -->
     <property name="useJaas" value="false" />

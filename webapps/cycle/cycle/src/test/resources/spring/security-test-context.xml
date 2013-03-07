@@ -16,12 +16,12 @@
   <aop:aspectj-autoproxy />
 
   <context:annotation-config />
-  <context:component-scan base-package="com.camunda.fox.security" />
-  <context:component-scan base-package="com.camunda.fox.cycle.connector.crypt" />
+  <context:component-scan base-package="org.camunda.bpm.security" />
+  <context:component-scan base-package="org.camunda.bpm.cycle.connector.crypt" />
   
-  <bean class="com.camunda.fox.security.aspect.SecurityAspect"></bean>
-  <bean class="com.camunda.fox.security.test.SecuredTestBean"></bean>
-  <bean class="com.camunda.fox.security.test.FakeUserLookup"></bean>
-  <bean class="com.camunda.fox.security.SecurityConfiguration"></bean>
+  <bean class="org.camunda.bpm.security.aspect.SecurityAspect"></bean>
+  <bean class="org.camunda.bpm.security.test.SecuredTestBean"></bean>
+  <bean class="org.camunda.bpm.security.test.FakeUserLookup"></bean>
+  <bean class="org.camunda.bpm.security.SecurityConfiguration"></bean>
       
 </beans>

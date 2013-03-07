@@ -11,6 +11,21 @@ import javax.ws.rs.core.Response.Status;
 
 import junit.framework.Assert;
 
+import org.camunda.bpm.cycle.connector.Connector;
+import org.camunda.bpm.cycle.connector.ConnectorLoginMode;
+import org.camunda.bpm.cycle.connector.ConnectorNode;
+import org.camunda.bpm.cycle.connector.ConnectorNodeType;
+import org.camunda.bpm.cycle.connector.signavio.SignavioConnector;
+import org.camunda.bpm.cycle.connector.svn.SvnConnector;
+import org.camunda.bpm.cycle.connector.vfs.VfsConnector;
+import org.camunda.bpm.cycle.entity.ConnectorConfiguration;
+import org.camunda.bpm.cycle.util.IoUtil;
+import org.camunda.bpm.cycle.web.dto.BpmnDiagramDTO;
+import org.camunda.bpm.cycle.web.dto.ConnectorConfigurationDTO;
+import org.camunda.bpm.cycle.web.dto.ConnectorNodeDTO;
+import org.camunda.bpm.cycle.web.dto.RoundtripDTO;
+import org.camunda.bpm.cycle.web.dto.SynchronizationResultDTO;
+import org.camunda.bpm.cycle.web.dto.SynchronizationResultDTO.SynchronizationStatus;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -18,21 +33,6 @@ import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
 
-import com.camunda.fox.cycle.connector.Connector;
-import com.camunda.fox.cycle.connector.ConnectorLoginMode;
-import com.camunda.fox.cycle.connector.ConnectorNode;
-import com.camunda.fox.cycle.connector.ConnectorNodeType;
-import com.camunda.fox.cycle.connector.signavio.SignavioConnector;
-import com.camunda.fox.cycle.connector.svn.SvnConnector;
-import com.camunda.fox.cycle.connector.vfs.VfsConnector;
-import com.camunda.fox.cycle.entity.ConnectorConfiguration;
-import com.camunda.fox.cycle.util.IoUtil;
-import com.camunda.fox.cycle.web.dto.BpmnDiagramDTO;
-import com.camunda.fox.cycle.web.dto.ConnectorConfigurationDTO;
-import com.camunda.fox.cycle.web.dto.ConnectorNodeDTO;
-import com.camunda.fox.cycle.web.dto.RoundtripDTO;
-import com.camunda.fox.cycle.web.dto.SynchronizationResultDTO;
-import com.camunda.fox.cycle.web.dto.SynchronizationResultDTO.SynchronizationStatus;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 

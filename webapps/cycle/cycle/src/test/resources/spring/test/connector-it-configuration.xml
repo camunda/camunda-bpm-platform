@@ -14,9 +14,9 @@
   
   <context:annotation-config />
   
-  <bean name="vfsConnectorConfig" class="com.camunda.fox.cycle.entity.ConnectorConfiguration">
+  <bean name="vfsConnectorConfig" class="org.camunda.bpm.cycle.entity.ConnectorConfiguration">
     <property name="name" value="Test VFS Connector" />
-    <property name="connectorClass" value="com.camunda.fox.cycle.connector.vfs.VfsConnector" />
+    <property name="connectorClass" value="org.camunda.bpm.cycle.connector.vfs.VfsConnector" />
     <property name="properties">
       <map>
         <entry key="BASE_PATH" value="file://target/vfs-repository" />
@@ -24,10 +24,10 @@
     </property>
   </bean>
 
-  <bean name="signavioConfig" class="com.camunda.fox.cycle.entity.ConnectorConfiguration">
+  <bean name="signavioConfig" class="org.camunda.bpm.cycle.entity.ConnectorConfiguration">
     <property name="name" value="My SignavioConnector" />
     <property name="connectorClass"
-              value="com.camunda.fox.cycle.connector.signavio.SignavioConnector" />
+              value="org.camunda.bpm.cycle.connector.signavio.SignavioConnector" />
     <property name="loginMode" value="GLOBAL" />
     <property name="globalUser" value="test@camunda.com" />
     <property name="globalPassword" value="testtest" />
@@ -38,10 +38,10 @@
     </property>
   </bean>
   
-  <bean name="svnConfig" class="com.camunda.fox.cycle.entity.ConnectorConfiguration">
+  <bean name="svnConfig" class="org.camunda.bpm.cycle.entity.ConnectorConfiguration">
     <property name="name" value="My Svn Connector" />
     <property name="connectorClass"
-              value="com.camunda.fox.cycle.connector.svn.SvnConnector" />
+              value="org.camunda.bpm.cycle.connector.svn.SvnConnector" />
     <property name="loginMode" value="GLOBAL" />
     <property name="globalUser" value="hudson-test" />
     <property name="globalPassword" value="2KamD3Lo" />
@@ -53,5 +53,5 @@
   </bean>
 
   <!-- instantiates test connector configurations for testing -->
-  <bean name="configurationProvider" class="com.camunda.fox.cycle.connector.test.util.ConnectorConfigurationProvider" />
+  <bean name="configurationProvider" class="org.camunda.bpm.cycle.connector.test.util.ConnectorConfigurationProvider" />
 </beans>

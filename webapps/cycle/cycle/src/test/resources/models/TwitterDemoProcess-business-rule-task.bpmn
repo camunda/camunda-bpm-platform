@@ -4,7 +4,7 @@
     <startEvent id="startevent1" name="Start" activiti:formKey="createTweet.form"></startEvent>
     <userTask id="usertask1" name="Review Tweet" activiti:assignee="kermit" activiti:formKey="reviewTweet.form"></userTask>
     <exclusiveGateway id="exclusivegateway1" name="Approved?"></exclusiveGateway>
-    <serviceTask id="servicetask1" name="Publish on Twitter" activiti:class="com.camunda.fox.demo.twitter.CreateTweetDelegate"></serviceTask>
+    <serviceTask id="servicetask1" name="Publish on Twitter" activiti:class="org.camunda.bpm.demo.twitter.CreateTweetDelegate"></serviceTask>
     <serviceTask id="mailtask1" name="Send rejection notification via email" activiti:type="mail">
       <extensionElements>
         <activiti:field name="to" expression="${tweet.email}"></activiti:field>
@@ -35,7 +35,7 @@
     <endEvent id="endevent1" name="End"></endEvent>
     <sequenceFlow id="flow1" name="" sourceRef="startevent1" targetRef="businessruletask1">
       <extensionElements>
-        <activiti:executionListener event="take" class="com.camunda.fox.demo.twitter.CreateTweetObjectDelegate"></activiti:executionListener>
+        <activiti:executionListener event="take" class="org.camunda.bpm.demo.twitter.CreateTweetObjectDelegate"></activiti:executionListener>
       </extensionElements>
     </sequenceFlow>
     <sequenceFlow id="flow2" name="" sourceRef="usertask1" targetRef="exclusivegateway1"></sequenceFlow>

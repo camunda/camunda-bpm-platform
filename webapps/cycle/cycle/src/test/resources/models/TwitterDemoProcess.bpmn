@@ -5,7 +5,7 @@
       <startEvent id="new_tweet_3" name="new tweet" activiti:formKey="createTweet.form" />
       <userTask id="Review_Tweet_3" name="Review Tweet" activiti:formKey="reviewTweet.form" activiti:assignee="kermit" />
       <exclusiveGateway gatewayDirection="Diverging" id="Approved__3" name="Approved?" />
-      <serviceTask id="Publish_on_Twitter_3" name="Publish on Twitter" activiti:class="com.camunda.fox.demo.twitter.TweetContentDelegate" />
+      <serviceTask id="Publish_on_Twitter_3" name="Publish on Twitter" activiti:class="org.camunda.bpm.demo.twitter.TweetContentDelegate" />
 
       <serviceTask id="Send_rejection_notification_via_email__3" name="Send rejection notification via email" activiti:type="mail">
 		  <extensionElements>

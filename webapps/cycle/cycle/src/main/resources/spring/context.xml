@@ -22,7 +22,7 @@
     so that there is no need for additional annotations
   -->
     
-  <context:component-scan base-package="com.camunda.fox">
+  <context:component-scan base-package="org.camunda.bpm">
     <context:include-filter type="annotation" expression="javax.ws.rs.Path"/>
     <context:include-filter type="annotation" expression="javax.ws.rs.ext.Provider"/>
   </context:component-scan>
