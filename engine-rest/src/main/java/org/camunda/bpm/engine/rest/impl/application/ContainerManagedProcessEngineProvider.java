@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.rest.impl.application;
 
+import java.util.Set;
+
 import org.camunda.bpm.BpmPlatform;
 import org.camunda.bpm.ProcessEngineService;
 import org.camunda.bpm.engine.ProcessEngine;
@@ -32,6 +34,11 @@ public class ContainerManagedProcessEngineProvider implements ProcessEngineProvi
   @Override
   public ProcessEngine getProcessEngine(String name) {
     return BpmPlatform.getProcessEngineService().getProcessEngine(name);
+  }
+
+  @Override
+  public Set<String> getProcessEngineNames() {
+    return BpmPlatform.getProcessEngineService().getProcessEngineNames();
   }
 
 }

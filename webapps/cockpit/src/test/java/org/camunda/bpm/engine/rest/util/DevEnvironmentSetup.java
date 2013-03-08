@@ -1,7 +1,9 @@
 package org.camunda.bpm.engine.rest.util;
 
 import java.io.File;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
@@ -94,6 +96,12 @@ public class DevEnvironmentSetup implements ProcessEngineProvider {
 
   public ProcessEngine getProcessEngine(String name) {
     return processEngine;
+  }
+
+  public Set<String> getProcessEngineNames() {
+    Set<String> names = new HashSet<String>();
+    names.add(processEngine.getName());
+    return names;
   }
 
 }

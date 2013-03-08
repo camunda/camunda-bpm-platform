@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.rest.spi;
 
+import java.util.Set;
+
 import org.camunda.bpm.engine.ProcessEngine;
 
 /**
@@ -22,8 +24,10 @@ import org.camunda.bpm.engine.ProcessEngine;
  */
 public interface ProcessEngineProvider {
 
-  public ProcessEngine getDefaultProcessEngine();
+  ProcessEngine getDefaultProcessEngine();
   
-  public ProcessEngine getProcessEngine(String name);
+  ProcessEngine getProcessEngine(String name);
+  
+  Set<String> getProcessEngineNames();
   
 }

@@ -5,7 +5,7 @@ import java.io.InputStream;
 import java.util.Properties;
 
 import org.camunda.bpm.engine.rest.AbstractRestServiceTest;
-import org.camunda.bpm.engine.rest.impl.EngineServiceImpl;
+import org.camunda.bpm.engine.rest.impl.ProcessEngineRestServiceImpl;
 import org.camunda.bpm.engine.rest.impl.ProcessDefinitionServiceImpl;
 import org.camunda.bpm.engine.rest.impl.ProcessInstanceServiceImpl;
 import org.camunda.bpm.engine.rest.impl.TaskRestServiceImpl;
@@ -46,7 +46,7 @@ public class ResteasyServerBootstrap {
     server.getDeployment().getActualResourceClasses().add(ProcessDefinitionServiceImpl.class);
     server.getDeployment().getActualResourceClasses().add(ProcessInstanceServiceImpl.class);
     server.getDeployment().getActualResourceClasses().add(TaskRestServiceImpl.class);
-    server.getDeployment().getActualResourceClasses().add(EngineServiceImpl.class);
+    server.getDeployment().getActualResourceClasses().add(ProcessEngineRestServiceImpl.class);
     
     server.getDeployment().getActualProviderClasses().add(EngineQueryDtoGetReader.class);
     server.getDeployment().getActualProviderClasses().add(JacksonConfigurator.class);
