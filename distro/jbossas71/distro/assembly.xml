@@ -120,6 +120,13 @@
         </includes>
         <outputDirectory>server/jboss-as-${version.jboss.as}/standalone/deployments</outputDirectory>
     </dependencySet>
+
+    <dependencySet>
+        <includes>
+            <include>org.camunda.bpm.tasklist:camunda-tasklist:war:*</include>
+        </includes>
+        <outputDirectory>server/jboss-as-${version.jboss.as}/standalone/deployments</outputDirectory>
+    </dependencySet>
     
   </dependencySets>
 </assembly>

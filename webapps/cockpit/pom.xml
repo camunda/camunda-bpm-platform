@@ -36,6 +36,7 @@
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine-rest</artifactId>
       <version>${project.version}</version>
+      <classifier>classes</classifier>
       <scope>test</scope>
     </dependency>
 

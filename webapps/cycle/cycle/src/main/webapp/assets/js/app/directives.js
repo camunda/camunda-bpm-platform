@@ -567,7 +567,7 @@ angular
       	if (error.status && error.config) {
       		html += "<strong>"+error.status+":</strong> ";
       		html += "<span>"+error.config+"</span>";
-      		if (error.type == 'com.camunda.fox.cycle.exception.CycleMissingCredentialsException') {
+      		if (error.type == 'org.camunda.bpm.cycle.exception.CycleMissingCredentialsException') {
       		  html += "<span>(<a style=\"color: #827AA2;\" href=\"" + App.uri("secured/view/profile") + "\">add user credentials</a>)</span>";
       		}
       	} else {

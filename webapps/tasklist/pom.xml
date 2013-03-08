@@ -11,6 +11,7 @@
     <relativePath>../..</relativePath>
   </parent>
 
+  <groupId>org.camunda.bpm.tasklist</groupId>
   <artifactId>camunda-tasklist</artifactId>
   <packaging>war</packaging>
   <name>camunda BPM - tasklist</name>
@@ -19,22 +20,26 @@
     <dependency>
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine</artifactId>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>
       <groupId>com.fasterxml.uuid</groupId>
       <artifactId>java-uuid-generator</artifactId>
+      <scope>provided</scope>
     </dependency>
 
     <dependency>
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine-rest</artifactId>
+      <classifier>classes</classifier>
       <version>${project.version}</version>
     </dependency>
 
     <dependency>
       <groupId>org.jboss.resteasy</groupId>
       <artifactId>resteasy-jaxrs</artifactId>
+      <scope>provided</scope>
       <exclusions>
         <exclusion>
           <artifactId>httpclient</artifactId>
@@ -66,37 +71,85 @@
     <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
+      <scope>provided</scope>
     </dependency>
 
   </dependencies>
 
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-war-plugin</artifactId>
-        <configuration>
-          <failOnMissingWebXml>false</failOnMissingWebXml>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.tomcat.maven</groupId>
-        <artifactId>tomcat6-maven-plugin</artifactId>
-        <version>2.0</version>
-      </plugin>
-      <plugin>
-        <groupId>org.mortbay.jetty</groupId>
-        <artifactId>jetty-maven-plugin</artifactId>
-        <version>8.1.8.v20121106</version>
-        <configuration>
-          <webAppConfig>
-            <contextPath>/tasklist</contextPath>
-            <!-- used to disable file mapped buffer -->
-            <defaultsDescriptor>src/runtime/jetty/webdefault.xml</defaultsDescriptor>
-          </webAppConfig>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
-  <groupId>org.camunda.bpm.tasklist</groupId>
+  <profiles>
+    <profile>
+      <id>default</id>
+      <activation>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-war-plugin</artifactId>
+            <configuration>
+              <archive>
+                <manifest>
+                  <!-- Maven project version number -->
+                  <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                </manifest>
+                <manifestEntries>
+                  <!-- module dependencies for deployment on AS 7 -->
+                  <Dependencies>org.camunda.bpm.camunda-engine</Dependencies>
+                </manifestEntries>
+              </archive>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+      
+    </profile>
+
+    <profile>
+      <id>develop</id>
+
+      <build>
+
+        <resources>
+          <resource>
+            <directory>src/develop/resources</directory>
+          </resource>
+        </resources>
+
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-war-plugin</artifactId>
+            <configuration>
+              <failOnMissingWebXml>false</failOnMissingWebXml>
+            </configuration>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.tomcat.maven</groupId>
+            <artifactId>tomcat6-maven-plugin</artifactId>
+            <version>2.0</version>
+          </plugin>
+          <plugin>
+            <groupId>org.mortbay.jetty</groupId>
+            <artifactId>jetty-maven-plugin</artifactId>
+            <version>8.1.8.v20121106</version>
+            <configuration>
+              <webAppConfig>
+                <contextPath>/camunda-tasklist</contextPath>
+                <!-- used to disable file mapped buffer -->
+                <defaultsDescriptor>src/runtime/jetty/webdefault.xml</defaultsDescriptor>
+                
+              </webAppConfig>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+
+    </profile>
+
+  </profiles>
+
+
+
 </project>
