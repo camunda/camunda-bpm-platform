@@ -30,9 +30,10 @@ import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.runtime.StartProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.task.FormDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+import org.camunda.bpm.engine.rest.spi.AbstractProcessEngineAware;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 
-public class ProcessDefinitionServiceImpl extends AbstractEngineService implements ProcessDefinitionService {
+public class ProcessDefinitionServiceImpl extends AbstractProcessEngineAware implements ProcessDefinitionService {
 
   public ProcessDefinitionServiceImpl() {
     super();

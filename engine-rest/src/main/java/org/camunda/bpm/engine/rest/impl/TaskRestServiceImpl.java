@@ -31,10 +31,11 @@ import org.camunda.bpm.engine.rest.dto.task.TaskQueryDto;
 import org.camunda.bpm.engine.rest.dto.task.UserDto;
 import org.camunda.bpm.engine.rest.dto.task.UserIdDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+import org.camunda.bpm.engine.rest.spi.AbstractProcessEngineAware;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
 
-public class TaskRestServiceImpl extends AbstractEngineService implements TaskRestService {
+public class TaskRestServiceImpl extends AbstractProcessEngineAware implements TaskRestService {
 
   @Override
   public List<TaskDto> getTasks(TaskQueryDto queryDto, Integer firstResult, Integer maxResults) {

@@ -1,17 +1,16 @@
-package org.camunda.bpm.engine.rest.impl;
+package org.camunda.bpm.engine.rest.spi;
 
 import java.util.Iterator;
 import java.util.ServiceLoader;
 
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.rest.exception.RestException;
-import org.camunda.bpm.engine.rest.spi.ProcessEngineProvider;
 
-public abstract class AbstractEngineService {
+public abstract class AbstractProcessEngineAware {
 
   protected ProcessEngine processEngine;
   
-  public AbstractEngineService() {
+  public AbstractProcessEngineAware() {
     initialize();
   }
   

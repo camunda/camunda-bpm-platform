@@ -10,27 +10,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.example.servlet;
+package org.camunda.bpm.tasklist.spi.impl;
 
 import org.camunda.bpm.BpmPlatform;
-import org.camunda.bpm.application.ProcessApplication;
-import org.camunda.bpm.application.impl.ServletProcessApplication;
 import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.rest.spi.ProcessEngineProvider;
+import org.camunda.bpm.tasklist.spi.TasklistProcessEngineProvider;
 
-/**
- * @author Daniel Meyer
- *
- */
-@ProcessApplication("MyApp1")
-public class MyServlet25ProcessApplication extends ServletProcessApplication {
-    
-  public void postDeploy() {
-    ProcessEngine processEngine = BpmPlatform.getDefaultProcessEngine();    
-    RuntimeService runtimeService = processEngine.getRuntimeService();
-    
-    runtimeService.startProcessInstanceByKey("fox-invoice");
+public class ContainerManagedProcessEngineProvider implements ProcessEngineProvider, TasklistProcessEngineProvider {
+
+  public ProcessEngine getProcessEngine() {
+    return BpmPlatform.getDefaultProcessEngine();
   }
 
-  
 }
