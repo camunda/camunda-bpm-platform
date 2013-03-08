@@ -16,14 +16,12 @@ import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceQueryDto;
 import org.camunda.bpm.engine.rest.dto.runtime.VariableListDto;
 import org.camunda.bpm.engine.rest.dto.runtime.VariableValueDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
-import org.camunda.bpm.engine.rest.spi.AbstractProcessEngineAware;
+import org.camunda.bpm.engine.rest.spi.impl.AbstractProcessEngineAware;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 
-public class ProcessInstanceRestServiceImpl extends AbstractEngineRestService implements
+public class ProcessInstanceRestServiceImpl extends AbstractProcessEngineAware implements
     ProcessInstanceRestService {
-public class ProcessInstanceServiceImpl extends AbstractProcessEngineAware implements
-    ProcessInstanceService {
 
   public ProcessInstanceRestServiceImpl() {
     super();
