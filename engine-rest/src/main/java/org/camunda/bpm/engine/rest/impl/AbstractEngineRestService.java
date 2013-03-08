@@ -7,15 +7,15 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.spi.ProcessEngineProvider;
 
-public abstract class AbstractEngineService {
+public abstract class AbstractEngineRestService {
 
   protected ProcessEngine processEngine;
   
-  public AbstractEngineService() {
+  public AbstractEngineRestService() {
     processEngine = lookupProcessEngine(null);
   }
   
-  public AbstractEngineService(String engineName) {
+  public AbstractEngineRestService(String engineName) {
     processEngine = lookupProcessEngine(engineName);
   }
   

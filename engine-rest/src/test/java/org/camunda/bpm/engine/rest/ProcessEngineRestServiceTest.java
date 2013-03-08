@@ -21,7 +21,7 @@ import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.rest.spi.impl.MockedProcessEngineProvider;
 import org.junit.Test;
 
-public class MultipleEnginesTest extends AbstractRestServiceTest {
+public class ProcessEngineRestServiceTest extends AbstractRestServiceTest {
 
   private static final String ENGINES_URL = TEST_RESOURCE_ROOT_PATH + "/engine";
   private static final String SINGLE_ENGINE_URL = ENGINES_URL + "/{name}";

@@ -10,8 +10,8 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.rest.ProcessEngineRestService;
-import org.camunda.bpm.engine.rest.ProcessDefinitionService;
-import org.camunda.bpm.engine.rest.ProcessInstanceService;
+import org.camunda.bpm.engine.rest.ProcessDefinitionRestService;
+import org.camunda.bpm.engine.rest.ProcessInstanceRestService;
 import org.camunda.bpm.engine.rest.TaskRestService;
 import org.camunda.bpm.engine.rest.dto.ProcessEngineDto;
 import org.camunda.bpm.engine.rest.spi.ProcessEngineProvider;
@@ -19,13 +19,13 @@ import org.camunda.bpm.engine.rest.spi.ProcessEngineProvider;
 public class ProcessEngineRestServiceImpl implements ProcessEngineRestService {
 
   @Override
-  public ProcessDefinitionService getProcessDefinitionService(String engineName) {
-    return new ProcessDefinitionServiceImpl(engineName);
+  public ProcessDefinitionRestService getProcessDefinitionService(String engineName) {
+    return new ProcessDefinitionRestServiceImpl(engineName);
   }
 
   @Override
-  public ProcessInstanceService getProcessInstanceService(String engineName) {
-    return new ProcessInstanceServiceImpl(engineName);
+  public ProcessInstanceRestService getProcessInstanceService(String engineName) {
+    return new ProcessInstanceRestServiceImpl(engineName);
   }
 
   @Override

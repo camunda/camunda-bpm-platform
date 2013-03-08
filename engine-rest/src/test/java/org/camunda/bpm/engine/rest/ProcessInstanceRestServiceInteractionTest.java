@@ -19,7 +19,7 @@ import org.camunda.bpm.engine.rest.helper.ExampleVariableObject;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.junit.Test;
 
-public class ProcessInstanceServiceInteractionTest extends AbstractRestServiceTest {
+public class ProcessInstanceRestServiceInteractionTest extends AbstractRestServiceTest {
   
   private static final String PROCESS_INSTANCE_URL = TEST_RESOURCE_ROOT_PATH + "/process-instance/{id}";
   private static final String PROCESS_INSTANCE_VARIABLES_URL = PROCESS_INSTANCE_URL + "/variables";

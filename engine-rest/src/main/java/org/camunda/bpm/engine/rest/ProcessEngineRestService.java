@@ -14,10 +14,10 @@ import org.camunda.bpm.engine.rest.dto.ProcessEngineDto;
 public interface ProcessEngineRestService {
 
   @Path("/{name}/process-definition")
-  ProcessDefinitionService getProcessDefinitionService(@PathParam("name") String engineName);
+  ProcessDefinitionRestService getProcessDefinitionService(@PathParam("name") String engineName);
   
   @Path("/{name}/process-instance")
-  ProcessInstanceService getProcessInstanceService(@PathParam("name") String engineName);
+  ProcessInstanceRestService getProcessInstanceService(@PathParam("name") String engineName);
   
   @Path("/{name}/task")
   TaskRestService getTaskRestService(@PathParam("name") String engineName);

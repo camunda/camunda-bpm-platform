@@ -1,7 +1,7 @@
 package org.camunda.bpm.tasklist;
 
-import org.camunda.bpm.engine.rest.impl.ProcessDefinitionServiceImpl;
-import org.camunda.bpm.engine.rest.impl.ProcessInstanceServiceImpl;
+import org.camunda.bpm.engine.rest.impl.ProcessDefinitionRestServiceImpl;
+import org.camunda.bpm.engine.rest.impl.ProcessInstanceRestServiceImpl;
 import org.camunda.bpm.engine.rest.impl.TaskRestServiceImpl;
 import org.camunda.bpm.engine.rest.mapper.EngineQueryDtoGetReader;
 import org.camunda.bpm.engine.rest.mapper.JacksonConfigurator;
@@ -22,8 +22,8 @@ public class EngineApiApplication extends Application {
   public Set<Class<?>> getClasses() {
     Set<Class<?>> classes = new HashSet<Class<?>>();
 
-    classes.add(ProcessDefinitionServiceImpl.class);
-    classes.add(ProcessInstanceServiceImpl.class);
+    classes.add(ProcessDefinitionRestServiceImpl.class);
+    classes.add(ProcessInstanceRestServiceImpl.class);
     classes.add(TaskRestServiceImpl.class);
 
     classes.add(EngineQueryDtoGetReader.class);

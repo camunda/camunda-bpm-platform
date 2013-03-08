@@ -9,7 +9,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.RuntimeService;
-import org.camunda.bpm.engine.rest.ProcessInstanceService;
+import org.camunda.bpm.engine.rest.ProcessInstanceRestService;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceQueryDto;
@@ -19,14 +19,14 @@ import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 
-public class ProcessInstanceServiceImpl extends AbstractEngineService implements
-    ProcessInstanceService {
+public class ProcessInstanceRestServiceImpl extends AbstractEngineRestService implements
+    ProcessInstanceRestService {
 
-  public ProcessInstanceServiceImpl() {
+  public ProcessInstanceRestServiceImpl() {
     super();
   }
   
-  public ProcessInstanceServiceImpl(String engineName) {
+  public ProcessInstanceRestServiceImpl(String engineName) {
     super(engineName);
   }
 

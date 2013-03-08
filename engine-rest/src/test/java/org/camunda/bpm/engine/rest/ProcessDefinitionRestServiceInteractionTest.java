@@ -32,7 +32,7 @@ import org.mockito.Matchers;
 
 import com.jayway.restassured.response.Response;
 
-public class ProcessDefinitionServiceInteractionTest extends
+public class ProcessDefinitionRestServiceInteractionTest extends
     AbstractRestServiceTest {
 
   private static final String SINGLE_PROCESS_DEFINITION_URL = TEST_RESOURCE_ROOT_PATH + "/process-definition/{id}";

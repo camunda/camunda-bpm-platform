@@ -22,7 +22,7 @@ import org.camunda.bpm.engine.management.ProcessDefinitionStatistics;
 import org.camunda.bpm.engine.management.ProcessDefinitionStatisticsQuery;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
-import org.camunda.bpm.engine.rest.ProcessDefinitionService;
+import org.camunda.bpm.engine.rest.ProcessDefinitionRestService;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.StatisticsResultDto;
 import org.camunda.bpm.engine.rest.dto.repository.*;
@@ -32,13 +32,13 @@ import org.camunda.bpm.engine.rest.dto.task.FormDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 
-public class ProcessDefinitionServiceImpl extends AbstractEngineService implements ProcessDefinitionService {
+public class ProcessDefinitionRestServiceImpl extends AbstractEngineRestService implements ProcessDefinitionRestService {
 
-  public ProcessDefinitionServiceImpl() {
+  public ProcessDefinitionRestServiceImpl() {
     super();
   }
 
-	public ProcessDefinitionServiceImpl(String engineName) {
+	public ProcessDefinitionRestServiceImpl(String engineName) {
     super(engineName);
   }
 
