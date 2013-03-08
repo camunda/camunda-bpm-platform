@@ -19,8 +19,12 @@ import org.camunda.bpm.tasklist.spi.TasklistProcessEngineProvider;
 
 public class ContainerManagedProcessEngineProvider implements ProcessEngineProvider, TasklistProcessEngineProvider {
 
-  public ProcessEngine getProcessEngine() {
+  public ProcessEngine getDefaultProcessEngine() {
     return BpmPlatform.getDefaultProcessEngine();
+  }
+
+  public ProcessEngine getProcessEngine(String name) {
+    return BpmPlatform.getProcessEngineService().getProcessEngine(name);
   }
 
 }

@@ -23,6 +23,14 @@ import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 public class ProcessInstanceServiceImpl extends AbstractProcessEngineAware implements
     ProcessInstanceService {
 
+  public ProcessInstanceServiceImpl() {
+    super();
+  }
+  
+  public ProcessInstanceServiceImpl(String engineName) {
+    super(engineName);
+  }
+
   @Override
   public List<ProcessInstanceDto> getProcessInstances(
       ProcessInstanceQueryDto queryDto, Integer firstResult, Integer maxResults) {

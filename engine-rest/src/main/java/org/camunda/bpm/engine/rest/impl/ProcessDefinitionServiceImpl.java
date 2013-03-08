@@ -39,7 +39,11 @@ public class ProcessDefinitionServiceImpl extends AbstractProcessEngineAware imp
     super();
   }
 
-	@Override
+	public ProcessDefinitionServiceImpl(String engineName) {
+    super(engineName);
+  }
+
+  @Override
 	public List<ProcessDefinitionDto> getProcessDefinitions(ProcessDefinitionQueryDto queryDto,
 	    Integer firstResult, Integer maxResults) {
 	  List<ProcessDefinitionDto> definitions = new ArrayList<ProcessDefinitionDto>();

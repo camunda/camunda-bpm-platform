@@ -5,29 +5,34 @@ import java.util.ServiceLoader;
 
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.rest.exception.RestException;
+import org.camunda.bpm.engine.rest.spi.ProcessEngineProvider;
 
 public abstract class AbstractProcessEngineAware {
 
   protected ProcessEngine processEngine;
   
   public AbstractProcessEngineAware() {
-    initialize();
+    processEngine = lookupProcessEngine(null);
   }
   
-  protected void initialize() {
-    processEngine = lookupProcessEngine();
+  public AbstractProcessEngineAware(String engineName) {
+    processEngine = lookupProcessEngine(engineName);
   }
-
-  protected ProcessEngine lookupProcessEngine() {
+  
+  protected ProcessEngine lookupProcessEngine(String engineName) {
     
-    ServiceLoader<TasklistProcessEngineProvider> serviceLoader = ServiceLoader.load(TasklistProcessEngineProvider.class);
-    Iterator<TasklistProcessEngineProvider> iterator = serviceLoader.iterator();
+    ServiceLoader<ProcessEngineProvider> serviceLoader = ServiceLoader.load(ProcessEngineProvider.class);
+    Iterator<ProcessEngineProvider> iterator = serviceLoader.iterator();
     
     if(iterator.hasNext()) {
-      TasklistProcessEngineProvider provider = iterator.next();
-      return provider.getProcessEngine();      
+      ProcessEngineProvider provider = iterator.next();
+      if (engineName == null) {
+        return provider.getDefaultProcessEngine();
+      } else {
+        return provider.getProcessEngine(engineName);
+      }
     } else {
-      throw new RestException("Could not find an implementation of the "+TasklistProcessEngineProvider.class+"- SPI");
+      throw new RestException("Could not find an implementation of the "+ProcessEngineProvider.class+"- SPI");
     }
 
   }

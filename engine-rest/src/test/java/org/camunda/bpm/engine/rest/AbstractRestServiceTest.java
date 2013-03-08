@@ -12,6 +12,7 @@ import javax.ws.rs.core.MediaType;
 
 import org.apache.http.entity.ContentType;
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.rest.spi.ProcessEngineProvider;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
@@ -59,7 +60,20 @@ public abstract class AbstractRestServiceTest {
 
     if (iterator.hasNext()) {
       ProcessEngineProvider provider = iterator.next();
-      processEngine = provider.getProcessEngine();
+      processEngine = provider.getDefaultProcessEngine();
+    }
+  }
+  
+  protected ProcessEngine getProcessEngine(String name) {
+    ServiceLoader<ProcessEngineProvider> serviceLoader = ServiceLoader
+        .load(ProcessEngineProvider.class);
+    Iterator<ProcessEngineProvider> iterator = serviceLoader.iterator();
+    
+    if (iterator.hasNext()) {
+      ProcessEngineProvider provider = iterator.next();
+      return provider.getProcessEngine(name);
+    } else {
+      throw new ProcessEngineException("No provider found");
     }
   }
 
