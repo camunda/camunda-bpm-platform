@@ -14,6 +14,7 @@ import org.apache.http.entity.ContentType;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.rest.spi.ProcessEngineProvider;
+import org.camunda.bpm.engine.rest.spi.impl.MockedProcessEngineProvider;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
@@ -59,7 +60,11 @@ public abstract class AbstractRestServiceTest {
     Iterator<ProcessEngineProvider> iterator = serviceLoader.iterator();
 
     if (iterator.hasNext()) {
-      ProcessEngineProvider provider = iterator.next();
+      MockedProcessEngineProvider provider = (MockedProcessEngineProvider) iterator.next();
+      
+      // reset engine mocks before every test
+      provider.resetEngines();
+      
       processEngine = provider.getDefaultProcessEngine();
     }
   }

@@ -35,6 +35,7 @@ import org.camunda.bpm.engine.rest.spi.AbstractProcessEngineAware;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
 
+public class TaskRestServiceImpl extends AbstractEngineRestService implements TaskRestService {
 public class TaskRestServiceImpl extends AbstractProcessEngineAware implements TaskRestService {
 
   public TaskRestServiceImpl() {

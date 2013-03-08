@@ -13,7 +13,7 @@ import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 
 @Path("/process-instance")
 @Produces(MediaType.APPLICATION_JSON)
-public interface ProcessInstanceService {
+public interface ProcessInstanceRestService {
 
   /**
    * Exposes the {@link ProcessInstanceQuery} interface as a REST service.
@@ -31,7 +31,7 @@ public interface ProcessInstanceService {
 
   /**
    * Expects the same parameters as
-   * {@link ProcessInstanceService#getProcessInstances(ProcessInstanceQueryDto, Integer, Integer)} (as a JSON message body)
+   * {@link ProcessInstanceRestService#getProcessInstances(ProcessInstanceQueryDto, Integer, Integer)} (as a JSON message body)
    * and allows for any number of variable checks.
    * 
    * @param query

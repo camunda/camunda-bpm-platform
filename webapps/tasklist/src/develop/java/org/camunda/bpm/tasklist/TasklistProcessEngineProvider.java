@@ -1,5 +1,7 @@
 package org.camunda.bpm.tasklist;
 
+import java.util.Set;
+
 import org.camunda.bpm.BpmPlatform;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.rest.spi.ProcessEngineProvider;
@@ -20,5 +22,9 @@ public class TasklistProcessEngineProvider implements ProcessEngineProvider {
 
     public ProcessEngine getProcessEngine(String name) {
       return BpmPlatform.getProcessEngineService().getProcessEngine(name);
+    }
+
+    public Set<String> getProcessEngineNames() {
+      return BpmPlatform.getProcessEngineService().getProcessEngineNames();
     }
 }

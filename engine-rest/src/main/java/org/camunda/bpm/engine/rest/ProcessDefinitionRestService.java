@@ -25,7 +25,7 @@ import org.camunda.bpm.engine.rest.dto.task.FormDto;
 
 @Path("/process-definition")
 @Produces(MediaType.APPLICATION_JSON)
-public interface ProcessDefinitionService {
+public interface ProcessDefinitionRestService {
 
   public static final String APPLICATION_BPMN20_XML = "application/bpmn20+xml";
   public static final MediaType APPLICATION_BPMN20_XML_TYPE =

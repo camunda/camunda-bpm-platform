@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.tasklist;
 
+import org.camunda.bpm.engine.rest.impl.ProcessDefinitionRestServiceImpl;
+import org.camunda.bpm.engine.rest.impl.ProcessInstanceRestServiceImpl;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -31,8 +33,8 @@ public class EngineApiApplication extends Application {
   public Set<Class<?>> getClasses() {
     Set<Class<?>> classes = new HashSet<Class<?>>();
 
-    classes.add(ProcessDefinitionServiceImpl.class);
-    classes.add(ProcessInstanceServiceImpl.class);
+    classes.add(ProcessDefinitionRestServiceImpl.class);
+    classes.add(ProcessInstanceRestServiceImpl.class);
     classes.add(TaskRestServiceImpl.class);
 
     classes.add(EngineQueryDtoGetReader.class);
