@@ -1,5 +1,5 @@
 
-<Context>
+<Context antiResourceLocking="true">
    <Resource name="BeanManager" 
       auth="Container"
       type="javax.enterprise.inject.spi.BeanManager"
