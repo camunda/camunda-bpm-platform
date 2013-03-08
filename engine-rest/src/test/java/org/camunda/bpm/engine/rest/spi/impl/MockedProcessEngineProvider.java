@@ -26,6 +26,11 @@ public class MockedProcessEngineProvider implements ProcessEngineProvider {
   public static final String EXAMPLE_PROCESS_ENGINE_NAME = "default";
   public static final String ANOTHER_EXAMPLE_PROCESS_ENGINE_NAME = "anotherEngineName";
   
+  public void resetEngines() {
+    cachedDefaultProcessEngine = null;
+    cachedEngines = new HashMap<String, ProcessEngine>();
+  }
+  
   private void mockServices(ProcessEngine engine) {
     RepositoryService repoService = mock(RepositoryService.class);
     IdentityService identityService = mock(IdentityService.class);
