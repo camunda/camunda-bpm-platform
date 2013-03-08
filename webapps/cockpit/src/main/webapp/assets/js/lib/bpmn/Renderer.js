@@ -45,7 +45,7 @@ define(["dojox/gfx", "dojo/_base/lang", "dojo/dom-construct", "dojo/_base/window
     "compensate": "M 50 70 L 55 65 L 55 75z M44.7 70 L49.7 75 L 49.7 65z"
   }
 
-  var regularStroke = "#888";
+  var regularStroke = "#444";
   var highlightStroke = "darkOrange";
 
   var generalStyle = {
