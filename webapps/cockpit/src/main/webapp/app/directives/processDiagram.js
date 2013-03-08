@@ -108,14 +108,17 @@ define([ "angular", "jquery", "bpmn/Bpmn", "dojo/domReady!", "bootstrap-slider/b
 
                   // id to scroll to is the process definition key
                   var processId = '#' + processDefinition.key;
-                  // scroll to selected process if it is a collaboration
-
-                  console.log("scrolling to point (" + $(processId).position().top + "," + $(processId).position().left + ")" );
-
-                  container.animate({
-                    scrollTop: $(processId).position().top,
-                    scrollLeft: $(processId).position().left
-                  }, 500);
+                  var processElement = $(processId);
+                  
+                  if (!!processElement && !!processElement.length) {
+                    console.log("scrolling to point (" + $(processId).position().top + "," + $(processId).position().left + ")" );
+                    
+                    // scroll to selected process if it is a collaboration
+                    container.animate({
+                      scrollTop: $(processId).position().top,
+                      scrollLeft: $(processId).position().left
+                    }, 500);
+                  }
 
                   ProcessDefinitionActivityStatisticsResource.queryStatistics({ id : scope.processDefinitionId }).$then(function(result) {
                     scope.activityStatistics = getActivityStatisticsResult(result);
