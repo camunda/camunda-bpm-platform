@@ -31,11 +31,10 @@ import org.camunda.bpm.engine.rest.dto.task.TaskQueryDto;
 import org.camunda.bpm.engine.rest.dto.task.UserDto;
 import org.camunda.bpm.engine.rest.dto.task.UserIdDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
-import org.camunda.bpm.engine.rest.spi.impl.AbstractProcessEngineAware;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
 
-public class TaskRestServiceImpl extends AbstractProcessEngineAware implements TaskRestService {
+public class TaskRestServiceImpl extends AbstractRestProcessEngineAware implements TaskRestService {
 
   public TaskRestServiceImpl() {
     super();
@@ -48,7 +47,7 @@ public class TaskRestServiceImpl extends AbstractProcessEngineAware implements T
   @Override
   public List<TaskDto> getTasks(TaskQueryDto queryDto, Integer firstResult, Integer maxResults) {
 
-    TaskService taskService = processEngine.getTaskService();
+    TaskService taskService = getProcessEngine().getTaskService();
 
     TaskQuery query;
 
@@ -92,26 +91,26 @@ public class TaskRestServiceImpl extends AbstractProcessEngineAware implements T
 
   @Override
   public void claim(String taskId, UserIdDto dto) {
-    TaskService taskService = processEngine.getTaskService();
+    TaskService taskService = getProcessEngine().getTaskService();
 
     taskService.claim(taskId, dto.getUserId());
   }
 
   @Override
   public void unclaim(@PathParam("id") String taskId, UserIdDto dto) {
-    processEngine.getTaskService().setAssignee(taskId, null);
+    getProcessEngine().getTaskService().setAssignee(taskId, null);
   }
 
   @Override
   public void complete(String taskId, CompleteTaskDto dto) {
-    TaskService taskService = processEngine.getTaskService();
+    TaskService taskService = getProcessEngine().getTaskService();
 
     taskService.complete(taskId, dto.getVariables());
   }
 
   @Override
   public void delegate(@PathParam("id") String taskId, UserIdDto delegatedUser) {
-    processEngine.getTaskService().delegateTask(taskId, delegatedUser.getUserId());
+    getProcessEngine().getTaskService().delegateTask(taskId, delegatedUser.getUserId());
   }
 
   @Override
@@ -120,8 +119,8 @@ public class TaskRestServiceImpl extends AbstractProcessEngineAware implements T
       throw new WebApplicationException(Status.BAD_REQUEST.getStatusCode());
     }
     
-    TaskService taskService = processEngine.getTaskService();
-    IdentityService identityService = processEngine.getIdentityService();
+    TaskService taskService = getProcessEngine().getTaskService();
+    IdentityService identityService = getProcessEngine().getIdentityService();
 
     Map<String, Long> groupCounts = new HashMap<String, Long>();
 
@@ -148,7 +147,7 @@ public class TaskRestServiceImpl extends AbstractProcessEngineAware implements T
 
   @Override
   public CountResultDto getTasksCount(TaskQueryDto queryDto) {
-    TaskService taskService = processEngine.getTaskService();
+    TaskService taskService = getProcessEngine().getTaskService();
 
     TaskQuery query;
     try {
@@ -181,7 +180,7 @@ public class TaskRestServiceImpl extends AbstractProcessEngineAware implements T
 
   @Override
   public FormDto getForm(String id) {
-    FormService formService = processEngine.getFormService();
+    FormService formService = getProcessEngine().getFormService();
 
     FormData formData;
     try {
@@ -195,8 +194,8 @@ public class TaskRestServiceImpl extends AbstractProcessEngineAware implements T
 
   @Override
   public void resolve(String taskId, CompleteTaskDto dto) {
-    TaskService taskService = processEngine.getTaskService();
-    RuntimeService runtimeService = processEngine.getRuntimeService();
+    TaskService taskService = getProcessEngine().getTaskService();
+    RuntimeService runtimeService = getProcessEngine().getRuntimeService();
 
     // FIXME: atomicity of operation
 
@@ -214,6 +213,6 @@ public class TaskRestServiceImpl extends AbstractProcessEngineAware implements T
    * @return
    */
   private Task getTaskById(String id) {
-    return processEngine.getTaskService().createTaskQuery().taskId(id).singleResult();
+    return getProcessEngine().getTaskService().createTaskQuery().taskId(id).singleResult();
   }
 }

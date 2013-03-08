@@ -9,9 +9,9 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.FormService;
 import org.camunda.bpm.engine.ManagementService;
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.form.StartFormData;
@@ -25,15 +25,18 @@ import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
 import org.camunda.bpm.engine.rest.ProcessDefinitionRestService;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.StatisticsResultDto;
-import org.camunda.bpm.engine.rest.dto.repository.*;
+import org.camunda.bpm.engine.rest.dto.repository.ActivityStatisticsResultDto;
+import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDiagramDto;
+import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDto;
+import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionQueryDto;
+import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionStatisticsResultDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.runtime.StartProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.task.FormDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
-import org.camunda.bpm.engine.rest.spi.impl.AbstractProcessEngineAware;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 
-public class ProcessDefinitionRestServiceImpl extends AbstractProcessEngineAware implements ProcessDefinitionRestService {
+public class ProcessDefinitionRestServiceImpl extends AbstractRestProcessEngineAware implements ProcessDefinitionRestService {
 
   public ProcessDefinitionRestServiceImpl() {
     super();
@@ -48,7 +51,7 @@ public class ProcessDefinitionRestServiceImpl extends AbstractProcessEngineAware
 	    Integer firstResult, Integer maxResults) {
 	  List<ProcessDefinitionDto> definitions = new ArrayList<ProcessDefinitionDto>();
 
-	  RepositoryService repoService = processEngine.getRepositoryService();
+	  RepositoryService repoService = getProcessEngine().getRepositoryService();
 
 	  ProcessDefinitionQuery query;
 	  try {
@@ -84,7 +87,7 @@ public class ProcessDefinitionRestServiceImpl extends AbstractProcessEngineAware
 
 	@Override
   public CountResultDto getProcessDefinitionsCount(ProcessDefinitionQueryDto queryDto) {
-    RepositoryService repoService = processEngine.getRepositoryService();
+    RepositoryService repoService = getProcessEngine().getRepositoryService();
 
     ProcessDefinitionQuery query;
     try {
@@ -101,7 +104,7 @@ public class ProcessDefinitionRestServiceImpl extends AbstractProcessEngineAware
 
   @Override
   public ProcessDefinitionDto getProcessDefinition(String processDefinitionId) {
-    RepositoryService repoService = processEngine.getRepositoryService();
+    RepositoryService repoService = getProcessEngine().getRepositoryService();
 
     ProcessDefinition definition;
     try {
@@ -117,7 +120,7 @@ public class ProcessDefinitionRestServiceImpl extends AbstractProcessEngineAware
 
   @Override
   public ProcessInstanceDto startProcessInstance(UriInfo context, String processDefinitionId, StartProcessInstanceDto parameters) {
-    RuntimeService runtimeService = processEngine.getRuntimeService();
+    RuntimeService runtimeService = getProcessEngine().getRuntimeService();
 
     ProcessInstance instance = null;
     try {
@@ -136,7 +139,7 @@ public class ProcessDefinitionRestServiceImpl extends AbstractProcessEngineAware
    */
   @Override
   public List<StatisticsResultDto> getStatistics(Boolean includeFailedJobs) {
-    ManagementService mgmtService = processEngine.getManagementService();
+    ManagementService mgmtService = getProcessEngine().getManagementService();
     ProcessDefinitionStatisticsQuery query = mgmtService.createProcessDefinitionStatisticsQuery();
     if (includeFailedJobs != null && includeFailedJobs) {
       query.includeFailedJobs();
@@ -155,7 +158,7 @@ public class ProcessDefinitionRestServiceImpl extends AbstractProcessEngineAware
 
   @Override
   public List<StatisticsResultDto> getActivityStatistics(String processDefinitionId, Boolean includeFailedJobs) {
-    ManagementService mgmtService = processEngine.getManagementService();
+    ManagementService mgmtService = getProcessEngine().getManagementService();
     ActivityStatisticsQuery query = mgmtService.createActivityStatisticsQuery(processDefinitionId);
     if (includeFailedJobs != null && includeFailedJobs) {
       query.includeFailedJobs();
@@ -176,7 +179,7 @@ public class ProcessDefinitionRestServiceImpl extends AbstractProcessEngineAware
   public ProcessDefinitionDiagramDto getProcessDefinitionBpmn20Xml(String processDefinitionId) {
     InputStream processModelIn = null;
     try {
-      processModelIn = processEngine.getRepositoryService().getProcessModel(processDefinitionId);
+      processModelIn = getProcessEngine().getRepositoryService().getProcessModel(processDefinitionId);
       byte[] processModel = IoUtil.readInputStream(processModelIn, "processModelBpmn20Xml");
       return ProcessDefinitionDiagramDto.create(processDefinitionId, new String(processModel, "UTF-8"));
     } catch (Exception e) {
@@ -188,7 +191,7 @@ public class ProcessDefinitionRestServiceImpl extends AbstractProcessEngineAware
 
   @Override
   public FormDto getStartForm(@PathParam("id") String processDefinitionId) {
-    final FormService formService = processEngine.getFormService();
+    final FormService formService = getProcessEngine().getFormService();
     
     final StartFormData formData;
     try {

@@ -25,6 +25,7 @@ public class MockedProcessEngineProvider implements ProcessEngineProvider {
   
   public static final String EXAMPLE_PROCESS_ENGINE_NAME = "default";
   public static final String ANOTHER_EXAMPLE_PROCESS_ENGINE_NAME = "anotherEngineName";
+  public static final String NON_EXISTING_PROCESS_ENGINE_NAME = "aNonExistingEngineName";
   
   public void resetEngines() {
     cachedDefaultProcessEngine = null;
@@ -61,6 +62,10 @@ public class MockedProcessEngineProvider implements ProcessEngineProvider {
 
   @Override
   public ProcessEngine getProcessEngine(String name) {
+    if (name.equals(NON_EXISTING_PROCESS_ENGINE_NAME)) {
+      return null;
+    }
+    
     if (cachedEngines.get(name) == null) {
       ProcessEngine mock = mock(ProcessEngine.class);
       mockServices(mock);

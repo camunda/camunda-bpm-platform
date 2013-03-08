@@ -58,9 +58,15 @@ public class ProcessEngineRestServiceTest extends AbstractRestServiceTest {
     verifyZeroInteractions(processEngine);
   }
   
-//  @Test
+  @Test
   public void testNonExistingEngineAccess() throws IOException {
-    // TODO: implement
+    setup();
+    
+    given().pathParam("name", MockedProcessEngineProvider.NON_EXISTING_PROCESS_ENGINE_NAME)
+      .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+    .when().get(PROCESS_DEFINITION_URL);
   }
   
   @Test
