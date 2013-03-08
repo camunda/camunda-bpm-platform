@@ -27,7 +27,7 @@ import org.mockito.Mockito;
 
 import com.jayway.restassured.response.Response;
 
-public class ProcessInstanceServiceQueryTest extends AbstractRestServiceTest {
+public class ProcessInstanceRestServiceQueryTest extends AbstractRestServiceTest {
   
   private static final String PROCESS_INSTANCE_QUERY_URL = TEST_RESOURCE_ROOT_PATH + "/process-instance";
   private static final String PROCESS_INSTANCE_COUNT_QUERY_URL = PROCESS_INSTANCE_QUERY_URL + "/count";

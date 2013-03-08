@@ -76,8 +76,7 @@
         <unpack>true</unpack>
     </dependencySet>
     
-    <!-- adding resteasy to camunda-engine-rest -->
-    
+    <!-- adding resteasy to camunda-engine-rest -->    
     <dependencySet>
       <outputDirectory>server/apache-tomcat-${tomcat6.version}/webapps/camunda-engine-rest/WEB-INF/lib</outputDirectory>
       <useTransitiveDependencies>true</useTransitiveDependencies>     
@@ -93,6 +92,24 @@
         </includes>
         <outputDirectory>server/apache-tomcat-${tomcat6.version}/webapps/camunda-cockpit</outputDirectory>
         <unpack>true</unpack>
+    </dependencySet>
+    
+    <dependencySet>
+        <includes>
+            <include>org.camunda.bpm.tasklist:camunda-tasklist:war:*</include>
+        </includes>
+        <outputDirectory>server/apache-tomcat-${tomcat6.version}/webapps/camunda-tasklist</outputDirectory>
+        <unpack>true</unpack>
+    </dependencySet>
+    
+    <!-- adding resteasy to camunda-tasklist -->    
+    <dependencySet>
+      <outputDirectory>server/apache-tomcat-${tomcat6.version}/webapps/camunda-tasklist/WEB-INF/lib</outputDirectory>
+      <useTransitiveDependencies>true</useTransitiveDependencies>     
+      <useTransitiveFiltering>true</useTransitiveFiltering>
+      <includes>
+        <include>org.jboss.resteasy:resteasy-jaxrs:jar:*</include>
+      </includes>
     </dependencySet>
 		
   </dependencySets>

@@ -10,35 +10,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.rest.impl.application;
-
-import java.util.Set;
+package org.camunda.bpm.tasklist.spi.impl;
 
 import org.camunda.bpm.BpmPlatform;
-import org.camunda.bpm.ProcessEngineService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.rest.spi.ProcessEngineProvider;
+import org.camunda.bpm.tasklist.spi.TasklistProcessEngineProvider;
 
-/**
- * <p>Uses the {@link ProcessEngineService} and exposes the default process engine</p>
- * 
- * @author Daniel Meyer
- */
-public class ContainerManagedProcessEngineProvider implements ProcessEngineProvider {
+public class ContainerManagedProcessEngineProvider implements ProcessEngineProvider, TasklistProcessEngineProvider {
 
-  @Override
   public ProcessEngine getDefaultProcessEngine() {
     return BpmPlatform.getDefaultProcessEngine();
   }
 
-  @Override
   public ProcessEngine getProcessEngine(String name) {
     return BpmPlatform.getProcessEngineService().getProcessEngine(name);
-  }
-
-  @Override
-  public Set<String> getProcessEngineNames() {
-    return BpmPlatform.getProcessEngineService().getProcessEngineNames();
   }
 
 }

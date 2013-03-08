@@ -1,30 +1,40 @@
 package org.camunda.bpm.tasklist;
 
-import java.util.logging.Logger;
-
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
-
+import org.camunda.bpm.BpmPlatform;
+import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
+import org.camunda.bpm.engine.RepositoryService;
+import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;
-import org.camunda.bpm.tasklist.spi.AbstractProcessEngineAware;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.persistence.StrongUuidGenerator;
+import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.rest.spi.ProcessEngineProvider;
+
+import javax.swing.*;
+import java.util.List;
 
 /**
  * @author: drobisch
  */
-public class TasklistDemoData extends AbstractProcessEngineAware {
-  
-    private final static Logger LOGGER = Logger.getLogger(TasklistDemoData.class.getName());
+public class TasklistDemoData {
 
-    public void createDemoData() {
+    private static final int numOfProcessesPerDefinition = 10;
 
-      User singleResult = processEngine.getIdentityService().createUserQuery().userId("demo").singleResult();
-      if(singleResult != null) {
-        return;
+    public static void createDemoData() {
+      ProcessEngine processEngine = BpmPlatform.getDefaultProcessEngine();
+
+      RepositoryService repositoryService = processEngine.getRepositoryService();
+
+      RuntimeService runtimeService = processEngine.getRuntimeService();
+      List<ProcessDefinition> pds = repositoryService.createProcessDefinitionQuery().list();
+      for (ProcessDefinition pd : pds) {
+        for (int i = 0; i < numOfProcessesPerDefinition; i++) {
+          runtimeService.startProcessInstanceById(pd.getId());
+        }
       }
- 
-      LOGGER.info("Generating demo data for tasklist");
-      
+
       User user = processEngine.getIdentityService().newUser("demo");
       user.setPassword("demo");
       user.setEmail("demo@camunda.org");
@@ -68,5 +78,4 @@ public class TasklistDemoData extends AbstractProcessEngineAware {
       processEngine.getIdentityService().createMembership("accounting", "accounting");
       processEngine.getIdentityService().createMembership("management", "management");
     }
-
 }

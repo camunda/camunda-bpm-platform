@@ -86,7 +86,7 @@ public class StatisticsRestTest extends AbstractRestServiceTest {
   
   @Test
   public void testActivityStatisticsRetrieval() throws IOException {
-    setupTestScenario();
+    setUp();
     
     given().pathParam("id", "aDefinitionId")
     .then().expect()
