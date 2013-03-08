@@ -46,7 +46,7 @@ public interface ProcessEngineService {
   
   /**
    * 
-   * @return the {@link ProcessEngine} for the given name
+   * @return the {@link ProcessEngine} for the given name or null if no such process engine exists.
    */
   public ProcessEngine getProcessEngine(String name);
   

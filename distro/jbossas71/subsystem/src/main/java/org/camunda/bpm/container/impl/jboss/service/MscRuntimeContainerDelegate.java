@@ -40,6 +40,7 @@ import org.jboss.msc.service.ServiceContainer;
 import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceController.Mode;
 import org.jboss.msc.service.ServiceName;
+import org.jboss.msc.service.ServiceNotFoundException;
 import org.jboss.msc.service.ServiceTarget;
 import org.jboss.msc.service.StartContext;
 import org.jboss.msc.service.StartException;
@@ -211,14 +212,18 @@ public class MscRuntimeContainerDelegate implements Service<MscRuntimeContainerD
     
   }
   
-  protected ProcessEngine getProcessEngineService(ServiceName processEgineServiceName) {
-    ServiceController<ProcessEngine> serviceController = getProcessEngineServiceController(processEgineServiceName);
-    return serviceController.getValue();
+  protected ProcessEngine getProcessEngineService(ServiceName processEngineServiceName) {
+    try {
+      ServiceController<ProcessEngine> serviceController = getProcessEngineServiceController(processEngineServiceName);
+      return serviceController.getValue();
+    } catch (ServiceNotFoundException e) {
+      return null;
+    }
   }
   
   @SuppressWarnings("unchecked")
-  protected ServiceController<ProcessEngine> getProcessEngineServiceController(ServiceName processEgineServiceName) {
-    ServiceController<ProcessEngine> serviceController = (ServiceController<ProcessEngine>) serviceContainer.getRequiredService(processEgineServiceName);
+  protected ServiceController<ProcessEngine> getProcessEngineServiceController(ServiceName processEngineServiceName) {
+    ServiceController<ProcessEngine> serviceController = (ServiceController<ProcessEngine>) serviceContainer.getRequiredService(processEngineServiceName);
     return serviceController;
   }
   
