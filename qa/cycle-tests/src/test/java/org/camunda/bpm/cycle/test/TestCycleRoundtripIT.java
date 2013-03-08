@@ -1,4 +1,4 @@
-package com.camunda.fox.cycle.test;
+package org.camunda.bpm.cycle.test;
 
 import java.io.File;
 import java.io.InputStream;
@@ -52,8 +52,8 @@ public class TestCycleRoundtripIT extends AbstractCycleIT {
   private static final String SVN_GLOBAL_USER = "hudson-test";
   private static final String SVN_GLOBAL_PWD = "2KamD3Lo";
   
-  private static final String LHS_PROCESS_DIAGRAM = "/com/camunda/fox/cycle/roundtrip/repository/test-lhs.bpmn";
-  private static final String RHS_PROCESS_DIAGRAM = "/com/camunda/fox/cycle/roundtrip/repository/test-rhs.bpmn";
+  private static final String LHS_PROCESS_DIAGRAM = "/org/camunda/bpm/cycle/roundtrip/repository/test-lhs.bpmn";
+  private static final String RHS_PROCESS_DIAGRAM = "/org/camunda/bpm/cycle/roundtrip/repository/test-rhs.bpmn";
   
   private RoundtripDTO roundtripDTO;
   private Long connectorId;

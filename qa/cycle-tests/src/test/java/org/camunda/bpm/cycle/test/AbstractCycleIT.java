@@ -1,4 +1,4 @@
-package com.camunda.fox.cycle.test;
+package org.camunda.bpm.cycle.test;
 
 import java.io.InputStream;
 import java.util.ArrayList;
