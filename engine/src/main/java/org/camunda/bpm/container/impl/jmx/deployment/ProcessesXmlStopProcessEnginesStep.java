@@ -24,7 +24,6 @@ import org.camunda.bpm.container.impl.jmx.kernel.MBeanDeploymentOperationStep;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanServiceContainer;
 import org.camunda.bpm.container.impl.jmx.services.JmxManagedProcessApplication;
 import org.camunda.bpm.container.impl.metadata.spi.ProcessEngineXml;
-import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 
 /**
@@ -35,7 +34,7 @@ import org.camunda.bpm.engine.ProcessEngineException;
  */
 public class ProcessesXmlStopProcessEnginesStep extends MBeanDeploymentOperationStep {
   
-  protected final static Logger log = Logger.getLogger(ProcessesXmlStopProcessEnginesStep.class.getName());
+  protected final static Logger LOGGER = Logger.getLogger(ProcessesXmlStopProcessEnginesStep.class.getName());
   
   public String getName() {
     return "Stopping process engines";
@@ -64,15 +63,14 @@ public class ProcessesXmlStopProcessEnginesStep extends MBeanDeploymentOperation
     }        
   }
 
-  protected void stopProcessEngine(String processEngineName, MBeanDeploymentOperation operationContext) {    
-    final MBeanServiceContainer serviceContainer = operationContext.getServiceContainer();    
+  protected void stopProcessEngine(String processEngineName, MBeanDeploymentOperation operationContext) {
     
-    ProcessEngine processEngine = serviceContainer.getServiceValue(ServiceTypes.PROCESS_ENGINE, processEngineName);
-    if(processEngine != null) {
-      processEngine.close();
+    final MBeanServiceContainer serviceContainer = operationContext.getServiceContainer();
+    try {
+      serviceContainer.stopService(ServiceTypes.PROCESS_ENGINE.getServiceName(processEngineName));
       
-    } else {
-      log.log(Level.INFO, "Cannot stop process engine; no such process engine registered.");
+    } catch(Exception e) {      
+      LOGGER.log(Level.WARNING, "Could not stop managed process engine: "+e.getMessage(), e);
       
     }
     

@@ -12,18 +12,19 @@
  */
 package org.camunda.bpm.container.impl.jmx.deployment;
 
-import java.util.List;
+import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
+import javax.management.ObjectName;
 
 import org.camunda.bpm.container.impl.jmx.JmxRuntimeContainerDelegate.ServiceTypes;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanDeploymentOperation;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanDeploymentOperationStep;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanServiceContainer;
-import org.camunda.bpm.engine.ProcessEngine;
 
 /**
- * <p>Deployment operation step that stops all process engines.</p>
+ * <p>Deployment operation step that stops ALL process engines registered inside the container.</p>
  * 
  * @author Daniel Meyer
  *
@@ -38,29 +39,26 @@ public class StopProcessEnginesStep extends MBeanDeploymentOperationStep {
 
   public void performOperationStep(MBeanDeploymentOperation operationContext) {
     
-    MBeanServiceContainer serviceContainer = operationContext.getServiceContainer();
-    List<ProcessEngine> processEngines = serviceContainer.getServiceValuesByType(ServiceTypes.PROCESS_ENGINE);
+    final MBeanServiceContainer serviceContainer = operationContext.getServiceContainer();
+    Set<ObjectName> serviceNames = serviceContainer.getServiceNames(ServiceTypes.PROCESS_ENGINE);
     
-    for (ProcessEngine processEngine : processEngines) {
-      stopProcessEngine(processEngine);      
+    for (ObjectName serviceName : serviceNames) {
+      stopProcessEngine(serviceName, serviceContainer);      
     }
     
   }
 
   /**
-   * Stops  a process engine, failures are logged but no exceptions are thrown. 
+   * Stops a process engine, failures are logged but no exceptions are thrown. 
    * 
-   * @param processEngine
    */
-  protected void stopProcessEngine(ProcessEngine processEngine) {
+  private void stopProcessEngine(ObjectName serviceName, MBeanServiceContainer serviceContainer) {
     
     try {
+      serviceContainer.stopService(serviceName);
       
-      // closing the process eninge makes sure it unregristers with the service container.
-      processEngine.close();
-      
-    } catch(Throwable t) {
-      LOGGER.log(Level.WARNING, "Exception while stopping process engine ", t);      
+    }catch(Exception e) {
+      LOGGER.log(Level.FINE, "Could not stop managed process engine "+serviceName.toString(), e);
     }
     
   }
