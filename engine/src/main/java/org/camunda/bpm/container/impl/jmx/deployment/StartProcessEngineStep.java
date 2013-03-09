@@ -129,12 +129,4 @@ public class StartProcessEngineStep extends MBeanDeploymentOperationStep {
     }
   }
 
-  public void cancelOperationStep(MBeanDeploymentOperation operationContext) {
-    
-    // stop the process engine
-    operationContext.getServiceContainer()
-      .stopService(ServiceTypes.PROCESS_ENGINE.getServiceName(processEngineXml.getName()));
-    
-  }
-
 }
