@@ -25,17 +25,22 @@ import org.jboss.shrinkwrap.resolver.api.maven.MavenDependencyResolver;
 public class DeploymentHelper {
   
   public static final String CAMUNDA_EJB_CLIENT = "org.camunda.bpm.javaee:camunda-ejb-client";
-
-  private static MavenDependencyResolver resolver = DependencyResolvers.use(MavenDependencyResolver.class).goOffline().loadMetadataFromPom("pom.xml");
+  public static final String CAMUNDA_ENGINE_CDI = "org.camunda.bpm:camunda-engine-cdi";
   
   private static JavaArchive CACHED_CLIENT_ASSET;
+  private static JavaArchive CACHED_ENGINE_CDI_ASSET;
   private static Collection<JavaArchive> CACHED_WELD_ASSETS;
 
   public static JavaArchive getEjbClient() {
     if(CACHED_CLIENT_ASSET != null) {
       return CACHED_CLIENT_ASSET;
     } else {
-      Collection<JavaArchive> resolvedArchives = resolver.artifact(CAMUNDA_EJB_CLIENT).resolveAs(JavaArchive.class);
+      
+      Collection<JavaArchive> resolvedArchives = DependencyResolvers
+          .use(MavenDependencyResolver.class)
+          .goOffline()
+          .loadMetadataFromPom("pom.xml")
+          .artifact(CAMUNDA_EJB_CLIENT).resolveAs(JavaArchive.class);
       
       if(resolvedArchives.size() != 1) {
         throw new RuntimeException("could not resolve "+CAMUNDA_EJB_CLIENT);
@@ -47,11 +52,37 @@ public class DeploymentHelper {
     
   }
   
+  public static JavaArchive getEngineCdi() {
+    if(CACHED_ENGINE_CDI_ASSET != null) {
+      return CACHED_ENGINE_CDI_ASSET;
+    } else {
+      
+      Collection<JavaArchive> resolvedArchives = DependencyResolvers
+          .use(MavenDependencyResolver.class)
+          .goOffline()
+          .loadMetadataFromPom("pom.xml")
+          .artifact(CAMUNDA_ENGINE_CDI).resolveAs(JavaArchive.class);
+      
+      if(resolvedArchives.size() != 1) {
+        throw new RuntimeException("could not resolve "+CAMUNDA_ENGINE_CDI);
+      } else {    
+        CACHED_ENGINE_CDI_ASSET = resolvedArchives.iterator().next();
+        return CACHED_ENGINE_CDI_ASSET;
+      }
+    }    
+  }
+  
   public static Collection<JavaArchive> getWeld() {
     if(CACHED_WELD_ASSETS != null) {
       return CACHED_WELD_ASSETS;
-    } else {      
-      Collection<JavaArchive> resolvedArchives = resolver.artifact("org.jboss.weld.servlet:weld-servlet").resolveAs(JavaArchive.class);
+    } else { 
+      
+      Collection<JavaArchive> resolvedArchives = DependencyResolvers
+          .use(MavenDependencyResolver.class)
+          .goOffline()
+          .loadMetadataFromPom("pom.xml")
+          .artifact(CAMUNDA_ENGINE_CDI)
+          .artifact("org.jboss.weld.servlet:weld-servlet").resolveAs(JavaArchive.class);
       
       if(resolvedArchives.size()==0) {
         throw new RuntimeException("could not resolve org.jboss.weld.servlet:weld-servlet");

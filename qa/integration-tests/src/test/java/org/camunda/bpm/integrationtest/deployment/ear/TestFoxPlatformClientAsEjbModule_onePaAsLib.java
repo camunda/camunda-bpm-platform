@@ -79,7 +79,8 @@ public class TestFoxPlatformClientAsEjbModule_onePaAsLib extends AbstractFoxPlat
     return ShrinkWrap.create(EnterpriseArchive.class, "onePaAsLib.ear")            
       .addAsLibrary(processArchiveJar)
       .addAsModule(foxPlatformClientJar)
-      .addAsModule(testJar);
+      .addAsModule(testJar)
+      .addAsLibrary(DeploymentHelper.getEngineCdi());
   }
       
   @Test

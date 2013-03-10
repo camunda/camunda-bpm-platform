@@ -128,7 +128,7 @@ public class MBeanDeploymentOperation {
           }   
           
           // re-throw the original exception
-          throw new ProcessEngineException("Exception while performing '" + name+"'", e);
+          throw new ProcessEngineException("Exception while performing '" + name+" => "+currentStep.getName()+"': " + e.getMessage(), e);
           
         } else {
           log.log(Level.SEVERE, "Exception while performing operation step '" + currentStep.getName() + "': " + e.getMessage(), e);
@@ -163,6 +163,10 @@ public class MBeanDeploymentOperation {
         
       }      
     }   
+  }
+  
+  public List<ObjectName> getInstalledServices() {
+    return installedServices;
   }
   
   // builder /////////////////////////////

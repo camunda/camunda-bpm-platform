@@ -15,6 +15,7 @@ package org.camunda.bpm.container.impl.jboss.service;
 import java.io.ByteArrayInputStream;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.ExecutorService;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -51,8 +52,13 @@ public class ProcessApplicationDeploymentService implements Service<ProcessAppli
   
   private final static Logger LOGGER = Logger.getLogger(ProcessApplicationDeploymentService.class.getName());
   
+  protected InjectedValue<ExecutorService> executorInjector = new InjectedValue<ExecutorService>();
+  
   protected InjectedValue<ProcessEngine> processEngineInjector = new InjectedValue<ProcessEngine>();
-  protected InjectedValue<ComponentView> processApplicationInjector = new InjectedValue<ComponentView>();
+  
+  protected InjectedValue<AbstractProcessApplication> noViewProcessApplication = new InjectedValue<AbstractProcessApplication>();  
+  // for view-exposing ProcessApplicationComponents
+  protected InjectedValue<ComponentView> paComponentViewInjector = new InjectedValue<ComponentView>();
   
   /** the map of deployment resources obtained  through scanning */
   protected final Map<String,byte[]> deploymentMap;  
@@ -63,25 +69,61 @@ public class ProcessApplicationDeploymentService implements Service<ProcessAppli
   protected Deployment deployment;
   /** the registration we maintain with the process engine */
   protected ProcessApplicationRegistration registration;
+
     
   public ProcessApplicationDeploymentService(Map<String,byte[]> deploymentMap, ProcessArchiveXml processArchive) {
     this.deploymentMap = deploymentMap;
     this.processArchive = processArchive;
   }
 
-  public void start(StartContext context) throws StartException {
-    
-    final ComponentView processApplicationComponentView = processApplicationInjector.getValue();
-    
-    ManagedReference reference = null;    
+  public void start(final StartContext context) throws StartException {
+    context.asynchronous();    
+    executorInjector.getValue().submit(new Runnable() {
+      public void run() {
+        try {
+          performDeployment();
+          context.complete();
+        } catch (StartException e) {
+          context.failed(e);
+        } catch (Throwable e) {
+          context.failed(new StartException(e));
+        }
+      }
+    });
+  }
+  
+  public void stop(final StopContext context) {
+    context.asynchronous();    
+    executorInjector.getValue().submit(new Runnable() {
+      public void run() {
+        try {
+          performUndeployment();
+        } finally {
+          context.complete();
+        }
+      }
+    });
+  }
+
+  protected void performDeployment() throws StartException {
+   
+    ManagedReference reference = null;
     try {
 
       // get process engine
       ProcessEngine processEngine = processEngineInjector.getValue();
       
       // get the process application component
-      reference = processApplicationComponentView.createInstance();      
-      AbstractProcessApplication processApplication = (AbstractProcessApplication) reference.getInstance();
+      AbstractProcessApplication processApplication = null;      
+      ComponentView componentView = paComponentViewInjector.getOptionalValue();
+      if(componentView != null) {
+        reference = componentView.createInstance();
+        processApplication = (AbstractProcessApplication) reference.getInstance();
+      } else {
+        processApplication = noViewProcessApplication.getValue();
+      }
+      
+      // get the application name
       String processApplicationName = processApplication.getName();
       
       // log a summary of the deployment 
@@ -140,12 +182,12 @@ public class ProcessApplicationDeploymentService implements Service<ProcessAppli
     } finally {
       if(reference != null) {
         reference.release();
-      }      
+      }    
     }    
   }
-
-  public void stop(StopContext context) {
-
+  
+  protected void performUndeployment() {
+    
     final ProcessEngine processEngine = processEngineInjector.getValue();
     
     try {
@@ -166,9 +208,9 @@ public class ProcessApplicationDeploymentService implements Service<ProcessAppli
         LOGGER.log(Level.WARNING, "Exception while deleting process engine deployment", e);
       }
       
-    }    
+    }        
   }
-  
+ 
   public ProcessApplicationDeploymentService getValue() throws IllegalStateException, IllegalArgumentException {
     return this;
   }
@@ -177,8 +219,12 @@ public class ProcessApplicationDeploymentService implements Service<ProcessAppli
     return processEngineInjector;
   }
   
-  public InjectedValue<ComponentView> getProcessApplicationInjector() {
-    return processApplicationInjector;
+  public InjectedValue<AbstractProcessApplication> getNoViewProcessApplication() {
+    return noViewProcessApplication;
+  }
+  
+  public InjectedValue<ComponentView> getPaComponentViewInjector() {
+    return paComponentViewInjector;
   }
   
   public ProcessApplicationRegistration getRegistration() {
@@ -192,5 +238,10 @@ public class ProcessApplicationDeploymentService implements Service<ProcessAppli
   public String getProcessEngineName() {
     return processEngineInjector.getValue().getName();
   }
+  
+  public InjectedValue<ExecutorService> getExecutorInjector() {
+    return executorInjector;
+  }
+
 
 }

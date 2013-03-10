@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.logging.Logger;
 
 import org.camunda.bpm.application.AbstractProcessApplication;
 import org.camunda.bpm.application.ProcessApplicationDeploymentInfo;
@@ -37,8 +36,6 @@ import org.camunda.bpm.engine.ProcessEngineException;
  */
 public class JmxManagedProcessApplication implements MBeanService<JmxManagedProcessApplication>, JmxManagedProcessApplicationMBean {
   
-  private final Logger LOGGER = Logger.getLogger(JmxManagedProcessApplication.class.getName());
-	
 	protected ProcessApplicationReference processApplicationReference;
   protected List<ProcessesXml> processesXmls;
   protected Map<String, ProcessApplicationRegistration> deploymentMap;
@@ -88,7 +85,6 @@ public class JmxManagedProcessApplication implements MBeanService<JmxManagedProc
 	  // clear reference
 	  processApplicationReference = null;
 	  
-	  LOGGER.info("Process Application "+processApplicationInfo.getName()+" sucessfully deployed.");	  	  
 	}
 
 	public void stop(MBeanServiceContainer mBeanServiceContainer) {	  

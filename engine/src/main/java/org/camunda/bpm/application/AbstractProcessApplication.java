@@ -16,6 +16,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.ServiceLoader;
 import java.util.concurrent.Callable;
+import java.util.logging.Logger;
 
 import org.camunda.bpm.ProcessApplicationService;
 import org.camunda.bpm.application.impl.DefaultElResolverLookup;
@@ -34,40 +35,47 @@ import org.camunda.bpm.engine.repository.DeploymentBuilder;
  */
 public abstract class AbstractProcessApplication {
   
+  private final static Logger LOGGER = Logger.getLogger(AbstractProcessApplication.class.getName());
+  
   protected ELResolver processApplicationElResolver;
+
+  protected boolean isDeployed = false;
               
   // deployment /////////////////////////////////////////////////////
 
   /**
-   * Deploy this process application into the runtime container.
+   * <p>Deploy this process application into the runtime container.</p>
+   * 
+   * <strong>NOTE:</strong> on some containers (like JBoss AS 7) the deployment of 
+   * the process application is performed asynchronously and via introspection at deployment 
+   * time. This means that there is no guarantee that the process application is fully 
+   * deployed after this method returns. 
+   * 
+   * <p>If you need a post deployment hook, use the {@literal @}{@link PostDeploy} 
+   * annotation.</p> 
    */
-  public void deploy() {
-    // initialize el resolver
-    processApplicationElResolver = initProcessApplicationElResolver();
-    // deploy the application
-    RuntimeContainerDelegate.INSTANCE.get().deployProcessApplication(this);
-    postDeploy();
+  public final void deploy() {
+    if(isDeployed) {
+      LOGGER.warning("Calling deploy() on process application that is already deployed.");      
+    } else {
+      // initialize el resolver
+      processApplicationElResolver = initProcessApplicationElResolver();
+      // deploy the application
+      RuntimeContainerDelegate.INSTANCE.get().deployProcessApplication(this);
+      isDeployed = true;      
+    }
   }
 
   /**
-   * Undeploy this process application from the runtime container.
+   * <p>Deploy this process application from the runtime container.</p>
+   * 
+   * <p>If your application needs to ne notified of the undeployment, 
+   * add a {@literal @}{@link PreUndeploy} method to your subclass.</p>
    */
-  public void undeploy() {
-    preUndeploy();
+  public final void undeploy() {
     // delegate stopping of the process application to the runtime container.
     RuntimeContainerDelegate.INSTANCE.get().undeployProcessApplication(this);
-  }
-
-  /**
-   * Called after deployment of the process application
-   */
-  public void postDeploy() {
-  }
-
-  /**
-   * Called before undeployment of the process application
-   */
-  public void preUndeploy() {
+    isDeployed = false;
   }
     
   /**
@@ -111,7 +119,7 @@ public abstract class AbstractProcessApplication {
   }
   
   /**
-   * override this method to autodetect an application name in case the
+   * Override this method to autodetect an application name in case the
    * {@link ProcessApplication} annotation was used but without parameter.
    */
   protected abstract String autodetectProcessApplicationName();
@@ -183,7 +191,7 @@ public abstract class AbstractProcessApplication {
    * <p>The process engine will use this ElResolver whenever it is executing a 
    * process in the context of this process application.</p>
    * 
-   * <p>The process engine must only call this method form Callable implementations passed 
+   * <p>The process engine must only call this method from Callable implementations passed 
    * to {@link #execute(Callable)}</p>
    */
   public ELResolver getElResolver() {

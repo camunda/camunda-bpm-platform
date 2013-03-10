@@ -54,7 +54,7 @@
 	<tomcat6.connector.http.redirectPort>48443</tomcat6.connector.http.redirectPort>
 	<tomcat6.connector.ajp.port>48009</tomcat6.connector.ajp.port>
 	<tomcat6.connector.ajp.redirectPort>48443</tomcat6.connector.ajp.redirectPort>
-	<tomcat6.assembly.location>../../distro/tomcat6/assembly/target/assembly/server/apache-tomcat-6.0.36</tomcat6.assembly.location>
+	<tomcat6.assembly.location>../../distro/tomcat/assembly/target/assembly/server/apache-tomcat-7.0.33</tomcat6.assembly.location>
     
   </properties>
   
@@ -87,9 +87,9 @@
     </profile>  
 	
 	  <profile>
-      <id>tomcat6</id>      
+      <id>tomcat</id>      
       <modules>
-        <module>tomcat6-runtime</module>                
+        <module>tomcat-runtime</module>                
         <module>integration-tests</module>
       </modules>
     </profile>  

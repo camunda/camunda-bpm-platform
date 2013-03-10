@@ -114,6 +114,13 @@
 		<dependency>
 			<groupId>org.camunda.bpm</groupId>
 			<artifactId>camunda-engine</artifactId>
+            <scope>provided</scope>
+            <exclusions>
+              <exclusion>
+                <artifactId>livetribe-jsr223</artifactId>
+                <groupId>org.livetribe</groupId>
+              </exclusion>
+            </exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.jboss.arquillian.junit</groupId>

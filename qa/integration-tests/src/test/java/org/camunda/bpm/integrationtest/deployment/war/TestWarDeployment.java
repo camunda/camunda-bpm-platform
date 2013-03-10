@@ -14,9 +14,7 @@
  * limitations under the License.
  */
 package org.camunda.bpm.integrationtest.deployment.war;
-import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RepositoryService;
-import org.camunda.bpm.engine.cdi.impl.util.ProgrammaticBeanLookup;
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
@@ -38,7 +36,6 @@ public class TestWarDeployment extends AbstractFoxPlatformIntegrationTest {
   
   @Test
   public void testDeployProcessArchive() {
-    ProcessEngine processEngine = ProgrammaticBeanLookup.lookup(ProcessEngine.class);
     Assert.assertNotNull(processEngine);
     RepositoryService repositoryService = processEngine.getRepositoryService();
     long count = repositoryService.createProcessDefinitionQuery()

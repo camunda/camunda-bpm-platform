@@ -32,7 +32,7 @@ import org.camunda.bpm.engine.delegate.JavaDelegate;
  * nature of the {@link ProcessApplicationReference} held by the process engine.</p>
  * 
  * <h2>Usage</h2>
- * <p>In order to add an EJB process application to your application, extend this class and configure 
+ * <p>In order to add a custom EJB process application to your application, extend this class and configure 
  * it as follows:</p>
  * <pre>
  * {@literal @}ProcessApplication("my process application")
@@ -66,7 +66,7 @@ import org.camunda.bpm.engine.delegate.JavaDelegate;
  * <ul>
  * <li>the call is intercepted by the EJB container and "enters" the process application legally.</li>
  * <li>the {@link JavaDelegate} may take advantage of the {@link EjbProcessApplication}'s invocation context 
- * and resolve resources form the component's Environment (such as a <code>java:comp/BeanManager</code>).
+ * and resolve resources from the component's Environment (such as a <code>java:comp/BeanManager</code>).
  * </ul>
  * </p>
  * 
@@ -102,12 +102,6 @@ public class EjbProcessApplication extends AbstractProcessApplication {
   private String eeModulePath;
 
   private EjbProcessApplicationReference ejbProcessApplicationReference;
-  
-  @Override
-  public void deploy() {
-    ensureInitialized();
-    super.deploy();
-  }
   
   public ProcessApplicationReference getReference() {    
     ensureInitialized();

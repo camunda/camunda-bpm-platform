@@ -1,132 +1,40 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<artifactId>camunda-ejb-client</artifactId>
-	<name>camunda BPM - Client</name>
-	<packaging>jar</packaging>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<groupId>org.camunda.bpm</groupId>
-		<artifactId>camunda-root</artifactId>
-		<relativePath>../..</relativePath>
-		<version>7.0.0-SNAPSHOT</version>
-	</parent>
+  <artifactId>camunda-ejb-client</artifactId>
+  <groupId>org.camunda.bpm.javaee</groupId>
+  <name>camunda BPM - Client</name>
+  <packaging>jar</packaging>
 
-	<dependencies>
-		<dependency>
-			<groupId>org.jboss.spec</groupId>
-			<artifactId>jboss-javaee-web-6.0</artifactId>
-			<type>pom</type>
-			<scope>provided</scope>
-		</dependency>
-		<dependency>
-			<groupId>org.camunda.bpm</groupId>
-			<artifactId>camunda-engine-cdi</artifactId>
-			<exclusions>
-				<exclusion>
-					<artifactId>spring-beans</artifactId>
-					<groupId>org.springframework</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>commons-lang</artifactId>
-					<groupId>commons-lang</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>mybatis</artifactId>
-					<groupId>org.mybatis</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>livetribe-jsr223</artifactId>
-					<groupId>org.livetribe</groupId>
-				</exclusion>
-				<exclusion>
-					<artifactId>commons-email</artifactId>
-					<groupId>org.apache.commons</groupId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		
-    <dependency>
-		  <groupId>junit</groupId>
-		  <artifactId>junit</artifactId>
-		  <scope>test</scope>
-		</dependency>
+  <parent>
+    <groupId>org.camunda.bpm</groupId>
+    <artifactId>camunda-root</artifactId>
+    <relativePath>../..</relativePath>
+    <version>7.0.0-SNAPSHOT</version>
+  </parent>
 
+  <dependencies>
     <dependency>
-      <groupId>org.jboss.arquillian.container</groupId>
-      <artifactId>arquillian-weld-ee-embedded-1.1</artifactId>
-      <scope>test</scope>
-    </dependency>
-    
-    <dependency>
-      <groupId>org.jboss.weld</groupId>
-      <artifactId>weld-core</artifactId>
+      <groupId>org.jboss.spec</groupId>
+      <artifactId>jboss-javaee-web-6.0</artifactId>
+      <type>pom</type>
       <scope>provided</scope>
     </dependency>
-    
+
     <dependency>
-      <groupId>org.jboss.weld</groupId>
-      <artifactId>weld-api</artifactId>
+      <groupId>org.camunda.bpm</groupId>
+      <artifactId>camunda-engine</artifactId>
       <scope>provided</scope>
-    </dependency>
-    
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>slf4j-simple</artifactId>
-      <scope>test</scope>
+      <exclusions>
+        <exclusion>
+          <artifactId>livetribe-jsr223</artifactId>
+          <groupId>org.livetribe</groupId>
+        </exclusion>
+      </exclusions>
+
     </dependency>
 
-    <dependency>
-      <groupId>org.jboss.arquillian.junit</groupId>
-      <artifactId>arquillian-junit-container</artifactId>
-      <scope>test</scope>
-    </dependency>
-	</dependencies>
+  </dependencies>
 
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.jboss.weld</groupId>
-        <artifactId>weld-core-bom</artifactId>
-        <version>1.1.5.Final</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
-    
-	<build>
-		<plugins>
-			<!-- package engine-cdi -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-shade-plugin</artifactId>
-				<executions>
-					<execution>
-						<phase>package</phase>
-						<goals>
-							<goal>shade</goal>
-						</goals>
-						<configuration>
-							<createSourcesJar>true</createSourcesJar>
-							<artifactSet>
-								<includes>
-									<include>org.camunda.bpm:camunda-engine-cdi</include>
-								</includes>
-							</artifactSet>	
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-			
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-source-plugin</artifactId>
-				<configuration>
-					<attach>false</attach>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
-	
-	<groupId>org.camunda.bpm.javaee</groupId>
 </project>

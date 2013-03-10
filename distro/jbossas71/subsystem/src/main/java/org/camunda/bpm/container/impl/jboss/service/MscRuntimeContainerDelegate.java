@@ -25,15 +25,18 @@ import org.camunda.bpm.ProcessApplicationService;
 import org.camunda.bpm.ProcessEngineService;
 import org.camunda.bpm.application.AbstractProcessApplication;
 import org.camunda.bpm.application.ProcessApplicationInfo;
+import org.camunda.bpm.application.impl.ServletProcessApplication;
 import org.camunda.bpm.container.RuntimeContainerDelegate;
 import org.camunda.bpm.container.impl.jboss.util.PlatformServiceReferenceFactory;
 import org.camunda.bpm.container.impl.jboss.util.ServiceTracker;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.util.ClassLoaderUtil;
 import org.jboss.as.naming.ManagedReferenceFactory;
 import org.jboss.as.naming.ServiceBasedNamingStore;
 import org.jboss.as.naming.deployment.ContextNames;
 import org.jboss.as.naming.service.BinderService;
+import org.jboss.modules.ModuleClassLoader;
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.ServiceBuilder;
 import org.jboss.msc.service.ServiceContainer;
@@ -64,7 +67,7 @@ public class MscRuntimeContainerDelegate implements Service<MscRuntimeContainerD
   
   protected ServiceTracker<ProcessApplicationInfo> processApplicationServiceTracker; 
   protected Set<ProcessApplicationInfo> processApplications = new CopyOnWriteArraySet<ProcessApplicationInfo>();
-          
+            
   // Lifecycle /////////////////////////////////////////////////
 
   public void start(StartContext context) throws StartException {
@@ -125,13 +128,35 @@ public class MscRuntimeContainerDelegate implements Service<MscRuntimeContainerD
   }
   
   public void deployProcessApplication(AbstractProcessApplication processApplication) {
-    // on JBoss AS 7, process applications are deployed using the deployment processors subsystem at application deployment time. 
-    // a subsequent call to deployProcessApplication() can thus be ignored, if the application is already registered. 
+    if(processApplication instanceof ServletProcessApplication) {
+      deployServletProcessApplication((ServletProcessApplication)processApplication);
+    }
   }
   
+  @SuppressWarnings("unchecked")
+  protected void deployServletProcessApplication(ServletProcessApplication processApplication) {
+    
+    ClassLoader contextClassloader = ClassLoaderUtil.getContextClassloader();
+    String moduleName = ((ModuleClassLoader)contextClassloader).getModule().getIdentifier().toString();
+    
+    ServiceName serviceName = ServiceNames.forNoViewProcessApplicationStartService(moduleName);
+    ServiceName paModuleService = ServiceNames.forProcessApplicationModuleService(moduleName);
+    
+    if(serviceContainer.getService(serviceName) == null) {
+
+      ServiceController<ServiceTarget> requiredService = (ServiceController<ServiceTarget>) serviceContainer.getRequiredService(paModuleService);
+        
+      NoViewProcessApplicationStartService service = new NoViewProcessApplicationStartService(processApplication.getReference());      
+      requiredService.getValue()
+        .addService(serviceName, service)      
+        .setInitialMode(Mode.ACTIVE)        
+        .install();            
+      
+    }
+  }
+
   public void undeployProcessApplication(AbstractProcessApplication processApplication) {
-    // on JBoss AS 7, process applications are undeployed using the deployment processors subsystem at application undeployment time. 
-    // a subsequent call to undeployProcessApplication() can thus be ignored.
+    // nothing to do
   }
   
   public ProcessEngineService getProcessEngineService() {

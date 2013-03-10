@@ -6,6 +6,7 @@ import org.camunda.bpm.integrationtest.functional.ejb.remote.bean.RemoteSingleto
 import org.camunda.bpm.integrationtest.functional.ejb.remote.bean.RemoteSingletonBeanClientDelegateBean;
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
 import org.camunda.bpm.integrationtest.util.DeploymentHelper;
+import org.camunda.bpm.integrationtest.util.TestContainer;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.junit.Arquillian;
@@ -43,12 +44,16 @@ public class RemoteSingletonBeanInvocationTest extends AbstractFoxPlatformIntegr
   
   @Deployment(order=1)
   public static WebArchive delegateDeployment() {    
-    return ShrinkWrap.create(WebArchive.class, "service.war")
+    WebArchive webArchive = ShrinkWrap.create(WebArchive.class, "service.war")
       .addAsLibraries(DeploymentHelper.getEjbClient())
       .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
       .addClass(AbstractFoxPlatformIntegrationTest.class)
       .addClass(RemoteSingletonBean.class) // the EJB 
       .addClass(BusinessInterface.class); // the business interface
+    
+    TestContainer.addContainerSpecificResourcesForNonPa(webArchive);
+    
+    return webArchive;
   }
     
   @Test

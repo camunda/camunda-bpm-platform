@@ -40,7 +40,7 @@ public class MscManagedProcessApplication implements Service<ProcessApplicationI
   }
   
   public void start(StartContext context) throws StartException {
-    // Nothing to do
+    // call the process application's 
   }
   
   public void stop(StopContext context) {

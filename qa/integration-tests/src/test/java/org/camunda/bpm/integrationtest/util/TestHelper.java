@@ -23,7 +23,7 @@ public abstract class TestHelper {
   
   public final static String PROCESS_XML = 
           "<definitions xmlns=\"http://www.omg.org/spec/BPMN/20100524/MODEL\"  targetNamespace=\"Examples\"><process id=\"PROCESS_KEY\" /></definitions>"; 
-
+    
   public static Asset getStringAsAssetWithReplacements(String string, String[][] replacements) {
 
     for (String[] replacement : replacements) {

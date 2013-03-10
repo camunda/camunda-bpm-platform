@@ -18,6 +18,7 @@ import javax.transaction.SystemException;
 
 import org.camunda.bpm.integrationtest.functional.classloading.beans.ExampleDelegate;
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
+import org.camunda.bpm.integrationtest.util.TestContainer;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.junit.Arquillian;
@@ -55,8 +56,12 @@ public class JavaDelegateResolution_ClientAsLibInWebModule extends AbstractFoxPl
   
   @Deployment(name="clientDeployment")
   public static WebArchive clientDeployment() {    
-    return ShrinkWrap.create(WebArchive.class, "client.war")
-            .addClass(AbstractFoxPlatformIntegrationTest.class);
+    WebArchive webArchive = ShrinkWrap.create(WebArchive.class, "client.war")
+        .addClass(AbstractFoxPlatformIntegrationTest.class);
+
+    TestContainer.addContainerSpecificResources(webArchive);
+    
+    return webArchive;
   }
   
   @Test

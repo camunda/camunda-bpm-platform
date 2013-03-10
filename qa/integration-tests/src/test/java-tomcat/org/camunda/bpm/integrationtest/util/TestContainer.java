@@ -15,10 +15,20 @@ public class TestContainer {
   
   public static void addContainerSpecificResources(WebArchive archive) {
     
-    archive.addAsWebInfResource("web.xml")    
+    archive
       .addAsManifestResource("context.xml")
       .addAsLibraries(DeploymentHelper.getWeld())
-      .addClass(IntegrationTestProcessApplication.class);
+      .addClass(IntegrationTestProcessApplication.class)
+      .addAsWebInfResource("web.xml");
+  }
+
+  public static void addContainerSpecificResourcesForNonPa(WebArchive deployment) {
+    
+    deployment
+    .addAsManifestResource("context.xml")
+    .addAsLibraries(DeploymentHelper.getWeld())
+    .addAsWebInfResource("web.xml");
+    
   }
   
 }

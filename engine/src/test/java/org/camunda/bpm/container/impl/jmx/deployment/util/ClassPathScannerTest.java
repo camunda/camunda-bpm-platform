@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.camunda.bpm.container.impl.jmx.deployment.scanning.ClassPathProcessApplicationScanner;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -43,7 +44,7 @@ import org.junit.runners.Parameterized.Parameters;
 public class ClassPathScannerTest {
 
   private final String url;
-  private static ClassPathScanner scanner;
+  private static ClassPathProcessApplicationScanner scanner;
 
   @Parameters
   public static List<Object[]> data() {
@@ -64,11 +65,11 @@ public class ClassPathScannerTest {
   
   @BeforeClass
   public static void setup() {
-    scanner = new ClassPathScanner();
+    scanner = new ClassPathProcessApplicationScanner();
   }
   
   /**
-   * Test method for {@link org.camunda.bpm.container.impl.jmx.deployment.util.ClassPathScanner#scanClassPath(java.lang.ClassLoader)}.
+   * Test method for {@link org.camunda.bpm.container.impl.jmx.deployment.scanning.ClassPathProcessApplicationScanner#scanClassPath(java.lang.ClassLoader)}.
    * @throws MalformedURLException 
    */
   @Test

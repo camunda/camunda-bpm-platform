@@ -57,12 +57,10 @@ public class CdiBeanResolutionTest extends AbstractFoxPlatformIntegrationTest {
   public static WebArchive clientDeployment() {    
     WebArchive deployment = ShrinkWrap.create(WebArchive.class, "client.war")
             .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
-            .addClass(ProgrammaticBeanLookup.class)
-            .addClass(BeanManagerLookup.class)
             .addClass(AbstractFoxPlatformIntegrationTest.class)
-            .addAsLibraries(DeploymentHelper.getEjbClient());
+            .addAsLibraries(DeploymentHelper.getEngineCdi());
     
-    TestContainer.addContainerSpecificResources(deployment);
+    TestContainer.addContainerSpecificResourcesForNonPa(deployment);
     
     return deployment;
   }

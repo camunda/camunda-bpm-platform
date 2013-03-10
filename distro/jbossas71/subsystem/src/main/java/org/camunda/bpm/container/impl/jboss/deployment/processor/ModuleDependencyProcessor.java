@@ -13,6 +13,8 @@
 package org.camunda.bpm.container.impl.jboss.deployment.processor;
 
 import org.camunda.bpm.container.impl.jboss.deployment.marker.ProcessApplicationAttachments;
+import org.camunda.bpm.container.impl.jboss.service.ProcessApplicationModuleService;
+import org.camunda.bpm.container.impl.jboss.service.ServiceNames;
 import org.jboss.as.server.deployment.AttachmentList;
 import org.jboss.as.server.deployment.Attachments;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
@@ -24,6 +26,8 @@ import org.jboss.as.server.deployment.module.ModuleSpecification;
 import org.jboss.modules.Module;
 import org.jboss.modules.ModuleIdentifier;
 import org.jboss.modules.ModuleLoader;
+import org.jboss.msc.service.ServiceController.Mode;
+import org.jboss.msc.service.ServiceName;
 
 
 /**
@@ -60,11 +64,22 @@ public class ModuleDependencyProcessor implements DeploymentUnitProcessor {
         moduleSpecification.addSystemDependency(new ModuleDependency(moduleLoader, MODULE_IDENTIFYER_PROCESS_ENGINE, false, false, false, false));    
       }
       
-    } else {    
-      final ModuleSpecification moduleSpecification = parent.getAttachment(Attachments.MODULE_SPECIFICATION);
-      moduleSpecification.addSystemDependency(new ModuleDependency(moduleLoader, MODULE_IDENTIFYER_PROCESS_ENGINE, false, false, false, false));   
-      
-    }
+    }    
+    
+    final ModuleSpecification moduleSpecification = parent.getAttachment(Attachments.MODULE_SPECIFICATION);
+    moduleSpecification.addSystemDependency(new ModuleDependency(moduleLoader, MODULE_IDENTIFYER_PROCESS_ENGINE, false, false, false, false));   
+    
+    // install the pa-module service
+    ModuleIdentifier identifyer = deploymentUnit.getAttachment(Attachments.MODULE_IDENTIFIER);
+    String moduleName = identifyer.toString();
+    
+    ProcessApplicationModuleService processApplicationModuleService = new ProcessApplicationModuleService();
+    ServiceName serviceName = ServiceNames.forProcessApplicationModuleService(moduleName);
+    
+    phaseContext.getServiceTarget()
+      .addService(serviceName, processApplicationModuleService)
+      .setInitialMode(Mode.ACTIVE)
+      .install();
     
   }
 

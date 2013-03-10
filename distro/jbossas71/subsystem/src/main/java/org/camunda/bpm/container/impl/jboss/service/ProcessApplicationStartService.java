@@ -12,17 +12,31 @@
  */
 package org.camunda.bpm.container.impl.jboss.service;
 
+import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.camunda.bpm.application.AbstractProcessApplication;
+import org.camunda.bpm.application.PostDeploy;
+import org.camunda.bpm.application.PreUndeploy;
 import org.camunda.bpm.application.ProcessApplicationDeploymentInfo;
 import org.camunda.bpm.application.ProcessApplicationInfo;
 import org.camunda.bpm.application.impl.ProcessApplicationDeploymentInfoImpl;
 import org.camunda.bpm.application.impl.ProcessApplicationInfoImpl;
+import org.camunda.bpm.container.impl.jmx.deployment.util.InjectionUtil;
+import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.jboss.as.ee.component.ComponentView;
 import org.jboss.as.naming.ManagedReference;
+import org.jboss.jandex.AnnotationInstance;
+import org.jboss.jandex.MethodInfo;
+import org.jboss.modules.Module;
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.ServiceContainer;
 import org.jboss.msc.service.ServiceController;
@@ -53,38 +67,61 @@ import org.jboss.msc.value.InjectedValue;
  */
 public class ProcessApplicationStartService implements Service<ProcessApplicationStartService> {
   
+  private final static Logger LOGGER = Logger.getLogger(ProcessApplicationStartService.class.getName());
+  
   /** the names of the deployment services we depend on; those must be added as 
    * declarative dependencies when the service is installed. */
   protected final Collection<ServiceName> deploymentServiceNames;
   
-  /** the process application component view */
-  protected InjectedValue<ComponentView> processApplicationInjector = new InjectedValue<ComponentView>();
+  // for view-exposing ProcessApplicationComponents
+  protected InjectedValue<ComponentView> paComponentViewInjector = new InjectedValue<ComponentView>();
+  protected InjectedValue<AbstractProcessApplication> noViewProcessApplication = new InjectedValue<AbstractProcessApplication>();
   
-  public ProcessApplicationStartService(Collection<ServiceName> deploymentServiceNames) {
+  /** injector for the default process engine */
+  protected InjectedValue<ProcessEngine> defaultProcessEngineInjector = new InjectedValue<ProcessEngine>();
+
+  protected AnnotationInstance preUndeployDescription;
+  protected AnnotationInstance postDeployDescription;
+
+  protected ProcessApplicationInfoImpl processApplicationInfo;
+  protected HashSet<ProcessEngine> referencedProcessEngines;
+
+  protected Module paModule;
+  
+  public ProcessApplicationStartService(Collection<ServiceName> deploymentServiceNames, AnnotationInstance postDeployDescription, AnnotationInstance preUndeployDescription, Module paModule) {
     this.deploymentServiceNames = deploymentServiceNames;
+    this.postDeployDescription = postDeployDescription;
+    this.preUndeployDescription = preUndeployDescription;
+    this.paModule = paModule;
   }
   
   public void start(StartContext context) throws StartException {
     
-    final ComponentView processApplicationComponentView = processApplicationInjector.getValue();
-    
-    ManagedReference reference = null;    
+    ManagedReference reference = null;
     try {
       
-      reference = processApplicationComponentView.createInstance();      
-      
-      AbstractProcessApplication processApplication = (AbstractProcessApplication) reference.getInstance();
+      // get the process application component
+      AbstractProcessApplication processApplication = null;      
+      ComponentView componentView = paComponentViewInjector.getOptionalValue();
+      if(componentView != null) {
+        reference = componentView.createInstance();
+        processApplication = (AbstractProcessApplication) reference.getInstance();
+      } else {
+        processApplication = noViewProcessApplication.getValue();
+      }
     
       // create & populate the process application info object
-      ProcessApplicationInfoImpl processApplicationInfo = new ProcessApplicationInfoImpl();    
+      processApplicationInfo = new ProcessApplicationInfoImpl();    
       processApplicationInfo.setName(processApplication.getName());    
       processApplicationInfo.setProperties(processApplication.getProperties());
-            
+       
+      referencedProcessEngines = new HashSet<ProcessEngine>();
       List<ProcessApplicationDeploymentInfo> deploymentInfos = new ArrayList<ProcessApplicationDeploymentInfo>();
        
       for (ServiceName deploymentServiceName : deploymentServiceNames) {
         
         ProcessApplicationDeploymentService value = getDeploymentService(context, deploymentServiceName);
+        referencedProcessEngines.add(value.getProcessEngineInjector().getValue());
               
         ProcessApplicationDeploymentInfoImpl deploymentInfo = new ProcessApplicationDeploymentInfoImpl();
         deploymentInfo.setDeploymentId(value.getDeployment().getId());
@@ -95,6 +132,10 @@ public class ProcessApplicationStartService implements Service<ProcessApplicatio
               
       }
       processApplicationInfo.setDeploymentInfo(deploymentInfos);  
+              
+      if(postDeployDescription != null) {
+        invokePostDeploy(processApplication);
+      }
       
       // install the ManagedProcessApplication Service as a child to this service
       // if this service stops (at undeployment) the ManagedProcessApplication service is removed as well.
@@ -102,19 +143,124 @@ public class ProcessApplicationStartService implements Service<ProcessApplicatio
       MscManagedProcessApplication managedProcessApplication = new MscManagedProcessApplication(processApplicationInfo);
       context.getChildTarget().addService(serviceName, managedProcessApplication).install();
       
+    } catch (StartException e) {
+      throw e;
+      
     } catch (Exception e) {
       throw new StartException(e);
       
     } finally {
       if(reference != null) {
         reference.release();
-      }
-      
+      }    
     }    
   }
+
   
+
   public void stop(StopContext context) {
     
+    ManagedReference reference = null;
+    try {
+      
+      // get the process application component
+      AbstractProcessApplication processApplication = null;      
+      ComponentView componentView = paComponentViewInjector.getOptionalValue();
+      if(componentView != null) {
+        reference = componentView.createInstance();
+        processApplication = (AbstractProcessApplication) reference.getInstance();
+      } else {
+        processApplication = noViewProcessApplication.getValue();       
+      }
+    
+      invokePreUndeploy(processApplication);
+         
+    } catch (Exception e) {
+      LOGGER.log(Level.SEVERE, "Exception while stopping process application", e);
+      
+    } finally {
+      if(reference != null) {
+        reference.release();
+      }   
+    }   
+    
+  }
+  
+  protected void invokePostDeploy(AbstractProcessApplication processApplication) throws ClassNotFoundException, StartException {
+    Class<?> paClass = getPaClass(postDeployDescription);      
+    Method postDeployMethod = InjectionUtil.detectAnnotatedMethod(paClass, PostDeploy.class);
+    if(postDeployMethod != null) {
+      try {
+        postDeployMethod.invoke(processApplication, getInjections(postDeployMethod));
+      }catch(Exception e) {
+        throw new StartException("Exception while invoking the @PostDeploy method ", e);
+      }
+    }
+  }
+  
+  protected void invokePreUndeploy(AbstractProcessApplication processApplication) throws ClassNotFoundException {
+    if(preUndeployDescription != null) {
+      Class<?> paClass = getPaClass(preUndeployDescription);      
+      Method preUndeployMethod = InjectionUtil.detectAnnotatedMethod(paClass, PreUndeploy.class);
+      if(preUndeployMethod != null) {
+        try {
+          preUndeployMethod.invoke(processApplication, getInjections(preUndeployMethod));
+        } catch(Exception e) {
+          throw new RuntimeException("Exception while invoking the @PreUndeploy method ", e);
+        }
+      }
+    }
+  }
+  
+  protected Object[] getInjections(Method lifecycleMethod) {
+    final Type[] parameterTypes = lifecycleMethod.getGenericParameterTypes();
+    final List<Object> parameters = new ArrayList<Object>();
+    
+    for (Type parameterType : parameterTypes) {
+      
+      boolean injectionResolved = false;
+      
+      if(parameterType instanceof Class) {
+        
+        Class<?> parameterClass = (Class<?>)parameterType;
+        
+        // support injection of the default process engine
+        if(ProcessEngine.class.isAssignableFrom(parameterClass)) {
+          parameters.add(defaultProcessEngineInjector.getValue());
+          injectionResolved = true;
+        }  
+        
+        // support injection of the ProcessApplicationInfo
+        else if(ProcessApplicationInfo.class.isAssignableFrom(parameterClass)) {
+          parameters.add(processApplicationInfo);
+          injectionResolved = true;
+        }
+        
+      } else if(parameterType instanceof ParameterizedType) {
+        
+        ParameterizedType parameterizedType = (ParameterizedType) parameterType;
+        Type[] actualTypeArguments = parameterizedType.getActualTypeArguments();
+        
+        // support injection of List<ProcessEngine>
+        if(actualTypeArguments.length==1 && ProcessEngine.class.isAssignableFrom((Class<?>) actualTypeArguments[0])) {
+          parameters.add(new ArrayList<ProcessEngine>(referencedProcessEngines));
+          injectionResolved = true;
+        }
+      }
+      
+      if(!injectionResolved) {
+        throw new ProcessEngineException("Unsupported parametertype "+parameterType);
+      }
+      
+    }
+    
+    return parameters.toArray();
+  }
+  
+  protected Class<?> getPaClass(AnnotationInstance annotation) throws ClassNotFoundException {
+    String paClassName = ((MethodInfo)annotation.target()).declaringClass().name().toString();
+    Class<?> paClass = paModule.getClassLoader().loadClass(paClassName);
+    return paClass;
   }
 
   @SuppressWarnings("unchecked")
@@ -124,12 +270,20 @@ public class ProcessApplicationStartService implements Service<ProcessApplicatio
     return deploymentService.getValue();
   }
     
-  public InjectedValue<ComponentView> getProcessApplicationInjector() {
-    return processApplicationInjector;
-  } 
+  public InjectedValue<AbstractProcessApplication> getNoViewProcessApplication() {
+    return noViewProcessApplication;
+  }
+  
+  public InjectedValue<ComponentView> getPaComponentViewInjector() {
+    return paComponentViewInjector;
+  }
 
   public ProcessApplicationStartService getValue() throws IllegalStateException, IllegalArgumentException {
     return this;
+  }
+  
+  public InjectedValue<ProcessEngine> getDefaultProcessEngineInjector() {
+    return defaultProcessEngineInjector;
   }
 
 }

@@ -59,7 +59,7 @@ public class BeanManagerLookup {
     } catch (NamingException e) {
       // silently ignore
     }
-
+    
     try {
       // in a servlet container
       return (BeanManager) InitialContext.doLookup("java:comp/env/BeanManager");

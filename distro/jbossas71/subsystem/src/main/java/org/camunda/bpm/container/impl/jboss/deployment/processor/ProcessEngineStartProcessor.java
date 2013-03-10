@@ -27,10 +27,8 @@ import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
 import org.jboss.as.server.deployment.DeploymentUnitProcessor;
 import org.jboss.msc.service.ServiceBuilder;
-import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceController.Mode;
 import org.jboss.msc.service.ServiceName;
-import org.jboss.msc.service.ServiceRegistry;
 import org.jboss.msc.service.ServiceTarget;
 
 
@@ -88,6 +86,9 @@ public class ProcessEngineStartProcessor implements DeploymentUnitProcessor {
     // add Service dependencies
     MscManagedProcessEngineController.initializeServiceBuilder(configuration, service, serviceBuilder);
     
+    // make this start on demand
+    serviceBuilder.setInitialMode(Mode.ACTIVE);
+    
     // install the service
     serviceBuilder.install();
     
@@ -109,22 +110,6 @@ public class ProcessEngineStartProcessor implements DeploymentUnitProcessor {
 
   public void undeploy(DeploymentUnit deploymentUnit) {
         
-  }
-
-  protected void stopProcessEngine(ProcessEngineXml processEngineXml, DeploymentUnit deploymentUnit) {
-
-    final ServiceRegistry serviceRegistry = deploymentUnit.getServiceRegistry();
-    
-    // get the service name for the process engine controller
-    ServiceName serviceName = ServiceNames.forManagedProcessEngine(processEngineXml.getName());
-    
-    // find the service
-    ServiceController<?> service = serviceRegistry.getService(serviceName);
-    
-    if(service != null) {
-      // remove the service
-      service.setMode(Mode.REMOVE);
-    }
   }
 
 }

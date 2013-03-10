@@ -1,6 +1,5 @@
 package org.camunda.bpm.integrationtest.deployment.war;
 
-import org.camunda.bpm.integrationtest.util.DeploymentHelper;
 import org.camunda.bpm.integrationtest.util.TestContainer;
 import org.jboss.arquillian.container.test.api.Deployer;
 import org.jboss.arquillian.container.test.api.Deployment;
@@ -34,7 +33,6 @@ public class TestWarDeploymentWithBrokenBpmnXml {
     
     WebArchive deployment = ShrinkWrap.create(WebArchive.class, "test.war")
       .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
-      .addAsLibraries(DeploymentHelper.getEjbClient())
       .addAsResource("META-INF/processes.xml", "META-INF/processes.xml")
       .addAsResource("org/camunda/bpm/integrationtest/deployment/war/TestWarDeploymentWithBrokenBpmnXml.testXmlInvalid.bpmn20.xml");
     

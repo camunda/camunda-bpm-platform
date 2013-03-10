@@ -29,6 +29,8 @@
     <module name="org.jboss.as.ee" />
     <module name="org.jboss.as.ejb3" />
     <module name="org.jboss.metadata" />
+    <module name="org.jboss.as.web" />
+    <module name="org.jboss.invocation" />
         
     <module name="org.camunda.bpm.camunda-engine" />
     

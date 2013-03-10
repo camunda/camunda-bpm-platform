@@ -21,6 +21,7 @@ import org.jboss.as.ee.component.ComponentDescription;
 import org.jboss.as.server.deployment.AttachmentKey;
 import org.jboss.as.server.deployment.AttachmentList;
 import org.jboss.as.server.deployment.DeploymentUnit;
+import org.jboss.jandex.AnnotationInstance;
 
 
 /**
@@ -34,6 +35,8 @@ public class ProcessApplicationAttachments {
   private static final AttachmentKey<Boolean> PART_OF_MARKER = AttachmentKey.create(Boolean.class);
   private static final AttachmentKey<AttachmentList<ProcessesXmlWrapper>> PROCESSES_XML_LIST = AttachmentKey.createList(ProcessesXmlWrapper.class);
   private static final AttachmentKey<ComponentDescription> PA_COMPONENT = AttachmentKey.create(ComponentDescription.class);
+  private static final AttachmentKey<AnnotationInstance> POST_DEPLOY_METHOD = AttachmentKey.create(AnnotationInstance.class);
+  private static final AttachmentKey<AnnotationInstance> PRE_UNDEPLOY_METHOD = AttachmentKey.create(AnnotationInstance.class);
 
   /**
    * Attach the parsed ProcessesXml file to a deployment unit.
@@ -101,6 +104,34 @@ public class ProcessApplicationAttachments {
    */
   public static void attachProcessApplicationComponent(DeploymentUnit deploymentUnit, ComponentDescription componentDescription){
     deploymentUnit.putAttachment(PA_COMPONENT, componentDescription);
+  }
+  
+  /**
+   * Attach the {@link AnnotationInstance}s for the PostDeploy methods
+   */
+  public static void attachPostDeployDescription(DeploymentUnit deploymentUnit, AnnotationInstance annotation){
+    deploymentUnit.putAttachment(POST_DEPLOY_METHOD, annotation);      
+  }
+  
+  /**
+   * Attach the {@link AnnotationInstance}s for the PreUndeploy methods
+   */
+  public static void attachPreUndeployDescription(DeploymentUnit deploymentUnit, AnnotationInstance annotation){
+    deploymentUnit.putAttachment(PRE_UNDEPLOY_METHOD, annotation);      
+  }
+  
+  /**
+   * @return the description of the PostDeploy method
+   */
+  public static AnnotationInstance getPostDeployDescription(DeploymentUnit deploymentUnit) {
+    return deploymentUnit.getAttachment(POST_DEPLOY_METHOD);
+  }
+  
+  /**
+   * @return the description of the PreUndeploy method
+   */
+  public static AnnotationInstance getPreUndeployDescription(DeploymentUnit deploymentUnit) {
+    return deploymentUnit.getAttachment(PRE_UNDEPLOY_METHOD);
   }
   
   private ProcessApplicationAttachments() {

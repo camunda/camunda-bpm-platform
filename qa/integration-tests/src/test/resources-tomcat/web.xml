@@ -3,14 +3,8 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
 
-
   <listener>
     <listener-class>org.jboss.weld.environment.servlet.Listener</listener-class>
-  </listener>
-
-
-  <listener>
-    <listener-class>org.camunda.bpm.integrationtest.util.IntegrationTestProcessApplication</listener-class>
   </listener>
 
   <!-- for CDI support -->

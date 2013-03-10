@@ -88,7 +88,8 @@ public class TestFoxPlatformClientAsEjbModule_twoPasAsLib extends AbstractFoxPla
       .addAsLibrary(processArchive1Jar)
       .addAsLibrary(processArchive2Jar)
       .addAsModule(foxPlatformClientJar)
-      .addAsModule(testJar);
+      .addAsModule(testJar)
+      .addAsLibrary(DeploymentHelper.getEngineCdi());
   }
   
   @Test

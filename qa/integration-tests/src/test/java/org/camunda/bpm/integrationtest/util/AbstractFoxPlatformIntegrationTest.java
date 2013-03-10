@@ -61,7 +61,7 @@ public abstract class AbstractFoxPlatformIntegrationTest {
   public static WebArchive initWebArchiveDeployment(String name) {
     WebArchive archive = ShrinkWrap.create(WebArchive.class, name)
               .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
-              .addAsLibraries(DeploymentHelper.getEjbClient())
+              .addAsLibraries(DeploymentHelper.getEngineCdi())
               .addAsResource("META-INF/processes.xml", "META-INF/processes.xml")
               .addClass(AbstractFoxPlatformIntegrationTest.class)
               .addClass(TestContainer.class);

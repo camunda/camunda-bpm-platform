@@ -15,6 +15,7 @@
  */
 package org.camunda.bpm.container.impl.jboss.service;
 
+import java.util.concurrent.ExecutorService;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -33,6 +34,7 @@ import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.camunda.bpm.engine.impl.persistence.StrongUuidGenerator;
 import org.jboss.as.connector.subsystems.datasources.DataSourceReferenceFactoryService;
 import org.jboss.as.naming.deployment.ContextNames;
+import org.jboss.as.server.Services;
 import org.jboss.msc.inject.Injector;
 import org.jboss.msc.service.ServiceBuilder;
 import org.jboss.msc.service.ServiceController.Mode;
@@ -56,6 +58,8 @@ import org.jboss.msc.value.InjectedValue;
 public class MscManagedProcessEngineController extends MscManagedProcessEngine {
   
   private final static Logger LOGGER = Logger.getLogger(MscManagedProcessEngineController.class.getName());
+  
+  protected InjectedValue<ExecutorService> executorInjector = new InjectedValue<ExecutorService>();
     
   // Injecting these values makes the MSC aware of our dependencies on these resources.
   // This ensures that they are available when this service is started
@@ -76,8 +80,41 @@ public class MscManagedProcessEngineController extends MscManagedProcessEngine {
     this.processEngineMetadata = processEngineConfiguration;
   }
   
-  public void start(StartContext context) throws StartException {
-        
+  public void start(final StartContext context) throws StartException {
+    context.asynchronous();    
+    executorInjector.getValue().submit(new Runnable() {
+      public void run() {
+        try {
+          start();
+          context.complete();          
+        } catch (Throwable e) {
+          context.failed(new StartException(e));
+        }
+      }
+    });
+  }
+  
+  public void stop(final StopContext context) {
+    context.asynchronous();    
+    executorInjector.getValue().submit(new Runnable() {
+      public void run() {
+        try {
+          
+          try {
+            processEngine.close();      
+          } catch(Exception e) {
+            LOGGER.log(Level.SEVERE, "exception while closing process engine", e);
+          }      
+          releaseJobExecutorDelegate();  
+          
+        } finally {
+          context.complete();
+        }
+      }
+    });
+  }
+    
+  public void start() {        
     // setting the TCCL to the Classloader of this module.
     // this exploits a hack in MyBatis allowing it to use the TCCL to load the 
     // mapping files from the process engine module
@@ -138,19 +175,6 @@ public class MscManagedProcessEngineController extends MscManagedProcessEngine {
     processEngine = processEngineConfiguration.buildProcessEngine();        
   }
 
-  public void stop(StopContext context) {
-    
-    try {
-      processEngine.close();
-      
-    } catch(Exception e) {
-      LOGGER.log(Level.SEVERE, "exception while closing process engine", e);
-    }
-      
-    releaseJobExecutorDelegate();      
-   
-  }
-
   public Injector<TransactionManager> getTransactionManagerInjector() {
     return transactionManagerInjector;
   }
@@ -176,6 +200,8 @@ public class MscManagedProcessEngineController extends MscManagedProcessEngine {
       .addDependency(ServiceNames.forMscRuntimeContainerDelegate(), MscRuntimeContainerDelegate.class, service.getContainerPlatformServiceInjector())
       .addDependency(ContainerJobExecutorService.getServiceName(), ContainerJobExecutorService.class, service.getContainerJobExecutorInjector())            
       .setInitialMode(Mode.ACTIVE);
+    
+    Services.addServerExecutorDependency(serviceBuilder, service.getExecutorInjector(), false);
     
   }
 
@@ -205,6 +231,10 @@ public class MscManagedProcessEngineController extends MscManagedProcessEngine {
 
   public ProcessEngine getProcessEngine() {
     return processEngine;
+  }
+  
+  public InjectedValue<ExecutorService> getExecutorInjector() {
+    return executorInjector;
   }
   
 }

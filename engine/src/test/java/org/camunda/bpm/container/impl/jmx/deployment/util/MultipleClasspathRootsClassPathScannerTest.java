@@ -25,6 +25,7 @@ import java.net.URLClassLoader;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.camunda.bpm.container.impl.jmx.deployment.scanning.ClassPathProcessApplicationScanner;
 import org.junit.Test;
 
 
@@ -45,7 +46,7 @@ public class MultipleClasspathRootsClassPathScannerTest {
         new URL("file:src/test/resources/org/camunda/bpm/container/impl/jmx/deployment/util/ClassPathScannerTest.testScanClassPathRecursiveTwoDirectories.jar")                    
       });
     
-    ClassPathScanner scanner = new ClassPathScanner();
+    ClassPathProcessApplicationScanner scanner = new ClassPathProcessApplicationScanner();
     
     Map<String, byte[]> scanResult = new HashMap<String, byte[]>();
     

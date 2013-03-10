@@ -80,7 +80,8 @@ public class TestFoxPlatformClientAsEjbModule_pasAsEjbModule extends AbstractFox
     return ShrinkWrap.create(EnterpriseArchive.class, "paAsEjbModule.ear")            
       .addAsModule(processArchive1Jar)
       .addAsModule(foxPlatformClientJar)
-      .addAsModule(testJar);    
+      .addAsModule(testJar)
+      .addAsLibrary(DeploymentHelper.getEngineCdi());
   }
   
   @Test

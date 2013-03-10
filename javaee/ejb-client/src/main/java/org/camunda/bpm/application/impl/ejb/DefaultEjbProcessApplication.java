@@ -47,13 +47,13 @@ public class DefaultEjbProcessApplication extends EjbProcessApplication {
   protected Map<String, String> properties = new HashMap<String, String>();
   
   @PostConstruct
-  public void deploy() {
-    super.deploy();
+  public void start() {
+    deploy();
   }
 
   @PreDestroy
-  public void undeploy() {
-    super.undeploy();
+  public void stop() {
+    undeploy();
   }
   
   public Map<String, String> getProperties() {

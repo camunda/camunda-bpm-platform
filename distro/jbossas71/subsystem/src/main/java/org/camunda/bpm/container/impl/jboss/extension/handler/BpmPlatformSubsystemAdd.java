@@ -18,8 +18,8 @@ package org.camunda.bpm.container.impl.jboss.extension.handler;
 import java.util.List;
 
 import org.camunda.bpm.container.impl.jboss.deployment.processor.ModuleDependencyProcessor;
-import org.camunda.bpm.container.impl.jboss.deployment.processor.ProcessApplicationComponentProcessor;
-import org.camunda.bpm.container.impl.jboss.deployment.processor.ProcessEngineDeploymentProcessor;
+import org.camunda.bpm.container.impl.jboss.deployment.processor.ProcessApplicationProcessor;
+import org.camunda.bpm.container.impl.jboss.deployment.processor.ProcessApplicationDeploymentProcessor;
 import org.camunda.bpm.container.impl.jboss.deployment.processor.ProcessEngineStartProcessor;
 import org.camunda.bpm.container.impl.jboss.deployment.processor.ProcessesXmlProcessor;
 import org.camunda.bpm.container.impl.jboss.extension.ModelConstants;
@@ -63,12 +63,12 @@ public class BpmPlatformSubsystemAdd extends AbstractBoottimeAddStepHandler {
     // add deployment processors
     context.addStep(new AbstractDeploymentChainStep() {
       public void execute(DeploymentProcessorTarget processorTarget) {
-        processorTarget.addDeploymentProcessor(ModelConstants.SUBSYSTEM_NAME, Phase.PARSE, ProcessApplicationComponentProcessor.PRIORITY, new ProcessApplicationComponentProcessor());
+        processorTarget.addDeploymentProcessor(ModelConstants.SUBSYSTEM_NAME, Phase.PARSE, ProcessApplicationProcessor.PRIORITY, new ProcessApplicationProcessor());
 //        processorTarget.addDeploymentProcessor(ModelConstants.SUBSYSTEM_NAME, Phase.PARSE, ProcessApplicationComponentAddProcessor.PRIORITY, new ProcessApplicationComponentAddProcessor(false));
         processorTarget.addDeploymentProcessor(ModelConstants.SUBSYSTEM_NAME, Phase.DEPENDENCIES, ModuleDependencyProcessor.PRIORITY, new ModuleDependencyProcessor());
         processorTarget.addDeploymentProcessor(ModelConstants.SUBSYSTEM_NAME, Phase.POST_MODULE, ProcessesXmlProcessor.PRIORITY, new ProcessesXmlProcessor());
         processorTarget.addDeploymentProcessor(ModelConstants.SUBSYSTEM_NAME, Phase.INSTALL, ProcessEngineStartProcessor.PRIORITY, new ProcessEngineStartProcessor());
-        processorTarget.addDeploymentProcessor(ModelConstants.SUBSYSTEM_NAME, Phase.INSTALL, ProcessEngineDeploymentProcessor.PRIORITY, new ProcessEngineDeploymentProcessor());
+        processorTarget.addDeploymentProcessor(ModelConstants.SUBSYSTEM_NAME, Phase.INSTALL, ProcessApplicationDeploymentProcessor.PRIORITY, new ProcessApplicationDeploymentProcessor());
       }
     }, OperationContext.Stage.RUNTIME);
 

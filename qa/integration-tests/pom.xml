@@ -48,12 +48,26 @@
       <artifactId>camunda-ejb-client</artifactId>
       <scope>provided</scope>
     </dependency>
-
+    
+    <dependency>
+      <groupId>org.camunda.bpm</groupId>
+      <artifactId>camunda-engine-cdi</artifactId>
+      <version>${project.version}</version>
+      <scope>provided</scope>
+      <exclusions>
+        <exclusion>
+          <artifactId>camunda-engine</artifactId>
+          <groupId>org.camunda.bpm</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    
     <dependency>
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine</artifactId>
       <scope>provided</scope>
     </dependency>
+
     
      <!-- weld for CDI support on tomcat-->
     <dependency>
@@ -192,56 +206,53 @@
                 <exclude>**/JobExecutorRequestContextRemoteInvocationTest.java</exclude>
                 <!-- HEMERA-2453 -->
                 <exclude>**/JobExecutorRequestContextLocalInvocationTest.java</exclude>
+                <exclude>**_OTHERS.java</exclude>
               </excludes>
             </configuration>
           </plugin>
         </plugins>
       </build>
     </profile>
+
     <profile>
-      <id>jboss-remote</id>
-      <dependencies>
-        <dependency>
-          <!-- make sure this comes after runtime in the reactor build -->
-          <groupId>org.camunda.bpm.platform</groupId>
-          <artifactId>camunda-qa-jboss-runtime</artifactId>
-          <version>${project.version}</version>
-          <scope>provided</scope>
-          <type>pom</type>
-        </dependency>
-        <dependency>
-          <groupId>org.jboss.as</groupId>
-          <artifactId>jboss-as-arquillian-container-remote</artifactId>
-          <version>${version.jboss.as}</version>
-          <scope>test</scope>
-        </dependency>
-        <dependency>
-          <groupId>org.jboss.arquillian.protocol</groupId>
-          <artifactId>arquillian-protocol-servlet</artifactId>
-          <version>${version.arquillian}</version>
-          <scope>test</scope>
-        </dependency>
-      </dependencies>
+      <id>jboss-servlet</id>
       <build>
-        <testResources>
-          <testResource>
-            <directory>src/test/resources</directory>
-            <filtering>true</filtering>
-            <includes>
-              <include>**/*.xml</include>
-              <include>**/*.properties</include>
-            </includes>
-          </testResource>
-          <testResource>
-            <directory>src/test/resources-jboss-remote</directory>
-            <filtering>true</filtering>
-            <includes>
-              <include>**/*.xml</include>
-            </includes>
-          </testResource>
-        </testResources>
+        <plugins>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>build-helper-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>add-test-source</id>
+                <phase>generate-test-sources</phase>
+                <goals>
+                  <goal>add-test-source</goal>
+                </goals>
+                <configuration>
+                  <sources>
+                    <source>src/test/java-jboss-servlet</source>
+                  </sources>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <excludes>
+                <!-- skip EE integration tests -->
+                <exclude>**/cdi/**</exclude>
+                <exclude>**/ejb/**</exclude>
+                <exclude>**/context/**</exclude>
+              </excludes>
+            </configuration>
+          </plugin>
+        </plugins>
       </build>
     </profile>
+    
+    
     <profile>
       <id>glassfish</id>
       <dependencies>
@@ -315,6 +326,7 @@
                 <!-- not supported by arquillian connector -->
                 <excludes>**/TestWarDeploymentWithBrokenBpmnXml.java</excludes>
                 <excludes>**/TestDeploymentWithDroolsTaskFails.java</excludes>
+                <exclude>**_JBOSS.java</exclude>
               </excludes>
             </configuration>
           </plugin>
@@ -332,7 +344,7 @@
     </profile>
     
     <profile>
-      <id>tomcat6</id>
+      <id>tomcat</id>
       <dependencyManagement>
         <dependencies>
           <dependency>
@@ -348,7 +360,7 @@
         <dependency>
           <!-- make sure this comes after runtime in the reactor build -->
           <groupId>org.camunda.bpm.qa</groupId>
-          <artifactId>camunda-qa-tomcat6-runtime</artifactId>
+          <artifactId>camunda-qa-tomcat-runtime</artifactId>
           <version>${project.version}</version>
           <scope>provided</scope>
           <type>pom</type>
@@ -362,7 +374,7 @@
         
         <dependency>
           <groupId>org.jboss.arquillian.container</groupId>
-          <artifactId>arquillian-tomcat-managed-6</artifactId>
+          <artifactId>arquillian-tomcat-managed-7</artifactId>
           <version>1.0.0.CR4</version>
           <scope>test</scope>
         </dependency>
@@ -405,36 +417,7 @@
                 </configuration>
               </execution>
             </executions>
-          </plugin>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-resources-plugin</artifactId>
-            <configuration>
-              <delimiters>
-                <delimiter>${*}</delimiter>          
-              </delimiters>
-              <useDefaultDelimiters>false</useDefaultDelimiters>
-            </configuration>
-            <executions>
-              <execution>
-                <id>configure-jboss</id>
-                <phase>process-test-resources</phase>
-                <goals>
-                  <goal>copy-resources</goal>
-                </goals>
-                <configuration>
-                  <resources>
-                    <resource>
-                      <directory>${jboss.runtime.location}/standalone/configuration/blueprint</directory>
-                      <filtering>true</filtering>
-                    </resource>
-                  </resources>
-                  <outputDirectory>${jboss.runtime.location}/standalone/configuration</outputDirectory>
-                  <overwrite>true</overwrite>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
+          </plugin>          
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-surefire-plugin</artifactId>
@@ -443,15 +426,15 @@
                 <!-- no EE stuff on tomcat :) -->
                 <exclude>**/ear/**</exclude>
                 <exclude>**/ejb/**</exclude>
-                <exclude>**/transactions/**</exclude>                
-                <!-- requires EL 2.2 -->
-                <exclude>**/CdiBeanResolutionTest.java</exclude>
+                <exclude>**/transactions/**</exclude>               
                 <!-- No EJB RequestContext available -->
                 <exclude>**/JobExecutorRequestContextTest.java</exclude>
                 <!-- Not supported by arquillian tomcat container -->
                 <exclude>**/TestWarDeploymentWithBrokenBpmnXml.java</exclude>
                 <exclude>**/TestDeploymentWithDroolsTaskFails.java</exclude>
                 <exclude>**/TestProcessEnginesXmlFails.java</exclude>
+                
+                <exclude>**_OTHERS.java</exclude>
               </excludes>
             </configuration>
           </plugin>

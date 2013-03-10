@@ -15,6 +15,7 @@ package org.camunda.bpm.container.impl.jmx;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import javax.management.MBeanServer;
 import javax.management.ObjectName;
@@ -27,6 +28,8 @@ import org.camunda.bpm.container.RuntimeContainerDelegate;
 import org.camunda.bpm.container.impl.jmx.deployment.Attachments;
 import org.camunda.bpm.container.impl.jmx.deployment.DeployProcessArchivesStep;
 import org.camunda.bpm.container.impl.jmx.deployment.ParseProcessesXmlStep;
+import org.camunda.bpm.container.impl.jmx.deployment.PostDeployInvocationStep;
+import org.camunda.bpm.container.impl.jmx.deployment.PreUndeployInvocationStep;
 import org.camunda.bpm.container.impl.jmx.deployment.ProcessesXmlStartProcessEnginesStep;
 import org.camunda.bpm.container.impl.jmx.deployment.ProcessesXmlStopProcessEnginesStep;
 import org.camunda.bpm.container.impl.jmx.deployment.StartProcessApplicationServiceStep;
@@ -53,6 +56,8 @@ import org.camunda.bpm.engine.impl.jobexecutor.tobemerged.spi.JobAcquisitionConf
  * 
  */
 public class JmxRuntimeContainerDelegate implements RuntimeContainerDelegate, ProcessEngineService, JobExecutorService, ProcessApplicationService {
+  
+  private final Logger LOGGER = Logger.getLogger(JmxRuntimeContainerDelegate.class.getName());
 
   protected static String BASE_REALM = "org.camunda.bpm.platform";
   protected static String ENGINE_REALM = BASE_REALM + ".process-engine";
@@ -135,7 +140,10 @@ public class JmxRuntimeContainerDelegate implements RuntimeContainerDelegate, Pr
       .addStep(new ProcessesXmlStartProcessEnginesStep())
       .addStep(new DeployProcessArchivesStep())
       .addStep(new StartProcessApplicationServiceStep())
+      .addStep(new PostDeployInvocationStep())
       .execute();
+    
+    LOGGER.info("Process Application "+processApplication.getName()+" sucessfully deployed.");  
     
   }
 
@@ -155,8 +163,9 @@ public class JmxRuntimeContainerDelegate implements RuntimeContainerDelegate, Pr
     // perform the undeployment
     serviceContainer.createUndeploymentOperation(operationName)
       .addAttachment(Attachments.PROCESS_APPLICATION, processApplication)
-      .addStep(new ProcessesXmlStopProcessEnginesStep())
+      .addStep(new PreUndeployInvocationStep())
       .addStep(new UndeployProcessArchivesStep())
+      .addStep(new ProcessesXmlStopProcessEnginesStep())
       .addStep(new StopProcessApplicationServiceStep())
       .execute();
     

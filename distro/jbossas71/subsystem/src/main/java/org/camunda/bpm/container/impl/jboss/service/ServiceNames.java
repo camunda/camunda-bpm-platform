@@ -29,7 +29,9 @@ public class ServiceNames {
   
   private final static ServiceName MSC_RUNTIME_CONTAINER_DELEGATE = BPM_PLATFORM.append("runtime-container");
   
-  private final static ServiceName PROCESS_APPLICATION = BPM_PLATFORM.append("process-application");  
+  private final static ServiceName PROCESS_APPLICATION = BPM_PLATFORM.append("process-application");
+  
+  private final static ServiceName PROCESS_APPLICATION_MODULE = BPM_PLATFORM.append("process-application-module");  
   
   /**
    * Returns the service name for a {@link MscManagedProcessEngine}. 
@@ -59,17 +61,6 @@ public class ServiceNames {
   }
   
   /**
-   * <p>Returns the name for a {@link ProcessApplicationDeploymentService} given
-   * the name of the deployment unit and the name of the deployment.</p>
-   * 
-   * @param processApplicationName
-   * @param deploymentId
-   */
-  public static ServiceName forProcessApplicationDeploymentService(String deploymentUnitName, String deploymentName) {
-    return PROCESS_APPLICATION.append("deployment").append(deploymentUnitName).append(deploymentName);
-  }
-
-  /**
    * @return the {@link ServiceName} that is the longest common prefix of all 
    * ServiceNames used for {@link MscManagedProcessEngine}.
    */
@@ -82,7 +73,7 @@ public class ServiceNames {
    * ServiceNames used for {@link MscManagedProcessApplication}.
    */
   public static ServiceName forManagedProcessApplications() {
-    return PROCESS_APPLICATION.append("runtime");
+    return PROCESS_APPLICATION;
   }
   
   /**
@@ -90,15 +81,34 @@ public class ServiceNames {
    * @return the name to be used for an {@link MscManagedProcessApplication} service.
    */
   public static ServiceName forManagedProcessApplication(String applicationName) {
-    return PROCESS_APPLICATION.append("runtime").append(applicationName);
+    return PROCESS_APPLICATION.append(applicationName);
+  }
+  
+  public static ServiceName forProcessApplicationModuleService(String moduleName) {
+    return PROCESS_APPLICATION_MODULE.append(moduleName);
   }
   
   /**
    * @param applicationName
    * @return the name to be used for an {@link MscManagedProcessApplication} service.
    */
-  public static ServiceName forProcessApplicationStartService(String deploymentUnitName) {
-    return PROCESS_APPLICATION.append("start").append(deploymentUnitName);
+  public static ServiceName forProcessApplicationStartService(String moduleName) {
+    return PROCESS_APPLICATION_MODULE.append(moduleName).append("START");
+  }
+  
+  /**
+   * <p>Returns the name for a {@link ProcessApplicationDeploymentService} given
+   * the name of the deployment unit and the name of the deployment.</p>
+   * 
+   * @param processApplicationName
+   * @param deploymentId
+   */
+  public static ServiceName forProcessApplicationDeploymentService(String moduleName, String deploymentName) {
+    return PROCESS_APPLICATION_MODULE.append(moduleName).append("DEPLOY").append(deploymentName);
+  }
+  
+  public static ServiceName forNoViewProcessApplicationStartService(String moduleName) {
+    return PROCESS_APPLICATION_MODULE.append(moduleName).append("NO_VIEW");
   }
   
   

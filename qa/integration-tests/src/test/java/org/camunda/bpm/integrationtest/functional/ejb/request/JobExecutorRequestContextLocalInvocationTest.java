@@ -11,6 +11,7 @@ import org.camunda.bpm.integrationtest.functional.ejb.request.beans.InvocationCo
 import org.camunda.bpm.integrationtest.functional.ejb.request.beans.InvocationCounterServiceLocal;
 import org.camunda.bpm.integrationtest.functional.ejb.request.beans.RequestScopedSFSBDelegate;
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
+import org.camunda.bpm.integrationtest.util.TestContainer;
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.junit.Arquillian;
@@ -49,13 +50,18 @@ public class JobExecutorRequestContextLocalInvocationTest extends AbstractFoxPla
   
   @Deployment(order=1)
   public static WebArchive delegateDeployment() {    
-    return ShrinkWrap.create(WebArchive.class, "service.war")
+    
+    WebArchive webArchive = ShrinkWrap.create(WebArchive.class, "service.war")
       .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
       .addClass(AbstractFoxPlatformIntegrationTest.class)
       .addClass(InvocationCounter.class) // @RequestScoped CDI bean
       .addClass(InvocationCounterService.class) // interface (remote)
       .addClass(InvocationCounterServiceLocal.class) // interface (local)
-      .addClass(InvocationCounterServiceBean.class); // @Stateless ejb 
+      .addClass(InvocationCounterServiceBean.class); // @Stateless ejb
+    
+    TestContainer.addContainerSpecificResourcesForNonPa(webArchive);
+    
+    return webArchive;
   }
     
   @Test

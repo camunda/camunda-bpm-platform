@@ -26,7 +26,7 @@ import org.camunda.bpm.application.AbstractProcessApplication;
 import org.camunda.bpm.application.ProcessApplicationRegistration;
 import org.camunda.bpm.application.impl.metadata.spi.ProcessArchiveXml;
 import org.camunda.bpm.container.impl.jmx.JmxRuntimeContainerDelegate.ServiceTypes;
-import org.camunda.bpm.container.impl.jmx.deployment.util.ClassPathScanner;
+import org.camunda.bpm.container.impl.jmx.deployment.scanning.ProcessApplicationScanningUtil;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanDeploymentOperation;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanDeploymentOperationStep;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanServiceContainer;
@@ -89,9 +89,8 @@ public class DeployProcessArchiveStep extends MBeanDeploymentOperationStep {
     
     // scan for additional process definitions if not turned off
     if(PropertyHelper.getBooleanProperty(processArchive.getProperties(), ProcessArchiveXml.PROP_IS_SCAN_FOR_PROCESS_DEFINITIONS, true)) {
-      ClassPathScanner scanner = new ClassPathScanner();
       String paResourceRoot = processArchive.getProperties().get(ProcessArchiveXml.PROP_RESOURCE_ROOT_PATH);
-      deploymentMap.putAll(scanner.findResources(processApplicationClassloader, paResourceRoot, metaFileUrl));
+      deploymentMap.putAll(ProcessApplicationScanningUtil.findResources(processApplicationClassloader, paResourceRoot, metaFileUrl));
     }
     
     logDeploymentSummary(deploymentMap);
