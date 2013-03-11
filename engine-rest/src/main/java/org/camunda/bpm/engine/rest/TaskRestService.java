@@ -73,8 +73,7 @@ public interface TaskRestService {
 
   @POST
   @Path("/{id}/unclaim")
-  @Consumes(MediaType.APPLICATION_JSON)
-  void unclaim(@PathParam("id") String taskId, UserIdDto dto);
+  void unclaim(@PathParam("id") String taskId);
 
   @POST
   @Path("/{id}/complete")

@@ -123,11 +123,7 @@ public class TaskRestServiceInteractionTest extends AbstractRestServiceTest {
   public void testUnclaimTask() throws IOException {
     setupMockTaskService();
     
-    Map<String, Object> json = new HashMap<String, Object>();
-    json.put("userId", MockProvider.EXAMPLE_USER_ID);
-    
     given().pathParam("id", MockProvider.EXAMPLE_TASK_ID)
-      .contentType(POST_JSON_CONTENT_TYPE).body(json)
       .then().expect()
         .statusCode(Status.NO_CONTENT.getStatusCode())
       .when().post(UNCLAIM_TASK_URL);
@@ -141,16 +137,10 @@ public class TaskRestServiceInteractionTest extends AbstractRestServiceTest {
     
     doThrow(new ProcessEngineException("expected exception")).when(taskServiceMock).setAssignee(any(String.class), any(String.class));
     
-    Map<String, Object> json = new HashMap<String, Object>();
-    json.put("userId", MockProvider.EXAMPLE_USER_ID);
-    
     given().pathParam("id", MockProvider.EXAMPLE_TASK_ID)
-      .contentType(POST_JSON_CONTENT_TYPE).body(json)
       .then().expect()
         .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
       .when().post(UNCLAIM_TASK_URL);
-    
-    verify(taskServiceMock).setAssignee(MockProvider.EXAMPLE_TASK_ID, null);
   }
   
   @Test

@@ -109,7 +109,7 @@ public class TaskRestServiceImpl extends AbstractRestProcessEngineAware implemen
   }
 
   @Override
-  public void unclaim(@PathParam("id") String taskId, UserIdDto dto) {
+  public void unclaim(@PathParam("id") String taskId) {
     getProcessEngine().getTaskService().setAssignee(taskId, null);
   }
 
