@@ -109,7 +109,7 @@ define(["angular", "bpmn/Bpmn"], function(angular, Bpmn) {
     };
 
     $scope.unclaimTask = function(task) {
-      return EngineApi.getTaskList().unclaim({ id : task.id }, { userId: Authentication.current() }).$then(function () {
+      return EngineApi.getTaskList().unclaim({ id : task.id }).$then(function () {
         $scope.removeTask(task);
 
         notifyScopeChange("Unclaimed task <a href='#/overview?filter=unassigned&selection=" + task.id + "'>" + task.name + "</a>");
