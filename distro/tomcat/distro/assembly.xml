@@ -29,7 +29,7 @@
     </fileSet> 
     <fileSet>
       <directory>src/overlay</directory>
-      <outputDirectory>server/apache-tomcat-${tomcat6.version}/webapps/</outputDirectory>    
+      <outputDirectory>server/apache-tomcat-${tomcat.version}/webapps/</outputDirectory>    
     </fileSet>      
   </fileSets>
 
@@ -64,7 +64,7 @@
   		<includes>
   			<include>org.camunda.bpm.cycle:camunda-cycle-tomcat:war:*</include>
   		</includes>
-  		<outputDirectory>server/apache-tomcat-${tomcat6.version}/webapps/camunda-cycle</outputDirectory>
+  		<outputDirectory>server/apache-tomcat-${tomcat.version}/webapps/camunda-cycle</outputDirectory>
         <unpack>true</unpack>
   	</dependencySet>
     
@@ -72,13 +72,13 @@
         <includes>
             <include>org.camunda.bpm:camunda-engine-rest:war:*</include>
         </includes>
-        <outputDirectory>server/apache-tomcat-${tomcat6.version}/webapps/camunda-engine-rest</outputDirectory>
+        <outputDirectory>server/apache-tomcat-${tomcat.version}/webapps/camunda-engine-rest</outputDirectory>
         <unpack>true</unpack>
     </dependencySet>
     
     <!-- adding resteasy to camunda-engine-rest -->    
     <dependencySet>
-      <outputDirectory>server/apache-tomcat-${tomcat6.version}/webapps/camunda-engine-rest/WEB-INF/lib</outputDirectory>
+      <outputDirectory>server/apache-tomcat-${tomcat.version}/webapps/camunda-engine-rest/WEB-INF/lib</outputDirectory>
       <useTransitiveDependencies>true</useTransitiveDependencies>     
       <useTransitiveFiltering>true</useTransitiveFiltering>
       <includes>
@@ -90,7 +90,7 @@
         <includes>
             <include>org.camunda.bpm.cockpit:camunda-cockpit:war:*</include>
         </includes>
-        <outputDirectory>server/apache-tomcat-${tomcat6.version}/webapps/camunda-cockpit</outputDirectory>
+        <outputDirectory>server/apache-tomcat-${tomcat.version}/webapps/camunda-cockpit</outputDirectory>
         <unpack>true</unpack>
     </dependencySet>
     
@@ -98,13 +98,13 @@
         <includes>
             <include>org.camunda.bpm.tasklist:camunda-tasklist:war:*</include>
         </includes>
-        <outputDirectory>server/apache-tomcat-${tomcat6.version}/webapps/camunda-tasklist</outputDirectory>
+        <outputDirectory>server/apache-tomcat-${tomcat.version}/webapps/camunda-tasklist</outputDirectory>
         <unpack>true</unpack>
     </dependencySet>
     
     <!-- adding resteasy to camunda-tasklist -->    
     <dependencySet>
-      <outputDirectory>server/apache-tomcat-${tomcat6.version}/webapps/camunda-tasklist/WEB-INF/lib</outputDirectory>
+      <outputDirectory>server/apache-tomcat-${tomcat.version}/webapps/camunda-tasklist/WEB-INF/lib</outputDirectory>
       <useTransitiveDependencies>true</useTransitiveDependencies>     
       <useTransitiveFiltering>true</useTransitiveFiltering>
       <includes>
