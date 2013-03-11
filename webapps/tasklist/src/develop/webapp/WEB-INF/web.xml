@@ -11,10 +11,6 @@
     <url-pattern>/engine/*</url-pattern>
   </filter-mapping>
 
-  <listener>
-    <listener-class>org.camunda.bpm.tasklist.TasklistProcessApplication</listener-class>
-  </listener>
-
   <servlet>
     <servlet-name>Engine API</servlet-name>
     <servlet-class>
