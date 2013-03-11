@@ -56,7 +56,6 @@ public class DevEnvironmentSetup implements ProcessEngineProvider {
       .addClasspathResource("processes/fox-invoice_en.bpmn")
       .addClasspathResource("processes/fox-invoice_en_long_id.bpmn")
       .addClasspathResource("processes/collaboration_scroll.bpmn")
-      .addClasspathResource("processes/newBpmnDiagram_1.bpmn")
       .deploy();
     
     RuntimeService runtimeService = processEngine.getRuntimeService();
@@ -73,7 +72,7 @@ public class DevEnvironmentSetup implements ProcessEngineProvider {
     
     TJWSEmbeddedJaxrsServer server = new TJWSEmbeddedJaxrsServer();
 
-    server.setRootResourcePath("/camunda-engine-rest");
+    server.setRootResourcePath("/engine-rest");
     server.addFileMapping("/cockpit", new File("./src/main/webapp"));
 
     server.setPort(8081);

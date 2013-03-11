@@ -108,9 +108,11 @@
 
     <profile>
       <id>develop</id>
-
+      <properties>
+        <maven.tomcat.path>/tasklist</maven.tomcat.path>
+      </properties>
+      
       <build>
-
         <resources>
           <resource>
             <directory>src/develop/resources</directory>
@@ -128,7 +130,10 @@
           <plugin>
             <groupId>org.apache.tomcat.maven</groupId>
             <artifactId>tomcat6-maven-plugin</artifactId>
-            <version>2.0</version>
+            <version>2.1</version>
+			      <configuration>
+			        <path>/tasklist</path>
+			      </configuration>
           </plugin>
           <plugin>
             <groupId>org.mortbay.jetty</groupId>
