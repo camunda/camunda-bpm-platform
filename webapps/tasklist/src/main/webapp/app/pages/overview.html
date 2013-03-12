@@ -23,7 +23,7 @@
   <tbody class="task" ng-repeat="task in taskList.tasks" ng-class="{ selected: isSelected(task) }" select="task">
     <tr class="entry">
       <td>{{ task.name }}</td>
-      <td>{{ task.processDefinitionId }}</td>
+      <td>{{ getDefinitionForTask(task).name }}</td>
       <td>{{ task.created | date:'medium' }}</td>
       <td>{{ task.due | date:'medium' }}</td>
 
