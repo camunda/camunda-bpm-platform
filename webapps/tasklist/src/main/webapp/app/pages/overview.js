@@ -80,9 +80,21 @@ define(["angular", "bpmn/Bpmn"], function(angular, Bpmn) {
       queryObject.sortBy = sort.by;
       queryObject.sortOrder = sort.order;
 
+      EngineApi.getProcessDefinitions().query().$then(function(response) {
+        var processDefinitions = {};
+        $.each(response.resource, function(index, definition) {
+          processDefinitions[definition.id] = definition;
+        });
+        $scope.processDefinitions = processDefinitions;
+      });
+      
       EngineApi.getTaskList().query(queryObject).$then(function(response) {
         $scope.taskList.tasks = response.resource;
       });
+    };
+    
+    $scope.getDefinitionForTask = function(task) {
+      return $scope.processDefinitions[task.processDefinitionId];
     };
 
     $scope.$watch(function() { return $location.search(); }, function(newValue) {
@@ -109,7 +121,7 @@ define(["angular", "bpmn/Bpmn"], function(angular, Bpmn) {
     };
 
     $scope.unclaimTask = function(task) {
-      return EngineApi.getTaskList().unclaim({ id : task.id }, { userId: Authentication.current() }).$then(function () {
+      return EngineApi.getTaskList().unclaim({ id : task.id }).$then(function () {
         $scope.removeTask(task);
 
         notifyScopeChange("Unclaimed task <a href='#/overview?filter=unassigned&selection=" + task.id + "'>" + task.name + "</a>");

@@ -5,7 +5,8 @@ define(["angular"], function(angular) {
   var module = angular.module("tasklist.pages");
 
   var ProcessDefinitionsController = function($scope, EngineApi) {
-    $scope.processDefinitions = EngineApi.getProcessDefinitions().query();
+    var queryObject = { latest : true };
+    $scope.processDefinitions = EngineApi.getProcessDefinitions().query(queryObject);
   };
 
   ProcessDefinitionsController.$inject = ["$scope", "EngineApi"];

@@ -1,11 +1,12 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>camunda-qa-jboss-runtime</artifactId>
   <packaging>pom</packaging>
 
   <name>camunda BPM - QA jBoss7 Test Runtime</name>
-  
+
   <properties>
     <jboss.assembly.location>../../distro/jbossas71/assembly/target/assembly-${project.version}/assembly-${project.version}/server</jboss.assembly.location>
   </properties>
@@ -46,102 +47,109 @@
       <version>4.0</version>
       <scope>test</scope>
     </dependency>
-	<dependency>
+    <dependency>
       <groupId>postgresql</groupId>
       <artifactId>postgresql</artifactId>
       <version>9.1-902.jdbc4</version>
-	  <scope>test</scope>
-    </dependency>	
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
-  <build>
-    <resources>
-      <resource>
-        <directory>src/main/standalone</directory>
-        <filtering>true</filtering>
-        <includes>
-          <include>configuration/standalone.xml</include>
-          <include>deployments/${jboss.datasource.filename}</include>
-        </includes>        
-      </resource>
-    </resources>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-antrun-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>copy-distro</id>
-            <phase>package</phase>
-            <goals>
-              <goal>run</goal>
-            </goals>
-            <configuration>
-              <target unless="maven.test.skip">
-                <copy todir="target">
-                  <fileset dir="${jboss.assembly.location}" />
-                </copy>
-                
-                <!-- processing of src/main/standalone replaced by resource filtering (see below) -->
-                <copy todir="target/jboss-as-${version.jboss.as}/modules" overwrite="true">
-                  <fileset dir="src/main/modules" />
-                </copy>
-                
-              </target>
-            </configuration>
-          </execution>
-          <execution>
-            <id>copy-test-dependencies</id>
-            <phase>package</phase>
-            <goals>
-              <goal>run</goal>
-            </goals>
-            <configuration>
-              <target unless="maven.test.skip">
-                <dependencyfilesets scopes="test" />
-                
-                <copy todir="target/jboss-as-${version.jboss.as}/modules" flatten="false">
-                  <fileset refid="maven.project.dependencies" />
-                  <regexpmapper from="^(.*)/([^/]+)/([^/]*)$$" to="\1/main/\3" handledirsep="yes" />
-                </copy>
-
-                <copy todir="target/jboss-as-${version.jboss.as}/modules" flatten="false">
-                  <fileset dir="src/main/modules" />
-                </copy>
-                                                               
-              </target>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <!-- copy filtered configuration resources -->
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-resources-plugin</artifactId>
-        <configuration>
-          <delimiters>
-            <delimiter>${*}</delimiter>          
-          </delimiters>
-          <useDefaultDelimiters>false</useDefaultDelimiters>
-        </configuration>
-        <executions>
-          <execution>
-            <id>copy-resources</id>
-            <phase>package</phase>
-            <goals>
-              <goal>resources</goal>
-            </goals>
-            <configuration>
-              <override>true</override>
-              <outputDirectory>target/jboss-as-${version.jboss.as}/standalone</outputDirectory>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
-
   <profiles>
+    <profile>
+      <id>jboss</id>
+      <build>
+        <resources>
+          <resource>
+            <directory>src/main/standalone</directory>
+            <filtering>true</filtering>
+            <includes>
+              <include>configuration/standalone.xml</include>
+              <include>deployments/${jboss.datasource.filename}</include>
+            </includes>
+          </resource>
+        </resources>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>copy-distro</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <configuration>
+                  <target unless="maven.test.skip">
+                    <copy todir="target">
+                      <fileset dir="${jboss.assembly.location}" />
+                    </copy>
+
+                    <!-- processing of src/main/standalone replaced by resource filtering 
+                      (see below) -->
+                    <copy todir="target/jboss-as-${version.jboss.as}/modules"
+                      overwrite="true">
+                      <fileset dir="src/main/modules" />
+                    </copy>
+
+                  </target>
+                </configuration>
+              </execution>
+              <execution>
+                <id>copy-test-dependencies</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <configuration>
+                  <target unless="maven.test.skip">
+                    <dependencyfilesets scopes="test" />
+
+                    <copy todir="target/jboss-as-${version.jboss.as}/modules"
+                      flatten="false">
+                      <fileset refid="maven.project.dependencies" />
+                      <regexpmapper from="^(.*)/([^/]+)/([^/]*)$$"
+                        to="\1/main/\3" handledirsep="yes" />
+                    </copy>
+
+                    <copy todir="target/jboss-as-${version.jboss.as}/modules"
+                      flatten="false">
+                      <fileset dir="src/main/modules" />
+                    </copy>
+
+                  </target>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <!-- copy filtered configuration resources -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-resources-plugin</artifactId>
+            <configuration>
+              <delimiters>
+                <delimiter>${*}</delimiter>
+              </delimiters>
+              <useDefaultDelimiters>false</useDefaultDelimiters>
+            </configuration>
+            <executions>
+              <execution>
+                <id>copy-resources</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>resources</goal>
+                </goals>
+                <configuration>
+                  <override>true</override>
+                  <outputDirectory>target/jboss-as-${version.jboss.as}/standalone</outputDirectory>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
     <profile>
       <id>install-test-runtime</id>
       <build>

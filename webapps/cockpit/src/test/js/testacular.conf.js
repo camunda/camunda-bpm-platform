@@ -71,5 +71,5 @@ urlRoot = '/__testacular/';
 proxies = {
   '/': 'http://localhost:8081/cockpit/',
   '/cockpit/': 'http://localhost:8081/cockpit/',
-  '/camunda-engine-rest/': 'http://localhost:8081/camunda-engine-rest/'
+  '/engine-rest/': 'http://localhost:8081/engine-rest/'
 };

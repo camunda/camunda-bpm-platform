@@ -530,6 +530,21 @@
         <test.db.url>jdbc:oracle:thin:@${database.host}:1521:xe</test.db.url>
       </properties>
     </profile>
+    <profile>
+      <id>distro</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <configuration>
+              <skipTests>true</skipTests>
+              <skipITs>true</skipITs>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
   </profiles>
 
   <build>
