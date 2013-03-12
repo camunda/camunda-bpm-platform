@@ -1,39 +1,53 @@
-This is a distribution of the 
+This is a distribution of 
 
-   camunda fox bpm platform enterprise edition (ee)
+       camunda BPM platform v${project.version}
+          
+visit     
+       http://www.camunda.org/implement.html
 
-camunda fox ee, (c) camunda services GmbH
+   
+camunda BPM platform is licensed under the Apache License v2.0
+http://www.apache.org/licenses/LICENSE-2.0
+ 
+The packaged Apache Tomcat server is licensed under 
+the Apache License v2.0 license.
 
 ==================
 
 Contents:
-		
-	server/
-		This directory contains a preconfigured distribution 
-		of apache tomcat 6 with camunda fox cockpit readily installed. 
-		
-		run the		
-			server/apache-tomcat-${tomcat6.version}/bin/startup.{bat/sh} 
-		script to start up the the server.
-		
-		Set CATALINA_OPTS in
-		    server/apache-tomcat-${tomcat6.version}/bin/setenv.{bat/sh}
-		
-		You can access camunda fox cockpit under:
-		
-		http://localhost:8080/cockpit 
-		
+
+    lib/
+        This directory contains the java libraries for application 
+        development.
+            
+    server/
+        This directory contains a preconfigured distribution 
+        of Apache Tomcat with camunda BPM platform readily 
+        installed. 
+        
+        run the     
+            server/apache-tomcat-${tomcat.version}/bin/startup.{bat/sh} 
+        script to start up the the server.
+        
+        After starting the server, you can access the 
+        following web applications:
+        
+        http://localhost:8080/tasklist
+        http://localhost:8080/cockpit
+        http://localhost:8080/engine-rest
+        http://localhost:8080/cycle    
+        
     sql/
-        This directory contains the create and upgrade sql scripts
+        This directory contains the create and upgrade sql script
         for the different databases.
         The engine create script contain the engine and history tables.
         
         Execute the current upgrade script to make the database compatible
-        with the newest fox platform version.
+        with the newest camunda BPM platform release.
 
-==================		
-		
-camunda fox ee version: ${project.version}
-tomcat server version: ${tomcat6.version}
+==================      
+        
+camunda BPM platform version: ${project.version}
+Apache Tomcat Server version: ${tomcat.version}
 
 =================

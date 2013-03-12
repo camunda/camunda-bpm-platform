@@ -1,38 +1,46 @@
-This is a distribution of the 
+This is a distribution of 
 
-   camunda fox bpm platform enterprise edition (ee)
+       camunda BPM platform v${project.version}
+          
+visit     
+       http://www.camunda.org/implement.html
 
-camunda fox ee, (c) camunda services GmbH
+   
+camunda BPM platform is licensed under the Apache License v2.0
+http://www.apache.org/licenses/LICENSE-2.0
  
-Packaged jboss as 7 server is licensed under the LGPL license.
+The packaged JBoss Application Server 7 server is licensed under 
+the LGPL license.
 
 ==================
 
 Contents:
 
-	client/
-		This directory contains the client jar which is 
-		needed for deploying process applications to the 
-		fox platform.
+    lib/
+        This directory contains the java libraries for application 
+        development.
 	
 	modules/
-		This directory contains the jboss 7 modules which 
-		make up the fox platform. You can use these modules 
-		to patch a vanilla distribution of jboss as.
+        This directory contains additional modules for JBoss Application 
+        erver 7. You can use these modules to patch a vanilla distribution 
+        of JBoss Application Server.
 		
 	server/
 		This directory contains a preconfigured distribution 
-		of jboss as 7 with camunda fox ce readily installed. 
+		of JBoss Application Server 7 with camunda BPM platform readily 
+		installed. 
 		
 		run the		
 			server/jboss-as-${version.jboss.as}/bin/standalone.{bat/sh} 
 		script to start up the the server.
 		
-		The server bundles a distribution of the activiti 
-		task explorer (branded as fox-explorer).
-		You can access it using the following URL:
+		After starting the server, you can access the 
+		following web applications:
 		
-		http://localhost:8080/explorer 
+		http://localhost:8080/tasklist
+		http://localhost:8080/cockpit
+		http://localhost:8080/engine-rest
+		http://localhost:8080/cycle    
 		
     sql/
         This directory contains the create and upgrade sql script
@@ -40,11 +48,11 @@ Contents:
         The engine create script contain the engine and history tables.
         
         Execute the current upgrade script to make the database compatible
-        with the newest fox platform version.
+        with the newest camunda BPM platform release.
 
 ==================		
 		
-camunda fox ee version: ${project.version}
-jboss as server version: ${version.jboss.as}
+camunda BPM platform version: ${project.version}
+JBoss Application Server version: ${version.jboss.as}
 
 =================
