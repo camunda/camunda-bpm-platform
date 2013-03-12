@@ -101,10 +101,10 @@ public class ActivityStatisticsQueryTest extends PluggableProcessEngineTestCase 
   
   @Test
   @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/StatisticsTest.testMultiInstanceStatisticsQuery.bpmn20.xml")
-  public void failing_testMultiInstanceActivityStatisticsQuery() {
+  public void testParallelMultiInstanceActivityStatisticsQuery() {
     runtimeService.startProcessInstanceByKey("MIExampleProcess");
     ProcessDefinition definition = repositoryService.createProcessDefinitionQuery()
-        .processDefinitionKey("ExampleProcess").singleResult();
+        .processDefinitionKey("MIExampleProcess").singleResult();
     
     List<ActivityStatistics> statistics = 
         managementService.createActivityStatisticsQuery(definition.getId()).includeFailedJobs().list();

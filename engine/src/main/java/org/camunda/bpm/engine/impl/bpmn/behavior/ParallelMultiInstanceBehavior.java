@@ -83,6 +83,11 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
         executeOriginalBehavior(concurrentExecution, loopCounter);
       }
     }
+
+    if (!concurrentExecutions.isEmpty()) {
+      execution.inactivate();
+    }
+    
   }
   
   /**
