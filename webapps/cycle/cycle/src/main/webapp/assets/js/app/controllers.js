@@ -346,7 +346,7 @@ function BpmnDiagramController($scope, Commons, Event, $http, App) {
  */
 function EditDiagramController($scope, Commons, Event, ConnectorConfiguration, Connector, Error) {
   
-  var FOX_DESIGNER = "fox designer", 
+  var CAMUNDA_MODELER = "camunda modeler", 
       RIGHT_HAND_SIDE = "rightHandSide";
   
   $scope.commitMessage = "Model created using camunda cycle.";
@@ -359,7 +359,7 @@ function EditDiagramController($scope, Commons, Event, ConnectorConfiguration, C
 
   // Can the modeler name be edited?
   var canEditModeler = $scope.canEditModeler = function() {
-    return !!($scope.identifier != RIGHT_HAND_SIDE || ($scope.editDiagram.modeler && $scope.editDiagram.modeler != FOX_DESIGNER));
+    return !!($scope.identifier != RIGHT_HAND_SIDE || ($scope.editDiagram.modeler && $scope.editDiagram.modeler != CAMUNDA_MODELER));
   };
   
   $scope.showCommitMessageInput = function() {	  
@@ -419,20 +419,20 @@ function EditDiagramController($scope, Commons, Event, ConnectorConfiguration, C
     }
   });
   
-  // set modeler name as fox designer whenever a right hand side 
+  // set modeler name as camunda modeler whenever a right hand side 
   // diagram with no name is edited
   // relaxed implements AT in HEMERA-2549
   if (!canEditModeler()) {
-    $scope.editDiagram.modeler = FOX_DESIGNER;
+    $scope.editDiagram.modeler = CAMUNDA_MODELER;
   }
   
   // TODO: nre: On update: How to initially display the right folder structure?
   // 
   // get required data
   Commons.getModelerNames().then(function(data) {
-    // filter out FOX_DESIGNER
+    // filter out CAMUNDA_MODELER
     for (var i = data.length-1; i >= 0; i--) {
-      if (angular.equals(data[i], FOX_DESIGNER)) {
+      if (angular.equals(data[i], CAMUNDA_MODELER)) {
         data.splice(i, 1);
         break;
       }
@@ -773,13 +773,13 @@ function EditConnectorController($scope, $http, App, ConnectorConfiguration) {
 
   $scope.currentHelpText = function(propertyKey) {
    if (propertyKey == BASE_PATH) {
-     return "provide path to your file system, e.g. 'C:\\Users\\Tommy\\FoxFileSystem'";
+     return "provide path to your file system, e.g. 'C:\\Users\\Tommy\\FileSystem'";
    } else if (propertyKey == SIGNAVIO_BASE_URL) {
      return "enter the URL to your modelers loginpage, e.g. 'https://editor.signavio.com/'";
    } else if (propertyKey == REPO_PATH) {
      return "The SVN root URL to use, e.g. 'https://svn.camunda.com/fox/'";
    } else if (propertyKey == FOLDER_ROOT_PATH) {
-     return "if you want to point the fox modeler to some root directory different to the normal Signavio root directory, enter the ID here, e.g. eb36d6fd27794eda95a9f7e9aa16d987";
+     return "if you want to point the camunda modeler to some root directory different to the normal Signavio root directory, enter the ID here, e.g. eb36d6fd27794eda95a9f7e9aa16d987";
    } else if (propertyKey == ALLOW_ALL_SSL_HOSTNAMES) {
      return "enter 'true' to allow changes in SSL-Hostnames of modeler, otherwise enter 'false'";
    } else if (propertyKey == TEMPORARY_FILE_STORE) {

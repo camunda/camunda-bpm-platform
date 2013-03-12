@@ -15,7 +15,7 @@ public class CycleConfiguration extends SecurityConfiguration {
   
   private String mailSessionName;
   private String emailFrom = "cycle@localhost";
-  private String defaultCommitMessage = "Changed using camunda fox cycle";
+  private String defaultCommitMessage = "Changed using camunda cycle";
   
   /**
    * The mail session name is used for looking up a mail session in JNDI

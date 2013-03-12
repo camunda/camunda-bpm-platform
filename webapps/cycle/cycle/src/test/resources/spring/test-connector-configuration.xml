@@ -48,7 +48,7 @@
   
   <bean id="cycleConfiguration" class="org.camunda.bpm.cycle.configuration.CycleConfiguration">
 
-    <property name="defaultCommitMessage" value="Changed using camunda fox cycle" />
+    <property name="defaultCommitMessage" value="Changed using camunda cycle" />
     
   </bean>
 </beans>

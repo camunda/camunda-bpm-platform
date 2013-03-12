@@ -264,7 +264,7 @@ public class SvnConnector extends Connector {
         svnClientAdapter.addDirectory(newFile, true);
       }
       
-      String defaultMessage = getDefaultCommitMessage("Created node '" + label + "' in '" + parentFolder + "' using camunda fox cycle.");
+      String defaultMessage = getDefaultCommitMessage("Created node '" + label + "' in '" + parentFolder + "' using camunda cycle.");
       if(message == null || message.length()==0) {
         message = defaultMessage;
       }
@@ -289,7 +289,7 @@ public class SvnConnector extends Connector {
     String id = node.getId();
     try {
       SVNUrl svnUrl = createSvnUrl(id);
-      String defaultMessage = getDefaultCommitMessage("Removed '" + id + "' using camunda fox cycle.");
+      String defaultMessage = getDefaultCommitMessage("Removed '" + id + "' using camunda cycle.");
       if(message == null || message.length()==0) {
         message = defaultMessage;
       }
@@ -328,7 +328,7 @@ public class SvnConnector extends Connector {
       bos.flush();
       bos.close();
       
-      String defaultMessage = getDefaultCommitMessage("Updated file '" + node.getLabel() + "' in '" + parentFolderId + "' using camunda fox cycle");
+      String defaultMessage = getDefaultCommitMessage("Updated file '" + node.getLabel() + "' in '" + parentFolderId + "' using camunda cycle");
       if(message == null || message.length()==0) {
         message = defaultMessage;
       }
