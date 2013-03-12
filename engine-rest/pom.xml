@@ -191,7 +191,7 @@
         <activeByDefault>true</activeByDefault>
       </activation>
       <properties>
-        <rest.http.port>8080</rest.http.port>
+        <rest.http.port>38080</rest.http.port>
       </properties>
       <build>
         <testResources>
