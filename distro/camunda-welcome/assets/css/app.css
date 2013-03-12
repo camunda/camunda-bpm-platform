@@ -1,0 +1,66 @@
+
+@font-face { font-family: VolkswagenTS-Regular; src: url(VolkswagenTS-Regular.otf); }
+
+/** 
+ * loaded to remove angular template flicker on site load
+ * @see http://docs.angularjs.org/api/ng.directive:ngCloak
+*/
+[ng\:cloak], [ng-cloak], .ng-cloak {
+  display: none;
+}
+
+.camunda-icon {
+  background-image: url(../img/camunda_icon.png);
+  width: 74px;
+  height: 74px;
+  display: inline-block;
+}
+
+h1, h2, h3, h4 {
+    font-family: 'VolkswagenTS-Regular';
+    font-weight: normal;
+}
+
+
+a, a:visited {
+  color: #B5152B;
+  text-decoration: none;
+}
+
+.center {
+  text-align: center;
+}
+
+
+/**
+ * shared style declarations
+*/
+html, body {
+  height:100%;
+  min-height: 100%;
+}
+
+.footer {
+  padding-top: 2em;
+  background-color: #333;
+  color: white;
+  padding-bottom: 2em;
+}
+.wrapper {
+  min-height: 100%;
+  height: auto !important; /* ie7 fix */
+  height: 100%;
+  margin: 0 auto -43px;
+}
+
+.push-down {
+  height: 60px;
+}
+
+.wrapper-dark {
+  background-color:#2f2f2f;
+}
+
+.row-white {
+  color:white;
+}
