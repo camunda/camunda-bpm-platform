@@ -247,9 +247,12 @@ public class SvnConnector extends Connector {
       id = parentId + label;
       
       String parentFolder = extractParentFolder(id);
+      logger.info("Parent Folder: " + parentFolder);
       File temporaryFileStore = getTemporaryFileStore(parentFolder + File.separator + UUID.randomUUID().toString());
+      logger.info("Temporary File Store (AbsolutePath): " + temporaryFileStore.getAbsolutePath());
       
       SVNUrl svnUrl = createSvnUrl(parentFolder);
+      logger.info("SvnUrl: " + svnUrl.toString());
       checkout(svnUrl, temporaryFileStore);
       
       File newFile = new File(temporaryFileStore + File.separator + label);
