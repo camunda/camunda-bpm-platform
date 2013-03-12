@@ -56,7 +56,19 @@
       </includes>
       <directoryMode>0700</directoryMode>
     </fileSet>   
+    <fileSet>
+      <directory>../../camunda-welcome</directory>
+      <outputDirectory>server/jboss-as-${version.jboss.as}/standalone/deployments/camunda-welcome.war</outputDirectory>      
+    </fileSet> 
   </fileSets>
+  
+  <files>
+     <file>
+      <source>src/EMPTY_FILE</source>
+      <outputDirectory>server/jboss-as-${version.jboss.as}/standalone/deployments/</outputDirectory>      
+      <destName>camunda-welcome.war.dodeploy</destName>
+    </file>  
+  </files>
 
   <dependencySets>
       
