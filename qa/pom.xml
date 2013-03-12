@@ -70,7 +70,6 @@
       <module>gf31-runtime</module>
       <module>tomcat-runtime</module>
       <module>cycle-tests</module>
-      <module>test-db-upgrade</module>
       <module>integration-tests</module>
 		</modules>
 	</profile>  
