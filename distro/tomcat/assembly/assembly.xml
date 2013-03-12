@@ -54,6 +54,11 @@
       <filtered>true</filtered>
       <outputDirectory></outputDirectory>
     </file>
+     <file>
+      <source>src/start-camunda.bat</source>
+      <filtered>true</filtered>
+      <outputDirectory></outputDirectory>
+    </file>
     
     <file>
       <source>src/conf/server.xml</source>

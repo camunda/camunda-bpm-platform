@@ -89,7 +89,7 @@
               <descriptors>
                 <descriptor>assembly.xml</descriptor>
               </descriptors>
-              <finalName>camunda-ee-tomcat7-${project.version}</finalName>
+              <finalName>camunda-bpm-tomcat7-${project.version}</finalName>
               <attach>true</attach>
               <appendAssemblyId>false</appendAssemblyId>
               <outputDirectory>target/</outputDirectory>
