@@ -80,9 +80,21 @@ define(["angular", "bpmn/Bpmn"], function(angular, Bpmn) {
       queryObject.sortBy = sort.by;
       queryObject.sortOrder = sort.order;
 
+      EngineApi.getProcessDefinitions().query().$then(function(response) {
+        var processDefinitions = {};
+        $.each(response.resource, function(index, definition) {
+          processDefinitions[definition.id] = definition;
+        });
+        $scope.processDefinitions = processDefinitions;
+      });
+      
       EngineApi.getTaskList().query(queryObject).$then(function(response) {
         $scope.taskList.tasks = response.resource;
       });
+    };
+    
+    $scope.getDefinitionForTask = function(task) {
+      return $scope.processDefinitions[task.processDefinitionId];
     };
 
     $scope.$watch(function() { return $location.search(); }, function(newValue) {
