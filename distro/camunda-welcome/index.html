@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Welcome to camunda BPM platform</title>
+    
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <meta name="author" content="camunda.org community" />
+    
+    <!-- loads all stylesheets -->
+    <link href="assets/css/app.css" rel="stylesheet" />
+    <link href="assets/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="assets/css/bootstrap-responsive.min.css" rel="stylesheet" />
+
+    <!-- For IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+     
+    <base app-base="." />
+
+  </head>
+  <body ng-controller="DefaultController" >
+    <div class="wrapper wrapper-dark">
+
+      <div style="position:absolute; width:100%; height:480px; background-color:white"> </div>
+
+        <div class="container" >
+
+          <div class="center" style="padding-top:100px; position: relative;"> 
+            <i class="camunda-icon"></i><p> <h1>camunda BPM platform</h1></p>
+            <div class="alert alert-success">
+              <strong>Congratulations!</strong> you have successfully installed camunda BPM platform.
+            </div>
+          </div>
+
+          <div style="position:relative; margin-top:40px">
+
+            <div class="row">
+              <div class="span4 center">
+                <a href="/tasklist">
+                  <img src="assets/img/tasklist.png" style="border: 1px solid grey; height:200px !important; width:100%">
+                </a>
+              </div>
+              <div class="span4 center">
+               <a href="/cockpit">
+                <img src="assets/img/cockpit.png" style="border: 1px solid grey; height:200px !important;  width:100%">
+                </a>
+              </div>
+              <div class="span4 center">
+               <a href="/cycle">
+                <img src="assets/img/cycle.png" style="border: 1px solid grey; height:200px !important; width:100%">
+               </a>
+              </div>
+
+            </div>
+            <div class="row row-white">
+              <div class="span4 center">
+                <h2>camunda tasklist</h2>
+                
+                <p>
+                  Human Workflow Management.
+                </p>
+                
+              </div>
+              <div class="span4 center">
+                <h2>camunda cockpit</h2>
+                
+                <p>
+                  Operations &amp; Monitoring
+                </p>
+                
+              </div>
+              <div class="span4 center">
+                <h2>camunda cycle</h2>
+                
+                <p>
+                  Work with any BPMN 2.0 compliant Modeler using <nobr><b>camunda Cycle</b></nobr>.
+                </p>
+               
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+      <div class="push-down"><!-- // --></div> 
+    </div>
+    <!-- footer -->
+    <footer class="footer">
+     
+    </footer>
+  </body>
+</html>

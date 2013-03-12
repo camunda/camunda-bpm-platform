@@ -31,6 +31,10 @@
       <directory>src/overlay</directory>
       <outputDirectory>server/apache-tomcat-${tomcat.version}/webapps/</outputDirectory>    
     </fileSet>      
+    <fileSet>
+      <directory>../../camunda-welcome</directory>
+      <outputDirectory>server/apache-tomcat-${tomcat.version}/webapps/camunda-welcome</outputDirectory>      
+    </fileSet>  
   </fileSets>
 
   <dependencySets>
