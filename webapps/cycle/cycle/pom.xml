@@ -372,6 +372,7 @@
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
+          <runOrder>alphabetical</runOrder>
           <excludes>
             <!-- skip signavio connector test in default profile -->
             <exclude>**/SignavioConnectorTest.java</exclude>

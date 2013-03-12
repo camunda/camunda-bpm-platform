@@ -54,6 +54,11 @@
       <outputDirectory></outputDirectory>
     </file>
     <file>
+      <source>src/start-camunda.bat</source>
+      <filtered>true</filtered>
+      <outputDirectory></outputDirectory>
+    </file>
+    <file>
       <source>src/LICENSE-2.0.txt</source>
       <filtered>true</filtered>
       <outputDirectory></outputDirectory>
