@@ -2,9 +2,6 @@ package org.camunda.bpm.tasklist;
 
 import java.util.logging.Logger;
 
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
-
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.tasklist.spi.AbstractProcessEngineAware;
@@ -30,21 +27,21 @@ public class TasklistDemoData extends AbstractProcessEngineAware {
       user.setEmail("demo@camunda.org");
       processEngine.getIdentityService().saveUser(user);
 
-      User user2 = processEngine.getIdentityService().newUser("sales");
-      user2.setPassword("sales");
-      user2.setEmail("sales@camunda.org");
+      User user2 = processEngine.getIdentityService().newUser("john");
+      user2.setPassword("john");
+      user2.setEmail("john@camunda.org");
 
       processEngine.getIdentityService().saveUser(user2);
 
-      User user3 = processEngine.getIdentityService().newUser("accounting");
-      user3.setPassword("accounting");
-      user3.setEmail("accounting@camunda.org");
+      User user3 = processEngine.getIdentityService().newUser("mary");
+      user3.setPassword("mary");
+      user3.setEmail("mary@camunda.org");
 
       processEngine.getIdentityService().saveUser(user3);
 
-      User user4 = processEngine.getIdentityService().newUser("management");
-      user4.setPassword("management");
-      user4.setEmail("management@camunda.org");
+      User user4 = processEngine.getIdentityService().newUser("peter");
+      user4.setPassword("peter");
+      user4.setEmail("peter@camunda.org");
 
       processEngine.getIdentityService().saveUser(user4);
 
@@ -52,11 +49,11 @@ public class TasklistDemoData extends AbstractProcessEngineAware {
       salesGroup.setName("Sales");
       processEngine.getIdentityService().saveGroup(salesGroup);
 
-      Group accountingGroup = processEngine.getIdentityService().newGroup("accounting");;
+      Group accountingGroup = processEngine.getIdentityService().newGroup("accounting");
       accountingGroup.setName("Accounting");
       processEngine.getIdentityService().saveGroup(accountingGroup);
 
-      Group managementGroup = processEngine.getIdentityService().newGroup("management");;
+      Group managementGroup = processEngine.getIdentityService().newGroup("management");
       managementGroup.setName("Management");
       processEngine.getIdentityService().saveGroup(managementGroup);
 
@@ -64,9 +61,9 @@ public class TasklistDemoData extends AbstractProcessEngineAware {
       processEngine.getIdentityService().createMembership("demo", "accounting");
       processEngine.getIdentityService().createMembership("demo", "management");
 
-      processEngine.getIdentityService().createMembership("sales", "sales");
-      processEngine.getIdentityService().createMembership("accounting", "accounting");
-      processEngine.getIdentityService().createMembership("management", "management");
+      processEngine.getIdentityService().createMembership("john", "sales");
+      processEngine.getIdentityService().createMembership("mary", "accounting");
+      processEngine.getIdentityService().createMembership("peter", "management");
     }
 
 }
