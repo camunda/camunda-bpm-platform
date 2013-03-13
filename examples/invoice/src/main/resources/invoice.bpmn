@@ -25,7 +25,7 @@
         <flowNodeRef>invoiceProcessed</flowNodeRef>
       </lane>
     </laneSet>
-    <userTask id="approveInvoice" activiti:assignee="#{approver}" activiti:formKey="approveInvoice" name="approve invoice">
+    <userTask id="approveInvoice" activiti:assignee="${approver}" activiti:formKey="embedded:app:forms/approve-invoice.html" name="approve invoice">
       <incoming>sequenceFlow_178</incoming>
       <incoming>reviewSuccessful</incoming>
       <outgoing>sequenceFlow_180</outgoing>
@@ -35,7 +35,7 @@
       <outgoing>invoiceNotApproved</outgoing>
       <outgoing>invoiceApproved</outgoing>
     </exclusiveGateway>
-    <userTask id="reviewInvoice" activiti:assignee="kermit" activiti:formKey="clarifyInvoice" name="review invoice">
+    <userTask id="reviewInvoice" activiti:assignee="demo" activiti:formKey="clarifyInvoice" name="review invoice">
       <incoming>invoiceNotApproved</incoming>
       <outgoing>sequenceFlow_183</outgoing>
     </userTask>
@@ -63,7 +63,7 @@
       <conditionExpression xsi:type="tFormalExpression" id="conditionExpression_68">${clarified.equals('yes')}</conditionExpression>
     </sequenceFlow>
     <dataStoreReference id="DataStoreReference_1" name="Financial Accounting System" dataStoreRef="FinancialAccountingSystem"/>
-    <userTask id="assignApprover" activiti:assignee="kermit" activiti:formKey="assignApprover" name="assign approver">
+    <userTask id="assignApprover" activiti:formKey="embedded:app:forms/assign-approver.html" activiti:candidateGroups="management" name="assign approver">
       <incoming>SequenceFlow_1</incoming>
       <outgoing>sequenceFlow_178</outgoing>
     </userTask>
