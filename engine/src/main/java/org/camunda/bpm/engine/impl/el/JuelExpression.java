@@ -52,13 +52,13 @@ public class JuelExpression implements Expression {
         .handleInvocation(invocation);
       return invocation.getInvocationResult();      
     } catch (PropertyNotFoundException pnfe) {
-      throw new ProcessEngineException("Unknown property used in expression: " + expressionText, pnfe);
+      throw new ProcessEngineException("Unknown property used in expression: " + expressionText+". Cause: "+pnfe.getMessage(), pnfe);
     } catch (MethodNotFoundException mnfe) {
-      throw new ProcessEngineException("Unknown method used in expression: " + expressionText, mnfe);
+      throw new ProcessEngineException("Unknown method used in expression: " + expressionText+". Cause: "+mnfe.getMessage(), mnfe);
     } catch(ELException ele) {
-      throw new ProcessEngineException("Error while evaluating expression: " + expressionText, ele);
+      throw new ProcessEngineException("Error while evaluating expression: " + expressionText+". Cause: "+ele.getMessage(), ele);
     } catch (Exception e) {
-      throw new ProcessEngineException("Error while evaluating expression: " + expressionText, e);
+      throw new ProcessEngineException("Error while evaluating expression: " + expressionText+". Cause: "+e.getMessage(), e);
     }
   }
     
@@ -70,7 +70,7 @@ public class JuelExpression implements Expression {
         .getDelegateInterceptor()
         .handleInvocation(invocation);
     } catch (Exception e) {
-      throw new ProcessEngineException("Error while evaluating expression: " + expressionText, e);
+      throw new ProcessEngineException("Error while evaluating expression: " + expressionText+". Cause: "+e.getMessage(), e);
     }
   }
   
