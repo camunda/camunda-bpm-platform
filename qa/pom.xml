@@ -62,9 +62,6 @@
 	
 	<profile>
 	  <id>distro</id>  
-		<activation>
-		  <activeByDefault>true</activeByDefault>
-		</activation>
 		<modules>
       <module>jboss7-runtime</module>
       <module>gf31-runtime</module>

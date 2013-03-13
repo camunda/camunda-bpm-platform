@@ -77,7 +77,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-assembly-plugin</artifactId>
-        <version>2.3</version>
         <executions>
           <execution>
             <id>distro</id>
@@ -101,10 +100,5 @@
       </plugin>
     </plugins>
   </build>
-
-  <scm>
-    <connection>scm:git:git@bitbucket.org:camunda/camunda-ee.git</connection>
-    <developerConnection>scm:git:git@bitbucket.org:camunda/camunda-ee.git</developerConnection>
-  </scm>
 
 </project>

@@ -102,9 +102,4 @@
     </plugins>
   </build>
   
-  <scm>
-   <connection>scm:git:git@bitbucket.org:camunda/camunda-ee.git</connection>
-   <developerConnection>scm:git:git@bitbucket.org:camunda/camunda-ee.git</developerConnection>
-  </scm>
-  
 </project>
