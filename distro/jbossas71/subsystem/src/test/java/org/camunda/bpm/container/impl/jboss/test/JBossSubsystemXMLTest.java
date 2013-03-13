@@ -57,9 +57,9 @@ public class JBossSubsystemXMLTest extends AbstractSubsystemTest {
   public static final ServiceName PLATFORM_JOBEXECUTOR_SERVICE_NAME = ServiceName.of("foxPlatform").append("containerJobExecutorService");
     
   public static final ServiceName processEngineServiceBindingServiceName = ContextNames.GLOBAL_CONTEXT_SERVICE_NAME            
-    .append("camunda-fox-platform")
+    .append("camunda")
     .append("process-engine")
-    .append("DefaultProcessEngineService!com.camunda.fox.platform.api.ProcessEngineService");
+    .append("ProcessEngineService!org.camunda.bpm.ProcessEngineService");
    
   public JBossSubsystemXMLTest() {
     super(ModelConstants.SUBSYSTEM_NAME, new BpmPlatformExtension());

@@ -37,7 +37,8 @@ public class TomcatCreateJndiBindingsStep extends MBeanDeploymentOperationStep {
   
   public final static Logger LOGGER = Logger.getLogger(TomcatCreateJndiBindingsStep.class.getName());
   
-  public final String PROCESS_ENGINE_SERVICE_NAME = "PlatformService!com.camunda.fox.platform.api.ProcessEngineService";   
+  public final String PROCESS_ENGINE_SERVICE_NAME = "ProcessEngineService!org.camunda.bpm.ProcessEngineService";
+  public final String PROCESS_APPLICATION_SERVICE_NAME = "ProcessApplicationService!org.camunda.bpm.ProcessApplicationService";
   
   protected Context bindingContext;
 
@@ -54,18 +55,19 @@ public class TomcatCreateJndiBindingsStep extends MBeanDeploymentOperationStep {
       
       // lookup the context
       bindingContext = getOrCreateSubContext(bindingContext, "global");
-      bindingContext = getOrCreateSubContext(bindingContext, "camunda-fox-platform");
+      bindingContext = getOrCreateSubContext(bindingContext, "camunda");
       bindingContext = getOrCreateSubContext(bindingContext, "process-engine");           
             
-      // bind the service 
+      // bind the services 
       bindingContext.bind(PROCESS_ENGINE_SERVICE_NAME, BpmPlatform.getProcessEngineService());
+      bindingContext.bind(PROCESS_APPLICATION_SERVICE_NAME, BpmPlatform.getProcessApplicationService());
       
-      LOGGER.info("the legacy bindings for the fox platform services are as follows: \n\n"
-          + "        java:global/camunda-fox-platform/process-engine/"
-          + PROCESS_ENGINE_SERVICE_NAME + "\n");
+//      LOGGER.info("the JNDI bindings for the BPM platform services are as follows: \n\n"
+//          + "        java:global/camunda/process-engine/"+ PROCESS_ENGINE_SERVICE_NAME + "\n"
+//          + "        java:global/camunda/process-engine/"+ PROCESS_APPLICATION_SERVICE_NAME + "\n");
       
     } catch (NamingException e) {
-      throw new ProcessEngineException("Unable to bind platform service in global naming context.", e);      
+      throw new ProcessEngineException("Unable to bind bpm platform services in global naming context.", e);      
     }
     
   }

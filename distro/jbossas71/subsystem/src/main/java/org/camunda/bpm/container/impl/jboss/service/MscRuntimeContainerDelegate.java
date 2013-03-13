@@ -215,15 +215,15 @@ public class MscRuntimeContainerDelegate implements Service<MscRuntimeContainerD
  
   protected void createJndiBindings() {
     
-    final String prefix = "java:global/camunda-fox-platform/";
-    final String processEngineServiceSuffix = "DefaultProcessEngineService!com.camunda.fox.platform.api.ProcessEngineService";    
+    final String prefix = "java:global/camunda/";
+    final String processEngineServiceSuffix = "ProcessEngineService!org.camunda.bpm.ProcessEngineService";
     
     String moduleName = "process-engine";
     
     final String processEngineServiceBindingName = prefix + moduleName + "/"+ processEngineServiceSuffix;
         
     final ServiceName processEngineServiceBindingServiceName = ContextNames.GLOBAL_CONTEXT_SERVICE_NAME            
-      .append("camunda-fox-platform")
+      .append("camunda")
       .append(moduleName)
       .append(processEngineServiceSuffix);
     
