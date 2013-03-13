@@ -5,20 +5,20 @@
   </dataStore>
   <message id="foxMessage_en" name="foxMessage_en"/>
   <collaboration id="collaboration_3">
-    <participant id="Process_Engine_1" name="invoice receipt" processRef="fox-invoice_en"/>
+    <participant id="Process_Engine_1" name="invoice receipt" processRef="invoice"/>
   </collaboration>
-  <process id="fox-invoice_en" name="invoice receipt (fox)" isExecutable="true">
+  <process id="invoice" name="invoice receipt" isExecutable="true">
     <laneSet id="laneSet_5">
       <lane id="Approver" name="approver">
         <flowNodeRef>approveInvoice</flowNodeRef>
         <flowNodeRef>invoice_approved</flowNodeRef>
       </lane>
       <lane id="teamAssistant" name="team assistant">
-        <flowNodeRef>invoiceReceived</flowNodeRef>
         <flowNodeRef>reviewInvoice</flowNodeRef>
         <flowNodeRef>reviewSuccessful_gw</flowNodeRef>
         <flowNodeRef>assignApprover</flowNodeRef>
         <flowNodeRef>invoiceNotProcessed</flowNodeRef>
+        <flowNodeRef>StartEvent_1</flowNodeRef>
       </lane>
       <lane id="Accountant" name="accountant">
         <flowNodeRef>prepareBankTransfer</flowNodeRef>
@@ -35,10 +35,6 @@
       <outgoing>invoiceNotApproved</outgoing>
       <outgoing>invoiceApproved</outgoing>
     </exclusiveGateway>
-    <startEvent id="invoiceReceived" activiti:formKey="startProcess" name="invoice received">
-      <outgoing>sequenceFlow_187</outgoing>
-      <messageEventDefinition id="messageEventDefinition_30" messageRef="foxMessage_en"/>
-    </startEvent>
     <userTask id="reviewInvoice" activiti:assignee="kermit" activiti:formKey="clarifyInvoice" name="review invoice">
       <incoming>invoiceNotApproved</incoming>
       <outgoing>sequenceFlow_183</outgoing>
@@ -63,13 +59,12 @@
     <sequenceFlow id="reviewNotSuccessful" name="no" isImmediate="true" sourceRef="reviewSuccessful_gw" targetRef="invoiceNotProcessed">
       <conditionExpression xsi:type="tFormalExpression" id="conditionExpression_65">${clarified.equals('no')}</conditionExpression>
     </sequenceFlow>
-    <sequenceFlow id="sequenceFlow_187" isImmediate="true" sourceRef="invoiceReceived" targetRef="assignApprover"/>
     <sequenceFlow id="reviewSuccessful" name="yes" isImmediate="true" sourceRef="reviewSuccessful_gw" targetRef="approveInvoice">
       <conditionExpression xsi:type="tFormalExpression" id="conditionExpression_68">${clarified.equals('yes')}</conditionExpression>
     </sequenceFlow>
     <dataStoreReference id="DataStoreReference_1" name="Financial Accounting System" dataStoreRef="FinancialAccountingSystem"/>
     <userTask id="assignApprover" activiti:assignee="kermit" activiti:formKey="assignApprover" name="assign approver">
-      <incoming>sequenceFlow_187</incoming>
+      <incoming>SequenceFlow_1</incoming>
       <outgoing>sequenceFlow_178</outgoing>
     </userTask>
     <sequenceFlow id="sequenceFlow_178" isImmediate="true" sourceRef="assignApprover" targetRef="approveInvoice"/>
@@ -80,6 +75,10 @@
     <endEvent id="invoiceProcessed" name="invoice processed">
       <incoming>SequenceFlow_2</incoming>
     </endEvent>
+    <startEvent id="StartEvent_1" activiti:formKey="embedded:app:forms/start-form.html" name="invoice received">
+      <outgoing>SequenceFlow_1</outgoing>
+    </startEvent>
+    <sequenceFlow id="SequenceFlow_1" name="" sourceRef="StartEvent_1" targetRef="assignApprover"/>
     <association id="Association_1" sourceRef="DataStoreReference_1" targetRef="prepareBankTransfer"/>
   </process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_73">
@@ -103,12 +102,6 @@
         <omgdc:Bounds height="40.0" width="40.0" x="488.0" y="244.0"/>
         <bpmndi:BPMNLabel>
           <omgdc:Bounds height="22.0" width="107.0" x="455.0" y="289.0"/>
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape id="Rechnung_eingegangen_138_gui" bpmnElement="invoiceReceived" isHorizontal="true">
-        <omgdc:Bounds height="28.0" width="28.0" x="112.0" y="78.0"/>
-        <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="22.0" width="96.0" x="78.0" y="111.0"/>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape id="Freigebenden_zuordnen_143_gui" bpmnElement="assignApprover" isHorizontal="true">
@@ -195,13 +188,6 @@
           <omgdc:Bounds height="22.0" width="20.0" x="818.0" y="92.0"/>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge id="sequenceFlow_187_gui" bpmnElement="sequenceFlow_187" sourceElement="Rechnung_eingegangen_138_gui" targetElement="Freigebenden_zuordnen_143_gui">
-        <omgdi:waypoint xsi:type="omgdc:Point" x="140.0" y="92.0"/>
-        <omgdi:waypoint xsi:type="omgdc:Point" x="180.0" y="92.0"/>
-        <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="0.0" width="0.0" x="160.0" y="92.0"/>
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge id="ja_186_gui" bpmnElement="reviewSuccessful" sourceElement="Kl_rung_erfolgreich__153_gui" targetElement="Rechnung_freigeben_125_gui">
         <omgdi:waypoint xsi:type="omgdc:Point" x="713.0" y="72.0"/>
         <omgdi:waypoint xsi:type="omgdc:Point" x="713.0" y="35.0"/>
@@ -217,6 +203,16 @@
         <bpmndi:BPMNLabel>
           <omgdc:Bounds height="6.0" width="6.0" x="836.0" y="423.0"/>
         </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_3" bpmnElement="StartEvent_1">
+        <omgdc:Bounds height="28.0" width="28.0" x="96.0" y="78.0"/>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="22.0" width="96.0" x="62.0" y="111.0"/>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_2" bpmnElement="SequenceFlow_1" sourceElement="_BPMNShape_StartEvent_3" targetElement="Freigebenden_zuordnen_143_gui">
+        <omgdi:waypoint xsi:type="omgdc:Point" x="124.0" y="92.0"/>
+        <omgdi:waypoint xsi:type="omgdc:Point" x="180.0" y="92.0"/>
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
