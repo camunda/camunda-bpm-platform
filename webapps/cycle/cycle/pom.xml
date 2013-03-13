@@ -316,7 +316,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
-        <version>2.4</version>
         <executions>
           <execution>
             <id>create-jar</id>
@@ -343,7 +342,6 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-war-plugin</artifactId>
-        <version>2.2</version>
         <configuration>
           <webResources>
             <resource>
@@ -662,11 +660,6 @@
             </exclusion>
           </exclusions>
         </dependency>
-     	      
-        <dependency>
-          <groupId>org.bouncycastle</groupId>
-          <artifactId>bcpg-jdk15on</artifactId>
-        </dependency>
               
       </dependencies>
       <build>
@@ -729,10 +722,6 @@
         <dependency>
           <groupId>cglib</groupId>
           <artifactId>cglib</artifactId>
-        </dependency>
-        <dependency>
-          <groupId>org.bouncycastle</groupId>
-          <artifactId>bcpg-jdk15on</artifactId>
         </dependency>
         <dependency>
           <groupId>com.sun.jersey.contribs</groupId>
@@ -848,7 +837,7 @@
                   <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
                 </manifest>
                 <manifestEntries>
-                  <Dependencies>org.hibernate,org.hibernate.envers,org.hibernate.validator,org.apache.xerces,org.apache.commons.io,org.bouncycastle.bcprov-jdk15on,org.bouncycastle.bcpg-jdk15on</Dependencies>
+                  <Dependencies>org.hibernate,org.hibernate.envers,org.hibernate.validator,org.apache.xerces,org.apache.commons.io</Dependencies>
                 </manifestEntries>
               </archive>
             </configuration>
