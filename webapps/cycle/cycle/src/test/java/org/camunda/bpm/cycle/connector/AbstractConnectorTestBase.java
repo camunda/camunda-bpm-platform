@@ -8,6 +8,10 @@ import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
 
+import org.camunda.bpm.cycle.connector.Connector;
+import org.camunda.bpm.cycle.connector.ConnectorNode;
+import org.camunda.bpm.cycle.connector.ConnectorNodeType;
+import org.camunda.bpm.cycle.connector.ContentInformation;
 import org.camunda.bpm.cycle.util.DateUtil;
 import org.camunda.bpm.cycle.util.IoUtil;
 import org.junit.Test;

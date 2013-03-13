@@ -385,6 +385,26 @@
   
   <profiles>
     
+    <profile>
+      <id>distro</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <excludes>
+                <exclude>**/AbstractConnectorTestBase.java</exclude>
+                <exclude>**/SvnConnectorTest.java</exclude>
+                <exclude>**/VfsConnectorTest.java</exclude>
+                <exclude>**/SignavioConnectorTest.java</exclude>
+              </excludes>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    
     <!-- enables signavio integration test -->
     <profile>
       <id>signavio</id>
