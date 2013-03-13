@@ -245,6 +245,7 @@
                 <exclude>**/cdi/**</exclude>
                 <exclude>**/ejb/**</exclude>
                 <exclude>**/context/**</exclude>
+                <exclude>**/jar/**</exclude>
               </excludes>
             </configuration>
           </plugin>
@@ -327,6 +328,7 @@
                 <excludes>**/TestWarDeploymentWithBrokenBpmnXml.java</excludes>
                 <excludes>**/TestDeploymentWithDroolsTaskFails.java</excludes>
                 <exclude>**_JBOSS.java</exclude>
+                <exclude>**/jar/**</exclude>
               </excludes>
             </configuration>
           </plugin>
@@ -426,6 +428,7 @@
                 <!-- no EE stuff on tomcat :) -->
                 <exclude>**/ear/**</exclude>
                 <exclude>**/ejb/**</exclude>
+                <exclude>**/jar/**</exclude>
                 <exclude>**/transactions/**</exclude>               
                 <!-- No EJB RequestContext available -->
                 <exclude>**/JobExecutorRequestContextTest.java</exclude>

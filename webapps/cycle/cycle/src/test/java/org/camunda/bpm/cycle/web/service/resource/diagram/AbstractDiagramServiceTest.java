@@ -32,7 +32,7 @@ public abstract class AbstractDiagramServiceTest {
 
   protected BpmnDiagram diagramLastModified(Date date) {
     
-    BpmnDiagram diagram = new BpmnDiagram("fox modeler", DIAGRAM_NODE);
+    BpmnDiagram diagram = new BpmnDiagram("camunda modeler", DIAGRAM_NODE);
     diagram.setLastModified(date);
     
     bpmnDiagramRepository.saveAndFlush(diagram);

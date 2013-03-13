@@ -248,7 +248,7 @@ public class RoundtripServiceTest {
     BpmnDiagramDTO rhs = new BpmnDiagramDTO();
     ConnectorNodeDTO rhsNode = new ConnectorNodeDTO("foo/Impl.bpmn", "Impl", connector.getId());
 
-    rhs.setModeler("Fox designer");
+    rhs.setModeler("camunda modeler");
     rhs.setConnectorNode(rhsNode);
 
     BpmnDiagramDTO lhs = new BpmnDiagramDTO();

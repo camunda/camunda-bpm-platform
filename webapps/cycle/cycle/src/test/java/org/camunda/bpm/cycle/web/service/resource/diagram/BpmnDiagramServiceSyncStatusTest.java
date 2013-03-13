@@ -66,7 +66,7 @@ public class BpmnDiagramServiceSyncStatusTest extends AbstractDiagramServiceTest
     Date now = now();
     
     // init diagram
-    BpmnDiagram diagram = new BpmnDiagram("fox modeler", DIAGRAM_NODE);
+    BpmnDiagram diagram = new BpmnDiagram("camunda modeler", DIAGRAM_NODE);
     diagram.setLastModified(now);
     diagram.setLastSync(now);
     bpmnDiagramRepository.saveAndFlush(diagram);

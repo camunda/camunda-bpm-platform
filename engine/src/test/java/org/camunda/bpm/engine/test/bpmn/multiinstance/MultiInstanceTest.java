@@ -25,6 +25,7 @@ import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
@@ -990,5 +991,28 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
     List<ProcessInstance> processInstances = runtimeService.createProcessInstanceQuery().processDefinitionKey("process").list();
     assertEquals(0, processInstances.size());
     assertProcessEnded(processInstance.getId());
+  }
+  
+
+  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testParallelUserTasks.bpmn20.xml"})
+  public void testActiveExecutionsInParallelTasks() {
+    runtimeService.startProcessInstanceByKey("miParallelUserTasks").getId();
+    
+    ProcessInstance instance = runtimeService.createProcessInstanceQuery().singleResult();
+    
+    List<Execution> executions = runtimeService.createExecutionQuery().list();
+    assertEquals(5, executions.size());
+    
+    for (Execution execution : executions) {
+      ExecutionEntity entity = (ExecutionEntity) execution;
+      
+      if (entity.getId() != instance.getId() && entity.getParentId() != instance.getId()) {
+        // child executions
+        assertTrue(entity.isActive());
+      } else {
+        // process instance and scope execution
+        assertFalse(entity.isActive());
+      }
+    }
   }
 }

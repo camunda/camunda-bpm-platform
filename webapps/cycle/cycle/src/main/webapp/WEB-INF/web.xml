@@ -5,7 +5,7 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
   xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd">
   
-  <display-name>fox cycle</display-name>
+  <display-name>camunda cycle</display-name>
   
   <!-- disable resteasy scanning for JBoss deployment -->
   <context-param>

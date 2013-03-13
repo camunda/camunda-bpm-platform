@@ -19,7 +19,7 @@
                  data-help work together (angular BUG) -->
             <span data-color-invert="true" 
                   data-help-title="Find process model" 
-                  data-help data-help-text="You need two process models for a Roundtrip, the right side is reserved for the fox designer (the engine model)">
+                  data-help data-help-text="You need two process models for a Roundtrip, the right side is reserved for the camunda modeler (the engine model)">
               Find process model
             </span>
           </a>
@@ -48,7 +48,7 @@
 
   <div class="bpmn-model thumbnail" data-ng-hide="diagram">
     <h3 data-ng-show="identifier == 'leftHandSide'" th:text="#{'Your modeler'}">Your modeler</h3>
-    <h3 data-ng-show="identifier == 'rightHandSide'">fox designer</h3>
+    <h3 data-ng-show="identifier == 'rightHandSide'">camunda modeler</h3>
     <div class="holder">
       <div class="diagram">
         <div class="centered">
@@ -60,7 +60,7 @@
             <span data-help-placement="'left'"
                   data-color-invert="true" 
                   data-help-title="Add a process model"                  
-                  data-help data-help-text="You need two process models for a Roundtrip, the right side is reserved for the fox designer (the engine model)" >
+                  data-help data-help-text="You need two process models for a Roundtrip, the right side is reserved for the camunda modeler (the engine model)" >
               Add Process Model
             </span>   
           </a>
@@ -84,7 +84,7 @@
             <div class="control-group">
               <label class="control-label" for="modelerName" 
                      th:text="#{'Modeler Name'}" 
-                     th:attr="data-help-text=#{'The name of your modeling tool. Examples: &quot;Fox Modeler&quot; or &quot;Signavio&quot; or &quot;Adonis&quot;.'}" 
+                     th:attr="data-help-text=#{'The name of your modeling tool. Examples: &quot;camunda modeler&quot; or &quot;Signavio&quot; or &quot;Adonis&quot;.'}" 
                      data-help-title="Modeler Name"
                      data-help>Modeler Name</label>
               <div class="controls">
