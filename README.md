@@ -21,7 +21,7 @@ camunda BPM platform provides a rich set of components centered our the BPM life
  * Spring, CDI - Programming model integration that allows developers to write Java Applications that interact with running processes.
 
 #### Process Design
- * camunda modeler - A [modler plugin for eclipse]{https://github.com/camunda/camunda-modeler} that allows developers to design & refactor processes inside their IDE.
+ * camunda modeler - A [modler plugin for eclipse](https://github.com/camunda/camunda-modeler) that allows developers to design & refactor processes inside their IDE.
  * camunda cycle - Enables BPMN 2.0 based Roundtrip between Business and IT parties involved in a project. Allows to use any BPMN 2.0 modeling tool with camunda BPM.
 
 #### Process Operations
@@ -31,8 +31,7 @@ camunda BPM platform provides a rich set of components centered our the BPM life
 #### Human Task Management
  * camunda takslist - simple webapplication demonstrating how the Process Engine Task API can be used
  
-
-#### And there's more
+#### And there's more...
 
  * [camunda-bpmn.js](https://github.com/camunda/camunda-bpmn.js) - We have started building a complete BPMN toolkit for Java Script (Parser, Process Engine, Renderer)
  * [camunda BPM sandbox](https://github.com/camunda/camunda-bpm-sandbox) - This is where we, together with the community, try out new ideas.
