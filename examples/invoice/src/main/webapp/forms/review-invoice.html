@@ -1,28 +1,30 @@
-<strong>Do you approve this invoice?</strong>
+<strong>Please clarify</strong>
+
+<p>This invoice needs clarification and could not be approved due to missing data.</p>
 
 <form class="form-horizontal">
   <div class="control-group">
     <label class="control-label">Creditor</label>
     <div class="controls">
-      <input form-field type="string" name="creditor" readonly="true" />
+      <input form-field type="string" name="creditor" />
     </div>
   </div>
   <div class="control-group">
     <label class="control-label">Amount</label>
     <div class="controls">
-      <input form-field type="string" name="amount" readonly="true" />
+      <input form-field type="string" name="amount" />
     </div>
   </div>
   <div class="control-group">
     <label class="control-label">Invoice Number</label>
     <div class="controls">
-      <input form-field type="string" name="invoiceNumber" readonly="true" />
+      <input form-field type="string" name="invoiceNumber" />
     </div>
   </div>
   <div class="control-group">
-    <label class="control-label">Approve? </label>
+    <label class="control-label">Could you clarify the invoice?</label>
     <div class="controls">
-      <input form-field type="boolean" name="approved" />
+      <input form-field type="boolean" name="clarified" />
     </div>
   </div>
 </form>

@@ -115,6 +115,13 @@
         <include>org.jboss.resteasy:resteasy-jaxrs:jar:*</include>
       </includes>
     </dependencySet>
+    
+    <dependencySet>
+        <includes>
+            <include>org.camunda.bpm.example:camunda-example-invoice:war:*</include>
+        </includes>
+        <outputDirectory>server/apache-tomcat-${tomcat.version}/webapps/</outputDirectory>
+    </dependencySet>
 		
   </dependencySets>
 </assembly>

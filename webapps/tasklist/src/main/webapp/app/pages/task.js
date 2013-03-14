@@ -13,10 +13,10 @@ define(["angular"], function(angular) {
       generic: $location.hash() == 'generic'
     };
 
-    function getVariableByKey(key, variables) {
+    function getVariableByName(name, variables) {
 
       for (var i = 0, variable; !!(variable = variables[i]); i++) {
-        if (variable.key == key) {
+        if (variable.name == name) {
           return variable;
         }
       }
@@ -53,9 +53,11 @@ define(["angular"], function(angular) {
                 scopeVariables = $scope.variables;
 
             for (var i = 0, variable; !!(variable = variables[i]); i++) {
-              var variableInScope = getVariableByKey(variable.key, scopeVariables);
+              var variableInScope = getVariableByName(variable.name, scopeVariables);
               if (!variableInScope) {
-                $scope.variables.push({ key: variable.name, value: variable.value, type: variable.type.toLowerCase() });
+                $scope.variables.push({ name: variable.name, value: variable.value, type: variable.type.toLowerCase() });
+              } else {
+                variableInScope.value = variable.value;
               }
             }
           });

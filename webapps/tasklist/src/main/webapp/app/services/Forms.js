@@ -18,7 +18,7 @@ define([ "angular" ], function(angular) {
         var variablesMap = {};
 
         for (var i = 0, variable; !!(variable = variables[i]); i++) {
-          var key = variable.key,
+          var name = variable.name,
               value = variable.value,
               type = variable.type;
 
@@ -26,7 +26,7 @@ define([ "angular" ], function(angular) {
             value = false;
           }
 
-          variablesMap[key] = value;
+          variablesMap[name] = value;
         }
         return variablesMap;
       },

@@ -12,10 +12,35 @@
  */
 package org.camunda.bpm.example.invoice;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import org.camunda.bpm.application.PostDeploy;
 import org.camunda.bpm.application.ProcessApplication;
 import org.camunda.bpm.application.impl.ServletProcessApplication;
+import org.camunda.bpm.engine.ProcessEngine;
 
+/**
+ * Process Application exposing this application's resources the process engine. 
+ */
 @ProcessApplication
 public class InvoiceProcessApplication extends ServletProcessApplication {
+
+  /**
+   * In a @PostDeploy Hook you can interact with the process engine and access 
+   * the processes the application has deployed. 
+   */
+  @PostDeploy
+  public void startFirstProcess(ProcessEngine processEngine) {
+       
+    // start an initial demo process.
+    
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("creditor", "Great Pizzas for Everyone Inc.");
+    variables.put("amount", "30$");
+    variables.put("invoiceNumber", "GPFE-23232323");
+    
+    processEngine.getRuntimeService().startProcessInstanceByKey("invoice", variables);
+  }
   
 }

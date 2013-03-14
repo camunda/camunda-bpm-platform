@@ -29,7 +29,7 @@
 
       <td>
         <div class="btn-group" ngm-if="taskList.view.filter != 'colleague'">
-          <a class="btn btn-small" title="Start to work on task" href="#/task/{{task.id}}"><i class="icon-play"></i></a>
+          <a class="btn btn-small" title="Start to work on task" href="#/task/{{task.id}}"><i class="icon-play"></i> </a>
           <button class="btn btn-small dropdown-toggle" data-toggle="dropdown">
             <span class="caret"></span>
           </button>
@@ -50,7 +50,7 @@
             </li>
           </ul>
         </div>
-        <button class="btn btn-small" ng-class="{ 'btn-info': isDiagramActive(task)}" data-ng-click="toggleShowDiagram(task, $index)"><i class="icon-search"></i></button>
+        <button class="btn btn-small" ng-class="{ 'btn-info': isDiagramActive(task)}" data-ng-click="toggleShowDiagram(task, $index)" title="Display BPMN Diagram"><i class="icon-search"></i></button>
       </td>
     </tr>
     <tr ngm-if="isDiagramActive(task)">

@@ -10,11 +10,11 @@ define(["angular", "jquery"], function(angular, $) {
    */
   var TaskVariablesController = function TaskVariablesController($scope) {
 
-    this.getVariable = function(key) {
+    this.getVariable = function(name) {
       var variables = this.variables;
 
       for (var i = 0, variable; !!(variable = variables[i]); i++) {
-        if (variable.key == key) {
+        if (variable.name == name) {
           return variable;
         }
       }
@@ -59,7 +59,7 @@ define(["angular", "jquery"], function(angular, $) {
         };
 
         scope.addVariable = function() {
-          controller.addVariable({ key : "", value: "", type: "string" });
+          controller.addVariable({ name : "", value: "", type: "string" });
         };
       }
     };
@@ -74,21 +74,21 @@ define(["angular", "jquery"], function(angular, $) {
       link: function(scope, element, attributes, taskVariables) {
 
         var type = attributes["type"],
-            key = attributes["key"],
+            name = attributes["name"],
             readOnly = (attributes["readonly"] == "readonly" || attributes["readonly"] === true),
             variable = scope.$eval(attributes["variable"]);
 
         if (variable) {
           taskVariables.addVariable(variable);
         } else {
-          if (!key || !type) {
-            throw new Error("key or type not defined for form field");
+          if (!name || !type) {
+            throw new Error("name or type not defined for form field");
           }
 
-          variable = taskVariables.getVariable(key);
+          variable = taskVariables.getVariable(name);
 
           if (!variable) {
-            variable = { type: type, key: key };
+            variable = { type: type, name: name };
             taskVariables.addVariable(variable);
           }
         }

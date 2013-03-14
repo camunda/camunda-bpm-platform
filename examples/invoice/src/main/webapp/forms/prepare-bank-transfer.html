@@ -1,4 +1,7 @@
-<strong>Do you approve this invoice?</strong>
+
+<p>
+    You can prepare the bank transfer for the following invoice
+</p>
 
 <form class="form-horizontal">
   <div class="control-group">
@@ -20,9 +23,9 @@
     </div>
   </div>
   <div class="control-group">
-    <label class="control-label">Approve? </label>
+    <label class="control-label">Approved by: </label>
     <div class="controls">
-      <input form-field type="boolean" name="approved" />
+      <input form-field type="string" name="approver" readonly="true" />
     </div>
   </div>
 </form>
