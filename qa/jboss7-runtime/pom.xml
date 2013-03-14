@@ -1,5 +1,4 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>camunda-qa-jboss-runtime</artifactId>
@@ -14,7 +13,7 @@
   <parent>
     <groupId>org.camunda.bpm.qa</groupId>
     <artifactId>camunda-qa</artifactId>
-    <version>7.0.0-SNAPSHOT</version>
+    <version>7.0.0-alpha1</version>
   </parent>
 
   <dependencies>
@@ -88,8 +87,7 @@
 
                     <!-- processing of src/main/standalone replaced by resource filtering 
                       (see below) -->
-                    <copy todir="target/jboss-as-${version.jboss.as}/modules"
-                      overwrite="true">
+                    <copy todir="target/jboss-as-${version.jboss.as}/modules" overwrite="true">
                       <fileset dir="src/main/modules" />
                     </copy>
 
@@ -106,15 +104,12 @@
                   <target unless="maven.test.skip">
                     <dependencyfilesets scopes="test" />
 
-                    <copy todir="target/jboss-as-${version.jboss.as}/modules"
-                      flatten="false">
+                    <copy todir="target/jboss-as-${version.jboss.as}/modules" flatten="false">
                       <fileset refid="maven.project.dependencies" />
-                      <regexpmapper from="^(.*)/([^/]+)/([^/]*)$$"
-                        to="\1/main/\3" handledirsep="yes" />
+                      <regexpmapper from="^(.*)/([^/]+)/([^/]*)$$" to="\1/main/\3" handledirsep="yes" />
                     </copy>
 
-                    <copy todir="target/jboss-as-${version.jboss.as}/modules"
-                      flatten="false">
+                    <copy todir="target/jboss-as-${version.jboss.as}/modules" flatten="false">
                       <fileset dir="src/main/modules" />
                     </copy>
 
