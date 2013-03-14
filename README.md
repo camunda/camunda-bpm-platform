@@ -13,7 +13,7 @@ camunda BPM platform is a flexible framework for workflow and process automation
 Components
 ----------
 
-camunda BPM platform provides a rich set of components centered our the BPM lifecycle. 
+camunda BPM platform provides a rich set of components centered around the BPM lifecycle. 
 
 #### Process Implementation and Execution
  * Process Engine - The core component responsible for executing BPMN 2.0 processes.
@@ -21,15 +21,15 @@ camunda BPM platform provides a rich set of components centered our the BPM life
  * Spring, CDI - Programming model integration that allows developers to write Java Applications that interact with running processes.
 
 #### Process Design
- * camunda modeler - A [modler plugin for eclipse](https://github.com/camunda/camunda-modeler) that allows developers to design & refactor processes inside their IDE.
+ * camunda modeler - A [modeler plugin for eclipse](https://github.com/camunda/camunda-modeler) that allows developers to design & refactor processes inside their IDE.
  * camunda cycle - Enables BPMN 2.0 based Roundtrip between Business and IT parties involved in a project. Allows to use any BPMN 2.0 modeling tool with camunda BPM.
 
 #### Process Operations
- * process engine - JMX and advanced Runtime Container Integration for process engine monitoring
- * camunda cockpit - Web application tool for process operations
+ * process engine - JMX and advanced Runtime Container Integration for process engine monitoring.
+ * camunda cockpit - Web application tool for process operations.
 
 #### Human Task Management
- * camunda takslist - simple webapplication demonstrating how the Process Engine Task API can be used
+ * camunda tasklist - Simple web application demonstrating how the process engine task API can be used.
  
 #### And there's more...
 
@@ -56,7 +56,7 @@ Apache Maven 3 and Java JDK 6 or 7 are prerequisites for building camunda BPM pl
 
 This will build all the modules that make up the camunda BPM platform but will not perform any integration testing. After the build is completed, you will find the distributions under
 
-	distro/gf31/distro/target  (Apache Tomcat 7 Distribution)
+    distro/gf31/distro/target  (Apache Tomcat 7 Distribution)
     distro/tomcat/distro/target  (Glassfish 3 Distribution)
     distro/jbossas71/distro/target  (JBoss AS 7 Distribution)
 
