@@ -17,16 +17,16 @@ Components
 camunda BPM platform provides a rich set of components centered around the BPM lifecycle. 
 
 #### Process Implementation and Execution
- * Process Engine - The core component responsible for executing BPMN 2.0 processes.
+ * camunda engine - The core component responsible for executing BPMN 2.0 processes.
  * REST API - The REST API provides remote access to running processes.
- * Spring, CDI - Programming model integration that allows developers to write Java Applications that interact with running processes.
+ * Spring, CDI integration - Programming model integration that allows developers to write Java Applications that interact with running processes.
 
 #### Process Design
  * camunda modeler - A [modeler plugin for eclipse](https://github.com/camunda/camunda-modeler) that allows developers to design & refactor processes inside their IDE.
  * camunda cycle - Enables BPMN 2.0 based Roundtrip between Business and IT parties involved in a project. Allows to use any BPMN 2.0 modeling tool with camunda BPM.
 
 #### Process Operations
- * process engine - JMX and advanced Runtime Container Integration for process engine monitoring.
+ * camunda engine - JMX and advanced Runtime Container Integration for process engine monitoring.
  * camunda cockpit - Web application tool for process operations.
 
 #### Human Task Management
