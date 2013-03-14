@@ -57,8 +57,8 @@ Apache Maven 3 and Java JDK 6 or 7 are prerequisites for building camunda BPM pl
 
 This will build all the modules that make up the camunda BPM platform but will not perform any integration testing. After the build is completed, you will find the distributions under
 
-    distro/gf31/distro/target  (Apache Tomcat 7 Distribution)
-    distro/tomcat/distro/target  (Glassfish 3 Distribution)
+    distro/tomcat/distro/target     (Apache Tomcat 7 Distribution)
+    distro/gf31/distro/target       (Glassfish 3 Distribution)
     distro/jbossas71/distro/target  (JBoss AS 7 Distribution)
 
 Running Integration Tests
