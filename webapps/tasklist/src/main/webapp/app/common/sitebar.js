@@ -12,6 +12,8 @@ define(["angular"], function(angular) {
     }
 
     var tasks;
+        
+    $scope.colleagueCount = {};
 
     $scope.loadSitebar = function () {
       tasks = $scope.tasks = {
@@ -20,13 +22,32 @@ define(["angular"], function(angular) {
       };
 
       $scope.groupInfo = EngineApi.getGroups(currentUser);
+      
+      $scope.groupInfo.$then(function(data){
+        	
+          angular.forEach(data.data.groupUsers, function(user) {    
+        	  
+      	    EngineApi.getColleagueCount(user.id)
+      	      .$then(function(data) {
+      	    	  
+                $scope.colleagueCount[user.id] = data.data.count;   
+                
+      	  }); 
+      	    
+      	});            
+      });
+           
+      
     };
 
     $scope.isActive = function(filter, search) {
       var params = $location.search();
       return (params.filter || "mytasks") == filter && params.search == search;
     };
-
+    
+    $scope.getColleagueCount = function(userId) {
+    };
+      
     $scope.$on("tasklist.reload", function () {
       $scope.loadSitebar();
     });

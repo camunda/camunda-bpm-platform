@@ -48,7 +48,7 @@ define(["angular"], function(angular) {
       this.processInstance = $resource(Uri.build(baseUri, "process-instance/:id/:operation"), { id: "@id" } , {
         variables : { method: 'GET', params : { operation: "variables" }}
       });
-
+      
     };
 
     EngineApi.prototype.getProcessDefinitions = function() {
@@ -61,6 +61,10 @@ define(["angular"], function(angular) {
 
     EngineApi.prototype.getTaskCount = function () {
       return this.taskCount;
+    };
+    
+    EngineApi.prototype.getColleagueCount = function (userId) {
+      return this.taskCount.get({ assignee: userId });
     };
 
     EngineApi.prototype.getGroups = function(userId) {

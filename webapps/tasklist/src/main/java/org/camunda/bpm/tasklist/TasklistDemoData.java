@@ -27,20 +27,20 @@ public class TasklistDemoData extends AbstractProcessEngineAware {
       user.setEmail("demo@camunda.org");
       processEngine.getIdentityService().saveUser(user);
 
-      User user2 = processEngine.getIdentityService().newUser("john");
-      user2.setPassword("john");
+      User user2 = processEngine.getIdentityService().newUser("John");
+      user2.setPassword("John");
       user2.setEmail("john@camunda.org");
 
       processEngine.getIdentityService().saveUser(user2);
 
-      User user3 = processEngine.getIdentityService().newUser("mary");
-      user3.setPassword("mary");
+      User user3 = processEngine.getIdentityService().newUser("Mary");
+      user3.setPassword("Mary");
       user3.setEmail("mary@camunda.org");
 
       processEngine.getIdentityService().saveUser(user3);
 
-      User user4 = processEngine.getIdentityService().newUser("peter");
-      user4.setPassword("peter");
+      User user4 = processEngine.getIdentityService().newUser("Peter");
+      user4.setPassword("Peter");
       user4.setEmail("peter@camunda.org");
 
       processEngine.getIdentityService().saveUser(user4);
@@ -61,9 +61,9 @@ public class TasklistDemoData extends AbstractProcessEngineAware {
       processEngine.getIdentityService().createMembership("demo", "accounting");
       processEngine.getIdentityService().createMembership("demo", "management");
 
-      processEngine.getIdentityService().createMembership("john", "sales");
-      processEngine.getIdentityService().createMembership("mary", "accounting");
-      processEngine.getIdentityService().createMembership("peter", "management");
+      processEngine.getIdentityService().createMembership("John", "sales");
+      processEngine.getIdentityService().createMembership("Mary", "accounting");
+      processEngine.getIdentityService().createMembership("Peter", "management");
     }
 
 }

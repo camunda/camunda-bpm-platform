@@ -21,7 +21,7 @@
       </li>
       <li class="nav-header">Colleagues</li>
       <li ng-repeat="colleague in groupInfo.groupUsers" ng-class="{active: isActive('colleague', colleague.id)}">
-        <a href="#/overview?filter=colleague&search={{colleague.id}}">{{colleague.displayName}}</a>
+        <a href="#/overview?filter=colleague&search={{colleague.id}}">{{colleague.displayName}} ({{ colleagueCount[colleague.id] }})</a>
       </li>
     </ul>
   </div>
