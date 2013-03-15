@@ -35,7 +35,7 @@ camunda BPM platform provides a rich set of components centered around the BPM l
 #### And there's more...
 
  * [camunda-bpmn.js](https://github.com/camunda/camunda-bpmn.js) - We have started building a complete BPMN toolkit for Java Script (Parser, Process Engine, Renderer)
- * [camunda BPM sandbox](https://github.com/camunda/camunda-bpm-sandbox) - This is where we, together with the community, try out new ideas.
+ * [camunda BPM incubation](https://github.com/camunda/camunda-bpm-incubation) - This is where we, together with the community, try out new ideas.
 
 
 A Framework
