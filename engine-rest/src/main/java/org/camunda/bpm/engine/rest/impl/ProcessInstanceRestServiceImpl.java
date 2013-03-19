@@ -41,6 +41,21 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
   public ProcessInstanceRestServiceImpl(String engineName) {
     super(engineName);
   }
+  
+
+  @Override
+  public ProcessInstanceDto getProcessInstance(String processInstanceId) {
+    RuntimeService runtimeService = getProcessEngine().getRuntimeService();
+    ProcessInstance instance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
+    
+    if (instance == null) {
+      throw new WebApplicationException(Status.NOT_FOUND);
+    }
+    
+    ProcessInstanceDto result = ProcessInstanceDto.fromProcessInstance(instance);
+    return result;
+  }
+
 
   @Override
   public List<ProcessInstanceDto> getProcessInstances(
@@ -117,5 +132,4 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
 
     return new VariableListDto(values);
   }
-
 }
