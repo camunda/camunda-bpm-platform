@@ -78,6 +78,10 @@ public class MockedProcessEngineProvider implements ProcessEngineProvider {
       return null;
     }
     
+    if (name.equals("default")) {
+      return getDefaultProcessEngine();
+    }
+    
     if (cachedEngines.get(name) == null) {
       ProcessEngine mock = mock(ProcessEngine.class);
       mockServices(mock);

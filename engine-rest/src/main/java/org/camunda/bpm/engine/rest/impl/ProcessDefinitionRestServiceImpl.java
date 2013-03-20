@@ -19,6 +19,7 @@ import java.util.List;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 import org.camunda.bpm.engine.FormService;
@@ -142,13 +143,11 @@ public class ProcessDefinitionRestServiceImpl extends AbstractRestProcessEngineA
     }
 
     ProcessInstanceDto result = ProcessInstanceDto.fromProcessInstance(instance);
-    result.addReflexiveLink(context, null, "self");
+    UriBuilder rootUriBuilder = context.getBaseUriBuilder().path(relativeRootResourcePath);
+    result.addReflexiveLink(rootUriBuilder, null, "self");
     return result;
   }
 
-  /**
-   * For the time being this is a stub implementation that returns a fixed data set.
-   */
   @Override
   public List<StatisticsResultDto> getStatistics(Boolean includeFailedJobs) {
     ManagementService mgmtService = getProcessEngine().getManagementService();

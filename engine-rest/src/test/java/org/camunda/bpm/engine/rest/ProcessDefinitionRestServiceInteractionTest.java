@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.rest;
 
 import static com.jayway.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
+import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
@@ -155,6 +156,22 @@ public class ProcessDefinitionRestServiceInteractionTest extends
         .statusCode(Status.OK.getStatusCode())
         .body("links[0].href", equalTo(fullInstanceUrl))
       .when().post(START_PROCESS_INSTANCE_URL);
+  }
+  
+  @Test
+  public void testInstanceResourceLinkWithEnginePrefix() throws IOException {
+    setupMocks();
+    
+    String startInstanceOnExplicitEngineUrl = TEST_RESOURCE_ROOT_PATH + "/engine/default/process-definition/{id}/start";
+    
+    String fullInstanceUrl = "http://localhost:" + PORT + TEST_RESOURCE_ROOT_PATH + "/engine/default/process-instance/" + MockProvider.EXAMPLE_PROCESS_INSTANCE_ID;
+    
+    given().pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
+      .contentType(POST_JSON_CONTENT_TYPE).body(EMPTY_JSON_OBJECT)
+      .then().expect()
+        .statusCode(Status.OK.getStatusCode())
+        .body("links[0].href", equalTo(fullInstanceUrl))
+      .when().post(startInstanceOnExplicitEngineUrl);
   }
   
   @Test

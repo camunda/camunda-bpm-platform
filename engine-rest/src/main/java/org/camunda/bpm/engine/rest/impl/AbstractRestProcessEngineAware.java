@@ -19,7 +19,9 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.rest.spi.impl.AbstractProcessEngineAware;
 
 public abstract class AbstractRestProcessEngineAware extends AbstractProcessEngineAware {
-
+  
+  protected String relativeRootResourcePath = "/";
+  
   public AbstractRestProcessEngineAware() {
     super();
   }
@@ -33,5 +35,15 @@ public abstract class AbstractRestProcessEngineAware extends AbstractProcessEngi
       throw new WebApplicationException(Status.BAD_REQUEST.getStatusCode());
     }
     return processEngine;
+  }
+  
+  /**
+   * Override the root resource path, if this resource is a sub-resource.
+   * The relative root resource path is used for generation of links to resources in results.
+   * 
+   * @param relativeRootResourcePath
+   */
+  public void setRelativeRootResourceUri(String relativeRootResourcePath) {
+    this.relativeRootResourcePath = relativeRootResourcePath;
   }
 }
