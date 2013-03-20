@@ -23,10 +23,12 @@ import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceQueryDto;
 import org.camunda.bpm.engine.rest.dto.runtime.VariableListDto;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 
-@Path("/process-instance")
+@Path(ProcessInstanceRestService.PATH)
 @Produces(MediaType.APPLICATION_JSON)
 public interface ProcessInstanceRestService {
 
+  public static final String PATH = "/process-instance";
+  
   @GET
   @Path("/{id}")
   ProcessInstanceDto getProcessInstance(@PathParam("id") String processInstanceId);

@@ -35,13 +35,15 @@ import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.runtime.StartProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.task.FormDto;
 
-@Path("/process-definition")
+@Path(ProcessDefinitionRestService.PATH)
 @Produces(MediaType.APPLICATION_JSON)
 public interface ProcessDefinitionRestService {
 
   public static final String APPLICATION_BPMN20_XML = "application/bpmn20+xml";
   public static final MediaType APPLICATION_BPMN20_XML_TYPE =
       new MediaType("application", "bpmn20+xml");
+  
+  public static final String PATH = "/process-definition";
 
   /**
    * Exposes the {@link ProcessDefinitionQuery} interface as a REST service.

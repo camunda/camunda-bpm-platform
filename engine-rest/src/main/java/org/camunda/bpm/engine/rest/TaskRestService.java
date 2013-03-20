@@ -26,10 +26,12 @@ import javax.ws.rs.core.MediaType;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.task.*;
 
-@Path("/task")
+@Path(TaskRestService.PATH)
 @Produces(MediaType.APPLICATION_JSON)
 public interface TaskRestService {
 
+  public static final String PATH = "/task";
+  
   @GET
   @Path("/")
   List<TaskDto> getTasks(TaskQueryDto query,
