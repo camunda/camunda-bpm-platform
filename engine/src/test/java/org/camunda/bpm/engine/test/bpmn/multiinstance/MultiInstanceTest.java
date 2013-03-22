@@ -1006,7 +1006,7 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
     for (Execution execution : executions) {
       ExecutionEntity entity = (ExecutionEntity) execution;
       
-      if (entity.getId() != instance.getId() && entity.getParentId() != instance.getId()) {
+      if (!entity.getId().equals(instance.getId()) && !entity.getParentId().equals(instance.getId())) {
         // child executions
         assertTrue(entity.isActive());
       } else {
