@@ -10,7 +10,7 @@
 
   <container qualifier="tomcat" default="true">
     <configuration>
-      <property name="catalinaHome">../tomcat-runtime/target/apache-tomcat-7.0.33</property>
+      <property name="catalinaHome">${tomcat6.runtime.location}</property>
       <property name="bindHttpPort">${tomcat6.connector.http.port}</property>
       <property name="user">arquillian</property>
       <property name="pass">arquillian</property>     

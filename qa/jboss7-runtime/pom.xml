@@ -21,7 +21,7 @@
       <!-- make sure it comes after assembly in the build -->
       <groupId>org.camunda.bpm.jboss</groupId>
       <artifactId>camunda-jboss-assembly</artifactId>
-      <version>${project.version}</version>
+      <version>${project.version}</version>      
       <type>pom</type>
     </dependency>
     <dependency>
@@ -69,7 +69,33 @@
           </resource>
         </resources>
         <plugins>
-          <plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-dependency-plugin</artifactId>
+          <executions>
+            <execution>
+              <id>unpack-server</id>
+              <phase>generate-resources</phase>
+              <goals>
+                <goal>unpack</goal>
+              </goals>
+              <inherited>false</inherited>
+              <configuration>
+                <artifactItems>
+                  <artifactItem>
+                    <groupId>org.camunda.bpm.jboss</groupId>
+                    <artifactId>camunda-jboss-assembly</artifactId>
+                    <version>${project.version}</version>
+                    <type>tar.gz</type>
+                    <overWrite>true</overWrite>                    
+                    <outputDirectory>target/</outputDirectory>
+                  </artifactItem>
+                </artifactItems>                
+              </configuration>
+            </execution>
+          </executions>
+        </plugin>
+        <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-antrun-plugin</artifactId>
             <executions>
@@ -80,14 +106,10 @@
                   <goal>run</goal>
                 </goals>
                 <configuration>
-                  <target unless="maven.test.skip">
-                    <copy todir="target">
-                      <fileset dir="${jboss.assembly.location}" />
-                    </copy>
-
+                  <target unless="maven.test.skip">   
                     <!-- processing of src/main/standalone replaced by resource filtering 
                       (see below) -->
-                    <copy todir="target/jboss-as-${version.jboss.as}/modules" overwrite="true">
+                    <copy todir="target/server/jboss-as-${version.jboss.as}/modules" overwrite="true">
                       <fileset dir="src/main/modules" />
                     </copy>
 
@@ -104,12 +126,12 @@
                   <target unless="maven.test.skip">
                     <dependencyfilesets scopes="test" />
 
-                    <copy todir="target/jboss-as-${version.jboss.as}/modules" flatten="false">
+                    <copy todir="target/server/jboss-as-${version.jboss.as}/modules" flatten="false">
                       <fileset refid="maven.project.dependencies" />
                       <regexpmapper from="^(.*)/([^/]+)/([^/]*)$$" to="\1/main/\3" handledirsep="yes" />
                     </copy>
 
-                    <copy todir="target/jboss-as-${version.jboss.as}/modules" flatten="false">
+                    <copy todir="target/server/jboss-as-${version.jboss.as}/modules" flatten="false">
                       <fileset dir="src/main/modules" />
                     </copy>
 
@@ -137,7 +159,7 @@
                 </goals>
                 <configuration>
                   <override>true</override>
-                  <outputDirectory>target/jboss-as-${version.jboss.as}/standalone</outputDirectory>
+                  <outputDirectory>target/server/jboss-as-${version.jboss.as}/standalone</outputDirectory>
                 </configuration>
               </execution>
             </executions>

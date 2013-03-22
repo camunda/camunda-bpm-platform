@@ -35,24 +35,30 @@
         <plugins>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-antrun-plugin</artifactId>
+            <artifactId>maven-dependency-plugin</artifactId>
             <executions>
               <execution>
-                <id>copy-distro</id>
-                <phase>package</phase>
+                <id>unpack-server</id>
+                <phase>generate-resources</phase>
                 <goals>
-                  <goal>run</goal>
+                  <goal>unpack</goal>
                 </goals>
+                <inherited>false</inherited>
                 <configuration>
-                  <target unless="maven.test.skip">
-                    <copy todir="target/apache-tomcat-7.0.33">
-                      <fileset dir="${tomcat6.assembly.location}" />
-                    </copy>                
-                  </target>
+                  <artifactItems>
+                    <artifactItem>
+                      <groupId>org.camunda.bpm.tomcat</groupId>
+                      <artifactId>camunda-tomcat-assembly</artifactId>
+                      <version>${project.version}</version>
+                      <type>tar.gz</type>
+                      <overWrite>true</overWrite>                    
+                      <outputDirectory>target/</outputDirectory>
+                    </artifactItem>
+                  </artifactItems>                
                 </configuration>
-              </execution>          
+              </execution>
             </executions>
-          </plugin>
+          </plugin>          
           <!-- copy filtered configuration resources -->
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
@@ -72,7 +78,7 @@
                 </goals>
                 <configuration>
                   <override>true</override>
-                  <outputDirectory>target/apache-tomcat-7.0.33</outputDirectory>
+                  <outputDirectory>target/server/apache-tomcat-7.0.33</outputDirectory>
                 </configuration>
               </execution>
             </executions>

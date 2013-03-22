@@ -19,7 +19,7 @@
     -->
     
     <!-- jboss -->
-    <jboss.runtime.location>../jboss7-runtime/target/jboss-as-${version.jboss.as}/</jboss.runtime.location>
+    <jboss.runtime.location>../jboss7-runtime/target/server/jboss-as-${version.jboss.as}/</jboss.runtime.location>
     <jboss.datasource.filename>h2-ds.xml</jboss.datasource.filename>
     <jboss.http.port>38080</jboss.http.port>
     <jboss.ajp.port>38009</jboss.ajp.port>
@@ -34,7 +34,7 @@
     <jboss.mail-smtp.port>25</jboss.mail-smtp.port>
     
     <!-- glassfish properties -->
-    <glassfish.server.location>../../distro/gf31/assembly/target/assembly-${project.version}/assembly-${project.version}/server</glassfish.server.location>
+    <glassfish.runtime.location>../gf31-runtime/target/server/</glassfish.runtime.location>
     
     <glassfish.http.port>28080</glassfish.http.port>
     <glassfish.admin.port>24848</glassfish.admin.port>
@@ -54,7 +54,7 @@
 	<tomcat6.connector.http.redirectPort>48443</tomcat6.connector.http.redirectPort>
 	<tomcat6.connector.ajp.port>48009</tomcat6.connector.ajp.port>
 	<tomcat6.connector.ajp.redirectPort>48443</tomcat6.connector.ajp.redirectPort>
-	<tomcat6.assembly.location>../../distro/tomcat/assembly/target/assembly/server/apache-tomcat-7.0.33</tomcat6.assembly.location>
+	<tomcat6.runtime.location>../tomcat-runtime/target/server/apache-tomcat-7.0.33</tomcat6.runtime.location>
     
   </properties>
   
