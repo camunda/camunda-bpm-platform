@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.rest;
+package org.camunda.bpm.engine.rest.embedded;
 
 import static com.jayway.restassured.RestAssured.expect;
 import static com.jayway.restassured.RestAssured.given;
@@ -21,7 +21,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -31,21 +30,36 @@ import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
+import org.camunda.bpm.engine.rest.AbstractProcessDefinitionRestServiceQueryTest;
+import org.camunda.bpm.engine.rest.helper.ExampleDataProvider;
 import org.camunda.bpm.engine.rest.helper.MockDefinitionBuilder;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
+import org.camunda.bpm.engine.rest.util.ResteasyServerBootstrap;
+import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
 
 import com.jayway.restassured.response.Response;
 
-public class ProcessDefinitionRestServiceQueryTest extends AbstractRestServiceTest {
+public class ProcessDefinitionRestServiceQueryTest extends AbstractProcessDefinitionRestServiceQueryTest {
   
-  private static final String PROCESS_DEFINITION_QUERY_URL = TEST_RESOURCE_ROOT_PATH + "/process-definition";
-  private static final String PROCESS_DEFINITION_COUNT_QUERY_URL = PROCESS_DEFINITION_QUERY_URL + "/count";
+  private static ResteasyServerBootstrap resteasyBootstrap;
   
   private ProcessDefinitionQuery mockedQuery;
+
+  @BeforeClass
+  public static void setUpEmbeddedRuntime() {
+    resteasyBootstrap = new ResteasyServerBootstrap();
+    resteasyBootstrap.start();
+  }
+  
+  @AfterClass
+  public static void tearDownEmbeddedRuntime() {
+    resteasyBootstrap.stop();
+  }
   
   private ProcessDefinitionQuery setUpMockDefinitionQuery(List<ProcessDefinition> mockedDefinitions) {
     ProcessDefinitionQuery sampleDefinitionsQuery = mock(ProcessDefinitionQuery.class);
@@ -54,16 +68,14 @@ public class ProcessDefinitionRestServiceQueryTest extends AbstractRestServiceTe
     when(processEngine.getRepositoryService().createProcessDefinitionQuery()).thenReturn(sampleDefinitionsQuery);
     return sampleDefinitionsQuery;
   }
-  
-//  @Before
-  public void setUpMockedQuery() throws IOException {
-    setupTestScenario();
+
+  @Override
+  public void setUpRuntimeData() {
     mockedQuery = setUpMockDefinitionQuery(MockProvider.createMockDefinitions());
   }
   
   @Test
-  public void testProcessDefinitionRetrieval() throws IOException {
-    setUpMockedQuery();
+  public void testProcessDefinitionRetrieval() {
     InOrder inOrder = Mockito.inOrder(mockedQuery);
     
     String queryKey = "Key";
@@ -91,16 +103,16 @@ public class ProcessDefinitionRestServiceQueryTest extends AbstractRestServiceTe
     String returnedDiagramResourceName = from(content).getString("[0].diagram");
     Boolean returnedIsSuspended = from(content).getBoolean("[0].suspended");
 
-    Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID, returnedDefinitionId);
-    Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY, returnedDefinitionKey);
-    Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_CATEGORY, returnedCategory);
-    Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_NAME, returnedDefinitionName);
-    Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_DESCRIPTION, returnedDescription);
-    Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_VERSION, returnedVersion);
-    Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_RESOURCE_NAME, returnedResourceName);
-    Assert.assertEquals(MockProvider.EXAMPLE_DEPLOYMENT_ID, returnedDeploymentId);
-    Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_DIAGRAM_RESOURCE_NAME, returnedDiagramResourceName);
-    Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_IS_SUSPENDED, returnedIsSuspended);
+    Assert.assertEquals(ExampleDataProvider.EXAMPLE_PROCESS_DEFINITION_ID, returnedDefinitionId);
+    Assert.assertEquals(ExampleDataProvider.EXAMPLE_PROCESS_DEFINITION_KEY, returnedDefinitionKey);
+    Assert.assertEquals(ExampleDataProvider.EXAMPLE_PROCESS_DEFINITION_CATEGORY, returnedCategory);
+    Assert.assertEquals(ExampleDataProvider.EXAMPLE_PROCESS_DEFINITION_NAME, returnedDefinitionName);
+    Assert.assertEquals(ExampleDataProvider.EXAMPLE_PROCESS_DEFINITION_DESCRIPTION, returnedDescription);
+    Assert.assertEquals(ExampleDataProvider.EXAMPLE_PROCESS_DEFINITION_VERSION, returnedVersion);
+    Assert.assertEquals(ExampleDataProvider.EXAMPLE_PROCESS_DEFINITION_RESOURCE_NAME, returnedResourceName);
+    Assert.assertEquals(ExampleDataProvider.EXAMPLE_DEPLOYMENT_ID, returnedDeploymentId);
+    Assert.assertEquals(ExampleDataProvider.EXAMPLE_PROCESS_DEFINITION_DIAGRAM_RESOURCE_NAME, returnedDiagramResourceName);
+    Assert.assertEquals(ExampleDataProvider.EXAMPLE_PROCESS_DEFINITION_IS_SUSPENDED, returnedIsSuspended);
   }
   
   @Test
@@ -120,26 +132,19 @@ public class ProcessDefinitionRestServiceQueryTest extends AbstractRestServiceTe
     
     MockDefinitionBuilder builder = new MockDefinitionBuilder();
     ProcessDefinition mockDefinition = 
-        builder.id(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID).category(MockProvider.EXAMPLE_PROCESS_DEFINITION_CATEGORY)
-          .name(MockProvider.EXAMPLE_PROCESS_DEFINITION_NAME).key(MockProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
-          .suspended(MockProvider.EXAMPLE_PROCESS_DEFINITION_IS_SUSPENDED).version(MockProvider.EXAMPLE_PROCESS_DEFINITION_VERSION).build();
+        builder.id(ExampleDataProvider.EXAMPLE_PROCESS_DEFINITION_ID)
+          .category(ExampleDataProvider.EXAMPLE_PROCESS_DEFINITION_CATEGORY)
+          .name(ExampleDataProvider.EXAMPLE_PROCESS_DEFINITION_NAME)
+          .key(ExampleDataProvider.EXAMPLE_PROCESS_DEFINITION_KEY)
+          .suspended(ExampleDataProvider.EXAMPLE_PROCESS_DEFINITION_IS_SUSPENDED)
+          .version(ExampleDataProvider.EXAMPLE_PROCESS_DEFINITION_VERSION).build();
     
     mocks.add(mockDefinition);
     return mocks;
   }
   
   @Test
-  public void testEmptyQuery() throws IOException {
-    setUpMockedQuery();
-    String queryKey = "";
-    given().queryParam("keyLike", queryKey)
-      .then().expect().statusCode(Status.OK.getStatusCode())
-      .when().get(PROCESS_DEFINITION_QUERY_URL);
-  }
-  
-  @Test
-  public void testNoParametersQuery() throws IOException {
-    setUpMockedQuery();
+  public void testNoParametersQuery() {
     expect().statusCode(Status.OK.getStatusCode()).when().get(PROCESS_DEFINITION_QUERY_URL);
     
     verify(mockedQuery).list();
@@ -147,31 +152,7 @@ public class ProcessDefinitionRestServiceQueryTest extends AbstractRestServiceTe
   }
   
   @Test
-  public void testInvalidNumericParameter() throws IOException {
-    setUpMockedQuery();
-    String anInvalidIntegerQueryParam = "aString";
-    given().queryParam("ver", anInvalidIntegerQueryParam)
-      .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
-      .when().get(PROCESS_DEFINITION_QUERY_URL);
-  }
-  
-  /**
-   * We assume that boolean query parameters that are not "true"
-   * or "false" are evaluated to "false" and don't cause a 400 error.
-   */
-  @Test
-  public void testInvalidBooleanParameter() throws IOException {
-    setUpMockedQuery();
-    String anInvalidBooleanQueryParam = "neitherTrueNorFalse";
-    given().queryParam("active", anInvalidBooleanQueryParam)
-      .then().expect().statusCode(Status.OK.getStatusCode())
-      .when().get(PROCESS_DEFINITION_QUERY_URL);
-  }
-  
-  @Test
-  public void testAdditionalParameters() throws IOException {
-    setUpMockedQuery();
-
+  public void testAdditionalParameters() {
     Map<String, String> queryParameters = getCompleteQueryParameters();
     
     given().queryParams(queryParameters)
@@ -219,78 +200,40 @@ public class ProcessDefinitionRestServiceQueryTest extends AbstractRestServiceTe
   
 
   @Test
-  public void testSortingParameters() throws IOException {
-    setUpMockedQuery();
-    
+  public void testSortingParameters() {
     InOrder inOrder = Mockito.inOrder(mockedQuery);
     executeAndVerifySorting("category", "asc", Status.OK);
     inOrder.verify(mockedQuery).orderByProcessDefinitionCategory();
     inOrder.verify(mockedQuery).asc();
-    setUpMockedQuery();
     
     inOrder = Mockito.inOrder(mockedQuery);
     executeAndVerifySorting("key", "desc", Status.OK);
     inOrder.verify(mockedQuery).orderByProcessDefinitionKey();
     inOrder.verify(mockedQuery).desc();
-    setUpMockedQuery();
     
     inOrder = Mockito.inOrder(mockedQuery);
     executeAndVerifySorting("id", "asc", Status.OK);
     inOrder.verify(mockedQuery).orderByProcessDefinitionId();
     inOrder.verify(mockedQuery).asc();
-    setUpMockedQuery();
     
     inOrder = Mockito.inOrder(mockedQuery);
     executeAndVerifySorting("version", "desc", Status.OK);
     inOrder.verify(mockedQuery).orderByProcessDefinitionVersion();
     inOrder.verify(mockedQuery).desc();
-    setUpMockedQuery();
     
     inOrder = Mockito.inOrder(mockedQuery);
     executeAndVerifySorting("name", "asc", Status.OK);
     inOrder.verify(mockedQuery).orderByProcessDefinitionName();
     inOrder.verify(mockedQuery).asc();
-    setUpMockedQuery();
     
     inOrder = Mockito.inOrder(mockedQuery);
     executeAndVerifySorting("deploymentId", "desc", Status.OK);
     inOrder.verify(mockedQuery).orderByDeploymentId();
     inOrder.verify(mockedQuery).desc();
   }
-  
-  @Test
-  public void testInvalidSortingOptions() throws IOException {
-    setUpMockedQuery();
-    executeAndVerifySorting("anInvalidSortByOption", "asc", Status.BAD_REQUEST);
-    executeAndVerifySorting("category", "anInvalidSortOrderOption", Status.BAD_REQUEST);
-  }
-
-  private void executeAndVerifySorting(String sortBy, String sortOrder, Status expectedStatus) {
-    given().queryParam("sortBy", sortBy).queryParam("sortOrder", sortOrder)
-      .then().expect().statusCode(expectedStatus.getStatusCode())
-      .when().get(PROCESS_DEFINITION_QUERY_URL);
-  }
-  
-  @Test
-  public void testSortByParameterOnly() throws IOException {
-    setUpMockedQuery();
-    given().queryParam("sortBy", "category")
-      .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
-      .when().get(PROCESS_DEFINITION_QUERY_URL);
-  }
-  
-  @Test
-  public void testSortOrderParameterOnly() throws IOException {
-    setUpMockedQuery();
-    given().queryParam("sortOrder", "asc")
-      .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
-      .when().get(PROCESS_DEFINITION_QUERY_URL);
-  }
 
   @Test
-  public void testSuccessfulPagination() throws IOException {
-    setUpMockedQuery();
-    
+  public void testSuccessfulPagination() {
     int firstResult = 0;
     int maxResults = 10;
     given().queryParam("firstResult", firstResult).queryParam("maxResults", maxResults)
@@ -304,8 +247,7 @@ public class ProcessDefinitionRestServiceQueryTest extends AbstractRestServiceTe
    * If parameter "firstResult" is missing, we expect 0 as default.
    */
   @Test
-  public void testMissingFirstResultParameter() throws IOException {
-    setUpMockedQuery();
+  public void testMissingFirstResultParameter() {
     int maxResults = 10;
     given().queryParam("maxResults", maxResults)
       .then().expect().statusCode(Status.OK.getStatusCode())
@@ -318,8 +260,7 @@ public class ProcessDefinitionRestServiceQueryTest extends AbstractRestServiceTe
    * If parameter "maxResults" is missing, we expect Integer.MAX_VALUE as default.
    */
   @Test
-  public void testMissingMaxResultsParameter() throws IOException {
-    setUpMockedQuery();
+  public void testMissingMaxResultsParameter() {
     int firstResult = 10;
     given().queryParam("firstResult", firstResult)
       .then().expect().statusCode(Status.OK.getStatusCode())
@@ -329,8 +270,7 @@ public class ProcessDefinitionRestServiceQueryTest extends AbstractRestServiceTe
   }
   
   @Test
-  public void testQueryCount() throws IOException {
-    setUpMockedQuery();
+  public void testQueryCount() {
     expect().statusCode(Status.OK.getStatusCode())
       .body("count", equalTo(1))
       .when().get(PROCESS_DEFINITION_COUNT_QUERY_URL);

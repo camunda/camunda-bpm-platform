@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.rest;
+package org.camunda.bpm.engine.rest.embedded;
 
 import static com.jayway.restassured.RestAssured.expect;
 import static com.jayway.restassured.RestAssured.given;
@@ -21,7 +21,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -29,21 +28,42 @@ import java.util.Map;
 
 import javax.ws.rs.core.Response.Status;
 
+import org.camunda.bpm.engine.rest.AbstractProcessInstanceRestServiceQueryTest;
+import org.camunda.bpm.engine.rest.helper.ExampleDataProvider;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
+import org.camunda.bpm.engine.rest.util.ResteasyServerBootstrap;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
+import org.junit.AfterClass;
 import org.junit.Assert;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
 
 import com.jayway.restassured.response.Response;
 
-public class ProcessInstanceRestServiceQueryTest extends AbstractRestServiceTest {
+public class ProcessInstanceRestServiceQueryTest extends AbstractProcessInstanceRestServiceQueryTest {
   
-  private static final String PROCESS_INSTANCE_QUERY_URL = TEST_RESOURCE_ROOT_PATH + "/process-instance";
-  private static final String PROCESS_INSTANCE_COUNT_QUERY_URL = PROCESS_INSTANCE_QUERY_URL + "/count";
+  private static ResteasyServerBootstrap resteasyBootstrap;
+  
   private ProcessInstanceQuery mockedQuery;
+  
+  @BeforeClass
+  public static void setUpEmbeddedRuntime() {
+    resteasyBootstrap = new ResteasyServerBootstrap();
+    resteasyBootstrap.start();
+  }
+  
+  @AfterClass
+  public static void tearDownEmbeddedRuntime() {
+    resteasyBootstrap.stop();
+  }
+
+  @Override
+  public void setUpRuntimeData() {
+    mockedQuery = setUpMockInstanceQuery(createMockInstanceList());
+  }
   
   private ProcessInstanceQuery setUpMockInstanceQuery(List<ProcessInstance> mockedInstances) {
     ProcessInstanceQuery sampleInstanceQuery = mock(ProcessInstanceQuery.class);
@@ -60,16 +80,8 @@ public class ProcessInstanceRestServiceQueryTest extends AbstractRestServiceTest
     return mocks;
   }
   
-//  @Before
-  public void setUpMockedQuery() throws IOException {
-    setupTestScenario();
-    mockedQuery = setUpMockInstanceQuery(createMockInstanceList());
-  }
-  
   @Test
-  public void testInstanceRetrieval() throws IOException {
-    setUpMockedQuery();
-    
+  public void testInstanceRetrieval() {
     String queryKey = "key";
     Response response = given().queryParam("processDefinitionKey", queryKey)
         .then().expect().statusCode(Status.OK.getStatusCode())
@@ -91,11 +103,11 @@ public class ProcessInstanceRestServiceQueryTest extends AbstractRestServiceTest
     String returnedBusinessKey = from(content).getString("[0].businessKey");
     Boolean returnedIsSuspended = from(content).getBoolean("[0].suspended");
 
-    Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID, returnedInstanceId);
-    Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_INSTANCE_IS_ENDED, returnedIsEnded);
-    Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID, returnedDefinitionId);
-    Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_INSTANCE_BUSINESS_KEY, returnedBusinessKey);
-    Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_INSTANCE_IS_SUSPENDED, returnedIsSuspended);
+    Assert.assertEquals(ExampleDataProvider.EXAMPLE_PROCESS_INSTANCE_ID, returnedInstanceId);
+    Assert.assertEquals(ExampleDataProvider.EXAMPLE_PROCESS_INSTANCE_IS_ENDED, returnedIsEnded);
+    Assert.assertEquals(ExampleDataProvider.EXAMPLE_PROCESS_DEFINITION_ID, returnedDefinitionId);
+    Assert.assertEquals(ExampleDataProvider.EXAMPLE_PROCESS_INSTANCE_BUSINESS_KEY, returnedBusinessKey);
+    Assert.assertEquals(ExampleDataProvider.EXAMPLE_PROCESS_INSTANCE_IS_SUSPENDED, returnedIsSuspended);
   }
   
   @Test
@@ -113,24 +125,14 @@ public class ProcessInstanceRestServiceQueryTest extends AbstractRestServiceTest
   private List<ProcessInstance> createIncompleteMockInstances() {
     List<ProcessInstance> mocks = new ArrayList<ProcessInstance>();
     ProcessInstance mockInstance = mock(ProcessInstance.class);
-    when(mockInstance.getId()).thenReturn(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID);
+    when(mockInstance.getId()).thenReturn(ExampleDataProvider.EXAMPLE_PROCESS_INSTANCE_ID);
     
     mocks.add(mockInstance);
     return mocks;
   }
   
   @Test
-  public void testEmptyQuery() throws IOException {
-    setUpMockedQuery();
-    String queryKey = "";
-    given().queryParam("processDefinitionKey", queryKey)
-      .then().expect().statusCode(Status.OK.getStatusCode())
-      .when().get(PROCESS_INSTANCE_QUERY_URL);
-  }
-  
-  @Test
-  public void testNoParametersQuery() throws IOException {
-    setUpMockedQuery();
+  public void testNoParametersQuery() {
     expect().statusCode(Status.OK.getStatusCode()).when().get(PROCESS_INSTANCE_QUERY_URL);
     
     verify(mockedQuery).list();
@@ -138,9 +140,7 @@ public class ProcessInstanceRestServiceQueryTest extends AbstractRestServiceTest
   }
   
   @Test
-  public void testAdditionalParametersExcludingVariables() throws IOException {
-    setUpMockedQuery();
-
+  public void testAdditionalParametersExcludingVariables() {
     Map<String, String> queryParameters = getCompleteQueryParameters();
     
     given().queryParams(queryParameters)
@@ -172,8 +172,7 @@ public class ProcessInstanceRestServiceQueryTest extends AbstractRestServiceTest
   }
   
   @Test
-  public void testVariableParameters() throws IOException {
-    setUpMockedQuery();
+  public void testVariableParameters() {
     String variableName = "varName";
     String variableValue = "varValue";
     String queryValue = variableName + "_eq_" + variableValue;    
@@ -182,42 +181,36 @@ public class ProcessInstanceRestServiceQueryTest extends AbstractRestServiceTest
       .when().get(PROCESS_INSTANCE_QUERY_URL);    
     verify(mockedQuery).variableValueEquals(variableName, variableValue);
     
-    setUpMockedQuery();
     queryValue = variableName + "_gt_" + variableValue;    
     given().queryParam("variables", queryValue)
       .then().expect().statusCode(Status.OK.getStatusCode())
       .when().get(PROCESS_INSTANCE_QUERY_URL);    
     verify(mockedQuery).variableValueGreaterThan(variableName, variableValue);
     
-    setUpMockedQuery();
     queryValue = variableName + "_gteq_" + variableValue;    
     given().queryParam("variables", queryValue)
       .then().expect().statusCode(Status.OK.getStatusCode())
       .when().get(PROCESS_INSTANCE_QUERY_URL);    
     verify(mockedQuery).variableValueGreaterThanOrEqual(variableName, variableValue);
     
-    setUpMockedQuery();
     queryValue = variableName + "_lt_" + variableValue;    
     given().queryParam("variables", queryValue)
       .then().expect().statusCode(Status.OK.getStatusCode())
       .when().get(PROCESS_INSTANCE_QUERY_URL);    
     verify(mockedQuery).variableValueLessThan(variableName, variableValue);
     
-    setUpMockedQuery();
     queryValue = variableName + "_lteq_" + variableValue;    
     given().queryParam("variables", queryValue)
       .then().expect().statusCode(Status.OK.getStatusCode())
       .when().get(PROCESS_INSTANCE_QUERY_URL);    
     verify(mockedQuery).variableValueLessThanOrEqual(variableName, variableValue);
 
-    setUpMockedQuery();
     queryValue = variableName + "_like_" + variableValue;    
     given().queryParam("variables", queryValue)
       .then().expect().statusCode(Status.OK.getStatusCode())
       .when().get(PROCESS_INSTANCE_QUERY_URL);    
     verify(mockedQuery).variableValueLike(variableName, variableValue);
 
-    setUpMockedQuery();
     queryValue = variableName + "_neq_" + variableValue;    
     given().queryParam("variables", queryValue)
       .then().expect().statusCode(Status.OK.getStatusCode())
@@ -226,27 +219,7 @@ public class ProcessInstanceRestServiceQueryTest extends AbstractRestServiceTest
   }
   
   @Test
-  public void testInvalidVariableRequests() throws IOException {
-    // invalid comparator
-    setUpMockedQuery();
-    String variableName = "varName";
-    String variableValue = "varValue";
-    String queryValue = variableName + "_anInvalidComparator_" + variableValue;    
-    given().queryParam("variables", queryValue)
-      .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
-      .when().get(PROCESS_INSTANCE_QUERY_URL);
-    
-    // invalid format
-    queryValue = "invalidFormattedVariableQuery";    
-    given().queryParam("variables", queryValue)
-      .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
-      .when().get(PROCESS_INSTANCE_QUERY_URL);
-  }
-  
-  @Test
-  public void testMultipleVariableParametersAsPost() throws IOException {
-    setUpMockedQuery();
-    
+  public void testMultipleVariableParametersAsPost() {
     String variableName = "varName";
     String variableValue = "varValue";
     String anotherVariableName = "anotherVarName";
@@ -279,9 +252,7 @@ public class ProcessInstanceRestServiceQueryTest extends AbstractRestServiceTest
   }
   
   @Test
-  public void testCompletePostParameters() throws IOException {
-    setUpMockedQuery();
-    
+  public void testCompletePostParameters() {
     Map<String, String> queryParameters = getCompleteQueryParameters();
     
     given().contentType(POST_JSON_CONTENT_TYPE).body(queryParameters)
@@ -299,60 +270,26 @@ public class ProcessInstanceRestServiceQueryTest extends AbstractRestServiceTest
   }
   
   @Test
-  public void testSortingParameters() throws IOException {
-    setUpMockedQuery();
-    
+  public void testSortingParameters() {
     InOrder inOrder = Mockito.inOrder(mockedQuery);
     executeAndVerifySorting("instanceId", "asc", Status.OK);
     inOrder.verify(mockedQuery).orderByProcessInstanceId();
     inOrder.verify(mockedQuery).asc();
-    setUpMockedQuery();
     
     inOrder = Mockito.inOrder(mockedQuery);
     executeAndVerifySorting("definitionKey", "desc", Status.OK);
     inOrder.verify(mockedQuery).orderByProcessDefinitionKey();
     inOrder.verify(mockedQuery).desc();
-    setUpMockedQuery();
     
     inOrder = Mockito.inOrder(mockedQuery);
     executeAndVerifySorting("definitionId", "asc", Status.OK);
     inOrder.verify(mockedQuery).orderByProcessDefinitionId();
     inOrder.verify(mockedQuery).asc();
-    setUpMockedQuery();
   }
   
-  @Test
-  public void testInvalidSortingOptions() throws IOException {
-    setUpMockedQuery();
-    executeAndVerifySorting("anInvalidSortByOption", "asc", Status.BAD_REQUEST);
-    executeAndVerifySorting("definitionId", "anInvalidSortOrderOption", Status.BAD_REQUEST);
-  }
-
-  private void executeAndVerifySorting(String sortBy, String sortOrder, Status expectedStatus) {
-    given().queryParam("sortBy", sortBy).queryParam("sortOrder", sortOrder)
-      .then().expect().statusCode(expectedStatus.getStatusCode())
-      .when().get(PROCESS_INSTANCE_QUERY_URL);
-  }
   
   @Test
-  public void testSortByParameterOnly() throws IOException {
-    setUpMockedQuery();
-    given().queryParam("sortBy", "definitionId")
-      .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
-      .when().get(PROCESS_INSTANCE_QUERY_URL);
-  }
-  
-  @Test
-  public void testSortOrderParameterOnly() throws IOException {
-    setUpMockedQuery();
-    given().queryParam("sortOrder", "asc")
-      .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
-      .when().get(PROCESS_INSTANCE_QUERY_URL);
-  }
-  
-  @Test
-  public void testSuccessfulPagination() throws IOException {
-    setUpMockedQuery();
+  public void testSuccessfulPagination() {
     
     int firstResult = 0;
     int maxResults = 10;
@@ -367,8 +304,7 @@ public class ProcessInstanceRestServiceQueryTest extends AbstractRestServiceTest
    * If parameter "firstResult" is missing, we expect 0 as default.
    */
   @Test
-  public void testMissingFirstResultParameter() throws IOException {
-    setUpMockedQuery();
+  public void testMissingFirstResultParameter() {
     int maxResults = 10;
     given().queryParam("maxResults", maxResults)
       .then().expect().statusCode(Status.OK.getStatusCode())
@@ -381,8 +317,7 @@ public class ProcessInstanceRestServiceQueryTest extends AbstractRestServiceTest
    * If parameter "maxResults" is missing, we expect Integer.MAX_VALUE as default.
    */
   @Test
-  public void testMissingMaxResultsParameter() throws IOException {
-    setUpMockedQuery();
+  public void testMissingMaxResultsParameter() {
     int firstResult = 10;
     given().queryParam("firstResult", firstResult)
       .then().expect().statusCode(Status.OK.getStatusCode())
@@ -392,8 +327,7 @@ public class ProcessInstanceRestServiceQueryTest extends AbstractRestServiceTest
   }
   
   @Test
-  public void testQueryCount() throws IOException {
-    setUpMockedQuery();
+  public void testQueryCount() {
     expect().statusCode(Status.OK.getStatusCode())
       .body("count", equalTo(1))
       .when().get(PROCESS_INSTANCE_COUNT_QUERY_URL);
@@ -402,9 +336,7 @@ public class ProcessInstanceRestServiceQueryTest extends AbstractRestServiceTest
   }
   
   @Test
-  public void testQueryCountForPost() throws IOException {
-    setUpMockedQuery();
-    
+  public void testQueryCountForPost() {
     given().contentType(POST_JSON_CONTENT_TYPE).body(EMPTY_JSON_OBJECT)
     .expect().statusCode(Status.OK.getStatusCode())
       .body("count", equalTo(1))
@@ -412,4 +344,5 @@ public class ProcessInstanceRestServiceQueryTest extends AbstractRestServiceTest
     
     verify(mockedQuery).count();
   }
+
 }

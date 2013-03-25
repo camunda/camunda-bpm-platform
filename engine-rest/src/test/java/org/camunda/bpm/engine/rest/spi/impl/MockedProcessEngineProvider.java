@@ -28,16 +28,13 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.rest.helper.ExampleDataProvider;
 import org.camunda.bpm.engine.rest.spi.ProcessEngineProvider;
 
 public class MockedProcessEngineProvider implements ProcessEngineProvider {
 
   private static ProcessEngine cachedDefaultProcessEngine;
   private static Map<String, ProcessEngine> cachedEngines = new HashMap<String, ProcessEngine>();
-  
-  public static final String EXAMPLE_PROCESS_ENGINE_NAME = "default";
-  public static final String ANOTHER_EXAMPLE_PROCESS_ENGINE_NAME = "anotherEngineName";
-  public static final String NON_EXISTING_PROCESS_ENGINE_NAME = "aNonExistingEngineName";
   
   public void resetEngines() {
     cachedDefaultProcessEngine = null;
@@ -74,7 +71,7 @@ public class MockedProcessEngineProvider implements ProcessEngineProvider {
 
   @Override
   public ProcessEngine getProcessEngine(String name) {
-    if (name.equals(NON_EXISTING_PROCESS_ENGINE_NAME)) {
+    if (name.equals(ExampleDataProvider.NON_EXISTING_PROCESS_ENGINE_NAME)) {
       return null;
     }
     
@@ -94,8 +91,8 @@ public class MockedProcessEngineProvider implements ProcessEngineProvider {
   @Override
   public Set<String> getProcessEngineNames() {
     Set<String> result = new HashSet<String>();
-    result.add(EXAMPLE_PROCESS_ENGINE_NAME);
-    result.add(ANOTHER_EXAMPLE_PROCESS_ENGINE_NAME);
+    result.add(ExampleDataProvider.EXAMPLE_PROCESS_ENGINE_NAME);
+    result.add(ExampleDataProvider.ANOTHER_EXAMPLE_PROCESS_ENGINE_NAME);
     return result;
   }
   

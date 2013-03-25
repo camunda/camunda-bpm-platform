@@ -10,10 +10,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.rest;
+package org.camunda.bpm.engine.rest.embedded;
 
 import static com.jayway.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.argThat;
@@ -23,7 +22,6 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -34,31 +32,39 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.form.TaskFormData;
+import org.camunda.bpm.engine.rest.AbstractTaskRestServiceInteractionTest;
 import org.camunda.bpm.engine.rest.helper.EqualsMap;
+import org.camunda.bpm.engine.rest.helper.ExampleDataProvider;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
+import org.camunda.bpm.engine.rest.util.ResteasyServerBootstrap;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.Matchers;
 
-public class TaskRestServiceInteractionTest extends AbstractRestServiceTest {
+public class TaskRestServiceInteractionTest extends AbstractTaskRestServiceInteractionTest {
 
-  private static final String TASK_SERVICE_URL = TEST_RESOURCE_ROOT_PATH + "/task";
-  private static final String SINGLE_TASK_URL = TASK_SERVICE_URL + "/{id}";
-  private static final String CLAIM_TASK_URL = SINGLE_TASK_URL + "/claim";
-  private static final String UNCLAIM_TASK_URL = SINGLE_TASK_URL + "/unclaim";
-  private static final String COMPLETE_TASK_URL = SINGLE_TASK_URL + "/complete";
-  private static final String RESOLVE_TASK_URL = SINGLE_TASK_URL + "/resolve";
-  private static final String DELEGATE_TASK_URL = SINGLE_TASK_URL + "/delegate";
-  private static final String TASK_FORM_URL = SINGLE_TASK_URL + "/form";
+  private static ResteasyServerBootstrap resteasyBootstrap;
   
   private TaskService taskServiceMock;
   private TaskQuery mockQuery;
   private FormService formServiceMock;
   
-  public void setupMockTaskService() throws IOException {
-    setupTestScenario();
-    
+  @BeforeClass
+  public static void setUpEmbeddedRuntime() {
+    resteasyBootstrap = new ResteasyServerBootstrap();
+    resteasyBootstrap.start();
+  }
+  
+  @AfterClass
+  public static void tearDownEmbeddedRuntime() {
+    resteasyBootstrap.stop();
+  }
+
+  @Override
+  public void setUpRuntimeData() {
     taskServiceMock = mock(TaskService.class);
     when(processEngine.getTaskService()).thenReturn(taskServiceMock);
 
@@ -75,44 +81,38 @@ public class TaskRestServiceInteractionTest extends AbstractRestServiceTest {
   }
   
   @Test
-  public void testClaimTask() throws IOException {
-    setupMockTaskService();
-    
+  public void testClaimTask() {
     Map<String, Object> json = new HashMap<String, Object>();
-    json.put("userId", MockProvider.EXAMPLE_USER_ID);
+    json.put("userId", ExampleDataProvider.EXAMPLE_USER_ID);
     
-    given().pathParam("id", MockProvider.EXAMPLE_TASK_ID)
+    given().pathParam("id", ExampleDataProvider.EXAMPLE_TASK_ID)
       .contentType(POST_JSON_CONTENT_TYPE).body(json)
       .then().expect()
         .statusCode(Status.NO_CONTENT.getStatusCode())
       .when().post(CLAIM_TASK_URL);
     
-    verify(taskServiceMock).claim(MockProvider.EXAMPLE_TASK_ID, MockProvider.EXAMPLE_USER_ID);
+    verify(taskServiceMock).claim(ExampleDataProvider.EXAMPLE_TASK_ID, ExampleDataProvider.EXAMPLE_USER_ID);
   }
   
   @Test
-  public void testMissingUserId() throws IOException {
-    setupMockTaskService();
-      
+  public void testMissingUserId() {
     Map<String, Object> json = new HashMap<String, Object>();
     json.put("userId", null);
     
-    given().pathParam("id", MockProvider.EXAMPLE_TASK_ID)
+    given().pathParam("id", ExampleDataProvider.EXAMPLE_TASK_ID)
       .contentType(POST_JSON_CONTENT_TYPE).body(json)
       .then().expect()
         .statusCode(Status.NO_CONTENT.getStatusCode())
       .when().post(CLAIM_TASK_URL);
     
-    verify(taskServiceMock).claim(MockProvider.EXAMPLE_TASK_ID, null);
+    verify(taskServiceMock).claim(ExampleDataProvider.EXAMPLE_TASK_ID, null);
   }
   
   @Test
-  public void testUnsuccessfulClaimTask() throws IOException {
-    setupMockTaskService();
-    
+  public void testUnsuccessfulClaimTask() {
     doThrow(new ProcessEngineException("expected exception")).when(taskServiceMock).claim(any(String.class), any(String.class));
     
-    given().pathParam("id", MockProvider.EXAMPLE_TASK_ID)
+    given().pathParam("id", ExampleDataProvider.EXAMPLE_TASK_ID)
       .contentType(POST_JSON_CONTENT_TYPE).body(EMPTY_JSON_OBJECT)
       .then().expect()
         .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
@@ -120,46 +120,38 @@ public class TaskRestServiceInteractionTest extends AbstractRestServiceTest {
   }
   
   @Test
-  public void testUnclaimTask() throws IOException {
-    setupMockTaskService();
-    
-    given().pathParam("id", MockProvider.EXAMPLE_TASK_ID)
+  public void testUnclaimTask() {
+    given().pathParam("id", ExampleDataProvider.EXAMPLE_TASK_ID)
       .then().expect()
         .statusCode(Status.NO_CONTENT.getStatusCode())
       .when().post(UNCLAIM_TASK_URL);
     
-    verify(taskServiceMock).setAssignee(MockProvider.EXAMPLE_TASK_ID, null);
+    verify(taskServiceMock).setAssignee(ExampleDataProvider.EXAMPLE_TASK_ID, null);
   }
   
   @Test
-  public void testUnsuccessfulUnclaimTask() throws IOException {
-    setupMockTaskService();
-    
+  public void testUnsuccessfulUnclaimTask() {
     doThrow(new ProcessEngineException("expected exception")).when(taskServiceMock).setAssignee(any(String.class), any(String.class));
     
-    given().pathParam("id", MockProvider.EXAMPLE_TASK_ID)
+    given().pathParam("id", ExampleDataProvider.EXAMPLE_TASK_ID)
       .then().expect()
         .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
       .when().post(UNCLAIM_TASK_URL);
   }
   
   @Test
-  public void testCompleteTask() throws IOException {
-    setupMockTaskService();
-    
-    given().pathParam("id", MockProvider.EXAMPLE_TASK_ID)
+  public void testCompleteTask() {
+    given().pathParam("id", ExampleDataProvider.EXAMPLE_TASK_ID)
     .contentType(POST_JSON_CONTENT_TYPE).body(EMPTY_JSON_OBJECT)
     .then().expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())
     .when().post(COMPLETE_TASK_URL);
     
-    verify(taskServiceMock).complete(MockProvider.EXAMPLE_TASK_ID, null);
+    verify(taskServiceMock).complete(ExampleDataProvider.EXAMPLE_TASK_ID, null);
   }
   
   @Test
-  public void testCompleteWithParameters() throws IOException {
-    setupMockTaskService();
-    
+  public void testCompleteWithParameters() {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("aVariable", "aStringValue");
     variables.put("anotherVariable", 42);
@@ -168,22 +160,20 @@ public class TaskRestServiceInteractionTest extends AbstractRestServiceTest {
     Map<String, Object> json = new HashMap<String, Object>();
     json.put("variables", variables);
     
-    given().pathParam("id", MockProvider.EXAMPLE_TASK_ID)
+    given().pathParam("id", ExampleDataProvider.EXAMPLE_TASK_ID)
       .contentType(POST_JSON_CONTENT_TYPE).body(json)
       .then().expect()
         .statusCode(Status.NO_CONTENT.getStatusCode())
       .when().post(COMPLETE_TASK_URL);
     
-    verify(taskServiceMock).complete(eq(MockProvider.EXAMPLE_TASK_ID), argThat(new EqualsMap(variables)));
+    verify(taskServiceMock).complete(eq(ExampleDataProvider.EXAMPLE_TASK_ID), argThat(new EqualsMap(variables)));
   }
   
   @Test
-  public void testUnsuccessfulCompleteTask() throws IOException {
-    setupMockTaskService();
-    
+  public void testUnsuccessfulCompleteTask() {
     doThrow(new ProcessEngineException("expected exception")).when(taskServiceMock).complete(any(String.class), Matchers.<Map<String, Object>>any());
     
-    given().pathParam("id", MockProvider.EXAMPLE_TASK_ID)
+    given().pathParam("id", ExampleDataProvider.EXAMPLE_TASK_ID)
       .contentType(POST_JSON_CONTENT_TYPE).body(EMPTY_JSON_OBJECT)
       .then().expect()
         .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
@@ -191,9 +181,7 @@ public class TaskRestServiceInteractionTest extends AbstractRestServiceTest {
   }
   
   @Test
-  public void testResolveTask() throws IOException {
-    setupMockTaskService();
-    
+  public void testResolveTask() {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("aVariable", "aStringValue");
     variables.put("anotherVariable", 42);
@@ -202,25 +190,23 @@ public class TaskRestServiceInteractionTest extends AbstractRestServiceTest {
     Map<String, Object> json = new HashMap<String, Object>();
     json.put("variables", variables);
     
-    given().pathParam("id", MockProvider.EXAMPLE_TASK_ID)
+    given().pathParam("id", ExampleDataProvider.EXAMPLE_TASK_ID)
     .contentType(POST_JSON_CONTENT_TYPE).body(json)
     .then().expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())
     .when().post(RESOLVE_TASK_URL);
     
-    verify(taskServiceMock).resolveTask(MockProvider.EXAMPLE_TASK_ID);
+    verify(taskServiceMock).resolveTask(ExampleDataProvider.EXAMPLE_TASK_ID);
     
     RuntimeService runtimeServiceMock = processEngine.getRuntimeService();
-    verify(runtimeServiceMock).setVariables(eq(MockProvider.EXAMPLE_TASK_EXECUTION_ID), argThat(new EqualsMap(variables)));
+    verify(runtimeServiceMock).setVariables(eq(ExampleDataProvider.EXAMPLE_TASK_EXECUTION_ID), argThat(new EqualsMap(variables)));
   }
   
   @Test
-  public void testUnsuccessfulResolving() throws IOException {
-    setupMockTaskService();
-    
+  public void testUnsuccessfulResolving() {
     doThrow(new ProcessEngineException("expected exception")).when(taskServiceMock).resolveTask(any(String.class));
     
-    given().pathParam("id", MockProvider.EXAMPLE_TASK_ID)
+    given().pathParam("id", ExampleDataProvider.EXAMPLE_TASK_ID)
     .contentType(POST_JSON_CONTENT_TYPE).body(EMPTY_JSON_OBJECT)
     .then().expect()
       .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
@@ -228,32 +214,7 @@ public class TaskRestServiceInteractionTest extends AbstractRestServiceTest {
   }
   
   @Test
-  public void testGetSingleTask() throws IOException {
-    setupMockTaskService();
-    
-    given().pathParam("id", MockProvider.EXAMPLE_TASK_ID)
-      .then().expect().statusCode(Status.OK.getStatusCode())
-      .body("id", equalTo(MockProvider.EXAMPLE_TASK_ID))
-      .body("name", equalTo(MockProvider.EXAMPLE_TASK_NAME))
-      .body("assignee", equalTo(MockProvider.EXAMPLE_TASK_ASSIGNEE_NAME))
-      .body("created", equalTo(MockProvider.EXAMPLE_TASK_CREATE_TIME))
-      .body("due", equalTo(MockProvider.EXAMPLE_TASK_DUE_DATE))
-      .body("delegationState", equalTo(MockProvider.EXAMPLE_TASK_DELEGATION_STATE.toString()))
-      .body("description", equalTo(MockProvider.EXAMPLE_TASK_DESCRIPTION))
-      .body("executionId", equalTo(MockProvider.EXAMPLE_TASK_EXECUTION_ID))
-      .body("owner", equalTo(MockProvider.EXAMPLE_TASK_OWNER))
-      .body("parentTaskId", equalTo(MockProvider.EXAMPLE_TASK_PARENT_TASK_ID))
-      .body("priority", equalTo(MockProvider.EXAMPLE_TASK_PRIORITY))
-      .body("processDefinitionId", equalTo(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID))
-      .body("processInstanceId", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID))
-      .body("taskDefinitionKey", equalTo(MockProvider.EXAMPLE_TASK_DEFINITION_KEY))
-      .when().get(SINGLE_TASK_URL);
-  }
-  
-  @Test
-  public void testGetNonExistingTask() throws IOException {
-    setupMockTaskService();
-    
+  public void testGetNonExistingTask() {
     when(mockQuery.singleResult()).thenReturn(null);
     
     given().pathParam("id", "aNonExistingTaskId")
@@ -262,19 +223,7 @@ public class TaskRestServiceInteractionTest extends AbstractRestServiceTest {
   }
   
   @Test
-  public void testGetForm() throws IOException {
-    setupMockTaskService();
-    
-    given().pathParam("id", MockProvider.EXAMPLE_TASK_ID)
-      .then().expect().statusCode(Status.OK.getStatusCode())
-      .body("key", equalTo(MockProvider.EXAMPLE_FORM_KEY))
-      .when().get(TASK_FORM_URL);
-  }
-  
-  @Test
-  public void testGetNonExistingForm() throws IOException {
-    setupMockTaskService();
-    
+  public void testGetNonExistingForm() {
     when(formServiceMock.getTaskFormData(anyString())).thenThrow(new ProcessEngineException("Expected exception: task does not exist."));
     
     given().pathParam("id", "aNonExistingTaskId")
@@ -283,34 +232,31 @@ public class TaskRestServiceInteractionTest extends AbstractRestServiceTest {
   }
   
   @Test
-  public void testDelegateTask() throws IOException {
-    setupMockTaskService();
-    
+  public void testDelegateTask() {
     Map<String, Object> json = new HashMap<String, Object>();
-    json.put("userId", MockProvider.EXAMPLE_USER_ID);
+    json.put("userId", ExampleDataProvider.EXAMPLE_USER_ID);
     
-    given().pathParam("id", MockProvider.EXAMPLE_TASK_ID)
+    given().pathParam("id", ExampleDataProvider.EXAMPLE_TASK_ID)
     .contentType(POST_JSON_CONTENT_TYPE).body(json)
     .then().expect()
       .statusCode(Status.NO_CONTENT.getStatusCode())
     .when().post(DELEGATE_TASK_URL);
     
-    verify(taskServiceMock).delegateTask(MockProvider.EXAMPLE_TASK_ID, MockProvider.EXAMPLE_USER_ID);
+    verify(taskServiceMock).delegateTask(ExampleDataProvider.EXAMPLE_TASK_ID, ExampleDataProvider.EXAMPLE_USER_ID);
   }
   
   @Test
-  public void testUnsuccessfulDelegateTask() throws IOException {
-    setupMockTaskService();
-    
+  public void testUnsuccessfulDelegateTask() {
     doThrow(new ProcessEngineException("expected exception")).when(taskServiceMock).delegateTask(any(String.class), any(String.class));
     
     Map<String, Object> json = new HashMap<String, Object>();
-    json.put("userId", MockProvider.EXAMPLE_USER_ID);
+    json.put("userId", ExampleDataProvider.EXAMPLE_USER_ID);
     
-    given().pathParam("id", MockProvider.EXAMPLE_TASK_ID)
+    given().pathParam("id", ExampleDataProvider.EXAMPLE_TASK_ID)
     .contentType(POST_JSON_CONTENT_TYPE).body(json)
     .then().expect()
       .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
     .when().post(DELEGATE_TASK_URL);
   }
+
 }

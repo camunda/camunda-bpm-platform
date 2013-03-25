@@ -10,16 +10,13 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.rest;
+package org.camunda.bpm.engine.rest.embedded;
 
 import static com.jayway.restassured.RestAssured.given;
-import static org.hamcrest.Matchers.hasItems;
-import static org.hamcrest.Matchers.is;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-import java.io.IOException;
 import java.util.List;
 
 import javax.ws.rs.core.Response.Status;
@@ -28,7 +25,11 @@ import org.camunda.bpm.engine.management.ActivityStatistics;
 import org.camunda.bpm.engine.management.ActivityStatisticsQuery;
 import org.camunda.bpm.engine.management.ProcessDefinitionStatistics;
 import org.camunda.bpm.engine.management.ProcessDefinitionStatisticsQuery;
+import org.camunda.bpm.engine.rest.AbstractStatisticsRestTest;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
+import org.camunda.bpm.engine.rest.util.ResteasyServerBootstrap;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
@@ -39,16 +40,26 @@ import org.mockito.Mockito;
  * @author Thorben Lindhauer
  *
  */
-public class StatisticsRestTest extends AbstractRestServiceTest {
-
-  private static final String PROCESS_DEFINITION_STATISTICS_URL = TEST_RESOURCE_ROOT_PATH + "/process-definition/statistics";
-  private static final String ACTIVITY_STATISTICS_URL = TEST_RESOURCE_ROOT_PATH + "/process-definition/{id}/statistics";
+public class StatisticsRestTest extends AbstractStatisticsRestTest {
+  
+  private static ResteasyServerBootstrap resteasyBootstrap;
   
   private ProcessDefinitionStatisticsQuery processDefinitionQueryMock;
   private ActivityStatisticsQuery activityQueryMock;
   
-  private void setUp() throws IOException {
-    setupTestScenario();
+  @BeforeClass
+  public static void setUpEmbeddedRuntime() {
+    resteasyBootstrap = new ResteasyServerBootstrap();
+    resteasyBootstrap.start();
+  }
+  
+  @AfterClass
+  public static void tearDownEmbeddedRuntime() {
+    resteasyBootstrap.stop();
+  }
+  
+  @Override
+  public void setUpRuntimeData() {
     setupProcessDefinitionStatisticsMock();
     setupActivityStatisticsMock();
   }
@@ -70,22 +81,7 @@ public class StatisticsRestTest extends AbstractRestServiceTest {
   }
   
   @Test
-  public void testStatisticsRetrievalPerProcessDefinitionVersion() throws IOException {
-    setUp();
-    
-    given()
-    .then().expect()
-      .statusCode(Status.OK.getStatusCode())
-      .body("$.size()", is(2))
-      .body("definition.size()", is(2))
-      .body("definition.id", hasItems(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID, MockProvider.ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID))
-    .when().get(PROCESS_DEFINITION_STATISTICS_URL);
-  }
-  
-  @Test
-  public void testAdditionalFailedJobsOption() throws IOException {
-    setUp();
-    
+  public void testAdditionalFailedJobsOption() {
     given().queryParam("failedJobs", "true")
     .then().expect()
       .statusCode(Status.OK.getStatusCode())
@@ -97,21 +93,7 @@ public class StatisticsRestTest extends AbstractRestServiceTest {
   }
   
   @Test
-  public void testActivityStatisticsRetrieval() throws IOException {
-    setUp();
-    
-    given().pathParam("id", "aDefinitionId")
-    .then().expect()
-      .statusCode(Status.OK.getStatusCode())
-      .body("$.size()", is(2))
-      .body("id", hasItems(MockProvider.EXAMPLE_ACTIVITY_ID, MockProvider.ANOTHER_EXAMPLE_ACTIVITY_ID))
-    .when().get(ACTIVITY_STATISTICS_URL);
-  }
-  
-  @Test
-  public void testActivityStatisticsWithFailedJobs() throws IOException {
-    setUp();
-    
+  public void testActivityStatisticsWithFailedJobs() {
     given().pathParam("id", "aDefinitionId").queryParam("failedJobs", "true")
     .then().expect()
       .statusCode(Status.OK.getStatusCode())
