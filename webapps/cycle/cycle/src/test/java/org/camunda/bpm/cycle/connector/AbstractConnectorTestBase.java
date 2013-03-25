@@ -8,12 +8,9 @@ import java.io.InputStream;
 import java.util.Date;
 import java.util.List;
 
-import org.camunda.bpm.cycle.connector.Connector;
-import org.camunda.bpm.cycle.connector.ConnectorNode;
-import org.camunda.bpm.cycle.connector.ConnectorNodeType;
-import org.camunda.bpm.cycle.connector.ContentInformation;
 import org.camunda.bpm.cycle.util.DateUtil;
 import org.camunda.bpm.cycle.util.IoUtil;
+import org.junit.Before;
 import org.junit.Test;
 
 
@@ -26,6 +23,8 @@ public abstract class AbstractConnectorTestBase {
   public static final String TMP_DIR_NAME = "connector-test-tmp-dir";
   public static final ConnectorNode TMP_FOLDER =
     new ConnectorNode("//" + TMP_DIR_NAME, TMP_DIR_NAME, ConnectorNodeType.FOLDER);
+  
+  private ConnectorNode tmpFolder;
 
   /**
    * Returns the connector to be tested
@@ -33,22 +32,25 @@ public abstract class AbstractConnectorTestBase {
    * @return
    */
   public abstract Connector getConnector();
-
-  @Test
-  public void shouldCreateDirectory() throws Exception {
-
+  
+  @Before
+  public void setUp() throws Exception {
     Connector connector = getConnector();
+    if (connector.getNode(TMP_FOLDER.getId()) != null) {
+      return;
+    }
+    
     String message = "create folder";
-    ConnectorNode tmpFolder = connector.createNode("//", TMP_DIR_NAME, ConnectorNodeType.FOLDER, message);
+    tmpFolder = connector.createNode("//", TMP_DIR_NAME, ConnectorNodeType.FOLDER, message);
     if(connector.isSupportsCommitMessage()) {
       assertThat(tmpFolder.getMessage()).isEqualTo(message);
     }
 
     assertThat(tmpFolder).isEqualTo(TMP_FOLDER);
     
-    ConnectorNode tmpNode = connector.getNode(tmpFolder.getId());
+    ConnectorNode node = connector.getNode(tmpFolder.getId());
     if(connector.isSupportsCommitMessage()) {
-      assertThat(tmpNode.getMessage()).isEqualTo(message);
+      assertThat(node.getMessage()).isEqualTo(message);
     }
 
     try {
@@ -57,13 +59,7 @@ public abstract class AbstractConnectorTestBase {
     } catch (IllegalArgumentException e) {
       // anticipated
     }
-  }
-
-  @Test
-  public void shouldImportDirectoryContents() throws Exception {
-    // given
-    Connector connector = getConnector();
-
+    
     // not alphabetically ordered!
     String[] filesToImport = new String[]{"test-rhs.bpmn", "test-lhs.bpmn"};
 
@@ -74,10 +70,8 @@ public abstract class AbstractConnectorTestBase {
 
     // import another file with no extension
     importFile(connector, "test-rhs.bpmn", "test-rhs");
-
-    // then we should reach this point
   }
-
+  
   @Test
   public void shouldNotThrowExceptionWhenObtainingContentInfoOfNonExistentFile() throws Exception {
     // give
