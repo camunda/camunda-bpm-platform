@@ -117,6 +117,7 @@
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine-rest</artifactId>
       <scope>test</scope>
+      <classifier>classes</classifier>
       <version>${project.version}</version>
     </dependency>
     
