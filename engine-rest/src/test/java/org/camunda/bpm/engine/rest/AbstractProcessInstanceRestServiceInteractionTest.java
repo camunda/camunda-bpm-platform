@@ -21,8 +21,6 @@ import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.junit.Before;
 import org.junit.Test;
 
-import com.jayway.restassured.response.Response;
-
 public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
     AbstractRestServiceTest {
 
@@ -58,14 +56,13 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
   
   @Test
   public void testGetVariables() {
-    Response response = given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID)
+    given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID)
       .then().expect().statusCode(Status.OK.getStatusCode())
       .body("variables.size()", is(1))
       .body("variables[0].name", equalTo(EXAMPLE_VARIABLE_KEY))
       .body("variables[0].value", equalTo(EXAMPLE_VARIABLE_VALUE))
       .body("variables[0].type", equalTo(String.class.getSimpleName()))
       .when().get(PROCESS_INSTANCE_VARIABLES_URL);
-    System.out.println(response.asString());
   }
 
   @Test
