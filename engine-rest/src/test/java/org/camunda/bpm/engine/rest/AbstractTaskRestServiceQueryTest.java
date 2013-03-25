@@ -1,15 +1,3 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *      http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package org.camunda.bpm.engine.rest;
 
 import static com.jayway.restassured.RestAssured.expect;
@@ -26,7 +14,6 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -45,32 +32,37 @@ import org.camunda.bpm.engine.task.DelegationState;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
 
 import com.jayway.restassured.response.Response;
 
-public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
+public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServiceTest {
 
-  private static final String TASK_QUERY_URL = TEST_RESOURCE_ROOT_PATH + "/task";
-  private static final String TASK_GROUPS_URL = TASK_QUERY_URL + "/groups";
-  private static final String TASK_COUNT_QUERY_URL = TASK_QUERY_URL + "/count";
-  
+  protected static final String TASK_QUERY_URL = TEST_RESOURCE_ROOT_PATH + "/task";
+  protected static final String TASK_GROUPS_URL = TASK_QUERY_URL + "/groups";
+  protected static final String TASK_COUNT_QUERY_URL = TASK_QUERY_URL + "/count";
   private TaskQuery mockQuery;
   
+  @Before
+  public void setUpRuntimeData() {
+    mockQuery = setUpMockTaskQuery(MockProvider.createMockTasks());
+  }
+
   private TaskQuery setUpMockTaskQuery(List<Task> mockedTasks) {
     UserQuery sampleUserQuery = mock(UserQuery.class);
-
+  
     List<User> mockUsers = new ArrayList<User>();
     
     User mockUser = MockProvider.createMockUser();
     mockUsers.add(mockUser);
-
+  
     when(sampleUserQuery.list()).thenReturn(mockUsers);
     when(sampleUserQuery.memberOfGroup(anyString())).thenReturn(sampleUserQuery);
     when(sampleUserQuery.count()).thenReturn((long) mockedTasks.size());
-
+  
     GroupQuery sampleGroupQuery = mock(GroupQuery.class);
     
     List<Group> mockGroups = MockProvider.createMockGroups();
@@ -81,28 +73,67 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     when(sampleGroupQuery.orderByGroupType()).thenReturn(sampleGroupQuery);
     when(sampleGroupQuery.asc()).thenReturn(sampleGroupQuery);
     when(sampleGroupQuery.desc()).thenReturn(sampleGroupQuery);
-
+  
     when(processEngine.getIdentityService().createGroupQuery()).thenReturn(sampleGroupQuery);
-
+  
     TaskQuery sampleTaskQuery = mock(TaskQuery.class);
     when(sampleTaskQuery.list()).thenReturn(mockedTasks);
     when(sampleTaskQuery.count()).thenReturn((long) mockedTasks.size());
     when(sampleTaskQuery.taskCandidateGroup(anyString())).thenReturn(sampleTaskQuery);
-
+  
     when(processEngine.getTaskService().createTaskQuery()).thenReturn(sampleTaskQuery);
     when(processEngine.getIdentityService().createUserQuery()).thenReturn(sampleUserQuery);
-
+  
     return sampleTaskQuery;
   }
   
-  public void setUpMockedQuery() throws IOException {
-    setupTestScenario();
-    mockQuery = setUpMockTaskQuery(MockProvider.createMockTasks());
+  @Test
+  public void testEmptyQuery() {
+    String queryKey = "";
+    given().queryParam("name", queryKey)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .when().get(TASK_QUERY_URL);
   }
   
   @Test
-  public void testSimpleTaskQuery() throws IOException {
-    setUpMockedQuery();
+  public void testInvalidDateParameter() {
+    given().queryParams("due", "anInvalidDate")
+      .expect().statusCode(Status.BAD_REQUEST.getStatusCode())
+      .when().get(TASK_QUERY_URL);
+  }
+  
+  @Test
+  public void testSortByParameterOnly() {
+    given().queryParam("sortBy", "dueDate")
+      .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
+      .when().get(TASK_QUERY_URL);
+  }
+  
+  @Test
+  public void testSortOrderParameterOnly() {
+    given().queryParam("sortOrder", "asc")
+      .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
+      .when().get(TASK_QUERY_URL);
+  }
+  
+  @Test
+  public void testGroupInfoQuery() {
+    given().queryParam("userId", "name")
+        .then().expect().statusCode(Status.OK.getStatusCode())
+        .body("groups.size()", is(1))
+        .body("groups[0].id", equalTo(MockProvider.EXAMPLE_GROUP_ID))
+        .body("groups[0].name", equalTo(MockProvider.EXAMPLE_GROUP_NAME))
+        .when().get(TASK_GROUPS_URL);
+  }
+  
+  @Test
+  public void testGroupInfoQueryWithMissingUserParameter() {
+    expect().statusCode(Status.BAD_REQUEST.getStatusCode())
+    .when().get(TASK_GROUPS_URL);
+  }
+
+  @Test
+  public void testSimpleTaskQuery() {
     String queryName = "name";
     
     Response response = given().queryParam("name", queryName)
@@ -151,27 +182,15 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
   }
 
   @Test
-  public void testEmptyQuery() throws IOException {
-    setUpMockedQuery();
-    String queryKey = "";
-    given().queryParam("name", queryKey)
-      .then().expect().statusCode(Status.OK.getStatusCode())
-      .when().get(TASK_QUERY_URL);
-  }
-  
-  @Test
-  public void testNoParametersQuery() throws IOException {
-    setUpMockedQuery();
+  public void testNoParametersQuery() {
     expect().statusCode(Status.OK.getStatusCode()).when().get(TASK_QUERY_URL);
     
     verify(mockQuery).list();
     verifyNoMoreInteractions(mockQuery);
   }
-  
-  @Test
-  public void testAdditionalParametersExcludingVariables() throws IOException {
-    setUpMockedQuery();
 
+  @Test
+  public void testAdditionalParametersExcludingVariables() {
     Map<String, String> stringQueryParameters = getCompleteStringQueryParameters();
     Map<String, Integer> intQueryParameters = getCompleteIntQueryParameters();
     
@@ -186,7 +205,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     
     verify(mockQuery).list();
   }
-  
+
   private void verifyIntegerParameterQueryInvocations() {
     Map<String, Integer> intQueryParameters = getCompleteIntQueryParameters();
     
@@ -194,7 +213,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     verify(mockQuery).taskMinPriority(intQueryParameters.get("minPriority"));
     verify(mockQuery).taskPriority(intQueryParameters.get("priority"));
   }
-  
+
   private Map<String, Integer> getCompleteIntQueryParameters() {
     Map<String, Integer> parameters = new HashMap<String, Integer>();
     
@@ -204,7 +223,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     
     return parameters;
   }
-  
+
   private Map<String, String> getCompleteStringQueryParameters() {
     Map<String, String> parameters = new HashMap<String, String>();
     
@@ -226,10 +245,10 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     parameters.put("nameLike", "aNameLike");
     parameters.put("owner", "anOwner");
     parameters.put("unassigned", "true");
-
+  
     return parameters;
   }
-  
+
   private void verifyStringParameterQueryInvocations() {
     Map<String, String> stringQueryParameters = getCompleteStringQueryParameters();
     
@@ -251,17 +270,15 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     verify(mockQuery).taskNameLike(stringQueryParameters.get("nameLike"));
     verify(mockQuery).taskOwner(stringQueryParameters.get("owner"));
   }
-  
+
   @Test
-  public void testDateParameters() throws IOException {
-    setUpMockedQuery();
-    
+  public void testDateParameters() {
     Map<String, String> queryParameters = getDateParameters();
     
     given().queryParams(queryParameters)
       .expect().statusCode(Status.OK.getStatusCode())
       .when().get(TASK_QUERY_URL);
-
+  
     verify(mockQuery).dueAfter(any(Date.class));
     verify(mockQuery).dueBefore(any(Date.class));
     verify(mockQuery).dueDate(any(Date.class));
@@ -269,7 +286,7 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     verify(mockQuery).taskCreatedBefore(any(Date.class));
     verify(mockQuery).taskCreatedOn(any(Date.class));
   }
-  
+
   private Map<String, String> getDateParameters() {
     Map<String, String> parameters = new HashMap<String, String>();
     parameters.put("dueAfter", "2013-01-23T14:42:42");
@@ -280,18 +297,9 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     parameters.put("created", "2013-01-23T14:42:47");
     return parameters;
   }
-  
+
   @Test
-  public void testInvalidDateParameter() {
-    given().queryParams("due", "anInvalidDate")
-      .expect().statusCode(Status.BAD_REQUEST.getStatusCode())
-      .when().get(TASK_QUERY_URL);
-  }
-  
-  @Test
-  public void testCandidateGroupInList() throws IOException {
-    setUpMockedQuery();
-   
+  public void testCandidateGroupInList() {
     List<String> candidateGroups = new ArrayList<String>();
     candidateGroups.add("boss");
     candidateGroups.add("worker");
@@ -303,11 +311,9 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     
     verify(mockQuery).taskCandidateGroupIn(argThat(new EqualsList(candidateGroups)));
   }
-  
+
   @Test
-  public void testDelegationState() throws IOException {
-    setUpMockedQuery();
-    
+  public void testDelegationState() {
     given().queryParams("delegationState", "PENDING")
       .expect().statusCode(Status.OK.getStatusCode())
       .when().get(TASK_QUERY_URL);
@@ -320,101 +326,72 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
   
     verify(mockQuery).taskDelegationState(DelegationState.RESOLVED);
   }
-  
-  @Test
-  public void testLowerCaseDelegationStateParam() throws IOException {
-    setUpMockedQuery();
 
+  @Test
+  public void testLowerCaseDelegationStateParam() {
     given().queryParams("delegationState", "resolved")
     .expect().statusCode(Status.OK.getStatusCode())
     .when().get(TASK_QUERY_URL);
   
     verify(mockQuery).taskDelegationState(DelegationState.RESOLVED);
   }
-  
+
   @Test
-  public void testSortingParameters() throws IOException {
-    setUpMockedQuery();
-    
+  public void testSortingParameters() {
     InOrder inOrder = Mockito.inOrder(mockQuery);
     executeAndVerifySorting("dueDate", "desc", Status.OK);
     inOrder.verify(mockQuery).orderByDueDate();
     inOrder.verify(mockQuery).desc();
-    setUpMockedQuery();
-    
+  
     inOrder = Mockito.inOrder(mockQuery);
     executeAndVerifySorting("executionId", "asc", Status.OK);
     inOrder.verify(mockQuery).orderByExecutionId();
     inOrder.verify(mockQuery).asc();
-    setUpMockedQuery();
     
     inOrder = Mockito.inOrder(mockQuery);
     executeAndVerifySorting("instanceId", "desc", Status.OK);
     inOrder.verify(mockQuery).orderByProcessInstanceId();
     inOrder.verify(mockQuery).desc();
-    setUpMockedQuery();
     
     inOrder = Mockito.inOrder(mockQuery);
     executeAndVerifySorting("assignee", "asc", Status.OK);
     inOrder.verify(mockQuery).orderByTaskAssignee();
     inOrder.verify(mockQuery).asc();
-    setUpMockedQuery();
     
     inOrder = Mockito.inOrder(mockQuery);
     executeAndVerifySorting("created", "desc", Status.OK);
     inOrder.verify(mockQuery).orderByTaskCreateTime();
     inOrder.verify(mockQuery).desc();
-    setUpMockedQuery();
     
     inOrder = Mockito.inOrder(mockQuery);
     executeAndVerifySorting("description", "asc", Status.OK);
     inOrder.verify(mockQuery).orderByTaskDescription();
     inOrder.verify(mockQuery).asc();
-    setUpMockedQuery();
     
     inOrder = Mockito.inOrder(mockQuery);
     executeAndVerifySorting("id", "desc", Status.OK);
     inOrder.verify(mockQuery).orderByTaskId();
     inOrder.verify(mockQuery).desc();
-    setUpMockedQuery();
     
     inOrder = Mockito.inOrder(mockQuery);
     executeAndVerifySorting("name", "asc", Status.OK);
     inOrder.verify(mockQuery).orderByTaskName();
     inOrder.verify(mockQuery).asc();
-    setUpMockedQuery();
     
     inOrder = Mockito.inOrder(mockQuery);
     executeAndVerifySorting("priority", "desc", Status.OK);
     inOrder.verify(mockQuery).orderByTaskPriority();
     inOrder.verify(mockQuery).desc();
   }
-  
+
   private void executeAndVerifySorting(String sortBy, String sortOrder, Status expectedStatus) {
     given().queryParam("sortBy", sortBy).queryParam("sortOrder", sortOrder)
       .then().expect().statusCode(expectedStatus.getStatusCode())
       .when().get(TASK_QUERY_URL);
   }
-  
+
   @Test
-  public void testSortByParameterOnly() throws IOException {
-    setUpMockedQuery();
-    given().queryParam("sortBy", "dueDate")
-      .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
-      .when().get(TASK_QUERY_URL);
-  }
-  
-  @Test
-  public void testSortOrderParameterOnly() throws IOException {
-    setUpMockedQuery();
-    given().queryParam("sortOrder", "asc")
-      .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
-      .when().get(TASK_QUERY_URL);
-  }
-  
-  @Test
-  public void testSuccessfulPagination() throws IOException {
-    setUpMockedQuery();
+  public void testSuccessfulPagination() {
     
     int firstResult = 0;
     int maxResults = 10;
@@ -424,10 +401,9 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     
     verify(mockQuery).listPage(firstResult, maxResults);
   }
-  
+
   @Test
-  public void testTaskVariableParameters() throws IOException {
-    setUpMockedQuery();
+  public void testTaskVariableParameters() {
     String variableName = "varName";
     String variableValue = "varValue";
     String queryValue = variableName + "_eq_" + variableValue;    
@@ -436,17 +412,15 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
       .when().get(TASK_QUERY_URL);    
     verify(mockQuery).taskVariableValueEquals(variableName, variableValue);
     
-    setUpMockedQuery();
     queryValue = variableName + "_neq_" + variableValue;    
     given().queryParam("taskVariables", queryValue)
       .then().expect().statusCode(Status.OK.getStatusCode())
       .when().get(TASK_QUERY_URL);    
     verify(mockQuery).taskVariableValueNotEquals(variableName, variableValue);
   }
-  
+
   @Test
-  public void testProcessVariableParameters() throws IOException {
-    setUpMockedQuery();
+  public void testProcessVariableParameters() {
     String variableName = "varName";
     String variableValue = "varValue";
     String queryValue = variableName + "_eq_" + variableValue;    
@@ -455,18 +429,15 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
       .when().get(TASK_QUERY_URL);    
     verify(mockQuery).processVariableValueEquals(variableName, variableValue);
     
-    setUpMockedQuery();
     queryValue = variableName + "_neq_" + variableValue;    
     given().queryParam("processVariables", queryValue)
       .then().expect().statusCode(Status.OK.getStatusCode())
       .when().get(TASK_QUERY_URL);    
     verify(mockQuery).processVariableValueNotEquals(variableName, variableValue);
   }
-  
+
   @Test
-  public void testMultipleVariableParametersAsPost() throws IOException {
-    setUpMockedQuery();
-    
+  public void testMultipleVariableParametersAsPost() {
     String variableName = "varName";
     String variableValue = "varValue";
     String anotherVariableName = "anotherVarName";
@@ -497,10 +468,9 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     verify(mockQuery).taskVariableValueNotEquals(anotherVariableName, anotherVariableValue);
     
   }
-  
+
   @Test
-  public void testCompletePostParameters() throws IOException {
-    setUpMockedQuery();
+  public void testCompletePostParameters() {
     
     Map<String, Object> queryParameters = new HashMap<String, Object>();
     Map<String, String> stringQueryParameters = getCompleteStringQueryParameters();
@@ -522,45 +492,24 @@ public class TaskRestServiceQueryTest extends AbstractRestServiceTest {
     verifyIntegerParameterQueryInvocations();
     verify(mockQuery).taskCandidateGroupIn(argThat(new EqualsList(candidateGroups)));
   }
-  
+
   @Test
-  public void testQueryCount() throws IOException {
-    setUpMockedQuery();
+  public void testQueryCount() {
     expect().statusCode(Status.OK.getStatusCode())
       .body("count", equalTo(1))
       .when().get(TASK_COUNT_QUERY_URL);
     
     verify(mockQuery).count();
   }
-  
+
   @Test
-  public void testQueryCountForPost() throws IOException {
-    setUpMockedQuery();
+  public void testQueryCountForPost() {
     given().contentType(POST_JSON_CONTENT_TYPE).body(EMPTY_JSON_OBJECT)
     .expect().statusCode(Status.OK.getStatusCode())
       .body("count", equalTo(1))
       .when().post(TASK_COUNT_QUERY_URL);
     
     verify(mockQuery).count();
-  }
-
-  @Test
-  public void testGroupInfoQuery() throws IOException {
-    setUpMockedQuery();
-
-    given().queryParam("userId", "name")
-        .then().expect().statusCode(Status.OK.getStatusCode())
-        .body("groups.size()", is(1))
-        .body("groups[0].id", equalTo(MockProvider.EXAMPLE_GROUP_ID))
-        .body("groups[0].name", equalTo(MockProvider.EXAMPLE_GROUP_NAME))
-        .when().get(TASK_GROUPS_URL);
-  }
-  
-  @Test
-  public void testGroupInfoQueryWithMissingUserParameter() throws IOException {
-    setUpMockedQuery();
-    expect().statusCode(Status.BAD_REQUEST.getStatusCode())
-    .when().get(TASK_GROUPS_URL);
   }
   
 }

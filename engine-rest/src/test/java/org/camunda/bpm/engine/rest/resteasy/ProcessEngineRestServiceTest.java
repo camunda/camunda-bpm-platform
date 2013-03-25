@@ -10,16 +10,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.rest.util;
+package org.camunda.bpm.engine.rest.resteasy;
 
-import org.jboss.arquillian.container.spi.ConfigurationException;
-import org.jboss.arquillian.container.spi.client.container.ContainerConfiguration;
+import org.camunda.bpm.engine.rest.AbstractProcessEngineRestServiceTest;
+import org.camunda.bpm.engine.rest.util.ResteasyServerBootstrap;
 
-public class EmbeddedRestContainerConfiguration implements
-    ContainerConfiguration {
-
-  @Override
-  public void validate() throws ConfigurationException {
-
+public class ProcessEngineRestServiceTest extends AbstractProcessEngineRestServiceTest {
+  
+  public ProcessEngineRestServiceTest() {
+    serverBootstrap = new ResteasyServerBootstrap();
   }
 }

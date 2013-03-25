@@ -1,20 +1,7 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *      http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package org.camunda.bpm.engine.rest;
 
 import static com.jayway.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
-import static org.mockito.Matchers.anyMap;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
@@ -40,25 +27,25 @@ import org.camunda.bpm.engine.rest.helper.EqualsMap;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.junit.Assert;
+import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Matchers;
 
 import com.jayway.restassured.response.Response;
 
-public class ProcessDefinitionRestServiceInteractionTest extends
-    AbstractRestServiceTest {
+public abstract class AbstractProcessDefinitionRestServiceInteractionTest extends AbstractRestServiceTest {
 
-  private static final String SINGLE_PROCESS_DEFINITION_URL = TEST_RESOURCE_ROOT_PATH + "/process-definition/{id}";
-  private static final String START_PROCESS_INSTANCE_URL = SINGLE_PROCESS_DEFINITION_URL + "/start";
-  private static final String XML_DEFINITION_URL = SINGLE_PROCESS_DEFINITION_URL + "/xml";
-  private static final String START_FORM_URL = SINGLE_PROCESS_DEFINITION_URL + "/startForm";
-  
+  protected static final String SINGLE_PROCESS_DEFINITION_URL = TEST_RESOURCE_ROOT_PATH + "/process-definition/{id}";
+  protected static final String START_PROCESS_INSTANCE_URL = SINGLE_PROCESS_DEFINITION_URL + "/start";
+  protected static final String XML_DEFINITION_URL = SINGLE_PROCESS_DEFINITION_URL + "/xml";
+  protected static final String START_FORM_URL = SINGLE_PROCESS_DEFINITION_URL + "/startForm";
   private RuntimeService runtimeServiceMock;
   private RepositoryService repositoryServiceMock;
   private FormService formServiceMock;
   
-  public void setupMocks() throws IOException {
-    setupTestScenario();
+
+  @Before
+  public void setUpRuntimeData() {
     ProcessInstance mockInstance = MockProvider.createMockInstance();
     ProcessDefinition mockDefinition = MockProvider.createMockDefinition();
     
@@ -77,7 +64,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends
     when(processEngine.getFormService()).thenReturn(formServiceMock);
     when(formServiceMock.getStartFormData(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID))).thenReturn(formDataMock);
   }
-  
+
   private InputStream createMockProcessDefinionBpmn20Xml() {
     // do not close the input stream, will be done in implementation
     InputStream bpmn20XmlIn = null;
@@ -87,9 +74,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends
   }
   
   @Test
-  public void testSimpleProcessInstantiation() throws IOException {
-    setupMocks();
-    
+  public void testSimpleProcessInstantiation() {
     given().pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
       .contentType(POST_JSON_CONTENT_TYPE).body(EMPTY_JSON_OBJECT)
       .then().expect()
@@ -98,10 +83,61 @@ public class ProcessDefinitionRestServiceInteractionTest extends
       .when().post(START_PROCESS_INSTANCE_URL);
   }
   
+
+  @Test
+  public void testInstanceResourceLinkResult() {
+    String fullInstanceUrl = "http://localhost:" + PORT + TEST_RESOURCE_ROOT_PATH + "/process-instance/" + MockProvider.EXAMPLE_PROCESS_INSTANCE_ID;
+    
+    given().pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
+      .contentType(POST_JSON_CONTENT_TYPE).body(EMPTY_JSON_OBJECT)
+      .then().expect()
+        .statusCode(Status.OK.getStatusCode())
+        .body("links[0].href", equalTo(fullInstanceUrl))
+      .when().post(START_PROCESS_INSTANCE_URL);
+  }
+  
+
+  @Test
+  public void testInstanceResourceLinkWithEnginePrefix() {
+    String startInstanceOnExplicitEngineUrl = TEST_RESOURCE_ROOT_PATH + "/engine/default/process-definition/{id}/start";
+    
+    String fullInstanceUrl = "http://localhost:" + PORT + TEST_RESOURCE_ROOT_PATH + "/engine/default/process-instance/" + MockProvider.EXAMPLE_PROCESS_INSTANCE_ID;
+    
+    given().pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
+      .contentType(POST_JSON_CONTENT_TYPE).body(EMPTY_JSON_OBJECT)
+      .then().expect()
+        .statusCode(Status.OK.getStatusCode())
+        .body("links[0].href", equalTo(fullInstanceUrl))
+      .when().post(startInstanceOnExplicitEngineUrl);
+  }
+
+  @Test
+  public void testProcessDefinitionBpmn20XmlRetrieval() {
+    // Rest-assured has problems with extracting json with escaped quotation marks, i.e. the xml content in our case
+    Response response = given().pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
+    .then()
+      .expect()
+      .statusCode(Status.OK.getStatusCode())
+//      .body("id", equalTo(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID))
+//      .body("bpmn20Xml", startsWith("<?xml"))
+    .when().get(XML_DEFINITION_URL);
+
+    String responseContent = response.asString();
+    Assert.assertTrue(responseContent.contains(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID));
+    Assert.assertTrue(responseContent.contains("<?xml"));
+  }
+
+  @Test
+  public void testGetStartFormData() {
+    given().pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+      .body("key", equalTo(MockProvider.EXAMPLE_FORM_KEY))
+    .when().get(START_FORM_URL);
+  }
+
   @Test
   public void testProcessInstantiationWithParameters() throws IOException {
-    setupMocks();
-    
     Map<String, Object> parameters = getInstanceVariablesParameters();
     
     Map<String, Object> json = new HashMap<String, Object>();
@@ -117,7 +153,7 @@ public class ProcessDefinitionRestServiceInteractionTest extends
     verify(runtimeServiceMock).startProcessInstanceById(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID), argThat(new EqualsMap(parameters)));
     
   }
-  
+
   private Map<String, Object> getInstanceVariablesParameters() {
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("aBoolean", Boolean.TRUE);
@@ -126,14 +162,12 @@ public class ProcessDefinitionRestServiceInteractionTest extends
     
     return variables;
   }
-  
+
   /**
    * {@link RuntimeService#startProcessInstanceById(String, Map)} throws an {@link ProcessEngineException}, if a definition with the given id does not exist.
    */
   @Test
-  public void testUnsuccessfulInstantiation() throws IOException {
-    setupMocks();
-    
+  public void testUnsuccessfulInstantiation() {
     when(runtimeServiceMock.startProcessInstanceById(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID), Matchers.<Map<String, Object>>any()))
       .thenThrow(new ProcessEngineException("expected exception"));
     
@@ -143,41 +177,9 @@ public class ProcessDefinitionRestServiceInteractionTest extends
         .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
       .when().post(START_PROCESS_INSTANCE_URL);
   }
-  
+
   @Test
-  public void testInstanceResourceLinkResult() throws IOException {
-    setupMocks();
-    
-    String fullInstanceUrl = "http://localhost:" + PORT + TEST_RESOURCE_ROOT_PATH + "/process-instance/" + MockProvider.EXAMPLE_PROCESS_INSTANCE_ID;
-    
-    given().pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
-      .contentType(POST_JSON_CONTENT_TYPE).body(EMPTY_JSON_OBJECT)
-      .then().expect()
-        .statusCode(Status.OK.getStatusCode())
-        .body("links[0].href", equalTo(fullInstanceUrl))
-      .when().post(START_PROCESS_INSTANCE_URL);
-  }
-  
-  @Test
-  public void testInstanceResourceLinkWithEnginePrefix() throws IOException {
-    setupMocks();
-    
-    String startInstanceOnExplicitEngineUrl = TEST_RESOURCE_ROOT_PATH + "/engine/default/process-definition/{id}/start";
-    
-    String fullInstanceUrl = "http://localhost:" + PORT + TEST_RESOURCE_ROOT_PATH + "/engine/default/process-instance/" + MockProvider.EXAMPLE_PROCESS_INSTANCE_ID;
-    
-    given().pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
-      .contentType(POST_JSON_CONTENT_TYPE).body(EMPTY_JSON_OBJECT)
-      .then().expect()
-        .statusCode(Status.OK.getStatusCode())
-        .body("links[0].href", equalTo(fullInstanceUrl))
-      .when().post(startInstanceOnExplicitEngineUrl);
-  }
-  
-  @Test
-  public void testDefinitionRetrieval() throws IOException {
-    setupMocks();
-    
+  public void testDefinitionRetrieval() {
     given().pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
     .then().expect()
       .statusCode(Status.OK.getStatusCode())
@@ -195,11 +197,9 @@ public class ProcessDefinitionRestServiceInteractionTest extends
     
     verify(repositoryServiceMock).getProcessDefinition(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID);
   }
-  
+
   @Test
-  public void testNonExistingProcessDefinitionRetrieval() throws IOException {
-    setupMocks();
-    
+  public void testNonExistingProcessDefinitionRetrieval() {
     String nonExistingId = "aNonExistingDefinitionId";
     when(repositoryServiceMock.getProcessDefinition(eq(nonExistingId))).thenThrow(new ProcessEngineException("no matching definition"));
     
@@ -208,30 +208,9 @@ public class ProcessDefinitionRestServiceInteractionTest extends
       .statusCode(Status.BAD_REQUEST.getStatusCode())
     .when().get(SINGLE_PROCESS_DEFINITION_URL);
   }
-  
-  @Test
-  public void testProcessDefinitionBpmn20XmlRetrieval() throws IOException {
-    setupMocks();
-    
-    // Rest-assured has problems with extracting json with escaped quotation marks, i.e. the xml content in our case
-    
-    Response response = given().pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
-    .then()
-      .expect()
-      .statusCode(Status.OK.getStatusCode())
-//      .body("id", equalTo(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID))
-//      .body("bpmn20Xml", startsWith("<?xml"))
-    .when().get(XML_DEFINITION_URL);
 
-    String responseContent = response.asString();
-    Assert.assertTrue(responseContent.contains(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID));
-    Assert.assertTrue(responseContent.contains("<?xml"));
-  }
-  
   @Test
-  public void testNonExistingProcessDefinitionBpmn20XmlRetrieval() throws IOException {
-    setupMocks();
-    
+  public void testNonExistingProcessDefinitionBpmn20XmlRetrieval() {
     String nonExistingId = "aNonExistingDefinitionId";
     when(repositoryServiceMock.getProcessModel(eq(nonExistingId))).thenThrow(new ProcessEngineException("no matching process definition found."));
     
@@ -240,22 +219,9 @@ public class ProcessDefinitionRestServiceInteractionTest extends
       .statusCode(Status.BAD_REQUEST.getStatusCode())
     .when().get(XML_DEFINITION_URL);
   }
-  
+
   @Test
-  public void testGetStartFormData() throws IOException {
-    setupMocks();
-    
-    given().pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
-    .then().expect()
-      .statusCode(Status.OK.getStatusCode())
-      .body("key", equalTo(MockProvider.EXAMPLE_FORM_KEY))
-    .when().get(START_FORM_URL);
-  }
-  
-  @Test
-  public void testGetStartFormDataForNonExistingProcessDefinition() throws IOException {
-    setupMocks();
-    
+  public void testGetStartFormDataForNonExistingProcessDefinition() {
     when(formServiceMock.getStartFormData(anyString())).thenThrow(new ProcessEngineException("expected exception"));
     
     given().pathParam("id", "aNonExistingProcessDefinitionId")

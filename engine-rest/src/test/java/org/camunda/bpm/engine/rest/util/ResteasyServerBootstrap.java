@@ -12,13 +12,10 @@
  */
 package org.camunda.bpm.engine.rest.util;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.Properties;
 
-import org.camunda.bpm.engine.rest.AbstractRestServiceTest;
-import org.camunda.bpm.engine.rest.impl.ProcessEngineRestServiceImpl;
 import org.camunda.bpm.engine.rest.impl.ProcessDefinitionRestServiceImpl;
+import org.camunda.bpm.engine.rest.impl.ProcessEngineRestServiceImpl;
 import org.camunda.bpm.engine.rest.impl.ProcessInstanceRestServiceImpl;
 import org.camunda.bpm.engine.rest.impl.TaskRestServiceImpl;
 import org.camunda.bpm.engine.rest.mapper.EngineQueryDtoGetReader;
@@ -26,13 +23,8 @@ import org.camunda.bpm.engine.rest.mapper.JacksonConfigurator;
 import org.codehaus.jackson.jaxrs.JacksonJsonProvider;
 import org.jboss.resteasy.plugins.server.tjws.TJWSEmbeddedJaxrsServer;
 
-public class ResteasyServerBootstrap {
+public class ResteasyServerBootstrap extends EmbeddedServerBootstrap {
 
-  private static final String PORT_PROPERTY = "rest.http.port";
-  private static final String ROOT_RESOURCE_PATH = "/rest-test";
-  
-  private static final String PROPERTIES_FILE = "/testconfig.properties";
-  
   private TJWSEmbeddedJaxrsServer server;
   
   public ResteasyServerBootstrap() {
@@ -53,8 +45,8 @@ public class ResteasyServerBootstrap {
     
     server = new TJWSEmbeddedJaxrsServer();
     server.setRootResourcePath(ROOT_RESOURCE_PATH);
-    
     server.setPort(port);
+    
     server.getDeployment().getActualResourceClasses().add(ProcessDefinitionRestServiceImpl.class);
     server.getDeployment().getActualResourceClasses().add(ProcessInstanceRestServiceImpl.class);
     server.getDeployment().getActualResourceClasses().add(TaskRestServiceImpl.class);
@@ -65,24 +57,5 @@ public class ResteasyServerBootstrap {
     
     server.getDeployment().getActualProviderClasses().add(JacksonJsonProvider.class);
   }
-  
-  private Properties readProperties() {
-    InputStream propStream = null;
-    Properties properties = new Properties();
-    
-    try {
-      propStream = AbstractRestServiceTest.class.getResourceAsStream(PROPERTIES_FILE);
-      properties.load(propStream);
-    } catch (IOException e) {
-      e.printStackTrace();
-    } finally {
-      try {
-        propStream.close();
-      } catch (IOException e) {
-        e.printStackTrace();
-      }
-    }
-    
-    return properties;
-  }
+
 }

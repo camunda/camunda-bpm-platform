@@ -11,8 +11,6 @@
   </parent>
 
   <properties>
-    <jboss.management-native.port>39999</jboss.management-native.port>
-    <jboss.runtime.location>../qa/jboss7-runtime/target/jboss-as-7.1.3.Final</jboss.runtime.location>
     <rest.http.port>8080</rest.http.port>
   </properties>
 
@@ -119,20 +117,6 @@
     </dependency>
 
     <dependency>
-      <groupId>org.jboss.arquillian.junit</groupId>
-      <artifactId>arquillian-junit-container</artifactId>
-      <version>${version.arquillian}</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.jboss.shrinkwrap.resolver</groupId>
-      <artifactId>shrinkwrap-resolver-impl-maven</artifactId>
-      <version>1.0.0-beta-7</version>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
       <groupId>org.codehaus.groovy</groupId>
       <artifactId>groovy</artifactId>
       <!-- override version -->
@@ -235,51 +219,6 @@
             <configuration>
               <systemPropertyVariables>
                 <org.apache.maven.user-settings>../../settings.xml</org.apache.maven.user-settings>
-              </systemPropertyVariables>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-    </profile>
-
-    <profile>
-      <id>jboss</id>
-      <properties>
-        <rest.http.port>38080</rest.http.port>
-      </properties>
-      <dependencies>
-        <dependency>
-          <groupId>org.jboss.as</groupId>
-          <artifactId>jboss-as-arquillian-container-managed</artifactId>
-          <version>${version.jboss.as}</version>
-          <scope>test</scope>
-        </dependency>
-        <dependency>
-          <groupId>org.jboss.arquillian.protocol</groupId>
-          <artifactId>arquillian-protocol-servlet</artifactId>
-          <version>${version.arquillian}</version>
-          <scope>test</scope>
-        </dependency>
-      </dependencies>
-      <build>
-        <testResources>
-          <testResource>
-            <directory>src/test/resources</directory>
-            <filtering>true</filtering>
-          </testResource>
-          <testResource>
-            <directory>src/test/resources-jboss-integration</directory>
-            <filtering>true</filtering>
-          </testResource>
-        </testResources>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-surefire-plugin</artifactId>
-            <configuration>
-              <systemPropertyVariables>
-                <org.apache.maven.user-settings>../../settings.xml</org.apache.maven.user-settings>
-                <jboss.runtime.location>${jboss.runtime.location}</jboss.runtime.location>
               </systemPropertyVariables>
             </configuration>
           </plugin>

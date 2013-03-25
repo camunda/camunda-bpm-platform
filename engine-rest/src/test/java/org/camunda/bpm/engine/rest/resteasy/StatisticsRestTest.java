@@ -10,16 +10,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.rest.util;
+package org.camunda.bpm.engine.rest.resteasy;
 
-import org.jboss.arquillian.container.spi.client.container.DeployableContainer;
-import org.jboss.arquillian.core.spi.LoadableExtension;
+import org.camunda.bpm.engine.rest.AbstractStatisticsRestTest;
+import org.camunda.bpm.engine.rest.util.ResteasyServerBootstrap;
 
-public class EmbeddedRestContainerExtension implements LoadableExtension {
-
-  @Override
-  public void register(ExtensionBuilder builder) {
-    builder.service(DeployableContainer.class, EmbeddedRestDeployableContainer.class);
+public class StatisticsRestTest extends AbstractStatisticsRestTest {
+  
+  public StatisticsRestTest() {
+    serverBootstrap = new ResteasyServerBootstrap();
   }
-
 }
