@@ -10,17 +10,6 @@
     <version>7.0.0-SNAPSHOT</version>
   </parent>
 
-  <properties>
-    <database.host>${project.build.directory}</database.host>
-    <database.name>camunda-engine</database.name>
-    <database.user>sa</database.user>
-    <database.password>sa</database.password>
-    
-    <test.db.name>h2</test.db.name>
-    <test.db.driver>org.h2.Driver</test.db.driver>
-    <test.db.url>jdbc:h2:${database.host}/dbs/${database.name};MVCC=TRUE</test.db.url>
-  </properties>
-
   <dependencies>
     <dependency>
       <groupId>org.jboss.spec</groupId>
