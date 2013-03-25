@@ -161,8 +161,18 @@
               </excludes>              
             </configuration>
           </execution>
+          <execution>
+            <id>create-test-jar</id>
+            <phase>package</phase>
+            <goals>
+              <goal>test-jar</goal>
+            </goals>
+            <configuration>
+              <forceCreate>true</forceCreate>
+            </configuration>
+          </execution>
         </executions>
-      </plugin>
+      </plugin>     
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-war-plugin</artifactId>

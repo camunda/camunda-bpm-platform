@@ -66,7 +66,7 @@
       <module>jboss7-runtime</module>
       <module>gf31-runtime</module>
       <module>tomcat-runtime</module>
-      <module>cycle-tests</module>
+      <module>webapp-integration-tests</module>
       <module>integration-tests</module>
 		</modules>
 	</profile>  
@@ -96,9 +96,9 @@
     </profile>  
 
     <profile>
-      <id>cycle</id>
+      <id>webapps</id>
       <modules>
-        <module>cycle-tests</module>
+        <module>webapp-integration-tests</module>
       </modules>
     </profile>
     
