@@ -33,7 +33,6 @@ public interface TaskRestService {
   public static final String PATH = "/task";
   
   @GET
-  @Path("/")
   List<TaskDto> getTasks(TaskQueryDto query,
       @QueryParam("firstResult") Integer firstResult, @QueryParam("maxResults") Integer maxResults);
 
@@ -54,7 +53,6 @@ public interface TaskRestService {
    * @return
    */
   @POST
-  @Path("/")
   @Consumes(MediaType.APPLICATION_JSON)
   List<TaskDto> queryTasks(TaskQueryDto query,
       @QueryParam("firstResult") Integer firstResult, @QueryParam("maxResults") Integer maxResults);

@@ -53,7 +53,6 @@ public interface ProcessDefinitionRestService {
    * @return
    */
 	@GET
-	@Path("/")
 	List<ProcessDefinitionDto> getProcessDefinitions(ProcessDefinitionQueryDto query,
 	    @QueryParam("firstResult") Integer firstResult, @QueryParam("maxResults") Integer maxResults);
 
