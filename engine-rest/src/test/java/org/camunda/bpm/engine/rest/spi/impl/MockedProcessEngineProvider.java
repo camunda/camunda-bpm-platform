@@ -28,7 +28,7 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
-import org.camunda.bpm.engine.rest.helper.ExampleDataProvider;
+import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.rest.spi.ProcessEngineProvider;
 
 public class MockedProcessEngineProvider implements ProcessEngineProvider {
@@ -71,7 +71,7 @@ public class MockedProcessEngineProvider implements ProcessEngineProvider {
 
   @Override
   public ProcessEngine getProcessEngine(String name) {
-    if (name.equals(ExampleDataProvider.NON_EXISTING_PROCESS_ENGINE_NAME)) {
+    if (name.equals(MockProvider.NON_EXISTING_PROCESS_ENGINE_NAME)) {
       return null;
     }
     
@@ -91,8 +91,8 @@ public class MockedProcessEngineProvider implements ProcessEngineProvider {
   @Override
   public Set<String> getProcessEngineNames() {
     Set<String> result = new HashSet<String>();
-    result.add(ExampleDataProvider.EXAMPLE_PROCESS_ENGINE_NAME);
-    result.add(ExampleDataProvider.ANOTHER_EXAMPLE_PROCESS_ENGINE_NAME);
+    result.add(MockProvider.EXAMPLE_PROCESS_ENGINE_NAME);
+    result.add(MockProvider.ANOTHER_EXAMPLE_PROCESS_ENGINE_NAME);
     return result;
   }
   

@@ -25,6 +25,8 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.rest.spi.ProcessEngineProvider;
 import org.camunda.bpm.engine.rest.spi.impl.MockedProcessEngineProvider;
+import org.camunda.bpm.engine.rest.util.EmbeddedServerBootstrap;
+import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
 import com.jayway.restassured.RestAssured;
@@ -44,6 +46,18 @@ public abstract class AbstractRestServiceTest {
   
   private static Properties connectionProperties = null;
 
+  protected static EmbeddedServerBootstrap serverBootstrap;  
+  
+  @BeforeClass
+  public static void setUpEmbeddedRuntime() {
+    serverBootstrap.start();
+  }
+  
+  @AfterClass
+  public static void tearDownEmbeddedRuntime() {
+    serverBootstrap.stop();
+  }
+  
   @BeforeClass
   public static void setUp() throws IOException {
     setupTestScenario();

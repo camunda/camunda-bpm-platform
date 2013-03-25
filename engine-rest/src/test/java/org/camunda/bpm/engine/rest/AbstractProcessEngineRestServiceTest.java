@@ -4,10 +4,18 @@ import static com.jayway.restassured.RestAssured.expect;
 import static com.jayway.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.when;
 
 import javax.ws.rs.core.Response.Status;
 
-import org.camunda.bpm.engine.rest.helper.ExampleDataProvider;
+import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.RepositoryService;
+import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -20,16 +28,23 @@ public abstract class AbstractProcessEngineRestServiceTest extends
   
   protected String EXAMPLE_ENGINE_NAME = "anEngineName";
 
-  /**
-   * Override this in specific test cases to create runtime data that is asserted.
-   */
+  public ProcessEngine namedProcessEngine;
+  public RepositoryService mockRepoService;
+
   @Before
-  public abstract void setUpRuntimeData();
+  public void setUpRuntimeData() {
+    ProcessDefinition mockDefinition = MockProvider.createMockDefinition();
+    
+    namedProcessEngine = getProcessEngine(EXAMPLE_ENGINE_NAME);
+    mockRepoService = mock(RepositoryService.class);
+    when(mockRepoService.getProcessDefinition(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID))).thenReturn(mockDefinition);
+    when(namedProcessEngine.getRepositoryService()).thenReturn(mockRepoService);
+  }
 
   @Test
   public void testNonExistingEngineAccess() {
-    given().pathParam("name", ExampleDataProvider.NON_EXISTING_PROCESS_ENGINE_NAME)
-      .pathParam("id", ExampleDataProvider.EXAMPLE_PROCESS_DEFINITION_ID)
+    given().pathParam("name", MockProvider.NON_EXISTING_PROCESS_ENGINE_NAME)
+      .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
     .then().expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode())
     .when().get(PROCESS_DEFINITION_URL);
@@ -40,8 +55,20 @@ public abstract class AbstractProcessEngineRestServiceTest extends
     expect()
       .statusCode(Status.OK.getStatusCode())
       .body("$.size()", is(2))
-      .body("[0].name", equalTo(ExampleDataProvider.EXAMPLE_PROCESS_ENGINE_NAME))
-      .body("[1].name", equalTo(ExampleDataProvider.ANOTHER_EXAMPLE_PROCESS_ENGINE_NAME))
+      .body("[0].name", equalTo(MockProvider.EXAMPLE_PROCESS_ENGINE_NAME))
+      .body("[1].name", equalTo(MockProvider.ANOTHER_EXAMPLE_PROCESS_ENGINE_NAME))
     .when().get(ENGINES_URL);
+  }
+  @Test
+  public void testEngineAccess() {
+    given().pathParam("name", EXAMPLE_ENGINE_NAME)
+      .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when().get(PROCESS_DEFINITION_URL);
+    
+    verify(namedProcessEngine).getRepositoryService();
+    verify(mockRepoService).getProcessDefinition(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID));
+    verifyZeroInteractions(processEngine);
   }
 }
