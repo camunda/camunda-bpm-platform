@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import javax.ws.rs.core.MultivaluedMap;
+
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
 import org.camunda.bpm.engine.rest.dto.SortableParameterizedQueryDto;
@@ -91,6 +93,14 @@ public class TaskQueryDto extends SortableParameterizedQueryDto {
 
   private List<VariableQueryParameterDto> taskVariables;
   private List<VariableQueryParameterDto> processVariables;
+  
+  public TaskQueryDto() {
+    
+  }
+  
+  public TaskQueryDto(MultivaluedMap<String, String> queryParameters) {
+    super(queryParameters);
+  }
 
   @CamundaQueryParam("processInstanceBusinessKey")
   public void setProcessInstanceBusinessKey(String businessKey) {

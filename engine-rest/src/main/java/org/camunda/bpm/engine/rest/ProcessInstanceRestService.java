@@ -15,7 +15,9 @@ package org.camunda.bpm.engine.rest;
 import java.util.List;
 
 import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.UriInfo;
 
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
@@ -42,7 +44,7 @@ public interface ProcessInstanceRestService {
    * @return
    */
   @GET
-  List<ProcessInstanceDto> getProcessInstances(ProcessInstanceQueryDto query,
+  List<ProcessInstanceDto> getProcessInstances(@Context UriInfo uriInfo,
       @QueryParam("firstResult") Integer firstResult,
       @QueryParam("maxResults") Integer maxResults);
 
@@ -64,7 +66,7 @@ public interface ProcessInstanceRestService {
 
   @GET
   @Path("/count")
-  CountResultDto getProcessInstancesCount(ProcessInstanceQueryDto query);
+  CountResultDto getProcessInstancesCount(@Context UriInfo uriInfo);
   
   @POST
   @Path("/count")

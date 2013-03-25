@@ -18,6 +18,7 @@ import java.util.Map;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriInfo;
 
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.rest.ProcessInstanceRestService;
@@ -55,9 +56,15 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
     return result;
   }
 
-
   @Override
   public List<ProcessInstanceDto> getProcessInstances(
+      UriInfo uriInfo, Integer firstResult, Integer maxResults) {
+    ProcessInstanceQueryDto queryDto = new ProcessInstanceQueryDto(uriInfo.getQueryParameters());
+    return queryProcessInstances(queryDto, firstResult, maxResults);
+  }
+
+  @Override
+  public List<ProcessInstanceDto> queryProcessInstances(
       ProcessInstanceQueryDto queryDto, Integer firstResult, Integer maxResults) {
     RuntimeService runtimeService = getProcessEngine().getRuntimeService();
     ProcessInstanceQuery query;
@@ -81,7 +88,7 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
     }
     return instanceResults;
   }
-
+  
   private List<ProcessInstance> executePaginatedQuery(ProcessInstanceQuery query, Integer firstResult, Integer maxResults) {
     if (firstResult == null) {
       firstResult = 0;
@@ -93,14 +100,13 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
   }
 
   @Override
-  public List<ProcessInstanceDto> queryProcessInstances(
-      ProcessInstanceQueryDto query, Integer firstResult, Integer maxResults) {
-    return getProcessInstances(query, firstResult, maxResults);
+  public CountResultDto getProcessInstancesCount(UriInfo uriInfo) {
+    ProcessInstanceQueryDto queryDto = new ProcessInstanceQueryDto(uriInfo.getQueryParameters());
+    return queryProcessInstancesCount(queryDto);
   }
 
   @Override
-  public CountResultDto getProcessInstancesCount(
-      ProcessInstanceQueryDto queryDto) {
+  public CountResultDto queryProcessInstancesCount(ProcessInstanceQueryDto queryDto) {
     RuntimeService runtimeService = getProcessEngine().getRuntimeService();
     ProcessInstanceQuery query;
     try {
@@ -114,11 +120,6 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
     result.setCount(count);
     
     return result;
-  }
-
-  @Override
-  public CountResultDto queryProcessInstancesCount(ProcessInstanceQueryDto queryDto) {
-    return getProcessInstancesCount(queryDto);
   }
 
   @Override
