@@ -18,7 +18,6 @@ import org.camunda.bpm.engine.rest.impl.ProcessDefinitionRestServiceImpl;
 import org.camunda.bpm.engine.rest.impl.ProcessEngineRestServiceImpl;
 import org.camunda.bpm.engine.rest.impl.ProcessInstanceRestServiceImpl;
 import org.camunda.bpm.engine.rest.impl.TaskRestServiceImpl;
-import org.camunda.bpm.engine.rest.mapper.EngineQueryDtoGetReader;
 import org.camunda.bpm.engine.rest.mapper.JacksonConfigurator;
 import org.codehaus.jackson.jaxrs.JacksonJsonProvider;
 import org.jboss.resteasy.plugins.server.tjws.TJWSEmbeddedJaxrsServer;
@@ -52,7 +51,6 @@ public class ResteasyServerBootstrap extends EmbeddedServerBootstrap {
     server.getDeployment().getActualResourceClasses().add(TaskRestServiceImpl.class);
     server.getDeployment().getActualResourceClasses().add(ProcessEngineRestServiceImpl.class);
     
-    server.getDeployment().getActualProviderClasses().add(EngineQueryDtoGetReader.class);
     server.getDeployment().getActualProviderClasses().add(JacksonConfigurator.class);
     
     server.getDeployment().getActualProviderClasses().add(JacksonJsonProvider.class);

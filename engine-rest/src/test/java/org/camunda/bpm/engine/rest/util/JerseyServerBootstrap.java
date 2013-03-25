@@ -10,7 +10,6 @@ import org.camunda.bpm.engine.rest.impl.ProcessDefinitionRestServiceImpl;
 import org.camunda.bpm.engine.rest.impl.ProcessEngineRestServiceImpl;
 import org.camunda.bpm.engine.rest.impl.ProcessInstanceRestServiceImpl;
 import org.camunda.bpm.engine.rest.impl.TaskRestServiceImpl;
-import org.camunda.bpm.engine.rest.mapper.EngineQueryDtoGetReader;
 import org.camunda.bpm.engine.rest.mapper.JacksonConfigurator;
 import org.codehaus.jackson.jaxrs.JacksonJsonProvider;
 import org.glassfish.grizzly.http.server.HttpServer;
@@ -65,7 +64,6 @@ public class JerseyServerBootstrap extends EmbeddedServerBootstrap {
       TaskRestServiceImpl.class,
       ProcessEngineRestServiceImpl.class,
       
-      EngineQueryDtoGetReader.class,
       JacksonConfigurator.class,
       JacksonJsonProvider.class
     };

@@ -30,7 +30,6 @@ import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.StatisticsResultDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDiagramDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDto;
-import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionQueryDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.runtime.StartProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.task.FormDto;
@@ -53,12 +52,12 @@ public interface ProcessDefinitionRestService {
    * @return
    */
 	@GET
-	List<ProcessDefinitionDto> getProcessDefinitions(ProcessDefinitionQueryDto query,
+	List<ProcessDefinitionDto> getProcessDefinitions(@Context UriInfo uriInfo,
 	    @QueryParam("firstResult") Integer firstResult, @QueryParam("maxResults") Integer maxResults);
 
 	@GET
   @Path("/count")
-  CountResultDto getProcessDefinitionsCount(ProcessDefinitionQueryDto query);
+  CountResultDto getProcessDefinitionsCount(@Context UriInfo uriInfo);
 
 	@GET
 	@Path("/{id}")

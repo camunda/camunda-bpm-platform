@@ -59,8 +59,9 @@ public class ProcessDefinitionRestServiceImpl extends AbstractRestProcessEngineA
   }
 
   @Override
-	public List<ProcessDefinitionDto> getProcessDefinitions(ProcessDefinitionQueryDto queryDto,
+	public List<ProcessDefinitionDto> getProcessDefinitions(UriInfo uriInfo,
 	    Integer firstResult, Integer maxResults) {
+    ProcessDefinitionQueryDto queryDto = new ProcessDefinitionQueryDto(uriInfo.getQueryParameters());
 	  List<ProcessDefinitionDto> definitions = new ArrayList<ProcessDefinitionDto>();
 
 	  RepositoryService repoService = getProcessEngine().getRepositoryService();
@@ -98,7 +99,9 @@ public class ProcessDefinitionRestServiceImpl extends AbstractRestProcessEngineA
 	}
 
 	@Override
-  public CountResultDto getProcessDefinitionsCount(ProcessDefinitionQueryDto queryDto) {
+  public CountResultDto getProcessDefinitionsCount(UriInfo uriInfo) {
+	  ProcessDefinitionQueryDto queryDto = new ProcessDefinitionQueryDto(uriInfo.getQueryParameters());
+	  
     RepositoryService repoService = getProcessEngine().getRepositoryService();
 
     ProcessDefinitionQuery query;
