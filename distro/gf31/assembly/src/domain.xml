@@ -13,7 +13,7 @@
         <engine sniffer="connector"></engine>
       </module>
     </application>
-    <application location="${com.sun.aas.instanceRootURI}/applications/camunda-camunda/" name="camunda-camunda" object-type="user">
+    <application location="${com.sun.aas.instanceRootURI}/applications/camunda-bpm-platform/" name="camunda-bpm-platform" object-type="user">
       <property name="isComposite" value="true"></property>
       <engine sniffer="ear"></engine>
       <module name="camunda-glassfish-service-#{project.version}.jar">
@@ -82,7 +82,7 @@
     <server name="server" config-ref="server-config">
       <application-ref ref="__admingui" virtual-servers="__asadmin"></application-ref>
       <application-ref ref="camunda-jobexecutor-rar" virtual-servers="server"></application-ref>
-      <application-ref ref="camunda-camunda" virtual-servers="server"></application-ref>
+      <application-ref ref="camunda-bpm-platform" virtual-servers="server"></application-ref>
       <resource-ref ref="jdbc/__TimerPool"></resource-ref>
       <resource-ref ref="jdbc/__default"></resource-ref>
       <resource-ref ref="jdbc/FoxEngine"></resource-ref>
