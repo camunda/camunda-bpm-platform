@@ -70,9 +70,9 @@ The integration testsuites are located under `qa/`. There you'll find a folder n
 In order to run the integration tests, first perform a full install build. Then navigate to the `qa` folder. 
 
 We have different maven profiles for selecting 
-* Runtime containers & environments: jboss, glassfish, tomcat
-* The testsuite: engine, webapps
-* The database: h2,h2-xa,db2,db2-xa,mssql,mssql-xa,oracle,oracle-xa,postgres,postgres-xa,mysql,mysql-xa (only supprted on JBoss ATM)
+* *Runtime containers & environments*: jboss, glassfish, tomcat
+* *The testsuite*: engine, webapps
+* *The database*: h2,h2-xa,db2,db2-xa,mssql,mssql-xa,oracle,oracle-xa,postgres,postgres-xa,mysql,mysql-xa (only supprted on JBoss ATM)
 
 In order to configure the build, compose the profiles for runtime container, testsuite, database. Example:
 
