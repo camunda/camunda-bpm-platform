@@ -25,8 +25,6 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.rest.spi.ProcessEngineProvider;
 import org.camunda.bpm.engine.rest.spi.impl.MockedProcessEngineProvider;
-import org.camunda.bpm.engine.rest.util.EmbeddedServerBootstrap;
-import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
 import com.jayway.restassured.RestAssured;

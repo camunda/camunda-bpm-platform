@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import javax.ws.rs.PathParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response.Status;
 
@@ -123,7 +122,7 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
   }
 
   @Override
-  public VariableListDto getVariables(@PathParam("id") String processInstanceId) {
+  public VariableListDto getVariables(String processInstanceId) {
     List<VariableValueDto> values = new ArrayList<VariableValueDto>();
 
     for (Map.Entry<String, Object> entry : getProcessEngine().getRuntimeService().getVariables(processInstanceId).entrySet()) {

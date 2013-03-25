@@ -21,6 +21,8 @@ import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.junit.Before;
 import org.junit.Test;
 
+import com.jayway.restassured.response.Response;
+
 public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
     AbstractRestServiceTest {
 
@@ -34,6 +36,15 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
   static {
     EXAMPLE_VARIABLES.put(EXAMPLE_VARIABLE_KEY, EXAMPLE_VARIABLE_VALUE);
   }
+  
+  protected static final Map<String, Object> EXAMPLE_OBJECT_VARIABLES = new HashMap<String, Object>();
+  static {
+    ExampleVariableObject variableValue = new ExampleVariableObject();
+    variableValue.setProperty1("aPropertyValue");
+    variableValue.setProperty2(true);
+    
+    EXAMPLE_OBJECT_VARIABLES.put(EXAMPLE_VARIABLE_KEY, variableValue);
+  }
 
   private RuntimeService runtimeServiceMock;
   
@@ -41,29 +52,25 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
   public void setUpRuntimeData() {
     runtimeServiceMock = mock(RuntimeService.class);
     when(runtimeServiceMock.getVariables(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID)).thenReturn(EXAMPLE_VARIABLES);
+    when(runtimeServiceMock.getVariables(MockProvider.ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID)).thenReturn(EXAMPLE_OBJECT_VARIABLES);
     when(processEngine.getRuntimeService()).thenReturn(runtimeServiceMock);
   }
   
   @Test
   public void testGetVariables() {
-    given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID)
+    Response response = given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID)
       .then().expect().statusCode(Status.OK.getStatusCode())
       .body("variables.size()", is(1))
       .body("variables[0].name", equalTo(EXAMPLE_VARIABLE_KEY))
       .body("variables[0].value", equalTo(EXAMPLE_VARIABLE_VALUE))
       .body("variables[0].type", equalTo(String.class.getSimpleName()))
       .when().get(PROCESS_INSTANCE_VARIABLES_URL);
+    System.out.println(response.asString());
   }
 
   @Test
   public void testJavaObjectVariableSerialization() {
-    ExampleVariableObject variableValue = new ExampleVariableObject();
-    variableValue.setProperty1("aPropertyValue");
-    variableValue.setProperty2(true);
-    
-    EXAMPLE_VARIABLES.put(EXAMPLE_VARIABLE_KEY, variableValue);
-    
-    given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID)
+    given().pathParam("id", MockProvider.ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID)
       .then().expect().statusCode(Status.OK.getStatusCode())
       .body("variables.size()", is(1))
       .body("variables[0].name", equalTo(EXAMPLE_VARIABLE_KEY))

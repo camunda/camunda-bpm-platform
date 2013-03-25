@@ -58,7 +58,6 @@ public class JerseyServerBootstrap extends EmbeddedServerBootstrap {
     server.stop();
   }
   
-  // TODO refactor
   private Class<?>[] getResourceClasses() {
     Class<?>[] classes = new Class<?>[]{
       ProcessDefinitionRestServiceImpl.class,

@@ -129,12 +129,11 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
 
   @Test
   public void testGetStartFormData() {
-    Response response = given().pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
+    given().pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
     .then().expect()
       .statusCode(Status.OK.getStatusCode())
-//      .body("key", equalTo(MockProvider.EXAMPLE_FORM_KEY))
+      .body("key", equalTo(MockProvider.EXAMPLE_FORM_KEY))
     .when().get(START_FORM_URL);
-    System.out.println(response.asString());
   }
 
   @Test

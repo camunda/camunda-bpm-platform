@@ -16,7 +16,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.ws.rs.PathParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
@@ -201,7 +200,7 @@ public class ProcessDefinitionRestServiceImpl extends AbstractRestProcessEngineA
   }
 
   @Override
-  public FormDto getStartForm(@PathParam("id") String processDefinitionId) {
+  public FormDto getStartForm(String processDefinitionId) {
     final FormService formService = getProcessEngine().getFormService();
     
     final StartFormData formData;
