@@ -54,6 +54,7 @@
 	<tomcat6.connector.http.redirectPort>48443</tomcat6.connector.http.redirectPort>
 	<tomcat6.connector.ajp.port>48009</tomcat6.connector.ajp.port>
 	<tomcat6.connector.ajp.redirectPort>48443</tomcat6.connector.ajp.redirectPort>
+    <tomcat6.server.port>48005</tomcat6.server.port>
 	<tomcat6.runtime.location>../tomcat-runtime/target/server/apache-tomcat-7.0.33</tomcat6.runtime.location>
     
   </properties>
@@ -62,43 +63,51 @@
 	
 	<profile>
 	  <id>distro</id>  
-		<modules>
-      <module>jboss7-runtime</module>
-      <module>gf31-runtime</module>
-      <module>tomcat-runtime</module>
-      <module>webapp-integration-tests</module>
-      <module>integration-tests</module>
-		</modules>
+      <modules>
+        <module>jboss7-runtime</module>
+        <module>gf31-runtime</module>
+        <module>tomcat-runtime</module>
+        <module>integration-tests-webapps</module>
+        <module>integration-tests-engine</module>
+      </modules>
 	</profile>  
+  
+    <!-- Server profiles -->
   	
     <profile>
       <id>glassfish</id>
       <modules>
         <module>gf31-runtime</module>
-        <module>integration-tests</module>
       </modules>
     </profile>
 	
     <profile>
       <id>jboss</id>   
       <modules>       
-  		  <module>jboss7-runtime</module>
-        <module>integration-tests</module>   
+        <module>jboss7-runtime</module>
       </modules>
     </profile>  
 	
-	  <profile>
+	<profile>
       <id>tomcat</id>      
       <modules>
-        <module>tomcat-runtime</module>                
-        <module>integration-tests</module>
+        <module>tomcat-runtime</module>     
       </modules>
     </profile>  
+    
+    <!-- Test profiles -->
 
     <profile>
       <id>webapps</id>
       <modules>
-        <module>webapp-integration-tests</module>
+        <module>integration-tests-webapps</module>
+      </modules>
+    </profile>
+    
+    <profile>
+      <id>engine</id>
+      <modules>
+        <module>integration-tests-engine</module>
       </modules>
     </profile>
     

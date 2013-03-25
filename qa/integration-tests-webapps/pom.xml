@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>camunda-qa-webapp-integration-tests</artifactId>
-  <name>camunda BPM - QA Webapp Integration Tests</name>
+  <name>camunda BPM - QA Integration Tests - Webapps</name>
 
   <parent>
     <groupId>org.camunda.bpm.qa</groupId>
@@ -117,6 +117,7 @@
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine-rest</artifactId>
       <scope>test</scope>
+      <classifier>classes</classifier>
       <version>${project.version}</version>
     </dependency>
     

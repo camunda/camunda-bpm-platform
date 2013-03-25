@@ -63,25 +63,17 @@ This will build all the modules that make up the camunda BPM platform but will n
 
 Running Integration Tests
 ----------
-The integration testsuites are located under `qa/`. There you'll find a folder named XX-runtime for each server runtime we support. These projects are responsible for taking a runtime container distribution (ie. Apache Tomcat, JBoss AS ...) and configuring it for integration testing. The actual integration tests are located in the `qa/integration-tests` module. This module contains an extensive testsuite that test the integration of the process engine within a particular runtime container. For example, such tests will ensure that if you use the Job Executor Service inside a Java EE Container, you get a proper CDI request context spanning multiple EJB invocations or that EE resource injection works as expected.
-
-Integration tests are executed in-container, using [JBoss Arquillian](http://arquillian.org/).
+The integration testsuites are located under `qa/`. There you'll find a folder named XX-runtime for each server runtime we support. These projects are responsible for taking a runtime container distribution (ie. Apache Tomcat, JBoss AS ...) and configuring it for integration testing. The actual integration tests are located in the `qa/integration-tests-engine` and `qa/integration-tests-webapps` modules. 
+ * *integration-tests-engine*: This module contains an extensive testsuite that test the integration of the process engine within a particular runtime container. For example, such tests will ensure that if you use the Job Executor Service inside a Java EE Container, you get a proper CDI request context spanning multiple EJB invocations or that EE resource injection works as expected. These integration tests are executed in-container, using [JBoss Arquillian](http://arquillian.org/).
+ * *integration-tests-webapps*: This module tests the camunda BPM webapplications inside the runtime containers. These integration tests run inside a client / server setting: the webapplication is deployed to the runtime container, the runtime container is started and the tests running inside a client VM perform requests against the deployed applications.
 
 In order to run the integration tests, first perform a full install build. Then navigate to the `qa` folder. 
 
-For JBoss AS, run 
+We have different maven profiles for selecting 
+* *Runtime containers & environments*: jboss, glassfish, tomcat
+* *The testsuite*: engine, webapps
+* *The database*: h2,h2-xa,db2,db2-xa,mssql,mssql-xa,oracle,oracle-xa,postgres,postgres-xa,mysql,mysql-xa (only supprted on JBoss ATM)
 
-    mvn clean install -Pjboss
+In order to configure the build, compose the profiles for runtime container, testsuite, database. Example:
 
-For JBoss AS ServletProcessApplication Support test, run
-
-    mvn clean install -Pjboss,jboss-servlet
-
-For Apache Tomcat, run
-
-    mvn clean install -Ptomcat
-
-For Glassfish, run
-
-    mvn clean install -Pglassfish
-
+    mvn clean install -Pjboss,engine,h2
