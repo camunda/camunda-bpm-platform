@@ -34,6 +34,15 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
   static {
     EXAMPLE_VARIABLES.put(EXAMPLE_VARIABLE_KEY, EXAMPLE_VARIABLE_VALUE);
   }
+  
+  protected static final Map<String, Object> EXAMPLE_OBJECT_VARIABLES = new HashMap<String, Object>();
+  static {
+    ExampleVariableObject variableValue = new ExampleVariableObject();
+    variableValue.setProperty1("aPropertyValue");
+    variableValue.setProperty2(true);
+    
+    EXAMPLE_OBJECT_VARIABLES.put(EXAMPLE_VARIABLE_KEY, variableValue);
+  }
 
   private RuntimeService runtimeServiceMock;
   
@@ -41,6 +50,7 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
   public void setUpRuntimeData() {
     runtimeServiceMock = mock(RuntimeService.class);
     when(runtimeServiceMock.getVariables(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID)).thenReturn(EXAMPLE_VARIABLES);
+    when(runtimeServiceMock.getVariables(MockProvider.ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID)).thenReturn(EXAMPLE_OBJECT_VARIABLES);
     when(processEngine.getRuntimeService()).thenReturn(runtimeServiceMock);
   }
   
@@ -57,13 +67,7 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
 
   @Test
   public void testJavaObjectVariableSerialization() {
-    ExampleVariableObject variableValue = new ExampleVariableObject();
-    variableValue.setProperty1("aPropertyValue");
-    variableValue.setProperty2(true);
-    
-    EXAMPLE_VARIABLES.put(EXAMPLE_VARIABLE_KEY, variableValue);
-    
-    given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID)
+    given().pathParam("id", MockProvider.ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID)
       .then().expect().statusCode(Status.OK.getStatusCode())
       .body("variables.size()", is(1))
       .body("variables[0].name", equalTo(EXAMPLE_VARIABLE_KEY))

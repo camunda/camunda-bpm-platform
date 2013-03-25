@@ -20,6 +20,7 @@ import java.util.List;
 
 import org.camunda.bpm.engine.rest.dto.converter.StringToTypeConverter;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+import org.camunda.bpm.engine.rest.exception.RestException;
 
 /**
  * Defines common query sorting options and validation.
@@ -71,12 +72,8 @@ public abstract class SortableParameterizedQueryDto {
    * Before invoking these methods, the annotated {@link StringToTypeConverter} is used to convert the String value to the desired Java type.
    * @param key
    * @param value
-   * @throws IllegalArgumentException
-   * @throws IllegalAccessException
-   * @throws InvocationTargetException
-   * @throws InstantiationException
    */
-  public void setValueBasedOnAnnotation(String key, String value) throws IllegalArgumentException, IllegalAccessException, InvocationTargetException, InstantiationException {
+  public void setValueBasedOnAnnotation(String key, String value) {
     List<Method> matchingMethods = findMatchingAnnotatedMethods(key);
     for (Method method : matchingMethods) {
       Class<? extends StringToTypeConverter<?>> converterClass = findAnnotatedTypeConverter(method);
@@ -84,9 +81,20 @@ public abstract class SortableParameterizedQueryDto {
         continue;
       }
       
-      StringToTypeConverter<?> converter = converterClass.newInstance();
-      Object convertedValue = converter.convertQueryParameterToType(value);
-      method.invoke(this, convertedValue);
+      StringToTypeConverter<?> converter = null;
+      try {
+        converter = converterClass.newInstance();
+        Object convertedValue = converter.convertQueryParameterToType(value);
+        method.invoke(this, convertedValue);
+      } catch (InstantiationException e) {
+        throw new RestException("Server error.");
+      } catch (IllegalAccessException e) {
+        throw new RestException("Server error.");
+      } catch (IllegalArgumentException e) {
+        throw new InvalidRequestException("Cannot set parameter.");
+      } catch (InvocationTargetException e) {
+        throw new InvalidRequestException("Cannot set parameter.");
+      }
     }
   }
   

@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.ws.rs.PathParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response.Status;
 
@@ -109,7 +108,7 @@ public class TaskRestServiceImpl extends AbstractRestProcessEngineAware implemen
   }
 
   @Override
-  public void unclaim(@PathParam("id") String taskId) {
+  public void unclaim(String taskId) {
     getProcessEngine().getTaskService().setAssignee(taskId, null);
   }
 
@@ -121,7 +120,7 @@ public class TaskRestServiceImpl extends AbstractRestProcessEngineAware implemen
   }
 
   @Override
-  public void delegate(@PathParam("id") String taskId, UserIdDto delegatedUser) {
+  public void delegate(String taskId, UserIdDto delegatedUser) {
     getProcessEngine().getTaskService().delegateTask(taskId, delegatedUser.getUserId());
   }
 

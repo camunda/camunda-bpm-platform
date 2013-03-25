@@ -10,11 +10,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.rest.resteasy;
+package org.camunda.bpm.engine.rest.jersey;
 
 import org.camunda.bpm.engine.rest.AbstractProcessInstanceRestServiceInteractionTest;
 import org.camunda.bpm.engine.rest.util.EmbeddedServerBootstrap;
-import org.camunda.bpm.engine.rest.util.ResteasyServerBootstrap;
+import org.camunda.bpm.engine.rest.util.JerseyServerBootstrap;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
@@ -24,7 +24,7 @@ public class ProcessInstanceRestServiceInteractionTest extends AbstractProcessIn
   
   @BeforeClass
   public static void setUpEmbeddedRuntime() {
-    serverBootstrap = new ResteasyServerBootstrap();
+    serverBootstrap = new JerseyServerBootstrap();
     serverBootstrap.start();
   }
   
@@ -32,4 +32,5 @@ public class ProcessInstanceRestServiceInteractionTest extends AbstractProcessIn
   public static void tearDownEmbeddedRuntime() {
     serverBootstrap.stop();
   }
+
 }

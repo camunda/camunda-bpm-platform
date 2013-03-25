@@ -15,7 +15,6 @@ package org.camunda.bpm.engine.rest.mapper;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.annotation.Annotation;
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Map.Entry;
@@ -103,14 +102,10 @@ public class EngineQueryDtoGetReader implements
 
       try {
         queryDto.setValueBasedOnAnnotation(key, value);
-      } catch (IllegalArgumentException e) {
-        throw new InvalidRequestException("Cannot set parameter.");
-      } catch (IllegalAccessException e) {
-        throw new RestException("Server error.");
-      } catch (InvocationTargetException e) {
-        throw new InvalidRequestException("Cannot set parameter.");
-      } catch (InstantiationException e) {
-        throw new RestException("Server error.");
+      } catch (RestException e) {
+        throw new WebApplicationException(e, Status.INTERNAL_SERVER_ERROR);
+      } catch (InvalidRequestException e) {
+        throw new WebApplicationException(e, Status.BAD_REQUEST);
       }
     }
 
