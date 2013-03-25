@@ -63,43 +63,51 @@
 	
 	<profile>
 	  <id>distro</id>  
-		<modules>
-      <module>jboss7-runtime</module>
-      <module>gf31-runtime</module>
-      <module>tomcat-runtime</module>
-      <module>webapp-integration-tests</module>
-      <module>integration-tests</module>
-		</modules>
+      <modules>
+        <module>jboss7-runtime</module>
+        <module>gf31-runtime</module>
+        <module>tomcat-runtime</module>
+        <module>integration-tests-webapps</module>
+        <module>integration-tests-engine</module>
+      </modules>
 	</profile>  
+  
+    <!-- Server profiles -->
   	
     <profile>
       <id>glassfish</id>
       <modules>
         <module>gf31-runtime</module>
-        <module>integration-tests</module>
       </modules>
     </profile>
 	
     <profile>
       <id>jboss</id>   
       <modules>       
-  		  <module>jboss7-runtime</module>
-        <module>integration-tests</module>   
+        <module>jboss7-runtime</module>
       </modules>
     </profile>  
 	
-	  <profile>
+	<profile>
       <id>tomcat</id>      
       <modules>
-        <module>tomcat-runtime</module>                
-        <module>integration-tests</module>
+        <module>tomcat-runtime</module>     
       </modules>
     </profile>  
+    
+    <!-- Test profiles -->
 
     <profile>
       <id>webapps</id>
       <modules>
-        <module>webapp-integration-tests</module>
+        <module>integration-tests-webapps</module>
+      </modules>
+    </profile>
+    
+    <profile>
+      <id>engine</id>
+      <modules>
+        <module>integration-tests-engine</module>
       </modules>
     </profile>
     

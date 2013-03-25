@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>camunda-qa-integration-tests</artifactId>
-  <name>camunda BPM - QA Integrationtests</name>
+  <name>camunda BPM - QA Integration Tests - Engine</name>
 
   <parent>
     <groupId>org.camunda.bpm.qa</groupId>
