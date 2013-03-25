@@ -46,18 +46,6 @@ public abstract class AbstractRestServiceTest {
   
   private static Properties connectionProperties = null;
 
-  protected static EmbeddedServerBootstrap serverBootstrap;  
-  
-  @BeforeClass
-  public static void setUpEmbeddedRuntime() {
-    serverBootstrap.start();
-  }
-  
-  @AfterClass
-  public static void tearDownEmbeddedRuntime() {
-    serverBootstrap.stop();
-  }
-  
   @BeforeClass
   public static void setUp() throws IOException {
     setupTestScenario();
