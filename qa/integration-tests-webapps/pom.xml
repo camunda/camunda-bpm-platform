@@ -422,103 +422,6 @@
       </build>
     </profile>
 
-    <!-- database properties for maven sql -->
-    <profile>
-      <id>h2</id>
-      <properties>
-        <test.db.name>h2</test.db.name>
-        <test.db.driver>org.h2.Driver</test.db.driver>
-        <test.db.url>jdbc:h2:${database.host}/dbs/${database.name};MVCC=TRUE</test.db.url>
-      </properties>
-    </profile>
-    <profile>
-      <id>h2-xa</id>
-      <properties>
-        <test.db.name>h2</test.db.name>
-        <test.db.driver>org.h2.Driver</test.db.driver>
-        <test.db.url>jdbc:h2:${database.host}/dbs/${database.name};MVCC=TRUE</test.db.url>
-      </properties>
-    </profile>
-    <profile>
-      <id>mysql</id>
-      <properties>
-        <test.db.name>mysql</test.db.name>
-        <test.db.driver>com.mysql.jdbc.Driver</test.db.driver>
-        <test.db.url>jdbc:mysql://${database.host}:3306/${database.name}</test.db.url>
-      </properties>
-    </profile>
-    <profile>
-      <id>mysql-xa</id>
-      <properties>
-        <test.db.name>mysql</test.db.name>
-        <test.db.driver>com.mysql.jdbc.Driver</test.db.driver>
-        <test.db.url>jdbc:mysql://${database.host}:3306/${database.name}</test.db.url>
-      </properties>
-    </profile>
-    <profile>
-      <id>mssql</id>
-      <properties>
-        <test.db.name>mssql</test.db.name>
-        <test.db.driver>com.microsoft.sqlserver.jdbc.SQLServerDriver</test.db.driver>
-        <test.db.url>jdbc:sqlserver://${database.host}:1433;DatabaseName=${database.name}</test.db.url>
-      </properties>
-    </profile>
-    <profile>
-      <id>mssql-xa</id>
-      <properties>
-        <test.db.name>mssql</test.db.name>
-        <test.db.driver>com.microsoft.sqlserver.jdbc.SQLServerDriver</test.db.driver>
-        <test.db.url>jdbc:sqlserver://${database.host}:1433;DatabaseName=${database.name}</test.db.url>
-      </properties>
-    </profile>
-    <profile>
-      <id>db2</id>
-      <properties>
-        <test.db.name>db2</test.db.name>
-        <test.db.driver>com.ibm.db2.jcc.DB2Driver</test.db.driver>
-        <test.db.url>jdbc:db2://${database.host}:50000/${database.name}</test.db.url>
-      </properties>
-    </profile>
-    <profile>
-      <id>db2-xa</id>
-      <properties>
-        <test.db.name>db2</test.db.name>
-        <test.db.driver>com.ibm.db2.jcc.DB2Driver</test.db.driver>
-        <test.db.url>jdbc:db2://${database.host}:50000/${database.name}</test.db.url>
-      </properties>
-    </profile>
-    <profile>
-      <id>postgres</id>
-      <properties>
-        <test.db.name>postgres</test.db.name>
-        <test.db.driver>org.postgresql.Driver</test.db.driver>
-        <test.db.url>jdbc:postgresql://${database.host}:5432/${database.name}</test.db.url>
-      </properties>
-    </profile>
-    <profile>
-      <id>postgres-xa</id>
-      <properties>
-        <test.db.name>postgres</test.db.name>
-        <test.db.driver>org.postgresql.Driver</test.db.driver>
-        <test.db.url>jdbc:postgresql://${database.host}:5432/${database.name}</test.db.url>
-      </properties>
-    </profile>
-    <profile>
-      <id>oracle</id>
-      <properties>
-        <test.db.name>oracle</test.db.name>
-        <test.db.driver>oracle.jdbc.OracleDriver</test.db.driver>
-        <test.db.url>jdbc:oracle:thin:@${database.host}:1521:xe</test.db.url>
-      </properties>
-    </profile>
-    <profile>
-      <id>oracle-xa</id>
-      <properties>
-        <test.db.name>oracle</test.db.name>
-        <test.db.driver>oracle.jdbc.OracleDriver</test.db.driver>
-        <test.db.url>jdbc:oracle:thin:@${database.host}:1521:xe</test.db.url>
-      </properties>
-    </profile>
     <profile>
       <id>distro</id>
       <build>
@@ -649,8 +552,8 @@
           </dependency>
         </dependencies>
         <configuration>
-          <driver>${test.db.driver}</driver>
-          <url>${test.db.url}</url>
+          <driver>${database.driver}</driver>
+          <url>${database.url}</url>
           <username>${database.user}</username>
           <password>${database.password}</password>
         </configuration>
@@ -664,7 +567,7 @@
             <configuration>
               <srcFiles>
                 <!-- try dropping the DB -->
-                <srcFile>${project.build.directory}/sql-scripts/sql/drop/${test.db.name}_cycle_${project.version}.sql</srcFile>
+                <srcFile>${project.build.directory}/sql-scripts/sql/drop/${database.type}_cycle_${project.version}.sql</srcFile>
               </srcFiles>
               <autocommit>true</autocommit>
               <onError>continue</onError>
