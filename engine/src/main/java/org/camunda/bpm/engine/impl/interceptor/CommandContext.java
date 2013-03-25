@@ -25,6 +25,7 @@ import org.camunda.bpm.engine.TaskAlreadyClaimedException;
 import org.camunda.bpm.engine.impl.application.ProcessApplicationManager;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.TransactionContext;
+import org.camunda.bpm.engine.impl.cfg.TransactionContextFactory;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbSqlSession;
 import org.camunda.bpm.engine.impl.jobexecutor.FailedJobCommandFactory;
@@ -74,15 +75,17 @@ public class CommandContext {
   protected FailedJobCommandFactory failedJobCommandFactory;
 
   public CommandContext(Command<?> command, ProcessEngineConfigurationImpl processEngineConfiguration) {
-    this.command = command;
+    this(command, processEngineConfiguration, processEngineConfiguration.getTransactionContextFactory());
+  }
+  
+  public CommandContext(Command<?> cmd, ProcessEngineConfigurationImpl processEngineConfiguration, TransactionContextFactory transactionContextFactory) {
+    this.command = cmd;
     this.processEngineConfiguration = processEngineConfiguration;
     this.failedJobCommandFactory = processEngineConfiguration.getFailedJobCommandFactory();
     sessionFactories = processEngineConfiguration.getSessionFactories();
-    this.transactionContext = processEngineConfiguration
-      .getTransactionContextFactory()
-      .openTransactionContext(this);
+    this.transactionContext = transactionContextFactory.openTransactionContext(this);
   }
-  
+
   public void performOperation(final AtomicOperation executionOperation, final InterpretableExecution execution) {
     
     ProcessApplicationReference targetProcessApplication = getTargetProcessApplication(execution);

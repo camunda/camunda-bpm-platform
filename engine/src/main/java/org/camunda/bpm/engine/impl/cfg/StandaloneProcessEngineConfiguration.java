@@ -38,4 +38,5 @@ public class StandaloneProcessEngineConfiguration extends ProcessEngineConfigura
     // assumes this is already initialized and in standalone cases the required and requires new are the same
     return commandInterceptorsTxRequired;
   }
+  
 }

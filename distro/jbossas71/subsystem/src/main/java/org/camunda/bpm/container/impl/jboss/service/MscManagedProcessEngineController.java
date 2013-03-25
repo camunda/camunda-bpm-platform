@@ -27,9 +27,8 @@ import org.camunda.bpm.container.impl.jboss.util.Tccl;
 import org.camunda.bpm.container.impl.jboss.util.Tccl.Operation;
 import org.camunda.bpm.container.impl.jmx.services.JmxManagedProcessEngineController;
 import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.cfg.JtaProcessEngineConfiguration;
-import org.camunda.bpm.engine.impl.cfg.jta.db.DbSchemaOperations;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.camunda.bpm.engine.impl.persistence.StrongUuidGenerator;
 import org.jboss.as.connector.subsystems.datasources.DataSourceReferenceFactoryService;
@@ -120,7 +119,6 @@ public class MscManagedProcessEngineController extends MscManagedProcessEngine {
     // mapping files from the process engine module
     Tccl.runUnderClassloader(new Operation<Void>() {
       public Void run() {        
-        performDbSchemaOperations();
         startProcessEngine();
         return null;
       }
@@ -129,24 +127,7 @@ public class MscManagedProcessEngineController extends MscManagedProcessEngine {
     
     setJobExecutorDelegate();    
   }
-  
-  protected void performDbSchemaOperations() {
-    if(processEngineMetadata.isAutoSchemaUpdate()) {
-      
-      if(processEngineMetadata.getDbTablePrefix() != null) {
-        throw new ProcessEngineException("Cannot use '" + ManagedProcessEngineMetadata.PROP_IS_AUTO_SCHEMA_UPDATE + "=true' in combination with "
-            + ManagedProcessEngineMetadata.PROP_DB_TABLE_PREFIX);
-      }
-      
-      LOGGER.info("now performing process engine auto schema update for process engine "+processEngineMetadata.getEngineName());
-      DbSchemaOperations dbSchemaOperations = new DbSchemaOperations();
-      dbSchemaOperations.setHistory(processEngineMetadata.getHistoryLevel());
-      dbSchemaOperations.setDbIdentityUsed(processEngineMetadata.isIdentityUsed());
-      dbSchemaOperations.setDataSourceJndiName(processEngineMetadata.getDatasourceJndiName());
-      dbSchemaOperations.update();      
-    }    
-  }
-  
+    
   protected void startProcessEngine() {
     
     processEngineConfiguration = new JtaProcessEngineConfiguration();
@@ -166,6 +147,11 @@ public class MscManagedProcessEngineController extends MscManagedProcessEngine {
     
     // set the value for the history
     processEngineConfiguration.setHistory(processEngineMetadata.getHistoryLevel());
+    
+    // set auto schema update
+    if(processEngineMetadata.isAutoSchemaUpdate()) {
+      processEngineConfiguration.setDatabaseSchemaUpdate(ProcessEngineConfiguration.DB_SCHEMA_UPDATE_TRUE);
+    }
 
     // set db table prefix
     if( processEngineMetadata.getDbTablePrefix() != null ) {

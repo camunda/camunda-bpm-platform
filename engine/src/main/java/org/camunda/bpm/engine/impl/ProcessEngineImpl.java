@@ -51,11 +51,13 @@ public class ProcessEngineImpl implements ProcessEngine {
   protected String databaseSchemaUpdate;
   protected JobExecutor jobExecutor;
   protected CommandExecutor commandExecutor;
+  protected CommandExecutor commandExecutorSchemaOperations;
   protected Map<Class<?>, SessionFactory> sessionFactories;
   protected ExpressionManager expressionManager;
   protected int historyLevel;
   protected TransactionContextFactory transactionContextFactory;
   protected ProcessEngineConfigurationImpl processEngineConfiguration;
+
 
   public ProcessEngineImpl(ProcessEngineConfigurationImpl processEngineConfiguration) {
     this.processEngineConfiguration = processEngineConfiguration;
@@ -70,11 +72,12 @@ public class ProcessEngineImpl implements ProcessEngine {
     this.databaseSchemaUpdate = processEngineConfiguration.getDatabaseSchemaUpdate();
     this.jobExecutor = processEngineConfiguration.getJobExecutor();
     this.commandExecutor = processEngineConfiguration.getCommandExecutorTxRequired();
+    commandExecutorSchemaOperations = processEngineConfiguration.getCommandExecutorSchemaOperations();
     this.sessionFactories = processEngineConfiguration.getSessionFactories();
     this.historyLevel = processEngineConfiguration.getHistoryLevel();
     this.transactionContextFactory = processEngineConfiguration.getTransactionContextFactory();
     
-    commandExecutor.execute(new SchemaOperationsProcessEngineBuild());
+    commandExecutorSchemaOperations.execute(new SchemaOperationsProcessEngineBuild());
 
     if (name == null) {
       log.info("default activiti ProcessEngine created");
@@ -97,7 +100,7 @@ public class ProcessEngineImpl implements ProcessEngine {
       jobExecutor.shutdown();
     }
 
-    commandExecutor.execute(new SchemaOperationProcessEngineClose());
+    commandExecutorSchemaOperations.execute(new SchemaOperationProcessEngineClose());
   }
 
   public DbSqlSessionFactory getDbSqlSessionFactory() {

@@ -211,6 +211,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   /** this will be initialized during the configurationComplete() */
   protected CommandExecutor commandExecutorTxRequiresNew;
   
+  /** Separate command executor to be used for db schema operations. Must always use NON-JTA transactions */
+  protected CommandExecutor commandExecutorSchemaOperations;
+  
   // SESSION FACTORIES ////////////////////////////////////////////////////////
 
   protected List<SessionFactory> customSessionFactories;
@@ -359,6 +362,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initCommandExecutorTxRequired();
     initCommandInterceptorsTxRequiresNew();
     initCommandExecutorTxRequiresNew();
+    initCommandExecutorDbSchemaOperations();
   }
 
   protected void initActualCommandExecutor() {
@@ -404,6 +408,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected void initCommandExecutorTxRequiresNew() {
     if (commandExecutorTxRequiresNew==null) {
       commandExecutorTxRequiresNew = initInterceptorChain(commandInterceptorsTxRequiresNew);
+    }
+  }
+  
+  protected void initCommandExecutorDbSchemaOperations() {
+    if (commandExecutorSchemaOperations==null) {
+      // in default case, we use the same command executor for DB Schema Operations as for runtime operations.
+      // configurations that Use JTA Transactions should override this method and provide a custom command executor 
+      // that uses NON-JTA Transactions. 
+      commandExecutorSchemaOperations = commandExecutorTxRequired;
     }
   }
 
@@ -1732,4 +1745,13 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   public void setProcessApplicationManager(ProcessApplicationManager processApplicationManager) {
     this.processApplicationManager = processApplicationManager;
   }
+  
+  public CommandExecutor getCommandExecutorSchemaOperations() {
+    return commandExecutorSchemaOperations;
+  }
+  
+  public void setCommandExecutorSchemaOperations(CommandExecutor commandExecutorSchemaOperations) {
+    this.commandExecutorSchemaOperations = commandExecutorSchemaOperations;
+  }
+  
 }
