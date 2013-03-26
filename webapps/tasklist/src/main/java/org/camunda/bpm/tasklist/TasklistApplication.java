@@ -6,7 +6,6 @@ import java.util.Set;
 import javax.ws.rs.core.Application;
 
 import org.camunda.bpm.engine.rest.exception.ExceptionHandler;
-import org.camunda.bpm.engine.rest.mapper.EngineQueryDtoGetReader;
 import org.camunda.bpm.engine.rest.mapper.JacksonConfigurator;
 import org.camunda.bpm.tasklist.resources.AuthenticationResource;
 import org.camunda.bpm.tasklist.resources.TaskFormResource;
@@ -24,7 +23,6 @@ public class TasklistApplication extends Application {
     classes.add(AuthenticationResource.class);
     classes.add(TaskFormResource.class);
 
-    classes.add(EngineQueryDtoGetReader.class);
     classes.add(JacksonConfigurator.class);
     classes.add(JacksonJsonProvider.class);
     classes.add(ExceptionHandler.class);
