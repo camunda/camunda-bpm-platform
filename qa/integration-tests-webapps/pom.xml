@@ -428,7 +428,7 @@
     </profile>
     
     <profile>      
-      <id>webapps</id>
+      <id>webapps-integration</id>
       <build>
         <plugins>         
           <plugin>

@@ -98,14 +98,14 @@
     <!-- Testsuite profiles -->
 
     <profile>
-      <id>webapps</id>
+      <id>webapps-integration</id>
       <modules>
         <module>integration-tests-webapps</module>
       </modules>      
     </profile>
     
     <profile>
-      <id>engine</id>
+      <id>engine-integration</id>
       <modules>
         <module>integration-tests-engine</module>
       </modules>

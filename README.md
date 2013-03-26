@@ -71,9 +71,13 @@ In order to run the integration tests, first perform a full install build. Then 
 
 We have different maven profiles for selecting 
 * *Runtime containers & environments*: jboss, glassfish, tomcat
-* *The testsuite*: engine, webapps
-* *The database*: h2,h2-xa,db2,db2-xa,mssql,mssql-xa,oracle,oracle-xa,postgres,postgres-xa,mysql,mysql-xa (only supprted on JBoss ATM)
+* *The testsuite*: engine-integration, webapps-integration
+* *The database*: h2,h2-xa,db2,db2-xa,mssql,mssql-xa,oracle,oracle-xa,postgres,postgres-xa,mysql,mysql-xa (XA is only supprted on JBoss & Glassfish ATM)
 
 In order to configure the build, compose the profiles for runtime container, testsuite, database. Example:
 
-    mvn clean install -Pjboss,engine,h2
+    mvn clean install -Pengine-integration,jboss,h2
+    
+You can select multiple testsuites but only a single database and a single runtime container. This is valid:
+
+    mvn clean install -Pengine-integration,webapps-integration,tomcat,db2
