@@ -92,10 +92,6 @@ define(["angular", "bpmn/Bpmn"], function(angular, Bpmn) {
         $scope.taskList.tasks = response.resource;
       });
     };
-    
-    $scope.getDefinitionForTask = function(task) {
-      return $scope.processDefinitions[task.processDefinitionId];
-    };
 
     $scope.$watch(function() { return $location.search(); }, function(newValue) {
       var view = angular.extend({ filter: "mytasks" }, newValue);
