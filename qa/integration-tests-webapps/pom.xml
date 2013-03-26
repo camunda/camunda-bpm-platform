@@ -104,17 +104,15 @@
     
     <dependency>
       <groupId>org.camunda.bpm</groupId>
-      <artifactId>camunda-engine-rest</artifactId>
+      <artifactId>camunda-engine</artifactId>
       <scope>test</scope>
-      <classifier>classes</classifier>
-      <version>${project.version}</version>
     </dependency>
     
     <dependency>
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine-rest</artifactId>
-      <classifier>tests</classifier>
       <scope>test</scope>
+      <type>war</type>
       <version>${project.version}</version>
     </dependency>
 
@@ -126,7 +124,7 @@
       <id>jboss</id>
       <properties>
         <jboss.assembly.location>${basedir}/${jboss.runtime.location}</jboss.assembly.location>
-        <cycle.http.port>${jboss.http.port}</cycle.http.port>
+        <http.port>${jboss.http.port}</http.port>
       </properties>
       <dependencies>
         <dependency>
@@ -190,6 +188,14 @@
                     <context>cycle</context>
                   </properties>
                 </deployable>
+                <deployable>
+                  <groupId>org.camunda.bpm</groupId>
+                  <artifactId>camunda-engine-rest</artifactId>
+                  <type>war</type>
+                  <properties>
+                    <context>engine-rest</context>
+                  </properties>
+                </deployable>
               </deployables>
               <wait>false</wait>
             </configuration>
@@ -201,7 +207,7 @@
       <id>glassfish</id>
       <properties>
         <glassfish.server.location>../gf31-runtime/target/glassfish3</glassfish.server.location>
-        <cycle.http.port>${glassfish.http.port}</cycle.http.port>
+        <http.port>${glassfish.http.port}</http.port>
       </properties>
 
       <dependencies>
@@ -338,7 +344,7 @@
       <id>tomcat</id>
       <properties>
         <tomcat.server.location>${basedir}/${tomcat6.runtime.location}</tomcat.server.location>
-        <cycle.http.port>${tomcat6.connector.http.port}</cycle.http.port>
+        <http.port>${tomcat6.connector.http.port}</http.port>
       </properties>
       <dependencies>
         <dependency>
@@ -401,6 +407,14 @@
                   <type>war</type>
                   <properties>
                     <context>cycle</context>
+                  </properties>
+                </deployable>
+                <deployable>
+                  <groupId>org.camunda.bpm</groupId>
+                  <artifactId>camunda-engine-rest</artifactId>
+                  <type>war</type>
+                  <properties>
+                    <context>engine-rest</context>
                   </properties>
                 </deployable>
               </deployables>
@@ -526,6 +540,32 @@
                   </srcFiles>
                   <autocommit>true</autocommit>
                   <onError>continue</onError>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          
+          <plugin>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <version>1.4</version>
+            <executions>
+              <execution>
+                <id>database-test-create-schema</id>
+                <phase>process-test-classes</phase>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <configuration>
+                  <target>
+                    <copy file="${basedir}/src/test/resources/activiti.cfg.xml" tofile="target/test-classes/activiti.cfg.xml" overwrite="true">
+                      <filterset>
+                        <filter token="@database.url@" value="${database.url}"/>
+                        <filter token="@database.driver@" value="${database.driver}"/>
+                        <filter token="@database.user@" value="${database.user}"/>
+                        <filter token="@database.password@" value="${database.password}"/>
+                      </filterset>
+                    </copy>
+                  </target>
                 </configuration>
               </execution>
             </executions>
