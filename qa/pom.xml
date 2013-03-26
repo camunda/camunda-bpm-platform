@@ -56,7 +56,7 @@
 	<tomcat6.connector.ajp.redirectPort>48443</tomcat6.connector.ajp.redirectPort>
     <tomcat6.server.port>48005</tomcat6.server.port>
 	<tomcat6.runtime.location>../tomcat-runtime/target/server/apache-tomcat-7.0.33</tomcat6.runtime.location>
-    
+
   </properties>
   
   <profiles>
@@ -81,15 +81,15 @@
       </modules>
     </profile>
 	
-    <profile>
-      <id>jboss</id>   
+    <profile>      
+      <id>jboss</id> 
       <modules>       
         <module>jboss7-runtime</module>
       </modules>
     </profile>  
 	
 	<profile>
-      <id>tomcat</id>      
+      <id>tomcat</id>       
       <modules>
         <module>tomcat-runtime</module>     
       </modules>
@@ -101,7 +101,7 @@
       <id>webapps</id>
       <modules>
         <module>integration-tests-webapps</module>
-      </modules>
+      </modules>      
     </profile>
     
     <profile>
@@ -152,21 +152,7 @@
         <database.url>jdbc:h2:mem:camunda-engine;MVCC=TRUE</database.url>
       </properties>
     </profile>
-    <!-- 
-    <profile>
-      <id>h2-xa</id>
-      <properties>
-        <database.type>h2</database.type>
-        <jboss.datasource.filename>h2-xa-ds.xml</jboss.datasource.filename>
-        <database.host>${env.h2.database.host}</database.host>
-        <database.name>${env.h2.database.name}</database.name>
-        <database.user>${env.h2.database.user}</database.user>
-        <database.password>${env.h2.database.password}</database.password>
-        <database.driver>org.h2.Driver</database.driver>
-        <database.url>jdbc:h2:${database.host}/dbs/${database.name};MVCC=TRUE</database.url>
-      </properties>
-    </profile>
-    -->
+   
     <profile>
       <id>mssql</id>
       <properties>
