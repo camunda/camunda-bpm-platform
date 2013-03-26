@@ -15,7 +15,6 @@ import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.rest.impl.ProcessDefinitionRestServiceImpl;
 import org.camunda.bpm.engine.rest.impl.ProcessInstanceRestServiceImpl;
 import org.camunda.bpm.engine.rest.impl.TaskRestServiceImpl;
-import org.camunda.bpm.engine.rest.mapper.EngineQueryDtoGetReader;
 import org.camunda.bpm.engine.rest.mapper.JacksonConfigurator;
 import org.camunda.bpm.engine.rest.spi.ProcessEngineProvider;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -81,7 +80,6 @@ public class DevEnvironmentSetup implements ProcessEngineProvider {
     server.getDeployment().getActualResourceClasses().add(ProcessInstanceRestServiceImpl.class);
     server.getDeployment().getActualResourceClasses().add(TaskRestServiceImpl.class);
 
-    server.getDeployment().getActualProviderClasses().add(EngineQueryDtoGetReader.class);
     server.getDeployment().getActualProviderClasses().add(JacksonConfigurator.class);
 
     server.getDeployment().getActualProviderClasses().add(JacksonJsonProvider.class);
