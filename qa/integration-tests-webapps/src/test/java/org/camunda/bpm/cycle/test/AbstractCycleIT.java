@@ -45,9 +45,9 @@ public abstract class AbstractCycleIT {
     
     InputStream propertiesStream = null;
     try {
-      propertiesStream = TestCycleRoundtripIT.class.getResourceAsStream("testconfig.properties");
+      propertiesStream = TestCycleRoundtripIT.class.getResourceAsStream("/testconfig.properties");
       properties.load(propertiesStream);
-      httpPort = (String) properties.get("cycle.http.port");
+      httpPort = (String) properties.get("http.port");
     } finally {
       IoUtil.closeSilently(propertiesStream);
     }

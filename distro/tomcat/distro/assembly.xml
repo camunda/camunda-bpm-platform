@@ -28,10 +28,6 @@
         <fileMode>0755</fileMode>
     </fileSet> 
     <fileSet>
-      <directory>src/overlay</directory>
-      <outputDirectory>server/apache-tomcat-${tomcat.version}/webapps/</outputDirectory>    
-    </fileSet>      
-    <fileSet>
       <directory>../../camunda-welcome</directory>
       <outputDirectory>server/apache-tomcat-${tomcat.version}/webapps/camunda-welcome</outputDirectory>      
     </fileSet>  
@@ -78,16 +74,6 @@
         </includes>
         <outputDirectory>server/apache-tomcat-${tomcat.version}/webapps/engine-rest</outputDirectory>
         <unpack>true</unpack>
-    </dependencySet>
-    
-    <!-- adding resteasy to engine-rest -->    
-    <dependencySet>
-      <outputDirectory>server/apache-tomcat-${tomcat.version}/webapps/engine-rest/WEB-INF/lib</outputDirectory>
-      <useTransitiveDependencies>true</useTransitiveDependencies>     
-      <useTransitiveFiltering>true</useTransitiveFiltering>
-      <includes>
-        <include>org.jboss.resteasy:resteasy-jaxrs:jar:*</include>
-      </includes>
     </dependencySet>
     
     <dependencySet>
