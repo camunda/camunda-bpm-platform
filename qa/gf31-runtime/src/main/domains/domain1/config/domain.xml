@@ -42,26 +42,24 @@
       <property name="serverName" value="localhost"></property>
       <property name="DatabaseName" value="sun-appserv-samples"></property>
       <property name="connectionAttributes" value=";create=true"></property>
-    </jdbc-connection-pool>
-        <jdbc-connection-pool 
+    </jdbc-connection-pool> 
+    <jdbc-connection-pool 
           is-isolation-level-guaranteed="false" 
-          datasource-classname="org.h2.jdbcx.JdbcDataSource" 
-          res-type="javax.sql.DataSource" non-transactional-connections="true" 
+          datasource-classname="${database.datasource.class}" 
+          res-type="${database.datasource.class.type}" non-transactional-connections="true" 
           name="ProcessEnginePool">
-        <property name="Url" value="jdbc:h2:mem:camunda-engine;DB_CLOSE_DELAY=-1;MVCC=TRUE;DB_CLOSE_ON_EXIT=FALSE"></property>
-<!--        <property name="Url" value="jdbc:h2:mem:camunda-engine"></property> -->
-        <property name="User" value="sa"></property>
-          <property name="Password" value="sa"></property>
-<!--          <property name="connectionAttributes" value=";create=true"></property> -->
+      <property name="Url" value="${database.url}"></property>
+      <property name="User" value="${database.user}"></property>
+      <property name="Password" value="${database.password}"></property>
     </jdbc-connection-pool>
     <jdbc-connection-pool 
           is-isolation-level-guaranteed="false" 
-          datasource-classname="org.h2.jdbcx.JdbcDataSource" 
-          res-type="javax.sql.DataSource" non-transactional-connections="true" 
+          datasource-classname="${database.datasource.class}" 
+          res-type="${database.datasource.class.type}" non-transactional-connections="true" 
           name="CamundaCyclePool">
-      <property name="Url" value="jdbc:h2:mem:camunda-cycle;DB_CLOSE_DELAY=-1;MVCC=TRUE;DB_CLOSE_ON_EXIT=FALSE"></property>
-      <property name="User" value="sa"></property>
-      <property name="Password" value="sa"></property>
+      <property name="Url" value="${database.url}"></property>
+      <property name="User" value="${database.user}"></property>
+      <property name="Password" value="${database.password}"></property>
     </jdbc-connection-pool>
     <resource-adapter-config
       enabled="true" 

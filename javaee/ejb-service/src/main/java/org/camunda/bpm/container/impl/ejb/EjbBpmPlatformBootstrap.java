@@ -6,7 +6,6 @@ import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.annotation.Resource;
-import javax.ejb.LocalBean;
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
 import javax.ejb.TransactionAttribute;
@@ -29,7 +28,6 @@ import org.camunda.bpm.container.impl.jmx.deployment.StopProcessEnginesStep;
  * @author Daniel Meyer
  */
 @Startup
-@LocalBean
 @Singleton(name="BpmPlatformBootstrap")
 @TransactionAttribute(TransactionAttributeType.SUPPORTS)
 public class EjbBpmPlatformBootstrap {
@@ -43,7 +41,7 @@ public class EjbBpmPlatformBootstrap {
   protected ProcessApplicationService processApplicationService; 
 
   @PostConstruct
-  public void start() {
+  protected void start() {
 
     final JmxRuntimeContainerDelegate containerDelegate = getContainerDelegate();
     
@@ -60,7 +58,7 @@ public class EjbBpmPlatformBootstrap {
   }
   
   @PreDestroy
-  public void stop() {
+  protected void stop() {
     
     final JmxRuntimeContainerDelegate containerDelegate = getContainerDelegate();
     
