@@ -168,29 +168,19 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-war-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>javaee6</id>
-            <goals>
-              <goal>war</goal>
-            </goals>
-            <configuration>
-              <failOnMissingWebXml>false</failOnMissingWebXml>
-              <archive>
-                <manifest>
-                  <!-- Maven project version number -->
-                  <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-                </manifest>
-                <manifestEntries>
-                  <!-- module dependencies for deployment on AS 7 -->
-                  <Dependencies>org.camunda.bpm.camunda-engine</Dependencies>
-                </manifestEntries>
-              </archive>
-      
-            </configuration>
-          </execution>
-        </executions>
-      
+        <configuration>
+          <failOnMissingWebXml>false</failOnMissingWebXml>
+          <archive>
+            <manifest>
+              <!-- Maven project version number -->
+              <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+            </manifest>
+            <manifestEntries>
+              <!-- module dependencies for deployment on AS 7  -->
+              <Dependencies>org.camunda.bpm.camunda-engine</Dependencies>
+            </manifestEntries>
+          </archive>
+        </configuration>        
       </plugin>
       
       <plugin>
