@@ -182,6 +182,29 @@
           </archive>
         </configuration>
       </plugin>
+      
+      <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-assembly-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>tomcat</id>
+                <phase>package</phase>
+                <goals>
+                  <goal>single</goal>
+                </goals>
+                <configuration>
+                  <descriptors>
+                    <descriptor>assembly.xml</descriptor>
+                  </descriptors>
+                  <finalName>camunda-engine-rest-${project.version}</finalName>
+                  <attach>true</attach>
+                  <outputDirectory>target/</outputDirectory>
+                  <workDirectory>target/assembly/work</workDirectory>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
     </plugins>
   </build>
 
