@@ -4,7 +4,7 @@
   xmlns:activiti="http://activiti.org/bpmn"
   targetNamespace="Examples">
   
-  <process id="ExampleProcess">
+  <process id="ExampleProcess" name="Example Process" isExecutable="true">
   
     <startEvent id="start"/>
     

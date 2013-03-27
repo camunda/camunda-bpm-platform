@@ -13,6 +13,8 @@ import org.camunda.bpm.cycle.util.IoUtil;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RepositoryService;
+import org.camunda.bpm.engine.impl.util.json.JSONArray;
+import org.camunda.bpm.engine.impl.util.json.JSONObject;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.junit.After;
 import org.junit.Before;
@@ -85,6 +87,12 @@ public class RestIT {
     
     Assert.assertEquals(200, response.getStatus());
     
+    JSONArray enginesJson = response.getEntity(JSONArray.class);
+    Assert.assertEquals(1, enginesJson.length());
+    
+    JSONObject engineJson = enginesJson.getJSONObject(0);
+    Assert.assertEquals("default", engineJson.getString("name"));
+    
     response.close();
     
     // get process definitions for default engine
@@ -93,6 +101,17 @@ public class RestIT {
     response = resource.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
     
     Assert.assertEquals(200, response.getStatus());
+    
+    JSONObject definitionJson = response.getEntity(JSONObject.class);
+    Assert.assertEquals("ExampleProcess", definitionJson.getString("key"));
+    Assert.assertEquals("Examples", definitionJson.getString("category"));
+    Assert.assertEquals("Example Process", definitionJson.getString("name"));
+//    Assert.assertEquals("ExampleProcess", definitionJson.get("description"));
+    Assert.assertEquals(deployment.getId(), definitionJson.getString("deploymentId"));
+    Assert.assertEquals(1, definitionJson.getInt("version"));
+    Assert.assertEquals(deployment.getId(), definitionJson.getString("resource"));
+//    Assert.assertEquals(deployment.getId(), definitionJson.getString("diagram"));
+    Assert.assertFalse(definitionJson.getBoolean("suspended"));
     
     response.close();
   }
