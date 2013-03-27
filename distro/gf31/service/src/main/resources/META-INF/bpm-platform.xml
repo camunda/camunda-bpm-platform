@@ -10,7 +10,7 @@
   <process-engine name="default">
     <job-acquisition>default</job-acquisition>
     <configuration>org.camunda.bpm.engine.impl.cfg.JtaProcessEngineConfiguration</configuration>
-    <datasource>jdbc/FoxEngine</datasource>
+    <datasource>jdbc/ProcessEngine</datasource>
 
     <properties>
       <property name="history">full</property>

@@ -15,19 +15,12 @@ package org.camunda.bpm.container.impl.jmx.services;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
-import org.camunda.bpm.application.AbstractProcessApplication;
-import org.camunda.bpm.application.ProcessApplicationDeploymentInfo;
-import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.application.ProcessApplicationRegistration;
-import org.camunda.bpm.application.ProcessApplicationUnavailableException;
-import org.camunda.bpm.application.impl.ProcessApplicationDeploymentInfoImpl;
 import org.camunda.bpm.application.impl.ProcessApplicationInfoImpl;
 import org.camunda.bpm.application.impl.metadata.spi.ProcessesXml;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanService;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanServiceContainer;
-import org.camunda.bpm.engine.ProcessEngineException;
 
 /**
  * 
@@ -36,14 +29,13 @@ import org.camunda.bpm.engine.ProcessEngineException;
  */
 public class JmxManagedProcessApplication implements MBeanService<JmxManagedProcessApplication>, JmxManagedProcessApplicationMBean {
   
-	protected ProcessApplicationReference processApplicationReference;
+  protected final ProcessApplicationInfoImpl processApplicationInfo;
+
   protected List<ProcessesXml> processesXmls;
   protected Map<String, ProcessApplicationRegistration> deploymentMap;
-  
-  protected ProcessApplicationInfoImpl processApplicationInfo;
 	
-	public JmxManagedProcessApplication(ProcessApplicationReference reference) {
-    this.processApplicationReference = reference;
+	public JmxManagedProcessApplication(ProcessApplicationInfoImpl processApplicationInfo) {
+    this.processApplicationInfo = processApplicationInfo;
 	}
 
 	public String getProcessApplicationName() {
@@ -51,44 +43,9 @@ public class JmxManagedProcessApplication implements MBeanService<JmxManagedProc
 	}
 
 	public void start(MBeanServiceContainer mBeanServiceContainer) {
-	  
-	  // populate process application info	  
-	  processApplicationInfo = new ProcessApplicationInfoImpl();
-
-    // set properties
-    try {
-      // set name
-      AbstractProcessApplication processApplication = processApplicationReference.getProcessApplication();
-      processApplicationInfo.setName(processApplication.getName());	  
-      processApplicationInfo.setProperties(processApplication.getProperties());
-    } catch (ProcessApplicationUnavailableException e) {
-      throw new ProcessEngineException("Exception while starting process application service");
-    }
-	  
-	  // create deployment infos
-	  List<ProcessApplicationDeploymentInfo> deploymentInfoList = new ArrayList<ProcessApplicationDeploymentInfo>();	
-	  if(deploymentMap != null) {
-  	  for (Entry<String, ProcessApplicationRegistration> deployment : deploymentMap.entrySet()) {
-  	    
-        ProcessApplicationDeploymentInfoImpl deploymentInfo = new ProcessApplicationDeploymentInfoImpl();
-        deploymentInfo.setDeploymentId(deployment.getValue().getDeploymentId());
-        deploymentInfo.setDeploymentName(deployment.getKey());
-        deploymentInfo.setProcessEngineName(deployment.getValue().getProcessEngineName());
-        
-        deploymentInfoList.add(deploymentInfo);
-        
-      }
-	  }
-	  
-	  processApplicationInfo.setDeploymentInfo(deploymentInfoList);
-	  
-	  // clear reference
-	  processApplicationReference = null;
-	  
 	}
 
 	public void stop(MBeanServiceContainer mBeanServiceContainer) {	  
-	  processApplicationInfo = null;				
 	}
 
 	public JmxManagedProcessApplication getValue() {

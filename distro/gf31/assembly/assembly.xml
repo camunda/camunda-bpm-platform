@@ -5,10 +5,10 @@
   <id>assemble</id>
   
   <formats>
-    <format>dir</format>
+    <format>tar.gz</format>
   </formats>
 
-  <includeBaseDirectory>true</includeBaseDirectory>
+  <includeBaseDirectory>false</includeBaseDirectory>
 
   <dependencySets>
     <dependencySet>

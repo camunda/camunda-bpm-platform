@@ -18,10 +18,15 @@ import static org.camunda.bpm.container.impl.jmx.deployment.Attachments.PROCESS_
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.camunda.bpm.application.AbstractProcessApplication;
+import org.camunda.bpm.application.ProcessApplicationDeploymentInfo;
 import org.camunda.bpm.application.ProcessApplicationRegistration;
+import org.camunda.bpm.application.impl.ProcessApplicationDeploymentInfoImpl;
+import org.camunda.bpm.application.impl.ProcessApplicationInfoImpl;
 import org.camunda.bpm.application.impl.metadata.spi.ProcessesXml;
 import org.camunda.bpm.container.impl.jmx.JmxRuntimeContainerDelegate.ServiceTypes;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanDeploymentOperation;
@@ -49,13 +54,43 @@ public class StartProcessApplicationServiceStep extends MBeanDeploymentOperation
     final Map<String, ProcessApplicationRegistration> processArchiveDeploymentMap = operationContext.getAttachment(PROCESS_ARCHIVE_DEPLOYMENT_MAP);
     final MBeanServiceContainer serviceContainer = operationContext.getServiceContainer();
     
+    ProcessApplicationInfoImpl processApplicationInfo = createProcessApplicationInfo(processApplication, processArchiveDeploymentMap);
+    
     // create service
-    JmxManagedProcessApplication mbean = new JmxManagedProcessApplication(processApplication.getReference());    
+    JmxManagedProcessApplication mbean = new JmxManagedProcessApplication(processApplicationInfo);    
     mbean.setProcessesXmls(new ArrayList<ProcessesXml>(processesXmls.values()));
     mbean.setDeploymentMap(processArchiveDeploymentMap);
     
     // start service
     serviceContainer.startService(ServiceTypes.PROCESS_APPLICATION, processApplication.getName(), mbean);
+  }
+
+  private ProcessApplicationInfoImpl createProcessApplicationInfo(final AbstractProcessApplication processApplication,
+      final Map<String, ProcessApplicationRegistration> processArchiveDeploymentMap) {
+    // populate process application info    
+    ProcessApplicationInfoImpl processApplicationInfo = new ProcessApplicationInfoImpl();
+
+    processApplicationInfo.setName(processApplication.getName());   
+    processApplicationInfo.setProperties(processApplication.getProperties());
+    
+    // create deployment infos
+    List<ProcessApplicationDeploymentInfo> deploymentInfoList = new ArrayList<ProcessApplicationDeploymentInfo>();  
+    if(processArchiveDeploymentMap != null) {
+      for (Entry<String, ProcessApplicationRegistration> deployment : processArchiveDeploymentMap.entrySet()) {
+        
+        ProcessApplicationDeploymentInfoImpl deploymentInfo = new ProcessApplicationDeploymentInfoImpl();
+        deploymentInfo.setDeploymentId(deployment.getValue().getDeploymentId());
+        deploymentInfo.setDeploymentName(deployment.getKey());
+        deploymentInfo.setProcessEngineName(deployment.getValue().getProcessEngineName());
+        
+        deploymentInfoList.add(deploymentInfo);
+        
+      }
+    }
+    
+    processApplicationInfo.setDeploymentInfo(deploymentInfoList);
+    
+    return processApplicationInfo;
   }
 
 }
