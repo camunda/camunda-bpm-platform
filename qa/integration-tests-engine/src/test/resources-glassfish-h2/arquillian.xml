@@ -10,7 +10,7 @@
 
   <container qualifier="glassfish" default="true">
     <configuration>
-      <property name="glassFishHome">../gf31-runtime/target/glassfish3/</property>
+      <property name="glassFishHome">../gf31-runtime/target/server/glassfish3/</property>
       <property name="adminPort">${glassfish.admin.port}</property>
       <property name="debug">true</property>
       <property name="outputToConsole">true</property>      

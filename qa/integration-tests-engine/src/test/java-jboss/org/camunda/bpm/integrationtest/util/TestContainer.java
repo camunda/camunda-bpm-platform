@@ -17,9 +17,9 @@ public class TestContainer {
     archive.addAsLibraries(DeploymentHelper.getEjbClient());
         
   }
-  
   public static void addContainerSpecificResourcesForNonPa(WebArchive webArchive) {
-    // nothing to do
+    webArchive.addAsManifestResource("jboss-deployment-structure.xml");
+    
   }
   
 }

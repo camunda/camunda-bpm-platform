@@ -180,7 +180,7 @@
               <Dependencies>org.camunda.bpm.camunda-engine</Dependencies>
             </manifestEntries>
           </archive>
-        </configuration>
+        </configuration>        
       </plugin>
       
       <plugin>
