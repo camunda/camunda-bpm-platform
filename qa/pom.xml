@@ -60,6 +60,8 @@
 
     <database.datasource.class.type>javax.sql.DataSource</database.datasource.class.type>
     <database.datasource.class.type.xa>javax.sql.XADataSource</database.datasource.class.type.xa>
+    
+    <h2.server.port>18080</h2.server.port>
   </properties>
   
   <profiles>
@@ -157,7 +159,7 @@
         <database.driver>org.h2.Driver</database.driver>
         <database.datasource.class>org.h2.jdbcx.JdbcDataSource</database.datasource.class>
         <!-- This url has to consistent for the subprojects: {server}-runtime and webapp-integration-tests -->
-        <database.url>jdbc:h2:${project.parent.basedir}/target/h2/camunda-engine;MVCC=TRUE;AUTO_SERVER=TRUE</database.url>
+        <database.url>jdbc:h2:${project.parent.basedir}/target/h2/camunda-engine;MVCC=TRUE;AUTO_SERVER=TRUE;AUTO_SERVER_PORT=${h2.server.port}</database.url>
       </properties>
     </profile>
    
