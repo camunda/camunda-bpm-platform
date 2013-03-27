@@ -149,7 +149,8 @@
         <database.user>sa</database.user>
         <database.password></database.password>
         <database.driver>org.h2.Driver</database.driver>
-        <database.url>jdbc:h2:mem:camunda-engine;MVCC=TRUE</database.url>
+        <!-- This url has to consistent for the subprojects: {server}-runtime and webapp-integration-tests -->
+        <database.url>jdbc:h2:${project.parent.basedir}/target/h2/camunda-engine;MVCC=TRUE;AUTO_SERVER=TRUE</database.url>
       </properties>
     </profile>
    
