@@ -13,9 +13,11 @@ import org.camunda.bpm.cycle.util.IoUtil;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.RepositoryService;
-import org.camunda.bpm.engine.impl.util.json.JSONArray;
-import org.camunda.bpm.engine.impl.util.json.JSONObject;
 import org.camunda.bpm.engine.repository.Deployment;
+import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.codehaus.jettison.json.JSONArray;
+import org.codehaus.jettison.json.JSONException;
+import org.codehaus.jettison.json.JSONObject;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -79,7 +81,7 @@ public class RestIT {
   }
   
   @Test
-  public void testScenario() {
+  public void testScenario() throws JSONException {
     // get list of process engines
     log.info("Checking " + BASE_PATH + ENGINES_PATH);
     WebResource resource = client.resource(BASE_PATH + ENGINES_PATH);
@@ -102,16 +104,26 @@ public class RestIT {
     
     Assert.assertEquals(200, response.getStatus());
     
-    JSONObject definitionJson = response.getEntity(JSONObject.class);
+    JSONArray definitionsJson = response.getEntity(JSONArray.class);
+    Assert.assertEquals(1, definitionsJson.length());
+    
+    JSONObject definitionJson = definitionsJson.getJSONObject(0);
+    
     Assert.assertEquals("ExampleProcess", definitionJson.getString("key"));
     Assert.assertEquals("Examples", definitionJson.getString("category"));
     Assert.assertEquals("Example Process", definitionJson.getString("name"));
-//    Assert.assertEquals("ExampleProcess", definitionJson.get("description"));
+    Assert.assertTrue(definitionJson.isNull("description"));
     Assert.assertEquals(deployment.getId(), definitionJson.getString("deploymentId"));
     Assert.assertEquals(1, definitionJson.getInt("version"));
-    Assert.assertEquals(deployment.getId(), definitionJson.getString("resource"));
-//    Assert.assertEquals(deployment.getId(), definitionJson.getString("diagram"));
+    Assert.assertEquals(SIMPLE_PROCESS_PATH, definitionJson.getString("resource"));
+    Assert.assertTrue(definitionJson.isNull("diagram"));
     Assert.assertFalse(definitionJson.getBoolean("suspended"));
+    
+    ProcessDefinition definition = 
+        processEngine.getRepositoryService().createProcessDefinitionQuery().
+        deploymentId(deployment.getId()).singleResult();
+    
+    Assert.assertEquals(definition.getId(), definitionJson.getString("id"));
     
     response.close();
   }

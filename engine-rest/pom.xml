@@ -195,7 +195,7 @@
                 </goals>
                 <configuration>
                   <descriptors>
-                    <descriptor>assembly.xml</descriptor>
+                    <descriptor>assembly-tomcat.xml</descriptor>
                   </descriptors>
                   <finalName>camunda-engine-rest-${project.version}</finalName>
                   <attach>true</attach>

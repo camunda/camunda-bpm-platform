@@ -107,15 +107,6 @@
       <artifactId>camunda-engine</artifactId>
       <scope>test</scope>
     </dependency>
-    
-    <dependency>
-      <groupId>org.camunda.bpm</groupId>
-      <artifactId>camunda-engine-rest</artifactId>
-      <scope>test</scope>
-      <type>war</type>
-      <version>${project.version}</version>
-    </dependency>
-
   </dependencies>
 
 
@@ -141,6 +132,14 @@
           <type>war</type>
           <scope>test</scope>
         </dependency>
+        
+		    <dependency>
+		      <groupId>org.camunda.bpm</groupId>
+		      <artifactId>camunda-engine-rest</artifactId>
+		      <scope>test</scope>
+		      <type>war</type>
+		      <version>${project.version}</version>
+		    </dependency>
       </dependencies>
 
       <build>
@@ -225,7 +224,14 @@
           <type>war</type>
           <scope>test</scope>
         </dependency>
-
+        
+        <dependency>
+          <groupId>org.camunda.bpm</groupId>
+          <artifactId>camunda-engine-rest</artifactId>
+          <scope>test</scope>
+          <type>war</type>
+          <version>${project.version}</version>
+        </dependency>
       </dependencies>
 
       <build>
@@ -361,6 +367,15 @@
           <type>war</type>
           <scope>test</scope>
         </dependency>
+        
+        <dependency>
+          <groupId>org.camunda.bpm</groupId>
+          <artifactId>camunda-engine-rest</artifactId>
+          <scope>test</scope>
+          <type>war</type>
+          <classifier>tomcat</classifier>
+          <version>${project.version}</version>
+        </dependency>
       </dependencies>
 
       <build> 
@@ -413,6 +428,7 @@
                   <groupId>org.camunda.bpm</groupId>
                   <artifactId>camunda-engine-rest</artifactId>
                   <type>war</type>
+                  <classifier>tomcat</classifier>
                   <properties>
                     <context>engine-rest</context>
                   </properties>
@@ -550,7 +566,7 @@
             <version>1.4</version>
             <executions>
               <execution>
-                <id>database-test-create-schema</id>
+                <id>database-test-config</id>
                 <phase>process-test-classes</phase>
                 <goals>
                   <goal>run</goal>

@@ -12,7 +12,7 @@
   
   <fileSets>
     <fileSet>
-      <directory>src/main/runtime/tomcat</directory>
+      <directory>src/main/runtime/tomcat/webapp</directory>
       <outputDirectory>/</outputDirectory>    
     </fileSet>      
   </fileSets>
