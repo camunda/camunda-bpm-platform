@@ -12,7 +12,7 @@
     <artifactId>camunda-root</artifactId>
     <version>7.0.0-SNAPSHOT</version>
   </parent>
-
+  
   <properties>
     <!-- 
       all maven properties used in QA/CI 
@@ -286,7 +286,7 @@
         <database.url>jdbc:mysql://${database.host}:3306/${database.name}</database.url>
       </properties>
     </profile>
-   	
+           	
   </profiles>
 
 </project>

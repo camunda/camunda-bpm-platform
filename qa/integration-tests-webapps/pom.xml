@@ -59,54 +59,6 @@
       <classifier>core</classifier>
     </dependency>
 
-    <dependency>
-      <groupId>org.camunda.bpm.cycle</groupId>
-      <artifactId>camunda-cycle-sql-scripts</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-
-    <!-- db drivers for maven sql -->
-    <dependency>
-      <groupId>com.h2database</groupId>
-      <artifactId>h2</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>mysql</groupId>
-      <artifactId>mysql-connector-java</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.oracle.jdbc</groupId>
-      <artifactId>ojdbc6</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.oracle.jdbc</groupId>
-      <artifactId>ojdbc14</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.ibm.db2.jcc</groupId>
-      <artifactId>db2jcc4</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.microsoft.sqlserver</groupId>
-      <artifactId>sqljdbc4</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>postgresql</groupId>
-      <artifactId>postgresql</artifactId>
-      <scope>test</scope>
-    </dependency>
-    
-    <dependency>
-      <groupId>org.camunda.bpm</groupId>
-      <artifactId>camunda-engine</artifactId>
-      <scope>test</scope>
-    </dependency>
   </dependencies>
 
 
@@ -443,7 +395,91 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-failsafe-plugin</artifactId>
+          </plugin>   
+          <plugin>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <version>1.4</version>
+            <executions>
+              <execution>
+                <id>database-test-config</id>
+                <phase>process-test-classes</phase>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <configuration>
+                  <target>
+                    <copy file="${basedir}/src/test/resources/activiti.cfg.xml" tofile="target/test-classes/activiti.cfg.xml" overwrite="true">
+                      <filterset>
+                        <filter token="@database.url@" value="${database.url}"/>
+                        <filter token="@database.driver@" value="${database.driver}"/>
+                        <filter token="@database.user@" value="${database.user}"/>
+                        <filter token="@database.password@" value="${database.password}"/>
+                      </filterset>
+                    </copy>
+                  </target>
+                </configuration>
+              </execution>
+            </executions>
           </plugin>
+        </plugins>
+      </build>
+    </profile>
+    
+    <!-- allows dropping all databases -->    
+    <profile>       
+      <id>clean-db</id>
+      <dependencies>          
+        <dependency>
+          <groupId>org.camunda.bpm.cycle</groupId>
+          <artifactId>camunda-cycle-sql-scripts</artifactId>
+          <version>${project.version}</version>
+        </dependency>
+    
+        <!-- db drivers for maven sql -->
+        <dependency>
+          <groupId>com.h2database</groupId>
+          <artifactId>h2</artifactId>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>mysql</groupId>
+          <artifactId>mysql-connector-java</artifactId>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>com.oracle.jdbc</groupId>
+          <artifactId>ojdbc6</artifactId>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>com.oracle.jdbc</groupId>
+          <artifactId>ojdbc14</artifactId>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>com.ibm.db2.jcc</groupId>
+          <artifactId>db2jcc4</artifactId>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>com.microsoft.sqlserver</groupId>
+          <artifactId>sqljdbc4</artifactId>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>postgresql</groupId>
+          <artifactId>postgresql</artifactId>
+          <scope>test</scope>
+        </dependency>
+        
+        <dependency>
+          <groupId>org.camunda.bpm</groupId>
+          <artifactId>camunda-engine</artifactId>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+      <build>
+        <plugins>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-dependency-plugin</artifactId>
@@ -537,32 +573,6 @@
                   </srcFiles>
                   <autocommit>true</autocommit>
                   <onError>continue</onError>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-          
-          <plugin>
-            <artifactId>maven-antrun-plugin</artifactId>
-            <version>1.4</version>
-            <executions>
-              <execution>
-                <id>database-test-config</id>
-                <phase>process-test-classes</phase>
-                <goals>
-                  <goal>run</goal>
-                </goals>
-                <configuration>
-                  <target>
-                    <copy file="${basedir}/src/test/resources/activiti.cfg.xml" tofile="target/test-classes/activiti.cfg.xml" overwrite="true">
-                      <filterset>
-                        <filter token="@database.url@" value="${database.url}"/>
-                        <filter token="@database.driver@" value="${database.driver}"/>
-                        <filter token="@database.user@" value="${database.user}"/>
-                        <filter token="@database.password@" value="${database.password}"/>
-                      </filterset>
-                    </copy>
-                  </target>
                 </configuration>
               </execution>
             </executions>
