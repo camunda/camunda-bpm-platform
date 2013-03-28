@@ -1,11 +1,8 @@
 package org.camunda.bpm.cycle.test;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
-import java.util.logging.Logger;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
@@ -16,77 +13,22 @@ import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
-import org.camunda.bpm.cycle.util.IoUtil;
+import org.camunda.bpm.AbstractWebappIntegrationTest;
 import org.camunda.bpm.cycle.web.dto.UserDTO;
 
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.api.client.config.ClientConfig;
-import com.sun.jersey.api.json.JSONConfiguration;
-import com.sun.jersey.client.apache4.ApacheHttpClient4;
-import com.sun.jersey.client.apache4.config.DefaultApacheHttpClient4Config;
 
 
-public abstract class AbstractCycleIT {
+public abstract class AbstractCycleIT extends AbstractWebappIntegrationTest {
   
-  private final static Logger log = Logger.getLogger(TestCycleRoundtripIT.class.getName());  
-  
-  private static final String HOST_NAME = "localhost";
-  private String httpPort;
-  public String CYCLE_BASE_PATH;
-  
-  public ApacheHttpClient4 client;
-  public DefaultHttpClient defaultHttpClient;
-    
-  public void connectToCycleService() throws Exception {
-    Properties properties = new Properties();
-    
-    InputStream propertiesStream = null;
-    try {
-      propertiesStream = TestCycleRoundtripIT.class.getResourceAsStream("/testconfig.properties");
-      properties.load(propertiesStream);
-      httpPort = (String) properties.get("http.port");
-    } finally {
-      IoUtil.closeSilently(propertiesStream);
-    }
-    
-    CYCLE_BASE_PATH = "http://" + HOST_NAME + ":"+httpPort+"/cycle/";
-    log.info("Connecting to cycle at "+CYCLE_BASE_PATH);
-    
-    ClientConfig clientConfig = new DefaultApacheHttpClient4Config();
-    clientConfig.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
-    client = ApacheHttpClient4.create(clientConfig);
-    
-    defaultHttpClient = (DefaultHttpClient) client.getClientHandler().getHttpClient();
-    
-    // waiting for cycle webapp to become available
-    boolean success = false;
-    for (int i = 0; i <= 30; i++) {
-      try {
-        WebResource webResource = client.resource(CYCLE_BASE_PATH);
-        ClientResponse clientResponse = webResource.get(ClientResponse.class);
-        int status = clientResponse.getStatus();
-        clientResponse.close();
-        if (status == Status.OK.getStatusCode()) {
-          success = true;
-          break;
-        }
-      } catch (Exception e) {
-        // do nothing
-      }
-      
-      Thread.sleep(2000);
-    }
-    
-    if (!success) {      
-      Assert.fail("Could not connect to cycle service at "+CYCLE_BASE_PATH+". Did cycle not deploy correctly? Check application server logs for details.");
-    }
+  protected String getApplicationContextPath() {
+    return "cycle/";
   }
   
   public void login(String username, String password) throws Exception {
-    HttpPost httpPost = new HttpPost(CYCLE_BASE_PATH+"j_security_check");
+    HttpPost httpPost = new HttpPost(APP_BASE_PATH+"j_security_check");
     List<NameValuePair> parameterList = new ArrayList<NameValuePair>();
     parameterList.add(new BasicNameValuePair("j_username", username));
     parameterList.add(new BasicNameValuePair("j_password", password));
@@ -101,7 +43,7 @@ public abstract class AbstractCycleIT {
   
   public void createInitialUserAndLogin() throws Exception {
     // create initial user
-    WebResource webResource = client.resource(CYCLE_BASE_PATH+"app/first-time-setup");
+    WebResource webResource = client.resource(APP_BASE_PATH+"app/first-time-setup");
     String username = "test";
     String password = "test";
 
@@ -121,7 +63,7 @@ public abstract class AbstractCycleIT {
   }
   
   public void deleteAllUsers() throws Exception {
-    WebResource webResource = client.resource(CYCLE_BASE_PATH+"app/secured/resource/user");
+    WebResource webResource = client.resource(APP_BASE_PATH+"app/secured/resource/user");
     ClientResponse response = webResource.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
     List<Map> users = response.getEntity(List.class);
     response.close();
@@ -131,13 +73,13 @@ public abstract class AbstractCycleIT {
   }
 
   public void deleteUser(String userId) {
-    WebResource webResource = client.resource(CYCLE_BASE_PATH+"app/secured/resource/user/"+userId);
+    WebResource webResource = client.resource(APP_BASE_PATH+"app/secured/resource/user/"+userId);
     ClientResponse clientResponse = webResource.delete(ClientResponse.class);
     clientResponse.close();
   }
   
   public void deleteAllRoundtrips() {
-    WebResource webResource = client.resource(CYCLE_BASE_PATH+"app/secured/resource/roundtrip/");
+    WebResource webResource = client.resource(APP_BASE_PATH+"app/secured/resource/roundtrip/");
     ClientResponse response = webResource.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
     List<Map> roundtrips = response.getEntity(List.class);
     response.close();
@@ -147,13 +89,13 @@ public abstract class AbstractCycleIT {
   }
 
   public void deleteRoundtrip(String roundtripId) {
-    WebResource webResource = client.resource(CYCLE_BASE_PATH+"app/secured/resource/roundtrip/"+roundtripId);
+    WebResource webResource = client.resource(APP_BASE_PATH+"app/secured/resource/roundtrip/"+roundtripId);
     ClientResponse clientResponse = webResource.delete(ClientResponse.class);
     clientResponse.close();
   }
   
   public void deleteAllConnectors() {
-    WebResource webResource = client.resource(CYCLE_BASE_PATH+"app/secured/resource/connector/configuration");
+    WebResource webResource = client.resource(APP_BASE_PATH+"app/secured/resource/connector/configuration");
     ClientResponse response = webResource.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
     List<Map> entity = response.getEntity(List.class);
     response.close();
@@ -163,7 +105,7 @@ public abstract class AbstractCycleIT {
   }
 
   public void deleteConnector(String connectorId) {
-    WebResource webResource = client.resource(CYCLE_BASE_PATH+"app/secured/resource/connector/configuration"+connectorId);
+    WebResource webResource = client.resource(APP_BASE_PATH+"app/secured/resource/connector/configuration"+connectorId);
     ClientResponse clientResponse = webResource.delete(ClientResponse.class);
     clientResponse.close();
   }

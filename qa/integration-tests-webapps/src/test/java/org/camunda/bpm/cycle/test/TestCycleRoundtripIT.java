@@ -28,6 +28,7 @@ import org.camunda.bpm.cycle.web.dto.SynchronizationResultDTO;
 import org.camunda.bpm.cycle.web.dto.SynchronizationResultDTO.SynchronizationStatus;
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -105,7 +106,7 @@ public class TestCycleRoundtripIT extends AbstractCycleIT {
   @Before
   public void init() throws Exception {
     initTmpDir();
-    connectToCycleService();
+    connectToWebapp();
     createInitialUserAndLogin();
     createConnector();
     createRoundtripWithDetails();
@@ -113,7 +114,7 @@ public class TestCycleRoundtripIT extends AbstractCycleIT {
 
   @Test
   public void testLeftToRightSynchronisation() throws Exception {
-    WebResource webResource = client.resource(CYCLE_BASE_PATH+"app/secured/resource/roundtrip/"+roundtripDTO.getId()+"/sync?syncMode=LEFT_TO_RIGHT");
+    WebResource webResource = client.resource(APP_BASE_PATH+"app/secured/resource/roundtrip/"+roundtripDTO.getId()+"/sync?syncMode=LEFT_TO_RIGHT");
       
     ClientResponse clientResponse = webResource.accept(MediaType.APPLICATION_JSON).type(MediaType.APPLICATION_JSON).post(ClientResponse.class);
     SynchronizationStatus synchronizationStatus = clientResponse.getEntity(SynchronizationResultDTO.class).getStatus();
@@ -125,7 +126,7 @@ public class TestCycleRoundtripIT extends AbstractCycleIT {
   
   @Test
   public void testRightToLeftSynchronisation() throws Exception {
-    WebResource webResource = client.resource(CYCLE_BASE_PATH+"app/secured/resource/roundtrip/"+roundtripDTO.getId()+"/sync?syncMode=RIGHT_TO_LEFT");
+    WebResource webResource = client.resource(APP_BASE_PATH+"app/secured/resource/roundtrip/"+roundtripDTO.getId()+"/sync?syncMode=RIGHT_TO_LEFT");
       
     ClientResponse clientResponse = webResource.accept(MediaType.APPLICATION_JSON).type(MediaType.APPLICATION_JSON).post(ClientResponse.class);
     SynchronizationStatus synchronizationStatus = clientResponse.getEntity(SynchronizationResultDTO.class).getStatus();
@@ -153,7 +154,7 @@ public class TestCycleRoundtripIT extends AbstractCycleIT {
   // *********************************** private methods *************************************//
     
   private void createConnector() {
-    WebResource webResource = client.resource(CYCLE_BASE_PATH+"app/secured/resource/connector/configuration");
+    WebResource webResource = client.resource(APP_BASE_PATH+"app/secured/resource/connector/configuration");
     
     ConnectorConfigurationDTO connectorConfigurationDTO = ConnectorConfigurationDTO.wrap(connectorConfiguration);
     connectorConfigurationDTO.setPassword(connectorConfiguration.getGlobalPassword());
@@ -180,7 +181,7 @@ public class TestCycleRoundtripIT extends AbstractCycleIT {
   }
   
   private void createRoundtripWithDetails() throws Exception {
-    WebResource webResource = client.resource(CYCLE_BASE_PATH+"app/secured/resource/roundtrip");
+    WebResource webResource = client.resource(APP_BASE_PATH+"app/secured/resource/roundtrip");
 
     // create roundtrip
     roundtripDTO = new RoundtripDTO();
@@ -194,7 +195,7 @@ public class TestCycleRoundtripIT extends AbstractCycleIT {
     Assert.assertEquals(Status.OK.getStatusCode(), status);
 
     // update roundtrip details LHS
-    webResource = client.resource(CYCLE_BASE_PATH+"app/secured/resource/roundtrip/"+roundtripDTO.getId()+"/details");
+    webResource = client.resource(APP_BASE_PATH+"app/secured/resource/roundtrip/"+roundtripDTO.getId()+"/details");
     
     BpmnDiagramDTO leftHandSide = new BpmnDiagramDTO();
     leftHandSide.setModeler("lhs-modeler");
