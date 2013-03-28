@@ -162,7 +162,7 @@
                 </goals>
                 <configuration>
                   <sources>
-                    <source>src/test/java-glassfish</source>
+                    <source>src/test/java-jboss</source>
                   </sources>
                 </configuration>
               </execution>
