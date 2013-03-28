@@ -182,6 +182,7 @@
                   <groupId>org.camunda.bpm.cycle</groupId>
                   <artifactId>camunda-cycle-jboss</artifactId>
                   <type>war</type>
+                  <pingURL>http://localhost:${jboss.http.port}/cycle</pingURL>
                   <properties>
                     <context>cycle</context>
                   </properties>
@@ -190,6 +191,7 @@
                   <groupId>org.camunda.bpm</groupId>
                   <artifactId>camunda-engine-rest</artifactId>
                   <type>war</type>
+                  <pingURL>http://localhost:${jboss.http.port}/engine-rest/engine/default/process-definition</pingURL>
                   <properties>
                     <context>engine-rest</context>
                   </properties>
@@ -299,6 +301,7 @@
                   <groupId>org.camunda.bpm.cycle</groupId>
                   <artifactId>camunda-cycle-glassfish</artifactId>
                   <type>war</type>
+                  <pingURL>http://localhost:${glassfish.http.port}/cycle</pingURL>
                   <properties>
                     <context>cycle</context>
                   </properties>
@@ -307,6 +310,7 @@
                   <groupId>org.camunda.bpm</groupId>
                   <artifactId>camunda-engine-rest</artifactId>
                   <type>war</type>
+                  <pingURL>http://localhost:${glassfish.http.port}/engine-rest/engine/default/process-definition</pingURL>
                   <properties>
                     <context>engine-rest</context>
                   </properties>
@@ -393,6 +397,7 @@
                   <groupId>org.camunda.bpm.cycle</groupId>
                   <artifactId>camunda-cycle-tomcat</artifactId>
                   <type>war</type>
+                  <pingURL>http://localhost:${tomcat6.connector.http.port}/cycle</pingURL>
                   <properties>
                     <context>cycle</context>
                   </properties>
@@ -402,6 +407,7 @@
                   <artifactId>camunda-engine-rest</artifactId>
                   <type>war</type>
                   <classifier>tomcat</classifier>
+                  <pingURL>http://localhost:${tomcat6.connector.http.port}/engine-rest/engine/default/process-definition</pingURL>
                   <properties>
                     <context>engine-rest</context>
                   </properties>
