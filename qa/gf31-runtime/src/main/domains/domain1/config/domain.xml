@@ -50,7 +50,6 @@
           name="ProcessEnginePool">
       <property name="Url" value="${database.url}"></property>
       <property name="serverName" value="${database.host}"></property>
-      <property name="port" value="${database.port}"></property>
       <property name="User" value="${database.user}"></property>
       <property name="Password" value="${database.password}"></property>
       <property name="driverType" value="4"></property>
@@ -62,7 +61,6 @@
           name="CamundaCyclePool">
       <property name="serverName" value="${database.host}"></property>
       <property name="Url" value="${database.url}"></property>
-      <property name="port" value="${database.port}"></property>
       <property name="User" value="${database.user}"></property>
       <property name="Password" value="${database.password}"></property>
       <property name="driverType" value="4"></property>
