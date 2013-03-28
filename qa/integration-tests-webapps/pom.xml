@@ -453,7 +453,13 @@
                     <artifactItem>
                       <groupId>org.camunda.bpm.cycle</groupId>
                       <artifactId>camunda-cycle-sql-scripts</artifactId>
-                      <outputDirectory>${project.build.directory}/sql-scripts</outputDirectory>
+                      <outputDirectory>${project.build.directory}/sql-scripts/cycle</outputDirectory>
+                      <overWrite>true</overWrite>
+                    </artifactItem>
+                    <artifactItem>
+                      <groupId>org.camunda.bpm</groupId>
+                      <artifactId>camunda-engine</artifactId>                      
+                      <outputDirectory>${project.build.directory}/sql-scripts/engine</outputDirectory>
                       <overWrite>true</overWrite>
                     </artifactItem>
                   </artifactItems>
@@ -511,14 +517,17 @@
             <executions>
               <execution>
                 <id>drop-db-if-present</id>
-                <phase>post-integration-test</phase>
+                <phase>generate-test-sources</phase>
                 <goals>
                   <goal>execute</goal>
                 </goals>
                 <configuration>
                   <srcFiles>
-                    <!-- try dropping the DB -->
-                    <srcFile>${project.build.directory}/sql-scripts/sql/drop/${database.type}_cycle_${project.version}.sql</srcFile>
+                    <!-- try dropping the DB if it exists. -->
+                    <srcFile>${project.build.directory}/sql-scripts/cycle/sql/drop/${database.type}_cycle_${project.version}.sql</srcFile>
+                    <srcFile>${project.build.directory}/sql-scripts/engine/org/camunda/bpm/engine/db/drop/activiti.${database.type}.drop.engine.sql</srcFile>
+                    <srcFile>${project.build.directory}/sql-scripts/engine/org/camunda/bpm/engine/db/drop/activiti.${database.type}.drop.identity.sql</srcFile>
+                    <srcFile>${project.build.directory}/sql-scripts/engine/org/camunda/bpm/engine/db/drop/activiti.${database.type}.drop.history.sql</srcFile>
                   </srcFiles>
                   <autocommit>true</autocommit>
                   <onError>continue</onError>
