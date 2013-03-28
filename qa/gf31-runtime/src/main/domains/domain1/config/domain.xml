@@ -49,6 +49,7 @@
           res-type="${database.datasource.class.type}" non-transactional-connections="true" 
           name="ProcessEnginePool">
       <property name="Url" value="${database.url}"></property>
+      <property name="serverName" value="{$database.host}"></property>
       <property name="User" value="${database.user}"></property>
       <property name="Password" value="${database.password}"></property>
       <property name="driverType" value="4"></property>
@@ -58,6 +59,7 @@
           datasource-classname="${database.datasource.class}" 
           res-type="${database.datasource.class.type}" non-transactional-connections="true" 
           name="CamundaCyclePool">
+      <property name="serverName" value="{$database.host}"></property>
       <property name="Url" value="${database.url}"></property>
       <property name="User" value="${database.user}"></property>
       <property name="Password" value="${database.password}"></property>
