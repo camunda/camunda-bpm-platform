@@ -44,7 +44,7 @@
       <property name="connectionAttributes" value=";create=true"></property>
     </jdbc-connection-pool> 
     <jdbc-connection-pool 
-          is-isolation-level-guaranteed="false" 
+          is-isolation-level-guaranteed="false" driver-type="4"
           datasource-classname="${database.datasource.class}" 
           res-type="${database.datasource.class.type}" non-transactional-connections="true" 
           name="ProcessEnginePool">
@@ -53,7 +53,7 @@
       <property name="Password" value="${database.password}"></property>
     </jdbc-connection-pool>
     <jdbc-connection-pool 
-          is-isolation-level-guaranteed="false" 
+          is-isolation-level-guaranteed="false" driver-type="4"
           datasource-classname="${database.datasource.class}" 
           res-type="${database.datasource.class.type}" non-transactional-connections="true" 
           name="CamundaCyclePool">
