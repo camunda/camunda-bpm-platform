@@ -28,7 +28,6 @@ import org.camunda.bpm.cycle.web.dto.SynchronizationResultDTO;
 import org.camunda.bpm.cycle.web.dto.SynchronizationResultDTO.SynchronizationStatus;
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
@@ -106,7 +105,6 @@ public class TestCycleRoundtripIT extends AbstractCycleIT {
   @Before
   public void init() throws Exception {
     initTmpDir();
-    connectToWebapp();
     createInitialUserAndLogin();
     createConnector();
     createRoundtripWithDetails();

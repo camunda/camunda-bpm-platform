@@ -16,17 +16,12 @@ import java.io.InputStream;
 import java.util.Properties;
 import java.util.logging.Logger;
 
-import javax.ws.rs.core.Response.Status;
-
-import junit.framework.Assert;
-
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.camunda.bpm.cycle.test.TestCycleRoundtripIT;
 import org.camunda.bpm.cycle.util.IoUtil;
+import org.junit.After;
 import org.junit.Before;
 
-import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.api.client.config.ClientConfig;
 import com.sun.jersey.api.json.JSONConfiguration;
 import com.sun.jersey.client.apache4.ApacheHttpClient4;
@@ -54,7 +49,7 @@ public abstract class AbstractWebappIntegrationTest {
   public DefaultHttpClient defaultHttpClient;
     
   @Before
-  public void connectToWebapp() throws Exception {
+  public void createClient() throws Exception {
     Properties properties = new Properties();
     
     InputStream propertiesStream = null;
@@ -74,31 +69,13 @@ public abstract class AbstractWebappIntegrationTest {
     clientConfig.getFeatures().put(JSONConfiguration.FEATURE_POJO_MAPPING, Boolean.TRUE);
     client = ApacheHttpClient4.create(clientConfig);
     
-    defaultHttpClient = (DefaultHttpClient) client.getClientHandler().getHttpClient();
+    defaultHttpClient = (DefaultHttpClient) client.getClientHandler().getHttpClient();  
     
-    // waiting for webapp to become available
-    boolean success = false;
-    for (int i = 0; i <= 30; i++) {
-      try {
-        WebResource webResource = client.resource(APP_BASE_PATH + getApplicationAvailablePing());
-        ClientResponse clientResponse = webResource.get(ClientResponse.class);
-        int status = clientResponse.getStatus();
-        clientResponse.close();
-        if (status == Status.OK.getStatusCode()) {
-          success = true;
-          break;
-        }
-      } catch (Exception e) {
-        // do nothing
-      }
-      
-      Thread.sleep(2000);
-    }
-    
-    if (!success) {      
-      Assert.fail("Could not connect to application at "+APP_BASE_PATH+". Probably the application did not deploy correctly." +
-      		" Check application server logs for details.");
-    }
+  }
+  
+  @After
+  public void destroyClient() {
+    client.destroy();
   }
 
   /** 
@@ -107,13 +84,5 @@ public abstract class AbstractWebappIntegrationTest {
    * <p>Example: <code>cycle/</code></p>
    */ 
   protected abstract String getApplicationContextPath();
-  
-  /**
-   * <p>return the name of the resource we can ping to determine whether application is available.</p>
-   * 
-   */
-  protected String getApplicationAvailablePing() {
-    return "";
-  }
 
 }

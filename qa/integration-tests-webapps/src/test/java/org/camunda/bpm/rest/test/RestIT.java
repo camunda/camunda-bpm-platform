@@ -40,11 +40,7 @@ public class RestIT extends AbstractWebappIntegrationTest {
   protected String getApplicationContextPath() {
     return "engine-rest/";
   }
-  
-  protected String getApplicationAvailablePing() {
-    return "engine";
-  }
-  
+    
   @Before
   public void setup() throws IOException {
     createProcessEngine();
