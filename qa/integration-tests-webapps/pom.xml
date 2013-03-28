@@ -58,6 +58,12 @@
       <scope>test</scope>
       <classifier>core</classifier>
     </dependency>
+    
+    <dependency>
+      <groupId>org.camunda.bpm</groupId>
+      <artifactId>camunda-engine</artifactId>
+      <scope>test</scope>
+    </dependency>
 
   </dependencies>
 
@@ -469,12 +475,6 @@
         <dependency>
           <groupId>postgresql</groupId>
           <artifactId>postgresql</artifactId>
-          <scope>test</scope>
-        </dependency>
-        
-        <dependency>
-          <groupId>org.camunda.bpm</groupId>
-          <artifactId>camunda-engine</artifactId>
           <scope>test</scope>
         </dependency>
       </dependencies>
