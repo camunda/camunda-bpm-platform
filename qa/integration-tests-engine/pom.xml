@@ -327,6 +327,7 @@
                 <!-- not supported by arquillian connector -->
                 <excludes>**/TestWarDeploymentWithBrokenBpmnXml.java</excludes>
                 <excludes>**/TestDeploymentWithDroolsTaskFails.java</excludes>
+                <exclude>**/TestProcessEnginesXmlFails.java</exclude>
                 <exclude>**_JBOSS.java</exclude>
                 <exclude>**/jar/**</exclude>
               </excludes>
