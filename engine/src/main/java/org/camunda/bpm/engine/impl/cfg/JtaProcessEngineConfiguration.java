@@ -44,6 +44,10 @@ public class JtaProcessEngineConfiguration extends ProcessEngineConfigurationImp
   /** {@link CommandContextFactory} to be used for DbSchemaOperations */
   protected CommandContextFactory dbSchemaOperationsCommandContextFactory;
   
+  public JtaProcessEngineConfiguration() {
+    transactionsExternallyManaged = true;
+  }
+  
   protected void init() {
     initTransactionManager();
     initDbSchemaOperationsCommandContextFactory();
