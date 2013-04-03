@@ -53,6 +53,8 @@
       <property name="User" value="${database.user}"></property>
       <property name="Password" value="${database.password}"></property>
       <property name="driverType" value="4"></property>
+      <property name="databaseName" value="${database.name}"></property>
+      <property name="portNumber" value="${database.port}"></property>
     </jdbc-connection-pool>
     <jdbc-connection-pool 
           is-isolation-level-guaranteed="false"
@@ -64,6 +66,8 @@
       <property name="User" value="${database.user}"></property>
       <property name="Password" value="${database.password}"></property>
       <property name="driverType" value="4"></property>
+      <property name="databaseName" value="${database.name}"></property>
+      <property name="portNumber" value="${database.port}"></property>
     </jdbc-connection-pool>
     <resource-adapter-config
       enabled="true" 
