@@ -58,6 +58,13 @@
       <scope>test</scope>
       <classifier>core</classifier>
     </dependency>
+    <dependency>
+      <groupId>org.camunda.bpm.cycle</groupId>
+      <artifactId>camunda-cycle</artifactId>
+      <version>${project.version}</version>
+      <type>test-jar</type>
+      <scope>test</scope>
+    </dependency>
     
     <dependency>
       <groupId>org.camunda.bpm</groupId>
@@ -131,6 +138,7 @@
               <configuration>
                 <type>standalone</type>
                 <home>${project.build.directory}/config-jboss</home>
+                
                 <properties>
                   <cargo.servlet.port>${jboss.http.port}</cargo.servlet.port>
                 </properties>

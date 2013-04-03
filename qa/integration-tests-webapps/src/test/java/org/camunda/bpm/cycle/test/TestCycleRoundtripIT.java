@@ -1,6 +1,7 @@
 package org.camunda.bpm.cycle.test;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
@@ -17,6 +18,7 @@ import org.camunda.bpm.cycle.connector.ConnectorNode;
 import org.camunda.bpm.cycle.connector.ConnectorNodeType;
 import org.camunda.bpm.cycle.connector.signavio.SignavioConnector;
 import org.camunda.bpm.cycle.connector.svn.SvnConnector;
+import org.camunda.bpm.cycle.connector.test.util.RepositoryUtil;
 import org.camunda.bpm.cycle.connector.vfs.VfsConnector;
 import org.camunda.bpm.cycle.entity.ConnectorConfiguration;
 import org.camunda.bpm.cycle.util.IoUtil;
@@ -32,6 +34,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
+import org.tmatesoft.svn.core.SVNException;
 
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
@@ -48,9 +51,7 @@ public class TestCycleRoundtripIT extends AbstractCycleIT {
   private static final String SIGNAVIO_GLOBAL_PWD = "testtest";
   
   // svn connector configuration
-  private static final String SVN_REPOSITORY_PATH = "https://svn.camunda.com/sandbox2";
-  private static final String SVN_GLOBAL_USER = "hudson-test";
-  private static final String SVN_GLOBAL_PWD = "2KamD3Lo";
+  private static final File SVN_DIRECTORY = new File("target/svn-repository");
   
   private static final String LHS_PROCESS_DIAGRAM = "/org/camunda/bpm/cycle/roundtrip/repository/test-lhs.bpmn";
   private static final String RHS_PROCESS_DIAGRAM = "/org/camunda/bpm/cycle/roundtrip/repository/test-rhs.bpmn";
@@ -69,7 +70,7 @@ public class TestCycleRoundtripIT extends AbstractCycleIT {
   }
   
   @Parameters
-  public static List<Object[]> data() {
+  public static List<Object[]> data() throws IOException, SVNException {
     ConnectorConfiguration vfsConnectorConfiguration = new ConnectorConfiguration();
     vfsConnectorConfiguration.setConnectorName("FileSystemConnector");
     vfsConnectorConfiguration.setName("FileSystemConnector");
@@ -89,10 +90,8 @@ public class TestCycleRoundtripIT extends AbstractCycleIT {
     ConnectorConfiguration svnConnectorConfiguration = new ConnectorConfiguration();
     svnConnectorConfiguration.setConnectorName("SvnConnector");
     svnConnectorConfiguration.setName("SvnConnector");
-    svnConnectorConfiguration.setLoginMode(ConnectorLoginMode.GLOBAL);
-    svnConnectorConfiguration.setGlobalUser(SVN_GLOBAL_USER);
-    svnConnectorConfiguration.setGlobalPassword(SVN_GLOBAL_PWD);
-    svnConnectorConfiguration.getProperties().put(SvnConnector.CONFIG_KEY_REPOSITORY_PATH, SVN_REPOSITORY_PATH);
+    svnConnectorConfiguration.setLoginMode(ConnectorLoginMode.LOGIN_NOT_REQUIRED);
+    svnConnectorConfiguration.getProperties().put(SvnConnector.CONFIG_KEY_REPOSITORY_PATH, RepositoryUtil.createSVNRepository(SVN_DIRECTORY));
     svnConnectorConfiguration.setConnectorClass(SvnConnector.class.getName());
     
     return Arrays.asList(new Object[][] {
