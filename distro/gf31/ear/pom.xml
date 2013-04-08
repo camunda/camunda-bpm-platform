@@ -18,7 +18,7 @@
         <configuration>
           <version>6</version>
           <defaultLibBundleDir>lib</defaultLibBundleDir>
-          <applicationName>camunda-camunda</applicationName>          
+          <applicationName>camunda-bpm-platform</applicationName>          
         </configuration>
       </plugin>      
     </plugins>

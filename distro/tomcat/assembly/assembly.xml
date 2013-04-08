@@ -5,7 +5,7 @@
   <id>assemble</id>
     
   <formats>
-    <format>dir</format>
+    <format>tar.gz</format>
   </formats>
 
   <includeBaseDirectory>false</includeBaseDirectory>

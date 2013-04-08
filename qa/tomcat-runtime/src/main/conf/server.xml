@@ -19,7 +19,7 @@
      define subcomponents such as "Valves" at this level.
      Documentation at /docs/config/server.html
  -->
-<Server port="8005" shutdown="SHUTDOWN">
+<Server port="${tomcat6.server.port}" shutdown="SHUTDOWN">
   <!-- Security listener. Documentation at /docs/config/listeners.html
   <Listener className="org.apache.catalina.security.SecurityListener" />
   -->
@@ -54,10 +54,22 @@
               type="javax.sql.DataSource" 
               factory="org.apache.tomcat.jdbc.pool.DataSourceFactory"
               uniqueResourceName="process-engine"
-              driverClassName="org.h2.Driver" 
-              url="jdbc:h2:mem:camunda-engine;MVCC=TRUE;TRACE_LEVEL_FILE=0"
-              username="sa"  
-              password=""  
+              driverClassName="${database.driver}" 
+              url="${database.url}"
+              username="${database.user}"  
+              password="${database.password}"  
+              maxPoolSize="20"  
+              minPoolSize="5" />
+              
+    <Resource name="jdbc/CycleDS"
+              auth="Container"
+              type="javax.sql.DataSource" 
+              factory="org.apache.tomcat.jdbc.pool.DataSourceFactory"
+              uniqueResourceName="cycle-datasource"
+              driverClassName="${database.driver}" 
+              url="${database.url}"
+              username="${database.user}"  
+              password="${database.password}"  
               maxPoolSize="20"  
               minPoolSize="5" />
               

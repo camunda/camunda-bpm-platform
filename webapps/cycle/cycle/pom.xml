@@ -213,7 +213,6 @@
     <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
-      <version>${version.h2}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
@@ -244,7 +243,6 @@
     <dependency>
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine</artifactId>
-      <version>${project.version}</version>
       <scope>test</scope>
       <exclusions>
         <exclusion>
@@ -275,7 +273,6 @@
     <dependency>
       <groupId>org.subethamail</groupId>
       <artifactId>subethasmtp-wiser</artifactId>
-      <version>1.2</version>
       <scope>test</scope>
     </dependency>
 
@@ -335,6 +332,19 @@
                 <exclude>**/org/camunda/bpm/cycle/web/jaxrs/**</exclude>
                 <exclude>**/org/camunda/bpm/cycle/web/service/**</exclude>
               </excludes>
+            </configuration>
+          </execution>
+          <execution>
+            <id>create-test-jar</id>
+            <goals>
+              <goal>test-jar</goal>
+            </goals>
+            <phase>package</phase>
+            <configuration>
+              <classifier>test</classifier>
+              <includes>
+                <include>**/org/camunda/bpm/cycle/connector/test/util/RepositoryUtil.*</include>
+              </includes>
             </configuration>
           </execution>
         </executions>

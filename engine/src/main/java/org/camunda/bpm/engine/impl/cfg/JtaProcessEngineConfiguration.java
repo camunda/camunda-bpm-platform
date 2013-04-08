@@ -17,13 +17,19 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import javax.transaction.TransactionManager;
 
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.cfg.jta.JtaTransactionContextFactory;
+import org.camunda.bpm.engine.impl.cfg.standalone.StandaloneMybatisTransactionContextFactory;
+import org.camunda.bpm.engine.impl.interceptor.CommandContextFactory;
 import org.camunda.bpm.engine.impl.interceptor.CommandContextInterceptor;
 import org.camunda.bpm.engine.impl.interceptor.CommandInterceptor;
 import org.camunda.bpm.engine.impl.interceptor.JtaTransactionInterceptor;
 import org.camunda.bpm.engine.impl.interceptor.LogInterceptor;
+import org.camunda.bpm.engine.impl.interceptor.TxContextCommandContextFactory;
 
 
 /**
@@ -33,6 +39,21 @@ public class JtaProcessEngineConfiguration extends ProcessEngineConfigurationImp
 
   protected TransactionManager transactionManager;
   
+  protected String transactionManagerJndiName;
+  
+  /** {@link CommandContextFactory} to be used for DbSchemaOperations */
+  protected CommandContextFactory dbSchemaOperationsCommandContextFactory;
+  
+  public JtaProcessEngineConfiguration() {
+    transactionsExternallyManaged = true;
+  }
+  
+  protected void init() {
+    initTransactionManager();
+    initDbSchemaOperationsCommandContextFactory();
+    super.init();
+  }
+
   @Override
   protected Collection< ? extends CommandInterceptor> getDefaultCommandInterceptorsTxRequired() {
     List<CommandInterceptor> defaultCommandInterceptorsTxRequired = new ArrayList<CommandInterceptor>();
@@ -50,6 +71,46 @@ public class JtaProcessEngineConfiguration extends ProcessEngineConfigurationImp
     defaultCommandInterceptorsTxRequiresNew.add(new CommandContextInterceptor(commandContextFactory, this));
     return defaultCommandInterceptorsTxRequiresNew;
   }
+
+  /**
+   * provide custom command executor that uses NON-JTA transactions
+   */
+  @Override
+  protected void initCommandExecutorDbSchemaOperations() {
+    if(commandExecutorSchemaOperations == null) {
+      List<CommandInterceptor> commandInterceptorsDbSchemaOperations = new ArrayList<CommandInterceptor>();
+      commandInterceptorsDbSchemaOperations.add(new LogInterceptor());
+      commandInterceptorsDbSchemaOperations.add(new CommandContextInterceptor(dbSchemaOperationsCommandContextFactory, this));
+      commandInterceptorsDbSchemaOperations.add(actualCommandExecutor);
+      commandExecutorSchemaOperations = initInterceptorChain(commandInterceptorsDbSchemaOperations);
+    }
+  }
+
+  protected void initDbSchemaOperationsCommandContextFactory() {
+    if(dbSchemaOperationsCommandContextFactory == null) {
+      TxContextCommandContextFactory cmdContextFactory = new TxContextCommandContextFactory();
+      cmdContextFactory.setProcessEngineConfiguration(this);
+      cmdContextFactory.setTransactionContextFactory(new StandaloneMybatisTransactionContextFactory());
+      dbSchemaOperationsCommandContextFactory = cmdContextFactory;
+    }
+  }
+    
+  protected void initTransactionManager() {
+    if(transactionManager == null){
+      
+      if(transactionManagerJndiName == null || transactionManagerJndiName.length() == 0) {
+        throw new ProcessEngineException("Property 'transactionManager' is null and 'transactionManagerJndiName' is not set. \n " +
+        		"Please set either the 'transactionManager' property or the 'transactionManagerJndiName' property.");
+      }
+      
+      try {
+        transactionManager = (TransactionManager) new InitialContext().lookup(transactionManagerJndiName);        
+        
+      } catch(NamingException e) {
+        throw new ProcessEngineException("Cannot lookup Jta TransactionManager in JNDI using name '"+transactionManagerJndiName+"'.", e);        
+      }
+    }    
+  }
   
   @Override
   protected void initTransactionContextFactory() {
@@ -64,5 +125,21 @@ public class JtaProcessEngineConfiguration extends ProcessEngineConfigurationImp
 
   public void setTransactionManager(TransactionManager transactionManager) {
     this.transactionManager = transactionManager;
+  }
+  
+  public String getTransactionManagerJndiName() {
+    return transactionManagerJndiName;
+  }
+  
+  public void setTransactionManagerJndiName(String transactionManagerJndiName) {
+    this.transactionManagerJndiName = transactionManagerJndiName;
+  }
+  
+  public CommandContextFactory getDbSchemaOperationsCommandContextFactory() {
+    return dbSchemaOperationsCommandContextFactory;
+  }
+  
+  public void setDbSchemaOperationsCommandContextFactory(CommandContextFactory dbSchemaOperationsCommandContextFactory) {
+    this.dbSchemaOperationsCommandContextFactory = dbSchemaOperationsCommandContextFactory;
   }
 }

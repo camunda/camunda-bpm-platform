@@ -40,7 +40,7 @@ import org.camunda.bpm.application.ProcessApplication;
 @HandlesTypes(ProcessApplication.class)
 public class ServletProcessApplicationDeployer implements ServletContainerInitializer {
   
-  private final static Logger LOGGER = Logger.getLogger(ServletProcessApplication.class.getName());
+  private final static Logger LOGGER = Logger.getLogger(ServletProcessApplicationDeployer.class.getName());
   
   public void onStartup(Set<Class<?>> c, ServletContext ctx) throws ServletException {    
     if(c == null || c.isEmpty()) {

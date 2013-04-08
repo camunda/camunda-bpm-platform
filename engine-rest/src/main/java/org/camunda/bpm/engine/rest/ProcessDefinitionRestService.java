@@ -30,18 +30,19 @@ import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.StatisticsResultDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDiagramDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDto;
-import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionQueryDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.runtime.StartProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.task.FormDto;
 
-@Path("/process-definition")
+@Path(ProcessDefinitionRestService.PATH)
 @Produces(MediaType.APPLICATION_JSON)
 public interface ProcessDefinitionRestService {
 
   public static final String APPLICATION_BPMN20_XML = "application/bpmn20+xml";
   public static final MediaType APPLICATION_BPMN20_XML_TYPE =
       new MediaType("application", "bpmn20+xml");
+  
+  public static final String PATH = "/process-definition";
 
   /**
    * Exposes the {@link ProcessDefinitionQuery} interface as a REST service.
@@ -51,13 +52,12 @@ public interface ProcessDefinitionRestService {
    * @return
    */
 	@GET
-	@Path("/")
-	List<ProcessDefinitionDto> getProcessDefinitions(ProcessDefinitionQueryDto query,
+	List<ProcessDefinitionDto> getProcessDefinitions(@Context UriInfo uriInfo,
 	    @QueryParam("firstResult") Integer firstResult, @QueryParam("maxResults") Integer maxResults);
 
 	@GET
   @Path("/count")
-  CountResultDto getProcessDefinitionsCount(ProcessDefinitionQueryDto query);
+  CountResultDto getProcessDefinitionsCount(@Context UriInfo uriInfo);
 
 	@GET
 	@Path("/{id}")

@@ -69,7 +69,7 @@ public abstract class AbstractProcessApplication {
   /**
    * <p>Deploy this process application from the runtime container.</p>
    * 
-   * <p>If your application needs to ne notified of the undeployment, 
+   * <p>If your application needs to be notified of the undeployment, 
    * add a {@literal @}{@link PreUndeploy} method to your subclass.</p>
    */
   public final void undeploy() {

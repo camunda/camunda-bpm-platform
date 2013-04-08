@@ -21,7 +21,6 @@ import org.camunda.bpm.engine.rest.exception.ExceptionHandler;
 import org.camunda.bpm.engine.rest.impl.ProcessDefinitionRestServiceImpl;
 import org.camunda.bpm.engine.rest.impl.ProcessInstanceRestServiceImpl;
 import org.camunda.bpm.engine.rest.impl.TaskRestServiceImpl;
-import org.camunda.bpm.engine.rest.mapper.EngineQueryDtoGetReader;
 import org.camunda.bpm.engine.rest.mapper.JacksonConfigurator;
 import org.codehaus.jackson.jaxrs.JacksonJsonProvider;
 
@@ -35,7 +34,6 @@ public class EngineApiApplication extends Application {
     classes.add(ProcessInstanceRestServiceImpl.class);
     classes.add(TaskRestServiceImpl.class);
 
-    classes.add(EngineQueryDtoGetReader.class);
     classes.add(JacksonConfigurator.class);
     classes.add(JacksonJsonProvider.class);
     classes.add(ExceptionHandler.class);

@@ -92,9 +92,7 @@
               <descriptors>
                 <descriptor>assembly.xml</descriptor>
               </descriptors>
-              <!-- do not attach to the build -->
-              <finalName>assembly</finalName>
-              <attach>false</attach>
+              <attach>true</attach>
               <appendAssemblyId>false</appendAssemblyId>
               <outputDirectory>target/</outputDirectory>
               <workDirectory>target/assembly/work</workDirectory>

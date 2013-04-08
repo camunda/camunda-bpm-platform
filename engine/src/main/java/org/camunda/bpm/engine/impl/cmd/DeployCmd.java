@@ -65,13 +65,20 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
   }
 
   protected boolean deploymentsDiffer(DeploymentEntity deployment, DeploymentEntity saved) {
+    
+    if(deployment.getResources() == null || saved.getResources() == null) {
+      return true;
+    }
+    
     Map<String, ResourceEntity> resources = deployment.getResources();
     Map<String, ResourceEntity> savedResources = saved.getResources();
     
     for (String resourceName: resources.keySet()) {
       ResourceEntity savedResource = savedResources.get(resourceName);
       
-      if(savedResource == null) return true;
+      if(savedResource == null) {
+        return true;
+      }
       
       if(!savedResource.isGenerated()) {
         ResourceEntity resource = resources.get(resourceName);

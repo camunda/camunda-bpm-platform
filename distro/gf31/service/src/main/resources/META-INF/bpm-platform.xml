@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<bpm-platform xmlns="http://www.camunda.org/schema/1.0/BpmPlatform"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.camunda.org/schema/1.0/BpmPlatform http://www.camunda.org/schema/1.0/BpmPlatform ">
+
+  <job-executor>
+    <job-acquisition name="default" />
+  </job-executor>
+
+  <process-engine name="default">
+    <job-acquisition>default</job-acquisition>
+    <configuration>org.camunda.bpm.engine.impl.cfg.JtaProcessEngineConfiguration</configuration>
+    <datasource>jdbc/ProcessEngine</datasource>
+
+    <properties>
+      <property name="history">full</property>
+      <property name="databaseSchemaUpdate">true</property>
+      <property name="transactionManagerJndiName">java:appserver/TransactionManager</property>
+    </properties>
+
+  </process-engine>
+
+</bpm-platform>

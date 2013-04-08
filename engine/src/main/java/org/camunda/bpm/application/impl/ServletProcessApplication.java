@@ -41,7 +41,7 @@ public class ServletProcessApplication extends AbstractProcessApplication implem
 
 
   protected String autodetectProcessApplicationName() {
-    return servletContextName != null ? servletContextName : servletContextPath;
+    return (servletContextName != null && !servletContextName.isEmpty()) ? servletContextName : servletContextPath;
   }
 
   public ProcessApplicationReference getReference() {
@@ -62,15 +62,15 @@ public class ServletProcessApplication extends AbstractProcessApplication implem
   }
 
   protected ClassLoader initProcessApplicationClassloader(ServletContextEvent sce) {
-    
-    if(isServlet30ApiPresent(sce)) {      
+
+    if (isServlet30ApiPresent(sce) && getClass().equals(ServletProcessApplication.class)) {
       return ClassLoaderUtil.getServletContextClassloader(sce);
-      
-    }else {
+
+    } else {
       return ClassLoaderUtil.getClassloader(getClass());
       
     }
-    
+
   }
 
   private boolean isServlet30ApiPresent(ServletContextEvent sce) {

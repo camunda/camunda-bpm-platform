@@ -16,9 +16,9 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.ws.rs.PathParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
 
 import org.camunda.bpm.engine.FormService;
@@ -59,8 +59,9 @@ public class ProcessDefinitionRestServiceImpl extends AbstractRestProcessEngineA
   }
 
   @Override
-	public List<ProcessDefinitionDto> getProcessDefinitions(ProcessDefinitionQueryDto queryDto,
+	public List<ProcessDefinitionDto> getProcessDefinitions(UriInfo uriInfo,
 	    Integer firstResult, Integer maxResults) {
+    ProcessDefinitionQueryDto queryDto = new ProcessDefinitionQueryDto(uriInfo.getQueryParameters());
 	  List<ProcessDefinitionDto> definitions = new ArrayList<ProcessDefinitionDto>();
 
 	  RepositoryService repoService = getProcessEngine().getRepositoryService();
@@ -98,7 +99,9 @@ public class ProcessDefinitionRestServiceImpl extends AbstractRestProcessEngineA
 	}
 
 	@Override
-  public CountResultDto getProcessDefinitionsCount(ProcessDefinitionQueryDto queryDto) {
+  public CountResultDto getProcessDefinitionsCount(UriInfo uriInfo) {
+	  ProcessDefinitionQueryDto queryDto = new ProcessDefinitionQueryDto(uriInfo.getQueryParameters());
+	  
     RepositoryService repoService = getProcessEngine().getRepositoryService();
 
     ProcessDefinitionQuery query;
@@ -142,13 +145,11 @@ public class ProcessDefinitionRestServiceImpl extends AbstractRestProcessEngineA
     }
 
     ProcessInstanceDto result = ProcessInstanceDto.fromProcessInstance(instance);
-    result.addReflexiveLink(context, null, "self");
+    UriBuilder rootUriBuilder = context.getBaseUriBuilder().path(relativeRootResourcePath);
+    result.addReflexiveLink(rootUriBuilder, null, "self");
     return result;
   }
 
-  /**
-   * For the time being this is a stub implementation that returns a fixed data set.
-   */
   @Override
   public List<StatisticsResultDto> getStatistics(Boolean includeFailedJobs) {
     ManagementService mgmtService = getProcessEngine().getManagementService();
@@ -202,7 +203,7 @@ public class ProcessDefinitionRestServiceImpl extends AbstractRestProcessEngineA
   }
 
   @Override
-  public FormDto getStartForm(@PathParam("id") String processDefinitionId) {
+  public FormDto getStartForm(String processDefinitionId) {
     final FormService formService = getProcessEngine().getFormService();
     
     final StartFormData formData;

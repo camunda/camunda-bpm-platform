@@ -11,6 +11,8 @@ import javax.ejb.Startup;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 
+import org.camunda.bpm.ProcessApplicationService;
+import org.camunda.bpm.ProcessEngineService;
 import org.camunda.bpm.container.RuntimeContainerDelegate;
 import org.camunda.bpm.container.impl.ejb.deployment.EjbJarAttachments;
 import org.camunda.bpm.container.impl.ejb.deployment.EjbJarParsePlatformXmlStep;
@@ -33,10 +35,13 @@ public class EjbBpmPlatformBootstrap {
   final private static Logger LOGGER = Logger.getLogger(EjbBpmPlatformBootstrap.class.getName());
   
   @Resource(description="The location of the bpm-platform.xml file.")
-  private String bpmPlatformXmlLocation = "META-INF/bpm-platform.xml"; 
+  private String bpmPlatformXmlLocation = "META-INF/bpm-platform.xml";
+
+  protected ProcessEngineService processEngineService;
+  protected ProcessApplicationService processApplicationService; 
 
   @PostConstruct
-  public void start() {
+  protected void start() {
 
     final JmxRuntimeContainerDelegate containerDelegate = getContainerDelegate();
     
@@ -46,12 +51,14 @@ public class EjbBpmPlatformBootstrap {
       .addStep(new PlatformXmlStartProcessEnginesStep())
       .execute();
     
-    LOGGER.log(Level.INFO, "camunda BPM platform started successfully.");
+    processEngineService = containerDelegate.getProcessEngineService();
+    processApplicationService = containerDelegate.getProcessApplicationService();
     
+    LOGGER.log(Level.INFO, "camunda BPM platform started successfully.");
   }
   
   @PreDestroy
-  public void stop() {
+  protected void stop() {
     
     final JmxRuntimeContainerDelegate containerDelegate = getContainerDelegate();
     
@@ -61,11 +68,21 @@ public class EjbBpmPlatformBootstrap {
       .execute();
     
     LOGGER.log(Level.INFO, "camunda BPM platform stopped.");
-    
+
   }
   
   protected JmxRuntimeContainerDelegate getContainerDelegate() {
     return (JmxRuntimeContainerDelegate) RuntimeContainerDelegate.INSTANCE.get();
+  }
+  
+  // getters //////////////////////////////////////////////
+  
+  public ProcessEngineService getProcessEngineService() {
+    return processEngineService;
+  }
+  
+  public ProcessApplicationService getProcessApplicationService() {
+    return processApplicationService;
   }
 
 }

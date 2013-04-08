@@ -15,6 +15,8 @@ package org.camunda.bpm.engine.rest.dto.repository;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.ws.rs.core.MultivaluedMap;
+
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
@@ -57,6 +59,15 @@ public class ProcessDefinitionQueryDto extends SortableParameterizedQueryDto {
   private String startableBy;
   private Boolean active;
   private Boolean suspended;
+  
+  public ProcessDefinitionQueryDto() {
+    
+  }
+  
+  public ProcessDefinitionQueryDto(
+      MultivaluedMap<String, String> queryParameters) {
+    super(queryParameters);
+  }
   
   @CamundaQueryParam("category")
   public void setCategory(String category) {

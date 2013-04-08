@@ -12,14 +12,14 @@
     <artifactId>camunda-root</artifactId>
     <version>7.0.0-SNAPSHOT</version>
   </parent>
-
+  
   <properties>
     <!-- 
       all maven properties used in QA/CI 
     -->
     
     <!-- jboss -->
-    <jboss.runtime.location>../jboss7-runtime/target/jboss-as-${version.jboss.as}/</jboss.runtime.location>
+    <jboss.runtime.location>../jboss7-runtime/target/server/jboss-as-${version.jboss.as}/</jboss.runtime.location>
     <jboss.datasource.filename>h2-ds.xml</jboss.datasource.filename>
     <jboss.http.port>38080</jboss.http.port>
     <jboss.ajp.port>38009</jboss.ajp.port>
@@ -34,7 +34,7 @@
     <jboss.mail-smtp.port>25</jboss.mail-smtp.port>
     
     <!-- glassfish properties -->
-    <glassfish.server.location>../../distro/gf31/assembly/target/assembly-${project.version}/assembly-${project.version}/server</glassfish.server.location>
+    <glassfish.runtime.location>../gf31-runtime/target/server/glassfish3</glassfish.runtime.location>
     
     <glassfish.http.port>28080</glassfish.http.port>
     <glassfish.admin.port>24848</glassfish.admin.port>
@@ -54,51 +54,65 @@
 	<tomcat6.connector.http.redirectPort>48443</tomcat6.connector.http.redirectPort>
 	<tomcat6.connector.ajp.port>48009</tomcat6.connector.ajp.port>
 	<tomcat6.connector.ajp.redirectPort>48443</tomcat6.connector.ajp.redirectPort>
-	<tomcat6.assembly.location>../../distro/tomcat/assembly/target/assembly/server/apache-tomcat-7.0.33</tomcat6.assembly.location>
+    <tomcat6.server.port>48005</tomcat6.server.port>
+	<tomcat6.runtime.location>../tomcat-runtime/target/server/apache-tomcat-7.0.33</tomcat6.runtime.location>
+
+
+    <database.datasource.class.type>javax.sql.DataSource</database.datasource.class.type>
+    <database.datasource.class.type.xa>javax.sql.XADataSource</database.datasource.class.type.xa>
     
+    <h2.server.port>18080</h2.server.port>
   </properties>
   
   <profiles>
 	
 	<profile>
 	  <id>distro</id>  
-		<modules>
-      <module>jboss7-runtime</module>
-      <module>gf31-runtime</module>
-      <module>tomcat-runtime</module>
-      <module>cycle-tests</module>
-      <module>integration-tests</module>
-		</modules>
+      <modules>
+        <module>jboss7-runtime</module>
+        <module>gf31-runtime</module>
+        <module>tomcat-runtime</module>
+        <module>integration-tests-webapps</module>
+        <module>integration-tests-engine</module>
+      </modules>
 	</profile>  
+  
+    <!-- Server profiles -->
   	
     <profile>
       <id>glassfish</id>
       <modules>
         <module>gf31-runtime</module>
-        <module>integration-tests</module>
       </modules>
     </profile>
 	
-    <profile>
-      <id>jboss</id>   
+    <profile>      
+      <id>jboss</id> 
       <modules>       
-  		  <module>jboss7-runtime</module>
-        <module>integration-tests</module>   
+        <module>jboss7-runtime</module>
       </modules>
     </profile>  
 	
-	  <profile>
-      <id>tomcat</id>      
+	<profile>
+      <id>tomcat</id>       
       <modules>
-        <module>tomcat-runtime</module>                
-        <module>integration-tests</module>
+        <module>tomcat-runtime</module>     
       </modules>
     </profile>  
+    
+    <!-- Testsuite profiles -->
 
     <profile>
-      <id>cycle</id>
+      <id>webapps-integration</id>
       <modules>
-        <module>cycle-tests</module>
+        <module>integration-tests-webapps</module>
+      </modules>      
+    </profile>
+    
+    <profile>
+      <id>engine-integration</id>
+      <modules>
+        <module>integration-tests-engine</module>
       </modules>
     </profile>
     
@@ -107,87 +121,172 @@
     <profile>
       <id>db2</id>
       <properties>
-          <jboss.datasource.filename>db2-ds.xml</jboss.datasource.filename>
+        <database.type>db2</database.type>
+        <jboss.datasource.filename>db2-ds.xml</jboss.datasource.filename>
+        <database.host>${env.db2.database.host}</database.host>
+        <database.name>${env.db2.database.name}</database.name>
+        <database.user>${env.db2.database.user}</database.user>
+        <database.password>${env.db2.database.password}</database.password>
+        <database.driver>com.ibm.db2.jcc.DB2Driver</database.driver>
+        <database.datasource.class>com.ibm.db2.jcc.DB2SimpleDataSource</database.datasource.class>        
+        <database.url>jdbc:db2://${database.host}:50000/${database.name}</database.url>
       </properties>
     </profile>
     
     <profile>
       <id>db2-xa</id>
       <properties>
-          <jboss.datasource.filename>db2-xa-ds.xml</jboss.datasource.filename>
+        <database.type>db2</database.type>
+        <jboss.datasource.filename>db2-xa-ds.xml</jboss.datasource.filename>
+        <database.host>${env.db2.database.host}</database.host>
+        <database.name>${env.db2.database.name}</database.name>
+        <database.user>${env.db2.database.user}</database.user>
+        <database.password>${env.db2.database.password}</database.password>
+        <database.driver>com.ibm.db2.jcc.DB2Driver</database.driver>
+        <database.datasource.class>com.ibm.db2.jcc.DB2XADataSource</database.datasource.class>
+        <database.datasource.class.type>${database.datasource.class.type.xa}</database.datasource.class.type>
+        <database.url>jdbc:db2://${database.host}:50000/${database.name}</database.url>
       </properties>
     </profile>
     
     <profile>
       <id>h2</id>
       <properties>
-          <jboss.datasource.filename>h2-ds.xml</jboss.datasource.filename>
+        <database.type>h2</database.type>
+        <jboss.datasource.filename>h2-ds.xml</jboss.datasource.filename>
+        <database.user>sa</database.user>
+        <database.password></database.password>
+        <database.driver>org.h2.Driver</database.driver>
+        <database.datasource.class>org.h2.jdbcx.JdbcDataSource</database.datasource.class>
+        <!-- This url has to consistent for the subprojects: {server}-runtime and webapp-integration-tests -->
+        <database.url>jdbc:h2:${project.parent.basedir}/target/h2/camunda-engine;MVCC=TRUE;AUTO_SERVER=TRUE;AUTO_SERVER_PORT=${h2.server.port}</database.url>
       </properties>
     </profile>
-    
-    <profile>
-      <id>h2-xa</id>
-      <properties>
-          <jboss.datasource.filename>h2-xa-ds.xml</jboss.datasource.filename>
-      </properties>
-    </profile>
-    
+   
     <profile>
       <id>mssql</id>
       <properties>
-          <jboss.datasource.filename>mssql-ds.xml</jboss.datasource.filename>
+        <database.type>mssql</database.type>
+        <jboss.datasource.filename>mssql-ds.xml</jboss.datasource.filename>
+        <database.host>${env.mssql.database.host}</database.host>
+        <database.name>${env.mssql.database.name}</database.name>
+        <database.user>${env.mssql.database.user}</database.user>
+        <database.password>${env.mssql.database.password}</database.password>
+        <database.driver>com.microsoft.sqlserver.jdbc.SQLServerDriver</database.driver>
+        <database.datasource.class>com.microsoft.sqlserver.jdbc.SQLServerDataSource</database.datasource.class>
+        <database.url>jdbc:sqlserver://${database.host}:1433;DatabaseName=${database.name}</database.url>
       </properties>
     </profile>
     
     <profile>
       <id>mssql-xa</id>
       <properties>
-          <jboss.datasource.filename>mssql-xa-ds.xml</jboss.datasource.filename>
+        <database.type>mssql</database.type>
+        <jboss.datasource.filename>mssql-xa-ds.xml</jboss.datasource.filename>
+        <database.host>${env.mssql.database.host}</database.host>
+        <database.name>${env.mssql.database.name}</database.name>
+        <database.user>${env.mssql.database.user}</database.user>
+        <database.password>${env.mssql.database.password}</database.password>
+        <database.driver>com.microsoft.sqlserver.jdbc.SQLServerDriver</database.driver>
+        <database.datasource.class>com.microsoft.sqlserver.jdbc.SQLServerXADataSource</database.datasource.class>
+        <database.datasource.class.type>${database.datasource.class.type.xa}</database.datasource.class.type>
+        <database.url>jdbc:sqlserver://${database.host}:1433;DatabaseName=${database.name}</database.url>
       </properties>
     </profile>
     
     <profile>
       <id>oracle</id>
       <properties>
-          <jboss.datasource.filename>oracle-ds.xml</jboss.datasource.filename>
+        <database.type>oracle</database.type>
+        <jboss.datasource.filename>oracle-ds.xml</jboss.datasource.filename>
+        <database.host>${env.oracle.database.host}</database.host>
+        <database.name>${env.oracle.database.name}</database.name>
+        <database.user>${env.oracle.database.user}</database.user>
+        <database.password>${env.oracle.database.password}</database.password>
+        <database.driver>oracle.jdbc.OracleDriver</database.driver>
+        <database.datasource.class>oracle.jdbc.pool.OracleDataSource</database.datasource.class>
+        <database.url>jdbc:oracle:thin:@${database.host}:1521:xe</database.url>
       </properties>
     </profile>
     
     <profile>
       <id>oracle-xa</id>
       <properties>
-          <jboss.datasource.filename>oracle-xa-ds.xml</jboss.datasource.filename>
+        <database.type>oracle</database.type>
+        <jboss.datasource.filename>oracle-xa-ds.xml</jboss.datasource.filename>
+        <database.host>${env.oracle.database.host}</database.host>
+        <database.name>${env.oracle.database.name}</database.name>
+        <database.user>${env.oracle.database.user}</database.user>
+        <database.password>${env.oracle.database.password}</database.password>
+        <database.driver>oracle.jdbc.OracleDriver</database.driver>
+        <database.datasource.class>oracle.jdbc.xa.OracleXADataSource</database.datasource.class>
+        <database.datasource.class.type>${database.datasource.class.type.xa}</database.datasource.class.type>
+        <database.url>jdbc:oracle:thin:@${database.host}:1521:xe</database.url>
       </properties>
     </profile>
     
     <profile>
       <id>postgres</id>
       <properties>
-          <jboss.datasource.filename>postgres-ds.xml</jboss.datasource.filename>
+        <database.type>postgres</database.type>
+        <jboss.datasource.filename>postgres-ds.xml</jboss.datasource.filename>
+        <database.host>${env.postgres.database.host}</database.host>
+        <database.name>${env.postgres.database.name}</database.name>
+        <database.user>${env.postgres.database.user}</database.user>
+        <database.password>${env.postgres.database.password}</database.password>
+        <database.driver>org.postgresql.Driver</database.driver>
+        <database.datasource.class>org.postgresql.ds.PGSimpleDataSource</database.datasource.class>
+        <database.url>jdbc:postgresql://${database.host}:5432/${database.name}</database.url>
       </properties>
     </profile>
     
     <profile>
       <id>postgres-xa</id>
       <properties>
-          <jboss.datasource.filename>postgres-xa-ds.xml</jboss.datasource.filename>
+        <database.type>postgres</database.type>
+        <jboss.datasource.filename>postgres-xa-ds.xml</jboss.datasource.filename>
+        <database.host>${env.postgres.database.host}</database.host>
+        <database.name>${env.postgres.database.name}</database.name>
+        <database.user>${env.postgres.database.user}</database.user>
+        <database.password>${env.postgres.database.password}</database.password>
+        <database.driver>org.postgresql.Driver</database.driver>
+        <database.datasource.class>org.postgresql.xa.PGXADataSource</database.datasource.class>
+        <database.datasource.class.type>${database.datasource.class.type.xa}</database.datasource.class.type>
+        <database.url>jdbc:postgresql://${database.host}:5432/${database.name}</database.url>
       </properties>
     </profile>
     
     <profile>
       <id>mysql</id>
       <properties>
-          <jboss.datasource.filename>mysql-ds.xml</jboss.datasource.filename>
+        <database.type>mysql</database.type>
+        <jboss.datasource.filename>mysql-ds.xml</jboss.datasource.filename>
+        <database.host>${env.mysql.database.host}</database.host>
+        <database.name>${env.mysql.database.name}</database.name>
+        <database.user>${env.mysql.database.user}</database.user>
+        <database.password>${env.mysql.database.password}</database.password>
+        <database.driver>com.mysql.jdbc.Driver</database.driver>
+        <database.datasource.class>com.mysql.jdbc.jdbc2.optional.MysqlDataSource</database.datasource.class>
+        <database.url>jdbc:mysql://${database.host}:3306/${database.name}</database.url>
       </properties>
     </profile>
     
     <profile>
       <id>mysql-xa</id>
       <properties>
-          <jboss.datasource.filename>mysql-xa-ds.xml</jboss.datasource.filename>
+        <database.type>mysql</database.type>
+        <jboss.datasource.filename>mysql-xa-ds.xml</jboss.datasource.filename>
+        <database.host>${env.mysql.database.host}</database.host>
+        <database.name>${env.mysql.database.name}</database.name>
+        <database.user>${env.mysql.database.user}</database.user>
+        <database.password>${env.mysql.database.password}</database.password>
+        <database.driver>com.mysql.jdbc.Driver</database.driver>
+        <database.datasource.class>com.mysql.jdbc.jdbc2.optional.MysqlXAConnection</database.datasource.class>
+        <database.datasource.class.type>${database.datasource.class.type.xa}</database.datasource.class.type>
+        <database.url>jdbc:mysql://${database.host}:3306/${database.name}</database.url>
       </properties>
     </profile>
-   	
+           	
   </profiles>
 
 </project>

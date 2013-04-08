@@ -16,9 +16,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import javax.ws.rs.PathParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriInfo;
 
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.rest.ProcessInstanceRestService;
@@ -41,9 +41,30 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
   public ProcessInstanceRestServiceImpl(String engineName) {
     super(engineName);
   }
+  
+
+  @Override
+  public ProcessInstanceDto getProcessInstance(String processInstanceId) {
+    RuntimeService runtimeService = getProcessEngine().getRuntimeService();
+    ProcessInstance instance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
+    
+    if (instance == null) {
+      throw new WebApplicationException(Status.NOT_FOUND);
+    }
+    
+    ProcessInstanceDto result = ProcessInstanceDto.fromProcessInstance(instance);
+    return result;
+  }
 
   @Override
   public List<ProcessInstanceDto> getProcessInstances(
+      UriInfo uriInfo, Integer firstResult, Integer maxResults) {
+    ProcessInstanceQueryDto queryDto = new ProcessInstanceQueryDto(uriInfo.getQueryParameters());
+    return queryProcessInstances(queryDto, firstResult, maxResults);
+  }
+
+  @Override
+  public List<ProcessInstanceDto> queryProcessInstances(
       ProcessInstanceQueryDto queryDto, Integer firstResult, Integer maxResults) {
     RuntimeService runtimeService = getProcessEngine().getRuntimeService();
     ProcessInstanceQuery query;
@@ -67,7 +88,7 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
     }
     return instanceResults;
   }
-
+  
   private List<ProcessInstance> executePaginatedQuery(ProcessInstanceQuery query, Integer firstResult, Integer maxResults) {
     if (firstResult == null) {
       firstResult = 0;
@@ -79,14 +100,13 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
   }
 
   @Override
-  public List<ProcessInstanceDto> queryProcessInstances(
-      ProcessInstanceQueryDto query, Integer firstResult, Integer maxResults) {
-    return getProcessInstances(query, firstResult, maxResults);
+  public CountResultDto getProcessInstancesCount(UriInfo uriInfo) {
+    ProcessInstanceQueryDto queryDto = new ProcessInstanceQueryDto(uriInfo.getQueryParameters());
+    return queryProcessInstancesCount(queryDto);
   }
 
   @Override
-  public CountResultDto getProcessInstancesCount(
-      ProcessInstanceQueryDto queryDto) {
+  public CountResultDto queryProcessInstancesCount(ProcessInstanceQueryDto queryDto) {
     RuntimeService runtimeService = getProcessEngine().getRuntimeService();
     ProcessInstanceQuery query;
     try {
@@ -103,12 +123,7 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
   }
 
   @Override
-  public CountResultDto queryProcessInstancesCount(ProcessInstanceQueryDto queryDto) {
-    return getProcessInstancesCount(queryDto);
-  }
-
-  @Override
-  public VariableListDto getVariables(@PathParam("id") String processInstanceId) {
+  public VariableListDto getVariables(String processInstanceId) {
     List<VariableValueDto> values = new ArrayList<VariableValueDto>();
 
     for (Map.Entry<String, Object> entry : getProcessEngine().getRuntimeService().getVariables(processInstanceId).entrySet()) {
@@ -117,5 +132,4 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
 
     return new VariableListDto(values);
   }
-
 }

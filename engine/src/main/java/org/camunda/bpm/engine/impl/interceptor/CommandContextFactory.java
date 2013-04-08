@@ -36,4 +36,5 @@ public class CommandContextFactory {
   public void setProcessEngineConfiguration(ProcessEngineConfigurationImpl processEngineConfiguration) {
     this.processEngineConfiguration = processEngineConfiguration;
   }
+
 }
