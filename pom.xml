@@ -15,7 +15,8 @@
   <properties>
     <spring.framework.version>3.1.2.RELEASE</spring.framework.version>   
     <restlet.version>2.0.14</restlet.version>
-	<cxf.version>2.6.1</cxf.version>
+    <cxf.version>2.6.1</cxf.version>
+    <junit.version>4.11</junit.version>
 
       <!-- OSGi bundles properties -->
       <activiti.artifact />
@@ -208,7 +209,7 @@
       <dependency>
         <groupId>junit</groupId>
         <artifactId>junit</artifactId>
-        <version>4.8.1</version>
+        <version>${junit.version}</version>
       </dependency>
       <dependency>
         <groupId>mysql</groupId>
