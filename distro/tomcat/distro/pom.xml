@@ -18,7 +18,7 @@
       <groupId>org.camunda.bpm.tomcat</groupId>
       <artifactId>camunda-tomcat-assembly</artifactId>
       <version>${project.version}</version>
-      <scope>provided</scope>
+      <type>tar.gz</type>
     </dependency>
 
     <dependency>
