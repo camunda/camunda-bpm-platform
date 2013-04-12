@@ -1,4 +1,4 @@
-camunda BPM platform
+camunda BPM platform - [![Build Status](https://buildhive.cloudbees.com/job/camunda/job/camunda-bpm-platform/badge/icon)](https://buildhive.cloudbees.com/job/camunda/job/camunda-bpm-platform/)
 ====================
 
 The open source BPM platform
