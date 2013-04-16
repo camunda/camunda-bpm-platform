@@ -21,18 +21,21 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.UriInfo;
 
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.task.*;
 
-@Path("/task")
+@Path(TaskRestService.PATH)
 @Produces(MediaType.APPLICATION_JSON)
 public interface TaskRestService {
 
+  public static final String PATH = "/task";
+  
   @GET
-  @Path("/")
-  List<TaskDto> getTasks(TaskQueryDto query,
+  List<TaskDto> getTasks(@Context UriInfo uriInfo,
       @QueryParam("firstResult") Integer firstResult, @QueryParam("maxResults") Integer maxResults);
 
   @GET
@@ -52,14 +55,13 @@ public interface TaskRestService {
    * @return
    */
   @POST
-  @Path("/")
   @Consumes(MediaType.APPLICATION_JSON)
   List<TaskDto> queryTasks(TaskQueryDto query,
       @QueryParam("firstResult") Integer firstResult, @QueryParam("maxResults") Integer maxResults);
 
   @GET
   @Path("/count")
-  CountResultDto getTasksCount(TaskQueryDto query);
+  CountResultDto getTasksCount(@Context UriInfo uriInfo);
 
   @POST
   @Path("/count")

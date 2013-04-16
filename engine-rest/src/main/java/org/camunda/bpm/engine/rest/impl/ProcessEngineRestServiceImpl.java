@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.engine.rest.impl;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -20,9 +21,10 @@ import java.util.Set;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriBuilder;
 
-import org.camunda.bpm.engine.rest.ProcessEngineRestService;
 import org.camunda.bpm.engine.rest.ProcessDefinitionRestService;
+import org.camunda.bpm.engine.rest.ProcessEngineRestService;
 import org.camunda.bpm.engine.rest.ProcessInstanceRestService;
 import org.camunda.bpm.engine.rest.TaskRestService;
 import org.camunda.bpm.engine.rest.dto.ProcessEngineDto;
@@ -32,17 +34,27 @@ public class ProcessEngineRestServiceImpl implements ProcessEngineRestService {
 
   @Override
   public ProcessDefinitionRestService getProcessDefinitionService(String engineName) {
-    return new ProcessDefinitionRestServiceImpl(engineName);
+    String rootResourcePath = getRelativeEngineUri(engineName).toASCIIString();
+    ProcessDefinitionRestServiceImpl subResource = new ProcessDefinitionRestServiceImpl(engineName);
+    subResource.setRelativeRootResourceUri(rootResourcePath);
+    return subResource;
   }
 
   @Override
   public ProcessInstanceRestService getProcessInstanceService(String engineName) {
-    return new ProcessInstanceRestServiceImpl(engineName);
+    String rootResourcePath = getRelativeEngineUri(engineName).toASCIIString();
+    ProcessInstanceRestServiceImpl subResource = new ProcessInstanceRestServiceImpl(engineName);
+    subResource.setRelativeRootResourceUri(rootResourcePath);
+    return subResource;
   }
 
   @Override
   public TaskRestService getTaskRestService(String engineName) {
-    return new TaskRestServiceImpl(engineName);
+    String rootResourcePath = getRelativeEngineUri(engineName).toASCIIString();
+    TaskRestServiceImpl subResource = new TaskRestServiceImpl(engineName);
+    subResource.setRelativeRootResourceUri(rootResourcePath);
+    
+    return subResource;
   }
 
   @Override
@@ -60,6 +72,9 @@ public class ProcessEngineRestServiceImpl implements ProcessEngineRestService {
     return results;
   }
   
+  private URI getRelativeEngineUri(String engineName) {
+    return UriBuilder.fromResource(ProcessEngineRestService.class).path("{name}").build(engineName);
+  }  
   
   private ProcessEngineProvider getProcessEngineProvider() {
     ServiceLoader<ProcessEngineProvider> serviceLoader = ServiceLoader.load(ProcessEngineProvider.class);

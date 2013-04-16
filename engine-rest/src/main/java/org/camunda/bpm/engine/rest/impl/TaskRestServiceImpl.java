@@ -19,9 +19,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.ws.rs.PathParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriInfo;
 
 import org.camunda.bpm.engine.FormService;
 import org.camunda.bpm.engine.IdentityService;
@@ -57,8 +57,14 @@ public class TaskRestServiceImpl extends AbstractRestProcessEngineAware implemen
   }
 
   @Override
-  public List<TaskDto> getTasks(TaskQueryDto queryDto, Integer firstResult, Integer maxResults) {
+  public List<TaskDto> getTasks(UriInfo uriInfo, Integer firstResult, Integer maxResults) {
+    TaskQueryDto queryDto = new TaskQueryDto(uriInfo.getQueryParameters());
+    return queryTasks(queryDto, firstResult, maxResults);
+  }
 
+  @Override
+  public List<TaskDto> queryTasks(TaskQueryDto queryDto, Integer firstResult,
+      Integer maxResults) {
     TaskService taskService = getProcessEngine().getTaskService();
 
     TaskQuery query;
@@ -94,13 +100,7 @@ public class TaskRestServiceImpl extends AbstractRestProcessEngineAware implemen
     }
     return query.listPage(firstResult, maxResults);
   }
-
-  @Override
-  public List<TaskDto> queryTasks(TaskQueryDto query, Integer firstResult,
-      Integer maxResults) {
-    return getTasks(query, firstResult, maxResults);
-  }
-
+  
   @Override
   public void claim(String taskId, UserIdDto dto) {
     TaskService taskService = getProcessEngine().getTaskService();
@@ -109,7 +109,7 @@ public class TaskRestServiceImpl extends AbstractRestProcessEngineAware implemen
   }
 
   @Override
-  public void unclaim(@PathParam("id") String taskId) {
+  public void unclaim(String taskId) {
     getProcessEngine().getTaskService().setAssignee(taskId, null);
   }
 
@@ -121,7 +121,7 @@ public class TaskRestServiceImpl extends AbstractRestProcessEngineAware implemen
   }
 
   @Override
-  public void delegate(@PathParam("id") String taskId, UserIdDto delegatedUser) {
+  public void delegate(String taskId, UserIdDto delegatedUser) {
     getProcessEngine().getTaskService().delegateTask(taskId, delegatedUser.getUserId());
   }
 
@@ -158,7 +158,13 @@ public class TaskRestServiceImpl extends AbstractRestProcessEngineAware implemen
   }
 
   @Override
-  public CountResultDto getTasksCount(TaskQueryDto queryDto) {
+  public CountResultDto getTasksCount(UriInfo uriInfo) {
+    TaskQueryDto queryDto = new TaskQueryDto(uriInfo.getQueryParameters());
+    return queryTasksCount(queryDto);
+  }
+
+  @Override
+  public CountResultDto queryTasksCount(TaskQueryDto queryDto) {
     TaskService taskService = getProcessEngine().getTaskService();
 
     TaskQuery query;
@@ -173,11 +179,6 @@ public class TaskRestServiceImpl extends AbstractRestProcessEngineAware implemen
     result.setCount(count);
 
     return result;
-  }
-
-  @Override
-  public CountResultDto queryTasksCount(TaskQueryDto queryDto) {
-    return getTasksCount(queryDto);
   }
 
   @Override

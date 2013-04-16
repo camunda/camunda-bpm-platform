@@ -13,14 +13,12 @@
   <name>camunda BPM - Glassfish 3.1.x Distro</name>
 
   <dependencies>
+  
     <dependency>
-      <!-- this dependency is to make sure that we are executed after the 
-        integration tests have passed in the reactor -->
-      <groupId>org.camunda.bpm.qa</groupId>
-      <artifactId>camunda-qa</artifactId>
+      <groupId>org.camunda.bpm.glassfish</groupId>
+      <artifactId>camunda-glassfish-assembly</artifactId>
       <version>${project.version}</version>
-      <type>pom</type>
-      <scope>provided</scope>
+      <type>tar.gz</type>
     </dependency>
 
     <dependency>
@@ -49,6 +47,24 @@
       <groupId>org.camunda.bpm.cycle</groupId>
       <artifactId>camunda-cycle-sql-scripts</artifactId>
       <version>${project.version}</version>
+    </dependency>
+    
+    <!-- rest -->
+    
+    <dependency>
+      <groupId>org.camunda.bpm</groupId>
+      <artifactId>camunda-engine-rest</artifactId>
+      <version>${project.version}</version>
+      <type>war</type>
+    </dependency>
+    
+    <!-- cockpit -->
+    
+    <dependency>
+      <groupId>org.camunda.bpm.cockpit</groupId>
+      <artifactId>camunda-cockpit</artifactId>
+      <version>${project.version}</version>
+      <type>war</type>
     </dependency>
 	
   </dependencies>

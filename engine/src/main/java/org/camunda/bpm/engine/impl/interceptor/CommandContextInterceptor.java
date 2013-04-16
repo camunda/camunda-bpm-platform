@@ -32,7 +32,7 @@ public class CommandContextInterceptor extends CommandInterceptor {
     this.commandContextFactory = commandContextFactory;
     this.processEngineConfiguration = processEngineConfiguration;
   }
-
+  
   public <T> T execute(Command<T> command) {
     CommandContext context = commandContextFactory.createCommandContext(command);
 

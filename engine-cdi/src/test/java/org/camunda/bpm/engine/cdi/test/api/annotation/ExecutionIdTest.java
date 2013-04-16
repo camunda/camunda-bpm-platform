@@ -14,7 +14,13 @@ package org.camunda.bpm.engine.cdi.test.api.annotation;
 
 import static org.junit.Assert.assertEquals;
 
+import java.util.Set;
+
+import javax.enterprise.context.spi.CreationalContext;
+import javax.enterprise.inject.spi.Bean;
+
 import org.camunda.bpm.engine.cdi.BusinessProcess;
+import org.camunda.bpm.engine.cdi.annotation.ExecutionIdLiteral;
 import org.camunda.bpm.engine.cdi.test.CdiProcessEngineTestCase;
 import org.camunda.bpm.engine.test.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
@@ -28,15 +34,33 @@ import org.junit.runner.RunWith;
  */
 @RunWith(Arquillian.class)
 public class ExecutionIdTest extends CdiProcessEngineTestCase {
-
+  
   @Test
   @Deployment
-  public void testExecutionIdInjectable() {
+  public void testExecutionIdInjectableByName() {
     getBeanInstance(BusinessProcess.class).startProcessByKey("keyOfTheProcess");
     String processInstanceId = (String) getBeanInstance("processInstanceId");
     Assert.assertNotNull(processInstanceId);
     String executionId = (String) getBeanInstance("executionId");
     Assert.assertNotNull(executionId);
+    
+    assertEquals(processInstanceId, executionId);
+  }
+  
+  @Test
+  @Deployment
+  public void testExecutionIdInjectableByQualifier() {
+    getBeanInstance(BusinessProcess.class).startProcessByKey("keyOfTheProcess");
+    
+    Set<Bean<?>> beans = beanManager.getBeans(String.class, new ExecutionIdLiteral());    
+    Bean<String> bean = (Bean<java.lang.String>) beanManager.resolve(beans);
+    
+    CreationalContext<String> ctx = beanManager.createCreationalContext(bean);
+    String executionId = (String) beanManager.getReference(bean, String.class, ctx);   
+    Assert.assertNotNull(executionId);
+    
+    String processInstanceId = (String) getBeanInstance("processInstanceId");
+    Assert.assertNotNull(processInstanceId);
     
     assertEquals(processInstanceId, executionId);
   }

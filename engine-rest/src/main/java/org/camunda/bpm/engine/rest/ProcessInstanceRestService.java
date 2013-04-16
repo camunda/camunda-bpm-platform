@@ -15,7 +15,9 @@ package org.camunda.bpm.engine.rest;
 import java.util.List;
 
 import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.UriInfo;
 
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
@@ -23,10 +25,16 @@ import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceQueryDto;
 import org.camunda.bpm.engine.rest.dto.runtime.VariableListDto;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 
-@Path("/process-instance")
+@Path(ProcessInstanceRestService.PATH)
 @Produces(MediaType.APPLICATION_JSON)
 public interface ProcessInstanceRestService {
 
+  public static final String PATH = "/process-instance";
+  
+  @GET
+  @Path("/{id}")
+  ProcessInstanceDto getProcessInstance(@PathParam("id") String processInstanceId);
+  
   /**
    * Exposes the {@link ProcessInstanceQuery} interface as a REST service.
    * 
@@ -36,8 +44,7 @@ public interface ProcessInstanceRestService {
    * @return
    */
   @GET
-  @Path("/")
-  List<ProcessInstanceDto> getProcessInstances(ProcessInstanceQueryDto query,
+  List<ProcessInstanceDto> getProcessInstances(@Context UriInfo uriInfo,
       @QueryParam("firstResult") Integer firstResult,
       @QueryParam("maxResults") Integer maxResults);
 
@@ -52,7 +59,6 @@ public interface ProcessInstanceRestService {
    * @return
    */
   @POST
-  @Path("/")
   @Consumes(MediaType.APPLICATION_JSON)
   List<ProcessInstanceDto> queryProcessInstances(ProcessInstanceQueryDto query,
       @QueryParam("firstResult") Integer firstResult,
@@ -60,7 +66,7 @@ public interface ProcessInstanceRestService {
 
   @GET
   @Path("/count")
-  CountResultDto getProcessInstancesCount(ProcessInstanceQueryDto query);
+  CountResultDto getProcessInstancesCount(@Context UriInfo uriInfo);
   
   @POST
   @Path("/count")

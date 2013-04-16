@@ -19,7 +19,46 @@
       <artifactId>camunda-tomcat-assembly</artifactId>
       <version>${project.version}</version>
       <type>pom</type>
+      <scope>test</scope>
     </dependency>   
+    
+    <!-- database dependencies -->
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>mysql</groupId>
+      <artifactId>mysql-connector-java</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.oracle.jdbc</groupId>
+      <artifactId>ojdbc6</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.oracle.jdbc</groupId>
+      <artifactId>ojdbc14</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.ibm.db2.jcc</groupId>
+      <artifactId>db2jcc4</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>com.microsoft.sqlserver</groupId>
+      <artifactId>sqljdbc4</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    <dependency>
+      <groupId>postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    
   </dependencies>
 
   <profiles>
@@ -35,24 +74,42 @@
         <plugins>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-antrun-plugin</artifactId>
+            <artifactId>maven-dependency-plugin</artifactId>
             <executions>
               <execution>
-                <id>copy-distro</id>
-                <phase>package</phase>
+                <id>unpack-server</id>
+                <phase>generate-resources</phase>
                 <goals>
-                  <goal>run</goal>
+                  <goal>unpack</goal>
                 </goals>
+                <inherited>false</inherited>
                 <configuration>
-                  <target unless="maven.test.skip">
-                    <copy todir="target/apache-tomcat-7.0.33">
-                      <fileset dir="${tomcat6.assembly.location}" />
-                    </copy>                
-                  </target>
+                  <artifactItems>
+                    <artifactItem>
+                      <groupId>org.camunda.bpm.tomcat</groupId>
+                      <artifactId>camunda-tomcat-assembly</artifactId>
+                      <version>${project.version}</version>
+                      <type>tar.gz</type>
+                      <overWrite>true</overWrite>                    
+                      <outputDirectory>target/</outputDirectory>
+                    </artifactItem>
+                  </artifactItems>                
                 </configuration>
-              </execution>          
+              </execution>
+              <execution>
+                <id>copy-libs</id>
+                <phase>generate-resources</phase>
+                <goals>
+                  <goal>copy-dependencies</goal>
+                </goals>
+                <inherited>false</inherited>
+                <configuration>
+                  <includeScope>runtime</includeScope>
+                  <outputDirectory>target/server/apache-tomcat-7.0.33/lib</outputDirectory>
+                </configuration>
+              </execution>
             </executions>
-          </plugin>
+          </plugin>          
           <!-- copy filtered configuration resources -->
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
@@ -71,8 +128,8 @@
                   <goal>resources</goal>
                 </goals>
                 <configuration>
-                  <override>true</override>
-                  <outputDirectory>target/apache-tomcat-7.0.33</outputDirectory>
+                  <overwrite>true</overwrite>
+                  <outputDirectory>target/server/apache-tomcat-7.0.33</outputDirectory>
                 </configuration>
               </execution>
             </executions>

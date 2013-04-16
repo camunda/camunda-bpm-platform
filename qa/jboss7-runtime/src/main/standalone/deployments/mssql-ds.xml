@@ -7,8 +7,8 @@
 		<password>sa</password>
 	  </security>
 	</datasource>
-	<datasource jndi-name="java:jboss/datasources/FoxEngineDS" enabled="true" use-java-context="true" jta="true" use-ccm="true" pool-name="FoxEngineDS">
-	  <connection-url>jdbc:sqlserver://${database.host}:1433;DatabaseName=${database.name}</connection-url>
+	<datasource jndi-name="java:jboss/datasources/ProcessEngine" enabled="true" use-java-context="true" jta="true" use-ccm="true" pool-name="ProcessEngine">
+	  <connection-url>${database.url}</connection-url>
 	  <driver>com.microsoft.sqlserver</driver>
 	  <security>
 		<user-name>${database.user}</user-name>
@@ -19,7 +19,7 @@
 	  </validation>
 	</datasource>
 	<datasource jndi-name="java:jboss/datasources/CycleDS" enabled="true" use-java-context="true" jta="true" use-ccm="true" pool-name="CycleDS">
-	  <connection-url>jdbc:sqlserver://${database.host}:1433;DatabaseName=${database.name}</connection-url>
+	  <connection-url>${database.url}</connection-url>
 	  <driver>com.microsoft.sqlserver</driver>
 	  <security>
 		<user-name>${database.user}</user-name>

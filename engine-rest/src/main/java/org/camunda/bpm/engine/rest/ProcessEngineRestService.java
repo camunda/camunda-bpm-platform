@@ -22,16 +22,18 @@ import javax.ws.rs.core.MediaType;
 
 import org.camunda.bpm.engine.rest.dto.ProcessEngineDto;
 
-@Path("/engine")
+@Path(ProcessEngineRestService.PATH)
 public interface ProcessEngineRestService {
+  
+  public static final String PATH = "/engine";
 
-  @Path("/{name}/process-definition")
+  @Path("/{name}" + ProcessDefinitionRestService.PATH)
   ProcessDefinitionRestService getProcessDefinitionService(@PathParam("name") String engineName);
   
-  @Path("/{name}/process-instance")
+  @Path("/{name}" + ProcessInstanceRestService.PATH)
   ProcessInstanceRestService getProcessInstanceService(@PathParam("name") String engineName);
   
-  @Path("/{name}/task")
+  @Path("/{name}" + TaskRestService.PATH)
   TaskRestService getTaskRestService(@PathParam("name") String engineName);
   
   @GET

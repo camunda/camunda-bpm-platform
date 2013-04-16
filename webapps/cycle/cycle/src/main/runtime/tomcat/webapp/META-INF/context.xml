@@ -8,7 +8,7 @@
     factory="org.apache.tomcat.jdbc.pool.DataSourceFactory"
     uniqueResourceName="cycle"
     driverClassName="org.h2.Driver" 
-    url="jdbc:h2:./fox-h2-dbs/cycle-db;MVCC=TRUE;TRACE_LEVEL_FILE=0"
+    url="jdbc:h2:./camunda-h2-dbs/cycle-db;MVCC=TRUE;TRACE_LEVEL_FILE=0"
     username="sa"  
     password=""  
     maxPoolSize="20"  

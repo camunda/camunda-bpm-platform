@@ -15,7 +15,7 @@ package org.camunda.bpm.engine.rest.dto;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.UriBuilder;
 
 public abstract class LinkableDto {
 
@@ -29,11 +29,11 @@ public abstract class LinkableDto {
     links.add(link);
   }
   
-  public void addReflexiveLink(UriInfo context, String action, String relation) {
-    AtomLink link = generateLink(context, action, relation);
+  public void addReflexiveLink(UriBuilder rootUriBuilder, String action, String relation) {
+    AtomLink link = generateLink(rootUriBuilder, action, relation);
     links.add(link);
   }
   
-  public abstract AtomLink generateLink(UriInfo context, String action, String relation);
+  public abstract AtomLink generateLink(UriBuilder rootUriBuilder, String action, String relation);
   
 }

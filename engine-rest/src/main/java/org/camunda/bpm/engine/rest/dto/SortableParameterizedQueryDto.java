@@ -17,9 +17,15 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map.Entry;
+
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.rest.dto.converter.StringToTypeConverter;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+import org.camunda.bpm.engine.rest.exception.RestException;
 
 /**
  * Defines common query sorting options and validation.
@@ -43,6 +49,25 @@ public abstract class SortableParameterizedQueryDto {
 
   protected String sortBy;
   protected String sortOrder;
+  
+  // required for populating via jackson
+  public SortableParameterizedQueryDto() {
+    
+  }
+  
+  public SortableParameterizedQueryDto(MultivaluedMap<String, String> queryParameters) {
+    for (Entry<String, List<String>> param : queryParameters.entrySet()) {
+      String key = param.getKey();
+      String value = param.getValue().iterator().next();
+      try {
+        this.setValueBasedOnAnnotation(key, value);
+      } catch (RestException e) {
+        throw new WebApplicationException(e, Status.INTERNAL_SERVER_ERROR);
+      } catch (InvalidRequestException e) {
+        throw new WebApplicationException(e, Status.BAD_REQUEST);
+      }
+    }
+  }
   
   @CamundaQueryParam("sortBy")
   public void setSortBy(String sortBy) {
@@ -71,12 +96,8 @@ public abstract class SortableParameterizedQueryDto {
    * Before invoking these methods, the annotated {@link StringToTypeConverter} is used to convert the String value to the desired Java type.
    * @param key
    * @param value
-   * @throws IllegalArgumentException
-   * @throws IllegalAccessException
-   * @throws InvocationTargetException
-   * @throws InstantiationException
    */
-  public void setValueBasedOnAnnotation(String key, String value) throws IllegalArgumentException, IllegalAccessException, InvocationTargetException, InstantiationException {
+  protected void setValueBasedOnAnnotation(String key, String value) {
     List<Method> matchingMethods = findMatchingAnnotatedMethods(key);
     for (Method method : matchingMethods) {
       Class<? extends StringToTypeConverter<?>> converterClass = findAnnotatedTypeConverter(method);
@@ -84,9 +105,20 @@ public abstract class SortableParameterizedQueryDto {
         continue;
       }
       
-      StringToTypeConverter<?> converter = converterClass.newInstance();
-      Object convertedValue = converter.convertQueryParameterToType(value);
-      method.invoke(this, convertedValue);
+      StringToTypeConverter<?> converter = null;
+      try {
+        converter = converterClass.newInstance();
+        Object convertedValue = converter.convertQueryParameterToType(value);
+        method.invoke(this, convertedValue);
+      } catch (InstantiationException e) {
+        throw new RestException("Server error.");
+      } catch (IllegalAccessException e) {
+        throw new RestException("Server error.");
+      } catch (IllegalArgumentException e) {
+        throw new InvalidRequestException("Cannot set parameter.");
+      } catch (InvocationTargetException e) {
+        throw new InvalidRequestException("Cannot set parameter.");
+      }
     }
   }
   

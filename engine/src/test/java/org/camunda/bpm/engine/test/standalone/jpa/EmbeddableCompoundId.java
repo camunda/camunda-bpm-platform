@@ -13,13 +13,16 @@
 
 package org.camunda.bpm.engine.test.standalone.jpa;
 
+import java.io.Serializable;
+
 import javax.persistence.Embeddable;
 
 /**
  * @author Frederik Heremans
  */
 @Embeddable
-public class EmbeddableCompoundId {
+@SuppressWarnings("serial")
+public class EmbeddableCompoundId implements Serializable {
 
   private long idPart1;
 
@@ -29,7 +32,7 @@ public class EmbeddableCompoundId {
     return idPart1;
   }
 
-  public void setIdPart1(long idPart1) {
+  public void setIdPart1(final long idPart1) {
     this.idPart1 = idPart1;
   }
 
@@ -37,16 +40,16 @@ public class EmbeddableCompoundId {
     return idPart2;
   }
 
-  public void setIdPart2(String idPart2) {
+  public void setIdPart2(final String idPart2) {
     this.idPart2 = idPart2;
   }
-  
+
   @Override
-  public boolean equals(Object obj) {
-    EmbeddableCompoundId other = (EmbeddableCompoundId) obj;
+  public boolean equals(final Object obj) {
+    final EmbeddableCompoundId other = (EmbeddableCompoundId) obj;
     return idPart1 == other.idPart1 && idPart2.equals(idPart2);
   }
-  
+
   @Override
   public int hashCode() {
     return (idPart1 + idPart2).hashCode();
