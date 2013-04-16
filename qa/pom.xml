@@ -128,8 +128,8 @@
         <database.user>${env.db2.database.user}</database.user>
         <database.password>${env.db2.database.password}</database.password>
         <database.driver>com.ibm.db2.jcc.DB2Driver</database.driver>
-        <database.port>${env.db2.database.port}</database.port>
         <database.datasource.class>com.ibm.db2.jcc.DB2SimpleDataSource</database.datasource.class>        
+        <database.port>${env.db2.database.port}</database.port>
         <database.url>jdbc:db2://${database.host}:${database.port}/${database.name}</database.url>
       </properties>
     </profile>
@@ -146,7 +146,8 @@
         <database.driver>com.ibm.db2.jcc.DB2Driver</database.driver>
         <database.datasource.class>com.ibm.db2.jcc.DB2XADataSource</database.datasource.class>
         <database.datasource.class.type>${database.datasource.class.type.xa}</database.datasource.class.type>
-        <database.url>jdbc:db2://${database.host}:50000/${database.name}</database.url>
+        <database.port>${env.db2.database.port}</database.port>
+        <database.url>jdbc:db2://${database.host}:${database.port}/${database.name}</database.url>
       </properties>
     </profile>
     
@@ -175,7 +176,8 @@
         <database.password>${env.mssql.database.password}</database.password>
         <database.driver>com.microsoft.sqlserver.jdbc.SQLServerDriver</database.driver>
         <database.datasource.class>com.microsoft.sqlserver.jdbc.SQLServerDataSource</database.datasource.class>
-        <database.url>jdbc:sqlserver://${database.host}:1433;DatabaseName=${database.name}</database.url>
+        <database.port>${env.mssql.database.port}</database.port>
+        <database.url>jdbc:sqlserver://${database.host}:${database.port};DatabaseName=${database.name}</database.url>
       </properties>
     </profile>
     
@@ -191,7 +193,8 @@
         <database.driver>com.microsoft.sqlserver.jdbc.SQLServerDriver</database.driver>
         <database.datasource.class>com.microsoft.sqlserver.jdbc.SQLServerXADataSource</database.datasource.class>
         <database.datasource.class.type>${database.datasource.class.type.xa}</database.datasource.class.type>
-        <database.url>jdbc:sqlserver://${database.host}:1433;DatabaseName=${database.name}</database.url>
+        <database.port>${env.mssql.database.port}</database.port>
+        <database.url>jdbc:sqlserver://${database.host}:${database.port};DatabaseName=${database.name}</database.url>
       </properties>
     </profile>
     
@@ -206,7 +209,8 @@
         <database.password>${env.oracle.database.password}</database.password>
         <database.driver>oracle.jdbc.OracleDriver</database.driver>
         <database.datasource.class>oracle.jdbc.pool.OracleDataSource</database.datasource.class>
-        <database.url>jdbc:oracle:thin:@${database.host}:1521:xe</database.url>
+        <database.port>${env.oracle.database.port}</database.port>
+        <database.url>jdbc:oracle:thin:@${database.host}:${database.port}:xe</database.url>
       </properties>
     </profile>
     
@@ -222,7 +226,8 @@
         <database.driver>oracle.jdbc.OracleDriver</database.driver>
         <database.datasource.class>oracle.jdbc.xa.OracleXADataSource</database.datasource.class>
         <database.datasource.class.type>${database.datasource.class.type.xa}</database.datasource.class.type>
-        <database.url>jdbc:oracle:thin:@${database.host}:1521:xe</database.url>
+        <database.port>${env.oracle.database.port}</database.port>
+        <database.url>jdbc:oracle:thin:@${database.host}:${database.port}:xe</database.url>
       </properties>
     </profile>
     
@@ -237,7 +242,8 @@
         <database.password>${env.postgres.database.password}</database.password>
         <database.driver>org.postgresql.Driver</database.driver>
         <database.datasource.class>org.postgresql.ds.PGSimpleDataSource</database.datasource.class>
-        <database.url>jdbc:postgresql://${database.host}:5432/${database.name}</database.url>
+        <database.port>${env.postgres.database.port}</database.port>
+        <database.url>jdbc:postgresql://${database.host}:${database.port}/${database.name}</database.url>
       </properties>
     </profile>
     
@@ -253,7 +259,8 @@
         <database.driver>org.postgresql.Driver</database.driver>
         <database.datasource.class>org.postgresql.xa.PGXADataSource</database.datasource.class>
         <database.datasource.class.type>${database.datasource.class.type.xa}</database.datasource.class.type>
-        <database.url>jdbc:postgresql://${database.host}:5432/${database.name}</database.url>
+        <database.port>${env.postgres.database.port}</database.port>
+        <database.url>jdbc:postgresql://${database.host}:${database.port}/${database.name}</database.url>
       </properties>
     </profile>
     
@@ -268,7 +275,8 @@
         <database.password>${env.mysql.database.password}</database.password>
         <database.driver>com.mysql.jdbc.Driver</database.driver>
         <database.datasource.class>com.mysql.jdbc.jdbc2.optional.MysqlDataSource</database.datasource.class>
-        <database.url>jdbc:mysql://${database.host}:3306/${database.name}</database.url>
+        <database.port>${env.mysql.database.port}</database.port>
+        <database.url>jdbc:mysql://${database.host}:${database.port}/${database.name}</database.url>
       </properties>
     </profile>
     
@@ -284,7 +292,8 @@
         <database.driver>com.mysql.jdbc.Driver</database.driver>
         <database.datasource.class>com.mysql.jdbc.jdbc2.optional.MysqlXAConnection</database.datasource.class>
         <database.datasource.class.type>${database.datasource.class.type.xa}</database.datasource.class.type>
-        <database.url>jdbc:mysql://${database.host}:3306/${database.name}</database.url>
+        <database.port>${env.mysql.database.port}</database.port>
+        <database.url>jdbc:mysql://${database.host}:${database.port}/${database.name}</database.url>
       </properties>
     </profile>
            	
