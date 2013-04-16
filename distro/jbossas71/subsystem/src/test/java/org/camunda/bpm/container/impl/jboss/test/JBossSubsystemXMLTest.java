@@ -20,8 +20,8 @@ import java.util.List;
 import junit.framework.Assert;
 
 import org.camunda.bpm.container.impl.jboss.extension.Attribute;
-import org.camunda.bpm.container.impl.jboss.extension.Element;
 import org.camunda.bpm.container.impl.jboss.extension.BpmPlatformExtension;
+import org.camunda.bpm.container.impl.jboss.extension.Element;
 import org.camunda.bpm.container.impl.jboss.extension.ModelConstants;
 import org.camunda.bpm.container.impl.jboss.service.ServiceNames;
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -57,7 +57,7 @@ public class JBossSubsystemXMLTest extends AbstractSubsystemTest {
   public static final ServiceName PLATFORM_JOBEXECUTOR_SERVICE_NAME = ServiceName.of("foxPlatform").append("containerJobExecutorService");
     
   public static final ServiceName processEngineServiceBindingServiceName = ContextNames.GLOBAL_CONTEXT_SERVICE_NAME            
-    .append("camunda")
+    .append("camunda-bpm-platform")
     .append("process-engine")
     .append("ProcessEngineService!org.camunda.bpm.ProcessEngineService");
    

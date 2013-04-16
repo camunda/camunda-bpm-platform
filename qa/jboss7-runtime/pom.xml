@@ -23,6 +23,7 @@
       <artifactId>camunda-jboss-assembly</artifactId>
       <version>${project.version}</version>      
       <type>pom</type>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>mysql</groupId>
