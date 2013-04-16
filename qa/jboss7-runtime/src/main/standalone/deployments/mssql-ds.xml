@@ -7,7 +7,7 @@
 		<password>sa</password>
 	  </security>
 	</datasource>
-	<datasource jndi-name="java:jboss/datasources/FoxEngineDS" enabled="true" use-java-context="true" jta="true" use-ccm="true" pool-name="FoxEngineDS">
+	<datasource jndi-name="java:jboss/datasources/ProcessEngine" enabled="true" use-java-context="true" jta="true" use-ccm="true" pool-name="ProcessEngine">
 	  <connection-url>${database.url}</connection-url>
 	  <driver>com.microsoft.sqlserver</driver>
 	  <security>

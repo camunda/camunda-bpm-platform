@@ -104,8 +104,8 @@
                         <password>sa</password>
                     </security>
                 </datasource>
-                <datasource jta="true" jndi-name="java:jboss/datasources/FoxEngineDS" pool-name="FoxEngineDS" enabled="true" use-java-context="true" use-ccm="true">
-                    <connection-url>jdbc:h2:./camunda-h2-dbs/camunda-engine;DB_CLOSE_DELAY=-1;MVCC=TRUE;DB_CLOSE_ON_EXIT=FALSE</connection-url>
+                <datasource jta="true" jndi-name="java:jboss/datasources/ProcessEngine" pool-name="ProcessEngine" enabled="true" use-java-context="true" use-ccm="true">
+                    <connection-url>jdbc:h2:./camunda-h2-dbs/process-engine;DB_CLOSE_DELAY=-1;MVCC=TRUE;DB_CLOSE_ON_EXIT=FALSE</connection-url>
                     <driver>h2</driver>
                     <security>
                         <user-name>sa</user-name>
@@ -307,7 +307,7 @@
 		<subsystem xmlns="urn:org.camunda.bpm.jboss:1.1">
             <process-engines>
                 <process-engine name="default" default="true">
-                    <datasource>java:jboss/datasources/FoxEngineDS</datasource>
+                    <datasource>java:jboss/datasources/ProcessEngine</datasource>
                     <history-level>full</history-level>
                     <properties>
                         <property name="jobExecutorAcquisitionName">default</property>

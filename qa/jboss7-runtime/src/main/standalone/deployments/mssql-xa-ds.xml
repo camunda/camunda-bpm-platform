@@ -7,7 +7,7 @@
 		<password>sa</password>
 	  </security>
 	</datasource>
-	<xa-datasource jndi-name="java:jboss/datasources/FoxEngineDS" enabled="true" use-ccm="false" pool-name="FoxEngineDS">
+	<xa-datasource jndi-name="java:jboss/datasources/ProcessEngine" enabled="true" use-ccm="false" pool-name="ProcessEngine">
 	  <xa-datasource-property name="URL">jdbc:sqlserver://${database.host}</xa-datasource-property>
 	  <xa-datasource-property name="PortNumber">1433</xa-datasource-property>
 	  <xa-datasource-property name="DatabaseName">${database.name}</xa-datasource-property>

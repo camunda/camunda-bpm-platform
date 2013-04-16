@@ -37,7 +37,7 @@
 		<exception-sorter class-name="org.jboss.jca.adapters.jdbc.extensions.db2.DB2ExceptionSorter"/>
 	  </validation>
 	</xa-datasource>
-	<xa-datasource jndi-name="java:jboss/datasources/FoxEngineDS" pool-name="FoxEngineDS" enabled="true" use-ccm="false">
+	<xa-datasource jndi-name="java:jboss/datasources/ProcessEngine" pool-name="ProcessEngine" enabled="true" use-ccm="false">
 	  <xa-datasource-property name="ServerName">
 		${database.host}
 	  </xa-datasource-property>

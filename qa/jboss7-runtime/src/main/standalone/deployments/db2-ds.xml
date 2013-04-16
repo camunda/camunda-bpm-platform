@@ -15,7 +15,7 @@
 		<password>${database.password}</password>
 	  </security>
 	</datasource>
-	<datasource jndi-name="java:jboss/datasources/FoxEngineDS" pool-name="FoxEngineDS" jta="true" enabled="true" use-java-context="true" use-ccm="true">
+	<datasource jndi-name="java:jboss/datasources/ProcessEngine" pool-name="ProcessEngine" jta="true" enabled="true" use-java-context="true" use-ccm="true">
 	  <connection-url>${database.url}</connection-url>
 	  <driver>db2</driver>
 	  <security>

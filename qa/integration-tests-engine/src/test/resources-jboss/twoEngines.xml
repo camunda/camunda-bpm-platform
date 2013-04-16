@@ -6,7 +6,7 @@
 
   <process-engine name="engine2">
     <job-acquisition>default</job-acquisition>
-    <datasource>java:jboss/datasources/FoxEngineDS</datasource>
+    <datasource>java:jboss/datasources/ProcessEngine</datasource>
     <properties>
       <property name="history">full</property>
     </properties>
@@ -14,7 +14,7 @@
 
   <process-engine name="engine3">
     <job-acquisition>default</job-acquisition>
-    <datasource>java:jboss/datasources/FoxEngineDS</datasource>
+    <datasource>java:jboss/datasources/ProcessEngine</datasource>
     <properties>
       <property name="history">full</property>
     </properties>
