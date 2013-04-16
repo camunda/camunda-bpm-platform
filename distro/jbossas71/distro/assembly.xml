@@ -11,53 +11,6 @@
 
   <includeBaseDirectory>false</includeBaseDirectory>
   
-<!--   <fileSets>
-    <fileSet>
-      <directory>../assembly/target/assembly-${project.version}/assembly-${project.version}</directory>
-      <outputDirectory />
-      <excludes>
-        <exclude>**/*.sh</exclude>
-        <exclude>**/jboss-*/domain/tmp/auth</exclude>
-        <exclude>**/jboss-*/standalone/tmp/auth</exclude>
-        <exclude>**/*-users.properties</exclude>
-      </excludes>
-    </fileSet>
-    <fileSet>
-      <directory>../assembly/target/assembly-${project.version}/assembly-${project.version}</directory>
-      <outputDirectory />
-      <includes>
-        <include>**/jboss-*/**/*.sh</include>
-      </includes>
-      <fileMode>0755</fileMode>
-    </fileSet>
-    <fileSet>
-      <directory>../assembly/target/assembly-${project.version}/assembly-${project.version}</directory>
-      <outputDirectory />
-      <includes>
-        <include>**/*-users.properties</include>
-      </includes>
-      <fileMode>0600</fileMode>
-    </fileSet>
-    <fileSet>
-      <directory>../assembly/target/assembly-${project.version}/assembly-${project.version}</directory>
-      <outputDirectory />
-      <includes>
-        <include>**/jboss-*/domain/tmp/auth</include>
-        <include>**/jboss-*/standalone/tmp/auth</include>
-      </includes>
-      <directoryMode>0700</directoryMode>
-    </fileSet>
-    <fileSet>
-      <directory>../assembly/target/assembly-${project.version}/assembly-${project.version}</directory>
-      <outputDirectory />
-      <includes>
-        <include>**/jboss-*/domain/tmp/auth</include>
-        <include>**/jboss-*/standalone/tmp/auth</include>
-      </includes>
-      <directoryMode>0700</directoryMode>
-    </fileSet>   
-  </fileSets> -->
-
   <dependencySets>
   
     <dependencySet>
