@@ -55,7 +55,7 @@ public class TomcatCreateJndiBindingsStep extends MBeanDeploymentOperationStep {
       
       // lookup the context
       bindingContext = getOrCreateSubContext(bindingContext, "global");
-      bindingContext = getOrCreateSubContext(bindingContext, "camunda");
+      bindingContext = getOrCreateSubContext(bindingContext, "camunda-bpm-platform");
       bindingContext = getOrCreateSubContext(bindingContext, "process-engine");           
             
       // bind the services 
@@ -63,8 +63,8 @@ public class TomcatCreateJndiBindingsStep extends MBeanDeploymentOperationStep {
       bindingContext.bind(PROCESS_APPLICATION_SERVICE_NAME, BpmPlatform.getProcessApplicationService());
       
 //      LOGGER.info("the JNDI bindings for the BPM platform services are as follows: \n\n"
-//          + "        java:global/camunda/process-engine/"+ PROCESS_ENGINE_SERVICE_NAME + "\n"
-//          + "        java:global/camunda/process-engine/"+ PROCESS_APPLICATION_SERVICE_NAME + "\n");
+//          + "        java:global/camunda-bpm-platform/process-engine/"+ PROCESS_ENGINE_SERVICE_NAME + "\n"
+//          + "        java:global/camunda-bpm-platform/process-engine/"+ PROCESS_APPLICATION_SERVICE_NAME + "\n");
       
     } catch (NamingException e) {
       throw new ProcessEngineException("Unable to bind bpm platform services in global naming context.", e);      

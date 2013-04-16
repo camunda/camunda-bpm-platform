@@ -72,6 +72,16 @@
               password="${database.password}"  
               maxPoolSize="20"  
               minPoolSize="5" />
+
+    <Resource name="global/camunda-bpm-platform/process-engine/ProcessEngineService!org.camunda.bpm.ProcessEngineService" auth="Container"
+              type="org.camunda.bpm.ProcessEngineService"
+              description="camunda BPM platform Process Engine Service"
+              factory="org.camunda.bpm.container.impl.tomcat.deployment.ProcessEngineServiceObjectFactory" />
+              
+    <Resource name="global/camunda-bpm-platform/process-engine/ProcessApplicationService!org.camunda.bpm.ProcessApplicationService" auth="Container"
+              type="org.camunda.bpm.ProcessApplicationService"
+              description="camunda BPM platform Process Application Service"
+              factory="org.camunda.bpm.container.impl.tomcat.deployment.ProcessApplicationServiceObjectFactory" />              
               
   </GlobalNamingResources>
 
