@@ -12,7 +12,7 @@
  */
 package org.camunda.bpm.integrationtest.deployment.callbacks;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
 import org.jboss.arquillian.container.test.api.Deployment;

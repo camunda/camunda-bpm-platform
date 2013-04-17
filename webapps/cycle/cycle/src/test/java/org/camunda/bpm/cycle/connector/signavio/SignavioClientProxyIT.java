@@ -13,11 +13,8 @@ import java.util.Scanner;
 
 import javax.inject.Inject;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
-import org.camunda.bpm.cycle.connector.signavio.SignavioClient;
-import org.camunda.bpm.cycle.connector.signavio.SignavioConnector;
-import org.camunda.bpm.cycle.connector.signavio.SignavioJson;
 import org.camunda.bpm.cycle.entity.ConnectorConfiguration;
 import org.camunda.bpm.cycle.exception.CycleException;
 import org.camunda.bpm.cycle.http.ParseException;
@@ -50,14 +47,14 @@ public class SignavioClientProxyIT {
 
   @Inject
   private List<ConnectorConfiguration> connectorConfiguration;
-  
+
   private SignavioClient signavioClient;
   private ConnectorConfiguration configuration;
-  
+
   @Before
   public void setUp() throws Exception {
     configuration = connectorConfiguration.get(1);
-    signavioClient = 
+    signavioClient =
             new SignavioClient(configuration.getName(),
                                configuration.getProperties().get(SignavioConnector.CONFIG_KEY_SIGNAVIO_BASE_URL),
                                configuration.getProperties().get(SignavioConnector.CONFIG_KEY_PROXY_URL),
@@ -83,7 +80,7 @@ public class SignavioClientProxyIT {
   @Test
   public void testGetFolderInfo() throws JSONException {
     String folderId = createFolder();
-    
+
     try {
       String info = signavioClient.getInfo(SignavioClient.DIRECTORY_URL_SUFFIX, folderId);
       assertThat(info).contains(CREATE_FOLDER_NAME);
@@ -97,11 +94,11 @@ public class SignavioClientProxyIT {
   public void testGetModelRepresentations() throws JSONException {
     // SVG, PNG, XML, JSON, INFO
     fail("Not implemented yet!");
-    
+
     String folderId = createFolder();
-    
+
     try {
-      
+
     } finally {
       deleteFolder(folderId);
     }
@@ -110,7 +107,7 @@ public class SignavioClientProxyIT {
   @Test
   public void testUpdateModel() throws JSONException, ParseException, IOException {
     String folderId = createFolder();
-    
+
     try {
       // create empty model
       String label = "CreateModel-" + new Date();
@@ -118,33 +115,33 @@ public class SignavioClientProxyIT {
       assertThat(createdModel).contains(label);
       String modelId = SignavioJson.extractModelId(new JSONObject(createdModel));
       Assert.assertEquals("create empty model", SignavioJson.extractModelComment(new JSONObject(createdModel)));
-      
+
       // import new model content
       String modelName = "HEMERA-2219";
       String newContent = new Scanner(getClass().getResourceAsStream("/models/" + modelName + "-import.bpmn"), "UTF-8").useDelimiter("\\A").next();
       signavioClient.importBpmnXml(folderId, newContent, modelName);
-      
+
       // retrieve imported model id
       String children = signavioClient.getChildren(folderId);
       String importedModelId = SignavioJson.extractIdForMatchingModelName(children, modelName);
-  
+
       String importedModelJson = signavioClient.getModelAsJson(importedModelId);
       String importedModelSvg = signavioClient.getModelAsSVG(importedModelId);
-      
+
       // update model
       String comment = "updating model...";
       String updatedModel = signavioClient.updateModel(modelId, label, importedModelJson, importedModelSvg, folderId, comment);
       assertThat(updatedModel).contains(comment);
-      
+
       // compare model contents
       InputStream newXmlContentStream = signavioClient.getXmlContent(modelId);
       byte[] newXmlContent = IoUtil.readInputStream(newXmlContentStream, "newXmlContent");
       IoUtil.closeSilently(newXmlContentStream);
-      
+
       InputStream importedXmlContentStream = signavioClient.getXmlContent(modelId);
       byte[] importedXmlContent = IoUtil.readInputStream(importedXmlContentStream, "newXmlContent");
       IoUtil.closeSilently(importedXmlContentStream);
-      
+
       DetailedDiff details = compareSignavioBpmn20Xml(new String(importedXmlContent, Charset.forName("UTF-8")),
                                new String(newXmlContent, Charset.forName("UTF-8")));
       assertTrue("Comparison:" + "\n" + details.toString().replaceAll("\\[not identical\\] [^\n]+\n", "").replaceAll("\n\n+", "\n"), details.similar());
@@ -156,15 +153,15 @@ public class SignavioClientProxyIT {
   @Test
   public void testCreateAndDeleteModel() throws JSONException {
     String folderId = createFolder();
-    
+
     try {
       // create
       String label = "CreateModel-" + new Date();
       String createdModel = signavioClient.createModel(folderId, label, null);
       assertThat(createdModel).contains(label);
-      
+
       // delete
-      String deleteResponse = signavioClient.delete(SignavioClient.MODEL_URL_SUFFIX, 
+      String deleteResponse = signavioClient.delete(SignavioClient.MODEL_URL_SUFFIX,
                                                     SignavioJson.extractModelId(new JSONObject(createdModel)));
       assertThat(deleteResponse).contains("\"success\":true");
     } finally {
@@ -181,7 +178,7 @@ public class SignavioClientProxyIT {
   @Test
   public void testImportBpmnXml() throws JSONException, ParseException, IOException {
     String folderId = createFolder();
-    
+
     try {
       String modelContent = new Scanner(getClass().getResourceAsStream("/models/HEMERA-2219-import.bpmn"), "UTF-8").useDelimiter("\\A").next();
       String response = signavioClient.importBpmnXml(folderId, modelContent, "HEMERA-2219");
@@ -193,7 +190,7 @@ public class SignavioClientProxyIT {
   @Test
   public void testImportSignavioArchive() throws ParseException, IOException, JSONException {
     String folderId = createFolder();
-    
+
     try {
       String response = signavioClient.importSignavioArchive(folderId, "src/test/resources/models/HEMERA-2219.sgx");
       assertThat(response).isEqualToIgnoringCase("{\"warnings\":[]}");
@@ -216,19 +213,19 @@ public class SignavioClientProxyIT {
     String newFolder = signavioClient.createFolder(name, parentId);
     assertThat(newFolder).contains(name);
     assertThat(newFolder).contains(parentId);
-    
+
     // extract id
     String id = SignavioJson.extractDirectoryId(new JSONObject(newFolder));
     assertThat(id).isNotEmpty();
-    
+
     return id;
   }
-  
+
   private void deleteFolder(String folderId) {
     String deleteResponse = signavioClient.delete(SignavioClient.DIRECTORY_URL_SUFFIX, folderId);
     assertThat(deleteResponse).contains("\"success\":true");
   }
-  
+
   /**
    * Compares two BPMN 2.0 XML files exported by Signavio using XMLUnit.
    * Stolen from {@link SignavioConnectorIT}
@@ -238,7 +235,7 @@ public class SignavioClientProxyIT {
       XMLUnit.setIgnoreWhitespace(true);
       XMLUnit.setIgnoreAttributeOrder(true);
       XMLUnit.setXpathNamespaceContext(new SimpleNamespaceContext(new BpmnNamespaceContext().getNamespaces()));
-      
+
       Diff diff = XMLUnit.compareXML(expectedRawBpmn20Xml, actualRawBpmn20Xml);
       DetailedDiff details = new DetailedDiff(diff);
       details.overrideDifferenceListener(new SignavioBpmn20XmlDifferenceListener());
@@ -246,7 +243,7 @@ public class SignavioClientProxyIT {
         @Override
         public boolean qualifyForComparison(Element control, Element test) {
           if (test.getLocalName().equals("outgoing")) {
-            return super.qualifyForComparison(control, test) && control.getTextContent().equals(test.getTextContent());  
+            return super.qualifyForComparison(control, test) && control.getTextContent().equals(test.getTextContent());
           }
           return super.qualifyForComparison(control, test);
         }

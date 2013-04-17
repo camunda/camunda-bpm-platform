@@ -3,7 +3,7 @@ package org.camunda.bpm.integrationtest.jobexecutor;
 import java.util.Date;
 import java.util.List;
 import javax.inject.Inject;
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.integrationtest.jobexecutor.beans.SampleServiceBean;

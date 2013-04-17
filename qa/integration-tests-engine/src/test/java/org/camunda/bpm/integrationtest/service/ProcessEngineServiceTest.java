@@ -1,6 +1,6 @@
 package org.camunda.bpm.integrationtest.service;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.camunda.bpm.BpmPlatform;
 import org.camunda.bpm.ProcessEngineService;

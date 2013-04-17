@@ -5,7 +5,7 @@ import java.util.logging.Logger;
 
 import javax.ws.rs.core.MediaType;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.camunda.bpm.AbstractWebappIntegrationTest;
 import org.camunda.bpm.engine.ProcessEngine;
@@ -28,27 +28,27 @@ public class RestIT extends AbstractWebappIntegrationTest {
   private static final String TEST_PACKAGE_PATH = "org/camunda/bpm/rest";
   private static final String CONFIG_PATH = "activiti.cfg.xml";
   private static final String SIMPLE_PROCESS_PATH = TEST_PACKAGE_PATH + "/simpleProcess.bpmn20.xml";
-  
+
   private static final String ENGINES_PATH = "engine";
   private static final String PROCESS_DEFINITION_PATH = "engine/default/process-definition";
-  
-  private final static Logger log = Logger.getLogger(RestIT.class.getName());  
-  
+
+  private final static Logger log = Logger.getLogger(RestIT.class.getName());
+
   private ProcessEngine processEngine;
   private Deployment deployment;
-  
+
   protected String getApplicationContextPath() {
     return "engine-rest/";
   }
-    
+
   @Before
   public void setup() throws IOException {
     createProcessEngine();
-    
+
     RepositoryService repoService = processEngine.getRepositoryService();
     deployment = repoService.createDeployment().addClasspathResource(SIMPLE_PROCESS_PATH).deploy();
   }
-  
+
   private void createProcessEngine() {
     if (processEngine == null) {
       processEngine = ProcessEngineConfiguration
@@ -56,36 +56,36 @@ public class RestIT extends AbstractWebappIntegrationTest {
               .buildProcessEngine();
     }
   }
-    
+
   @Test
   public void testScenario() throws JSONException {
     // get list of process engines
     log.info("Checking " + APP_BASE_PATH + ENGINES_PATH);
     WebResource resource = client.resource(APP_BASE_PATH + ENGINES_PATH);
     ClientResponse response = resource.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
-    
+
     Assert.assertEquals(200, response.getStatus());
-    
+
     JSONArray enginesJson = response.getEntity(JSONArray.class);
     Assert.assertEquals(1, enginesJson.length());
-    
+
     JSONObject engineJson = enginesJson.getJSONObject(0);
     Assert.assertEquals("default", engineJson.getString("name"));
-    
+
     response.close();
-    
+
     // get process definitions for default engine
     log.info("Checking " + APP_BASE_PATH + PROCESS_DEFINITION_PATH);
     resource = client.resource(APP_BASE_PATH + PROCESS_DEFINITION_PATH);
     response = resource.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
-    
+
     Assert.assertEquals(200, response.getStatus());
-    
+
     JSONArray definitionsJson = response.getEntity(JSONArray.class);
     Assert.assertEquals(1, definitionsJson.length());
-    
+
     JSONObject definitionJson = definitionsJson.getJSONObject(0);
-    
+
     Assert.assertEquals("ExampleProcess", definitionJson.getString("key"));
     Assert.assertEquals("Examples", definitionJson.getString("category"));
     Assert.assertEquals("Example Process", definitionJson.getString("name"));
@@ -95,16 +95,16 @@ public class RestIT extends AbstractWebappIntegrationTest {
     Assert.assertEquals(SIMPLE_PROCESS_PATH, definitionJson.getString("resource"));
     Assert.assertTrue(definitionJson.isNull("diagram"));
     Assert.assertFalse(definitionJson.getBoolean("suspended"));
-    
-    ProcessDefinition definition = 
+
+    ProcessDefinition definition =
         processEngine.getRepositoryService().createProcessDefinitionQuery().
         deploymentId(deployment.getId()).singleResult();
-    
+
     Assert.assertEquals(definition.getId(), definitionJson.getString("id"));
-    
+
     response.close();
   }
-  
+
   @After
   public void tearDown() {
     processEngine.getRepositoryService().deleteDeployment(deployment.getId());
