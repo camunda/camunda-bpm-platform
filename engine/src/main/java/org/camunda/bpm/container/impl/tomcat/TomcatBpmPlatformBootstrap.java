@@ -25,7 +25,6 @@ import org.camunda.bpm.container.impl.jmx.deployment.PlatformXmlStartProcessEngi
 import org.camunda.bpm.container.impl.jmx.deployment.StopProcessApplicationsStep;
 import org.camunda.bpm.container.impl.jmx.deployment.StopProcessEnginesStep;
 import org.camunda.bpm.container.impl.tomcat.deployment.TomcatAttachments;
-import org.camunda.bpm.container.impl.tomcat.deployment.TomcatCreateJndiBindingsStep;
 import org.camunda.bpm.container.impl.tomcat.deployment.TomcatParseBpmPlatformXmlStep;
 import org.camunda.bpm.engine.ProcessEngine;
 
@@ -68,7 +67,7 @@ public class TomcatBpmPlatformBootstrap implements LifecycleListener {
       .addAttachment(TomcatAttachments.SERVER, server)
       .addStep(new TomcatParseBpmPlatformXmlStep())
       .addStep(new PlatformXmlStartProcessEnginesStep())
-      .addStep(new TomcatCreateJndiBindingsStep())      
+//      .addStep(new TomcatCreateJndiBindingsStep())      
       .execute();
     
     LOGGER.log(Level.INFO, "camunda BPM platform" + " sucessfully started on "+server.getServerInfo()+".");

@@ -12,6 +12,8 @@ import org.jboss.shrinkwrap.api.spec.WebArchive;
 public class TestContainer {
   
   public final static String APP_NAME = "";
+  public final static String PROCESS_ENGINE_SERVICE_JNDI_NAME = "java:comp/env/ProcessEngineService";
+  public final static String PROCESS_APPLICATION_SERVICE_JNDI_NAME = "java:comp/env/ProcessApplicationService";
   
   public static void addContainerSpecificResources(WebArchive archive) {
     

@@ -1,5 +1,6 @@
 package org.camunda.bpm.integrationtest.util;
 
+import org.camunda.bpm.BpmPlatform;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 
 
@@ -11,6 +12,9 @@ import org.jboss.shrinkwrap.api.spec.WebArchive;
 public class TestContainer {
   
   public final static String APP_NAME = "";
+  
+  public final static String PROCESS_ENGINE_SERVICE_JNDI_NAME = BpmPlatform.PROCESS_ENGINE_SERVICE_JNDI_NAME;
+  public final static String PROCESS_APPLICATION_SERVICE_JNDI_NAME = BpmPlatform.PROCESS_APPLICATION_SERVICE_JNDI_NAME;
   
   public static void addContainerSpecificResources(WebArchive archive) {
     

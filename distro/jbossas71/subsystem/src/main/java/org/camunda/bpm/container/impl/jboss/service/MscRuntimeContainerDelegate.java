@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArraySet;
 
+import org.camunda.bpm.BpmPlatform;
 import org.camunda.bpm.ProcessApplicationService;
 import org.camunda.bpm.ProcessEngineService;
 import org.camunda.bpm.application.AbstractProcessApplication;
@@ -214,20 +215,12 @@ public class MscRuntimeContainerDelegate implements Service<MscRuntimeContainerD
   // internal implementation ///////////////////////////////
  
   protected void createJndiBindings() {
-    
-    final String prefix = "java:global/camunda/";
-    final String processEngineServiceSuffix = "ProcessEngineService!org.camunda.bpm.ProcessEngineService";
-    
-    String moduleName = "process-engine";
-    
-    final String processEngineServiceBindingName = prefix + moduleName + "/"+ processEngineServiceSuffix;
-        
     final ServiceName processEngineServiceBindingServiceName = ContextNames.GLOBAL_CONTEXT_SERVICE_NAME            
-      .append("camunda")
-      .append(moduleName)
-      .append(processEngineServiceSuffix);
+      .append(BpmPlatform.APP_JNDI_NAME)
+      .append(BpmPlatform.MODUL_JNDI_NAME)
+      .append(BpmPlatform.PROCESS_ENGINE_SERVICE_NAME);
     
-    BinderService processEngineServiceBinder = new BinderService(processEngineServiceBindingName);
+    BinderService processEngineServiceBinder = new BinderService(BpmPlatform.PROCESS_ENGINE_SERVICE_JNDI_NAME);
     ServiceBuilder<ManagedReferenceFactory> processEngineServiceBuilder = childTarget
             .addService(processEngineServiceBindingServiceName, processEngineServiceBinder)
             .addDependency(ContextNames.GLOBAL_CONTEXT_SERVICE_NAME, ServiceBasedNamingStore.class, processEngineServiceBinder.getNamingStoreInjector());
@@ -235,6 +228,18 @@ public class MscRuntimeContainerDelegate implements Service<MscRuntimeContainerD
             
     processEngineServiceBuilder.install();
     
+    final ServiceName processApplicationServiceBindingServiceName = ContextNames.GLOBAL_CONTEXT_SERVICE_NAME            
+        .append(BpmPlatform.APP_JNDI_NAME)
+        .append(BpmPlatform.MODUL_JNDI_NAME)
+        .append(BpmPlatform.PROCESS_APPLICATION_SERVICE_NAME);
+      
+    BinderService processApplicationServiceBinder = new BinderService(BpmPlatform.PROCESS_APPLICATION_SERVICE_JNDI_NAME);
+    ServiceBuilder<ManagedReferenceFactory> processApplicationServiceBuilder = childTarget
+             .addService(processApplicationServiceBindingServiceName, processApplicationServiceBinder)
+             .addDependency(ContextNames.GLOBAL_CONTEXT_SERVICE_NAME, ServiceBasedNamingStore.class, processApplicationServiceBinder.getNamingStoreInjector());
+    processApplicationServiceBinder.getManagedObjectInjector().inject(new PlatformServiceReferenceFactory(this));
+              
+    processApplicationServiceBuilder.install();
   }
   
   protected ProcessEngine getProcessEngineService(ServiceName processEngineServiceName) {
