@@ -11,23 +11,18 @@
 
   <includeBaseDirectory>false</includeBaseDirectory>
   
-  <fileSets>
-    <fileSet>
-      <directory>../../camunda-welcome</directory>
-      <outputDirectory>server/glassfish3/glassfish/domains/domain1/autodeploy/camunda-welcome.war</outputDirectory>      
-    </fileSet> 
-  </fileSets>
-  
   <dependencySets>
   
-   <dependencySet>
+    <dependencySet>
       <unpack>true</unpack>
       <includes>
-        <include>org.camunda.bpm.glassfish:camunda-glassfish-assembly:tar.gz:*</include>
+        <include>org.camunda.bpm.glassfish:camunda-glassfish-assembly</include>
       </includes>
+      <outputDirectory />
     </dependencySet>
   
     <dependencySet>
+      <outputDirectory />
       <unpack>true</unpack>
       <unpackOptions>
         <includes>
@@ -48,7 +43,7 @@
         </includes>
       </unpackOptions>
       <includes>
-		<include>org.camunda.bpm.cycle:camunda-cycle-sql-scripts:jar:*</include>
+        <include>org.camunda.bpm.cycle:camunda-cycle-sql-scripts:jar:*</include>
       </includes>
     </dependencySet>
 
@@ -59,7 +54,7 @@
   		<outputDirectory>server/glassfish3/glassfish/domains/domain1/autodeploy</outputDirectory>
   	</dependencySet>    
     
-	<dependencySet>
+    <dependencySet>
       <includes>
         <include>org.camunda.bpm.cycle:camunda-cycle-glassfish:war:*</include>
       </includes>
@@ -78,7 +73,15 @@
         <include>org.camunda.bpm.cockpit:camunda-cockpit:war:*</include>
       </includes>
       <outputDirectory>server/glassfish3/glassfish/domains/domain1/autodeploy</outputDirectory>
-    </dependencySet>           
+    </dependencySet>
+
   </dependencySets>
+
+  <fileSets>
+    <fileSet>
+      <directory>../../camunda-welcome</directory>
+      <outputDirectory>server/glassfish3/glassfish/domains/domain1/autodeploy/camunda-welcome.war</outputDirectory>
+    </fileSet>
+  </fileSets>
 
 </assembly>

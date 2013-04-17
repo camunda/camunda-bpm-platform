@@ -3,7 +3,7 @@ This is a distribution of
        camunda BPM platform v${project.version}
           
 visit     
-       http://www.camunda.org/implement.html
+       http://docs.camunda.org/
 
    
 camunda BPM platform is licensed under the Apache License v2.0
@@ -16,11 +16,11 @@ the Apache License v2.0 license.
 
 Contents:
 
-    lib/
+  lib/
         This directory contains the java libraries for application 
         development.
             
-    server/
+  server/
         This directory contains a preconfigured distribution 
         of Apache Tomcat with camunda BPM platform readily 
         installed. 
@@ -37,7 +37,7 @@ Contents:
         http://localhost:8080/engine-rest
         http://localhost:8080/cycle    
         
-    sql/
+  sql/
         This directory contains the create and upgrade sql script
         for the different databases.
         The engine create script contain the engine and history tables.

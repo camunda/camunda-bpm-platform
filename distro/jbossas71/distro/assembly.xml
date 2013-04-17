@@ -77,32 +77,32 @@
     
     <dependencySet>
         <includes>
-            <include>org.camunda.bpm.cockpit:camunda-cockpit:war:*</include>
+          <include>org.camunda.bpm.cockpit:camunda-cockpit:war:*</include>
         </includes>
         <outputDirectory>server/jboss-as-${version.jboss.as}/standalone/deployments</outputDirectory>
     </dependencySet>
 
     <dependencySet>
         <includes>
-            <include>org.camunda.bpm.tasklist:camunda-tasklist:war:*</include>
+          <include>org.camunda.bpm.tasklist:camunda-tasklist:war:*</include>
         </includes>
         <outputDirectory>server/jboss-as-${version.jboss.as}/standalone/deployments</outputDirectory>
     </dependencySet>
     
     <dependencySet>
         <includes>
-            <include>org.camunda.bpm.example:camunda-example-invoice:war:*</include>
+          <include>org.camunda.bpm.example:camunda-example-invoice:war:*</include>
         </includes>
         <outputDirectory>server/jboss-as-${version.jboss.as}/standalone/deployments</outputDirectory>
     </dependencySet>
     
   </dependencySets>
   
-  <fileSets>    
+  <fileSets>
     <fileSet>
       <directory>../../camunda-welcome</directory>
       <outputDirectory>server/jboss-as-${version.jboss.as}/standalone/deployments/camunda-welcome.war</outputDirectory>      
-    </fileSet> 
+    </fileSet>
   </fileSets>
   
   <files>
