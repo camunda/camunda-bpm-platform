@@ -1,5 +1,5 @@
 #! /bin/sh
-echo "starting camunda BPM ${project.version} on Glassfish Application Server ${version.glassfish}";
+echo "starting camunda BPM ${project.version}  on JBoss Application Server ${version.jboss.as}";
 
 if [ "`which firefox`" = "/usr/bin/firefox" ]; then
   BROWSER="/usr/bin/firefox";

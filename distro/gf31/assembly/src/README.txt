@@ -18,16 +18,17 @@ Contents:
   client/
         This directory contains the client jar which is 
         needed for deploying process applications to the 
-        fox platform.
+        camunda BPM platform.
   
   modules/
         This directory contains the modules which 
-        make up the fox platform. You can use these modules 
-        and copy them to a vanilla distribution of glassfish.
+        make up the camunda BPM platform. You can use these
+        modules and copy them to a vanilla distribution of
+        glassfish.
           
   server/
         This directory contains a preconfigured distribution 
-        of glassfish 3.1.x with camunda fox ee readily installed. 
+        of glassfish 3.1.x with camunda BPM platform readily installed. 
         
         run the         
                 server/glassfish3/glassfish/bin/startserv.{bat/sh} 
