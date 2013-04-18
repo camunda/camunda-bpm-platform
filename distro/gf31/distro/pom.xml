@@ -67,6 +67,13 @@
       <type>war</type>
     </dependency>
 	
+    <!-- sample applications -->
+    <dependency>
+      <groupId>org.camunda.bpm.example</groupId>
+      <artifactId>camunda-example-invoice</artifactId>
+      <version>${project.version}</version>
+      <type>war</type>
+    </dependency>
   </dependencies>
 
   <build>
