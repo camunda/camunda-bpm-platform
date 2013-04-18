@@ -49,7 +49,7 @@
 
     <dependencySet>
   		<includes>
-  			<include>org.camunda.bpm.tasklist:camunda-tasklist:war:*</include>
+  			<include>org.camunda.bpm.tasklist:camunda-tasklist-glassfish:war:*</include>
   		</includes>
   		<outputDirectory>server/glassfish3/glassfish/domains/domain1/autodeploy</outputDirectory>
   	</dependencySet>
