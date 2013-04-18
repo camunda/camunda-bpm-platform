@@ -49,7 +49,7 @@
           datasource-classname="org.h2.jdbcx.JdbcDataSource" 
           res-type="javax.sql.DataSource" non-transactional-connections="true" 
           name="ProcessEnginePool">
-	  <property name="Url" value="jdbc:h2:./camunda-h2-dbs/camunda-engine;DB_CLOSE_DELAY=-1;MVCC=TRUE;DB_CLOSE_ON_EXIT=FALSE"></property>
+	  <property name="Url" value="jdbc:h2:./camunda-h2-dbs/process-engine;DB_CLOSE_DELAY=-1;MVCC=TRUE;DB_CLOSE_ON_EXIT=FALSE"></property>
 	  <property name="User" value="sa"></property>
       <property name="Password" value="sa"></property>
     </jdbc-connection-pool>
