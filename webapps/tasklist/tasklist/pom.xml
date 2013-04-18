@@ -91,10 +91,6 @@
                   <!-- Maven project version number -->
                   <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
                 </manifest>
-                <manifestEntries>
-                  <!-- module dependencies for deployment on AS 7 -->
-                  <Dependencies>org.camunda.bpm.camunda-engine</Dependencies>
-                </manifestEntries>
               </archive>
             </configuration>
           </plugin>
