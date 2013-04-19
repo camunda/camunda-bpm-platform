@@ -13,10 +13,6 @@
 
   <name>camunda BPM - jBoss7</name>
   
-  <description>
-    This pom defines the modules for the JBoss distribution which is shipped as Fox Platform Comunity Edition (CE)
-  </description>
-
   <modules>
     <module>assembly</module>
     <module>distro</module>

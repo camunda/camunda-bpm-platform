@@ -93,7 +93,7 @@ public class MailService {
 
   protected void setSubject(Message msg, String foxType, String emailName) {
     try {
-      msg.setSubject("Welcome to camunda fox " + foxType);
+      msg.setSubject("Welcome to camunda " + foxType);
     } catch (MessagingException e) {
       throw new MailServiceException("Could not set 'subject' field in "+emailName+": "+e.getMessage(), e);
     }

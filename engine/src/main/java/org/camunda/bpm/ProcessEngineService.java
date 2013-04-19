@@ -34,13 +34,13 @@ public interface ProcessEngineService {
   public ProcessEngine getDefaultProcessEngine();
 
   /**
-   * @return all {@link ProcessEngine ProcessEngines} managed by the fox platform.
+   * @return all {@link ProcessEngine ProcessEngines} managed by the camunda BPM platform.
    */
   public List<ProcessEngine> getProcessEngines();
 
   /**
    * 
-   * @return the names of all {@link ProcessEngine ProcessEngines} managed by the fox platform.
+   * @return the names of all {@link ProcessEngine ProcessEngines} managed by the camunda BPM platform.
    */
   public Set<String> getProcessEngineNames();
   

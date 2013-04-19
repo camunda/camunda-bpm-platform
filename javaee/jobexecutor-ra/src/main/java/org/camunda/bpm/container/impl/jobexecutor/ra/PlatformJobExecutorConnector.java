@@ -55,17 +55,17 @@ public class PlatformJobExecutorConnector implements ResourceAdapter {
     PlatformJobExecutorFactory platformJobExecutorFactory = null;
     if (iterator.hasNext()) {
       platformJobExecutorFactory = iterator.next();
-      log.log(Level.INFO, "Using user-configured fox platform job executor factory: " + platformJobExecutorFactory.getClass().getName());
+      log.log(Level.INFO, "Using user-configured camunda BPM platform job executor factory: " + platformJobExecutorFactory.getClass().getName());
     } else {
       // try to auto-detect environment (commonJ or JCA)
       platformJobExecutorFactory = new AutoDetectWorkManagerPlatformJobExecutorFactory();
-      log.log(Level.INFO, "Using default fox platform job executor factory: " + platformJobExecutorFactory.getClass().getName());
+      log.log(Level.INFO, "Using default camunda BPM platform job executor factory: " + platformJobExecutorFactory.getClass().getName());
     }
     
     platformJobExecutor = platformJobExecutorFactory.createPlatformJobExecutor(this);
     platformJobExecutor.start();
     
-    log.log(Level.INFO, "fox platform job executor started.");
+    log.log(Level.INFO, "camunda BPM platform job executor started.");
   }
 
   public void stop() {
@@ -76,7 +76,7 @@ public class PlatformJobExecutorConnector implements ResourceAdapter {
 
   public void endpointActivation(MessageEndpointFactory endpointFactory, ActivationSpec spec) throws ResourceException {
     if(jobHandlerActivation != null) {
-      throw new ResourceException("The fox platform job executor can only service a single MessageEndpoint for job execution. " +
+      throw new ResourceException("The camunda BPM platform job executor can only service a single MessageEndpoint for job execution. " +
       		"Make sure not to deploy more than one MDB implementing the '"+JobExecutionHandler.class.getName()+"' interface.");
     }
     JobExecutionHandlerActivation activation = new JobExecutionHandlerActivation(this, endpointFactory, (JobExecutionHandlerActivationSpec) spec);

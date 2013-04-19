@@ -5,7 +5,7 @@ import java.util.Map;
 /**
  * <p>Configuraiton of a job acquisition.</p> 
  * 
- * <p><strong>NOTE:</strong> this class is not part of fox platform 
+ * <p><strong>NOTE:</strong> this class is not part of camunda BPM platform 
  * public api and as such subject to incompatible change.</p>
  *  
  * @author Daniel Meyer

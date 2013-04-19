@@ -10,7 +10,7 @@ import org.camunda.bpm.engine.impl.jobexecutor.tobemerged.spi.JobAcquisitionConf
 /**
  * <p>Service interface of the platform job executor</p>
  * 
- * <p><strong>NOTE:</strong> this class is not part of fox platform 
+ * <p><strong>NOTE:</strong> this class is not part of camunda BPM platform 
  * public api and as such subject to incompatible change.</p>
  * 
  * @author Daniel Meyer

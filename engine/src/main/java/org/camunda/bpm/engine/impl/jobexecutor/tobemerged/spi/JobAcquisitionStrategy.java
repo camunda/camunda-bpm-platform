@@ -11,7 +11,7 @@ import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
  * <p>You may plugin custom implementations of this interface using 
  * the {@link java.util.ServiceLoader} mechanisms</p>
  * 
- * <p><strong>NOTE:</strong> this class is not part of fox platform 
+ * <p><strong>NOTE:</strong> this class is not part of camunda BPM platform 
  * public api and as such potentially to incompatible change.</p>
  * 
  * @author Daniel Meyer

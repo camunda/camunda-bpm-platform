@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
 
   <description>
-    Assembles the fox platform and makes it ready for qa. 
+    Assembles the camunda BPM platform and makes it ready for qa. 
     The assembly is installed to maven later in the reactor, if the integration tests pass sucessfully
   </description>
 
