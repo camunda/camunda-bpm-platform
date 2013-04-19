@@ -82,7 +82,8 @@ public class RestIT extends AbstractWebappIntegrationTest {
     Assert.assertEquals(200, response.getStatus());
 
     JSONArray definitionsJson = response.getEntity(JSONArray.class);
-    Assert.assertEquals(1, definitionsJson.length());
+    // 2 = simple process + invoice example
+    Assert.assertEquals(2, definitionsJson.length());
 
     JSONObject definitionJson = definitionsJson.getJSONObject(0);
 
