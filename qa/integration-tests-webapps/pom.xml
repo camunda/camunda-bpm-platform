@@ -32,6 +32,34 @@
     </dependency>
 
     <dependency>
+      <groupId>org.seleniumhq.selenium</groupId>
+      <artifactId>selenium-java</artifactId>
+      <version>2.32.0</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.seleniumhq.selenium</groupId>
+      <artifactId>selenium-server</artifactId>
+      <version>2.32.0</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>xml-apis</groupId>
+      <artifactId>xml-apis</artifactId>
+      <version>1.4.01</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpclient</artifactId>
+      <version>4.2.3</version>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
       <groupId>com.sun.jersey.contribs</groupId>
       <artifactId>jersey-apache-client4</artifactId>
       <version>1.15</version>
@@ -69,6 +97,30 @@
     <dependency>
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.camunda.bpm.cockpit</groupId>
+      <artifactId>camunda-cockpit</artifactId>
+      <version>${project.version}</version>
+      <type>war</type>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.camunda.bpm.tasklist</groupId>
+      <artifactId>camunda-tasklist</artifactId>
+      <version>${project.version}</version>
+      <type>war</type>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.camunda.bpm.example</groupId>
+      <artifactId>camunda-example-invoice</artifactId>
+      <version>${project.version}</version>
+      <type>war</type>
       <scope>test</scope>
     </dependency>
 
@@ -317,6 +369,32 @@
                     <context>engine-rest</context>
                   </properties>
                 </deployable>
+                <deployable>
+                  <groupId>org.camunda.bpm.cockpit</groupId>
+                  <artifactId>camunda-cockpit</artifactId>
+                  <type>war</type>
+                  <pingURL>http://localhost:${glassfish.http.port}/cockpit</pingURL>
+                  <properties>
+                    <context>cockpit</context>
+                  </properties>
+                </deployable>
+                <deployable>
+                  <groupId>org.camunda.bpm.tasklist</groupId>
+                  <artifactId>camunda-tasklist</artifactId>
+                  <type>war</type>
+                  <pingURL>http://localhost:${glassfish.http.port}/tasklist</pingURL>
+                  <properties>
+                    <context>tasklist</context>
+                  </properties>
+                </deployable>
+                <deployable>
+                  <groupId>org.camunda.bpm.example</groupId>
+                  <artifactId>camunda-example-invoice</artifactId>
+                  <type>war</type>
+                  <properties>
+                    <context>invoice</context>
+                  </properties>
+                </deployable>
               </deployables>
               <wait>false</wait>
             </configuration>
@@ -414,6 +492,32 @@
                     <context>engine-rest</context>
                   </properties>
                 </deployable>
+                <deployable>
+                  <groupId>org.camunda.bpm.cockpit</groupId>
+                  <artifactId>camunda-cockpit</artifactId>
+                  <type>war</type>
+                  <pingURL>http://localhost:${tomcat6.connector.http.port}/cockpit</pingURL>
+                  <properties>
+                    <context>cockpit</context>
+                  </properties>
+                </deployable>
+                <deployable>
+                  <groupId>org.camunda.bpm.tasklist</groupId>
+                  <artifactId>camunda-tasklist</artifactId>
+                  <type>war</type>
+                  <pingURL>http://localhost:${tomcat6.connector.http.port}/tasklist</pingURL>
+                  <properties>
+                    <context>tasklist</context>
+                  </properties>
+                </deployable>
+                <deployable>
+                  <groupId>org.camunda.bpm.example</groupId>
+                  <artifactId>camunda-example-invoice</artifactId>
+                  <type>war</type>
+                  <properties>
+                    <context>invoice</context>
+                  </properties>
+                </deployable>
               </deployables>
               <wait>false</wait>
             </configuration>
@@ -445,7 +549,7 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-failsafe-plugin</artifactId>
-          </plugin>   
+          </plugin>
           <plugin>
             <artifactId>maven-antrun-plugin</artifactId>
             <version>1.4</version>

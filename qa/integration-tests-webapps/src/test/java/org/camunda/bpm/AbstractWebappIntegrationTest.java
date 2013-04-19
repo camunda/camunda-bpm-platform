@@ -12,13 +12,9 @@
  */
 package org.camunda.bpm;
 
-import java.io.InputStream;
-import java.util.Properties;
 import java.util.logging.Logger;
 
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.camunda.bpm.cycle.test.TestCycleRoundtripIT;
-import org.camunda.bpm.cycle.util.IoUtil;
 import org.junit.After;
 import org.junit.Before;
 
@@ -50,19 +46,10 @@ public abstract class AbstractWebappIntegrationTest {
 
   @Before
   public void createClient() throws Exception {
-    Properties properties = new Properties();
-
-    InputStream propertiesStream = null;
-    try {
-      propertiesStream = TestCycleRoundtripIT.class.getResourceAsStream("/testconfig.properties");
-      properties.load(propertiesStream);
-      httpPort = (String) properties.get("http.port");
-    } finally {
-      IoUtil.closeSilently(propertiesStream);
-    }
+    TestProperties util = new TestProperties();
 
     String applicationContextPath = getApplicationContextPath();
-    APP_BASE_PATH = "http://" + HOST_NAME + ":"+httpPort+"/"+applicationContextPath;
+    APP_BASE_PATH = util.getApplicationPath("/" + applicationContextPath);
     LOGGER.info("Connecting to application "+APP_BASE_PATH);
 
     ClientConfig clientConfig = new DefaultApacheHttpClient4Config();
