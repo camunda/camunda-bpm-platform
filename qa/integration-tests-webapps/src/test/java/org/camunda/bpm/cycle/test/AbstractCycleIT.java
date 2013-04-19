@@ -7,7 +7,7 @@ import java.util.Map;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -22,11 +22,11 @@ import com.sun.jersey.api.client.WebResource;
 
 
 public abstract class AbstractCycleIT extends AbstractWebappIntegrationTest {
-  
+
   protected String getApplicationContextPath() {
     return "cycle/";
   }
-  
+
   public void login(String username, String password) throws Exception {
     HttpPost httpPost = new HttpPost(APP_BASE_PATH+"j_security_check");
     List<NameValuePair> parameterList = new ArrayList<NameValuePair>();
@@ -37,10 +37,10 @@ public abstract class AbstractCycleIT extends AbstractWebappIntegrationTest {
     HttpResponse httpResponse = defaultHttpClient.execute(httpPost);
     int status = httpResponse.getStatusLine().getStatusCode();
     httpResponse.getEntity().getContent().close();
-    
-    Assert.assertEquals(302, status);        
+
+    Assert.assertEquals(302, status);
   }
-  
+
   public void createInitialUserAndLogin() throws Exception {
     // create initial user
     WebResource webResource = client.resource(APP_BASE_PATH+"app/first-time-setup");
@@ -52,16 +52,16 @@ public abstract class AbstractCycleIT extends AbstractWebappIntegrationTest {
     userDTO.setPassword(password);
     userDTO.setEmail("test@camunda.com");
     userDTO.setAdmin(true);
-    
+
     ClientResponse clientResponse = webResource.accept(MediaType.APPLICATION_JSON).type(MediaType.APPLICATION_JSON).post(ClientResponse.class, userDTO);
     int status = clientResponse.getStatus();
     clientResponse.close();
     Assert.assertEquals(Status.OK.getStatusCode(), status);
-    
+
     // login with created user
     login(username, password);
   }
-  
+
   public void deleteAllUsers() throws Exception {
     WebResource webResource = client.resource(APP_BASE_PATH+"app/secured/resource/user");
     ClientResponse response = webResource.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
@@ -69,7 +69,7 @@ public abstract class AbstractCycleIT extends AbstractWebappIntegrationTest {
     response.close();
     for (Map userDTO : users) {
       deleteUser(String.valueOf(userDTO.get("id")));
-    }    
+    }
   }
 
   public void deleteUser(String userId) {
@@ -77,7 +77,7 @@ public abstract class AbstractCycleIT extends AbstractWebappIntegrationTest {
     ClientResponse clientResponse = webResource.delete(ClientResponse.class);
     clientResponse.close();
   }
-  
+
   public void deleteAllRoundtrips() {
     WebResource webResource = client.resource(APP_BASE_PATH+"app/secured/resource/roundtrip/");
     ClientResponse response = webResource.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
@@ -93,7 +93,7 @@ public abstract class AbstractCycleIT extends AbstractWebappIntegrationTest {
     ClientResponse clientResponse = webResource.delete(ClientResponse.class);
     clientResponse.close();
   }
-  
+
   public void deleteAllConnectors() {
     WebResource webResource = client.resource(APP_BASE_PATH+"app/secured/resource/connector/configuration");
     ClientResponse response = webResource.accept(MediaType.APPLICATION_JSON).get(ClientResponse.class);
@@ -101,7 +101,7 @@ public abstract class AbstractCycleIT extends AbstractWebappIntegrationTest {
     response.close();
     for (Map<String,Object> connectorConfigurationDTO : entity) {
       deleteConnector(String.valueOf(connectorConfigurationDTO.get("connectorId")));
-    }    
+    }
   }
 
   public void deleteConnector(String connectorId) {

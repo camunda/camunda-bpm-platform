@@ -33,7 +33,7 @@
     <dependencySet>
       <outputDirectory>modules</outputDirectory>
       <includes>
-        <include>org.camunda.bpm.glassfish:camunda-glassfish-ear:ear:*</include>                
+        <include>org.camunda.bpm.glassfish:camunda-glassfish-ear:ear:*</include>
         <include>org.camunda.bpm.javaee:camunda-jobexecutor-rar:rar:*</include>
       </includes>     
     </dependencySet>
@@ -97,6 +97,22 @@
       <outputDirectory></outputDirectory>
     </file>
     <file>
+      <source>src/start-camunda.bat</source>
+      <filtered>true</filtered>
+      <outputDirectory></outputDirectory>
+    </file>
+    <!-- <file>
+      <source>src/start-camunda.sh</source>
+      <filtered>true</filtered>
+      <outputDirectory></outputDirectory>
+      <fileMode>0755</fileMode>
+    </file> -->
+    <file>
+      <source>src/LICENSE-2.0.txt</source>
+      <filtered>true</filtered>
+      <outputDirectory></outputDirectory>
+    </file>
+    <file>
       <source>target/filtered-resources/domain.xml</source>
       <filtered>false</filtered>
       <outputDirectory>server/glassfish3/glassfish/domains/domain1/config</outputDirectory>
@@ -105,6 +121,6 @@
       <source>src/default-web.xml</source>
       <filtered>false</filtered>
       <outputDirectory>server/glassfish3/glassfish/domains/domain1/config</outputDirectory>
-    </file>      
+    </file>
   </files>
 </assembly>

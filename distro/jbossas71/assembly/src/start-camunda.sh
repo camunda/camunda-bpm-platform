@@ -1,5 +1,5 @@
 #! /bin/sh
-echo "starting camunda BPM platform on JBoss Application Server";
+echo "starting camunda BPM ${project.version}  on JBoss Application Server ${version.jboss.as}";
 
 if [ "`which firefox`" = "/usr/bin/firefox" ]; then
   BROWSER="/usr/bin/firefox";
@@ -12,7 +12,7 @@ fi
 if [ "$BROWSER" = "empty" ]; then
 ( sleep 15;  echo "We are sorry... We tried all we could do but we couldn't locate your default browser... \nIf you want to see our default website please open your browser and insert this URL:\nhttp://localhost:8080/camunda-welcome/index.html";) &
 else
-  (sleep 5; $BROWSER "http://localhost:8080/camunda-welcome/index.html";) &
+  (sleep 15; $BROWSER "http://localhost:8080/camunda-welcome/index.html";) &
 fi
 
 /bin/sh ./server/jboss-as-${version.jboss.as}/bin/standalone.sh

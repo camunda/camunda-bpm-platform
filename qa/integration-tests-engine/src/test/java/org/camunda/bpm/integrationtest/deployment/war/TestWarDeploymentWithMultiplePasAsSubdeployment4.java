@@ -16,7 +16,7 @@
 
 package org.camunda.bpm.integrationtest.deployment.war;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.camunda.bpm.engine.repository.DeploymentQuery;
 import org.camunda.bpm.engine.repository.ProcessDefinition;

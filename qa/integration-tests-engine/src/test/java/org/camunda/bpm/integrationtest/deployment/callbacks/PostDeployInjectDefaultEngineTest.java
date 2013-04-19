@@ -14,7 +14,7 @@ package org.camunda.bpm.integrationtest.deployment.callbacks;
 
 import java.util.List;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.integrationtest.deployment.callbacks.apps.PostDeployInjectApp;

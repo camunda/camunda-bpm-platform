@@ -1,6 +1,6 @@
 package org.camunda.bpm.integrationtest.functional.transactions;
 
-import junit.framework.Assert;
+import org.junit.Assert;
 
 import org.camunda.bpm.engine.impl.cfg.TransactionListener;
 import org.camunda.bpm.engine.impl.cfg.TransactionState;
