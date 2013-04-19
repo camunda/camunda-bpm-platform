@@ -93,7 +93,7 @@
       <type>test-jar</type>
       <scope>test</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine</artifactId>
@@ -119,6 +119,22 @@
     <dependency>
       <groupId>org.camunda.bpm.tasklist</groupId>
       <artifactId>camunda-tasklist-tomcat</artifactId>
+      <version>${project.version}</version>
+      <type>war</type>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.camunda.bpm.tasklist</groupId>
+      <artifactId>camunda-tasklist-glassfish</artifactId>
+      <version>${project.version}</version>
+      <type>war</type>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.camunda.bpm.tasklist</groupId>
+      <artifactId>camunda-tasklist-jboss</artifactId>
       <version>${project.version}</version>
       <type>war</type>
       <scope>test</scope>
@@ -192,7 +208,7 @@
           <version>${project.version}</version>
           <type>war</type>
           <scope>test</scope>
-        </dependency>        
+        </dependency>
 	    <dependency>
 	      <groupId>org.camunda.bpm</groupId>
 	      <artifactId>camunda-engine-rest</artifactId>
@@ -234,7 +250,7 @@
               <configuration>
                 <type>standalone</type>
                 <home>${project.build.directory}/config-jboss</home>
-                
+
                 <properties>
                   <cargo.servlet.port>${jboss.http.port}</cargo.servlet.port>
                 </properties>
@@ -269,7 +285,7 @@
                 </deployable>
                 <deployable>
                   <groupId>org.camunda.bpm.tasklist</groupId>
-                  <artifactId>camunda-tasklist</artifactId>
+                  <artifactId>camunda-tasklist-jboss</artifactId>
                   <type>war</type>
                   <pingURL>http://localhost:${jboss.http.port}/tasklist</pingURL>
                   <properties>
@@ -313,7 +329,7 @@
           <type>war</type>
           <scope>test</scope>
         </dependency>
-        
+
         <dependency>
           <groupId>org.camunda.bpm</groupId>
           <artifactId>camunda-engine-rest</artifactId>
@@ -323,8 +339,8 @@
         </dependency>
       </dependencies>
 
-      <build>        
-        <plugins>         
+      <build>
+        <plugins>
           <plugin>
             <artifactId>maven-resources-plugin</artifactId>
             <executions>
@@ -414,7 +430,7 @@
                 </deployable>
                 <deployable>
                   <groupId>org.camunda.bpm.tasklist</groupId>
-                  <artifactId>camunda-tasklist</artifactId>
+                  <artifactId>camunda-tasklist-glassfish</artifactId>
                   <type>war</type>
                   <pingURL>http://localhost:${glassfish.http.port}/tasklist</pingURL>
                   <properties>
@@ -436,7 +452,7 @@
         </plugins>
       </build>
     </profile>
-   
+
     <profile>
       <id>tomcat</id>
       <properties>
@@ -458,7 +474,7 @@
           <type>war</type>
           <scope>test</scope>
         </dependency>
-        
+
         <dependency>
           <groupId>org.camunda.bpm</groupId>
           <artifactId>camunda-engine-rest</artifactId>
@@ -469,8 +485,8 @@
         </dependency>
       </dependencies>
 
-      <build> 
-        <plugins>      
+      <build>
+        <plugins>
           <plugin>
             <groupId>org.codehaus.cargo</groupId>
             <artifactId>cargo-maven2-plugin</artifactId>
@@ -575,11 +591,11 @@
         </plugins>
       </build>
     </profile>
-    
-    <profile>      
+
+    <profile>
       <id>webapps-integration</id>
       <build>
-        <plugins>        
+        <plugins>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-failsafe-plugin</artifactId>
@@ -612,11 +628,11 @@
         </plugins>
       </build>
     </profile>
-    
-    <!-- allows dropping all databases -->    
-    <profile>       
+
+    <!-- allows dropping all databases -->
+    <profile>
       <id>clean-db</id>
-      <dependencies>          
+      <dependencies>
         <dependency>
           <groupId>org.camunda.bpm.cycle</groupId>
           <artifactId>camunda-cycle-sql-scripts</artifactId>
@@ -645,7 +661,7 @@
                     </artifactItem>
                     <artifactItem>
                       <groupId>org.camunda.bpm</groupId>
-                      <artifactId>camunda-engine</artifactId>                      
+                      <artifactId>camunda-engine</artifactId>
                       <outputDirectory>${project.build.directory}/sql-scripts/engine</outputDirectory>
                       <overWrite>true</overWrite>
                     </artifactItem>
@@ -725,7 +741,7 @@
         </plugins>
       </build>
     </profile>
-    
+
   </profiles>
 
   <build>
@@ -768,7 +784,7 @@
 
     <pluginManagement>
       <plugins>
-        <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build 
+        <!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build
           itself. -->
         <plugin>
           <groupId>org.eclipse.m2e</groupId>
