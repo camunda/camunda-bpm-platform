@@ -237,6 +237,7 @@
                 
                 <properties>
                   <cargo.servlet.port>${jboss.http.port}</cargo.servlet.port>
+                  <cargo.jboss.ajp.port>${jboss.ajp.port}</cargo.jboss.ajp.port>
                 </properties>
               </configuration>
               <deployables>
