@@ -117,6 +117,14 @@
     </dependency>
 
     <dependency>
+      <groupId>org.camunda.bpm.tasklist</groupId>
+      <artifactId>camunda-tasklist-tomcat</artifactId>
+      <version>${project.version}</version>
+      <type>war</type>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
       <groupId>org.camunda.bpm.example</groupId>
       <artifactId>camunda-example-invoice</artifactId>
       <version>${project.version}</version>
@@ -248,6 +256,32 @@
                   <pingURL>http://localhost:${jboss.http.port}/engine-rest/engine/default/process-definition</pingURL>
                   <properties>
                     <context>engine-rest</context>
+                  </properties>
+                </deployable>
+                <deployable>
+                  <groupId>org.camunda.bpm.cockpit</groupId>
+                  <artifactId>camunda-cockpit</artifactId>
+                  <type>war</type>
+                  <pingURL>http://localhost:${jboss.http.port}/cockpit</pingURL>
+                  <properties>
+                    <context>cockpit</context>
+                  </properties>
+                </deployable>
+                <deployable>
+                  <groupId>org.camunda.bpm.tasklist</groupId>
+                  <artifactId>camunda-tasklist</artifactId>
+                  <type>war</type>
+                  <pingURL>http://localhost:${jboss.http.port}/tasklist</pingURL>
+                  <properties>
+                    <context>tasklist</context>
+                  </properties>
+                </deployable>
+                <deployable>
+                  <groupId>org.camunda.bpm.example</groupId>
+                  <artifactId>camunda-example-invoice</artifactId>
+                  <type>war</type>
+                  <properties>
+                    <context>invoice</context>
                   </properties>
                 </deployable>
               </deployables>
@@ -503,7 +537,7 @@
                 </deployable>
                 <deployable>
                   <groupId>org.camunda.bpm.tasklist</groupId>
-                  <artifactId>camunda-tasklist</artifactId>
+                  <artifactId>camunda-tasklist-tomcat</artifactId>
                   <type>war</type>
                   <pingURL>http://localhost:${tomcat6.connector.http.port}/tasklist</pingURL>
                   <properties>

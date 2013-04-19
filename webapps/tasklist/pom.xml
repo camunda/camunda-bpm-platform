@@ -17,6 +17,7 @@
     <module>tasklist</module>
     <module>tasklist-jboss</module>
     <module>tasklist-glassfish</module>
+    <module>tasklist-tomcat</module>
   </modules>
   
 </project>
