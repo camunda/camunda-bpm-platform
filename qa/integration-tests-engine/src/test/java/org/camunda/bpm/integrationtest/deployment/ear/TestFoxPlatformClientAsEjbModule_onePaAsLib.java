@@ -35,7 +35,7 @@ import org.junit.runner.RunWith;
 
 
 /**
- * This test verifies that a process archive packaging the fox platform client
+ * This test verifies that a process archive packaging the camunda BPM platform client
  * can be packaged inside an EAR application.
  * 
  * @author Daniel Meyer

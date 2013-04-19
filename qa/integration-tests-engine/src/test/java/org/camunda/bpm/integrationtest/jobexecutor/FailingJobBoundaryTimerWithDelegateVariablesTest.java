@@ -33,7 +33,7 @@ import org.junit.runner.RunWith;
 
 
 /**
- * Test fox platform container job exectuor.
+ * Test camunda BPM platform container job exectuor.
  * FAILING ATM!
  * Expected a job with an exception but it isn't left in db with 0 retries, instead it is completely removed from the job table!
  *  
