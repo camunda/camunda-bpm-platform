@@ -185,7 +185,7 @@
 	    from
 	    (select ACT_ID_, count(PROC_INST_ID_) as INSTANCE_COUNT 
 	    from ${prefix}ACT_RU_EXECUTION
-	    where PROC_DEF_ID_ = #{processDefinitionId} and IS_ACTIVE_ = 1
+	    where PROC_DEF_ID_ = #{processDefinitionId} and CAST(IS_ACTIVE_ as INTEGER) = 1
 	    group by ACT_ID_) INSTANCE
 	    
 	    <if test="failedJobsToInclude">
