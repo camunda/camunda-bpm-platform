@@ -222,7 +222,7 @@ public class MscRuntimeContainerDelegate implements Service<MscRuntimeContainerD
   protected void createJndiBindings() {
     final ServiceName processEngineServiceBindingServiceName = ContextNames.GLOBAL_CONTEXT_SERVICE_NAME            
       .append(BpmPlatform.APP_JNDI_NAME)
-      .append(BpmPlatform.MODUL_JNDI_NAME)
+      .append(BpmPlatform.MODULE_JNDI_NAME)
       .append(BpmPlatform.PROCESS_ENGINE_SERVICE_NAME);
     
     BinderService processEngineServiceBinder = new BinderService(BpmPlatform.PROCESS_ENGINE_SERVICE_JNDI_NAME);
@@ -235,7 +235,7 @@ public class MscRuntimeContainerDelegate implements Service<MscRuntimeContainerD
     
     final ServiceName processApplicationServiceBindingServiceName = ContextNames.GLOBAL_CONTEXT_SERVICE_NAME            
         .append(BpmPlatform.APP_JNDI_NAME)
-        .append(BpmPlatform.MODUL_JNDI_NAME)
+        .append(BpmPlatform.MODULE_JNDI_NAME)
         .append(BpmPlatform.PROCESS_APPLICATION_SERVICE_NAME);
       
     BinderService processApplicationServiceBinder = new BinderService(BpmPlatform.PROCESS_APPLICATION_SERVICE_JNDI_NAME);
