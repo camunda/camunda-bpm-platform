@@ -79,6 +79,8 @@ public class DbSqlSessionFactory implements SessionFactory {
     addDatabaseSpecificStatement("postgres", "selectCommentsByTaskId", "selectCommentsByTaskId_postgres");
     addDatabaseSpecificStatement("postgres", "selectCommentsByProcessInstanceId", "selectCommentsByProcessInstanceId_postgres");
     addDatabaseSpecificStatement("postgres", "selectEventsByTaskId", "selectEventsByTaskId_postgres");
+    addDatabaseSpecificStatement("postgres", "selectActivityStatistics", "selectActivityStatistics_postgres");
+    addDatabaseSpecificStatement("postgres", "selectActivityStatisticsCount", "selectActivityStatisticsCount_postgres");
         
     // oracle
     databaseSpecificLimitBeforeStatements.put("oracle", "select * from ( select a.*, ROWNUM rnum from (");
