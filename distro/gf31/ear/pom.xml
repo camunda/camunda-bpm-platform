@@ -30,13 +30,7 @@
       <artifactId>camunda-glassfish-service</artifactId>
       <version>${project.version}</version>
       <type>ejb</type>
-    </dependency>
-    <dependency>
-      <groupId>org.camunda.bpm.javaee</groupId>
-      <artifactId>camunda-jobexecutor-service</artifactId>
-      <version>${project.version}</version>
-      <type>ejb</type>
-    </dependency>
+    </dependency>  
 
     <!-- exclude engine from ear -->
     <dependency>

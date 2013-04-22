@@ -25,6 +25,7 @@ public class ServiceNames {
   private final static ServiceName BPM_PLATFORM = ServiceName.of("org", "camunda", "bpm", "platform");
   
   private final static ServiceName PROCESS_ENGINE = BPM_PLATFORM.append("process-engine");
+  private final static ServiceName JOB_EXECUTOR = BPM_PLATFORM.append("job-executor");
   private final static ServiceName DEFAULT_PROCESS_ENGINE = PROCESS_ENGINE.append("default");
   
   private final static ServiceName MSC_RUNTIME_CONTAINER_DELEGATE = BPM_PLATFORM.append("runtime-container");
@@ -109,6 +110,20 @@ public class ServiceNames {
   
   public static ServiceName forNoViewProcessApplicationStartService(String moduleName) {
     return PROCESS_APPLICATION_MODULE.append(moduleName).append("NO_VIEW");
+  }
+
+  /**
+   * @return the {@link ServiceName} of the {@link MscExecutorService}. 
+   */
+  public static ServiceName forMscExecutorService() {
+    return BPM_PLATFORM.append("executor-service");
+  }
+  
+  /**
+   * @return the {@link ServiceName} of the {@link MscRuntimeContainerJobExecutor}
+   */
+  public static ServiceName forMscRuntimeContainerJobExecutorService(String jobExecutorName) {
+    return JOB_EXECUTOR.append(jobExecutorName);
   }
   
   

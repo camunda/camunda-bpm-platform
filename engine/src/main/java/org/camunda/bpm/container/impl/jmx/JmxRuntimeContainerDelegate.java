@@ -24,6 +24,7 @@ import org.camunda.bpm.ProcessApplicationService;
 import org.camunda.bpm.ProcessEngineService;
 import org.camunda.bpm.application.AbstractProcessApplication;
 import org.camunda.bpm.application.ProcessApplicationInfo;
+import org.camunda.bpm.container.ExecutorService;
 import org.camunda.bpm.container.RuntimeContainerDelegate;
 import org.camunda.bpm.container.impl.jmx.deployment.Attachments;
 import org.camunda.bpm.container.impl.jmx.deployment.DeployProcessArchivesStep;
@@ -41,21 +42,17 @@ import org.camunda.bpm.container.impl.jmx.services.JmxManagedProcessApplication;
 import org.camunda.bpm.container.impl.jmx.services.JmxManagedProcessEngine;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
-import org.camunda.bpm.engine.impl.jobexecutor.tobemerged.JobExecutorService;
-import org.camunda.bpm.engine.impl.jobexecutor.tobemerged.spi.JobAcquisitionConfiguration;
 
 /**
  * <p>This is the default {@link RuntimeContainerDelegate} implementation that delegates
  * to the local {@link MBeanServer} infrastructure. The MBeanServer is available
  * as per the Java Virtual Machine and allows the process engine to expose
  * Management Resources.</p>
- *
+ * 
  * @author Daniel Meyer
  * 
  */
-public class JmxRuntimeContainerDelegate implements RuntimeContainerDelegate, ProcessEngineService, JobExecutorService, ProcessApplicationService {
+public class JmxRuntimeContainerDelegate implements RuntimeContainerDelegate, ProcessEngineService, ProcessApplicationService {
   
   private final Logger LOGGER = Logger.getLogger(JmxRuntimeContainerDelegate.class.getName());
 
@@ -64,7 +61,9 @@ public class JmxRuntimeContainerDelegate implements RuntimeContainerDelegate, Pr
   protected static String JOB_EXECUTOR_REALM = BASE_REALM + ".job-executor";
   protected static String PROCESS_APPLICATION_REALM = BASE_REALM + ".process-application";
   
-  final protected MBeanServiceContainer serviceContainer = new MBeanServiceContainer();
+  public final static String SERVICE_NAME_EXECUTOR = "executor-service";
+  
+  protected MBeanServiceContainer serviceContainer = new MBeanServiceContainer();
   
   /**
    * The service types managed by this container.
@@ -72,8 +71,9 @@ public class JmxRuntimeContainerDelegate implements RuntimeContainerDelegate, Pr
    */
   public enum ServiceTypes implements ServiceType {
     
+    BPM_PLATFORM(BASE_REALM),
     PROCESS_ENGINE(ENGINE_REALM),
-    JOB_ACQUISITION(JOB_EXECUTOR_REALM),
+    JOB_EXECUTOR(JOB_EXECUTOR_REALM),
     PROCESS_APPLICATION(PROCESS_APPLICATION_REALM);
 
     protected String serviceRealm;
@@ -170,19 +170,20 @@ public class JmxRuntimeContainerDelegate implements RuntimeContainerDelegate, Pr
       .execute();
     
   }
-  
+      
   public ProcessEngineService getProcessEngineService() {
     return this;
   }
 
-  public JobExecutorService getJobExecutorService() {
-    return this;
-  }
   
   public ProcessApplicationService getProcessApplicationService() {
     return this;
   }
   
+  public ExecutorService getExecutorService() {    
+    return serviceContainer.getServiceValue(ServiceTypes.BPM_PLATFORM, SERVICE_NAME_EXECUTOR);
+  }
+    
   // ProcessEngineServiceDelegate //////////////////////////////////////////////
 
   public ProcessEngine getDefaultProcessEngine() {
@@ -204,30 +205,6 @@ public class JmxRuntimeContainerDelegate implements RuntimeContainerDelegate, Pr
       processEngineNames.add(processEngine.getName());
     }
     return processEngineNames;
-  }
-
-  // JobExecutorService implementation /////////////////////////////////////////
-  
-  public JobExecutor getJobAcquisitionByName(String name) {
-    return serviceContainer.getServiceValue(ServiceTypes.JOB_ACQUISITION, name);
-  }
-
-  public List<JobExecutor> getJobAcquisitions() {
-    return serviceContainer.getServiceValuesByType(ServiceTypes.JOB_ACQUISITION);
-  }
-  
-  public JobExecutor registerProcessEngine(ProcessEngineConfigurationImpl processEngineConfiguration, String acquisitionName) {
-    return null;
-  }
-  
-  public JobExecutor startJobAcquisition(JobAcquisitionConfiguration configuration) {
-    return null;
-  }
-  
-  public void stopJobAcquisition(String jobAcquisitionName) {
-  }
-  
-  public void unregisterProcessEngine(ProcessEngineConfigurationImpl processEngineConfiguration, String acquisitionName) {
   }
   
   // process application service implementation /////////////////////////////////
@@ -257,6 +234,5 @@ public class JmxRuntimeContainerDelegate implements RuntimeContainerDelegate, Pr
   public MBeanServiceContainer getServiceContainer() {
     return serviceContainer;
   }
-
- 
+     
 }

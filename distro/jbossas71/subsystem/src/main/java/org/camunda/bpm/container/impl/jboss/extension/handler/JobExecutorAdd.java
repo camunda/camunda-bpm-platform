@@ -26,7 +26,8 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.TYP
 import java.util.List;
 import java.util.Locale;
 
-import org.camunda.bpm.container.impl.jboss.service.ContainerJobExecutorService;
+import org.camunda.bpm.container.impl.jboss.service.MscExecutorService;
+import org.camunda.bpm.container.impl.jboss.service.ServiceNames;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.jboss.as.controller.AbstractAddStepHandler;
 import org.jboss.as.controller.OperationContext;
@@ -83,8 +84,8 @@ public class JobExecutorAdd extends AbstractAddStepHandler implements Descriptio
     
     String jobExecutorThreadPoolName = operation.get(THREAD_POOL_NAME).asString();
 
-    ContainerJobExecutorService service = new ContainerJobExecutorService();
-    ServiceController<ContainerJobExecutorService> serviceController = context.getServiceTarget().addService(ContainerJobExecutorService.getServiceName(), service)
+    MscExecutorService service = new MscExecutorService();
+    ServiceController<MscExecutorService> serviceController = context.getServiceTarget().addService(ServiceNames.forMscExecutorService(), service)
         .addDependency(ThreadsServices.EXECUTOR.append(jobExecutorThreadPoolName), ManagedQueueExecutorService.class, service.getManagedQueueInjector())
         .addListener(verificationHandler)
         .setInitialMode(Mode.ACTIVE)

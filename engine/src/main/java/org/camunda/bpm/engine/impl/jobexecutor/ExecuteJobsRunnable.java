@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.impl.jobexecutor;
 
 import java.util.List;
 
+import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.cmd.ExecuteJobsCmd;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
@@ -25,28 +26,47 @@ import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
  */
 public class ExecuteJobsRunnable implements Runnable {
 
-  private final List<String> jobIds;
-  private final JobExecutor jobExecutor;
+  protected final List<String> jobIds;
+  protected JobExecutor jobExecutor;
+  protected ProcessEngineImpl processEngine;
   
   public ExecuteJobsRunnable(JobExecutor jobExecutor, List<String> jobIds) {
     this.jobExecutor = jobExecutor;
     this.jobIds = jobIds;
   }
+  
+  public ExecuteJobsRunnable(List<String> jobIds, ProcessEngineImpl processEngine) {
+    this.jobIds = jobIds;
+    this.processEngine = processEngine;
+  }
 
   public void run() {
     final JobExecutorContext jobExecutorContext = new JobExecutorContext();
     final List<String> currentProcessorJobQueue = jobExecutorContext.getCurrentProcessorJobQueue();
-    final CommandExecutor commandExecutor = jobExecutor.getCommandExecutor();
+    CommandExecutor commandExecutor = null;
+    
+    if(processEngine == null) {
+      // temporary hack to maintain API compatibility 
+      commandExecutor = jobExecutor.getCommandExecutor();
+    } else {
+      commandExecutor = processEngine.getProcessEngineConfiguration().getCommandExecutorTxRequired();
+    }
 
     currentProcessorJobQueue.addAll(jobIds);
     
     Context.setJobExecutorContext(jobExecutorContext);
     try {
       while (!currentProcessorJobQueue.isEmpty()) {
-        commandExecutor.execute(new ExecuteJobsCmd(currentProcessorJobQueue.remove(0)));
+        String nextJobId = currentProcessorJobQueue.remove(0);
+        executeJob(nextJobId, commandExecutor);        
       }      
     }finally {
       Context.removeJobExecutorContext();
     }
   }
+  
+  protected void executeJob(String nextJobId, CommandExecutor commandExecutor) {
+    commandExecutor.execute(new ExecuteJobsCmd(nextJobId));
+  }
+  
 }

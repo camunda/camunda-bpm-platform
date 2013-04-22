@@ -14,8 +14,6 @@ package org.camunda.bpm.container.impl.metadata.spi;
 
 import java.util.Map;
 
-import org.camunda.bpm.engine.impl.jobexecutor.tobemerged.spi.JobAcquisitionStrategy;
-
 
 /**
  * <p>Java API to the JobAcquisition deployment metadata</p>
@@ -26,23 +24,22 @@ import org.camunda.bpm.engine.impl.jobexecutor.tobemerged.spi.JobAcquisitionStra
 public interface JobAcquisitionXml {
 
   public final static String LOCK_TIME_IN_MILLIS = "lockTimeInMillis";
-  public final static String WAIT_TIME_IN_MILLIS = "lockTimeInMillis";
+  public final static String WAIT_TIME_IN_MILLIS = "waitTimeInMillis";
   public final static String MAX_JOBS_PER_ACQUISITION = "maxJobsPerAcquisition";
 
   /**
-   * @return the name of the JobAcquisition.
+   * @return the name of the JobExecutor.
    */
   public String getName();
-
+  
   /**
-   * @return the name of the Job Acquisition Strategy. If unspecified, the
-   *         default value is {@link JobAcquisitionStrategy#SEQUENTIAL}.
+   * @return the fully qualified classname of the JobExecutor to be used.
    */
-  public String getAcquisitionStrategy();
+  public String getJobExecutorClassName();
 
   /**
-   * @return a set of properties to configure the Job Acquisition. The
-   *         properties are mapped to bean properties of the JobAcquisition
+   * @return a set of properties to configure the Job Executor. The
+   *         properties are mapped to bean properties of the JobExecutor
    *         class used.
    * 
    * @see #LOCK_TIME_IN_MILLIS

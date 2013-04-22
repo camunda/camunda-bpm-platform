@@ -27,5 +27,5 @@ public interface JobExecutorXml {
    * @return a list of configured JobAcquisitions.
    */
   public List<JobAcquisitionXml> getJobAcquisitions();
-
+ 
 }

@@ -87,8 +87,9 @@ public class ProcessEngineImpl implements ProcessEngine {
     
     ProcessEngines.registerProcessEngine(this);
     
-    if ((jobExecutor != null) && (jobExecutor.isAutoActivate())) {
-      jobExecutor.start();
+    if ((jobExecutor != null)) {      
+      // register process engine with Job Executor
+      jobExecutor.registerProcessEngine(this);      
     }
   }
   
@@ -96,8 +97,9 @@ public class ProcessEngineImpl implements ProcessEngine {
     
     ProcessEngines.unregister(this);
     
-    if ((jobExecutor != null) && (jobExecutor.isActive())) {
-      jobExecutor.shutdown();
+    if ((jobExecutor != null)) {      
+      // unregister process engine with Job Executor
+      jobExecutor.unregisterProcessEngine(this);      
     }
 
     commandExecutorSchemaOperations.execute(new SchemaOperationProcessEngineClose());

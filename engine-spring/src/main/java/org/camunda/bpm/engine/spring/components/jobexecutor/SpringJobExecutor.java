@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.spring.components.jobexecutor;
 import java.util.List;
 import java.util.concurrent.RejectedExecutionException;
 
+import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.jobexecutor.ExecuteJobsRunnable;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.springframework.core.task.TaskExecutor;
@@ -49,14 +50,13 @@ public class SpringJobExecutor extends JobExecutor {
 	public void setTaskExecutor(TaskExecutor taskExecutor) {
 		this.taskExecutor = taskExecutor;
 	}
-
-	@Override
-	public void executeJobs(List<String> jobIds) {
-		try {
-			taskExecutor.execute(new ExecuteJobsRunnable(this, jobIds));
-		} catch (RejectedExecutionException e) {
-			rejectedJobsHandler.jobsRejected(this, jobIds);
-		}
+	
+	public void executeJobs(List<String> jobIds, ProcessEngineImpl processEngine) {
+	  try {
+      taskExecutor.execute(new ExecuteJobsRunnable(jobIds, processEngine));
+    } catch (RejectedExecutionException e) {
+      rejectedJobsHandler.jobsRejected(jobIds, processEngine);
+    }
 	}
 
 	@Override

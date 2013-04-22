@@ -29,7 +29,7 @@ public class DeploymentMetadataConstants {
   
   public static final String JOB_EXECUTOR = "job-executor";
   public static final String JOB_ACQUISITION = "job-acquisition";
-  public static final String ACQUISITION_STRATEGY = "acquisition-strategy";
+  public static final String JOB_EXECUTOR_CLASS_NAME = "job-executor-class";
     
   public static final String PROCESS_ENGINE = "process-engine";
   public static final String CONFIGURATION = "configuration";

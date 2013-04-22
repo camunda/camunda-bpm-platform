@@ -6,7 +6,7 @@
   <job-executor>
 
     <job-acquisition name="default">
-      <acquisition-strategy>SEQUENTIAL</acquisition-strategy>
+      <job-executor-class>org.camunda.bpm.engine.impl.jobexecutor.DefaultJobExecutor</job-executor-class>
       <properties>
         <property name="name1">value1</property>
         <property name="name2">value2</property>

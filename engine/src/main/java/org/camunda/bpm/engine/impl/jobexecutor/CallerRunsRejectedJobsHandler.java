@@ -15,15 +15,16 @@ package org.camunda.bpm.engine.impl.jobexecutor;
 
 import java.util.List;
 
+import org.camunda.bpm.engine.impl.ProcessEngineImpl;
+
 /**
  * 
  * @author Daniel Meyer
  */
 public class CallerRunsRejectedJobsHandler implements RejectedJobsHandler {
 
-  public void jobsRejected(JobExecutor jobExecutor, List<String> jobIds) {
-    // execute rejected work in caller thread (potentially blocking job acquisition)
-    new ExecuteJobsRunnable(jobExecutor, jobIds).run();
+  public void jobsRejected(List<String> jobIds, ProcessEngineImpl processEngine) {
+    new ExecuteJobsRunnable(jobIds, processEngine).run();
   }
 
 }

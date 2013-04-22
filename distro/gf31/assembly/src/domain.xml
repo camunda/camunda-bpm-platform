@@ -19,11 +19,7 @@
       <module name="camunda-glassfish-service-#{project.version}.jar">
         <engine sniffer="ejb"></engine>
         <engine sniffer="security"></engine>
-      </module>
-      <module name="camunda-jobexecutor-service-#{project.version}.jar">
-        <engine sniffer="ejb"></engine>
-        <engine sniffer="security"></engine>
-      </module>
+      </module>      
     </application>
   </applications>
   <resources>
@@ -71,12 +67,12 @@
         enabled="true" 
         name="platformJobExecutorPool" 
         resource-adapter-name="camunda-jobexecutor-rar" 
-        connection-definition-name="org.camunda.bpm.platform.jobexecutor.impl.ra.outbound.PlatformJobExecutorConnectionFactory" 
+        connection-definition-name="org.camunda.bpm.container.impl.threading.jca.outbound.JcaExecutorServiceConnectionFactory" 
         transaction-support="NoTransaction" />
     <connector-resource
         enabled="true" 
         pool-name="platformJobExecutorPool" 
-        jndi-name="eis/PlatformJobExecutorConnectionFactory" />
+        jndi-name="eis/JcaExecutorServiceConnectionFactory" />
   </resources>
   <servers>
     <server name="server" config-ref="server-config">
@@ -87,7 +83,7 @@
       <resource-ref ref="jdbc/__default"></resource-ref>
       <resource-ref ref="jdbc/ProcessEngine"></resource-ref>
       <resource-ref ref="jdbc/CycleDS"></resource-ref>
-      <resource-ref ref="eis/PlatformJobExecutorConnectionFactory"></resource-ref>
+      <resource-ref ref="eis/JcaExecutorServiceConnectionFactory"></resource-ref>
     </server>
   </servers>
   <nodes>

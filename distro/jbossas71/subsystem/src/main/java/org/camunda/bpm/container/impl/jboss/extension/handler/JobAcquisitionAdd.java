@@ -15,9 +15,9 @@
  */
 package org.camunda.bpm.container.impl.jboss.extension.handler;
 
-import static org.camunda.bpm.container.impl.jboss.extension.ModelConstants.ACQUISITION_STRATEGY;
 import static org.camunda.bpm.container.impl.jboss.extension.ModelConstants.NAME;
 import static org.camunda.bpm.container.impl.jboss.extension.ModelConstants.PROPERTIES;
+import static org.camunda.bpm.container.impl.jboss.extension.ModelConstants.ACQUISITION_STRATEGY;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.ADD;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.DESCRIPTION;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OPERATION_NAME;
@@ -26,15 +26,11 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.REQ
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.TYPE;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.VALUE_TYPE;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
-import org.camunda.bpm.container.impl.jboss.extension.Element;
-import org.camunda.bpm.container.impl.jboss.service.ContainerJobExecutorService;
-import org.camunda.bpm.engine.impl.jobexecutor.tobemerged.impl.util.JobAcquisitionConfigurationBean;
-import org.camunda.bpm.engine.impl.jobexecutor.tobemerged.spi.JobAcquisitionConfiguration;
+import org.camunda.bpm.container.impl.jboss.service.MscRuntimeContainerJobExecutor;
+import org.camunda.bpm.container.impl.jboss.service.ServiceNames;
 import org.jboss.as.controller.AbstractAddStepHandler;
 import org.jboss.as.controller.OperationContext;
 import org.jboss.as.controller.OperationFailedException;
@@ -44,7 +40,6 @@ import org.jboss.as.controller.descriptions.DescriptionProvider;
 import org.jboss.as.controller.descriptions.ModelDescriptionConstants;
 import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.ModelType;
-import org.jboss.dmr.Property;
 import org.jboss.msc.service.ServiceController;
 
 
@@ -67,8 +62,8 @@ public class JobAcquisitionAdd extends AbstractAddStepHandler implements Descrip
     
     node.get(REQUEST_PROPERTIES, ACQUISITION_STRATEGY, DESCRIPTION).set("Job acquisition strategy");
     node.get(REQUEST_PROPERTIES, ACQUISITION_STRATEGY, TYPE).set(ModelType.STRING);
-    node.get(REQUEST_PROPERTIES, ACQUISITION_STRATEGY, REQUIRED).set(true);
-    
+    node.get(REQUEST_PROPERTIES, ACQUISITION_STRATEGY, REQUIRED).set(false);
+        
     node.get(REQUEST_PROPERTIES, PROPERTIES, DESCRIPTION).set("Additional properties");
     node.get(REQUEST_PROPERTIES, PROPERTIES, TYPE).set(ModelType.OBJECT);
     node.get(REQUEST_PROPERTIES, PROPERTIES, VALUE_TYPE).set(ModelType.LIST);
@@ -90,7 +85,7 @@ public class JobAcquisitionAdd extends AbstractAddStepHandler implements Descrip
       acquisitionStrategy = operation.get(ACQUISITION_STRATEGY).asString();
     }
     model.get(ACQUISITION_STRATEGY).set(acquisitionStrategy);
-    
+        
     // retrieve all properties
     ModelNode properties = new ModelNode();
     if (operation.hasDefined(PROPERTIES)) {
@@ -103,54 +98,15 @@ public class JobAcquisitionAdd extends AbstractAddStepHandler implements Descrip
   protected void performRuntime(OperationContext context, ModelNode operation, ModelNode model,
           ServiceVerificationHandler verificationHandler, List<ServiceController<?>> newControllers)
           throws OperationFailedException {
-    
+       
     String acquisitionName = PathAddress.pathAddress(operation.get(ModelDescriptionConstants.ADDRESS)).getLastElement().getValue();
     
-    JobAcquisitionConfiguration jobAcquisitionConfiguration = transformConfiguration(context, acquisitionName, model);
+    MscRuntimeContainerJobExecutor mscRuntimeContainerJobExecutor = new MscRuntimeContainerJobExecutor();
+  
+    // start new service for job executor
+    context.getServiceTarget().addService(ServiceNames.forMscRuntimeContainerJobExecutorService(acquisitionName), mscRuntimeContainerJobExecutor)
+      .install();
     
-    ContainerJobExecutorService service = (ContainerJobExecutorService) context.getServiceRegistry(false).getService(ContainerJobExecutorService.getServiceName()).getService();
-    // HACK to resolve parallel starts from job executor and job acquisition
-    if (service.getDiscoveredStrategies() == null) {
-      service.start();
-    }
-    service.startJobAcquisition(jobAcquisitionConfiguration);
   }
 
-  private JobAcquisitionConfiguration transformConfiguration(final OperationContext context, String acquisitionName, final ModelNode model) {
-    String acquistionStrategy = model.get(ACQUISITION_STRATEGY).asString();   
-    
-    Map<String,Object> properties = new HashMap<String, Object>();
-    if (model.hasDefined(Element.PROPERTIES.getLocalName())) {
-      ModelNode propertiesNode = model.get(Element.PROPERTIES.getLocalName());
-      List<Property> propertyList = propertiesNode.asPropertyList();
-      if (!propertyList.isEmpty()) {
-        for (Property property : propertyList) {
-          properties.put(property.getName(), property.getValue().asString());
-        }
-      }
-    }
-    
-    JobAcquisitionConfigurationBean jobAcquisitionConfigBean = new JobAcquisitionConfigurationBean();
-    jobAcquisitionConfigBean.setAcquisitionName(acquisitionName);
-    jobAcquisitionConfigBean.setJobAcquisitionStrategy(acquistionStrategy);
-    /**
-     *   protected String lockOwner??;
-     *   protected Integer lockTimeInMillis;
-     *   protected Integer maxJobsPerAcquisition;
-     *   protected Integer waitTimeInMillis;
-     */
-    if (properties.containsKey(JobAcquisitionConfiguration.PROP_LOCK_TIME_IN_MILLIS)) {
-      jobAcquisitionConfigBean.setLockTimeInMillis(Integer.valueOf((String)properties.get(JobAcquisitionConfiguration.PROP_LOCK_TIME_IN_MILLIS)));
-      
-    } 
-    if (properties.containsKey(JobAcquisitionConfiguration.PROP_MAX_JOBS_PER_ACQUISITION)) {
-      jobAcquisitionConfigBean.setMaxJobsPerAcquisition(Integer.valueOf((String)properties.get(JobAcquisitionConfiguration.PROP_MAX_JOBS_PER_ACQUISITION)));
-      
-    }
-    if (properties.containsKey(JobAcquisitionConfiguration.PROP_WAIT_TIME_IN_MILLIS)) {
-      jobAcquisitionConfigBean.setWaitTimeInMillis(Integer.valueOf((String)properties.get(JobAcquisitionConfiguration.PROP_WAIT_TIME_IN_MILLIS)));
-    }
-    
-    return jobAcquisitionConfigBean;
-  }
 }

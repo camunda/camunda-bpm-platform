@@ -12,7 +12,7 @@
  */
 package org.camunda.bpm.container.impl.metadata;
 
-import static org.camunda.bpm.container.impl.metadata.DeploymentMetadataConstants.ACQUISITION_STRATEGY;
+import static org.camunda.bpm.container.impl.metadata.DeploymentMetadataConstants.JOB_EXECUTOR_CLASS_NAME;
 import static org.camunda.bpm.container.impl.metadata.DeploymentMetadataConstants.JOB_ACQUISITION;
 import static org.camunda.bpm.container.impl.metadata.DeploymentMetadataConstants.JOB_EXECUTOR;
 import static org.camunda.bpm.container.impl.metadata.DeploymentMetadataConstants.NAME;
@@ -106,8 +106,8 @@ public class BpmPlatformXmlParse extends DeploymentMetadataParse {
     Map<String, String> properties = new HashMap<String, String>();
 
     for (Element childElement : element.elements()) {
-      if (ACQUISITION_STRATEGY.equals(childElement.getTagName())) {
-        jobAcquisition.setAcquisitionStrategy(childElement.getText());
+      if (JOB_EXECUTOR_CLASS_NAME.equals(childElement.getTagName())) {
+        jobAcquisition.setJobExecutorClassName(childElement.getText());
 
       } else if (PROPERTIES.equals(childElement.getTagName())) {
         parseProperties(childElement, properties);

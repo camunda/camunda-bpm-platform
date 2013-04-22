@@ -21,9 +21,13 @@ import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.core.StandardServer;
 import org.camunda.bpm.container.RuntimeContainerDelegate;
 import org.camunda.bpm.container.impl.jmx.JmxRuntimeContainerDelegate;
+import org.camunda.bpm.container.impl.jmx.deployment.Attachments;
 import org.camunda.bpm.container.impl.jmx.deployment.PlatformXmlStartProcessEnginesStep;
 import org.camunda.bpm.container.impl.jmx.deployment.StopProcessApplicationsStep;
 import org.camunda.bpm.container.impl.jmx.deployment.StopProcessEnginesStep;
+import org.camunda.bpm.container.impl.jmx.deployment.jobexecutor.StartJobExecutorStep;
+import org.camunda.bpm.container.impl.jmx.deployment.jobexecutor.StartManagedThreadPoolStep;
+import org.camunda.bpm.container.impl.jmx.deployment.jobexecutor.StopJobExecutorStep;
 import org.camunda.bpm.container.impl.tomcat.deployment.TomcatAttachments;
 import org.camunda.bpm.container.impl.tomcat.deployment.TomcatParseBpmPlatformXmlStep;
 import org.camunda.bpm.engine.ProcessEngine;
@@ -66,8 +70,9 @@ public class TomcatBpmPlatformBootstrap implements LifecycleListener {
     containerDelegate.getServiceContainer().createDeploymentOperation("deploy BPM platform")
       .addAttachment(TomcatAttachments.SERVER, server)
       .addStep(new TomcatParseBpmPlatformXmlStep())
+      .addStep(new StartManagedThreadPoolStep())
+      .addStep(new StartJobExecutorStep())
       .addStep(new PlatformXmlStartProcessEnginesStep())
-//      .addStep(new TomcatCreateJndiBindingsStep())      
       .execute();
     
     LOGGER.log(Level.INFO, "camunda BPM platform" + " sucessfully started on "+server.getServerInfo()+".");
@@ -83,6 +88,7 @@ public class TomcatBpmPlatformBootstrap implements LifecycleListener {
       .addAttachment(TomcatAttachments.SERVER, server)
       .addStep(new StopProcessApplicationsStep())
       .addStep(new StopProcessEnginesStep())
+      .addStep(new StopJobExecutorStep())
       .execute();
     
     LOGGER.log(Level.INFO, "camunda BPM platform stopped.");

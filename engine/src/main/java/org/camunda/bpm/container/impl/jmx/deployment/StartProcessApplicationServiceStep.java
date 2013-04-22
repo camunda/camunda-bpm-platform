@@ -65,7 +65,7 @@ public class StartProcessApplicationServiceStep extends MBeanDeploymentOperation
     serviceContainer.startService(ServiceTypes.PROCESS_APPLICATION, processApplication.getName(), mbean);
   }
 
-  private ProcessApplicationInfoImpl createProcessApplicationInfo(final AbstractProcessApplication processApplication,
+  protected ProcessApplicationInfoImpl createProcessApplicationInfo(final AbstractProcessApplication processApplication,
       final Map<String, ProcessApplicationRegistration> processArchiveDeploymentMap) {
     // populate process application info    
     ProcessApplicationInfoImpl processApplicationInfo = new ProcessApplicationInfoImpl();

@@ -17,14 +17,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import junit.framework.Assert;
-
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.management.ProcessDefinitionStatistics;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.test.Deployment;
+import org.junit.Assert;
 import org.junit.Test;
-
 
 public class ProcessDefinitionStatisticsQueryTest extends PluggableProcessEngineTestCase {
 
@@ -34,7 +32,7 @@ public class ProcessDefinitionStatisticsQueryTest extends PluggableProcessEngine
     runtimeService.startProcessInstanceByKey("ExampleProcess");
     
     Map<String, Object> parameters = new HashMap<String, Object>();
-    parameters.put("fail", false);
+    parameters.put("fail", true);
     runtimeService.startProcessInstanceByKey("ExampleProcess", parameters);
 
     waitForJobExecutorToProcessAllJobs(6000, 500);
@@ -150,7 +148,7 @@ public class ProcessDefinitionStatisticsQueryTest extends PluggableProcessEngine
     
     ProcessDefinitionStatistics definitionResult = statistics.get(0);
     Assert.assertEquals(1, definitionResult.getInstances());
-    Assert.assertEquals(1, definitionResult.getFailedJobs());
+    Assert.assertEquals(0, definitionResult.getFailedJobs());
     
     repositoryService.deleteDeployment(deployment.getId(), true);
   }

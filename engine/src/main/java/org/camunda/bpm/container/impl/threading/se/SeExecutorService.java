@@ -1,0 +1,72 @@
+/* Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.camunda.bpm.container.impl.threading.se;
+
+import java.util.List;
+import java.util.concurrent.RejectedExecutionException;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import org.camunda.bpm.container.ExecutorService;
+import org.camunda.bpm.engine.impl.ProcessEngineImpl;
+import org.camunda.bpm.engine.impl.jobexecutor.ExecuteJobsRunnable;
+
+/**
+ * @author Daniel Meyer
+ *
+ */
+public class SeExecutorService implements ExecutorService {
+  
+  private final static Logger LOGGER = Logger.getLogger(SeExecutorService.class.getName());
+
+  protected ThreadPoolExecutor threadPoolExecutor;
+
+  public SeExecutorService(ThreadPoolExecutor threadPoolExecutor) {
+    this.threadPoolExecutor = threadPoolExecutor;
+  }
+
+  public boolean schedule(Runnable runnable, boolean isLongRunning) {
+    
+    if(isLongRunning) {
+      return executeLongRunning(runnable);
+      
+    } else {      
+      return executeShortRunning(runnable);
+      
+    }
+  }
+
+  protected boolean executeLongRunning(Runnable runnable) {
+    new Thread(runnable).start();
+    return true;
+  }
+  
+  protected boolean executeShortRunning(Runnable runnable) {    
+    
+    try {
+      threadPoolExecutor.execute(runnable);
+      return true;
+      
+    } catch (RejectedExecutionException e) {
+      LOGGER.log(Level.FINE, "RejectedExecutionException while scheduling work", e);
+      return false;
+      
+    }
+  }
+  
+  public Runnable getExecuteJobsRunnable(List<String> jobIds, ProcessEngineImpl processEngine) {
+    return new ExecuteJobsRunnable(jobIds, processEngine);
+  }
+
+}

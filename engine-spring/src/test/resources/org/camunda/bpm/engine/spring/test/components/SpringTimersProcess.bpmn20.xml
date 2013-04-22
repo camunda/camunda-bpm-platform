@@ -5,7 +5,7 @@
     <userTask id="usertask1" name="User Task"></userTask>
     <boundaryEvent id="boundarytimer1" name="" cancelActivity="true" attachedToRef="usertask1">
       <timerEventDefinition>
-        <timeDuration>PT1S</timeDuration>
+        <timeDuration>PT0S</timeDuration>
       </timerEventDefinition>
     </boundaryEvent>
     <endEvent id="endevent1" name="End"></endEvent>

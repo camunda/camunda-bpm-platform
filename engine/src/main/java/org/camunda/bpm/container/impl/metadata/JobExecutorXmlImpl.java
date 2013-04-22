@@ -26,6 +26,7 @@ import org.camunda.bpm.container.impl.metadata.spi.JobExecutorXml;
 public class JobExecutorXmlImpl implements JobExecutorXml {
   
   protected List<JobAcquisitionXml> jobAcquisitions;
+  protected String jobExecutorClass;
 
   public List<JobAcquisitionXml> getJobAcquisitions() {
     return jobAcquisitions;
@@ -35,4 +36,12 @@ public class JobExecutorXmlImpl implements JobExecutorXml {
     this.jobAcquisitions = jobAcquisitions;
   }
 
+  public String getJobExecutorClass() {
+    return jobExecutorClass;
+  }
+
+  public void setJobExecutorClass(String jobExecutorClass) {
+    this.jobExecutorClass = jobExecutorClass;
+  }
+  
 }

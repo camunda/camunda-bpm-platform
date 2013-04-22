@@ -46,7 +46,7 @@ public class BpmPlatformXmlParserTest extends TestCase {
     
     JobAcquisitionXml jobAcquisitionXml = jobExecutorXml.getJobAcquisitions().get(0);
     assertEquals("default", jobAcquisitionXml.getName());
-    assertEquals("SEQUENTIAL", jobAcquisitionXml.getAcquisitionStrategy());
+    assertEquals("org.camunda.bpm.engine.impl.jobexecutor.DefaultJobExecutor", jobAcquisitionXml.getJobExecutorClassName());
     
     assertEquals(2, jobAcquisitionXml.getProperties().size());
     
@@ -68,7 +68,7 @@ public class BpmPlatformXmlParserTest extends TestCase {
     
     JobAcquisitionXml jobAcquisitionXml = jobExecutorXml.getJobAcquisitions().get(0);
     assertEquals("default", jobAcquisitionXml.getName());
-    assertEquals("SEQUENTIAL", jobAcquisitionXml.getAcquisitionStrategy());
+    assertEquals("org.camunda.bpm.engine.impl.jobexecutor.DefaultJobExecutor", jobAcquisitionXml.getJobExecutorClassName());
     
     assertEquals(2, jobAcquisitionXml.getProperties().size());
     

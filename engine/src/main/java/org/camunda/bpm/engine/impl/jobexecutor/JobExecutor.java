@@ -15,23 +15,25 @@ package org.camunda.bpm.engine.impl.jobexecutor;
 
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.cmd.AcquireJobsCmd;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.runtime.Job;
 
 /**
- * <p>Interface to the work management component of activiti.</p>
+ * <p>Interface to the component responsible for performing 
+ * background work ({@link Job Jobs}).</p>
  * 
- * <p>This component is responsible for performing all background work 
- * ({@link Job Jobs}) scheduled by activiti.</p>
+ * <p>The {@link JobExecutor} is capable of dispatching to multiple process engines, 
+ * ie. multiple process engines can share a single Thread Pool for performing Background 
+ * Work. </p>
  * 
- * <p>You should generally only have one of these per Activiti instance (process 
- * engine) in a JVM.
- * In clustered situations, you can have multiple of these running against the
+ * <p>In clustered situations, you can have multiple Job Executors running against the
  * same queue + pending job list.</p>
  * 
  * @author Daniel Meyer
@@ -41,7 +43,7 @@ public abstract class JobExecutor {
   private static Logger log = Logger.getLogger(JobExecutor.class.getName());
 
   protected String name = "JobExecutor["+getClass().getName()+"]";
-  protected CommandExecutor commandExecutor;
+  protected List<ProcessEngineImpl> processEngines = new CopyOnWriteArrayList<ProcessEngineImpl>();
   protected Command<AcquiredJobs> acquireJobsCmd;
   protected AcquireJobsRunnable acquireJobsRunnable;
   protected RejectedJobsHandler rejectedJobsHandler;
@@ -78,7 +80,7 @@ public abstract class JobExecutor {
   
   protected void ensureInitialization() { 
     acquireJobsCmd = new AcquireJobsCmd(this);
-    acquireJobsRunnable = new AcquireJobsRunnable(this);  
+    acquireJobsRunnable = new SequentialJobAcquisitionRunnable(this);  
   }
   
   protected void ensureCleanup() {  
@@ -92,16 +94,66 @@ public abstract class JobExecutor {
     }
   }
   
+  public synchronized void registerProcessEngine(ProcessEngineImpl processEngine) {
+    processEngines.add(processEngine);
+    
+    // when we register the first process engine, start the jobexecutor
+    if(processEngines.size() == 1 && isAutoActivate) {
+      start();
+    }
+  }
+  
+  public synchronized void unregisterProcessEngine(ProcessEngineImpl processEngine) {
+    processEngines.remove(processEngine);
+    
+    // if we unregister the last process engine, auto-shutdown the jobexecutor
+    if(processEngines.isEmpty() && isActive) {
+      shutdown();
+    }
+  }
+  
   protected abstract void startExecutingJobs();
   protected abstract void stopExecutingJobs(); 
-  protected abstract void executeJobs(List<String> jobIds);
+  public abstract void executeJobs(List<String> jobIds, ProcessEngineImpl processEngine);
+  
+  /**
+   * Deprecated: use {@link #executeJobs(List, ProcessEngineImpl)} instead
+   * @param jobIds
+   */
+  @Deprecated
+  public void executeJobs(List<String> jobIds) {
+    if(!processEngines.isEmpty()) {
+      executeJobs(jobIds, processEngines.get(0));
+    }
+  }
   
   // getters and setters //////////////////////////////////////////////////////
 
-  public CommandExecutor getCommandExecutor() {
-    return commandExecutor;
+  public List<ProcessEngineImpl> getProcessEngines() {
+    return processEngines;
   }
-
+  
+  /**
+   * Deprecated: use {@link #getProcessEngines()} instead
+   */
+  @Deprecated
+  public CommandExecutor getCommandExecutor() {
+    if(processEngines.isEmpty()) {
+      return null;
+    } else {
+      return processEngines.get(0).getProcessEngineConfiguration().getCommandExecutorTxRequired();
+    }
+  }
+  
+  /** 
+   * Deprecated: use {@link #registerProcessEngine(ProcessEngineImpl)} instead
+   * @param commandExecutorTxRequired
+   */
+  @Deprecated
+  public void setCommandExecutor(CommandExecutor commandExecutorTxRequired) {
+   
+  }
+  
   public int getWaitTimeInMillis() {
     return waitTimeInMillis;
   }
@@ -130,8 +182,8 @@ public abstract class JobExecutor {
     return isAutoActivate;
   }
 
-  public void setCommandExecutor(CommandExecutor commandExecutor) {
-    this.commandExecutor = commandExecutor;
+  public void setProcessEngines(List<ProcessEngineImpl> processEngines) {
+    this.processEngines = processEngines;
   }
 
   public void setAutoActivate(boolean isAutoActivate) {
@@ -188,4 +240,9 @@ public abstract class JobExecutor {
 		}	
 		jobAcquisitionThread = null;
 	}
+
+  public AcquireJobsRunnable getAcquireJobsRunnable() {
+    return acquireJobsRunnable;
+  }
+
 }

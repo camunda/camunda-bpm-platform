@@ -25,7 +25,9 @@ package org.camunda.bpm.container.impl.jboss.extension;
 public interface ModelConstants {
   
   // elements
+  @Deprecated
   public final static String ACQUISITION_STRATEGY = "acquisition-strategy";
+  
   public final static String DATASOURCE = "datasource";
   public final static String HISTORY_LEVEL = "history-level";
   public final static String JOB_ACQUISITION = "job-acquisition";
@@ -35,6 +37,7 @@ public interface ModelConstants {
   public final static String PROCESS_ENGINES = "process-engines";
   public final static String PROPERTY = "property";
   public final static String PROPERTIES = "properties";
+  public final static String CONFIGURATION = "configuration";
   
   // attributes
   public final static String DEFAULT = "default";

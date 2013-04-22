@@ -19,13 +19,9 @@ import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.DES
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OPERATION_NAME;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.REMOVE;
 
-import java.util.List;
 import java.util.Locale;
 
-import org.camunda.bpm.container.impl.jboss.service.ContainerJobExecutorService;
-import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.engine.impl.jobexecutor.tobemerged.impl.acquisition.JobAcquisition;
+import org.camunda.bpm.container.impl.jboss.service.ServiceNames;
 import org.jboss.as.controller.AbstractRemoveStepHandler;
 import org.jboss.as.controller.OperationContext;
 import org.jboss.as.controller.OperationFailedException;
@@ -52,22 +48,11 @@ public class JobAcquisitionRemove extends AbstractRemoveStepHandler implements D
   }
 
   protected void performRuntime(OperationContext context, ModelNode operation, ModelNode model) throws OperationFailedException {
-    ContainerJobExecutorService service = (ContainerJobExecutorService) context.getServiceRegistry(false).getService(ContainerJobExecutorService.getServiceName()).getService();
-    String jobAcquisitionName = PathAddress.pathAddress(operation.get(ModelDescriptionConstants.ADDRESS)).getLastElement().getValue();
-    JobAcquisition jobAcquisition = service.getJobAcquisitionByName(jobAcquisitionName);
     
-    if (!jobAcquisition.getRegisteredProcessEngines().isEmpty()) {
-      List<ProcessEngineConfigurationImpl> registeredProcessEngines = jobAcquisition.getRegisteredProcessEngines();
-      StringBuffer sb = new StringBuffer("[");
-      for (ProcessEngineConfigurationImpl peci : registeredProcessEngines) {
-        sb.append(peci.getProcessEngineName() + ", ");
-      }
-      sb.append("]");
-      int lastIndexOf = sb.lastIndexOf(",");
-      sb.deleteCharAt(lastIndexOf).deleteCharAt(lastIndexOf+1);
-      throw new ProcessEngineException("Unable to remove jobAcquisition '" + jobAcquisitionName + "' because following process engines are still registered with it: " + sb.toString());
-    }
-    service.stopJobAcquisition(jobAcquisitionName);
+    String jobAcquisitionName = PathAddress.pathAddress(operation.get(ModelDescriptionConstants.ADDRESS)).getLastElement().getValue();
+    
+    context.removeService(ServiceNames.forMscRuntimeContainerJobExecutorService(jobAcquisitionName));
+   
   }
 
 }

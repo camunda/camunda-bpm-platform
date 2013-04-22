@@ -22,15 +22,15 @@ import java.util.logging.Logger;
 import javax.sql.DataSource;
 import javax.transaction.TransactionManager;
 
-import org.camunda.bpm.container.impl.jboss.metadata.ManagedProcessEngineMetadata;
+import org.camunda.bpm.container.impl.jboss.config.ManagedJtaProcessEngineConfiguration;
+import org.camunda.bpm.container.impl.jboss.config.ManagedProcessEngineMetadata;
 import org.camunda.bpm.container.impl.jboss.util.Tccl;
 import org.camunda.bpm.container.impl.jboss.util.Tccl.Operation;
 import org.camunda.bpm.container.impl.jmx.services.JmxManagedProcessEngineController;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.cfg.JtaProcessEngineConfiguration;
-import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
-import org.camunda.bpm.engine.impl.persistence.StrongUuidGenerator;
 import org.jboss.as.connector.subsystems.datasources.DataSourceReferenceFactoryService;
 import org.jboss.as.naming.deployment.ContextNames;
 import org.jboss.as.server.Services;
@@ -65,7 +65,7 @@ public class MscManagedProcessEngineController extends MscManagedProcessEngine {
   protected final InjectedValue<TransactionManager> transactionManagerInjector = new InjectedValue<TransactionManager>();
   protected final InjectedValue<DataSourceReferenceFactoryService> datasourceBinderServiceInjector = new InjectedValue<DataSourceReferenceFactoryService>();
   protected final InjectedValue<MscRuntimeContainerDelegate> containerPlatformServiceInjector = new InjectedValue<MscRuntimeContainerDelegate>();
-  protected final InjectedValue<ContainerJobExecutorService> containerJobExecutorInjector = new InjectedValue<ContainerJobExecutorService>();
+  protected final InjectedValue<MscRuntimeContainerJobExecutor> mscRuntimeContainerJobExecutorInjector = new InjectedValue<MscRuntimeContainerJobExecutor>();
     
   protected ManagedProcessEngineMetadata processEngineMetadata;
 
@@ -104,7 +104,6 @@ public class MscManagedProcessEngineController extends MscManagedProcessEngine {
           } catch(Exception e) {
             LOGGER.log(Level.SEVERE, "exception while closing process engine", e);
           }      
-          releaseJobExecutorDelegate();  
           
         } finally {
           context.complete();
@@ -124,29 +123,24 @@ public class MscManagedProcessEngineController extends MscManagedProcessEngine {
       }
 
     }, ProcessEngine.class.getClassLoader());   
-    
-    setJobExecutorDelegate();    
+      
   }
     
   protected void startProcessEngine() {
     
-    processEngineConfiguration = new JtaProcessEngineConfiguration();
+    processEngineConfiguration = createProcessEngineConfiguration();
         
     // set the name for the process engine 
     processEngineConfiguration.setProcessEngineName(processEngineMetadata.getEngineName());
     
-    // set UUid generator
-    // TODO: move this to configuration and use as default?
-    processEngineConfiguration.setIdGenerator(new StrongUuidGenerator());
-    
+    // set the value for the history
+    processEngineConfiguration.setHistory(processEngineMetadata.getHistoryLevel());
+        
     // use the injected datasource
     processEngineConfiguration.setDataSource((DataSource) datasourceBinderServiceInjector.getValue().getReference().getInstance());
     
     // use the injected transaction manager
-    processEngineConfiguration.setTransactionManager(transactionManagerInjector.getValue());    
-    
-    // set the value for the history
-    processEngineConfiguration.setHistory(processEngineMetadata.getHistoryLevel());
+    processEngineConfiguration.setTransactionManager(transactionManagerInjector.getValue());
     
     // set auto schema update
     if(processEngineMetadata.isAutoSchemaUpdate()) {
@@ -158,7 +152,39 @@ public class MscManagedProcessEngineController extends MscManagedProcessEngine {
       processEngineConfiguration.setDatabaseTablePrefix(processEngineMetadata.getDbTablePrefix());
     }
     
+    // set job executor on process engine.
+    MscRuntimeContainerJobExecutor mscRuntimeContainerJobExecutor = mscRuntimeContainerJobExecutorInjector.getValue();
+    processEngineConfiguration.setJobExecutor(mscRuntimeContainerJobExecutor);
+    
     processEngine = processEngineConfiguration.buildProcessEngine();        
+  }
+
+  protected JtaProcessEngineConfiguration createProcessEngineConfiguration() {
+    
+    String configurationClassName = ManagedJtaProcessEngineConfiguration.class.getName();
+    if(processEngineMetadata.getConfiguration() != null && !processEngineMetadata.getConfiguration().isEmpty()) {
+      configurationClassName = processEngineMetadata.getConfiguration();
+    }
+    
+    Object configurationObject = null;
+    
+    try {
+      Class<?> configurationClass = getClass().getClassLoader().loadClass(configurationClassName);
+      configurationObject = configurationClass.newInstance();
+      
+    } catch (Exception e) {
+      throw new ProcessEngineException("Could not load '"+configurationClassName+"': the class must be visible from the camunda-jboss-subsystem module.");
+    }
+        
+        
+    if (configurationObject instanceof JtaProcessEngineConfiguration) {
+      return (JtaProcessEngineConfiguration) configurationObject;
+      
+    } else {
+      throw new ProcessEngineException("Configuration class '"+configurationClassName+"' " +
+      		"is not a subclass of " + JtaProcessEngineConfiguration.class.getName());
+    }
+    
   }
 
   public Injector<TransactionManager> getTransactionManagerInjector() {
@@ -173,46 +199,23 @@ public class MscManagedProcessEngineController extends MscManagedProcessEngine {
     return containerPlatformServiceInjector;
   }
   
-  public InjectedValue<ContainerJobExecutorService> getContainerJobExecutorInjector() {
-    return containerJobExecutorInjector;
+  public InjectedValue<MscRuntimeContainerJobExecutor> getMscRuntimeContainerJobExecutorInjector() {
+    return mscRuntimeContainerJobExecutorInjector;
   }
-
+  
   public static void initializeServiceBuilder(ManagedProcessEngineMetadata processEngineConfiguration, MscManagedProcessEngineController service,
-          ServiceBuilder<ProcessEngine> serviceBuilder) {
+          ServiceBuilder<ProcessEngine> serviceBuilder, String jobExecutorName) {
     
     ContextNames.BindInfo datasourceBindInfo = ContextNames.bindInfoFor(processEngineConfiguration.getDatasourceJndiName());
     serviceBuilder.addDependency(ServiceName.JBOSS.append("txn").append("TransactionManager"), TransactionManager.class, service.getTransactionManagerInjector())
       .addDependency(datasourceBindInfo.getBinderServiceName(), DataSourceReferenceFactoryService.class, service.getDatasourceBinderServiceInjector())
       .addDependency(ServiceNames.forMscRuntimeContainerDelegate(), MscRuntimeContainerDelegate.class, service.getContainerPlatformServiceInjector())
-      .addDependency(ContainerJobExecutorService.getServiceName(), ContainerJobExecutorService.class, service.getContainerJobExecutorInjector())            
+      .addDependency(ServiceNames.forMscRuntimeContainerJobExecutorService(jobExecutorName), MscRuntimeContainerJobExecutor.class, service.getMscRuntimeContainerJobExecutorInjector())
+      .addDependency(ServiceNames.forMscExecutorService())         
       .setInitialMode(Mode.ACTIVE);
     
     Services.addServerExecutorDependency(serviceBuilder, service.getExecutorInjector(), false);
     
-  }
-
-  protected void setJobExecutorDelegate() {
-
-    String jobAcquisitionName = processEngineMetadata.getJobExecutorAcquisitionName();
-    
-    if (jobAcquisitionName != null) {
-      // register the process engine
-      JobExecutor jobExecutorDelegate = containerJobExecutorInjector.getValue().registerProcessEngine(processEngineConfiguration, jobAcquisitionName);
-      processEngineConfiguration.setJobExecutor(jobExecutorDelegate);
-    }
-
-  }
-  
-  protected void releaseJobExecutorDelegate() {
-
-    String jobAcquisitionName = processEngineMetadata.getJobExecutorAcquisitionName();
-    
-    if (jobAcquisitionName != null) {
-      // register the process engine
-      containerJobExecutorInjector.getValue().unregisterProcessEngine(processEngineConfiguration, jobAcquisitionName);
-      processEngineConfiguration.setJobExecutor(null);
-    }
-
   }
 
   public ProcessEngine getProcessEngine() {

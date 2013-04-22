@@ -17,8 +17,6 @@ package org.camunda.bpm.container.impl.jboss.test;
 
 import java.util.List;
 
-import junit.framework.Assert;
-
 import org.camunda.bpm.container.impl.jboss.extension.Attribute;
 import org.camunda.bpm.container.impl.jboss.extension.BpmPlatformExtension;
 import org.camunda.bpm.container.impl.jboss.extension.Element;
@@ -34,6 +32,7 @@ import org.jboss.as.subsystem.test.KernelServices;
 import org.jboss.dmr.ModelNode;
 import org.jboss.msc.service.ServiceContainer;
 import org.jboss.msc.service.ServiceName;
+import org.junit.Assert;
 import org.junit.Test;
 
 
@@ -52,9 +51,10 @@ public class JBossSubsystemXMLTest extends AbstractSubsystemTest {
   public static final String SUBSYSTEM_WITH_JOB_EXECUTOR = "subsystemWithJobExecutor.xml";
   public static final String SUBSYSTEM_WITH_PROCESS_ENGINES_AND_JOB_EXECUTOR = "subsystemWithProcessEnginesAndJobExecutor.xml";
   public static final String SUBSYSTEM_WITH_JOB_EXECUTOR_AND_PROPERTIES = "subsystemWithJobExecutorAndProperties.xml";
+  public static final String SUBSYSTEM_WITH_JOB_EXECUTOR_WITHOUT_ACQUISITION_STRATEGY = "subsystemWithJobExecutorAndWithoutAcquisitionStrategy.xml";
   
   public static final ServiceName PLATFORM_SERVICE_NAME = ServiceNames.forMscRuntimeContainerDelegate();
-  public static final ServiceName PLATFORM_JOBEXECUTOR_SERVICE_NAME = ServiceName.of("foxPlatform").append("containerJobExecutorService");
+  public static final ServiceName PLATFORM_JOBEXECUTOR_SERVICE_NAME = ServiceNames.forMscExecutorService();
     
   public static final ServiceName processEngineServiceBindingServiceName = ContextNames.GLOBAL_CONTEXT_SERVICE_NAME            
     .append("camunda-bpm-platform")
@@ -230,6 +230,20 @@ public class JBossSubsystemXMLTest extends AbstractSubsystemTest {
   @Test
   public void testInstallSubsystemWithJobExecutorAndPropertiesXml() throws Exception {
     String subsystemXml = FileUtils.readFile(SUBSYSTEM_WITH_JOB_EXECUTOR_AND_PROPERTIES);
+//    System.out.println(normalizeXML(subsystemXml));
+    KernelServices services = installInController(subsystemXml);
+    ServiceContainer container = services.getContainer();
+//    container.dumpServices();
+
+    Assert.assertNotNull("platform service should be installed", container.getService(PLATFORM_SERVICE_NAME));
+    Assert.assertNotNull("process engine service should be bound in JNDI", container.getService(processEngineServiceBindingServiceName));
+    
+    Assert.assertNotNull("platform jobexecutor service should be installed", container.getService(PLATFORM_JOBEXECUTOR_SERVICE_NAME));
+  }
+  
+  @Test
+  public void testJobAcquisitionStrategyOptional() throws Exception {
+    String subsystemXml = FileUtils.readFile(SUBSYSTEM_WITH_JOB_EXECUTOR_WITHOUT_ACQUISITION_STRATEGY);
 //    System.out.println(normalizeXML(subsystemXml));
     KernelServices services = installInController(subsystemXml);
     ServiceContainer container = services.getContainer();

@@ -13,15 +13,16 @@
 
 package org.camunda.bpm.engine.test.api.mgmt;
 
+import java.util.HashMap;
 import java.util.List;
-
-import junit.framework.Assert;
+import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.management.ActivityStatistics;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.test.Deployment;
+import org.junit.Assert;
 import org.junit.Test;
 
 public class ActivityStatisticsQueryTest extends PluggableProcessEngineTestCase {
@@ -29,7 +30,11 @@ public class ActivityStatisticsQueryTest extends PluggableProcessEngineTestCase 
   @Test
   @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/StatisticsTest.testStatisticsQueryWithFailedJobs.bpmn20.xml")
   public void testActivityStatisticsQueryWithoutFailedJobs() {
-    runtimeService.startProcessInstanceByKey("ExampleProcess");
+    
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("fail", true);
+    
+    runtimeService.startProcessInstanceByKey("ExampleProcess", parameters);
     
     waitForJobExecutorToProcessAllJobs(6000, 500);
     
@@ -152,7 +157,7 @@ public class ActivityStatisticsQueryTest extends PluggableProcessEngineTestCase 
     
     ActivityStatistics result = statistics.get(0);
     Assert.assertEquals(1, result.getInstances());
-    Assert.assertEquals(1, result.getFailedJobs());
+    Assert.assertEquals(0, result.getFailedJobs());
     
     ProcessDefinition callSubProcessDefinition = repositoryService.createProcessDefinitionQuery()
         .processDefinitionKey("callExampleSubProcess").singleResult();

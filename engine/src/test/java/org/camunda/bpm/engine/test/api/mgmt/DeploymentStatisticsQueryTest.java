@@ -14,7 +14,9 @@
 package org.camunda.bpm.engine.test.api.mgmt;
 
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import junit.framework.Assert;
 
@@ -96,8 +98,12 @@ public class DeploymentStatisticsQueryTest extends PluggableProcessEngineTestCas
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/StatisticsTest.testMultiInstanceStatisticsQuery.bpmn20.xml",
   "org/camunda/bpm/engine/test/api/mgmt/StatisticsTest.testStatisticsQueryWithFailedJobs.bpmn20.xml"})
   public void testDeploymentStatisticsQueryWithFailedJobs() {
+    
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("fail", true);
+    
     runtimeService.startProcessInstanceByKey("MIExampleProcess");
-    runtimeService.startProcessInstanceByKey("ExampleProcess");
+    runtimeService.startProcessInstanceByKey("ExampleProcess", parameters);
     
     waitForJobExecutorToProcessAllJobs(6000, 500);
     

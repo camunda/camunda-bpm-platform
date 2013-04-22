@@ -6,6 +6,7 @@ import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import javax.annotation.Resource;
+import javax.ejb.EJB;
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
 import javax.ejb.TransactionAttribute;
@@ -13,13 +14,16 @@ import javax.ejb.TransactionAttributeType;
 
 import org.camunda.bpm.ProcessApplicationService;
 import org.camunda.bpm.ProcessEngineService;
+import org.camunda.bpm.container.ExecutorService;
 import org.camunda.bpm.container.RuntimeContainerDelegate;
 import org.camunda.bpm.container.impl.ejb.deployment.EjbJarAttachments;
 import org.camunda.bpm.container.impl.ejb.deployment.EjbJarParsePlatformXmlStep;
+import org.camunda.bpm.container.impl.ejb.deployment.StartJcaExecutorServiceStep;
 import org.camunda.bpm.container.impl.jmx.JmxRuntimeContainerDelegate;
 import org.camunda.bpm.container.impl.jmx.deployment.PlatformXmlStartProcessEnginesStep;
 import org.camunda.bpm.container.impl.jmx.deployment.StopProcessApplicationsStep;
 import org.camunda.bpm.container.impl.jmx.deployment.StopProcessEnginesStep;
+import org.camunda.bpm.container.impl.jmx.deployment.jobexecutor.StartJobExecutorStep;
 
 
 /**
@@ -36,6 +40,9 @@ public class EjbBpmPlatformBootstrap {
   
   @Resource(description="The location of the bpm-platform.xml file.")
   private String bpmPlatformXmlLocation = "META-INF/bpm-platform.xml";
+  
+  @EJB
+  protected ExecutorService executorServiceBean;
 
   protected ProcessEngineService processEngineService;
   protected ProcessApplicationService processApplicationService; 
@@ -48,6 +55,8 @@ public class EjbBpmPlatformBootstrap {
     containerDelegate.getServiceContainer().createDeploymentOperation("deploying camunda BPM platform")
       .addAttachment(EjbJarAttachments.BPM_PLATFORM_RESOURCE, bpmPlatformXmlLocation)
       .addStep(new EjbJarParsePlatformXmlStep())
+      .addStep(new StartJcaExecutorServiceStep(executorServiceBean))
+      .addStep(new StartJobExecutorStep())
       .addStep(new PlatformXmlStartProcessEnginesStep())
       .execute();
     

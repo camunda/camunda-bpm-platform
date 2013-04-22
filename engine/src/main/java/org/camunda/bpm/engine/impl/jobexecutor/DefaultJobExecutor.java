@@ -12,10 +12,8 @@
  */
 package org.camunda.bpm.engine.impl.jobexecutor;
 
-import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
@@ -34,30 +32,29 @@ import java.util.logging.Logger;
  * 
  * @author Daniel Meyer
  */
-public class DefaultJobExecutor extends JobExecutor {
+public class DefaultJobExecutor extends ThreadPoolJobExecutor {
   
   private static Logger log = Logger.getLogger(DefaultJobExecutor.class.getName());
   
   protected int queueSize = 3;
   protected int corePoolSize = 3;
   private int maxPoolSize = 10;
-
-  protected BlockingQueue<Runnable> threadPoolQueue;
-  protected ThreadPoolExecutor threadPoolExecutor;
     
   protected void startExecutingJobs() {
-    if (threadPoolQueue==null) {
-      threadPoolQueue = new ArrayBlockingQueue<Runnable>(queueSize);
-    }
+   
+    BlockingQueue<Runnable> threadPoolQueue = new ArrayBlockingQueue<Runnable>(queueSize);
+    
     if (threadPoolExecutor==null) {
       threadPoolExecutor = new ThreadPoolExecutor(corePoolSize, maxPoolSize, 0L, TimeUnit.MILLISECONDS, threadPoolQueue);      
       threadPoolExecutor.setRejectedExecutionHandler(new ThreadPoolExecutor.AbortPolicy());
     }
-    startJobAcquisitionThread(); 
+    
+    super.startExecutingJobs();
   }
     
   protected void stopExecutingJobs() {
-	stopJobAcquisitionThread();
+    
+    super.stopExecutingJobs();
     
     // Ask the thread pool to finish and exit
     threadPoolExecutor.shutdown();
@@ -70,16 +67,6 @@ public class DefaultJobExecutor extends JobExecutor {
       }              
     } catch (InterruptedException e) {
       log.log(Level.WARNING, "Interrupted while shutting down the job executor. ", e);
-    }
-
-    threadPoolExecutor = null;
-  }
-  
-  public void executeJobs(List<String> jobIds) {
-    try {
-      threadPoolExecutor.execute(new ExecuteJobsRunnable(this, jobIds));
-    }catch (RejectedExecutionException e) {
-      rejectedJobsHandler.jobsRejected(this, jobIds);
     }
   }
   
@@ -108,22 +95,6 @@ public class DefaultJobExecutor extends JobExecutor {
   public void setMaxPoolSize(int maxPoolSize) {
     this.maxPoolSize = maxPoolSize;
   }
-  
-  public BlockingQueue<Runnable> getThreadPoolQueue() {
-    return threadPoolQueue;
-  }
-
-  public void setThreadPoolQueue(BlockingQueue<Runnable> threadPoolQueue) {
-    this.threadPoolQueue = threadPoolQueue;
-  }
-
-  public ThreadPoolExecutor getThreadPoolExecutor() {
-    return threadPoolExecutor;
-  }
-  
-  public void setThreadPoolExecutor(ThreadPoolExecutor threadPoolExecutor) {
-    this.threadPoolExecutor = threadPoolExecutor;
-  }
-    
+      
 }
 

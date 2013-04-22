@@ -17,6 +17,7 @@ import java.util.logging.Logger;
 
 import org.camunda.bpm.engine.OptimisticLockingException;
 import org.camunda.bpm.engine.impl.cmd.AcquireJobsCmd;
+import org.camunda.bpm.engine.impl.jobexecutor.AcquiredJobs;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.test.Deployment;
@@ -43,10 +44,10 @@ public class CompetingJobAcquisitionTest extends PluggableProcessEngineTestCase 
     public void run() {
       try {
         JobExecutor jobExecutor = processEngineConfiguration.getJobExecutor();
-        processEngineConfiguration
+        AcquiredJobs jobs = (AcquiredJobs) processEngineConfiguration
           .getCommandExecutorTxRequired()
           .execute(new ControlledCommand(activeThread, new AcquireJobsCmd(jobExecutor)));
-
+        
       } catch (OptimisticLockingException e) {
         this.exception = e;
       }

@@ -166,6 +166,10 @@ public class BpmPlatformParser implements XMLStreamConstants, XMLElementReader<L
           parseElement(Element.HISTORY_LEVEL, reader, addProcessEngine);
           break;
         }
+        case CONFIGURATION: {
+          parseElement(Element.CONFIGURATION, reader, addProcessEngine);
+          break;
+        }
         default: {
           throw unexpectedElement(reader);
         }
@@ -330,7 +334,7 @@ public class BpmPlatformParser implements XMLStreamConstants, XMLElementReader<L
         case PROPERTIES: {
           parseProperties(reader, list, addJobAcquisition);
           break;
-        }
+        }       
         case ACQUISITION_STRATEGY: {
           parseElement(Element.ACQUISITION_STRATEGY, reader, addJobAcquisition);
           break;
@@ -421,8 +425,9 @@ public class BpmPlatformParser implements XMLStreamConstants, XMLElementReader<L
         
         writer.writeAttribute(Attribute.NAME.getLocalName(), property.getName());
         ModelNode entry = property.getValue();
-        writeElement(Element.ACQUISITION_STRATEGY, writer, entry);
   
+        writeElement(Element.ACQUISITION_STRATEGY, writer, entry);
+        
         writeProperties(writer, entry);
   
         writer.writeEndElement();

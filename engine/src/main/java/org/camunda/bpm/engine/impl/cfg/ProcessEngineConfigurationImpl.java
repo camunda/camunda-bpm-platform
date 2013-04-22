@@ -753,7 +753,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       }
     }
 
-    jobExecutor.setCommandExecutor(commandExecutorTxRequired);
     jobExecutor.setAutoActivate(jobExecutorActivate);
     
     if(jobExecutor.getRejectedJobsHandler() == null) {

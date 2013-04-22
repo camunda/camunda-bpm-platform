@@ -15,8 +15,8 @@ package org.camunda.bpm.container.impl.jboss.deployment.processor;
 import java.util.List;
 import java.util.Map;
 
+import org.camunda.bpm.container.impl.jboss.config.ManagedProcessEngineMetadata;
 import org.camunda.bpm.container.impl.jboss.deployment.marker.ProcessApplicationAttachments;
-import org.camunda.bpm.container.impl.jboss.metadata.ManagedProcessEngineMetadata;
 import org.camunda.bpm.container.impl.jboss.service.MscManagedProcessEngineController;
 import org.camunda.bpm.container.impl.jboss.service.ServiceNames;
 import org.camunda.bpm.container.impl.jboss.util.ProcessesXmlWrapper;
@@ -84,7 +84,7 @@ public class ProcessEngineStartProcessor implements DeploymentUnitProcessor {
     serviceBuilder.addDependency(phaseContext.getPhaseServiceName());
     
     // add Service dependencies
-    MscManagedProcessEngineController.initializeServiceBuilder(configuration, service, serviceBuilder);
+    MscManagedProcessEngineController.initializeServiceBuilder(configuration, service, serviceBuilder, processEngineXml.getJobAcquisitionName());
     
     // make this start on demand
     serviceBuilder.setInitialMode(Mode.ACTIVE);
@@ -103,8 +103,9 @@ public class ProcessEngineStartProcessor implements DeploymentUnitProcessor {
     String engineName = processEngineXml.getName();
     String datasourceJndiName = processEngineXml.getDatasource();
     String historyLevel = processEngineXml.getProperties().get("history");
+    String configurationClass = processEngineXml.getConfigurationClass();
     
-    return new ManagedProcessEngineMetadata(isDefault, engineName, datasourceJndiName, historyLevel, (Map) processEngineXml.getProperties());
+    return new ManagedProcessEngineMetadata(isDefault, engineName, datasourceJndiName, historyLevel, configurationClass, (Map) processEngineXml.getProperties());
         
   }
 

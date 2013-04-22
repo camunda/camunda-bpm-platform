@@ -27,6 +27,7 @@ import org.camunda.bpm.ProcessEngineService;
 import org.camunda.bpm.application.AbstractProcessApplication;
 import org.camunda.bpm.application.ProcessApplicationInfo;
 import org.camunda.bpm.application.impl.ServletProcessApplication;
+import org.camunda.bpm.container.ExecutorService;
 import org.camunda.bpm.container.RuntimeContainerDelegate;
 import org.camunda.bpm.container.impl.jboss.util.PlatformServiceReferenceFactory;
 import org.camunda.bpm.container.impl.jboss.util.ServiceTracker;
@@ -168,6 +169,10 @@ public class MscRuntimeContainerDelegate implements Service<MscRuntimeContainerD
   public ProcessApplicationService getProcessApplicationService() {
     // TODO: return proxy?
     return this;
+  }
+  
+  public ExecutorService getExecutorService() {    
+    return (ExecutorService) serviceContainer.getRequiredService(ServiceNames.forMscExecutorService()).getValue();
   }
   
   // ProcessEngineService implementation /////////////////////////////////

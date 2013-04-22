@@ -49,10 +49,6 @@ public interface RuntimeContainerDelegate {
    */
   public void unregisterProcessEngine(ProcessEngine processEngine);
   
-//  public void registerJobAcquisition(JobAcquisition jobAcquisitionConfiguration);
-
-//  public void unregisterJobAcquisition(JobAcquisition jobAcquisitionConfiguration);
-  
   /**
    * Deploy a {@link AbstractProcessApplication} into the runtime container.
    * 
@@ -70,12 +66,15 @@ public interface RuntimeContainerDelegate {
    */
   public ProcessEngineService getProcessEngineService();
   
-//  public JobExecutorService getJobExecutorService();
-
   /**
    * @return the Container's {@link ProcessApplicationService} implementation
    */
   public ProcessApplicationService getProcessApplicationService();
+  
+  /**
+   * @return the Runtime Container's {@link ExecutorService} implementation
+   */
+  public ExecutorService getExecutorService();
   
   /**
    * Holder of the current {@link RuntimeContainerDelegate} instance. 

@@ -25,7 +25,7 @@ import org.camunda.bpm.container.impl.metadata.spi.JobAcquisitionXml;
 public class JobAcquisitionXmlImpl implements JobAcquisitionXml {
 
   private String name;
-  private String acquisitionStrategy;
+  private String jobExecutorClassName;
   private Map<String, String> properties;
 
   public String getName() {
@@ -36,13 +36,6 @@ public class JobAcquisitionXmlImpl implements JobAcquisitionXml {
     this.name = name;
   }
 
-  public String getAcquisitionStrategy() {
-    return acquisitionStrategy;
-  }
-
-  public void setAcquisitionStrategy(String acquisitionStrategy) {
-    this.acquisitionStrategy = acquisitionStrategy;
-  }
 
   public Map<String, String> getProperties() {
     return properties;
@@ -50,6 +43,14 @@ public class JobAcquisitionXmlImpl implements JobAcquisitionXml {
 
   public void setProperties(Map<String, String> properties) {
     this.properties = properties;
+  }
+
+  public String getJobExecutorClassName() {
+    return jobExecutorClassName;
+  }
+  
+  public void setJobExecutorClassName(String jobExecutorClassName) {
+    this.jobExecutorClassName = jobExecutorClassName;
   }
 
 }

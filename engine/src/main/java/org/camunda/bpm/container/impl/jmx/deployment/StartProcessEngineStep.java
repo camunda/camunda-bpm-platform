@@ -15,6 +15,8 @@ package org.camunda.bpm.container.impl.jmx.deployment;
 import static org.camunda.bpm.container.impl.jmx.deployment.Attachments.PROCESS_APPLICATION;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -28,8 +30,12 @@ import org.camunda.bpm.container.impl.jmx.services.JmxManagedProcessEngineContro
 import org.camunda.bpm.container.impl.metadata.spi.ProcessEngineXml;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseListener;
+import org.camunda.bpm.engine.impl.bpmn.parser.FoxFailedJobParseListener;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.StandaloneProcessEngineConfiguration;
+import org.camunda.bpm.engine.impl.jobexecutor.FoxFailedJobCommandFactory;
+import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.camunda.bpm.engine.impl.persistence.StrongUuidGenerator;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
 
@@ -52,6 +58,7 @@ public class StartProcessEngineStep extends MBeanDeploymentOperationStep {
   public String getName() {    
     return "Start process engine " + processEngineXml.getName();
   }
+  
 
   public void performOperationStep(MBeanDeploymentOperation operationContext) {
     
@@ -78,7 +85,18 @@ public class StartProcessEngineStep extends MBeanDeploymentOperationStep {
     
     // set UUid generator
     // TODO: move this to configuration and use as default?
-    ((ProcessEngineConfigurationImpl)configuration).setIdGenerator(new StrongUuidGenerator());
+    ProcessEngineConfigurationImpl configurationImpl = (ProcessEngineConfigurationImpl)configuration;
+    configurationImpl.setIdGenerator(new StrongUuidGenerator());
+    
+    // add support for custom Retry strategy
+    // TODO: decide whether this should be moved  to configuration
+    List<BpmnParseListener> customPostBPMNParseListeners = configurationImpl.getCustomPostBPMNParseListeners();
+    if(customPostBPMNParseListeners==null) {
+      customPostBPMNParseListeners = new ArrayList<BpmnParseListener>();
+      configurationImpl.setCustomPostBPMNParseListeners(customPostBPMNParseListeners);
+    }    
+    customPostBPMNParseListeners.add(new FoxFailedJobParseListener());    
+    configurationImpl.setFailedJobCommandFactory(new FoxFailedJobCommandFactory());
     
     // set configuration values
     String name = processEngineXml.getName();
@@ -103,12 +121,27 @@ public class StartProcessEngineStep extends MBeanDeploymentOperationStep {
       
     }
     
+    JobExecutor jobExecutor = getJobExecutorService(serviceContainer);
+    if(jobExecutor == null) {
+      throw new ProcessEngineException("Cannot find referenced job executor with name '"+processEngineXml.getJobAcquisitionName()+"'");
+    }
+    
+    // set JobExecutor on process engine
+    configurationImpl.setJobExecutor(jobExecutor);
+        
     // start the process engine inside the container.
     JmxManagedProcessEngine managedProcessEngineService = new JmxManagedProcessEngineController(configuration);
     serviceContainer.startService(ServiceTypes.PROCESS_ENGINE, configuration.getProcessEngineName(), managedProcessEngineService);
-    
+            
   }
 
+  protected JobExecutor getJobExecutorService(final MBeanServiceContainer serviceContainer) {
+    // lookup container managed job executor
+    String jobAcquisitionName = processEngineXml.getJobAcquisitionName();
+    JobExecutor jobExecutor = serviceContainer.getServiceValue(ServiceTypes.JOB_EXECUTOR, jobAcquisitionName);
+    return jobExecutor;
+  }
+  
   protected ProcessEngineConfiguration instantiateConfiguration(Class<? extends ProcessEngineConfiguration> configurationClass) {
     try {
       return configurationClass.newInstance();

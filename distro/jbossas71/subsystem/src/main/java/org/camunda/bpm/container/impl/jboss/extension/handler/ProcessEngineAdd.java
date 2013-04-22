@@ -15,6 +15,7 @@
  */
 package org.camunda.bpm.container.impl.jboss.extension.handler;
 
+import static org.camunda.bpm.container.impl.jboss.extension.ModelConstants.CONFIGURATION;
 import static org.camunda.bpm.container.impl.jboss.extension.ModelConstants.DATASOURCE;
 import static org.camunda.bpm.container.impl.jboss.extension.ModelConstants.DEFAULT;
 import static org.camunda.bpm.container.impl.jboss.extension.ModelConstants.HISTORY_LEVEL;
@@ -33,8 +34,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
+import org.camunda.bpm.container.impl.jboss.config.ManagedJtaProcessEngineConfiguration;
+import org.camunda.bpm.container.impl.jboss.config.ManagedProcessEngineMetadata;
 import org.camunda.bpm.container.impl.jboss.extension.Element;
-import org.camunda.bpm.container.impl.jboss.metadata.ManagedProcessEngineMetadata;
 import org.camunda.bpm.container.impl.jboss.service.MscManagedProcessEngineController;
 import org.camunda.bpm.container.impl.jboss.service.ServiceNames;
 import org.camunda.bpm.engine.ProcessEngine;
@@ -87,6 +89,10 @@ public class ProcessEngineAdd extends AbstractAddStepHandler implements Descript
     node.get(REQUEST_PROPERTIES, PROPERTIES, TYPE).set(ModelType.OBJECT);
     node.get(REQUEST_PROPERTIES, PROPERTIES, VALUE_TYPE).set(ModelType.LIST);
     node.get(REQUEST_PROPERTIES, PROPERTIES, REQUIRED).set(false);
+    
+    node.get(REQUEST_PROPERTIES, CONFIGURATION, DESCRIPTION).set("Which configuration class to use");
+    node.get(REQUEST_PROPERTIES, CONFIGURATION, TYPE).set(ModelType.STRING);
+    node.get(REQUEST_PROPERTIES, CONFIGURATION, REQUIRED).set(false);
 
     return node;
   }
@@ -116,6 +122,12 @@ public class ProcessEngineAdd extends AbstractAddStepHandler implements Descript
       datasource = operation.get(DATASOURCE).asString();
     }
     model.get(DATASOURCE).set(datasource);
+    
+    String configuration = ManagedJtaProcessEngineConfiguration.class.getName();
+    if (operation.hasDefined(CONFIGURATION)) {
+      configuration = operation.get(CONFIGURATION).asString();
+    }
+    model.get(CONFIGURATION).set(configuration);
     
     // retrieve all properties
     ModelNode properties = new ModelNode();
@@ -147,7 +159,7 @@ public class ProcessEngineAdd extends AbstractAddStepHandler implements Descript
     
     ServiceBuilder<ProcessEngine> serviceBuilder = context.getServiceTarget().addService(name, service);
     
-    MscManagedProcessEngineController.initializeServiceBuilder(processEngineConfiguration, service, serviceBuilder);
+    MscManagedProcessEngineController.initializeServiceBuilder(processEngineConfiguration, service, serviceBuilder, processEngineConfiguration.getJobExecutorAcquisitionName());
     
     serviceBuilder.addListener(verificationHandler);    
     return serviceBuilder.install();
@@ -156,6 +168,7 @@ public class ProcessEngineAdd extends AbstractAddStepHandler implements Descript
   protected ManagedProcessEngineMetadata transformConfiguration(final OperationContext context, String engineName, final ModelNode model) {
     String datasourceJndiName = model.get(DATASOURCE).asString();   
     String historyLevel = model.get(HISTORY_LEVEL).asString();
+    String configuration = model.get(CONFIGURATION).asString();
     boolean isDefault = model.get(DEFAULT).asBoolean();
     
     Map<String,Object> properties = new HashMap<String, Object>();
@@ -169,7 +182,7 @@ public class ProcessEngineAdd extends AbstractAddStepHandler implements Descript
       }
     }
         
-    return new ManagedProcessEngineMetadata(isDefault, engineName, datasourceJndiName, historyLevel, properties);
+    return new ManagedProcessEngineMetadata(isDefault, engineName, datasourceJndiName, historyLevel, configuration, properties);
   }
   
 }

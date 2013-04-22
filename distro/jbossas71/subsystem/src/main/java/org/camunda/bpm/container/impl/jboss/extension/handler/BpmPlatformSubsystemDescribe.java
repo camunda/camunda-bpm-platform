@@ -15,8 +15,8 @@
  */
 package org.camunda.bpm.container.impl.jboss.extension.handler;
 
-import static org.camunda.bpm.container.impl.jboss.extension.ModelConstants.ACQUISITION_STRATEGY;
 import static org.camunda.bpm.container.impl.jboss.extension.ModelConstants.DATASOURCE;
+import static org.camunda.bpm.container.impl.jboss.extension.ModelConstants.ACQUISITION_STRATEGY;
 import static org.camunda.bpm.container.impl.jboss.extension.ModelConstants.DEFAULT;
 import static org.camunda.bpm.container.impl.jboss.extension.ModelConstants.HISTORY_LEVEL;
 import static org.camunda.bpm.container.impl.jboss.extension.ModelConstants.JOB_ACQUISITIONS;
@@ -135,9 +135,11 @@ public class BpmPlatformSubsystemDescribe implements OperationStepHandler, Descr
   
   private void addJobAcquisition(ModelNode property, ModelNode jobAcquisitionAdd, PathAddress jobAcquisitionAddress, ModelNode result) {
     jobAcquisitionAdd.get(NAME).set(property.get(NAME).asString());
+    
     if (property.hasDefined(ACQUISITION_STRATEGY)) {
       jobAcquisitionAdd.get(ACQUISITION_STRATEGY).set(property.get(ACQUISITION_STRATEGY).asString());
     }
+    
     if (property.hasDefined(PROPERTIES)) {
       jobAcquisitionAdd.get(PROPERTIES).set(property.get(PROPERTIES).asList());
     }
