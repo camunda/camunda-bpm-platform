@@ -10,7 +10,7 @@
   <parent>
     <groupId>org.camunda.bpm</groupId>
     <artifactId>camunda-root</artifactId>
-    <version>7.0.0-SNAPSHOT</version>
+    <version>7.0.0-alpha2</version>
   </parent>
   
   <properties>
@@ -157,7 +157,7 @@
         <database.type>h2</database.type>
         <jboss.datasource.filename>h2-ds.xml</jboss.datasource.filename>
         <database.user>sa</database.user>
-        <database.password></database.password>
+        <database.password />
         <database.driver>org.h2.Driver</database.driver>
         <database.datasource.class>org.h2.jdbcx.JdbcDataSource</database.datasource.class>
         <!-- This url has to consistent for the subprojects: {server}-runtime and webapp-integration-tests -->
