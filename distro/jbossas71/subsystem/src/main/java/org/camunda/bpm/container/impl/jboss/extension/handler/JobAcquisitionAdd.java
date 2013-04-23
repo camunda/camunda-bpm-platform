@@ -15,9 +15,9 @@
  */
 package org.camunda.bpm.container.impl.jboss.extension.handler;
 
+import static org.camunda.bpm.container.impl.jboss.extension.ModelConstants.ACQUISITION_STRATEGY;
 import static org.camunda.bpm.container.impl.jboss.extension.ModelConstants.NAME;
 import static org.camunda.bpm.container.impl.jboss.extension.ModelConstants.PROPERTIES;
-import static org.camunda.bpm.container.impl.jboss.extension.ModelConstants.ACQUISITION_STRATEGY;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.ADD;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.DESCRIPTION;
 import static org.jboss.as.controller.descriptions.ModelDescriptionConstants.OPERATION_NAME;
@@ -31,6 +31,7 @@ import java.util.Locale;
 
 import org.camunda.bpm.container.impl.jboss.service.MscRuntimeContainerJobExecutor;
 import org.camunda.bpm.container.impl.jboss.service.ServiceNames;
+import org.camunda.bpm.engine.impl.jobexecutor.RuntimeContainerJobExecutor;
 import org.jboss.as.controller.AbstractAddStepHandler;
 import org.jboss.as.controller.OperationContext;
 import org.jboss.as.controller.OperationFailedException;
@@ -41,6 +42,7 @@ import org.jboss.as.controller.descriptions.ModelDescriptionConstants;
 import org.jboss.dmr.ModelNode;
 import org.jboss.dmr.ModelType;
 import org.jboss.msc.service.ServiceController;
+import org.jboss.msc.service.ServiceController.Mode;
 
 
 /**
@@ -104,8 +106,13 @@ public class JobAcquisitionAdd extends AbstractAddStepHandler implements Descrip
     MscRuntimeContainerJobExecutor mscRuntimeContainerJobExecutor = new MscRuntimeContainerJobExecutor();
   
     // start new service for job executor
-    context.getServiceTarget().addService(ServiceNames.forMscRuntimeContainerJobExecutorService(acquisitionName), mscRuntimeContainerJobExecutor)
+    ServiceController<RuntimeContainerJobExecutor> serviceController = context.getServiceTarget().addService(ServiceNames.forMscRuntimeContainerJobExecutorService(acquisitionName), mscRuntimeContainerJobExecutor)
+      .addDependency(ServiceNames.forMscExecutorService())
+      .addListener(verificationHandler)
+      .setInitialMode(Mode.ACTIVE)
       .install();
+    
+    newControllers.add(serviceController);
     
   }
 
