@@ -107,6 +107,7 @@ public class JobAcquisitionAdd extends AbstractAddStepHandler implements Descrip
   
     // start new service for job executor
     ServiceController<RuntimeContainerJobExecutor> serviceController = context.getServiceTarget().addService(ServiceNames.forMscRuntimeContainerJobExecutorService(acquisitionName), mscRuntimeContainerJobExecutor)
+      .addDependency(ServiceNames.forMscRuntimeContainerDelegate())
       .addDependency(ServiceNames.forMscExecutorService())
       .addListener(verificationHandler)
       .setInitialMode(Mode.ACTIVE)
