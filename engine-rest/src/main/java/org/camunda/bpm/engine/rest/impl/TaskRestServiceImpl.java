@@ -165,15 +165,7 @@ public class TaskRestServiceImpl extends AbstractRestProcessEngineAware implemen
   @Override
   public void resolve(String taskId, CompleteTaskDto dto) {
     TaskService taskService = getProcessEngine().getTaskService();
-    RuntimeService runtimeService = getProcessEngine().getRuntimeService();
-
-    // FIXME: atomicity of operation
-
-    Task task = getTaskById(taskId);
-    String executionId = task.getExecutionId();
-
-    runtimeService.setVariables(executionId, dto.getVariables());
-    taskService.resolveTask(taskId);
+    taskService.resolveTask(taskId, dto.getVariables());
   }
 
   /**
