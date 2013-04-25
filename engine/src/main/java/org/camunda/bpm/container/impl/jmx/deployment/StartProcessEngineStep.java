@@ -69,9 +69,7 @@ public class StartProcessEngineStep extends MBeanDeploymentOperationStep {
     
     if(processApplication != null) {
       configurationClassloader = processApplication.getProcessApplicationClassloader();      
-    } else {
-      configurationClassloader = ProcessEngineConfiguration.class.getClassLoader();      
-    }
+    } 
     
     String configurationClassName = processEngineXml.getConfigurationClass();
     
@@ -80,7 +78,7 @@ public class StartProcessEngineStep extends MBeanDeploymentOperationStep {
     }
     
     // create & instantiate configuration class    
-    Class<? extends ProcessEngineConfiguration> configurationClass = loadProcessEngineConfigurationClass(configurationClassloader, configurationClassName);
+    Class<? extends ProcessEngineConfiguration> configurationClass = loadProcessEngineConfigurationClass(configurationClassName, configurationClassloader);
     ProcessEngineConfiguration configuration = instantiateConfiguration(configurationClass);
     
     // set UUid generator
@@ -154,11 +152,20 @@ public class StartProcessEngineStep extends MBeanDeploymentOperationStep {
   }
 
   @SuppressWarnings("unchecked")
-  protected Class<? extends ProcessEngineConfiguration> loadProcessEngineConfigurationClass(ClassLoader processApplicationClassloader, String processEngineConfigurationClassName) {
+  protected Class<? extends ProcessEngineConfiguration> loadProcessEngineConfigurationClass(String processEngineConfigurationClassName, ClassLoader customClassloader) {
     try {
-      return (Class<? extends ProcessEngineConfiguration>) processApplicationClassloader.loadClass(processEngineConfigurationClassName);
+      if(customClassloader != null) {
+        return (Class<? extends ProcessEngineConfiguration>) customClassloader.loadClass(processEngineConfigurationClassName);
+      }else {
+        return (Class<? extends ProcessEngineConfiguration>) ReflectUtil.loadClass(processEngineConfigurationClassName);
+      }
+      
     } catch (ClassNotFoundException e) {
-      throw new ProcessEngineException("Could not load process engine configuration class",e);
+      throw new ProcessEngineException("Could not load process engine configuration class", e);
+      
+    } catch (ClassCastException e) {
+      throw new ProcessEngineException("Custom ProcessEngineConfiguration class must extend ProcessEngineConfiguration", e);
+      
     }
   }
 

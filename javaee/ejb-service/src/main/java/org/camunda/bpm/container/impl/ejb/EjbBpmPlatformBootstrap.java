@@ -5,7 +5,6 @@ import java.util.logging.Logger;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import javax.annotation.Resource;
 import javax.ejb.EJB;
 import javax.ejb.Singleton;
 import javax.ejb.Startup;
@@ -33,12 +32,12 @@ import org.camunda.bpm.container.impl.jmx.deployment.jobexecutor.StartJobExecuto
  */
 @Startup
 @Singleton(name="BpmPlatformBootstrap")
-@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+@TransactionAttribute(TransactionAttributeType.NOT_SUPPORTED)
 public class EjbBpmPlatformBootstrap {
 
   final private static Logger LOGGER = Logger.getLogger(EjbBpmPlatformBootstrap.class.getName());
   
-  @Resource(description="The location of the bpm-platform.xml file.")
+//  @Resource
   private String bpmPlatformXmlLocation = "META-INF/bpm-platform.xml";
   
   @EJB
