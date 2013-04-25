@@ -18,7 +18,6 @@ import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.FormService;
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.form.TaskFormData;
 import org.camunda.bpm.engine.rest.helper.EqualsMap;
@@ -206,15 +205,12 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
       .statusCode(Status.NO_CONTENT.getStatusCode())
     .when().post(RESOLVE_TASK_URL);
     
-    verify(taskServiceMock).resolveTask(MockProvider.EXAMPLE_TASK_ID);
-    
-    RuntimeService runtimeServiceMock = processEngine.getRuntimeService();
-    verify(runtimeServiceMock).setVariables(eq(MockProvider.EXAMPLE_TASK_EXECUTION_ID), argThat(new EqualsMap(variables)));
+    verify(taskServiceMock).resolveTask(eq(MockProvider.EXAMPLE_TASK_ID), argThat(new EqualsMap(variables)));
   }
 
   @Test
   public void testUnsuccessfulResolving() {
-    doThrow(new ProcessEngineException("expected exception")).when(taskServiceMock).resolveTask(any(String.class));
+    doThrow(new ProcessEngineException("expected exception")).when(taskServiceMock).resolveTask(any(String.class), any(Map.class));
     
     given().pathParam("id", MockProvider.EXAMPLE_TASK_ID)
     .contentType(POST_JSON_CONTENT_TYPE).body(EMPTY_JSON_OBJECT)
