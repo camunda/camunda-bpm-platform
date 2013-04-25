@@ -4,7 +4,7 @@ import javax.ejb.MessageDriven;
 import javax.ejb.TransactionAttribute;
 import javax.ejb.TransactionAttributeType;
 
-import org.camunda.bpm.container.impl.threading.jca.inflow.JobExecutionHandler;
+import org.camunda.bpm.container.impl.threading.ra.inflow.JobExecutionHandler;
 import org.camunda.bpm.engine.impl.cmd.ExecuteJobsCmd;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 

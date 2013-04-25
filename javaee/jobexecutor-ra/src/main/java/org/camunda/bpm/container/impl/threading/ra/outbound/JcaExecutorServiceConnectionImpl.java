@@ -2,7 +2,6 @@ package org.camunda.bpm.container.impl.threading.ra.outbound;
 
 import java.util.List;
 
-import org.camunda.bpm.container.impl.threading.jca.outbound.JcaExecutorServiceConnection;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 
 
@@ -35,6 +34,7 @@ public class JcaExecutorServiceConnectionImpl implements JcaExecutorServiceConne
   public Runnable getExecuteJobsRunnable(List<String> jobIds, ProcessEngineImpl processEngine) {
     return mc.getExecuteJobsRunnable(jobIds, processEngine);
   }
+ 
 
 
 }

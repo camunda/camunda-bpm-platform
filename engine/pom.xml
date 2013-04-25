@@ -24,6 +24,7 @@
       <!-- required for building with JDK 5 -->
       <groupId>org.livetribe</groupId>
       <artifactId>livetribe-jsr223</artifactId>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.mybatis</groupId>

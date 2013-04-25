@@ -9,7 +9,6 @@ import javax.resource.ResourceException;
 import javax.resource.spi.UnavailableException;
 import javax.resource.spi.endpoint.MessageEndpoint;
 
-import org.camunda.bpm.container.impl.threading.jca.inflow.JobExecutionHandler;
 import org.camunda.bpm.container.impl.threading.ra.JcaExecutorServiceConnector;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;

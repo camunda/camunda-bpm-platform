@@ -12,8 +12,8 @@ import javax.ejb.TransactionAttributeType;
 import javax.resource.ResourceException;
 
 import org.camunda.bpm.container.ExecutorService;
-import org.camunda.bpm.container.impl.threading.jca.outbound.JcaExecutorServiceConnection;
-import org.camunda.bpm.container.impl.threading.jca.outbound.JcaExecutorServiceConnectionFactory;
+import org.camunda.bpm.container.impl.threading.ra.outbound.JcaExecutorServiceConnection;
+import org.camunda.bpm.container.impl.threading.ra.outbound.JcaExecutorServiceConnectionFactory;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 

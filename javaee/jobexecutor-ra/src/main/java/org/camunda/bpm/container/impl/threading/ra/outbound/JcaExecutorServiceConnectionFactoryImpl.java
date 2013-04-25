@@ -5,8 +5,6 @@ import javax.naming.Reference;
 import javax.resource.ResourceException;
 import javax.resource.spi.ConnectionManager;
 
-import org.camunda.bpm.container.impl.threading.jca.outbound.JcaExecutorServiceConnection;
-import org.camunda.bpm.container.impl.threading.jca.outbound.JcaExecutorServiceConnectionFactory;
 
 
 

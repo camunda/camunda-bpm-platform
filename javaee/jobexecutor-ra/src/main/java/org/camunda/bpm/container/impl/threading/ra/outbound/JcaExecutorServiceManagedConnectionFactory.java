@@ -14,8 +14,6 @@ import javax.resource.spi.ResourceAdapter;
 import javax.resource.spi.ResourceAdapterAssociation;
 import javax.security.auth.Subject;
 
-import org.camunda.bpm.container.impl.threading.jca.outbound.JcaExecutorServiceConnection;
-import org.camunda.bpm.container.impl.threading.jca.outbound.JcaExecutorServiceConnectionFactory;
 
 @ConnectionDefinition(
     connectionFactory = JcaExecutorServiceConnectionFactory.class, 

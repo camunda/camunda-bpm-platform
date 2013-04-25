@@ -15,7 +15,7 @@ import javax.resource.spi.work.WorkManager;
 import javax.transaction.xa.XAResource;
 
 import org.camunda.bpm.container.ExecutorService;
-import org.camunda.bpm.container.impl.threading.jca.inflow.JobExecutionHandler;
+import org.camunda.bpm.container.impl.threading.ra.inflow.JobExecutionHandler;
 import org.camunda.bpm.container.impl.threading.ra.inflow.JobExecutionHandlerActivation;
 import org.camunda.bpm.container.impl.threading.ra.inflow.JobExecutionHandlerActivationSpec;
 import org.camunda.bpm.container.impl.threading.ra.util.AutodetectWorkManagerExecutorService;

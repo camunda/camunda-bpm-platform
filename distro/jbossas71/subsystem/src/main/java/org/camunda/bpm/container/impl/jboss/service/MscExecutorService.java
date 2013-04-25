@@ -67,7 +67,7 @@ public class MscExecutorService implements Service<MscExecutorService>, Executor
       // the the acquisition thread is interrupted, this probably means the app server is turning the lights off -> ignore          
     } catch (Exception e) {      
       // we must be able to schedule this
-      log.log(Level.WARNING,  "Can not schedule long running work.", e);
+      log.log(Level.WARNING,  "Cannot schedule long running work.", e);
     }
     
     return false;
