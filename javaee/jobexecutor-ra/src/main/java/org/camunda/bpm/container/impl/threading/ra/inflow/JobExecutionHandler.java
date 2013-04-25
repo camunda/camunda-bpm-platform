@@ -1,4 +1,4 @@
-package org.camunda.bpm.container.impl.threading.jca.inflow;
+package org.camunda.bpm.container.impl.threading.ra.inflow;
 
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 

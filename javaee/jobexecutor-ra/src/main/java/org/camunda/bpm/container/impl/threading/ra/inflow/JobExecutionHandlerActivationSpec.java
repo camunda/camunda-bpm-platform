@@ -5,7 +5,6 @@ import javax.resource.spi.ActivationSpec;
 import javax.resource.spi.InvalidPropertyException;
 import javax.resource.spi.ResourceAdapter;
 
-import org.camunda.bpm.container.impl.threading.jca.inflow.JobExecutionHandler;
 
 
 

@@ -4,7 +4,6 @@ package org.camunda.bpm.container.impl.threading.ra.inflow;
 import javax.resource.ResourceException;
 import javax.resource.spi.endpoint.MessageEndpointFactory;
 
-import org.camunda.bpm.container.impl.threading.jca.inflow.JobExecutionHandler;
 import org.camunda.bpm.container.impl.threading.ra.JcaExecutorServiceConnector;
 
 /**

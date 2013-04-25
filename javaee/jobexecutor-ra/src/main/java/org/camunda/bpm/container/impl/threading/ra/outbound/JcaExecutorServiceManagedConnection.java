@@ -17,7 +17,6 @@ import javax.security.auth.Subject;
 import javax.transaction.xa.XAResource;
 
 import org.camunda.bpm.container.ExecutorService;
-import org.camunda.bpm.container.impl.threading.jca.outbound.JcaExecutorServiceConnection;
 import org.camunda.bpm.container.impl.threading.ra.JcaExecutorServiceConnector;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 
@@ -119,7 +118,7 @@ public class JcaExecutorServiceManagedConnection implements ManagedConnection {
   public boolean schedule(Runnable runnable, boolean isLongRunning) {
     return delegate.schedule(runnable, isLongRunning);
   }
-  
+
   public Runnable getExecuteJobsRunnable(List<String> jobIds, ProcessEngineImpl processEngine) {
     return delegate.getExecuteJobsRunnable(jobIds, processEngine);
   }

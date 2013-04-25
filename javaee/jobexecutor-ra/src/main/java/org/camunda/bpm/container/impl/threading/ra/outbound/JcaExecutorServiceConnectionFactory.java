@@ -1,4 +1,4 @@
-package org.camunda.bpm.container.impl.threading.jca.outbound;
+package org.camunda.bpm.container.impl.threading.ra.outbound;
 
 import java.io.Serializable;
 
