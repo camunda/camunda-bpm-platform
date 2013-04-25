@@ -18,6 +18,7 @@ import java.util.Set;
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
 
+import org.camunda.bpm.engine.rest.impl.IdentityRestServiceImpl;
 import org.camunda.bpm.engine.rest.impl.ProcessDefinitionRestServiceImpl;
 import org.camunda.bpm.engine.rest.impl.ProcessEngineRestServiceImpl;
 import org.camunda.bpm.engine.rest.impl.ProcessInstanceRestServiceImpl;
@@ -30,7 +31,7 @@ import org.codehaus.jackson.jaxrs.JsonParseExceptionMapper;
 /**
  * <p>Default {@link Application} registering all resources.</p>
  * 
- * <p><strong>NOTE</strong>This class is excluded from the classes-jar, 
+ * <p><strong>NOTE</strong> This class is excluded from the classes-jar, 
  * such that users that want to embed the REST API as a JAR file into a 
  * custom JAX-RS application are able to build a deployment based on their 
  * requirements.</p>
@@ -48,6 +49,8 @@ public class DefaultApplication extends Application {
     classes.add(ProcessDefinitionRestServiceImpl.class);
     classes.add(ProcessInstanceRestServiceImpl.class);
     classes.add(TaskRestServiceImpl.class);
+    classes.add(IdentityRestServiceImpl.class);
+    
     classes.add(JacksonConfigurator.class);
     
     classes.add(JacksonJsonProvider.class);

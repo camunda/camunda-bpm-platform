@@ -4,7 +4,6 @@ import static com.jayway.restassured.RestAssured.expect;
 import static com.jayway.restassured.RestAssured.given;
 import static com.jayway.restassured.path.json.JsonPath.from;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.argThat;
@@ -22,10 +21,6 @@ import java.util.Map;
 
 import javax.ws.rs.core.Response.Status;
 
-import org.camunda.bpm.engine.identity.Group;
-import org.camunda.bpm.engine.identity.GroupQuery;
-import org.camunda.bpm.engine.identity.User;
-import org.camunda.bpm.engine.identity.UserQuery;
 import org.camunda.bpm.engine.rest.helper.EqualsList;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.task.DelegationState;
@@ -42,7 +37,6 @@ import com.jayway.restassured.response.Response;
 public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServiceTest {
 
   protected static final String TASK_QUERY_URL = TEST_RESOURCE_ROOT_PATH + "/task";
-  protected static final String TASK_GROUPS_URL = TASK_QUERY_URL + "/groups";
   protected static final String TASK_COUNT_QUERY_URL = TASK_QUERY_URL + "/count";
   private TaskQuery mockQuery;
   
@@ -52,37 +46,12 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
   }
 
   private TaskQuery setUpMockTaskQuery(List<Task> mockedTasks) {
-    UserQuery sampleUserQuery = mock(UserQuery.class);
-  
-    List<User> mockUsers = new ArrayList<User>();
-    
-    User mockUser = MockProvider.createMockUser();
-    mockUsers.add(mockUser);
-  
-    when(sampleUserQuery.list()).thenReturn(mockUsers);
-    when(sampleUserQuery.memberOfGroup(anyString())).thenReturn(sampleUserQuery);
-    when(sampleUserQuery.count()).thenReturn((long) mockedTasks.size());
-  
-    GroupQuery sampleGroupQuery = mock(GroupQuery.class);
-    
-    List<Group> mockGroups = MockProvider.createMockGroups();
-    when(sampleGroupQuery.list()).thenReturn(mockGroups);
-    when(sampleGroupQuery.groupMember(anyString())).thenReturn(sampleGroupQuery);
-    when(sampleGroupQuery.orderByGroupName()).thenReturn(sampleGroupQuery);
-    when(sampleGroupQuery.orderByGroupId()).thenReturn(sampleGroupQuery);
-    when(sampleGroupQuery.orderByGroupType()).thenReturn(sampleGroupQuery);
-    when(sampleGroupQuery.asc()).thenReturn(sampleGroupQuery);
-    when(sampleGroupQuery.desc()).thenReturn(sampleGroupQuery);
-  
-    when(processEngine.getIdentityService().createGroupQuery()).thenReturn(sampleGroupQuery);
-  
     TaskQuery sampleTaskQuery = mock(TaskQuery.class);
     when(sampleTaskQuery.list()).thenReturn(mockedTasks);
     when(sampleTaskQuery.count()).thenReturn((long) mockedTasks.size());
     when(sampleTaskQuery.taskCandidateGroup(anyString())).thenReturn(sampleTaskQuery);
   
     when(processEngine.getTaskService().createTaskQuery()).thenReturn(sampleTaskQuery);
-    when(processEngine.getIdentityService().createUserQuery()).thenReturn(sampleUserQuery);
   
     return sampleTaskQuery;
   }
@@ -114,22 +83,6 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
     given().queryParam("sortOrder", "asc")
       .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
       .when().get(TASK_QUERY_URL);
-  }
-  
-  @Test
-  public void testGroupInfoQuery() {
-    given().queryParam("userId", "name")
-        .then().expect().statusCode(Status.OK.getStatusCode())
-        .body("groups.size()", is(1))
-        .body("groups[0].id", equalTo(MockProvider.EXAMPLE_GROUP_ID))
-        .body("groups[0].name", equalTo(MockProvider.EXAMPLE_GROUP_NAME))
-        .when().get(TASK_GROUPS_URL);
-  }
-  
-  @Test
-  public void testGroupInfoQueryWithMissingUserParameter() {
-    expect().statusCode(Status.BAD_REQUEST.getStatusCode())
-    .when().get(TASK_GROUPS_URL);
   }
 
   @Test
