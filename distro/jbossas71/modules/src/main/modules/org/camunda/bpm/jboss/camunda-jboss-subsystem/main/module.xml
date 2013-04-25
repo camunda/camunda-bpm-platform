@@ -33,8 +33,6 @@
     <module name="org.jboss.invocation" />
         
     <module name="org.camunda.bpm.camunda-engine" />
-    
-    <module name="org.livetribe.livetribe-jsr223" />  
         
   </dependencies>
 </module>
