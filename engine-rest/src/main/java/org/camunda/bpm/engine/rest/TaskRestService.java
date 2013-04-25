@@ -91,9 +91,4 @@ public interface TaskRestService {
   @Path("/{id}/delegate")
   @Consumes(MediaType.APPLICATION_JSON)
   void delegate(@PathParam("id") String taskId, UserIdDto delegatedUser);
-
-  @GET
-  @Path("/groups")
-  // FIXME discussion : move this into a group resource?
-  GroupInfoDto getGroupInfo(@QueryParam("userId") String userId);
 }

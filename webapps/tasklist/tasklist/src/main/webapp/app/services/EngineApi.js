@@ -43,7 +43,7 @@ define(["angular"], function(angular) {
         return this.save(data, fn);
       };
 
-      this.groups = $resource(Uri.build(baseUri, "task/groups"));
+      this.groups = $resource(Uri.build(baseUri, "identity/groups"));
 
       this.processInstance = $resource(Uri.build(baseUri, "process-instance/:id/:operation"), { id: "@id" } , {
         variables : { method: 'GET', params : { operation: "variables" }}
