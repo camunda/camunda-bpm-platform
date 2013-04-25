@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+
+<mapper namespace="cockpit">
+
+  <resultMap id="finishedVariableEntryResultMap" type="com.camunda.fox.cockpit.entity.VariableEntry">
+    <result property="name" column="NAME_" javaType="String" jdbcType="VARCHAR" />
+    <result property="type" column="VAR_TYPE_" javaType="String" jdbcType="VARCHAR"/>
+  </resultMap>
+  
+  <resultMap id="runningVariableEntryResultMap" type="com.camunda.fox.cockpit.entity.VariableEntry">
+    <result property="name" column="NAME_" javaType="String" jdbcType="VARCHAR" />
+    <result property="type" column="TYPE_" javaType="String" jdbcType="VARCHAR"/>
+  </resultMap>
+  
+  <resultMap id="variableEntryResultMap" type="com.camunda.fox.cockpit.entity.VariableEntry">
+    <result property="name" column="VAR_NAME" javaType="String" jdbcType="VARCHAR" />
+    <result property="type" column="VAR_TYPE" javaType="String" jdbcType="VARCHAR"/>
+  </resultMap>
+    
+  <!-- runtime/with failures variable entries -->
+  <select id="selectRuntimeVariableEntriesByQueryCriteria" parameterType="com.camunda.fox.cockpit.persistence.VariableQueryParameter" resultMap="runningVariableEntryResultMap">
+    ${limitBefore}
+    select RES.* ${limitBetween}
+    <include refid="selectRuntimeVariableEntriesByQueryCriteriaSql"/>
+    ${limitAfter}
+  </select>
+  
+  <select id="selectRuntimeVariableEntriesCountByQueryCriteria" parameterType="com.camunda.fox.cockpit.persistence.VariableQueryParameter" resultType="long">
+    select count(*) from (
+	select RES.NAME_, RES.TYPE_ 
+    <include refid="selectRuntimeVariableEntriesByQueryCriteriaSql"/>
+	) VARS
+  </select>
+  
+  <sql id="selectRuntimeVariableEntriesByQueryCriteriaSql">
+    from ( SELECT RES.NAME_, RES.TYPE_ from ${prefix}ACT_RU_VARIABLE RES
+    <where>
+      <if test="variableName != null">
+        lower(RES.NAME_) like #{variableName} OR lower(RES.TYPE_) like #{variableName}
+      </if>
+    </where>
+    group by RES.NAME_, RES.TYPE_
+    ) RES
+  </sql>
+  
+  <!-- finished variable entries -->
+  <select id="selectFinishedVariableEntriesByQueryCriteria" parameterType="com.camunda.fox.cockpit.persistence.VariableQueryParameter" resultMap="finishedVariableEntryResultMap">
+    ${limitBefore}
+    select RES.* ${limitBetween}
+    <include refid="selectFinishedVariableEntriesByQueryCriteriaSql"/>
+    ${orderBy}
+    ${limitAfter}
+  </select>
+  
+  <select id="selectFinishedVariableEntriesCountByQueryCriteria" parameterType="com.camunda.fox.cockpit.persistence.VariableQueryParameter" resultType="long">
+    select count(*) from (
+      select RES.NAME_, RES.VAR_TYPE_ 
+      <include refid="selectFinishedVariableEntriesByQueryCriteriaSql"/>
+    ) VARS
+  </select>
+  
+  <sql id="selectFinishedVariableEntriesByQueryCriteriaSql">
+    from ( SELECT RES.NAME_, RES.VAR_TYPE_ from ${prefix}ACT_HI_VARINST RES
+    <where>
+      <if test="variableName != null">
+        lower(RES.NAME_) like #{variableName} or lower(RES.VAR_TYPE_) like #{variableName}
+      </if>
+    </where>
+    group by RES.NAME_, RES.VAR_TYPE_
+    ) RES
+  </sql>
+  
+  <!-- all variable entries -->
+  <select id="selectVariableEntriesByQueryCriteria" parameterType="com.camunda.fox.cockpit.persistence.VariableQueryParameter" resultMap="variableEntryResultMap">
+    ${limitBefore}
+    select RES.* ${limitBetween}
+    <include refid="selectVariableEntriesByQueryCriteriaSql"/>
+    ${orderBy}
+    ${limitAfter}
+  </select>
+  
+  <select id="selectVariableEntriesCountByQueryCriteria" parameterType="com.camunda.fox.cockpit.persistence.VariableQueryParameter" resultType="long">
+    select count(*)
+    <include refid="selectVariableEntriesByQueryCriteriaSql"/>
+  </select>
+  
+  <sql id="selectVariableEntriesByQueryCriteriaSql">
+    from (
+		select PV.NAME_ as VAR_NAME, PV.VAR_TYPE_ as VAR_TYPE from ${prefix}ACT_HI_VARINST PV
+		<where>
+		  <if test="variableName != null">
+			lower(PV.NAME_) like #{variableName} or lower(PV.VAR_TYPE_) like #{variableName}
+		  </if>
+		</where>
+		UNION
+		select VE.NAME_ as VAR_NAME, VE.TYPE_ as VAR_TYPE from ${prefix}ACT_RU_VARIABLE VE
+		<where>
+		  <if test="variableName != null">
+			lower(VE.NAME_) like #{variableName} or lower(VE.TYPE_) like #{variableName}
+		  </if>
+		</where>
+	) RES
+  </sql>
+</mapper>

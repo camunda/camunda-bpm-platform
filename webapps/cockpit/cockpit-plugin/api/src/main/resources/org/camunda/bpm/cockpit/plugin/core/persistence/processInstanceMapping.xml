@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+  
+<mapper namespace="cockpit">
+  
+  <resultMap id="executionResultMap" type="com.camunda.fox.cockpit.model.ProcessInstanceDTO">
+    <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
+    <result property="businessKey" column="BUSINESS_KEY_" jdbcType="VARCHAR" />
+    <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR" />
+    <result property="startTime" column="START_TIME_" jdbcType="TIMESTAMP" />
+    <result property="endTime" column="END_TIME_" jdbcType="TIMESTAMP" />
+    <result property="processDefinitionName" column="NAME_" jdbcType="VARCHAR"/>
+    <result property="processDefinitionKey" column="KEY_" jdbcType="VARCHAR"/>
+    <result property="processDefinitionVersion" column="VERSION_" jdbcType="INTEGER"/>
+    <result property="parentId" column="PARENT_ID_" jdbcType="VARCHAR" />
+    <result property="superExecutionId" column="SUPER_EXEC_" jdbcType="VARCHAR" />
+    <result property="activityId" column="ACT_ID_" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  <resultMap id="failedJobsResultMap" type="com.camunda.fox.cockpit.model.FailedJobs">
+    <result property="processInstanceId" column="PROCESS_INSTANCE_ID_" jdbcType="VARCHAR" />
+    <result property="failedJobsCount" column="JOB_COUNT" jdbcType="INTEGER" />
+  </resultMap>
+  
+  <!-- EXECUTION SELECT -->
+  
+  <select id="selectProcessInstances" parameterType="com.camunda.fox.cockpit.persistence.ProcessInstanceQueryParameter" resultMap="executionResultMap">
+    ${limitBefore}
+    select RES.* ${limitBetween}, NAME_, KEY_, VERSION_
+    <if test="activityId != null">
+      , PARENT_ID_, SUPER_EXEC_, ACT_ID_
+    </if>
+    <include refid="selectExecutionsByQueryCriteriaSql"/>
+    ${orderBy}
+    ${limitAfter}
+  </select>
+  
+  <select id="selectProcessInstanceCountByQueryCriteria" parameterType="com.camunda.fox.cockpit.persistence.ProcessInstanceQueryParameter" resultType="long">
+    select count(*)
+    <include refid="selectExecutionsByQueryCriteriaSql"/>
+  </select>
+  
+  <sql id="selectExecutionsByQueryCriteriaSql">
+    from ${prefix}ACT_HI_PROCINST RES
+    left join ${prefix}ACT_RE_PROCDEF P on RES.PROC_DEF_ID_ = P.ID_
+    <if test="activityId != null">
+     left join ${prefix}ACT_RU_EXECUTION E on E.PROC_INST_ID_ = RES.PROC_INST_ID_
+    </if>
+    <where>
+      <if test="processDefinitionKey != null">
+        and P.KEY_ = #{processDefinitionKey}
+      </if>
+      <if test="processDefinitionVersion != null">
+        and P.VERSION_ = #{processDefinitionVersion}
+      </if>
+      <if test="businessKey != null">
+        and lower(RES.BUSINESS_KEY_) LIKE #{businessKey}
+      </if>
+      <if test="activityId != null">
+        and E.ACT_ID_ = #{activityId}
+      </if>
+      <if test="parentProcessKey != null">
+        and RES.SUPER_PROCESS_INSTANCE_ID_ IS NOT NULL
+        and EXISTS (
+          select HP.PROC_DEF_ID_ from ${prefix}ACT_HI_PROCINST HP, ${prefix}ACT_RE_PROCDEF PP
+          where HP.PROC_INST_ID_ = RES.SUPER_PROCESS_INSTANCE_ID_
+          and HP.PROC_DEF_ID_ = PP.ID_
+          and PP.KEY_ = #{parentProcessKey}
+        )
+      </if>
+	  <if test="running and !finished">
+	  	and RES.END_TIME_ IS NULL
+	  </if>
+	  <if test="finished and !running">
+		  and RES.END_TIME_ IS NOT NULL
+	  </if>
+	  <if test="failed">
+	    and RES.END_TIME_ IS NULL
+		  and EXISTS (
+  			select J.ID_ from ${prefix}ACT_RU_JOB J
+        where J.PROCESS_INSTANCE_ID_ = RES.PROC_INST_ID_
+  			<if test="exceptionMessage != null and !exceptionMessage.empty">
+  				and J.EXCEPTION_MSG_ = #{exceptionMessage}
+  			</if> 
+  			<if test="exceptionMessage != null and exceptionMessage.empty">
+  				and EXISTS (
+            select BA.ID_ from ${prefix}ACT_GE_BYTEARRAY BA
+            where BA.ID_ = J.EXCEPTION_STACK_ID_
+          )
+  			</if> 
+  			<if test="exceptionMessage == null">
+  				and J.EXCEPTION_MSG_ IS NULL
+          and EXISTS (
+            select BA.ID_ from ${prefix}ACT_GE_BYTEARRAY BA
+            where BA.ID_ = J.EXCEPTION_STACK_ID_
+          )
+  			</if> 
+		  )	  	
+	  </if>
+	  <if test="startTimeFrom != null">
+		  and RES.START_TIME_ &gt;= #{startTimeFrom}
+	  </if>
+	  <if test="startTimeTo != null">
+		  and RES.START_TIME_ &lt;= #{startTimeTo}	  
+	  </if>
+	  <if test="endTimeFrom != null">
+		  and RES.END_TIME_ &gt;= #{endTimeFrom}	  
+	  </if>
+	  <if test="endTimeTo != null">
+		  and RES.END_TIME_ &lt;= #{endTimeTo}	  
+	  </if>
+      <if test="superProcessInstanceId != null">
+        <!-- A sub process instance is stored under a certain *execution*, potentially nested.
+             A sub process instance is NOT stored under the process instance, hence the following: -->
+        and E.SUPER_EXEC_ IN (select ID_ from ${prefix}ACT_RU_EXECUTION where PROC_INST_ID_ = #{superProcessInstanceId})
+      </if>
+      <if test="subProcessInstanceId != null">
+        and E.ID_ = (
+          select PROC_INST_ID_ from ${prefix}ACT_RU_EXECUTION
+          where ID_ = (
+            select SUPER_EXEC_ from ${prefix}ACT_RU_EXECUTION where ID_ = #{subProcessInstanceId}
+          )
+        )
+      </if>
+      
+      <if test="variableFilters!=null">
+		  <foreach collection="variableFilters" index="index" item="variableFilter">
+		  	<include refid="existsVariableStatement"/>
+    	  </foreach>      
+      </if>
+    </where>
+  </sql>
+
+  <sql id="existsVariableStatement">
+  	and (
+      EXISTS (
+    		select * from ${prefix}ACT_RU_VARIABLE V
+    		where V.PROC_INST_ID_ = RES.PROC_INST_ID_
+    		and V.NAME_ = #{variableFilter.name}
+    		and 
+    		<choose>
+    		<when test="variableFilter.stringType and variableFilter.filterType.name() == 'EQUAL'">V.TEXT_</when>
+        <when test="variableFilter.stringType and variableFilter.filterType.name() == 'LIKE'">lower(V.TEXT_)</when>
+    		<when test="variableFilter.dateType or variableFilter.intType or variableFilter.booleanType or variableFilter.longType or variableFilter.shortType">V.LONG_</when>
+    		<when test="variableFilter.floatType or variableFilter.doubleType">V.DOUBLE_</when>
+    		</choose>
+    		<include refid="variableOperator"/>
+  		  #{variableFilter.queryValue}
+    	) 
+    	<if test="historyEnabled">
+    	or EXISTS (
+    		select * from ${prefix}ACT_HI_VARINST V
+    		where V.PROC_INST_ID_ = RES.PROC_INST_ID_
+    		and V.NAME_ = #{variableFilter.name}
+    		and 
+    		<choose>
+    		<when test="variableFilter.stringType and variableFilter.filterType.name() == 'EQUAL'">V.TEXT_</when>
+        <when test="variableFilter.stringType and variableFilter.filterType.name() == 'LIKE'">lower(V.TEXT_)</when>
+    		<when test="variableFilter.dateType or variableFilter.intType or variableFilter.booleanType or variableFilter.longType or variableFilter.shortType">V.LONG_</when>
+    		<when test="variableFilter.floatType or variableFilter.doubleType">V.DOUBLE_</when>
+    		</choose>
+    		<include refid="variableOperator"/>
+        #{variableFilter.queryValue}
+    	)
+    	</if>
+  	)
+  </sql>
+  
+  <sql id="variableOperator">
+    <choose>
+   	  <when test="variableFilter.filterType.name() == 'EQUAL'">=</when>
+   	  <when test="variableFilter.filterType.name() == 'GREATER'">&gt;</when>
+   	  <when test="variableFilter.filterType.name() == 'GREATER_EQUAL'">&gt;=</when>
+   	  <when test="variableFilter.filterType.name() == 'LESS'">&lt;</when>
+   	  <when test="variableFilter.filterType.name() == 'LESS_EQUAL'">&lt;=</when>
+   	  <when test="variableFilter.filterType.name() == 'LIKE'">LIKE</when>
+   </choose>
+  </sql>
+
+  <select id="selectProcessInstanceById" parameterType="com.camunda.fox.cockpit.persistence.ProcessInstanceQueryParameter" resultMap="executionResultMap">
+    select * 
+    <include refid="selectProcessInstanceByExecutionQueryCriteriaSql"/>
+  </select>
+  
+  <select id="selectInstancesWithFailedJobs" parameterType="com.camunda.fox.cockpit.persistence.FailedJobsQueryParameter" resultMap="failedJobsResultMap">
+    select J.PROCESS_INSTANCE_ID_, COUNT(J.PROCESS_INSTANCE_ID_) as JOB_COUNT
+     from ${prefix}ACT_RU_JOB J
+     <where>
+     	(J.EXCEPTION_MSG_ IS NOT NULL 
+      or EXISTS ( 
+        select BA.ID_ from ${prefix}ACT_GE_BYTEARRAY BA
+        where BA.ID_ = J.EXCEPTION_STACK_ID_
+      ))
+     	and J.PROCESS_INSTANCE_ID_ in
+	    <foreach item="item" index="index" collection="processInstanceIds" open="(" separator="," close=")">
+	      #{item}
+	    </foreach>
+     </where>
+     group by J.PROCESS_INSTANCE_ID_
+  </select>
+  
+  <sql id="selectProcessInstanceByExecutionQueryCriteriaSql">
+    from ${prefix}ACT_HI_PROCINST RES
+    left join ${prefix}ACT_RE_PROCDEF P on RES.PROC_DEF_ID_ = P.ID_
+    left join ${prefix}ACT_RU_EXECUTION E on E.PROC_INST_ID_ = RES.PROC_INST_ID_
+    <where>
+      E.PARENT_ID_ is null
+      <if test="id != null">
+        and RES.PROC_INST_ID_ = #{id}
+      </if>
+    </where>
+  </sql>
+  
+</mapper>

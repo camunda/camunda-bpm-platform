@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+
+<mapper namespace="cockpit">
+
+  <select id="selectCalledProcessEntriesByQueryCriteria" parameterType="string" resultType="com.camunda.fox.cockpit.model.CallAudit">
+    select hpi.ID_ as calledInstance, pd.ID_ as calledDefinitionId, pd.KEY_ as calledDefinitionKey
+    from ${prefix}ACT_HI_ACTINST act, ${prefix}ACT_HI_PROCINST hpi, ${prefix}ACT_RE_PROCDEF pd 
+    where act.ID_ = #{activityId}
+    and act.CALL_PROC_INST_ID_ = hpi.ID_
+    and pd.ID_ = hpi.PROC_DEF_ID_
+  </select>
+  
+  <select id="selectParentInstanceIdByQueryCriteria" parameterType="string" resultType="string">
+    select PROC_INST_ID_ from ${prefix}ACT_RU_EXECUTION 
+    where ID_ = (
+      select SUPER_EXEC_ from ${prefix}ACT_RU_EXECUTION where ID_ = #{childInstanceId}
+    )
+  </select>
+</mapper>

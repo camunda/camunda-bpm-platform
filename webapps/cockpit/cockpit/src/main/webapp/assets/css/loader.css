@@ -1,0 +1,8 @@
+@import url('../bootstrap/css/bootstrap.min.css');
+@import url('../bootstrap/css/bootstrap-responsive.min.css');
+@import url('../bootstrap-slider/slider.css');
+
+@import url('app.css');
+@import url('tile-responsive.css');
+@import url('processDiagram.css');
+@import url('panel.css');
