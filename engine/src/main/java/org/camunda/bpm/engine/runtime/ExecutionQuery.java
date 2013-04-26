@@ -35,7 +35,7 @@ public interface ExecutionQuery extends Query<ExecutionQuery, Execution>{
   /** Only select executions which have the given process instance id. **/
   ExecutionQuery processInstanceId(String processInstanceId);
   
-  /** Only executions with the given business key */
+  /** Only select executions that belong to a process instance with the given business key */
   ExecutionQuery processInstanceBusinessKey(String processInstanceBusinessKey);
 
   /** Only select executions with the given id. **/
