@@ -16,11 +16,11 @@ package org.camunda.bpm.engine.impl.cmd;
 import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.runtime.CorrelationHandler;
 import org.camunda.bpm.engine.impl.runtime.CorrelationSet;
-import org.camunda.bpm.engine.impl.runtime.DefaultCorrelationHandler;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Execution;
 
@@ -47,7 +47,7 @@ public class CorrelateMessageCmd implements Command<Void> {
       throw new ProcessEngineException("messageName cannot be null");
     }
 
-    CorrelationHandler correlationHandler = new DefaultCorrelationHandler();
+    CorrelationHandler correlationHandler = Context.getProcessEngineConfiguration().getCorrelationHandler();
     
     CorrelationSet correlationSet = new CorrelationSet(businessKey, correlationKeys);
     Execution matchingExecution = correlationHandler.correlateMessageToExecution(commandContext, messageName, correlationSet);
