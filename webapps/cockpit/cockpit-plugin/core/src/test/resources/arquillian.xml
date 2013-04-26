@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<arquillian xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="http://jboss.org/schema/arquillian http://jboss.org/schema/arquillian/arquillian-1.0.xsd">
+
+  <defaultProtocol type="Servlet 3.0" />
+
+  <engine>
+    <property name="deploymentExportPath">target/deployments</property>
+  </engine>
+
+  <container qualifier="tomcat" default="true">
+    <configuration>
+      <property name="catalinaHome">../../../../qa/tomcat-runtime/target/server/apache-tomcat-7.0.33</property>
+      <property name="bindHttpPort">48080</property>
+      <property name="user">arquillian</property>
+      <property name="pass">arquillian</property>
+
+      <!-- toggle to enable / disable debugging -->
+      <property name="javaVmArguments">-Xmx512m -XX:MaxPermSize=128m</property>
+      <!--<property name="javaVmArguments">-Xmx512m -XX:MaxPermSize=128m -Xrunjdwp:transport=dt_socket,address=8787,server=y,suspend=y</property>-->
+    </configuration>
+  </container>
+</arquillian>

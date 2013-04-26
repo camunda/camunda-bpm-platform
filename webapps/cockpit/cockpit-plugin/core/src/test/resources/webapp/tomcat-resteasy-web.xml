@@ -12,7 +12,7 @@
     </servlet-class>
     <init-param>
       <param-name>javax.ws.rs.Application</param-name>
-      <param-value>org.camunda.bpm.cockpit.core.web.CockpitApplication</param-value>
+      <param-value>org.camunda.bpm.cockpit.plugin.web.CockpitTestApplication</param-value>
     </init-param>
     <init-param>
       <param-name>resteasy.servlet.mapping.prefix</param-name>

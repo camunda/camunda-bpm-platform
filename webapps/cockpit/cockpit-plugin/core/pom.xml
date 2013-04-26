@@ -7,32 +7,16 @@
     <groupId>org.camunda.bpm.cockpit</groupId>
     <artifactId>camunda-cockpit-root</artifactId>
     <version>7.0.0-SNAPSHOT</version>
+    <relativePath>../..</relativePath>
   </parent>
 
-  <artifactId>camunda-cockpit</artifactId>
   <groupId>org.camunda.bpm.cockpit</groupId>
-  <packaging>war</packaging>
-  <name>camunda BPM - cockpit</name>
+  <artifactId>camunda-cockpit-plugin-core</artifactId>
+  <packaging>jar</packaging>
+  <name>camunda BPM - cockpit - plugin core</name>
 
   <dependencies>
 
-    <dependency>
-      <groupId>org.camunda.bpm.cockpit</groupId>
-      <artifactId>camunda-cockpit-plugin-core</artifactId>
-      <version>${project.version}</version>
-    </dependency>
-
-    <!-- jee spec -->
-
-    <dependency>
-      <groupId>org.jboss.spec</groupId>
-      <artifactId>jboss-javaee-6.0</artifactId>
-      <type>pom</type>
-      <scope>provided</scope>
-      <version>3.0.2.Final</version>
-    </dependency>
-
-    <!-- rest api -->
     <dependency>
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine</artifactId>
@@ -46,13 +30,21 @@
       <version>${project.version}</version>
     </dependency>
 
-    <!-- tests -->
+    <dependency>
+      <groupId>org.jboss.spec</groupId>
+      <artifactId>jboss-javaee-6.0</artifactId>
+      <type>pom</type>
+      <scope>provided</scope>
+      <version>3.0.2.Final</version>
+    </dependency>
+
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <scope>test</scope>
+      <scope>provided</scope>
     </dependency>
 
+    <!-- tests -->
     <dependency>
       <groupId>org.easytesting</groupId>
       <artifactId>fest-assert</artifactId>
@@ -85,25 +77,33 @@
       <version>1.17</version>
       <scope>test</scope>
     </dependency>
-
-    <dependency>
-      <groupId>commons-codec</groupId>
-      <artifactId>commons-codec</artifactId>
-      <version>1.5</version>
-      <scope>test</scope>
-    </dependency>
   </dependencies>
 
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-war-plugin</artifactId>
-        <configuration>
-          <failOnMissingWebXml>false</failOnMissingWebXml>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
-  
+  <profiles>
+    <profile>
+      <id>tomcat</id>
+
+      <dependencies>
+        <dependency>
+          <groupId>org.jboss.arquillian.container</groupId>
+          <artifactId>arquillian-tomcat-managed-7</artifactId>
+          <version>1.0.0.CR4</version>
+          <scope>test</scope>
+        </dependency>
+        <dependency>
+          <groupId>org.jboss.resteasy</groupId>
+          <artifactId>resteasy-jaxrs</artifactId>
+          <scope>compile</scope>
+        </dependency>
+
+        <dependency>
+          <groupId>commons-codec</groupId>
+          <artifactId>commons-codec</artifactId>
+          <scope>compile</scope>
+          <version>1.5</version>
+        </dependency>
+      </dependencies>
+    </profile>
+  </profiles>
+
 </project>

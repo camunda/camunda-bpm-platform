@@ -16,16 +16,23 @@
 
   <modules>
     <module>cockpit</module>
-    <module>cockpit-plugin/api</module>
-	<module>cockpit-plugin/sample</module>
+    <module>cockpit-plugin/core</module>
+    <module>cockpit-plugin/sample</module>
   </modules>
 
   <dependencyManagement>
     <dependencies>
       <dependency>
         <groupId>org.camunda.bpm.cockpit</groupId>
-        <artifactId>camunda-cockpit-plugin-registry</artifactId>
-        <version>7.0.0-SNAPSHOT</version>
+        <artifactId>camunda-cockpit-plugin-core</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jboss.arquillian</groupId>
+        <artifactId>arquillian-bom</artifactId>
+        <version>1.0.3.Final</version>
+        <scope>import</scope>
+        <type>pom</type>
       </dependency>
     </dependencies>
   </dependencyManagement>
