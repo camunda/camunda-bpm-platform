@@ -39,6 +39,11 @@ public class DefaultCorrelationHandler implements CorrelationHandler {
       }
     }
     
+    String businessKey = correlationSet.getBusinessKey();
+    if(businessKey != null) {
+      query.processInstanceBusinessKey(businessKey);
+    }
+    
     query.messageEventSubscriptionName(messageName);
     List<Execution> matchingExecutions = query.executeList(commandContext, null);
     
@@ -49,15 +54,6 @@ public class DefaultCorrelationHandler implements CorrelationHandler {
     Execution matchingExecution = null;
     if (!matchingExecutions.isEmpty()) {
       matchingExecution = matchingExecutions.get(0);
-      
-      String businessKey = correlationSet.getBusinessKey();
-      if (businessKey != null) {
-        query = new ExecutionQueryImpl();
-        query.processInstanceId(matchingExecution.getProcessInstanceId()).processInstanceBusinessKey(businessKey);
-        if (query.count() == 0) {
-          return null;
-        } 
-      }
     }
 
     return matchingExecution;
