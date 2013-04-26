@@ -11,16 +11,17 @@
   </parent>
 
   <groupId>org.camunda.bpm.cockpit</groupId>
-  <artifactId>camunda-cockpit-plugin-core</artifactId>
+  <artifactId>camunda-cockpit-plugin-api</artifactId>
   <packaging>jar</packaging>
-  <name>camunda BPM - cockpit - plugin core</name>
+  <name>camunda BPM - cockpit - plugin api</name>
 
   <dependencies>
 
     <dependency>
       <groupId>org.camunda.bpm</groupId>
-      <artifactId>camunda-engine</artifactId>
-      <scope>provided</scope>
+      <artifactId>camunda-engine-rest</artifactId>
+      <classifier>classes</classifier>
+      <version>${project.version}</version>
     </dependency>
 
     <dependency>
@@ -32,7 +33,7 @@
     </dependency>
 
   </dependencies>
-  
+
   <build>
     <plugins>
       <plugin>
