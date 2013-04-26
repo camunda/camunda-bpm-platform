@@ -22,6 +22,7 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.form.FormData;
 import org.camunda.bpm.engine.impl.cmd.ActivateProcessInstanceCmd;
+import org.camunda.bpm.engine.impl.cmd.CorrelateMessageCmd;
 import org.camunda.bpm.engine.impl.cmd.DeleteProcessInstanceCmd;
 import org.camunda.bpm.engine.impl.cmd.FindActiveActivityIdsCmd;
 import org.camunda.bpm.engine.impl.cmd.GetExecutionVariableCmd;
@@ -48,35 +49,35 @@ import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
 
   public ProcessInstance startProcessInstanceByKey(String processDefinitionKey) {
-    return commandExecutor.execute(new StartProcessInstanceCmd<ProcessInstance>(processDefinitionKey, null, null, null));
+    return commandExecutor.execute(new StartProcessInstanceCmd(processDefinitionKey, null, null, null));
   }
 
   public ProcessInstance startProcessInstanceByKey(String processDefinitionKey, String businessKey) {
-    return commandExecutor.execute(new StartProcessInstanceCmd<ProcessInstance>(processDefinitionKey, null, businessKey, null));
+    return commandExecutor.execute(new StartProcessInstanceCmd(processDefinitionKey, null, businessKey, null));
   }
   
   public ProcessInstance startProcessInstanceByKey(String processDefinitionKey, Map<String, Object> variables) {
-    return commandExecutor.execute(new StartProcessInstanceCmd<ProcessInstance>(processDefinitionKey, null, null, variables));
+    return commandExecutor.execute(new StartProcessInstanceCmd(processDefinitionKey, null, null, variables));
   }
   
   public ProcessInstance startProcessInstanceByKey(String processDefinitionKey, String businessKey, Map<String, Object> variables) {
-    return commandExecutor.execute(new StartProcessInstanceCmd<ProcessInstance>(processDefinitionKey, null, businessKey, variables));
+    return commandExecutor.execute(new StartProcessInstanceCmd(processDefinitionKey, null, businessKey, variables));
   }
   
   public ProcessInstance startProcessInstanceById(String processDefinitionId) {
-    return commandExecutor.execute(new StartProcessInstanceCmd<ProcessInstance>(null, processDefinitionId, null, null));
+    return commandExecutor.execute(new StartProcessInstanceCmd(null, processDefinitionId, null, null));
   }
   
   public ProcessInstance startProcessInstanceById(String processDefinitionId, String businessKey) {
-    return commandExecutor.execute(new StartProcessInstanceCmd<ProcessInstance>(null, processDefinitionId, businessKey, null));
+    return commandExecutor.execute(new StartProcessInstanceCmd(null, processDefinitionId, businessKey, null));
   }
 
   public ProcessInstance startProcessInstanceById(String processDefinitionId, Map<String, Object> variables) {
-    return commandExecutor.execute(new StartProcessInstanceCmd<ProcessInstance>(null, processDefinitionId, null, variables));
+    return commandExecutor.execute(new StartProcessInstanceCmd(null, processDefinitionId, null, variables));
   }
   
   public ProcessInstance startProcessInstanceById(String processDefinitionId, String businessKey, Map<String, Object> variables) {
-    return commandExecutor.execute(new StartProcessInstanceCmd<ProcessInstance>(null, processDefinitionId, businessKey, variables));
+    return commandExecutor.execute(new StartProcessInstanceCmd(null, processDefinitionId, businessKey, variables));
   }
   
   public void deleteProcessInstance(String processInstanceId, String deleteReason) {
@@ -232,6 +233,33 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
 
   public void messageEventReceived(String messageName, String executionId, Map<String, Object> processVariables) {
     commandExecutor.execute(new MessageEventReceivedCmd(messageName, executionId, processVariables));
+  }
+
+  public void correlateMessage(String messageName, Map<String, Object> correlationKeys, Map<String, Object> processVariables) {
+    commandExecutor.execute(new CorrelateMessageCmd(messageName, null, correlationKeys, processVariables));
+  }
+
+  public void correlateMessage(String messageName, String businessKey,
+      Map<String, Object> correlationKeys, Map<String, Object> processVariables) {
+    commandExecutor.execute(new CorrelateMessageCmd(messageName, businessKey, correlationKeys, processVariables));
+  }
+
+  public void correlateMessage(String messageName) {
+    commandExecutor.execute(new CorrelateMessageCmd(messageName, null, null, null));
+  }
+
+  public void correlateMessage(String messageName, String businessKey) {
+    commandExecutor.execute(new CorrelateMessageCmd(messageName, businessKey, null, null));
+  }
+
+  public void correlateMessage(String messageName,
+      Map<String, Object> correlationKeys) {
+    commandExecutor.execute(new CorrelateMessageCmd(messageName, null, correlationKeys, null));
+  }
+
+  public void correlateMessage(String messageName, String businessKey,
+      Map<String, Object> processVariables) {
+    commandExecutor.execute(new CorrelateMessageCmd(messageName, businessKey, null, processVariables));
   }
 
 }
