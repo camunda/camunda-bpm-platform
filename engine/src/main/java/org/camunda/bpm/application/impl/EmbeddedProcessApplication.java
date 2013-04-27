@@ -12,7 +12,10 @@
  */
 package org.camunda.bpm.application.impl;
 
+import java.util.concurrent.Callable;
+
 import org.camunda.bpm.application.AbstractProcessApplication;
+import org.camunda.bpm.application.ProcessApplicationExecutionException;
 import org.camunda.bpm.application.ProcessApplicationReference;
 
 /**
@@ -33,6 +36,18 @@ public class EmbeddedProcessApplication extends AbstractProcessApplication {
 
   public ProcessApplicationReference getReference() {
     return new ProcessApplicationReferenceImpl(this);
+  }
+  
+  /**
+   * Since the process engine is loaded by the same classloader 
+   * as the process application, nothing needs to be done.
+   */
+  public <T> T execute(Callable<T> callable) throws ProcessApplicationExecutionException {
+    try {
+      return callable.call();
+    } catch (Exception e) {
+      throw new ProcessApplicationExecutionException(e);
+    }
   }
 
 }

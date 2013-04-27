@@ -12,18 +12,23 @@
  */
 package org.camunda.bpm.container.impl.jboss.deployment.processor;
 
+import static org.jboss.as.server.deployment.Attachments.MODULE;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
 
+import org.camunda.bpm.application.ProcessApplication;
 import org.camunda.bpm.application.impl.metadata.ProcessesXmlParser;
 import org.camunda.bpm.application.impl.metadata.spi.ProcessesXml;
 import org.camunda.bpm.container.impl.jboss.deployment.marker.ProcessApplicationAttachments;
 import org.camunda.bpm.container.impl.jboss.util.ProcessesXmlWrapper;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.util.IoUtil;
-import org.jboss.as.server.deployment.Attachments;
+import org.jboss.as.ee.component.ComponentDescription;
 import org.jboss.as.server.deployment.DeploymentPhaseContext;
 import org.jboss.as.server.deployment.DeploymentUnit;
 import org.jboss.as.server.deployment.DeploymentUnitProcessingException;
@@ -57,11 +62,15 @@ public class ProcessesXmlProcessor implements DeploymentUnitProcessor {
       return;
     }
     
-    final Module module = deploymentUnit.getAttachment(Attachments.MODULE);
+    final Module module = deploymentUnit.getAttachment(MODULE);
     
-    Enumeration<URL> processesXmlResources = getProcessesXmlResources(module);           
-    while (processesXmlResources.hasMoreElements()) {
-      URL processesXmlResource = (URL) processesXmlResources.nextElement();
+    // read @ProcessApplication annotation of PA-component   
+    String[] deploymentDescriptors = getDeploymentDescriptors(deploymentUnit);
+    
+    // load all processes.xml files
+    List<URL> deploymentDescriptorURLs = getDeploymentDescriptorUrls(module, deploymentDescriptors);
+    
+    for (URL processesXmlResource : deploymentDescriptorURLs) {            
       VirtualFile processesXmlFile = getFile(processesXmlResource);
       
       // parse processes.xml metadata.
@@ -77,7 +86,51 @@ public class ProcessesXmlProcessor implements DeploymentUnitProcessor {
     }
   }
 
-  private Enumeration<URL> getProcessesXmlResources(Module module) throws DeploymentUnitProcessingException {    
+  protected List<URL> getDeploymentDescriptorUrls(final Module module, String[] deploymentDescriptors) throws DeploymentUnitProcessingException {
+    List<URL> deploymentDescriptorURLs = new ArrayList<URL>();
+    for (String deploymentDescriptor : deploymentDescriptors) {
+      Enumeration<URL> resources = null;
+      try {
+        resources = module.getClassLoader().getResources(deploymentDescriptor);
+      } catch (IOException e) {
+        throw new DeploymentUnitProcessingException("Could not load processes.xml resource: ", e);
+      }
+      while (resources.hasMoreElements()) {
+        deploymentDescriptorURLs.add((URL) resources.nextElement());        
+      }
+    }
+    return deploymentDescriptorURLs;
+  }
+
+  protected String[] getDeploymentDescriptors(DeploymentUnit deploymentUnit) throws DeploymentUnitProcessingException {
+    
+    final ComponentDescription processApplicationComponent = ProcessApplicationAttachments.getProcessApplicationComponent(deploymentUnit);
+    final String paClassName = processApplicationComponent.getComponentClassName();
+    
+    String[] deploymentDescriptorResourceNames = null;
+
+    Module module = deploymentUnit.getAttachment(MODULE);
+    
+    Class<?> paClass = null;
+    try {
+      paClass = (Class<?>) module.getClassLoader().loadClass(paClassName);
+    } catch (ClassNotFoundException e) {
+      throw new DeploymentUnitProcessingException("Unable to load process application class '"+paClassName+"'.");
+    }
+    
+    ProcessApplication annotation = paClass.getAnnotation(ProcessApplication.class);
+    
+    if(annotation == null) {
+      deploymentDescriptorResourceNames = new String[]{ PROCESSES_XML };
+      
+    } else {
+      deploymentDescriptorResourceNames = annotation.deploymentDescriptors();
+      
+    }
+    return deploymentDescriptorResourceNames;
+  }
+
+  protected Enumeration<URL> getProcessesXmlResources(Module module, String[] deploymentDescriptors) throws DeploymentUnitProcessingException {    
     try {
       return module.getClassLoader().getResources(PROCESSES_XML);
     } catch (IOException e) {
