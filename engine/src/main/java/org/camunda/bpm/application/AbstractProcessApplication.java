@@ -57,9 +57,7 @@ public abstract class AbstractProcessApplication {
   public final void deploy() {
     if(isDeployed) {
       LOGGER.warning("Calling deploy() on process application that is already deployed.");      
-    } else {
-      // initialize el resolver
-      processApplicationElResolver = initProcessApplicationElResolver();
+    } else {      
       // deploy the application
       RuntimeContainerDelegate.INSTANCE.get().deployProcessApplication(this);
       isDeployed = true;      
@@ -195,7 +193,13 @@ public abstract class AbstractProcessApplication {
    * to {@link #execute(Callable)}</p>
    */
   public ELResolver getElResolver() {
-    
+    if(processApplicationElResolver == null) {
+      synchronized (this) {
+        if(processApplicationElResolver == null) {
+          processApplicationElResolver = initProcessApplicationElResolver();          
+        }        
+      }
+    }
     return processApplicationElResolver;
     
   }
