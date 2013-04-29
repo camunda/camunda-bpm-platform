@@ -41,24 +41,24 @@ a.btn {
 */
 html, body {
   height:100%;
-  min-height: 100%;
+  min-height:100%;
 }
 
 .footer {
-  padding-top: 2em;
-  background-color: #333;
-  color: white;
-  padding-bottom: 2em;
+  padding-top:2em;
+  background-color:#333;
+  color:white;
+  padding-bottom:2em;
 }
 .wrapper {
-  min-height: 100%;
-  height: auto !important; /* ie7 fix */
-  height: 100%;
-  margin: 0 auto -43px;
+  min-height:100%;
+  height:auto !important; /* ie7 fix */
+  height:100%;
+  margin:0 auto -43px;
 }
 
 .push-down {
-  height: 60px;
+  height:60px;
 }
 
 .wrapper-dark {
@@ -67,4 +67,27 @@ html, body {
 
 .row-white {
   color:white;
+}
+
+.clearer {
+  position:absolute; 
+  width:100%; 
+  height:480px; 
+  background-color:white
+}
+
+.center-custom {
+  padding-top:100px; 
+  position:relative;
+}
+
+.welcome-container {
+  position:relative; 
+  margin-top:40px
+}
+
+.preview {
+  border:1px solid grey;
+  height:200px !important;
+  width:100%
 }
