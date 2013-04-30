@@ -15,6 +15,7 @@ package org.camunda.bpm.application.impl;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.servlet.ServletContext;
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
@@ -38,6 +39,7 @@ public class ServletProcessApplication extends AbstractProcessApplication implem
   protected ProcessApplicationReferenceImpl reference;
 
   protected ClassLoader processApplicationClassloader;
+  protected ServletContext servletContext;
 
 
   protected String autodetectProcessApplicationName() {
@@ -52,7 +54,8 @@ public class ServletProcessApplication extends AbstractProcessApplication implem
   }
 
   public void contextInitialized(ServletContextEvent sce) {
-    servletContextPath = sce.getServletContext().getContextPath();
+    servletContext = sce.getServletContext();
+    servletContextPath = servletContext.getContextPath();
     servletContextName = sce.getServletContext().getServletContextName();
     
     processApplicationClassloader = initProcessApplicationClassloader(sce);    
@@ -100,6 +103,10 @@ public class ServletProcessApplication extends AbstractProcessApplication implem
     properties.put(ProcessApplicationInfo.PROP_SERVLET_CONTEXT_PATH, servletContextPath);
     
     return properties;
+  }
+  
+  public ServletContext getServletContext() {
+    return servletContext;
   }
 
 }
