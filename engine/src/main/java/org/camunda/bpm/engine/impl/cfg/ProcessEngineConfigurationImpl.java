@@ -988,7 +988,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   }
   
   // correlation handler //////////////////////////////////////////////////////
-  private void initCorrelationHandler() {
+  protected void initCorrelationHandler() {
     if (correlationHandler == null) {
       correlationHandler = new DefaultCorrelationHandler();
     }
