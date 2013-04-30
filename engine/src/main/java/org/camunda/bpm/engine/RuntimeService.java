@@ -512,5 +512,134 @@ public interface RuntimeService {
    *          has not subscribed to the signal
    */
   void messageEventReceived(String messageName, String executionId, Map<String, Object> processVariables);
-   
+  
+  /**
+   * Correlates a message to either an execution that is waiting for this message or a process definition
+   * that can be started by this message.
+   * 
+   * Notification and instantiation happen synchronously.
+   * 
+   * @param messageName
+   *          the name of the message event
+   * @throws ProcessEngineException if none or more than one execution or process definition is correlated
+   */
+  void correlateMessage(String messageName);
+  
+  /**
+   * Correlates a message to
+   * <ul>
+   *  <li>
+   *    an execution that is waiting for this message and belongs to a process instance with the given business key
+   *  </li>
+   *  <li>
+   *    a process definition that can be started by this message.
+   *  </li>
+   * </ul>
+   * 
+   * Notification and instantiation happen synchronously.
+   * 
+   * @param messageName
+   *          the name of the message event
+   * @param businessKey
+   *          the business key of process instances to correlate against
+   * @throws ProcessEngineException if none or more than one execution or process definition is correlated
+   */
+  void correlateMessage(String messageName, String businessKey);
+  
+  /**
+   * Correlates a message to
+   * <ul>
+   *  <li>
+   *    an execution that is waiting for this message and can be correlated according
+   *    to the given correlation keys. This is typically matched against process instance variables.
+   *  </li>
+   *  <li>
+   *    a process definition that can be started by this message.
+   *  </li>
+   * </ul>
+   * 
+   * Notification and instantiation happen synchronously.
+   * 
+   * @param messageName
+   *          the name of the message event
+   * @param correlationKeys
+   *          a map of key value pairs that are used to correlate the message to an execution
+   * @throws ProcessEngineException if none or more than one execution or process definition is correlated
+   */
+  void correlateMessage(String messageName, Map<String, Object> correlationKeys);
+  
+  /**
+   * Correlates a message to
+   * <ul>
+   *  <li>
+   *    an execution that is waiting for this message and belongs to a process instance with the given business key
+   *  </li>
+   *  <li>
+   *    a process definition that can be started by this message.
+   *  </li>
+   * </ul>
+   * and updates the process instance variables.
+   * 
+   * Notification and instantiation happen synchronously.
+   * 
+   * @param messageName
+   *          the name of the message event
+   * @param businessKey
+   *          the business key of process instances to correlate against
+   * @throws ProcessEngineException if none or more than one execution or process definition is correlated
+   */
+  void correlateMessage(String messageName, String businessKey, Map<String, Object> processVariables);
+  
+  /**
+   * Correlates a message to
+   * <ul>
+   *  <li>
+   *    an execution that is waiting for this message and can be correlated according
+   *    to the given correlation keys. This is typically matched against process instance variables.
+   *  </li>
+   *  <li>
+   *    a process definition that can be started by this message.
+   *  </li>
+   * </ul>
+   * and updates the process instance variables.
+   * 
+   * Notification and instantiation happen synchronously.
+   * 
+   * @param messageName
+   *          the name of the message event
+   * @param correlationKeys
+   *          a map of key value pairs that are used to correlate the message to an execution
+   * @param processVariables
+   *          a map of variables added to the execution or newly created process instance
+   * @throws ProcessEngineException if none or more than one execution or process definition is correlated
+   */
+  void correlateMessage(String messageName, Map<String, Object> correlationKeys, Map<String, Object> processVariables);
+  
+  /**
+   * Correlates a message to
+   * <ul>
+   *  <li>
+   *    an execution that is waiting for this message and can be correlated according
+   *    to the given correlation keys. This is typically matched against process instance variables.
+   *    The process instance it belongs to has to have the given business key.
+   *  </li>
+   *  <li>
+   *    a process definition that can be started by this message.
+   *  </li>
+   * </ul>
+   * and updates the process instance variables.
+   * 
+   * Notification and instantiation happen synchronously.
+   * 
+   * @param messageName
+   *          the name of the message event
+   * @param businessKey
+   *          the business key of process instances to correlate against
+   * @param correlationKeys
+   *          a map of key value pairs that are used to correlate the message to an execution
+   * @param processVariables
+   *          a map of variables added to the execution or newly created process instance
+   * @throws ProcessEngineException if none or more than one execution or process definition is correlated
+   */
+  void correlateMessage(String messageName, String businessKey, Map<String, Object> correlationKeys, Map<String, Object> processVariables);
 }

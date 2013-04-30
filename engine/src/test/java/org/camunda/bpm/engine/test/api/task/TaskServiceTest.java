@@ -424,8 +424,11 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
   }
   
   public void testCompleteTaskWithParametersNullTaskId() {
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("myKey", "myValue");
+    
     try {
-      taskService.complete(null);
+      taskService.complete(null, variables);
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
       assertTextPresent("taskId is null", ae.getMessage());
@@ -433,8 +436,11 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
   }
   
   public void testCompleteTaskWithParametersUnexistingTaskId() {
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("myKey", "myValue");
+    
     try {
-      taskService.complete("unexistingtask");
+      taskService.complete("unexistingtask", variables);
       fail("ProcessEngineException expected");
     } catch (ProcessEngineException ae) {
       assertTextPresent("Cannot find task with id unexistingtask", ae.getMessage());
@@ -493,6 +499,89 @@ public class TaskServiceTest extends PluggableProcessEngineTestCase {
     task = taskService.createTaskQuery().singleResult();
     assertEquals("Second task", task.getName());
 
+    // Verify task parameters set on execution
+    Map<String, Object> variables = runtimeService.getVariables(processInstance.getId());
+    assertEquals(1, variables.size());
+    assertEquals("myValue", variables.get("myParam"));
+  }
+  
+  public void testResolveTaskNullTaskId() {
+    try {
+      taskService.resolveTask(null);
+      fail("ProcessEngineException expected");
+    } catch (ProcessEngineException ae) {
+      assertTextPresent("taskId is null", ae.getMessage());
+    }
+  }
+  
+  public void testResolveTaskUnexistingTaskId() {
+    try {
+      taskService.resolveTask("unexistingtask");
+      fail("ProcessEngineException expected");
+    } catch (ProcessEngineException ae) {
+      assertTextPresent("Cannot find task with id unexistingtask", ae.getMessage());
+    }
+  }
+  
+  public void testResolveTaskWithParametersNullParameters() {
+    Task task = taskService.newTask();
+    task.setDelegationState(DelegationState.PENDING);
+    taskService.saveTask(task);
+    
+    String taskId = task.getId();
+    taskService.resolveTask(taskId, null);
+
+    if (processEngineConfiguration.getHistoryLevel()>=ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
+      historyService.deleteHistoricTaskInstance(taskId);
+    }
+    
+    // Fetch the task again
+    task = taskService.createTaskQuery().taskId(taskId).singleResult();
+    assertEquals(DelegationState.RESOLVED, task.getDelegationState());
+    
+    taskService.deleteTask(taskId, true);
+  }
+  
+  @SuppressWarnings("unchecked")
+  public void testResolveTaskWithParametersEmptyParameters() {
+    Task task = taskService.newTask();
+    task.setDelegationState(DelegationState.PENDING);
+    taskService.saveTask(task);
+    
+    String taskId = task.getId();
+    taskService.resolveTask(taskId, Collections.EMPTY_MAP);
+
+    if (processEngineConfiguration.getHistoryLevel()>=ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
+      historyService.deleteHistoricTaskInstance(taskId);
+    }
+    
+    // Fetch the task again
+    task = taskService.createTaskQuery().taskId(taskId).singleResult();
+    assertEquals(DelegationState.RESOLVED, task.getDelegationState());
+    
+    taskService.deleteTask(taskId, true);
+  }
+  
+  @Deployment(resources = { 
+  "org/camunda/bpm/engine/test/api/twoTasksProcess.bpmn20.xml" })
+  public void testResolveWithParametersTask() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("twoTasksProcess");
+  
+    // Fetch first task
+    Task task = taskService.createTaskQuery().singleResult();
+    assertEquals("First task", task.getName());
+    
+    task.delegate("johndoe");
+  
+    // Resolve first task
+    Map<String, Object> taskParams = new HashMap<String, Object>();
+    taskParams.put("myParam", "myValue");
+    taskService.resolveTask(task.getId(), taskParams);
+  
+    // Verify that task is resolved
+    task = taskService.createTaskQuery().taskDelegationState(DelegationState.RESOLVED).singleResult();
+    assertEquals("First task", task.getName());
+  
     // Verify task parameters set on execution
     Map<String, Object> variables = runtimeService.getVariables(processInstance.getId());
     assertEquals(1, variables.size());

@@ -28,6 +28,25 @@ import java.lang.annotation.Target;
 @Target(ElementType.TYPE)
 public @interface ProcessApplication {
   
+  /**
+   * Allows specifying the name of the process application
+   */
   String value() default "";
+  
+  /**
+   * Allows specifying the name of the process application
+   */
+  String name() default "";
+  
+  /**
+   * Returns the location(s) of the <code>processes.xml</code> deployment descriptors. 
+   * The default value is<code>{META-INF/processes.xml}</code>. The provided path(s) 
+   * must be resolvable through the {@link ClassLoader#getResourceAsStream(String)}-Method 
+   * of the classloader returned  by the {@link AbstractProcessApplication#getProcessApplicationClassloader()} 
+   * method provided by the process application.
+   * 
+   * @return the location of the <code>processes.xml</code> file. 
+   */
+  String[] deploymentDescriptors() default { "META-INF/processes.xml" };    
   
 }

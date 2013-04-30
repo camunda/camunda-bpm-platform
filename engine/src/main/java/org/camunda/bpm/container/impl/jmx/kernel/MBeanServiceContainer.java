@@ -198,7 +198,7 @@ public class MBeanServiceContainer {
    * @return the service names ( {@link ObjectName} ) for all services for a given type
    */
   public Set<ObjectName> getServiceNames(ServiceType type) {
-    return mBeanServer.queryNames(type.getTypeName(),null);
+    return getmBeanServer().queryNames(type.getTypeName(),null);
   }
     
   /**

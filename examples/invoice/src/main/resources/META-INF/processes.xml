@@ -7,7 +7,7 @@
   <process-archive name="pa">
     <process-engine>default</process-engine>
     <properties>
-      <property name="isDeleteUponUndeploy">true</property>
+      <property name="isDeleteUponUndeploy">false</property>
       <property name="isScanForProcessDefinitions">true</property>
     </properties>
   </process-archive>

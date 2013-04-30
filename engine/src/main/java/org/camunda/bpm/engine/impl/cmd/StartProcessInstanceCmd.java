@@ -28,7 +28,7 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 /**
  * @author Tom Baeyens
  */
-public class StartProcessInstanceCmd<T> implements Command<ProcessInstance>, Serializable {
+public class StartProcessInstanceCmd implements Command<ProcessInstance>, Serializable {
 
   private static final long serialVersionUID = 1L;
   protected String processDefinitionKey;

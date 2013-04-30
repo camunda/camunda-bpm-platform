@@ -131,6 +131,9 @@
     	 	inner join ${prefix}ACT_RU_EVENT_SUBSCR EVT${index} on RES.ID_ = EVT${index}.EXECUTION_ID_
 	    </foreach>
     </if>
+    <if test="businessKey != null">
+        inner join ${prefix}ACT_RU_EXECUTION INST on RES.PROC_INST_ID_ = INST.ID_
+    </if>
     inner join ${prefix}ACT_RE_PROCDEF P on RES.PROC_DEF_ID_ = P.ID_
     <where>
       <if test="onlyProcessInstances">
@@ -155,7 +158,7 @@
         </foreach>
       </if>
       <if test="businessKey != null">
-        and RES.BUSINESS_KEY_ = #{businessKey}
+        and INST.BUSINESS_KEY_ = #{businessKey}
       </if>
       <if test="activityId != null">
         and RES.ACT_ID_ = #{activityId}
