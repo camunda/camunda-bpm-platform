@@ -1,17 +1,14 @@
 package org.camunda.bpm.engine.rest.impl;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.IdentityService;
-import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.GroupQuery;
 import org.camunda.bpm.engine.identity.User;
