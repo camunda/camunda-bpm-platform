@@ -21,7 +21,6 @@ import javax.ws.rs.core.UriInfo;
 
 import org.camunda.bpm.engine.FormService;
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.form.FormData;
 import org.camunda.bpm.engine.rest.TaskRestService;

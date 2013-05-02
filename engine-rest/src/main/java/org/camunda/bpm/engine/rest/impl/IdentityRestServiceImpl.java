@@ -1,17 +1,14 @@
 package org.camunda.bpm.engine.rest.impl;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.IdentityService;
-import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.GroupQuery;
 import org.camunda.bpm.engine.identity.User;
@@ -22,16 +19,21 @@ import org.camunda.bpm.engine.rest.dto.task.UserDto;
 
 public class IdentityRestServiceImpl extends AbstractRestProcessEngineAware implements IdentityRestService {
 
+  public IdentityRestServiceImpl() {
+    super();
+  }
+  
+  public IdentityRestServiceImpl(String engineName) {
+    super(engineName);
+  }
+
   @Override
   public GroupInfoDto getGroupInfo(String userId) {
     if (userId == null) {
       throw new WebApplicationException(Status.BAD_REQUEST.getStatusCode());
     }
     
-    TaskService taskService = getProcessEngine().getTaskService();
     IdentityService identityService = getProcessEngine().getIdentityService();
-
-    Map<String, Long> groupCounts = new HashMap<String, Long>();
 
     GroupQuery query = identityService.createGroupQuery();
     List<Group> userGroups = query.groupMember(userId).orderByGroupName().asc().list();
@@ -40,8 +42,6 @@ public class IdentityRestServiceImpl extends AbstractRestProcessEngineAware impl
     List<GroupDto> allGroups = new ArrayList<GroupDto>();
 
     for (Group group : userGroups) {
-      long groupTaskCount = taskService.createTaskQuery().taskCandidateGroup(group.getId()).count();
-      groupCounts.put(group.getId(), groupTaskCount);
       List<User> groupUsers = identityService.createUserQuery().memberOfGroup(group.getId()).list();
       for (User user: groupUsers) {
         if (!user.getId().equals(userId)) {
@@ -51,7 +51,7 @@ public class IdentityRestServiceImpl extends AbstractRestProcessEngineAware impl
       allGroups.add(new GroupDto(group.getId(), group.getName()));
     }
 
-    return new GroupInfoDto(groupCounts, allGroups, allGroupUsers);
+    return new GroupInfoDto(allGroups, allGroupUsers);
   }
 
 }

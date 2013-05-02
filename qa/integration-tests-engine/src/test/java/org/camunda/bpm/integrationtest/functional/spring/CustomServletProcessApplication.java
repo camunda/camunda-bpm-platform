@@ -10,28 +10,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.rest.dto.task;
+package org.camunda.bpm.integrationtest.functional.spring;
 
-import java.util.List;
-import java.util.Set;
+import org.camunda.bpm.application.ProcessApplication;
+import org.camunda.bpm.application.impl.ServletProcessApplication;
 
 /**
- * @author: drobisch
+ * @author Daniel Meyer
+ *
  */
-public class GroupInfoDto {
-  private final List<GroupDto> groups;
-  private Set<UserDto> groupUsers;
+@ProcessApplication
+public class CustomServletProcessApplication extends ServletProcessApplication {
 
-  public GroupInfoDto(List<GroupDto> groups, Set<UserDto> groupUsers) {
-    this.groupUsers = groupUsers;
-    this.groups = groups;
-  }
-
-  public Set<UserDto> getGroupUsers() {
-    return groupUsers;
-  }
-
-  public List<GroupDto> getGroups() {
-    return groups;
-  }
 }
