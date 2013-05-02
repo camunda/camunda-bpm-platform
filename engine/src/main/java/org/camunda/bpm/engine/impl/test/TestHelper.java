@@ -157,6 +157,7 @@ public abstract class TestHelper {
             DbSqlSession dbSqlSession = commandContext.getSession(DbSqlSession.class);
             dbSqlSession.dbSchemaDrop();
             dbSqlSession.dbSchemaCreate();
+            dbSqlSession.dbCreateHistoryLevel();
             return null;
           }
         });
@@ -235,4 +236,28 @@ public abstract class TestHelper {
     }
     processEngines.clear();
   }
+  
+  public static void createSchema(ProcessEngineConfigurationImpl processEngineConfiguration) {
+    processEngineConfiguration.getCommandExecutorTxRequired()
+        .execute(new Command<Object>() {
+          public Object execute(CommandContext commandContext) {
+            DbSqlSession dbSqlSession = commandContext.getDbSqlSession();
+            dbSqlSession.executeMandatorySchemaResource("create", "engine");
+            dbSqlSession.executeMandatorySchemaResource("create", "history");
+            dbSqlSession.executeMandatorySchemaResource("create", "identity");
+            return null;
+          }
+        });
+  }
+  
+  public static void dropSchema(ProcessEngineConfigurationImpl processEngineConfiguration) {
+    processEngineConfiguration.getCommandExecutorTxRequired()
+        .execute(new Command<Object>() {
+         public Object execute(CommandContext commandContext) {
+           commandContext.getDbSqlSession().dbSchemaDrop();
+           return null;
+         }
+        });
+  }
+
 }
