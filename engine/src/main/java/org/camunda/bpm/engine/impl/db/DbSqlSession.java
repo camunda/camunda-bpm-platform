@@ -702,23 +702,6 @@ public class DbSqlSession implements Session {
         errorMessage = addMissingComponent(errorMessage, "identity");
       }
       
-      Integer configuredHistoryLevel = Context.getProcessEngineConfiguration().getHistoryLevel();
-      PropertyEntity historyLevelProperty = selectById(PropertyEntity.class, "historyLevel");
-      if (historyLevelProperty==null) {
-        if (errorMessage==null) {
-          errorMessage = "";
-        }
-        errorMessage += "no historyLevel property specified";
-      } else {
-        Integer databaseHistoryLevel = new Integer(historyLevelProperty.getValue());
-        if (!configuredHistoryLevel.equals(databaseHistoryLevel)) {
-          if (errorMessage==null) {
-            errorMessage = "";
-          }
-          errorMessage += "historyLevel mismatch: configuration says "+configuredHistoryLevel+" and database says "+databaseHistoryLevel;
-        }
-      }
-      
       if (errorMessage!=null) {
         throw new ProcessEngineException("Activiti database problem: "+errorMessage);
       }
@@ -736,6 +719,28 @@ public class DbSqlSession implements Session {
     }
 
     log.fine("activiti db schema check successful");
+  }
+
+  public void dbCreateHistoryLevel() {
+    ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+    int configuredHistoryLevel = processEngineConfiguration.getHistoryLevel();
+    PropertyEntity property = new PropertyEntity("historyLevel", Integer.toString(configuredHistoryLevel));
+    insert(property);
+    log.info("Creating historyLevel property in database with value: " + processEngineConfiguration.getHistory());
+  }
+  
+  public void checkHistoryLevel() {
+    Integer configuredHistoryLevel = Context.getProcessEngineConfiguration().getHistoryLevel();
+    PropertyEntity historyLevelProperty = selectById(PropertyEntity.class, "historyLevel");
+    if (historyLevelProperty == null) {
+      log.info("No historyLevel property found in database.");
+      dbCreateHistoryLevel();
+    } else {
+      Integer databaseHistoryLevel = new Integer(historyLevelProperty.getValue());
+      if (!configuredHistoryLevel.equals(databaseHistoryLevel)) {
+        throw new ProcessEngineException("historyLevel mismatch: configuration says " + configuredHistoryLevel + " and database says " + databaseHistoryLevel);
+      }
+    }
   }
 
   protected String addMissingComponent(String missingComponents, String component) {
@@ -788,10 +793,6 @@ public class DbSqlSession implements Session {
 
   protected void dbSchemaCreateEngine() {
     executeMandatorySchemaResource("create", "engine");
-    
-    int configuredHistoryLevel = Context.getProcessEngineConfiguration().getHistoryLevel();
-    PropertyEntity property = new PropertyEntity("historyLevel", Integer.toString(configuredHistoryLevel));
-    insert(property);
   }
 
   public void dbSchemaDrop() {
@@ -1076,23 +1077,23 @@ public class DbSqlSession implements Session {
         // ignore
       }
     }
-    if ( org.camunda.bpm.engine.ProcessEngineConfiguration.DB_SCHEMA_UPDATE_CREATE_DROP.equals(databaseSchemaUpdate) 
+    if ( ProcessEngineConfiguration.DB_SCHEMA_UPDATE_CREATE_DROP.equals(databaseSchemaUpdate) 
          || ProcessEngineConfigurationImpl.DB_SCHEMA_UPDATE_DROP_CREATE.equals(databaseSchemaUpdate)
          || ProcessEngineConfigurationImpl.DB_SCHEMA_UPDATE_CREATE.equals(databaseSchemaUpdate)
        ) {
       dbSchemaCreate();
-      
-    } else if (org.camunda.bpm.engine.ProcessEngineConfiguration.DB_SCHEMA_UPDATE_FALSE.equals(databaseSchemaUpdate)) {
+    } else if (ProcessEngineConfiguration.DB_SCHEMA_UPDATE_FALSE.equals(databaseSchemaUpdate)) {
       dbSchemaCheckVersion();
-      
     } else if (ProcessEngineConfiguration.DB_SCHEMA_UPDATE_TRUE.equals(databaseSchemaUpdate)) {
       dbSchemaUpdate();
     }
+    
+    checkHistoryLevel();
   }
 
   public void performSchemaOperationsProcessEngineClose() {
     String databaseSchemaUpdate = Context.getProcessEngineConfiguration().getDatabaseSchemaUpdate();
-    if (org.camunda.bpm.engine.ProcessEngineConfiguration.DB_SCHEMA_UPDATE_CREATE_DROP.equals(databaseSchemaUpdate)) {
+    if (ProcessEngineConfiguration.DB_SCHEMA_UPDATE_CREATE_DROP.equals(databaseSchemaUpdate)) {
       dbSchemaDrop();
     }
   }

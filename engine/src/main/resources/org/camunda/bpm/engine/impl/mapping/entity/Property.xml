@@ -33,7 +33,7 @@
   <!-- PROPERTY DELETE -->
   
   <delete id="deleteProperty" parameterType="org.camunda.bpm.engine.impl.persistence.entity.PropertyEntity">
-    delete from ${prefix}ACT_GE_PROPERTY where NAME_ = #{propertyName} and REV_ = #{revision}
+    delete from ${prefix}ACT_GE_PROPERTY where NAME_ = #{name} and REV_ = #{revision}
   </delete>
 
 

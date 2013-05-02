@@ -40,6 +40,7 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
+import org.camunda.bpm.engine.impl.persistence.entity.PropertyEntity;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.impl.util.LogUtil.ThreadLogMode;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -88,7 +89,9 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
     if (repositoryService==null) {
       initializeServices();
     }
-
+    
+    createOrUpdateHistoryLevel(processEngineConfiguration);
+    
     log.severe(EMPTY_LINE);
 
     try {
@@ -125,6 +128,9 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
    * If the DB is not clean, it is cleaned by performing a create a drop. */
   protected void assertAndEnsureCleanDb() throws Throwable {
     log.fine("verifying that db is clean after test");
+    
+    deleteHistoryLevel(processEngineConfiguration);
+    
     Map<String, Long> tableCounts = managementService.getTableCount();
     StringBuilder outputMessage = new StringBuilder();
     for (String tableName : tableCounts.keySet()) {
@@ -270,4 +276,36 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
       thread.interrupt();
     }
   }
+  
+  public void createOrUpdateHistoryLevel(final ProcessEngineConfigurationImpl processEngineConfiguration) {
+    processEngineConfiguration.getCommandExecutorTxRequired()
+      .execute(new Command<Object>() {
+       public Object execute(CommandContext commandContext) {
+         DbSqlSession dbSqlSession = commandContext.getDbSqlSession();
+         PropertyEntity historyLevelProperty = dbSqlSession.selectById(PropertyEntity.class, "historyLevel");
+         if (historyLevelProperty != null) {
+           historyLevelProperty.setValue(Integer.toString(processEngineConfiguration.getHistoryLevel()));
+           dbSqlSession.update(historyLevelProperty);
+         } else {
+           commandContext.getDbSqlSession().dbCreateHistoryLevel();
+         }
+         return null;
+       }
+      });
+  }
+  
+  public void deleteHistoryLevel(ProcessEngineConfigurationImpl processEngineConfiguration) {
+    processEngineConfiguration.getCommandExecutorTxRequired()
+      .execute(new Command<Object>() {
+       public Object execute(CommandContext commandContext) {
+         DbSqlSession dbSqlSession = commandContext.getDbSqlSession();
+         PropertyEntity historyLevelProperty = dbSqlSession.selectById(PropertyEntity.class, "historyLevel");
+         if (historyLevelProperty != null) {
+           dbSqlSession.delete(historyLevelProperty);
+         }
+         return null;
+       }
+      });
+  }
+  
 }
