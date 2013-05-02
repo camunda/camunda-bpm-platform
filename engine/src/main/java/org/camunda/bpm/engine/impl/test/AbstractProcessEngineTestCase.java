@@ -40,7 +40,6 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
-import org.camunda.bpm.engine.impl.persistence.entity.PropertyEntity;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.impl.util.LogUtil.ThreadLogMode;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -90,7 +89,7 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
       initializeServices();
     }
     
-    createOrUpdateHistoryLevel(processEngineConfiguration);
+    TestHelper.createOrUpdateHistoryLevel(processEngineConfiguration);
     
     log.severe(EMPTY_LINE);
 
@@ -129,7 +128,7 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
   protected void assertAndEnsureCleanDb() throws Throwable {
     log.fine("verifying that db is clean after test");
     
-    deleteHistoryLevel(processEngineConfiguration);
+    TestHelper.deleteHistoryLevel(processEngineConfiguration);
     
     Map<String, Long> tableCounts = managementService.getTableCount();
     StringBuilder outputMessage = new StringBuilder();
@@ -275,37 +274,6 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
       timeLimitExceeded = true;
       thread.interrupt();
     }
-  }
-  
-  public void createOrUpdateHistoryLevel(final ProcessEngineConfigurationImpl processEngineConfiguration) {
-    processEngineConfiguration.getCommandExecutorTxRequired()
-      .execute(new Command<Object>() {
-       public Object execute(CommandContext commandContext) {
-         DbSqlSession dbSqlSession = commandContext.getDbSqlSession();
-         PropertyEntity historyLevelProperty = dbSqlSession.selectById(PropertyEntity.class, "historyLevel");
-         if (historyLevelProperty != null) {
-           historyLevelProperty.setValue(Integer.toString(processEngineConfiguration.getHistoryLevel()));
-           dbSqlSession.update(historyLevelProperty);
-         } else {
-           commandContext.getDbSqlSession().dbCreateHistoryLevel();
-         }
-         return null;
-       }
-      });
-  }
-  
-  public void deleteHistoryLevel(ProcessEngineConfigurationImpl processEngineConfiguration) {
-    processEngineConfiguration.getCommandExecutorTxRequired()
-      .execute(new Command<Object>() {
-       public Object execute(CommandContext commandContext) {
-         DbSqlSession dbSqlSession = commandContext.getDbSqlSession();
-         PropertyEntity historyLevelProperty = dbSqlSession.selectById(PropertyEntity.class, "historyLevel");
-         if (historyLevelProperty != null) {
-           dbSqlSession.delete(historyLevelProperty);
-         }
-         return null;
-       }
-      });
   }
   
 }
