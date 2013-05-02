@@ -105,7 +105,8 @@ public class DeploymentHelper {
           .use(MavenDependencyResolver.class)
           .goOffline()
           .loadMetadataFromPom("pom.xml")
-          .artifacts("org.camunda.bpm:camunda-engine-spring", "org.springframework:spring-web")          
+          .artifacts("org.camunda.bpm:camunda-engine-spring", "org.springframework:spring-web")
+          .exclusion("org.camunda.bpm:camunda-engine")          
           .resolveAs(JavaArchive.class);
       
       if(resolvedArchives.size()==0) {
