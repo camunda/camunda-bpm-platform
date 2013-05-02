@@ -28,10 +28,7 @@ public class IdentityRestServiceImpl extends AbstractRestProcessEngineAware impl
       throw new WebApplicationException(Status.BAD_REQUEST.getStatusCode());
     }
     
-    TaskService taskService = getProcessEngine().getTaskService();
     IdentityService identityService = getProcessEngine().getIdentityService();
-
-    Map<String, Long> groupCounts = new HashMap<String, Long>();
 
     GroupQuery query = identityService.createGroupQuery();
     List<Group> userGroups = query.groupMember(userId).orderByGroupName().asc().list();
@@ -40,8 +37,6 @@ public class IdentityRestServiceImpl extends AbstractRestProcessEngineAware impl
     List<GroupDto> allGroups = new ArrayList<GroupDto>();
 
     for (Group group : userGroups) {
-      long groupTaskCount = taskService.createTaskQuery().taskCandidateGroup(group.getId()).count();
-      groupCounts.put(group.getId(), groupTaskCount);
       List<User> groupUsers = identityService.createUserQuery().memberOfGroup(group.getId()).list();
       for (User user: groupUsers) {
         if (!user.getId().equals(userId)) {
@@ -51,7 +46,7 @@ public class IdentityRestServiceImpl extends AbstractRestProcessEngineAware impl
       allGroups.add(new GroupDto(group.getId(), group.getName()));
     }
 
-    return new GroupInfoDto(groupCounts, allGroups, allGroupUsers);
+    return new GroupInfoDto(allGroups, allGroupUsers);
   }
 
 }

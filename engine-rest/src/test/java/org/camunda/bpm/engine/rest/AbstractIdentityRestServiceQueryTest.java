@@ -28,6 +28,8 @@ public abstract class AbstractIdentityRestServiceQueryTest extends AbstractRestS
   protected static final String IDENTITY_URL = TEST_RESOURCE_ROOT_PATH + "/identity";
   protected static final String TASK_GROUPS_URL = IDENTITY_URL + "/groups";
   
+  private User mockUser;
+  
   @Before
   public void setUpRuntimeData() {
     createMockIdentityQueries();
@@ -50,7 +52,7 @@ public abstract class AbstractIdentityRestServiceQueryTest extends AbstractRestS
     
     List<User> mockUsers = new ArrayList<User>();
     
-    User mockUser = MockProvider.createMockUser();
+    mockUser = MockProvider.createMockUser();
     mockUsers.add(mockUser);
   
     when(sampleUserQuery.list()).thenReturn(mockUsers);
@@ -80,6 +82,8 @@ public abstract class AbstractIdentityRestServiceQueryTest extends AbstractRestS
         .body("groups.size()", is(1))
         .body("groups[0].id", equalTo(MockProvider.EXAMPLE_GROUP_ID))
         .body("groups[0].name", equalTo(MockProvider.EXAMPLE_GROUP_NAME))
+        .body("groupUsers.size()", is(1))
+        .body("groupUsers[0].id", equalTo(mockUser.getId()))
         .when().get(TASK_GROUPS_URL);
   }
   
