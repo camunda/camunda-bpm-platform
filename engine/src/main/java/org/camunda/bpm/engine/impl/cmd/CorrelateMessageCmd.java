@@ -16,6 +16,7 @@ package org.camunda.bpm.engine.impl.cmd;
 import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.MismatchingMessageCorrelationException;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -54,7 +55,8 @@ public class CorrelateMessageCmd implements Command<Void> {
     ProcessDefinition matchingDefinition = correlationHandler.correlateMessageToProcessDefinition(commandContext, messageName);
     
     if (matchingExecution != null && matchingDefinition != null) {
-      throw new ProcessEngineException("An execution and a process definition match the correlation.");
+      throw new MismatchingMessageCorrelationException(messageName, businessKey, 
+          correlationKeys, "An execution and a process definition match the correlation.");
     }
     
     if (matchingExecution != null) {
@@ -67,7 +69,7 @@ public class CorrelateMessageCmd implements Command<Void> {
       return null;
     }
     
-    throw new ProcessEngineException("Could not correlate message " + messageName);
+    throw new MismatchingMessageCorrelationException(messageName, "No process definition or execution matches the parameters");
   }
 
   private void triggerExecution(CommandContext commandContext, Execution matchingExecution) {
