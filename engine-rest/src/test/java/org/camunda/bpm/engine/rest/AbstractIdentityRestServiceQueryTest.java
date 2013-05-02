@@ -18,8 +18,6 @@ import org.camunda.bpm.engine.identity.GroupQuery;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.identity.UserQuery;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
-import org.camunda.bpm.engine.task.Task;
-import org.camunda.bpm.engine.task.TaskQuery;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -33,20 +31,8 @@ public abstract class AbstractIdentityRestServiceQueryTest extends AbstractRestS
   @Before
   public void setUpRuntimeData() {
     createMockIdentityQueries();
-    createMockTaskQuery();
   }
   
-  private void createMockTaskQuery() {
-    List<Task> mockedTasks = MockProvider.createMockTasks();
-    
-    TaskQuery sampleTaskQuery = mock(TaskQuery.class);
-    when(sampleTaskQuery.list()).thenReturn(mockedTasks);
-    when(sampleTaskQuery.count()).thenReturn((long) mockedTasks.size());
-    when(sampleTaskQuery.taskCandidateGroup(anyString())).thenReturn(sampleTaskQuery);
-  
-    when(processEngine.getTaskService().createTaskQuery()).thenReturn(sampleTaskQuery);
-  }
-
   private void createMockIdentityQueries() {
     UserQuery sampleUserQuery = mock(UserQuery.class);
     

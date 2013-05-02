@@ -19,6 +19,14 @@ import org.camunda.bpm.engine.rest.dto.task.UserDto;
 
 public class IdentityRestServiceImpl extends AbstractRestProcessEngineAware implements IdentityRestService {
 
+  public IdentityRestServiceImpl() {
+    super();
+  }
+  
+  public IdentityRestServiceImpl(String engineName) {
+    super(engineName);
+  }
+
   @Override
   public GroupInfoDto getGroupInfo(String userId) {
     if (userId == null) {
