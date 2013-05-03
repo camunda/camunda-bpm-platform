@@ -22,6 +22,14 @@ import org.camunda.bpm.engine.rest.dto.message.MessageDto;
 
 public class MessageRestServiceImpl extends AbstractRestProcessEngineAware implements MessageRestService {
 
+  public MessageRestServiceImpl() {
+    super();
+  }
+  
+  public MessageRestServiceImpl(String engineName) {
+    super(engineName);
+  }
+  
   @Override
   public void deliverMessage(MessageDto messageDto) {
 

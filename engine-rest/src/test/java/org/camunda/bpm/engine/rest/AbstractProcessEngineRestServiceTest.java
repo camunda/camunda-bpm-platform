@@ -5,6 +5,7 @@ import static com.jayway.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -12,7 +13,9 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.core.Response.Status;
 
@@ -26,6 +29,7 @@ import org.camunda.bpm.engine.identity.GroupQuery;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.identity.UserQuery;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.rest.helper.EqualsMap;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
@@ -43,6 +47,7 @@ public abstract class AbstractProcessEngineRestServiceTest extends
   protected static final String PROCESS_INSTANCE_URL = SINGLE_ENGINE_URL + "/process-instance/{id}";
   protected static final String TASK_URL = SINGLE_ENGINE_URL + "/task/{id}";
   protected static final String IDENTITY_GROUPS_URL = SINGLE_ENGINE_URL + "/identity/groups";
+  protected static final String MESSAGE_URL = SINGLE_ENGINE_URL + "/message";
   
   protected String EXAMPLE_ENGINE_NAME = "anEngineName";
 
@@ -60,6 +65,11 @@ public abstract class AbstractProcessEngineRestServiceTest extends
     mockTaskService = mock(TaskService.class);
     mockIdentityService = mock(IdentityService.class);
     
+    when(namedProcessEngine.getRepositoryService()).thenReturn(mockRepoService);
+    when(namedProcessEngine.getRuntimeService()).thenReturn(mockRuntimeService);
+    when(namedProcessEngine.getTaskService()).thenReturn(mockTaskService);
+    when(namedProcessEngine.getIdentityService()).thenReturn(mockIdentityService);
+    
     createProcessDefinitionMock();
     createProcessInstanceMock();
     createTaskMock();
@@ -71,7 +81,6 @@ public abstract class AbstractProcessEngineRestServiceTest extends
     ProcessDefinition mockDefinition = MockProvider.createMockDefinition();
     
     when(mockRepoService.getProcessDefinition(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID))).thenReturn(mockDefinition);
-    when(namedProcessEngine.getRepositoryService()).thenReturn(mockRepoService);
   }
   
   private void createProcessInstanceMock() {
@@ -80,7 +89,6 @@ public abstract class AbstractProcessEngineRestServiceTest extends
     ProcessInstanceQuery mockInstanceQuery = mock(ProcessInstanceQuery.class);
     when(mockInstanceQuery.processInstanceId(eq(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID))).thenReturn(mockInstanceQuery);
     when(mockInstanceQuery.singleResult()).thenReturn(mockInstance);
-    when(namedProcessEngine.getRuntimeService()).thenReturn(mockRuntimeService);
     when(mockRuntimeService.createProcessInstanceQuery()).thenReturn(mockInstanceQuery);
   }
   
@@ -91,7 +99,6 @@ public abstract class AbstractProcessEngineRestServiceTest extends
     when(mockTaskQuery.taskId(eq(MockProvider.EXAMPLE_TASK_ID))).thenReturn(mockTaskQuery);
     when(mockTaskQuery.singleResult()).thenReturn(mockTask);
     when(mockTaskService.createTaskQuery()).thenReturn(mockTaskQuery);
-    when(namedProcessEngine.getTaskService()).thenReturn(mockTaskService);
   }
   
   private void createIdentityMocks() {
@@ -113,7 +120,6 @@ public abstract class AbstractProcessEngineRestServiceTest extends
     when(sampleGroupQuery.asc()).thenReturn(sampleGroupQuery);
     when(sampleGroupQuery.list()).thenReturn(mockGroups);
     
-    when(namedProcessEngine.getIdentityService()).thenReturn(mockIdentityService);
     when(mockIdentityService.createGroupQuery()).thenReturn(sampleGroupQuery);
     when(mockIdentityService.createUserQuery()).thenReturn(sampleUserQuery);
   }
@@ -184,6 +190,21 @@ public abstract class AbstractProcessEngineRestServiceTest extends
     .when().get(IDENTITY_GROUPS_URL);
     
     verify(namedProcessEngine).getIdentityService();
+    verifyZeroInteractions(processEngine);
+  }
+  
+  @Test
+  public void testMessageServiceEngineAccess() {
+    String messageName = "aMessage";
+    Map<String, Object> messageParameters = new HashMap<String, Object>();
+    messageParameters.put("messageName", messageName);
+    
+    given().contentType(POST_JSON_CONTENT_TYPE).body(messageParameters).pathParam("name", EXAMPLE_ENGINE_NAME)
+      .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
+      .when().post(MESSAGE_URL);
+
+    verify(mockRuntimeService).correlateMessage(eq(messageName), eq((String) null), 
+        argThat(new EqualsMap(null)), argThat(new EqualsMap(null)));
     verifyZeroInteractions(processEngine);
   }
 }
