@@ -1088,7 +1088,7 @@ public class DbSqlSession implements Session {
       dbSchemaUpdate();
     }
     
-    checkHistoryLevel();
+//    checkHistoryLevel();
   }
 
   public void performSchemaOperationsProcessEngineClose() {
