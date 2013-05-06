@@ -24,8 +24,8 @@
 		</xa-pool>
 		<transaction-isolation>TRANSACTION_READ_COMMITTED</transaction-isolation>
 		<validation>
-			<exception-sorter class-name="org.jboss.jca.adapters.jdbc.extensions.mysql.MySQLExceptionSorter" />
-			<valid-connection-checker class-name="org.jboss.jca.adapters.jdbc.extensions.mysql.MySQLValidConnectionChecker" />
+			<exception-sorter class-name="org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLExceptionSorter" />
+			<valid-connection-checker class-name="org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLValidConnectionChecker" />
 			<validate-on-match>false</validate-on-match>
 			<background-validation>false</background-validation>
 		</validation>
@@ -47,8 +47,8 @@
 		</xa-pool>
 		<transaction-isolation>TRANSACTION_READ_COMMITTED</transaction-isolation>
 		<validation>
-			<exception-sorter class-name="org.jboss.jca.adapters.jdbc.extensions.mysql.MySQLExceptionSorter" />
-			<valid-connection-checker class-name="org.jboss.jca.adapters.jdbc.extensions.mysql.MySQLValidConnectionChecker" />
+			<exception-sorter class-name="org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLExceptionSorter" />
+			<valid-connection-checker class-name="org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLValidConnectionChecker" />
 			<validate-on-match>false</validate-on-match>
 			<background-validation>false</background-validation>
 		</validation>

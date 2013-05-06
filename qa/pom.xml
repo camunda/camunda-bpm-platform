@@ -224,7 +224,7 @@
         <database.user>${env.oracle.database.user}</database.user>
         <database.password>${env.oracle.database.password}</database.password>
         <database.driver>oracle.jdbc.OracleDriver</database.driver>
-        <database.datasource.class>oracle.jdbc.xa.OracleXADataSource</database.datasource.class>
+        <database.datasource.class>oracle.jdbc.xa.client.OracleXADataSource</database.datasource.class>
         <database.datasource.class.type>${database.datasource.class.type.xa}</database.datasource.class.type>
         <database.port>${env.oracle.database.port}</database.port>
         <database.url>jdbc:oracle:thin:@${database.host}:${database.port}:xe</database.url>
@@ -290,7 +290,7 @@
         <database.user>${env.mysql.database.user}</database.user>
         <database.password>${env.mysql.database.password}</database.password>
         <database.driver>com.mysql.jdbc.Driver</database.driver>
-        <database.datasource.class>com.mysql.jdbc.jdbc2.optional.MysqlXAConnection</database.datasource.class>
+        <database.datasource.class>com.mysql.jdbc.jdbc2.optional.MysqlXADataSource</database.datasource.class>
         <database.datasource.class.type>${database.datasource.class.type.xa}</database.datasource.class.type>
         <database.port>${env.mysql.database.port}</database.port>
         <database.url>jdbc:mysql://${database.host}:${database.port}/${database.name}</database.url>
