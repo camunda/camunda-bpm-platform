@@ -15,16 +15,34 @@
   </parent>
 
   <modules>
-    <module>cockpit</module>
-    <module>cockpit-plugin/core</module>
-    <module>cockpit-plugin/sample</module>
+    <module>cockpit-core</module>
+    <module>cockpit-webapp</module>
   </modules>
 
+  <properties>
+    <tomcat6.connector.http.port>48080</tomcat6.connector.http.port>
+    <tomcat6.connector.http.redirectPort>48443</tomcat6.connector.http.redirectPort>
+    <tomcat6.connector.ajp.port>48009</tomcat6.connector.ajp.port>
+    <tomcat6.connector.ajp.redirectPort>48443</tomcat6.connector.ajp.redirectPort>
+    <tomcat6.server.port>48005</tomcat6.server.port>
+  </properties>
+  
   <dependencyManagement>
     <dependencies>
       <dependency>
         <groupId>org.camunda.bpm.cockpit</groupId>
-        <artifactId>camunda-cockpit-plugin-core</artifactId>
+        <artifactId>camunda-cockpit-core</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.camunda.bpm</groupId>
+        <artifactId>camunda-engine-rest</artifactId>
+        <classifier>classes</classifier>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.camunda.bpm</groupId>
+        <artifactId>camunda-engine-rest</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
@@ -34,6 +52,6 @@
         <scope>import</scope>
         <type>pom</type>
       </dependency>
-    </dependencies>
+      </dependencies>
   </dependencyManagement>
 </project>
