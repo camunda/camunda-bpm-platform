@@ -76,4 +76,8 @@ public interface ProcessInstanceRestService {
   @GET
   @Path("/{id}/variables")
   VariableListDto getVariables(@PathParam("id") String processInstanceId);
+  
+  @DELETE
+  @Path("/{id}")
+  void deleteProcessInstance(@PathParam("id") String processInstanceId);
 }

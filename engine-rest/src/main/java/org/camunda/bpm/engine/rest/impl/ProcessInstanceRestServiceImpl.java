@@ -20,6 +20,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.rest.ProcessInstanceRestService;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
@@ -131,5 +132,14 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
     }
 
     return new VariableListDto(values);
+  }
+
+  @Override
+  public void deleteProcessInstance(String processInstanceId) {
+	try {
+	  getProcessEngine().getRuntimeService().deleteProcessInstance(processInstanceId, "");
+	} catch (ProcessEngineException pex){
+	  throw new WebApplicationException(Status.BAD_REQUEST);
+	}	
   }
 }
