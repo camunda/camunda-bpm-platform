@@ -94,32 +94,30 @@ import org.camunda.bpm.engine.delegate.JavaDelegate;
  * the actual component instance is looked up and invoked.</p>
  *
  * @author Daniel Meyer
+ * @author Andreas Drobisch
  * 
  */
 public class EjbProcessApplication extends AbstractProcessApplication {
 
-  private String sessionObjectName;
-  private String eeModulePath;
-
   private EjbProcessApplicationReference ejbProcessApplicationReference;
-  
+  private NameLookup names;
+
   public ProcessApplicationReference getReference() {    
     ensureInitialized();
     return ejbProcessApplicationReference;
   }
 
-  protected void ensureInitialized() {    
-    if(sessionObjectName == null) {
-      sessionObjectName = composeSessionObjectName();
-    }
+  protected void ensureInitialized() {
+    names = lookupNames();
+
     if(ejbProcessApplicationReference == null) {
-      ejbProcessApplicationReference = new EjbProcessApplicationReference(eeModulePath, sessionObjectName);      
+      ejbProcessApplicationReference = new EjbProcessApplicationReference(names);
     }
   }
   
   protected String autodetectProcessApplicationName() {
     ensureInitialized();
-    return eeModulePath;
+    return names.processApplicationName;
   }
   
   public <T> T execute(Callable<T> callable) throws ProcessApplicationExecutionException {
@@ -129,34 +127,46 @@ public class EjbProcessApplication extends AbstractProcessApplication {
       throw new ProcessApplicationExecutionException(e);
     }
   }
+
+  public class NameLookup {
+    public final String appName;
+    public final String appClassName;
+    public final String moduleName;
+    public final String processApplicationName;
+
+    private NameLookup(String appName, String moduleName, String processApplicationName, String appClassName) {
+      this.appName = appName;
+      this.appClassName = appClassName;
+      this.moduleName = moduleName;
+      this.processApplicationName = processApplicationName;
+    }
+  }
   
-  protected String composeSessionObjectName() {
-    
+  private NameLookup lookupNames() {
     try {
 
       InitialContext initialContext = new InitialContext();
 
       String appName = (String) initialContext.lookup("java:app/AppName");
       String moduleName = (String) initialContext.lookup("java:module/ModuleName");
+      String processApplicationName = null;
 
       if (moduleName != null && !moduleName.equals(appName)) {
         // make sure that if an EAR carries multiple PAs, they are correctly
-        // identified by appName + moduleName        
-        // NOTE: this may be broken on IBM since there WARs or EJBs 
-        // are always wrapped inside an EAR deployment. 
-        eeModulePath = appName + "/" + moduleName;
+        // identified by appName + moduleName
+        // NOTE: this does not work on IBM since there WARs or EJBs
+        // are always wrapped inside an EAR deployment.
+        // This is handled with a special ProcessApplicationManager in the WAS service
+        processApplicationName = appName + "/" + moduleName;
       } else {
-        eeModulePath = appName;
+        processApplicationName = appName;
       }
 
-      Class<? extends EjbProcessApplication> applicationClass = getClass();
-      return "java:global/" + eeModulePath + "/" + applicationClass.getSimpleName() + "!" + applicationClass.getName();  
+      return new NameLookup(appName, moduleName, processApplicationName, getClass().getSimpleName());
 
     } catch (NamingException e) {
       throw new ProcessEngineException("Could not autodetect EjbProcessApplicationName: "+e.getMessage(), e);
     }
-    
-    
   }
-  
+
 }
