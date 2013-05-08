@@ -17,7 +17,9 @@ import java.util.List;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineInfo;
 import org.camunda.bpm.engine.ProcessEngines;
+import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.test.PvmTestCase;
+import org.camunda.bpm.engine.impl.test.TestHelper;
 
 /**
  * @author Tom Baeyens
@@ -28,9 +30,11 @@ public class ProcessEnginesTest extends PvmTestCase {
     super.setUp();
     ProcessEngines.destroy();
     ProcessEngines.init();
+    TestHelper.createOrUpdateHistoryLevel(((ProcessEngineImpl) ProcessEngines.getDefaultProcessEngine()).getProcessEngineConfiguration());
   }
   
   protected void tearDown() throws Exception {
+    TestHelper.deleteHistoryLevel(((ProcessEngineImpl) ProcessEngines.getDefaultProcessEngine()).getProcessEngineConfiguration());
     ProcessEngines.destroy();
     super.tearDown();
   }

@@ -5,8 +5,11 @@
  * The BPMN 2.0 transformer module
  *
  * This module provides the functionality necessary to transform
- * a BPMN 2.0 XML file into a set of ActivityDefinitions that can be consumed
- * by the process engine.
+ * a BPMN 2.0 XML file into a Tree of Java Script objects that can be consumed
+ * by both the Executor (process engine) and the Renderer
+ * 
+ * @author Daniel Meyer
+ * @author Andreas Drobisch
  */
 define([], function () {
 
@@ -105,6 +108,7 @@ define([], function () {
 
       bpmnObject.outgoing = [];
       bpmnObject.listeners = [];
+      bpmnObject.properties = {};
 
       var attributes = element.attributes;
 
@@ -337,8 +341,10 @@ define([], function () {
 
         } else if(elementType == "subProcess") {
           bpmnObject = transformElementsContainer(element, scopeActivity, sequenceFlows, bpmnDiElementIndex);
-        } else if(!!element && element.nodeName != "sequenceFlow") {
+
+        } else if(!!element && element.nodeName != "sequenceFlow" && element.nodeType == 1 /* (nodeType=1 => element nodes only) */ ) {  
           bpmnObject = createBpmnObject(element, scopeActivity, bpmnDiElementIndex);
+
         }
 
         if(!!bpmnObject) {

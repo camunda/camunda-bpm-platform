@@ -19,7 +19,10 @@ import junit.framework.TestCase;
 
 import org.apache.ibatis.datasource.pooled.PooledDataSource;
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
+import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
 
 /**
@@ -45,15 +48,13 @@ public class DatabaseTablePrefixTest extends TestCase {
     connection.close();
 
     // configure & build two different process engines, each having a separate table prefix 
-    ProcessEngineConfigurationImpl config1 = (ProcessEngineConfigurationImpl) ProcessEngineConfigurationImpl
-            .createStandaloneInMemProcessEngineConfiguration()
+    ProcessEngineConfigurationImpl config1 = createCustomProcessEngineConfiguration()
             .setDataSource(pooledDataSource)
             .setDatabaseSchemaUpdate("NO_CHECK"); // disable auto create/drop schema
     config1.setDatabaseTablePrefix("SCHEMA1.");
     ProcessEngine engine1 = config1.buildProcessEngine();
     
-    ProcessEngineConfigurationImpl config2 = (ProcessEngineConfigurationImpl) ProcessEngineConfigurationImpl
-            .createStandaloneInMemProcessEngineConfiguration()
+    ProcessEngineConfigurationImpl config2 = createCustomProcessEngineConfiguration()
             .setDataSource(pooledDataSource)
             .setDatabaseSchemaUpdate("NO_CHECK"); // disable auto create/drop schema        
     config2.setDatabaseTablePrefix("SCHEMA2.");
@@ -86,6 +87,33 @@ public class DatabaseTablePrefixTest extends TestCase {
       engine1.close();
       engine2.close();
     }
+  }
+
+  
+  //----------------------- TEST HELPERS -----------------------
+  
+  // allows to return a process engine configuration which doesn't create a schema when it's build.
+  private static class CustomStandaloneInMemProcessEngineConfiguration extends StandaloneInMemProcessEngineConfiguration {
+    
+    public ProcessEngine buildProcessEngine() {
+      init();
+      return new NoSchemaProcessEngineImpl(this);
+    }
+    
+    class NoSchemaProcessEngineImpl extends ProcessEngineImpl {
+      public NoSchemaProcessEngineImpl(ProcessEngineConfigurationImpl processEngineConfiguration) {
+        super(processEngineConfiguration);
+      }
+      
+      protected void executeSchemaOperations() {
+        // nop - do not execute create schema operations
+      }
+    }
+    
+  }
+  
+  private static ProcessEngineConfigurationImpl createCustomProcessEngineConfiguration() {
+    return new CustomStandaloneInMemProcessEngineConfiguration().setHistory(ProcessEngineConfiguration.HISTORY_FULL);
   }
 
 }
