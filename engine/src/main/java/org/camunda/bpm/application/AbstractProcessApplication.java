@@ -33,7 +33,7 @@ import org.camunda.bpm.engine.repository.DeploymentBuilder;
  * @author Daniel Meyer
  *
  */
-public abstract class AbstractProcessApplication {
+public abstract class AbstractProcessApplication implements ProcessApplicationInterface {
   
   private final static Logger LOGGER = Logger.getLogger(AbstractProcessApplication.class.getName());
   

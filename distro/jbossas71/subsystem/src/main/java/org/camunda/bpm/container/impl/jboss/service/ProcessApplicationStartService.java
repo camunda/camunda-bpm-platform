@@ -22,11 +22,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.camunda.bpm.application.AbstractProcessApplication;
-import org.camunda.bpm.application.PostDeploy;
-import org.camunda.bpm.application.PreUndeploy;
-import org.camunda.bpm.application.ProcessApplicationDeploymentInfo;
-import org.camunda.bpm.application.ProcessApplicationInfo;
+import org.camunda.bpm.application.*;
 import org.camunda.bpm.application.impl.ProcessApplicationDeploymentInfoImpl;
 import org.camunda.bpm.application.impl.ProcessApplicationInfoImpl;
 import org.camunda.bpm.container.impl.jmx.deployment.util.InjectionUtil;
@@ -75,7 +71,7 @@ public class ProcessApplicationStartService implements Service<ProcessApplicatio
   
   // for view-exposing ProcessApplicationComponents
   protected InjectedValue<ComponentView> paComponentViewInjector = new InjectedValue<ComponentView>();
-  protected InjectedValue<AbstractProcessApplication> noViewProcessApplication = new InjectedValue<AbstractProcessApplication>();
+  protected InjectedValue<ProcessApplicationInterface> noViewProcessApplication = new InjectedValue<ProcessApplicationInterface>();
   
   /** injector for the default process engine */
   protected InjectedValue<ProcessEngine> defaultProcessEngineInjector = new InjectedValue<ProcessEngine>();
@@ -101,11 +97,11 @@ public class ProcessApplicationStartService implements Service<ProcessApplicatio
     try {
       
       // get the process application component
-      AbstractProcessApplication processApplication = null;      
+      ProcessApplicationInterface processApplication = null;
       ComponentView componentView = paComponentViewInjector.getOptionalValue();
       if(componentView != null) {
         reference = componentView.createInstance();
-        processApplication = (AbstractProcessApplication) reference.getInstance();
+        processApplication = (ProcessApplicationInterface) reference.getInstance();
       } else {
         processApplication = noViewProcessApplication.getValue();
       }
@@ -164,11 +160,11 @@ public class ProcessApplicationStartService implements Service<ProcessApplicatio
     try {
       
       // get the process application component
-      AbstractProcessApplication processApplication = null;      
+      ProcessApplicationInterface processApplication = null;
       ComponentView componentView = paComponentViewInjector.getOptionalValue();
       if(componentView != null) {
         reference = componentView.createInstance();
-        processApplication = (AbstractProcessApplication) reference.getInstance();
+        processApplication = (ProcessApplicationInterface) reference.getInstance();
       } else {
         processApplication = noViewProcessApplication.getValue();       
       }
@@ -186,7 +182,7 @@ public class ProcessApplicationStartService implements Service<ProcessApplicatio
     
   }
   
-  protected void invokePostDeploy(AbstractProcessApplication processApplication) throws ClassNotFoundException, StartException {
+  protected void invokePostDeploy(ProcessApplicationInterface processApplication) throws ClassNotFoundException, StartException {
     Class<?> paClass = getPaClass(postDeployDescription);      
     Method postDeployMethod = InjectionUtil.detectAnnotatedMethod(paClass, PostDeploy.class);
     if(postDeployMethod != null) {
@@ -198,7 +194,7 @@ public class ProcessApplicationStartService implements Service<ProcessApplicatio
     }
   }
   
-  protected void invokePreUndeploy(AbstractProcessApplication processApplication) throws ClassNotFoundException {
+  protected void invokePreUndeploy(ProcessApplicationInterface processApplication) throws ClassNotFoundException {
     if(preUndeployDescription != null) {
       Class<?> paClass = getPaClass(preUndeployDescription);      
       Method preUndeployMethod = InjectionUtil.detectAnnotatedMethod(paClass, PreUndeploy.class);
@@ -270,7 +266,7 @@ public class ProcessApplicationStartService implements Service<ProcessApplicatio
     return deploymentService.getValue();
   }
     
-  public InjectedValue<AbstractProcessApplication> getNoViewProcessApplication() {
+  public InjectedValue<ProcessApplicationInterface> getNoViewProcessApplication() {
     return noViewProcessApplication;
   }
   
