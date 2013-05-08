@@ -521,7 +521,8 @@ public interface RuntimeService {
    * 
    * @param messageName
    *          the name of the message event
-   * @throws ProcessEngineException if none or more than one execution or process definition is correlated
+   * @throws MismatchingMessageCorrelationException if none or more than one execution or process definition is correlated
+   * @throws ProcessEngineException if messageName is null
    */
   void correlateMessage(String messageName);
   
@@ -542,7 +543,8 @@ public interface RuntimeService {
    *          the name of the message event
    * @param businessKey
    *          the business key of process instances to correlate against
-   * @throws ProcessEngineException if none or more than one execution or process definition is correlated
+   * @throws MismatchingMessageCorrelationException if none or more than one execution or process definition is correlated
+   * @throws ProcessEngineException if messageName is null
    */
   void correlateMessage(String messageName, String businessKey);
   
@@ -564,7 +566,8 @@ public interface RuntimeService {
    *          the name of the message event
    * @param correlationKeys
    *          a map of key value pairs that are used to correlate the message to an execution
-   * @throws ProcessEngineException if none or more than one execution or process definition is correlated
+   * @throws MismatchingMessageCorrelationException if none or more than one execution or process definition is correlated
+   * @throws ProcessEngineException if messageName is null
    */
   void correlateMessage(String messageName, Map<String, Object> correlationKeys);
   
@@ -586,7 +589,8 @@ public interface RuntimeService {
    *          the name of the message event
    * @param businessKey
    *          the business key of process instances to correlate against
-   * @throws ProcessEngineException if none or more than one execution or process definition is correlated
+   * @throws MismatchingMessageCorrelationException if none or more than one execution or process definition is correlated
+   * @throws ProcessEngineException if messageName is null
    */
   void correlateMessage(String messageName, String businessKey, Map<String, Object> processVariables);
   
@@ -611,7 +615,8 @@ public interface RuntimeService {
    *          a map of key value pairs that are used to correlate the message to an execution
    * @param processVariables
    *          a map of variables added to the execution or newly created process instance
-   * @throws ProcessEngineException if none or more than one execution or process definition is correlated
+   * @throws MismatchingMessageCorrelationException if none or more than one execution or process definition is correlated
+   * @throws ProcessEngineException if messageName is null
    */
   void correlateMessage(String messageName, Map<String, Object> correlationKeys, Map<String, Object> processVariables);
   
@@ -639,7 +644,8 @@ public interface RuntimeService {
    *          a map of key value pairs that are used to correlate the message to an execution
    * @param processVariables
    *          a map of variables added to the execution or newly created process instance
-   * @throws ProcessEngineException if none or more than one execution or process definition is correlated
+   * @throws MismatchingMessageCorrelationException if none or more than one execution or process definition is correlated
+   * @throws ProcessEngineException if messageName is null
    */
   void correlateMessage(String messageName, String businessKey, Map<String, Object> correlationKeys, Map<String, Object> processVariables);
 }

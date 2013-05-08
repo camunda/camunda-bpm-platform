@@ -5,7 +5,6 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
   <process-engine name="default">
-    <job-acquisition>default</job-acquisition>
     <configuration>org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration</configuration>
   </process-engine>
 

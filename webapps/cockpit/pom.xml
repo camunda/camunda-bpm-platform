@@ -10,6 +10,7 @@
     <relativePath>../..</relativePath>
   </parent>
 
+  <groupId>org.camunda.bpm.cockpit</groupId>
   <artifactId>camunda-cockpit</artifactId>
   <packaging>war</packaging>
   <name>camunda BPM - cockpit</name>
@@ -86,9 +87,25 @@
         <artifactId>maven-war-plugin</artifactId>
         <configuration>
           <failOnMissingWebXml>false</failOnMissingWebXml>
+          <webResources>
+            <resource>
+              <filtering>true</filtering>
+              <directory>src/main/webapp</directory>
+              <!-- no filtering for favicon because linux destroys images through carriage return -->
+              <excludes>
+                <exclude>assets/img/favicon.ico</exclude>
+              </excludes>
+            </resource>
+          </webResources>
+          <archive>
+            <manifest>
+              <!-- Maven project version number -->
+              <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+            </manifest>
+          </archive>
         </configuration>
       </plugin>
     </plugins>
   </build>
-  <groupId>org.camunda.bpm.cockpit</groupId>
+  
 </project>

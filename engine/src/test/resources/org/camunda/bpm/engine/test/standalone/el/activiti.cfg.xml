@@ -20,6 +20,9 @@
     <!-- mail server configurations -->
     <property name="mailServerPort" value="5025" />    
     
+    <!-- history level -->
+    <property name="history" value="full" />
+    
     <!-- Expose beans to expressions -->
     <property name="beans">
       <map>

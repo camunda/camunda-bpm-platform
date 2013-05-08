@@ -45,7 +45,7 @@
       <outgoing>reviewNotSuccessful</outgoing>
       <outgoing>reviewSuccessful</outgoing>
     </exclusiveGateway>
-    <userTask id="prepareBankTransfer" activiti:formKey="embedded:app:forms/prepare-bank-transfer.html" activiti:candidateGroups="accounting" name="Prepare Bank Transfer">
+    <userTask id="prepareBankTransfer" activiti:formKey="embedded:app:forms/prepare-bank-transfer.html" activiti:candidateGroups="accounting" name="Prepare&#xD;&#xA;Bank&#xD;&#xA;Transfer">
       <incoming>invoiceApproved</incoming>
       <outgoing>SequenceFlow_2</outgoing>
     </userTask>

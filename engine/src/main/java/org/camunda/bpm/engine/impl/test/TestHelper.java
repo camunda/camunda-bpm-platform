@@ -35,6 +35,7 @@ import org.camunda.bpm.engine.impl.db.DbSqlSession;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
+import org.camunda.bpm.engine.impl.persistence.entity.PropertyEntity;
 import org.camunda.bpm.engine.impl.util.ClassNameUtil;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
 import org.camunda.bpm.engine.repository.DeploymentBuilder;
@@ -157,6 +158,7 @@ public abstract class TestHelper {
             DbSqlSession dbSqlSession = commandContext.getSession(DbSqlSession.class);
             dbSqlSession.dbSchemaDrop();
             dbSqlSession.dbSchemaCreate();
+            dbSqlSession.dbCreateHistoryLevel();
             return null;
           }
         });
@@ -235,4 +237,61 @@ public abstract class TestHelper {
     }
     processEngines.clear();
   }
+  
+  public static void createSchema(ProcessEngineConfigurationImpl processEngineConfiguration) {
+    processEngineConfiguration.getCommandExecutorTxRequired()
+        .execute(new Command<Object>() {
+          public Object execute(CommandContext commandContext) {
+            DbSqlSession dbSqlSession = commandContext.getDbSqlSession();
+            dbSqlSession.executeMandatorySchemaResource("create", "engine");
+            dbSqlSession.executeMandatorySchemaResource("create", "history");
+            dbSqlSession.executeMandatorySchemaResource("create", "identity");
+            return null;
+          }
+        });
+  }
+  
+  public static void dropSchema(ProcessEngineConfigurationImpl processEngineConfiguration) {
+    processEngineConfiguration.getCommandExecutorTxRequired()
+        .execute(new Command<Object>() {
+         public Object execute(CommandContext commandContext) {
+           commandContext.getDbSqlSession().dbSchemaDrop();
+           return null;
+         }
+        });
+  }
+  
+  public static void createOrUpdateHistoryLevel(final ProcessEngineConfigurationImpl processEngineConfiguration) {
+    processEngineConfiguration.getCommandExecutorTxRequired()
+      .execute(new Command<Object>() {
+       public Object execute(CommandContext commandContext) {
+         DbSqlSession dbSqlSession = commandContext.getDbSqlSession();
+         PropertyEntity historyLevelProperty = dbSqlSession.selectById(PropertyEntity.class, "historyLevel");
+         if (historyLevelProperty != null) {
+           if (processEngineConfiguration.getHistoryLevel() != new Integer(historyLevelProperty.getValue())) {
+             historyLevelProperty.setValue(Integer.toString(processEngineConfiguration.getHistoryLevel()));
+             dbSqlSession.update(historyLevelProperty);
+           }
+         } else {
+           commandContext.getDbSqlSession().dbCreateHistoryLevel();
+         }
+         return null;
+       }
+      });
+  }
+  
+  public static void deleteHistoryLevel(ProcessEngineConfigurationImpl processEngineConfiguration) {
+    processEngineConfiguration.getCommandExecutorTxRequired()
+      .execute(new Command<Object>() {
+       public Object execute(CommandContext commandContext) {
+         DbSqlSession dbSqlSession = commandContext.getDbSqlSession();
+         PropertyEntity historyLevelProperty = dbSqlSession.selectById(PropertyEntity.class, "historyLevel");
+         if (historyLevelProperty != null) {
+           dbSqlSession.delete(historyLevelProperty);
+         }
+         return null;
+       }
+      });
+  }
+
 }

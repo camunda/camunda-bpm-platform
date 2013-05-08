@@ -77,7 +77,7 @@ public class ProcessEngineImpl implements ProcessEngine {
     this.historyLevel = processEngineConfiguration.getHistoryLevel();
     this.transactionContextFactory = processEngineConfiguration.getTransactionContextFactory();
     
-    commandExecutorSchemaOperations.execute(new SchemaOperationsProcessEngineBuild());
+    executeSchemaOperations();
 
     if (name == null) {
       log.info("default activiti ProcessEngine created");
@@ -91,6 +91,10 @@ public class ProcessEngineImpl implements ProcessEngine {
       // register process engine with Job Executor
       jobExecutor.registerProcessEngine(this);      
     }
+  }
+  
+  protected void executeSchemaOperations() {
+    commandExecutorSchemaOperations.execute(new SchemaOperationsProcessEngineBuild());
   }
   
   public void close() {

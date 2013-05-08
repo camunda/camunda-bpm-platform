@@ -12,21 +12,21 @@
  */
 package org.camunda.bpm.engine.rest;
 
-import javax.ws.rs.GET;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
-import org.camunda.bpm.engine.rest.dto.task.GroupInfoDto;
+import org.camunda.bpm.engine.rest.dto.message.MessageDto;
 
-@Path(IdentityRestService.PATH)
+@Path(MessageRestService.PATH)
 @Produces(MediaType.APPLICATION_JSON)
-public interface IdentityRestService {
-
-  public static final String PATH = "/identity";
+public interface MessageRestService {
   
-  @GET
-  @Path("/groups")
-  GroupInfoDto getGroupInfo(@QueryParam("userId") String userId);
+  public static final String PATH = "/message";
+
+  @POST
+  @Consumes(MediaType.APPLICATION_JSON)
+  void deliverMessage(MessageDto messageDto);
 }

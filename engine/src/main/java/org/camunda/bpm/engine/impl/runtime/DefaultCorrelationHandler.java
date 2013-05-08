@@ -16,7 +16,7 @@ package org.camunda.bpm.engine.impl.runtime;
 import java.util.List;
 import java.util.Map;
 
-import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.MismatchingMessageCorrelationException;
 import org.camunda.bpm.engine.impl.ExecutionQueryImpl;
 import org.camunda.bpm.engine.impl.ProcessDefinitionQueryImpl;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -48,7 +48,8 @@ public class DefaultCorrelationHandler implements CorrelationHandler {
     List<Execution> matchingExecutions = query.executeList(commandContext, null);
     
     if (matchingExecutions.size() > 1) {
-      throw new ProcessEngineException(String.valueOf(matchingExecutions.size()) + " executions match the correlation keys. Should be one or zero.");
+      throw new MismatchingMessageCorrelationException(messageName, businessKey, correlationKeys, 
+          String.valueOf(matchingExecutions.size()) + " executions match the correlation keys. Should be one or zero.");
     }
     
     Execution matchingExecution = null;
@@ -64,7 +65,8 @@ public class DefaultCorrelationHandler implements CorrelationHandler {
     List<ProcessDefinition> matchingDefinitions = query.executeList(commandContext, null);
     
     if (matchingDefinitions.size() > 1) {
-      throw new ProcessEngineException(String.valueOf(matchingDefinitions.size()) + " process definitions match the message " + 
+      throw new MismatchingMessageCorrelationException(messageName, 
+          String.valueOf(matchingDefinitions.size()) + " process definitions match the message " + 
           messageName + ". Should be one or zero.");
     }
     
