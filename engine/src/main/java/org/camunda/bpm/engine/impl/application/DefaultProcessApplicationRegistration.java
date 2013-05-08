@@ -26,8 +26,7 @@ public class DefaultProcessApplicationRegistration implements ProcessApplication
   protected ProcessApplicationReference reference;
 
   /**
-   * @param processApplicationManager
-   * @param reference 
+   * @param reference
    */
   public DefaultProcessApplicationRegistration(ProcessApplicationReference reference, String deploymentId, String processEnginenName) {
     this.reference = reference;
