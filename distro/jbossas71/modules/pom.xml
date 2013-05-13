@@ -66,7 +66,7 @@
                   <regexpmapper from="^(.*)/([^/]+)/([^/]*)$$" to="\1/main/\3" handledirsep="yes" />
                 </copy>
 
-                <delete dir="target/modules/com/camunda/fox" />
+                <delete dir="target/modules/org/camunda/bpm" />
 
                 <!-- copy all files again, but this only matches fox files and this treatment makes is maven 2/3 compatible => timestamped snapshot -->
                 <copy todir="target/modules" flatten="false">

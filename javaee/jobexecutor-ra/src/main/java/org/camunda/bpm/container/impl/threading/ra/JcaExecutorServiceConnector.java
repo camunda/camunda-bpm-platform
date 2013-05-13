@@ -62,7 +62,7 @@ public class JcaExecutorServiceConnector implements ResourceAdapter {
 
   public void endpointActivation(MessageEndpointFactory endpointFactory, ActivationSpec spec) throws ResourceException {
     if(jobHandlerActivation != null) {
-      throw new ResourceException("The fox platform job executor can only service a single MessageEndpoint for job execution. " +
+      throw new ResourceException("The camunda BPM job executor can only service a single MessageEndpoint for job execution. " +
       		"Make sure not to deploy more than one MDB implementing the '"+JobExecutionHandler.class.getName()+"' interface.");
     }
     JobExecutionHandlerActivation activation = new JobExecutionHandlerActivation(this, endpointFactory, (JobExecutionHandlerActivationSpec) spec);
