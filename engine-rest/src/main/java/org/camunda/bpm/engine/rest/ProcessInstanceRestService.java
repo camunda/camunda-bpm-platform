@@ -68,6 +68,7 @@ public interface ProcessInstanceRestService {
   @Path("/count")
   CountResultDto getProcessInstancesCount(@Context UriInfo uriInfo);
   
+  
   @POST
   @Path("/count")
   @Consumes(MediaType.APPLICATION_JSON)
