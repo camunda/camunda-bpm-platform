@@ -42,7 +42,7 @@ public class TasklistIT {
     WebElement submit = wait.until(ExpectedConditions.presenceOfElementLocated(By.cssSelector(".form-signin")));
     submit.submit();
 
-    wait.until(ExpectedConditions.textToBePresentInElement(By.cssSelector("td"), "assign approver"));
+    wait.until(ExpectedConditions.textToBePresentInElement(By.cssSelector("td"), "Assign Approver"));
   }
 
   @After

@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.rest.util;
 import java.util.Properties;
 
 import org.camunda.bpm.engine.rest.impl.IdentityRestServiceImpl;
+import org.camunda.bpm.engine.rest.impl.MessageRestServiceImpl;
 import org.camunda.bpm.engine.rest.impl.ProcessDefinitionRestServiceImpl;
 import org.camunda.bpm.engine.rest.impl.ProcessEngineRestServiceImpl;
 import org.camunda.bpm.engine.rest.impl.ProcessInstanceRestServiceImpl;
@@ -52,6 +53,7 @@ public class ResteasyServerBootstrap extends EmbeddedServerBootstrap {
     server.getDeployment().getActualResourceClasses().add(TaskRestServiceImpl.class);
     server.getDeployment().getActualResourceClasses().add(ProcessEngineRestServiceImpl.class);
     server.getDeployment().getActualResourceClasses().add(IdentityRestServiceImpl.class);
+    server.getDeployment().getActualResourceClasses().add(MessageRestServiceImpl.class);
     
     server.getDeployment().getActualProviderClasses().add(JacksonConfigurator.class);
     

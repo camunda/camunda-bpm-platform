@@ -28,6 +28,14 @@ public class EqualsMap extends ArgumentMatcher<Map<String, Object>> {
   
   @Override
   public boolean matches(Object argument) {
+    if (argument == null) {
+      if (mapToCompare == null) {
+        return true;
+      } else {
+        return false;
+      }
+    }
+    
     Map<String, Object> argumentMap = (Map<String, Object>) argument;
     
     Set<Entry<String, Object>> setToCompare = mapToCompare.entrySet();

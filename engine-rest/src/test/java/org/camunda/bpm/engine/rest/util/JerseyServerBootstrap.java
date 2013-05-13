@@ -7,6 +7,7 @@ import java.util.Properties;
 import javax.ws.rs.core.UriBuilder;
 
 import org.camunda.bpm.engine.rest.impl.IdentityRestServiceImpl;
+import org.camunda.bpm.engine.rest.impl.MessageRestServiceImpl;
 import org.camunda.bpm.engine.rest.impl.ProcessDefinitionRestServiceImpl;
 import org.camunda.bpm.engine.rest.impl.ProcessEngineRestServiceImpl;
 import org.camunda.bpm.engine.rest.impl.ProcessInstanceRestServiceImpl;
@@ -65,6 +66,7 @@ public class JerseyServerBootstrap extends EmbeddedServerBootstrap {
       TaskRestServiceImpl.class,
       ProcessEngineRestServiceImpl.class,
       IdentityRestServiceImpl.class,
+      MessageRestServiceImpl.class,
       
       JacksonConfigurator.class,
       JacksonJsonProvider.class

@@ -18,12 +18,15 @@ import static org.camunda.bpm.container.impl.jmx.deployment.Attachments.PROCESS_
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
 import org.camunda.bpm.application.AbstractProcessApplication;
+import org.camunda.bpm.application.ProcessApplication;
 import org.camunda.bpm.application.impl.metadata.ProcessesXmlParser;
 import org.camunda.bpm.application.impl.metadata.spi.ProcessesXml;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanDeploymentOperation;
@@ -46,43 +49,77 @@ public class ParseProcessesXmlStep extends MBeanDeploymentOperationStep {
   private static final String META_INF_PROCESSES_XML = "META-INF/processes.xml";
 
   public String getName() {
-    return "Parse "+META_INF_PROCESSES_XML+" files";
+    return "Parse processes.xml deployment descriptor files.";
   }
 
   public void performOperationStep(MBeanDeploymentOperation operationContext) {
 
     final AbstractProcessApplication processApplication = operationContext.getAttachment(PROCESS_APPLICATION);
-    final ClassLoader processApplicationClassloader = processApplication.getProcessApplicationClassloader();
-      
-    // load all marker files using the classloader of the process application
-    Enumeration<URL> processesXmlFileLocations = null;
-    try {
-      processesXmlFileLocations = processApplicationClassloader.getResources(META_INF_PROCESSES_XML);
-            
-    } catch (IOException e) {
-      throw new ProcessEngineException("IOException while reading "+META_INF_PROCESSES_XML);
-    }
+    
+    Map<URL, ProcessesXml> parsedFiles = parseProcessesXmlFiles(processApplication);
+    
+    // attach parsed metadata
+    operationContext.addAttachment(PROCESSES_XML_RESOURCES, parsedFiles);
+  }
 
-    // perform parsing
+  protected Map<URL, ProcessesXml> parseProcessesXmlFiles(final AbstractProcessApplication processApplication) {
+    final ClassLoader processApplicationClassloader = processApplication.getProcessApplicationClassloader();
+    
+    String[] deploymentDescriptors = getDeploymentDescriptorLocations(processApplication);    
+    List<URL> processesXmlUrls = getProcessesXmlUrls(deploymentDescriptors, processApplicationClassloader);
+
     Map<URL, ProcessesXml> parsedFiles = new HashMap<URL, ProcessesXml>();
-    while (processesXmlFileLocations.hasMoreElements()) {        
-      URL url = (URL) processesXmlFileLocations.nextElement();    
+    
+    // perform parsing
+    for (URL url : processesXmlUrls) {
+          
       if(isEmptyFile(url)) {
         parsedFiles.put(url, ProcessesXml.EMPTY_PROCESSES_XML);
-        LOGGER.info("Using default values for empty META-INF/processes.xml file found at "+url.toString());
+        LOGGER.info("Using default values for empty processes.xml file found at "+url.toString());
         
       } else {
         parsedFiles.put(url, parseProcessesXml(url));
-        LOGGER.info("Found META-INF/processes.xml file at "+url.toString());        
+        LOGGER.info("Found process application file at "+url.toString());        
       }
     }
     
     if(parsedFiles.isEmpty()) {
-      LOGGER.info("No META-INF/processes.xml file found in process application "+processApplication.getName());
+      LOGGER.info("No processes.xml file found in process application "+processApplication.getName());
+    }
+    return parsedFiles;
+  }
+
+  protected List<URL> getProcessesXmlUrls(String[] deploymentDescriptors, ClassLoader processApplicationClassloader) {
+    List<URL> result = new ArrayList<URL>();
+    
+    // load all deployment descriptor files using the classloader of the process application
+    for (String deploymentDescriptor : deploymentDescriptors) {
+
+      Enumeration<URL> processesXmlFileLocations = null;
+      try {
+        processesXmlFileLocations = processApplicationClassloader.getResources(deploymentDescriptor);              
+      } catch (IOException e) {
+        throw new ProcessEngineException("IOException while reading "+deploymentDescriptor);
+      }
+      
+      while (processesXmlFileLocations.hasMoreElements()) {
+        result.add((URL) processesXmlFileLocations.nextElement());        
+      }
+            
     }
     
-    // attach parsed metadata
-    operationContext.addAttachment(PROCESSES_XML_RESOURCES, parsedFiles);
+    return result;
+  }
+
+  protected String[] getDeploymentDescriptorLocations(AbstractProcessApplication processApplication) {
+    ProcessApplication annotation = processApplication.getClass().getAnnotation(ProcessApplication.class);
+    if(annotation == null) {
+      return new String[] {META_INF_PROCESSES_XML};
+      
+    } else {
+      return annotation.deploymentDescriptors();
+      
+    }
   }
 
   protected boolean isEmptyFile(URL url) {
@@ -94,7 +131,7 @@ public class ParseProcessesXmlStep extends MBeanDeploymentOperationStep {
       return inputStream.available() == 0;
       
     } catch (IOException e) {
-      throw new ProcessEngineException("Could not open stream for " + META_INF_PROCESSES_XML, e); 
+      throw new ProcessEngineException("Could not open stream for " + url, e); 
       
     } finally {
       IoUtil.closeSilently(inputStream);

@@ -9,7 +9,9 @@
 	</datasource>
 	<xa-datasource jndi-name="java:jboss/datasources/ProcessEngine" pool-name="ProcessEngine" enabled="true" use-ccm="false">
 		<driver>postgresql</driver>
-		<xa-datasource-property name="URL">jdbc:postgresql://${database.host}:5432/${database.name}</xa-datasource-property>
+		<xa-datasource-property name="ServerName">${database.host}</xa-datasource-property>
+		<xa-datasource-property name="PortNumber">5432</xa-datasource-property>
+		<xa-datasource-property name="DatabaseName">${database.name}</xa-datasource-property>
 		<xa-datasource-property name="User">${database.user}</xa-datasource-property>
 		<xa-datasource-property name="Password">${database.password}</xa-datasource-property>
 		<xa-pool>
@@ -24,15 +26,17 @@
 		</xa-pool>
 		<transaction-isolation>TRANSACTION_READ_COMMITTED</transaction-isolation>
 		<validation>
-			<exception-sorter class-name="org.jboss.jca.adapters.jdbc.extensions.mysql.MySQLExceptionSorter" />
-			<valid-connection-checker class-name="org.jboss.jca.adapters.jdbc.extensions.mysql.MySQLValidConnectionChecker" />
+			<exception-sorter class-name="org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLExceptionSorter" />
+			<valid-connection-checker class-name="org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLValidConnectionChecker" />
 			<validate-on-match>false</validate-on-match>
 			<background-validation>false</background-validation>
 		</validation>
 	</xa-datasource>
 	<xa-datasource jndi-name="java:jboss/datasources/CycleDS" pool-name="CycleDS" enabled="true" use-ccm="true">
 		<driver>postgresql</driver>
-		<xa-datasource-property name="URL">jdbc:postgresql://${database.host}:5432/${database.name}</xa-datasource-property>
+		<xa-datasource-property name="ServerName">${database.host}</xa-datasource-property>
+		<xa-datasource-property name="PortNumber">5432</xa-datasource-property>
+		<xa-datasource-property name="DatabaseName">${database.name}</xa-datasource-property>
 		<xa-datasource-property name="User">${database.user}</xa-datasource-property>
 		<xa-datasource-property name="Password">${database.password}</xa-datasource-property>
 		<xa-pool>
@@ -47,8 +51,8 @@
 		</xa-pool>
 		<transaction-isolation>TRANSACTION_READ_COMMITTED</transaction-isolation>
 		<validation>
-			<exception-sorter class-name="org.jboss.jca.adapters.jdbc.extensions.mysql.MySQLExceptionSorter" />
-			<valid-connection-checker class-name="org.jboss.jca.adapters.jdbc.extensions.mysql.MySQLValidConnectionChecker" />
+			<exception-sorter class-name="org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLExceptionSorter" />
+			<valid-connection-checker class-name="org.jboss.jca.adapters.jdbc.extensions.postgres.PostgreSQLValidConnectionChecker" />
 			<validate-on-match>false</validate-on-match>
 			<background-validation>false</background-validation>
 		</validation>

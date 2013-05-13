@@ -135,6 +135,8 @@ import org.camunda.bpm.engine.impl.persistence.entity.TableDataManager;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskManager;
 import org.camunda.bpm.engine.impl.persistence.entity.UserManager;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceManager;
+import org.camunda.bpm.engine.impl.runtime.CorrelationHandler;
+import org.camunda.bpm.engine.impl.runtime.DefaultCorrelationHandler;
 import org.camunda.bpm.engine.impl.scripting.BeansResolverFactory;
 import org.camunda.bpm.engine.impl.scripting.ResolverFactory;
 import org.camunda.bpm.engine.impl.scripting.ScriptBindingsFactory;
@@ -306,6 +308,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   
   protected ProcessApplicationManager processApplicationManager;
   
+  protected CorrelationHandler correlationHandler;
+    
   // buildProcessEngine ///////////////////////////////////////////////////////
   
   public ProcessEngine buildProcessEngine() {
@@ -341,10 +345,11 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initEventHandlers();
     initFailedJobCommandFactory();
     initProcessApplicationManager();
+    initCorrelationHandler();
   }
 
   // failedJobCommandFactory ////////////////////////////////////////////////////////
-  
+
   protected void initFailedJobCommandFactory() {
     if (failedJobCommandFactory == null) {
       failedJobCommandFactory = new DefaultFailedJobCommandFactory();
@@ -980,6 +985,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     if(processApplicationManager == null) {
       processApplicationManager = new ProcessApplicationManager();
     }
+  }
+  
+  // correlation handler //////////////////////////////////////////////////////
+  protected void initCorrelationHandler() {
+    if (correlationHandler == null) {
+      correlationHandler = new DefaultCorrelationHandler();
+    }
+    
   }
 
   // getters and setters //////////////////////////////////////////////////////
@@ -1752,5 +1765,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   public void setCommandExecutorSchemaOperations(CommandExecutor commandExecutorSchemaOperations) {
     this.commandExecutorSchemaOperations = commandExecutorSchemaOperations;
   }
-  
+
+  public CorrelationHandler getCorrelationHandler() {
+    return correlationHandler;
+  }
+
+  public void setCorrelationHandler(CorrelationHandler correlationHandler) {
+    this.correlationHandler = correlationHandler;
+  }
 }

@@ -26,10 +26,12 @@ public class DeploymentHelper {
   
   public static final String CAMUNDA_EJB_CLIENT = "org.camunda.bpm.javaee:camunda-ejb-client";
   public static final String CAMUNDA_ENGINE_CDI = "org.camunda.bpm:camunda-engine-cdi";
+  public static final String CAMUNDA_ENGINE_SPRING = "org.camunda.bpm:camunda-engine-spring";
   
   private static JavaArchive CACHED_CLIENT_ASSET;
   private static JavaArchive CACHED_ENGINE_CDI_ASSET;
   private static Collection<JavaArchive> CACHED_WELD_ASSETS;
+  private static Collection<JavaArchive> CACHED_SPRING_ASSETS;
 
   public static JavaArchive getEjbClient() {
     if(CACHED_CLIENT_ASSET != null) {
@@ -89,6 +91,29 @@ public class DeploymentHelper {
       } else {    
         CACHED_WELD_ASSETS = resolvedArchives;
         return CACHED_WELD_ASSETS;
+      }
+    }
+    
+  }
+  
+  public static Collection<JavaArchive> getEngineSpring() {
+    if(CACHED_SPRING_ASSETS != null) {
+      return CACHED_SPRING_ASSETS;
+    } else { 
+      
+      Collection<JavaArchive> resolvedArchives = DependencyResolvers
+          .use(MavenDependencyResolver.class)
+          .goOffline()
+          .loadMetadataFromPom("pom.xml")
+          .artifacts("org.camunda.bpm:camunda-engine-spring", "org.springframework:spring-web")
+          .exclusion("org.camunda.bpm:camunda-engine")          
+          .resolveAs(JavaArchive.class);
+      
+      if(resolvedArchives.size()==0) {
+        throw new RuntimeException("could not resolve org.camunda.bpm:camunda-engine-spring");
+      } else {    
+        CACHED_SPRING_ASSETS = resolvedArchives;
+        return CACHED_SPRING_ASSETS;
       }
     }
     

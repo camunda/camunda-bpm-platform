@@ -66,7 +66,23 @@
       <artifactId>camunda-engine</artifactId>
       <scope>provided</scope>
     </dependency>
-
+    
+    <dependency>
+      <groupId>org.camunda.bpm</groupId>
+      <artifactId>camunda-engine-spring</artifactId>
+      <scope>provided</scope>
+      <exclusions>
+        <exclusion>
+          <artifactId>camunda-engine</artifactId>
+          <groupId>org.camunda.bpm</groupId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-web</artifactId>
+    </dependency>
     
      <!-- weld for CDI support on tomcat-->
     <dependency>

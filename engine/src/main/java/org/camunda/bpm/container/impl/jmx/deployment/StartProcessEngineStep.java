@@ -119,13 +119,15 @@ public class StartProcessEngineStep extends MBeanDeploymentOperationStep {
       
     }
     
-    JobExecutor jobExecutor = getJobExecutorService(serviceContainer);
-    if(jobExecutor == null) {
-      throw new ProcessEngineException("Cannot find referenced job executor with name '"+processEngineXml.getJobAcquisitionName()+"'");
+    if(processEngineXml.getJobAcquisitionName() != null && !processEngineXml.getJobAcquisitionName().isEmpty()) {
+      JobExecutor jobExecutor = getJobExecutorService(serviceContainer);
+      if(jobExecutor == null) {
+        throw new ProcessEngineException("Cannot find referenced job executor with name '"+processEngineXml.getJobAcquisitionName()+"'");
+      }
+      
+      // set JobExecutor on process engine
+      configurationImpl.setJobExecutor(jobExecutor);
     }
-    
-    // set JobExecutor on process engine
-    configurationImpl.setJobExecutor(jobExecutor);
         
     // start the process engine inside the container.
     JmxManagedProcessEngine managedProcessEngineService = new JmxManagedProcessEngineController(configuration);

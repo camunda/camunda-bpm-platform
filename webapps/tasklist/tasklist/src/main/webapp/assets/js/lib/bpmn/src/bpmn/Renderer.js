@@ -1,7 +1,12 @@
 /**
  * The BPMN 2.0 SVG renderer module
  *
- * This module provides the functionality for rendering a BPMN 2.0 Process Model in SVG
+ * This module provides the functionality for rendering a BPMN 2.0 Process Model using DOJO GFX
+ * 
+ * @author: Andreas Drobisch
+ * @author: Jakob Freund
+ * @author: Daniel Meyer
+ * 
  */
 define(["dojox/gfx", "dojo/_base/lang", "dojo/dom-construct", "dojo/_base/window", "dojo/query", "dojo/dom", "dojo/dom-class"], function (gfx, lang, domConstruct, win, query, dom, domClass) {
   var eventDefinitionPaths = {
@@ -181,30 +186,17 @@ define(["dojox/gfx", "dojo/_base/lang", "dojo/dom-construct", "dojo/_base/window
 
   function wordWrap (text, group, font, x, y, align) {
     var tempText = "";
+    var fontSize = font.size ? font.size :  10;
+    var defaultAlign = "right";
 
-    var name = text.replace("&#xD;", "\n");
-    var words = name.split(" ");
-    var maxWidth = 100;
+    var text = text.replace(/&#xD;/g, "<w>").replace(/&#xA;/g, "<w>").replace(/\n/g, "<w>");
+    var textLines = text.split("<w>");
 
-    for (var i=0; i<words.length; i++) {
-      var text = group.createText({text: tempText + " " + words[i], align: align ? align : "left" })
+    for (var i=0; i<textLines.length; i++) {
+      var textLine = group.createText({text: textLines[i], align: align ? align : defaultAlign})
         .setFont(font) //set font
         .setFill("black");
-
-      if (text.getTextWidth() > maxWidth) {
-        tempText += '\n' + words[i];
-      } else {
-        tempText += " " + words[i];
-      }
-      text.getParent().remove(text);
-    }
-
-    var textLines = tempText.substring(1).split("\n");
-
-    for (var i=0; group!= undefined && i<textLines.length; i++) {
-      group.createText({ x: x, y: y + i * font.size , text: textLines[i], align: align ? align : "left" })
-        .setFont(font) //set font
-        .setFill("black");
+      textLine.setTransform({dx: x, dy: y + i*fontSize});
     }
 
     return textLines;
@@ -212,6 +204,7 @@ define(["dojox/gfx", "dojo/_base/lang", "dojo/dom-construct", "dojo/_base/window
 
   function renderLabel(elementRenderer, group, bounds, align) {
     var baseElement = elementRenderer.baseElement;
+    var labelPadding = 2;
 
     if (!baseElement.name) {
       return;
@@ -219,12 +212,12 @@ define(["dojox/gfx", "dojo/_base/lang", "dojo/dom-construct", "dojo/_base/window
     var font = { family: textStyle["font-family"], size: textStyle["font-size"], weight: "normal" };
 
     var labelBounds = elementRenderer.getLabelBounds();
-    var pos = labelBounds ? {x: +labelBounds.x, y: labelBounds.y} : {x: +bounds.x, y: +bounds.y};
+    var pos = labelBounds ? {x: +labelBounds.x + labelPadding, y: +labelBounds.y + labelPadding} : {x: +bounds.x, y: +bounds.y};
 
-    var  x =  pos.x,
-         y = pos.y;
+    var x =  pos.x,
+        y = pos.y;
+    wordWrap(baseElement.name, group, font, +x, +y, labelBounds ? null : align);
 
-    wordWrap(baseElement.name, group, font, x, y, align);
     return group;
   }
 
@@ -254,7 +247,7 @@ define(["dojox/gfx", "dojo/_base/lang", "dojo/dom-construct", "dojo/_base/window
 
       text.setFont({ family: "Arial", size: "9pt", weight: "normal", align: "middle"}) //set font
       text.setFill("black");
-
+      // FIXME this 30 looks like a magic number
       text.setTransform([gfx.matrix.translate(15, height/2 +30), gfx.matrix.rotateg(-90) ]);
 
       var separator = processGroup.createLine({ x1: 30, y1: 0, x2: 30, y2: height});
@@ -501,17 +494,6 @@ define(["dojox/gfx", "dojo/_base/lang", "dojo/dom-construct", "dojo/_base/window
     render : function(elementRenderer, gfxGroup) {
       var style = elementRenderer.getStyle();
       var bounds = elementRenderer.getBounds();
-
-      var x = +bounds.x;
-      var y = +bounds.y;
-      var rad = +bounds.width / 2;
-
-      // render basic circle
-      var circleGroup = gfxGroup.createGroup();
-      circleGroup.setTransform({dx :x, dy:y});
-
-      var circle = circleGroup.createCircle({cx :rad, cy :rad, r:rad});
-
       var element = elementRenderer.baseElement;
       var eventType = elementRenderer.getEventType();
 
@@ -527,6 +509,17 @@ define(["dojox/gfx", "dojo/_base/lang", "dojo/dom-construct", "dojo/_base/window
 
       var strokeStyle = {color: style.stroke, style: strokeStyle, width: style["stroke-width"]};
       var fill = style.fill;
+
+      var x = +bounds.x + strokeStyle.width/2;
+      var y = +bounds.y + strokeStyle.width/2;
+
+      var rad = +bounds.width / 2 - strokeStyle.width;
+
+      // render basic circle
+      var circleGroup = gfxGroup.createGroup();
+      circleGroup.setTransform({dx :x, dy:y});
+
+      var circle = circleGroup.createCircle({cx :rad, cy :rad, r:rad});
 
       circle.setStroke(strokeStyle);
       circle.setFill(fill);
@@ -552,6 +545,7 @@ define(["dojox/gfx", "dojo/_base/lang", "dojo/dom-construct", "dojo/_base/window
 
         var path = circleGroup.createPath(eventDefinitionPaths[typeLookup]);
         path.setStroke(style.stroke);
+        path.setTransform({dx: -strokeStyle.width/2, dy: -strokeStyle.width/2});
         if (eventType == "throw") {
           path.setFill("black");
         }
@@ -588,7 +582,7 @@ define(["dojox/gfx", "dojo/_base/lang", "dojo/dom-construct", "dojo/_base/window
       var font = { family: textStyle["font-family"], size: textStyle["font-size"], weight: "normal" };
       var padding = 4;
 
-      wordWrap(elementRenderer.baseElement.text, annotationGroup, font, padding,  font.size + padding, "left");
+      wordWrap(elementRenderer.baseElement.text, annotationGroup, font, padding, font.size + padding, "left");
     }
   };
 
@@ -607,7 +601,11 @@ define(["dojox/gfx", "dojo/_base/lang", "dojo/dom-construct", "dojo/_base/window
       var dataRefGroup = gfxGroup.createGroup();
       dataRefGroup.setTransform({dx :x ,dy: y});
 
-      dataRefGroup.createPath(dataPaths[elementRenderer.baseElement.type]).setStroke(style.stroke);
+      var font = { family: textStyle["font-family"], size: textStyle["font-size"], weight: "normal" };
+
+      var path = dataRefGroup.createPath(dataPaths[elementRenderer.baseElement.type]).setStroke(style.stroke);
+      renderLabel(elementRenderer, gfxGroup, {x: x + width/2, y: y + height + 10}, "middle");
+      return path;
     }
   };
 
