@@ -22,14 +22,15 @@ import javax.ws.rs.core.UriInfo;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
-import org.camunda.bpm.engine.impl.ProcessInstanceQueryImpl;
 import org.camunda.bpm.engine.rest.ProcessInstanceRestService;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceQueryDto;
+import org.camunda.bpm.engine.rest.dto.runtime.SignalProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.runtime.VariableListDto;
 import org.camunda.bpm.engine.rest.dto.runtime.VariableValueDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 
@@ -162,6 +163,33 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
 	  runtimeService.activateProcessInstanceById(processInstanceId);
 	} catch (ProcessEngineException pex){
 	  throw new WebApplicationException(Status.BAD_REQUEST);
+	}
+  }
+
+  @Override
+  public void signalProcessInstance(String processInstanceId, SignalProcessInstanceDto parameter) {
+	
+	try {
+		RuntimeService runtimeService = getProcessEngine().getRuntimeService();
+		String activityId = parameter.getActivityId();
+		
+		if (activityId != null && activityId.length() > 0) {
+		
+		  Execution execution = runtimeService.createExecutionQuery()
+				  .processInstanceId(processInstanceId)
+				  .activityId(activityId)
+				  .singleResult();
+		  
+		  if (parameter.getVariables() != null) {
+		    runtimeService.signal(execution.getId(), parameter.getVariables());
+		  } else {
+			  runtimeService.signal(execution.getId());  
+		  }
+		} else {
+			throw new WebApplicationException(Status.BAD_REQUEST);
+		}
+	} catch (ProcessEngineException pex){
+        throw new WebApplicationException(Status.BAD_REQUEST);
 	}
   }
 }

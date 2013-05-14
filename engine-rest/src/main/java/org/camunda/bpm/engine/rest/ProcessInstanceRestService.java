@@ -22,6 +22,7 @@ import javax.ws.rs.core.UriInfo;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceQueryDto;
+import org.camunda.bpm.engine.rest.dto.runtime.SignalProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.runtime.VariableListDto;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 
@@ -89,4 +90,9 @@ public interface ProcessInstanceRestService {
   @POST
   @Path("/{id}/activate")
   void activateProcessInstance(@PathParam("id") String processInstanceId);
+  
+  @POST
+  @Path("/{id}/signal")
+  @Consumes(MediaType.APPLICATION_JSON)
+  void signalProcessInstance(@PathParam("id") String processInstanceId, SignalProcessInstanceDto parameter);
 }
