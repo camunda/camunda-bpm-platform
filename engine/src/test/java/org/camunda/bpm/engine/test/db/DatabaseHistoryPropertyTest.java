@@ -10,9 +10,7 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.test.TestHelper;
 import org.junit.After;
-import org.junit.AfterClass;
 import org.junit.Assert;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
@@ -23,33 +21,11 @@ public class DatabaseHistoryPropertyTest {
   private static ProcessEngineImpl processEngineImpl;
 
   // make sure schema is dropped
-  @BeforeClass
-  public static void initialize() {
-    ProcessEngineImpl processEngine = createProcessEngineImpl("false", false);
-    try {
-      TestHelper.dropSchema(processEngine.getProcessEngineConfiguration());
-    } catch (RuntimeException e) {
-      // ignore
-    }
-    processEngine.close();
-    processEngine = null;
-  }
-  
-  // make sure schema is dropped
   @After
   public void cleanup() {
     TestHelper.dropSchema(processEngineImpl.getProcessEngineConfiguration());
     processEngineImpl.close();
     processEngineImpl = null;
-  }
-  
-  // make sure we have a schema available after running this test class
-  @AfterClass
-  public static void shutdown() {
-    ProcessEngineImpl processEngine = createProcessEngineImpl("false", false);
-    TestHelper.createSchema(processEngine.getProcessEngineConfiguration());
-    processEngine.close();
-    processEngine = null;
   }
   
   @Test
