@@ -13,8 +13,6 @@
 
 package org.camunda.bpm.engine.impl.test;
 
-import java.util.Map;
-
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 
@@ -37,10 +35,6 @@ public class PluggableProcessEngineTestCase extends AbstractProcessEngineTestCas
 
   protected void initializeProcessEngine() {    
     processEngine = getOrInitializeCachedProcessEngine();
-    Map<String, Long> tableCount = processEngine.getManagementService().getTableCount();
-    if(tableCount.get("ACT_GE_PROPERTY") == 3) {
-      throw new RuntimeException(processEngine.getManagementService().getProperties().toString());
-    }
   }
 
   private static ProcessEngine getOrInitializeCachedProcessEngine() {
