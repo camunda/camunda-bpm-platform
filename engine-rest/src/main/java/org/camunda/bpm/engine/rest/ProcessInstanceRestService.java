@@ -81,4 +81,12 @@ public interface ProcessInstanceRestService {
   @DELETE
   @Path("/{id}")
   void deleteProcessInstance(@PathParam("id") String processInstanceId);
+  
+  @POST
+  @Path("/{id}/suspend")
+  void suspendProcessInstance(@PathParam("id") String processInstanceId);
+  
+  @POST
+  @Path("/{id}/activate")
+  void activateProcessInstance(@PathParam("id") String processInstanceId);
 }
