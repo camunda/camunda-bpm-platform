@@ -1,18 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<process-application
-  xmlns="http://www.camunda.org/schema/1.0/ProcessApplication"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<process-application xmlns="http://www.camunda.org/schema/1.0/ProcessApplication" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://www.camunda.org/schema/1.0/ProcessApplication http://www.camunda.org/schema/1.0/ProcessApplication ">
 
   <process-engine name="engine1">
     <job-acquisition>default</job-acquisition>
     <configuration>org.camunda.bpm.engine.impl.cfg.StandaloneProcessEngineConfiguration</configuration>
-    <datasource>java:comp/env/jdbc/ProcessEngine</datasource>
     <properties>
-        <property name="history">full</property>
-        <property name="databaseType">h2</property>
-        <property name="databaseSchemaUpdate">off</property>
+      <property name="history">full</property>
+      <property name="databaseType">h2</property>
+      <property name="databaseSchemaUpdate">create-drop</property>
+      <property name="jdbcUrl">jdbc:h2:mem:engine1</property>
     </properties>
-  </process-engine>  
+  </process-engine>
 
 </process-application>
