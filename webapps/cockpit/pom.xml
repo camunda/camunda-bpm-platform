@@ -17,6 +17,9 @@
   <modules>
     <module>cockpit-core</module>
     <module>cockpit-webapp</module>
+    <module>cockpit-tomcat</module>
+    <module>cockpit-glassfish</module>
+    <module>cockpit-jboss</module>
   </modules>
 
   <properties>
@@ -26,7 +29,7 @@
     <tomcat6.connector.ajp.redirectPort>48443</tomcat6.connector.ajp.redirectPort>
     <tomcat6.server.port>48005</tomcat6.server.port>
   </properties>
-  
+
   <dependencyManagement>
     <dependencies>
       <dependency>

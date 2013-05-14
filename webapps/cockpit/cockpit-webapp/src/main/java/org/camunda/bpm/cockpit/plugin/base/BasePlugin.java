@@ -6,7 +6,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.camunda.bpm.cockpit.plugin.base.resources.BaseRootResource;
-import org.camunda.bpm.cockpit.plugin.base.resources.ProcessDefinitionResource;
 import org.camunda.bpm.cockpit.plugin.spi.impl.AbstractCockpitPlugin;
 
 /**

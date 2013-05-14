@@ -5,7 +5,7 @@
 
   <!-- cockpit bootstrap listener -->
   <listener>
-    <listener-class>org.camunda.bpm.cockpit.impl.web.bootstrap.CockpitEmbeddedBootstrap</listener-class>
+    <listener-class>org.camunda.bpm.cockpit.impl.web.bootstrap.CockpitContainerBootstrap</listener-class>
   </listener>
 
   <!-- client plugins filter -->

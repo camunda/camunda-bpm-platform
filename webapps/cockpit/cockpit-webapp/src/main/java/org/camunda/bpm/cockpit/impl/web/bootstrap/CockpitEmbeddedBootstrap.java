@@ -12,12 +12,6 @@
  */
 package org.camunda.bpm.cockpit.impl.web.bootstrap;
 
-import javax.servlet.ServletContextEvent;
-import javax.servlet.ServletContextListener;
-
-import org.camunda.bpm.cockpit.Cockpit;
-import org.camunda.bpm.cockpit.impl.DefaultRuntimeDelegate;
-import org.camunda.bpm.container.RuntimeContainerDelegate;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 
@@ -30,59 +24,41 @@ import org.camunda.bpm.engine.ProcessEngineConfiguration;
  *
  * @author nico.rehwaldt
  */
-public class CockpitEmbeddedBootstrap implements ServletContextListener {
-
-  private CockpitEnvironment environment;
+public class CockpitEmbeddedBootstrap extends CockpitContainerBootstrap {
 
   @Override
-  public void contextInitialized(ServletContextEvent sce) {
-
-    environment = createCockpitEnvironment();
-    environment.setup();
-  }
-
-  @Override
-  public void contextDestroyed(ServletContextEvent sce) {
-
-    environment.tearDown();
-  }
-
   protected CockpitEnvironment createCockpitEnvironment() {
-    return new CockpitEnvironment();
+    return new CockpitEmbeddedEnvironment();
   }
 
-  protected static class CockpitEnvironment {
+  protected static class CockpitEmbeddedEnvironment extends CockpitEnvironment {
 
     private ProcessEngine processEngine;
 
-    private void tearDown() {
-
+    @Override
+    public void tearDown() {
       System.out.println("Tearing down cockpit environment");
 
-      Cockpit.setCockpitRuntimeDelegate(null);
+      super.tearDown();
 
       getContainerRuntimeDelegate().unregisterProcessEngine(processEngine);
       processEngine.close();
     }
 
-    private void setup() {
-
-      System.out.println("Bootstrapping cockpit with " + CockpitEmbeddedBootstrap.class.getName());
+    @Override
+    public void setup() {
+      System.out.println("Bootstrapping cockpit with " + CockpitEmbeddedEnvironment.class.getName());
 
       processEngine = createProcessEngine();
       getContainerRuntimeDelegate().registerProcessEngine(processEngine);
 
-      Cockpit.setCockpitRuntimeDelegate(new DefaultRuntimeDelegate());
+      super.setup();
     }
 
     protected ProcessEngine createProcessEngine() {
       ProcessEngineConfiguration processEngineConfiguration = ProcessEngineConfiguration.createStandaloneInMemProcessEngineConfiguration();
       processEngineConfiguration.setProcessEngineName("default");
       return processEngineConfiguration.buildProcessEngine();
-    }
-
-    protected RuntimeContainerDelegate getContainerRuntimeDelegate() {
-      return RuntimeContainerDelegate.INSTANCE.get();
     }
   }
 }

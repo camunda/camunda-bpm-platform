@@ -12,7 +12,13 @@
   <artifactId>camunda-cockpit</artifactId>
   <groupId>org.camunda.bpm.cockpit</groupId>
   <packaging>war</packaging>
-  <name>camunda BPM - cockpit</name>
+  <name>camunda BPM - cockpit - app</name>
+
+  <properties>
+    <web.resources.override>src/main/runtime/default/webapp</web.resources.override>
+    <java.resources.override>src/main/runtime/default/resources</java.resources.override>
+    <properties.override>src/main/runtime/default/config.properties</properties.override>
+  </properties>
 
   <dependencies>
 
@@ -31,13 +37,13 @@
       <version>3.0.2.Final</version>
     </dependency>
 
-    <!-- rest api -->
     <dependency>
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine</artifactId>
       <scope>provided</scope>
     </dependency>
 
+    <!-- rest api -->
     <dependency>
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine-rest</artifactId>
@@ -87,12 +93,40 @@
 
   <build>
     <finalName>cockpit</finalName>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+      </resource>
+      <resource>
+        <directory>${java.resources.override}</directory>
+        <filtering>true</filtering>
+      </resource>
+    </resources>
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-war-plugin</artifactId>
         <configuration>
-          <failOnMissingWebXml>false</failOnMissingWebXml>
+          <webResources>
+            <resource>
+              <filtering>true</filtering>
+              <directory>${web.resources.override}</directory>
+            </resource>
+            <resource>
+              <filtering>true</filtering>
+              <directory>src/main/webapp</directory>
+              <!-- no filtering for favicon because linux destroys images through carriage return -->
+              <excludes>
+                <exclude>assets/img/favicon.ico</exclude>
+              </excludes>
+            </resource>
+          </webResources>
+          <archive>
+            <manifest>
+              <!-- Maven project version number -->
+              <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+            </manifest>
+          </archive>
         </configuration>
       </plugin>
     </plugins>
@@ -108,6 +142,46 @@
           <scope>runtime</scope>
         </dependency>
       </dependencies>
+      <properties>
+        <web.resources.override>src/main/runtime/tomcat/webapp</web.resources.override>
+        <java.resources.override>src/main/runtime/tomcat/resources</java.resources.override>
+      </properties>
+    </profile>
+
+    <profile>
+      <id>jboss</id>
+      <dependencies>
+        <dependency>
+          <groupId>org.jboss.resteasy</groupId>
+          <artifactId>resteasy-jaxrs</artifactId>
+          <scope>provided</scope>
+        </dependency>
+      </dependencies>
+      <properties>
+        <web.resources.override>src/main/runtime/jboss/webapp</web.resources.override>
+        <java.resources.override>src/main/runtime/jboss/resources</java.resources.override>
+      </properties>
+
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-war-plugin</artifactId>
+            <configuration>
+              <archive>
+                <manifest>
+                  <!-- Maven project version number -->
+                  <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+                </manifest>
+                <manifestEntries>
+                  <!-- module dependencies for deployment on AS 7 -->
+                  <Dependencies>org.camunda.bpm.camunda-engine</Dependencies>
+                </manifestEntries>
+              </archive>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
     </profile>
 
     <profile>
