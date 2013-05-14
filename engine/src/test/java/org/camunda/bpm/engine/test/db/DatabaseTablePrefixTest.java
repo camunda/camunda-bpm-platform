@@ -35,7 +35,7 @@ public class DatabaseTablePrefixTest extends TestCase {
     // both process engines will be using this datasource.
     PooledDataSource pooledDataSource = new PooledDataSource(ReflectUtil.getClassLoader(), 
             "org.h2.Driver", 
-            "jdbc:h2:mem:activiti-test;DB_CLOSE_DELAY=1000", 
+            "jdbc:h2:mem:DatabaseTablePrefixTest;DB_CLOSE_DELAY=1000", 
             "sa", 
             "" );
           
@@ -49,12 +49,14 @@ public class DatabaseTablePrefixTest extends TestCase {
 
     // configure & build two different process engines, each having a separate table prefix 
     ProcessEngineConfigurationImpl config1 = createCustomProcessEngineConfiguration()
+            .setProcessEngineName("DatabaseTablePrefixTest-engine1")
             .setDataSource(pooledDataSource)
             .setDatabaseSchemaUpdate("NO_CHECK"); // disable auto create/drop schema
     config1.setDatabaseTablePrefix("SCHEMA1.");
     ProcessEngine engine1 = config1.buildProcessEngine();
     
     ProcessEngineConfigurationImpl config2 = createCustomProcessEngineConfiguration()
+            .setProcessEngineName("DatabaseTablePrefixTest-engine2")
             .setDataSource(pooledDataSource)
             .setDatabaseSchemaUpdate("NO_CHECK"); // disable auto create/drop schema        
     config2.setDatabaseTablePrefix("SCHEMA2.");

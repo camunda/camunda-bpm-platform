@@ -29,6 +29,12 @@ public class ExpressionBeanAccessTest extends ResourceProcessEngineTestCase {
     super("org/camunda/bpm/engine/test/standalone/el/activiti.cfg.xml");
   }
   
+  @Override
+  protected void closeDownProcessEngine() {
+    processEngine.close();
+    super.closeDownProcessEngine();
+  }
+  
   @Deployment
   public void testConfigurationBeanAccess() {
     // Exposed bean returns 'I'm exposed' when to-string is called in first service-task

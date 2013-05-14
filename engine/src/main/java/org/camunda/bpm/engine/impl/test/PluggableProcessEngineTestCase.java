@@ -13,11 +13,13 @@
 
 package org.camunda.bpm.engine.impl.test;
 
+import java.util.Map;
+
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 
 
-/** Base class for the activiti test cases.
+/** Base class for the process engine test cases.
  * 
  * The main reason not to use our own test support classes is that we need to 
  * run our test suite with various configurations, e.g. with and without spring,
@@ -33,12 +35,26 @@ public class PluggableProcessEngineTestCase extends AbstractProcessEngineTestCas
   
   protected static ProcessEngine cachedProcessEngine;
 
-  protected void initializeProcessEngine() {
+  protected void initializeProcessEngine() {    
+    processEngine = getOrInitializeCachedProcessEngine();
+    Map<String, Long> tableCount = processEngine.getManagementService().getTableCount();
+    if(tableCount.get("ACT_GE_PROPERTY") == 3) {
+      throw new RuntimeException(processEngine.getManagementService().getProperties().toString());
+    }
+  }
+
+  private static ProcessEngine getOrInitializeCachedProcessEngine() {
     if (cachedProcessEngine == null) {
       cachedProcessEngine = ProcessEngineConfiguration
               .createProcessEngineConfigurationFromResource("activiti.cfg.xml")
               .buildProcessEngine();
     }
-    processEngine = cachedProcessEngine;
+    return cachedProcessEngine;
   }
+  
+  public static ProcessEngine getProcessEngine() {
+    return getOrInitializeCachedProcessEngine();
+  }
+  
+  
 }

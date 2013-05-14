@@ -7,7 +7,7 @@ public class IdGeneratorDataSource extends PooledDataSource {
 
   public IdGeneratorDataSource() {
     setDriver("org.h2.Driver");
-    setUrl("jdbc:h2:mem:activiti");
+    setUrl("jdbc:h2:mem:IdGeneratorDataSourceTest");
     setUsername("sa");
     setPassword("");
     setPoolMaximumActiveConnections(2);

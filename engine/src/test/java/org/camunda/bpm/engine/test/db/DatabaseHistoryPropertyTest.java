@@ -13,13 +13,11 @@ import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
  * @author Christian Lipphardt
  */
-@Ignore
 public class DatabaseHistoryPropertyTest {
 
   private static ProcessEngineImpl processEngineImpl;
@@ -143,9 +141,12 @@ public class DatabaseHistoryPropertyTest {
     ProcessEngineImpl processEngine = 
         (ProcessEngineImpl) new CustomStandaloneInMemProcessEngineConfiguration()
                .setExecuteSchemaOperations(executeSchemaOperations)
+               .setProcessEngineName("database-history-test-engine")
                .setDatabaseSchemaUpdate(databaseSchemaUpdate)
                .setHistory(ProcessEngineConfiguration.HISTORY_FULL)
+               .setJdbcUrl("jdbc:h2:mem:DatabaseHistoryPropertyTest")
                .buildProcessEngine();
+    
     return processEngine;
   }
   
