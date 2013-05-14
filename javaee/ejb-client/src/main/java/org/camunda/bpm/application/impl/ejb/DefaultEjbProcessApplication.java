@@ -40,7 +40,7 @@ import org.camunda.bpm.application.impl.EjbProcessApplication;
 @Singleton
 @Startup
 @ConcurrencyManagement(ConcurrencyManagementType.BEAN) 
-@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+@TransactionAttribute(TransactionAttributeType.REQUIRED)
 @ProcessApplication
 public class DefaultEjbProcessApplication extends EjbProcessApplication {
   
