@@ -24,6 +24,10 @@ public class TestContainer {
       .addAsWebInfResource("web.xml");
   }
 
+  public static String getAppName() {
+    return APP_NAME;
+  }
+
   public static void addContainerSpecificResourcesForNonPa(WebArchive deployment) {
     
     deployment

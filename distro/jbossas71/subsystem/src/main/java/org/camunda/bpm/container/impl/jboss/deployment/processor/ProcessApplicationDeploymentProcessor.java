@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.camunda.bpm.application.AbstractProcessApplication;
+import org.camunda.bpm.application.ProcessApplicationInterface;
 import org.camunda.bpm.application.impl.metadata.spi.ProcessArchiveXml;
 import org.camunda.bpm.application.impl.metadata.spi.ProcessesXml;
 import org.camunda.bpm.container.impl.jboss.deployment.marker.ProcessApplicationAttachments;
@@ -60,7 +61,7 @@ import org.jboss.vfs.VirtualFile;
  * <p>This processor installs the process application into the container.</p> 
  *  
  * <p>First, we initialize the deployments for all process archives declared by the process application. 
- * It then registers a {@link MscProcessApplicationDeploymentService} for each process archive to be deployed.
+ * It then registers a {@link ProcessApplicationDeploymentService} for each process archive to be deployed.
  * Finally it registers the {@link MscManagedProcessApplication} service which depends on all the deployment services 
  * to have completed deployment</p> 
  * 
@@ -108,9 +109,11 @@ public class ProcessApplicationDeploymentProcessor implements DeploymentUnitProc
           .setInitialMode(Mode.ACTIVE);
         
         if(paViewServiceName != null) {
+          // add a dependency on the component start service to make sure we are started after the pa-component (Singleton EJB) has started
+          serviceBuilder.addDependency(paComponent.getStartServiceName()); 
           serviceBuilder.addDependency(paViewServiceName, ComponentView.class, deploymentService.getPaComponentViewInjector());
         } else {
-          serviceBuilder.addDependency(noViewStartService, AbstractProcessApplication.class, deploymentService.getNoViewProcessApplication());
+          serviceBuilder.addDependency(noViewStartService, ProcessApplicationInterface.class, deploymentService.getNoViewProcessApplication());
         }
         
         Services.addServerExecutorDependency(serviceBuilder, deploymentService.getExecutorInjector(), false);
@@ -136,7 +139,7 @@ public class ProcessApplicationDeploymentProcessor implements DeploymentUnitProc
     if(paViewServiceName != null) {
       serviceBuilder.addDependency(paViewServiceName, ComponentView.class, paStartService.getPaComponentViewInjector());
     } else {      
-      serviceBuilder.addDependency(noViewStartService, AbstractProcessApplication.class, paStartService.getNoViewProcessApplication());
+      serviceBuilder.addDependency(noViewStartService, ProcessApplicationInterface.class, paStartService.getNoViewProcessApplication());
     }
     
     serviceBuilder.install();

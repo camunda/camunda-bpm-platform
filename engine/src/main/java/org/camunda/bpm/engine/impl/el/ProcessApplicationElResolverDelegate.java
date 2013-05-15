@@ -17,6 +17,7 @@ import java.util.Collections;
 import java.util.Iterator;
 
 import org.camunda.bpm.application.AbstractProcessApplication;
+import org.camunda.bpm.application.ProcessApplicationInterface;
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.application.ProcessApplicationUnavailableException;
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -49,7 +50,7 @@ public class ProcessApplicationElResolverDelegate extends ELResolver {
     if(processApplicationReference != null) {
       
       try {
-        AbstractProcessApplication processApplication = processApplicationReference.getProcessApplication();
+        ProcessApplicationInterface processApplication = processApplicationReference.getProcessApplication();
         return processApplication.getElResolver();
         
       } catch (ProcessApplicationUnavailableException e) {

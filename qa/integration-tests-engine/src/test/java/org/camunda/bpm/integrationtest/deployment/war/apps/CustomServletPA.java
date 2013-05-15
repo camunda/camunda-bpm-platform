@@ -10,30 +10,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.application;
+package org.camunda.bpm.integrationtest.deployment.war.apps;
 
+import org.camunda.bpm.application.ProcessApplication;
+import org.camunda.bpm.application.impl.ServletProcessApplication;
 
 /**
- * A reference to a process application.
- * 
  * @author Daniel Meyer
- * 
+ *
  */
-public interface ProcessApplicationReference {
-
-  /**
-   * 
-   * @return the name of the process application
-   */
-  public String getName();
-
-  /**
-   * Get the process application.
-   * 
-   * @return the {@link AbstractProcessApplication}
-   * @throws ProcessApplicationUnavailableException
-   *           if the process application is unavailable
-   */
-  public ProcessApplicationInterface getProcessApplication() throws ProcessApplicationUnavailableException;
+@ProcessApplication
+public class CustomServletPA extends ServletProcessApplication {
 
 }
