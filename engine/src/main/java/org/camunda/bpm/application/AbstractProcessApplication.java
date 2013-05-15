@@ -71,9 +71,13 @@ public abstract class AbstractProcessApplication {
    * add a {@literal @}{@link PreUndeploy} method to your subclass.</p>
    */
   public final void undeploy() {
-    // delegate stopping of the process application to the runtime container.
-    RuntimeContainerDelegate.INSTANCE.get().undeployProcessApplication(this);
-    isDeployed = false;
+    if(!isDeployed) {
+      LOGGER.fine("Calling undeploy() on process application that is already undeployed.");
+    } else {
+      // delegate stopping of the process application to the runtime container.
+      RuntimeContainerDelegate.INSTANCE.get().undeployProcessApplication(this);
+      isDeployed = false;
+    }
   }
     
   /**
