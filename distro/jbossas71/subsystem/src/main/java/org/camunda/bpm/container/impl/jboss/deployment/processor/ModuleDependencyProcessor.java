@@ -78,6 +78,7 @@ public class ModuleDependencyProcessor implements DeploymentUnitProcessor {
     
     phaseContext.getServiceTarget()
       .addService(serviceName, processApplicationModuleService)
+      .addDependency(phaseContext.getPhaseServiceName())
       .setInitialMode(Mode.ACTIVE)
       .install();
     
