@@ -10,28 +10,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.cockpit.test.sample.plugin;
+package org.camunda.bpm.cockpit.test.sample.plugin.simple;
 
 import java.util.Arrays;
 
-import org.camunda.bpm.cockpit.test.sample.plugin.resources.TestPluginRootResource;
-import org.camunda.bpm.cockpit.test.sample.plugin.resources.TestResource;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import org.camunda.bpm.cockpit.plugin.spi.impl.AbstractCockpitPlugin;
+import org.camunda.bpm.cockpit.test.sample.plugin.simple.resources.SimpleRootResource;
 
 /**
  *
  * @author nico.rehwaldt
  */
-public class TestPlugin extends AbstractCockpitPlugin {
+public class SimplePlugin extends AbstractCockpitPlugin {
 
-  public static final String ID = "test";
+  public static final String ID = "simple";
 
   private static final String[] MAPPING_FILES = {
-    "org/camunda/bpm/cockpit/test/sample/plugin/queries/simple.xml"
+    "org/camunda/bpm/cockpit/test/sample/plugin/simple/queries/simple.xml"
   };
 
   @Override
@@ -48,8 +47,7 @@ public class TestPlugin extends AbstractCockpitPlugin {
   public Set<Class<?>> getResourceClasses() {
     final HashSet<Class<?>> classes = new HashSet<Class<?>>();
 
-    classes.add(TestResource.class);
-    classes.add(TestPluginRootResource.class);
+    classes.add(SimpleRootResource.class);
 
     return classes;
   }

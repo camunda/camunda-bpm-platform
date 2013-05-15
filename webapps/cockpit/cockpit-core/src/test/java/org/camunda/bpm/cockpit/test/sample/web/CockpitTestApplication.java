@@ -18,7 +18,7 @@ import java.util.Set;
 
 import javax.ws.rs.core.Application;
 
-import org.camunda.bpm.cockpit.plugin.Registry;
+import org.camunda.bpm.cockpit.Cockpit;
 import org.camunda.bpm.cockpit.plugin.spi.CockpitPlugin;
 import org.camunda.bpm.engine.rest.exception.ExceptionHandler;
 import org.camunda.bpm.engine.rest.mapper.JacksonConfigurator;
@@ -45,8 +45,8 @@ public class CockpitTestApplication extends Application {
 
   private void addPluginResourceClasses(Set<Class<?>> classes) {
 
-    List<CockpitPlugin> plugins = Registry.getCockpitPlugins();
-
+    List<CockpitPlugin> plugins = Cockpit.getRuntimeDelegate().getPluginRegistry().getPlugins();
+    
     for (CockpitPlugin plugin : plugins) {
       classes.addAll(plugin.getResourceClasses());
     }

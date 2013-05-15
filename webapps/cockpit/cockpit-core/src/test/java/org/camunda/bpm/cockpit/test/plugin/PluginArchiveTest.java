@@ -15,7 +15,7 @@ package org.camunda.bpm.cockpit.test.plugin;
 import static org.fest.assertions.Assertions.assertThat;
 
 import org.camunda.bpm.cockpit.plugin.spi.CockpitPlugin;
-import org.camunda.bpm.cockpit.test.sample.plugin.TestPlugin;
+import org.camunda.bpm.cockpit.test.sample.plugin.simple.SimplePlugin;
 import org.camunda.bpm.cockpit.test.util.DeploymentHelper;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.junit.Test;
@@ -27,18 +27,18 @@ import org.junit.Test;
 public class PluginArchiveTest {
 
   @Test
-  public void shouldContainTestResources() {
+  public void shouldContainCorrectResources() {
 
-    JavaArchive testPluginArchive = DeploymentHelper.getTestPluginAsFiles();
+    JavaArchive pluginArchive = DeploymentHelper.getTestPluginAsFiles();
 
-    String testPluginPkg = TestPlugin.class.getPackage().getName().replaceAll("\\.", "/");
+    String pluginPkg = SimplePlugin.class.getPackage().getName().replaceAll("\\.", "/");
 
-    String contents = testPluginArchive.toString(true);
+    String contents = pluginArchive.toString(true);
 
     assertThat(contents)
         .contains("/META-INF/services/" + CockpitPlugin.class.getName())
-        .contains("/" + testPluginPkg + "/TestPlugin.class")
-        .contains("/" + testPluginPkg + "/assets/test.txt")
-        .contains("/" + testPluginPkg + "/queries/simple.xml");
+        .contains("/" + pluginPkg + "/" + SimplePlugin.class.getSimpleName() + ".class")
+        .contains("/" + pluginPkg + "/assets/test.txt")
+        .contains("/" + pluginPkg + "/queries/simple.xml");
   }
 }
