@@ -15,6 +15,7 @@ package org.camunda.bpm.application.impl;
 import javax.ejb.EJBException;
 
 import org.camunda.bpm.application.AbstractProcessApplication;
+import org.camunda.bpm.application.ProcessApplicationInterface;
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.application.ProcessApplicationUnavailableException;
 import org.camunda.bpm.engine.ProcessEngine;
@@ -30,12 +31,12 @@ import org.camunda.bpm.engine.ProcessEngine;
 public class EjbProcessApplicationReference implements ProcessApplicationReference {
 
   /** this is an EjbProxy and can be cached */
-  protected EjbProcessApplication selfReference;
+  protected ProcessApplicationInterface selfReference;
   
   /** the name of the process application */
   protected String processApplicationName;
 
-  public EjbProcessApplicationReference(EjbProcessApplication selfReference, String name) {
+  public EjbProcessApplicationReference(ProcessApplicationInterface selfReference, String name) {
     this.selfReference = selfReference;
     this.processApplicationName = name;
   }
@@ -44,7 +45,7 @@ public class EjbProcessApplicationReference implements ProcessApplicationReferen
     return processApplicationName;
   }
 
-  public AbstractProcessApplication getProcessApplication() throws ProcessApplicationUnavailableException {
+  public ProcessApplicationInterface getProcessApplication() throws ProcessApplicationUnavailableException {
     try {
       // check whether process application is still deployed
       selfReference.getName();
