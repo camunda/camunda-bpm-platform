@@ -145,19 +145,12 @@
           <groupId>org.jboss.resteasy</groupId>
           <artifactId>resteasy-jaxrs</artifactId>
           <scope>test</scope>
-        </dependency>
-
-        <dependency>
-          <groupId>commons-io</groupId>
-          <artifactId>commons-io</artifactId>
-          <scope>test</scope>
-        </dependency>
-
-        <dependency>
-          <groupId>commons-codec</groupId>
-          <artifactId>commons-codec</artifactId>
-          <scope>test</scope>
-          <version>1.5</version>
+          <exclusions>
+            <exclusion>
+              <artifactId>commons-httpclient</artifactId>
+              <groupId>commons-httpclient</groupId>
+            </exclusion>
+          </exclusions>
         </dependency>
       </dependencies>
 
