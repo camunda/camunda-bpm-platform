@@ -5,10 +5,14 @@
        xsi:schemaLocation="http://www.springframework.org/schema/beans   http://www.springframework.org/schema/beans/spring-beans.xsd">
 
   <bean id="processEngineConfiguration" class="org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration">
-  
+
+    <property name="processEngineName" value="VariableHistoryLevelCompatibilityTest-engine" />
+          
     <!-- Database configurations -->
+    <property name="databaseSchemaUpdate" value="create-drop" />
+    <property name="jdbcUrl" value="jdbc:h2:mem:VariableHistoryLevelCompatibilityTest" />
+  
     <property name="history" value="variable" />
-    <property name="databaseSchemaUpdate" value="true" />
     
     <!-- job executor configurations -->
     <property name="jobExecutorActivate" value="false" />

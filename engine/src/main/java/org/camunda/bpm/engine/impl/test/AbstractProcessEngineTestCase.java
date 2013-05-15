@@ -89,8 +89,6 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
       initializeServices();
     }
     
-    TestHelper.createOrUpdateHistoryLevel(processEngineConfiguration);
-    
     log.severe(EMPTY_LINE);
 
     try {
@@ -127,8 +125,6 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
    * If the DB is not clean, it is cleaned by performing a create a drop. */
   protected void assertAndEnsureCleanDb() throws Throwable {
     log.fine("verifying that db is clean after test");
-    
-    TestHelper.deleteHistoryLevel(processEngineConfiguration);
     
     Map<String, Long> tableCounts = managementService.getTableCount();
     StringBuilder outputMessage = new StringBuilder();

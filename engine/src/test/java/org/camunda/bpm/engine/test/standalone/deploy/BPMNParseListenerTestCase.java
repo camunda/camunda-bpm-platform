@@ -28,6 +28,12 @@ public class BPMNParseListenerTestCase extends ResourceProcessEngineTestCase {
   public BPMNParseListenerTestCase() {
     super("org/camunda/bpm/engine/test/standalone/deploy/bpmn.parse.listener.activiti.cfg.xml");
   }
+  
+  @Override
+  protected void closeDownProcessEngine() {
+    processEngine.close();
+    super.closeDownProcessEngine();
+  }
 
   @Deployment
   public void testAlterProcessDefinitionKeyWhenDeploying() throws Exception {

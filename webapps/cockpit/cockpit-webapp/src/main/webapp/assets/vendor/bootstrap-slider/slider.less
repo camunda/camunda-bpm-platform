@@ -1,0 +1,104 @@
+/*!
+ * Slider for Bootstrap
+ *
+ * Copyright 2012 Stefan Petre
+ * Licensed under the Apache License v2.0
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ */
+
+.slider {
+	display: inline-block;
+	vertical-align: middle;
+	position: relative;
+	&.slider-horizontal {
+		width: 210px;
+		height: @baseLineHeight;
+		.slider-track {
+			height: @baseLineHeight/2;
+			width: 100%;
+			margin-top: -@baseLineHeight/4;
+			top: 50%;
+			left: 0;
+		}
+		.slider-selection {
+			height: 100%;
+			top: 0;
+			bottom: 0;
+		}
+		.slider-handle {
+			margin-left: -@baseLineHeight/2;
+			margin-top: -@baseLineHeight/4;
+			&.triangle {
+    			border-width: 0 @baseLineHeight/2 @baseLineHeight/2 @baseLineHeight/2;
+				width: 0;
+				height: 0;
+				border-bottom-color: #0480be;
+				margin-top: 0;
+			}
+		}
+	}
+	&.slider-vertical {
+		height: 210px;
+		width: @baseLineHeight;
+		.slider-track {
+			width: @baseLineHeight/2;
+			height: 100%;
+			margin-left: -@baseLineHeight/4;
+			left: 50%;
+			top: 0;
+		}
+		.slider-selection {
+			width: 100%;
+			left: 0;
+			top: 0;
+			bottom: 0;
+		}
+		.slider-handle {
+			margin-left: -@baseLineHeight/4;
+			margin-top: -@baseLineHeight/2;
+			&.triangle {
+				border-width: @baseLineHeight/2 0 @baseLineHeight/2 @baseLineHeight/2;
+				width: 1px;
+				height: 1px;
+				border-left-color: #0480be;
+				margin-left: 0;
+			}
+		}
+	}
+	input {
+		display: none;
+	}
+	.tooltip-inner {
+		white-space: nowrap;
+	}
+}
+.slider-track {
+	position: absolute;
+	cursor: pointer;
+	#gradient > .vertical(#f5f5f5, #f9f9f9);
+	.box-shadow(inset 0 1px 2px rgba(0,0,0,.1));
+	.border-radius(@baseBorderRadius);
+}
+.slider-selection {
+	position: absolute;
+	#gradient > .vertical(#f9f9f9, #f5f5f5);
+	.box-shadow(inset 0 -1px 0 rgba(0,0,0,.15));
+	.box-sizing(border-box);
+	.border-radius(@baseBorderRadius);
+}
+.slider-handle {
+	position: absolute;
+	width: @baseLineHeight;
+	height: @baseLineHeight;
+	#gradient > .vertical(#149bdf, #0480be);
+	.box-shadow(~"inset 0 1px 0 rgba(255,255,255,.2), 0 1px 2px rgba(0,0,0,.05)");
+	opacity: 0.8;
+	border: 0px solid transparent;
+	&.round {
+		.border-radius(@baseLineHeight);
+	}
+	&.triangle {
+		background: transparent none;
+	}
+}

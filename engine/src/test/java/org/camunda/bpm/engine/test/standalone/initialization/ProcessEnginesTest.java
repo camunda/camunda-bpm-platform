@@ -30,11 +30,9 @@ public class ProcessEnginesTest extends PvmTestCase {
     super.setUp();
     ProcessEngines.destroy();
     ProcessEngines.init();
-    TestHelper.createOrUpdateHistoryLevel(((ProcessEngineImpl) ProcessEngines.getDefaultProcessEngine()).getProcessEngineConfiguration());
   }
   
   protected void tearDown() throws Exception {
-    TestHelper.deleteHistoryLevel(((ProcessEngineImpl) ProcessEngines.getDefaultProcessEngine()).getProcessEngineConfiguration());
     ProcessEngines.destroy();
     super.tearDown();
   }

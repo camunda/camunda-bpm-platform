@@ -30,6 +30,12 @@ public class RulesDeployerTest extends ResourceProcessEngineTestCase {
   public RulesDeployerTest() {
     super("org/camunda/bpm/engine/test/standalone/rules/rules.activiti.cfg.xml");
   }
+  
+  @Override
+  protected void closeDownProcessEngine() {
+    processEngine.close();
+    super.closeDownProcessEngine();
+  }
 
   @SuppressWarnings("unchecked")
   @Deployment(

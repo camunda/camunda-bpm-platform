@@ -14,6 +14,7 @@ package org.camunda.bpm.application.impl;
 
 import java.util.concurrent.Callable;
 
+import javax.ejb.SessionContext;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
@@ -39,7 +40,7 @@ import org.camunda.bpm.engine.delegate.JavaDelegate;
  * {@literal @}Singleton
  * {@literal @}Startup 
  * {@literal @}ConcurrencyManagement(ConcurrencyManagementType.BEAN) 
- * {@literal @}TransactionAttribute(TransactionAttributeType.SUPPORTS)
+ * {@literal @}TransactionAttribute(TransactionAttributeType.REQUIRED)
  * public class DefaultEjbProcessApplication extends EjbProcessApplication {
  *   
  *   {@literal @}PostConstruct
@@ -94,30 +95,29 @@ import org.camunda.bpm.engine.delegate.JavaDelegate;
  * the actual component instance is looked up and invoked.</p>
  *
  * @author Daniel Meyer
- * @author Andreas Drobisch
  * 
  */
 public class EjbProcessApplication extends AbstractProcessApplication {
 
+  protected static String MODULE_NAME_PATH  = "java:module/ModuleName";
+  protected static String JAVA_APP_APP_NAME_PATH = "java:app/AppName";
+  protected static String EJB_CONTEXT_PATH = "java:comp/EJBContext";
+  
   private EjbProcessApplicationReference ejbProcessApplicationReference;
-  private NameLookup names;
-
+  private EjbProcessApplication selfReference;
+  
   public ProcessApplicationReference getReference() {    
     ensureInitialized();
     return ejbProcessApplicationReference;
   }
 
-  protected void ensureInitialized() {
-    names = lookupNames();
-
-    if(ejbProcessApplicationReference == null) {
-      ejbProcessApplicationReference = new EjbProcessApplicationReference(names);
-    }
+  protected String autodetectProcessApplicationName() {
+    return lookupEeApplicationName();
   }
   
-  protected String autodetectProcessApplicationName() {
-    ensureInitialized();
-    return names.processApplicationName;
+  /** allows subclasses to provide a custom business interface */
+  protected Class<? extends EjbProcessApplication> getBusinessInterface() {
+    return getClass();
   }
   
   public <T> T execute(Callable<T> callable) throws ProcessApplicationExecutionException {
@@ -127,46 +127,57 @@ public class EjbProcessApplication extends AbstractProcessApplication {
       throw new ProcessApplicationExecutionException(e);
     }
   }
-
-  public class NameLookup {
-    public final String appName;
-    public final String appClassName;
-    public final String moduleName;
-    public final String processApplicationName;
-
-    private NameLookup(String appName, String moduleName, String processApplicationName, String appClassName) {
-      this.appName = appName;
-      this.appClassName = appClassName;
-      this.moduleName = moduleName;
-      this.processApplicationName = processApplicationName;
+  
+  
+  protected void ensureInitialized() {
+    if(selfReference == null) {
+      selfReference = lookupSelfReference();
+    }
+    if(ejbProcessApplicationReference == null) {
+      ejbProcessApplicationReference = new EjbProcessApplicationReference(selfReference, getName());      
     }
   }
   
-  private NameLookup lookupNames() {
+  /**
+   * lookup a proxy object representing the invoked business view of this component. 
+   */
+  protected EjbProcessApplication lookupSelfReference() {
+    
     try {
+      InitialContext ic = new InitialContext();
+      SessionContext sctxLookup = (SessionContext) ic.lookup(EJB_CONTEXT_PATH);
+      return (EjbProcessApplication) sctxLookup.getBusinessObject(getBusinessInterface());
+      
+    } catch (NamingException e) {
+      throw new ProcessEngineException("Cannot lookup self reference to EjbProcessApplication", e);
+    }
+    
+  }
 
+  /**
+   * determine the ee application name based on information obtained from JNDI.
+   */
+  protected String lookupEeApplicationName() {
+    
+    try {
       InitialContext initialContext = new InitialContext();
 
-      String appName = (String) initialContext.lookup("java:app/AppName");
-      String moduleName = (String) initialContext.lookup("java:module/ModuleName");
-      String processApplicationName = null;
+      String appName = (String) initialContext.lookup(JAVA_APP_APP_NAME_PATH);
+      String moduleName = (String) initialContext.lookup(MODULE_NAME_PATH);
 
+      // make sure that if an EAR carries multiple PAs, they are correctly
+      // identified by appName + moduleName        
       if (moduleName != null && !moduleName.equals(appName)) {
-        // make sure that if an EAR carries multiple PAs, they are correctly
-        // identified by appName + moduleName
-        // NOTE: this does not work on IBM since there WARs or EJBs
-        // are always wrapped inside an EAR deployment.
-        // This is handled with a special ProcessApplicationManager in the WAS service
-        processApplicationName = appName + "/" + moduleName;
+        return appName + "/" + moduleName;
       } else {
-        processApplicationName = appName;
+        return appName;
       }
-
-      return new NameLookup(appName, moduleName, processApplicationName, getClass().getSimpleName());
-
+  
     } catch (NamingException e) {
       throw new ProcessEngineException("Could not autodetect EjbProcessApplicationName: "+e.getMessage(), e);
     }
+    
+    
   }
-
+  
 }

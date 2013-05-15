@@ -12,9 +12,9 @@
  */
 package org.camunda.bpm.application.impl;
 
-import javax.naming.InitialContext;
+import javax.ejb.EJBException;
 
-import org.camunda.bpm.application.ProcessApplicationInterface;
+import org.camunda.bpm.application.AbstractProcessApplication;
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.application.ProcessApplicationUnavailableException;
 import org.camunda.bpm.engine.ProcessEngine;
@@ -25,44 +25,37 @@ import org.camunda.bpm.engine.ProcessEngine;
  * <p>An EJB process application is an EJB Session Bean that can be looked up in JNDI.</p>
  * 
  * @author Daniel Meyer
- * @author Andreas Drobisch
  *
  */
 public class EjbProcessApplicationReference implements ProcessApplicationReference {
 
-  public final EjbProcessApplication.NameLookup names;
-  protected final String lookupName;
-  protected final static String lookupScope = "java:global/";
+  /** this is an EjbProxy and can be cached */
+  protected EjbProcessApplication selfReference;
+  
+  /** the name of the process application */
+  protected String processApplicationName;
 
-  public EjbProcessApplicationReference() {
-    names = null;
-    lookupName = null;
-  }
-
-  public EjbProcessApplicationReference(EjbProcessApplication.NameLookup names) {
-    this.names = names;
-    this.lookupName = lookupScope + getSessionObjectName(names);
+  public EjbProcessApplicationReference(EjbProcessApplication selfReference, String name) {
+    this.selfReference = selfReference;
+    this.processApplicationName = name;
   }
 
   public String getName() {
-    return names.processApplicationName;
+    return processApplicationName;
   }
 
-  public String getSessionObjectName (EjbProcessApplication.NameLookup names) {
-    return names.processApplicationName + "/" + names.appClassName;
-  }
-
-  public ProcessApplicationInterface getProcessApplication() throws ProcessApplicationUnavailableException {
+  public AbstractProcessApplication getProcessApplication() throws ProcessApplicationUnavailableException {
     try {
-      // TODO: do lookup once and cache EJB proxy
-      return InitialContext.doLookup(lookupName);
-    } catch (Exception e) {
-      throw new ProcessApplicationUnavailableException("Could not lookup process application using JNDI name '"+lookupName+"'", e);
+      // check whether process application is still deployed
+      selfReference.getName();
+    } catch(EJBException e) {
+      throw new ProcessApplicationUnavailableException();
     }
+    return selfReference;
   }
 
   public void processEngineStopping(ProcessEngine processEngine) throws ProcessApplicationUnavailableException {
-    // do nothing.
+    // do nothing.   
   }
 
 }

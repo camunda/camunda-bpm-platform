@@ -109,6 +109,8 @@ public class ProcessApplicationDeploymentProcessor implements DeploymentUnitProc
           .setInitialMode(Mode.ACTIVE);
         
         if(paViewServiceName != null) {
+          // add a dependency on the component start service to make sure we are started after the pa-component (Singleton EJB) has started
+          serviceBuilder.addDependency(paComponent.getStartServiceName()); 
           serviceBuilder.addDependency(paViewServiceName, ComponentView.class, deploymentService.getPaComponentViewInjector());
         } else {
           serviceBuilder.addDependency(noViewStartService, ProcessApplicationInterface.class, deploymentService.getNoViewProcessApplication());

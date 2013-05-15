@@ -24,6 +24,7 @@
     <xs:sequence>
       <xs:element name="datasource" minOccurs="1" maxOccurs="1" />
       <xs:element name="history-level" minOccurs="0" maxOccurs="1" />
+      <xs:element name="configuration" minOccurs="0" maxOccurs="1" />
       <xs:element name="properties" type="propertiesType" minOccurs="0" maxOccurs="1" />
     </xs:sequence>
     <xs:attribute name="name" use="required" />

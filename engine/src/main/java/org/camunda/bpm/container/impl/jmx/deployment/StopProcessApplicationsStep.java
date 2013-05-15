@@ -23,6 +23,7 @@ import org.camunda.bpm.container.impl.jmx.JmxRuntimeContainerDelegate.ServiceTyp
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanDeploymentOperation;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanDeploymentOperationStep;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanServiceContainer;
+import org.camunda.bpm.container.impl.jmx.services.JmxManagedProcessApplication;
 
 /**
  * <p>Deployment operation step that is responsible for stopping all process applications</p>
@@ -41,10 +42,10 @@ public class StopProcessApplicationsStep extends MBeanDeploymentOperationStep {
   public void performOperationStep(MBeanDeploymentOperation operationContext) {
     
     final MBeanServiceContainer serviceContainer = operationContext.getServiceContainer();
-    List<ProcessApplicationReference> processApplicationsReferences = serviceContainer.getServiceValuesByType(ServiceTypes.PROCESS_APPLICATION);
+    List<JmxManagedProcessApplication> processApplicationsReferences = serviceContainer.getServiceValuesByType(ServiceTypes.PROCESS_APPLICATION);
     
-    for (ProcessApplicationReference processApplication : processApplicationsReferences) {
-      stopProcessApplication(processApplication);      
+    for (JmxManagedProcessApplication processApplication : processApplicationsReferences) {
+      stopProcessApplication(processApplication.getProcessApplicationReference());      
     }
 
   }

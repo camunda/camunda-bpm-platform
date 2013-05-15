@@ -16,6 +16,7 @@ package org.camunda.bpm.engine.test.db;
 import javax.sql.DataSource;
 
 import org.apache.ibatis.datasource.pooled.PooledDataSource;
+import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.test.PvmTestCase;
@@ -30,7 +31,7 @@ public class ConnectionPoolTest extends PvmTestCase {
     ProcessEngineConfigurationImpl config = (ProcessEngineConfigurationImpl) ProcessEngineConfiguration
       .createProcessEngineConfigurationFromResource("org/camunda/bpm/engine/test/db/connection-pool.activiti.cfg.xml");
     
-    config.buildProcessEngine();
+    ProcessEngine engine = config.buildProcessEngine();
     
     // Expected values
     int maxActive = 25;
@@ -52,6 +53,8 @@ public class ConnectionPoolTest extends PvmTestCase {
     assertEquals(maxIdle, pooledDataSource.getPoolMaximumIdleConnections());
     assertEquals(maxCheckoutTime, pooledDataSource.getPoolMaximumCheckoutTime());
     assertEquals(maxWaitTime, pooledDataSource.getPoolTimeToWait());
+    
+    engine.close();
   }
 
 }
