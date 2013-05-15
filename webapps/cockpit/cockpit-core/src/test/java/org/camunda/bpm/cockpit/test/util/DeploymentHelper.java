@@ -60,6 +60,7 @@ public class DeploymentHelper {
         .artifact("org.jboss.resteasy:resteasy-jaxrs")
           .exclusion("org.apache.httpcomponents:httpclient")
           .exclusion("commons-httpclient:commons-httpclient")
+          .exclusion("commons-io:commons-io")
           .resolveAsFiles();
   }
 
