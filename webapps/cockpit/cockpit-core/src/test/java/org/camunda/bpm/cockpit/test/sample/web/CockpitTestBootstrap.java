@@ -14,7 +14,6 @@ package org.camunda.bpm.cockpit.test.sample.web;
 
 import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
-import javax.servlet.annotation.WebListener;
 
 import org.camunda.bpm.cockpit.impl.DefaultRuntimeDelegate;
 import org.camunda.bpm.cockpit.Cockpit;
@@ -26,7 +25,6 @@ import org.camunda.bpm.engine.ProcessEngineConfiguration;
  *
  * @author nico.rehwaldt
  */
-@WebListener
 public class CockpitTestBootstrap implements ServletContextListener {
 
   private ProcessEngine processEngine;

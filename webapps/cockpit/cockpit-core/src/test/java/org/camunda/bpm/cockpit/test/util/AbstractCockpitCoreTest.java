@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.cockpit.test.util;
 
+import org.camunda.bpm.cockpit.Cockpit;
+import org.camunda.bpm.cockpit.plugin.PluginRegistry;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 
 /**
@@ -21,8 +23,16 @@ import org.jboss.shrinkwrap.api.spec.WebArchive;
 public class AbstractCockpitCoreTest {
 
   public static WebArchive createBaseDeployment() {
-    return DeploymentHelper.getCockpitWar()
+    return createBaseDeployment("test.war");
+  }
+
+  public static WebArchive createBaseDeployment(String archiveName) {
+    return DeploymentHelper.getCockpitWar(archiveName)
       .addAsLibraries(DeploymentHelper.getFestAssertions())
       .addClass(AbstractCockpitCoreTest.class);
+  }
+  
+  public PluginRegistry getPluginRegistry() {
+    return Cockpit.getRuntimeDelegate().getPluginRegistry();
   }
 }

@@ -35,6 +35,11 @@ public class BasePlugin extends AbstractCockpitPlugin {
   }
 
   @Override
+  public String getAssetDirectory() {
+    return "webapp://plugin/base";
+  }
+
+  @Override
   public List<String> getMappingFiles() {
     return Arrays.asList(MAPPING_FILES);
   }

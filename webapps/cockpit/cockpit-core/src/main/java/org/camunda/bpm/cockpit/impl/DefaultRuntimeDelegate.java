@@ -12,12 +12,13 @@
  */
 package org.camunda.bpm.cockpit.impl;
 
+import org.camunda.bpm.cockpit.impl.plugin.DefaultPluginRegistry;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.camunda.bpm.BpmPlatform;
 import org.camunda.bpm.cockpit.CockpitRuntimeDelegate;
-import org.camunda.bpm.cockpit.plugin.Registry;
+import org.camunda.bpm.cockpit.plugin.PluginRegistry;
 import org.camunda.bpm.cockpit.db.CommandExecutor;
 import org.camunda.bpm.cockpit.db.QueryService;
 import org.camunda.bpm.cockpit.impl.db.CommandExecutorImpl;
@@ -30,13 +31,19 @@ import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 
 /**
  * <p>This is the default {@link CockpitRuntimeDelegate} implementation that provides
- * the camunda cockpit plugin services (i.e. {@link QuerySerive} and
- * {@link CommandExecutor}.</p>
+ * the camunda cockpit plugin services (i.e. {@link QueryService} and
+ * {@link CommandExecutor}).</p>
  *
  * @author roman.smirnov
- *
+ * @author nico.rehwaldt
  */
 public class DefaultRuntimeDelegate implements CockpitRuntimeDelegate {
+
+  private final PluginRegistry pluginRegistry;
+
+  public DefaultRuntimeDelegate() {
+    this.pluginRegistry = new DefaultPluginRegistry();
+  }
 
   @Override
   public QueryService getQueryService(String processEngineName) {
@@ -60,7 +67,7 @@ public class DefaultRuntimeDelegate implements CockpitRuntimeDelegate {
   }
 
   protected List<String> getMappingFiles() {
-    List<CockpitPlugin> cockpitPlugins = Registry.getCockpitPlugins();
+    List<CockpitPlugin> cockpitPlugins = pluginRegistry.getPlugins();
 
     List<String> mappingFiles = new ArrayList<String>();
     for (CockpitPlugin plugin: cockpitPlugins) {
@@ -70,6 +77,12 @@ public class DefaultRuntimeDelegate implements CockpitRuntimeDelegate {
     return mappingFiles;
   }
 
+  @Override
+  public PluginRegistry getPluginRegistry() {
+    return pluginRegistry;
+  }
+
+  @Override
   public ProcessEngine getProcessEngine(String processEngineName) {
     try {
       return BpmPlatform.getProcessEngineService().getProcessEngine(processEngineName);

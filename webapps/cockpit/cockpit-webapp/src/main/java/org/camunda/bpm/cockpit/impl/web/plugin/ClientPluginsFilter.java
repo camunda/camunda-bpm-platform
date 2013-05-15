@@ -16,7 +16,8 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.camunda.bpm.cockpit.plugin.Registry;
+import org.camunda.bpm.cockpit.Cockpit;
+import org.camunda.bpm.cockpit.plugin.PluginRegistry;
 import org.camunda.bpm.cockpit.plugin.spi.CockpitPlugin;
 
 /**
@@ -94,7 +95,7 @@ public class ClientPluginsFilter implements Filter {
   }
 
   private CharSequence createPluginPackagesStr() {
-    final List<CockpitPlugin> plugins = Registry.getCockpitPlugins();
+    final List<CockpitPlugin> plugins = getCockpitPlugins();
 
     StringBuilder builder = new StringBuilder();
 
@@ -112,7 +113,7 @@ public class ClientPluginsFilter implements Filter {
   }
 
   private CharSequence createPluginDependenciesStr() {
-     final List<CockpitPlugin> plugins = Registry.getCockpitPlugins();
+    final List<CockpitPlugin> plugins = getCockpitPlugins();
 
     StringBuilder builder = new StringBuilder();
 
@@ -127,5 +128,9 @@ public class ClientPluginsFilter implements Filter {
     }
 
     return "[" + builder.toString() + "]";
+  }
+
+  private List<CockpitPlugin> getCockpitPlugins() {
+    return Cockpit.getRuntimeDelegate().getPluginRegistry().getPlugins();
   }
 }

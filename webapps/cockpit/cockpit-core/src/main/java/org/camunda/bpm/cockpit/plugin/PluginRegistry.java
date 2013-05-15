@@ -10,31 +10,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.cockpit.test.sample.plugin.resources;
+package org.camunda.bpm.cockpit.plugin;
 
 import java.util.List;
-import javax.ws.rs.GET;
-
-import org.camunda.bpm.cockpit.db.QueryParameters;
-import org.camunda.bpm.cockpit.plugin.resource.AbstractPluginResource;
-import org.camunda.bpm.engine.runtime.Execution;
+import org.camunda.bpm.cockpit.plugin.spi.CockpitPlugin;
 
 /**
- * A test resource
+ * The holder of registered cockpit plugins.
  *
  * @author nico.rehwaldt
  */
-public class TestResource extends AbstractPluginResource {
+public interface PluginRegistry {
+  
+  /**
+   * Returns all registered plugins
+   *
+   * @return
+   */
+  public List<CockpitPlugin> getPlugins();
 
-  public TestResource(String engine) {
-    super(engine);
-  }
-
-  @GET
-  public List<Execution> listExecutions() {
-
-    List<Execution> result = getQueryService().executeQuery("cockpit.test.selectExecution", new QueryParameters<Execution>());
-
-    return result;
-  }
+  /**
+   * Returns the registered plugin with the given name or
+   * <code>null</code> if the plugin does not exist.
+   *
+   * @param id
+   * @return
+   */
+  public CockpitPlugin getPlugin(String id);
 }
