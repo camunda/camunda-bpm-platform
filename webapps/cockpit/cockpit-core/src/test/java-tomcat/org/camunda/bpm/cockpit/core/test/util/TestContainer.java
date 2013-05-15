@@ -3,8 +3,6 @@ package org.camunda.bpm.cockpit.core.test.util;
 import org.camunda.bpm.cockpit.test.util.DeploymentHelper;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 
-
-
 /**
  * Tomcat test container
  *

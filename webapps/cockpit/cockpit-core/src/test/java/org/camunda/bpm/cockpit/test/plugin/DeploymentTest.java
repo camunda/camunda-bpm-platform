@@ -12,8 +12,6 @@
  */
 package org.camunda.bpm.cockpit.test.plugin;
 
-import org.camunda.bpm.cockpit.plugin.Registry;
-
 import static org.fest.assertions.Assertions.assertThat;
 
 import org.camunda.bpm.cockpit.Cockpit;

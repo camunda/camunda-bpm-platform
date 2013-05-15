@@ -56,7 +56,11 @@ public class DeploymentHelper {
 
   public static File[] getResteasyJaxRs() {
 
-    return resolver().artifacts("org.jboss.resteasy:resteasy-jaxrs").exclusion("org.apache.httpcomponents:httpclient").resolveAsFiles();
+    return resolver()
+        .artifact("org.jboss.resteasy:resteasy-jaxrs")
+          .exclusion("org.apache.httpcomponents:httpclient")
+          .exclusion("commons-httpclient:commons-httpclient")
+          .resolveAsFiles();
   }
 
   public static File[] getFestAssertions() {
