@@ -77,7 +77,7 @@
     
     <dependencySet>
         <includes>
-          <include>org.camunda.bpm.cockpit:camunda-cockpit:war:*</include>
+          <include>org.camunda.bpm.cockpit:camunda-cockpit-jboss:war:*</include>
         </includes>
         <outputDirectory>server/jboss-as-${version.jboss.as}/standalone/deployments</outputDirectory>
     </dependencySet>
