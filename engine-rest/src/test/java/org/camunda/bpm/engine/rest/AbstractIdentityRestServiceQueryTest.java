@@ -17,9 +17,12 @@ import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.GroupQuery;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.identity.UserQuery;
+import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.junit.Before;
 import org.junit.Test;
+
+import com.jayway.restassured.http.ContentType;
 
 public abstract class AbstractIdentityRestServiceQueryTest extends AbstractRestServiceTest {
 
@@ -75,7 +78,9 @@ public abstract class AbstractIdentityRestServiceQueryTest extends AbstractRestS
   
   @Test
   public void testGroupInfoQueryWithMissingUserParameter() {
-    expect().statusCode(Status.BAD_REQUEST.getStatusCode())
+    expect().statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+    .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+    .body("message", equalTo("userId has to be supplied"))
     .when().get(TASK_GROUPS_URL);
   }
 }

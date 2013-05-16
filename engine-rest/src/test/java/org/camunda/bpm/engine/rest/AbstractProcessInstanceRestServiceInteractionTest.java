@@ -14,12 +14,15 @@ import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.helper.ExampleVariableObject;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.junit.Before;
 import org.junit.Test;
+
+import com.jayway.restassured.http.ContentType;
 
 public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
     AbstractRestServiceTest {
@@ -103,7 +106,9 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
     when(sampleInstanceQuery.singleResult()).thenReturn(null);
     
     given().pathParam("id", "aNonExistingInstanceId")
-      .then().expect().statusCode(Status.NOT_FOUND.getStatusCode())
+      .then().expect().statusCode(Status.NOT_FOUND.getStatusCode()).contentType(ContentType.JSON)
+      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", equalTo("TODO: fix me"))
       .when().get(PROCESS_INSTANCE_URL);
   }
 
@@ -112,7 +117,9 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
     when(runtimeServiceMock.getVariables(anyString())).thenThrow(new ProcessEngineException("expected exception"));
     
     given().pathParam("id", "aNonExistingProcessInstanceId")
-      .then().expect().statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
+      .then().expect().statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).contentType(ContentType.JSON)
+      .body("type", equalTo(ProcessEngineException.class.getSimpleName()))
+      .body("message", equalTo("expected exception"))
       .when().get(PROCESS_INSTANCE_VARIABLES_URL);
   }
 }

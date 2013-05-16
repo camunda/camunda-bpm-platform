@@ -18,6 +18,7 @@ import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
+import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.helper.MockDefinitionBuilder;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.junit.Assert;
@@ -26,6 +27,7 @@ import org.junit.Test;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
 
+import com.jayway.restassured.http.ContentType;
 import com.jayway.restassured.response.Response;
 
 public abstract class AbstractProcessDefinitionRestServiceQueryTest extends AbstractRestServiceTest {
@@ -59,7 +61,9 @@ public abstract class AbstractProcessDefinitionRestServiceQueryTest extends Abst
   public void testInvalidNumericParameter() {
     String anInvalidIntegerQueryParam = "aString";
     given().queryParam("ver", anInvalidIntegerQueryParam)
-      .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
+      .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", equalTo("TODO: fix me"))
       .when().get(PROCESS_DEFINITION_QUERY_URL);
   }
 
@@ -77,27 +81,43 @@ public abstract class AbstractProcessDefinitionRestServiceQueryTest extends Abst
   
   @Test
   public void testInvalidSortingOptions() {
-    executeAndVerifySorting("anInvalidSortByOption", "asc", Status.BAD_REQUEST);
-    executeAndVerifySorting("category", "anInvalidSortOrderOption", Status.BAD_REQUEST);
+    executeAndVerifyFailingSorting("anInvalidSortByOption", "asc", Status.BAD_REQUEST, 
+        InvalidRequestException.class.getSimpleName(), "TODO: fix me");
+    executeAndVerifyFailingSorting("category", "anInvalidSortOrderOption", Status.BAD_REQUEST, 
+        InvalidRequestException.class.getSimpleName(), "TODO: fix me");
   }
 
-  protected void executeAndVerifySorting(String sortBy, String sortOrder, Status expectedStatus) {
+  protected void executeAndVerifySuccessfulSorting(String sortBy, String sortOrder, Status expectedStatus) {
     given().queryParam("sortBy", sortBy).queryParam("sortOrder", sortOrder)
-      .then().expect().statusCode(expectedStatus.getStatusCode())
+      .then().expect().statusCode(expectedStatus.getStatusCode()).contentType(ContentType.JSON)
+      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", equalTo("TODO: fix me"))
+      .when().get(PROCESS_DEFINITION_QUERY_URL);
+  }
+  
+  protected void executeAndVerifyFailingSorting(String sortBy, String sortOrder, Status expectedStatus, String expectedErrorType, String expectedErrorMessage) {
+    given().queryParam("sortBy", sortBy).queryParam("sortOrder", sortOrder)
+      .then().expect().statusCode(expectedStatus.getStatusCode()).contentType(ContentType.JSON)
+      .body("type", equalTo(expectedErrorType))
+      .body("message", equalTo(expectedErrorMessage))
       .when().get(PROCESS_DEFINITION_QUERY_URL);
   }
   
   @Test
   public void testSortByParameterOnly() {
     given().queryParam("sortBy", "category")
-      .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
+      .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", equalTo("TODO: fix me"))
       .when().get(PROCESS_DEFINITION_QUERY_URL);
   }
   
   @Test
   public void testSortOrderParameterOnly() {
     given().queryParam("sortOrder", "asc")
-      .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
+      .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", equalTo("TODO: fix me"))
       .when().get(PROCESS_DEFINITION_QUERY_URL);
   }
 
@@ -228,32 +248,32 @@ public abstract class AbstractProcessDefinitionRestServiceQueryTest extends Abst
   @Test
   public void testSortingParameters() {
     InOrder inOrder = Mockito.inOrder(mockedQuery);
-    executeAndVerifySorting("category", "asc", Status.OK);
+    executeAndVerifySuccessfulSorting("category", "asc", Status.OK);
     inOrder.verify(mockedQuery).orderByProcessDefinitionCategory();
     inOrder.verify(mockedQuery).asc();
     
     inOrder = Mockito.inOrder(mockedQuery);
-    executeAndVerifySorting("key", "desc", Status.OK);
+    executeAndVerifySuccessfulSorting("key", "desc", Status.OK);
     inOrder.verify(mockedQuery).orderByProcessDefinitionKey();
     inOrder.verify(mockedQuery).desc();
     
     inOrder = Mockito.inOrder(mockedQuery);
-    executeAndVerifySorting("id", "asc", Status.OK);
+    executeAndVerifySuccessfulSorting("id", "asc", Status.OK);
     inOrder.verify(mockedQuery).orderByProcessDefinitionId();
     inOrder.verify(mockedQuery).asc();
     
     inOrder = Mockito.inOrder(mockedQuery);
-    executeAndVerifySorting("version", "desc", Status.OK);
+    executeAndVerifySuccessfulSorting("version", "desc", Status.OK);
     inOrder.verify(mockedQuery).orderByProcessDefinitionVersion();
     inOrder.verify(mockedQuery).desc();
     
     inOrder = Mockito.inOrder(mockedQuery);
-    executeAndVerifySorting("name", "asc", Status.OK);
+    executeAndVerifySuccessfulSorting("name", "asc", Status.OK);
     inOrder.verify(mockedQuery).orderByProcessDefinitionName();
     inOrder.verify(mockedQuery).asc();
     
     inOrder = Mockito.inOrder(mockedQuery);
-    executeAndVerifySorting("deploymentId", "desc", Status.OK);
+    executeAndVerifySuccessfulSorting("deploymentId", "desc", Status.OK);
     inOrder.verify(mockedQuery).orderByDeploymentId();
     inOrder.verify(mockedQuery).desc();
   }

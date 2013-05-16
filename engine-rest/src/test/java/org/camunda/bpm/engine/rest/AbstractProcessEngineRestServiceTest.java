@@ -29,6 +29,7 @@ import org.camunda.bpm.engine.identity.GroupQuery;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.identity.UserQuery;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.helper.EqualsMap;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -37,6 +38,8 @@ import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
 import org.junit.Before;
 import org.junit.Test;
+
+import com.jayway.restassured.http.ContentType;
 
 public abstract class AbstractProcessEngineRestServiceTest extends
     AbstractRestServiceTest {
@@ -130,7 +133,9 @@ public abstract class AbstractProcessEngineRestServiceTest extends
     given().pathParam("name", MockProvider.NON_EXISTING_PROCESS_ENGINE_NAME)
       .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
     .then().expect()
-      .statusCode(Status.BAD_REQUEST.getStatusCode())
+      .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", equalTo(""))
     .when().get(PROCESS_DEFINITION_URL);
   }
   
