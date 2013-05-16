@@ -15,6 +15,7 @@ import java.util.Map;
 import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.MismatchingMessageCorrelationException;
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.rest.helper.EqualsMap;
 import org.junit.Before;
@@ -84,6 +85,21 @@ public abstract class AbstractMessageRestServiceTest extends AbstractRestService
     messageParameters.put("messageName", messageName);
     given().contentType(POST_JSON_CONTENT_TYPE).body(messageParameters)
       .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
+      .when().post(MESSAGE_URL);
+  }
+  
+  @Test
+  public void testFailingInstantiation() {
+    String messageName = "aMessage";
+    
+    // thrown, if instantiation of the process or signalling the instance fails
+    doThrow(new ProcessEngineException("Expected exception"))
+      .when(runtimeServiceMock).correlateMessage(any(String.class), any(String.class), any(Map.class), any(Map.class));
+    
+    Map<String, Object> messageParameters = new HashMap<String, Object>();
+    messageParameters.put("messageName", messageName);
+    given().contentType(POST_JSON_CONTENT_TYPE).body(messageParameters)
+      .then().expect().statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
       .when().post(MESSAGE_URL);
   }
   

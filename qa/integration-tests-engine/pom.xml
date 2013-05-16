@@ -344,7 +344,7 @@
                 <excludes>**/TestWarDeploymentWithBrokenBpmnXml.java</excludes>
                 <excludes>**/TestDeploymentWithDroolsTaskFails.java</excludes>
                 <exclude>**/TestProcessEnginesXmlFails.java</exclude>
-                <exclude>**_JBOSS.java</exclude>
+                <exclude>**/*_JBOSS.java</exclude>
                 <exclude>**/jar/**</exclude>
               </excludes>
             </configuration>
@@ -493,7 +493,7 @@
                 <exclude>**/TestDeploymentWithDroolsTaskFails.java</exclude>
                 <exclude>**/TestProcessEnginesXmlFails.java</exclude>
                 
-                <exclude>**_OTHERS.java</exclude>
+                <exclude>**/*_JBOSS.java</exclude>
               </excludes>
             </configuration>
           </plugin>

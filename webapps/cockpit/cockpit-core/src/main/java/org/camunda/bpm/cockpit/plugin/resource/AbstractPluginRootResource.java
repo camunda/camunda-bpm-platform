@@ -14,15 +14,17 @@ package org.camunda.bpm.cockpit.plugin.resource;
 
 import java.io.InputStream;
 
+import javax.servlet.ServletContext;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
-import org.camunda.bpm.cockpit.plugin.Registry;
+import org.camunda.bpm.cockpit.Cockpit;
+import org.camunda.bpm.cockpit.plugin.PluginRegistry;
 import org.camunda.bpm.cockpit.plugin.spi.CockpitPlugin;
 
 /**
@@ -54,6 +56,11 @@ import org.camunda.bpm.cockpit.plugin.spi.CockpitPlugin;
  */
 public class AbstractPluginRootResource {
 
+  protected static final String WEBAPP_PREFIX = "webapp://";
+
+  @Context
+  private ServletContext servletContext;
+
   private final String pluginName;
 
   public AbstractPluginRootResource(String pluginName) {
@@ -71,22 +78,23 @@ public class AbstractPluginRootResource {
     return subResource;
   }
 
+  /**
+   * Provides a plugins asset files via <code>$PLUGIN_ROOT_PATH/static</code>.
+   *
+   * @param file
+   * @return
+   */
   @GET
   @Path("/static/{file:.*}")
   public Response getAsset(@PathParam("file") String file) {
 
-    CockpitPlugin plugin = Registry.getCockpitPlugin(pluginName);
-
+    CockpitPlugin plugin = getPluginRegistry().getPlugin(pluginName);
+    
     if (plugin != null) {
-      String assetDirectory = plugin.getAssetDirectory();
-      if (assetDirectory != null) {
-        String assetName = String.format("%s/%s", assetDirectory, file);
-
-        InputStream assetStream = getAssetAsStream(plugin, assetName);
-        if (assetStream != null) {
-          String contentType = getContentType(file);
-          return Response.ok(assetStream, contentType).build();
-        }
+      InputStream assetStream = getPluginAssetAsStream(plugin, file);
+      if (assetStream != null) {
+        String contentType = getContentType(file);
+        return Response.ok(assetStream, contentType).build();
       }
     }
 
@@ -104,15 +112,41 @@ public class AbstractPluginRootResource {
       return "text/plain";
     }
   }
+
   /**
    * Returns an input stream for a given resource
    *
    * @param resourceName
    * @return
    */
-  private InputStream getAssetAsStream(CockpitPlugin plugin, String resourceName) {
+  private InputStream getPluginAssetAsStream(CockpitPlugin plugin, String fileName) {
 
+    String assetDirectory = plugin.getAssetDirectory();
+
+    if (assetDirectory == null) {
+      return null;
+    }
+
+    if (assetDirectory.startsWith(WEBAPP_PREFIX)) {
+      assetDirectory = assetDirectory.substring(WEBAPP_PREFIX.length());
+      return getWebResourceAsStream(assetDirectory, fileName);
+    } else {
+      return getClasspathResourceAsStream(plugin, assetDirectory, fileName);
+    }
+  }
+
+  private InputStream getWebResourceAsStream(String assetDirectory, String fileName) {
+    String resourceName = String.format("/%s/%s", assetDirectory, fileName);
+
+    return servletContext.getResourceAsStream(resourceName);
+  }
+
+  private InputStream getClasspathResourceAsStream(CockpitPlugin plugin, String assetDirectory, String fileName) {
+    String resourceName = String.format("%s/%s", assetDirectory, fileName);
     return plugin.getClass().getResourceAsStream(resourceName);
   }
 
+  private PluginRegistry getPluginRegistry() {
+    return Cockpit.getRuntimeDelegate().getPluginRegistry();
+  }
 }

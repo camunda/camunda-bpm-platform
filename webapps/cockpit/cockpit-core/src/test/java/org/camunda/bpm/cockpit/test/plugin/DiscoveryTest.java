@@ -12,19 +12,19 @@
  */
 package org.camunda.bpm.cockpit.test.plugin;
 
-import org.camunda.bpm.cockpit.plugin.Registry;
 
 import static org.fest.assertions.Assertions.assertThat;
 
-import org.camunda.bpm.cockpit.test.sample.plugin.TestPlugin;
 import java.util.List;
 
-import org.camunda.bpm.cockpit.plugin.Registry;
+import org.camunda.bpm.cockpit.plugin.PluginRegistry;
 import org.junit.Test;
 
 import org.camunda.bpm.cockpit.test.sample.web.CockpitTestApplication;
 import org.camunda.bpm.cockpit.plugin.spi.CockpitPlugin;
-import org.camunda.bpm.cockpit.test.sample.plugin.resources.TestResource;
+import org.camunda.bpm.cockpit.test.sample.plugin.simple.SimplePlugin;
+import org.camunda.bpm.cockpit.test.sample.plugin.simple.resources.SimpleRootResource;
+import org.camunda.bpm.cockpit.test.sample.plugin.simple.resources.SimpleResource;
 import org.camunda.bpm.cockpit.test.util.AbstractCockpitCoreTest;
 import org.camunda.bpm.cockpit.test.util.DeploymentHelper;
 import org.fest.assertions.Condition;
@@ -54,7 +54,7 @@ public class DiscoveryTest extends AbstractCockpitCoreTest {
     @Override
     public boolean matches(List<?> value) {
       for (Object o: value) {
-        if (o instanceof TestPlugin) {
+        if (o instanceof SimplePlugin) {
           return true;
         }
       }
@@ -70,7 +70,7 @@ public class DiscoveryTest extends AbstractCockpitCoreTest {
     // plugin on class path
 
     // when
-    List<CockpitPlugin> plugins = Registry.getCockpitPlugins();
+    List<CockpitPlugin> plugins = getPluginRegistry().getPlugins();
 
     // then
     assertThat(plugins).satisfies(CONTAINS_PLUGIN);
@@ -86,6 +86,6 @@ public class DiscoveryTest extends AbstractCockpitCoreTest {
     CockpitTestApplication application = new CockpitTestApplication();
 
     // then
-    assertThat(application.getClasses()).contains(TestResource.class);
+    assertThat(application.getClasses()).contains(SimpleRootResource.class);
   }
 }

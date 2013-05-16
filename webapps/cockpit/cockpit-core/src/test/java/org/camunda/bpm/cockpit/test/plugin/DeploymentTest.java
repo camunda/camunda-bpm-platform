@@ -21,9 +21,8 @@ import org.camunda.bpm.cockpit.db.QueryService;
 import java.util.List;
 
 import org.camunda.bpm.BpmPlatform;
-import org.camunda.bpm.cockpit.plugin.Registry;
 import org.camunda.bpm.cockpit.plugin.spi.CockpitPlugin;
-import org.camunda.bpm.cockpit.test.sample.plugin.TestPlugin;
+import org.camunda.bpm.cockpit.test.sample.plugin.simple.SimplePlugin;
 import org.camunda.bpm.cockpit.test.util.AbstractCockpitCoreTest;
 import org.camunda.bpm.cockpit.test.util.DeploymentHelper;
 import org.camunda.bpm.engine.ProcessEngine;
@@ -54,10 +53,10 @@ public class DeploymentTest extends AbstractCockpitCoreTest {
 
   @Test
   public void shouldContainCorePlugin () {
-    List<CockpitPlugin> plugins = Registry.getCockpitPlugins();
+    List<CockpitPlugin> plugins = getPluginRegistry().getPlugins();
     assertThat(plugins).hasSize(1);
 
-    assertThat(plugins.get(0)).isInstanceOf(TestPlugin.class);
+    assertThat(plugins.get(0)).isInstanceOf(SimplePlugin.class);
   }
 
   @Test

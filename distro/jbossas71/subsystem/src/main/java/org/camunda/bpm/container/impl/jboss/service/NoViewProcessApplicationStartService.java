@@ -13,6 +13,7 @@
 package org.camunda.bpm.container.impl.jboss.service;
 
 import org.camunda.bpm.application.AbstractProcessApplication;
+import org.camunda.bpm.application.ProcessApplicationInterface;
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.application.ProcessApplicationUnavailableException;
 import org.camunda.bpm.application.impl.ServletProcessApplication;
@@ -28,7 +29,7 @@ import org.jboss.msc.service.StopContext;
  * @author Daniel Meyer
  *
  */
-public class NoViewProcessApplicationStartService implements Service<AbstractProcessApplication> {
+public class NoViewProcessApplicationStartService implements Service<ProcessApplicationInterface> {
   
   protected ProcessApplicationReference reference;
 
@@ -36,7 +37,7 @@ public class NoViewProcessApplicationStartService implements Service<AbstractPro
     this.reference = reference;
   }
 
-  public AbstractProcessApplication getValue() throws IllegalStateException, IllegalArgumentException {
+  public ProcessApplicationInterface getValue() throws IllegalStateException, IllegalArgumentException {
     try {
       return reference.getProcessApplication();
       

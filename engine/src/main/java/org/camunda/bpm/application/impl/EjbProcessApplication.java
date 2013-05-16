@@ -20,6 +20,7 @@ import javax.naming.NamingException;
 
 import org.camunda.bpm.application.AbstractProcessApplication;
 import org.camunda.bpm.application.ProcessApplicationExecutionException;
+import org.camunda.bpm.application.ProcessApplicationInterface;
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -104,7 +105,7 @@ public class EjbProcessApplication extends AbstractProcessApplication {
   protected static String EJB_CONTEXT_PATH = "java:comp/EJBContext";
   
   private EjbProcessApplicationReference ejbProcessApplicationReference;
-  private EjbProcessApplication selfReference;
+  private ProcessApplicationInterface selfReference;
   
   public ProcessApplicationReference getReference() {    
     ensureInitialized();
@@ -116,8 +117,8 @@ public class EjbProcessApplication extends AbstractProcessApplication {
   }
   
   /** allows subclasses to provide a custom business interface */
-  protected Class<? extends EjbProcessApplication> getBusinessInterface() {
-    return getClass();
+  protected Class<? extends ProcessApplicationInterface> getBusinessInterface() {
+    return ProcessApplicationInterface.class;
   }
   
   public <T> T execute(Callable<T> callable) throws ProcessApplicationExecutionException {
@@ -141,12 +142,12 @@ public class EjbProcessApplication extends AbstractProcessApplication {
   /**
    * lookup a proxy object representing the invoked business view of this component. 
    */
-  protected EjbProcessApplication lookupSelfReference() {
+  protected ProcessApplicationInterface lookupSelfReference() {
     
     try {
       InitialContext ic = new InitialContext();
       SessionContext sctxLookup = (SessionContext) ic.lookup(EJB_CONTEXT_PATH);
-      return (EjbProcessApplication) sctxLookup.getBusinessObject(getBusinessInterface());
+      return (ProcessApplicationInterface) sctxLookup.getBusinessObject(getBusinessInterface());
       
     } catch (NamingException e) {
       throw new ProcessEngineException("Cannot lookup self reference to EjbProcessApplication", e);

@@ -18,7 +18,7 @@ import java.io.File;
 import org.camunda.bpm.cockpit.Cockpit;
 import org.camunda.bpm.cockpit.core.test.util.TestContainer;
 import org.camunda.bpm.cockpit.plugin.spi.CockpitPlugin;
-import org.camunda.bpm.cockpit.test.sample.plugin.TestPlugin;
+import org.camunda.bpm.cockpit.test.sample.plugin.simple.SimplePlugin;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.exporter.ZipExporter;
 import org.jboss.shrinkwrap.api.spec.JavaArchive;
@@ -60,6 +60,7 @@ public class DeploymentHelper {
         .artifact("org.jboss.resteasy:resteasy-jaxrs")
           .exclusion("org.apache.httpcomponents:httpclient")
           .exclusion("commons-httpclient:commons-httpclient")
+          .exclusion("commons-io:commons-io")
           .resolveAsFiles();
   }
 
@@ -75,12 +76,12 @@ public class DeploymentHelper {
     return resolver().artifacts(names).resolveAsFiles();
   }
 
-  public static WebArchive getCockpitWar() {
+  public static WebArchive getCockpitWar(String archiveName) {
     String cockpitPkg = Cockpit.class.getPackage().getName();
 
     final WebArchive archive =
         ShrinkWrap
-          .create(WebArchive.class, "test.war")
+          .create(WebArchive.class, archiveName)
             .addPackage(cockpitPkg)
             .addPackages(true, cockpitPkg + ".db")
             .addPackages(true, cockpitPkg + ".impl")
@@ -111,10 +112,10 @@ public class DeploymentHelper {
 
   public static JavaArchive getTestPluginAsFiles() {
     JavaArchive archive = ShrinkWrap.create(JavaArchive.class, "test-plugin.jar")
-        .addPackages(true, TestPlugin.class.getPackage())
-        .addAsServiceProvider(CockpitPlugin.class, TestPlugin.class);
+        .addPackages(true, SimplePlugin.class.getPackage())
+        .addAsServiceProvider(CockpitPlugin.class, SimplePlugin.class);
 
-    String pkgName = TestPlugin.class.getPackage().getName().replaceAll("\\.", "/");
+    String pkgName = SimplePlugin.class.getPackage().getName().replaceAll("\\.", "/");
 
     addFiles(archive, pkgName, new File("src/test/resources/" + pkgName));
 

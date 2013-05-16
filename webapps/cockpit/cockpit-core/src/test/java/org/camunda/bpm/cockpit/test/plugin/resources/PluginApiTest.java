@@ -63,7 +63,7 @@ public class PluginApiTest extends AbstractCockpitCoreTest {
     WebResource appResource = client.resource(contextPath.toURI());
 
     // /api/plugin/:pluginName/static/...
-    ClientResponse result = appResource.path("/api/plugin/test/static/test.txt").accept(MediaType.TEXT_PLAIN).get(ClientResponse.class);
+    ClientResponse result = appResource.path("/api/plugin/simple/static/test.txt").accept(MediaType.TEXT_PLAIN).get(ClientResponse.class);
 
     assertThat(result.getStatus()).isEqualTo(200);
     assertThat(result.getEntity(String.class)).isEqualTo("FOO BAR");
@@ -75,7 +75,7 @@ public class PluginApiTest extends AbstractCockpitCoreTest {
 
     WebResource appResource = client.resource(contextPath.toURI());
     // /api/plugin/:pluginName/:engineName/...
-    ClientResponse result = appResource.path("/api/plugin/test/default/test").accept(MediaType.TEXT_PLAIN).get(ClientResponse.class);
+    ClientResponse result = appResource.path("/api/plugin/simple/default/test").accept(MediaType.TEXT_PLAIN).get(ClientResponse.class);
 
     assertThat(result.getStatus()).isEqualTo(200);
     assertThat(result.getEntity(String.class)).contains("[");
