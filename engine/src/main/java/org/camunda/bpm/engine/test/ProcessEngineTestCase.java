@@ -88,8 +88,6 @@ public class ProcessEngineTestCase extends TestCase {
       initializeServices();
     }
     
-    TestHelper.createOrUpdateHistoryLevel(((ProcessEngineImpl) processEngine).getProcessEngineConfiguration());
-    
     deploymentId = TestHelper.annotationDeploymentSetUp(processEngine, getClass(), getName());
   }
 
@@ -112,8 +110,6 @@ public class ProcessEngineTestCase extends TestCase {
     TestHelper.annotationDeploymentTearDown(processEngine, deploymentId, getClass(), getName());
 
     ClockUtil.reset();
-    
-    TestHelper.deleteHistoryLevel(((ProcessEngineImpl) processEngine).getProcessEngineConfiguration());
     
     super.tearDown();
   }

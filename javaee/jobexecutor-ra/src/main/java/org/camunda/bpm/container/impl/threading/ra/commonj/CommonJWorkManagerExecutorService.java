@@ -25,22 +25,24 @@ public class CommonJWorkManagerExecutorService implements ExecutorService {
 
   private static Logger logger = Logger.getLogger(CommonJWorkManagerExecutorService.class.getName());
   
-  protected String workManagerJndiName = "wm/camunda-bpm-workmanager";
   protected WorkManager workManager;
 
   protected JcaExecutorServiceConnector ra;
+
+  protected String commonJWorkManagerName;
   
   protected WorkManager lookupWorkMananger() {
     try {
       InitialContext initialContext = new InitialContext();
-      return (WorkManager) initialContext.lookup(workManagerJndiName);
+      return (WorkManager) initialContext.lookup(commonJWorkManagerName);
     } catch (Exception e) {
       throw new RuntimeException("Error while starting JobExecutor: could not look up CommonJ WorkManager in Jndi: "+e.getMessage(), e);
     }   
   }
     
-  public CommonJWorkManagerExecutorService(JcaExecutorServiceConnector ra) {
+  public CommonJWorkManagerExecutorService(JcaExecutorServiceConnector ra, String commonJWorkManagerName) {
     this.ra = ra;
+    this.commonJWorkManagerName = commonJWorkManagerName;
   }
   
   public boolean schedule(Runnable runnable, boolean isLongRunning) {

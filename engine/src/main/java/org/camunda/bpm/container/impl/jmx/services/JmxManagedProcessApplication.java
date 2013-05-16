@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.application.ProcessApplicationRegistration;
 import org.camunda.bpm.application.impl.ProcessApplicationInfoImpl;
 import org.camunda.bpm.application.impl.metadata.spi.ProcessesXml;
@@ -30,12 +31,15 @@ import org.camunda.bpm.container.impl.jmx.kernel.MBeanServiceContainer;
 public class JmxManagedProcessApplication implements MBeanService<JmxManagedProcessApplication>, JmxManagedProcessApplicationMBean {
   
   protected final ProcessApplicationInfoImpl processApplicationInfo;
+  protected final ProcessApplicationReference processApplicationReference;
 
   protected List<ProcessesXml> processesXmls;
   protected Map<String, ProcessApplicationRegistration> deploymentMap;
+
 	
-	public JmxManagedProcessApplication(ProcessApplicationInfoImpl processApplicationInfo) {
+	public JmxManagedProcessApplication(ProcessApplicationInfoImpl processApplicationInfo, ProcessApplicationReference processApplicationReference) {
     this.processApplicationInfo = processApplicationInfo;
+    this.processApplicationReference = processApplicationReference;
 	}
 
 	public String getProcessApplicationName() {
@@ -82,6 +86,10 @@ public class JmxManagedProcessApplication implements MBeanService<JmxManagedProc
   
   public ProcessApplicationInfoImpl getProcessApplicationInfo() {
     return processApplicationInfo;
+  }
+  
+  public ProcessApplicationReference getProcessApplicationReference() {
+    return processApplicationReference;
   }
 
 }

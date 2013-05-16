@@ -94,9 +94,10 @@ public class ProcessEngineRule extends TestWatchman {
   public void starting(FrameworkMethod method) {
     if (processEngine==null) {
       initializeProcessEngine();
-      initializeServices();
     }
-
+    
+    initializeServices();
+    
     deploymentId = TestHelper.annotationDeploymentSetUp(processEngine, method.getMethod().getDeclaringClass(), method.getName());
   }
   

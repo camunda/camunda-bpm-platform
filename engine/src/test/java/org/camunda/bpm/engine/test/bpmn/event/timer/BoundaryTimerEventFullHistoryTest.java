@@ -26,6 +26,12 @@ public class BoundaryTimerEventFullHistoryTest extends ResourceProcessEngineTest
     super("org/camunda/bpm/engine/test/standalone/history/fullhistory.activiti.cfg.xml");
   }
   
+  @Override
+  protected void closeDownProcessEngine() {
+    processEngine.close();
+    super.closeDownProcessEngine();
+  }
+  
   @Deployment
   public void testSetProcessVariablesFromTaskWhenTimerOnTask() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("timerVariablesProcess");

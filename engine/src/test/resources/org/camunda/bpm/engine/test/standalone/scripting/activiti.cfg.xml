@@ -6,13 +6,15 @@
 
   <bean id="processEngineConfiguration" class="org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration">
   
-    <property name="jdbcUrl" value="jdbc:h2:mem:activiti;DB_CLOSE_DELAY=1000" />
+    <property name="processEngineName" value="ScriptBeanAccessTest-engine" />
+  
+    <property name="jdbcUrl" value="jdbc:h2:mem:ScriptBeanAccessTest;DB_CLOSE_DELAY=1000" />
     <property name="jdbcDriver" value="org.h2.Driver" />
     <property name="jdbcUsername" value="sa" />
     <property name="jdbcPassword" value="" />
     
     <!-- Database configurations -->
-    <property name="databaseSchemaUpdate" value="true" />
+    <property name="databaseSchemaUpdate" value="create-drop" />
     
     <!-- job executor configurations -->
     <property name="jobExecutorActivate" value="false" />

@@ -387,6 +387,7 @@ public class BpmPlatformParser implements XMLStreamConstants, XMLElementReader<L
         writeAttribute(Attribute.DEFAULT, writer, entry);
         writeElement(Element.DATASOURCE, writer, entry);
         writeElement(Element.HISTORY_LEVEL, writer, entry);
+        writeElement(Element.CONFIGURATION, writer, entry);
   
         writeProperties(writer, entry);
   

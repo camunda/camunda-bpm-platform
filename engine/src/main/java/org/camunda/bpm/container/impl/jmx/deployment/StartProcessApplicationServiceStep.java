@@ -57,7 +57,7 @@ public class StartProcessApplicationServiceStep extends MBeanDeploymentOperation
     ProcessApplicationInfoImpl processApplicationInfo = createProcessApplicationInfo(processApplication, processArchiveDeploymentMap);
     
     // create service
-    JmxManagedProcessApplication mbean = new JmxManagedProcessApplication(processApplicationInfo);    
+    JmxManagedProcessApplication mbean = new JmxManagedProcessApplication(processApplicationInfo, processApplication.getReference());    
     mbean.setProcessesXmls(new ArrayList<ProcessesXml>(processesXmls.values()));
     mbean.setDeploymentMap(processArchiveDeploymentMap);
     

@@ -34,6 +34,6 @@ public interface ProcessApplicationReference {
    * @throws ProcessApplicationUnavailableException
    *           if the process application is unavailable
    */
-  public AbstractProcessApplication getProcessApplication() throws ProcessApplicationUnavailableException;
+  public ProcessApplicationInterface getProcessApplication() throws ProcessApplicationUnavailableException;
 
 }

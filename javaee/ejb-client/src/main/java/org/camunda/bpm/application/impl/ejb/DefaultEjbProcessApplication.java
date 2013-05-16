@@ -20,14 +20,10 @@ import java.util.Map;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
-import javax.ejb.ConcurrencyManagement;
-import javax.ejb.ConcurrencyManagementType;
-import javax.ejb.Singleton;
-import javax.ejb.Startup;
-import javax.ejb.TransactionAttribute;
-import javax.ejb.TransactionAttributeType;
+import javax.ejb.*;
 
 import org.camunda.bpm.application.ProcessApplication;
+import org.camunda.bpm.application.ProcessApplicationInterface;
 import org.camunda.bpm.application.impl.EjbProcessApplication;
 
 
@@ -40,8 +36,9 @@ import org.camunda.bpm.application.impl.EjbProcessApplication;
 @Singleton
 @Startup
 @ConcurrencyManagement(ConcurrencyManagementType.BEAN) 
-@TransactionAttribute(TransactionAttributeType.SUPPORTS)
+@TransactionAttribute(TransactionAttributeType.REQUIRED)
 @ProcessApplication
+@Local(ProcessApplicationInterface.class)
 public class DefaultEjbProcessApplication extends EjbProcessApplication {
   
   protected Map<String, String> properties = new HashMap<String, String>();

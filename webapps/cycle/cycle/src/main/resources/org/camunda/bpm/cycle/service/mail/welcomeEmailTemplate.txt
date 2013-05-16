@@ -1,7 +1,7 @@
 Dear ${foxType} user,
 
 
-welcome to camunda fox ${foxType}. Your account information is as follows:
+welcome to camunda ${foxType}. Your account information is as follows:
 
 
 Username: ${username}

@@ -6,8 +6,11 @@
 
   <bean id="processEngineConfiguration" class="org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration">
   
+    <property name="processEngineName" value="connection-pool-engine" />
+  
     <!-- Database configurations -->
-    <property name="databaseSchemaUpdate" value="true" />
+    <property name="databaseSchemaUpdate" value="create-drop" />
+    <property name="jdbcUrl" value="jdbc:h2:mem:connection-pool-engine" />
 
     <property name="jdbcMaxActiveConnections" value="25" />
     <property name="jdbcMaxIdleConnections" value="10" />

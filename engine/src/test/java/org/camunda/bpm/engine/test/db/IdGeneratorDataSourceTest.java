@@ -8,6 +8,12 @@ import org.camunda.bpm.engine.test.Deployment;
 
 
 public class IdGeneratorDataSourceTest extends ResourceProcessEngineTestCase {
+  
+  @Override
+  protected void closeDownProcessEngine() {
+    processEngine.close();
+    super.closeDownProcessEngine();
+  }
 
   public IdGeneratorDataSourceTest() {
     super("org/camunda/bpm/engine/test/db/IdGeneratorDataSourceTest.activiti.cfg.xml");

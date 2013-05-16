@@ -40,8 +40,9 @@ public class HistoricVariableInstanceTest extends AbstractProcessEngineTestCase 
   @Override
   protected void initializeProcessEngine() {
     processEngineConfiguration = (ProcessEngineConfigurationImpl) ProcessEngineConfiguration.createStandaloneProcessEngineConfiguration()
+    .setProcessEngineName("HistoricVariableInstanceTest-engine")
     .setJdbcDriver("org.h2.Driver")
-    .setJdbcUrl("jdbc:h2:mem:activiti;DB_CLOSE_DELAY=1000")
+    .setJdbcUrl("jdbc:h2:mem:HistoricVariableInstanceTest;DB_CLOSE_DELAY=1000")
     .setJdbcUsername("sa")
     .setJdbcPassword("")
     .setDatabaseSchemaUpdate(ProcessEngineConfigurationImpl.DB_SCHEMA_UPDATE_TRUE)

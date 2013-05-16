@@ -32,8 +32,8 @@ public class JcaWorkManagerExecutorService implements Referenceable, ExecutorSer
   protected final JcaExecutorServiceConnector ra;
   protected WorkManager workManager;
   
-  public JcaWorkManagerExecutorService(JcaExecutorServiceConnector connector) {
-    this.workManager = connector.getWorkManager();
+  public JcaWorkManagerExecutorService(JcaExecutorServiceConnector connector, WorkManager workManager) {
+    this.workManager = workManager;
     this.ra = connector;
   }
   

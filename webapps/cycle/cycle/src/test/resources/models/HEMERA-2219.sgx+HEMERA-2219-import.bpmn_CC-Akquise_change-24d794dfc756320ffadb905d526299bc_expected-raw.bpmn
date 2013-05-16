@@ -1,9 +1,9 @@
-<?xml version="1.0" encoding="UTF-8"?><definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:signavio="http://www.signavio.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" exporter="Signavio Process Editor, http://www.signavio.com" exporterVersion="6.4.0" expressionLanguage="http://www.w3.org/1999/XPath" id="sid-c262c682-a7ea-4b5d-8920-98c1284f0dc0" targetNamespace="http://www.signavio.com/bpmn20" typeLanguage="http://www.w3.org/2001/XMLSchema" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/2.0/20100501/BPMN20.xsd">
-   <error id="sid-e90199c4-be07-47c6-9678-f8a0e0ff1617" name="SAPWriteContactError"/>
-   <error id="sid-17a1eba0-9a27-44f5-b423-ebd775501072" name="TechnicalMasterDataCreationError"/>
-   <message id="sid-3b6f1d3e-6568-4c5c-974b-e7c5c74c585c" name="manual"/>
-   <message id="sid-ff92c2f1-e934-426a-b3d7-0afac6516ac5" name="automatic"/>
-   <collaboration id="sid-da62acb5-3f68-476a-be31-c5b546fa94d8">
+<?xml version="1.0" encoding="UTF-8"?><definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:signavio="http://www.signavio.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" exporter="Signavio Process Editor, http://www.signavio.com" exporterVersion="7.0.0" expressionLanguage="http://www.w3.org/1999/XPath" id="sid-e26e80c1-374e-44ad-8766-ef2aea616958" targetNamespace="http://www.signavio.com/bpmn20" typeLanguage="http://www.w3.org/2001/XMLSchema" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/2.0/20100501/BPMN20.xsd">
+   <error id="sid-b0b2f153-c76b-41ab-a36f-5b3fdcb0baed" name="SAPWriteContactError"/>
+   <error id="sid-83c4467e-2060-439c-815b-a8a5da255539" name="TechnicalMasterDataCreationError"/>
+   <message id="sid-e23d3c61-441a-4fd1-a1de-c4812cdcc48c" name="manual"/>
+   <message id="sid-cca379ff-2762-4b70-b2b9-3addca7a2702" name="automatic"/>
+   <collaboration id="sid-21f42430-c9cb-46dc-bf63-3f316ee85434">
       <participant id="UI_Mediator_6" name="UI Mediator">
          <extensionElements>
             <signavio:signavioMetaData metaKey="bgcolor" metaValue="#ffffff"/>
@@ -39,7 +39,7 @@
    </collaboration>
    <process id="Usersicht_Akquise_Prozess_572" isClosed="true" isExecutable="false" name="Usersicht Akquise Prozess" processType="None">
       <extensionElements/>
-      <laneSet id="sid-739c0d4e-7147-4049-8d47-ddead4332cc1">
+      <laneSet id="sid-22036d5d-2286-401e-9cdc-bba09fa343ee">
          <lane id="lane_572">
             <extensionElements>
                <signavio:signavioMetaData metaKey="bgcolor" metaValue=""/>
@@ -154,7 +154,7 @@
       </userTask>
       <sequenceFlow id="Fehler_beim__anlegen_der__Stammdaten____Wechselbelege_687" isImmediate="true" name="Fehler beim &#10;anlegen der &#10;Stammdaten / &#10;Wechselbelege" sourceRef="Statusanzeige_652" targetRef="Anschluss-objekt_und_Verbrauchs-stelle_identifizieren_616">
          <extensionElements>
-            <signavio:signavioLabel align="center" bottom="false" distance="-13.0" from="1" left="false" ref="text_name" right="false" to="2" top="false" valign="middle" x="2115.5824629385465" y="483.0"/>
+            <signavio:signavioLabel align="center" distance="-13.0" from="1" ref="text_name" to="2" valign="middle" x="2115.5824629385465" y="483.0"/>
          </extensionElements>
       </sequenceFlow>
       <sequenceFlow id="sequenceFlow_686" isImmediate="true" name="" sourceRef="Statusanzeige_652" targetRef="SAP_Kontakt_erfassen_660"/>
@@ -192,7 +192,7 @@ Schufa bei manueller Akquise?</text>
    </process>
    <process id="GUI__JSF2__183" isClosed="true" isExecutable="false" name="GUI (JSF2)" processType="None">
       <extensionElements/>
-      <laneSet id="sid-13483d24-8c45-4cad-936c-767fb181627b">
+      <laneSet id="sid-959c75d1-d37c-4660-b27e-c5be499a3514">
          <lane id="lane_183">
             <extensionElements>
                <signavio:signavioMetaData metaKey="bgcolor" metaValue=""/>
@@ -324,7 +324,7 @@ Schufa bei manueller Akquise?</text>
          </extensionElements>
          <incoming>sequenceFlow_538</incoming>
          <outgoing>sequenceFlow_511</outgoing>
-         <messageEventDefinition id="sid-f8c3f764-c05e-4b76-a0dd-fe2487af67a5"/>
+         <messageEventDefinition id="sid-b8acf276-c9b0-4933-a79c-4f3c94991a05"/>
       </intermediateThrowEvent>
       <task completionQuantity="1" id="GP-Suche_308" isForCompensation="false" name="GP-Suche" startQuantity="1">
          <extensionElements>
@@ -450,7 +450,7 @@ Schufa bei manueller Akquise?</text>
          </extensionElements>
          <incoming>sequenceFlow_501</incoming>
          <outgoing>sequenceFlow_512</outgoing>
-         <messageEventDefinition id="sid-2ce7c737-acf3-44cb-9fa3-e7963ab77afd"/>
+         <messageEventDefinition id="sid-e82af416-abc4-48b3-bdf4-3a6f97909478"/>
       </intermediateThrowEvent>
       <exclusiveGateway gatewayDirection="Converging" id="exclusiveGateway_414" name="">
          <extensionElements>
@@ -476,21 +476,21 @@ Schufa bei manueller Akquise?</text>
       </eventBasedGateway>
       <intermediateCatchEvent id="technische__Stammdaten_und_WB__angelegt_430" name="technische &#10;Stammdaten&#10;und WB &#10;angelegt">
          <extensionElements>
-            <signavio:signavioLabel align="left" bottom="false" left="false" ref="text_name" right="false" top="false" x="27.0" y="26.0"/>
+            <signavio:signavioLabel align="left" ref="text_name" x="27.0" y="26.0"/>
             <signavio:signavioMetaData metaKey="bgcolor" metaValue="#ffffff"/>
          </extensionElements>
          <incoming>sequenceFlow_516</incoming>
          <outgoing>sequenceFlow_515</outgoing>
-         <messageEventDefinition id="sid-3a3e6ce7-f227-4beb-b35c-202fc390cafa"/>
+         <messageEventDefinition id="sid-dccb5768-7e46-433b-ac3e-e623526c1b0e"/>
       </intermediateCatchEvent>
       <intermediateCatchEvent id="Fehler_bei__technische__Stammdaten__anlegen_438" name="Fehler bei &#10;technische &#10;Stammdaten &#10;anlegen">
          <extensionElements>
-            <signavio:signavioLabel bottom="false" left="false" ref="text_name" right="false" top="false" valign="middle" x="-62.0" y="-20.0"/>
+            <signavio:signavioLabel ref="text_name" valign="middle" x="-62.0" y="-20.0"/>
             <signavio:signavioMetaData metaKey="bgcolor" metaValue="#ffffff"/>
          </extensionElements>
          <incoming>sequenceFlow_517</incoming>
          <outgoing>sequenceFlow_519</outgoing>
-         <messageEventDefinition id="sid-ac1ac860-fae5-4464-ab9b-fd31bc87e2a8"/>
+         <messageEventDefinition id="sid-82031316-43e1-4cc6-a380-6b333c64e3ff"/>
       </intermediateCatchEvent>
       <eventBasedGateway eventGatewayType="Exclusive" gatewayDirection="Diverging" id="eventBasedGateway_446" instantiate="false" name="">
          <extensionElements>
@@ -502,12 +502,12 @@ Schufa bei manueller Akquise?</text>
       </eventBasedGateway>
       <intermediateCatchEvent id="Fehler_bei__Kontakt__schreiben_452" name="Fehler bei &#10;Kontakt &#10;schreiben">
          <extensionElements>
-            <signavio:signavioLabel bottom="false" left="false" ref="text_name" right="false" top="false" valign="middle" x="71.0" y="28.0"/>
+            <signavio:signavioLabel ref="text_name" valign="middle" x="71.0" y="28.0"/>
             <signavio:signavioMetaData metaKey="bgcolor" metaValue="#ffffff"/>
          </extensionElements>
          <incoming>sequenceFlow_525</incoming>
          <outgoing>sequenceFlow_530</outgoing>
-         <messageEventDefinition id="sid-a537e5d9-8353-4c08-8833-e38b8ecdce9a"/>
+         <messageEventDefinition id="sid-f8937c79-9720-4067-b5eb-93e74f65e215"/>
       </intermediateCatchEvent>
       <intermediateCatchEvent id="Kontakt_geschrieben_460" name="Kontakt&#10;geschrieben">
          <extensionElements>
@@ -515,7 +515,7 @@ Schufa bei manueller Akquise?</text>
          </extensionElements>
          <incoming>sequenceFlow_524</incoming>
          <outgoing>sequenceFlow_523</outgoing>
-         <messageEventDefinition id="sid-7630f81f-0999-452a-8b6e-f3338b40c9c4"/>
+         <messageEventDefinition id="sid-8c52c4d2-94ab-4000-83c4-cd4db1a3d8f7"/>
       </intermediateCatchEvent>
       <intermediateThrowEvent id="GP_identifiziert___angelegt__467" name="GP identifiziert &#10;(angelegt)">
          <extensionElements>
@@ -523,8 +523,8 @@ Schufa bei manueller Akquise?</text>
          </extensionElements>
          <incoming>sequenceFlow_509</incoming>
          <outgoing>sequenceFlow_535</outgoing>
-         <cancelEventDefinition id="sid-8d42daa8-79d7-4b30-9591-623641c77c11"/>
-         <terminateEventDefinition id="sid-f11427c5-3175-424e-92e5-a7fc42328977"/>
+         <cancelEventDefinition id="sid-5bd252d0-3c6d-4049-bc65-9a57073031cf"/>
+         <terminateEventDefinition id="sid-0f6675a9-9b21-4727-b2d9-220f9d70bacc"/>
       </intermediateThrowEvent>
       <task completionQuantity="1" id="Akquise_Metadaten_erfassen_474" isForCompensation="false" name="Akquise Metadaten erfassen" startQuantity="1">
          <extensionElements>
@@ -558,7 +558,7 @@ Schufa bei manueller Akquise?</text>
       <sequenceFlow id="GP_anlegen_506" isImmediate="true" name="GP&#10;anlegen" sourceRef="Aktion_347" targetRef="GP_anlegen_330"/>
       <sequenceFlow id="sequenceFlow_530" isImmediate="true" name="" sourceRef="Fehler_bei__Kontakt__schreiben_452" targetRef="exclusiveGateway_414">
          <extensionElements>
-            <signavio:signavioLabel align="center" bottom="false" left="false" ref="text_name" right="false" top="false" valign="middle" x="4228.8517366542155" y="1058.0014106042422"/>
+            <signavio:signavioLabel align="center" ref="text_name" valign="middle" x="4228.8517366542155" y="1058.0014106042422"/>
          </extensionElements>
       </sequenceFlow>
       <sequenceFlow id="sequenceFlow_533" isImmediate="true" name="" sourceRef="Akquise_Metadaten_erfassen_474" targetRef="VS__AO__Suche_und_Auswahl_247"/>
@@ -582,7 +582,7 @@ Schufa bei manueller Akquise?</text>
       <sequenceFlow id="sequenceFlow_513" isImmediate="true" name="" sourceRef="exclusiveGateway_414" targetRef="Kontakt_abschlie_en_270"/>
       <sequenceFlow id="sequenceFlow_519" isImmediate="true" name="" sourceRef="Fehler_bei__technische__Stammdaten__anlegen_438" targetRef="Statusanzeige__Fehlermeldungen__295">
          <extensionElements>
-            <signavio:signavioLabel align="right" bottom="false" distance="7.0" from="0" left="false" orientation="ur" ref="text_name" right="false" to="1" top="false" valign="top" x="3508.9168464012128" y="1323.0115326591347"/>
+            <signavio:signavioLabel align="right" distance="7.0" from="0" orientation="ur" ref="text_name" to="1" valign="top" x="3508.9168464012128" y="1323.0115326591347"/>
          </extensionElements>
       </sequenceFlow>
       <sequenceFlow id="sequenceFlow_514" isImmediate="true" name="" sourceRef="Login__falls_Session_expired__226" targetRef="Auswahl_manuell___automatisiert___beenden_233"/>
@@ -650,7 +650,7 @@ Weiterleitungen
    </process>
    <process id="Webservice-Aufrufe____SOA__148" isClosed="true" isExecutable="false" name="Webservice-Aufrufe / &quot;SOA&quot;" processType="None">
       <extensionElements/>
-      <laneSet id="sid-8a3cfc04-7cd4-4ff2-b441-b69d39b76260">
+      <laneSet id="sid-72ee3217-3a42-44db-9e89-caac2982ce4c">
          <lane id="lane_148">
             <extensionElements>
                <signavio:signavioMetaData metaKey="bgcolor" metaValue=""/>
@@ -690,7 +690,7 @@ Weiterleitungen
    </process>
    <process id="CC-Akquise_" isClosed="true" isExecutable="true" name="Prozess Engine&#10;Akquise Prozess" processType="None">
       <extensionElements/>
-      <laneSet id="sid-457ea92a-c80a-43fe-9fec-0f81101804ab">
+      <laneSet id="sid-02a8e9b0-4464-4ee0-aacb-8e760ba4f7ad">
          <lane id="lane_32">
             <flowNodeRef>N_chsten_Akquise_Fall_claimen_49</flowNodeRef>
             <flowNodeRef>Automatische_Akquise_56</flowNodeRef>
@@ -713,7 +713,7 @@ Weiterleitungen
       </serviceTask>
       <startEvent id="Automatische_Akquise_56" name="Automatische Akquise">
          <outgoing>sequenceFlow_128</outgoing>
-         <messageEventDefinition id="sid-1314841f-7c45-44b0-bf56-a2aa5d584368" messageRef="sid-ff92c2f1-e934-426a-b3d7-0afac6516ac5"/>
+         <messageEventDefinition id="sid-9748d988-9312-48c4-8706-2379372aec99" messageRef="sid-cca379ff-2762-4b70-b2b9-3addca7a2702"/>
       </startEvent>
       <userTask completionQuantity="1" id="GP_identifizieren_62" isForCompensation="false" name="GP identifizieren" startQuantity="1">
          <incoming>sequenceFlow_132</incoming>
@@ -739,7 +739,7 @@ Weiterleitungen
       </intermediateThrowEvent>
       <startEvent id="Manuelle_Akquise_95" name="Manuelle Akquise">
          <outgoing>sequenceFlow_131</outgoing>
-         <messageEventDefinition id="sid-025fb1bc-b601-4521-ad64-c3f370120416" messageRef="sid-3b6f1d3e-6568-4c5c-974b-e7c5c74c585c"/>
+         <messageEventDefinition id="sid-0ed6f111-e6ea-4200-a462-02e017d14bc6" messageRef="sid-e23d3c61-441a-4fd1-a1de-c4812cdcc48c"/>
       </startEvent>
       <userTask completionQuantity="1" id="Kontakt_abschlie_en_101" isForCompensation="false" name="Kontakt abschließen" startQuantity="1">
          <incoming>sequenceFlow_136</incoming>
@@ -755,11 +755,11 @@ Weiterleitungen
       </endEvent>
       <boundaryEvent attachedToRef="Technische_Stammdaten_anlegen_77" cancelActivity="true" id="boundaryEvent_120" name="" parallelMultiple="false">
          <outgoing>sequenceFlow_134</outgoing>
-         <errorEventDefinition errorRef="sid-17a1eba0-9a27-44f5-b423-ebd775501072" id="sid-2621c5f4-53f6-4b95-a1a3-e5a83c88b888"/>
+         <errorEventDefinition errorRef="sid-83c4467e-2060-439c-815b-a8a5da255539" id="sid-72be438f-4e24-48b8-96fb-fa53d80372d3"/>
       </boundaryEvent>
       <boundaryEvent attachedToRef="SAP_Kontakt_schreiben_109" cancelActivity="true" id="boundaryEvent_123" name="" parallelMultiple="false">
          <outgoing>sequenceFlow_137</outgoing>
-         <errorEventDefinition errorRef="sid-e90199c4-be07-47c6-9678-f8a0e0ff1617" id="sid-390a4bc3-12f1-4255-9d88-a02ef55057aa"/>
+         <errorEventDefinition errorRef="sid-b0b2f153-c76b-41ab-a36f-5b3fdcb0baed" id="sid-6dbe922f-8dd9-4368-8e2f-34332defe449"/>
       </boundaryEvent>
       <sequenceFlow id="sequenceFlow_132" isImmediate="true" name="" sourceRef="N_chsten_Akquise_Fall_claimen_49" targetRef="GP_identifizieren_62"/>
       <sequenceFlow id="sequenceFlow_133" isImmediate="true" name="" sourceRef="Akquisedaten_erfassen_69" targetRef="Akquisedaten_erfasst_90"/>
@@ -787,8 +787,8 @@ erfasst</text>
          <text>Wirklich direkt ohne Prozess?</text>
       </textAnnotation>
    </process>
-   <bpmndi:BPMNDiagram id="sid-4ecae6da-9a35-4dee-9955-4c7e91b63f6b">
-      <bpmndi:BPMNPlane bpmnElement="sid-da62acb5-3f68-476a-be31-c5b546fa94d8" id="sid-23644814-e0d5-4136-be23-aeb7ff2d4d3b">
+   <bpmndi:BPMNDiagram id="sid-8e423d09-e5e1-4836-814e-b7b2e13cf152">
+      <bpmndi:BPMNPlane bpmnElement="sid-21f42430-c9cb-46dc-bf63-3f316ee85434" id="sid-009a3062-5b77-449d-b075-b3d600dc73f7">
          <bpmndi:BPMNShape bpmnElement="UI_Mediator_6" id="UI_Mediator_6_gui" isHorizontal="true">
             <omgdc:Bounds height="60.0" width="361.0" x="59.0" y="1433.0"/>
          </bpmndi:BPMNShape>
@@ -815,7 +815,7 @@ erfasst</text>
             <omgdc:Bounds height="319.0" width="3525.0" x="88.0" y="405.0"/>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="startEvent_589" id="startEvent_589_gui">
-            <omgdc:Bounds height="28.0" width="28.0" x="167.0" y="612.0"/>
+            <omgdc:Bounds height="30.0" width="30.0" x="166.0" y="611.0"/>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="Auswahl_Akquisetyp_593" id="Auswahl_Akquisetyp_593_gui">
             <omgdc:Bounds height="80.0" width="100.0" x="461.0" y="585.0"/>
@@ -848,7 +848,7 @@ erfasst</text>
             <omgdc:Bounds height="80.0" width="100.0" x="2353.0" y="585.0"/>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="endEvent_667" id="endEvent_667_gui">
-            <omgdc:Bounds height="28.0" width="28.0" x="2569.0" y="611.0"/>
+            <omgdc:Bounds height="30.0" width="30.0" x="2568.0" y="610.0"/>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="Akquise_Metadaten_erfassen_671" id="Akquise_Metadaten_erfassen_671_gui">
             <omgdc:Bounds height="80.0" width="100.0" x="885.999731474938" y="585.0"/>
@@ -890,7 +890,7 @@ erfasst</text>
             <omgdc:Bounds height="80.0" width="100.0" x="4147.0" y="1158.2528537355154"/>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="startEvent_277" id="startEvent_277_gui">
-            <omgdc:Bounds height="28.0" width="28.0" x="107.0" y="1185.2528537355154"/>
+            <omgdc:Bounds height="30.0" width="30.0" x="106.0" y="1184.2528537355154"/>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="Anlage_definieren_bearbeiten__Tarifauswahl_281" id="Anlage_definieren_bearbeiten__Tarifauswahl_281_gui">
             <omgdc:Bounds height="80.0" width="100.0" x="3191.0" y="983.0"/>
@@ -902,7 +902,7 @@ erfasst</text>
             <omgdc:Bounds height="80.0" width="100.0" x="3408.0" y="1283.0"/>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="Akquisedaten_erfasst_302" id="Akquisedaten_erfasst_302_gui">
-            <omgdc:Bounds height="28.0" width="28.0" x="3373.0019062457704" y="1186.2528537355154"/>
+            <omgdc:Bounds height="30.0" width="30.0" x="3372.0019062457704" y="1185.2528537355154"/>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="GP-Suche_308" id="GP-Suche_308_gui">
             <omgdc:Bounds height="80.0" width="100.0" x="659.0" y="983.0"/>
@@ -923,7 +923,7 @@ erfasst</text>
             <omgdc:Bounds height="40.0" width="40.0" x="1712.0" y="1178.2528537355154"/>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="endEvent_353" id="endEvent_353_gui">
-            <omgdc:Bounds height="28.0" width="28.0" x="632.0" y="1253.0"/>
+            <omgdc:Bounds height="30.0" width="30.0" x="631.0" y="1252.0"/>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="N_chsten_Akquise_Fall_claimen_357" id="N_chsten_Akquise_Fall_claimen_357_gui">
             <omgdc:Bounds height="80.0" width="100.0" x="721.0" y="1158.2528537355154"/>
@@ -950,34 +950,34 @@ erfasst</text>
             <omgdc:Bounds height="40.0" width="40.0" x="2118.4982019571535" y="1178.2528537355154"/>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="intermediateThrowEvent_408" id="intermediateThrowEvent_408_gui">
-            <omgdc:Bounds height="28.0" width="28.0" x="4315.0" y="1186.2528537355154"/>
+            <omgdc:Bounds height="30.0" width="30.0" x="4314.0" y="1185.2528537355154"/>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="exclusiveGateway_414" id="exclusiveGateway_414_gui" isMarkerVisible="true">
             <omgdc:Bounds height="40.0" width="40.0" x="4042.0" y="1178.2528537355154"/>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="endEvent_420" id="endEvent_420_gui">
-            <omgdc:Bounds height="28.0" width="28.0" x="4585.0" y="1184.2528537355154"/>
+            <omgdc:Bounds height="30.0" width="30.0" x="4584.0" y="1183.2528537355154"/>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="eventBasedGateway_424" id="eventBasedGateway_424_gui">
             <omgdc:Bounds height="40.0" width="40.0" x="3645.0" y="1178.2528537355154"/>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="technische__Stammdaten_und_WB__angelegt_430" id="technische__Stammdaten_und_WB__angelegt_430_gui">
-            <omgdc:Bounds height="28.0" width="28.0" x="3753.0" y="1186.2528537355154"/>
+            <omgdc:Bounds height="30.0" width="30.0" x="3752.0" y="1185.2528537355154"/>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="Fehler_bei__technische__Stammdaten__anlegen_438" id="Fehler_bei__technische__Stammdaten__anlegen_438_gui">
-            <omgdc:Bounds height="28.0" width="28.0" x="3653.0" y="1311.0"/>
+            <omgdc:Bounds height="30.0" width="30.0" x="3652.0" y="1310.0"/>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="eventBasedGateway_446" id="eventBasedGateway_446_gui">
             <omgdc:Bounds height="40.0" width="40.0" x="4397.0" y="1178.2528537355154"/>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="Fehler_bei__Kontakt__schreiben_452" id="Fehler_bei__Kontakt__schreiben_452_gui">
-            <omgdc:Bounds height="28.0" width="28.0" x="4405.0" y="1076.0"/>
+            <omgdc:Bounds height="30.0" width="30.0" x="4404.0" y="1075.0"/>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="Kontakt_geschrieben_460" id="Kontakt_geschrieben_460_gui">
-            <omgdc:Bounds height="28.0" width="28.0" x="4503.0" y="1186.2528537355154"/>
+            <omgdc:Bounds height="30.0" width="30.0" x="4502.0" y="1185.2528537355154"/>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="GP_identifiziert___angelegt__467" id="GP_identifiziert___angelegt__467_gui">
-            <omgdc:Bounds height="28.0" width="28.0" x="2240.0" y="1186.2528537355154"/>
+            <omgdc:Bounds height="30.0" width="30.0" x="2239.0" y="1185.2528537355154"/>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="Akquise_Metadaten_erfassen_474" id="Akquise_Metadaten_erfassen_474_gui">
             <omgdc:Bounds height="80.0" width="100.0" x="2443.0" y="1158.2528537355154"/>
@@ -1040,7 +1040,7 @@ erfasst</text>
             <omgdc:Bounds height="80.0" width="100.0" x="721.0" y="1655.0"/>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="Automatische_Akquise_56" id="Automatische_Akquise_56_gui">
-            <omgdc:Bounds height="28.0" width="28.0" x="633.0" y="1682.0"/>
+            <omgdc:Bounds height="30.0" width="30.0" x="632.0" y="1681.0"/>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="GP_identifizieren_62" id="GP_identifizieren_62_gui">
             <omgdc:Bounds height="80.0" width="100.0" x="1432.0" y="1655.0"/>
@@ -1052,13 +1052,13 @@ erfasst</text>
             <omgdc:Bounds height="80.0" width="100.0" x="3484.0" y="1655.0"/>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="GP_identifiziert___angelegt_84" id="GP_identifiziert___angelegt_84_gui">
-            <omgdc:Bounds height="28.0" width="28.0" x="2240.0" y="1682.8735731322422"/>
+            <omgdc:Bounds height="30.0" width="30.0" x="2239.0" y="1681.8735731322422"/>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="Akquisedaten_erfasst_90" id="Akquisedaten_erfasst_90_gui">
-            <omgdc:Bounds height="28.0" width="28.0" x="3373.0019062457704" y="1683.0"/>
+            <omgdc:Bounds height="30.0" width="30.0" x="3372.0019062457704" y="1682.0"/>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="Manuelle_Akquise_95" id="Manuelle_Akquise_95_gui">
-            <omgdc:Bounds height="28.0" width="28.0" x="2239.0" y="1569.8735731322422"/>
+            <omgdc:Bounds height="30.0" width="30.0" x="2238.0" y="1568.8735731322422"/>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="Kontakt_abschlie_en_101" id="Kontakt_abschlie_en_101_gui">
             <omgdc:Bounds height="80.0" width="100.0" x="4087.0" y="1655.0"/>
@@ -1067,13 +1067,13 @@ erfasst</text>
             <omgdc:Bounds height="80.0" width="100.0" x="4252.0" y="1655.0"/>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="endEvent_116" id="endEvent_116_gui">
-            <omgdc:Bounds height="28.0" width="28.0" x="4585.0" y="1681.0"/>
+            <omgdc:Bounds height="30.0" width="30.0" x="4584.0" y="1680.0"/>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="boundaryEvent_120" id="boundaryEvent_120_gui">
-            <omgdc:Bounds height="28.0" width="28.0" x="3497.4358974359056" y="1721.0"/>
+            <omgdc:Bounds height="30.0" width="30.0" x="3496.4358974359056" y="1720.0"/>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="boundaryEvent_123" id="boundaryEvent_123_gui">
-            <omgdc:Bounds height="28.0" width="28.0" x="4255.272727272764" y="1721.0"/>
+            <omgdc:Bounds height="30.0" width="30.0" x="4254.272727272764" y="1720.0"/>
          </bpmndi:BPMNShape>
          <bpmndi:BPMNShape bpmnElement="textAnnotation_701" id="textAnnotation_701_gui">
             <omgdc:Bounds height="50.0" width="100.0" x="840.0" y="1439.0"/>
@@ -1093,62 +1093,62 @@ erfasst</text>
             <omgdi:waypoint x="3191.0" y="991.0"/>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="association_546" id="association_546_gui">
-            <omgdi:waypoint x="1506.0" y="1238.0"/>
+            <omgdi:waypoint x="1506.197225913702" y="1238.2528537355154"/>
             <omgdi:waypoint x="1545.0" y="1288.0"/>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="association_547" id="association_547_gui">
-            <omgdi:waypoint x="1442.0" y="1238.0"/>
+            <omgdi:waypoint x="1441.7850743248118" y="1238.2528537355154"/>
             <omgdi:waypoint x="1391.0" y="1298.0"/>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="association_548" id="association_548_gui">
-            <omgdi:waypoint x="2492.0" y="1158.0"/>
+            <omgdi:waypoint x="2492.0" y="1158.2528537355154"/>
             <omgdi:waypoint x="2490.0" y="1113.0"/>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="association_549" id="association_549_gui">
-            <omgdi:waypoint x="2703.0" y="1158.0"/>
+            <omgdi:waypoint x="2703.0" y="1158.2528537355154"/>
             <omgdi:waypoint x="2745.0" y="1058.0"/>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="association_540" id="association_540_gui">
-            <omgdi:waypoint x="3911.0" y="1158.0"/>
+            <omgdi:waypoint x="3911.0" y="1158.2528537355154"/>
             <omgdi:waypoint x="3931.0" y="1021.0"/>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="association_541" id="association_541_gui">
-            <omgdi:waypoint x="253.0" y="1158.0"/>
+            <omgdi:waypoint x="253.0" y="1158.2528537355154"/>
             <omgdi:waypoint x="271.0" y="1075.0"/>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="association_542" id="association_542_gui">
-            <omgdi:waypoint x="2255.0" y="1186.0"/>
+            <omgdi:waypoint x="2255.3721088096827" y="1185.2528537355154"/>
             <omgdi:waypoint x="2265.0" y="1080.0"/>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="association_543" id="association_543_gui">
-            <omgdi:waypoint x="2922.0" y="1323.0"/>
+            <omgdi:waypoint x="2922.3896701090775" y="1323.0"/>
             <omgdi:waypoint x="3041.0" y="1375.0"/>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="association_544" id="association_544_gui">
-            <omgdi:waypoint x="3122.0" y="1158.0"/>
+            <omgdi:waypoint x="3122.0" y="1158.2528537355154"/>
             <omgdi:waypoint x="3131.0" y="944.0"/>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="nein_529" id="nein_529_gui">
-            <omgdi:waypoint x="2018.0" y="1043.0"/>
+            <omgdi:waypoint x="2018.1" y="1043.0"/>
             <omgdi:waypoint x="2018.5" y="1123.0"/>
             <omgdi:waypoint x="1757.0" y="1123.0"/>
             <omgdi:waypoint x="1757.0" y="1063.0"/>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="ja_510" id="ja_510_gui">
-            <omgdi:waypoint x="2038.0" y="1023.0"/>
+            <omgdi:waypoint x="2038.0" y="1023.0822888161795"/>
             <omgdi:waypoint x="2139.5231967632817" y="1023.5"/>
-            <omgdi:waypoint x="2138.0" y="1178.0"/>
+            <omgdi:waypoint x="2138.6155098905256" y="1178.2528537355154"/>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="nein_522" id="nein_522_gui">
-            <omgdi:waypoint x="935.0" y="1218.0"/>
+            <omgdi:waypoint x="936.0861266935048" y="1218.2528537355154"/>
             <omgdi:waypoint x="936.499731474938" y="1314.0"/>
             <omgdi:waypoint x="410.0" y="1314.0"/>
-            <omgdi:waypoint x="410.0" y="1238.0"/>
+            <omgdi:waypoint x="410.0" y="1238.2528537355154"/>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="beenden_507" id="beenden_507_gui">
-            <omgdi:waypoint x="547.0" y="1218.0"/>
+            <omgdi:waypoint x="547.1454605833604" y="1218.2528537355154"/>
             <omgdi:waypoint x="547.5" y="1267.0"/>
-            <omgdi:waypoint x="632.0" y="1267.0"/>
+            <omgdi:waypoint x="631.0" y="1267.0"/>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="Fehler_beim__anlegen_der__Stammdaten____Wechselbelege_687" id="Fehler_beim__anlegen_der__Stammdaten____Wechselbelege_687_gui">
             <omgdi:waypoint x="2150.0" y="585.0"/>
@@ -1160,19 +1160,19 @@ erfasst</text>
             <omgdi:waypoint x="1195.0" y="1023.0"/>
             <omgdi:waypoint x="1266.0" y="1023.0"/>
             <omgdi:waypoint x="1266.0" y="1198.7528537355154"/>
-            <omgdi:waypoint x="1320.0" y="1198.0"/>
+            <omgdi:waypoint x="1320.000768959114" y="1198.38798746643"/>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="association_550" id="association_550_gui">
             <omgdi:waypoint x="435.0" y="1029.0"/>
-            <omgdi:waypoint x="415.0" y="1158.0"/>
+            <omgdi:waypoint x="415.0" y="1158.2528537355154"/>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="Suche_503" id="Suche_503_gui">
             <omgdi:waypoint x="866.0" y="1023.0"/>
             <omgdi:waypoint x="946.0" y="1023.0"/>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="Akquisetyp__manuell_23" id="Akquisetyp__manuell_23_gui">
-            <omgdi:waypoint x="2254.0" y="1214.0"/>
-            <omgdi:waypoint x="2253.0" y="1569.0"/>
+            <omgdi:waypoint x="2253.960898879436" y="1215.2528537355154"/>
+            <omgdi:waypoint x="2253.0391011205643" y="1568.8735731322422"/>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="sequenceFlow_686" id="sequenceFlow_686_gui">
             <omgdi:waypoint x="2200.0" y="625.0"/>
@@ -1192,7 +1192,7 @@ erfasst</text>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="sequenceFlow_685" id="sequenceFlow_685_gui">
             <omgdi:waypoint x="2453.0" y="625.0"/>
-            <omgdi:waypoint x="2569.0" y="625.0"/>
+            <omgdi:waypoint x="2568.0" y="625.0"/>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="sequenceFlow_690" id="sequenceFlow_690_gui">
             <omgdi:waypoint x="1225.0" y="625.0"/>
@@ -1203,11 +1203,11 @@ erfasst</text>
             <omgdi:waypoint x="1605.0" y="625.0"/>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="sequenceFlow_691" id="sequenceFlow_691_gui">
-            <omgdi:waypoint x="985.0" y="625.0"/>
+            <omgdi:waypoint x="985.999731474938" y="625.0"/>
             <omgdi:waypoint x="1125.0" y="625.0"/>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="Akquisetyp__automatisch_21" id="Akquisetyp__automatisch_21_gui">
-            <omgdi:waypoint x="2254.0" y="1214.0"/>
+            <omgdi:waypoint x="2253.8908086929823" y="1215.2528537355154"/>
             <omgdi:waypoint x="2252.0" y="1475.0"/>
             <omgdi:waypoint x="1513.0" y="1475.0"/>
             <omgdi:waypoint x="1513.0" y="1655.0"/>
@@ -1217,8 +1217,8 @@ erfasst</text>
             <omgdi:waypoint x="1845.0" y="625.0"/>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="GP_ausgew_hlt_505" id="GP_ausgew_hlt_505_gui">
-            <omgdi:waypoint x="1752.0" y="1198.0"/>
-            <omgdi:waypoint x="2118.0" y="1198.0"/>
+            <omgdi:waypoint x="1752.0" y="1198.2528537355154"/>
+            <omgdi:waypoint x="2118.4982019571535" y="1198.2528537355154"/>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="sequenceFlow_680" id="sequenceFlow_680_gui">
             <omgdi:waypoint x="561.0" y="625.0"/>
@@ -1226,10 +1226,10 @@ erfasst</text>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="sequenceFlow_681" id="sequenceFlow_681_gui">
             <omgdi:waypoint x="759.0" y="625.0"/>
-            <omgdi:waypoint x="885.0" y="625.0"/>
+            <omgdi:waypoint x="885.999731474938" y="625.0"/>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="sequenceFlow_495" id="sequenceFlow_495_gui">
-            <omgdi:waypoint x="2378.0" y="1198.0"/>
+            <omgdi:waypoint x="2378.0" y="1198.2900381083853"/>
             <omgdi:waypoint x="2443.0" y="1198.0"/>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="sequenceFlow_537" id="sequenceFlow_537_gui">
@@ -1237,14 +1237,14 @@ erfasst</text>
             <omgdi:waypoint x="3071.0" y="1198.0"/>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="z_518" id="z_518_gui">
-            <omgdi:waypoint x="1175.0" y="1043.0"/>
+            <omgdi:waypoint x="1175.1206225750086" y="1043.0"/>
             <omgdi:waypoint x="1175.5" y="1105.903221053733"/>
             <omgdi:waypoint x="709.0" y="1105.903221053733"/>
             <omgdi:waypoint x="709.0" y="1063.0"/>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="messageFlow_18" id="messageFlow_18_gui">
             <omgdi:waypoint x="771.0" y="1655.0"/>
-            <omgdi:waypoint x="771.0" y="1238.0"/>
+            <omgdi:waypoint x="771.0" y="1238.2528537355154"/>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="sequenceFlow_496" id="sequenceFlow_496_gui">
             <omgdi:waypoint x="1782.0" y="1023.0"/>
@@ -1255,7 +1255,7 @@ erfasst</text>
             <omgdi:waypoint x="2865.0" y="1198.0"/>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="sequenceFlow_678" id="sequenceFlow_678_gui">
-            <omgdi:waypoint x="195.0" y="626.0"/>
+            <omgdi:waypoint x="196.0" y="625.8333333333334"/>
             <omgdi:waypoint x="271.0" y="625.0"/>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="messageFlow_19" id="messageFlow_19_gui">
@@ -1264,25 +1264,25 @@ erfasst</text>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="sequenceFlow_539" id="sequenceFlow_539_gui">
             <omgdi:waypoint x="3956.0" y="1198.0"/>
-            <omgdi:waypoint x="4042.0" y="1198.0"/>
+            <omgdi:waypoint x="4042.0" y="1198.2051454835314"/>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="manuell_490" id="manuell_490_gui">
-            <omgdi:waypoint x="547.0" y="1178.0"/>
+            <omgdi:waypoint x="547.0570604117813" y="1178.2528537355154"/>
             <omgdi:waypoint x="547.5" y="1023.0"/>
             <omgdi:waypoint x="659.0" y="1023.0"/>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="sequenceFlow_538" id="sequenceFlow_538_gui">
             <omgdi:waypoint x="3171.0" y="1198.0"/>
-            <omgdi:waypoint x="3373.0" y="1200.0"/>
+            <omgdi:waypoint x="3372.0019062457704" y="1200.096406940114"/>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="GP_anlegen_506" id="GP_anlegen_506_gui">
-            <omgdi:waypoint x="1732.0" y="1178.0"/>
+            <omgdi:waypoint x="1732.0" y="1178.2528537355154"/>
             <omgdi:waypoint x="1732.0" y="1063.0"/>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="sequenceFlow_530" id="sequenceFlow_530_gui">
-            <omgdi:waypoint x="4405.0" y="1090.0"/>
+            <omgdi:waypoint x="4404.0" y="1089.9212132472167"/>
             <omgdi:waypoint x="4062.5" y="1088.1275015088509"/>
-            <omgdi:waypoint x="4062.0" y="1178.0"/>
+            <omgdi:waypoint x="4062.090805611949" y="1178.2528537355154"/>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="sequenceFlow_533" id="sequenceFlow_533_gui">
             <omgdi:waypoint x="2543.0" y="1198.0"/>
@@ -1293,12 +1293,12 @@ erfasst</text>
             <omgdi:waypoint x="461.0" y="625.0"/>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="sequenceFlow_535" id="sequenceFlow_535_gui">
-            <omgdi:waypoint x="2268.0" y="1200.0"/>
-            <omgdi:waypoint x="2338.0" y="1198.0"/>
+            <omgdi:waypoint x="2269.0" y="1199.982626841442"/>
+            <omgdi:waypoint x="2338.0" y="1198.7395831287042"/>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="sequenceFlow_534" id="sequenceFlow_534_gui">
             <omgdi:waypoint x="1660.0" y="1198.0"/>
-            <omgdi:waypoint x="1712.0" y="1198.0"/>
+            <omgdi:waypoint x="1712.0" y="1198.182616586761"/>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="messageFlow_22" id="messageFlow_22_gui">
             <omgdi:waypoint x="4302.0" y="1735.0"/>
@@ -1311,7 +1311,7 @@ erfasst</text>
          <bpmndi:BPMNEdge bpmnElement="sequenceFlow_494" id="sequenceFlow_494_gui">
             <omgdi:waypoint x="3191.0" y="1023.0"/>
             <omgdi:waypoint x="3121.0" y="1023.0"/>
-            <omgdi:waypoint x="3121.0" y="1158.0"/>
+            <omgdi:waypoint x="3121.0" y="1158.2528537355154"/>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="messageFlow_27" id="messageFlow_27_gui">
             <omgdi:waypoint x="988.0" y="1063.0"/>
@@ -1323,27 +1323,27 @@ erfasst</text>
             <omgdi:waypoint x="3241.0" y="1063.0"/>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="messageFlow_26" id="messageFlow_26_gui">
-            <omgdi:waypoint x="754.0" y="1238.0"/>
+            <omgdi:waypoint x="754.0003344626131" y="1238.2528537355154"/>
             <omgdi:waypoint x="754.3333333333334" y="1490.0"/>
             <omgdi:waypoint x="646.0" y="1490.0"/>
-            <omgdi:waypoint x="647.0" y="1682.0"/>
+            <omgdi:waypoint x="646.9271844660194" y="1681.0"/>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="sequenceFlow_492" id="sequenceFlow_492_gui">
             <omgdi:waypoint x="1525.0" y="1198.0"/>
             <omgdi:waypoint x="1560.0" y="1198.0"/>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="messageFlow_25" id="messageFlow_25_gui">
-            <omgdi:waypoint x="3387.0" y="1214.0"/>
+            <omgdi:waypoint x="3386.895804379151" y="1215.2528537355154"/>
             <omgdi:waypoint x="3385.0019062457704" y="1483.0"/>
             <omgdi:waypoint x="2682.0" y="1483.0"/>
             <omgdi:waypoint x="2682.0" y="1655.0"/>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="sequenceFlow_491" id="sequenceFlow_491_gui">
-            <omgdi:waypoint x="135.0" y="1199.0"/>
+            <omgdi:waypoint x="136.0" y="1198.9988968972352"/>
             <omgdi:waypoint x="195.0" y="1198.0"/>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="messageFlow_24" id="messageFlow_24_gui">
-            <omgdi:waypoint x="4329.0" y="1214.0"/>
+            <omgdi:waypoint x="4328.891597798189" y="1215.2528537355154"/>
             <omgdi:waypoint x="4327.0" y="1477.0"/>
             <omgdi:waypoint x="4132.0" y="1477.0"/>
             <omgdi:waypoint x="4132.0" y="1655.0"/>
@@ -1351,40 +1351,40 @@ erfasst</text>
          <bpmndi:BPMNEdge bpmnElement="sequenceFlow_527" id="sequenceFlow_527_gui">
             <omgdi:waypoint x="3408.0" y="1323.0"/>
             <omgdi:waypoint x="2358.5" y="1323.0"/>
-            <omgdi:waypoint x="2358.0" y="1218.0"/>
+            <omgdi:waypoint x="2358.080243478359" y="1218.379280603273"/>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="sequenceFlow_525" id="sequenceFlow_525_gui">
-            <omgdi:waypoint x="4417.0" y="1178.0"/>
-            <omgdi:waypoint x="4419.0" y="1104.0"/>
+            <omgdi:waypoint x="4417.3695052704825" y="1178.2528537355154"/>
+            <omgdi:waypoint x="4418.722871047138" y="1105.0"/>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="sequenceFlow_488" id="sequenceFlow_488_gui">
             <omgdi:waypoint x="460.0" y="1198.0"/>
-            <omgdi:waypoint x="527.0" y="1198.0"/>
+            <omgdi:waypoint x="527.0" y="1198.1947264399946"/>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="sequenceFlow_489" id="sequenceFlow_489_gui">
             <omgdi:waypoint x="759.0" y="1023.0"/>
             <omgdi:waypoint x="826.0" y="1023.0"/>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="sequenceFlow_524" id="sequenceFlow_524_gui">
-            <omgdi:waypoint x="4437.0" y="1198.0"/>
-            <omgdi:waypoint x="4503.0" y="1200.0"/>
+            <omgdi:waypoint x="4437.0" y="1198.6528537355155"/>
+            <omgdi:waypoint x="4502.0" y="1199.9528537355154"/>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="sequenceFlow_523" id="sequenceFlow_523_gui">
-            <omgdi:waypoint x="4531.0" y="1200.0"/>
-            <omgdi:waypoint x="4585.0" y="1198.0"/>
+            <omgdi:waypoint x="4532.0" y="1199.887000076979"/>
+            <omgdi:waypoint x="4584.0" y="1198.618707394052"/>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="z_1_498" id="z_1_498_gui">
-            <omgdi:waypoint x="1360.0" y="1198.0"/>
+            <omgdi:waypoint x="1360.000768959114" y="1198.1933582006925"/>
             <omgdi:waypoint x="1425.0" y="1198.0"/>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="GP_anlegen_528" id="GP_anlegen_528_gui">
-            <omgdi:waypoint x="846.0" y="1003.0"/>
+            <omgdi:waypoint x="846.0813008130082" y="1003.0"/>
             <omgdi:waypoint x="846.5" y="900.0"/>
             <omgdi:waypoint x="1707.0" y="900.0"/>
             <omgdi:waypoint x="1707.0" y="983.0"/>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="automatisiert_499" id="automatisiert_499_gui">
-            <omgdi:waypoint x="567.0" y="1198.0"/>
+            <omgdi:waypoint x="567.0" y="1198.2237900877549"/>
             <omgdi:waypoint x="721.0" y="1198.0"/>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="sequenceFlow_132" id="sequenceFlow_132_gui">
@@ -1393,42 +1393,42 @@ erfasst</text>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="sequenceFlow_133" id="sequenceFlow_133_gui">
             <omgdi:waypoint x="2694.0" y="1695.0"/>
-            <omgdi:waypoint x="3373.0" y="1697.0"/>
+            <omgdi:waypoint x="3372.0019062457704" y="1696.9567100757881"/>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="sequenceFlow_134" id="sequenceFlow_134_gui">
-            <omgdi:waypoint x="3511.0" y="1749.0"/>
+            <omgdi:waypoint x="3511.4358974359056" y="1750.0"/>
             <omgdi:waypoint x="3511.4358974359056" y="1773.0"/>
             <omgdi:waypoint x="2652.062743091873" y="1773.0"/>
             <omgdi:waypoint x="2652.0" y="1735.0"/>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="sequenceFlow_135" id="sequenceFlow_135_gui">
             <omgdi:waypoint x="4352.0" y="1695.0"/>
-            <omgdi:waypoint x="4585.0" y="1695.0"/>
+            <omgdi:waypoint x="4584.0" y="1695.0"/>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="sequenceFlow_136" id="sequenceFlow_136_gui">
             <omgdi:waypoint x="3584.0" y="1695.0"/>
             <omgdi:waypoint x="4087.0" y="1695.0"/>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="sequenceFlow_137" id="sequenceFlow_137_gui">
-            <omgdi:waypoint x="4269.0" y="1749.0"/>
+            <omgdi:waypoint x="4269.272727272756" y="1750.0"/>
             <omgdi:waypoint x="4269.272727272735" y="1786.0"/>
             <omgdi:waypoint x="4137.0" y="1786.0"/>
             <omgdi:waypoint x="4137.0" y="1735.0"/>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="sequenceFlow_511" id="sequenceFlow_511_gui">
-            <omgdi:waypoint x="3401.0" y="1200.0"/>
-            <omgdi:waypoint x="3645.0" y="1198.0"/>
+            <omgdi:waypoint x="3402.0019062457704" y="1200.1449393264816"/>
+            <omgdi:waypoint x="3645.0" y="1198.396739614227"/>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="sequenceFlow_512" id="sequenceFlow_512_gui">
-            <omgdi:waypoint x="4343.0" y="1200.0"/>
-            <omgdi:waypoint x="4397.0" y="1198.0"/>
+            <omgdi:waypoint x="4344.0" y="1199.9119446446064"/>
+            <omgdi:waypoint x="4397.0" y="1198.7073991900609"/>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="sequenceFlow_513" id="sequenceFlow_513_gui">
-            <omgdi:waypoint x="4082.0" y="1198.0"/>
+            <omgdi:waypoint x="4082.0" y="1198.1933587389235"/>
             <omgdi:waypoint x="4147.0" y="1198.0"/>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="sequenceFlow_519" id="sequenceFlow_519_gui">
-            <omgdi:waypoint x="3653.0" y="1325.0"/>
+            <omgdi:waypoint x="3652.0" y="1324.811320754717"/>
             <omgdi:waypoint x="3508.0" y="1323.0"/>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="sequenceFlow_514" id="sequenceFlow_514_gui">
@@ -1436,45 +1436,45 @@ erfasst</text>
             <omgdi:waypoint x="360.0" y="1198.0"/>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="sequenceFlow_515" id="sequenceFlow_515_gui">
-            <omgdi:waypoint x="3781.0" y="1200.0"/>
+            <omgdi:waypoint x="3782.0" y="1199.8731592857093"/>
             <omgdi:waypoint x="3856.0" y="1198.0"/>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="sequenceFlow_516" id="sequenceFlow_516_gui">
-            <omgdi:waypoint x="3685.0" y="1198.0"/>
-            <omgdi:waypoint x="3753.0" y="1200.0"/>
+            <omgdi:waypoint x="3685.0" y="1198.6450105982606"/>
+            <omgdi:waypoint x="3752.0" y="1199.9587360884566"/>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="sequenceFlow_517" id="sequenceFlow_517_gui">
-            <omgdi:waypoint x="3665.0" y="1218.0"/>
-            <omgdi:waypoint x="3667.0" y="1311.0"/>
+            <omgdi:waypoint x="3665.3155889594273" y="1218.2528537355154"/>
+            <omgdi:waypoint x="3666.7633082804296" y="1310.0"/>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="sequenceFlow_129" id="sequenceFlow_129_gui">
-            <omgdi:waypoint x="3401.0" y="1697.0"/>
+            <omgdi:waypoint x="3402.0019062457704" y="1696.6907155714214"/>
             <omgdi:waypoint x="3484.0" y="1695.0"/>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="z_497" id="z_497_gui">
-            <omgdi:waypoint x="1340.0" y="1178.0"/>
+            <omgdi:waypoint x="1340.0578293708954" y="1178.2528537355154"/>
             <omgdi:waypoint x="1340.500768959114" y="1023.0"/>
             <omgdi:waypoint x="1682.0" y="1023.0"/>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="ja_508" id="ja_508_gui">
-            <omgdi:waypoint x="955.0" y="1198.0"/>
-            <omgdi:waypoint x="1320.0" y="1198.0"/>
+            <omgdi:waypoint x="955.999731474938" y="1198.2528537355154"/>
+            <omgdi:waypoint x="1320.000768959114" y="1198.2528537355154"/>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="sequenceFlow_127" id="sequenceFlow_127_gui">
             <omgdi:waypoint x="1532.0" y="1695.0"/>
-            <omgdi:waypoint x="2240.0" y="1696.0"/>
+            <omgdi:waypoint x="2239.0" y="1696.8346484826804"/>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="sequenceFlow_128" id="sequenceFlow_128_gui">
-            <omgdi:waypoint x="661.0" y="1696.0"/>
+            <omgdi:waypoint x="662.0" y="1695.7972972972973"/>
             <omgdi:waypoint x="721.0" y="1695.0"/>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="sequenceFlow_126" id="sequenceFlow_126_gui">
-            <omgdi:waypoint x="2268.0" y="1696.0"/>
+            <omgdi:waypoint x="2269.0" y="1696.790915494055"/>
             <omgdi:waypoint x="2594.0" y="1695.0"/>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="sequenceFlow_501" id="sequenceFlow_501_gui">
             <omgdi:waypoint x="4247.0" y="1198.0"/>
-            <omgdi:waypoint x="4315.0" y="1200.0"/>
+            <omgdi:waypoint x="4314.0" y="1199.8407463448723"/>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="sequenceFlow_502" id="sequenceFlow_502_gui">
             <omgdi:waypoint x="1046.0" y="1023.0"/>
@@ -1482,19 +1482,19 @@ erfasst</text>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="sequenceFlow_500" id="sequenceFlow_500_gui">
             <omgdi:waypoint x="821.0" y="1198.0"/>
-            <omgdi:waypoint x="915.0" y="1198.0"/>
+            <omgdi:waypoint x="915.999731474938" y="1198.2088790701362"/>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="sequenceFlow_131" id="sequenceFlow_131_gui">
-            <omgdi:waypoint x="2253.0" y="1597.0"/>
-            <omgdi:waypoint x="2254.0" y="1682.0"/>
+            <omgdi:waypoint x="2253.1327433628317" y="1598.8735731322422"/>
+            <omgdi:waypoint x="2253.867256637168" y="1681.8735731322422"/>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="sequenceFlow_130" id="sequenceFlow_130_gui">
             <omgdi:waypoint x="4187.0" y="1697.0"/>
             <omgdi:waypoint x="4252.0" y="1695.0"/>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="sequenceFlow_509" id="sequenceFlow_509_gui">
-            <omgdi:waypoint x="2158.0" y="1198.0"/>
-            <omgdi:waypoint x="2240.0" y="1200.0"/>
+            <omgdi:waypoint x="2158.4982019571535" y="1198.599168690588"/>
+            <omgdi:waypoint x="2239.0" y="1199.993117519211"/>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="association_694" id="association_694_gui">
             <omgdi:waypoint x="507.0" y="585.0"/>
@@ -1510,7 +1510,7 @@ erfasst</text>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="association_697" id="association_697_gui">
             <omgdi:waypoint x="481.0" y="585.0"/>
-            <omgdi:waypoint x="402.0" y="484.0"/>
+            <omgdi:waypoint x="402.3910891089109" y="484.5"/>
          </bpmndi:BPMNEdge>
          <bpmndi:BPMNEdge bpmnElement="sequenceFlow_504" id="sequenceFlow_504_gui">
             <omgdi:waypoint x="1933.0" y="1023.0"/>
