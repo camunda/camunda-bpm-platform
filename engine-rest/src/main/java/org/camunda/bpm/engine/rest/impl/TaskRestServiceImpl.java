@@ -15,7 +15,6 @@ package org.camunda.bpm.engine.rest.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
@@ -31,6 +30,7 @@ import org.camunda.bpm.engine.rest.dto.task.TaskDto;
 import org.camunda.bpm.engine.rest.dto.task.TaskQueryDto;
 import org.camunda.bpm.engine.rest.dto.task.UserIdDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
 
@@ -55,13 +55,7 @@ public class TaskRestServiceImpl extends AbstractRestProcessEngineAware implemen
       Integer maxResults) {
     TaskService taskService = getProcessEngine().getTaskService();
 
-    TaskQuery query;
-
-    try {
-      query = queryDto.toQuery(taskService);
-    } catch (InvalidRequestException e) {
-      throw new WebApplicationException(Status.BAD_REQUEST.getStatusCode());
-    }
+    TaskQuery query = queryDto.toQuery(taskService);
 
     List<Task> matchingTasks;
     if (firstResult != null || maxResults != null) {
@@ -123,12 +117,7 @@ public class TaskRestServiceImpl extends AbstractRestProcessEngineAware implemen
   public CountResultDto queryTasksCount(TaskQueryDto queryDto) {
     TaskService taskService = getProcessEngine().getTaskService();
 
-    TaskQuery query;
-    try {
-      query = queryDto.toQuery(taskService);
-    } catch (InvalidRequestException e) {
-      throw new WebApplicationException(Status.BAD_REQUEST.getStatusCode());
-    }
+    TaskQuery query = queryDto.toQuery(taskService);
 
     long count = query.count();
     CountResultDto result = new CountResultDto();
@@ -141,7 +130,7 @@ public class TaskRestServiceImpl extends AbstractRestProcessEngineAware implemen
   public TaskDto getTask(String id) {
     Task task = getTaskById(id);
     if (task == null) {
-      throw new WebApplicationException(Status.BAD_REQUEST.getStatusCode());
+      throw new InvalidRequestException(Status.BAD_REQUEST, "No task id supplied");
     }
     
     return TaskDto.fromTask(task);
@@ -155,7 +144,7 @@ public class TaskRestServiceImpl extends AbstractRestProcessEngineAware implemen
     try {
       formData = formService.getTaskFormData(id);
     } catch (ProcessEngineException e) {
-      throw new WebApplicationException(Status.BAD_REQUEST.getStatusCode());
+      throw new RestException(Status.BAD_REQUEST, e, "Cannot get form for task " + id);
     }
     
     return FormDto.fromFormData(formData);

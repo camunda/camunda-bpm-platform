@@ -17,6 +17,7 @@ import java.util.Date;
 import java.util.List;
 
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
@@ -364,7 +365,7 @@ public class TaskQueryDto extends SortableParameterizedQueryDto {
         } else if (op.equals(VariableQueryParameterDto.NOT_EQUALS_OPERATOR_NAME)) {
           query.taskVariableValueNotEquals(variableName, variableValue);
         } else {
-          throw new InvalidRequestException("You have specified an invalid task variable comparator.");
+          throw new InvalidRequestException(Status.BAD_REQUEST, "You have specified an invalid task variable comparator");
         }
 
       }
@@ -381,13 +382,13 @@ public class TaskQueryDto extends SortableParameterizedQueryDto {
         } else if (op.equals(VariableQueryParameterDto.NOT_EQUALS_OPERATOR_NAME)) {
           query.processVariableValueNotEquals(variableName, variableValue);
         } else {
-          throw new InvalidRequestException("You have specified an invalid process variable comparator.");
+          throw new InvalidRequestException(Status.BAD_REQUEST, "You have specified an invalid process variable comparator");
         }
       }
     }
 
     if (!sortOptionsValid()) {
-      throw new InvalidRequestException("You may not specify a single sorting parameter.");
+      throw new InvalidRequestException(Status.BAD_REQUEST, "You may not specify a single sorting parameter");
     }
 
     if (sortBy != null) {

@@ -15,6 +15,8 @@ package org.camunda.bpm.engine.rest.dto.converter;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.ws.rs.core.Response.Status;
+
 import org.camunda.bpm.engine.rest.dto.VariableQueryParameterDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 
@@ -35,7 +37,7 @@ public class VariableListConverter implements
     
     String[] valueTriple = value.split("_");
     if (valueTriple.length != 3) {
-      throw new InvalidRequestException("variable query parameter has to have format KEY_OPERATOR_VALUE.");
+      throw new InvalidRequestException(Status.BAD_REQUEST, "variable query parameter has to have format KEY_OPERATOR_VALUE.");
     }
     queryVariable.setName(valueTriple[0]);
     queryVariable.setOperator(valueTriple[1]);

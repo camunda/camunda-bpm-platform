@@ -80,7 +80,7 @@ public abstract class AbstractIdentityRestServiceQueryTest extends AbstractRestS
   public void testGroupInfoQueryWithMissingUserParameter() {
     expect().statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
     .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
-    .body("message", equalTo("userId has to be supplied"))
+    .body("message", equalTo("No user id was supplied"))
     .when().get(TASK_GROUPS_URL);
   }
 }

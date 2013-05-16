@@ -1,6 +1,7 @@
 package org.camunda.bpm.engine.rest;
 
 import static com.jayway.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.argThat;
@@ -24,6 +25,7 @@ import org.camunda.bpm.engine.form.StartFormData;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.helper.EqualsMap;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -177,8 +179,8 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
       .contentType(POST_JSON_CONTENT_TYPE).body(EMPTY_JSON_OBJECT)
       .then().expect()
         .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).contentType(ContentType.JSON)
-        .body("type", equalTo(ProcessEngineException.class.getSimpleName()))
-        .body("message", equalTo("expected exception"))
+        .body("type", equalTo(RestException.class.getSimpleName()))
+        .body("message", containsString("Cannot instantiate process definition"))
       .when().post(START_PROCESS_INSTANCE_URL);
   }
 
@@ -211,7 +213,7 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
     .then().expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
       .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
-      .body("message", equalTo("no matching definition"))
+      .body("message", equalTo("No matching definition with id " + nonExistingId))
     .when().get(SINGLE_PROCESS_DEFINITION_URL);
   }
 
@@ -224,7 +226,7 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
     .then().expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
       .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
-      .body("message", equalTo("no matching process definition found."))
+      .body("message", equalTo("No matching definition with id " + nonExistingId))
     .when().get(XML_DEFINITION_URL);
   }
 
@@ -236,7 +238,7 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
     .then().expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
       .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
-      .body("message", equalTo("expected exception"))
+      .body("message", containsString("Cannot get start form data for process definition"))
     .when().get(START_FORM_URL);
   }
 }

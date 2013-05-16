@@ -21,6 +21,7 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.form.TaskFormData;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.helper.EqualsMap;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.task.Task;
@@ -237,7 +238,7 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     given().pathParam("id", "aNonExistingTaskId")
       .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
       .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
-      .body("message", equalTo("expected exception"))
+      .body("message", equalTo("No task id supplied"))
       .when().get(SINGLE_TASK_URL);
   }
 
@@ -247,8 +248,8 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     
     given().pathParam("id", "aNonExistingTaskId")
       .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
-      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
-      .body("message", equalTo("expected exception"))
+      .body("type", equalTo(RestException.class.getSimpleName()))
+      .body("message", equalTo("Cannot get form for task aNonExistingTaskId"))
       .when().get(TASK_FORM_URL);
   }
 

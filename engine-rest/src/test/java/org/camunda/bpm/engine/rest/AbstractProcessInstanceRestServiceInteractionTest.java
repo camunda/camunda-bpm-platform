@@ -108,7 +108,7 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
     given().pathParam("id", "aNonExistingInstanceId")
       .then().expect().statusCode(Status.NOT_FOUND.getStatusCode()).contentType(ContentType.JSON)
       .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
-      .body("message", equalTo("TODO: fix me"))
+      .body("message", equalTo("Process instance with id aNonExistingInstanceId does not exist"))
       .when().get(PROCESS_INSTANCE_URL);
   }
 

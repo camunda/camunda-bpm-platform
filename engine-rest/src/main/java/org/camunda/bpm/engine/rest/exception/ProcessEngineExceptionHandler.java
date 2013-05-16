@@ -22,31 +22,30 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.rest.dto.ExceptionDto;
 
 /**
- * Translates any {@link Exception} to a HTTP 500 error and a JSON response. 
+ * Translates any {@link ProcessEngineException} to a HTTP 500 error and a JSON response. 
  * Response content format: <code>{"type" : "ExceptionType", "message" : "some exception message"}
- * @author nico.rehwaldt
+ * @author Thorben Lindhauer
  */
 @Provider
-public class ExceptionHandler implements ExceptionMapper<Exception> {
+public class ProcessEngineExceptionHandler implements ExceptionMapper<ProcessEngineException> {
 
   @Override
-  public Response toResponse(Exception exception) {
+  public Response toResponse(ProcessEngineException exception) {
     ExceptionDto dto = ExceptionDto.fromException(exception, true);
 
     Logger.getLogger(ExceptionHandler.class.getSimpleName()).log(Level.WARNING, getStackTrace(exception));
     
     return Response.serverError().entity(dto).build();
   }
-  
+
   protected String getStackTrace(Throwable aThrowable) {
     final Writer result = new StringWriter();
     final PrintWriter printWriter = new PrintWriter(result);
     aThrowable.printStackTrace(printWriter);
     return result.toString();
   }
-
-  
 }

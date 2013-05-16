@@ -1,6 +1,7 @@
 package org.camunda.bpm.engine.rest;
 
 import static com.jayway.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.argThat;
@@ -19,6 +20,7 @@ import org.camunda.bpm.engine.MismatchingMessageCorrelationException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.helper.EqualsMap;
 import org.junit.Before;
 import org.junit.Test;
@@ -89,8 +91,8 @@ public abstract class AbstractMessageRestServiceTest extends AbstractRestService
     messageParameters.put("messageName", messageName);
     given().contentType(POST_JSON_CONTENT_TYPE).body(messageParameters)
       .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
-      .body("type", equalTo(MismatchingMessageCorrelationException.class.getSimpleName()))
-      .body("message", equalTo("Expected exception: cannot correlate"))
+      .body("type", equalTo(RestException.class.getSimpleName()))
+      .body("message", containsString("Expected exception: cannot correlate"))
       .when().post(MESSAGE_URL);
   }
   
@@ -116,7 +118,7 @@ public abstract class AbstractMessageRestServiceTest extends AbstractRestService
     given().contentType(POST_JSON_CONTENT_TYPE).body(EMPTY_JSON_OBJECT)
       .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
       .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
-      .body("message", equalTo("Message name has to be supplied"))
+      .body("message", equalTo("No message name supplied"))
       .when().post(MESSAGE_URL);
   }
 }

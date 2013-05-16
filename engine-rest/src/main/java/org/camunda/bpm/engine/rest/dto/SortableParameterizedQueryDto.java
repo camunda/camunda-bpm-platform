@@ -19,7 +19,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map.Entry;
 
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response.Status;
 
@@ -59,20 +58,14 @@ public abstract class SortableParameterizedQueryDto {
     for (Entry<String, List<String>> param : queryParameters.entrySet()) {
       String key = param.getKey();
       String value = param.getValue().iterator().next();
-      try {
-        this.setValueBasedOnAnnotation(key, value);
-      } catch (RestException e) {
-        throw new WebApplicationException(e, Status.INTERNAL_SERVER_ERROR);
-      } catch (InvalidRequestException e) {
-        throw new WebApplicationException(e, Status.BAD_REQUEST);
-      }
+      this.setValueBasedOnAnnotation(key, value);
     }
   }
   
   @CamundaQueryParam("sortBy")
   public void setSortBy(String sortBy) {
     if (!isValidSortByValue(sortBy)) {
-      throw new InvalidRequestException("sortBy parameter has invalid value.");
+      throw new InvalidRequestException(Status.BAD_REQUEST, "sortBy parameter has invalid value.");
     }
     this.sortBy = sortBy;
   }
@@ -80,7 +73,7 @@ public abstract class SortableParameterizedQueryDto {
   @CamundaQueryParam("sortOrder")
   public void setSortOrder(String sortOrder) {
     if (!VALID_SORT_ORDER_VALUES.contains(sortOrder)) {
-      throw new InvalidRequestException("sortOrder parameter has invalid value.");
+      throw new InvalidRequestException(Status.BAD_REQUEST, "sortOrder parameter has invalid value.");
     }
     this.sortOrder = sortOrder;
   }
@@ -111,13 +104,13 @@ public abstract class SortableParameterizedQueryDto {
         Object convertedValue = converter.convertQueryParameterToType(value);
         method.invoke(this, convertedValue);
       } catch (InstantiationException e) {
-        throw new RestException("Server error.");
+        throw new RestException(Status.INTERNAL_SERVER_ERROR, e, "Server error.");
       } catch (IllegalAccessException e) {
-        throw new RestException("Server error.");
+        throw new RestException(Status.INTERNAL_SERVER_ERROR, e, "Server error.");
       } catch (IllegalArgumentException e) {
-        throw new InvalidRequestException("Cannot set parameter.");
+        throw new InvalidRequestException(Status.BAD_REQUEST, e, "Cannot set query parameter '" + key + "' to value '" + value + "'");
       } catch (InvocationTargetException e) {
-        throw new InvalidRequestException("Cannot set parameter.");
+        throw new InvalidRequestException(Status.BAD_REQUEST, e, "Cannot set query parameter '" + key + "' to value '" + value + "'");
       }
     }
   }

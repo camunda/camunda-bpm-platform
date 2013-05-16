@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
@@ -195,7 +196,7 @@ public class ProcessDefinitionQueryDto extends SortableParameterizedQueryDto {
     }
     
     if (!sortOptionsValid()) {
-      throw new InvalidRequestException("You may not specify a single sorting parameter.");
+      throw new InvalidRequestException(Status.BAD_REQUEST, "You may not specify a single sorting parameter");
     }
     
     if (sortBy != null) {

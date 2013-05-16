@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
@@ -49,7 +48,7 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
     ProcessInstance instance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
     
     if (instance == null) {
-      throw new WebApplicationException(Status.NOT_FOUND);
+      throw new InvalidRequestException(Status.NOT_FOUND, "Process instance with id " + processInstanceId + " does not exist");
     }
     
     ProcessInstanceDto result = ProcessInstanceDto.fromProcessInstance(instance);
@@ -67,12 +66,7 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
   public List<ProcessInstanceDto> queryProcessInstances(
       ProcessInstanceQueryDto queryDto, Integer firstResult, Integer maxResults) {
     RuntimeService runtimeService = getProcessEngine().getRuntimeService();
-    ProcessInstanceQuery query;
-    try {
-      query = queryDto.toQuery(runtimeService);
-    } catch (InvalidRequestException e) {
-      throw new WebApplicationException(Status.BAD_REQUEST.getStatusCode());
-    }
+    ProcessInstanceQuery query = queryDto.toQuery(runtimeService);
     
     List<ProcessInstance> matchingInstances;
     if (firstResult != null || maxResults != null) {
@@ -108,12 +102,7 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
   @Override
   public CountResultDto queryProcessInstancesCount(ProcessInstanceQueryDto queryDto) {
     RuntimeService runtimeService = getProcessEngine().getRuntimeService();
-    ProcessInstanceQuery query;
-    try {
-      query = queryDto.toQuery(runtimeService);
-    } catch (InvalidRequestException e) {
-      throw new WebApplicationException(Status.BAD_REQUEST.getStatusCode());
-    }
+    ProcessInstanceQuery query = queryDto.toQuery(runtimeService);
     
     long count = query.count();
     CountResultDto result = new CountResultDto();

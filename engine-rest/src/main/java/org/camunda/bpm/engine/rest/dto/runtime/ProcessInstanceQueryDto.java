@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.ws.rs.core.MultivaluedMap;
+import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
@@ -152,13 +153,13 @@ public class ProcessInstanceQueryDto extends SortableParameterizedQueryDto {
         } else if (op.equals(VariableQueryParameterDto.LIKE_OPERATOR_NAME)) {
           query.variableValueLike(variableName, String.valueOf(variableValue));
         } else {
-          throw new InvalidRequestException("You have specified an invalid variable comparator.");
+          throw new InvalidRequestException(Status.BAD_REQUEST, "You have specified an invalid variable comparator");
         }
       }
     }
     
     if (!sortOptionsValid()) {
-      throw new InvalidRequestException("You may not specify a single sorting parameter.");
+      throw new InvalidRequestException(Status.BAD_REQUEST, "You may not specify a single sorting parameter");
     }
     
     if (sortBy != null) {

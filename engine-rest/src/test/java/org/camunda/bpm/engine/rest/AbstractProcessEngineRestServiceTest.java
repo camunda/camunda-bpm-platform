@@ -135,7 +135,7 @@ public abstract class AbstractProcessEngineRestServiceTest extends
     .then().expect()
       .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
       .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
-      .body("message", equalTo(""))
+      .body("message", equalTo("No process engine available"))
     .when().get(PROCESS_DEFINITION_URL);
   }
   

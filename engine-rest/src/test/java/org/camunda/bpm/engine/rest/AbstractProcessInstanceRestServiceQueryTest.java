@@ -3,6 +3,7 @@ package org.camunda.bpm.engine.rest;
 import static com.jayway.restassured.RestAssured.expect;
 import static com.jayway.restassured.RestAssured.given;
 import static com.jayway.restassured.path.json.JsonPath.from;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -15,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.core.Response.Status;
+import javax.xml.registry.InvalidRequestException;
 
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -25,6 +27,7 @@ import org.junit.Test;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
 
+import com.jayway.restassured.http.ContentType;
 import com.jayway.restassured.response.Response;
 
 public abstract class AbstractProcessInstanceRestServiceQueryTest extends
@@ -69,13 +72,17 @@ public abstract class AbstractProcessInstanceRestServiceQueryTest extends
     String variableValue = "varValue";
     String queryValue = variableName + "_anInvalidComparator_" + variableValue;    
     given().queryParam("variables", queryValue)
-      .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
+      .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", containsString("You have specified an invalid variable comparator"))
       .when().get(PROCESS_INSTANCE_QUERY_URL);
     
     // invalid format
     queryValue = "invalidFormattedVariableQuery";    
     given().queryParam("variables", queryValue)
-      .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
+      .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", containsString("variable query parameter has to have format KEY_OPERATOR_VALUE"))
       .when().get(PROCESS_INSTANCE_QUERY_URL);
   }
   

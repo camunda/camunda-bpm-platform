@@ -63,7 +63,7 @@ public abstract class AbstractProcessDefinitionRestServiceQueryTest extends Abst
     given().queryParam("ver", anInvalidIntegerQueryParam)
       .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
       .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
-      .body("message", equalTo("TODO: fix me"))
+      .body("message", equalTo("Cannot set query parameter 'ver' to value 'aString'"))
       .when().get(PROCESS_DEFINITION_QUERY_URL);
   }
 
@@ -82,16 +82,14 @@ public abstract class AbstractProcessDefinitionRestServiceQueryTest extends Abst
   @Test
   public void testInvalidSortingOptions() {
     executeAndVerifyFailingSorting("anInvalidSortByOption", "asc", Status.BAD_REQUEST, 
-        InvalidRequestException.class.getSimpleName(), "TODO: fix me");
+        InvalidRequestException.class.getSimpleName(), "Cannot set query parameter 'sortBy' to value 'anInvalidSortByOption'");
     executeAndVerifyFailingSorting("category", "anInvalidSortOrderOption", Status.BAD_REQUEST, 
-        InvalidRequestException.class.getSimpleName(), "TODO: fix me");
+        InvalidRequestException.class.getSimpleName(), "Cannot set query parameter 'sortOrder' to value 'anInvalidSortOrderOption'");
   }
 
   protected void executeAndVerifySuccessfulSorting(String sortBy, String sortOrder, Status expectedStatus) {
     given().queryParam("sortBy", sortBy).queryParam("sortOrder", sortOrder)
-      .then().expect().statusCode(expectedStatus.getStatusCode()).contentType(ContentType.JSON)
-      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
-      .body("message", equalTo("TODO: fix me"))
+      .then().expect().statusCode(expectedStatus.getStatusCode())
       .when().get(PROCESS_DEFINITION_QUERY_URL);
   }
   
@@ -108,7 +106,7 @@ public abstract class AbstractProcessDefinitionRestServiceQueryTest extends Abst
     given().queryParam("sortBy", "category")
       .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
       .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
-      .body("message", equalTo("TODO: fix me"))
+      .body("message", equalTo("You may not specify a single sorting parameter"))
       .when().get(PROCESS_DEFINITION_QUERY_URL);
   }
   
@@ -117,7 +115,7 @@ public abstract class AbstractProcessDefinitionRestServiceQueryTest extends Abst
     given().queryParam("sortOrder", "asc")
       .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
       .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
-      .body("message", equalTo("TODO: fix me"))
+      .body("message", equalTo("You may not specify a single sorting parameter"))
       .when().get(PROCESS_DEFINITION_QUERY_URL);
   }
 
