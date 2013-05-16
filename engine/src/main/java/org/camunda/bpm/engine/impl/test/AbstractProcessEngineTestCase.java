@@ -230,7 +230,7 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
       timer.schedule(task, maxMillisToWait);
       boolean conditionIsViolated = true;
       try {
-        while (conditionIsViolated) {
+        while (conditionIsViolated && !task.isTimeLimitExceeded()) {
           Thread.sleep(intervalMillis);
           conditionIsViolated = !condition.call();
         }
