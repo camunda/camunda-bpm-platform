@@ -65,7 +65,7 @@ public abstract class SortableParameterizedQueryDto {
   @CamundaQueryParam("sortBy")
   public void setSortBy(String sortBy) {
     if (!isValidSortByValue(sortBy)) {
-      throw new InvalidRequestException(Status.BAD_REQUEST, "sortBy parameter has invalid value.");
+      throw new InvalidRequestException(Status.BAD_REQUEST, "sortBy parameter has invalid value: " + sortBy);
     }
     this.sortBy = sortBy;
   }
@@ -73,7 +73,7 @@ public abstract class SortableParameterizedQueryDto {
   @CamundaQueryParam("sortOrder")
   public void setSortOrder(String sortOrder) {
     if (!VALID_SORT_ORDER_VALUES.contains(sortOrder)) {
-      throw new InvalidRequestException(Status.BAD_REQUEST, "sortOrder parameter has invalid value.");
+      throw new InvalidRequestException(Status.BAD_REQUEST, "sortOrder parameter has invalid value: " + sortOrder);
     }
     this.sortOrder = sortOrder;
   }

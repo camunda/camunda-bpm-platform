@@ -365,7 +365,7 @@ public class TaskQueryDto extends SortableParameterizedQueryDto {
         } else if (op.equals(VariableQueryParameterDto.NOT_EQUALS_OPERATOR_NAME)) {
           query.taskVariableValueNotEquals(variableName, variableValue);
         } else {
-          throw new InvalidRequestException(Status.BAD_REQUEST, "You have specified an invalid task variable comparator");
+          throw new InvalidRequestException(Status.BAD_REQUEST, "Invalid task variable comparator specified: " + op);
         }
 
       }
@@ -382,13 +382,13 @@ public class TaskQueryDto extends SortableParameterizedQueryDto {
         } else if (op.equals(VariableQueryParameterDto.NOT_EQUALS_OPERATOR_NAME)) {
           query.processVariableValueNotEquals(variableName, variableValue);
         } else {
-          throw new InvalidRequestException(Status.BAD_REQUEST, "You have specified an invalid process variable comparator");
+          throw new InvalidRequestException(Status.BAD_REQUEST, "Invalid process variable comparator specified: " + op);
         }
       }
     }
 
     if (!sortOptionsValid()) {
-      throw new InvalidRequestException(Status.BAD_REQUEST, "You may not specify a single sorting parameter");
+      throw new InvalidRequestException(Status.BAD_REQUEST, "Only a single sorting parameter specified. sortBy and sortOrder required");
     }
 
     if (sortBy != null) {

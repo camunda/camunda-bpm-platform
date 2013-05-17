@@ -68,13 +68,14 @@ public abstract class AbstractProcessInstanceRestServiceQueryTest extends
   @Test
   public void testInvalidVariableRequests() {
     // invalid comparator
+    String invalidComparator = "anInvalidComparator";
     String variableName = "varName";
     String variableValue = "varValue";
-    String queryValue = variableName + "_anInvalidComparator_" + variableValue;    
+    String queryValue = variableName + "_" + invalidComparator + "_" + variableValue;    
     given().queryParam("variables", queryValue)
       .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
       .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
-      .body("message", containsString("You have specified an invalid variable comparator"))
+      .body("message", containsString("Invalid variable comparator specified: " + invalidComparator))
       .when().get(PROCESS_INSTANCE_QUERY_URL);
     
     // invalid format

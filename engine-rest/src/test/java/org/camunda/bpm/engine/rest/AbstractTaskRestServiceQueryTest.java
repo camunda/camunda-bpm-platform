@@ -80,7 +80,7 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
     given().queryParam("sortBy", "dueDate")
       .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
       .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
-      .body("message", equalTo("You may not specify a single sorting parameter"))
+      .body("message", equalTo("Only a single sorting parameter specified. sortBy and sortOrder required"))
       .when().get(TASK_QUERY_URL);
   }
   
@@ -89,7 +89,7 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
     given().queryParam("sortOrder", "asc")
       .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
       .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
-      .body("message", equalTo("You may not specify a single sorting parameter"))
+      .body("message", equalTo("Only a single sorting parameter specified. sortBy and sortOrder required"))
       .when().get(TASK_QUERY_URL);
   }
 

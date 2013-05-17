@@ -196,7 +196,7 @@ public class ProcessDefinitionQueryDto extends SortableParameterizedQueryDto {
     }
     
     if (!sortOptionsValid()) {
-      throw new InvalidRequestException(Status.BAD_REQUEST, "You may not specify a single sorting parameter");
+      throw new InvalidRequestException(Status.BAD_REQUEST, "Only a single sorting parameter specified. sortBy and sortOrder required");
     }
     
     if (sortBy != null) {
