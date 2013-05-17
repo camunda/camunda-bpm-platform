@@ -21,11 +21,13 @@ import org.camunda.bpm.engine.rest.dto.ExceptionDto;
 @Provider
 public class RestExceptionHandler implements ExceptionMapper<RestException> {
 
+  private static final Logger LOGGER = Logger.getLogger(ExceptionHandler.class.getSimpleName());
+
   @Override
   public Response toResponse(RestException exception) {
     ExceptionDto dto = ExceptionDto.fromException(exception, true);
 
-    Logger.getLogger(ExceptionHandler.class.getSimpleName()).log(Level.WARNING, getStackTrace(exception));
+    LOGGER.log(Level.WARNING, getStackTrace(exception));
     
     if (exception.getStatus() != null) {
       return Response.status(exception.getStatus()).entity(dto).build();
