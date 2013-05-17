@@ -33,11 +33,13 @@ import org.camunda.bpm.engine.rest.dto.ExceptionDto;
 @Provider
 public class ProcessEngineExceptionHandler implements ExceptionMapper<ProcessEngineException> {
 
+  private static final Logger LOGGER = Logger.getLogger(ExceptionHandler.class.getSimpleName());
+
   @Override
   public Response toResponse(ProcessEngineException exception) {
     ExceptionDto dto = ExceptionDto.fromException(exception, true);
 
-    Logger.getLogger(ExceptionHandler.class.getSimpleName()).log(Level.WARNING, getStackTrace(exception));
+    LOGGER.log(Level.WARNING, getStackTrace(exception));
     
     return Response.serverError().entity(dto).build();
   }
