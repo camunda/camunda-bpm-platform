@@ -17,14 +17,10 @@ import static org.fest.assertions.Assertions.assertThat;
 
 import java.util.List;
 
-import org.camunda.bpm.cockpit.plugin.PluginRegistry;
-import org.junit.Test;
-
-import org.camunda.bpm.cockpit.test.sample.web.CockpitTestApplication;
 import org.camunda.bpm.cockpit.plugin.spi.CockpitPlugin;
 import org.camunda.bpm.cockpit.test.sample.plugin.simple.SimplePlugin;
 import org.camunda.bpm.cockpit.test.sample.plugin.simple.resources.SimpleRootResource;
-import org.camunda.bpm.cockpit.test.sample.plugin.simple.resources.SimpleResource;
+import org.camunda.bpm.cockpit.test.sample.web.CockpitTestApplication;
 import org.camunda.bpm.cockpit.test.util.AbstractCockpitCoreTest;
 import org.camunda.bpm.cockpit.test.util.DeploymentHelper;
 import org.fest.assertions.Condition;
@@ -32,6 +28,7 @@ import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.shrinkwrap.api.Archive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
+import org.junit.Test;
 import org.junit.runner.RunWith;
 
 /**

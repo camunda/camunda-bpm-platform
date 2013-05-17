@@ -70,7 +70,7 @@
 
     <dependencySet>
       <includes>
-        <include>org.camunda.bpm.cockpit:camunda-cockpit:war:*</include>
+        <include>org.camunda.bpm.cockpit:camunda-cockpit-glassfish:war:*</include>
       </includes>
       <outputDirectory>server/glassfish3/glassfish/domains/domain1/autodeploy</outputDirectory>
     </dependencySet>

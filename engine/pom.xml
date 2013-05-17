@@ -347,11 +347,14 @@
                   <goal>run</goal>
                 </goals>
                 <configuration>
-                  <tasks>
+                  <tasks>                                     
                     <echo message="updating activiti configuration to db ${database}" />
                     <copy file="${basedir}/src/test/resources/activiti.cfg.db.xml" tofile="target/test-classes/activiti.cfg.xml" overwrite="true">
                       <filterset filtersfile="${db.properties.file}" />
                     </copy>
+                    
+                    <echo message="dropping schema in ${database}" />
+                    <java classname="org.camunda.bpm.engine.impl.db.DbSchemaDrop" classpathref="maven.test.classpath" />
                   </tasks>
                 </configuration>
               </execution>
