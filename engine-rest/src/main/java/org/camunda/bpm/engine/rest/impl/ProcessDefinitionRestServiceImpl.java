@@ -17,7 +17,6 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
@@ -100,13 +99,7 @@ public class ProcessDefinitionRestServiceImpl extends AbstractRestProcessEngineA
 	  ProcessDefinitionQueryDto queryDto = new ProcessDefinitionQueryDto(uriInfo.getQueryParameters());
 	  
     RepositoryService repoService = getProcessEngine().getRepositoryService();
-
-    ProcessDefinitionQuery query;
-    try {
-       query = queryDto.toQuery(repoService);
-    } catch (InvalidRequestException e) {
-      throw new WebApplicationException(Status.BAD_REQUEST.getStatusCode());
-    }
+    ProcessDefinitionQuery query = queryDto.toQuery(repoService);
 
     long count = query.count();
     CountResultDto result = new CountResultDto();

@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.ServiceLoader;
 import java.util.Set;
 
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 
@@ -30,6 +29,7 @@ import org.camunda.bpm.engine.rest.ProcessEngineRestService;
 import org.camunda.bpm.engine.rest.ProcessInstanceRestService;
 import org.camunda.bpm.engine.rest.TaskRestService;
 import org.camunda.bpm.engine.rest.dto.ProcessEngineDto;
+import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.spi.ProcessEngineProvider;
 
 public class ProcessEngineRestServiceImpl implements ProcessEngineRestService {
@@ -102,7 +102,7 @@ public class ProcessEngineRestServiceImpl implements ProcessEngineRestService {
       ProcessEngineProvider provider = iterator.next();
       return provider;
     } else {
-      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+      throw new RestException(Status.INTERNAL_SERVER_ERROR, "No process engine provider found");
     }
   }
 }
