@@ -19,9 +19,11 @@ import java.util.Map;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.rest.ProcessInstanceRestService;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
+import org.camunda.bpm.engine.rest.dto.DeleteEngineEntityDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceQueryDto;
 import org.camunda.bpm.engine.rest.dto.runtime.VariableListDto;
@@ -53,6 +55,18 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
     
     ProcessInstanceDto result = ProcessInstanceDto.fromProcessInstance(instance);
     return result;
+  }
+  
+  @Override
+  public void deleteProcessInstance(String processInstanceId,
+      DeleteEngineEntityDto dto) {
+    RuntimeService runtimeService = getProcessEngine().getRuntimeService();
+    try {
+      runtimeService.deleteProcessInstance(processInstanceId, dto.getDeleteReason());
+    } catch (ProcessEngineException e) {
+      throw new InvalidRequestException(Status.NOT_FOUND, e, "Process instance with id " + processInstanceId + " does not exist");
+    }
+    
   }
 
   @Override
@@ -121,4 +135,5 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
 
     return new VariableListDto(values);
   }
+  
 }

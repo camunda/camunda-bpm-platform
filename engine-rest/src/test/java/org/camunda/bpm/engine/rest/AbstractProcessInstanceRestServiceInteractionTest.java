@@ -4,7 +4,9 @@ import static com.jayway.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.HashMap;
@@ -121,5 +123,44 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
       .body("type", equalTo(ProcessEngineException.class.getSimpleName()))
       .body("message", equalTo("expected exception"))
       .when().get(PROCESS_INSTANCE_VARIABLES_URL);
+  }
+  
+  @Test
+  public void testDeleteProcessInstance() {
+    String deleteReason = "some delete reason";
+    Map<String, String> messageBodyJson = new HashMap<String, String>();
+    messageBodyJson.put("deleteReason", deleteReason);
+    
+    given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).contentType(ContentType.JSON).body(messageBodyJson)
+      .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
+      .when().delete(PROCESS_INSTANCE_URL);
+    
+    verify(runtimeServiceMock).deleteProcessInstance(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID, deleteReason);
+  }
+  
+  @Test
+  public void testDeleteNonExistingProcessInstance() {
+    doThrow(new ProcessEngineException("expected exception")).when(runtimeServiceMock).deleteProcessInstance(anyString(), anyString());
+    
+    String deleteReason = "some delete reason";
+    Map<String, String> messageBodyJson = new HashMap<String, String>();
+    messageBodyJson.put("deleteReason", deleteReason);
+    
+    given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).contentType(ContentType.JSON).body(messageBodyJson)
+      .then().expect().statusCode(Status.NOT_FOUND.getStatusCode()).contentType(ContentType.JSON)
+      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", equalTo("Process instance with id " + MockProvider.EXAMPLE_PROCESS_INSTANCE_ID + " does not exist"))
+      .when().delete(PROCESS_INSTANCE_URL);
+    
+    verify(runtimeServiceMock).deleteProcessInstance(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID, deleteReason);
+  }
+  
+  @Test
+  public void testNoGivenDeleteReason() {
+    given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).contentType(ContentType.JSON).body(EMPTY_JSON_OBJECT)
+      .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
+      .when().delete(PROCESS_INSTANCE_URL);
+    
+    verify(runtimeServiceMock).deleteProcessInstance(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID, null);
   }
 }

@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.rest;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -26,6 +27,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
+import org.camunda.bpm.engine.rest.dto.DeleteEngineEntityDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceQueryDto;
 import org.camunda.bpm.engine.rest.dto.runtime.VariableListDto;
@@ -40,6 +42,11 @@ public interface ProcessInstanceRestService {
   @GET
   @Path("/{id}")
   ProcessInstanceDto getProcessInstance(@PathParam("id") String processInstanceId);
+  
+  @DELETE
+  @Path("/{id}")
+  @Consumes(MediaType.APPLICATION_JSON)
+  void deleteProcessInstance(@PathParam("id") String processInstanceId, DeleteEngineEntityDto dto);
   
   /**
    * Exposes the {@link ProcessInstanceQuery} interface as a REST service.
