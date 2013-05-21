@@ -394,6 +394,7 @@
                 <exclude>**/ejb/**</exclude>
                 <exclude>**/context/**</exclude>
                 <exclude>**/jar/**</exclude>
+                <exclude>**/*_JBOSS.java</exclude>
               </excludes>
             </configuration>
           </plugin>
