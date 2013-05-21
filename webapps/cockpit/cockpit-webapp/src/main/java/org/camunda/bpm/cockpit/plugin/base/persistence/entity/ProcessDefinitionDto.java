@@ -17,10 +17,6 @@ public class ProcessDefinitionDto {
   private String id;
   private String name;
   private String key;
-  private String deploymentId;
-  private long suspensionState;
-  private long failedJobs;
-  private long version;
   
   public ProcessDefinitionDto() {}
 
@@ -48,36 +44,4 @@ public class ProcessDefinitionDto {
     this.key = key;
   }
 
-  public String getDeploymentId() {
-    return deploymentId;
-  }
-
-  public void setDeploymentId(String deploymentId) {
-    this.deploymentId = deploymentId;
-  }
-
-  public long getSuspensionState() {
-    return suspensionState;
-  }
-
-  public void setSuspensionState(long suspensionState) {
-    this.suspensionState = suspensionState;
-  }
-
-  public long getFailedJobs() {
-    return failedJobs;
-  }
-
-  public void setFailedJobs(long failedJobs) {
-    this.failedJobs = failedJobs;
-  }
-
-  public long getVersion() {
-    return version;
-  }
-
-  public void setVersion(long version) {
-    this.version = version;
-  }
-  
 }
