@@ -17,7 +17,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.IdentityService;
@@ -28,6 +27,7 @@ import org.camunda.bpm.engine.rest.IdentityRestService;
 import org.camunda.bpm.engine.rest.dto.task.GroupDto;
 import org.camunda.bpm.engine.rest.dto.task.GroupInfoDto;
 import org.camunda.bpm.engine.rest.dto.task.UserDto;
+import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 
 public class IdentityRestServiceImpl extends AbstractRestProcessEngineAware implements IdentityRestService {
 
@@ -42,7 +42,7 @@ public class IdentityRestServiceImpl extends AbstractRestProcessEngineAware impl
   @Override
   public GroupInfoDto getGroupInfo(String userId) {
     if (userId == null) {
-      throw new WebApplicationException(Status.BAD_REQUEST.getStatusCode());
+      throw new InvalidRequestException(Status.BAD_REQUEST, "No user id was supplied");
     }
     
     IdentityService identityService = getProcessEngine().getIdentityService();

@@ -10,26 +10,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.rest.exception;
-
-import javax.ws.rs.core.Response.Status;
+package org.camunda.bpm.engine.rest.dto;
 
 /**
- * This exception is used for any kind of errors that occur due to malformed
- * parameters in a Http query.
- * 
+ * Used for anything that needs a delete reason.
  * @author Thorben Lindhauer
- * 
+ *
  */
-public class InvalidRequestException extends RestException {
+public class DeleteEngineEntityDto {
 
-  private static final long serialVersionUID = 1L;
-  
-  public InvalidRequestException(Status status, String message) {
-    super(status, message);
+  private String deleteReason;
+
+  public String getDeleteReason() {
+    return deleteReason;
   }
-  
-  public InvalidRequestException(Status status, Exception cause, String message) {
-    super(status, cause, message);
+
+  public void setDeleteReason(String deleteReason) {
+    this.deleteReason = deleteReason;
   }
 }

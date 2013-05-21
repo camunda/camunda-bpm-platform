@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
@@ -24,6 +23,7 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.rest.ProcessInstanceRestService;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
+import org.camunda.bpm.engine.rest.dto.DeleteEngineEntityDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceQueryDto;
 import org.camunda.bpm.engine.rest.dto.runtime.SignalProcessInstanceDto;
@@ -52,11 +52,23 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
     ProcessInstance instance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
     
     if (instance == null) {
-      throw new WebApplicationException(Status.NOT_FOUND);
+      throw new InvalidRequestException(Status.NOT_FOUND, "Process instance with id " + processInstanceId + " does not exist");
     }
     
     ProcessInstanceDto result = ProcessInstanceDto.fromProcessInstance(instance);
     return result;
+  }
+  
+  @Override
+  public void deleteProcessInstance(String processInstanceId,
+      DeleteEngineEntityDto dto) {
+    RuntimeService runtimeService = getProcessEngine().getRuntimeService();
+    try {
+      runtimeService.deleteProcessInstance(processInstanceId, dto.getDeleteReason());
+    } catch (ProcessEngineException e) {
+      throw new InvalidRequestException(Status.NOT_FOUND, e, "Process instance with id " + processInstanceId + " does not exist");
+    }
+    
   }
 
   @Override
@@ -70,12 +82,7 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
   public List<ProcessInstanceDto> queryProcessInstances(
       ProcessInstanceQueryDto queryDto, Integer firstResult, Integer maxResults) {
     RuntimeService runtimeService = getProcessEngine().getRuntimeService();
-    ProcessInstanceQuery query;
-    try {
-      query = queryDto.toQuery(runtimeService);
-    } catch (InvalidRequestException e) {
-      throw new WebApplicationException(Status.BAD_REQUEST.getStatusCode());
-    }
+    ProcessInstanceQuery query = queryDto.toQuery(runtimeService);
     
     List<ProcessInstance> matchingInstances;
     if (firstResult != null || maxResults != null) {
@@ -111,12 +118,7 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
   @Override
   public CountResultDto queryProcessInstancesCount(ProcessInstanceQueryDto queryDto) {
     RuntimeService runtimeService = getProcessEngine().getRuntimeService();
-    ProcessInstanceQuery query;
-    try {
-      query = queryDto.toQuery(runtimeService);
-    } catch (InvalidRequestException e) {
-      throw new WebApplicationException(Status.BAD_REQUEST.getStatusCode());
-    }
+    ProcessInstanceQuery query = queryDto.toQuery(runtimeService);
     
     long count = query.count();
     CountResultDto result = new CountResultDto();
@@ -137,22 +139,13 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
   }
 
   @Override
-  public void deleteProcessInstance(String processInstanceId) {
-	try {
-	  getProcessEngine().getRuntimeService().deleteProcessInstance(processInstanceId, "");
-	} catch (ProcessEngineException pex){
-	  throw new WebApplicationException(Status.BAD_REQUEST);
-	}	
-  }
-
-  @Override
   public void suspendProcessInstance(String processInstanceId) {
 	
 	try {
 	  RuntimeService runtimeService = getProcessEngine().getRuntimeService();
 	  runtimeService.suspendProcessInstanceById(processInstanceId);
-	} catch (ProcessEngineException pex){
-	  throw new WebApplicationException(Status.BAD_REQUEST);
+	} catch (ProcessEngineException e){
+	    throw new InvalidRequestException(Status.NOT_FOUND, e, "Process instance with id " + processInstanceId + " does not exist");
 	} 
   }
 
@@ -161,8 +154,8 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
 	try {
 	  RuntimeService runtimeService = getProcessEngine().getRuntimeService();
 	  runtimeService.activateProcessInstanceById(processInstanceId);
-	} catch (ProcessEngineException pex){
-	  throw new WebApplicationException(Status.BAD_REQUEST);
+	} catch (ProcessEngineException e){
+	  throw new InvalidRequestException(Status.NOT_FOUND, e, "Process instance with id " + processInstanceId + " does not exist");
 	}
   }
 
@@ -186,10 +179,10 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
 			  runtimeService.signal(execution.getId());  
 		  }
 		} else {
-			throw new WebApplicationException(Status.BAD_REQUEST);
+			throw new InvalidRequestException(Status.BAD_REQUEST, "Parameter activityId is missing");
 		}
-	} catch (ProcessEngineException pex){
-        throw new WebApplicationException(Status.BAD_REQUEST);
+	} catch (ProcessEngineException e){
+		throw new InvalidRequestException(Status.NOT_FOUND, e, "Process instance with id " + processInstanceId + " does not exist");
 	}
   }
 }

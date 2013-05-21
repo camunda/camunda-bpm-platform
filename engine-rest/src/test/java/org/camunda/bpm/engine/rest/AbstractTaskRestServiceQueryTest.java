@@ -21,6 +21,7 @@ import java.util.Map;
 
 import javax.ws.rs.core.Response.Status;
 
+import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.helper.EqualsList;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.task.DelegationState;
@@ -32,6 +33,7 @@ import org.junit.Test;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
 
+import com.jayway.restassured.http.ContentType;
 import com.jayway.restassured.response.Response;
 
 public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServiceTest {
@@ -67,21 +69,27 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
   @Test
   public void testInvalidDateParameter() {
     given().queryParams("due", "anInvalidDate")
-      .expect().statusCode(Status.BAD_REQUEST.getStatusCode())
+      .expect().statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", equalTo("Cannot set query parameter 'due' to value 'anInvalidDate'"))
       .when().get(TASK_QUERY_URL);
   }
   
   @Test
   public void testSortByParameterOnly() {
     given().queryParam("sortBy", "dueDate")
-      .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
+      .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", equalTo("Only a single sorting parameter specified. sortBy and sortOrder required"))
       .when().get(TASK_QUERY_URL);
   }
   
   @Test
   public void testSortOrderParameterOnly() {
     given().queryParam("sortOrder", "asc")
-      .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
+      .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", equalTo("Only a single sorting parameter specified. sortBy and sortOrder required"))
       .when().get(TASK_QUERY_URL);
   }
 

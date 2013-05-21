@@ -13,10 +13,10 @@
 package org.camunda.bpm.engine.rest.impl;
 
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
@@ -46,6 +46,7 @@ import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.runtime.StartProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.task.FormDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 
 public class ProcessDefinitionRestServiceImpl extends AbstractRestProcessEngineAware implements ProcessDefinitionRestService {
@@ -66,12 +67,7 @@ public class ProcessDefinitionRestServiceImpl extends AbstractRestProcessEngineA
 
 	  RepositoryService repoService = getProcessEngine().getRepositoryService();
 
-	  ProcessDefinitionQuery query;
-	  try {
-	     query = queryDto.toQuery(repoService);
-	  } catch (InvalidRequestException e) {
-	    throw new WebApplicationException(Status.BAD_REQUEST.getStatusCode());
-	  }
+	  ProcessDefinitionQuery query = queryDto.toQuery(repoService);
 
 	  List<ProcessDefinition> matchingDefinitions = null;
 
@@ -103,13 +99,7 @@ public class ProcessDefinitionRestServiceImpl extends AbstractRestProcessEngineA
 	  ProcessDefinitionQueryDto queryDto = new ProcessDefinitionQueryDto(uriInfo.getQueryParameters());
 	  
     RepositoryService repoService = getProcessEngine().getRepositoryService();
-
-    ProcessDefinitionQuery query;
-    try {
-       query = queryDto.toQuery(repoService);
-    } catch (InvalidRequestException e) {
-      throw new WebApplicationException(Status.BAD_REQUEST.getStatusCode());
-    }
+    ProcessDefinitionQuery query = queryDto.toQuery(repoService);
 
     long count = query.count();
     CountResultDto result = new CountResultDto();
@@ -125,7 +115,7 @@ public class ProcessDefinitionRestServiceImpl extends AbstractRestProcessEngineA
     try {
       definition = repoService.getProcessDefinition(processDefinitionId);
     } catch (ProcessEngineException e) {
-      throw new WebApplicationException(Status.BAD_REQUEST.getStatusCode());
+      throw new InvalidRequestException(Status.BAD_REQUEST, e, "No matching definition with id " + processDefinitionId);
     }
 
     ProcessDefinitionDto result = ProcessDefinitionDto.fromProcessDefinition(definition);
@@ -141,7 +131,7 @@ public class ProcessDefinitionRestServiceImpl extends AbstractRestProcessEngineA
     try {
       instance = runtimeService.startProcessInstanceById(processDefinitionId, parameters.getVariables());
     } catch (ProcessEngineException e) {
-      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
+      throw new RestException(Status.INTERNAL_SERVER_ERROR, e, "Cannot instantiate process definition " + processDefinitionId);
     }
 
     ProcessInstanceDto result = ProcessInstanceDto.fromProcessInstance(instance);
@@ -195,8 +185,10 @@ public class ProcessDefinitionRestServiceImpl extends AbstractRestProcessEngineA
       processModelIn = getProcessEngine().getRepositoryService().getProcessModel(processDefinitionId);
       byte[] processModel = IoUtil.readInputStream(processModelIn, "processModelBpmn20Xml");
       return ProcessDefinitionDiagramDto.create(processDefinitionId, new String(processModel, "UTF-8"));
-    } catch (Exception e) {
-      throw new WebApplicationException(e, Status.BAD_REQUEST);
+    } catch (ProcessEngineException e) {
+      throw new InvalidRequestException(Status.BAD_REQUEST, e, "No matching definition with id " + processDefinitionId);
+    } catch (UnsupportedEncodingException e) {
+      throw new RestException(Status.INTERNAL_SERVER_ERROR, e);
     } finally {
       IoUtil.closeSilently(processModelIn);
     }
@@ -210,7 +202,7 @@ public class ProcessDefinitionRestServiceImpl extends AbstractRestProcessEngineA
     try {
       formData = formService.getStartFormData(processDefinitionId);
     } catch (ProcessEngineException e) {
-      throw new WebApplicationException(Status.BAD_REQUEST.getStatusCode());
+      throw new InvalidRequestException(Status.BAD_REQUEST, e, "Cannot get start form data for process definition " + processDefinitionId);
     }
 
     return FormDto.fromFormData(formData);

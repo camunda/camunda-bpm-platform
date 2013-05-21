@@ -66,6 +66,10 @@ define(["angular"], function(angular) {
     EngineApi.prototype.getColleagueCount = function (userId) {
       return this.taskCount.get({ assignee: userId });
     };
+    
+    EngineApi.prototype.getGroupTaskCount = function(groupId) {
+      return this.taskCount.get({ candidateGroup: groupId });
+    };
 
     EngineApi.prototype.getGroups = function(userId) {
       return this.groups.get({ userId: userId });
