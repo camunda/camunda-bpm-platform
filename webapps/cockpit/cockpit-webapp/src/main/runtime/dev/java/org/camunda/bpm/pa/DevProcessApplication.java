@@ -20,5 +20,6 @@ public class DevProcessApplication extends ServletProcessApplication {
 
     runtimeService.startProcessInstanceByKey("OrderProcess");
     runtimeService.startProcessInstanceByKey("FailingProcess");
+    runtimeService.startProcessInstanceByKey("CallActivity");
   }
 }

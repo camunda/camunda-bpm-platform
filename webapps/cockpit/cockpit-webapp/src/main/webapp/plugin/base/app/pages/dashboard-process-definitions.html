@@ -4,6 +4,7 @@
       <tr>
         <th>Name</th>
         <th>Running Instances</th>
+        <th>State</th>
       </tr>
     </thead>
     <tbody>
@@ -16,6 +17,10 @@
         <td>
           {{ statistic.instances }}
         </td>
+        <td>
+          <span ngm-if="statistic.failedJobs > 0" class="badge badge-important">&nbsp;</span>
+          <span ngm-if="statistic.failedJobs == 0" class="badge badge-success">&nbsp;</span>
+        </td>  
       </tr>
     </tbody>
   </table>

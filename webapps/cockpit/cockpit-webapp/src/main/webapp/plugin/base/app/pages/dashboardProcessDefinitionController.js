@@ -1,9 +1,11 @@
 ngDefine('cockpit.plugin.base.pages', function(module) {
 
-  var Controller = function($scope, PluginProcessDefinitionResource, ProcessDefinitionResource) {
+  var Controller = function($scope, ProcessDefinitionResource) {
 
-    ProcessDefinitionResource.queryStatistics({"failedJobs": true}, function(data){
-      $scope.statistics = getStatisticsResult(data);
+    ProcessDefinitionResource.queryStatistics(
+        {"failedJobs": true},
+        function(data){
+          $scope.statistics = getStatisticsResult(data);
     });
     
     var getStatisticsResult = function(statistics) {
@@ -19,30 +21,29 @@ ngDefine('cockpit.plugin.base.pages', function(module) {
             statistic.definition.name = statistic.definition.key;
           }
           statisticsResult[statistic.definition.key] = statistic;
+          
           result.push(statistic);
           
         } else {
           if (currentStatistic.definition.version > statistic.definition.version) {
             var currentInstances = statistic.instances;
+            var currentFailedJobs = statistic.failedJobs;
             angular.copy(currentStatistic, statistic);
             if (!statistic.definition.name) {
               statistic.definition.name = statistic.definition.key;
             }
             statistic.instances = currentInstances + currentStatistic.instances;
+            statistic.failedJobs = currentFailedJobs + currentStatistic.failedJobs;
           }
         }
       });
       
       return result;
-    };
-    
-    PluginProcessDefinitionResource.query(null, function(data) {
-      $scope.processDefinitions = data;
-    });
+    };  
 
   };
 
-  Controller.$inject = ["$scope", "PluginProcessDefinitionResource", "ProcessDefinitionResource"];
+  Controller.$inject = ["$scope", "ProcessDefinitionResource"];
 
 
   var PluginConfiguration = function PluginConfiguration(PluginsProvider) {
