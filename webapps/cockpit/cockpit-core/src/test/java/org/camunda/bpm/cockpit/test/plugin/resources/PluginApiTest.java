@@ -83,6 +83,19 @@ public class PluginApiTest extends AbstractCockpitCoreTest {
 
   @Test
   @RunAsClient
+  public void shouldServePluginNestedAsset() throws Exception {
+
+    WebResource appResource = client.resource(contextPath.toURI());
+
+    // /api/plugin/:pluginName/static/...
+    ClientResponse result = appResource.path("/api/plugin/simple/static/app/plugin.js").accept(MediaType.TEXT_PLAIN).get(ClientResponse.class);
+
+    assertThat(result.getStatus()).isEqualTo(200);
+    assertThat(result.getEntity(String.class)).isEqualTo("// plugin definition");
+  }
+
+  @Test
+  @RunAsClient
   public void shouldPublishPluginApi() throws Exception {
 
     WebResource appResource = client.resource(contextPath.toURI());
