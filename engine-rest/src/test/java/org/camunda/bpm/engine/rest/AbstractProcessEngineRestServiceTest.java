@@ -127,7 +127,6 @@ public abstract class AbstractProcessEngineRestServiceTest extends
     when(mockIdentityService.createUserQuery()).thenReturn(sampleUserQuery);
   }
   
-
   @Test
   public void testNonExistingEngineAccess() {
     given().pathParam("name", MockProvider.NON_EXISTING_PROCESS_ENGINE_NAME)

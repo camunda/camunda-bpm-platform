@@ -27,6 +27,7 @@ import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.management.ActivityStatistics;
 import org.camunda.bpm.engine.management.ProcessDefinitionStatistics;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.DelegationState;
 import org.camunda.bpm.engine.task.Task;
@@ -110,6 +111,13 @@ public abstract class MockProvider {
   public static final String EXAMPLE_USER_ID = "userId";
   public static final String EXAMPLE_USER_FIRST_NAME = "firstName";
   public static final String EXAMPLE_USER_LAST_NAME = "lastName";
+  
+  // Jobs
+  public static final String EXAMPLE_JOB_ID = "aJobId";
+  public static final String EXAMPLE_NON_EXISTING_JOB_ID = "aNonExistingJobId";
+  public static final int EXAMPLE_NEGATIVE_JOB_RETRIES = -3; 
+  public static final int EXAMPLE_JOB_RETRIES = 3; 
+
   
   // tasks
   public static Task createMockTask() {
@@ -268,4 +276,15 @@ public abstract class MockProvider {
     when(mockUser.getLastName()).thenReturn(EXAMPLE_USER_LAST_NAME);
     return mockUser;
   }
+  
+  // jobs
+  public static Job createMockJob() {
+	    Job mock = mock(Job.class);	    
+	    when(mock.getId()).thenReturn(EXAMPLE_JOB_ID);
+	    when(mock.getRetries()).thenReturn(EXAMPLE_JOB_RETRIES);
+	    when(mock.getProcessInstanceId()).thenReturn(EXAMPLE_PROCESS_INSTANCE_ID);
+	    
+	    return mock;
+	  }
+  
 }
