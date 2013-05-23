@@ -3,20 +3,27 @@ package org.camunda.bpm.engine.rest;
 import static com.jayway.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
+import static org.mockito.Mockito.any;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.argThat;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.impl.RuntimeServiceImpl;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+import org.camunda.bpm.engine.rest.helper.EqualsList;
+import org.camunda.bpm.engine.rest.helper.EqualsMap;
 import org.camunda.bpm.engine.rest.helper.ExampleVariableObject;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -49,11 +56,11 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
     EXAMPLE_OBJECT_VARIABLES.put(EXAMPLE_VARIABLE_KEY, variableValue);
   }
 
-  private RuntimeService runtimeServiceMock;
+  private RuntimeServiceImpl runtimeServiceMock;
   
   @Before
   public void setUpRuntimeData() {
-    runtimeServiceMock = mock(RuntimeService.class);
+    runtimeServiceMock = mock(RuntimeServiceImpl.class);
     when(runtimeServiceMock.getVariables(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID)).thenReturn(EXAMPLE_VARIABLES);
     when(runtimeServiceMock.getVariables(MockProvider.ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID)).thenReturn(EXAMPLE_OBJECT_VARIABLES);
     when(processEngine.getRuntimeService()).thenReturn(runtimeServiceMock);
@@ -151,8 +158,6 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
       .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
       .body("message", equalTo("Process instance with id " + MockProvider.EXAMPLE_PROCESS_INSTANCE_ID + " does not exist"))
       .when().delete(PROCESS_INSTANCE_URL);
-    
-    verify(runtimeServiceMock).deleteProcessInstance(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID, deleteReason);
   }
   
   @Test
@@ -162,5 +167,60 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
       .when().delete(PROCESS_INSTANCE_URL);
     
     verify(runtimeServiceMock).deleteProcessInstance(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID, null);
+  }
+  
+  @Test
+  public void testVariableModification() {
+    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
+    
+    List<Map<String, Object>> modifications = new ArrayList<Map<String, Object>>();
+    Map<String, Object> variable = new HashMap<String, Object>();
+    variable.put("name", "aKey");
+    variable.put("value", 123);
+    variable.put("type", "Integer");
+    modifications.add(variable);
+    
+    messageBodyJson.put("modifications", modifications);
+    
+    List<String> deletions = new ArrayList<String>();
+    deletions.add("deleteKey");
+    messageBodyJson.put("deletions", deletions);
+    
+    given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).contentType(ContentType.JSON).body(messageBodyJson)
+      .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
+      .when().patch(PROCESS_INSTANCE_VARIABLES_URL);
+    
+    Map<String, Object> expectedModifications = new HashMap<String, Object>();
+    expectedModifications.put("aKey", 123);
+    verify(runtimeServiceMock).updateVariables(eq(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID), argThat(new EqualsMap(expectedModifications)), 
+        argThat(new EqualsList(deletions)));
+  }
+  
+  @Test
+  public void testVariableModificationForNonExistingProcessInstance() {
+    doThrow(new ProcessEngineException("expected exception")).when(runtimeServiceMock).updateVariables(anyString(), any(Map.class), any(List.class));
+    
+    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
+    
+    List<Map<String, Object>> modifications = new ArrayList<Map<String, Object>>();
+    Map<String, Object> variable = new HashMap<String, Object>();
+    variable.put("aKey", "aStringValue");
+    variable.put("anotherKey", 123);
+    variable.put("aThirdValue", false);
+    
+    messageBodyJson.put("modifications", modifications);
+    
+    given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).contentType(ContentType.JSON).body(messageBodyJson)
+      .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", equalTo("Process instance with id " + MockProvider.EXAMPLE_PROCESS_INSTANCE_ID + " does not exist"))
+      .when().patch(PROCESS_INSTANCE_VARIABLES_URL);
+  }
+  
+  @Test
+  public void testEmptyVariableModification() {
+    given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).contentType(ContentType.JSON).body(EMPTY_JSON_OBJECT)
+      .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
+      .when().patch(PROCESS_INSTANCE_VARIABLES_URL);
   }
 }

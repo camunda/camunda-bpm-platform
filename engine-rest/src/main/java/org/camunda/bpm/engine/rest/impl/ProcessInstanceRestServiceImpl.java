@@ -13,6 +13,7 @@
 package org.camunda.bpm.engine.rest.impl;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -21,9 +22,11 @@ import javax.ws.rs.core.UriInfo;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.impl.RuntimeServiceImpl;
 import org.camunda.bpm.engine.rest.ProcessInstanceRestService;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.DeleteEngineEntityDto;
+import org.camunda.bpm.engine.rest.dto.PatchVariablesDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceQueryDto;
 import org.camunda.bpm.engine.rest.dto.runtime.VariableListDto;
@@ -134,6 +137,28 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
     }
 
     return new VariableListDto(values);
+  }
+
+  @Override
+  public void modifyVariables(String processInstanceId, PatchVariablesDto patch) {
+    Map<String, Object> variableModifications = new HashMap<String, Object>();
+    if (patch.getModifications() != null) {
+      for (VariableValueDto variable : patch.getModifications()) {
+        variableModifications.put(variable.getName(), variable.getValue());
+      }
+    }
+    
+    List<String> variableDeletions = patch.getDeletions();
+    
+    // this custom command might later be moved to the engine
+    RuntimeServiceImpl runtimeService = (RuntimeServiceImpl) getProcessEngine().getRuntimeService();
+    
+    try {
+      runtimeService.updateVariables(processInstanceId, variableModifications, variableDeletions);
+    } catch (ProcessEngineException e) {
+      throw new InvalidRequestException(Status.BAD_REQUEST, "Process instance with id " + processInstanceId + " does not exist");
+    }
+    
   }
   
 }

@@ -28,9 +28,11 @@ import javax.ws.rs.core.UriInfo;
 
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.DeleteEngineEntityDto;
+import org.camunda.bpm.engine.rest.dto.PatchVariablesDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceQueryDto;
 import org.camunda.bpm.engine.rest.dto.runtime.VariableListDto;
+import org.camunda.bpm.engine.rest.http.PATCH;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 
 @Path(ProcessInstanceRestService.PATH)
@@ -89,4 +91,8 @@ public interface ProcessInstanceRestService {
   @GET
   @Path("/{id}/variables")
   VariableListDto getVariables(@PathParam("id") String processInstanceId);
+  
+  @PATCH
+  @Path("/{id}/variables")
+  void modifyVariables(@PathParam("id") String processInstanceId, PatchVariablesDto patch);
 }
