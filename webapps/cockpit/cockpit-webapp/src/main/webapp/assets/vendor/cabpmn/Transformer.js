@@ -179,8 +179,12 @@ define([], function () {
       if(!!child) {
         do {
           if(child.nodeName.indexOf("EventDefinition") != -1) {
+            var elementType = child.nodeName;
+            if (elementType.indexOf(":") != -1) {
+              elementType = elementType.substr(elementType.indexOf(":") + 1, elementType.length)
+            }
             eventObject.eventDefinitions.push({
-              type : child.nodeName
+              type : elementType
             });
           }
         } while(child = child.nextSibling);
@@ -316,10 +320,13 @@ define([], function () {
       }
 
       do {
-
         var bpmnObject = null;
 
         var elementType = element.nodeName;
+
+        if (elementType.indexOf(":") != -1) {
+          elementType = elementType.substr(elementType.indexOf(":") + 1, elementType.length);
+        }
 
         var taskElementTypes = ["task", "manualTask", "serviceTask", "scriptTask", "userTask", "sendTask", "recieveTask", "businessRuleTask"];
         var eventElementTypes = ["startEvent", "endEvent",  "intermediateThrowEvent", "intermediateCatchEvent", "boundaryEvent"];

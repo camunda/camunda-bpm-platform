@@ -89,7 +89,7 @@ public class AbstractPluginRootResource {
   public Response getAsset(@PathParam("file") String file) {
 
     CockpitPlugin plugin = getPluginRegistry().getPlugin(pluginName);
-    
+
     if (plugin != null) {
       InputStream assetStream = getPluginAssetAsStream(plugin, file);
       if (assetStream != null) {

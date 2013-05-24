@@ -802,6 +802,13 @@ public class TaskQueryTest extends PluggableProcessEngineTestCase {
     // use parameters
     assertEquals(1, taskService.createNativeTaskQuery().sql("SELECT count(*) FROM " + managementService.getTableName(Task.class) + " T WHERE T.NAME_ = #{taskName}").parameter("taskName", "gonzoTask").count());
   }
+  
+  public void testNativeQueryPaging() {
+    assertEquals("ACT_RU_TASK", managementService.getTableName(Task.class));
+    assertEquals("ACT_RU_TASK", managementService.getTableName(TaskEntity.class));
+    assertEquals(5, taskService.createNativeTaskQuery().sql("SELECT * FROM " + managementService.getTableName(Task.class)).listPage(0, 5).size());
+    assertEquals(2, taskService.createNativeTaskQuery().sql("SELECT * FROM " + managementService.getTableName(Task.class)).listPage(10, 12).size());
+  }
 
   /**
    * Generates some test tasks. - 6 tasks where kermit is a candidate - 1 tasks

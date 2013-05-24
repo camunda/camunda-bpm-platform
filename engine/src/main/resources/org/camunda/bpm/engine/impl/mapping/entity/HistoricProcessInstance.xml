@@ -115,7 +115,7 @@
   <sql id="selectHistoricProcessInstancesByQueryCriteriaSql">
     from ${prefix}ACT_HI_PROCINST RES
     <if test="processKeyNotIn != null || processDefinitionKey != null">
-      inner join ACT_RE_PROCDEF DEF on RES.PROC_DEF_ID_ = DEF.ID_
+      inner join ${prefix}ACT_RE_PROCDEF DEF on RES.PROC_DEF_ID_ = DEF.ID_
     </if>
     <foreach collection="queryVariableValues" index="index" item="queryVariableValue">
       inner join ${prefix}ACT_HI_VARINST  A${index} on RES.PROC_INST_ID_ = A${index}.PROC_INST_ID_
@@ -247,8 +247,24 @@
    </choose>
   </sql>
  
-   <select id="selectHistoricProcessInstanceByNativeQuery" parameterType="java.util.Map" resultMap="historicProcessInstanceResultMap">
+  <select id="selectHistoricProcessInstanceByNativeQuery" parameterType="java.util.Map" resultMap="historicProcessInstanceResultMap">
+    <if test="resultType == 'LIST_PAGE'">
+      ${limitBefore}
+    </if>
     ${sql}
+    <if test="resultType == 'LIST_PAGE'">
+      ${limitAfter}
+    </if>
+  </select>
+  
+  <select id="selectHistoricProcessInstanceByNativeQuery_mssql_or_db2" parameterType="java.util.Map" resultMap="historicProcessInstanceResultMap">
+    <if test="resultType == 'LIST_PAGE'">
+        ${limitBeforeNativeQuery}
+    </if>
+    ${sql} 
+    <if test="resultType == 'LIST_PAGE'">
+      ${limitAfter}
+    </if>
   </select>
 
   <select id="selectHistoricProcessInstanceCountByNativeQuery" parameterType="java.util.Map" resultType="long">

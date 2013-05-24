@@ -20,6 +20,9 @@ public class VariableValueDto {
   Object value;
   String type;
 
+  public VariableValueDto() {
+  }
+  
   public VariableValueDto(String name, Object value, String type) {
     this.name = name;
     this.value = value;
@@ -36,5 +39,17 @@ public class VariableValueDto {
 
   public String getType() {
     return type;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public void setValue(Object value) {
+    this.value = value;
+  }
+
+  public void setType(String type) {
+    this.type = type;
   }
 }
