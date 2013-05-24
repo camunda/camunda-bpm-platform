@@ -35,15 +35,18 @@ public interface TaskRestService {
   public static final String PATH = "/task";
   
   @GET
+  @Produces(MediaType.APPLICATION_JSON)
   List<TaskDto> getTasks(@Context UriInfo uriInfo,
       @QueryParam("firstResult") Integer firstResult, @QueryParam("maxResults") Integer maxResults);
 
   @GET
   @Path("/{id}")
+  @Produces(MediaType.APPLICATION_JSON)
   TaskDto getTask(@PathParam("id") String id);
 
   @GET
   @Path("/{id}/form")
+  @Produces(MediaType.APPLICATION_JSON)
   FormDto getForm(@PathParam("id") String id);
 
   /**
@@ -56,16 +59,19 @@ public interface TaskRestService {
    */
   @POST
   @Consumes(MediaType.APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
   List<TaskDto> queryTasks(TaskQueryDto query,
       @QueryParam("firstResult") Integer firstResult, @QueryParam("maxResults") Integer maxResults);
 
   @GET
   @Path("/count")
+  @Produces(MediaType.APPLICATION_JSON)
   CountResultDto getTasksCount(@Context UriInfo uriInfo);
 
   @POST
   @Path("/count")
   @Consumes(MediaType.APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
   CountResultDto queryTasksCount(TaskQueryDto query);
 
   @POST

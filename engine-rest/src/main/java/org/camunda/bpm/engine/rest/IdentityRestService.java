@@ -28,5 +28,6 @@ public interface IdentityRestService {
   
   @GET
   @Path("/groups")
+  @Produces(MediaType.APPLICATION_JSON)
   GroupInfoDto getGroupInfo(@QueryParam("userId") String userId);
 }

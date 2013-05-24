@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 
+import org.apache.catalina.LifecycleException;
 import org.camunda.bpm.engine.rest.AbstractRestServiceTest;
 
 public abstract class EmbeddedServerBootstrap {
