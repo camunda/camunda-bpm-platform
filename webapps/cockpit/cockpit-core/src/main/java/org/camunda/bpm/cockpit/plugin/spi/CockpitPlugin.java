@@ -15,9 +15,6 @@ package org.camunda.bpm.cockpit.plugin.spi;
 import java.util.List;
 import java.util.Set;
 
-import org.camunda.bpm.cockpit.Cockpit;
-import org.camunda.bpm.cockpit.db.QueryService;
-
 /**
  * The service provider interface (SPI) that must be provided by
  * a cockpit plugin.

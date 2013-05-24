@@ -15,6 +15,8 @@ package org.camunda.bpm.engine.rest.spi.impl;
 import java.util.Iterator;
 import java.util.ServiceLoader;
 
+import javax.ws.rs.core.Response.Status;
+
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.spi.ProcessEngineProvider;
@@ -44,7 +46,7 @@ public abstract class AbstractProcessEngineAware {
         return provider.getProcessEngine(engineName);
       }
     } else {
-      throw new RestException("Could not find an implementation of the "+ProcessEngineProvider.class+"- SPI");
+      throw new RestException(Status.INTERNAL_SERVER_ERROR, "Could not find an implementation of the "+ProcessEngineProvider.class+"- SPI");
     }
 
   }

@@ -12,10 +12,7 @@
  */
 package org.camunda.bpm.cockpit.test.sample.plugin.embedded;
 
-import java.util.Arrays;
-
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.camunda.bpm.cockpit.plugin.spi.impl.AbstractCockpitPlugin;

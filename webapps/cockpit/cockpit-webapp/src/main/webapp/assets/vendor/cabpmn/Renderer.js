@@ -8,20 +8,21 @@
  * @author: Daniel Meyer
  * 
  */
+
 define(["dojox/gfx", "dojo/_base/lang", "dojo/dom-construct", "dojo/_base/window", "dojo/query", "dojo/dom", "dojo/dom-class"], function (gfx, lang, domConstruct, win, query, dom, domClass) {
   var eventDefinitionPaths = {
     "messagecatch":" M7 10  L7 20  L23 20  L23 10  z M7 10  L15 16  L23 10 ",
     "messagethrow":"M7 9  L15 15  L23 9  z M7 10  L7 20  L23 20  L23 10  L15 16  z",
     "timerEventDefinition":" M15 5  L15 8  M20 6  L18.5 9  M24 10  L21 11.5  M25 15  L22 15  M24 20  L21 18.5  M20 24  L18.5 21  M15 25  L15 22  M10 24  L11.5 21  M6 20  L9 18.5  M5 15  L8 15  M6 10  L9 11.5  M10 6  L11.5 9  M17 8  L15 15  L19 15 ",
     "errorEventDefinition": " M21.820839 10.171502  L18.36734 23.58992  L12.541380000000002 13.281818999999999  L8.338651200000001 19.071607  L12.048949000000002 5.832305699999999  L17.996148000000005 15.132659  L21.820839 10.171502  z",
-    "escalation": "M15 7.75  L21 22.75  L15 16  L9 22.75  z",
+    "escalationEventDefinition": "M15 7.75  L21 22.75  L15 16  L9 22.75  z",
     "signalEventDefinition": "M7.7124971 20.247342  L22.333334 20.247342  L15.022915000000001 7.575951200000001  L7.7124971 20.247342  z",
-    "cancel": " M6.283910500000001 9.27369  L9.151395 6.4062062  L14.886362000000002 12.141174  L20.621331 6.4062056  L23.488814 9.273689  L17.753846 15.008657  L23.488815 20.743626  L20.621331 23.611111  L14.886362000000002 17.876142  L9.151394 23.611109  L6.283911000000001 20.743625  L12.018878 15.008658  L6.283910500000001 9.27369  z",
+    "cancelEventDefinition": " M6.283910500000001 9.27369  L9.151395 6.4062062  L14.886362000000002 12.141174  L20.621331 6.4062056  L23.488814 9.273689  L17.753846 15.008657  L23.488815 20.743626  L20.621331 23.611111  L14.886362000000002 17.876142  L9.151394 23.611109  L6.283911000000001 20.743625  L12.018878 15.008658  L6.283910500000001 9.27369  z",
     "conditionalEventDefinition": " M6 6  L24 6 L24 24 L6 24 L6 6 M9 9  L21 9  M9 13  L21 13  M9 17  L21 17  M9 21  L21 21 z",
-    "compensate": "M14 8 L14 22 L7 15 L14 8 M21 8 L21 22 L14 15 L21 8 z",
+    "compensateEventDefinition": "M14 8 L14 22 L7 15 L14 8 M21 8 L21 22 L14 15 L21 8 z",
     "multipleParallel": "M5.75 12  L5.75 18  L12 18  L12 24.75  L18 24.75  L18 18  L24.75 18  L24.75 12  L18 12  L18 5.75  L12 5.75  L12 12  z",
     "multiple": " M19.834856 21.874369  L9.762008 21.873529  L6.650126 12.293421000000002  L14.799725 6.373429600000001  L22.948336 12.294781  L19.834856 21.874369  z",
-    "link": "M9 13 L18 13 L18 10 L23 15 L18 20 L18 17 L8 17 L8 13"
+    "linkEventDefinition": "M9 13 L18 13 L18 10 L23 15 L18 20 L18 17 L8 17 L8 13"
   }
 
   var taskDefinitionPaths = {
@@ -86,7 +87,16 @@ define(["dojox/gfx", "dojo/_base/lang", "dojo/dom-construct", "dojo/_base/window
 
   var activityStyle = {
     stroke: regularStroke,
-    "stroke-width": 2,
+    "stroke-width": 1,
+    "stroke-linecap": "round",
+    "stroke-linejoin": "round",
+    "stroke-opacity" : 1,
+    "fill": "white"
+  };
+
+  var callActivityStyle = {
+    stroke: regularStroke,
+    "stroke-width": 3,
     "stroke-linecap": "round",
     "stroke-linejoin": "round",
     "stroke-opacity" : 1,
@@ -169,6 +179,7 @@ define(["dojox/gfx", "dojo/_base/lang", "dojo/dom-construct", "dojo/_base/window
     "eventBasedGateway" : generalStyle,
     "userTask" : activityStyle,
     "serviceTask" : activityStyle,
+    "callActivity" : callActivityStyle,
     "manualTask" : activityStyle,
     "receiveTask" : activityStyle,
     "scriptTask" : activityStyle,
@@ -413,7 +424,7 @@ define(["dojox/gfx", "dojo/_base/lang", "dojo/dom-construct", "dojo/_base/window
       var taskGroup = gfxGroup.createGroup();
       taskGroup.setTransform({dx :x, dy:y});
 
-      var strokeStyle = {color : style.stroke};
+      var strokeStyle = {color : style.stroke, width: style["stroke-width"]};
 
       if(baseElement.triggeredByEvent == "true") {
         strokeStyle.style = "Dot";
@@ -476,7 +487,6 @@ define(["dojox/gfx", "dojo/_base/lang", "dojo/dom-construct", "dojo/_base/window
           var path5 = taskGroup.createPath(path5String);
           path5.setStroke({color : style.stroke, width: 0.69999999});
           path5.setFill("#f0eff0");
-
 
         } else {
 
@@ -541,6 +551,16 @@ define(["dojox/gfx", "dojo/_base/lang", "dojo/dom-construct", "dojo/_base/window
 
         if (element.eventDefinitions.length > 1) {
           typeLookup = "multiple";
+          if (element.parallelMultiple == "true") {
+            typeLookup = "multipleParallel";
+          }
+        } else {
+          if (definitionType == "terminateEventDefinition") {
+            var innerCircle = circleGroup.createCircle({cx :rad, cy :rad, r:rad * 0.75});
+            //innerCircle.setStroke(strokeStyle);
+            innerCircle.setFill("black");
+          }
+
         }
 
         var path = circleGroup.createPath(eventDefinitionPaths[typeLookup]);
@@ -621,6 +641,7 @@ define(["dojox/gfx", "dojo/_base/lang", "dojo/dom-construct", "dojo/_base/window
   RENDERER_DELEGATES["task"] = taskRenderer;
   RENDERER_DELEGATES["subProcess"] = taskRenderer;
   RENDERER_DELEGATES["serviceTask"] = taskRenderer;
+  RENDERER_DELEGATES["callActivity"] = taskRenderer;
   RENDERER_DELEGATES["manualTask"] = taskRenderer;
   RENDERER_DELEGATES["receiveTask"] = taskRenderer;
   RENDERER_DELEGATES["scriptTask"] = taskRenderer;

@@ -29,14 +29,19 @@ import org.camunda.bpm.engine.identity.GroupQuery;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.identity.UserQuery;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.helper.EqualsMap;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
+import org.camunda.bpm.engine.runtime.Execution;
+import org.camunda.bpm.engine.runtime.ExecutionQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
 import org.junit.Before;
 import org.junit.Test;
+
+import com.jayway.restassured.http.ContentType;
 
 public abstract class AbstractProcessEngineRestServiceTest extends
     AbstractRestServiceTest {
@@ -48,6 +53,7 @@ public abstract class AbstractProcessEngineRestServiceTest extends
   protected static final String TASK_URL = SINGLE_ENGINE_URL + "/task/{id}";
   protected static final String IDENTITY_GROUPS_URL = SINGLE_ENGINE_URL + "/identity/groups";
   protected static final String MESSAGE_URL = SINGLE_ENGINE_URL + "/message";
+  protected static final String EXECUTION_URL = SINGLE_ENGINE_URL + "/execution";
   
   protected String EXAMPLE_ENGINE_NAME = "anEngineName";
 
@@ -74,6 +80,7 @@ public abstract class AbstractProcessEngineRestServiceTest extends
     createProcessInstanceMock();
     createTaskMock();
     createIdentityMocks();
+    createExecutionMock();
   }
   
 
@@ -90,6 +97,15 @@ public abstract class AbstractProcessEngineRestServiceTest extends
     when(mockInstanceQuery.processInstanceId(eq(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID))).thenReturn(mockInstanceQuery);
     when(mockInstanceQuery.singleResult()).thenReturn(mockInstance);
     when(mockRuntimeService.createProcessInstanceQuery()).thenReturn(mockInstanceQuery);
+  }
+  
+  private void createExecutionMock() {
+    Execution mockExecution = MockProvider.createMockExecution();
+    
+    ExecutionQuery mockExecutionQuery = mock(ExecutionQuery.class);
+    when(mockExecutionQuery.processInstanceId(eq(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID))).thenReturn(mockExecutionQuery);
+    when(mockExecutionQuery.singleResult()).thenReturn(mockExecution);
+    when(mockRuntimeService.createExecutionQuery()).thenReturn(mockExecutionQuery);
   }
   
   private void createTaskMock() {
@@ -130,7 +146,9 @@ public abstract class AbstractProcessEngineRestServiceTest extends
     given().pathParam("name", MockProvider.NON_EXISTING_PROCESS_ENGINE_NAME)
       .pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
     .then().expect()
-      .statusCode(Status.BAD_REQUEST.getStatusCode())
+      .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", equalTo("No process engine available"))
     .when().get(PROCESS_DEFINITION_URL);
   }
   
@@ -152,7 +170,6 @@ public abstract class AbstractProcessEngineRestServiceTest extends
       .statusCode(Status.OK.getStatusCode())
     .when().get(PROCESS_DEFINITION_URL);
     
-    verify(namedProcessEngine).getRepositoryService();
     verify(mockRepoService).getProcessDefinition(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID));
     verifyZeroInteractions(processEngine);
   }
@@ -165,7 +182,7 @@ public abstract class AbstractProcessEngineRestServiceTest extends
       .statusCode(Status.OK.getStatusCode())
     .when().get(PROCESS_INSTANCE_URL);
     
-    verify(namedProcessEngine).getRuntimeService();
+    verify(mockRuntimeService).createProcessInstanceQuery();
     verifyZeroInteractions(processEngine);
   }
   
@@ -177,7 +194,7 @@ public abstract class AbstractProcessEngineRestServiceTest extends
       .statusCode(Status.OK.getStatusCode())
     .when().get(TASK_URL);
     
-    verify(namedProcessEngine).getTaskService();
+    verify(mockTaskService).createTaskQuery();
     verifyZeroInteractions(processEngine);
   }
   
@@ -189,7 +206,7 @@ public abstract class AbstractProcessEngineRestServiceTest extends
       .statusCode(Status.OK.getStatusCode())
     .when().get(IDENTITY_GROUPS_URL);
     
-    verify(namedProcessEngine).getIdentityService();
+    verify(mockIdentityService).createUserQuery();
     verifyZeroInteractions(processEngine);
   }
   
@@ -205,6 +222,17 @@ public abstract class AbstractProcessEngineRestServiceTest extends
 
     verify(mockRuntimeService).correlateMessage(eq(messageName), eq((String) null), 
         argThat(new EqualsMap(null)), argThat(new EqualsMap(null)));
+    verifyZeroInteractions(processEngine);
+  }
+  
+  @Test
+  public void testExecutionServiceEngineAccess() {
+    given().pathParam("name", EXAMPLE_ENGINE_NAME)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when().get(EXECUTION_URL);
+    
+    verify(mockRuntimeService).createExecutionQuery();
     verifyZeroInteractions(processEngine);
   }
 }

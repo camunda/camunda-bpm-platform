@@ -17,10 +17,10 @@ import org.camunda.bpm.cockpit.db.QueryService;
 import org.camunda.bpm.engine.ProcessEngine;
 
 /**
- * <p>Provides access to the camunda cockpit plugin services.</p>
+ * <p>Provides access to the camunda cockpit core services.</p>
  *
  * @author roman.smirnov
- *
+ * @author nico.rehwaldt
  */
 public class Cockpit {
 
@@ -54,7 +54,7 @@ public class Cockpit {
   public static CommandExecutor getCommandExecutor(String processEngineName) {
     return getRuntimeDelegate().getCommandExecutor(processEngineName);
   }
-  
+
   public static ProcessEngine getProcessEngine(String processEngineName) {
     return getRuntimeDelegate().getProcessEngine(processEngineName);
   }

@@ -2,21 +2,25 @@
   <table class="table table-bordered table-hover table-condensed">
     <thead>
       <tr>
-        <th>Id</th>
         <th>Name</th>
-        <th>Version</th>
+        <th>Running Instances</th>
         <th>State</th>
       </tr>
     </thead>
     <tbody>
-      <tr data-ng-repeat="processDefinition in processDefinitions">
-        <td><a href="#/process-definition/{{ processDefinition.id }}">{{ processDefinition.id }}</a></td>
-        <td>{{ processDefinition.name }}</td>
-        <td>{{ processDefinition.version }}</td>
+      <tr data-ng-repeat="statistic in statistics">
         <td>
-          <span ngm-if="!processDefinition.failedJobs || processDefinition.failedJobs == 0" class="badge badge-success">&nbsp;</span>
-          <span ngm-if="processDefinition.failedJobs > 0" class="badge badge-important">&nbsp;</span>
-        </td>      
+          <a href="#/process-definition/{{ statistic.definition.id }}">
+            {{ statistic.definition.name }}
+          </a>
+        </td>
+        <td>
+          {{ statistic.instances }}
+        </td>
+        <td>
+          <span ngm-if="statistic.failedJobs > 0" class="badge badge-important">&nbsp;</span>
+          <span ngm-if="statistic.failedJobs == 0" class="badge badge-success">&nbsp;</span>
+        </td>  
       </tr>
     </tbody>
   </table>

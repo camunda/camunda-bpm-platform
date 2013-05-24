@@ -12,13 +12,14 @@
  */
 package org.camunda.bpm.engine.rest.impl;
 
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.MismatchingMessageCorrelationException;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.rest.MessageRestService;
 import org.camunda.bpm.engine.rest.dto.message.MessageDto;
+import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+import org.camunda.bpm.engine.rest.exception.RestException;
 
 public class MessageRestServiceImpl extends AbstractRestProcessEngineAware implements MessageRestService {
 
@@ -34,7 +35,7 @@ public class MessageRestServiceImpl extends AbstractRestProcessEngineAware imple
   public void deliverMessage(MessageDto messageDto) {
 
     if (messageDto.getMessageName() == null) {
-      throw new WebApplicationException(Status.BAD_REQUEST);
+      throw new InvalidRequestException(Status.BAD_REQUEST, "No message name supplied");
     }
     
     RuntimeService runtimeService = processEngine.getRuntimeService();
@@ -42,7 +43,7 @@ public class MessageRestServiceImpl extends AbstractRestProcessEngineAware imple
       runtimeService.correlateMessage(messageDto.getMessageName(), messageDto.getBusinessKey(), 
           messageDto.getCorrelationKeys(), messageDto.getProcessVariables());
     } catch (MismatchingMessageCorrelationException e) {
-      throw new WebApplicationException(e, Status.BAD_REQUEST);
+      throw new RestException(Status.BAD_REQUEST, e);
     }
 
   }

@@ -58,6 +58,12 @@
     </dependency>
 
     <dependency>
+      <groupId>com.fasterxml.uuid</groupId>
+      <artifactId>java-uuid-generator</artifactId>
+      <scope>test</scope>
+    </dependency>
+    
+    <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
       <scope>test</scope>
@@ -200,6 +206,10 @@
           <groupId>com.h2database</groupId>
           <artifactId>h2</artifactId>
         </dependency>
+         <dependency>
+          <groupId>com.fasterxml.uuid</groupId>
+          <artifactId>java-uuid-generator</artifactId>
+        </dependency>
       </dependencies>
       <build>
         <plugins>
@@ -208,9 +218,40 @@
             <artifactId>tomcat7-maven-plugin</artifactId>
             <version>2.1</version>
           </plugin>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>build-helper-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>add-sources</id>
+                <goals>
+                  <goal>add-source</goal>
+                </goals>
+                <configuration>
+                  <sources>
+                    <source>src/main/runtime/dev/java</source>
+                  </sources>
+                </configuration>
+              </execution>
+              <execution>
+                <id>add-resources</id>
+                <goals>
+                  <goal>add-resource</goal>
+                </goals>
+                <configuration>
+                  <resources>
+                    <resource>
+                      <directory>src/main/runtime/dev/resources</directory>
+                    </resource>
+                  </resources>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
         </plugins>
       </build>
       <properties>
+        <java.resources.override>src/main/runtime/dev/resources</java.resources.override>
         <maven.tomcat.path>/cockpit</maven.tomcat.path>
       </properties>
     </profile>

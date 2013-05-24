@@ -12,51 +12,17 @@
  */
 package org.camunda.bpm.cockpit.plugin.resource;
 
-
-import org.camunda.bpm.cockpit.Cockpit;
-import org.camunda.bpm.cockpit.db.CommandExecutor;
-import org.camunda.bpm.cockpit.db.QueryService;
-import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.cockpit.service.AbstractEngineAware;
 
 /**
- *
+ * A abstract plugin resource class that may be used to implement
+ * resources in cockpit.
+ * 
  * @author nico.rehwaldt
  */
-public class AbstractPluginResource {
-
-  private final String engineName;
+public class AbstractPluginResource extends AbstractEngineAware {
 
   public AbstractPluginResource(String engineName) {
-    this.engineName = engineName;
-  }
-
-  /**
-   * Return a {@link CommandExecutor} for the current
-   * engine to execute plugin commands.
-   *
-   * @return
-   */
-  public CommandExecutor getCommandExecutor() {
-    return Cockpit.getCommandExecutor(engineName);
-  }
-
-  /**
-   * Return a {@link QueryService} for the current
-   * engine to execute queries against the engine datbase.
-   *
-   * @return
-   */
-  public QueryService getQueryService() {
-    return Cockpit.getQueryService(engineName);
-  }
-
-  /**
-   * Return a {@link ProcessEngine} for the current
-   * engine name to execute queries against the engine.
-   *
-   * @return a {@link ProcessEngine}
-   */
-  public ProcessEngine getProcessEngine() {
-    return Cockpit.getProcessEngine(engineName);
+    super(engineName);
   }
 }

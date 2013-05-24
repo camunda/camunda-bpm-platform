@@ -18,6 +18,8 @@ import java.util.Set;
 import javax.ws.rs.ApplicationPath;
 import javax.ws.rs.core.Application;
 
+import org.camunda.bpm.engine.rest.exception.ProcessEngineExceptionHandler;
+import org.camunda.bpm.engine.rest.exception.RestExceptionHandler;
 import org.camunda.bpm.engine.rest.impl.IdentityRestServiceImpl;
 import org.camunda.bpm.engine.rest.impl.MessageRestServiceImpl;
 import org.camunda.bpm.engine.rest.impl.ProcessDefinitionRestServiceImpl;
@@ -58,6 +60,9 @@ public class DefaultApplication extends Application {
     classes.add(JacksonJsonProvider.class);
     classes.add(JsonMappingExceptionMapper.class);
     classes.add(JsonParseExceptionMapper.class);
+    
+    classes.add(ProcessEngineExceptionHandler.class);
+    classes.add(RestExceptionHandler.class);
     
     return classes;
   }

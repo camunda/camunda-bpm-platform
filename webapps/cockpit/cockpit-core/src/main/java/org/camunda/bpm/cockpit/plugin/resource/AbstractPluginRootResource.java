@@ -28,8 +28,7 @@ import org.camunda.bpm.cockpit.plugin.PluginRegistry;
 import org.camunda.bpm.cockpit.plugin.spi.CockpitPlugin;
 
 /**
- * A resource class that may be implemented as a root resource
- * that constitutes a plugins restful API.
+ * A resource class that provides a plugins restful API.
  *
  * <p>
  *
@@ -89,7 +88,7 @@ public class AbstractPluginRootResource {
   public Response getAsset(@PathParam("file") String file) {
 
     CockpitPlugin plugin = getPluginRegistry().getPlugin(pluginName);
-    
+
     if (plugin != null) {
       InputStream assetStream = getPluginAssetAsStream(plugin, file);
       if (assetStream != null) {

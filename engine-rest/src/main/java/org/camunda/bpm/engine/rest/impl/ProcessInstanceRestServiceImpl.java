@@ -13,21 +13,27 @@
 package org.camunda.bpm.engine.rest.impl;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
+import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.impl.RuntimeServiceImpl;
 import org.camunda.bpm.engine.rest.ProcessInstanceRestService;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
+import org.camunda.bpm.engine.rest.dto.DeleteEngineEntityDto;
+import org.camunda.bpm.engine.rest.dto.PatchVariablesDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceQueryDto;
 import org.camunda.bpm.engine.rest.dto.runtime.VariableListDto;
 import org.camunda.bpm.engine.rest.dto.runtime.VariableValueDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 
@@ -49,11 +55,23 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
     ProcessInstance instance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
     
     if (instance == null) {
-      throw new WebApplicationException(Status.NOT_FOUND);
+      throw new InvalidRequestException(Status.NOT_FOUND, "Process instance with id " + processInstanceId + " does not exist");
     }
     
     ProcessInstanceDto result = ProcessInstanceDto.fromProcessInstance(instance);
     return result;
+  }
+  
+  @Override
+  public void deleteProcessInstance(String processInstanceId,
+      DeleteEngineEntityDto dto) {
+    RuntimeService runtimeService = getProcessEngine().getRuntimeService();
+    try {
+      runtimeService.deleteProcessInstance(processInstanceId, dto.getDeleteReason());
+    } catch (ProcessEngineException e) {
+      throw new InvalidRequestException(Status.NOT_FOUND, e, "Process instance with id " + processInstanceId + " does not exist");
+    }
+    
   }
 
   @Override
@@ -66,13 +84,8 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
   @Override
   public List<ProcessInstanceDto> queryProcessInstances(
       ProcessInstanceQueryDto queryDto, Integer firstResult, Integer maxResults) {
-    RuntimeService runtimeService = getProcessEngine().getRuntimeService();
-    ProcessInstanceQuery query;
-    try {
-      query = queryDto.toQuery(runtimeService);
-    } catch (InvalidRequestException e) {
-      throw new WebApplicationException(Status.BAD_REQUEST.getStatusCode());
-    }
+    ProcessEngine engine = getProcessEngine();
+    ProcessInstanceQuery query = queryDto.toQuery(engine);
     
     List<ProcessInstance> matchingInstances;
     if (firstResult != null || maxResults != null) {
@@ -107,13 +120,8 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
 
   @Override
   public CountResultDto queryProcessInstancesCount(ProcessInstanceQueryDto queryDto) {
-    RuntimeService runtimeService = getProcessEngine().getRuntimeService();
-    ProcessInstanceQuery query;
-    try {
-      query = queryDto.toQuery(runtimeService);
-    } catch (InvalidRequestException e) {
-      throw new WebApplicationException(Status.BAD_REQUEST.getStatusCode());
-    }
+    ProcessEngine engine = getProcessEngine();
+    ProcessInstanceQuery query = queryDto.toQuery(engine);
     
     long count = query.count();
     CountResultDto result = new CountResultDto();
@@ -132,4 +140,69 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
 
     return new VariableListDto(values);
   }
+
+  @Override
+  public VariableValueDto getVariable(String processInstanceId,
+      String variableName) {
+    RuntimeService runtimeService = getProcessEngine().getRuntimeService();
+    Object variable = null;
+    try {
+       variable = runtimeService.getVariable(processInstanceId, variableName);
+    } catch (ProcessEngineException e) {
+      throw new RestException(Status.INTERNAL_SERVER_ERROR, e, "Cannot get variable " + variableName + ": " + e.getMessage());
+    }
+    
+    if (variable == null) {
+      throw new InvalidRequestException(Status.NOT_FOUND, "Process variable with name " + variableName + " does not exist or is null");
+    }
+    
+    return new VariableValueDto(variableName, variable, variable.getClass().getSimpleName());
+    
+  }
+
+  @Override
+  public void putVariable(String processInstanceId, String variableName,
+      VariableValueDto variable) {
+    
+    RuntimeService runtimeService = getProcessEngine().getRuntimeService();
+    try {
+      runtimeService.setVariable(processInstanceId, variableName, variable.getValue());
+    } catch (ProcessEngineException e) {
+      throw new RestException(Status.INTERNAL_SERVER_ERROR, e, "Cannot put variable " + variableName + ": " + e.getMessage());
+    }
+  }
+
+  @Override
+  public void deleteVariable(String processInstanceId,
+      String variableName) {
+    RuntimeService runtimeService = getProcessEngine().getRuntimeService();
+    try {
+      runtimeService.removeVariable(processInstanceId, variableName);
+    } catch (ProcessEngineException e) {
+      throw new RestException(Status.INTERNAL_SERVER_ERROR, e, "Cannot delete variable " + variableName + ": " + e.getMessage());
+    }
+  }
+  
+  @Override
+  public void modifyVariables(String processInstanceId, PatchVariablesDto patch) {
+    Map<String, Object> variableModifications = new HashMap<String, Object>();
+    if (patch.getModifications() != null) {
+      for (VariableValueDto variable : patch.getModifications()) {
+        variableModifications.put(variable.getName(), variable.getValue());
+      }
+    }
+    
+    List<String> variableDeletions = patch.getDeletions();
+    RuntimeServiceImpl runtimeService = (RuntimeServiceImpl) getProcessEngine().getRuntimeService();
+    
+    try {
+      runtimeService.updateVariables(processInstanceId, variableModifications, variableDeletions);
+    } catch (ProcessEngineException e) {
+      throw new RestException(Status.INTERNAL_SERVER_ERROR, e, 
+          "Cannot modify variables for process instance " + processInstanceId + ": " + e.getMessage());
+    }
+    
+  }
+
+  
 }
