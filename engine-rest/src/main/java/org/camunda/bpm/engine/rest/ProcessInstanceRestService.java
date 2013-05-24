@@ -128,4 +128,5 @@ public interface ProcessInstanceRestService {
   @Path("/{id}/signal")
   @Consumes(MediaType.APPLICATION_JSON)
   void signalProcessInstance(@PathParam("id") String processInstanceId, SignalProcessInstanceDto parameter);
+
 }

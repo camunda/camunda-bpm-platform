@@ -20,6 +20,7 @@ import java.util.Map;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
+import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.impl.RuntimeServiceImpl;
@@ -33,8 +34,8 @@ import org.camunda.bpm.engine.rest.dto.runtime.SignalProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.runtime.VariableListDto;
 import org.camunda.bpm.engine.rest.dto.runtime.VariableValueDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
-import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.rest.exception.RestException;
+import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 
@@ -85,8 +86,8 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
   @Override
   public List<ProcessInstanceDto> queryProcessInstances(
       ProcessInstanceQueryDto queryDto, Integer firstResult, Integer maxResults) {
-    RuntimeService runtimeService = getProcessEngine().getRuntimeService();
-    ProcessInstanceQuery query = queryDto.toQuery(runtimeService);
+    ProcessEngine engine = getProcessEngine();
+    ProcessInstanceQuery query = queryDto.toQuery(engine);
     
     List<ProcessInstance> matchingInstances;
     if (firstResult != null || maxResults != null) {
@@ -121,8 +122,8 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
 
   @Override
   public CountResultDto queryProcessInstancesCount(ProcessInstanceQueryDto queryDto) {
-    RuntimeService runtimeService = getProcessEngine().getRuntimeService();
-    ProcessInstanceQuery query = queryDto.toQuery(runtimeService);
+    ProcessEngine engine = getProcessEngine();
+    ProcessInstanceQuery query = queryDto.toQuery(engine);
     
     long count = query.count();
     CountResultDto result = new CountResultDto();

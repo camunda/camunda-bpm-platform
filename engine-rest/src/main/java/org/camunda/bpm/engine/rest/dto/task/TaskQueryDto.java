@@ -19,9 +19,9 @@ import java.util.List;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response.Status;
 
-import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
-import org.camunda.bpm.engine.rest.dto.SortableParameterizedQueryDto;
+import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
 import org.camunda.bpm.engine.rest.dto.VariableQueryParameterDto;
 import org.camunda.bpm.engine.rest.dto.converter.BooleanConverter;
 import org.camunda.bpm.engine.rest.dto.converter.DateConverter;
@@ -33,7 +33,7 @@ import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.task.DelegationState;
 import org.camunda.bpm.engine.task.TaskQuery;
 
-public class TaskQueryDto extends SortableParameterizedQueryDto {
+public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
 
   private static final String SORT_BY_PROCESS_INSTANCE_ID_VALUE = "instanceId";
   private static final String SORT_BY_DUE_DATE_VALUE = "dueDate";
@@ -263,9 +263,13 @@ public class TaskQueryDto extends SortableParameterizedQueryDto {
     return VALID_SORT_BY_VALUES.contains(value);
   }
 
-  public TaskQuery toQuery(TaskService taskService) {
-    TaskQuery query = taskService.createTaskQuery();
+  @Override
+  protected TaskQuery createNewQuery(ProcessEngine engine) {
+    return engine.getTaskService().createTaskQuery();
+  }
 
+  @Override
+  protected void applyFilters(TaskQuery query) {
     if (processInstanceBusinessKey != null) {
       query.processInstanceBusinessKey(processInstanceBusinessKey);
     }
@@ -386,11 +390,10 @@ public class TaskQueryDto extends SortableParameterizedQueryDto {
         }
       }
     }
+  }
 
-    if (!sortOptionsValid()) {
-      throw new InvalidRequestException(Status.BAD_REQUEST, "Only a single sorting parameter specified. sortBy and sortOrder required");
-    }
-
+  @Override
+  protected void applySortingOptions(TaskQuery query) {
     if (sortBy != null) {
       if (sortBy.equals(SORT_BY_PROCESS_INSTANCE_ID_VALUE)) {
         query.orderByProcessInstanceId();
@@ -420,8 +423,6 @@ public class TaskQueryDto extends SortableParameterizedQueryDto {
         query.desc();
       }
     }
-
-    return query;
   }
 
 }
