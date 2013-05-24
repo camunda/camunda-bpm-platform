@@ -19,6 +19,7 @@ import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
 import org.camunda.bpm.engine.FormService;
+import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.form.FormData;
@@ -53,9 +54,8 @@ public class TaskRestServiceImpl extends AbstractRestProcessEngineAware implemen
   @Override
   public List<TaskDto> queryTasks(TaskQueryDto queryDto, Integer firstResult,
       Integer maxResults) {
-    TaskService taskService = getProcessEngine().getTaskService();
-
-    TaskQuery query = queryDto.toQuery(taskService);
+    ProcessEngine engine = getProcessEngine();
+    TaskQuery query = queryDto.toQuery(engine);
 
     List<Task> matchingTasks;
     if (firstResult != null || maxResults != null) {
@@ -115,9 +115,8 @@ public class TaskRestServiceImpl extends AbstractRestProcessEngineAware implemen
 
   @Override
   public CountResultDto queryTasksCount(TaskQueryDto queryDto) {
-    TaskService taskService = getProcessEngine().getTaskService();
-
-    TaskQuery query = queryDto.toQuery(taskService);
+    ProcessEngine engine = getProcessEngine();
+    TaskQuery query = queryDto.toQuery(engine);
 
     long count = query.count();
     CountResultDto result = new CountResultDto();

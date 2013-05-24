@@ -37,10 +37,12 @@ public interface ExecutionRestService {
   
   @GET
   @Path("/count")
+  @Produces(MediaType.APPLICATION_JSON)
   CountResultDto getExecutionsCount(@Context UriInfo uriInfo);
   
   @POST
   @Path("/count")
+  @Produces(MediaType.APPLICATION_JSON)
   @Consumes(MediaType.APPLICATION_JSON)
   CountResultDto queryExecutionsCount(ExecutionQueryDto query);
 }

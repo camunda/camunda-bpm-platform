@@ -18,16 +18,16 @@ import java.util.List;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response.Status;
 
-import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
-import org.camunda.bpm.engine.rest.dto.SortableParameterizedQueryDto;
+import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
 import org.camunda.bpm.engine.rest.dto.VariableQueryParameterDto;
 import org.camunda.bpm.engine.rest.dto.converter.BooleanConverter;
 import org.camunda.bpm.engine.rest.dto.converter.VariableListConverter;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 
-public class ProcessInstanceQueryDto extends SortableParameterizedQueryDto {
+public class ProcessInstanceQueryDto extends AbstractQueryDto<ProcessInstanceQuery> {
 
   private static final String SORT_BY_INSTANCE_ID_VALUE = "instanceId";
   private static final String SORT_BY_DEFINITION_KEY_VALUE = "definitionKey";
@@ -108,9 +108,13 @@ public class ProcessInstanceQueryDto extends SortableParameterizedQueryDto {
     return VALID_SORT_BY_VALUES.contains(value);
   }
 
-  public ProcessInstanceQuery toQuery(RuntimeService runtimeService) {
-    ProcessInstanceQuery query = runtimeService.createProcessInstanceQuery();
-    
+  @Override
+  protected ProcessInstanceQuery createNewQuery(ProcessEngine engine) {
+    return engine.getRuntimeService().createProcessInstanceQuery();
+  }
+
+  @Override
+  protected void applyFilters(ProcessInstanceQuery query) {
     if (processDefinitionKey != null) {
       query.processDefinitionKey(processDefinitionKey);
     }
@@ -157,11 +161,10 @@ public class ProcessInstanceQueryDto extends SortableParameterizedQueryDto {
         }
       }
     }
-    
-    if (!sortOptionsValid()) {
-      throw new InvalidRequestException(Status.BAD_REQUEST, "Only a single sorting parameter specified. sortBy and sortOrder required");
-    }
-    
+  }
+
+  @Override
+  protected void applySortingOptions(ProcessInstanceQuery query) {
     if (sortBy != null) {
       if (sortBy.equals(SORT_BY_INSTANCE_ID_VALUE)) {
         query.orderByProcessInstanceId();
@@ -179,8 +182,6 @@ public class ProcessInstanceQueryDto extends SortableParameterizedQueryDto {
         query.desc();
       }
     }
-    
-    return query;
   }
   
 }

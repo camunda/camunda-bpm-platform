@@ -6,15 +6,15 @@ import java.util.List;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response.Status;
 
-import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
-import org.camunda.bpm.engine.rest.dto.SortableParameterizedQueryDto;
+import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
 import org.camunda.bpm.engine.rest.dto.VariableQueryParameterDto;
 import org.camunda.bpm.engine.rest.dto.converter.VariableListConverter;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.runtime.ExecutionQuery;
 
-public class ExecutionQueryDto extends SortableParameterizedQueryDto {
+public class ExecutionQueryDto extends AbstractQueryDto<ExecutionQuery> {
 
   private static final String SORT_BY_INSTANCE_ID_VALUE = "instanceId";
   private static final String SORT_BY_DEFINITION_KEY_VALUE = "definitionKey";
@@ -38,11 +38,6 @@ public class ExecutionQueryDto extends SortableParameterizedQueryDto {
   
   private List<VariableQueryParameterDto> variables;
   private List<VariableQueryParameterDto> processVariables;
-  
-  @Override
-  protected boolean isValidSortByValue(String value) {
-    return VALID_SORT_BY_VALUES.contains(value);
-  }
 
   public ExecutionQueryDto() {
     
@@ -97,10 +92,18 @@ public class ExecutionQueryDto extends SortableParameterizedQueryDto {
     this.processVariables = processVariables;
   }
   
+  @Override
+  protected boolean isValidSortByValue(String value) {
+    return VALID_SORT_BY_VALUES.contains(value);
+  }
 
-  public ExecutionQuery toQuery(RuntimeService runtimeService) {
-    ExecutionQuery query = runtimeService.createExecutionQuery();
-    
+  @Override
+  protected ExecutionQuery createNewQuery(ProcessEngine engine) {
+    return engine.getRuntimeService().createExecutionQuery();
+  }
+
+  @Override
+  protected void applyFilters(ExecutionQuery query) {
     if (processDefinitionKey != null) {
       query.processDefinitionKey(processDefinitionKey);
     }
@@ -164,11 +167,10 @@ public class ExecutionQueryDto extends SortableParameterizedQueryDto {
         }
       }
     }
-    
-    if (!sortOptionsValid()) {
-      throw new InvalidRequestException(Status.BAD_REQUEST, "Only a single sorting parameter specified. sortBy and sortOrder required");
-    }
-    
+  }
+
+  @Override
+  protected void applySortingOptions(ExecutionQuery query) {
     if (sortBy != null) {
       if (sortBy.equals(SORT_BY_INSTANCE_ID_VALUE)) {
         query.orderByProcessInstanceId();
@@ -186,8 +188,6 @@ public class ExecutionQueryDto extends SortableParameterizedQueryDto {
         query.desc();
       }
     }
-    
-    return query;
   }
   
   

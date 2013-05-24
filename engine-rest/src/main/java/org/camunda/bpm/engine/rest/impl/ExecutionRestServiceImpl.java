@@ -5,7 +5,7 @@ import java.util.List;
 
 import javax.ws.rs.core.UriInfo;
 
-import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.rest.ExecutionRestService;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ExecutionDto;
@@ -33,8 +33,8 @@ public class ExecutionRestServiceImpl extends AbstractRestProcessEngineAware imp
   @Override
   public List<ExecutionDto> queryExecutions(
       ExecutionQueryDto queryDto, Integer firstResult, Integer maxResults) {
-    RuntimeService runtimeService = getProcessEngine().getRuntimeService();
-    ExecutionQuery query = queryDto.toQuery(runtimeService);
+    ProcessEngine engine = getProcessEngine();
+    ExecutionQuery query = queryDto.toQuery(engine);
     
     List<Execution> matchingExecutions;
     if (firstResult != null || maxResults != null) {
@@ -69,8 +69,8 @@ public class ExecutionRestServiceImpl extends AbstractRestProcessEngineAware imp
 
   @Override
   public CountResultDto queryExecutionsCount(ExecutionQueryDto queryDto) {
-    RuntimeService runtimeService = getProcessEngine().getRuntimeService();
-    ExecutionQuery query = queryDto.toQuery(runtimeService);
+    ProcessEngine engine = getProcessEngine();
+    ExecutionQuery query = queryDto.toQuery(engine);
     
     long count = query.count();
     CountResultDto result = new CountResultDto();
