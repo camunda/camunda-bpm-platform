@@ -12,11 +12,13 @@
  */
 package org.camunda.bpm.cockpit.plugin.test;
 
+import org.apache.ibatis.logging.LogFactory;
 import org.camunda.bpm.cockpit.Cockpit;
 import org.camunda.bpm.cockpit.db.CommandExecutor;
 import org.camunda.bpm.cockpit.db.QueryService;
 import org.camunda.bpm.cockpit.impl.DefaultRuntimeDelegate;
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.impl.util.LogUtil;
 import org.camunda.bpm.engine.test.ProcessEngineRule;
 import org.junit.After;
 import org.junit.AfterClass;
@@ -28,9 +30,17 @@ import org.junit.Rule;
  *
  * @author nico.rehwaldt
  */
-public class AbstractCockpitPluginTest {
+public abstract class AbstractCockpitPluginTest {
 
   private static TestCockpitRuntimeDelegate RUNTIME_DELEGATE = new TestCockpitRuntimeDelegate();
+
+  static {
+    LogUtil.readJavaUtilLoggingConfigFromClasspath();
+
+    // this ensures that mybatis uses the jdk logging
+    LogFactory.useJdkLogging();
+    // with an upgrade of mybatis, this might have to become org.mybatis.generator.logging.LogFactory.forceJavaLogging();
+  }
 
   @Rule
   public ProcessEngineRule processEngineRule = new ProcessEngineRule();
@@ -56,6 +66,7 @@ public class AbstractCockpitPluginTest {
   }
 
   public ProcessEngine getProcessEngine() {
+    System.out.println(processEngineRule.getProcessEngine());
     return processEngineRule.getProcessEngine();
   }
 
