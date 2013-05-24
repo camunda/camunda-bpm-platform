@@ -28,6 +28,7 @@ import javax.ws.rs.core.UriInfo;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ExecutionDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ExecutionQueryDto;
+import org.camunda.bpm.engine.rest.dto.runtime.VariableListDto;
 
 @Path(ExecutionRestService.PATH)
 @Produces(MediaType.APPLICATION_JSON)
@@ -63,5 +64,11 @@ public interface ExecutionRestService {
   @Produces(MediaType.APPLICATION_JSON)
   @Consumes(MediaType.APPLICATION_JSON)
   CountResultDto queryExecutionsCount(ExecutionQueryDto query);
+  
+  @POST
+  @Path("/{id}/signal")
+  @Produces(MediaType.APPLICATION_JSON)
+  @Consumes(MediaType.APPLICATION_JSON)
+  void signalExecution(@PathParam("id") String executionId, VariableListDto variables);
   
 }
