@@ -116,15 +116,15 @@ public interface ProcessInstanceRestService {
   @Consumes(MediaType.APPLICATION_JSON)
   void modifyVariables(@PathParam("id") String processInstanceId, PatchVariablesDto patch);
 
-  @POST
+  @PUT
   @Path("/{id}/suspend")
   void suspendProcessInstance(@PathParam("id") String processInstanceId);
   
-  @POST
+  @PUT
   @Path("/{id}/activate")
   void activateProcessInstance(@PathParam("id") String processInstanceId);
   
-  @POST
+  @PUT
   @Path("/{id}/signal")
   @Consumes(MediaType.APPLICATION_JSON)
   void signalProcessInstance(@PathParam("id") String processInstanceId, SignalProcessInstanceDto parameter);
