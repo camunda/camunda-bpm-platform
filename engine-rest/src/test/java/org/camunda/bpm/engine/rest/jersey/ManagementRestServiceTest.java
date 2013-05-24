@@ -1,18 +1,19 @@
-package org.camunda.bpm.engine.rest.resteasy;
+package org.camunda.bpm.engine.rest.jersey;
 
-import org.camunda.bpm.engine.rest.AbstractJobRestServiceTest;
+import org.camunda.bpm.engine.rest.AbstractManagementRestServiceTest;
 import org.camunda.bpm.engine.rest.util.EmbeddedServerBootstrap;
-import org.camunda.bpm.engine.rest.util.ResteasyServerBootstrap;
+import org.camunda.bpm.engine.rest.util.JerseyServerBootstrap;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
-public class JobRestServiceTest extends AbstractJobRestServiceTest {
+
+public class ManagementRestServiceTest extends AbstractManagementRestServiceTest {
 
 	  protected static EmbeddedServerBootstrap serverBootstrap;  
 	  
 	  @BeforeClass
 	  public static void setUpEmbeddedRuntime() {
-	    serverBootstrap = new ResteasyServerBootstrap();
+	    serverBootstrap = new JerseyServerBootstrap();
 	    serverBootstrap.start();
 	  }
 	  

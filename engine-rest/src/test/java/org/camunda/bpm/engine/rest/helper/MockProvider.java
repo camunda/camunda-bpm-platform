@@ -80,6 +80,7 @@ public abstract class MockProvider {
   public static final String ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID = "anotherId";
   public static final boolean EXAMPLE_PROCESS_INSTANCE_IS_SUSPENDED = false;
   public static final boolean EXAMPLE_PROCESS_INSTANCE_IS_ENDED = false;
+  public static final String NON_EXISTING_PROCESS_INSTANCE_ID = "aNonExistingId";
   
   // process definition
   public static final String EXAMPLE_PROCESS_DEFINITION_ID = "aProcDefId";
@@ -114,7 +115,7 @@ public abstract class MockProvider {
   
   // Jobs
   public static final String EXAMPLE_JOB_ID = "aJobId";
-  public static final String EXAMPLE_NON_EXISTING_JOB_ID = "aNonExistingJobId";
+  public static final String NON_EXISTING_JOB_ID = "aNonExistingJobId";
   public static final int EXAMPLE_NEGATIVE_JOB_RETRIES = -3; 
   public static final int EXAMPLE_JOB_RETRIES = 3; 
 
@@ -286,5 +287,16 @@ public abstract class MockProvider {
 	    
 	    return mock;
 	  }
-  
+
+ public static List<Job> createMockJobList() {
+		List<Job> mockList = new ArrayList<Job>();
+		mockList.add(createMockJob());
+		return mockList;
+ }
+
+ public static List<Job> createMockEmptyJobList() {
+	List<Job> mockList = new ArrayList<Job>();	
+	return mockList;
+ }
+
 }

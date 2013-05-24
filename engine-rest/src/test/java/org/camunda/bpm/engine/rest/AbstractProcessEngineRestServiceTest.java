@@ -58,7 +58,7 @@ public abstract class AbstractProcessEngineRestServiceTest extends
   private RepositoryService mockRepoService;
   private RuntimeService mockRuntimeService;
   private TaskService mockTaskService;
-  private IdentityService mockIdentityService;
+  private IdentityService mockIdentityService; 
 
   @Before
   public void setUpRuntimeData() {
@@ -71,7 +71,7 @@ public abstract class AbstractProcessEngineRestServiceTest extends
     when(namedProcessEngine.getRepositoryService()).thenReturn(mockRepoService);
     when(namedProcessEngine.getRuntimeService()).thenReturn(mockRuntimeService);
     when(namedProcessEngine.getTaskService()).thenReturn(mockTaskService);
-    when(namedProcessEngine.getIdentityService()).thenReturn(mockIdentityService);
+    when(namedProcessEngine.getIdentityService()).thenReturn(mockIdentityService);   
     
     createProcessDefinitionMock();
     createProcessInstanceMock();
@@ -210,5 +210,5 @@ public abstract class AbstractProcessEngineRestServiceTest extends
     verify(mockRuntimeService).correlateMessage(eq(messageName), eq((String) null), 
         argThat(new EqualsMap(null)), argThat(new EqualsMap(null)));
     verifyZeroInteractions(processEngine);
-  }
+  }  
 }
