@@ -12,7 +12,9 @@
  */
 package org.camunda.bpm.engine.rest.dto.runtime;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * @author: drobisch
@@ -20,11 +22,26 @@ import java.util.List;
 public class VariableListDto {
   List<VariableValueDto> variables;
 
+  public VariableListDto() {
+  }
+  
   public VariableListDto(List<VariableValueDto> variables) {
     this.variables = variables;
   }
 
+  public void setVariables(List<VariableValueDto> variables) {
+    this.variables = variables;
+  }
+  
   public List<VariableValueDto> getVariables() {
     return variables;
+  }
+  
+  public Map<String, Object> toMap() {
+    Map<String, Object> variablesMap = new HashMap<String, Object>();
+    for (VariableValueDto variable : variables) {
+      variablesMap.put(variable.getName(), variable.getValue());
+    }
+    return variablesMap;
   }
 }

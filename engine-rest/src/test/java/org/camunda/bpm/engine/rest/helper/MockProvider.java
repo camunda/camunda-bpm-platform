@@ -27,6 +27,7 @@ import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.management.ActivityStatistics;
 import org.camunda.bpm.engine.management.ProcessDefinitionStatistics;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.DelegationState;
 import org.camunda.bpm.engine.task.Task;
@@ -79,6 +80,11 @@ public abstract class MockProvider {
   public static final String ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID = "anotherId";
   public static final boolean EXAMPLE_PROCESS_INSTANCE_IS_SUSPENDED = false;
   public static final boolean EXAMPLE_PROCESS_INSTANCE_IS_ENDED = false;
+  
+  
+  // execution
+  public static final String EXAMPLE_EXECUTION_ID = "anId";
+  public static final boolean EXAMPLE_EXECUTION_IS_ENDED = false;
   
   // process definition
   public static final String EXAMPLE_PROCESS_DEFINITION_ID = "aProcDefId";
@@ -186,6 +192,16 @@ public abstract class MockProvider {
     when(mock.getProcessInstanceId()).thenReturn(EXAMPLE_PROCESS_INSTANCE_ID);
     when(mock.isSuspended()).thenReturn(EXAMPLE_PROCESS_INSTANCE_IS_SUSPENDED);
     when(mock.isEnded()).thenReturn(EXAMPLE_PROCESS_INSTANCE_IS_ENDED);
+    
+    return mock;
+  }
+  
+  public static Execution createMockExecution() {
+    Execution mock = mock(Execution.class);
+    
+    when(mock.getId()).thenReturn(EXAMPLE_EXECUTION_ID);
+    when(mock.getProcessInstanceId()).thenReturn(EXAMPLE_PROCESS_INSTANCE_ID);
+    when(mock.isEnded()).thenReturn(EXAMPLE_EXECUTION_IS_ENDED);
     
     return mock;
   }

@@ -23,6 +23,7 @@ import javax.ws.rs.core.UriInfo;
 
 import org.camunda.bpm.engine.FormService;
 import org.camunda.bpm.engine.ManagementService;
+import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
@@ -65,9 +66,8 @@ public class ProcessDefinitionRestServiceImpl extends AbstractRestProcessEngineA
     ProcessDefinitionQueryDto queryDto = new ProcessDefinitionQueryDto(uriInfo.getQueryParameters());
 	  List<ProcessDefinitionDto> definitions = new ArrayList<ProcessDefinitionDto>();
 
-	  RepositoryService repoService = getProcessEngine().getRepositoryService();
-
-	  ProcessDefinitionQuery query = queryDto.toQuery(repoService);
+	  ProcessEngine engine = getProcessEngine();
+	  ProcessDefinitionQuery query = queryDto.toQuery(engine);
 
 	  List<ProcessDefinition> matchingDefinitions = null;
 
@@ -98,8 +98,8 @@ public class ProcessDefinitionRestServiceImpl extends AbstractRestProcessEngineA
   public CountResultDto getProcessDefinitionsCount(UriInfo uriInfo) {
 	  ProcessDefinitionQueryDto queryDto = new ProcessDefinitionQueryDto(uriInfo.getQueryParameters());
 	  
-    RepositoryService repoService = getProcessEngine().getRepositoryService();
-    ProcessDefinitionQuery query = queryDto.toQuery(repoService);
+	  ProcessEngine engine = getProcessEngine();
+    ProcessDefinitionQuery query = queryDto.toQuery(engine);
 
     long count = query.count();
     CountResultDto result = new CountResultDto();

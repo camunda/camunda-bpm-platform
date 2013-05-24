@@ -22,12 +22,11 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
 import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
 import org.camunda.bpm.engine.rest.dto.VariableQueryParameterDto;
-import org.camunda.bpm.engine.rest.dto.converter.BooleanConverter;
 import org.camunda.bpm.engine.rest.dto.converter.VariableListConverter;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
-import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
+import org.camunda.bpm.engine.runtime.ExecutionQuery;
 
-public class ProcessInstanceQueryDto extends AbstractQueryDto<ProcessInstanceQuery> {
+public class ExecutionQueryDto extends AbstractQueryDto<ExecutionQuery> {
 
   private static final String SORT_BY_INSTANCE_ID_VALUE = "instanceId";
   private static final String SORT_BY_DEFINITION_KEY_VALUE = "definitionKey";
@@ -44,30 +43,27 @@ public class ProcessInstanceQueryDto extends AbstractQueryDto<ProcessInstanceQue
   private String processDefinitionKey;
   private String businessKey;
   private String processDefinitionId;
-  private String superProcessInstance;
-  private String subProcessInstance;
-  private Boolean active;
-  private Boolean suspended;
+  private String processInstanceId;
+  private String activityId;
+  private String signalEventSubscriptionName;
+  private String messageEventSubscriptionName;
   
   private List<VariableQueryParameterDto> variables;
-  
-  public ProcessInstanceQueryDto() {
+  private List<VariableQueryParameterDto> processVariables;
+
+  public ExecutionQueryDto() {
     
   }
   
-  public ProcessInstanceQueryDto(MultivaluedMap<String, String> queryParameters) {
+  public ExecutionQueryDto(MultivaluedMap<String, String> queryParameters) {
     super(queryParameters);
-  }
-
-  public String getProcessDefinitionKey() {
-    return processDefinitionKey;
   }
 
   @CamundaQueryParam("processDefinitionKey")
   public void setProcessDefinitionKey(String processDefinitionKey) {
     this.processDefinitionKey = processDefinitionKey;
   }
-  
+
   @CamundaQueryParam("businessKey")
   public void setBusinessKey(String businessKey) {
     this.businessKey = businessKey;
@@ -78,29 +74,34 @@ public class ProcessInstanceQueryDto extends AbstractQueryDto<ProcessInstanceQue
     this.processDefinitionId = processDefinitionId;
   }
 
-  @CamundaQueryParam("superProcessInstance")
-  public void setSuperProcessInstance(String superProcessInstance) {
-    this.superProcessInstance = superProcessInstance;
+  @CamundaQueryParam("processInstanceId")
+  public void setProcessInstanceId(String processInstanceId) {
+    this.processInstanceId = processInstanceId;
   }
 
-  @CamundaQueryParam("subProcessInstance")
-  public void setSubProcessInstance(String subProcessInstance) {
-    this.subProcessInstance = subProcessInstance;
+  @CamundaQueryParam("activityId")
+  public void setActivityId(String activityId) {
+    this.activityId = activityId;
   }
 
-  @CamundaQueryParam(value = "active", converter = BooleanConverter.class)
-  public void setActive(Boolean active) {
-    this.active = active;
+  @CamundaQueryParam("signalEventSubscriptionName")
+  public void setSignalEventSubscriptionName(String signalEventSubscriptionName) {
+    this.signalEventSubscriptionName = signalEventSubscriptionName;
   }
 
-  @CamundaQueryParam(value = "suspended", converter = BooleanConverter.class)
-  public void setSuspended(Boolean suspended) {
-    this.suspended = suspended;
+  @CamundaQueryParam("messageEventSubscriptionName")
+  public void setMessageEventSubscriptionName(String messageEventSubscriptionName) {
+    this.messageEventSubscriptionName = messageEventSubscriptionName;
   }
 
   @CamundaQueryParam(value = "variables", converter = VariableListConverter.class)
   public void setVariables(List<VariableQueryParameterDto> variables) {
     this.variables = variables;
+  }
+
+  @CamundaQueryParam(value = "processVariables", converter = VariableListConverter.class)
+  public void setProcessVariables(List<VariableQueryParameterDto> processVariables) {
+    this.processVariables = processVariables;
   }
   
   @Override
@@ -109,12 +110,12 @@ public class ProcessInstanceQueryDto extends AbstractQueryDto<ProcessInstanceQue
   }
 
   @Override
-  protected ProcessInstanceQuery createNewQuery(ProcessEngine engine) {
-    return engine.getRuntimeService().createProcessInstanceQuery();
+  protected ExecutionQuery createNewQuery(ProcessEngine engine) {
+    return engine.getRuntimeService().createExecutionQuery();
   }
 
   @Override
-  protected void applyFilters(ProcessInstanceQuery query) {
+  protected void applyFilters(ExecutionQuery query) {
     if (processDefinitionKey != null) {
       query.processDefinitionKey(processDefinitionKey);
     }
@@ -124,18 +125,19 @@ public class ProcessInstanceQueryDto extends AbstractQueryDto<ProcessInstanceQue
     if (processDefinitionId != null) {
       query.processDefinitionId(processDefinitionId);
     }
-    if (superProcessInstance != null) {
-      query.superProcessInstanceId(superProcessInstance);
+    if (processInstanceId != null) {
+      query.processInstanceId(processInstanceId);
+    } 
+    if (activityId != null) {
+      query.activityId(activityId);
     }
-    if (subProcessInstance != null) {
-      query.subProcessInstanceId(subProcessInstance);
+    if (signalEventSubscriptionName != null) {
+      query.signalEventSubscriptionName(signalEventSubscriptionName);
     }
-    if (active != null && active == true) {
-      query.active();
+    if (messageEventSubscriptionName != null) {
+      query.messageEventSubscriptionName(messageEventSubscriptionName);
     }
-    if (suspended != null && suspended == true) {
-      query.suspended();
-    }
+    
     if (variables != null) {
       for (VariableQueryParameterDto variableQueryParam : variables) {
         String variableName = variableQueryParam.getName();
@@ -161,10 +163,26 @@ public class ProcessInstanceQueryDto extends AbstractQueryDto<ProcessInstanceQue
         }
       }
     }
+    
+    if (processVariables != null) {
+      for (VariableQueryParameterDto variableQueryParam : processVariables) {
+        String variableName = variableQueryParam.getName();
+        String op = variableQueryParam.getOperator();
+        Object variableValue = variableQueryParam.getValue();
+        
+        if (op.equals(VariableQueryParameterDto.EQUALS_OPERATOR_NAME)) {
+          query.processVariableValueEquals(variableName, variableValue);
+        } else if (op.equals(VariableQueryParameterDto.NOT_EQUALS_OPERATOR_NAME)) {
+          query.processVariableValueNotEquals(variableName, variableValue);
+        } else {
+          throw new InvalidRequestException(Status.BAD_REQUEST, "Invalid process variable comparator specified: " + op);
+        }
+      }
+    }
   }
 
   @Override
-  protected void applySortingOptions(ProcessInstanceQuery query) {
+  protected void applySortingOptions(ExecutionQuery query) {
     if (sortBy != null) {
       if (sortBy.equals(SORT_BY_INSTANCE_ID_VALUE)) {
         query.orderByProcessInstanceId();
@@ -183,5 +201,7 @@ public class ProcessInstanceQueryDto extends AbstractQueryDto<ProcessInstanceQue
       }
     }
   }
+  
+  
   
 }

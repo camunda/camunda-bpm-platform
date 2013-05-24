@@ -12,44 +12,31 @@
  */
 package org.camunda.bpm.engine.rest.dto.runtime;
 
-/**
- * @author: drobisch
- */
-public class VariableValueDto {
-  String name;
-  Object value;
-  String type;
+import org.camunda.bpm.engine.runtime.Execution;
 
-  public VariableValueDto() {
-  }
+public class ExecutionDto {
+
+  private String id;
+  private String processInstanceId;
+  private boolean ended;
   
-  public VariableValueDto(String name, Object value, String type) {
-    this.name = name;
-    this.value = value;
-    this.type = type;
+  public static ExecutionDto fromExecution(Execution execution) {
+    ExecutionDto dto = new ExecutionDto();
+    dto.id = execution.getId();
+    dto.processInstanceId = execution.getProcessInstanceId();
+    dto.ended = execution.isEnded();
+    return dto;
   }
 
-  public String getName() {
-    return name;
+  public String getId() {
+    return id;
   }
 
-  public Object getValue() {
-    return value;
+  public String getProcessInstanceId() {
+    return processInstanceId;
   }
 
-  public String getType() {
-    return type;
-  }
-
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  public void setValue(Object value) {
-    this.value = value;
-  }
-
-  public void setType(String type) {
-    this.type = type;
+  public boolean isEnded() {
+    return ended;
   }
 }

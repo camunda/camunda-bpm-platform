@@ -16,17 +16,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.Response.Status;
 
-import org.camunda.bpm.engine.RepositoryService;
+import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
-import org.camunda.bpm.engine.rest.dto.SortableParameterizedQueryDto;
+import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
 import org.camunda.bpm.engine.rest.dto.converter.BooleanConverter;
 import org.camunda.bpm.engine.rest.dto.converter.IntegerConverter;
-import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 
-public class ProcessDefinitionQueryDto extends SortableParameterizedQueryDto {
+public class ProcessDefinitionQueryDto extends AbstractQueryDto<ProcessDefinitionQuery> {
 
   private static final String SORT_BY_CATEGORY_VALUE = "category";
   private static final String SORT_BY_KEY_VALUE = "key";
@@ -145,13 +143,13 @@ public class ProcessDefinitionQueryDto extends SortableParameterizedQueryDto {
     return VALID_SORT_BY_VALUES.contains(value);
   }
   
-  /**
-   * Creates a {@link ProcessDefinitionQuery} against the given {@link RepositoryService}.
-   * @param repositoryService
-   * @return
-   */
-  public ProcessDefinitionQuery toQuery(RepositoryService repositoryService) {
-    ProcessDefinitionQuery query = repositoryService.createProcessDefinitionQuery();
+  @Override
+  protected ProcessDefinitionQuery createNewQuery(ProcessEngine engine) {
+    return engine.getRepositoryService().createProcessDefinitionQuery();
+  }
+
+  @Override
+  protected void applyFilters(ProcessDefinitionQuery query) {
     if (category != null) {
       query.processDefinitionCategory(category);
     }
@@ -194,11 +192,10 @@ public class ProcessDefinitionQueryDto extends SortableParameterizedQueryDto {
     if (suspended != null && suspended == true) {
       query.suspended();
     }
-    
-    if (!sortOptionsValid()) {
-      throw new InvalidRequestException(Status.BAD_REQUEST, "Only a single sorting parameter specified. sortBy and sortOrder required");
-    }
-    
+  }
+
+  @Override
+  protected void applySortingOptions(ProcessDefinitionQuery query) {
     if (sortBy != null) {
       if (sortBy.equals(SORT_BY_CATEGORY_VALUE)) {
         query.orderByProcessDefinitionCategory();
@@ -222,7 +219,5 @@ public class ProcessDefinitionQueryDto extends SortableParameterizedQueryDto {
         query.desc();
       }
     }
-    
-    return query;
   }
 }
