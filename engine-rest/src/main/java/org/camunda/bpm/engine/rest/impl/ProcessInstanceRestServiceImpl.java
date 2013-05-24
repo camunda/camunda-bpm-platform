@@ -17,7 +17,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
@@ -33,6 +32,7 @@ import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceQueryDto;
 import org.camunda.bpm.engine.rest.dto.runtime.VariableListDto;
 import org.camunda.bpm.engine.rest.dto.runtime.VariableValueDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 
@@ -148,7 +148,7 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
     try {
        variable = runtimeService.getVariable(processInstanceId, variableName);
     } catch (ProcessEngineException e) {
-      throw new InvalidRequestException(Status.BAD_REQUEST, e, "Cannot get variable " + variableName + ": " + e.getMessage());
+      throw new RestException(Status.INTERNAL_SERVER_ERROR, e, "Cannot get variable " + variableName + ": " + e.getMessage());
     }
     
     if (variable == null) {
@@ -167,7 +167,7 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
     try {
       runtimeService.setVariable(processInstanceId, variableName, variable.getValue());
     } catch (ProcessEngineException e) {
-      throw new InvalidRequestException(Status.BAD_REQUEST, e, "Cannot put variable " + variableName + ": " + e.getMessage());
+      throw new RestException(Status.INTERNAL_SERVER_ERROR, e, "Cannot put variable " + variableName + ": " + e.getMessage());
     }
   }
 
@@ -178,7 +178,7 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
     try {
       runtimeService.removeVariable(processInstanceId, variableName);
     } catch (ProcessEngineException e) {
-      throw new InvalidRequestException(Status.BAD_REQUEST, e, "Cannot delete variable " + variableName + ": " + e.getMessage());
+      throw new RestException(Status.INTERNAL_SERVER_ERROR, e, "Cannot delete variable " + variableName + ": " + e.getMessage());
     }
   }
   
@@ -192,14 +192,13 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
     }
     
     List<String> variableDeletions = patch.getDeletions();
-    
-    // this custom command might later be moved to the engine
     RuntimeServiceImpl runtimeService = (RuntimeServiceImpl) getProcessEngine().getRuntimeService();
     
     try {
       runtimeService.updateVariables(processInstanceId, variableModifications, variableDeletions);
     } catch (ProcessEngineException e) {
-      throw new InvalidRequestException(Status.BAD_REQUEST, "Process instance with id " + processInstanceId + " does not exist");
+      throw new RestException(Status.INTERNAL_SERVER_ERROR, e, 
+          "Cannot modify variables for process instance " + processInstanceId + ": " + e.getMessage());
     }
     
   }

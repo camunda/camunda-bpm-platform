@@ -23,6 +23,7 @@ import javax.ws.rs.core.Response.Status;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.RuntimeServiceImpl;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.helper.EqualsList;
 import org.camunda.bpm.engine.rest.helper.EqualsMap;
 import org.camunda.bpm.engine.rest.helper.ExampleVariableObject;
@@ -213,9 +214,9 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
     messageBodyJson.put("modifications", modifications);
     
     given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).contentType(ContentType.JSON).body(messageBodyJson)
-      .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
-      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
-      .body("message", equalTo("Process instance with id " + MockProvider.EXAMPLE_PROCESS_INSTANCE_ID + " does not exist"))
+      .then().expect().statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).contentType(ContentType.JSON)
+      .body("type", equalTo(RestException.class.getSimpleName()))
+      .body("message", equalTo("Cannot modify variables for process instance " + MockProvider.EXAMPLE_PROCESS_INSTANCE_ID + ": expected exception"))
       .when().patch(PROCESS_INSTANCE_VARIABLES_URL);
   }
   
@@ -262,8 +263,8 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
       .thenThrow(new ProcessEngineException("expected exception"));
     
     given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).pathParam("varId", variableKey)
-      .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
-      .body("type", is(InvalidRequestException.class.getSimpleName()))
+      .then().expect().statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
+      .body("type", is(RestException.class.getSimpleName()))
       .body("message", is("Cannot get variable " + variableKey + ": expected exception"))
       .when().get(SINGLE_PROCESS_INSTANCE_VARIABLE_URL);
   }
@@ -311,8 +312,8 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
     
     given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).pathParam("varId", variableKey)
       .contentType(ContentType.JSON).body(variableJson)
-      .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
-      .body("type", is(InvalidRequestException.class.getSimpleName()))
+      .then().expect().statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
+      .body("type", is(RestException.class.getSimpleName()))
       .body("message", is("Cannot put variable " + variableKey + ": expected exception"))
       .when().put(SINGLE_PROCESS_INSTANCE_VARIABLE_URL);
   }
@@ -336,8 +337,8 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
       .when(runtimeServiceMock).removeVariable(eq(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID), eq(variableKey));
     
     given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).pathParam("varId", variableKey)
-      .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
-      .body("type", is(InvalidRequestException.class.getSimpleName()))
+      .then().expect().statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
+      .body("type", is(RestException.class.getSimpleName()))
       .body("message", is("Cannot delete variable " + variableKey + ": expected exception"))
       .when().delete(SINGLE_PROCESS_INSTANCE_VARIABLE_URL);
   }
