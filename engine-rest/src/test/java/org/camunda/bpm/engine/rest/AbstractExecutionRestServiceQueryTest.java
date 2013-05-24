@@ -74,7 +74,7 @@ public abstract class AbstractExecutionRestServiceQueryTest extends
     given().queryParam("processVariables", queryValue)
       .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
       .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
-      .body("message", containsString("Invalid variable comparator specified: " + invalidComparator))
+      .body("message", containsString("Invalid process variable comparator specified: " + invalidComparator))
       .when().get(EXECUTION_QUERY_URL);
     
     // invalid format
@@ -131,13 +131,13 @@ public abstract class AbstractExecutionRestServiceQueryTest extends
     inOrder.verify(mockedQuery).list();
     
     String content = response.asString();
-    List<String> instances = from(content).getList("");
-    Assert.assertEquals("There should be one execution returned.", 1, instances.size());
-    Assert.assertNotNull("There should be one execution returned", instances.get(0));
+    List<String> executions = from(content).getList("");
+    Assert.assertEquals("There should be one execution returned.", 1, executions.size());
+    Assert.assertNotNull("There should be one execution returned", executions.get(0));
     
     String returnedExecutionId = from(content).getString("[0].id");
     Boolean returnedIsEnded = from(content).getBoolean("[0].ended");
-    String returnedProcessInstanceId = from(content).getString("[0].instanceId");
+    String returnedProcessInstanceId = from(content).getString("[0].processInstanceId");
   
     Assert.assertEquals(MockProvider.EXAMPLE_EXECUTION_ID, returnedExecutionId);
     Assert.assertEquals(MockProvider.EXAMPLE_EXECUTION_IS_ENDED, returnedIsEnded);
@@ -145,18 +145,18 @@ public abstract class AbstractExecutionRestServiceQueryTest extends
   }
 
   @Test
-  public void testIncompleteProcessInstance() {
-    setUpMockExecutionQuery(createIncompleteMockInstances());
+  public void testIncompleteExecution() {
+    setUpMockExecutionQuery(createIncompleteMockExecutions());
     Response response = expect().statusCode(Status.OK.getStatusCode())
         .when().get(EXECUTION_QUERY_URL);
     
     String content = response.asString();
-    String returnedProcessInstanceId = from(content).getString("[0].instanceId");
+    String returnedProcessInstanceId = from(content).getString("[0].processInstanceId");
     Assert.assertNull("Should be null, as it is also null in the original execution on the server.", 
         returnedProcessInstanceId);
   }
 
-  private List<Execution> createIncompleteMockInstances() {
+  private List<Execution> createIncompleteMockExecutions() {
     List<Execution> mocks = new ArrayList<Execution>();
     Execution mockExecution = mock(Execution.class);
     when(mockExecution.getId()).thenReturn(MockProvider.EXAMPLE_EXECUTION_ID);
