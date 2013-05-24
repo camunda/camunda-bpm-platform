@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
@@ -140,6 +141,48 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
   }
 
   @Override
+  public VariableValueDto getVariable(String processInstanceId,
+      String variableName) {
+    RuntimeService runtimeService = getProcessEngine().getRuntimeService();
+    Object variable = null;
+    try {
+       variable = runtimeService.getVariable(processInstanceId, variableName);
+    } catch (ProcessEngineException e) {
+      throw new InvalidRequestException(Status.BAD_REQUEST, e, "Cannot get variable " + variableName + ": " + e.getMessage());
+    }
+    
+    if (variable == null) {
+      throw new InvalidRequestException(Status.NOT_FOUND, "Process variable with name " + variableName + " does not exist or is null");
+    }
+    
+    return new VariableValueDto(variableName, variable, variable.getClass().getSimpleName());
+    
+  }
+
+  @Override
+  public void putVariable(String processInstanceId, String variableName,
+      VariableValueDto variable) {
+    
+    RuntimeService runtimeService = getProcessEngine().getRuntimeService();
+    try {
+      runtimeService.setVariable(processInstanceId, variableName, variable.getValue());
+    } catch (ProcessEngineException e) {
+      throw new InvalidRequestException(Status.BAD_REQUEST, e, "Cannot put variable " + variableName + ": " + e.getMessage());
+    }
+  }
+
+  @Override
+  public void deleteVariable(String processInstanceId,
+      String variableName) {
+    RuntimeService runtimeService = getProcessEngine().getRuntimeService();
+    try {
+      runtimeService.removeVariable(processInstanceId, variableName);
+    } catch (ProcessEngineException e) {
+      throw new InvalidRequestException(Status.BAD_REQUEST, e, "Cannot delete variable " + variableName + ": " + e.getMessage());
+    }
+  }
+  
+  @Override
   public void modifyVariables(String processInstanceId, PatchVariablesDto patch) {
     Map<String, Object> variableModifications = new HashMap<String, Object>();
     if (patch.getModifications() != null) {
@@ -160,5 +203,6 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
     }
     
   }
+
   
 }

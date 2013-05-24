@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.argThat;
+import static org.mockito.Matchers.isNull;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
@@ -38,6 +39,7 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
 
   protected static final String PROCESS_INSTANCE_URL = TEST_RESOURCE_ROOT_PATH + "/process-instance/{id}";
   protected static final String PROCESS_INSTANCE_VARIABLES_URL = PROCESS_INSTANCE_URL + "/variables";
+  protected static final String SINGLE_PROCESS_INSTANCE_VARIABLE_URL = PROCESS_INSTANCE_VARIABLES_URL + "/{varId}";
   
   protected static final String EXAMPLE_VARIABLE_KEY = "aProcessVariableKey";
   protected static final String EXAMPLE_VARIABLE_VALUE = "aProcessVariableValue";
@@ -222,5 +224,121 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
     given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).contentType(ContentType.JSON).body(EMPTY_JSON_OBJECT)
       .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
       .when().patch(PROCESS_INSTANCE_VARIABLES_URL);
+  }
+  
+  @Test
+  public void testGetSingleVariable() {
+    String variableKey = "aVariableKey";
+    int variableValue = 123;
+    
+    when(runtimeServiceMock.getVariable(eq(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID), eq(variableKey))).thenReturn(variableValue);
+    
+    given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).pathParam("varId", variableKey)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .body("value", is(123))
+      .body("name", is(variableKey))
+      .body("type", is("Integer"))
+      .when().get(SINGLE_PROCESS_INSTANCE_VARIABLE_URL);
+  }
+  
+  @Test
+  public void testNonExistingVariable() {
+    String variableKey = "aVariableKey";
+    
+    when(runtimeServiceMock.getVariable(eq(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID), eq(variableKey))).thenReturn(null);
+    
+    given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).pathParam("varId", variableKey)
+      .then().expect().statusCode(Status.NOT_FOUND.getStatusCode())
+      .body("type", is(InvalidRequestException.class.getSimpleName()))
+      .body("message", is("Process variable with name " + variableKey + " does not exist or is null"))
+      .when().get(SINGLE_PROCESS_INSTANCE_VARIABLE_URL);
+  }
+  
+  @Test
+  public void testGetVariableForNonExistingInstance() {
+    String variableKey = "aVariableKey";
+    
+    when(runtimeServiceMock.getVariable(eq(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID), eq(variableKey)))
+      .thenThrow(new ProcessEngineException("expected exception"));
+    
+    given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).pathParam("varId", variableKey)
+      .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
+      .body("type", is(InvalidRequestException.class.getSimpleName()))
+      .body("message", is("Cannot get variable " + variableKey + ": expected exception"))
+      .when().get(SINGLE_PROCESS_INSTANCE_VARIABLE_URL);
+  }
+  
+  @Test
+  public void testPutSingleVariable() {
+    String variableKey = "aVariableKey";
+    String variableValue = "aVariableValue";
+    
+    Map<String, Object> variableJson = new HashMap<String, Object>();
+    variableJson.put("value", variableValue);
+    
+    given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).pathParam("varId", variableKey)
+      .contentType(ContentType.JSON).body(variableJson)
+      .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
+      .when().put(SINGLE_PROCESS_INSTANCE_VARIABLE_URL);
+    
+    verify(runtimeServiceMock).setVariable(eq(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID), eq(variableKey), 
+        eq(variableValue));
+  }
+  
+  @Test
+  public void testPutSingleVariableWithNoValue() {
+    String variableKey = "aVariableKey";
+    
+    given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).pathParam("varId", variableKey)
+      .contentType(ContentType.JSON).body(EMPTY_JSON_OBJECT)
+      .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
+      .when().put(SINGLE_PROCESS_INSTANCE_VARIABLE_URL);
+    
+    verify(runtimeServiceMock).setVariable(eq(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID), eq(variableKey), 
+        isNull());
+  }
+  
+  @Test
+  public void testPutVariableForNonExistingInstance() {
+    String variableKey = "aVariableKey";
+    String variableValue = "aVariableValue";
+    
+    Map<String, Object> variableJson = new HashMap<String, Object>();
+    variableJson.put("value", variableValue);
+    
+    doThrow(new ProcessEngineException("expected exception"))
+      .when(runtimeServiceMock).setVariable(eq(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID), eq(variableKey), eq(variableValue));
+    
+    given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).pathParam("varId", variableKey)
+      .contentType(ContentType.JSON).body(variableJson)
+      .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
+      .body("type", is(InvalidRequestException.class.getSimpleName()))
+      .body("message", is("Cannot put variable " + variableKey + ": expected exception"))
+      .when().put(SINGLE_PROCESS_INSTANCE_VARIABLE_URL);
+  }
+  
+  @Test
+  public void testDeleteSingleVariable() {
+    String variableKey = "aVariableKey";
+    
+    given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).pathParam("varId", variableKey)
+      .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
+      .when().delete(SINGLE_PROCESS_INSTANCE_VARIABLE_URL);
+    
+    verify(runtimeServiceMock).removeVariable(eq(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID), eq(variableKey));
+  }
+  
+  @Test
+  public void testDeleteariableForNonExistingInstance() {
+    String variableKey = "aVariableKey";
+    
+    doThrow(new ProcessEngineException("expected exception"))
+      .when(runtimeServiceMock).removeVariable(eq(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID), eq(variableKey));
+    
+    given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).pathParam("varId", variableKey)
+      .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
+      .body("type", is(InvalidRequestException.class.getSimpleName()))
+      .body("message", is("Cannot delete variable " + variableKey + ": expected exception"))
+      .when().delete(SINGLE_PROCESS_INSTANCE_VARIABLE_URL);
   }
 }
