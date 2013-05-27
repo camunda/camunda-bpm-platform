@@ -89,6 +89,7 @@ public interface ProcessInstanceRestService {
   @Produces(MediaType.APPLICATION_JSON)
   CountResultDto getProcessInstancesCount(@Context UriInfo uriInfo);
   
+  
   @POST
   @Path("/count")
   @Consumes(MediaType.APPLICATION_JSON)
@@ -118,4 +119,13 @@ public interface ProcessInstanceRestService {
   @Path("/{id}/variables")
   @Consumes(MediaType.APPLICATION_JSON)
   void modifyVariables(@PathParam("id") String processInstanceId, PatchVariablesDto patch);
+
+  @PUT
+  @Path("/{id}/suspend")
+  void suspendProcessInstance(@PathParam("id") String processInstanceId);
+  
+  @PUT
+  @Path("/{id}/activate")
+  void activateProcessInstance(@PathParam("id") String processInstanceId);
+
 }

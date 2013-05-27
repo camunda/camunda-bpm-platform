@@ -21,6 +21,7 @@ import javax.ws.rs.core.Application;
 import org.camunda.bpm.engine.rest.exception.ProcessEngineExceptionHandler;
 import org.camunda.bpm.engine.rest.exception.RestExceptionHandler;
 import org.camunda.bpm.engine.rest.impl.IdentityRestServiceImpl;
+import org.camunda.bpm.engine.rest.impl.ManagementRestServiceImpl;
 import org.camunda.bpm.engine.rest.impl.MessageRestServiceImpl;
 import org.camunda.bpm.engine.rest.impl.ProcessDefinitionRestServiceImpl;
 import org.camunda.bpm.engine.rest.impl.ProcessEngineRestServiceImpl;
@@ -54,6 +55,7 @@ public class DefaultApplication extends Application {
     classes.add(TaskRestServiceImpl.class);
     classes.add(IdentityRestServiceImpl.class);
     classes.add(MessageRestServiceImpl.class);
+    classes.add(ManagementRestServiceImpl.class);    
     
     classes.add(JacksonConfigurator.class);
     

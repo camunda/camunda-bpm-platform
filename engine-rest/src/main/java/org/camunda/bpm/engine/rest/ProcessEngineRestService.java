@@ -44,6 +44,9 @@ public interface ProcessEngineRestService {
   
   @Path("/{name}" + MessageRestService.PATH)
   MessageRestService getMessageRestService(@PathParam("name") String engineName);
+
+  @Path("/{name}" + ManagementRestService.PATH)
+  ManagementRestService getManagementRestService(@PathParam("name") String engineName);
   
   @GET
   @Produces(MediaType.APPLICATION_JSON)
