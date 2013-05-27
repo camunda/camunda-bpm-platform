@@ -13,6 +13,7 @@
 package org.camunda.bpm.engine.test.bpmn.event.timer;
 
 import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -168,16 +169,20 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
     assertEquals(1, jobQuery.count());
 
     //we deploy new process version, with some small change
-    String process = new String(IoUtil.readInputStream(getClass().getResourceAsStream("StartTimerEventTest.testVersionUpgradeShouldCancelJobs.bpmn20.xml"), "")).replaceAll("beforeChange","changed");
+    InputStream in = getClass().getResourceAsStream("StartTimerEventTest.testVersionUpgradeShouldCancelJobs.bpmn20.xml");
+    String process = new String(IoUtil.readInputStream(in, "")).replaceAll("beforeChange","changed");
+    IoUtil.closeSilently(in);
+    in = new ByteArrayInputStream(process.getBytes());
     String id = repositoryService.createDeployment().addInputStream("StartTimerEventTest.testVersionUpgradeShouldCancelJobs.bpmn20.xml",
-        new ByteArrayInputStream(process.getBytes())).deploy().getId();
+        in).deploy().getId();
+    IoUtil.closeSilently(in);
 
     assertEquals(1, jobQuery.count());
 
     moveByMinutes(5);
     waitForJobExecutorOnCondition(10000, 500, new Callable<Boolean>() {
       public Boolean call() throws Exception {
-        //we check that correct version was started
+        // we check that correct version was started
         ProcessInstance processInstance = runtimeService.createProcessInstanceQuery().processDefinitionKey("startTimerEventExample").singleResult();
         if(processInstance != null) {
           String pi = processInstance.getProcessInstanceId();        
@@ -216,9 +221,14 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
   // Test for ACT-1533
   public void testTimerShouldNotBeRemovedWhenUndeployingOldVersion() throws Exception {
     // Deploy test process
-    String process = new String(IoUtil.readInputStream(getClass().getResourceAsStream("StartTimerEventTest.testTimerShouldNotBeRemovedWhenUndeployingOldVersion.bpmn20.xml"), ""));
+    InputStream in = getClass().getResourceAsStream("StartTimerEventTest.testTimerShouldNotBeRemovedWhenUndeployingOldVersion.bpmn20.xml");
+    String process = new String(IoUtil.readInputStream(in, ""));
+    IoUtil.closeSilently(in);
+    
+    in = new ByteArrayInputStream(process.getBytes());
     String firstDeploymentId = repositoryService.createDeployment().addInputStream("StartTimerEventTest.testVersionUpgradeShouldCancelJobs.bpmn20.xml",
-            new ByteArrayInputStream(process.getBytes())).deploy().getId();
+            in).deploy().getId();
+    IoUtil.closeSilently(in);
     
     // After process start, there should be timer created
     JobQuery jobQuery = managementService.createJobQuery();
@@ -226,8 +236,10 @@ public class StartTimerEventTest extends PluggableProcessEngineTestCase {
 
     //we deploy new process version, with some small change
     String processChanged = process.replaceAll("beforeChange","changed");
+    in = new ByteArrayInputStream(processChanged.getBytes());
     String secondDeploymentId = repositoryService.createDeployment().addInputStream("StartTimerEventTest.testVersionUpgradeShouldCancelJobs.bpmn20.xml",
-        new ByteArrayInputStream(processChanged.getBytes())).deploy().getId();
+        in).deploy().getId();
+    IoUtil.closeSilently(in);
     assertEquals(1, jobQuery.count());
 
     // Remove the first deployment
