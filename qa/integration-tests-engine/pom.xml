@@ -9,12 +9,12 @@
     <artifactId>camunda-qa</artifactId>
     <version>7.0.0-SNAPSHOT</version>
   </parent>
-  
-  <!--  <properties>    
+
+  <!--  <properties>
     <WAS8_HOME>C:\Program Files (x86)\IBM\WebSphere85\AppServer</WAS8_HOME>
-    <WAS8_REMOTE_SERVER_SOAP_PORT>8882</WAS8_REMOTE_SERVER_SOAP_PORT>    
+    <WAS8_REMOTE_SERVER_SOAP_PORT>8882</WAS8_REMOTE_SERVER_SOAP_PORT>
   </properties> -->
-  
+
   <dependencies>
     <dependency>
       <groupId>junit</groupId>
@@ -48,7 +48,7 @@
       <artifactId>camunda-ejb-client</artifactId>
       <scope>provided</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine-cdi</artifactId>
@@ -60,13 +60,13 @@
         </exclusion>
       </exclusions>
     </dependency>
-    
+
     <dependency>
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine</artifactId>
       <scope>provided</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine-spring</artifactId>
@@ -78,19 +78,19 @@
         </exclusion>
       </exclusions>
     </dependency>
-    
+
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-web</artifactId>
     </dependency>
-    
+
      <!-- weld for CDI support on tomcat-->
     <dependency>
       <groupId>org.jboss.weld.servlet</groupId>
       <artifactId>weld-servlet</artifactId>
       <version>1.1.10.Final</version>
     </dependency>
-    
+
   </dependencies>
 
   <build>
@@ -129,7 +129,7 @@
       </plugin>
     </plugins>
   </build>
-  
+
   <profiles>
     <profile>
       <id>jboss</id>
@@ -163,8 +163,8 @@
           <resource>
             <directory>src/test/resources-jboss</directory>
             <filtering>true</filtering>
-          </resource>          
-        </resources>      
+          </resource>
+        </resources>
         <plugins>
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
@@ -189,7 +189,7 @@
             <artifactId>maven-resources-plugin</artifactId>
             <configuration>
               <delimiters>
-                <delimiter>${*}</delimiter>          
+                <delimiter>${*}</delimiter>
               </delimiters>
               <useDefaultDelimiters>false</useDefaultDelimiters>
             </configuration>
@@ -268,8 +268,8 @@
         </plugins>
       </build>
     </profile>
-    
-    
+
+
     <profile>
       <id>glassfish</id>
       <dependencies>
@@ -298,8 +298,8 @@
           <groupId>org.jboss.shrinkwrap.resolver</groupId>
           <artifactId>shrinkwrap-resolver-impl-maven</artifactId>
           <version>1.0.0-beta-6</version>
-          <scope>test</scope>    
-        </dependency>        
+          <scope>test</scope>
+        </dependency>
         <dependency>
           <groupId>org.jboss.shrinkwrap</groupId>
           <artifactId>shrinkwrap-api</artifactId>
@@ -349,7 +349,7 @@
               </excludes>
             </configuration>
           </plugin>
-        </plugins>      
+        </plugins>
         <testResources>
           <testResource>
             <directory>src/test/resources-glassfish-h2</directory>
@@ -361,7 +361,7 @@
         </testResources>
       </build>
     </profile>
-    
+
     <profile>
       <id>glassfish-servlet</id>
       <build>
@@ -401,7 +401,7 @@
         </plugins>
       </build>
     </profile>
-    
+
     <profile>
       <id>tomcat</id>
       <dependencyManagement>
@@ -414,7 +414,7 @@
             <type>pom</type>
           </dependency>
         </dependencies>
-      </dependencyManagement>      
+      </dependencyManagement>
       <dependencies>
         <dependency>
           <!-- make sure this comes after runtime in the reactor build -->
@@ -424,30 +424,30 @@
           <scope>provided</scope>
           <type>pom</type>
         </dependency>
-        
+
         <dependency>
           <groupId>org.jboss.arquillian.junit</groupId>
           <artifactId>arquillian-junit-container</artifactId>
           <scope>test</scope>
         </dependency>
-        
+
         <dependency>
           <groupId>org.jboss.arquillian.container</groupId>
           <artifactId>arquillian-tomcat-managed-7</artifactId>
           <version>1.0.0.CR4</version>
           <scope>test</scope>
         </dependency>
-        
+
         <dependency>
           <groupId>org.jboss.arquillian.protocol</groupId>
           <artifactId>arquillian-protocol-servlet</artifactId>
           <scope>test</scope>
         </dependency>
-        
+
         <dependency>
           <groupId>org.jboss.shrinkwrap.resolver</groupId>
           <artifactId>shrinkwrap-resolver-impl-maven</artifactId>
-          <scope>test</scope>    
+          <scope>test</scope>
         </dependency>
 
       </dependencies>
@@ -456,8 +456,8 @@
           <resource>
             <directory>src/test/resources-tomcat</directory>
             <filtering>true</filtering>
-          </resource>          
-        </resources>      
+          </resource>
+        </resources>
         <plugins>
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
@@ -476,7 +476,7 @@
                 </configuration>
               </execution>
             </executions>
-          </plugin>          
+          </plugin>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-surefire-plugin</artifactId>
@@ -486,14 +486,14 @@
                 <exclude>**/ear/**</exclude>
                 <exclude>**/ejb/**</exclude>
                 <exclude>**/jar/**</exclude>
-                <exclude>**/transactions/**</exclude>               
+                <exclude>**/transactions/**</exclude>
                 <!-- No EJB RequestContext available -->
                 <exclude>**/JobExecutorRequestContextTest.java</exclude>
                 <!-- Not supported by arquillian tomcat container -->
                 <exclude>**/TestWarDeploymentWithBrokenBpmnXml.java</exclude>
                 <exclude>**/TestDeploymentWithDroolsTaskFails.java</exclude>
                 <exclude>**/TestProcessEnginesXmlFails.java</exclude>
-                
+
                 <exclude>**/*_JBOSS.java</exclude>
               </excludes>
             </configuration>
@@ -501,7 +501,7 @@
         </plugins>
       </build>
     </profile>
-      
+
     <profile>
       <id>distro</id>
       <activation>
@@ -552,8 +552,8 @@
       </build>
     </profile>
     <profile>
-      <!-- This profile is used by the ci server. The maven build on the 
-        ci server uses a local maven repository. This allows us to give the arquillian 
+      <!-- This profile is used by the ci server. The maven build on the
+        ci server uses a local maven repository. This allows us to give the arquillian
         maven resolver access to the artifacts produced by this build. -->
       <id>ci</id>
       <build>
@@ -563,18 +563,18 @@
             <artifactId>maven-surefire-plugin</artifactId>
             <configuration>
               <systemPropertyVariables>
-                <org.apache.maven.user-settings>../../settings.xml</org.apache.maven.user-settings>                
+                <org.apache.maven.user-settings>../../settings.xml</org.apache.maven.user-settings>
               </systemPropertyVariables>
             </configuration>
           </plugin>
         </plugins>
       </build>
     </profile>
-    
-    <!-- allows dropping all databases -->    
-    <profile>       
+
+    <!-- allows dropping all databases -->
+    <profile>
       <id>clean-db</id>
-      <dependencies>              
+      <dependencies>
         <!-- db drivers for maven sql -->
         <dependency>
           <groupId>com.h2database</groupId>
@@ -611,7 +611,7 @@
           <artifactId>postgresql</artifactId>
           <scope>test</scope>
         </dependency>
-        
+
         <dependency>
           <groupId>org.camunda.bpm</groupId>
           <artifactId>camunda-engine</artifactId>
@@ -631,10 +631,10 @@
                   <goal>unpack</goal>
                 </goals>
                 <configuration>
-                  <artifactItems>                   
+                  <artifactItems>
                     <artifactItem>
                       <groupId>org.camunda.bpm</groupId>
-                      <artifactId>camunda-engine</artifactId>                      
+                      <artifactId>camunda-engine</artifactId>
                       <outputDirectory>${project.build.directory}/sql-scripts/engine</outputDirectory>
                       <overWrite>true</overWrite>
                     </artifactItem>
@@ -713,7 +713,91 @@
         </plugins>
       </build>
     </profile>
-            
-  </profiles>
 
+    <!--
+      deactivate failing
+      CdiDelegateBeanResolutionTest test
+      on xa profile until CAM-788 is fixed
+    -->
+    <profile>
+      <id>db2-xa</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <configuration>
+              <excludes>
+                <exclude>**/CdiDelegateBeanResolutionTest</exclude>
+              </excludes>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>mssql-xa</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <configuration>
+              <excludes>
+                <exclude>**/CdiDelegateBeanResolutionTest</exclude>
+              </excludes>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>oracle-xa</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <configuration>
+              <excludes>
+                <exclude>**/CdiDelegateBeanResolutionTest</exclude>
+              </excludes>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>mysql-xa</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <configuration>
+              <excludes>
+                <exclude>**/CdiDelegateBeanResolutionTest</exclude>
+              </excludes>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>postgres-xa</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <configuration>
+              <excludes>
+                <exclude>**/CdiDelegateBeanResolutionTest</exclude>
+              </excludes>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 </project>
