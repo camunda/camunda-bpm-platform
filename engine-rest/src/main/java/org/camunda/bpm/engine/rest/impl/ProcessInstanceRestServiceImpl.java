@@ -30,12 +30,10 @@ import org.camunda.bpm.engine.rest.dto.DeleteEngineEntityDto;
 import org.camunda.bpm.engine.rest.dto.PatchVariablesDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceQueryDto;
-import org.camunda.bpm.engine.rest.dto.runtime.SignalProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.runtime.VariableListDto;
 import org.camunda.bpm.engine.rest.dto.runtime.VariableValueDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
-import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 
@@ -226,30 +224,4 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
 	}
   }
 
-  @Override
-  public void signalProcessInstance(String processInstanceId, SignalProcessInstanceDto parameter) {
-	
-	try {
-		RuntimeService runtimeService = getProcessEngine().getRuntimeService();
-		String activityId = parameter.getActivityId();
-		
-		if (activityId != null && activityId.length() > 0) {
-		
-		  Execution execution = runtimeService.createExecutionQuery()
-				  .processInstanceId(processInstanceId)
-				  .activityId(activityId)
-				  .singleResult();
-		  
-		  if (parameter.getVariables() != null) {
-		    runtimeService.signal(execution.getId(), parameter.getVariables());
-		  } else {
-			  runtimeService.signal(execution.getId());  
-		  }
-		} else {
-			throw new InvalidRequestException(Status.BAD_REQUEST, "Parameter activityId is missing");
-		}
-	} catch (ProcessEngineException e){
-		throw new InvalidRequestException(Status.NOT_FOUND, e, "Process instance with id " + processInstanceId + " does not exist");
-	}
-  }
 }

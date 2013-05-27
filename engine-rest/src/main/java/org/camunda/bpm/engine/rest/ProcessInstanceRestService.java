@@ -32,7 +32,6 @@ import org.camunda.bpm.engine.rest.dto.DeleteEngineEntityDto;
 import org.camunda.bpm.engine.rest.dto.PatchVariablesDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceQueryDto;
-import org.camunda.bpm.engine.rest.dto.runtime.SignalProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.runtime.VariableListDto;
 import org.camunda.bpm.engine.rest.dto.runtime.VariableValueDto;
 import org.camunda.bpm.engine.rest.http.PATCH;
@@ -123,10 +122,5 @@ public interface ProcessInstanceRestService {
   @PUT
   @Path("/{id}/activate")
   void activateProcessInstance(@PathParam("id") String processInstanceId);
-  
-  @PUT
-  @Path("/{id}/signal")
-  @Consumes(MediaType.APPLICATION_JSON)
-  void signalProcessInstance(@PathParam("id") String processInstanceId, SignalProcessInstanceDto parameter);
 
 }
