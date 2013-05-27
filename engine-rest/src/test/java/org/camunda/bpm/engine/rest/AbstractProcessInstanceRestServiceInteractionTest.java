@@ -207,9 +207,9 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
     
     List<Map<String, Object>> modifications = new ArrayList<Map<String, Object>>();
     Map<String, Object> variable = new HashMap<String, Object>();
-    variable.put("aKey", "aStringValue");
-    variable.put("anotherKey", 123);
-    variable.put("aThirdValue", false);
+    variable.put("name", "aKey");
+    variable.put("value", 123);
+    variable.put("type", "Integer");
     
     messageBodyJson.put("modifications", modifications);
     
@@ -330,7 +330,7 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
   }
   
   @Test
-  public void testDeleteariableForNonExistingInstance() {
+  public void testDeleteVariableForNonExistingInstance() {
     String variableKey = "aVariableKey";
     
     doThrow(new ProcessEngineException("expected exception"))

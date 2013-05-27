@@ -52,35 +52,43 @@ public interface ProcessDefinitionRestService {
    * @return
    */
 	@GET
+  @Produces(MediaType.APPLICATION_JSON)
 	List<ProcessDefinitionDto> getProcessDefinitions(@Context UriInfo uriInfo,
 	    @QueryParam("firstResult") Integer firstResult, @QueryParam("maxResults") Integer maxResults);
 
 	@GET
   @Path("/count")
+  @Produces(MediaType.APPLICATION_JSON)
   CountResultDto getProcessDefinitionsCount(@Context UriInfo uriInfo);
 
 	@GET
 	@Path("/{id}")
+  @Produces(MediaType.APPLICATION_JSON)
 	ProcessDefinitionDto getProcessDefinition(@PathParam("id") String processDefinitionId);
 
 	@GET
 	@Path("/{id}/xml")
+  @Produces(MediaType.APPLICATION_JSON)
 	ProcessDefinitionDiagramDto getProcessDefinitionBpmn20Xml(@PathParam("id") String processDefinitionId);
 
 	@POST
 	@Path("/{id}/start")
 	@Consumes(MediaType.APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
 	ProcessInstanceDto startProcessInstance(@Context UriInfo context, @PathParam("id") String processDefinitionId, StartProcessInstanceDto parameters);
 
 	@GET
 	@Path("/statistics")
+  @Produces(MediaType.APPLICATION_JSON)
 	List<StatisticsResultDto> getStatistics(@QueryParam("failedJobs") Boolean includeFailedJobs);
 
 	@GET
 	@Path("/{id}/statistics")
-	List<StatisticsResultDto> getActivityStatistics(@PathParam("id") String processDefinitionId, @QueryParam("failedJobs") Boolean includeFailedJobs);
+  @Produces(MediaType.APPLICATION_JSON)
+  List<StatisticsResultDto> getActivityStatistics(@PathParam("id") String processDefinitionId, @QueryParam("failedJobs") Boolean includeFailedJobs);
 
   @GET
   @Path("/{id}/startForm")
+  @Produces(MediaType.APPLICATION_JSON)
   FormDto getStartForm(@PathParam("id") String processDefinitionId);
 }

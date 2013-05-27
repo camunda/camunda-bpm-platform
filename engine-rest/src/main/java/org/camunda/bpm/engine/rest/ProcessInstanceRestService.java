@@ -45,6 +45,7 @@ public interface ProcessInstanceRestService {
   
   @GET
   @Path("/{id}")
+  @Produces(MediaType.APPLICATION_JSON)
   ProcessInstanceDto getProcessInstance(@PathParam("id") String processInstanceId);
   
   @DELETE
@@ -61,6 +62,7 @@ public interface ProcessInstanceRestService {
    * @return
    */
   @GET
+  @Produces(MediaType.APPLICATION_JSON)
   List<ProcessInstanceDto> getProcessInstances(@Context UriInfo uriInfo,
       @QueryParam("firstResult") Integer firstResult,
       @QueryParam("maxResults") Integer maxResults);
@@ -77,17 +79,20 @@ public interface ProcessInstanceRestService {
    */
   @POST
   @Consumes(MediaType.APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
   List<ProcessInstanceDto> queryProcessInstances(ProcessInstanceQueryDto query,
       @QueryParam("firstResult") Integer firstResult,
       @QueryParam("maxResults") Integer maxResults);
 
   @GET
   @Path("/count")
+  @Produces(MediaType.APPLICATION_JSON)
   CountResultDto getProcessInstancesCount(@Context UriInfo uriInfo);
   
   @POST
   @Path("/count")
   @Consumes(MediaType.APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
   CountResultDto queryProcessInstancesCount(ProcessInstanceQueryDto query);
 
   @GET

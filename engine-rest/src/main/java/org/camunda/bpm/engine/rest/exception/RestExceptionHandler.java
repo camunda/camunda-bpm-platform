@@ -6,6 +6,7 @@ import java.io.Writer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
@@ -30,9 +31,9 @@ public class RestExceptionHandler implements ExceptionMapper<RestException> {
     LOGGER.log(Level.WARNING, getStackTrace(exception));
     
     if (exception.getStatus() != null) {
-      return Response.status(exception.getStatus()).entity(dto).build();
+      return Response.status(exception.getStatus()).entity(dto).type(MediaType.APPLICATION_JSON_TYPE).build();
     } else {
-      return Response.serverError().entity(dto).build();
+      return Response.serverError().entity(dto).type(MediaType.APPLICATION_JSON_TYPE).build();
     }
   }
   

@@ -39,6 +39,10 @@ public class VariableListDto {
   
   public Map<String, Object> toMap() {
     Map<String, Object> variablesMap = new HashMap<String, Object>();
+    if (variables == null) {
+      return variablesMap;
+    }
+    
     for (VariableValueDto variable : variables) {
       variablesMap.put(variable.getName(), variable.getValue());
     }
