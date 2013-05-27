@@ -34,7 +34,7 @@ public class AbstractEngineAware {
 
   /**
    * Creates a engine aware instance for the given engine
-   * 
+   *
    * @param engineName
    */
   public AbstractEngineAware(String engineName) {
@@ -47,7 +47,7 @@ public class AbstractEngineAware {
    *
    * @return
    */
-  public CommandExecutor getCommandExecutor() {
+  protected CommandExecutor getCommandExecutor() {
     return Cockpit.getCommandExecutor(engineName);
   }
 
@@ -57,7 +57,7 @@ public class AbstractEngineAware {
    *
    * @return
    */
-  public QueryService getQueryService() {
+  protected QueryService getQueryService() {
     return Cockpit.getQueryService(engineName);
   }
 
@@ -67,7 +67,7 @@ public class AbstractEngineAware {
    *
    * @return the process engine
    */
-  public ProcessEngine getProcessEngine() {
+  protected ProcessEngine getProcessEngine() {
     return Cockpit.getProcessEngine(engineName);
   }
 }
