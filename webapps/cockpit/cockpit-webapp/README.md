@@ -24,10 +24,11 @@ Run tests via `mvn clean test`.
 
 > Requires [NodeJS](http://nodejs.org/) and [karma](http://karma-runner.github.com).
 >
-> Install karma + dependencies via `npm update --dev`.
+> Install karma `npm -g install karma@canary` + dependencies `npm install --dev` (update using `npm update --dev`).
 >
-> Additionally paths to browser runtimes may need to be defined in environment variables
-> (<code>PHANTOMJS_BIN</code>, <code>FIREFOX_BIN</code>, <code>CHROME_BIN</code>).
+> Additionally paths to browser runtimes may need to be defined in environment variables:
+> <code>PHANTOMJS_BIN</code>, <code>FIREFOX_BIN</code>, <code>CHROME_BIN</code>.
 
 Run unit tests via `karma start src/test/js/config/karma.unit.js`.
+
 Run end-to-end tests via `karma start src/test/js/config/karma.e2e.js` (requires dev environment to be running).
