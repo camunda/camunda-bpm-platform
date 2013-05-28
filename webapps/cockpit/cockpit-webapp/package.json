@@ -1,0 +1,14 @@
+{
+  "name": "cockpit-webapp",
+  "version": "1.0.0",
+  "devDependencies": {
+    "karma": "~0.9.2",
+    "karma-chrome-launcher": "0.0.1",
+    "karma-coffee-preprocessor": "0.0.1",
+    "karma-firefox-launcher": "0.0.1",
+    "karma-jasmine": "0.0.1",
+    "karma-ng-scenario": "0.0.1",
+    "karma-phantomjs-launcher": "0.0.1",
+    "karma-requirejs": "0.0.1"
+  }
+}
