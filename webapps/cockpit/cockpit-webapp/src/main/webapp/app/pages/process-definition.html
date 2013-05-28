@@ -29,8 +29,9 @@
     </div>
   </div>
   
-  <div class="right-panel" fill-height fill-width>
-    <div process-diagram id="processDiagram"></div>
+  <div class="right-panel" fill-width fill-height style="overflow: auto;">
+    <div process-diagram id="processDiagram" style="height: 600px;"></div>
+    <plugin ref="processInstanceTable" vars="processDefinitionLatestVersionCount" />
   </div>
 
 </div>

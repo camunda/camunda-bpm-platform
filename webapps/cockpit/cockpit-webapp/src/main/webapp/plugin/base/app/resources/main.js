@@ -1,5 +1,6 @@
 ngDefine('cockpit.plugin.base.resources', [
-  './processDefinition'
+  './processDefinition',
+  './processInstance'
 ], function(module) {
 
 });

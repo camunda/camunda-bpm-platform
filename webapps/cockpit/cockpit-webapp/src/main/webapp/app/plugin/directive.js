@@ -38,10 +38,10 @@ define([ "angular", "jquery"], function(angular, $) {
 
         scope.$on('$includeContentLoaded', function(event) {
           
-          var vars = scope.vars, 
-              varsRead = vars.read || [], 
-              varsWrite = vars.write || [], 
-              targetScope = event.targetScope;
+          var vars = scope.vars; 
+          var varsRead = vars.read || []; 
+          var varsWrite = vars.write || [];
+          var targetScope = event.targetScope;
           
           // establish binding from outer scope to include scope
           exportVars(targetScope.$parent.$parent, targetScope, varsRead);

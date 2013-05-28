@@ -4,7 +4,7 @@ define(["angular"], function(angular) {
   
   var module = angular.module("cockpit.pages");
 
-  var Controller = function ($scope, ProcessDefinitionResource, Plugins, FOO) {
+  var Controller = function ($scope, ProcessDefinitionResource, Plugins) {
     
     $scope.orderByPredicate = 'definition.name';
     $scope.orderByReverse = false;
