@@ -50,8 +50,8 @@ public class ClientPluginsFilter implements Filter {
   // accepts two times the plugin name
   private static final String PLUGIN_DEPENDENCY_FORMAT = "'module:cockpit.plugin.%s:cockpit-plugin-%s'";
 
-  private final String PLUGIN_DEPENDENCIES = "PLUGIN_DEPENDENCIES";
-  private final String PLUGIN_PACKAGES = "PLUGIN_PACKAGES";
+  private final String PLUGIN_DEPENDENCIES = "window.PLUGIN_DEPENDENCIES";
+  private final String PLUGIN_PACKAGES = "window.PLUGIN_PACKAGES";
 
   private FilterConfig filterConfig;
 
