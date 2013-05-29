@@ -1,5 +1,6 @@
 ngDefine('cockpit.plugin.base.pages', [
-  './dashboardProcessDefinitionController'
+  './dashboardProcessDefinitionController',
+  './processInstanceController'
 ], function(module) {
 
 });

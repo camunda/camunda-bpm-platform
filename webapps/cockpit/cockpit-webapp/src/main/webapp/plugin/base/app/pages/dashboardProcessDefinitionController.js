@@ -61,4 +61,6 @@ ngDefine('cockpit.plugin.base.pages', function(module) {
   module
     .config(PluginConfiguration);
 
+  return module;
+  
 });

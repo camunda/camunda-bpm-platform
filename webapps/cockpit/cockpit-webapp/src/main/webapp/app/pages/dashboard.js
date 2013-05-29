@@ -10,7 +10,7 @@ define(['angular'], function(angular) {
     $scope.orderByReverse = false;
 
     $scope.dashboardProvider = Views.getProvider({ component: 'cockpit.dashboard'});
-    
+
     ProcessDefinitionResource.queryStatistics(function(data){
       $scope.statistics = getStatisticsResult(data);
     });
