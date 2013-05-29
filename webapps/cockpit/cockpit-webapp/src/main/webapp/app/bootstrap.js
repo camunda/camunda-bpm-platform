@@ -2,9 +2,9 @@
  * bootstrap script of the cockpit application
  */
 
-(function(document, require) {
+(function(document, window, require) {
 
-  var pluginPackages = PLUGIN_PACKAGES || [];
+  var pluginPackages = window.PLUGIN_PACKAGES || [];
 
   require({
     baseUrl: '../',
@@ -73,4 +73,4 @@
     });
   });
 
-})(document, require);
+})(document, window || this, require);

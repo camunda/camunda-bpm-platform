@@ -13,6 +13,8 @@
 package org.camunda.bpm.engine.impl.jobexecutor;
 
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.cmd.ExecuteJobsCmd;
@@ -25,6 +27,8 @@ import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
  * @author Daniel Meyer
  */
 public class ExecuteJobsRunnable implements Runnable {
+  
+  private final static Logger LOGG = Logger.getLogger(ExecuteJobsRunnable.class.getName());
 
   protected final List<String> jobIds;
   protected JobExecutor jobExecutor;
@@ -57,15 +61,21 @@ public class ExecuteJobsRunnable implements Runnable {
     Context.setJobExecutorContext(jobExecutorContext);
     try {
       while (!currentProcessorJobQueue.isEmpty()) {
+        
         String nextJobId = currentProcessorJobQueue.remove(0);
-        executeJob(nextJobId, commandExecutor);        
+        try {
+          executeJob(nextJobId, commandExecutor);        
+        } catch(Throwable t) {
+          LOGG.log(Level.WARNING, "Execption while executing job with id "+nextJobId, t);
+        }
+        
       }      
     }finally {
       Context.removeJobExecutorContext();
     }
   }
   
-  protected void executeJob(String nextJobId, CommandExecutor commandExecutor) {
+  protected void executeJob(String nextJobId, CommandExecutor commandExecutor) {    
     commandExecutor.execute(new ExecuteJobsCmd(nextJobId));
   }
   

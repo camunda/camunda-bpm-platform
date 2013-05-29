@@ -324,12 +324,6 @@
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-failsafe-plugin</artifactId>
-            <configuration>
-              <excludes>
-                <!-- CAM-787 -->
-                <exclude>**/RestIT</exclude>
-              </excludes>
-            </configuration>
           </plugin>
         </plugins>
       </build>
@@ -348,7 +342,8 @@
           <artifactId>camunda-qa-glassfish-runtime</artifactId>
           <version>${project.version}</version>
           <type>pom</type>
-        </dependency>
+        </dependency>   
+        
         <dependency>
           <groupId>org.camunda.bpm.cycle</groupId>
           <artifactId>camunda-cycle-glassfish</artifactId>
@@ -356,14 +351,15 @@
           <type>war</type>
           <scope>test</scope>
         </dependency>
-
+        
         <dependency>
           <groupId>org.camunda.bpm</groupId>
           <artifactId>camunda-engine-rest</artifactId>
-          <scope>test</scope>
-          <type>war</type>
           <version>${project.version}</version>
+          <type>war</type>
+          <scope>test</scope>
         </dependency>
+             
       </dependencies>
 
       <build>
@@ -420,7 +416,7 @@
                 <type>existing</type>
                 <home>${glassfish.runtime}/glassfish/domains</home>
                 <properties>
-                  <cargo.servlet.port>${glassfish.http.port}</cargo.servlet.port>
+                  <cargo.servlet.port>${http.port}</cargo.servlet.port>
                   <cargo.glassfish.adminPort>${glassfish.admin.port}</cargo.glassfish.adminPort>
                   <cargo.glassfish.domain.name>domain1</cargo.glassfish.domain.name>
                   <cargo.remote.username>admin</cargo.remote.username>
@@ -432,7 +428,7 @@
                   <groupId>org.camunda.bpm.cycle</groupId>
                   <artifactId>camunda-cycle-glassfish</artifactId>
                   <type>war</type>
-                  <pingURL>http://localhost:${glassfish.http.port}/cycle</pingURL>
+                  <pingURL>http://localhost:${http.port}/cycle</pingURL>
                   <properties>
                     <context>cycle</context>
                   </properties>
@@ -441,7 +437,7 @@
                   <groupId>org.camunda.bpm</groupId>
                   <artifactId>camunda-engine-rest</artifactId>
                   <type>war</type>
-                  <pingURL>http://localhost:${glassfish.http.port}/engine-rest/engine/default/process-definition</pingURL>
+                  <pingURL>http://localhost:${http.port}/engine-rest/engine/default/process-definition</pingURL>
                   <properties>
                     <context>engine-rest</context>
                   </properties>
@@ -450,7 +446,7 @@
                   <groupId>org.camunda.bpm.cockpit</groupId>
                   <artifactId>camunda-cockpit-glassfish</artifactId>
                   <type>war</type>
-                  <pingURL>http://localhost:${glassfish.http.port}/cockpit</pingURL>
+                  <pingURL>http://localhost:${http.port}/cockpit</pingURL>
                   <properties>
                     <context>cockpit</context>
                   </properties>
@@ -459,7 +455,7 @@
                   <groupId>org.camunda.bpm.tasklist</groupId>
                   <artifactId>camunda-tasklist-glassfish</artifactId>
                   <type>war</type>
-                  <pingURL>http://localhost:${glassfish.http.port}/tasklist</pingURL>
+                  <pingURL>http://localhost:${http.port}/tasklist</pingURL>
                   <properties>
                     <context>tasklist</context>
                   </properties>
