@@ -38,7 +38,7 @@ public class EmailServiceTaskTest extends PluggableProcessEngineTestCase {
   protected void setUp() throws Exception {
     super.setUp();
     wiser = new Wiser();
-    wiser.setPort(5025);
+    wiser.setPort(processEngineConfiguration.getMailServerPort());
     wiser.start();
   }
   
