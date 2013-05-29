@@ -29,7 +29,8 @@ public class BasePlugin extends AbstractCockpitPlugin {
   public static final String ID = "base";
 
   private static final String[] MAPPING_FILES = {
-    "org/camunda/bpm/cockpit/plugin/base/queries/processDefinition.xml"
+    "org/camunda/bpm/cockpit/plugin/base/queries/processDefinition.xml",
+    "org/camunda/bpm/cockpit/plugin/base/queries/processInstance.xml"
   };
 
   @Override

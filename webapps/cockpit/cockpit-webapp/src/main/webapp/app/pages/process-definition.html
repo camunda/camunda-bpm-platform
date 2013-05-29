@@ -1,14 +1,14 @@
 <div class="panel-page" page-overflow-hidden>
 
   <div class="left-panel well" fill-height>
-  
+
     <div hide-panel></div>
-    
+
     <div class="page-header">
       <h1 ngm-if="!!processDefinition.name">{{ processDefinition.name }}</h1>
       <h1 ngm-if="!processDefinition.name">{{ processDefinition.key }}</h1>
     </div>
-    
+
     <div>
       <table>
         <tbody>
@@ -28,9 +28,10 @@
       </table>
     </div>
   </div>
-  
-  <div class="right-panel" fill-height fill-width>
-    <div process-diagram id="processDiagram"></div>
+
+  <div class="right-panel" fill-width fill-height style="overflow: auto;">
+    <div process-diagram id="processDiagram" style="height: 600px;"></div>
+    <view provider="processInstanceTable" vars="processDefinitionLatestVersionCount" />
   </div>
 
 </div>

@@ -7,23 +7,23 @@ ngDefine('cockpit.plugin.base.pages', function(module) {
         function(data){
           $scope.statistics = getStatisticsResult(data);
     });
-    
+
     var getStatisticsResult = function(statistics) {
       var statisticsResult = [];
       var result = [];
-      
+
       angular.forEach(statistics, function (currentStatistic) {
         var statistic = statisticsResult[currentStatistic.definition.key];
-        
+
         if (!statistic) {
           statistic = angular.copy(currentStatistic);
           if (!statistic.definition.name) {
             statistic.definition.name = statistic.definition.key;
           }
           statisticsResult[statistic.definition.key] = statistic;
-          
+
           result.push(statistic);
-          
+
         } else {
           if (currentStatistic.definition.version > statistic.definition.version) {
             var currentInstances = statistic.instances;
@@ -37,18 +37,18 @@ ngDefine('cockpit.plugin.base.pages', function(module) {
           }
         }
       });
-      
+
       return result;
-    };  
+    };
 
   };
 
   Controller.$inject = ["$scope", "ProcessDefinitionResource"];
+  
 
+  var PluginConfiguration = function PluginConfiguration(ViewsProvider) {
 
-  var PluginConfiguration = function PluginConfiguration(PluginsProvider) {
-
-    PluginsProvider.registerDefaultPlugin('cockpit.dashboard', {
+    ViewsProvider.registerDefaultView('cockpit.dashboard', {
       id: 'process-definitions',
       label: 'Deployed Processes',
       url: 'plugin://base/static/app/pages/dashboard-process-definitions.html',
@@ -56,9 +56,11 @@ ngDefine('cockpit.plugin.base.pages', function(module) {
     });
   };
 
-  PluginConfiguration.$inject = ['PluginsProvider'];
+  PluginConfiguration.$inject = [ 'ViewsProvider' ];
 
   module
     .config(PluginConfiguration);
 
+  return module;
+  
 });
