@@ -104,15 +104,6 @@ public class IncidentEntity implements Incident, PersistentObject {
   }
   
   public void delete(ExecutionEntity execution) {
-    // delete this incident
-    Context
-      .getCommandContext()
-      .getDbSqlSession()
-      .delete(this);
-    
-    // remove link to execution
-    execution.removeIncident(this);
-    
     // Extract possible super execution of the assigned execution
     ExecutionEntity superExecution = null;
     if (execution.getId().equals(execution.getProcessInstanceId())) {
@@ -130,6 +121,14 @@ public class IncidentEntity implements Incident, PersistentObject {
         incident.delete(superExecution);
       }
     }
+    // delete this incident
+    Context
+      .getCommandContext()
+      .getDbSqlSession()
+      .delete(this);
+    
+    // remove link to execution
+    execution.removeIncident(this);
   }
   
   public String getId() {

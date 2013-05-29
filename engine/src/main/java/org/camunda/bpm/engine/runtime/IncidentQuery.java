@@ -18,6 +18,9 @@ import org.camunda.bpm.engine.query.Query;
  * @author roman.smirnov
  */
 public interface IncidentQuery extends Query<IncidentQuery, Incident> {
+
+  /** Only select incidents which have the given id. **/
+  IncidentQuery id(String id);
   
   /** Only select incidents which have the given incident type. **/
   IncidentQuery incidentType(String incidentType);
@@ -35,8 +38,8 @@ public interface IncidentQuery extends Query<IncidentQuery, Incident> {
   IncidentQuery activityId(String activityId);
 
   /** Only select incidents which contain the id of the cause incident. **/
-  IncidentQuery causeId(String causeId);
+  IncidentQuery causeIncidentId(String causeIncidentId);
 
   /** Only select incidents which contain the id of the root cause incident. **/
-  IncidentQuery rootCauseId(String causeId);
+  IncidentQuery rootCauseIncidentId(String rootCauseIncidentId);
 }

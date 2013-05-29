@@ -20,17 +20,21 @@ import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.IncidentQuery;
 
+/**
+ * @author roman.smirnov
+ */
 public class IncidentQueryImpl extends AbstractQuery<IncidentQuery, Incident> implements IncidentQuery, Serializable {
 
   private static final long serialVersionUID = 1L;
-  
+
+  protected String id;
   protected String incidentType;
   protected String executionId;
   protected String activityId;
   protected String processInstanceId;
   protected String processDefinitionId;
-  protected String causeId;
-  protected String rootCauseId;
+  protected String causeIncidentId;
+  protected String rootCauseIncidentId;
   
   public IncidentQueryImpl() {
   }
@@ -42,14 +46,14 @@ public class IncidentQueryImpl extends AbstractQuery<IncidentQuery, Incident> im
   public IncidentQueryImpl(CommandExecutor commandExecutor) {
     super(commandExecutor);
   }
-
-  public IncidentQuery processDefinitionId(String processDefinitionId) {
-    this.processDefinitionId = processDefinitionId;
+  
+  public IncidentQuery id(String id) {
+    this.id = id;
     return this;
   }
-
-  public IncidentQuery processInstanceId(String processInstanceId) {
-    this.processInstanceId = processInstanceId;
+  
+  public IncidentQuery incidentType(String incidentType) {
+    this.incidentType = incidentType;
     return this;
   }
 
@@ -57,65 +61,44 @@ public class IncidentQueryImpl extends AbstractQuery<IncidentQuery, Incident> im
     this.executionId = executionId;
     return this;
   }
-
+  
   public IncidentQuery activityId(String activityId) {
     this.activityId = activityId;
     return this;
   }
 
-  public IncidentQuery causeId(String causeId) {
-    this.causeId = causeId;
+  public IncidentQuery processInstanceId(String processInstanceId) {
+    this.processInstanceId = processInstanceId;
+    return this;
+  }
+  
+  public IncidentQuery processDefinitionId(String processDefinitionId) {
+    this.processDefinitionId = processDefinitionId;
     return this;
   }
 
-  public IncidentQuery rootCauseId(String rootCauseId) {
-    this.rootCauseId = rootCauseId;
+  public IncidentQuery causeIncidentId(String causeIncidentId) {
+    this.causeIncidentId = causeIncidentId;
     return this;
   }
 
-  public IncidentQuery incidentType(String incidentType) {
-    this.incidentType = incidentType;
+  public IncidentQuery rootCauseIncidentId(String rootCauseIncidentId) {
+    this.rootCauseIncidentId = rootCauseIncidentId;
     return this;
   }
 
   public long executeCount(CommandContext commandContext) {
-    // TODO Auto-generated method stub
-    return 0;
+    checkQueryOk();
+    return commandContext
+      .getIncidentManager()
+      .findIncidentCountByQueryCriteria(this);
   }
 
   public List<Incident> executeList(CommandContext commandContext, Page page) {
-    // TODO Auto-generated method stub
-    return null;
-  }
-  
-  public List<Incident> listPage(int firstResult, int maxResults) {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  public IncidentQuery asc() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  public IncidentQuery desc() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  public long count() {
-    // TODO Auto-generated method stub
-    return 0;
-  }
-
-  public Incident singleResult() {
-    // TODO Auto-generated method stub
-    return null;
-  }
-
-  public List<Incident> list() {
-    // TODO Auto-generated method stub
-    return null;
+    checkQueryOk();
+    return commandContext
+      .getIncidentManager()
+      .findIncidentByQueryCriteria(this, page);
   }
 
 }

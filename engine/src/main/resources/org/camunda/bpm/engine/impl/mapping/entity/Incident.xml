@@ -51,4 +51,47 @@
     where I.EXECUTION_ID_ = #{parameter}
   </select>
   
+  <select id="selectIncidentByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.IncidentQueryImpl" resultMap="incidentResultMap">
+    ${limitBefore}
+    select RES.* ${limitBetween}
+    <include refid="selectIncidentByQueryCriteriaSql"/>
+    ${orderBy}
+    ${limitAfter}
+  </select>
+
+  <select id="selectIncidentCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.IncidentQueryImpl" resultType="long">
+    select count(distinct RES.ID_)
+    <include refid="selectIncidentByQueryCriteriaSql"/>
+  </select>
+  
+  <sql id="selectIncidentByQueryCriteriaSql">
+    from ${prefix}ACT_RU_INCIDENT RES
+    <where>
+      <if test="id != null">
+        RES.ID_ = #{id}
+      </if>
+      <if test="incidentType != null">
+        and RES.INCIDENT_TYPE_ = #{incidentType}
+      </if>
+      <if test="executionId != null">
+        and RES.EXECUTION_ID_ = #{executionId}
+      </if>
+      <if test="activityId != null">
+        and RES.ACTIVITY_ID_ = #{activityId}
+      </if>
+      <if test="processInstanceId != null">
+        and RES.PROC_INST_ID_ = #{processInstanceId}
+      </if>
+      <if test="processDefinitionId != null">
+        and RES.PROC_DEF_ID_ = #{processDefinitionId}
+      </if>
+      <if test="causeIncidentId != null">
+        and RES.CAUSE_INCIDENT_ID_ = #{causeIncidentId}
+      </if>
+      <if test="rootCauseIncidentId != null">
+        and RES.ROOT_CAUSE_INCIDENT_ID_ = #{rootCauseIncidentId}
+      </if>
+    </where>
+  </sql>
+  
 </mapper>

@@ -14,6 +14,8 @@ package org.camunda.bpm.engine.impl.persistence.entity;
 
 import java.util.List;
 
+import org.camunda.bpm.engine.impl.IncidentQueryImpl;
+import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 import org.camunda.bpm.engine.runtime.Incident;
 
@@ -25,6 +27,15 @@ public class IncidentManager extends AbstractManager {
   @SuppressWarnings("unchecked")
   public List<Incident> findIncidentsByExecution(String id) {
     return getDbSqlSession().selectList("selectIncidentsByExecutionId", id);
+  }
+  
+  public long findIncidentCountByQueryCriteria(IncidentQueryImpl jobQuery) {
+    return (Long) getDbSqlSession().selectOne("selectIncidentCountByQueryCriteria", jobQuery);
+  }
+  
+  @SuppressWarnings("unchecked")
+  public List<Incident> findIncidentByQueryCriteria(IncidentQueryImpl jobQuery, Page page) {
+    return getDbSqlSession().selectList("selectIncidentByQueryCriteria", jobQuery, page);
   }
 
 }
