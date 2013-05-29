@@ -12,11 +12,13 @@
       'ngDefine' : 'main/webapp/assets/vendor/requirejs-angular-define/ngDefine',
       'jquery' : 'main/webapp/assets/vendor/jquery-1.7.2.min',
       'angular' : 'main/webapp/assets/vendor/angular/angular',
-      'angular-resource' : 'main/webapp/assets/vendor/angular/angular-resource'
+      'angular-resource' : 'main/webapp/assets/vendor/angular/angular-resource',
+      'angular-mocks': 'test/js/lib/angular/angular-mocks'
     },
     shim: {
       'angular' : { deps: [ 'jquery' ], exports: 'angular' },
-      'angular-resource': { deps: [ 'angular' ] }
+      'angular-resource': { deps: [ 'angular' ] },
+      'angular-mocks': { deps: [ 'angular' ] }
     },
     packages: [
       { name: 'cockpit', location: 'main/webapp/app', main: 'cockpit' },
@@ -35,7 +37,18 @@
     }
   }
 
-  require([ 'angular', 'angular-resource', 'ngDefine' ], function(angular) {
+  require([
+    'angular',
+    'jquery',
+    'angular-resource',
+    'angular-mocks',
+    'ngDefine' ], function(angular, $) {
+
+    window._jQuery = $;
+    window._jqLiteMode = false;
+
+    tests.unshift('/base/test/js/unit/testabilityPatch.js');
+    
     require(tests, function() {
       window.__karma__.start();
     });

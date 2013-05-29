@@ -10,12 +10,13 @@ var config = {
 
   files: [
     { pattern: 'main/webapp/**/*.js', included: false },
-    { pattern: 'test/js/unit/**Spec.js', included: false },
+    { pattern: 'test/js/unit/**/*.js', included: false },
+    { pattern: 'test/js/lib/**/*.js', included: false },
 
     'test/js/config/require-unit-bootstrap.js'
   ],
 
-  browsers: ["Chrome"], // "PhantomJS", "Firefox" ]; // ,
+  browsers: ["Chrome"], // "PhantomJS", "Firefox"
 
   autoWatch: true,
 
