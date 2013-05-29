@@ -64,12 +64,12 @@ public class JobExecutorCmdExceptionTest extends PluggableProcessEngineTestCase 
     commandExecutor.execute(new DeleteJobsCmd(jobId));
   }
   
-  public void testMixedFailingAndSucceedingJobs() {
-    tweetExceptionHandler.setExceptionsRemaining(62);
+  public void testMultipleFailingJobs() {
+    tweetExceptionHandler.setExceptionsRemaining(600);
     
     List<String> createdJobs = new ArrayList<String>();
 
-    // create 40 jobs: 20 of these fail and 20 pass.
+    // create 40 jobs
     for(int i = 0; i < 40; i++) {
       createdJobs.add(commandExecutor.execute(new Command<String>() {
   
@@ -83,9 +83,9 @@ public class JobExecutorCmdExceptionTest extends PluggableProcessEngineTestCase 
 
     waitForJobExecutorToProcessAllJobs(15000L, 50L);
     
-    // now there are 20 jobs with retries = 0:
+    // now there are 40 jobs with retries = 0:
     List<Job> jobList = managementService.createJobQuery().list();    
-    assertEquals(20, jobList.size());
+    assertEquals(40, jobList.size());
     
     for (Job job : jobList) {
       // all jobs have retries exhausted
