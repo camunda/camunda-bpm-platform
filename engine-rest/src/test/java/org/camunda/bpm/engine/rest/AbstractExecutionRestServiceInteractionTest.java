@@ -27,6 +27,7 @@ import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.helper.EqualsList;
 import org.camunda.bpm.engine.rest.helper.EqualsMap;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
+import org.camunda.bpm.engine.rest.util.RequestBodyUtil;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ExecutionQuery;
 import org.junit.Before;
@@ -88,11 +89,10 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
   public void testSignalExecution() {
     Map<String, Object> variablesJson = new HashMap<String, Object>();
     List<Map<String, Object>> variables = new ArrayList<Map<String, Object>>();
-    Map<String, Object> variable = new HashMap<String, Object>();
-    variable.put("name", "aKey");
-    variable.put("value", 123);
-    variable.put("type", "Integer");
-    variables.add(variable);
+    String variableKey = "aKey";
+    int variableValue = 123;
+    
+    variables.add(RequestBodyUtil.createVariableJsonObject(variableKey, variableValue));
     
     variablesJson.put("variables", variables);
     
@@ -101,7 +101,7 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
       .when().post(SIGNAL_EXECUTION_URL);
     
     Map<String, Object> expectedSignalVariables = new HashMap<String, Object>();
-    expectedSignalVariables.put("aKey", 123);
+    expectedSignalVariables.put(variableKey, variableValue);
     
     verify(runtimeServiceMock).signal(eq(MockProvider.EXAMPLE_EXECUTION_ID), argThat(new EqualsMap(expectedSignalVariables)));
   }
@@ -145,11 +145,10 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
     Map<String, Object> messageBodyJson = new HashMap<String, Object>();
     
     List<Map<String, Object>> modifications = new ArrayList<Map<String, Object>>();
-    Map<String, Object> variable = new HashMap<String, Object>();
-    variable.put("name", "aKey");
-    variable.put("value", 123);
-    variable.put("type", "Integer");
-    modifications.add(variable);
+    String variableKey = "aKey";
+    int variableValue = 123;
+    
+    modifications.add(RequestBodyUtil.createVariableJsonObject(variableKey, variableValue));
     
     messageBodyJson.put("modifications", modifications);
     
@@ -162,12 +161,11 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
       .when().post(EXECUTION_VARIABLES_URL);
     
     Map<String, Object> expectedModifications = new HashMap<String, Object>();
-    expectedModifications.put("aKey", 123);
+    expectedModifications.put(variableKey, variableValue);
     verify(runtimeServiceMock).updateVariablesLocal(eq(MockProvider.EXAMPLE_EXECUTION_ID), argThat(new EqualsMap(expectedModifications)), 
         argThat(new EqualsList(deletions)));
   }
   
-  // TODO how can this be green?
   @Test
   public void testVariableModificationForNonExistingExecution() {
     doThrow(new ProcessEngineException("expected exception")).when(runtimeServiceMock).updateVariablesLocal(anyString(), any(Map.class), any(List.class));
@@ -175,11 +173,10 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
     Map<String, Object> messageBodyJson = new HashMap<String, Object>();
     
     List<Map<String, Object>> modifications = new ArrayList<Map<String, Object>>();
-    Map<String, Object> variable = new HashMap<String, Object>();
-    variable.put("name", "aKey");
-    variable.put("value", 123);
-    variable.put("type", "Integer");
+    String variableKey = "aKey";
+    int variableValue = 123;
     
+    modifications.add(RequestBodyUtil.createVariableJsonObject(variableKey, variableValue));
     messageBodyJson.put("modifications", modifications);
     
     given().pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID).contentType(ContentType.JSON).body(messageBodyJson)
@@ -243,8 +240,7 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
     String variableKey = "aVariableKey";
     String variableValue = "aVariableValue";
     
-    Map<String, Object> variableJson = new HashMap<String, Object>();
-    variableJson.put("value", variableValue);
+    Map<String, Object> variableJson = RequestBodyUtil.createVariableJsonObject(null, variableValue);
     
     given().pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID).pathParam("varId", variableKey)
       .contentType(ContentType.JSON).body(variableJson)
@@ -273,8 +269,7 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
     String variableKey = "aVariableKey";
     String variableValue = "aVariableValue";
     
-    Map<String, Object> variableJson = new HashMap<String, Object>();
-    variableJson.put("value", variableValue);
+    Map<String, Object> variableJson = RequestBodyUtil.createVariableJsonObject(null, variableValue);
     
     doThrow(new ProcessEngineException("expected exception"))
       .when(runtimeServiceMock).setVariableLocal(eq(MockProvider.EXAMPLE_EXECUTION_ID), eq(variableKey), eq(variableValue));
@@ -321,15 +316,8 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
     String variableValue2 = "anotherVarValue";
     
     List<Map<String, Object>> variables = new ArrayList<Map<String, Object>>();
-    Map<String, Object> variable1 = new HashMap<String, Object>();
-    variable1.put("name", variableKey1);
-    variable1.put("value", variableValue1);
-    variables.add(variable1);
-    
-    Map<String, Object> variable2 = new HashMap<String, Object>();
-    variable2.put("name", variableKey2);
-    variable2.put("value", variableValue2);
-    variables.add(variable2);
+    variables.add(RequestBodyUtil.createVariableJsonObject(variableKey1, variableValue1));
+    variables.add(RequestBodyUtil.createVariableJsonObject(variableKey2, variableValue2));
     
     Map<String, Object> variablesJson = new HashMap<String, Object>();
     variablesJson.put("variables", variables);

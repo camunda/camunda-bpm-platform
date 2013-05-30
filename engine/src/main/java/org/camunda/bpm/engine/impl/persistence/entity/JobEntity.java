@@ -114,11 +114,12 @@ public abstract class JobEntity implements Serializable, Job, PersistentObject, 
       ExecutionEntity execution = Context.getCommandContext()
         .getExecutionManager()
         .findExecutionById(executionId);
-      execution.removeJob(this);
-      
-      if (retries == 0) {
-        removeFailedJobIncident();
-      }
+      execution.removeJob(this);    
+    }
+    
+    // if a job with retries == 0 is deleted this means that the corresponding incident is resolved.
+    if (retries == 0) {
+      removeFailedJobIncident();
     }
   }
 
@@ -167,8 +168,8 @@ public abstract class JobEntity implements Serializable, Job, PersistentObject, 
     IncidentHandler handler = Context
         .getProcessEngineConfiguration()
         .getIncidentHandler(FailedJobIncidentHandler.INCIDENT_HANDLER_TYPE);
-    
-    handler.resolveIncident(executionId, getId());
+            
+    handler.resolveIncident(null, null, executionId, id); 
   }
 
   public String getExceptionStacktrace() {

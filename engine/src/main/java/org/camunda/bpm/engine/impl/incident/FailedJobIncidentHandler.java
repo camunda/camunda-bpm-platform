@@ -15,7 +15,6 @@ package org.camunda.bpm.engine.impl.incident;
 import java.util.List;
 
 import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity;
 import org.camunda.bpm.engine.runtime.Incident;
 
@@ -27,26 +26,31 @@ public class FailedJobIncidentHandler implements IncidentHandler {
     return INCIDENT_HANDLER_TYPE;
   }
 
-  public void handleIncident(String executionId, String configuration) {
-    IncidentEntity.createAndInsertIncident(true, INCIDENT_HANDLER_TYPE, executionId, null, null, configuration);
-  }
-
-  public void resolveIncident(String executionId, String configuration) {
-    if (executionId != null && configuration != null) {
-      ExecutionEntity execution = Context.getCommandContext()
-          .getExecutionManager()
-          .findExecutionById(executionId);
-  
-      List<Incident> incidents = Context
-          .getCommandContext()
-          .getIncidentManager()
-          .findIncidentByConfiguration(configuration);
+  public void handleIncident(String processDefinitionId, String activityId, String executionId, String jobId) {
+    
+    if(executionId != null) {
+      IncidentEntity newIncident = IncidentEntity.createAndInsertIncident(INCIDENT_HANDLER_TYPE, executionId, jobId);
+      newIncident.createRecursiveIncidents();
       
-      for (Incident currentIncident : incidents) {
-        IncidentEntity incident = (IncidentEntity) currentIncident;
-        incident.delete(execution);
-      }
+    } else {      
+      IncidentEntity.createAndInsertIncident(INCIDENT_HANDLER_TYPE, processDefinitionId, activityId, jobId);
+      
     }
+    
+  }
+  
+  public void resolveIncident(String processDefinitionId, String activityId, String executionId, String jobId) {
+
+    List<Incident> incidents = Context
+        .getCommandContext()
+        .getIncidentManager()
+        .findIncidentByConfiguration(jobId);
+    
+    for (Incident currentIncident : incidents) {
+      IncidentEntity incident = (IncidentEntity) currentIncident;
+      incident.delete();
+    }
+        
   }
 
 }

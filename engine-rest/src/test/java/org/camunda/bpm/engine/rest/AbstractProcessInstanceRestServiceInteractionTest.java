@@ -28,6 +28,7 @@ import org.camunda.bpm.engine.rest.helper.EqualsList;
 import org.camunda.bpm.engine.rest.helper.EqualsMap;
 import org.camunda.bpm.engine.rest.helper.ExampleVariableObject;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
+import org.camunda.bpm.engine.rest.util.RequestBodyUtil;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.junit.Before;
@@ -166,14 +167,13 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
   
   @Test
   public void testVariableModification() {
+    String variableKey = "aKey";
+    int variableValue = 123;
+    
     Map<String, Object> messageBodyJson = new HashMap<String, Object>();
     
     List<Map<String, Object>> modifications = new ArrayList<Map<String, Object>>();
-    Map<String, Object> variable = new HashMap<String, Object>();
-    variable.put("name", "aKey");
-    variable.put("value", 123);
-    variable.put("type", "Integer");
-    modifications.add(variable);
+    modifications.add(RequestBodyUtil.createVariableJsonObject(variableKey, variableValue));
     
     messageBodyJson.put("modifications", modifications);
     
@@ -186,7 +186,7 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
       .when().post(PROCESS_INSTANCE_VARIABLES_URL);
     
     Map<String, Object> expectedModifications = new HashMap<String, Object>();
-    expectedModifications.put("aKey", 123);
+    expectedModifications.put(variableKey, variableValue);
     verify(runtimeServiceMock).updateVariables(eq(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID), argThat(new EqualsMap(expectedModifications)), 
         argThat(new EqualsList(deletions)));
   }
@@ -195,13 +195,13 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
   public void testVariableModificationForNonExistingProcessInstance() {
     doThrow(new ProcessEngineException("expected exception")).when(runtimeServiceMock).updateVariables(anyString(), any(Map.class), any(List.class));
     
+    String variableKey = "aKey";
+    int variableValue = 123;
+    
     Map<String, Object> messageBodyJson = new HashMap<String, Object>();
     
     List<Map<String, Object>> modifications = new ArrayList<Map<String, Object>>();
-    Map<String, Object> variable = new HashMap<String, Object>();
-    variable.put("name", "aKey");
-    variable.put("value", 123);
-    variable.put("type", "Integer");
+    modifications.add(RequestBodyUtil.createVariableJsonObject(variableKey, variableValue));
     
     messageBodyJson.put("modifications", modifications);
     

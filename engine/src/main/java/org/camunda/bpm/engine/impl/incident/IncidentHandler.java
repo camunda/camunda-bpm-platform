@@ -19,8 +19,8 @@ public interface IncidentHandler {
   
   public String getIncidentHandlerType();
   
-  public void handleIncident(String executionId, String configuration);
+  public void handleIncident(String processDefinitionId, String activityId, String executionId, String configuration);
   
-  public void resolveIncident(String executionId, String configuration);
+  public void resolveIncident(String processDefinitionId, String activityId, String executionId, String configuration);
 
 }
