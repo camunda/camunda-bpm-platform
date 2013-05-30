@@ -18,14 +18,16 @@ public class FailedJobIncidentHandler implements IncidentHandler {
 
   public final static String INCIDENT_HANDLER_TYPE = "failedJob";
   
-  @Override
   public String getIncidentHandlerType() {
     return INCIDENT_HANDLER_TYPE;
   }
 
-  @Override
-  public void handleIncident(boolean recursive, String executionId, String causeIncidentId, String rootCauseIncidentId, String configuration) {
-    IncidentEntity.createAndInsertIncident(recursive, INCIDENT_HANDLER_TYPE, executionId, causeIncidentId, rootCauseIncidentId, configuration);
+  public void handleIncident(String executionId, String configuration) {
+    IncidentEntity.createAndInsertIncident(true, INCIDENT_HANDLER_TYPE, executionId, null, null, configuration);
+  }
+
+  public void resolveIncident(String executionId, String configuration) {
+    // TODO:
   }
 
 }

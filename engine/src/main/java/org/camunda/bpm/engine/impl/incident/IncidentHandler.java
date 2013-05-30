@@ -19,6 +19,8 @@ public interface IncidentHandler {
   
   public String getIncidentHandlerType();
   
-  public void handleIncident(boolean recursive, String executionId, String causeIncidentId, String rootCauseIncidentId, String configuration);
+  public void handleIncident(String executionId, String configuration);
+  
+  public void resolveIncident(String executionId, String configuration);
 
 }
