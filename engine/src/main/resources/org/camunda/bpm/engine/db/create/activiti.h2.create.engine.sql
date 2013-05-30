@@ -142,6 +142,20 @@ create table ACT_RU_EVENT_SUBSCR (
     primary key (ID_)
 );
 
+create table ACT_RU_INCIDENT (
+  ID_ varchar(64) not null,
+  INCIDENT_TIMESTAMP_ timestamp not null,
+  INCIDENT_TYPE_ varchar(255) not null,
+  EXECUTION_ID_ varchar(64),
+  ACTIVITY_ID_ varchar(64),
+  PROC_INST_ID_ varchar(64),
+  PROC_DEF_ID_ varchar(64),
+  CAUSE_INCIDENT_ID_ varchar(64),
+  ROOT_CAUSE_INCIDENT_ID_ varchar(64),
+  CONFIGURATION_ varchar(255),
+  primary key (ID_)
+);
+
 create index ACT_IDX_EXEC_BUSKEY on ACT_RU_EXECUTION(BUSINESS_KEY_);
 create index ACT_IDX_TASK_CREATE on ACT_RU_TASK(CREATE_TIME_);
 create index ACT_IDX_IDENT_LNK_USER on ACT_RU_IDENTITYLINK(USER_ID_);
@@ -232,3 +246,28 @@ alter table ACT_RU_EVENT_SUBSCR
     add constraint ACT_FK_EVENT_EXEC
     foreign key (EXECUTION_ID_)
     references ACT_RU_EXECUTION;
+    
+alter table ACT_RU_INCIDENT
+    add constraint ACT_FK_INC_EXE 
+    foreign key (EXECUTION_ID_) 
+    references ACT_RU_EXECUTION (ID_);
+  
+alter table ACT_RU_INCIDENT
+    add constraint ACT_FK_INC_PROCINST 
+    foreign key (PROC_INST_ID_) 
+    references ACT_RU_EXECUTION (ID_);
+
+alter table ACT_RU_INCIDENT
+    add constraint ACT_FK_INC_PROCDEF 
+    foreign key (PROC_DEF_ID_) 
+    references ACT_RE_PROCDEF (ID_);  
+    
+alter table ACT_RU_INCIDENT
+    add constraint ACT_FK_INC_CAUSE 
+    foreign key (CAUSE_INCIDENT_ID_) 
+    references ACT_RU_INCIDENT (ID_);
+
+alter table ACT_RU_INCIDENT
+    add constraint ACT_FK_INC_RCAUSE 
+    foreign key (ROOT_CAUSE_INCIDENT_ID_) 
+    references ACT_RU_INCIDENT (ID_);
