@@ -1,4 +1,4 @@
-ngDefine('cockpit.filters', function(module) {
+ngDefine('cockpit.filters.shorten', function(module) {
 
   var ShortenFilter = function() {
     return function(input, length) {

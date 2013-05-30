@@ -11,21 +11,21 @@ import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 
 public class ProcessInstanceResource extends AbstractPluginResource {
-  
+
   public static final String PATH = "/process-instance";
 
   public ProcessInstanceResource(String engineName) {
     super(engineName);
   }
-  
+
   @GET
   public List<ProcessInstanceDto> getProcessInstances(@QueryParam("processDefinitionId") String processDefinitionId,
-      @QueryParam("firstResult") int firstResult, @QueryParam("offset") int offset) {
-    ProcessInstanceQueryParameter param = new ProcessInstanceQueryParameter(firstResult, offset);
+      @QueryParam("firstResult") int firstResult, @QueryParam("maxResults") int maxResults) {
+    ProcessInstanceQueryParameter param = new ProcessInstanceQueryParameter(firstResult, maxResults);
     param.setProcessDefinitionId(processDefinitionId);
+
+    ProcessEngineConfigurationImpl processEngineConfiguration = ((ProcessEngineImpl) getProcessEngine()).getProcessEngineConfiguration();
     
-    ProcessEngineConfigurationImpl processEngineConfiguration = ((ProcessEngineImpl) getProcessEngine())
-        .getProcessEngineConfiguration();
     if (processEngineConfiguration.getHistoryLevel() == 0) {
       param.setHistoryEnabled(false);
     }

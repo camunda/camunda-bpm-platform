@@ -3,6 +3,7 @@
   var cockpitCore = [
     'module:cockpit.pages:./pages/main',
     'module:cockpit.directives:./directives/main',
+    'module:cockpit.filters:./filters/main',
     'module:cockpit.resources:./resources/main',
     'module:cockpit.plugin:cockpit-plugin' ];
 

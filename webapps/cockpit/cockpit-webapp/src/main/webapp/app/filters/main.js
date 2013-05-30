@@ -1,5 +1,5 @@
 ngDefine('cockpit.filters', [
-  './shorten'
+  'module:cockpit.filters.shorten:./shorten'
 ], function(module) {
 
 });
