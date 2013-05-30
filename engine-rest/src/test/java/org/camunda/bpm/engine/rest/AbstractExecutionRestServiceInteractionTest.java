@@ -22,6 +22,7 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.RuntimeServiceImpl;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
+import org.camunda.bpm.engine.rest.helper.EqualsList;
 import org.camunda.bpm.engine.rest.helper.EqualsMap;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.runtime.Execution;
@@ -35,6 +36,7 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
 
   protected static final String EXECUTION_URL = TEST_RESOURCE_ROOT_PATH + "/execution/{id}";
   protected static final String SIGNAL_EXECUTION_URL = EXECUTION_URL + "/signal";
+  protected static final String EXECUTION_VARIABLES_URL = EXECUTION_URL + "/variables";
   
   private RuntimeServiceImpl runtimeServiceMock;
   
@@ -108,5 +110,61 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
       .body("message", equalTo("Cannot signal execution " + MockProvider.EXAMPLE_EXECUTION_ID + ": expected exception"))
       .when().post(SIGNAL_EXECUTION_URL);
   }
+  
+  @Test
+  public void testVariableModification() {
+    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
+    
+    List<Map<String, Object>> modifications = new ArrayList<Map<String, Object>>();
+    Map<String, Object> variable = new HashMap<String, Object>();
+    variable.put("name", "aKey");
+    variable.put("value", 123);
+    variable.put("type", "Integer");
+    modifications.add(variable);
+    
+    messageBodyJson.put("modifications", modifications);
+    
+    List<String> deletions = new ArrayList<String>();
+    deletions.add("deleteKey");
+    messageBodyJson.put("deletions", deletions);
+    
+    given().pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID).contentType(ContentType.JSON).body(messageBodyJson)
+      .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
+      .when().post(EXECUTION_VARIABLES_URL);
+    
+    Map<String, Object> expectedModifications = new HashMap<String, Object>();
+    expectedModifications.put("aKey", 123);
+    verify(runtimeServiceMock).updateVariablesLocal(eq(MockProvider.EXAMPLE_EXECUTION_ID), argThat(new EqualsMap(expectedModifications)), 
+        argThat(new EqualsList(deletions)));
+  }
+  
+  @Test
+  public void testVariableModificationForNonExistingExecution() {
+    doThrow(new ProcessEngineException("expected exception")).when(runtimeServiceMock).updateVariablesLocal(anyString(), any(Map.class), any(List.class));
+    
+    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
+    
+    List<Map<String, Object>> modifications = new ArrayList<Map<String, Object>>();
+    Map<String, Object> variable = new HashMap<String, Object>();
+    variable.put("name", "aKey");
+    variable.put("value", 123);
+    variable.put("type", "Integer");
+    
+    messageBodyJson.put("modifications", modifications);
+    
+    given().pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID).contentType(ContentType.JSON).body(messageBodyJson)
+      .then().expect().statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).contentType(ContentType.JSON)
+      .body("type", equalTo(RestException.class.getSimpleName()))
+      .body("message", equalTo("Cannot modify variables for execution " + MockProvider.EXAMPLE_PROCESS_INSTANCE_ID + ": expected exception"))
+      .when().post(EXECUTION_VARIABLES_URL);
+  }
+  
+  @Test
+  public void testEmptyVariableModification() {
+    given().pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID).contentType(ContentType.JSON).body(EMPTY_JSON_OBJECT)
+      .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
+      .when().post(EXECUTION_VARIABLES_URL);
+  }
+  
   
 }

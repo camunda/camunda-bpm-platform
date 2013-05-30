@@ -26,6 +26,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
+import org.camunda.bpm.engine.rest.dto.PatchVariablesDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ExecutionDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ExecutionQueryDto;
 import org.camunda.bpm.engine.rest.dto.runtime.VariableListDto;
@@ -70,5 +71,10 @@ public interface ExecutionRestService {
   @Produces(MediaType.APPLICATION_JSON)
   @Consumes(MediaType.APPLICATION_JSON)
   void signalExecution(@PathParam("id") String executionId, VariableListDto variables);
+  
+  @POST
+  @Path("/{id}/variables")
+  @Consumes(MediaType.APPLICATION_JSON)
+  void modifyVariables(@PathParam("id") String executionId, PatchVariablesDto patch);
   
 }

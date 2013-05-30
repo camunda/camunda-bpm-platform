@@ -13,7 +13,9 @@
 package org.camunda.bpm.engine.rest.impl;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
@@ -21,11 +23,14 @@ import javax.ws.rs.core.UriInfo;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.impl.RuntimeServiceImpl;
 import org.camunda.bpm.engine.rest.ExecutionRestService;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
+import org.camunda.bpm.engine.rest.dto.PatchVariablesDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ExecutionDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ExecutionQueryDto;
 import org.camunda.bpm.engine.rest.dto.runtime.VariableListDto;
+import org.camunda.bpm.engine.rest.dto.runtime.VariableValueDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.runtime.Execution;
@@ -120,6 +125,26 @@ public class ExecutionRestServiceImpl extends AbstractRestProcessEngineAware imp
       throw new RestException(Status.INTERNAL_SERVER_ERROR, e, "Cannot signal execution " + executionId + ": " + e.getMessage());
     }
     
+  }
+
+  @Override
+  public void modifyVariables(String executionId, PatchVariablesDto patch) {
+    Map<String, Object> variableModifications = new HashMap<String, Object>();
+    if (patch.getModifications() != null) {
+      for (VariableValueDto variable : patch.getModifications()) {
+        variableModifications.put(variable.getName(), variable.getValue());
+      }
+    }
+    
+    List<String> variableDeletions = patch.getDeletions();
+    RuntimeServiceImpl runtimeService = (RuntimeServiceImpl) getProcessEngine().getRuntimeService();
+    
+    try {
+      runtimeService.updateVariablesLocal(executionId, variableModifications, variableDeletions);
+    } catch (ProcessEngineException e) {
+      throw new RestException(Status.INTERNAL_SERVER_ERROR, e, 
+          "Cannot modify variables for execution " + executionId + ": " + e.getMessage());
+    }
   }
   
 }
