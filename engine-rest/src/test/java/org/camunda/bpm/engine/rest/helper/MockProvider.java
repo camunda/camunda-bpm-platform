@@ -76,14 +76,14 @@ public abstract class MockProvider {
  
   // process instance
   public static final String EXAMPLE_PROCESS_INSTANCE_BUSINESS_KEY = "aKey";
-  public static final String EXAMPLE_PROCESS_INSTANCE_ID = "anId";
+  public static final String EXAMPLE_PROCESS_INSTANCE_ID = "aProcInstId";
   public static final String ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID = "anotherId";
   public static final boolean EXAMPLE_PROCESS_INSTANCE_IS_SUSPENDED = false;
   public static final boolean EXAMPLE_PROCESS_INSTANCE_IS_ENDED = false;
   
   
   // execution
-  public static final String EXAMPLE_EXECUTION_ID = "anId";
+  public static final String EXAMPLE_EXECUTION_ID = "anExecutionId";
   public static final boolean EXAMPLE_EXECUTION_IS_ENDED = false;
   
   // process definition

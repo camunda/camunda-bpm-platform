@@ -46,6 +46,8 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
   @Before
   public void setUpRuntimeData() {
     runtimeServiceMock = mock(RuntimeServiceImpl.class);
+    when(runtimeServiceMock.getVariablesLocal(MockProvider.EXAMPLE_EXECUTION_ID)).thenReturn(EXAMPLE_VARIABLES);
+
     when(processEngine.getRuntimeService()).thenReturn(runtimeServiceMock);
   }
   
@@ -114,6 +116,29 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
       .when().post(SIGNAL_EXECUTION_URL);
   }
   
+
+  @Test
+  public void testGetVariables() {
+    given().pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .body("variables.size()", is(1))
+      .body("variables[0].name", equalTo(EXAMPLE_VARIABLE_KEY))
+      .body("variables[0].value", equalTo(EXAMPLE_VARIABLE_VALUE))
+      .body("variables[0].type", equalTo(String.class.getSimpleName()))
+      .when().get(EXECUTION_VARIABLES_URL);
+  }
+  
+  @Test
+  public void testGetVariablesForNonExistingExecution() {
+    when(runtimeServiceMock.getVariablesLocal(anyString())).thenThrow(new ProcessEngineException("expected exception"));
+    
+    given().pathParam("id", "aNonExistingExecutionId")
+      .then().expect().statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).contentType(ContentType.JSON)
+      .body("type", equalTo(ProcessEngineException.class.getSimpleName()))
+      .body("message", equalTo("expected exception"))
+      .when().get(EXECUTION_VARIABLES_URL);
+  }
+  
   @Test
   public void testVariableModification() {
     Map<String, Object> messageBodyJson = new HashMap<String, Object>();
@@ -141,6 +166,7 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
         argThat(new EqualsList(deletions)));
   }
   
+  // TODO how can this be green?
   @Test
   public void testVariableModificationForNonExistingExecution() {
     doThrow(new ProcessEngineException("expected exception")).when(runtimeServiceMock).updateVariablesLocal(anyString(), any(Map.class), any(List.class));
@@ -158,7 +184,7 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
     given().pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID).contentType(ContentType.JSON).body(messageBodyJson)
       .then().expect().statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).contentType(ContentType.JSON)
       .body("type", equalTo(RestException.class.getSimpleName()))
-      .body("message", equalTo("Cannot modify variables for execution " + MockProvider.EXAMPLE_PROCESS_INSTANCE_ID + ": expected exception"))
+      .body("message", equalTo("Cannot modify variables for execution " + MockProvider.EXAMPLE_EXECUTION_ID + ": expected exception"))
       .when().post(EXECUTION_VARIABLES_URL);
   }
   
@@ -204,7 +230,7 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
     when(runtimeServiceMock.getVariableLocal(eq(MockProvider.EXAMPLE_EXECUTION_ID), eq(variableKey)))
       .thenThrow(new ProcessEngineException("expected exception"));
     
-    given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).pathParam("varId", variableKey)
+    given().pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID).pathParam("varId", variableKey)
       .then().expect().statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
       .body("type", is(RestException.class.getSimpleName()))
       .body("message", is("Cannot get execution variable " + variableKey + ": expected exception"))

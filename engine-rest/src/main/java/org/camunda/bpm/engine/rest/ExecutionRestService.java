@@ -75,6 +75,11 @@ public interface ExecutionRestService {
   @Consumes(MediaType.APPLICATION_JSON)
   void signalExecution(@PathParam("id") String executionId, VariableListDto variables);
   
+  @GET
+  @Path("/{id}/variables")
+  @Produces(MediaType.APPLICATION_JSON)
+  VariableListDto getVariables(@PathParam("id") String processInstanceId);
+  
   @POST
   @Path("/{id}/variables")
   @Consumes(MediaType.APPLICATION_JSON)

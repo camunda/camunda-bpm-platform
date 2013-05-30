@@ -126,6 +126,19 @@ public class ExecutionRestServiceImpl extends AbstractRestProcessEngineAware imp
     }
     
   }
+  
+  @Override
+  public VariableListDto getVariables(String executionId) {
+    List<VariableValueDto> values = new ArrayList<VariableValueDto>();
+    
+    RuntimeService runtimeService = getProcessEngine().getRuntimeService();
+
+    for (Map.Entry<String, Object> entry : runtimeService.getVariablesLocal(executionId).entrySet()) {
+      values.add(new VariableValueDto(entry.getKey(), entry.getValue(), entry.getValue().getClass().getSimpleName()));
+    }
+
+    return new VariableListDto(values);
+  }
 
   @Override
   public void modifyVariables(String executionId, PatchVariablesDto patch) {

@@ -42,14 +42,6 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
   protected static final String PROCESS_INSTANCE_VARIABLES_URL = PROCESS_INSTANCE_URL + "/variables";
   protected static final String SINGLE_PROCESS_INSTANCE_VARIABLE_URL = PROCESS_INSTANCE_VARIABLES_URL + "/{varId}";
   
-  protected static final String EXAMPLE_VARIABLE_KEY = "aProcessVariableKey";
-  protected static final String EXAMPLE_VARIABLE_VALUE = "aProcessVariableValue";
-  
-  protected static final Map<String, Object> EXAMPLE_VARIABLES = new HashMap<String, Object>();
-  static {
-    EXAMPLE_VARIABLES.put(EXAMPLE_VARIABLE_KEY, EXAMPLE_VARIABLE_VALUE);
-  }
-  
   protected static final Map<String, Object> EXAMPLE_OBJECT_VARIABLES = new HashMap<String, Object>();
   static {
     ExampleVariableObject variableValue = new ExampleVariableObject();
