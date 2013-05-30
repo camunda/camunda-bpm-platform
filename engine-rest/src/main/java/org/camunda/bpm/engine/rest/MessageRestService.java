@@ -18,7 +18,7 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-import org.camunda.bpm.engine.rest.dto.message.MessageDto;
+import org.camunda.bpm.engine.rest.dto.message.CorrelationMessageDto;
 
 @Path(MessageRestService.PATH)
 @Produces(MediaType.APPLICATION_JSON)
@@ -28,5 +28,5 @@ public interface MessageRestService {
 
   @POST
   @Consumes(MediaType.APPLICATION_JSON)
-  void deliverMessage(MessageDto messageDto);
+  void deliverMessage(CorrelationMessageDto messageDto);
 }

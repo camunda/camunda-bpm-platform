@@ -99,4 +99,9 @@ public interface ExecutionRestService {
   @Path("/{id}/variables/{varId}")
   void deleteVariable(@PathParam("id") String executionId, @PathParam("varId") String variableName);
   
+  @POST
+  @Path("/{id}/messageSubscriptions/{messageName}/trigger")
+  @Consumes(MediaType.APPLICATION_JSON)
+  void triggerMessageEvent(@PathParam("id") String executionId, @PathParam("messageName") String messageName, VariableListDto variables);
+  
 }

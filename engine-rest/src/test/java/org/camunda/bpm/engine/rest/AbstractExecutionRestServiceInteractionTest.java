@@ -40,6 +40,7 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
   protected static final String SIGNAL_EXECUTION_URL = EXECUTION_URL + "/signal";
   protected static final String EXECUTION_VARIABLES_URL = EXECUTION_URL + "/variables";
   protected static final String SINGLE_EXECUTION_VARIABLE_URL = EXECUTION_VARIABLES_URL + "/{varId}";
+  protected static final String MESSAGE_SUBSCRIPTION_URL = EXECUTION_URL + "/messageSubscriptions/{messageName}/trigger";
   
   private RuntimeServiceImpl runtimeServiceMock;
   
@@ -311,5 +312,65 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
       .when().delete(SINGLE_EXECUTION_VARIABLE_URL);
   }
   
+  @Test
+  public void testMessageEventTriggering() {
+    String messageName = "aMessageName";
+    String variableKey1 = "aVarName";
+    String variableValue1 = "aVarValue";
+    String variableKey2 = "anotherVarName";
+    String variableValue2 = "anotherVarValue";
+    
+    List<Map<String, Object>> variables = new ArrayList<Map<String, Object>>();
+    Map<String, Object> variable1 = new HashMap<String, Object>();
+    variable1.put("name", variableKey1);
+    variable1.put("value", variableValue1);
+    variables.add(variable1);
+    
+    Map<String, Object> variable2 = new HashMap<String, Object>();
+    variable2.put("name", variableKey2);
+    variable2.put("value", variableValue2);
+    variables.add(variable2);
+    
+    Map<String, Object> variablesJson = new HashMap<String, Object>();
+    variablesJson.put("variables", variables);
+    
+    given().pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID).pathParam("messageName", messageName)
+      .contentType(ContentType.JSON).body(variablesJson)
+      .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
+      .when().post(MESSAGE_SUBSCRIPTION_URL);
   
+    Map<String, Object> expectedVariables = new HashMap<String, Object>();
+    expectedVariables.put(variableKey1, variableValue1);
+    expectedVariables.put(variableKey2, variableValue2);
+    
+    verify(runtimeServiceMock).messageEventReceived(eq(messageName), eq(MockProvider.EXAMPLE_EXECUTION_ID),
+        argThat(new EqualsMap(expectedVariables)));
+  }
+  
+  @Test
+  public void testMessageEventTriggeringWithoutVariables() {
+    String messageName = "aMessageName";
+    
+    given().pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID).pathParam("messageName", messageName)
+      .contentType(ContentType.JSON).body(EMPTY_JSON_OBJECT)
+      .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
+      .when().post(MESSAGE_SUBSCRIPTION_URL);
+  
+    verify(runtimeServiceMock).messageEventReceived(eq(messageName), eq(MockProvider.EXAMPLE_EXECUTION_ID),
+        argThat(new EqualsMap(null)));
+  }
+  
+  @Test
+  public void testFailingMessageEventTriggering() {
+    String messageName = "someMessage";
+    doThrow(new ProcessEngineException("expected exception"))
+      .when(runtimeServiceMock).messageEventReceived(anyString(), anyString(), any(Map.class));
+    
+    given().pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID).pathParam("messageName", messageName)
+      .contentType(ContentType.JSON).body(EMPTY_JSON_OBJECT)
+      .then().expect().statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
+      .body("type", is(RestException.class.getSimpleName()))
+      .body("message", is("Cannot trigger message " + messageName + " for execution " + MockProvider.EXAMPLE_EXECUTION_ID + ": expected exception"))
+      .when().post(MESSAGE_SUBSCRIPTION_URL);
+  }
 }

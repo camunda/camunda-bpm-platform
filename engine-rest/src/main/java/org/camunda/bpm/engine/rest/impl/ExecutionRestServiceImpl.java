@@ -201,5 +201,21 @@ public class ExecutionRestServiceImpl extends AbstractRestProcessEngineAware imp
       throw new RestException(Status.INTERNAL_SERVER_ERROR, e, "Cannot delete execution variable " + variableName + ": " + e.getMessage());
     }
   }
+
+  @Override
+  public void triggerMessageEvent(String executionId, String messageName, VariableListDto variablesDto) {
+    RuntimeService runtimeService = getProcessEngine().getRuntimeService();
+    
+    Map<String, Object> variables = variablesDto.toMap();
+    
+    try {
+      runtimeService.messageEventReceived(messageName, executionId, variables);
+    } catch (ProcessEngineException e) {
+      throw new RestException(Status.INTERNAL_SERVER_ERROR, e, "Cannot trigger message " + messageName +
+      		" for execution " + executionId + ": " + e.getMessage());
+    }
+    
+    
+  }
   
 }
