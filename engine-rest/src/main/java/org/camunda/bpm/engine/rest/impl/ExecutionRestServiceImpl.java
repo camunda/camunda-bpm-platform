@@ -147,4 +147,46 @@ public class ExecutionRestServiceImpl extends AbstractRestProcessEngineAware imp
     }
   }
   
+  @Override
+  public VariableValueDto getVariable(String executionId,
+      String variableName) {
+    RuntimeService runtimeService = getProcessEngine().getRuntimeService();
+    Object variable = null;
+    try {
+       variable = runtimeService.getVariableLocal(executionId, variableName);
+    } catch (ProcessEngineException e) {
+      throw new RestException(Status.INTERNAL_SERVER_ERROR, e, "Cannot get execution variable " + variableName + ": " + e.getMessage());
+    }
+    
+    if (variable == null) {
+      throw new InvalidRequestException(Status.NOT_FOUND, "Execution variable with name " + variableName + " does not exist or is null");
+    }
+    
+    return new VariableValueDto(variableName, variable, variable.getClass().getSimpleName());
+    
+  }
+
+  @Override
+  public void putVariable(String executionId, String variableName,
+      VariableValueDto variable) {
+    
+    RuntimeService runtimeService = getProcessEngine().getRuntimeService();
+    try {
+      runtimeService.setVariableLocal(executionId, variableName, variable.getValue());
+    } catch (ProcessEngineException e) {
+      throw new RestException(Status.INTERNAL_SERVER_ERROR, e, "Cannot put execution variable " + variableName + ": " + e.getMessage());
+    }
+  }
+
+  @Override
+  public void deleteVariable(String executionId,
+      String variableName) {
+    RuntimeService runtimeService = getProcessEngine().getRuntimeService();
+    try {
+      runtimeService.removeVariableLocal(executionId, variableName);
+    } catch (ProcessEngineException e) {
+      throw new RestException(Status.INTERNAL_SERVER_ERROR, e, "Cannot delete execution variable " + variableName + ": " + e.getMessage());
+    }
+  }
+  
 }

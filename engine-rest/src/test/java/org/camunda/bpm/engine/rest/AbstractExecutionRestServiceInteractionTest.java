@@ -2,10 +2,12 @@ package org.camunda.bpm.engine.rest;
 
 import static com.jayway.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.isNull;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -37,6 +39,7 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
   protected static final String EXECUTION_URL = TEST_RESOURCE_ROOT_PATH + "/execution/{id}";
   protected static final String SIGNAL_EXECUTION_URL = EXECUTION_URL + "/signal";
   protected static final String EXECUTION_VARIABLES_URL = EXECUTION_URL + "/variables";
+  protected static final String SINGLE_EXECUTION_VARIABLE_URL = EXECUTION_VARIABLES_URL + "/{varId}";
   
   private RuntimeServiceImpl runtimeServiceMock;
   
@@ -164,6 +167,122 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
     given().pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID).contentType(ContentType.JSON).body(EMPTY_JSON_OBJECT)
       .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
       .when().post(EXECUTION_VARIABLES_URL);
+  }
+  
+  @Test
+  public void testGetSingleVariable() {
+    String variableKey = "aVariableKey";
+    int variableValue = 123;
+    
+    when(runtimeServiceMock.getVariableLocal(eq(MockProvider.EXAMPLE_EXECUTION_ID), eq(variableKey))).thenReturn(variableValue);
+    
+    given().pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID).pathParam("varId", variableKey)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .body("value", is(123))
+      .body("name", is(variableKey))
+      .body("type", is("Integer"))
+      .when().get(SINGLE_EXECUTION_VARIABLE_URL);
+  }
+  
+  @Test
+  public void testNonExistingVariable() {
+    String variableKey = "aVariableKey";
+    
+    when(runtimeServiceMock.getVariableLocal(eq(MockProvider.EXAMPLE_EXECUTION_ID), eq(variableKey))).thenReturn(null);
+    
+    given().pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID).pathParam("varId", variableKey)
+      .then().expect().statusCode(Status.NOT_FOUND.getStatusCode())
+      .body("type", is(InvalidRequestException.class.getSimpleName()))
+      .body("message", is("Execution variable with name " + variableKey + " does not exist or is null"))
+      .when().get(SINGLE_EXECUTION_VARIABLE_URL);
+  }
+  
+  @Test
+  public void testGetVariableForNonExistingExecution() {
+    String variableKey = "aVariableKey";
+    
+    when(runtimeServiceMock.getVariableLocal(eq(MockProvider.EXAMPLE_EXECUTION_ID), eq(variableKey)))
+      .thenThrow(new ProcessEngineException("expected exception"));
+    
+    given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).pathParam("varId", variableKey)
+      .then().expect().statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
+      .body("type", is(RestException.class.getSimpleName()))
+      .body("message", is("Cannot get execution variable " + variableKey + ": expected exception"))
+      .when().get(SINGLE_EXECUTION_VARIABLE_URL);
+  }
+  
+  @Test
+  public void testPutSingleVariable() {
+    String variableKey = "aVariableKey";
+    String variableValue = "aVariableValue";
+    
+    Map<String, Object> variableJson = new HashMap<String, Object>();
+    variableJson.put("value", variableValue);
+    
+    given().pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID).pathParam("varId", variableKey)
+      .contentType(ContentType.JSON).body(variableJson)
+      .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
+      .when().put(SINGLE_EXECUTION_VARIABLE_URL);
+    
+    verify(runtimeServiceMock).setVariableLocal(eq(MockProvider.EXAMPLE_EXECUTION_ID), eq(variableKey), 
+        eq(variableValue));
+  }
+  
+  @Test
+  public void testPutSingleVariableWithNoValue() {
+    String variableKey = "aVariableKey";
+    
+    given().pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID).pathParam("varId", variableKey)
+      .contentType(ContentType.JSON).body(EMPTY_JSON_OBJECT)
+      .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
+      .when().put(SINGLE_EXECUTION_VARIABLE_URL);
+    
+    verify(runtimeServiceMock).setVariableLocal(eq(MockProvider.EXAMPLE_EXECUTION_ID), eq(variableKey), 
+        isNull());
+  }
+  
+  @Test
+  public void testPutVariableForNonExistingExecution() {
+    String variableKey = "aVariableKey";
+    String variableValue = "aVariableValue";
+    
+    Map<String, Object> variableJson = new HashMap<String, Object>();
+    variableJson.put("value", variableValue);
+    
+    doThrow(new ProcessEngineException("expected exception"))
+      .when(runtimeServiceMock).setVariableLocal(eq(MockProvider.EXAMPLE_EXECUTION_ID), eq(variableKey), eq(variableValue));
+    
+    given().pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID).pathParam("varId", variableKey)
+      .contentType(ContentType.JSON).body(variableJson)
+      .then().expect().statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
+      .body("type", is(RestException.class.getSimpleName()))
+      .body("message", is("Cannot put execution variable " + variableKey + ": expected exception"))
+      .when().put(SINGLE_EXECUTION_VARIABLE_URL);
+  }
+  
+  @Test
+  public void testDeleteSingleVariable() {
+    String variableKey = "aVariableKey";
+    
+    given().pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID).pathParam("varId", variableKey)
+      .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
+      .when().delete(SINGLE_EXECUTION_VARIABLE_URL);
+    
+    verify(runtimeServiceMock).removeVariableLocal(eq(MockProvider.EXAMPLE_EXECUTION_ID), eq(variableKey));
+  }
+  
+  @Test
+  public void testDeleteVariableForNonExistingExecution() {
+    String variableKey = "aVariableKey";
+    
+    doThrow(new ProcessEngineException("expected exception"))
+      .when(runtimeServiceMock).removeVariableLocal(eq(MockProvider.EXAMPLE_EXECUTION_ID), eq(variableKey));
+    
+    given().pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID).pathParam("varId", variableKey)
+      .then().expect().statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
+      .body("type", is(RestException.class.getSimpleName()))
+      .body("message", is("Cannot delete execution variable " + variableKey + ": expected exception"))
+      .when().delete(SINGLE_EXECUTION_VARIABLE_URL);
   }
   
   
