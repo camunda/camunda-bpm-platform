@@ -15,12 +15,10 @@ import javax.resource.spi.TransactionSupport;
 import javax.resource.spi.endpoint.MessageEndpointFactory;
 import javax.transaction.xa.XAResource;
 
-import org.camunda.bpm.container.ExecutorService;
 import org.camunda.bpm.container.impl.threading.ra.commonj.CommonJWorkManagerExecutorService;
 import org.camunda.bpm.container.impl.threading.ra.inflow.JobExecutionHandler;
 import org.camunda.bpm.container.impl.threading.ra.inflow.JobExecutionHandlerActivation;
 import org.camunda.bpm.container.impl.threading.ra.inflow.JobExecutionHandlerActivationSpec;
-import org.camunda.bpm.engine.ProcessEngineException;
 
 
 /**
@@ -34,13 +32,34 @@ import org.camunda.bpm.engine.ProcessEngineException;
   )
 public class JcaExecutorServiceConnector implements ResourceAdapter, Serializable {
 
+  /**
+   * This class must be free of engine classes to make it possible to install
+   * the resource adapter without shared libraries. Some deployments scenarios might
+   * require that.
+   *
+   * The wrapper class was introduced to provide more meaning to a otherwise
+   * unspecified property.
+   */
+  public class ExecutorServiceWrapper {
+    protected Object executorService;
+
+    public Object getExecutorService() {
+      return executorService;
+    }
+
+    private void setExecutorService(Object executorService) {
+      this.executorService = executorService;
+    }
+
+  }
+
+  protected ExecutorServiceWrapper executorServiceWrapper;
+
   private static final long serialVersionUID = 1L;
 
   private static Logger log = Logger.getLogger(JcaExecutorServiceConnector.class.getName());
 
   protected JobExecutionHandlerActivation jobHandlerActivation;
-
-  protected ExecutorService executorService;
 
   // no arg-constructor
   public JcaExecutorServiceConnector() {
@@ -68,24 +87,38 @@ public class JcaExecutorServiceConnector implements ResourceAdapter, Serializabl
   // RA-Lifecycle ///////////////////////////////////////////////////
   
   public void start(BootstrapContext ctx) throws ResourceAdapterInternalException {
-    
+
+    try {
+      Class.forName("org.activiti.engine.ProcessEngine");
+    } catch (ClassNotFoundException e) {
+      log.info("ProcessEngine classes not found in shared libraries. Not initializing Fox Platform JobExecutor Resource Adapter.");
+      return;
+    }
+
+    executorServiceWrapper = new ExecutorServiceWrapper();
+
     // initialize the ExecutorService (CommonJ or JCA, depending on configuration)
     if(isUseCommonJWorkManager) {
       if(commonJWorkManagerName != null & commonJWorkManagerName.length() > 0) {
-        executorService = new CommonJWorkManagerExecutorService(this, commonJWorkManagerName);
+        executorServiceWrapper.setExecutorService(new CommonJWorkManagerExecutorService(this, commonJWorkManagerName));
       } else {
-        throw new ProcessEngineException("Resource Adapter configuration property 'isUseCommonJWorkManager' is set to true but 'commonJWorkManagerName' is not provided.");
+        throw new RuntimeException("Resource Adapter configuration property 'isUseCommonJWorkManager' is set to true but 'commonJWorkManagerName' is not provided.");
       }
       
     } else {
-      executorService = new JcaWorkManagerExecutorService(this, ctx.getWorkManager());
+      executorServiceWrapper.setExecutorService(new JcaWorkManagerExecutorService(this, ctx.getWorkManager()));
     }
     
     log.log(Level.INFO, "camunda BPM executor service started.");
   }
 
   public void stop() {
-    
+    try {
+      Class.forName("org.activiti.engine.ProcessEngine");
+    } catch (ClassNotFoundException e) {
+      return;
+    }
+
     log.log(Level.INFO, "camunda BPM executor service stopped.");
     
   }
@@ -121,8 +154,8 @@ public class JcaExecutorServiceConnector implements ResourceAdapter, Serializabl
   
   // getters ///////////////////////////////////////////////////////////////
   
-  public ExecutorService getExecutorService() {
-    return executorService;
+  public ExecutorServiceWrapper getExecutorServiceWrapper() {
+    return executorServiceWrapper;
   }
    
   public JobExecutionHandlerActivation getJobHandlerActivation() {
