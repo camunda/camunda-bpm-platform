@@ -42,7 +42,7 @@ public class EmailSendTaskTest extends PluggableProcessEngineTestCase {
     boolean serverUpAndRunning = false;
     while (!serverUpAndRunning) {
       wiser = new Wiser();
-      wiser.setPort(5025);
+      wiser.setPort(processEngineConfiguration.getMailServerPort());
       
       try {
         wiser.start();

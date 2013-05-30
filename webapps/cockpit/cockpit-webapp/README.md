@@ -24,7 +24,7 @@ Run tests via `mvn clean test`.
 
 > Requires [NodeJS](http://nodejs.org/) and [karma](http://karma-runner.github.com).
 >
-> Install karma `npm -g install karma@canary` + dependencies `npm install --dev` (update using `npm update --dev`).
+> Install karma `npm -g install karma@canary` + dependencies `npm update --dev`.
 >
 > Additionally paths to browser runtimes may need to be defined in environment variables:
 > <code>PHANTOMJS_BIN</code>, <code>FIREFOX_BIN</code>, <code>CHROME_BIN</code>.

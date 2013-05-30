@@ -22,9 +22,6 @@ import org.camunda.bpm.cockpit.plugin.test.AbstractCockpitPluginTest;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.test.Deployment;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
-import org.junit.Rule;
 import org.junit.Test;
 
 /**
@@ -35,27 +32,15 @@ public class FailedProcessInstancesQueryTest extends AbstractCockpitPluginTest {
 
   private JobExecutorHelper helper;
 
-//  @BeforeClass
-//  public static void beforeClass2() throws Exception {
-//
-//    org.h2.tools.Server.createWebServer("-web").start();
-//  }
-
   @Test
   @Deployment(resources = {
     "processes/call-activity.bpmn",
     "processes/nested-call-activity.bpmn",
     "processes/failing-process.bpmn",
   })
-  @Ignore
   public void testQuery() throws Exception {
 
     helper = new JobExecutorHelper(getProcessEngine());
-
-    System.out.println("DEBUG - START - executable jobs : " + getProcessEngine().getManagementService()
-      .createJobQuery()
-      .executable()
-      .list());
 
     ProcessEngine processEngine = getProcessEngine();
     RuntimeService runtimeService = processEngine.getRuntimeService();
@@ -64,17 +49,7 @@ public class FailedProcessInstancesQueryTest extends AbstractCockpitPluginTest {
     runtimeService.startProcessInstanceByKey("FailingProcess");
     runtimeService.startProcessInstanceByKey("FailingProcess");
 
-    System.out.println("DEBUG - BEFORE - executable jobs : " + getProcessEngine().getManagementService()
-      .createJobQuery()
-      .executable()
-      .list());
-
     helper.waitForJobExecutorToProcessAllJobs(15000, 500);
-
-    System.out.println("DEBUG - AFTER - executable jobs: " + getProcessEngine().getManagementService()
-      .createJobQuery()
-      .executable()
-      .list());
 
     FailureService failureService = new FailureService(getProcessEngine().getName());
 
@@ -92,15 +67,9 @@ public class FailedProcessInstancesQueryTest extends AbstractCockpitPluginTest {
     "processes/nested-call-activity.bpmn",
     "processes/failing-process.bpmn",
   })
-  @Ignore
   public void testCallActivityQuery() throws Exception {
 
     helper = new JobExecutorHelper(getProcessEngine());
-
-    System.out.println("DEBUG - START - executable jobs : " + getProcessEngine().getManagementService()
-      .createJobQuery()
-      .executable()
-      .list());
 
     ProcessEngine processEngine = getProcessEngine();
     RuntimeService runtimeService = processEngine.getRuntimeService();
@@ -108,17 +77,7 @@ public class FailedProcessInstancesQueryTest extends AbstractCockpitPluginTest {
     runtimeService.startProcessInstanceByKey("CallActivity");
     runtimeService.startProcessInstanceByKey("CallActivity");
 
-    System.out.println("DEBUG - BEFORE - executable jobs : " + getProcessEngine().getManagementService()
-      .createJobQuery()
-      .executable()
-      .list());
-
     helper.waitForJobExecutorToProcessAllJobs(15000, 500);
-
-    System.out.println("DEBUG - AFTER - executable jobs: " + getProcessEngine().getManagementService()
-      .createJobQuery()
-      .executable()
-      .list());
 
     FailureService failureService = new FailureService(getProcessEngine().getName());
 
@@ -137,15 +96,9 @@ public class FailedProcessInstancesQueryTest extends AbstractCockpitPluginTest {
     "processes/nested-call-activity.bpmn",
     "processes/failing-process.bpmn",
   })
-  @Ignore
   public void testNestedCallActivityQuery() throws Exception {
 
     helper = new JobExecutorHelper(getProcessEngine());
-
-    System.out.println("DEBUG - START - executable jobs : " + getProcessEngine().getManagementService()
-      .createJobQuery()
-      .executable()
-      .list());
 
     ProcessEngine processEngine = getProcessEngine();
     RuntimeService runtimeService = processEngine.getRuntimeService();
@@ -153,17 +106,7 @@ public class FailedProcessInstancesQueryTest extends AbstractCockpitPluginTest {
     runtimeService.startProcessInstanceByKey("NestedCallActivity");
     runtimeService.startProcessInstanceByKey("NestedCallActivity");
 
-    System.out.println("DEBUG - BEFORE - executable jobs : " + getProcessEngine().getManagementService()
-      .createJobQuery()
-      .executable()
-      .list());
-
     helper.waitForJobExecutorToProcessAllJobs(15000, 500);
-
-    System.out.println("DEBUG - AFTER - executable jobs: " + getProcessEngine().getManagementService()
-      .createJobQuery()
-      .executable()
-      .list());
 
     FailureService failureService = new FailureService(getProcessEngine().getName());
 
@@ -185,11 +128,6 @@ public class FailedProcessInstancesQueryTest extends AbstractCockpitPluginTest {
 
     helper = new JobExecutorHelper(getProcessEngine());
 
-    System.out.println("DEBUG - START - executable jobs : " + getProcessEngine().getManagementService()
-      .createJobQuery()
-      .executable()
-      .list());
-
     ProcessEngine processEngine = getProcessEngine();
     RuntimeService runtimeService = processEngine.getRuntimeService();
 
@@ -200,17 +138,7 @@ public class FailedProcessInstancesQueryTest extends AbstractCockpitPluginTest {
     runtimeService.startProcessInstanceByKey("FailingProcess");
     runtimeService.startProcessInstanceByKey("CallActivity");
 
-    System.out.println("DEBUG - BEFORE - executable jobs : " + getProcessEngine().getManagementService()
-      .createJobQuery()
-      .executable()
-      .list());
-
     helper.waitForJobExecutorToProcessAllJobs(15000, 500);
-
-    System.out.println("DEBUG - AFTER - executable jobs: " + getProcessEngine().getManagementService()
-      .createJobQuery()
-      .executable()
-      .list());
 
     FailureService failureService = new FailureService(getProcessEngine().getName());
 
