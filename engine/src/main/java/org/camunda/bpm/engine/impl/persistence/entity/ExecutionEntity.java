@@ -921,7 +921,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
       if (replacedBy!=null) {
         incident.setExecution((ExecutionEntity) replacedBy);
       } else {
-        incident.delete(this);
+        incident.delete();
       }
     }
   }

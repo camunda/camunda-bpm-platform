@@ -13,7 +13,6 @@
 package org.camunda.bpm.engine.impl.persistence.entity;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -21,6 +20,7 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.PersistentObject;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.Incident;
 
 public class IncidentEntity implements Incident, PersistentObject {
@@ -35,100 +35,113 @@ public class IncidentEntity implements Incident, PersistentObject {
   protected String causeIncidentId;
   protected String rootCauseIncidentId;
   protected String configuration;
+  
+  public List<IncidentEntity> createRecursiveIncidents() {
+    List<IncidentEntity> createdIncidents = new ArrayList<IncidentEntity>();
+    createRecursiveIncidents(id, createdIncidents);    
+    return createdIncidents;
+  }
 
-  @SuppressWarnings("unchecked")
-  public static List<IncidentEntity> createAndInsertIncident(boolean recursive, String incidentType, 
-      String executionId, String causeIncidentId, String rootCauseIncidentId, String configuration) {
+  /** Instantiate recursive a new incident a super execution
+   * (i.e. super process instance) which is affected from this
+   * incident.
+   * For example: a super process instance called via CallActivity 
+   * a new process instance on which an incident happened, so that
+   * the super process instance has an incident too. */
+  protected void createRecursiveIncidents(String rootCauseIncidentId, List<IncidentEntity> createdIncidents) {
     
-    if(executionId != null) {
-      // fetch execution
-      ExecutionEntity execution = Context
-        .getCommandContext()
-        .getExecutionManager()
-        .findExecutionById(executionId);
-      
-      List<IncidentEntity> result = new ArrayList<IncidentEntity>();
-      
-      // decorate new incident
-      IncidentEntity newIncident = new IncidentEntity();
-      newIncident.setIncidentTimestamp(new Date());
-      newIncident.setIncidentType(incidentType);
-      newIncident.setExecutionId(executionId);
-      newIncident.setActivityId(execution.getActivityId());
-      newIncident.setProcessInstanceId(execution.getProcessInstanceId());
-      newIncident.setProcessDefinitionId(execution.getProcessDefinitionId());
-      newIncident.setCauseIncidentId(causeIncidentId);
-      newIncident.setRootCauseIncidentId(rootCauseIncidentId);
-      newIncident.setConfiguration(configuration);
-      
-      // add new incident to result set
-      result.add(newIncident);
-      
-      // persist new incident
-      Context
-        .getCommandContext()
-        .getDbSqlSession()
-        .insert(newIncident);
-      
-      // add link to execution      
-      execution.addIncident(newIncident);
+    final ExecutionEntity execution = getExecution();
+    
+    if(execution != null) {
 
-      if (recursive) {
-        // Instantiate recursive a new incident a super execution
-        // (i.e. super process instance) which is affected from this
-        // incident.
-        // For example: a super process instance called via CallActivity 
-        // a new process instance on which an incident happened, so that
-        // the super process instance has an incident too.
-        String superExecutionId = null;
-        if (execution.getId().equals(execution.getProcessInstanceId())) {
-          superExecutionId = execution.getSuperExecutionId();
-        } else {
-          superExecutionId = execution.getProcessInstance().getSuperExecutionId();
-        }
-        if (superExecutionId != null && !superExecutionId.isEmpty()) {
-          if (rootCauseIncidentId == null) {
-            // If a root cause has not been set, then this incident (newIncident)
-            // will be set to be the root cause.
-            rootCauseIncidentId = newIncident.getId();
-          }
-          List<IncidentEntity> incidents = createAndInsertIncident(recursive, incidentType, superExecutionId, newIncident.getId(), rootCauseIncidentId, null); 
-          result.addAll(incidents);
-        }
+      String superExecutionId = execution.getProcessInstance().getSuperExecutionId();
+   
+      if (superExecutionId != null && !superExecutionId.isEmpty()) {
+        
+        IncidentEntity newIncident = createAndInsertIncident(incidentType, superExecutionId, null);
+        newIncident.setCauseIncidentId(id);
+        newIncident.setRootCauseIncidentId(rootCauseIncidentId);
+        createdIncidents.add(newIncident);
+        newIncident.createRecursiveIncidents(rootCauseIncidentId, createdIncidents);
       }
-      
-      return result;
     }
-    
-    return Collections.EMPTY_LIST;
   }
   
-  public void delete(ExecutionEntity execution) {
-    // Extract possible super execution of the assigned execution
-    ExecutionEntity superExecution = null;
-    if (execution.getId().equals(execution.getProcessInstanceId())) {
-      superExecution = execution.getSuperExecution();
-    } else {
-      superExecution = execution.getProcessInstance().getSuperExecution();
+  public static IncidentEntity createAndInsertIncident(String incidentType, String configuration) {
+    
+    // decorate new incident
+    IncidentEntity newIncident = new IncidentEntity();
+    newIncident.setIncidentTimestamp(ClockUtil.getCurrentTime());
+    newIncident.setConfiguration(configuration);
+    newIncident.setIncidentType(incidentType);
+        
+    // persist new incident
+    Context
+      .getCommandContext()
+      .getDbSqlSession()
+      .insert(newIncident);
+         
+    return newIncident;
+  }
+  
+  public static IncidentEntity createAndInsertIncident(String incidentType, String executionId, String configuration) {
+    
+    // fetch execution
+    ExecutionEntity execution = Context
+      .getCommandContext()
+      .getExecutionManager()
+      .findExecutionById(executionId);
+        
+    // decorate new incident
+    IncidentEntity newIncident = createAndInsertIncident(incidentType, configuration);
+    newIncident.setExecution(execution);
+         
+    return newIncident;
+  }
+  
+  public static IncidentEntity createAndInsertIncident(String incidentType, String processDefinitionId, String activityId, String configuration) {
+        
+    // decorate new incident
+    IncidentEntity newIncident = createAndInsertIncident(incidentType, configuration);
+    
+    newIncident.setActivityId(activityId);
+    newIncident.setProcessDefinitionId(processDefinitionId);
+         
+    return newIncident;
+  }
+  
+  public void delete() {
+    
+    final ExecutionEntity execution = getExecution();
+    
+    if(execution != null) {
+      // Extract possible super execution of the assigned execution
+      ExecutionEntity superExecution = null;
+      if (execution.getId().equals(execution.getProcessInstanceId())) {
+        superExecution = execution.getSuperExecution();
+      } else {
+        superExecution = execution.getProcessInstance().getSuperExecution();
+      }
+      
+      if (superExecution != null) {
+        // get the incident, where this incident is the cause
+        IncidentEntity parentIncident = superExecution.getIncidentByCauseIncidentId(getId());
+        
+        if (parentIncident != null) {
+          // delete the incident
+          parentIncident.delete();
+        }
+      }
+      
+      // remove link to execution
+      execution.removeIncident(this);
     }
     
-    if (superExecution != null) {
-      // get the incident, where this incident is the cause
-      IncidentEntity incident = superExecution.getIncidentByCauseIncidentId(getId());
-      
-      if (incident != null) {
-        // delete the incident
-        incident.delete(superExecution);
-      }
-    }
-    // delete this incident
+    // always delete the incident
     Context
       .getCommandContext()
       .getDbSqlSession()
       .delete(this);
-    
-    // remove link to execution
-    execution.removeIncident(this);
   }
   
   public String getId() {
@@ -213,8 +226,20 @@ public class IncidentEntity implements Incident, PersistentObject {
 
   public void setExecution(ExecutionEntity execution) {
     executionId = execution.getId();
+    activityId = execution.getActivityId();
     processInstanceId = execution.getProcessInstanceId();
+    processDefinitionId = execution.getProcessDefinitionId();
     execution.addIncident(this);
+  }
+  
+  public ExecutionEntity getExecution() { 
+    if(executionId != null) {
+      return Context.getCommandContext()
+        .getExecutionManager()
+        .findExecutionById(executionId);        
+    } else {
+      return null;
+    }
   }
   
   public Object getPersistentState() {

@@ -62,7 +62,7 @@ public class DecrementJobRetriesCmd implements Command<Object> {
         Context
           .getProcessEngineConfiguration()
           .getIncidentHandler(FailedJobIncidentHandler.INCIDENT_HANDLER_TYPE)
-          .handleIncident(job.getExecutionId(), job.getId());
+          .handleIncident(null, null, job.getExecutionId(), job.getId());
       }
     }
     

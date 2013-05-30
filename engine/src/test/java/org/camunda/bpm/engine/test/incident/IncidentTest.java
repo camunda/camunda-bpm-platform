@@ -1,16 +1,21 @@
 package org.camunda.bpm.engine.test.incident;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.cmd.DeleteJobsCmd;
 import org.camunda.bpm.engine.impl.incident.FailedJobIncidentHandler;
+import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.Job;
+import org.camunda.bpm.engine.runtime.JobQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 
@@ -309,25 +314,29 @@ public class IncidentTest extends PluggableProcessEngineTestCase {
     assertNull(incident);
   }
   
-//  @Deployment(resources = {"org/camunda/bpm/engine/test/incident/IncidentTest.testShouldCreateIncidentOnFailedStartTimerEvent.bpmn"})
-//  public void testShouldCreateIncidentOnFailedStartTimerEvent() {
-//    // After process start, there should be timer created
-//    JobQuery jobQuery = managementService.createJobQuery();
-//    assertEquals(1, jobQuery.count());
-//    
-//    ClockUtil.setCurrentTime(new Date(ClockUtil.getCurrentTime().getTime() + 302 * 1000));
-//    
-//    waitForJobExecutorToProcessAllJobs(6000, 500);
-//
-//    // job exists
-//    Job job = managementService.createJobQuery().singleResult();
-//    assertNotNull(job);
-//    
-//    assertEquals(0, job.getRetries());
-//    
-//    // incident was created
-//    Incident incident = runtimeService.createIncidentQuery().configuration(job.getId()).singleResult();
-//    assertNotNull(incident);
-//  }
+  @Deployment(resources = {"org/camunda/bpm/engine/test/incident/IncidentTest.testShouldCreateIncidentOnFailedStartTimerEvent.bpmn"})
+  public void testShouldCreateIncidentOnFailedStartTimerEvent() {
+    // After process start, there should be timer created
+    JobQuery jobQuery = managementService.createJobQuery();
+    assertEquals(1, jobQuery.count());
+    
+    ClockUtil.setCurrentTime(new Date(ClockUtil.getCurrentTime().getTime() + 302 * 1000));
+    
+    waitForJobExecutorToProcessAllJobs(6000, 500);
+
+    // job exists
+    Job job = managementService.createJobQuery().singleResult();
+    assertNotNull(job);
+    
+    assertEquals(0, job.getRetries());
+    
+    // incident was created
+    Incident incident = runtimeService.createIncidentQuery().configuration(job.getId()).singleResult();
+    assertNotNull(incident);
+    
+    // manually delete job for timer start event
+    managementService.deleteJob(job.getId());    
+    
+  }
   
 }
