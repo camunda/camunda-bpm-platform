@@ -12,7 +12,12 @@
  */
 package org.camunda.bpm.engine.impl.incident;
 
+import java.util.List;
+
+import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity;
+import org.camunda.bpm.engine.runtime.Incident;
 
 public class FailedJobIncidentHandler implements IncidentHandler {
 
@@ -27,7 +32,21 @@ public class FailedJobIncidentHandler implements IncidentHandler {
   }
 
   public void resolveIncident(String executionId, String configuration) {
-    // TODO:
+    if (executionId != null && configuration != null) {
+      ExecutionEntity execution = Context.getCommandContext()
+          .getExecutionManager()
+          .findExecutionById(executionId);
+  
+      List<Incident> incidents = Context
+          .getCommandContext()
+          .getIncidentManager()
+          .findIncidentByConfiguration(configuration);
+      
+      for (Incident currentIncident : incidents) {
+        IncidentEntity incident = (IncidentEntity) currentIncident;
+        incident.delete(execution);
+      }
+    }
   }
 
 }

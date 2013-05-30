@@ -4,11 +4,16 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.JavaDelegate;
 
-public class FailingServcie implements JavaDelegate {
+public class FailingDelegateWithFailParameter implements JavaDelegate {
 
   @Override
   public void execute(DelegateExecution execution) throws Exception {
-    throw new ProcessEngineException("Exception expected.");
+    
+    Boolean fail = (Boolean) execution.getVariable("fail");
+    
+    if (fail != null && fail) {
+      throw new ProcessEngineException("Exception expected.");
+    }
   }
 
 }

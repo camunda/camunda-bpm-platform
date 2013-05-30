@@ -34,6 +34,11 @@ public class IncidentManager extends AbstractManager {
   }
   
   @SuppressWarnings("unchecked")
+  public List<Incident> findIncidentByConfiguration(String configuration) {
+    return getDbSqlSession().selectList("selectIncidentsByConfiguration", configuration);
+  }
+  
+  @SuppressWarnings("unchecked")
   public List<Incident> findIncidentByQueryCriteria(IncidentQueryImpl jobQuery, Page page) {
     return getDbSqlSession().selectList("selectIncidentByQueryCriteria", jobQuery, page);
   }

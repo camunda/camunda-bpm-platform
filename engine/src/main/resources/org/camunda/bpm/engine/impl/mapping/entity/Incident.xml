@@ -50,6 +50,12 @@
     from ${prefix}ACT_RU_INCIDENT I
     where I.EXECUTION_ID_ = #{parameter}
   </select>
+
+  <select id="selectIncidentsByConfiguration" parameterType="string" resultMap="incidentResultMap">
+    select *
+    from ${prefix}ACT_RU_INCIDENT I
+    where I.CONFIGURATION_ = #{parameter}
+  </select>  
   
   <select id="selectIncidentByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.IncidentQueryImpl" resultMap="incidentResultMap">
     ${limitBefore}
@@ -90,6 +96,9 @@
       </if>
       <if test="rootCauseIncidentId != null">
         and RES.ROOT_CAUSE_INCIDENT_ID_ = #{rootCauseIncidentId}
+      </if>
+      <if test="configuration != null">
+        and RES.CONFIGURATION_ = #{configuration}
       </if>
     </where>
   </sql>

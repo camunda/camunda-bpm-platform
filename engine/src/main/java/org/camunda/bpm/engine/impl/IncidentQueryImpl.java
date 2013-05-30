@@ -35,6 +35,7 @@ public class IncidentQueryImpl extends AbstractQuery<IncidentQuery, Incident> im
   protected String processDefinitionId;
   protected String causeIncidentId;
   protected String rootCauseIncidentId;
+  protected String configuration;
   
   public IncidentQueryImpl() {
   }
@@ -47,8 +48,8 @@ public class IncidentQueryImpl extends AbstractQuery<IncidentQuery, Incident> im
     super(commandExecutor);
   }
   
-  public IncidentQuery id(String id) {
-    this.id = id;
+  public IncidentQuery incidentId(String incidentId) {
+    this.id = incidentId;
     return this;
   }
   
@@ -84,6 +85,11 @@ public class IncidentQueryImpl extends AbstractQuery<IncidentQuery, Incident> im
 
   public IncidentQuery rootCauseIncidentId(String rootCauseIncidentId) {
     this.rootCauseIncidentId = rootCauseIncidentId;
+    return this;
+  }
+  
+  public IncidentQuery configuration(String configuration) {
+    this.configuration = configuration;
     return this;
   }
 
