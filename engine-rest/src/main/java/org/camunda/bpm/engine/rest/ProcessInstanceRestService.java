@@ -34,7 +34,6 @@ import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceQueryDto;
 import org.camunda.bpm.engine.rest.dto.runtime.VariableListDto;
 import org.camunda.bpm.engine.rest.dto.runtime.VariableValueDto;
-import org.camunda.bpm.engine.rest.http.PATCH;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 
 @Path(ProcessInstanceRestService.PATH)
@@ -114,7 +113,7 @@ public interface ProcessInstanceRestService {
   @Path("/{id}/variables/{varId}")
   void deleteVariable(@PathParam("id") String processInstanceId, @PathParam("varId") String variableName);
   
-  @PATCH
+  @POST
   @Path("/{id}/variables")
   @Consumes(MediaType.APPLICATION_JSON)
   void modifyVariables(@PathParam("id") String processInstanceId, PatchVariablesDto patch);

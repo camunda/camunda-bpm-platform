@@ -34,5 +34,22 @@ public class FailedJobCommandTest extends AbstractFoxPlatformIntegrationTest {
     Assert.assertEquals(0, managementService.createJobQuery().withRetriesLeft().count());
     
   }
+  
+  @Test
+  public void testJobRetriesDecremented_multiple() {
+    
+    for(int i = 0; i < 50; i++) {
+      runtimeService.startProcessInstanceByKey("theProcess");
+    }
+    
+    Assert.assertEquals(50, managementService.createJobQuery().withRetriesLeft().count());
+    
+    waitForJobExecutorToProcessAllJobs(30000, 500);
+    
+    // now the retries = 0
+    
+    Assert.assertEquals(0, managementService.createJobQuery().withRetriesLeft().count());
+    
+  }
 
 }

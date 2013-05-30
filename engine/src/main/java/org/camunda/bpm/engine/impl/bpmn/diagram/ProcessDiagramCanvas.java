@@ -90,18 +90,18 @@ public class ProcessDiagramCanvas {
   // icons are statically loaded for performace
   static {
     try {
-      USERTASK_IMAGE = ImageIO.read(ReflectUtil.getResourceAsStream("org/camunda/bpm/engine/engine/impl/bpmn/deployer/user.png"));
-      SCRIPTTASK_IMAGE = ImageIO.read(ReflectUtil.getResourceAsStream("org/camunda/bpm/engine/engine/impl/bpmn/deployer/script.png"));
-      SERVICETASK_IMAGE = ImageIO.read(ReflectUtil.getResourceAsStream("org/camunda/bpm/engine/engine/impl/bpmn/deployer/service.png"));
-      RECEIVETASK_IMAGE = ImageIO.read(ReflectUtil.getResourceAsStream("org/camunda/bpm/engine/engine/impl/bpmn/deployer/receive.png"));
-      SENDTASK_IMAGE = ImageIO.read(ReflectUtil.getResourceAsStream("org/camunda/bpm/engine/engine/impl/bpmn/deployer/send.png"));
-      MANUALTASK_IMAGE = ImageIO.read(ReflectUtil.getResourceAsStream("org/camunda/bpm/engine/engine/impl/bpmn/deployer/manual.png"));
-      BUSINESS_RULE_TASK_IMAGE = ImageIO.read(ReflectUtil.getResourceAsStream("org/camunda/bpm/engine/engine/impl/bpmn/deployer/business_rule.png"));
-      TIMER_IMAGE = ImageIO.read(ReflectUtil.getResourceAsStream("org/camunda/bpm/engine/engine/impl/bpmn/deployer/timer.png"));
-      ERROR_THROW_IMAGE = ImageIO.read(ReflectUtil.getResourceAsStream("org/camunda/bpm/engine/engine/impl/bpmn/deployer/error_throw.png"));
-      ERROR_CATCH_IMAGE = ImageIO.read(ReflectUtil.getResourceAsStream("org/camunda/bpm/engine/engine/impl/bpmn/deployer/error_catch.png"));
-      SIGNAL_CATCH_IMAGE = ImageIO.read(ReflectUtil.getResourceAsStream("org/camunda/bpm/engine/engine/impl/bpmn/deployer/signal_catch.png"));
-      SIGNAL_THROW_IMAGE = ImageIO.read(ReflectUtil.getResourceAsStream("org/camunda/bpm/engine/engine/impl/bpmn/deployer/signal_throw.png"));
+      USERTASK_IMAGE = ImageIO.read(ReflectUtil.getResourceAsStream("org/camunda/bpm/engine/impl/bpmn/deployer/user.png"));
+      SCRIPTTASK_IMAGE = ImageIO.read(ReflectUtil.getResourceAsStream("org/camunda/bpm/engine/impl/bpmn/deployer/script.png"));
+      SERVICETASK_IMAGE = ImageIO.read(ReflectUtil.getResourceAsStream("org/camunda/bpm/engine/impl/bpmn/deployer/service.png"));
+      RECEIVETASK_IMAGE = ImageIO.read(ReflectUtil.getResourceAsStream("org/camunda/bpm/engine/impl/bpmn/deployer/receive.png"));
+      SENDTASK_IMAGE = ImageIO.read(ReflectUtil.getResourceAsStream("org/camunda/bpm/engine/impl/bpmn/deployer/send.png"));
+      MANUALTASK_IMAGE = ImageIO.read(ReflectUtil.getResourceAsStream("org/camunda/bpm/engine/impl/bpmn/deployer/manual.png"));
+      BUSINESS_RULE_TASK_IMAGE = ImageIO.read(ReflectUtil.getResourceAsStream("org/camunda/bpm/engine/impl/bpmn/deployer/business_rule.png"));
+      TIMER_IMAGE = ImageIO.read(ReflectUtil.getResourceAsStream("org/camunda/bpm/engine/impl/bpmn/deployer/timer.png"));
+      ERROR_THROW_IMAGE = ImageIO.read(ReflectUtil.getResourceAsStream("org/camunda/bpm/engine/impl/bpmn/deployer/error_throw.png"));
+      ERROR_CATCH_IMAGE = ImageIO.read(ReflectUtil.getResourceAsStream("org/camunda/bpm/engine/impl/bpmn/deployer/error_catch.png"));
+      SIGNAL_CATCH_IMAGE = ImageIO.read(ReflectUtil.getResourceAsStream("org/camunda/bpm/engine/impl/bpmn/deployer/signal_catch.png"));
+      SIGNAL_THROW_IMAGE = ImageIO.read(ReflectUtil.getResourceAsStream("org/camunda/bpm/engine/impl/bpmn/deployer/signal_throw.png"));
     } catch (IOException e) {
       LOGGER.warning("Could not load image for process diagram creation: " + e.getMessage());
     }

@@ -5,6 +5,7 @@ import org.camunda.bpm.application.ProcessApplication;
 import org.camunda.bpm.application.impl.ServletProcessApplication;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 
 /**
  *
@@ -20,6 +21,27 @@ public class DevProcessApplication extends ServletProcessApplication {
 
     runtimeService.startProcessInstanceByKey("OrderProcess");
     runtimeService.startProcessInstanceByKey("FailingProcess");
+    runtimeService.startProcessInstanceByKey("FailingProcess");
     runtimeService.startProcessInstanceByKey("CallActivity");
+
+
+    runtimeService.startProcessInstanceByKey("OrderProcess");
+    runtimeService.startProcessInstanceByKey("OrderProcess");
+    runtimeService.startProcessInstanceByKey("OrderProcess");
+    runtimeService.startProcessInstanceByKey("OrderProcess");
+    runtimeService.startProcessInstanceByKey("FailingProcess");
+    runtimeService.startProcessInstanceByKey("FailingProcess");
+    runtimeService.startProcessInstanceByKey("FailingProcess");
+    runtimeService.startProcessInstanceByKey("FailingProcess");
+    runtimeService.startProcessInstanceByKey("FailingProcess");
+    runtimeService.startProcessInstanceByKey("FailingProcess");
+    runtimeService.startProcessInstanceByKey("CallActivity");
+    runtimeService.startProcessInstanceByKey("CallActivity");
+    runtimeService.startProcessInstanceByKey("CallActivity");
+    runtimeService.startProcessInstanceByKey("CallActivity");
+    runtimeService.startProcessInstanceByKey("CallActivity");
+
+    ((ProcessEngineImpl) engine).getProcessEngineConfiguration().getJobExecutor().start();
+
   }
 }

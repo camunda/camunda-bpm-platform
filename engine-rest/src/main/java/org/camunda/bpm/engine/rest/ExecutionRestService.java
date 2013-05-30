@@ -15,8 +15,10 @@ package org.camunda.bpm.engine.rest;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -26,9 +28,11 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
+import org.camunda.bpm.engine.rest.dto.PatchVariablesDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ExecutionDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ExecutionQueryDto;
 import org.camunda.bpm.engine.rest.dto.runtime.VariableListDto;
+import org.camunda.bpm.engine.rest.dto.runtime.VariableValueDto;
 
 @Path(ExecutionRestService.PATH)
 @Produces(MediaType.APPLICATION_JSON)
@@ -70,5 +74,34 @@ public interface ExecutionRestService {
   @Produces(MediaType.APPLICATION_JSON)
   @Consumes(MediaType.APPLICATION_JSON)
   void signalExecution(@PathParam("id") String executionId, VariableListDto variables);
+  
+  @GET
+  @Path("/{id}/variables")
+  @Produces(MediaType.APPLICATION_JSON)
+  VariableListDto getVariables(@PathParam("id") String executionId);
+  
+  @POST
+  @Path("/{id}/variables")
+  @Consumes(MediaType.APPLICATION_JSON)
+  void modifyVariables(@PathParam("id") String executionId, PatchVariablesDto patch);
+  
+  @GET
+  @Path("/{id}/variables/{varId}")
+  @Produces(MediaType.APPLICATION_JSON)
+  VariableValueDto getVariable(@PathParam("id") String executionId, @PathParam("varId") String variableName);
+  
+  @PUT
+  @Path("/{id}/variables/{varId}")
+  @Consumes(MediaType.APPLICATION_JSON)
+  void putVariable(@PathParam("id") String executionId, @PathParam("varId") String variableName, VariableValueDto variable);
+  
+  @DELETE
+  @Path("/{id}/variables/{varId}")
+  void deleteVariable(@PathParam("id") String executionId, @PathParam("varId") String variableName);
+  
+  @POST
+  @Path("/{id}/messageSubscriptions/{messageName}/trigger")
+  @Consumes(MediaType.APPLICATION_JSON)
+  void triggerMessageEvent(@PathParam("id") String executionId, @PathParam("messageName") String messageName, VariableListDto variables);
   
 }

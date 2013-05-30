@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" 
+  xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" 
+  xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
+  xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" 
+  xmlns:activiti="http://activiti.org/bpmn" 
+  targetNamespace="Examples">
+
+  <process id="processDiagramProcess">
+
+    <startEvent id="start"/>
+
+    <sequenceFlow id="flow1" sourceRef="start" targetRef="end" />
+
+    <endEvent id="end" />
+
+  </process>
+
+  <bpmndi:BPMNDiagram id="sid-6822053f-a7b5-488b-b37e-0616458073ec">
+    <bpmndi:BPMNPlane bpmnElement="processDiagramProcess" id="diagram">
+      <bpmndi:BPMNShape bpmnElement="start" id="start_gui">
+       <omgdc:Bounds height="30.0" width="30.0" x="70.0" y="255.0" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="end" id="end_gui">
+        <omgdc:Bounds height="30.0" width="30.0" x="150.0" y="255.0" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="flow1_gui">
+        <omgdi:waypoint x="100.0" y="270.0" />
+        <omgdi:waypoint x="150.0" y="270.0" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

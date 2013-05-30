@@ -157,6 +157,8 @@
   </dependencies>
   
   <properties>
+      <mail.server.port>5025</mail.server.port>
+  
       <activiti.artifact>
         org.camunda.bpm.engine.db.mapping.entity,
         org.camunda.bpm.engine
@@ -177,7 +179,23 @@
   </properties>
 
   <build>
-    <plugins>      
+    <!-- filter mail.server.port -->
+    <testResources>
+      <testResource>
+        <directory>src/test/resources</directory>
+      </testResource>
+      <testResource>
+        <directory>src/test/resources</directory>
+        <filtering>true</filtering>
+        <includes>
+          <include>**/activiti.cfg.xml</include>
+          <include>**/*activiti.cfg.xml</include>
+          <include>**/activiti.cfg.db.xml</include>
+        </includes>
+      </testResource>
+    </testResources>
+        
+    <plugins>     
       <plugin>
         <artifactId>maven-surefire-plugin</artifactId>
         <configuration>
@@ -203,24 +221,24 @@
         </configuration>
       </plugin>
       <plugin>
-         <groupId>org.apache.felix</groupId>
-         <artifactId>maven-bundle-plugin</artifactId>
-          <executions>
-              <execution>
-                  <phase>generate-sources</phase>
-                  <goals>
-                      <goal>cleanVersions</goal>
-                  </goals>
-              </execution>
-        <execution>
-          <id>bundle-manifest</id>
-          <phase>process-classes</phase>
-          <goals>
-            <goal>manifest</goal>
-          </goals>
-        </execution>
-      </executions>
-    </plugin>
+        <groupId>org.apache.felix</groupId>
+        <artifactId>maven-bundle-plugin</artifactId>
+        <executions>
+          <execution>
+            <phase>generate-sources</phase>
+              <goals>
+                <goal>cleanVersions</goal>
+              </goals>
+          </execution>
+          <execution>
+            <id>bundle-manifest</id>
+            <phase>process-classes</phase>
+            <goals>
+              <goal>manifest</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
     </plugins>
     <pluginManagement>
     	<plugins>
@@ -349,7 +367,7 @@
                 <configuration>
                   <tasks>                                     
                     <echo message="updating activiti configuration to db ${database}" />
-                    <copy file="${basedir}/src/test/resources/activiti.cfg.db.xml" tofile="target/test-classes/activiti.cfg.xml" overwrite="true">
+                    <copy file="target/test-classes/activiti.cfg.db.xml" tofile="target/test-classes/activiti.cfg.xml" overwrite="true">
                       <filterset filtersfile="${db.properties.file}" />
                     </copy>
                     

@@ -3,6 +3,7 @@
   var cockpitCore = [
     'module:cockpit.pages:./pages/main',
     'module:cockpit.directives:./directives/main',
+    'module:cockpit.filters:./filters/main',
     'module:cockpit.resources:./resources/main',
     'module:cockpit.plugin:cockpit-plugin' ];
 
@@ -11,7 +12,7 @@
     'module:camunda.common.extensions:camunda-common/extensions/main',
     'module:camunda.common.services:camunda-common/services/main' ];
 
-  var plugins = PLUGIN_DEPENDENCIES || [];
+  var plugins = window.PLUGIN_DEPENDENCIES || [];
 
   var dependencies = [ 'jquery', 'module:ng', 'module:ngResource' ].concat(commons, cockpitCore, plugins);
 
@@ -65,4 +66,4 @@
 
   });
 
-})();
+})(window || this);

@@ -1,0 +1,24 @@
+<div>
+
+  <table class="table table-bordered table-hover table-condensed">
+    <thead>
+      <th>ID</th>
+      <th>Starttime</th>
+      <th>Business Key</th>
+      <th>State</th>
+    </thead>
+    <tbody>
+      <tr ng-repeat="processInstance in processInstances">
+        <td title="{{ processInstance.id }}">{{ processInstance.id | shorten:8 }}</td>
+        <td>{{ processInstance.startTime }}</td>
+        <td>{{ processInstance.businessKey }}</td>
+        <td>
+          <span ngm-if="hasFailedJobs(processInstance)" class="badge badge-important">&nbsp;</span>
+          <span ngm-if="!hasFailedJobs(processInstance)" class="badge badge-success">&nbsp;</span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div paginator total-pages="pages.total" current-page="pages.current" />
+</div>
