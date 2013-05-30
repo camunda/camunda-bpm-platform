@@ -20,6 +20,7 @@
     <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/IdentityInfo.xml" />
     <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/IdentityLink.xml" />
     <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/Job.xml" />
+    <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/Incident.xml" />
     <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/Membership.xml" />
     <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/ProcessDefinition.xml" />
     <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/Property.xml" />

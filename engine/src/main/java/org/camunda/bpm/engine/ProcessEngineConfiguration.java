@@ -142,6 +142,8 @@ public abstract class ProcessEngineConfiguration {
   protected boolean jpaCloseEntityManager;
   
   protected ClassLoader classLoader;
+  
+  protected boolean createIncidentOnFailedJobEnabled = true;
 
   /** use one of the static createXxxx methods instead */
   protected ProcessEngineConfiguration() {
@@ -506,6 +508,15 @@ public abstract class ProcessEngineConfiguration {
 
   public void setDataSourceJndiName(String dataSourceJndiName) {
     this.dataSourceJndiName = dataSourceJndiName;
+  }
+
+  public boolean isCreateIncidentOnFailedJobEnabled() {
+    return createIncidentOnFailedJobEnabled;
+  }
+
+  public ProcessEngineConfiguration setCreateIncidentOnFailedJobEnabled(boolean createIncidentOnFailedJobEnabled) {
+    this.createIncidentOnFailedJobEnabled = createIncidentOnFailedJobEnabled;
+    return this;
   }
   
 }
