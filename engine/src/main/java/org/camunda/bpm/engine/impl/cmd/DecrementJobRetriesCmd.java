@@ -19,6 +19,7 @@ import java.io.StringWriter;
 import org.camunda.bpm.engine.impl.cfg.TransactionContext;
 import org.camunda.bpm.engine.impl.cfg.TransactionState;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.incident.FailedJobIncidentHandler;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
@@ -51,6 +52,18 @@ public class DecrementJobRetriesCmd implements Command<Object> {
     if(exception != null) {
       job.setExceptionMessage(exception.getMessage());
       job.setExceptionStacktrace(getExceptionStacktrace());
+    }
+    
+    if (job.getRetries() == 0) {
+      if (Context
+          .getProcessEngineConfiguration()
+          .isCreateIncidentOnFailedJobEnabled()) {
+        
+        Context
+          .getProcessEngineConfiguration()
+          .getIncidentHandler(FailedJobIncidentHandler.INCIDENT_HANDLER_TYPE)
+          .handleIncident(null, null, job.getExecutionId(), job.getId());
+      }
     }
     
     JobExecutor jobExecutor = Context.getProcessEngineConfiguration().getJobExecutor();

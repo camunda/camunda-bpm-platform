@@ -20,6 +20,7 @@ import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ExecutionQuery;
+import org.camunda.bpm.engine.runtime.IncidentQuery;
 import org.camunda.bpm.engine.runtime.NativeExecutionQuery;
 import org.camunda.bpm.engine.runtime.NativeProcessInstanceQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -393,6 +394,12 @@ public interface RuntimeService {
    * by SQL directly
    */
   NativeProcessInstanceQuery createNativeProcessInstanceQuery();
+
+  /**
+   * Creates a new {@link IncidentQuery} instance, that can be used
+   * to query incidents.
+   */
+  IncidentQuery createIncidentQuery();
   
   // Process instance state //////////////////////////////////////////
     

@@ -4,6 +4,7 @@ drop index ACT_RU_IDENTITYLINK.ACT_IDX_IDENT_LNK_USER;
 drop index ACT_RU_IDENTITYLINK.ACT_IDX_IDENT_LNK_GROUP;
 drop index ACT_RU_VARIABLE.ACT_IDX_VARIABLE_TASK_ID;
 drop index ACT_RU_EVENT_SUBSCR.ACT_IDX_EVENT_SUBSCR_CONFIG_;
+drop index ACT_RU_INCIDENT.ACT_IDX_INC_CONFIGURATION;
 
 alter table ACT_GE_BYTEARRAY 
     drop constraint ACT_FK_BYTEARR_DEPL;
@@ -47,6 +48,21 @@ alter table ACT_RU_JOB
 alter table ACT_RU_EVENT_SUBSCR
     drop constraint ACT_FK_EVENT_EXEC;
 
+alter table ACT_RU_INCIDENT
+    drop constraint ACT_FK_INC_EXE; 
+  
+alter table ACT_RU_INCIDENT
+    drop constraint ACT_FK_INC_PROCINST; 
+
+alter table ACT_RU_INCIDENT
+    drop constraint ACT_FK_INC_PROCDEF;
+    
+alter table ACT_RU_INCIDENT
+    drop constraint ACT_FK_INC_CAUSE; 
+
+alter table ACT_RU_INCIDENT
+    drop constraint ACT_FK_INC_RCAUSE; 
+    
 drop index ACT_RU_IDENTITYLINK.ACT_IDX_ATHRZ_PROCEDEF;
     
 if exists (select TABLE_NAME from INFORMATION_SCHEMA.TABLES where TABLE_NAME = 'ACT_GE_PROPERTY') drop table ACT_GE_PROPERTY;
@@ -59,3 +75,4 @@ if exists (select TABLE_NAME from INFORMATION_SCHEMA.TABLES where TABLE_NAME = '
 if exists (select TABLE_NAME from INFORMATION_SCHEMA.TABLES where TABLE_NAME = 'ACT_RU_EXECUTION') drop table ACT_RU_EXECUTION;
 if exists (select TABLE_NAME from INFORMATION_SCHEMA.TABLES where TABLE_NAME = 'ACT_RU_EVENT_SUBSCR') drop table ACT_RU_EVENT_SUBSCR;
 if exists (select TABLE_NAME from INFORMATION_SCHEMA.TABLES where TABLE_NAME = 'ACT_RU_JOB') drop table ACT_RU_JOB;
+if exists (select TABLE_NAME from INFORMATION_SCHEMA.TABLES where TABLE_NAME = 'ACT_RU_INCIDENT') drop table ACT_RU_INCIDENT;
