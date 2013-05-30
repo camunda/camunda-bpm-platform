@@ -78,7 +78,7 @@ public interface ExecutionRestService {
   @GET
   @Path("/{id}/variables")
   @Produces(MediaType.APPLICATION_JSON)
-  VariableListDto getVariables(@PathParam("id") String processInstanceId);
+  VariableListDto getVariables(@PathParam("id") String executionId);
   
   @POST
   @Path("/{id}/variables")
