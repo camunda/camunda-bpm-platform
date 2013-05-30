@@ -244,6 +244,10 @@ h1 {
 Cursors
 -------------------**/
 
-.pointer {
+.pagination li {
   cursor: pointer;
+}
+
+.pagination .active, .pagination .disabled {
+  cursor: auto;
 }

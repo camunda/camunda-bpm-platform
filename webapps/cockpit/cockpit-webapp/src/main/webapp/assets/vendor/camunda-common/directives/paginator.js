@@ -1,145 +1,100 @@
-"use strict";
-
-define([ "angular", "jquery" ], function(angular, $) {
+ngDefine('camunda.common.directives', [ 'angular', 'jquery' ], function(module, angular, $) {
 
   var paginatorTmpl =
     '<div class="pagination pagination-centered">' +
-    '  <ul>' +
-    '    <li ng-repeat="page in pages" ng-class="{active: page.isActive, disabled: page.isDisabled, pointer: (!page.isActive && page.number != -1)}">' +
-    '      <a ng-click="selectPage(page.number)">{{ page.text }}</a>' +
+    '  <ul ngm-if="pages.length">' +
+    '    <li ng-repeat="page in pages" ng-class="{ active: page.current, disabled: page.disabled }">' +
+    '      <a ngm-if="page.disabled" href ng-bind-html-unsafe="page.text"></a>' +
+    '      <a ngm-if="!page.disabled" ng-click="selectPage(page.number)" ng-bind-html-unsafe="page.text"></a>' +
     '    </li>' +
     '  </ul>' +
     '</div>';
 
-  var module = angular.module("cockpit.directives");
-
-  var Directive = function ($window) {
+  var PaginatorDirective = function () {
     return {
-      restrict: 'A',
+      restrict: 'EAC',
       template: paginatorTmpl,
       replace: true,
       scope: {
-        numRows: '=',
+        totalPages: '=',
         currentPage: '='
       },
       link: function(scope, element, attrs) {
 
         /* constants */
-        var previousText = '&laquo;';
-        var nextText = '&raquo;';
-        var dots = '&hellip;';
 
-        /* default offset if no one is specified */
-        var defaultOffset = 20;
+        var LABEL = {
+          PREVIOUS: '&laquo;',
+          NEXT: '&raquo;',
+          DOTS: '&hellip;'
+        };
 
-        /* check whether an offset is set, if not the default offset is chosen */
-        var offset = angular.isDefined(attrs.offset) ? attrs.offset : defaultOffset;
+        scope.$watch('totalPages', function() {
+          update();
+        });
 
-        /**
-         * Returns a configured page.
-         */
-        function createPage (number, text, isActive, isDisabled) {
-          return {
-            number: number,
-            text: text,
-            isActive: isActive,
-            isDisabled: isDisabled
-          };
+        scope.$watch('currentPage', function() {
+          update();
+        });
+
+        function update() {
+          var totalPages = scope.totalPages;
+          var currentPage = scope.currentPage;
+
+          var pages = scope.pages = [];
+
+          if ((!totalPages && totalPages !== 0) ||
+              (!currentPage && currentPage !== 0)) {
+
+            return;
+          }
+
+          if (totalPages > 10) {
+
+            // more than 10 pages, show
+            //   1 ... 4 [5] 6 ... n
+            for (var i = currentPage - 1; i < currentPage + 2; i++) {
+              if (i > 0 && i <= totalPages) {
+                pages.push({ number: i, text: i, current: (currentPage === i) });
+              }
+            }
+
+            if (currentPage - 1 > 2) {
+              pages.unshift({ disabled: true, text: LABEL.DOTS });
+            }
+
+            if (currentPage - 1 > 1) {
+              pages.unshift({ number: 1, text: 1 });
+            }
+
+            if (currentPage + 2 < totalPages) {
+              pages.push({ disabled: true, text: LABEL.DOTS });
+            }
+
+            if (currentPage + 1 < totalPages) {
+              pages.push({ number: totalPages, text: totalPages });
+            }
+          } else {
+
+            // less/eq 10 pages, show
+            //   1 2 3 4 5 6
+            for (var i = 1; i <= totalPages; i++) {
+              pages.push({ number: i, text: i, current: (currentPage === i) });
+            }
+          }
+
+          // add << and >> handles
+
+          pages.push({ number: (currentPage + 1), text: LABEL.NEXT, disabled: (currentPage + 1 > totalPages) });
+          pages.unshift({ number: (currentPage - 1), text: LABEL.PREVIOUS, disabled: (currentPage - 1 < 1)});
         }
 
-        scope.$watch('numRows', function () {
-          if (!!scope.numRows) {
-            scope.createPaginator();
-          }
-        });
-
-        scope.$watch('currentPage', function () {
-          if (!!scope.currentPage) {
-            scope.createPaginator();
-          }
-        });
-
-        scope.createPaginator = function () {
-
-          scope.pages = [];
-
-          var numPages = scope.numPages = Math.ceil(scope.numRows/offset);
-
-          if (numPages <= 10) {
-            // If there are less or equal 10 pages that has to be shown, then
-            // all of them will be displayed in the pagination.
-            for (var number = 1; number <= numPages; number++) {
-              var page = createPage(number, number, scope.isActive(number), false);
-              scope.pages.push(page);
-            }
-          } else if (numPages > 10) {
-
-            // If there are more than 10 pages that has to be shown, then
-            // only the first and last one will be shown. Furthermore, the current
-            // selected page and the previous and next page will be shown, too.
-
-            var placeHolder = createPage(-1, dots, false, true);
-
-            if (scope.currentPage <= 3) {
-              for (var number = 2; number <= 4; number++) {
-                scope.pages.push(createPage(number, number, scope.isActive(number), false));
-              };
-              scope.pages.push(placeHolder);
-            }
-
-            if (scope.currentPage >= (numPages-2)) {
-              scope.pages.push(placeHolder);
-              for (var number = numPages-3; number <= numPages-1; number++) {
-                scope.pages.push(createPage(number, number, scope.isActive(number), false));
-              };
-            }
-
-            if (scope.currentPage > 3 && scope.currentPage < (numPages-2)) {
-              scope.pages.push(placeHolder);
-              for (var number = scope.currentPage-1; number <= scope.currentPage+1; number++) {
-                scope.pages.push(createPage(number, number, scope.isActive(number), false));
-              };
-              scope.pages.push(placeHolder);
-            }
-
-            var firstPage = createPage(1, 1, scope.isActive(1), false);
-            scope.pages.unshift(firstPage);
-
-            var lastPage = createPage(numPages, numPages, scope.isActive(numPages), false);
-            scope.pages.push(lastPage);
-          }
-
-          var previousPage = createPage(scope.currentPage - 1, previousText, false, scope.noPrevious());
-          scope.pages.unshift(previousPage);
-
-          var nextPage = createPage(scope.currentPage + 1, nextText, false, scope.noNext());
-          scope.pages.push(nextPage);
-
-        };
-
-        scope.isActive = function (page) {
-          return scope.currentPage == page;
-        };
-
-        scope.noPrevious = function() {
-          return scope.currentPage == 1;
-        };
-
-        scope.noNext = function() {
-          return scope.currentPage == scope.numPages;
-        };
-
         scope.selectPage = function(page) {
-          if (!scope.isActive(page) && page > 0 && page <= scope.numPages) {
-            scope.currentPage = page;
-          }
+          scope.currentPage = page;
         };
-
       }
     };
   };
 
-  module
-    .directive('paginator', Directive);
-
+  module.directive('paginator', PaginatorDirective);
 });

@@ -4,12 +4,12 @@ import org.camunda.bpm.cockpit.db.QueryParameters;
 import org.camunda.bpm.cockpit.plugin.base.persistence.entity.ProcessInstanceDto;
 
 public class ProcessInstanceQueryParameter extends QueryParameters<ProcessInstanceDto> {
-  
+
   private String processDefinitionId;
-  
-  public ProcessInstanceQueryParameter(int firstResult, int offset) {
+
+  public ProcessInstanceQueryParameter(int firstResult, int maxResults) {
     this.firstResult = firstResult;
-    this.maxResults = offset;
+    this.maxResults = maxResults;
   }
 
   public String getProcessDefinitionId() {
