@@ -1,48 +1,34 @@
-/* Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- * 
- *      http://www.apache.org/licenses/LICENSE-2.0
- * 
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package org.camunda.bpm.engine.rest.dto.message;
 
+import java.util.List;
 import java.util.Map;
+
+import org.camunda.bpm.engine.rest.dto.runtime.VariableValueDto;
+import org.camunda.bpm.engine.rest.util.DtoUtil;
 
 public class MessageDto {
 
   private String messageName;
-  private String businessKey;
-  private Map<String, Object> correlationKeys;
-  private Map<String, Object> processVariables;
   
+  private List<VariableValueDto> variables;
+
   public String getMessageName() {
     return messageName;
   }
+
   public void setMessageName(String messageName) {
     this.messageName = messageName;
   }
-  public String getBusinessKey() {
-    return businessKey;
+
+  public List<VariableValueDto> getVariables() {
+    return variables;
   }
-  public void setBusinessKey(String businessKey) {
-    this.businessKey = businessKey;
+
+  public void setVariables(List<VariableValueDto> variables) {
+    this.variables = variables;
   }
-  public Map<String, Object> getCorrelationKeys() {
-    return correlationKeys;
-  }
-  public void setCorrelationKeys(Map<String, Object> correlationKeys) {
-    this.correlationKeys = correlationKeys;
-  }
-  public Map<String, Object> getProcessVariables() {
-    return processVariables;
-  }
-  public void setProcessVariables(Map<String, Object> processVariables) {
-    this.processVariables = processVariables;
+  
+  public Map<String, Object> variablesToMap() {
+    return DtoUtil.toMap(variables);
   }
 }

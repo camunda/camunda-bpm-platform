@@ -17,7 +17,7 @@ import javax.ws.rs.core.Response.Status;
 import org.camunda.bpm.engine.MismatchingMessageCorrelationException;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.rest.MessageRestService;
-import org.camunda.bpm.engine.rest.dto.message.MessageDto;
+import org.camunda.bpm.engine.rest.dto.message.CorrelationMessageDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 
@@ -32,7 +32,7 @@ public class MessageRestServiceImpl extends AbstractRestProcessEngineAware imple
   }
   
   @Override
-  public void deliverMessage(MessageDto messageDto) {
+  public void deliverMessage(CorrelationMessageDto messageDto) {
 
     if (messageDto.getMessageName() == null) {
       throw new InvalidRequestException(Status.BAD_REQUEST, "No message name supplied");
