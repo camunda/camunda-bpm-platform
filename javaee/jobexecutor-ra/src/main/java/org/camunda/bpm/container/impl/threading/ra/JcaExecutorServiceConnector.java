@@ -53,7 +53,7 @@ public class JcaExecutorServiceConnector implements ResourceAdapter, Serializabl
 
   }
 
-  protected ExecutorServiceWrapper executorServiceWrapper;
+  protected ExecutorServiceWrapper executorServiceWrapper = new ExecutorServiceWrapper();
 
   private static final long serialVersionUID = 1L;
 
@@ -94,8 +94,6 @@ public class JcaExecutorServiceConnector implements ResourceAdapter, Serializabl
       log.info("ProcessEngine classes not found in shared libraries. Not initializing Fox Platform JobExecutor Resource Adapter.");
       return;
     }
-
-    executorServiceWrapper = new ExecutorServiceWrapper();
 
     // initialize the ExecutorService (CommonJ or JCA, depending on configuration)
     if(isUseCommonJWorkManager) {
