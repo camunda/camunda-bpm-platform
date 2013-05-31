@@ -39,8 +39,8 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
 
   protected static final String EXECUTION_URL = TEST_RESOURCE_ROOT_PATH + "/execution/{id}";
   protected static final String SIGNAL_EXECUTION_URL = EXECUTION_URL + "/signal";
-  protected static final String EXECUTION_VARIABLES_URL = EXECUTION_URL + "/variables";
-  protected static final String SINGLE_EXECUTION_VARIABLE_URL = EXECUTION_VARIABLES_URL + "/{varId}";
+  protected static final String EXECUTION_LOCAL_VARIABLES_URL = EXECUTION_URL + "/localVariables";
+  protected static final String SINGLE_EXECUTION_LOCAL_VARIABLE_URL = EXECUTION_LOCAL_VARIABLES_URL + "/{varId}";
   protected static final String MESSAGE_SUBSCRIPTION_URL = EXECUTION_URL + "/messageSubscriptions/{messageName}/trigger";
   
   private RuntimeServiceImpl runtimeServiceMock;
@@ -126,7 +126,7 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
       .body("variables[0].name", equalTo(EXAMPLE_VARIABLE_KEY))
       .body("variables[0].value", equalTo(EXAMPLE_VARIABLE_VALUE))
       .body("variables[0].type", equalTo(String.class.getSimpleName()))
-      .when().get(EXECUTION_VARIABLES_URL);
+      .when().get(EXECUTION_LOCAL_VARIABLES_URL);
   }
   
   @Test
@@ -137,7 +137,7 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
       .then().expect().statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).contentType(ContentType.JSON)
       .body("type", equalTo(ProcessEngineException.class.getSimpleName()))
       .body("message", equalTo("expected exception"))
-      .when().get(EXECUTION_VARIABLES_URL);
+      .when().get(EXECUTION_LOCAL_VARIABLES_URL);
   }
   
   @Test
@@ -158,7 +158,7 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
     
     given().pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID).contentType(ContentType.JSON).body(messageBodyJson)
       .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
-      .when().post(EXECUTION_VARIABLES_URL);
+      .when().post(EXECUTION_LOCAL_VARIABLES_URL);
     
     Map<String, Object> expectedModifications = new HashMap<String, Object>();
     expectedModifications.put(variableKey, variableValue);
@@ -183,18 +183,18 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
       .then().expect().statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).contentType(ContentType.JSON)
       .body("type", equalTo(RestException.class.getSimpleName()))
       .body("message", equalTo("Cannot modify variables for execution " + MockProvider.EXAMPLE_EXECUTION_ID + ": expected exception"))
-      .when().post(EXECUTION_VARIABLES_URL);
+      .when().post(EXECUTION_LOCAL_VARIABLES_URL);
   }
   
   @Test
   public void testEmptyVariableModification() {
     given().pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID).contentType(ContentType.JSON).body(EMPTY_JSON_OBJECT)
       .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
-      .when().post(EXECUTION_VARIABLES_URL);
+      .when().post(EXECUTION_LOCAL_VARIABLES_URL);
   }
   
   @Test
-  public void testGetSingleVariable() {
+  public void testGetSingleLocalVariable() {
     String variableKey = "aVariableKey";
     int variableValue = 123;
     
@@ -205,11 +205,11 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
       .body("value", is(123))
       .body("name", is(variableKey))
       .body("type", is("Integer"))
-      .when().get(SINGLE_EXECUTION_VARIABLE_URL);
+      .when().get(SINGLE_EXECUTION_LOCAL_VARIABLE_URL);
   }
   
   @Test
-  public void testNonExistingVariable() {
+  public void testNonExistingLocalVariable() {
     String variableKey = "aVariableKey";
     
     when(runtimeServiceMock.getVariableLocal(eq(MockProvider.EXAMPLE_EXECUTION_ID), eq(variableKey))).thenReturn(null);
@@ -218,11 +218,11 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
       .then().expect().statusCode(Status.NOT_FOUND.getStatusCode())
       .body("type", is(InvalidRequestException.class.getSimpleName()))
       .body("message", is("Execution variable with name " + variableKey + " does not exist or is null"))
-      .when().get(SINGLE_EXECUTION_VARIABLE_URL);
+      .when().get(SINGLE_EXECUTION_LOCAL_VARIABLE_URL);
   }
   
   @Test
-  public void testGetVariableForNonExistingExecution() {
+  public void testGetLocalVariableForNonExistingExecution() {
     String variableKey = "aVariableKey";
     
     when(runtimeServiceMock.getVariableLocal(eq(MockProvider.EXAMPLE_EXECUTION_ID), eq(variableKey)))
@@ -232,11 +232,11 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
       .then().expect().statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
       .body("type", is(RestException.class.getSimpleName()))
       .body("message", is("Cannot get execution variable " + variableKey + ": expected exception"))
-      .when().get(SINGLE_EXECUTION_VARIABLE_URL);
+      .when().get(SINGLE_EXECUTION_LOCAL_VARIABLE_URL);
   }
   
   @Test
-  public void testPutSingleVariable() {
+  public void testPutSingleLocalVariable() {
     String variableKey = "aVariableKey";
     String variableValue = "aVariableValue";
     
@@ -245,27 +245,27 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
     given().pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID).pathParam("varId", variableKey)
       .contentType(ContentType.JSON).body(variableJson)
       .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
-      .when().put(SINGLE_EXECUTION_VARIABLE_URL);
+      .when().put(SINGLE_EXECUTION_LOCAL_VARIABLE_URL);
     
     verify(runtimeServiceMock).setVariableLocal(eq(MockProvider.EXAMPLE_EXECUTION_ID), eq(variableKey), 
         eq(variableValue));
   }
   
   @Test
-  public void testPutSingleVariableWithNoValue() {
+  public void testPutSingleLocalVariableWithNoValue() {
     String variableKey = "aVariableKey";
     
     given().pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID).pathParam("varId", variableKey)
       .contentType(ContentType.JSON).body(EMPTY_JSON_OBJECT)
       .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
-      .when().put(SINGLE_EXECUTION_VARIABLE_URL);
+      .when().put(SINGLE_EXECUTION_LOCAL_VARIABLE_URL);
     
     verify(runtimeServiceMock).setVariableLocal(eq(MockProvider.EXAMPLE_EXECUTION_ID), eq(variableKey), 
         isNull());
   }
   
   @Test
-  public void testPutVariableForNonExistingExecution() {
+  public void testPutLocalVariableForNonExistingExecution() {
     String variableKey = "aVariableKey";
     String variableValue = "aVariableValue";
     
@@ -279,22 +279,22 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
       .then().expect().statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
       .body("type", is(RestException.class.getSimpleName()))
       .body("message", is("Cannot put execution variable " + variableKey + ": expected exception"))
-      .when().put(SINGLE_EXECUTION_VARIABLE_URL);
+      .when().put(SINGLE_EXECUTION_LOCAL_VARIABLE_URL);
   }
   
   @Test
-  public void testDeleteSingleVariable() {
+  public void testDeleteSingleLocalVariable() {
     String variableKey = "aVariableKey";
     
     given().pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID).pathParam("varId", variableKey)
       .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
-      .when().delete(SINGLE_EXECUTION_VARIABLE_URL);
+      .when().delete(SINGLE_EXECUTION_LOCAL_VARIABLE_URL);
     
     verify(runtimeServiceMock).removeVariableLocal(eq(MockProvider.EXAMPLE_EXECUTION_ID), eq(variableKey));
   }
   
   @Test
-  public void testDeleteVariableForNonExistingExecution() {
+  public void testDeleteLocalVariableForNonExistingExecution() {
     String variableKey = "aVariableKey";
     
     doThrow(new ProcessEngineException("expected exception"))
@@ -304,7 +304,7 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
       .then().expect().statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
       .body("type", is(RestException.class.getSimpleName()))
       .body("message", is("Cannot delete execution variable " + variableKey + ": expected exception"))
-      .when().delete(SINGLE_EXECUTION_VARIABLE_URL);
+      .when().delete(SINGLE_EXECUTION_LOCAL_VARIABLE_URL);
   }
   
   @Test

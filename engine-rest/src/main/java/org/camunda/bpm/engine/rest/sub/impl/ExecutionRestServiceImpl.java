@@ -129,7 +129,7 @@ public class ExecutionRestServiceImpl extends AbstractRestProcessEngineAware imp
   }
   
   @Override
-  public VariableListDto getVariables(String executionId) {
+  public VariableListDto getLocalVariables(String executionId) {
     List<VariableValueDto> values = new ArrayList<VariableValueDto>();
     
     RuntimeService runtimeService = getProcessEngine().getRuntimeService();
@@ -142,7 +142,7 @@ public class ExecutionRestServiceImpl extends AbstractRestProcessEngineAware imp
   }
 
   @Override
-  public void modifyVariables(String executionId, PatchVariablesDto patch) {
+  public void modifyLocalVariables(String executionId, PatchVariablesDto patch) {
     Map<String, Object> variableModifications = new HashMap<String, Object>();
     if (patch.getModifications() != null) {
       for (VariableValueDto variable : patch.getModifications()) {
@@ -162,7 +162,7 @@ public class ExecutionRestServiceImpl extends AbstractRestProcessEngineAware imp
   }
   
   @Override
-  public VariableValueDto getVariable(String executionId,
+  public VariableValueDto getLocalVariable(String executionId,
       String variableName) {
     RuntimeService runtimeService = getProcessEngine().getRuntimeService();
     Object variable = null;
@@ -181,7 +181,7 @@ public class ExecutionRestServiceImpl extends AbstractRestProcessEngineAware imp
   }
 
   @Override
-  public void putVariable(String executionId, String variableName,
+  public void putLocalVariable(String executionId, String variableName,
       VariableValueDto variable) {
     
     RuntimeService runtimeService = getProcessEngine().getRuntimeService();
@@ -193,7 +193,7 @@ public class ExecutionRestServiceImpl extends AbstractRestProcessEngineAware imp
   }
 
   @Override
-  public void deleteVariable(String executionId,
+  public void deleteLocalVariable(String executionId,
       String variableName) {
     RuntimeService runtimeService = getProcessEngine().getRuntimeService();
     try {
