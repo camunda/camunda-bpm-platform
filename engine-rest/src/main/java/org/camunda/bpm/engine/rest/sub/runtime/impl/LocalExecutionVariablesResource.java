@@ -1,10 +1,11 @@
-package org.camunda.bpm.engine.rest.sub.impl;
+package org.camunda.bpm.engine.rest.sub.runtime.impl;
 
 import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.RuntimeServiceImpl;
+import org.camunda.bpm.engine.rest.sub.impl.AbstractVariablesResource;
 
 public class LocalExecutionVariablesResource extends AbstractVariablesResource {
 

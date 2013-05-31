@@ -22,8 +22,8 @@ import org.camunda.bpm.engine.rest.ProcessInstanceRestService;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceQueryDto;
-import org.camunda.bpm.engine.rest.sub.ProcessInstanceResource;
-import org.camunda.bpm.engine.rest.sub.impl.ProcessInstanceResourceImpl;
+import org.camunda.bpm.engine.rest.sub.runtime.ProcessInstanceResource;
+import org.camunda.bpm.engine.rest.sub.runtime.impl.ProcessInstanceResourceImpl;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 

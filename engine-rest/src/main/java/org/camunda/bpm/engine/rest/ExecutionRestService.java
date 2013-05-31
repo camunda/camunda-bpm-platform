@@ -28,7 +28,7 @@ import javax.ws.rs.core.UriInfo;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ExecutionDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ExecutionQueryDto;
-import org.camunda.bpm.engine.rest.sub.ExecutionResource;
+import org.camunda.bpm.engine.rest.sub.runtime.ExecutionResource;
 
 @Path(ExecutionRestService.PATH)
 @Produces(MediaType.APPLICATION_JSON)

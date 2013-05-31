@@ -14,9 +14,7 @@ package org.camunda.bpm.engine.rest;
 
 import java.util.List;
 
-import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
-import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -28,11 +26,8 @@ import javax.ws.rs.core.UriInfo;
 import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.StatisticsResultDto;
-import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDiagramDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDto;
-import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
-import org.camunda.bpm.engine.rest.dto.runtime.StartProcessInstanceDto;
-import org.camunda.bpm.engine.rest.dto.task.FormDto;
+import org.camunda.bpm.engine.rest.sub.repository.ProcessDefinitionResource;
 
 @Path(ProcessDefinitionRestService.PATH)
 @Produces(MediaType.APPLICATION_JSON)
@@ -44,6 +39,10 @@ public interface ProcessDefinitionRestService {
   
   public static final String PATH = "/process-definition";
 
+
+  @Path("/{id}")
+  ProcessDefinitionResource getProcessDefinition(@PathParam("id") String processDefinitionId);
+  
   /**
    * Exposes the {@link ProcessDefinitionQuery} interface as a REST service.
    * @param query
@@ -60,35 +59,9 @@ public interface ProcessDefinitionRestService {
   @Path("/count")
   @Produces(MediaType.APPLICATION_JSON)
   CountResultDto getProcessDefinitionsCount(@Context UriInfo uriInfo);
-
+	
 	@GET
-	@Path("/{id}")
+  @Path("/statistics")
   @Produces(MediaType.APPLICATION_JSON)
-	ProcessDefinitionDto getProcessDefinition(@PathParam("id") String processDefinitionId);
-
-	@GET
-	@Path("/{id}/xml")
-  @Produces(MediaType.APPLICATION_JSON)
-	ProcessDefinitionDiagramDto getProcessDefinitionBpmn20Xml(@PathParam("id") String processDefinitionId);
-
-	@POST
-	@Path("/{id}/start")
-	@Consumes(MediaType.APPLICATION_JSON)
-  @Produces(MediaType.APPLICATION_JSON)
-	ProcessInstanceDto startProcessInstance(@Context UriInfo context, @PathParam("id") String processDefinitionId, StartProcessInstanceDto parameters);
-
-	@GET
-	@Path("/statistics")
-  @Produces(MediaType.APPLICATION_JSON)
-	List<StatisticsResultDto> getStatistics(@QueryParam("failedJobs") Boolean includeFailedJobs);
-
-	@GET
-	@Path("/{id}/statistics")
-  @Produces(MediaType.APPLICATION_JSON)
-  List<StatisticsResultDto> getActivityStatistics(@PathParam("id") String processDefinitionId, @QueryParam("failedJobs") Boolean includeFailedJobs);
-
-  @GET
-  @Path("/{id}/startForm")
-  @Produces(MediaType.APPLICATION_JSON)
-  FormDto getStartForm(@PathParam("id") String processDefinitionId);
+  List<StatisticsResultDto> getStatistics(@QueryParam("failedJobs") Boolean includeFailedJobs);
 }

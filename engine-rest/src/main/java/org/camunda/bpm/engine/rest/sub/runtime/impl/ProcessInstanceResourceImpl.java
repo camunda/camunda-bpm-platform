@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.rest.sub.impl;
+package org.camunda.bpm.engine.rest.sub.runtime.impl;
 
 import javax.ws.rs.core.Response.Status;
 
@@ -20,8 +20,8 @@ import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.rest.dto.DeleteEngineEntityDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
-import org.camunda.bpm.engine.rest.sub.ProcessInstanceResource;
 import org.camunda.bpm.engine.rest.sub.VariableResource;
+import org.camunda.bpm.engine.rest.sub.runtime.ProcessInstanceResource;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 
 public class ProcessInstanceResourceImpl implements ProcessInstanceResource {

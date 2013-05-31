@@ -22,8 +22,8 @@ import org.camunda.bpm.engine.rest.ExecutionRestService;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ExecutionDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ExecutionQueryDto;
-import org.camunda.bpm.engine.rest.sub.ExecutionResource;
-import org.camunda.bpm.engine.rest.sub.impl.ExecutionResourceImpl;
+import org.camunda.bpm.engine.rest.sub.runtime.ExecutionResource;
+import org.camunda.bpm.engine.rest.sub.runtime.impl.ExecutionResourceImpl;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ExecutionQuery;
 

@@ -1,4 +1,4 @@
-package org.camunda.bpm.engine.rest.sub.impl;
+package org.camunda.bpm.engine.rest.sub.runtime.impl;
 
 import java.util.Map;
 
@@ -11,8 +11,8 @@ import org.camunda.bpm.engine.rest.dto.runtime.ExecutionDto;
 import org.camunda.bpm.engine.rest.dto.runtime.VariableListDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
-import org.camunda.bpm.engine.rest.sub.ExecutionResource;
 import org.camunda.bpm.engine.rest.sub.VariableResource;
+import org.camunda.bpm.engine.rest.sub.runtime.ExecutionResource;
 import org.camunda.bpm.engine.runtime.Execution;
 
 public class ExecutionResourceImpl implements ExecutionResource {

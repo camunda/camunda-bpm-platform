@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.rest.sub;
+package org.camunda.bpm.engine.rest.sub.runtime;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
@@ -21,6 +21,7 @@ import javax.ws.rs.core.MediaType;
 
 import org.camunda.bpm.engine.rest.dto.DeleteEngineEntityDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
+import org.camunda.bpm.engine.rest.sub.VariableResource;
 
 public interface ProcessInstanceResource {
 

@@ -28,7 +28,7 @@ import javax.ws.rs.core.UriInfo;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceQueryDto;
-import org.camunda.bpm.engine.rest.sub.ProcessInstanceResource;
+import org.camunda.bpm.engine.rest.sub.runtime.ProcessInstanceResource;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 
 @Path(ProcessInstanceRestService.PATH)
@@ -36,6 +36,9 @@ import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 public interface ProcessInstanceRestService {
 
   public static final String PATH = "/process-instance";
+
+  @Path("/{id}")
+  ProcessInstanceResource getProcessInstance(@PathParam("id") String processInstanceId);
   
   /**
    * Exposes the {@link ProcessInstanceQuery} interface as a REST service.
@@ -78,9 +81,5 @@ public interface ProcessInstanceRestService {
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
   CountResultDto queryProcessInstancesCount(ProcessInstanceQueryDto query);
-
-  @Path("/{id}")
-  ProcessInstanceResource getProcessInstance(@PathParam("id") String processInstanceId);
-  
   
 }
