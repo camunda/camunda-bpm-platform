@@ -208,7 +208,7 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
     given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).contentType(ContentType.JSON).body(messageBodyJson)
       .then().expect().statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).contentType(ContentType.JSON)
       .body("type", equalTo(RestException.class.getSimpleName()))
-      .body("message", equalTo("Cannot modify variables for process instance " + MockProvider.EXAMPLE_PROCESS_INSTANCE_ID + ": expected exception"))
+      .body("message", equalTo("Cannot modify variables for execution " + MockProvider.EXAMPLE_PROCESS_INSTANCE_ID + ": expected exception"))
       .when().post(PROCESS_INSTANCE_VARIABLES_URL);
   }
   

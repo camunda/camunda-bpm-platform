@@ -4,7 +4,6 @@ import java.util.Properties;
 
 import org.camunda.bpm.engine.rest.exception.ProcessEngineExceptionHandler;
 import org.camunda.bpm.engine.rest.exception.RestExceptionHandler;
-import org.camunda.bpm.engine.rest.impl.ExecutionRestServiceImpl;
 import org.camunda.bpm.engine.rest.impl.IdentityRestServiceImpl;
 import org.camunda.bpm.engine.rest.impl.MessageRestServiceImpl;
 import org.camunda.bpm.engine.rest.impl.ProcessDefinitionRestServiceImpl;
@@ -12,6 +11,7 @@ import org.camunda.bpm.engine.rest.impl.ProcessEngineRestServiceImpl;
 import org.camunda.bpm.engine.rest.impl.ProcessInstanceRestServiceImpl;
 import org.camunda.bpm.engine.rest.impl.TaskRestServiceImpl;
 import org.camunda.bpm.engine.rest.mapper.JacksonConfigurator;
+import org.camunda.bpm.engine.rest.sub.impl.ExecutionRestServiceImpl;
 import org.codehaus.jackson.jaxrs.JacksonJsonProvider;
 import org.jboss.resteasy.plugins.server.netty.NettyJaxrsServer;
 
