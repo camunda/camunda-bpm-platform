@@ -208,7 +208,7 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
     given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).contentType(ContentType.JSON).body(messageBodyJson)
       .then().expect().statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).contentType(ContentType.JSON)
       .body("type", equalTo(RestException.class.getSimpleName()))
-      .body("message", equalTo("Cannot modify variables for execution " + MockProvider.EXAMPLE_PROCESS_INSTANCE_ID + ": expected exception"))
+      .body("message", equalTo("Cannot modify variables for process instance " + MockProvider.EXAMPLE_PROCESS_INSTANCE_ID + ": expected exception"))
       .when().post(PROCESS_INSTANCE_VARIABLES_URL);
   }
   
@@ -243,7 +243,7 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
     given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).pathParam("varId", variableKey)
       .then().expect().statusCode(Status.NOT_FOUND.getStatusCode())
       .body("type", is(InvalidRequestException.class.getSimpleName()))
-      .body("message", is("Process variable with name " + variableKey + " does not exist or is null"))
+      .body("message", is("process instance variable with name " + variableKey + " does not exist or is null"))
       .when().get(SINGLE_PROCESS_INSTANCE_VARIABLE_URL);
   }
   
@@ -257,7 +257,7 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
     given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).pathParam("varId", variableKey)
       .then().expect().statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
       .body("type", is(RestException.class.getSimpleName()))
-      .body("message", is("Cannot get variable " + variableKey + ": expected exception"))
+      .body("message", is("Cannot get process instance variable " + variableKey + ": expected exception"))
       .when().get(SINGLE_PROCESS_INSTANCE_VARIABLE_URL);
   }
   
@@ -306,7 +306,7 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
       .contentType(ContentType.JSON).body(variableJson)
       .then().expect().statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
       .body("type", is(RestException.class.getSimpleName()))
-      .body("message", is("Cannot put variable " + variableKey + ": expected exception"))
+      .body("message", is("Cannot put process instance variable " + variableKey + ": expected exception"))
       .when().put(SINGLE_PROCESS_INSTANCE_VARIABLE_URL);
   }
   
@@ -331,7 +331,7 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
     given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).pathParam("varId", variableKey)
       .then().expect().statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
       .body("type", is(RestException.class.getSimpleName()))
-      .body("message", is("Cannot delete variable " + variableKey + ": expected exception"))
+      .body("message", is("Cannot delete process instance variable " + variableKey + ": expected exception"))
       .when().delete(SINGLE_PROCESS_INSTANCE_VARIABLE_URL);
   }
 }

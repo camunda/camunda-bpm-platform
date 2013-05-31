@@ -32,7 +32,6 @@ import org.camunda.bpm.engine.rest.TaskRestService;
 import org.camunda.bpm.engine.rest.dto.ProcessEngineDto;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.spi.ProcessEngineProvider;
-import org.camunda.bpm.engine.rest.sub.impl.ExecutionRestServiceImpl;
 
 public class ProcessEngineRestServiceImpl implements ProcessEngineRestService {
 

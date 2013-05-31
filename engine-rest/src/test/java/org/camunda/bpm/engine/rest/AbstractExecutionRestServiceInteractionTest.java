@@ -217,7 +217,7 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
     given().pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID).pathParam("varId", variableKey)
       .then().expect().statusCode(Status.NOT_FOUND.getStatusCode())
       .body("type", is(InvalidRequestException.class.getSimpleName()))
-      .body("message", is("Execution variable with name " + variableKey + " does not exist or is null"))
+      .body("message", is("execution variable with name " + variableKey + " does not exist or is null"))
       .when().get(SINGLE_EXECUTION_LOCAL_VARIABLE_URL);
   }
   

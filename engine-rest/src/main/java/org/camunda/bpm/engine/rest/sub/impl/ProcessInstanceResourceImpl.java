@@ -20,7 +20,6 @@ import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.rest.dto.DeleteEngineEntityDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
-import org.camunda.bpm.engine.rest.impl.ExecutionVariablesResource;
 import org.camunda.bpm.engine.rest.sub.ProcessInstanceResource;
 import org.camunda.bpm.engine.rest.sub.VariableResource;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -61,6 +60,6 @@ public class ProcessInstanceResourceImpl implements ProcessInstanceResource {
 
   @Override
   public VariableResource getVariablesResource() {
-    return new ExecutionVariablesResource(engine, processInstanceId);
+    return new ExecutionVariablesResource(engine, processInstanceId, true);
   }
 }
