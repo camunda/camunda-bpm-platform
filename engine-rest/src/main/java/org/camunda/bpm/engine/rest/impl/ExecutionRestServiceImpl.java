@@ -13,26 +13,17 @@
 package org.camunda.bpm.engine.rest.impl;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
-import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
 import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.RuntimeService;
-import org.camunda.bpm.engine.impl.RuntimeServiceImpl;
 import org.camunda.bpm.engine.rest.ExecutionRestService;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
-import org.camunda.bpm.engine.rest.dto.PatchVariablesDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ExecutionDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ExecutionQueryDto;
-import org.camunda.bpm.engine.rest.dto.runtime.VariableListDto;
-import org.camunda.bpm.engine.rest.dto.runtime.VariableValueDto;
-import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
-import org.camunda.bpm.engine.rest.exception.RestException;
+import org.camunda.bpm.engine.rest.sub.runtime.ExecutionResource;
+import org.camunda.bpm.engine.rest.sub.runtime.impl.ExecutionResourceImpl;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ExecutionQuery;
 
@@ -46,17 +37,9 @@ public class ExecutionRestServiceImpl extends AbstractRestProcessEngineAware imp
     super(engineName);
   }
   
-
   @Override
-  public ExecutionDto getExecution(String executionId) {
-    RuntimeService runtimeService = getProcessEngine().getRuntimeService();
-    Execution execution = runtimeService.createExecutionQuery().executionId(executionId).singleResult();
-    
-    if (execution == null) {
-      throw new InvalidRequestException(Status.NOT_FOUND, "Execution with id " + executionId + " does not exist");
-    }
-    
-    return ExecutionDto.fromExecution(execution);
+  public ExecutionResource getExecution(String executionId) {
+    return new ExecutionResourceImpl(getProcessEngine(), executionId);
   }
   
   @Override
@@ -114,108 +97,4 @@ public class ExecutionRestServiceImpl extends AbstractRestProcessEngineAware imp
     
     return result;
   }
-
-  @Override
-  public void signalExecution(String executionId,
-      VariableListDto variables) {
-    RuntimeService runtimeService = getProcessEngine().getRuntimeService();
-    try {
-      runtimeService.signal(executionId, variables.toMap());
-    } catch (ProcessEngineException e) {
-      throw new RestException(Status.INTERNAL_SERVER_ERROR, e, "Cannot signal execution " + executionId + ": " + e.getMessage());
-    }
-    
-  }
-  
-  @Override
-  public VariableListDto getLocalVariables(String executionId) {
-    List<VariableValueDto> values = new ArrayList<VariableValueDto>();
-    
-    RuntimeService runtimeService = getProcessEngine().getRuntimeService();
-
-    for (Map.Entry<String, Object> entry : runtimeService.getVariablesLocal(executionId).entrySet()) {
-      values.add(new VariableValueDto(entry.getKey(), entry.getValue(), entry.getValue().getClass().getSimpleName()));
-    }
-
-    return new VariableListDto(values);
-  }
-
-  @Override
-  public void modifyLocalVariables(String executionId, PatchVariablesDto patch) {
-    Map<String, Object> variableModifications = new HashMap<String, Object>();
-    if (patch.getModifications() != null) {
-      for (VariableValueDto variable : patch.getModifications()) {
-        variableModifications.put(variable.getName(), variable.getValue());
-      }
-    }
-    
-    List<String> variableDeletions = patch.getDeletions();
-    RuntimeServiceImpl runtimeService = (RuntimeServiceImpl) getProcessEngine().getRuntimeService();
-    
-    try {
-      runtimeService.updateVariablesLocal(executionId, variableModifications, variableDeletions);
-    } catch (ProcessEngineException e) {
-      throw new RestException(Status.INTERNAL_SERVER_ERROR, e, 
-          "Cannot modify variables for execution " + executionId + ": " + e.getMessage());
-    }
-  }
-  
-  @Override
-  public VariableValueDto getLocalVariable(String executionId,
-      String variableName) {
-    RuntimeService runtimeService = getProcessEngine().getRuntimeService();
-    Object variable = null;
-    try {
-       variable = runtimeService.getVariableLocal(executionId, variableName);
-    } catch (ProcessEngineException e) {
-      throw new RestException(Status.INTERNAL_SERVER_ERROR, e, "Cannot get execution variable " + variableName + ": " + e.getMessage());
-    }
-    
-    if (variable == null) {
-      throw new InvalidRequestException(Status.NOT_FOUND, "Execution variable with name " + variableName + " does not exist or is null");
-    }
-    
-    return new VariableValueDto(variableName, variable, variable.getClass().getSimpleName());
-    
-  }
-
-  @Override
-  public void putLocalVariable(String executionId, String variableName,
-      VariableValueDto variable) {
-    
-    RuntimeService runtimeService = getProcessEngine().getRuntimeService();
-    try {
-      runtimeService.setVariableLocal(executionId, variableName, variable.getValue());
-    } catch (ProcessEngineException e) {
-      throw new RestException(Status.INTERNAL_SERVER_ERROR, e, "Cannot put execution variable " + variableName + ": " + e.getMessage());
-    }
-  }
-
-  @Override
-  public void deleteLocalVariable(String executionId,
-      String variableName) {
-    RuntimeService runtimeService = getProcessEngine().getRuntimeService();
-    try {
-      runtimeService.removeVariableLocal(executionId, variableName);
-    } catch (ProcessEngineException e) {
-      throw new RestException(Status.INTERNAL_SERVER_ERROR, e, "Cannot delete execution variable " + variableName + ": " + e.getMessage());
-    }
-  }
-
-  @Override
-  public void triggerMessageEvent(String executionId, String messageName, VariableListDto variablesDto) {
-    RuntimeService runtimeService = getProcessEngine().getRuntimeService();
-    
-    Map<String, Object> variables = variablesDto.toMap();
-    
-    try {
-      runtimeService.messageEventReceived(messageName, executionId, variables);
-    } catch (ProcessEngineException e) {
-      throw new RestException(Status.INTERNAL_SERVER_ERROR, e, "Cannot trigger message " + messageName +
-      		" for execution " + executionId + ": " + e.getMessage());
-    }
-    
-    
-  }
-  
 }

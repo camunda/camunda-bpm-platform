@@ -15,10 +15,8 @@ package org.camunda.bpm.engine.rest;
 import java.util.List;
 
 import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -28,11 +26,9 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
-import org.camunda.bpm.engine.rest.dto.PatchVariablesDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ExecutionDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ExecutionQueryDto;
-import org.camunda.bpm.engine.rest.dto.runtime.VariableListDto;
-import org.camunda.bpm.engine.rest.dto.runtime.VariableValueDto;
+import org.camunda.bpm.engine.rest.sub.runtime.ExecutionResource;
 
 @Path(ExecutionRestService.PATH)
 @Produces(MediaType.APPLICATION_JSON)
@@ -40,10 +36,8 @@ public interface ExecutionRestService {
   
   public static final String PATH = "/execution";
 
-  @GET
   @Path("/{id}")
-  @Produces(MediaType.APPLICATION_JSON)
-  ExecutionDto getExecution(@PathParam("id") String executionId);
+  ExecutionResource getExecution(@PathParam("id") String executionId);
   
   @GET
   @Produces(MediaType.APPLICATION_JSON)
@@ -68,40 +62,4 @@ public interface ExecutionRestService {
   @Produces(MediaType.APPLICATION_JSON)
   @Consumes(MediaType.APPLICATION_JSON)
   CountResultDto queryExecutionsCount(ExecutionQueryDto query);
-  
-  @POST
-  @Path("/{id}/signal")
-  @Produces(MediaType.APPLICATION_JSON)
-  @Consumes(MediaType.APPLICATION_JSON)
-  void signalExecution(@PathParam("id") String executionId, VariableListDto variables);
-  
-  @GET
-  @Path("/{id}/localVariables")
-  @Produces(MediaType.APPLICATION_JSON)
-  VariableListDto getLocalVariables(@PathParam("id") String executionId);
-  
-  @POST
-  @Path("/{id}/localVariables")
-  @Consumes(MediaType.APPLICATION_JSON)
-  void modifyLocalVariables(@PathParam("id") String executionId, PatchVariablesDto patch);
-  
-  @GET
-  @Path("/{id}/localVariables/{varId}")
-  @Produces(MediaType.APPLICATION_JSON)
-  VariableValueDto getLocalVariable(@PathParam("id") String executionId, @PathParam("varId") String variableName);
-  
-  @PUT
-  @Path("/{id}/localVariables/{varId}")
-  @Consumes(MediaType.APPLICATION_JSON)
-  void putLocalVariable(@PathParam("id") String executionId, @PathParam("varId") String variableName, VariableValueDto variable);
-  
-  @DELETE
-  @Path("/{id}/localVariables/{varId}")
-  void deleteLocalVariable(@PathParam("id") String executionId, @PathParam("varId") String variableName);
-  
-  @POST
-  @Path("/{id}/messageSubscriptions/{messageName}/trigger")
-  @Consumes(MediaType.APPLICATION_JSON)
-  void triggerMessageEvent(@PathParam("id") String executionId, @PathParam("messageName") String messageName, VariableListDto variables);
-  
 }
