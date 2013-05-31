@@ -72,6 +72,23 @@ define([ 'angular', 'jquery', 'camunda-common/directives/main', 'camunda-common/
 
         expect(text).toEqual(' « 1 … 10 11 12 » ');
       }));
+      
+      it('creates compact pagination > 10 elements (3)', inject(function($rootScope, $compile) {
+
+          $rootScope.totalPages = 12;
+          $rootScope.currentPage = 6;
+
+          element = createElement('<paginator total-pages="totalPages" current-page="currentPage" />');
+          element = $compile(element)($rootScope);
+
+          $rootScope.$digest();
+
+          var text = element.text();
+          text = text.replace(/\s+/gm, " ");
+
+          expect(text).toEqual(' « 1 … 5 6 7 … 12 » ');
+      }));
+      
     });
   });
 });
