@@ -37,7 +37,6 @@ public class ExecutionRestServiceImpl extends AbstractRestProcessEngineAware imp
     super(engineName);
   }
   
-
   @Override
   public ExecutionResource getExecution(String executionId) {
     return new ExecutionResourceImpl(getProcessEngine(), executionId);

@@ -55,11 +55,13 @@ public abstract class AbstractVariablesResource implements VariableResource {
     try {
        variable = getVariableEntity(variableName);
     } catch (ProcessEngineException e) {
-      throw new RestException(Status.INTERNAL_SERVER_ERROR, e, "Cannot get " + getResourceTypeName() + " variable " + variableName + ": " + e.getMessage());
+      String errorMessage = String.format("Cannot get %s variable %s: %s", getResourceTypeName(), variableName, e.getMessage());
+      throw new RestException(Status.INTERNAL_SERVER_ERROR, e, errorMessage);
     }
     
     if (variable == null) {
-      throw new InvalidRequestException(Status.NOT_FOUND, getResourceTypeName() + " variable with name " + variableName + " does not exist or is null");
+      String errorMessage = String.format("%s variable with name %s does not exist or is null", getResourceTypeName(), variableName);
+      throw new InvalidRequestException(Status.NOT_FOUND, errorMessage);
     }
     
     return new VariableValueDto(variableName, variable, variable.getClass().getSimpleName());
@@ -72,7 +74,8 @@ public abstract class AbstractVariablesResource implements VariableResource {
     try {
       setVariableEntity(variableName, variable.getValue());
     } catch (ProcessEngineException e) {
-      throw new RestException(Status.INTERNAL_SERVER_ERROR, e, "Cannot put " + getResourceTypeName() + " variable " + variableName + ": " + e.getMessage());
+      String errorMessage = String.format("Cannot put %s variable %s: %s", getResourceTypeName(), variableName, e.getMessage());
+      throw new RestException(Status.INTERNAL_SERVER_ERROR, e, errorMessage);
     }
   }
 
@@ -81,7 +84,8 @@ public abstract class AbstractVariablesResource implements VariableResource {
     try {
       removeVariableEntity(variableName);
     } catch (ProcessEngineException e) {
-      throw new RestException(Status.INTERNAL_SERVER_ERROR, e, "Cannot delete " + getResourceTypeName() + " variable " + variableName + ": " + e.getMessage());
+      String errorMessage = String.format("Cannot delete %s variable %s: %s", getResourceTypeName(), variableName, e.getMessage());
+      throw new RestException(Status.INTERNAL_SERVER_ERROR, e, errorMessage);
     }
   }
   
@@ -99,8 +103,8 @@ public abstract class AbstractVariablesResource implements VariableResource {
     try {
       updateVariableEntities(variableModifications, variableDeletions);
     } catch (ProcessEngineException e) {
-      throw new RestException(Status.INTERNAL_SERVER_ERROR, e, 
-          "Cannot modify variables for " + getResourceTypeName() + " " + resourceId + ": " + e.getMessage());
+      String errorMessage = String.format("Cannot modify variables for %s %s: %s", getResourceTypeName(), resourceId, e.getMessage());
+      throw new RestException(Status.INTERNAL_SERVER_ERROR, e, errorMessage);
     }
     
   }
