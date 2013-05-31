@@ -76,28 +76,28 @@ public interface ExecutionRestService {
   void signalExecution(@PathParam("id") String executionId, VariableListDto variables);
   
   @GET
-  @Path("/{id}/variables")
+  @Path("/{id}/localVariables")
   @Produces(MediaType.APPLICATION_JSON)
-  VariableListDto getVariables(@PathParam("id") String executionId);
+  VariableListDto getLocalVariables(@PathParam("id") String executionId);
   
   @POST
-  @Path("/{id}/variables")
+  @Path("/{id}/localVariables")
   @Consumes(MediaType.APPLICATION_JSON)
-  void modifyVariables(@PathParam("id") String executionId, PatchVariablesDto patch);
+  void modifyLocalVariables(@PathParam("id") String executionId, PatchVariablesDto patch);
   
   @GET
-  @Path("/{id}/variables/{varId}")
+  @Path("/{id}/localVariables/{varId}")
   @Produces(MediaType.APPLICATION_JSON)
-  VariableValueDto getVariable(@PathParam("id") String executionId, @PathParam("varId") String variableName);
+  VariableValueDto getLocalVariable(@PathParam("id") String executionId, @PathParam("varId") String variableName);
   
   @PUT
-  @Path("/{id}/variables/{varId}")
+  @Path("/{id}/localVariables/{varId}")
   @Consumes(MediaType.APPLICATION_JSON)
-  void putVariable(@PathParam("id") String executionId, @PathParam("varId") String variableName, VariableValueDto variable);
+  void putLocalVariable(@PathParam("id") String executionId, @PathParam("varId") String variableName, VariableValueDto variable);
   
   @DELETE
-  @Path("/{id}/variables/{varId}")
-  void deleteVariable(@PathParam("id") String executionId, @PathParam("varId") String variableName);
+  @Path("/{id}/localVariables/{varId}")
+  void deleteLocalVariable(@PathParam("id") String executionId, @PathParam("varId") String variableName);
   
   @POST
   @Path("/{id}/messageSubscriptions/{messageName}/trigger")
