@@ -13,8 +13,8 @@
 package org.camunda.bpm.engine.impl.history.producer;
 
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
-import org.camunda.bpm.engine.impl.history.event.HistoricActivityInstanceEvent;
-import org.camunda.bpm.engine.impl.history.event.HistoricProcessInstanceEvent;
+import org.camunda.bpm.engine.impl.history.event.HistoricActivityInstanceEventEntity;
+import org.camunda.bpm.engine.impl.history.event.HistoricProcessInstanceEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 
 /**
@@ -34,7 +34,7 @@ public class HistoryEventProducerFactory {
   // process instance ///////////////////////////////
   
   /**
-   * @return the {@link HistoryEventProducer} to be invoked for producing the {@link HistoricProcessInstanceEvent} 
+   * @return the {@link HistoryEventProducer} to be invoked for producing the {@link HistoricProcessInstanceEventEntity} 
    * when a process instance is <b>started</b>.
    */
   public HistoryEventProducer getHistoricProcessInstanceStartEventProducer() {
@@ -42,7 +42,7 @@ public class HistoryEventProducerFactory {
   }
   
   /**
-   * @return the {@link HistoryEventProducer} to be invoked for producing the {@link HistoricProcessInstanceEvent} 
+   * @return the {@link HistoryEventProducer} to be invoked for producing the {@link HistoricProcessInstanceEventEntity} 
    * when a process instance is <b>ended</b>.
    */
   public HistoryEventProducer getHistoricProcessInstanceEndEventProducer() {
@@ -52,19 +52,19 @@ public class HistoryEventProducerFactory {
   // activity instance ///////////////////////////////
   
   /**
-   * @return the {@link HistoryEventProducer} to be invoked for producing the {@link HistoricActivityInstanceEvent} 
+   * @return the {@link HistoryEventProducer} to be invoked for producing the {@link HistoricActivityInstanceEventEntity} 
    * when an activity instance is <b>started</b>.
    */
   public HistoryEventProducer getHistoricActivityInstanceStartEventProducer() {
-    return new HistoricActivityInstanceEventProducer(HistoricActivityInstanceEvent.ACTIVITY_EVENT_TYPE_START);
+    return new HistoricActivityInstanceEventProducer(HistoricActivityInstanceEventEntity.ACTIVITY_EVENT_TYPE_START);
   }
   
   /**
-   * @return the {@link HistoryEventProducer} to be invoked for producing the {@link HistoricActivityInstanceEvent} 
+   * @return the {@link HistoryEventProducer} to be invoked for producing the {@link HistoricActivityInstanceEventEntity} 
    * when an activity instance is <b>ended</b>.
    */
   public HistoryEventProducer getHistoricActivityInstanceEndEventProducer() {
-    return new HistoricActivityInstanceEventProducer(HistoricActivityInstanceEvent.ACTIVITY_EVENT_TYPE_END);
+    return new HistoricActivityInstanceEventProducer(HistoricActivityInstanceEventEntity.ACTIVITY_EVENT_TYPE_END);
   }
   
   // tasks instance ///////////////////////////////

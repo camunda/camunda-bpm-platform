@@ -31,7 +31,8 @@
 
   <select id="selectDeploymentsByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.DeploymentQueryImpl" resultMap="deploymentResultMap">
   	${limitBefore}
-    select distinct RES.* ${limitBetween}
+    select ${limitBetween}
+    RES.*
     <include refid="selectDeploymentsByQueryCriteriaSql"/>
     ${orderBy}
     ${limitAfter}
@@ -42,7 +43,7 @@
     <include refid="selectDeploymentsByQueryCriteriaSql"/>
   </select>
   
-  <sql id="selectDeploymentsByQueryCriteriaSql">  
+  <sql id="selectDeploymentsByQueryCriteriaSql">
     from ${prefix}ACT_RE_DEPLOYMENT RES
     <where>
       <if test="deploymentId != null">

@@ -52,7 +52,7 @@
   <select id ="selectProcessDefinitionStatistics" resultMap="processDefinitionStatisticsResultMap" 
     parameterType="org.camunda.bpm.engine.impl.ProcessDefinitionStatisticsQueryImpl">
     ${limitBefore}
-    select RES.* ${limitBetween}
+    select ${limitBetween} RES.* 
     <include refid="selectProcessDefinitionStatisticsByQueryCriteriaSql"/>
     ${orderBy}
     ${limitAfter}
@@ -132,7 +132,7 @@
   <select id ="selectDeploymentStatistics" resultMap="deploymentStatisticsResultMap" 
     parameterType="org.camunda.bpm.engine.impl.DeploymentStatisticsQueryImpl">
     ${limitBefore}
-    select RES.* ${limitBetween}
+    select ${limitBetween} RES.* 
     <include refid="selectDeploymentStatisticsByQueryCriteriaSql"/>
     ${orderBy}
     ${limitAfter}

@@ -92,7 +92,7 @@
   
   <select id="selectTaskByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.TaskQueryImpl" resultMap="taskResultMap">
   	${limitBefore}
-    select distinct RES.* ${limitBetween}
+    select distinct ${limitBetween} RES.* 
     <include refid="selectTaskByQueryCriteriaSql"/> 
     ${orderBy}
     ${limitAfter}

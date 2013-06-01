@@ -58,7 +58,7 @@
     
   <select id="selectUserByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.UserQueryImpl" resultMap="userResultMap">
   	${limitBefore}
-    select RES.* ${limitBetween}
+    select ${limitBetween} RES.* 
     <include refid="selectUserByQueryCriteriaSql" />
     ${orderBy}
     ${limitAfter}

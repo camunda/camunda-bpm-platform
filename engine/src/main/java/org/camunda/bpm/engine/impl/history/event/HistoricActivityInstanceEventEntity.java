@@ -18,7 +18,7 @@ package org.camunda.bpm.engine.impl.history.event;
  * @author Daniel Meyer
  *
  */
-public class HistoricActivityInstanceEvent extends HistoryEvent {
+public class HistoricActivityInstanceEventEntity extends HistoryEvent {
   
   private static final long serialVersionUID = 1L;
   
@@ -35,6 +35,12 @@ public class HistoricActivityInstanceEvent extends HistoryEvent {
 
   /** the type of the activity (startEvent, serviceTask ...) */
   protected String activityType;
+  
+  /** the id of this activity instance */
+  protected String activityInstanceId;
+  
+  /** the id of the parent activity instance */
+  protected String parentActivityInstanceId;
   
   /**
    * The type of the activity audit event. 
@@ -77,6 +83,22 @@ public class HistoricActivityInstanceEvent extends HistoryEvent {
   
   public void setActivityName(String activityName) {
     this.activityName = activityName;
+  }
+  
+  public String getActivityInstanceId() {
+    return activityInstanceId;
+  }
+  
+  public void setActivityInstanceId(String activityInstanceId) {
+    this.activityInstanceId = activityInstanceId;
+  }
+  
+  public String getParentActivityInstanceId() {
+    return parentActivityInstanceId;
+  }
+  
+  public void setParentActivityInstanceId(String parentActivityInstanceId) {
+    this.parentActivityInstanceId = parentActivityInstanceId;
   }
 
 }

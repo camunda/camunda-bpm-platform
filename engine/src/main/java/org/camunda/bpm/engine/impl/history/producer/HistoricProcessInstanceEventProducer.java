@@ -13,7 +13,8 @@
 package org.camunda.bpm.engine.impl.history.producer;
 
 import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.camunda.bpm.engine.impl.history.event.HistoricProcessInstanceEvent;
+import org.camunda.bpm.engine.impl.history.event.HistoricActivityInstanceEventEntity;
+import org.camunda.bpm.engine.impl.history.event.HistoricProcessInstanceEventEntity;
 
 /**
  * <p>The producer for process instance audit events.</p>
@@ -27,8 +28,20 @@ public class HistoricProcessInstanceEventProducer extends HistoricActivityInstan
     super(eventType);
   }
   
-  protected HistoricProcessInstanceEvent createEventInstance(DelegateExecution execution) {
-    return new HistoricProcessInstanceEvent();
+  protected HistoricProcessInstanceEventEntity createEventInstance(DelegateExecution execution) {
+    return new HistoricProcessInstanceEventEntity();
+  }
+  
+  protected void initEvent(DelegateExecution execution, HistoricActivityInstanceEventEntity evt) {
+
+    final HistoricProcessInstanceEventEntity hpie = (HistoricProcessInstanceEventEntity) evt;
+
+    // call common init behavior
+    super.initEvent(execution, evt);
+    
+    // set business key
+    hpie.setBusinessKey(execution.getProcessBusinessKey());
+    
   }
 
 }

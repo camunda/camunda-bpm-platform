@@ -13,6 +13,7 @@
 package org.camunda.bpm.engine.impl.history.event;
 
 import java.io.Serializable;
+import java.util.Date;
 
 import org.camunda.bpm.engine.impl.db.DbSqlSession;
 import org.camunda.bpm.engine.impl.db.PersistentObject;
@@ -21,7 +22,7 @@ import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
 /**
  * <p>The base class for all history events.</p>
  * 
- * <p>An history event contains data about an event that has happened 
+ * <p>A history event contains data about an event that has happened 
  * in a process instance. Such an event may be the start of an activity,
  * the end of an activity, a task instance that is created or other similar
  * events...</p> 
@@ -56,7 +57,7 @@ public class HistoryEvent implements Serializable, PersistentObject {
   protected String processDefinitionId;
   
   /** a timestamp taken at the moment in time this event happens */
-  protected Long timestamp;
+  protected Date timestamp;
   
   // getters / setters ///////////////////////////////////
   
@@ -84,11 +85,11 @@ public class HistoryEvent implements Serializable, PersistentObject {
     this.processDefinitionId = processDefinitionId;
   }
   
-  public Long getTimestamp() {
+  public Date getTimestamp() {
     return timestamp;
   }
   
-  public void setTimestamp(Long timestamp) {
+  public void setTimestamp(Date timestamp) {
     this.timestamp = timestamp;
   }
   

@@ -1095,27 +1095,8 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
       }
     }
     
-    // update the cached historic activity instances that are open
-    List<HistoricActivityInstanceEntity> cachedHistoricActivityInstances = dbSqlSession.findInCache(HistoricActivityInstanceEntity.class);
-    for (HistoricActivityInstanceEntity cachedHistoricActivityInstance: cachedHistoricActivityInstances) {
-      if ( (cachedHistoricActivityInstance.getEndTime()==null)
-           && (id.equals(cachedHistoricActivityInstance.getExecutionId())) 
-         ) {
-        cachedHistoricActivityInstance.setExecutionId(replacedBy.getId());
-      }
-    }
-    
-    // update the persisted historic activity instances that are open
-    if (Context.getProcessEngineConfiguration().getHistoryLevel()>ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
-      List<HistoricActivityInstanceEntity> historicActivityInstances = (List) new HistoricActivityInstanceQueryImpl(commandContext)
-        .executionId(id)
-        .unfinished()
-        .list();
-      for (HistoricActivityInstanceEntity historicActivityInstance: historicActivityInstances) {
-        historicActivityInstance.setExecutionId(replacedBy.getId());
-      }
-    }
-    
+    // TODO: fire UPDATE activity instance events with new execution?
+        
     // set replaced by activity to our activity id
     replacedBy.setActivityInstanceId(activityInstanceId);
   }

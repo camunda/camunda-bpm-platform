@@ -13,8 +13,8 @@
 package org.camunda.bpm.engine.impl.history.producer;
 
 import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.camunda.bpm.engine.impl.history.event.HistoricActivityInstanceEvent;
-import org.camunda.bpm.engine.impl.history.event.HistoricProcessInstanceEvent;
+import org.camunda.bpm.engine.impl.history.event.HistoricActivityInstanceEventEntity;
+import org.camunda.bpm.engine.impl.history.event.HistoricProcessInstanceEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 
@@ -28,14 +28,13 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 public class HistoricProcessInstanceEndEventProducer extends HistoricProcessInstanceEventProducer {
 
   public HistoricProcessInstanceEndEventProducer() {
-    super(HistoricActivityInstanceEvent.ACTIVITY_EVENT_TYPE_END);
+    super(HistoricActivityInstanceEventEntity.ACTIVITY_EVENT_TYPE_END);
   }
     
-  @Override
-  protected void initEvent(DelegateExecution execution, HistoricActivityInstanceEvent evt) {
+  protected void initEvent(DelegateExecution execution, HistoricActivityInstanceEventEntity evt) {
 
     final ExecutionEntity executionEntity = (ExecutionEntity) execution;
-    final HistoricProcessInstanceEvent hpie = (HistoricProcessInstanceEvent) evt;
+    final HistoricProcessInstanceEventEntity hpie = (HistoricProcessInstanceEventEntity) evt;
 
     // call common init behavior
     super.initEvent(execution, evt);

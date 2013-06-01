@@ -111,8 +111,8 @@ public class TaskEntity extends VariableScopeImpl implements Task, DelegateTask,
     
     int historyLevel = Context.getProcessEngineConfiguration().getHistoryLevel();
     if (historyLevel>=ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
-//      HistoricTaskInstanceEntity historicTaskInstance = new HistoricTaskInstanceEntity(this, execution);
-//      dbSqlSession.insert(historicTaskInstance);
+      HistoricTaskInstanceEntity historicTaskInstance = new HistoricTaskInstanceEntity(this, execution);
+      dbSqlSession.insert(historicTaskInstance);
     }
   }
   

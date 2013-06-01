@@ -75,10 +75,13 @@ public class HistoryParseListener implements BpmnParseListener {
 
   protected void initExecutionListeners(HistoryEventProducerFactory factory) {
     PROCESS_INSTANCE_START_LISTENER = new ExecutionListenerHistoryAdapter(factory.getHistoricProcessInstanceStartEventProducer());
-    PROCESS_INSTANCE_END_LISTENER = new ExecutionListenerHistoryAdapter(factory.getHistoricProcessInstanceStartEventProducer());
+    PROCESS_INSTANCE_END_LISTENER = new ExecutionListenerHistoryAdapter(factory.getHistoricProcessInstanceEndEventProducer());
     
     ACTIVITY_INSTANCE_START_LISTENER = new ExecutionListenerHistoryAdapter(factory.getHistoricActivityInstanceStartEventProducer());
     ACTIVITI_INSTANCE_END_LISTENER = new ExecutionListenerHistoryAdapter(factory.getHistoricActivityInstanceEndEventProducer());
+    
+    USER_TASK_ASSIGNMENT_HANDLER = new UserTaskAssignmentHandler();
+    USER_TASK_ID_HANDLER = new UserTaskIdHandler();
   }
 
   public void parseProcess(Element processElement, ProcessDefinitionEntity processDefinition) {

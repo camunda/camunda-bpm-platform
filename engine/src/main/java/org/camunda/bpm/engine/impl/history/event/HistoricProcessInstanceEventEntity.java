@@ -18,7 +18,7 @@ package org.camunda.bpm.engine.impl.history.event;
  * @author Daniel Meyer
  *
  */
-public class HistoricProcessInstanceEvent extends HistoricActivityInstanceEvent {
+public class HistoricProcessInstanceEventEntity extends HistoricActivityInstanceEventEntity {
 
   private static final long serialVersionUID = 1L;
   

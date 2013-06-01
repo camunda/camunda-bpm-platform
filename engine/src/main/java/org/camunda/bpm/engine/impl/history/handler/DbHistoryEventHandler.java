@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.impl.history.handler;
 
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbSqlSession;
+import org.camunda.bpm.engine.impl.history.event.HistoricActivityInstanceEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 
 /**
@@ -34,7 +35,9 @@ public class DbHistoryEventHandler implements HistoryEventHandler {
     final DbSqlSession dbSqlSession = Context.getCommandContext()
       .getDbSqlSession();
     
-    dbSqlSession.insert(historyEvent);
+    if (historyEvent instanceof HistoricActivityInstanceEventEntity) {
+      dbSqlSession.insert(historyEvent);      
+    }
     
   }
 

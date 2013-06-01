@@ -19,6 +19,7 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.impl.db.PersistentObject;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
 
 
 /**
@@ -39,6 +40,23 @@ public class HistoricTaskInstanceEntity extends HistoricScopeInstanceEntity impl
   protected Date dueDate;
 
   public HistoricTaskInstanceEntity() {
+  }
+  
+  public HistoricTaskInstanceEntity(TaskEntity task, ExecutionEntity execution) {
+    this.id = task.getId();
+    if (execution!=null) {
+      this.processDefinitionId = execution.getProcessDefinitionId();
+      this.processInstanceId = execution.getProcessInstanceId();
+      this.executionId = execution.getId();
+    }
+    this.name = task.getName();
+    this.parentTaskId = task.getParentTaskId();
+    this.description = task.getDescription();
+    this.owner = task.getOwner();
+    this.assignee = task.getAssignee();
+    this.startTime = ClockUtil.getCurrentTime();
+    this.taskDefinitionKey = task.getTaskDefinitionKey();
+    this.setPriority(task.getPriority());
   }
 
   // persistence //////////////////////////////////////////////////////////////

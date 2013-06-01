@@ -78,7 +78,8 @@
 
   <select id="selectHistoricVariableInstanceByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricVariableInstanceQueryImpl" resultMap="historicProcessVariableResultMap">
   	${limitBefore}
-    select RES.* ${limitBetween}
+    select ${limitBetween}
+    RES.*
     <include refid="selectHistoricVariableInstanceByQueryCriteriaSql"/>
     ${orderBy}
     ${limitAfter}

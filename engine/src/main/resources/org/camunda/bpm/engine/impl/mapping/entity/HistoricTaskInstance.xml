@@ -118,7 +118,8 @@
 
   <select id="selectHistoricTaskInstancesByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricTaskInstanceQueryImpl" resultMap="historicTaskInstanceResultMap">
   	${limitBefore}
-    select RES.* ${limitBetween}
+    select ${limitBetween}
+    RES.*
     <include refid="selectHistoricTaskInstancesByQueryCriteriaSql"/>
     ${orderBy}
     ${limitAfter}

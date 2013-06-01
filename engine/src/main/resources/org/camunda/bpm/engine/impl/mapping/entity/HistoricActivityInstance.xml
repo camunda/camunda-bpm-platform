@@ -18,84 +18,135 @@
 
 <mapper namespace="org.camunda.bpm.engine.impl.persistence.entity.HistoricActivityInstanceEntity">
 
-  <!-- HISTORIC ACTIVITY INSTANCE INSERT -->
+  <!-- 
   
-  <insert id="insertHistoricActivityInstance" parameterType="org.camunda.bpm.engine.impl.persistence.entity.HistoricActivityInstanceEntity">
+  NOTE:
+  
+  HAIs are stored as update events. For each HAI, there are usually two update 
+  events which correspond to two lines in the DB:
+     
+    * a first line added when the activity is started
+    * a second line added when the activity is ended  
+  
+  The first part of this file contains the mappings for these update events. 
+  
+  When querying the DB, we are usually interested in an aggregated 
+  representation which combines the data contained in both update events as an individual 
+  object. The second part of this file contains aggregation queries which allows retrieving 
+  HAIs as single lines / objects.     
+    
+  -->
+  
+  <!-- /////////////////// start mappings for HistoricActivityInstanceEvent //////////////////// -->
+
+  <resultMap id="historicActivityInstanceEventResultMap" type="org.camunda.bpm.engine.impl.history.event.HistoricActivityInstanceEventEntity">
+    <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR" />
+    <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
+    <result property="executionId" column="EXECUTION_ID_" jdbcType="VARCHAR" />
+    <result property="timestamp" column="TIMESTAMP_" jdbcType="TIMESTAMP" />
+    <result property="activityId" column="ACT_ID_" jdbcType="VARCHAR" />
+    <result property="activityName" column="ACT_NAME_" jdbcType="VARCHAR" />
+    <result property="activityType" column="ACT_TYPE_" jdbcType="VARCHAR" />
+    <result property="activityInstanceId" column="ACT_INST_ID_" jdbcType="VARCHAR" />
+    <result property="parentActivityInstanceId" column="PARENT_ACT_INST_ID_" jdbcType="VARCHAR" />
+    <result property="eventType" column="EVENT_TYPE_" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  <insert id="insertHistoricActivityInstanceEvent" parameterType="org.camunda.bpm.engine.impl.history.event.HistoricActivityInstanceEventEntity">
       insert into ${prefix}ACT_HI_ACTINST (
         ID_,
         PROC_DEF_ID_,
         PROC_INST_ID_,
         EXECUTION_ID_,
+        TIMESTAMP_,
         ACT_ID_,
-        TASK_ID_,
-        CALL_PROC_INST_ID_,
         ACT_NAME_,
         ACT_TYPE_,
-        ASSIGNEE_,
-        START_TIME_,
-        END_TIME_,
-        DURATION_
+        ACT_INST_ID_,
+        PARENT_ACT_INST_ID_,
+        EVENT_TYPE_             
       ) values (
         #{id ,jdbcType=VARCHAR},
         #{processDefinitionId, jdbcType=VARCHAR},
         #{processInstanceId, jdbcType=VARCHAR},
         #{executionId, jdbcType=VARCHAR},
+        #{timestamp, jdbcType=TIMESTAMP},
         #{activityId ,jdbcType=VARCHAR},
-        #{taskId ,jdbcType=VARCHAR},
-        #{calledProcessInstanceId ,jdbcType=VARCHAR},
         #{activityName ,jdbcType=VARCHAR},
         #{activityType ,jdbcType=VARCHAR},
-        #{assignee ,jdbcType=VARCHAR},
-        #{startTime, jdbcType=TIMESTAMP},
-        #{endTime, jdbcType=TIMESTAMP},
-        #{durationInMillis ,jdbcType=BIGINT}
+        #{activityInstanceId ,jdbcType=VARCHAR},
+        #{parentActivityInstanceId ,jdbcType=VARCHAR},
+        #{eventType ,jdbcType=VARCHAR}      
       )
   </insert>
-
-  <!-- HISTORIC ACTIVITY INSTANCE UPDATE -->
   
-  <update id="updateHistoricActivityInstance" parameterType="org.camunda.bpm.engine.impl.persistence.entity.HistoricActivityInstanceEntity">
-    update ${prefix}ACT_HI_ACTINST set
-      EXECUTION_ID_ = #{executionId, jdbcType=VARCHAR},
-      ASSIGNEE_ = #{assignee, jdbcType=VARCHAR},
-      END_TIME_ = #{endTime, jdbcType=TIMESTAMP},
-      DURATION_ = #{durationInMillis ,jdbcType=BIGINT}
-    where ID_ = #{id}
-  </update>
-
-  <!-- HISTORIC ACTIVITY INSTANCE DELETE -->
+  <select id="selectHistoricActivityInstanceEvent" resultMap="historicActivityInstanceEventResultMap">
+    SELECT *       
+    FROM 
+      ${prefix}ACT_HI_ACTINST      
+    WHERE 
+      ID_ = #{id}    
+  </select>
   
   <delete id="deleteHistoricActivityInstancesByProcessInstanceId">
     delete from ${prefix}ACT_HI_ACTINST where PROC_INST_ID_ = #{processInstanceId}
   </delete>
+  
+  <!-- /////////////////// start mappings for HistoricProcessInstance //////////////////// -->
 
   <!-- HISTORIC ACTIVITY INSTANCE RESULT MAP -->
+  <!-- this is the aggregated HAI -->
 
   <resultMap id="historicActivityInstanceResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.HistoricActivityInstanceEntity">
-    <id property="id" column="ID_" jdbcType="VARCHAR" />
     <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR" />
     <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
     <result property="executionId" column="EXECUTION_ID_" jdbcType="VARCHAR" />
     <result property="activityId" column="ACT_ID_" jdbcType="VARCHAR" />
-    <result property="taskId" column="TASK_ID_" jdbcType="VARCHAR" />
-    <result property="calledProcessInstanceId" column="CALL_PROC_INST_ID_" jdbcType="VARCHAR" />
     <result property="activityName" column="ACT_NAME_" jdbcType="VARCHAR" />
     <result property="activityType" column="ACT_TYPE_" jdbcType="VARCHAR" />
+    <result property="taskId" column="TASK_ID_" jdbcType="VARCHAR" />
+    <result property="calledProcessInstanceId" column="CALL_PROC_INST_ID_" jdbcType="VARCHAR" />
     <result property="assignee" column="ASSIGNEE_" jdbcType="VARCHAR" />
     <result property="startTime" column="START_TIME_" jdbcType="TIMESTAMP" />
     <result property="endTime" column="END_TIME_" jdbcType="TIMESTAMP" />
     <result property="durationInMillis" column="DURATION_" jdbcType="BIGINT" />
   </resultMap>
-
-  <!-- HISTORIC ACTIVITY INSTANCE SELECT -->
   
   <select id="selectHistoricActivityInstance" resultMap="historicActivityInstanceResultMap">
-    select * from ${prefix}ACT_HI_ACTINST where ACT_ID_ = #{activityId} and PROC_INST_ID_ = #{processInstanceId}
+    SELECT distinct
+      A1.PROC_DEF_ID_ as PROC_DEF_ID_ ,
+      A1.PROC_INST_ID_  as PROC_INST_ID_,
+      A1.EXECUTION_ID_ as EXECUTION_ID_ ,
+      A1.ACT_ID_ as ACT_ID_ , 
+      A1.ACT_NAME_ as ACT_NAME_ ,
+      A1.ACT_TYPE_ as ACT_TYPE_ ,
+      A1.ACT_INST_ID_ as ACT_INST_ID_ ,
+      A1.PARENT_ACT_INST_ID_ as PARENT_ACT_INST_ID_ ,
+      A1.TASK_ID_ as TASK_ID_,
+      A1.CALL_PROC_INST_ID_ as CALL_PROC_INST_ID_ ,
+      A1.ASSIGNEE_ as ASSIGNEE_,
+      A1.TIMESTAMP_ as START_TIME_,
+      A2.TIMESTAMP_ as END_TIME_,
+      DATEDIFF(ms, A1.TIMESTAMP_ , A2.TIMESTAMP_ ) as DURATION_
+    
+    FROM
+      ${prefix}ACT_HI_ACTINST A1
+    LEFT JOIN 
+      ${prefix}ACT_HI_ACTINST A2 
+      ON
+        A1.ACT_INST_ID_ = A2.ACT_INST_ID_ 
+      AND
+        A2.EVENT_TYPE_ = 'end'
+    
+    WHERE
+      A1.EVENT_TYPE_ = 'start'
   </select>
 
   <select id="selectHistoricActivityInstancesByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricActivityInstanceQueryImpl" resultMap="historicActivityInstanceResultMap">
     ${limitBefore}
-    select RES.* ${limitBetween}
+    select ${limitBetween}
+    RES.*
     <include refid="selectHistoricActivityInstancesByQueryCriteriaSql"/>
     ${orderBy}
     ${limitAfter}

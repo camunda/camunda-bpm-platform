@@ -49,7 +49,8 @@
 
   <select id="selectEventSubscriptionByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.EventSubscriptionQueryImpl" resultMap="eventSubscriptionResultMap">
   	${limitBefore}
-    select RES.* ${limitBetween}
+    select ${limitBetween}
+    RES.*
     <include refid="selectEventSubscriptionByQueryCriteriaSql"/>
     ${orderBy}
     ${limitAfter}

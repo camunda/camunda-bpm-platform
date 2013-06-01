@@ -61,7 +61,7 @@
 
   <select id="selectProcessDefinitionsByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.ProcessDefinitionQueryImpl" resultMap="processDefinitionResultMap">
   	${limitBefore}
-    select RES.* ${limitBetween}
+    select ${limitBetween} RES.* 
     <include refid="selectProcessDefinitionsByQueryCriteriaSql"/>
     ${orderBy}
     ${limitAfter}
@@ -145,7 +145,7 @@
   <!-- mysql specific sql -->
   <select id="selectProcessDefinitionsByQueryCriteria_mysql" parameterType="org.camunda.bpm.engine.impl.ProcessDefinitionQueryImpl" resultMap="processDefinitionResultMap">
   	${limitBefore}
-    select distinct RES.* ${limitBetween}
+    select distinct ${limitBetween} RES.* 
     <include refid="selectProcessDefinitionsByQueryCriteriaSql"/>
     ${orderBy}
     ${limitAfter}

@@ -64,4 +64,10 @@ public interface DelegateExecution extends VariableScope {
    * Gets the name of the current activity.
    */
   String getCurrentActivityName();
+  
+  /** return the id of the current activity instance */
+  String getActivityInstanceId();
+  
+  /** return the id of the parent activity instance */
+  String getParentActivityInstanceId();
 }
