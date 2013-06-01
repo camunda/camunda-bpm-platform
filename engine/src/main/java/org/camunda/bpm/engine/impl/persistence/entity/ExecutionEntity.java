@@ -109,6 +109,9 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
   
   protected StartingExecution startingExecution;
   
+  /** the unique id of the current activity instance */
+  protected String activityInstanceId;
+  
   // state/type of execution ////////////////////////////////////////////////// 
   
   /** indicates if this execution represents an active path of execution.
@@ -728,17 +731,92 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
     }
   }
 
-  public void setActivity(ActivityImpl activity) {
-    this.activity = activity;
-    if (activity != null) {
-      this.activityId = activity.getId();
-      this.activityName = (String) activity.getProperty("name");
-    } else {
+  public void setActivity(ActivityImpl newActivity) {
+    ActivityImpl currentAct = this.activity;
+    
+    if (newActivity == null || (currentAct != null && newActivity.contains(currentAct))) {
+      leaveActivityInstance();
+    }
+    this.activity = newActivity;
+    
+    if (newActivity != null) {      
+      this.activityId = newActivity.getId();
+      this.activityName = (String) newActivity.getProperty("name");
+      
+      if(currentAct != newActivity) {
+        // we enter a new activity instance
+        enterActivityInstance();
+      }
+      
+    } else {      
       this.activityId = null;
       this.activityName = null;
+    }  
+    
+  }
+    
+  public void enterActivityInstance() {
+    
+    final ExecutionEntity parent = getParent();
+    
+    if (parent == null || parent.getActivity() != getActivity()) {
+      // generate new activity instance id
+      activityInstanceId = generateActivityInstanceId(getActivity().getId());    
+      if(log.isLoggable(Level.FINE)) {
+        log.log(Level.FINE, toString()+" enters activity instance "+activityInstanceId +"; parent activity instance: "+getParentActivityInstanceId());
+      }
+    } else {
+      activityInstanceId = parent.getActivityInstanceId();  
+      if(log.isLoggable(Level.FINE)) {
+        log.log(Level.FINE, toString()+" starts in activity instance "+activityInstanceId +"; parent activity instance: "+getParentActivityInstanceId());
+      }
     }
   }
   
+  public void leaveActivityInstance() {
+    activityInstanceId = getParentActivityInstanceId();    
+  }
+  
+  public String getParentActivityInstanceId() {
+    
+    final ExecutionEntity parent = getParent();
+    
+    if(isProcessInstance()) {
+      return processInstanceId;
+    } else {
+      if(parent.getActivity().contains(getActivity())) {
+        return parent.getActivityInstanceId();        
+      } else {
+        return parent.getParentActivityInstanceId();        
+      }
+    }
+  }
+  
+  /**
+   * generates an activity instance id
+   */
+  protected String generateActivityInstanceId(String activityId) {
+    
+    String nextId = Context.getProcessEngineConfiguration()
+      .getIdGenerator()
+      .getNextId();
+    
+    String compositeId = activityId+":"+nextId;
+    if(compositeId.length()>64) {
+      return String.valueOf(nextId);
+    } else {
+      return compositeId;
+    }
+  }
+  
+  public void setActivityInstanceId(String activityInstanceId) {
+    this.activityInstanceId = activityInstanceId;
+  }
+  
+  public String getActivityInstanceId() {
+    return activityInstanceId;
+  }
+
   // parent ///////////////////////////////////////////////////////////////////
   
   /** ensures initialization and returns the parent */
@@ -1037,6 +1115,9 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
         historicActivityInstance.setExecutionId(replacedBy.getId());
       }
     }
+    
+    // set replaced by activity to our activity id
+    replacedBy.setActivityInstanceId(activityInstanceId);
   }
 
   // variables ////////////////////////////////////////////////////////////////
@@ -1084,6 +1165,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
     persistentState.put("processDefinitionId", this.processDefinitionId);
     persistentState.put("businessKey", businessKey);
     persistentState.put("activityId", this.activityId);
+    persistentState.put("activityInstanceId", this.activityInstanceId);
     persistentState.put("isActive", this.isActive);
     persistentState.put("isConcurrent", this.isConcurrent);
     persistentState.put("isScope", this.isScope);

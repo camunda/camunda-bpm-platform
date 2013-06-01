@@ -7,7 +7,7 @@
   <!-- EXECUTION INSERT -->
 
   <insert id="insertExecution" parameterType="org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity">
-    insert into ${prefix}ACT_RU_EXECUTION (ID_, REV_, PROC_INST_ID_, BUSINESS_KEY_, PROC_DEF_ID_, ACT_ID_, IS_ACTIVE_, IS_CONCURRENT_, IS_SCOPE_,IS_EVENT_SCOPE_, PARENT_ID_, SUPER_EXEC_, SUSPENSION_STATE_, CACHED_ENT_STATE_)
+    insert into ${prefix}ACT_RU_EXECUTION (ID_, REV_, PROC_INST_ID_, BUSINESS_KEY_, PROC_DEF_ID_, ACT_ID_, ACT_INST_ID_, IS_ACTIVE_, IS_CONCURRENT_, IS_SCOPE_,IS_EVENT_SCOPE_, PARENT_ID_, SUPER_EXEC_, SUSPENSION_STATE_, CACHED_ENT_STATE_)
     values (
       #{id ,jdbcType=VARCHAR},
       1,
@@ -15,6 +15,7 @@
       #{businessKey, jdbcType=VARCHAR},
       #{processDefinitionId ,jdbcType=VARCHAR},
       #{activityId ,jdbcType=VARCHAR},
+      #{activityInstanceId ,jdbcType=VARCHAR},
       #{isActive ,jdbcType=BOOLEAN},
       #{isConcurrent ,jdbcType=BOOLEAN},
       #{isScope ,jdbcType=BOOLEAN},
@@ -33,6 +34,7 @@
       REV_ = #{revisionNext, jdbcType=INTEGER},
       PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR},
       ACT_ID_ = #{activityId, jdbcType=VARCHAR},
+      ACT_INST_ID_ = #{activityInstanceId, jdbcType=VARCHAR},
       IS_ACTIVE_ = #{isActive, jdbcType=BOOLEAN},
       IS_CONCURRENT_ = #{isConcurrent, jdbcType=BOOLEAN},
       IS_SCOPE_ = #{isScope, jdbcType=BOOLEAN},
@@ -60,6 +62,7 @@
     <result property="businessKey" column="BUSINESS_KEY_" jdbcType="VARCHAR" />
     <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR" />
     <result property="activityId" column="ACT_ID_" jdbcType="VARCHAR" />
+    <result property="activityInstanceId" column="ACT_INST_ID_" jdbcType="VARCHAR" />
     <result property="isActive" column="IS_ACTIVE_" jdbcType="BOOLEAN" />
     <result property="isConcurrent" column="IS_CONCURRENT_" jdbcType="BOOLEAN" />
     <result property="isScope" column="IS_SCOPE_" jdbcType="BOOLEAN" />

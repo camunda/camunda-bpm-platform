@@ -34,6 +34,7 @@ public class AtomicOperationTransitionNotifyListenerStart extends AbstractEventA
 
   @Override
   protected void eventNotificationsCompleted(InterpretableExecution execution) {
+    
     TransitionImpl transition = execution.getTransition();
     ActivityImpl destination = null;
     if(transition == null) { // this is null after async cont. -> transition is not stored in execution

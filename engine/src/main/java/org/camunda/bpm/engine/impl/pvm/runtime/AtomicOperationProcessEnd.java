@@ -41,6 +41,7 @@ public class AtomicOperationProcessEnd extends AbstractEventAtomicOperation {
 
   @Override
   protected void eventNotificationsCompleted(InterpretableExecution execution) {
+    
     InterpretableExecution superExecution = execution.getSuperExecution();
     SubProcessActivityBehavior subProcessActivityBehavior = null;
 

@@ -31,7 +31,7 @@ public class AtomicOperationTransitionNotifyListenerEnd extends AbstractEventAto
   }
 
   @Override
-  protected void eventNotificationsCompleted(InterpretableExecution execution) {
+  protected void eventNotificationsCompleted(InterpretableExecution execution) {   
     execution.performOperation(TRANSITION_DESTROY_SCOPE);
   }
 }

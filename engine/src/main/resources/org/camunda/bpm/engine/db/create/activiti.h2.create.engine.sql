@@ -40,6 +40,7 @@ create table ACT_RU_EXECUTION (
     PROC_DEF_ID_ varchar(64),
     SUPER_EXEC_ varchar(64),
     ACT_ID_ varchar(255),
+    ACT_INST_ID_ varchar(255),
     IS_ACTIVE_ bit,
     IS_CONCURRENT_ bit,
     IS_SCOPE_ bit,
