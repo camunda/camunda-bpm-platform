@@ -99,6 +99,7 @@
   <!-- this is the aggregated HAI -->
 
   <resultMap id="historicActivityInstanceResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.HistoricActivityInstanceEntity">
+    <result property="id" column="ID_" jdbcType="VARCHAR" />
     <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR" />
     <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
     <result property="executionId" column="EXECUTION_ID_" jdbcType="VARCHAR" />
@@ -148,7 +149,7 @@
     select ${limitBetween}
     
     * FROM (SELECT distinct 
-      A1.ACT_ID_ as ID_ ,
+      A1.ACT_INST_ID_ as ID_ ,
       A1.PROC_DEF_ID_ as PROC_DEF_ID_ ,
       A1.PROC_INST_ID_  as PROC_INST_ID_,
       A1.EXECUTION_ID_ as EXECUTION_ID_ ,
