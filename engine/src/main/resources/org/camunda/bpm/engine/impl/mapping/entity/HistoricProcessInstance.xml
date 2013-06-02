@@ -160,7 +160,8 @@
   	${limitBefore}    
     select ${limitBetween}
     
-    * FROM (SELECT 
+    * FROM (SELECT distinct
+    
     P1.PROC_INST_ID_  as ID_,  
     P1.PROC_INST_ID_  as PROC_INST_ID_,
     P2.BUSINESS_KEY_ as BUSINESS_KEY_ ,

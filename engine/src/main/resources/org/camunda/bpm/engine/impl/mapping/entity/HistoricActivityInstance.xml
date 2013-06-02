@@ -146,8 +146,28 @@
   <select id="selectHistoricActivityInstancesByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricActivityInstanceQueryImpl" resultMap="historicActivityInstanceResultMap">
     ${limitBefore}
     select ${limitBetween}
-    RES.*
+    
+    * FROM (SELECT distinct 
+      A1.ACT_ID_ as ID_ ,
+      A1.PROC_DEF_ID_ as PROC_DEF_ID_ ,
+      A1.PROC_INST_ID_  as PROC_INST_ID_,
+      A1.EXECUTION_ID_ as EXECUTION_ID_ ,
+      A1.ACT_ID_ as ACT_ID_ , 
+      A1.ACT_NAME_ as ACT_NAME_ ,
+      A1.ACT_TYPE_ as ACT_TYPE_ ,
+      A1.ACT_INST_ID_ as ACT_INST_ID_ ,
+      A1.PARENT_ACT_INST_ID_ as PARENT_ACT_INST_ID_ ,
+      A1.TASK_ID_ as TASK_ID_,
+      A1.CALL_PROC_INST_ID_ as CALL_PROC_INST_ID_ ,
+      A1.ASSIGNEE_ as ASSIGNEE_,
+      A1.TIMESTAMP_ as START_TIME_,
+      A2.TIMESTAMP_ as END_TIME_,
+      DATEDIFF(ms, A1.TIMESTAMP_ , A2.TIMESTAMP_ ) as DURATION_
+    
     <include refid="selectHistoricActivityInstancesByQueryCriteriaSql"/>
+    
+    ) RES
+    
     ${orderBy}
     ${limitAfter}
   </select>
@@ -158,37 +178,52 @@
   </select>
   
   <sql id="selectHistoricActivityInstancesByQueryCriteriaSql">
-    from ${prefix}ACT_HI_ACTINST RES
-    <where>
+    
+    FROM ${prefix}ACT_HI_ACTINST A1
+    LEFT JOIN 
+      ${prefix}ACT_HI_ACTINST A2 
+      ON
+        A1.ACT_INST_ID_ = A2.ACT_INST_ID_ 
+      AND
+        A2.EVENT_TYPE_ = 'end'
+        
+    <where>     
+      
+      A1.EVENT_TYPE_ = 'start'
+      
       <if test="processInstanceId != null">
-        RES.PROC_INST_ID_ = #{processInstanceId}
+        and A1.PROC_INST_ID_ = #{processInstanceId}
       </if>
       <if test="activityInstanceId != null">
-        and RES.ID_ = #{activityInstanceId}
+        and A1.ACT_INST_ID_ = #{activityInstanceId}
       </if>
       <if test="executionId != null">
-        and RES.EXECUTION_ID_ = #{executionId}
+      
+        <!-- TODO: Think about this:
+        Execution Id may be different in A1 than in A2 -->
+        
+        and A1.EXECUTION_ID_ = #{executionId}
       </if>
       <if test="processDefinitionId != null">
-        and RES.PROC_DEF_ID_ = #{processDefinitionId}
+        and A1.PROC_DEF_ID_ = #{processDefinitionId}
       </if>
       <if test="activityId != null">
-        and RES.ACT_ID_ = #{activityId}
+        and A1.ACT_ID_ = #{activityId}
       </if>
       <if test="activityName != null">
-        and RES.ACT_NAME_ = #{activityName}
+        and A1.ACT_NAME_ = #{activityName}
       </if>
       <if test="activityType != null">
-        and RES.ACT_TYPE_ = #{activityType}
+        and A1.ACT_TYPE_ = #{activityType}
       </if>
       <if test="assignee != null">
-        and RES.ASSIGNEE_ = #{assignee}
+        and A1.ASSIGNEE_ = #{assignee}
       </if>
       <if test="unfinished">
-        and RES.END_TIME_ is null
+        and A2.TIMESTAMP_ is null
       </if>
       <if test="finished">
-       and RES.END_TIME_ is not null
+       and A2.TIMESTAMP_ is not null
       </if>
     </where>
   </sql>
