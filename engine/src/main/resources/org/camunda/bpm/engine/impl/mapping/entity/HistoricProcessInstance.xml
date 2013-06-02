@@ -124,7 +124,7 @@
     SELECT distinct
        P1.PROC_INST_ID_  as ID_,  
        P1.PROC_INST_ID_  as PROC_INST_ID_,
-       P2.BUSINESS_KEY_ as BUSINESS_KEY_ ,
+       P1.BUSINESS_KEY_ as BUSINESS_KEY_ ,
        P1.PROC_DEF_ID_ as PROC_DEF_ID_ ,
        P1.TIMESTAMP_ as START_TIME_,
        P2.TIMESTAMP_ as END_TIME_,
@@ -134,7 +134,7 @@
        P2.ACT_ID_ as END_ACT_ID_,
        P1.SUPER_PROCESS_INSTANCE_ID_ as SUPER_PROCESS_INSTANCE_ID_,
        P2.DELETE_REASON_  as DELETE_REASON_
-        
+    
      FROM
        ${prefix}ACT_HI_PROCINST P1
      LEFT JOIN 
