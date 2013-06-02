@@ -164,7 +164,7 @@
     
     P1.PROC_INST_ID_  as ID_,  
     P1.PROC_INST_ID_  as PROC_INST_ID_,
-    P2.BUSINESS_KEY_ as BUSINESS_KEY_ ,
+    P1.BUSINESS_KEY_ as BUSINESS_KEY_ ,
     P1.PROC_DEF_ID_ as PROC_DEF_ID_ ,
     P1.TIMESTAMP_ as START_TIME_,
     P2.TIMESTAMP_ as END_TIME_,
@@ -208,7 +208,7 @@
       P1.EVENT_TYPE_ = 'start'
        
       <if test="processInstanceId != null">
-        P1.PROC_INST_ID_ = #{processInstanceId}
+        and P1.PROC_INST_ID_ = #{processInstanceId}
       </if>
       <if test="processInstanceIds != null and !processInstanceIds.isEmpty()">
         and P1.PROC_INST_ID_ in
@@ -240,18 +240,18 @@
       </if>
       <if test="processKeyNotIn != null">
         <foreach collection="processKeyNotIn" index="index" item="procDefKey">
-        and P1.KEY_ not like #{procDefKey}
-      </foreach>
+            and DEF.KEY_ not like #{procDefKey}
+        </foreach>
       </if>
       
       <!-- DEPRECATED : TO BE REMOVED IN 5.11 -->
       <if test="startDateOn">
         and P1.TIMESTAMP_ &gt;= #{startDateOnBegin}
-        and P2.TIMESTAMP_ &lt;= #{startDateOnEnd}
+        and P1.TIMESTAMP_ &lt;= #{startDateOnEnd}
       </if>
       <!-- DEPRECATED : TO BE REMOVED IN 5.11 -->
       <if test="finishDateOn">
-        and P1.TIMESTAMP_ &gt;= #{finishDateOnBegin}
+        and P2.TIMESTAMP_ &gt;= #{finishDateOnBegin}
         and P2.TIMESTAMP_ &lt;= #{finishDateOnEnd}
       </if>
       <!-- DEPRECATED : TO BE REMOVED IN 5.11 -->
