@@ -45,4 +45,36 @@ public interface IncidentQuery extends Query<IncidentQuery, Incident> {
   
   /** Only select incidents which contain the configuration. **/
   IncidentQuery configuration(String configuration);
+  
+  /** Order by id (needs to be followed by {@link #asc()} or {@link #desc()}). */
+  IncidentQuery orderByIncidentId();
+  
+  /** Order by incidentTimestamp (needs to be followed by {@link #asc()} or {@link #desc()}). */
+  IncidentQuery orderByIncidentTimestamp();
+  
+  /** Order by incidentType (needs to be followed by {@link #asc()} or {@link #desc()}). */
+  IncidentQuery orderByIncidentType();
+  
+  /** Order by executionId (needs to be followed by {@link #asc()} or {@link #desc()}). */
+  IncidentQuery orderByExecutionId();
+  
+  /** Order by activityId (needs to be followed by {@link #asc()} or {@link #desc()}). */
+  IncidentQuery orderByActivityId();
+  
+  /** Order by processInstanceId (needs to be followed by {@link #asc()} or {@link #desc()}). */
+  IncidentQuery orderByProcessInstanceId();
+  
+  /** Order by processDefinitionId (needs to be followed by {@link #asc()} or {@link #desc()}). */
+  IncidentQuery orderByProcessDefinitionId();
+  
+  /** Order by causeIncidentId (needs to be followed by {@link #asc()} or {@link #desc()}). */
+  IncidentQuery orderByCauseIncidentId();
+  
+  /** Order by rootCauseIncidentId (needs to be followed by {@link #asc()} or {@link #desc()}). */
+  IncidentQuery orderByRootCauseIncidentId();
+  
+  /** Order by configuration (needs to be followed by {@link #asc()} or {@link #desc()}). */
+  IncidentQuery orderByConfiguration();
+  
 }
+

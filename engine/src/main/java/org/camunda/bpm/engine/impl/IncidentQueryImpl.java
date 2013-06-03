@@ -92,7 +92,61 @@ public class IncidentQueryImpl extends AbstractQuery<IncidentQuery, Incident> im
     this.configuration = configuration;
     return this;
   }
+  
+  //ordering ////////////////////////////////////////////////////
+  
+  public IncidentQuery orderByIncidentId() {
+    this.orderProperty = IncidentQueryProperty.INCIDENT_ID;
+    return this;
+  }
+  
+  public IncidentQuery orderByIncidentTimestamp() {
+    this.orderProperty = IncidentQueryProperty.INCIDENT_TIMESTAMP;
+    return this;
+  }
+  
+  public IncidentQuery orderByIncidentType() {
+    this.orderProperty = IncidentQueryProperty.INCIDENT_TYPE;
+    return this;
+  }
+  
+  public IncidentQuery orderByExecutionId() {
+    this.orderProperty = IncidentQueryProperty.EXECUTION_ID;
+    return this;
+  }
+  
+  public IncidentQuery orderByActivityId() {
+    this.orderProperty = IncidentQueryProperty.ACTIVITY_ID;
+    return this;
+  }
+  
+  public IncidentQuery orderByProcessInstanceId() {
+    this.orderProperty = IncidentQueryProperty.PROCESS_INSTANCE_ID;
+    return this;
+  }
+  
+  public IncidentQuery orderByProcessDefinitionId() {
+    this.orderProperty = IncidentQueryProperty.PROCESS_DEFINITION_ID;
+    return this;
+  }
+  
+  public IncidentQuery orderByCauseIncidentId() {
+    this.orderProperty = IncidentQueryProperty.CAUSE_INCIDENT_ID;
+    return this;
+  }  
+  
+  public IncidentQuery orderByRootCauseIncidentId() {
+    this.orderProperty = IncidentQueryProperty.ROOT_CAUSE_INCIDENT_ID;
+    return this;
+  }
+  
+  public IncidentQuery orderByConfiguration() {
+    this.orderProperty = IncidentQueryProperty.CONFIGURATION;
+    return this;
+  }
 
+  //results ////////////////////////////////////////////////////
+  
   public long executeCount(CommandContext commandContext) {
     checkQueryOk();
     return commandContext
