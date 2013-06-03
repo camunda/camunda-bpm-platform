@@ -13,11 +13,15 @@
 
 package org.camunda.bpm.engine.test.bpmn.deployment;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
+import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.RepositoryServiceImpl;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -33,6 +37,7 @@ import org.camunda.bpm.engine.test.Deployment;
 
 /**
  * @author Joram Barrez
+ * @author Thorben Lindhauer
  */
 public class BpmnDeploymentTest extends PluggableProcessEngineTestCase {
   
@@ -217,6 +222,31 @@ public class BpmnDeploymentTest extends PluggableProcessEngineTestCase {
       assertEquals(0, repositoryService.createDeploymentQuery().count());
       assertTrue(expected.getMessage().startsWith("Error while parsing process: "));
     }
+  }
+  
+  /**
+   * Just assures that diagram creation actually creates something and does not crash.
+   * No qualitative evaluation of created diagram.
+   * @throws IOException 
+   */
+  public void testProcessDiagramCreation() throws IOException {
+    ProcessEngineConfigurationImpl config = (ProcessEngineConfigurationImpl) ProcessEngineConfiguration.createProcessEngineConfigurationFromResource("activiti.cfg.xml");
+    config.setCreateDiagramOnDeploy(true);
+    ProcessEngine engine = config.buildProcessEngine();
+    String deploymentId = engine.getRepositoryService().createDeployment()
+      .addClasspathResource("org/camunda/bpm/engine/test/bpmn/deployment/BpmnDeploymentTest.testProcessDiagramCreation.bpmn20.xml")
+      .deploy().getId();
+    
+    ProcessDefinition definition = engine.getRepositoryService().createProcessDefinitionQuery().singleResult();
+    String expectedDiagramName = "org/camunda/bpm/engine/test/bpmn/deployment/BpmnDeploymentTest.testProcessDiagramCreation.processDiagramProcess.png";
+    assertEquals(expectedDiagramName, definition.getDiagramResourceName());
+    
+    InputStream diagramStream = engine.getRepositoryService().getProcessDiagram(definition.getId());
+    assertNotNull(diagramStream);
+    diagramStream.close();
+    
+    // clean db
+    engine.getRepositoryService().deleteDeployment(deploymentId);
   }
   
 }

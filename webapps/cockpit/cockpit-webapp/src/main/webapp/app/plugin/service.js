@@ -6,69 +6,91 @@ define([ "angular" ], function(angular) {
 
   var module = angular.module("cockpit.plugin");
 
-  function PluginsProvider() {
-    var defaultPluginMap = {};
-    var extensionPluginMap = {};
+  function ViewsProvider() {
+
+    var defaultViewMap = {};
+    var pluginViewMap = {};
 
     var initialized = false;
 
-    function internalRegisterPlugin(key, plugin, map) {
+    function internalRegisterProvider(key, provider, map) {
       // make sure map is initialized
-      var pluginsByKey = map[key] = map[key] || [];
+      var viewsByKey = map[key] = map[key] || [];
 
-      pluginsByKey.push(plugin);
+      addViewProvider(viewsByKey, provider);
+    }
+
+    function addViewProvider(viewProviders, provider) {
+      var priority = provider.priority || 0;
+
+      // check from right to left (*-) where plugin
+      // should be added
+      for (var i = 0, p; !!(p = viewProviders[i]); i++) {
+        if (!p.priority || p.priority < priority) {
+          viewProviders.splice(i, 0, provider);
+          return;
+        }
+      }
+
+      // not yet added; add to front
+      viewProviders.push(provider);
     }
 
     /**
-     * Initializes plugin map to replace prefixes in templates
+     * Initializes the view map to replace prefixes in templates
      *
      * @param map the plugin map
      * @param app the application to resolve plugin references against
      */
-    function initializePlugins(map, Uri) {
-      angular.forEach(map, function(plugins) {
-        angular.forEach(plugins, function(plugin) {
+    function initializeViews(map, Uri) {
+      angular.forEach(map, function(viewProviders) {
+        angular.forEach(viewProviders, function(viewProvider) {
 
-          if (plugin.url) {
-            plugin.url = Uri.appUri(plugin.url);
+          if (viewProvider.url) {
+            viewProvider.url = Uri.appUri(viewProvider.url);
           }
         });
       });
     }
 
-    this.registerDefaultPlugin = function(key, plugin) {
-      internalRegisterPlugin(key, plugin, defaultPluginMap);
+    this.registerDefaultView = function(key, viewProvider) {
+      internalRegisterProvider(key, viewProvider, defaultViewMap);
     };
 
-    this.registerPlugin = function(key, plugin) {
-      internalRegisterPlugin(key, plugin, extensionPluginMap);
+    this.registerView = function(key, viewProvider) {
+      internalRegisterProvider(key, viewProvider, defaultViewMap);
     };
+
+    function ensureInitialized(Uri) {
+      if (!initialized) {
+        initializeViews(defaultViewMap, Uri);
+        initializeViews(pluginViewMap, Uri);
+
+        initialized = true;
+      }
+    }
 
     this.$get = ['Uri', '$filter', function(Uri, $filter) {
-      var plugins = {
-        get: function(options, dynamic) {
-          if (!initialized) {
-            initializePlugins(defaultPluginMap, Uri);
-            initializePlugins(extensionPluginMap, Uri);
+      var service = {
 
-            initialized = true;
-          }
+        getProviders: function(options) {
+          ensureInitialized(Uri);
 
           var component = options.component;
           if (!component) {
             throw new Error("No component given");
           }
 
-          var autoActivatedDynamicPlugins = dynamic || [];
-          if (!angular.isArray(autoActivatedDynamicPlugins)) {
-            throw new Error("Argument dynamic must be an array");
-          }
+          var viewProviders = defaultViewMap[component];
+          return viewProviders || [];
+        },
 
-          // load default plugins
-          var plugins = angular.copy(defaultPluginMap[component]);
+        getProvider: function(options) {
 
-          function getPluginById(id, plugins) {
-            var filtered = $filter('filter')(plugins, { id: id });
+          var viewProviders = this.getProviders(options);
+
+          function getViewById(id, viewProviders) {
+            var filtered = $filter('filter')(viewProviders, { id: id });
             if (filtered.length) {
               return filtered[0];
             } else {
@@ -76,28 +98,11 @@ define([ "angular" ], function(angular) {
             }
           }
 
-          function addPlugin(plugins, plugin) {
-            var addPluginPriority = plugin.priority || 0;
-
-            // check from right to left (*-) where plugin
-            // should be added
-            for (var i = plugins.length - 1; i >= 0; i--) {
-              var p = plugins[i];
-              if (!p.priority || p.priority < addPluginPriority) {
-                plugins.splice(i + 1, 0, plugin);
-                return;
-              }
-            }
-
-            // not yet added; add to front
-            plugins.splice(0, 0, plugin);
-          }
-
-          function replacePlugin(plugins, id, newPlugin) {
-            for (var i = 0; i < plugins.length; i++) {
-              var plugin = plugins[i];
-              if (plugin.id == id) {
-                plugins.splice(i, 1, newPlugin);
+          function replaceView(viewProviders, id, replaceViewProvider) {
+            for (var i = 0; i < viewProviders.length; i++) {
+              var p = viewProviders[i];
+              if (p.id === id) {
+                viewProviders.splice(i, 1, replaceViewProvider);
                 return true;
               }
             }
@@ -105,25 +110,15 @@ define([ "angular" ], function(angular) {
             return false;
           }
 
-          // add client side activated dynamic plugins
-          angular.forEach(autoActivatedDynamicPlugins, function(pluginId) {
-            var plugin = getPluginById(pluginId, extensionPluginMap[component]);
-            if (plugin) {
-              addPlugin(plugins, plugin);
-            } else {
-              console.log("[warn] enabled plugin not loaded: ", pluginId);
-            }
-          });
-
-          return plugins;
+          return (viewProviders || [])[0];
         }
       };
 
-      return plugins;
+      return service;
     }];
   }
 
-  module.provider('Plugins', PluginsProvider);
+  module.provider('Views', ViewsProvider);
   // end config
 
   return module;

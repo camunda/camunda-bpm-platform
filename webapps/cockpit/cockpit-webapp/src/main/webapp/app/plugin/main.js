@@ -1,5 +1,5 @@
 ngDefine('cockpit.plugin', [
-  './directive',
+  './view',
   './service'
 ], function(module) {
 

@@ -1,31 +1,39 @@
-frameworks = ['ng-scenario'];
+var config = {
 
-files = [
-  // add require/amd support
-  'require-e2e-adapter.js',
-  '../e2e/cockpit-scenario.js'
-];
+  frameworks: ['ng-scenario'],
 
-browsers = ["PhantomJS", "Firefox", "Chrome"];
+  files: [
+    // add require/amd support
+    'require-e2e-adapter.js',
+    '../e2e/cockpit-scenario.js'
+  ],
 
-autoWatch = false;
+  browsers: ["PhantomJS", "Firefox", "Chrome"],
 
-junitReporter = {
-  outputFile: '../../../../target/failsafe-reports/e2e.xml',
-  suite: 'E2E'
+  autoWatch: false,
+
+  junitReporter: {
+    outputFile: '../../../../target/failsafe-reports/e2e.xml',
+    suite: 'E2E'
+  },
+
+  // Proxying the original application due to same origin policy constraints
+  // https://github.com/karma-runner/karma/issues/179
+  urlRoot: '/__karma/',
+
+  proxies: {
+    '/': 'http://localhost:8080'
+  },
+
+  plugins: [
+    'karma-chrome-launcher',
+    'karma-firefox-launcher',
+    'karma-phantomjs-launcher',
+    'karma-ng-scenario'
+  ]
 };
 
-// Proxying the original application due to same origin policy constraints
-// https://github.com/karma-runner/karma/issues/179
-urlRoot = '/__karma/';
+for (var key in config) {
 
-proxies = {
-  '/': 'http://localhost:8080'
-};
-
-plugins = [
-  'karma-chrome-launcher',
-  'karma-firefox-launcher',
-  'karma-phantomjs-launcher',
-  'karma-ng-scenario'
-];
+  this[key] = config[key];
+}

@@ -239,3 +239,15 @@ Headlines
 h1 {
   font-size: 30px;
 }
+
+/**----------------
+Cursors
+-------------------**/
+
+.pagination li {
+  cursor: pointer;
+}
+
+.pagination .active, .pagination .disabled {
+  cursor: auto;
+}

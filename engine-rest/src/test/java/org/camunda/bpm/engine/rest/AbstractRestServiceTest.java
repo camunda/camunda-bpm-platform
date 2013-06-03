@@ -14,7 +14,9 @@ package org.camunda.bpm.engine.rest;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 import java.util.Properties;
 import java.util.ServiceLoader;
 
@@ -41,6 +43,14 @@ public abstract class AbstractRestServiceTest {
   
   private static final String PROPERTIES_FILE_PATH = "/testconfig.properties";
   private static final String PORT_PROPERTY = "rest.http.port";
+  
+  protected static final String EXAMPLE_VARIABLE_KEY = "aVariableKey";
+  protected static final String EXAMPLE_VARIABLE_VALUE = "aVariableValue";
+  
+  protected static final Map<String, Object> EXAMPLE_VARIABLES = new HashMap<String, Object>();
+  static {
+    EXAMPLE_VARIABLES.put(EXAMPLE_VARIABLE_KEY, EXAMPLE_VARIABLE_VALUE);
+  }
   
   private static Properties connectionProperties = null;
 

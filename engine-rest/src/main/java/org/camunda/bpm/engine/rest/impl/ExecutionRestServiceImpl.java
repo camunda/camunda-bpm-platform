@@ -15,19 +15,15 @@ package org.camunda.bpm.engine.rest.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
 import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.rest.ExecutionRestService;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ExecutionDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ExecutionQueryDto;
-import org.camunda.bpm.engine.rest.dto.runtime.VariableListDto;
-import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
-import org.camunda.bpm.engine.rest.exception.RestException;
+import org.camunda.bpm.engine.rest.sub.runtime.ExecutionResource;
+import org.camunda.bpm.engine.rest.sub.runtime.impl.ExecutionResourceImpl;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ExecutionQuery;
 
@@ -41,17 +37,9 @@ public class ExecutionRestServiceImpl extends AbstractRestProcessEngineAware imp
     super(engineName);
   }
   
-
   @Override
-  public ExecutionDto getExecution(String executionId) {
-    RuntimeService runtimeService = getProcessEngine().getRuntimeService();
-    Execution execution = runtimeService.createExecutionQuery().executionId(executionId).singleResult();
-    
-    if (execution == null) {
-      throw new InvalidRequestException(Status.NOT_FOUND, "Execution with id " + executionId + " does not exist");
-    }
-    
-    return ExecutionDto.fromExecution(execution);
+  public ExecutionResource getExecution(String executionId) {
+    return new ExecutionResourceImpl(getProcessEngine(), executionId);
   }
   
   @Override
@@ -109,17 +97,4 @@ public class ExecutionRestServiceImpl extends AbstractRestProcessEngineAware imp
     
     return result;
   }
-
-  @Override
-  public void signalExecution(String executionId,
-      VariableListDto variables) {
-    RuntimeService runtimeService = getProcessEngine().getRuntimeService();
-    try {
-      runtimeService.signal(executionId, variables.toMap());
-    } catch (ProcessEngineException e) {
-      throw new RestException(Status.INTERNAL_SERVER_ERROR, e, "Cannot signal execution " + executionId + ": " + e.getMessage());
-    }
-    
-  }
-  
 }

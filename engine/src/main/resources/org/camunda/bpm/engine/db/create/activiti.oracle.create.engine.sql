@@ -142,12 +142,27 @@ create table ACT_RU_EVENT_SUBSCR (
     primary key (ID_)
 );
 
+create table ACT_RU_INCIDENT (
+  ID_ NVARCHAR2(64) not null,
+  INCIDENT_TIMESTAMP_ TIMESTAMP(6) not null,
+  INCIDENT_TYPE_ NVARCHAR2(255) not null,
+  EXECUTION_ID_ NVARCHAR2(64),
+  ACTIVITY_ID_ NVARCHAR2(255),
+  PROC_INST_ID_ NVARCHAR2(64),
+  PROC_DEF_ID_ NVARCHAR2(64),
+  CAUSE_INCIDENT_ID_ NVARCHAR2(64),
+  ROOT_CAUSE_INCIDENT_ID_ NVARCHAR2(64),
+  CONFIGURATION_ NVARCHAR2(255),
+  primary key (ID_)
+);
+
 create index ACT_IDX_EXEC_BUSKEY on ACT_RU_EXECUTION(BUSINESS_KEY_);
 create index ACT_IDX_TASK_CREATE on ACT_RU_TASK(CREATE_TIME_);
 create index ACT_IDX_IDENT_LNK_USER on ACT_RU_IDENTITYLINK(USER_ID_);
 create index ACT_IDX_IDENT_LNK_GROUP on ACT_RU_IDENTITYLINK(GROUP_ID_);
 create index ACT_IDX_EVENT_SUBSCR_CONFIG_ on ACT_RU_EVENT_SUBSCR(CONFIGURATION_);
 create index ACT_IDX_VARIABLE_TASK_ID on ACT_RU_VARIABLE(TASK_ID_);
+create index ACT_IDX_INC_CONFIGURATION on ACT_RU_INCIDENT(CONFIGURATION_);
 
 create index ACT_IDX_BYTEAR_DEPL on ACT_GE_BYTEARRAY(DEPLOYMENT_ID_);
 alter table ACT_GE_BYTEARRAY
@@ -242,6 +257,31 @@ alter table ACT_RU_EVENT_SUBSCR
     add constraint ACT_FK_EVENT_EXEC
     foreign key (EXECUTION_ID_)
     references ACT_RU_EXECUTION(ID_);
+    
+alter table ACT_RU_INCIDENT
+    add constraint ACT_FK_INC_EXE 
+    foreign key (EXECUTION_ID_) 
+    references ACT_RU_EXECUTION (ID_);
+  
+alter table ACT_RU_INCIDENT
+    add constraint ACT_FK_INC_PROCINST 
+    foreign key (PROC_INST_ID_) 
+    references ACT_RU_EXECUTION (ID_);
+
+alter table ACT_RU_INCIDENT
+    add constraint ACT_FK_INC_PROCDEF 
+    foreign key (PROC_DEF_ID_) 
+    references ACT_RE_PROCDEF (ID_);  
+    
+alter table ACT_RU_INCIDENT
+    add constraint ACT_FK_INC_CAUSE 
+    foreign key (CAUSE_INCIDENT_ID_) 
+    references ACT_RU_INCIDENT (ID_);
+
+alter table ACT_RU_INCIDENT
+    add constraint ACT_FK_INC_RCAUSE 
+    foreign key (ROOT_CAUSE_INCIDENT_ID_) 
+    references ACT_RU_INCIDENT (ID_);   
     
 -- see http://stackoverflow.com/questions/675398/how-can-i-constrain-multiple-columns-to-prevent-duplicates-but-ignore-null-value
 create unique index ACT_UNIQ_RU_BUS_KEY on ACT_RU_EXECUTION

@@ -12,6 +12,10 @@
  */
 package org.camunda.bpm.engine.rest.util;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.Properties;
+
 import org.apache.catalina.LifecycleException;
 import org.apache.catalina.LifecycleState;
 import org.apache.catalina.startup.Tomcat;
@@ -23,10 +27,6 @@ import org.jboss.shrinkwrap.api.exporter.ZipExporter;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.jboss.shrinkwrap.resolver.api.maven.Maven;
 import org.jboss.shrinkwrap.resolver.api.maven.PomEquippedResolveStage;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.Properties;
 
 public class WinkTomcatServerBootstrap extends EmbeddedServerBootstrap {
 

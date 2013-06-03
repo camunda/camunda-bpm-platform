@@ -2,3 +2,4 @@
 .externalToolBuilders
 projectFilesBackup
 test-results.xml
+/node_modules
