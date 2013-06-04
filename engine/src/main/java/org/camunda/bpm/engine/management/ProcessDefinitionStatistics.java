@@ -13,6 +13,8 @@
 
 package org.camunda.bpm.engine.management;
 
+import java.util.List;
+
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 
 public interface ProcessDefinitionStatistics extends ProcessDefinition {
@@ -26,4 +28,9 @@ public interface ProcessDefinitionStatistics extends ProcessDefinition {
    * The number of all failed jobs of all process instances.
    */
   int getFailedJobs();
+  
+  /**
+   * Returns a list of incident statistics.
+   */
+  List<IncidentStatistics> getIncidentStatistics();
 }

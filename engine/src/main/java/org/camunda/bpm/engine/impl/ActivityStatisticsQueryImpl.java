@@ -20,6 +20,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.management.ActivityStatistics;
 import org.camunda.bpm.engine.management.ActivityStatisticsQuery;
+import org.camunda.bpm.engine.management.ProcessDefinitionStatisticsQuery;
 
 public class ActivityStatisticsQueryImpl extends
     AbstractQuery<ActivityStatisticsQuery, ActivityStatistics> implements ActivityStatisticsQuery{
@@ -27,6 +28,8 @@ public class ActivityStatisticsQueryImpl extends
   protected static final long serialVersionUID = 1L;
   protected boolean includeFailedJobs = false;
   protected String processDefinitionId;
+  protected boolean includeIncidents;
+  protected String incidentType;
   
   public ActivityStatisticsQueryImpl(String processDefinitionId, CommandExecutor executor) {
     super(executor);
@@ -62,8 +65,23 @@ public class ActivityStatisticsQueryImpl extends
     return this;
   }
 
+  public ActivityStatisticsQuery includeIncidents() {
+    includeIncidents = true;
+    return this;
+  }
+
+  public ActivityStatisticsQuery includeIncidentsForType(String incidentType) {
+    includeIncidents = true;
+    this.incidentType = incidentType;
+    return this;
+  }
+  
   public boolean isFailedJobsToInclude() {
     return includeFailedJobs;
+  }
+  
+  public boolean isIncidentsToInclude() {
+    return includeIncidents;
   }
 
   public String getProcessDefinitionId() {

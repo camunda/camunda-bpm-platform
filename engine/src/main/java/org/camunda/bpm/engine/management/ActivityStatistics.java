@@ -13,6 +13,8 @@
 
 package org.camunda.bpm.engine.management;
 
+import java.util.List;
+
 public interface ActivityStatistics {
 
   /**
@@ -29,4 +31,9 @@ public interface ActivityStatistics {
    * The number of all failed jobs for the activity.
    */
   int getFailedJobs();
+  
+  /**
+   * Returns a list of incident statistics.
+   */
+  List<IncidentStatistics> getIncidentStatistics();
 }

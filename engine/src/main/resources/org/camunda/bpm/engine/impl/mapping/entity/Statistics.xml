@@ -20,6 +20,10 @@
     <result property="diagramResourceName" column="DGRM_RESOURCE_NAME_" jdbcType="VARCHAR"/>
     <result property="hasStartFormKey" column="HAS_START_FORM_KEY_" jdbcType="BOOLEAN"/>
     <result property="suspensionState" column="SUSPENSION_STATE_" jdbcType="INTEGER"/>
+    <collection property="incidentStatistics" javaType="ArrayList" ofType="org.camunda.bpm.engine.impl.persistence.entity.IncidentStatisticsEntity">
+      <result property="incidentType" column="INCIDENT_TYPE_" jdbcType="VARCHAR" />
+      <result property="incidentCount" column="INCIDENT_COUNT" jdbcType="INTEGER"/>
+    </collection>
   </resultMap>
   
   <resultMap id="deploymentStatisticsResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.DeploymentStatisticsEntity">
@@ -28,12 +32,20 @@
     <result property="deploymentTime" column="DEPLOY_TIME_" jdbcType="TIMESTAMP"/>
     <result property="instances" column="INSTANCE_COUNT" jdbcType="INTEGER" />
     <result property="failedJobs" column="FAILED_JOBS_COUNT" jdbcType="INTEGER" />
+    <collection property="incidentStatistics" javaType="ArrayList" ofType="org.camunda.bpm.engine.impl.persistence.entity.IncidentStatisticsEntity">
+      <result property="incidentType" column="INCIDENT_TYPE_" jdbcType="VARCHAR" />
+      <result property="incidentCount" column="INCIDENT_COUNT" jdbcType="INTEGER"/>
+    </collection>
   </resultMap>
   
   <resultMap id="activityStatisticsResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.ActivityStatisticsImpl">
     <id property="id" column="ID_" jdbcType="VARCHAR" />
     <result property="instances" column="INSTANCE_COUNT" jdbcType="INTEGER" />
     <result property="failedJobs" column="FAILED_JOBS_COUNT" jdbcType="INTEGER" />
+    <collection property="incidentStatistics" javaType="ArrayList" ofType="org.camunda.bpm.engine.impl.persistence.entity.IncidentStatisticsEntity">
+      <result property="incidentType" column="INCIDENT_TYPE_" jdbcType="VARCHAR" />
+      <result property="incidentCount" column="INCIDENT_COUNT" jdbcType="INTEGER"/>
+    </collection>
   </resultMap>
   
   <!-- Process Definition Statistics -->  
@@ -58,6 +70,10 @@
     <if test="failedJobsToInclude">
     , AGG.FAILED_JOBS_COUNT
     </if>
+    <if test="incidentsToInclude">
+    , AGG.INCIDENT_TYPE_
+    , AGG.INCIDENT_COUNT
+    </if>
     
     <!-- Join process definitions with data about running instances and failed jobs -->
     from ${prefix}ACT_RE_PROCDEF PROCDEF left outer join 
@@ -65,6 +81,10 @@
       INSTANCE_COUNT
       <if test="failedJobsToInclude">
       , FAILED_JOBS_COUNT
+      </if>
+      <if test="incidentsToInclude">
+      , INCIDENT_TYPE_
+      , INCIDENT_COUNT
       </if>
       
       from
@@ -75,6 +95,7 @@
       where ID_ = PROC_INST_ID_
       group by PROC_DEF_ID_) INSTANCE
       
+      <!-- failed jobs -->
       <if test="failedJobsToInclude">
       left outer join
       
@@ -87,6 +108,21 @@
       group by JOB.PROC_DEF_ID_) JOB
       on JOB.PROC_DEF_ID_ = INSTANCE.PROC_DEF_ID_ 
       </if>
+      
+      <!-- incidents -->
+      <if test="incidentsToInclude">
+      left outer join
+      
+      <!-- Sum all incidents grouped by process definition and incident type-->
+      (select INC.PROC_DEF_ID_, INC.INCIDENT_TYPE_, count(INC.ID_) as INCIDENT_COUNT
+        from ${prefix}ACT_RU_INCIDENT INC
+        <if test="incidentType != null">
+        where INC.INCIDENT_TYPE_ = #{incidentType}
+        </if>
+        group by INC.PROC_DEF_ID_, INC.INCIDENT_TYPE_) INC
+      on INC.PROC_DEF_ID_ = INSTANCE.PROC_DEF_ID_ 
+      </if>
+      
       ) AGG
     on PROCDEF.ID_ = AGG.ID_
     ) RES
@@ -115,6 +151,10 @@
     <if test="failedJobsToInclude">
     , AGG.FAILED_JOBS_COUNT
     </if>
+    <if test="incidentsToInclude">
+    , AGG.INCIDENT_TYPE_
+    , AGG.INCIDENT_COUNT
+    </if>
     
     <!-- Join process definitions with data about running instances and failed jobs -->
     from ${prefix}ACT_RE_DEPLOYMENT DEPLOYMENT left outer join 
@@ -122,6 +162,10 @@
       INSTANCE_COUNT
       <if test="failedJobsToInclude">
       , FAILED_JOBS_COUNT
+      </if>
+      <if test="incidentsToInclude">
+      , INCIDENT_TYPE_
+      , INCIDENT_COUNT
       </if>
       
       from
@@ -134,6 +178,7 @@
       and PROCDEF.DEPLOYMENT_ID_ = DEPLOYMENT.ID_
       group by DEPLOYMENT.ID_) INSTANCE
       
+      <!-- failed jobs -->
       <if test="failedJobsToInclude">
       left outer join
       
@@ -149,6 +194,27 @@
       group by DEPLOYMENT.ID_) JOB
       on JOB.DEPLOYMENT_ID_ = INSTANCE.DEPLOYMENT_ID_
       </if>
+      
+      <!-- incidents -->
+      <if test="incidentsToInclude">
+      left outer join
+      
+      <!-- Sum all incidents by deployment -->
+      (select DEPLOYMENT.ID_ AS DEPLOYMENT_ID_, INC.INCIDENT_TYPE_, count(INC.ID_) as INCIDENT_COUNT from 
+        ${prefix}ACT_RE_PROCDEF PROCDEF, ${prefix}ACT_RE_DEPLOYMENT DEPLOYMENT,
+        <!-- Select all executions and their incidents -->
+        ( select INC.ID_, INC.INCIDENT_TYPE_, INC.PROC_DEF_ID_ 
+        from ${prefix}ACT_RU_INCIDENT INC 
+        <if test="incidentType != null">
+        where INC.INCIDENT_TYPE_ = #{incidentType}
+        </if>
+        ) INC
+      where INC.PROC_DEF_ID_ = PROCDEF.ID_
+      and PROCDEF.DEPLOYMENT_ID_ = DEPLOYMENT.ID_
+      group by DEPLOYMENT.ID_, INC.INCIDENT_TYPE_) INC
+      on INC.DEPLOYMENT_ID_ = INSTANCE.DEPLOYMENT_ID_ 
+      </if>      
+      
       ) AGG
     on DEPLOYMENT.ID_ = AGG.ID_
     ) RES
@@ -178,6 +244,10 @@
       ,
       FAILED_JOBS_COUNT
       </if>
+      <if test="incidentsToInclude">
+      , INCIDENT_TYPE_
+      , INCIDENT_COUNT
+      </if>      
 	    
 	    <!-- Count and group all activity instances by activity ids.
 	    The executions that are actual activity instances can be found with the IS_ACTIVE_.
@@ -188,6 +258,7 @@
 	    where PROC_DEF_ID_ = #{processDefinitionId} and IS_ACTIVE_ = 1
 	    group by ACT_ID_) INSTANCE
 	    
+      <!-- failedJobs -->
 	    <if test="failedJobsToInclude">
 	    left outer join
 	    
@@ -203,6 +274,22 @@
 	    
 	    on JOB.ACT_ID_ = INSTANCE.ACT_ID_
 	    </if>
+      
+      <!-- incidents -->
+      <if test="incidentsToInclude">
+      left outer join
+      
+      <!-- Sum all incidents grouped by activity id -->
+      (select INC.ACTIVITY_ID_, INC.INCIDENT_TYPE_, count(INC.ID_) as INCIDENT_COUNT
+        from ${prefix}ACT_RU_INCIDENT INC
+        where INC.PROC_DEF_ID_ = #{processDefinitionId}
+        <if test="incidentType != null">
+        and INC.INCIDENT_TYPE_ = #{incidentType}
+        </if>
+        group by INC.ACTIVITY_ID_, INC.INCIDENT_TYPE_
+      ) INC        
+      on INC.ACTIVITY_ID_ = INSTANCE.ACT_ID_
+      </if>
 	    ) RES
   </sql>
   
@@ -227,9 +314,12 @@
     from ( select INSTANCE.ACT_ID_ as ID_,
       INSTANCE_COUNT
       <if test="failedJobsToInclude">
-      ,
-      FAILED_JOBS_COUNT
+      , FAILED_JOBS_COUNT
       </if>
+      <if test="incidentsToInclude">
+      , INCIDENT_TYPE_
+      , INCIDENT_COUNT
+      </if>       
       
       <!-- Count and group all activity instances by activity ids.
       The executions that are actual activity instances can be found with the IS_ACTIVE_.
@@ -240,6 +330,7 @@
       where PROC_DEF_ID_ = #{processDefinitionId} and IS_ACTIVE_ = true
       group by ACT_ID_) INSTANCE
       
+      <!-- ////////////////////////////////////////// failedJobs ////////////////////////////////////////// -->
       <if test="failedJobsToInclude">
       left outer join
       
@@ -255,6 +346,22 @@
       
       on JOB.ACT_ID_ = INSTANCE.ACT_ID_
       </if>
+      
+      <!-- ////////////////////////////////////////// incidents ////////////////////////////////////////// -->
+      <if test="incidentsToInclude">
+      left outer join
+      
+      <!-- Sum all incidents grouped by activity id -->
+      (select INC.ACTIVITY_ID_, INC.INCIDENT_TYPE_, count(INC.ID_) as INCIDENT_COUNT
+        from ${prefix}ACT_RU_INCIDENT INC
+        where INC.PROC_DEF_ID_ = #{processDefinitionId}
+        <if test="incidentType != null">
+        and INC.INCIDENT_TYPE_ = #{incidentType}
+        </if>
+        group by INC.ACTIVITY_ID_, INC.INCIDENT_TYPE_
+      ) INC        
+      on INC.ACTIVITY_ID_ = INSTANCE.ACT_ID_
+      </if>    
       ) RES
   </sql>
   

@@ -25,6 +25,8 @@ public class ProcessDefinitionStatisticsQueryImpl extends AbstractQuery<ProcessD
 
   protected static final long serialVersionUID = 1L;
   protected boolean includeFailedJobs = false;
+  protected boolean includeIncidents = false;
+  protected String incidentType;
 
   public ProcessDefinitionStatisticsQueryImpl(CommandExecutor commandExecutor) {
     super(commandExecutor);
@@ -53,8 +55,24 @@ public class ProcessDefinitionStatisticsQueryImpl extends AbstractQuery<ProcessD
     includeFailedJobs = true;
     return this;
   }
+  
+  public ProcessDefinitionStatisticsQuery includeIncidents() {
+    includeIncidents = true;
+    return this;
+  }
+  
+  public ProcessDefinitionStatisticsQuery includeIncidentsForType(String incidentType) {
+    includeIncidents = true;
+    this.incidentType = incidentType;
+    return this;
+  }
 
   public boolean isFailedJobsToInclude() {
     return includeFailedJobs;
   }
+
+  public boolean isIncidentsToInclude() {
+    return includeIncidents;
+  }
+
 }

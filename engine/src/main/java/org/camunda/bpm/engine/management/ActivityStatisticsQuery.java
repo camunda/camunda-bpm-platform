@@ -21,4 +21,14 @@ public interface ActivityStatisticsQuery extends Query<ActivityStatisticsQuery, 
    * Include an aggregation of failed jobs in the result.
    */
   ActivityStatisticsQuery includeFailedJobs();
+  
+  /**
+   * Include an aggregation of incidents in the result.
+   */
+  ActivityStatisticsQuery includeIncidents();
+
+  /**
+   * Include an aggregation of incidents of the assigned incidentType in the result.
+   */
+  ActivityStatisticsQuery includeIncidentsForType(String incidentType);
 }

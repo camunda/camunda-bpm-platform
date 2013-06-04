@@ -25,18 +25,29 @@ implements DeploymentStatisticsQuery {
 
   protected static final long serialVersionUID = 1L;
   protected boolean includeFailedJobs = false;
+  protected boolean includeIncidents = false;
+  protected String incidentType;
   
   public DeploymentStatisticsQueryImpl(CommandExecutor executor) {
     super(executor);
   }
 
-  @Override
   public DeploymentStatisticsQuery includeFailedJobs() {
     includeFailedJobs = true;
     return this;
   }
+  
+  public DeploymentStatisticsQuery includeIncidents() {
+    includeIncidents = true;
+    return this;
+  }
 
-  @Override
+  public DeploymentStatisticsQuery includeIncidentsForType(String incidentType) {
+    includeIncidents = true;
+    this.incidentType = incidentType;
+    return this;
+  }
+
   public long executeCount(CommandContext commandContext) {
     checkQueryOk();
     return 
@@ -59,5 +70,8 @@ implements DeploymentStatisticsQuery {
     return includeFailedJobs;
   }
   
+  public boolean isIncidentsToInclude() {
+    return includeIncidents;
+  }
 
 }

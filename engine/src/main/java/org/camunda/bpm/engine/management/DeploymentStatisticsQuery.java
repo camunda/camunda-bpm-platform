@@ -21,4 +21,14 @@ public interface DeploymentStatisticsQuery extends Query<DeploymentStatisticsQue
    * Include an aggregation of failed jobs in the result.
    */
   DeploymentStatisticsQuery includeFailedJobs();
+  
+  /**
+   * Include an aggregation of incidents in the result.
+   */
+  DeploymentStatisticsQuery includeIncidents();
+
+  /**
+   * Include an aggregation of incidents of the assigned incidentType in the result.
+   */
+  DeploymentStatisticsQuery includeIncidentsForType(String incidentType);
 }
