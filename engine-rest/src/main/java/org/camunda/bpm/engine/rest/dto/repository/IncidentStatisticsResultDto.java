@@ -10,30 +10,41 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.persistence.entity;
+package org.camunda.bpm.engine.rest.dto.repository;
 
 import org.camunda.bpm.engine.management.IncidentStatistics;
 
 /**
  * @author roman.smirnov
  */
-public class IncidentStatisticsEntity implements IncidentStatistics {
+public class IncidentStatisticsResultDto {
   
   protected String incidentType;
-  protected int incidentCount;
+  protected Integer incidentCount;
   
-  public IncidentStatisticsEntity() {}
+  public IncidentStatisticsResultDto() {}
   
   public String getIncidentType() {
     return incidentType;
   }
 
-  public void setIncidenType(String incidentType) {
+  public void setIncidentType(String incidentType) {
     this.incidentType = incidentType;
   }
-  
-  public int getIncidentCount() {
+
+  public Integer getIncidentCount() {
     return incidentCount;
+  }
+
+  public void setIncidentCount(Integer incidentCount) {
+    this.incidentCount = incidentCount;
+  }
+  
+  public static IncidentStatisticsResultDto fromIncidentStatistics(IncidentStatistics statistics) {
+    IncidentStatisticsResultDto dto = new IncidentStatisticsResultDto();
+    dto.setIncidentType(statistics.getIncidentType());
+    dto.setIncidentCount(statistics.getIncidentCount());
+    return dto;
   }
 
 }

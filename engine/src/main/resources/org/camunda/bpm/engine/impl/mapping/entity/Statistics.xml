@@ -116,8 +116,8 @@
       <!-- Sum all incidents grouped by process definition and incident type-->
       (select INC.PROC_DEF_ID_, INC.INCIDENT_TYPE_, count(INC.ID_) as INCIDENT_COUNT
         from ${prefix}ACT_RU_INCIDENT INC
-        <if test="incidentType != null">
-        where INC.INCIDENT_TYPE_ = #{incidentType}
+        <if test="includeIncidentsForType != null">
+        where INC.INCIDENT_TYPE_ = #{includeIncidentsForType}
         </if>
         group by INC.PROC_DEF_ID_, INC.INCIDENT_TYPE_) INC
       on INC.PROC_DEF_ID_ = INSTANCE.PROC_DEF_ID_ 
@@ -205,8 +205,8 @@
         <!-- Select all executions and their incidents -->
         ( select INC.ID_, INC.INCIDENT_TYPE_, INC.PROC_DEF_ID_ 
         from ${prefix}ACT_RU_INCIDENT INC 
-        <if test="incidentType != null">
-        where INC.INCIDENT_TYPE_ = #{incidentType}
+        <if test="includeIncidentsForType != null">
+        where INC.INCIDENT_TYPE_ = #{includeIncidentsForType}
         </if>
         ) INC
       where INC.PROC_DEF_ID_ = PROCDEF.ID_
@@ -283,8 +283,8 @@
       (select INC.ACTIVITY_ID_, INC.INCIDENT_TYPE_, count(INC.ID_) as INCIDENT_COUNT
         from ${prefix}ACT_RU_INCIDENT INC
         where INC.PROC_DEF_ID_ = #{processDefinitionId}
-        <if test="incidentType != null">
-        and INC.INCIDENT_TYPE_ = #{incidentType}
+        <if test="includeIncidentsForType != null">
+        and INC.INCIDENT_TYPE_ = #{includeIncidentsForType}
         </if>
         group by INC.ACTIVITY_ID_, INC.INCIDENT_TYPE_
       ) INC        
@@ -355,8 +355,8 @@
       (select INC.ACTIVITY_ID_, INC.INCIDENT_TYPE_, count(INC.ID_) as INCIDENT_COUNT
         from ${prefix}ACT_RU_INCIDENT INC
         where INC.PROC_DEF_ID_ = #{processDefinitionId}
-        <if test="incidentType != null">
-        and INC.INCIDENT_TYPE_ = #{incidentType}
+        <if test="includeIncidentsForType != null">
+        and INC.INCIDENT_TYPE_ = #{includeIncidentsForType}
         </if>
         group by INC.ACTIVITY_ID_, INC.INCIDENT_TYPE_
       ) INC        

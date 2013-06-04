@@ -20,7 +20,6 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.management.ActivityStatistics;
 import org.camunda.bpm.engine.management.ActivityStatisticsQuery;
-import org.camunda.bpm.engine.management.ProcessDefinitionStatisticsQuery;
 
 public class ActivityStatisticsQueryImpl extends
     AbstractQuery<ActivityStatisticsQuery, ActivityStatistics> implements ActivityStatisticsQuery{
@@ -29,7 +28,7 @@ public class ActivityStatisticsQueryImpl extends
   protected boolean includeFailedJobs = false;
   protected String processDefinitionId;
   protected boolean includeIncidents;
-  protected String incidentType;
+  protected String includeIncidentsForType;
   
   public ActivityStatisticsQueryImpl(String processDefinitionId, CommandExecutor executor) {
     super(executor);
@@ -53,13 +52,6 @@ public class ActivityStatisticsQueryImpl extends
         .getStatisticsGroupedByActivity(this, page);
   }
   
-  protected void checkQueryOk() {
-    super.checkQueryOk();
-    if (processDefinitionId == null) {
-      throw new ProcessEngineException("No valid process definition id supplied.");
-    }
-  }
-
   public ActivityStatisticsQuery includeFailedJobs() {
     includeFailedJobs = true;
     return this;
@@ -71,8 +63,7 @@ public class ActivityStatisticsQueryImpl extends
   }
 
   public ActivityStatisticsQuery includeIncidentsForType(String incidentType) {
-    includeIncidents = true;
-    this.incidentType = incidentType;
+    this.includeIncidentsForType = incidentType;
     return this;
   }
   
@@ -81,10 +72,20 @@ public class ActivityStatisticsQueryImpl extends
   }
   
   public boolean isIncidentsToInclude() {
-    return includeIncidents;
+    return includeIncidents || includeIncidentsForType != null;
   }
 
   public String getProcessDefinitionId() {
     return processDefinitionId;
+  }
+  
+  protected void checkQueryOk() {
+    super.checkQueryOk();
+    if (processDefinitionId == null) {
+      throw new ProcessEngineException("No valid process definition id supplied.");
+    }
+    if (includeIncidents && includeIncidentsForType != null) {
+      throw new ProcessEngineException("Invalid query: It is not possible to use includeIncident() and includeIncidentForType() to execute one query.");
+    }
   }
 }

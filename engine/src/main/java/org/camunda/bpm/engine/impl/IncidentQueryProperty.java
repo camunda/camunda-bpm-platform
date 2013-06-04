@@ -17,6 +17,9 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.query.QueryProperty;
 
+/**
+ * @author roman.smirnov
+ */
 public class IncidentQueryProperty implements QueryProperty {
 
   private static final long serialVersionUID = 1L;
