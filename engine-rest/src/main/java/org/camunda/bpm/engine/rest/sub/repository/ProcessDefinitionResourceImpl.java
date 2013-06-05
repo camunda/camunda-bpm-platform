@@ -90,11 +90,22 @@ public class ProcessDefinitionResourceImpl implements ProcessDefinitionResource 
 
 
   @Override
-  public List<StatisticsResultDto> getActivityStatistics(Boolean includeFailedJobs) {
+  public List<StatisticsResultDto> getActivityStatistics(Boolean includeFailedJobs, Boolean includeIncidents, String includeIncidentsForType) {
+    if (includeIncidents != null && includeIncidentsForType != null) {
+      throw new InvalidRequestException(Status.BAD_REQUEST, "Only one of the query parameter includeIncidents or includeIncidentsForType can be set.");
+    }
+    
     ManagementService mgmtService = engine.getManagementService();
     ActivityStatisticsQuery query = mgmtService.createActivityStatisticsQuery(processDefinitionId);
+    
     if (includeFailedJobs != null && includeFailedJobs) {
       query.includeFailedJobs();
+    }
+    
+    if (includeIncidents != null && includeIncidents) {
+      query.includeIncidents();
+    } else if (includeIncidentsForType != null) {
+      query.includeIncidentsForType(includeIncidentsForType);
     }
 
     List<ActivityStatistics> queryResults = query.list();

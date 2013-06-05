@@ -23,6 +23,9 @@ import org.camunda.bpm.engine.impl.db.PersistentObject;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.Incident;
 
+/**
+ * @author roman.smirnov
+ */
 public class IncidentEntity implements Incident, PersistentObject {
   
   protected String id;

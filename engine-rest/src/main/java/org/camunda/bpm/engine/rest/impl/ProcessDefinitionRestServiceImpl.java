@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;
@@ -29,6 +30,7 @@ import org.camunda.bpm.engine.rest.dto.StatisticsResultDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionQueryDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionStatisticsResultDto;
+import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.sub.repository.ProcessDefinitionResource;
 import org.camunda.bpm.engine.rest.sub.repository.ProcessDefinitionResourceImpl;
 
@@ -97,11 +99,22 @@ public class ProcessDefinitionRestServiceImpl extends AbstractRestProcessEngineA
 
   
   @Override
-  public List<StatisticsResultDto> getStatistics(Boolean includeFailedJobs) {
+  public List<StatisticsResultDto> getStatistics(Boolean includeFailedJobs, Boolean includeIncidents, String includeIncidentsForType) {
+    if (includeIncidents != null && includeIncidentsForType != null) {
+      throw new InvalidRequestException(Status.BAD_REQUEST, "Only one of the query parameter includeIncidents or includeIncidentsForType can be set.");
+    }
+    
     ManagementService mgmtService = getProcessEngine().getManagementService();
     ProcessDefinitionStatisticsQuery query = mgmtService.createProcessDefinitionStatisticsQuery();
+    
     if (includeFailedJobs != null && includeFailedJobs) {
       query.includeFailedJobs();
+    }
+    
+    if (includeIncidents != null && includeIncidents) {
+      query.includeIncidents();
+    } else if (includeIncidentsForType != null) {
+      query.includeIncidentsForType(includeIncidentsForType);
     }
 
     List<ProcessDefinitionStatistics> queryResults = query.list();

@@ -63,5 +63,5 @@ public interface ProcessDefinitionRestService {
 	@GET
   @Path("/statistics")
   @Produces(MediaType.APPLICATION_JSON)
-  List<StatisticsResultDto> getStatistics(@QueryParam("failedJobs") Boolean includeFailedJobs);
+  List<StatisticsResultDto> getStatistics(@QueryParam("failedJobs") Boolean includeFailedJobs, @QueryParam("incidents") Boolean includeIncidents, @QueryParam("incidentsForType") String includeIncidentsForType);
 }

@@ -27,6 +27,8 @@ public class ActivityStatisticsQueryImpl extends
   protected static final long serialVersionUID = 1L;
   protected boolean includeFailedJobs = false;
   protected String processDefinitionId;
+  protected boolean includeIncidents;
+  protected String includeIncidentsForType;
   
   public ActivityStatisticsQueryImpl(String processDefinitionId, CommandExecutor executor) {
     super(executor);
@@ -50,23 +52,40 @@ public class ActivityStatisticsQueryImpl extends
         .getStatisticsGroupedByActivity(this, page);
   }
   
-  protected void checkQueryOk() {
-    super.checkQueryOk();
-    if (processDefinitionId == null) {
-      throw new ProcessEngineException("No valid process definition id supplied.");
-    }
-  }
-
   public ActivityStatisticsQuery includeFailedJobs() {
     includeFailedJobs = true;
     return this;
   }
 
+  public ActivityStatisticsQuery includeIncidents() {
+    includeIncidents = true;
+    return this;
+  }
+
+  public ActivityStatisticsQuery includeIncidentsForType(String incidentType) {
+    this.includeIncidentsForType = incidentType;
+    return this;
+  }
+  
   public boolean isFailedJobsToInclude() {
     return includeFailedJobs;
+  }
+  
+  public boolean isIncidentsToInclude() {
+    return includeIncidents || includeIncidentsForType != null;
   }
 
   public String getProcessDefinitionId() {
     return processDefinitionId;
+  }
+  
+  protected void checkQueryOk() {
+    super.checkQueryOk();
+    if (processDefinitionId == null) {
+      throw new ProcessEngineException("No valid process definition id supplied.");
+    }
+    if (includeIncidents && includeIncidentsForType != null) {
+      throw new ProcessEngineException("Invalid query: It is not possible to use includeIncident() and includeIncidentForType() to execute one query.");
+    }
   }
 }

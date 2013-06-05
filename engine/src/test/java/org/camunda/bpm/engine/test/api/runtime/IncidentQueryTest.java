@@ -1,3 +1,15 @@
+/* Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.camunda.bpm.engine.test.api.runtime;
 
 import java.util.ArrayList;
@@ -12,6 +24,9 @@ import org.camunda.bpm.engine.runtime.IncidentQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 
+/**
+ * @author roman.smirnov
+ */
 public class IncidentQueryTest extends PluggableProcessEngineTestCase {
 
   private static String PROCESS_DEFINITION_KEY = "oneFailingServiceTaskProcess";
@@ -32,7 +47,7 @@ public class IncidentQueryTest extends PluggableProcessEngineTestCase {
       processInstanceIds.add(runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY, i + "").getId());
     }
     
-    waitForJobExecutorToProcessAllJobs(6000, 500);
+    waitForJobExecutorToProcessAllJobs(15000, 500);
   }
 
   protected void tearDown() throws Exception {
@@ -236,7 +251,7 @@ public class IncidentQueryTest extends PluggableProcessEngineTestCase {
   public void testQueryByCauseIncidentId() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callFailingProcess");
     
-    waitForJobExecutorToProcessAllJobs(6000, 500);
+    waitForJobExecutorToProcessAllJobs(15000, 500);
     
     ProcessInstance subProcessInstance = runtimeService.createProcessInstanceQuery().superProcessInstanceId(processInstance.getId()).singleResult();
     assertNotNull(subProcessInstance);
@@ -277,7 +292,7 @@ public class IncidentQueryTest extends PluggableProcessEngineTestCase {
   public void testQueryByRootCauseIncidentId() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callFailingCallActivity");
     
-    waitForJobExecutorToProcessAllJobs(6000, 500);
+    waitForJobExecutorToProcessAllJobs(15000, 500);
     
     ProcessInstance subProcessInstance = runtimeService.createProcessInstanceQuery().superProcessInstanceId(processInstance.getId()).singleResult();
     assertNotNull(subProcessInstance);

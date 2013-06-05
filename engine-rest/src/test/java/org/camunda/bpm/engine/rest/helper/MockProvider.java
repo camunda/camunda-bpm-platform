@@ -25,6 +25,7 @@ import org.camunda.bpm.engine.form.TaskFormData;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.management.ActivityStatistics;
+import org.camunda.bpm.engine.management.IncidentStatistics;
 import org.camunda.bpm.engine.management.ProcessDefinitionStatistics;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Execution;
@@ -105,10 +106,16 @@ public abstract class MockProvider {
   // statistics
   public static final int EXAMPLE_FAILED_JOBS = 42;
   public static final int EXAMPLE_INSTANCES = 123;
- 
+  
+  public static final String EXAMPLE_INCIDENT_TYPE = "anIncidentType";
+  public static final int EXAMPLE_INCIDENT_COUNT = 1;
+  
   public static final int ANOTHER_EXAMPLE_FAILED_JOBS = 43;
   public static final int ANOTHER_EXAMPLE_INSTANCES = 124;
- 
+  
+  public static final String ANOTHER_EXAMPLE_INCIDENT_TYPE = "anotherIncidentType";
+  public static final int ANOTHER_EXAMPLE_INCIDENT_COUNT = 2;
+
   // user & groups
   public static final String EXAMPLE_GROUP_ID = "group1Id";
   public static final String EXAMPLE_GROUP_NAME = "group1";
@@ -215,12 +222,28 @@ public abstract class MockProvider {
     when(statistics.getName()).thenReturn(EXAMPLE_PROCESS_DEFINITION_NAME);
     when(statistics.getKey()).thenReturn(EXAMPLE_PROCESS_DEFINITION_KEY);
     
+    IncidentStatistics incidentStaticits = mock(IncidentStatistics.class);
+    when(incidentStaticits.getIncidentType()).thenReturn(EXAMPLE_INCIDENT_TYPE);
+    when(incidentStaticits.getIncidentCount()).thenReturn(EXAMPLE_INCIDENT_COUNT);
+    
+    List<IncidentStatistics> exampleIncidentList = new ArrayList<IncidentStatistics>();
+    exampleIncidentList.add(incidentStaticits);
+    when(statistics.getIncidentStatistics()).thenReturn(exampleIncidentList);
+    
     ProcessDefinitionStatistics anotherStatistics = mock(ProcessDefinitionStatistics.class);
     when(anotherStatistics.getFailedJobs()).thenReturn(ANOTHER_EXAMPLE_FAILED_JOBS);
     when(anotherStatistics.getInstances()).thenReturn(ANOTHER_EXAMPLE_INSTANCES);
     when(anotherStatistics.getId()).thenReturn(ANOTHER_EXAMPLE_PROCESS_DEFINITION_ID);
     when(anotherStatistics.getName()).thenReturn(EXAMPLE_PROCESS_DEFINITION_NAME);
     when(anotherStatistics.getKey()).thenReturn(EXAMPLE_PROCESS_DEFINITION_KEY);
+    
+    IncidentStatistics anotherIncidentStaticits = mock(IncidentStatistics.class);
+    when(anotherIncidentStaticits.getIncidentType()).thenReturn(ANOTHER_EXAMPLE_INCIDENT_TYPE);
+    when(anotherIncidentStaticits.getIncidentCount()).thenReturn(ANOTHER_EXAMPLE_INCIDENT_COUNT);
+    
+    List<IncidentStatistics> anotherExampleIncidentList = new ArrayList<IncidentStatistics>();
+    anotherExampleIncidentList.add(anotherIncidentStaticits);
+    when(anotherStatistics.getIncidentStatistics()).thenReturn(anotherExampleIncidentList);
     
     List<ProcessDefinitionStatistics> processDefinitionResults = new ArrayList<ProcessDefinitionStatistics>();
     processDefinitionResults.add(statistics);
@@ -235,10 +258,26 @@ public abstract class MockProvider {
     when(statistics.getInstances()).thenReturn(EXAMPLE_INSTANCES);
     when(statistics.getId()).thenReturn(EXAMPLE_ACTIVITY_ID);
     
+    IncidentStatistics incidentStaticits = mock(IncidentStatistics.class);
+    when(incidentStaticits.getIncidentType()).thenReturn(EXAMPLE_INCIDENT_TYPE);
+    when(incidentStaticits.getIncidentCount()).thenReturn(EXAMPLE_INCIDENT_COUNT);
+    
+    List<IncidentStatistics> exampleIncidentList = new ArrayList<IncidentStatistics>();
+    exampleIncidentList.add(incidentStaticits);
+    when(statistics.getIncidentStatistics()).thenReturn(exampleIncidentList);
+    
     ActivityStatistics anotherStatistics = mock(ActivityStatistics.class);
     when(anotherStatistics.getFailedJobs()).thenReturn(ANOTHER_EXAMPLE_FAILED_JOBS);
     when(anotherStatistics.getInstances()).thenReturn(ANOTHER_EXAMPLE_INSTANCES);
     when(anotherStatistics.getId()).thenReturn(ANOTHER_EXAMPLE_ACTIVITY_ID);
+    
+    IncidentStatistics anotherIncidentStaticits = mock(IncidentStatistics.class);
+    when(anotherIncidentStaticits.getIncidentType()).thenReturn(ANOTHER_EXAMPLE_INCIDENT_TYPE);
+    when(anotherIncidentStaticits.getIncidentCount()).thenReturn(ANOTHER_EXAMPLE_INCIDENT_COUNT);
+    
+    List<IncidentStatistics> anotherExampleIncidentList = new ArrayList<IncidentStatistics>();
+    anotherExampleIncidentList.add(anotherIncidentStaticits);
+    when(anotherStatistics.getIncidentStatistics()).thenReturn(anotherExampleIncidentList);
     
     List<ActivityStatistics> activityResults = new ArrayList<ActivityStatistics>();
     activityResults.add(statistics);
