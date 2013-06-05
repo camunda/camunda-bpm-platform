@@ -13,25 +13,27 @@
   </parent>
 
   <properties>
-    <test.version.old>6.1.11</test.version.old>
-    <test.version.old.major>6.1</test.version.old.major>
+    <test.version.old>6.2.4</test.version.old>
+    <test.version.old.major>6.2</test.version.old.major>
     <test.version.current>${project.version}</test.version.current>
 
     <test.db.host>${project.build.directory}</test.db.host>
     <test.db.database>camunda-engine</test.db.database>
     <test.db.username>sa</test.db.username>
     <test.db.password>sa</test.db.password>
+    
+    <mail.server.port>5025</mail.server.port>
   </properties>
   
   <profiles>
     <profile>
-      <id>62</id>
+      <id>70</id>
         <activation>
           <activeByDefault>true</activeByDefault>
         </activation>
         <properties>
           <test.version.current>${project.version}</test.version.current>
-          <test.version.current.major>6.2</test.version.current.major>
+          <test.version.current.major>7.0</test.version.current.major>
         </properties>      
     </profile>
     <profile>
