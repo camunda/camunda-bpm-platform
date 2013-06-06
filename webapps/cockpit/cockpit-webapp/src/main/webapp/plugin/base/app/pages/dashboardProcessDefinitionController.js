@@ -3,7 +3,6 @@ ngDefine('cockpit.plugin.base.pages', function(module) {
   var Controller = function($scope, ProcessDefinitionResource) {
     
     var failedJobIncidentType = 'failedJob';
-    $scope.incidentTypes = [ failedJobIncidentType ];
 
     ProcessDefinitionResource.queryStatistics({
 	      incidentsForType: failedJobIncidentType
@@ -72,6 +71,7 @@ ngDefine('cockpit.plugin.base.pages', function(module) {
             }
           }
           
+          // Add the saved values to the corresponding values of the current statistic
           statistic.instances = currentInstances + currentStatistic.instances;
           statistic.failedJobs = currentFailedJobs + currentStatistic.failedJobs;
           
@@ -89,6 +89,7 @@ ngDefine('cockpit.plugin.base.pages', function(module) {
             }
             
             if (!!newIncident) {
+              // merge the incidents
               statistic.incidents.push(incident);
             }
             
@@ -97,19 +98,6 @@ ngDefine('cockpit.plugin.base.pages', function(module) {
         }
       });
 
-      return result;
-    };
-    
-    $scope.hasFailedJobIncidents = function(statistics) {
-      var result = false;
-      angular.forEach(statistics.incidents, function (incident) {
-        if (incident.incidentType == failedJobIncidentType) {
-          if (incident.incidentCount > 0) {
-            result = true;
-          }
-          return;
-        }
-      });
       return result;
     };
     
