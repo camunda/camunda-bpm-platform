@@ -44,7 +44,7 @@ public class FailedJobCommandTest extends AbstractFoxPlatformIntegrationTest {
     
     Assert.assertEquals(50, managementService.createJobQuery().withRetriesLeft().count());
     
-    waitForJobExecutorToProcessAllJobs(30000, 500);
+    waitForJobExecutorToProcessAllJobs(90000, 500);
     
     // now the retries = 0
     
