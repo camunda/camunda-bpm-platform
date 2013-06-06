@@ -22,6 +22,7 @@ import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.helper.EqualsMap;
+import org.camunda.bpm.engine.rest.util.VariablesBuilder;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -43,13 +44,12 @@ public abstract class AbstractMessageRestServiceTest extends AbstractRestService
   public void testFullMessageCorrelation() {
     String messageName = "aMessageName";
     String businessKey = "aBusinessKey";
-    Map<String, Object> variables = new HashMap<String, Object>();
-    variables.put("aKey", "aValue");
+    Map<String, Object> variables = VariablesBuilder.create().variable("aKey", "aValue").getVariables();
     
-    Map<String, Object> correlationKeys = new HashMap<String, Object>();
-    correlationKeys.put("aKey", "aValue");
-    correlationKeys.put("anotherKey", 1);
-    correlationKeys.put("aThirdKey", true);
+    Map<String, Object> correlationKeys = VariablesBuilder.create()
+        .variable("aKey", "aValue")
+        .variable("anotherKey", 1)
+        .variable("aThirdKey", true).getVariables();
     
     Map<String, Object> messageParameters = new HashMap<String, Object>();
     messageParameters.put("messageName", messageName);
@@ -61,8 +61,16 @@ public abstract class AbstractMessageRestServiceTest extends AbstractRestService
       .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
       .when().post(MESSAGE_URL);
     
+    Map<String, Object> expectedCorrelationKeys = new HashMap<String, Object>();
+    expectedCorrelationKeys.put("aKey", "aValue");
+    expectedCorrelationKeys.put("anotherKey", 1);
+    expectedCorrelationKeys.put("aThirdKey", true);
+    
+    Map<String, Object> expectedVariables = new HashMap<String, Object>();
+    expectedVariables.put("aKey", "aValue");
+    
     verify(runtimeServiceMock).correlateMessage(eq(messageName), eq(businessKey), 
-        argThat(new EqualsMap(correlationKeys)), argThat(new EqualsMap(variables)));
+        argThat(new EqualsMap(expectedCorrelationKeys)), argThat(new EqualsMap(expectedVariables)));
   }
   
   @Test

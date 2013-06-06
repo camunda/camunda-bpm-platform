@@ -16,6 +16,7 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
@@ -41,6 +42,7 @@ import org.camunda.bpm.engine.rest.dto.runtime.StartProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.task.FormDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
+import org.camunda.bpm.engine.rest.util.DtoUtil;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 
 public class ProcessDefinitionResourceImpl implements ProcessDefinitionResource {
@@ -76,8 +78,9 @@ public class ProcessDefinitionResourceImpl implements ProcessDefinitionResource 
     RuntimeService runtimeService = engine.getRuntimeService();
 
     ProcessInstance instance = null;
+    Map<String, Object> variables = DtoUtil.toMap(parameters.getVariables());
     try {
-      instance = runtimeService.startProcessInstanceById(processDefinitionId, parameters.getVariables());
+      instance = runtimeService.startProcessInstanceById(processDefinitionId, variables);
     } catch (ProcessEngineException e) {
       throw new RestException(Status.INTERNAL_SERVER_ERROR, e, "Cannot instantiate process definition " + processDefinitionId);
     }

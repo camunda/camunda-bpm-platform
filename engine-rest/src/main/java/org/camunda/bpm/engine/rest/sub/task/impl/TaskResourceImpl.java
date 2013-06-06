@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.rest.sub.task.impl;
 
+import java.util.Map;
+
 import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.FormService;
@@ -26,6 +28,7 @@ import org.camunda.bpm.engine.rest.dto.task.UserIdDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.sub.task.TaskResource;
+import org.camunda.bpm.engine.rest.util.DtoUtil;
 import org.camunda.bpm.engine.task.Task;
 
 public class TaskResourceImpl implements TaskResource {
@@ -54,7 +57,8 @@ public class TaskResourceImpl implements TaskResource {
   public void complete(CompleteTaskDto dto) {
     TaskService taskService = engine.getTaskService();
 
-    taskService.complete(taskId, dto.getVariables());
+    Map<String, Object> variables = DtoUtil.toMap(dto.getVariables());
+    taskService.complete(taskId, variables);
   }
 
   @Override
@@ -89,7 +93,8 @@ public class TaskResourceImpl implements TaskResource {
   @Override
   public void resolve(CompleteTaskDto dto) {
     TaskService taskService = engine.getTaskService();
-    taskService.resolveTask(taskId, dto.getVariables());
+    Map<String, Object> variables = DtoUtil.toMap(dto.getVariables());
+    taskService.resolveTask(taskId, variables);
   }
   
 

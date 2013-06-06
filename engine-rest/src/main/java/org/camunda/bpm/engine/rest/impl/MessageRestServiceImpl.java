@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.rest.impl;
 
+import java.util.Map;
+
 import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.MismatchingMessageCorrelationException;
@@ -20,6 +22,7 @@ import org.camunda.bpm.engine.rest.MessageRestService;
 import org.camunda.bpm.engine.rest.dto.message.CorrelationMessageDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
+import org.camunda.bpm.engine.rest.util.DtoUtil;
 
 public class MessageRestServiceImpl extends AbstractRestProcessEngineAware implements MessageRestService {
 
@@ -39,9 +42,11 @@ public class MessageRestServiceImpl extends AbstractRestProcessEngineAware imple
     }
     
     RuntimeService runtimeService = processEngine.getRuntimeService();
+    Map<String, Object> correlationKeys = DtoUtil.toMap(messageDto.getCorrelationKeys());
+    Map<String, Object> processVariables = DtoUtil.toMap(messageDto.getProcessVariables());
     try {
       runtimeService.correlateMessage(messageDto.getMessageName(), messageDto.getBusinessKey(), 
-          messageDto.getCorrelationKeys(), messageDto.getProcessVariables());
+          correlationKeys, processVariables);
     } catch (MismatchingMessageCorrelationException e) {
       throw new RestException(Status.BAD_REQUEST, e);
     }
