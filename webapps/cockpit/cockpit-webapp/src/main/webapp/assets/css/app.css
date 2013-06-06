@@ -251,3 +251,21 @@ Cursors
 .pagination .active, .pagination .disabled {
   cursor: auto;
 }
+
+/**----------------
+Circle
+-------------------**/
+
+.circle {
+  border-radius: 50%;
+  width: 20px;
+  height: 20px; 
+}
+
+.circle-red {
+  background-color: #b94a48;
+}
+
+.circle-green {
+  background-color: #468847;
+}
