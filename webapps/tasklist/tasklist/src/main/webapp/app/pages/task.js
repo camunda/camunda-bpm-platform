@@ -49,7 +49,7 @@ define(["angular"], function(angular) {
           }
 
           EngineApi.getProcessInstance().variables({ id : task.processInstanceId }).$then(function (result) {
-            var variables = result.data.variables,
+            var variables = Forms.mapToVariablesArray(result.data.variables),
                 scopeVariables = $scope.variables;
 
             for (var i = 0, variable; !!(variable = variables[i]); i++) {
