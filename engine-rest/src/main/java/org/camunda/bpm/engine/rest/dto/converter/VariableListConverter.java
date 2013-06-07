@@ -28,23 +28,33 @@ import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 public class VariableListConverter implements
     StringToTypeConverter<List<VariableQueryParameterDto>> {
 
+  private static final String EXPRESSION_DELIMITER = ",";
+  private static final String ATTRIBUTE_DELIMITER = "_";
+  
   /**
-   * Expects a query parameter of format KEY_OPERATOR_VALUE, e.g. aVariable_eq_aValue
+   * Expects a query parameter of multiple variable expressions formatted as KEY_OPERATOR_VALUE, e.g. aVariable_eq_aValue.
+   * Multiple values are expected to be comma-separated.
    */
   @Override
   public List<VariableQueryParameterDto> convertQueryParameterToType(String value) {
-    VariableQueryParameterDto queryVariable = new VariableQueryParameterDto();
-    
-    String[] valueTriple = value.split("_");
-    if (valueTriple.length != 3) {
-      throw new InvalidRequestException(Status.BAD_REQUEST, "variable query parameter has to have format KEY_OPERATOR_VALUE.");
-    }
-    queryVariable.setName(valueTriple[0]);
-    queryVariable.setOperator(valueTriple[1]);
-    queryVariable.setValue(valueTriple[2]);
+    String[] expressions = value.split(EXPRESSION_DELIMITER);
     
     List<VariableQueryParameterDto> queryVariables = new ArrayList<VariableQueryParameterDto>();
-    queryVariables.add(queryVariable);
+    
+    for (String expression : expressions) {
+      String[] valueTriple = expression.split(ATTRIBUTE_DELIMITER);
+      if (valueTriple.length != 3) {
+        throw new InvalidRequestException(Status.BAD_REQUEST, "variable query parameter has to have format KEY_OPERATOR_VALUE.");
+      }
+      
+      VariableQueryParameterDto queryVariable = new VariableQueryParameterDto();
+      queryVariable.setName(valueTriple[0]);
+      queryVariable.setOperator(valueTriple[1]);
+      queryVariable.setValue(valueTriple[2]);
+      
+      queryVariables.add(queryVariable);
+    }
+    
     return queryVariables;
   }
 }
