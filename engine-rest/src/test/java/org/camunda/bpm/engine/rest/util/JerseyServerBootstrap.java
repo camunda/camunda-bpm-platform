@@ -4,23 +4,14 @@ import java.io.IOException;
 import java.net.URI;
 import java.util.Properties;
 
+import javax.ws.rs.core.Application;
 import javax.ws.rs.core.UriBuilder;
 
-import org.camunda.bpm.engine.rest.exception.ProcessEngineExceptionHandler;
-import org.camunda.bpm.engine.rest.exception.RestExceptionHandler;
-import org.camunda.bpm.engine.rest.impl.ExecutionRestServiceImpl;
-import org.camunda.bpm.engine.rest.impl.IdentityRestServiceImpl;
-import org.camunda.bpm.engine.rest.impl.MessageRestServiceImpl;
-import org.camunda.bpm.engine.rest.impl.ProcessDefinitionRestServiceImpl;
-import org.camunda.bpm.engine.rest.impl.ProcessEngineRestServiceImpl;
-import org.camunda.bpm.engine.rest.impl.ProcessInstanceRestServiceImpl;
-import org.camunda.bpm.engine.rest.impl.TaskRestServiceImpl;
-import org.camunda.bpm.engine.rest.mapper.JacksonConfigurator;
-import org.codehaus.jackson.jaxrs.JacksonJsonProvider;
+import org.camunda.bpm.engine.rest.impl.application.DefaultApplication;
 import org.glassfish.grizzly.http.server.HttpServer;
 
 import com.sun.jersey.api.container.grizzly2.GrizzlyServerFactory;
-import com.sun.jersey.api.core.ClassNamesResourceConfig;
+import com.sun.jersey.api.core.ApplicationAdapter;
 import com.sun.jersey.api.core.ResourceConfig;
 
 public class JerseyServerBootstrap extends EmbeddedServerBootstrap {
@@ -28,7 +19,11 @@ public class JerseyServerBootstrap extends EmbeddedServerBootstrap {
   private HttpServer server;
   
   public JerseyServerBootstrap() {
-    setupServer();
+    setupServer(new DefaultApplication());
+  }
+  
+  public JerseyServerBootstrap(Application application) {
+    setupServer(application);
   }
   
   @Override
@@ -40,8 +35,8 @@ public class JerseyServerBootstrap extends EmbeddedServerBootstrap {
     }
   }
   
-  private void setupServer() {
-    ResourceConfig rc = new ClassNamesResourceConfig(getResourceClasses());
+  private void setupServer(Application application) {
+    ResourceConfig rc = new ApplicationAdapter(application);
     
     Properties serverProperties = readProperties();
     int port = Integer.parseInt(serverProperties.getProperty(PORT_PROPERTY));
@@ -61,25 +56,4 @@ public class JerseyServerBootstrap extends EmbeddedServerBootstrap {
   public void stop() {
     server.stop();
   }
-  
-  private Class<?>[] getResourceClasses() {
-    Class<?>[] classes = new Class<?>[]{
-      ProcessDefinitionRestServiceImpl.class,
-      ProcessInstanceRestServiceImpl.class,
-      TaskRestServiceImpl.class,
-      ProcessEngineRestServiceImpl.class,
-      IdentityRestServiceImpl.class,
-      MessageRestServiceImpl.class,
-      ExecutionRestServiceImpl.class,
-      
-      ProcessEngineExceptionHandler.class,
-      RestExceptionHandler.class,
-      
-      JacksonConfigurator.class,
-      JacksonJsonProvider.class
-    };
-    
-    return classes;
-  }
-
 }
