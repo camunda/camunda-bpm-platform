@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.rest.sub;
 
+import java.util.Map;
+
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
@@ -23,7 +25,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import org.camunda.bpm.engine.rest.dto.PatchVariablesDto;
-import org.camunda.bpm.engine.rest.dto.runtime.VariableListDto;
 import org.camunda.bpm.engine.rest.dto.runtime.VariableValueDto;
 
 public interface VariableResource {
@@ -31,7 +32,7 @@ public interface VariableResource {
 
   @GET
   @Produces(MediaType.APPLICATION_JSON)
-  VariableListDto getVariables();
+  Map<String, VariableValueDto> getVariables();
   
   @GET
   @Path("/{varId}")

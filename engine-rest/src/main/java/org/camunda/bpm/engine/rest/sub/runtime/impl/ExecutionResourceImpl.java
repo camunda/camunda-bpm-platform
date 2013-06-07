@@ -8,11 +8,12 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.rest.dto.runtime.ExecutionDto;
-import org.camunda.bpm.engine.rest.dto.runtime.VariableListDto;
+import org.camunda.bpm.engine.rest.dto.runtime.ExecutionTriggerDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.sub.VariableResource;
 import org.camunda.bpm.engine.rest.sub.runtime.ExecutionResource;
+import org.camunda.bpm.engine.rest.util.DtoUtil;
 import org.camunda.bpm.engine.runtime.Execution;
 
 public class ExecutionResourceImpl implements ExecutionResource {
@@ -38,10 +39,11 @@ public class ExecutionResourceImpl implements ExecutionResource {
   }
 
   @Override
-  public void signalExecution(VariableListDto variables) {
+  public void signalExecution(ExecutionTriggerDto triggerDto) {
     RuntimeService runtimeService = engine.getRuntimeService();
+    Map<String, Object> variables = DtoUtil.toMap(triggerDto.getVariables());
     try {
-      runtimeService.signal(executionId, variables.toMap());
+      runtimeService.signal(executionId, variables);
     } catch (ProcessEngineException e) {
       throw new RestException(Status.INTERNAL_SERVER_ERROR, e, "Cannot signal execution " + executionId + ": " + e.getMessage());
     }
@@ -54,10 +56,10 @@ public class ExecutionResourceImpl implements ExecutionResource {
   }
 
   @Override
-  public void triggerMessageEvent(String messageName, VariableListDto variablesDto) {
+  public void triggerMessageEvent(String messageName, ExecutionTriggerDto triggerDto) {
     RuntimeService runtimeService = engine.getRuntimeService();
     
-    Map<String, Object> variables = variablesDto.toMap();
+    Map<String, Object> variables = DtoUtil.toMap(triggerDto.getVariables());
     
     try {
       runtimeService.messageEventReceived(messageName, executionId, variables);

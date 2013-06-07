@@ -12,33 +12,17 @@
  */
 package org.camunda.bpm.engine.rest.dto.runtime;
 
-import java.util.List;
 import java.util.Map;
 
-import org.camunda.bpm.engine.rest.util.DtoUtil;
+public class ExecutionTriggerDto {
 
-/**
- * @author: drobisch
- */
-public class VariableListDto {
-  List<VariableValueDto> variables;
+  private Map<String, VariableValueDto> variables;
 
-  public VariableListDto() {
-  }
-  
-  public VariableListDto(List<VariableValueDto> variables) {
-    this.variables = variables;
-  }
-
-  public void setVariables(List<VariableValueDto> variables) {
-    this.variables = variables;
-  }
-  
-  public List<VariableValueDto> getVariables() {
+  public Map<String, VariableValueDto> getVariables() {
     return variables;
   }
-  
-  public Map<String, Object> toMap() {
-    return DtoUtil.toMap(variables);
+
+  public void setVariables(Map<String, VariableValueDto> variables) {
+    this.variables = variables;
   }
 }

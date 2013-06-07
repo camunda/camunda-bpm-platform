@@ -14,13 +14,14 @@ package org.camunda.bpm.engine.rest.dto.message;
 
 import java.util.Map;
 
-// TODO make consistent with MessageDto when doing CAM-765
+import org.camunda.bpm.engine.rest.dto.runtime.VariableValueDto;
+
 public class CorrelationMessageDto {
 
   private String messageName;
   private String businessKey;
-  private Map<String, Object> correlationKeys;
-  private Map<String, Object> processVariables;
+  private Map<String, VariableValueDto> correlationKeys;
+  private Map<String, VariableValueDto> processVariables;
   
   public String getMessageName() {
     return messageName;
@@ -34,16 +35,16 @@ public class CorrelationMessageDto {
   public void setBusinessKey(String businessKey) {
     this.businessKey = businessKey;
   }
-  public Map<String, Object> getCorrelationKeys() {
+  public Map<String, VariableValueDto> getCorrelationKeys() {
     return correlationKeys;
   }
-  public void setCorrelationKeys(Map<String, Object> correlationKeys) {
+  public void setCorrelationKeys(Map<String, VariableValueDto> correlationKeys) {
     this.correlationKeys = correlationKeys;
   }
-  public Map<String, Object> getProcessVariables() {
+  public Map<String, VariableValueDto> getProcessVariables() {
     return processVariables;
   }
-  public void setProcessVariables(Map<String, Object> processVariables) {
+  public void setProcessVariables(Map<String, VariableValueDto> processVariables) {
     this.processVariables = processVariables;
   }
 }

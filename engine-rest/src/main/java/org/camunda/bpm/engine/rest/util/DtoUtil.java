@@ -1,8 +1,8 @@
 package org.camunda.bpm.engine.rest.util;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import org.camunda.bpm.engine.rest.dto.runtime.VariableValueDto;
 
@@ -13,14 +13,14 @@ public class DtoUtil {
    * @param variables
    * @return
    */
-  public static Map<String, Object> toMap(List<VariableValueDto> variables) {
+  public static Map<String, Object> toMap(Map<String, VariableValueDto> variables) {
     if (variables == null) {
       return null;
     }
     
     Map<String, Object> variablesMap = new HashMap<String, Object>();
-    for (VariableValueDto variable : variables) {
-      variablesMap.put(variable.getName(), variable.getValue());
+    for (Entry<String, VariableValueDto> variable : variables.entrySet()) {
+      variablesMap.put(variable.getKey(), variable.getValue().getValue());
     }
     return variablesMap;
   }
