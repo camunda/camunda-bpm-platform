@@ -5,100 +5,68 @@
 <mapper namespace="cockpit.base">
 
   <resultMap id="processInstanceMap" type="org.camunda.bpm.cockpit.plugin.base.persistence.entity.ProcessInstanceDto">
-    <id property="id" column="PROC_INST_ID_" jdbcType="VARCHAR" />
+    <id property="id" column="ID_" jdbcType="VARCHAR" />
     <result property="businessKey" column="BUSINESS_KEY_" jdbcType="VARCHAR" />
     <result property="startTime" column="START_TIME_" jdbcType="TIMESTAMP"/>
-    <result property="localFailedJobs" column="LOCAL_FAILED_JOBS_" jdbcType="INTEGER" />
-    <result property="child1FailedJobs" column="CHILD_1_OF_LOCAL_FAILED_JOBS_" jdbcType="INTEGER" />
-    <result property="child2FailedJobs" column="CHILD_2_OF_CHILD_1_FAILED_JOBS_" jdbcType="INTEGER" />
-    <result property="child3FailedJobs" column="CHILD_3_OF_CHILD_2_FAILED_JOBS_" jdbcType="INTEGER" />
+    <collection property="incidents" javaType="java.util.ArrayList" ofType="org.camunda.bpm.cockpit.plugin.base.persistence.entity.IncidentDto">
+      <result property="incidentType" column="INCIDENT_TYPE_" jdbcType="VARCHAR" />
+      <result property="incidentCount" column="INCIDENT_COUNT_" jdbcType="INTEGER"/>
+    </collection>
   </resultMap>
 
-  <select id="selectRunningProcessInstances" parameterType="org.camunda.bpm.cockpit.plugin.base.resources.ProcessInstanceQueryParameter" resultMap="processInstanceMap">
-    ${limitBefore}
-    
+  <select id="selectRunningProcessInstancesIncludingIncidents" parameterType="org.camunda.bpm.cockpit.plugin.base.query.parameter.ProcessInstanceQueryParameter"
+          resultMap="processInstanceMap">
     select
-      l0_proc_inst.PROC_INST_ID_,
-      l0_proc_inst.BUSINESS_KEY_,
-      count(l0_job.RETRIES_) LOCAL_FAILED_JOBS_,
-      count(l1_job.RETRIES_) CHILD_1_OF_LOCAL_FAILED_JOBS_,
-      count(l2_job.RETRIES_) CHILD_2_OF_CHILD_1_FAILED_JOBS_,
-      count(l3_job.RETRIES_) CHILD_3_OF_CHILD_2_FAILED_JOBS_,
-      <if test="historyEnabled">
-        hist.START_TIME_
-      </if>
-      <if test="!historyEnabled">
-        null START_TIME_
-      </if>
-      
+      INSTANCE.ID_,
+      INSTANCE.BUSINESS_KEY_,
+      INSTANCE.START_TIME_,
+      INCIDENT.INCIDENT_TYPE_,
+      INCIDENT.INCIDENT_COUNT_
     from
-      ACT_RU_EXECUTION l0_proc_inst
-      <if test="historyEnabled">
-        left join
-          ACT_HI_ACTINST hist
-        on
-          hist.PROC_INST_ID_ = l0_proc_inst.PROC_INST_ID_ and hist.ACT_TYPE_ = 'startEvent'
-      </if>  
-      
-    <!-- Level 0 -->
+      (
+        <!-- This statement selects all process instances to an assigned process definition id (by using pagination!).-->
+        ${limitBefore}
+        select RES.* ${limitBetween},
+        <if test="historyEnabled">
+        HISTORY.START_TIME_
+        </if>
+        <if test="!historyEnabled">
+        null START_TIME_
+        </if>
+        <include refid="selectProcessInstances"/>
+        ${orderBy}
+        ${limitAfter}
+      ) INSTANCE
+    <!-- The set of process instances will be (left) joined with a set of incidents. -->
     left join
-      ACT_RU_JOB l0_job
+      (
+        <!-- to avoid to have a list of incidents with only one item which type is null and count is zero an extra subselect is needed -->
+        <!-- this subselect selects all incidents to the assigned process definition id -->
+        select
+          INCIDENT.PROC_INST_ID_, INCIDENT.INCIDENT_TYPE_, count(INCIDENT.ID_) INCIDENT_COUNT_
+        from
+          ACT_RU_INCIDENT INCIDENT
+        where
+          INCIDENT.PROC_DEF_ID_ = #{processDefinitionId}
+        group by
+          INCIDENT.PROC_INST_ID_, INCIDENT.INCIDENT_TYPE_
+      ) INCIDENT
     on
-      l0_proc_inst.ID_ = l0_job.PROCESS_INSTANCE_ID_ and l0_job.RETRIES_ = 0
-    
-    <!-- Level 1 -->
-    left join
-      ACT_RU_EXECUTION l1_exec
-    on
-      l1_exec.SUPER_EXEC_ = l0_proc_inst.ID_
-    left join
-      ACT_RU_EXECUTION l1_proc_inst 
-    on
-     l1_proc_inst.PROC_INST_ID_ = l1_exec.PROC_INST_ID_
-    left join
-      ACT_RU_JOB l1_job
-    on
-      l1_proc_inst.ID_ = l1_job.PROCESS_INSTANCE_ID_ and l1_job.RETRIES_ = 0
-    
-    <!-- Level 2 -->
-    left join
-      ACT_RU_EXECUTION l2_exec
-    on
-      l2_exec.SUPER_EXEC_ = l1_proc_inst.ID_
-    left join
-      ACT_RU_EXECUTION l2_proc_inst 
-    on
-     l2_proc_inst.PROC_INST_ID_ = l2_exec.PROC_INST_ID_
-    left join
-      ACT_RU_JOB l2_job
-    on
-      l2_proc_inst.ID_ = l2_job.PROCESS_INSTANCE_ID_ and l2_job.RETRIES_ = 0
-    
-    <!-- Level 3 -->
-    left join
-      ACT_RU_EXECUTION l3_exec
-    on
-      l3_exec.SUPER_EXEC_ = l2_proc_inst.ID_
-    left join
-      ACT_RU_EXECUTION l3_proc_inst 
-    on
-     l3_proc_inst.PROC_INST_ID_ = l3_exec.PROC_INST_ID_
-    left join
-      ACT_RU_JOB l3_job
-    on
-      l3_proc_inst.ID_ = l3_job.PROCESS_INSTANCE_ID_ and l3_job.RETRIES_ = 0
-    
-    where
-      l0_proc_inst.PROC_DEF_ID_ = #{processDefinitionId}
-    
-    group by
-      l0_proc_inst.PROC_INST_ID_
-    <if test="historyEnabled">
-      order by
-        hist.START_TIME_ desc
-    </if>
- 
-    ${limitAfter}
+      INSTANCE.ID_ = INCIDENT.PROC_INST_ID_
   </select>
+  
+  <sql id="selectProcessInstances">
+    from
+      ${prefix}ACT_RU_EXECUTION RES
+    <if test="historyEnabled">
+    left join
+      ${prefix}ACT_HI_PROCINST HISTORY
+    ON 
+      RES.ID_ = HISTORY.PROC_INST_ID_
+    </if>
+    where
+      RES.ID_ = RES.PROC_INST_ID_ and
+      RES.PROC_DEF_ID_ = #{processDefinitionId}
+  </sql>
 
 </mapper>

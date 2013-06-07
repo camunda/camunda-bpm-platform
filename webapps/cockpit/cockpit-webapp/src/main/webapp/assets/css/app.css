@@ -259,7 +259,8 @@ Circle
 .circle {
   border-radius: 50%;
   width: 20px;
-  height: 20px; 
+  height: 20px;
+  background-color: #999999;
 }
 
 .circle-red {

@@ -37,8 +37,10 @@ ngDefine('camunda.common.directives', [ 'angular', 'jquery' ], function(module, 
               var incident = incidents[i];
               
               if(incident.incidentType.indexOf(incidentsForTypes) != -1) {
-                setStateToRed();
-                return;
+                if (incident.incidentCount > 0) {
+                  setStateToRed();
+                  return;
+                }
               }
               
             }

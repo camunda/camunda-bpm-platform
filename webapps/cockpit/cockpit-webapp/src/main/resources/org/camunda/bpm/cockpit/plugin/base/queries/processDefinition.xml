@@ -8,8 +8,6 @@
     <id property="id" column="ID_" jdbcType="VARCHAR" />
     <result property="name" column="NAME_" jdbcType="VARCHAR" />
     <result property="key" column="KEY_" jdbcType="VARCHAR" />
-    <result property="deploymentId" column="DEPLOYMENT_ID_" jdbcType="VARCHAR" />
-    <result property="suspensionState" column="SUSPENSION_STATE_" jdbcType="INTEGER" />
     <result property="version" column="VERSION_" jdbcType="INTEGER" />
     <result property="failedJobs" column="FAILED_JOBS_" jdbcType="INTEGER" />
   </resultMap>
@@ -22,86 +20,4 @@
     from ACT_RE_PROCDEF procdef
   </select>
 
-  <resultMap id="processFailureMap" type="org.camunda.bpm.cockpit.plugin.base.persistence.entity.ProcessDefinitionFailureChainDto">
-
-    <!-- level0 definition -->
-    <id property="procDefId_0" column="L0_PROC_DEF_ID_" jdbcType="VARCHAR" />
-    <id property="procDefKey_0" column="L0_PROC_DEF_KEY_" jdbcType="VARCHAR" />
-    <id property="procDefName_0" column="L0_PROC_DEF_NAME_" jdbcType="VARCHAR" />
-    <id property="procDefVersion_0" column="L0_PROC_DEF_VERSION_" jdbcType="INTEGER" />
-
-    <!-- level1 definition -->
-    <id property="procDefId_1" column="L1_PROC_DEF_ID_" jdbcType="VARCHAR" />
-    <id property="procDefKey_1" column="L1_PROC_DEF_KEY_" jdbcType="VARCHAR" />
-    <id property="procDefName_1" column="L1_PROC_DEF_NAME_" jdbcType="VARCHAR" />
-    <id property="procDefVersion_1" column="L1_PROC_DEF_VERSION_" jdbcType="INTEGER" />
-
-    <!-- level2 definition -->
-    <id property="procDefId_2" column="L2_PROC_DEF_ID_" jdbcType="VARCHAR" />
-    <id property="procDefKey_2" column="L2_PROC_DEF_KEY_" jdbcType="VARCHAR" />
-    <id property="procDefName_2" column="L2_PROC_DEF_NAME_" jdbcType="VARCHAR" />
-    <id property="procDefVersion_2" column="L2_PROC_DEF_VERSION_" jdbcType="INTEGER" />
-
-    <!-- level3 definition -->
-    <id property="procDefId_3" column="L3_PROC_DEF_ID_" jdbcType="VARCHAR" />
-    <id property="procDefKey_3" column="L3_PROC_DEF_KEY_" jdbcType="VARCHAR" />
-    <id property="procDefName_3" column="L3_PROC_DEF_NAME_" jdbcType="VARCHAR" />
-    <id property="procDefVersion_3" column="L3_PROC_DEF_VERSION_" jdbcType="INTEGER" />
-
-    <id property="count" column="COUNT_" jdbcType="INTEGER" />
-  </resultMap>
-
-  <select id="selectJobFailuresByProcessDefinition" resultMap="processFailureMap">
-    select
-      <!-- level 0 -->
-      l0_proc_def.ID_ L0_PROC_DEF_ID_,
-      l0_proc_def.KEY_ L0_PROC_DEF_KEY_,
-      l0_proc_def.NAME_ L0_PROC_DEF_NAME_,
-      l0_proc_def.VERSION_ L0_PROC_DEF_VERSION_,
-
-      <!-- level 1 -->
-      l1_proc_def.ID_ L1_PROC_DEF_ID_,
-      l1_proc_def.KEY_ L1_PROC_DEF_KEY_,
-      l1_proc_def.NAME_ L1_PROC_DEF_NAME_,
-      l1_proc_def.VERSION_ L1_PROC_DEF_VERSION_,
-
-      <!-- level 2 -->
-      l2_proc_def.ID_ L2_PROC_DEF_ID_,
-      l2_proc_def.KEY_ L2_PROC_DEF_KEY_,
-      l2_proc_def.NAME_ L2_PROC_DEF_NAME_,
-      l2_proc_def.VERSION_ L2_PROC_DEF_VERSION_,
-
-      <!-- level 3 -->
-      l3_proc_def.ID_ L3_PROC_DEF_ID_,
-      l3_proc_def.KEY_ L3_PROC_DEF_KEY_,
-      l3_proc_def.NAME_ L3_PROC_DEF_NAME_,
-      l3_proc_def.VERSION_ L3_PROC_DEF_VERSION_,
-
-      COUNT(*) COUNT_
-    from ACT_RU_JOB job
-      <!-- level 0 -->
-      JOIN ACT_RU_EXECUTION l0_proc_inst ON (l0_proc_inst.ID_ = job.PROCESS_INSTANCE_ID_)
-      JOIN ACT_RE_PROCDEF l0_proc_def ON (l0_proc_def.ID_ = l0_proc_inst.PROC_DEF_ID_)
-
-      <!-- join super (1) -->
-      LEFT JOIN ACT_RU_EXECUTION l1_exec ON (l0_proc_inst.SUPER_EXEC_ = l1_exec.ID_)
-      LEFT JOIN ACT_RU_EXECUTION l1_proc_inst ON (l1_exec.PROC_INST_ID_ = l1_proc_inst.ID_)
-      LEFT JOIN ACT_RE_PROCDEF l1_proc_def ON (l1_proc_def.ID_ = l1_proc_inst.PROC_DEF_ID_)
-
-      <!-- join super (2) -->
-      LEFT JOIN ACT_RU_EXECUTION l2_exec ON (l1_proc_inst.SUPER_EXEC_ = l2_exec.ID_)
-      LEFT JOIN ACT_RU_EXECUTION l2_proc_inst ON (l2_exec.PROC_INST_ID_ = l2_proc_inst.ID_)
-      LEFT JOIN ACT_RE_PROCDEF l2_proc_def ON (l2_proc_def.ID_ = l2_proc_inst.PROC_DEF_ID_)
-
-      <!-- join super (3) -->
-      LEFT JOIN ACT_RU_EXECUTION l3_exec ON (l2_proc_inst.SUPER_EXEC_ = l3_exec.ID_)
-      LEFT JOIN ACT_RU_EXECUTION l3_proc_inst ON (l3_exec.PROC_INST_ID_ = l3_proc_inst.ID_)
-      LEFT JOIN ACT_RE_PROCDEF l3_proc_def ON (l3_proc_def.ID_ = l3_proc_inst.PROC_DEF_ID_)
-    where job.RETRIES_ = 0
-
-    <!-- group by all desired fields from level n ... 0 -->
-    group by L3_PROC_DEF_ID_, L2_PROC_DEF_ID_, L1_PROC_DEF_ID_, L0_PROC_DEF_ID_
-
-    order by L3_PROC_DEF_ID_ DESC, L2_PROC_DEF_ID_ DESC, L1_PROC_DEF_ID_ DESC, L0_PROC_DEF_ID_ DESC
-  </select>
 </mapper>
