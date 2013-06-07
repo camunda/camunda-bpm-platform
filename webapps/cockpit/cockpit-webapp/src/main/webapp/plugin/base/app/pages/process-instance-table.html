@@ -13,8 +13,7 @@
         <td>{{ processInstance.startTime }}</td>
         <td>{{ processInstance.businessKey }}</td>
         <td>
-          <span ngm-if="hasFailedJobs(processInstance)" class="badge badge-important">&nbsp;</span>
-          <span ngm-if="!hasFailedJobs(processInstance)" class="badge badge-success">&nbsp;</span>
+          <div state-circle incidents="processInstance.incidents" />
         </td>
       </tr>
     </tbody>

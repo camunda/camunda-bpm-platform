@@ -1,7 +1,7 @@
 ngDefine('cockpit.plugin.base.pages', function(module) {
 
   var Controller = function ($scope, $routeParams, $location, PluginProcessInstanceResource, ProcessInstanceResource) {
-
+    
     var processDefinitionId = $routeParams.processDefinitionId;
 
     var pages = $scope.pages = { size: 5, total: 0 };
@@ -36,9 +36,6 @@ ngDefine('cockpit.plugin.base.pages', function(module) {
       });
     };
 
-    $scope.hasFailedJobs = function(processInstance) {
-      return !!processInstance.localFailedJobs;
-    };
   };
 
   Controller.$inject = [ '$scope', '$routeParams', '$location', 'PluginProcessInstanceResource', 'ProcessInstanceResource' ];

@@ -14,9 +14,11 @@ package org.camunda.bpm.cockpit.plugin.base.persistence.entity;
 
 public class ProcessDefinitionDto {
   
-  private String id;
-  private String name;
-  private String key;
+  protected String id;
+  protected String name;
+  protected String key;
+  protected int version;
+  protected int failedJobs;
   
   public ProcessDefinitionDto() {}
 
