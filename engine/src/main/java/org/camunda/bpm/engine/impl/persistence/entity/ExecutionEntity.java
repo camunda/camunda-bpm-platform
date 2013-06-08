@@ -20,7 +20,6 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import org.camunda.bpm.engine.impl.HistoricActivityInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.bpmn.parser.EventSubscriptionDeclaration;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -273,10 +272,9 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
       HistoryEvent hpise = eventFactory.getHistoricProcessInstanceStartEventProducer().createHistoryEvent(subProcessInstance);      
       eventHandler.handleEvent(hpise);
             
-//      HistoricActivityInstanceEntity activitiyInstance = ActivityInstanceEndHandler.findActivityInstance(this);
-//      if (activitiyInstance != null) {
-//        activitiyInstance.setCalledProcessInstanceId(subProcessInstance.getProcessInstanceId());
-//      }
+      // publish update event for current activity instance (containing the id of the sub process)
+      HistoryEvent haie = eventFactory.getHistoricActivityInstanceUpdateEventProducer().createHistoryEvent(this);
+      eventHandler.handleEvent(haie);
       
     }
 

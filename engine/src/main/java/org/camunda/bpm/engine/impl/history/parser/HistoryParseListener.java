@@ -21,9 +21,8 @@ import org.camunda.bpm.engine.impl.bpmn.behavior.UserTaskActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseListener;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
-import org.camunda.bpm.engine.impl.history.handler.refactor.UserTaskAssignmentHandler;
-import org.camunda.bpm.engine.impl.history.handler.refactor.UserTaskIdHandler;
 import org.camunda.bpm.engine.impl.history.producer.ExecutionListenerHistoryAdapter;
+import org.camunda.bpm.engine.impl.history.producer.HistoricUserTaskAssignmentListener;
 import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducerFactory;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmEvent;
@@ -62,8 +61,8 @@ public class HistoryParseListener implements BpmnParseListener {
   protected ExecutionListener ACTIVITY_INSTANCE_START_LISTENER;
   protected ExecutionListener ACTIVITI_INSTANCE_END_LISTENER;
 
-  protected UserTaskAssignmentHandler USER_TASK_ASSIGNMENT_HANDLER;
-  protected UserTaskIdHandler USER_TASK_ID_HANDLER;
+  protected TaskListener USER_TASK_ASSIGNMENT_HANDLER;
+  protected TaskListener USER_TASK_ID_HANDLER;
 
   // The history level set in the process engine configuration
   protected int historyLevel;
@@ -80,8 +79,8 @@ public class HistoryParseListener implements BpmnParseListener {
     ACTIVITY_INSTANCE_START_LISTENER = new ExecutionListenerHistoryAdapter(factory.getHistoricActivityInstanceStartEventProducer());
     ACTIVITI_INSTANCE_END_LISTENER = new ExecutionListenerHistoryAdapter(factory.getHistoricActivityInstanceEndEventProducer());
     
-    USER_TASK_ASSIGNMENT_HANDLER = new UserTaskAssignmentHandler();
-    USER_TASK_ID_HANDLER = new UserTaskIdHandler();
+    USER_TASK_ASSIGNMENT_HANDLER = new HistoricUserTaskAssignmentListener(factory.getHistoricActivityInstanceUpdateEventProducer());
+    USER_TASK_ID_HANDLER = USER_TASK_ASSIGNMENT_HANDLER;
   }
 
   public void parseProcess(Element processElement, ProcessDefinitionEntity processDefinition) {

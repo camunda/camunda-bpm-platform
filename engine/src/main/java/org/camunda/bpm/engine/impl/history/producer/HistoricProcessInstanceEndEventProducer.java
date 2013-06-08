@@ -15,38 +15,40 @@ package org.camunda.bpm.engine.impl.history.producer;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.impl.history.event.HistoricActivityInstanceEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricProcessInstanceEventEntity;
+import org.camunda.bpm.engine.impl.history.event.HistoricScopeInstanceEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 
 /**
- * <p>{@link HistoryEventProducer} for producing {@link HistoryEvent}s when a process 
- * instance ends.</p>
+ * <p>{@link HistoryEventProducer} for producing {@link HistoryEvent}s when a
+ * process instance ends.</p>
  * 
  * @author Daniel Meyer
- *
+ * @author Marcel Wieczorek
+ * 
  */
 public class HistoricProcessInstanceEndEventProducer extends HistoricProcessInstanceEventProducer {
 
   public HistoricProcessInstanceEndEventProducer() {
     super(HistoricActivityInstanceEventEntity.ACTIVITY_EVENT_TYPE_END);
   }
-    
-  protected void initEvent(DelegateExecution execution, HistoricActivityInstanceEventEntity evt) {
+
+  protected void initEvent(DelegateExecution execution, HistoricScopeInstanceEventEntity evt) {
 
     final ExecutionEntity executionEntity = (ExecutionEntity) execution;
     final HistoricProcessInstanceEventEntity hpie = (HistoricProcessInstanceEventEntity) evt;
 
     // call common init behavior
     super.initEvent(execution, evt);
-    
+
     // set the id of the activity in which this process instance ended.
     hpie.setEndActivityId(executionEntity.getActivityId());
 
     // set delete reason (if applicable).
-    if(executionEntity.getDeleteReason() != null) {
+    if (executionEntity.getDeleteReason() != null) {
       hpie.setDeleteReason(executionEntity.getDeleteReason());
     }
-    
+
   }
 
 }

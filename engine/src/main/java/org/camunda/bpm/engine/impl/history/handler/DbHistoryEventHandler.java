@@ -14,31 +14,27 @@ package org.camunda.bpm.engine.impl.history.handler;
 
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbSqlSession;
-import org.camunda.bpm.engine.impl.history.event.HistoricActivityInstanceEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 
 /**
- * <p>History event handler that writes history events to the 
- * process engine database using the DbSqlSession.</p>
+ * <p>History event handler that writes history events to the process engine
+ * database using the DbSqlSession.</p>
  * 
- * <p>This history implementation is INSERT-only: when writing history
- * events to the database we do not perform updates but rather append 
- * all events to their respective tables. 
+ * <p>This history implementation is INSERT-only: when writing history events to
+ * the database we do not perform updates but rather append all events to their
+ * respective tables.
  * 
  * @author Daniel Meyer
- *
+ * 
  */
 public class DbHistoryEventHandler implements HistoryEventHandler {
 
   public void handleEvent(HistoryEvent historyEvent) {
-    
+
     final DbSqlSession dbSqlSession = Context.getCommandContext()
       .getDbSqlSession();
-    
-    if (historyEvent instanceof HistoricActivityInstanceEventEntity) {
-      dbSqlSession.insert(historyEvent);      
-    }
-    
+
+    dbSqlSession.insert(historyEvent);
   }
 
 }

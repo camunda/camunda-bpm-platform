@@ -13,27 +13,28 @@
 package org.camunda.bpm.engine.impl.history.event;
 
 /**
- * <p>{@link HistoryEvent} signifying a top-level event in a process instance.</p>  
- *
+ * <p>{@link HistoryEvent} signifying a top-level event in a process instance.</p>
+ * 
  * @author Daniel Meyer
- *
+ * @author Marcel Wieczorek
+ * 
  */
-public class HistoricProcessInstanceEventEntity extends HistoricActivityInstanceEventEntity {
+public class HistoricProcessInstanceEventEntity extends HistoricScopeInstanceEventEntity {
 
   private static final long serialVersionUID = 1L;
-  
+
   /** the id of the activity that ended the process instance */
   protected String endActivityId;
-  
+
   /** the business key of the process instance */
   protected String businessKey;
-  
+
   /** the id of the user that started the process instance */
   protected String startUserId;
-  
+
   /** the id of the activity at which the process instance was started */
   protected String startActivityId;
-  
+
   /** the id of the super process instance */
   protected String superProcessInstanceId;
 
@@ -88,6 +89,6 @@ public class HistoricProcessInstanceEventEntity extends HistoricActivityInstance
 
   public void setDeleteReason(String deleteReason) {
     this.deleteReason = deleteReason;
-  }  
+  }
 
 }

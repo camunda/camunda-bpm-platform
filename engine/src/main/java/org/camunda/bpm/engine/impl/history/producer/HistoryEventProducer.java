@@ -13,16 +13,20 @@
 package org.camunda.bpm.engine.impl.history.producer;
 
 import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.bpm.engine.delegate.DelegateTask;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 
 /**
- * <p>Interface for implementing history event producers.</p> 
+ * <p>Interface for implementing history event producers.</p>
  * 
  * @author Daniel Meyer
- *
+ * @author Marcel Wieczorek
+ * 
  */
 public interface HistoryEventProducer {
-  
+
   public HistoryEvent createHistoryEvent(DelegateExecution execution);
-  
+
+  public HistoryEvent createHistoryEvent(DelegateExecution execution, DelegateTask task);
+
 }

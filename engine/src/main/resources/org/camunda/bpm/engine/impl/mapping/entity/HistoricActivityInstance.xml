@@ -51,6 +51,9 @@
     <result property="activityInstanceId" column="ACT_INST_ID_" jdbcType="VARCHAR" />
     <result property="parentActivityInstanceId" column="PARENT_ACT_INST_ID_" jdbcType="VARCHAR" />
     <result property="eventType" column="EVENT_TYPE_" jdbcType="VARCHAR" />
+    <result property="calledProcessInstanceId" column="CALL_PROC_INST_ID_" jdbcType="VARCHAR" />
+    <result property="taskId" column="TASK_ID_" jdbcType="VARCHAR" />
+    <result property="taskAssignee" column="ASSIGNEE_" jdbcType="VARCHAR" />
   </resultMap>
   
   <insert id="insertHistoricActivityInstanceEvent" parameterType="org.camunda.bpm.engine.impl.history.event.HistoricActivityInstanceEventEntity">
@@ -65,7 +68,10 @@
         ACT_TYPE_,
         ACT_INST_ID_,
         PARENT_ACT_INST_ID_,
-        EVENT_TYPE_             
+        EVENT_TYPE_,
+        CALL_PROC_INST_ID_,
+        TASK_ID_,
+        ASSIGNEE_             
       ) values (
         #{id ,jdbcType=VARCHAR},
         #{processDefinitionId, jdbcType=VARCHAR},
@@ -77,7 +83,10 @@
         #{activityType ,jdbcType=VARCHAR},
         #{activityInstanceId ,jdbcType=VARCHAR},
         #{parentActivityInstanceId ,jdbcType=VARCHAR},
-        #{eventType ,jdbcType=VARCHAR}      
+        #{eventType ,jdbcType=VARCHAR},
+        #{calledProcessInstanceId ,jdbcType=VARCHAR},
+        #{taskId ,jdbcType=VARCHAR},
+        #{taskAssignee ,jdbcType=VARCHAR}      
       )
   </insert>
   
@@ -124,13 +133,12 @@
       A1.ACT_TYPE_ as ACT_TYPE_ ,
       A1.ACT_INST_ID_ as ACT_INST_ID_ ,
       A1.PARENT_ACT_INST_ID_ as PARENT_ACT_INST_ID_ ,
-      A1.TASK_ID_ as TASK_ID_,
-      A1.CALL_PROC_INST_ID_ as CALL_PROC_INST_ID_ ,
-      A1.ASSIGNEE_ as ASSIGNEE_,
+      A3.TASK_ID_ as TASK_ID_,
+      A3.CALL_PROC_INST_ID_ as CALL_PROC_INST_ID_ ,
+      A3.ASSIGNEE_ as ASSIGNEE_,
       A1.TIMESTAMP_ as START_TIME_,
       A2.TIMESTAMP_ as END_TIME_,
       DATEDIFF(ms, A1.TIMESTAMP_ , A2.TIMESTAMP_ ) as DURATION_
-    
     FROM
       ${prefix}ACT_HI_ACTINST A1
     LEFT JOIN 
@@ -139,7 +147,19 @@
         A1.ACT_INST_ID_ = A2.ACT_INST_ID_ 
       AND
         A2.EVENT_TYPE_ = 'end'
-    
+    LEFT JOIN 
+      ${prefix}ACT_HI_ACTINST A3
+      ON
+        A1.ACT_INST_ID_ = A3.ACT_INST_ID_ 
+      AND
+        A3.EVENT_TYPE_ = 'update'
+      AND
+        A3.ID_ = (
+      		SELECT MAX(ID_)
+      		FROM ${prefix}ACT_HI_ACTINST A_TEMP
+      		WHERE A_TEMP.ACT_INST_ID_ = A3.ACT_INST_ID_ 
+      			AND A_TEMP.EVENT_TYPE_ = 'update'
+      	)
     WHERE
       A1.EVENT_TYPE_ = 'start'
   </select>
@@ -158,9 +178,9 @@
       A1.ACT_TYPE_ as ACT_TYPE_ ,
       A1.ACT_INST_ID_ as ACT_INST_ID_ ,
       A1.PARENT_ACT_INST_ID_ as PARENT_ACT_INST_ID_ ,
-      A1.TASK_ID_ as TASK_ID_,
-      A1.CALL_PROC_INST_ID_ as CALL_PROC_INST_ID_ ,
-      A1.ASSIGNEE_ as ASSIGNEE_,
+      A3.TASK_ID_ as TASK_ID_,
+      A3.CALL_PROC_INST_ID_ as CALL_PROC_INST_ID_ ,
+      A3.ASSIGNEE_ as ASSIGNEE_,
       A1.TIMESTAMP_ as START_TIME_,
       A2.TIMESTAMP_ as END_TIME_,
       DATEDIFF(ms, A1.TIMESTAMP_ , A2.TIMESTAMP_ ) as DURATION_
@@ -187,7 +207,19 @@
         A1.ACT_INST_ID_ = A2.ACT_INST_ID_ 
       AND
         A2.EVENT_TYPE_ = 'end'
-        
+    LEFT JOIN 
+      ${prefix}ACT_HI_ACTINST A3
+      ON
+        A1.ACT_INST_ID_ = A3.ACT_INST_ID_ 
+      AND
+        A3.EVENT_TYPE_ = 'update'
+      AND
+        A3.ID_ = (
+      		SELECT MAX(ID_)
+      		FROM ${prefix}ACT_HI_ACTINST A_TEMP
+      		WHERE A_TEMP.ACT_INST_ID_ = A3.ACT_INST_ID_ 
+      			AND A_TEMP.EVENT_TYPE_ = 'update'
+      	)
     <where>     
       
       A1.EVENT_TYPE_ = 'start'

@@ -16,89 +16,42 @@ package org.camunda.bpm.engine.impl.history.event;
  * <p>{@link HistoryEvent} implementation for events that happen in an activity.</p>
  * 
  * @author Daniel Meyer
- *
+ * @author Marcel Wieczorek
+ * 
  */
-public class HistoricActivityInstanceEventEntity extends HistoryEvent {
-  
-  private static final long serialVersionUID = 1L;
-  
-  /** fired when an activity instance is started. */
-  public static final String ACTIVITY_EVENT_TYPE_START = "start";  
-  /** fired when an activity instance is ended. */
-  public static final String ACTIVITY_EVENT_TYPE_END = "end";  
-  
-  /** the id of the activity */
-  protected String activityId;
-  
-  /** the name of the activity */
-  protected String activityName;
+public class HistoricActivityInstanceEventEntity extends HistoricScopeInstanceEventEntity {
 
-  /** the type of the activity (startEvent, serviceTask ...) */
-  protected String activityType;
-  
-  /** the id of this activity instance */
-  protected String activityInstanceId;
-  
-  /** the id of the parent activity instance */
-  protected String parentActivityInstanceId;
-  
-  /**
-   * The type of the activity audit event. 
-   *  
-   * @see #ACTIVITY_EVENT_TYPE_START  
-   * @see #ACTIVITY_EVENT_TYPE_END
-   * 
-   * */
-  protected String eventType;
-  
+  private static final long serialVersionUID = 1L;
+
+  /** the id of the child activity instance */
+  protected String calledProcessInstanceId;
+  protected String taskId;
+  protected String taskAssignee;
+
   // getters / setters ///////////////////////////////
 
-  public String getActivityId() {
-    return activityId;
+  public String getCalledProcessInstanceId() {
+    return calledProcessInstanceId;
   }
 
-  public void setActivityId(String activityId) {
-    this.activityId = activityId;
+  public void setCalledProcessInstanceId(String calledProcessInstanceId) {
+    this.calledProcessInstanceId = calledProcessInstanceId;
   }
 
-  public String getEventType() {
-    return eventType;
+  public String getTaskId() {
+    return taskId;
   }
 
-  public void setEventType(String eventType) {
-    this.eventType = eventType;
+  public void setTaskId(String taskId) {
+    this.taskId = taskId;
   }
 
-  public String getActivityType() {
-    return activityType;
+  public String getTaskAssignee() {
+    return taskAssignee;
   }
 
-  public void setActivityType(String activityType) {
-    this.activityType = activityType;
-  }
-  
-  public String getActivityName() {
-    return activityName;
-  }
-  
-  public void setActivityName(String activityName) {
-    this.activityName = activityName;
-  }
-  
-  public String getActivityInstanceId() {
-    return activityInstanceId;
-  }
-  
-  public void setActivityInstanceId(String activityInstanceId) {
-    this.activityInstanceId = activityInstanceId;
-  }
-  
-  public String getParentActivityInstanceId() {
-    return parentActivityInstanceId;
-  }
-  
-  public void setParentActivityInstanceId(String parentActivityInstanceId) {
-    this.parentActivityInstanceId = parentActivityInstanceId;
+  public void setTaskAssignee(String taskAssignee) {
+    this.taskAssignee = taskAssignee;
   }
 
 }

@@ -15,40 +15,44 @@ package org.camunda.bpm.engine.impl.history.producer;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.impl.history.event.HistoricActivityInstanceEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricProcessInstanceEventEntity;
+import org.camunda.bpm.engine.impl.history.event.HistoricScopeInstanceEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 
 /**
- * <p>{@link HistoryEventProducer} for producing {@link HistoryEvent}s when a process 
- * instance is stated.</p>
+ * <p>
+ * {@link HistoryEventProducer} for producing {@link HistoryEvent}s when a
+ * process instance is stated.
+ * </p>
  * 
  * @author Daniel Meyer
- *
+ * @author Marcel Wieczorek
+ * 
  */
 public class HistoricProcessInstanceStartEventProducer extends HistoricProcessInstanceEventProducer {
 
   public HistoricProcessInstanceStartEventProducer() {
     super(HistoricActivityInstanceEventEntity.ACTIVITY_EVENT_TYPE_START);
   }
-  
-  protected void initEvent(DelegateExecution execution, HistoricActivityInstanceEventEntity evt) {
+
+  protected void initEvent(DelegateExecution execution, HistoricScopeInstanceEventEntity evt) {
 
     final ExecutionEntity executionEntity = (ExecutionEntity) execution;
     final HistoricProcessInstanceEventEntity hpie = (HistoricProcessInstanceEventEntity) evt;
 
     // call common init behavior
     super.initEvent(execution, evt);
-    
+
     // set super process instnace id
     ExecutionEntity superExecution = executionEntity.getSuperExecution();
-    if(superExecution != null) {
+    if (superExecution != null) {
       hpie.setSuperProcessInstanceId(superExecution.getProcessInstanceId());
     }
-    
+
     // set start user Id
     hpie.setStartUserId(Authentication.getAuthenticatedUserId());
-    
+
   }
-  
+
 }

@@ -11,26 +11,38 @@
  * limitations under the License.
  */
 
-package org.camunda.bpm.engine.impl.history.handler.refactor;
+package org.camunda.bpm.engine.impl.history.producer;
 
 import org.camunda.bpm.engine.delegate.DelegateTask;
 import org.camunda.bpm.engine.delegate.TaskListener;
+import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
+import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.HistoricActivityInstanceEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
-
 
 /**
  * @author Tom Baeyens
  */
-public class UserTaskAssignmentHandler implements TaskListener {
+public class HistoricUserTaskAssignmentListener implements TaskListener {
+
+  protected HistoryEventProducer eventProducer;
+
+  public HistoricUserTaskAssignmentListener(HistoryEventProducer historicActivityInstanceUpdateEventProducer) {
+    this.eventProducer = historicActivityInstanceUpdateEventProducer;
+  }
 
   public void notify(DelegateTask task) {
+    
     ExecutionEntity execution = ((TaskEntity) task).getExecution();
+    
     if (execution != null) {
-//      HistoricActivityInstanceEntity historicActivityInstance = ActivityInstanceEndHandler.findActivityInstance(execution);
-//      historicActivityInstance.setAssignee(task.getAssignee());
+      final HistoryEventHandler eventHandler = Context.getProcessEngineConfiguration().getHistoryEventHandler();
+      
+      HistoryEvent historyEvent = eventProducer.createHistoryEvent(execution, task);
+      eventHandler.handleEvent(historyEvent);
     }
+    
   }
-  
+
 }
