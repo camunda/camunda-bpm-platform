@@ -12,7 +12,6 @@
  */
 package org.camunda.bpm.engine.rest.sub.impl;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -22,11 +21,11 @@ import javax.ws.rs.core.Response.Status;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.rest.dto.PatchVariablesDto;
-import org.camunda.bpm.engine.rest.dto.runtime.VariableListDto;
 import org.camunda.bpm.engine.rest.dto.runtime.VariableValueDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.sub.VariableResource;
+import org.camunda.bpm.engine.rest.util.DtoUtil;
 
 public abstract class AbstractVariablesResource implements VariableResource {
 
@@ -39,14 +38,14 @@ public abstract class AbstractVariablesResource implements VariableResource {
   }
 
   @Override
-  public VariableListDto getVariables() {
-    List<VariableValueDto> values = new ArrayList<VariableValueDto>();
+  public Map<String, VariableValueDto> getVariables() {
+    Map<String, VariableValueDto> values = new HashMap<String, VariableValueDto>();
 
     for (Map.Entry<String, Object> entry : getVariableEntities().entrySet()) {
-      values.add(new VariableValueDto(entry.getKey(), entry.getValue(), entry.getValue().getClass().getSimpleName()));
+      values.put(entry.getKey(), new VariableValueDto(entry.getValue(), entry.getValue().getClass().getSimpleName()));
     }
 
-    return new VariableListDto(values);
+    return values;
   }
 
   @Override
@@ -64,7 +63,7 @@ public abstract class AbstractVariablesResource implements VariableResource {
       throw new InvalidRequestException(Status.NOT_FOUND, errorMessage);
     }
     
-    return new VariableValueDto(variableName, variable, variable.getClass().getSimpleName());
+    return new VariableValueDto(variable, variable.getClass().getSimpleName());
     
   }
 
@@ -91,12 +90,7 @@ public abstract class AbstractVariablesResource implements VariableResource {
   
   @Override
   public void modifyVariables(PatchVariablesDto patch) {
-    Map<String, Object> variableModifications = new HashMap<String, Object>();
-    if (patch.getModifications() != null) {
-      for (VariableValueDto variable : patch.getModifications()) {
-        variableModifications.put(variable.getName(), variable.getValue());
-      }
-    }
+    Map<String, Object> variableModifications = DtoUtil.toMap(patch.getModifications());
     
     List<String> variableDeletions = patch.getDeletions();
     

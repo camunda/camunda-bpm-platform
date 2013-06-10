@@ -24,6 +24,7 @@ import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.helper.EqualsMap;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
+import org.camunda.bpm.engine.rest.util.VariablesBuilder;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
 import org.junit.Before;
@@ -169,10 +170,10 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
 
   @Test
   public void testCompleteWithParameters() {
-    Map<String, Object> variables = new HashMap<String, Object>();
-    variables.put("aVariable", "aStringValue");
-    variables.put("anotherVariable", 42);
-    variables.put("aThirdVariable", Boolean.TRUE);
+    Map<String, Object> variables = VariablesBuilder.create()
+        .variable("aVariable", "aStringValue")
+        .variable("anotherVariable", 42)
+        .variable("aThirdValue", Boolean.TRUE).getVariables();
     
     Map<String, Object> json = new HashMap<String, Object>();
     json.put("variables", variables);
@@ -183,7 +184,12 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
         .statusCode(Status.NO_CONTENT.getStatusCode())
       .when().post(COMPLETE_TASK_URL);
     
-    verify(taskServiceMock).complete(eq(MockProvider.EXAMPLE_TASK_ID), argThat(new EqualsMap(variables)));
+    Map<String, Object> expectedVariables = new HashMap<String, Object>();
+    expectedVariables.put("aVariable", "aStringValue");
+    expectedVariables.put("anotherVariable", 42);
+    expectedVariables.put("aThirdValue", Boolean.TRUE);
+    
+    verify(taskServiceMock).complete(eq(MockProvider.EXAMPLE_TASK_ID), argThat(new EqualsMap(expectedVariables)));
   }
 
   @Test
@@ -201,10 +207,10 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
 
   @Test
   public void testResolveTask() {
-    Map<String, Object> variables = new HashMap<String, Object>();
-    variables.put("aVariable", "aStringValue");
-    variables.put("anotherVariable", 42);
-    variables.put("aThirdVariable", Boolean.TRUE);
+    Map<String, Object> variables = VariablesBuilder.create()
+        .variable("aVariable", "aStringValue")
+        .variable("anotherVariable", 42)
+        .variable("aThirdValue", Boolean.TRUE).getVariables();
     
     Map<String, Object> json = new HashMap<String, Object>();
     json.put("variables", variables);
@@ -215,7 +221,12 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
       .statusCode(Status.NO_CONTENT.getStatusCode())
     .when().post(RESOLVE_TASK_URL);
     
-    verify(taskServiceMock).resolveTask(eq(MockProvider.EXAMPLE_TASK_ID), argThat(new EqualsMap(variables)));
+    Map<String, Object> expectedVariables = new HashMap<String, Object>();
+    expectedVariables.put("aVariable", "aStringValue");
+    expectedVariables.put("anotherVariable", 42);
+    expectedVariables.put("aThirdValue", Boolean.TRUE);
+    
+    verify(taskServiceMock).resolveTask(eq(MockProvider.EXAMPLE_TASK_ID), argThat(new EqualsMap(expectedVariables)));
   }
 
   @Test

@@ -13,29 +13,34 @@
   </parent>
 
   <properties>
-    <test.version.old>6.1.11</test.version.old>
-    <test.version.old.major>6.1</test.version.old.major>
+    <test.version.old>6.2.4</test.version.old>
+    <test.version.old.major>6.2</test.version.old.major>
     <test.version.current>${project.version}</test.version.current>
 
     <test.db.host>${project.build.directory}</test.db.host>
     <test.db.database>camunda-engine</test.db.database>
     <test.db.username>sa</test.db.username>
     <test.db.password>sa</test.db.password>
+    
+    <mail.server.port>5025</mail.server.port>
   </properties>
   
   <profiles>
     <profile>
-      <id>62</id>
+      <id>70</id>
         <activation>
           <activeByDefault>true</activeByDefault>
         </activation>
         <properties>
           <test.version.current>${project.version}</test.version.current>
-          <test.version.current.major>6.2</test.version.current.major>
+          <test.version.current.major>7.0</test.version.current.major>
         </properties>      
     </profile>
     <profile>
       <id>h2</id>
+      <activation>
+          <activeByDefault>true</activeByDefault>
+        </activation>
       <properties>
         <test.db.name>h2</test.db.name>
         <test.db.driver>org.h2.Driver</test.db.driver>
@@ -96,7 +101,7 @@
 
     <dependency>
       <groupId>org.camunda.bpm.distro</groupId>
-      <artifactId>camunda-sql-script</artifactId>
+      <artifactId>camunda-sql-scripts</artifactId>
       <version>${test.version.current}</version>
     </dependency>
 
@@ -104,6 +109,12 @@
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine</artifactId>
       <version>${test.version.current}</version>
+      <scope>test</scope>
+    </dependency>
+
+     <dependency>
+      <groupId>com.fasterxml.uuid</groupId>
+      <artifactId>java-uuid-generator</artifactId>
       <scope>test</scope>
     </dependency>
 
@@ -248,8 +259,8 @@
                   <groupId>org.camunda.bpm</groupId>
                   <artifactId>camunda-engine</artifactId>
                   <version>${test.version.current}</version>
-                  <classifier>test-sources</classifier>
-                  <outputDirectory>${project.build.directory}/engine-test-sources</outputDirectory>
+                  <type>test-jar</type>
+                  <outputDirectory>${project.build.directory}/test-classes</outputDirectory>
                 </artifactItem>
               </artifactItems>
             </configuration>
@@ -263,15 +274,15 @@
             <configuration>
               <artifactItems>
                 <artifactItem>
-                  <groupId>org.camunda.bpm.distro</groupId>
-                  <artifactId>camunda-sql-script</artifactId>
+                  <groupId>com.camunda.fox.platform</groupId>
+                  <artifactId>fox-platform-sql-script</artifactId>
                   <version>${test.version.old}</version>
                   <outputDirectory>${project.build.directory}/scripts-old</outputDirectory>
                   <overWrite>true</overWrite>
                 </artifactItem>
                 <artifactItem>
                   <groupId>org.camunda.bpm.distro</groupId>
-                  <artifactId>camunda-sql-script</artifactId>
+                  <artifactId>camunda-sql-scripts</artifactId>
                   <version>${test.version.current}</version>
                   <outputDirectory>${project.build.directory}/scripts-current</outputDirectory>
                   <overWrite>true</overWrite>
@@ -346,7 +357,7 @@
             </configuration>            
           </execution>
            <execution>
-            <id>create-and-upgrade-db</id>
+            <id>create-old-schema</id>
             <phase>generate-test-resources</phase>
             <goals>
               <goal>execute</goal>
@@ -356,7 +367,17 @@
                 <!-- now create old version of the schema -->
                 <srcFile>${project.build.directory}/scripts-old/sql/create/${test.db.name}_engine_${test.version.old}.sql</srcFile>
                 <srcFile>${project.build.directory}/scripts-old/sql/create/${test.db.name}_identity_${test.version.old}.sql</srcFile>
-
+              </srcFiles>
+            </configuration>            
+          </execution>
+          <execution>
+            <id>upgrade-db</id>
+            <phase>generate-test-resources</phase>
+            <goals>
+              <goal>execute</goal>
+            </goals>
+            <configuration>
+              <srcFiles>       
                 <!-- now perform the schema migrations -->
                 <srcFile>${project.build.directory}/scripts-current/sql/upgrade/${test.db.name}_engine_${test.version.old.major}_to_${test.version.current.major}.sql</srcFile>
                 <srcFile>${project.build.directory}/scripts-current/sql/upgrade/${test.db.name}_identity_${test.version.old.major}_to_${test.version.current.major}.sql</srcFile>
@@ -387,12 +408,16 @@
           <excludes>
             <exclude>**/*TestCase.java</exclude>
 
+            <exclude>**/ClassPathScannerTest.java</exclude>
+            <exclude>**/MultipleClasspathRootsClassPathScannerTest.java</exclude>
+
             <exclude>**/WSDLImporterTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-315 -->
             <exclude>**/JobExecutorTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-427 -->
             <exclude>**/HistoricTaskInstanceUpdateTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-485 -->
             <exclude>**/RepeatingServiceTaskTest.java</exclude>
-            <exclude>**/ProcessDiagramRetrievalTest.java</exclude> <!-- fixme -->
-            <exclude>**/ManagementServiceTest.java</exclude>
+            
+            <exclude>**/ProcessDiagramRetrievalTest.java</exclude> 
+            <!--exclude>**/ManagementServiceTest.java</exclude-->
           </excludes>
           <testFailureIgnore>true</testFailureIgnore>
         </configuration>

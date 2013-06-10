@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions" 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:activiti="http://activiti.org/bpmn"
+  targetNamespace="Examples">
+  
+  <process id="callExampleSubProcess">
+  
+    <startEvent id="theStart" />
+    
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="callSubProcess" />
+    
+    <callActivity id="callSubProcess" calledElement="ExampleProcess" />
+    
+    <sequenceFlow id="flow2" sourceRef="callSubProcess" targetRef="theEnd1" />
+     
+    <endEvent id="theEnd1" />
+    
+  </process>
+  
+  <process id="ExampleProcess">
+  
+    <startEvent id="start"/>
+    
+    <sequenceFlow id="flow3" sourceRef="start" targetRef="theServiceTask" />
+
+    <serviceTask id="theServiceTask" name="my task" activiti:class="org.camunda.bpm.engine.test.api.mgmt.AlwaysFailingDelegate" activiti:async="true"/>
+    
+    <sequenceFlow id="flow4" sourceRef="theServiceTask" targetRef="theUserTask" />
+    
+    <userTask id="theUserTask" name="my task"/>
+    
+    <sequenceFlow id="flow5" sourceRef="theUserTask" targetRef="theEnd2" />
+    
+    <endEvent id="theEnd2" />
+    
+  </process>
+  
+
+</definitions>

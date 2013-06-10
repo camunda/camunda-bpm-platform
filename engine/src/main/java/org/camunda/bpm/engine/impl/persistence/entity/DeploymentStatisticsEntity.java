@@ -13,7 +13,10 @@
 
 package org.camunda.bpm.engine.impl.persistence.entity;
 
+import java.util.List;
+
 import org.camunda.bpm.engine.management.DeploymentStatistics;
+import org.camunda.bpm.engine.management.IncidentStatistics;
 
 public class DeploymentStatisticsEntity extends DeploymentEntity implements DeploymentStatistics {
 
@@ -21,6 +24,7 @@ public class DeploymentStatisticsEntity extends DeploymentEntity implements Depl
 
   protected int instances;
   protected int failedJobs;
+  protected List<IncidentStatistics> incidentStatistics;
   
   public int getInstances() {
     return instances;
@@ -33,5 +37,11 @@ public class DeploymentStatisticsEntity extends DeploymentEntity implements Depl
   }
   public void setFailedJobs(int failedJobs) {
     this.failedJobs = failedJobs;
+  }
+  public List<IncidentStatistics> getIncidentStatistics() {
+    return incidentStatistics;
+  }
+  public void setIncidentStatistics(List<IncidentStatistics> incidentStatistics) {
+    this.incidentStatistics = incidentStatistics;
   }
 }

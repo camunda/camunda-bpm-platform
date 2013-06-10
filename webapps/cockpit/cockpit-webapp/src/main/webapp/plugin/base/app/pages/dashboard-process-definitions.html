@@ -1,4 +1,8 @@
 <div>
+  <div class="page-header">
+    <h1>Process Definition State Overview</h1>
+  </div>
+
   <table class="table table-bordered table-hover table-condensed">
     <thead>
       <tr>
@@ -18,8 +22,7 @@
           {{ statistic.instances }}
         </td>
         <td>
-          <span ngm-if="statistic.failedJobs > 0" class="badge badge-important">&nbsp;</span>
-          <span ngm-if="statistic.failedJobs == 0" class="badge badge-success">&nbsp;</span>
+          <div state-circle incidents="statistic.incidents" />
         </td>  
       </tr>
     </tbody>

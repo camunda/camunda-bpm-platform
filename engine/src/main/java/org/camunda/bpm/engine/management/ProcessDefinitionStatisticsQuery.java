@@ -21,4 +21,14 @@ public interface ProcessDefinitionStatisticsQuery extends Query<ProcessDefinitio
    * Include an aggregation of failed jobs in the result.
    */
   ProcessDefinitionStatisticsQuery includeFailedJobs();
+  
+  /**
+   * Include an aggregation of incidents in the result.
+   */
+  ProcessDefinitionStatisticsQuery includeIncidents();
+
+  /**
+   * Include an aggregation of incidents of the assigned incidentType in the result.
+   */
+  ProcessDefinitionStatisticsQuery includeIncidentsForType(String incidentType);
 }

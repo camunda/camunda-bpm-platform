@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.impl;
 
 import java.util.List;
 
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.management.DeploymentStatistics;
@@ -25,18 +26,28 @@ implements DeploymentStatisticsQuery {
 
   protected static final long serialVersionUID = 1L;
   protected boolean includeFailedJobs = false;
+  protected boolean includeIncidents = false;
+  protected String includeIncidentsForType;
   
   public DeploymentStatisticsQueryImpl(CommandExecutor executor) {
     super(executor);
   }
 
-  @Override
   public DeploymentStatisticsQuery includeFailedJobs() {
     includeFailedJobs = true;
     return this;
   }
+  
+  public DeploymentStatisticsQuery includeIncidents() {
+    includeIncidents = true;
+    return this;
+  }
 
-  @Override
+  public DeploymentStatisticsQuery includeIncidentsForType(String incidentType) {
+    this.includeIncidentsForType = incidentType;
+    return this;
+  }
+
   public long executeCount(CommandContext commandContext) {
     checkQueryOk();
     return 
@@ -59,5 +70,15 @@ implements DeploymentStatisticsQuery {
     return includeFailedJobs;
   }
   
+  public boolean isIncidentsToInclude() {
+    return includeIncidents || includeIncidentsForType != null;
+  }
+  
+  protected void checkQueryOk() {
+    super.checkQueryOk();
+    if (includeIncidents && includeIncidentsForType != null) {
+      throw new ProcessEngineException("Invalid query: It is not possible to use includeIncident() and includeIncidentForType() to execute one query.");
+    }
+  }
 
 }

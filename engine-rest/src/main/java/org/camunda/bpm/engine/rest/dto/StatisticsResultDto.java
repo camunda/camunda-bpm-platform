@@ -12,11 +12,16 @@
  */
 package org.camunda.bpm.engine.rest.dto;
 
+import java.util.List;
+
+import org.camunda.bpm.engine.rest.dto.repository.IncidentStatisticsResultDto;
+
 public abstract class StatisticsResultDto {
 
   protected String id;
   protected Integer instances;
   protected Integer failedJobs;
+  protected List<IncidentStatisticsResultDto> incidents;
   
   public String getId() {
     return id;
@@ -35,6 +40,12 @@ public abstract class StatisticsResultDto {
   }
   public void setFailedJobs(Integer failedJobs) {
     this.failedJobs = failedJobs;
+  }
+  public List<IncidentStatisticsResultDto> getIncidents() {
+    return incidents;
+  }
+  public void setIncidents(List<IncidentStatisticsResultDto> incidents) {
+    this.incidents = incidents;
   }
   
 }

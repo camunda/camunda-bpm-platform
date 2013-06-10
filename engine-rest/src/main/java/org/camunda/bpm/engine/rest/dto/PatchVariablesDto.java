@@ -13,6 +13,7 @@
 package org.camunda.bpm.engine.rest.dto;
 
 import java.util.List;
+import java.util.Map;
 
 import org.camunda.bpm.engine.rest.dto.runtime.VariableValueDto;
 
@@ -21,13 +22,13 @@ import org.camunda.bpm.engine.rest.dto.runtime.VariableValueDto;
  */
 public class PatchVariablesDto {
 
-  private List<VariableValueDto> modifications;
+  private Map<String, VariableValueDto> modifications;
   private List<String> deletions;
   
-  public List<VariableValueDto> getModifications() {
+  public Map<String, VariableValueDto> getModifications() {
     return modifications;
   }
-  public void setModifications(List<VariableValueDto> modifications) {
+  public void setModifications(Map<String, VariableValueDto> modifications) {
     this.modifications = modifications;
   }
   public List<String> getDeletions() {

@@ -26,9 +26,19 @@ define([ "angular" ], function(angular) {
             value = false;
           }
 
-          variablesMap[name] = value;
+          variablesMap[name] = {"value" : value};
         }
         return variablesMap;
+      },
+      
+      mapToVariablesArray: function(variables_map) {
+        var variablesArray = [];
+        
+        $.each(variables_map, function(name, value) {
+          variablesArray.push({name : name, value : value.value, type : type});
+        });
+        
+        return variablesArray;
       },
 
       /**

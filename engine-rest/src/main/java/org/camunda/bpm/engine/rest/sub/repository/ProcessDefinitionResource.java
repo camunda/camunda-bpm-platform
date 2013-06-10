@@ -51,7 +51,7 @@ public interface ProcessDefinitionResource {
   @GET
   @Path("/statistics")
   @Produces(MediaType.APPLICATION_JSON)
-  List<StatisticsResultDto> getActivityStatistics(@QueryParam("failedJobs") Boolean includeFailedJobs);
+  List<StatisticsResultDto> getActivityStatistics(@QueryParam("failedJobs") Boolean includeFailedJobs, @QueryParam("incidents") Boolean includeIncidents, @QueryParam("incidentsForType") String includeIncidentsForType);
 
   @GET
   @Path("/startForm")

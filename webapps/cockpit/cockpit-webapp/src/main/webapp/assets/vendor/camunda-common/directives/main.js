@@ -2,7 +2,8 @@ ngDefine('camunda.common.directives', [
   './errorPanel',
   './help',
   './requestAware',
-  './paginator'
+  './paginator',
+  './stateCircle'
 ], function(module) {
 
 });

@@ -14,15 +14,17 @@ package org.camunda.bpm.engine.rest.dto.task;
 
 import java.util.Map;
 
+import org.camunda.bpm.engine.rest.dto.runtime.VariableValueDto;
+
 public class CompleteTaskDto {
 
-  private Map<String, Object> variables;
+  private Map<String, VariableValueDto> variables;
 
-  public Map<String, Object> getVariables() {
+  public Map<String, VariableValueDto> getVariables() {
     return variables;
   }
 
-  public void setVariables(Map<String, Object> variables) {
+  public void setVariables(Map<String, VariableValueDto> variables) {
     this.variables = variables;
   }
 }
