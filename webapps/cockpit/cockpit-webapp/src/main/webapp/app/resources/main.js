@@ -1,5 +1,5 @@
 ngDefine('cockpit.resources', [
-  './processDefinitionDiagramResource',
+  'module:cockpit.resources.process.diagram:./processDiagramResource',
   './processDefinitionResource',
   './processInstanceResource'
 ], function(module) {

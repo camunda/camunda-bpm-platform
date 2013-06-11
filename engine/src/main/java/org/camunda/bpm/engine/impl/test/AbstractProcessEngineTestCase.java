@@ -24,7 +24,6 @@ import java.util.logging.Level;
 
 import junit.framework.AssertionFailedError;
 
-import org.apache.ibatis.logging.LogFactory;
 import org.camunda.bpm.engine.FormService;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.IdentityService;

@@ -155,10 +155,7 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
       ActivityInstance processInstance = runtimeService.getProcessInstance(procId);
       List<ActivityInstance> instancesForActivitiyId = getInstancesForActivitiyId(processInstance, "miTasks");
       assertEquals(1, instancesForActivitiyId.size());
-      ActivityInstance userTaskActInst = instancesForActivitiyId.get(0);
-      assertEquals("nesting3", userTaskActInst.getParentActivityInstance().getActivityId());
-      assertEquals("nesting2", userTaskActInst.getParentActivityInstance().getParentActivityInstance().getActivityId());
-      assertEquals("nesting1", userTaskActInst.getParentActivityInstance().getParentActivityInstance().getParentActivityInstance().getActivityId());
+      ActivityInstance userTaskActInst = instancesForActivitiyId.get(0);    
       taskService.complete(task.getId());
     }
     

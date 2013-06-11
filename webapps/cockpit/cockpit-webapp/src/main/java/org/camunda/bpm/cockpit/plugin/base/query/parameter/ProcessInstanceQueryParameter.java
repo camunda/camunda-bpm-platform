@@ -13,7 +13,7 @@
 package org.camunda.bpm.cockpit.plugin.base.query.parameter;
 
 import org.camunda.bpm.cockpit.db.QueryParameters;
-import org.camunda.bpm.cockpit.plugin.base.persistence.entity.ProcessInstanceDto;
+import org.camunda.bpm.cockpit.plugin.base.dto.ProcessInstanceDto;
 
 public class ProcessInstanceQueryParameter extends QueryParameters<ProcessInstanceDto> {
 

@@ -61,57 +61,72 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
       if(executionEntity.isProcessInstance()) {
         processInstance = executionEntity;
       }
-      List<ExecutionEntity> exeForThisParentActInst = executionsByParentActIds.get(executionEntity.getParentActivityInstanceId());
+      String parentActivityInstanceId = executionEntity.getParentActivityInstanceId();
+      List<ExecutionEntity> exeForThisParentActInst = executionsByParentActIds.get(parentActivityInstanceId);
       if(exeForThisParentActInst == null) {
         exeForThisParentActInst = new ArrayList<ExecutionEntity>();
-        executionsByParentActIds.put(executionEntity.getParentActivityInstanceId(), exeForThisParentActInst);
+        executionsByParentActIds.put(parentActivityInstanceId, exeForThisParentActInst);
       }
       exeForThisParentActInst.add(executionEntity);                   
     }
         
-    // create act inst for process instance
+    // create act instance for process instance
     ActivityInstanceImpl processActInst = new ActivityInstanceImpl();                
     processActInst.setActivityId(processInstance.getProcessDefinitionId());
     processActInst.setBusinessKey(processInstance.getBusinessKey());
     processActInst.setId(processInstanceId);
-    processActInst.setExecutionId(processInstanceId);
+    processActInst.getExecutionIds().add(processInstanceId);
     
-    initActivityInstanceTree(processActInst, processInstance, executionsByParentActIds, processInstance.getProcessDefinition());
+    initActivityInstanceTree(processActInst, executionsByParentActIds);
     
     return processActInst;
   }
 
-  protected void initActivityInstanceTree(ActivityInstanceImpl parentActInst, ExecutionEntity execution, Map<String, List<ExecutionEntity>> executionsByParentActIds,
-      ScopeImpl scope) {
-    
-    List<ActivityInstance> childInstances = parentActInst.getChildInstances();    
-    if(!execution.getId().equals(parentActInst.getId()) && !isConcurrentRoot(execution)) {
-      
-      ActivityInstanceImpl actInst = new ActivityInstanceImpl();     
-      ScopeImpl activity = getActivity(execution);
-      
-      actInst.setActivityId(activity.getId());      
-      actInst.setBusinessKey(execution.getBusinessKey());
-      actInst.setId(execution.getActivityInstanceId());
-      actInst.setExecutionId(execution.getId());
-      actInst.setParentActivityInstance(parentActInst);
-      childInstances.add(actInst);
-      
-      parentActInst = actInst;      
-    } 
-    
-    List<ExecutionEntity> executions = execution.getExecutions();
-    for (ExecutionEntity executionEntity : executions) {
-      initActivityInstanceTree(parentActInst, executionEntity, executionsByParentActIds, scope);    
+  protected void initActivityInstanceTree(ActivityInstance parentActInst, Map<String, List<ExecutionEntity>> executionsByParentActIds) {
+
+    Map<String, ActivityInstanceImpl> childInstances = new HashMap<String, ActivityInstanceImpl>();
+    List<ExecutionEntity> childExecutions = executionsByParentActIds.get(parentActInst.getId());
+
+    if(childExecutions == null) {
+      return;
     }
     
-    
+    for (ExecutionEntity execution : childExecutions) {
+      if (!isConcurrentRoot(execution) && !execution.getActivityInstanceId().equals(parentActInst.getId())) {
+
+        ActivityInstance activityInstance = childInstances.get(execution.getActivityInstanceId());
+        if (activityInstance != null) {
+          // instance already created -> add executionId
+          activityInstance.getExecutionIds().add(execution.getId());
+
+        } else {
+          // create new activity instance
+          ActivityInstanceImpl actInstance = new ActivityInstanceImpl();
+          ScopeImpl activity = getActivity(execution);
+
+          actInstance.setActivityId(activity.getId());
+          actInstance.setBusinessKey(execution.getBusinessKey());
+          actInstance.setId(execution.getActivityInstanceId());
+          actInstance.setParentActivityInstanceId(parentActInst.getId());
+          actInstance.getExecutionIds().add(execution.getId());
+
+          childInstances.put(actInstance.getId(), actInstance);
+
+        }
+      }
+    }
+
+    parentActInst.getChildInstances().addAll(childInstances.values());
+    for (ActivityInstance childActInstance : parentActInst.getChildInstances()) {
+      initActivityInstanceTree(childActInstance, executionsByParentActIds);
+    }
+
   }
 
+  /** returns true if execution is concurrent root. */
   protected boolean isConcurrentRoot(ExecutionEntity execution) {
-
     List<ExecutionEntity> executions = execution.getExecutions();
-    return !executions.isEmpty() && executions.get(0).isConcurrent();
+    return execution.isScope() && !executions.isEmpty() && executions.get(0).isConcurrent();
 
   }
 
@@ -122,12 +137,17 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
     } else {
       int i = 0;
       while(!executionEntity.getExecutions().isEmpty()) {
-        executionEntity = executionEntity.getExecutions().get(0); 
-        i++;
+        ExecutionEntity childExecution = executionEntity.getExecutions().get(0); 
+        if(executionEntity.isScope() && !childExecution.getActivityInstanceId().equals(executionEntity.getActivityInstanceId())) {
+          i++;
+        }
+        executionEntity = childExecution;
       }
       ActivityImpl scope = executionEntity.getActivity();
       for (int j = 0; j < i; j++) {
+        if(scope.getParentActivity() != null) { 
         scope = scope.getParentActivity();
+        }
       }      
       return scope;
     }

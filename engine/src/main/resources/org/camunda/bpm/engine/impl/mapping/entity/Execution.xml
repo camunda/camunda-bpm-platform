@@ -7,7 +7,7 @@
   <!-- EXECUTION INSERT -->
 
   <insert id="insertExecution" parameterType="org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity">
-    insert into ${prefix}ACT_RU_EXECUTION (ID_, REV_, PROC_INST_ID_, BUSINESS_KEY_, PROC_DEF_ID_, ACT_ID_, ACT_INST_ID_, PARENT_ACT_INST_ID_, IS_ACTIVE_, IS_CONCURRENT_, IS_SCOPE_,IS_EVENT_SCOPE_, PARENT_ID_, SUPER_EXEC_, SUSPENSION_STATE_, CACHED_ENT_STATE_)
+    insert into ${prefix}ACT_RU_EXECUTION (ID_, REV_, PROC_INST_ID_, BUSINESS_KEY_, PROC_DEF_ID_, ACT_ID_, ACT_INST_ID_, IS_ACTIVE_, IS_CONCURRENT_, IS_SCOPE_,IS_EVENT_SCOPE_, PARENT_ID_, SUPER_EXEC_, SUSPENSION_STATE_, CACHED_ENT_STATE_)
     values (
       #{id ,jdbcType=VARCHAR},
       1,
@@ -16,7 +16,6 @@
       #{processDefinitionId ,jdbcType=VARCHAR},
       #{activityId ,jdbcType=VARCHAR},
       #{activityInstanceId ,jdbcType=VARCHAR},
-      #{parentActivityInstanceId ,jdbcType=VARCHAR},
       #{isActive ,jdbcType=BOOLEAN},
       #{isConcurrent ,jdbcType=BOOLEAN},
       #{isScope ,jdbcType=BOOLEAN},
@@ -36,7 +35,6 @@
       PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR},
       ACT_ID_ = #{activityId, jdbcType=VARCHAR},
       ACT_INST_ID_ = #{activityInstanceId, jdbcType=VARCHAR},
-      PARENT_ACT_INST_ID_ = #{parentActivityInstanceId, jdbcType=VARCHAR},
       IS_ACTIVE_ = #{isActive, jdbcType=BOOLEAN},
       IS_CONCURRENT_ = #{isConcurrent, jdbcType=BOOLEAN},
       IS_SCOPE_ = #{isScope, jdbcType=BOOLEAN},
@@ -94,7 +92,7 @@
   
   <select id="selectExecutionsByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.ExecutionQueryImpl" resultMap="executionResultMap">
   	${limitBefore}
-    select ${limitBetween} RES.*, KEY_
+    select RES.* ${limitBetween}, KEY_
     <include refid="selectExecutionsByQueryCriteriaSql"/>
     ${orderBy}
     ${limitAfter}
@@ -108,7 +106,7 @@
   <!--  same as selectExecutionByQueryCriteria, but with different parameterType -->
   <select id="selectProcessInstanceByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.ProcessInstanceQueryImpl" resultMap="executionResultMap">
   	${limitBefore}
-    select ${limitBetween} RES.*, KEY_
+    select RES.* ${limitBetween}, KEY_
     <include refid="selectExecutionsByQueryCriteriaSql"/>
     ${orderBy}
     ${limitAfter}
@@ -166,7 +164,7 @@
         and INST.BUSINESS_KEY_ = #{businessKey}
       </if>
       <if test="activityId != null">
-        and RES.ACT_ID_ = #{activityId} and RES.IS_ACTIVE_
+        and RES.ACT_ID_ = #{activityId}
       </if>
       <if test="superProcessInstanceId != null">
         <!-- A sub process instance is stored under a certain *execution*, potentially nested.

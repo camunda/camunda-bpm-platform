@@ -67,7 +67,7 @@ public class SequentialMultiInstanceBehavior extends MultiInstanceActivityBehavi
     
     if (loopCounter == nrOfInstances || completionConditionSatisfied(execution)) {
       super.leave(execution);
-    } else {
+    } else {      
       callActivityEndListeners(execution);
       
       try {

@@ -334,12 +334,19 @@ public class PvmActivityInstanceTest extends PvmTestCase {
     assertTrue(processInstance.isEnded());
     
     verifier.assertStartInstanceCount(1, "start");
+    verifier.assertProcessInstanceParent("start", processInstance);
     verifier.assertStartInstanceCount(1, "embeddedsubprocess");
+    verifier.assertProcessInstanceParent("embeddedsubprocess", processInstance);
     verifier.assertStartInstanceCount(1, "startInside");
+    verifier.assertParent("startInside", "embeddedsubprocess");
     verifier.assertStartInstanceCount(1, "nestedSubProcess");
+    verifier.assertParent("nestedSubProcess", "embeddedsubprocess");
     verifier.assertStartInstanceCount(1, "startNestedInside");
+    verifier.assertParent("startNestedInside", "nestedSubProcess");
     verifier.assertStartInstanceCount(1, "endInside");
+    verifier.assertParent("endInside", "nestedSubProcess");
     verifier.assertStartInstanceCount(1, "end");
+    verifier.assertProcessInstanceParent("end", processInstance);
   }
     
 }

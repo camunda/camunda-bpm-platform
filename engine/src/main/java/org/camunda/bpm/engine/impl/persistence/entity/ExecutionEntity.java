@@ -108,6 +108,9 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
   /** reference to a subprocessinstance, not-null if currently subprocess is started from this execution */
   protected ExecutionEntity subProcessInstance;
   
+  /** the unique id of the current activity instance */
+  protected String activityInstanceId;
+  
   protected StartingExecution startingExecution;
   
   /** the unique id of the current activity instance */
@@ -719,8 +722,8 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
     return parentId == null;
   }
 
-  // activity /////////////////////////////////////////////////////////////////
-
+ // activity /////////////////////////////////////////////////////////////////
+  
   /** ensures initialization and returns the activity */
   public ActivityImpl getActivity() {
     ensureActivityInitialized();
@@ -832,7 +835,8 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
     return activityInstanceId;
   }
 
-  // parent ///////////////////////////////////////////////////////////////////
+  
+ // parent ///////////////////////////////////////////////////////////////////
   
   /** ensures initialization and returns the parent */
   public ExecutionEntity getParent() {
@@ -1114,6 +1118,9 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
         
     // set replaced by activity to our activity id
     replacedBy.setActivityInstanceId(activityInstanceId);
+    
+    // set replaced by activity to our activity id
+    replacedBy.setActivityInstanceId(activityInstanceId);    
   }
 
   // variables ////////////////////////////////////////////////////////////////

@@ -38,17 +38,18 @@ public interface ActivityInstance {
   /** the process instance id */
   String getProcessInstanceId();
   
-  String getExecutionId();
-
-  /** Returns the child activity instances.
-   * Returns an empty list if there are no child instances. 
-   * Returns "null" if child instances have not been fetched.  */
-  List<ActivityInstance> getChildInstances();
-
+  /** the process definition id */
   String getProcessDefinitionId();
-
+  
+  /** the business key */
   String getBusinessKey();
 
-  ActivityInstance getParentActivityInstance();
+  /** Returns the child activity instances.
+   * Returns an empty list if there are no child instances. */
+  List<ActivityInstance> getChildInstances();
+  
+  /** the list of executions that are currently waiting in this activity instance */
+  List<String> getExecutionIds();
+
 
 }

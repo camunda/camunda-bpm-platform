@@ -25,15 +25,15 @@ import org.camunda.bpm.engine.runtime.ActivityInstance;
 public class ActivityInstanceImpl implements ActivityInstance {
 
   protected String id;
-  protected ActivityInstance parentActivityInstance;
   protected String activityName;
+  protected String parentActivityInstanceId;
   protected String processInstanceId;
   protected String businessKey;
   protected String processDefinitionId;
   protected String activityId;
-  protected String executionId;
-
+  
   protected List<ActivityInstance> childInstances = new ArrayList<ActivityInstance>();
+  protected List<String> executionIds = new ArrayList<String>();
 
   public String getId() {
     return id;
@@ -41,14 +41,6 @@ public class ActivityInstanceImpl implements ActivityInstance {
 
   public void setId(String id) {
     this.id = id;
-  }
-
-  public String getParentActivityInstanceId() {
-    if(parentActivityInstance == null) {
-      return null;
-    } else {
-      return parentActivityInstance.getId();
-    }
   }
 
   public String getActivityName() {
@@ -98,21 +90,21 @@ public class ActivityInstanceImpl implements ActivityInstance {
   public void setActivityId(String activityId) {
     this.activityId = activityId;
   }
-  
-  public String getExecutionId() {
-    return executionId;
+    
+  public String getParentActivityInstanceId() {
+    return parentActivityInstanceId;
   }
   
-  public void setExecutionId(String executionId) {
-    this.executionId = executionId;
+  public void setParentActivityInstanceId(String parentActivityInstanceId) {
+    this.parentActivityInstanceId = parentActivityInstanceId;
   }
 
-  public ActivityInstance getParentActivityInstance() {
-    return parentActivityInstance;
+  public List<String> getExecutionIds() {
+    return executionIds;
   }
-  
-  public void setParentActivityInstance(ActivityInstance parentActivityInstance) {
-    this.parentActivityInstance = parentActivityInstance;
+
+  public void setExecutionIds(List<String> executionIds) {
+    this.executionIds = executionIds;
   }
 
 }
