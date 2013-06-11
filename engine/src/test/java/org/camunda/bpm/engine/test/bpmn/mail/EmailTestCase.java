@@ -27,15 +27,19 @@ public class EmailTestCase extends PluggableProcessEngineTestCase {
   @Override
   protected void setUp() throws Exception {
     super.setUp();
+
+    int port = processEngineConfiguration.getMailServerPort();
     
     boolean serverUpAndRunning = false;
     while (!serverUpAndRunning) {
       wiser = new Wiser();
-      wiser.setPort(5025);
+      wiser.setPort(port);
       
       try {
+        log.info("Starting Wiser mail server on port: " + port);
         wiser.start();
         serverUpAndRunning = true;
+        log.info("Wiser mail server listening on port: " + port);
       } catch (RuntimeException e) { // Fix for slow port-closing Jenkins
         if (e.getMessage().toLowerCase().contains("BindException")) {
           Thread.sleep(250L);

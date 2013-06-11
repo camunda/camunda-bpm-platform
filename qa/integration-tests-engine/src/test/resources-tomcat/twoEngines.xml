@@ -7,22 +7,22 @@
   <process-engine name="engine2">
     <job-acquisition>default</job-acquisition>
     <configuration>org.camunda.bpm.engine.impl.cfg.StandaloneProcessEngineConfiguration</configuration>
-    <datasource>java:comp/env/jdbc/ProcessEngine</datasource>
     <properties>
       <property name="history">full</property>
       <property name="databaseType">h2</property>
-      <property name="databaseSchemaUpdate">off</property>
+      <property name="databaseSchemaUpdate">create-drop</property>
+      <property name="jdbcUrl">jdbc:h2:mem:engine2</property>
     </properties>
   </process-engine>
 
   <process-engine name="engine3">
     <job-acquisition>default</job-acquisition>
     <configuration>org.camunda.bpm.engine.impl.cfg.StandaloneProcessEngineConfiguration</configuration>
-    <datasource>java:comp/env/jdbc/ProcessEngine</datasource>
     <properties>
       <property name="history">full</property>
       <property name="databaseType">h2</property>
-      <property name="databaseSchemaUpdate">off</property>
+      <property name="databaseSchemaUpdate">create-drop</property>
+      <property name="jdbcUrl">jdbc:h2:mem:engine3</property>
     </properties>
   </process-engine>
 

@@ -33,8 +33,17 @@ public interface ProcessEngineRestService {
   @Path("/{name}" + ProcessInstanceRestService.PATH)
   ProcessInstanceRestService getProcessInstanceService(@PathParam("name") String engineName);
   
+  @Path("/{name}" + ExecutionRestService.PATH)
+  ExecutionRestService getExecutionService(@PathParam("name") String engineName);
+  
   @Path("/{name}" + TaskRestService.PATH)
   TaskRestService getTaskRestService(@PathParam("name") String engineName);
+  
+  @Path("/{name}" + IdentityRestService.PATH)
+  IdentityRestService getIdentityRestService(@PathParam("name") String engineName);
+  
+  @Path("/{name}" + MessageRestService.PATH)
+  MessageRestService getMessageRestService(@PathParam("name") String engineName);
   
   @GET
   @Produces(MediaType.APPLICATION_JSON)

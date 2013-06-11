@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+  
+<mapper namespace="org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity">
+
+  <!-- INCIDENT DELETE -->
+
+  <delete id="deleteIncident" parameterType="org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity">
+    delete from ${prefix}ACT_RU_INCIDENT where ID_ = #{id}
+  </delete>
+
+  <!-- INCIDENT INSERT -->
+
+  <insert id="insertIncident" parameterType="org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity">
+    insert into ${prefix}ACT_RU_INCIDENT (ID_, INCIDENT_TIMESTAMP_, INCIDENT_TYPE_, EXECUTION_ID_, ACTIVITY_ID_, PROC_INST_ID_, PROC_DEF_ID_, CAUSE_INCIDENT_ID_, ROOT_CAUSE_INCIDENT_ID_, CONFIGURATION_)
+    values (
+      #{id ,jdbcType=VARCHAR},
+      #{incidentTimestamp, jdbcType=TIMESTAMP},
+      #{incidentType, jdbcType=VARCHAR},
+      #{executionId ,jdbcType=VARCHAR},
+      #{activityId ,jdbcType=VARCHAR},
+      #{processInstanceId ,jdbcType=VARCHAR},
+      #{processDefinitionId ,jdbcType=VARCHAR},
+      #{causeIncidentId ,jdbcType=VARCHAR},
+      #{rootCauseIncidentId ,jdbcType=VARCHAR},
+      #{configuration, jdbcType=VARCHAR}
+    )
+  </insert>
+
+  <!-- INCIDENT RESULTMAP -->
+
+  <resultMap id="incidentResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity">
+    <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <result property="incidentTimestamp" column="INCIDENT_TIMESTAMP_" jdbcType="TIMESTAMP" />
+    <result property="incidentType" column="INCIDENT_TYPE_" jdbcType="VARCHAR" />
+    <result property="executionId" column="EXECUTION_ID_" jdbcType="VARCHAR" />
+    <result property="activityId" column="ACTIVITY_ID_" jdbcType="VARCHAR" />
+    <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
+    <result property="processDefinitionId" column="PROC_DEF_ID_" jdbcType="VARCHAR" />
+    <result property="causeIncidentId" column="CAUSE_INCIDENT_ID_" jdbcType="VARCHAR" />
+    <result property="rootCauseIncidentId" column="ROOT_CAUSE_INCIDENT_ID_" jdbcType="VARCHAR" />
+    <result property="configuration" column="CONFIGURATION_" jdbcType="VARCHAR" />
+  </resultMap>
+  
+  <!-- INCIDENT SELECT -->  
+
+  <select id="selectIncidentsByExecutionId" parameterType="string" resultMap="incidentResultMap">
+    select *
+    from ${prefix}ACT_RU_INCIDENT I
+    where I.EXECUTION_ID_ = #{parameter}
+  </select>
+
+  <select id="selectIncidentsByConfiguration" parameterType="string" resultMap="incidentResultMap">
+    select *
+    from ${prefix}ACT_RU_INCIDENT I
+    where I.CONFIGURATION_ = #{parameter}
+  </select>  
+  
+  <select id="selectIncidentByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.IncidentQueryImpl" resultMap="incidentResultMap">
+    ${limitBefore}
+    select RES.* ${limitBetween}
+    <include refid="selectIncidentByQueryCriteriaSql"/>
+    ${orderBy}
+    ${limitAfter}
+  </select>
+
+  <select id="selectIncidentCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.IncidentQueryImpl" resultType="long">
+    select count(distinct RES.ID_)
+    <include refid="selectIncidentByQueryCriteriaSql"/>
+  </select>
+  
+  <sql id="selectIncidentByQueryCriteriaSql">
+    from ${prefix}ACT_RU_INCIDENT RES
+    <where>
+      <if test="id != null">
+        RES.ID_ = #{id}
+      </if>
+      <if test="incidentType != null">
+        and RES.INCIDENT_TYPE_ = #{incidentType}
+      </if>
+      <if test="executionId != null">
+        and RES.EXECUTION_ID_ = #{executionId}
+      </if>
+      <if test="activityId != null">
+        and RES.ACTIVITY_ID_ = #{activityId}
+      </if>
+      <if test="processInstanceId != null">
+        and RES.PROC_INST_ID_ = #{processInstanceId}
+      </if>
+      <if test="processDefinitionId != null">
+        and RES.PROC_DEF_ID_ = #{processDefinitionId}
+      </if>
+      <if test="causeIncidentId != null">
+        and RES.CAUSE_INCIDENT_ID_ = #{causeIncidentId}
+      </if>
+      <if test="rootCauseIncidentId != null">
+        and RES.ROOT_CAUSE_INCIDENT_ID_ = #{rootCauseIncidentId}
+      </if>
+      <if test="configuration != null">
+        and RES.CONFIGURATION_ = #{configuration}
+      </if>
+    </where>
+  </sql>
+  
+</mapper>

@@ -1,6 +1,7 @@
 package org.camunda.bpm.engine.rest;
 
 import static com.jayway.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.argThat;
@@ -23,14 +24,18 @@ import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.form.StartFormData;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.helper.EqualsMap;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
+import org.camunda.bpm.engine.rest.util.VariablesBuilder;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Matchers;
 
+import com.jayway.restassured.http.ContentType;
 import com.jayway.restassured.response.Response;
 
 public abstract class AbstractProcessDefinitionRestServiceInteractionTest extends AbstractRestServiceTest {
@@ -72,17 +77,6 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
     Assert.assertNotNull(bpmn20XmlIn);
     return bpmn20XmlIn;
   }
-  
-  @Test
-  public void testSimpleProcessInstantiation() {
-    given().pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
-      .contentType(POST_JSON_CONTENT_TYPE).body(EMPTY_JSON_OBJECT)
-      .then().expect()
-        .statusCode(Status.OK.getStatusCode())
-        .body("id", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID))
-      .when().post(START_PROCESS_INSTANCE_URL);
-  }
-  
 
   @Test
   public void testInstanceResourceLinkResult() {
@@ -135,10 +129,23 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
       .body("key", equalTo(MockProvider.EXAMPLE_FORM_KEY))
     .when().get(START_FORM_URL);
   }
+  
+  @Test
+  public void testSimpleProcessInstantiation() {
+    given().pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
+      .contentType(POST_JSON_CONTENT_TYPE).body(EMPTY_JSON_OBJECT)
+      .then().expect()
+        .statusCode(Status.OK.getStatusCode())
+        .body("id", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID))
+      .when().post(START_PROCESS_INSTANCE_URL);
+  }
 
   @Test
   public void testProcessInstantiationWithParameters() throws IOException {
-    Map<String, Object> parameters = getInstanceVariablesParameters();
+    Map<String, Object> parameters = VariablesBuilder.create()
+        .variable("aBoolean", Boolean.TRUE)
+        .variable("aString", "aStringVariableValue")
+        .variable("anInteger", 42).getVariables();
     
     Map<String, Object> json = new HashMap<String, Object>();
     json.put("variables", parameters);
@@ -150,17 +157,13 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
         .body("id", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID))
       .when().post(START_PROCESS_INSTANCE_URL);
     
-    verify(runtimeServiceMock).startProcessInstanceById(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID), argThat(new EqualsMap(parameters)));
+    Map<String, Object> expectedParameters = new HashMap<String, Object>();
+    expectedParameters.put("aBoolean", Boolean.TRUE);
+    expectedParameters.put("aString", "aStringVariableValue");
+    expectedParameters.put("anInteger", 42);
     
-  }
-
-  private Map<String, Object> getInstanceVariablesParameters() {
-    Map<String, Object> variables = new HashMap<String, Object>();
-    variables.put("aBoolean", Boolean.TRUE);
-    variables.put("aString", "aStringVariableValue");
-    variables.put("anInteger", 42);
+    verify(runtimeServiceMock).startProcessInstanceById(eq(MockProvider.EXAMPLE_PROCESS_DEFINITION_ID), argThat(new EqualsMap(expectedParameters)));
     
-    return variables;
   }
 
   /**
@@ -174,7 +177,9 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
     given().pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
       .contentType(POST_JSON_CONTENT_TYPE).body(EMPTY_JSON_OBJECT)
       .then().expect()
-        .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
+        .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).contentType(ContentType.JSON)
+        .body("type", equalTo(RestException.class.getSimpleName()))
+        .body("message", containsString("Cannot instantiate process definition"))
       .when().post(START_PROCESS_INSTANCE_URL);
   }
 
@@ -205,7 +210,9 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
     
     given().pathParam("id", "aNonExistingDefinitionId")
     .then().expect()
-      .statusCode(Status.BAD_REQUEST.getStatusCode())
+      .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", equalTo("No matching definition with id " + nonExistingId))
     .when().get(SINGLE_PROCESS_DEFINITION_URL);
   }
 
@@ -216,7 +223,9 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
     
     given().pathParam("id", nonExistingId)
     .then().expect()
-      .statusCode(Status.BAD_REQUEST.getStatusCode())
+      .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", equalTo("No matching definition with id " + nonExistingId))
     .when().get(XML_DEFINITION_URL);
   }
 
@@ -226,7 +235,9 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
     
     given().pathParam("id", "aNonExistingProcessDefinitionId")
     .then().expect()
-      .statusCode(Status.BAD_REQUEST.getStatusCode())
+      .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", containsString("Cannot get start form data for process definition"))
     .when().get(START_FORM_URL);
   }
 }

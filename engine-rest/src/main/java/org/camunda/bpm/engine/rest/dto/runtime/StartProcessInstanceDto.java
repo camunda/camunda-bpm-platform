@@ -16,13 +16,13 @@ import java.util.Map;
 
 public class StartProcessInstanceDto {
 
-  private Map<String, Object> variables;
+  private Map<String, VariableValueDto> variables;
 
-  public Map<String, Object> getVariables() {
+  public Map<String, VariableValueDto> getVariables() {
     return variables;
   }
 
-  public void setVariables(Map<String, Object> variables) {
+  public void setVariables(Map<String, VariableValueDto> variables) {
     this.variables = variables;
   }
 }

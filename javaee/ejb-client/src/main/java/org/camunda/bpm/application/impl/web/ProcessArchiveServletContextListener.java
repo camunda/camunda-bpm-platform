@@ -5,8 +5,8 @@ import javax.servlet.ServletContextEvent;
 import javax.servlet.ServletContextListener;
 
 import org.camunda.bpm.application.ProcessApplicationInfo;
+import org.camunda.bpm.application.ProcessApplicationInterface;
 import org.camunda.bpm.application.impl.ejb.DefaultEjbProcessApplication;
-
 
 
 /**
@@ -19,7 +19,7 @@ import org.camunda.bpm.application.impl.ejb.DefaultEjbProcessApplication;
 public class ProcessArchiveServletContextListener implements ServletContextListener {
   
   @EJB
-  private DefaultEjbProcessApplication defaultEjbProcessApplication;
+  private ProcessApplicationInterface defaultEjbProcessApplication;
 
   public void contextInitialized(ServletContextEvent contextEvent) {
 

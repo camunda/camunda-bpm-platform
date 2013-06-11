@@ -26,6 +26,12 @@ public class ScriptBeanAccessTest extends ResourceProcessEngineTestCase {
   public ScriptBeanAccessTest() {
     super("org/camunda/bpm/engine/test/standalone/scripting/activiti.cfg.xml");
   }
+  
+  @Override
+  protected void closeDownProcessEngine() {
+    processEngine.close();
+    super.closeDownProcessEngine();
+  }
 
   @Deployment
   public void testConfigurationBeanAccess() {

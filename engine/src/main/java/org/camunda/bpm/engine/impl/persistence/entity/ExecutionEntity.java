@@ -74,6 +74,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
   protected static final int EVENT_SUBSCRIPTIONS_STATE_BIT = 1;
   protected static final int TASKS_STATE_BIT = 2;
   protected static final int JOBS_STATE_BIT = 3;
+  protected static final int INCIDENT_STATE_BIT = 4;
   
   // current position /////////////////////////////////////////////////////////
   
@@ -134,6 +135,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
   protected List<EventSubscriptionEntity> eventSubscriptions;  
   protected List<JobEntity> jobs;
   protected List<TaskEntity> tasks;
+  protected List<IncidentEntity> incidents;
   protected int cachedEntityState;
   
   // cascade deletion ////////////////////////////////////////////////////////
@@ -306,6 +308,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
     eventSubscriptions = new ArrayList<EventSubscriptionEntity>();
     jobs = new ArrayList<JobEntity>();
     tasks = new ArrayList<TaskEntity>();
+    incidents = new ArrayList<IncidentEntity>();
     
     // Cached entity-state initialized to null, all bits are zore, indicating NO entities present
     cachedEntityState = 0;
@@ -847,6 +850,9 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
     // remove all jobs
     removeJobs();
     
+    // remove all incidents
+    removeIncidents();
+    
     // remove all event subscriptions for this scope, if the scope has event subscriptions:
     removeEventSubscriptions();
     
@@ -909,7 +915,17 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
       }
     }
   }
-
+  
+  private void removeIncidents() {
+    for (IncidentEntity incident: getIncidents()) {
+      if (replacedBy!=null) {
+        incident.setExecution((ExecutionEntity) replacedBy);
+      } else {
+        incident.delete();
+      }
+    }
+  }
+  
   private void removeTasks(String reason) {
     if(reason == null) {
       reason = TaskEntity.DELETE_REASON_DELETED;
@@ -1072,7 +1088,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
       persistentState.put("forcedUpdate", Boolean.TRUE);
     }
     persistentState.put("suspensionState", this.suspensionState);
-    persistentState.put("cachedEntityState", this.cachedEntityState);
+    persistentState.put("cachedEntityState", getCachedEntityState());
     return persistentState;
   }
   
@@ -1198,6 +1214,44 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
     getJobsInternal().remove(job);
   }
   
+  // referenced incidents entities //////////////////////////////////////////////
+  
+  @SuppressWarnings({ "unchecked", "rawtypes" })
+  protected void ensureIncidentsInitialized() {
+    if(incidents == null) {    
+      incidents = (List)Context.getCommandContext()
+        .getIncidentManager()
+        .findIncidentsByExecution(id);
+    }    
+  }
+  
+  protected List<IncidentEntity> getIncidentsInternal() {
+    ensureIncidentsInitialized();
+    return incidents;
+  }
+  
+  public List<IncidentEntity> getIncidents() {
+    return new ArrayList<IncidentEntity>(getIncidentsInternal());
+  }
+  
+  public void addIncident(IncidentEntity incident) {
+    getIncidentsInternal().add(incident);
+  }
+  
+  public void removeIncident(IncidentEntity incident) {
+    getIncidentsInternal().remove(incident);
+  }
+  
+  public IncidentEntity getIncidentByCauseIncidentId(String causeIncidentId) {
+    for (IncidentEntity incident : getIncidents()) {
+      if (incident.getCauseIncidentId() != null &&
+          incident.getCauseIncidentId().equals(causeIncidentId)) {
+        return incident;
+      }
+    }
+    return null;
+  }
+  
   // referenced task entities ///////////////////////////////////////////////////
   
   @SuppressWarnings({ "unchecked", "rawtypes" })
@@ -1244,6 +1298,9 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
     if(eventSubscriptions == null && !BitMaskUtil.isBitOn(cachedEntityState, EVENT_SUBSCRIPTIONS_STATE_BIT)) {
       eventSubscriptions = new ArrayList<EventSubscriptionEntity>();
     }
+    if(incidents == null && !BitMaskUtil.isBitOn(cachedEntityState, INCIDENT_STATE_BIT)) {
+      incidents = new ArrayList<IncidentEntity>();
+    }
   }
     
   public int getCachedEntityState() {
@@ -1254,6 +1311,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
     cachedEntityState = BitMaskUtil.setBit(cachedEntityState, TASKS_STATE_BIT, (tasks == null || tasks.size() > 0));
     cachedEntityState = BitMaskUtil.setBit(cachedEntityState, EVENT_SUBSCRIPTIONS_STATE_BIT, (eventSubscriptions == null || eventSubscriptions.size() > 0));
     cachedEntityState = BitMaskUtil.setBit(cachedEntityState, JOBS_STATE_BIT, (jobs == null || jobs.size() > 0));
+    cachedEntityState = BitMaskUtil.setBit(cachedEntityState, INCIDENT_STATE_BIT, (incidents == null || incidents.size() > 0));
     
     return cachedEntityState;
   }

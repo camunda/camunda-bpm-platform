@@ -14,20 +14,16 @@ package org.camunda.bpm.engine.rest.impl;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
-import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.rest.ProcessInstanceRestService;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceQueryDto;
-import org.camunda.bpm.engine.rest.dto.runtime.VariableListDto;
-import org.camunda.bpm.engine.rest.dto.runtime.VariableValueDto;
-import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+import org.camunda.bpm.engine.rest.sub.runtime.ProcessInstanceResource;
+import org.camunda.bpm.engine.rest.sub.runtime.impl.ProcessInstanceResourceImpl;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 
@@ -44,19 +40,6 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
   
 
   @Override
-  public ProcessInstanceDto getProcessInstance(String processInstanceId) {
-    RuntimeService runtimeService = getProcessEngine().getRuntimeService();
-    ProcessInstance instance = runtimeService.createProcessInstanceQuery().processInstanceId(processInstanceId).singleResult();
-    
-    if (instance == null) {
-      throw new WebApplicationException(Status.NOT_FOUND);
-    }
-    
-    ProcessInstanceDto result = ProcessInstanceDto.fromProcessInstance(instance);
-    return result;
-  }
-
-  @Override
   public List<ProcessInstanceDto> getProcessInstances(
       UriInfo uriInfo, Integer firstResult, Integer maxResults) {
     ProcessInstanceQueryDto queryDto = new ProcessInstanceQueryDto(uriInfo.getQueryParameters());
@@ -66,13 +49,8 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
   @Override
   public List<ProcessInstanceDto> queryProcessInstances(
       ProcessInstanceQueryDto queryDto, Integer firstResult, Integer maxResults) {
-    RuntimeService runtimeService = getProcessEngine().getRuntimeService();
-    ProcessInstanceQuery query;
-    try {
-      query = queryDto.toQuery(runtimeService);
-    } catch (InvalidRequestException e) {
-      throw new WebApplicationException(Status.BAD_REQUEST.getStatusCode());
-    }
+    ProcessEngine engine = getProcessEngine();
+    ProcessInstanceQuery query = queryDto.toQuery(engine);
     
     List<ProcessInstance> matchingInstances;
     if (firstResult != null || maxResults != null) {
@@ -107,13 +85,8 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
 
   @Override
   public CountResultDto queryProcessInstancesCount(ProcessInstanceQueryDto queryDto) {
-    RuntimeService runtimeService = getProcessEngine().getRuntimeService();
-    ProcessInstanceQuery query;
-    try {
-      query = queryDto.toQuery(runtimeService);
-    } catch (InvalidRequestException e) {
-      throw new WebApplicationException(Status.BAD_REQUEST.getStatusCode());
-    }
+    ProcessEngine engine = getProcessEngine();
+    ProcessInstanceQuery query = queryDto.toQuery(engine);
     
     long count = query.count();
     CountResultDto result = new CountResultDto();
@@ -123,13 +96,8 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
   }
 
   @Override
-  public VariableListDto getVariables(String processInstanceId) {
-    List<VariableValueDto> values = new ArrayList<VariableValueDto>();
-
-    for (Map.Entry<String, Object> entry : getProcessEngine().getRuntimeService().getVariables(processInstanceId).entrySet()) {
-      values.add(new VariableValueDto(entry.getKey(), entry.getValue(), entry.getValue().getClass().getSimpleName()));
-    }
-
-    return new VariableListDto(values);
+  public ProcessInstanceResource getProcessInstance(String processInstanceId) {
+    return new ProcessInstanceResourceImpl(getProcessEngine(), processInstanceId);
   }
+
 }

@@ -14,7 +14,13 @@ package org.camunda.bpm.engine.rest;
 
 import java.util.List;
 
-import javax.ws.rs.*;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
@@ -22,7 +28,7 @@ import javax.ws.rs.core.UriInfo;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceQueryDto;
-import org.camunda.bpm.engine.rest.dto.runtime.VariableListDto;
+import org.camunda.bpm.engine.rest.sub.runtime.ProcessInstanceResource;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 
 @Path(ProcessInstanceRestService.PATH)
@@ -30,10 +36,9 @@ import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 public interface ProcessInstanceRestService {
 
   public static final String PATH = "/process-instance";
-  
-  @GET
+
   @Path("/{id}")
-  ProcessInstanceDto getProcessInstance(@PathParam("id") String processInstanceId);
+  ProcessInstanceResource getProcessInstance(@PathParam("id") String processInstanceId);
   
   /**
    * Exposes the {@link ProcessInstanceQuery} interface as a REST service.
@@ -44,6 +49,7 @@ public interface ProcessInstanceRestService {
    * @return
    */
   @GET
+  @Produces(MediaType.APPLICATION_JSON)
   List<ProcessInstanceDto> getProcessInstances(@Context UriInfo uriInfo,
       @QueryParam("firstResult") Integer firstResult,
       @QueryParam("maxResults") Integer maxResults);
@@ -60,20 +66,20 @@ public interface ProcessInstanceRestService {
    */
   @POST
   @Consumes(MediaType.APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
   List<ProcessInstanceDto> queryProcessInstances(ProcessInstanceQueryDto query,
       @QueryParam("firstResult") Integer firstResult,
       @QueryParam("maxResults") Integer maxResults);
 
   @GET
   @Path("/count")
+  @Produces(MediaType.APPLICATION_JSON)
   CountResultDto getProcessInstancesCount(@Context UriInfo uriInfo);
   
   @POST
   @Path("/count")
   @Consumes(MediaType.APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
   CountResultDto queryProcessInstancesCount(ProcessInstanceQueryDto query);
-
-  @GET
-  @Path("/{id}/variables")
-  VariableListDto getVariables(@PathParam("id") String processInstanceId);
+  
 }

@@ -26,25 +26,23 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
-import org.camunda.bpm.engine.rest.dto.task.*;
+import org.camunda.bpm.engine.rest.dto.task.TaskDto;
+import org.camunda.bpm.engine.rest.dto.task.TaskQueryDto;
+import org.camunda.bpm.engine.rest.sub.task.TaskResource;
 
 @Path(TaskRestService.PATH)
 @Produces(MediaType.APPLICATION_JSON)
 public interface TaskRestService {
 
   public static final String PATH = "/task";
+
+  @Path("/{id}")
+  TaskResource getTask(@PathParam("id") String id);
   
   @GET
+  @Produces(MediaType.APPLICATION_JSON)
   List<TaskDto> getTasks(@Context UriInfo uriInfo,
       @QueryParam("firstResult") Integer firstResult, @QueryParam("maxResults") Integer maxResults);
-
-  @GET
-  @Path("/{id}")
-  TaskDto getTask(@PathParam("id") String id);
-
-  @GET
-  @Path("/{id}/form")
-  FormDto getForm(@PathParam("id") String id);
 
   /**
    * Expects the same parameters as {@link TaskRestService#getTasks(TaskQueryDto, Integer, Integer)} (as
@@ -56,39 +54,19 @@ public interface TaskRestService {
    */
   @POST
   @Consumes(MediaType.APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
   List<TaskDto> queryTasks(TaskQueryDto query,
       @QueryParam("firstResult") Integer firstResult, @QueryParam("maxResults") Integer maxResults);
 
   @GET
   @Path("/count")
+  @Produces(MediaType.APPLICATION_JSON)
   CountResultDto getTasksCount(@Context UriInfo uriInfo);
 
   @POST
   @Path("/count")
   @Consumes(MediaType.APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
   CountResultDto queryTasksCount(TaskQueryDto query);
 
-  @POST
-  @Path("/{id}/claim")
-  @Consumes(MediaType.APPLICATION_JSON)
-  void claim(@PathParam("id") String taskId, UserIdDto dto);
-
-  @POST
-  @Path("/{id}/unclaim")
-  void unclaim(@PathParam("id") String taskId);
-
-  @POST
-  @Path("/{id}/complete")
-  @Consumes(MediaType.APPLICATION_JSON)
-  void complete(@PathParam("id") String taskId, CompleteTaskDto dto);
-
-  @POST
-  @Path("/{id}/resolve")
-  @Consumes(MediaType.APPLICATION_JSON)
-  void resolve(@PathParam("id") String taskId, CompleteTaskDto dto);
-  
-  @POST
-  @Path("/{id}/delegate")
-  @Consumes(MediaType.APPLICATION_JSON)
-  void delegate(@PathParam("id") String taskId, UserIdDto delegatedUser);
 }

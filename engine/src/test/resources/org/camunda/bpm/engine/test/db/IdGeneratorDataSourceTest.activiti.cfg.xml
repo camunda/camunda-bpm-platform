@@ -6,12 +6,17 @@
 
   <bean id="processEngineConfiguration" class="org.camunda.bpm.engine.impl.cfg.StandaloneInMemProcessEngineConfiguration">
   
+    <property name="processEngineName" value="IdGeneratorDataSourceTest-engine" />
+    
     <!-- Database configurations -->
     <property name="history" value="full" />
-    <property name="databaseSchemaUpdate" value="true" />
+    <property name="databaseSchemaUpdate" value="create-drop" />
+    <property name="jdbcUrl" value="jdbc:h2:mem:IdGeneratorDataSourceTest" />
+    
     <property name="jdbcMaxActiveConnections" value="2" />
     <property name="idBlockSize" value="3" />
     <property name="idGeneratorDataSource" ref="idGeneratorDataSource" />
+    
     
     <!-- job executor configurations -->
     <property name="jobExecutorActivate" value="false" />

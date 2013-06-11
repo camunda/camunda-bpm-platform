@@ -12,10 +12,10 @@
  */
 package org.camunda.bpm.engine.rest.impl;
 
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.spi.impl.AbstractProcessEngineAware;
 
 public abstract class AbstractRestProcessEngineAware extends AbstractProcessEngineAware {
@@ -32,7 +32,7 @@ public abstract class AbstractRestProcessEngineAware extends AbstractProcessEngi
   
   protected ProcessEngine getProcessEngine() {
     if (processEngine == null) {
-      throw new WebApplicationException(Status.BAD_REQUEST.getStatusCode());
+      throw new InvalidRequestException(Status.BAD_REQUEST, "No process engine available");
     }
     return processEngine;
   }

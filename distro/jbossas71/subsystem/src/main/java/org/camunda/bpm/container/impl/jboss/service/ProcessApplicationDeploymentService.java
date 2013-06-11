@@ -20,6 +20,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.camunda.bpm.application.AbstractProcessApplication;
+import org.camunda.bpm.application.ProcessApplicationInterface;
 import org.camunda.bpm.application.ProcessApplicationRegistration;
 import org.camunda.bpm.application.impl.metadata.spi.ProcessArchiveXml;
 import org.camunda.bpm.container.impl.metadata.PropertyHelper;
@@ -56,7 +57,7 @@ public class ProcessApplicationDeploymentService implements Service<ProcessAppli
   
   protected InjectedValue<ProcessEngine> processEngineInjector = new InjectedValue<ProcessEngine>();
   
-  protected InjectedValue<AbstractProcessApplication> noViewProcessApplication = new InjectedValue<AbstractProcessApplication>();  
+  protected InjectedValue<ProcessApplicationInterface> noViewProcessApplication = new InjectedValue<ProcessApplicationInterface>();
   // for view-exposing ProcessApplicationComponents
   protected InjectedValue<ComponentView> paComponentViewInjector = new InjectedValue<ComponentView>();
   
@@ -114,11 +115,11 @@ public class ProcessApplicationDeploymentService implements Service<ProcessAppli
       ProcessEngine processEngine = processEngineInjector.getValue();
       
       // get the process application component
-      AbstractProcessApplication processApplication = null;      
+      ProcessApplicationInterface processApplication = null;
       ComponentView componentView = paComponentViewInjector.getOptionalValue();
       if(componentView != null) {
         reference = componentView.createInstance();
-        processApplication = (AbstractProcessApplication) reference.getInstance();
+        processApplication = (ProcessApplicationInterface) reference.getInstance();
       } else {
         processApplication = noViewProcessApplication.getValue();
       }
@@ -219,7 +220,7 @@ public class ProcessApplicationDeploymentService implements Service<ProcessAppli
     return processEngineInjector;
   }
   
-  public InjectedValue<AbstractProcessApplication> getNoViewProcessApplication() {
+  public InjectedValue<ProcessApplicationInterface> getNoViewProcessApplication() {
     return noViewProcessApplication;
   }
   

@@ -17,7 +17,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.camunda.bpm.engine.impl.incident.FailedJobIncidentHandler;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.management.IncidentStatistics;
 import org.camunda.bpm.engine.management.ProcessDefinitionStatistics;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.test.Deployment;
@@ -38,7 +40,10 @@ public class ProcessDefinitionStatisticsQueryTest extends PluggableProcessEngine
     waitForJobExecutorToProcessAllJobs(6000, 500);
     
     List<ProcessDefinitionStatistics> statistics = 
-        managementService.createProcessDefinitionStatisticsQuery().includeFailedJobs().list();
+        managementService
+        .createProcessDefinitionStatisticsQuery()
+        .includeFailedJobs()
+        .list();
     
     Assert.assertEquals(1, statistics.size());
     
@@ -49,15 +54,141 @@ public class ProcessDefinitionStatisticsQueryTest extends PluggableProcessEngine
   
   @Test
   @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/StatisticsTest.testStatisticsQueryWithFailedJobs.bpmn20.xml")
+  public void testProcessDefinitionStatisticsQueryWithIncidents() {
+    runtimeService.startProcessInstanceByKey("ExampleProcess");
+    
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("fail", true);
+    runtimeService.startProcessInstanceByKey("ExampleProcess", parameters);
+
+    waitForJobExecutorToProcessAllJobs(6000, 500);
+    
+    List<ProcessDefinitionStatistics> statistics = 
+        managementService
+        .createProcessDefinitionStatisticsQuery()
+        .includeIncidents()
+        .list();
+    
+    Assert.assertEquals(1, statistics.size());
+    
+    ProcessDefinitionStatistics definitionResult = statistics.get(0);
+    Assert.assertEquals(2, definitionResult.getInstances());
+    
+    assertFalse(definitionResult.getIncidentStatistics().isEmpty());
+    assertEquals(1, definitionResult.getIncidentStatistics().size());
+    
+    IncidentStatistics incidentStatistics = definitionResult.getIncidentStatistics().get(0);
+    Assert.assertEquals(FailedJobIncidentHandler.INCIDENT_HANDLER_TYPE, incidentStatistics.getIncidentType());
+    Assert.assertEquals(1, incidentStatistics.getIncidentCount());
+  }
+  
+  @Test
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/StatisticsTest.testStatisticsQueryWithFailedJobs.bpmn20.xml")
+  public void testProcessDefinitionStatisticsQueryWithIncidentType() {
+    runtimeService.startProcessInstanceByKey("ExampleProcess");
+    
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("fail", true);
+    runtimeService.startProcessInstanceByKey("ExampleProcess", parameters);
+
+    waitForJobExecutorToProcessAllJobs(6000, 500);
+    
+    List<ProcessDefinitionStatistics> statistics = 
+        managementService
+        .createProcessDefinitionStatisticsQuery()
+        .includeIncidentsForType("failedJob")
+        .list();
+    
+    Assert.assertEquals(1, statistics.size());
+    
+    ProcessDefinitionStatistics definitionResult = statistics.get(0);
+    Assert.assertEquals(2, definitionResult.getInstances());
+    
+    assertFalse(definitionResult.getIncidentStatistics().isEmpty());
+    assertEquals(1, definitionResult.getIncidentStatistics().size());
+    
+    IncidentStatistics incidentStatistics = definitionResult.getIncidentStatistics().get(0);
+    Assert.assertEquals(FailedJobIncidentHandler.INCIDENT_HANDLER_TYPE, incidentStatistics.getIncidentType());
+    Assert.assertEquals(1, incidentStatistics.getIncidentCount());
+  }
+  
+  @Test
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/StatisticsTest.testStatisticsQueryWithFailedJobs.bpmn20.xml")
+  public void testProcessDefinitionStatisticsQueryWithInvalidIncidentType() {
+    runtimeService.startProcessInstanceByKey("ExampleProcess");
+    
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("fail", true);
+    runtimeService.startProcessInstanceByKey("ExampleProcess", parameters);
+
+    waitForJobExecutorToProcessAllJobs(6000, 500);
+    
+    List<ProcessDefinitionStatistics> statistics = 
+        managementService
+        .createProcessDefinitionStatisticsQuery()
+        .includeIncidentsForType("invalid")
+        .list();
+    
+    Assert.assertEquals(1, statistics.size());
+    
+    ProcessDefinitionStatistics definitionResult = statistics.get(0);
+    Assert.assertEquals(2, definitionResult.getInstances());
+    
+    assertTrue(definitionResult.getIncidentStatistics().isEmpty());
+  }
+  
+  @Test
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/StatisticsTest.testStatisticsQueryWithFailedJobs.bpmn20.xml")
+  public void testProcessDefinitionStatisticsQueryWithIncidentsAndFailedJobs() {
+    runtimeService.startProcessInstanceByKey("ExampleProcess");
+    
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("fail", true);
+    runtimeService.startProcessInstanceByKey("ExampleProcess", parameters);
+
+    waitForJobExecutorToProcessAllJobs(6000, 500);
+    
+    List<ProcessDefinitionStatistics> statistics = 
+        managementService
+        .createProcessDefinitionStatisticsQuery()
+        .includeIncidents()
+        .includeFailedJobs()
+        .list();
+    
+    Assert.assertEquals(1, statistics.size());
+    
+    ProcessDefinitionStatistics definitionResult = statistics.get(0);
+    Assert.assertEquals(2, definitionResult.getInstances());
+    Assert.assertEquals(1, definitionResult.getFailedJobs());
+    
+    assertFalse(definitionResult.getIncidentStatistics().isEmpty());
+    assertEquals(1, definitionResult.getIncidentStatistics().size());
+    
+    IncidentStatistics incidentStatistics = definitionResult.getIncidentStatistics().get(0);
+    Assert.assertEquals(FailedJobIncidentHandler.INCIDENT_HANDLER_TYPE, incidentStatistics.getIncidentType());
+    Assert.assertEquals(1, incidentStatistics.getIncidentCount());
+  }
+  
+  @Test
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/StatisticsTest.testStatisticsQueryWithFailedJobs.bpmn20.xml")
   public void testProcessDefinitionStatisticsQueryWithoutRunningInstances() {
     List<ProcessDefinitionStatistics> statistics = 
-        managementService.createProcessDefinitionStatisticsQuery().includeFailedJobs().list();
+        managementService
+        .createProcessDefinitionStatisticsQuery()
+        .includeFailedJobs()
+        .includeIncidents()
+        .list();
     
     Assert.assertEquals(1, statistics.size());
     
     ProcessDefinitionStatistics definitionResult = statistics.get(0);
     Assert.assertEquals(0, definitionResult.getInstances());
     Assert.assertEquals(0, definitionResult.getFailedJobs());
+    
+    statistics = 
+        managementService.createProcessDefinitionStatisticsQuery().includeIncidents().list();
+    
+    assertTrue(definitionResult.getIncidentStatistics().isEmpty());
   }
   
   @Test
@@ -68,7 +199,11 @@ public class ProcessDefinitionStatisticsQueryTest extends PluggableProcessEngine
     waitForJobExecutorToProcessAllJobs(6000, 500);
     
     long count = 
-        managementService.createProcessDefinitionStatisticsQuery().includeFailedJobs().count();
+        managementService
+        .createProcessDefinitionStatisticsQuery()
+        .includeFailedJobs()
+        .includeIncidents()
+        .count();
     
     Assert.assertEquals(1, count);
   }
@@ -77,8 +212,11 @@ public class ProcessDefinitionStatisticsQueryTest extends PluggableProcessEngine
   @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/StatisticsTest.testMultiInstanceStatisticsQuery.bpmn20.xml")
   public void testMultiInstanceProcessDefinitionStatisticsQuery() {
     runtimeService.startProcessInstanceByKey("MIExampleProcess");
+    
     List<ProcessDefinitionStatistics> statistics = 
-        managementService.createProcessDefinitionStatisticsQuery().list();
+        managementService
+        .createProcessDefinitionStatisticsQuery()
+        .list();
     
     Assert.assertEquals(1, statistics.size());
     
@@ -90,8 +228,11 @@ public class ProcessDefinitionStatisticsQueryTest extends PluggableProcessEngine
   @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/StatisticsTest.testSubprocessStatisticsQuery.bpmn20.xml")
   public void testSubprocessProcessDefinitionStatisticsQuery() {
     runtimeService.startProcessInstanceByKey("ExampleProcess");
+    
     List<ProcessDefinitionStatistics> statistics = 
-        managementService.createProcessDefinitionStatisticsQuery().list();
+        managementService
+        .createProcessDefinitionStatisticsQuery()
+        .list();
     
     Assert.assertEquals(1, statistics.size());
     
@@ -100,26 +241,29 @@ public class ProcessDefinitionStatisticsQueryTest extends PluggableProcessEngine
   }
   
   @Test
-  @Deployment(resources = {
-      "org/camunda/bpm/engine/test/api/mgmt/StatisticsTest.testCallActivityStatisticsQuery.bpmn20.xml",
-      "org/camunda/bpm/engine/test/api/mgmt/StatisticsTest.testStatisticsQueryWithFailedJobs.bpmn20.xml"})
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/StatisticesTest.testCallActivityWithIncidentsWithoutFailedJobs.bpmn20.xml")
   public void testCallActivityProcessDefinitionStatisticsQuery() {
     runtimeService.startProcessInstanceByKey("callExampleSubProcess");
     
     waitForJobExecutorToProcessAllJobs(6000, 500);
     
     List<ProcessDefinitionStatistics> statistics = 
-        managementService.createProcessDefinitionStatisticsQuery().includeFailedJobs().list();
+        managementService
+        .createProcessDefinitionStatisticsQuery()
+        .includeFailedJobs()
+        .list();
     
     Assert.assertEquals(2, statistics.size());
     
     for (ProcessDefinitionStatistics result : statistics) {
-      if (result.getKey().equals("ExampleSubProcess")) {
+      if (result.getKey().equals("ExampleProcess")) {
         Assert.assertEquals(1, result.getInstances());
         Assert.assertEquals(1, result.getFailedJobs());
       } else if (result.getKey().equals("callExampleSubProcess")) {
         Assert.assertEquals(1, result.getInstances());
         Assert.assertEquals(0, result.getFailedJobs());
+      } else {
+        fail(result + " was not expected.");
       }
     }
   }
@@ -133,7 +277,10 @@ public class ProcessDefinitionStatisticsQueryTest extends PluggableProcessEngine
           .deploy();
     
     List<ProcessDefinition> definitions = 
-        repositoryService.createProcessDefinitionQuery().processDefinitionKey("ExampleProcess").list();
+        repositoryService
+        .createProcessDefinitionQuery()
+        .processDefinitionKey("ExampleProcess")
+        .list();
     
     for (ProcessDefinition definition : definitions) {
       runtimeService.startProcessInstanceById(definition.getId());
@@ -142,13 +289,130 @@ public class ProcessDefinitionStatisticsQueryTest extends PluggableProcessEngine
     waitForJobExecutorToProcessAllJobs(6000, 500);
     
     List<ProcessDefinitionStatistics> statistics = 
-        managementService.createProcessDefinitionStatisticsQuery().includeFailedJobs().list();
+        managementService
+        .createProcessDefinitionStatisticsQuery()
+        .includeFailedJobs()
+        .includeIncidents()
+        .list();
     
     Assert.assertEquals(2, statistics.size());
     
     ProcessDefinitionStatistics definitionResult = statistics.get(0);
     Assert.assertEquals(1, definitionResult.getInstances());
     Assert.assertEquals(0, definitionResult.getFailedJobs());
+    
+    assertTrue(definitionResult.getIncidentStatistics().isEmpty());
+
+    definitionResult = statistics.get(1);
+    Assert.assertEquals(1, definitionResult.getInstances());
+    Assert.assertEquals(0, definitionResult.getFailedJobs());
+    
+    assertTrue(definitionResult.getIncidentStatistics().isEmpty());
+    
+    repositoryService.deleteDeployment(deployment.getId(), true);
+  }
+  
+  @Test
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/StatisticsTest.testStatisticsQueryWithFailedJobs.bpmn20.xml")
+  public void testProcessDefinitionStatisticsQueryForMultipleVersionsWithFailedJobsAndIncidents() {
+    org.camunda.bpm.engine.repository.Deployment deployment = 
+        repositoryService.createDeployment()
+          .addClasspathResource("org/camunda/bpm/engine/test/api/mgmt/StatisticsTest.testStatisticsQueryWithFailedJobs.bpmn20.xml")
+          .deploy();
+    
+    List<ProcessDefinition> definitions = 
+        repositoryService
+        .createProcessDefinitionQuery()
+        .processDefinitionKey("ExampleProcess")
+        .list();
+    
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("fail", true);
+    
+    for (ProcessDefinition definition : definitions) {
+      runtimeService.startProcessInstanceById(definition.getId(), parameters);
+    }
+    
+    waitForJobExecutorToProcessAllJobs(6000, 500);
+    
+    List<ProcessDefinitionStatistics> statistics = 
+        managementService
+        .createProcessDefinitionStatisticsQuery()
+        .includeFailedJobs()
+        .includeIncidents()
+        .list();
+    
+    Assert.assertEquals(2, statistics.size());
+    
+    ProcessDefinitionStatistics definitionResult = statistics.get(0);
+    Assert.assertEquals(1, definitionResult.getInstances());
+    Assert.assertEquals(1, definitionResult.getFailedJobs());
+    
+    List<IncidentStatistics> incidentStatistics = definitionResult.getIncidentStatistics();
+    assertFalse(incidentStatistics.isEmpty());
+    assertEquals(1, incidentStatistics.size());
+    
+    IncidentStatistics incident = incidentStatistics.get(0);
+    
+    assertEquals(FailedJobIncidentHandler.INCIDENT_HANDLER_TYPE, incident.getIncidentType());
+    assertEquals(1, incident.getIncidentCount());
+
+    definitionResult = statistics.get(1);
+    Assert.assertEquals(1, definitionResult.getInstances());
+    Assert.assertEquals(1, definitionResult.getFailedJobs());
+    
+    incidentStatistics = definitionResult.getIncidentStatistics();
+    assertFalse(incidentStatistics.isEmpty());
+    assertEquals(1, incidentStatistics.size());
+    
+    incident = incidentStatistics.get(0);
+    
+    assertEquals(FailedJobIncidentHandler.INCIDENT_HANDLER_TYPE, incident.getIncidentType());
+    assertEquals(1, incident.getIncidentCount());
+    
+    repositoryService.deleteDeployment(deployment.getId(), true);
+  }
+  
+  @Test
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/StatisticsTest.testStatisticsQueryWithFailedJobs.bpmn20.xml")
+  public void testProcessDefinitionStatisticsQueryForMultipleVersionsWithIncidentType() {
+    org.camunda.bpm.engine.repository.Deployment deployment = 
+        repositoryService.createDeployment()
+          .addClasspathResource("org/camunda/bpm/engine/test/api/mgmt/StatisticsTest.testStatisticsQueryWithFailedJobs.bpmn20.xml")
+          .deploy();
+    
+    List<ProcessDefinition> definitions = 
+        repositoryService
+        .createProcessDefinitionQuery()
+        .processDefinitionKey("ExampleProcess")
+        .list();
+    
+    for (ProcessDefinition definition : definitions) {
+      runtimeService.startProcessInstanceById(definition.getId());
+    }
+    
+    waitForJobExecutorToProcessAllJobs(6000, 500);
+    
+    List<ProcessDefinitionStatistics> statistics = 
+        managementService
+        .createProcessDefinitionStatisticsQuery()
+        .includeFailedJobs()
+        .includeIncidentsForType("failedJob")
+        .list();
+    
+    Assert.assertEquals(2, statistics.size());
+    
+    ProcessDefinitionStatistics definitionResult = statistics.get(0);
+    Assert.assertEquals(1, definitionResult.getInstances());
+    Assert.assertEquals(0, definitionResult.getFailedJobs());
+    
+    assertTrue(definitionResult.getIncidentStatistics().isEmpty());
+
+    definitionResult = statistics.get(1);
+    Assert.assertEquals(1, definitionResult.getInstances());
+    Assert.assertEquals(0, definitionResult.getFailedJobs());
+    
+    assertTrue(definitionResult.getIncidentStatistics().isEmpty());
     
     repositoryService.deleteDeployment(deployment.getId(), true);
   }
@@ -162,7 +426,10 @@ public class ProcessDefinitionStatisticsQueryTest extends PluggableProcessEngine
           .deploy();
     
     List<ProcessDefinition> definitions = 
-        repositoryService.createProcessDefinitionQuery().processDefinitionKey("ExampleProcess").list();
+        repositoryService
+        .createProcessDefinitionQuery()
+        .processDefinitionKey("ExampleProcess")
+        .list();
     
     for (ProcessDefinition definition : definitions) {
       runtimeService.startProcessInstanceById(definition.getId());
@@ -175,6 +442,60 @@ public class ProcessDefinitionStatisticsQueryTest extends PluggableProcessEngine
     
     repositoryService.deleteDeployment(deployment.getId(), true);
   }
+
+  @Test
+  @Deployment(resources = "org/camunda/bpm/engine/test/api/mgmt/StatisticesTest.testCallActivityWithIncidentsWithoutFailedJobs.bpmn20.xml")
+  public void testProcessDefinitionStatisticsQueryWithIncidentsWithoutFailedJobs() {
+    runtimeService.startProcessInstanceByKey("callExampleSubProcess");
+    
+    waitForJobExecutorToProcessAllJobs(6000, 500);
+    
+    List<ProcessDefinitionStatistics> statistics = 
+        managementService
+        .createProcessDefinitionStatisticsQuery()
+        .includeIncidents()
+        .includeFailedJobs()
+        .list();
+    
+    Assert.assertEquals(2, statistics.size());
+    
+    ProcessDefinitionStatistics callExampleSubProcessStaticstics = null;
+    ProcessDefinitionStatistics exampleSubProcessStaticstics = null;
+    
+    for (ProcessDefinitionStatistics current : statistics) {
+      if (current.getKey().equals("callExampleSubProcess")) {
+        callExampleSubProcessStaticstics = current;
+      } else if (current.getKey().equals("ExampleProcess")) {
+        exampleSubProcessStaticstics = current;
+      } else {
+        fail(current.getKey() + " was not expected.");
+      }
+    }
+    
+    assertNotNull(callExampleSubProcessStaticstics);
+    assertNotNull(exampleSubProcessStaticstics);
+    
+    // "super" process definition
+    assertEquals(1, callExampleSubProcessStaticstics.getInstances());
+    assertEquals(0, callExampleSubProcessStaticstics.getFailedJobs());
+    
+    assertFalse(callExampleSubProcessStaticstics.getIncidentStatistics().isEmpty());
+    assertEquals(1, callExampleSubProcessStaticstics.getIncidentStatistics().size());
+    
+    IncidentStatistics incidentStatistics = callExampleSubProcessStaticstics.getIncidentStatistics().get(0);
+    assertEquals(FailedJobIncidentHandler.INCIDENT_HANDLER_TYPE, incidentStatistics.getIncidentType());
+    assertEquals(1, incidentStatistics.getIncidentCount());
+
+    // "called" process definition
+    assertEquals(1, exampleSubProcessStaticstics.getInstances());
+    assertEquals(1, exampleSubProcessStaticstics.getFailedJobs());
+    
+    assertFalse(exampleSubProcessStaticstics.getIncidentStatistics().isEmpty());
+    assertEquals(1, exampleSubProcessStaticstics.getIncidentStatistics().size());
+    
+    incidentStatistics = exampleSubProcessStaticstics.getIncidentStatistics().get(0);
+    assertEquals(FailedJobIncidentHandler.INCIDENT_HANDLER_TYPE, incidentStatistics.getIncidentType());
+    assertEquals(1, incidentStatistics.getIncidentCount());
+  }
   
-  // TODO test for results, if no instances are running for a process definition
 }

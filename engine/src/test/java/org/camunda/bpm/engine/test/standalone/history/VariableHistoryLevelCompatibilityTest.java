@@ -30,6 +30,12 @@ public class VariableHistoryLevelCompatibilityTest extends ResourceProcessEngine
   public VariableHistoryLevelCompatibilityTest() {
     super("org/camunda/bpm/engine/test/standalone/history/variablehistory.activiti.cfg.xml");
   }
+  
+  @Override
+  protected void closeDownProcessEngine() {
+    processEngine.close();
+    super.closeDownProcessEngine();
+  }
 
   public void testCompatibilty() {
     int historyLevel = processEngineConfiguration.getHistoryLevel();

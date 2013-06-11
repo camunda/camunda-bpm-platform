@@ -15,23 +15,15 @@ package org.camunda.bpm.engine.rest.impl;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
-import org.camunda.bpm.engine.FormService;
-import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.RuntimeService;
-import org.camunda.bpm.engine.TaskService;
-import org.camunda.bpm.engine.form.FormData;
+import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.rest.TaskRestService;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
-import org.camunda.bpm.engine.rest.dto.task.CompleteTaskDto;
-import org.camunda.bpm.engine.rest.dto.task.FormDto;
 import org.camunda.bpm.engine.rest.dto.task.TaskDto;
 import org.camunda.bpm.engine.rest.dto.task.TaskQueryDto;
-import org.camunda.bpm.engine.rest.dto.task.UserIdDto;
-import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+import org.camunda.bpm.engine.rest.sub.task.TaskResource;
+import org.camunda.bpm.engine.rest.sub.task.impl.TaskResourceImpl;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
 
@@ -54,15 +46,8 @@ public class TaskRestServiceImpl extends AbstractRestProcessEngineAware implemen
   @Override
   public List<TaskDto> queryTasks(TaskQueryDto queryDto, Integer firstResult,
       Integer maxResults) {
-    TaskService taskService = getProcessEngine().getTaskService();
-
-    TaskQuery query;
-
-    try {
-      query = queryDto.toQuery(taskService);
-    } catch (InvalidRequestException e) {
-      throw new WebApplicationException(Status.BAD_REQUEST.getStatusCode());
-    }
+    ProcessEngine engine = getProcessEngine();
+    TaskQuery query = queryDto.toQuery(engine);
 
     List<Task> matchingTasks;
     if (firstResult != null || maxResults != null) {
@@ -91,30 +76,6 @@ public class TaskRestServiceImpl extends AbstractRestProcessEngineAware implemen
   }
   
   @Override
-  public void claim(String taskId, UserIdDto dto) {
-    TaskService taskService = getProcessEngine().getTaskService();
-
-    taskService.claim(taskId, dto.getUserId());
-  }
-
-  @Override
-  public void unclaim(String taskId) {
-    getProcessEngine().getTaskService().setAssignee(taskId, null);
-  }
-
-  @Override
-  public void complete(String taskId, CompleteTaskDto dto) {
-    TaskService taskService = getProcessEngine().getTaskService();
-
-    taskService.complete(taskId, dto.getVariables());
-  }
-
-  @Override
-  public void delegate(String taskId, UserIdDto delegatedUser) {
-    getProcessEngine().getTaskService().delegateTask(taskId, delegatedUser.getUserId());
-  }
-
-  @Override
   public CountResultDto getTasksCount(UriInfo uriInfo) {
     TaskQueryDto queryDto = new TaskQueryDto(uriInfo.getQueryParameters());
     return queryTasksCount(queryDto);
@@ -122,14 +83,8 @@ public class TaskRestServiceImpl extends AbstractRestProcessEngineAware implemen
 
   @Override
   public CountResultDto queryTasksCount(TaskQueryDto queryDto) {
-    TaskService taskService = getProcessEngine().getTaskService();
-
-    TaskQuery query;
-    try {
-      query = queryDto.toQuery(taskService);
-    } catch (InvalidRequestException e) {
-      throw new WebApplicationException(Status.BAD_REQUEST.getStatusCode());
-    }
+    ProcessEngine engine = getProcessEngine();
+    TaskQuery query = queryDto.toQuery(engine);
 
     long count = query.count();
     CountResultDto result = new CountResultDto();
@@ -139,42 +94,7 @@ public class TaskRestServiceImpl extends AbstractRestProcessEngineAware implemen
   }
 
   @Override
-  public TaskDto getTask(String id) {
-    Task task = getTaskById(id);
-    if (task == null) {
-      throw new WebApplicationException(Status.BAD_REQUEST.getStatusCode());
-    }
-    
-    return TaskDto.fromTask(task);
-  }
-
-  @Override
-  public FormDto getForm(String id) {
-    FormService formService = getProcessEngine().getFormService();
-
-    FormData formData;
-    try {
-      formData = formService.getTaskFormData(id);
-    } catch (ProcessEngineException e) {
-      throw new WebApplicationException(Status.BAD_REQUEST.getStatusCode());
-    }
-    
-    return FormDto.fromFormData(formData);
-  }
-
-  @Override
-  public void resolve(String taskId, CompleteTaskDto dto) {
-    TaskService taskService = getProcessEngine().getTaskService();
-    taskService.resolveTask(taskId, dto.getVariables());
-  }
-
-  /**
-   * Returns the task with the given id
-   *
-   * @param id
-   * @return
-   */
-  private Task getTaskById(String id) {
-    return getProcessEngine().getTaskService().createTaskQuery().taskId(id).singleResult();
+  public TaskResource getTask(String id) {
+    return new TaskResourceImpl(getProcessEngine(), id);
   }
 }

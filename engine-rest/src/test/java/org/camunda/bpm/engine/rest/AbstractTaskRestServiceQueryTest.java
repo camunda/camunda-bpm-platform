@@ -21,6 +21,7 @@ import java.util.Map;
 
 import javax.ws.rs.core.Response.Status;
 
+import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.helper.EqualsList;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.task.DelegationState;
@@ -32,6 +33,7 @@ import org.junit.Test;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
 
+import com.jayway.restassured.http.ContentType;
 import com.jayway.restassured.response.Response;
 
 public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServiceTest {
@@ -67,21 +69,27 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
   @Test
   public void testInvalidDateParameter() {
     given().queryParams("due", "anInvalidDate")
-      .expect().statusCode(Status.BAD_REQUEST.getStatusCode())
+      .expect().statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", equalTo("Cannot set query parameter 'due' to value 'anInvalidDate'"))
       .when().get(TASK_QUERY_URL);
   }
   
   @Test
   public void testSortByParameterOnly() {
     given().queryParam("sortBy", "dueDate")
-      .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
+      .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", equalTo("Only a single sorting parameter specified. sortBy and sortOrder required"))
       .when().get(TASK_QUERY_URL);
   }
   
   @Test
   public void testSortOrderParameterOnly() {
     given().queryParam("sortOrder", "asc")
-      .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
+      .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", equalTo("Only a single sorting parameter specified. sortBy and sortOrder required"))
       .when().get(TASK_QUERY_URL);
   }
 
@@ -387,6 +395,46 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
       .then().expect().statusCode(Status.OK.getStatusCode())
       .when().get(TASK_QUERY_URL);    
     verify(mockQuery).processVariableValueNotEquals(variableName, variableValue);
+  }
+  
+  @Test
+  public void testMultipleVariableParameters() {
+    String variableName1 = "varName";
+    String variableValue1 = "varValue";
+    String variableParameter1 = variableName1 + "_eq_" + variableValue1; 
+    
+    String variableName2 = "anotherVarName";
+    String variableValue2 = "anotherVarValue";
+    String variableParameter2 = variableName2 + "_neq_" + variableValue2;
+    
+    String queryValue = variableParameter1 + "," + variableParameter2;
+    
+    given().queryParam("taskVariables", queryValue)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .when().get(TASK_QUERY_URL);    
+    
+    verify(mockQuery).taskVariableValueEquals(variableName1, variableValue1);
+    verify(mockQuery).taskVariableValueNotEquals(variableName2, variableValue2);
+  }
+  
+  @Test
+  public void testMultipleProcessVariableParameters() {
+    String variableName1 = "varName";
+    String variableValue1 = "varValue";
+    String variableParameter1 = variableName1 + "_eq_" + variableValue1; 
+    
+    String variableName2 = "anotherVarName";
+    String variableValue2 = "anotherVarValue";
+    String variableParameter2 = variableName2 + "_neq_" + variableValue2;
+    
+    String queryValue = variableParameter1 + "," + variableParameter2;
+    
+    given().queryParam("processVariables", queryValue)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .when().get(TASK_QUERY_URL);    
+    
+    verify(mockQuery).processVariableValueEquals(variableName1, variableValue1);
+    verify(mockQuery).processVariableValueNotEquals(variableName2, variableValue2);
   }
 
   @Test

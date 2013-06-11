@@ -205,12 +205,12 @@ public class SignavioConnectorIT {
     String businessModel = bpmnPoolExtractionRoundtrip("HEMERA-2379.sgx", false, null, null, false, null);
     
     // initial x/y-coordinates of messageflow-endpoint (messageflow from non technical pool to technical pool)
-    assertXpathEvaluatesTo("1840.0", "//bpmndi:BPMNEdge[@bpmnElement='messageFlow_24']/omgdi:waypoint[last()]/@x", businessModel);
-    assertXpathEvaluatesTo("852.0", "//bpmndi:BPMNEdge[@bpmnElement='messageFlow_24']/omgdi:waypoint[last()]/@y", businessModel);
+    assertXpathEvaluatesTo("1840.6666666666667", "//bpmndi:BPMNEdge[@bpmnElement='messageFlow_24']/omgdi:waypoint[last()]/@x", businessModel);
+    assertXpathEvaluatesTo("852.8122743336277", "//bpmndi:BPMNEdge[@bpmnElement='messageFlow_24']/omgdi:waypoint[last()]/@y", businessModel);
     
     // initial x/y-coordinates of messageflow-startpoint (messageflow from technical pool to non technical pool)
-    assertXpathEvaluatesTo("1807.0", "//bpmndi:BPMNEdge[@bpmnElement='sid-3630ECEC-DC84-43F3-8373-6EE89E88DA7A']/omgdi:waypoint[1]/@x", businessModel);
-    assertXpathEvaluatesTo("852.0", "//bpmndi:BPMNEdge[@bpmnElement='sid-3630ECEC-DC84-43F3-8373-6EE89E88DA7A']/omgdi:waypoint[1]/@y", businessModel);
+    assertXpathEvaluatesTo("1807.3333333333333", "//bpmndi:BPMNEdge[@bpmnElement='sid-3630ECEC-DC84-43F3-8373-6EE89E88DA7A']/omgdi:waypoint[1]/@x", businessModel);
+    assertXpathEvaluatesTo("852.8122743336277", "//bpmndi:BPMNEdge[@bpmnElement='sid-3630ECEC-DC84-43F3-8373-6EE89E88DA7A']/omgdi:waypoint[1]/@y", businessModel);
   }
 
   @Test
@@ -223,12 +223,12 @@ public class SignavioConnectorIT {
             "HEMERA-2379-import.bpmn");
     
     // x/y-coordinates of the messageflow-endpoint after the import of the changed technical model (messageflow from non technical pool to technical pool)
-    assertXpathEvaluatesTo("1840.0", "//bpmndi:BPMNEdge[@bpmnElement='messageFlow_24']/omgdi:waypoint[last()]/@x", roundtripResult);
-    assertXpathEvaluatesTo("757.0", "//bpmndi:BPMNEdge[@bpmnElement='messageFlow_24']/omgdi:waypoint[last()]/@y", roundtripResult); // the message flow-target is now the pool-border
+    assertXpathEvaluatesTo("1840.6666666666665", "//bpmndi:BPMNEdge[@bpmnElement='messageFlow_24']/omgdi:waypoint[last()]/@x", roundtripResult);
+    assertXpathEvaluatesTo("1017.8122743336279", "//bpmndi:BPMNEdge[@bpmnElement='messageFlow_24']/omgdi:waypoint[last()]/@y", roundtripResult); // the message flow-target is now the pool-border
       
     // x/y-coordinates of the messageflow-startpoint after the import of the changed technical model (messageflow from technical pool to non technical pool)
-    assertXpathEvaluatesTo("1807.0", "//bpmndi:BPMNEdge[@bpmnElement='sid-3630ECEC-DC84-43F3-8373-6EE89E88DA7A']/omgdi:waypoint[1]/@x", roundtripResult);
-    assertXpathEvaluatesTo("757.0", "//bpmndi:BPMNEdge[@bpmnElement='sid-3630ECEC-DC84-43F3-8373-6EE89E88DA7A']/omgdi:waypoint[1]/@y", roundtripResult); // the message flow-source is now the pool-border
+    assertXpathEvaluatesTo("1807.333333333333", "//bpmndi:BPMNEdge[@bpmnElement='sid-3630ECEC-DC84-43F3-8373-6EE89E88DA7A']/omgdi:waypoint[1]/@x", roundtripResult);
+    assertXpathEvaluatesTo("1017.8122743336279", "//bpmndi:BPMNEdge[@bpmnElement='sid-3630ECEC-DC84-43F3-8373-6EE89E88DA7A']/omgdi:waypoint[1]/@y", roundtripResult); // the message flow-source is now the pool-border
     
     assertXpathEvaluatesTo("AutomatedAcquisition", "//bpmn:message[1]/@name", roundtripResult);
     assertXpathEvaluatesTo("ManualAcquisition", "//bpmn:message[2]/@name", roundtripResult);

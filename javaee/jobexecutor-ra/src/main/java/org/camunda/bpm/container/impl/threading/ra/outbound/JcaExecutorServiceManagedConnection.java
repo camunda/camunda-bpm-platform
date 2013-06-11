@@ -45,7 +45,7 @@ public class JcaExecutorServiceManagedConnection implements ManagedConnection {
     this.listeners = Collections.synchronizedList(new ArrayList<ConnectionEventListener>(1));
     this.connection = null;
     JcaExecutorServiceConnector ra = (JcaExecutorServiceConnector) mcf.getResourceAdapter();
-    delegate = ra.getExecutorService();
+    delegate = (ExecutorService) ra.getExecutorServiceWrapper().getExecutorService();
   }
 
   public Object getConnection(Subject subject, ConnectionRequestInfo cxRequestInfo) throws ResourceException {

@@ -13,6 +13,8 @@
 
 package org.camunda.bpm.engine.management;
 
+import java.util.List;
+
 import org.camunda.bpm.engine.repository.Deployment;
 
 public interface DeploymentStatistics extends Deployment {
@@ -26,4 +28,9 @@ public interface DeploymentStatistics extends Deployment {
    * The number of all failed jobs of process instances of definitions contained in this deployment.
    */
   int getFailedJobs();
+  
+  /**
+   * Returns a list of incident statistics.
+   */
+  List<IncidentStatistics> getIncidentStatistics();
 }

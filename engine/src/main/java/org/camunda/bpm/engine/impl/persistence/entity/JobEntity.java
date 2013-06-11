@@ -23,6 +23,8 @@ import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbSqlSession;
 import org.camunda.bpm.engine.impl.db.HasRevision;
 import org.camunda.bpm.engine.impl.db.PersistentObject;
+import org.camunda.bpm.engine.impl.incident.FailedJobIncidentHandler;
+import org.camunda.bpm.engine.impl.incident.IncidentHandler;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandler;
 import org.camunda.bpm.engine.runtime.Job;
@@ -112,7 +114,12 @@ public abstract class JobEntity implements Serializable, Job, PersistentObject, 
       ExecutionEntity execution = Context.getCommandContext()
         .getExecutionManager()
         .findExecutionById(executionId);
-      execution.removeJob(this);
+      execution.removeJob(this);    
+    }
+    
+    // if a job with retries == 0 is deleted this means that the corresponding incident is resolved.
+    if (retries == 0) {
+      removeFailedJobIncident();
     }
   }
 
@@ -151,9 +158,20 @@ public abstract class JobEntity implements Serializable, Job, PersistentObject, 
     return retries;
   }
   public void setRetries(int retries) {
+    if (this.retries == 0 && retries > 0) {
+      removeFailedJobIncident();
+    }
     this.retries = retries;
   }
   
+  private void removeFailedJobIncident() {
+    IncidentHandler handler = Context
+        .getProcessEngineConfiguration()
+        .getIncidentHandler(FailedJobIncidentHandler.INCIDENT_HANDLER_TYPE);
+            
+    handler.resolveIncident(null, null, executionId, id); 
+  }
+
   public String getExceptionStacktrace() {
     String exception = null;
     ByteArrayEntity byteArray = getExceptionByteArray();

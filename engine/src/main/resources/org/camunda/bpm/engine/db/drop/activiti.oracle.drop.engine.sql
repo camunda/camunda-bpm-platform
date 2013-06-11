@@ -10,6 +10,7 @@ drop index ACT_IDX_VAR_EXE;
 drop index ACT_IDX_VAR_PROCINST;
 drop index ACT_IDX_VAR_BYTEARRAY;
 drop index ACT_IDX_JOB_EXCEPTION;
+drop index ACT_IDX_INC_CONFIGURATION;
 
 drop index ACT_IDX_EXEC_BUSKEY;
 drop index ACT_IDX_TASK_CREATE;
@@ -65,6 +66,21 @@ alter table ACT_RU_EVENT_SUBSCR
 alter table ACT_RE_PROCDEF
     drop CONSTRAINT ACT_UNIQ_PROCDEF;
     
+alter table ACT_RU_INCIDENT
+    drop CONSTRAINT ACT_FK_INC_EXE; 
+  
+alter table ACT_RU_INCIDENT
+    drop CONSTRAINT ACT_FK_INC_PROCINST; 
+
+alter table ACT_RU_INCIDENT
+    drop CONSTRAINT ACT_FK_INC_PROCDEF;
+    
+alter table ACT_RU_INCIDENT
+    drop CONSTRAINT ACT_FK_INC_CAUSE; 
+
+alter table ACT_RU_INCIDENT
+    drop CONSTRAINT ACT_FK_INC_RCAUSE; 
+    
 drop index ACT_IDX_EVENT_SUBSCR_CONFIG_;
 drop index ACT_IDX_EVENT_SUBSCR;
 drop index ACT_IDX_ATHRZ_PROCEDEF;
@@ -79,3 +95,4 @@ drop table  ACT_RU_TASK;
 drop table  ACT_RU_EXECUTION;
 drop table  ACT_RU_JOB;
 drop table  ACT_RU_EVENT_SUBSCR;
+drop table  ACT_RU_INCIDENT;

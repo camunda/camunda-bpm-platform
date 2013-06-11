@@ -38,6 +38,7 @@ import java.util.List;
 import org.apache.commons.io.FileUtils;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.impl.bpmn.diagram.ProcessDiagramLayoutFactory;
+import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.repository.DiagramLayout;
 import org.camunda.bpm.engine.repository.DiagramNode;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
@@ -78,7 +79,7 @@ public class ProcessDiagramRetrievalTest {
   private static final boolean OVERWRITE_EXPECTED_HTML_FILES = false;
   
   @Rule
-  public ProcessEngineRule activitiRule = new ProcessEngineRule();
+  public ProcessEngineRule activitiRule = new ProcessEngineRule(PluggableProcessEngineTestCase.getProcessEngine());
 
   /**
    * Provides a list of parameters for

@@ -12,9 +12,10 @@
  */
 package org.camunda.bpm.application.impl;
 
-import javax.naming.InitialContext;
+import javax.ejb.EJBException;
 
 import org.camunda.bpm.application.AbstractProcessApplication;
+import org.camunda.bpm.application.ProcessApplicationInterface;
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.application.ProcessApplicationUnavailableException;
 import org.camunda.bpm.engine.ProcessEngine;
@@ -28,27 +29,30 @@ import org.camunda.bpm.engine.ProcessEngine;
  *
  */
 public class EjbProcessApplicationReference implements ProcessApplicationReference {
+
+  /** this is an EjbProxy and can be cached */
+  protected ProcessApplicationInterface selfReference;
   
-  private final String processApplicationName;
-  
-  private final String processApplicationSessionObjectName;
-  
-  public EjbProcessApplicationReference(String processApplicationName, String processApplicationSessionObjectName) {
-    this.processApplicationName = processApplicationName;
-    this.processApplicationSessionObjectName = processApplicationSessionObjectName;
+  /** the name of the process application */
+  protected String processApplicationName;
+
+  public EjbProcessApplicationReference(ProcessApplicationInterface selfReference, String name) {
+    this.selfReference = selfReference;
+    this.processApplicationName = name;
   }
 
   public String getName() {
     return processApplicationName;
   }
 
-  public AbstractProcessApplication getProcessApplication() throws ProcessApplicationUnavailableException {
+  public ProcessApplicationInterface getProcessApplication() throws ProcessApplicationUnavailableException {
     try {
-      // TODO: do lookup once and cache EJB proxy
-      return InitialContext.doLookup(processApplicationSessionObjectName);
-    } catch (Exception e) {
-      throw new ProcessApplicationUnavailableException("Could not lookup process application using JNDI name '"+processApplicationSessionObjectName+"'", e);
+      // check whether process application is still deployed
+      selfReference.getName();
+    } catch(EJBException e) {
+      throw new ProcessApplicationUnavailableException();
     }
+    return selfReference;
   }
 
   public void processEngineStopping(ProcessEngine processEngine) throws ProcessApplicationUnavailableException {

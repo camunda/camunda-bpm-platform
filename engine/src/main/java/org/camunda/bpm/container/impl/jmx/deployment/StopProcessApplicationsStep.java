@@ -17,11 +17,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.camunda.bpm.application.AbstractProcessApplication;
+import org.camunda.bpm.application.ProcessApplicationInterface;
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.container.impl.jmx.JmxRuntimeContainerDelegate.ServiceTypes;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanDeploymentOperation;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanDeploymentOperationStep;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanServiceContainer;
+import org.camunda.bpm.container.impl.jmx.services.JmxManagedProcessApplication;
 
 /**
  * <p>Deployment operation step that is responsible for stopping all process applications</p>
@@ -40,10 +42,10 @@ public class StopProcessApplicationsStep extends MBeanDeploymentOperationStep {
   public void performOperationStep(MBeanDeploymentOperation operationContext) {
     
     final MBeanServiceContainer serviceContainer = operationContext.getServiceContainer();
-    List<ProcessApplicationReference> processApplicationsReferences = serviceContainer.getServiceValuesByType(ServiceTypes.PROCESS_APPLICATION);
+    List<JmxManagedProcessApplication> processApplicationsReferences = serviceContainer.getServiceValuesByType(ServiceTypes.PROCESS_APPLICATION);
     
-    for (ProcessApplicationReference processApplication : processApplicationsReferences) {
-      stopProcessApplication(processApplication);      
+    for (JmxManagedProcessApplication processApplication : processApplicationsReferences) {
+      stopProcessApplication(processApplication.getProcessApplicationReference());      
     }
 
   }
@@ -59,7 +61,7 @@ public class StopProcessApplicationsStep extends MBeanDeploymentOperationStep {
       // unless the user has overridden the stop behavior, 
       // this causes the process application to remove its services 
       // (triggers nested undeployment operation)
-      AbstractProcessApplication processApplication = processApplicationReference.getProcessApplication();
+      ProcessApplicationInterface processApplication = processApplicationReference.getProcessApplication();
       processApplication.undeploy();
       
     } catch(Throwable t) {

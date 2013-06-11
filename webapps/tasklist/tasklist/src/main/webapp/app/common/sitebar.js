@@ -14,6 +14,7 @@ define(["angular"], function(angular) {
     var tasks;
         
     $scope.colleagueCount = {};
+    $scope.groupCount = {};
 
     $scope.loadSitebar = function () {
       tasks = $scope.tasks = {
@@ -32,9 +33,20 @@ define(["angular"], function(angular) {
       	    	  
                 $scope.colleagueCount[user.id] = data.data.count;   
                 
-      	  }); 
+	    }); 
       	    
-      	});            
+	  });
+	  
+	  angular.forEach(data.data.groups, function(group) {    
+        	  
+      	    EngineApi.getGroupTaskCount(group.id)
+      	      .$then(function(data) {
+      	    	  
+                $scope.groupCount[group.id] = data.data.count;   
+                
+	    }); 
+      	    
+	  });  
       });
            
       

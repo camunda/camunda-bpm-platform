@@ -12,24 +12,14 @@
  */
 package org.camunda.bpm.engine.rest.impl;
 
-import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Response.Status;
-import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.Response.Status;
 
-import org.camunda.bpm.engine.FormService;
 import org.camunda.bpm.engine.ManagementService;
-import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.RepositoryService;
-import org.camunda.bpm.engine.RuntimeService;
-import org.camunda.bpm.engine.form.StartFormData;
-import org.camunda.bpm.engine.impl.util.IoUtil;
-import org.camunda.bpm.engine.management.ActivityStatistics;
-import org.camunda.bpm.engine.management.ActivityStatisticsQuery;
+import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.management.ProcessDefinitionStatistics;
 import org.camunda.bpm.engine.management.ProcessDefinitionStatisticsQuery;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
@@ -37,16 +27,12 @@ import org.camunda.bpm.engine.repository.ProcessDefinitionQuery;
 import org.camunda.bpm.engine.rest.ProcessDefinitionRestService;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.StatisticsResultDto;
-import org.camunda.bpm.engine.rest.dto.repository.ActivityStatisticsResultDto;
-import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDiagramDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionQueryDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionStatisticsResultDto;
-import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
-import org.camunda.bpm.engine.rest.dto.runtime.StartProcessInstanceDto;
-import org.camunda.bpm.engine.rest.dto.task.FormDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
-import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.rest.sub.repository.ProcessDefinitionResource;
+import org.camunda.bpm.engine.rest.sub.repository.ProcessDefinitionResourceImpl;
 
 public class ProcessDefinitionRestServiceImpl extends AbstractRestProcessEngineAware implements ProcessDefinitionRestService {
 
@@ -59,19 +45,19 @@ public class ProcessDefinitionRestServiceImpl extends AbstractRestProcessEngineA
   }
 
   @Override
+  public ProcessDefinitionResource getProcessDefinition(
+      String processDefinitionId) {
+    return new ProcessDefinitionResourceImpl(getProcessEngine(), processDefinitionId, relativeRootResourcePath);
+  }
+
+  @Override
 	public List<ProcessDefinitionDto> getProcessDefinitions(UriInfo uriInfo,
 	    Integer firstResult, Integer maxResults) {
     ProcessDefinitionQueryDto queryDto = new ProcessDefinitionQueryDto(uriInfo.getQueryParameters());
 	  List<ProcessDefinitionDto> definitions = new ArrayList<ProcessDefinitionDto>();
 
-	  RepositoryService repoService = getProcessEngine().getRepositoryService();
-
-	  ProcessDefinitionQuery query;
-	  try {
-	     query = queryDto.toQuery(repoService);
-	  } catch (InvalidRequestException e) {
-	    throw new WebApplicationException(Status.BAD_REQUEST.getStatusCode());
-	  }
+	  ProcessEngine engine = getProcessEngine();
+	  ProcessDefinitionQuery query = queryDto.toQuery(engine);
 
 	  List<ProcessDefinition> matchingDefinitions = null;
 
@@ -102,14 +88,8 @@ public class ProcessDefinitionRestServiceImpl extends AbstractRestProcessEngineA
   public CountResultDto getProcessDefinitionsCount(UriInfo uriInfo) {
 	  ProcessDefinitionQueryDto queryDto = new ProcessDefinitionQueryDto(uriInfo.getQueryParameters());
 	  
-    RepositoryService repoService = getProcessEngine().getRepositoryService();
-
-    ProcessDefinitionQuery query;
-    try {
-       query = queryDto.toQuery(repoService);
-    } catch (InvalidRequestException e) {
-      throw new WebApplicationException(Status.BAD_REQUEST.getStatusCode());
-    }
+	  ProcessEngine engine = getProcessEngine();
+    ProcessDefinitionQuery query = queryDto.toQuery(engine);
 
     long count = query.count();
     CountResultDto result = new CountResultDto();
@@ -117,45 +97,24 @@ public class ProcessDefinitionRestServiceImpl extends AbstractRestProcessEngineA
     return result;
   }
 
+  
   @Override
-  public ProcessDefinitionDto getProcessDefinition(String processDefinitionId) {
-    RepositoryService repoService = getProcessEngine().getRepositoryService();
-
-    ProcessDefinition definition;
-    try {
-      definition = repoService.getProcessDefinition(processDefinitionId);
-    } catch (ProcessEngineException e) {
-      throw new WebApplicationException(Status.BAD_REQUEST.getStatusCode());
+  public List<StatisticsResultDto> getStatistics(Boolean includeFailedJobs, Boolean includeIncidents, String includeIncidentsForType) {
+    if (includeIncidents != null && includeIncidentsForType != null) {
+      throw new InvalidRequestException(Status.BAD_REQUEST, "Only one of the query parameter includeIncidents or includeIncidentsForType can be set.");
     }
-
-    ProcessDefinitionDto result = ProcessDefinitionDto.fromProcessDefinition(definition);
-
-    return result;
-  }
-
-  @Override
-  public ProcessInstanceDto startProcessInstance(UriInfo context, String processDefinitionId, StartProcessInstanceDto parameters) {
-    RuntimeService runtimeService = getProcessEngine().getRuntimeService();
-
-    ProcessInstance instance = null;
-    try {
-      instance = runtimeService.startProcessInstanceById(processDefinitionId, parameters.getVariables());
-    } catch (ProcessEngineException e) {
-      throw new WebApplicationException(Status.INTERNAL_SERVER_ERROR);
-    }
-
-    ProcessInstanceDto result = ProcessInstanceDto.fromProcessInstance(instance);
-    UriBuilder rootUriBuilder = context.getBaseUriBuilder().path(relativeRootResourcePath);
-    result.addReflexiveLink(rootUriBuilder, null, "self");
-    return result;
-  }
-
-  @Override
-  public List<StatisticsResultDto> getStatistics(Boolean includeFailedJobs) {
+    
     ManagementService mgmtService = getProcessEngine().getManagementService();
     ProcessDefinitionStatisticsQuery query = mgmtService.createProcessDefinitionStatisticsQuery();
+    
     if (includeFailedJobs != null && includeFailedJobs) {
       query.includeFailedJobs();
+    }
+    
+    if (includeIncidents != null && includeIncidents) {
+      query.includeIncidents();
+    } else if (includeIncidentsForType != null) {
+      query.includeIncidentsForType(includeIncidentsForType);
     }
 
     List<ProcessDefinitionStatistics> queryResults = query.list();
@@ -168,51 +127,7 @@ public class ProcessDefinitionRestServiceImpl extends AbstractRestProcessEngineA
 
     return results;
   }
+	
+	
 
-  @Override
-  public List<StatisticsResultDto> getActivityStatistics(String processDefinitionId, Boolean includeFailedJobs) {
-    ManagementService mgmtService = getProcessEngine().getManagementService();
-    ActivityStatisticsQuery query = mgmtService.createActivityStatisticsQuery(processDefinitionId);
-    if (includeFailedJobs != null && includeFailedJobs) {
-      query.includeFailedJobs();
-    }
-
-    List<ActivityStatistics> queryResults = query.list();
-
-    List<StatisticsResultDto> results = new ArrayList<StatisticsResultDto>();
-    for (ActivityStatistics queryResult : queryResults) {
-      StatisticsResultDto dto = ActivityStatisticsResultDto.fromActivityStatistics(queryResult);
-      results.add(dto);
-    }
-
-    return results;
-  }
-
-  @Override
-  public ProcessDefinitionDiagramDto getProcessDefinitionBpmn20Xml(String processDefinitionId) {
-    InputStream processModelIn = null;
-    try {
-      processModelIn = getProcessEngine().getRepositoryService().getProcessModel(processDefinitionId);
-      byte[] processModel = IoUtil.readInputStream(processModelIn, "processModelBpmn20Xml");
-      return ProcessDefinitionDiagramDto.create(processDefinitionId, new String(processModel, "UTF-8"));
-    } catch (Exception e) {
-      throw new WebApplicationException(e, Status.BAD_REQUEST);
-    } finally {
-      IoUtil.closeSilently(processModelIn);
-    }
-  }
-
-  @Override
-  public FormDto getStartForm(String processDefinitionId) {
-    final FormService formService = getProcessEngine().getFormService();
-    
-    final StartFormData formData;
-    try {
-      formData = formService.getStartFormData(processDefinitionId);
-    } catch (ProcessEngineException e) {
-      throw new WebApplicationException(Status.BAD_REQUEST.getStatusCode());
-    }
-
-    return FormDto.fromFormData(formData);
-  }
 }

@@ -29,6 +29,7 @@ import org.camunda.bpm.engine.impl.cmd.GetExecutionVariableCmd;
 import org.camunda.bpm.engine.impl.cmd.GetExecutionVariablesCmd;
 import org.camunda.bpm.engine.impl.cmd.GetStartFormCmd;
 import org.camunda.bpm.engine.impl.cmd.MessageEventReceivedCmd;
+import org.camunda.bpm.engine.impl.cmd.PatchExecutionVariablesCmd;
 import org.camunda.bpm.engine.impl.cmd.RemoveExecutionVariablesCmd;
 import org.camunda.bpm.engine.impl.cmd.SetExecutionVariablesCmd;
 import org.camunda.bpm.engine.impl.cmd.SignalCmd;
@@ -37,6 +38,7 @@ import org.camunda.bpm.engine.impl.cmd.StartProcessInstanceByMessageCmd;
 import org.camunda.bpm.engine.impl.cmd.StartProcessInstanceCmd;
 import org.camunda.bpm.engine.impl.cmd.SuspendProcessInstanceCmd;
 import org.camunda.bpm.engine.runtime.ExecutionQuery;
+import org.camunda.bpm.engine.runtime.IncidentQuery;
 import org.camunda.bpm.engine.runtime.NativeExecutionQuery;
 import org.camunda.bpm.engine.runtime.NativeProcessInstanceQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -94,7 +96,11 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
 
   public NativeProcessInstanceQuery createNativeProcessInstanceQuery() {
     return new NativeProcessInstanceQueryImpl(commandExecutor);
-  }  
+  }
+  
+  public IncidentQuery createIncidentQuery() {
+    return new IncidentQueryImpl(commandExecutor);
+  }
   
   public Map<String, Object> getVariables(String executionId) {
     return commandExecutor.execute(new GetExecutionVariablesCmd(executionId, null, false));
@@ -165,6 +171,14 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
 
   public void removeVariablesLocal(String executionId, Collection<String> variableNames) {
     commandExecutor.execute(new RemoveExecutionVariablesCmd(executionId, variableNames, true));    
+  }
+  
+  public void updateVariables(String executionId, Map<String, ? extends Object> modifications, Collection<String> deletions) {
+    commandExecutor.execute(new PatchExecutionVariablesCmd(executionId, modifications, deletions, false));
+  }
+  
+  public void updateVariablesLocal(String executionId, Map<String, ? extends Object> modifications, Collection<String> deletions) {
+    commandExecutor.execute(new PatchExecutionVariablesCmd(executionId, modifications, deletions, true));
   }
 
   public void signal(String executionId) {

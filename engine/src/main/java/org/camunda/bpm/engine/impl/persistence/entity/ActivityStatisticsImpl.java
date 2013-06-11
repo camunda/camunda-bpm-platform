@@ -13,13 +13,17 @@
 
 package org.camunda.bpm.engine.impl.persistence.entity;
 
+import java.util.List;
+
 import org.camunda.bpm.engine.management.ActivityStatistics;
+import org.camunda.bpm.engine.management.IncidentStatistics;
 
 public class ActivityStatisticsImpl implements ActivityStatistics {
 
   protected String id;
   protected int instances;
   protected int failedJobs;
+  protected List<IncidentStatistics> incidentStatistics;
   
   public String getId() {
     return id;
@@ -38,5 +42,11 @@ public class ActivityStatisticsImpl implements ActivityStatistics {
   }
   public void setFailedJobs(int failedJobs) {
     this.failedJobs = failedJobs;
+  }
+  public List<IncidentStatistics> getIncidentStatistics() {
+    return incidentStatistics;
+  }
+  public void setIncidentStatistics(List<IncidentStatistics> incidentStatistics) {
+    this.incidentStatistics = incidentStatistics;
   }
 }

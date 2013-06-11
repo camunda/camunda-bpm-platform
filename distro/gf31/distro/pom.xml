@@ -62,7 +62,7 @@
     
     <dependency>
       <groupId>org.camunda.bpm.cockpit</groupId>
-      <artifactId>camunda-cockpit</artifactId>
+      <artifactId>camunda-cockpit-glassfish</artifactId>
       <version>${project.version}</version>
       <type>war</type>
     </dependency>

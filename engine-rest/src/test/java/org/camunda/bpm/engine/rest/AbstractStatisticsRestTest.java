@@ -83,6 +83,64 @@ public abstract class AbstractStatisticsRestTest extends AbstractRestServiceTest
     inOrder.verify(processDefinitionQueryMock).includeFailedJobs();
     inOrder.verify(processDefinitionQueryMock).list();
   }
+  
+  @Test
+  public void testAdditionalIncidentsOption() {
+    given().queryParam("incidents", "true")
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when().get(PROCESS_DEFINITION_STATISTICS_URL);
+    
+    InOrder inOrder = Mockito.inOrder(processDefinitionQueryMock);
+    inOrder.verify(processDefinitionQueryMock).includeIncidents();
+    inOrder.verify(processDefinitionQueryMock).list();
+  }
+  
+  @Test
+  public void testAdditionalIncidentsForTypeOption() {
+    given().queryParam("incidentsForType", "failedJob")
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when().get(PROCESS_DEFINITION_STATISTICS_URL);
+    
+    InOrder inOrder = Mockito.inOrder(processDefinitionQueryMock);
+    inOrder.verify(processDefinitionQueryMock).includeIncidentsForType("failedJob");
+    inOrder.verify(processDefinitionQueryMock).list();
+  }
+  
+  @Test
+  public void testAdditionalIncidentsAndFailedJobsOption() {
+    given().queryParam("incidents", "true").queryParam("failedJobs", "true")
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when().get(PROCESS_DEFINITION_STATISTICS_URL);
+    
+    InOrder inOrder = Mockito.inOrder(processDefinitionQueryMock);
+    inOrder.verify(processDefinitionQueryMock).includeFailedJobs();
+    inOrder.verify(processDefinitionQueryMock).includeIncidents();
+    inOrder.verify(processDefinitionQueryMock).list();
+  }
+  
+  @Test
+  public void testAdditionalIncidentsForTypeAndFailedJobsOption() {
+    given().queryParam("incidentsForType", "failedJob").queryParam("failedJobs", "true")
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when().get(PROCESS_DEFINITION_STATISTICS_URL);
+    
+    InOrder inOrder = Mockito.inOrder(processDefinitionQueryMock);
+    inOrder.verify(processDefinitionQueryMock).includeFailedJobs();
+    inOrder.verify(processDefinitionQueryMock).includeIncidentsForType("failedJob");
+    inOrder.verify(processDefinitionQueryMock).list();
+  }
+  
+  @Test
+  public void testAdditionalIncidentsAndIncidentsForType() {
+    given().queryParam("incidents", "true").queryParam("incidentsForType", "anIncidentTpye")
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+    .when().get(PROCESS_DEFINITION_STATISTICS_URL);
+  }
 
   @Test
   public void testActivityStatisticsWithFailedJobs() {
@@ -95,4 +153,66 @@ public abstract class AbstractStatisticsRestTest extends AbstractRestServiceTest
     inOrder.verify(activityQueryMock).includeFailedJobs();
     inOrder.verify(activityQueryMock).list();
   }
+  
+  @Test
+  public void testActivityStatisticsWithIncidents() {
+    given().pathParam("id", "aDefinitionId").queryParam("incidents", "true")
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when().get(ACTIVITY_STATISTICS_URL);
+    
+    InOrder inOrder = Mockito.inOrder(activityQueryMock);
+    inOrder.verify(activityQueryMock).includeIncidents();
+    inOrder.verify(activityQueryMock).list();
+  }
+  
+  @Test
+  public void testActivityStatisticsIncidentsForTypeTypeOption() {
+    given().pathParam("id", "aDefinitionId").queryParam("incidentsForType", "failedJob")
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when().get(ACTIVITY_STATISTICS_URL);
+    
+    InOrder inOrder = Mockito.inOrder(activityQueryMock);
+    inOrder.verify(activityQueryMock).includeIncidentsForType("failedJob");
+    inOrder.verify(activityQueryMock).list();
+  }
+  
+  @Test
+  public void testActivtyStatisticsIncidentsAndFailedJobsOption() {
+    given().pathParam("id", "aDefinitionId")
+    .queryParam("incidents", "true").queryParam("failedJobs", "true")
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when().get(ACTIVITY_STATISTICS_URL);
+    
+    InOrder inOrder = Mockito.inOrder(activityQueryMock);
+    inOrder.verify(activityQueryMock).includeFailedJobs();
+    inOrder.verify(activityQueryMock).includeIncidents();
+    inOrder.verify(activityQueryMock).list();
+  }
+  
+  @Test
+  public void testActivtyStatisticsIncidentsForTypeAndFailedJobsOption() {
+    given().pathParam("id", "aDefinitionId")
+    .queryParam("incidentsForType", "failedJob").queryParam("failedJobs", "true")
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when().get(ACTIVITY_STATISTICS_URL);
+    
+    InOrder inOrder = Mockito.inOrder(activityQueryMock);
+    inOrder.verify(activityQueryMock).includeFailedJobs();
+    inOrder.verify(activityQueryMock).includeIncidentsForType("failedJob");
+    inOrder.verify(activityQueryMock).list();
+  }
+  
+  @Test
+  public void testActivtyStatisticsIncidentsAndIncidentsForType() {
+    given().pathParam("id", "aDefinitionId")
+    .queryParam("incidents", "true").queryParam("incidentsForType", "anIncidentTpye")
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+    .when().get(ACTIVITY_STATISTICS_URL);
+  }
+
 }

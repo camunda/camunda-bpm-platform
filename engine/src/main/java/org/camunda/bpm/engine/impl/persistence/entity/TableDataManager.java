@@ -41,6 +41,7 @@ import org.camunda.bpm.engine.management.TablePage;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.Execution;
+import org.camunda.bpm.engine.runtime.Incident;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
@@ -66,6 +67,8 @@ public class TableDataManager extends AbstractManager {
     persistentObjectToTableNameMap.put(JobEntity.class, "ACT_RU_JOB");
     persistentObjectToTableNameMap.put(MessageEntity.class, "ACT_RU_JOB");
     persistentObjectToTableNameMap.put(TimerEntity.class, "ACT_RU_JOB");
+    
+    persistentObjectToTableNameMap.put(IncidentEntity.class, "ACT_RU_INCIDENT");
     
     persistentObjectToTableNameMap.put(EventSubscriptionEntity.class, "ACT_RU_EVENT_SUBSCRIPTION");
     persistentObjectToTableNameMap.put(CompensateEventSubscriptionEntity.class, "ACT_RU_EVENT_SUBSCRIPTION");    
@@ -111,6 +114,8 @@ public class TableDataManager extends AbstractManager {
     apiTypeToTableNameMap.put(ProcessDefinition.class, "ACT_RE_PROCDEF");
     apiTypeToTableNameMap.put(Deployment.class, "ACT_RE_DEPLOYMENT");    
     apiTypeToTableNameMap.put(Job.class, "ACT_RU_JOB");
+    apiTypeToTableNameMap.put(Incident.class, "ACT_RU_INCIDENT");
+    
     
     // history
     apiTypeToTableNameMap.put(HistoricProcessInstance.class, "ACT_HI_PROCINST");

@@ -17,40 +17,31 @@ import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.GroupQuery;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.identity.UserQuery;
+import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
-import org.camunda.bpm.engine.task.Task;
-import org.camunda.bpm.engine.task.TaskQuery;
 import org.junit.Before;
 import org.junit.Test;
+
+import com.jayway.restassured.http.ContentType;
 
 public abstract class AbstractIdentityRestServiceQueryTest extends AbstractRestServiceTest {
 
   protected static final String IDENTITY_URL = TEST_RESOURCE_ROOT_PATH + "/identity";
   protected static final String TASK_GROUPS_URL = IDENTITY_URL + "/groups";
   
+  private User mockUser;
+  
   @Before
   public void setUpRuntimeData() {
     createMockIdentityQueries();
-    createMockTaskQuery();
   }
   
-  private void createMockTaskQuery() {
-    List<Task> mockedTasks = MockProvider.createMockTasks();
-    
-    TaskQuery sampleTaskQuery = mock(TaskQuery.class);
-    when(sampleTaskQuery.list()).thenReturn(mockedTasks);
-    when(sampleTaskQuery.count()).thenReturn((long) mockedTasks.size());
-    when(sampleTaskQuery.taskCandidateGroup(anyString())).thenReturn(sampleTaskQuery);
-  
-    when(processEngine.getTaskService().createTaskQuery()).thenReturn(sampleTaskQuery);
-  }
-
   private void createMockIdentityQueries() {
     UserQuery sampleUserQuery = mock(UserQuery.class);
     
     List<User> mockUsers = new ArrayList<User>();
     
-    User mockUser = MockProvider.createMockUser();
+    mockUser = MockProvider.createMockUser();
     mockUsers.add(mockUser);
   
     when(sampleUserQuery.list()).thenReturn(mockUsers);
@@ -80,12 +71,16 @@ public abstract class AbstractIdentityRestServiceQueryTest extends AbstractRestS
         .body("groups.size()", is(1))
         .body("groups[0].id", equalTo(MockProvider.EXAMPLE_GROUP_ID))
         .body("groups[0].name", equalTo(MockProvider.EXAMPLE_GROUP_NAME))
+        .body("groupUsers.size()", is(1))
+        .body("groupUsers[0].id", equalTo(mockUser.getId()))
         .when().get(TASK_GROUPS_URL);
   }
   
   @Test
   public void testGroupInfoQueryWithMissingUserParameter() {
-    expect().statusCode(Status.BAD_REQUEST.getStatusCode())
+    expect().statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+    .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+    .body("message", equalTo("No user id was supplied"))
     .when().get(TASK_GROUPS_URL);
   }
 }

@@ -20,13 +20,18 @@ import org.camunda.bpm.engine.FormService;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.form.TaskFormData;
+import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.helper.EqualsMap;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
+import org.camunda.bpm.engine.rest.util.VariablesBuilder;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Matchers;
+
+import com.jayway.restassured.http.ContentType;
 
 public abstract class AbstractTaskRestServiceInteractionTest extends
     AbstractRestServiceTest {
@@ -124,7 +129,9 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     given().pathParam("id", MockProvider.EXAMPLE_TASK_ID)
       .contentType(POST_JSON_CONTENT_TYPE).body(EMPTY_JSON_OBJECT)
       .then().expect()
-        .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
+        .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).contentType(ContentType.JSON)
+        .body("type", equalTo(ProcessEngineException.class.getSimpleName()))
+        .body("message", equalTo("expected exception"))
       .when().post(CLAIM_TASK_URL);
   }
 
@@ -144,7 +151,9 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     
     given().pathParam("id", MockProvider.EXAMPLE_TASK_ID)
       .then().expect()
-        .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
+        .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).contentType(ContentType.JSON)
+        .body("type", equalTo(ProcessEngineException.class.getSimpleName()))
+        .body("message", equalTo("expected exception"))
       .when().post(UNCLAIM_TASK_URL);
   }
 
@@ -161,10 +170,10 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
 
   @Test
   public void testCompleteWithParameters() {
-    Map<String, Object> variables = new HashMap<String, Object>();
-    variables.put("aVariable", "aStringValue");
-    variables.put("anotherVariable", 42);
-    variables.put("aThirdVariable", Boolean.TRUE);
+    Map<String, Object> variables = VariablesBuilder.create()
+        .variable("aVariable", "aStringValue")
+        .variable("anotherVariable", 42)
+        .variable("aThirdValue", Boolean.TRUE).getVariables();
     
     Map<String, Object> json = new HashMap<String, Object>();
     json.put("variables", variables);
@@ -175,7 +184,12 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
         .statusCode(Status.NO_CONTENT.getStatusCode())
       .when().post(COMPLETE_TASK_URL);
     
-    verify(taskServiceMock).complete(eq(MockProvider.EXAMPLE_TASK_ID), argThat(new EqualsMap(variables)));
+    Map<String, Object> expectedVariables = new HashMap<String, Object>();
+    expectedVariables.put("aVariable", "aStringValue");
+    expectedVariables.put("anotherVariable", 42);
+    expectedVariables.put("aThirdValue", Boolean.TRUE);
+    
+    verify(taskServiceMock).complete(eq(MockProvider.EXAMPLE_TASK_ID), argThat(new EqualsMap(expectedVariables)));
   }
 
   @Test
@@ -185,16 +199,18 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     given().pathParam("id", MockProvider.EXAMPLE_TASK_ID)
       .contentType(POST_JSON_CONTENT_TYPE).body(EMPTY_JSON_OBJECT)
       .then().expect()
-        .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
+        .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).contentType(ContentType.JSON)
+        .body("type", equalTo(ProcessEngineException.class.getSimpleName()))
+        .body("message", equalTo("expected exception"))
       .when().post(COMPLETE_TASK_URL);
   }
 
   @Test
   public void testResolveTask() {
-    Map<String, Object> variables = new HashMap<String, Object>();
-    variables.put("aVariable", "aStringValue");
-    variables.put("anotherVariable", 42);
-    variables.put("aThirdVariable", Boolean.TRUE);
+    Map<String, Object> variables = VariablesBuilder.create()
+        .variable("aVariable", "aStringValue")
+        .variable("anotherVariable", 42)
+        .variable("aThirdValue", Boolean.TRUE).getVariables();
     
     Map<String, Object> json = new HashMap<String, Object>();
     json.put("variables", variables);
@@ -205,7 +221,12 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
       .statusCode(Status.NO_CONTENT.getStatusCode())
     .when().post(RESOLVE_TASK_URL);
     
-    verify(taskServiceMock).resolveTask(eq(MockProvider.EXAMPLE_TASK_ID), argThat(new EqualsMap(variables)));
+    Map<String, Object> expectedVariables = new HashMap<String, Object>();
+    expectedVariables.put("aVariable", "aStringValue");
+    expectedVariables.put("anotherVariable", 42);
+    expectedVariables.put("aThirdValue", Boolean.TRUE);
+    
+    verify(taskServiceMock).resolveTask(eq(MockProvider.EXAMPLE_TASK_ID), argThat(new EqualsMap(expectedVariables)));
   }
 
   @Test
@@ -215,7 +236,9 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     given().pathParam("id", MockProvider.EXAMPLE_TASK_ID)
     .contentType(POST_JSON_CONTENT_TYPE).body(EMPTY_JSON_OBJECT)
     .then().expect()
-      .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
+      .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).contentType(ContentType.JSON)
+      .body("type", equalTo(ProcessEngineException.class.getSimpleName()))
+      .body("message", equalTo("expected exception"))
     .when().post(RESOLVE_TASK_URL);
   }
 
@@ -224,7 +247,9 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     when(mockQuery.singleResult()).thenReturn(null);
     
     given().pathParam("id", "aNonExistingTaskId")
-      .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
+      .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", equalTo("No task id supplied"))
       .when().get(SINGLE_TASK_URL);
   }
 
@@ -233,7 +258,9 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     when(formServiceMock.getTaskFormData(anyString())).thenThrow(new ProcessEngineException("Expected exception: task does not exist."));
     
     given().pathParam("id", "aNonExistingTaskId")
-      .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
+      .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+      .body("type", equalTo(RestException.class.getSimpleName()))
+      .body("message", equalTo("Cannot get form for task aNonExistingTaskId"))
       .when().get(TASK_FORM_URL);
   }
 
@@ -261,7 +288,9 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     given().pathParam("id", MockProvider.EXAMPLE_TASK_ID)
     .contentType(POST_JSON_CONTENT_TYPE).body(json)
     .then().expect()
-      .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
+      .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).contentType(ContentType.JSON)
+      .body("type", equalTo(ProcessEngineException.class.getSimpleName()))
+      .body("message", equalTo("expected exception"))
     .when().post(DELEGATE_TASK_URL);
   }
 
