@@ -25,6 +25,7 @@ import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
+import org.camunda.bpm.engine.impl.pvm.PvmScope;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 
 /**
@@ -71,11 +72,16 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     evt.setActivityInstanceId(activityInstanceId);
     evt.setParentActivityInstanceId(parentActivityInstanceId);
 
-    if (activityId != null) {
-      evt.setActivityId(activityId);
-      evt.setActivityName((String) execution.getActivity().getProperty("name"));
-      evt.setActivityType((String) execution.getActivity().getProperty("type"));
+    PvmScope eventSource = null;
+    if(activityId != null) {
+      eventSource = execution.getActivity();
+    } else {
+      eventSource = (PvmScope) execution.getEventSource(); 
     }
+
+    evt.setActivityId(eventSource.getId());
+    evt.setActivityName((String) eventSource.getProperty("name"));
+    evt.setActivityType((String) eventSource.getProperty("type"));
         
   }
   
