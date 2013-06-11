@@ -1,10 +1,10 @@
 /**
- * ngDefine() - a friendly integration of angularjs into requirejs powered applications
+ * ngDefine() - a friendly integration of AngularJS into RequireJS powered applications
  *
  * @version 1.0.0
- * @author nico.rehwaldt <http://github.com/Nikku>
+ * @author Nico Rehwaldt <http://github.com/Nikku>
  *
- * @license MIT
+ * @license (c) 2013 Nico Rehwaldt, MIT
  */
 (function(window) {
 
@@ -70,7 +70,9 @@
     }
 
     if (modules.length && exists) {
-      throw new Error("Failed to define module " + name + ". Already exists");
+      throw new Error(
+        "Cannot re-define angular module " + name + " with new dependencies [" + modules + "]. " +
+        "Make sure the module is not defined else where or define a sub-module with additional angular module dependencies instead.");
     }
 
     if (modules.length || !exists) {
@@ -102,7 +104,7 @@
   var angularDefine = function(angular) {
     return function(name, dependencies, body) {
       if (!dependencies) {
-        throw new Error("wrong number of arguments, expected name, [dependencies, ]body");
+        throw new Error("wrong number of arguments, expected name[, dependencies], body");
       }
       internalModule(angular, name, dependencies, body);
     };
