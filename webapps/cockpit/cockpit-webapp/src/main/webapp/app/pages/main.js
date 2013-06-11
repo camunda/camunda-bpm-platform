@@ -1,6 +1,7 @@
 ngDefine('cockpit.pages', [
   './dashboard', 
-  './processDefinition'
+  './processDefinition',
+  './processInstance'
 ], function(module) {
 
 });

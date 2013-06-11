@@ -3,7 +3,7 @@ ngDefine('cockpit.directives', [
   './fillWidth',
   './pageOverflowHidden',
   './processDiagram',
-  './miniatureProcessDiagram',
+  './activityStatistics',
   './hidePanel'
 ], function(module) {
 
