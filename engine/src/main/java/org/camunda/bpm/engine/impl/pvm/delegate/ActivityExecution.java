@@ -35,6 +35,20 @@ public interface ActivityExecution extends DelegateExecution {
    */
   PvmActivity getActivity();
   
+  /** invoked to notify the execution that a new activity instance is started */
+  void enterActivityInstance();
+  
+  /** invoked to notify the execution that an activity instance is ended. */
+  void leaveActivityInstance();
+  
+  /** return the Id of the activity instance currently executed by this execution */
+  String getActivityInstanceId();
+  
+  void setActivityInstanceId(String id);
+  
+  /** return the Id of the parent activity instance currently executed by this execution */
+  String getParentActivityInstanceId();
+  
   /**
    * leaves the current activity by taking the given transition.
    */
@@ -145,4 +159,5 @@ public interface ActivityExecution extends DelegateExecution {
    * resources are removed. The execution itself can continue execution. 
    */
   void destroyScope(String string);
+  
 }

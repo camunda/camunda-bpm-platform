@@ -19,10 +19,11 @@ import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 /**
  * @author Tom Baeyens
  */
-public class AtomicOperationActivityStart extends AbstractEventAtomicOperation {
+public class AtomicOperationActivityStart extends AtomicOperationActivityInstanceStart {
 
   @Override
   protected void eventNotificationsCompleted(InterpretableExecution execution) {
+    super.eventNotificationsCompleted(execution);
     execution.performOperation(AtomicOperation.ACTIVITY_EXECUTE);
   }
 

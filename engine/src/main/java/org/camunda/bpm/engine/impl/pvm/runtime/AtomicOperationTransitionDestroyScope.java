@@ -33,6 +33,8 @@ public class AtomicOperationTransitionDestroyScope implements AtomicOperation {
 
   @SuppressWarnings("unchecked")
   public void execute(InterpretableExecution execution) {
+    
+    // calculate the propagating execution
     InterpretableExecution propagatingExecution = null;
 
     ActivityImpl activity = (ActivityImpl) execution.getActivity();

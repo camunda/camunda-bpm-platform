@@ -175,7 +175,7 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
               || collectionVariable != null;
   }
   
-  protected boolean isExtraScopeNeeded() {
+  public boolean isExtraScopeNeeded() {
     // special care is needed when the behavior is an embedded subprocess (not very clean, but it works)
     return innerActivityBehavior instanceof org.camunda.bpm.engine.impl.bpmn.behavior.SubProcessActivityBehavior;  
   }

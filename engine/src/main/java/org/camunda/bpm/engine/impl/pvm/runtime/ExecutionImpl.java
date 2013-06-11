@@ -18,10 +18,14 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.PvmException;
 import org.camunda.bpm.engine.impl.pvm.PvmExecution;
@@ -54,12 +58,17 @@ public class ExecutionImpl implements
   
   private static Logger log = Logger.getLogger(ExecutionImpl.class.getName());
   
+  private static AtomicInteger idGenerator = new AtomicInteger();
+  
   // current position /////////////////////////////////////////////////////////
   
   protected ProcessDefinitionImpl processDefinition;
 
   /** current activity */
   protected ActivityImpl activity;
+  
+  /** the Id of the current activity instance */
+  protected String activityInstanceId;
   
   /** current transition.  is null when there is no transition being taken. */
   protected TransitionImpl transition = null;
@@ -153,6 +162,9 @@ public class ExecutionImpl implements
     createdExecution.setProcessDefinition(getProcessDefinition());
     createdExecution.setProcessInstance(getProcessInstance());
     createdExecution.setActivity(getActivity());
+    
+    // make created execution start in same activity instance
+    createdExecution.activityInstanceId = activityInstanceId;
     
     return createdExecution;
   }
@@ -402,6 +414,65 @@ public class ExecutionImpl implements
 
   /** must be called before the activity member field or getActivity() is called */
   protected void ensureActivityInitialized() {
+  }
+    
+  public void enterActivityInstance() {
+    
+    activity = getActivity();
+    // special treatment for starting process instance
+    if(activity == null && startingExecution!= null) {
+      activity = startingExecution.getInitial();
+    }
+    
+    activityInstanceId = generateActivityInstanceId(activity.getId());
+    
+    if(log.isLoggable(Level.FINE)) {
+      log.fine("[ENTER] "+this + ": "+activityInstanceId+", parent: "+getParentActivityInstanceId());
+    }
+    
+  }
+    
+  public void leaveActivityInstance() {
+    
+    if(activityInstanceId != null) {
+      
+      if(log.isLoggable(Level.FINE)) {
+        log.fine("[LEAVE] "+ this + ": "+activityInstanceId );
+      }
+      
+      activityInstanceId = getParentActivityInstanceId();
+    }    
+    
+  }
+  
+  public String getParentActivityInstanceId() {
+    if(isProcessInstance()) {
+      return String.valueOf(System.identityHashCode(getProcessInstance()));    
+    } else { 
+      ExecutionImpl parent = getParent();
+      ActivityImpl activity = getActivity();
+      ActivityImpl parentActivity = parent.getActivity();
+      if (parent.isScope() && !isConcurrent() || parent.isConcurrent
+         && activity != parentActivity
+        ) {
+        return parent.getActivityInstanceId();        
+      } else {
+        return parent.getParentActivityInstanceId();        
+      }
+    }
+  }
+  
+  /**
+   * generates an activity instance id
+   */
+  protected String generateActivityInstanceId(String activityId) {
+    int nextId = idGenerator.incrementAndGet();
+    String compositeId = activityId+":"+nextId;
+    if(compositeId.length()>64) {
+      return String.valueOf(nextId);
+    } else {
+      return compositeId;
+    }
   }
   
   // scopes ///////////////////////////////////////////////////////////////////
@@ -761,6 +832,8 @@ public class ExecutionImpl implements
   }
   public void setReplacedBy(InterpretableExecution replacedBy) {
     this.replacedBy = (ExecutionImpl) replacedBy;
+    // set execution to this activity instance
+    replacedBy.setActivityInstanceId(this.activityInstanceId);
   }
   public void setExecutions(List<ExecutionImpl> executions) {
     this.executions = executions;
@@ -868,5 +941,13 @@ public class ExecutionImpl implements
     this.deleteReason = deleteReason;
     this.deleteRoot = true;
     performOperation(new FoxAtomicOperationDeleteCascadeFireActivityEnd());
+  }
+  
+  public String getActivityInstanceId() {
+    return activityInstanceId;
+  }
+  
+  public void setActivityInstanceId(String activityInstanceId) {
+    this.activityInstanceId = activityInstanceId;
   }
 }

@@ -20,7 +20,7 @@ import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 /**
  * @author Tom Baeyens
  */
-public class AtomicOperationDeleteCascadeFireActivityEnd extends AbstractEventAtomicOperation {
+public class AtomicOperationDeleteCascadeFireActivityEnd extends AtomicOperationActivityInstanceEnd {
 
   @Override
   protected ScopeImpl getScope(InterpretableExecution execution) {
@@ -41,9 +41,12 @@ public class AtomicOperationDeleteCascadeFireActivityEnd extends AbstractEventAt
   protected String getEventName() {
     return org.camunda.bpm.engine.impl.pvm.PvmEvent.EVENTNAME_END;
   }
-
+  
   @Override
   protected void eventNotificationsCompleted(InterpretableExecution execution) {
+    
+    super.eventNotificationsCompleted(execution);
+    
     ActivityImpl activity = (ActivityImpl) execution.getActivity();
     if ( (execution.isScope())
             && (activity!=null)
