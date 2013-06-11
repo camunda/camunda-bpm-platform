@@ -60,6 +60,8 @@ import org.camunda.bpm.engine.impl.RuntimeServiceImpl;
 import org.camunda.bpm.engine.impl.ServiceImpl;
 import org.camunda.bpm.engine.impl.TaskServiceImpl;
 import org.camunda.bpm.engine.impl.application.ProcessApplicationManager;
+import org.camunda.bpm.engine.impl.audit.handler.AuditEventHandler;
+import org.camunda.bpm.engine.impl.audit.handler.DbAuditEventHandler;
 import org.camunda.bpm.engine.impl.bpmn.data.ItemInstance;
 import org.camunda.bpm.engine.impl.bpmn.deployer.BpmnDeployer;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseListener;
@@ -318,6 +320,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected ProcessApplicationManager processApplicationManager;
   
   protected CorrelationHandler correlationHandler;
+  
+  protected AuditEventHandler auditEventHandler;
     
   // buildProcessEngine ///////////////////////////////////////////////////////
   
@@ -355,7 +359,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initFailedJobCommandFactory();
     initProcessApplicationManager();
     initCorrelationHandler();
-    initIncidentHandlers();
+    initIncidentHandlers();    initAuditEventHandler();
   }
 
   // failedJobCommandFactory ////////////////////////////////////////////////////////
@@ -1021,6 +1025,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       correlationHandler = new DefaultCorrelationHandler();
     }
     
+  }
+  
+  // audit event handler /////////////////////////////////////////////////////
+  
+  protected void initAuditEventHandler() {
+    if(auditEventHandler == null) {
+      auditEventHandler = new DbAuditEventHandler();
+    }
   }
 
   // getters and setters //////////////////////////////////////////////////////
@@ -1800,6 +1812,15 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public void setCorrelationHandler(CorrelationHandler correlationHandler) {
     this.correlationHandler = correlationHandler;
+  }
+
+  public ProcessEngineConfigurationImpl setAuditEventHandler(AuditEventHandler auditEventHandler) {
+    this.auditEventHandler = auditEventHandler;
+    return this;
+  }
+  
+  public AuditEventHandler getAuditEventHandler() {
+    return auditEventHandler;
   }
 
   public IncidentHandler getIncidentHandler(String incidentType) {

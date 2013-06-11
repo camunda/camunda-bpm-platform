@@ -1,4 +1,4 @@
-package org.camunda.bpm.engine.impl.history.handler;
+package org.camunda.bpm.engine.impl.history.handler.refactor;
 
 import org.camunda.bpm.engine.delegate.DelegateTask;
 import org.camunda.bpm.engine.delegate.TaskListener;
@@ -13,8 +13,8 @@ public class UserTaskIdHandler implements TaskListener {
     TaskEntity t = (TaskEntity) task;
     ExecutionEntity execution = t.getExecution();
     if (execution != null) {
-      HistoricActivityInstanceEntity historicActivityInstance = ActivityInstanceEndHandler.findActivityInstance(execution);
-      historicActivityInstance.setTaskId(t.getId());
+//      HistoricActivityInstanceEntity historicActivityInstance = ActivityInstanceEndHandler.findActivityInstance(execution);
+//      historicActivityInstance.setTaskId(t.getId());
     }
   }
   

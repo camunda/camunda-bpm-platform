@@ -18,8 +18,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.camunda.bpm.engine.history.HistoricProcessInstance;
-import org.camunda.bpm.engine.impl.identity.Authentication;
-import org.camunda.bpm.engine.impl.util.ClockUtil;
 
 /**
  * @author Tom Baeyens
@@ -37,18 +35,6 @@ public class HistoricProcessInstanceEntity extends HistoricScopeInstanceEntity i
 
   public HistoricProcessInstanceEntity() {
   }
-
-  public HistoricProcessInstanceEntity(ExecutionEntity processInstance) {
-    id = processInstance.getId();
-    processInstanceId = processInstance.getId();
-    businessKey = processInstance.getBusinessKey();
-    processDefinitionId = processInstance.getProcessDefinitionId();
-    startTime = ClockUtil.getCurrentTime();
-    startUserId = Authentication.getAuthenticatedUserId();
-    startActivityId = processInstance.getActivityId();
-    superProcessInstanceId = processInstance.getSuperExecution() != null ? processInstance.getSuperExecution().getProcessInstanceId() : null;
-  }
-
   
   public Object getPersistentState() {
     Map<String, Object> persistentState = (Map<String, Object>) new HashMap<String, Object>();

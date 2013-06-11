@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package org.camunda.bpm.engine.impl.history.handler;
+package org.camunda.bpm.engine.impl.history.handler.refactor;
 
 import org.camunda.bpm.engine.delegate.DelegateTask;
 import org.camunda.bpm.engine.delegate.TaskListener;
@@ -28,8 +28,8 @@ public class UserTaskAssignmentHandler implements TaskListener {
   public void notify(DelegateTask task) {
     ExecutionEntity execution = ((TaskEntity) task).getExecution();
     if (execution != null) {
-      HistoricActivityInstanceEntity historicActivityInstance = ActivityInstanceEndHandler.findActivityInstance(execution);
-      historicActivityInstance.setAssignee(task.getAssignee());
+//      HistoricActivityInstanceEntity historicActivityInstance = ActivityInstanceEndHandler.findActivityInstance(execution);
+//      historicActivityInstance.setAssignee(task.getAssignee());
     }
   }
   

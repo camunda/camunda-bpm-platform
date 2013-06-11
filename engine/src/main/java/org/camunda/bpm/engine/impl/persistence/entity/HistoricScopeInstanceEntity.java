@@ -18,7 +18,6 @@ import java.io.Serializable;
 import java.util.Date;
 
 import org.camunda.bpm.engine.impl.db.PersistentObject;
-import org.camunda.bpm.engine.impl.util.ClockUtil;
 
 /**
  * @author Christian Stettler
@@ -35,12 +34,6 @@ public abstract class HistoricScopeInstanceEntity implements PersistentObject, S
   protected Long durationInMillis;
   protected String deleteReason;
 
-  public void markEnded(String deleteReason) {
-    this.deleteReason = deleteReason;
-    this.endTime = ClockUtil.getCurrentTime();
-    this.durationInMillis = endTime.getTime() - startTime.getTime();
-  }
-  
   // getters and setters //////////////////////////////////////////////////////
 
   public String getProcessInstanceId() {

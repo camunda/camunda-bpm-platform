@@ -107,7 +107,7 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
         .getSession(DbSqlSession.class)
         .insert(historicProcessInstance);
 
-      // do basically the same as in ActivityInstanceStanrtHandler
+      // do basically the same as in ActivityInstanceStartHandler
       IdGenerator idGenerator = Context.getProcessEngineConfiguration().getIdGenerator();
       
       String processDefinitionId = processInstance.getProcessDefinitionId();

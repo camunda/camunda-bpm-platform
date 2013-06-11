@@ -14,7 +14,7 @@
 package org.camunda.bpm.engine.impl.persistence.entity;
 
 import org.camunda.bpm.engine.history.HistoricFormProperty;
-import org.camunda.bpm.engine.impl.history.handler.ActivityInstanceEndHandler;
+import org.camunda.bpm.engine.impl.history.handler.refactor.ActivityInstanceEndHandler;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 
 

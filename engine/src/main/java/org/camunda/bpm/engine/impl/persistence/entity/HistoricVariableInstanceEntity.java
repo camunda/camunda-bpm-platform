@@ -66,7 +66,7 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
     copyValue(variableInstance);
   }
   
-  public void copyValue(VariableInstanceEntity variableInstance) {
+  protected void copyValue(VariableInstanceEntity variableInstance) {
     this.textValue = variableInstance.getTextValue();
     this.textValue2 = variableInstance.getTextValue2();
     this.doubleValue = variableInstance.getDoubleValue();

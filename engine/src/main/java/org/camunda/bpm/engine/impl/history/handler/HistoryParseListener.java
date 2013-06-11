@@ -16,9 +16,15 @@ package org.camunda.bpm.engine.impl.history.handler;
 import java.util.List;
 
 import org.camunda.bpm.engine.delegate.TaskListener;
+import org.camunda.bpm.engine.impl.audit.ActivityInstanceAuditEvent;
+import org.camunda.bpm.engine.impl.audit.producer.ActivityAuditEventProducer;
+import org.camunda.bpm.engine.impl.audit.producer.ProcessInstanceEndEventProducer;
+import org.camunda.bpm.engine.impl.audit.producer.ProcessInstanceStartEventProducer;
 import org.camunda.bpm.engine.impl.bpmn.behavior.UserTaskActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseListener;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.history.handler.refactor.UserTaskAssignmentHandler;
+import org.camunda.bpm.engine.impl.history.handler.refactor.UserTaskIdHandler;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
@@ -38,11 +44,11 @@ import org.camunda.bpm.engine.impl.variable.VariableDeclaration;
  */
 public class HistoryParseListener implements BpmnParseListener {
 
-  protected static final StartEventEndHandler START_EVENT_END_HANDLER = new StartEventEndHandler();
+  protected static final ProcessInstanceStartEventProducer PROCESS_INSTANCE_START_LISTENER = new ProcessInstanceStartEventProducer();
+  protected static final ProcessInstanceEndEventProducer PROCESS_INSTANCE_END_LISTENER = new ProcessInstanceEndEventProducer();
 
-  protected static final ActivityInstanceEndHandler ACTIVITI_INSTANCE_END_LISTENER = new ActivityInstanceEndHandler();
-
-  protected static final ActivityInstanceStartHandler ACTIVITY_INSTANCE_START_LISTENER = new ActivityInstanceStartHandler();
+  protected static final ActivityAuditEventProducer ACTIVITY_INSTANCE_START_LISTENER = new ActivityAuditEventProducer(ActivityInstanceAuditEvent.ACTIVITY_EVENT_TYPE_START);
+  protected static final ActivityAuditEventProducer ACTIVITI_INSTANCE_END_LISTENER = new ActivityAuditEventProducer(ActivityInstanceAuditEvent.ACTIVITY_EVENT_TYPE_END);
 
   protected static final UserTaskAssignmentHandler USER_TASK_ASSIGNMENT_HANDLER = new UserTaskAssignmentHandler();
 
@@ -57,7 +63,7 @@ public class HistoryParseListener implements BpmnParseListener {
 
   public void parseProcess(Element processElement, ProcessDefinitionEntity processDefinition) {
     if (activityHistoryEnabled(processDefinition, historyLevel)) {
-      processDefinition.addExecutionListener(org.camunda.bpm.engine.impl.pvm.PvmEvent.EVENTNAME_END, new ProcessInstanceEndHandler());
+      processDefinition.addExecutionListener(org.camunda.bpm.engine.impl.pvm.PvmEvent.EVENTNAME_END, PROCESS_INSTANCE_END_LISTENER);
     }
   }
 
@@ -113,7 +119,7 @@ public class HistoryParseListener implements BpmnParseListener {
 
   public void parseStartEvent(Element startEventElement, ScopeImpl scope, ActivityImpl activity) {
     if (activityHistoryEnabled(activity, historyLevel)) {
-      activity.addExecutionListener(org.camunda.bpm.engine.impl.pvm.PvmEvent.EVENTNAME_END, START_EVENT_END_HANDLER);
+      activity.addExecutionListener(org.camunda.bpm.engine.impl.pvm.PvmEvent.EVENTNAME_END, ACTIVITI_INSTANCE_END_LISTENER);
     }
   }
 
