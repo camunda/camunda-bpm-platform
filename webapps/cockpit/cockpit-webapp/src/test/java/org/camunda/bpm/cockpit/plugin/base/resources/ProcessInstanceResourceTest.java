@@ -4,7 +4,7 @@ import static org.fest.assertions.Assertions.assertThat;
 
 import java.util.List;
 
-import org.camunda.bpm.cockpit.plugin.base.persistence.entity.ActivityInstanceDto;
+import org.camunda.bpm.cockpit.plugin.base.dto.ActivityInstanceDto;
 import org.camunda.bpm.cockpit.plugin.test.AbstractCockpitPluginTest;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RuntimeService;

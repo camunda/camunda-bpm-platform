@@ -2,7 +2,7 @@ package org.camunda.bpm.cockpit.plugin.base.resources;
 
 import java.util.Iterator;
 
-import org.camunda.bpm.cockpit.plugin.base.persistence.entity.ActivityInstanceDto;
+import org.camunda.bpm.cockpit.plugin.base.dto.ActivityInstanceDto;
 import java.util.List;
 
 import javax.ws.rs.GET;
@@ -12,7 +12,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
-import org.camunda.bpm.cockpit.plugin.base.persistence.entity.ProcessInstanceDto;
+import org.camunda.bpm.cockpit.plugin.base.dto.ProcessInstanceDto;
 import org.camunda.bpm.cockpit.plugin.base.query.parameter.ProcessInstanceQueryParameter;
 import org.camunda.bpm.cockpit.plugin.resource.AbstractPluginResource;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;

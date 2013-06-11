@@ -1,4 +1,4 @@
-package org.camunda.bpm.cockpit.plugin.base.persistence.entity;
+package org.camunda.bpm.cockpit.plugin.base.dto;
 
 import java.util.ArrayList;
 import java.util.List;
