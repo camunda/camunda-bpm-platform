@@ -12,14 +12,16 @@ ngDefine('cockpit.directives', [
   
   function DirectiveController($scope, $element, $attrs, $filter, ProcessDiagramService) {
 
+    var activityStatistics = null;
     var bpmnRenderer = null;
     $scope.zoomLevel = null;
     
-    var elementId = "processDiagram_" + $scope.processDefinitionId.replace(/:/g, "_");
-    $element.attr("id", elementId);
-    
-    $scope.$watch('processDefinitionId', function() {
+    $scope.$watch('processDefinitionId', function () {
       loadProcessDiagram();
+    });
+    
+    $scope.$watch(function() { return bpmnRenderer; }, function(newValue) {
+      annotate();
     });
     
     $scope.$on('$destroy', function() {
@@ -34,10 +36,17 @@ ngDefine('cockpit.directives', [
       }
     });
     
-    function loadProcessDiagram () {
+    function loadProcessDiagram() {
+      // set id of element
+      var elementId = 'processDiagram_' + $scope.processDefinitionId.replace(/:/g, '_');
+      $element.attr('id', elementId);
       
+      // clear innerHTML of element
+      $element.empty();
+      
+      // get the bpmn20xml
       ProcessDiagramService.getBpmn20Xml($scope.processDefinitionId)
-        .then(
+      .then(
           function(data) {
             if (!!$scope.miniature && $scope.miniature === true) {
               renderMiniatureProcessDiagram(data.bpmn20Xml);
@@ -45,7 +54,7 @@ ngDefine('cockpit.directives', [
               renderProcessDiagram(data.bpmn20Xml);
             }
           }
-        );
+      );
     }
     
     function renderProcessDiagram (bpmn20Xml) {
@@ -54,7 +63,7 @@ ngDefine('cockpit.directives', [
       
       bpmnRenderer = new Bpmn();
       bpmnRenderer.render(bpmn20Xml, {
-        diagramElement : elementId,
+        diagramElement : $element.attr('id')
       });
       
       $scope.zoomLevel = 1;
@@ -69,7 +78,7 @@ ngDefine('cockpit.directives', [
     function renderMiniatureProcessDiagram (bpmn20Xml) {
       bpmnRenderer = new Bpmn();
       bpmnRenderer.render(bpmn20Xml, {
-        diagramElement : elementId,
+        diagramElement : $element.attr('id'),
         width : parseInt($element.parent().css("min-width")),
         height : $element.parent().height(),
       });
@@ -99,18 +108,31 @@ ngDefine('cockpit.directives', [
       return newZoomLevel;
     };
 
-    this.getRenderer = function () {
-      return bpmnRenderer;
-    };
+    function annotate() {
+      if (bpmnRenderer) {
+        
+        if (activityStatistics) {
+          doAnnotateWithActivityStatistics(activityStatistics);
+        }
+      }
+    }
     
-    this.annotateWithActivityStatistics = function (activityStatistics) {
+    function doAnnotateWithActivityStatistics(activityStaticstics) {
       var shortenNumberFilter = $filter('shortenNumber');
       
       angular.forEach(activityStatistics, function (currentActivityStatistics) {
         var instances = shortenNumberFilter(currentActivityStatistics.instances);
         bpmnRenderer.annotate(currentActivityStatistics.id, '<p class="currentActivityCount">' + instances + '</p>');
       });
-      
+    }
+    
+    this.getRenderer = function () {
+      return bpmnRenderer;
+    };
+    
+    this.annotateWithActivityStatistics = function (statistics) {
+      activityStatistics = statistics;
+      annotate();
     };
     
   }
