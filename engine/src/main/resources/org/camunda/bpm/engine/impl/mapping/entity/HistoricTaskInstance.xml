@@ -18,39 +18,60 @@
 
 <mapper namespace="org.camunda.bpm.engine.impl.persistence.entity.HistoricTaskInstanceEntity">
   
+  <!-- 
+  
+  NOTE:
+  
+  HTIs are stored as update events. For each HTI, there are at least two update 
+  events which correspond to multiple lines in the DB:
+     
+    * the first line added when the task is created
+    * several lines added when the task is updated
+  
+  The first part of this file contains the mappings for these update events. 
+  
+  When querying the DB, we are usually interested in an aggregated 
+  representation which combines the data contained in all update events as an individual 
+  object. The second part of this file contains aggregation queries which allows retrieving 
+  HTIs as single lines / objects.     
+    
+  -->
+  
+  <!-- /////////////////// start mappings for HistoricTaskInstanceEvent //////////////////// -->
+  
   <!-- HISTORIC TASK INSTANCE INSERT -->
   
-  <insert id="insertHistoricTaskInstance" parameterType="org.camunda.bpm.engine.impl.persistence.entity.HistoricTaskInstanceEntity">
+  <insert id="insertHistoricTaskInstanceEvent" parameterType="org.camunda.bpm.engine.impl.history.event.HistoricTaskInstanceEventEntity">
       insert into ${prefix}ACT_HI_TASKINST (
         ID_,
+        TASK_ID_,
         PROC_DEF_ID_,
         PROC_INST_ID_,
         EXECUTION_ID_,
+        TIMESTAMP_,
+        EVENT_TYPE_,
         NAME_,
         PARENT_TASK_ID_,
         DESCRIPTION_,
         OWNER_,
         ASSIGNEE_,
-        START_TIME_,
-        END_TIME_,
-        DURATION_,
         DELETE_REASON_,
         TASK_DEF_KEY_,
         PRIORITY_,
         DUE_DATE_
       ) values (
         #{id ,jdbcType=VARCHAR},
+        #{taskId ,jdbcType=VARCHAR},
         #{processDefinitionId, jdbcType=VARCHAR},
         #{processInstanceId, jdbcType=VARCHAR},
         #{executionId, jdbcType=VARCHAR},
+        #{timestamp, jdbcType=TIMESTAMP},
+        #{eventType ,jdbcType=VARCHAR},
         #{name ,jdbcType=VARCHAR},
         #{parentTaskId ,jdbcType=VARCHAR},
         #{description ,jdbcType=VARCHAR},
         #{owner ,jdbcType=VARCHAR},
-        #{assignee ,jdbcType=VARCHAR},
-        #{startTime, jdbcType=TIMESTAMP},
-        #{endTime, jdbcType=TIMESTAMP},
-        #{durationInMillis ,jdbcType=BIGINT},
+        #{assignee ,jdbcType=VARCHAR},        
         #{deleteReason ,jdbcType=VARCHAR},
         #{taskDefinitionKey ,jdbcType=VARCHAR},
         #{priority, jdbcType=INTEGER},
@@ -58,32 +79,16 @@
       )
   </insert>
 
-  <!-- HISTORIC TASK INSTANCE UPDATE -->
-  
-  <update id="updateHistoricTaskInstance" parameterType="org.camunda.bpm.engine.impl.persistence.entity.HistoricTaskInstanceEntity">
-    update ${prefix}ACT_HI_TASKINST set
-      EXECUTION_ID_ = #{executionId, jdbcType=VARCHAR},
-      NAME_ = #{name, jdbcType=VARCHAR},
-      PARENT_TASK_ID_ = #{parentTaskId, jdbcType=VARCHAR},
-      DESCRIPTION_ = #{description, jdbcType=VARCHAR},
-      OWNER_ = #{owner, jdbcType=VARCHAR},
-      ASSIGNEE_ = #{assignee, jdbcType=VARCHAR},
-      END_TIME_ = #{endTime, jdbcType=TIMESTAMP},
-      DURATION_ = #{durationInMillis ,jdbcType=BIGINT},
-      DELETE_REASON_ = #{deleteReason ,jdbcType=VARCHAR},
-      TASK_DEF_KEY_ = #{taskDefinitionKey ,jdbcType=VARCHAR},
-      PRIORITY_ = #{priority, jdbcType=INTEGER},
-      DUE_DATE_ = #{dueDate, jdbcType=TIMESTAMP}
-    where ID_ = #{id}
-  </update>
-
   <!-- HISTORIC TASK INSTANCE DELETE -->
   
   <delete id="deleteHistoricTaskInstance" parameterType="org.camunda.bpm.engine.impl.persistence.entity.HistoricTaskInstanceEntity">
-    delete from ${prefix}ACT_HI_TASKINST where ID_ = #{id}
+    delete from ${prefix}ACT_HI_TASKINST where TASK_ID_ = #{id}
   </delete>
 
+  <!-- /////////////////// start mappings for HistoricTaskInstance //////////////////// -->
+
   <!-- HISTORIC TASK INSTANCE RESULT MAP -->
+  <!-- this is the aggregated HTI -->
 
   <resultMap id="historicTaskInstanceResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.HistoricTaskInstanceEntity">
     <id property="id" column="ID_" jdbcType="VARCHAR" />
@@ -102,16 +107,48 @@
     <result property="taskDefinitionKey" column="TASK_DEF_KEY_" jdbcType="VARCHAR" />
     <result property="priority" column="PRIORITY_" jdbcType="INTEGER" />
     <result property="dueDate" column="DUE_DATE_" jdbcType="TIMESTAMP" />
+    <result property="lastEvent" column="LAST_EVENT_" jdbcType="TIMESTAMP" />
   </resultMap>
 
   <!-- HISTORIC TASK INSTANCE SELECT -->
   
   <select id="selectHistoricTaskInstance" resultMap="historicTaskInstanceResultMap">
-    select * from ${prefix}ACT_HI_TASKINST where ID_ = #{historicTaskInstanceId}
+    select distinct
+      T2.TASK_ID_ as ID_,
+      T2.PROC_DEF_ID_ as PROC_DEF_ID_,
+      T2.PROC_INST_ID_ as PROC_INST_ID_,
+      T2.EXECUTION_ID_ as EXECUTION_ID_,
+      T2.NAME_ as NAME_,
+      T2.PARENT_TASK_ID_ as PARENT_TASK_ID_,
+      T2.DESCRIPTION_ as DESCRIPTION_,
+      T2.OWNER_ as OWNER_,
+      T2.ASSIGNEE_ as ASSIGNEE_,
+      T1.TIMESTAMP_ as START_TIME_,
+      T2.TIMESTAMP_ as END_TIME_,
+      DATEDIFF(ms, T1.TIMESTAMP_ , T2.TIMESTAMP_ ) as DURATION_,
+      T2.DELETE_REASON_ as DELETE_REASON_,
+      T2.TASK_DEF_KEY_ as TASK_DEF_KEY_,
+      T2.PRIORITY_ as PRIORITY_,
+      T2.DUE_DATE_ as DUE_DATE_,
+      T2.EVENT_TYPE_ as LAST_EVENT_
+     from ${prefix}ACT_HI_TASKINST T1
+      INNER JOIN 
+        ${prefix}ACT_HI_TASKINST T2 
+      ON
+        T1.TASK_ID_ = T2.TASK_ID_ 
+      AND
+        T2.ID_ = (
+            SELECT MAX(ID_)
+            FROM ${prefix}ACT_HI_TASKINST T_TEMP
+            WHERE T_TEMP.TASK_ID_ = T1.TASK_ID_ 
+        )
+    where
+      T1.EVENT_TYPE_ = 'create'
+    AND T1.TASK_ID_ = #{historicTaskInstanceId}
   </select>
   
   <select id="selectHistoricTaskInstanceIdsByProcessInstanceId" resultType="string" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" >
-    select ID_ 
+    select distinct TASK_ID_ 
     from ${prefix}ACT_HI_TASKINST 
     where PROC_INST_ID_ = #{parameter}
   </select>
@@ -119,8 +156,30 @@
   <select id="selectHistoricTaskInstancesByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricTaskInstanceQueryImpl" resultMap="historicTaskInstanceResultMap">
   	${limitBefore}
     select ${limitBetween}
-    RES.*
+    
+    * from (SELECT distinct
+      T2.TASK_ID_ as ID_,
+      T2.PROC_DEF_ID_ as PROC_DEF_ID_,
+      T2.PROC_INST_ID_ as PROC_INST_ID_,
+      T2.EXECUTION_ID_ as EXECUTION_ID_,
+      T2.NAME_ as NAME_,
+      T2.PARENT_TASK_ID_ as PARENT_TASK_ID_,
+      T2.DESCRIPTION_ as DESCRIPTION_,
+      T2.OWNER_ as OWNER_,
+      T2.ASSIGNEE_ as ASSIGNEE_,
+      T1.TIMESTAMP_ as START_TIME_,
+      T2.TIMESTAMP_ as END_TIME_,
+      DATEDIFF(ms, T1.TIMESTAMP_ , T2.TIMESTAMP_ ) as DURATION_,
+      T2.DELETE_REASON_ as DELETE_REASON_,
+      T2.TASK_DEF_KEY_ as TASK_DEF_KEY_,
+      T2.PRIORITY_ as PRIORITY_,
+      T2.DUE_DATE_ as DUE_DATE_,
+      T2.EVENT_TYPE_ as LAST_EVENT_
+      
     <include refid="selectHistoricTaskInstancesByQueryCriteriaSql"/>
+    
+    ) RES
+    
     ${orderBy}
     ${limitAfter}
   </select>
@@ -131,19 +190,37 @@
   </select>
   
   <sql id="selectHistoricTaskInstancesByQueryCriteriaSql">
-    from ${prefix}ACT_HI_TASKINST RES
-    <if test="processFinished || processUnfinished">
-      inner join ${prefix}ACT_HI_PROCINST HPI ON RES.PROC_INST_ID_ = HPI.ID_
-    </if>
+    from ${prefix}ACT_HI_TASKINST T1
+      INNER JOIN 
+        ${prefix}ACT_HI_TASKINST T2 
+      ON
+        T1.TASK_ID_ = T2.TASK_ID_ 
+      AND
+        T2.TIMESTAMP_ = (
+            SELECT MAX(TIMESTAMP_)
+            FROM ${prefix}ACT_HI_TASKINST T_TEMP
+            WHERE T_TEMP.TASK_ID_ = T1.TASK_ID_ 
+        )
+    <if test="processFinished">
+      inner join 
+        ${prefix}ACT_HI_PROCINST HPI 
+        ON 
+          T1.PROC_INST_ID_ = HPI.PROC_INST_ID_
+        AND
+          HPI.EVENT_TYPE_ = 'end'
+    </if>    
     <if test="processDefinitionKey != null || processDefinitionName != null">
-      inner join ${prefix}ACT_RE_PROCDEF D on RES.PROC_DEF_ID_ = D.ID_
+      inner join ${prefix}ACT_RE_PROCDEF D on T1.PROC_DEF_ID_ = D.ID_
     </if>
     <where>
+    
+      T1.EVENT_TYPE_ = 'create'
+    
       <if test="taskId != null">
-        RES.ID_ = #{taskId}
+        and T2.TASK_ID_ = #{taskId}
       </if>
       <if test="processDefinitionId != null">
-        and RES.PROC_DEF_ID_ = #{processDefinitionId}
+        and T2.PROC_DEF_ID_ = #{processDefinitionId}
       </if>
       <if test="processDefinitionKey != null">
         and D.KEY_ = #{processDefinitionKey}
@@ -152,70 +229,81 @@
         and D.NAME_ = #{processDefinitionName}
       </if>
       <if test="processInstanceId != null">
-        and RES.PROC_INST_ID_ = #{processInstanceId}
+        and T2.PROC_INST_ID_ = #{processInstanceId}
       </if>
       <if test="taskDefinitionKey != null">
-        and RES.TASK_DEF_KEY_ = #{taskDefinitionKey}
+        and T2.TASK_DEF_KEY_ = #{taskDefinitionKey}
       </if>
       <if test="executionId != null">
-        and RES.EXECUTION_ID_ = #{executionId}
+        and T2.EXECUTION_ID_ = #{executionId}
       </if>
       <if test="taskName != null">
-        and RES.NAME_ = #{taskName}
+        and T2.NAME_ = #{taskName}
       </if>
       <if test="taskNameLike != null">
-        and RES.NAME_ like #{taskNameLike}
+        and T2.NAME_ like #{taskNameLike}
       </if>
       <if test="taskParentTaskId != null">
-        and RES.PARENT_TASK_ID_ = #{taskParentTaskId}
+        and T2.PARENT_TASK_ID_ = #{taskParentTaskId}
       </if>
       <if test="taskDescription != null">
-        and RES.DESCRIPTION_ = #{taskDescription}
+        and T2.DESCRIPTION_ = #{taskDescription}
       </if>
       <if test="taskDescriptionLike != null">
-        and RES.DESCRIPTION_ like #{taskDescriptionLike}
+        and T2.DESCRIPTION_ like #{taskDescriptionLike}
       </if>
       <if test="taskDeleteReason != null">
-        and RES.DELETE_REASON_ = #{taskDeleteReason}
+        and T2.DELETE_REASON_ = #{taskDeleteReason}
       </if>
       <if test="taskDeleteReasonLike != null">
-        and RES.DELETE_REASON_ like #{taskDeleteReasonLike}
+        and T2.DELETE_REASON_ like #{taskDeleteReasonLike}
       </if>
       <if test="taskOwner != null">
-        and RES.OWNER_ = #{taskOwner}
+        and T2.OWNER_ = #{taskOwner}
       </if>
       <if test="taskOwnerLike != null">
-        and RES.OWNER_ like #{taskOwnerLike}
+        and T2.OWNER_ like #{taskOwnerLike}
       </if>
       <if test="taskAssignee != null">
-        and RES.ASSIGNEE_ = #{taskAssignee}
+        and T2.ASSIGNEE_ = #{taskAssignee}
       </if>
       <if test="taskAssigneeLike != null">
-        and RES.ASSIGNEE_ like #{taskAssigneeLike}
+        and T2.ASSIGNEE_ like #{taskAssigneeLike}
       </if>
       <if test="taskPriority != null">
-        and RES.PRIORITY_ = #{taskPriority}
+        and T2.PRIORITY_ = #{taskPriority}
       </if>
       <if test="unfinished">
-        and RES.END_TIME_ is null
+        and (
+              T2.EVENT_TYPE_ = 'create'
+            OR
+              T2.EVENT_TYPE_ = 'update'
+            )
       </if>
       <if test="finished">
-        and RES.END_TIME_ is not null
-      </if>
-      <if test="processFinished">
-        and HPI.END_TIME_ is not null
+        and (
+              T2.EVENT_TYPE_ = 'complete'
+            OR
+              T2.EVENT_TYPE_ = 'delete'
+            )
       </if>
       <if test="processUnfinished">
-        and HPI.END_TIME_ is null
+        and NOT EXISTS(
+          SELECT ID_
+          FROM 
+            ${prefix}ACT_HI_PROCINST HPI_END
+          WHERE 
+            HPI_END.EVENT_TYPE_ = 'end'
+        )
       </if>
       <if test="dueDate != null">
-        and RES.DUE_DATE_ = #{dueDate}
+        and T2.DUE_DATE_ = #{dueDate}
       </if>
       <if test="dueBefore != null">
-        and RES.DUE_DATE_ &lt; #{dueBefore}
+        and T2.DUE_DATE_ &lt; #{dueBefore}
       </if>
       <if test="dueAfter != null">
-        and RES.DUE_DATE_ &gt; #{dueAfter}
+        and T2.DUE_DATE_ &gt; #{dueAfter}
       </if>
       <foreach collection="variables" index="index" item="var">
         and exists (
@@ -226,14 +314,14 @@
             and HD.NAME_ =  #{var.name}
             <choose>
               <when test="var.local">
-                and HD.TASK_ID_ = RES.ID_
-                and HD.REV_ = (select max(HDM.REV_) from ${prefix}ACT_HI_DETAIL HDM where HDM.TASK_ID_ = RES.ID_ and HDM.VAR_TYPE_ = #{var.type} and HDM.NAME_ = #{var.name} and HDM.TYPE_ = 'VariableUpdate')
-                and HD.TIME_ = (select max(HDM.TIME_) from ${prefix}ACT_HI_DETAIL HDM where HDM.TASK_ID_ = RES.ID_ and HDM.VAR_TYPE_ = #{var.type} and HDM.NAME_ = #{var.name} and HDM.TYPE_ = 'VariableUpdate')
+                and HD.TASK_ID_ = T1.TASK_ID_
+                and HD.REV_ = (select max(HDM.REV_) from ${prefix}ACT_HI_DETAIL HDM where HDM.TASK_ID_ = T1.ID_ and HDM.VAR_TYPE_ = #{var.type} and HDM.NAME_ = #{var.name} and HDM.TYPE_ = 'VariableUpdate')
+                and HD.TIME_ = (select max(HDM.TIME_) from ${prefix}ACT_HI_DETAIL HDM where HDM.TASK_ID_ = T1.ID_ and HDM.VAR_TYPE_ = #{var.type} and HDM.NAME_ = #{var.name} and HDM.TYPE_ = 'VariableUpdate')
               </when>
               <otherwise>
-                and HD.PROC_INST_ID_ = RES.PROC_INST_ID_ and HD.TASK_ID_ is null
-                and HD.REV_ = (select max(HDM.REV_) from ${prefix}ACT_HI_DETAIL HDM where HDM.PROC_INST_ID_ = RES.PROC_INST_ID_ and HDM.TASK_ID_ is null and HDM.VAR_TYPE_ = #{var.type} and HDM.NAME_ = #{var.name} and HDM.TYPE_ = 'VariableUpdate')
-                and HD.TIME_ = (select max(HDM.TIME_) from ${prefix}ACT_HI_DETAIL HDM where HDM.PROC_INST_ID_ = RES.PROC_INST_ID_ and HDM.TASK_ID_ is null and HDM.VAR_TYPE_ = #{var.type} and HDM.NAME_ = #{var.name} and HDM.TYPE_ = 'VariableUpdate')
+                and HD.PROC_INST_ID_ = T1.PROC_INST_ID_ and HD.TASK_ID_ is null
+                and HD.REV_ = (select max(HDM.REV_) from ${prefix}ACT_HI_DETAIL HDM where HDM.PROC_INST_ID_ = T1.PROC_INST_ID_ and HDM.TASK_ID_ is null and HDM.VAR_TYPE_ = #{var.type} and HDM.NAME_ = #{var.name} and HDM.TYPE_ = 'VariableUpdate')
+                and HD.TIME_ = (select max(HDM.TIME_) from ${prefix}ACT_HI_DETAIL HDM where HDM.PROC_INST_ID_ = T1.PROC_INST_ID_ and HDM.TASK_ID_ is null and HDM.VAR_TYPE_ = #{var.type} and HDM.NAME_ = #{var.name} and HDM.TYPE_ = 'VariableUpdate')
               </otherwise>
             </choose>  
             <if test="!var.type.equals('null')">

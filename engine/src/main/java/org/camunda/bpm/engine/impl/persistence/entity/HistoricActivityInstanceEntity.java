@@ -14,9 +14,6 @@
 
 package org.camunda.bpm.engine.impl.persistence.entity;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 
 /**
@@ -34,14 +31,9 @@ public class HistoricActivityInstanceEntity extends HistoricScopeInstanceEntity 
   protected String taskId;
   protected String calledProcessInstanceId;
   
-  public Object getPersistentState() {
-    Map<String, Object> persistentState = (Map<String, Object>) new HashMap<String, Object>();
-    persistentState.put("endTime", endTime);
-    persistentState.put("durationInMillis", durationInMillis);
-    persistentState.put("deleteReason", deleteReason);
-    persistentState.put("executionId", executionId);
-    persistentState.put("assignee", assignee);
-    return persistentState;
+  public Object getPersistentState() {   
+    // immutable
+    return HistoricActivityInstanceEntity.class;
   }
 
   // getters and setters //////////////////////////////////////////////////////

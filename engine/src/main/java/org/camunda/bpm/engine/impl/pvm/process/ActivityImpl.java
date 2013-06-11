@@ -178,4 +178,8 @@ public class ActivityImpl extends ScopeImpl implements PvmActivity, HasDIBounds 
     this.isExclusive = isExclusive;
   }
   
+  public String getActivityId() {
+    return super.getId();
+  }
+  
 }

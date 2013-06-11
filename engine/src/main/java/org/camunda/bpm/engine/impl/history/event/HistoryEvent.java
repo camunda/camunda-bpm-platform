@@ -44,6 +44,23 @@ public class HistoryEvent implements Serializable, PersistentObject {
   
   private static final long serialVersionUID = 1L;
   
+  /** fired when an activity instance is started. */
+  public static final String ACTIVITY_EVENT_TYPE_START = "start";
+  /** fired when an activity instance is updated. */
+  public static final String ACTIVITY_EVENT_TYPE_UPDATE = "update";
+  /** fired when an activity instance is ended. */
+  public static final String ACTIVITY_EVENT_TYPE_END = "end";
+  
+  /** fired when a task instance is created */
+  public static final String TASK_EVENT_TYPE_CREATE = "create";
+  /** fired when a task instance is updated. */
+  public static final String TASK_EVENT_TYPE_UPDATE = "update";
+  /** fired when a task instance is completed. */
+  public static final String TASK_EVENT_TYPE_COMPLETE = "complete";
+  /** fired when a task instance is deleted. */
+  public static final String TASK_EVENT_TYPE_DELETE = "delete";
+    
+  
   /** each {@link HistoryEvent} has a unique id */
   protected String id;
   
@@ -58,6 +75,19 @@ public class HistoryEvent implements Serializable, PersistentObject {
   
   /** a timestamp taken at the moment in time this event happens */
   protected Date timestamp;
+  
+  /**
+   * The type of the activity audit event.
+   * 
+   * @see #ACTIVITY_EVENT_TYPE_START
+   * @see #ACTIVITY_EVENT_TYPE_END
+   * @see #ACTIVITY_EVENT_TYPE_UPDATE
+   * @see #TASK_EVENT_TYPE_CREATE
+   * @see #TASK_EVENT_TYPE_UPDATE
+   * @see #TASK_EVENT_TYPE_COMPLETE
+   * @see #TASK_EVENT_TYPE_DELETE
+   * */
+  protected String eventType;
   
   // getters / setters ///////////////////////////////////
   
@@ -99,6 +129,14 @@ public class HistoryEvent implements Serializable, PersistentObject {
   
   public String getId() {
     return id;
+  }
+
+  public String getEventType() {
+    return eventType;
+  }
+
+  public void setEventType(String eventType) {
+    this.eventType = eventType;
   }
   
   // persistent object implementation ///////////////

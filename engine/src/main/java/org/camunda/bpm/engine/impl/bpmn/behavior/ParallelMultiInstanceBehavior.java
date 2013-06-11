@@ -37,6 +37,7 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
    * Will create child executions accordingly for every instance needed.
    */
    protected void createInstances(ActivityExecution execution) throws Exception {
+     
     int nrOfInstances = resolveNrOfInstances(execution);
     if (nrOfInstances <= 0) {
       throw new ProcessEngineException("Invalid number of instances: must be positive integer value" 
@@ -58,6 +59,9 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
       // Otherwise, all child executions would end up under the same parent,
       // without any differentation to which embedded subprocess they belong
       if (isExtraScopeNeeded()) {
+        
+        execution.getParent().setActivityInstanceId(execution.getParent().getParentActivityInstanceId());
+        
         ActivityExecution extraScopedExecution = concurrentExecution.createExecution();
         extraScopedExecution.setActive(true);
         extraScopedExecution.setConcurrent(false);
@@ -79,6 +83,7 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
       if (concurrentExecution.isActive() && !concurrentExecution.isEnded() 
               && concurrentExecution.getParent().isActive() 
               && !concurrentExecution.getParent().isEnded()) { 
+        
         setLoopVariable(concurrentExecution, LOOP_COUNTER, loopCounter);
         executeOriginalBehavior(concurrentExecution, loopCounter);
       }
@@ -96,7 +101,10 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
    * Handles the completion of one of the parallel instances
    */
   public void leave(ActivityExecution execution) {
-    callActivityEndListeners(execution);
+
+    if(!isExtraScopeNeeded() && !execution.getActivityInstanceId().equals(execution.getParent().getActivityInstanceId())) {
+      callActivityEndListeners(execution);
+    }
     
     int loopCounter = getLoopVariable(execution, LOOP_COUNTER);
     int nrOfInstances = getLoopVariable(execution, NUMBER_OF_INSTANCES);
@@ -108,6 +116,9 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
       ExecutionEntity extraScope = (ExecutionEntity) execution;
       execution = execution.getParent();
       extraScope.remove();
+      
+      execution.getParent().getParent().setActivityInstanceId(execution.getActivityInstanceId());      
+
     }
     
     setLoopVariable(execution.getParent(), NUMBER_OF_COMPLETED_INSTANCES, nrOfCompletedInstances);
@@ -136,8 +147,14 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
         executionToRemove.inactivate();
         executionToRemove.deleteCascade("multi-instance completed");
       }
-      executionEntity.takeAll(executionEntity.getActivity().getOutgoingTransitions(), joinedExecutions);
-    } 
+      
+      executionEntity.takeAll(activity.getOutgoingTransitions(), joinedExecutions);
+    } else {
+      if(isExtraScopeNeeded()) {
+        callActivityEndListeners(execution);
+      }
+    }
   }
+ 
 
 }

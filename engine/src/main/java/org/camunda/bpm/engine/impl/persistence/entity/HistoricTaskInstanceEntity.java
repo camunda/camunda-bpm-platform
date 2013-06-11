@@ -14,12 +14,10 @@
 package org.camunda.bpm.engine.impl.persistence.entity;
 
 import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.impl.db.PersistentObject;
-import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 
 
 /**
@@ -38,50 +36,53 @@ public class HistoricTaskInstanceEntity extends HistoricScopeInstanceEntity impl
   protected String taskDefinitionKey;
   protected int priority;
   protected Date dueDate;
+  protected String lastEvent;
 
   public HistoricTaskInstanceEntity() {
   }
   
-  public HistoricTaskInstanceEntity(TaskEntity task, ExecutionEntity execution) {
-    this.id = task.getId();
-    if (execution!=null) {
-      this.processDefinitionId = execution.getProcessDefinitionId();
-      this.processInstanceId = execution.getProcessInstanceId();
-      this.executionId = execution.getId();
-    }
-    this.name = task.getName();
-    this.parentTaskId = task.getParentTaskId();
-    this.description = task.getDescription();
-    this.owner = task.getOwner();
-    this.assignee = task.getAssignee();
-    this.startTime = ClockUtil.getCurrentTime();
-    this.taskDefinitionKey = task.getTaskDefinitionKey();
-    this.setPriority(task.getPriority());
-  }
-
   // persistence //////////////////////////////////////////////////////////////
   
-  public Object getPersistentState() {
-    Map<String, Object> persistentState = new HashMap<String, Object>();
-    persistentState.put("name", name);
-    persistentState.put("owner", owner);
-    persistentState.put("assignee", assignee);
-    persistentState.put("endTime", endTime);
-    persistentState.put("durationInMillis", durationInMillis);
-    persistentState.put("description", description);
-    persistentState.put("deleteReason", deleteReason);
-    persistentState.put("taskDefinitionKey", taskDefinitionKey);
-    persistentState.put("priority", priority);
-    if(parentTaskId != null) {
-      persistentState.put("parentTaskId", parentTaskId);
+  public Object getPersistentState() {    
+    // immutable
+    return HistoricTaskInstanceEntity.class;
+  }
+  
+  // getters and setters //////////////////////////////////////////////////////
+  
+  /** custom endTime behavior: only return end time if 
+   * last history event closed the task instance.
+   */
+  @Override
+  public Date getEndTime() {
+    if(isEnded()) {      
+      return endTime;
+      
+    } else {
+      return null;
+      
     }
-    if(dueDate != null) {
-      persistentState.put("dueDate", dueDate);
+  }
+  
+  /** custom endTime behavior: only return duration time if 
+   * last history event closed the task instance.
+   */
+  @Override
+  public Long getDurationInMillis() {
+    if(isEnded()) {      
+      return durationInMillis;
+      
+    } else {
+      return null;
+      
     }
-    return persistentState;
   }
 
-  // getters and setters //////////////////////////////////////////////////////
+  protected boolean isEnded() {
+    return HistoryEvent.TASK_EVENT_TYPE_COMPLETE.equals(lastEvent)
+        || HistoryEvent.TASK_EVENT_TYPE_DELETE.equals(lastEvent);
+  }
+
   public String getExecutionId() {
     return executionId;
   }

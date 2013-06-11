@@ -17,16 +17,87 @@ import org.camunda.bpm.engine.delegate.DelegateTask;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 
 /**
- * <p>Interface for implementing history event producers.</p>
- * 
+ * <p>The producer for history events. The history event producer is 
+ * responsible for extracting data from the runtime structures 
+ * (Executions, Tasks, ...) and adding the data to a {@link HistoryEvent}.
+ *  
  * @author Daniel Meyer
  * @author Marcel Wieczorek
  * 
  */
 public interface HistoryEventProducer {
-
-  public HistoryEvent createHistoryEvent(DelegateExecution execution);
-
-  public HistoryEvent createHistoryEvent(DelegateExecution execution, DelegateTask task);
+  
+  // Process instances //////////////////////////////////////
+  
+  /** 
+   * Creates the history event fired when an activity instances is <strong>created</strong>.
+   *  
+   * @param execution the current execution.
+   * @return the history event
+   */
+  public HistoryEvent createProcessInstanceStartEvt(DelegateExecution execution);
+  
+  /** 
+   * Creates the history event fired when a process instances is <strong>ended</strong>.
+   *  
+   * @param execution the current execution.
+   * @return the history event
+   */
+  public HistoryEvent createProcessInstanceEndEvt(DelegateExecution execution);
+    
+  // Activity instances /////////////////////////////////////
+  
+  /** 
+   * Creates the history event fired when an activity instances is <strong>started</strong>.
+   *  
+   * @param execution the current execution.
+   * @return the history event
+   */
+  public HistoryEvent createActivityInstanceStartEvt(DelegateExecution execution);
+  
+  /** 
+   * Creates the history event fired when an activity instances is <strong>updated</strong>.
+   *  
+   * @param execution the current execution.
+   * @param task the task association that is currently updated. (May be null in case there is not task associated.)
+   * @return the history event
+   */
+  public HistoryEvent createActivityInstanceUpdateEvt(DelegateExecution execution, DelegateTask task);
+  
+  /** 
+   * Creates the history event fired when an activity instances is <strong>ended</strong>.
+   *  
+   * @param execution the current execution.
+   * @return the history event
+   */
+  public HistoryEvent createActivityInstanceEndEvt(DelegateExecution execution);
+  
+  // Task Instances /////////////////////////////////////////
+  
+  /** 
+   * Creates the history event fired when a task instances is <strong>created</strong>.
+   *  
+   * @param task the task
+   * @return the history event
+   */
+  public HistoryEvent createTaskInstanceCreateEvt(DelegateTask task);
+  
+  /** 
+   * Creates the history event fired when a task instances is <strong>updated</strong>.
+   *  
+   * @param task the task
+   * @return the history event
+   */
+  public HistoryEvent createTaskInstanceUpdateEvt(DelegateTask task);
+  
+  /** 
+   * Creates the history event fired when a task instances is <strong>completed</strong>.
+   *  
+   * @param task the task
+   * @param deleteReason 
+   * @return the history event
+   */
+  public HistoryEvent createTaskInstanceCompleteEvt(DelegateTask task, String deleteReason);
+  
 
 }

@@ -91,7 +91,8 @@ import org.camunda.bpm.engine.impl.form.StringFormType;
 import org.camunda.bpm.engine.impl.history.handler.DbHistoryEventHandler;
 import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
 import org.camunda.bpm.engine.impl.history.parser.HistoryParseListener;
-import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducerFactory;
+import org.camunda.bpm.engine.impl.history.producer.DefaultHistoryEventProducer;
+import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
 import org.camunda.bpm.engine.impl.incident.FailedJobIncidentHandler;
 import org.camunda.bpm.engine.impl.incident.IncidentHandler;
 import org.camunda.bpm.engine.impl.interceptor.CommandContextFactory;
@@ -322,7 +323,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   
   protected CorrelationHandler correlationHandler;
   
-  protected HistoryEventProducerFactory historyEventProducerFactory;
+  protected HistoryEventProducer historyEventProducer;
 
   protected HistoryEventHandler historyEventHandler;
     
@@ -337,7 +338,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   
   protected void init() {
     initHistoryLevel();
-    initHistoryEventProducerFactory();
+    initHistoryEventProducer();
     initHistoryEventHandler();
     initExpressionManager();
     initVariableTypes();
@@ -760,7 +761,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected List<BpmnParseListener> getDefaultBPMNParseListeners() {
     List<BpmnParseListener> defaultListeners = new ArrayList<BpmnParseListener>();
         if (historyLevel>=ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
-      defaultListeners.add(new HistoryParseListener(historyLevel, historyEventProducerFactory));
+      defaultListeners.add(new HistoryParseListener(historyLevel, historyEventProducer));
     }
     return defaultListeners;
   }
@@ -1034,9 +1035,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   
   // history handlers /////////////////////////////////////////////////////
   
-  protected void initHistoryEventProducerFactory() {
-    if(historyEventProducerFactory == null) {
-      historyEventProducerFactory = new HistoryEventProducerFactory();
+  protected void initHistoryEventProducer() {
+    if(historyEventProducer == null) {
+      historyEventProducer = new DefaultHistoryEventProducer();
     }
   }
   
@@ -1837,7 +1838,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   public IncidentHandler getIncidentHandler(String incidentType) {
     return incidentHandlers.get(incidentType);
   }
-    public Map<String, IncidentHandler> getIncidentHandlers() {
+  public Map<String, IncidentHandler> getIncidentHandlers() {
     return incidentHandlers;
   }
 
@@ -1853,11 +1854,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     this.customIncidentHandlers = customIncidentHandlers;
   }
 
-  public ProcessEngineConfigurationImpl setHistoryEventProducerFactory(HistoryEventProducerFactory historyEventProducerFactory) {
-    this.historyEventProducerFactory = historyEventProducerFactory;
+  public ProcessEngineConfigurationImpl setHistoryEventProducer(HistoryEventProducer historyEventProducerFactory) {
+    this.historyEventProducer = historyEventProducerFactory;
     return this;
   }
   
-  public HistoryEventProducerFactory getHistoryEventProducerFactory() {
-    return historyEventProducerFactory;
-  }}
+  public HistoryEventProducer getHistoryEventProducer() {
+    return historyEventProducer;
+  }
+}

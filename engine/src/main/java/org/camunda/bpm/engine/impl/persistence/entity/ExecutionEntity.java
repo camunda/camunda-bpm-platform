@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.camunda.bpm.engine.impl.bpmn.behavior.ParallelMultiInstanceBehavior;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.bpmn.parser.EventSubscriptionDeclaration;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -29,7 +30,7 @@ import org.camunda.bpm.engine.impl.db.HasRevision;
 import org.camunda.bpm.engine.impl.db.PersistentObject;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
-import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducerFactory;
+import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.AsyncContinuationJobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerDeclarationImpl;
@@ -40,6 +41,7 @@ import org.camunda.bpm.engine.impl.pvm.PvmProcessDefinition;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessElement;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessInstance;
 import org.camunda.bpm.engine.impl.pvm.PvmTransition;
+import org.camunda.bpm.engine.impl.pvm.delegate.ActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.pvm.delegate.ExecutionListenerExecution;
 import org.camunda.bpm.engine.impl.pvm.delegate.SignallableActivityBehavior;
@@ -110,7 +112,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
   
   /** the unique id of the current activity instance */
   protected String activityInstanceId;
-  
+    
   // state/type of execution ////////////////////////////////////////////////// 
   
   /** indicates if this execution represents an active path of execution.
@@ -243,6 +245,9 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
     createdExecution.setProcessInstance(getProcessInstance());
     createdExecution.setActivity(getActivity());
     
+    // make created execution start in same activity instance
+    createdExecution.activityInstanceId = activityInstanceId;
+    
     if (log.isLoggable(Level.FINE)) {
       log.fine("Child execution "+createdExecution+" created with parent "+this);
     }
@@ -265,15 +270,15 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
     int historyLevel = configuration.getHistoryLevel();
     if (historyLevel>=ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
       
-      final HistoryEventProducerFactory eventFactory = configuration.getHistoryEventProducerFactory();
+      final HistoryEventProducer eventFactory = configuration.getHistoryEventProducer();
       final HistoryEventHandler eventHandler = configuration.getHistoryEventHandler();
       
       // publish start event for sub process instance
-      HistoryEvent hpise = eventFactory.getHistoricProcessInstanceStartEventProducer().createHistoryEvent(subProcessInstance);      
+      HistoryEvent hpise = eventFactory.createProcessInstanceStartEvt(subProcessInstance);      
       eventHandler.handleEvent(hpise);
             
       // publish update event for current activity instance (containing the id of the sub process)
-      HistoryEvent haie = eventFactory.getHistoricActivityInstanceUpdateEventProducer().createHistoryEvent(this);
+      HistoryEvent haie = eventFactory.createActivityInstanceUpdateEvt(this, null);
       eventHandler.handleEvent(haie);
       
     }
@@ -517,7 +522,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
         outgoingExecution.setTransitionBeingTaken((TransitionImpl) outgoingTransition);
         outgoingExecutions.add(new OutgoingExecution(outgoingExecution, outgoingTransition, true));
       }
-
+      
       // prune the executions that are not recycled 
       for (ActivityExecution prunedExecution: recyclableExecutions) {
         log.fine("pruning execution "+prunedExecution);
@@ -729,82 +734,94 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
     }
   }
 
-  public void setActivity(ActivityImpl newActivity) {
-    ActivityImpl currentAct = this.activity;
-    
-    if (newActivity == null || (currentAct != null && newActivity.contains(currentAct))) {
-      leaveActivityInstance();
-    }
-    this.activity = newActivity;
-    
-    if (newActivity != null) {      
-      this.activityId = newActivity.getId();
-      this.activityName = (String) newActivity.getProperty("name");
-      
-      if(currentAct != newActivity) {
-        // we enter a new activity instance
-        enterActivityInstance();
-      }
-      
-    } else {      
+  public void setActivity(ActivityImpl activity) {
+  
+    this.activity = activity;
+    if (activity != null) {
+      this.activityId = activity.getId();
+      this.activityName = (String) activity.getProperty("name");
+    } else {
       this.activityId = null;
       this.activityName = null;
-    }  
-    
-  }
-    
-  public void enterActivityInstance() {
-    
-    final ExecutionEntity parent = getParent();
-    
-    if (parent == null || parent.getActivity() != getActivity()) {
-      // generate new activity instance id
-      activityInstanceId = generateActivityInstanceId(getActivity().getId());    
-      if(log.isLoggable(Level.FINE)) {
-        log.log(Level.FINE, toString()+" enters activity instance "+activityInstanceId +"; parent activity instance: "+getParentActivityInstanceId());
-      }
-    } else {
-      activityInstanceId = parent.getActivityInstanceId();  
-      if(log.isLoggable(Level.FINE)) {
-        log.log(Level.FINE, toString()+" starts in activity instance "+activityInstanceId +"; parent activity instance: "+getParentActivityInstanceId());
-      }
     }
+    
   }
   
+  public void enterActivityInstance() {
+    
+    ActivityImpl activity = getActivity();
+    
+    // special treatment for starting process instance
+    if(activity == null && startingExecution!= null) {
+      activity = startingExecution.getInitial();
+    }
+    
+    activityInstanceId = generateActivityInstanceId(activity.getId());
+    
+    if(log.isLoggable(Level.FINE)) {
+      log.fine("[ENTER] "+this + ": "+activityInstanceId+", parent: "+getParentActivityInstanceId());
+    }
+    
+  }
+    
   public void leaveActivityInstance() {
-    activityInstanceId = getParentActivityInstanceId();    
+    
+    if(activityInstanceId != null) {
+      
+      if(log.isLoggable(Level.FINE)) {
+        log.fine("[LEAVE] "+ this + ": "+activityInstanceId );
+      }
+      
+      activityInstanceId = getParentActivityInstanceId();
+    }    
+    
   }
   
   public String getParentActivityInstanceId() {
-    
-    final ExecutionEntity parent = getParent();
-    
     if(isProcessInstance()) {
-      return processInstanceId;
+      return id; 
+      
     } else {
-      if(parent.getActivity().contains(getActivity())) {
-        return parent.getActivityInstanceId();        
+      ExecutionEntity parent = getParent();
+      ActivityImpl activity = getActivity();
+      ActivityImpl parentActivity = parent.getActivity();
+      if (parent.isScope() && !isConcurrent() || parent.isConcurrent
+           && activity != parentActivity
+          ) {
+        return parent.getActivityInstanceId();
       } else {
-        return parent.getParentActivityInstanceId();        
+        return parent.getParentActivityInstanceId();
       }
+      
     }
   }
+
   
   /**
    * generates an activity instance id
    */
   protected String generateActivityInstanceId(String activityId) {
     
-    String nextId = Context.getProcessEngineConfiguration()
-      .getIdGenerator()
-      .getNextId();
-    
-    String compositeId = activityId+":"+nextId;
-    if(compositeId.length()>64) {
-      return String.valueOf(nextId);
+    if(activityId.equals(processDefinitionId)) {
+      return processInstanceId;
+      
     } else {
-      return compositeId;
+      
+      String nextId = Context.getProcessEngineConfiguration()
+        .getIdGenerator()
+        .getNextId();
+      
+      String compositeId = activityId+":"+nextId;
+      if(compositeId.length()>64) {
+        return String.valueOf(nextId);
+      } else {
+        return compositeId;
+      }
     }
+  }
+
+  public void forceUpdateActivityInstance() {
+    activityInstanceId = generateActivityInstanceId(getActivity().getActivityId());    
   }
   
   public void setActivityInstanceId(String activityInstanceId) {

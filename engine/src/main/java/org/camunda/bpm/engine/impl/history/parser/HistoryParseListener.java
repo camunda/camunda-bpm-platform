@@ -21,9 +21,7 @@ import org.camunda.bpm.engine.impl.bpmn.behavior.UserTaskActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseListener;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
-import org.camunda.bpm.engine.impl.history.producer.ExecutionListenerHistoryAdapter;
-import org.camunda.bpm.engine.impl.history.producer.HistoricUserTaskAssignmentListener;
-import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducerFactory;
+import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmEvent;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
@@ -37,7 +35,7 @@ import org.camunda.bpm.engine.impl.variable.VariableDeclaration;
  * <p>This class is responsible for wiring history as execution listeners into process execution. 
  * 
  * <p>NOTE: the role of this class has changed since 7.0: in order to customize history behavior it is 
- * usually not necessary to override this class but rather the {@link HistoryEventProducerFactory} for 
+ * usually not necessary to override this class but rather the {@link HistoryEventProducer} for 
  * customizing data acquisition and {@link HistoryEventHandler} for customizing the persistence behavior 
  * or if you need a history event stream.
  *  
@@ -53,13 +51,13 @@ public class HistoryParseListener implements BpmnParseListener {
 
   // Cached listeners
   // listeners can be reused for a given process engine instance but cannot be cached in static fields since 
-  // different process engine instances on the same Classloader may have different HistoryEventProducerFactory 
+  // different process engine instances on the same Classloader may have different HistoryEventProducer 
   // configurations wired
   protected ExecutionListener PROCESS_INSTANCE_START_LISTENER;
   protected ExecutionListener PROCESS_INSTANCE_END_LISTENER;
 
   protected ExecutionListener ACTIVITY_INSTANCE_START_LISTENER;
-  protected ExecutionListener ACTIVITI_INSTANCE_END_LISTENER;
+  protected ExecutionListener ACTIVITY_INSTANCE_END_LISTENER;
 
   protected TaskListener USER_TASK_ASSIGNMENT_HANDLER;
   protected TaskListener USER_TASK_ID_HANDLER;
@@ -67,19 +65,19 @@ public class HistoryParseListener implements BpmnParseListener {
   // The history level set in the process engine configuration
   protected int historyLevel;
 
-  public HistoryParseListener(int historyLevel, HistoryEventProducerFactory historyEventProducerFactory) {
+  public HistoryParseListener(int historyLevel, HistoryEventProducer historyEventProducer) {
     this.historyLevel = historyLevel;
-    initExecutionListeners(historyEventProducerFactory);
+    initExecutionListeners(historyEventProducer);
   }
 
-  protected void initExecutionListeners(HistoryEventProducerFactory factory) {
-    PROCESS_INSTANCE_START_LISTENER = new ExecutionListenerHistoryAdapter(factory.getHistoricProcessInstanceStartEventProducer());
-    PROCESS_INSTANCE_END_LISTENER = new ExecutionListenerHistoryAdapter(factory.getHistoricProcessInstanceEndEventProducer());
+  protected void initExecutionListeners(HistoryEventProducer historyEventProducer) {
+    PROCESS_INSTANCE_START_LISTENER = new ProcessInstanceStartListener(historyEventProducer);
+    PROCESS_INSTANCE_END_LISTENER = new ProcessInstanceEndListener(historyEventProducer);
     
-    ACTIVITY_INSTANCE_START_LISTENER = new ExecutionListenerHistoryAdapter(factory.getHistoricActivityInstanceStartEventProducer());
-    ACTIVITI_INSTANCE_END_LISTENER = new ExecutionListenerHistoryAdapter(factory.getHistoricActivityInstanceEndEventProducer());
+    ACTIVITY_INSTANCE_START_LISTENER = new ActivityInstanceStartListener(historyEventProducer);
+    ACTIVITY_INSTANCE_END_LISTENER = new ActivityInstanceEndListener(historyEventProducer);
     
-    USER_TASK_ASSIGNMENT_HANDLER = new HistoricUserTaskAssignmentListener(factory.getHistoricActivityInstanceUpdateEventProducer());
+    USER_TASK_ASSIGNMENT_HANDLER = new ActivityInstanceUpdateListener(historyEventProducer);
     USER_TASK_ID_HANDLER = USER_TASK_ASSIGNMENT_HANDLER;
   }
 
@@ -140,9 +138,7 @@ public class HistoryParseListener implements BpmnParseListener {
   }
 
   public void parseStartEvent(Element startEventElement, ScopeImpl scope, ActivityImpl activity) {
-    if (activityHistoryEnabled(activity, historyLevel)) {
-      activity.addExecutionListener(org.camunda.bpm.engine.impl.pvm.PvmEvent.EVENTNAME_END, ACTIVITI_INSTANCE_END_LISTENER);
-    }
+    addActivityHandlers(activity);
   }
 
   public void parseSendTask(Element sendTaskElement, ScopeImpl scope, ActivityImpl activity) {
@@ -220,7 +216,7 @@ public class HistoryParseListener implements BpmnParseListener {
   protected void addActivityHandlers(ActivityImpl activity) {
     if (activityHistoryEnabled(activity, historyLevel)) {
       activity.addExecutionListener(PvmEvent.EVENTNAME_START, ACTIVITY_INSTANCE_START_LISTENER, 0);
-      activity.addExecutionListener(PvmEvent.EVENTNAME_END, ACTIVITI_INSTANCE_END_LISTENER);
+      activity.addExecutionListener(PvmEvent.EVENTNAME_END, ACTIVITY_INSTANCE_END_LISTENER);
     }
   }
 

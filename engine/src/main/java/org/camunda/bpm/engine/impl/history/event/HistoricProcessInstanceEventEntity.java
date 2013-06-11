@@ -19,21 +19,18 @@ package org.camunda.bpm.engine.impl.history.event;
  * @author Marcel Wieczorek
  * 
  */
-public class HistoricProcessInstanceEventEntity extends HistoricScopeInstanceEventEntity {
+public class HistoricProcessInstanceEventEntity extends HistoryEvent {
 
   private static final long serialVersionUID = 1L;
 
-  /** the id of the activity that ended the process instance */
-  protected String endActivityId;
+  /** the id of the activity that starts or ends the process */
+  protected String activityId;
 
   /** the business key of the process instance */
   protected String businessKey;
 
   /** the id of the user that started the process instance */
   protected String startUserId;
-
-  /** the id of the activity at which the process instance was started */
-  protected String startActivityId;
 
   /** the id of the super process instance */
   protected String superProcessInstanceId;
@@ -43,12 +40,12 @@ public class HistoricProcessInstanceEventEntity extends HistoricScopeInstanceEve
 
   // getters / setters ////////////////////////////////////////
 
-  public String getEndActivityId() {
-    return endActivityId;
+  public String getActivityId() {
+    return activityId;
   }
-
-  public void setEndActivityId(String endActivityId) {
-    this.endActivityId = endActivityId;
+  
+  public void setActivityId(String activityId) {
+    this.activityId = activityId;
   }
 
   public String getBusinessKey() {
@@ -65,14 +62,6 @@ public class HistoricProcessInstanceEventEntity extends HistoricScopeInstanceEve
 
   public void setStartUserId(String startUserId) {
     this.startUserId = startUserId;
-  }
-
-  public String getStartActivityId() {
-    return startActivityId;
-  }
-
-  public void setStartActivityId(String startActivityId) {
-    this.startActivityId = startActivityId;
   }
 
   public String getSuperProcessInstanceId() {

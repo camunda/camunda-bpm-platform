@@ -69,33 +69,41 @@ public class ParallelGatewayTest extends PluggableProcessEngineTestCase {
   // ACT-482
   @Deployment
   public void testNestedForkJoin() {
-   runtimeService.startProcessInstanceByKey("nestedForkJoin");
+   ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("nestedForkJoin");
    
-   // After process startm, only task 0 should be active
+   // After process start, only task 0 should be active
    TaskQuery query = taskService.createTaskQuery().orderByTaskName().asc(); 
    List<Task> tasks = query.list();
    assertEquals(1, tasks.size());
-   assertEquals("Task 0", tasks.get(0).getName());
+   assertEquals("Task 0", tasks.get(0).getName());      
+   // there is one act instance below the process instance
+//   assertEquals(1, runtimeService.getProcessInstance(processInstance.getId()).getChildInstances().size());
    
    // Completing task 0 will create Task A and B
    taskService.complete(tasks.get(0).getId());
    tasks = query.list();
    assertEquals(2, tasks.size());
    assertEquals("Task A", tasks.get(0).getName());
-   assertEquals("Task B", tasks.get(1).getName());
+   assertEquals("Task B", tasks.get(1).getName());      
+   // there are 2 act instance below the process instance
+   assertEquals(2, runtimeService.getProcessInstance(processInstance.getId()).getChildInstances().size());
    
    // Completing task A should not trigger any new tasks
    taskService.complete(tasks.get(0).getId());
    tasks = query.list();
    assertEquals(1, tasks.size());
-   assertEquals("Task B", tasks.get(0).getName());
+   assertEquals("Task B", tasks.get(0).getName());   
+   // there is 2 act instance below the process instance (one at the task, one at the join)
+   assertEquals(2, runtimeService.getProcessInstance(processInstance.getId()).getChildInstances().size());
 
    // Completing task B creates tasks B1 and B2
    taskService.complete(tasks.get(0).getId());
    tasks = query.list();
    assertEquals(2, tasks.size());
    assertEquals("Task B1", tasks.get(0).getName());
-   assertEquals("Task B2", tasks.get(1).getName());
+   assertEquals("Task B2", tasks.get(1).getName());   
+   // there are 3 act instances below the process instance
+   assertEquals(3, runtimeService.getProcessInstance(processInstance.getId()).getChildInstances().size());
    
    // Completing B1 and B2 will activate both joins, and process reaches task C
    taskService.complete(tasks.get(0).getId());

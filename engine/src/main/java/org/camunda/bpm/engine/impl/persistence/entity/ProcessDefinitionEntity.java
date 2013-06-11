@@ -13,7 +13,6 @@
 package org.camunda.bpm.engine.impl.persistence.entity;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -22,24 +21,19 @@ import java.util.Set;
 
 import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
-import org.camunda.bpm.engine.impl.cfg.IdGenerator;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.db.DbSqlSession;
 import org.camunda.bpm.engine.impl.db.HasRevision;
 import org.camunda.bpm.engine.impl.db.PersistentObject;
 import org.camunda.bpm.engine.impl.form.StartFormHandler;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
 import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
-import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducerFactory;
 import org.camunda.bpm.engine.impl.identity.Authentication;
-import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.InterpretableExecution;
 import org.camunda.bpm.engine.impl.task.TaskDefinition;
-import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.task.IdentityLinkType;
 
@@ -100,22 +94,18 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
       processInstance.setVariable(initiatorVariableName, authenticatedUserId);
     }
     
-    ProcessEngineConfigurationImpl configurqation = Context.getProcessEngineConfiguration();
-    int historyLevel = configurqation.getHistoryLevel();
+    ProcessEngineConfigurationImpl configuration = Context.getProcessEngineConfiguration();
+    int historyLevel = configuration.getHistoryLevel();
     // TODO: This smells bad, as the rest of the history is done via the ParseListener
     if (historyLevel>=ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
       
-      final HistoryEventProducerFactory eventFactory = configurqation.getHistoryEventProducerFactory();      
-      final HistoryEventHandler eventHandler = configurqation.getHistoryEventHandler();
+      final HistoryEventProducer eventFactory = configuration.getHistoryEventProducer();      
+      final HistoryEventHandler eventHandler = configuration.getHistoryEventHandler();
       
       // publish event for historic process instance start
-      HistoryEvent pise = eventFactory.getHistoricProcessInstanceStartEventProducer().createHistoryEvent(processInstance);
+      HistoryEvent pise = eventFactory.createProcessInstanceStartEvt(processInstance);
       eventHandler.handleEvent(pise); 
-         
-      // publish event for historic activity instance start
-      // TODO: this is actually BUG: if execution starts at a nested scope this emits event for wrong execution.
-      HistoryEvent aise = eventFactory.getHistoricActivityInstanceStartEventProducer().createHistoryEvent(processInstance);
-      eventHandler.handleEvent(aise);
+      
     }
 
     return processInstance;
@@ -327,4 +317,5 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
   public void addCandidateStarterGroupIdExpression(Expression groupId) {
     candidateStarterGroupIdExpressions.add(groupId);
   }
+  
 }

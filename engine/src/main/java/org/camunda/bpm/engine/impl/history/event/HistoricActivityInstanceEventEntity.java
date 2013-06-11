@@ -19,16 +19,72 @@ package org.camunda.bpm.engine.impl.history.event;
  * @author Marcel Wieczorek
  * 
  */
-public class HistoricActivityInstanceEventEntity extends HistoricScopeInstanceEventEntity {
+public class HistoricActivityInstanceEventEntity extends HistoryEvent {
 
   private static final long serialVersionUID = 1L;
 
+  /** the id of the activity */
+  protected String activityId;
+
+  /** the name of the activity */
+  protected String activityName;
+
+  /** the type of the activity (startEvent, serviceTask ...) */
+  protected String activityType;
+
+  /** the id of this activity instance */
+  protected String activityInstanceId;
+
+  /** the id of the parent activity instance */
+  protected String parentActivityInstanceId;
+  
   /** the id of the child activity instance */
   protected String calledProcessInstanceId;
+  
   protected String taskId;
   protected String taskAssignee;
 
   // getters / setters ///////////////////////////////
+
+  public String getActivityId() {
+    return activityId;
+  }
+
+  public void setActivityId(String activityId) {
+    this.activityId = activityId;
+  }
+
+  public String getActivityType() {
+    return activityType;
+  }
+
+  public void setActivityType(String activityType) {
+    this.activityType = activityType;
+  }
+
+  public String getActivityName() {
+    return activityName;
+  }
+
+  public void setActivityName(String activityName) {
+    this.activityName = activityName;
+  }
+
+  public String getActivityInstanceId() {
+    return activityInstanceId;
+  }
+
+  public void setActivityInstanceId(String activityInstanceId) {
+    this.activityInstanceId = activityInstanceId;
+  }
+
+  public String getParentActivityInstanceId() {
+    return parentActivityInstanceId;
+  }
+
+  public void setParentActivityInstanceId(String parentActivityInstanceId) {
+    this.parentActivityInstanceId = parentActivityInstanceId;
+  }
 
   public String getCalledProcessInstanceId() {
     return calledProcessInstanceId;

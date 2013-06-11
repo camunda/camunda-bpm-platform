@@ -555,6 +555,7 @@ public class DbSqlSession implements Session {
           Object originalState = cachedObject.getPersistentObjectState();
           if (!persistentObject.getPersistentState().equals(originalState)) {
             updatedObjects.add(persistentObject);
+            
           } else {
             log.finest("loaded object '"+persistentObject+"' was not updated");
           }
@@ -563,7 +564,12 @@ public class DbSqlSession implements Session {
       }
       
     }
+    
     return updatedObjects;
+  }
+  
+  public boolean isUpdated(PersistentObject persistentObject) {
+    return getUpdatedObjects().contains(persistentObject);
   }
   
   protected boolean isPersistentObjectDeleted(PersistentObject persistentObject) {

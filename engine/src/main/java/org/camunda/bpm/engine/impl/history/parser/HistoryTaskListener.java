@@ -10,39 +10,52 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package org.camunda.bpm.engine.impl.history.producer;
+package org.camunda.bpm.engine.impl.history.parser;
 
 import org.camunda.bpm.engine.delegate.DelegateTask;
 import org.camunda.bpm.engine.delegate.TaskListener;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
+import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 
 /**
- * @author Tom Baeyens
+ * <p>A {@link TaskListener} implementation that delegates to a
+ * {@link HistoryEventProducer}.
+ * 
+ * @author Daniel Meyer
+ *
  */
-public class HistoricUserTaskAssignmentListener implements TaskListener {
+public abstract class HistoryTaskListener implements TaskListener {
+  
+  protected final HistoryEventProducer eventProducer;
 
-  protected HistoryEventProducer eventProducer;
-
-  public HistoricUserTaskAssignmentListener(HistoryEventProducer historicActivityInstanceUpdateEventProducer) {
-    this.eventProducer = historicActivityInstanceUpdateEventProducer;
+  public HistoryTaskListener(HistoryEventProducer historyEventProducer) {
+    this.eventProducer = historyEventProducer;
   }
 
   public void notify(DelegateTask task) {
     
+    // get the event handler
+    final HistoryEventHandler historyEventHandler = Context.getProcessEngineConfiguration()
+      .getHistoryEventHandler();
+    
     ExecutionEntity execution = ((TaskEntity) task).getExecution();
     
     if (execution != null) {
-      final HistoryEventHandler eventHandler = Context.getProcessEngineConfiguration().getHistoryEventHandler();
       
-      HistoryEvent historyEvent = eventProducer.createHistoryEvent(execution, task);
-      eventHandler.handleEvent(historyEvent);
+      // delegate creation of the history event to the producer
+      HistoryEvent historyEvent = createHistoryEvent(task, execution);
+      
+      // pass the event to the handler
+      historyEventHandler.handleEvent(historyEvent);
+      
     }
     
   }
+  
+  protected abstract HistoryEvent createHistoryEvent(DelegateTask task, ExecutionEntity execution);
 
 }

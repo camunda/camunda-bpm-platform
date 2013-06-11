@@ -163,6 +163,9 @@ public class ExecutionImpl implements
     createdExecution.setProcessInstance(getProcessInstance());
     createdExecution.setActivity(getActivity());
     
+    // make created execution start in same activity instance
+    createdExecution.activityInstanceId = activityInstanceId;
+    
     return createdExecution;
   }
   
@@ -406,17 +409,7 @@ public class ExecutionImpl implements
   /** sets the current activity.  can be overridden by subclasses.  doesn't 
    * require initialization. */
   public void setActivity(ActivityImpl activity) {
-    ActivityImpl activityBefore = this.activity;
-
-    if (activity == null || (activityBefore != null && activity.contains(activityBefore))) {
-      leaveActivityInstance();
-      this.activity = activity;
-      
-    } else if(activityBefore != activity) {
-      this.activity = activity;
-      enterActivityInstance();      
-    }
-    
+    this.activity = activity;
   }
 
   /** must be called before the activity member field or getActivity() is called */
@@ -424,31 +417,44 @@ public class ExecutionImpl implements
   }
     
   public void enterActivityInstance() {
-    if (parent == null || parent.getActivity() != getActivity()) {
-      // generate new activity instance id
-      activityInstanceId = generateActivityInstanceId(getActivity().getId());    
-      if(log.isLoggable(Level.FINE)) {
-        log.log(Level.FINE, toString()+" enters activity instance "+activityInstanceId +"; parent activity instance: "+getParentActivityInstanceId());
-      }
-    } else {
-      activityInstanceId = parent.getActivityInstanceId();  
-      if(log.isLoggable(Level.FINE)) {
-        log.log(Level.FINE, toString()+" starts in activity instance "+activityInstanceId +"; parent activity instance: "+getParentActivityInstanceId());
-      }
+    
+    activity = getActivity();
+    // special treatment for starting process instance
+    if(activity == null && startingExecution!= null) {
+      activity = startingExecution.getInitial();
     }
+    
+    activityInstanceId = generateActivityInstanceId(activity.getId());
+    
+    if(log.isLoggable(Level.FINE)) {
+      log.fine("[ENTER] "+this + ": "+activityInstanceId+", parent: "+getParentActivityInstanceId());
+    }
+    
   }
-  
+    
   public void leaveActivityInstance() {
-
-    activityInstanceId = getParentActivityInstanceId();
+    
+    if(activityInstanceId != null) {
+      
+      if(log.isLoggable(Level.FINE)) {
+        log.fine("[LEAVE] "+ this + ": "+activityInstanceId );
+      }
+      
+      activityInstanceId = getParentActivityInstanceId();
+    }    
     
   }
   
   public String getParentActivityInstanceId() {
     if(isProcessInstance()) {
       return String.valueOf(System.identityHashCode(getProcessInstance()));    
-    } else {
-      if(parent.getActivity().contains(getActivity())) {
+    } else { 
+      ExecutionImpl parent = getParent();
+      ActivityImpl activity = getActivity();
+      ActivityImpl parentActivity = parent.getActivity();
+      if (parent.isScope() && !isConcurrent() || parent.isConcurrent
+         && activity != parentActivity
+        ) {
         return parent.getActivityInstanceId();        
       } else {
         return parent.getParentActivityInstanceId();        

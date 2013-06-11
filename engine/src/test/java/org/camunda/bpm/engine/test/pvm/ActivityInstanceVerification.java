@@ -125,12 +125,12 @@ public class ActivityInstanceVerification extends Assert implements ExecutionLis
     List<ActivityInstance> actInstanceList = startedActivityInstances.get(actId);
     
     for (ActivityInstance activityInstance : actInstanceList) {
-      assertEquals(activityInstance.parentId, actInstId);
+      assertEquals(actInstId, activityInstance.parentId);
     }
     
     actInstanceList = endedActivityInstances.get(actId);    
     for (ActivityInstance activityInstance : actInstanceList) {
-      assertEquals(activityInstance.parentId, actInstId);
+      assertEquals(actInstId, activityInstance.parentId);
     }
     
   }

@@ -22,11 +22,12 @@
   
   NOTE:
   
-  HAIs are stored as update events. For each HAI, there are usually two update 
+  HAIs are stored as update events. For each HAI, there are at least two update 
   events which correspond to two lines in the DB:
      
-    * a first line added when the activity is started
-    * a second line added when the activity is ended  
+    * the first line added when the activity is started
+    * [several lines added when the activity is updated]
+    * the last line added when the activity is ended  
   
   The first part of this file contains the mappings for these update events. 
   
@@ -162,6 +163,8 @@
       	)
     WHERE
       A1.EVENT_TYPE_ = 'start'
+    AND A1.ACT_ID_ = #{activityId}
+    AND A1.PROC_INST_ID_ = #{processInstanceId}
   </select>
 
   <select id="selectHistoricActivityInstancesByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricActivityInstanceQueryImpl" resultMap="historicActivityInstanceResultMap">
@@ -194,12 +197,11 @@
   </select>
   
   <select id="selectHistoricActivityInstanceCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.HistoricActivityInstanceQueryImpl" resultType="long">
-    select count(*)
+    select count(A1.ACT_INST_ID_)
     <include refid="selectHistoricActivityInstancesByQueryCriteriaSql"/>
   </select>
   
   <sql id="selectHistoricActivityInstancesByQueryCriteriaSql">
-    
     FROM ${prefix}ACT_HI_ACTINST A1
     LEFT JOIN 
       ${prefix}ACT_HI_ACTINST A2 
