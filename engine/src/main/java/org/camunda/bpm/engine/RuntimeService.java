@@ -18,6 +18,7 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ExecutionQuery;
 import org.camunda.bpm.engine.runtime.IncidentQuery;
@@ -255,6 +256,11 @@ public interface RuntimeService {
    * @throws ProcessEngineException when no execution exists with the given executionId. 
    */
   List<String> getActiveActivityIds(String executionId);
+  
+  /**
+   * @return the activity instance tree for a given process instance 
+   */
+  ActivityInstance getProcessInstance(String processInstanceId);
 
   /** Sends an external trigger to an activity instance that is waiting inside the given execution.
    * @param executionId id of execution to signal, cannot be null.

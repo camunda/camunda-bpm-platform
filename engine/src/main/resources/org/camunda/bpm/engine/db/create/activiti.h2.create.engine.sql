@@ -32,13 +32,14 @@ create table ACT_RE_DEPLOYMENT (
 );
 
 create table ACT_RU_EXECUTION (
-    ID_ varchar(64),
+    ID_ varchar(64),    
     REV_ integer,
     PROC_INST_ID_ varchar(64),
     BUSINESS_KEY_ varchar(255),
     PARENT_ID_ varchar(64),
     PROC_DEF_ID_ varchar(64),
     SUPER_EXEC_ varchar(64),
+    ACT_INST_ID_ varchar(64),
     ACT_ID_ varchar(255),
     IS_ACTIVE_ bit,
     IS_CONCURRENT_ bit,

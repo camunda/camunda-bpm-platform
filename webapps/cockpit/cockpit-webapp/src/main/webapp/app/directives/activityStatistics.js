@@ -4,27 +4,25 @@ ngDefine('cockpit.directives', [ 'angular' ], function(module, angular) {
   
   var Directive = function (ProcessDefinitionActivityStatisticsResource) {
     return {
-      restrict: 'A',
+      restrict: 'AC',
       require: 'processDiagram', 
       link: function(scope, element, attr, processDiagram) {
         
-        scope.$watch(function() { return processDiagram.getRenderer(); }, function (newValue) {
-          if (!!newValue) {
-            getActivityStatisics();
-          }
+        scope.$watch('processDefinitionId', function (newValue) {
+          processDiagram.annotateWithActivityStatistics(null);
+          getActivityStatistics();
         });
-
-        function getActivityStatisics () {
+        
+        function getActivityStatistics() {
           ProcessDefinitionActivityStatisticsResource
-            .queryStatistics(
+          .queryStatistics(
               {
                 id : scope.processDefinitionId
               })
               .$then(function(result) {
                 processDiagram.annotateWithActivityStatistics(result.data);
-          });
-        };
-        
+              });
+        }
       }
     };
   };

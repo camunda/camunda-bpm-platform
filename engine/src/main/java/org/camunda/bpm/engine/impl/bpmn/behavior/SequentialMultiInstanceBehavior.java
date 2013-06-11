@@ -56,7 +56,7 @@ public class SequentialMultiInstanceBehavior extends MultiInstanceActivityBehavi
    */
   public void leave(ActivityExecution execution) {
     callActivityEndListeners(execution);
-    
+        
     int loopCounter = getLoopVariable(execution, LOOP_COUNTER) + 1;
     int nrOfInstances = getLoopVariable(execution, NUMBER_OF_INSTANCES);
     int nrOfCompletedInstances = getLoopVariable(execution, NUMBER_OF_COMPLETED_INSTANCES) + 1;
@@ -68,7 +68,7 @@ public class SequentialMultiInstanceBehavior extends MultiInstanceActivityBehavi
     
     if (loopCounter == nrOfInstances || completionConditionSatisfied(execution)) {
       super.leave(execution);
-    } else {
+    } else {      
       try {
         executeOriginalBehavior(execution, loopCounter);
       } catch (BpmnError error) {

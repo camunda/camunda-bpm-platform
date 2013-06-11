@@ -16,6 +16,7 @@ package org.camunda.bpm.engine.test.bpmn.gateway;
 import java.util.List;
 
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
@@ -69,13 +70,14 @@ public class ParallelGatewayTest extends PluggableProcessEngineTestCase {
   // ACT-482
   @Deployment
   public void testNestedForkJoin() {
-   runtimeService.startProcessInstanceByKey("nestedForkJoin");
+   String pid = runtimeService.startProcessInstanceByKey("nestedForkJoin").getId();
    
    // After process startm, only task 0 should be active
    TaskQuery query = taskService.createTaskQuery().orderByTaskName().asc(); 
    List<Task> tasks = query.list();
    assertEquals(1, tasks.size());
    assertEquals("Task 0", tasks.get(0).getName());
+   assertEquals(1, runtimeService.getProcessInstance(pid).getChildInstances().size());
    
    // Completing task 0 will create Task A and B
    taskService.complete(tasks.get(0).getId());
@@ -83,12 +85,14 @@ public class ParallelGatewayTest extends PluggableProcessEngineTestCase {
    assertEquals(2, tasks.size());
    assertEquals("Task A", tasks.get(0).getName());
    assertEquals("Task B", tasks.get(1).getName());
+   assertEquals(2, runtimeService.getProcessInstance(pid).getChildInstances().size());
    
    // Completing task A should not trigger any new tasks
    taskService.complete(tasks.get(0).getId());
    tasks = query.list();
    assertEquals(1, tasks.size());
    assertEquals("Task B", tasks.get(0).getName());
+   assertEquals(2, runtimeService.getProcessInstance(pid).getChildInstances().size());
 
    // Completing task B creates tasks B1 and B2
    taskService.complete(tasks.get(0).getId());
@@ -96,13 +100,15 @@ public class ParallelGatewayTest extends PluggableProcessEngineTestCase {
    assertEquals(2, tasks.size());
    assertEquals("Task B1", tasks.get(0).getName());
    assertEquals("Task B2", tasks.get(1).getName());
+   assertEquals(3, runtimeService.getProcessInstance(pid).getChildInstances().size());
    
    // Completing B1 and B2 will activate both joins, and process reaches task C
    taskService.complete(tasks.get(0).getId());
    taskService.complete(tasks.get(1).getId());
    tasks = query.list();
    assertEquals(1, tasks.size());
-   assertEquals("Task C", tasks.get(0).getName());   
+   assertEquals("Task C", tasks.get(0).getName());
+   assertEquals(1, runtimeService.getProcessInstance(pid).getChildInstances().size());
   }
   
   /**

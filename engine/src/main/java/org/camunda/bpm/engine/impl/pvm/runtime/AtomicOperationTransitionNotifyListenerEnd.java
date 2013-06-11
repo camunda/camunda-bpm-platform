@@ -18,7 +18,7 @@ import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 /**
  * @author Tom Baeyens
  */
-public class AtomicOperationTransitionNotifyListenerEnd extends AbstractEventAtomicOperation {
+public class AtomicOperationTransitionNotifyListenerEnd extends AtomicOperationActivityInstanceEnd {
 
   @Override
   protected ScopeImpl getScope(InterpretableExecution execution) {
@@ -31,7 +31,8 @@ public class AtomicOperationTransitionNotifyListenerEnd extends AbstractEventAto
   }
 
   @Override
-  protected void eventNotificationsCompleted(InterpretableExecution execution) {
+  protected void eventNotificationsCompleted(InterpretableExecution execution) {   
+    super.eventNotificationsCompleted(execution);
     execution.performOperation(TRANSITION_DESTROY_SCOPE);
   }
 }

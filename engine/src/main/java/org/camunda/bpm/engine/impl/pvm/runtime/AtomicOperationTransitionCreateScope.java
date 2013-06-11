@@ -37,15 +37,15 @@ public class AtomicOperationTransitionCreateScope implements AtomicOperation {
       propagatingExecution.setActivity(activity);
       propagatingExecution.setTransition(execution.getTransition());
       execution.setTransition(null);
-      execution.setActivity(null);
       execution.setActive(false);
+      execution.setActivity(null);
       log.fine("create scope: parent "+execution+" continues as execution "+propagatingExecution);
       propagatingExecution.initialize();
 
     } else {
       propagatingExecution = execution;
     }
-
+    
     propagatingExecution.performOperation(AtomicOperation.TRANSITION_NOTIFY_LISTENER_START);
   }
 }

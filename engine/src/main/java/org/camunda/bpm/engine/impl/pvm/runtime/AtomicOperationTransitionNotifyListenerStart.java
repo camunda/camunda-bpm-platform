@@ -20,7 +20,7 @@ import org.camunda.bpm.engine.impl.pvm.process.TransitionImpl;
 /**
  * @author Tom Baeyens
  */
-public class AtomicOperationTransitionNotifyListenerStart extends AbstractEventAtomicOperation {
+public class AtomicOperationTransitionNotifyListenerStart extends AtomicOperationActivityInstanceStart {
   
   @Override
   protected ScopeImpl getScope(InterpretableExecution execution) {
@@ -31,9 +31,12 @@ public class AtomicOperationTransitionNotifyListenerStart extends AbstractEventA
   protected String getEventName() {
     return org.camunda.bpm.engine.impl.pvm.PvmEvent.EVENTNAME_START;
   }
-
+  
   @Override
   protected void eventNotificationsCompleted(InterpretableExecution execution) {
+    
+    super.eventNotificationsCompleted(execution);
+    
     TransitionImpl transition = execution.getTransition();
     ActivityImpl destination = null;
     if(transition == null) { // this is null after async cont. -> transition is not stored in execution

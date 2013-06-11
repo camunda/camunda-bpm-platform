@@ -174,4 +174,5 @@ public class ProcessDefinitionImpl extends ScopeImpl implements PvmProcessDefini
   public ParticipantProcess getParticipantProcess() {
     return participantProcess;
   }
+  
 }
