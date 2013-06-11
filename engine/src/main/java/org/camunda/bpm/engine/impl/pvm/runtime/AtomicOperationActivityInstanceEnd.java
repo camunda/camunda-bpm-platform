@@ -34,7 +34,8 @@ public abstract class AtomicOperationActivityInstanceEnd extends AbstractEventAt
     // if we end a scope activity, take remembered activity instance from parent and set on 
     // execution before calling END listeners.
     ActivityExecution parent = execution.getParent();
-    if(parent != null && execution.isScope() && ((ActivityImpl)execution.getActivity()).isScope()) {
+    ActivityImpl activity = (ActivityImpl)execution.getActivity();
+    if(parent != null && execution.isScope() && activity != null && activity.isScope()) {
 
       if(log.isLoggable(Level.FINE)) {
         log.fine("[LEAVE] "+ execution + ": "+execution.getActivityInstanceId() );
