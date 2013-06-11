@@ -10,27 +10,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.audit.handler;
+package org.camunda.bpm.engine.impl.history.handler;
 
-import org.camunda.bpm.engine.impl.audit.AuditEvent;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbSqlSession;
+import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 
 /**
- * <p>Audit event handler that writes audit events to the 
+ * <p>History event handler that writes history events to the 
  * process engine database using the DbSqlSession.</p>
+ * 
+ * <p>This history implementation is INSERT-only: when writing history
+ * events to the database we do not perform updates but rather append 
+ * all events to their respective tables. 
  * 
  * @author Daniel Meyer
  *
  */
-public class DbAuditEventHandler implements AuditEventHandler {
+public class DbHistoryEventHandler implements HistoryEventHandler {
 
-  public void handleAuditEvent(AuditEvent auditEvent) {
+  public void handleEvent(HistoryEvent historyEvent) {
     
     final DbSqlSession dbSqlSession = Context.getCommandContext()
       .getDbSqlSession();
     
-    dbSqlSession.insert(auditEvent);
+    dbSqlSession.insert(historyEvent);
     
   }
 

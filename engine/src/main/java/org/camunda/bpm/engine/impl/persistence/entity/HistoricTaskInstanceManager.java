@@ -99,7 +99,7 @@ public class HistoricTaskInstanceManager extends AbstractHistoricManager {
     if (historyLevel>=ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
       HistoricTaskInstanceEntity historicTaskInstance = getDbSqlSession().selectById(HistoricTaskInstanceEntity.class, taskId);
       if (historicTaskInstance!=null) {
-        historicTaskInstance.markEnded(deleteReason);
+//        historicTaskInstance.markEnded(deleteReason);
       }
     }
   }

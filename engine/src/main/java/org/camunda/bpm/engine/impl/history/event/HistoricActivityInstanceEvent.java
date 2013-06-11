@@ -10,16 +10,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.audit;
+package org.camunda.bpm.engine.impl.history.event;
 
 /**
- * <p>{@link AuditEvent} implementation for events that happen in an 
- * activity.</p>
+ * <p>{@link HistoryEvent} implementation for events that happen in an activity.</p>
  * 
  * @author Daniel Meyer
  *
  */
-public class ActivityInstanceAuditEvent extends AuditEvent {
+public class HistoricActivityInstanceEvent extends HistoryEvent {
   
   private static final long serialVersionUID = 1L;
   
@@ -27,8 +26,6 @@ public class ActivityInstanceAuditEvent extends AuditEvent {
   public static final String ACTIVITY_EVENT_TYPE_START = "start";  
   /** fired when an activity instance is ended. */
   public static final String ACTIVITY_EVENT_TYPE_END = "end";  
-  /** fired when an activity instance is cancelled. */
-  public static final String ACTIVITY_EVENT_TYPE_CANCEL = "cancel";
   
   /** the id of the activity */
   protected String activityId;

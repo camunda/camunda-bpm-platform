@@ -10,15 +10,15 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.audit;
+package org.camunda.bpm.engine.impl.history.event;
 
 /**
- * <p>{@link AuditEvent} signifying a top-level event in a process instance.</p>  
+ * <p>{@link HistoryEvent} signifying a top-level event in a process instance.</p>  
  *
  * @author Daniel Meyer
  *
  */
-public class ProcessInstanceAuditEvent extends ActivityInstanceAuditEvent {
+public class HistoricProcessInstanceEvent extends HistoricActivityInstanceEvent {
 
   private static final long serialVersionUID = 1L;
   

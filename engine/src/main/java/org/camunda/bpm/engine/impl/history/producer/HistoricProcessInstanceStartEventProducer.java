@@ -10,23 +10,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.audit.handler;
+package org.camunda.bpm.engine.impl.history.producer;
 
-import org.camunda.bpm.engine.impl.audit.AuditEvent;
+import org.camunda.bpm.engine.impl.history.event.HistoricActivityInstanceEvent;
+import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 
 /**
- * <p>The interface for implementing an audit event handler.</p>
- *  
+ * <p>{@link HistoryEventProducer} for producing {@link HistoryEvent}s when a process 
+ * instance is stated.</p>
+ * 
  * @author Daniel Meyer
  *
  */
-public interface AuditEventHandler {
-  
-  /**
-   * Called by the process engine when an audit event is fired.
-   *  
-   * @param auditEvent the {@link AuditEvent} that is about to be fired.
-   */
-  public void handleAuditEvent(AuditEvent auditEvent);
+public class HistoricProcessInstanceStartEventProducer extends HistoricProcessInstanceEventProducer {
 
+  public HistoricProcessInstanceStartEventProducer() {
+    super(HistoricActivityInstanceEvent.ACTIVITY_EVENT_TYPE_START);
+  }
+  
 }

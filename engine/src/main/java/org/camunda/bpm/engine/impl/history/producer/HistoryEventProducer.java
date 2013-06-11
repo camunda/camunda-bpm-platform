@@ -10,34 +10,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.audit.producer;
+package org.camunda.bpm.engine.impl.history.producer;
 
 import org.camunda.bpm.engine.delegate.DelegateExecution;
-import org.camunda.bpm.engine.impl.audit.AuditEvent;
-import org.camunda.bpm.engine.impl.audit.ProcessInstanceAuditEvent;
+import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 
 /**
- * <p>The producer for process instance audit events.</p>
+ * <p>Interface for implementing history event producers.</p> 
  * 
  * @author Daniel Meyer
  *
  */
-public class ProcessInstanceAuditEventProducer extends ActivityAuditEventProducer {
-
-  public ProcessInstanceAuditEventProducer(String eventType) {
-    super(eventType);
-  }
+public interface HistoryEventProducer {
   
-  @Override
-  protected AuditEvent createAuditEvent(DelegateExecution execution) {
-    
-    ProcessInstanceAuditEvent evt = new ProcessInstanceAuditEvent();
-    
-    // initialize the event
-    initAuditEvent(evt, execution);
-    
-    return evt;
-    
-  }
-
+  public HistoryEvent createHistoryEvent(DelegateExecution execution);
+  
 }

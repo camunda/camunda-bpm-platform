@@ -28,7 +28,9 @@ import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbSqlSession;
 import org.camunda.bpm.engine.impl.db.HasRevision;
 import org.camunda.bpm.engine.impl.db.PersistentObject;
-import org.camunda.bpm.engine.impl.history.handler.refactor.ActivityInstanceEndHandler;
+import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
+import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
+import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducerFactory;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.AsyncContinuationJobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerDeclarationImpl;
@@ -257,17 +259,21 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
     subProcessInstance.setProcessDefinition((ProcessDefinitionImpl) processDefinition);
     subProcessInstance.setProcessInstance(subProcessInstance);
     
-    CommandContext commandContext = Context.getCommandContext();
-    int historyLevel = Context.getProcessEngineConfiguration().getHistoryLevel();
+    ProcessEngineConfigurationImpl configuration = Context.getProcessEngineConfiguration();
+    int historyLevel = configuration.getHistoryLevel();
     if (historyLevel>=ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
-      DbSqlSession dbSqlSession = commandContext.getSession(DbSqlSession.class);
-      HistoricProcessInstanceEntity historicProcessInstance = new HistoricProcessInstanceEntity((ExecutionEntity) subProcessInstance);
-      dbSqlSession.insert(historicProcessInstance);
       
-      HistoricActivityInstanceEntity activitiyInstance = ActivityInstanceEndHandler.findActivityInstance(this);
-      if (activitiyInstance != null) {
-        activitiyInstance.setCalledProcessInstanceId(subProcessInstance.getProcessInstanceId());
-      }
+      final HistoryEventProducerFactory eventFactory = configuration.getHistoryEventProducerFactory();
+      final HistoryEventHandler eventHandler = configuration.getHistoryEventHandler();
+      
+      // publish start event for sub process instance
+      HistoryEvent hpise = eventFactory.getHistoricProcessInstanceStartEventProducer().createHistoryEvent(subProcessInstance);      
+      eventHandler.handleEvent(hpise);
+            
+//      HistoricActivityInstanceEntity activitiyInstance = ActivityInstanceEndHandler.findActivityInstance(this);
+//      if (activitiyInstance != null) {
+//        activitiyInstance.setCalledProcessInstanceId(subProcessInstance.getProcessInstanceId());
+//      }
       
     }
 
@@ -1064,10 +1070,10 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
     int historyLevel = Context.getProcessEngineConfiguration().getHistoryLevel();
     if (historyLevel >= ProcessEngineConfigurationImpl.HISTORYLEVEL_FULL
         && sourceActivityExecution!=null) {
-      HistoricActivityInstanceEntity historicActivityInstance = ActivityInstanceEndHandler.findActivityInstance(sourceActivityExecution); 
-      if (historicActivityInstance!=null) {
-        historicVariableUpdate.setActivityInstanceId(historicActivityInstance.getId());
-      }
+//      HistoricActivityInstanceEntity historicActivityInstance = ActivityInstanceEndHandler.findActivityInstance(sourceActivityExecution); 
+//      if (historicActivityInstance!=null) {
+//        historicVariableUpdate.setActivityInstanceId(historicActivityInstance.getId());
+//      }
     }
   }
 

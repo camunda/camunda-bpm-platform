@@ -14,7 +14,6 @@
 package org.camunda.bpm.engine.impl.persistence.entity;
 
 import org.camunda.bpm.engine.history.HistoricFormProperty;
-import org.camunda.bpm.engine.impl.history.handler.refactor.ActivityInstanceEndHandler;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 
 
@@ -43,10 +42,10 @@ public class HistoricFormPropertyEntity extends HistoricDetailEntity implements 
     this.propertyValue = propertyValue;
     this.time = ClockUtil.getCurrentTime();
 
-    HistoricActivityInstanceEntity historicActivityInstance = ActivityInstanceEndHandler.findActivityInstance(execution);
-    if (historicActivityInstance!=null) {
-      this.activityInstanceId = historicActivityInstance.getId();
-    }
+//    HistoricActivityInstanceEntity historicActivityInstance = ActivityInstanceEndHandler.findActivityInstance(execution);
+//    if (historicActivityInstance!=null) {
+//      this.activityInstanceId = historicActivityInstance.getId();
+//    }
   }
 
   public String getPropertyId() {

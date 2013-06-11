@@ -10,40 +10,40 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.audit;
+package org.camunda.bpm.engine.impl.history.event;
 
 import java.io.Serializable;
 
-import org.camunda.bpm.engine.impl.audit.handler.AuditEventHandler;
 import org.camunda.bpm.engine.impl.db.DbSqlSession;
 import org.camunda.bpm.engine.impl.db.PersistentObject;
+import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
 
 /**
- * <p>The base class for all audit events.</p>
+ * <p>The base class for all history events.</p>
  * 
- * <p>An audit event contains data about an event that has happened 
+ * <p>An history event contains data about an event that has happened 
  * in a process instance. Such an event may be the start of an activity,
- * the end of an activity, a task instance that is created or the 
- * like... </p> 
+ * the end of an activity, a task instance that is created or other similar
+ * events...</p> 
  * 
- * <p>Audit events contain data in a serializable form. Some 
- * implementations may persist audit events directly or may serialize 
+ * <p>History events contain data in a serializable form. Some 
+ * implementations may persist events directly or may serialize 
  * them as an intermediate representation for later processing 
- * (ie. for an asynchronous implementation).</p>
+ * (ie. in an asynchronous implementation).</p>
  * 
- * <p>This class implements {@link PersistentObject} as well in oder 
- * for {@link AuditEvent}s to be easily persistable using the 
- * {@link DbSqlSession}. This may not be used by all {@link AuditEventHandler} 
- * implementations but itdoes also not cause harm.</p>
+ * <p>This class implements {@link PersistentObject}. This was chosen so
+ * that {@link HistoryEvent}s can be easily persisted using the 
+ * {@link DbSqlSession}. This may not be used by all {@link HistoryEventHandler} 
+ * implementations but it does also not cause harm.</p>
  *    
  * @author Daniel Meyer
  *
  */
-public class AuditEvent implements Serializable, PersistentObject {
+public class HistoryEvent implements Serializable, PersistentObject {
   
   private static final long serialVersionUID = 1L;
   
-  /** each {@link AuditEvent} has a unique id */
+  /** each {@link HistoryEvent} has a unique id */
   protected String id;
   
   /** the process instance in which the event has happened */
@@ -103,8 +103,8 @@ public class AuditEvent implements Serializable, PersistentObject {
   // persistent object implementation ///////////////
 
   public Object getPersistentState() {    
-    // audit events are immutable
-    return AuditEvent.class;
+    // events are immutable
+    return HistoryEvent.class;
   }
 
 }

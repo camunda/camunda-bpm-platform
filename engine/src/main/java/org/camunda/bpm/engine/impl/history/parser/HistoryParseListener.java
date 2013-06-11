@@ -11,21 +11,22 @@
  * limitations under the License.
  */
 
-package org.camunda.bpm.engine.impl.history.handler;
+package org.camunda.bpm.engine.impl.history.parser;
 
 import java.util.List;
 
+import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.delegate.TaskListener;
-import org.camunda.bpm.engine.impl.audit.ActivityInstanceAuditEvent;
-import org.camunda.bpm.engine.impl.audit.producer.ActivityAuditEventProducer;
-import org.camunda.bpm.engine.impl.audit.producer.ProcessInstanceEndEventProducer;
-import org.camunda.bpm.engine.impl.audit.producer.ProcessInstanceStartEventProducer;
 import org.camunda.bpm.engine.impl.bpmn.behavior.UserTaskActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseListener;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
 import org.camunda.bpm.engine.impl.history.handler.refactor.UserTaskAssignmentHandler;
 import org.camunda.bpm.engine.impl.history.handler.refactor.UserTaskIdHandler;
+import org.camunda.bpm.engine.impl.history.producer.ExecutionListenerHistoryAdapter;
+import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducerFactory;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
+import org.camunda.bpm.engine.impl.pvm.PvmEvent;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.impl.pvm.process.TransitionImpl;
@@ -34,36 +35,55 @@ import org.camunda.bpm.engine.impl.util.xml.Element;
 import org.camunda.bpm.engine.impl.variable.VariableDeclaration;
 
 /**
- * Implements writing the history, but not all logic is contained here, see {@link ProcessDefinitionEntity} as well!
+ * <p>This class is responsible for wiring history as execution listeners into process execution. 
  * 
+ * <p>NOTE: the role of this class has changed since 7.0: in order to customize history behavior it is 
+ * usually not necessary to override this class but rather the {@link HistoryEventProducerFactory} for 
+ * customizing data acquisition and {@link HistoryEventHandler} for customizing the persistence behavior 
+ * or if you need a history event stream.
+ *  
  * @author Tom Baeyens
  * @author Joram Barrez
  * @author Falko Menge
  * @author Bernd Ruecker (camunda)
  * @author Christian Lipphardt (camunda)
+ * 
+ * @author Daniel Meyer
  */
 public class HistoryParseListener implements BpmnParseListener {
 
-  protected static final ProcessInstanceStartEventProducer PROCESS_INSTANCE_START_LISTENER = new ProcessInstanceStartEventProducer();
-  protected static final ProcessInstanceEndEventProducer PROCESS_INSTANCE_END_LISTENER = new ProcessInstanceEndEventProducer();
+  // Cached listeners
+  // listeners can be reused for a given process engine instance but cannot be cached in static fields since 
+  // different process engine instances on the same Classloader may have different HistoryEventProducerFactory 
+  // configurations wired
+  protected ExecutionListener PROCESS_INSTANCE_START_LISTENER;
+  protected ExecutionListener PROCESS_INSTANCE_END_LISTENER;
 
-  protected static final ActivityAuditEventProducer ACTIVITY_INSTANCE_START_LISTENER = new ActivityAuditEventProducer(ActivityInstanceAuditEvent.ACTIVITY_EVENT_TYPE_START);
-  protected static final ActivityAuditEventProducer ACTIVITI_INSTANCE_END_LISTENER = new ActivityAuditEventProducer(ActivityInstanceAuditEvent.ACTIVITY_EVENT_TYPE_END);
+  protected ExecutionListener ACTIVITY_INSTANCE_START_LISTENER;
+  protected ExecutionListener ACTIVITI_INSTANCE_END_LISTENER;
 
-  protected static final UserTaskAssignmentHandler USER_TASK_ASSIGNMENT_HANDLER = new UserTaskAssignmentHandler();
+  protected UserTaskAssignmentHandler USER_TASK_ASSIGNMENT_HANDLER;
+  protected UserTaskIdHandler USER_TASK_ID_HANDLER;
 
-  protected static final UserTaskIdHandler USER_TASK_ID_HANDLER = new UserTaskIdHandler();
-
-  // The history level set in the Activiti configuration
+  // The history level set in the process engine configuration
   protected int historyLevel;
 
-  public HistoryParseListener(int historyLevel) {
+  public HistoryParseListener(int historyLevel, HistoryEventProducerFactory historyEventProducerFactory) {
     this.historyLevel = historyLevel;
+    initExecutionListeners(historyEventProducerFactory);
+  }
+
+  protected void initExecutionListeners(HistoryEventProducerFactory factory) {
+    PROCESS_INSTANCE_START_LISTENER = new ExecutionListenerHistoryAdapter(factory.getHistoricProcessInstanceStartEventProducer());
+    PROCESS_INSTANCE_END_LISTENER = new ExecutionListenerHistoryAdapter(factory.getHistoricProcessInstanceStartEventProducer());
+    
+    ACTIVITY_INSTANCE_START_LISTENER = new ExecutionListenerHistoryAdapter(factory.getHistoricActivityInstanceStartEventProducer());
+    ACTIVITI_INSTANCE_END_LISTENER = new ExecutionListenerHistoryAdapter(factory.getHistoricActivityInstanceEndEventProducer());
   }
 
   public void parseProcess(Element processElement, ProcessDefinitionEntity processDefinition) {
     if (activityHistoryEnabled(processDefinition, historyLevel)) {
-      processDefinition.addExecutionListener(org.camunda.bpm.engine.impl.pvm.PvmEvent.EVENTNAME_END, PROCESS_INSTANCE_END_LISTENER);
+      processDefinition.addExecutionListener(PvmEvent.EVENTNAME_END, PROCESS_INSTANCE_END_LISTENER);
     }
   }
 
@@ -166,31 +186,6 @@ public class HistoryParseListener implements BpmnParseListener {
     // call them for every instance that will be created
   }
 
-  // helper methods ///////////////////////////////////////////////////////////
-
-  protected void addActivityHandlers(ActivityImpl activity) {
-    if (activityHistoryEnabled(activity, historyLevel)) {
-      activity.addExecutionListener(org.camunda.bpm.engine.impl.pvm.PvmEvent.EVENTNAME_START, ACTIVITY_INSTANCE_START_LISTENER, 0);
-      activity.addExecutionListener(org.camunda.bpm.engine.impl.pvm.PvmEvent.EVENTNAME_END, ACTIVITI_INSTANCE_END_LISTENER);
-    }
-  }
-
-  public static boolean fullHistoryEnabled(int historyLevel) {
-    return historyLevel >= ProcessEngineConfigurationImpl.HISTORYLEVEL_FULL;
-  }
-
-  public static boolean auditHistoryEnabled(ScopeImpl scopeElement, int historyLevel) {
-    return historyLevel >= ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT;
-  }
-
-  public static boolean variableHistoryEnabled(ScopeImpl scopeElement, int historyLevel) {
-    return historyLevel >= ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY;
-  }
-  
-  public static boolean activityHistoryEnabled(ScopeImpl scopeElement, int historyLevel) {
-    return historyLevel >= ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY;
-  }
-  
   public void parseIntermediateSignalCatchEventDefinition(Element signalEventDefinition, ActivityImpl signalActivity) {
   }
 
@@ -218,4 +213,29 @@ public class HistoryParseListener implements BpmnParseListener {
   public void parseBoundaryMessageEventDefinition(Element element, boolean interrupting, ActivityImpl messageActivity) {
   }
 
+  // helper methods ///////////////////////////////////////////////////////////
+
+  protected void addActivityHandlers(ActivityImpl activity) {
+    if (activityHistoryEnabled(activity, historyLevel)) {
+      activity.addExecutionListener(PvmEvent.EVENTNAME_START, ACTIVITY_INSTANCE_START_LISTENER, 0);
+      activity.addExecutionListener(PvmEvent.EVENTNAME_END, ACTIVITI_INSTANCE_END_LISTENER);
+    }
+  }
+
+  public static boolean fullHistoryEnabled(int historyLevel) {
+    return historyLevel >= ProcessEngineConfigurationImpl.HISTORYLEVEL_FULL;
+  }
+
+  public static boolean auditHistoryEnabled(ScopeImpl scopeElement, int historyLevel) {
+    return historyLevel >= ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT;
+  }
+
+  public static boolean variableHistoryEnabled(ScopeImpl scopeElement, int historyLevel) {
+    return historyLevel >= ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY;
+  }
+  
+  public static boolean activityHistoryEnabled(ScopeImpl scopeElement, int historyLevel) {
+    return historyLevel >= ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY;
+  }
+  
 }

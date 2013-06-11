@@ -29,6 +29,10 @@ import org.camunda.bpm.engine.impl.db.DbSqlSession;
 import org.camunda.bpm.engine.impl.db.HasRevision;
 import org.camunda.bpm.engine.impl.db.PersistentObject;
 import org.camunda.bpm.engine.impl.form.StartFormHandler;
+import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
+import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
+import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
+import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducerFactory;
 import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
@@ -79,8 +83,6 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
       processInstance = (ExecutionEntity) super.createProcessInstanceForInitial(initial);
     }
 
-    CommandContext commandContext = Context.getCommandContext();
-  
     processInstance.setExecutions(new ArrayList<ExecutionEntity>());
     processInstance.setProcessDefinition(processDefinition);
     // Do not initialize variable map (let it happen lazily)
@@ -98,36 +100,22 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
       processInstance.setVariable(initiatorVariableName, authenticatedUserId);
     }
     
-    int historyLevel = Context.getProcessEngineConfiguration().getHistoryLevel();
+    ProcessEngineConfigurationImpl configurqation = Context.getProcessEngineConfiguration();
+    int historyLevel = configurqation.getHistoryLevel();
     // TODO: This smells bad, as the rest of the history is done via the ParseListener
     if (historyLevel>=ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
-      HistoricProcessInstanceEntity historicProcessInstance = new HistoricProcessInstanceEntity(processInstance);
-
-      commandContext
-        .getSession(DbSqlSession.class)
-        .insert(historicProcessInstance);
-
-      // do basically the same as in ActivityInstanceStartHandler
-      IdGenerator idGenerator = Context.getProcessEngineConfiguration().getIdGenerator();
       
-      String processDefinitionId = processInstance.getProcessDefinitionId();
-      String processInstanceId = processInstance.getProcessInstanceId();
-      String executionId = processInstance.getId();
-
-      HistoricActivityInstanceEntity historicActivityInstance = new HistoricActivityInstanceEntity();
-      historicActivityInstance.setId(idGenerator.getNextId());
-      historicActivityInstance.setProcessDefinitionId(processDefinitionId);
-      historicActivityInstance.setProcessInstanceId(processInstanceId);
-      historicActivityInstance.setExecutionId(executionId);
-      historicActivityInstance.setActivityId(processInstance.getActivityId());
-      historicActivityInstance.setActivityName((String) processInstance.getActivity().getProperty("name"));
-      historicActivityInstance.setActivityType((String) processInstance.getActivity().getProperty("type"));
-      Date now = ClockUtil.getCurrentTime();
-      historicActivityInstance.setStartTime(now);
+      final HistoryEventProducerFactory eventFactory = configurqation.getHistoryEventProducerFactory();      
+      final HistoryEventHandler eventHandler = configurqation.getHistoryEventHandler();
       
-      commandContext
-        .getDbSqlSession()
-        .insert(historicActivityInstance);
+      // publish event for historic process instance start
+      HistoryEvent pise = eventFactory.getHistoricProcessInstanceStartEventProducer().createHistoryEvent(processInstance);
+      eventHandler.handleEvent(pise); 
+         
+      // publish event for historic activity instance start
+      // TODO: this is actually BUG: if execution starts at a nested scope this emits event for wrong execution.
+      HistoryEvent aise = eventFactory.getHistoricActivityInstanceStartEventProducer().createHistoryEvent(processInstance);
+      eventHandler.handleEvent(aise);
     }
 
     return processInstance;
