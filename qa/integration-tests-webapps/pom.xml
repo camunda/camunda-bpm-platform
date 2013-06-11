@@ -262,6 +262,7 @@
                 <containerId>jboss71x</containerId>
                 <append>false</append>
                 <home>${jboss.runtime}</home>
+                <timeout>60000</timeout>
               </container>
               <configuration>
                 <type>standalone</type>

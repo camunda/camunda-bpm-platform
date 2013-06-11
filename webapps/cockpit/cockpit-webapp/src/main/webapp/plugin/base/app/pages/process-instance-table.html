@@ -9,7 +9,11 @@
     </thead>
     <tbody>
       <tr ng-repeat="processInstance in processInstances">
-        <td title="{{ processInstance.id }}">{{ processInstance.id | shorten:8 }}</td>
+        <td title="{{ processInstance.id }}">
+          <a href="#/process-definition/{{ processDefinitionId }}/process-instance/{{ processInstance.id }}">
+            {{ processInstance.id | shorten:8 }}
+          </a>
+        </td>
         <td>{{ processInstance.startTime }}</td>
         <td>{{ processInstance.businessKey }}</td>
         <td>

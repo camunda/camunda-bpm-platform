@@ -4,11 +4,11 @@
 
 <mapper namespace="cockpit.base">
 
-  <resultMap id="processInstanceMap" type="org.camunda.bpm.cockpit.plugin.base.persistence.entity.ProcessInstanceDto">
+  <resultMap id="processInstanceMap" type="org.camunda.bpm.cockpit.plugin.base.dto.ProcessInstanceDto">
     <id property="id" column="ID_" jdbcType="VARCHAR" />
     <result property="businessKey" column="BUSINESS_KEY_" jdbcType="VARCHAR" />
     <result property="startTime" column="START_TIME_" jdbcType="TIMESTAMP"/>
-    <collection property="incidents" javaType="java.util.ArrayList" ofType="org.camunda.bpm.cockpit.plugin.base.persistence.entity.IncidentDto">
+    <collection property="incidents" javaType="java.util.ArrayList" ofType="org.camunda.bpm.cockpit.plugin.base.dto.IncidentDto">
       <result property="incidentType" column="INCIDENT_TYPE_" jdbcType="VARCHAR" />
       <result property="incidentCount" column="INCIDENT_COUNT_" jdbcType="INTEGER"/>
     </collection>

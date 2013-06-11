@@ -250,6 +250,26 @@ public abstract class AbstractProcessInstanceRestServiceQueryTest extends
       .when().get(PROCESS_INSTANCE_QUERY_URL);    
     verify(mockedQuery).variableValueNotEquals(variableName, variableValue);
   }
+  
+  @Test
+  public void testMultipleVariableParameters() {
+    String variableName1 = "varName";
+    String variableValue1 = "varValue";
+    String variableParameter1 = variableName1 + "_eq_" + variableValue1; 
+    
+    String variableName2 = "anotherVarName";
+    String variableValue2 = "anotherVarValue";
+    String variableParameter2 = variableName2 + "_neq_" + variableValue2;
+    
+    String queryValue = variableParameter1 + "," + variableParameter2;
+    
+    given().queryParam("variables", queryValue)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .when().get(PROCESS_INSTANCE_QUERY_URL);    
+    
+    verify(mockedQuery).variableValueEquals(variableName1, variableValue1);
+    verify(mockedQuery).variableValueNotEquals(variableName2, variableValue2);
+  }
 
   @Test
   public void testMultipleVariableParametersAsPost() {
