@@ -23,6 +23,7 @@ public class HistoricActivityInstanceEntity extends HistoricScopeInstanceEntity 
 
   private static final long serialVersionUID = 1L;
   
+  protected String parentActivityInstanceId;
   protected String activityId;
   protected String activityName;
   protected String activityType;
@@ -92,5 +93,15 @@ public class HistoricActivityInstanceEntity extends HistoricScopeInstanceEntity 
   public void setCalledProcessInstanceId(String calledProcessInstanceId) {
     this.calledProcessInstanceId = calledProcessInstanceId;
   }
+
+  public String getParentActivityInstanceId() {
+    return parentActivityInstanceId;
+  }
+
+  public void setParentActivityInstanceId(String parentActivityInstanceId) {
+    this.parentActivityInstanceId = parentActivityInstanceId;
+  }
+  
+  
 
 }

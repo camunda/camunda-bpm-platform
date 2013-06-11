@@ -48,7 +48,7 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
     setLoopVariable(execution, NUMBER_OF_COMPLETED_INSTANCES, 0);
     setLoopVariable(execution, NUMBER_OF_ACTIVE_INSTANCES, nrOfInstances);
 
-    execution.getParent().setActivityInstanceId(execution.getParent().getParentActivityInstanceId());
+    fixMiRootActivityInstanceId(execution);
     
     List<ActivityExecution> concurrentExecutions = new ArrayList<ActivityExecution>();
     for (int loopCounter=0; loopCounter<nrOfInstances; loopCounter++) {
@@ -56,14 +56,11 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
       concurrentExecution.setActive(true);
       concurrentExecution.setConcurrent(true);
       concurrentExecution.setScope(false);
-
       
       // In case of an embedded subprocess, and extra child execution is required
       // Otherwise, all child executions would end up under the same parent,
       // without any differentation to which embedded subprocess they belong
-      if (isExtraScopeNeeded()) {
-        
-        
+      if (isExtraScopeNeeded()) {        
         ActivityExecution extraScopedExecution = concurrentExecution.createExecution();
         extraScopedExecution.setActive(true);
         extraScopedExecution.setConcurrent(false);
@@ -112,15 +109,13 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
     int nrOfInstances = getLoopVariable(execution, NUMBER_OF_INSTANCES);
     int nrOfCompletedInstances = getLoopVariable(execution, NUMBER_OF_COMPLETED_INSTANCES) + 1;
     int nrOfActiveInstances = getLoopVariable(execution, NUMBER_OF_ACTIVE_INSTANCES) - 1;
-        
+    
     if (isExtraScopeNeeded()) {
+      resetMiRootActivityInstanceId(execution);
       // In case an extra scope was created, it must be destroyed first before going further
       ExecutionEntity extraScope = (ExecutionEntity) execution;
       execution = execution.getParent();
-      extraScope.remove();     
-      
-      execution.getParent().getParent().setActivityInstanceId(execution.getActivityInstanceId());      
-
+      extraScope.remove();
     }
     
     setLoopVariable(execution.getParent(), NUMBER_OF_COMPLETED_INSTANCES, nrOfCompletedInstances);
@@ -133,8 +128,8 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
     
     List<ActivityExecution> joinedExecutions = executionEntity.findInactiveConcurrentExecutions(execution.getActivity());
     if (joinedExecutions.size() == nrOfInstances || completionConditionSatisfied(execution)) {
-      
-      execution.getParent().getParent().setActivityInstanceId(execution.getActivityInstanceId());      
+
+      resetMiRootActivityInstanceId(execution);      
       
       // Removing all active child executions (ie because completionCondition is true)
       List<ExecutionEntity> executionsToRemove = new ArrayList<ExecutionEntity>();
@@ -158,6 +153,18 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
         callActivityEndListeners(execution);
       }
     }
+  }
+  
+  
+  protected void fixMiRootActivityInstanceId(ActivityExecution execution) {
+    ActivityExecution miRoot = execution.getParent();
+    miRoot.setActivityInstanceId(miRoot.getParentActivityInstanceId());
+  }
+
+  protected void resetMiRootActivityInstanceId(ActivityExecution execution) {
+    ActivityExecution miEnteringExecution = execution.getParent();
+    ActivityExecution miRoot = miEnteringExecution.getParent();
+    miRoot.setActivityInstanceId(miEnteringExecution.getActivityInstanceId());
   }
  
 

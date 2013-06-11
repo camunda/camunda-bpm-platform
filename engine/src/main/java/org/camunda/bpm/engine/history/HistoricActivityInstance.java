@@ -25,6 +25,9 @@ public interface HistoricActivityInstance {
 
   /** The unique identifier of this historic activity instance. */
   String getId();
+  
+  /** return the id of the parent activity instance */
+  String getParentActivityInstanceId();
 
   /** The unique identifier of the activity in the process */
   String getActivityId();

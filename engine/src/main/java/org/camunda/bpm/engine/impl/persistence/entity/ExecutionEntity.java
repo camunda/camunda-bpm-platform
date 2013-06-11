@@ -112,10 +112,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
   protected String activityInstanceId;
   
   protected StartingExecution startingExecution;
-  
-  /** the unique id of the current activity instance */
-  protected String activityInstanceId;
-    
+      
   // state/type of execution ////////////////////////////////////////////////// 
   
   /** indicates if this execution represents an active path of execution.

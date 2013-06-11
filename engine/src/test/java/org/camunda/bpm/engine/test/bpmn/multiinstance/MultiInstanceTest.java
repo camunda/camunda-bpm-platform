@@ -193,7 +193,7 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
   
   @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testParallelUserTasks.bpmn20.xml"})
   public void testParallelUserTasksHistory() {
-    runtimeService.startProcessInstanceByKey("miParallelUserTasks");
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("miParallelUserTasks");
     for (Task task : taskService.createTaskQuery().list()) {
       taskService.complete(task.getId());
     }
@@ -215,6 +215,7 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
         assertNotNull(hai.getEndTime());
         assertNotNull(hai.getAssignee());
         assertEquals("userTask", hai.getActivityType());
+        assertEquals(pi.getId(), hai.getParentActivityInstanceId());
       }
     }
   }

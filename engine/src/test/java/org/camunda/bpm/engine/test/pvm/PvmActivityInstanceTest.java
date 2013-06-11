@@ -13,7 +13,6 @@
 package org.camunda.bpm.engine.test.pvm;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.impl.pvm.ProcessDefinitionBuilder;
