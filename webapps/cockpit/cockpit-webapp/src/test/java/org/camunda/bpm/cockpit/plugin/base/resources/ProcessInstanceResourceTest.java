@@ -39,7 +39,7 @@ public class ProcessInstanceResourceTest extends AbstractCockpitPluginTest {
     "processes/activity-instance-test-process.bpmn",
     "processes/simple-user-task-process.bpmn"
   })
-  public void testQuery() {
+  public void shouldListActivityInstances_runningProcessInstance() {
     // given
     // start and correlate messages
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("activityInstanceTestProcess");
@@ -47,19 +47,38 @@ public class ProcessInstanceResourceTest extends AbstractCockpitPluginTest {
     runtimeService.correlateMessage("Message_A");
     runtimeService.correlateMessage("Message_B");
 
+    // when
     List<ActivityInstanceDto> activityInstances = resource.getActivityInstances(processInstance.getId());
 
-//    System.out.println(
-//        String.format(
-//          "%40s | %40s | %20s | %10s | %10s | %10s | %10s",
-//          "processInstanceId", "parentId", "actId",
-//          "scope", "evt", "active", "concurrent"));
-
-    // System.out.println(toString(activityInstances));
-
+    // then
     assertThat(activityInstances).onProperty("activityId").containsExactly(
         "Task_D", "CallActivity_A", "Task_B", "Task_B", "Task_B", "Task_B", "Task_B", "StartEvent_2", "Task_C"
     );
+  }
+
+  @Test
+  @Deployment(resources = {
+    "processes/finished-process.bpmn"
+  })
+  public void shouldListActivityInstances_finishedProcessInstance() {
+    // given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("finished-process");
+
+    // when
+    List<ActivityInstanceDto> activityInstances = resource.getActivityInstances(processInstance.getId());
+
+    // then
+    assertThat(activityInstances).isEmpty();
+  }
+
+  protected void printActivityInstances(List<ActivityInstanceDto> instances) {
+    System.out.println(
+      String.format(
+        "%40s | %40s | %20s | %10s | %10s | %10s | %10s",
+        "processInstanceId", "parentId", "actId",
+        "scope", "evt", "active", "concurrent"));
+
+    System.out.println(toString(instances));
   }
 
   protected String toString(List<?> objects) {
