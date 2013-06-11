@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.impl.interceptor;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -207,13 +209,15 @@ public class CommandContext {
   }
 
   protected void flushSessions() {
-    for (Session session : sessions.values()) {
+    List<Session> sessions = new ArrayList<Session>(this.sessions.values());
+    for (Session session : sessions) {
       session.flush();
     }
   }
 
   protected void closeSessions() {
-    for (Session session : sessions.values()) {
+    List<Session> sessions = new ArrayList<Session>(this.sessions.values());
+    for (Session session : sessions) {
       try {
         session.close();
       } catch (Throwable exception) {
