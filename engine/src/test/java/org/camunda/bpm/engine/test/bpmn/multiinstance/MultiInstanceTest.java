@@ -577,7 +577,7 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
   
   @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testParallelSubProcess.bpmn20.xml"})
   public void testParallelSubProcessHistory() {
-    runtimeService.startProcessInstanceByKey("miParallelSubprocess");
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("miParallelSubprocess");
     for (Task task : taskService.createTaskQuery().list()) {
       taskService.complete(task.getId());
     }
@@ -589,6 +589,7 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
       for (HistoricActivityInstance hai : historicActivityInstances) {
         assertNotNull(hai.getStartTime());
         assertNotNull(hai.getEndTime());
+        assertNotNull(pi.getId(), hai.getParentActivityInstanceId());
       }
     }
   }

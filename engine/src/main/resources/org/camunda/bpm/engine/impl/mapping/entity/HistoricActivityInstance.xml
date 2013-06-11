@@ -149,6 +149,13 @@
         A1.ACT_INST_ID_ = A2.ACT_INST_ID_ 
       AND
         A2.EVENT_TYPE_ = 'end'
+      AND
+        A2.ID_ = (
+            SELECT MAX(ID_)
+            FROM ${prefix}ACT_HI_ACTINST A_TEMP
+            WHERE A_TEMP.ACT_INST_ID_ = A2.ACT_INST_ID_ 
+                AND A_TEMP.EVENT_TYPE_ = 'end'
+        )
     LEFT JOIN 
       ${prefix}ACT_HI_ACTINST A3
       ON
@@ -210,6 +217,13 @@
         A1.ACT_INST_ID_ = A2.ACT_INST_ID_ 
       AND
         A2.EVENT_TYPE_ = 'end'
+      AND
+        A2.ID_ = (
+            SELECT MAX(ID_)
+            FROM ${prefix}ACT_HI_ACTINST A_TEMP
+            WHERE A_TEMP.ACT_INST_ID_ = A2.ACT_INST_ID_ 
+                AND A_TEMP.EVENT_TYPE_ = 'end'
+        )
     LEFT JOIN 
       ${prefix}ACT_HI_ACTINST A3
       ON
