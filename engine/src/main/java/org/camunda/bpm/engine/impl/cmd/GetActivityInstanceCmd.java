@@ -53,6 +53,10 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
       .processInstanceId(processInstanceId)
       .list();
     
+    if(executionList.isEmpty()) {
+      return null;
+    }
+    
     ExecutionEntity processInstance = null;
     
     // find process instance && index executions by parentActivityInstanceId
@@ -71,11 +75,17 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
     }
         
     // create act instance for process instance
-    ActivityInstanceImpl processActInst = new ActivityInstanceImpl();                
-    processActInst.setActivityId(processInstance.getProcessDefinitionId());
-    processActInst.setBusinessKey(processInstance.getBusinessKey());
+    ActivityInstanceImpl processActInst = new ActivityInstanceImpl();
+    
     processActInst.setId(processInstanceId);
+    processActInst.setParentActivityInstanceId(null);
+    processActInst.setProcessInstanceId(processInstanceId);
+    processActInst.setProcessDefinitionId(processInstance.getProcessDefinitionId());
     processActInst.getExecutionIds().add(processInstanceId);
+    processActInst.setBusinessKey(processInstance.getBusinessKey());
+    processActInst.setActivityId(processInstance.getProcessDefinitionId());
+    processActInst.setActivityName(processInstance.getProcessDefinition().getName());
+    processActInst.setBusinessKey(processInstance.getBusinessKey());
     
     initActivityInstanceTree(processActInst, executionsByParentActIds);
     
@@ -102,13 +112,19 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
         } else {
           // create new activity instance
           ActivityInstanceImpl actInstance = new ActivityInstanceImpl();
-          ScopeImpl activity = getActivity(execution);
-
-          actInstance.setActivityId(activity.getId());
-          actInstance.setBusinessKey(execution.getBusinessKey());
           actInstance.setId(execution.getActivityInstanceId());
-          actInstance.setParentActivityInstanceId(parentActInst.getId());
+          actInstance.setParentActivityInstanceId(parentActInst.getId());          
+          actInstance.setProcessInstanceId(parentActInst.getProcessInstanceId());
+          actInstance.setProcessDefinitionId(parentActInst.getProcessDefinitionId());
+          actInstance.setBusinessKey(execution.getBusinessKey());
           actInstance.getExecutionIds().add(execution.getId());
+          
+          ScopeImpl activity = getActivity(execution);
+          actInstance.setActivityId(activity.getId());
+          Object name = activity.getProperty("name");
+          if(name!=null) {
+            actInstance.setActivityName((String) name);
+          }
 
           childInstances.put(actInstance.getId(), actInstance);
 
@@ -123,11 +139,10 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
 
   }
 
-  /** returns true if execution is concurrent root. */
+  /** returns true if execution is a concurrent root. */
   protected boolean isConcurrentRoot(ExecutionEntity execution) {
     List<ExecutionEntity> executions = execution.getExecutions();
     return execution.isScope() && !executions.isEmpty() && executions.get(0).isConcurrent();
-
   }
 
   protected ScopeImpl getActivity(ExecutionEntity executionEntity) {

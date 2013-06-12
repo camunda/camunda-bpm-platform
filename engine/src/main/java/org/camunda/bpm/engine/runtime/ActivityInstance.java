@@ -14,8 +14,12 @@ package org.camunda.bpm.engine.runtime;
 
 import java.util.List;
 
+import org.camunda.bpm.engine.RuntimeService;
+
 /**
- * <p>An activity instance is the instance of an activity</p>
+ * <p>An activity instance represents an instance of an activity.</p>
+ * 
+ * <p>For documentation, see {@link RuntimeService#getActivityInstance(String)}</p>
  * 
  * @author Daniel Meyer
  *

@@ -50,7 +50,7 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
     String procId = processInstance.getId();
     
     // now there is now 1 activity instance below the pi:
-    List<ActivityInstance> childInstances = runtimeService.getProcessInstance(processInstance.getId()).getChildInstances();
+    List<ActivityInstance> childInstances = runtimeService.getActivityInstance(processInstance.getId()).getChildInstances();
     assertEquals(1, childInstances.size());
     ActivityInstance firstActInstance = childInstances.get(0);
     assertEquals(processInstance.getId(), firstActInstance.getParentActivityInstanceId());
@@ -60,7 +60,7 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
     assertEquals("kermit_0", task.getAssignee());
     taskService.complete(task.getId());
     
-    childInstances = runtimeService.getProcessInstance(processInstance.getId()).getChildInstances();
+    childInstances = runtimeService.getActivityInstance(processInstance.getId()).getChildInstances();
     assertEquals(1, childInstances.size());
     assertFalse(childInstances.get(0).getId().equals(firstActInstance.getId()));
     
@@ -69,7 +69,7 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
     assertEquals("kermit_1", task.getAssignee());
     taskService.complete(task.getId());
     
-    childInstances = runtimeService.getProcessInstance(processInstance.getId()).getChildInstances();
+    childInstances = runtimeService.getActivityInstance(processInstance.getId()).getChildInstances();
     assertEquals(1, childInstances.size());
     assertFalse(childInstances.get(0).getId().equals(firstActInstance.getId()));
     
@@ -152,7 +152,7 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
     for (int i=0; i<3; i++) {
       Task task = taskService.createTaskQuery().taskAssignee("kermit").singleResult();
       assertEquals("My Task", task.getName());
-      ActivityInstance processInstance = runtimeService.getProcessInstance(procId);
+      ActivityInstance processInstance = runtimeService.getActivityInstance(procId);
       List<ActivityInstance> instancesForActivitiyId = getInstancesForActivitiyId(processInstance, "miTasks");
       assertEquals(1, instancesForActivitiyId.size());
       ActivityInstance userTaskActInst = instancesForActivitiyId.get(0);    
@@ -173,18 +173,18 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
     assertEquals("My Task 1", tasks.get(1).getName());
     assertEquals("My Task 2", tasks.get(2).getName());
     
-    ActivityInstance processInstance = runtimeService.getProcessInstance(procId);
+    ActivityInstance processInstance = runtimeService.getActivityInstance(procId);
     assertEquals(3, processInstance.getChildInstances().size());
     
     taskService.complete(tasks.get(0).getId());
     
-    processInstance = runtimeService.getProcessInstance(procId);
+    processInstance = runtimeService.getActivityInstance(procId);
     // there are still 3 activity instances since they are not joined yet!
     assertEquals(3, processInstance.getChildInstances().size());
     
     taskService.complete(tasks.get(1).getId());
     
-    processInstance = runtimeService.getProcessInstance(procId);
+    processInstance = runtimeService.getActivityInstance(procId);
     assertEquals(3, processInstance.getChildInstances().size());
     
     taskService.complete(tasks.get(2).getId());

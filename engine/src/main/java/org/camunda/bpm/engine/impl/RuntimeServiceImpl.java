@@ -199,7 +199,7 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
     return commandExecutor.execute(new FindActiveActivityIdsCmd(executionId));
   }
   
-  public ActivityInstance getProcessInstance(String processInstanceId) {
+  public ActivityInstance getActivityInstance(String processInstanceId) {
     return commandExecutor.execute(new GetActivityInstanceCmd(processInstanceId));
   }
 

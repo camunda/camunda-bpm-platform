@@ -45,7 +45,7 @@ public class SubProcessTest extends PluggableProcessEngineTestCase {
     
     // we have 3 levels in the activityInstance:
     // pd
-    ActivityInstance rootActivityInstance = runtimeService.getProcessInstance(pi.getProcessInstanceId());
+    ActivityInstance rootActivityInstance = runtimeService.getActivityInstance(pi.getProcessInstanceId());
     assertEquals(pi.getProcessDefinitionId(), rootActivityInstance.getActivityId());
     //subprocess
     assertEquals(1, rootActivityInstance.getChildInstances().size());
@@ -86,7 +86,7 @@ public class SubProcessTest extends PluggableProcessEngineTestCase {
     
     // we have 3 levels in the activityInstance:
     // pd
-    ActivityInstance rootActivityInstance = runtimeService.getProcessInstance(pi.getProcessInstanceId());
+    ActivityInstance rootActivityInstance = runtimeService.getActivityInstance(pi.getProcessInstanceId());
     assertEquals(pi.getProcessDefinitionId(), rootActivityInstance.getActivityId());
     //subprocess
     assertEquals(1, rootActivityInstance.getChildInstances().size());
@@ -161,7 +161,7 @@ public class SubProcessTest extends PluggableProcessEngineTestCase {
     
     // now we have 4 levels in the activityInstance:
     // pd
-    ActivityInstance rootActivityInstance = runtimeService.getProcessInstance(pi.getProcessInstanceId());
+    ActivityInstance rootActivityInstance = runtimeService.getActivityInstance(pi.getProcessInstanceId());
     assertEquals(pi.getProcessDefinitionId(), rootActivityInstance.getActivityId());
     //subprocess1
     assertEquals(1, rootActivityInstance.getChildInstances().size());
@@ -197,7 +197,7 @@ public class SubProcessTest extends PluggableProcessEngineTestCase {
     
     // now we have 4 levels in the activityInstance:
     // pd
-    ActivityInstance rootActivityInstance = runtimeService.getProcessInstance(pi.getProcessInstanceId());
+    ActivityInstance rootActivityInstance = runtimeService.getActivityInstance(pi.getProcessInstanceId());
     assertEquals(pi.getProcessDefinitionId(), rootActivityInstance.getActivityId());
     //subprocess1
     assertEquals(1, rootActivityInstance.getChildInstances().size());
@@ -222,7 +222,7 @@ public class SubProcessTest extends PluggableProcessEngineTestCase {
     
     // now we have 3 levels in the activityInstance:
     // pd
-    rootActivityInstance = runtimeService.getProcessInstance(pi.getProcessInstanceId());
+    rootActivityInstance = runtimeService.getActivityInstance(pi.getProcessInstanceId());
     assertEquals(pi.getProcessDefinitionId(), rootActivityInstance.getActivityId());
     //subprocess1
     assertEquals(1, rootActivityInstance.getChildInstances().size());
@@ -270,7 +270,7 @@ public class SubProcessTest extends PluggableProcessEngineTestCase {
     assertEquals("Task A", taskA.getName());
     assertEquals("Task B", taskB.getName());
 
-    ActivityInstance rootActivityInstance = runtimeService.getProcessInstance(pi.getProcessInstanceId());
+    ActivityInstance rootActivityInstance = runtimeService.getActivityInstance(pi.getProcessInstanceId());
     assertEquals(pi.getProcessDefinitionId(), rootActivityInstance.getActivityId());
     //subprocess1
     assertEquals(1, rootActivityInstance.getChildInstances().size());
@@ -282,7 +282,7 @@ public class SubProcessTest extends PluggableProcessEngineTestCase {
     // Completing both tasks, should destroiy the subprocess and activate the task after the subprocess
     taskService.complete(taskA.getId());
     
-    rootActivityInstance = runtimeService.getProcessInstance(pi.getProcessInstanceId());
+    rootActivityInstance = runtimeService.getActivityInstance(pi.getProcessInstanceId());
     assertEquals(pi.getProcessDefinitionId(), rootActivityInstance.getActivityId());
     subProcessInstance = rootActivityInstance.getChildInstances().get(0);
     // 1 task + 1 join
