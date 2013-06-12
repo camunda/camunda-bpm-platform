@@ -141,7 +141,7 @@ public class BpmnDeployer implements Deployer {
         ProcessDefinitionEntity latestProcessDefinition = processDefinitionManager.findLatestProcessDefinitionByKey(processDefinition.getKey());
         
         processDefinition.setDeploymentId(deployment.getId());
-        processDefinition.setVersion(getNextVersion(deployment, processDefinition, latestProcessDefinition));
+        processDefinition.setVersion(getVersionForNewProcessDefinition(deployment, processDefinition, latestProcessDefinition));
         processDefinition.setId(getProcessDefinitionId(deployment, processDefinition));
 
         adjustStartEventSubscriptions(processDefinition, latestProcessDefinition);
@@ -208,7 +208,7 @@ public class BpmnDeployer implements Deployer {
    * might want to hook in some own logic here, e.g. to align process definition
    * versions with deployment / build versions.
    */
-  protected int getNextVersion(DeploymentEntity deployment, ProcessDefinitionEntity newProcessDefinition, ProcessDefinitionEntity latestProcessDefinition) {
+  protected int getVersionForNewProcessDefinition(DeploymentEntity deployment, ProcessDefinitionEntity newProcessDefinition, ProcessDefinitionEntity latestProcessDefinition) {
 	if (latestProcessDefinition != null) {
 	  return latestProcessDefinition.getVersion() + 1;
 	} else {
