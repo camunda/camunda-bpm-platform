@@ -17,8 +17,10 @@ import java.util.Date;
 
 import org.camunda.bpm.engine.history.HistoricVariableUpdate;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.db.DbSqlSession;
 import org.camunda.bpm.engine.impl.db.HasRevision;
 import org.camunda.bpm.engine.impl.db.PersistentObject;
+import org.camunda.bpm.engine.impl.history.event.HistoricVariableUpdateEventEntity;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.impl.variable.ValueFields;
 import org.camunda.bpm.engine.impl.variable.VariableType;
@@ -27,26 +29,15 @@ import org.camunda.bpm.engine.impl.variable.VariableType;
 /**
  * @author Tom Baeyens
  */
-public class HistoricDetailVariableInstanceUpdateEntity extends HistoricDetailEntity implements ValueFields, HistoricVariableUpdate, PersistentObject, HasRevision {
+public class HistoricDetailVariableInstanceUpdateEntity extends HistoricVariableUpdateEventEntity implements ValueFields, HistoricVariableUpdate {
   
   private static final long serialVersionUID = 1L;
   
-  protected String name;
-  protected int revision;
   protected VariableType variableType;
-
-  protected Long longValue;
-  protected Double doubleValue; 
-  protected String textValue;
-  protected String textValue2;
-
   protected ByteArrayEntity byteArrayValue;
   protected String byteArrayValueId;
 
   protected Object cachedValue;
-
-  public HistoricDetailVariableInstanceUpdateEntity() {
-  }
 
   public HistoricDetailVariableInstanceUpdateEntity(VariableInstanceEntity variableInstance) {
     this.processInstanceId = variableInstance.getProcessInstanceId();
@@ -79,7 +70,12 @@ public class HistoricDetailVariableInstanceUpdateEntity extends HistoricDetailEn
   }
 
   public void delete() {
-    super.delete();
+    
+    DbSqlSession dbSqlSession = Context
+        .getCommandContext()
+        .getDbSqlSession();
+
+    dbSqlSession.delete(this);
 
     if (byteArrayValueId != null) {
       // the next apparently useless line is probably to ensure consistency in the DbSqlSession 
@@ -91,11 +87,6 @@ public class HistoricDetailVariableInstanceUpdateEntity extends HistoricDetailEn
         .getByteArrayManager()
         .deleteByteArrayById(byteArrayValueId);
     }
-  }
-
-  public Object getPersistentState() {
-    // HistoricDetailVariableInstanceUpdateEntity is immutable, so always the same object is returned
-    return HistoricDetailVariableInstanceUpdateEntity.class;
   }
   
   public String getVariableTypeName() {
@@ -110,11 +101,6 @@ public class HistoricDetailVariableInstanceUpdateEntity extends HistoricDetailEn
   
   public String getByteArrayValueId() {
     return byteArrayValueId;
-  }
-
-  public void setByteArrayValueId(String byteArrayValueId) {
-    this.byteArrayValueId = byteArrayValueId;
-    this.byteArrayValue = null;
   }
 
   public ByteArrayEntity getByteArrayValue() {
@@ -163,6 +149,10 @@ public class HistoricDetailVariableInstanceUpdateEntity extends HistoricDetailEn
     }
   }
   
+  public String getName() {
+    return getVariableName();
+  }
+  
   // getters and setters //////////////////////////////////////////////////////
   
   public Date getTime() {
@@ -173,89 +163,17 @@ public class HistoricDetailVariableInstanceUpdateEntity extends HistoricDetailEn
     this.time = time;
   }
 
-  public String getVariableName() {
-    return name;
-  }
-
   public VariableType getVariableType() {
     return variableType;
-  }
-
-  public int getRevision() {
-    return revision;
-  }
-
-  public void setRevision(int revision) {
-    this.revision = revision;
-  }
-  
-  public int getRevisionNext() {
-    return revision + 1;
-  }
-  
-  public String getName() {
-    return name;
-  }
-
-  
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  
-  public Long getLongValue() {
-    return longValue;
-  }
-
-  
-  public void setLongValue(Long longValue) {
-    this.longValue = longValue;
-  }
-
-  
-  public Double getDoubleValue() {
-    return doubleValue;
-  }
-
-  
-  public void setDoubleValue(Double doubleValue) {
-    this.doubleValue = doubleValue;
-  }
-
-  
-  public String getTextValue() {
-    return textValue;
-  }
-
-  
-  public void setTextValue(String textValue) {
-    this.textValue = textValue;
-  }
-
-  
-  public String getTextValue2() {
-    return textValue2;
-  }
-
-  
-  public void setTextValue2(String textValue2) {
-    this.textValue2 = textValue2;
-  }
-
-  
-  public void setByteArrayValue(ByteArrayEntity byteArrayValue) {
-    this.byteArrayValue = byteArrayValue;
   }
 
   public Object getCachedValue() {
     return cachedValue;
   }
-
   
   public void setCachedValue(Object cachedValue) {
     this.cachedValue = cachedValue;
   }
-
   
   public void setVariableType(VariableType variableType) {
     this.variableType = variableType;

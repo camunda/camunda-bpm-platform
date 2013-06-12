@@ -21,10 +21,13 @@ import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.history.event.HistoricActivityInstanceEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricProcessInstanceEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricTaskInstanceEventEntity;
+import org.camunda.bpm.engine.impl.history.event.HistoricVariableUpdateEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.identity.Authentication;
+import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmScope;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 
@@ -33,7 +36,7 @@ import org.camunda.bpm.engine.impl.util.ClockUtil;
  *
  */
 public class DefaultHistoryEventProducer implements HistoryEventProducer {
-  
+
   protected void initHistoryEvent(HistoryEvent evt, String eventType) {
     
     final IdGenerator idGenerator = Context.getProcessEngineConfiguration().getIdGenerator();
@@ -122,6 +125,30 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     evt.setTaskDefinitionKey(taskEntity.getTaskDefinitionKey());
     
   }
+  
+
+  protected void initHistoricVariableUpdateEvt(HistoricVariableUpdateEventEntity evt, VariableInstanceEntity variableInstance) {
+    
+    final Date currentTime = ClockUtil.getCurrentTime();
+
+    evt.setProcessInstanceId(variableInstance.getProcessInstanceId());
+    evt.setExecutionId(variableInstance.getExecutionId());
+    evt.setTaskId(variableInstance.getTaskId());
+    evt.setRevision(variableInstance.getRevision());
+    evt.setVariableName(variableInstance.getName());
+    evt.setTimestamp(currentTime);
+
+    // copy value
+    evt.setTextValue(variableInstance.getTextValue());
+    evt.setTextValue2(variableInstance.getTextValue2());
+    evt.setDoubleValue(variableInstance.getDoubleValue());
+    evt.setLongValue(variableInstance.getLongValue());
+    if (variableInstance.getByteArrayValueId() != null) {
+      ByteArrayEntity byteArrayValue = variableInstance.getByteArrayValue();
+      evt.setByteValue(byteArrayValue.getBytes());
+    }
+  }
+
   
   // Implementation ////////////////////////////////
 
@@ -244,6 +271,40 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
         
     return evt;
   }
+  
+  // variables /////////////////////////////////
+  
+  public HistoryEvent createHistoricVariableUpdateEvt(VariableInstanceEntity variableInstance, DelegateExecution execution) {
 
+    final ExecutionEntity executionEntity = (ExecutionEntity) execution;
+    
+    HistoricVariableUpdateEventEntity evt = new HistoricVariableUpdateEventEntity();
+
+    // initialize
+    initHistoricVariableUpdateEvt(evt, variableInstance);
+    
+    evt.setActivityInstanceId(executionEntity.getActivityInstanceId());
+    
+    return evt;
+  }
+  
+  
+  public HistoryEvent createHistoricVariableUpdateEvt(VariableInstanceEntity variableInstance, DelegateTask task) {
+    
+    final TaskEntity taskEntity = (TaskEntity) task;
+    final ExecutionEntity execution = taskEntity.getExecution();
+    
+    HistoricVariableUpdateEventEntity evt = new HistoricVariableUpdateEventEntity();
+
+    // initialize
+    initHistoricVariableUpdateEvt(evt, variableInstance);
+    
+    if(execution != null) {
+      evt.setActivityInstanceId(execution.getActivityInstanceId());
+    }
+    
+    return evt;
+  }
+  
 
 }

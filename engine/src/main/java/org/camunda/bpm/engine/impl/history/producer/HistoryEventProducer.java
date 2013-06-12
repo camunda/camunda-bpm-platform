@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.impl.history.producer;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.DelegateTask;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
+import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 
 /**
  * <p>The producer for history events. The history event producer is 
@@ -45,6 +46,7 @@ public interface HistoryEventProducer {
    */
   public HistoryEvent createProcessInstanceEndEvt(DelegateExecution execution);
     
+  
   // Activity instances /////////////////////////////////////
   
   /** 
@@ -71,6 +73,7 @@ public interface HistoryEventProducer {
    * @return the history event
    */
   public HistoryEvent createActivityInstanceEndEvt(DelegateExecution execution);
+  
   
   // Task Instances /////////////////////////////////////////
   
@@ -99,5 +102,25 @@ public interface HistoryEventProducer {
    */
   public HistoryEvent createTaskInstanceCompleteEvt(DelegateTask task, String deleteReason);
   
+  
+  // HistoricVariableUpdateEventEntity //////////////////////
+  
+  /** 
+   * Creates the history event fired when an execution variable is updated.
+   *  
+   * @param variableInstance the runtime variable instance
+   * @param execution the execution to which the variable is linked
+   * @return the history event
+   */
+  public HistoryEvent createHistoricVariableUpdateEvt(VariableInstanceEntity variableInstance, DelegateExecution execution);
+  
+  /** 
+   * Creates the history event fired when a task local variable is updated.
+   *  
+   * @param variableInstance the runtime variable instance
+   * @param task the task to which the execution is linked
+   * @return the history event
+   */
+  public HistoryEvent createHistoricVariableUpdateEvt(VariableInstanceEntity variableInstance, DelegateTask task);
 
 }

@@ -14,7 +14,9 @@ package org.camunda.bpm.engine.impl.history.handler;
 
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbSqlSession;
+import org.camunda.bpm.engine.impl.history.event.HistoricVariableUpdateEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
+import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 
 /**
  * <p>History event handler that writes history events to the process engine
@@ -30,11 +32,37 @@ import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 public class DbHistoryEventHandler implements HistoryEventHandler {
 
   public void handleEvent(HistoryEvent historyEvent) {
+    
+    insert(historyEvent);
 
-    final DbSqlSession dbSqlSession = Context.getCommandContext()
-      .getDbSqlSession();
+  }
 
+  /** general history event insert behavior */
+  protected void insert(HistoryEvent historyEvent) {
+    DbSqlSession dbSqlSession = getDbSqlSession();
     dbSqlSession.insert(historyEvent);
+  }
+
+  /** customized insert behvior for HistoricVariableUpdateEventEntity */
+  protected void insertHistoricVariableUpdateEntity(HistoricVariableUpdateEventEntity historyEvent) {
+    DbSqlSession dbSqlSession = getDbSqlSession();
+    
+    // insert byte array entity (if applicable)
+    byte[] byteValue = historyEvent.getByteValue();
+    if(byteValue != null) {
+        ByteArrayEntity byteArrayEntity = new ByteArrayEntity(historyEvent.getVariableName(), byteValue);
+        Context
+          .getCommandContext()
+          .getDbSqlSession()
+          .insert(byteArrayEntity);
+        historyEvent.setByteArrayId(byteArrayEntity.getId());
+    }
+    
+    dbSqlSession.insert(historyEvent);
+  }
+  
+  protected DbSqlSession getDbSqlSession() {
+    return Context.getCommandContext().getDbSqlSession();
   }
 
 }
