@@ -1,9 +1,7 @@
-"use strict";
+'use strict';
 
-(function() {
-
-  var module = angular.module("cockpit.resources");
-
+ngDefine('cockpit.resources.process.diagram', ['module:camunda.common.services:camunda-common/services/httpUtils'], function(module) {
+  
   var Resource = function ($http, HttpUtils, Uri) {
     return {
       getBpmn20Xml : function(processDefinitionId) {
@@ -18,9 +16,7 @@
     };
   };
 
-  Resource.$inject = ["$http", "HttpUtils", "Uri"];
-
   module
-    .factory('ProcessDefinitionDiagramService', Resource);
+    .factory("ProcessDiagramService", Resource);
 
-})();
+});

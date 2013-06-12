@@ -25,7 +25,7 @@ import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 /**
  * @author Tom Baeyens
  */
-public class AtomicOperationActivityEnd extends AbstractEventAtomicOperation {
+public class AtomicOperationActivityEnd extends AtomicOperationActivityInstanceEnd {
 
   @Override
   protected ScopeImpl getScope(InterpretableExecution execution) {
@@ -40,6 +40,10 @@ public class AtomicOperationActivityEnd extends AbstractEventAtomicOperation {
   @SuppressWarnings("unchecked")
   @Override
   protected void eventNotificationsCompleted(InterpretableExecution execution) {
+    
+    // invoke behavior from abstract AtomicOperationActivityInstanceEnd
+    super.eventNotificationsCompleted(execution);
+    
     ActivityImpl activity = (ActivityImpl) execution.getActivity();
     ActivityImpl parentActivity = activity.getParentActivity();
 

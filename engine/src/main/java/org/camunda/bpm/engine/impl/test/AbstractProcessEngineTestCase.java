@@ -13,6 +13,7 @@
 
 package org.camunda.bpm.engine.impl.test;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -23,7 +24,6 @@ import java.util.logging.Level;
 
 import junit.framework.AssertionFailedError;
 
-import org.apache.ibatis.logging.LogFactory;
 import org.camunda.bpm.engine.FormService;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.IdentityService;
@@ -42,6 +42,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.impl.util.LogUtil.ThreadLogMode;
+import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.junit.Assert;
 
@@ -53,7 +54,7 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
 
   static {
     // this ensures that mybatis uses the jdk logging
-    LogFactory.useJdkLogging();
+//    LogFactory.useJdkLogging();
     // with an upgrade of mybatis, this might have to become org.mybatis.generator.logging.LogFactory.forceJavaLogging();
   }
   
@@ -270,6 +271,17 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
       timeLimitExceeded = true;
       thread.interrupt();
     }
+  }
+  
+  protected List<ActivityInstance> getInstancesForActivitiyId(ActivityInstance activityInstance, String activityId) {
+    List<ActivityInstance> result = new ArrayList<ActivityInstance>();
+    if(activityInstance.getActivityId().equals(activityId)) {
+      result.add(activityInstance);
+    }
+    for (ActivityInstance childInstance : activityInstance.getChildInstances()) {
+      result.addAll(getInstancesForActivitiyId(childInstance,activityId));
+    }
+    return result;
   }
   
 }

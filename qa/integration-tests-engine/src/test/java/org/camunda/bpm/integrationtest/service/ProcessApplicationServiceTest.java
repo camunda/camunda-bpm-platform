@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.integrationtest.service;
 
+import java.util.Arrays;
 import java.util.Set;
 
 import org.camunda.bpm.BpmPlatform;
@@ -53,9 +54,12 @@ public class ProcessApplicationServiceTest extends AbstractFoxPlatformIntegratio
     ProcessApplicationService processApplicationService = BpmPlatform.getProcessApplicationService();
     
     Set<String> processApplicationNames = processApplicationService.getProcessApplicationNames();
-    
+
+    // check if the new applications are deployed with allowed names
+    processApplicationNames.retainAll(Arrays.asList(new String [] {"test1", "test2", "/test1", "/test2"}));
+
     Assert.assertEquals(2, processApplicationNames.size());
-    
+
     for (String appName : processApplicationNames) {
       ProcessApplicationInfo processApplicationInfo = processApplicationService.getProcessApplicationInfo(appName);
       

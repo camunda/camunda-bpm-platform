@@ -1,15 +1,6 @@
-div#processDiagramWrapper .slider {
-  margin-top : 20px;
-  width: 150px;
-}
-
-div#processDiagramWrapper {
-  position: relative;
-}
-
-div#processDiagram {
+div .process-diagram {
   min-height: 200px;
-  height: 100%;
+  height: 600px;
   overflow: hidden;
   cursor: pointer;
 
@@ -22,7 +13,7 @@ div#processDiagram {
   user-select: none;
 }
 
-div#processDiagram .drag {
+div .process-diagram .drag {
   cursor: move;
 }
 
