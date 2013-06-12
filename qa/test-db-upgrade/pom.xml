@@ -419,7 +419,8 @@
             <exclude>**/ProcessDiagramRetrievalTest.java</exclude> 
             <!--exclude>**/ManagementServiceTest.java</exclude-->
           </excludes>
-          <testFailureIgnore>true</testFailureIgnore>
+          <testFailureIgnore>false</testFailureIgnore>
+          <redirectTestOutputToFile>true</redirectTestOutputToFile>
         </configuration>
       </plugin>
 
