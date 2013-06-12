@@ -68,7 +68,7 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
     when(runtimeServiceMock.getVariables(MockProvider.ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID)).thenReturn(EXAMPLE_OBJECT_VARIABLES);
     
     // activity instances
-    when(runtimeServiceMock.getProcessInstance(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID)).thenReturn(EXAMPLE_ACTIVITY_INSTANCE);
+    when(runtimeServiceMock.getActivityInstance(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID)).thenReturn(EXAMPLE_ACTIVITY_INSTANCE);
     
     // runtime service
     when(processEngine.getRuntimeService()).thenReturn(runtimeServiceMock);
@@ -104,7 +104,7 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
   
   @Test
   public void testGetActivityInstanceTreeForNonExistingProcessInstance() {
-    when(runtimeServiceMock.getProcessInstance(anyString())).thenReturn(null);
+    when(runtimeServiceMock.getActivityInstance(anyString())).thenReturn(null);
     
     given().pathParam("id", "aNonExistingProcessInstanceId")
       .then().expect().statusCode(Status.NOT_FOUND.getStatusCode()).contentType(ContentType.JSON)
@@ -115,7 +115,7 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
   
   @Test
   public void testGetActivityInstanceTreeWithInternalError() {
-    when(runtimeServiceMock.getProcessInstance(anyString())).thenThrow(new ProcessEngineException("expected exception"));
+    when(runtimeServiceMock.getActivityInstance(anyString())).thenThrow(new ProcessEngineException("expected exception"));
     
     given().pathParam("id", "aNonExistingProcessInstanceId")
       .then().expect().statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).contentType(ContentType.JSON)

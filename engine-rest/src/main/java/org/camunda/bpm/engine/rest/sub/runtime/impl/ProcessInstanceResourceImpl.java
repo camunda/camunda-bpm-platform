@@ -72,7 +72,7 @@ public class ProcessInstanceResourceImpl implements ProcessInstanceResource {
     ActivityInstance activityInstance = null;
     
     try {
-      activityInstance = runtimeService.getProcessInstance(processInstanceId);
+      activityInstance = runtimeService.getActivityInstance(processInstanceId);
     } catch (ProcessEngineException e) {
       throw new InvalidRequestException(Status.INTERNAL_SERVER_ERROR, e, e.getMessage());
     }
