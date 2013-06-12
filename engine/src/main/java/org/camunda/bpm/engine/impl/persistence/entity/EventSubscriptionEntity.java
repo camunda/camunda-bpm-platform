@@ -274,5 +274,11 @@ public abstract class EventSubscriptionEntity implements PersistentObject, HasRe
       return false;
     return true;
   }
+
+  @Override
+  public String toString() {
+    return "EventSubscriptionEntity [id=" + id + ", eventType=" + eventType + ", eventName=" + eventName + ", executionId=" + executionId
+        + ", processInstanceId=" + processInstanceId + ", activityId=" + activityId + ", configuration=" + configuration + "]";
+  }
   
 }
