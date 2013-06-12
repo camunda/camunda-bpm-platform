@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.rest;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -25,8 +26,10 @@ import javax.ws.rs.core.MediaType;
 import org.apache.http.entity.ContentType;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.persistence.entity.ActivityInstanceImpl;
 import org.camunda.bpm.engine.rest.spi.ProcessEngineProvider;
 import org.camunda.bpm.engine.rest.spi.impl.MockedProcessEngineProvider;
+import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.junit.BeforeClass;
 
 import com.jayway.restassured.RestAssured;
@@ -51,6 +54,51 @@ public abstract class AbstractRestServiceTest {
   static {
     EXAMPLE_VARIABLES.put(EXAMPLE_VARIABLE_KEY, EXAMPLE_VARIABLE_VALUE);
   }
+  
+  protected static final String EXAMPLE_ACTIVITY_INSTANCE_ID = "anActivityInstanceId";
+  protected static final String EXAMPLE_PARENT_ACTIVITY_INSTANCE_ID = "aParentActivityInstanceId";
+  protected static final String EXAMPLE_ACTIVITY_ID = "anActivityId";
+  protected static final String EXAMPLE_ACTIVITY_NAME = "anActivityName";
+  protected static final String EXAMPLE_PROCESS_INSTANCE_ID = "aProcessInstanceId";
+  protected static final String EXAMPLE_PROCESS_DEFINITION_ID = "aProcessDefinitionId";
+  protected static final String EXAMPLE_BUSINESS_KEY = "aBusinessKey";
+  
+  protected static final String CHILD_EXAMPLE_ACTIVITY_INSTANCE_ID = "aChildActivityInstanceId";
+  protected static final String CHILD_EXAMPLE_PARENT_ACTIVITY_INSTANCE_ID = "aChildParentActivityInstanceId";
+  protected static final String CHILD_EXAMPLE_ACTIVITY_ID = "aChildActivityId";
+  protected static final String CHILD_EXAMPLE_ACTIVITY_NAME = "aChildActivityName";
+  protected static final String CHILD_EXAMPLE_PROCESS_INSTANCE_ID = "aChildProcessInstanceId";
+  protected static final String CHILD_EXAMPLE_PROCESS_DEFINITION_ID = "aChildProcessDefinitionId";
+  protected static final String CHILD_EXAMPLE_BUSINESS_KEY = "aChildBusinessKey";
+  
+  protected static final ActivityInstance EXAMPLE_ACTIVITY_INSTANCE = new ActivityInstanceImpl();
+  static {
+    ActivityInstanceImpl instance = (ActivityInstanceImpl) EXAMPLE_ACTIVITY_INSTANCE;
+    instance.setId(EXAMPLE_ACTIVITY_INSTANCE_ID);
+    instance.setParentActivityInstanceId(EXAMPLE_PARENT_ACTIVITY_INSTANCE_ID);
+    instance.setActivityId(EXAMPLE_ACTIVITY_ID);
+    instance.setActivityName(EXAMPLE_ACTIVITY_NAME);
+    instance.setProcessInstanceId(EXAMPLE_PROCESS_INSTANCE_ID);
+    instance.setProcessDefinitionId(EXAMPLE_PROCESS_DEFINITION_ID);
+    instance.setBusinessKey(EXAMPLE_BUSINESS_KEY);
+    instance.getExecutionIds().add(EXAMPLE_ACTIVITY_INSTANCE_ID);
+    
+    instance.setChildInstances(new ArrayList<ActivityInstance>());
+    
+    ActivityInstanceImpl child = new ActivityInstanceImpl();
+    child.setId(CHILD_EXAMPLE_ACTIVITY_INSTANCE_ID);
+    child.setParentActivityInstanceId(CHILD_EXAMPLE_PARENT_ACTIVITY_INSTANCE_ID);
+    child.setActivityId(CHILD_EXAMPLE_ACTIVITY_ID);
+    child.setActivityName(CHILD_EXAMPLE_ACTIVITY_NAME);
+    child.setProcessInstanceId(CHILD_EXAMPLE_PROCESS_INSTANCE_ID);
+    child.setProcessDefinitionId(CHILD_EXAMPLE_PROCESS_DEFINITION_ID);
+    child.setBusinessKey(CHILD_EXAMPLE_BUSINESS_KEY);
+    child.setExecutionIds(new ArrayList<String>());
+    child.getExecutionIds().add(EXAMPLE_ACTIVITY_INSTANCE_ID);
+
+    instance.getChildInstances().add(child);
+  }
+  
   
   private static Properties connectionProperties = null;
 

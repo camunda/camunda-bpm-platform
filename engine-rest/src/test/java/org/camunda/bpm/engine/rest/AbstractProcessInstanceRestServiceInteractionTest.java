@@ -1,8 +1,10 @@
 package org.camunda.bpm.engine.rest;
 
 import static com.jayway.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.empty;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
@@ -45,6 +47,7 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
   protected static final String PROCESS_INSTANCE_URL = TEST_RESOURCE_ROOT_PATH + "/process-instance/{id}";
   protected static final String PROCESS_INSTANCE_VARIABLES_URL = PROCESS_INSTANCE_URL + "/variables";
   protected static final String SINGLE_PROCESS_INSTANCE_VARIABLE_URL = PROCESS_INSTANCE_VARIABLES_URL + "/{varId}";
+  protected static final String PROCESS_INSTANCE_ACTIVIY_INSTANCES_URL = PROCESS_INSTANCE_URL + "/activity-instances";
   
   protected static final Map<String, Object> EXAMPLE_OBJECT_VARIABLES = new HashMap<String, Object>();
   static {
@@ -54,15 +57,71 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
     
     EXAMPLE_OBJECT_VARIABLES.put(EXAMPLE_VARIABLE_KEY, variableValue);
   }
-
+  
   private RuntimeServiceImpl runtimeServiceMock;
   
   @Before
   public void setUpRuntimeData() {
     runtimeServiceMock = mock(RuntimeServiceImpl.class);
+    // variables
     when(runtimeServiceMock.getVariables(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID)).thenReturn(EXAMPLE_VARIABLES);
     when(runtimeServiceMock.getVariables(MockProvider.ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID)).thenReturn(EXAMPLE_OBJECT_VARIABLES);
+    
+    // activity instances
+    when(runtimeServiceMock.getProcessInstance(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID)).thenReturn(EXAMPLE_ACTIVITY_INSTANCE);
+    
+    // runtime service
     when(processEngine.getRuntimeService()).thenReturn(runtimeServiceMock);
+  }
+  
+  @Test
+  public void testGetActivityInstanceTree() {
+    Response response = given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID)
+        .then().expect().statusCode(Status.OK.getStatusCode())
+        .body("id", equalTo(EXAMPLE_ACTIVITY_INSTANCE_ID))
+        .body("parentActivityInstanceId", equalTo(EXAMPLE_PARENT_ACTIVITY_INSTANCE_ID))
+        .body("activityId", equalTo(EXAMPLE_ACTIVITY_ID))
+        .body("activityName", equalTo(EXAMPLE_ACTIVITY_NAME))
+        .body("processInstanceId", equalTo(EXAMPLE_PROCESS_INSTANCE_ID))
+        .body("processDefinitionId", equalTo(EXAMPLE_PROCESS_DEFINITION_ID))
+        .body("businessKey", equalTo(EXAMPLE_BUSINESS_KEY))
+        .body("executionIds", not(empty()))
+        .body("executionIds[0]", equalTo(EXAMPLE_ACTIVITY_INSTANCE_ID))
+        .body("childInstances", not(empty()))
+        .body("childInstances[0].id", equalTo(CHILD_EXAMPLE_ACTIVITY_INSTANCE_ID))
+        .body("childInstances[0].parentActivityInstanceId", equalTo(CHILD_EXAMPLE_PARENT_ACTIVITY_INSTANCE_ID))
+        .body("childInstances[0].activityId", equalTo(CHILD_EXAMPLE_ACTIVITY_ID))
+        .body("childInstances[0].activityName", equalTo(CHILD_EXAMPLE_ACTIVITY_NAME))
+        .body("childInstances[0].processInstanceId", equalTo(CHILD_EXAMPLE_PROCESS_INSTANCE_ID))
+        .body("childInstances[0].processDefinitionId", equalTo(CHILD_EXAMPLE_PROCESS_DEFINITION_ID))
+        .body("childInstances[0].businessKey", equalTo(CHILD_EXAMPLE_BUSINESS_KEY))
+        .body("childInstances[0].executionIds", not(empty()))
+        .body("childInstances[0].childInstances", empty())
+        .when().get(PROCESS_INSTANCE_ACTIVIY_INSTANCES_URL);
+    
+    Assert.assertEquals("Should return exactly nine properties", 9, response.jsonPath().getMap("").size());
+  }
+  
+  @Test
+  public void testGetActivityInstanceTreeForNonExistingProcessInstance() {
+    when(runtimeServiceMock.getProcessInstance(anyString())).thenReturn(null);
+    
+    given().pathParam("id", "aNonExistingProcessInstanceId")
+      .then().expect().statusCode(Status.NOT_FOUND.getStatusCode()).contentType(ContentType.JSON)
+      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", equalTo("Process instance with id aNonExistingProcessInstanceId does not exist"))
+      .when().get(PROCESS_INSTANCE_ACTIVIY_INSTANCES_URL);
+  }
+  
+  @Test
+  public void testGetActivityInstanceTreeWithInternalError() {
+    when(runtimeServiceMock.getProcessInstance(anyString())).thenThrow(new ProcessEngineException("expected exception"));
+    
+    given().pathParam("id", "aNonExistingProcessInstanceId")
+      .then().expect().statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).contentType(ContentType.JSON)
+      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", equalTo("expected exception"))
+      .when().get(PROCESS_INSTANCE_ACTIVIY_INSTANCES_URL);
   }
   
   @Test
