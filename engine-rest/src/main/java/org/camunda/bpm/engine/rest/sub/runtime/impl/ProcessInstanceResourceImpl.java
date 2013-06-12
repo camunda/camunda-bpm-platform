@@ -18,10 +18,12 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.rest.dto.DeleteEngineEntityDto;
+import org.camunda.bpm.engine.rest.dto.runtime.ActivityInstanceDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.sub.VariableResource;
 import org.camunda.bpm.engine.rest.sub.runtime.ProcessInstanceResource;
+import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 
 public class ProcessInstanceResourceImpl implements ProcessInstanceResource {
@@ -61,5 +63,25 @@ public class ProcessInstanceResourceImpl implements ProcessInstanceResource {
   @Override
   public VariableResource getVariablesResource() {
     return new ExecutionVariablesResource(engine, processInstanceId, true);
+  }
+
+  @Override
+  public ActivityInstanceDto getActivityInstanceTree() {
+    RuntimeService runtimeService = engine.getRuntimeService();
+    
+    ActivityInstance activityInstance = null;
+    
+    try {
+      activityInstance = runtimeService.getProcessInstance(processInstanceId);
+    } catch (ProcessEngineException e) {
+      throw new InvalidRequestException(Status.INTERNAL_SERVER_ERROR, e, e.getMessage());
+    }
+    
+    if (activityInstance == null) {
+      throw new InvalidRequestException(Status.NOT_FOUND, "Process instance with id " + processInstanceId + " does not exist");
+    }
+    
+    ActivityInstanceDto result = ActivityInstanceDto.fromActivityInstance(activityInstance);
+    return result;
   }
 }
