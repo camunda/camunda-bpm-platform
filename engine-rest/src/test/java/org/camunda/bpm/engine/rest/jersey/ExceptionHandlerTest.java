@@ -1,18 +1,19 @@
 package org.camunda.bpm.engine.rest.jersey;
 
-import org.camunda.bpm.engine.rest.AbstractExecutionRestServiceInteractionTest;
+import org.camunda.bpm.engine.rest.AbstractExceptionHandlerTest;
+import org.camunda.bpm.engine.rest.application.TestCustomResourceApplication;
 import org.camunda.bpm.engine.rest.util.EmbeddedServerBootstrap;
 import org.camunda.bpm.engine.rest.util.JerseyServerBootstrap;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
-public class ExecutionRestServiceInteractionTest extends AbstractExecutionRestServiceInteractionTest {
+public class ExceptionHandlerTest extends AbstractExceptionHandlerTest {
 
   protected static EmbeddedServerBootstrap serverBootstrap;  
   
   @BeforeClass
   public static void setUpEmbeddedRuntime() {
-    serverBootstrap = new JerseyServerBootstrap();
+    serverBootstrap = new JerseyServerBootstrap(new TestCustomResourceApplication());
     serverBootstrap.start();
   }
   
