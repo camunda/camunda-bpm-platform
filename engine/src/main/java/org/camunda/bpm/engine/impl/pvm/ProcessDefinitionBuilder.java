@@ -148,7 +148,7 @@ public class ProcessDefinitionBuilder {
     if (transition==null) {
       scopeStack.peek().addExecutionListener(eventName, executionListener);
     } else {
-      throw new PvmException("not in an activity- or process definition scope. (but in a transition scope)");
+      transition.addExecutionListener(executionListener);
     }
     return this;
   }

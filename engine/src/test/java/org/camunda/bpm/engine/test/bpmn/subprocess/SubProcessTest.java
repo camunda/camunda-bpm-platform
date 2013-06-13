@@ -48,12 +48,12 @@ public class SubProcessTest extends PluggableProcessEngineTestCase {
     ActivityInstance rootActivityInstance = runtimeService.getActivityInstance(pi.getProcessInstanceId());
     assertEquals(pi.getProcessDefinitionId(), rootActivityInstance.getActivityId());
     //subprocess
-    assertEquals(1, rootActivityInstance.getChildInstances().size());
-    ActivityInstance subProcessInstance = rootActivityInstance.getChildInstances().get(0);
+    assertEquals(1, rootActivityInstance.getChildActivityInstances().length);
+    ActivityInstance subProcessInstance = rootActivityInstance.getChildActivityInstances()[0];
     assertEquals("subProcess", subProcessInstance.getActivityId());
     // usertask
-    assertEquals(1, subProcessInstance.getChildInstances().size());
-    ActivityInstance userTaskInstance = subProcessInstance.getChildInstances().get(0);
+    assertEquals(1, subProcessInstance.getChildActivityInstances().length);
+    ActivityInstance userTaskInstance = subProcessInstance.getChildActivityInstances()[0];
     assertEquals("subProcessTask", userTaskInstance.getActivityId());
     
     // After completing the task in the subprocess, 
@@ -89,12 +89,12 @@ public class SubProcessTest extends PluggableProcessEngineTestCase {
     ActivityInstance rootActivityInstance = runtimeService.getActivityInstance(pi.getProcessInstanceId());
     assertEquals(pi.getProcessDefinitionId(), rootActivityInstance.getActivityId());
     //subprocess
-    assertEquals(1, rootActivityInstance.getChildInstances().size());
-    ActivityInstance subProcessInstance = rootActivityInstance.getChildInstances().get(0);
+    assertEquals(1, rootActivityInstance.getChildActivityInstances().length);
+    ActivityInstance subProcessInstance = rootActivityInstance.getChildActivityInstances()[0];
     assertEquals("subProcess", subProcessInstance.getActivityId());
     // usertask
-    assertEquals(1, subProcessInstance.getChildInstances().size());
-    ActivityInstance userTaskInstance = subProcessInstance.getChildInstances().get(0);
+    assertEquals(1, subProcessInstance.getChildActivityInstances().length);
+    ActivityInstance userTaskInstance = subProcessInstance.getChildActivityInstances()[0];
     assertEquals("subProcessTask", userTaskInstance.getActivityId());
     
     // Setting the clock forward 2 hours 1 second (timer fires in 2 hours) and fire up the job executor 
@@ -164,16 +164,16 @@ public class SubProcessTest extends PluggableProcessEngineTestCase {
     ActivityInstance rootActivityInstance = runtimeService.getActivityInstance(pi.getProcessInstanceId());
     assertEquals(pi.getProcessDefinitionId(), rootActivityInstance.getActivityId());
     //subprocess1
-    assertEquals(1, rootActivityInstance.getChildInstances().size());
-    ActivityInstance subProcessInstance1 = rootActivityInstance.getChildInstances().get(0);
+    assertEquals(1, rootActivityInstance.getChildActivityInstances().length);
+    ActivityInstance subProcessInstance1 = rootActivityInstance.getChildActivityInstances()[0];
     assertEquals("outerSubProcess", subProcessInstance1.getActivityId());
     //subprocess2
-    assertEquals(1, rootActivityInstance.getChildInstances().size());
-    ActivityInstance subProcessInstance2 = subProcessInstance1.getChildInstances().get(0);
+    assertEquals(1, rootActivityInstance.getChildActivityInstances().length);
+    ActivityInstance subProcessInstance2 = subProcessInstance1.getChildActivityInstances()[0];
     assertEquals("innerSubProcess", subProcessInstance2.getActivityId());
     // usertask
-    assertEquals(1, subProcessInstance2.getChildInstances().size());
-    ActivityInstance userTaskInstance = subProcessInstance2.getChildInstances().get(0);
+    assertEquals(1, subProcessInstance2.getChildActivityInstances().length);
+    ActivityInstance userTaskInstance = subProcessInstance2.getChildActivityInstances()[0];
     assertEquals("innerSubProcessTask", userTaskInstance.getActivityId());
     
     // After completing the task in the subprocess, 
@@ -200,16 +200,16 @@ public class SubProcessTest extends PluggableProcessEngineTestCase {
     ActivityInstance rootActivityInstance = runtimeService.getActivityInstance(pi.getProcessInstanceId());
     assertEquals(pi.getProcessDefinitionId(), rootActivityInstance.getActivityId());
     //subprocess1
-    assertEquals(1, rootActivityInstance.getChildInstances().size());
-    ActivityInstance subProcessInstance1 = rootActivityInstance.getChildInstances().get(0);
+    assertEquals(1, rootActivityInstance.getChildActivityInstances().length);
+    ActivityInstance subProcessInstance1 = rootActivityInstance.getChildActivityInstances()[0];
     assertEquals("outerSubProcess", subProcessInstance1.getActivityId());
     //subprocess2
-    assertEquals(1, rootActivityInstance.getChildInstances().size());
-    ActivityInstance subProcessInstance2 = subProcessInstance1.getChildInstances().get(0);
+    assertEquals(1, rootActivityInstance.getChildActivityInstances().length);
+    ActivityInstance subProcessInstance2 = subProcessInstance1.getChildActivityInstances()[0];
     assertEquals("innerSubProcess", subProcessInstance2.getActivityId());
     // usertask
-    assertEquals(1, subProcessInstance2.getChildInstances().size());
-    ActivityInstance userTaskInstance = subProcessInstance2.getChildInstances().get(0);
+    assertEquals(1, subProcessInstance2.getChildActivityInstances().length);
+    ActivityInstance userTaskInstance = subProcessInstance2.getChildActivityInstances()[0];
     assertEquals("innerSubProcessTask", userTaskInstance.getActivityId());
     
     // Setting the clock forward 1 hour 1 second (timer fires in 1 hour) and fire up the job executor 
@@ -225,12 +225,12 @@ public class SubProcessTest extends PluggableProcessEngineTestCase {
     rootActivityInstance = runtimeService.getActivityInstance(pi.getProcessInstanceId());
     assertEquals(pi.getProcessDefinitionId(), rootActivityInstance.getActivityId());
     //subprocess1
-    assertEquals(1, rootActivityInstance.getChildInstances().size());
-    subProcessInstance1 = rootActivityInstance.getChildInstances().get(0);
+    assertEquals(1, rootActivityInstance.getChildActivityInstances().length);
+    subProcessInstance1 = rootActivityInstance.getChildActivityInstances()[0];
     assertEquals("outerSubProcess", subProcessInstance1.getActivityId());
     //subprocess2
-    assertEquals(1, rootActivityInstance.getChildInstances().size());
-    ActivityInstance escalationTaskInst = subProcessInstance1.getChildInstances().get(0);
+    assertEquals(1, rootActivityInstance.getChildActivityInstances().length);
+    ActivityInstance escalationTaskInst = subProcessInstance1.getChildActivityInstances()[0];
     assertEquals("escalationTask", escalationTaskInst.getActivityId());
     
     // Completing the escalated task, destroys the outer scope and activates the task after the subprocess
@@ -273,20 +273,20 @@ public class SubProcessTest extends PluggableProcessEngineTestCase {
     ActivityInstance rootActivityInstance = runtimeService.getActivityInstance(pi.getProcessInstanceId());
     assertEquals(pi.getProcessDefinitionId(), rootActivityInstance.getActivityId());
     //subprocess1
-    assertEquals(1, rootActivityInstance.getChildInstances().size());
-    ActivityInstance subProcessInstance = rootActivityInstance.getChildInstances().get(0);
+    assertEquals(1, rootActivityInstance.getChildActivityInstances().length);
+    ActivityInstance subProcessInstance = rootActivityInstance.getChildActivityInstances()[0];
     assertEquals("subProcess", subProcessInstance.getActivityId());
     // 2 tasks are present
-    assertEquals(2, subProcessInstance.getChildInstances().size());
+    assertEquals(2, subProcessInstance.getChildActivityInstances().length);
     
-    // Completing both tasks, should destroiy the subprocess and activate the task after the subprocess
+    // Completing both tasks, should destroy the subprocess and activate the task after the subprocess
     taskService.complete(taskA.getId());
     
     rootActivityInstance = runtimeService.getActivityInstance(pi.getProcessInstanceId());
     assertEquals(pi.getProcessDefinitionId(), rootActivityInstance.getActivityId());
-    subProcessInstance = rootActivityInstance.getChildInstances().get(0);
+    subProcessInstance = rootActivityInstance.getChildActivityInstances()[0];
     // 1 task + 1 join
-    assertEquals(2, subProcessInstance.getChildInstances().size());
+    assertEquals(2, subProcessInstance.getChildActivityInstances().length);
     
     taskService.complete(taskB.getId());
     Task taskAfterSubProcess = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();

@@ -13,6 +13,7 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,9 +24,12 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ActivityInstanceImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.ProcessElementInstanceImpl;
+import org.camunda.bpm.engine.impl.persistence.entity.TransitionInstanceImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
+import org.camunda.bpm.engine.runtime.TransitionInstance;
 
 /**
  * @author Daniel Meyer
@@ -81,7 +85,7 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
     processActInst.setParentActivityInstanceId(null);
     processActInst.setProcessInstanceId(processInstanceId);
     processActInst.setProcessDefinitionId(processInstance.getProcessDefinitionId());
-    processActInst.getExecutionIds().add(processInstanceId);
+    processActInst.setExecutionIds(new String[]{processInstanceId});
     processActInst.setBusinessKey(processInstance.getBusinessKey());
     processActInst.setActivityId(processInstance.getProcessDefinitionId());
     processActInst.setActivityName(processInstance.getProcessDefinition().getName());
@@ -92,9 +96,10 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
     return processActInst;
   }
 
-  protected void initActivityInstanceTree(ActivityInstance parentActInst, Map<String, List<ExecutionEntity>> executionsByParentActIds) {
+  protected void initActivityInstanceTree(ActivityInstanceImpl parentActInst, Map<String, List<ExecutionEntity>> executionsByParentActIds) {
 
-    Map<String, ActivityInstanceImpl> childInstances = new HashMap<String, ActivityInstanceImpl>();
+    Map<String, ActivityInstanceImpl> childActivityInstances = new HashMap<String, ActivityInstanceImpl>();
+    List<TransitionInstance> childTransitionInstances = new ArrayList<TransitionInstance>();
     List<ExecutionEntity> childExecutions = executionsByParentActIds.get(parentActInst.getId());
 
     if(childExecutions == null) {
@@ -102,22 +107,37 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
     }
     
     for (ExecutionEntity execution : childExecutions) {
-      if (!isConcurrentRoot(execution) && !execution.getActivityInstanceId().equals(parentActInst.getId())) {
+      
+      if(execution.getActivityInstanceId() == null) {
+        TransitionInstanceImpl transitionInstance = new TransitionInstanceImpl();
+        
+        initProcessElementInstance(transitionInstance, parentActInst, execution);
+        
+        // can use execution id as persistent ID for transition as an execution can execute as most one transition at a time. 
+        transitionInstance.setId(execution.getId());
+        transitionInstance.setExecutionId(execution.getId());        
+        transitionInstance.setTargetActivityId(execution.getActivityId());
+        
+        childTransitionInstances.add(transitionInstance);
+              
+      } else if (!isConcurrentRoot(execution) && !execution.getActivityInstanceId().equals(parentActInst.getId())) {
 
-        ActivityInstance activityInstance = childInstances.get(execution.getActivityInstanceId());
+        ActivityInstanceImpl activityInstance = childActivityInstances.get(execution.getActivityInstanceId());
         if (activityInstance != null) {
           // instance already created -> add executionId
-          activityInstance.getExecutionIds().add(execution.getId());
+          String[] executionIds = activityInstance.getExecutionIds();
+          executionIds = Arrays.copyOf(executionIds, executionIds.length + 1);
+          executionIds[executionIds.length] = execution.getId();          
+          activityInstance.setExecutionIds(executionIds);
 
         } else {
           // create new activity instance
           ActivityInstanceImpl actInstance = new ActivityInstanceImpl();
-          actInstance.setId(execution.getActivityInstanceId());
-          actInstance.setParentActivityInstanceId(parentActInst.getId());          
-          actInstance.setProcessInstanceId(parentActInst.getProcessInstanceId());
-          actInstance.setProcessDefinitionId(parentActInst.getProcessDefinitionId());
+          
+          initProcessElementInstance(actInstance, parentActInst, execution);
+          
           actInstance.setBusinessKey(execution.getBusinessKey());
-          actInstance.getExecutionIds().add(execution.getId());
+          actInstance.setExecutionIds(new String[]{execution.getId()});
           
           ScopeImpl activity = getActivity(execution);
           actInstance.setActivityId(activity.getId());
@@ -126,17 +146,27 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
             actInstance.setActivityName((String) name);
           }
 
-          childInstances.put(actInstance.getId(), actInstance);
+          childActivityInstances.put(actInstance.getId(), actInstance);
 
         }
       }
     }
 
-    parentActInst.getChildInstances().addAll(childInstances.values());
-    for (ActivityInstance childActInstance : parentActInst.getChildInstances()) {
-      initActivityInstanceTree(childActInstance, executionsByParentActIds);
+    parentActInst.setChildActivityInstances(childActivityInstances.values().toArray(new ActivityInstance[0]));
+    parentActInst.setChildTransitionInstances(childTransitionInstances.toArray(new TransitionInstance[0]));
+    for (ActivityInstance childActInstance : parentActInst.getChildActivityInstances()) {
+      initActivityInstanceTree((ActivityInstanceImpl) childActInstance, executionsByParentActIds);
     }
 
+  }
+
+  private void initProcessElementInstance(ProcessElementInstanceImpl inst, ActivityInstance parentActInst, ExecutionEntity execution) {
+    
+    inst.setId(execution.getActivityInstanceId());
+    inst.setParentActivityInstanceId(parentActInst.getId());          
+    inst.setProcessInstanceId(parentActInst.getProcessInstanceId());
+    inst.setProcessDefinitionId(parentActInst.getProcessDefinitionId());
+    
   }
 
   /** returns true if execution is a concurrent root. */

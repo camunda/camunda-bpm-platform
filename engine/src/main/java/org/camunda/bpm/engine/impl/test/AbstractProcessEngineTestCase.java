@@ -278,7 +278,7 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
     if(activityInstance.getActivityId().equals(activityId)) {
       result.add(activityInstance);
     }
-    for (ActivityInstance childInstance : activityInstance.getChildInstances()) {
+    for (ActivityInstance childInstance : activityInstance.getChildActivityInstances()) {
       result.addAll(getInstancesForActivitiyId(childInstance,activityId));
     }
     return result;

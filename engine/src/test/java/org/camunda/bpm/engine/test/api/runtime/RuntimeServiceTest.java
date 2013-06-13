@@ -886,22 +886,18 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
     ActivityInstance rootActInstance = runtimeService.getActivityInstance(processInstance.getId());
     assertEquals(processInstance.getId(), rootActInstance.getProcessInstanceId());
     assertEquals(processInstance.getProcessDefinitionId(), rootActInstance.getProcessDefinitionId());
-    assertEquals(processInstance.getBusinessKey(), rootActInstance.getBusinessKey());
     assertEquals(processInstance.getId(), rootActInstance.getProcessInstanceId());    
-    assertTrue(rootActInstance.getExecutionIds().contains(processInstance.getId()));
-    assertEquals("The One Task Process", rootActInstance.getActivityName());
+    assertTrue(rootActInstance.getExecutionIds()[0].equals(processInstance.getId()));
     assertEquals(rootActInstance.getProcessDefinitionId(), rootActInstance.getActivityId());
     assertNull(rootActInstance.getParentActivityInstanceId());
     
     // validate properties of child:
     Task task = taskService.createTaskQuery().singleResult();
-    ActivityInstance childActivityInstance = rootActInstance.getChildInstances().get(0);
+    ActivityInstance childActivityInstance = rootActInstance.getChildActivityInstances()[0];
     assertEquals(processInstance.getId(), childActivityInstance.getProcessInstanceId());
     assertEquals(processInstance.getProcessDefinitionId(), childActivityInstance.getProcessDefinitionId());
-    assertEquals(processInstance.getBusinessKey(), childActivityInstance.getBusinessKey());
     assertEquals(processInstance.getId(), childActivityInstance.getProcessInstanceId());    
-    assertTrue(childActivityInstance.getExecutionIds().contains(task.getExecutionId()));
-    assertEquals("my task", childActivityInstance.getActivityName());
+    assertTrue(childActivityInstance.getExecutionIds()[0].equals(task.getExecutionId()));
     assertEquals("theTask", childActivityInstance.getActivityId());
     assertEquals(rootActInstance.getId(), childActivityInstance.getParentActivityInstanceId());
        
