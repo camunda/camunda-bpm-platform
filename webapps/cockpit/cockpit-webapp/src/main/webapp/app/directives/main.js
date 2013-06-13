@@ -4,6 +4,7 @@ ngDefine('cockpit.directives', [
   './pageOverflowHidden',
   './processDiagram',
   './activityStatistics',
+  './activityInstances',
   './hidePanel'
 ], function(module) {
 
