@@ -157,7 +157,7 @@ ngDefine('cockpit.directives', [
     
     function aggregateActivityInstances(instance, map) {
       
-      var children = instance.childInstances;
+      var children = instance.childActivityInstances;
       
       for (var i = 0; i < children.length; i++) {
         var child = children[i];
@@ -169,6 +169,18 @@ ngDefine('cockpit.directives', [
           map[child.activityId] = mappings;
         }
         mappings.push(child);
+      }
+      
+      var transitions = instance.childTransitionInstances;
+      for (var i = 0; i < transitions.length; i++) {
+        var transition = transitions[i];
+        
+        var mappings = map[transition.targetActivityId];
+        if (!mappings) {
+          mappings = [];
+          map[transition.targetActivityId] = mappings;
+        }
+        mappings.push(transition);
       }
     }
     
