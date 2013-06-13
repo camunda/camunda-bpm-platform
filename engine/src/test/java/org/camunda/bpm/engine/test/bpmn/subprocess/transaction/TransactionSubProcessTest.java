@@ -16,12 +16,11 @@ package org.camunda.bpm.engine.test.bpmn.subprocess.transaction;
 import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
-import org.camunda.bpm.engine.impl.cmd.GetActivityInstanceCmd;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
-
+import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.EventSubscription;
-import org.camunda.bpm.engine.runtime.ActivityInstance;import org.camunda.bpm.engine.runtime.Execution;
+import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
@@ -87,8 +86,8 @@ public class TransactionSubProcessTest extends PluggableProcessEngineTestCase {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("transactionProcess");
     
     // after the process is started, we have compensate event subscriptions:
-    assertEquals(5,createEventSubscriptionQuery().eventType("compensate").activityId("undoBookHotel").count());
-    assertEquals(1,createEventSubscriptionQuery().eventType("compensate").activityId("undoBookFlight").count());
+    assertEquals(5, runtimeService.createEventSubscriptionQuery().eventType("compensate").activityId("undoBookHotel").count());
+    assertEquals(1, runtimeService.createEventSubscriptionQuery().eventType("compensate").activityId("undoBookFlight").count());
     
     // the task is present:
     Task task = taskService.createTaskQuery().singleResult();
@@ -127,7 +126,7 @@ public class TransactionSubProcessTest extends PluggableProcessEngineTestCase {
     assertTrue(activeActivityIds.contains("afterCancellation"));
     
     // we have no more compensate event subscriptions
-    assertEquals(0,createEventSubscriptionQuery().eventType("compensate").count());
+    assertEquals(0, runtimeService.createEventSubscriptionQuery().eventType("compensate").count());
        
     // end the process instance
     runtimeService.signal(processInstance.getId());    
