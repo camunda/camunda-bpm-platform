@@ -19,15 +19,16 @@ import java.util.List;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
-import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
+import org.camunda.bpm.engine.runtime.EventSubscription;
+import org.camunda.bpm.engine.runtime.EventSubscriptionQuery;
 
 
 /**
  * @author Daniel Meyer
  */
 public class EventSubscriptionQueryImpl 
-                extends AbstractQuery<EventSubscriptionQueryImpl, EventSubscriptionEntity> 
-                implements Serializable {
+                extends AbstractQuery<EventSubscriptionQuery, EventSubscription> 
+                implements Serializable, EventSubscriptionQuery {
 
   private static final long serialVersionUID = 1L;
   
@@ -46,7 +47,11 @@ public class EventSubscriptionQueryImpl
     super(commandExecutor);
   }
 
-  public EventSubscriptionQueryImpl eventSubscriptionId(String id) {
+  /* (non-Javadoc)
+   * @see org.camunda.bpm.engine.impl.EventSubscriptionQuery#eventSubscriptionId(java.lang.String)
+   */
+  @Override
+  public EventSubscriptionQuery eventSubscriptionId(String id) {
     if (eventSubscriptionId == null) {
       throw new ProcessEngineException("Provided svent subscription id is null");
     }
@@ -54,7 +59,11 @@ public class EventSubscriptionQueryImpl
     return this;
   }
 
-  public EventSubscriptionQueryImpl eventName(String eventName) {
+  /* (non-Javadoc)
+   * @see org.camunda.bpm.engine.impl.EventSubscriptionQuery#eventName(java.lang.String)
+   */
+  @Override
+  public EventSubscriptionQuery eventName(String eventName) {
     if (eventName == null) {
       throw new ProcessEngineException("Provided event name is null");
     }
@@ -62,6 +71,10 @@ public class EventSubscriptionQueryImpl
     return this;
   }
 
+  /* (non-Javadoc)
+   * @see org.camunda.bpm.engine.impl.EventSubscriptionQuery#executionId(java.lang.String)
+   */
+  @Override
   public EventSubscriptionQueryImpl executionId(String executionId) {
     if (executionId == null) {
       throw new ProcessEngineException("Provided execution id is null");
@@ -70,7 +83,11 @@ public class EventSubscriptionQueryImpl
     return this;
   }
 
-  public EventSubscriptionQueryImpl processInstanceId(String processInstanceId) {
+  /* (non-Javadoc)
+   * @see org.camunda.bpm.engine.impl.EventSubscriptionQuery#processInstanceId(java.lang.String)
+   */
+  @Override
+  public EventSubscriptionQuery processInstanceId(String processInstanceId) {
     if (processInstanceId == null) {
       throw new ProcessEngineException("Provided process instance id is null");
     }
@@ -78,6 +95,10 @@ public class EventSubscriptionQueryImpl
     return this;
   }
 
+  /* (non-Javadoc)
+   * @see org.camunda.bpm.engine.impl.EventSubscriptionQuery#activityId(java.lang.String)
+   */
+  @Override
   public EventSubscriptionQueryImpl activityId(String activityId) {
     if (activityId == null) {
       throw new ProcessEngineException("Provided activity id is null");
@@ -86,6 +107,10 @@ public class EventSubscriptionQueryImpl
     return this;
   }
   
+  /* (non-Javadoc)
+   * @see org.camunda.bpm.engine.impl.EventSubscriptionQuery#eventType(java.lang.String)
+   */
+  @Override
   public EventSubscriptionQueryImpl eventType(String eventType) {
     if (eventType == null) {
       throw new ProcessEngineException("Provided event type is null");
@@ -94,7 +119,11 @@ public class EventSubscriptionQueryImpl
     return this;
   }
   
-  public EventSubscriptionQueryImpl orderByCreated() {
+  /* (non-Javadoc)
+   * @see org.camunda.bpm.engine.impl.EventSubscriptionQuery#orderByCreated()
+   */
+  @Override
+  public EventSubscriptionQuery orderByCreated() {
     return orderBy(EventSubscriptionQueryProperty.CREATED);
   }
   
@@ -109,7 +138,7 @@ public class EventSubscriptionQueryImpl
   }
 
   @Override
-  public List<EventSubscriptionEntity> executeList(CommandContext commandContext, Page page) {
+  public List<EventSubscription> executeList(CommandContext commandContext, Page page) {
     checkQueryOk();
     return commandContext
       .getEventSubscriptionManager()

@@ -19,58 +19,54 @@ import javax.ws.rs.core.Response.Status;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
-import org.camunda.bpm.engine.rest.dto.runtime.ExecutionDto;
+import org.camunda.bpm.engine.rest.dto.runtime.EventSubscriptionDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ExecutionTriggerDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
-import org.camunda.bpm.engine.rest.sub.VariableResource;
 import org.camunda.bpm.engine.rest.sub.runtime.EventSubscriptionResource;
-import org.camunda.bpm.engine.rest.sub.runtime.ExecutionResource;
 import org.camunda.bpm.engine.rest.util.DtoUtil;
-import org.camunda.bpm.engine.runtime.Execution;
+import org.camunda.bpm.engine.runtime.EventSubscription;
 
-public class ExecutionResourceImpl implements ExecutionResource {
+public class MessageEventSubscriptionResource implements EventSubscriptionResource {
+
+  protected static final String MESSAGE_EVENT_TYPE = "message";
 
   private ProcessEngine engine;
   private String executionId;
+  private String messageName;
   
-  public ExecutionResourceImpl(ProcessEngine engine, String executionId) {
+  public MessageEventSubscriptionResource(ProcessEngine engine, String executionId, String messageName) {
     this.engine = engine;
     this.executionId = executionId;
+    this.messageName = messageName;
   }
-
+  
   @Override
-  public ExecutionDto getExecution() {
+  public EventSubscriptionDto getEventSubscription() {
     RuntimeService runtimeService = engine.getRuntimeService();
-    Execution execution = runtimeService.createExecutionQuery().executionId(executionId).singleResult();
+    EventSubscription eventSubscription = runtimeService.createEventSubscriptionQuery()
+        .executionId(executionId).eventName(messageName).eventType(MESSAGE_EVENT_TYPE).singleResult();
     
-    if (execution == null) {
-      throw new InvalidRequestException(Status.NOT_FOUND, "Execution with id " + executionId + " does not exist");
+    if (eventSubscription == null) {
+      String errorMessage = String.format("Message event subscription for execution %s named %s does not exist", executionId, messageName);
+      throw new InvalidRequestException(Status.NOT_FOUND, errorMessage);
     }
     
-    return ExecutionDto.fromExecution(execution);
+    return EventSubscriptionDto.fromEventSubscription(eventSubscription);
   }
 
   @Override
-  public void signalExecution(ExecutionTriggerDto triggerDto) {
+  public void triggerEvent(ExecutionTriggerDto triggerDto) {
     RuntimeService runtimeService = engine.getRuntimeService();
+    
     Map<String, Object> variables = DtoUtil.toMap(triggerDto.getVariables());
-    try {
-      runtimeService.signal(executionId, variables);
-    } catch (ProcessEngineException e) {
-      throw new RestException(Status.INTERNAL_SERVER_ERROR, e, "Cannot signal execution " + executionId + ": " + e.getMessage());
-    }
     
-  }
-
-  @Override
-  public VariableResource getLocalVariables() {
-    return new LocalExecutionVariablesResource(engine, executionId);
-  }
-
-  @Override
-  public EventSubscriptionResource getMessageEventSubscription(String messageName) {
-    return new MessageEventSubscriptionResource(engine, executionId, messageName);
+    try {
+      runtimeService.messageEventReceived(messageName, executionId, variables);
+    } catch (ProcessEngineException e) {
+      throw new RestException(Status.INTERNAL_SERVER_ERROR, e, "Cannot trigger message " + messageName +
+          " for execution " + executionId + ": " + e.getMessage());
+    }
   }
 
 }
