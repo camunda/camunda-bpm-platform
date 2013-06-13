@@ -23,6 +23,7 @@ import java.util.Set;
 import org.camunda.bpm.engine.impl.EventSubscriptionQueryImpl;
 import org.camunda.bpm.engine.impl.Page;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
+import org.camunda.bpm.engine.runtime.EventSubscription;
 
 
 /**
@@ -57,7 +58,7 @@ public class EventSubscriptionManager extends AbstractManager {
   }
 
   @SuppressWarnings("unchecked")
-  public List<EventSubscriptionEntity> findEventSubscriptionsByQueryCriteria(EventSubscriptionQueryImpl eventSubscriptionQueryImpl, Page page) {
+  public List<EventSubscription> findEventSubscriptionsByQueryCriteria(EventSubscriptionQueryImpl eventSubscriptionQueryImpl, Page page) {
     final String query = "selectEventSubscriptionByQueryCriteria"; 
     return getDbSqlSession().selectList(query, eventSubscriptionQueryImpl, page);
   }

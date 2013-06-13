@@ -16,10 +16,10 @@ package org.camunda.bpm.engine.test.bpmn.event.message;
 import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.EventSubscriptionQueryImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
@@ -37,8 +37,7 @@ public class MessageStartEventTest extends PluggableProcessEngineTestCase {
       .deploy()
       .getId();
     
-    List<EventSubscriptionEntity> eventSubscriptions = new EventSubscriptionQueryImpl(processEngineConfiguration.getCommandExecutorTxRequired())
-      .list();
+    List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().list();
     
     assertEquals(1, eventSubscriptions.size());
     
@@ -85,7 +84,7 @@ public class MessageStartEventTest extends PluggableProcessEngineTestCase {
       .deploy()
       .getId();
     
-    List<EventSubscriptionEntity> eventSubscriptions = new EventSubscriptionQueryImpl(processEngineConfiguration.getCommandExecutorTxRequired()).list();
+    List<EventSubscription> eventSubscriptions = runtimeService.createEventSubscriptionQuery().list();
     List<ProcessDefinition> processDefinitions = repositoryService.createProcessDefinitionQuery().list();
         
     assertEquals(1, eventSubscriptions.size());
@@ -97,19 +96,21 @@ public class MessageStartEventTest extends PluggableProcessEngineTestCase {
       .deploy()
       .getId();
     
-    List<EventSubscriptionEntity> newEventSubscriptions = new EventSubscriptionQueryImpl(processEngineConfiguration.getCommandExecutorTxRequired()).list();
+    List<EventSubscription> newEventSubscriptions = runtimeService.createEventSubscriptionQuery().list();
     List<ProcessDefinition> newProcessDefinitions = repositoryService.createProcessDefinitionQuery().list();
         
     assertEquals(1, newEventSubscriptions.size());
     assertEquals(2, newProcessDefinitions.size());
     for (ProcessDefinition processDefinition : newProcessDefinitions) {
       if(processDefinition.getVersion() == 1) {
-        for (EventSubscriptionEntity subscription : newEventSubscriptions) {
-          assertFalse(subscription.getConfiguration().equals(processDefinition.getId()));         
+        for (EventSubscription subscription : newEventSubscriptions) {
+          EventSubscriptionEntity subscriptionEntity = (EventSubscriptionEntity) subscription;
+          assertFalse(subscriptionEntity.getConfiguration().equals(processDefinition.getId()));         
         }
       } else {
-        for (EventSubscriptionEntity subscription : newEventSubscriptions) {
-          assertTrue(subscription.getConfiguration().equals(processDefinition.getId()));         
+        for (EventSubscription subscription : newEventSubscriptions) {
+          EventSubscriptionEntity subscriptionEntity = (EventSubscriptionEntity) subscription;
+          assertTrue(subscriptionEntity.getConfiguration().equals(processDefinition.getId()));         
         }
       }
     }
