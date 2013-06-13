@@ -27,10 +27,10 @@ public class ActivityInstanceImpl extends ProcessElementInstanceImpl implements 
   protected String activityName;
   protected String activityType;
   
-  protected ActivityInstance[] childActivityInstances;
-  protected TransitionInstance[] childTransitionInstances;
+  protected ActivityInstance[] childActivityInstances = new ActivityInstance[0];
+  protected TransitionInstance[] childTransitionInstances = new TransitionInstance[0];
   
-  protected String[] executionIds;
+  protected String[] executionIds = new String[0];
 
   public ActivityInstance[] getChildActivityInstances() {
     return childActivityInstances;

@@ -900,6 +900,10 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
     assertTrue(childActivityInstance.getExecutionIds()[0].equals(task.getExecutionId()));
     assertEquals("theTask", childActivityInstance.getActivityId());
     assertEquals(rootActInstance.getId(), childActivityInstance.getParentActivityInstanceId());
+    assertNotNull(childActivityInstance.getChildActivityInstances());
+    assertNotNull(childActivityInstance.getChildTransitionInstances());
+    assertEquals(0, childActivityInstance.getChildActivityInstances().length);
+    assertEquals(0, childActivityInstance.getChildTransitionInstances().length);
        
   }  
   
