@@ -346,10 +346,9 @@ define([], function () {
         } else if(elementType == "laneSet") {
           bpmnObject = transformLaneSet(element, scopeActivity, bpmnDiElementIndex);
 
-        } else if(elementType == "subProcess") {
+        } else if(elementType == "subProcess" || elementType =="adHocSubProcess") {
           bpmnObject = transformElementsContainer(element, scopeActivity, sequenceFlows, bpmnDiElementIndex);
-
-        } else if(!!element && element.nodeName != "sequenceFlow" && element.nodeType == 1 /* (nodeType=1 => element nodes only) */ ) {  
+        } else if(!!element && element.nodeName != "sequenceFlow" && element.nodeType == 1 /* (nodeType=1 => element nodes only) */ ) {
           bpmnObject = createBpmnObject(element, scopeActivity, bpmnDiElementIndex);
 
         }
@@ -385,8 +384,6 @@ define([], function () {
 
       // transform a scope
       transformScope(containerElement, containerObject, bpmnDiElementIndex);
-
-      generatedElements.push(containerObject);
 
       invokeParseListeners(containerObject, containerElement);
     };
@@ -438,6 +435,24 @@ define([], function () {
       }
     }
 
+    function getMessageFlows (definitionsElement) {
+
+    }
+
+    function getParticipants (definitionsElement, bpmnDiElementIndex) {
+      var participants = [];
+      var participantElements = definitionsElement.getElementsByTagNameNS(NS_BPMN_SEMANTIC, "participant");
+
+      if (participantElements.length != 0) {
+        for (var index = 0; index < participantElements.length; index++) {
+          var participant = createBpmnObject(participantElements[index], null, bpmnDiElementIndex);
+          participants.push(participant);
+        }
+      }
+
+      return participants;
+    }
+
     /** transforms a <definitions ... /> element into a set of activity definitions */
     function transformDefinitions(definitionsElement) {
 
@@ -451,27 +466,27 @@ define([], function () {
         createBpmnDiElementIndex(bpmnDiagrams[i], bpmnDiElementIndex);
       }
 
-      var participants = definitionsElement.getElementsByTagNameNS(NS_BPMN_SEMANTIC, "participant");
+      var processes = definitionsElement.getElementsByTagNameNS(NS_BPMN_SEMANTIC, "process");
       var processNames = {};
 
-      if (participants.length != 0) {
-        for (var index = 0; index < participants.length; index++) {
-          var participant = participants[index];
-          var processRef = participant.getAttribute("processRef");
-          var participantId = participants[index].getAttribute("id");
-          // map participant shape to process shape for resolution in transform process
-          bpmnDiElementIndex[processRef] = bpmnDiElementIndex[participantId];
-          processNames[processRef] = participant.getAttribute("name");
-        }
+      var participants = getParticipants(definitionsElement, bpmnDiElementIndex);
+      generatedElements = generatedElements.concat(participants);
+
+      for(var i = 0; i < participants.length; i++) {
+        var participant = participants[i];
+        // map participant shape to process shape for resolution in transform process
+        bpmnDiElementIndex[participant.processRef] = bpmnDiElementIndex[participant.id];
+        processNames[participant.processRef] = participant.name;
       }
 
-      var processes = definitionsElement.getElementsByTagNameNS(NS_BPMN_SEMANTIC, "process");
+      for(var i = 0; i < processes.length; i++) {
+        var name = processNames[processes[i].getAttribute("id")];
+        if (name) {
+          processes[i].setAttributeNS(NS_BPMN_SEMANTIC, "name" , processNames[processes[i].getAttribute("id")]);
+        }
 
-      for(var i =0; i < processes.length; i++) {
-        processes[i].setAttributeNS(NS_BPMN_SEMANTIC, "name" , processNames[processes[i].getAttribute("id")]);
         transformProcess(processes[i], bpmnDiElementIndex);
       }
-
     };
 
     transformDefinitions(definitions[0]);

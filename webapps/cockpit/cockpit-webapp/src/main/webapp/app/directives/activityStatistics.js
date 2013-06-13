@@ -6,18 +6,18 @@ ngDefine('cockpit.directives', [ 'angular' ], function(module, angular) {
     return {
       restrict: 'AC',
       require: 'processDiagram', 
-      link: function(scope, element, attr, processDiagram) {
+      link: function(scope, element, attrs, processDiagram) {
         
-        scope.$watch('processDefinitionId', function (newValue) {
+        scope.$watch(attrs['processDefinitionId'], function (newValue) {
           processDiagram.annotateWithActivityStatistics(null);
-          getActivityStatistics();
+          getActivityStatistics(newValue);
         });
         
-        function getActivityStatistics() {
+        function getActivityStatistics(processDefinitionId) {
           ProcessDefinitionActivityStatisticsResource
           .queryStatistics(
               {
-                id : scope.processDefinitionId
+                id : processDefinitionId
               })
               .$then(function(result) {
                 processDiagram.annotateWithActivityStatistics(result.data);

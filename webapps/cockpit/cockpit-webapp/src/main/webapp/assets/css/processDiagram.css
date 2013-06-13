@@ -33,3 +33,10 @@ div .process-diagram .drag {
   color: #ffffff;
   background-color: #4169e1;
 }
+
+.badgePosition {
+  margin-left: -1.1em;
+  margin-top: -0.75em;
+  top: 100%;
+  position: absolute;
+}
