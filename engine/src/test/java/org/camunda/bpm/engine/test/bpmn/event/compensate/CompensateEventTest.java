@@ -57,7 +57,7 @@ public class CompensateEventTest extends PluggableProcessEngineTestCase {
   }
   
   @Deployment
-  public void testCompensateParallelSubprocessCompensationHandlerWaitstate() {
+  public void testCompensateParallelSubprocessCompHandlerWaitstate() {
     
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess");
     
