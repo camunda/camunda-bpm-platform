@@ -40,6 +40,7 @@ create table ACT_RU_EXECUTION (
     PROC_DEF_ID_ varchar(64),
     SUPER_EXEC_ varchar(64),
     ACT_ID_ varchar(255),
+    ACT_INST_ID_ varchar(64),
     IS_ACTIVE_ smallint check(IS_ACTIVE_ in (1,0)),
     IS_CONCURRENT_ smallint check(IS_CONCURRENT_ in (1,0)),
     IS_SCOPE_ smallint check(IS_SCOPE_ in (1,0)),

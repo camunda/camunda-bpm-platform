@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.cockpit.plugin.base.persistence.entity;
+package org.camunda.bpm.cockpit.plugin.base.dto;
 
 public class ProcessDefinitionDto {
   

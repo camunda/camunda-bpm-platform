@@ -2,10 +2,8 @@ ngDefine('cockpit.plugin.base.pages', function(module) {
 
   var Controller = function($scope, ProcessDefinitionResource) {
     
-    var failedJobIncidentType = 'failedJob';
-
     ProcessDefinitionResource.queryStatistics({
-	      incidentsForType: failedJobIncidentType
+	      incidents: true
 	    }).$then(function (data) {
 	      $scope.statistics = aggregateStatistics(data.resource);
 	    });
@@ -112,7 +110,8 @@ ngDefine('cockpit.plugin.base.pages', function(module) {
       id: 'process-definitions',
       label: 'Deployed Processes',
       url: 'plugin://base/static/app/pages/dashboard-process-definitions.html',
-      controller: Controller
+      controller: Controller,
+      priority: 5
     });
   };
 

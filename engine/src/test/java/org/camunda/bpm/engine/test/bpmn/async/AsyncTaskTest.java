@@ -17,8 +17,10 @@ import java.util.Date;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.Job;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 
 /**
@@ -33,7 +35,15 @@ public class AsyncTaskTest extends PluggableProcessEngineTestCase {
   public void testAsycServiceNoListeners() {  
     INVOCATION = false;
     // start process 
-    runtimeService.startProcessInstanceByKey("asyncService");
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("asyncService");
+    
+    // now we have one transition instance below the process instance:
+    ActivityInstance activityInstance = runtimeService.getActivityInstance(processInstance.getId());
+    assertEquals(1, activityInstance.getChildTransitionInstances().length);
+    assertEquals(0, activityInstance.getChildActivityInstances().length);
+    
+    assertNotNull(activityInstance.getChildTransitionInstances()[0]);
+    
     // now there should be one job in the database:
     assertEquals(1, managementService.createJobQuery().count());
     // the service was not invoked:

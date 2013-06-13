@@ -23,7 +23,7 @@ import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 /**
  * @author Tom Baeyens
  */
-public class AtomicOperationProcessStartInitial extends AbstractEventAtomicOperation {
+public class AtomicOperationProcessStartInitial extends AtomicOperationActivityInstanceStart {
 
   @Override
   protected ScopeImpl getScope(InterpretableExecution execution) {
@@ -37,6 +37,9 @@ public class AtomicOperationProcessStartInitial extends AbstractEventAtomicOpera
 
   @Override
   protected void eventNotificationsCompleted(InterpretableExecution execution) {
+    
+    super.eventNotificationsCompleted(execution);
+    
     ActivityImpl activity = (ActivityImpl) execution.getActivity();
     ProcessDefinitionImpl processDefinition = execution.getProcessDefinition();
     StartingExecution startingExecution = execution.getStartingExecution();

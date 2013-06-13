@@ -20,11 +20,11 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import org.camunda.bpm.engine.rest.dto.DeleteEngineEntityDto;
+import org.camunda.bpm.engine.rest.dto.runtime.ActivityInstanceDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
 import org.camunda.bpm.engine.rest.sub.VariableResource;
 
 public interface ProcessInstanceResource {
-
 
   @GET
   @Produces(MediaType.APPLICATION_JSON)
@@ -36,4 +36,9 @@ public interface ProcessInstanceResource {
   
   @Path("/variables")
   VariableResource getVariablesResource();
+  
+  @GET
+  @Path("/activity-instances")
+  @Produces(MediaType.APPLICATION_JSON)
+  ActivityInstanceDto getActivityInstanceTree();
 }

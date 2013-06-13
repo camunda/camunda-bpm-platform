@@ -34,6 +34,10 @@ public abstract class AbstractEventAtomicOperation implements AtomicOperation {
     List<ExecutionListener> exectionListeners = scope.getExecutionListeners(getEventName());
     int executionListenerIndex = execution.getExecutionListenerIndex();
     
+    if(executionListenerIndex == 0) {
+      eventNotificationsStarted(execution);
+    }
+    
     if (exectionListeners.size()>executionListenerIndex) {
       execution.setEventName(getEventName());
       execution.setEventSource(scope);
@@ -55,6 +59,10 @@ public abstract class AbstractEventAtomicOperation implements AtomicOperation {
       
       eventNotificationsCompleted(execution);
     }
+  }
+
+  protected void eventNotificationsStarted(InterpretableExecution execution) {
+    // do nothing
   }
 
   protected abstract ScopeImpl getScope(InterpretableExecution execution);

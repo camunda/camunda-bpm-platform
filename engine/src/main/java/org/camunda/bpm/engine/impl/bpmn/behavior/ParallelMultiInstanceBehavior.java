@@ -37,6 +37,7 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
    * Will create child executions accordingly for every instance needed.
    */
    protected void createInstances(ActivityExecution execution) throws Exception {
+     
     int nrOfInstances = resolveNrOfInstances(execution);
     if (nrOfInstances <= 0) {
       throw new ProcessEngineException("Invalid number of instances: must be positive integer value" 
@@ -46,6 +47,8 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
     setLoopVariable(execution, NUMBER_OF_INSTANCES, nrOfInstances);
     setLoopVariable(execution, NUMBER_OF_COMPLETED_INSTANCES, 0);
     setLoopVariable(execution, NUMBER_OF_ACTIVE_INSTANCES, nrOfInstances);
+
+    execution.getParent().setActivityInstanceId(execution.getParent().getParentActivityInstanceId());
     
     List<ActivityExecution> concurrentExecutions = new ArrayList<ActivityExecution>();
     for (int loopCounter=0; loopCounter<nrOfInstances; loopCounter++) {
@@ -53,11 +56,14 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
       concurrentExecution.setActive(true);
       concurrentExecution.setConcurrent(true);
       concurrentExecution.setScope(false);
+
       
       // In case of an embedded subprocess, and extra child execution is required
       // Otherwise, all child executions would end up under the same parent,
       // without any differentation to which embedded subprocess they belong
       if (isExtraScopeNeeded()) {
+        
+        
         ActivityExecution extraScopedExecution = concurrentExecution.createExecution();
         extraScopedExecution.setActive(true);
         extraScopedExecution.setConcurrent(false);
@@ -79,6 +85,7 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
       if (concurrentExecution.isActive() && !concurrentExecution.isEnded() 
               && concurrentExecution.getParent().isActive() 
               && !concurrentExecution.getParent().isEnded()) { 
+        
         setLoopVariable(concurrentExecution, LOOP_COUNTER, loopCounter);
         executeOriginalBehavior(concurrentExecution, loopCounter);
       }
@@ -96,18 +103,19 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
    * Handles the completion of one of the parallel instances
    */
   public void leave(ActivityExecution execution) {
+
     callActivityEndListeners(execution);
     
     int loopCounter = getLoopVariable(execution, LOOP_COUNTER);
     int nrOfInstances = getLoopVariable(execution, NUMBER_OF_INSTANCES);
     int nrOfCompletedInstances = getLoopVariable(execution, NUMBER_OF_COMPLETED_INSTANCES) + 1;
     int nrOfActiveInstances = getLoopVariable(execution, NUMBER_OF_ACTIVE_INSTANCES) - 1;
-    
+        
     if (isExtraScopeNeeded()) {
       // In case an extra scope was created, it must be destroyed first before going further
       ExecutionEntity extraScope = (ExecutionEntity) execution;
       execution = execution.getParent();
-      extraScope.remove();
+      extraScope.remove();     
     }
     
     setLoopVariable(execution.getParent(), NUMBER_OF_COMPLETED_INSTANCES, nrOfCompletedInstances);
@@ -120,6 +128,8 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
     
     List<ActivityExecution> joinedExecutions = executionEntity.findInactiveConcurrentExecutions(execution.getActivity());
     if (joinedExecutions.size() == nrOfInstances || completionConditionSatisfied(execution)) {
+      
+      execution.getParent().getParent().setActivityInstanceId(execution.getActivityInstanceId());      
       
       // Removing all active child executions (ie because completionCondition is true)
       List<ExecutionEntity> executionsToRemove = new ArrayList<ExecutionEntity>();
@@ -136,8 +146,10 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
         executionToRemove.inactivate();
         executionToRemove.deleteCascade("multi-instance completed");
       }
-      executionEntity.takeAll(executionEntity.getActivity().getOutgoingTransitions(), joinedExecutions);
-    } 
+      
+      executionEntity.takeAll(activity.getOutgoingTransitions(), joinedExecutions);
+    }
   }
+ 
 
 }

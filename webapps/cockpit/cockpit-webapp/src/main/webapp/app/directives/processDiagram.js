@@ -1,144 +1,218 @@
-"use strict";
+'use strict';
 
-define([ "angular", "jquery", "bpmn/Bpmn", "dojo/domReady!", "bootstrap-slider", "jquery-overscroll", "jquery-mousewheel" ], function(angular, $, Bpmn, Slider) {
+ngDefine('cockpit.directives', [ 
+                                 'angular',
+                                 'jquery',
+                                 'bpmn/Bpmn',
+                                 'bootstrap-slider',
+                                 'jquery-overscroll',
+                                 'jquery-mousewheel',
+                                 'dojo/domReady!'
+                                 ], function(module, angular, $, Bpmn) {
   
-  var module = angular.module("cockpit.directives");
-  
-  var Directive = function (ProcessDefinitionDiagramService, ProcessDefinitionActivityStatisticsResource, Debouncer) {
-    return {
-      restrict: 'A',
-      link: function(scope, element, attrs, $destroy) {
-        if (!!scope.processDefinitionId) {
-          var containerName = 'processDiagram';
-          var container = $('#' + containerName);
+  function DirectiveController($scope, $element, $attrs, $filter, ProcessDiagramService) {
 
-          var bpmnRenderer;
-//          var currentActivityCssClass = 'currentActivity';
-          var currentActivityCountCssClass = 'currentActivityCount';
-
-          // -------------- zoom - start --------------------//
-          // initial zoom level
-          scope.zoomLevel = 1;
-
-          container.mousewheel(function(event, delta) {
-            scope.$apply(function() {
-              scope.zoomLevel = calculateZoomLevel(delta);
-
-            });
-          });
-
-          var calculateZoomLevel = function(zoomDelta) {
-            var minZoomLevelMin = 0.1;
-            var maxZoomLevelMax = 5;
-            var zoomSteps = 10;
-
-            var newZoomLevel = scope.zoomLevel + Math.round((zoomDelta * 100)/ zoomSteps) / 100;
-
-            if (newZoomLevel > maxZoomLevelMax) {
-              newZoomLevel = maxZoomLevelMax;
-            } else if (newZoomLevel < minZoomLevelMin) {
-              newZoomLevel = minZoomLevelMin;
+    var activityStatistics = null;
+    var activityInstances = null;
+    
+    var bpmnRenderer = null;
+    var miniature = $scope.$eval($attrs['miniature']);
+    var zoomLevel = null;
+    
+    $scope.$watch($attrs['processDefinitionId'], function (newValue) {
+      if (newValue) {
+        loadProcessDiagram(newValue);
+      }
+    });
+    
+    $scope.$watch(function() { return bpmnRenderer; }, function(newValue) {
+      annotate();
+    });
+    
+    $scope.$on('$destroy', function() {
+      bpmnRenderer = null;
+    });
+    
+    $scope.$watch(function() { return zoomLevel; }, function(newZoomLevel) {
+      if (!!newZoomLevel && !!bpmnRenderer) {
+        removeOverscroll();
+        bpmnRenderer.zoom(newZoomLevel);
+        overscroll();
+      }
+    });
+    
+    function loadProcessDiagram(processDefinitionId) {
+      // set id of element
+      var elementId = 'processDiagram_' + processDefinitionId.replace(/:/g, '_');
+      $element.attr('id', elementId);
+      
+      // clear innerHTML of element
+      $element.empty();
+      
+      // get the bpmn20xml
+      ProcessDiagramService.getBpmn20Xml(processDefinitionId)
+      .then(
+          function(data) {
+            if (miniature && miniature === true) {
+              renderMiniatureProcessDiagram(data.bpmn20Xml);
+            } else {
+              renderProcessDiagram(data.bpmn20Xml);
             }
-
-            return newZoomLevel;
-          };
-
-          scope.$watch('zoomLevel', function(newZoomLevel) {
-            container.removeOverscroll();
-            if (newZoomLevel && bpmnRenderer) {
-              console.log("New ZoomLevel: " + newZoomLevel);
-              bpmnRenderer.zoom(newZoomLevel);
-            }
-            container.overscroll({captureWheel:false});
+          }
+      );
+    }
+    
+    function renderProcessDiagram (bpmn20Xml) {
+      
+      $element.addClass('process-diagram');
+      
+      try {
+        bpmnRenderer = new Bpmn();
+        bpmnRenderer.render(bpmn20Xml, {
+          diagramElement : $element.attr('id')
+        });
+        
+        zoomLevel = 1;
+        
+        $element.mousewheel(function(event, delta) {
+          $scope.$apply(function() {
+            zoomLevel = calculateZoomLevel(delta);
           });
+        });
+      } catch (err) {
+        // clear innerHTML of element
+        $element.empty();
+        console.log('Could not render process diagram: ' + err.message);
+        // TODO: Create a hint that the diagram could not be rendered. 
+      }
+    }
+    
+    function renderMiniatureProcessDiagram (bpmn20Xml) {
+      try {
+        bpmnRenderer = new Bpmn();
+        bpmnRenderer.render(bpmn20Xml, {
+          diagramElement : $element.attr('id'),
+          width : parseInt($element.parent().css("min-width")),
+          height : $element.parent().height(),
+        });
+      } catch (err) {
+        // clear innerHTML of element
+        $element.empty();
+        console.log('Could not render process diagram: ' + err.message);
+        // TODO: Create a hint that the diagram could not be rendered. 
+      }
+    }
+    
+    function overscroll() {
+      $element.overscroll({captureWheel:false});
+    }
+    
+    function removeOverscroll() {
+      $element.removeOverscroll();
+    }
+    
+    function calculateZoomLevel (delta) {
+      var minZoomLevelMin = 0.1;
+      var maxZoomLevelMax = 5;
+      var zoomSteps = 10;
 
-          // -------------- zoom - end --------------------//
+      var newZoomLevel = zoomLevel + Math.round((delta * 100)/ zoomSteps) / 100;
 
-          var getActivityStatisticsResult = function(activityStatistics) {
-            var activityStatisticsResult = [];
+      if (newZoomLevel > maxZoomLevelMax) {
+        newZoomLevel = maxZoomLevelMax;
+      } else if (newZoomLevel < minZoomLevelMin) {
+        newZoomLevel = minZoomLevelMin;
+      }
 
-            angular.forEach(activityStatistics.data, function (currentActivityStatistic) {
-              convertActivityStatisticNumber(currentActivityStatistic);
-              activityStatisticsResult.push(angular.copy(currentActivityStatistic));
-            });
+      return newZoomLevel;
+    };
 
-            return activityStatisticsResult;
-          };
-
-          var convertActivityStatisticNumber = function(activityStatistic) {
-            var instances = activityStatistic.instances;
-            var numberLength = instances.toString().length;
-            switch (numberLength) {
-              case 4:
-              case 5:
-              case 6:
-                // make it K-size
-                activityStatistic.instances = Math.floor(instances / 1000) + 'K';
-                break;
-              case 7:
-              case 8:
-              case 9:
-                // make it mn-size
-                activityStatistic.instances = Math.floor(instances / 1000000) + 'mn';
-                break;
-              default:
-                // leave it alone because it is under 1000
-                break;
-            }
-          };
-
-          var renderActivityStatistics = function(activityStatistics, renderer) {
-            angular.forEach(activityStatistics, function (currentActivity) {
-              renderer.annotate(currentActivity.id, '<p class="' + currentActivityCountCssClass + '">' + currentActivity.instances + '</p>');
-            });
-          };
-
-          scope.$watch(function() { return scope.processDefinition; }, function(processDefinition) {
-            if (processDefinition && processDefinition.$resolved) {
-
-              ProcessDefinitionDiagramService.getBpmn20Xml(scope.processDefinitionId).then(
-                function(data) {
-                  bpmnRenderer = new Bpmn();
-                  bpmnRenderer.render(data.bpmn20Xml, {
-                    diagramElement : containerName,
-                    overlayHtml : '<div></div>'
-                  });
-                  
-                  container.overscroll({captureWheel:false});
-
-                  // id to scroll to is the process definition key
-                  var processId = '#' + processDefinition.key;
-                  var processElement = $(processId);
-                  
-                  if (!!processElement && !!processElement.length) {
-                    console.log("scrolling to point (" + $(processId).position().top + "," + $(processId).position().left + ")" );
-                    
-                    // scroll to selected process if it is a collaboration
-                    container.animate({
-                      scrollTop: $(processId).position().top,
-                      scrollLeft: $(processId).position().left
-                    }, 500);
-                  }
-
-                  ProcessDefinitionActivityStatisticsResource.queryStatistics({ id : scope.processDefinitionId }).$then(function(result) {
-                    scope.activityStatistics = getActivityStatisticsResult(result);
-                    renderActivityStatistics(scope.activityStatistics, bpmnRenderer);
-                  });
-                }
-              );
-            }
-          });
-
-          scope.$on($destroy, function() {
-            bpmnRenderer = null;
-          });
-
+    function annotate() {
+      if (bpmnRenderer) {
+        
+        if (activityStatistics) {
+          doAnnotateWithActivityStatistics(activityStatistics);
+        } else if (activityInstances) {
+          doAnnotateWithActivityInstances(activityInstances);
         }
       }
+    }
+    
+    function doAnnotateWithActivityStatistics(activityStaticstics) {
+      angular.forEach(activityStatistics, function (currentActivityStatistics) {
+        doAnnotate(currentActivityStatistics.id, currentActivityStatistics.instances);
+      });
+    }
+    
+    function doAnnotateWithActivityInstances(activityInstances) {
+      var result = [];
+      aggregateActivityInstances(activityInstances, result);
+      
+      for (var key in result) {
+        var mappings = result[key];
+        doAnnotate(key, mappings.length);
+      }
+      
+    }
+    
+    function aggregateActivityInstances(instance, map) {
+      
+      var children = instance.childActivityInstances;
+      
+      for (var i = 0; i < children.length; i++) {
+        var child = children[i];
+        aggregateActivityInstances(child, map);
+        
+        var mappings = map[child.activityId];
+        if (!mappings) {
+          mappings = [];
+          map[child.activityId] = mappings;
+        }
+        mappings.push(child);
+      }
+      
+      var transitions = instance.childTransitionInstances;
+      for (var i = 0; i < transitions.length; i++) {
+        var transition = transitions[i];
+        
+        var mappings = map[transition.targetActivityId];
+        if (!mappings) {
+          mappings = [];
+          map[transition.targetActivityId] = mappings;
+        }
+        mappings.push(transition);
+      }
+    }
+    
+    function doAnnotate(activityId, count) {
+      var shortenNumberFilter = $filter('shortenNumber');
+      bpmnRenderer.annotate(activityId, '<p class="badge badgePosition">' + shortenNumberFilter(count) + '</p>');
+    }
+    
+    this.getRenderer = function () {
+      return bpmnRenderer;
+    };
+    
+    this.annotateWithActivityStatistics = function (statistics) {
+      activityStatistics = statistics;
+      annotate();
+    };
+    
+    this.annotateWithActivityInstances = function (instances) {
+      activityInstances = instances;
+      annotate();
+    };
+    
+  }
+  
+  var Directive = function (ProcessDiagramService) {
+    return {
+      restrict: 'EAC',
+      controller: DirectiveController 
     };
   };
-  
-  Directive.$inject = ["ProcessDefinitionDiagramService", "ProcessDefinitionActivityStatisticsResource", "Debouncer"];
+
+  Directive.$inject = [ 'ProcessDiagramService' ];
   
   module
     .directive('processDiagram', Directive);
