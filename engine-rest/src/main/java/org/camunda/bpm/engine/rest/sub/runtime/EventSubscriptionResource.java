@@ -16,29 +16,20 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-import org.camunda.bpm.engine.rest.dto.runtime.ExecutionDto;
+import org.camunda.bpm.engine.rest.dto.runtime.EventSubscriptionDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ExecutionTriggerDto;
-import org.camunda.bpm.engine.rest.sub.VariableResource;
 
-public interface ExecutionResource {
+public interface EventSubscriptionResource {
 
   @GET
   @Produces(MediaType.APPLICATION_JSON)
-  ExecutionDto getExecution();
+  EventSubscriptionDto getEventSubscription();
   
   @POST
-  @Path("/signal")
-  @Produces(MediaType.APPLICATION_JSON)
+  @Path("/trigger")
   @Consumes(MediaType.APPLICATION_JSON)
-  void signalExecution(ExecutionTriggerDto triggerDto);
-  
-  @Path("/localVariables")
-  VariableResource getLocalVariables();
-  
-  @Path("/messageSubscriptions/{messageName}")
-  EventSubscriptionResource getMessageEventSubscription(@PathParam("messageName") String messageName);
+  void triggerEvent(ExecutionTriggerDto triggerDto);
 }

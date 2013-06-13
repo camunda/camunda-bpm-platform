@@ -29,6 +29,8 @@ import org.camunda.bpm.engine.rest.helper.EqualsList;
 import org.camunda.bpm.engine.rest.helper.EqualsMap;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.rest.util.VariablesBuilder;
+import org.camunda.bpm.engine.runtime.EventSubscription;
+import org.camunda.bpm.engine.runtime.EventSubscriptionQuery;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ExecutionQuery;
 import org.junit.Assert;
@@ -44,7 +46,8 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
   protected static final String SIGNAL_EXECUTION_URL = EXECUTION_URL + "/signal";
   protected static final String EXECUTION_LOCAL_VARIABLES_URL = EXECUTION_URL + "/localVariables";
   protected static final String SINGLE_EXECUTION_LOCAL_VARIABLE_URL = EXECUTION_LOCAL_VARIABLES_URL + "/{varId}";
-  protected static final String MESSAGE_SUBSCRIPTION_URL = EXECUTION_URL + "/messageSubscriptions/{messageName}/trigger";
+  protected static final String MESSAGE_SUBSCRIPTION_URL = EXECUTION_URL + "/messageSubscriptions/{messageName}";
+  protected static final String TRIGGER_MESSAGE_SUBSCRIPTION_URL = EXECUTION_URL + "/messageSubscriptions/{messageName}/trigger";
   
   private RuntimeServiceImpl runtimeServiceMock;
   
@@ -52,10 +55,21 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
   public void setUpRuntimeData() {
     runtimeServiceMock = mock(RuntimeServiceImpl.class);
     when(runtimeServiceMock.getVariablesLocal(MockProvider.EXAMPLE_EXECUTION_ID)).thenReturn(EXAMPLE_VARIABLES);
+    mockEventSubscriptionQuery();
 
     when(processEngine.getRuntimeService()).thenReturn(runtimeServiceMock);
   }
   
+  private void mockEventSubscriptionQuery() {
+    EventSubscription mockSubscription = MockProvider.createMockEventSubscription();
+    EventSubscriptionQuery mockQuery = mock(EventSubscriptionQuery.class);
+    when(runtimeServiceMock.createEventSubscriptionQuery()).thenReturn(mockQuery);
+    when(mockQuery.executionId(eq(MockProvider.EXAMPLE_EXECUTION_ID))).thenReturn(mockQuery);
+    when(mockQuery.eventType(eq(MockProvider.EXAMPLE_EVENT_SUBSCRIPTION_TYPE))).thenReturn(mockQuery);
+    when(mockQuery.eventName(eq(MockProvider.EXAMPLE_EVENT_SUBSCRIPTION_NAME))).thenReturn(mockQuery);
+    when(mockQuery.singleResult()).thenReturn(mockSubscription);
+  }
+
   @Test
   public void testGetSingleExecution() {
     Execution mockExecution = MockProvider.createMockExecution();
@@ -299,9 +313,45 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
     
     given().pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID).pathParam("varId", variableKey)
       .then().expect().statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
+      .contentType(ContentType.JSON)
       .body("type", is(RestException.class.getSimpleName()))
       .body("message", is("Cannot delete execution variable " + variableKey + ": expected exception"))
       .when().delete(SINGLE_EXECUTION_LOCAL_VARIABLE_URL);
+  }
+  
+  @Test
+  public void testGetMessageEventSubscription() {
+    String messageName = MockProvider.EXAMPLE_EVENT_SUBSCRIPTION_NAME;
+    
+    given().pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID).pathParam("messageName", messageName)
+    .then().expect().statusCode(Status.OK.getStatusCode())
+    .body("id", equalTo(MockProvider.EXAMPLE_EVENT_SUBSCRIPTION_ID))
+    .body("eventType", equalTo(MockProvider.EXAMPLE_EVENT_SUBSCRIPTION_TYPE))
+    .body("eventName", equalTo(MockProvider.EXAMPLE_EVENT_SUBSCRIPTION_NAME))
+    .body("executionId", equalTo(MockProvider.EXAMPLE_EXECUTION_ID))
+    .body("processInstanceId", equalTo(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID))
+    .body("activityId", equalTo(MockProvider.EXAMPLE_ACTIVITY_ID))
+    .body("createdDate", equalTo(MockProvider.EXAMPLE_EVENT_SUBSCRIPTION_CREATION_DATE))
+    .when().get(MESSAGE_SUBSCRIPTION_URL);
+  }
+  
+  @Test
+  public void testGetNonExistingMessageEventSubscription() {
+    EventSubscriptionQuery sampleEventSubscriptionQuery = mock(EventSubscriptionQuery.class);
+    when(runtimeServiceMock.createEventSubscriptionQuery()).thenReturn(sampleEventSubscriptionQuery);
+    when(sampleEventSubscriptionQuery.executionId(anyString())).thenReturn(sampleEventSubscriptionQuery);
+    when(sampleEventSubscriptionQuery.eventName(anyString())).thenReturn(sampleEventSubscriptionQuery);
+    when(sampleEventSubscriptionQuery.eventType(anyString())).thenReturn(sampleEventSubscriptionQuery);
+    when(sampleEventSubscriptionQuery.singleResult()).thenReturn(null);
+    
+    String executionId = MockProvider.EXAMPLE_EXECUTION_ID;
+    String nonExistingMessageName = "aMessage";
+    
+    given().pathParam("id", executionId).pathParam("messageName", nonExistingMessageName)
+      .then().expect().statusCode(Status.NOT_FOUND.getStatusCode()).contentType(ContentType.JSON)
+      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", equalTo("Message event subscription for execution " + executionId + " named " + nonExistingMessageName + " does not exist"))
+      .when().get(MESSAGE_SUBSCRIPTION_URL);
   }
   
   @Test
@@ -322,7 +372,7 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
     given().pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID).pathParam("messageName", messageName)
       .contentType(ContentType.JSON).body(variablesJson)
       .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
-      .when().post(MESSAGE_SUBSCRIPTION_URL);
+      .when().post(TRIGGER_MESSAGE_SUBSCRIPTION_URL);
   
     Map<String, Object> expectedVariables = new HashMap<String, Object>();
     expectedVariables.put(variableKey1, variableValue1);
@@ -339,7 +389,7 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
     given().pathParam("id", MockProvider.EXAMPLE_EXECUTION_ID).pathParam("messageName", messageName)
       .contentType(ContentType.JSON).body(EMPTY_JSON_OBJECT)
       .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
-      .when().post(MESSAGE_SUBSCRIPTION_URL);
+      .when().post(TRIGGER_MESSAGE_SUBSCRIPTION_URL);
   
     verify(runtimeServiceMock).messageEventReceived(eq(messageName), eq(MockProvider.EXAMPLE_EXECUTION_ID),
         argThat(new EqualsMap(null)));
@@ -356,6 +406,6 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
       .then().expect().statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
       .body("type", is(RestException.class.getSimpleName()))
       .body("message", is("Cannot trigger message " + messageName + " for execution " + MockProvider.EXAMPLE_EXECUTION_ID + ": expected exception"))
-      .when().post(MESSAGE_SUBSCRIPTION_URL);
+      .when().post(TRIGGER_MESSAGE_SUBSCRIPTION_URL);
   }
 }
