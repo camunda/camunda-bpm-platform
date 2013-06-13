@@ -17,8 +17,10 @@ import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.EventSubscriptionQueryImpl;
+import org.camunda.bpm.engine.impl.cmd.GetActivityInstanceCmd;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
@@ -76,6 +78,60 @@ public class TransactionSubProcessTest extends PluggableProcessEngineTestCase {
     assertProcessEnded(processInstance.getId());    
     assertEquals(0, runtimeService.createExecutionQuery().count());
     
+  }
+  
+  @Deployment(resources={"org/camunda/bpm/engine/test/bpmn/subprocess/transaction/TransactionSubProcessTest.testWaitstateCompensationHandler.bpmn20.xml"})
+  public void testWaitstateCompensationHandler() {
+
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("transactionProcess");
+    
+    // after the process is started, we have compensate event subscriptions:
+    assertEquals(5,createEventSubscriptionQuery().eventType("compensate").activityId("undoBookHotel").count());
+    assertEquals(1,createEventSubscriptionQuery().eventType("compensate").activityId("undoBookFlight").count());
+    
+    // the task is present:
+    Task task = taskService.createTaskQuery().singleResult();
+    assertNotNull(task);
+    
+    // making the tx fail:
+    taskService.setVariable(task.getId(), "confirmed", false);    
+    taskService.complete(task.getId());
+    
+    // now there are two user task instances (the compensation handlers):
+    
+    List<Task> undoBookHotel = taskService.createTaskQuery().taskDefinitionKey("undoBookHotel").list();
+    List<Task> undoBookFlight = taskService.createTaskQuery().taskDefinitionKey("undoBookFlight").list();
+    
+    assertEquals(5,undoBookHotel.size());
+    assertEquals(1,undoBookFlight.size());
+    
+    ActivityInstance rootActivityInstance = runtimeService.getActivityInstance(processInstance.getId());
+    List<ActivityInstance> undoBookHotelInstances = getInstancesForActivitiyId(rootActivityInstance, "undoBookHotel");
+    List<ActivityInstance> undoBookFlightInstances = getInstancesForActivitiyId(rootActivityInstance, "undoBookFlight");
+    assertEquals(5, undoBookHotelInstances.size());
+    assertEquals(1, undoBookFlightInstances.size());
+    
+    ActivityInstance txActivityInstance = rootActivityInstance.getChildActivityInstances()[0];
+    assertEquals("tx", txActivityInstance.getActivityId());
+    assertEquals(7, txActivityInstance.getChildActivityInstances().length);
+    
+    for (Task t : undoBookHotel) {
+      taskService.complete(t.getId());      
+    }
+    taskService.complete(undoBookFlight.get(0).getId());
+        
+    // now the process instance execution is sitting in the 'afterCancellation' task 
+    // -> has left the transaction using the cancel boundary event
+    List<String> activeActivityIds = runtimeService.getActiveActivityIds(processInstance.getId());
+    assertTrue(activeActivityIds.contains("afterCancellation"));
+    
+    // we have no more compensate event subscriptions
+    assertEquals(0,createEventSubscriptionQuery().eventType("compensate").count());
+       
+    // end the process instance
+    runtimeService.signal(processInstance.getId());    
+    assertProcessEnded(processInstance.getId());
+    assertEquals(0, runtimeService.createExecutionQuery().count());    
   }
   
   @Deployment(resources={"org/camunda/bpm/engine/test/bpmn/subprocess/transaction/TransactionSubProcessTest.testSimpleCase.bpmn20.xml"})
