@@ -44,4 +44,4 @@ create index ACT_IDX_HI_ACT_INST_COMP on ACT_HI_ACTINST(EXECUTION_ID_, ACT_ID_, 
 
 /** add ACT_INST_ID_ column to execution table */
 alter table ACT_RU_EXECUTION
-    add ACT_INST_ID_ nvarchar(64);
+    add ACT_INST_ID_ varchar(64);
