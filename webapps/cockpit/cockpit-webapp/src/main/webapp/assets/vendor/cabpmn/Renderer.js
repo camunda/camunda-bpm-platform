@@ -50,23 +50,30 @@ define(["dojox/gfx", "dojo/_base/lang", "dojo/dom-construct", "dojo/_base/window
   };
 
   var dataPaths = {
-    "dataObject" : "M5,5L45,5L55,15L55,65L5,65L5,5M45,5L45,15L55,15",
-    "dataObjectReference" : "M5,5L45,5L55,15L55,65L5,65L5,5M45,5L45,15L55,15",
-    "dataStoreReference" : "m 62.926,15.69 c 0,1.986 -3.62,6.551 -31.267,6.551 -27.646,0 -30.734,-4.686 -30.734,-6.454 m 0,-4.65 c 0,1.769 3.088,6.455 30.734,6.455 27.647,0 31.267,-4.565 31.267,-6.551 M 0.925,6.487 c 0,2.35 3.088,6.455 30.734,6.455 27.647,0 31.267,-3.912 31.267,-6.552 m 0,0.001 v 4.844 M 0.949,6.391 v 4.844 m 61.977,-0.194 v 4.844 M 0.949,11.041 v 4.844 M 31.634,0.662 c 20.013,0 31.292,3.05 31.292,5.729 0,2.678 0,45.096 0,48.244 0,3.148 -16.42,6.2 -31.388,6.2 -14.968,0 -30.613,-2.955 -30.613,-6.298 0,-3.342 0,-45.728 0,-48.05 0,-2.322 10.697,-5.825 30.709,-5.825 z"
+    "dataObject" : {path: "m 0.49099769,0.73102628 39.21440331,0 9.803601,9.83633372 0,49.181671 -49.01800431,0 0,-59.01800472 m 39.21440331,0 0,9.83633372 9.803601,0", width: 50, height:60},
+    "dataObjectReference" :{path: "m 0.49099769,0.73102628 39.21440331,0 9.803601,9.83633372 0,49.181671 -49.01800431,0 0,-59.01800472 m 39.21440331,0 0,9.83633372 9.803601,0", width: 50, height:60},
+    "dataInput" :{path: "m 0.49099769,0.73102628 39.21440331,0 9.803601,9.83633372 0,49.181671 -49.01800431,0 0,-59.01800472 m 39.21440331,0 0,9.83633372 9.803601,0", width: 50, height:60},
+    "dataOutput" :{path: "m 0.49099769,0.73102628 39.21440331,0 9.803601,9.83633372 0,49.181671 -49.01800431,0 0,-59.01800472 m 39.21440331,0 0,9.83633372 9.803601,0", width: 50, height:60},
+    "dataStoreReference" : {path: "m 59.525317,15.298375 c 0,1.948956 -3.447739,6.428808 -29.779135,6.428808 -26.3304438,0 -29.2714988,-4.598594 -29.2714988,-6.333617 m 0,-4.563267 c 0,1.736004 2.941055,6.334599 29.2714988,6.334599 26.331396,0 29.779135,-4.479852 29.779135,-6.428808 M 0.4746832,6.2670314 c 0,2.306167 2.941055,6.3345996 29.2714988,6.3345996 26.331396,0 29.779135,-3.8390326 29.779135,-6.4297906 m 0,9.81e-4 V 10.926471 M 0.49754114,6.1728214 V 10.926471 M 59.525317,10.73609 v 4.753647 M 0.49754114,10.73609 v 4.753647 M 29.722371,0.55068142 c 19.060666,0 29.802946,2.99310998 29.802946,5.62213998 0,2.62805 0,44.2548566 0,47.3441386 0,3.089282 -15.638642,6.084356 -29.894377,6.084356 -14.255736,0 -29.1562568,-2.899883 -29.1562568,-6.180529 0,-3.279663 0,-44.8750666 0,-47.1537556 0,-2.278689 10.1879748,-5.71634998 29.2476878,-5.71634998 z", width:60, height:60}
   };
 
-  var activityMarkerPaths = {
-    "loop": "M 0 0 L 0 3 L -3 3 M 0 3 A 4.875,4.875 0 1 1 4 3",
-    "miSeq": "M 0 -2 h10 M 0 2 h10 M 0 6 h10",
-    "miPar": "M 0 -2 v8 M 4 -2 v8 M 8 -2 v8",
-    "adhoc": "m 0 0 c -0.54305,0.60192 -1.04853,1.0324 -1.51647,1.29142 -0.46216,0.25908 -0.94744,0.38857 -1.4558,0.38857 -0.57194,0 -1.23628,-0.22473 -1.99307,-0.67428 -0.0577,-0.0306 -0.10111,-0.0534 -0.12999,-0.0687 -0.0346,-0.0228 -0.0896,-0.0533 -0.16464,-0.0915 -0.80878,-0.47234 -1.4558,-0.70857 -1.94107,-0.70857 -0.46217,0 -0.91566,0.14858 -1.36047,0.44576 -0.44485,0.2895 -0.92434,0.75046 -1.43849,1.38285 l 0,-2.03429 c 0.54881,-0.60194 1.05431,-1.0324 1.51647,-1.29147 0.46793,-0.26666 0.9532,-0.39999 1.45581,-0.39999 0.57191,0 1.24205,0.22856 2.01039,0.68574 0.0461,0.0308 0.0838,0.0533 0.11266,0.0687 0.0404,0.0228 0.0982,0.0533 0.1733,0.0913 0.803,0.4724 1.45002,0.70861 1.94108,0.70857 0.44481,4e-5 0.88676,-0.14475 1.32581,-0.43429 0.43905,-0.2895 0.9272,-0.75425 1.46448,-1.39428",
-    "compensate": "M 50 70 L 55 65 L 55 75z M44.7 70 L49.7 75 L 49.7 65z"
+  var markerPaths = {
+    "loop": "m 0,2.4999366 0,3 -3,0 m 3,0 a 4.875,4.875 0 1 1 4,0",
+    "multiInstanceSequential": "m -2.499754,-2 h 10 m -10,4 h 10 m -10,4 h 10",
+    "multiInstanceParallel": "m -2.199754,-2 v 8 m 4,-8 v 8 m 4,-8 v 8",
+    "adHoc": "M -0.59975394,0 C -1.1428039,0.60192 -1.648284,1.0324 -2.116224,1.29142 c -0.46216,0.25908 -0.94744,0.38857 -1.4558,0.38857 -0.57194,0 -1.23628,-0.22473 -1.99307,-0.67428 -0.0577,-0.0306 -0.10111,-0.0534 -0.12999,-0.0687 -0.0346,-0.0228 -0.0896,-0.0533 -0.16464,-0.0915 -0.80878,-0.47234 -1.4558,-0.70857 -1.94107,-0.70857 -0.46217,0 -0.91566,0.14858 -1.36047,0.44576 -0.44485,0.2895 -0.92434,0.75046 -1.43849,1.38285 l 0,-2.03429 c 0.54881,-0.60194 1.05431,-1.0324 1.51647,-1.29147 0.46793,-0.26666 0.9532,-0.39999 1.45581,-0.39999 0.57191,0 1.24205,0.22856 2.01039,0.68574 0.0461,0.0308 0.0838,0.0533 0.11266,0.0687 0.0404,0.0228 0.0982,0.0533 0.1733,0.0913 0.803,0.4724 1.45002,0.70861 1.94108,0.70857 0.44481,4e-5 0.88676,-0.14475 1.32581,-0.43429 0.43905,-0.2895 0.9272001,-0.75425 1.46448006,-1.39428 z",
+    "compensation": "m 0.71428559,1.6639369 5.00000041,-5.0000001 0,9.9999998 z m -5.29999999,0 4.99999999,4.9999997 0,-9.9999998 z",
+    "reference" : "m -2.8535142,-2.3696092 c 0,9.607029 0,9.7871607 0,9.7871607 l 9.3068093,0 0,-9.7871607 -9.6389273,-0.025715 5.1356324,0.025715 0,9.7871607 4.4432509,0 0,-4.8638044 -9.2553782,0.025715 z"
   };
 
   BpmnElementRenderer.labelPadding = 2;
+
+  // TODO: use element width rather than fixed width
   BpmnElementRenderer.wordWrapMaxWidth = 100 + BpmnElementRenderer.labelPadding;
 
-  var regularStroke = "#444";
+  var categoryValues = {};
+
+  var regularStroke = "#222";
   var highlightStroke = "darkOrange";
 
 
@@ -82,16 +89,22 @@ define(["dojox/gfx", "dojo/_base/lang", "dojo/dom-construct", "dojo/_base/window
     "stroke-opacity" : 1
   };
 
+  var markerStyle = {
+    stroke: regularStroke,
+    "stroke-width": 1.3,
+    "stroke-opacity" : 1
+  };
+
   var groupStyle = {
     stroke: regularStroke,
-    "stroke-width": 2,
-    "stroke-opacity" : 1
+    style : "LongDashDot"
   };
 
   var dataObjectStyle = {
     stroke: regularStroke,
     "stroke-width": 1,
-    "stroke-opacity" : 1
+    "stroke-opacity" : 1,
+    "fill": "white"
   };
 
   var eventStyle = {
@@ -139,6 +152,10 @@ define(["dojox/gfx", "dojo/_base/lang", "dojo/dom-construct", "dojo/_base/window
     "stroke": regularStroke
   };
 
+  var collapsedPoolStyle = lang.mixin(lang.clone(participantStyle), {
+    "stroke-width": 2
+  });
+
   var laneStyle = {
     "stroke": "#ccc"
   };
@@ -154,7 +171,7 @@ define(["dojox/gfx", "dojo/_base/lang", "dojo/dom-construct", "dojo/_base/window
     "fill" : regularStroke,
     "style" : "Solid",
     "stroke-width": 2,
-    "arrow-end": "block-midium-midium",
+    "arrow-end": "block-medium-medium",
     "stroke-linecap": "square",
     "stroke-linejoin": "round"
   };
@@ -163,15 +180,18 @@ define(["dojox/gfx", "dojo/_base/lang", "dojo/dom-construct", "dojo/_base/window
     "stroke" : regularStroke,
     "style" : "Dot",
     "stroke-width": 2,
-    "arrow-end": "block-midium-midium",
+    "arrow-end": "block-medium-medium",
     "stroke-linecap": "square",
     "stroke-linejoin": "round"
   };
+
+  var dataAssociationStyle = lang.clone(associationStyle);
 
   var messageFlowStyle = {
     "stroke-width": 2,
     "arrow-end": "open-wide-long",
     "stroke-dasharray": "-",
+    "style" : "LongDash",
     "stroke-linecap": "round",
     "stroke-linejoin": "round"
   };
@@ -207,27 +227,57 @@ define(["dojox/gfx", "dojo/_base/lang", "dojo/dom-construct", "dojo/_base/window
     "businessRuleTask" : activityStyle,
     "task": activityStyle,
     "subProcess" :  activityStyle,
+    "transaction" :  activityStyle,
     "adHocSubProcess" :  activityStyle,
     "process" : participantStyle,
+    "group" : groupStyle,
+    "participant" : collapsedPoolStyle,
     "lane" : laneStyle,
     "sequenceFlow" : lang.mixin(lang.clone(generalStyle), sequenceFlowStyle),
+    "messageFlow" : lang.mixin(lang.clone(generalStyle), messageFlowStyle),
     "textAnnotation" : generalStyle,
     "association" : associationStyle,
+    "dataInputAssociation" : dataAssociationStyle,
+    "dataOutputAssociation" : dataAssociationStyle,
     "dataStoreReference" : dataObjectStyle,
-    "dataObject" : dataObjectStyle
+    "dataObject" : dataObjectStyle,
+    "dataInput" : dataObjectStyle,
+    "dataOutput" : dataObjectStyle
   };
 
-  function wordWrap (text, group, font, x, y, align) {
+  function wordWrap (text, group, font, x, y, align, moveUp) {
     var tempText = "";
     var fontSize = font.size ? font.size :  10;
     var defaultAlign = "right";
 
-    if(!text) {
+    if(!text || text.length == 0) {
       return;
     }
 
     var text = text.replace(/&#xD;/g, "<w>").replace(/&#xA;/g, "<w>").replace(/\n/g, "<w>");
     var textLines = []; // the lines which will be used to render
+
+
+    var renderText = function (text) {
+      return group.createText({text: text, align: align ? align : defaultAlign})
+        .setFont(font) //set font
+        .setFill("black");
+    }
+
+    /**
+     * splits given string into chunks of given length
+     *
+     * @param str the string
+     * @param len the chunksize
+     * @returns {Array}
+     */
+    function splitSubstring(str, len) {
+      var ret = [ ];
+      for (var offset = 0, strLen = str.length; offset < strLen; offset += len) {
+        ret.push(str.substring(offset, offset + len));
+      }
+      return ret;
+    }
 
     if (text.indexOf("<w>") != -1) { // there are line breaks, use them
       textLines = text.split("<w>");
@@ -235,7 +285,17 @@ define(["dojox/gfx", "dojo/_base/lang", "dojo/dom-construct", "dojo/_base/window
       var words = text.split(" ");
 
       if (words.length == 1) {
-        textLines.push(text);
+        var word = words[0];
+        // divide with increasing divider until we are sure the parts fit into the max width
+        for (var divider= 1, isFitting = false; isFitting == false; divider++) {
+          var chunkSize = word.length / divider;
+          var tempTextGroup = renderText(word.substring(0, chunkSize));
+          if (tempTextGroup.getTextWidth() <= BpmnElementRenderer.wordWrapMaxWidth) {
+            textLines = splitSubstring(word, chunkSize);
+            isFitting = true;
+          }
+          tempTextGroup.getParent().remove(tempTextGroup);
+        }
       }else {
         var currentLine = "";
         var oldLine = "";
@@ -247,9 +307,7 @@ define(["dojox/gfx", "dojo/_base/lang", "dojo/dom-construct", "dojo/_base/window
           var lastWord = i == (words.length -1);
 
           // create temporary gfx group the check the real rendered width
-          var tempTextGroup = group.createText({text: currentLine, align: align ? align : defaultAlign})
-            .setFont(font) //set font
-            .setFill("black");
+          var tempTextGroup = renderText(currentLine);
 
           if (tempTextGroup.getTextWidth() > BpmnElementRenderer.wordWrapMaxWidth) {
             textLines.push(oldLine.trim());
@@ -267,22 +325,23 @@ define(["dojox/gfx", "dojo/_base/lang", "dojo/dom-construct", "dojo/_base/window
     }
 
     for (var i=0; i<textLines.length; i++) {
-      var textLine = group.createText({text: textLines[i], align: align ? align : defaultAlign})
-        .setFont(font) //set font
-        .setFill("black");
+      var textLine = renderText(textLines[i]);
+      // if we habe more than two lines, move the lines up by 25 per cent, beginning with the second line, so we get impression of vertical centering
+      var dy = moveUp ? (y - (textLines.length > 1 ? textLines.length * fontSize * 0.25 : 0) + i*fontSize) : y + i*fontSize;
 
-      textLine.setTransform({dx: x, dy: y + i*fontSize});
+      textLine.setTransform({dx: x, dy: dy});
     }
 
     return textLines;
   }
 
-  function renderLabel(elementRenderer, group, bounds, align) {
-    var baseElement = elementRenderer.baseElement;
+  function renderLabel(elementRenderer, group, bounds, align, moveUp) {
+    var baseElement = elementRenderer.renderElement;
 
     if (!baseElement.name) {
       return;
     }
+
     var font = { family: textStyle["font-family"], size: textStyle["font-size"], weight: "normal" };
 
     var labelBounds = elementRenderer.getLabelBounds();
@@ -291,10 +350,47 @@ define(["dojox/gfx", "dojo/_base/lang", "dojo/dom-construct", "dojo/_base/window
     var x =  pos.x,
         y = pos.y;
 
-    wordWrap(baseElement.name, group, font, +x, +y, labelBounds ? null : align);
+    wordWrap(baseElement.name, group, font, +x, +y, labelBounds ? null : align, moveUp);
 
     return group;
   }
+
+  var collapsedPoolRenderer = {
+    render: function(elementRenderer, gfxGroup) {
+
+      var baseElement = elementRenderer.renderElement;
+      var style = elementRenderer.getStyle(baseElement);
+      var bounds = elementRenderer.renderBounds;
+
+      if (baseElement.processRef) {
+        // only render collapsed pools (i.e. pools without content)
+        return;
+      }
+
+      // no participant bounds
+      if (!bounds) {
+        return;
+      }
+
+      var x = +bounds.x;
+      var y = +bounds.y;
+      var width = +bounds.width;
+      var height = +bounds.height;
+
+      var group = gfxGroup.createGroup();
+      group.setTransform({dx :x, dy:y});
+
+      var stroke = { color: style.stroke, width : style["stroke-width"]};
+
+      var rect = group.createRect({ x: 0, y: 0, width: width, height: height});
+      rect.setStroke(stroke);
+
+      var label = baseElement.name;
+      if (label) {
+        renderLabel(elementRenderer, gfxGroup, {x: x + width / 2, y: y + height / 2}, "middle");
+      }
+    }
+  };
 
   var processRenderer = {
     render : function(elementRenderer, gfxGroup) {
@@ -333,6 +429,33 @@ define(["dojox/gfx", "dojo/_base/lang", "dojo/dom-construct", "dojo/_base/window
     }
   };
 
+  var groupRenderer = {
+    render : function(elementRenderer, gfxGroup) {
+      var baseElement = elementRenderer.renderElement;
+      var style = elementRenderer.getStyle(baseElement);
+      var bounds = elementRenderer.renderBounds;
+
+      if (!bounds) {
+        return;
+      }
+
+      var x = +bounds.x;
+      var y = +bounds.y;
+      var width = +bounds.width;
+      var height = +bounds.height;
+
+      var groupGfx = gfxGroup.createGroup();
+      groupGfx.setTransform({dx :x, dy:y});
+
+      var rect = groupGfx.createRect({ x: 0, y: 0, width: width, height: height});
+      rect.setStroke({color: style.stroke, style : style.style});
+
+      baseElement.name = categoryValues[baseElement.categoryValueRef] ? categoryValues[baseElement.categoryValueRef] : "";
+
+      renderLabel(elementRenderer, gfxGroup, {x: x + BpmnElementRenderer.labelPadding*2 , y: y + BpmnElementRenderer.labelPadding*4+ textStyle["font-size"]}, "left", true);
+    }
+  };
+
   var laneRenderer = {
     render : function(elementRenderer, gfxGroup) {
       var baseElement = elementRenderer.baseElement;
@@ -362,9 +485,31 @@ define(["dojox/gfx", "dojo/_base/lang", "dojo/dom-construct", "dojo/_base/window
     }
   };
 
+  function getMidPoint(waypoints) {
+
+    var sumx = 0;
+    var sumy = 0;
+    var count = 0;
+
+    for (var index in waypoints) {
+      var waypoint = waypoints[index];
+      var factor = 1;
+
+      if (waypoints.length > 2 && index == 1) {
+        factor = 12;
+      }
+
+      sumx += +waypoint.x * factor;
+      sumy += +waypoint.y * factor;
+      count+= factor;
+    }
+
+    return { x: sumx / count, y: sumy / count };
+  }
+
   var connectionRenderer = {
     render : function(elementRenderer, gfxGroup) {
-      var baseElement = elementRenderer.baseElement;
+      var baseElement = elementRenderer.renderElement;
       var style = elementRenderer.getStyle();
       var waypoints = elementRenderer.getWaypoints();
 
@@ -373,50 +518,15 @@ define(["dojox/gfx", "dojo/_base/lang", "dojo/dom-construct", "dojo/_base/window
       var line = flowGroup.createPolyline(waypoints);
       line.setStroke({color: style.stroke, style : style.style});
 
-      var secondLastPoint = waypoints[waypoints.length-2];
-      var lastPoint = waypoints[waypoints.length-1];
+      var endPointDecorator = CONNECTION_DECORATORS[baseElement.type];
 
-      var vector = {x:lastPoint.x - secondLastPoint.x, y: lastPoint.y - secondLastPoint.y};
-
-      var xsize = 6;
-      var ysize = 4;
-
-      var svgPath = "M" + lastPoint.x +
-        " " + lastPoint.y +
-        " L"+ (lastPoint.x - xsize) +
-        " " + (lastPoint.y + ysize) +
-        " L"+ (lastPoint.x - xsize) +
-        " " + (lastPoint.y - ysize) +
-        " Z";
-
-      if (elementRenderer.isDirectedFlow()) {
-        var arrowGroup = flowGroup.createGroup();
-        var arrowPath = arrowGroup.createPath(svgPath);
-        var theta = Math.atan2(-vector.y, vector.x);
-
-        arrowPath.setStroke({color : style.stroke});
-        arrowPath.setFill(style.fill);
-        arrowPath.setTransform([gfx.matrix.rotateAt(-theta, lastPoint)]);
+      if (endPointDecorator) {
+        endPointDecorator.decorate(elementRenderer, waypoints, flowGroup);
       }
 
-      var sumx = 0;
-      var sumy = 0;
-      var count = 0;
+      renderLabel(elementRenderer, gfxGroup, getMidPoint(waypoints), "middle");
 
-      for (var index in waypoints) {
-        var waypoint = waypoints[index];
-        var factor = 1;
-
-        if (waypoints.length > 2 && index == 1) {
-          factor = 12;
-        }
-
-        sumx += +waypoint.x * factor;
-        sumy += +waypoint.y * factor;
-        count+= factor;
-      }
-
-      renderLabel(elementRenderer, gfxGroup, {x: sumx / count, y: sumy / count}, "middle");
+      return flowGroup;
     }
   };
 
@@ -516,6 +626,43 @@ define(["dojox/gfx", "dojo/_base/lang", "dojo/dom-construct", "dojo/_base/window
       rect.setStroke(strokeStyle);
       rect.setFill(style.fill);
 
+      if (baseElement.type == "transaction") {
+        var innerRectDistance = 3;
+        var insideRect = taskGroup.createRect({ x: 0+innerRectDistance, y: 0+innerRectDistance, width: width-innerRectDistance*2, height: height-innerRectDistance*2, r: 5 });
+        insideRect.setStroke(strokeStyle);
+        insideRect.setFill(style.fill);
+      }
+
+      if (baseElement.marker) {
+        var count = 0;
+
+        function renderMarker(marker) {
+          var markerPath = taskGroup.createPath(markerPaths[marker]);
+          markerPath.setStroke({color : markerStyle.stroke, width: markerStyle["stroke-width"]});
+          if (marker == "adHoc") {
+            markerPath.setFill("black");
+          }
+          var sign = count % 2 == 0 ? 1 : -1;
+          markerPath.setTransform({dx :width/2 + (count * 15)*sign, dy:height-10});
+        }
+        // always render reference marker first, so its always centered
+        if ( (baseElement.type == "callActivity" && baseElement.calledElement) ||
+             (baseElement.type == "subProcess" && baseElement.bpmndi[0].isExpanded === "false") ||
+             (baseElement.type == "transaction" && baseElement.bpmndi[0].isExpanded === "false")) {
+          renderMarker("reference");
+          count++;
+        }
+
+        if (baseElement.type.indexOf("adHoc") != -1) {
+          baseElement.marker["adHoc"] = true;
+        }
+
+        for (var marker in baseElement.marker) {
+          renderMarker(marker);
+          count++;
+        }
+      }
+
       function createServiceTaskPath(group, style) {
         var path1String = "m 20.347,4.895 -2.561,2.56 0.943,2.277 3.624,0 0,3.383 -3.622,0 -0.943,2.277 2.563,2.563 -2.393,2.392 -2.561,-2.561 -2.277,0.943 0,3.624 -3.383,0 0,-3.622 L 7.46,17.788 4.897,20.35 2.506,17.958 5.066,15.397 4.124,13.12 l -3.624,0 0,-3.383 3.621,0 0.944,-2.276 -2.562,-2.563 2.392,-2.392 2.56,2.56 2.277,-0.941 0,-3.625 3.384,0 0,3.621 2.276,0.943 2.562,-2.562 z";
         var path1 = group.createPath(path1String);
@@ -586,7 +733,7 @@ define(["dojox/gfx", "dojo/_base/lang", "dojo/dom-construct", "dojo/_base/window
         }
       }
 
-      var text = renderLabel(elementRenderer, gfxGroup, {x: x + width /2 , y: y + height /2}, "middle");
+      var text = renderLabel(elementRenderer, gfxGroup, {x: x + width /2 , y: y + height /2}, "middle", true);
     }
   };
 
@@ -704,6 +851,11 @@ define(["dojox/gfx", "dojo/_base/lang", "dojo/dom-construct", "dojo/_base/window
     }
   };
 
+  // messages are not directly rendered
+  var messageRenderer = {
+    render: function() {}
+  };
+
   var dataRefRenderer = {
     render : function(elementRenderer, gfxGroup) {
       var style = elementRenderer.getStyle();
@@ -715,21 +867,207 @@ define(["dojox/gfx", "dojo/_base/lang", "dojo/dom-construct", "dojo/_base/window
       var width = +bounds.width;
       var height= +bounds.height;
 
+      var pathInfo = dataPaths[elementRenderer.baseElement.type];
       // render basic circle
       var dataRefGroup = gfxGroup.createGroup();
-      dataRefGroup.setTransform({dx :x ,dy: y});
+      dataRefGroup.setTransform({dx :x ,dy: y, xx : width / pathInfo.width, yy: height / pathInfo.height});
+
+      if (elementRenderer.baseElement.isCollection === "true") {
+        var collectionPath = dataRefGroup.createPath(markerPaths["multiInstanceParallel"]);
+        collectionPath.setStroke("#000");
+        collectionPath.setFill("#000");
+        collectionPath.setTransform({dx: width /2 -5 , dy: height - 15});
+      }
+
+      var defaultBounds = {x: x + width/2, y: y + height / 2};
+      var dataMarkerDistance = 7;
+      var dataStoreLabelDistance = 12;
+
+      switch(elementRenderer.baseElement.type) {
+        case "dataInput" :
+          var dataMarkerPath = dataRefGroup.createPath(eventDefinitionPaths["linkEventDefinition"]);
+          dataMarkerPath.setStroke("#000");
+          dataMarkerPath.setTransform({dx: dataMarkerDistance, dy: dataMarkerDistance});
+          break;
+        case "dataOutput" :
+          var dataMarkerPath = dataRefGroup.createPath(eventDefinitionPaths["linkEventDefinition"]);
+          dataMarkerPath.setStroke("#000");
+          dataMarkerPath.setFill("#000");
+          dataMarkerPath.setTransform({dx: dataMarkerDistance, dy: dataMarkerDistance});
+          break;
+        case "dataStoreReference":
+          defaultBounds.y = y + height + dataStoreLabelDistance;
+          break;
+      }
 
       var font = { family: textStyle["font-family"], size: textStyle["font-size"], weight: "normal" };
 
-      var path = dataRefGroup.createPath(dataPaths[elementRenderer.baseElement.type]).setStroke(style.stroke);
-      renderLabel(elementRenderer, gfxGroup, {x: x + width/2, y: y + height + 10}, "middle");
+      var path = dataRefGroup.createPath(pathInfo.path).setStroke(style.stroke);
+
+
+      renderLabel(elementRenderer, gfxGroup, defaultBounds, "middle");
       return path;
+    }
+  };
+
+  function createArrow(options) {
+    var from = options.from,
+        to = options.to,
+        flowGroup = options.group,
+        open = options.open;
+
+    var vector = {x: to.x - from.x, y: to.y - from.y };
+
+    var xsize = 8;
+    var ysize = 4;
+
+    var svgPath =
+      "M" + (to.x - xsize) + " " + (to.y + ysize) +
+      " L " + to.x + " " + to.y +
+      " L"+ (to.x - xsize) + " " + (to.y - ysize);
+
+    if (!open) {
+      svgPath += " Z";
+    }
+
+    var group = flowGroup.createGroup();
+    var arrowPath = group.createPath(svgPath);
+    var theta = Math.atan2(-vector.y, vector.x);
+
+    arrowPath.setTransform([gfx.matrix.rotateAt(-theta, to)]);
+
+    return arrowPath;
+  }
+
+  function createDot(point, flowGroup) {
+
+    var r = 4;
+
+    var group = flowGroup.createGroup();
+    var circle = group.createCircle({ cx: point.x, cy: point.y, r: r });
+
+    return circle;
+  }
+
+  var sequenceFlowDecorator = {
+
+    decorate: function(elementRenderer, waypoints, flowGroup) {
+
+      var style = elementRenderer.getStyle();
+      var arrow = createArrow({
+        from: waypoints[waypoints.length - 2],
+        to: waypoints[waypoints.length - 1],
+        group: flowGroup });
+
+      arrow.setStroke({ color : style.stroke });
+      arrow.setFill("black");
+    }
+  };
+
+  var messageFlowDecorator = {
+    decorate: function(elementRenderer, waypoints, flowGroup) {
+
+      var style = elementRenderer.getStyle();
+
+      // render additional start / end symbol
+      var arrowPath = createArrow({ 
+        from: waypoints[waypoints.length - 2],
+        to: waypoints[waypoints.length - 1],
+        group: flowGroup });
+
+      arrowPath.setStroke({ color : style.stroke });
+      arrowPath.setFill("white");
+
+      var circle = createDot(waypoints[0], flowGroup);
+      circle.setStroke({ color : style.stroke });
+      circle.setFill("white");
+
+      function findElementById(elements, id) {
+        for (var i = 0, e; !!(e = elements[i]); i++) {
+          if (e.id == id) {
+            return e;
+          }
+        }
+
+        return null;
+      }
+
+      // render envelope if present
+      var baseElement = elementRenderer.renderElement;
+
+      // TODO: render message in the correct way
+      if (baseElement.messageRef) {
+
+        var message = findElementById(elementRenderer.baseElement, baseElement.messageRef);
+        if (!message) {
+          return;
+        }
+
+        var envelopeGroup = flowGroup.createGroup();
+        var envelop = envelopeGroup.createPath(eventDefinitionPaths.messagecatch);
+
+        var position = getMidPoint(waypoints);
+
+        envelop.setStroke(style.stroke);
+        envelop.setFill("white");
+        envelop.setTransform({ dx: position.x, dy: position.y, xx: 1.5, yy: 1.5 });
+
+        renderLabel({
+          renderElement: message, getLabelBounds: function() { return { x: position.x + 30, y: position.y + 10 }; }
+        }, envelopeGroup, null, "left");
+      }
+    }
+  };
+
+  var dataAssociationDecorator = {
+    decorate: function(elementRenderer, waypoints, flowGroup) {
+
+      var style = elementRenderer.getStyle();
+      var arrow = createArrow({
+        from: waypoints[waypoints.length - 2],
+        to: waypoints[waypoints.length - 1],
+        group: flowGroup,
+        open: true });
+
+      arrow.setStroke({ color : style.stroke });
+    }
+  };
+
+  var associationDecorator = {
+    decorate: function(elementRenderer, waypoints, flowGroup) {
+
+      var element = elementRenderer.renderElement;
+
+      var direction = element.associationDirection;
+
+      var style = elementRenderer.getStyle();
+
+      if (direction == "One" || direction == "Both") {
+        var arrow1 = createArrow({
+          from: waypoints[waypoints.length - 2],
+          to: waypoints[waypoints.length - 1],
+          group: flowGroup,
+          open: true });
+
+        arrow1.setStroke({ color : style.stroke });
+      }
+
+      if (direction == "Both") {
+        var arrow2 = createArrow({
+          from: waypoints[1],
+          to: waypoints[0],
+          group: flowGroup,
+          open: true });
+
+        arrow2.setStroke({ color : style.stroke });
+      }
     }
   };
 
   // build up the map of renderers
   var RENDERER_DELEGATES = {};
   RENDERER_DELEGATES["process"] = processRenderer;
+  RENDERER_DELEGATES["participant"] = collapsedPoolRenderer;
   RENDERER_DELEGATES["startEvent"] = eventRenderer;
   RENDERER_DELEGATES["endEvent"] = eventRenderer;
   RENDERER_DELEGATES["boundaryEvent"] = eventRenderer;
@@ -738,6 +1076,8 @@ define(["dojox/gfx", "dojo/_base/lang", "dojo/dom-construct", "dojo/_base/window
   RENDERER_DELEGATES["userTask"] = activityRenderer;
   RENDERER_DELEGATES["task"] = activityRenderer;
   RENDERER_DELEGATES["subProcess"] = activityRenderer;
+  RENDERER_DELEGATES["transaction"] = activityRenderer;
+  RENDERER_DELEGATES["group"] = groupRenderer;
   RENDERER_DELEGATES["adHocSubProcess"] = activityRenderer;
   RENDERER_DELEGATES["serviceTask"] = activityRenderer;
   RENDERER_DELEGATES["callActivity"] = activityRenderer;
@@ -752,12 +1092,26 @@ define(["dojox/gfx", "dojo/_base/lang", "dojo/dom-construct", "dojo/_base/window
   RENDERER_DELEGATES["eventBasedGateway"] = gatewayRenderer;
   RENDERER_DELEGATES["complexGateway"] = gatewayRenderer;
   RENDERER_DELEGATES["sequenceFlow"] = connectionRenderer;
+  RENDERER_DELEGATES["dataInputAssociation"] = connectionRenderer;
+  RENDERER_DELEGATES["dataOutputAssociation"] = connectionRenderer;
+  RENDERER_DELEGATES["messageFlow"] = connectionRenderer;
   RENDERER_DELEGATES["association"] = connectionRenderer;
   RENDERER_DELEGATES["lane"] = laneRenderer;
   RENDERER_DELEGATES["textAnnotation"] = textAnnotationRenderer;
   RENDERER_DELEGATES["dataStoreReference"] = dataRefRenderer;
   RENDERER_DELEGATES["dataObjectReference"] = dataRefRenderer;
   RENDERER_DELEGATES["dataObject"] = dataRefRenderer;
+  RENDERER_DELEGATES["dataInput"] = dataRefRenderer;
+  RENDERER_DELEGATES["dataOutput"] = dataRefRenderer;
+  RENDERER_DELEGATES["message"] = messageRenderer;
+
+  var CONNECTION_DECORATORS = {};
+
+  CONNECTION_DECORATORS["sequenceFlow"] = sequenceFlowDecorator;
+  CONNECTION_DECORATORS["messageFlow"] = messageFlowDecorator;
+  CONNECTION_DECORATORS["dataInputAssociation"] = dataAssociationDecorator;
+  CONNECTION_DECORATORS["dataOutputAssociation"] = dataAssociationDecorator;
+  CONNECTION_DECORATORS["association"] = associationDecorator;
 
   var RenderingException = (function () {
 
@@ -791,9 +1145,15 @@ define(["dojox/gfx", "dojo/_base/lang", "dojo/dom-construct", "dojo/_base/window
     var elements = [].concat(this.baseElement);
 
     for (var index in elements) {
+
       // TODO use this elements in all renderers, currently they are using the elementRenderer ref to get this stuff
       var currentElement = this.renderElement = elements[index];
       var bounds = this.renderBounds = this.getElementBounds(currentElement);
+
+      if (currentElement.type == "categoryValue") {
+        categoryValues[currentElement.id] = currentElement.value;
+        continue;
+      }
 
       if (bounds) {
         var diagramElement = query("#"+options.diagramElement)[0];
@@ -819,7 +1179,7 @@ define(["dojox/gfx", "dojo/_base/lang", "dojo/dom-construct", "dojo/_base/window
       if(!!delegate) {
         this.svgElement = delegate.render(this, gfxGroup);
       } else {
-        console.log("Unable to render element of type ", this.baseElement.type);
+        console.log("Unable to render element of type ", currentElement.type);
       }
 
       // if the current element has child base elements, create the
@@ -853,15 +1213,21 @@ define(["dojox/gfx", "dojo/_base/lang", "dojo/dom-construct", "dojo/_base/window
 
   BpmnElementRenderer.prototype.getLabelBounds = function () {
 
+    var element = this.renderElement;
+
     // first check by type
-    switch (this.baseElement.type) {
+    switch (element.type) {
+      case "transaction":
       case "adHocSubProcess":
       case "subProcess":
-        return {x: this.baseElement.bounds.x + textStyle["font-size"] + BpmnElementRenderer.labelPadding, y: +this.baseElement.bounds.y + textStyle["font-size"] + BpmnElementRenderer.labelPadding};
+        if (element.bpmndi[0].isExpanded === "true") {
+          return {x: element.bounds.x + textStyle["font-size"] + BpmnElementRenderer.labelPadding, y: + element.bounds.y + textStyle["font-size"] + BpmnElementRenderer.labelPadding};
+        }
+
         break;
     }
 
-    var diChildren = this.baseElement.bpmndi[0].children;
+    var diChildren = element.bpmndi[0].children;
 
     for (var index in diChildren) {
       var diChild = diChildren[index];
@@ -932,9 +1298,10 @@ define(["dojox/gfx", "dojo/_base/lang", "dojo/dom-construct", "dojo/_base/window
   };
 
   BpmnElementRenderer.prototype.getWaypoints = function() {
-    var waypoints = [];
+    var element = this.renderElement,
+        waypoints = [];
 
-    var diChildren = this.baseElement.bpmndi[0].children;
+    var diChildren = element.bpmndi[0].children;
     for (var index in diChildren) {
       var diChild = diChildren[index];
 
@@ -947,11 +1314,9 @@ define(["dojox/gfx", "dojo/_base/lang", "dojo/dom-construct", "dojo/_base/window
   };
 
   BpmnElementRenderer.prototype.getStyle = function (baseElement) {
-    if (!baseElement) {
-      return styleMap[this.baseElement.type] ? styleMap[this.baseElement.type] : defaultStyle;
-    }else {
-      return styleMap[baseElement.type] ? styleMap[baseElement.type] : defaultStyle;
-    }
+    var element = baseElement || this.renderElement;
+
+    return styleMap[element.type] || defaultStyle;
   };
 
   BpmnElementRenderer.prototype.getEventType = function () {
@@ -978,16 +1343,6 @@ define(["dojox/gfx", "dojo/_base/lang", "dojo/dom-construct", "dojo/_base/window
       case "intermediateCatchEvent":
       case "boundaryEvent":
       case "intermediateThrowEvent":
-        return true;
-      default:
-        return false;
-    }
-  };
-
-  BpmnElementRenderer.prototype.isDirectedFlow = function () {
-    switch (this.baseElement.type) {
-      case "sequenceFlow":
-      case "messageFlow":
         return true;
       default:
         return false;
