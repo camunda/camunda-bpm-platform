@@ -3,7 +3,7 @@
   <parent>
     <groupId>org.camunda.bpm.cycle</groupId>
     <artifactId>camunda-cycle-root</artifactId>
-    <version>7.0.0-alpha6</version>
+    <version>7.0.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>camunda-cycle-jboss</artifactId>
