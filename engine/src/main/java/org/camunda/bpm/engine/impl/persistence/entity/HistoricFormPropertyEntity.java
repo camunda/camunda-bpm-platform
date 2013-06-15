@@ -13,6 +13,8 @@
 
 package org.camunda.bpm.engine.impl.persistence.entity;
 
+import java.util.Date;
+
 import org.camunda.bpm.engine.history.HistoricFormProperty;
 import org.camunda.bpm.engine.impl.history.event.HistoricDetailEventEntity;
 
@@ -44,5 +46,9 @@ public class HistoricFormPropertyEntity extends HistoricDetailEventEntity implem
   
   public void setPropertyValue(String propertyValue) {
     this.propertyValue = propertyValue;
+  }
+  
+  public Date getTime() {
+    return timestamp;
   }
 }

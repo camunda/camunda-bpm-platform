@@ -52,10 +52,13 @@ public abstract class AtomicOperationActivityInstanceEnd extends AbstractEventAt
   
   @Override
   protected void eventNotificationsCompleted(InterpretableExecution execution) {
-      
-      execution.leaveActivityInstance();
-    
-    
+    // make execution leave the activity instance
+    execution.leaveActivityInstance();    
+  }
+  
+  protected boolean isSkipNotifyListeners(InterpretableExecution execution) {
+    // listeners are skipped if this execution is not part of an activity instance.
+    return execution.getActivityInstanceId() == null;
   }
  
 }
