@@ -18,10 +18,7 @@ import java.util.Date;
 import org.camunda.bpm.engine.history.HistoricVariableUpdate;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbSqlSession;
-import org.camunda.bpm.engine.impl.db.HasRevision;
-import org.camunda.bpm.engine.impl.db.PersistentObject;
 import org.camunda.bpm.engine.impl.history.event.HistoricVariableUpdateEventEntity;
-import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.impl.variable.ValueFields;
 import org.camunda.bpm.engine.impl.variable.VariableType;
 
@@ -35,32 +32,8 @@ public class HistoricDetailVariableInstanceUpdateEntity extends HistoricVariable
   
   protected VariableType variableType;
   protected ByteArrayEntity byteArrayValue;
-  protected String byteArrayValueId;
 
   protected Object cachedValue;
-
-  public HistoricDetailVariableInstanceUpdateEntity(VariableInstanceEntity variableInstance) {
-    this.processInstanceId = variableInstance.getProcessInstanceId();
-    this.executionId = variableInstance.getExecutionId();
-    this.taskId = variableInstance.getTaskId();
-    this.revision = variableInstance.getRevision();
-    this.name = variableInstance.getName();
-    this.variableType = variableInstance.getType();
-    this.time = ClockUtil.getCurrentTime();
-    if (variableInstance.getByteArrayValueId()!=null) {
-      // TODO test and review.  name ok here?
-      this.byteArrayValue = new ByteArrayEntity(name, variableInstance.getByteArrayValue().getBytes());
-      Context
-        .getCommandContext()
-        .getDbSqlSession()
-        .insert(byteArrayValue);
-      this.byteArrayValueId = byteArrayValue.getId();
-    }
-    this.textValue = variableInstance.getTextValue();
-    this.textValue2 = variableInstance.getTextValue2();
-    this.doubleValue = variableInstance.getDoubleValue();
-    this.longValue = variableInstance.getLongValue();
-  }
   
   public Object getValue() {
     if (!variableType.isCachable() || cachedValue==null) {
@@ -77,7 +50,7 @@ public class HistoricDetailVariableInstanceUpdateEntity extends HistoricVariable
 
     dbSqlSession.delete(this);
 
-    if (byteArrayValueId != null) {
+    if (byteArrayId != null) {
       // the next apparently useless line is probably to ensure consistency in the DbSqlSession 
       // cache, but should be checked and docced here (or removed if it turns out to be unnecessary)
       // @see also HistoricVariableInstanceEntity
@@ -85,7 +58,7 @@ public class HistoricDetailVariableInstanceUpdateEntity extends HistoricVariable
       Context
         .getCommandContext()
         .getByteArrayManager()
-        .deleteByteArrayById(byteArrayValueId);
+        .deleteByteArrayById(byteArrayId);
     }
   }
   
@@ -100,27 +73,27 @@ public class HistoricDetailVariableInstanceUpdateEntity extends HistoricVariable
   // HistoricVariableInstance and HistoricDetailVariableInstanceUpdateEntity 
   
   public String getByteArrayValueId() {
-    return byteArrayValueId;
+    return byteArrayId;
   }
 
   public ByteArrayEntity getByteArrayValue() {
-    if ((byteArrayValue == null) && (byteArrayValueId != null)) {
+    if ((byteArrayValue == null) && (byteArrayId != null)) {
       byteArrayValue = Context
         .getCommandContext()
         .getDbSqlSession()
-        .selectById(ByteArrayEntity.class, byteArrayValueId);
+        .selectById(ByteArrayEntity.class, byteArrayId);
     }
     return byteArrayValue;
   }
   
   public void setByteArrayValue(byte[] bytes) {
     ByteArrayEntity byteArrayValue = null;
-    if (this.byteArrayValueId!=null) {
+    if (this.byteArrayId!=null) {
       getByteArrayValue();
       Context
         .getCommandContext()
         .getByteArrayManager()
-       .deleteByteArrayById(this.byteArrayValueId);
+       .deleteByteArrayById(this.byteArrayId);
     }
     if (bytes!=null) {
       byteArrayValue = new ByteArrayEntity(bytes);
@@ -131,21 +104,21 @@ public class HistoricDetailVariableInstanceUpdateEntity extends HistoricVariable
     }
     this.byteArrayValue = byteArrayValue;
     if (byteArrayValue != null) {
-      this.byteArrayValueId = byteArrayValue.getId();
+      this.byteArrayId = byteArrayValue.getId();
     } else {
-      this.byteArrayValueId = null;
+      this.byteArrayId = null;
     }
   }
 
   protected void deleteByteArrayValue() {
-    if (byteArrayValueId != null) {
+    if (byteArrayId != null) {
       // the next apparently useless line is probably to ensure consistency in the DbSqlSession 
       // cache, but should be checked and docced here (or removed if it turns out to be unnecessary)
       getByteArrayValue();
       Context
         .getCommandContext()
         .getByteArrayManager()
-        .deleteByteArrayById(this.byteArrayValueId);
+        .deleteByteArrayById(this.byteArrayId);
     }
   }
   
@@ -156,11 +129,7 @@ public class HistoricDetailVariableInstanceUpdateEntity extends HistoricVariable
   // getters and setters //////////////////////////////////////////////////////
   
   public Date getTime() {
-    return time;
-  }
-
-  public void setTime(Date time) {
-    this.time = time;
+    return timestamp;
   }
 
   public VariableType getVariableType() {

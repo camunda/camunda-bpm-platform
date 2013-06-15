@@ -25,7 +25,7 @@ import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 /**
  * @author Tom Baeyens
  */
-public class AtomicOperationProcessEnd extends AtomicOperationActivityInstanceEnd {
+public class AtomicOperationProcessEnd extends AbstractEventAtomicOperation {
   
   private static Logger log = Logger.getLogger(AtomicOperationProcessEnd.class.getName());
 
@@ -41,8 +41,6 @@ public class AtomicOperationProcessEnd extends AtomicOperationActivityInstanceEn
   
   @Override
   protected void eventNotificationsCompleted(InterpretableExecution execution) {
-    
-    super.eventNotificationsCompleted(execution);
     
     InterpretableExecution superExecution = execution.getSuperExecution();
     SubProcessActivityBehavior subProcessActivityBehavior = null;

@@ -115,6 +115,7 @@ import org.camunda.bpm.engine.impl.jobexecutor.TimerExecuteNestedActivityJobHand
 import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventJobHandler;
 import org.camunda.bpm.engine.impl.mail.MailScanner;
 import org.camunda.bpm.engine.impl.persistence.GenericManagerFactory;
+import org.camunda.bpm.engine.impl.persistence.StrongUuidGenerator;
 import org.camunda.bpm.engine.impl.persistence.deploy.Deployer;
 import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
 import org.camunda.bpm.engine.impl.persistence.entity.AttachmentManager;
@@ -840,27 +841,27 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   
   protected void initIdGenerator() {
     if (idGenerator==null) {
-      CommandExecutor idGeneratorCommandExecutor = null;
-      if (idGeneratorDataSource!=null) {
-        ProcessEngineConfigurationImpl processEngineConfiguration = new StandaloneProcessEngineConfiguration();
-        processEngineConfiguration.setDataSource(idGeneratorDataSource);
-        processEngineConfiguration.setDatabaseSchemaUpdate(DB_SCHEMA_UPDATE_FALSE);
-        processEngineConfiguration.init();
-        idGeneratorCommandExecutor = processEngineConfiguration.getCommandExecutorTxRequiresNew();
-      } else if (idGeneratorDataSourceJndiName!=null) {
-        ProcessEngineConfigurationImpl processEngineConfiguration = new StandaloneProcessEngineConfiguration();
-        processEngineConfiguration.setDataSourceJndiName(idGeneratorDataSourceJndiName);
-        processEngineConfiguration.setDatabaseSchemaUpdate(DB_SCHEMA_UPDATE_FALSE);
-        processEngineConfiguration.init();
-        idGeneratorCommandExecutor = processEngineConfiguration.getCommandExecutorTxRequiresNew();
-      } else {
-        idGeneratorCommandExecutor = commandExecutorTxRequiresNew;
-      }
-      
-      DbIdGenerator dbIdGenerator = new DbIdGenerator();
-      dbIdGenerator.setIdBlockSize(idBlockSize);
-      dbIdGenerator.setCommandExecutor(idGeneratorCommandExecutor);
-      idGenerator = dbIdGenerator;
+//      CommandExecutor idGeneratorCommandExecutor = null;
+//      if (idGeneratorDataSource!=null) {
+//        ProcessEngineConfigurationImpl processEngineConfiguration = new StandaloneProcessEngineConfiguration();
+//        processEngineConfiguration.setDataSource(idGeneratorDataSource);
+//        processEngineConfiguration.setDatabaseSchemaUpdate(DB_SCHEMA_UPDATE_FALSE);
+//        processEngineConfiguration.init();
+//        idGeneratorCommandExecutor = processEngineConfiguration.getCommandExecutorTxRequiresNew();
+//      } else if (idGeneratorDataSourceJndiName!=null) {
+//        ProcessEngineConfigurationImpl processEngineConfiguration = new StandaloneProcessEngineConfiguration();
+//        processEngineConfiguration.setDataSourceJndiName(idGeneratorDataSourceJndiName);
+//        processEngineConfiguration.setDatabaseSchemaUpdate(DB_SCHEMA_UPDATE_FALSE);
+//        processEngineConfiguration.init();
+//        idGeneratorCommandExecutor = processEngineConfiguration.getCommandExecutorTxRequiresNew();
+//      } else {
+//        idGeneratorCommandExecutor = commandExecutorTxRequiresNew;
+//      }
+//      
+//      DbIdGenerator dbIdGenerator = new DbIdGenerator();
+//      dbIdGenerator.setIdBlockSize(idBlockSize);
+//      dbIdGenerator.setCommandExecutor(idGeneratorCommandExecutor);
+      idGenerator = new StrongUuidGenerator();
     }
   }
 

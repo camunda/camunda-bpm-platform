@@ -13,6 +13,8 @@
 
 package org.camunda.bpm.engine.impl.pvm.runtime;
 
+import java.util.Map;
+
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 
 
@@ -22,6 +24,7 @@ import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 public class StartingExecution {
   
   protected final ActivityImpl selectedInitial;
+  protected Map<String, Object> variables;
 
   public StartingExecution(ActivityImpl selectedInitial) {
     this.selectedInitial = selectedInitial;
@@ -29,6 +32,14 @@ public class StartingExecution {
 
   public ActivityImpl getInitial() {
     return selectedInitial;
+  }
+
+  public void setVariables(Map<String, Object> variables) {
+    this.variables = variables;
+  }
+  
+  public Map<String, Object> getVariables() {
+    return variables;
   }
   
 }

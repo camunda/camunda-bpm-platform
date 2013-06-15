@@ -63,8 +63,8 @@ public class SubmitTaskFormCmd implements Command<Object>, Serializable {
       DbSqlSession dbSqlSession = commandContext.getSession(DbSqlSession.class);
       for (String propertyId: properties.keySet()) {
         String propertyValue = properties.get(propertyId);
-        HistoricFormPropertyEntity historicFormProperty = new HistoricFormPropertyEntity(execution, propertyId, propertyValue, taskId);
-        dbSqlSession.insert(historicFormProperty);
+//        HistoricFormPropertyEntity historicFormProperty = new HistoricFormPropertyEntity(execution, propertyId, propertyValue, taskId);
+//        dbSqlSession.insert(historicFormProperty);
       }
     }
     

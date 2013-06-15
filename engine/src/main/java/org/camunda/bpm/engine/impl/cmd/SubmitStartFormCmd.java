@@ -68,8 +68,8 @@ public class SubmitStartFormCmd implements Command<ProcessInstance>, Serializabl
       if (historyLevel>=ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
         for (String propertyId: properties.keySet()) {
           String propertyValue = properties.get(propertyId);
-          HistoricFormPropertyEntity historicFormProperty = new HistoricFormPropertyEntity(processInstance, propertyId, propertyValue);
-          dbSqlSession.insert(historicFormProperty);
+//          HistoricFormPropertyEntity historicFormProperty = new HistoricFormPropertyEntity(processInstance, propertyId, propertyValue);
+//          dbSqlSession.insert(historicFormProperty);
         }
       }
     }

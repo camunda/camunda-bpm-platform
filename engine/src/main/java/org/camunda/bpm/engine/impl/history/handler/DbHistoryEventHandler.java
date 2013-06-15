@@ -33,7 +33,13 @@ public class DbHistoryEventHandler implements HistoryEventHandler {
 
   public void handleEvent(HistoryEvent historyEvent) {
     
-    insert(historyEvent);
+    if (historyEvent instanceof HistoricVariableUpdateEventEntity) {
+      insertHistoricVariableUpdateEntity((HistoricVariableUpdateEventEntity) historyEvent);
+      
+    }else {
+      insert(historyEvent);
+      
+    }
 
   }
 
@@ -43,7 +49,7 @@ public class DbHistoryEventHandler implements HistoryEventHandler {
     dbSqlSession.insert(historyEvent);
   }
 
-  /** customized insert behvior for HistoricVariableUpdateEventEntity */
+  /** customized insert behavior for HistoricVariableUpdateEventEntity */
   protected void insertHistoricVariableUpdateEntity(HistoricVariableUpdateEventEntity historyEvent) {
     DbSqlSession dbSqlSession = getDbSqlSession();
     

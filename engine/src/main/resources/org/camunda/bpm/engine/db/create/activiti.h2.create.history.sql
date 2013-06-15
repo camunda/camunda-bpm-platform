@@ -50,33 +50,20 @@ create table ACT_HI_TASKINST (
     primary key (ID_)
 );
 
-create table ACT_HI_VARINST (
-    ID_ varchar(64) not null,
-    PROC_INST_ID_ varchar(64),
-    EXECUTION_ID_ varchar(64),
-    TASK_ID_ varchar(64),
-    NAME_ varchar(255) not null,
-    VAR_TYPE_ varchar(100),
-    REV_ integer,
-    BYTEARRAY_ID_ varchar(64),
-    DOUBLE_ double,
-    LONG_ bigint,
-    TEXT_ varchar(4000),
-    TEXT2_ varchar(4000),
-    primary key (ID_)
-);
-
 create table ACT_HI_DETAIL (
     ID_ varchar(64) not null,
     TYPE_ varchar(255) not null,
-    TIME_ timestamp not null,
-    NAME_ varchar(255),
     PROC_INST_ID_ varchar(64),
     EXECUTION_ID_ varchar(64),
-    TASK_ID_ varchar(64),
+    PROC_DEF_ID_ varchar(64),
+    TIMESTAMP_ timestamp not null,
+    EVENT_TYPE_ varchar(64) not null,
     ACT_INST_ID_ varchar(64),
-    VAR_TYPE_ varchar(255),
+    VAR_INST_ID_ varchar(64),
+    TASK_ID_ varchar(64),
+    NAME_ varchar(255),
     REV_ integer,
+    VAR_TYPE_ varchar(255),
     BYTEARRAY_ID_ varchar(64),
     DOUBLE_ double,
     LONG_ bigint,
@@ -117,9 +104,7 @@ create index ACT_IDX_HI_PRO_I_BUSKEY on ACT_HI_PROCINST(BUSINESS_KEY_);
 create index ACT_IDX_HI_ACT_INST_START on ACT_HI_ACTINST(TIMESTAMP_);
 create index ACT_IDX_HI_DETAIL_PROC_INST on ACT_HI_DETAIL(PROC_INST_ID_);
 create index ACT_IDX_HI_DETAIL_ACT_INST on ACT_HI_DETAIL(ACT_INST_ID_);
-create index ACT_IDX_HI_DETAIL_TIME on ACT_HI_DETAIL(TIME_);
+create index ACT_IDX_HI_DETAIL_TIME on ACT_HI_DETAIL(TIMESTAMP_);
 create index ACT_IDX_HI_DETAIL_NAME on ACT_HI_DETAIL(NAME_);
 create index ACT_IDX_HI_DETAIL_TASK_ID on ACT_HI_DETAIL(TASK_ID_);
-create index ACT_IDX_HI_PROCVAR_PROC_INST on ACT_HI_VARINST(PROC_INST_ID_);
-create index ACT_IDX_HI_PROCVAR_NAME_TYPE on ACT_HI_VARINST(NAME_, VAR_TYPE_);
 create index ACT_IDX_HI_ACT_INST_PROCINST on ACT_HI_ACTINST(PROC_INST_ID_, ACT_ID_);

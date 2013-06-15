@@ -316,12 +316,12 @@
               <when test="var.local">
                 and HD.TASK_ID_ = T1.TASK_ID_
                 and HD.REV_ = (select max(HDM.REV_) from ${prefix}ACT_HI_DETAIL HDM where HDM.TASK_ID_ = T1.ID_ and HDM.VAR_TYPE_ = #{var.type} and HDM.NAME_ = #{var.name} and HDM.TYPE_ = 'VariableUpdate')
-                and HD.TIME_ = (select max(HDM.TIME_) from ${prefix}ACT_HI_DETAIL HDM where HDM.TASK_ID_ = T1.ID_ and HDM.VAR_TYPE_ = #{var.type} and HDM.NAME_ = #{var.name} and HDM.TYPE_ = 'VariableUpdate')
+                and HD.TIMESTAMP_ = (select max(HDM.TIMESTAMP_) from ${prefix}ACT_HI_DETAIL HDM where HDM.TASK_ID_ = T1.ID_ and HDM.VAR_TYPE_ = #{var.type} and HDM.NAME_ = #{var.name} and HDM.TYPE_ = 'VariableUpdate')
               </when>
               <otherwise>
                 and HD.PROC_INST_ID_ = T1.PROC_INST_ID_ and HD.TASK_ID_ is null
                 and HD.REV_ = (select max(HDM.REV_) from ${prefix}ACT_HI_DETAIL HDM where HDM.PROC_INST_ID_ = T1.PROC_INST_ID_ and HDM.TASK_ID_ is null and HDM.VAR_TYPE_ = #{var.type} and HDM.NAME_ = #{var.name} and HDM.TYPE_ = 'VariableUpdate')
-                and HD.TIME_ = (select max(HDM.TIME_) from ${prefix}ACT_HI_DETAIL HDM where HDM.PROC_INST_ID_ = T1.PROC_INST_ID_ and HDM.TASK_ID_ is null and HDM.VAR_TYPE_ = #{var.type} and HDM.NAME_ = #{var.name} and HDM.TYPE_ = 'VariableUpdate')
+                and HD.TIMESTAMP_ = (select max(HDM.TIMESTAMP_) from ${prefix}ACT_HI_DETAIL HDM where HDM.PROC_INST_ID_ = T1.PROC_INST_ID_ and HDM.TASK_ID_ is null and HDM.VAR_TYPE_ = #{var.type} and HDM.NAME_ = #{var.name} and HDM.TYPE_ = 'VariableUpdate')
               </otherwise>
             </choose>  
             <if test="!var.type.equals('null')">

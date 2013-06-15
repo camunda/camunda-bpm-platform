@@ -12,44 +12,30 @@
  */
 package org.camunda.bpm.engine.runtime;
 
-import java.util.List;
+import org.camunda.bpm.engine.RuntimeService;
 
 /**
- * <p>An activity instance is the instance of an activity</p>
+ * <p>An activity instance represents an instance of an activity.</p>
+ * 
+ * <p>For documentation, see {@link RuntimeService#getActivityInstance(String)}</p>
  * 
  * @author Daniel Meyer
  *
  */
-public interface ActivityInstance {
-
-  /** The id of the activity instance */
-  String getId();
-
-  /** The id of the parent activity instance. If the activity is the process definition, 
-   {@link #getId()} and {@link #getParentActivityInstanceId()} return the same value */
-  String getParentActivityInstanceId();
+public interface ActivityInstance extends ProcessElementInstance {
 
   /** the id of the activity */
   String getActivityId();
-  
-  /** The name of the activity */
-  String getActivityName();
-  
-  /** the process instance id */
-  String getProcessInstanceId();
-  
-  /** the process definition id */
-  String getProcessDefinitionId();
-  
-  /** the business key */
-  String getBusinessKey();
-
+    
   /** Returns the child activity instances.
-   * Returns an empty list if there are no child instances. */
-  List<ActivityInstance> getChildInstances();
+   * Returns an empty list if there are no child instances */
+  ActivityInstance[] getChildActivityInstances();
+  
+  /** Returns the child transition instances.
+   * Returns an empty list if there are no child transition instances */
+  TransitionInstance[] getChildTransitionInstances();
   
   /** the list of executions that are currently waiting in this activity instance */
-  List<String> getExecutionIds();
-
+  String[] getExecutionIds();
 
 }

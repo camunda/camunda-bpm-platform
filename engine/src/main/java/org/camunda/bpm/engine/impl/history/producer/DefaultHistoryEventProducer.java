@@ -28,6 +28,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.VariableScopeImpl;
 import org.camunda.bpm.engine.impl.pvm.PvmScope;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 
@@ -127,15 +128,19 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
   }
   
 
-  protected void initHistoricVariableUpdateEvt(HistoricVariableUpdateEventEntity evt, VariableInstanceEntity variableInstance) {
+  protected void initHistoricVariableUpdateEvt(HistoricVariableUpdateEventEntity evt, VariableInstanceEntity variableInstance, String eventType) {
     
     final Date currentTime = ClockUtil.getCurrentTime();
 
+    // init properties
+    evt.setEventType(eventType);
+    evt.setVariableInstanceId(variableInstance.getId());
     evt.setProcessInstanceId(variableInstance.getProcessInstanceId());
     evt.setExecutionId(variableInstance.getExecutionId());
     evt.setTaskId(variableInstance.getTaskId());
     evt.setRevision(variableInstance.getRevision());
     evt.setVariableName(variableInstance.getName());
+    evt.setVariableTypeName(variableInstance.getType().getTypeName());
     evt.setTimestamp(currentTime);
 
     // copy value
@@ -147,6 +152,29 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
       ByteArrayEntity byteArrayValue = variableInstance.getByteArrayValue();
       evt.setByteValue(byteArrayValue.getBytes());
     }
+  }
+
+  protected HistoryEvent createHistoricVariableEvent(VariableInstanceEntity variableInstance, VariableScopeImpl variableScopeImpl, String eventType) {
+    ExecutionEntity execution = null;
+
+    if (variableScopeImpl instanceof ExecutionEntity) {
+      execution = (ExecutionEntity) variableScopeImpl;
+      
+    } else if (variableScopeImpl instanceof TaskEntity) {
+      execution = ((TaskEntity) variableScopeImpl).getExecution();
+      
+    }
+
+    // create event
+    HistoricVariableUpdateEventEntity evt = new HistoricVariableUpdateEventEntity();
+    // initialize
+    initHistoricVariableUpdateEvt(evt, variableInstance, eventType);
+    
+    if (execution != null) {
+      evt.setActivityInstanceId(execution.getActivityInstanceId());
+    }
+
+    return evt;
   }
 
   
@@ -274,37 +302,12 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
   
   // variables /////////////////////////////////
   
-  public HistoryEvent createHistoricVariableUpdateEvt(VariableInstanceEntity variableInstance, DelegateExecution execution) {
-
-    final ExecutionEntity executionEntity = (ExecutionEntity) execution;
-    
-    HistoricVariableUpdateEventEntity evt = new HistoricVariableUpdateEventEntity();
-
-    // initialize
-    initHistoricVariableUpdateEvt(evt, variableInstance);
-    
-    evt.setActivityInstanceId(executionEntity.getActivityInstanceId());
-    
-    return evt;
+  public HistoryEvent createHistoricVariableDeleteEvt(VariableInstanceEntity variableInstance, VariableScopeImpl variableScopeImpl) {
+    return createHistoricVariableEvent(variableInstance, variableScopeImpl, HistoryEvent.VARIABLE_EVENT_TYPE_DELETE);
   }
-  
-  
-  public HistoryEvent createHistoricVariableUpdateEvt(VariableInstanceEntity variableInstance, DelegateTask task) {
-    
-    final TaskEntity taskEntity = (TaskEntity) task;
-    final ExecutionEntity execution = taskEntity.getExecution();
-    
-    HistoricVariableUpdateEventEntity evt = new HistoricVariableUpdateEventEntity();
 
-    // initialize
-    initHistoricVariableUpdateEvt(evt, variableInstance);
-    
-    if(execution != null) {
-      evt.setActivityInstanceId(execution.getActivityInstanceId());
-    }
-    
-    return evt;
+  public HistoryEvent createHistoricVariableUpdateEvt(VariableInstanceEntity variableInstance, VariableScopeImpl variableScopeImpl) {
+    return createHistoricVariableEvent(variableInstance, variableScopeImpl, HistoryEvent.VARIABLE_EVENT_TYPE_UPDATE);
   }
-  
 
 }

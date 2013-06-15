@@ -19,7 +19,6 @@ import java.util.List;
 
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.db.HasRevision;
 import org.camunda.bpm.engine.impl.db.PersistentObject;
 import org.camunda.bpm.engine.impl.variable.ValueFields;
 import org.camunda.bpm.engine.impl.variable.VariableType;
@@ -27,7 +26,7 @@ import org.camunda.bpm.engine.impl.variable.VariableType;
 /**
  * @author Christian Lipphardt (camunda)
  */
-public class HistoricVariableInstanceEntity implements ValueFields, HistoricVariableInstance, PersistentObject, HasRevision, Serializable {
+public class HistoricVariableInstanceEntity implements ValueFields, HistoricVariableInstance, PersistentObject, Serializable {
 
   private static final long serialVersionUID = 1L;
 
@@ -47,57 +46,18 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
   protected String textValue2;
 
   protected ByteArrayEntity byteArrayValue;
-  protected String byteArrayValueId;
+  protected String byteArrayId;
 
   protected Object cachedValue;
 
   public HistoricVariableInstanceEntity() {
   }
 
-  public HistoricVariableInstanceEntity(VariableInstanceEntity variableInstance) {
-    this.id = variableInstance.getId();
-    this.processInstanceId = variableInstance.getProcessInstanceId();
-    this.executionId = variableInstance.getExecutionId();
-    this.taskId = variableInstance.getTaskId();
-    this.revision = variableInstance.getRevision();
-    this.name = variableInstance.getName();
-    this.variableType = variableInstance.getType();
-
-    copyValue(variableInstance);
-  }
-  
-  protected void copyValue(VariableInstanceEntity variableInstance) {
-    this.textValue = variableInstance.getTextValue();
-    this.textValue2 = variableInstance.getTextValue2();
-    this.doubleValue = variableInstance.getDoubleValue();
-    this.longValue = variableInstance.getLongValue();
-    if (variableInstance.getByteArrayValueId()!=null) {
-      setByteArrayValue(variableInstance.getByteArrayValue().getBytes());
-    }
-  }
-
-  public void delete() {
-    deleteByteArrayValue();
-    Context
-      .getCommandContext()
-      .getDbSqlSession()
-      .delete(this);
-  }
-
   public Object getPersistentState() {
-    List<Object> state = new ArrayList<Object>(5);
-    state.add(textValue);
-    state.add(textValue2);
-    state.add(doubleValue);
-    state.add(longValue);
-    state.add(byteArrayValueId);
-    return state;
+    // immutable
+    return HistoricVariableInstanceEntity.class;
   }
   
-  public int getRevisionNext() {
-    return revision+1;
-  }
-
   public Object getValue() {
     if (!variableType.isCachable() || cachedValue == null) {
       cachedValue = variableType.getValue(this);
@@ -112,32 +72,32 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
   // HistoricVariableInstance and HistoricDetailVariableInstanceUpdateEntity 
   
   public String getByteArrayValueId() {
-    return byteArrayValueId;
+    return byteArrayId;
   }
 
   public void setByteArrayValueId(String byteArrayValueId) {
-    this.byteArrayValueId = byteArrayValueId;
+    this.byteArrayId = byteArrayValueId;
     this.byteArrayValue = null;
   }
 
   public ByteArrayEntity getByteArrayValue() {
-    if ((byteArrayValue == null) && (byteArrayValueId != null)) {
+    if ((byteArrayValue == null) && (byteArrayId != null)) {
       byteArrayValue = Context
         .getCommandContext()
         .getDbSqlSession()
-        .selectById(ByteArrayEntity.class, byteArrayValueId);
+        .selectById(ByteArrayEntity.class, byteArrayId);
     }
     return byteArrayValue;
   }
   
   public void setByteArrayValue(byte[] bytes) {
     ByteArrayEntity byteArrayValue = null;
-    if (this.byteArrayValueId!=null) {
+    if (this.byteArrayId!=null) {
       getByteArrayValue();
       Context
         .getCommandContext()
         .getByteArrayManager()
-        .deleteByteArrayById(this.byteArrayValueId);
+        .deleteByteArrayById(this.byteArrayId);
     }
     if (bytes!=null) {
       byteArrayValue = new ByteArrayEntity(bytes);
@@ -148,21 +108,9 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
     }
     this.byteArrayValue = byteArrayValue;
     if (byteArrayValue != null) {
-      this.byteArrayValueId = byteArrayValue.getId();
+      this.byteArrayId = byteArrayValue.getId();
     } else {
-      this.byteArrayValueId = null;
-    }
-  }
-
-  protected void deleteByteArrayValue() {
-    if (byteArrayValueId != null) {
-      // the next apparently useless line is probably to ensure consistency in the DbSqlSession 
-      // cache, but should be checked and docced here (or removed if it turns out to be unnecessary)
-      getByteArrayValue();
-      Context
-        .getCommandContext()
-        .getByteArrayManager()
-        .deleteByteArrayById(this.byteArrayValueId);
+      this.byteArrayId = null;
     }
   }
 

@@ -16,6 +16,7 @@ import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.DelegateTask;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.VariableScopeImpl;
 
 /**
  * <p>The producer for history events. The history event producer is 
@@ -104,23 +105,23 @@ public interface HistoryEventProducer {
   
   
   // HistoricVariableUpdateEventEntity //////////////////////
-  
+
   /** 
-   * Creates the history event fired when an execution variable is updated.
+   * Creates the history event fired when a variable is <strong>updated</strong>.
    *  
    * @param variableInstance the runtime variable instance
-   * @param execution the execution to which the variable is linked
+   * @param the scope to which the variable is linked
    * @return the history event
    */
-  public HistoryEvent createHistoricVariableUpdateEvt(VariableInstanceEntity variableInstance, DelegateExecution execution);
-  
-  /** 
-   * Creates the history event fired when a task local variable is updated.
-   *  
-   * @param variableInstance the runtime variable instance
-   * @param task the task to which the execution is linked
-   * @return the history event
+  public HistoryEvent createHistoricVariableUpdateEvt(VariableInstanceEntity variableInstance, VariableScopeImpl variableScopeImpl);
+
+  /**
+   * Creates the history event fired when a variable is <strong>deleted</strong>.
+   * 
+   * @param variableInstance
+   * @param variableScopeImpl
+   * @return
    */
-  public HistoryEvent createHistoricVariableUpdateEvt(VariableInstanceEntity variableInstance, DelegateTask task);
+  public HistoryEvent createHistoricVariableDeleteEvt(VariableInstanceEntity variableInstance, VariableScopeImpl variableScopeImpl);
 
 }

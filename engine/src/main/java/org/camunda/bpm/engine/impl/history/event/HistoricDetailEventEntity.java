@@ -12,7 +12,6 @@
  */
 package org.camunda.bpm.engine.impl.history.event;
 
-import java.util.Date;
 
 /**
  * @author Daniel Meyer
@@ -24,7 +23,6 @@ public class HistoricDetailEventEntity extends HistoryEvent  {
   
   protected String activityInstanceId;
   protected String taskId;
-  protected Date time;
 
   // getters and setters //////////////////////////////////////////////////////
   
@@ -34,10 +32,6 @@ public class HistoricDetailEventEntity extends HistoryEvent  {
   
   public void setActivityInstanceId(String activityInstanceId) {
     this.activityInstanceId = activityInstanceId;
-  }
-
-  public Date getTime() {
-    return timestamp;
   }
   
   public String getTaskId() {

@@ -261,6 +261,7 @@ Circle
   width: 20px;
   height: 20px;
   background-color: #999999;
+  top: 100%;
 }
 
 .circle-red {

@@ -349,9 +349,14 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
   }
   
   public void start() {
+    start(null);
+  }
+  
+  public void start(Map<String, Object> variables) {
     if(startingExecution == null && isProcessInstance()) {
       startingExecution = new StartingExecution(processDefinition.getInitial());
     }
+    startingExecution.setVariables(variables);
     performOperation(AtomicOperation.PROCESS_START);
   }
 
@@ -1144,18 +1149,6 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
   /** used to calculate the sourceActivityExecution for method {@link #updateActivityInstanceIdInHistoricVariableUpdate(HistoricDetailVariableInstanceUpdateEntity, ExecutionEntity)} */
   protected ExecutionEntity getSourceActivityExecution() {
     return (activityId!=null ? this : null);
-  }
-
-  @Override
-  protected void updateActivityInstanceIdInHistoricVariableUpdate(HistoricDetailVariableInstanceUpdateEntity historicVariableUpdate, ExecutionEntity sourceActivityExecution) {
-    int historyLevel = Context.getProcessEngineConfiguration().getHistoryLevel();
-    if (historyLevel >= ProcessEngineConfigurationImpl.HISTORYLEVEL_FULL
-        && sourceActivityExecution!=null) {
-//      HistoricActivityInstanceEntity historicActivityInstance = ActivityInstanceEndHandler.findActivityInstance(sourceActivityExecution); 
-//      if (historicActivityInstance!=null) {
-//        historicVariableUpdate.setActivityInstanceId(historicActivityInstance.getId());
-//      }
-    }
   }
 
   // persistent state /////////////////////////////////////////////////////////

@@ -30,10 +30,19 @@ import org.jboss.shrinkwrap.resolver.api.maven.PomEquippedResolveStage;
 
 public class WinkTomcatServerBootstrap extends EmbeddedServerBootstrap {
 
+  private static final String DEFAULT_REST_WEB_XML_PATH = "runtime/wink/web.xml";
+  
   private Tomcat tomcat;
   private String workingDir = System.getProperty("java.io.tmpdir");
+  
+  private String webXmlPath;
 
   public WinkTomcatServerBootstrap() {
+    this(DEFAULT_REST_WEB_XML_PATH);
+  }
+  
+  public WinkTomcatServerBootstrap(String webXmlPath) {
+    this.webXmlPath = webXmlPath;
   }
 
   public void start() {
@@ -59,7 +68,7 @@ public class WinkTomcatServerBootstrap extends EmbeddedServerBootstrap {
 
     PomEquippedResolveStage resolver = Maven.resolver().loadPomFromFile("pom.xml");
 
-    WebArchive wa = ShrinkWrap.create(WebArchive.class, "rest-test.war").setWebXML("runtime/wink/web.xml")
+    WebArchive wa = ShrinkWrap.create(WebArchive.class, "rest-test.war").setWebXML(webXmlPath)
         .addAsLibraries(resolver.resolve("org.apache.wink:wink-server:1.1.1-incubating").withTransitivity().asFile())
         .addAsLibraries(resolver.resolve("org.codehaus.jackson:jackson-jaxrs:1.6.5").withTransitivity().asFile())
         .addAsLibraries(resolver.resolve("org.camunda.bpm:camunda-engine").withTransitivity().asFile())

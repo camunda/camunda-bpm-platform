@@ -19,7 +19,7 @@
 <mapper namespace="org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity">
 
   <!-- HISTORIC PROCESS VARIABLE INSERT -->
-  
+  <!-- 
   <insert id="insertHistoricVariableInstance" parameterType="org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity">
     insert into ${prefix}ACT_HI_VARINST (ID_, PROC_INST_ID_, EXECUTION_ID_, TASK_ID_, NAME_, REV_, VAR_TYPE_, BYTEARRAY_ID_, DOUBLE_, LONG_ , TEXT_, TEXT2_)
     values (
@@ -36,10 +36,10 @@
       #{textValue, jdbcType=VARCHAR},
       #{textValue2, jdbcType=VARCHAR}
     )
-  </insert>
+  </insert> -->
 
   <!-- HISTORIC PROCESS VARIABLE UPDATE -->
-  
+  <!-- 
   <update id="updateHistoricVariableInstance" parameterType="org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity">
     update ${prefix}ACT_HI_VARINST set
       REV_ = #{revisionNext, jdbcType=INTEGER},
@@ -50,13 +50,13 @@
       TEXT2_ = #{textValue2, jdbcType=VARCHAR}
     where ID_ = #{id, jdbcType=VARCHAR}
       and REV_ = #{revision, jdbcType=INTEGER}
-  </update>
+  </update> -->
   
   <!-- HISTORIC PROCESS VARIABLE DELETE -->
 
-  <delete id="deleteHistoricVariableInstance" parameterType="org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity">
+<!--   <delete id="deleteHistoricVariableInstance" parameterType="org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity">
     delete from ${prefix}ACT_HI_VARINST where ID_ = #{id} and REV_ = #{revision}
-  </delete>
+  </delete> -->
   
   <!-- HISTORIC PROCESS VARIABLE RESULTMAP -->
   <resultMap id="historicProcessVariableResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.HistoricVariableInstanceEntity">
@@ -67,7 +67,7 @@
     <result property="name" column="NAME_" javaType="String" jdbcType="VARCHAR" />
     <result property="revision" column="REV_" jdbcType="INTEGER" />
     <result property="variableType" column="VAR_TYPE_" javaType="org.camunda.bpm.engine.impl.variable.VariableType" jdbcType="VARCHAR"/>
-    <result property="byteArrayValueId" column="BYTEARRAY_ID_" jdbcType="VARCHAR" />
+    <result property="byteArrayId" column="BYTEARRAY_ID_" jdbcType="VARCHAR" />
     <result property="doubleValue" column="DOUBLE_" jdbcType="DOUBLE" />
     <result property="textValue" column="TEXT_" jdbcType="VARCHAR" />
     <result property="textValue2" column="TEXT2_" jdbcType="VARCHAR" />
@@ -91,13 +91,22 @@
   </select>
   
   <sql id="selectHistoricVariableInstanceByQueryCriteriaSql">
-    from ${prefix}ACT_HI_VARINST RES
-    <where>
+    from ${prefix}ACT_HI_DETAIL RES
+    <where>    
+    
+      RES.ID_ = ( 
+        select 
+          MAX(ID_) 
+        FROM 
+          ${prefix}ACT_HI_DETAIL D
+        WHERE 
+          D.VAR_INST_ID_ = RES.VAR_INST_ID_ )
+        
       <if test="processInstanceId != null">
-        RES.PROC_INST_ID_ = #{processInstanceId}
+        AND RES.PROC_INST_ID_ = #{processInstanceId}
       </if>
       <if test="taskId != null">
-        RES.TASK_ID_ = #{taskId}
+        AND RES.TASK_ID_ = #{taskId}
       </if>
       <if test="variableName != null">
         and RES.NAME_ = #{variableName}

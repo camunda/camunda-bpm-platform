@@ -201,7 +201,19 @@
       inner join ${prefix}ACT_RE_PROCDEF DEF on P1.PROC_DEF_ID_ = DEF.ID_
     </if>
     <foreach collection="queryVariableValues" index="index" item="queryVariableValue">
-      inner join ${prefix}ACT_HI_VARINST  A${index} on P1.PROC_INST_ID_ = A${index}.PROC_INST_ID_
+      inner join 
+        ${prefix}ACT_HI_DETAIL  A${index} 
+      on 
+        P1.PROC_INST_ID_ = A${index}.PROC_INST_ID_
+      AND 
+        A${index}.ID_ = (
+                           SELECT 
+                             MAX(ID_) 
+                           FROM 
+                             ${prefix}ACT_HI_DETAIL TEMP${index} 
+                           WHERE 
+                             TEMP${index}.VAR_INST_ID_ = A${index}.VAR_INST_ID_ 
+                         )
     </foreach>    
     <where>
     

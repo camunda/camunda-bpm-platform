@@ -59,6 +59,11 @@ public class HistoryEvent implements Serializable, PersistentObject {
   public static final String TASK_EVENT_TYPE_COMPLETE = "complete";
   /** fired when a task instance is deleted. */
   public static final String TASK_EVENT_TYPE_DELETE = "delete";
+  
+  /** fired when a variable instance is created or updated */
+  public static final String VARIABLE_EVENT_TYPE_UPDATE = "update";
+  /** fired when a variable instance is deleted */
+  public static final String VARIABLE_EVENT_TYPE_DELETE = "delete";
     
   
   /** each {@link HistoryEvent} has a unique id */
@@ -82,10 +87,15 @@ public class HistoryEvent implements Serializable, PersistentObject {
    * @see #ACTIVITY_EVENT_TYPE_START
    * @see #ACTIVITY_EVENT_TYPE_END
    * @see #ACTIVITY_EVENT_TYPE_UPDATE
+   * 
    * @see #TASK_EVENT_TYPE_CREATE
    * @see #TASK_EVENT_TYPE_UPDATE
    * @see #TASK_EVENT_TYPE_COMPLETE
    * @see #TASK_EVENT_TYPE_DELETE
+   * 
+   * @see #VARIABLE_EVENT_TYPE_CREATE
+   * @see #VARIABLE_EVENT_TYPE_UPDATE
+   * @see #VARIABLE_EVENT_TYPE_DELETE
    * */
   protected String eventType;
   

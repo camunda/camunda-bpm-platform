@@ -8,7 +8,7 @@ import org.junit.BeforeClass;
 
 public class ExecutionRestServiceInteractionTest extends AbstractExecutionRestServiceInteractionTest {
 
-protected static EmbeddedServerBootstrap serverBootstrap;  
+  protected static EmbeddedServerBootstrap serverBootstrap;  
   
   @BeforeClass
   public static void setUpEmbeddedRuntime() {

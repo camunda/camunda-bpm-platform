@@ -12,59 +12,32 @@
  */
 package org.camunda.bpm.engine.impl.persistence.entity;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.camunda.bpm.engine.runtime.ActivityInstance;
+import org.camunda.bpm.engine.runtime.TransitionInstance;
 
 /**
  * 
  * @author Daniel Meyer
  * 
  */
-public class ActivityInstanceImpl implements ActivityInstance {
+public class ActivityInstanceImpl extends ProcessElementInstanceImpl implements ActivityInstance {
 
-  protected String id;
-  protected String activityName;
-  protected String parentActivityInstanceId;
-  protected String processInstanceId;
   protected String businessKey;
-  protected String processDefinitionId;
   protected String activityId;
+  protected String activityName;
+  protected String activityType;
   
-  protected List<ActivityInstance> childInstances = new ArrayList<ActivityInstance>();
-  protected List<String> executionIds = new ArrayList<String>();
+  protected ActivityInstance[] childActivityInstances = new ActivityInstance[0];
+  protected TransitionInstance[] childTransitionInstances = new TransitionInstance[0];
+  
+  protected String[] executionIds = new String[0];
 
-  public String getId() {
-    return id;
+  public ActivityInstance[] getChildActivityInstances() {
+    return childActivityInstances;
   }
 
-  public void setId(String id) {
-    this.id = id;
-  }
-
-  public String getActivityName() {
-    return activityName;
-  }
-
-  public void setActivityName(String activityName) {
-    this.activityName = activityName;
-  }
-
-  public List<ActivityInstance> getChildInstances() {
-    return childInstances;
-  }
-
-  public void setChildInstances(List<ActivityInstance> childInstances) {
-    this.childInstances = childInstances;
-  }
-
-  public void setProcessInstanceId(String processInstanceId) {
-    this.processInstanceId = processInstanceId;
-  }
-
-  public String getProcessInstanceId() {
-    return processInstanceId;
+  public void setChildActivityInstances(ActivityInstance[] childInstances) {
+    this.childActivityInstances = childInstances;
   }
 
   public String getBusinessKey() {
@@ -75,14 +48,6 @@ public class ActivityInstanceImpl implements ActivityInstance {
     this.businessKey = businessKey;
   }
 
-  public String getProcessDefinitionId() {
-    return processDefinitionId;
-  }
-
-  public void setProcessDefinitionId(String processDefinitionId) {
-    this.processDefinitionId = processDefinitionId;
-  }
-
   public String getActivityId() {
     return activityId;
   }
@@ -91,20 +56,36 @@ public class ActivityInstanceImpl implements ActivityInstance {
     this.activityId = activityId;
   }
     
-  public String getParentActivityInstanceId() {
-    return parentActivityInstanceId;
-  }
-  
-  public void setParentActivityInstanceId(String parentActivityInstanceId) {
-    this.parentActivityInstanceId = parentActivityInstanceId;
-  }
-
-  public List<String> getExecutionIds() {
+  public String[] getExecutionIds() {
     return executionIds;
   }
 
-  public void setExecutionIds(List<String> executionIds) {
+  public void setExecutionIds(String[] executionIds) {
     this.executionIds = executionIds;
   }
 
+  public TransitionInstance[] getChildTransitionInstances() {
+    return childTransitionInstances;
+  }
+
+  public void setChildTransitionInstances(TransitionInstance[] childTransitionInstances) {
+    this.childTransitionInstances = childTransitionInstances;
+  }
+  
+  public String getActivityType() {
+    return activityType;
+  }
+  
+  public void setActivityType(String activityType) {
+    this.activityType = activityType;
+  }
+
+  public String getActivityName() {
+    return activityName;
+  }
+
+  public void setActivityName(String activityName) {
+    this.activityName = activityName;
+  }
+  
 }

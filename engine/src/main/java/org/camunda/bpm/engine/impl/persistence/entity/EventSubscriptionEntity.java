@@ -27,11 +27,12 @@ import org.camunda.bpm.engine.impl.jobexecutor.ProcessEventJobHandler;
 import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.runtime.EventSubscription;
 
 /**
  * @author Daniel Meyer
  */
-public abstract class EventSubscriptionEntity implements PersistentObject, HasRevision, Serializable {
+public abstract class EventSubscriptionEntity implements EventSubscription, PersistentObject, HasRevision, Serializable {
 
   private static final long serialVersionUID = 1L;
   
@@ -273,6 +274,12 @@ public abstract class EventSubscriptionEntity implements PersistentObject, HasRe
     } else if (!id.equals(other.id))
       return false;
     return true;
+  }
+
+  @Override
+  public String toString() {
+    return "EventSubscriptionEntity [id=" + id + ", eventType=" + eventType + ", eventName=" + eventName + ", executionId=" + executionId
+        + ", processInstanceId=" + processInstanceId + ", activityId=" + activityId + ", configuration=" + configuration + "]";
   }
   
 }

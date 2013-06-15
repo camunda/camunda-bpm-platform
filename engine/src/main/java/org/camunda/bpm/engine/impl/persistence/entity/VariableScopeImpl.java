@@ -25,6 +25,9 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.VariableScope;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
+import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
+import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.javax.el.ELContext;
 import org.camunda.bpm.engine.impl.variable.VariableType;
@@ -212,10 +215,10 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
       if (variableInstance != null) {
         variableInstance.delete();
 
-        int historyLevel = Context.getProcessEngineConfiguration().getHistoryLevel();
-        if (historyLevel == ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
-          insertHistoricVariableInstance(variableInstance);
-        }
+//        int historyLevel = Context.getProcessEngineConfiguration().getHistoryLevel();
+//        if (historyLevel >= ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
+//          insertHistoricVariableInstanceUpdate(variableInstance, (ExecutionEntity) this);
+//        }
       }
     }
   }
@@ -332,22 +335,20 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
   }
 
   protected void deleteVariableInstanceForExplicitUserCall(VariableInstanceEntity variableInstance, ExecutionEntity sourceActivityExecution) {
+    
+    final ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+    final HistoryEventProducer eventProducer = processEngineConfiguration.getHistoryEventProducer();
+    final HistoryEventHandler eventHandler = processEngineConfiguration.getHistoryEventHandler();
+
     variableInstance.delete();
     variableInstance.setValue(null);
     
-    int historyLevel = Context.getProcessEngineConfiguration().getHistoryLevel();
+    int historyLevel = processEngineConfiguration.getHistoryLevel();
     
-    if (historyLevel>=ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
-      updateHistoricVariableInstanceValue(variableInstance);
-    }
-
-    if (historyLevel == ProcessEngineConfigurationImpl.HISTORYLEVEL_FULL) {
-      HistoricDetailVariableInstanceUpdateEntity historicVariableUpdate = new HistoricDetailVariableInstanceUpdateEntity(variableInstance);
-      updateActivityInstanceIdInHistoricVariableUpdate(historicVariableUpdate, sourceActivityExecution);
-      Context
-        .getCommandContext()
-        .getDbSqlSession()
-        .insert(historicVariableUpdate);
+    if (historyLevel>=ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {  
+      // fire delete event
+      HistoryEvent evt = eventProducer.createHistoricVariableDeleteEvt(variableInstance, this);
+      eventHandler.handleEvent(evt);      
     }
   }
 
@@ -356,12 +357,8 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
 
     int historyLevel = Context.getProcessEngineConfiguration().getHistoryLevel();
     if (historyLevel==ProcessEngineConfigurationImpl.HISTORYLEVEL_FULL) {
-      insertHistoricDetailVariableInstanceUpdate(variableInstance, sourceActivityExecution);
-    }
-    
-    if (historyLevel>=ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
-      updateHistoricVariableInstanceValue(variableInstance);
-    }
+      insertHistoricVariableInstanceUpdate(variableInstance, sourceActivityExecution);
+    }    
   }
 
   protected VariableInstanceEntity createVariableInstance(String variableName, Object value, ExecutionEntity sourceActivityExecution) {
@@ -377,68 +374,27 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
     
     variableInstance.setValue(value);
     
-    int historyLevel = Context.getProcessEngineConfiguration().getHistoryLevel();
-    if (historyLevel==ProcessEngineConfigurationImpl.HISTORYLEVEL_FULL) {
-      insertHistoricDetailVariableInstanceUpdate(variableInstance, sourceActivityExecution);
-    }
+    insertHistoricVariableInstanceUpdate(variableInstance, sourceActivityExecution);
     
-    if (historyLevel>=ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
-      insertHistoricVariableInstance(variableInstance);
-    }
-
     return variableInstance;
   }
 
-  protected void insertHistoricVariableInstance(VariableInstanceEntity variableInstance) {
-    HistoricVariableInstanceEntity historicVariableInstance = new HistoricVariableInstanceEntity(variableInstance);
-    Context
-      .getCommandContext()
-      .getDbSqlSession()
-      .insert(historicVariableInstance);
-  }
-  
-  protected void insertHistoricDetailVariableInstanceUpdate(VariableInstanceEntity variableInstance, ExecutionEntity sourceActivityExecution) {
-    HistoricDetailVariableInstanceUpdateEntity historicVariableUpdate = new HistoricDetailVariableInstanceUpdateEntity(variableInstance);
+  protected void insertHistoricVariableInstanceUpdate(VariableInstanceEntity variableInstance, ExecutionEntity sourceActivityExecution) {
 
-    updateActivityInstanceIdInHistoricVariableUpdate(historicVariableUpdate, sourceActivityExecution);
+    int historyLevel = Context.getProcessEngineConfiguration().getHistoryLevel();
+    if (historyLevel >=ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
+      
+      final ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+      final HistoryEventHandler eventHandler = processEngineConfiguration.getHistoryEventHandler();
+      final HistoryEventProducer eventProducer = processEngineConfiguration.getHistoryEventProducer();
+      
+      HistoryEvent evt = eventProducer.createHistoricVariableUpdateEvt(variableInstance, sourceActivityExecution);
+      eventHandler.handleEvent(evt);
+      
+    }
     
-    Context
-      .getCommandContext()
-      .getDbSqlSession()
-      .insert(historicVariableUpdate);
   }
 
-  /** execution variable updates have activity instance ids
-   * but historic task variable updates don't
-   * @see ExecutionEntity#updateActivityInstanceIdInHistoricVariableUpdate(HistoricDetailVariableInstanceUpdateEntity) */
-  protected void updateActivityInstanceIdInHistoricVariableUpdate(HistoricDetailVariableInstanceUpdateEntity historicVariableUpdate, ExecutionEntity sourceActivityExecution) {
-  }
-
-  /** only called when an existing variable is updated.
-   * This method is also responsible for propagating the creation of this 
-   * variable to the history. */
-  protected void updateHistoricVariableInstanceValue(VariableInstanceEntity variableInstance) {
-    HistoricVariableInstanceEntity historicProcessVariable = 
-      Context
-        .getCommandContext()
-        .getDbSqlSession()
-        .findInCache(HistoricVariableInstanceEntity.class, variableInstance.getId());
-    if (historicProcessVariable==null) {
-      historicProcessVariable = Context
-              .getCommandContext()
-              .getHistoricVariableInstanceManager()
-              .findHistoricVariableInstanceByVariableInstanceId(variableInstance.getId());
-    }
-    if (historicProcessVariable!=null) {
-      historicProcessVariable.copyValue(variableInstance);
-    } else {
-      historicProcessVariable = new HistoricVariableInstanceEntity(variableInstance);
-      Context
-        .getCommandContext()
-        .getDbSqlSession()
-        .insert(historicProcessVariable);
-    }
-  }
 
   // getters and setters //////////////////////////////////////////////////////
 

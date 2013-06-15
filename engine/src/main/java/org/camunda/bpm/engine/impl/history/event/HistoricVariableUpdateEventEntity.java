@@ -22,6 +22,7 @@ public class HistoricVariableUpdateEventEntity extends HistoricDetailEventEntity
   private static final long serialVersionUID = 1L;
   
   protected String variableName;
+  protected String variableInstanceId;
   protected int revision;
   
   protected String variableTypeName;
@@ -89,6 +90,12 @@ public class HistoricVariableUpdateEventEntity extends HistoricDetailEventEntity
   }
   public String getByteArrayId() {
     return byteArrayId;
+  }
+  public String getVariableInstanceId() {
+    return variableInstanceId;
+  }
+  public void setVariableInstanceId(String variableInstanceId) {
+    this.variableInstanceId = variableInstanceId;
   }
   
 }

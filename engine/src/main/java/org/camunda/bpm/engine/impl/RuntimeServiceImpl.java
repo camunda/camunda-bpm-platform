@@ -39,6 +39,7 @@ import org.camunda.bpm.engine.impl.cmd.StartProcessInstanceByMessageCmd;
 import org.camunda.bpm.engine.impl.cmd.StartProcessInstanceCmd;
 import org.camunda.bpm.engine.impl.cmd.SuspendProcessInstanceCmd;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
+import org.camunda.bpm.engine.runtime.EventSubscriptionQuery;
 import org.camunda.bpm.engine.runtime.ExecutionQuery;
 import org.camunda.bpm.engine.runtime.IncidentQuery;
 import org.camunda.bpm.engine.runtime.NativeExecutionQuery;
@@ -102,6 +103,11 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
   
   public IncidentQuery createIncidentQuery() {
     return new IncidentQueryImpl(commandExecutor);
+  }
+  
+
+  public EventSubscriptionQuery createEventSubscriptionQuery() {
+    return new EventSubscriptionQueryImpl(commandExecutor);
   }
   
   public Map<String, Object> getVariables(String executionId) {
@@ -199,7 +205,7 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
     return commandExecutor.execute(new FindActiveActivityIdsCmd(executionId));
   }
   
-  public ActivityInstance getProcessInstance(String processInstanceId) {
+  public ActivityInstance getActivityInstance(String processInstanceId) {
     return commandExecutor.execute(new GetActivityInstanceCmd(processInstanceId));
   }
 

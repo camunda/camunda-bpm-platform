@@ -130,8 +130,10 @@ public class FullHistoryTest extends ResourceProcessEngineTestCase {
     historicVariableUpdate = (HistoricVariableUpdate) historicDetails.get(5);
     assertEquals("zVar1", historicVariableUpdate.getVariableName());
     assertEquals("Event: start", historicVariableUpdate.getValue());
-    assertEquals(0, historicVariableUpdate.getRevision());
-    assertEquals(historicStartEvent.getId(), historicVariableUpdate.getActivityInstanceId());
+    assertEquals(0, historicVariableUpdate.getRevision());    
+    // at the time the execution listener is invoked, the activity instance for the start event 
+    // does not yet exist. -> null
+    assertEquals(null, historicVariableUpdate.getActivityInstanceId());
     
     // Variable set from transition take execution listener
     historicVariableUpdate = (HistoricVariableUpdate) historicDetails.get(6);

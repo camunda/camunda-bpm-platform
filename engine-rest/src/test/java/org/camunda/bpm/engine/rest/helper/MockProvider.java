@@ -28,6 +28,7 @@ import org.camunda.bpm.engine.management.ActivityStatistics;
 import org.camunda.bpm.engine.management.IncidentStatistics;
 import org.camunda.bpm.engine.management.ProcessDefinitionStatistics;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.DelegationState;
@@ -86,6 +87,12 @@ public abstract class MockProvider {
   // execution
   public static final String EXAMPLE_EXECUTION_ID = "anExecutionId";
   public static final boolean EXAMPLE_EXECUTION_IS_ENDED = false;
+  
+  // event subscription
+  public static final String EXAMPLE_EVENT_SUBSCRIPTION_ID = "anEventSubscriptionId";
+  public static final String EXAMPLE_EVENT_SUBSCRIPTION_TYPE = "message";
+  public static final String EXAMPLE_EVENT_SUBSCRIPTION_NAME = "anEvent";
+  public static final String EXAMPLE_EVENT_SUBSCRIPTION_CREATION_DATE = "2013-01-23T13:59:43";
   
   // process definition
   public static final String EXAMPLE_PROCESS_DEFINITION_ID = "aProcDefId";
@@ -209,6 +216,20 @@ public abstract class MockProvider {
     when(mock.getId()).thenReturn(EXAMPLE_EXECUTION_ID);
     when(mock.getProcessInstanceId()).thenReturn(EXAMPLE_PROCESS_INSTANCE_ID);
     when(mock.isEnded()).thenReturn(EXAMPLE_EXECUTION_IS_ENDED);
+    
+    return mock;
+  }
+  
+  public static EventSubscription createMockEventSubscription() {
+    EventSubscription mock = mock(EventSubscription.class);
+    
+    when(mock.getId()).thenReturn(EXAMPLE_EVENT_SUBSCRIPTION_ID);
+    when(mock.getEventType()).thenReturn(EXAMPLE_EVENT_SUBSCRIPTION_TYPE);
+    when(mock.getEventName()).thenReturn(EXAMPLE_EVENT_SUBSCRIPTION_NAME);
+    when(mock.getExecutionId()).thenReturn(EXAMPLE_EXECUTION_ID);
+    when(mock.getProcessInstanceId()).thenReturn(EXAMPLE_PROCESS_INSTANCE_ID);
+    when(mock.getActivityId()).thenReturn(EXAMPLE_ACTIVITY_ID);
+    when(mock.getCreated()).thenReturn(DateTime.parse(EXAMPLE_EVENT_SUBSCRIPTION_CREATION_DATE).toDate());
     
     return mock;
   }

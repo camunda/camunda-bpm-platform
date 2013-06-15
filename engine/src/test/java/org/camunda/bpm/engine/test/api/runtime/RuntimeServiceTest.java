@@ -29,10 +29,12 @@ import org.camunda.bpm.engine.impl.persistence.entity.HistoricDetailVariableInst
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.CollectionUtil;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
+import org.junit.rules.ExpectedException;
 
 
 /**
@@ -859,5 +861,51 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
       runtimeService.startProcessInstanceByKey("catchPanicMessage");      
     }
   }
+  
+  // getActivityInstance Tests //////////////////////////////////
+  
+  public void testActivityInstanceForNonExistingProcessInstanceId() {
+    assertNull(runtimeService.getActivityInstance("some-nonexisting-id"));
+  }
+  
+  public void testActivityInstanceForNullProcessInstanceId() {
+    try {
+      runtimeService.getActivityInstance(null);
+      fail("PEE expected!");
+    } catch (ProcessEngineException engineException) {
+      assertTrue(engineException.getMessage().contains("processInstanceId cannot be null"));
+    }
+  }
+  
+  @Deployment(resources={
+  "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void testActivityInstancePopulated() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", "business-key");
+    
+    // validate properties of root
+    ActivityInstance rootActInstance = runtimeService.getActivityInstance(processInstance.getId());
+    assertEquals(processInstance.getId(), rootActInstance.getProcessInstanceId());
+    assertEquals(processInstance.getProcessDefinitionId(), rootActInstance.getProcessDefinitionId());
+    assertEquals(processInstance.getId(), rootActInstance.getProcessInstanceId());    
+    assertTrue(rootActInstance.getExecutionIds()[0].equals(processInstance.getId()));
+    assertEquals(rootActInstance.getProcessDefinitionId(), rootActInstance.getActivityId());
+    assertNull(rootActInstance.getParentActivityInstanceId());
+    
+    // validate properties of child:
+    Task task = taskService.createTaskQuery().singleResult();
+    ActivityInstance childActivityInstance = rootActInstance.getChildActivityInstances()[0];
+    assertEquals(processInstance.getId(), childActivityInstance.getProcessInstanceId());
+    assertEquals(processInstance.getProcessDefinitionId(), childActivityInstance.getProcessDefinitionId());
+    assertEquals(processInstance.getId(), childActivityInstance.getProcessInstanceId());    
+    assertTrue(childActivityInstance.getExecutionIds()[0].equals(task.getExecutionId()));
+    assertEquals("theTask", childActivityInstance.getActivityId());
+    assertEquals(rootActInstance.getId(), childActivityInstance.getParentActivityInstanceId());
+    assertNotNull(childActivityInstance.getChildActivityInstances());
+    assertNotNull(childActivityInstance.getChildTransitionInstances());
+    assertEquals(0, childActivityInstance.getChildActivityInstances().length);
+    assertEquals(0, childActivityInstance.getChildTransitionInstances().length);
+       
+  }  
+  
    
 }

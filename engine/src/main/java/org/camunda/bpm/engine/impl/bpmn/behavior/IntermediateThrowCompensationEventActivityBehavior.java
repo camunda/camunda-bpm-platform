@@ -20,7 +20,6 @@ import org.camunda.bpm.engine.impl.bpmn.parser.CompensateEventDefinition;
 import org.camunda.bpm.engine.impl.persistence.entity.CompensateEventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
-import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 
 
 /**
@@ -38,7 +37,7 @@ public class IntermediateThrowCompensationEventActivityBehavior extends FlowNode
   public void execute(ActivityExecution execution) throws Exception {
     final String activityRef = compensateEventDefinition.getActivityRef();
             
-    ExecutionEntity scopeExecution = ScopeUtil.findScopeExecutionForScope((ExecutionEntity)execution, (ActivityImpl)execution.getActivity());
+    ExecutionEntity scopeExecution = (ExecutionEntity) (execution.isConcurrent() && !execution.isScope() ? execution.getParent() : execution);
     
     List<CompensateEventSubscriptionEntity> eventSubscriptions;
     
