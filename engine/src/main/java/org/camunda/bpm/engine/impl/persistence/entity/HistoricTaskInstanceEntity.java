@@ -70,7 +70,7 @@ public class HistoricTaskInstanceEntity extends HistoricScopeInstanceEntity impl
   @Override
   public Long getDurationInMillis() {
     if(isEnded()) {      
-      return durationInMillis;
+      return getDurationInMillis();
       
     } else {
       return null;

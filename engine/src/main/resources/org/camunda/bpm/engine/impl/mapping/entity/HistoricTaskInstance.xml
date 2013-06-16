@@ -102,7 +102,6 @@
     <result property="assignee" column="ASSIGNEE_" jdbcType="VARCHAR" />
     <result property="startTime" column="START_TIME_" jdbcType="TIMESTAMP" />
     <result property="endTime" column="END_TIME_" jdbcType="TIMESTAMP" />
-    <result property="durationInMillis" column="DURATION_" jdbcType="BIGINT" />
     <result property="deleteReason" column="DELETE_REASON_" jdbcType="VARCHAR" />
     <result property="taskDefinitionKey" column="TASK_DEF_KEY_" jdbcType="VARCHAR" />
     <result property="priority" column="PRIORITY_" jdbcType="INTEGER" />
@@ -125,7 +124,6 @@
       T2.ASSIGNEE_ as ASSIGNEE_,
       T1.TIMESTAMP_ as START_TIME_,
       T2.TIMESTAMP_ as END_TIME_,
-      DATEDIFF(ms, T1.TIMESTAMP_ , T2.TIMESTAMP_ ) as DURATION_,
       T2.DELETE_REASON_ as DELETE_REASON_,
       T2.TASK_DEF_KEY_ as TASK_DEF_KEY_,
       T2.PRIORITY_ as PRIORITY_,
@@ -169,7 +167,6 @@
       T2.ASSIGNEE_ as ASSIGNEE_,
       T1.TIMESTAMP_ as START_TIME_,
       T2.TIMESTAMP_ as END_TIME_,
-      DATEDIFF(ms, T1.TIMESTAMP_ , T2.TIMESTAMP_ ) as DURATION_,
       T2.DELETE_REASON_ as DELETE_REASON_,
       T2.TASK_DEF_KEY_ as TASK_DEF_KEY_,
       T2.PRIORITY_ as PRIORITY_,

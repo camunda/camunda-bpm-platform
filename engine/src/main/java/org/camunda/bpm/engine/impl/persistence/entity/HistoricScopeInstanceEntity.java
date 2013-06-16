@@ -31,7 +31,6 @@ public abstract class HistoricScopeInstanceEntity implements PersistentObject, S
   protected String processDefinitionId;
   protected Date startTime;
   protected Date endTime;
-  protected Long durationInMillis;
   protected String deleteReason;
 
   // getters and setters //////////////////////////////////////////////////////
@@ -49,7 +48,11 @@ public abstract class HistoricScopeInstanceEntity implements PersistentObject, S
     return endTime;
   }
   public Long getDurationInMillis() {
-    return durationInMillis;
+    if(endTime == null) {
+      return 0L;
+    } else {
+      return endTime.getTime() - startTime.getTime();
+    }
   }
   public String getId() {
     return id;
@@ -68,9 +71,6 @@ public abstract class HistoricScopeInstanceEntity implements PersistentObject, S
   }
   public void setEndTime(Date endTime) {
     this.endTime = endTime;
-  }
-  public void setDurationInMillis(Long durationInMillis) {
-    this.durationInMillis = durationInMillis;
   }
   public String getDeleteReason() {
     return deleteReason;
