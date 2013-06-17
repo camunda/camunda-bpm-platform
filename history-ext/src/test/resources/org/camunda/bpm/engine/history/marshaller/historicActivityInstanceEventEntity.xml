@@ -1,0 +1,13 @@
+<org.camunda.bpm.engine.impl.history.event.HistoricActivityInstanceEventEntity>
+  <id>TEST_ID</id>
+  <processInstanceId>TEST_PROCESSINSTANCE_ID</processInstanceId>
+  <executionId>TEST_EXECUTION_ID</executionId>
+  <processDefinitionId>TEST_PROCESSDEFINITION_ID</processDefinitionId>
+  <timestamp>2013-06-04 17:15:26.674 UTC</timestamp>
+  <activityId>TEST_ACTIVITY_ID</activityId>
+  <activityName>TEST_ACTIVITY_NAME</activityName>
+  <activityType>TEST_ACTIVITY_TYPE</activityType>
+  <activityInstanceId>TEST_ACTIVITY_ID</activityInstanceId>
+  <parentActivityInstanceId>TEST_PARENT_ACTIVITY_INSTANCE_ID</parentActivityInstanceId>
+  <eventType>TEST_EVENT_TYPE</eventType>
+</org.camunda.bpm.engine.impl.history.event.HistoricActivityInstanceEventEntity>
