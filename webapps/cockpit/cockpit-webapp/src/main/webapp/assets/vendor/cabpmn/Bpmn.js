@@ -74,6 +74,54 @@ define(["bpmn/Transformer", "bpmn/Renderer", "dojo/request", "dojo/Deferred", "d
     return this;
   };
 
+  Bpmn.prototype.annotation = function (id) {
+    var element = query(".bpmnElement" + "#"+id)[0];
+    if (!element) {
+      throw new Error("Element " + id + " does not exist.");
+    }
+
+    function addClasses(el, classes) {
+      domClass.add(el, (classes || []).join(" "));
+    };
+
+    return {
+      /**
+       * adds child annotation div bpmn element div
+       * @param innerHTML the inner html of the new annotation
+       * @param classesArray classes of the new annotation
+       * @returns the DOM element of the new annoation
+       */
+      addDiv : function (innerHTML, classesArray) {
+        var newElement = domConstruct.create("div", {
+          innerHTML: innerHTML
+        }, element);
+        addClasses(newElement, classesArray);
+        return newElement;
+      },
+      /**
+       * sets the html of the bpmn element div
+       * @param html
+       * @returns the annotation builder object
+       */
+      setHtml : function (html) {
+        element.innerHTML = html;
+        return this;
+      },
+      /**
+       * adds classes to the bpmn element div
+       * @param classesArray
+       * @returns {*}
+       */
+      addClasses : function (classesArray) {
+        addClasses(element, classesArray);
+        return this;
+      }
+    };
+  };
+
+  /**
+   * @deprecated use Bpmn.prototype.annotation instead
+   */
   Bpmn.prototype.annotate = function (id, innerHTML, classesArray) {
     var element = query(".bpmnElement" + "#"+id)[0];
     if (!element) {
@@ -83,6 +131,7 @@ define(["bpmn/Transformer", "bpmn/Renderer", "dojo/request", "dojo/Deferred", "d
     element.innerHTML = innerHTML;
 
     domClass.add(element, (classesArray || []).join(" "));
+    return element;
   };
 
   Bpmn.prototype.clearAnnotations = function (id, classesArray) {

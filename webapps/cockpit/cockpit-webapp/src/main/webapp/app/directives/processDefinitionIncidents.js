@@ -5,31 +5,34 @@ ngDefine('cockpit.directives', [ 'angular' ], function(module, angular) {
   var Directive = function (ProcessDefinitionResource) {
     return {
       restrict: 'AC',
-      require: 'processDiagram', 
+      require: 'processDiagram',
       link: function(scope, element, attrs, processDiagram) {
         
-        scope.$watch(attrs['processDefinitionId'], function (newValue) {
-          processDiagram.annotateWithActivityStatistics(null);
-          getActivityStatistics(newValue);
+        scope.$watch(attrs['processDefinitionId'], function(newValue) {
+          if (newValue) {
+            annotateProcessDiagram(newValue);
+          }
         });
         
-        function getActivityStatistics(processDefinitionId) {
+        function annotateProcessDiagram(processDefinitionId) {
           ProcessDefinitionResource
           .queryActivityStatistics(
               {
-                id : processDefinitionId
+                id : processDefinitionId,
+                incidents: true
               })
               .$then(function(result) {
-                processDiagram.annotateWithActivityStatistics(result.data);
+                processDiagram.annotateWithIncidents(result.data);
               });
-        }
+        };
+        
       }
     };
   };
   
   Directive.$inject = [ 'ProcessDefinitionResource' ];
-   
+  
   module
-    .directive('activityStatistics', Directive);
+    .directive('processDefinitionIncidents', Directive);
   
 });

@@ -205,13 +205,18 @@ define([], function () {
     };
 
     function transformLaneSet(laneSetElement, scope, bpmnDiElementIndex) {
+      if (laneSetElement.childNodes.length == 0) {
+        return;
+      }
+
       // TODO not creating a seperate bpmn object for the lane set, adding lanes to the process directly
       var element = laneSetElement.firstChild;
+
       do {
         var elementType = element.nodeName;
         if (elementType == "lane") {
-          createBpmnObject(element, scope, bpmnDiElementIndex);
         }
+        createBpmnObject(element, scope, bpmnDiElementIndex);
       }
       while (element = element.nextSibling)
     };
