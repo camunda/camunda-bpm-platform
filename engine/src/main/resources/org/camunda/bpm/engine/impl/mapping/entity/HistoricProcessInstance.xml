@@ -115,6 +115,8 @@
     <result property="endTime" column="END_TIME_" jdbcType="TIMESTAMP" />
     <result property="endActivityId" column="END_ACT_ID_" jdbcType="VARCHAR" />
 
+    <!-- calculated -->
+    <result property="durationInMillis" column="DURATION_" jdbcType="BIGINT" />
   </resultMap>
   
   <!-- aggregates HPIE by  -->
@@ -126,6 +128,7 @@
        P1.PROC_DEF_ID_ as PROC_DEF_ID_ ,
        P1.TIMESTAMP_ as START_TIME_,
        P2.TIMESTAMP_ as END_TIME_,
+       DATEDIFF(ms, P1.TIMESTAMP_ , P2.TIMESTAMP_ ) as DURATION_,
        P1.START_USER_ID_ as START_USER_ID_ ,
        P1.ACT_ID_ as START_ACT_ID_,
        P2.ACT_ID_ as END_ACT_ID_,
@@ -165,6 +168,7 @@
     P1.PROC_DEF_ID_ as PROC_DEF_ID_ ,
     P1.TIMESTAMP_ as START_TIME_,
     P2.TIMESTAMP_ as END_TIME_,
+    DATEDIFF(ms, P1.TIMESTAMP_ , P2.TIMESTAMP_ ) as DURATION_,
     P1.START_USER_ID_ as START_USER_ID_ ,
     P1.ACT_ID_ as START_ACT_ID_,
     P2.ACT_ID_ as END_ACT_ID_,

@@ -122,6 +122,7 @@
     <result property="assignee" column="ASSIGNEE_" jdbcType="VARCHAR" />
     <result property="startTime" column="START_TIME_" jdbcType="TIMESTAMP" />
     <result property="endTime" column="END_TIME_" jdbcType="TIMESTAMP" />
+    <result property="durationInMillis" column="DURATION_" jdbcType="BIGINT" />
   </resultMap>
   
   <select id="selectHistoricActivityInstance" resultMap="historicActivityInstanceResultMap">
@@ -139,6 +140,7 @@
       A3.ASSIGNEE_ as ASSIGNEE_,
       A1.TIMESTAMP_ as START_TIME_,
       A2.TIMESTAMP_ as END_TIME_,
+      DATEDIFF(ms, A1.TIMESTAMP_ , A2.TIMESTAMP_ ) as DURATION_
     FROM
       ${prefix}ACT_HI_ACTINST A1
     LEFT JOIN 
@@ -192,6 +194,7 @@
       A3.ASSIGNEE_ as ASSIGNEE_,
       A1.TIMESTAMP_ as START_TIME_,
       A2.TIMESTAMP_ as END_TIME_,
+      DATEDIFF(ms, A1.TIMESTAMP_ , A2.TIMESTAMP_ ) as DURATION_
     
     <include refid="selectHistoricActivityInstancesByQueryCriteriaSql"/>
     
