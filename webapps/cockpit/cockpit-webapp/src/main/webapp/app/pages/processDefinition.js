@@ -18,7 +18,7 @@ define(["angular"], function(angular, BpmnRender) {
       return;
     }
 
-    $scope.processInstanceTable = Views.getProvider({ component: 'cockpit.process.instances'});
+    $scope.processInstanceTable = Views.getProvider({ component: 'cockpit.processDefinition.instancesTable' });
 
     $scope.processDefinitionId = $routeParams.processDefinitionId;
 
