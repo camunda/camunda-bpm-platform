@@ -4,10 +4,22 @@
 
     <div hide-panel></div>
 
+    <div ng-show="activityInstances.length">
+
+    </div>
   </div>
 
   <div class="right-panel" fill-width fill-height style="overflow: auto;">
     <div process-diagram process-definition-id="processDefinitionId" activity-instances="activityInstances" />
-  </div>
 
+    <div ng-show="processInstanceViews.length">
+      <ul class="nav nav-tabs">
+        <li ng-class="{ active: selectedView == viewProvider }" ng-repeat="viewProvider in processInstanceViews">
+          <a href ng-click="selectView(viewProvider)">{{ viewProvider.label }}</a>
+        </li>
+      </ul>
+
+      <view provider="selectedView" vars="processInstanceVars" />
+    </div>
+  </div>
 </div>

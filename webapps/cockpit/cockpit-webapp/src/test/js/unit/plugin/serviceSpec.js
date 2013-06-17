@@ -73,6 +73,38 @@ define([ 'cockpit-plugin', 'angular', 'camunda-common/services/uri' ], function(
 
         });
       });
+
+      it('filters', function() {
+
+        var viewProvider1 = {
+          id: 'viewProvider1'
+        };
+
+        var viewProvider2 = {
+          id: 'viewProvider2'
+        };
+
+        var sampleModule = angular.module('my-module', [ 'cockpit.plugin', 'camunda.common.services' ]);
+        sampleModule.config(function(ViewsProvider) {
+          expect(ViewsProvider).toBeDefined();
+
+          ViewsProvider.registerDefaultView('some-view', viewProvider1);
+          ViewsProvider.registerDefaultView('some-view', viewProvider2);
+        });
+
+        // bootstrap module
+        module('my-module');
+
+        inject(function(Views) {
+
+          var provider1 = Views.getProvider({ component: 'some-view', id: 'viewProvider1' });
+          expect(provider1).toBe(viewProvider1);
+
+          var provider2 = Views.getProvider({ component: 'some-view', id: 'viewProvider2' });
+          expect(provider2).toBe(viewProvider2);
+
+        });
+      });
     });
   });
 });

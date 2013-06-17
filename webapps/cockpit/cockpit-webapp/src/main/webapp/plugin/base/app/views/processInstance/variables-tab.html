@@ -1,0 +1,25 @@
+<table>
+  <tr>
+    <th>Name</th>
+    <th>Value</th>
+    <th>Type</th>
+  </tr>
+
+  <tr ng-repeat="variable in variables">
+    <td>
+      {{ variable.name }}
+    </td>
+    <td>
+      {{ variable.value }}
+    </td>
+    <td>
+      {{ variable.type }}
+    </td>
+  </tr>
+
+  <tr ng-hide="variables.length">
+    <td  colspan="3">
+      No process variables
+    </td>
+  </tr>
+</table>
