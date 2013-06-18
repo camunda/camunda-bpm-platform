@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.impl.history.event;
 
+import java.util.Date;
+
 /**
  * <p>{@link HistoryEvent} signifying a top-level event in a process instance.</p>
  * 
@@ -22,9 +24,6 @@ package org.camunda.bpm.engine.impl.history.event;
 public class HistoricProcessInstanceEventEntity extends HistoryEvent {
 
   private static final long serialVersionUID = 1L;
-
-  /** the id of the activity that starts or ends the process */
-  protected String activityId;
 
   /** the business key of the process instance */
   protected String businessKey;
@@ -38,14 +37,63 @@ public class HistoricProcessInstanceEventEntity extends HistoryEvent {
   /** the reason why this process instance was cancelled (deleted) */
   protected String deleteReason;
 
+  /** duration in millis */
+  protected Long durationInMillis;
+  
+  protected Date startTime;
+  
+  protected Date endTime;
+  
+  /** id of the activity which started the process instance */
+  protected String endActivityId;
+  
+  /** id of the activity which ended the process instance */
+  protected String startActivityId;
+
   // getters / setters ////////////////////////////////////////
 
-  public String getActivityId() {
-    return activityId;
+  public Long getDurationInMillis() {
+    return durationInMillis;
   }
-  
-  public void setActivityId(String activityId) {
-    this.activityId = activityId;
+
+  public void setDurationInMillis(Long durationInMillis) {
+    this.durationInMillis = durationInMillis;
+  }
+
+  public Date getStartTime() {
+    return startTime;
+  }
+
+  public void setStartTime(Date startTime) {
+    this.startTime = startTime;
+  }
+
+  public Date getEndTime() {
+    return endTime;
+  }
+
+  public void setEndTime(Date endTime) {
+    this.endTime = endTime;
+    
+    if(startTime != null) {
+      durationInMillis = endTime.getTime() - startTime.getTime();
+    }
+  }
+
+  public String getEndActivityId() {
+    return endActivityId;
+  }
+
+  public void setEndActivityId(String endActivityId) {
+    this.endActivityId = endActivityId;
+  }
+
+  public String getStartActivityId() {
+    return startActivityId;
+  }
+
+  public void setStartActivityId(String startActivityId) {
+    this.startActivityId = startActivityId;
   }
 
   public String getBusinessKey() {

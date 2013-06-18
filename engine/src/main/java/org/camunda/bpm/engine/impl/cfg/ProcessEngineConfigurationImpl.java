@@ -91,6 +91,7 @@ import org.camunda.bpm.engine.impl.form.StringFormType;
 import org.camunda.bpm.engine.impl.history.handler.DbHistoryEventHandler;
 import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
 import org.camunda.bpm.engine.impl.history.parser.HistoryParseListener;
+import org.camunda.bpm.engine.impl.history.producer.CacheAwareHistoryEventProducer;
 import org.camunda.bpm.engine.impl.history.producer.DefaultHistoryEventProducer;
 import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
 import org.camunda.bpm.engine.impl.incident.FailedJobIncidentHandler;
@@ -841,27 +842,27 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   
   protected void initIdGenerator() {
     if (idGenerator==null) {
-//      CommandExecutor idGeneratorCommandExecutor = null;
-//      if (idGeneratorDataSource!=null) {
-//        ProcessEngineConfigurationImpl processEngineConfiguration = new StandaloneProcessEngineConfiguration();
-//        processEngineConfiguration.setDataSource(idGeneratorDataSource);
-//        processEngineConfiguration.setDatabaseSchemaUpdate(DB_SCHEMA_UPDATE_FALSE);
-//        processEngineConfiguration.init();
-//        idGeneratorCommandExecutor = processEngineConfiguration.getCommandExecutorTxRequiresNew();
-//      } else if (idGeneratorDataSourceJndiName!=null) {
-//        ProcessEngineConfigurationImpl processEngineConfiguration = new StandaloneProcessEngineConfiguration();
-//        processEngineConfiguration.setDataSourceJndiName(idGeneratorDataSourceJndiName);
-//        processEngineConfiguration.setDatabaseSchemaUpdate(DB_SCHEMA_UPDATE_FALSE);
-//        processEngineConfiguration.init();
-//        idGeneratorCommandExecutor = processEngineConfiguration.getCommandExecutorTxRequiresNew();
-//      } else {
-//        idGeneratorCommandExecutor = commandExecutorTxRequiresNew;
-//      }
-//      
-//      DbIdGenerator dbIdGenerator = new DbIdGenerator();
-//      dbIdGenerator.setIdBlockSize(idBlockSize);
-//      dbIdGenerator.setCommandExecutor(idGeneratorCommandExecutor);
-      idGenerator = new StrongUuidGenerator();
+      CommandExecutor idGeneratorCommandExecutor = null;
+      if (idGeneratorDataSource!=null) {
+        ProcessEngineConfigurationImpl processEngineConfiguration = new StandaloneProcessEngineConfiguration();
+        processEngineConfiguration.setDataSource(idGeneratorDataSource);
+        processEngineConfiguration.setDatabaseSchemaUpdate(DB_SCHEMA_UPDATE_FALSE);
+        processEngineConfiguration.init();
+        idGeneratorCommandExecutor = processEngineConfiguration.getCommandExecutorTxRequiresNew();
+      } else if (idGeneratorDataSourceJndiName!=null) {
+        ProcessEngineConfigurationImpl processEngineConfiguration = new StandaloneProcessEngineConfiguration();
+        processEngineConfiguration.setDataSourceJndiName(idGeneratorDataSourceJndiName);
+        processEngineConfiguration.setDatabaseSchemaUpdate(DB_SCHEMA_UPDATE_FALSE);
+        processEngineConfiguration.init();
+        idGeneratorCommandExecutor = processEngineConfiguration.getCommandExecutorTxRequiresNew();
+      } else {
+        idGeneratorCommandExecutor = commandExecutorTxRequiresNew;
+      }
+      
+      DbIdGenerator dbIdGenerator = new DbIdGenerator();
+      dbIdGenerator.setIdBlockSize(idBlockSize);
+      dbIdGenerator.setCommandExecutor(idGeneratorCommandExecutor);
+      idGenerator = dbIdGenerator;
     }
   }
 
@@ -1038,7 +1039,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   
   protected void initHistoryEventProducer() {
     if(historyEventProducer == null) {
-      historyEventProducer = new DefaultHistoryEventProducer();
+      historyEventProducer = new CacheAwareHistoryEventProducer();
     }
   }
   

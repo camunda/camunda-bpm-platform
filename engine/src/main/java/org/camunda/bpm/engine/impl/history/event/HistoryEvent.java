@@ -77,10 +77,7 @@ public class HistoryEvent implements Serializable, PersistentObject {
   
   /** the id of the process definition */
   protected String processDefinitionId;
-  
-  /** a timestamp taken at the moment in time this event happens */
-  protected Date timestamp;
-  
+    
   /**
    * The type of the activity audit event.
    * 
@@ -123,14 +120,6 @@ public class HistoryEvent implements Serializable, PersistentObject {
   
   public void setProcessDefinitionId(String processDefinitionId) {
     this.processDefinitionId = processDefinitionId;
-  }
-  
-  public Date getTimestamp() {
-    return timestamp;
-  }
-  
-  public void setTimestamp(Date timestamp) {
-    this.timestamp = timestamp;
   }
   
   public void setId(String id) {

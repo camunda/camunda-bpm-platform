@@ -36,17 +36,31 @@ public class DbHistoryEventHandler implements HistoryEventHandler {
     if (historyEvent instanceof HistoricVariableUpdateEventEntity) {
       insertHistoricVariableUpdateEntity((HistoricVariableUpdateEventEntity) historyEvent);
       
-    }else {
-      insert(historyEvent);
+    } else {
+      insertOrUpdate(historyEvent);
       
     }
 
   }
 
   /** general history event insert behavior */
-  protected void insert(HistoryEvent historyEvent) {
+  protected void insertOrUpdate(HistoryEvent historyEvent) {
+   
     DbSqlSession dbSqlSession = getDbSqlSession();
-    dbSqlSession.insert(historyEvent);
+    
+    String eventType = historyEvent.getEventType();
+    if(isInitialEvent(eventType)) {
+      dbSqlSession.insert(historyEvent);      
+    } else {
+      if(dbSqlSession.findInCache(historyEvent.getClass(), historyEvent.getId())==null) {
+        dbSqlSession.update(historyEvent);
+      }
+    }        
+  }
+
+  protected boolean isInitialEvent(String eventType) {
+    return HistoryEvent.ACTIVITY_EVENT_TYPE_START.equals(eventType) 
+        || HistoryEvent.TASK_EVENT_TYPE_CREATE.equals(eventType);
   }
 
   /** customized insert behavior for HistoricVariableUpdateEventEntity */

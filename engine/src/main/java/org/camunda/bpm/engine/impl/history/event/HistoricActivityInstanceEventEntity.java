@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.impl.history.event;
 
+import java.util.Date;
+
 /**
  * <p>{@link HistoryEvent} implementation for events that happen in an activity.</p>
  * 
@@ -43,8 +45,44 @@ public class HistoricActivityInstanceEventEntity extends HistoryEvent {
   
   protected String taskId;
   protected String taskAssignee;
-
-  // getters / setters ///////////////////////////////
+  
+  protected Long durationInMillis;
+  protected Date startTime;
+  protected Date endTime;
+  
+  // getters and setters //////////////////////////////////////////////////////
+ 
+  public Date getEndTime() {
+    return endTime;
+  }
+  
+  public void setEndTime(Date endTime) {
+    this.endTime = endTime;
+    
+    if(startTime != null) {
+      durationInMillis = endTime.getTime() - startTime.getTime();
+    }
+  }
+  
+  public Date getStartTime() {
+    return startTime;
+  }
+  
+  public void setStartTime(Date startTime) {
+    this.startTime = startTime;
+  }
+  
+  public String getAssignee() {
+    return taskAssignee;
+  }
+  
+  public Long getDurationInMillis() {
+    return durationInMillis;
+  }
+  
+  public void setDurationInMillis(Long durationInMillis) {
+    this.durationInMillis = durationInMillis;
+  }
 
   public String getActivityId() {
     return activityId;

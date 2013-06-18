@@ -59,8 +59,7 @@
   
   <select id="selectIncidentByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.IncidentQueryImpl" resultMap="incidentResultMap">
     ${limitBefore}
-    select ${limitBetween}
-    RES.*
+    select RES.* ${limitBetween}
     <include refid="selectIncidentByQueryCriteriaSql"/>
     ${orderBy}
     ${limitAfter}

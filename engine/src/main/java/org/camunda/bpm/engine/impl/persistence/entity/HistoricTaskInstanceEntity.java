@@ -13,128 +13,38 @@
 
 package org.camunda.bpm.engine.impl.persistence.entity;
 
-import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
-import org.camunda.bpm.engine.impl.db.PersistentObject;
-import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
+import org.camunda.bpm.engine.impl.history.event.HistoricTaskInstanceEventEntity;
 
 
 /**
  * @author Tom Baeyens
  */
-public class HistoricTaskInstanceEntity extends HistoricScopeInstanceEntity implements HistoricTaskInstance, PersistentObject {
+public class HistoricTaskInstanceEntity extends HistoricTaskInstanceEventEntity implements HistoricTaskInstance {
 
   private static final long serialVersionUID = 1L;
-  
-  protected String executionId;
-  protected String name;
-  protected String parentTaskId;
-  protected String description;
-  protected String owner;
-  protected String assignee;
-  protected String taskDefinitionKey;
-  protected int priority;
-  protected Date dueDate;
-  protected String lastEvent;
 
-  public HistoricTaskInstanceEntity() {
-  }
-  
-  // persistence //////////////////////////////////////////////////////////////
-  
-  public Object getPersistentState() {    
-    // immutable
-    return HistoricTaskInstanceEntity.class;
-  }
-  
-  // getters and setters //////////////////////////////////////////////////////
-  
-  /** custom endTime behavior: only return end time if 
-   * last history event closed the task instance.
-   */
-  @Override
-  public Date getEndTime() {
-    if(isEnded()) {      
-      return endTime;
-      
-    } else {
-      return null;
-      
+  public Object getPersistentState() {
+    Map<String, Object> persistentState = new HashMap<String, Object>();
+    persistentState.put("name", name);
+    persistentState.put("owner", owner);
+    persistentState.put("assignee", assignee);
+    persistentState.put("endTime", endTime);
+    persistentState.put("durationInMillis", durationInMillis);
+    persistentState.put("description", description);
+    persistentState.put("deleteReason", deleteReason);
+    persistentState.put("taskDefinitionKey", taskDefinitionKey);
+    persistentState.put("priority", priority);
+    if(parentTaskId != null) {
+      persistentState.put("parentTaskId", parentTaskId);
     }
+    if(dueDate != null) {
+      persistentState.put("dueDate", dueDate);
+    }
+    return persistentState;
   }
   
-  /** custom endTime behavior: only return duration time if 
-   * last history event closed the task instance.
-   */
-  @Override
-  public Long getDurationInMillis() {
-    if(isEnded()) {      
-      return durationInMillis;
-      
-    } else {
-      return null;
-      
-    }
-  }
-
-  protected boolean isEnded() {
-    return HistoryEvent.TASK_EVENT_TYPE_COMPLETE.equals(lastEvent)
-        || HistoryEvent.TASK_EVENT_TYPE_DELETE.equals(lastEvent);
-  }
-
-  public String getExecutionId() {
-    return executionId;
-  }
-  public void setExecutionId(String executionId) {
-    this.executionId = executionId;
-  }
-  public String getName() {
-    return name;
-  }
-  public void setName(String name) {
-    this.name = name;
-  }
-  public String getDescription() {
-    return description;
-  }
-  public void setDescription(String description) {
-    this.description = description;
-  }
-  public String getAssignee() {
-    return assignee;
-  }
-  public void setAssignee(String assignee) {
-    this.assignee = assignee;
-  }
-  public String getTaskDefinitionKey() {
-    return taskDefinitionKey;
-  }
-  public void setTaskDefinitionKey(String taskDefinitionKey) {
-    this.taskDefinitionKey = taskDefinitionKey;
-  }
-  public int getPriority() {
-    return priority;
-  }
-  public void setPriority(int priority) {
-    this.priority = priority;
-  }
-  public Date getDueDate() {
-    return dueDate;
-  }
-  public void setDueDate(Date dueDate) {
-    this.dueDate = dueDate;
-  }
-  public String getOwner() {
-    return owner;
-  }
-  public void setOwner(String owner) {
-    this.owner = owner;
-  }
-  public String getParentTaskId() {
-    return parentTaskId;
-  }
-  public void setParentTaskId(String parentTaskId) {
-    this.parentTaskId = parentTaskId;
-  }
 }
