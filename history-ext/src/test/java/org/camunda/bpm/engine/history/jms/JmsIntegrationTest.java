@@ -4,9 +4,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.activemq.ActiveMQConnectionFactory;
 import org.apache.activemq.command.ActiveMQQueue;
+import org.camunda.bpm.engine.history.EventBuilder;
 import org.camunda.bpm.engine.history.HistoryEventHandlerComposite;
 import org.camunda.bpm.engine.history.IncreaseCounterHandler;
-import org.camunda.bpm.engine.history.marshaller.EventBuilder;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
 import org.junit.Assert;

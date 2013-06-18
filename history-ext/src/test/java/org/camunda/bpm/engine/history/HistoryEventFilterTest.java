@@ -3,7 +3,6 @@ package org.camunda.bpm.engine.history;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.camunda.bpm.engine.history.marshaller.EventBuilder;
 import org.camunda.bpm.engine.impl.history.event.HistoricActivityInstanceEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.junit.Assert;
@@ -18,6 +17,7 @@ public class HistoryEventFilterTest {
 
   @Test
   public void defaultHistoryFilter() {
+
     List<Class<?>> clazzez = new ArrayList<Class<?>>();
     clazzez.add(HistoricActivityInstanceEventEntity.class);
     HistoryEventFilter filter = new HistoryEventTypeFilter(clazzez);
@@ -26,6 +26,7 @@ public class HistoryEventFilterTest {
 
   @Test
   public void negatedHistoryFilter() {
+
     List<Class<?>> clazzez = new ArrayList<Class<?>>();
     clazzez.add(HistoricActivityInstanceEventEntity.class);
     clazzez.add(HistoryEvent.class);

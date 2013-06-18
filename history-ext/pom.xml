@@ -7,8 +7,8 @@
   </parent>
   <artifactId>history-ext</artifactId>
   <properties>
-    <!-- <spring.version>3.2.3.RELEASE</spring.version> -->
-    <spring.version>3.1.2.RELEASE</spring.version>
+    <spring.version>3.2.3.RELEASE</spring.version>
+    <!-- <spring.version>3.1.2.RELEASE</spring.version> -->
     <!-- <spring.integration.version>2.2.3.RELEASE</spring.integration.version> -->
     <activemq.version>5.8.0</activemq.version>
     <guava.version>14.0.1</guava.version>

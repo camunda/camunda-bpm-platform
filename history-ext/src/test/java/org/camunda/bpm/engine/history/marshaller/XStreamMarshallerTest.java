@@ -1,5 +1,6 @@
 package org.camunda.bpm.engine.history.marshaller;
 
+import org.camunda.bpm.engine.history.EventBuilder;
 import org.camunda.bpm.engine.impl.history.event.HistoricActivityInstanceEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
