@@ -21,7 +21,7 @@ ngDefine('cockpit.directives', [ 'angular' ], function(module, angular) {
                 id : processInstanceId,
               })
               .$then(function(data) {
-                var activities = [];
+                var activities = {};
                 angular.forEach(data.data, function (incident) {
                   var activity = activities[incident.activityId];
                   if (!activity) {

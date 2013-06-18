@@ -132,7 +132,7 @@ ngDefine('cockpit.directives', [
 
     function annotate() {
       if (bpmnRenderer) {
-
+        
         if (activityStatistics) {
           doAnnotateWithActivityStatistics(activityStatistics);
           // set to null, so that the number will not set twice
@@ -142,6 +142,7 @@ ngDefine('cockpit.directives', [
           // set to null, so that the number will not set twice
           activityInstances = null;
         }
+        
         if (activitiesWithIncidents) {
           doAnnotateWithIncidents(activitiesWithIncidents);
           // set to null, so that the incidents will not set twice
@@ -209,22 +210,34 @@ ngDefine('cockpit.directives', [
     }
     
     function executeAnnotation(activityId, innerHtml) {
-      // Select corresponding div for activityId
-      var activity = $('#' + $element.attr('id') + ' > #' + activityId);
-      if (activity) {
-        // get innerHTML of activity (i.e. div)
-        var html = activity.html();
-        if (html) {
-          // If there exists an innerHTML then get the div as element
-          // and append the the assigned 'innerHtml'
-          var badgeElement = $("#" + activityId + ' > .badgePosition');
-          badgeElement.append(innerHtml);
+      var badge = $('#' + $element.attr('id') + ' > #' + activityId + ' > .badgePosition');
+      if (badge.length > 0) {
+        var importantBadge = $('#' + $element.attr('id') + ' > #' + activityId + ' > .badgePosition > .badge-important');
+        if (importantBadge.length > 0) {
+          badge.prepend(innerHtml);
         } else {
-          // If there does not exist an innerHTML then add a new div to the 
-          // activity div via bpmnRenderer.
-          bpmnRenderer.annotation(activityId).addDiv(innerHtml, ['badgePosition']);
+          badge.append(innerHtml);
         }
+      } else {
+        bpmnRenderer.annotation(activityId).addDiv(innerHtml, ['badgePosition']);
       }
+      
+      // Select corresponding div for activityId
+//      var activity = $('#' + $element.attr('id') + ' > #' + activityId);
+//      if (activity) {
+//        // get innerHTML of activity (i.e. div)
+//        var html = activity.html();
+//        if (html) {
+//          // If there exists an innerHTML then get the div as element
+//          // and append the the assigned 'innerHtml'
+//          var badgeElement = $("#" + activityId + ' > .badgePosition');
+//          badgeElement.append(innerHtml);
+//        } else {
+//          // If there does not exist an innerHTML then add a new div to the 
+//          // activity div via bpmnRenderer.
+//          bpmnRenderer.annotation(activityId).addDiv(innerHtml, ['badgePosition']);
+//        }
+//      }
     }
 
     this.getRenderer = function () {
