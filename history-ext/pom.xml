@@ -17,6 +17,7 @@
 		<junit.version>4.11</junit.version>
 		<mockito.version>1.9.5</mockito.version>
 		<xstream.version>1.4.4</xstream.version>
+        <jackson.core.version>2.2.2</jackson.core.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -24,6 +25,21 @@
 			<artifactId>camunda-engine</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+        <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-core</artifactId>
+      <version>${jackson.core.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.core</groupId>
+      <artifactId>jackson-databind</artifactId>
+      <version>${jackson.core.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.fasterxml.jackson.module</groupId>
+  <artifactId>jackson-module-jaxb-annotations</artifactId>
+  <version>${jackson.core.version}</version>
+    </dependency>
 		<dependency>
 			<groupId>cglib</groupId>
 			<artifactId>cglib</artifactId>

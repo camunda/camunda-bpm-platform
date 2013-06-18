@@ -11,28 +11,46 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 
 /**
- * Dispatches the {@link HistoryEvent}s through all registered {@link HistoryEventHandler}s.
- *
- * @author  jbellmann
+ * Dispatches the {@link HistoryEvent}s through all registered
+ * {@link HistoryEventHandler}s.
+ * 
+ * @author jbellmann
  */
 public class HistoryEventHandlerComposite implements HistoryEventHandler {
 
-    private List<HistoryEventHandler> eventHandlerList = Lists.newLinkedList();
+  private List<HistoryEventHandler> eventHandlerList = Lists.newLinkedList();
+  private HistoryEventFilter historyEventFilter = new DefaultPassHistoryEventFilter();
 
-    public HistoryEventHandlerComposite(final List<HistoryEventHandler> historyEventHandlers) {
-        Preconditions.checkNotNull(historyEventHandlers, "List of HistoryEventHandler should never be null");
-        this.eventHandlerList.addAll(Lists.newArrayList(Iterables.filter(historyEventHandlers, Predicates.notNull())));
+  public HistoryEventHandlerComposite(final List<HistoryEventHandler> historyEventHandlers) {
+
+    Preconditions.checkNotNull(historyEventHandlers, "List of HistoryEventHandler should never be null");
+    this.eventHandlerList.addAll(Lists.newArrayList(Iterables.filter(historyEventHandlers, Predicates.notNull())));
+  }
+
+  public void setHistoryEventHandlers(final List<HistoryEventHandler> historyEventHandlers) {
+
+    Preconditions.checkNotNull(historyEventHandlers, "List of HistoryEventHandler should never be null");
+    this.eventHandlerList = Lists.newArrayList(Iterables.filter(historyEventHandlers, Predicates.notNull()));
+  }
+
+  public void setHistoryEventFilter(HistoryEventFilter historyEventFilter) {
+
+    Preconditions.checkNotNull(historyEventFilter, "HistoryEventFilter should never be null");
+    this.historyEventFilter = historyEventFilter;
+  }
+
+  public void handleEvent(final HistoryEvent historyEvent) {
+
+    if (passEventsToListener(historyEvent)) {
+
+      for (HistoryEventHandler handler : this.eventHandlerList) {
+        handler.handleEvent(historyEvent);
+      }
     }
+  }
 
-    public void setHistoryEventHandlers(final List<HistoryEventHandler> historyEventHandlers) {
-        Preconditions.checkNotNull(historyEventHandlers, "List of HistoryEventHandler should never be null");
-        this.eventHandlerList = Lists.newArrayList(Iterables.filter(historyEventHandlers, Predicates.notNull()));
-    }
+  protected boolean passEventsToListener(HistoryEvent historyEvent) {
 
-    public void handleEvent(final HistoryEvent historyEvent) {
-        for (HistoryEventHandler handler : this.eventHandlerList) {
-            handler.handleEvent(historyEvent);
-        }
-    }
-
+    return this.historyEventFilter.canPass(historyEvent);
+  }
 }
