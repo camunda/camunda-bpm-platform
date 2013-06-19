@@ -7,7 +7,7 @@
   var pluginPackages = window.PLUGIN_PACKAGES || [];
 
   require({
-    baseUrl: '../',
+    baseUrl: '../../',
     paths: {
       'ngDefine' : 'assets/vendor/requirejs-angular-define/ngDefine',
       'domReady' : 'assets/vendor/require/domReady',

@@ -3,12 +3,8 @@ package org.camunda.bpm.cockpit.impl.web.filter.engine;
 import java.io.IOException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.servlet.Filter;
 import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -21,9 +17,9 @@ import org.camunda.bpm.cockpit.impl.web.filter.AbstractTemplateFilter;
  */
 public class EnginesFilter extends AbstractTemplateFilter {
 
-  protected static final String COCKPIT_ROOT_PLACEHOLDER = "$COCKPIT_ROOT";
+  public static final String COCKPIT_ROOT_PLACEHOLDER = "$COCKPIT_ROOT";
 
-  protected static Pattern APPLICATION_BASE_PATTERN = Pattern.compile("/app/(?:(\\w+)/)?");
+  public static Pattern HTML_FILE_PATTERN = Pattern.compile("/app/(?:(\\w+)/(?:(|(.*\\.html))))?");
 
   @Override
   protected void applyFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
@@ -31,12 +27,14 @@ public class EnginesFilter extends AbstractTemplateFilter {
     String contextPath = request.getContextPath();
     String requestUri = request.getRequestURI().substring(contextPath.length());
 
-    Matcher applicationBaseMatcher = APPLICATION_BASE_PATTERN.matcher(requestUri);
+    Matcher applicationBaseMatcher = HTML_FILE_PATTERN.matcher(requestUri);
 
     if (applicationBaseMatcher.matches()) {
-      // access to base url, either /app/ or /app/{engineName}/
+      // access to base url, either /app/.* or /app/{engineName}/.*
 
       String engineName = applicationBaseMatcher.group(1);
+      String page = applicationBaseMatcher.group(2);
+
       if (engineName == null) {
 
         // access to /app/
@@ -48,17 +46,12 @@ public class EnginesFilter extends AbstractTemplateFilter {
         // internal forward to /app/
 
         // serve the index page
-        serveIndexPage(engineName, request, response);
+        servePage(engineName, page, request, response);
       }
     } else {
       // request to normal resource
       chain.doFilter(request, response);
     }
-  }
-
-  @Override
-  public void destroy() {
-
   }
 
   protected String getDefaultEngineName() {
@@ -74,5 +67,13 @@ public class EnginesFilter extends AbstractTemplateFilter {
     response.setContentType("text/html");
 
     response.getWriter().append(data);
+  }
+
+  private void servePage(String engineName, String page, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
+    if ("".equals(page) || "index.html".equals(page)) {
+      serveIndexPage(engineName, request, response);
+    } else {
+      request.getRequestDispatcher("/app/" + page).forward(request, response);
+    }
   }
 }

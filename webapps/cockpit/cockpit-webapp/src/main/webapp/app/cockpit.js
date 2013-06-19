@@ -41,7 +41,7 @@
 
       $scope.$watch('currentEngine', function(engine) {
         if (engine && current !== engine.name) {
-          $window.location.href = Uri.appUri("app://" + engine.name + "/");
+          $window.location.href = Uri.appUri("app://../" + engine.name + "/");
         }
       });
     }];
