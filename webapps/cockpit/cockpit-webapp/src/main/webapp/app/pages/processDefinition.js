@@ -17,7 +17,7 @@ ngDefine('cockpit.pages', [ 'angular' ], function(module, angular) {
 
   Controller.$inject = [ '$scope', 'Notifications', 'ProcessInstanceResource', 'Views', 'processDefinition' ];
 
-  var RouteConfig = function ($routeProvider) {
+  var RouteConfig = [ '$routeProvider', function($routeProvider) {
     $routeProvider.when('/process-definition/:processDefinitionId', {
       templateUrl: 'pages/process-definition.html',
       controller: Controller,
@@ -34,9 +34,7 @@ ngDefine('cockpit.pages', [ 'angular' ], function(module, angular) {
       },
       reloadOnSearch: false
     });
-  };
-
-  RouteConfig.$inject = ['$routeProvider'];
+  }];
 
   module
     .config(RouteConfig);
