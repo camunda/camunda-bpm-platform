@@ -40,6 +40,7 @@ import org.camunda.bpm.engine.test.Deployment;
 
 /**
  * @author Joram Barrez
+ * @author Bernd Ruecker
  */
 public class MultiInstanceTest extends PluggableProcessEngineTestCase {
   
@@ -271,7 +272,24 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
     assertEquals(0, taskService.createTaskQuery().count());
     assertProcessEnded(procId);
   }
-  
+
+  @Deployment(resources="org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testParallelUserTasksBasedOnCollection.bpmn20.xml")
+  public void testEmptyCollectionInMI() {
+    List<String> assigneeList = new ArrayList<String>();
+    String procId = runtimeService.startProcessInstanceByKey("miParallelUserTasksBasedOnCollection",
+          CollectionUtil.singletonMap("assigneeList", assigneeList)).getId();
+    
+    assertEquals(0, taskService.createTaskQuery().count());
+    assertProcessEnded(procId);
+    
+    List<HistoricActivityInstance> activities = historyService.createHistoricActivityInstanceQuery().processInstanceId(procId).orderByActivityId().asc().list();
+    assertEquals(3, activities.size());
+    // note that the multiple instance task is mentioned in the history once 
+    assertEquals("miTasks", activities.get(0).getActivityId());
+    assertEquals("theEnd", activities.get(1).getActivityId());
+    assertEquals("theStart", activities.get(2).getActivityId());
+  }
+
   @Deployment
   public void testParallelUserTasksCustomExtensions() {
     Map<String, Object> vars = new HashMap<String, Object>();
