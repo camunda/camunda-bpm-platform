@@ -10,10 +10,11 @@ ngDefine('cockpit.directives', [
     'dojo/domReady!'
   ], function(module, angular, $, Bpmn) {
 
-  function DirectiveController($scope, $element, $attrs, $filter, ProcessDiagramService) {
+  var DirectiveController = [ '$scope', '$element', '$attrs', '$filter', 'ProcessDefinitionResource', function ($scope, $element, $attrs, $filter, ProcessDefinitionResource) {
 
     var activityStatistics = null;
     var activityInstances = null;
+    var activitiesWithIncidents = null;
 
     var bpmnRenderer = null;
     var miniature = $scope.$eval($attrs['miniature']);
@@ -50,16 +51,15 @@ ngDefine('cockpit.directives', [
       $element.empty();
 
       // get the bpmn20xml
-      ProcessDiagramService.getBpmn20Xml(processDefinitionId)
-      .then(
-          function(data) {
-            if (miniature && miniature === true) {
-              renderMiniatureProcessDiagram(data.bpmn20Xml);
-            } else {
-              renderProcessDiagram(data.bpmn20Xml);
-            }
+      ProcessDefinitionResource
+        .getBpmn20Xml({ id: processDefinitionId })
+        .$then(function(data) {
+          if (miniature && miniature === true) {
+            renderMiniatureProcessDiagram(data.data.bpmn20Xml);
+          } else {
+            renderProcessDiagram(data.data.bpmn20Xml);
           }
-      );
+        });
     }
 
     function renderProcessDiagram (bpmn20Xml) {
@@ -132,8 +132,18 @@ ngDefine('cockpit.directives', [
 
         if (activityStatistics) {
           doAnnotateWithActivityStatistics(activityStatistics);
+          // set to null, so that the number will not set twice
+          activityStatistics = null;
         } else if (activityInstances) {
           doAnnotateWithActivityInstances(activityInstances);
+          // set to null, so that the number will not set twice
+          activityInstances = null;
+        }
+
+        if (activitiesWithIncidents) {
+          doAnnotateWithIncidents(activitiesWithIncidents);
+          // set to null, so that the incidents will not set twice
+          activitiesWithIncidents = null;
         }
       }
     }
@@ -158,7 +168,6 @@ ngDefine('cockpit.directives', [
     function aggregateActivityInstances(instance, map) {
 
       var children = instance.childActivityInstances;
-
       for (var i = 0; i < children.length; i++) {
         var child = children[i];
         aggregateActivityInstances(child, map);
@@ -184,9 +193,31 @@ ngDefine('cockpit.directives', [
       }
     }
 
+    function doAnnotateWithIncidents(activitiesWithIncidents) {
+      angular.forEach(activitiesWithIncidents, function (activity) {
+        if (activity.incidents && activity.incidents.length > 0) {
+          executeAnnotation(activity.id, '<p class="badge badge-important">!</p>');
+        }
+      });
+    }
+
     function doAnnotate(activityId, count) {
       var shortenNumberFilter = $filter('shortenNumber');
-      bpmnRenderer.annotate(activityId, '<p class="badge badgePosition">' + shortenNumberFilter(count) + '</p>');
+      executeAnnotation(activityId, '<p class="badge">' + shortenNumberFilter(count) + '</p>');
+    }
+
+    function executeAnnotation(activityId, innerHtml) {
+      var badge = $('#' + $element.attr('id') + ' > #' + activityId + ' > .badgePosition');
+      if (badge.length > 0) {
+        var importantBadge = $('#' + $element.attr('id') + ' > #' + activityId + ' > .badgePosition > .badge-important');
+        if (importantBadge.length > 0) {
+          badge.prepend(innerHtml);
+        } else {
+          badge.append(innerHtml);
+        }
+      } else {
+        bpmnRenderer.annotation(activityId).addDiv(innerHtml, ['badgePosition']);
+      }
     }
 
     this.getRenderer = function () {
@@ -202,16 +233,19 @@ ngDefine('cockpit.directives', [
       activityInstances = instances;
       annotate();
     };
-  }
 
-  var Directive = function (ProcessDiagramService) {
+    this.annotateWithIncidents = function (activities) {
+      activitiesWithIncidents = activities;
+      annotate();
+    };
+  }];
+
+  var Directive = function () {
     return {
       restrict: 'EAC',
       controller: DirectiveController
     };
   };
-
-  Directive.$inject = [ 'ProcessDiagramService' ];
 
   module
     .directive('processDiagram', Directive);

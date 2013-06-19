@@ -4,9 +4,18 @@ ngDefine('cockpit.plugin.base.views', function(module) {
 
     // input: processInstanceId
 
-    $http.get(Uri.appUri("engine://engine/default/process-instance/" + $scope.processInstanceId + "/variables"), function(response) {
-      $scope.variables = response.data;
-    });
+    $http.get(Uri.appUri("engine://process-instance/" + $scope.processInstanceId + "/variables"))
+      .success(function(data) {
+        var x = [];
+        for( var i in data) {
+          var tmp = {};
+          tmp.name = i;
+          tmp.value = data[i].value;
+          tmp.type = data[i].type;
+          x.push(tmp);
+        }
+        $scope.variables = x;
+      });
   };
 
   Controller.$inject = [ '$scope', '$http', 'Uri' ];

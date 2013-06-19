@@ -12,7 +12,11 @@ ngDefine('cockpit.plugin.base.views', function(module) {
 
     $scope.$watch('pages.current', function(newValue) {
       var currentPage = newValue || 1;
-      $location.search('page', currentPage);
+      var search = $location.search().page;
+
+      if (search || currentPage !== 1) {
+        $location.search('page', currentPage);
+      }
 
       updateView(currentPage);
     });

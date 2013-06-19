@@ -2,14 +2,12 @@
 <web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
 
   <!-- development web.xml -->
-
   <display-name>camunda bpm cockpit</display-name>
 
   <!-- cockpit bootstrap listener -->
   <listener>
     <listener-class>org.camunda.bpm.cockpit.impl.web.bootstrap.CockpitContainerBootstrap</listener-class>
   </listener>
-
   <listener>
     <listener-class>org.camunda.bpm.pa.DevProcessApplication</listener-class>
   </listener>
@@ -17,7 +15,7 @@
   <!-- client plugins filter -->
   <filter>
     <filter-name>Client Plugins Filter</filter-name>
-    <filter-class>org.camunda.bpm.cockpit.impl.web.plugin.ClientPluginsFilter</filter-class>
+    <filter-class>org.camunda.bpm.cockpit.impl.web.filter.plugin.ClientPluginsFilter</filter-class>
   </filter>
   <filter-mapping>
     <filter-name>Client Plugins Filter</filter-name>
@@ -27,6 +25,17 @@
   <filter-mapping>
     <filter-name>Client Plugins Filter</filter-name>
     <url-pattern>/app/cockpit.js</url-pattern>
+    <dispatcher>REQUEST</dispatcher>
+  </filter-mapping>
+
+  <!-- engines filter -->
+  <filter>
+    <filter-name>Engines Filter</filter-name>
+    <filter-class>org.camunda.bpm.cockpit.impl.web.filter.engine.EnginesFilter</filter-class>
+  </filter>
+  <filter-mapping>
+    <filter-name>Engines Filter</filter-name>
+    <url-pattern>/app/*</url-pattern>
     <dispatcher>REQUEST</dispatcher>
   </filter-mapping>
 
@@ -61,6 +70,7 @@
       <param-value>/api/engine</param-value>
     </init-param>
   </servlet>
+  
   <servlet-mapping>
     <servlet-name>Engine Api</servlet-name>
     <url-pattern>/api/engine/*</url-pattern>

@@ -8,7 +8,7 @@ public class ProcessInstanceDto {
   protected String id;
   protected String businessKey;
   protected Date startTime;
-  protected List<IncidentDto> incidents;
+  protected List<IncidentStatisticsDto> incidents;
 
   public ProcessInstanceDto() {}
 
@@ -36,11 +36,11 @@ public class ProcessInstanceDto {
     this.startTime = startTime;
   }
 
-  public List<IncidentDto> getIncidents() {
+  public List<IncidentStatisticsDto> getIncidents() {
     return incidents;
   }
   
-  public void setIncidents(List<IncidentDto> incidents) {
+  public void setIncidents(List<IncidentStatisticsDto> incidents) {
     this.incidents = incidents;
   }
 

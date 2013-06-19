@@ -1,7 +1,7 @@
 define([ 'angular',
          'jquery', 
          'cockpit/directives/processDiagram',
-         'cockpit/directives/activityStatistics',
+         'cockpit/directives/processDefinitionIncidents',
          'cockpit/resources/processDefinitionResource',
          'angular-resource',
          'cockpit/filters/shortenNumber' ], function(angular, $) {
@@ -12,7 +12,7 @@ define([ 'angular',
    */
   return describe('directives', function() {
 
-    describe('activity statistics directive', function() {
+    describe('process definition incidents directive', function() {
       var element;
 
       function createElement(content) {
@@ -45,6 +45,13 @@ define([ 'angular',
             });
         
         $httpBackend
+        .whenGET('engine://process-definition/FailingProcess:1:d91f75f6-d1cb-11e2-95b0-f0def1557726/statistics?incidents=true')
+        .respond(
+            [
+             {id: 'ServiceTask_1', instances: 18, failedJobs: 0, incidents: [{incidentType: 'failedJob', incidentCount: 18}]}
+            ]);
+        
+        $httpBackend
         .whenGET('engine://process-definition/FailingProcess:1:d91f75f6-d1cb-11e2-95b0-f0def1557726/statistics')
         .respond(
             [
@@ -60,20 +67,21 @@ define([ 'angular',
           });
       
         $httpBackend
-        .whenGET('engine://process-definition/FailingProcess:1:d91f75f6-d1cb-11e2-95b0-f0def1557721/statistics')
+        .whenGET('engine://process-definition/FailingProcess:1:d91f75f6-d1cb-11e2-95b0-f0def1557721/statistics?incidents=true')
         .respond(
             [
-             {id: 'ServiceTask_1', instances: 1549, failedJobs: 0, incidents:[]}
+             {id: 'ServiceTask_1', instances: 18, failedJobs: 0, incidents: [{incidentType: 'failedJob', incidentCount: 18}]}
             ]);
+        
       }));
       
-      it('should show number of current instances on activity', inject(function($rootScope, $compile, $httpBackend) {
-        $httpBackend.expectGET('engine://process-definition/FailingProcess:1:d91f75f6-d1cb-11e2-95b0-f0def1557726/statistics');
+      it('should show incident on activity', inject(function($rootScope, $compile, $httpBackend) {
+        $httpBackend.expectGET('engine://process-definition/FailingProcess:1:d91f75f6-d1cb-11e2-95b0-f0def1557726/statistics?incidents=true');
         
         // given process diagram
         $rootScope.processDefinitionId = 'FailingProcess:1:d91f75f6-d1cb-11e2-95b0-f0def1557726';
         
-        element = createElement('<process-diagram process-definition-id="processDefinitionId" activity-statistics />');
+        element = createElement('<process-diagram process-definition-id="processDefinitionId" process-definition-incidents />');
         element = $compile(element)($rootScope);
         
         $rootScope.$digest();
@@ -81,15 +89,15 @@ define([ 'angular',
         $httpBackend.flush();
         
         // then
-        expect(element.html()).toContain('<div id="ServiceTask_1" class="bpmnElement" style="position: absolute; left: 382px; top: 237px; width: 100px; height: 80px;"><div class="badgePosition"><p class="badge">14</p></div></div>');
-        expect(element.text()).toBe('Start EventService TaskEnd Event14');
+        expect(element.html()).toContain('<div id="ServiceTask_1" class="bpmnElement" style="position: absolute; left: 382px; top: 237px; width: 100px; height: 80px;"><div class="badgePosition"><p class="badge badge-important">!</p></div></div>');
+        expect(element.text()).toBe('Start EventService TaskEnd Event!');
       }));
       
-      it('should show number new number of current instances on activity after process process definition id has been changed', inject(function($rootScope, $compile, $httpBackend) {
+      it('should still show incident on activity after process process definition id has been changed', inject(function($rootScope, $compile, $httpBackend) {
         // given process diagram
         $rootScope.processDefinitionId = 'FailingProcess:1:d91f75f6-d1cb-11e2-95b0-f0def1557726';
         
-        element = createElement('<process-diagram process-definition-id="processDefinitionId" activity-statistics />');
+        element = createElement('<process-diagram process-definition-id="processDefinitionId" process-definition-incidents />');
         element = $compile(element)($rootScope);
         
         $rootScope.$digest();
@@ -99,7 +107,7 @@ define([ 'angular',
         // when
         
         $httpBackend.expectGET('engine://process-definition/FailingProcess:1:d91f75f6-d1cb-11e2-95b0-f0def1557721/xml');
-        $httpBackend.expectGET('engine://process-definition/FailingProcess:1:d91f75f6-d1cb-11e2-95b0-f0def1557721/statistics');
+        $httpBackend.expectGET('engine://process-definition/FailingProcess:1:d91f75f6-d1cb-11e2-95b0-f0def1557721/statistics?incidents=true');
         
         // change processDefinitionId
         $rootScope.processDefinitionId = 'FailingProcess:1:d91f75f6-d1cb-11e2-95b0-f0def1557721';
@@ -109,8 +117,26 @@ define([ 'angular',
         $httpBackend.flush();
         
         // then
-        expect(element.html()).toContain('<div id="ServiceTask_1" class="bpmnElement" style="position: absolute; left: 382px; top: 237px; width: 100px; height: 80px;"><div class="badgePosition"><p class="badge">1.5k</p></div></div>');
-        expect(element.text()).toBe('Start EventService TaskEnd Event1.5k');
+        expect(element.html()).toContain('<div id="ServiceTask_1" class="bpmnElement" style="position: absolute; left: 382px; top: 237px; width: 100px; height: 80px;"><div class="badgePosition"><p class="badge badge-important">!</p></div></div>');
+        expect(element.text()).toBe('Start EventService TaskEnd Event!');
+      }));
+      
+      it('should show incident and number activity statistics on activity', inject(function($rootScope, $compile, $httpBackend) {
+        $httpBackend.expectGET('engine://process-definition/FailingProcess:1:d91f75f6-d1cb-11e2-95b0-f0def1557726/statistics?incidents=true');
+        
+        // given process diagram
+        $rootScope.processDefinitionId = 'FailingProcess:1:d91f75f6-d1cb-11e2-95b0-f0def1557726';
+        
+        element = createElement('<process-diagram process-definition-id="processDefinitionId" activity-statistics process-definition-incidents />');
+        element = $compile(element)($rootScope);
+        
+        $rootScope.$digest();
+        
+        $httpBackend.flush();
+        
+        // then
+        expect(element.html()).toContain('<div id="ServiceTask_1" class="bpmnElement" style="position: absolute; left: 382px; top: 237px; width: 100px; height: 80px;"><div class="badgePosition"><p class="badge">14</p><p class="badge badge-important">!</p></div></div>');
+        expect(element.text()).toBe('Start EventService TaskEnd Event14!');
       }));
       
     });

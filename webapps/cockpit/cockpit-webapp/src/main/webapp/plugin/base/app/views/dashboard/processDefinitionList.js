@@ -1,12 +1,12 @@
-ngDefine('cockpit.plugin.base.views', function(module) {
+ngDefine('cockpit.plugin.base.views', [
+  'angular'
+], function(module, angular) {
 
-  var Controller = function($scope, ProcessDefinitionResource) {
+  var Controller = [ '$scope', 'ProcessDefinitionResource', function($scope, ProcessDefinitionResource) {
 
-    ProcessDefinitionResource.queryStatistics({
-	      incidents: true
-	    }).$then(function (data) {
-	      $scope.statistics = aggregateStatistics(data.resource);
-	    });
+    ProcessDefinitionResource.queryStatistics({ incidents: true }).$then(function (data) {
+      $scope.statistics = aggregateStatistics(data.resource);
+    });
 
     /**
      * Returns an aggregated list over the statistics.
@@ -98,14 +98,10 @@ ngDefine('cockpit.plugin.base.views', function(module) {
 
       return result;
     };
-
-  };
-
-  Controller.$inject = ["$scope", "ProcessDefinitionResource"];
+  }];
 
 
-  var PluginConfiguration = function PluginConfiguration(ViewsProvider) {
-
+  var PluginConfiguration = [ 'ViewsProvider', function PluginConfiguration(ViewsProvider) {
     ViewsProvider.registerDefaultView('cockpit.dashboard', {
       id: 'process-definition-list',
       label: 'Deployed Processes',
@@ -113,12 +109,9 @@ ngDefine('cockpit.plugin.base.views', function(module) {
       controller: Controller,
       priority: 5
     });
-  };
+  }];
 
-  PluginConfiguration.$inject = [ 'ViewsProvider' ];
-
-  module
-    .config(PluginConfiguration);
+  module.config(PluginConfiguration);
 
   return module;
 

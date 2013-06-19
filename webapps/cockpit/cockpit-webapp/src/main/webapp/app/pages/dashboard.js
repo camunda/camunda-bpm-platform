@@ -4,25 +4,26 @@ define(['angular'], function(angular) {
 
   var module = angular.module('cockpit.pages');
 
-  var Controller = function ($scope, ProcessDefinitionResource, Views) {
+  var Controller = ['$scope', 'Views', function ($scope, Views) {
 
     $scope.dashboardProviders = Views.getProviders({ component: 'cockpit.dashboard'});
 
-  };
+  }];
 
-  Controller.$inject = ['$scope', 'ProcessDefinitionResource', 'Views'];
-
-  var RouteConfig = function($routeProvider) {
+  var RouteConfig = [ '$routeProvider', function($routeProvider) {
     $routeProvider.when('/dashboard', {
       templateUrl: 'pages/dashboard.html',
-      controller: 'DashboardCtrl'
+      controller: Controller
     });
-  };
 
-  RouteConfig.$inject = ['$routeProvider'];
+    // multi tenacy
+    $routeProvider.when('/:engine/dashboard', {
+      templateUrl: 'pages/dashboard.html',
+      controller: Controller
+    });
+  }];
 
   module
-    .config(RouteConfig)
-    .controller('DashboardCtrl', Controller);
+    .config(RouteConfig);
 
 });

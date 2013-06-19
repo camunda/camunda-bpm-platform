@@ -3,15 +3,19 @@ package org.camunda.bpm.cockpit.plugin.base.resources;
 import java.util.List;
 
 import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
+import org.camunda.bpm.cockpit.plugin.base.dto.IncidentDto;
 import org.camunda.bpm.cockpit.plugin.base.dto.ProcessInstanceDto;
 import org.camunda.bpm.cockpit.plugin.base.query.parameter.ProcessInstanceQueryParameter;
 import org.camunda.bpm.cockpit.plugin.resource.AbstractPluginResource;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.runtime.Incident;
 
 public class ProcessInstanceResource extends AbstractPluginResource {
 
@@ -44,6 +48,19 @@ public class ProcessInstanceResource extends AbstractPluginResource {
     }
 
     return getQueryService().executeQuery("selectRunningProcessInstancesIncludingIncidents", param);
+  }
+  
+  @GET
+  @Path("/{id}/incidents")
+  @Produces(MediaType.APPLICATION_JSON)
+  public List<IncidentDto> getIncidents(@PathParam("id") String processInstanceId) {
+    List<Incident> incidents =  getProcessEngine()
+        .getRuntimeService()
+        .createIncidentQuery()
+        .processInstanceId(processInstanceId)
+        .list();
+    
+    return IncidentDto.fromListOfIncidents(incidents);
   }
 
 }

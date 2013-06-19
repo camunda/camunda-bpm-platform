@@ -5,6 +5,8 @@ ngDefine('cockpit.directives', [
   './processDiagram',
   './activityStatistics',
   './activityInstances',
+  './processDefinitionIncidents',
+  './processInstanceIncidents',
   './hidePanel'
 ], function(module) {
 
