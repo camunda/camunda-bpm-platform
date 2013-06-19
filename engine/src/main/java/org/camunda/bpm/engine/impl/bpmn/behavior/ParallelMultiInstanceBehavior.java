@@ -36,14 +36,7 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
    * Handles the parallel case of spawning the instances.
    * Will create child executions accordingly for every instance needed.
    */
-   protected void createInstances(ActivityExecution execution) throws Exception {
-     
-    int nrOfInstances = resolveNrOfInstances(execution);
-    if (nrOfInstances <= 0) {
-      throw new ProcessEngineException("Invalid number of instances: must be positive integer value" 
-              + ", but was " + nrOfInstances);
-    }
-    
+   protected void createInstances(ActivityExecution execution, int nrOfInstances) throws Exception {    
     setLoopVariable(execution, NUMBER_OF_INSTANCES, nrOfInstances);
     setLoopVariable(execution, NUMBER_OF_COMPLETED_INSTANCES, 0);
     setLoopVariable(execution, NUMBER_OF_ACTIVE_INSTANCES, nrOfInstances);
