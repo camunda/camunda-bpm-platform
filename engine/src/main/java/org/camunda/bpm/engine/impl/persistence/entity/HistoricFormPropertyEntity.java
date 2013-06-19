@@ -13,42 +13,15 @@
 
 package org.camunda.bpm.engine.impl.persistence.entity;
 
-import java.util.Date;
-
 import org.camunda.bpm.engine.history.HistoricFormProperty;
-import org.camunda.bpm.engine.impl.history.event.HistoricDetailEventEntity;
+import org.camunda.bpm.engine.impl.history.event.HistoricFormPropertyEventEntity;
 
 
 /**
  * @author Tom Baeyens
  */
-public class HistoricFormPropertyEntity extends HistoricDetailEventEntity implements HistoricFormProperty {
+public class HistoricFormPropertyEntity extends HistoricFormPropertyEventEntity implements HistoricFormProperty {
 
   private static final long serialVersionUID = 1L;
   
-  protected String propertyId;
-  protected String propertyValue;
-  
-  public HistoricFormPropertyEntity() {
-  }
-
-  public String getPropertyId() {
-    return propertyId;
-  }
-  
-  public void setPropertyId(String propertyId) {
-    this.propertyId = propertyId;
-  }
-  
-  public String getPropertyValue() {
-    return propertyValue;
-  }
-  
-  public void setPropertyValue(String propertyValue) {
-    this.propertyValue = propertyValue;
-  }
-  
-  public Date getTime() {
-    return timestamp;
-  }
 }

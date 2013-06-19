@@ -20,7 +20,7 @@
 
   <!-- HISTORIC DETAILS INSERT -->
   
-  <insert id="insertHistoricFormProperty" parameterType="org.camunda.bpm.engine.impl.persistence.entity.HistoricFormPropertyEntity">
+  <insert id="insertHistoricFormPropertyEvent" parameterType="org.camunda.bpm.engine.impl.history.event.HistoricFormPropertyEventEntity">
     insert into ${prefix}ACT_HI_DETAIL (ID_, TYPE_, PROC_INST_ID_, ACT_INST_ID_, EXECUTION_ID_, TASK_ID_, TIME_, NAME_, TEXT_)
     values (
       #{id, jdbcType=VARCHAR},

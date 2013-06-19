@@ -17,6 +17,7 @@ import org.camunda.bpm.engine.delegate.DelegateTask;
 import org.camunda.bpm.engine.impl.cfg.IdGenerator;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.history.event.HistoricActivityInstanceEventEntity;
+import org.camunda.bpm.engine.impl.history.event.HistoricFormPropertyEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricProcessInstanceEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricTaskInstanceEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricVariableUpdateEventEntity;
@@ -171,8 +172,8 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     return new HistoricVariableUpdateEventEntity();
   }
   
-  protected HistoricFormPropertyEntity newHistoricFormPropertyEvent() {
-    return new HistoricFormPropertyEntity();
+  protected HistoricFormPropertyEventEntity newHistoricFormPropertyEvent() {
+    return new HistoricFormPropertyEventEntity();
   }
   
   protected HistoricProcessInstanceEventEntity loadProcessInstanceEventEntity(ExecutionEntity execution) {
@@ -357,7 +358,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     
     final IdGenerator idGenerator = Context.getProcessEngineConfiguration().getIdGenerator();
 
-    HistoricFormPropertyEntity historicFormPropertyEntity = newHistoricFormPropertyEvent();
+    HistoricFormPropertyEventEntity historicFormPropertyEntity = newHistoricFormPropertyEvent();
     
     historicFormPropertyEntity.setId(idGenerator.getNextId());
     historicFormPropertyEntity.setEventType(HistoryEvent.FORM_PROPERTY_UPDATE);
