@@ -1,52 +1,37 @@
-"use strict";
+ngDefine('cockpit.pages', [ 'angular' ], function(module, angular) {
 
-define(["angular"], function(angular, BpmnRender) {
+  var Controller = function($scope, Notifications, ProcessInstanceResource, Views, processDefinition) {
 
-  var module = angular.module("cockpit.pages");
-
-  var Controller = function($scope, $routeParams, $location, Errors, ProcessDefinitionResource, ProcessInstanceResource, Views) {
-
-    function failNoProcessDefinition() {
-      $location.path('/dashboard').search({}).replace();
-
-      Errors.add({ status : "Error" , message :  "No process definition id was provided. Auto-redirecting to main site." });
-    }
-
-    // redirect when no processDefinitionId is set
-    if (!$routeParams.processDefinitionId) {
-      failNoProcessDefinition();
-      return;
-    }
+    $scope.processDefinition = processDefinition;
 
     $scope.processInstanceTable = Views.getProvider({ component: 'cockpit.processDefinition.instancesTable' });
 
-    $scope.processDefinitionId = $routeParams.processDefinitionId;
+    ProcessInstanceResource.count({ processDefinitionKey : processDefinition.key }).$then(function(response) {
+      $scope.processDefinitionTotalCount = response.data;
+    });
 
-    ProcessDefinitionResource
-      .get({ id : $scope.processDefinitionId })
-        .$then(function(result) {
-          $scope.processDefinition = result.resource;
-
-          ProcessInstanceResource.count({ processDefinitionKey : $scope.processDefinition.key }).$then(function(result) {
-            $scope.processDefinitionTotalCount = result.data;
-          });
-        }, function(err) {
-          if (err.status === 400) {
-            failNoProcessDefinition();
-          }
-        });
-
-    ProcessInstanceResource.count({ processDefinitionId : $scope.processDefinitionId }).$then(function(result) {
-      $scope.processDefinitionLatestVersionCount = result.data;
+    ProcessInstanceResource.count({ processDefinitionId : processDefinition.id }).$then(function(response) {
+      $scope.processDefinitionLatestVersionCount = response.data;
     });
   };
 
-  Controller.$inject = [ '$scope', '$routeParams', '$location', 'Errors', 'ProcessDefinitionResource', 'ProcessInstanceResource', 'Views' ];
+  Controller.$inject = [ '$scope', 'Notifications', 'ProcessInstanceResource', 'Views', 'processDefinition' ];
 
   var RouteConfig = function ($routeProvider) {
     $routeProvider.when('/process-definition/:processDefinitionId', {
       templateUrl: 'pages/process-definition.html',
       controller: Controller,
+      resolve: {
+        processDefinition: ['ResourceResolver', 'ProcessDefinitionResource',
+          function(ResourceResolver, ProcessDefinitionResource) {
+            return ResourceResolver.getByRouteParam('processDefinitionId', {
+              name: 'process definition',
+              resolve: function(id) {
+                return ProcessDefinitionResource.get({ id : id })
+              }
+            });
+          }]
+      },
       reloadOnSearch: false
     });
   };

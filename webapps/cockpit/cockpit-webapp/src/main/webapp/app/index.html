@@ -9,10 +9,10 @@
     <meta name="author" content="camunda services GmbH" />
 
     <!-- settings the base path for relative links -->
-    <base href="." app-base="/cockpit/" cockpit-base="/cockpit/api/cockpit/" engine-base="/cockpit/api/engine/" />
+    <base href="$COCKPIT_ROOT/app/" cockpit-api="$COCKPIT_ROOT/api/cockpit/" engine-api="$COCKPIT_ROOT/api/engine/" />
 
     <!-- Styles -->
-    <link href="../assets/css/loader.css" rel="stylesheet" />
+    <link href="$COCKPIT_ROOT/assets/css/loader.css" rel="stylesheet" />
 
     <!-- For IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
@@ -20,22 +20,23 @@
     <![endif]-->
 
     <!-- Favicon -->
-    <link rel="shortcut icon" type="image/x-icon" href="../assets/img/favicon.ico" />
+    <link rel="shortcut icon" type="image/x-icon" href="$COCKPIT_ROOT/assets/img/favicon.ico" />
 
     <!-- scripts -->
-    <script src="../assets/vendor/require/require.js"></script>
+    <script src="$COCKPIT_ROOT/assets/vendor/require/require.js"></script>
 
-    <script src="bootstrap.js"></script>
+    <script src="$COCKPIT_ROOT/app/bootstrap.js"></script>
 
   </head>
-  <body ng-controller="DefaultCtrl">
+  <body>
 
     <div class="wrapper">
       <!-- Header -->
       <div ng-include="'common/header.html'"></div>
 
       <div class="container-fluid content-container content-inset">
-        <div error-panel></div>
+        <div notifications-panel></div>
+
         <div class="row-fluid content-container">
           <!-- actual view body is rendered here whenever the url changes -->
           <div ng-view class="span12">

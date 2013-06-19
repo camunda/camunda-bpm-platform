@@ -14,53 +14,71 @@
 
   var plugins = window.PLUGIN_DEPENDENCIES || [];
 
-  var dependencies = [ 'jquery', 'module:ng', 'module:ngResource' ].concat(commons, cockpitCore, plugins);
+  var dependencies = [ 'jquery', 'angular', 'module:ng', 'module:ngResource' ].concat(commons, cockpitCore, plugins);
 
-  ngDefine('cockpit', dependencies, function(module, $) {
+  ngDefine('cockpit', dependencies, function(module, $, angular) {
 
-    var Controller = function ($scope, Errors) {
+    var ProcessEngineSelectionController = [
+      '$scope', '$rootScope', '$http', '$location', '$window', 'Uri', 'Notifications',
+      function($scope, $rootScope, $http, $location, $window, Uri, Notifications) {
 
-      $scope.appErrors = function () {
-        return Errors.errors;
-      };
+      var current = Uri.appUri(':engine');
 
-      $scope.removeError = function (error) {
-        Errors.clear(error);
-      };
+      $http.get(Uri.appUri('engine://engine')).then(function(response) {
+        $scope.engines = {};
 
-      // needed for form validation
-      // DO NOT REMOVE FROM DEFAULT CONTROLLER!
-      $scope.errorClass = function(form) {
-        return form.$valid || !form.$dirty ? '' : 'error';
-      };
+        angular.forEach(response.data, function(engine) {
+          $scope.engines[engine.name] = engine;
+        });
 
-    };
+        $scope.currentEngine = $rootScope.currentEngine = $scope.engines[current];
 
-    Controller.$inject = ['$scope', 'Errors'];
+        if (!$scope.currentEngine) {
+          Notifications.addError({ status: 'Not found', message: 'The engine you are trying to access does not exist' });
+          $location.path('/dashboard')
+        }
+      });
 
-    var ModuleConfig = function($routeProvider, $httpProvider, UriProvider) {
+      $scope.$watch('currentEngine', function(engine) {
+        if (engine && current !== engine.name) {
+          $window.location.href = Uri.appUri("app://" + engine.name + "/");
+        }
+      });
+    }];
+
+    var ModuleConfig = [ '$routeProvider', '$httpProvider', 'UriProvider', function($routeProvider, $httpProvider, UriProvider) {
       $httpProvider.responseInterceptors.push('httpStatusInterceptor');
       $routeProvider.otherwise({ redirectTo: '/dashboard' });
 
       function getUri(id) {
-        var uri = $("base").attr(id);
+        var uri = $('base').attr(id);
         if (!id) {
-          throw new Error("Uri base for " + id + " could not be resolved");
+          throw new Error('Uri base for ' + id + ' could not be resolved');
         }
 
         return uri;
       }
 
-      UriProvider.replace('app://', getUri("cockpit-base"));
-      UriProvider.replace('plugin://', getUri("cockpit-base") + "plugin/");
-      UriProvider.replace('engine://', getUri("engine-base"));
-    };
+      UriProvider.replace('app://', getUri('href'));
+      UriProvider.replace('cockpit://', getUri('cockpit-api'));
+      UriProvider.replace('plugin://', getUri('cockpit-api') + 'plugin/');
+      UriProvider.replace('engine://', getUri('engine-api'));
 
-    ModuleConfig.$inject = ['$routeProvider', '$httpProvider', 'UriProvider'];
+      UriProvider.replace(':engine', [ '$window', function($window) {
+        var uri = $window.location.href;
+
+        var match = uri.match(/app\/(\w+)\//);
+        if (match) {
+          return match[1];
+        } else {
+          throw new Error('no process engine selected');
+        }
+      }]);
+    }];
 
     module
       .config(ModuleConfig)
-      .controller('DefaultCtrl', Controller);
+      .controller('ProcessEngineSelectionController', ProcessEngineSelectionController);
 
     return module;
 

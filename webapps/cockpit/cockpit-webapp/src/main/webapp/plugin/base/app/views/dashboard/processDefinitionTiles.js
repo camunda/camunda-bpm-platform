@@ -1,12 +1,13 @@
-ngDefine('cockpit.plugin.base.views', function(module) {
+ngDefine('cockpit.plugin.base.views', [
+  'angular'
+], function(module) {
 
-  var Controller = function($scope, ProcessDefinitionResource) {
+  var Controller = [ '$scope', 'ProcessDefinitionResource', function($scope, ProcessDefinitionResource) {
 
     $scope.orderByPredicate = 'definition.name';
     $scope.orderByReverse = false;
 
-    ProcessDefinitionResource.queryStatistics()
-    .$then(function (data) {
+    ProcessDefinitionResource.queryStatistics().$then(function (data) {
       $scope.statistics = aggregateStatistics(data.resource);
     });
 
@@ -48,13 +49,10 @@ ngDefine('cockpit.plugin.base.views', function(module) {
       }
       return false;
     };
-
-  };
-
-  Controller.$inject = ["$scope", "ProcessDefinitionResource"];
+  }];
 
 
-  var PluginConfiguration = function PluginConfiguration(ViewsProvider) {
+  var PluginConfiguration = [ 'ViewsProvider', function PluginConfiguration(ViewsProvider) {
 
     ViewsProvider.registerDefaultView('cockpit.dashboard', {
       id: 'process-definition-tiles',
@@ -63,12 +61,9 @@ ngDefine('cockpit.plugin.base.views', function(module) {
       controller: Controller,
       priority: 0
     });
-  };
+  }];
 
-  PluginConfiguration.$inject = [ 'ViewsProvider' ];
-
-  module
-    .config(PluginConfiguration);
+  module.config(PluginConfiguration);
 
   return module;
 

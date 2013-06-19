@@ -271,3 +271,7 @@ Circle
 .circle-green {
   background-color: #468847;
 }
+
+.navbar-search select {
+  margin-bottom: 5px;
+}

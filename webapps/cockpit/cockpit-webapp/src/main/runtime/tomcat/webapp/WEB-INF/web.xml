@@ -11,7 +11,7 @@
   <!-- client plugins filter -->
   <filter>
     <filter-name>Client Plugins Filter</filter-name>
-    <filter-class>org.camunda.bpm.cockpit.impl.web.plugin.ClientPluginsFilter</filter-class>
+    <filter-class>org.camunda.bpm.cockpit.impl.web.filter.plugin.ClientPluginsFilter</filter-class>
   </filter>
   <filter-mapping>
     <filter-name>Client Plugins Filter</filter-name>
@@ -21,6 +21,17 @@
   <filter-mapping>
     <filter-name>Client Plugins Filter</filter-name>
     <url-pattern>/app/cockpit.js</url-pattern>
+    <dispatcher>REQUEST</dispatcher>
+  </filter-mapping>
+
+  <!-- engines filter -->
+  <filter>
+    <filter-name>Engines Filter</filter-name>
+    <filter-class>org.camunda.bpm.cockpit.impl.web.filter.engine.EnginesFilter</filter-class>
+  </filter>
+  <filter-mapping>
+    <filter-name>Engines Filter</filter-name>
+    <url-pattern>/app/*</url-pattern>
     <dispatcher>REQUEST</dispatcher>
   </filter-mapping>
 

@@ -1,6 +1,7 @@
 ngDefine('cockpit.resources', [
-  'module:cockpit.resources.process.definition:./processDefinitionResource',
-  'module:cockpit.resources.incident:./incidentResource',
+  'module:camunda.common.services.uri:camunda-common/services/uri', 
+  './processDefinitionResource',
+  './incidentResource',
   './processInstanceResource'
 ], function(module) {
 

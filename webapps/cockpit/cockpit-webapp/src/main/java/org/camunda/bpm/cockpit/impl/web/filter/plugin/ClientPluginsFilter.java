@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.cockpit.impl.web.plugin;
+package org.camunda.bpm.cockpit.impl.web.filter.plugin;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -29,6 +29,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.camunda.bpm.cockpit.Cockpit;
+import org.camunda.bpm.cockpit.impl.web.filter.AbstractTemplateFilter;
 import org.camunda.bpm.cockpit.plugin.spi.CockpitPlugin;
 
 /**
@@ -42,7 +43,7 @@ import org.camunda.bpm.cockpit.plugin.spi.CockpitPlugin;
  *
  * @author nico.rehwaldt
  */
-public class ClientPluginsFilter implements Filter {
+public class ClientPluginsFilter extends AbstractTemplateFilter {
 
   // accepts two times the plugin name
   private static final String PLUGIN_PACKAGE_FORMAT = "{ name: 'cockpit-plugin-%s', location: 'api/cockpit/plugin/%s/static/app', main: 'plugin.js' }";
@@ -53,56 +54,19 @@ public class ClientPluginsFilter implements Filter {
   private final String PLUGIN_DEPENDENCIES = "window.PLUGIN_DEPENDENCIES";
   private final String PLUGIN_PACKAGES = "window.PLUGIN_PACKAGES";
 
-  private FilterConfig filterConfig;
-
   @Override
-  public void init(FilterConfig filterConfig) throws ServletException {
-    this.filterConfig = filterConfig;
-  }
+  protected void applyFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
 
-  @Override
-  public void destroy() {
-    filterConfig = null;
-  }
+    String data = getWebResourceContents(request.getRequestURI().replaceFirst(request.getContextPath(), ""));
 
-  @Override
-  public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+    data = data.replace(PLUGIN_PACKAGES, createPluginPackagesStr());
 
-    filterInjectPlugins((HttpServletRequest) request, (HttpServletResponse) response, chain);
-  }
+    data = data.replace(PLUGIN_DEPENDENCIES, createPluginDependenciesStr());
 
-  public void filterInjectPlugins(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
+    response.setContentLength(data.getBytes("UTF-8").length);
+    response.setContentType("text/javascript;charset=UTF-8");
 
-    InputStream is = null;
-
-    try {
-      is = filterConfig.getServletContext().getResourceAsStream(request.getRequestURI().replaceFirst(request.getContextPath(), ""));
-
-      BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-
-      StringWriter writer = new StringWriter();
-      String line = null;
-
-      while ((line = reader.readLine()) != null) {
-        writer.write(line);
-        writer.append("\n");
-      }
-
-      String data = writer.toString();
-
-      data = data.replace(PLUGIN_PACKAGES, createPluginPackagesStr());
-
-      data = data.replace(PLUGIN_DEPENDENCIES, createPluginDependenciesStr());
-
-      response.setContentLength(data.getBytes("UTF-8").length);
-      response.setContentType("text/javascript;charset=UTF-8");
-
-      response.getWriter().append(data);
-    } finally {
-      if (is != null) {
-        try { is.close(); } catch (IOException e) {}
-      }
-    }
+    response.getWriter().append(data);
   }
 
   private CharSequence createPluginPackagesStr() {
