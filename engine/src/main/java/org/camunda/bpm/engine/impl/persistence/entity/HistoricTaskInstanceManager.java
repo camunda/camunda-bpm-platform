@@ -85,6 +85,10 @@ public class HistoricTaskInstanceManager extends AbstractHistoricManager {
 
                 commandContext.getHistoricDetailManager()
                   .deleteHistoricDetailsByTaskId(taskId);
+                
+                commandContext
+                  .getHistoricVariableInstanceManager()
+                  .deleteHistoricVariableInstancesByTaskId(taskId);
 
                 commandContext.getCommentManager()
                   .deleteCommentsByTaskId(taskId);

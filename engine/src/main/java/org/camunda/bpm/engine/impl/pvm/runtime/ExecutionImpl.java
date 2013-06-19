@@ -87,7 +87,7 @@ public class ExecutionImpl implements
   protected ExecutionImpl subProcessInstance;
   
   /** only available until the process instance is started */
-  protected StartingExecution startingExecution;
+  protected ExecutionStartContext executionStartContext;
   
   // state/type of execution ////////////////////////////////////////////////// 
   
@@ -140,7 +140,7 @@ public class ExecutionImpl implements
   }
   
   public ExecutionImpl(ActivityImpl initial) {
-    startingExecution = new StartingExecution(initial);
+    executionStartContext = new ExecutionStartContext(initial);
   }
   
   // lifecycle methods ////////////////////////////////////////////////////////
@@ -193,6 +193,8 @@ public class ExecutionImpl implements
   }
   
   public void remove() {
+    isEnded = true;
+    isActive = false;
     ensureParentInitialized();
     if (parent!=null) {
       parent.ensureExecutionsInitialized();
@@ -417,8 +419,8 @@ public class ExecutionImpl implements
     
     activity = getActivity();
     // special treatment for starting process instance
-    if(activity == null && startingExecution!= null) {
-      activity = startingExecution.getInitial();
+    if(activity == null && executionStartContext!= null) {
+      activity = executionStartContext.getInitial();
     }
     
     activityInstanceId = generateActivityInstanceId(activity.getId());
@@ -491,9 +493,9 @@ public class ExecutionImpl implements
   }
   
   public void start(Map<String, Object> variables) {
-    if(startingExecution == null && isProcessInstance()) {
-      startingExecution = new StartingExecution(processDefinition.getInitial());
-      startingExecution.setVariables(variables);
+    if(executionStartContext == null && isProcessInstance()) {
+      executionStartContext = new ExecutionStartContext(processDefinition.getInitial());
+      executionStartContext.setVariables(variables);
     }
     performOperation(AtomicOperation.PROCESS_START);
   }
@@ -931,12 +933,12 @@ public class ExecutionImpl implements
     this.isEventScope = isEventScope;
   }
   
-  public StartingExecution getStartingExecution() {
-    return startingExecution;
+  public ExecutionStartContext getExecutionStartContext() {
+    return executionStartContext;
   }
   
   public void disposeStartingExecution() {
-    startingExecution = null;
+    executionStartContext = null;
   }
 
   public void deleteCascade2(String deleteReason) {

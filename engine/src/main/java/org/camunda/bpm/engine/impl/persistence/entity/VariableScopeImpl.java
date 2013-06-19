@@ -215,10 +215,9 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
       if (variableInstance != null) {
         variableInstance.delete();
 
-//        int historyLevel = Context.getProcessEngineConfiguration().getHistoryLevel();
-//        if (historyLevel >= ProcessEngineConfigurationImpl.HISTORYLEVEL_ACTIVITY) {
-//          insertHistoricVariableInstanceUpdate(variableInstance, (ExecutionEntity) this);
-//        }
+//        fireHistoricVariableInstanceDelete(variableInstance, (ExecutionEntity) this);
+//        
+//        fireHistoricVariableInstanceUpdate(variableInstance, (ExecutionEntity)this);
       }
     }
   }
@@ -336,32 +335,26 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
 
   protected void deleteVariableInstanceForExplicitUserCall(VariableInstanceEntity variableInstance, ExecutionEntity sourceActivityExecution) {
     
-    final ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
-    final HistoryEventProducer eventProducer = processEngineConfiguration.getHistoryEventProducer();
-    final HistoryEventHandler eventHandler = processEngineConfiguration.getHistoryEventHandler();
-
+    // delete variable instance
     variableInstance.delete();
     variableInstance.setValue(null);
     
-    int historyLevel = processEngineConfiguration.getHistoryLevel();
-    
-    if (historyLevel>=ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {  
-      // fire delete event
-      HistoryEvent evt = eventProducer.createHistoricVariableDeleteEvt(variableInstance, this);
-      eventHandler.handleEvent(evt);      
-    }
+    // fire DELETE event
+    fireHistoricVariableInstanceDelete(variableInstance, sourceActivityExecution);
   }
 
   protected void updateVariableInstance(VariableInstanceEntity variableInstance, Object value, ExecutionEntity sourceActivityExecution) {
+    
+    // update variable instance
     variableInstance.setValue(value);
 
-    int historyLevel = Context.getProcessEngineConfiguration().getHistoryLevel();
-    if (historyLevel==ProcessEngineConfigurationImpl.HISTORYLEVEL_FULL) {
-      insertHistoricVariableInstanceUpdate(variableInstance, sourceActivityExecution);
-    }    
+    // fire UPDATE event
+    fireHistoricVariableInstanceUpdate(variableInstance, sourceActivityExecution);
   }
 
   protected VariableInstanceEntity createVariableInstance(String variableName, Object value, ExecutionEntity sourceActivityExecution) {
+    
+    // create variable instance
     VariableTypes variableTypes = Context
       .getProcessEngineConfiguration()
       .getVariableTypes();
@@ -374,12 +367,45 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
     
     variableInstance.setValue(value);
     
-    insertHistoricVariableInstanceUpdate(variableInstance, sourceActivityExecution);
+    // fire CREATE event
+    fireHistoricVariableInstanceCreate(variableInstance, sourceActivityExecution);
     
     return variableInstance;
   }
+  
+  protected void fireHistoricVariableInstanceDelete(VariableInstanceEntity variableInstance, ExecutionEntity sourceActivityExecution) {
 
-  protected void insertHistoricVariableInstanceUpdate(VariableInstanceEntity variableInstance, ExecutionEntity sourceActivityExecution) {
+    int historyLevel = Context.getProcessEngineConfiguration().getHistoryLevel();
+    if (historyLevel >=ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
+      
+      final ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+      final HistoryEventHandler eventHandler = processEngineConfiguration.getHistoryEventHandler();
+      final HistoryEventProducer eventProducer = processEngineConfiguration.getHistoryEventProducer();
+      
+      HistoryEvent evt = eventProducer.createHistoricVariableDeleteEvt(variableInstance, sourceActivityExecution);
+      eventHandler.handleEvent(evt);
+      
+    }
+    
+  }
+  
+  protected void fireHistoricVariableInstanceCreate(VariableInstanceEntity variableInstance, ExecutionEntity sourceActivityExecution) {
+
+    int historyLevel = Context.getProcessEngineConfiguration().getHistoryLevel();
+    if (historyLevel >=ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {
+      
+      final ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+      final HistoryEventHandler eventHandler = processEngineConfiguration.getHistoryEventHandler();
+      final HistoryEventProducer eventProducer = processEngineConfiguration.getHistoryEventProducer();
+      
+      HistoryEvent evt = eventProducer.createHistoricVariableCreateEvt(variableInstance, sourceActivityExecution);
+      eventHandler.handleEvent(evt);
+      
+    }
+    
+  }
+
+  protected void fireHistoricVariableInstanceUpdate(VariableInstanceEntity variableInstance, ExecutionEntity sourceActivityExecution) {
 
     int historyLevel = Context.getProcessEngineConfiguration().getHistoryLevel();
     if (historyLevel >=ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT) {

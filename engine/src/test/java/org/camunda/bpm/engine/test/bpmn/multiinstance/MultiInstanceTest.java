@@ -216,6 +216,7 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
         assertNotNull(hai.getAssignee());
         assertEquals("userTask", hai.getActivityType());
         assertEquals(pi.getId(), hai.getParentActivityInstanceId());
+        assertNotNull(hai.getTaskId());
       }
     }
   }

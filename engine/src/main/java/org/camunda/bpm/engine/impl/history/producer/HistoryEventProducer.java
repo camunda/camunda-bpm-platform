@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.impl.history.producer;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.DelegateTask;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableScopeImpl;
 
@@ -107,6 +108,15 @@ public interface HistoryEventProducer {
   // HistoricVariableUpdateEventEntity //////////////////////
 
   /** 
+   * Creates the history event fired when a variable is <strong>created</strong>.
+   *  
+   * @param variableInstance the runtime variable instance
+   * @param the scope to which the variable is linked
+   * @return the history event
+   */
+  public HistoryEvent createHistoricVariableCreateEvt(VariableInstanceEntity variableInstance, VariableScopeImpl variableScopeImpl);
+  
+  /** 
    * Creates the history event fired when a variable is <strong>updated</strong>.
    *  
    * @param variableInstance the runtime variable instance
@@ -120,8 +130,20 @@ public interface HistoryEventProducer {
    * 
    * @param variableInstance
    * @param variableScopeImpl
-   * @return
+   * @return the history event
    */
   public HistoryEvent createHistoricVariableDeleteEvt(VariableInstanceEntity variableInstance, VariableScopeImpl variableScopeImpl);
 
+  // Form properties //////////////////////////////////////////
+  
+  /**
+   * Creates the history event fired when a form property is <strong>updated</strong>.
+   * 
+   * @param processInstance the id for the process instance
+   * @param propertyId the id of the form property
+   * @param propertyValue the value of the form property
+   * @param taskId 
+   * @return the history event
+   */
+  public HistoryEvent createFormPropertyUpdateEvt(ExecutionEntity execution, String propertyId, String propertyValue, String taskId);
 }

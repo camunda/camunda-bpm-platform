@@ -13,7 +13,6 @@
 package org.camunda.bpm.engine.impl.history.event;
 
 import java.io.Serializable;
-import java.util.Date;
 
 import org.camunda.bpm.engine.impl.db.DbSqlSession;
 import org.camunda.bpm.engine.impl.db.PersistentObject;
@@ -60,11 +59,15 @@ public class HistoryEvent implements Serializable, PersistentObject {
   /** fired when a task instance is deleted. */
   public static final String TASK_EVENT_TYPE_DELETE = "delete";
   
-  /** fired when a variable instance is created or updated */
+  /** fired when a variable instance is created */
+  public static final String VARIABLE_EVENT_TYPE_CREATE = "create";
+  /** fired when a variable instance is updated */
   public static final String VARIABLE_EVENT_TYPE_UPDATE = "update";
   /** fired when a variable instance is deleted */
   public static final String VARIABLE_EVENT_TYPE_DELETE = "delete";
-    
+  
+  /** fired when a form property is updated */
+  public static final String FORM_PROPERTY_UPDATE = "form-property-update";
   
   /** each {@link HistoryEvent} has a unique id */
   protected String id;

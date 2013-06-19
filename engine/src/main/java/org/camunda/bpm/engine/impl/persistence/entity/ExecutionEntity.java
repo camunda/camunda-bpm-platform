@@ -34,6 +34,7 @@ import org.camunda.bpm.engine.impl.history.producer.HistoryEventProducer;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.jobexecutor.AsyncContinuationJobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerDeclarationImpl;
+import org.camunda.bpm.engine.impl.persistence.entity.util.FormPropertyStartContext;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.PvmException;
 import org.camunda.bpm.engine.impl.pvm.PvmExecution;
@@ -53,7 +54,7 @@ import org.camunda.bpm.engine.impl.pvm.runtime.AtomicOperation;
 import org.camunda.bpm.engine.impl.pvm.runtime.FoxAtomicOperationDeleteCascadeFireActivityEnd;
 import org.camunda.bpm.engine.impl.pvm.runtime.InterpretableExecution;
 import org.camunda.bpm.engine.impl.pvm.runtime.OutgoingExecution;
-import org.camunda.bpm.engine.impl.pvm.runtime.StartingExecution;
+import org.camunda.bpm.engine.impl.pvm.runtime.ExecutionStartContext;
 import org.camunda.bpm.engine.impl.util.BitMaskUtil;
 import org.camunda.bpm.engine.impl.variable.VariableDeclaration;
 import org.camunda.bpm.engine.runtime.Execution;
@@ -111,7 +112,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
   /** the unique id of the current activity instance */
   protected String activityInstanceId;
   
-  protected StartingExecution startingExecution;
+  protected ExecutionStartContext executionStartContext;
       
   // state/type of execution ////////////////////////////////////////////////// 
   
@@ -227,7 +228,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
   }
   
   public ExecutionEntity(ActivityImpl activityImpl) {
-    this.startingExecution = new StartingExecution(activityImpl);
+    this.executionStartContext = new ExecutionStartContext(activityImpl);
   }
 
   /** creates a new execution. properties processDefinition, processInstance and activity will be initialized. */  
@@ -351,14 +352,28 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
   public void start() {
     start(null);
   }
-  
+   
   public void start(Map<String, Object> variables) {
-    if(startingExecution == null && isProcessInstance()) {
-      startingExecution = new StartingExecution(processDefinition.getInitial());
+    if(executionStartContext == null && isProcessInstance()) {
+      executionStartContext = new ExecutionStartContext(processDefinition.getInitial());
     }
-    startingExecution.setVariables(variables);
+    executionStartContext.setVariables(variables);
     performOperation(AtomicOperation.PROCESS_START);
   }
+  
+   public void startWithFormProperties(Map<String, String> properties) {
+     if(isProcessInstance()) {
+       ActivityImpl initial = processDefinition.getInitial();
+       if(executionStartContext != null) {
+         initial = executionStartContext.getInitial();
+       }
+       FormPropertyStartContext formPropertyStartContext = new FormPropertyStartContext(initial);
+       formPropertyStartContext.setFormProperties(properties);
+       executionStartContext = formPropertyStartContext;
+     } 
+     performOperation(AtomicOperation.PROCESS_START);
+   }
+  
 
   public void destroy() {
     log.fine("destroying "+this);
@@ -757,8 +772,8 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
     ActivityImpl activity = getActivity();
     
     // special treatment for starting process instance
-    if(activity == null && startingExecution!= null) {
-      activity = startingExecution.getInitial();
+    if(activity == null && executionStartContext!= null) {
+      activity = executionStartContext.getInitial();
     }
     
     activityInstanceId = generateActivityInstanceId(activity.getId());
@@ -1497,12 +1512,12 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
     this.isEventScope = isEventScope;
   }
   
-  public StartingExecution getStartingExecution() {
-    return startingExecution;
+  public ExecutionStartContext getExecutionStartContext() {
+    return executionStartContext;
   }
   
   public void disposeStartingExecution() {
-    startingExecution = null;
+    executionStartContext = null;
   }
   
   public String getCurrentActivityId() {

@@ -43,19 +43,16 @@ public class AtomicOperationProcessStartInitial extends AtomicOperationActivityI
     
     ActivityImpl activity = (ActivityImpl) execution.getActivity();
     ProcessDefinitionImpl processDefinition = execution.getProcessDefinition();
-    StartingExecution startingExecution = execution.getStartingExecution();
-    if (activity==startingExecution.getInitial()) {
+    ExecutionStartContext executionStartContext = execution.getExecutionStartContext();
+    if (activity==executionStartContext.getInitial()) {
       
-      // set variables in the context of the activity instance of the selected initial (start event)
-      if(startingExecution.getVariables()!=null) {
-        execution.setVariables(startingExecution.getVariables());
-      }
+      executionStartContext.initialStarted(execution);
       
       execution.disposeStartingExecution();
       execution.performOperation(ACTIVITY_EXECUTE);
 
     } else {
-      List<ActivityImpl> initialActivityStack = processDefinition.getInitialActivityStack(startingExecution.getInitial());
+      List<ActivityImpl> initialActivityStack = processDefinition.getInitialActivityStack(executionStartContext.getInitial());
       int index = initialActivityStack.indexOf(activity);
       activity = initialActivityStack.get(index+1);
 

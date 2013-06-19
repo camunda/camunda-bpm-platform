@@ -53,6 +53,8 @@ import org.camunda.bpm.engine.impl.UserQueryImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.upgrade.DbUpgradeStep;
+import org.camunda.bpm.engine.impl.history.event.HistoricActivityInstanceEventEntity;
+import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.interceptor.Session;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
@@ -79,7 +81,7 @@ public class DbSqlSession implements Session {
   protected List<PersistentObject> insertedObjects = new ArrayList<PersistentObject>();
   protected List<PersistentObject> updatedObjects = new ArrayList<PersistentObject>();
   protected Map<Class<?>, Map<String, CachedObject>> cachedObjects = new HashMap<Class<?>, Map<String,CachedObject>>();
-  protected Map<Class<?>, Map<String, BulkUpdateOpertaion>> bulkUpdates = new HashMap<Class<?>, Map<String,BulkUpdateOpertaion>>();
+  protected Map<Class<?>, Map<String, BulkUpdateOperation>> bulkUpdates = new HashMap<Class<?>, Map<String,BulkUpdateOperation>>();
   protected List<DeleteOperation> deleteOperations = new ArrayList<DeleteOperation>();
   protected List<DeserializedObject> deserializedObjects = new ArrayList<DeserializedObject>();
   protected String connectionMetadataDefaultCatalog = null;
@@ -166,18 +168,19 @@ public class DbSqlSession implements Session {
   }
   
   public void update(String statement, PersistentObject parameter) {
-    Map<String, BulkUpdateOpertaion> updatesForType = bulkUpdates.get(parameter.getClass());
+    Map<String, BulkUpdateOperation> updatesForType = bulkUpdates.get(parameter.getClass());
     if(updatesForType == null) {
-      updatesForType = new HashMap<String, DbSqlSession.BulkUpdateOpertaion>();  
+      updatesForType = new HashMap<String, DbSqlSession.BulkUpdateOperation>();  
       bulkUpdates.put(parameter.getClass(), updatesForType);
     } 
     
-    BulkUpdateOpertaion updateOpertaion = updatesForType.get(parameter.getId());
-    if(updateOpertaion == null) {
-      updatesForType.put(parameter.getId(), new BulkUpdateOpertaion(statement, parameter));
+    BulkUpdateOperation updateOperation = updatesForType.get(parameter.getId());
+    if(updateOperation == null) {
+      updatesForType.put(parameter.getId(), new BulkUpdateOperation(statement, parameter));
     } else {
-      updateOpertaion.parameter = parameter;      
+      updateOperation.parameter = parameter;      
     }     
+    cachePut(parameter, true);
   }
   
   /**
@@ -207,11 +210,11 @@ public class DbSqlSession implements Session {
     }
   }
   
-  public class BulkUpdateOpertaion {
+  public class BulkUpdateOperation {
     String statement;
     PersistentObject parameter;
     
-    public BulkUpdateOpertaion(String statement, PersistentObject parameter) {
+    public BulkUpdateOperation(String statement, PersistentObject parameter) {
       this.statement = statement;
       this.parameter = parameter;
     }
@@ -469,7 +472,7 @@ public class DbSqlSession implements Session {
     removeUnnecessaryOperations();
     flushDeserializedObjects();
     List<PersistentObject> updatedObjects = getUpdatedObjects();
-    List<BulkUpdateOpertaion> bulkUpdateOperations = getBulkUpdateOperations();
+    List<BulkUpdateOperation> bulkUpdateOperations = getBulkUpdateOperations();
     
     if (log.isLoggable(Level.FINE)) {
       log.fine("flush summary:");
@@ -479,7 +482,7 @@ public class DbSqlSession implements Session {
       for (PersistentObject updatedObject: updatedObjects) {
         log.fine("  update "+toString(updatedObject));
       }
-      for (BulkUpdateOpertaion bulkUpdateOperation: bulkUpdateOperations) {
+      for (BulkUpdateOperation bulkUpdateOperation: bulkUpdateOperations) {
         log.fine("  bulk update "+toString(bulkUpdateOperation.parameter));
       }
       for (Object deleteOperation: deleteOperations) {
@@ -494,10 +497,10 @@ public class DbSqlSession implements Session {
     flushDeletes();
   }
 
-  protected List<BulkUpdateOpertaion> getBulkUpdateOperations() {
-    ArrayList<BulkUpdateOpertaion> operations = new ArrayList<DbSqlSession.BulkUpdateOpertaion>();
-    Collection<Map<String, BulkUpdateOpertaion>> updatesByType = bulkUpdates.values();
-    for (Map<String, BulkUpdateOpertaion> updates : updatesByType) {
+  protected List<BulkUpdateOperation> getBulkUpdateOperations() {
+    ArrayList<BulkUpdateOperation> operations = new ArrayList<DbSqlSession.BulkUpdateOperation>();
+    Collection<Map<String, BulkUpdateOperation>> updatesByType = bulkUpdates.values();
+    for (Map<String, BulkUpdateOperation> updates : updatesByType) {
       operations.addAll(updates.values());      
     }
     return operations;        
@@ -698,25 +701,39 @@ public class DbSqlSession implements Session {
         log.fine("updating: "+toString(updatedObject)+"]");
       }
       int updatedRecords = sqlSession.update(updateStatement, updatedObject);
-      if (updatedRecords!=1) {
-        throw new OptimisticLockingException(toString(updatedObject)+" was updated by another transaction concurrently");
-      } 
       
-      // See http://jira.codehaus.org/browse/ACT-1290
-      if (updatedObject instanceof HasRevision) {
-        ((HasRevision) updatedObject).setRevision(((HasRevision) updatedObject).getRevisionNext());
+      if (!(updatedObject instanceof HistoricActivityInstanceEventEntity)) {
+      
+        if (updatedRecords!=1) {
+          throw new OptimisticLockingException(toString(updatedObject)+" was updated by another transaction concurrently");
+        } 
+        
+        if (updatedObject instanceof HasRevision) {
+          // See http://jira.codehaus.org/browse/ACT-1290
+          ((HasRevision) updatedObject).setRevision(((HasRevision) updatedObject).getRevisionNext());
+        }        
+      
       }
       
     }
     updatedObjects.clear();
   }
   
-  protected void flushBulkUpdates(List<BulkUpdateOpertaion> opertions) {
-    for (BulkUpdateOpertaion bulkUpdateOpertaion : opertions) {
-      if(log.isLoggable(Level.FINE)) {
-        log.fine("bulk updating: "+toString(bulkUpdateOpertaion.parameter)+"]");
+  protected void flushBulkUpdates(List<BulkUpdateOperation> opertions) {
+    for (BulkUpdateOperation bulkUpdateOperation : opertions) {
+      String updateStatement = bulkUpdateOperation.getStatement();
+      PersistentObject parameter = (PersistentObject) bulkUpdateOperation.getParameter();
+      if(updateStatement == null) {
+        updateStatement = dbSqlSessionFactory.getUpdateStatement(parameter);
+        updateStatement = dbSqlSessionFactory.mapStatement(updateStatement);
       }
-      sqlSession.update(bulkUpdateOpertaion.statement, bulkUpdateOpertaion.parameter);      
+      if (updateStatement==null) {
+        throw new ProcessEngineException("no update statement for "+parameter.getClass()+" in the ibatis mapping files");
+      }
+      if(log.isLoggable(Level.FINE)) {
+        log.fine("bulk updating: "+toString(bulkUpdateOperation.parameter)+"]");
+      }
+      sqlSession.update(updateStatement, bulkUpdateOperation.parameter);      
     }
     
   }

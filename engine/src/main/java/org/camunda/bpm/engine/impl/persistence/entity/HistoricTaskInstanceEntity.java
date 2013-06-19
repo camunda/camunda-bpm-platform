@@ -13,9 +13,6 @@
 
 package org.camunda.bpm.engine.impl.persistence.entity;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.camunda.bpm.engine.history.HistoricTaskInstance;
 import org.camunda.bpm.engine.impl.history.event.HistoricTaskInstanceEventEntity;
 
@@ -26,25 +23,5 @@ import org.camunda.bpm.engine.impl.history.event.HistoricTaskInstanceEventEntity
 public class HistoricTaskInstanceEntity extends HistoricTaskInstanceEventEntity implements HistoricTaskInstance {
 
   private static final long serialVersionUID = 1L;
-
-  public Object getPersistentState() {
-    Map<String, Object> persistentState = new HashMap<String, Object>();
-    persistentState.put("name", name);
-    persistentState.put("owner", owner);
-    persistentState.put("assignee", assignee);
-    persistentState.put("endTime", endTime);
-    persistentState.put("durationInMillis", durationInMillis);
-    persistentState.put("description", description);
-    persistentState.put("deleteReason", deleteReason);
-    persistentState.put("taskDefinitionKey", taskDefinitionKey);
-    persistentState.put("priority", priority);
-    if(parentTaskId != null) {
-      persistentState.put("parentTaskId", parentTaskId);
-    }
-    if(dueDate != null) {
-      persistentState.put("dueDate", dueDate);
-    }
-    return persistentState;
-  }
   
 }

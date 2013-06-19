@@ -21,9 +21,6 @@ import org.camunda.bpm.engine.impl.history.event.HistoricTaskInstanceEventEntity
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.history.handler.DbHistoryEventHandler;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.HistoricActivityInstanceEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.HistoricProcessInstanceEntity;
-import org.camunda.bpm.engine.impl.persistence.entity.HistoricTaskInstanceEntity;
 
 /**
  * <p>This HistoryEventProducer is aware of the {@link DbSqlSession} cache
@@ -34,58 +31,46 @@ import org.camunda.bpm.engine.impl.persistence.entity.HistoricTaskInstanceEntity
  */
 public class CacheAwareHistoryEventProducer extends DefaultHistoryEventProducer {
   
-  protected HistoricActivityInstanceEventEntity createActivityInstanceEventEntity(ExecutionEntity execution) {
-    return new HistoricActivityInstanceEntity();
-  }
-  
-  protected HistoricProcessInstanceEventEntity createProcessInstanceEventEntity(ExecutionEntity execution) {
-    return new HistoricProcessInstanceEntity();
-  }
-  
-  protected HistoricTaskInstanceEventEntity createTaskInstanceEvent(DelegateTask task) {
-    return new HistoricTaskInstanceEntity();
-  }
-  
-  protected HistoricActivityInstanceEventEntity getActivityInstanceEventEntity(ExecutionEntity execution) {
+   protected HistoricActivityInstanceEventEntity loadActivityInstanceEventEntity(ExecutionEntity execution) {
     final String activityInstanceId = execution.getActivityInstanceId();
     
-    HistoricActivityInstanceEntity cachedEntity = findInCache(HistoricActivityInstanceEntity.class, activityInstanceId);
+    HistoricActivityInstanceEventEntity cachedEntity = findInCache(HistoricActivityInstanceEventEntity.class, activityInstanceId);
     
     if(cachedEntity != null) {
       return cachedEntity;
       
     } else {      
-      return createActivityInstanceEventEntity(execution);
+      return newActivityInstanceEventEntity(execution);
       
     }
     
   }
   
-  protected HistoricProcessInstanceEventEntity getProcessInstanceEventEntity(ExecutionEntity execution) {
+  protected HistoricProcessInstanceEventEntity loadProcessInstanceEventEntity(ExecutionEntity execution) {
     final String processInstanceId = execution.getProcessInstanceId();
     
-    HistoricProcessInstanceEntity cachedEntity = findInCache(HistoricProcessInstanceEntity.class, processInstanceId);
+    HistoricProcessInstanceEventEntity cachedEntity = findInCache(HistoricProcessInstanceEventEntity.class, processInstanceId);
     
     if(cachedEntity != null) {
       return cachedEntity;
       
     } else {
-      return createProcessInstanceEventEntity(execution);
+      return newProcessInstanceEventEntity(execution);
       
     }
     
   }
   
-  protected HistoricTaskInstanceEventEntity getTaskInstanceEvent(DelegateTask task) {    
+  protected HistoricTaskInstanceEventEntity loadTaskInstanceEvent(DelegateTask task) {    
     final String taskId = task.getId();
     
-    HistoricTaskInstanceEntity cachedEntity = findInCache(HistoricTaskInstanceEntity.class, taskId);
+    HistoricTaskInstanceEventEntity cachedEntity = findInCache(HistoricTaskInstanceEventEntity.class, taskId);
     
     if(cachedEntity != null) {
       return cachedEntity;
       
     } else {
-      return createTaskInstanceEvent(task);
+      return newTaskInstanceEventEntity(task);
       
     }
   }

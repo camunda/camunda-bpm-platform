@@ -19,14 +19,16 @@ import java.util.List;
 
 import org.camunda.bpm.engine.history.HistoricVariableInstance;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.db.HasRevision;
 import org.camunda.bpm.engine.impl.db.PersistentObject;
+import org.camunda.bpm.engine.impl.history.event.HistoricVariableUpdateEventEntity;
 import org.camunda.bpm.engine.impl.variable.ValueFields;
 import org.camunda.bpm.engine.impl.variable.VariableType;
 
 /**
  * @author Christian Lipphardt (camunda)
  */
-public class HistoricVariableInstanceEntity implements ValueFields, HistoricVariableInstance, PersistentObject, Serializable {
+public class HistoricVariableInstanceEntity implements ValueFields, HistoricVariableInstance, PersistentObject, HasRevision, Serializable {
 
   private static final long serialVersionUID = 1L;
 
@@ -38,6 +40,7 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
   
   protected String name;
   protected int revision;
+  protected String variableTypeName;
   protected VariableType variableType;
 
   protected Long longValue;
@@ -50,12 +53,52 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
 
   protected Object cachedValue;
 
+  
   public HistoricVariableInstanceEntity() {
   }
 
+  public HistoricVariableInstanceEntity(HistoricVariableUpdateEventEntity historyEvent) {
+    updateFromEvent(historyEvent);
+  }
+
+  public void updateFromEvent(HistoricVariableUpdateEventEntity historyEvent) {
+    this.id = historyEvent.getVariableInstanceId();
+    this.processInstanceId = historyEvent.getProcessInstanceId();
+    this.taskId = historyEvent.getTaskId();
+    this.executionId = historyEvent.getExecutionId();
+    this.name = historyEvent.getVariableName();
+    this.variableTypeName = historyEvent.getVariableTypeName();
+    this.longValue = historyEvent.getLongValue();
+    this.doubleValue = historyEvent.getDoubleValue();
+    this.textValue = historyEvent.getTextValue();
+    this.textValue2 = historyEvent.getTextValue2();
+    
+    if(historyEvent.getByteValue() != null) {
+      setByteArrayValue(historyEvent.getByteValue());
+    }
+    
+  }
+  
+  public void delete() {
+    deleteByteArrayValue();
+    Context
+      .getCommandContext()
+      .getDbSqlSession()
+      .delete(this);
+  }
+
   public Object getPersistentState() {
-    // immutable
-    return HistoricVariableInstanceEntity.class;
+    List<Object> state = new ArrayList<Object>(5);
+    state.add(textValue);
+    state.add(textValue2);
+    state.add(doubleValue);
+    state.add(longValue);
+    state.add(byteArrayId);
+    return state;
+  }
+  
+  public int getRevisionNext() {
+    return revision+1;
   }
   
   public Object getValue() {
@@ -65,7 +108,7 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
     return cachedValue;
   }
   
-  // byte array value /////////////////////////////////////////////////////////
+ // byte array value /////////////////////////////////////////////////////////
   
   // i couldn't find a easy readable way to extract the common byte array value logic
   // into a common class.  therefor it's duplicated in VariableInstanceEntity, 
@@ -75,8 +118,8 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
     return byteArrayId;
   }
 
-  public void setByteArrayValueId(String byteArrayValueId) {
-    this.byteArrayId = byteArrayValueId;
+  public void setbyteArrayId(String byteArrayId) {
+    this.byteArrayId = byteArrayId;
     this.byteArrayValue = null;
   }
 
@@ -114,12 +157,24 @@ public class HistoricVariableInstanceEntity implements ValueFields, HistoricVari
     }
   }
 
+  protected void deleteByteArrayValue() {
+    if (byteArrayId != null) {
+      // the next apparently useless line is probably to ensure consistency in the DbSqlSession 
+      // cache, but should be checked and docced here (or removed if it turns out to be unnecessary)
+      getByteArrayValue();
+      Context
+        .getCommandContext()
+        .getByteArrayManager()
+        .deleteByteArrayById(this.byteArrayId);
+    }
+  }
+
   // getters and setters //////////////////////////////////////////////////////
 
   public String getVariableTypeName() {
-    return (variableType != null ? variableType.getTypeName() : null);
+    return variableTypeName;
   }
-
+  
   public String getVariableName() {
     return name;
   }

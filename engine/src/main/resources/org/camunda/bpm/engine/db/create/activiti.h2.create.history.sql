@@ -16,7 +16,8 @@ create table ACT_HI_PROCINST (
 );
 
 create table ACT_HI_ACTINST (
-    ID_ varchar(64) not null,
+    ID_ varchar(64) not null,    
+    PARENT_ACT_INST_ID_ varchar(64),
     PROC_DEF_ID_ varchar(64) not null,
     PROC_INST_ID_ varchar(64) not null,
     EXECUTION_ID_ varchar(64) not null,

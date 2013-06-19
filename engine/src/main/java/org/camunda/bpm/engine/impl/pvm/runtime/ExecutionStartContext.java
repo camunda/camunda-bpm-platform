@@ -21,12 +21,12 @@ import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
 /**
  * @author Daniel Meyer
  */
-public class StartingExecution {
+public class ExecutionStartContext {
   
   protected final ActivityImpl selectedInitial;
   protected Map<String, Object> variables;
 
-  public StartingExecution(ActivityImpl selectedInitial) {
+  public ExecutionStartContext(ActivityImpl selectedInitial) {
     this.selectedInitial = selectedInitial;
   }
 
@@ -40,6 +40,13 @@ public class StartingExecution {
   
   public Map<String, Object> getVariables() {
     return variables;
+  }
+
+  public void initialStarted(InterpretableExecution execution) {
+    // set variables in the context of the activity instance of the selected initial (start event)
+    if(variables != null) {
+      execution.setVariables(variables);
+    }
   }
   
 }

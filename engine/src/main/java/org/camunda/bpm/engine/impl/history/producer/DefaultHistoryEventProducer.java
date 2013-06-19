@@ -14,6 +14,8 @@ package org.camunda.bpm.engine.impl.history.producer;
 
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.DelegateTask;
+import org.camunda.bpm.engine.impl.cfg.IdGenerator;
+import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.history.event.HistoricActivityInstanceEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricProcessInstanceEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricTaskInstanceEventEntity;
@@ -22,6 +24,7 @@ import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricFormPropertyEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableScopeImpl;
@@ -106,6 +109,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     
     // init properties
     evt.setEventType(eventType);
+    evt.setTimestamp(ClockUtil.getCurrentTime());
     evt.setVariableInstanceId(variableInstance.getId());
     evt.setProcessInstanceId(variableInstance.getProcessInstanceId());
     evt.setExecutionId(variableInstance.getExecutionId());
@@ -137,7 +141,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     }
 
     // create event
-    HistoricVariableUpdateEventEntity evt = new HistoricVariableUpdateEventEntity();
+    HistoricVariableUpdateEventEntity evt = newVariableUpdateEventEntity(execution);
     // initialize
     initHistoricVariableUpdateEvt(evt, variableInstance, eventType);
     
@@ -150,38 +154,46 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
 
   // event instance factory ////////////////////////
   
-  protected HistoricProcessInstanceEventEntity createProcessInstanceEventEntity(ExecutionEntity execution) {
+  
+  protected HistoricProcessInstanceEventEntity newProcessInstanceEventEntity(ExecutionEntity execution) {
     return new HistoricProcessInstanceEventEntity();
   }
   
-  protected HistoricActivityInstanceEventEntity createActivityInstanceEventEntity(ExecutionEntity execution) {
+  protected HistoricActivityInstanceEventEntity newActivityInstanceEventEntity(ExecutionEntity execution) {
     return new HistoricActivityInstanceEventEntity();
   }
   
-  protected HistoricTaskInstanceEventEntity createTaskInstanceEvent(DelegateTask task) {
+  protected HistoricTaskInstanceEventEntity newTaskInstanceEventEntity(DelegateTask task) {
     return new HistoricTaskInstanceEventEntity();
   }
   
-  protected HistoricProcessInstanceEventEntity getProcessInstanceEventEntity(ExecutionEntity execution) {
-    return new HistoricProcessInstanceEventEntity();
+  protected HistoricVariableUpdateEventEntity newVariableUpdateEventEntity(ExecutionEntity execution) {
+    return new HistoricVariableUpdateEventEntity();
   }
   
-  protected HistoricActivityInstanceEventEntity getActivityInstanceEventEntity(ExecutionEntity execution) {
-    return new HistoricActivityInstanceEventEntity();
+  protected HistoricFormPropertyEntity newHistoricFormPropertyEvent() {
+    return new HistoricFormPropertyEntity();
   }
   
-  protected HistoricTaskInstanceEventEntity getTaskInstanceEvent(DelegateTask task) {
-    return new HistoricTaskInstanceEventEntity();
+  protected HistoricProcessInstanceEventEntity loadProcessInstanceEventEntity(ExecutionEntity execution) {
+    return newProcessInstanceEventEntity(execution);
+  }
+  
+  protected HistoricActivityInstanceEventEntity loadActivityInstanceEventEntity(ExecutionEntity execution) {
+    return newActivityInstanceEventEntity(execution);
+  }
+  
+  protected HistoricTaskInstanceEventEntity loadTaskInstanceEvent(DelegateTask task) {
+    return newTaskInstanceEventEntity(task);
   }
   
   // Implementation ////////////////////////////////
-  
 
   public HistoryEvent createProcessInstanceStartEvt(DelegateExecution execution) {
     final ExecutionEntity executionEntity = (ExecutionEntity) execution;
     
     // create event instance
-    HistoricProcessInstanceEventEntity evt = createProcessInstanceEventEntity(executionEntity);
+    HistoricProcessInstanceEventEntity evt = newProcessInstanceEventEntity(executionEntity);
        
     // initialize event
     initProcessInstanceEvent(evt, executionEntity, HistoryEvent.ACTIVITY_EVENT_TYPE_START);
@@ -205,7 +217,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     final ExecutionEntity executionEntity = (ExecutionEntity) execution;
     
     // create event instance
-    HistoricProcessInstanceEventEntity evt = getProcessInstanceEventEntity(executionEntity);
+    HistoricProcessInstanceEventEntity evt = loadProcessInstanceEventEntity(executionEntity);
        
     // initialize event
     initProcessInstanceEvent(evt, executionEntity, HistoryEvent.ACTIVITY_EVENT_TYPE_END);
@@ -230,7 +242,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     final ExecutionEntity executionEntity = (ExecutionEntity) execution;
     
     // create event instance
-    HistoricActivityInstanceEventEntity evt = createActivityInstanceEventEntity(executionEntity);
+    HistoricActivityInstanceEventEntity evt = newActivityInstanceEventEntity(executionEntity);
        
     // initialize event
     initActivityInstanceEvent(evt, (ExecutionEntity) execution, HistoryEvent.ACTIVITY_EVENT_TYPE_START);
@@ -244,7 +256,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     final ExecutionEntity executionEntity = (ExecutionEntity) execution;
     
     // create event instance
-    HistoricActivityInstanceEventEntity evt = getActivityInstanceEventEntity(executionEntity);
+    HistoricActivityInstanceEventEntity evt = loadActivityInstanceEventEntity(executionEntity);
        
     // initialize event
     initActivityInstanceEvent(evt, executionEntity, HistoryEvent.ACTIVITY_EVENT_TYPE_UPDATE);
@@ -268,7 +280,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
     final ExecutionEntity executionEntity = (ExecutionEntity) execution;
     
     // create event instance
-    HistoricActivityInstanceEventEntity evt = getActivityInstanceEventEntity(executionEntity);
+    HistoricActivityInstanceEventEntity evt = loadActivityInstanceEventEntity(executionEntity);
        
     // initialize event
     initActivityInstanceEvent(evt, (ExecutionEntity) execution, HistoryEvent.ACTIVITY_EVENT_TYPE_END);
@@ -284,7 +296,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
   public HistoryEvent createTaskInstanceCreateEvt(DelegateTask task) {
     
     // create event instance
-    HistoricTaskInstanceEventEntity evt = createTaskInstanceEvent(task);
+    HistoricTaskInstanceEventEntity evt = newTaskInstanceEventEntity(task);
        
     // initialize event
     initTaskInstanceEvent(evt, (TaskEntity) task, HistoryEvent.TASK_EVENT_TYPE_CREATE);
@@ -297,7 +309,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
   public HistoryEvent createTaskInstanceUpdateEvt(DelegateTask task) {
     
     // create event instance
-    HistoricTaskInstanceEventEntity evt = getTaskInstanceEvent(task);
+    HistoricTaskInstanceEventEntity evt = loadTaskInstanceEvent(task);
        
     // initialize event
     initTaskInstanceEvent(evt, (TaskEntity) task, HistoryEvent.TASK_EVENT_TYPE_UPDATE);
@@ -308,7 +320,7 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
   public HistoryEvent createTaskInstanceCompleteEvt(DelegateTask task, String deleteReason) {
     
     // create event instance
-    HistoricTaskInstanceEventEntity evt = getTaskInstanceEvent(task);
+    HistoricTaskInstanceEventEntity evt = loadTaskInstanceEvent(task);
        
     // initialize event
     initTaskInstanceEvent(evt, (TaskEntity) task, HistoryEvent.TASK_EVENT_TYPE_DELETE);
@@ -327,12 +339,38 @@ public class DefaultHistoryEventProducer implements HistoryEventProducer {
   
   // variables /////////////////////////////////
   
+  public HistoryEvent createHistoricVariableCreateEvt(VariableInstanceEntity variableInstance, VariableScopeImpl variableScopeImpl) {
+    return createHistoricVariableEvent(variableInstance, variableScopeImpl, HistoryEvent.VARIABLE_EVENT_TYPE_CREATE);
+  }
+  
   public HistoryEvent createHistoricVariableDeleteEvt(VariableInstanceEntity variableInstance, VariableScopeImpl variableScopeImpl) {
     return createHistoricVariableEvent(variableInstance, variableScopeImpl, HistoryEvent.VARIABLE_EVENT_TYPE_DELETE);
   }
 
   public HistoryEvent createHistoricVariableUpdateEvt(VariableInstanceEntity variableInstance, VariableScopeImpl variableScopeImpl) {
     return createHistoricVariableEvent(variableInstance, variableScopeImpl, HistoryEvent.VARIABLE_EVENT_TYPE_UPDATE);
+  }
+  
+  // form Properties ///////////////////////////
+  
+  public HistoryEvent createFormPropertyUpdateEvt(ExecutionEntity execution, String propertyId, String propertyValue, String taskId) {
+    
+    final IdGenerator idGenerator = Context.getProcessEngineConfiguration().getIdGenerator();
+
+    HistoricFormPropertyEntity historicFormPropertyEntity = newHistoricFormPropertyEvent();
+    
+    historicFormPropertyEntity.setId(idGenerator.getNextId());
+    historicFormPropertyEntity.setEventType(HistoryEvent.FORM_PROPERTY_UPDATE);
+    historicFormPropertyEntity.setTimestamp(ClockUtil.getCurrentTime());
+    historicFormPropertyEntity.setActivityInstanceId(execution.getActivityInstanceId());
+    historicFormPropertyEntity.setExecutionId(execution.getId());
+    historicFormPropertyEntity.setProcessDefinitionId(execution.getProcessDefinitionId());    
+    historicFormPropertyEntity.setProcessInstanceId(execution.getProcessInstanceId());
+    historicFormPropertyEntity.setPropertyId(propertyId);
+    historicFormPropertyEntity.setPropertyValue(propertyValue);
+    historicFormPropertyEntity.setTaskId(taskId);
+    
+    return historicFormPropertyEntity;
   }
 
 }

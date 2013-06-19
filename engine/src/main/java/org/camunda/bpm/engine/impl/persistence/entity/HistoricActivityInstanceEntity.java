@@ -14,9 +14,6 @@
 
 package org.camunda.bpm.engine.impl.persistence.entity;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.impl.history.event.HistoricActivityInstanceEventEntity;
 
@@ -27,13 +24,4 @@ public class HistoricActivityInstanceEntity extends HistoricActivityInstanceEven
 
   private static final long serialVersionUID = 1L;
   
-  public Object getPersistentState() {
-    Map<String, Object> persistentState = (Map<String, Object>) new HashMap<String, Object>();
-    persistentState.put("endTime", endTime);
-    persistentState.put("durationInMillis", durationInMillis);
-    persistentState.put("executionId", executionId);
-    persistentState.put("assignee", taskAssignee);
-    return persistentState;
-  }
-
 }
