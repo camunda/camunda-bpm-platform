@@ -215,6 +215,8 @@
             <exclude>**/ProcessInstanceMigrationTest.java</exclude>
             <exclude>**/HistoricTaskInstanceTest.java</exclude>
             <exclude>**/ExecutionListenerTest.java</exclude>
+            <exclude>**/ManagementServiceTest.java</exclude>
+            <exclude>**/VariablesTest.java</exclude>
             <!-- END-DO NOT MERGE THIS -->
           </excludes>
         </configuration>
