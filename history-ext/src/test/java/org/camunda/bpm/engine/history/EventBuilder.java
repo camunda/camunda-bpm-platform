@@ -8,6 +8,7 @@ import org.camunda.bpm.engine.impl.history.event.HistoricProcessInstanceEventEnt
 import org.camunda.bpm.engine.impl.history.event.HistoricTaskInstanceEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoricVariableUpdateEventEntity;
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
+import org.camunda.bpm.engine.impl.persistence.entity.HistoricFormPropertyEntity;
 
 /**
  * Builds some events for testing.
@@ -60,12 +61,26 @@ public class EventBuilder {
     return event;
   }
 
+  public static HistoricFormPropertyEntity buildHistoricFormPropertyEntity() {
+
+    HistoricFormPropertyEntity event = new HistoricFormPropertyEntity();
+    event = fillHistoricEventData(event);
+    event = fillHistoricDetailEventEntity(event);
+    event = fillHistoricFormPropertyEntity(event);
+    return event;
+  }
+
+  public static <T extends HistoricFormPropertyEntity> T fillHistoricFormPropertyEntity(T event) {
+    event.setPropertyId("TEST_PROPERTY_ID");
+    event.setPropertyValue("TEST_PROPERTY_VALUE");
+    return event;
+  }
+
   public static <T extends HistoryEvent> T fillHistoricEventData(final T event) {
     event.setId("TEST_ID");
     event.setExecutionId("TEST_EXECUTION_ID");
     event.setProcessDefinitionId("TEST_PROCESSDEFINITION_ID");
     event.setProcessInstanceId("TEST_PROCESSINSTANCE_ID");
-    // event.setTimestamp(new Date());
     return event;
   }
 
@@ -86,7 +101,6 @@ public class EventBuilder {
   }
 
   public static <T extends HistoricProcessInstanceEventEntity> T fillHistoricProcessInstanceEventEntity(T event) {
-    // event.setActivityId("TEST_ACTIVITY_ID");
     event.setBusinessKey("TEST_BUSINESS_KEY");
     event.setStartUserId("TEST_START_USER_ID");
     event.setSuperProcessInstanceId("TEST_SUPER_PROCESS_INSTANCE_ID");

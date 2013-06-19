@@ -11,6 +11,14 @@
         </layout>
     </appender>
 
+    <logger name="org.camunda.bpm.engine.history">
+      <level value="DEBUG"/>
+    </logger>
+
+    <logger name="org.springframework">
+      <level value="WARN"/>
+    </logger>
+
     <root>
         <priority value="info"/>
         <appender-ref ref="default"/>

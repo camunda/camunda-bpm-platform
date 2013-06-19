@@ -7,6 +7,8 @@ import org.camunda.bpm.engine.impl.history.event.HistoricVariableUpdateEventEnti
 import org.camunda.bpm.engine.impl.history.event.HistoryEvent;
 import org.junit.Assert;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Base for Marshalling-Tests.
@@ -15,6 +17,8 @@ import org.junit.Test;
  * 
  */
 public abstract class AbstractMarshallingTest {
+
+  private static final Logger LOG = LoggerFactory.getLogger(AbstractMarshallingTest.class);
 
   @Test
   public void marshallHistoricTaskInstanceEventEntity() throws Exception {
@@ -47,6 +51,7 @@ public abstract class AbstractMarshallingTest {
   protected void testMarshalling(HistoryEventMessage entity) throws Exception {
 
     String marshallResult = marshall(entity);
+    LOG.debug("Marshalled Event : {}", marshallResult);
     HistoryEventMessage unmarshallResult = unmarshall(marshallResult);
     assertHistoryEvent(entity.getHistoryEvent(), unmarshallResult.getHistoryEvent());
   }
