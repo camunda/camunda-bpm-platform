@@ -98,10 +98,6 @@ public class ScopeUtil {
         candiadateExecution = originalExecution.getParent();
       }      
       
-      if(!candiadateExecution.isScope()) {
-        candiadateExecution = candiadateExecution.getParent();
-      }
-      
       return candiadateExecution;
     }
   }
