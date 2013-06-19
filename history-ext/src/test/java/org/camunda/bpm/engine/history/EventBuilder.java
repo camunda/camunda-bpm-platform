@@ -65,7 +65,7 @@ public class EventBuilder {
     event.setExecutionId("TEST_EXECUTION_ID");
     event.setProcessDefinitionId("TEST_PROCESSDEFINITION_ID");
     event.setProcessInstanceId("TEST_PROCESSINSTANCE_ID");
-    event.setTimestamp(new Date());
+    // event.setTimestamp(new Date());
     return event;
   }
 
@@ -86,7 +86,7 @@ public class EventBuilder {
   }
 
   public static <T extends HistoricProcessInstanceEventEntity> T fillHistoricProcessInstanceEventEntity(T event) {
-    event.setActivityId("TEST_ACTIVITY_ID");
+    // event.setActivityId("TEST_ACTIVITY_ID");
     event.setBusinessKey("TEST_BUSINESS_KEY");
     event.setStartUserId("TEST_START_USER_ID");
     event.setSuperProcessInstanceId("TEST_SUPER_PROCESS_INSTANCE_ID");
