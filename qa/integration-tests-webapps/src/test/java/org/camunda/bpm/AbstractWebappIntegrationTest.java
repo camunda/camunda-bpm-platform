@@ -44,12 +44,14 @@ public abstract class AbstractWebappIntegrationTest {
   public ApacheHttpClient4 client;
   public DefaultHttpClient defaultHttpClient;
 
+  protected TestProperties testProperties;
+
   @Before
   public void createClient() throws Exception {
-    TestProperties util = new TestProperties();
+    testProperties = new TestProperties();
 
     String applicationContextPath = getApplicationContextPath();
-    APP_BASE_PATH = util.getApplicationPath("/" + applicationContextPath);
+    APP_BASE_PATH = testProperties.getApplicationPath("/" + applicationContextPath);
     LOGGER.info("Connecting to application "+APP_BASE_PATH);
 
     ClientConfig clientConfig = new DefaultApacheHttpClient4Config();
