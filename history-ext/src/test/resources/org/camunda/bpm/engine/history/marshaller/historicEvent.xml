@@ -1,0 +1,6 @@
+<org.camunda.bpm.engine.impl.history.event.HistoryEvent>
+  <id>TEST_ID</id>
+  <processInstanceId>TEST_PROCESSINSTANCE_ID</processInstanceId>
+  <executionId>TEST_EXECUTION_ID</executionId>
+  <processDefinitionId>TEST_PROCESSDEFINITION_ID</processDefinitionId>
+</org.camunda.bpm.engine.impl.history.event.HistoryEvent>

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:int="http://www.springframework.org/schema/integration"
+  xmlns:p="http://www.springframework.org/schema/p"
+  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+  http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration-2.2.xsd">
+
+  <!-- HistoryEventMessage goes in here -->
+  <int:channel id="historyEventMessageChannel"/>
+
+  <!-- START-TRANSFORMATION -->
+
+  <int:channel id="transformedHistoryEventMessageChannel"/>
+
+  <bean id="historyEventMessageTransformer" class="org.camunda.bpm.engine.history.si.Jackson2HistoryEventMessageTransformer"/>
+
+<!--
+  <bean id="historyEventMessageTransformer" class="org.camunda.bpm.engine.history.si.Jaxb2HistoryEventMessageTransformer"/>
+-->
+
+  <!-- transforms the historyEventMessages to XML or JSON, whatever 'ref' points to -->
+  <int:service-activator input-channel="historyEventMessageChannel" 
+                         output-channel="transformedHistoryEventMessageChannel"
+                         ref="historyEventMessageTransformer"
+                         method="transformFromHistoryEventMessage"/>
+
+  <!-- END-TRANSFORMATION -->
+
+  <!-- ENRICH HEADER WITH NEEDED INFORMATION -->
+  <int:header-enricher input-channel="transformedHistoryEventMessageChannel" output-channel="outChannel">
+    <int:header name="hostname" value="localhost"/>
+    <int:header name="developerOfTheDay" value="Klaus.Mueller"/>
+    <int:header name="messageOfTheDay" value="Use meaningfull headers in messages"/>
+  </int:header-enricher>
+
+  <!-- THIS CHANNEL SHOULD POINT TO AN OUTBOUND-GATEWAY, IN THE TEST WE USE AN CONSUMER  -->
+  <int:channel id="outChannel"/>
+
+</beans>
