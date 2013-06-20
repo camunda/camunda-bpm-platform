@@ -84,6 +84,11 @@
     where PARENT_ID_ = #{parameter}
   </select>
   
+  <select id="selectExecutionsByProcessInstanceId" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="executionResultMap">
+    select * from ${prefix}ACT_RU_EXECUTION
+    where PROC_INST_ID_ = #{parameter}
+  </select>
+  
   <select id="selectProcessInstanceIdsByProcessDefinitionId" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultType="string">
     select ID_
     from ${prefix}ACT_RU_EXECUTION
@@ -92,7 +97,7 @@
   
   <select id="selectExecutionsByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.ExecutionQueryImpl" resultMap="executionResultMap">
   	${limitBefore}
-    select RES.* ${limitBetween}, KEY_
+    select RES.* ${limitBetween}, P.KEY_
     <include refid="selectExecutionsByQueryCriteriaSql"/>
     ${orderBy}
     ${limitAfter}
@@ -106,7 +111,7 @@
   <!--  same as selectExecutionByQueryCriteria, but with different parameterType -->
   <select id="selectProcessInstanceByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.ProcessInstanceQueryImpl" resultMap="executionResultMap">
   	${limitBefore}
-    select RES.* ${limitBetween}, KEY_
+    select RES.* ${limitBetween}, P.KEY_
     <include refid="selectExecutionsByQueryCriteriaSql"/>
     ${orderBy}
     ${limitAfter}
@@ -280,5 +285,19 @@
   <select id="selectExecutionCountByNativeQuery" parameterType="java.util.Map" resultType="long">
     ${sql}
   </select>  
+  
+  <update id="updateExecutionSuspensionStateByParameters" parameterType="java.util.Map">
+    update ${prefix}ACT_RU_EXECUTION EXC set
+      EXC.REV_ = EXC.REV_ + 1,
+      EXC.SUSPENSION_STATE_ = #{suspensionState, jdbcType=INTEGER}
+    <where>
+      <if test="processDefinitionId != null">
+        EXC.PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR}
+      </if>
+      <if test="processInstanceId != null">
+        and EXC.PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
+      </if>
+    </where>
+  </update>
   
 </mapper>

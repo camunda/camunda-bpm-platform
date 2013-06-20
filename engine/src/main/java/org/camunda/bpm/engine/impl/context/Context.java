@@ -16,7 +16,6 @@ package org.camunda.bpm.engine.impl.context;
 import java.util.Stack;
 import java.util.concurrent.Callable;
 
-import org.camunda.bpm.application.AbstractProcessApplication;
 import org.camunda.bpm.application.ProcessApplicationInterface;
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.application.ProcessApplicationUnavailableException;

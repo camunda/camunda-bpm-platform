@@ -13,15 +13,12 @@
 
 package org.camunda.bpm.engine.impl.cmd;
 
-import java.io.Serializable;
 import java.util.Map;
 
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbSqlSession;
 import org.camunda.bpm.engine.impl.form.TaskFormHandler;
-import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricFormPropertyEntity;
@@ -32,31 +29,20 @@ import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
  * @author Tom Baeyens
  * @author Joram Barrez
  */
-public class SubmitTaskFormCmd implements Command<Object>, Serializable {
+public class SubmitTaskFormCmd extends NeedsActiveTaskCmd<Object> {
 
   private static final long serialVersionUID = 1L;
+  
   protected String taskId;
   protected Map<String, String> properties;
   
   public SubmitTaskFormCmd(String taskId, Map<String, String> properties) {
+    super(taskId);
     this.taskId = taskId;
     this.properties = properties;
   }
-
-  public Object execute(CommandContext commandContext) {
-    if(taskId == null) {
-      throw new ProcessEngineException("taskId is null");
-    }
-    
-    TaskEntity task = Context
-      .getCommandContext()
-      .getTaskManager()
-      .findTaskById(taskId);
-
-    if (task == null) {
-      throw new ProcessEngineException("Cannot find task with id " + taskId);
-    }
-    
+  
+  protected Object execute(CommandContext commandContext, TaskEntity task) {
     int historyLevel = Context.getProcessEngineConfiguration().getHistoryLevel();
     ExecutionEntity execution = task.getExecution();
     if (historyLevel>=ProcessEngineConfigurationImpl.HISTORYLEVEL_AUDIT && execution != null) {
@@ -75,4 +61,10 @@ public class SubmitTaskFormCmd implements Command<Object>, Serializable {
 
     return null;
   }
+  
+  @Override
+  protected String getSuspendedTaskException() {
+    return "Cannot submit a form to a suspended task";
+  }
+  
 }

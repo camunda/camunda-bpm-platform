@@ -16,18 +16,15 @@ import static org.camunda.bpm.container.impl.jmx.deployment.Attachments.PROCESS_
 
 import org.camunda.bpm.application.AbstractProcessApplication;
 import org.camunda.bpm.container.impl.jmx.JmxRuntimeContainerDelegate.ServiceTypes;
-import org.camunda.bpm.container.impl.jmx.deployment.Attachments;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanDeploymentOperation;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanDeploymentOperationStep;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanServiceContainer;
 import org.camunda.bpm.container.impl.jmx.services.JmxManagedJobExecutor;
-import org.camunda.bpm.container.impl.jmx.services.JmxManagedThreadPool;
 import org.camunda.bpm.container.impl.metadata.spi.JobAcquisitionXml;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.RuntimeContainerJobExecutor;
-import org.camunda.bpm.engine.impl.jobexecutor.ThreadPoolJobExecutor;
 
 /**
  * <p>Deployment operation step responsible for starting a JobEexecutor</p> 

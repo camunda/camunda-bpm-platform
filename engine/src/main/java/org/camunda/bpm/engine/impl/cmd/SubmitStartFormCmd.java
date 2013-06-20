@@ -13,15 +13,12 @@
 
 package org.camunda.bpm.engine.impl.cmd;
 
-import java.io.Serializable;
 import java.util.Map;
 
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbSqlSession;
 import org.camunda.bpm.engine.impl.form.StartFormHandler;
-import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricFormPropertyEntity;
@@ -31,29 +28,22 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 
 /**
  * @author Tom Baeyens
+ * @author Joram Barrez
  */
-public class SubmitStartFormCmd implements Command<ProcessInstance>, Serializable {
+public class SubmitStartFormCmd extends NeedsActiveProcessDefinitionCmd<ProcessInstance> {
 
   private static final long serialVersionUID = 1L;
-  protected String processDefinitionId;
+  
   protected final String businessKey;
   protected Map<String, String> properties;
   
   public SubmitStartFormCmd(String processDefinitionId, String businessKey, Map<String, String> properties) {
-    this.processDefinitionId = processDefinitionId;
-	this.businessKey = businessKey;
+    super(processDefinitionId);
+    this.businessKey = businessKey;
     this.properties = properties;
   }
-
-  public ProcessInstance execute(CommandContext commandContext) {
-    ProcessDefinitionEntity processDefinition = Context
-      .getProcessEngineConfiguration()
-      .getDeploymentCache()
-      .findDeployedProcessDefinitionById(processDefinitionId);
-    if (processDefinition == null) {
-      throw new ProcessEngineException("No process definition found for id = '" + processDefinitionId + "'");
-    }
-    
+  
+  protected ProcessInstance execute(CommandContext commandContext, ProcessDefinitionEntity processDefinition) {
     ExecutionEntity processInstance = null;
     if (businessKey != null) {
       processInstance = processDefinition.createProcessInstance(businessKey);

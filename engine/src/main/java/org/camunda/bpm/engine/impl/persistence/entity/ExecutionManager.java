@@ -83,6 +83,11 @@ public class ExecutionManager extends AbstractManager {
   public List<ExecutionEntity> findChildExecutionsByParentExecutionId(String parentExecutionId) {
     return getDbSqlSession().selectList("selectExecutionsByParentExecutionId", parentExecutionId);
   }
+  
+  @SuppressWarnings("unchecked")
+  public List<ExecutionEntity> findChildExecutionsByProcessInstanceId(String processInstanceId) {
+    return getDbSqlSession().selectList("selectExecutionsByProcessInstanceId", processInstanceId);
+  }
 
   public ExecutionEntity findExecutionById(String executionId) {
     return (ExecutionEntity) getDbSqlSession().selectById(ExecutionEntity.class, executionId);
@@ -126,6 +131,20 @@ public class ExecutionManager extends AbstractManager {
 
   public long findExecutionCountByNativeQuery(Map<String, Object> parameterMap) {
     return (Long) getDbSqlSession().selectOne("selectExecutionCountByNativeQuery", parameterMap);
+  }
+  
+  public void updateExecutionSuspensionStateByProcessDefinitionId(String processDefinitionId, SuspensionState suspensionState) {
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("processDefinitionId", processDefinitionId);
+    parameters.put("suspensionState", suspensionState.getStateCode());
+    getDbSqlSession().update("updateExecutionSuspensionStateByParameters", parameters);
+  }
+  
+  public void updateExecutionSuspensionStateByProcessInstanceId(String processInstanceId, SuspensionState suspensionState) {
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("processInstanceId", processInstanceId);
+    parameters.put("suspensionState", suspensionState.getStateCode());
+    getDbSqlSession().update("updateExecutionSuspensionStateByParameters", parameters);
   }
 
 }

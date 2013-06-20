@@ -20,6 +20,7 @@ import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity;
 import org.camunda.bpm.engine.impl.repository.DeploymentBuilderImpl;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
@@ -27,6 +28,7 @@ import org.camunda.bpm.engine.repository.Deployment;
 
 /**
  * @author Tom Baeyens
+ * @author Joram Barrez
  */
 public class DeployCmd<T> implements Command<Deployment>, Serializable {
 
@@ -61,15 +63,19 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
       .getDeploymentManager()
       .insertDeployment(deployment);
     
+    
+    if (deploymentBuilder.getProcessDefinitionsActivationDate() != null) {
+      scheduleProcessDefinitionActivation(commandContext, deployment);
+    }
+    
     return deployment;
   }
 
   protected boolean deploymentsDiffer(DeploymentEntity deployment, DeploymentEntity saved) {
-    
     if(deployment.getResources() == null || saved.getResources() == null) {
       return true;
     }
-    
+  
     Map<String, ResourceEntity> resources = deployment.getResources();
     Map<String, ResourceEntity> savedResources = saved.getResources();
     
@@ -91,6 +97,21 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
       }
     }
     return false;
+  }
+  
+  protected void scheduleProcessDefinitionActivation(CommandContext commandContext, DeploymentEntity deployment) {
+    for (ProcessDefinitionEntity processDefinitionEntity : deployment.getDeployedArtifacts(ProcessDefinitionEntity.class)) {
+      
+      // If activation date is set, we first suspend all the process definition
+      SuspendProcessDefinitionCmd suspendProcessDefinitionCmd = 
+              new SuspendProcessDefinitionCmd(processDefinitionEntity, false, null);
+      suspendProcessDefinitionCmd.execute(commandContext);
+      
+      // And we schedule an activation at the provided date
+      ActivateProcessDefinitionCmd activateProcessDefinitionCmd =
+              new ActivateProcessDefinitionCmd(processDefinitionEntity, false, deploymentBuilder.getProcessDefinitionsActivationDate());
+      activateProcessDefinitionCmd.execute(commandContext);
+    }
   }
 
 //  private boolean resourcesDiffer(ByteArrayEntity value, ByteArrayEntity other) {

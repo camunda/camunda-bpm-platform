@@ -16,8 +16,6 @@ import java.io.Serializable;
 import java.util.Collection;
 import java.util.Map;
 
-import org.camunda.bpm.engine.impl.cmd.RemoveExecutionVariablesCmd;
-import org.camunda.bpm.engine.impl.cmd.SetExecutionVariablesCmd;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 

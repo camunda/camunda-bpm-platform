@@ -175,7 +175,7 @@ public interface RuntimeService {
 
    * @return the {@link ProcessInstance} object representing the started process instance
    * 
-   * @throws ActivitiExeception if no subscription to a message with the given name exists
+   * @throws ProcessEngineException if no subscription to a message with the given name exists
    * 
    * @since 5.9
    */
@@ -194,7 +194,7 @@ public interface RuntimeService {
    * @param businessKey
    *          the business key which is added to the started process instance 
    * 
-   * @throws ActivitiExeception if no subscription to a message with the given name exists
+   * @throws ProcessEngineException if no subscription to a message with the given name exists
    * 
    * @since 5.10
    */
@@ -215,7 +215,7 @@ public interface RuntimeService {
    *          variables to the started process instance.
    * @return the {@link ProcessInstance} object representing the started process instance
    * 
-   * @throws ActivitiExeception if no subscription to a message with the given name exists
+   * @throws ProcessEngineException if no subscription to a message with the given name exists
    * 
    * @since 5.9
    */
@@ -238,7 +238,7 @@ public interface RuntimeService {
    *          variables to the started process instance.
    * @return the {@link ProcessInstance} object representing the started process instance
    * 
-   * @throws ActivitiExeception if no subscription to a message with the given name exists
+   * @throws ProcessEngineException if no subscription to a message with the given name exists
    * 
    * @since 5.9
    */
@@ -460,14 +460,14 @@ public interface RuntimeService {
   /**
    * Suspends the process instance with the given id. 
    * 
-   * If a process instance is in state suspended, activiti will not 
+   * If a process instance is in state suspended, the engine will not 
    * execute jobs (timers, messages) associated with this instance.
    * 
    * If you have a process instance hierarchy, suspending
    * one process instance form the hierarchy will not suspend other 
    * process instances form that hierarchy.
    * 
-   *  @throws ProcessEngineException if no such processInstance can be found or if the process instance is already in state suspended.
+   *  @throws ProcessEngineException if no such processInstance can be found.
    */
   void suspendProcessInstanceById(String processInstanceId);
   
@@ -478,7 +478,7 @@ public interface RuntimeService {
    * one process instance form the hierarchy will not suspend other 
    * process instances form that hierarchy.
    * 
-   * @throws ProcessEngineException if no such processInstance can be found or if the process instance is already in state active.
+   * @throws ProcessEngineException if no such processInstance can be found.
    */
   void activateProcessInstanceById(String processInstanceId);
   

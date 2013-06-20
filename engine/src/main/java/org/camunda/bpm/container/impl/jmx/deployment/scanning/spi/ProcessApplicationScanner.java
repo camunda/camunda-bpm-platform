@@ -15,6 +15,8 @@ package org.camunda.bpm.container.impl.jmx.deployment.scanning.spi;
 import java.net.URL;
 import java.util.Map;
 
+import org.camunda.bpm.application.impl.metadata.spi.ProcessArchiveXml;
+
 /**
  * @author Daniel Meyer
  *

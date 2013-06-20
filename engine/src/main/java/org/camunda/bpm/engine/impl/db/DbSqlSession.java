@@ -22,6 +22,7 @@ import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -78,6 +79,7 @@ public class DbSqlSession implements Session {
   protected List<PersistentObject> insertedObjects = new ArrayList<PersistentObject>();
   protected List<PersistentObject> updatedObjects = new ArrayList<PersistentObject>();
   protected Map<Class<?>, Map<String, CachedObject>> cachedObjects = new HashMap<Class<?>, Map<String,CachedObject>>();
+  protected List<BulkUpdateOperation> bulkUpdates = new ArrayList<BulkUpdateOperation>();
   protected List<DeleteOperation> deleteOperations = new ArrayList<DeleteOperation>();
   protected List<DeserializedObject> deserializedObjects = new ArrayList<DeserializedObject>();
   protected String connectionMetadataDefaultCatalog = null;
@@ -163,6 +165,11 @@ public class DbSqlSession implements Session {
     deleteOperations.add(new BulkDeleteOperation(statement, parameter));
   }
   
+  public void update(String statement, Object parameter) {
+    BulkUpdateOperation updateOperation = new BulkUpdateOperation(statement, parameter);
+    bulkUpdates.add(updateOperation);
+  }
+  
   /**
    * Use this {@link DeleteOperation} to execute a dedicated delete statement.
    * It is important to note there won't be any optimistic locking checks done 
@@ -187,6 +194,24 @@ public class DbSqlSession implements Session {
     }
     public String toString() {
       return "bulk delete: "+statement;
+    }
+  }
+  
+  public class BulkUpdateOperation {
+    String statement;
+    Object parameter;
+    
+    public BulkUpdateOperation(String statement, Object parameter) {
+      this.statement = statement;
+      this.parameter = parameter;
+    }
+    
+    public String getStatement() {
+      return statement;
+    }
+    
+    public Object getParameter() {
+      return parameter;
     }
   }
   
@@ -443,6 +468,9 @@ public class DbSqlSession implements Session {
       for (PersistentObject updatedObject: updatedObjects) {
         log.fine("  update "+toString(updatedObject));
       }
+      for (BulkUpdateOperation bulkUpdateOperation: bulkUpdates) {
+        log.fine(" bulk update "+ bulkUpdateOperation);
+      }
       for (Object deleteOperation: deleteOperations) {
         log.fine("  "+deleteOperation);
       }
@@ -451,6 +479,7 @@ public class DbSqlSession implements Session {
 
     flushInserts();
     flushUpdates(updatedObjects);
+    flushBulkUpdates();
     flushDeletes();
   }
 
@@ -652,6 +681,20 @@ public class DbSqlSession implements Session {
       
     }
     updatedObjects.clear();
+  }
+  
+  protected void flushBulkUpdates() {
+    for (BulkUpdateOperation bulkUpdateOperation : bulkUpdates) {
+      String updateStatement = bulkUpdateOperation.getStatement();
+      if (updateStatement==null) {
+        throw new ProcessEngineException("no update statement " + updateStatement + " in the ibatis mapping files");
+      }
+      if(log.isLoggable(Level.FINE)) {
+        log.fine("bulk updating: "+ bulkUpdateOperation);
+      }
+      sqlSession.update(updateStatement, bulkUpdateOperation.parameter);
+    }
+    
   }
 
   protected void flushDeletes() {

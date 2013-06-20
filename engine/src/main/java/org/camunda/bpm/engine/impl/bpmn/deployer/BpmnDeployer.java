@@ -180,10 +180,14 @@ public class BpmnDeployer implements Deployer {
 
       }
 
+      // Add to cache
       Context
         .getProcessEngineConfiguration()
         .getDeploymentCache()
         .addProcessDefinition(processDefinition);
+      
+      // Add to deployment for further usage
+      deployment.addDeployedArtifact(processDefinition);
     }
   }
 

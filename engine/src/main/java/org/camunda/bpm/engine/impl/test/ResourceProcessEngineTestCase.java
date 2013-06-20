@@ -23,10 +23,10 @@ import org.camunda.bpm.engine.ProcessEngines;
  */
 public class ResourceProcessEngineTestCase extends AbstractProcessEngineTestCase {
   
-  protected String activitiConfigurationResource;
+  protected String engineConfigurationResource;
   
   public ResourceProcessEngineTestCase(String activitiConfigurationResource) {
-    this.activitiConfigurationResource = activitiConfigurationResource;
+    this.engineConfigurationResource = activitiConfigurationResource;
   }
   
   @Override
@@ -39,7 +39,7 @@ public class ResourceProcessEngineTestCase extends AbstractProcessEngineTestCase
   @Override
   protected void initializeProcessEngine() {
     processEngine = ProcessEngineConfiguration
-            .createProcessEngineConfigurationFromResource(activitiConfigurationResource)
+            .createProcessEngineConfigurationFromResource(engineConfigurationResource)
             .buildProcessEngine();
   }
 

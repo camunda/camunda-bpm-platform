@@ -19,32 +19,31 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.event.MessageEventHandler;
-import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 
 
 /**
  * @author Daniel Meyer
+ * @author Joram Barrez
  */
-public class MessageEventReceivedCmd implements Command<Void> {
+public class MessageEventReceivedCmd extends NeedsActiveExecutionCmd<Void> {
+  
+  private static final long serialVersionUID = 1L;
   
   protected final Map<String, Object> processVariables;
   protected final String messageName;
-  protected final String executionId;
 
   public MessageEventReceivedCmd(String messageName, String executionId, Map<String, Object> processVariables) {
+    super(executionId);
     this.messageName = messageName;
-    this.executionId = executionId;
     this.processVariables = processVariables;
   }
 
-  public Void execute(CommandContext commandContext) {
+  protected Void execute(CommandContext commandContext, ExecutionEntity execution) {
     if(messageName == null) {
       throw new ProcessEngineException("messageName cannot be null");
-    }
-    if(executionId == null) {
-      throw new ProcessEngineException("executionId cannot be null");
     }
     
     List<EventSubscriptionEntity> eventSubscriptions = commandContext.getEventSubscriptionManager()

@@ -16,7 +16,6 @@ import java.beans.FeatureDescriptor;
 import java.util.Collections;
 import java.util.Iterator;
 
-import org.camunda.bpm.application.AbstractProcessApplication;
 import org.camunda.bpm.application.ProcessApplicationInterface;
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.application.ProcessApplicationUnavailableException;
