@@ -34,7 +34,7 @@
         $scope.currentEngine = $rootScope.currentEngine = $scope.engines[current];
 
         if (!$scope.currentEngine) {
-          Notifications.addError({ status: 'Not found', message: 'The engine you are trying to access does not exist' });
+          Notifications.addError({ status: 'Not found', message: 'The process engine you are trying to access does not exist' });
           $location.path('/dashboard')
         }
       });
