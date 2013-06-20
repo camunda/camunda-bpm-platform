@@ -41,18 +41,24 @@ public class SpringIntegationTest {
   @Qualifier("historyEventMessageChannel")
   private MessageChannel historyEventMessageChannel;
 
+  @Autowired
+  private HistoryEventMessageGateway historyEventMessageGateway;
+
   @Before
   public void checkDeps() {
     Assert.assertNotNull(historyEventMessageChannel);
+    Assert.assertNotNull(historyEventMessageGateway);
   }
 
   @Test
   public void test() throws InterruptedException {
     Message<HistoryEventMessage> message = MessageBuilder.withPayload(new HistoryEventMessage(EventBuilder.buildHistoricActivityInstanceEventEntity()))
-        .setHeader("hostname", "localhost").build();
+        .setHeader("hostname", "localhost").setHeader("inputStyle", "CHANNEL").build();
     Assert.assertTrue(historyEventMessageChannel.send(message));
 
-    Thread.sleep(5 * 1000);
+    historyEventMessageGateway.send(new HistoryEventMessage(EventBuilder.buildHistoricProcessInstanceEventEntity()));
+
+    Thread.sleep(3 * 1000);
   }
 
   @Configuration
@@ -63,6 +69,11 @@ public class SpringIntegationTest {
     @Qualifier("inChannel")
     private SubscribableChannel inChannel;
 
+    /**
+     * Consumes the Messages.
+     * 
+     * @return
+     */
     @Bean
     public AbstractEndpoint consumer() {
 
