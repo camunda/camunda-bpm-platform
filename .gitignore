@@ -17,4 +17,5 @@ dependency-reduced-pom.xml
 *.sublime-project
 *.sublime-workspace
 .springBeans
+activemq-data/
 
