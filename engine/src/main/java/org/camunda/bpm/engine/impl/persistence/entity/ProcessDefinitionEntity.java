@@ -197,10 +197,10 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
     if (!this.key.equals(updatingProcessDefinition.key) || !this.deploymentId.equals(updatingProcessDefinition.deploymentId)) {
       throw new ProcessEngineException("Cannot update entity from an unrelated process definition");
     }
-    if (this.revision < updatingProcessDefinition.revision) {
-      this.revision = updatingProcessDefinition.revision;
-      this.suspensionState = updatingProcessDefinition.suspensionState;
-    }
+    
+    // TODO: add a guard once the mismatch between revisions in deployment cache and database has been resolved
+    this.revision = updatingProcessDefinition.revision;
+    this.suspensionState = updatingProcessDefinition.suspensionState;
     
   }
 
