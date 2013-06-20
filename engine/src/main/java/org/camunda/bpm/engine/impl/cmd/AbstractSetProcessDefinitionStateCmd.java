@@ -127,11 +127,6 @@ public abstract class AbstractSetProcessDefinitionStateCmd implements Command<Vo
   protected void changeProcessDefinitionState(CommandContext commandContext, List<ProcessDefinitionEntity> processDefinitions) {
     for (ProcessDefinitionEntity processDefinition : processDefinitions) {
     
-   // evict cache
-      Context
-        .getProcessEngineConfiguration()
-        .getDeploymentCache().removeProcessDefinition(processDefinition.getId());
-      
       processDefinition.setSuspensionState(getProcessDefinitionSuspensionState().getStateCode());
       
       // Suspend process instances and child executions and their tasks (if needed)

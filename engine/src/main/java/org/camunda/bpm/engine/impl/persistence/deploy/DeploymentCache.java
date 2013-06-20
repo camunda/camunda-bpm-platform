@@ -87,21 +87,24 @@ public class DeploymentCache {
   public ProcessDefinitionEntity resolveProcessDefinition(ProcessDefinitionEntity processDefinition) {
     String processDefinitionId = processDefinition.getId();
     String deploymentId = processDefinition.getDeploymentId();
-    processDefinition = processDefinitionCache.get(processDefinitionId);
-    if (processDefinition==null) {
+    ProcessDefinitionEntity cachedProcessDefinition = processDefinitionCache.get(processDefinitionId);
+    if (cachedProcessDefinition==null) {
       DeploymentEntity deployment = Context
         .getCommandContext()
         .getDeploymentManager()
         .findDeploymentById(deploymentId);
       deployment.setNew(false);
       deploy(deployment);
-      processDefinition = processDefinitionCache.get(processDefinitionId);
+      cachedProcessDefinition = processDefinitionCache.get(processDefinitionId);
       
-      if (processDefinition==null) {
+      if (cachedProcessDefinition==null) {
         throw new ProcessEngineException("deployment '"+deploymentId+"' didn't put process definition '"+processDefinitionId+"' in the cache");
       }
+    } else {
+      // update cached process definition
+      cachedProcessDefinition.updateModifiedFieldsFromEntity(processDefinition);
     }
-    return processDefinition;
+    return cachedProcessDefinition;
   }
 
   public void addProcessDefinition(ProcessDefinitionEntity processDefinition) {
