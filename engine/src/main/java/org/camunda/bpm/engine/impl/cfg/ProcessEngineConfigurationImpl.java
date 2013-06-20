@@ -309,16 +309,6 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected String databaseTablePrefix = "";
   
   /**
-   * The following settings will determine the amount of entities loaded at once when the engine 
-   * needs to load multiple entities (eg. when suspending a process definition with all its process instances).
-   * 
-   * The default setting is quite low, as not to surprise anyone with sudden memory spikes.
-   * Change it to something higher if the environment Activiti runs in allows it.
-   */
-  protected int batchSizeProcessInstances = 25;
-  protected int batchSizeTasks = 25;
-  
-  /**
    * In some situations you want to set the schema to use for table checks / generation if the database metadata
    * doesn't return that correctly, see https://jira.codehaus.org/browse/ACT-1220,
    * https://jira.codehaus.org/browse/ACT-1062
@@ -1840,21 +1830,4 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     this.customIncidentHandlers = customIncidentHandlers;
   }
 
-  public int getBatchSizeProcessInstances() {    
-    return batchSizeProcessInstances;
-  }
-  
-  public void setBatchSizeProcessInstances(int batchSizeProcessInstances) {
-    this.batchSizeProcessInstances = batchSizeProcessInstances;
-  }
-  
-  public int getBatchSizeTasks() {
-    return batchSizeTasks;
-  }
-  
-  public void setBatchSizeTasks(int batchSizeTasks) {
-    this.batchSizeTasks = batchSizeTasks;
-  }
-
-  
 }
