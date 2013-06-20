@@ -97,6 +97,11 @@ public class EventBuilder {
     event.setActivityType("TEST_ACTIVITY_TYPE");
     event.setEventType("TEST_EVENT_TYPE");
     event.setParentActivityInstanceId("TEST_PARENT_ACTIVITY_INSTANCE_ID");
+    event.setTaskId("TEST_TASK_ID");
+    event.setTaskAssignee("TEST_TASK_ASSIGNEE");
+    event.setCalledProcessInstanceId("TEST_CALLED_PROCESS_INSTANCE_ID");
+    event.setStartTime(new Date());
+    event.setEndTime(new Date());
     return event;
   }
 

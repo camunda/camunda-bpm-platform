@@ -61,6 +61,11 @@
       <version>2.2.4.RELEASE</version>
     </dependency>
     <dependency>
+      <groupId>org.springframework.integration</groupId>
+      <artifactId>spring-integration-jms</artifactId>
+      <version>2.2.4.RELEASE</version>
+    </dependency>
+    <dependency>
       <groupId>org.apache.activemq</groupId>
       <artifactId>activemq-kahadb-store</artifactId>
       <version>${activemq.version}</version>

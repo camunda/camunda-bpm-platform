@@ -17,6 +17,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.module.jaxb.JaxbAnnotationIntrospector;
 
 /**
+ * Transform a {@link HistoryEventMessage} to JSON via Jackson2.
  * 
  * @author jbellmann
  * 

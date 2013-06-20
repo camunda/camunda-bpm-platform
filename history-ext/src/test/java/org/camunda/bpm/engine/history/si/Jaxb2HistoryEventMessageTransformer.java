@@ -12,6 +12,8 @@ import javax.xml.bind.Unmarshaller;
 import org.camunda.bpm.engine.history.HistoryEventMessage;
 
 /**
+ * Transform a {@link HistoryEventMessage} to XML via JAXB.
+ * 
  * @author jbellmann
  * 
  */

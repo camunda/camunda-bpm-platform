@@ -47,10 +47,12 @@ public class SpringIntegationTest {
   }
 
   @Test
-  public void test() {
+  public void test() throws InterruptedException {
     Message<HistoryEventMessage> message = MessageBuilder.withPayload(new HistoryEventMessage(EventBuilder.buildHistoricActivityInstanceEventEntity()))
         .setHeader("hostname", "localhost").build();
     Assert.assertTrue(historyEventMessageChannel.send(message));
+
+    Thread.sleep(5 * 1000);
   }
 
   @Configuration
@@ -58,13 +60,13 @@ public class SpringIntegationTest {
   static class TesConfig {
 
     @Autowired
-    @Qualifier("outChannel")
-    private SubscribableChannel outChannel;
+    @Qualifier("inChannel")
+    private SubscribableChannel inChannel;
 
     @Bean
     public AbstractEndpoint consumer() {
 
-      EventDrivenConsumer c = new EventDrivenConsumer(outChannel, messageHandler());
+      EventDrivenConsumer c = new EventDrivenConsumer(inChannel, messageHandler());
       return c;
 
     }

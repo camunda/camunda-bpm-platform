@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<beans xmlns="http://www.springframework.org/schema/beans"
-  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xmlns:int="http://www.springframework.org/schema/integration"
-  xmlns:p="http://www.springframework.org/schema/p"
-  xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
-  http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration-2.2.xsd">
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:int="http://www.springframework.org/schema/integration"
+  xmlns:p="http://www.springframework.org/schema/p" xmlns:int-jms="http://www.springframework.org/schema/integration/jms"
+  xsi:schemaLocation="http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration-2.2.xsd
+		http://www.springframework.org/schema/integration/jms http://www.springframework.org/schema/integration/jms/spring-integration-jms-2.2.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
 
   <!-- HistoryEventMessage goes in here -->
   <int:channel id="historyEventMessageChannel"/>
@@ -34,7 +33,37 @@
     <int:header name="messageOfTheDay" value="Use meaningfull headers in messages"/>
   </int:header-enricher>
 
-  <!-- THIS CHANNEL SHOULD POINT TO AN OUTBOUND-GATEWAY, IN THE TEST WE USE AN CONSUMER  -->
+  <!-- THIS CHANNEL SHOULD POINT TO AN OUTBOUND_CHANNEL_ADAPTER OR OUTBOUND-GATEWAY, IN THE TEST WE USE AN CONSUMER  -->
   <int:channel id="outChannel"/>
+
+
+
+  <!-- JMS-EXAMPLE -->
+  <!-- PRODUCER -->
+  <bean id="connectionFactory" class="org.springframework.jms.connection.CachingConnectionFactory">
+    <property name="targetConnectionFactory">
+      <bean class="org.apache.activemq.ActiveMQConnectionFactory">
+        <!-- <property name="brokerURL" value="tcp://yourJmsBrokerHostname:61616"/>-->
+        <property name="brokerURL" value="vm://localhost"/>
+      </bean>
+    </property>
+    <property name="sessionCacheSize" value="10"/>
+    <property name="cacheProducers" value="false"/>
+  </bean>
+
+  
+  <bean id="historyEventQueue" class="org.apache.activemq.command.ActiveMQQueue">
+    <constructor-arg value="cam-async-history"/>
+  </bean>
+
+  <int-jms:outbound-channel-adapter id="jmsOut" channel="outChannel" delivery-persistent="false" explicit-qos-enabled="true" destination="historyEventQueue"/>
+  <!-- PRODUCER END -->
+
+
+
+  <!-- CONSUMER -->
+  <int-jms:message-driven-channel-adapter id="jmsIn" channel="inChannel" destination="historyEventQueue" />
+  
+  <int:channel id="inChannel"/>
 
 </beans>
