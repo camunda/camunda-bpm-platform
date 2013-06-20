@@ -5,7 +5,7 @@ ngDefine('camunda.common.services', function(module) {
 
       RequestStatus.setBusy(true);
 
-      function success(response)  {
+      function success(response) {
         RequestStatus.setBusy(false);
         return promise;
       };

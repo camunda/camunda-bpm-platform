@@ -39,7 +39,7 @@ public abstract class AbstractProcessApplication implements ProcessApplicationIn
               
   // deployment /////////////////////////////////////////////////////
 
-  public final void deploy() {
+  public void deploy() {
     if(isDeployed) {
       LOGGER.warning("Calling deploy() on process application that is already deployed.");      
     } else {      
@@ -49,7 +49,7 @@ public abstract class AbstractProcessApplication implements ProcessApplicationIn
     }
   }
 
-  public final void undeploy() {
+  public void undeploy() {
     if(!isDeployed) {
       LOGGER.fine("Calling undeploy() on process application that is already undeployed.");
     } else {

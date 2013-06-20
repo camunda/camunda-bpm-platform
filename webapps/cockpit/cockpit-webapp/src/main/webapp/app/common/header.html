@@ -2,9 +2,13 @@
 <div class="navbar navbar-fixed-top content-container">
   <div class="navbar-inner">
     <div class="container-fluid">
-      <a class="brand ir" href="../index.html">
+      <a class="brand ir" href="#/">
         camunda cockpit
       </a>
+
+      <form class="navbar-search pull-right" ng-show="engines" ng-controller="ProcessEngineSelectionController">
+        <select class="span2" ng-model="currentEngine" ng-options="engine.name for (id, engine) in engines"></select>
+      </form>
     </div>
   </div>
 </div>

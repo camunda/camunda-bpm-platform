@@ -23,7 +23,17 @@
         </td>
         <td>
           <div state-circle incidents="statistic.incidents" />
-        </td>  
+        </td>
+      </tr>
+      <tr ngm-if="!statistics">
+        <td colspan="3">
+          <i class="icon-loading"></i> loading statistics...
+        </td>
+      </tr>
+      <tr ngm-if="statistics && !statistics.length">
+        <td colspan="3">
+          No process definitions.
+        </td>
       </tr>
     </tbody>
   </table>

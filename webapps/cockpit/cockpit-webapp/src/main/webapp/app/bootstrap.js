@@ -7,7 +7,7 @@
   var pluginPackages = window.PLUGIN_PACKAGES || [];
 
   require({
-    baseUrl: '../',
+    baseUrl: '../../',
     paths: {
       'ngDefine' : 'assets/vendor/requirejs-angular-define/ngDefine',
       'domReady' : 'assets/vendor/require/domReady',
@@ -17,7 +17,8 @@
       'bootstrap' : 'assets/vendor/bootstrap/js/bootstrap',
       'bootstrap-slider' : 'assets/vendor/bootstrap-slider/bootstrap-slider',
       'angular' : 'assets/vendor/angular/angular',
-      'angular-resource' : 'assets/vendor/angular/angular-resource'
+      'angular-resource' : 'assets/vendor/angular/angular-resource',
+      'angular-sanitize' : 'assets/vendor/angular/angular-sanitize'
     },
     shim: {
       'jquery-mousewheel' : { deps: [ 'jquery' ] },
@@ -25,7 +26,8 @@
       'bootstrap' : { deps: [ 'jquery' ] },
       'bootstrap-slider' : { deps: [ 'jquery' ] },
       'angular' : { deps: [ 'jquery' ], exports: 'angular' },
-      'angular-resource': { deps: [ 'angular' ] }
+      'angular-resource': { deps: [ 'angular' ] },
+      'angular-sanitize': { deps: [ 'angular' ] }
     },
     packages: [
       { name: 'cockpit', location: 'app', main: 'cockpit' },
@@ -67,7 +69,7 @@
     ensureScenarioCompatibility();
   }
 
-  require([ 'angular', 'angular-resource', 'ngDefine', 'bootstrap' ], function(angular) {
+  require([ 'angular', 'angular-resource', 'angular-sanitize', 'ngDefine', 'bootstrap' ], function(angular) {
     require([ APP_NAME, 'domReady!' ], function() {
       bootstrapApp(angular);
     });

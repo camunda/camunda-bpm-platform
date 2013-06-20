@@ -44,6 +44,10 @@ public class TestProperties {
       return defaultPort;
     }
   }
+  
+  public String getStringProperty(String propName, String defaultValue) {
+    return properties.getProperty(propName, defaultValue);    
+  }
 
   public String getHttpHost() {
     return properties.getProperty("http.host", "localhost");

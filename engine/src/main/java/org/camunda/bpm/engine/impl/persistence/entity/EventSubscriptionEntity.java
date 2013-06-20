@@ -275,5 +275,11 @@ public abstract class EventSubscriptionEntity implements EventSubscription, Pers
       return false;
     return true;
   }
+
+  @Override
+  public String toString() {
+    return "EventSubscriptionEntity [id=" + id + ", eventType=" + eventType + ", eventName=" + eventName + ", executionId=" + executionId
+        + ", processInstanceId=" + processInstanceId + ", activityId=" + activityId + ", configuration=" + configuration + "]";
+  }
   
 }

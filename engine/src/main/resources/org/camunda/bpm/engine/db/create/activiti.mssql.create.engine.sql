@@ -40,7 +40,7 @@ create table ACT_RU_EXECUTION (
     PROC_DEF_ID_ nvarchar(64),
     SUPER_EXEC_ nvarchar(64),
     ACT_ID_ nvarchar(255),
-    ACT_INST_ID_ varchar(64),
+    ACT_INST_ID_ nvarchar(64),
     IS_ACTIVE_ tinyint,
     IS_CONCURRENT_ tinyint,
     IS_SCOPE_ tinyint,

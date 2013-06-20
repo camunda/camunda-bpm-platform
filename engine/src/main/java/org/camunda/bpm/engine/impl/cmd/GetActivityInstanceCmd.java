@@ -120,7 +120,7 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
         
         childTransitionInstances.add(transitionInstance);
               
-      } else if (!isConcurrentRoot(execution) && !execution.getActivityInstanceId().equals(parentActInst.getId())) {
+      } else if (!isInactiveConcurrentRoot(execution) && !execution.getActivityInstanceId().equals(parentActInst.getId())) {
 
         ActivityInstanceImpl activityInstance = childActivityInstances.get(execution.getActivityInstanceId());
         if (activityInstance != null) {
@@ -170,9 +170,10 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
   }
 
   /** returns true if execution is a concurrent root. */
-  protected boolean isConcurrentRoot(ExecutionEntity execution) {
+  protected boolean isInactiveConcurrentRoot(ExecutionEntity execution) {
     List<ExecutionEntity> executions = execution.getExecutions();
-    return execution.isScope() && !executions.isEmpty() && executions.get(0).isConcurrent();
+//    ActivityImpl activity = execution.getActivity();
+    return execution.isScope() && !executions.isEmpty() && executions.get(0).isConcurrent() && !execution.isActive();
   }
 
   protected ScopeImpl getActivity(ExecutionEntity executionEntity) {
@@ -183,7 +184,7 @@ public class GetActivityInstanceCmd implements Command<ActivityInstance> {
       int i = 0;
       while(!executionEntity.getExecutions().isEmpty()) {
         ExecutionEntity childExecution = executionEntity.getExecutions().get(0); 
-        if(executionEntity.isScope() && !childExecution.getActivityInstanceId().equals(executionEntity.getActivityInstanceId())) {
+        if(!executionEntity.getActivityInstanceId().equals(childExecution.getActivityInstanceId())) {
           i++;
         }
         executionEntity = childExecution;
