@@ -8,7 +8,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.camunda.bpm.BpmPlatform;
+import org.camunda.bpm.cockpit.Cockpit;
 import org.camunda.bpm.cockpit.impl.web.filter.AbstractTemplateFilter;
 
 /**
@@ -55,7 +55,7 @@ public class EnginesFilter extends AbstractTemplateFilter {
   }
 
   protected String getDefaultEngineName() {
-    return BpmPlatform.getDefaultProcessEngine().getName();
+    return Cockpit.getRuntimeDelegate().getDefaultProcessEngine().getName();
   }
 
   protected void serveIndexPage(String engineName, HttpServletRequest request, HttpServletResponse response) throws IOException {

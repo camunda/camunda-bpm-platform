@@ -14,7 +14,12 @@ package org.camunda.bpm.cockpit.impl;
 
 import org.camunda.bpm.cockpit.impl.plugin.DefaultPluginRegistry;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.ServiceLoader;
+import java.util.Set;
 
 import org.camunda.bpm.BpmPlatform;
 import org.camunda.bpm.cockpit.CockpitRuntimeDelegate;
@@ -28,6 +33,7 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.rest.spi.ProcessEngineProvider;
 
 /**
  * <p>This is the default {@link CockpitRuntimeDelegate} implementation that provides
@@ -41,8 +47,15 @@ public class DefaultRuntimeDelegate implements CockpitRuntimeDelegate {
 
   private final PluginRegistry pluginRegistry;
 
+  private final ProcessEngineProvider processEngineProvider;
+
+  private  Map<String, CommandExecutor> commandExecutors;
+
   public DefaultRuntimeDelegate() {
+
     this.pluginRegistry = new DefaultPluginRegistry();
+    this.commandExecutors = new HashMap<String, CommandExecutor>();
+    this.processEngineProvider = loadProcessEngineProvider();
   }
 
   @Override
@@ -53,19 +66,46 @@ public class DefaultRuntimeDelegate implements CockpitRuntimeDelegate {
 
   @Override
   public CommandExecutor getCommandExecutor(String processEngineName) {
-    ProcessEngine processEngine = getProcessEngine(processEngineName);
-    if (processEngine == null) {
-      throw new ProcessEngineException("No process engine with name " + processEngineName + " found.");
+
+    CommandExecutor commandExecutor = commandExecutors.get(processEngineName);
+    if (commandExecutor == null) {
+      commandExecutor = createCommandExecutor(processEngineName);
+      commandExecutors.put(processEngineName, commandExecutor);
     }
-
-    ProcessEngineConfigurationImpl processEngineConfiguration = ((ProcessEngineImpl)processEngine).getProcessEngineConfiguration();
-    List<String> mappingFiles = getMappingFiles();
-
-    CommandExecutor commandExecutor = new CommandExecutorImpl(processEngineConfiguration, mappingFiles);
 
     return commandExecutor;
   }
 
+  @Override
+  public PluginRegistry getPluginRegistry() {
+    return pluginRegistry;
+  }
+
+  @Override
+  public ProcessEngine getProcessEngine(String processEngineName) {
+    try {
+      return processEngineProvider.getProcessEngine(processEngineName);
+    } catch (Exception e) {
+      throw new ProcessEngineException("No process engine with name " + processEngineName + " found.", e);
+    }
+  }
+
+  @Override
+  public Set<String> getProcessEngineNames() {
+    return processEngineProvider.getProcessEngineNames();
+  }
+
+  @Override
+  public ProcessEngine getDefaultProcessEngine() {
+    return processEngineProvider.getDefaultProcessEngine();
+  }
+
+  /**
+   * Returns the list of mapping files that should be used to create the
+   * session factory for this runtime.
+   *
+   * @return
+   */
   protected List<String> getMappingFiles() {
     List<CockpitPlugin> cockpitPlugins = pluginRegistry.getPlugins();
 
@@ -77,17 +117,38 @@ public class DefaultRuntimeDelegate implements CockpitRuntimeDelegate {
     return mappingFiles;
   }
 
-  @Override
-  public PluginRegistry getPluginRegistry() {
-    return pluginRegistry;
+  /**
+   * Create command executor for the engine with the given name
+   *
+   * @param processEngineName
+   * @return
+   */
+  protected CommandExecutor createCommandExecutor(String processEngineName) {
+
+    ProcessEngine processEngine = getProcessEngine(processEngineName);
+    if (processEngine == null) {
+      throw new ProcessEngineException("No process engine with name " + processEngineName + " found.");
+    }
+
+    ProcessEngineConfigurationImpl processEngineConfiguration = ((ProcessEngineImpl)processEngine).getProcessEngineConfiguration();
+    List<String> mappingFiles = getMappingFiles();
+
+    return new CommandExecutorImpl(processEngineConfiguration, mappingFiles);
   }
 
-  @Override
-  public ProcessEngine getProcessEngine(String processEngineName) {
+  /**
+   * Load the {@link ProcessEngineProvider} spi implementation.
+   *
+   * @return
+   */
+  protected ProcessEngineProvider loadProcessEngineProvider() {
+    ServiceLoader<ProcessEngineProvider> loader = ServiceLoader.load(ProcessEngineProvider.class);
+
     try {
-      return BpmPlatform.getProcessEngineService().getProcessEngine(processEngineName);
-    } catch (Exception e) {
-      throw new ProcessEngineException("No process engine with name " + processEngineName + " found.", e);
+      return loader.iterator().next();
+    } catch (NoSuchElementException e) {
+      String message = String.format("No implementation for the %s spi found on classpath", ProcessEngineProvider.class.getName());
+      throw new IllegalStateException(message, e);
     }
   }
 }
