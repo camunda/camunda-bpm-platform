@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.cockpit.impl.application;
+package org.camunda.bpm.cockpit.test.sample.application;
 
 import java.util.Set;
 
@@ -24,7 +24,7 @@ import org.camunda.bpm.engine.rest.spi.ProcessEngineProvider;
  * @author Daniel Meyer
  * @author nico.rehwaldt
  */
-public class ContainerManagedProcessEngineProvider implements ProcessEngineProvider {
+public class TestProcessEngineProvider implements ProcessEngineProvider {
 
   @Override
   public ProcessEngine getDefaultProcessEngine() {
