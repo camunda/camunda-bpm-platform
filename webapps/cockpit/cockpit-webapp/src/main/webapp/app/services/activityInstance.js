@@ -35,7 +35,7 @@ define([ "angular" ], function(angular) {
       };
     }
     
-    function addChildren(parent, processSemantic, activityInstance) {
+    function addChildren(parent, processSemantic, activityInstance, activityIdToNodeMap) {
       angular.forEach(activityInstance.childActivityInstances, function(childActivityInstance) {
         
         // create and decorate child node
@@ -46,6 +46,13 @@ define([ "angular" ], function(angular) {
         childNode.isOpen = true;
         childNode.isSelected = false;
         
+        var instanceList = activityIdToNodeMap[childNode.activityId];
+        if (!instanceList) {
+          instanceList = activityIdToNodeMap[childNode.activityId] = [];
+        }
+        
+        instanceList.push(childNode);
+        
         // get the label for child
         childNode.label = getActivityName(processSemantic.baseElements, childActivityInstance.activityId);
         
@@ -53,7 +60,7 @@ define([ "angular" ], function(angular) {
         parent.children.push(childNode);
         
         // call recursive add children for child node as parent
-        addChildren(childNode, processSemantic, childActivityInstance);
+        addChildren(childNode, processSemantic, childActivityInstance, activityIdToNodeMap);
       });
       
       angular.forEach(activityInstance.childTransitionInstances, function(childTransitionInstance) {
@@ -66,8 +73,15 @@ define([ "angular" ], function(angular) {
         childNode.isOpen = true;
         childNode.isSelected = false;
         
+        var instanceList = activityIdToNodeMap[childNode.activityId];
+        if (!instanceList) {
+          instanceList = activityIdToNodeMap[childNode.activityId] = [];
+        }
+        
+        instanceList.push(childNode);
+        
         // get the label for child
-        childNode.label = getActivityName(processSemantic.baseElements, childTransitionInstance.targetActivityId);;
+        childNode.label = getActivityName(processSemantic.baseElements, childTransitionInstance.targetActivityId);
         
         // add parent the child node
         parent.children.push(childNode);
@@ -100,7 +114,7 @@ define([ "angular" ], function(angular) {
       return result;
     }
     
-    function createActivityInstanceTree(processDefinition, semantic, activityInstances) {
+    function createActivityInstanceTree(processDefinition, semantic, activityInstances, activityIdToNodeMap) {
       // get the corresponding semantic for the model.
       var correspondingSemantic = null;
       for (var i = 0; i < semantic.length; i++) {
@@ -112,13 +126,21 @@ define([ "angular" ], function(angular) {
       // create and decorate root
       var root = {};
       root.id = activityInstances.id;
+      root.activityId = activityInstances.id;
       root.label = correspondingSemantic.name;
       root.children = [];
       root.isOpen = true;
       root.isSelected = false;
       
+      var instanceList = activityIdToNodeMap[root.activityId];
+      if (!instanceList) {
+        instanceList = activityIdToNodeMap[root.activityId] = [];
+      }
+      
+      instanceList.push(root);
+      
       // add children
-      addChildren(root, correspondingSemantic, activityInstances);
+      addChildren(root, correspondingSemantic, activityInstances, activityIdToNodeMap);
       
       return root;
     }

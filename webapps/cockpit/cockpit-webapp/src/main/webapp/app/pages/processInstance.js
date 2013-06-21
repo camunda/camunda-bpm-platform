@@ -7,36 +7,31 @@ ngDefine('cockpit.pages', function(module) {
 
     $scope.selection = {};
     
-    $scope.$watch(function() { return $scope.selection.selectedBpmnElements; }, function(newValue, oldValue) {
-      if (newValue && newValue.length == 0) {
+    $scope.$watch('selection.treeToDiagramMap', function (newValue) {
+      if (!newValue) {
         return;
       }
-      if (newValue && newValue != oldValue) {
-        
-        $scope.selection.selectedActivityIdsInProcessDiagram = [];
-        $scope.selection.selectedActivityInstances = [];
-        $scope.selection.selectedActivityIdsInTree = [];
-        
-        angular.forEach(newValue, function(selectedBpmnElement) {
-          $scope.selection.selectedActivityIdsInTree.push(selectedBpmnElement.id);
+      
+      if (newValue.activityInstances) {
+        $scope.selection.treeToDiagramMap.bpmnElements = [];
+        angular.forEach(newValue.activityInstances, function(activityInstance) {
+          var elements = [];
+          var bpmnElement = $scope.processInstance.activityIdToBpmnElementMap[activityInstance.activityId];
+          elements.push(bpmnElement);
+          $scope.selection.treeToDiagramMap.bpmnElements = elements;
         });
-      }
-    });
-    
-    $scope.$watch(function() { return $scope.selection.selectedActivityInstances; }, function(newValue, oldValue) {
-      if (newValue && newValue.length == 0) {
         return;
       }
-      if (newValue && newValue != oldValue) {
-        
-        $scope.selection.selectedActivityIdsInProcessDiagram = [];
-        $scope.selection.selectedActivityIdsInTree = [];
-        $scope.selection.selectedBpmnElements = [];
-        
-        angular.forEach(newValue, function(selectedActivityInstance) {
-          $scope.selection.selectedActivityIdsInProcessDiagram.push(selectedActivityInstance.activityId);
+      
+      if (newValue.bpmnElements) {
+        $scope.selection.treeToDiagramMap.activityInstances = [];
+        angular.forEach(newValue.bpmnElements, function(bpmnElement) {
+          var instanceList = $scope.processInstance.activityIdToNodeMap[bpmnElement.id];
+          $scope.selection.treeToDiagramMap.activityInstances = $scope.selection.treeToDiagramMap.activityInstances.concat(instanceList);
         });
+        return;
       }
+      
     });
     
     $scope.processInstance = {};
@@ -97,7 +92,9 @@ ngDefine('cockpit.pages', function(module) {
         
         // second result is the bpmn20Xml
         var bpmn20Xml = results[1].bpmn20Xml;
-        $scope.processInstance.semantic = Transform.transformBpmn20Xml(bpmn20Xml);  
+        $scope.processInstance.semantic = Transform.transformBpmn20Xml(bpmn20Xml);
+        $scope.processInstance.activityIdToBpmnElementMap = {};
+        createActivityIdToBpmnElementMap($scope.processInstance.semantic, $scope.processInstance.activityIdToBpmnElementMap);
         
         // third result is the activity instance tree
         var activityInstances = results[2];
@@ -113,7 +110,8 @@ ngDefine('cockpit.pages', function(module) {
         }
         
         // create a tree with that results
-        $scope.processInstance.activityInstanceTree = ActivityInstance.createActivityInstanceTree(processDefinition, $scope.processInstance.semantic, activityInstances);
+        $scope.processInstance.activityIdToNodeMap = {};
+        $scope.processInstance.activityInstanceTree = ActivityInstance.createActivityInstanceTree(processDefinition, $scope.processInstance.semantic, activityInstances, $scope.processInstance.activityIdToNodeMap);
         
         // fourth result are the incidents
         var incidents = results[3];
@@ -138,6 +136,17 @@ ngDefine('cockpit.pages', function(module) {
           $scope.processInstance.incidentsOnActivityArray.push(tmp);
         }
       });
+    
+    function createActivityIdToBpmnElementMap(semantic, result) {
+      angular.forEach(semantic, function(currentSemantic) {
+        result[currentSemantic.id] = currentSemantic;
+        
+        if (currentSemantic.baseElements) {
+          createActivityIdToBpmnElementMap(currentSemantic.baseElements, result);
+        }
+        
+      });
+    }
     
     $scope.processInstanceVars = { read: [ 'processInstanceId' ] };
     $scope.processInstanceViews = Views.getProviders({ component: 'cockpit.processInstance.instanceDetails' });

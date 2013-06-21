@@ -33,47 +33,18 @@ ngDefine('cockpit.directives', [ 'angular' ], function(module, angular) {
           }
         });
 
-        scope.$watch(function() { return scope.selection.selectedActivityInstances; }, function (newValue, oldValue) {
+        scope.$watch('selection.treeToDiagramMap.activityInstances', function(newValue, oldValue) {
           if (oldValue) {
-            deselectNode(oldValue);
+            if (oldValue.indexOf(scope.tree) != -1) {
+              scope.tree.isSelected = false;
+            }
           }
           if (newValue) {
-            selectNode(newValue);
-          }
+            if (newValue.indexOf(scope.tree) != -1) {
+              scope.tree.isSelected = true;
+            }
+          }          
         });
-        
-        function selectNode(selectedActivityInstances) {
-          if (selectedActivityInstances.indexOf(scope.tree) != -1) {
-            scope.tree.isSelected = true;
-          }
-        }
-
-        function deselectNode(deselectedActivityInstances) {
-          if (deselectedActivityInstances.indexOf(scope.tree) != -1) {
-            scope.tree.isSelected = false;
-          }
-        }
-        
-        scope.$watch(function() { return scope.selection.selectedActivityIdsInTree; }, function (newValue, oldValue) {
-          if (oldValue) {
-            deselectNodeWithActivityId(oldValue);
-          }
-          if (newValue) {
-            selectNodeWithActivityId(newValue);
-          }
-        });
-        
-        function selectNodeWithActivityId(selectedActivityIds) {
-          if (selectedActivityIds.indexOf(scope.tree.activityId) != -1) {
-            scope.tree.isSelected = true;
-          }
-        }
-
-        function deselectNodeWithActivityId(deselectedActivityIds) {
-          if (deselectedActivityIds.indexOf(scope.tree.activityId) != -1) {
-            scope.tree.isSelected = false;
-          }
-        }
         
         function createTree (tree) {
           var template = labelTemplate;
@@ -99,8 +70,11 @@ ngDefine('cockpit.directives', [ 'angular' ], function(module, angular) {
         };
         
         scope.selectNode = function (node) {
-          scope.selection.selectedActivityInstances = [];
-          scope.selection.selectedActivityInstances.push(node);
+          if (node.isSelected) {
+            scope.selection.treeToDiagramMap = {};
+          } else {
+            scope.selection.treeToDiagramMap = {activityInstances: [ node ]};
+          }
         };
       }
     };
