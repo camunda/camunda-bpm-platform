@@ -27,7 +27,20 @@ ngDefine('cockpit.directives', [
         bpmnRenderer = new Bpmn();
         renderDiagram();
         registerClickEventOnBaseElements();
+        registerMouseEnterAndMouseLeaveOnBaseElements();
+//        annotations();
+//        incidents();
+      }
+    });
+    
+    $scope.$watch('annotations', function(newValue, oldValue) {
+      if (newValue) {
         annotations();
+      }
+    });
+
+    $scope.$watch('incidents', function(newValue, oldValue) {
+      if (newValue) {
         incidents();
       }
     });
@@ -64,6 +77,28 @@ ngDefine('cockpit.directives', [
     
     /*------------------- Register click events ---------------------*/
     
+    var clickHandler = function($event) {
+      if ($scope.selection.treeToDiagramMap) {
+        if ($scope.selection.treeToDiagramMap.bpmnElements) {
+          var index = $scope.selection.treeToDiagramMap.bpmnElements.indexOf($event.data);
+          if (index != -1) {
+            var elements = [];
+            angular.forEach($scope.selection.treeToDiagramMap.bpmnElements, function (element) {
+              if (element.id != $event.data.id) {
+                elements.push(element);
+              }
+            });
+            $scope.selection.treeToDiagramMap = {bpmnElements: elements};
+            $scope.$apply();
+            return;
+          }
+        }
+      }
+      
+      $scope.selection.treeToDiagramMap = {bpmnElements: [ $event.data ]};
+      $scope.$apply();
+    };
+    
     function registerClickEventOnBaseElements() {
       if ($scope.selection) {
         var model = selectProcessObject(); 
@@ -73,37 +108,46 @@ ngDefine('cockpit.directives', [
     
     function registerClickEvent(element) {
 
-//    bpmnRenderer.on('click', element, function($event, baseElement) {
-//      if ($scope.selection) {
-//        $scope.selection.activityId = baseElement.id;
-//      }
-//    });
-      
-      $('#' + element.id).on('click', element, function($event) {
-        $scope.selection.selectedActivityIdsInProcessDiagram = [];
-        $scope.selection.selectedBpmnElements = [];
-        $scope.selection.selectedBpmnElements.push($event.data);
-        $scope.$apply();
-      });
+      $('#' + element.id).on('click', element, clickHandler);
       
       if (element.baseElements) {
         angular.forEach(element.baseElements, function(baseElement) {
           registerClickEvent(baseElement);
         });
-        
+      }
+    }
+    
+    function registerMouseEnterAndMouseLeaveOnBaseElements() {
+      if ($scope.selection) {
+        var model = selectProcessObject(); 
+        registerMouseEnterAndMouseLeave(model);
+      }
+    }
+    
+    var activityHighligtClass = 'activity-highlight';
+    
+    function registerMouseEnterAndMouseLeave(element) {
+      $('#' + element.id).mouseover(element, function($event) {
+        if (!element.isSelected) {
+          bpmnRenderer.annotation($event.data.id).addClasses([ activityHighligtClass ]);
+        }
+      }).mouseout(element, function($event){
+        if (!element.isSelected) {
+          bpmnRenderer.annotation($event.data.id).removeClasses([ activityHighligtClass ]);
+        }          
+      });
+      
+      if (element.baseElements) {
+        angular.forEach(element.baseElements, function(baseElement) {
+          registerMouseEnterAndMouseLeave(baseElement);
+        });
       }
     }
     
     /*------------------- Handle selected activity id---------------------*/
     
-    var activityHighligtClass = 'activity-highlight';
     
-    $scope.$watch(function () {
-      if ($scope.selection) {
-        return $scope.selection.selectedBpmnElements;
-      }
-      return null;
-    }, function(newValue, oldValue) {
+    $scope.$watch('selection.treeToDiagramMap.bpmnElements', function(newValue, oldValue) {
       if (newValue) {
         selectActivity(newValue);
       }
@@ -111,44 +155,21 @@ ngDefine('cockpit.directives', [
         deselectActivity(oldValue);
       }
     });
-    
+
     function selectActivity(bpmnElements) {
       angular.forEach(bpmnElements, function(bpmnElement) {
+        bpmnElement.isSelected = true;
         bpmnRenderer.annotation(bpmnElement.id).addClasses([ activityHighligtClass ]);
       });
     }
     
     function deselectActivity(bpmnElements) {
       angular.forEach(bpmnElements, function(bpmnElement) {
+        bpmnElement.isSelected = false;
         bpmnRenderer.annotation(bpmnElement.id).removeClasses([ activityHighligtClass ]);
       });
     }
-
-    $scope.$watch(function () {
-      if ($scope.selection) {
-        return $scope.selection.selectedActivityIdsInProcessDiagram;
-      }
-      return null;
-    }, function(newValue, oldValue) {
-      if (newValue) {
-        selectActivitiesWithIds(newValue);
-      }
-      if (oldValue) {
-        deselectActivitiesWithIds(oldValue);
-      }
-    });
     
-    function selectActivitiesWithIds(activityIds) {
-      angular.forEach(activityIds, function(activityId) {
-        bpmnRenderer.annotation(activityId).addClasses([ activityHighligtClass ]);
-      });
-    }
-    
-    function deselectActivitiesWithIds(activityIds) {
-      angular.forEach(activityIds, function(activityId) {
-        bpmnRenderer.annotation(activityId).removeClasses([ activityHighligtClass ]);
-      });
-    }
     
     /*------------------- Handle annotation/incidents ---------------------*/
     
