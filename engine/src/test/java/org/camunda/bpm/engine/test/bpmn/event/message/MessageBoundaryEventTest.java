@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.test.bpmn.event.message;
 
 import java.util.List;
 
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -118,8 +119,8 @@ public class MessageBoundaryEventTest extends PluggableProcessEngineTestCase {
     try {
       runtimeService.messageEventReceived("messageName_2", execution2.getId());
       fail();
-    } catch (Exception e) {
-      assertTextPresent("does not have a subscription to a message event with name 'messageName_2'", e.getMessage());
+    } catch (ProcessEngineException e) {
+      assertTextPresent("execution " + execution2.getId() + " doesn't exist", e.getMessage());
     }
     
     userTask = taskService.createTaskQuery().singleResult();
@@ -177,8 +178,8 @@ public class MessageBoundaryEventTest extends PluggableProcessEngineTestCase {
     try {
       runtimeService.messageEventReceived("messageName_2", execution2.getId());
       fail();
-    } catch (Exception e) {
-      assertTextPresent("does not have a subscription to a message event with name 'messageName_2'", e.getMessage());
+    } catch (ProcessEngineException e) {
+      assertTextPresent("execution " + execution2.getId() + " doesn't exist", e.getMessage());
     }
     
     // only process instance left

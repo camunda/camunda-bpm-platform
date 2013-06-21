@@ -12,12 +12,7 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
-import java.io.Serializable;
-
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.TaskAlreadyClaimedException;
-import org.camunda.bpm.engine.impl.context.Context;
-import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 
@@ -25,32 +20,19 @@ import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 /**
  * @author Joram Barrez
  */
-public class ClaimTaskCmd implements Command<Void>, Serializable {
+public class ClaimTaskCmd extends NeedsActiveTaskCmd<Void> {
   
   private static final long serialVersionUID = 1L;
 
-  protected String taskId;
-  
   protected String userId;
   
   public ClaimTaskCmd(String taskId, String userId) {
-    this.taskId = taskId;
+    super(taskId);
     this.userId = userId;
   }
   
-  public Void execute(CommandContext commandContext) {
-    if(taskId == null) {
-      throw new ProcessEngineException("taskId is null");
-    }
-    
-    TaskEntity task = Context
-      .getCommandContext()
-      .getTaskManager()
-      .findTaskById(taskId);
-    
-    if (task == null) {
-      throw new ProcessEngineException("Cannot find task with id " + taskId);
-    }
+  protected Void execute(CommandContext commandContext, TaskEntity task) {
+
     if(userId != null) {
       if (task.getAssignee() != null) {
         if(!task.getAssignee().equals(userId)) {
@@ -67,6 +49,11 @@ public class ClaimTaskCmd implements Command<Void>, Serializable {
     }
 
     return null;
+  }
+  
+  @Override
+  protected String getSuspendedTaskException() {
+    return "Cannot claim a suspended task";
   }
 
 }

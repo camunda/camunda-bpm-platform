@@ -14,8 +14,8 @@
 package org.camunda.bpm.engine.test.standalone.testing;
 
 import org.camunda.bpm.engine.task.Task;
-import org.camunda.bpm.engine.test.ProcessEngineTestCase;
 import org.camunda.bpm.engine.test.Deployment;
+import org.camunda.bpm.engine.test.ProcessEngineTestCase;
 
 
 /**

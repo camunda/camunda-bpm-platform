@@ -1,44 +1,29 @@
 package org.camunda.bpm.engine.impl.cmd;
 
-import java.io.Serializable;
 import java.util.Collection;
 
-import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 
 /**
  * @author roman.smirnov
+ * @author Joram Barrez
  */
-public class RemoveExecutionVariablesCmd implements Command<Void>, Serializable {
+public class RemoveExecutionVariablesCmd extends NeedsActiveExecutionCmd<Void> {
 
   private static final long serialVersionUID = 1L;
 
-  private String executionId;
   private Collection<String> variableNames;
   private boolean isLocal;
   
   public RemoveExecutionVariablesCmd(String executionId, Collection<String> variableNames, boolean isLocal) {
-    this.executionId = executionId;
+    super(executionId);
     this.variableNames = variableNames;
     this.isLocal = isLocal;
   }
   
+  protected Void execute(CommandContext commandContext, ExecutionEntity execution) {
 
-  public Void execute(CommandContext commandContext) {
-    if (executionId == null) {
-      throw new ProcessEngineException("executionId is null");
-    }
-    
-    ExecutionEntity execution = commandContext
-            .getExecutionManager()
-            .findExecutionById(executionId);
-          
-    if (execution==null) {
-      throw new ProcessEngineException("execution "+executionId+" doesn't exist");
-    }
-    
     if (isLocal) {
       execution.removeVariablesLocal(variableNames);
     } else {
@@ -46,6 +31,11 @@ public class RemoveExecutionVariablesCmd implements Command<Void>, Serializable 
     }
     
     return null;
+  }
+  
+  @Override
+  protected String getSuspendedExceptionMessage() {
+    return "Cannot remove variables because execution '" + executionId + "' is suspended";
   }
 
 }

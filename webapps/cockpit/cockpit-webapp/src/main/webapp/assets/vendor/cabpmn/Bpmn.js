@@ -1,7 +1,15 @@
-define(["bpmn/Transformer", "bpmn/Renderer", "dojo/request", "dojo/Deferred", "dojo/query", "dojo/_base/array", "dojo/dom-class", "dojo/dom-construct"], function (Transformer, Renderer, request, Deferred, query, array, domClass, domConstruct) {
+define([
+        "bpmn/Transformer",
+        "bpmn/Renderer",
+        "dojo/request",
+        "dojo/Deferred",
+        "dojo/query",
+        "dojo/_base/array",
+        "dojo/dom-class",
+        "dojo/dom-construct"], function (Transformer, Renderer, request, Deferred, query, array, domClass, domConstruct) {
   function Bpmn() {
   };
-
+  
   Bpmn.prototype.renderUrl  = function (url, options) {
     var deferred = new Deferred();
     var promise = request(url);
@@ -21,15 +29,12 @@ define(["bpmn/Transformer", "bpmn/Renderer", "dojo/request", "dojo/Deferred", "d
     return deferred;
   };
 
-  Bpmn.prototype.render = function(bpmnXml, options) {
-    var processDefinition = new Transformer().transform(bpmnXml);
-
-    var definitionRenderer = new Renderer(processDefinition);
+  Bpmn.prototype.renderDiagram = function(diagram, options) {
+    var definitionRenderer = new Renderer(diagram);
     definitionRenderer.render(options);
 
     this.definitionRenderer = definitionRenderer;
-    this.processDefinitions = processDefinition;
-    this.bpmnXml = bpmnXml;
+    this.processDefinitions = diagram;
     this.options = options;
 
     // zoom the diagram to suite the bounds specified on options if any;
@@ -47,7 +52,13 @@ define(["bpmn/Transformer", "bpmn/Renderer", "dojo/request", "dojo/Deferred", "d
     this.zoom(scale);
 
     return this;
-  },
+  };
+  
+  Bpmn.prototype.render = function(bpmnXml, options) {
+    var processDefinition = new Transformer().transform(bpmnXml);
+    this.bpmnXml = bpmnXml;
+    this.renderDiagram(processDefinition, options);
+  };
 
   Bpmn.prototype.zoom = function (factor) {
     var transform = this.definitionRenderer.gfxGroup.getTransform();
@@ -64,7 +75,7 @@ define(["bpmn/Transformer", "bpmn/Renderer", "dojo/request", "dojo/Deferred", "d
     var currentDimension = this.definitionRenderer.getSurface().getDimensions();
     this.definitionRenderer.getSurface().setDimensions(+currentDimension.width/xx * factor, +currentDimension.height/xx * factor);
 
-    array.forEach(query(".bpmnElement"), function(element) {
+    array.forEach(this.getOverlays(), function(element) {
       element.style.left = element.style.left.split("px")[0]/xx * factor + "px";
       element.style.top = element.style.top.split("px")[0]/yy * factor + "px";
       element.style.width = element.style.width.split("px")[0]/xx * factor + "px";
@@ -74,15 +85,39 @@ define(["bpmn/Transformer", "bpmn/Renderer", "dojo/request", "dojo/Deferred", "d
     return this;
   };
 
+  Bpmn.prototype.getOverlays = function() {
+    return query(".bpmnElement");
+  };
+
+  Bpmn.prototype.getOverlay = function(id) {
+    return query("#" + id);
+  };
+
+  /**
+   * Attach an event handler function for one event to the selected bpmn element.
+   * @param event One event type, such as "click".
+   * @param bpmnElement The bpmn element to be passed to the handler.
+   * @param handler A function to execute when the event is triggered.
+   */
+  Bpmn.prototype.on = function(event, bpmnElement, handler) {
+    // TODO: implement this method.
+    // the handler should get at first parameter the event, and as second parameter
+    // the passed bpmnElement.
+  };
+  
   Bpmn.prototype.annotation = function (id) {
-    var element = query(".bpmnElement" + "#"+id)[0];
+    var element = this.getOverlay(id)[0];
     if (!element) {
       throw new Error("Element " + id + " does not exist.");
     }
 
     function addClasses(el, classes) {
       domClass.add(el, (classes || []).join(" "));
-    };
+    }
+
+    function removeClasses(el, classes) {
+      domClass.remove(el, (classes || []).join(" "));
+    }
 
     return {
       /**
@@ -115,27 +150,32 @@ define(["bpmn/Transformer", "bpmn/Renderer", "dojo/request", "dojo/Deferred", "d
       addClasses : function (classesArray) {
         addClasses(element, classesArray);
         return this;
+      },
+
+      removeClasses : function (classesArray) {
+        removeClasses(element, classesArray);
+        return this;
       }
     };
   };
 
-  /**
-   * @deprecated use Bpmn.prototype.annotation instead
-   */
-  Bpmn.prototype.annotate = function (id, innerHTML, classesArray) {
-    var element = query(".bpmnElement" + "#"+id)[0];
-    if (!element) {
-      return;
-    }
-
-    element.innerHTML = innerHTML;
-
-    domClass.add(element, (classesArray || []).join(" "));
-    return element;
-  };
+//  /**
+//   * @deprecated use Bpmn.prototype.annotation instead
+//   */
+//  Bpmn.prototype.annotate = function (id, innerHTML, classesArray) {
+//    var element = this.getOverlay(id)[0];
+//    if (!element) {
+//      return;
+//    }
+//
+//    element.innerHTML = innerHTML;
+//
+//    domClass.add(element, (classesArray || []).join(" "));
+//    return element;
+//  };
 
   Bpmn.prototype.clearAnnotations = function (id, classesArray) {
-    var element = query(".bpmnElement" + "#"+id)[0];
+    var element = this.getOverlay(id)[0];
     if (!element) {
       return;
     }

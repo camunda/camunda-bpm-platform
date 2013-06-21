@@ -13,6 +13,7 @@
 
 package org.camunda.bpm.engine.impl.persistence.entity;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -147,5 +148,19 @@ public class TaskManager extends AbstractManager {
         .getHistoricTaskInstanceManager()
         .deleteHistoricTaskInstanceById(taskId);
     }
+  }
+  
+  public void updateTaskSuspensionStateByProcessDefinitionId(String processDefinitionId, SuspensionState suspensionState) {
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("processDefinitionId", processDefinitionId);
+    parameters.put("suspensionState", suspensionState.getStateCode());
+    getDbSqlSession().update("updateTaskSuspensionStateByParameters", parameters);
+  }
+  
+  public void updateTaskSuspensionStateByProcessInstanceId(String processInstanceId, SuspensionState suspensionState) {
+    Map<String, Object> parameters = new HashMap<String, Object>();
+    parameters.put("processInstanceId", processInstanceId);
+    parameters.put("suspensionState", suspensionState.getStateCode());
+    getDbSqlSession().update("updateTaskSuspensionStateByParameters", parameters);
   }
 }

@@ -15,8 +15,8 @@
 package org.camunda.bpm.engine.test.standalone.calendar;
 
 import static groovy.util.GroovyTestCase.assertEquals;
-import static junit.framework.Assert.assertEquals;
 import static junit.framework.Assert.assertNull;
+import static junit.framework.TestCase.assertEquals;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

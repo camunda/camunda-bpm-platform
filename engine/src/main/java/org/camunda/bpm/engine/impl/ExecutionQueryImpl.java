@@ -38,11 +38,11 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
   protected String executionId;
   protected String processInstanceId;
   protected List<EventSubscriptionQueryValue> eventSubscriptions;
+  protected SuspensionState suspensionState;
   
   // Not used by end-users, but needed for dynamic ibatis query
   protected String superProcessInstanceId;
   protected String subProcessInstanceId;
-  protected SuspensionState suspensionState;
   private String businessKey;
   
   public ExecutionQueryImpl() {
@@ -131,6 +131,16 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
     return this;
   }
 
+  public ExecutionQuery suspended() {
+    this.suspensionState = SuspensionState.SUSPENDED;
+    return this;
+  }
+
+  public ExecutionQuery active() {
+    this.suspensionState = SuspensionState.ACTIVE;
+    return this;
+  }
+  
   //ordering ////////////////////////////////////////////////////
   
   public ExecutionQueryImpl orderByProcessInstanceId() {

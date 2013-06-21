@@ -23,9 +23,9 @@ import org.camunda.bpm.engine.test.Deployment;
 /**
  * @author Frederik Heremans
  */
-public class BPMNParseListenerTestCase extends ResourceProcessEngineTestCase {
+public class BPMNParseListenerTest extends ResourceProcessEngineTestCase {
   
-  public BPMNParseListenerTestCase() {
+  public BPMNParseListenerTest() {
     super("org/camunda/bpm/engine/test/standalone/deploy/bpmn.parse.listener.activiti.cfg.xml");
   }
   

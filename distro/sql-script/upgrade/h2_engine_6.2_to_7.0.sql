@@ -47,3 +47,6 @@ create index ACT_IDX_HI_ACT_INST_COMP on ACT_HI_ACTINST(EXECUTION_ID_, ACT_ID_, 
 alter table ACT_RU_EXECUTION
     add ACT_INST_ID_ varchar(64);
     
+/** add SUSPENSION_STATE_ column to task table */
+alter table ACT_RU_TASK
+    add SUSPENSION_STATE_ integer;

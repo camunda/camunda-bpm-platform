@@ -14,7 +14,6 @@ package org.camunda.bpm.application.impl;
 
 import javax.ejb.EJBException;
 
-import org.camunda.bpm.application.AbstractProcessApplication;
 import org.camunda.bpm.application.ProcessApplicationInterface;
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.application.ProcessApplicationUnavailableException;
