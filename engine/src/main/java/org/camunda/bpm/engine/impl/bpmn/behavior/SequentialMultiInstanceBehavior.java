@@ -61,6 +61,7 @@ public class SequentialMultiInstanceBehavior extends MultiInstanceActivityBehavi
     logLoopDetails(execution, "instance completed", loopCounter, nrOfCompletedInstances, nrOfActiveInstances, nrOfInstances);
     
     if (loopCounter == nrOfInstances || completionConditionSatisfied(execution)) {
+      ensureExecutionNotSuspended(execution);
       super.leave(execution);
     } else {      
       try {

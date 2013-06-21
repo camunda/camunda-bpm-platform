@@ -16,14 +16,17 @@ package org.camunda.bpm.engine.impl.bpmn.behavior;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.impl.bpmn.data.AbstractDataAssociation;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessInstance;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
 import org.camunda.bpm.engine.impl.pvm.delegate.SubProcessActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
+import org.camunda.bpm.engine.impl.pvm.runtime.InterpretableExecution;
 
 
 /**
@@ -103,8 +106,17 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
   }
 
   public void completed(ActivityExecution execution) throws Exception {
+    ensureExecutionNotSuspended(execution);
+    
     // only control flow.  no sub process instance data available
     leave(execution);
+  }
+  
+
+  protected void ensureExecutionNotSuspended(ActivityExecution execution) {
+    if (((ExecutionEntity) execution).isSuspended()) {
+      throw new ProcessEngineException("Parent execution " + execution + " is suspended.");
+    }
   }
 
 }

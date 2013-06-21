@@ -34,6 +34,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayManager;
 import org.camunda.bpm.engine.impl.persistence.entity.CommentManager;
 import org.camunda.bpm.engine.impl.persistence.entity.DeploymentManager;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionManager;
+import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.GroupManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricActivityInstanceManager;
@@ -121,7 +122,7 @@ public class CommandContext {
     }   
     
   }
-  
+
   protected ProcessApplicationReference getTargetProcessApplication(InterpretableExecution execution) {
     
     String deploymentId = execution.getProcessDefinition().getDeploymentId();

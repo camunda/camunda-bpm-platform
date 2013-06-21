@@ -566,4 +566,46 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     assertEquals(0, runtimeService.createProcessInstanceQuery().count());
   }
   
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/runtime/ProcessInstanceSuspensionTest.callSimpleProcess.bpmn20.xml",
+      "org/camunda/bpm/engine/test/api/runtime/subProcess.bpmn20.xml"})
+  public void testCallActivityReturnAfterProcessInstanceSuspend() {
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("callSimpleProcess");
+    runtimeService.suspendProcessInstanceById(instance.getId());
+    
+    Task task = taskService.createTaskQuery().singleResult();
+    
+    try {
+      taskService.complete(task.getId());
+      fail("this should not be successful, as the execution of a suspended instance is resumed");
+    } catch (ProcessEngineException e) {
+      // this is expected to fail
+    }
+  }
+  
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/runtime/ProcessInstanceSuspensionTest.callMISimpleProcess.bpmn20.xml",
+  "org/camunda/bpm/engine/test/api/runtime/subProcess.bpmn20.xml"})
+  public void testMICallActivityReturnAfterProcessInstanceSuspend() {
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("callMISimpleProcess");
+    runtimeService.suspendProcessInstanceById(instance.getId());
+    
+    List<Task> tasks = taskService.createTaskQuery().list();
+    Task task1 = tasks.get(0);
+    Task task2 = tasks.get(1);
+    
+    taskService.complete(task1.getId());
+    
+    try {
+      taskService.complete(task2.getId());
+      fail("this should not be successful, as the execution of a suspended instance is resumed");
+    } catch (ProcessEngineException e) {
+      // this is expected to fail
+    }
+    
+    // should be successful after reactivation
+    runtimeService.activateProcessInstanceById(instance.getId());
+    taskService.complete(task2.getId());
+    
+    assertEquals(0, runtimeService.createProcessInstanceQuery().count());
+  }
+  
 }
