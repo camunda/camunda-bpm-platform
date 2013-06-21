@@ -339,15 +339,15 @@
   </select>
   
   <update id="updateTaskSuspensionStateByParameters" parameterType="java.util.Map">
-    update ${prefix}ACT_RU_TASK T set
-      T.REV_ = T.REV_ + 1,
-      T.SUSPENSION_STATE_ = #{suspensionState, jdbcType=INTEGER}
+    update ${prefix}ACT_RU_TASK set
+      REV_ = REV_ + 1,
+      SUSPENSION_STATE_ = #{suspensionState, jdbcType=INTEGER}
     <where>
       <if test="processDefinitionId != null">
-        T.PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR}
+        PROC_DEF_ID_ = #{processDefinitionId, jdbcType=VARCHAR}
       </if>
       <if test="processInstanceId != null">
-        T.PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
+        PROC_INST_ID_ = #{processInstanceId, jdbcType=VARCHAR}
       </if>
     </where>
   </update>
