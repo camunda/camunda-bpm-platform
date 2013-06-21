@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.SuspendedEntityInteractionException;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
@@ -156,7 +157,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
     try {
       runtimeService.startProcessInstanceById(processDefinition.getId());
       fail("Exception is expected but not thrown");
-    } catch(ProcessEngineException e) {
+    } catch(SuspendedEntityInteractionException e) {
       assertTextPresentIgnoreCase("cannot start process instance", e.getMessage());
     }
     
@@ -164,7 +165,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
     try {
       runtimeService.startProcessInstanceByKey(processDefinition.getKey());
       fail("Exception is expected but not thrown");
-    } catch(ProcessEngineException e) {
+    } catch(SuspendedEntityInteractionException e) {
       assertTextPresentIgnoreCase("cannot start process instance", e.getMessage());
     }
   }
@@ -216,7 +217,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
       try {
         taskService.complete(task.getId());
         fail("A suspended task shouldn't be able to be continued");
-      } catch(ProcessEngineException e) {
+      } catch(SuspendedEntityInteractionException e) {
         // This is good
       }
     }
@@ -303,7 +304,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
     try {
       runtimeService.startProcessInstanceById(processDefinition.getId());
       fail();
-    } catch (ProcessEngineException e) {
+    } catch (SuspendedEntityInteractionException e) {
       assertTextPresentIgnoreCase("suspended", e.getMessage());
     }
     assertEquals(1, runtimeService.createProcessInstanceQuery().count());
@@ -357,7 +358,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
     try {
       runtimeService.startProcessInstanceById(processDefinition.getId());
       fail();
-    } catch (ProcessEngineException e) {
+    } catch (SuspendedEntityInteractionException e) {
       assertTextPresentIgnoreCase("suspended", e.getMessage());
     }
     assertEquals(nrOfProcessInstances, runtimeService.createProcessInstanceQuery().count());
@@ -392,7 +393,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
     try {
       runtimeService.startProcessInstanceById(processDefinition.getId());
       fail();
-    } catch (ProcessEngineException e) {
+    } catch (SuspendedEntityInteractionException e) {
       assertTextPresentIgnoreCase("suspended", e.getMessage());
     }
     assertEquals(0, runtimeService.createProcessInstanceQuery().count());

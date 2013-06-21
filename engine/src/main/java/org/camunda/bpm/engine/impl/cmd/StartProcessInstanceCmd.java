@@ -16,6 +16,7 @@ import java.io.Serializable;
 import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.SuspendedEntityInteractionException;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -67,7 +68,7 @@ public class StartProcessInstanceCmd implements Command<ProcessInstance>, Serial
     
     // Do not start process a process instance if the process definition is suspended
     if (processDefinition.isSuspended()) {
-      throw new ProcessEngineException("Cannot start process instance. Process definition " 
+      throw new SuspendedEntityInteractionException("Cannot start process instance. Process definition " 
               + processDefinition.getName() + " (id = " + processDefinition.getId() + ") is suspended");
     }
 

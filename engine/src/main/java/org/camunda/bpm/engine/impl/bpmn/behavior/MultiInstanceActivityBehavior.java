@@ -20,6 +20,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.SuspendedEntityInteractionException;
 import org.camunda.bpm.engine.delegate.BpmnError;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.ExecutionListener;
@@ -142,7 +143,7 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
   
   protected void ensureExecutionNotSuspended(ActivityExecution execution) {
     if (((ExecutionEntity) execution).isSuspended()) {
-      throw new ProcessEngineException("Parent execution " + execution + " is suspended.");
+      throw new SuspendedEntityInteractionException("Parent execution " + execution + " is suspended.");
     }
   }
   

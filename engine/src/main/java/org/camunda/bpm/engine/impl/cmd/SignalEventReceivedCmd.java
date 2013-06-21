@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.SuspendedEntityInteractionException;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
@@ -56,7 +57,7 @@ public class SignalEventReceivedCmd implements Command<Void> {
       }
       
       if (execution.isSuspended()) {
-        throw new ProcessEngineException("Cannot throw signal event '" + eventName 
+        throw new SuspendedEntityInteractionException("Cannot throw signal event '" + eventName 
                 + "' because execution '" + executionId + "' is suspended");
       }
       

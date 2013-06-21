@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.impl.cmd;
 import java.io.Serializable;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.SuspendedEntityInteractionException;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
@@ -46,7 +47,7 @@ public abstract class NeedsActiveExecutionCmd<T> implements Command<T>, Serializ
     }
     
     if (execution.isSuspended()) {
-      throw new ProcessEngineException(getSuspendedExceptionMessage());
+      throw new SuspendedEntityInteractionException(getSuspendedExceptionMessage());
     }
     
     return execute(commandContext, execution);

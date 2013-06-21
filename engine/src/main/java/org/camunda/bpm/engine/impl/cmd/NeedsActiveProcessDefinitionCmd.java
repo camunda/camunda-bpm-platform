@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.impl.cmd;
 import java.io.Serializable;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.SuspendedEntityInteractionException;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -45,7 +46,7 @@ public abstract class NeedsActiveProcessDefinitionCmd<T> implements Command<T>, 
     }
     
     if (processDefinition.isSuspended()) {
-      throw new ProcessEngineException("Cannot execute operation because process definition '" 
+      throw new SuspendedEntityInteractionException("Cannot execute operation because process definition '" 
               + processDefinition.getName() + "' (id=" + processDefinition.getId() + ") is supended");
     }
     
