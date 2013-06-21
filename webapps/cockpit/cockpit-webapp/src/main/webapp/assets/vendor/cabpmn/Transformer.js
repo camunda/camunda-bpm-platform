@@ -95,7 +95,7 @@ define([], function () {
 
       function getChildElementByName(element, name) {
         for (var index = 0; index < element.childNodes.length; index++) {
-            if (element.childNodes[index].nodeName == name) {
+            if (element.childNodes[index].localName == name) {
               return element.childNodes[index];
             }
         }
@@ -122,7 +122,6 @@ define([], function () {
 
 
       return bpmnObject;
-
     }
 
     /** creates an ActivityDefinition and adds it to the scope activity.

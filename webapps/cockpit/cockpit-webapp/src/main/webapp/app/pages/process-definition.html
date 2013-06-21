@@ -30,7 +30,9 @@
   </div>
 
   <div class="right-panel" fill-width fill-height style="overflow: auto;">
-    <div process-diagram process-definition-id="processDefinition.id" activity-statistics process-definition-incidents />
+    <div process-diagram="semantic" process-definition="processDefinition" annotations="activityStatistics" incidents="incidents" on-scroll-and-zoom></div>
+    
+    <!-- <div process-diagram="bpmn20Xml" activity-statistics="activityStatistics" process-definition-incidents zoom-and-scroll /> -->
     <view provider="processInstanceTable" vars="processDefinitionLatestVersionCount" />
   </div>
 

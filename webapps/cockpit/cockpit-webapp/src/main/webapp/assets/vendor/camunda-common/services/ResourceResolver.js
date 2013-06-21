@@ -13,8 +13,8 @@ ngDefine('camunda.common.services.resolver', function(module) {
             resolve = options.resolve,
             resourceName = options.name || "entity";
 
-        function succeed(response) {
-          deferred.resolve(response.resource);
+        function succeed(result) {
+          deferred.resolve(result);
         }
 
         function fail(errorResponse) {
@@ -38,7 +38,15 @@ ngDefine('camunda.common.services.resolver', function(module) {
         }
 
         // resolve
-        resolve(id).$then(succeed, fail);
+        var promise = resolve(id);
+        if (promise.$then) {
+          promise = promise.$then(function(response) { succeed(response.resource); }, fail);
+        } else 
+        if (promise.then) {
+          promise = promise.then(succeed, fail);
+        } else {
+          throw new Error("No promise returned by #resolve");
+        }
 
         return deferred.promise;
       }

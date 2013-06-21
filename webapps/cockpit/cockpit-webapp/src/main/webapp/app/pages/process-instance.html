@@ -3,15 +3,21 @@
   <div class="left-panel well" fill-height>
 
     <div hide-panel></div>
+    
+    <div tree="processInstance.activityInstanceTree" selection="selection"></div>
 
-    <div ng-show="activityInstances.length">
-
-    </div>
+  
   </div>
 
   <div class="right-panel" fill-width fill-height style="overflow: auto;">
-    <div process-diagram process-definition-id="processDefinitionId" activity-instances="activityInstances" process-instance-incidents />
-
+  
+    <div process-diagram="processInstance.semantic" process-definition="processInstance.processDefinition"
+          annotations="processInstance.activityInstanceArray" incidents="processInstance.incidentsOnActivityArray"
+          selection="selection" on-scroll-and-zoom></div>
+  
+    <!-- <div process-diagram="processInstance.semantic" process-definition="processInstance.processDefinition" annotations="processInstance.activityInstanceArray"
+         selection="selection" on-scroll-and-zoom></div> -->
+         
     <div ng-show="processInstanceViews.length">
       <ul class="nav nav-tabs">
         <li ng-class="{ active: selectedView == viewProvider }" ng-repeat="viewProvider in processInstanceViews">

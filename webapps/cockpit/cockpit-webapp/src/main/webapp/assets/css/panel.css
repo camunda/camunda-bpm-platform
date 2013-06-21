@@ -20,6 +20,7 @@ div.panel-page {
   -webkit-border-radius: 0px;
   -moz-border-radius: 0px;
   border-radius: 0px;
+  overflow: auto;
 }
 
 .right-panel {
@@ -28,6 +29,7 @@ div.panel-page {
   position: absolute;
   top: 41px;
   padding: 19px;
+  overflow: auto;
 }
 
 .arrow-button {

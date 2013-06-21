@@ -272,6 +272,29 @@ Circle
   background-color: #468847;
 }
 
+/**------------------
+Tree
+---------------------**/
+
+.none-list-style {
+  list-style-type: none;
+}
+
+.invisible-button {
+  padding: 0px;
+  cursor: pointer;
+  background-color: transparent;
+  border: 0px;
+  -webkit-appearance: none;
+}
+
+.activity-highlight  {
+  -webkit-box-shadow: 0px 0px 4px 4px rgba(187, 13, 255, 1);
+  -moz-box-shadow: 0px 0px 4px 4px rgba(85, 255, 13, 1);
+  box-shadow: 0px 0px 4px 4px rgb(14, 132, 241);
+  border-radius: 5px;
+}
+
 .navbar-search select {
   margin-bottom: 5px;
 }
