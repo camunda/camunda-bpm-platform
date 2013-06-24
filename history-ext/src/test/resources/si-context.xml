@@ -14,6 +14,8 @@
 
   <int:channel id="transformedHistoryEventMessageChannel"/>
 
+  <!-- DECIDE MARSHALLING HERE -->
+
   <bean id="historyEventMessageTransformer" class="org.camunda.bpm.engine.history.si.Jackson2HistoryEventMessageTransformer"/>
 
 <!--
@@ -35,38 +37,34 @@
     <int:header name="messageOfTheDay" value="Use meaningfull headers in messages"/>
   </int:header-enricher>
 
-  <!-- THIS CHANNEL SHOULD POINT TO AN OUTBOUND_CHANNEL_ADAPTER OR OUTBOUND-GATEWAY, IN THE TEST WE USE AN CONSUMER  -->
+  <!-- 
+        THIS CHANNEL SHOULD POINT TO AN OUTBOUND_CHANNEL_ADAPTER OR OUTBOUND-GATEWAY,
+        SEE PRODUCER FOR CONFIGURATION.
+  -->
   <int:channel id="outChannel"/>
 
-
-
-  <!-- JMS-EXAMPLE -->
-  <!-- PRODUCER -->
-  <bean id="connectionFactory" class="org.springframework.jms.connection.CachingConnectionFactory">
-    <property name="targetConnectionFactory">
-      <bean class="org.apache.activemq.ActiveMQConnectionFactory">
-        <!-- <property name="brokerURL" value="tcp://yourJmsBrokerHostname:61616"/>-->
-        <property name="brokerURL" value="vm://localhost"/>
-      </bean>
-    </property>
-    <property name="sessionCacheSize" value="10"/>
-    <property name="cacheProducers" value="false"/>
-  </bean>
-
-  
-  <bean id="historyEventQueue" class="org.apache.activemq.command.ActiveMQQueue">
-    <constructor-arg value="cam-async-history"/>
-  </bean>
-
-  <int-jms:outbound-channel-adapter id="jmsOut" channel="outChannel" delivery-persistent="false" explicit-qos-enabled="true" destination="historyEventQueue"/>
-  <!-- PRODUCER END -->
-
-
+  <!-- PRODUCERS ARE DEFINED IN si-jms-context.xml and si-jms-over-amqp-context.xml-->
 
   <!-- CONSUMER -->
   <int-jms:message-driven-channel-adapter id="jmsIn" channel="inChannel" destination="historyEventQueue" />
-  
-  <int:channel id="inChannel"/>
-  <!-- CONSUMER-END -->
+
+  <int:channel id="inChannel" />
+
+  <!-- transforms the historyEventMessages to XML or JSON, whatever 'ref' points to -->
+  <int:service-activator input-channel="inChannel" 
+                         output-channel="transformedInChannel"
+                         ref="historyEventMessageTransformer"
+                         method="transformToHistoryEventMessage"/>
+
+  <int:channel id="transformedInChannel"/>
+
+  <int:service-activator input-channel="transformedInChannel" ref="historyEventLoger"/>
+
+  <bean id="historyEventLoger" class="org.camunda.bpm.engine.history.si.HistoryEventMessageMessageHandler">
+    <constructor-arg>
+      <bean class="org.camunda.bpm.engine.history.si.LoggingHistoryEventHandler"/>
+    </constructor-arg>
+  </bean>
+  <!-- CONSUMER END -->
 
 </beans>

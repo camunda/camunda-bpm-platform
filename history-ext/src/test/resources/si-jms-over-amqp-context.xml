@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:int="http://www.springframework.org/schema/integration"
+  xmlns:p="http://www.springframework.org/schema/p" xmlns:int-jms="http://www.springframework.org/schema/integration/jms"
+  xsi:schemaLocation="http://www.springframework.org/schema/integration http://www.springframework.org/schema/integration/spring-integration-2.2.xsd
+		http://www.springframework.org/schema/integration/jms http://www.springframework.org/schema/integration/jms/spring-integration-jms-2.2.xsd
+		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd">
+
+  <import resource="si-context.xml"/>
+
+  <!-- JMS-EXAMPLE -->
+  <!-- PRODUCER -->
+  <bean id="connectionFactory" class="org.springframework.jms.connection.CachingConnectionFactory">
+    <property name="targetConnectionFactory">
+      <bean class="org.apache.qpid.amqp_1_0.jms.impl.ConnectionFactoryImpl">
+        <constructor-arg index="0" value="yourHost"/>
+        <constructor-arg index="1" value="5672"/>
+        <constructor-arg index="2" value="egal"/>
+        <constructor-arg index="3" value="egal"/>
+        <constructor-arg index="4" value="testclient"/>
+      </bean>
+    </property>
+    <property name="sessionCacheSize" value="10"/>
+    <property name="cacheProducers" value="false"/>
+  </bean>
+
+  <bean id="historyEventQueue" class="org.apache.qpid.amqp_1_0.jms.impl.QueueImpl">
+    <constructor-arg value="queue://cam-async-history-2"/>
+  </bean>
+
+  <int-jms:outbound-channel-adapter id="jmsOut" channel="outChannel" delivery-persistent="false" explicit-qos-enabled="true" destination="historyEventQueue"/>
+  <!-- PRODUCER END -->
+</beans>
