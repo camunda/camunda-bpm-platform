@@ -7,20 +7,28 @@ import org.camunda.bpm.engine.impl.history.handler.HistoryEventHandler;
 
 /**
  * Just for Testing.
- *
- * @author  jbellmann
+ * 
+ * @author jbellmann
  */
 public class IncreaseCounterHandler implements HistoryEventHandler {
 
-    private final AtomicInteger counter;
+  private final AtomicInteger counter;
 
-    public IncreaseCounterHandler(final AtomicInteger counter) {
-        this.counter = counter;
-    }
+  public IncreaseCounterHandler(final AtomicInteger counter) {
+    this.counter = counter;
+  }
 
-    @Override
-    public void handleEvent(final HistoryEvent historyEvent) {
-        counter.incrementAndGet();
-    }
+  public IncreaseCounterHandler() {
+    this(new AtomicInteger(0));
+  }
+
+  @Override
+  public void handleEvent(final HistoryEvent historyEvent) {
+    counter.incrementAndGet();
+  }
+
+  public int getCount() {
+    return counter.get();
+  }
 
 }
