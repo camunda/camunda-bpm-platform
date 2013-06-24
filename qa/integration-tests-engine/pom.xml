@@ -223,7 +223,7 @@
                 <!-- HEMERA-2453 -->
                 <exclude>**/JobExecutorRequestContextLocalInvocationTest.java</exclude>
                 <exclude>**_OTHERS.java</exclude>
-                <<excludes>**/SpringPAExpressionResolvingTest.java</excludes>
+                <excludes>**/SpringPAExpressionResolvingTest.java</excludes>
               </excludes>
             </configuration>
           </plugin>
