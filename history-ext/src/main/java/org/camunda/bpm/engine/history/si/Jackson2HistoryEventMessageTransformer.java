@@ -8,6 +8,7 @@ import org.camunda.bpm.engine.history.HistoryEventMessage;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.AnnotationIntrospector;
@@ -33,6 +34,9 @@ public class Jackson2HistoryEventMessageTransformer implements HistoryEventMessa
     ObjectMapper mapper = new ObjectMapper();
     AnnotationIntrospector introspector = new JaxbAnnotationIntrospector(mapper.getTypeFactory());
     mapper.setAnnotationIntrospector(introspector);
+
+    // we got strange errors without that
+    mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
     // needed because of PersistentObject.persistentState has no setter for
     // example
     mapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -50,6 +54,7 @@ public class Jackson2HistoryEventMessageTransformer implements HistoryEventMessa
 
   @Override
   public HistoryEventMessage transformToHistoryEventMessage(String source) {
+    LOG.debug(source);
     try {
       return this.objectMapper.readValue(source, HistoryEventMessage.class);
     } catch (JsonParseException e) {

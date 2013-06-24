@@ -19,6 +19,7 @@ import com.google.common.collect.Lists;
 public class HistoryEventHandlerComposite implements HistoryEventHandler {
 
   private List<HistoryEventHandler> eventHandlerList = Lists.newLinkedList();
+
   private HistoryEventFilter historyEventFilter = new DefaultPassHistoryEventFilter();
 
   public HistoryEventHandlerComposite(final List<HistoryEventHandler> historyEventHandlers) {

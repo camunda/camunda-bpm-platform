@@ -13,14 +13,14 @@ import com.google.common.collect.ImmutableList;
  */
 public final class HistoryEventTypeFilter implements HistoryEventFilter {
 
-  private final List<Class<?>> types;
+  private final List<? extends Class<?>> types;
   private final boolean negate;
 
-  public HistoryEventTypeFilter(List<Class<?>> classes) {
+  public HistoryEventTypeFilter(List<? extends Class<?>> classes) {
     this(classes, false);
   }
 
-  public HistoryEventTypeFilter(List<Class<?>> classes, boolean negate) {
+  public HistoryEventTypeFilter(List<? extends Class<?>> classes, boolean negate) {
     this.types = ImmutableList.copyOf(classes);
     this.negate = negate;
   }
