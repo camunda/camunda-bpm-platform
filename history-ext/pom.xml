@@ -91,17 +91,19 @@
     <groupId>org.apache.qpid</groupId>
       <artifactId>qpid-amqp-1-0-client-jms</artifactId>
       <version>${qpid-jms-version}</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.activemq</groupId>
       <artifactId>activemq-kahadb-store</artifactId>
       <version>${activemq.version}</version>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.springframework</groupId>
       <artifactId>spring-jms</artifactId>
       <version>${spring.version}</version>
-      <scope>compile</scope>
+      <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>com.google.guava</groupId>
