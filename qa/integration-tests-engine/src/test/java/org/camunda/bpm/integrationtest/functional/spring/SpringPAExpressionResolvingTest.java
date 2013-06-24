@@ -34,7 +34,7 @@ import org.junit.runner.RunWith;
  *
  */
 @RunWith(Arquillian.class)
-public class SpringPAExpressionResolvingTest_OTHERS extends AbstractFoxPlatformIntegrationTest {
+public class SpringPAExpressionResolvingTest extends AbstractFoxPlatformIntegrationTest {
 
   @Deployment
   public static WebArchive processArchive() {    
