@@ -22,7 +22,9 @@ define([], function () {
   function getXmlObject(source) {
     // use the browser's DOM implemenation
     var xmlDoc;
-    if (window.DOMParser) {
+    if (source instanceof Document) {
+        xmlDoc = source;
+    } else if (window.DOMParser) {
       var parser = new DOMParser();
       xmlDoc = parser.parseFromString(source,"text/xml");
     } else {
