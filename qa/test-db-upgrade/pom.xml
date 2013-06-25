@@ -15,13 +15,7 @@
   <properties>
     <test.version.old>6.2.4</test.version.old>
     <test.version.old.major>6.2</test.version.old.major>
-    <test.version.current>${project.version}</test.version.current>
-
-    <test.db.host>${project.build.directory}</test.db.host>
-    <test.db.database>camunda-engine</test.db.database>
-    <test.db.username>sa</test.db.username>
-    <test.db.password>sa</test.db.password>
-    
+    <test.version.current>${project.version}</test.version.current>   
     <mail.server.port>5025</mail.server.port>
   </properties>
   
@@ -35,66 +29,7 @@
           <test.version.current>${project.version}</test.version.current>
           <test.version.current.major>7.0</test.version.current.major>
         </properties>      
-    </profile>
-    <profile>
-      <id>h2</id>
-      <activation>
-          <activeByDefault>true</activeByDefault>
-        </activation>
-      <properties>
-        <test.db.name>h2</test.db.name>
-        <test.db.driver>org.h2.Driver</test.db.driver>
-        <test.db.url>jdbc:h2:${test.db.host}/dbs/${test.db.database};MVCC=TRUE</test.db.url>
-      </properties>
-    </profile>
-    <profile>
-      <id>mysql</id>
-      <properties>
-        <test.db.name>mysql</test.db.name>
-        <test.db.driver>com.mysql.jdbc.Driver</test.db.driver>
-        <test.db.url>jdbc:mysql://${test.db.host}:3306/${test.db.database}</test.db.url>
-      </properties>
-    </profile>
-    <profile>
-      <id>mssql</id>
-      <properties>
-        <test.db.name>mssql</test.db.name>
-        <test.db.driver>com.microsoft.sqlserver.jdbc.SQLServerDriver</test.db.driver>
-        <test.db.url>jdbc:sqlserver://${test.db.host}:1433;DatabaseName=${test.db.database}</test.db.url>
-      </properties>
-    </profile>
-    <profile>
-      <id>db2</id>
-      <properties>
-        <test.db.name>db2</test.db.name>
-        <test.db.driver>com.ibm.db2.jcc.DB2Driver</test.db.driver>
-        <test.db.url>jdbc:db2://${test.db.host}:50000/${test.db.database}</test.db.url>
-      </properties>
-    </profile>
-    <profile>
-      <id>postgres</id>
-      <properties>
-        <test.db.name>postgres</test.db.name>
-        <test.db.driver>org.postgresql.Driver</test.db.driver>
-        <test.db.url>jdbc:postgresql://${test.db.host}:5432/${test.db.database}</test.db.url>
-      </properties>
-    </profile>
-    <profile>
-      <id>oracle10g</id>
-      <properties>
-        <test.db.name>oracle</test.db.name>
-        <test.db.driver>oracle.jdbc.OracleDriver</test.db.driver>
-        <test.db.url>jdbc:oracle:thin:@${test.db.host}:1521:xe</test.db.url>
-      </properties>
-    </profile>
-    <profile>
-      <id>oracle11g</id>
-      <properties>
-        <test.db.name>oracle</test.db.name>
-        <test.db.driver>oracle.jdbc.OracleDriver</test.db.driver>
-        <test.db.url>jdbc:oracle:thin:@${test.db.host}:1521:xe</test.db.url>
-      </properties>
-    </profile>
+    </profile>    
   </profiles>
 
   <dependencies>
@@ -229,9 +164,9 @@
                 <mkdir
                   dir="${project.build.directory}/scripts-current/sql/upgrade/"></mkdir>
                 <touch
-                  file="${project.build.directory}/scripts-current/sql/upgrade/${test.db.name}_engine_${test.version.old.major}_to_${test.version.current.major}.sql" />
+                  file="${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${test.version.old.major}_to_${test.version.current.major}.sql" />
                 <touch
-                  file="${project.build.directory}/scripts-current/sql/upgrade/${test.db.name}_identity_${test.version.old.major}_to_${test.version.current.major}.sql" />
+                  file="${project.build.directory}/scripts-current/sql/upgrade/${database.type}_identity_${test.version.old.major}_to_${test.version.current.major}.sql" />
 
               </target>
             </configuration>
@@ -334,10 +269,10 @@
           </dependency>
         </dependencies>
         <configuration>
-          <driver>${test.db.driver}</driver>
-          <url>${test.db.url}</url>
-          <username>${test.db.username}</username>
-          <password>${test.db.password}</password>
+          <driver>${database.driver}</driver>
+          <url>${database.url}</url>
+          <username>${database.user}</username>
+          <password>${database.password}</password>
         </configuration>
         <executions>
           <execution>
@@ -349,8 +284,8 @@
             <configuration>
               <srcFiles>
                 <!-- first: try dropping the DB -->
-                <srcFile>${project.build.directory}/scripts-current/sql/drop/${test.db.name}_engine_${test.version.current}.sql</srcFile>
-                <srcFile>${project.build.directory}/scripts-current/sql/drop/${test.db.name}_identity_${test.version.current}.sql</srcFile>
+                <srcFile>${project.build.directory}/scripts-current/sql/drop/${database.type}_engine_${test.version.current}.sql</srcFile>
+                <srcFile>${project.build.directory}/scripts-current/sql/drop/${database.type}_identity_${test.version.current}.sql</srcFile>
               </srcFiles>
               <autocommit>true</autocommit>
               <onError>continue</onError>
@@ -365,8 +300,8 @@
             <configuration>
               <srcFiles>       
                 <!-- now create old version of the schema -->
-                <srcFile>${project.build.directory}/scripts-old/sql/create/${test.db.name}_engine_${test.version.old}.sql</srcFile>
-                <srcFile>${project.build.directory}/scripts-old/sql/create/${test.db.name}_identity_${test.version.old}.sql</srcFile>
+                <srcFile>${project.build.directory}/scripts-old/sql/create/${database.type}_engine_${test.version.old}.sql</srcFile>
+                <srcFile>${project.build.directory}/scripts-old/sql/create/${database.type}_identity_${test.version.old}.sql</srcFile>
               </srcFiles>
             </configuration>            
           </execution>
@@ -379,8 +314,8 @@
             <configuration>
               <srcFiles>       
                 <!-- now perform the schema migrations -->
-                <srcFile>${project.build.directory}/scripts-current/sql/upgrade/${test.db.name}_engine_${test.version.old.major}_to_${test.version.current.major}.sql</srcFile>
-                <srcFile>${project.build.directory}/scripts-current/sql/upgrade/${test.db.name}_identity_${test.version.old.major}_to_${test.version.current.major}.sql</srcFile>
+                <srcFile>${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${test.version.old.major}_to_${test.version.current.major}.sql</srcFile>
+                <srcFile>${project.build.directory}/scripts-current/sql/upgrade/${database.type}_identity_${test.version.old.major}_to_${test.version.current.major}.sql</srcFile>
               </srcFiles>
             </configuration>            
           </execution>
@@ -393,8 +328,8 @@
             <configuration>
               <srcFiles>
                 <!-- finally drop db -->
-                <srcFile>${project.build.directory}/scripts-current/sql/drop/${test.db.name}_engine_${test.version.current}.sql</srcFile>
-                <srcFile>${project.build.directory}/scripts-current/sql/drop/${test.db.name}_identity_${test.version.current}.sql</srcFile>
+                <srcFile>${project.build.directory}/scripts-current/sql/drop/${database.type}_engine_${test.version.current}.sql</srcFile>
+                <srcFile>${project.build.directory}/scripts-current/sql/drop/${database.type}_identity_${test.version.current}.sql</srcFile>
               </srcFiles>
             </configuration>
           </execution>

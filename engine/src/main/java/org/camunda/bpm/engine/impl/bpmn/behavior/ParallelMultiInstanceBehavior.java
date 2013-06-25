@@ -141,6 +141,8 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
       }
       
       executionEntity.takeAll(activity.getOutgoingTransitions(), joinedExecutions);
+    } else {
+      executionEntity.setActivityInstanceId(null);
     }
   }
  

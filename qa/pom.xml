@@ -74,6 +74,8 @@
         <module>tomcat-runtime</module>
         <module>integration-tests-webapps</module>
         <module>integration-tests-engine</module>
+        <module>test-db-upgrade</module>
+        <module>test-db-instance-migration</module>
       </modules>
 	</profile>  
   
@@ -113,6 +115,14 @@
       <id>engine-integration</id>
       <modules>
         <module>integration-tests-engine</module>
+      </modules>
+    </profile>
+    
+    <profile>
+      <id>upgrade</id>
+      <modules>
+        <module>test-db-upgrade</module>
+        <module>test-db-instance-migration</module>
       </modules>
     </profile>
     

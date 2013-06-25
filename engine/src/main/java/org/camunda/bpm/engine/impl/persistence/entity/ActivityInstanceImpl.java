@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.impl.persistence.entity;
 
+import java.io.StringWriter;
+
 import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.TransitionInstance;
 
@@ -86,6 +88,28 @@ public class ActivityInstanceImpl extends ProcessElementInstanceImpl implements 
 
   public void setActivityName(String activityName) {
     this.activityName = activityName;
+  }
+  
+  protected void writeTree(StringWriter writer, String prefix, boolean isTail) {
+    writer.append(prefix);
+    if(isTail) {
+      writer.append("└── ");
+    } else {
+      writer.append("├── ");
+    }
+    
+    writer.append(getActivityId()+"=>"+getId() +"\n");
+    
+    for (int i = 0; i < childActivityInstances.length; i++) {
+      ActivityInstanceImpl child = (ActivityInstanceImpl) childActivityInstances[i];
+      child.writeTree(writer, prefix + (isTail ? "    " : "│   "), (i==(childActivityInstances.length-1)));      
+    }
+  }
+  
+  public String toString() {
+    StringWriter writer = new StringWriter();
+    writeTree(writer, "", true);
+    return writer.toString();
   }
   
 }

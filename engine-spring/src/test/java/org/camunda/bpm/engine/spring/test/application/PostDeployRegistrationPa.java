@@ -16,7 +16,6 @@ import java.util.concurrent.Callable;
 
 import org.camunda.bpm.application.PostDeploy;
 import org.camunda.bpm.application.PreUndeploy;
-import org.camunda.bpm.application.ProcessApplication;
 import org.camunda.bpm.application.ProcessApplicationExecutionException;
 import org.camunda.bpm.application.ProcessApplicationRegistration;
 import org.camunda.bpm.engine.ProcessEngine;
@@ -30,8 +29,6 @@ import org.camunda.bpm.engine.spring.application.SpringProcessApplication;
 public class PostDeployRegistrationPa extends SpringProcessApplication {
 
   protected ProcessApplicationRegistration processApplicaitonRegistration;
-  
-  protected boolean isInvoked = false;
   
   @PostDeploy
   public void registerProcessApplication(ProcessEngine processEngine) {
@@ -60,6 +57,8 @@ public class PostDeployRegistrationPa extends SpringProcessApplication {
   
   
   // customization of Process Application for unit test ////////////////////////////
+
+  protected boolean isInvoked = false;
   
   public void afterPropertiesSet() throws Exception {
     // do not auto-deploy the process application : we want to manually deploy from the testcase 
