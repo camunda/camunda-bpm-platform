@@ -26,7 +26,7 @@
     </dependency>
 
     <dependency>
-      <groupId>org.camunda.bpm.upgrade</groupId>
+      <groupId>org.camunda.bpm.qa.upgrade</groupId>
       <artifactId>camunda-qa-upgrade-test-fixture-62</artifactId>
       <version>${project.version}</version>
     </dependency>
