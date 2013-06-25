@@ -119,11 +119,6 @@ define(['jquery', 'bpmn/Transformer', 'bpmn/Renderer'], function ($, Transformer
         return this;
       },
 
-      /**
-       * removes classes from the bpmn element div
-       * @param classesArray
-       * @returns {*}
-       */
       removeClasses : function (classesArray) {
         element.removeClass((classesArray || []).join(" "));
         return this;
