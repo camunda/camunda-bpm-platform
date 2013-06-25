@@ -10,7 +10,7 @@ ngDefine('cockpit.directives', [ 'angular' ], function(module, angular) {
   '    <i class="icon-minus"></i>' +
   '  </button>';
   
-  var labelTemplate = '<span ng-click="selectNode(tree)" ng-class="{\'activity-highlight\' : tree.isSelected}">{{ tree.label }}</span>';
+  var labelTemplate = '<span id="{{ tree.activityId + \'_\' + tree.id }}" class="clickable-tree-node" ng-class="{\'activity-highlight\' : tree.isSelected}">{{ tree.label }}</span>';
   var childrenTemplate = '<ul ng-show="tree.isOpen">' + 
                             '<li ng-repeat="item in tree.children | orderBy:\'label\'" class="none-list-style">' + 
                                '<div tree="item" selection="selection" />' +
@@ -46,6 +46,52 @@ ngDefine('cockpit.directives', [ 'angular' ], function(module, angular) {
           }          
         });
         
+        var nodeHandler = function ($event) {
+          var selectedNode = $event.data;
+          var targetId = $($event.target).attr('id');
+          
+          if (targetId === selectedNode.activityId + '_' + selectedNode.id) {
+            
+            var instances = [];
+            var scrollTo = selectedNode;
+            
+            if ($event.ctrlKey) {
+              // if the 'ctrl' key has been pushed down, then select or deselect the clicked instance
+              
+              if (scope.selection.treeToDiagramMap && scope.selection.treeToDiagramMap.activityInstances) {
+                
+                var index = scope.selection.treeToDiagramMap.activityInstances.indexOf(selectedNode);
+                
+                if (index != -1) {
+                  // if the clicked instance is already selected then deselect it.
+                  angular.forEach(scope.selection.treeToDiagramMap.activityInstances, function (instance) {
+                    if (instance.id != selectedNode.id) {
+                      instances.push(instance);
+                    }
+                  });
+                  scrollTo = null;
+                  
+                } else if (index == -1) {
+                  // if the clicked instance is not already selected then select it together with other instances.
+                  angular.forEach(scope.selection.treeToDiagramMap.activityInstances, function (instance) {
+                    instances.push(instance);
+                  });
+                  instances.push(selectedNode);
+                }
+                
+              }
+            } else {
+              // else, push selected node to instances array
+              instances.push(selectedNode);
+              
+            }
+            
+            scope.selection.treeToDiagramMap = {activityInstances: instances, scrollTo: scrollTo};
+            scope.$apply();
+          }
+          
+        };
+        
         function createTree (tree) {
           var template = labelTemplate;
           
@@ -59,6 +105,9 @@ ngDefine('cockpit.directives', [ 'angular' ], function(module, angular) {
           var newElement = angular.element(template);
           $compile(newElement)(scope);
           element.replaceWith(newElement);
+          
+          newElement.click(tree, nodeHandler);
+          
         }
         
         scope.open = function(node) {
@@ -69,13 +118,6 @@ ngDefine('cockpit.directives', [ 'angular' ], function(module, angular) {
           node.isOpen = false;
         };
         
-        scope.selectNode = function (node) {
-          if (node.isSelected) {
-            scope.selection.treeToDiagramMap = {};
-          } else {
-            scope.selection.treeToDiagramMap = {activityInstances: [ node ]};
-          }
-        };
       }
     };
   };

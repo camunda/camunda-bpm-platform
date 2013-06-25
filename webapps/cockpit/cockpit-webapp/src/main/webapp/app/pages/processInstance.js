@@ -11,14 +11,18 @@ ngDefine('cockpit.pages', function(module) {
       if (!newValue) {
         return;
       }
+
+      if (newValue.scrollTo) {
+        var bpmnElement = $scope.processInstance.activityIdToBpmnElementMap[newValue.scrollTo.activityId];
+        $scope.selection.treeToDiagramMap.scrollTo = null;
+        $scope.selection.treeToDiagramMap.scrollToBpmnElement = bpmnElement;
+      }
       
       if (newValue.activityInstances) {
         $scope.selection.treeToDiagramMap.bpmnElements = [];
         angular.forEach(newValue.activityInstances, function(activityInstance) {
-          var elements = [];
           var bpmnElement = $scope.processInstance.activityIdToBpmnElementMap[activityInstance.activityId];
-          elements.push(bpmnElement);
-          $scope.selection.treeToDiagramMap.bpmnElements = elements;
+          $scope.selection.treeToDiagramMap.bpmnElements.push(bpmnElement);
         });
         return;
       }
@@ -32,6 +36,30 @@ ngDefine('cockpit.pages', function(module) {
         return;
       }
       
+    });
+    
+    $scope.$watch('selection.elements', function (newValue) {
+      if (!newValue) {
+        return;
+      }
+      
+      if (newValue.hidden) {
+        var elements = [];
+        if (newValue.hidden === 'sidebar') {
+          elements.push('main-content');
+        }
+        $scope.selection.elements.toResize = {toGreater: elements}; 
+        return;
+      };
+
+      if (newValue.visible) {
+        var elements = [];
+        if (newValue.visible === 'sidebar') {
+          elements.push('main-content');
+        }
+        $scope.selection.elements.toResize = {toShrink: elements}; 
+        return;
+      };
     });
     
     $scope.processInstance = {};
@@ -102,11 +130,14 @@ ngDefine('cockpit.pages', function(module) {
         $scope.processInstance.activityInstanceMap = ActivityInstance.aggregateActivityInstances(activityInstances);
         
         $scope.processInstance.activityInstanceArray = [];
+        $scope.processInstance.clickableElements = [];
         
         for (key in $scope.processInstance.activityInstanceMap) {
           var items = $scope.processInstance.activityInstanceMap[key];
           var activityInstance = { id: key, count: items.length};
           $scope.processInstance.activityInstanceArray.push(activityInstance);
+          
+          $scope.processInstance.clickableElements.push(key);
         }
         
         // create a tree with that results
