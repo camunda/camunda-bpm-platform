@@ -66,7 +66,8 @@ public class TestCycleRoundtripIT extends AbstractCycleIT {
   }
 
   @Parameters
-  public static List<Object[]> data(TestProperties testProperties) throws IOException, SVNException {
+  public static List<Object[]> data() throws IOException, SVNException {
+    TestProperties testProperties = new TestProperties(48080);
     ConnectorConfiguration vfsConnectorConfiguration = new ConnectorConfiguration();
     vfsConnectorConfiguration.setConnectorName("FileSystemConnector");
     vfsConnectorConfiguration.setName("FileSystemConnector");
