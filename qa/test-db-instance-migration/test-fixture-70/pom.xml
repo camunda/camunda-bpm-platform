@@ -11,7 +11,7 @@
     <version>7.0.0-SNAPSHOT</version>
   </parent>
 
-  <name>camunda BPM - QA - upgrade - 70 test fixture</name>
+  <name>camunda BPM - QA - upgrade - instance migration - 70 test fixture</name>
 
   <properties>
     <mail.server.port>5025</mail.server.port>
@@ -22,13 +22,13 @@
     <dependency>
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine</artifactId>
-      <version>7.0.0-SNAPSHOT</version>
+      <version>${project.version}</version>
     </dependency>
 
     <dependency>
       <groupId>org.camunda.bpm.upgrade</groupId>
       <artifactId>camunda-qa-upgrade-test-fixture-62</artifactId>
-      <version>1.0</version>
+      <version>${project.version}</version>
     </dependency>
 
     <dependency>
@@ -97,7 +97,7 @@
                     <artifactItem>
                       <groupId>org.camunda.bpm.distro</groupId>
                       <artifactId>camunda-sql-scripts</artifactId>
-                      <version>7.0.0-SNAPSHOT</version>
+                      <version>${project.version}</version>
                       <outputDirectory>${project.build.directory}/scripts-current</outputDirectory>
                       <overWrite>true</overWrite>
                     </artifactItem>

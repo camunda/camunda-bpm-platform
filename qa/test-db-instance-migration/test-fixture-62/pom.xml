@@ -10,7 +10,7 @@
     <version>7.0.0-SNAPSHOT</version>
   </parent>
 
-  <name>camunda BPM - QA - upgrade - 62 test fixture</name>
+  <name>camunda BPM - QA - upgrade - instance migration - 62 test fixture</name>
 
   <dependencies>
 
