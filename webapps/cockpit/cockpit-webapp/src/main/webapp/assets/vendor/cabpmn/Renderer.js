@@ -9,7 +9,10 @@
  * 
  */
 
-define(["dojox/gfx", "dojo/_base/lang", "dojo/dom-construct", "dojo/_base/window", "dojo/query", "dojo/dom", "dojo/dom-class", "dojo/NodeList-manipulate", "dojo/NodeList-traverse"], function (gfx, lang, domConstruct, win, query, dom, domClass) {
+define([ "dojox/gfx", "jquery" ], function (gfx, $) {
+
+  var mixin = $.extend;
+
   // constructor
   function BpmnElementRenderer(baseElement) {
 
@@ -152,7 +155,7 @@ define(["dojox/gfx", "dojo/_base/lang", "dojo/dom-construct", "dojo/_base/window
     "stroke": regularStroke
   };
 
-  var collapsedPoolStyle = lang.mixin(lang.clone(participantStyle), {
+  var collapsedPoolStyle = mixin({}, participantStyle, {
     "stroke-width": 2
   });
 
@@ -185,7 +188,7 @@ define(["dojox/gfx", "dojo/_base/lang", "dojo/dom-construct", "dojo/_base/window
     "stroke-linejoin": "round"
   };
 
-  var dataAssociationStyle = lang.clone(associationStyle);
+  var dataAssociationStyle = mixin({}, associationStyle);
 
   var messageFlowStyle = {
     "stroke-width": 2,
@@ -208,14 +211,14 @@ define(["dojox/gfx", "dojo/_base/lang", "dojo/dom-construct", "dojo/_base/window
 
   var styleMap = {
     "startEvent" : eventStyle,
-    "endEvent" : lang.mixin(lang.clone(eventStyle), endEventStyle),
+    "endEvent" : mixin({}, eventStyle, endEventStyle),
     "boundaryEvent" : eventStyle,
     "intermediateCatchEvent" : eventStyle,
     "intermediateThrowEvent" : eventStyle,
     "exclusiveGateway" : generalStyle,
     "inclusiveGateway" : generalStyle,
     "complexGateway" : generalStyle,
-    "parallelGateway" : lang.mixin(lang.clone(eventStyle), {"stroke-width" : 3}),
+    "parallelGateway" : mixin({}, eventStyle, { "stroke-width" : 3 }),
     "eventBasedGateway" : generalStyle,
     "userTask" : activityStyle,
     "serviceTask" : activityStyle,
@@ -233,8 +236,8 @@ define(["dojox/gfx", "dojo/_base/lang", "dojo/dom-construct", "dojo/_base/window
     "group" : groupStyle,
     "participant" : collapsedPoolStyle,
     "lane" : laneStyle,
-    "sequenceFlow" : lang.mixin(lang.clone(generalStyle), sequenceFlowStyle),
-    "messageFlow" : lang.mixin(lang.clone(generalStyle), messageFlowStyle),
+    "sequenceFlow" : mixin({}, generalStyle, sequenceFlowStyle),
+    "messageFlow" : mixin({}, generalStyle, messageFlowStyle),
     "textAnnotation" : generalStyle,
     "association" : associationStyle,
     "dataInputAssociation" : dataAssociationStyle,
@@ -244,7 +247,7 @@ define(["dojox/gfx", "dojo/_base/lang", "dojo/dom-construct", "dojo/_base/window
     "dataInput" : dataObjectStyle,
     "dataOutput" : dataObjectStyle
   };
-   
+
   /**
    * Moves an element to front (both visually in diagram and in overlay)
    *
@@ -253,10 +256,9 @@ define(["dojox/gfx", "dojo/_base/lang", "dojo/dom-construct", "dojo/_base/window
    */
   function moveToFront(element, group) {
     group.moveToFront();
-    var overlay = query("#" + element.id);
-    var parent = overlay.parent();
-    overlay.remove();
-    parent.append(overlay);
+
+    var overlay = $("#" + element.id);
+    overlay.appendTo(overlay.parent());
   }
 
   /**
@@ -1240,22 +1242,24 @@ define(["dojox/gfx", "dojo/_base/lang", "dojo/dom-construct", "dojo/_base/window
       }
 
       if (bounds) {
-        var diagramElement = query("#"+options.diagramElement)[0];
-        diagramElement.style.position = "relative";
+        var diagramElement = $("#" + options.diagramElement).css("position", "relative");
 
-        var overlayDiv = domConstruct.create("div", {
-          id : currentElement.id,
-          innerHTML : options.overlayHtml ? options.overlayHtml : null,
-          style: {
+        var overlayDiv = $('<div class="bpmnElement"></div>');
+
+        overlayDiv
+          .attr('id', currentElement.id)
+          .css({
             position: "absolute" ,
             left: +bounds.x +"px",
             top: +bounds.y + "px",
             width : +bounds.width + "px",
             height : +bounds.height + "px"
-          }
-        },
-        diagramElement);
-        domClass.add(overlayDiv, "bpmnElement");
+          })
+          .appendTo(diagramElement);
+
+        if (options.overlayHtml) {
+          overlayDiv.html(options.overlayHtml);
+        }
       }
 
 
@@ -1270,8 +1274,8 @@ define(["dojox/gfx", "dojo/_base/lang", "dojo/dom-construct", "dojo/_base/window
       // subordinate renderers
       if(!!currentElement.baseElements) {
         var postRenderCallbacks = [];
-        var renderingOpts = lang.mixin(lang.clone(options), { postRenderCallbacks: postRenderCallbacks });
-        
+        var renderingOpts = mixin({}, options, { postRenderCallbacks: postRenderCallbacks });
+
         for(var i = 0; i < currentElement.baseElements.length; i++) {
           new BpmnElementRenderer(currentElement.baseElements[i], this).render(renderingOpts, gfxGroup);
         }

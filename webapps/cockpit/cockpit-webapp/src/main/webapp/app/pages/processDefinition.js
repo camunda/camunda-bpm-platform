@@ -8,8 +8,28 @@ ngDefine('cockpit.pages', [ 'angular' ], function(module, angular) {
 
     $scope.selection = {};
     
-    $scope.$watch(function() { return $scope.selection.activityId; }, function (activityId) {
-      // TODO: Implement the expected behavior.
+    $scope.$watch('selection.elements', function (newValue) {
+      if (!newValue) {
+        return;
+      }
+      
+      if (newValue.hidden) {
+        var elements = [];
+        if (newValue.hidden === 'sidebar') {
+          elements.push('main-content');
+        }
+        $scope.selection.elements.toResize = {toGreater: elements}; 
+        return;
+      };
+
+      if (newValue.visible) {
+        var elements = [];
+        if (newValue.visible === 'sidebar') {
+          elements.push('main-content');
+        }
+        $scope.selection.elements.toResize = {toShrink: elements}; 
+        return;
+      };
     });
     
     ProcessInstanceResource.count({ processDefinitionKey : processDefinition.key }).$then(function(response) {

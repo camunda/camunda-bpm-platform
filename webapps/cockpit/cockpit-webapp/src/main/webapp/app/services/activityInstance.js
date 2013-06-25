@@ -6,7 +6,7 @@ define([ "angular" ], function(angular) {
 
   var module = angular.module("cockpit.services");
 
-  function ActivityInstanceProvider() {
+  function ActivityInstanceProvider($filter) {
 
     function aggregateActivityInstancesHelper(activityInstance, result) {
       var children = activityInstance.childActivityInstances;
@@ -95,7 +95,8 @@ define([ "angular" ], function(angular) {
         if (element.id === activityId) {
           name = element.name;
           if (!name) {
-            name = element.type + ' (' + element.id + ')';
+            var shortenFilter = $filter('shorten');
+            name = element.type + ' (' + shortenFilter(element.id, 8) + '...)';
           }
           return name;
         }
@@ -116,18 +117,25 @@ define([ "angular" ], function(angular) {
     
     function createActivityInstanceTree(processDefinition, semantic, activityInstances, activityIdToNodeMap) {
       // get the corresponding semantic for the model.
-      var correspondingSemantic = null;
+      var model = null;
       for (var i = 0; i < semantic.length; i++) {
         var currentSemantic = semantic[i];
         if (currentSemantic.id === processDefinition.key && currentSemantic.type === 'process') {
-          correspondingSemantic = currentSemantic;
+          model = currentSemantic;
         }
       }
       // create and decorate root
       var root = {};
       root.id = activityInstances.id;
-      root.activityId = activityInstances.id;
-      root.label = correspondingSemantic.name;
+      root.activityId = model.id;
+      var label = null;
+      if (model.name) {
+        label = model.name;
+      } else {
+        var shortenFilter = $filter('shorten');
+        label = model.type + ' (' + shortenFilter(root.activityId, 8) + ')';
+      }
+      root.label = label;
       root.children = [];
       root.isOpen = true;
       root.isSelected = false;
@@ -140,7 +148,7 @@ define([ "angular" ], function(angular) {
       instanceList.push(root);
       
       // add children
-      addChildren(root, correspondingSemantic, activityInstances, activityIdToNodeMap);
+      addChildren(root, model, activityInstances, activityIdToNodeMap);
       
       return root;
     }
@@ -152,7 +160,7 @@ define([ "angular" ], function(angular) {
     
   }
   
-  module.factory('ActivityInstance', ActivityInstanceProvider);
+  module.factory('ActivityInstance', [ '$filter' , ActivityInstanceProvider ]);
   // end config
 
   return module;
