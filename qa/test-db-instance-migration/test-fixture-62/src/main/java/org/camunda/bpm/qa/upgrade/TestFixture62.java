@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.qa.upgrade;
 
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -19,9 +20,11 @@ import org.activiti.engine.ProcessEngine;
 import org.activiti.engine.ProcessEngineConfiguration;
 import org.activiti.engine.RepositoryService;
 import org.activiti.engine.RuntimeService;
+import org.activiti.engine.impl.ProcessEngineImpl;
 import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.interceptor.Command;
 import org.activiti.engine.impl.interceptor.CommandContext;
+import org.activiti.engine.repository.Deployment;
 
 /**
  * @author Daniel Meyer
@@ -37,7 +40,7 @@ public class TestFixture62 {
       .createProcessEngineConfigurationFromResource("process-engine-config62.xml");
     ProcessEngine processEngine = processEngineConfiguration.buildProcessEngine();
     
-    createDropDatabase(processEngineConfiguration);
+    dropCreateDatabase(processEngine);
     
     TestFixture62 fixture = new TestFixture62(processEngine);
     
@@ -77,10 +80,20 @@ public class TestFixture62 {
 
   }
 
-  protected static void createDropDatabase(ProcessEngineConfigurationImpl processEngineConfiguration) {
-    // recreate database:
+  protected static void dropCreateDatabase(ProcessEngine processEngine) {
+    // delete all deployments
+    RepositoryService repositoryService = processEngine.getRepositoryService();
+    List<Deployment> deployments = repositoryService
+      .createDeploymentQuery()
+      .list();
+    for (Deployment deployment : deployments) {
+      LOGG.info("deleting deployment "+deployment.getId());
+      repositoryService.deleteDeployment(deployment.getId(), true);
+    }
+    
     try {
-      processEngineConfiguration.getCommandExecutorTxRequired()
+      ((ProcessEngineImpl)processEngine).getProcessEngineConfiguration()
+        .getCommandExecutorTxRequired()
         .execute(new Command<Void>() {  
           public Void execute(CommandContext commandContext) {
             commandContext.getDbSqlSession().dbSchemaDrop();
@@ -91,7 +104,8 @@ public class TestFixture62 {
       LOGG.log(Level.WARNING, "Could not drop schema: " +e.getMessage());
     }
     
-    processEngineConfiguration.getCommandExecutorTxRequired()
+    ((ProcessEngineImpl)processEngine).getProcessEngineConfiguration()
+      .getCommandExecutorTxRequired()
       .execute(new Command<Void>() {  
         public Void execute(CommandContext commandContext) {
           commandContext.getDbSqlSession().dbSchemaCreate();
