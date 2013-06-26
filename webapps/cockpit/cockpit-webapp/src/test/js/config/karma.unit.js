@@ -1,5 +1,5 @@
-
-var config = {
+module.exports = function(karma) {
+  karma.configure({
 
   // base path, that will be used to
   // resolve files and exclude
@@ -16,7 +16,7 @@ var config = {
     'test/js/config/require-unit-bootstrap.js'
   ],
 
-  browsers: ["Chrome"], // "PhantomJS", "Firefox"
+  browsers: ["Chrome", "IE"], // "PhantomJS", "Firefox"
 
   autoWatch: true,
 
@@ -26,15 +26,18 @@ var config = {
   },
 
   plugins: [
+    'karma-ie-launcher',            
     'karma-chrome-launcher',
     'karma-firefox-launcher',
     'karma-phantomjs-launcher',
     'karma-jasmine',
     'karma-requirejs'
   ]
+  });
 };
 
-for (var key in config) {
-
-  this[key] = config[key];
-}
+//return config;
+//for (var key in config) {
+//
+//  this[key] = config[key];
+//}

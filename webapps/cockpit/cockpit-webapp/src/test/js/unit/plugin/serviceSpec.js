@@ -18,7 +18,7 @@ define([ 'cockpit-plugin', 'angular', 'camunda-common/services/uri' ], function(
           url: 'myUrl'
         };
 
-        var sampleModule = angular.module('my-module', [ 'cockpit.plugin', 'camunda.common.services' ]);
+        var sampleModule = angular.module('my-module', [ 'cockpit.plugin', 'camunda.common.services.uri' ]);
         sampleModule.config(function(ViewsProvider) {
           expect(ViewsProvider).toBeDefined();
 
@@ -55,7 +55,7 @@ define([ 'cockpit-plugin', 'angular', 'camunda-common/services/uri' ], function(
           url: 'myUrl'
         };
 
-        var sampleModule = angular.module('my-module', [ 'cockpit.plugin', 'camunda.common.services' ]);
+        var sampleModule = angular.module('my-module', [ 'cockpit.plugin', 'camunda.common.services.uri' ]);
         sampleModule.config(function(ViewsProvider) {
           expect(ViewsProvider).toBeDefined();
 
@@ -84,7 +84,7 @@ define([ 'cockpit-plugin', 'angular', 'camunda-common/services/uri' ], function(
           id: 'viewProvider2'
         };
 
-        var sampleModule = angular.module('my-module', [ 'cockpit.plugin', 'camunda.common.services' ]);
+        var sampleModule = angular.module('my-module', [ 'cockpit.plugin', 'camunda.common.services.uri' ]);
         sampleModule.config(function(ViewsProvider) {
           expect(ViewsProvider).toBeDefined();
 
