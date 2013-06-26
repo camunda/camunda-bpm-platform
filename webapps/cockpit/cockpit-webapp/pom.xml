@@ -271,7 +271,7 @@
       <id>database</id>
       
       <properties>
-        <db.properties.file>${user.home}/.camunda/jdbc/engine.${database}.properties</db.properties.file>
+        <db.properties.file>${user.home}/.camunda/jdbc/cockpit.${database}.properties</db.properties.file>
       </properties>
       
       <activation>
