@@ -91,7 +91,10 @@ public abstract class AbstractFoxPlatformIntegrationTest {
     taskService = processEngine.getTaskService();
   }
 
-  public void waitForJobExecutorToProcessAllJobs(long maxMillisToWait, long intervalMillis) {
+  public void waitForJobExecutorToProcessAllJobs(long maxMillisToWait) {
+    
+    int checkInterval = 1000;
+
     JobExecutor jobExecutor = processEngineConfiguration.getJobExecutor();
     jobExecutor.start();
     
@@ -102,7 +105,7 @@ public abstract class AbstractFoxPlatformIntegrationTest {
       boolean areJobsAvailable = true;
       try {
         while (areJobsAvailable && !task.isTimeLimitExceeded()) {
-          Thread.sleep(intervalMillis);
+          Thread.sleep(checkInterval);
           areJobsAvailable = areJobsAvailable();
         }
       } catch (InterruptedException e) {

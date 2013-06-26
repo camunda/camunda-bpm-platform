@@ -44,7 +44,7 @@ public class JobExecutorRequestContextSFSBDelegateTest extends AbstractFoxPlatfo
     
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("testScopingSFSB");    
     
-    waitForJobExecutorToProcessAllJobs(6000, 100);
+    waitForJobExecutorToProcessAllJobs(6000);
     
     Object variable = runtimeService.getVariable(pi.getId(), "invocationCounter");
     // -> the same bean instance was invoked 2 times!
@@ -55,7 +55,7 @@ public class JobExecutorRequestContextSFSBDelegateTest extends AbstractFoxPlatfo
       .singleResult();
     taskService.complete(task.getId());
     
-    waitForJobExecutorToProcessAllJobs(6000, 100);
+    waitForJobExecutorToProcessAllJobs(6000);
     
     variable = runtimeService.getVariable(pi.getId(), "invocationCounter");
     // now it's '1' again! -> new instance of the bean
@@ -74,7 +74,7 @@ public class JobExecutorRequestContextSFSBDelegateTest extends AbstractFoxPlatfo
       ids[i] = runtimeService.startProcessInstanceByKey("testScopingSFSB").getId();     
     }
         
-    waitForJobExecutorToProcessAllJobs(60*1000, 300);
+    waitForJobExecutorToProcessAllJobs(60*1000);
     
     for(int i=0; i<instances; i++) {    
       Object variable = runtimeService.getVariable(ids[i], "invocationCounter");
@@ -84,7 +84,7 @@ public class JobExecutorRequestContextSFSBDelegateTest extends AbstractFoxPlatfo
       taskService.complete(taskService.createTaskQuery().processInstanceId(ids[i]).singleResult().getId());
     }
     
-    waitForJobExecutorToProcessAllJobs(60*1000, 300);
+    waitForJobExecutorToProcessAllJobs(60*1000);
     
     for(int i=0; i<instances; i++) {    
       // now it's '1' again! -> new instance of the bean

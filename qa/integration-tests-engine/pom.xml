@@ -225,6 +225,7 @@
                 <exclude>**_OTHERS.java</exclude>
                 <excludes>**/SpringPAExpressionResolvingTest.java</excludes>
               </excludes>
+             <redirectTestOutputToFile>true</redirectTestOutputToFile>
             </configuration>
           </plugin>
         </plugins>
@@ -264,6 +265,7 @@
                 <exclude>**/context/**</exclude>
                 <exclude>**/jar/**</exclude>
               </excludes>
+              <redirectTestOutputToFile>true</redirectTestOutputToFile>
             </configuration>
           </plugin>
         </plugins>
@@ -346,8 +348,9 @@
                 <excludes>**/TestDeploymentWithDroolsTaskFails.java</excludes>
                 <exclude>**/TestProcessEnginesXmlFails.java</exclude>
                 <exclude>**/*_JBOSS.java</exclude>
-                <exclude>**/jar/**</exclude>
+                <exclude>**/jar/**</exclude>                
               </excludes>
+              <redirectTestOutputToFile>true</redirectTestOutputToFile>
             </configuration>
           </plugin>
         </plugins>
@@ -397,6 +400,7 @@
                 <exclude>**/jar/**</exclude>
                 <exclude>**/*_JBOSS.java</exclude>
               </excludes>
+              <redirectTestOutputToFile>true</redirectTestOutputToFile>
             </configuration>
           </plugin>
         </plugins>
@@ -497,6 +501,7 @@
 
                 <exclude>**/*_JBOSS.java</exclude>
               </excludes>
+              <redirectTestOutputToFile>true</redirectTestOutputToFile>
             </configuration>
           </plugin>
         </plugins>
@@ -529,6 +534,7 @@
             <artifactId>maven-surefire-plugin</artifactId>
             <configuration>
               <skipTests>true</skipTests>
+              <redirectTestOutputToFile>true</redirectTestOutputToFile>
             </configuration>
           </plugin>
           <plugin>
@@ -566,6 +572,7 @@
               <systemPropertyVariables>
                 <org.apache.maven.user-settings>../../settings.xml</org.apache.maven.user-settings>
               </systemPropertyVariables>
+              <redirectTestOutputToFile>true</redirectTestOutputToFile>
             </configuration>
           </plugin>
         </plugins>
@@ -738,6 +745,22 @@
     </profile>
     <profile>
       <id>mssql-xa</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <configuration>
+              <excludes>
+                <exclude>**/CdiDelegateBeanResolutionTest</exclude>
+              </excludes>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>mssql12-xa</id>
       <build>
         <plugins>
           <plugin>

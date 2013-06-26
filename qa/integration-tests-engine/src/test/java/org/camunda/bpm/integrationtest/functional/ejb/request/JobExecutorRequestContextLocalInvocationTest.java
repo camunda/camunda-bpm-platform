@@ -79,7 +79,7 @@ public class JobExecutorRequestContextLocalInvocationTest extends AbstractFoxPla
       
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("testContextPropagationEjbLocal");    
     
-    waitForJobExecutorToProcessAllJobs(6000, 100);
+    waitForJobExecutorToProcessAllJobs(6000);
     
     Object variable = runtimeService.getVariable(pi.getId(), "invocationCounter");
     // -> the same bean instance was invoked 2 times!
@@ -90,7 +90,7 @@ public class JobExecutorRequestContextLocalInvocationTest extends AbstractFoxPla
       .singleResult();
     taskService.complete(task.getId());
     
-    waitForJobExecutorToProcessAllJobs(6000, 100);
+    waitForJobExecutorToProcessAllJobs(6000);
     
     variable = runtimeService.getVariable(pi.getId(), "invocationCounter");
     // now it's '1' again! -> new instance of the bean

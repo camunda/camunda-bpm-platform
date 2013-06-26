@@ -207,6 +207,39 @@
     </profile>
     
     <profile>
+      <id>mssql12</id>
+      <properties>
+        <database.type>mssql</database.type>
+        <jboss.datasource.filename>mssql-ds.xml</jboss.datasource.filename>
+        <database.host>${env.mssql12.database.host}</database.host>
+        <database.name>${env.mssql12.database.name}</database.name>
+        <database.user>${env.mssql12.database.user}</database.user>
+        <database.password>${env.mssql12.database.password}</database.password>
+        <database.driver>com.microsoft.sqlserver.jdbc.SQLServerDriver</database.driver>
+        <database.datasource.class>com.microsoft.sqlserver.jdbc.SQLServerDataSource</database.datasource.class>
+        <database.port>${env.mssql12.database.port}</database.port>
+        <database.url>jdbc:sqlserver://${database.host}:${database.port};DatabaseName=${database.name}</database.url>
+      </properties>
+    </profile>
+    
+    <profile>
+      <id>mssql12-xa</id>
+      <properties>
+        <database.type>mssql</database.type>
+        <jboss.datasource.filename>mssql-xa-ds.xml</jboss.datasource.filename>
+        <database.host>${env.mssql12.database.host}</database.host>
+        <database.name>${env.mssql12.database.name}</database.name>
+        <database.user>${env.mssql12.database.user}</database.user>
+        <database.password>${env.mssql12.database.password}</database.password>
+        <database.driver>com.microsoft.sqlserver.jdbc.SQLServerDriver</database.driver>
+        <database.datasource.class>com.microsoft.sqlserver.jdbc.SQLServerXADataSource</database.datasource.class>
+        <database.datasource.class.type>${database.datasource.class.type.xa}</database.datasource.class.type>
+        <database.port>${env.mssql12.database.port}</database.port>
+        <database.url>jdbc:sqlserver://${database.host}:${database.port};DatabaseName=${database.name}</database.url>
+      </properties>
+    </profile>
+    
+    <profile>
       <id>oracle</id>
       <properties>
         <database.type>oracle</database.type>
