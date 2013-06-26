@@ -50,7 +50,7 @@ ngDefine('cockpit.directives', [ 'angular' ], function(module, angular) {
           var selectedNode = $event.data;
           var targetId = $($event.target).attr('id');
           
-          if (targetId === selectedNode.activityId + '_' + selectedNode.id) {
+          if (targetId === selectedNode.activityId + '_' + selectedNode.id && scope.selection) {
             
             var instances = [];
             var scrollTo = selectedNode;
