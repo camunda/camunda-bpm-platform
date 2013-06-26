@@ -62,7 +62,7 @@ public class JobExecutorRequestContextRemoteInvocationTest extends AbstractFoxPl
       
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("testContextPropagationEjbRemote");    
     
-    waitForJobExecutorToProcessAllJobs(6000, 100);
+    waitForJobExecutorToProcessAllJobs(6000);
     
     Object variable = runtimeService.getVariable(pi.getId(), "invocationCounter");
     Assert.assertEquals(1, variable);
@@ -75,7 +75,7 @@ public class JobExecutorRequestContextRemoteInvocationTest extends AbstractFoxPl
       .singleResult();
     taskService.complete(task.getId());
     
-    waitForJobExecutorToProcessAllJobs(6000, 100);
+    waitForJobExecutorToProcessAllJobs(6000);
     
     variable = runtimeService.getVariable(pi.getId(), "invocationCounter");
     // now it's '1' again! -> new instance of the bean

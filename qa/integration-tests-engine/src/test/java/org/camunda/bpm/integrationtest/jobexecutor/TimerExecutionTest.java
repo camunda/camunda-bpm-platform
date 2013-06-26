@@ -53,7 +53,7 @@ public class TimerExecutionTest extends AbstractFoxPlatformIntegrationTest {
       managementService.createJobQuery().duedateHigherThen(new Date()).list();
     }
     
-    waitForJobExecutorToProcessAllJobs(10000, 1500);
+    waitForJobExecutorToProcessAllJobs(10000);
     
     List<ProcessInstance> finallyRunningInstances = runtimeService.createProcessInstanceQuery().processInstanceId(instance.getId()).list();
     Assert.assertEquals(0, finallyRunningInstances.size());

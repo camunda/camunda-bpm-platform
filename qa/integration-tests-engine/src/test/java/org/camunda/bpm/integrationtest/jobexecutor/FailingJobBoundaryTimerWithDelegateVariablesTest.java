@@ -66,7 +66,9 @@ public class FailingJobBoundaryTimerWithDelegateVariablesTest extends AbstractFo
     assertEquals(1, runtimeService.createExecutionQuery().processInstanceId(pi.getProcessInstanceId()).activityId("usertask1").count());
     assertEquals(2, runtimeService.createExecutionQuery().processInstanceId(pi.getProcessInstanceId()).count());
     
-    waitForJobExecutorToProcessAllJobs(21000, 5000);
+    assertEquals(1, managementService.createJobQuery().executable().count()); 
+    
+    waitForJobExecutorToProcessAllJobs(21000);
 
     assertEquals(0, managementService.createJobQuery().executable().count()); // should be 0, because it has failed 3 times
     assertEquals(1, managementService.createJobQuery().withException().count()); // should be 1, because job failed!

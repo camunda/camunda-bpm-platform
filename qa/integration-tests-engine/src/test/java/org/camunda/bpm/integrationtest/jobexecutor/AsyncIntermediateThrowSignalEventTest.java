@@ -27,7 +27,7 @@ public class AsyncIntermediateThrowSignalEventTest extends AbstractFoxPlatformIn
 
     ProcessInstance piThrowSignal = runtimeService.startProcessInstanceByKey("throwSignal");
 
-    waitForJobExecutorToProcessAllJobs(2000, 200);
+    waitForJobExecutorToProcessAllJobs(2000);
 
     assertEquals(1, runtimeService.createExecutionQuery().processInstanceId(piCatchSignal.getProcessInstanceId()).activityId("receiveTask").count());
     assertEquals(1, runtimeService.createExecutionQuery().processInstanceId(piThrowSignal.getProcessInstanceId()).activityId("receiveTask").count());
