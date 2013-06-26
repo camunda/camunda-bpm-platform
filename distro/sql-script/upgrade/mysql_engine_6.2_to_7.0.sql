@@ -69,42 +69,42 @@ AND
 
 /** set act_inst_id for inactive scope executions */
 UPDATE 
-    ACT_RU_EXECUTION E
+    ACT_RU_EXECUTION E_
 SET 
-    E.ACT_INST_ID_  = (
+    ACT_INST_ID_  = (
         SELECT 
             MIN(HAI.ID_)
         FROM 
-            ACT_HI_ACTINST HAI          
-        WHERE
-            HAI.END_TIME_ is null
-        AND 
-            EXISTS (
-                SELECT 
+            ACT_HI_ACTINST HAI 
+        WHERE 
+            HAI.END_TIME_ is null 
+        AND
+            exists (
+                  SELECT 
                     ID_ 
-                FROM 
-                    (SELECT * FROM ACT_RU_EXECUTION) SCOPE 
-                WHERE 
-                    HAI.EXECUTION_ID_ = SCOPE.ID_
-                AND 
-                    SCOPE.PARENT_ID_ = E.ID_
-                AND 
-                    SCOPE.IS_SCOPE_ = true            
-            )    
+                  FROM 
+                    ACT_RU_EXECUTION SCOPE_                
+                  WHERE 
+                    SCOPE_.PARENT_ID_ = E_.ID_                    
+                  AND 
+                    HAI.EXECUTION_ID_ = SCOPE_.ID_
+                  AND 
+                    SCOPE_.IS_SCOPE_ = 1                
+            )                    
         AND 
             NOT EXISTS (
                 SELECT 
                     ACT_INST_ID_
                 FROM 
-                    (SELECT * FROM ACT_RU_EXECUTION) CHILD
+                    ACT_RU_EXECUTION CHILD_
                 WHERE 
-                    CHILD.ACT_INST_ID_ = HAI.ID_
+                    CHILD_.ACT_INST_ID_ = HAI.ID_
                 AND 
-                    CHILD.ACT_ID_ is not null
+                    E_.ACT_ID_ is not null
             )    
     )
 WHERE 
-    E.ACT_INST_ID_ is null;
+    E_.ACT_INST_ID_ is null;
    
 /** remaining executions get id from parent  */
 UPDATE 

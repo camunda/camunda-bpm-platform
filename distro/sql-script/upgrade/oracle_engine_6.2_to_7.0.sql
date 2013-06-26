@@ -102,7 +102,29 @@ SET
 WHERE 
     E_.ACT_INST_ID_ is null;
     
+
+/** remaining executions get id from parent  */
+UPDATE 
+    ACT_RU_EXECUTION E 
+SET 
+    ACT_INST_ID_  = (
+        SELECT 
+          ACT_INST_ID_ FROM ACT_RU_EXECUTION PARENT 
+        WHERE 
+            PARENT.ID_ = E.PARENT_ID_
+        AND
+            PARENT.ACT_ID_ = E.ACT_ID_
+    )
+WHERE 
+    E.ACT_INST_ID_ is null;
     
+/** remaining executions use execution id as activity instance id */
+UPDATE 
+    ACT_RU_EXECUTION E 
+SET 
+    ACT_INST_ID_  = E.ID_
+WHERE
+    E.ACT_INST_ID_ is null;    
 
 /** mark MI-scope executions in temporary column */
 alter table ACT_RU_EXECUTION
