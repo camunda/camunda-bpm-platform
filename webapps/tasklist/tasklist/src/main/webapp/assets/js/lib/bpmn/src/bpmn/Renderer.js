@@ -1241,7 +1241,7 @@ define([ "dojox/gfx", "jquery" ], function (gfx, $) {
         continue;
       }
 
-      if (bounds) {
+      if (bounds && !options.skipOverlays) {
         var diagramElement = $("#" + options.diagramElement).css("position", "relative");
 
         var overlayDiv = $('<div class="bpmnElement"></div>');
