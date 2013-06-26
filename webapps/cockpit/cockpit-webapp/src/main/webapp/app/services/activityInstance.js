@@ -88,6 +88,18 @@ define([ "angular" ], function(angular) {
       });
     }
     
+    function createNode(id, activityId, label) {
+      var childNode = {};
+      
+      childNode.id = childTransitionInstance.id;
+      childNode.activityId = childTransitionInstance.targetActivityId;
+      childNode.children = [];
+      childNode.isOpen = true;
+      childNode.isSelected = false;
+      
+      return childNode;
+    }
+    
     function getActivityName(elements, activityId) {
       var name = null;
       for (var i = 0; i < elements.length; i++) {
