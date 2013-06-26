@@ -175,7 +175,11 @@ ngDefine('cockpit.directives', [
         }
       } else {
         // in that case there no badges are existings, so the first one will initially added.
-        bpmnRenderer.annotation(activityId).addDiv(innerHtml, ['badge-position']);
+        try {
+          bpmnRenderer.annotation(activityId).addDiv(innerHtml, ['badge-position']);
+        } catch (error) {
+          console.log('Could not annotate activity \'' + activityId + '\': ' + error.message);
+        }
       }
     }    
     
