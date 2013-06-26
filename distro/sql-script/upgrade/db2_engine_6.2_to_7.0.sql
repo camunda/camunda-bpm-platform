@@ -1,5 +1,4 @@
 
-
 create table ACT_RU_INCIDENT (
   ID_ varchar(64) not null,
   INCIDENT_TIMESTAMP_ timestamp not null,
@@ -44,14 +43,14 @@ alter table ACT_RU_INCIDENT
 
 create index ACT_IDX_HI_ACT_INST_COMP on ACT_HI_ACTINST(EXECUTION_ID_, ACT_ID_, END_TIME_, ID_);
 
-/** add ACT_INST_ID_ column to execution table */
+-- add ACT_INST_ID_ column to execution table --
 alter table ACT_RU_EXECUTION
     add ACT_INST_ID_ varchar(64);
-    
 
-/** populate ACT_INST_ID_ from history */
+-- populate ACT_INST_ID_ from history -- 
 
-/** get from history for active activity instances */
+-- get from history for active activity instances -- 
+
 UPDATE 
     ACT_RU_EXECUTION E 
 SET 
@@ -70,7 +69,7 @@ WHERE
 AND 
     E.ACT_ID_ is not null;
 
-/** set act_inst_id for inactive scope executions */
+-- set act_inst_id for inactive scope executions -- 
 UPDATE 
     ACT_RU_EXECUTION E 
 SET 
@@ -86,7 +85,7 @@ SET
             AND 
                 SCOPE.PARENT_ID_ = E.ID_
             AND 
-                SCOPE.IS_SCOPE_ = true
+                SCOPE.IS_SCOPE_ = 1
         WHERE
             HAI.END_TIME_ is null    
         AND 
@@ -104,7 +103,7 @@ SET
 WHERE 
     E.ACT_INST_ID_ is null;
    
-/** remaining executions get id from parent  */
+-- remaining executions get id from parent -- 
 UPDATE 
     ACT_RU_EXECUTION E 
 SET 
@@ -118,17 +117,8 @@ SET
     )
 WHERE 
     E.ACT_INST_ID_ is null;
-/**AND 
-    not exists (
-        SELECT 
-            ID_ 
-        FROM 
-            ACT_RU_EXECUTION CHILD
-        WHERE
-            CHILD.PARENT_ID_ = E.ID_
-    );*/
     
-/** remaining executions use execution id as activity instance id */
+-- remaining executions use execution id as activity instance id -- 
 UPDATE 
     ACT_RU_EXECUTION E 
 SET 
@@ -137,17 +127,17 @@ WHERE
     E.ACT_INST_ID_ is null;
 
 
-/** mark MI-scope executions in temporary column */
+-- mark MI-scope executions in temporary column -- 
 alter table ACT_RU_EXECUTION
-    add IS_MI_SCOPE_ boolean;
+    add IS_MI_SCOPE_ smallint;
     
     
 UPDATE
     ACT_RU_EXECUTION MI_SCOPE 
 SET 
-    IS_MI_SCOPE_ = true        
+    IS_MI_SCOPE_ = 1        
 WHERE 
-    MI_SCOPE.IS_SCOPE_ = true
+    MI_SCOPE.IS_SCOPE_ = 1
 AND
     MI_SCOPE.ACT_ID_ is not null
 AND EXISTS (
@@ -158,23 +148,23 @@ AND EXISTS (
     WHERE  
         MI_CONCUR.PARENT_ID_ = MI_SCOPE.ID_
     AND
-        MI_CONCUR.IS_SCOPE_ = false
+        MI_CONCUR.IS_SCOPE_ = 0
     AND
-        MI_CONCUR.IS_CONCURRENT_ = true
+        MI_CONCUR.IS_CONCURRENT_ = 1
     AND 
         MI_CONCUR.ACT_ID_ = MI_SCOPE.ACT_ID_
 );
     
-/** set IS_ACTIVE to false for MI-Scopes: */
+-- set IS_ACTIVE to 0 for MI-Scopes:-- 
 UPDATE
     ACT_RU_EXECUTION MI_SCOPE 
 SET 
-    IS_ACTIVE_ = false    
+    IS_ACTIVE_ = 0    
 WHERE
-    MI_SCOPE.IS_MI_SCOPE_ = true;
+    MI_SCOPE.IS_MI_SCOPE_ = 1;
 
-/** set correct root for mi-parallel: 
-    CASE 1: process instance (use ID_) */    
+-- set correct root for mi-parallel: -- 
+-- CASE 1: process instance (use ID_) --   
 UPDATE 
     ACT_RU_EXECUTION MI_ROOT 
 SET 
@@ -189,11 +179,10 @@ AND EXISTS (
     WHERE  
         MI_SCOPE.PARENT_ID_ = MI_ROOT.ID_
     AND
-        MI_SCOPE.IS_MI_SCOPE_ = true
+        MI_SCOPE.IS_MI_SCOPE_ = 1
 );
 
-/**     
-    CASE 2: scopes below process instance (use ACT_INST_ID_ from parent) */    
+-- CASE 2: scopes below process instance (use ACT_INST_ID_ from parent) -- 
 UPDATE 
     ACT_RU_EXECUTION MI_ROOT 
 SET 
@@ -215,12 +204,12 @@ AND EXISTS (
     WHERE  
         MI_SCOPE.PARENT_ID_ = MI_ROOT.ID_
     AND
-        MI_SCOPE.IS_MI_SCOPE_ = true
+        MI_SCOPE.IS_MI_SCOPE_ = 1
 );
 
 alter table ACT_RU_EXECUTION
     drop IS_MI_SCOPE_;
     
-/** add SUSPENSION_STATE_ column to task table */
+-- add SUSPENSION_STATE_ column to task table -- 
 alter table ACT_RU_TASK
     add SUSPENSION_STATE_ integer;
