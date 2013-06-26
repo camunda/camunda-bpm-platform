@@ -17,6 +17,7 @@ import java.util.List;
 
 import org.camunda.bpm.engine.delegate.TaskListener;
 import org.camunda.bpm.engine.impl.bpmn.behavior.UserTaskActivityBehavior;
+import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParseListener;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
@@ -199,7 +200,10 @@ public class HistoryParseListener implements BpmnParseListener {
   }
 
   public void parseIntermediateCatchEvent(Element intermediateEventElement, ScopeImpl scope, ActivityImpl activity) {
-    addActivityHandlers(activity);
+    // do not write history for link events
+    if(!activity.getProperty("type").equals("intermediateLinkCatch")) {
+      addActivityHandlers(activity);
+    }
   }
 
   public void parseBoundaryEvent(Element boundaryEventElement, ScopeImpl scopeElement, ActivityImpl activity) {
