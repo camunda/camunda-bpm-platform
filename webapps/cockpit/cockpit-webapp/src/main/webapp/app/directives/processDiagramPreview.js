@@ -21,7 +21,8 @@ ngDefine('cockpit.directives', [ 'angular', 'bpmn/Bpmn' ], function(module, angu
                 new Bpmn().render(xml, {
                   diagramElement : element.attr('id'),
                   width : parseInt(element.parent().css("min-width")),
-                  height : element.parent().height()
+                  height : element.parent().height(),
+                  skipOverlays: true
                 });
               });
           }
