@@ -13,6 +13,10 @@
 
 package org.camunda.bpm.engine.impl.cmd;
 
+import java.io.Serializable;
+
+import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 
@@ -20,24 +24,33 @@ import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 /**
  * @author Tom Baeyens
  */
-public class DelegateTaskCmd extends NeedsActiveTaskCmd<Object> {  
+public class DelegateTaskCmd implements Command<Object>, Serializable {  
 
   private static final long serialVersionUID = 1L;
+  
+  protected String taskId;
   protected String userId;
   
   public DelegateTaskCmd(String taskId, String userId) {
-    super(taskId);
+    this.taskId = taskId;
     this.userId = userId;
   }
   
-  protected Object execute(CommandContext commandContext, TaskEntity task) {
+  public Object execute(CommandContext commandContext) {
+    if(taskId == null) {
+      throw new ProcessEngineException("taskId is null");
+    }
+    
+    TaskEntity task = commandContext
+      .getTaskManager()
+      .findTaskById(taskId);
+    
+    if (task == null) {
+      throw new ProcessEngineException("Cannot find task with id " + taskId);
+    }
+    
     task.delegate(userId);
     return null;
-  }
-  
-  @Override
-  protected String getSuspendedTaskException() {
-    return "Cannot delegate a suspended task";
   }
 
 }

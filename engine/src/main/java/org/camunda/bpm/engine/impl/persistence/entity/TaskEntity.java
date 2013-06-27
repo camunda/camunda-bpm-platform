@@ -24,6 +24,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.SuspendedEntityInteractionException;
 import org.camunda.bpm.engine.delegate.DelegateExecution;
 import org.camunda.bpm.engine.delegate.DelegateTask;
 import org.camunda.bpm.engine.delegate.TaskListener;
@@ -102,6 +103,8 @@ public class TaskEntity extends VariableScopeImpl implements Task, DelegateTask,
   }
 
   public void insert(ExecutionEntity execution) {
+    ensureParentTaskActive();
+    
     CommandContext commandContext = Context.getCommandContext();
     DbSqlSession dbSqlSession = commandContext.getDbSqlSession();
     dbSqlSession.insert(this);
@@ -149,6 +152,8 @@ public class TaskEntity extends VariableScopeImpl implements Task, DelegateTask,
   }
 
   public void complete() {
+    ensureTaskActive();
+    
     fireEvent(TaskListener.EVENTNAME_COMPLETE);
 
     Context
@@ -211,6 +216,25 @@ public class TaskEntity extends VariableScopeImpl implements Task, DelegateTask,
   
   public int getRevisionNext() {
     return revision+1;
+  }
+  
+  protected void ensureParentTaskActive() {
+    if (parentTaskId != null) {
+      TaskEntity parentTask = Context
+          .getCommandContext()
+          .getTaskManager()
+          .findTaskById(parentTaskId);
+      
+      if (parentTask.suspensionState == SuspensionState.SUSPENDED.getStateCode()) {
+        throw new SuspendedEntityInteractionException("parent task " + id + " is suspended");
+      }
+    }
+  }
+  
+  protected void ensureTaskActive() {
+    if (suspensionState == SuspensionState.SUSPENDED.getStateCode()) {
+      throw new SuspendedEntityInteractionException("task " + id + " is suspended");
+    }
   }
 
   // variables ////////////////////////////////////////////////////////////////
@@ -279,6 +303,8 @@ public class TaskEntity extends VariableScopeImpl implements Task, DelegateTask,
   // task assignment //////////////////////////////////////////////////////////
   
   public IdentityLinkEntity addIdentityLink(String userId, String groupId, String type) {
+    ensureTaskActive();
+    
     IdentityLinkEntity identityLinkEntity = IdentityLinkEntity.createAndInsert();
     getIdentityLinks().add(identityLinkEntity);
     identityLinkEntity.setTask(this);
@@ -289,6 +315,8 @@ public class TaskEntity extends VariableScopeImpl implements Task, DelegateTask,
   }
   
   public void deleteIdentityLink(String userId, String groupId, String type) {
+    ensureTaskActive();
+    
     List<IdentityLinkEntity> identityLinks = Context
       .getCommandContext()
       .getIdentityLinkManager()
@@ -425,6 +453,8 @@ public class TaskEntity extends VariableScopeImpl implements Task, DelegateTask,
   }
 
   public void setAssignee(String assignee) {
+    ensureTaskActive();
+    
     if (assignee==null && this.assignee==null) {
       return;
     }
@@ -453,6 +483,8 @@ public class TaskEntity extends VariableScopeImpl implements Task, DelegateTask,
   }
   
   public void setOwner(String owner) {
+    ensureTaskActive();
+    
     if (owner==null && this.owner==null) {
       return;
     }

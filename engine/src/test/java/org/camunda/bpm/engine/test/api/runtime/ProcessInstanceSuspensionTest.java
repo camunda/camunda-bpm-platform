@@ -209,7 +209,63 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
   }
   
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
-  public void testSubmitTaskFormAfterProcessInstanceSuspend() {
+  public void testChangeVariablesAfterProcessInstanceSuspend() {
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+    ProcessInstance processInstance = runtimeService.startProcessInstanceById(processDefinition.getId());
+    runtimeService.suspendProcessInstanceById(processInstance.getId());
+    
+    try {
+      runtimeService.removeVariable(processInstance.getId(), "someVariable");
+    } catch (ProcessEngineException e) {
+      fail("This should be possible");
+    }
+    
+    try {
+      runtimeService.removeVariableLocal(processInstance.getId(), "someVariable");
+    } catch (ProcessEngineException e) {
+      fail("This should be possible");
+    }
+    
+    try {
+      runtimeService.removeVariables(processInstance.getId(), Arrays.asList("one", "two", "three"));
+    } catch (ProcessEngineException e) {
+      fail("This should be possible");
+    }
+    
+    
+    try {
+      runtimeService.removeVariablesLocal(processInstance.getId(), Arrays.asList("one", "two", "three"));
+    } catch (ProcessEngineException e) {
+      fail("This should be possible");
+    }
+    
+    try {
+      runtimeService.setVariable(processInstance.getId(), "someVariable", "someValue");
+    } catch (ProcessEngineException e) {
+      fail("This should be possible");
+    }
+    
+    try {
+      runtimeService.setVariableLocal(processInstance.getId(), "someVariable", "someValue");
+    } catch (ProcessEngineException e) {
+      fail("This should be possible");
+    }
+    
+    try {
+      runtimeService.setVariables(processInstance.getId(), new HashMap<String, Object>());
+    } catch (ProcessEngineException e) {
+      fail("This should be possible");
+    }
+    
+    try {
+      runtimeService.setVariablesLocal(processInstance.getId(), new HashMap<String, Object>());
+    } catch (ProcessEngineException e) {
+      fail("This should be possible");
+    }
+  }
+  
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void testSubmitTaskFormFailAfterProcessInstanceSuspend() {
     ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
     ProcessInstance processInstance = runtimeService.startProcessInstanceById(processDefinition.getId());
     runtimeService.suspendProcessInstanceById(processInstance.getId());
@@ -316,7 +372,7 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
   }
   
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
-  public void testTaskOperationsFailAfterProcessInstanceSuspend() {
+  public void testTaskLifecycleOperationsFailAfterProcessInstanceSuspend() {
 
     // Start a new process instance with one task
     ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
@@ -326,9 +382,6 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     
     // Suspend the process instance
     runtimeService.suspendProcessInstanceById(processInstance.getId());
-    
-    // Yeah, the following is pretty long and boring ... but I didn't have the patience
-    // to create separate tests for each of them.
     
     // Completing the task should fail
     try {
@@ -346,75 +399,7 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
       // This is good
     } 
     
-    // Setting variable on the task should fail
-    try {
-      taskService.setVariable(task.getId(), "someVar", "someValue");
-      fail("It is not allowed to set a variable on a task of a suspended process instance");
-    } catch (SuspendedEntityInteractionException e) {
-      // This is good
-    } 
-    
-    // Setting variable on the task should fail
-    try {
-      taskService.setVariableLocal(task.getId(), "someVar", "someValue");
-      fail("It is not allowed to set a variable on a task of a suspended process instance");
-    } catch (SuspendedEntityInteractionException e) {
-      // This is good
-    } 
-    
-    // Setting variables on the task should fail
-    try {
-      HashMap<String, String> variables = new HashMap<String, String>();
-      variables.put("varOne", "one");
-      variables.put("varTwo", "two");
-      taskService.setVariables(task.getId(), variables);
-      fail("It is not allowed to set variables on a task of a suspended process instance");
-    } catch (SuspendedEntityInteractionException e) {
-      // This is good
-    }
-    
-    // Setting variables on the task should fail
-    try {
-      HashMap<String, String> variables = new HashMap<String, String>();
-      variables.put("varOne", "one");
-      variables.put("varTwo", "two");
-      taskService.setVariablesLocal(task.getId(), variables);
-      fail("It is not allowed to set variables on a task of a suspended process instance");
-    } catch (SuspendedEntityInteractionException e) {
-      // This is good
-    }
-    
-    // Removing variable on the task should fail
-    try {
-      taskService.removeVariable(task.getId(), "someVar");
-      fail("It is not allowed to remove a variable on a task of a suspended process instance");
-    } catch (SuspendedEntityInteractionException e) {
-      // This is good
-    } 
-    
-    // Removing variable on the task should fail
-    try {
-      taskService.removeVariableLocal(task.getId(), "someVar");
-      fail("It is not allowed to remove a variable on a task of a suspended process instance");
-    } catch (SuspendedEntityInteractionException e) {
-      // This is good
-    } 
-    
-    // Removing variables on the task should fail
-    try {
-      taskService.removeVariables(task.getId(), Arrays.asList("one", "two"));
-      fail("It is not allowed to remove variables on a task of a suspended process instance");
-    } catch (SuspendedEntityInteractionException e) {
-      // This is good
-    } 
-    
-    // Removing variables on the task should fail
-    try {
-      taskService.removeVariablesLocal(task.getId(), Arrays.asList("one", "two"));
-      fail("It is not allowed to remove variables on a task of a suspended process instance");
-    } catch (SuspendedEntityInteractionException e) {
-      // This is good
-    } 
+     
     
     // Adding candidate groups on the task should fail
     try {
@@ -432,7 +417,7 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
       // This is good
     }
     
-    // Adding candidate users on the task should fail
+    // Adding group identity links on the task should fail
     try {
       taskService.addGroupIdentityLink(task.getId(), "blahGroup", IdentityLinkType.CANDIDATE);
       fail("It is not allowed to add a candidate user on a task of a suspended process instance");
@@ -448,21 +433,6 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
       // This is good
     }
     
-    // Adding a comment on the task should fail
-    try {
-      taskService.addComment(task.getId(), processInstance.getId(), "test comment");
-      fail("It is not allowed to add a comment on a task of a suspended process instance");
-    } catch (SuspendedEntityInteractionException e) {
-      // This is good
-    }
-    
-    // Adding an attachment on the task should fail
-    try {
-      taskService.createAttachment("text", task.getId(), processInstance.getId(), "testName", "testDescription", "http://test.com");
-      fail("It is not allowed to add an attachment on a task of a suspended process instance");
-    } catch (SuspendedEntityInteractionException e) {
-      // This is good
-    }
     
     // Set an assignee on the task should fail
     try {
@@ -480,12 +450,137 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
       // This is good
     }
     
-    // Set priority on the task should fail
+    // Removing candidate groups on the task should fail
     try {
-      taskService.setPriority(task.getId(), 99);
-      fail("It is not allowed to set a priority on a task of a suspended process instance");
+      taskService.deleteCandidateGroup(task.getId(), "blahGroup");
+      fail("It is not allowed to remove a candidate group on a task of a suspended process instance");
     } catch (SuspendedEntityInteractionException e) {
       // This is good
+    } 
+    
+    // Removing candidate users on the task should fail
+    try {
+      taskService.deleteCandidateUser(task.getId(), "blahUser");
+      fail("It is not allowed to remove a candidate user on a task of a suspended process instance");
+    } catch (SuspendedEntityInteractionException e) {
+      // This is good
+    }
+    
+    // Removing group identity links on the task should fail
+    try {
+      taskService.deleteGroupIdentityLink(task.getId(), "blahGroup", IdentityLinkType.CANDIDATE);
+      fail("It is not allowed to remove a candidate user on a task of a suspended process instance");
+    } catch (SuspendedEntityInteractionException e) {
+      // This is good
+    }
+    
+    // Removing an identity link on the task should fail
+    try {
+      taskService.deleteUserIdentityLink(task.getId(), "blahUser", IdentityLinkType.OWNER);
+      fail("It is not allowed to remove an identityLink on a task of a suspended process instance");
+    } catch (SuspendedEntityInteractionException e) {
+      // This is good
+    }
+    
+  }
+  
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void testSubTaskCreationFailAfterProcessInstanceSuspend() {
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+    ProcessInstance processInstance = runtimeService.startProcessInstanceById(processDefinition.getId());
+    final Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    runtimeService.suspendProcessInstanceById(processInstance.getId());
+    
+    Task subTask = taskService.newTask("someTaskId");
+    subTask.setParentTaskId(task.getId());
+    
+    try {
+      taskService.saveTask(subTask);
+      fail("Creating sub tasks for suspended task should not be possible");
+    } catch (SuspendedEntityInteractionException e) {
+    }
+  }
+  
+  
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
+  public void testTaskNonLifecycleOperationsSucceedAfterProcessInstanceSuspend() {
+
+    // Start a new process instance with one task
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+    ProcessInstance processInstance = runtimeService.startProcessInstanceById(processDefinition.getId());
+    final Task task = taskService.createTaskQuery().processInstanceId(processInstance.getId()).singleResult();
+    assertNotNull(task);
+    
+    try {
+      taskService.setVariable(task.getId(), "someVar", "someValue");
+    } catch (SuspendedEntityInteractionException e) {
+      fail("should be allowed");
+    } 
+    
+    try {
+      taskService.setVariableLocal(task.getId(), "someVar", "someValue");
+    } catch (SuspendedEntityInteractionException e) {
+      fail("should be allowed");
+    } 
+    
+    try {
+      HashMap<String, String> variables = new HashMap<String, String>();
+      variables.put("varOne", "one");
+      variables.put("varTwo", "two");
+      taskService.setVariables(task.getId(), variables);
+    } catch (SuspendedEntityInteractionException e) {
+      fail("should be allowed");
+    }
+    
+    try {
+      HashMap<String, String> variables = new HashMap<String, String>();
+      variables.put("varOne", "one");
+      variables.put("varTwo", "two");
+      taskService.setVariablesLocal(task.getId(), variables);
+    } catch (SuspendedEntityInteractionException e) {
+      fail("should be allowed");
+    }
+    
+    try {
+      taskService.removeVariable(task.getId(), "someVar");
+    } catch (SuspendedEntityInteractionException e) {
+      fail("should be allowed");
+    } 
+    
+    try {
+      taskService.removeVariableLocal(task.getId(), "someVar");
+    } catch (SuspendedEntityInteractionException e) {
+      fail("should be allowed");
+    } 
+    
+    try {
+      taskService.removeVariables(task.getId(), Arrays.asList("one", "two"));
+    } catch (SuspendedEntityInteractionException e) {
+      fail("should be allowed");
+    } 
+    
+    try {
+      taskService.removeVariablesLocal(task.getId(), Arrays.asList("one", "two"));
+    } catch (SuspendedEntityInteractionException e) {
+      fail("should be allowed");
+    }
+    
+    try {
+      taskService.addComment(task.getId(), processInstance.getId(), "test comment");
+    } catch (SuspendedEntityInteractionException e) {
+      fail("should be allowed");
+    }
+    
+    try {
+      taskService.createAttachment("text", task.getId(), processInstance.getId(), "testName", "testDescription", "http://test.com");
+    } catch (SuspendedEntityInteractionException e) {
+      fail("should be allowed");
+    }
+
+    try {
+      taskService.setPriority(task.getId(), 99);
+    } catch (SuspendedEntityInteractionException e) {
+      fail("should be allowed");
     }
   }
   
