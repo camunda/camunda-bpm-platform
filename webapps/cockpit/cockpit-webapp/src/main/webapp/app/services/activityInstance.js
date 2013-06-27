@@ -1,138 +1,201 @@
 'use strict';
 
-/* Plugin Services */
+ngDefine('cockpit.services', function(module) {
+  
+  var Service = function($filter) { 
 
-define([ "angular" ], function(angular) {
+    /**
+     * Travers over the activityInstances and collect in an array
+     * for each activity id the corresponding activityInstances.
+     *
+     * @return a map which contains for each activity id the activity instances.
+     **/
+    function aggregateActivityInstances(activityInstances) {
+      var result = {};
+      aggregateActivityInstancesHelper(activityInstances, result);
+      return result;
+    }
 
-  var module = angular.module("cockpit.services");
-
-  function ActivityInstanceProvider() {
-
+    /**
+     * Helper to travers over the activityInstances.
+     *
+     **/
     function aggregateActivityInstancesHelper(activityInstance, result) {
       var children = activityInstance.childActivityInstances;
-      for (var i = 0; i < children.length; i++) {
-        var child = children[i];
-        aggregateActivityInstancesHelper(child, result);
-        
-        var mappings = result[child.activityId];
-        if (!mappings) {
-          mappings = [];
-          result[child.activityId] = mappings;
+      if (children) {
+        for (var i = 0; i < children.length; i++) {
+          var child = children[i];
+          aggregateActivityInstancesHelper(child, result);
+          
+          var mappings = result[child.activityId];
+          if (!mappings) {
+            mappings = [];
+            result[child.activityId] = mappings;
+          }
+          mappings.push(child);
         }
-        mappings.push(child);
       }
 
       var transitions = activityInstance.childTransitionInstances;
-      for (var i = 0; i < transitions.length; i++) {
-        var transition = transitions[i];
-        
-        var mappings = result[transition.targetActivityId];
-        if (!mappings) {
-          mappings = [];
-          result[transition.targetActivityId] = mappings;
+      if (transitions) {
+        for (var i = 0; i < transitions.length; i++) {
+          var transition = transitions[i];
+          
+          var mappings = result[transition.targetActivityId];
+          if (!mappings) {
+            mappings = [];
+            result[transition.targetActivityId] = mappings;
+          }
+          mappings.push(transition);
+        };        
+      }
+
+    }
+
+    /**
+     * Creates a activity instance tree from the assigned activity instances. There the child activity instances
+     * and child transitions will be merged to a certain list of children of parent node.<p>
+     * 
+     * Furthermore, the assigned map <code>activityIdToNodeMap</code> will be filled during the creation of the node,
+     * so that for each activity id the corresponding nodes will be collected. The map could look like this:
+     * <code>{ServiceTask_1: [{id: 'instanceId_1', label: 'Service Task', ...}, {id: 'instanceId_2', label: 'Service Task', ...}], ...}</code>
+     *
+     * @param processDefinition The process definition to get the corresponding model from the assigned parameter 'semantic'.
+     * @param semantic The bpmn model as object, containing all rendered bpmn elements.
+     * @param activityInstances The activity instances which will be transformed to a tree.
+     * @param activityIdToNodeMap The map which will contain for each activity id the corresponding nodes
+     *
+     * @return the root node, which contains the children (i.e. the tree will be returned).
+     **/
+    function createActivityInstanceTree(processDefinition, semantic, activityInstances, activityIdToNodeMap) {
+      // get the corresponding semantic for the model.
+      var model = null;
+
+      for (var i = 0; i < semantic.length; i++) {
+        var currentSemantic = semantic[i];
+        if (currentSemantic.id === processDefinition.key && currentSemantic.type === 'process') {
+          model = currentSemantic;
         }
-        mappings.push(transition);
-      };
+      }
+
+      // create and decorate root
+      var root = createNode(activityInstances.id, model.id, getActivityName(model, model.id));
+      
+      // add new node to activityIdToNodeMap
+      addNodeToMap(root, activityIdToNodeMap);
+      
+      // add children
+      addChildren(root, model, activityInstances, activityIdToNodeMap);
+      
+      return root;
     }
     
-    function addChildren(parent, processSemantic, activityInstance) {
+    /**
+     * Add the parent the children, i.e. merge the childTransitions and childActivityInstances of
+     * the assigned <code>activityInstance</code> to one list containing the corresponding nodes.
+     *
+     * @param parent The parent, whom will be the children will added
+     * @param semantic The bpmn model as object, containing all rendered bpmn elements.
+     * @param activityInstance The activity instance which is the parent element.
+     * @param activityIdToNodeMap The map which will contain for each activity id the corresponding nodes
+     *
+     **/
+    function addChildren(parent, semantic, activityInstance, activityIdToNodeMap) {
       angular.forEach(activityInstance.childActivityInstances, function(childActivityInstance) {
         
         // create and decorate child node
-        var childNode = {};
-        childNode.id = childActivityInstance.id;
-        childNode.activityId = childActivityInstance.activityId;
-        childNode.children = [];
-        childNode.isOpen = true;
-        childNode.isSelected = false;
-        
-        // get the label for child
-        childNode.label = getActivityName(processSemantic.baseElements, childActivityInstance.activityId);
+        var childNode = createNode(childActivityInstance.id, childActivityInstance.activityId, getActivityName(semantic, childActivityInstance.activityId));
+
+        // add new node to activityIdToNodeMap
+        addNodeToMap(childNode, activityIdToNodeMap);
         
         // add parent the child node
         parent.children.push(childNode);
         
         // call recursive add children for child node as parent
-        addChildren(childNode, processSemantic, childActivityInstance);
+        addChildren(childNode, semantic, childActivityInstance, activityIdToNodeMap);
       });
       
       angular.forEach(activityInstance.childTransitionInstances, function(childTransitionInstance) {
         
         // create and decorate child node
-        var childNode = {};
-        childNode.id = childTransitionInstance.id;
-        childNode.activityId = childTransitionInstance.targetActivityId;
-        childNode.children = [];
-        childNode.isOpen = true;
-        childNode.isSelected = false;
-        
-        // get the label for child
-        childNode.label = getActivityName(processSemantic.baseElements, childTransitionInstance.targetActivityId);;
+        var childNode = createNode(childTransitionInstance.id, childTransitionInstance.targetActivityId, getActivityName(semantic, childTransitionInstance.targetActivityId));
+    
+        // add new node to activityIdToNodeMap
+        addNodeToMap(childNode, activityIdToNodeMap);
         
         // add parent the child node
         parent.children.push(childNode);
       });
     }
+
+    /**
+     * Add the node to the assigned activityIdToNodeMap.
+     *
+     **/
+    function addNodeToMap(node, activityIdToNodeMap) {
+      var instanceList = activityIdToNodeMap[node.activityId];
+      if (!instanceList) {
+        instanceList = activityIdToNodeMap[node.activityId] = [];
+      }
+        
+      instanceList.push(node);   
+    }
     
-    function getActivityName(elements, activityId) {
+    /**
+     * Creates a new node and decorates it with the assigned parameters.
+     *
+     **/
+    function createNode(id, activityId, label) {
+      var childNode = {};
+      
+      childNode.id = id;
+      childNode.label = label;
+      childNode.activityId = activityId;
+      childNode.children = [];
+      childNode.isOpen = true;
+      
+      return childNode;
+    }
+    
+    /**
+     * Returns the corresponding name to the assigned activity id
+     * from the assigned element (i.e. bpmn model).
+     *
+     **/
+    function getActivityName(element, activityId) {
       var name = null;
-      for (var i = 0; i < elements.length; i++) {
-        var element = elements[i];
-        if (element.id === activityId) {
-          name = element.name;
-          if (!name) {
-            name = element.type + ' (' + element.id + ')';
-          }
-          return name;
+
+      if (activityId === element.id) {
+        name = element.name;
+        if (!name) {
+          var shortenFilter = $filter('shorten');
+          name = element.type + ' (' + shortenFilter(element.id, 8) + '...)';
         }
-        if (element.baseElements) {
-          name = getActivityName(element.baseElements, activityId);
+        return name;
+      }
+
+      if (element.baseElements) {
+        for (var i = 0; i < element.baseElements.length; i++) {
+          var currentElement = element.baseElements[i];
+          name = getActivityName(currentElement, activityId);
           if (name) {
             return name;
-          }
-        }
+          }   
+        }        
       }
     }
-
-    function aggregateActivityInstances(activityInstances) {
-      var result = [];
-      aggregateActivityInstancesHelper(activityInstances, result);
-      return result;
-    }
-    
-    function createActivityInstanceTree(processDefinition, semantic, activityInstances) {
-      // get the corresponding semantic for the model.
-      var correspondingSemantic = null;
-      for (var i = 0; i < semantic.length; i++) {
-        var currentSemantic = semantic[i];
-        if (currentSemantic.id === processDefinition.key && currentSemantic.type === 'process') {
-          correspondingSemantic = currentSemantic;
-        }
-      }
-      // create and decorate root
-      var root = {};
-      root.id = activityInstances.id;
-      root.label = correspondingSemantic.name;
-      root.children = [];
-      root.isOpen = true;
-      root.isSelected = false;
-      
-      // add children
-      addChildren(root, correspondingSemantic, activityInstances);
-      
-      return root;
-    }
-    
+ 
     return {
       aggregateActivityInstances: aggregateActivityInstances,
       createActivityInstanceTree: createActivityInstanceTree
     };
     
-  }
-  
-  module.factory('ActivityInstance', ActivityInstanceProvider);
+  };
+
+  module.factory('ActivityInstance', [ '$filter' , Service ]);
   // end config
 
   return module;
-  
+
 });

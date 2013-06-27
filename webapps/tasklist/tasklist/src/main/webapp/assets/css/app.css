@@ -261,11 +261,12 @@ table .selected tr > td {
  * bpmn renderer
  */
 .bpmn-highlight  {
-    -webkit-box-shadow: 0px 0px 35px 5px rgba(85, 255, 13, 1); /* WebKit */
-    -moz-box-shadow: 0px 0px 35px 5px rgba(85, 255, 13, 1); /* Firefox */
-    box-shadow: 0px 0px 35px 5px rgba(85, 255, 13, 1); /* Standard */
-    border-radius: 5px;
+  -webkit-box-shadow: 0px 0px 4px 4px rgba(30, 144, 255, 1); /* WebKit */
+  -moz-box-shadow: 0px 0px 4px 4px rgba(30, 144, 255, 1); /* Firefox */
+  box-shadow: 0px 0px 4px 4px rgb(30, 144, 255); /* Standard */
+  border-radius: 5px;
 }
+
 .bpmn-diagram {
   overflow: hidden;
 }

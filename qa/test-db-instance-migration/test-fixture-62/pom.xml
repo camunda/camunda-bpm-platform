@@ -1,0 +1,27 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <artifactId>camunda-qa-upgrade-test-fixture-62</artifactId>
+  <packaging>jar</packaging>
+
+  <parent>
+    <groupId>org.camunda.bpm.qa.upgrade</groupId>
+    <artifactId>camunda-qa-db-instance-migration</artifactId>
+    <version>7.0.0-SNAPSHOT</version>
+  </parent>
+
+  <name>camunda BPM - QA - upgrade - instance migration - 62 test fixture</name>
+
+  <dependencies>
+
+    <dependency>
+      <groupId>com.camunda.fox.engine</groupId>
+      <artifactId>fox-engine</artifactId>
+      <version>6.2.4</version>
+      <scope>provided</scope>
+    </dependency>
+    
+  </dependencies>
+
+
+</project>

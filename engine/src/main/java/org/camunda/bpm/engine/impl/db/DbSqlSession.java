@@ -14,6 +14,9 @@
 package org.camunda.bpm.engine.impl.db;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
@@ -1003,6 +1006,18 @@ public class DbSqlSession implements Session {
       IoUtil.closeSilently(inputStream);
     }
   }
+  
+  public void executeSchemaResource(String schemaFileResourceName) {
+    FileInputStream inputStream = null;
+    try {
+      inputStream = new FileInputStream(new File(schemaFileResourceName));
+      executeSchemaResource("schema operation", "process engine", schemaFileResourceName, inputStream);
+    } catch (FileNotFoundException e) {
+      throw new ProcessEngineException("Cannot find schema resource file '"+schemaFileResourceName,e);
+    } finally {
+      IoUtil.closeSilently(inputStream);
+    }
+  }
 
   private void executeSchemaResource(String operation, String component, String resourceName, InputStream inputStream) {
     log.info("performing "+operation+" on "+component+" with resource "+resourceName);
@@ -1191,4 +1206,6 @@ public class DbSqlSession implements Session {
   public DbSqlSessionFactory getDbSqlSessionFactory() {
     return dbSqlSessionFactory;
   }
+
+
 }

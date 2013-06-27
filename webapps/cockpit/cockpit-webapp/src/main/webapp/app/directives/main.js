@@ -1,12 +1,9 @@
 ngDefine('cockpit.directives', [
-  './fillHeight',
-  './fillWidth',
   './processDiagram',
-  './zoomAndScroll',
   './processDiagramPreview',
-//  './activityInstances',
-  './processInstanceIncidents',
-  './hidePanel',
+  './onClickHideElement',
+  './onClickShowElement',
+  './resize',
   './tree'
 ], function(module) {
 

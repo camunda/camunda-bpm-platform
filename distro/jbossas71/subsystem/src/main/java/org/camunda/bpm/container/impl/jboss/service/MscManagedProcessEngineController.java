@@ -145,6 +145,8 @@ public class MscManagedProcessEngineController extends MscManagedProcessEngine {
     // set auto schema update
     if(processEngineMetadata.isAutoSchemaUpdate()) {
       processEngineConfiguration.setDatabaseSchemaUpdate(ProcessEngineConfiguration.DB_SCHEMA_UPDATE_TRUE);
+    } else {
+      processEngineConfiguration.setDatabaseSchemaUpdate("off");
     }
 
     // set db table prefix

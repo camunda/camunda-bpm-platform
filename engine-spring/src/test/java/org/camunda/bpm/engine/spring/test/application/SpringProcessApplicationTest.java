@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.spring.test.application;
 
 import org.camunda.bpm.BpmPlatform;
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.spring.application.SpringProcessApplication;
 import org.junit.Assert;
 import org.junit.Test;
@@ -66,6 +67,46 @@ public class SpringProcessApplicationTest {
     
     // assert the process is undeployed
     Assert.assertNull(processEngine.getRepositoryService().createDeploymentQuery().deploymentName("pa").singleResult());
+    
+  }
+  
+  @Test
+  public void testPostDeployRegistrationPa() {
+    // this test verifies that a process application is able to register a deployment from the @PostDeploy callback:
+    
+    AbstractApplicationContext applicationContext = new ClassPathXmlApplicationContext("org/camunda/bpm/engine/spring/test/application/PostDeployRegistrationPaTest-context.xml");
+    applicationContext.start();
+    
+    ProcessEngine processEngine = BpmPlatform.getDefaultProcessEngine();
+    
+    // create a manual deployment:
+    Deployment deployment = processEngine.getRepositoryService()
+      .createDeployment()
+      .addClasspathResource("org/camunda/bpm/engine/spring/test/application/process.bpmn20.xml")
+      .deploy();
+    
+    // lookup the process application spring bean:
+    PostDeployRegistrationPa processApplication = applicationContext.getBean("customProcessApplicaiton", PostDeployRegistrationPa.class);
+    processApplication.deploy();
+    
+    // the process application was not invoked
+    Assert.assertFalse(processApplication.isInvoked());
+    
+    // start process instance:    
+    processEngine.getRuntimeService()
+      .startProcessInstanceByKey("startToEnd");
+    
+    // now the process application was invoked:
+    Assert.assertTrue(processApplication.isInvoked());
+    
+    // undeploy PA
+    processApplication.undeploy();
+    
+    // manually undeploy the process
+    processEngine.getRepositoryService()
+      .deleteDeployment(deployment.getId(), true);
+    
+    applicationContext.close();
     
   }
   
