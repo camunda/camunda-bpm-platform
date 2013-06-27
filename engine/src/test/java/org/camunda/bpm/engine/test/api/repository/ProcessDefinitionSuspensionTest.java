@@ -158,7 +158,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
       runtimeService.startProcessInstanceById(processDefinition.getId());
       fail("Exception is expected but not thrown");
     } catch(SuspendedEntityInteractionException e) {
-      assertTextPresentIgnoreCase("cannot start process instance", e.getMessage());
+      assertTextPresentIgnoreCase("is suspended", e.getMessage());
     }
     
     // By Key
@@ -166,7 +166,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
       runtimeService.startProcessInstanceByKey(processDefinition.getKey());
       fail("Exception is expected but not thrown");
     } catch(SuspendedEntityInteractionException e) {
-      assertTextPresentIgnoreCase("cannot start process instance", e.getMessage());
+      assertTextPresentIgnoreCase("is suspended", e.getMessage());
     }
   }
   

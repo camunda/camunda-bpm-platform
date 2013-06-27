@@ -13,12 +13,14 @@
 
 package org.camunda.bpm.engine.impl.cmd;
 
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.event.MessageEventHandler;
+import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
@@ -28,20 +30,26 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
  * @author Daniel Meyer
  * @author Joram Barrez
  */
-public class MessageEventReceivedCmd extends NeedsActiveExecutionCmd<Void> {
+public class MessageEventReceivedCmd implements Command<Void>, Serializable {
   
   private static final long serialVersionUID = 1L;
   
+  protected final String executionId;
   protected final Map<String, Object> processVariables;
   protected final String messageName;
 
   public MessageEventReceivedCmd(String messageName, String executionId, Map<String, Object> processVariables) {
-    super(executionId);
+    this.executionId = executionId;
     this.messageName = messageName;
     this.processVariables = processVariables;
   }
 
-  protected Void execute(CommandContext commandContext, ExecutionEntity execution) {
+  @Override
+  public Void execute(CommandContext commandContext) {
+    if(executionId == null) {
+      throw new ProcessEngineException("executionId is null");
+    }
+
     if(messageName == null) {
       throw new ProcessEngineException("messageName cannot be null");
     }

@@ -22,6 +22,7 @@ import org.camunda.bpm.engine.SuspendedEntityInteractionException;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.IdentityLinkType;
@@ -221,95 +222,15 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     }
   }
   
+  
   @Deployment(resources = {"org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml"})
-  public void testProcessInstanceOperationsFailAfterSuspend() {
+  public void testProcessInstanceSignalFailAfterSuspend() {
     
     // Suspend process instance
     ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
     ProcessInstance processInstance = runtimeService.startProcessInstanceById(processDefinition.getId());
     runtimeService.suspendProcessInstanceById(processInstance.getId());
-    
-    try {
-      runtimeService.messageEventReceived("someMessage", processInstance.getId());
-      fail();
-    } catch (SuspendedEntityInteractionException e) {
-      // This is expected
-      assertTextPresent("is suspended", e.getMessage());
-    }
-    
-    try {
-      runtimeService.messageEventReceived("someMessage", processInstance.getId(), new HashMap<String, Object>());
-      fail();
-    } catch (SuspendedEntityInteractionException e) {
-      // This is expected
-      assertTextPresent("is suspended", e.getMessage());
-    }
-    
-    try {
-      runtimeService.removeVariable(processInstance.getId(), "someVariable");
-      fail();
-    } catch (SuspendedEntityInteractionException e) {
-      // This is expected
-      assertTextPresent("is suspended", e.getMessage());
-    }
-    
-    try {
-      runtimeService.removeVariableLocal(processInstance.getId(), "someVariable");
-      fail();
-    } catch (SuspendedEntityInteractionException e) {
-      // This is expected
-      assertTextPresent("is suspended", e.getMessage());
-    }
-    
-    try {
-      runtimeService.removeVariables(processInstance.getId(), Arrays.asList("one", "two", "three"));
-      fail();
-    } catch (SuspendedEntityInteractionException e) {
-      // This is expected
-      assertTextPresent("is suspended", e.getMessage());
-    }
-    
-    
-    try {
-      runtimeService.removeVariablesLocal(processInstance.getId(), Arrays.asList("one", "two", "three"));
-      fail();
-    } catch (SuspendedEntityInteractionException e) {
-      // This is expected
-      assertTextPresent("is suspended", e.getMessage());
-    }
-    
-    try {
-      runtimeService.setVariable(processInstance.getId(), "someVariable", "someValue");
-      fail();
-    } catch (SuspendedEntityInteractionException e) {
-      // This is expected
-      assertTextPresent("is suspended", e.getMessage());
-    }
-    
-    try {
-      runtimeService.setVariableLocal(processInstance.getId(), "someVariable", "someValue");
-      fail();
-    } catch (SuspendedEntityInteractionException e) {
-      // This is expected
-      assertTextPresent("is suspended", e.getMessage());
-    }
-    
-    try {
-      runtimeService.setVariables(processInstance.getId(), new HashMap<String, Object>());
-      fail();
-    } catch (SuspendedEntityInteractionException e) {
-      // This is expected
-      assertTextPresent("is suspended", e.getMessage());
-    }
-    
-    try {
-      runtimeService.setVariablesLocal(processInstance.getId(), new HashMap<String, Object>());
-      fail();
-    } catch (SuspendedEntityInteractionException e) {
-      // This is expected
-      assertTextPresent("is suspended", e.getMessage());
-    }
-    
+
     try {
       runtimeService.signal(processInstance.getId());
       fail();
@@ -325,9 +246,18 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
       // This is expected
       assertTextPresent("is suspended", e.getMessage());
     }
-    
+  }
+  
+
+  @Deployment
+  public void testMessageEventReceiveFailAfterSuspend() {
+    ProcessDefinition processDefinition = repositoryService.createProcessDefinitionQuery().singleResult();
+    ProcessInstance processInstance = runtimeService.startProcessInstanceById(processDefinition.getId());
+    runtimeService.suspendProcessInstanceById(processInstance.getId());
+    EventSubscription subscription = runtimeService.createEventSubscriptionQuery().singleResult();
+
     try {
-      runtimeService.signalEventReceived("someSignal", processInstance.getId());
+      runtimeService.messageEventReceived("someMessage", subscription.getExecutionId());
       fail();
     } catch (SuspendedEntityInteractionException e) {
       // This is expected
@@ -335,7 +265,7 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     }
     
     try {
-      runtimeService.signalEventReceived("someSignal", processInstance.getId(), new HashMap<String, Object>());
+      runtimeService.messageEventReceived("someMessage", subscription.getExecutionId(), new HashMap<String, Object>());
       fail();
     } catch (SuspendedEntityInteractionException e) {
       // This is expected
@@ -361,6 +291,23 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     
     runtimeService.signalEventReceived(signal, new HashMap<String, Object>());
     assertEquals(1, runtimeService.createProcessInstanceQuery().count());
+    
+    EventSubscription subscription = runtimeService.createEventSubscriptionQuery().singleResult();
+    try {
+      runtimeService.signalEventReceived(signal, subscription.getExecutionId());
+      fail();
+    } catch (SuspendedEntityInteractionException e) {
+      // This is expected
+      assertTextPresent("is suspended", e.getMessage());
+    }
+    
+    try {
+      runtimeService.signalEventReceived(signal, subscription.getExecutionId(), new HashMap<String, Object>());
+      fail();
+    } catch (SuspendedEntityInteractionException e) {
+      // This is expected
+      assertTextPresent("is suspended", e.getMessage());
+    }
     
     // Activate and try again
     runtimeService.activateProcessInstanceById(processInstance.getId());

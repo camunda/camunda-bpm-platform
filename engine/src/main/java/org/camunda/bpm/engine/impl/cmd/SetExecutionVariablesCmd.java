@@ -12,8 +12,11 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
+import java.io.Serializable;
 import java.util.Map;
 
+import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 
@@ -22,20 +25,34 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
  * @author Tom Baeyens
  * @author Joram Barrez
  */
-public class SetExecutionVariablesCmd extends NeedsActiveExecutionCmd<Object> {
+public class SetExecutionVariablesCmd implements Command<Object>, Serializable {
 
   private static final long serialVersionUID = 1L;
   
+  private String executionId;
   protected Map<String, ? extends Object> variables;
   protected boolean isLocal;
   
   public SetExecutionVariablesCmd(String executionId, Map<String, ? extends Object> variables, boolean isLocal) {
-    super(executionId);
+    this.executionId = executionId;
     this.variables = variables;
     this.isLocal = isLocal;
   }
   
-  protected Object execute(CommandContext commandContext, ExecutionEntity execution) {
+  @Override
+  public Object execute(CommandContext commandContext) {
+    if(executionId == null) {
+      throw new ProcessEngineException("executionId is null");
+    }
+    
+    ExecutionEntity execution = commandContext
+      .getExecutionManager()
+      .findExecutionById(executionId);
+    
+    if (execution==null) {
+      throw new ProcessEngineException("execution "+executionId+" doesn't exist");
+    }
+    
     if (isLocal) {
       execution.setVariablesLocal(variables);
     } else {
@@ -45,10 +62,6 @@ public class SetExecutionVariablesCmd extends NeedsActiveExecutionCmd<Object> {
     return null;
   }
   
-  @Override
-  protected String getSuspendedExceptionMessage() {
-    return "Cannot set variables because execution '" + executionId + "' is suspended";
-  }
   
 }
 

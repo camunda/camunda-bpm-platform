@@ -141,12 +141,6 @@ public abstract class MultiInstanceActivityBehavior extends FlowNodeActivityBeha
     leave(execution);
   }
   
-  protected void ensureExecutionNotSuspended(ActivityExecution execution) {
-    if (((ExecutionEntity) execution).isSuspended()) {
-      throw new SuspendedEntityInteractionException("Parent execution " + execution + " is suspended.");
-    }
-  }
-  
   // Helpers //////////////////////////////////////////////////////////////////////
   
   @SuppressWarnings("rawtypes")

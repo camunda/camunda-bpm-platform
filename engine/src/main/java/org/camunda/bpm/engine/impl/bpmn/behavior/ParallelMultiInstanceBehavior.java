@@ -120,8 +120,6 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
     
     List<ActivityExecution> joinedExecutions = executionEntity.findInactiveConcurrentExecutions(execution.getActivity());
     if (joinedExecutions.size() == nrOfInstances || completionConditionSatisfied(execution)) {
-      ensureExecutionNotSuspended(execution);
-      
       execution.getParent().getParent().setActivityInstanceId(execution.getActivityInstanceId());      
       
       // Removing all active child executions (ie because completionCondition is true)

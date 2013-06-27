@@ -106,17 +106,7 @@ public class CallActivityBehavior extends AbstractBpmnActivityBehavior implement
   }
 
   public void completed(ActivityExecution execution) throws Exception {
-    ensureExecutionNotSuspended(execution);
-    
     // only control flow.  no sub process instance data available
     leave(execution);
   }
-  
-
-  protected void ensureExecutionNotSuspended(ActivityExecution execution) {
-    if (((ExecutionEntity) execution).isSuspended()) {
-      throw new SuspendedEntityInteractionException("Parent execution " + execution + " is suspended.");
-    }
-  }
-
 }
