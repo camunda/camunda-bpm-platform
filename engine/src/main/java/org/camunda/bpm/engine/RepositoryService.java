@@ -107,11 +107,13 @@ public interface RepositoryService {
    *                       Note: The job executor needs to be active to use this!                                
    * 
    * @throws ProcessEngineException if no such processDefinition can be found.
+   * 
+   * @see RuntimeService#suspendProcessInstanceById(String)
    */
   void suspendProcessDefinitionById(String processDefinitionId, boolean suspendProcessInstances, Date suspensionDate);
   
   /**
-   * Suspends the <strong>all<strong> process definitions with the given key (= id in the bpmn20.xml file). 
+   * Suspends the <strong>all</strong> process definitions with the given key (= id in the bpmn20.xml file). 
    * 
    * If a process definition is in state suspended, it will not be possible to start new process instances
    * based on the process definition.
@@ -124,7 +126,7 @@ public interface RepositoryService {
   void suspendProcessDefinitionByKey(String processDefinitionKey);
   
   /**
-   * Suspends the <strong>all<strong> process definitions with the given key (= id in the bpmn20.xml file). 
+   * Suspends the <strong>all</strong> process definitions with the given key (= id in the bpmn20.xml file). 
    * 
    * If a process definition is in state suspended, it will not be possible to start new process instances
    * based on the process definition.
@@ -135,6 +137,8 @@ public interface RepositoryService {
    *                       process definition is suspended immediately. 
    *                       Note: The job executor needs to be active to use this!   
    * @throws ProcessEngineException if no such processDefinition can be found.
+   * 
+   * @see RuntimeService#suspendProcessInstanceById(String)
    */
   void suspendProcessDefinitionByKey(String processDefinitionKey, boolean suspendProcessInstances, Date suspensionDate);
   
@@ -155,6 +159,8 @@ public interface RepositoryService {
    *                       Note: The job executor needs to be active to use this!                                 
    *                                
    * @throws ProcessEngineException if no such processDefinition can be found.
+   * 
+   * @see RuntimeService#activateProcessInstanceById(String)
    */
   void activateProcessDefinitionById(String processDefinitionId, boolean activateProcessInstances, Date activationDate);
   
@@ -175,6 +181,8 @@ public interface RepositoryService {
    *                       Note: The job executor needs to be active to use this!                                 
    *                                
    * @throws ProcessEngineException if no such processDefinition can be found.
+   * 
+   * @see RuntimeService#activateProcessInstanceById(String)
    */
   void activateProcessDefinitionByKey(String processDefinitionKey, boolean activateProcessInstances,  Date activationDate);
 

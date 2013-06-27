@@ -21,6 +21,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.SuspendedEntityInteractionException;
 import org.camunda.bpm.engine.delegate.Expression;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.cfg.IdGenerator;
@@ -71,7 +72,15 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
     super(null);
   }
   
+  protected void ensureNotSuspended() {
+    if (isSuspended()) {
+      throw new SuspendedEntityInteractionException("Process definition " + id + " is suspended.");
+    }
+  }
+  
   public ExecutionEntity createProcessInstance(String businessKey, ActivityImpl initial) {
+    ensureNotSuspended();
+    
     ExecutionEntity processInstance = null;
   
     if(initial == null) {

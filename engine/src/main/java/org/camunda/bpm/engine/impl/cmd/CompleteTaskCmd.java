@@ -12,8 +12,11 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
+import java.io.Serializable;
 import java.util.Map;
 
+import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 
@@ -21,17 +24,31 @@ import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 /**
  * @author Joram Barrez
  */
-public class CompleteTaskCmd extends NeedsActiveTaskCmd<Void> {
+public class CompleteTaskCmd implements Command<Void>, Serializable {
       
   private static final long serialVersionUID = 1L;
+  
+  protected String taskId;
   protected Map<String, Object> variables;
   
   public CompleteTaskCmd(String taskId, Map<String, Object> variables) {
-    super(taskId);
+    this.taskId = taskId;
     this.variables = variables;
   }
   
-  protected Void execute(CommandContext commandContext, TaskEntity task) {
+  public Void execute(CommandContext commandContext) {
+    if(taskId == null) {
+      throw new ProcessEngineException("taskId is null");
+    }
+    
+    TaskEntity task = commandContext
+      .getTaskManager()
+      .findTaskById(taskId);
+    
+    if (task == null) {
+      throw new ProcessEngineException("Cannot find task with id " + taskId);
+    }
+    
     if (variables!=null) {
       task.setExecutionVariables(variables);
     }
@@ -44,10 +61,4 @@ public class CompleteTaskCmd extends NeedsActiveTaskCmd<Void> {
   protected void completeTask(TaskEntity task) {
     task.complete();
   }
-  
-  @Override
-  protected String getSuspendedTaskException() {
-    return "Cannot complete a suspended task";
-  }
-
 }

@@ -22,29 +22,34 @@ ngDefine('cockpit.services', function(module) {
      **/
     function aggregateActivityInstancesHelper(activityInstance, result) {
       var children = activityInstance.childActivityInstances;
-      for (var i = 0; i < children.length; i++) {
-        var child = children[i];
-        aggregateActivityInstancesHelper(child, result);
-        
-        var mappings = result[child.activityId];
-        if (!mappings) {
-          mappings = [];
-          result[child.activityId] = mappings;
+      if (children) {
+        for (var i = 0; i < children.length; i++) {
+          var child = children[i];
+          aggregateActivityInstancesHelper(child, result);
+          
+          var mappings = result[child.activityId];
+          if (!mappings) {
+            mappings = [];
+            result[child.activityId] = mappings;
+          }
+          mappings.push(child);
         }
-        mappings.push(child);
       }
 
       var transitions = activityInstance.childTransitionInstances;
-      for (var i = 0; i < transitions.length; i++) {
-        var transition = transitions[i];
-        
-        var mappings = result[transition.targetActivityId];
-        if (!mappings) {
-          mappings = [];
-          result[transition.targetActivityId] = mappings;
-        }
-        mappings.push(transition);
-      };
+      if (transitions) {
+        for (var i = 0; i < transitions.length; i++) {
+          var transition = transitions[i];
+          
+          var mappings = result[transition.targetActivityId];
+          if (!mappings) {
+            mappings = [];
+            result[transition.targetActivityId] = mappings;
+          }
+          mappings.push(transition);
+        };        
+      }
+
     }
 
     /**

@@ -320,7 +320,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected ProcessApplicationManager processApplicationManager;
   
   protected CorrelationHandler correlationHandler;
-    
+  
   // buildProcessEngine ///////////////////////////////////////////////////////
   
   public ProcessEngine buildProcessEngine() {

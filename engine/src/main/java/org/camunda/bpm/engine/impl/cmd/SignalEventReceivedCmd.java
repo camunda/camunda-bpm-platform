@@ -55,11 +55,6 @@ public class SignalEventReceivedCmd implements Command<Void> {
         throw new ProcessEngineException("Cannot find execution with id '" + executionId + "'");
       }
       
-      if (execution.isSuspended()) {
-        throw new ProcessEngineException("Cannot throw signal event '" + eventName 
-                + "' because execution '" + executionId + "' is suspended");
-      }
-      
       signalEvents = commandContext.getEventSubscriptionManager()
         .findSignalEventSubscriptionsByNameAndExecution(eventName, executionId);
       

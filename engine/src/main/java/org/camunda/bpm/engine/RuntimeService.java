@@ -458,25 +458,40 @@ public interface RuntimeService {
   // Process instance state //////////////////////////////////////////
     
   /**
-   * Suspends the process instance with the given id. 
+   * <p>Suspends the process instance with the given id. This means that the
+   * execution is stopped, so the <i>token state</i> will not change.
+   * However, actions that do not change token state, like setting/removing
+   * variables, etc. will succeed.</p>
    * 
-   * If a process instance is in state suspended, the engine will not 
-   * execute jobs (timers, messages) associated with this instance.
+   * <p>Tasks belonging to this process instance will also be suspended. This means
+   * that any actions influencing the tasks' lifecycles will fail, such as 
+   * <ul>
+   *   <li>claiming</li>
+   *   <li>completing</li>
+   *   <li>delegation</li>
+   *   <li>changes in task assignees, owners, etc.</li>
+   * </ul>
+   * Actions that only change task properties will succeed, such as changing variables
+   * or adding comments.
+   * </p>
    * 
-   * If you have a process instance hierarchy, suspending
-   * one process instance form the hierarchy will not suspend other 
-   * process instances form that hierarchy.
+   * <p>If a process instance is in state suspended, the engine will also not 
+   * execute jobs (timers, messages) associated with this instance.</p>
+   * 
+   * <p>If you have a process instance hierarchy, suspending
+   * one process instance from the hierarchy will not suspend other 
+   * process instances from that hierarchy.</p>
    * 
    *  @throws ProcessEngineException if no such processInstance can be found.
    */
   void suspendProcessInstanceById(String processInstanceId);
   
   /**
-   * Activates the process instance with the given id. 
+   * <p>Activates the process instance with the given id.</p>
    * 
-   * If you have a process instance hierarchy, suspending
-   * one process instance form the hierarchy will not suspend other 
-   * process instances form that hierarchy.
+   * <p>If you have a process instance hierarchy, activating
+   * one process instance from the hierarchy will not activate other 
+   * process instances from that hierarchy.</p>
    * 
    * @throws ProcessEngineException if no such processInstance can be found.
    */

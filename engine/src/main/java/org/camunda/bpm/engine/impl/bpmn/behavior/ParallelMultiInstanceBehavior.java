@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityBehavior;
 import org.camunda.bpm.engine.impl.pvm.delegate.ActivityExecution;
@@ -121,7 +120,6 @@ public class ParallelMultiInstanceBehavior extends MultiInstanceActivityBehavior
     
     List<ActivityExecution> joinedExecutions = executionEntity.findInactiveConcurrentExecutions(execution.getActivity());
     if (joinedExecutions.size() == nrOfInstances || completionConditionSatisfied(execution)) {
-      
       execution.getParent().getParent().setActivityInstanceId(execution.getActivityInstanceId());      
       
       // Removing all active child executions (ie because completionCondition is true)

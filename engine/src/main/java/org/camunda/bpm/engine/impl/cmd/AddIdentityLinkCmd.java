@@ -12,8 +12,11 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
+import java.io.Serializable;
+
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.identity.Authentication;
+import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.CommentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.CommentManager;
@@ -26,7 +29,7 @@ import org.camunda.bpm.engine.task.IdentityLinkType;
 /**
  * @author Joram Barrez
  */
-public class AddIdentityLinkCmd extends NeedsActiveTaskCmd<Void> {
+public class AddIdentityLinkCmd implements Command<Void>, Serializable {
   
   private static final long serialVersionUID = 1L;
 
@@ -36,8 +39,9 @@ public class AddIdentityLinkCmd extends NeedsActiveTaskCmd<Void> {
   
   protected String type;
   
+  protected String taskId;
+  
   public AddIdentityLinkCmd(String taskId, String userId, String groupId, String type) {
-    super(taskId);
     validateParams(userId, groupId, type, taskId);
     this.taskId = taskId;
     this.userId = userId;
@@ -67,8 +71,20 @@ public class AddIdentityLinkCmd extends NeedsActiveTaskCmd<Void> {
     }
   }
   
-  protected Void execute(CommandContext commandContext, TaskEntity task) {
+  public Void execute(CommandContext commandContext) {
 
+    if(taskId == null) {
+      throw new ProcessEngineException("taskId is null");
+    }
+    
+    TaskEntity task = commandContext
+      .getTaskManager()
+      .findTaskById(taskId);
+    
+    if (task == null) {
+      throw new ProcessEngineException("Cannot find task with id " + taskId);
+    }
+    
     if (IdentityLinkType.ASSIGNEE.equals(type)) {
       task.setAssignee(userId);
     } else if (IdentityLinkType.OWNER.equals(type)) {

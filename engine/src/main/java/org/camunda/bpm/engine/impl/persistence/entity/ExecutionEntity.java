@@ -14,12 +14,14 @@
 package org.camunda.bpm.engine.impl.persistence.entity;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.camunda.bpm.engine.SuspendedEntityInteractionException;
 import org.camunda.bpm.engine.impl.HistoricActivityInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.bpmn.parser.BpmnParse;
 import org.camunda.bpm.engine.impl.bpmn.parser.EventSubscriptionDeclaration;
@@ -47,6 +49,19 @@ import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.impl.pvm.process.TransitionImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.AtomicOperation;
+import org.camunda.bpm.engine.impl.pvm.runtime.AtomicOperationActivityEnd;
+import org.camunda.bpm.engine.impl.pvm.runtime.AtomicOperationActivityExecute;
+import org.camunda.bpm.engine.impl.pvm.runtime.AtomicOperationActivityStart;
+import org.camunda.bpm.engine.impl.pvm.runtime.AtomicOperationDeleteCascade;
+import org.camunda.bpm.engine.impl.pvm.runtime.AtomicOperationDeleteCascadeFireActivityEnd;
+import org.camunda.bpm.engine.impl.pvm.runtime.AtomicOperationProcessEnd;
+import org.camunda.bpm.engine.impl.pvm.runtime.AtomicOperationProcessStart;
+import org.camunda.bpm.engine.impl.pvm.runtime.AtomicOperationProcessStartInitial;
+import org.camunda.bpm.engine.impl.pvm.runtime.AtomicOperationTransitionCreateScope;
+import org.camunda.bpm.engine.impl.pvm.runtime.AtomicOperationTransitionDestroyScope;
+import org.camunda.bpm.engine.impl.pvm.runtime.AtomicOperationTransitionNotifyListenerEnd;
+import org.camunda.bpm.engine.impl.pvm.runtime.AtomicOperationTransitionNotifyListenerStart;
+import org.camunda.bpm.engine.impl.pvm.runtime.AtomicOperationTransitionNotifyListenerTake;
 import org.camunda.bpm.engine.impl.pvm.runtime.FoxAtomicOperationDeleteCascadeFireActivityEnd;
 import org.camunda.bpm.engine.impl.pvm.runtime.InterpretableExecution;
 import org.camunda.bpm.engine.impl.pvm.runtime.OutgoingExecution;
@@ -556,9 +571,35 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
   }
   
   protected void performOperationSync(AtomicOperation executionOperation) {
+    if (requiresUnsuspendedExecution(executionOperation)) {
+      ensureNotSuspended();
+    }
+    
     Context
       .getCommandContext()
       .performOperation(executionOperation, this);
+  }
+  
+  protected void ensureNotSuspended() {
+    if (isSuspended()) {
+      throw new SuspendedEntityInteractionException("Execution " + id + " is suspended.");
+    }
+  }
+
+  protected boolean requiresUnsuspendedExecution(
+      AtomicOperation executionOperation) {
+    if (executionOperation != AtomicOperation.TRANSITION_NOTIFY_LISTENER_END
+        && executionOperation != AtomicOperation.TRANSITION_DESTROY_SCOPE
+        && executionOperation != AtomicOperation.TRANSITION_NOTIFY_LISTENER_TAKE
+        && executionOperation != AtomicOperation.TRANSITION_NOTIFY_LISTENER_END
+        && executionOperation != AtomicOperation.TRANSITION_CREATE_SCOPE
+        && executionOperation != AtomicOperation.TRANSITION_NOTIFY_LISTENER_START
+        && executionOperation != AtomicOperation.DELETE_CASCADE
+        && executionOperation != AtomicOperation.DELETE_CASCADE_FIRE_ACTIVITY_END) {
+      return true;
+    }
+    
+    return false;
   }
 
   protected void scheduleAtomicOperationAsync(AtomicOperation executionOperation) {
@@ -729,7 +770,6 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
   }
 
   public void setActivity(ActivityImpl activity) {
-  
     this.activity = activity;
     if (activity != null) {
       this.activityId = activity.getId();
@@ -1167,7 +1207,7 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
       }
     }
   }
-
+  
   // persistent state /////////////////////////////////////////////////////////
 
   public Object getPersistentState() {

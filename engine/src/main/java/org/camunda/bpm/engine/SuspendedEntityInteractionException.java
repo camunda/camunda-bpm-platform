@@ -10,27 +10,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
-package org.camunda.bpm.engine.impl.cmd;
-
-import java.util.Map;
-
-import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
-
+package org.camunda.bpm.engine;
 
 /**
- * @author Tom Baeyens
+ * This exception is thrown, if an operation that requires a non-suspended entity (execution, task, process definition) 
+ * is executed on a suspended one. 
+ * 
+ * 
+ * @author Thorben Lindhauer
  */
-public class ResolveTaskCmd extends CompleteTaskCmd {
+public class SuspendedEntityInteractionException extends ProcessEngineException {
 
   private static final long serialVersionUID = 1L;
 
-  public ResolveTaskCmd(String taskId, Map<String, Object> variables) {
-    super(taskId, variables);
+  public SuspendedEntityInteractionException(String message) {
+    super(message);
   }
   
-  @Override
-  protected void completeTask(TaskEntity task) {
-    task.resolve();
-  }
 }

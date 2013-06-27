@@ -826,7 +826,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
      fail("exeception expected");
    }catch (ProcessEngineException e) {
      // this is good
-     assertTrue(e.getMessage().contains("execution nonexistingExecution doesn't exist"));
+     assertTrue(e.getMessage().contains("Execution with id 'nonexistingExecution' does not have a subscription to a message event with name 'alert'"));
    }
   }
  

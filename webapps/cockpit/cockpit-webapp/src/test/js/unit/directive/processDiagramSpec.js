@@ -2,8 +2,7 @@ define([ 'angular',
          'jquery',
          'cockpit/services/transform',
          'cockpit/filters/shortenNumber',
-         'cockpit/directives/processDiagram',
-         'angular-resource' ], function(angular, $) {
+         'cockpit/directives/processDiagram' ], function(angular, $) {
 
   /**
    * @see http://docs.angularjs.org/guide/dev_guide.unit-testing
@@ -26,8 +25,7 @@ define([ 'angular',
       beforeEach(function () {
         angular.module('testmodule', [ 'cockpit.directives',
                                        'cockpit.services',
-                                       'cockpit.filters.shorten.number',
-                                       'ngResource' ]);
+                                       'cockpit.filters.shorten.number' ]);
       });
 
       // load app that uses the directive
