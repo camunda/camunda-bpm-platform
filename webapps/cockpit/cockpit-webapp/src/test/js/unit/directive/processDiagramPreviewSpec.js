@@ -33,7 +33,7 @@ define([ 'angular',
       // load app that uses the directive
       beforeEach(module('testmodule'));
 
-      beforeEach(inject(function($rootScope, $compile, $httpBackend) {
+      beforeEach(inject(function($httpBackend) {
         // backend definition common for all tests
         $httpBackend
           .when('GET', 'engine://engine/process-definition/FailingProcess:1:d91f75f6-d1cb-11e2-95b0-f0def1557726/xml')

@@ -1,6 +1,6 @@
 ngDefine('cockpit.pages', function(module) {
 
-  var Controller = function($scope, $routeParams, $location, $q, ProcessDefinitionResource, ProcessInstanceResource, IncidentResource, Views, ActivityInstance, Transform) {
+  function ProcessInstanceController ($scope, $routeParams, $location, $q, ProcessDefinitionResource, ProcessInstanceResource, IncidentResource, Views, ActivityInstance, Transform) {
     
     $scope.processDefinitionId = $routeParams.processDefinitionId;
     $scope.processInstanceId = $routeParams.processInstanceId;
@@ -210,12 +210,12 @@ ngDefine('cockpit.pages', function(module) {
 
   };
 
-  Controller.$inject = [ '$scope', '$routeParams', '$location', '$q', 'ProcessDefinitionResource', 'ProcessInstanceResource', 'IncidentResource', 'Views', 'ActivityInstance', 'Transform' ];
+  module.controller('ProcessInstanceController', [ '$scope', '$routeParams', '$location', '$q', 'ProcessDefinitionResource', 'ProcessInstanceResource', 'IncidentResource', 'Views', 'ActivityInstance', 'Transform', ProcessInstanceController ]);
 
   var RouteConfig = function ($routeProvider) {
     $routeProvider.when('/process-definition/:processDefinitionId/process-instance/:processInstanceId', {
       templateUrl: 'pages/process-instance.html',
-      controller: Controller,
+      controller: 'ProcessInstanceController',
       reloadOnSearch: false
     });
   };
