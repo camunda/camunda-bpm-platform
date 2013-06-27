@@ -34,15 +34,15 @@ define([ 'angular',
       beforeEach(module('testmodule'));
 
       
-      beforeEach(inject(function($rootScope, $compile, Transform) {
+      beforeEach(inject(function($rootScope, Transform) {
         // given
         var xml = '<?xml version="1.0" encoding="UTF-8"?><bpmn2:definitions targetNamespace="http://activiti.org/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd" id="_QzotMMIpEeKp3rR3eqX9hQ"><bpmn2:process id="FailingProcess" name="FailingProcess" isExecutable="true">    <bpmn2:startEvent id="StartEvent_1" name="Start Event">      <bpmn2:outgoing>SequenceFlow_1</bpmn2:outgoing>    </bpmn2:startEvent>    <bpmn2:serviceTask id="ServiceTask_1" activiti:class="org.camunda.bpm.pa.service.FailingDelegate" activiti:async="true" name="Service Task">      <bpmn2:incoming>SequenceFlow_1</bpmn2:incoming>      <bpmn2:outgoing>SequenceFlow_2</bpmn2:outgoing>    </bpmn2:serviceTask>    <bpmn2:sequenceFlow id="SequenceFlow_1" sourceRef="StartEvent_1" targetRef="ServiceTask_1"/>    <bpmn2:endEvent id="EndEvent_1" name="End Event">      <bpmn2:incoming>SequenceFlow_2</bpmn2:incoming>    </bpmn2:endEvent>    <bpmn2:sequenceFlow id="SequenceFlow_2" sourceRef="ServiceTask_1" targetRef="EndEvent_1"/>  </bpmn2:process>  <bpmndi:BPMNDiagram id="BPMNDiagram_1" name="Test">    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="FailingProcess">      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_16" bpmnElement="StartEvent_1">        <dc:Bounds height="36.0" width="36.0" x="296.0" y="259.0"/>      </bpmndi:BPMNShape>      <bpmndi:BPMNShape id="_BPMNShape_ServiceTask_3" bpmnElement="ServiceTask_1">        <dc:Bounds height="80.0" width="100.0" x="382.0" y="237.0"/>      </bpmndi:BPMNShape>      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_1" bpmnElement="SequenceFlow_1" sourceElement="_BPMNShape_StartEvent_16" targetElement="_BPMNShape_ServiceTask_3">        <di:waypoint xsi:type="dc:Point" x="332.0" y="277.0"/>        <di:waypoint xsi:type="dc:Point" x="382.0" y="277.0"/>      </bpmndi:BPMNEdge>      <bpmndi:BPMNShape id="_BPMNShape_EndEvent_18" bpmnElement="EndEvent_1">        <dc:Bounds height="36.0" width="36.0" x="532.0" y="259.0"/>      </bpmndi:BPMNShape>      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_2" bpmnElement="SequenceFlow_2" sourceElement="_BPMNShape_ServiceTask_3" targetElement="_BPMNShape_EndEvent_18">        <di:waypoint xsi:type="dc:Point" x="482.0" y="277.0"/>        <di:waypoint xsi:type="dc:Point" x="532.0" y="277.0"/>      </bpmndi:BPMNEdge>    </bpmndi:BPMNPlane>  </bpmndi:BPMNDiagram></bpmn2:definitions>';
         $rootScope.semantic = Transform.transformBpmn20Xml(xml);
 
-        $rootScope.processDefinition = {id: 'FailingProcess:1:d91f75f6-d1cb-11e2-95b0-f0def1557726'};
+        $rootScope.processDefinition = {id: 'FailingProcess:1:d91f75f6-d1cb-11e2-95b0-f0def1557726', key: 'FailingProcess'};
       }));
          
-      it('should render process diagram', inject(function($rootScope, $compile, Transform) {
+      it('should render process diagram', inject(function($rootScope, $compile) {
         // when
         element = createElement('<div process-diagram="semantic" process-definition="processDefinition"></div>');
         element = $compile(element)($rootScope);
@@ -76,12 +76,8 @@ define([ 'angular',
 
       }));
 
-      it('should display annotations on process diagram', inject(function($rootScope, $compile, Transform) {
+      it('should display annotations on process diagram', inject(function($rootScope, $compile) {
         // given
-        var xml = '<?xml version="1.0" encoding="UTF-8"?><bpmn2:definitions targetNamespace="http://activiti.org/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd" id="_QzotMMIpEeKp3rR3eqX9hQ"><bpmn2:process id="FailingProcess" name="FailingProcess" isExecutable="true">    <bpmn2:startEvent id="StartEvent_1" name="Start Event">      <bpmn2:outgoing>SequenceFlow_1</bpmn2:outgoing>    </bpmn2:startEvent>    <bpmn2:serviceTask id="ServiceTask_1" activiti:class="org.camunda.bpm.pa.service.FailingDelegate" activiti:async="true" name="Service Task">      <bpmn2:incoming>SequenceFlow_1</bpmn2:incoming>      <bpmn2:outgoing>SequenceFlow_2</bpmn2:outgoing>    </bpmn2:serviceTask>    <bpmn2:sequenceFlow id="SequenceFlow_1" sourceRef="StartEvent_1" targetRef="ServiceTask_1"/>    <bpmn2:endEvent id="EndEvent_1" name="End Event">      <bpmn2:incoming>SequenceFlow_2</bpmn2:incoming>    </bpmn2:endEvent>    <bpmn2:sequenceFlow id="SequenceFlow_2" sourceRef="ServiceTask_1" targetRef="EndEvent_1"/>  </bpmn2:process>  <bpmndi:BPMNDiagram id="BPMNDiagram_1" name="Test">    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="FailingProcess">      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_16" bpmnElement="StartEvent_1">        <dc:Bounds height="36.0" width="36.0" x="296.0" y="259.0"/>      </bpmndi:BPMNShape>      <bpmndi:BPMNShape id="_BPMNShape_ServiceTask_3" bpmnElement="ServiceTask_1">        <dc:Bounds height="80.0" width="100.0" x="382.0" y="237.0"/>      </bpmndi:BPMNShape>      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_1" bpmnElement="SequenceFlow_1" sourceElement="_BPMNShape_StartEvent_16" targetElement="_BPMNShape_ServiceTask_3">        <di:waypoint xsi:type="dc:Point" x="332.0" y="277.0"/>        <di:waypoint xsi:type="dc:Point" x="382.0" y="277.0"/>      </bpmndi:BPMNEdge>      <bpmndi:BPMNShape id="_BPMNShape_EndEvent_18" bpmnElement="EndEvent_1">        <dc:Bounds height="36.0" width="36.0" x="532.0" y="259.0"/>      </bpmndi:BPMNShape>      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_2" bpmnElement="SequenceFlow_2" sourceElement="_BPMNShape_ServiceTask_3" targetElement="_BPMNShape_EndEvent_18">        <di:waypoint xsi:type="dc:Point" x="482.0" y="277.0"/>        <di:waypoint xsi:type="dc:Point" x="532.0" y="277.0"/>      </bpmndi:BPMNEdge>    </bpmndi:BPMNPlane>  </bpmndi:BPMNDiagram></bpmn2:definitions>';
-        $rootScope.semantic = Transform.transformBpmn20Xml(xml);
-        $rootScope.processDefinition = {id: 'FailingProcess:1:d91f75f6-d1cb-11e2-95b0-f0def1557726'};
-
         $rootScope.activityStatistics = [ {id: 'ServiceTask_1', count: 4} ]
 
         // when        
@@ -94,12 +90,8 @@ define([ 'angular',
         expect($('#ServiceTask_1').html()).toBe('<div class="badge-position"><p class="badge">4</p></div>');
       }));
 
-      it('should display incidents on process diagram', inject(function($rootScope, $compile, Transform) {
+      it('should display incidents on process diagram', inject(function($rootScope, $compile) {
         // given
-        var xml = '<?xml version="1.0" encoding="UTF-8"?><bpmn2:definitions targetNamespace="http://activiti.org/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd" id="_QzotMMIpEeKp3rR3eqX9hQ"><bpmn2:process id="FailingProcess" name="FailingProcess" isExecutable="true">    <bpmn2:startEvent id="StartEvent_1" name="Start Event">      <bpmn2:outgoing>SequenceFlow_1</bpmn2:outgoing>    </bpmn2:startEvent>    <bpmn2:serviceTask id="ServiceTask_1" activiti:class="org.camunda.bpm.pa.service.FailingDelegate" activiti:async="true" name="Service Task">      <bpmn2:incoming>SequenceFlow_1</bpmn2:incoming>      <bpmn2:outgoing>SequenceFlow_2</bpmn2:outgoing>    </bpmn2:serviceTask>    <bpmn2:sequenceFlow id="SequenceFlow_1" sourceRef="StartEvent_1" targetRef="ServiceTask_1"/>    <bpmn2:endEvent id="EndEvent_1" name="End Event">      <bpmn2:incoming>SequenceFlow_2</bpmn2:incoming>    </bpmn2:endEvent>    <bpmn2:sequenceFlow id="SequenceFlow_2" sourceRef="ServiceTask_1" targetRef="EndEvent_1"/>  </bpmn2:process>  <bpmndi:BPMNDiagram id="BPMNDiagram_1" name="Test">    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="FailingProcess">      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_16" bpmnElement="StartEvent_1">        <dc:Bounds height="36.0" width="36.0" x="296.0" y="259.0"/>      </bpmndi:BPMNShape>      <bpmndi:BPMNShape id="_BPMNShape_ServiceTask_3" bpmnElement="ServiceTask_1">        <dc:Bounds height="80.0" width="100.0" x="382.0" y="237.0"/>      </bpmndi:BPMNShape>      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_1" bpmnElement="SequenceFlow_1" sourceElement="_BPMNShape_StartEvent_16" targetElement="_BPMNShape_ServiceTask_3">        <di:waypoint xsi:type="dc:Point" x="332.0" y="277.0"/>        <di:waypoint xsi:type="dc:Point" x="382.0" y="277.0"/>      </bpmndi:BPMNEdge>      <bpmndi:BPMNShape id="_BPMNShape_EndEvent_18" bpmnElement="EndEvent_1">        <dc:Bounds height="36.0" width="36.0" x="532.0" y="259.0"/>      </bpmndi:BPMNShape>      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_2" bpmnElement="SequenceFlow_2" sourceElement="_BPMNShape_ServiceTask_3" targetElement="_BPMNShape_EndEvent_18">        <di:waypoint xsi:type="dc:Point" x="482.0" y="277.0"/>        <di:waypoint xsi:type="dc:Point" x="532.0" y="277.0"/>      </bpmndi:BPMNEdge>    </bpmndi:BPMNPlane>  </bpmndi:BPMNDiagram></bpmn2:definitions>';
-        $rootScope.semantic = Transform.transformBpmn20Xml(xml);
-        $rootScope.processDefinition = {id: 'FailingProcess:1:d91f75f6-d1cb-11e2-95b0-f0def1557726'};
-
         $rootScope.incidents = [ {id: 'ServiceTask_1', incidents: [ {incidentType: 'failedJob', incidentCount: 18}, {incidentType: 'anotherIncidentType', incidentCount: 18} ]} ]
 
         // when        
@@ -112,12 +104,8 @@ define([ 'angular',
         expect($('#ServiceTask_1').html()).toBe('<div class="badge-position"><p class="badge badge-important">!</p></div>');
       }));
 
-      it('should display annotations and incidents on process diagram', inject(function($rootScope, $compile, Transform) {
+      it('should display annotations and incidents on process diagram', inject(function($rootScope, $compile) {
         // given
-        var xml = '<?xml version="1.0" encoding="UTF-8"?><bpmn2:definitions targetNamespace="http://activiti.org/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd" id="_QzotMMIpEeKp3rR3eqX9hQ"><bpmn2:process id="FailingProcess" name="FailingProcess" isExecutable="true">    <bpmn2:startEvent id="StartEvent_1" name="Start Event">      <bpmn2:outgoing>SequenceFlow_1</bpmn2:outgoing>    </bpmn2:startEvent>    <bpmn2:serviceTask id="ServiceTask_1" activiti:class="org.camunda.bpm.pa.service.FailingDelegate" activiti:async="true" name="Service Task">      <bpmn2:incoming>SequenceFlow_1</bpmn2:incoming>      <bpmn2:outgoing>SequenceFlow_2</bpmn2:outgoing>    </bpmn2:serviceTask>    <bpmn2:sequenceFlow id="SequenceFlow_1" sourceRef="StartEvent_1" targetRef="ServiceTask_1"/>    <bpmn2:endEvent id="EndEvent_1" name="End Event">      <bpmn2:incoming>SequenceFlow_2</bpmn2:incoming>    </bpmn2:endEvent>    <bpmn2:sequenceFlow id="SequenceFlow_2" sourceRef="ServiceTask_1" targetRef="EndEvent_1"/>  </bpmn2:process>  <bpmndi:BPMNDiagram id="BPMNDiagram_1" name="Test">    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="FailingProcess">      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_16" bpmnElement="StartEvent_1">        <dc:Bounds height="36.0" width="36.0" x="296.0" y="259.0"/>      </bpmndi:BPMNShape>      <bpmndi:BPMNShape id="_BPMNShape_ServiceTask_3" bpmnElement="ServiceTask_1">        <dc:Bounds height="80.0" width="100.0" x="382.0" y="237.0"/>      </bpmndi:BPMNShape>      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_1" bpmnElement="SequenceFlow_1" sourceElement="_BPMNShape_StartEvent_16" targetElement="_BPMNShape_ServiceTask_3">        <di:waypoint xsi:type="dc:Point" x="332.0" y="277.0"/>        <di:waypoint xsi:type="dc:Point" x="382.0" y="277.0"/>      </bpmndi:BPMNEdge>      <bpmndi:BPMNShape id="_BPMNShape_EndEvent_18" bpmnElement="EndEvent_1">        <dc:Bounds height="36.0" width="36.0" x="532.0" y="259.0"/>      </bpmndi:BPMNShape>      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_2" bpmnElement="SequenceFlow_2" sourceElement="_BPMNShape_ServiceTask_3" targetElement="_BPMNShape_EndEvent_18">        <di:waypoint xsi:type="dc:Point" x="482.0" y="277.0"/>        <di:waypoint xsi:type="dc:Point" x="532.0" y="277.0"/>      </bpmndi:BPMNEdge>    </bpmndi:BPMNPlane>  </bpmndi:BPMNDiagram></bpmn2:definitions>';
-        $rootScope.semantic = Transform.transformBpmn20Xml(xml);
-        $rootScope.processDefinition = {id: 'FailingProcess:1:d91f75f6-d1cb-11e2-95b0-f0def1557726'};
-
         $rootScope.activityStatistics = [ {id: 'ServiceTask_1', count: 4} ]
         $rootScope.incidents = [ {id: 'ServiceTask_1', incidents: [ {incidentType: 'failedJob', incidentCount: 18}, {incidentType: 'anotherIncidentType', incidentCount: 18} ]} ]
 
@@ -131,12 +119,8 @@ define([ 'angular',
         expect($('#ServiceTask_1').html()).toBe('<div class="badge-position"><p class="badge">4</p><p class="badge badge-important">!</p></div>');
       }));
 
-      it('should not display (empty list of) incidents on process diagram ', inject(function($rootScope, $compile, Transform) {
+      it('should not display (empty list of) incidents on process diagram ', inject(function($rootScope, $compile) {
         // given
-        var xml = '<?xml version="1.0" encoding="UTF-8"?><bpmn2:definitions targetNamespace="http://activiti.org/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd" id="_QzotMMIpEeKp3rR3eqX9hQ"><bpmn2:process id="FailingProcess" name="FailingProcess" isExecutable="true">    <bpmn2:startEvent id="StartEvent_1" name="Start Event">      <bpmn2:outgoing>SequenceFlow_1</bpmn2:outgoing>    </bpmn2:startEvent>    <bpmn2:serviceTask id="ServiceTask_1" activiti:class="org.camunda.bpm.pa.service.FailingDelegate" activiti:async="true" name="Service Task">      <bpmn2:incoming>SequenceFlow_1</bpmn2:incoming>      <bpmn2:outgoing>SequenceFlow_2</bpmn2:outgoing>    </bpmn2:serviceTask>    <bpmn2:sequenceFlow id="SequenceFlow_1" sourceRef="StartEvent_1" targetRef="ServiceTask_1"/>    <bpmn2:endEvent id="EndEvent_1" name="End Event">      <bpmn2:incoming>SequenceFlow_2</bpmn2:incoming>    </bpmn2:endEvent>    <bpmn2:sequenceFlow id="SequenceFlow_2" sourceRef="ServiceTask_1" targetRef="EndEvent_1"/>  </bpmn2:process>  <bpmndi:BPMNDiagram id="BPMNDiagram_1" name="Test">    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="FailingProcess">      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_16" bpmnElement="StartEvent_1">        <dc:Bounds height="36.0" width="36.0" x="296.0" y="259.0"/>      </bpmndi:BPMNShape>      <bpmndi:BPMNShape id="_BPMNShape_ServiceTask_3" bpmnElement="ServiceTask_1">        <dc:Bounds height="80.0" width="100.0" x="382.0" y="237.0"/>      </bpmndi:BPMNShape>      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_1" bpmnElement="SequenceFlow_1" sourceElement="_BPMNShape_StartEvent_16" targetElement="_BPMNShape_ServiceTask_3">        <di:waypoint xsi:type="dc:Point" x="332.0" y="277.0"/>        <di:waypoint xsi:type="dc:Point" x="382.0" y="277.0"/>      </bpmndi:BPMNEdge>      <bpmndi:BPMNShape id="_BPMNShape_EndEvent_18" bpmnElement="EndEvent_1">        <dc:Bounds height="36.0" width="36.0" x="532.0" y="259.0"/>      </bpmndi:BPMNShape>      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_2" bpmnElement="SequenceFlow_2" sourceElement="_BPMNShape_ServiceTask_3" targetElement="_BPMNShape_EndEvent_18">        <di:waypoint xsi:type="dc:Point" x="482.0" y="277.0"/>        <di:waypoint xsi:type="dc:Point" x="532.0" y="277.0"/>      </bpmndi:BPMNEdge>    </bpmndi:BPMNPlane>  </bpmndi:BPMNDiagram></bpmn2:definitions>';
-        $rootScope.semantic = Transform.transformBpmn20Xml(xml);
-        $rootScope.processDefinition = {id: 'FailingProcess:1:d91f75f6-d1cb-11e2-95b0-f0def1557726'};
-
         $rootScope.incidents = [ {id: 'ServiceTask_1', incidents: [ ]} ]
 
         // when        
@@ -149,11 +133,8 @@ define([ 'angular',
         expect($('#ServiceTask_1').html()).toBe('');
       }));
 
-      it('should register click event on bpmn element', inject(function($rootScope, $compile, Transform) {
+      it('should register click event on bpmn element', inject(function($rootScope, $compile) {
         // given
-        var xml = '<?xml version="1.0" encoding="UTF-8"?><bpmn2:definitions targetNamespace="http://activiti.org/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd" id="_QzotMMIpEeKp3rR3eqX9hQ"><bpmn2:process id="FailingProcess" name="FailingProcess" isExecutable="true">    <bpmn2:startEvent id="StartEvent_1" name="Start Event">      <bpmn2:outgoing>SequenceFlow_1</bpmn2:outgoing>    </bpmn2:startEvent>    <bpmn2:serviceTask id="ServiceTask_1" activiti:class="org.camunda.bpm.pa.service.FailingDelegate" activiti:async="true" name="Service Task">      <bpmn2:incoming>SequenceFlow_1</bpmn2:incoming>      <bpmn2:outgoing>SequenceFlow_2</bpmn2:outgoing>    </bpmn2:serviceTask>    <bpmn2:sequenceFlow id="SequenceFlow_1" sourceRef="StartEvent_1" targetRef="ServiceTask_1"/>    <bpmn2:endEvent id="EndEvent_1" name="End Event">      <bpmn2:incoming>SequenceFlow_2</bpmn2:incoming>    </bpmn2:endEvent>    <bpmn2:sequenceFlow id="SequenceFlow_2" sourceRef="ServiceTask_1" targetRef="EndEvent_1"/>  </bpmn2:process>  <bpmndi:BPMNDiagram id="BPMNDiagram_1" name="Test">    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="FailingProcess">      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_16" bpmnElement="StartEvent_1">        <dc:Bounds height="36.0" width="36.0" x="296.0" y="259.0"/>      </bpmndi:BPMNShape>      <bpmndi:BPMNShape id="_BPMNShape_ServiceTask_3" bpmnElement="ServiceTask_1">        <dc:Bounds height="80.0" width="100.0" x="382.0" y="237.0"/>      </bpmndi:BPMNShape>      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_1" bpmnElement="SequenceFlow_1" sourceElement="_BPMNShape_StartEvent_16" targetElement="_BPMNShape_ServiceTask_3">        <di:waypoint xsi:type="dc:Point" x="332.0" y="277.0"/>        <di:waypoint xsi:type="dc:Point" x="382.0" y="277.0"/>      </bpmndi:BPMNEdge>      <bpmndi:BPMNShape id="_BPMNShape_EndEvent_18" bpmnElement="EndEvent_1">        <dc:Bounds height="36.0" width="36.0" x="532.0" y="259.0"/>      </bpmndi:BPMNShape>      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_2" bpmnElement="SequenceFlow_2" sourceElement="_BPMNShape_ServiceTask_3" targetElement="_BPMNShape_EndEvent_18">        <di:waypoint xsi:type="dc:Point" x="482.0" y="277.0"/>        <di:waypoint xsi:type="dc:Point" x="532.0" y="277.0"/>      </bpmndi:BPMNEdge>    </bpmndi:BPMNPlane>  </bpmndi:BPMNDiagram></bpmn2:definitions>';
-        $rootScope.semantic = Transform.transformBpmn20Xml(xml);
-        $rootScope.processDefinition = {id: 'FailingProcess:1:d91f75f6-d1cb-11e2-95b0-f0def1557726', key: 'FailingProcess'};
         $rootScope.selection = {};
         $rootScope.clickableElements = [ 'ServiceTask_1']
 
@@ -167,17 +148,167 @@ define([ 'angular',
 
         serviceTaskElement.click();
 
+        $rootScope.$digest();
+
         // then
         expect($rootScope.selection.treeToDiagramMap.bpmnElements.length).toBe(1);
         expect($rootScope.selection.treeToDiagramMap.bpmnElements[0].id).toBe('ServiceTask_1');
         expect(serviceTaskElement.hasClass('activity-highlight')).toBe(true);
       }));
 
-      it('should not deselect bpmn element on second click', inject(function($rootScope, $compile, Transform) {
+      it('should highlight bpmn element', inject(function($rootScope, $compile) {
         // given
-        var xml = '<?xml version="1.0" encoding="UTF-8"?><bpmn2:definitions targetNamespace="http://activiti.org/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd" id="_QzotMMIpEeKp3rR3eqX9hQ"><bpmn2:process id="FailingProcess" name="FailingProcess" isExecutable="true">    <bpmn2:startEvent id="StartEvent_1" name="Start Event">      <bpmn2:outgoing>SequenceFlow_1</bpmn2:outgoing>    </bpmn2:startEvent>    <bpmn2:serviceTask id="ServiceTask_1" activiti:class="org.camunda.bpm.pa.service.FailingDelegate" activiti:async="true" name="Service Task">      <bpmn2:incoming>SequenceFlow_1</bpmn2:incoming>      <bpmn2:outgoing>SequenceFlow_2</bpmn2:outgoing>    </bpmn2:serviceTask>    <bpmn2:sequenceFlow id="SequenceFlow_1" sourceRef="StartEvent_1" targetRef="ServiceTask_1"/>    <bpmn2:endEvent id="EndEvent_1" name="End Event">      <bpmn2:incoming>SequenceFlow_2</bpmn2:incoming>    </bpmn2:endEvent>    <bpmn2:sequenceFlow id="SequenceFlow_2" sourceRef="ServiceTask_1" targetRef="EndEvent_1"/>  </bpmn2:process>  <bpmndi:BPMNDiagram id="BPMNDiagram_1" name="Test">    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="FailingProcess">      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_16" bpmnElement="StartEvent_1">        <dc:Bounds height="36.0" width="36.0" x="296.0" y="259.0"/>      </bpmndi:BPMNShape>      <bpmndi:BPMNShape id="_BPMNShape_ServiceTask_3" bpmnElement="ServiceTask_1">        <dc:Bounds height="80.0" width="100.0" x="382.0" y="237.0"/>      </bpmndi:BPMNShape>      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_1" bpmnElement="SequenceFlow_1" sourceElement="_BPMNShape_StartEvent_16" targetElement="_BPMNShape_ServiceTask_3">        <di:waypoint xsi:type="dc:Point" x="332.0" y="277.0"/>        <di:waypoint xsi:type="dc:Point" x="382.0" y="277.0"/>      </bpmndi:BPMNEdge>      <bpmndi:BPMNShape id="_BPMNShape_EndEvent_18" bpmnElement="EndEvent_1">        <dc:Bounds height="36.0" width="36.0" x="532.0" y="259.0"/>      </bpmndi:BPMNShape>      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_2" bpmnElement="SequenceFlow_2" sourceElement="_BPMNShape_ServiceTask_3" targetElement="_BPMNShape_EndEvent_18">        <di:waypoint xsi:type="dc:Point" x="482.0" y="277.0"/>        <di:waypoint xsi:type="dc:Point" x="532.0" y="277.0"/>      </bpmndi:BPMNEdge>    </bpmndi:BPMNPlane>  </bpmndi:BPMNDiagram></bpmn2:definitions>';
+        $rootScope.selection = {};   
+        $rootScope.clickableElements = [ 'ServiceTask_1']
+
+        element = createElement('<div process-diagram="semantic" process-definition="processDefinition" clickable-elements="clickableElements" selection="selection"></div>');
+        element = $compile(element)($rootScope);
+
+        $rootScope.$digest();
+
+        var serviceTaskElement = $('#ServiceTask_1');
+
+        // when
+        var bpmnElements = [ ];
+        var model = $rootScope.semantic[0];
+        for (var i = 0; i < model.baseElements.length; i++) {
+          var baseElement = model.baseElements[i];
+          if (baseElement.id === 'ServiceTask_1') {
+            bpmnElements.push(baseElement);
+            return;
+          }
+        };
+
+        $rootScope.selection.treeToDiagramMap = {bpmnElements: bpmnElements};
+
+        $rootScope.$digest();
+
+        // then
+        expect(serviceTaskElement.hasClass('activity-highlight')).toBe(true);
+      }));
+
+      it('should deselect first former selected bpmn element and highlight another bpmn element', inject(function($rootScope, $compile, Transform) {
+        // given
+        var xml = '<?xml version="1.0" encoding="UTF-8"?><bpmn2:definitions targetNamespace="http://activiti.org/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd" id="_gLLjYNKaEeK06IvgDdgSXA"><bpmn2:process id="FailingProcess" isExecutable="false"><bpmn2:startEvent id="StartEvent_1" name="Start Event"><bpmn2:outgoing>SequenceFlow_1</bpmn2:outgoing></bpmn2:startEvent><bpmn2:serviceTask id="ServiceTask_1" name="Service Task"><bpmn2:incoming>SequenceFlow_1</bpmn2:incoming><bpmn2:outgoing>SequenceFlow_2</bpmn2:outgoing></bpmn2:serviceTask><bpmn2:sequenceFlow id="SequenceFlow_1" sourceRef="StartEvent_1" targetRef="ServiceTask_1"/><bpmn2:userTask id="UserTask_1" name="User Task"><bpmn2:incoming>SequenceFlow_2</bpmn2:incoming><bpmn2:outgoing>SequenceFlow_3</bpmn2:outgoing></bpmn2:userTask><bpmn2:sequenceFlow id="SequenceFlow_2" sourceRef="ServiceTask_1" targetRef="UserTask_1"/><bpmn2:endEvent id="EndEvent_1" name="End Event"><bpmn2:incoming>SequenceFlow_3</bpmn2:incoming></bpmn2:endEvent><bpmn2:sequenceFlow id="SequenceFlow_3" sourceRef="UserTask_1" targetRef="EndEvent_1"/></bpmn2:process><bpmndi:BPMNDiagram id="BPMNDiagram_1"><bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_1"><bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1"><dc:Bounds height="36.0" width="36.0" x="130.0" y="224.0"/></bpmndi:BPMNShape><bpmndi:BPMNShape id="_BPMNShape_ServiceTask_2" bpmnElement="ServiceTask_1"><dc:Bounds height="80.0" width="100.0" x="216.0" y="202.0"/></bpmndi:BPMNShape><bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_1" bpmnElement="SequenceFlow_1" sourceElement="_BPMNShape_StartEvent_2" targetElement="_BPMNShape_ServiceTask_2"><di:waypoint xsi:type="dc:Point" x="166.0" y="242.0"/><di:waypoint xsi:type="dc:Point" x="216.0" y="242.0"/></bpmndi:BPMNEdge><bpmndi:BPMNShape id="_BPMNShape_UserTask_2" bpmnElement="UserTask_1"><dc:Bounds height="80.0" width="100.0" x="366.0" y="202.0"/></bpmndi:BPMNShape><bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_2" bpmnElement="SequenceFlow_2" sourceElement="_BPMNShape_ServiceTask_2" targetElement="_BPMNShape_UserTask_2"><di:waypoint xsi:type="dc:Point" x="316.0" y="242.0"/><di:waypoint xsi:type="dc:Point" x="366.0" y="242.0"/></bpmndi:BPMNEdge><bpmndi:BPMNShape id="_BPMNShape_EndEvent_2" bpmnElement="EndEvent_1"><dc:Bounds height="36.0" width="36.0" x="516.0" y="224.0"/></bpmndi:BPMNShape><bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_3" bpmnElement="SequenceFlow_3" sourceElement="_BPMNShape_UserTask_2" targetElement="_BPMNShape_EndEvent_2"><di:waypoint xsi:type="dc:Point" x="466.0" y="242.0"/><di:waypoint xsi:type="dc:Point" x="516.0" y="242.0"/></bpmndi:BPMNEdge></bpmndi:BPMNPlane></bpmndi:BPMNDiagram></bpmn2:definitions>'
         $rootScope.semantic = Transform.transformBpmn20Xml(xml);
-        $rootScope.processDefinition = {id: 'FailingProcess:1:d91f75f6-d1cb-11e2-95b0-f0def1557726', key: 'FailingProcess'};
+
+        $rootScope.selection = {};   
+        $rootScope.clickableElements = [ 'ServiceTask_1', 'UserTask_1']
+
+        element = createElement('<div process-diagram="semantic" process-definition="processDefinition" clickable-elements="clickableElements" selection="selection"></div>');
+        element = $compile(element)($rootScope);
+
+        $rootScope.$digest();
+
+        var serviceTaskElement = $('#ServiceTask_1');
+        var userTaskElement = $('#UserTask_1');
+
+        serviceTaskElement.click();
+
+        $rootScope.$digest();
+
+        // when
+        var bpmnElements = [ ];
+        var model = $rootScope.semantic[0];
+        for (var i = 0; i < model.baseElements.length; i++) {
+          var baseElement = model.baseElements[i];
+          if (baseElement.id === 'UserTask_1') {
+            bpmnElements.push(baseElement);
+            return;
+          }
+        };
+
+        $rootScope.selection.treeToDiagramMap = {bpmnElements: bpmnElements};
+
+        $rootScope.$digest();
+
+        // then
+        expect(serviceTaskElement.hasClass('activity-highlight')).toBe(false);
+        expect(userTaskElement.hasClass('activity-highlight')).toBe(true);
+      }));
+
+      it('should highlight two bpmn elements', inject(function($rootScope, $compile, Transform) {
+        // given
+        var xml = '<?xml version="1.0" encoding="UTF-8"?><bpmn2:definitions targetNamespace="http://activiti.org/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd" id="_gLLjYNKaEeK06IvgDdgSXA"><bpmn2:process id="FailingProcess" isExecutable="false"><bpmn2:startEvent id="StartEvent_1" name="Start Event"><bpmn2:outgoing>SequenceFlow_1</bpmn2:outgoing></bpmn2:startEvent><bpmn2:serviceTask id="ServiceTask_1" name="Service Task"><bpmn2:incoming>SequenceFlow_1</bpmn2:incoming><bpmn2:outgoing>SequenceFlow_2</bpmn2:outgoing></bpmn2:serviceTask><bpmn2:sequenceFlow id="SequenceFlow_1" sourceRef="StartEvent_1" targetRef="ServiceTask_1"/><bpmn2:userTask id="UserTask_1" name="User Task"><bpmn2:incoming>SequenceFlow_2</bpmn2:incoming><bpmn2:outgoing>SequenceFlow_3</bpmn2:outgoing></bpmn2:userTask><bpmn2:sequenceFlow id="SequenceFlow_2" sourceRef="ServiceTask_1" targetRef="UserTask_1"/><bpmn2:endEvent id="EndEvent_1" name="End Event"><bpmn2:incoming>SequenceFlow_3</bpmn2:incoming></bpmn2:endEvent><bpmn2:sequenceFlow id="SequenceFlow_3" sourceRef="UserTask_1" targetRef="EndEvent_1"/></bpmn2:process><bpmndi:BPMNDiagram id="BPMNDiagram_1"><bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_1"><bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1"><dc:Bounds height="36.0" width="36.0" x="130.0" y="224.0"/></bpmndi:BPMNShape><bpmndi:BPMNShape id="_BPMNShape_ServiceTask_2" bpmnElement="ServiceTask_1"><dc:Bounds height="80.0" width="100.0" x="216.0" y="202.0"/></bpmndi:BPMNShape><bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_1" bpmnElement="SequenceFlow_1" sourceElement="_BPMNShape_StartEvent_2" targetElement="_BPMNShape_ServiceTask_2"><di:waypoint xsi:type="dc:Point" x="166.0" y="242.0"/><di:waypoint xsi:type="dc:Point" x="216.0" y="242.0"/></bpmndi:BPMNEdge><bpmndi:BPMNShape id="_BPMNShape_UserTask_2" bpmnElement="UserTask_1"><dc:Bounds height="80.0" width="100.0" x="366.0" y="202.0"/></bpmndi:BPMNShape><bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_2" bpmnElement="SequenceFlow_2" sourceElement="_BPMNShape_ServiceTask_2" targetElement="_BPMNShape_UserTask_2"><di:waypoint xsi:type="dc:Point" x="316.0" y="242.0"/><di:waypoint xsi:type="dc:Point" x="366.0" y="242.0"/></bpmndi:BPMNEdge><bpmndi:BPMNShape id="_BPMNShape_EndEvent_2" bpmnElement="EndEvent_1"><dc:Bounds height="36.0" width="36.0" x="516.0" y="224.0"/></bpmndi:BPMNShape><bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_3" bpmnElement="SequenceFlow_3" sourceElement="_BPMNShape_UserTask_2" targetElement="_BPMNShape_EndEvent_2"><di:waypoint xsi:type="dc:Point" x="466.0" y="242.0"/><di:waypoint xsi:type="dc:Point" x="516.0" y="242.0"/></bpmndi:BPMNEdge></bpmndi:BPMNPlane></bpmndi:BPMNDiagram></bpmn2:definitions>'
+        $rootScope.semantic = Transform.transformBpmn20Xml(xml);
+
+        $rootScope.selection = {};   
+        $rootScope.clickableElements = [ 'ServiceTask_1', 'UserTask_1']
+
+        element = createElement('<div process-diagram="semantic" process-definition="processDefinition" clickable-elements="clickableElements" selection="selection"></div>');
+        element = $compile(element)($rootScope);
+
+        $rootScope.$digest();
+
+        var serviceTaskElement = $('#ServiceTask_1');
+        var userTaskElement = $('#UserTask_1');
+
+        // when
+        var bpmnElements = [ ];
+        var model = $rootScope.semantic[0];
+        for (var i = 0; i < model.baseElements.length; i++) {
+          var baseElement = model.baseElements[i];
+          if (baseElement.id === 'UserTask_1') {
+            bpmnElements.push(baseElement);
+          }
+          if (baseElement.id === 'ServiceTask_1') {
+            bpmnElements.push(baseElement);
+          }
+        };
+
+        $rootScope.selection.treeToDiagramMap = {bpmnElements: bpmnElements};
+
+        $rootScope.$digest();
+
+        // then
+        expect(userTaskElement.hasClass('activity-highlight')).toBe(true);
+        expect(serviceTaskElement.hasClass('activity-highlight')).toBe(true);
+      }));
+
+      it('should highlight two bpmn elements but the one of them was highlighted before', inject(function($rootScope, $compile, Transform) {
+        // given
+        var xml = '<?xml version="1.0" encoding="UTF-8"?><bpmn2:definitions targetNamespace="http://activiti.org/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd" id="_gLLjYNKaEeK06IvgDdgSXA"><bpmn2:process id="FailingProcess" isExecutable="false"><bpmn2:startEvent id="StartEvent_1" name="Start Event"><bpmn2:outgoing>SequenceFlow_1</bpmn2:outgoing></bpmn2:startEvent><bpmn2:serviceTask id="ServiceTask_1" name="Service Task"><bpmn2:incoming>SequenceFlow_1</bpmn2:incoming><bpmn2:outgoing>SequenceFlow_2</bpmn2:outgoing></bpmn2:serviceTask><bpmn2:sequenceFlow id="SequenceFlow_1" sourceRef="StartEvent_1" targetRef="ServiceTask_1"/><bpmn2:userTask id="UserTask_1" name="User Task"><bpmn2:incoming>SequenceFlow_2</bpmn2:incoming><bpmn2:outgoing>SequenceFlow_3</bpmn2:outgoing></bpmn2:userTask><bpmn2:sequenceFlow id="SequenceFlow_2" sourceRef="ServiceTask_1" targetRef="UserTask_1"/><bpmn2:endEvent id="EndEvent_1" name="End Event"><bpmn2:incoming>SequenceFlow_3</bpmn2:incoming></bpmn2:endEvent><bpmn2:sequenceFlow id="SequenceFlow_3" sourceRef="UserTask_1" targetRef="EndEvent_1"/></bpmn2:process><bpmndi:BPMNDiagram id="BPMNDiagram_1"><bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_1"><bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1"><dc:Bounds height="36.0" width="36.0" x="130.0" y="224.0"/></bpmndi:BPMNShape><bpmndi:BPMNShape id="_BPMNShape_ServiceTask_2" bpmnElement="ServiceTask_1"><dc:Bounds height="80.0" width="100.0" x="216.0" y="202.0"/></bpmndi:BPMNShape><bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_1" bpmnElement="SequenceFlow_1" sourceElement="_BPMNShape_StartEvent_2" targetElement="_BPMNShape_ServiceTask_2"><di:waypoint xsi:type="dc:Point" x="166.0" y="242.0"/><di:waypoint xsi:type="dc:Point" x="216.0" y="242.0"/></bpmndi:BPMNEdge><bpmndi:BPMNShape id="_BPMNShape_UserTask_2" bpmnElement="UserTask_1"><dc:Bounds height="80.0" width="100.0" x="366.0" y="202.0"/></bpmndi:BPMNShape><bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_2" bpmnElement="SequenceFlow_2" sourceElement="_BPMNShape_ServiceTask_2" targetElement="_BPMNShape_UserTask_2"><di:waypoint xsi:type="dc:Point" x="316.0" y="242.0"/><di:waypoint xsi:type="dc:Point" x="366.0" y="242.0"/></bpmndi:BPMNEdge><bpmndi:BPMNShape id="_BPMNShape_EndEvent_2" bpmnElement="EndEvent_1"><dc:Bounds height="36.0" width="36.0" x="516.0" y="224.0"/></bpmndi:BPMNShape><bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_3" bpmnElement="SequenceFlow_3" sourceElement="_BPMNShape_UserTask_2" targetElement="_BPMNShape_EndEvent_2"><di:waypoint xsi:type="dc:Point" x="466.0" y="242.0"/><di:waypoint xsi:type="dc:Point" x="516.0" y="242.0"/></bpmndi:BPMNEdge></bpmndi:BPMNPlane></bpmndi:BPMNDiagram></bpmn2:definitions>'
+        $rootScope.semantic = Transform.transformBpmn20Xml(xml);
+
+        $rootScope.selection = {};   
+        $rootScope.clickableElements = [ 'ServiceTask_1', 'UserTask_1']
+
+        element = createElement('<div process-diagram="semantic" process-definition="processDefinition" clickable-elements="clickableElements" selection="selection"></div>');
+        element = $compile(element)($rootScope);
+
+        $rootScope.$digest();
+
+        var serviceTaskElement = $('#ServiceTask_1');
+        var userTaskElement = $('#UserTask_1');
+
+        serviceTaskElement.click();
+
+        $rootScope.$digest();        
+
+        // when
+        var bpmnElements = [ ];
+        var model = $rootScope.semantic[0];
+        for (var i = 0; i < model.baseElements.length; i++) {
+          var baseElement = model.baseElements[i];
+          if (baseElement.id === 'UserTask_1') {
+            bpmnElements.push(baseElement);
+          }
+          if (baseElement.id === 'ServiceTask_1') {
+            bpmnElements.push(baseElement);
+          }
+        };
+
+        $rootScope.selection.treeToDiagramMap = {bpmnElements: bpmnElements};
+
+        $rootScope.$digest();
+
+        // then
+        expect(userTaskElement.hasClass('activity-highlight')).toBe(true);
+        expect(serviceTaskElement.hasClass('activity-highlight')).toBe(true);
+      }));
+
+      it('should not deselect bpmn element on second click', inject(function($rootScope, $compile) {
+        // given
         $rootScope.selection = {};
         $rootScope.clickableElements = [ 'ServiceTask_1']
 
@@ -191,8 +322,12 @@ define([ 'angular',
 
         serviceTaskElement.click();    
 
+        $rootScope.$digest();
+
         // when (second click)
         serviceTaskElement.click();              
+
+        $rootScope.$digest();
 
         // then
         expect($rootScope.selection.treeToDiagramMap.bpmnElements.length).toBe(1);
@@ -200,11 +335,8 @@ define([ 'angular',
         expect(serviceTaskElement.hasClass('activity-highlight')).toBe(true);
       }));
 
-      it('should deselect bpmn element on second click with ctrl key', inject(function($rootScope, $compile, Transform) {
+      it('should deselect bpmn element on second click with ctrl key', inject(function($rootScope, $compile) {
         // given
-        var xml = '<?xml version="1.0" encoding="UTF-8"?><bpmn2:definitions targetNamespace="http://activiti.org/bpmn" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmn2="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd" id="_QzotMMIpEeKp3rR3eqX9hQ"><bpmn2:process id="FailingProcess" name="FailingProcess" isExecutable="true">    <bpmn2:startEvent id="StartEvent_1" name="Start Event">      <bpmn2:outgoing>SequenceFlow_1</bpmn2:outgoing>    </bpmn2:startEvent>    <bpmn2:serviceTask id="ServiceTask_1" activiti:class="org.camunda.bpm.pa.service.FailingDelegate" activiti:async="true" name="Service Task">      <bpmn2:incoming>SequenceFlow_1</bpmn2:incoming>      <bpmn2:outgoing>SequenceFlow_2</bpmn2:outgoing>    </bpmn2:serviceTask>    <bpmn2:sequenceFlow id="SequenceFlow_1" sourceRef="StartEvent_1" targetRef="ServiceTask_1"/>    <bpmn2:endEvent id="EndEvent_1" name="End Event">      <bpmn2:incoming>SequenceFlow_2</bpmn2:incoming>    </bpmn2:endEvent>    <bpmn2:sequenceFlow id="SequenceFlow_2" sourceRef="ServiceTask_1" targetRef="EndEvent_1"/>  </bpmn2:process>  <bpmndi:BPMNDiagram id="BPMNDiagram_1" name="Test">    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="FailingProcess">      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_16" bpmnElement="StartEvent_1">        <dc:Bounds height="36.0" width="36.0" x="296.0" y="259.0"/>      </bpmndi:BPMNShape>      <bpmndi:BPMNShape id="_BPMNShape_ServiceTask_3" bpmnElement="ServiceTask_1">        <dc:Bounds height="80.0" width="100.0" x="382.0" y="237.0"/>      </bpmndi:BPMNShape>      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_1" bpmnElement="SequenceFlow_1" sourceElement="_BPMNShape_StartEvent_16" targetElement="_BPMNShape_ServiceTask_3">        <di:waypoint xsi:type="dc:Point" x="332.0" y="277.0"/>        <di:waypoint xsi:type="dc:Point" x="382.0" y="277.0"/>      </bpmndi:BPMNEdge>      <bpmndi:BPMNShape id="_BPMNShape_EndEvent_18" bpmnElement="EndEvent_1">        <dc:Bounds height="36.0" width="36.0" x="532.0" y="259.0"/>      </bpmndi:BPMNShape>      <bpmndi:BPMNEdge id="BPMNEdge_SequenceFlow_2" bpmnElement="SequenceFlow_2" sourceElement="_BPMNShape_ServiceTask_3" targetElement="_BPMNShape_EndEvent_18">        <di:waypoint xsi:type="dc:Point" x="482.0" y="277.0"/>        <di:waypoint xsi:type="dc:Point" x="532.0" y="277.0"/>      </bpmndi:BPMNEdge>    </bpmndi:BPMNPlane>  </bpmndi:BPMNDiagram></bpmn2:definitions>';
-        $rootScope.semantic = Transform.transformBpmn20Xml(xml);
-        $rootScope.processDefinition = {id: 'FailingProcess:1:d91f75f6-d1cb-11e2-95b0-f0def1557726', key: 'FailingProcess'};
         $rootScope.selection = {};
         $rootScope.clickableElements = [ 'ServiceTask_1']
 
@@ -217,8 +349,12 @@ define([ 'angular',
 
         serviceTaskElement.click();       
 
+        $rootScope.$digest();
+
         // when
         serviceTaskElement.trigger({ type: 'click', ctrlKey: true });  
+
+        $rootScope.$digest();
 
         // then
         expect($rootScope.selection.treeToDiagramMap.bpmnElements.length).toBe(0);
@@ -242,9 +378,13 @@ define([ 'angular',
         var serviceTaskElement = $('#ServiceTask_1');
         serviceTaskElement.click();       
 
+        $rootScope.$digest();
+
         // when
         var userTaskElement = $('#UserTask_1');
         userTaskElement.trigger({ type: 'click', ctrlKey: true });  
+
+        $rootScope.$digest();
 
         // then
         expect($rootScope.selection.treeToDiagramMap.bpmnElements.length).toBe(2);
@@ -269,11 +409,17 @@ define([ 'angular',
         var serviceTaskElement = $('#ServiceTask_1');
         serviceTaskElement.click();       
 
+        $rootScope.$digest();
+
         var userTaskElement = $('#UserTask_1');
         userTaskElement.trigger({ type: 'click', ctrlKey: true });  
 
+        $rootScope.$digest();
+
         // when
         serviceTaskElement.trigger({ type: 'click', ctrlKey: true });  
+
+        $rootScope.$digest();
 
         // then
         expect($rootScope.selection.treeToDiagramMap.bpmnElements.length).toBe(1);

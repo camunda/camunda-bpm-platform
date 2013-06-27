@@ -287,6 +287,98 @@ define([ 'angular',
         expect($rootScope.selection.treeToDiagramMap.activityInstances[0].activityId).toBe('Task_2');
       }));
 
+      it('should highlight a node', inject(function($rootScope, $compile) {
+        // given
+        $rootScope.selection = {};
+
+        element = createElement('<div tree="tree" selection="selection"></div>');
+        element = $compile(element)($rootScope);
+
+        $rootScope.$digest();
+
+        // when
+        var nodeToHighlight = $rootScope.tree.children[1].children[1];
+
+        $rootScope.selection.treeToDiagramMap = {activityInstances: [ nodeToHighlight ]};
+
+        $rootScope.$digest();
+
+        // then
+        expect($('#' + nodeToHighlight.activityId + '_' + nodeToHighlight.id).hasClass('activity-highlight')).toBe(true);
+      }));
+
+      it('should highlight two nodes', inject(function($rootScope, $compile) {
+        // given
+        $rootScope.selection = {};
+
+        element = createElement('<div tree="tree" selection="selection"></div>');
+        element = $compile(element)($rootScope);
+
+        $rootScope.$digest();
+
+        // when
+        var firstNodeToHighlight = $rootScope.tree.children[1].children[1];
+        var secondNodeToHighlight = $rootScope.tree.children[3];
+
+        $rootScope.selection.treeToDiagramMap = {activityInstances: [ firstNodeToHighlight, secondNodeToHighlight ]};
+
+        $rootScope.$digest();
+
+        // then
+        expect($('#' + firstNodeToHighlight.activityId + '_' + firstNodeToHighlight.id).hasClass('activity-highlight')).toBe(true);
+        expect($('#' + secondNodeToHighlight.activityId + '_' + secondNodeToHighlight.id).hasClass('activity-highlight')).toBe(true);
+      }));
+
+      it('should deselect first selected node and highlight another node', inject(function($rootScope, $compile) {
+        // given
+        $rootScope.selection = {};
+
+        element = createElement('<div tree="tree" selection="selection"></div>');
+        element = $compile(element)($rootScope);
+
+        $rootScope.$digest();
+
+        var node = $('#SubProcess_2_instance_9')       
+        node.click();
+
+        // when
+        var nodeToHighlight = $rootScope.tree.children[1].children[1];
+
+        $rootScope.selection.treeToDiagramMap = {activityInstances: [ nodeToHighlight ]};
+
+        $rootScope.$digest();
+
+        // then
+        expect($('#SubProcess_2_instance_9').hasClass('activity-highlight')).toBe(false);        
+        expect($('#' + nodeToHighlight.activityId + '_' + nodeToHighlight.id).hasClass('activity-highlight')).toBe(true);
+      }));
+
+      it('should highlight two bpmn elements but the one of them was highlighted before', inject(function($rootScope, $compile) {
+        // given
+        $rootScope.selection = {};
+
+        element = createElement('<div tree="tree" selection="selection"></div>');
+        element = $compile(element)($rootScope);
+
+        $rootScope.$digest();
+
+        var firstNodeToHighlight = $rootScope.tree.children[1].children[1];
+        var secondNodeToHighlight = $rootScope.tree.children[3];
+
+        $('#' + firstNodeToHighlight.activityId + '_' + firstNodeToHighlight.id).click();
+
+        $rootScope.$digest();
+
+        // when
+        $rootScope.selection.treeToDiagramMap = {activityInstances: [ firstNodeToHighlight, secondNodeToHighlight ]};
+
+        $rootScope.$digest();
+
+        // then
+        expect($('#' + firstNodeToHighlight.activityId + '_' + firstNodeToHighlight.id).hasClass('activity-highlight')).toBe(true);
+        expect($('#' + secondNodeToHighlight.activityId + '_' + secondNodeToHighlight.id).hasClass('activity-highlight')).toBe(true);
+      }));
+
     });
   });
 });
