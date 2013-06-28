@@ -99,10 +99,10 @@
   
   <sql id="selectVariableInstanceByQueryCriteriaSql">
     from (
-          select RES.*, EXEC.ACT_INST_ID_
+          select RES.*, EXECUTION.ACT_INST_ID_
           from ${prefix}ACT_RU_VARIABLE RES 
-          left join ${prefix}ACT_RU_EXECUTION EXEC
-          on RES.EXECUTION_ID_ = EXEC.ID_
+          left join ${prefix}ACT_RU_EXECUTION EXECUTION
+          on RES.EXECUTION_ID_ = EXECUTION.ID_
           <where>
             <!-- variableName -->
             <if test="variableName != null">
@@ -143,7 +143,7 @@
             
             <!-- activityInstanceIds -->
             <if test="activityInstanceIds != null &amp;&amp; activityInstanceIds.length > 0">
-              EXEC.ACT_INST_ID_ in
+              EXECUTION.ACT_INST_ID_ in
               <foreach item="item" index="index" collection="activityInstanceIds"
                        open="(" separator="," close=")">
                 #{item}
