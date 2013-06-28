@@ -63,7 +63,7 @@ WHERE
 AND 
     E.ACT_ID_ is not null;
 
-/** set act_inst_id for inactive scope executions */
+/** set act_inst_id for inactive parents of scope executions */
 UPDATE 
     ACT_RU_EXECUTION E_
 SET 
