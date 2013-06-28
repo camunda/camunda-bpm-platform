@@ -136,6 +136,7 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
   
   @Test
   @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+<<<<<<< HEAD
   public void testQueryByNameAndVariableValueEquals_String() {
     // given
     Map<String, Object> variables = new HashMap<String, Object>();
@@ -159,6 +160,8 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
   
   @Test
   @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+=======
+>>>>>>> c32116e2a495512080f0a425448f93e42c8d7855
   public void testQueryByVariableValueEquals_String() {
     // given
     Map<String, Object> variables = new HashMap<String, Object>();
@@ -166,7 +169,11 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
     runtimeService.startProcessInstanceByKey("oneTaskProcess", variables);
     
     // when
+<<<<<<< HEAD
     VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().variableValueEquals("test");
+=======
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().variableValueEquals("stringVar", "test");
+>>>>>>> c32116e2a495512080f0a425448f93e42c8d7855
     
     // then
     List<VariableInstance> result = query.list();
@@ -182,6 +189,7 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
   
   @Test
   @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+<<<<<<< HEAD
   public void testQueryByNameAndVariableValueEquals_Integer() {
     // given
     Map<String, Object> variables = new HashMap<String, Object>();
@@ -205,6 +213,8 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
   
   @Test
   @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+=======
+>>>>>>> c32116e2a495512080f0a425448f93e42c8d7855
   public void testQueryByVariableValueEquals_Integer() {
     // given
     Map<String, Object> variables = new HashMap<String, Object>();
@@ -212,7 +222,11 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
     runtimeService.startProcessInstanceByKey("oneTaskProcess", variables);
     
     // when
+<<<<<<< HEAD
     VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().variableValueEquals((int) 1234);
+=======
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().variableValueEquals("intValue", (int) 1234);
+>>>>>>> c32116e2a495512080f0a425448f93e42c8d7855
     
     // then
     List<VariableInstance> result = query.list();
@@ -228,6 +242,7 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
   
   @Test
   @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+<<<<<<< HEAD
   public void testQueryByNameAndVariableValueEquals_Long() {
     // given
     Map<String, Object> variables = new HashMap<String, Object>();
@@ -251,6 +266,8 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
  
   @Test
   @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+=======
+>>>>>>> c32116e2a495512080f0a425448f93e42c8d7855
   public void testQueryByVariableValueEquals_Long() {
     // given
     Map<String, Object> variables = new HashMap<String, Object>();
@@ -258,7 +275,11 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
     runtimeService.startProcessInstanceByKey("oneTaskProcess", variables);
     
     // when
+<<<<<<< HEAD
     VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().variableValueEquals(123456L);
+=======
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().variableValueEquals("longValue", 123456L);
+>>>>>>> c32116e2a495512080f0a425448f93e42c8d7855
     
     // then
     List<VariableInstance> result = query.list();
@@ -274,6 +295,7 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
   
   @Test
   @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+<<<<<<< HEAD
   public void testQueryByNameAndVariableValueEquals_Double() {
     // given
     Map<String, Object> variables = new HashMap<String, Object>();
@@ -297,6 +319,8 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
   
   @Test
   @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+=======
+>>>>>>> c32116e2a495512080f0a425448f93e42c8d7855
   public void testQueryByVariableValueEquals_Double() {
     // given
     Map<String, Object> variables = new HashMap<String, Object>();
@@ -304,7 +328,11 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
     runtimeService.startProcessInstanceByKey("oneTaskProcess", variables);
     
     // when
+<<<<<<< HEAD
     VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().variableValueEquals(123.456);
+=======
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().variableValueEquals("doubleValue", 123.456);
+>>>>>>> c32116e2a495512080f0a425448f93e42c8d7855
     
     // then
     List<VariableInstance> result = query.list();
@@ -320,6 +348,7 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
   
   @Test
   @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+<<<<<<< HEAD
   public void testQueryByNameAndVariableValueEquals_Short() {
     // given
     Map<String, Object> variables = new HashMap<String, Object>();
@@ -343,6 +372,8 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
   
   @Test
   @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+=======
+>>>>>>> c32116e2a495512080f0a425448f93e42c8d7855
   public void testQueryByVariableValueEquals_Short() {
     // given
     Map<String, Object> variables = new HashMap<String, Object>();
@@ -350,7 +381,11 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
     runtimeService.startProcessInstanceByKey("oneTaskProcess", variables);
     
     // when
+<<<<<<< HEAD
     VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().variableValueEquals((short) 123);
+=======
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().variableValueEquals("shortValue", (short) 123);
+>>>>>>> c32116e2a495512080f0a425448f93e42c8d7855
     
     // then
     List<VariableInstance> result = query.list();
@@ -366,6 +401,7 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
   
   @Test
   @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+<<<<<<< HEAD
   public void testQueryByNameAndVariableValueEquals_Bytes() {
     // given
     byte[] bytes = "somebytes".getBytes();
@@ -387,6 +423,8 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
   
   @Test
   @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+=======
+>>>>>>> c32116e2a495512080f0a425448f93e42c8d7855
   public void testQueryByVariableValueEquals_Bytes() {
     // given
     byte[] bytes = "somebytes".getBytes();
@@ -395,7 +433,11 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
     runtimeService.startProcessInstanceByKey("oneTaskProcess", variables);
     
     // when
+<<<<<<< HEAD
     VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().variableValueEquals(bytes);
+=======
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().variableValueEquals("bytesVar", bytes);
+>>>>>>> c32116e2a495512080f0a425448f93e42c8d7855
     
     // then
     try {
@@ -408,6 +450,7 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
   
   @Test
   @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+<<<<<<< HEAD
   public void testQueryByNameAndVariableValueEquals_Date() {
     // given
      Date now = new Date();
@@ -433,6 +476,8 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
   
   @Test
   @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+=======
+>>>>>>> c32116e2a495512080f0a425448f93e42c8d7855
   public void testQueryByVariableValueEquals_Date() {
     // given
      Date now = new Date();
@@ -442,7 +487,11 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
     runtimeService.startProcessInstanceByKey("oneTaskProcess", variables);
     
     // when
+<<<<<<< HEAD
     VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().variableValueEquals(now);
+=======
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().variableValueEquals("date", now);
+>>>>>>> c32116e2a495512080f0a425448f93e42c8d7855
     
     // then
     List<VariableInstance> result = query.list();
@@ -458,7 +507,11 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
   
   @Test
   @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+<<<<<<< HEAD
   public void testQueryByNameAndVariableValueEqualsWihtoutAnyResult() {
+=======
+  public void testQueryByVariableValueEqualsWihtoutAnyResult() {
+>>>>>>> c32116e2a495512080f0a425448f93e42c8d7855
     // given
     Map<String, Object> variables = new HashMap<String, Object>();
     variables.put("stringVar", "test");
