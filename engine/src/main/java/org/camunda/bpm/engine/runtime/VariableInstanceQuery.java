@@ -24,12 +24,9 @@ public interface VariableInstanceQuery extends Query<VariableInstanceQuery, Vari
   
   /** Only select variable instances which have the name like the assigned variable name. **/
   VariableInstanceQuery variableNameLike(String variableNameLike);
-<<<<<<< HEAD
 
   /** Only select variable instances which have the the assigned variable value. **/
   VariableInstanceQuery variableValueEquals(Object variableValue);
-=======
->>>>>>> c32116e2a495512080f0a425448f93e42c8d7855
   
   /** Only select variable instances which have the variable name and their value is equal the assigned variable value. **/
   VariableInstanceQuery variableValueEquals(String variableName, Object variableValue);

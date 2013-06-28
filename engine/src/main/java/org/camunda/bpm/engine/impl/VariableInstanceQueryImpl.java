@@ -61,15 +61,11 @@ public class VariableInstanceQueryImpl extends AbstractQuery<VariableInstanceQue
     if (variableValue == null) {
       throw new ProcessEngineException("variableValue is null");
     }
-<<<<<<< HEAD
-    
-=======
->>>>>>> c32116e2a495512080f0a425448f93e42c8d7855
+
     this.variableName = variableName;
     queryVariableValue = new QueryVariableValue(variableName, variableValue, QueryOperator.EQUALS, true);
     return this;
   }
-<<<<<<< HEAD
   
   public VariableInstanceQuery variableValueEquals(Object variableValue) {
     if (variableValue == null) {
@@ -79,8 +75,6 @@ public class VariableInstanceQueryImpl extends AbstractQuery<VariableInstanceQue
     queryVariableValue = new QueryVariableValue(variableName, variableValue, QueryOperator.EQUALS, true);
     return this;
   }
-=======
->>>>>>> c32116e2a495512080f0a425448f93e42c8d7855
 
   public VariableInstanceQuery executionIdIn(String... executionIds) {
     this.executionIds = executionIds;
