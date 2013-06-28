@@ -22,6 +22,7 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
 import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
 import org.camunda.bpm.engine.rest.dto.VariableQueryParameterDto;
+import org.camunda.bpm.engine.rest.dto.converter.BooleanConverter;
 import org.camunda.bpm.engine.rest.dto.converter.VariableListConverter;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.runtime.ExecutionQuery;
@@ -47,6 +48,8 @@ public class ExecutionQueryDto extends AbstractQueryDto<ExecutionQuery> {
   private String activityId;
   private String signalEventSubscriptionName;
   private String messageEventSubscriptionName;
+  private Boolean active;
+  private Boolean suspended;
   
   private List<VariableQueryParameterDto> variables;
   private List<VariableQueryParameterDto> processVariables;
@@ -104,6 +107,16 @@ public class ExecutionQueryDto extends AbstractQueryDto<ExecutionQuery> {
     this.processVariables = processVariables;
   }
   
+  @CamundaQueryParam(value = "active", converter = BooleanConverter.class)
+  public void setActive(Boolean active) {
+    this.active = active;
+  }
+
+  @CamundaQueryParam(value = "suspended", converter = BooleanConverter.class)
+  public void setSuspended(Boolean suspended) {
+    this.suspended = suspended;
+  }
+  
   @Override
   protected boolean isValidSortByValue(String value) {
     return VALID_SORT_BY_VALUES.contains(value);
@@ -136,6 +149,12 @@ public class ExecutionQueryDto extends AbstractQueryDto<ExecutionQuery> {
     }
     if (messageEventSubscriptionName != null) {
       query.messageEventSubscriptionName(messageEventSubscriptionName);
+    }
+    if (active != null && active == true) {
+      query.active();
+    }
+    if (suspended != null && suspended == true) {
+      query.suspended();
     }
     
     if (variables != null) {
