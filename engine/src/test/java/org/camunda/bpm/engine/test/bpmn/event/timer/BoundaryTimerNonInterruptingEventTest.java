@@ -49,7 +49,7 @@ public class BoundaryTimerNonInterruptingEventTest extends PluggableProcessEngin
 
     // After setting the clock to time '1 hour and 5 seconds', the first timer should fire
     ClockUtil.setCurrentTime(new Date(startTime.getTime() + ((60 * 60 * 1000) + 5000)));
-    waitForJobExecutorToProcessAllJobs(5000L, 25L);
+    waitForJobExecutorToProcessAllJobs(5000L);
     
     // we still have one timer more to fire
     assertEquals(1L, jobQuery.count());
@@ -69,7 +69,7 @@ public class BoundaryTimerNonInterruptingEventTest extends PluggableProcessEngin
 
     // After setting the clock to time '2 hour and 5 seconds', the second timer should fire
     ClockUtil.setCurrentTime(new Date(startTime.getTime() + ((2 * 60 * 60 * 1000) + 5000)));
-    waitForJobExecutorToProcessAllJobs(5000L, 25L);
+    waitForJobExecutorToProcessAllJobs(5000L);
     
     // no more timers to fire
     assertEquals(0L, jobQuery.count());
@@ -110,7 +110,7 @@ public class BoundaryTimerNonInterruptingEventTest extends PluggableProcessEngin
 
     // After setting the clock to time '1 hour and 5 seconds', the first timer should fire
     ClockUtil.setCurrentTime(new Date(startTime.getTime() + ((60 * 60 * 1000) + 5000)));
-    waitForJobExecutorToProcessAllJobs(5000L, 25L);
+    waitForJobExecutorToProcessAllJobs(5000L);
     
     // timer has fired
     assertEquals(0L, jobQuery.count());
@@ -253,7 +253,7 @@ public class BoundaryTimerNonInterruptingEventTest extends PluggableProcessEngin
 
 //    // After setting the clock to time '1 hour and 5 seconds', the second timer should fire
 //    ClockUtil.setCurrentTime(new Date(startTime.getTime() + ((60 * 60 * 1000) + 5000)));
-//    waitForJobExecutorToProcessAllJobs(5000L, 25L);
+//    waitForJobExecutorToProcessAllJobs(5000L);
 //    assertEquals(0L, jobQuery.count());
 
     // which means the process has ended

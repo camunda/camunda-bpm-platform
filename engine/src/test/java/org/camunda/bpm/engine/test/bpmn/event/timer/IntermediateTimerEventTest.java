@@ -40,7 +40,7 @@ public class IntermediateTimerEventTest extends PluggableProcessEngineTestCase {
 
     // After setting the clock to time '50minutes and 5 seconds', the second timer should fire
     ClockUtil.setCurrentTime(new Date(startTime.getTime() + ((50 * 60 * 1000) + 5000)));
-    waitForJobExecutorToProcessAllJobs(5000L, 25L);
+    waitForJobExecutorToProcessAllJobs(5000L);
 
     assertEquals(0, jobQuery.count());
     assertProcessEnded(pi.getProcessInstanceId());

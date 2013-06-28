@@ -189,9 +189,15 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
     }
   }
 
+  @Deprecated
   public void waitForJobExecutorToProcessAllJobs(long maxMillisToWait, long intervalMillis) {
+    waitForJobExecutorToProcessAllJobs(maxMillisToWait);
+  }
+  
+  public void waitForJobExecutorToProcessAllJobs(long maxMillisToWait) {
     JobExecutor jobExecutor = processEngineConfiguration.getJobExecutor();
     jobExecutor.start();
+    long intervalMillis = 1000;
 
     try {
       Timer timer = new Timer();
@@ -221,9 +227,15 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
     }
   }
 
+  @Deprecated
   public void waitForJobExecutorOnCondition(long maxMillisToWait, long intervalMillis, Callable<Boolean> condition) {
+    waitForJobExecutorOnCondition(maxMillisToWait, condition);
+  }
+  
+  public void waitForJobExecutorOnCondition(long maxMillisToWait, Callable<Boolean> condition) {
     JobExecutor jobExecutor = processEngineConfiguration.getJobExecutor();
     jobExecutor.start();
+    long intervalMillis = 1000;
 
     try {
       Timer timer = new Timer();

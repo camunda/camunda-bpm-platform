@@ -23,7 +23,7 @@ public class SpringJobExecutorTest extends SpringProcessEngineTestCase {
 		
 		assertNotNull(instance);
 		
-		waitForJobExecutorToProcessAllJobs(10000, 500);
+		waitForJobExecutorToProcessAllJobs(10000);
 		
 		List<Task> activeTasks = taskService.createTaskQuery().processInstanceId(instance.getId()).list();
 		assertTrue(activeTasks.size() == 0);
@@ -37,7 +37,7 @@ public class SpringJobExecutorTest extends SpringProcessEngineTestCase {
 		
 		assertNotNull(instance);
 		
-		waitForJobExecutorToProcessAllJobs(10000, 500);
+		waitForJobExecutorToProcessAllJobs(10000);
 		
 		List<Task> activeTasks = taskService.createTaskQuery().processInstanceId(instance.getId()).list();
 		assertTrue(activeTasks.size() == 1);

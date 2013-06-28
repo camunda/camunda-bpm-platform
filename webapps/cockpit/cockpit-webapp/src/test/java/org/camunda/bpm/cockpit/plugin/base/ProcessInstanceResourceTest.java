@@ -63,7 +63,7 @@ public class ProcessInstanceResourceTest extends AbstractCockpitPluginTest {
         .createProcessDefinitionQuery()
         .singleResult();
     
-    helper.waitForJobExecutorToProcessAllJobs(15000, 500);
+    helper.waitForJobExecutorToProcessAllJobs(15000);
     
     Job job = managementService.createJobQuery().singleResult();
     
@@ -94,7 +94,7 @@ public class ProcessInstanceResourceTest extends AbstractCockpitPluginTest {
         .processDefinitionKey("CallActivity")
         .singleResult();
     
-    helper.waitForJobExecutorToProcessAllJobs(15000, 500);
+    helper.waitForJobExecutorToProcessAllJobs(15000);
     
     List<IncidentDto> incidents = resource.getIncidents(processInstance.getId());
     assertThat(incidents).isNotEmpty();
@@ -118,7 +118,7 @@ public class ProcessInstanceResourceTest extends AbstractCockpitPluginTest {
   public void testGetTenIncidents() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("processWithTwoParallelFailingServices");
     
-    helper.waitForJobExecutorToProcessAllJobs(15000, 500);
+    helper.waitForJobExecutorToProcessAllJobs(15000);
     
     List<IncidentDto> incidents = resource.getIncidents(processInstance.getId());
     assertThat(incidents).isNotEmpty();

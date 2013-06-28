@@ -77,7 +77,7 @@ public class ServiceTaskVariablesTest extends PluggableProcessEngineTestCase {
     // third service task in the sequence
     
     runtimeService.startProcessInstanceByKey("process");
-    waitForJobExecutorToProcessAllJobs(10000, 500);
+    waitForJobExecutorToProcessAllJobs(10000);
     
     synchronized (ServiceTaskVariablesTest.class) {
       assertTrue(isNullInDelegate2);
@@ -91,7 +91,7 @@ public class ServiceTaskVariablesTest extends PluggableProcessEngineTestCase {
     // in this test, only the third service task is async
         
     runtimeService.startProcessInstanceByKey("process");
-    waitForJobExecutorToProcessAllJobs(10000, 500);
+    waitForJobExecutorToProcessAllJobs(10000);
     
     synchronized (ServiceTaskVariablesTest.class) {
       assertTrue(isNullInDelegate2); 

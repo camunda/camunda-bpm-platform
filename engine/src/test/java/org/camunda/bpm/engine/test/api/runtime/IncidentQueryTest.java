@@ -47,7 +47,7 @@ public class IncidentQueryTest extends PluggableProcessEngineTestCase {
       processInstanceIds.add(runtimeService.startProcessInstanceByKey(PROCESS_DEFINITION_KEY, i + "").getId());
     }
     
-    waitForJobExecutorToProcessAllJobs(15000, 500);
+    waitForJobExecutorToProcessAllJobs(15000);
   }
 
   protected void tearDown() throws Exception {
@@ -251,7 +251,7 @@ public class IncidentQueryTest extends PluggableProcessEngineTestCase {
   public void testQueryByCauseIncidentId() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callFailingProcess");
     
-    waitForJobExecutorToProcessAllJobs(15000, 500);
+    waitForJobExecutorToProcessAllJobs(15000);
     
     ProcessInstance subProcessInstance = runtimeService.createProcessInstanceQuery().superProcessInstanceId(processInstance.getId()).singleResult();
     assertNotNull(subProcessInstance);
@@ -292,7 +292,7 @@ public class IncidentQueryTest extends PluggableProcessEngineTestCase {
   public void testQueryByRootCauseIncidentId() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callFailingCallActivity");
     
-    waitForJobExecutorToProcessAllJobs(15000, 500);
+    waitForJobExecutorToProcessAllJobs(15000);
     
     ProcessInstance subProcessInstance = runtimeService.createProcessInstanceQuery().superProcessInstanceId(processInstance.getId()).singleResult();
     assertNotNull(subProcessInstance);
