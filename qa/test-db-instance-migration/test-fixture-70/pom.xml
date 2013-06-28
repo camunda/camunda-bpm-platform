@@ -142,6 +142,19 @@
                   </arguments>
                 </configuration>
               </execution>
+              <execution>
+                <id>Drop upgraded DB</id>
+                <goals>
+                  <goal>java</goal>
+                </goals>
+                <phase>pre-integration-test</phase>
+                <configuration>
+                  <includeProjectDependencies>true</includeProjectDependencies>
+                  <includePluginDependencies>true</includePluginDependencies>
+                  <classpathScope>test</classpathScope>
+                  <mainClass>org.camunda.bpm.qa.upgrade.DB70Dropper</mainClass>
+                </configuration>
+              </execution>
             </executions>
             <dependencies>
               <dependency>

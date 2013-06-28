@@ -25,6 +25,7 @@ import org.activiti.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.activiti.engine.impl.interceptor.Command;
 import org.activiti.engine.impl.interceptor.CommandContext;
 import org.activiti.engine.repository.Deployment;
+import org.activiti.engine.runtime.ProcessInstance;
 
 /**
  * @author Daniel Meyer
@@ -76,9 +77,13 @@ public class TestFixture62 {
     fixture.startMultiInstanceParallelSubprocessConcurrent();
     fixture.startNestedMultiInstanceParallelSubprocessConcurrent();
     
+    // suspended process instance
+    fixture.startSuspendedAndActiveSingleTaskProcess();
+    
     processEngine.close();
 
   }
+
 
   protected static void dropCreateDatabase(ProcessEngine processEngine) {
     // delete all deployments
@@ -133,6 +138,7 @@ public class TestFixture62 {
     runtimeService.startProcessInstanceByKey("TestFixture62.singleTaskProcess");    
   }
   
+
   public void startNestedSingleTaskProcess() {
     repositoryService
       .createDeployment() 
@@ -338,6 +344,17 @@ public class TestFixture62 {
       .deploy();
     
     runtimeService.startProcessInstanceByKey("TestFixture62.nestedMultiInstanceParallelSubprocessConcurrent");    
+  }
+  
+  public void startSuspendedAndActiveSingleTaskProcess() {
+    repositoryService
+    .createDeployment() 
+    .addClasspathResource("org/camunda/bpm/qa/upgrade/TestFixture62.suspensionStateSingleTaskProcess.bpmn20.xml")
+    .deploy();
+  
+    runtimeService.startProcessInstanceByKey("TestFixture62.suspensionStateSingleTaskProcess", "activeInstance");  
+    ProcessInstance instance = runtimeService.startProcessInstanceByKey("TestFixture62.suspensionStateSingleTaskProcess", "suspendedInstance");  
+    runtimeService.suspendProcessInstanceById(instance.getId());
   }
       
 }
