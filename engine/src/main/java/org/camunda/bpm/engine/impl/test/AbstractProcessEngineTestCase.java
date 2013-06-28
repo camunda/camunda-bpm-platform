@@ -199,6 +199,11 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
     jobExecutor.start();
     long intervalMillis = 1000;
 
+    int jobExecutorWaitTime = jobExecutor.getWaitTimeInMillis() * 2;
+    if(maxMillisToWait < jobExecutorWaitTime) {
+      maxMillisToWait = jobExecutorWaitTime;
+    }
+    
     try {
       Timer timer = new Timer();
       InteruptTask task = new InteruptTask(Thread.currentThread());
@@ -236,6 +241,10 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
     JobExecutor jobExecutor = processEngineConfiguration.getJobExecutor();
     jobExecutor.start();
     long intervalMillis = 1000;
+    
+    if(maxMillisToWait < (jobExecutor.getWaitTimeInMillis()*2)) {
+      maxMillisToWait = (jobExecutor.getWaitTimeInMillis()*2);
+    }
 
     try {
       Timer timer = new Timer();
