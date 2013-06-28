@@ -27,6 +27,7 @@ import org.camunda.bpm.engine.runtime.NativeExecutionQuery;
 import org.camunda.bpm.engine.runtime.NativeProcessInstanceQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
+import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
 
 
 /** Service which provides access to {@link Deployment}s,
@@ -454,6 +455,12 @@ public interface RuntimeService {
    * event subscriptions.
    */
   EventSubscriptionQuery createEventSubscriptionQuery();
+  
+  /**
+   * Creates a new {@link VariableInstanceQuery} instance, that can be used to query
+   * variable instances.
+   */
+  VariableInstanceQuery createVariableInstanceQuery();
   
   // Process instance state //////////////////////////////////////////
     
