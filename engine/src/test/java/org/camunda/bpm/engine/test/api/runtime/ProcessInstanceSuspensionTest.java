@@ -599,11 +599,11 @@ public class ProcessInstanceSuspensionTest extends PluggableProcessEngineTestCas
     
     // The jobs should not be executed now
     ClockUtil.setCurrentTime(new Date(now.getTime() + (60 * 60 * 1000))); // Timer is set to fire on 5 minutes
-    waitForJobExecutorToProcessAllJobs(1000L);
-    assertEquals(1, managementService.createJobQuery().count());
+    assertEquals(0, managementService.createJobQuery().executable().count());
     
     // Activation of the process instance should now allow for job execution
     runtimeService.activateProcessInstanceById(processInstance.getId());
+    assertEquals(1, managementService.createJobQuery().executable().count());
     waitForJobExecutorToProcessAllJobs(1000L);
     assertEquals(0, managementService.createJobQuery().count());
     assertEquals(0, runtimeService.createProcessInstanceQuery().count());

@@ -43,6 +43,7 @@ import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.impl.util.LogUtil.ThreadLogMode;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
+import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.junit.Assert;
 
@@ -240,7 +241,7 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
   public void waitForJobExecutorOnCondition(long maxMillisToWait, Callable<Boolean> condition) {
     JobExecutor jobExecutor = processEngineConfiguration.getJobExecutor();
     jobExecutor.start();
-    long intervalMillis = 1000;
+    long intervalMillis = 500;
     
     if(maxMillisToWait < (jobExecutor.getWaitTimeInMillis()*2)) {
       maxMillisToWait = (jobExecutor.getWaitTimeInMillis()*2);
@@ -272,13 +273,15 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
   }
 
   public boolean areJobsAvailable() {
-    return !managementService
-      .createJobQuery()
-      .executable()
-      .list()
-      .isEmpty();
+    List<Job> list = managementService.createJobQuery().list();
+    for (Job job : list) {
+      if (job.getRetries() > 0 && (job.getDuedate() == null || ClockUtil.getCurrentTime().after(job.getDuedate()))) {
+        return true;
+      }
+    }
+    return false;
   }
-
+  
   private static class InteruptTask extends TimerTask {
     protected boolean timeLimitExceeded = false;
     protected Thread thread;
