@@ -140,7 +140,7 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
     // Move time four days forward, the timer will fire and the process definitions will be active
     Date inFourDays = new Date(startTime.getTime() + (4 * 24 * 60 * 60 * 1000));
     ClockUtil.setCurrentTime(inFourDays);
-    waitForJobExecutorToProcessAllJobs(5000L, 50L);
+    waitForJobExecutorToProcessAllJobs(5000L);
     
     assertEquals(1, repositoryService.createDeploymentQuery().count());
     assertEquals(2, repositoryService.createProcessDefinitionQuery().count());

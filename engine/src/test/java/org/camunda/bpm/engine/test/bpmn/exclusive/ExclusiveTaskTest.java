@@ -32,7 +32,7 @@ public class ExclusiveTaskTest extends PluggableProcessEngineTestCase {
     assertNotNull(job);
     assertFalse(((JobEntity)job).isExclusive());
                
-    waitForJobExecutorToProcessAllJobs(6000L, 100L);
+    waitForJobExecutorToProcessAllJobs(6000L);
     
     // all the jobs are done
     assertEquals(0, managementService.createJobQuery().count());      
@@ -47,7 +47,7 @@ public class ExclusiveTaskTest extends PluggableProcessEngineTestCase {
     assertNotNull(job);
     assertTrue(((JobEntity)job).isExclusive());
                
-    waitForJobExecutorToProcessAllJobs(6000L, 100L);
+    waitForJobExecutorToProcessAllJobs(6000L);
     
     // all the jobs are done
     assertEquals(0, managementService.createJobQuery().count());      
@@ -60,7 +60,7 @@ public class ExclusiveTaskTest extends PluggableProcessEngineTestCase {
     // now there should be 3 exclusive jobs in the database:
     assertEquals(3, managementService.createJobQuery().count());
                    
-    waitForJobExecutorToProcessAllJobs(6000L, 100L);
+    waitForJobExecutorToProcessAllJobs(6000L);
     
     // all the jobs are done
     assertEquals(0, managementService.createJobQuery().count());      

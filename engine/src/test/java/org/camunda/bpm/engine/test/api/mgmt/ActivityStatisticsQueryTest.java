@@ -39,7 +39,7 @@ public class ActivityStatisticsQueryTest extends PluggableProcessEngineTestCase 
     
     runtimeService.startProcessInstanceByKey("ExampleProcess", parameters);
     
-    waitForJobExecutorToProcessAllJobs(6000, 500);
+    waitForJobExecutorToProcessAllJobs(6000);
     
     ProcessDefinition definition = repositoryService.createProcessDefinitionQuery()
         .processDefinitionKey("ExampleProcess").singleResult();
@@ -64,7 +64,7 @@ public class ActivityStatisticsQueryTest extends PluggableProcessEngineTestCase 
     
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("ExampleProcess", parameters);
     
-    waitForJobExecutorToProcessAllJobs(6000, 500);
+    waitForJobExecutorToProcessAllJobs(6000);
     
     List<ActivityStatistics> statistics = 
         managementService
@@ -94,7 +94,7 @@ public class ActivityStatisticsQueryTest extends PluggableProcessEngineTestCase 
     
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("ExampleProcess", parameters);
     
-    waitForJobExecutorToProcessAllJobs(6000, 500);
+    waitForJobExecutorToProcessAllJobs(6000);
     
     List<ActivityStatistics> statistics = 
         managementService
@@ -124,7 +124,7 @@ public class ActivityStatisticsQueryTest extends PluggableProcessEngineTestCase 
     
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("ExampleProcess", parameters);
     
-    waitForJobExecutorToProcessAllJobs(6000, 500);
+    waitForJobExecutorToProcessAllJobs(6000);
     
     List<ActivityStatistics> statistics = 
         managementService
@@ -145,7 +145,7 @@ public class ActivityStatisticsQueryTest extends PluggableProcessEngineTestCase 
   public void testActivityStatisticsQueryWithIncidentsWithoutFailedJobs() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("callExampleSubProcess");
     
-    waitForJobExecutorToProcessAllJobs(6000, 500);
+    waitForJobExecutorToProcessAllJobs(6000);
     
     List<ActivityStatistics> statistics = 
         managementService
@@ -288,7 +288,7 @@ public class ActivityStatisticsQueryTest extends PluggableProcessEngineTestCase 
   public void testCallActivityActivityStatisticsQuery() {
     runtimeService.startProcessInstanceByKey("callExampleSubProcess");
     
-    waitForJobExecutorToProcessAllJobs(6000, 500);
+    waitForJobExecutorToProcessAllJobs(6000);
     
     ProcessDefinition definition = repositoryService
         .createProcessDefinitionQuery()

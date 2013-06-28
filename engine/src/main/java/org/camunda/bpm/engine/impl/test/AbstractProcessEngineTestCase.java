@@ -189,10 +189,21 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
     }
   }
 
+  @Deprecated
   public void waitForJobExecutorToProcessAllJobs(long maxMillisToWait, long intervalMillis) {
+    waitForJobExecutorToProcessAllJobs(maxMillisToWait);
+  }
+  
+  public void waitForJobExecutorToProcessAllJobs(long maxMillisToWait) {
     JobExecutor jobExecutor = processEngineConfiguration.getJobExecutor();
     jobExecutor.start();
+    long intervalMillis = 1000;
 
+    int jobExecutorWaitTime = jobExecutor.getWaitTimeInMillis() * 2;
+    if(maxMillisToWait < jobExecutorWaitTime) {
+      maxMillisToWait = jobExecutorWaitTime;
+    }
+    
     try {
       Timer timer = new Timer();
       InteruptTask task = new InteruptTask(Thread.currentThread());
@@ -221,9 +232,19 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
     }
   }
 
+  @Deprecated
   public void waitForJobExecutorOnCondition(long maxMillisToWait, long intervalMillis, Callable<Boolean> condition) {
+    waitForJobExecutorOnCondition(maxMillisToWait, condition);
+  }
+  
+  public void waitForJobExecutorOnCondition(long maxMillisToWait, Callable<Boolean> condition) {
     JobExecutor jobExecutor = processEngineConfiguration.getJobExecutor();
     jobExecutor.start();
+    long intervalMillis = 1000;
+    
+    if(maxMillisToWait < (jobExecutor.getWaitTimeInMillis()*2)) {
+      maxMillisToWait = (jobExecutor.getWaitTimeInMillis()*2);
+    }
 
     try {
       Timer timer = new Timer();

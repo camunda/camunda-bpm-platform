@@ -64,7 +64,7 @@ public class MscManagedProcessEngineController extends MscManagedProcessEngine {
   // This ensures that they are available when this service is started
   protected final InjectedValue<TransactionManager> transactionManagerInjector = new InjectedValue<TransactionManager>();
   protected final InjectedValue<DataSourceReferenceFactoryService> datasourceBinderServiceInjector = new InjectedValue<DataSourceReferenceFactoryService>();
-  protected final InjectedValue<MscRuntimeContainerDelegate> containerPlatformServiceInjector = new InjectedValue<MscRuntimeContainerDelegate>();
+  protected final InjectedValue<MscRuntimeContainerDelegate> runtimeContainerDelegate = new InjectedValue<MscRuntimeContainerDelegate>();
   protected final InjectedValue<MscRuntimeContainerJobExecutor> mscRuntimeContainerJobExecutorInjector = new InjectedValue<MscRuntimeContainerJobExecutor>();
     
   protected ManagedProcessEngineMetadata processEngineMetadata;
@@ -106,6 +106,10 @@ public class MscManagedProcessEngineController extends MscManagedProcessEngine {
           }      
           
         } finally {
+          
+          MscRuntimeContainerDelegate mscRuntimeContainerDelegate = runtimeContainerDelegate.getValue();
+          mscRuntimeContainerDelegate.processEngineStopped(processEngine);
+          
           context.complete();
         }
       }
@@ -123,7 +127,9 @@ public class MscManagedProcessEngineController extends MscManagedProcessEngine {
       }
 
     }, ProcessEngine.class.getClassLoader());   
-      
+    
+    MscRuntimeContainerDelegate mscRuntimeContainerDelegate = runtimeContainerDelegate.getValue();
+    mscRuntimeContainerDelegate.processEngineStarted(processEngine);
   }
     
   protected void startProcessEngine() {
@@ -198,7 +204,7 @@ public class MscManagedProcessEngineController extends MscManagedProcessEngine {
   }
     
   public InjectedValue<MscRuntimeContainerDelegate> getContainerPlatformServiceInjector() {
-    return containerPlatformServiceInjector;
+    return runtimeContainerDelegate;
   }
   
   public InjectedValue<MscRuntimeContainerJobExecutor> getMscRuntimeContainerJobExecutorInjector() {
@@ -215,6 +221,10 @@ public class MscManagedProcessEngineController extends MscManagedProcessEngine {
       .addDependency(ServiceNames.forMscRuntimeContainerJobExecutorService(jobExecutorName), MscRuntimeContainerJobExecutor.class, service.getMscRuntimeContainerJobExecutorInjector())
       .addDependency(ServiceNames.forMscExecutorService())         
       .setInitialMode(Mode.ACTIVE);
+    
+    if(processEngineConfiguration.isDefault()) {
+      serviceBuilder.addAliases(ServiceNames.forDefaultProcessEngine());
+    }
     
     Services.addServerExecutorDependency(serviceBuilder, service.getExecutorInjector(), false);
     

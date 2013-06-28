@@ -100,7 +100,7 @@ public class SubProcessTest extends PluggableProcessEngineTestCase {
     
     // Setting the clock forward 2 hours 1 second (timer fires in 2 hours) and fire up the job executor 
     ClockUtil.setCurrentTime(new Date(startTime.getTime() + (2 * 60 * 60 * 1000 ) + 1000));
-    waitForJobExecutorToProcessAllJobs(5000L, 50L);
+    waitForJobExecutorToProcessAllJobs(5000L);
 
     // The subprocess should be left, and the escalated task should be active
     Task escalationTask = taskService.createTaskQuery()
@@ -215,7 +215,7 @@ public class SubProcessTest extends PluggableProcessEngineTestCase {
     
     // Setting the clock forward 1 hour 1 second (timer fires in 1 hour) and fire up the job executor 
     ClockUtil.setCurrentTime(new Date(startTime.getTime() + ( 60 * 60 * 1000 ) + 1000));
-    waitForJobExecutorToProcessAllJobs(5000L, 50L);
+    waitForJobExecutorToProcessAllJobs(5000L);
 
     // The inner subprocess should be destoyed, and the escalated task should be active
     Task escalationTask = taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult();
