@@ -14,14 +14,18 @@ package org.camunda.bpm.engine.impl.variable;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.ObjectStreamClass;
 import java.io.Serializable;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.camunda.bpm.engine.impl.util.IoUtil;
+import org.camunda.bpm.engine.impl.util.ReflectUtil;
 
 /**
  * @author Tom Baeyens
@@ -45,7 +49,7 @@ public class SerializableType extends ByteArrayType {
     ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
     Object deserializedObject;
     try {
-      ObjectInputStream ois = new ObjectInputStream(bais);
+      ObjectInputStream ois = new ClassloaderAwareObjectInputStream(bais);
       deserializedObject = ois.readObject();
       valueFields.setCachedValue(deserializedObject);
       
@@ -99,5 +103,18 @@ public class SerializableType extends ByteArrayType {
   
   public boolean isAbleToStore(Object value) {
     return value instanceof Serializable;
+  }
+  
+  protected static class ClassloaderAwareObjectInputStream extends ObjectInputStream {
+
+    public ClassloaderAwareObjectInputStream(InputStream in) throws IOException {
+      super(in);
+    }
+    
+    @Override
+    protected Class<?> resolveClass(ObjectStreamClass desc) throws IOException, ClassNotFoundException {
+      return ReflectUtil.loadClass(desc.getName());
+    }
+    
   }
 }
