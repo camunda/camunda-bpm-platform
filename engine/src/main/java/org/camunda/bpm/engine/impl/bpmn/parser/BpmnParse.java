@@ -40,7 +40,7 @@ import org.camunda.bpm.engine.impl.bpmn.behavior.EventSubProcessStartEventActivi
 import org.camunda.bpm.engine.impl.bpmn.behavior.ExclusiveGatewayActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.InclusiveGatewayActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.IntermediateCatchEventActivitiBehaviour;
-import org.camunda.bpm.engine.impl.bpmn.behavior.IntermediateCatchLinkEventActivitiBehaviour;
+import org.camunda.bpm.engine.impl.bpmn.behavior.IntermediateCatchLinkEventActivityBehaviour;
 import org.camunda.bpm.engine.impl.bpmn.behavior.IntermediateThrowCompensationEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.IntermediateThrowNoneEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.IntermediateThrowSignalEventActivityBehavior;
@@ -1232,7 +1232,7 @@ public class BpmnParse extends Parse {
       parseIntemediateMessageEventDefinition(messageEventDefinition, nestedActivity, isAfterEventBasedGateway);
       
     } else if(linkEventDefinitionElement != null) {
-      nestedActivity.setActivityBehavior(new IntermediateCatchLinkEventActivitiBehaviour());
+      nestedActivity.setActivityBehavior(new IntermediateCatchLinkEventActivityBehaviour());
       parseIntermediateLinkEventCatchBehavior(intermediateEventElement, nestedActivity, linkEventDefinitionElement);
         
     } else {
