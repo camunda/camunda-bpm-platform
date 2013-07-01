@@ -150,37 +150,37 @@
               </foreach>
             </if>
             
-            <!-- queryVariableValue -->
-            <!-- PLEASE NOTE: If you change anything have a look into the Execution, the same query object is used there! -->
-            <if test="queryVariableValue != null" >
+            <!-- PLEASE NOTE: If you change anything have a look into the HistoricVariableInstance & HistoricProcessInstance & Execution, the same query object is used there! -->
+            <foreach collection="queryVariableValues" index="index" item="queryVariableValue">
+              and RES.NAME_= #{queryVariableValue.name}
               <if test="!queryVariableValue.type.equals('null')">
               <!-- When operator is not-equals or type of value is null, type doesn't matter! -->
                 and RES.TYPE_ = #{queryVariableValue.type}
               </if>
               <if test="queryVariableValue.textValue != null &amp;&amp; queryVariableValue.longValue == null &amp;&amp; queryVariableValue.doubleValue == null">
                 and RES.TEXT_
-              <choose>
-                <when test="queryVariableValue.operator.equals('LIKE')">LIKE</when>
-                <otherwise><include refid="executionVariableOperator" /></otherwise>
-              </choose>
+                <choose>
+                  <when test="queryVariableValue.operator.equals('LIKE')">LIKE</when>
+                  <otherwise><include refid="executionVariableOperator" /></otherwise>
+                </choose>
                 #{queryVariableValue.textValue}
               </if>
               <if test="queryVariableValue.textValue2 != null">
                 and RES.TEXT2_
-              <choose>
-                <when test="queryVariableValue.operator.equals('LIKE')">LIKE</when>
-                <otherwise><include refid="executionVariableOperator" /></otherwise>
-              </choose>
+                <choose>
+                  <when test="queryVariableValue.operator.equals('LIKE')">LIKE</when>
+                  <otherwise><include refid="executionVariableOperator" /></otherwise>
+                </choose>
                 #{queryVariableValue.textValue2}
               </if>
               <if test="queryVariableValue.longValue != null">
                 and RES.LONG_
-              <include refid="executionVariableOperator" />
+                <include refid="executionVariableOperator" />
                 #{queryVariableValue.longValue}
               </if>
               <if test="queryVariableValue.doubleValue != null">
                 and RES.DOUBLE_
-              <include refid="executionVariableOperator" />
+                <include refid="executionVariableOperator" />
                 #{queryVariableValue.doubleValue}
               </if>
               <!-- Null variable type -->
@@ -194,7 +194,7 @@
                 </otherwise>
               </choose>
               </if>
-            </if>
+            </foreach>
           </where>
     ) RES
   </sql>

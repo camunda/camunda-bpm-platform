@@ -15,18 +15,15 @@ package org.camunda.bpm.engine.impl;
 import java.io.Serializable;
 import java.util.List;
 
-import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
-import org.camunda.bpm.engine.impl.variable.VariableTypes;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
 
 /**
  * @author roman.smirnov
  */
-public class VariableInstanceQueryImpl extends AbstractQuery<VariableInstanceQuery, VariableInstance> implements VariableInstanceQuery, Serializable {
+public class VariableInstanceQueryImpl extends AbstractVariableQueryImpl<VariableInstanceQuery, VariableInstance> implements VariableInstanceQuery, Serializable {
 
   private static final long serialVersionUID = 7177849740680446490L;
   
@@ -36,7 +33,7 @@ public class VariableInstanceQueryImpl extends AbstractQuery<VariableInstanceQue
   protected String[] processInstanceIds;
   protected String[] taskIds;
   protected String[] activityInstanceIds;
-  protected QueryVariableValue queryVariableValue;
+//  protected QueryVariableValue queryVariableValue;
 
   public VariableInstanceQueryImpl() { }
   
@@ -54,27 +51,27 @@ public class VariableInstanceQueryImpl extends AbstractQuery<VariableInstanceQue
     return this;
   }
 
-  public VariableInstanceQuery variableValueEquals(String variableName, Object variableValue) {
-    if (variableName == null) {
-      throw new ProcessEngineException("variableName is null");
-    }
-    if (variableValue == null) {
-      throw new ProcessEngineException("variableValue is null");
-    }
-
-    this.variableName = variableName;
-    queryVariableValue = new QueryVariableValue(variableName, variableValue, QueryOperator.EQUALS, true);
-    return this;
-  }
-  
-  public VariableInstanceQuery variableValueEquals(Object variableValue) {
-    if (variableValue == null) {
-      throw new ProcessEngineException("variableValue is null");
-    }
-    
-    queryVariableValue = new QueryVariableValue(variableName, variableValue, QueryOperator.EQUALS, true);
-    return this;
-  }
+//  public VariableInstanceQuery variableValueEquals(String variableName, Object variableValue) {
+//    if (variableName == null) {
+//      throw new ProcessEngineException("variableName is null");
+//    }
+//    if (variableValue == null) {
+//      throw new ProcessEngineException("variableValue is null");
+//    }
+//
+//    this.variableName = variableName;
+//    queryVariableValue = new QueryVariableValue(variableName, variableValue, QueryOperator.EQUALS, true);
+//    return this;
+//  }
+//  
+//  public VariableInstanceQuery variableValueEquals(Object variableValue) {
+//    if (variableValue == null) {
+//      throw new ProcessEngineException("variableValue is null");
+//    }
+//    
+//    queryVariableValue = new QueryVariableValue(variableName, variableValue, QueryOperator.EQUALS, true);
+//    return this;
+//  }
 
   public VariableInstanceQuery executionIdIn(String... executionIds) {
     this.executionIds = executionIds;
@@ -115,12 +112,12 @@ public class VariableInstanceQueryImpl extends AbstractQuery<VariableInstanceQue
 
   // results ////////////////////////////////////////////////////  
   
-  protected void ensureVariablesInitialized() {
-    if (this.queryVariableValue != null) {
-      VariableTypes variableTypes = Context.getProcessEngineConfiguration().getVariableTypes();
-      queryVariableValue.initialize(variableTypes);
-    }
-  }
+//  protected void ensureVariablesInitialized() {
+//    if (this.queryVariableValue != null) {
+//      VariableTypes variableTypes = Context.getProcessEngineConfiguration().getVariableTypes();
+//      queryVariableValue.initialize(variableTypes);
+//    }
+//  }
   
   public long executeCount(CommandContext commandContext) {
     checkQueryOk();
@@ -164,8 +161,8 @@ public class VariableInstanceQueryImpl extends AbstractQuery<VariableInstanceQue
     return activityInstanceIds;
   }
 
-  public QueryVariableValue getQueryVariableValue() {
-    return queryVariableValue;
-  }
+//  public QueryVariableValue getQueryVariableValue() {
+//    return queryVariableValue;
+//  }
   
 }

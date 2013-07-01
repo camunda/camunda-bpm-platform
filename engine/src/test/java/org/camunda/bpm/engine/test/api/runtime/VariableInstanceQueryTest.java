@@ -159,15 +159,19 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
   
   @Test
   @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
-  public void testQueryByVariableValueEquals_String() {
+  public void testQueryByNameAndVariableValueNotEquals_String() {
     // given
-    Map<String, Object> variables = new HashMap<String, Object>();
-    variables.put("stringVar", "test");
-    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables);
+    Map<String, Object> variables1 = new HashMap<String, Object>();
+    variables1.put("stringVar", "test");
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables1);
+ 
+    Map<String, Object> variables2 = new HashMap<String, Object>();
+    variables2.put("stringVar", "test123");
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables2);
     
     // when
-    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().variableValueEquals("test");
-
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().variableValueNotEquals("stringVar", "test123");
+    
     // then
     List<VariableInstance> result = query.list();
     assertFalse(result.isEmpty());
@@ -178,6 +182,202 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
     VariableInstance var = result.get(0);
     assertEquals("stringVar", var.getName());
     assertEquals("test", var.getValue());
+  }
+  
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+  public void testQueryByNameAndVariableValueGreaterThan_String() {
+    // given
+    Map<String, Object> variables1 = new HashMap<String, Object>();
+    variables1.put("stringVar", "a");
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables1);
+
+    Map<String, Object> variables2 = new HashMap<String, Object>();
+    variables2.put("stringVar", "b");
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables2);
+    
+    Map<String, Object> variables3 = new HashMap<String, Object>();
+    variables3.put("stringVar", "c");
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables3);
+    
+    // when
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().variableValueGreaterThan("stringVar", "a");
+    
+    // then
+    List<VariableInstance> result = query.list();
+    assertFalse(result.isEmpty());
+    assertEquals(2, result.size());
+    
+    assertEquals(2, query.count());
+    
+    for (VariableInstance var : result) {
+      assertEquals("stringVar", var.getName());
+      if (var.getValue().equals("b")) {
+        assertEquals("b", var.getValue());  
+      } else if (var.getValue().equals("c")) {
+        assertEquals("c", var.getValue());
+      } else {
+        fail("A non expected value occured: " + var.getValue());
+      }
+    }
+  }
+  
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+  public void testQueryByNameAndVariableValueGreaterThanOrEqual_String() {
+    // given
+    Map<String, Object> variables1 = new HashMap<String, Object>();
+    variables1.put("stringVar", "a");
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables1);
+
+    Map<String, Object> variables2 = new HashMap<String, Object>();
+    variables2.put("stringVar", "b");
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables2);
+    
+    Map<String, Object> variables3 = new HashMap<String, Object>();
+    variables3.put("stringVar", "c");
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables3);
+    
+    // when
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().variableValueGreaterThanOrEqual("stringVar", "a");
+    
+    // then
+    List<VariableInstance> result = query.list();
+    assertFalse(result.isEmpty());
+    assertEquals(3, result.size());
+    
+    assertEquals(3, query.count());
+    
+    for (VariableInstance var : result) {
+      assertEquals("stringVar", var.getName());
+      if (var.getValue().equals("a")) {
+        assertEquals("a", var.getValue());  
+      } else if (var.getValue().equals("b")) {
+        assertEquals("b", var.getValue());  
+      } else if (var.getValue().equals("c")) {
+        assertEquals("c", var.getValue());
+      } else {
+        fail("A non expected value occured: " + var.getValue());
+      }
+    }
+  }
+  
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+  public void testQueryByNameAndVariableValueLessThan_String() {
+    // given
+    Map<String, Object> variables1 = new HashMap<String, Object>();
+    variables1.put("stringVar", "a");
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables1);
+
+    Map<String, Object> variables2 = new HashMap<String, Object>();
+    variables2.put("stringVar", "b");
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables2);
+    
+    Map<String, Object> variables3 = new HashMap<String, Object>();
+    variables3.put("stringVar", "c");
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables3);
+    
+    // when
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().variableValueLessThan("stringVar", "c");
+    
+    // then
+    List<VariableInstance> result = query.list();
+    assertFalse(result.isEmpty());
+    assertEquals(2, result.size());
+    
+    assertEquals(2, query.count());
+    
+    for (VariableInstance var : result) {
+      assertEquals("stringVar", var.getName());
+      if (var.getValue().equals("a")) {
+        assertEquals("a", var.getValue());  
+      } else if (var.getValue().equals("b")) {
+        assertEquals("b", var.getValue());
+      } else {
+        fail("A non expected value occured: " + var.getValue());
+      }
+    }
+  }
+  
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+  public void testQueryByNameAndVariableValueLessThanOrEqual_String() {
+    // given
+    Map<String, Object> variables1 = new HashMap<String, Object>();
+    variables1.put("stringVar", "a");
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables1);
+
+    Map<String, Object> variables2 = new HashMap<String, Object>();
+    variables2.put("stringVar", "b");
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables2);
+    
+    Map<String, Object> variables3 = new HashMap<String, Object>();
+    variables3.put("stringVar", "c");
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables3);
+    
+    // when
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().variableValueLessThanOrEqual("stringVar", "c");
+    
+    // then
+    List<VariableInstance> result = query.list();
+    assertFalse(result.isEmpty());
+    assertEquals(3, result.size());
+    
+    assertEquals(3, query.count());
+    
+    for (VariableInstance var : result) {
+      assertEquals("stringVar", var.getName());
+      if (var.getValue().equals("a")) {
+        assertEquals("a", var.getValue());  
+      } else if (var.getValue().equals("b")) {
+        assertEquals("b", var.getValue());  
+      } else if (var.getValue().equals("c")) {
+        assertEquals("c", var.getValue());
+      } else {
+        fail("A non expected value occured: " + var.getValue());
+      }
+    }
+  }
+  
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+  public void testQueryByNameAndVariableValueLike_String() {
+    // given
+    Map<String, Object> variables1 = new HashMap<String, Object>();
+    variables1.put("stringVar", "test123");
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables1);
+
+    Map<String, Object> variables2 = new HashMap<String, Object>();
+    variables2.put("stringVar", "test456");
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables2);
+    
+    Map<String, Object> variables3 = new HashMap<String, Object>();
+    variables3.put("stringVar", "test789");
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables3);
+    
+    // when
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().variableValueLike("stringVar", "test%");
+    
+    // then
+    List<VariableInstance> result = query.list();
+    assertFalse(result.isEmpty());
+    assertEquals(3, result.size());
+    
+    assertEquals(3, query.count());
+    
+    for (VariableInstance var : result) {
+      assertEquals("stringVar", var.getName());
+      if (var.getValue().equals("test123")) {
+        assertEquals("test123", var.getValue());  
+      } else if (var.getValue().equals("test456")) {
+        assertEquals("test456", var.getValue());  
+      } else if (var.getValue().equals("test789")) {
+        assertEquals("test789", var.getValue());
+      } else {
+        fail("A non expected value occured: " + var.getValue());
+      }
+    }
   }
   
   @Test
@@ -205,15 +405,19 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
   
   @Test
   @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
-  public void testQueryByVariableValueEquals_Integer() {
+  public void testQueryByNameAndVariableValueNotEquals_Integer() {
     // given
-    Map<String, Object> variables = new HashMap<String, Object>();
-    variables.put("intValue", (int) 1234);
-    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables);
+    Map<String, Object> variables1 = new HashMap<String, Object>();
+    variables1.put("intValue", (int) 1234);
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables1);
+    
+    Map<String, Object> variables2 = new HashMap<String, Object>();
+    variables2.put("intValue", (int) 5555);
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables2);
     
     // when
-    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().variableValueEquals((int) 1234);
-
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().variableValueNotEquals("intValue", (int) 5555);
+    
     // then
     List<VariableInstance> result = query.list();
     assertFalse(result.isEmpty());
@@ -224,6 +428,162 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
     VariableInstance var = result.get(0);
     assertEquals("intValue", var.getName());
     assertEquals(1234, var.getValue());
+  }
+  
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+  public void testQueryByNameAndVariableGreaterThan_Integer() {
+    // given
+    Map<String, Object> variables1 = new HashMap<String, Object>();
+    variables1.put("intValue", (int) 1234);
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables1);
+    
+    Map<String, Object> variables2 = new HashMap<String, Object>();
+    variables2.put("intValue", (int) 5555);
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables2);
+    
+    Map<String, Object> variables3 = new HashMap<String, Object>();
+    variables3.put("intValue", (int) 9876);
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables3);
+    
+    // when
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().variableValueGreaterThan("intValue", (int) 1234);
+    
+    // then
+    List<VariableInstance> result = query.list();
+    assertFalse(result.isEmpty());
+    assertEquals(2, result.size());
+    
+    assertEquals(2, query.count());
+    
+    for (VariableInstance var : result) {
+      assertEquals("intValue", var.getName());
+      if (var.getValue().equals(5555)) {
+        assertEquals(5555, var.getValue());  
+      } else if (var.getValue().equals(9876)) {
+        assertEquals(9876, var.getValue());  
+      } else {
+        fail("A non expected value occured: " + var.getValue());
+      }
+    }
+  }
+  
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+  public void testQueryByNameAndVariableGreaterThanAndEqual_Integer() {
+    // given
+    Map<String, Object> variables1 = new HashMap<String, Object>();
+    variables1.put("intValue", (int) 1234);
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables1);
+    
+    Map<String, Object> variables2 = new HashMap<String, Object>();
+    variables2.put("intValue", (int) 5555);
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables2);
+    
+    Map<String, Object> variables3 = new HashMap<String, Object>();
+    variables3.put("intValue", (int) 9876);
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables3);
+    
+    // when
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().variableValueGreaterThanOrEqual("intValue", (int) 1234);
+    
+    // then
+    List<VariableInstance> result = query.list();
+    assertFalse(result.isEmpty());
+    assertEquals(3, result.size());
+    
+    assertEquals(3, query.count());
+    
+    for (VariableInstance var : result) {
+      assertEquals("intValue", var.getName());
+      if (var.getValue().equals(1234)) {
+        assertEquals(1234, var.getValue()); 
+      } else if (var.getValue().equals(5555)) {
+        assertEquals(5555, var.getValue());  
+      } else if (var.getValue().equals(9876)) {
+        assertEquals(9876, var.getValue());  
+      } else {
+        fail("A non expected value occured: " + var.getValue());
+      }
+    }
+  }
+  
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+  public void testQueryByNameAndVariableLessThan_Integer() {
+    // given
+    Map<String, Object> variables1 = new HashMap<String, Object>();
+    variables1.put("intValue", (int) 1234);
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables1);
+    
+    Map<String, Object> variables2 = new HashMap<String, Object>();
+    variables2.put("intValue", (int) 5555);
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables2);
+    
+    Map<String, Object> variables3 = new HashMap<String, Object>();
+    variables3.put("intValue", (int) 9876);
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables3);
+    
+    // when
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().variableValueLessThan("intValue", (int) 9876);
+    
+    // then
+    List<VariableInstance> result = query.list();
+    assertFalse(result.isEmpty());
+    assertEquals(2, result.size());
+    
+    assertEquals(2, query.count());
+    
+    for (VariableInstance var : result) {
+      assertEquals("intValue", var.getName());
+      if (var.getValue().equals(5555)) {
+        assertEquals(5555, var.getValue());  
+      } else if (var.getValue().equals(1234)) {
+        assertEquals(1234, var.getValue());  
+      } else {
+        fail("A non expected value occured: " + var.getValue());
+      }
+    }
+  }
+  
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+  public void testQueryByNameAndVariableLessThanAndEqual_Integer() {
+    // given
+    Map<String, Object> variables1 = new HashMap<String, Object>();
+    variables1.put("intValue", (int) 1234);
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables1);
+    
+    Map<String, Object> variables2 = new HashMap<String, Object>();
+    variables2.put("intValue", (int) 5555);
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables2);
+    
+    Map<String, Object> variables3 = new HashMap<String, Object>();
+    variables3.put("intValue", (int) 9876);
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables3);
+    
+    // when
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().variableValueLessThanOrEqual("intValue", (int) 9876);
+    
+    // then
+    List<VariableInstance> result = query.list();
+    assertFalse(result.isEmpty());
+    assertEquals(3, result.size());
+    
+    assertEquals(3, query.count());
+    
+    for (VariableInstance var : result) {
+      assertEquals("intValue", var.getName());
+      if (var.getValue().equals(1234)) {
+        assertEquals(1234, var.getValue()); 
+      } else if (var.getValue().equals(5555)) {
+        assertEquals(5555, var.getValue());  
+      } else if (var.getValue().equals(9876)) {
+        assertEquals(9876, var.getValue());  
+      } else {
+        fail("A non expected value occured: " + var.getValue());
+      }
+    }
   }
   
   @Test
@@ -251,14 +611,18 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
  
   @Test
   @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
-  public void testQueryByVariableValueEquals_Long() {
+  public void testQueryByNameAndVariableValueNotEquals_Long() {
     // given
-    Map<String, Object> variables = new HashMap<String, Object>();
-    variables.put("longValue", 123456L);
-    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables);
+    Map<String, Object> variables1 = new HashMap<String, Object>();
+    variables1.put("longValue", 123456L);
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables1);
+    
+    Map<String, Object> variables2 = new HashMap<String, Object>();
+    variables2.put("longValue", 987654L);
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables2);
     
     // when
-    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().variableValueEquals(123456L);
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().variableValueNotEquals("longValue", 987654L);
     
     // then
     List<VariableInstance> result = query.list();
@@ -270,6 +634,162 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
     VariableInstance var = result.get(0);
     assertEquals("longValue", var.getName());
     assertEquals(123456L, var.getValue());
+  }
+  
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+  public void testQueryByNameAndVariableGreaterThan_Long() {
+    // given
+    Map<String, Object> variables1 = new HashMap<String, Object>();
+    variables1.put("longValue", 123456L);
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables1);
+    
+    Map<String, Object> variables2 = new HashMap<String, Object>();
+    variables2.put("longValue", 987654L);
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables2);
+    
+    Map<String, Object> variables3 = new HashMap<String, Object>();
+    variables3.put("longValue", 555555L);
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables3);
+    
+    // when
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().variableValueGreaterThan("longValue", 123456L);
+    
+    // then
+    List<VariableInstance> result = query.list();
+    assertFalse(result.isEmpty());
+    assertEquals(2, result.size());
+    
+    assertEquals(2, query.count());
+    
+    for (VariableInstance var : result) {
+      assertEquals("longValue", var.getName());
+      if (var.getValue().equals(555555L)) {
+        assertEquals(555555L, var.getValue());  
+      } else if (var.getValue().equals(987654L)) {
+        assertEquals(987654L, var.getValue());  
+      } else {
+        fail("A non expected value occured: " + var.getValue());
+      }
+    }
+  }
+  
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+  public void testQueryByNameAndVariableGreaterThanAndEqual_Long() {
+    // given
+    Map<String, Object> variables1 = new HashMap<String, Object>();
+    variables1.put("longValue", 123456L);
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables1);
+    
+    Map<String, Object> variables2 = new HashMap<String, Object>();
+    variables2.put("longValue", 987654L);
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables2);
+    
+    Map<String, Object> variables3 = new HashMap<String, Object>();
+    variables3.put("longValue", 555555L);
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables3);
+    
+    // when
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().variableValueGreaterThanOrEqual("longValue", 123456L);
+    
+    // then
+    List<VariableInstance> result = query.list();
+    assertFalse(result.isEmpty());
+    assertEquals(3, result.size());
+    
+    assertEquals(3, query.count());
+    
+    for (VariableInstance var : result) {
+      assertEquals("longValue", var.getName());
+      if (var.getValue().equals(123456L)) {
+        assertEquals(123456L, var.getValue()); 
+      } else if (var.getValue().equals(555555L)) {
+        assertEquals(555555L, var.getValue());  
+      } else if (var.getValue().equals(987654L)) {
+        assertEquals(987654L, var.getValue());  
+      } else {
+        fail("A non expected value occured: " + var.getValue());
+      }
+    }
+  }
+  
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+  public void testQueryByNameAndVariableLessThan_Long() {
+    // given
+    Map<String, Object> variables1 = new HashMap<String, Object>();
+    variables1.put("longValue", 123456L);
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables1);
+    
+    Map<String, Object> variables2 = new HashMap<String, Object>();
+    variables2.put("longValue", 987654L);
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables2);
+    
+    Map<String, Object> variables3 = new HashMap<String, Object>();
+    variables3.put("longValue", 555555L);
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables3);
+    
+    // when
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().variableValueLessThan("longValue", 987654L);
+    
+    // then
+    List<VariableInstance> result = query.list();
+    assertFalse(result.isEmpty());
+    assertEquals(2, result.size());
+    
+    assertEquals(2, query.count());
+    
+    for (VariableInstance var : result) {
+      assertEquals("longValue", var.getName());
+      if (var.getValue().equals(123456L)) {
+        assertEquals(123456L, var.getValue());  
+      } else if (var.getValue().equals(555555L)) {
+        assertEquals(555555L, var.getValue());  
+      } else {
+        fail("A non expected value occured: " + var.getValue());
+      }
+    }
+  }
+  
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+  public void testQueryByNameAndVariableLessThanAndEqual_Long() {
+    // given
+    Map<String, Object> variables1 = new HashMap<String, Object>();
+    variables1.put("longValue", 123456L);
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables1);
+    
+    Map<String, Object> variables2 = new HashMap<String, Object>();
+    variables2.put("longValue", 987654L);
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables2);
+    
+    Map<String, Object> variables3 = new HashMap<String, Object>();
+    variables3.put("longValue", 555555L);
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables3);
+    
+    // when
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().variableValueLessThanOrEqual("longValue", 987654L);
+    
+    // then
+    List<VariableInstance> result = query.list();
+    assertFalse(result.isEmpty());
+    assertEquals(3, result.size());
+    
+    assertEquals(3, query.count());
+    
+    for (VariableInstance var : result) {
+      assertEquals("longValue", var.getName());
+      if (var.getValue().equals(123456L)) {
+        assertEquals(123456L, var.getValue()); 
+      } else if (var.getValue().equals(555555L)) {
+        assertEquals(555555L, var.getValue());  
+      } else if (var.getValue().equals(987654L)) {
+        assertEquals(987654L, var.getValue());  
+      } else {
+        fail("A non expected value occured: " + var.getValue());
+      }
+    }
   }
   
   @Test
@@ -297,14 +817,18 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
   
   @Test
   @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
-  public void testQueryByVariableValueEquals_Double() {
+  public void testQueryByNameAndVariableValueNotEquals_Double() {
     // given
-    Map<String, Object> variables = new HashMap<String, Object>();
-    variables.put("doubleValue", 123.456);
-    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables);
+    Map<String, Object> variables1 = new HashMap<String, Object>();
+    variables1.put("doubleValue", 123.456);
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables1);
+    
+    Map<String, Object> variables2 = new HashMap<String, Object>();
+    variables2.put("doubleValue", 654.321);
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables2);
     
     // when
-    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().variableValueEquals(123.456);
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().variableValueNotEquals("doubleValue", 654.321);
     
     // then
     List<VariableInstance> result = query.list();
@@ -316,6 +840,162 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
     VariableInstance var = result.get(0);
     assertEquals("doubleValue", var.getName());
     assertEquals(123.456, var.getValue());
+  }
+  
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+  public void testQueryByNameAndVariableGreaterThan_Double() {
+    // given
+    Map<String, Object> variables1 = new HashMap<String, Object>();
+    variables1.put("doubleValue", 123.456);
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables1);
+    
+    Map<String, Object> variables2 = new HashMap<String, Object>();
+    variables2.put("doubleValue", 654.321);
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables2);
+    
+    Map<String, Object> variables3 = new HashMap<String, Object>();
+    variables3.put("doubleValue", 999.999);
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables3);
+    
+    // when
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().variableValueGreaterThan("doubleValue", 123.456);
+    
+    // then
+    List<VariableInstance> result = query.list();
+    assertFalse(result.isEmpty());
+    assertEquals(2, result.size());
+    
+    assertEquals(2, query.count());
+    
+    for (VariableInstance var : result) {
+      assertEquals("doubleValue", var.getName());
+      if (var.getValue().equals(654.321)) {
+        assertEquals(654.321, var.getValue());  
+      } else if (var.getValue().equals(999.999)) {
+        assertEquals(999.999, var.getValue());  
+      } else {
+        fail("A non expected value occured: " + var.getValue());
+      }
+    }
+  }
+  
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+  public void testQueryByNameAndVariableGreaterThanAndEqual_Double() {
+    // given
+    Map<String, Object> variables1 = new HashMap<String, Object>();
+    variables1.put("doubleValue", 123.456);
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables1);
+    
+    Map<String, Object> variables2 = new HashMap<String, Object>();
+    variables2.put("doubleValue", 654.321);
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables2);
+    
+    Map<String, Object> variables3 = new HashMap<String, Object>();
+    variables3.put("doubleValue", 999.999);
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables3);
+    
+    // when
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().variableValueGreaterThanOrEqual("doubleValue", 123.456);
+    
+    // then
+    List<VariableInstance> result = query.list();
+    assertFalse(result.isEmpty());
+    assertEquals(3, result.size());
+    
+    assertEquals(3, query.count());
+    
+    for (VariableInstance var : result) {
+      assertEquals("doubleValue", var.getName());
+      if (var.getValue().equals(123.456)) {
+        assertEquals(123.456, var.getValue()); 
+      } else if (var.getValue().equals(654.321)) {
+        assertEquals(654.321, var.getValue());  
+      } else if (var.getValue().equals(999.999)) {
+        assertEquals(999.999, var.getValue());  
+      } else {
+        fail("A non expected value occured: " + var.getValue());
+      }
+    }
+  }
+  
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+  public void testQueryByNameAndVariableLessThan_Double() {
+    // given
+    Map<String, Object> variables1 = new HashMap<String, Object>();
+    variables1.put("doubleValue", 123.456);
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables1);
+    
+    Map<String, Object> variables2 = new HashMap<String, Object>();
+    variables2.put("doubleValue", 654.321);
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables2);
+    
+    Map<String, Object> variables3 = new HashMap<String, Object>();
+    variables3.put("doubleValue", 999.999);
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables3);
+    
+    // when
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().variableValueLessThan("doubleValue", 999.999);
+    
+    // then
+    List<VariableInstance> result = query.list();
+    assertFalse(result.isEmpty());
+    assertEquals(2, result.size());
+    
+    assertEquals(2, query.count());
+    
+    for (VariableInstance var : result) {
+      assertEquals("doubleValue", var.getName());
+      if (var.getValue().equals(123.456)) {
+        assertEquals(123.456, var.getValue());  
+      } else if (var.getValue().equals(654.321)) {
+        assertEquals(654.321, var.getValue());  
+      } else {
+        fail("A non expected value occured: " + var.getValue());
+      }
+    }
+  }
+  
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+  public void testQueryByNameAndVariableLessThanAndEqual_Double() {
+    // given
+    Map<String, Object> variables1 = new HashMap<String, Object>();
+    variables1.put("doubleValue", 123.456);
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables1);
+    
+    Map<String, Object> variables2 = new HashMap<String, Object>();
+    variables2.put("doubleValue", 654.321);
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables2);
+    
+    Map<String, Object> variables3 = new HashMap<String, Object>();
+    variables3.put("doubleValue", 999.999);
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables3);
+    
+    // when
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().variableValueLessThanOrEqual("doubleValue", 999.999);
+    
+    // then
+    List<VariableInstance> result = query.list();
+    assertFalse(result.isEmpty());
+    assertEquals(3, result.size());
+    
+    assertEquals(3, query.count());
+    
+    for (VariableInstance var : result) {
+      assertEquals("doubleValue", var.getName());
+      if (var.getValue().equals(123.456)) {
+        assertEquals(123.456, var.getValue()); 
+      } else if (var.getValue().equals(654.321)) {
+        assertEquals(654.321, var.getValue());  
+      } else if (var.getValue().equals(999.999)) {
+        assertEquals(999.999, var.getValue());  
+      } else {
+        fail("A non expected value occured: " + var.getValue());
+      }
+    }
   }
   
   @Test
@@ -343,14 +1023,18 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
   
   @Test
   @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
-  public void testQueryByVariableValueEquals_Short() {
+  public void testQueryByVariableValueNotEquals_Short() {
     // given
-    Map<String, Object> variables = new HashMap<String, Object>();
-    variables.put("shortValue", (short) 123);
-    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables);
+    Map<String, Object> variables1 = new HashMap<String, Object>();
+    variables1.put("shortValue", (short) 123);
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables1);
+
+    Map<String, Object> variables2 = new HashMap<String, Object>();
+    variables2.put("shortValue", (short) 999);
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables2);
     
     // when
-    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().variableValueEquals((short) 123);
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().variableValueNotEquals("shortValue", (short) 999);
     
     // then
     List<VariableInstance> result = query.list();
@@ -366,6 +1050,162 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
   
   @Test
   @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+  public void testQueryByNameAndVariableGreaterThan_Short() {
+    // given
+    Map<String, Object> variables1 = new HashMap<String, Object>();
+    variables1.put("shortValue", (short) 123);
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables1);
+
+    Map<String, Object> variables2 = new HashMap<String, Object>();
+    variables2.put("shortValue", (short) 999);
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables2);
+    
+    Map<String, Object> variables3 = new HashMap<String, Object>();
+    variables3.put("shortValue", (short) 555);
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables3);
+    
+    // when
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().variableValueGreaterThan("shortValue", (short) 123);
+    
+    // then
+    List<VariableInstance> result = query.list();
+    assertFalse(result.isEmpty());
+    assertEquals(2, result.size());
+    
+    assertEquals(2, query.count());
+    
+    for (VariableInstance var : result) {
+      assertEquals("shortValue", var.getName());
+      if (var.getValue().equals((short) 555)) {
+        assertEquals((short) 555, var.getValue());  
+      } else if (var.getValue().equals((short) 999)) {
+        assertEquals((short) 999, var.getValue());  
+      } else {
+        fail("A non expected value occured: " + var.getValue());
+      }
+    }
+  }
+  
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+  public void testQueryByNameAndVariableGreaterThanAndEqual_Short() {
+    // given
+    Map<String, Object> variables1 = new HashMap<String, Object>();
+    variables1.put("shortValue", (short) 123);
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables1);
+
+    Map<String, Object> variables2 = new HashMap<String, Object>();
+    variables2.put("shortValue", (short) 999);
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables2);
+    
+    Map<String, Object> variables3 = new HashMap<String, Object>();
+    variables3.put("shortValue", (short) 555);
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables3);
+    
+    // when
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().variableValueGreaterThanOrEqual("shortValue", (short) 123);
+    
+    // then
+    List<VariableInstance> result = query.list();
+    assertFalse(result.isEmpty());
+    assertEquals(3, result.size());
+    
+    assertEquals(3, query.count());
+    
+    for (VariableInstance var : result) {
+      assertEquals("shortValue", var.getName());
+      if (var.getValue().equals((short) 123)) {
+        assertEquals((short) 123, var.getValue()); 
+      } else if (var.getValue().equals((short) 555)) {
+        assertEquals((short) 555, var.getValue());  
+      } else if (var.getValue().equals((short) 999)) {
+        assertEquals((short) 999, var.getValue());  
+      } else {
+        fail("A non expected value occured: " + var.getValue());
+      }
+    }
+  }
+  
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+  public void testQueryByNameAndVariableLessThan_Short() {
+    // given
+    Map<String, Object> variables1 = new HashMap<String, Object>();
+    variables1.put("shortValue", (short) 123);
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables1);
+
+    Map<String, Object> variables2 = new HashMap<String, Object>();
+    variables2.put("shortValue", (short) 999);
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables2);
+    
+    Map<String, Object> variables3 = new HashMap<String, Object>();
+    variables3.put("shortValue", (short) 555);
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables3);
+    
+    // when
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().variableValueLessThan("shortValue", (short) 999);
+    
+    // then
+    List<VariableInstance> result = query.list();
+    assertFalse(result.isEmpty());
+    assertEquals(2, result.size());
+    
+    assertEquals(2, query.count());
+    
+    for (VariableInstance var : result) {
+      assertEquals("shortValue", var.getName());
+      if (var.getValue().equals((short) 123)) {
+        assertEquals((short) 123, var.getValue());  
+      } else if (var.getValue().equals((short) 555)) {
+        assertEquals((short) 555, var.getValue());  
+      } else {
+        fail("A non expected value occured: " + var.getValue());
+      }
+    }
+  }
+  
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+  public void testQueryByNameAndVariableLessThanAndEqual_Short() {
+    // given
+    Map<String, Object> variables1 = new HashMap<String, Object>();
+    variables1.put("shortValue", (short) 123);
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables1);
+
+    Map<String, Object> variables2 = new HashMap<String, Object>();
+    variables2.put("shortValue", (short) 999);
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables2);
+    
+    Map<String, Object> variables3 = new HashMap<String, Object>();
+    variables3.put("shortValue", (short) 555);
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables3);
+    
+    // when
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().variableValueLessThanOrEqual("shortValue", (short) 999);
+    
+    // then
+    List<VariableInstance> result = query.list();
+    assertFalse(result.isEmpty());
+    assertEquals(3, result.size());
+    
+    assertEquals(3, query.count());
+    
+    for (VariableInstance var : result) {
+      assertEquals("shortValue", var.getName());
+      if (var.getValue().equals((short) 123)) {
+        assertEquals((short) 123, var.getValue()); 
+      } else if (var.getValue().equals((short) 555)) {
+        assertEquals((short) 555, var.getValue());  
+      } else if (var.getValue().equals((short) 999)) {
+        assertEquals((short) 999, var.getValue());  
+      } else {
+        fail("A non expected value occured: " + var.getValue());
+      }
+    }
+  }
+  
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
   public void testQueryByNameAndVariableValueEquals_Bytes() {
     // given
     byte[] bytes = "somebytes".getBytes();
@@ -375,27 +1215,6 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
     
     // when
     VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().variableValueEquals("bytesVar", bytes);
-    
-    // then
-    try {
-      query.list();
-      fail("A ProcessEngineException was expected: Variables of type ByteArray cannot be used to query.");
-    } catch (ProcessEngineException e) {
-      // expected exception
-    }
-  }
-  
-  @Test
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
-  public void testQueryByVariableValueEquals_Bytes() {
-    // given
-    byte[] bytes = "somebytes".getBytes();
-    Map<String, Object> variables = new HashMap<String, Object>();
-    variables.put("bytesVar", bytes);
-    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables);
-    
-    // when
-    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().variableValueEquals(bytes);
     
     // then
     try {
@@ -433,31 +1252,6 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
   
   @Test
   @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
-  public void testQueryByVariableValueEquals_Date() {
-    // given
-     Date now = new Date();
-    
-    Map<String, Object> variables = new HashMap<String, Object>();
-    variables.put("date", now);
-    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables);
-    
-    // when
-    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().variableValueEquals(now);
-    
-    // then
-    List<VariableInstance> result = query.list();
-    assertFalse(result.isEmpty());
-    assertEquals(1, result.size());
-    
-    assertEquals(1, query.count());
-    
-    VariableInstance var = result.get(0);
-    assertEquals("date", var.getName());
-    assertEquals(now, var.getValue());
-  }
-  
-  @Test
-  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
   public void testQueryByNameAndVariableValueEqualsWihtoutAnyResult() {
     // given
     Map<String, Object> variables = new HashMap<String, Object>();
@@ -476,20 +1270,64 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
   
   @Test
   @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
-  public void testQueryByVariableValueEqualsWihtoutAnyResult() {
+  public void testQueryByNameAndVariableValueEquals_NullValue() {
     // given
     Map<String, Object> variables = new HashMap<String, Object>();
-    variables.put("stringVar", "test");
+    variables.put("nullValue", null);
     runtimeService.startProcessInstanceByKey("oneTaskProcess", variables);
     
     // when
-    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().variableValueEquals("notFoundValue");
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().variableValueEquals("nullValue", null);
     
     // then
     List<VariableInstance> result = query.list();
-    assertTrue(result.isEmpty());
+    assertFalse(result.isEmpty());
+    assertEquals(1, result.size());
     
-    assertEquals(0, query.count());
+    assertEquals(1, query.count());
+    
+    VariableInstance var = result.get(0);
+    assertEquals("nullValue", var.getName());
+    assertEquals(null, var.getValue());
+  }
+  
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+  public void testQueryByVariableValueNotEquals_NullValue() {
+    // given
+    Map<String, Object> variables1 = new HashMap<String, Object>();
+    variables1.put("value", null);
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables1);
+
+    Map<String, Object> variables2 = new HashMap<String, Object>();
+    variables2.put("value", (short) 999);
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables2);
+
+    Map<String, Object> variables3 = new HashMap<String, Object>();
+    variables3.put("value", "abc");
+    runtimeService.startProcessInstanceByKey("oneTaskProcess", variables3);
+    
+    // when
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().variableValueNotEquals("value", null);
+    
+    // then
+    List<VariableInstance> result = query.list();
+    assertFalse(result.isEmpty());
+    assertEquals(2, result.size());
+    
+    assertEquals(2, query.count());
+    
+    for (VariableInstance var : result) {
+      assertEquals("value", var.getName());
+      if (var.getValue().equals((short) 999)) {
+        assertEquals((short) 999, var.getValue());
+      } else if (var.getValue().equals("abc")) {
+        assertEquals("abc", var.getValue());
+      } else {
+        fail("A non expected value occured: " + var.getValue());
+      }
+      
+    }
   }
   
   @Test

@@ -95,20 +95,7 @@ public abstract class AbstractVariableQueryImpl<T extends Query<?,?>, U> extends
     return (T)this;
   }
   
-  @SuppressWarnings("unchecked")
-  public T processVariableValueEquals(String variableName, Object variableValue) {
-    addVariable(variableName, variableValue, QueryOperator.EQUALS, false);
-    return (T)this;
-  }
-
-  @SuppressWarnings("unchecked")
-  public T processVariableValueNotEquals(String variableName, Object variableValue) {
-    addVariable(variableName, variableValue, QueryOperator.NOT_EQUALS, false);
-    return (T)this;
-  }
-
-  
-  private void addVariable(String name, Object value, QueryOperator operator, boolean processInstanceScope) {
+  protected void addVariable(String name, Object value, QueryOperator operator, boolean processInstanceScope) {
     if(name == null) {
       throw new ProcessEngineException("name is null");
     }
