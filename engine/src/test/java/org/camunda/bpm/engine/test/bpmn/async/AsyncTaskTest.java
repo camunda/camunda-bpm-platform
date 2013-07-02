@@ -17,8 +17,10 @@ import java.util.Date;
 import org.camunda.bpm.engine.impl.persistence.entity.MessageEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.Job;
+import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 
 /**
@@ -33,13 +35,21 @@ public class AsyncTaskTest extends PluggableProcessEngineTestCase {
   public void testAsycServiceNoListeners() {  
     INVOCATION = false;
     // start process 
-    runtimeService.startProcessInstanceByKey("asyncService");
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("asyncService");
+    
+    // now we have one transition instance below the process instance:
+    ActivityInstance activityInstance = runtimeService.getActivityInstance(processInstance.getId());
+    assertEquals(1, activityInstance.getChildTransitionInstances().length);
+    assertEquals(0, activityInstance.getChildActivityInstances().length);
+    
+    assertNotNull(activityInstance.getChildTransitionInstances()[0]);
+    
     // now there should be one job in the database:
     assertEquals(1, managementService.createJobQuery().count());
     // the service was not invoked:
     assertFalse(INVOCATION);
     
-    waitForJobExecutorToProcessAllJobs(10000L, 25L);
+    waitForJobExecutorToProcessAllJobs(10000L);
     
     // the service was invoked
     assertTrue(INVOCATION);    
@@ -54,7 +64,7 @@ public class AsyncTaskTest extends PluggableProcessEngineTestCase {
     // the listener was not yet invoked:
     assertNull(runtimeService.getVariable(pid, "listener"));
     
-    waitForJobExecutorToProcessAllJobs(10000L, 25L);
+    waitForJobExecutorToProcessAllJobs(10000L);
     
     assertEquals(0, managementService.createJobQuery().count());
   }
@@ -69,7 +79,7 @@ public class AsyncTaskTest extends PluggableProcessEngineTestCase {
     // the service was not invoked:
     assertFalse(INVOCATION);
     
-    waitForJobExecutorToProcessAllJobs(10000L, 25L);
+    waitForJobExecutorToProcessAllJobs(10000L);
     
     // the service was invoked
     assertTrue(INVOCATION);    
@@ -87,7 +97,7 @@ public class AsyncTaskTest extends PluggableProcessEngineTestCase {
     // the service was not invoked:
     assertFalse(INVOCATION);
     
-    waitForJobExecutorToProcessAllJobs(10000L, 25L);
+    waitForJobExecutorToProcessAllJobs(10000L);
     
     // the service was invoked
     assertTrue(INVOCATION);    
@@ -107,7 +117,7 @@ public class AsyncTaskTest extends PluggableProcessEngineTestCase {
       fail("the job must be a message");
     }      
     
-    waitForJobExecutorToProcessAllJobs(10000L, 25L);
+    waitForJobExecutorToProcessAllJobs(10000L);
     
     // the service failed: the execution is still sitting in the service task:
     Execution execution = runtimeService.createExecutionQuery().singleResult();
@@ -130,7 +140,7 @@ public class AsyncTaskTest extends PluggableProcessEngineTestCase {
     assertEquals(2, managementService.createJobQuery().count());          
     
     // let 'max-retires' on the message be reached
-    waitForJobExecutorToProcessAllJobs(10000L, 25L);
+    waitForJobExecutorToProcessAllJobs(10000L);
     
     // the service failed: the execution is still sitting in the service task:
     Execution execution = runtimeService.createExecutionQuery().singleResult();
@@ -142,7 +152,7 @@ public class AsyncTaskTest extends PluggableProcessEngineTestCase {
       
     // now the timer triggers:
     ClockUtil.setCurrentTime(new Date(System.currentTimeMillis()+10000));
-    waitForJobExecutorToProcessAllJobs(10000L, 25L);
+    waitForJobExecutorToProcessAllJobs(10000L);
     
     // and we are done:
     assertNull(runtimeService.createExecutionQuery().singleResult());    
@@ -161,7 +171,7 @@ public class AsyncTaskTest extends PluggableProcessEngineTestCase {
     // the service was not invoked:
     assertFalse(INVOCATION);
     
-    waitForJobExecutorToProcessAllJobs(10000L, 25L);
+    waitForJobExecutorToProcessAllJobs(10000L);
     
     // the service was invoked
     assertTrue(INVOCATION);    
@@ -177,7 +187,7 @@ public class AsyncTaskTest extends PluggableProcessEngineTestCase {
 
     assertEquals(1, managementService.createJobQuery().count());
     
-    waitForJobExecutorToProcessAllJobs(10000L, 25L);
+    waitForJobExecutorToProcessAllJobs(10000L);
     
     // both the timer and the message are cancelled
     assertEquals(0, managementService.createJobQuery().count());   
@@ -191,7 +201,7 @@ public class AsyncTaskTest extends PluggableProcessEngineTestCase {
     // now there should be one job in the database:
     assertEquals(1, managementService.createJobQuery().count());
        
-    waitForJobExecutorToProcessAllJobs(10000L, 25L);
+    waitForJobExecutorToProcessAllJobs(10000L);
     
     // the job is done
     assertEquals(0, managementService.createJobQuery().count()); 
@@ -207,7 +217,7 @@ public class AsyncTaskTest extends PluggableProcessEngineTestCase {
     String eid = runtimeService.createExecutionQuery().singleResult().getId();
     assertNull(runtimeService.getVariable(eid, "invoked"));  
     
-    waitForJobExecutorToProcessAllJobs(10000L, 25L);
+    waitForJobExecutorToProcessAllJobs(10000L);
     
     // and the job is done
     assertEquals(0, managementService.createJobQuery().count());
@@ -226,7 +236,7 @@ public class AsyncTaskTest extends PluggableProcessEngineTestCase {
     // now there should be one job in the database:
     assertEquals(1, managementService.createJobQuery().count());
    
-    waitForJobExecutorToProcessAllJobs(10000L, 25L);
+    waitForJobExecutorToProcessAllJobs(10000L);
     
     assertEquals(0, managementService.createJobQuery().count());
       
@@ -243,7 +253,7 @@ public class AsyncTaskTest extends PluggableProcessEngineTestCase {
     // there is no usertask
     assertNull(taskService.createTaskQuery().singleResult());
         
-    waitForJobExecutorToProcessAllJobs(10000L, 25L);
+    waitForJobExecutorToProcessAllJobs(10000L);
     // the listener was now invoked:
     assertNotNull(runtimeService.getVariable(pid, "listener"));
     

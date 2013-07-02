@@ -51,8 +51,13 @@ import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.task.IdentityLinkType;
 
 /**
+ * {@link Deployer} responsible to parse BPMN 2.0 XML files and create the proper
+ * {@link ProcessDefinitionEntity}s. Overwrite this class if you want to gain some control over
+ * this mechanism, e.g. setting different version numbers, or you want to use your own {@link BpmnParser}. 
+ * 
  * @author Tom Baeyens
  * @author Joram Barrez
+ * @author Bernd Ruecker
  */
 public class BpmnDeployer implements Deployer {
 
@@ -133,41 +138,20 @@ public class BpmnDeployer implements Deployer {
     DbSqlSession dbSqlSession = commandContext.getSession(DbSqlSession.class);
     for (ProcessDefinitionEntity processDefinition : processDefinitions) {
       if (deployment.isNew()) {
-        int processDefinitionVersion;
-
         ProcessDefinitionEntity latestProcessDefinition = processDefinitionManager.findLatestProcessDefinitionByKey(processDefinition.getKey());
-        if (latestProcessDefinition != null) {
-          processDefinitionVersion = latestProcessDefinition.getVersion() + 1;
-        } else {
-          processDefinitionVersion = 1;
-        }
-
-        processDefinition.setVersion(processDefinitionVersion);
-        processDefinition.setDeploymentId(deployment.getId());
-
-        String nextId = idGenerator.getNextId();
-        String processDefinitionId = processDefinition.getKey() 
-          + ":" + processDefinition.getVersion()
-          + ":" + nextId; // ACT-505
-                   
-        // ACT-115: maximum id length is 64 charcaters
-        if (processDefinitionId.length() > 64) {          
-          processDefinitionId = nextId; 
-        }
-        processDefinition.setId(processDefinitionId);
-
-        removeObsoleteTimers(processDefinition);
-        addTimerDeclarations(processDefinition);
         
-        removeObsoleteMessageEventSubscriptions(processDefinition, latestProcessDefinition);
-        addMessageEventSubscriptions(processDefinition);
+        processDefinition.setDeploymentId(deployment.getId());
+        processDefinition.setVersion(getVersionForNewProcessDefinition(deployment, processDefinition, latestProcessDefinition));
+        processDefinition.setId(getProcessDefinitionId(deployment, processDefinition));
+
+        adjustStartEventSubscriptions(processDefinition, latestProcessDefinition);
 
         dbSqlSession.insert(processDefinition);
         deploymentCache.addProcessDefinition(processDefinition);
         addAuthorizations(processDefinition);
-
         
       } else {
+    	  
         String deploymentId = deployment.getId();
         processDefinition.setDeploymentId(deploymentId);
         ProcessDefinitionEntity persistedProcessDefinition = processDefinitionManager.findProcessDefinitionByDeploymentAndKey(deploymentId, processDefinition.getKey());
@@ -177,14 +161,63 @@ public class BpmnDeployer implements Deployer {
         
         deploymentCache.addProcessDefinition(processDefinition);
         addAuthorizations(processDefinition);
-
+        
       }
 
+      // Add to cache
       Context
         .getProcessEngineConfiguration()
         .getDeploymentCache()
         .addProcessDefinition(processDefinition);
+      
+      // Add to deployment for further usage
+      deployment.addDeployedArtifact(processDefinition);
     }
+  }
+
+  /**
+   * adjust all event subscriptions responsible to start process instances
+   * (timer start event, message start event). The default behavior is to remove the old
+   * subscriptions and add new ones for the new deployed process definitions.
+   */
+  protected void adjustStartEventSubscriptions(ProcessDefinitionEntity newLatestProcessDefinition, ProcessDefinitionEntity oldLatestProcessDefinition) {
+	removeObsoleteTimers(newLatestProcessDefinition);
+	addTimerDeclarations(newLatestProcessDefinition);
+	
+	removeObsoleteMessageEventSubscriptions(newLatestProcessDefinition, oldLatestProcessDefinition);
+	addMessageEventSubscriptions(newLatestProcessDefinition);
+  }
+
+  /**
+   * create an id for the process definition. The default is to ask the {@link IdGenerator}
+   * and add the process definition key and version if that does not exceed 64 characters.
+   * You might want to hook in your own implemenation here.
+ * @param deployment 
+   */
+  protected String getProcessDefinitionId(DeploymentEntity deployment, ProcessDefinitionEntity processDefinition) {
+	String nextId = idGenerator.getNextId();
+	String processDefinitionId = processDefinition.getKey() 
+	  + ":" + processDefinition.getVersion()
+	  + ":" + nextId; // ACT-505
+	           
+	// ACT-115: maximum id length is 64 charcaters
+	if (processDefinitionId.length() > 64) {          
+	  processDefinitionId = nextId; 
+	}
+	return processDefinitionId;
+  }
+
+  /**
+   * per default we increment the latest process definition by one - but you 
+   * might want to hook in some own logic here, e.g. to align process definition
+   * versions with deployment / build versions.
+   */
+  protected int getVersionForNewProcessDefinition(DeploymentEntity deployment, ProcessDefinitionEntity newProcessDefinition, ProcessDefinitionEntity latestProcessDefinition) {
+	if (latestProcessDefinition != null) {
+	  return latestProcessDefinition.getVersion() + 1;
+	} else {
+	  return 1;
+	}
   }
 
   @SuppressWarnings("unchecked")

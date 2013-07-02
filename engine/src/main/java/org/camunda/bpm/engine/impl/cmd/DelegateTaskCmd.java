@@ -16,7 +16,6 @@ package org.camunda.bpm.engine.impl.cmd;
 import java.io.Serializable;
 
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
@@ -28,6 +27,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 public class DelegateTaskCmd implements Command<Object>, Serializable {  
 
   private static final long serialVersionUID = 1L;
+  
   protected String taskId;
   protected String userId;
   
@@ -35,23 +35,21 @@ public class DelegateTaskCmd implements Command<Object>, Serializable {
     this.taskId = taskId;
     this.userId = userId;
   }
-
+  
   public Object execute(CommandContext commandContext) {
     if(taskId == null) {
       throw new ProcessEngineException("taskId is null");
     }
     
-    TaskEntity task = Context
-      .getCommandContext()
+    TaskEntity task = commandContext
       .getTaskManager()
       .findTaskById(taskId);
     
     if (task == null) {
       throw new ProcessEngineException("Cannot find task with id " + taskId);
     }
-
-    task.delegate(userId);
     
+    task.delegate(userId);
     return null;
   }
 

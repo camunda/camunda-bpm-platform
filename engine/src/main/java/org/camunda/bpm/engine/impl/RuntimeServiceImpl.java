@@ -39,12 +39,14 @@ import org.camunda.bpm.engine.impl.cmd.StartProcessInstanceByMessageCmd;
 import org.camunda.bpm.engine.impl.cmd.StartProcessInstanceCmd;
 import org.camunda.bpm.engine.impl.cmd.SuspendProcessInstanceCmd;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
+import org.camunda.bpm.engine.runtime.EventSubscriptionQuery;
 import org.camunda.bpm.engine.runtime.ExecutionQuery;
 import org.camunda.bpm.engine.runtime.IncidentQuery;
 import org.camunda.bpm.engine.runtime.NativeExecutionQuery;
 import org.camunda.bpm.engine.runtime.NativeProcessInstanceQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
+import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
 
 /**
  * @author Tom Baeyens
@@ -102,6 +104,15 @@ public class RuntimeServiceImpl extends ServiceImpl implements RuntimeService {
   
   public IncidentQuery createIncidentQuery() {
     return new IncidentQueryImpl(commandExecutor);
+  }
+  
+
+  public EventSubscriptionQuery createEventSubscriptionQuery() {
+    return new EventSubscriptionQueryImpl(commandExecutor);
+  }
+  
+  public VariableInstanceQuery createVariableInstanceQuery() {
+    return new VariableInstanceQueryImpl(commandExecutor);
   }
   
   public Map<String, Object> getVariables(String executionId) {

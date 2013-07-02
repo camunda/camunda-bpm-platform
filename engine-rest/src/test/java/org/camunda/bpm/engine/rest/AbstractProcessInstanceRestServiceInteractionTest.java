@@ -81,25 +81,29 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
         .body("id", equalTo(EXAMPLE_ACTIVITY_INSTANCE_ID))
         .body("parentActivityInstanceId", equalTo(EXAMPLE_PARENT_ACTIVITY_INSTANCE_ID))
         .body("activityId", equalTo(EXAMPLE_ACTIVITY_ID))
-        .body("activityName", equalTo(EXAMPLE_ACTIVITY_NAME))
         .body("processInstanceId", equalTo(EXAMPLE_PROCESS_INSTANCE_ID))
         .body("processDefinitionId", equalTo(EXAMPLE_PROCESS_DEFINITION_ID))
-        .body("businessKey", equalTo(EXAMPLE_BUSINESS_KEY))
         .body("executionIds", not(empty()))
-        .body("executionIds[0]", equalTo(EXAMPLE_ACTIVITY_INSTANCE_ID))
-        .body("childInstances", not(empty()))
-        .body("childInstances[0].id", equalTo(CHILD_EXAMPLE_ACTIVITY_INSTANCE_ID))
-        .body("childInstances[0].parentActivityInstanceId", equalTo(CHILD_EXAMPLE_PARENT_ACTIVITY_INSTANCE_ID))
-        .body("childInstances[0].activityId", equalTo(CHILD_EXAMPLE_ACTIVITY_ID))
-        .body("childInstances[0].activityName", equalTo(CHILD_EXAMPLE_ACTIVITY_NAME))
-        .body("childInstances[0].processInstanceId", equalTo(CHILD_EXAMPLE_PROCESS_INSTANCE_ID))
-        .body("childInstances[0].processDefinitionId", equalTo(CHILD_EXAMPLE_PROCESS_DEFINITION_ID))
-        .body("childInstances[0].businessKey", equalTo(CHILD_EXAMPLE_BUSINESS_KEY))
-        .body("childInstances[0].executionIds", not(empty()))
-        .body("childInstances[0].childInstances", empty())
+        .body("executionIds[0]", equalTo(EXAMPLE_EXECUTION_ID))
+        .body("childActivityInstances", not(empty()))
+        .body("childActivityInstances[0].id", equalTo(CHILD_EXAMPLE_ACTIVITY_INSTANCE_ID))
+        .body("childActivityInstances[0].parentActivityInstanceId", equalTo(CHILD_EXAMPLE_PARENT_ACTIVITY_INSTANCE_ID))
+        .body("childActivityInstances[0].activityId", equalTo(CHILD_EXAMPLE_ACTIVITY_ID))
+        .body("childActivityInstances[0].processInstanceId", equalTo(CHILD_EXAMPLE_PROCESS_INSTANCE_ID))
+        .body("childActivityInstances[0].processDefinitionId", equalTo(CHILD_EXAMPLE_PROCESS_DEFINITION_ID))
+        .body("childActivityInstances[0].executionIds", not(empty()))
+        .body("childActivityInstances[0].childActivityInstances", empty())
+        .body("childActivityInstances[0].childTransitionInstances", empty())
+        .body("childTransitionInstances", not(empty()))
+        .body("childTransitionInstances[0].id", equalTo(CHILD_EXAMPLE_ACTIVITY_INSTANCE_ID))
+        .body("childTransitionInstances[0].parentActivityInstanceId", equalTo(CHILD_EXAMPLE_PARENT_ACTIVITY_INSTANCE_ID))
+        .body("childTransitionInstances[0].targetActivityId", equalTo(CHILD_EXAMPLE_ACTIVITY_ID))
+        .body("childTransitionInstances[0].processInstanceId", equalTo(CHILD_EXAMPLE_PROCESS_INSTANCE_ID))
+        .body("childTransitionInstances[0].processDefinitionId", equalTo(CHILD_EXAMPLE_PROCESS_DEFINITION_ID))
+        .body("childTransitionInstances[0].executionId", equalTo(EXAMPLE_EXECUTION_ID))
         .when().get(PROCESS_INSTANCE_ACTIVIY_INSTANCES_URL);
     
-    Assert.assertEquals("Should return exactly nine properties", 9, response.jsonPath().getMap("").size());
+    Assert.assertEquals("Should return exactly nine properties", 8, response.jsonPath().getMap("").size());
   }
   
   @Test

@@ -1,35 +1,27 @@
-define(["bpmn/Transformer", "bpmn/Renderer", "dojo/request", "dojo/Deferred", "dojo/query", "dojo/_base/array", "dojo/dom-class", "dojo/dom-construct"], function (Transformer, Renderer, request, Deferred, query, array, domClass, domConstruct) {
-  function Bpmn() {
-  };
+define(['jquery', 'bpmn/Transformer', 'bpmn/Renderer'], function ($, Transformer, Renderer) {
+
+  function Bpmn() { }
 
   Bpmn.prototype.renderUrl  = function (url, options) {
-    var deferred = new Deferred();
-    var promise = request(url);
+
+    var deferred = jQuery.Deferred();
     var self = this;
 
-    promise.then(
-      function (bpmnXml) {
-        var renderer = self.render(bpmnXml, options);
-        self.bpmnXml = bpmnXml;
-        deferred.resolve(self);
-      },
-      function (error) {
-        throw error;
-      }
-    );
+    $.get(url).done(function(bpmnXml) {
+      deferred.resolve(self.render(bpmnXml, options));
+    }).fail(function(error) {
+      deferred.reject(error);
+    });
 
     return deferred;
   };
-
-  Bpmn.prototype.render = function(bpmnXml, options) {
-    var processDefinition = new Transformer().transform(bpmnXml);
-
-    var definitionRenderer = new Renderer(processDefinition);
+  
+  Bpmn.prototype.renderDiagram = function(diagram, options) {
+    var definitionRenderer = new Renderer(diagram);
     definitionRenderer.render(options);
 
     this.definitionRenderer = definitionRenderer;
-    this.processDefinitions = processDefinition;
-    this.bpmnXml = bpmnXml;
+    this.processDefinitions = diagram;
     this.options = options;
 
     // zoom the diagram to suite the bounds specified on options if any;
@@ -47,7 +39,14 @@ define(["bpmn/Transformer", "bpmn/Renderer", "dojo/request", "dojo/Deferred", "d
     this.zoom(scale);
 
     return this;
-  },
+  };
+  
+  Bpmn.prototype.render = function(bpmnXml, options) {
+    var processDefinition = new Transformer().transform(bpmnXml);
+    this.bpmnXml = bpmnXml;
+    this.renderDiagram(processDefinition, options);
+    return this;
+  };
 
   Bpmn.prototype.zoom = function (factor) {
     var transform = this.definitionRenderer.gfxGroup.getTransform();
@@ -64,7 +63,7 @@ define(["bpmn/Transformer", "bpmn/Renderer", "dojo/request", "dojo/Deferred", "d
     var currentDimension = this.definitionRenderer.getSurface().getDimensions();
     this.definitionRenderer.getSurface().setDimensions(+currentDimension.width/xx * factor, +currentDimension.height/xx * factor);
 
-    array.forEach(query(".bpmnElement"), function(element) {
+    $.each(this.getOverlays(), function(i, element) {
       element.style.left = element.style.left.split("px")[0]/xx * factor + "px";
       element.style.top = element.style.top.split("px")[0]/yy * factor + "px";
       element.style.width = element.style.width.split("px")[0]/xx * factor + "px";
@@ -74,31 +73,86 @@ define(["bpmn/Transformer", "bpmn/Renderer", "dojo/request", "dojo/Deferred", "d
     return this;
   };
 
-  Bpmn.prototype.annotate = function (id, innerHTML, classesArray) {
-    var element = query(".bpmnElement" + "#"+id)[0];
-    if (!element) {
-      return;
+  Bpmn.prototype.getOverlays = function() {
+    return $("#" + this.options.diagramElement + " .bpmnElement");
+  };
+
+  Bpmn.prototype.getOverlay = function(id) {
+    return $("#" + id);
+  };
+
+  Bpmn.prototype.annotation = function (id) {
+    var element = this.getOverlay(id);
+    if (!element.length) {
+      throw new Error("Element " + id + " does not exist.");
     }
 
-    element.innerHTML = innerHTML;
+    return {
+      /**
+       * adds child annotation div bpmn element div
+       * @param innerHTML the inner html of the new annotation
+       * @param classesArray classes of the new annotation
+       * @returns the DOM element of the new annoation
+       */
+      addDiv : function (innerHTML, classesArray) {
+        return $("<div></div>")
+                  .html(innerHTML)
+                  .addClass((classesArray || []).join(" "))
+                  .appendTo(element);
+      },
 
-    domClass.add(element, (classesArray || []).join(" "));
+      /**
+       * sets the html of the bpmn element div
+       * @param html
+       * @returns the annotation builder object
+       */
+      setHtml : function (html) {
+        element.html(html);
+        return this;
+      },
+      /**
+       * adds classes to the bpmn element div
+       * @param classesArray
+       * @returns {*}
+       */
+      addClasses : function (classesArray) {
+        element.addClass((classesArray || []).join(" "));
+        return this;
+      },
+
+      removeClasses : function (classesArray) {
+        element.removeClass((classesArray || []).join(" "));
+        return this;
+      }
+    };
+  };
+
+  /**
+   * @deprecated use Bpmn.prototype.annotation instead
+   */
+  Bpmn.prototype.annotate = function (id, innerHTML, classesArray) {
+    var element = this.getOverlay(id);
+
+    element
+      .html(innerHTML)
+      .addClass((classesArray || []).join(" "));
+
+    return element;
   };
 
   Bpmn.prototype.clearAnnotations = function (id, classesArray) {
-    var element = query(".bpmnElement" + "#"+id)[0];
-    if (!element) {
-      return;
-    }
+    var element = this.getOverlay(id);
 
-    element.innerHTML = "";
+    element
+      .empty()
+      .removeClass((classesArray || []).join(" "));
 
-    domClass.remove(element, classesArray.join(" "));
+    return element;
   };
 
   Bpmn.prototype.clear = function () {
     this.definitionRenderer.gfxGroup.destroy();
-    domConstruct.empty(query("#"+this.options.diagramElement)[0]);
+    $("#"+this.options.diagramElement).empty();
   };
 
   return Bpmn;

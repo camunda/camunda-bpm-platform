@@ -12,7 +12,6 @@
  */
 package org.camunda.bpm.engine.impl.persistence.entity;
 
-import org.camunda.bpm.engine.ProcessEngineException;
 
 /**
  * Contains a predefined set of states for process definitions and process instances
@@ -69,22 +68,4 @@ public interface SuspensionState {
       return name;
     }
   }
-  
-  /////////////////////////////////////////// helper class
-  
-  public static class SuspensionStateUtil{
-    public static void setSuspensionState(ProcessDefinitionEntity processDefinitionEntity, SuspensionState state) {
-      if(processDefinitionEntity.getSuspensionState() == state.getStateCode()) {
-        throw new ProcessEngineException("Cannot set suspension state '"+state+"' for "+processDefinitionEntity+"': already in state '"+state+"'.");
-      }
-      processDefinitionEntity.setSuspensionState(state.getStateCode());
-    }   
-    public static void setSuspensionState(ExecutionEntity executionEntity, SuspensionState state) {
-      if(executionEntity.getSuspensionState() == state.getStateCode()) {
-        throw new ProcessEngineException("Cannot set suspension state '"+state+"' for "+executionEntity+"': already in state '"+state+"'.");
-      }
-      executionEntity.setSuspensionState(state.getStateCode());
-    }   
-  }
-  
 }

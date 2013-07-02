@@ -40,6 +40,7 @@ import org.camunda.bpm.engine.test.Deployment;
 
 /**
  * @author Joram Barrez
+ * @author Bernd Ruecker
  */
 public class MultiInstanceTest extends PluggableProcessEngineTestCase {
   
@@ -50,9 +51,9 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
     String procId = processInstance.getId();
     
     // now there is now 1 activity instance below the pi:
-    List<ActivityInstance> childInstances = runtimeService.getActivityInstance(processInstance.getId()).getChildInstances();
-    assertEquals(1, childInstances.size());
-    ActivityInstance firstActInstance = childInstances.get(0);
+    ActivityInstance[] childInstances = runtimeService.getActivityInstance(processInstance.getId()).getChildActivityInstances();
+    assertEquals(1, childInstances.length);
+    ActivityInstance firstActInstance = childInstances[0];
     assertEquals(processInstance.getId(), firstActInstance.getParentActivityInstanceId());
     
     Task task = taskService.createTaskQuery().singleResult();
@@ -60,18 +61,18 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
     assertEquals("kermit_0", task.getAssignee());
     taskService.complete(task.getId());
     
-    childInstances = runtimeService.getActivityInstance(processInstance.getId()).getChildInstances();
-    assertEquals(1, childInstances.size());
-    assertFalse(childInstances.get(0).getId().equals(firstActInstance.getId()));
+    childInstances = runtimeService.getActivityInstance(processInstance.getId()).getChildActivityInstances();
+    assertEquals(1, childInstances.length);
+    assertFalse(childInstances[0].getId().equals(firstActInstance.getId()));
     
     task = taskService.createTaskQuery().singleResult();
     assertEquals("My Task", task.getName());
     assertEquals("kermit_1", task.getAssignee());
     taskService.complete(task.getId());
     
-    childInstances = runtimeService.getActivityInstance(processInstance.getId()).getChildInstances();
-    assertEquals(1, childInstances.size());
-    assertFalse(childInstances.get(0).getId().equals(firstActInstance.getId()));
+    childInstances = runtimeService.getActivityInstance(processInstance.getId()).getChildActivityInstances();
+    assertEquals(1, childInstances.length);
+    assertFalse(childInstances[0].getId().equals(firstActInstance.getId()));
     
     task = taskService.createTaskQuery().singleResult();
     assertEquals("My Task", task.getName());
@@ -174,18 +175,18 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
     assertEquals("My Task 2", tasks.get(2).getName());
     
     ActivityInstance processInstance = runtimeService.getActivityInstance(procId);
-    assertEquals(3, processInstance.getChildInstances().size());
+    assertEquals(3, processInstance.getChildActivityInstances().length);
     
     taskService.complete(tasks.get(0).getId());
     
     processInstance = runtimeService.getActivityInstance(procId);
-    // there are still 3 activity instances since they are not joined yet!
-    assertEquals(3, processInstance.getChildInstances().size());
+    
+    assertEquals(2, processInstance.getChildActivityInstances().length);
     
     taskService.complete(tasks.get(1).getId());
     
     processInstance = runtimeService.getActivityInstance(procId);
-    assertEquals(3, processInstance.getChildInstances().size());
+    assertEquals(1, processInstance.getChildActivityInstances().length);
     
     taskService.complete(tasks.get(2).getId());
     assertProcessEnded(procId); 
@@ -271,7 +272,26 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
     assertEquals(0, taskService.createTaskQuery().count());
     assertProcessEnded(procId);
   }
-  
+
+  @Deployment(resources="org/camunda/bpm/engine/test/bpmn/multiinstance/MultiInstanceTest.testParallelUserTasksBasedOnCollection.bpmn20.xml")
+  public void testEmptyCollectionInMI() {
+    List<String> assigneeList = new ArrayList<String>();
+    String procId = runtimeService.startProcessInstanceByKey("miParallelUserTasksBasedOnCollection",
+          CollectionUtil.singletonMap("assigneeList", assigneeList)).getId();
+    
+    assertEquals(0, taskService.createTaskQuery().count());
+    assertProcessEnded(procId);
+    
+    if (processEngineConfiguration.getHistoryLevel() > ProcessEngineConfigurationImpl.HISTORYLEVEL_NONE) {
+      List<HistoricActivityInstance> activities = historyService.createHistoricActivityInstanceQuery().processInstanceId(procId).orderByActivityId().asc().list();
+      assertEquals(3, activities.size());
+      // note that the multiple instance task is mentioned in the history once 
+      assertEquals("miTasks", activities.get(0).getActivityId());
+      assertEquals("theEnd", activities.get(1).getActivityId());
+      assertEquals("theStart", activities.get(2).getActivityId());
+    }
+  }
+
   @Deployment
   public void testParallelUserTasksCustomExtensions() {
     Map<String, Object> vars = new HashMap<String, Object>();

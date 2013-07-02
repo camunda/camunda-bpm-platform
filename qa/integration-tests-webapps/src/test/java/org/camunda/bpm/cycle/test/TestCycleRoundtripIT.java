@@ -12,6 +12,7 @@ import javax.ws.rs.core.Response.Status;
 
 import org.junit.Assert;
 
+import org.camunda.bpm.TestProperties;
 import org.camunda.bpm.cycle.connector.Connector;
 import org.camunda.bpm.cycle.connector.ConnectorLoginMode;
 import org.camunda.bpm.cycle.connector.ConnectorNode;
@@ -45,11 +46,6 @@ public class TestCycleRoundtripIT extends AbstractCycleIT {
   private static final File TARGET_DIRECTORY = new File("target/cycle-repository");
   private static final String TMP_DIR_BASE = "cycle-integration-test";
 
-  // signavio connector configuration
-  private static final String SIGNAVIO_BASE_URL = "http://vm2.camunda.com:8080";
-  private static final String SIGNAVIO_GLOBAL_USER = "test@camunda.com";
-  private static final String SIGNAVIO_GLOBAL_PWD = "testtest";
-
   // svn connector configuration
   private static final File SVN_DIRECTORY = new File("target/svn-repository");
 
@@ -71,6 +67,7 @@ public class TestCycleRoundtripIT extends AbstractCycleIT {
 
   @Parameters
   public static List<Object[]> data() throws IOException, SVNException {
+    TestProperties testProperties = new TestProperties(48080);
     ConnectorConfiguration vfsConnectorConfiguration = new ConnectorConfiguration();
     vfsConnectorConfiguration.setConnectorName("FileSystemConnector");
     vfsConnectorConfiguration.setName("FileSystemConnector");
@@ -82,9 +79,9 @@ public class TestCycleRoundtripIT extends AbstractCycleIT {
     signavioConnectorConfiguration.setConnectorName("SignavioConnector");
     signavioConnectorConfiguration.setName("SignavioConnector");
     signavioConnectorConfiguration.setLoginMode(ConnectorLoginMode.GLOBAL);
-    signavioConnectorConfiguration.setGlobalUser(SIGNAVIO_GLOBAL_USER);
-    signavioConnectorConfiguration.setGlobalPassword(SIGNAVIO_GLOBAL_PWD);
-    signavioConnectorConfiguration.getProperties().put(SignavioConnector.CONFIG_KEY_SIGNAVIO_BASE_URL, SIGNAVIO_BASE_URL);
+    signavioConnectorConfiguration.setGlobalUser(testProperties.getStringProperty("SIGNAVIO_GLOBAL_USER", null));
+    signavioConnectorConfiguration.setGlobalPassword(testProperties.getStringProperty("SIGNAVIO_GLOBAL_PWD", null));
+    signavioConnectorConfiguration.getProperties().put(SignavioConnector.CONFIG_KEY_SIGNAVIO_BASE_URL, testProperties.getStringProperty("SIGNAVIO_BASE_URL", null));
     signavioConnectorConfiguration.setConnectorClass(SignavioConnector.class.getName());
 
     ConnectorConfiguration svnConnectorConfiguration = new ConnectorConfiguration();

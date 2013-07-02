@@ -16,7 +16,7 @@ import static org.fest.assertions.Assertions.assertThat;
 
 import java.util.List;
 
-import org.camunda.bpm.cockpit.plugin.base.dto.IncidentDto;
+import org.camunda.bpm.cockpit.plugin.base.dto.IncidentStatisticsDto;
 import org.camunda.bpm.cockpit.plugin.base.dto.ProcessInstanceDto;
 import org.camunda.bpm.cockpit.plugin.base.resources.ProcessInstanceResource;
 import org.camunda.bpm.cockpit.plugin.test.AbstractCockpitPluginTest;
@@ -68,7 +68,7 @@ public class ProcessInstancesQueryTest extends AbstractCockpitPluginTest {
   public void testQuery() {
     startProcessInstances("userTaskProcess", 10);
 
-    helper.waitForJobExecutorToProcessAllJobs(15000, 500);
+    helper.waitForJobExecutorToProcessAllJobs(15000);
 
     String processDefinitionId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
 
@@ -84,7 +84,7 @@ public class ProcessInstancesQueryTest extends AbstractCockpitPluginTest {
   public void testQueryPagination() {
     startProcessInstances("userTaskProcess", 10);
 
-    helper.waitForJobExecutorToProcessAllJobs(15000, 500);
+    helper.waitForJobExecutorToProcessAllJobs(15000);
 
     String processDefinitionId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
 
@@ -107,7 +107,7 @@ public class ProcessInstancesQueryTest extends AbstractCockpitPluginTest {
   public void testQueryWithException() {
     startProcessInstances("userTaskProcess", 1);
 
-    helper.waitForJobExecutorToProcessAllJobs(15000, 500);
+    helper.waitForJobExecutorToProcessAllJobs(15000);
 
     String processDefinitionId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
 
@@ -134,7 +134,7 @@ public class ProcessInstancesQueryTest extends AbstractCockpitPluginTest {
   public void testQueryWithoutAnyIncident() {
     startProcessInstances("userTaskProcess", 1);
 
-    helper.waitForJobExecutorToProcessAllJobs(15000, 500);
+    helper.waitForJobExecutorToProcessAllJobs(15000);
 
     String processDefinitionId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
 
@@ -143,7 +143,7 @@ public class ProcessInstancesQueryTest extends AbstractCockpitPluginTest {
     assertThat(result).isNotEmpty();
     assertThat(result).hasSize(1);
 
-    List<IncidentDto> incidents = result.get(0).getIncidents();
+    List<IncidentStatisticsDto> incidents = result.get(0).getIncidents();
 
     assertThat(incidents).isEmpty();
   }
@@ -155,7 +155,7 @@ public class ProcessInstancesQueryTest extends AbstractCockpitPluginTest {
   public void testQueryWithContainingIncidents() {
     startProcessInstances("FailingProcess", 1);
 
-    helper.waitForJobExecutorToProcessAllJobs(15000, 500);
+    helper.waitForJobExecutorToProcessAllJobs(15000);
 
     String processDefinitionId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
 
@@ -164,12 +164,12 @@ public class ProcessInstancesQueryTest extends AbstractCockpitPluginTest {
     assertThat(result).isNotEmpty();
     assertThat(result).hasSize(1);
 
-    List<IncidentDto> incidents = result.get(0).getIncidents();
+    List<IncidentStatisticsDto> incidents = result.get(0).getIncidents();
 
     assertThat(incidents).isNotEmpty();
     assertThat(incidents).hasSize(1);
 
-    IncidentDto incident = incidents.get(0);
+    IncidentStatisticsDto incident = incidents.get(0);
 
     assertThat(incident.getIncidentType()).isEqualTo("failedJob");
     assertThat(incident.getIncidentCount()).isEqualTo(1);
@@ -182,7 +182,7 @@ public class ProcessInstancesQueryTest extends AbstractCockpitPluginTest {
   public void testQueryWithMoreThanOneIncident() {
     startProcessInstances("processWithTwoParallelFailingServices", 1);
 
-    helper.waitForJobExecutorToProcessAllJobs(15000, 500);
+    helper.waitForJobExecutorToProcessAllJobs(15000);
 
     String processDefinitionId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
 
@@ -191,12 +191,12 @@ public class ProcessInstancesQueryTest extends AbstractCockpitPluginTest {
     assertThat(result).isNotEmpty();
     assertThat(result).hasSize(1);
 
-    List<IncidentDto> incidents = result.get(0).getIncidents();
+    List<IncidentStatisticsDto> incidents = result.get(0).getIncidents();
 
     assertThat(incidents).isNotEmpty();
     assertThat(incidents).hasSize(3);
 
-    for (IncidentDto incident : incidents) {
+    for (IncidentStatisticsDto incident : incidents) {
       String incidentType = incident.getIncidentType();
       assertThat(incidentType).isNotNull();
 
@@ -222,7 +222,7 @@ public class ProcessInstancesQueryTest extends AbstractCockpitPluginTest {
   public void testNestedIncidents() {
     startProcessInstances("NestedCallActivity", 1);
 
-    helper.waitForJobExecutorToProcessAllJobs(15000, 500);
+    helper.waitForJobExecutorToProcessAllJobs(15000);
 
     String nestedCallActivityId = repositoryService
         .createProcessDefinitionQuery()
@@ -246,11 +246,11 @@ public class ProcessInstancesQueryTest extends AbstractCockpitPluginTest {
     assertThat(nestedCallActivityInstances).isNotEmpty();
     assertThat(nestedCallActivityInstances).hasSize(1);
 
-    List<IncidentDto> nestedCallActivityIncidents = nestedCallActivityInstances.get(0).getIncidents();
+    List<IncidentStatisticsDto> nestedCallActivityIncidents = nestedCallActivityInstances.get(0).getIncidents();
     assertThat(nestedCallActivityIncidents).isNotEmpty();
     assertThat(nestedCallActivityIncidents).hasSize(1);
 
-    IncidentDto nestedCallActivityIncident = nestedCallActivityIncidents.get(0);
+    IncidentStatisticsDto nestedCallActivityIncident = nestedCallActivityIncidents.get(0);
     assertThat(nestedCallActivityIncident.getIncidentType()).isEqualTo("failedJob");
     assertThat(nestedCallActivityIncident.getIncidentCount()).isEqualTo(1);
 
@@ -258,11 +258,11 @@ public class ProcessInstancesQueryTest extends AbstractCockpitPluginTest {
     assertThat(callActivityInstances).isNotEmpty();
     assertThat(callActivityInstances).hasSize(1);
 
-    List<IncidentDto> callActivityIncidents = callActivityInstances.get(0).getIncidents();
+    List<IncidentStatisticsDto> callActivityIncidents = callActivityInstances.get(0).getIncidents();
     assertThat(callActivityIncidents).isNotEmpty();
     assertThat(callActivityIncidents).hasSize(1);
 
-    IncidentDto callActivityIncident = callActivityIncidents.get(0);
+    IncidentStatisticsDto callActivityIncident = callActivityIncidents.get(0);
     assertThat(callActivityIncident.getIncidentType()).isEqualTo("failedJob");
     assertThat(callActivityIncident.getIncidentCount()).isEqualTo(1);
 
@@ -270,11 +270,11 @@ public class ProcessInstancesQueryTest extends AbstractCockpitPluginTest {
     assertThat(failingProcessInstances).isNotEmpty();
     assertThat(failingProcessInstances).hasSize(1);
 
-    List<IncidentDto> failingProcessIncidents = failingProcessInstances.get(0).getIncidents();
+    List<IncidentStatisticsDto> failingProcessIncidents = failingProcessInstances.get(0).getIncidents();
     assertThat(failingProcessIncidents).isNotEmpty();
     assertThat(failingProcessIncidents).hasSize(1);
 
-    IncidentDto failingProcessIncident = failingProcessIncidents.get(0);
+    IncidentStatisticsDto failingProcessIncident = failingProcessIncidents.get(0);
     assertThat(failingProcessIncident.getIncidentType()).isEqualTo("failedJob");
     assertThat(failingProcessIncident.getIncidentCount()).isEqualTo(1);
   }

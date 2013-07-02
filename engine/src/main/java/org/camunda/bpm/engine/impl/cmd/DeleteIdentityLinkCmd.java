@@ -16,7 +16,6 @@ package org.camunda.bpm.engine.impl.cmd;
 import java.io.Serializable;
 
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -31,18 +30,19 @@ import org.camunda.bpm.engine.task.IdentityLinkType;
 /**
  * @author Tom Baeyens
  * @author Falko Menge
+ * @author Joram Barrez
  */
-public class DeleteIdentityLinkCmd implements Command<Object>, Serializable {
+public class DeleteIdentityLinkCmd implements Command<Void>, Serializable {
 
   private static final long serialVersionUID = 1L;
 
-  protected String taskId;
-  
   protected String userId;
   
   protected String groupId;
   
   protected String type;
+  
+  protected String taskId;
   
   public DeleteIdentityLinkCmd(String taskId, String userId, String groupId, String type) {
     validateParams(userId, groupId, type, taskId);
@@ -75,8 +75,11 @@ public class DeleteIdentityLinkCmd implements Command<Object>, Serializable {
   }
   
   public Void execute(CommandContext commandContext) {
-    TaskEntity task = Context
-      .getCommandContext()
+    if(taskId == null) {
+      throw new ProcessEngineException("taskId is null");
+    }
+    
+    TaskEntity task = commandContext
       .getTaskManager()
       .findTaskById(taskId);
     

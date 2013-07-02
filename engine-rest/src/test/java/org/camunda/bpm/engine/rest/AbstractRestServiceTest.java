@@ -14,7 +14,6 @@ package org.camunda.bpm.engine.rest;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -27,9 +26,11 @@ import org.apache.http.entity.ContentType;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.persistence.entity.ActivityInstanceImpl;
+import org.camunda.bpm.engine.impl.persistence.entity.TransitionInstanceImpl;
 import org.camunda.bpm.engine.rest.spi.ProcessEngineProvider;
 import org.camunda.bpm.engine.rest.spi.impl.MockedProcessEngineProvider;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
+import org.camunda.bpm.engine.runtime.TransitionInstance;
 import org.junit.BeforeClass;
 
 import com.jayway.restassured.RestAssured;
@@ -62,6 +63,7 @@ public abstract class AbstractRestServiceTest {
   protected static final String EXAMPLE_PROCESS_INSTANCE_ID = "aProcessInstanceId";
   protected static final String EXAMPLE_PROCESS_DEFINITION_ID = "aProcessDefinitionId";
   protected static final String EXAMPLE_BUSINESS_KEY = "aBusinessKey";
+  protected static final String EXAMPLE_EXECUTION_ID = "anExecutionId";
   
   protected static final String CHILD_EXAMPLE_ACTIVITY_INSTANCE_ID = "aChildActivityInstanceId";
   protected static final String CHILD_EXAMPLE_PARENT_ACTIVITY_INSTANCE_ID = "aChildParentActivityInstanceId";
@@ -81,22 +83,30 @@ public abstract class AbstractRestServiceTest {
     instance.setProcessInstanceId(EXAMPLE_PROCESS_INSTANCE_ID);
     instance.setProcessDefinitionId(EXAMPLE_PROCESS_DEFINITION_ID);
     instance.setBusinessKey(EXAMPLE_BUSINESS_KEY);
-    instance.getExecutionIds().add(EXAMPLE_ACTIVITY_INSTANCE_ID);
+    instance.setExecutionIds(new String[]{EXAMPLE_EXECUTION_ID});
+        
+    ActivityInstanceImpl childActivity = new ActivityInstanceImpl();
+    childActivity.setId(CHILD_EXAMPLE_ACTIVITY_INSTANCE_ID);
+    childActivity.setParentActivityInstanceId(CHILD_EXAMPLE_PARENT_ACTIVITY_INSTANCE_ID);
+    childActivity.setActivityId(CHILD_EXAMPLE_ACTIVITY_ID);
+    childActivity.setActivityName(CHILD_EXAMPLE_ACTIVITY_NAME);
+    childActivity.setProcessInstanceId(CHILD_EXAMPLE_PROCESS_INSTANCE_ID);
+    childActivity.setProcessDefinitionId(CHILD_EXAMPLE_PROCESS_DEFINITION_ID);
+    childActivity.setBusinessKey(CHILD_EXAMPLE_BUSINESS_KEY);
+    childActivity.setExecutionIds(new String[]{EXAMPLE_EXECUTION_ID});
+    childActivity.setChildActivityInstances(new ActivityInstance[0]);
+    childActivity.setChildTransitionInstances(new TransitionInstance[0]);
     
-    instance.setChildInstances(new ArrayList<ActivityInstance>());
-    
-    ActivityInstanceImpl child = new ActivityInstanceImpl();
-    child.setId(CHILD_EXAMPLE_ACTIVITY_INSTANCE_ID);
-    child.setParentActivityInstanceId(CHILD_EXAMPLE_PARENT_ACTIVITY_INSTANCE_ID);
-    child.setActivityId(CHILD_EXAMPLE_ACTIVITY_ID);
-    child.setActivityName(CHILD_EXAMPLE_ACTIVITY_NAME);
-    child.setProcessInstanceId(CHILD_EXAMPLE_PROCESS_INSTANCE_ID);
-    child.setProcessDefinitionId(CHILD_EXAMPLE_PROCESS_DEFINITION_ID);
-    child.setBusinessKey(CHILD_EXAMPLE_BUSINESS_KEY);
-    child.setExecutionIds(new ArrayList<String>());
-    child.getExecutionIds().add(EXAMPLE_ACTIVITY_INSTANCE_ID);
+    TransitionInstanceImpl childTransition = new TransitionInstanceImpl();
+    childTransition.setId(CHILD_EXAMPLE_ACTIVITY_INSTANCE_ID);
+    childTransition.setParentActivityInstanceId(CHILD_EXAMPLE_PARENT_ACTIVITY_INSTANCE_ID);
+    childTransition.setTargetActivityId(CHILD_EXAMPLE_ACTIVITY_ID);
+    childTransition.setProcessInstanceId(CHILD_EXAMPLE_PROCESS_INSTANCE_ID);
+    childTransition.setProcessDefinitionId(CHILD_EXAMPLE_PROCESS_DEFINITION_ID);
+    childTransition.setExecutionId(EXAMPLE_EXECUTION_ID);
 
-    instance.getChildInstances().add(child);
+    instance.setChildActivityInstances(new ActivityInstance[]{childActivity});
+    instance.setChildTransitionInstances(new TransitionInstance[]{childTransition});
   }
   
   

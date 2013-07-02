@@ -18,8 +18,10 @@ import java.util.Set;
 import javax.ws.rs.core.Application;
 
 import org.camunda.bpm.engine.rest.exception.ExceptionHandler;
+import org.camunda.bpm.engine.rest.exception.ProcessEngineExceptionHandler;
 import org.camunda.bpm.engine.rest.exception.RestExceptionHandler;
 import org.camunda.bpm.engine.rest.impl.ProcessDefinitionRestServiceImpl;
+import org.camunda.bpm.engine.rest.impl.ProcessEngineRestServiceImpl;
 import org.camunda.bpm.engine.rest.impl.ProcessInstanceRestServiceImpl;
 import org.camunda.bpm.engine.rest.impl.TaskRestServiceImpl;
 import org.camunda.bpm.engine.rest.mapper.JacksonConfigurator;
@@ -36,15 +38,19 @@ public class EngineRestApplication extends Application {
   public Set<Class<?>> getClasses() {
     Set<Class<?>> classes = new HashSet<Class<?>>();
 
+    // add camunda engine rest classes that you need
+    classes.add(ProcessEngineRestServiceImpl.class);
     classes.add(ProcessDefinitionRestServiceImpl.class);
     classes.add(ProcessInstanceRestServiceImpl.class);
     classes.add(TaskRestServiceImpl.class);
 
+    // mandatory
     classes.add(JacksonConfigurator.class);
     classes.add(JacksonJsonProvider.class);
-    classes.add(ExceptionHandler.class);
     classes.add(RestExceptionHandler.class);
-
+    classes.add(ProcessEngineExceptionHandler.class);
+    classes.add(ExceptionHandler.class);
+    
     return classes;
   }
 }

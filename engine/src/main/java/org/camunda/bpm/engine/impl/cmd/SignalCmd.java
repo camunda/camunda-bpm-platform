@@ -28,6 +28,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 public class SignalCmd implements Command<Object>, Serializable {
 
   private static final long serialVersionUID = 1L;
+  
   protected String executionId;
   protected String signalName;
   protected Object signalData;
@@ -39,8 +40,18 @@ public class SignalCmd implements Command<Object>, Serializable {
     this.signalData = signalData;
     this.processVariables = processVariables;
   }
+  
+  protected Object execute(CommandContext commandContext, ExecutionEntity execution) {
+    if(processVariables != null) {
+      execution.setVariables(processVariables);
+    }
+    
+    execution.signal(signalName, signalData);
+    return null;
+  }
 
-  public Object execute(CommandContext commandContext) { 
+  @Override
+  public Object execute(CommandContext commandContext) {
     if(executionId == null) {
       throw new ProcessEngineException("executionId is null");
     }

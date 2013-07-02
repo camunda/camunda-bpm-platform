@@ -24,22 +24,43 @@ public class DevProcessApplication extends ServletProcessApplication {
     runtimeService.startProcessInstanceByKey("FailingProcess");
     runtimeService.startProcessInstanceByKey("CallActivity");
 
+    runtimeService.startProcessInstanceByKey("OrderProcess");
+    runtimeService.startProcessInstanceByKey("OrderProcess");
+    runtimeService.startProcessInstanceByKey("OrderProcess");
+    runtimeService.startProcessInstanceByKey("OrderProcess");
 
-    runtimeService.startProcessInstanceByKey("OrderProcess");
-    runtimeService.startProcessInstanceByKey("OrderProcess");
-    runtimeService.startProcessInstanceByKey("OrderProcess");
-    runtimeService.startProcessInstanceByKey("OrderProcess");
     runtimeService.startProcessInstanceByKey("FailingProcess");
     runtimeService.startProcessInstanceByKey("FailingProcess");
     runtimeService.startProcessInstanceByKey("FailingProcess");
     runtimeService.startProcessInstanceByKey("FailingProcess");
     runtimeService.startProcessInstanceByKey("FailingProcess");
     runtimeService.startProcessInstanceByKey("FailingProcess");
+
     runtimeService.startProcessInstanceByKey("CallActivity");
     runtimeService.startProcessInstanceByKey("CallActivity");
     runtimeService.startProcessInstanceByKey("CallActivity");
     runtimeService.startProcessInstanceByKey("CallActivity");
     runtimeService.startProcessInstanceByKey("CallActivity");
+
+    runtimeService.startProcessInstanceByKey("cornercasesProcess");
+    runtimeService.startProcessInstanceByKey("cornercasesProcess");
+    runtimeService.startProcessInstanceByKey("cornercasesProcess");
+    runtimeService.startProcessInstanceByKey("cornercasesProcess");
+
+    runtimeService.startProcessInstanceByKey("processWithSubProcess");
+    runtimeService.startProcessInstanceByKey("processWithSubProcess");
+    runtimeService.startProcessInstanceByKey("processWithSubProcess");
+    runtimeService.startProcessInstanceByKey("processWithSubProcess");
+    runtimeService.startProcessInstanceByKey("processWithSubProcess");
+    runtimeService.startProcessInstanceByKey("processWithSubProcess");
+
+    runtimeService.startProcessInstanceByKey("executionProcess");
+    runtimeService.startProcessInstanceByKey("executionProcess");
+    runtimeService.startProcessInstanceByKey("executionProcess");
+    runtimeService.startProcessInstanceByKey("executionProcess");
+    runtimeService.startProcessInstanceByKey("executionProcess");
+    runtimeService.startProcessInstanceByKey("executionProcess");
+
 
     ((ProcessEngineImpl) engine).getProcessEngineConfiguration().getJobExecutor().start();
 

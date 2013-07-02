@@ -19,6 +19,7 @@ import java.util.Map;
 import org.camunda.bpm.engine.repository.Deployment;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
+import org.camunda.bpm.engine.runtime.EventSubscriptionQuery;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ExecutionQuery;
 import org.camunda.bpm.engine.runtime.IncidentQuery;
@@ -26,6 +27,7 @@ import org.camunda.bpm.engine.runtime.NativeExecutionQuery;
 import org.camunda.bpm.engine.runtime.NativeProcessInstanceQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
+import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
 
 
 /** Service which provides access to {@link Deployment}s,
@@ -174,7 +176,7 @@ public interface RuntimeService {
 
    * @return the {@link ProcessInstance} object representing the started process instance
    * 
-   * @throws ActivitiExeception if no subscription to a message with the given name exists
+   * @throws ProcessEngineException if no subscription to a message with the given name exists
    * 
    * @since 5.9
    */
@@ -193,7 +195,7 @@ public interface RuntimeService {
    * @param businessKey
    *          the business key which is added to the started process instance 
    * 
-   * @throws ActivitiExeception if no subscription to a message with the given name exists
+   * @throws ProcessEngineException if no subscription to a message with the given name exists
    * 
    * @since 5.10
    */
@@ -214,7 +216,7 @@ public interface RuntimeService {
    *          variables to the started process instance.
    * @return the {@link ProcessInstance} object representing the started process instance
    * 
-   * @throws ActivitiExeception if no subscription to a message with the given name exists
+   * @throws ProcessEngineException if no subscription to a message with the given name exists
    * 
    * @since 5.9
    */
@@ -237,7 +239,7 @@ public interface RuntimeService {
    *          variables to the started process instance.
    * @return the {@link ProcessInstance} object representing the started process instance
    * 
-   * @throws ActivitiExeception if no subscription to a message with the given name exists
+   * @throws ProcessEngineException if no subscription to a message with the given name exists
    * 
    * @since 5.9
    */
@@ -448,30 +450,57 @@ public interface RuntimeService {
    */
   IncidentQuery createIncidentQuery();
   
+  /**
+   * Creates a new {@link EventSubscriptionQuery} instance, that can be used to query
+   * event subscriptions.
+   */
+  EventSubscriptionQuery createEventSubscriptionQuery();
+  
+  /**
+   * Creates a new {@link VariableInstanceQuery} instance, that can be used to query
+   * variable instances.
+   */
+  VariableInstanceQuery createVariableInstanceQuery();
+  
   // Process instance state //////////////////////////////////////////
     
   /**
-   * Suspends the process instance with the given id. 
+   * <p>Suspends the process instance with the given id. This means that the
+   * execution is stopped, so the <i>token state</i> will not change.
+   * However, actions that do not change token state, like setting/removing
+   * variables, etc. will succeed.</p>
    * 
-   * If a process instance is in state suspended, activiti will not 
-   * execute jobs (timers, messages) associated with this instance.
+   * <p>Tasks belonging to this process instance will also be suspended. This means
+   * that any actions influencing the tasks' lifecycles will fail, such as 
+   * <ul>
+   *   <li>claiming</li>
+   *   <li>completing</li>
+   *   <li>delegation</li>
+   *   <li>changes in task assignees, owners, etc.</li>
+   * </ul>
+   * Actions that only change task properties will succeed, such as changing variables
+   * or adding comments.
+   * </p>
    * 
-   * If you have a process instance hierarchy, suspending
-   * one process instance form the hierarchy will not suspend other 
-   * process instances form that hierarchy.
+   * <p>If a process instance is in state suspended, the engine will also not 
+   * execute jobs (timers, messages) associated with this instance.</p>
    * 
-   *  @throws ProcessEngineException if no such processInstance can be found or if the process instance is already in state suspended.
+   * <p>If you have a process instance hierarchy, suspending
+   * one process instance from the hierarchy will not suspend other 
+   * process instances from that hierarchy.</p>
+   * 
+   *  @throws ProcessEngineException if no such processInstance can be found.
    */
   void suspendProcessInstanceById(String processInstanceId);
   
   /**
-   * Activates the process instance with the given id. 
+   * <p>Activates the process instance with the given id.</p>
    * 
-   * If you have a process instance hierarchy, suspending
-   * one process instance form the hierarchy will not suspend other 
-   * process instances form that hierarchy.
+   * <p>If you have a process instance hierarchy, activating
+   * one process instance from the hierarchy will not activate other 
+   * process instances from that hierarchy.</p>
    * 
-   * @throws ProcessEngineException if no such processInstance can be found or if the process instance is already in state active.
+   * @throws ProcessEngineException if no such processInstance can be found.
    */
   void activateProcessInstanceById(String processInstanceId);
   

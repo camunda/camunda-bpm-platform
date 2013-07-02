@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+  xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd"
+  id="_ZeSZENg2EeKYYcWBkDaPIQ" targetNamespace="http://activiti.org/bpmn">
+
+  <process id="linkEventValid" isExecutable="true">
+
+    <startEvent id="StartEvent_1" name="Start Event" />
+    <sequenceFlow sourceRef="StartEvent_1" targetRef="IntermediateThrowEvent_1" />
+
+    <intermediateThrowEvent id="IntermediateThrowEvent_1" name="LinkA">
+      <linkEventDefinition id="LinkEventDefinition_1" name="LinkA" />
+    </intermediateThrowEvent>
+
+    <intermediateCatchEvent id="IntermediateCatchEvent_1" name="LinkA">
+      <linkEventDefinition id="LinkEventDefinition_2" name="LinkA" />
+    </intermediateCatchEvent>
+    <sequenceFlow sourceRef="IntermediateCatchEvent_1" targetRef="waitAfterLink1" />
+
+    <receiveTask id="waitAfterLink1" />
+    <sequenceFlow sourceRef="waitAfterLink1" targetRef="IntermediateThrowEvent_2" />
+
+    <intermediateThrowEvent id="IntermediateThrowEvent_2" name="B">
+      <linkEventDefinition name="B" />
+    </intermediateThrowEvent>
+
+    <intermediateCatchEvent id="IntermediateCatchEvent_2" name="B">
+      <linkEventDefinition name="B" />
+    </intermediateCatchEvent>
+    <sequenceFlow sourceRef="IntermediateCatchEvent_2" targetRef="waitAfterLink2" />
+
+    <receiveTask id="waitAfterLink2" />
+    <sequenceFlow sourceRef="waitAfterLink2" targetRef="EndEvent_1" />
+
+    <endEvent id="EndEvent_1" name="End Event" />
+
+  </process>
+</definitions>

@@ -27,6 +27,7 @@ import org.camunda.bpm.engine.runtime.ProcessInstance;
 
 /**
  * @author Tom Baeyens
+ * @author Joram Barrez
  */
 public class StartProcessInstanceCmd implements Command<ProcessInstance>, Serializable {
 
@@ -48,6 +49,7 @@ public class StartProcessInstanceCmd implements Command<ProcessInstance>, Serial
       .getProcessEngineConfiguration()
       .getDeploymentCache();
     
+    // Find the process definition
     ProcessDefinitionEntity processDefinition = null;
     if (processDefinitionId!=null) {
       processDefinition = deploymentCache.findDeployedProcessDefinitionById(processDefinitionId);
@@ -63,12 +65,11 @@ public class StartProcessInstanceCmd implements Command<ProcessInstance>, Serial
       throw new ProcessEngineException("processDefinitionKey and processDefinitionId are null");
     }
     
+    // Start the process instance
     ExecutionEntity processInstance = processDefinition.createProcessInstance(businessKey);
-
     if (variables!=null) {
       processInstance.setVariables(variables);
     }
-    
     processInstance.start();
     
     return processInstance;

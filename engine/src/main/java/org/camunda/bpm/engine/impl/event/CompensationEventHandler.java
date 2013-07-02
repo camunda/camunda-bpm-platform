@@ -53,6 +53,8 @@ public class CompensationEventHandler implements EventHandler {
         ||!(Boolean)compensationHandler.getProperty(BpmnParse.PROPERTYNAME_IS_FOR_COMPENSATION))
             && compensationHandler.isScope()) {      
    
+      // activate execution
+      compensatingExecution.setActive(true);
       // descend into scope:
       List<CompensateEventSubscriptionEntity> eventsForThisScope = compensatingExecution.getCompensateEventSubscriptions();      
       ScopeUtil.throwCompensationEvent(eventsForThisScope, compensatingExecution, false);

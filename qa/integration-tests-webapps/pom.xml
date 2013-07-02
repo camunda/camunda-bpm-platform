@@ -9,6 +9,12 @@
     <artifactId>camunda-qa</artifactId>
     <version>7.0.0-SNAPSHOT</version>
   </parent>
+  
+  <properties>
+    <signavio.globaluser>${env.signavio.globaluser}</signavio.globaluser>
+    <signavio.globalpassword>${env.signavio.globalpassword}</signavio.globalpassword>
+    <signavio.baseurl>${env.signavio.baseurl}</signavio.baseurl>    
+  </properties>
 
   <dependencies>
     <dependency>

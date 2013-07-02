@@ -13,7 +13,6 @@
 package org.camunda.bpm.engine.test.pvm;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import org.camunda.bpm.engine.delegate.ExecutionListener;
 import org.camunda.bpm.engine.impl.pvm.ProcessDefinitionBuilder;
@@ -27,6 +26,7 @@ import org.camunda.bpm.engine.test.pvm.activities.End;
 import org.camunda.bpm.engine.test.pvm.activities.ParallelGateway;
 import org.camunda.bpm.engine.test.pvm.activities.WaitState;
 import org.camunda.bpm.engine.test.pvm.activities.While;
+import org.camunda.bpm.engine.test.pvm.verification.TransitionInstanceVerifyer;
 
 /**
  * @author Daniel Meyer
@@ -87,6 +87,7 @@ public class PvmActivityInstanceTest extends PvmTestCase {
   public void testWhileLoop() {
     
     ActivityInstanceVerification verifier = new ActivityInstanceVerification();
+    TransitionInstanceVerifyer transitionVerifier = new TransitionInstanceVerifyer();
     
     PvmProcessDefinition processDefinition = new ProcessDefinitionBuilder()
       .createActivity("start")
@@ -94,14 +95,20 @@ public class PvmActivityInstanceTest extends PvmTestCase {
         .behavior(new Automatic())
         .executionListener(ExecutionListener.EVENTNAME_START, verifier)
         .executionListener(ExecutionListener.EVENTNAME_END, verifier)
-        .transition("loop")
+        .startTransition("loop")
+          .executionListener(ExecutionListener.EVENTNAME_TAKE, transitionVerifier)
+        .endTransition()
       .endActivity()
       .createActivity("loop")
         .behavior(new While("count", 0, 10))
         .executionListener(ExecutionListener.EVENTNAME_START, verifier)
         .executionListener(ExecutionListener.EVENTNAME_END, verifier)
-        .transition("one", "more")
-        .transition("end", "done")
+        .startTransition("one", "more")
+         .executionListener(ExecutionListener.EVENTNAME_TAKE, transitionVerifier)
+        .endTransition()
+        .startTransition("end", "done")
+         .executionListener(ExecutionListener.EVENTNAME_TAKE, transitionVerifier)
+        .endTransition()
       .endActivity()
       .createActivity("one")
         .behavior(new Automatic())

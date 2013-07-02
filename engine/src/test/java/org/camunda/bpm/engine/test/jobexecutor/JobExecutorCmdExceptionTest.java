@@ -42,7 +42,7 @@ public class JobExecutorCmdExceptionTest extends PluggableProcessEngineTestCase 
       }
     });
 
-    waitForJobExecutorToProcessAllJobs(15000L, 50L);
+    waitForJobExecutorToProcessAllJobs(15000L);
   }
 
   public void testJobCommandsWith3Exceptions() {
@@ -57,7 +57,7 @@ public class JobExecutorCmdExceptionTest extends PluggableProcessEngineTestCase 
       }
     });
 
-    waitForJobExecutorToProcessAllJobs(15000L, 50L);
+    waitForJobExecutorToProcessAllJobs(15000L);
 
     // TODO check if there is a failed job in the DLQ
 
@@ -81,7 +81,7 @@ public class JobExecutorCmdExceptionTest extends PluggableProcessEngineTestCase 
       }));
     }
 
-    waitForJobExecutorToProcessAllJobs(15000L, 50L);
+    waitForJobExecutorToProcessAllJobs(15000L);
     
     // now there are 40 jobs with retries = 0:
     List<Job> jobList = managementService.createJobQuery().list();    

@@ -134,7 +134,7 @@ public class CallActivityContextSwitchTest extends AbstractFoxPlatformIntegratio
     
     Assert.assertEquals(true, runtimeService.getVariable(pi.getId(), DelegateBefore.class.getName()));
     
-    waitForJobExecutorToProcessAllJobs(6000, 200);
+    waitForJobExecutorToProcessAllJobs(6000);
     
     ProcessInstance calledPi = runtimeService.createProcessInstanceQuery()
       .processDefinitionKey("calledProcessSync")
@@ -158,7 +158,7 @@ public class CallActivityContextSwitchTest extends AbstractFoxPlatformIntegratio
     
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("mainProcessASyncBefore", processVariables);
 
-    waitForJobExecutorToProcessAllJobs(6000, 200);
+    waitForJobExecutorToProcessAllJobs(6000);
     
     Assert.assertEquals(true, runtimeService.getVariable(pi.getId(), DelegateBefore.class.getName()));
     
@@ -193,7 +193,7 @@ public class CallActivityContextSwitchTest extends AbstractFoxPlatformIntegratio
     
     taskService.complete(taskService.createTaskQuery().processInstanceId(calledPi.getId()).singleResult().getId());
     
-    waitForJobExecutorToProcessAllJobs(6000, 200);
+    waitForJobExecutorToProcessAllJobs(6000);
 
     Assert.assertEquals(true, runtimeService.getVariable(pi.getId(), DelegateAfter.class.getName()));
     
@@ -221,7 +221,7 @@ public class CallActivityContextSwitchTest extends AbstractFoxPlatformIntegratio
     Assert.assertNotNull(calledPi);
     Assert.assertNull(runtimeService.getVariable(calledPi.getId(), "calledDelegate"));
     
-    waitForJobExecutorToProcessAllJobs(6000, 200);
+    waitForJobExecutorToProcessAllJobs(6000);
     
     Assert.assertEquals(true, runtimeService.getVariable(calledPi.getId(), "calledDelegate"));
     
@@ -244,7 +244,7 @@ public class CallActivityContextSwitchTest extends AbstractFoxPlatformIntegratio
     
     Assert.assertEquals(true, runtimeService.getVariable(pi.getId(), DelegateBefore.class.getName()));
     
-    waitForJobExecutorToProcessAllJobs(6000, 200);
+    waitForJobExecutorToProcessAllJobs(6000);
     
     ProcessInstance calledPi = runtimeService.createProcessInstanceQuery()
       .processDefinitionKey("calledProcessASync")
@@ -268,7 +268,7 @@ public class CallActivityContextSwitchTest extends AbstractFoxPlatformIntegratio
     
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("mainProcessASyncBefore", processVariables);
 
-    waitForJobExecutorToProcessAllJobs(6000, 200);
+    waitForJobExecutorToProcessAllJobs(6000);
     
     Assert.assertEquals(true, runtimeService.getVariable(pi.getId(), DelegateBefore.class.getName()));
     
@@ -296,7 +296,7 @@ public class CallActivityContextSwitchTest extends AbstractFoxPlatformIntegratio
     
     Assert.assertEquals(true, runtimeService.getVariable(pi.getId(), DelegateBefore.class.getName()));
     
-    waitForJobExecutorToProcessAllJobs(6000, 200);
+    waitForJobExecutorToProcessAllJobs(6000);
     
     ProcessInstance calledPi = runtimeService.createProcessInstanceQuery()
       .processDefinitionKey("calledProcessASync")
@@ -305,7 +305,7 @@ public class CallActivityContextSwitchTest extends AbstractFoxPlatformIntegratio
     
     taskService.complete(taskService.createTaskQuery().processInstanceId(calledPi.getId()).singleResult().getId());
     
-    waitForJobExecutorToProcessAllJobs(6000, 200);
+    waitForJobExecutorToProcessAllJobs(6000);
 
     Assert.assertEquals(true, runtimeService.getVariable(pi.getId(), DelegateAfter.class.getName()));
     

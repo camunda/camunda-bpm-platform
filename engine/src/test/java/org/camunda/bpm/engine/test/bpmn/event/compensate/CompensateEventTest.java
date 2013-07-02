@@ -13,9 +13,13 @@
 
 package org.camunda.bpm.engine.test.bpmn.event.compensate;
 
+import java.util.List;
+
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
 import org.camunda.bpm.engine.test.bpmn.event.compensate.helper.SetVariablesDelegate;
 
@@ -31,6 +35,45 @@ public class CompensateEventTest extends PluggableProcessEngineTestCase {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess");
     
     assertEquals(5, runtimeService.getVariable(processInstance.getId(), "undoBookHotel"));
+    
+    runtimeService.signal(processInstance.getId());    
+    assertProcessEnded(processInstance.getId());
+    
+  }
+  
+  @Deployment
+  public void testCompensateParallelSubprocess() {
+    
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess");
+    
+    assertEquals(5, runtimeService.getVariable(processInstance.getId(), "undoBookHotel"));
+        
+    Task singleResult = taskService.createTaskQuery().singleResult();
+    taskService.complete(singleResult.getId());
+    
+    runtimeService.signal(processInstance.getId());    
+    assertProcessEnded(processInstance.getId());
+    
+  }
+  
+  @Deployment
+  public void testCompensateParallelSubprocessCompHandlerWaitstate() {
+    
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("compensateProcess");
+    
+    List<Task> compensationHandlerTasks = taskService.createTaskQuery().taskDefinitionKey("undoBookHotel").list();
+    assertEquals(5, compensationHandlerTasks.size());
+    
+    ActivityInstance rootActivityInstance = runtimeService.getActivityInstance(processInstance.getId());
+    List<ActivityInstance> compensationHandlerInstances = getInstancesForActivitiyId(rootActivityInstance, "undoBookHotel");
+    assertEquals(5, compensationHandlerInstances.size());
+    
+    for (Task task : compensationHandlerTasks) {
+      taskService.complete(task.getId());
+    }
+        
+    Task singleResult = taskService.createTaskQuery().singleResult();
+    taskService.complete(singleResult.getId());
     
     runtimeService.signal(processInstance.getId());    
     assertProcessEnded(processInstance.getId());

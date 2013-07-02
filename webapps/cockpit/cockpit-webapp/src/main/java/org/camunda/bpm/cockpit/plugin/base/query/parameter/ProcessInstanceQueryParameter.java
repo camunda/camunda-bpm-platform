@@ -18,7 +18,7 @@ import org.camunda.bpm.cockpit.plugin.base.dto.ProcessInstanceDto;
 public class ProcessInstanceQueryParameter extends QueryParameters<ProcessInstanceDto> {
 
   protected String processDefinitionId;
-  protected String orderBy = "HISTORY.START_TIME_ desc";
+  protected String orderBy = "START_TIME_ desc";
   
   public ProcessInstanceQueryParameter() {
   }

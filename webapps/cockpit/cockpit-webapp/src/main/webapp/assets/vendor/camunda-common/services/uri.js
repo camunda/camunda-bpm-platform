@@ -1,37 +1,66 @@
-ngDefine('camunda.common.services', function(module) {
+ngDefine('camunda.common.services.uri', [ 'angular' ], function(module, angular) {
 
-  var UriProvider = function () {
+  var UriProvider = function() {
 
-    var templatePattern = "://";
+    var TEMPLATES_PATTERN = /[\w]+:\/\/|:[\w]+/g;
+
     var replacements = {};
 
+    /**
+     * Specifies a pattern and its replacement on the UriProvider
+     *
+     * @description
+     * Used to register a new replacement for app uris.
+     * Typically the registration of these replacements takes place in one distinct place (i.e. the app main file).
+     *
+     * Two kinds of patterns are supported, <code>:foo</code> (as path parameter) and <code>foo://</code> (as path prefix).
+     *
+     * In addition to a plain replacement string, a function may be specified that provides the replacement.
+     *
+       <pre>
+         module.config(function(UriProvider, $routeParams) {
+           UriProvider.register(':foo', 'bar');
+           UriProvider.register('asdf://', function() {
+             return $routeParams.bar;
+           });
+         });
+       </pre>
+     *
+     * @param {string} pattern
+     * @param {string|Function} replacement string or function
+     */
     this.replace = function(pattern, replacement) {
       replacements[pattern] = replacement;
     };
 
-    function appUri(str) {
-      var idx = str.indexOf(templatePattern);
-      if (idx === -1) {
-        return str;
-      }
-
-      var endIdx = idx + templatePattern.length;
-
-      var template = str.substring(0, endIdx);
-      var replacement = replacements[template];
-
-      if (replacement === undefined) {
-        return str;
-      }
-
-      var replaced = replacement + str.substring(endIdx);
-
-      return replaced;
-    }
-
-    this.$get = [function() {
+    this.$get = [ '$injector', function($injector) {
       return {
-        appUri: appUri
+        /**
+         * @function
+         *
+         * Transforms a app uri using the configured replacement rules.
+         *
+         * @param {string} str the uri to transform
+         * @returns {string} the replaced string
+         */
+        appUri: function appUri(str) {
+          var replaced = str.replace(TEMPLATES_PATTERN, function(template, index, str) {
+
+            var replacement = replacements[template];
+            if (replacement === undefined) {
+              return template;
+            }
+
+            // allow replace support for functions
+            if (angular.isFunction(replacement) || angular.isArray(replacement)) {
+              replacement = $injector.invoke(replacement);
+            }
+
+            return replacement;
+          });
+
+          return replaced;
+        }
       };
     }];
   };

@@ -15,10 +15,10 @@ package org.camunda.bpm.engine.test.bpmn.gateway;
 
 import java.util.Date;
 
-import org.camunda.bpm.engine.impl.EventSubscriptionQueryImpl;
-import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.runtime.EventSubscription;
+import org.camunda.bpm.engine.runtime.EventSubscriptionQuery;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
@@ -36,13 +36,13 @@ public class EventBasedGatewayTest extends PluggableProcessEngineTestCase {
     
     runtimeService.startProcessInstanceByKey("catchSignal");
         
-    assertEquals(1, createEventSubscriptionQuery().count());    
+    assertEquals(1, runtimeService.createEventSubscriptionQuery().count());    
     assertEquals(1, runtimeService.createProcessInstanceQuery().count());
     assertEquals(1, managementService.createJobQuery().count());
     
     runtimeService.startProcessInstanceByKey("throwSignal");
     
-    assertEquals(0, createEventSubscriptionQuery().count());    
+    assertEquals(0, runtimeService.createEventSubscriptionQuery().count());    
     assertEquals(1, runtimeService.createProcessInstanceQuery().count());    
     assertEquals(0, managementService.createJobQuery().count());
     
@@ -63,16 +63,16 @@ public class EventBasedGatewayTest extends PluggableProcessEngineTestCase {
     
     runtimeService.startProcessInstanceByKey("catchSignal");
         
-    assertEquals(1, createEventSubscriptionQuery().count());    
+    assertEquals(1, runtimeService.createEventSubscriptionQuery().count());    
     assertEquals(1, runtimeService.createProcessInstanceQuery().count());
     assertEquals(1, managementService.createJobQuery().count());
     
     ClockUtil.setCurrentTime(new Date(ClockUtil.getCurrentTime().getTime() +10000));
     try {
       // wait for timer to fire
-      waitForJobExecutorToProcessAllJobs(10000, 100);
+      waitForJobExecutorToProcessAllJobs(10000);
       
-      assertEquals(0, createEventSubscriptionQuery().count());    
+      assertEquals(0, runtimeService.createEventSubscriptionQuery().count());    
       assertEquals(1, runtimeService.createProcessInstanceQuery().count());    
       assertEquals(0, managementService.createJobQuery().count());
       
@@ -93,10 +93,10 @@ public class EventBasedGatewayTest extends PluggableProcessEngineTestCase {
     
     runtimeService.startProcessInstanceByKey("catchSignal");
         
-    assertEquals(2, createEventSubscriptionQuery().count());
-    EventSubscriptionQueryImpl messageEventSubscriptionQuery = createEventSubscriptionQuery().eventType("message");
+    assertEquals(2, runtimeService.createEventSubscriptionQuery().count());
+    EventSubscriptionQuery messageEventSubscriptionQuery = runtimeService.createEventSubscriptionQuery().eventType("message");
     assertEquals(1, messageEventSubscriptionQuery.count());
-    assertEquals(1, createEventSubscriptionQuery().eventType("signal").count());
+    assertEquals(1, runtimeService.createEventSubscriptionQuery().eventType("signal").count());
     assertEquals(1, runtimeService.createProcessInstanceQuery().count());
     assertEquals(1, managementService.createJobQuery().count());
     
@@ -110,10 +110,10 @@ public class EventBasedGatewayTest extends PluggableProcessEngineTestCase {
     ClockUtil.setCurrentTime(new Date(ClockUtil.getCurrentTime().getTime() +10000));
     try {
      
-      EventSubscriptionEntity messageEventSubscription = messageEventSubscriptionQuery.singleResult();
+      EventSubscription messageEventSubscription = messageEventSubscriptionQuery.singleResult();
       runtimeService.messageEventReceived(messageEventSubscription.getEventName(), messageEventSubscription.getExecutionId());
       
-      assertEquals(0, createEventSubscriptionQuery().count());    
+      assertEquals(0, runtimeService.createEventSubscriptionQuery().count());    
       assertEquals(1, runtimeService.createProcessInstanceQuery().count());    
       assertEquals(0, managementService.createJobQuery().count());
       
@@ -159,8 +159,4 @@ public class EventBasedGatewayTest extends PluggableProcessEngineTestCase {
     
   }
   
-  private EventSubscriptionQueryImpl createEventSubscriptionQuery() {
-    return new EventSubscriptionQueryImpl(processEngineConfiguration.getCommandExecutorTxRequired());
-  }
-
 }

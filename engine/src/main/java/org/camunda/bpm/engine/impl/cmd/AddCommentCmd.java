@@ -39,7 +39,7 @@ public class AddCommentCmd implements Command<Object>, Serializable {
     this.processInstanceId = processInstanceId;
     this.message = message;
   }
-
+  
   public Object execute(CommandContext commandContext) {
     String userId = Authentication.getAuthenticatedUserId();
     CommentEntity comment = new CommentEntity();

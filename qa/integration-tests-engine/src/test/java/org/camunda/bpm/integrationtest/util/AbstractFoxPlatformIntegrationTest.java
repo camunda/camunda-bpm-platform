@@ -34,6 +34,7 @@ import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.integrationtest.util.TestContainer;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
@@ -91,7 +92,10 @@ public abstract class AbstractFoxPlatformIntegrationTest {
     taskService = processEngine.getTaskService();
   }
 
-  public void waitForJobExecutorToProcessAllJobs(long maxMillisToWait, long intervalMillis) {
+  public void waitForJobExecutorToProcessAllJobs(long maxMillisToWait) {
+    
+    int checkInterval = 1000;
+
     JobExecutor jobExecutor = processEngineConfiguration.getJobExecutor();
     jobExecutor.start();
     
@@ -102,7 +106,7 @@ public abstract class AbstractFoxPlatformIntegrationTest {
       boolean areJobsAvailable = true;
       try {
         while (areJobsAvailable && !task.isTimeLimitExceeded()) {
-          Thread.sleep(intervalMillis);
+          Thread.sleep(checkInterval);
           areJobsAvailable = areJobsAvailable();
         }
       } catch (InterruptedException e) {
@@ -119,9 +123,13 @@ public abstract class AbstractFoxPlatformIntegrationTest {
   }
 
   public boolean areJobsAvailable() {
-    List<Job> list = managementService.createJobQuery().executable().list();
-    logger.info("Jobs: " + list.size() + " left.");
-    return !list.isEmpty();
+    List<Job> list = managementService.createJobQuery().list();
+    for (Job job : list) {
+      if (job.getRetries() > 0 && (job.getDuedate() == null || ClockUtil.getCurrentTime().after(job.getDuedate()))) {
+        return true;
+      }
+    }
+    return false;
   }
 
   private static class InteruptTask extends TimerTask {

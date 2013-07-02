@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+  xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" xmlns:di="http://www.omg.org/spec/DD/20100524/DI" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd"
+  id="_ZeSZENg2EeKYYcWBkDaPIQ" targetNamespace="http://activiti.org/bpmn">
+  <process id="linkEventInvalid" isExecutable="true">
+    <startEvent id="StartEvent_1" name="Start Event">
+    </startEvent>
+    <manualTask id="ManualTask_1" name="Manual Task 1">
+    </manualTask>
+    <sequenceFlow id="SequenceFlow_1" sourceRef="StartEvent_1" targetRef="ManualTask_1" />
+    <sequenceFlow id="SequenceFlow_2" sourceRef="ManualTask_1" targetRef="IntermediateThrowEvent_1" />
+    <intermediateThrowEvent id="IntermediateThrowEvent_1" name="LinkA">
+      <linkEventDefinition id="LinkEventDefinition_1" name="LinkA" />
+    </intermediateThrowEvent>
+    <manualTask id="ManualTask_2" name="Manual Task 2">
+    </manualTask>
+    <intermediateCatchEvent id="IntermediateCatchEvent_1" name="LinkA">
+      <linkEventDefinition id="LinkEventDefinition_2" name="LinkA" />
+    </intermediateCatchEvent>
+    <sequenceFlow id="SequenceFlow_3" sourceRef="IntermediateCatchEvent_1" targetRef="ManualTask_2" />
+    <intermediateCatchEvent id="IntermediateCatchEvent_2" name="LinkA">
+      <linkEventDefinition id="LinkEventDefinition_4" name="LinkA" />
+    </intermediateCatchEvent>
+    <sequenceFlow id="SequenceFlow_5" sourceRef="IntermediateCatchEvent_2" targetRef="ManualTask_3" />
+    <manualTask id="ManualTask_3" name="Manual Task 3">
+    </manualTask>
+    <sequenceFlow id="SequenceFlow_6" sourceRef="ManualTask_3" targetRef="EndEvent_1" />
+    <endEvent id="EndEvent_1" name="End Event">
+    </endEvent>
+    <sequenceFlow id="SequenceFlow_4" sourceRef="ManualTask_2" targetRef="EndEvent_2" />
+    <endEvent id="EndEvent_2" name="End Event">
+    </endEvent>
+  </process>
+</definitions>

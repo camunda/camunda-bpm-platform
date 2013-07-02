@@ -39,7 +39,7 @@ public class JobExecutorRequestContextTest extends AbstractFoxPlatformIntegratio
     
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("testResolveBean");
     
-    waitForJobExecutorToProcessAllJobs(6000, 100);
+    waitForJobExecutorToProcessAllJobs(6000);
     
     Object variable = runtimeService.getVariable(pi.getId(), "invocationCounter");
     Assert.assertEquals(1, variable);    
@@ -53,7 +53,7 @@ public class JobExecutorRequestContextTest extends AbstractFoxPlatformIntegratio
     
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("testScoping");    
     
-    waitForJobExecutorToProcessAllJobs(6000, 100);
+    waitForJobExecutorToProcessAllJobs(6000);
     
     Object variable = runtimeService.getVariable(pi.getId(), "invocationCounter");
     // -> the same bean instance was invoked 2 times!
@@ -64,7 +64,7 @@ public class JobExecutorRequestContextTest extends AbstractFoxPlatformIntegratio
       .singleResult();
     taskService.complete(task.getId());
     
-    waitForJobExecutorToProcessAllJobs(6000, 100);
+    waitForJobExecutorToProcessAllJobs(6000);
     
     variable = runtimeService.getVariable(pi.getId(), "invocationCounter");
     // now it's '1' again! -> new instance of the bean
@@ -82,7 +82,7 @@ public class JobExecutorRequestContextTest extends AbstractFoxPlatformIntegratio
     
     ProcessInstance pi = runtimeService.startProcessInstanceByKey("testScopingExclusiveJobs");    
     
-    waitForJobExecutorToProcessAllJobs(6000, 500);
+    waitForJobExecutorToProcessAllJobs(6000);
     
     Object variable = runtimeService.getVariable(pi.getId(), "invocationCounter");
     // -> seperate requests
@@ -93,7 +93,7 @@ public class JobExecutorRequestContextTest extends AbstractFoxPlatformIntegratio
       .singleResult();
     taskService.complete(task.getId());
     
-    waitForJobExecutorToProcessAllJobs(6000, 100);
+    waitForJobExecutorToProcessAllJobs(6000);
     
     variable = runtimeService.getVariable(pi.getId(), "invocationCounter");
     Assert.assertEquals(1, variable);

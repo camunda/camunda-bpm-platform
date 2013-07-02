@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.cockpit;
 
+import java.util.Set;
 import org.camunda.bpm.cockpit.db.CommandExecutor;
 import org.camunda.bpm.cockpit.db.QueryService;
 import org.camunda.bpm.cockpit.plugin.PluginRegistry;
@@ -22,7 +23,6 @@ import org.camunda.bpm.engine.ProcessEngine;
  * the camunda cockpit plugin service.</p>
  *
  * @author roman.smirnov
- *
  */
 public interface CockpitRuntimeDelegate {
 
@@ -52,9 +52,21 @@ public interface CockpitRuntimeDelegate {
   public ProcessEngine getProcessEngine(String processEngineName);
 
   /**
+   * Returns the list of {@link ProcessEngine} names available to the runtime
+   * @return
+   */
+  public Set<String> getProcessEngineNames();
+
+  /**
+   * Returns the default {@link ProcessEngine} provided by the
+   * @return
+   */
+  public ProcessEngine getDefaultProcessEngine();
+
+  /**
    * A registry that provides access to the plugins registered
    * in the application.
-   * 
+   *
    * @return
    */
   public PluginRegistry getPluginRegistry();

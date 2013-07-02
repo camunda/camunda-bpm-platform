@@ -188,6 +188,8 @@ public abstract class AbstractExecutionRestServiceQueryTest extends
     verify(mockedQuery).activityId(queryParameters.get("activityId"));
     verify(mockedQuery).signalEventSubscriptionName(queryParameters.get("signalEventSubscriptionName"));
     verify(mockedQuery).messageEventSubscriptionName(queryParameters.get("messageEventSubscriptionName"));
+    verify(mockedQuery).active();
+    verify(mockedQuery).suspended();
     verify(mockedQuery).list();
   }
 
@@ -201,6 +203,8 @@ public abstract class AbstractExecutionRestServiceQueryTest extends
     parameters.put("activityId", "anActivityId");
     parameters.put("signalEventSubscriptionName", "anEventName");
     parameters.put("messageEventSubscriptionName", "aMessageName");
+    parameters.put("suspended", "true");
+    parameters.put("active", "true");
     
     return parameters;
   }
@@ -390,6 +394,8 @@ public abstract class AbstractExecutionRestServiceQueryTest extends
     verify(mockedQuery).activityId(queryParameters.get("activityId"));
     verify(mockedQuery).signalEventSubscriptionName(queryParameters.get("signalEventSubscriptionName"));
     verify(mockedQuery).messageEventSubscriptionName(queryParameters.get("messageEventSubscriptionName"));
+    verify(mockedQuery).active();
+    verify(mockedQuery).suspended();
     verify(mockedQuery).list();
   }
 

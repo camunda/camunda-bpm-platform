@@ -35,8 +35,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.junit.Assert;
-
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
@@ -44,6 +42,7 @@ import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ExecutionQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
+import org.junit.Assert;
 
 
 /**
@@ -1088,5 +1087,25 @@ public void testBooleanVariable() throws Exception {
 
     assertEquals(3, runtimeService.createExecutionQuery().processInstanceId(pi.getId()).processVariableValueEquals("x", "parent").count());
     assertEquals(3, runtimeService.createExecutionQuery().processInstanceId(pi.getId()).processVariableValueNotEquals("x", "xxx").count());
+  }
+  
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/concurrentExecution.bpmn20.xml"})
+  public void testExecutionQueryForSuspendedExecutions() {
+    List<Execution> suspendedExecutions = runtimeService.createExecutionQuery().suspended().list();
+    assertEquals(suspendedExecutions.size(), 0);
+
+    for (String instanceId : concurrentProcessInstanceIds) {
+      runtimeService.suspendProcessInstanceById(instanceId);
+    }
+    
+    suspendedExecutions = runtimeService.createExecutionQuery().suspended().list();
+    assertEquals(12, suspendedExecutions.size());
+    
+    List<Execution> activeExecutions = runtimeService.createExecutionQuery().active().list();
+    assertEquals(1, activeExecutions.size());
+    
+    for (Execution activeExecution : activeExecutions) {
+      assertEquals(activeExecution.getProcessInstanceId(), sequentialProcessInstanceIds.get(0));
+    }
   }
 }

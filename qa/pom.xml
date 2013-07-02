@@ -74,6 +74,7 @@
         <module>tomcat-runtime</module>
         <module>integration-tests-webapps</module>
         <module>integration-tests-engine</module>
+        <module>test-db-upgrade</module>
       </modules>
 	</profile>  
   
@@ -113,6 +114,13 @@
       <id>engine-integration</id>
       <modules>
         <module>integration-tests-engine</module>
+      </modules>
+    </profile>
+    
+    <profile>
+      <id>upgrade</id>
+      <modules>
+        <module>test-db-upgrade</module>
       </modules>
     </profile>
     
@@ -194,6 +202,39 @@
         <database.datasource.class>com.microsoft.sqlserver.jdbc.SQLServerXADataSource</database.datasource.class>
         <database.datasource.class.type>${database.datasource.class.type.xa}</database.datasource.class.type>
         <database.port>${env.mssql.database.port}</database.port>
+        <database.url>jdbc:sqlserver://${database.host}:${database.port};DatabaseName=${database.name}</database.url>
+      </properties>
+    </profile>
+    
+    <profile>
+      <id>mssql12</id>
+      <properties>
+        <database.type>mssql</database.type>
+        <jboss.datasource.filename>mssql-ds.xml</jboss.datasource.filename>
+        <database.host>${env.mssql12.database.host}</database.host>
+        <database.name>${env.mssql12.database.name}</database.name>
+        <database.user>${env.mssql12.database.user}</database.user>
+        <database.password>${env.mssql12.database.password}</database.password>
+        <database.driver>com.microsoft.sqlserver.jdbc.SQLServerDriver</database.driver>
+        <database.datasource.class>com.microsoft.sqlserver.jdbc.SQLServerDataSource</database.datasource.class>
+        <database.port>${env.mssql12.database.port}</database.port>
+        <database.url>jdbc:sqlserver://${database.host}:${database.port};DatabaseName=${database.name}</database.url>
+      </properties>
+    </profile>
+    
+    <profile>
+      <id>mssql12-xa</id>
+      <properties>
+        <database.type>mssql</database.type>
+        <jboss.datasource.filename>mssql-xa-ds.xml</jboss.datasource.filename>
+        <database.host>${env.mssql12.database.host}</database.host>
+        <database.name>${env.mssql12.database.name}</database.name>
+        <database.user>${env.mssql12.database.user}</database.user>
+        <database.password>${env.mssql12.database.password}</database.password>
+        <database.driver>com.microsoft.sqlserver.jdbc.SQLServerDriver</database.driver>
+        <database.datasource.class>com.microsoft.sqlserver.jdbc.SQLServerXADataSource</database.datasource.class>
+        <database.datasource.class.type>${database.datasource.class.type.xa}</database.datasource.class.type>
+        <database.port>${env.mssql12.database.port}</database.port>
         <database.url>jdbc:sqlserver://${database.host}:${database.port};DatabaseName=${database.name}</database.url>
       </properties>
     </profile>

@@ -107,6 +107,7 @@ public class MscRuntimeContainerDelegate implements Service<MscRuntimeContainerD
       // install the service asynchronously. 
       childTarget.addService(serviceName, processEngineRegistration)
         .setInitialMode(Mode.ACTIVE)
+        .addDependency(ServiceNames.forMscRuntimeContainerDelegate(), MscRuntimeContainerDelegate.class, processEngineRegistration.getRuntimContainerDelegateInjector())
         .install();    
     }
     
@@ -272,6 +273,22 @@ public class MscRuntimeContainerDelegate implements Service<MscRuntimeContainerD
 
   protected void stopTrackingServices() {
     serviceContainer.removeListener(processEngineServiceTracker);    
+  }
+
+  /**
+   * <p>invoked by the {@link MscManagedProcessEngine} and {@link MscManagedProcessEngineController} 
+   * when a process engine is started</p>
+   */
+  public void processEngineStarted(ProcessEngine processEngine) {
+    processEngines.add(processEngine);
+  }
+  
+  /**
+   * <p>invoked by the {@link MscManagedProcessEngine} and {@link MscManagedProcessEngineController} 
+   * when a process engine is stopped</p>
+   */
+  public void processEngineStopped(ProcessEngine processEngine) {
+    processEngines.remove(processEngine);
   }
   
 }

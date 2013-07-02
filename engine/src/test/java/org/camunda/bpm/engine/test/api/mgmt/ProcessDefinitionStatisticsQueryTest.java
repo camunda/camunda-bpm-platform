@@ -37,7 +37,7 @@ public class ProcessDefinitionStatisticsQueryTest extends PluggableProcessEngine
     parameters.put("fail", true);
     runtimeService.startProcessInstanceByKey("ExampleProcess", parameters);
 
-    waitForJobExecutorToProcessAllJobs(6000, 500);
+    waitForJobExecutorToProcessAllJobs(6000);
     
     List<ProcessDefinitionStatistics> statistics = 
         managementService
@@ -61,7 +61,7 @@ public class ProcessDefinitionStatisticsQueryTest extends PluggableProcessEngine
     parameters.put("fail", true);
     runtimeService.startProcessInstanceByKey("ExampleProcess", parameters);
 
-    waitForJobExecutorToProcessAllJobs(6000, 500);
+    waitForJobExecutorToProcessAllJobs(6000);
     
     List<ProcessDefinitionStatistics> statistics = 
         managementService
@@ -91,7 +91,7 @@ public class ProcessDefinitionStatisticsQueryTest extends PluggableProcessEngine
     parameters.put("fail", true);
     runtimeService.startProcessInstanceByKey("ExampleProcess", parameters);
 
-    waitForJobExecutorToProcessAllJobs(6000, 500);
+    waitForJobExecutorToProcessAllJobs(6000);
     
     List<ProcessDefinitionStatistics> statistics = 
         managementService
@@ -121,7 +121,7 @@ public class ProcessDefinitionStatisticsQueryTest extends PluggableProcessEngine
     parameters.put("fail", true);
     runtimeService.startProcessInstanceByKey("ExampleProcess", parameters);
 
-    waitForJobExecutorToProcessAllJobs(6000, 500);
+    waitForJobExecutorToProcessAllJobs(6000);
     
     List<ProcessDefinitionStatistics> statistics = 
         managementService
@@ -146,7 +146,7 @@ public class ProcessDefinitionStatisticsQueryTest extends PluggableProcessEngine
     parameters.put("fail", true);
     runtimeService.startProcessInstanceByKey("ExampleProcess", parameters);
 
-    waitForJobExecutorToProcessAllJobs(6000, 500);
+    waitForJobExecutorToProcessAllJobs(6000);
     
     List<ProcessDefinitionStatistics> statistics = 
         managementService
@@ -196,7 +196,7 @@ public class ProcessDefinitionStatisticsQueryTest extends PluggableProcessEngine
   public void testProcessDefinitionStatisticsQueryCount() {
     runtimeService.startProcessInstanceByKey("ExampleProcess");
     
-    waitForJobExecutorToProcessAllJobs(6000, 500);
+    waitForJobExecutorToProcessAllJobs(6000);
     
     long count = 
         managementService
@@ -245,7 +245,7 @@ public class ProcessDefinitionStatisticsQueryTest extends PluggableProcessEngine
   public void testCallActivityProcessDefinitionStatisticsQuery() {
     runtimeService.startProcessInstanceByKey("callExampleSubProcess");
     
-    waitForJobExecutorToProcessAllJobs(6000, 500);
+    waitForJobExecutorToProcessAllJobs(6000);
     
     List<ProcessDefinitionStatistics> statistics = 
         managementService
@@ -286,7 +286,7 @@ public class ProcessDefinitionStatisticsQueryTest extends PluggableProcessEngine
       runtimeService.startProcessInstanceById(definition.getId());
     }
     
-    waitForJobExecutorToProcessAllJobs(6000, 500);
+    waitForJobExecutorToProcessAllJobs(6000);
     
     List<ProcessDefinitionStatistics> statistics = 
         managementService
@@ -333,7 +333,7 @@ public class ProcessDefinitionStatisticsQueryTest extends PluggableProcessEngine
       runtimeService.startProcessInstanceById(definition.getId(), parameters);
     }
     
-    waitForJobExecutorToProcessAllJobs(6000, 500);
+    waitForJobExecutorToProcessAllJobs(6000);
     
     List<ProcessDefinitionStatistics> statistics = 
         managementService
@@ -391,7 +391,7 @@ public class ProcessDefinitionStatisticsQueryTest extends PluggableProcessEngine
       runtimeService.startProcessInstanceById(definition.getId());
     }
     
-    waitForJobExecutorToProcessAllJobs(6000, 500);
+    waitForJobExecutorToProcessAllJobs(6000);
     
     List<ProcessDefinitionStatistics> statistics = 
         managementService
@@ -448,7 +448,7 @@ public class ProcessDefinitionStatisticsQueryTest extends PluggableProcessEngine
   public void testProcessDefinitionStatisticsQueryWithIncidentsWithoutFailedJobs() {
     runtimeService.startProcessInstanceByKey("callExampleSubProcess");
     
-    waitForJobExecutorToProcessAllJobs(6000, 500);
+    waitForJobExecutorToProcessAllJobs(6000);
     
     List<ProcessDefinitionStatistics> statistics = 
         managementService

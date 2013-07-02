@@ -36,6 +36,10 @@ public class AtomicOperationTransitionNotifyListenerTake implements AtomicOperat
   public void execute(InterpretableExecution execution) {
     TransitionImpl transition = execution.getTransition();
     
+    // while executing the transition, the activityInstance is 'null'
+    // (we are not executing an activity)
+    execution.setActivityInstanceId(null);
+    
     List<ExecutionListener> executionListeners = transition.getExecutionListeners();
     int executionListenerIndex = execution.getExecutionListenerIndex();
     
@@ -58,7 +62,7 @@ public class AtomicOperationTransitionNotifyListenerTake implements AtomicOperat
       execution.setExecutionListenerIndex(0);
       execution.setEventName(null);
       execution.setEventSource(null);
-
+      
       ActivityImpl activity = (ActivityImpl) execution.getActivity();
       ActivityImpl nextScope = findNextScope(activity.getParent(), transition.getDestination());
       execution.setActivity(nextScope);

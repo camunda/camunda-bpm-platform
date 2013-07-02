@@ -1,5 +1,5 @@
 ngDefine('camunda.common.directives', [
-  './errorPanel',
+  'module:camunda.common.directives.notificationsPanel:./notificationsPanel',
   './help',
   './requestAware',
   './paginator',

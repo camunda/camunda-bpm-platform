@@ -6,10 +6,10 @@
 
   <bean id="processEngineConfiguration" class="org.camunda.bpm.engine.impl.cfg.StandaloneProcessEngineConfiguration">
   
-    <property name="jdbcUrl" value="${test.db.url}" />
-    <property name="jdbcDriver" value="${test.db.driver}" />
-    <property name="jdbcUsername" value="${test.db.username}" />
-    <property name="jdbcPassword" value="${test.db.password}" />
+    <property name="jdbcUrl" value="${database.url}" />
+    <property name="jdbcDriver" value="${database.driver}" />
+    <property name="jdbcUsername" value="${database.user}" />
+    <property name="jdbcPassword" value="${database.password}" />
     
     <!-- Database configurations -->
     <property name="databaseSchemaUpdate" value="keep-your-hands-off-my-database" />

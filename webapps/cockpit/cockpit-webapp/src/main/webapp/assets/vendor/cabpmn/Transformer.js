@@ -19,14 +19,12 @@ define([], function () {
   var NS_OMG_DC = "http://www.omg.org/spec/DD/20100524/DC";
   var NS_OMG_DI = "http://www.omg.org/spec/DD/20100524/DI";
 
-  /** the parse listeners are callbacks that are invoked by the transformer
-   * when activity definitions are created */
-  var parseListeners = [];
-
   function getXmlObject(source) {
     // use the browser's DOM implemenation
     var xmlDoc;
-    if (window.DOMParser) {
+    if (source instanceof Document) {
+        xmlDoc = source;
+    } else if (window.DOMParser) {
       var parser = new DOMParser();
       xmlDoc = parser.parseFromString(source,"text/xml");
     } else {
@@ -38,11 +36,14 @@ define([], function () {
   }
 
   function Transformer () {
+    this.parseListeners = [];
   }
 
-  Transformer.prototype.parseListeners = parseListeners;
-
   Transformer.prototype.transform =  function(source) {
+
+    /** the parse listeners are callbacks that are invoked by the transformer
+     * when activity definitions are created */
+    var parseListeners = this.parseListeners;
 
     var doc = getXmlObject(source);
     var definitions = doc.getElementsByTagNameNS(NS_BPMN_SEMANTIC, "definitions");
@@ -93,8 +94,35 @@ define([], function () {
         lastGeneratedId++;
       }
 
-      return bpmnObject;
+      function getChildElementByName(element, name) {
+        for (var index = 0; index < element.childNodes.length; index++) {
+            if (element.childNodes[index].localName == name) {
+              return element.childNodes[index];
+            }
+        }
+      }
 
+      var miElement = getChildElementByName(element, "multiInstanceLoopCharacteristics");
+      var loop = getChildElementByName(element, "standardLoopCharacteristics");
+
+      bpmnObject.marker = {};
+
+      if (miElement && miElement.getAttribute("isSequential") === "true") {
+        bpmnObject.marker["multiInstanceSequential"] = true;
+      }else if (miElement) {
+        bpmnObject.marker["multiInstanceParallel"] = true;
+      }
+
+      if (loop) {
+        bpmnObject.marker["loop"] = true;
+      }
+
+      if(bpmnObject.isForCompensation == "true") {
+        bpmnObject.marker["compensation"] = true;
+      }
+
+
+      return bpmnObject;
     }
 
     /** creates an ActivityDefinition and adds it to the scope activity.
@@ -147,26 +175,51 @@ define([], function () {
       }
 
       return bpmnObject;
-    };
+    }
 
-    function transformTask(element, scope, sequenceFlows, bpmnDiElementIndex) {
+    function transformActivity(element, scope, sequenceFlows, bpmnDiElementIndex) {
       // the ActivityDefinition to be built
 
       var taskObject = createFlowElement(element, scope, sequenceFlows, bpmnDiElementIndex);
       return taskObject;
-    };
+    }
+
+    function transformIoSpecification(element, scope, bpmnDiElementIndex) {
+      var ioObject = createBpmnObject(element, scope, bpmnDiElementIndex);
+      var inputElements = element.getElementsByTagName("dataInput");
+      var outputElements = element.getElementsByTagName("dataOutput");
+
+      var baseElements = [];
+
+      for (var index = 0; index < inputElements.length; index++) {
+        baseElements.push(createBpmnObject(inputElements[index], scope, bpmnDiElementIndex));
+      }
+
+      for (var index = 0; index < outputElements.length; index++) {
+        baseElements.push(createBpmnObject(outputElements[index], scope, bpmnDiElementIndex));
+      }
+
+      ioObject["baseElements"] = baseElements;
+
+      return ioObject;
+    }
 
     function transformLaneSet(laneSetElement, scope, bpmnDiElementIndex) {
+      if (laneSetElement.childNodes.length == 0) {
+        return;
+      }
+
       // TODO not creating a seperate bpmn object for the lane set, adding lanes to the process directly
       var element = laneSetElement.firstChild;
+
       do {
         var elementType = element.nodeName;
         if (elementType == "lane") {
-          createBpmnObject(element, scope, bpmnDiElementIndex);
         }
+        createBpmnObject(element, scope, bpmnDiElementIndex);
       }
       while (element = element.nextSibling)
-    };
+    }
 
 
     function transformEvent(element, scope, sequenceFlows, bpmnDiElementIndex) {
@@ -181,7 +234,7 @@ define([], function () {
           if(child.nodeName.indexOf("EventDefinition") != -1) {
             var elementType = child.nodeName;
             if (elementType.indexOf(":") != -1) {
-              elementType = elementType.substr(elementType.indexOf(":") + 1, elementType.length)
+              elementType = elementType.substr(elementType.indexOf(":") + 1, elementType.length);
             }
             eventObject.eventDefinitions.push({
               type : elementType
@@ -191,7 +244,7 @@ define([], function () {
       }
 
       return eventObject;
-    };
+    }
 
     function createSequenceFlow(element, scopeActivity, bpmnDiElementIndex, index) {
 
@@ -236,7 +289,7 @@ define([], function () {
       } while(element = element.nextSibling);
 
       return index;
-    };
+    }
 
     /** transform <parallelGateway ... /> elements */
     function transformParallelGateway(element, scopeActivity, sequenceFlows, bpmnDiElementIndex) {
@@ -256,7 +309,7 @@ define([], function () {
       bpmnObject.cardinality = incomingFlows;
 
       return bpmnObject;
-    };
+    }
 
     /** transform <exclusiveGateway ... /> elements */
     function transformExclusiveGateway(element, scopeActivity, sequenceFlows, bpmnDiElementIndex) {
@@ -294,7 +347,7 @@ define([], function () {
         }
       }
       return bpmnObject;
-    };
+    }
 
     /** invokes all parse listeners */
     function invokeParseListeners(bpmnObject, element, scopeActivity, scopeElement) {
@@ -328,7 +381,7 @@ define([], function () {
           elementType = elementType.substr(elementType.indexOf(":") + 1, elementType.length);
         }
 
-        var taskElementTypes = ["task", "manualTask", "serviceTask", "scriptTask", "userTask", "sendTask", "recieveTask", "businessRuleTask"];
+        var taskElementTypes = ["callActivity","task", "manualTask", "serviceTask", "scriptTask", "userTask", "sendTask", "recieveTask", "businessRuleTask"];
         var eventElementTypes = ["startEvent", "endEvent",  "intermediateThrowEvent", "intermediateCatchEvent", "boundaryEvent"];
 
         if(elementType == "exclusiveGateway") {
@@ -338,7 +391,7 @@ define([], function () {
           bpmnObject = transformParallelGateway(element, scopeActivity, sequenceFlows, bpmnDiElementIndex);
 
         } else if(taskElementTypes.indexOf(elementType) != -1) {
-          bpmnObject = transformTask(element, scopeActivity, sequenceFlows, bpmnDiElementIndex);
+          bpmnObject = transformActivity(element, scopeActivity, sequenceFlows, bpmnDiElementIndex);
 
         } else if(eventElementTypes.indexOf(elementType) != -1) {
           bpmnObject = transformEvent(element, scopeActivity, sequenceFlows, bpmnDiElementIndex);
@@ -346,12 +399,12 @@ define([], function () {
         } else if(elementType == "laneSet") {
           bpmnObject = transformLaneSet(element, scopeActivity, bpmnDiElementIndex);
 
-        } else if(elementType == "subProcess") {
+        } else if(elementType == "subProcess" || elementType =="adHocSubProcess" || elementType == "transaction") {
           bpmnObject = transformElementsContainer(element, scopeActivity, sequenceFlows, bpmnDiElementIndex);
-
-        } else if(!!element && element.nodeName != "sequenceFlow" && element.nodeType == 1 /* (nodeType=1 => element nodes only) */ ) {  
+        } else if(elementType == "ioSpecification"){
+          bpmnObject = transformIoSpecification(element, scopeActivity, bpmnDiElementIndex);
+        } else if(!!element && element.nodeName != "sequenceFlow" && element.nodeType == 1 /* (nodeType=1 => element nodes only) */ ) {
           bpmnObject = createBpmnObject(element, scopeActivity, bpmnDiElementIndex);
-
         }
 
         if(!!bpmnObject) {
@@ -385,8 +438,6 @@ define([], function () {
 
       // transform a scope
       transformScope(containerElement, containerObject, bpmnDiElementIndex);
-
-      generatedElements.push(containerObject);
 
       invokeParseListeners(containerObject, containerElement);
     };
@@ -438,6 +489,73 @@ define([], function () {
       }
     }
 
+    function getMessageFlows (definitionsElement, bpmnDiElementIndex) {
+      var messageFlows = [];
+      var messageFlowElements = definitionsElement.getElementsByTagNameNS(NS_BPMN_SEMANTIC, "messageFlow");
+
+      for (var i = 0, mfe; !!(mfe = messageFlowElements[i]); i++) {
+        var flow = createBpmnObject(mfe, null, bpmnDiElementIndex);
+        messageFlows.push(flow);
+      }
+
+      return messageFlows;
+    }
+
+    function getParticipants (definitionsElement, bpmnDiElementIndex) {
+      var participants = [];
+      var participantElements = definitionsElement.getElementsByTagNameNS(NS_BPMN_SEMANTIC, "participant");
+
+      for (var index = 0; index < participantElements.length; index++) {
+        var participant = createBpmnObject(participantElements[index], null, bpmnDiElementIndex);
+        participants.push(participant);
+      }
+
+      return participants;
+    }
+
+    function getCategoryValues (definitionsElement) {
+      var categoryValues = [];
+      var categoryElements = definitionsElement.getElementsByTagNameNS(NS_BPMN_SEMANTIC, "categoryValue");
+
+      if (categoryElements.length != 0) {
+        for (var index = 0; index < categoryElements.length; index++) {
+          var value = createBpmnObject(categoryElements[index], null, []);
+          categoryValues.push(value);
+        }
+      }
+
+      return categoryValues;
+    }
+
+    function getDataAssociations(definitionsElement, bpmnDiElementIndex) {
+      var associations = [];
+
+      var inputAssociationElements = definitionsElement.getElementsByTagNameNS(NS_BPMN_SEMANTIC, "dataInputAssociation");
+      var outputAssociationElements = definitionsElement.getElementsByTagNameNS(NS_BPMN_SEMANTIC, "dataOutputAssociation");
+
+      for (var j = 0, inputElement; !!(inputElement = inputAssociationElements[j]); j++) {
+        associations.push(createBpmnObject(inputElement, null, bpmnDiElementIndex));
+      }
+
+      for (var k = 0, outputElement; !!(outputElement = outputAssociationElements[k]); k++) {
+        associations.push(createBpmnObject(outputElement, null, bpmnDiElementIndex));
+      }
+
+      return associations;
+    }
+
+    function getMessages(definitionsElement, bpmnDiElementIndex) {
+      var messages = [];
+      var messageElements = definitionsElement.getElementsByTagNameNS(NS_BPMN_SEMANTIC, "message");
+
+      for (var i = 0; i < messageElements.length; i++) {
+        var m = createBpmnObject(messageElements[i], null, bpmnDiElementIndex);
+        messages.push(m);
+      }
+
+      return messages;
+    }
+
     /** transforms a <definitions ... /> element into a set of activity definitions */
     function transformDefinitions(definitionsElement) {
 
@@ -447,36 +565,47 @@ define([], function () {
       var bpmnDiagrams = definitionsElement.getElementsByTagNameNS(NS_BPMN_DIAGRAM_INTERCHANGE, "BPMNDiagram");
 
       var bpmnDiElementIndex = {};
-      for(var i=0; i < bpmnDiagrams.length; i++) {
+      for(var i = 0; i < bpmnDiagrams.length; i++) {
         createBpmnDiElementIndex(bpmnDiagrams[i], bpmnDiElementIndex);
       }
 
-      var participants = definitionsElement.getElementsByTagNameNS(NS_BPMN_SEMANTIC, "participant");
+      var processes = definitionsElement.getElementsByTagNameNS(NS_BPMN_SEMANTIC, "process");
       var processNames = {};
 
-      if (participants.length != 0) {
-        for (var index = 0; index < participants.length; index++) {
-          var participant = participants[index];
-          var processRef = participant.getAttribute("processRef");
-          var participantId = participants[index].getAttribute("id");
-          // map participant shape to process shape for resolution in transform process
-          bpmnDiElementIndex[processRef] = bpmnDiElementIndex[participantId];
-          processNames[processRef] = participant.getAttribute("name");
+      var participants = getParticipants(definitionsElement, bpmnDiElementIndex);
+      var categoryValues = getCategoryValues(definitionsElement);
+
+      generatedElements = categoryValues.concat(generatedElements.concat(participants));
+
+      for (var j = 0, participant; !!(participant = participants[j]); j++) {
+
+        if (!participant.processRef) {
+          continue;
         }
+
+        // map participant shape to process shape for resolution in transform process
+        bpmnDiElementIndex[participant.processRef] = bpmnDiElementIndex[participant.id];
+
+        processNames[participant.processRef] = participant.name;
       }
 
-      var processes = definitionsElement.getElementsByTagNameNS(NS_BPMN_SEMANTIC, "process");
+      for(var k = 0, process; !!(process = processes[k]); k++) {
+        var name = processNames[process.getAttribute("id")];
+        if (name) {
+          process.setAttributeNS(NS_BPMN_SEMANTIC, "name" , processNames[process.getAttribute("id")]);
+        }
 
-      for(var i =0; i < processes.length; i++) {
-        processes[i].setAttributeNS(NS_BPMN_SEMANTIC, "name" , processNames[processes[i].getAttribute("id")]);
-        transformProcess(processes[i], bpmnDiElementIndex);
+        transformProcess(process, bpmnDiElementIndex);
       }
 
-    };
+      var messageFlows = getMessageFlows(definitionsElement, bpmnDiElementIndex);
+      var dataAssociations = getDataAssociations(definitionsElement, bpmnDiElementIndex);
+      var messages = getMessages(definitionsElement, bpmnDiElementIndex);
 
-    transformDefinitions(definitions[0]);
+      return generatedElements.concat(messageFlows, dataAssociations, messages);
+    }
 
-    return generatedElements;
+    return transformDefinitions(definitions[0]);
   };
 
   return Transformer;
