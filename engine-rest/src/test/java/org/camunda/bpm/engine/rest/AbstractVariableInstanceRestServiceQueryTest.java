@@ -33,6 +33,8 @@ import com.jayway.restassured.response.Response;
 public abstract class AbstractVariableInstanceRestServiceQueryTest extends AbstractRestServiceTest {
   
   protected static final String VARIABLE_INSTANCE_QUERY_URL = TEST_RESOURCE_ROOT_PATH + "/variable-instance";
+  protected static final String VARIABLE_INSTANCE_COUNT_QUERY_URL = VARIABLE_INSTANCE_QUERY_URL + "/count";
+  
   private VariableInstanceQuery mockedQuery;
   
   @Before
@@ -60,6 +62,16 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
   @Test
   public void testNoParametersQuery() {
     expect().statusCode(Status.OK.getStatusCode()).when().get(VARIABLE_INSTANCE_QUERY_URL);
+    
+    verify(mockedQuery).list();
+    verifyNoMoreInteractions(mockedQuery);
+  }
+  
+  @Test
+  public void testNoParametersQueryAsPost() {
+    given().contentType(POST_JSON_CONTENT_TYPE).body(EMPTY_JSON_OBJECT)
+      .expect().statusCode(Status.OK.getStatusCode())
+      .when().post(VARIABLE_INSTANCE_QUERY_URL);
     
     verify(mockedQuery).list();
     verifyNoMoreInteractions(mockedQuery);
@@ -498,6 +510,25 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
     verify(mockedQuery).executionIdIn(anExecutionId, anotherExecutionId);
     verify(mockedQuery).taskIdIn(aTaskId, anotherTaskId);
     verify(mockedQuery).activityInstanceIdIn(anActivityInstanceId, anotherActivityInstanceId);
+  }
+  
+  @Test
+  public void testQueryCount() {
+    expect().statusCode(Status.OK.getStatusCode())
+      .body("count", equalTo(1))
+      .when().get(VARIABLE_INSTANCE_COUNT_QUERY_URL);
+    
+    verify(mockedQuery).count();
+  }
+
+  @Test
+  public void testQueryCountForPost() {
+    given().contentType(POST_JSON_CONTENT_TYPE).body(EMPTY_JSON_OBJECT)
+    .expect().statusCode(Status.OK.getStatusCode())
+      .body("count", equalTo(1))
+      .when().post(VARIABLE_INSTANCE_COUNT_QUERY_URL);
+    
+    verify(mockedQuery).count();
   }
   
 }

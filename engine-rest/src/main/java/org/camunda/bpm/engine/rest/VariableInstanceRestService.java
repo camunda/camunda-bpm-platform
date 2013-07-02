@@ -24,6 +24,7 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 
+import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.runtime.VariableInstanceDto;
 import org.camunda.bpm.engine.rest.dto.runtime.VariableInstanceQueryDto;
 import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
@@ -67,5 +68,16 @@ public interface VariableInstanceRestService {
   List<VariableInstanceDto> queryVariableInstances(VariableInstanceQueryDto queryDto,
       @QueryParam("firstResult") Integer firstResult,
       @QueryParam("maxResults") Integer maxResults);
+  
+  @GET
+  @Path("/count")
+  @Produces(MediaType.APPLICATION_JSON)
+  CountResultDto getVariableInstancesCount(@Context UriInfo uriInfo);
+  
+  @POST
+  @Path("/count")
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
+  CountResultDto queryVariableInstancesCount(VariableInstanceQueryDto queryDto);
   
 }

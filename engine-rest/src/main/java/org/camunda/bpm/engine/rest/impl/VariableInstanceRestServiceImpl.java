@@ -19,6 +19,7 @@ import javax.ws.rs.core.UriInfo;
 
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.rest.VariableInstanceRestService;
+import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.runtime.VariableInstanceDto;
 import org.camunda.bpm.engine.rest.dto.runtime.VariableInstanceQueryDto;
 import org.camunda.bpm.engine.runtime.VariableInstance;
@@ -34,11 +35,13 @@ public class VariableInstanceRestServiceImpl extends AbstractRestProcessEngineAw
     super(engineName);
   }
 
+  @Override
   public List<VariableInstanceDto> getVariableInstances(UriInfo uriInfo, Integer firstResult, Integer maxResults) {
     VariableInstanceQueryDto queryDto = new VariableInstanceQueryDto(uriInfo.getQueryParameters());
     return queryVariableInstances(queryDto, firstResult, maxResults);
   }
 
+  @Override
   public List<VariableInstanceDto> queryVariableInstances(VariableInstanceQueryDto queryDto, Integer firstResult, Integer maxResults) {
     ProcessEngine engine = getProcessEngine();
     VariableInstanceQuery query = queryDto.toQuery(engine);
@@ -66,6 +69,24 @@ public class VariableInstanceRestServiceImpl extends AbstractRestProcessEngineAw
       maxResults = Integer.MAX_VALUE;
     }
     return query.listPage(firstResult, maxResults); 
+  }
+
+  @Override
+  public CountResultDto getVariableInstancesCount(UriInfo uriInfo) {
+    VariableInstanceQueryDto queryDto = new VariableInstanceQueryDto(uriInfo.getQueryParameters());
+    return queryVariableInstancesCount(queryDto);
+  }
+
+  @Override
+  public CountResultDto queryVariableInstancesCount(VariableInstanceQueryDto queryDto) {
+    ProcessEngine engine = getProcessEngine();
+    VariableInstanceQuery query = queryDto.toQuery(engine);
+    
+    long count = query.count();
+    CountResultDto result = new CountResultDto();
+    result.setCount(count);
+    
+    return result;
   }
 
 }
