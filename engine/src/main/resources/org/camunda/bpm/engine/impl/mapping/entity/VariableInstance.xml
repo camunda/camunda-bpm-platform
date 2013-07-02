@@ -116,7 +116,7 @@
             
             <!-- executionIds -->
             <if test="executionIds != null &amp;&amp; executionIds.length > 0">
-              RES.EXECUTION_ID_ in
+              and RES.EXECUTION_ID_ in
               <foreach item="item" index="index" collection="executionIds"
                        open="(" separator="," close=")">
                 #{item}
@@ -125,7 +125,7 @@
             
             <!-- processInstanceIds -->
             <if test="processInstanceIds != null &amp;&amp; processInstanceIds.length > 0">
-              RES.PROC_INST_ID_ in
+              and RES.PROC_INST_ID_ in
               <foreach item="item" index="index" collection="processInstanceIds"
                        open="(" separator="," close=")">
                 #{item}
@@ -134,7 +134,7 @@
             
             <!-- taskIds -->
             <if test="taskIds != null &amp;&amp; taskIds.length > 0">
-              RES.TASK_ID_ in
+              and RES.TASK_ID_ in
               <foreach item="item" index="index" collection="taskIds"
                        open="(" separator="," close=")">
                 #{item}
@@ -143,7 +143,7 @@
             
             <!-- activityInstanceIds -->
             <if test="activityInstanceIds != null &amp;&amp; activityInstanceIds.length > 0">
-              EXECUTION.ACT_INST_ID_ in
+              and EXECUTION.ACT_INST_ID_ in
               <foreach item="item" index="index" collection="activityInstanceIds"
                        open="(" separator="," close=")">
                 #{item}
