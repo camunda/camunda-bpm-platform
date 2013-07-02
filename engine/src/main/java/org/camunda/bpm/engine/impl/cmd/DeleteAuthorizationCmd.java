@@ -12,40 +12,38 @@
  */
 package org.camunda.bpm.engine.impl.cmd;
 
-import java.io.Serializable;
-
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-
+import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 
 /**
- * @author Tom Baeyens
+ * @author Daniel Meyer
+ *
  */
-public class DeleteUserCmd extends AbstractWritableIdentityServiceCmd<Void> implements Command<Void>, Serializable {
+public class DeleteAuthorizationCmd implements Command<Void> {
 
-  private static final long serialVersionUID = 1L;
-  String userId;
-  
-  public DeleteUserCmd(String userId) {
-    this.userId = userId;
+  protected String authorizationId;
+
+  public DeleteAuthorizationCmd(String authorizationId) {
+    this.authorizationId = authorizationId;
   }
   
-  protected Void executeCmd(CommandContext commandContext) {
-    if(userId == null) {
-      throw new ProcessEngineException("userId is null");
+  public Void execute(CommandContext commandContext) {
+    
+    final AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
+    
+    AuthorizationEntity authorization = authorizationManager
+      .selectAuthorizationById(authorizationId);
+   
+    if(authorization == null) {
+      throw new ProcessEngineException("Authorization for Id '"+authorizationId+"' does not exist.");
     }
     
-    // delete user picture
-    new DeleteUserPictureCmd(userId).execute(commandContext);
-    
-    commandContext.getIdentityInfoManager()
-      .deleteUserInfoByUserId(userId);
-    
-    commandContext
-      .getWritableIdentityProvider()
-      .deleteUser(userId);
+    authorizationManager.delete(authorization);
     
     return null;
   }
+
 }

@@ -13,8 +13,6 @@
 
 package org.camunda.bpm.engine.impl;
 
-import java.util.List;
-
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.GroupQuery;
@@ -25,7 +23,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 /**
  * @author Joram Barrez
  */
-public class GroupQueryImpl extends AbstractQuery<GroupQuery, Group> implements GroupQuery {
+public abstract class GroupQueryImpl extends AbstractQuery<GroupQuery, Group> implements GroupQuery {
   
   private static final long serialVersionUID = 1L;
   protected String id;
@@ -108,22 +106,6 @@ public class GroupQueryImpl extends AbstractQuery<GroupQuery, Group> implements 
   
   public GroupQuery orderByGroupType() {
     return orderBy(GroupQueryProperty.TYPE);
-  }
-  
-  //results ////////////////////////////////////////////////////////
-  
-  public long executeCount(CommandContext commandContext) {
-    checkQueryOk();
-    return commandContext
-      .getGroupManager()
-      .findGroupCountByQueryCriteria(this);
-  }
-  
-  public List<Group> executeList(CommandContext commandContext, Page page) {
-    checkQueryOk();
-    return commandContext
-      .getGroupManager()
-      .findGroupByQueryCriteria(this, page);
   }
   
   //getters ////////////////////////////////////////////////////////

@@ -34,7 +34,11 @@ package org.camunda.bpm.engine;
  *  <li>
  * <b>{@link org.camunda.bpm.engine.HistoryService}: </b> Service exposing information about 
  * ongoing and past process instances.</li>
+ * 
+ * <li><b>{@link org.camunda.bpm.engine.AuthorizationService}:</b> Service allowing 
+ * to manage access permissions for users and groups.</b>
  * </ul>
+ * 
  * 
  * Typically, there will be only one central ProcessEngine instance needed in a
  * end-user application. Building a ProcessEngine is done through a
@@ -45,6 +49,7 @@ package org.camunda.bpm.engine;
  * 
  * @author Tom Baeyens
  * @author Joram Barrez
+ * @author Daniel Meyer
  */
 public interface ProcessEngine {
 
@@ -63,6 +68,7 @@ public interface ProcessEngine {
   HistoryService getHistoryService();
   IdentityService getIdentityService();
   ManagementService getManagementService();
+  AuthorizationService getAuthorizationService();
 
   void close();
 }

@@ -10,36 +10,46 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.impl.cmd;
 
-import java.io.Serializable;
-
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-
+import org.camunda.bpm.engine.impl.persistence.entity.IdentityInfoEntity;
 
 /**
- * @author Tom Baeyens
+ * @author Daniel Meyer
+ *
  */
-public class CreateUserCmd extends AbstractWritableIdentityServiceCmd<User> implements Command<User>, Serializable {
-
-  private static final long serialVersionUID = 1L;
+public class DeleteUserPictureCmd implements Command<Void> {
   
   protected String userId;
-  
-  public CreateUserCmd(String userId) {
-    if(userId == null) {
-      throw new ProcessEngineException("userId is null");
-    }
+
+  public DeleteUserPictureCmd(String userId) {
     this.userId = userId;
   }
-  
-  protected User executeCmd(CommandContext commandContext) {
-    return commandContext
-      .getWritableIdentityProvider()
-      .createNewUser(userId);
+
+  public Void execute(CommandContext commandContext) {
+    
+    if(userId == null) {
+      throw new ProcessEngineException("UserId cannot be null.");
+    }
+    
+    IdentityInfoEntity infoEntity = commandContext.getIdentityInfoManager()
+      .findUserInfoByUserIdAndKey(userId, "picture");
+    
+    if(infoEntity != null) {
+      String byteArrayId = infoEntity.getValue();
+      if(byteArrayId != null) {
+        commandContext.getByteArrayManager()
+          .deleteByteArrayById(byteArrayId);
+      }
+      commandContext.getIdentityInfoManager()
+        .delete(infoEntity);
+    }
+    
+    
+    return null;
   }
+
 }

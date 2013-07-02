@@ -10,36 +10,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.impl.cmd;
-
-import java.io.Serializable;
+package org.camunda.bpm.engine.impl.identity;
 
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.interceptor.Command;
-import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-
 
 /**
- * @author Tom Baeyens
+ * <p>Marks an exception triggered inside an identity provider implementation</p>
+ * 
+ * @author Daniel Meyer
+ *
  */
-public class DeleteGroupCmd extends AbstractWritableIdentityServiceCmd<Void>  implements Command<Void>, Serializable  {
+public class IdentityProviderException extends ProcessEngineException {
 
   private static final long serialVersionUID = 1L;
-  String groupId;
   
-  public DeleteGroupCmd(String groupId) {
-    this.groupId = groupId;
+  public IdentityProviderException(String message) {
+    super(message);
   }
   
-  protected Void executeCmd(CommandContext commandContext) {
-    if(groupId == null) {
-      throw new ProcessEngineException("groupId is null");
-    }
-    commandContext
-      .getWritableIdentityProvider()
-      .deleteGroup(groupId);
-    
-    return null;
+  public IdentityProviderException(String message, Throwable cause) {
+    super(message, cause);
   }
+
 
 }

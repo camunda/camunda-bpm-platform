@@ -22,7 +22,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 /**
  * @author Tom Baeyens
  */
-public class DeleteMembershipCmd implements Command<Void>, Serializable {
+public class DeleteMembershipCmd extends AbstractWritableIdentityServiceCmd<Void> implements Command<Void>, Serializable {
 
   private static final long serialVersionUID = 1L;
   String userId;
@@ -33,7 +33,7 @@ public class DeleteMembershipCmd implements Command<Void>, Serializable {
     this.groupId = groupId;
   }
   
-  public Void execute(CommandContext commandContext) {
+  protected Void executeCmd(CommandContext commandContext) {
     if(userId == null) {
       throw new ProcessEngineException("userId is null");
     }
@@ -42,7 +42,7 @@ public class DeleteMembershipCmd implements Command<Void>, Serializable {
     }
     
     commandContext
-      .getMembershipManager()
+      .getWritableIdentityProvider()
       .deleteMembership(userId, groupId);
     
     return null;    

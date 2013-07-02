@@ -40,6 +40,7 @@ import org.apache.ibatis.transaction.TransactionFactory;
 import org.apache.ibatis.transaction.jdbc.JdbcTransactionFactory;
 import org.apache.ibatis.transaction.managed.ManagedTransactionFactory;
 import org.apache.ibatis.type.JdbcType;
+import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.FormService;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.IdentityService;
@@ -50,6 +51,7 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.TaskService;
+import org.camunda.bpm.engine.impl.AuthorizationServiceImpl;
 import org.camunda.bpm.engine.impl.FormServiceImpl;
 import org.camunda.bpm.engine.impl.HistoryServiceImpl;
 import org.camunda.bpm.engine.impl.IdentityServiceImpl;
@@ -89,6 +91,9 @@ import org.camunda.bpm.engine.impl.form.JuelFormEngine;
 import org.camunda.bpm.engine.impl.form.LongFormType;
 import org.camunda.bpm.engine.impl.form.StringFormType;
 import org.camunda.bpm.engine.impl.history.handler.HistoryParseListener;
+import org.camunda.bpm.engine.impl.identity.ReadOnlyIdentityProvider;
+import org.camunda.bpm.engine.impl.identity.WritableIdentityProvider;
+import org.camunda.bpm.engine.impl.identity.db.DbIdentityServiceProvider;
 import org.camunda.bpm.engine.impl.incident.FailedJobIncidentHandler;
 import org.camunda.bpm.engine.impl.incident.IncidentHandler;
 import org.camunda.bpm.engine.impl.interceptor.CommandContextFactory;
@@ -116,12 +121,12 @@ import org.camunda.bpm.engine.impl.persistence.GenericManagerFactory;
 import org.camunda.bpm.engine.impl.persistence.deploy.Deployer;
 import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentCache;
 import org.camunda.bpm.engine.impl.persistence.entity.AttachmentManager;
+import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayManager;
 import org.camunda.bpm.engine.impl.persistence.entity.CommentManager;
 import org.camunda.bpm.engine.impl.persistence.entity.DeploymentManager;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionManager;
-import org.camunda.bpm.engine.impl.persistence.entity.GroupManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricActivityInstanceManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricDetailManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricProcessInstanceManager;
@@ -131,14 +136,12 @@ import org.camunda.bpm.engine.impl.persistence.entity.IdentityInfoManager;
 import org.camunda.bpm.engine.impl.persistence.entity.IdentityLinkManager;
 import org.camunda.bpm.engine.impl.persistence.entity.IncidentManager;
 import org.camunda.bpm.engine.impl.persistence.entity.JobManager;
-import org.camunda.bpm.engine.impl.persistence.entity.MembershipManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ResourceManager;
 import org.camunda.bpm.engine.impl.persistence.entity.StatisticsManager;
 import org.camunda.bpm.engine.impl.persistence.entity.TableDataManager;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskManager;
-import org.camunda.bpm.engine.impl.persistence.entity.UserManager;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceManager;
 import org.camunda.bpm.engine.impl.runtime.CorrelationHandler;
 import org.camunda.bpm.engine.impl.runtime.DefaultCorrelationHandler;
@@ -196,6 +199,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected TaskService taskService = new TaskServiceImpl();
   protected FormService formService = new FormServiceImpl();
   protected ManagementService managementService = new ManagementServiceImpl();
+  protected AuthorizationService authorizationService = new AuthorizationServiceImpl();  
   
   // COMMAND EXECUTORS ////////////////////////////////////////////////////////
   
@@ -320,6 +324,9 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected ProcessApplicationManager processApplicationManager;
   
   protected CorrelationHandler correlationHandler;
+
+  /** session factory to be used for obtaining identity provider sessions */
+  protected SessionFactory identityProviderSessionFactory;
   
   // buildProcessEngine ///////////////////////////////////////////////////////
   
@@ -350,6 +357,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initDataSource();
     initTransactionFactory();
     initSqlSessionFactory();
+    initIdentityProviderSessionFactory();
     initSessionFactories();
     initJpa();
     initDelegateInterceptor();
@@ -473,6 +481,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initService(taskService);
     initService(formService);
     initService(managementService);
+    initService(authorizationService);
   }
 
   protected void initService(Object service) {
@@ -644,6 +653,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   // session factories ////////////////////////////////////////////////////////
   
+  protected void initIdentityProviderSessionFactory() {
+    if(identityProviderSessionFactory == null) {
+      identityProviderSessionFactory = new GenericManagerFactory(DbIdentityServiceProvider.class);
+    }
+  }
+  
   protected void initSessionFactories() {
     if (sessionFactories==null) {
       sessionFactories = new HashMap<Class<?>, SessionFactory>();
@@ -670,19 +685,26 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       addSessionFactory(new GenericManagerFactory(IdentityInfoManager.class));
       addSessionFactory(new GenericManagerFactory(IdentityLinkManager.class));
       addSessionFactory(new GenericManagerFactory(JobManager.class));
-      addSessionFactory(new GenericManagerFactory(GroupManager.class));
-      addSessionFactory(new GenericManagerFactory(MembershipManager.class));
       addSessionFactory(new GenericManagerFactory(ProcessDefinitionManager.class));
       addSessionFactory(new GenericManagerFactory(PropertyManager.class));
       addSessionFactory(new GenericManagerFactory(ResourceManager.class));
       addSessionFactory(new GenericManagerFactory(ByteArrayManager.class));
       addSessionFactory(new GenericManagerFactory(TableDataManager.class));
       addSessionFactory(new GenericManagerFactory(TaskManager.class));
-      addSessionFactory(new GenericManagerFactory(UserManager.class));
       addSessionFactory(new GenericManagerFactory(VariableInstanceManager.class));
       addSessionFactory(new GenericManagerFactory(EventSubscriptionManager.class));
       addSessionFactory(new GenericManagerFactory(StatisticsManager.class));
       addSessionFactory(new GenericManagerFactory(IncidentManager.class));
+      addSessionFactory(new GenericManagerFactory(AuthorizationManager.class));
+      
+      sessionFactories.put(ReadOnlyIdentityProvider.class, identityProviderSessionFactory); 
+
+      // check whether identityProviderSessionFactory implements WritableIdentityProvider
+      Class<?> identityProviderType = identityProviderSessionFactory.getSessionType();
+      if(WritableIdentityProvider.class.isAssignableFrom(identityProviderType)) {
+        sessionFactories.put(WritableIdentityProvider.class, identityProviderSessionFactory); 
+      }
+      
     }
     if (customSessionFactories!=null) {
       for (SessionFactory sessionFactory: customSessionFactories) {
@@ -690,7 +712,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       }
     }
   }
-  
+
   protected void addSessionFactory(SessionFactory sessionFactory) {
     sessionFactories.put(sessionFactory.getSessionType(), sessionFactory);
   }
@@ -1178,6 +1200,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   
   public ManagementService getManagementService() {
     return managementService;
+  }
+  
+  public AuthorizationService getAuthorizationService() {
+    return authorizationService;
   }
   
   public ProcessEngineConfigurationImpl setManagementService(ManagementService managementService) {
@@ -1828,6 +1854,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public void setCustomIncidentHandlers(List<IncidentHandler> customIncidentHandlers) {
     this.customIncidentHandlers = customIncidentHandlers;
+  }
+  
+  public SessionFactory getIdentityProviderSessionFactory() {
+    return identityProviderSessionFactory;
+  }
+  
+  public void setIdentityProviderSessionFactory(SessionFactory identityProviderSessionFactory) {
+    this.identityProviderSessionFactory = identityProviderSessionFactory;
   }
 
 }

@@ -25,7 +25,6 @@ import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -56,6 +55,8 @@ import org.camunda.bpm.engine.impl.UserQueryImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.upgrade.DbUpgradeStep;
+import org.camunda.bpm.engine.impl.identity.db.DbGroupQueryImpl;
+import org.camunda.bpm.engine.impl.identity.db.DbUserQueryImpl;
 import org.camunda.bpm.engine.impl.interceptor.Session;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
@@ -1192,10 +1193,10 @@ public class DbSqlSession implements Session {
     return new HistoricVariableInstanceQueryImpl();
   }
   public UserQueryImpl createUserQuery() {
-    return new UserQueryImpl();
+    return new DbUserQueryImpl();
   }
   public GroupQueryImpl createGroupQuery() {
-    return new GroupQueryImpl();
+    return new DbGroupQueryImpl();
   }
 
   // getters and setters //////////////////////////////////////////////////////

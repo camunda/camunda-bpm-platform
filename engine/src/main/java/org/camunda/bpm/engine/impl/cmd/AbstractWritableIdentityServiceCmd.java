@@ -10,37 +10,33 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.camunda.bpm.engine.impl.cmd;
 
 import java.io.Serializable;
 
-import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.identity.Group;
+import org.camunda.bpm.engine.impl.identity.WritableIdentityProvider;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 
-
 /**
- * @author Tom Baeyens
+ * @author Daniel Meyer
+ *
  */
-public class CreateGroupCmd extends AbstractWritableIdentityServiceCmd<Group> implements Command<Group>, Serializable {
+public abstract class AbstractWritableIdentityServiceCmd<T> implements Command<T>, Serializable {
 
   private static final long serialVersionUID = 1L;
-  
-  protected String groupId;
-  
-  public CreateGroupCmd(String groupId) {
-    if(groupId == null) {
-      throw new ProcessEngineException("groupId is null");
+
+  public final T execute(CommandContext commandContext) {
+    
+    // check identity service implementation
+    if(!commandContext.getSessionFactories().containsKey(WritableIdentityProvider.class)) {
+      throw new UnsupportedOperationException("This identity service implementation is read-only.");
     }
-    this.groupId = groupId;
+    
+    T result = executeCmd(commandContext);
+    return result; 
   }
-  
-  protected Group executeCmd(CommandContext commandContext) {   
-    return commandContext
-      .getWritableIdentityProvider()
-      .createNewGroup(groupId);
-  }
+
+  protected abstract T executeCmd(CommandContext commandContext);
 
 }

@@ -31,6 +31,10 @@ import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
  * @author Frederik Heremans
  */
 public class IdentityServiceTest extends PluggableProcessEngineTestCase {
+  
+  public void testIsReadOnly() {
+    assertFalse(identityService.isReadOnly());
+  }
 
   public void testUserInfo() {
     User user = identityService.newUser("testuser");
@@ -163,7 +167,20 @@ public class IdentityServiceTest extends PluggableProcessEngineTestCase {
     user = identityService.createUserQuery().userId("johndoe").singleResult();
     assertTrue("byte arrays differ", Arrays.equals("niceface".getBytes(), picture.getBytes()));
     assertEquals("image/string", picture.getMimeType());
-
+    
+    identityService.deleteUserPicture("johndoe");
+    // this is ignored
+    identityService.deleteUserPicture("someone-else-we-dont-know");
+    
+    // picture does not exist
+    picture = identityService.getUserPicture("johndoe");
+    assertNull(picture);
+    
+    // add new picture
+    picture = new Picture("niceface".getBytes(), "image/string");
+    identityService.setUserPicture(userId, picture);
+    
+    // makes the picture go away
     identityService.deleteUser(user.getId());
   }
 
