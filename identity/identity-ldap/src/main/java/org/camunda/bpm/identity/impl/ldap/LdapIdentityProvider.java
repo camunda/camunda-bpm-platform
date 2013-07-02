@@ -20,6 +20,7 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import javax.naming.AuthenticationException;
 import javax.naming.Context;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
@@ -38,6 +39,7 @@ import org.camunda.bpm.engine.identity.UserQuery;
 import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.impl.UserQueryImpl;
 import org.camunda.bpm.engine.impl.UserQueryProperty;
+import org.camunda.bpm.engine.impl.digest.PasswordDigest;
 import org.camunda.bpm.engine.impl.identity.IdentityProviderException;
 import org.camunda.bpm.engine.impl.identity.ReadOnlyIdentityProvider;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -78,13 +80,13 @@ public class LdapIdentityProvider implements ReadOnlyIdentityProvider {
     }
   }
   
-  protected void open() {
+  protected InitialLdapContext openContext(String userDn, String password) {
     Hashtable<String, String> env = new Hashtable<String, String>();
     env.put(Context.INITIAL_CONTEXT_FACTORY, ldapConfiguration.getInitialContextFactory());
     env.put(Context.SECURITY_AUTHENTICATION, ldapConfiguration.getSecurityAuthentication());
     env.put(Context.PROVIDER_URL, ldapConfiguration.getServerUrl());
-    env.put(Context.SECURITY_PRINCIPAL, ldapConfiguration.getManagerDn());
-    env.put(Context.SECURITY_CREDENTIALS, ldapConfiguration.getManagerPassword());
+    env.put(Context.SECURITY_PRINCIPAL, userDn);
+    env.put(Context.SECURITY_CREDENTIALS, getPassword(password));
 
     // add additional properties
     Map<String, String> contextProperties = ldapConfiguration.getContextProperties();
@@ -93,23 +95,26 @@ public class LdapIdentityProvider implements ReadOnlyIdentityProvider {
     }
 
     try {
-      initialContext = new InitialLdapContext(env, null);
-    } catch(Exception e) {
+      return new InitialLdapContext(env, null);
+      
+    } catch(AuthenticationException e) {
+      throw new LdapAuthenticationException("Could not authenticate with LDAP server", e);
+      
+    } catch(NamingException e) {
       throw new IdentityProviderException("Could not connect to LDAP server", e);
+      
     }
   }
   
   protected void ensureContextInitialized() {
     if(initialContext == null) {
-      open();
+      initialContext = openContext(ldapConfiguration.getManagerDn(), ldapConfiguration.getManagerPassword());
     }
   }
   
   // Users /////////////////////////////////////////////////
 
   public User findUserById(String userId) {
-    ensureContextInitialized();
-    
     return createUserQuery(org.camunda.bpm.engine.impl.context.Context.getCommandContext())
       .userId(userId)
       .singleResult();
@@ -137,10 +142,11 @@ public class LdapIdentityProvider implements ReadOnlyIdentityProvider {
       applyRequestControls(query);
     }
     
+    NamingEnumeration<SearchResult> enumeration = null;
     try {
       
       String filter = getUserSearchFilter(query);
-      NamingEnumeration<SearchResult> enumeration = initialContext.search(userBaseDn, filter, ldapConfiguration.getSearchControls());
+      enumeration = initialContext.search(userBaseDn, filter, ldapConfiguration.getSearchControls());
       
       // perform client-side paging
       int resultCount = 0;
@@ -155,17 +161,50 @@ public class LdapIdentityProvider implements ReadOnlyIdentityProvider {
         
         resultCount ++;
       }
+      enumeration.close();
       
       return userList;
       
     } catch (NamingException e) {
       throw new IdentityProviderException("Could not query for users", e);
+      
+    } finally {
+      try {
+        if (enumeration != null) {
+          enumeration.close();
+        }
+      } catch (Exception e) {
+        // ignore silently
+      }
     }
   }
   
   public Boolean checkPassword(String userId, String password) {
-    ensureContextInitialized();
-    return null;
+    
+    if(userId == null || password == null) {
+      return false;
+    }
+    
+    // first search for user using manager DN
+    LdapUserEntity user = (LdapUserEntity) findUserById(userId);
+    close();
+    
+    if(user == null) {
+      return false;
+    } else {
+      
+      try {
+        // bind authenticate for user + supplied password
+        openContext(user.getDn(), password);
+        return true;
+        
+      } catch(LdapAuthenticationException e) {
+        return false;
+        
+      } 
+      
+    }
+    
   }
   
   protected String getUserSearchFilter(LdapUserQueryImpl query) {
@@ -210,7 +249,6 @@ public class LdapIdentityProvider implements ReadOnlyIdentityProvider {
   // Groups ///////////////////////////////////////////////
 
   public Group findGroupById(String groupId) {
-    ensureContextInitialized();    
     return createGroupQuery(org.camunda.bpm.engine.impl.context.Context.getCommandContext())
       .groupId(groupId)
       .singleResult();
@@ -238,10 +276,11 @@ public class LdapIdentityProvider implements ReadOnlyIdentityProvider {
       applyRequestControls(query);
     }
     
+    NamingEnumeration<SearchResult> enumeration = null;
     try {
       
       String filter = getGroupSearchFilter(query);
-      NamingEnumeration<SearchResult> enumeration = initialContext.search(groupBaseDn, filter, ldapConfiguration.getSearchControls());
+      enumeration = initialContext.search(groupBaseDn, filter, ldapConfiguration.getSearchControls());
       
       // perform client-side paging
       int resultCount = 0;
@@ -261,6 +300,15 @@ public class LdapIdentityProvider implements ReadOnlyIdentityProvider {
       
     } catch (NamingException e) {
       throw new IdentityProviderException("Could not query for users", e);
+      
+    } finally {
+      try {
+        if (enumeration != null) {
+          enumeration.close();
+        }
+      } catch (Exception e) {
+        // ignore silently
+      }
     }
   }
   
@@ -378,6 +426,15 @@ public class LdapIdentityProvider implements ReadOnlyIdentityProvider {
       
     } catch (Exception e) {
       throw new IdentityProviderException("Execption while setting paging settings", e);
+    }
+  }
+  
+  protected String getPassword(String password) {
+    if(ldapConfiguration.isUsePasswordDigest()) {
+      PasswordDigest passwordDigest = ldapConfiguration.getPasswordDigest();
+      return passwordDigest.encrypt(password);
+    } else {
+      return password;
     }
   }
   

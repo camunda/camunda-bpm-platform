@@ -38,11 +38,16 @@ public class DbIdentityServiceProvider extends DbReadOnlyIdentityServiceProvider
   
   public User saveUser(User user) {
     UserEntity userEntity = (UserEntity) user;
+    
+    // encrypt password
+    userEntity.setPassword(encryptPassword(userEntity.getPassword()));
+    
     if(userEntity.getRevision() == 0) {
       getDbSqlSession().insert(userEntity);
     } else {
       getDbSqlSession().update(userEntity);
     }
+
     return userEntity;
   }
   

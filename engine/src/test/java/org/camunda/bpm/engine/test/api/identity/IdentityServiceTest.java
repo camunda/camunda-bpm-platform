@@ -407,6 +407,20 @@ public class IdentityServiceTest extends PluggableProcessEngineTestCase {
     // be ignored silently
      identityService.deleteUser("unexistinguser");
   }
+  
+  public void testCheckPassword() {
+    
+    // store user with password
+    User user = identityService.newUser("secureUser");
+    user.setPassword("s3cret");
+    identityService.saveUser(user);
+    
+    assertTrue(identityService.checkPassword(user.getId(), "s3cret"));
+    assertFalse(identityService.checkPassword(user.getId(), "wrong"));
+    
+    identityService.deleteUser(user.getId());
+    
+  }
 
   public void testCheckPasswordNullSafe() {
     assertFalse(identityService.checkPassword("userId", null));

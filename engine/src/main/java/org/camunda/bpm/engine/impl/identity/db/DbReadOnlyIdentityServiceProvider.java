@@ -14,12 +14,14 @@ package org.camunda.bpm.engine.impl.identity.db;
 
 import java.util.List;
 
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.GroupQuery;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.identity.UserQuery;
 import org.camunda.bpm.engine.impl.UserQueryImpl;
 import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.digest.PasswordDigest;
 import org.camunda.bpm.engine.impl.identity.ReadOnlyIdentityProvider;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
@@ -59,13 +61,27 @@ public class DbReadOnlyIdentityServiceProvider extends AbstractManager implement
 
   public Boolean checkPassword(String userId, String password) {
     User user = findUserById(userId);
-    if ((user != null) && (password != null) && (password.equals(user.getPassword()))) {
+    if ((user != null) && (password != null) && matchPassword(password, user)) {
       return true;
     } else {
       return false;
     }
   }
+
+  protected boolean matchPassword(String password, User user) {
+    return encryptPassword(password).equals(user.getPassword());
+  }
   
+  protected String encryptPassword(String password) {
+    if(password == null) {
+      return null;
+    } else {
+      return Context.getProcessEngineConfiguration()
+        .getPasswordDigest()
+        .encrypt(password);
+    }
+  }
+
   // groups //////////////////////////////////////////
 
   public GroupEntity findGroupById(String groupId) {

@@ -12,10 +12,15 @@
  */
 package org.camunda.bpm.identity.impl.ldap;
 
+
 import java.util.HashMap;
 import java.util.Map;
 
 import javax.naming.directory.SearchControls;
+
+import org.camunda.bpm.engine.impl.digest.PasswordDigest;
+import org.camunda.bpm.engine.impl.digest.ShaHashDigest;
+
 
 /**
  * <p>Java Bean holding LDAP configuration</p>
@@ -55,6 +60,11 @@ public class LdapConfiguration {
   protected String groupMemberAttribute = "memberOf";
   
   protected boolean sortControlSupported = false;
+  
+  protected boolean isUsePasswordDigest = false;
+  
+  protected PasswordDigest passwordDigest = new ShaHashDigest();
+  
   
   // getters / setters //////////////////////////////////////
     
@@ -225,6 +235,36 @@ public class LdapConfiguration {
   
   public void setGroupMemberAttribute(String groupMemberAttribute) {
     this.groupMemberAttribute = groupMemberAttribute;
+  }
+  
+  public void setUsePasswordDigest(boolean isUsePasswordDigest) {
+    this.isUsePasswordDigest = isUsePasswordDigest;
+  }
+  
+  public boolean isUsePasswordDigest() {
+    return isUsePasswordDigest;
+  }
+
+  /** The password digest to use for encrypting LDAP passwords.
+   * 
+   * <p>Some LDAP systems are configured in a way that they do not store the actual user password but rather 
+   * some encrypted or hashed representation of the password. In order to authenticate against such LDAP 
+   * installations we need to use the same hash / encryption procedure for transforming the user-provided 
+   * password into the the encrypted / hashed form used by the LDAP installation.</p>
+   * 
+   * <p>By default, password digesting is turned off. In order to turn it on, use 
+   * {@link #setUsePasswordDigest(boolean)}</p>
+   * 
+   * <p>If turned on, the default password digest implementation is used which works with 
+   * base64 encoded SHA hashes.</p>
+   *  
+   */
+  public void setPasswordDigest(PasswordDigest passwordDigest) {
+    this.passwordDigest = passwordDigest;
+  }
+  
+  public PasswordDigest getPasswordDigest() {
+    return passwordDigest;
   }
 
   public SearchControls getSearchControls() {

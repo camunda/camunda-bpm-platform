@@ -77,6 +77,8 @@ import org.camunda.bpm.engine.impl.db.DbIdGenerator;
 import org.camunda.bpm.engine.impl.db.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.db.IbatisVariableTypeHandler;
 import org.camunda.bpm.engine.impl.delegate.DefaultDelegateInterceptor;
+import org.camunda.bpm.engine.impl.digest.PasswordDigest;
+import org.camunda.bpm.engine.impl.digest.ShaHashDigest;
 import org.camunda.bpm.engine.impl.el.ExpressionManager;
 import org.camunda.bpm.engine.impl.event.CompensationEventHandler;
 import org.camunda.bpm.engine.impl.event.EventHandler;
@@ -328,6 +330,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   /** session factory to be used for obtaining identity provider sessions */
   protected SessionFactory identityProviderSessionFactory;
   
+  protected PasswordDigest passwordDigest;
+  
   // buildProcessEngine ///////////////////////////////////////////////////////
   
   public ProcessEngine buildProcessEngine() {
@@ -366,6 +370,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initProcessApplicationManager();
     initCorrelationHandler();
     initIncidentHandlers();
+    initPasswordDigest();
   }
 
   // failedJobCommandFactory ////////////////////////////////////////////////////////
@@ -1051,6 +1056,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
       correlationHandler = new DefaultCorrelationHandler();
     }
     
+  }
+  
+  // password digest //////////////////////////////////////////////////////////
+  
+  protected void initPasswordDigest() {
+    if(passwordDigest == null) {
+      passwordDigest = new ShaHashDigest();
+    }
   }
 
   // getters and setters //////////////////////////////////////////////////////
@@ -1862,6 +1875,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   
   public void setIdentityProviderSessionFactory(SessionFactory identityProviderSessionFactory) {
     this.identityProviderSessionFactory = identityProviderSessionFactory;
+  }
+
+  public void setPasswordDigest(PasswordDigest passwordDigest) {
+    this.passwordDigest = passwordDigest;
+  }
+  
+  public PasswordDigest getPasswordDigest() {
+    return passwordDigest;
   }
 
 }
