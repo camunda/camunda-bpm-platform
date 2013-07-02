@@ -45,6 +45,9 @@ public interface ProcessEngineRestService {
   @Path("/{name}" + MessageRestService.PATH)
   MessageRestService getMessageRestService(@PathParam("name") String engineName);
   
+  @Path("/{name}" + VariableInstanceRestService.PATH)
+  VariableInstanceRestService getVariableInstanceService(@PathParam("name") String engineName);
+  
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   List<ProcessEngineDto> getProcessEngineNames();
