@@ -33,7 +33,6 @@ public class VariableInstanceQueryImpl extends AbstractVariableQueryImpl<Variabl
   protected String[] processInstanceIds;
   protected String[] taskIds;
   protected String[] activityInstanceIds;
-//  protected QueryVariableValue queryVariableValue;
 
   public VariableInstanceQueryImpl() { }
   
@@ -50,28 +49,6 @@ public class VariableInstanceQueryImpl extends AbstractVariableQueryImpl<Variabl
     this.variableNameLike = variableNameLike;
     return this;
   }
-
-//  public VariableInstanceQuery variableValueEquals(String variableName, Object variableValue) {
-//    if (variableName == null) {
-//      throw new ProcessEngineException("variableName is null");
-//    }
-//    if (variableValue == null) {
-//      throw new ProcessEngineException("variableValue is null");
-//    }
-//
-//    this.variableName = variableName;
-//    queryVariableValue = new QueryVariableValue(variableName, variableValue, QueryOperator.EQUALS, true);
-//    return this;
-//  }
-//  
-//  public VariableInstanceQuery variableValueEquals(Object variableValue) {
-//    if (variableValue == null) {
-//      throw new ProcessEngineException("variableValue is null");
-//    }
-//    
-//    queryVariableValue = new QueryVariableValue(variableName, variableValue, QueryOperator.EQUALS, true);
-//    return this;
-//  }
 
   public VariableInstanceQuery executionIdIn(String... executionIds) {
     this.executionIds = executionIds;
@@ -111,13 +88,6 @@ public class VariableInstanceQueryImpl extends AbstractVariableQueryImpl<Variabl
   }
 
   // results ////////////////////////////////////////////////////  
-  
-//  protected void ensureVariablesInitialized() {
-//    if (this.queryVariableValue != null) {
-//      VariableTypes variableTypes = Context.getProcessEngineConfiguration().getVariableTypes();
-//      queryVariableValue.initialize(variableTypes);
-//    }
-//  }
   
   public long executeCount(CommandContext commandContext) {
     checkQueryOk();
@@ -160,9 +130,5 @@ public class VariableInstanceQueryImpl extends AbstractVariableQueryImpl<Variabl
   public String[] getActivityInstanceIds() {
     return activityInstanceIds;
   }
-
-//  public QueryVariableValue getQueryVariableValue() {
-//    return queryVariableValue;
-//  }
   
 }
