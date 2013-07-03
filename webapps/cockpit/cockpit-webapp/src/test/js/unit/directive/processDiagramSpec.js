@@ -149,8 +149,8 @@ define([ 'angular',
         $rootScope.$digest();
 
         // then
-        expect($rootScope.selection.treeToDiagramMap.bpmnElements.length).toBe(1);
-        expect($rootScope.selection.treeToDiagramMap.bpmnElements[0].id).toBe('ServiceTask_1');
+        expect($rootScope.selection.treeDiagramMapping.bpmnElements.length).toBe(1);
+        expect($rootScope.selection.treeDiagramMapping.bpmnElements[0].id).toBe('ServiceTask_1');
         expect(serviceTaskElement.hasClass('activity-highlight')).toBe(true);
       }));
 
@@ -177,7 +177,7 @@ define([ 'angular',
           }
         };
 
-        $rootScope.selection.treeToDiagramMap = {bpmnElements: bpmnElements};
+        $rootScope.selection.treeDiagramMapping = {bpmnElements: bpmnElements};
 
         $rootScope.$digest();
 
@@ -216,7 +216,7 @@ define([ 'angular',
           }
         };
 
-        $rootScope.selection.treeToDiagramMap = {bpmnElements: bpmnElements};
+        $rootScope.selection.treeDiagramMapping = {bpmnElements: bpmnElements};
 
         $rootScope.$digest();
 
@@ -254,7 +254,7 @@ define([ 'angular',
           }
         };
 
-        $rootScope.selection.treeToDiagramMap = {bpmnElements: bpmnElements};
+        $rootScope.selection.treeDiagramMapping = {bpmnElements: bpmnElements};
 
         $rootScope.$digest();
 
@@ -296,7 +296,7 @@ define([ 'angular',
           }
         };
 
-        $rootScope.selection.treeToDiagramMap = {bpmnElements: bpmnElements};
+        $rootScope.selection.treeDiagramMapping = {bpmnElements: bpmnElements};
 
         $rootScope.$digest();
 
@@ -328,8 +328,8 @@ define([ 'angular',
         $rootScope.$digest();
 
         // then
-        expect($rootScope.selection.treeToDiagramMap.bpmnElements.length).toBe(1);
-        expect($rootScope.selection.treeToDiagramMap.bpmnElements[0].id).toBe('ServiceTask_1');
+        expect($rootScope.selection.treeDiagramMapping.bpmnElements.length).toBe(1);
+        expect($rootScope.selection.treeDiagramMapping.bpmnElements[0].id).toBe('ServiceTask_1');
         expect(serviceTaskElement.hasClass('activity-highlight')).toBe(true);
       }));
 
@@ -355,7 +355,7 @@ define([ 'angular',
         $rootScope.$digest();
 
         // then
-        expect($rootScope.selection.treeToDiagramMap.bpmnElements.length).toBe(0);
+        expect($rootScope.selection.treeDiagramMapping.bpmnElements.length).toBe(0);
         expect(serviceTaskElement.hasClass('activity-highlight')).toBe(false);
       }));
 
@@ -385,7 +385,7 @@ define([ 'angular',
         $rootScope.$digest();
 
         // then
-        expect($rootScope.selection.treeToDiagramMap.bpmnElements.length).toBe(2);
+        expect($rootScope.selection.treeDiagramMapping.bpmnElements.length).toBe(2);
         expect(serviceTaskElement.hasClass('activity-highlight')).toBe(true);
         expect(userTaskElement.hasClass('activity-highlight')).toBe(true);
       }));
@@ -420,8 +420,8 @@ define([ 'angular',
         $rootScope.$digest();
 
         // then
-        expect($rootScope.selection.treeToDiagramMap.bpmnElements.length).toBe(1);
-        expect($rootScope.selection.treeToDiagramMap.bpmnElements[0].id).toBe('UserTask_1');
+        expect($rootScope.selection.treeDiagramMapping.bpmnElements.length).toBe(1);
+        expect($rootScope.selection.treeDiagramMapping.bpmnElements[0].id).toBe('UserTask_1');
         expect(serviceTaskElement.hasClass('activity-highlight')).toBe(false);
         expect(userTaskElement.hasClass('activity-highlight')).toBe(true);
       }));

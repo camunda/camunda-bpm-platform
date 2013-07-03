@@ -1,37 +1,38 @@
 ngDefine('cockpit.pages', function(module) {
 
-  function ProcessInstanceController ($scope, $routeParams, $location, $q, ProcessDefinitionResource, ProcessInstanceResource, IncidentResource, Views, ActivityInstance, Transform) {
+  function ProcessInstanceController ($scope, $routeParams, $location, $q, $filter, ProcessDefinitionResource, ProcessInstanceResource, IncidentResource, Views, Transform) {
     
     $scope.processDefinitionId = $routeParams.processDefinitionId;
     $scope.processInstanceId = $routeParams.processInstanceId;
 
     $scope.selection = {};
     
-    $scope.$watch('selection.treeToDiagramMap', function (newValue) {
+    $scope.$watch('selection.treeDiagramMapping', function (newValue) {
       if (!newValue) {
         return;
       }
 
       if (newValue.scrollTo) {
         var bpmnElement = $scope.processInstance.activityIdToBpmnElementMap[newValue.scrollTo.activityId];
-        $scope.selection.treeToDiagramMap.scrollTo = null;
-        $scope.selection.treeToDiagramMap.scrollToBpmnElement = bpmnElement;
+        $scope.selection.treeDiagramMapping.scrollTo = null;
+        $scope.selection.treeDiagramMapping.scrollToBpmnElement = bpmnElement;
       }
       
       if (newValue.activityInstances) {
-        $scope.selection.treeToDiagramMap.bpmnElements = [];
+        $scope.selection.treeDiagramMapping.bpmnElements = [];
         angular.forEach(newValue.activityInstances, function(activityInstance) {
-          var bpmnElement = $scope.processInstance.activityIdToBpmnElementMap[activityInstance.activityId];
-          $scope.selection.treeToDiagramMap.bpmnElements.push(bpmnElement);
+          var activityId = activityInstance.activityId || activityInstance.targetActivityId;
+          var bpmnElement = $scope.processInstance.activityIdToBpmnElementMap[activityId];
+          $scope.selection.treeDiagramMapping.bpmnElements.push(bpmnElement);
         });
         return;
       }
       
       if (newValue.bpmnElements) {
-        $scope.selection.treeToDiagramMap.activityInstances = [];
+        $scope.selection.treeDiagramMapping.activityInstances = [];
         angular.forEach(newValue.bpmnElements, function(bpmnElement) {
-          var instanceList = $scope.processInstance.activityIdToNodeMap[bpmnElement.id];
-          $scope.selection.treeToDiagramMap.activityInstances = $scope.selection.treeToDiagramMap.activityInstances.concat(instanceList);
+          var instanceList = $scope.processInstance.activityIdToInstancesMap[bpmnElement.id];
+          $scope.selection.treeDiagramMapping.activityInstances = $scope.selection.treeDiagramMapping.activityInstances.concat(instanceList);
         });
         return;
       }
@@ -121,49 +122,60 @@ ngDefine('cockpit.pages', function(module) {
         // second result is the bpmn20Xml
         var bpmn20Xml = results[1].bpmn20Xml;
         $scope.processInstance.semantic = Transform.transformBpmn20Xml(bpmn20Xml);
+
+        // contains for each activity id the corresponding bpmnElement
         $scope.processInstance.activityIdToBpmnElementMap = {};
         createActivityIdToBpmnElementMap($scope.processInstance.semantic, $scope.processInstance.activityIdToBpmnElementMap);
         
         // third result is the activity instance tree
         var activityInstances = results[2];
-        $scope.processInstance.activityInstances = activityInstances;
-        $scope.processInstance.activityInstanceMap = ActivityInstance.aggregateActivityInstances(activityInstances);
-        
-        $scope.processInstance.activityInstanceArray = [];
+        $scope.processInstance.activityInstanceTree = activityInstances;
+
+        // contains for each activity id the corresponding activity/transition instance
+        $scope.processInstance.activityIdToInstancesMap = {};
+        // contains for each activity/transition id the corresponding activity/transition instance
+        $scope.processInstance.instanceIdToInstanceMap = {};
+
+        decorateActivityInstanceTree($scope.processInstance.activityInstanceTree, $scope.processInstance.activityIdToBpmnElementMap, $scope.processInstance.activityIdToInstancesMap, $scope.processInstance.instanceIdToInstanceMap, $scope.processInstance.semantic, processDefinition);
+       
+        // contains activity id the current count of activity/transition instances
+        $scope.processInstance.activityInstanceStatistics = [];
+
+        // contains the activity ids which are clickable on the process diagram
         $scope.processInstance.clickableElements = [];
         
-        for (key in $scope.processInstance.activityInstanceMap) {
-          var items = $scope.processInstance.activityInstanceMap[key];
-          var activityInstance = { id: key, count: items.length};
-          $scope.processInstance.activityInstanceArray.push(activityInstance);
+        $scope.processInstance.activityInstanceIdToActivityIdMap = {};
+
+        for (key in $scope.processInstance.activityIdToInstancesMap) {
+          var items = $scope.processInstance.activityIdToInstancesMap[key];
+          var activityInstanceStatistics = { id: key, count: items.length};
+          $scope.processInstance.activityInstanceStatistics.push(activityInstanceStatistics);
           
           $scope.processInstance.clickableElements.push(key);
         }
-        
-        // create a tree with that results
-        $scope.processInstance.activityIdToNodeMap = {};
-        $scope.processInstance.activityInstanceTree = ActivityInstance.createActivityInstanceTree(processDefinition, $scope.processInstance.semantic, activityInstances, $scope.processInstance.activityIdToNodeMap);
-        
+              
         // fourth result are the incidents
         var incidents = results[3];
         
-        $scope.processInstance.incidentsOnActivityMap = {};
+        // contains for each activity id the corresponding incidents
+        $scope.processInstance.incidentsStatistics = {};
+
         // get for each activity the incidents such as:
         // {ServiceTask_1: [firstIncident, secondIncident, ...], ServiceTask_2: [...], ...}
         angular.forEach(incidents, function (incident) {
-          var activity = $scope.processInstance.incidentsOnActivityMap[incident.activityId];
+          var activity = $scope.processInstance.incidentsStatistics[incident.activityId];
           if (!activity) {
             activity = [];
-            $scope.processInstance.incidentsOnActivityMap[incident.activityId] = activity;
+            $scope.processInstance.incidentsStatistics[incident.activityId] = activity;
           }
           activity.push(incident);
         });
         
         $scope.processInstance.incidentsOnActivityArray = [];
-        for (var key in $scope.processInstance.incidentsOnActivityMap) {
+        for (var key in $scope.processInstance.incidentsStatistics) {
           var tmp = {};
           tmp.id = key;
-          tmp.incidents = $scope.processInstance.incidentsOnActivityMap[key];
+          tmp.incidents = $scope.processInstance.incidentsStatistics[key];
           $scope.processInstance.incidentsOnActivityArray.push(tmp);
         }
       });
@@ -178,8 +190,92 @@ ngDefine('cockpit.pages', function(module) {
         
       });
     }
-    
-    $scope.processInstanceVars = { read: [ 'processInstanceId' ] };
+
+    function decorateActivityInstanceTree(activityInstanceTree, activityIdToBpmnElementMap, activityIdToInstancesMap, instanceIdToInstanceMap, semantic, processDefinition) {
+
+      // the root node has to be handled quite different then the child nodes
+      var model = null;
+      for (var i = 0; i < semantic.length; i++) {
+        var currentSemantic = semantic[i];
+        if (currentSemantic.id === processDefinition.key && currentSemantic.type === 'process') {
+          model = currentSemantic;
+        }
+      }
+      activityIdToBpmnElementMap[activityInstanceTree.activityId] = model;
+      activityInstanceTree.name = getActivityName(model);
+
+      // if (activityIdToInstancesMap) {
+      //   activityIdToInstancesMap[model.id] = [ activityInstanceTree ];
+      // }
+
+      if (instanceIdToInstanceMap) {
+        instanceIdToInstanceMap[activityInstanceTree.id] = activityInstanceTree;
+      }
+
+      decorateActivityInstanceTreeHelper(activityInstanceTree, activityIdToBpmnElementMap, activityIdToInstancesMap, instanceIdToInstanceMap);
+    }
+
+    function decorateActivityInstanceTreeHelper(activityInstanceTree, activityIdToBpmnElementMap, activityIdToInstancesMap, instanceIdToInstanceMap) {
+      var children = activityInstanceTree.childActivityInstances;
+      if (children) {
+        for (var i = 0; i < children.length; i++) {
+          var child = children[i];
+          decorateActivityInstanceTreeHelper(child, activityIdToBpmnElementMap, activityIdToInstancesMap, instanceIdToInstanceMap)
+
+          var bpmnElement = activityIdToBpmnElementMap[child.activityId];
+          child.name = getActivityName(bpmnElement);
+
+          if (activityIdToInstancesMap) {
+            var instances = activityIdToInstancesMap[child.activityId];
+            if (!instances) {
+              instances = [];
+              activityIdToInstancesMap[child.activityId] = instances;
+            }
+            instances.push(child);            
+          }
+          
+          if (instanceIdToInstanceMap) {
+            instanceIdToInstanceMap[child.id] = child;
+          }
+
+        }
+      }
+
+      var transitions = activityInstanceTree.childTransitionInstances;
+      if (transitions) {
+        for (var i = 0; i < transitions.length; i++) {
+          var transition = transitions[i];
+          
+          var bpmnElement = activityIdToBpmnElementMap[transition.targetActivityId];
+          transition.name = getActivityName(bpmnElement);
+
+          if (activityIdToInstancesMap) {
+            var instances = activityIdToInstancesMap[transition.targetActivityId];
+            if (!instances) {
+              instances = [];
+              activityIdToInstancesMap[transition.targetActivityId] = instances;
+            }
+            instances.push(transition);            
+          }
+          
+          if (instanceIdToInstanceMap) {
+            instanceIdToInstanceMap[transition.id] = transition;
+          }
+        };     
+      }
+    }
+
+    function getActivityName(bpmnElement) {
+      var name = bpmnElement.name;
+      if (!name) {
+        var shortenFilter = $filter('shorten');
+        name = bpmnElement.type + ' (' + shortenFilter(bpmnElement.id, 8) + '...)';
+      }
+
+      return name;
+    }
+
+    $scope.processInstanceVars = { read: [ 'processInstanceId', 'processInstance', 'selection' ] };
     $scope.processInstanceViews = Views.getProviders({ component: 'cockpit.processInstance.instanceDetails' });
 
     $scope.selectView = function(view) {
@@ -210,7 +306,7 @@ ngDefine('cockpit.pages', function(module) {
 
   };
 
-  module.controller('ProcessInstanceController', [ '$scope', '$routeParams', '$location', '$q', 'ProcessDefinitionResource', 'ProcessInstanceResource', 'IncidentResource', 'Views', 'ActivityInstance', 'Transform', ProcessInstanceController ]);
+  module.controller('ProcessInstanceController', [ '$scope', '$routeParams', '$location', '$q', '$filter', 'ProcessDefinitionResource', 'ProcessInstanceResource', 'IncidentResource', 'Views', 'Transform', ProcessInstanceController ]);
 
   var RouteConfig = function ($routeProvider) {
     $routeProvider.when('/process-definition/:processDefinitionId/process-instance/:processInstanceId', {

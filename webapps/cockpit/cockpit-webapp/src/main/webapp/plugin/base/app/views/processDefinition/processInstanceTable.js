@@ -4,7 +4,7 @@ ngDefine('cockpit.plugin.base.views', function(module) {
 
     var processDefinitionId = $scope.processDefinitionId = $routeParams.processDefinitionId;
 
-    var pages = $scope.pages = { size: 5, total: 0 };
+    var pages = $scope.pages = { size: 50, total: 0 };
 
     $scope.$watch(function() { return $location.search().page; }, function(newValue) {
       pages.current = parseInt(newValue) || 1;

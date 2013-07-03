@@ -217,14 +217,14 @@ ngDefine('cockpit.directives', [
             if (!moved && mousedown) {
               // if the mouse have not moved and a mousedown happend,
               // then you have to deselect the current selection.
-              if ($scope.selection && $scope.selection.treeToDiagramMap) {
+              if ($scope.selection && $scope.selection.treeDiagramMapping) {
                 
                 // get selected target
                 var targetId = $($event.target).attr('id');
                 
                 if ($scope.clickableElements.indexOf(targetId) == -1) {
                   // in that case clear the selected bpmnElements
-                  $scope.selection.treeToDiagramMap = {bpmnElements: []};
+                  $scope.selection.treeDiagramMapping = {bpmnElements: []};
                   $scope.$apply();
                 }
               }              
@@ -243,14 +243,14 @@ ngDefine('cockpit.directives', [
       if ($event.ctrlKey) {
         // if the 'ctrl' key has been pushed down, then select or deselect the clicked element
         
-        if ($scope.selection.treeToDiagramMap && $scope.selection.treeToDiagramMap.bpmnElements) {
+        if ($scope.selection.treeDiagramMapping && $scope.selection.treeDiagramMapping.bpmnElements) {
           var elements = [];
           
-          var index = $scope.selection.treeToDiagramMap.bpmnElements.indexOf(selectedBpmnElement);
+          var index = $scope.selection.treeDiagramMapping.bpmnElements.indexOf(selectedBpmnElement);
           
           if (index != -1) {
             // if the clicked element is already selected then deselect it.
-            angular.forEach($scope.selection.treeToDiagramMap.bpmnElements, function (element) {
+            angular.forEach($scope.selection.treeDiagramMapping.bpmnElements, function (element) {
               if (element.id != selectedBpmnElement.id) {
                 elements.push(element);
               }
@@ -259,20 +259,20 @@ ngDefine('cockpit.directives', [
           } else if (index == -1) {
             // if the clicked element is not already selected then select it together with other elements.
             elements.push(selectedBpmnElement);
-            angular.forEach($scope.selection.treeToDiagramMap.bpmnElements, function (element) {
+            angular.forEach($scope.selection.treeDiagramMapping.bpmnElements, function (element) {
               elements.push(element);
             });            
           }
           
           // set the selected bpmn elements
-          $scope.selection.treeToDiagramMap = {bpmnElements: elements};
+          $scope.selection.treeDiagramMapping = {bpmnElements: elements};
           $scope.$apply();
           return;
         }
       }
       
       
-      $scope.selection.treeToDiagramMap = {bpmnElements: [ selectedBpmnElement ]};
+      $scope.selection.treeDiagramMapping = {bpmnElements: [ selectedBpmnElement ]};
       $scope.$apply();
     };
     
@@ -319,7 +319,7 @@ ngDefine('cockpit.directives', [
     
     /*------------------- Handle selected activity id---------------------*/
     
-    $scope.$watch('selection.treeToDiagramMap.bpmnElements', function(newValue, oldValue) {
+    $scope.$watch('selection.treeDiagramMapping.bpmnElements', function(newValue, oldValue) {
       if (oldValue) {
         deselectActivity(oldValue);
       }
@@ -354,7 +354,7 @@ ngDefine('cockpit.directives', [
       });
     }
     
-    $scope.$watch('selection.treeToDiagramMap.scrollToBpmnElement', function(newValue) {
+    $scope.$watch('selection.treeDiagramMapping.scrollToBpmnElement', function(newValue) {
       if (newValue) {
         
         // parent size

@@ -1,4 +1,8 @@
+
 package org.camunda.bpm.pa;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import org.camunda.bpm.application.PostDeploy;
 import org.camunda.bpm.application.ProcessApplication;
@@ -42,10 +46,15 @@ public class DevProcessApplication extends ServletProcessApplication {
     runtimeService.startProcessInstanceByKey("CallActivity");
     runtimeService.startProcessInstanceByKey("CallActivity");
 
-    runtimeService.startProcessInstanceByKey("cornercasesProcess");
-    runtimeService.startProcessInstanceByKey("cornercasesProcess");
-    runtimeService.startProcessInstanceByKey("cornercasesProcess");
-    runtimeService.startProcessInstanceByKey("cornercasesProcess");
+    Map<String, Object> params = new HashMap<String, Object>();
+    params.put("value1", "a");
+    params.put("value2", "b");
+    params.put("value3", "c");
+    
+    runtimeService.startProcessInstanceByKey("cornercasesProcess", params);
+    runtimeService.startProcessInstanceByKey("cornercasesProcess", params);
+    runtimeService.startProcessInstanceByKey("cornercasesProcess", params);
+    runtimeService.startProcessInstanceByKey("cornercasesProcess", params);
 
     runtimeService.startProcessInstanceByKey("processWithSubProcess");
     runtimeService.startProcessInstanceByKey("processWithSubProcess");

@@ -45,6 +45,7 @@ define(['jquery', 'bpmn/Transformer', 'bpmn/Renderer'], function ($, Transformer
     var processDefinition = new Transformer().transform(bpmnXml);
     this.bpmnXml = bpmnXml;
     this.renderDiagram(processDefinition, options);
+    return this;
   };
 
   Bpmn.prototype.zoom = function (factor) {

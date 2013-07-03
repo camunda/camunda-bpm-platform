@@ -4,6 +4,7 @@
       <th>Name</th>
       <th>Value</th>
       <th>Type</th>
+      <th>Scope</th>
     </tr>
   </thead>
   <tbody>
@@ -17,12 +18,19 @@
       <td>
         {{ variable.type }}
       </td>
+      <td>
+        <a href ng-click="selectActivityInstance(variable)" title="{{ variable.instance.id }}">
+          {{ variable.instance.name }}
+        </a>
+      </td>
     </tr>
   
     <tr ng-hide="variables.length">
-      <td  colspan="3">
-        No process variables
+      <td  colspan="4">
+        No variable instances
       </td>
     </tr>
   </tbody>
 </table>
+
+<div paginator total-pages="pages.total" current-page="pages.current"></div>
