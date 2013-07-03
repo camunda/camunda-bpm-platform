@@ -59,9 +59,37 @@
         <test.version.current>${project.version}</test.version.current>
         <test.version.current.major>7.0</test.version.current.major>
       </properties>
+      <dependencies>
+        <dependency>    
+          <groupId>org.camunda.bpm.distro</groupId>
+          <artifactId>camunda-sql-scripts</artifactId>
+          <version>${test.version.current}</version>
+        </dependency>
+
+        <dependency>
+          <groupId>org.camunda.bpm</groupId>
+          <artifactId>camunda-engine</artifactId>
+          <version>${test.version.current}</version>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
     </profile>
     <profile>
       <id>upgrade</id>
+      <dependencies>
+        <dependency>    
+          <groupId>org.camunda.bpm.distro</groupId>
+          <artifactId>camunda-sql-scripts</artifactId>
+          <version>${test.version.current}</version>
+        </dependency>
+
+        <dependency>
+          <groupId>org.camunda.bpm</groupId>
+          <artifactId>camunda-engine</artifactId>
+          <version>${test.version.current}</version>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
       <build>
         <plugins>
           <plugin>
@@ -280,19 +308,6 @@
   </profiles>
 
   <dependencies>
-
-    <dependency>
-      <groupId>org.camunda.bpm.distro</groupId>
-      <artifactId>camunda-sql-scripts</artifactId>
-      <version>${test.version.current}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.camunda.bpm</groupId>
-      <artifactId>camunda-engine</artifactId>
-      <version>${test.version.current}</version>
-      <scope>test</scope>
-    </dependency>
 
     <dependency>
       <groupId>com.fasterxml.uuid</groupId>
