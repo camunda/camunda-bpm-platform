@@ -17,6 +17,7 @@ import java.util.List;
 
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
+import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
 
@@ -100,9 +101,23 @@ public class VariableInstanceQueryImpl extends AbstractVariableQueryImpl<Variabl
   public List<VariableInstance> executeList(CommandContext commandContext, Page page) {
     checkQueryOk();
     ensureVariablesInitialized();
-    return commandContext
+    List<VariableInstance> result = commandContext
       .getVariableInstanceManager()
       .findVariableInstanceByQueryCriteria(this, page);
+    
+    if (result == null) {
+      return result;
+    }
+    
+    // iterate over the result array to initialize the value of the value
+    for (VariableInstance variableInstance : result) {
+      if (variableInstance instanceof VariableInstanceEntity) {
+        VariableInstanceEntity variableInstanceEntity = (VariableInstanceEntity) variableInstance;
+        variableInstanceEntity.getValue();
+      }      
+    }
+    
+    return result;
   }
 
   // getters ////////////////////////////////////////////////////

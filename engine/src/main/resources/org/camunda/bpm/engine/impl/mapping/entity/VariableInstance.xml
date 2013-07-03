@@ -195,6 +195,10 @@
               </choose>
               </if>
             </foreach>
+            
+            <!-- Add this hook to prevent loading of byte arrays -->
+            and RES.TYPE_ != 'bytes'
+            
           </where>
     ) RES
   </sql>
