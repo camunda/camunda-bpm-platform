@@ -20,9 +20,6 @@
 			<prefill>false</prefill>
 			<use-strict-min>false</use-strict-min>
 			<flush-strategy>FailingConnectionOnly</flush-strategy>
-			<no-tx-separate-pools>true</no-tx-separate-pools>
-			<pad-xid>false</pad-xid>
-			<wrap-xa-resource>true</wrap-xa-resource>
 		</xa-pool>
 		<transaction-isolation>TRANSACTION_READ_COMMITTED</transaction-isolation>
 		<validation>
