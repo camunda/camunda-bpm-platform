@@ -93,6 +93,13 @@
         </includes>
         <outputDirectory>server/apache-tomcat-${tomcat.version}/webapps/</outputDirectory>
     </dependencySet>
+    
+    <dependencySet>
+        <includes>
+            <include>org.camunda.bpm.example:camunda-example-wait-states:war:*</include>
+        </includes>
+        <outputDirectory>server/apache-tomcat-${tomcat.version}/webapps/</outputDirectory>
+    </dependencySet>    
 		
   </dependencySets>
   
