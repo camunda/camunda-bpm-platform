@@ -4,7 +4,7 @@ ngDefine('cockpit.plugin.base.views', function(module) {
 
     // input: processInstanceId, selection, processInstance
 
-    var pages = $scope.pages = { size: 2, total: 0 };
+    var pages = $scope.pages = { size: 50, total: 0 };
 
     var activityInstanceIds = null;
     var alreadyUpdated = false;
