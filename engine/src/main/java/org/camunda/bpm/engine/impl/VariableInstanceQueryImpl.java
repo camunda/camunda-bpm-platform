@@ -26,7 +26,7 @@ import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
  */
 public class VariableInstanceQueryImpl extends AbstractVariableQueryImpl<VariableInstanceQuery, VariableInstance> implements VariableInstanceQuery, Serializable {
 
-  private static final long serialVersionUID = 7177849740680446490L;
+  private static final long serialVersionUID = 1L;
   
   protected String variableName;
   protected String variableNameLike;
