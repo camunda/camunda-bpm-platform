@@ -74,7 +74,7 @@
         <module>tomcat-runtime</module>
         <module>integration-tests-webapps</module>
         <module>integration-tests-engine</module>
-        <module>test-db-upgrade</module>
+        <!-- <module>test-db-upgrade</module> -->
       </modules>
 	</profile>  
   
