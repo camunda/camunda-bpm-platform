@@ -24,8 +24,14 @@
         </a>
       </td>
     </tr>
+
+    <tr ngm-if="!variables">
+      <td colspan="4">
+        <i class="icon-loading"></i> loading variable instances...
+      </td>
+    </tr>    
   
-    <tr ng-hide="variables.length">
+    <tr ng-hide="variables && variables.length">
       <td  colspan="4">
         No variable instances
       </td>
