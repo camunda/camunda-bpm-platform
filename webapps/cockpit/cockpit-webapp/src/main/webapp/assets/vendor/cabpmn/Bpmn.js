@@ -127,19 +127,6 @@ define(['jquery', 'bpmn/Transformer', 'bpmn/Renderer'], function ($, Transformer
     };
   };
 
-  /**
-   * @deprecated use Bpmn.prototype.annotation instead
-   */
-  Bpmn.prototype.annotate = function (id, innerHTML, classesArray) {
-    var element = this.getOverlay(id);
-
-    element
-      .html(innerHTML)
-      .addClass((classesArray || []).join(" "));
-
-    return element;
-  };
-
   Bpmn.prototype.clearAnnotations = function (id, classesArray) {
     var element = this.getOverlay(id);
 

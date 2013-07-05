@@ -321,6 +321,12 @@ Tree
   right: 0;
 }
 
+@media (max-width: 767px) {
+  .content-fixed {
+    top: 61px;
+  }
+}
+
 .content {
   float: left;
   height: 100%;
