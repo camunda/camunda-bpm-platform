@@ -67,6 +67,19 @@
   <select id="selectAuthorization" resultMap="authorizationResultMap">
     select * FROM ${prefix}ACT_RU_AUTHORIZATION WHERE ID_ = #{id}
   </select>
+
+  <select id="selectAuthorizationByQueryCriteria_BITAND" parameterType="org.camunda.bpm.engine.impl.AuthorizationQueryImpl" resultMap="authorizationResultMap">
+    ${limitBefore}
+    select RES.* ${limitBetween}
+    <include refid="selectAuthorizationByQueryCriteriaSql_BITAND"/>
+    ${orderBy}
+    ${limitAfter}
+  </select>
+
+  <select id="selectAuthorizationCountByQueryCriteria_BITAND" parameterType="org.camunda.bpm.engine.impl.AuthorizationQueryImpl" resultType="long">
+    select count(distinct RES.ID_)
+    <include refid="selectAuthorizationByQueryCriteriaSql_BITAND"/>
+  </select>
   
   <select id="selectAuthorizationByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.AuthorizationQueryImpl" resultMap="authorizationResultMap">
     ${limitBefore}
@@ -80,6 +93,43 @@
     select count(distinct RES.ID_)
     <include refid="selectAuthorizationByQueryCriteriaSql"/>
   </select>
+  
+  <sql id="selectAuthorizationByQueryCriteriaSql_BITAND">
+    from ${prefix}ACT_RU_AUTHORIZATION RES
+    <where>
+      <if test="id != null">
+        RES.ID_ = #{id}
+      </if>
+      
+      <!-- userIds -->
+      <if test="userIds != null &amp;&amp; userIds.length > 0">
+        and RES.USER_ID_ in
+        <foreach item="item" index="index" collection="userIds"
+                 open="(" separator="," close=")">
+          #{item}
+        </foreach>
+      </if>
+      
+      <!-- groupIds -->
+      <if test="groupIds != null &amp;&amp; groupIds.length > 0">
+        and RES.GROUP_ID_ in
+        <foreach item="item" index="index" collection="groupIds"
+                 open="(" separator="," close=")">
+          #{item}
+        </foreach>
+      </if>
+      
+      <if test="resourceType != null">
+        and RES.RESOURCE_TYPE_ = #{resourceType}
+      </if>      
+      <if test="resourceId != null">
+        and RES.RESOURCE_ID_ = #{resourceId}
+      </if>     
+      <if test="queryByPermission">
+        and (BITAND(RES.PERMS_, #{permission})) = #{permission}  
+      </if>
+    </where>
+  </sql>
   
   <sql id="selectAuthorizationByQueryCriteriaSql">
     from ${prefix}ACT_RU_AUTHORIZATION RES
@@ -113,7 +163,7 @@
         and RES.RESOURCE_ID_ = #{resourceId}
       </if>     
       <if test="queryByPermission">
-        and (BITAND(RES.PERMS_, #{permission})) = #{permission}  
+        and RES.PERMS_ &amp; #{permission} = #{permission}  
       </if>
     </where>
   </sql>

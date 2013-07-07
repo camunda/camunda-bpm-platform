@@ -65,6 +65,12 @@ alter table ACT_RU_INCIDENT
 alter table ACT_RU_INCIDENT
     drop FOREIGN KEY ACT_FK_INC_RCAUSE; 
     
+alter table ACT_RU_AUTHORIZATION
+    drop constraint ACT_UNIQ_AUTH_GROUP; 
+    
+alter table ACT_RU_AUTHORIZATION
+    drop constraint ACT_UNIQ_AUTH_USER; 
+    
 drop index ACT_IDX_ATHRZ_PROCEDEF on ACT_RU_IDENTITYLINK;
 drop index ACT_IDX_EVENT_SUBSCR_CONFIG_ on ACT_RU_EVENT_SUBSCR;
     
@@ -79,3 +85,4 @@ drop table if exists ACT_RU_EXECUTION;
 drop table if exists ACT_RU_JOB; 
 drop table if exists ACT_RU_EVENT_SUBSCR;
 drop table if exists ACT_RU_INCIDENT;
+drop table if exists ACT_RU_AUTHORIZATION;
