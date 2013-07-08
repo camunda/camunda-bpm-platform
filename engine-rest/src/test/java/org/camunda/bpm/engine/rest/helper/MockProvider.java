@@ -135,10 +135,16 @@ public abstract class MockProvider {
   // user & groups
   public static final String EXAMPLE_GROUP_ID = "group1Id";
   public static final String EXAMPLE_GROUP_NAME = "group1";
+  public static final String EXAMPLE_GROUP_NAME_UPDATE = "group1Update";
  
   public static final String EXAMPLE_USER_ID = "userId";
   public static final String EXAMPLE_USER_FIRST_NAME = "firstName";
   public static final String EXAMPLE_USER_LAST_NAME = "lastName";
+  public static final String EXAMPLE_USER_EMAIL = "test@example.org";
+  
+  public static final String EXAMPLE_USER_FIRST_NAME_UPDATE = "firstNameUpdate";
+  public static final String EXAMPLE_USER_LAST_NAME_UPDATE = "lastNameUpdate";
+  public static final String EXAMPLE_USER_EMAIL_UPDATE = "testUpdate@example.org";
   
   // tasks
   public static Task createMockTask() {
@@ -350,13 +356,26 @@ public abstract class MockProvider {
   }
   
   // user & groups
-  public static List<Group> createMockGroups() {
-    List<Group> mockGroups = new ArrayList<Group>();
+  
+  public static Group createMockGroup() {
     Group mockGroup = mock(Group.class);
     when(mockGroup.getId()).thenReturn(EXAMPLE_GROUP_ID);
     when(mockGroup.getName()).thenReturn(EXAMPLE_GROUP_NAME);
-    mockGroups.add(mockGroup);
     
+    return mockGroup;
+  }
+  
+  public static Group createMockGroupUpdate() {
+    Group mockGroup = mock(Group.class);
+    when(mockGroup.getId()).thenReturn(EXAMPLE_GROUP_ID);
+    when(mockGroup.getName()).thenReturn(EXAMPLE_GROUP_NAME_UPDATE);
+    
+    return mockGroup;
+  }
+  
+  public static List<Group> createMockGroups() {
+    List<Group> mockGroups = new ArrayList<Group>();
+    mockGroups.add(createMockGroup());
     return mockGroups;
   }
   
@@ -365,6 +384,22 @@ public abstract class MockProvider {
     when(mockUser.getId()).thenReturn(EXAMPLE_USER_ID);
     when(mockUser.getFirstName()).thenReturn(EXAMPLE_USER_FIRST_NAME);
     when(mockUser.getLastName()).thenReturn(EXAMPLE_USER_LAST_NAME);
+    when(mockUser.getEmail()).thenReturn(EXAMPLE_USER_EMAIL);
     return mockUser;
+  }
+  
+  public static User createMockUserUpdate() {
+    User mockUser = mock(User.class);
+    when(mockUser.getId()).thenReturn(EXAMPLE_USER_ID);
+    when(mockUser.getFirstName()).thenReturn(EXAMPLE_USER_FIRST_NAME_UPDATE);
+    when(mockUser.getLastName()).thenReturn(EXAMPLE_USER_LAST_NAME_UPDATE);
+    when(mockUser.getEmail()).thenReturn(EXAMPLE_USER_EMAIL_UPDATE);
+    return mockUser;
+  }
+  
+  public static List<User> createMockUsers() {
+    ArrayList<User> list = new ArrayList<User>();
+    list.add(createMockUser());
+    return list;
   }
 }

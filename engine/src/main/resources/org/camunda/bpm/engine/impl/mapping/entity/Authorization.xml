@@ -90,7 +90,7 @@
       
       <!-- userIds -->
       <if test="userIds != null &amp;&amp; userIds.length > 0">
-        RES.USER_ID_ in
+        and RES.USER_ID_ in
         <foreach item="item" index="index" collection="userIds"
                  open="(" separator="," close=")">
           #{item}
@@ -99,7 +99,7 @@
       
       <!-- groupIds -->
       <if test="groupIds != null &amp;&amp; groupIds.length > 0">
-        RES.GROUP_ID_ in
+        and RES.GROUP_ID_ in
         <foreach item="item" index="index" collection="groupIds"
                  open="(" separator="," close=")">
           #{item}
