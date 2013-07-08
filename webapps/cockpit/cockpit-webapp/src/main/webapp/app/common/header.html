@@ -7,7 +7,7 @@
       </a>
 
       <form class="navbar-search pull-right" ng-show="engines" ng-controller="ProcessEngineSelectionController">
-        <select class="span2" ng-model="currentEngine" ng-options="engine.name for (id, engine) in engines"></select>
+        <select class="span2" title="Select process engine" ng-model="currentEngine" ng-options="engine.name for (id, engine) in engines"></select>
       </form>
     </div>
   </div>
