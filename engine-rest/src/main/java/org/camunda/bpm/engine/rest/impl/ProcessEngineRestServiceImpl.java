@@ -24,7 +24,7 @@ import javax.ws.rs.core.UriBuilder;
 
 import org.camunda.bpm.engine.rest.ExecutionRestService;
 import org.camunda.bpm.engine.rest.IdentityRestService;
-import org.camunda.bpm.engine.rest.ManagementRestService;
+import org.camunda.bpm.engine.rest.JobRestService;
 import org.camunda.bpm.engine.rest.MessageRestService;
 import org.camunda.bpm.engine.rest.ProcessDefinitionRestService;
 import org.camunda.bpm.engine.rest.ProcessEngineRestService;
@@ -86,9 +86,9 @@ public class ProcessEngineRestServiceImpl implements ProcessEngineRestService {
   }
   
   @Override
-  public ManagementRestService getManagementRestService(String engineName) {
+  public JobRestService getJobRestService(String engineName) {
 	String rootResourcePath = getRelativeEngineUri(engineName).toASCIIString();
-	ManagementRestServiceImpl subResource = new ManagementRestServiceImpl(engineName);
+	JobRestServiceImpl subResource = new JobRestServiceImpl(engineName);
 	subResource.setRelativeRootResourceUri(rootResourcePath);
 	return subResource;
   }

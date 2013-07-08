@@ -16,6 +16,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.camunda.bpm.engine.form.FormProperty;
@@ -136,7 +137,11 @@ public abstract class MockProvider {
   public static final String EXAMPLE_JOB_ID = "aJobId";
   public static final String NON_EXISTING_JOB_ID = "aNonExistingJobId";
   public static final int EXAMPLE_NEGATIVE_JOB_RETRIES = -3; 
-  public static final int EXAMPLE_JOB_RETRIES = 3; 
+  public static final int EXAMPLE_JOB_RETRIES = 3;
+  public static final String EXAMPLE_JOB_NO_EXCEPTION_MESSAGE = "";
+  public static final String EXAMPLE_EXCEPTION_MESSAGE = "aExceptionMessage";
+  public static final String EXAMPLE_EMPTY_JOB_ID = "";
+  public static final Date EXAMPLE_DUE_DATE = DateTime.now().toDate();
 
   
   // tasks
@@ -355,23 +360,24 @@ public abstract class MockProvider {
   
   // jobs
   public static Job createMockJob() {
-	    Job mock = mock(Job.class);	    
-	    when(mock.getId()).thenReturn(EXAMPLE_JOB_ID);
-	    when(mock.getRetries()).thenReturn(EXAMPLE_JOB_RETRIES);
-	    when(mock.getProcessInstanceId()).thenReturn(EXAMPLE_PROCESS_INSTANCE_ID);
-	    
-	    return mock;
-	  }
+		Job mock = new MockJobBuilder().id(EXAMPLE_JOB_ID)
+				.processInstanceId(EXAMPLE_PROCESS_INSTANCE_ID)
+				.executionId(EXAMPLE_EXECUTION_ID).retries(EXAMPLE_JOB_RETRIES)
+				.exceptionMessage(EXAMPLE_JOB_NO_EXCEPTION_MESSAGE)
+				.dueDate(EXAMPLE_DUE_DATE)
+				.build();
+		return mock;
+  }
 
- public static List<Job> createMockJobList() {
+  public static List<Job> createMockJobs() {
 		List<Job> mockList = new ArrayList<Job>();
 		mockList.add(createMockJob());
 		return mockList;
- }
+  }
 
- public static List<Job> createMockEmptyJobList() {
+  public static List<Job> createMockEmptyJobList() {
 	List<Job> mockList = new ArrayList<Job>();	
 	return mockList;
- }
+  }
 
 }
