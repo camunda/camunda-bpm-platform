@@ -101,6 +101,7 @@
         <module>distro/tomcat</module>
         <module>distro/sql-script</module>
 
+        <module>identity/identity-ldap</module>
             
       </modules>     
     </profile>  
@@ -113,6 +114,7 @@
         <module>engine-osgi</module>
         <module>engine-spring</module>          
         <module>engine-rest</module>      
+        <module>identity/identity-ldap</module>
       </modules>
     </profile>    
     <profile>
