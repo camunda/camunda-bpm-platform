@@ -58,7 +58,7 @@
 
     <dependency>
       <groupId>org.camunda.bpm.tasklist</groupId>
-      <artifactId>camunda-tasklist</artifactId>
+      <artifactId>camunda-tasklist-tomcat</artifactId>
       <version>${project.version}</version>
       <type>war</type>
     </dependency>
