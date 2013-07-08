@@ -6,10 +6,10 @@ The real cockpit webapplication.
 Development Setup
 -----------------
 
-For developing cockpit you can use the `dev` profile.
+For developing cockpit you can use the `develop` profile.
 It will bootstrap cockpit in an embedded tomcat and allows it to reload web resources on the fly.
 
-The cockpit on embedded tomcat can be started from within the `cockpit-webapp` folder via `mvn clean tomcat:run -Pdev`.
+The cockpit on embedded tomcat can be started from within the `cockpit-webapp` folder via `mvn clean tomcat:run -Pdevelop`.
 
 
 Test Suite
@@ -31,4 +31,4 @@ Run tests via `mvn clean test`.
 
 Run unit tests via `karma start src/test/js/config/karma.unit.js`.
 
-Run end-to-end tests via `karma start src/test/js/config/karma.e2e.js` (requires dev environment to be running).
+Run end-to-end tests via `karma start src/test/js/config/karma.e2e.js` (requires the develop environment to be running).
