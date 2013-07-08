@@ -14,10 +14,12 @@ package org.camunda.bpm.container.impl.jboss.service;
 
 import org.camunda.bpm.container.impl.jmx.services.JmxManagedProcessEngine;
 import org.camunda.bpm.engine.ProcessEngine;
+import org.jboss.msc.inject.Injector;
 import org.jboss.msc.service.Service;
 import org.jboss.msc.service.StartContext;
 import org.jboss.msc.service.StartException;
 import org.jboss.msc.service.StopContext;
+import org.jboss.msc.value.InjectedValue;
 
 /**
  * <p>Service representing a managed process engine instance registered with the Msc.</p>
@@ -31,6 +33,8 @@ import org.jboss.msc.service.StopContext;
  *
  */
 public class MscManagedProcessEngine implements Service<ProcessEngine> {
+  
+  protected InjectedValue<MscRuntimeContainerDelegate> runtimContainerDelegateInjector = new InjectedValue<MscRuntimeContainerDelegate>();
   
   /** the process engine managed by this service */
   protected ProcessEngine processEngine;
@@ -48,11 +52,17 @@ public class MscManagedProcessEngine implements Service<ProcessEngine> {
   }
 
   public void start(StartContext context) throws StartException {
-    // no lifecycle
+    MscRuntimeContainerDelegate runtimeContainerDelegate = runtimContainerDelegateInjector.getValue();
+    runtimeContainerDelegate.processEngineStarted(processEngine);
   }
 
   public void stop(StopContext context) {
-    // no lifecycle    
+    MscRuntimeContainerDelegate runtimeContainerDelegate = runtimContainerDelegateInjector.getValue();
+    runtimeContainerDelegate.processEngineStopped(processEngine);    
+  }
+
+  public Injector<MscRuntimeContainerDelegate> getRuntimContainerDelegateInjector() {
+    return runtimContainerDelegateInjector;
   }
   
 }

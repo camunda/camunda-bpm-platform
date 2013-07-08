@@ -106,9 +106,11 @@ import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.camunda.bpm.engine.impl.jobexecutor.JobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.ProcessEventJobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.RejectedJobsHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.TimerActivateProcessDefinitionHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerCatchIntermediateEventJobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerExecuteNestedActivityJobHandler;
 import org.camunda.bpm.engine.impl.jobexecutor.TimerStartEventJobHandler;
+import org.camunda.bpm.engine.impl.jobexecutor.TimerSuspendProcessDefinitionHandler;
 import org.camunda.bpm.engine.impl.mail.MailScanner;
 import org.camunda.bpm.engine.impl.persistence.GenericManagerFactory;
 import org.camunda.bpm.engine.impl.persistence.deploy.Deployer;
@@ -318,7 +320,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected ProcessApplicationManager processApplicationManager;
   
   protected CorrelationHandler correlationHandler;
-    
+  
   // buildProcessEngine ///////////////////////////////////////////////////////
   
   public ProcessEngine buildProcessEngine() {
@@ -778,6 +780,12 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     
     ProcessEventJobHandler processEventJobHandler = new ProcessEventJobHandler();
     jobHandlers.put(processEventJobHandler.getType(), processEventJobHandler);
+    
+    TimerSuspendProcessDefinitionHandler suspendProcessDefinitionHandler = new TimerSuspendProcessDefinitionHandler();
+    jobHandlers.put(suspendProcessDefinitionHandler.getType(), suspendProcessDefinitionHandler);
+    
+    TimerActivateProcessDefinitionHandler activateProcessDefinitionHandler = new TimerActivateProcessDefinitionHandler();
+    jobHandlers.put(activateProcessDefinitionHandler.getType(), activateProcessDefinitionHandler);
     
     // if we have custom job handlers, register them
     if (getCustomJobHandlers()!=null) {
@@ -1821,5 +1829,5 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   public void setCustomIncidentHandlers(List<IncidentHandler> customIncidentHandlers) {
     this.customIncidentHandlers = customIncidentHandlers;
   }
-  
+
 }

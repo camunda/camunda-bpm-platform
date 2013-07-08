@@ -106,7 +106,7 @@ public class DeploymentStatisticsQueryTest extends PluggableProcessEngineTestCas
     runtimeService.startProcessInstanceByKey("MIExampleProcess");
     runtimeService.startProcessInstanceByKey("ExampleProcess", parameters);
     
-    waitForJobExecutorToProcessAllJobs(6000, 500);
+    waitForJobExecutorToProcessAllJobs(6000);
     
     List<DeploymentStatistics> statistics = 
         managementService.createDeploymentStatisticsQuery().includeFailedJobs().list();
@@ -126,7 +126,7 @@ public class DeploymentStatisticsQueryTest extends PluggableProcessEngineTestCas
     runtimeService.startProcessInstanceByKey("MIExampleProcess");
     runtimeService.startProcessInstanceByKey("ExampleProcess", parameters);
     
-    waitForJobExecutorToProcessAllJobs(6000, 500);
+    waitForJobExecutorToProcessAllJobs(6000);
     
     List<DeploymentStatistics> statistics = 
         managementService.createDeploymentStatisticsQuery().includeIncidents().list();
@@ -156,7 +156,7 @@ public class DeploymentStatisticsQueryTest extends PluggableProcessEngineTestCas
     runtimeService.startProcessInstanceByKey("MIExampleProcess");
     runtimeService.startProcessInstanceByKey("ExampleProcess", parameters);
     
-    waitForJobExecutorToProcessAllJobs(6000, 500);
+    waitForJobExecutorToProcessAllJobs(6000);
     
     List<DeploymentStatistics> statistics = 
         managementService
@@ -189,7 +189,7 @@ public class DeploymentStatisticsQueryTest extends PluggableProcessEngineTestCas
     runtimeService.startProcessInstanceByKey("MIExampleProcess");
     runtimeService.startProcessInstanceByKey("ExampleProcess", parameters);
     
-    waitForJobExecutorToProcessAllJobs(6000, 500);
+    waitForJobExecutorToProcessAllJobs(6000);
     
     List<DeploymentStatistics> statistics = 
         managementService
@@ -217,7 +217,7 @@ public class DeploymentStatisticsQueryTest extends PluggableProcessEngineTestCas
     runtimeService.startProcessInstanceByKey("MIExampleProcess");
     runtimeService.startProcessInstanceByKey("ExampleProcess", parameters);
     
-    waitForJobExecutorToProcessAllJobs(6000, 500);
+    waitForJobExecutorToProcessAllJobs(6000);
     
     List<DeploymentStatistics> statistics = 
         managementService
@@ -247,7 +247,7 @@ public class DeploymentStatisticsQueryTest extends PluggableProcessEngineTestCas
   public void testDeploymentStatisticsQueryWithTwoIncidentsAndOneFailedJobs() {
     runtimeService.startProcessInstanceByKey("callExampleSubProcess");
     
-    waitForJobExecutorToProcessAllJobs(6000, 500);
+    waitForJobExecutorToProcessAllJobs(6000);
     
     List<DeploymentStatistics> statistics = 
         managementService

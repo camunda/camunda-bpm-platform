@@ -54,7 +54,7 @@ public class SignalEventCatchBoundaryWithVariablesTest extends AbstractFoxPlatfo
     variables2.put("signalProcessInstanceId", piCatchSignal.getProcessInstanceId());
     ProcessInstance piThrowSignal = runtimeService.startProcessInstanceByKey("throwSignal", variables2);
 
-    waitForJobExecutorToProcessAllJobs(2000, 200);
+    waitForJobExecutorToProcessAllJobs(2000);
 
     assertEquals(1, runtimeService.createExecutionQuery().processInstanceId(piCatchSignal.getProcessInstanceId()).activityId("receiveTask").count());
     assertEquals(1, runtimeService.createExecutionQuery().processInstanceId(piThrowSignal.getProcessInstanceId()).activityId("receiveTask").count());

@@ -97,7 +97,7 @@ public class SignalEventTest extends PluggableProcessEngineTestCase {
     
     try {
       ClockUtil.setCurrentTime( new Date(System.currentTimeMillis() + 1000));
-      waitForJobExecutorToProcessAllJobs(10000, 100l);
+      waitForJobExecutorToProcessAllJobs(10000);
       
       assertEquals(0, createEventSubscriptionQuery().count());    
       assertEquals(0, runtimeService.createProcessInstanceQuery().count());

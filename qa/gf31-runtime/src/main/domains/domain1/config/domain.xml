@@ -42,7 +42,7 @@
     <jdbc-connection-pool 
           is-isolation-level-guaranteed="false"
           datasource-classname="${database.datasource.class}" 
-          res-type="${database.datasource.class.type}" non-transactional-connections="true" 
+          res-type="${database.datasource.class.type}" non-transactional-connections="${glassfish.transactions.noxa}" 
           name="ProcessEnginePool">
       <property name="Url" value="${database.url}"></property>
       <property name="serverName" value="${database.host}"></property>
@@ -55,7 +55,7 @@
     <jdbc-connection-pool 
           is-isolation-level-guaranteed="false"
           datasource-classname="${database.datasource.class}" 
-          res-type="${database.datasource.class.type}" non-transactional-connections="true" 
+          res-type="${database.datasource.class.type}" non-transactional-connections="${glassfish.transactions.noxa}" 
           name="CamundaCyclePool">
       <property name="serverName" value="${database.host}"></property>
       <property name="Url" value="${database.url}"></property>

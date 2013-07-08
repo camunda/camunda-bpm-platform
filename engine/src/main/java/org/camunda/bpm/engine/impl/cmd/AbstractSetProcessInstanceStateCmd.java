@@ -17,11 +17,10 @@ import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
-import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState.SuspensionStateUtil;
 
 /**
- * 
  * @author Daniel Meyer
+ * @author Joram Barrez
  */
 public abstract class AbstractSetProcessInstanceStateCmd implements Command<Void> {
     
@@ -49,7 +48,13 @@ public abstract class AbstractSetProcessInstanceStateCmd implements Command<Void
       throw new ProcessEngineException("Cannot set suspension state for execution '"+executionId+"': not a process instance.");
     }
     
-    SuspensionStateUtil.setSuspensionState(executionEntity, getNewState());
+    executionEntity.setSuspensionState(getNewState().getStateCode());
+
+    // All child executions are suspended
+    commandContext.getExecutionManager().updateExecutionSuspensionStateByProcessInstanceId(executionId, getNewState());
+    
+    // All tasks are suspended
+    commandContext.getTaskManager().updateTaskSuspensionStateByProcessInstanceId(executionId, getNewState());
     
     return null;
   }

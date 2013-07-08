@@ -13,10 +13,12 @@
 
 package org.camunda.bpm.engine.test.api.repository;
 
+import java.util.Date;
 import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.test.Deployment;
 
@@ -49,10 +51,6 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
     assertEquals("oneTaskProcess", processDefinition.getKey());
     assertEquals("The One Task Process", processDefinition.getName());
 
-    // See http://jira.codehaus.org/browse/ACT-1020, we have to query the process definition via the extra method to get all information
-    // otherwise it is null:
-    assertNull(processDefinition.getDescription());
-    // and here we get it:
     processDefinition = repositoryService.getProcessDefinition(definitions.get(0).getId());    
     assertEquals("This is a process for testing purposes", processDefinition.getDescription());
   }
@@ -111,6 +109,50 @@ public class RepositoryServiceTest extends PluggableProcessEngineTestCase {
     } catch (ProcessEngineException ae) {
       assertTextPresent("deploymentId is null", ae.getMessage());
     }
+  }
+  
+  public void testDeploymentWithDelayedProcessDefinitionActivation() {
+    
+    Date startTime = new Date();
+    ClockUtil.setCurrentTime(startTime);
+    Date inThreeDays = new Date(startTime.getTime() + (3 * 24 * 60 * 60 * 1000));
+    
+    // Deploy process, but activate after three days
+    org.camunda.bpm.engine.repository.Deployment deployment = repositoryService.createDeployment()
+            .addClasspathResource("org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml")
+            .addClasspathResource("org/camunda/bpm/engine/test/api/twoTasksProcess.bpmn20.xml")
+            .activateProcessDefinitionsOn(inThreeDays)
+            .deploy();
+    
+    assertEquals(1, repositoryService.createDeploymentQuery().count());
+    assertEquals(2, repositoryService.createProcessDefinitionQuery().count());
+    assertEquals(2, repositoryService.createProcessDefinitionQuery().suspended().count());
+    assertEquals(0, repositoryService.createProcessDefinitionQuery().active().count());
+    
+    // Shouldn't be able to start a process instance
+    try {
+      runtimeService.startProcessInstanceByKey("oneTaskProcess");
+      fail();
+    } catch (ProcessEngineException e) {
+      assertTextPresentIgnoreCase("suspended", e.getMessage());
+    }
+    
+    // Move time four days forward, the timer will fire and the process definitions will be active
+    Date inFourDays = new Date(startTime.getTime() + (4 * 24 * 60 * 60 * 1000));
+    ClockUtil.setCurrentTime(inFourDays);
+    waitForJobExecutorToProcessAllJobs(5000L);
+    
+    assertEquals(1, repositoryService.createDeploymentQuery().count());
+    assertEquals(2, repositoryService.createProcessDefinitionQuery().count());
+    assertEquals(0, repositoryService.createProcessDefinitionQuery().suspended().count());
+    assertEquals(2, repositoryService.createProcessDefinitionQuery().active().count());
+    
+    // Should be able to start process instance
+    runtimeService.startProcessInstanceByKey("oneTaskProcess");
+    assertEquals(1, runtimeService.createProcessInstanceQuery().count());
+    
+    // Cleanup
+    repositoryService.deleteDeployment(deployment.getId(), true);
   }
   
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })

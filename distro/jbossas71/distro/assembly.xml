@@ -89,6 +89,13 @@
         <outputDirectory>server/jboss-as-${version.jboss.as}/standalone/deployments</outputDirectory>
     </dependencySet>
     
+    <dependencySet>
+        <includes>
+          <include>org.camunda.bpm.example:camunda-example-wait-states:war:*</include>
+        </includes>
+        <outputDirectory>server/jboss-as-${version.jboss.as}/standalone/deployments</outputDirectory>
+    </dependencySet>
+    
   </dependencySets>
   
   <fileSets>

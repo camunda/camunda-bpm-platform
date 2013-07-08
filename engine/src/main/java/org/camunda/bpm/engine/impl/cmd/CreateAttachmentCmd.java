@@ -35,8 +35,8 @@ import org.camunda.bpm.engine.task.Event;
 // Not Serializable
 public class CreateAttachmentCmd implements Command<Attachment> {  
   
-  protected String attachmentType;
   protected String taskId;
+  protected String attachmentType;
   protected String processInstanceId;
   protected String attachmentName;
   protected String attachmentDescription;
@@ -44,6 +44,7 @@ public class CreateAttachmentCmd implements Command<Attachment> {
   protected String url;
   
   public CreateAttachmentCmd(String attachmentType, String taskId, String processInstanceId, String attachmentName, String attachmentDescription, InputStream content, String url) {
+    this.taskId = taskId;
     this.attachmentType = attachmentType;
     this.taskId = taskId;
     this.processInstanceId = processInstanceId;
@@ -52,7 +53,8 @@ public class CreateAttachmentCmd implements Command<Attachment> {
     this.content = content;
     this.url = url;
   }
-
+  
+  @Override
   public Attachment execute(CommandContext commandContext) {
     AttachmentEntity attachment = new AttachmentEntity();
     attachment.setName(attachmentName);

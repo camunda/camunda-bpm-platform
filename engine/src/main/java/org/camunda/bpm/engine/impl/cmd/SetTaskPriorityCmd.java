@@ -15,7 +15,6 @@ package org.camunda.bpm.engine.impl.cmd;
 import java.io.Serializable;
 
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
@@ -28,9 +27,8 @@ public class SetTaskPriorityCmd implements Command<Void>, Serializable {
   
   private static final long serialVersionUID = 1L;
 
-  protected String taskId;
-  
   protected int priority;
+  protected String taskId;
   
   public SetTaskPriorityCmd(String taskId, int priority) {
     this.taskId = taskId;
@@ -42,8 +40,7 @@ public class SetTaskPriorityCmd implements Command<Void>, Serializable {
       throw new ProcessEngineException("taskId is null");
     }
     
-    TaskEntity task = Context
-      .getCommandContext()
+    TaskEntity task = commandContext
       .getTaskManager()
       .findTaskById(taskId);
     
@@ -52,7 +49,6 @@ public class SetTaskPriorityCmd implements Command<Void>, Serializable {
     }
     
     task.setPriority(priority);
-    
     return null;
   }
 

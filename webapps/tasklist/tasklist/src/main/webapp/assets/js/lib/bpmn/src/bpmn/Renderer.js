@@ -9,7 +9,10 @@
  * 
  */
 
-define(["dojox/gfx", "dojo/_base/lang", "dojo/dom-construct", "dojo/_base/window", "dojo/query", "dojo/dom", "dojo/dom-class"], function (gfx, lang, domConstruct, win, query, dom, domClass) {
+define([ "dojox/gfx", "jquery" ], function (gfx, $) {
+
+  var mixin = $.extend;
+
   // constructor
   function BpmnElementRenderer(baseElement) {
 
@@ -152,7 +155,7 @@ define(["dojox/gfx", "dojo/_base/lang", "dojo/dom-construct", "dojo/_base/window
     "stroke": regularStroke
   };
 
-  var collapsedPoolStyle = lang.mixin(lang.clone(participantStyle), {
+  var collapsedPoolStyle = mixin({}, participantStyle, {
     "stroke-width": 2
   });
 
@@ -185,7 +188,7 @@ define(["dojox/gfx", "dojo/_base/lang", "dojo/dom-construct", "dojo/_base/window
     "stroke-linejoin": "round"
   };
 
-  var dataAssociationStyle = lang.clone(associationStyle);
+  var dataAssociationStyle = mixin({}, associationStyle);
 
   var messageFlowStyle = {
     "stroke-width": 2,
@@ -208,14 +211,14 @@ define(["dojox/gfx", "dojo/_base/lang", "dojo/dom-construct", "dojo/_base/window
 
   var styleMap = {
     "startEvent" : eventStyle,
-    "endEvent" : lang.mixin(lang.clone(eventStyle), endEventStyle),
+    "endEvent" : mixin({}, eventStyle, endEventStyle),
     "boundaryEvent" : eventStyle,
     "intermediateCatchEvent" : eventStyle,
     "intermediateThrowEvent" : eventStyle,
     "exclusiveGateway" : generalStyle,
     "inclusiveGateway" : generalStyle,
     "complexGateway" : generalStyle,
-    "parallelGateway" : lang.mixin(lang.clone(eventStyle), {"stroke-width" : 3}),
+    "parallelGateway" : mixin({}, eventStyle, { "stroke-width" : 3 }),
     "eventBasedGateway" : generalStyle,
     "userTask" : activityStyle,
     "serviceTask" : activityStyle,
@@ -233,8 +236,8 @@ define(["dojox/gfx", "dojo/_base/lang", "dojo/dom-construct", "dojo/_base/window
     "group" : groupStyle,
     "participant" : collapsedPoolStyle,
     "lane" : laneStyle,
-    "sequenceFlow" : lang.mixin(lang.clone(generalStyle), sequenceFlowStyle),
-    "messageFlow" : lang.mixin(lang.clone(generalStyle), messageFlowStyle),
+    "sequenceFlow" : mixin({}, generalStyle, sequenceFlowStyle),
+    "messageFlow" : mixin({}, generalStyle, messageFlowStyle),
     "textAnnotation" : generalStyle,
     "association" : associationStyle,
     "dataInputAssociation" : dataAssociationStyle,
@@ -245,94 +248,166 @@ define(["dojox/gfx", "dojo/_base/lang", "dojo/dom-construct", "dojo/_base/window
     "dataOutput" : dataObjectStyle
   };
 
+  /**
+   * Moves an element to front (both visually in diagram and in overlay)
+   *
+   * @param  {object}   element   the bpmn element that should be moved to front
+   * @param  {gfxGroup} group     the graphics group the element is drawn on
+   */
+  function moveToFront(element, group) {
+    group.moveToFront();
+
+    var overlay = $("#" + element.id);
+    overlay.appendTo(overlay.parent());
+  }
+
+  /**
+   * splits given string into chunks of given length
+   *
+   * @param str the string
+   * @param len the chunksize
+   * @returns {Array}
+   */
+  function splitSubstring(str, len) {
+    var ret = [ ];
+    for (var offset = 0, strLen = str.length; offset < strLen; offset += len) {
+      ret.push(str.substring(offset, offset + len));
+    }
+    return ret;
+  };
+
+  var renderTextFn = function (group, font, align, defaultAlign) {
+    return function (text) {
+      return group.createText({text: text, align: align ? align : defaultAlign})
+        .setFont(font) //set font
+        .setFill("black");
+    }
+  };
+
+  function wrapSingleWord(word, renderText, maxWidth) {
+    var lines = [];
+    for (var divider = 1, isFitting = false; isFitting == false; divider++) {
+      var chunkSize = word.length / divider;
+      var tempTextGroup = renderText(word.substring(0, chunkSize));
+      if (tempTextGroup.getTextWidth() <= maxWidth) {
+        lines = splitSubstring(word, chunkSize);
+        isFitting = true;
+      }
+      tempTextGroup.getParent().remove(tempTextGroup);
+    }
+    return lines;
+  };
+
+  function renderLineFn(x, y, renderText, fontSize, moveUp, customTransform) {
+    return function (text, lineIndex, totalLength) {
+      var rendered = renderText(text);
+      // if we habe more than two lines, move the lines up by 25 per cent, beginning with the second line, so we get impression of vertical centering
+      var dy = moveUp ? (y - (totalLength > 1 ? totalLength * fontSize * 0.25 : 0) + lineIndex*fontSize) : y + lineIndex*fontSize;
+
+      if (customTransform) {
+        customTransform(rendered, dy, lineIndex, totalLength);
+      }else {
+        rendered.setTransform({dx: x, dy: dy});
+      }
+
+    }
+  };
+
+  function renderLines(textLines, renderText, renderLine, maxWidth) {
+    var alignIndex = 0;
+
+    for (var i= 0; i<textLines.length; i++, alignIndex++) {
+      var currentLine = textLines[i];
+
+      var tempWordGroup = renderText(currentLine);
+
+      if (tempWordGroup.getTextWidth() > maxWidth) {
+        var wrapped = wrapSingleWord(currentLine, renderText, maxWidth);
+        for (var wrappedLineIndex = 0; wrappedLineIndex < wrapped.length; wrappedLineIndex++) {
+          renderLine(wrapped[wrappedLineIndex], wrappedLineIndex+alignIndex, wrapped.length);
+        }
+        alignIndex += wrapped.length -1;
+      } else {
+        renderLine(currentLine, alignIndex, textLines.length);
+      }
+
+      tempWordGroup.getParent().remove(tempWordGroup); // remove temporary gfx group
+    }
+
+    return alignIndex;
+  };
+
+  /**
+   *  Get lines for a array of words, so that every line does not exceed a given width
+   *
+   * @param words array of words
+   */
+  function getWrappedLines (words, renderText) {
+    var lines = [];
+
+    var currentLine = "";
+    var oldLine = "";
+
+    // append word for word, render the resulting line and check against the configured max width
+    // TODO check if there is a "native" way to do, for example in SVG
+
+    for (var currentWordIndex = 0; currentWordIndex < words.length; currentWordIndex++) {
+      if (words[currentWordIndex].length == 0) {
+        continue;
+      }
+
+      currentLine = oldLine + " " + words[currentWordIndex];
+      var lastWord = currentWordIndex == (words.length - 1);
+
+      // create temporary gfx group the check the real rendered width
+      var tempTextGroup = renderText(currentLine);
+
+      if (tempTextGroup.getTextWidth() > BpmnElementRenderer.wordWrapMaxWidth) {
+        if (oldLine.length != 0) lines.push(oldLine.trim());
+        oldLine = words[currentWordIndex];
+        if (lastWord) lines = lines.concat(words[currentWordIndex].split(" "));
+      } else if (lastWord) {
+        lines.push(currentLine.trim());
+      } else { // continue with current line
+        oldLine = currentLine;
+      }
+
+      tempTextGroup.getParent().remove(tempTextGroup); // remove temporary gfx group
+    }
+
+    return lines;
+  };
+
   function wordWrap (text, group, font, x, y, align, moveUp) {
-    var tempText = "";
     var fontSize = font.size ? font.size :  10;
     var defaultAlign = "right";
+    var wrapIndicator = "<w>";
+
+    var renderText = renderTextFn(group, font, align, defaultAlign);
+    var renderLine = renderLineFn(x, y, renderText, fontSize, moveUp);
 
     if(!text || text.length == 0) {
       return;
     }
 
-    var text = text.replace(/&#xD;/g, "<w>").replace(/&#xA;/g, "<w>").replace(/\n/g, "<w>");
+    var text = text.replace(/&#xD;/g, wrapIndicator).replace(/&#xA;/g, wrapIndicator).replace(/&#10;/g, wrapIndicator).replace(/\n/g, wrapIndicator).trim();
     var textLines = []; // the lines which will be used to render
 
+    var hasBreaks = text.indexOf(wrapIndicator) != -1;
+    var words = text.split(" ");
 
-    var renderText = function (text) {
-      return group.createText({text: text, align: align ? align : defaultAlign})
-        .setFont(font) //set font
-        .setFill("black");
+    if (words.length == 1) {
+      // single word might still have linebreaks
+      textLines = words[0].split(wrapIndicator);
+    }
+    else if (!hasBreaks) {
+      textLines = getWrappedLines(words, renderText);
+    }
+    else {
+      textLines = text.split(wrapIndicator);
     }
 
-    /**
-     * splits given string into chunks of given length
-     *
-     * @param str the string
-     * @param len the chunksize
-     * @returns {Array}
-     */
-    function splitSubstring(str, len) {
-      var ret = [ ];
-      for (var offset = 0, strLen = str.length; offset < strLen; offset += len) {
-        ret.push(str.substring(offset, offset + len));
-      }
-      return ret;
-    }
-
-    if (text.indexOf("<w>") != -1) { // there are line breaks, use them
-      textLines = text.split("<w>");
-    }else { // no line breaks, try to wrap
-      var words = text.split(" ");
-
-      if (words.length == 1) {
-        var word = words[0];
-        // divide with increasing divider until we are sure the parts fit into the max width
-        for (var divider= 1, isFitting = false; isFitting == false; divider++) {
-          var chunkSize = word.length / divider;
-          var tempTextGroup = renderText(word.substring(0, chunkSize));
-          if (tempTextGroup.getTextWidth() <= BpmnElementRenderer.wordWrapMaxWidth) {
-            textLines = splitSubstring(word, chunkSize);
-            isFitting = true;
-          }
-          tempTextGroup.getParent().remove(tempTextGroup);
-        }
-      }else {
-        var currentLine = "";
-        var oldLine = "";
-
-        // append word for word, render the resulting line and check against the configured max width
-        // TODO check if there is a "native" way to do, for example in SVG
-        for (var i=0; i < words.length; i++) {
-          currentLine = oldLine + words[i] + " ";
-          var lastWord = i == (words.length -1);
-
-          // create temporary gfx group the check the real rendered width
-          var tempTextGroup = renderText(currentLine);
-
-          if (tempTextGroup.getTextWidth() > BpmnElementRenderer.wordWrapMaxWidth) {
-            textLines.push(oldLine.trim());
-            oldLine = words[i];
-            if (lastWord) textLines.push(words[i])
-          } else if (lastWord) {
-            textLines.push(currentLine.trim());
-          } else { // continue with current line
-            oldLine = currentLine;
-          }
-
-          tempTextGroup.getParent().remove(tempTextGroup); // remove temporary gfx group
-        }
-      }
-    }
-
-    for (var i=0; i<textLines.length; i++) {
-      var textLine = renderText(textLines[i]);
-      // if we habe more than two lines, move the lines up by 25 per cent, beginning with the second line, so we get impression of vertical centering
-      var dy = moveUp ? (y - (textLines.length > 1 ? textLines.length * fontSize * 0.25 : 0) + i*fontSize) : y + i*fontSize;
-
-      textLine.setTransform({dx: x, dy: dy});
-    }
-
-    return textLines;
+    return renderLines(textLines, renderText, renderLine, BpmnElementRenderer.wordWrapMaxWidth);
   }
 
   function renderLabel(elementRenderer, group, bounds, align, moveUp) {
@@ -350,9 +425,9 @@ define(["dojox/gfx", "dojo/_base/lang", "dojo/dom-construct", "dojo/_base/window
     var x =  pos.x,
         y = pos.y;
 
-    wordWrap(baseElement.name, group, font, +x, +y, labelBounds ? null : align, moveUp);
+    var lineCount = wordWrap(baseElement.name, group, font, +x, +y, labelBounds ? null : align, moveUp);
 
-    return group;
+    return {group: group, lineCount : lineCount};
   }
 
   var collapsedPoolRenderer = {
@@ -397,6 +472,7 @@ define(["dojox/gfx", "dojo/_base/lang", "dojo/dom-construct", "dojo/_base/window
       var baseElement = elementRenderer.renderElement;
       var style = elementRenderer.getStyle(baseElement);
       var bounds = elementRenderer.renderBounds;
+      var font = { family: "Arial", size: 12, weight: "normal", align: "left"};
 
       // no participant bounds
       if (!bounds) {
@@ -405,6 +481,7 @@ define(["dojox/gfx", "dojo/_base/lang", "dojo/dom-construct", "dojo/_base/window
 
       var x = +bounds.x;
       var y = +bounds.y;
+
       var width = +bounds.width;
       var height = +bounds.height;
 
@@ -415,13 +492,16 @@ define(["dojox/gfx", "dojo/_base/lang", "dojo/dom-construct", "dojo/_base/window
       rect.setStroke(style.stroke);
 
       var label = baseElement.name;
-      if (label) {
-        var text = processGroup.createText({ x: 0, y: 0, text: label });
 
-        text.setFont({ family: "Arial", size: "9pt", weight: "normal", align: "middle"}); //set font
-        text.setFill("black");
-        // FIXME this 30 looks like a magic number
-        text.setTransform([gfx.matrix.translate(15, height/2 +30), gfx.matrix.rotateg(-90) ]);
+      if (label) {
+        var renderText = renderTextFn(gfxGroup, font, "left");
+        var renderLine = renderLineFn(x, y, renderText, font.size, true, function (element, dy, lineIndex, totalLines) {
+          var textWidth = element.getTextWidth();
+          var offsetY = (totalLines > 1 ?  height : height/2 + textWidth/2);
+
+          element.applyTransform(gfx.matrix.translate(BpmnElementRenderer.labelPadding+x + (lineIndex+1) * font.size, dy + offsetY)).applyTransform(gfx.matrix.rotateg(-90));
+        });
+        renderLines([label], renderText, renderLine, height);
       }
 
       var separator = processGroup.createLine({ x1: 30, y1: 0, x2: 30, y2: height});
@@ -733,7 +813,7 @@ define(["dojox/gfx", "dojo/_base/lang", "dojo/dom-construct", "dojo/_base/window
         }
       }
 
-      var text = renderLabel(elementRenderer, gfxGroup, {x: x + width /2 , y: y + height /2}, "middle", true);
+      renderLabel(elementRenderer, gfxGroup, {x: x + width /2 , y: y + height /2}, "middle", true);
     }
   };
 
@@ -811,9 +891,11 @@ define(["dojox/gfx", "dojo/_base/lang", "dojo/dom-construct", "dojo/_base/window
       }
 
       if (element.type == "boundaryEvent") {
-        elementRenderer.postRenderParent(function() {
-          circleGroup.moveToFront();
-        });
+        (function(e, group) {
+          elementRenderer.postRenderParent(function() {
+            moveToFront(e, group);
+          });
+        })(element, circleGroup);
       }
 
       renderLabel(elementRenderer, gfxGroup, {x : x + +bounds.width / 2, y : y + +bounds.width + rad}, "middle");
@@ -825,16 +907,20 @@ define(["dojox/gfx", "dojo/_base/lang", "dojo/dom-construct", "dojo/_base/window
   var textAnnotationRenderer = {
     render : function(elementRenderer, gfxGroup) {
       var style = elementRenderer.getStyle();
+      var font = { family: textStyle["font-family"], size: textStyle["font-size"], weight: "normal" };
+      var padding = 4;
+
       var bounds = elementRenderer.getBounds();
 
       var x = +bounds.x;
       var y = +bounds.y;
 
-      var width = +bounds.width;
-      var height= +bounds.height;
 
-      // render basic circle
       var annotationGroup = gfxGroup.createGroup();
+      var lineCount = wordWrap(elementRenderer.baseElement.text, annotationGroup, font, padding, font.size + padding, "left");
+
+      var height = (lineCount+1) * font.size;
+
       annotationGroup.setTransform({dx :x ,dy: y});
 
       annotationGroup.createPolyline([
@@ -844,10 +930,6 @@ define(["dojox/gfx", "dojo/_base/lang", "dojo/dom-construct", "dojo/_base/window
         {x: 10, y: height }
       ]).setStroke(style.stroke);
 
-      var font = { family: textStyle["font-family"], size: textStyle["font-size"], weight: "normal" };
-      var padding = 4;
-
-      wordWrap(elementRenderer.baseElement.text, annotationGroup, font, padding, font.size + padding, "left");
     }
   };
 
@@ -994,9 +1076,10 @@ define(["dojox/gfx", "dojo/_base/lang", "dojo/dom-construct", "dojo/_base/window
 
       // render envelope if present
       var baseElement = elementRenderer.renderElement;
+      var visibileKind =  baseElement.bpmndi && baseElement.bpmndi[0].messageVisibleKind ? baseElement.bpmndi[0].messageVisibleKind : null;
 
       // TODO: render message in the correct way
-      if (baseElement.messageRef) {
+      if (baseElement.messageRef && visibileKind) {
 
         var message = findElementById(elementRenderer.baseElement, baseElement.messageRef);
         if (!message) {
@@ -1009,7 +1092,10 @@ define(["dojox/gfx", "dojo/_base/lang", "dojo/dom-construct", "dojo/_base/window
         var position = getMidPoint(waypoints);
 
         envelop.setStroke(style.stroke);
-        envelop.setFill("white");
+
+        var nonInitiating = visibileKind.toLowerCase() == "non-initiating";
+
+        envelop.setFill(nonInitiating ? "#ccc" : "#fff");
         envelop.setTransform({ dx: position.x, dy: position.y, xx: 1.5, yy: 1.5 });
 
         renderLabel({
@@ -1155,23 +1241,25 @@ define(["dojox/gfx", "dojo/_base/lang", "dojo/dom-construct", "dojo/_base/window
         continue;
       }
 
-      if (bounds) {
-        var diagramElement = query("#"+options.diagramElement)[0];
-        diagramElement.style.position = "relative";
+      if (bounds && !options.skipOverlays) {
+        var diagramElement = $("#" + options.diagramElement).css("position", "relative");
 
-        var overlayDiv = domConstruct.create("div", {
-          id : currentElement.id,
-          innerHTML : options.overlayHtml ? options.overlayHtml : null,
-          style: {
+        var overlayDiv = $('<div class="bpmnElement"></div>');
+
+        overlayDiv
+          .attr('id', currentElement.id)
+          .css({
             position: "absolute" ,
             left: +bounds.x +"px",
             top: +bounds.y + "px",
             width : +bounds.width + "px",
             height : +bounds.height + "px"
-          }
-        },
-        diagramElement);
-        domClass.add(overlayDiv, "bpmnElement");
+          })
+          .appendTo(diagramElement);
+
+        if (options.overlayHtml) {
+          overlayDiv.html(options.overlayHtml);
+        }
       }
 
 
@@ -1186,8 +1274,8 @@ define(["dojox/gfx", "dojo/_base/lang", "dojo/dom-construct", "dojo/_base/window
       // subordinate renderers
       if(!!currentElement.baseElements) {
         var postRenderCallbacks = [];
-        var renderingOpts = lang.mixin(lang.clone(options), { postRenderCallbacks: postRenderCallbacks });
-        
+        var renderingOpts = mixin({}, options, { postRenderCallbacks: postRenderCallbacks });
+
         for(var i = 0; i < currentElement.baseElements.length; i++) {
           new BpmnElementRenderer(currentElement.baseElements[i], this).render(renderingOpts, gfxGroup);
         }

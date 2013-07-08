@@ -16,7 +16,6 @@ import java.io.Serializable;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.TaskAlreadyClaimedException;
-import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
@@ -30,7 +29,6 @@ public class ClaimTaskCmd implements Command<Void>, Serializable {
   private static final long serialVersionUID = 1L;
 
   protected String taskId;
-  
   protected String userId;
   
   public ClaimTaskCmd(String taskId, String userId) {
@@ -43,14 +41,14 @@ public class ClaimTaskCmd implements Command<Void>, Serializable {
       throw new ProcessEngineException("taskId is null");
     }
     
-    TaskEntity task = Context
-      .getCommandContext()
+    TaskEntity task = commandContext
       .getTaskManager()
       .findTaskById(taskId);
     
     if (task == null) {
       throw new ProcessEngineException("Cannot find task with id " + taskId);
     }
+    
     if(userId != null) {
       if (task.getAssignee() != null) {
         if(!task.getAssignee().equals(userId)) {
@@ -68,5 +66,4 @@ public class ClaimTaskCmd implements Command<Void>, Serializable {
 
     return null;
   }
-
 }

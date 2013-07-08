@@ -1,10 +1,9 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>camunda-qa-db-upgrade</artifactId>
   <packaging>jar</packaging>
-  <name>camunda BPM - QA</name>
+  <name>camunda BPM - QA - upgrade - test</name>
 
   <parent>
     <groupId>org.camunda.bpm.qa</groupId>
@@ -16,103 +15,301 @@
     <test.version.old>6.2.4</test.version.old>
     <test.version.old.major>6.2</test.version.old.major>
     <test.version.current>${project.version}</test.version.current>
-
-    <test.db.host>${project.build.directory}</test.db.host>
-    <test.db.database>camunda-engine</test.db.database>
-    <test.db.username>sa</test.db.username>
-    <test.db.password>sa</test.db.password>
-    
     <mail.server.port>5025</mail.server.port>
   </properties>
-  
+
+  <build>
+    <testSourceDirectory>${project.build.directory}/engine-test-sources</testSourceDirectory>
+    <testResources>
+      <testResource>
+        <directory>${project.build.directory}/engine-test-sources</directory>
+        <excludes>
+          <exclude>**/*.java</exclude>
+          <exclude>activiti.cfg.xml</exclude>
+        </excludes>
+      </testResource>
+      <testResource>
+        <directory>config</directory>
+        <filtering>true</filtering>
+      </testResource>
+    </testResources>
+  </build>
+
   <profiles>
     <profile>
-      <id>70</id>
-        <activation>
-          <activeByDefault>true</activeByDefault>
-        </activation>
-        <properties>
-          <test.version.current>${project.version}</test.version.current>
-          <test.version.current.major>7.0</test.version.current.major>
-        </properties>      
-    </profile>
-    <profile>
-      <id>h2</id>
+      <id>distro</id>
       <activation>
-          <activeByDefault>true</activeByDefault>
-        </activation>
-      <properties>
-        <test.db.name>h2</test.db.name>
-        <test.db.driver>org.h2.Driver</test.db.driver>
-        <test.db.url>jdbc:h2:${test.db.host}/dbs/${test.db.database};MVCC=TRUE</test.db.url>
-      </properties>
+        <activeByDefault>true</activeByDefault>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <skipTests>true</skipTests>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
     </profile>
     <profile>
-      <id>mysql</id>
+      <id>70</id>
       <properties>
-        <test.db.name>mysql</test.db.name>
-        <test.db.driver>com.mysql.jdbc.Driver</test.db.driver>
-        <test.db.url>jdbc:mysql://${test.db.host}:3306/${test.db.database}</test.db.url>
+        <test.version.current>${project.version}</test.version.current>
+        <test.version.current.major>7.0</test.version.current.major>
       </properties>
+      <dependencies>
+        <dependency>    
+          <groupId>org.camunda.bpm.distro</groupId>
+          <artifactId>camunda-sql-scripts</artifactId>
+          <version>${test.version.current}</version>
+        </dependency>
+
+        <dependency>
+          <groupId>org.camunda.bpm</groupId>
+          <artifactId>camunda-engine</artifactId>
+          <version>${test.version.current}</version>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
     </profile>
     <profile>
-      <id>mssql</id>
-      <properties>
-        <test.db.name>mssql</test.db.name>
-        <test.db.driver>com.microsoft.sqlserver.jdbc.SQLServerDriver</test.db.driver>
-        <test.db.url>jdbc:sqlserver://${test.db.host}:1433;DatabaseName=${test.db.database}</test.db.url>
-      </properties>
-    </profile>
-    <profile>
-      <id>db2</id>
-      <properties>
-        <test.db.name>db2</test.db.name>
-        <test.db.driver>com.ibm.db2.jcc.DB2Driver</test.db.driver>
-        <test.db.url>jdbc:db2://${test.db.host}:50000/${test.db.database}</test.db.url>
-      </properties>
-    </profile>
-    <profile>
-      <id>postgres</id>
-      <properties>
-        <test.db.name>postgres</test.db.name>
-        <test.db.driver>org.postgresql.Driver</test.db.driver>
-        <test.db.url>jdbc:postgresql://${test.db.host}:5432/${test.db.database}</test.db.url>
-      </properties>
-    </profile>
-    <profile>
-      <id>oracle10g</id>
-      <properties>
-        <test.db.name>oracle</test.db.name>
-        <test.db.driver>oracle.jdbc.OracleDriver</test.db.driver>
-        <test.db.url>jdbc:oracle:thin:@${test.db.host}:1521:xe</test.db.url>
-      </properties>
-    </profile>
-    <profile>
-      <id>oracle11g</id>
-      <properties>
-        <test.db.name>oracle</test.db.name>
-        <test.db.driver>oracle.jdbc.OracleDriver</test.db.driver>
-        <test.db.url>jdbc:oracle:thin:@${test.db.host}:1521:xe</test.db.url>
-      </properties>
+      <id>upgrade</id>
+      <dependencies>
+        <dependency>    
+          <groupId>org.camunda.bpm.distro</groupId>
+          <artifactId>camunda-sql-scripts</artifactId>
+          <version>${test.version.current}</version>
+        </dependency>
+
+        <dependency>
+          <groupId>org.camunda.bpm</groupId>
+          <artifactId>camunda-engine</artifactId>
+          <version>${test.version.current}</version>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>compile</id>
+                <phase>generate-test-sources</phase>
+                <configuration>
+                  <target>
+
+                    <!-- create the SQL scripts so that the files existi even if they do not exist in the distribution. (this can be the case if there are no db 
+                      upgrades (yet) for a particular release ) -->
+
+                    <mkdir dir="${project.build.directory}/scripts-current/sql/upgrade/"></mkdir>
+                    <touch
+                      file="${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${test.version.old.major}_to_${test.version.current.major}.sql" />
+                    <touch
+                      file="${project.build.directory}/scripts-current/sql/upgrade/${database.type}_identity_${test.version.old.major}_to_${test.version.current.major}.sql" />
+
+                  </target>
+                </configuration>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-dependency-plugin</artifactId>
+
+            <executions>
+              <execution>
+                <id>unpack-engine-tests</id>
+                <phase>generate-test-sources</phase>
+                <goals>
+                  <goal>unpack</goal>
+                </goals>
+                <configuration>
+                  <artifactItems>
+                    <artifactItem>
+                      <groupId>org.camunda.bpm</groupId>
+                      <artifactId>camunda-engine</artifactId>
+                      <version>${test.version.current}</version>
+                      <type>test-jar</type>
+                      <outputDirectory>${project.build.directory}/test-classes</outputDirectory>
+                    </artifactItem>
+                  </artifactItems>
+                </configuration>
+              </execution>
+              <execution>
+                <id>unpack-old-scripts</id>
+                <phase>generate-test-resources</phase>
+                <goals>
+                  <goal>unpack</goal>
+                </goals>
+                <configuration>
+                  <artifactItems>
+                    <artifactItem>
+                      <groupId>com.camunda.fox.platform</groupId>
+                      <artifactId>fox-platform-sql-script</artifactId>
+                      <version>${test.version.old}</version>
+                      <outputDirectory>${project.build.directory}/scripts-old</outputDirectory>
+                      <overWrite>true</overWrite>
+                    </artifactItem>
+                    <artifactItem>
+                      <groupId>org.camunda.bpm.distro</groupId>
+                      <artifactId>camunda-sql-scripts</artifactId>
+                      <version>${test.version.current}</version>
+                      <outputDirectory>${project.build.directory}/scripts-current</outputDirectory>
+                      <overWrite>true</overWrite>
+                    </artifactItem>
+                  </artifactItems>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>sql-maven-plugin</artifactId>
+            <version>1.5</version>
+            <dependencies>
+              <dependency>
+                <groupId>mysql</groupId>
+                <artifactId>mysql-connector-java</artifactId>
+                <version>5.1.21</version>
+              </dependency>
+              <dependency>
+                <groupId>com.oracle.jdbc</groupId>
+                <artifactId>ojdbc6</artifactId>
+                <version>11.2.0.3</version>
+              </dependency>
+              <dependency>
+                <groupId>com.oracle.jdbc</groupId>
+                <artifactId>ojdbc14</artifactId>
+                <version>10.2.0.5</version>
+              </dependency>
+              <dependency>
+                <groupId>com.ibm.db2.jcc</groupId>
+                <artifactId>db2jcc4</artifactId>
+                <version>9.7</version>
+              </dependency>
+              <dependency>
+                <groupId>com.microsoft.sqlserver</groupId>
+                <artifactId>sqljdbc4</artifactId>
+                <version>4.0</version>
+              </dependency>
+              <dependency>
+                <groupId>postgresql</groupId>
+                <artifactId>postgresql</artifactId>
+                <version>9.1-902.jdbc4</version>
+              </dependency>
+              <dependency>
+                <groupId>com.h2database</groupId>
+                <artifactId>h2</artifactId>
+                <version>1.3.168</version>
+              </dependency>
+            </dependencies>
+            <configuration>
+              <driver>${database.driver}</driver>
+              <url>${database.url}</url>
+              <username>${database.user}</username>
+              <password>${database.password}</password>
+            </configuration>
+            <executions>
+              <execution>
+                <id>drop-db-if-present</id>
+                <phase>generate-test-resources</phase>
+                <goals>
+                  <goal>execute</goal>
+                </goals>
+                <configuration>
+                  <srcFiles>
+                    <!-- first: try dropping the DB -->
+                    <srcFile>${project.build.directory}/scripts-current/sql/drop/${database.type}_engine_${test.version.current}.sql</srcFile>
+                    <srcFile>${project.build.directory}/scripts-current/sql/drop/${database.type}_identity_${test.version.current}.sql</srcFile>
+                  </srcFiles>
+                  <autocommit>true</autocommit>
+                  <onError>continue</onError>
+                </configuration>
+              </execution>
+              <execution>
+                <id>create-old-schema</id>
+                <phase>generate-test-resources</phase>
+                <goals>
+                  <goal>execute</goal>
+                </goals>
+                <configuration>
+                  <srcFiles>
+                    <!-- now create old version of the schema -->
+                    <srcFile>${project.build.directory}/scripts-old/sql/create/${database.type}_engine_${test.version.old}.sql</srcFile>
+                    <srcFile>${project.build.directory}/scripts-old/sql/create/${database.type}_identity_${test.version.old}.sql</srcFile>
+                  </srcFiles>
+                </configuration>
+              </execution>
+              <execution>
+                <id>upgrade-db</id>
+                <phase>generate-test-resources</phase>
+                <goals>
+                  <goal>execute</goal>
+                </goals>
+                <configuration>
+                  <srcFiles>
+                    <!-- now perform the schema migrations -->
+                    <srcFile>${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_${test.version.old.major}_to_${test.version.current.major}.sql</srcFile>
+                    <srcFile>${project.build.directory}/scripts-current/sql/upgrade/${database.type}_identity_${test.version.old.major}_to_${test.version.current.major}.sql</srcFile>
+                  </srcFiles>
+                </configuration>
+              </execution>
+              <execution>
+                <id>drop-db</id>
+                <phase>post-integration-test</phase>
+                <goals>
+                  <goal>execute</goal>
+                </goals>
+                <configuration>
+                  <srcFiles>
+                    <!-- finally drop db -->
+                    <srcFile>${project.build.directory}/scripts-current/sql/drop/${database.type}_engine_${test.version.current}.sql</srcFile>
+                    <srcFile>${project.build.directory}/scripts-current/sql/drop/${database.type}_identity_${test.version.current}.sql</srcFile>
+                  </srcFiles>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+              <excludes>
+                <exclude>**/*TestCase.java</exclude>
+
+                <exclude>**/ClassPathScannerTest.java</exclude>
+                <exclude>**/MultipleClasspathRootsClassPathScannerTest.java</exclude>
+
+                <exclude>**/WSDLImporterTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-315 -->
+                <exclude>**/JobExecutorTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-427 -->
+                <exclude>**/HistoricTaskInstanceUpdateTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-485 -->
+                <exclude>**/RepeatingServiceTaskTest.java</exclude>
+
+                <exclude>**/ProcessDiagramRetrievalTest.java</exclude>
+                <!--exclude>**/ManagementServiceTest.java</exclude -->
+              </excludes>
+              <testFailureIgnore>false</testFailureIgnore>
+              <redirectTestOutputToFile>true</redirectTestOutputToFile>
+            </configuration>
+          </plugin>
+
+        </plugins>
+      </build>
     </profile>
   </profiles>
 
   <dependencies>
 
     <dependency>
-      <groupId>org.camunda.bpm.distro</groupId>
-      <artifactId>camunda-sql-scripts</artifactId>
-      <version>${test.version.current}</version>
-    </dependency>
-
-    <dependency>
-      <groupId>org.camunda.bpm</groupId>
-      <artifactId>camunda-engine</artifactId>
-      <version>${test.version.current}</version>
-      <scope>test</scope>
-    </dependency>
-
-     <dependency>
       <groupId>com.fasterxml.uuid</groupId>
       <artifactId>java-uuid-generator</artifactId>
       <scope>test</scope>
@@ -194,237 +391,5 @@
     </dependency>
 
   </dependencies>
-
-  <build>
-    <testSourceDirectory>${project.build.directory}/engine-test-sources</testSourceDirectory>
-    <testResources>
-      <testResource>
-        <directory>${project.build.directory}/engine-test-sources</directory>
-        <excludes>
-          <exclude>**/*.java</exclude>
-          <exclude>activiti.cfg.xml</exclude>
-        </excludes>
-      </testResource>
-      <testResource>
-        <directory>config</directory>
-        <filtering>true</filtering>
-      </testResource>
-    </testResources>
-    <plugins>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-antrun-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>compile</id>
-            <phase>generate-test-sources</phase>
-            <configuration>
-              <target>
-
-                <!-- create the SQL scripts so that the files existi even 
-                  if they do not exist in the distribution. (this can be the case if there 
-                  are no db upgrades (yet) for a particular release ) -->
-
-                <mkdir
-                  dir="${project.build.directory}/scripts-current/sql/upgrade/"></mkdir>
-                <touch
-                  file="${project.build.directory}/scripts-current/sql/upgrade/${test.db.name}_engine_${test.version.old.major}_to_${test.version.current.major}.sql" />
-                <touch
-                  file="${project.build.directory}/scripts-current/sql/upgrade/${test.db.name}_identity_${test.version.old.major}_to_${test.version.current.major}.sql" />
-
-              </target>
-            </configuration>
-            <goals>
-              <goal>run</goal>
-            </goals>
-          </execution>
-        </executions>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-dependency-plugin</artifactId>
-
-        <executions>
-          <execution>
-            <id>unpack-engine-tests</id>
-            <phase>generate-test-sources</phase>
-            <goals>
-              <goal>unpack</goal>
-            </goals>
-            <configuration>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>org.camunda.bpm</groupId>
-                  <artifactId>camunda-engine</artifactId>
-                  <version>${test.version.current}</version>
-                  <type>test-jar</type>
-                  <outputDirectory>${project.build.directory}/test-classes</outputDirectory>
-                </artifactItem>
-              </artifactItems>
-            </configuration>
-          </execution>
-          <execution>
-            <id>unpack-old-scripts</id>
-            <phase>generate-test-resources</phase>
-            <goals>
-              <goal>unpack</goal>
-            </goals>
-            <configuration>
-              <artifactItems>
-                <artifactItem>
-                  <groupId>com.camunda.fox.platform</groupId>
-                  <artifactId>fox-platform-sql-script</artifactId>
-                  <version>${test.version.old}</version>
-                  <outputDirectory>${project.build.directory}/scripts-old</outputDirectory>
-                  <overWrite>true</overWrite>
-                </artifactItem>
-                <artifactItem>
-                  <groupId>org.camunda.bpm.distro</groupId>
-                  <artifactId>camunda-sql-scripts</artifactId>
-                  <version>${test.version.current}</version>
-                  <outputDirectory>${project.build.directory}/scripts-current</outputDirectory>
-                  <overWrite>true</overWrite>
-                </artifactItem>
-              </artifactItems>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-      <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>sql-maven-plugin</artifactId>
-        <version>1.5</version>
-        <dependencies>
-          <dependency>
-            <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
-            <version>5.1.21</version>
-          </dependency>
-          <dependency>
-            <groupId>com.oracle.jdbc</groupId>
-            <artifactId>ojdbc6</artifactId>
-            <version>11.2.0.3</version>
-          </dependency>
-          <dependency>
-            <groupId>com.oracle.jdbc</groupId>
-            <artifactId>ojdbc14</artifactId>
-            <version>10.2.0.5</version>
-          </dependency>
-          <dependency>
-            <groupId>com.ibm.db2.jcc</groupId>
-            <artifactId>db2jcc4</artifactId>
-            <version>9.7</version>
-          </dependency>
-          <dependency>
-            <groupId>com.microsoft.sqlserver</groupId>
-            <artifactId>sqljdbc4</artifactId>
-            <version>4.0</version>
-          </dependency>
-          <dependency>
-            <groupId>postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-            <version>9.1-902.jdbc4</version>
-          </dependency>
-          <dependency>
-            <groupId>com.h2database</groupId>
-            <artifactId>h2</artifactId>
-            <version>1.3.168</version>
-          </dependency>
-        </dependencies>
-        <configuration>
-          <driver>${test.db.driver}</driver>
-          <url>${test.db.url}</url>
-          <username>${test.db.username}</username>
-          <password>${test.db.password}</password>
-        </configuration>
-        <executions>
-          <execution>
-            <id>drop-db-if-present</id>
-            <phase>generate-test-resources</phase>
-            <goals>
-              <goal>execute</goal>
-            </goals>
-            <configuration>
-              <srcFiles>
-                <!-- first: try dropping the DB -->
-                <srcFile>${project.build.directory}/scripts-current/sql/drop/${test.db.name}_engine_${test.version.current}.sql</srcFile>
-                <srcFile>${project.build.directory}/scripts-current/sql/drop/${test.db.name}_identity_${test.version.current}.sql</srcFile>
-              </srcFiles>
-              <autocommit>true</autocommit>
-              <onError>continue</onError>
-            </configuration>            
-          </execution>
-           <execution>
-            <id>create-old-schema</id>
-            <phase>generate-test-resources</phase>
-            <goals>
-              <goal>execute</goal>
-            </goals>
-            <configuration>
-              <srcFiles>       
-                <!-- now create old version of the schema -->
-                <srcFile>${project.build.directory}/scripts-old/sql/create/${test.db.name}_engine_${test.version.old}.sql</srcFile>
-                <srcFile>${project.build.directory}/scripts-old/sql/create/${test.db.name}_identity_${test.version.old}.sql</srcFile>
-              </srcFiles>
-            </configuration>            
-          </execution>
-          <execution>
-            <id>upgrade-db</id>
-            <phase>generate-test-resources</phase>
-            <goals>
-              <goal>execute</goal>
-            </goals>
-            <configuration>
-              <srcFiles>       
-                <!-- now perform the schema migrations -->
-                <srcFile>${project.build.directory}/scripts-current/sql/upgrade/${test.db.name}_engine_${test.version.old.major}_to_${test.version.current.major}.sql</srcFile>
-                <srcFile>${project.build.directory}/scripts-current/sql/upgrade/${test.db.name}_identity_${test.version.old.major}_to_${test.version.current.major}.sql</srcFile>
-              </srcFiles>
-            </configuration>            
-          </execution>
-          <execution>
-            <id>drop-db</id>
-            <phase>post-integration-test</phase>
-            <goals>
-              <goal>execute</goal>
-            </goals>
-            <configuration>
-              <srcFiles>
-                <!-- finally drop db -->
-                <srcFile>${project.build.directory}/scripts-current/sql/drop/${test.db.name}_engine_${test.version.current}.sql</srcFile>
-                <srcFile>${project.build.directory}/scripts-current/sql/drop/${test.db.name}_identity_${test.version.current}.sql</srcFile>
-              </srcFiles>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-surefire-plugin</artifactId>
-        <configuration>
-          <excludes>
-            <exclude>**/*TestCase.java</exclude>
-
-            <exclude>**/ClassPathScannerTest.java</exclude>
-            <exclude>**/MultipleClasspathRootsClassPathScannerTest.java</exclude>
-
-            <exclude>**/WSDLImporterTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-315 -->
-            <exclude>**/JobExecutorTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-427 -->
-            <exclude>**/HistoricTaskInstanceUpdateTest.java</exclude> <!-- http://jira.codehaus.org/browse/ACT-485 -->
-            <exclude>**/RepeatingServiceTaskTest.java</exclude>
-            
-            <exclude>**/ProcessDiagramRetrievalTest.java</exclude> 
-            <!--exclude>**/ManagementServiceTest.java</exclude-->
-          </excludes>
-          <testFailureIgnore>false</testFailureIgnore>
-          <redirectTestOutputToFile>true</redirectTestOutputToFile>
-        </configuration>
-      </plugin>
-
-    </plugins>
-  </build>
 
 </project>

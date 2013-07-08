@@ -34,7 +34,6 @@ import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.test.Deployment;
-import org.junit.rules.ExpectedException;
 
 
 /**
@@ -817,7 +816,7 @@ public class RuntimeServiceTest extends PluggableProcessEngineTestCase {
      fail("exeception expected");
    }catch (ProcessEngineException e) {
      // this is good
-     assertTrue(e.getMessage().contains("Execution 'nonexistingExecution' has not subscribed to a signal event with name 'alert'"));
+     assertTrue(e.getMessage().contains("Cannot find execution with id 'nonexistingExecution'"));
    }
   }
  

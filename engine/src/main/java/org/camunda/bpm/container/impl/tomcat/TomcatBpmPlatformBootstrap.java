@@ -21,7 +21,6 @@ import org.apache.catalina.LifecycleListener;
 import org.apache.catalina.core.StandardServer;
 import org.camunda.bpm.container.RuntimeContainerDelegate;
 import org.camunda.bpm.container.impl.jmx.JmxRuntimeContainerDelegate;
-import org.camunda.bpm.container.impl.jmx.deployment.Attachments;
 import org.camunda.bpm.container.impl.jmx.deployment.PlatformXmlStartProcessEnginesStep;
 import org.camunda.bpm.container.impl.jmx.deployment.StopProcessApplicationsStep;
 import org.camunda.bpm.container.impl.jmx.deployment.StopProcessEnginesStep;

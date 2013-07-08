@@ -13,7 +13,6 @@
 
 package org.camunda.bpm.engine.impl.cmd;
 
-import java.io.Serializable;
 import java.util.Map;
 
 import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
@@ -22,14 +21,14 @@ import org.camunda.bpm.engine.impl.persistence.entity.TaskEntity;
 /**
  * @author Tom Baeyens
  */
-public class ResolveTaskCmd extends CompleteTaskCmd implements Serializable {
+public class ResolveTaskCmd extends CompleteTaskCmd {
 
   private static final long serialVersionUID = 1L;
 
   public ResolveTaskCmd(String taskId, Map<String, Object> variables) {
     super(taskId, variables);
   }
-
+  
   @Override
   protected void completeTask(TaskEntity task) {
     task.resolve();

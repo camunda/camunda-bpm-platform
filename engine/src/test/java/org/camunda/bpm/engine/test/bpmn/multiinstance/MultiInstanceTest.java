@@ -180,13 +180,13 @@ public class MultiInstanceTest extends PluggableProcessEngineTestCase {
     taskService.complete(tasks.get(0).getId());
     
     processInstance = runtimeService.getActivityInstance(procId);
-    // there are still 3 activity instances since they are not joined yet!
-    assertEquals(3, processInstance.getChildActivityInstances().length);
+    
+    assertEquals(2, processInstance.getChildActivityInstances().length);
     
     taskService.complete(tasks.get(1).getId());
     
     processInstance = runtimeService.getActivityInstance(procId);
-    assertEquals(3, processInstance.getChildActivityInstances().length);
+    assertEquals(1, processInstance.getChildActivityInstances().length);
     
     taskService.complete(tasks.get(2).getId());
     assertProcessEnded(procId); 
