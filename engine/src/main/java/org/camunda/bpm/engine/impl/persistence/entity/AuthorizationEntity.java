@@ -117,7 +117,7 @@ public class AuthorizationEntity implements Authorization, PersistentObject, Has
     state.put("groupId", groupId);
     state.put("resourceType", resourceType);
     state.put("resourceId", resourceId);
-    state.put("authModifier", permissions);
+    state.put("permissions", permissions);
     
     return state;
   }

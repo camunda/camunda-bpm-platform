@@ -83,11 +83,13 @@ public class AuthorizationQueryImpl extends AbstractQuery<AuthorizationQuery, Au
   
 
   public long executeCount(CommandContext commandContext) {
+    checkQueryOk();
     return commandContext.getAuthorizationManager()
       .selectAuthorizationCountByQueryCriteria(this);
   }
 
   public List<Authorization> executeList(CommandContext commandContext, Page page) {
+    checkQueryOk();
     return commandContext.getAuthorizationManager()
         .selectAuthorizationByQueryCriteria(this);
   }
@@ -120,6 +122,16 @@ public class AuthorizationQueryImpl extends AbstractQuery<AuthorizationQuery, Au
 
   public int getPermission() {
     return permission;
+  }
+
+  public AuthorizationQuery orderByResourceType() {
+    this.orderProperty = AuthorizationQueryProperty.RESOURCE_TYPE;
+    return this;
+  }
+
+  public AuthorizationQuery orderByResourceId() {
+    this.orderProperty = AuthorizationQueryProperty.RESOURCE_ID;
+    return this;
   }
   
 }

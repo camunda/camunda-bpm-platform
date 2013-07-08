@@ -147,6 +147,80 @@ public class AuthorizationQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(0, authorizationService.createAuthorizationQuery().groupIdIn("group1").resourceType("non-existing").list().size());
   }
   
+  public void testOrderByQueries() {
+    
+    List<Authorization> list = authorizationService.createAuthorizationQuery().orderByResourceType().asc().list();
+    assertEquals("resource1", list.get(0).getResourceType());
+    assertEquals("resource1", list.get(1).getResourceType());
+    assertEquals("resource1", list.get(2).getResourceType());
+    assertEquals("resource1", list.get(3).getResourceType());
+    assertEquals("resource2", list.get(4).getResourceType());
+    assertEquals("resource2", list.get(5).getResourceType());
+    assertEquals("resource2", list.get(6).getResourceType());
+    assertEquals("resource2", list.get(7).getResourceType());
+    
+    list = authorizationService.createAuthorizationQuery().orderByResourceType().desc().list();
+    assertEquals("resource2", list.get(0).getResourceType());
+    assertEquals("resource2", list.get(1).getResourceType());
+    assertEquals("resource2", list.get(2).getResourceType());
+    assertEquals("resource2", list.get(3).getResourceType());
+    assertEquals("resource1", list.get(4).getResourceType());
+    assertEquals("resource1", list.get(5).getResourceType());
+    assertEquals("resource1", list.get(6).getResourceType());
+    assertEquals("resource1", list.get(7).getResourceType());
+    
+    list = authorizationService.createAuthorizationQuery().orderByResourceId().asc().list();
+    assertEquals("resource1-1", list.get(0).getResourceId());
+    assertEquals("resource1-1", list.get(1).getResourceId());
+    assertEquals("resource1-2", list.get(2).getResourceId());
+    assertEquals("resource1-2", list.get(3).getResourceId());
+    assertEquals("resource2-1", list.get(4).getResourceId());
+    assertEquals("resource2-1", list.get(5).getResourceId());
+    assertEquals("resource2-2", list.get(6).getResourceId());
+    assertEquals("resource2-3", list.get(7).getResourceId());
+    
+    list = authorizationService.createAuthorizationQuery().orderByResourceId().desc().list();
+    assertEquals("resource2-3", list.get(0).getResourceId());
+    assertEquals("resource2-2", list.get(1).getResourceId());
+    assertEquals("resource2-1", list.get(2).getResourceId());
+    assertEquals("resource2-1", list.get(3).getResourceId());
+    assertEquals("resource1-2", list.get(4).getResourceId());
+    assertEquals("resource1-2", list.get(5).getResourceId());
+    assertEquals("resource1-1", list.get(6).getResourceId());
+    assertEquals("resource1-1", list.get(7).getResourceId());
+    
+  }
+  
+  public void testInvalidOrderByQueries() {
+    try {
+      authorizationService.createAuthorizationQuery().orderByResourceType().list();
+      fail("Exception expected");
+    } catch(ProcessEngineException e) {
+      assertTextPresent("Invalid query: call asc() or desc() after using orderByXX()", e.getMessage());
+    }
+    
+    try {
+      authorizationService.createAuthorizationQuery().orderByResourceId().list();
+      fail("Exception expected");
+    } catch(ProcessEngineException e) {
+      assertTextPresent("Invalid query: call asc() or desc() after using orderByXX()", e.getMessage());
+    }
+    
+    try {
+      authorizationService.createAuthorizationQuery().orderByResourceId().orderByResourceType().list();
+      fail("Exception expected");
+    } catch(ProcessEngineException e) {
+      assertTextPresent("Invalid query: call asc() or desc() after using orderByXX()", e.getMessage());
+    }
+    
+    try {
+      authorizationService.createAuthorizationQuery().orderByResourceType().orderByResourceId().list();
+      fail("Exception expected");
+    } catch(ProcessEngineException e) {
+      assertTextPresent("Invalid query: call asc() or desc() after using orderByXX()", e.getMessage());
+    }
+  }
+  
   public void testInvalidQueries() {
     
     // cannot query for user id and group id at the same time

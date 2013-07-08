@@ -41,6 +41,8 @@ public interface AuthorizationQuery extends Query<AuthorizationQuery, Authorizat
    * 
    * <pre>
    * authorizationQuery.userId("user1")
+   *   .resourceType("processDefinition")
+   *   .resourceId("2313")
    *   .hasPermission(Authorization.PERMISSION_TYPE_READ)
    *   .hasPermission(Authorization.PERMISSION_TYPE_WRITE)
    *   .hasPermission(Authorization.PERMISSION_TYPE_DELETE)
@@ -52,5 +54,13 @@ public interface AuthorizationQuery extends Query<AuthorizationQuery, Authorizat
    * 
    */
   AuthorizationQuery hasPermission(int permission);
+  
+  // order by /////////////////////////////////////////////
+  
+  /** Order by resource type (needs to be followed by {@link #asc()} or {@link #desc()}). */
+  AuthorizationQuery orderByResourceType();
+  
+  /** Order by resource id (needs to be followed by {@link #asc()} or {@link #desc()}). */
+  AuthorizationQuery orderByResourceId();
     
 }
