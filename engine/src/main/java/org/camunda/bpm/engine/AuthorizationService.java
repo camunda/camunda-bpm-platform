@@ -28,10 +28,49 @@ import org.camunda.bpm.engine.identity.AuthorizationQuery;
  * resource. (See {@link Authorization} for details).</p>
  * 
  * <h2>Granting / revoking permissions</h2>
- * <p></p>
+ * <p>In order to grant the permission to access a certain resource, an authorization 
+ * object is created:
+ * <pre>
+ * Authorization auth = authorizationService.createNewAuthorization();
+ * //... configure auth
+ * authorizationService.saveAuthorization(auth);
+ * </pre>
+ * The authorization object can be configured either for a user or a group:
+ * <pre>
+ * auth.setUserId("john");
+ *   -OR-
+ * auth.setGroupId("management");
+ * </pre>
+ * and a resource:
+ * <pre>
+ * auth.setResource("processDefinition");
+ * auth.setResourceId("2313");
+ * </pre>
+ * finally the permissions to access that resource can be assigned:
+ * <pre>
+ * auth.addPermission(Authorization.PERMISSION_TYPE_READ);
+ * </pre>
+ * and the authorization object is saved:
+ * <pre>
+ * authorizationService.saveAuthorization(auth);
+ * </pre>
+ * As a result, the given user or group will have permission to READ the referenced process definition. 
+ * </p>
  * 
  * <h2>Checking a permission</h2>
- * <p></p>
+ * <p>Permissions can be checked using a query:
+ * <pre>
+ * authorizationQuery.userId("john")
+ *   .resourceType("processDefinition")
+ *   .resourceId("2313")
+ *   .hasPermission(Authorization.PERMISSION_TYPE_READ)
+ *   .hasPermission(Authorization.PERMISSION_TYPE_WRITE)
+ *   .hasPermission(Authorization.PERMISSION_TYPE_DELETE)
+ *   .list();
+ * </pre>
+ * 
+ * Selects all Authorization objects which provide READ,WRITE,DELETE 
+ * Permissions for the user "john". </p>
  * 
  * @author Daniel Meyer
  *
