@@ -19,13 +19,13 @@ import java.util.List;
 import java.util.ServiceLoader;
 import java.util.Set;
 
-import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 
 import org.camunda.bpm.engine.rest.ExecutionRestService;
 import org.camunda.bpm.engine.rest.GroupRestService;
 import org.camunda.bpm.engine.rest.IdentityRestService;
+import org.camunda.bpm.engine.rest.JobRestService;
 import org.camunda.bpm.engine.rest.MessageRestService;
 import org.camunda.bpm.engine.rest.ProcessDefinitionRestService;
 import org.camunda.bpm.engine.rest.ProcessEngineRestService;
@@ -95,6 +95,14 @@ public class ProcessEngineRestServiceImpl implements ProcessEngineRestService {
     subResource.setRelativeRootResourceUri(rootResourcePath);
     return subResource;
   }
+  
+  @Override
+  public JobRestService getJobRestService(String engineName) {
+	String rootResourcePath = getRelativeEngineUri(engineName).toASCIIString();
+	JobRestServiceImpl subResource = new JobRestServiceImpl(engineName);
+	subResource.setRelativeRootResourceUri(rootResourcePath);
+	return subResource;
+  }
 
   public GroupRestService getGroupRestService(String engineName) {
     String rootResourcePath = getRelativeEngineUri(engineName).toASCIIString();
@@ -141,4 +149,5 @@ public class ProcessEngineRestServiceImpl implements ProcessEngineRestService {
       throw new RestException(Status.INTERNAL_SERVER_ERROR, "No process engine provider found");
     }
   }
+
 }
