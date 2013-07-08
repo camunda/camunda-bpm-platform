@@ -1,20 +1,23 @@
-package org.camunda.bpm.tasklist;
+
+package org.camunda.bpm.pa;
+
 
 import org.camunda.bpm.application.PostDeploy;
 import org.camunda.bpm.application.ProcessApplication;
 import org.camunda.bpm.application.impl.ServletProcessApplication;
+import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.tasklist.TasklistDemoData;
 
-
 /**
- * @author: drobisch
+ *
+ * @author nico.rehwaldt
  */
-@ProcessApplication
-public class TasklistProcessApplication extends ServletProcessApplication {
+@ProcessApplication("tasklist-test-processes")
+public class DevProcessApplication extends ServletProcessApplication {
 
   @PostDeploy
-  public void postDeploy() {
+  public void startProcesses(ProcessEngine engine) {
+
     new TasklistDemoData().createDemoData();
   }
-
 }

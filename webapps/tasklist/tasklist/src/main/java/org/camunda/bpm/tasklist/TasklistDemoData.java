@@ -4,13 +4,13 @@ import java.util.logging.Logger;
 
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;
-import org.camunda.bpm.tasklist.spi.AbstractProcessEngineAware;
+import org.camunda.bpm.engine.rest.spi.impl.AbstractProcessEngineAware;
 
 /**
  * @author: drobisch
  */
 public class TasklistDemoData extends AbstractProcessEngineAware {
-  
+
     private final static Logger LOGGER = Logger.getLogger(TasklistDemoData.class.getName());
 
     public void createDemoData() {
@@ -19,9 +19,9 @@ public class TasklistDemoData extends AbstractProcessEngineAware {
       if(singleResult != null) {
         return;
       }
- 
+
       LOGGER.info("Generating demo data for tasklist");
-      
+
       User user = processEngine.getIdentityService().newUser("demo");
       user.setPassword("demo");
       user.setEmail("demo@camunda.org");
