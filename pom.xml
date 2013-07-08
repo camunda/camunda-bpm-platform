@@ -95,6 +95,7 @@
        
         
         <module>examples/invoice</module>
+        <module>examples/wait-states</module>
     
         <module>distro/jbossas71</module>
         <module>distro/gf31</module>
