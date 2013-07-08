@@ -13,7 +13,11 @@
 package org.camunda.bpm.identity.impl.ldap;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.HashSet;
+import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -30,6 +34,7 @@ import org.apache.directory.server.ldap.LdapServer;
 import org.apache.directory.server.protocol.shared.transport.TcpTransport;
 import org.apache.directory.server.xdbm.Index;
 import org.apache.directory.shared.ldap.name.LdapDN;
+import org.camunda.bpm.engine.impl.util.IoUtil;
 
 /**
  * <p>LDAP test setup using apache directory</p>
@@ -43,12 +48,15 @@ public class LdapTestEnvironment {
   private final static Logger LOG = Logger.getLogger(LdapTestEnvironment.class.getName());
   
   private static final String BASE_DN = "o=camunda,c=org";
-  private static final int PORT = 389;
   
   private DirectoryService service;
   private LdapServer ldapService;
 
   public void init() throws Exception {
+    
+    Properties properties = loadTestProperties();    
+    String port = properties.getProperty("ldap.server.port");
+    
     service = new DefaultDirectoryService();
     service.setWorkingDirectory(new File("target/ldap-work"));
     
@@ -59,7 +67,7 @@ public class LdapTestEnvironment {
     createIndex(camundaPartition, "objectClass", "ou", "uid");
 
     ldapService = new LdapServer();
-    ldapService.setTransports(new TcpTransport(PORT));
+    ldapService.setTransports(new TcpTransport(Integer.parseInt(port)));
     ldapService.setDirectoryService(service);
 
     service.startup();
@@ -156,6 +164,19 @@ public class LdapTestEnvironment {
     } catch (Exception e) {
       LOG.log(Level.SEVERE, "exception while shutting down ldap", e);
     }
+  }
+  
+  protected Properties loadTestProperties() throws FileNotFoundException, IOException {
+    Properties properties = new Properties();
+    File file = IoUtil.getFile("ldap.properties");
+    FileInputStream propertiesStream= null;
+    try {
+      propertiesStream = new FileInputStream(file);
+      properties.load(propertiesStream);
+    } finally {
+      IoUtil.closeSilently(propertiesStream);
+    }
+    return properties;
   }
 
 }

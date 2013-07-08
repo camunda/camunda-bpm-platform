@@ -30,7 +30,7 @@
     <property name="ldapConfiguration">
       <bean class="org.camunda.bpm.identity.impl.ldap.LdapConfiguration">
       
-        <property name="serverUrl" value="ldap://localhost:389/" />
+        <property name="serverUrl" value="ldap://localhost:${ldap.server.port}/" />
         <property name="managerDn" value="uid=daniel,ou=office-berlin,o=camunda,c=org" />
         <property name="managerPassword" value="daniel" />      
         

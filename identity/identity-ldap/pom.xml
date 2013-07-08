@@ -13,6 +13,10 @@
     <relativePath>../..</relativePath>
   </parent>
 
+  <properties>
+    <ldap.server.port>5026</ldap.server.port>
+  </properties>
+
   <dependencies>
 
     <dependency>
@@ -53,5 +57,24 @@
     </dependency>
 
   </dependencies>
+
+  <build>
+    <testResources>
+      <testResource>
+        <directory>src/test/resources</directory>
+        <filtering>true</filtering>
+      </testResource>
+    </testResources>
+    <plugins>
+      <plugin>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <failIfNoTests>false</failIfNoTests>
+          <trimStackTrace>false</trimStackTrace>
+          <redirectTestOutputToFile>true</redirectTestOutputToFile>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 
 </project>
