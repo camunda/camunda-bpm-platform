@@ -24,15 +24,16 @@
       function($scope, $rootScope, $http, $location, $window, Uri, Notifications) {
 
       var current = Uri.appUri(':engine');
+      var enginesByName = {};
 
       $http.get(Uri.appUri('engine://engine')).then(function(response) {
-        $scope.engines = {};
+        $scope.engines = response.data;
 
-        angular.forEach(response.data, function(engine) {
-          $scope.engines[engine.name] = engine;
+        angular.forEach($scope.engines , function(engine) {
+          enginesByName[engine.name] = engine;
         });
 
-        $scope.currentEngine = $rootScope.currentEngine = $scope.engines[current];
+        $scope.currentEngine = $rootScope.currentEngine = enginesByName[current];
 
         if (!$scope.currentEngine) {
           Notifications.addError({ status: 'Not found', message: 'The process engine you are trying to access does not exist' });
