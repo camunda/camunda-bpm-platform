@@ -110,6 +110,8 @@ public class DbSqlSessionFactory implements SessionFactory {
     addDatabaseSpecificStatement("db2", "selectHistoricProcessInstanceByNativeQuery", "selectHistoricProcessInstanceByNativeQuery_mssql_or_db2");
     addDatabaseSpecificStatement("db2", "selectHistoricTaskInstanceByNativeQuery", "selectHistoricTaskInstanceByNativeQuery_mssql_or_db2");
     addDatabaseSpecificStatement("db2", "selectTaskByNativeQuery", "selectTaskByNativeQuery_mssql_or_db2");
+    addDatabaseSpecificStatement("db2", "selectAuthorizationByQueryCriteria", "selectAuthorizationByQueryCriteria_BITAND");
+    addDatabaseSpecificStatement("db2", "selectAuthorizationCountByQueryCriteria", "selectAuthorizationCountByQueryCriteria_BITAND");
     
     // mssql
     databaseSpecificLimitBeforeStatements.put("mssql", "SELECT SUB.* FROM (");
