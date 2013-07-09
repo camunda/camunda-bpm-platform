@@ -45,6 +45,7 @@ define(['jquery', 'bpmn/Transformer', 'bpmn/Renderer'], function ($, Transformer
     var processDefinition = new Transformer().transform(bpmnXml);
     this.bpmnXml = bpmnXml;
     this.renderDiagram(processDefinition, options);
+    return this;
   };
 
   Bpmn.prototype.zoom = function (factor) {
@@ -124,19 +125,6 @@ define(['jquery', 'bpmn/Transformer', 'bpmn/Renderer'], function ($, Transformer
         return this;
       }
     };
-  };
-
-  /**
-   * @deprecated use Bpmn.prototype.annotation instead
-   */
-  Bpmn.prototype.annotate = function (id, innerHTML, classesArray) {
-    var element = this.getOverlay(id);
-
-    element
-      .html(innerHTML)
-      .addClass((classesArray || []).join(" "));
-
-    return element;
   };
 
   Bpmn.prototype.clearAnnotations = function (id, classesArray) {

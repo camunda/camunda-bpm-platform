@@ -27,23 +27,25 @@
   <build>
     <finalName>tasklist</finalName>
 
-    <!--resources>
+    <!--
+    <resources>
       <resource>
         <directory>../tasklist/src/main/runtime/tomcat/resources</directory>
         <filtering>true</filtering>
       </resource>
-    </resources-->
+    </resources>
+    -->
 
     <plugins>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-war-plugin</artifactId>
         <configuration>
-          <!--webResources>
+          <webResources>
             <resource>
               <directory>../tasklist/src/main/runtime/tomcat/webapp</directory>
             </resource>
-          </webResources-->
+          </webResources>
         </configuration>
       </plugin>
     </plugins>

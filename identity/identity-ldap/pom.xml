@@ -1,0 +1,80 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.camunda.bpm.identity</groupId>
+  <artifactId>camunda-identity-ldap</artifactId>
+  <packaging>jar</packaging>
+  <name>camunda BPM - identity - ldap</name>
+
+  <parent>
+    <groupId>org.camunda.bpm</groupId>
+    <artifactId>camunda-root</artifactId>
+    <version>7.0.0-SNAPSHOT</version>
+    <relativePath>../..</relativePath>
+  </parent>
+
+  <properties>
+    <ldap.server.port>5026</ldap.server.port>
+  </properties>
+
+  <dependencies>
+
+    <dependency>
+      <groupId>org.camunda.bpm</groupId>
+      <artifactId>camunda-engine</artifactId>
+      <scope>provided</scope>
+    </dependency>
+
+    <!-- LDAP Libraries to start test server -->
+    <dependency>
+      <groupId>org.apache.directory.server</groupId>
+      <artifactId>apacheds-all</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.apache.directory.shared</groupId>
+          <artifactId>shared-ldap</artifactId>
+        </exclusion>
+      </exclusions>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>slf4j-simple</artifactId>
+      <version>1.5.6</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>com.h2database</groupId>
+      <artifactId>h2</artifactId>
+    </dependency>
+
+  </dependencies>
+
+  <build>
+    <testResources>
+      <testResource>
+        <directory>src/test/resources</directory>
+        <filtering>true</filtering>
+      </testResource>
+    </testResources>
+    <plugins>
+      <plugin>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <failIfNoTests>false</failIfNoTests>
+          <trimStackTrace>false</trimStackTrace>
+          <redirectTestOutputToFile>true</redirectTestOutputToFile>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>

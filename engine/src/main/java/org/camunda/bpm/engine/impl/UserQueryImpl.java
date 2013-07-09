@@ -13,8 +13,6 @@
 
 package org.camunda.bpm.engine.impl;
 
-import java.util.List;
-
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.identity.UserQuery;
@@ -25,7 +23,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 /**
  * @author Joram Barrez
  */
-public class UserQueryImpl extends AbstractQuery<UserQuery, User> implements UserQuery {
+public abstract class UserQueryImpl extends AbstractQuery<UserQuery, User> implements UserQuery {
   
   private static final long serialVersionUID = 1L;
   protected String id;
@@ -129,22 +127,6 @@ public class UserQueryImpl extends AbstractQuery<UserQuery, User> implements Use
   
   public UserQuery orderByUserLastName() {
     return orderBy(UserQueryProperty.LAST_NAME);
-  }
-  
-  //results //////////////////////////////////////////////////////////
-  
-  public long executeCount(CommandContext commandContext) {
-    checkQueryOk();
-    return commandContext
-      .getUserManager()
-      .findUserCountByQueryCriteria(this);
-  }
-  
-  public List<User> executeList(CommandContext commandContext, Page page) {
-    checkQueryOk();
-    return commandContext
-      .getUserManager()
-      .findUserByQueryCriteria(this, page);
   }
   
   //getters //////////////////////////////////////////////////////////

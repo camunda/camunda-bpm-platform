@@ -14,7 +14,6 @@
 package org.camunda.bpm.engine.impl.persistence.entity;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,19 +48,6 @@ import org.camunda.bpm.engine.impl.pvm.process.ProcessDefinitionImpl;
 import org.camunda.bpm.engine.impl.pvm.process.ScopeImpl;
 import org.camunda.bpm.engine.impl.pvm.process.TransitionImpl;
 import org.camunda.bpm.engine.impl.pvm.runtime.AtomicOperation;
-import org.camunda.bpm.engine.impl.pvm.runtime.AtomicOperationActivityEnd;
-import org.camunda.bpm.engine.impl.pvm.runtime.AtomicOperationActivityExecute;
-import org.camunda.bpm.engine.impl.pvm.runtime.AtomicOperationActivityStart;
-import org.camunda.bpm.engine.impl.pvm.runtime.AtomicOperationDeleteCascade;
-import org.camunda.bpm.engine.impl.pvm.runtime.AtomicOperationDeleteCascadeFireActivityEnd;
-import org.camunda.bpm.engine.impl.pvm.runtime.AtomicOperationProcessEnd;
-import org.camunda.bpm.engine.impl.pvm.runtime.AtomicOperationProcessStart;
-import org.camunda.bpm.engine.impl.pvm.runtime.AtomicOperationProcessStartInitial;
-import org.camunda.bpm.engine.impl.pvm.runtime.AtomicOperationTransitionCreateScope;
-import org.camunda.bpm.engine.impl.pvm.runtime.AtomicOperationTransitionDestroyScope;
-import org.camunda.bpm.engine.impl.pvm.runtime.AtomicOperationTransitionNotifyListenerEnd;
-import org.camunda.bpm.engine.impl.pvm.runtime.AtomicOperationTransitionNotifyListenerStart;
-import org.camunda.bpm.engine.impl.pvm.runtime.AtomicOperationTransitionNotifyListenerTake;
 import org.camunda.bpm.engine.impl.pvm.runtime.FoxAtomicOperationDeleteCascadeFireActivityEnd;
 import org.camunda.bpm.engine.impl.pvm.runtime.InterpretableExecution;
 import org.camunda.bpm.engine.impl.pvm.runtime.OutgoingExecution;
@@ -531,6 +517,8 @@ public class ExecutionEntity extends VariableScopeImpl implements ActivityExecut
         outgoingExecution.setTransitionBeingTaken((TransitionImpl) outgoingTransition);
         outgoingExecutions.add(new OutgoingExecution(outgoingExecution, outgoingTransition, true));
       }
+      
+      concurrentRoot.setActivityInstanceId(concurrentRoot.getParentActivityInstanceId());
 
       // prune the executions that are not recycled 
       for (ActivityExecution prunedExecution: recyclableExecutions) {

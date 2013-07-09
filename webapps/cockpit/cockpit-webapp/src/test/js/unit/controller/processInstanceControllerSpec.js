@@ -2,7 +2,7 @@ define([ 'angular', 'cockpit/pages/processInstance',
                     'cockpit/resources/processDefinitionResource',
                     'cockpit/resources/processInstanceResource',
                     'cockpit/resources/incidentResource',
-                    'cockpit/services/activityInstance',
+                    //'cockpit/services/activityInstance',
                     'cockpit/filters/shorten',
                     'cockpit-plugin/view',
                     'angular-resource',
@@ -107,14 +107,14 @@ define([ 'angular', 'cockpit/pages/processInstance',
         $httpBackend.flush();
 
         // when
-        var serviceTask = $rootScope.processInstance.activityIdToNodeMap.ServiceTask_1[0];
+        var serviceTask = $rootScope.processInstance.activityIdToInstancesMap.ServiceTask_1[0];
 
-        $rootScope.selection.treeToDiagramMap = {activityInstances : [ serviceTask ]};
+        $rootScope.selection.treeDiagramMapping = {activityInstances : [ serviceTask ]};
 
         $rootScope.$digest();
 
         // then
-        var selectedBpmnElements = $rootScope.selection.treeToDiagramMap.bpmnElements;
+        var selectedBpmnElements = $rootScope.selection.treeDiagramMapping.bpmnElements;
         expect(selectedBpmnElements).toBeDefined();
         expect(selectedBpmnElements.length).toBe(1);
 
@@ -131,21 +131,21 @@ define([ 'angular', 'cockpit/pages/processInstance',
 
         $httpBackend.flush();
 
-        var serviceTask = $rootScope.processInstance.activityIdToNodeMap.ServiceTask_1[0];
+        var serviceTask = $rootScope.processInstance.activityIdToInstancesMap.ServiceTask_1[0];
 
-        $rootScope.selection.treeToDiagramMap = {activityInstances : [ serviceTask ]};
+        $rootScope.selection.treeDiagramMapping = {activityInstances : [ serviceTask ]};
 
         $rootScope.$digest();
 
         // when
-        var userTask = $rootScope.processInstance.activityIdToNodeMap.UserTask_1[0];
+        var userTask = $rootScope.processInstance.activityIdToInstancesMap.UserTask_1[0];
 
-        $rootScope.selection.treeToDiagramMap = {activityInstances : [ userTask ]};
+        $rootScope.selection.treeDiagramMapping = {activityInstances : [ userTask ]};
 
         $rootScope.$digest();
 
         // then
-        var selectedBpmnElements = $rootScope.selection.treeToDiagramMap.bpmnElements;
+        var selectedBpmnElements = $rootScope.selection.treeDiagramMapping.bpmnElements;
         expect(selectedBpmnElements).toBeDefined();
         expect(selectedBpmnElements.length).toBe(1);
 
@@ -163,15 +163,15 @@ define([ 'angular', 'cockpit/pages/processInstance',
         $httpBackend.flush();
 
         // when 
-        var serviceTask = $rootScope.processInstance.activityIdToNodeMap.ServiceTask_1[0];
-        var userTask = $rootScope.processInstance.activityIdToNodeMap.UserTask_1[0];
+        var serviceTask = $rootScope.processInstance.activityIdToInstancesMap.ServiceTask_1[0];
+        var userTask = $rootScope.processInstance.activityIdToInstancesMap.UserTask_1[0];
 
-        $rootScope.selection.treeToDiagramMap = {activityInstances : [ serviceTask, userTask ]};
+        $rootScope.selection.treeDiagramMapping = {activityInstances : [ serviceTask, userTask ]};
 
         $rootScope.$digest();
 
         // then
-        var selectedBpmnElements = $rootScope.selection.treeToDiagramMap.bpmnElements;
+        var selectedBpmnElements = $rootScope.selection.treeDiagramMapping.bpmnElements;
         expect(selectedBpmnElements).toBeDefined();
         expect(selectedBpmnElements.length).toBe(2);
 
@@ -187,20 +187,20 @@ define([ 'angular', 'cockpit/pages/processInstance',
 
         $httpBackend.flush();
 
-        var serviceTask = $rootScope.processInstance.activityIdToNodeMap.ServiceTask_1[0];
-        var userTask = $rootScope.processInstance.activityIdToNodeMap.UserTask_1[0];
+        var serviceTask = $rootScope.processInstance.activityIdToInstancesMap.ServiceTask_1[0];
+        var userTask = $rootScope.processInstance.activityIdToInstancesMap.UserTask_1[0];
 
-        $rootScope.selection.treeToDiagramMap = {activityInstances : [ serviceTask, userTask ]};
+        $rootScope.selection.treeDiagramMapping = {activityInstances : [ serviceTask, userTask ]};
 
         $rootScope.$digest();
 
         // when      
-        $rootScope.selection.treeToDiagramMap = {activityInstances : [ ]};
+        $rootScope.selection.treeDiagramMapping = {activityInstances : [ ]};
 
         $rootScope.$digest();
 
         // then
-        var selectedBpmnElements = $rootScope.selection.treeToDiagramMap.bpmnElements;
+        var selectedBpmnElements = $rootScope.selection.treeDiagramMapping.bpmnElements;
         expect(selectedBpmnElements).toBeDefined();
         expect(selectedBpmnElements.length).toBe(0);
       }));
@@ -214,14 +214,14 @@ define([ 'angular', 'cockpit/pages/processInstance',
         $httpBackend.flush();
 
         // when
-        var serviceTask = $rootScope.processInstance.activityIdToNodeMap.ServiceTask_1[0];
+        var serviceTask = $rootScope.processInstance.activityIdToInstancesMap.ServiceTask_1[0];
 
-        $rootScope.selection.treeToDiagramMap = {scrollTo : serviceTask };
+        $rootScope.selection.treeDiagramMapping = {scrollTo : serviceTask };
 
         $rootScope.$digest();
 
         // then
-        var scrollToBpmnElement = $rootScope.selection.treeToDiagramMap.scrollToBpmnElement;
+        var scrollToBpmnElement = $rootScope.selection.treeDiagramMapping.scrollToBpmnElement;
         expect(scrollToBpmnElement).toBeDefined();
         expect(scrollToBpmnElement).toBe($rootScope.processInstance.activityIdToBpmnElementMap.ServiceTask_1);
       }));
@@ -237,17 +237,17 @@ define([ 'angular', 'cockpit/pages/processInstance',
         // when
         var serviceTask = $rootScope.processInstance.activityIdToBpmnElementMap.ServiceTask_1;
 
-        $rootScope.selection.treeToDiagramMap = {bpmnElements : [ serviceTask ]};
+        $rootScope.selection.treeDiagramMapping = {bpmnElements : [ serviceTask ]};
 
         $rootScope.$digest();
 
         // then
-        var selectedActivityInstances = $rootScope.selection.treeToDiagramMap.activityInstances;
+        var selectedActivityInstances = $rootScope.selection.treeDiagramMapping.activityInstances;
         expect(selectedActivityInstances).toBeDefined();
         expect(selectedActivityInstances.length).toBe(1);
 
         var node = selectedActivityInstances[0];
-        expect(node).toBe($rootScope.processInstance.activityIdToNodeMap.ServiceTask_1[0]);
+        expect(node).toBe($rootScope.processInstance.activityIdToInstancesMap.ServiceTask_1[0]);
 
       }));
 
@@ -261,24 +261,24 @@ define([ 'angular', 'cockpit/pages/processInstance',
 
         var serviceTask = $rootScope.processInstance.activityIdToBpmnElementMap.ServiceTask_1;
 
-        $rootScope.selection.treeToDiagramMap = {bpmnElements : [ serviceTask ]};
+        $rootScope.selection.treeDiagramMapping = {bpmnElements : [ serviceTask ]};
 
         $rootScope.$digest();
 
         // when
         var userTask = $rootScope.processInstance.activityIdToBpmnElementMap.UserTask_1;
 
-        $rootScope.selection.treeToDiagramMap = {bpmnElements : [ userTask ]};
+        $rootScope.selection.treeDiagramMapping = {bpmnElements : [ userTask ]};
 
         $rootScope.$digest();
 
         // then
-        var selectedActivityInstances = $rootScope.selection.treeToDiagramMap.activityInstances;
+        var selectedActivityInstances = $rootScope.selection.treeDiagramMapping.activityInstances;
         expect(selectedActivityInstances).toBeDefined();
         expect(selectedActivityInstances.length).toBe(1);
 
         var node = selectedActivityInstances[0];
-        expect(node).toBe($rootScope.processInstance.activityIdToNodeMap.UserTask_1[0]);
+        expect(node).toBe($rootScope.processInstance.activityIdToInstancesMap.UserTask_1[0]);
 
       }));
 
@@ -294,17 +294,17 @@ define([ 'angular', 'cockpit/pages/processInstance',
         var serviceTask = $rootScope.processInstance.activityIdToBpmnElementMap.ServiceTask_1;
         var userTask = $rootScope.processInstance.activityIdToBpmnElementMap.UserTask_1;
 
-        $rootScope.selection.treeToDiagramMap = {bpmnElements : [ serviceTask, userTask ]};
+        $rootScope.selection.treeDiagramMapping = {bpmnElements : [ serviceTask, userTask ]};
 
         $rootScope.$digest();
 
         // then
-        var selectedActivityInstances = $rootScope.selection.treeToDiagramMap.activityInstances;
+        var selectedActivityInstances = $rootScope.selection.treeDiagramMapping.activityInstances;
         expect(selectedActivityInstances).toBeDefined();
         expect(selectedActivityInstances.length).toBe(2);
 
-        expect(selectedActivityInstances[0]).toBe($rootScope.processInstance.activityIdToNodeMap.ServiceTask_1[0]);
-        expect(selectedActivityInstances[1]).toBe($rootScope.processInstance.activityIdToNodeMap.UserTask_1[0]);
+        expect(selectedActivityInstances[0]).toBe($rootScope.processInstance.activityIdToInstancesMap.ServiceTask_1[0]);
+        expect(selectedActivityInstances[1]).toBe($rootScope.processInstance.activityIdToInstancesMap.UserTask_1[0]);
       }));
 
       it('should deselect all selected node', inject(function($rootScope, $controller, $httpBackend) {
@@ -318,17 +318,17 @@ define([ 'angular', 'cockpit/pages/processInstance',
         var serviceTask = $rootScope.processInstance.activityIdToBpmnElementMap.ServiceTask_1;
         var userTask = $rootScope.processInstance.activityIdToBpmnElementMap.UserTask_1;
 
-        $rootScope.selection.treeToDiagramMap = {bpmnElements : [ serviceTask, userTask ]};
+        $rootScope.selection.treeDiagramMapping = {bpmnElements : [ serviceTask, userTask ]};
 
         $rootScope.$digest();
 
         // when      
-        $rootScope.selection.treeToDiagramMap = {bpmnElements : [ ]};
+        $rootScope.selection.treeDiagramMapping = {bpmnElements : [ ]};
 
         $rootScope.$digest();
 
         // then
-        var selectedActivityInstances = $rootScope.selection.treeToDiagramMap.activityInstances;
+        var selectedActivityInstances = $rootScope.selection.treeDiagramMapping.activityInstances;
         expect(selectedActivityInstances).toBeDefined();
         expect(selectedActivityInstances.length).toBe(0);
       }));

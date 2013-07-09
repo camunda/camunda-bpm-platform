@@ -81,6 +81,13 @@
       </includes>
       <outputDirectory>server/glassfish3/glassfish/domains/domain1/autodeploy</outputDirectory>
     </dependencySet>
+
+    <dependencySet>
+      <includes>
+        <include>org.camunda.bpm.example:camunda-example-wait-states:war:*</include>
+      </includes>
+      <outputDirectory>server/glassfish3/glassfish/domains/domain1/autodeploy</outputDirectory>
+    </dependencySet>    
   </dependencySets>
 
   <fileSets>

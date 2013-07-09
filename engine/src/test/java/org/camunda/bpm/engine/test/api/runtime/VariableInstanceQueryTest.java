@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.engine.test.api.runtime;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -20,6 +21,7 @@ import java.util.Map;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
+import org.camunda.bpm.engine.runtime.ActivityInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
@@ -1843,6 +1845,101 @@ public class VariableInstanceQueryTest extends PluggableProcessEngineTestCase {
     } else {
       fail("Something went wrong: both activity instances have the same id " + execution1.getActivityInstanceId() + " and " + execution2.getActivityInstanceId());
     }
+  }
+  
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/oneTaskProcess.bpmn20.xml"})
+  public void testGetValueOfserializableVar() {
+    // given
+    List<String> serializable = new ArrayList<String>();
+    serializable.add("one");
+    serializable.add("two");
+    serializable.add("three");
+    
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("serializableVar", serializable);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess", variables);
+    
+    // when
+    VariableInstanceQuery query = runtimeService.createVariableInstanceQuery().processInstanceIdIn(processInstance.getId());
+    
+    // then
+    List<VariableInstance> result = query.list();
+    assertFalse(result.isEmpty());
+    assertEquals(1, result.size());
+    
+    VariableInstance instance = result.get(0);
+    
+    assertEquals("serializableVar", instance.getName());
+    assertNotNull(instance.getValue());
+    assertEquals(serializable, instance.getValue()); 
+    
+  }
+  
+  
+  @Test
+  @Deployment(resources={"org/camunda/bpm/engine/test/api/runtime/VariableInstanceQueryTest.testSubProcessWithVariables.bpmn"})
+  public void testSubProcessWithVariables() {
+    // given
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("processWithSubProcess");
+    
+    ActivityInstance tree = runtimeService.getActivityInstance(processInstance.getId());
+    assertNotNull(tree);
+    assertEquals(5, tree.getChildActivityInstances().length);
+    
+    //when
+    String activityInstanceId1 = tree.getChildActivityInstances()[0].getId();
+    VariableInstanceQuery query1 = runtimeService.createVariableInstanceQuery().activityInstanceIdIn(activityInstanceId1);
+        
+    String activityInstanceId2 = tree.getChildActivityInstances()[1].getId();
+    VariableInstanceQuery query2 = runtimeService.createVariableInstanceQuery().activityInstanceIdIn(activityInstanceId2);
+    
+    String activityInstanceId3 = tree.getChildActivityInstances()[2].getId();
+    VariableInstanceQuery query3 = runtimeService.createVariableInstanceQuery().activityInstanceIdIn(activityInstanceId3);
+    
+    String activityInstanceId4 = tree.getChildActivityInstances()[3].getId();
+    VariableInstanceQuery query4 = runtimeService.createVariableInstanceQuery().activityInstanceIdIn(activityInstanceId4);
+    
+    String activityInstanceId5 = tree.getChildActivityInstances()[4].getId();
+    VariableInstanceQuery query5 = runtimeService.createVariableInstanceQuery().activityInstanceIdIn(activityInstanceId5);
+    
+    // then
+    checkVariables(query1.list());
+    checkVariables(query2.list());
+    checkVariables(query3.list());
+    checkVariables(query4.list());
+    checkVariables(query5.list());
+  }
+  
+  private void checkVariables(List<VariableInstance> variableInstances) {
+    assertFalse(variableInstances.isEmpty());
+    for (VariableInstance instance : variableInstances) {
+      if (instance.getName().equals("nrOfInstances")) {
+        assertEquals("nrOfInstances", instance.getName());
+      } else if (instance.getName().equals("nrOfCompletedInstances")) {
+        assertEquals("nrOfCompletedInstances", instance.getName());
+      } else if (instance.getName().equals("nrOfActiveInstances")) {
+        assertEquals("nrOfActiveInstances", instance.getName());
+      } else if (instance.getName().equals("loopCounter")) {
+        assertEquals("loopCounter", instance.getName());      
+      } else if (instance.getName().equals("nullVar")) {
+        assertEquals("nullVar", instance.getName());
+      } else if (instance.getName().equals("integerVar")) {
+        assertEquals("integerVar", instance.getName());        
+      } else if (instance.getName().equals("dateVar")) {
+        assertEquals("dateVar", instance.getName());            
+      } else if (instance.getName().equals("stringVar")) {
+        assertEquals("stringVar", instance.getName()); 
+      } else if (instance.getName().equals("shortVar")) {
+        assertEquals("shortVar", instance.getName());         
+      } else if (instance.getName().equals("longVar")) {
+        assertEquals("longVar", instance.getName());          
+      } else if (instance.getName().equals("serializableVar")) {
+        assertEquals("serializableVar", instance.getName());       
+      } else {
+        fail("An unexpected variable '" + instance.getName() + "' was found with value " + instance.getValue());
+      }
+    }    
   }
   
 }

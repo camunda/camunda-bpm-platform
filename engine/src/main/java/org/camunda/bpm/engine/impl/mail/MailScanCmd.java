@@ -26,7 +26,6 @@ import javax.mail.Store;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.identity.User;
-import org.camunda.bpm.engine.impl.UserQueryImpl;
 import org.camunda.bpm.engine.impl.db.DbSqlSession;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
@@ -138,7 +137,7 @@ public class MailScanCmd implements Command<Object> {
     
     // add identity links for all the recipients
     for (String recipientEmailAddress: mailTransformer.getRecipients()) {
-      User recipient = new UserQueryImpl(commandContext)
+      User recipient = commandContext.getReadOnlyIdentityProvider().createUserQuery(commandContext)
         .userEmail(recipientEmailAddress)
         .singleResult();
       if (recipient!=null) {

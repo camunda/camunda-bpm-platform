@@ -12,9 +12,9 @@ import org.camunda.bpm.application.ProcessApplicationInfo;
 import org.camunda.bpm.engine.form.StartFormData;
 import org.camunda.bpm.engine.form.TaskFormData;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.rest.spi.impl.AbstractProcessEngineAware;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.tasklist.dto.FormDto;
-import org.camunda.bpm.tasklist.spi.AbstractProcessEngineAware;
 
 /**
  * @author drobisch

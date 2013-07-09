@@ -5,6 +5,10 @@
 
   <display-name>camunda bpm tasklist</display-name>
 
+  <listener>
+    <listener-class>org.camunda.bpm.pa.DevProcessApplication</listener-class>
+  </listener>
+  
   <filter>
     <filter-name>AuthenticationFilter</filter-name>
     <filter-class>org.camunda.bpm.tasklist.AuthenticationFilter</filter-class>

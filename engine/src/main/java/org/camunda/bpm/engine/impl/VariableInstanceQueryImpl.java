@@ -17,6 +17,7 @@ import java.util.List;
 
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
+import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
 
@@ -25,7 +26,7 @@ import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
  */
 public class VariableInstanceQueryImpl extends AbstractVariableQueryImpl<VariableInstanceQuery, VariableInstance> implements VariableInstanceQuery, Serializable {
 
-  private static final long serialVersionUID = 7177849740680446490L;
+  private static final long serialVersionUID = 1L;
   
   protected String variableName;
   protected String variableNameLike;
@@ -33,7 +34,6 @@ public class VariableInstanceQueryImpl extends AbstractVariableQueryImpl<Variabl
   protected String[] processInstanceIds;
   protected String[] taskIds;
   protected String[] activityInstanceIds;
-//  protected QueryVariableValue queryVariableValue;
 
   public VariableInstanceQueryImpl() { }
   
@@ -50,28 +50,6 @@ public class VariableInstanceQueryImpl extends AbstractVariableQueryImpl<Variabl
     this.variableNameLike = variableNameLike;
     return this;
   }
-
-//  public VariableInstanceQuery variableValueEquals(String variableName, Object variableValue) {
-//    if (variableName == null) {
-//      throw new ProcessEngineException("variableName is null");
-//    }
-//    if (variableValue == null) {
-//      throw new ProcessEngineException("variableValue is null");
-//    }
-//
-//    this.variableName = variableName;
-//    queryVariableValue = new QueryVariableValue(variableName, variableValue, QueryOperator.EQUALS, true);
-//    return this;
-//  }
-//  
-//  public VariableInstanceQuery variableValueEquals(Object variableValue) {
-//    if (variableValue == null) {
-//      throw new ProcessEngineException("variableValue is null");
-//    }
-//    
-//    queryVariableValue = new QueryVariableValue(variableName, variableValue, QueryOperator.EQUALS, true);
-//    return this;
-//  }
 
   public VariableInstanceQuery executionIdIn(String... executionIds) {
     this.executionIds = executionIds;
@@ -112,13 +90,6 @@ public class VariableInstanceQueryImpl extends AbstractVariableQueryImpl<Variabl
 
   // results ////////////////////////////////////////////////////  
   
-//  protected void ensureVariablesInitialized() {
-//    if (this.queryVariableValue != null) {
-//      VariableTypes variableTypes = Context.getProcessEngineConfiguration().getVariableTypes();
-//      queryVariableValue.initialize(variableTypes);
-//    }
-//  }
-  
   public long executeCount(CommandContext commandContext) {
     checkQueryOk();
     ensureVariablesInitialized();
@@ -130,9 +101,23 @@ public class VariableInstanceQueryImpl extends AbstractVariableQueryImpl<Variabl
   public List<VariableInstance> executeList(CommandContext commandContext, Page page) {
     checkQueryOk();
     ensureVariablesInitialized();
-    return commandContext
+    List<VariableInstance> result = commandContext
       .getVariableInstanceManager()
       .findVariableInstanceByQueryCriteria(this, page);
+    
+    if (result == null) {
+      return result;
+    }
+    
+    // iterate over the result array to initialize the value of the value
+    for (VariableInstance variableInstance : result) {
+      if (variableInstance instanceof VariableInstanceEntity) {
+        VariableInstanceEntity variableInstanceEntity = (VariableInstanceEntity) variableInstance;
+        variableInstanceEntity.getValue();
+      }      
+    }
+    
+    return result;
   }
 
   // getters ////////////////////////////////////////////////////
@@ -160,9 +145,5 @@ public class VariableInstanceQueryImpl extends AbstractVariableQueryImpl<Variabl
   public String[] getActivityInstanceIds() {
     return activityInstanceIds;
   }
-
-//  public QueryVariableValue getQueryVariableValue() {
-//    return queryVariableValue;
-//  }
   
 }

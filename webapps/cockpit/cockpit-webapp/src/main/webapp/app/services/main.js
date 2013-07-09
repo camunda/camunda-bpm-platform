@@ -1,5 +1,5 @@
 ngDefine('cockpit.services', [
-  './activityInstance',
+  //'./activityInstance',
   './transform'
 ], function(module) {
 

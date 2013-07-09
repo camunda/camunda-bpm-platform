@@ -81,6 +81,12 @@ alter table ACT_RU_INCIDENT
 alter table ACT_RU_INCIDENT
     drop constraint ACT_FK_INC_RCAUSE; 
     
+alter table ACT_RU_AUTHORIZATION
+    drop constraint ACT_UNIQ_AUTH_GROUP; 
+    
+alter table ACT_RU_AUTHORIZATION
+    drop constraint ACT_UNIQ_AUTH_USER;
+    
 drop index ACT_IDX_EVENT_SUBSCR_CONFIG_;
 drop index ACT_IDX_EVENT_SUBSCR;
 drop index ACT_IDX_ATHRZ_PROCEDEF;
@@ -96,3 +102,4 @@ drop table ACT_RU_IDENTITYLINK;
 drop table ACT_RU_VARIABLE;
 drop table ACT_RU_EVENT_SUBSCR;
 drop table ACT_RU_INCIDENT;
+drop table ACT_RU_AUTHORIZATION;

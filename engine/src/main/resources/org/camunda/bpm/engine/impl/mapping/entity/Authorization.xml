@@ -1,0 +1,171 @@
+<?xml version="1.0" encoding="UTF-8" ?> 
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+  
+<mapper namespace="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity">
+
+  <!-- AUTHORIZATION INSERT -->
+  <insert id="insertAuthorization" parameterType="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity">
+    insert into ${prefix}ACT_RU_AUTHORIZATION (
+      ID_,
+      REV_,
+      GROUP_ID_,
+      USER_ID_,
+      RESOURCE_TYPE_,
+      RESOURCE_ID_,
+      PERMS_
+      )
+    values (
+      #{id ,jdbcType=VARCHAR},
+      1,
+      #{groupId ,jdbcType=VARCHAR},
+      #{userId ,jdbcType=VARCHAR},
+      #{resourceType ,jdbcType=VARCHAR},
+      #{resourceId ,jdbcType=VARCHAR},
+      #{permissions, jdbcType=INTEGER}
+    )
+  </insert>
+  
+  <!-- AUTHORIZATION UPDATE -->
+  
+  <update id="updateAuthorization" parameterType="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity">
+    update ${prefix}ACT_RU_AUTHORIZATION set
+      REV_ = #{revisionNext, jdbcType=INTEGER},
+      GROUP_ID_ = #{groupId, jdbcType=VARCHAR},
+      USER_ID_ = #{userId, jdbcType=VARCHAR},
+      RESOURCE_TYPE_ = #{resourceType, jdbcType=VARCHAR},
+      RESOURCE_ID_ = #{resourceId, jdbcType=VARCHAR},
+      PERMS_ = #{permissions, jdbcType=INTEGER}     
+    where ID_ = #{id, jdbcType=VARCHAR}
+      and REV_ = #{revision, jdbcType=INTEGER}
+  </update>
+  
+    <!-- AUTHORIZATION DELETE -->
+  
+  <update id="deleteAuthorization" parameterType="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity">
+    DELETE FROM 
+        ${prefix}ACT_RU_AUTHORIZATION 
+    where  
+        ID_ = #{id}  
+        and REV_ = #{revision}
+  </update>
+
+  <!-- AUTHORIZATION RESULTMAP -->
+
+  <resultMap id="authorizationResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity">
+    <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <result property="revision" column="REV_" jdbcType="INTEGER" />
+    <result property="groupId" column="GROUP_ID_" jdbcType="VARCHAR" />
+    <result property="userId" column="USER_ID_" jdbcType="VARCHAR" />
+    <result property="resourceType" column="RESOURCE_TYPE_" jdbcType="VARCHAR" />
+    <result property="resourceId" column="RESOURCE_ID_" jdbcType="VARCHAR" />
+    <result property="permissions" column="PERMS_" jdbcType="INTEGER" />
+  </resultMap>
+  
+  <!-- AUTHORIZATION SELECT -->  
+  
+  <select id="selectAuthorization" resultMap="authorizationResultMap">
+    select * FROM ${prefix}ACT_RU_AUTHORIZATION WHERE ID_ = #{id}
+  </select>
+
+  <select id="selectAuthorizationByQueryCriteria_BITAND" parameterType="org.camunda.bpm.engine.impl.AuthorizationQueryImpl" resultMap="authorizationResultMap">
+    ${limitBefore}
+    select RES.* ${limitBetween}
+    <include refid="selectAuthorizationByQueryCriteriaSql_BITAND"/>
+    ${orderBy}
+    ${limitAfter}
+  </select>
+
+  <select id="selectAuthorizationCountByQueryCriteria_BITAND" parameterType="org.camunda.bpm.engine.impl.AuthorizationQueryImpl" resultType="long">
+    select count(distinct RES.ID_)
+    <include refid="selectAuthorizationByQueryCriteriaSql_BITAND"/>
+  </select>
+  
+  <select id="selectAuthorizationByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.AuthorizationQueryImpl" resultMap="authorizationResultMap">
+    ${limitBefore}
+    select RES.* ${limitBetween}
+    <include refid="selectAuthorizationByQueryCriteriaSql"/>
+    ${orderBy}
+    ${limitAfter}
+  </select>
+
+  <select id="selectAuthorizationCountByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.AuthorizationQueryImpl" resultType="long">
+    select count(distinct RES.ID_)
+    <include refid="selectAuthorizationByQueryCriteriaSql"/>
+  </select>
+  
+  <sql id="selectAuthorizationByQueryCriteriaSql_BITAND">
+    from ${prefix}ACT_RU_AUTHORIZATION RES
+    <where>
+      <if test="id != null">
+        RES.ID_ = #{id}
+      </if>
+      
+      <!-- userIds -->
+      <if test="userIds != null &amp;&amp; userIds.length > 0">
+        and RES.USER_ID_ in
+        <foreach item="item" index="index" collection="userIds"
+                 open="(" separator="," close=")">
+          #{item}
+        </foreach>
+      </if>
+      
+      <!-- groupIds -->
+      <if test="groupIds != null &amp;&amp; groupIds.length > 0">
+        and RES.GROUP_ID_ in
+        <foreach item="item" index="index" collection="groupIds"
+                 open="(" separator="," close=")">
+          #{item}
+        </foreach>
+      </if>
+      
+      <if test="resourceType != null">
+        and RES.RESOURCE_TYPE_ = #{resourceType}
+      </if>      
+      <if test="resourceId != null">
+        and RES.RESOURCE_ID_ = #{resourceId}
+      </if>     
+      <if test="queryByPermission">
+        and (BITAND(RES.PERMS_, #{permission})) = #{permission}  
+      </if>
+    </where>
+  </sql>
+  
+  <sql id="selectAuthorizationByQueryCriteriaSql">
+    from ${prefix}ACT_RU_AUTHORIZATION RES
+    <where>
+      <if test="id != null">
+        RES.ID_ = #{id}
+      </if>
+      
+      <!-- userIds -->
+      <if test="userIds != null &amp;&amp; userIds.length > 0">
+        and RES.USER_ID_ in
+        <foreach item="item" index="index" collection="userIds"
+                 open="(" separator="," close=")">
+          #{item}
+        </foreach>
+      </if>
+      
+      <!-- groupIds -->
+      <if test="groupIds != null &amp;&amp; groupIds.length > 0">
+        and RES.GROUP_ID_ in
+        <foreach item="item" index="index" collection="groupIds"
+                 open="(" separator="," close=")">
+          #{item}
+        </foreach>
+      </if>
+      
+      <if test="resourceType != null">
+        and RES.RESOURCE_TYPE_ = #{resourceType}
+      </if>      
+      <if test="resourceId != null">
+        and RES.RESOURCE_ID_ = #{resourceId}
+      </if>     
+      <if test="queryByPermission">
+        and RES.PERMS_ &amp; #{permission} = #{permission}  
+      </if>
+    </where>
+  </sql>
+  
+</mapper>

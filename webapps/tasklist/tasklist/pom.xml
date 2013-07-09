@@ -14,6 +14,12 @@
   <packaging>war</packaging>
   <name>camunda BPM - tasklist</name>
 
+  <properties>
+    <web.resources.override>src/main/runtime/default/webapp</web.resources.override>
+    <java.resources.override>src/main/runtime/default/resources</java.resources.override>
+    <properties.override>src/main/runtime/default/config.properties</properties.override>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.camunda.bpm</groupId>
@@ -74,133 +80,140 @@
 
   </dependencies>
 
+  <build>
+    <finalName>tasklist</finalName>
+    <resources>
+      <resource>
+        <directory>src/main/resources</directory>
+      </resource>
+      <resource>
+        <directory>${java.resources.override}</directory>
+        <filtering>true</filtering>
+      </resource>
+    </resources>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-war-plugin</artifactId>
+        <configuration>
+          <webResources>
+            <resource>
+              <filtering>true</filtering>
+              <directory>${web.resources.override}</directory>
+            </resource>
+            <resource>
+              <filtering>true</filtering>
+              <directory>src/main/webapp</directory>
+              <!-- no filtering for favicon because linux destroys images through carriage return -->
+              <excludes>
+                <exclude>assets/img/favicon.ico</exclude>
+              </excludes>
+            </resource>
+          </webResources>
+          <archive>
+            <manifest>
+              <!-- Maven project version number -->
+              <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+            </manifest>
+          </archive>
+          <!-- exclude development resources (task forms etc.) -->
+          <packagingExcludes>
+            develop/**
+          </packagingExcludes>
+        </configuration>
+      </plugin>
+      <plugin>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <failIfNoTests>false</failIfNoTests>
+          <trimStackTrace>false</trimStackTrace>
+          <redirectTestOutputToFile>true</redirectTestOutputToFile>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
   <profiles>
     <profile>
-      <id>default</id>
-      <activation>
-        <activeByDefault>true</activeByDefault>
-      </activation>
-      <build>
-        <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-war-plugin</artifactId>
-            <configuration>
-              <webResources>
-                <resource>
-                  <filtering>true</filtering>
-                  <directory>src/main/webapp</directory>
-                  <!-- no filtering for favicon because linux destroys images through carriage return -->
-                  <excludes>
-                    <exclude>assets/img/favicon.ico</exclude>
-                  </excludes>
-                </resource>
-              </webResources>
-              <archive>
-                <manifest>
-                  <!-- Maven project version number -->
-                  <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
-                </manifest>
-              </archive>
-            </configuration>
-          </plugin>
-        </plugins>
-      </build>
-      
+      <id>tomcat</id>
+      <dependencies>
+        <dependency>
+          <groupId>org.jboss.resteasy</groupId>
+          <artifactId>resteasy-jaxrs</artifactId>
+          <scope>runtime</scope>
+        </dependency>
+      </dependencies>
+      <properties>
+        <web.resources.override>src/main/runtime/tomcat/webapp</web.resources.override>
+        <java.resources.override>src/main/runtime/tomcat/resources</java.resources.override>
+      </properties>
     </profile>
 
     <profile>
       <id>develop</id>
       <dependencies>
         <dependency>
+          <groupId>org.jboss.resteasy</groupId>
+          <artifactId>resteasy-jaxrs</artifactId>
+          <scope>runtime</scope>
+        </dependency>
+        <dependency>
           <groupId>org.camunda.bpm</groupId>
           <artifactId>camunda-engine</artifactId>
         </dependency>
-    
-        <dependency>
+         <dependency>
+          <groupId>com.h2database</groupId>
+          <artifactId>h2</artifactId>
+        </dependency>
+         <dependency>
           <groupId>com.fasterxml.uuid</groupId>
           <artifactId>java-uuid-generator</artifactId>
         </dependency>
-        
-        <dependency>
-          <groupId>org.jboss.resteasy</groupId>
-          <artifactId>resteasy-jaxrs</artifactId>
-        </dependency>
-        
-        <dependency>
-		      <groupId>com.h2database</groupId>
-		      <artifactId>h2</artifactId>
-		    </dependency>
       </dependencies>
-      
-      <properties>
-        <maven.tomcat.path>/tasklist</maven.tomcat.path>
-      </properties>
-      
       <build>
-        <resources>
-          <resource>
-            <directory>src/develop/resources</directory>
-          </resource>
-        </resources>
-
         <plugins>
-          <plugin>
-            <groupId>org.apache.maven.plugins</groupId>
-            <artifactId>maven-war-plugin</artifactId>
-            <configuration>
-              <failOnMissingWebXml>false</failOnMissingWebXml>
-              <webResources>
-                <resource>
-                  <directory>src/develop/webapp</directory>
-                </resource>
-               </webResources>
-            </configuration>
-          </plugin>
-          <plugin>
-            <groupId>org.codehaus.mojo</groupId>
-            <artifactId>build-helper-maven-plugin</artifactId>
-            <executions>
-              <execution>
-                <id>add-source</id>
-                <phase>generate-sources</phase>
-                <goals>
-                  <goal>add-source</goal>
-                </goals>
-                <configuration>
-                  <sources>
-                    <source>src/develop/java</source>
-                  </sources>
-                </configuration>
-              </execution>
-            </executions>
-          </plugin>
-          
           <plugin>
             <groupId>org.apache.tomcat.maven</groupId>
             <artifactId>tomcat7-maven-plugin</artifactId>
             <version>2.1</version>
           </plugin>
           <plugin>
-            <groupId>org.mortbay.jetty</groupId>
-            <artifactId>jetty-maven-plugin</artifactId>
-            <version>8.1.8.v20121106</version>
-            <configuration>
-              <webAppConfig>
-                <contextPath>/camunda-tasklist</contextPath>
-                <!-- used to disable file mapped buffer -->
-                <defaultsDescriptor>src/runtime/jetty/webdefault.xml</defaultsDescriptor>
-                
-              </webAppConfig>
-            </configuration>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>build-helper-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>add-sources</id>
+                <goals>
+                  <goal>add-source</goal>
+                </goals>
+                <configuration>
+                  <sources>
+                    <source>src/main/runtime/develop/java</source>
+                  </sources>
+                </configuration>
+              </execution>
+              <execution>
+                <id>add-resources</id>
+                <goals>
+                  <goal>add-resource</goal>
+                </goals>
+                <configuration>
+                  <resources>
+                    <resource>
+                      <directory>src/main/runtime/develop/resources</directory>
+                    </resource>
+                  </resources>
+                </configuration>
+              </execution>
+            </executions>
           </plugin>
         </plugins>
       </build>
-
+      <properties>
+        <java.resources.override>src/main/runtime/develop/resources</java.resources.override>
+        <maven.tomcat.path>/tasklist</maven.tomcat.path>
+      </properties>
     </profile>
-
   </profiles>
-
-
 
 </project>

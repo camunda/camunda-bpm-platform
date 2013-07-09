@@ -19,13 +19,15 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.identity.Picture;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.entity.UserEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.IdentityInfoEntity;
 
 
 /**
+ * @author Daniel Meyer
  * @author Tom Baeyens
  */
-public class SetUserPictureCmd implements Command<Object>, Serializable {
+public class SetUserPictureCmd implements Command<Void>, Serializable {
 
   private static final long serialVersionUID = 1L;
   protected String userId;
@@ -37,18 +39,36 @@ public class SetUserPictureCmd implements Command<Object>, Serializable {
     this.picture = picture;
   }
 
-  public Object execute(CommandContext commandContext) {
+  public Void execute(CommandContext commandContext) {
     if(userId == null) {
       throw new ProcessEngineException("userId is null");
     }
-    UserEntity user = (UserEntity) commandContext
-      .getUserManager()
-      .findUserById(userId);
-    if(user == null) {
-      throw new ProcessEngineException("user "+userId+" doesn't exist");
+    
+    IdentityInfoEntity pictureInfo = commandContext.getIdentityInfoManager()
+        .findUserInfoByUserIdAndKey(userId, "picture");
+    
+    if(pictureInfo != null) {
+      String byteArrayId = pictureInfo.getValue();
+      if(byteArrayId != null) {
+        commandContext.getByteArrayManager()
+          .deleteByteArrayById(byteArrayId);
+      }
+      
+    } else {
+      pictureInfo = new IdentityInfoEntity();
+      pictureInfo.setUserId(userId);
+      pictureInfo.setKey("picture");
+      commandContext.getDbSqlSession().insert(pictureInfo);
     }
-    user.setPicture(picture);
+    
+    ByteArrayEntity byteArrayEntity = new ByteArrayEntity(picture.getMimeType(), picture.getBytes());
+
+    commandContext.getDbSqlSession()
+      .insert(byteArrayEntity);
+    
+    pictureInfo.setValue(byteArrayEntity.getId());
+    
     return null;
   }
-
+  
 }

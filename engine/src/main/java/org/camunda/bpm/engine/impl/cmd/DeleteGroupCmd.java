@@ -22,7 +22,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 /**
  * @author Tom Baeyens
  */
-public class DeleteGroupCmd implements Command<Void>, Serializable  {
+public class DeleteGroupCmd extends AbstractWritableIdentityServiceCmd<Void>  implements Command<Void>, Serializable  {
 
   private static final long serialVersionUID = 1L;
   String groupId;
@@ -31,12 +31,12 @@ public class DeleteGroupCmd implements Command<Void>, Serializable  {
     this.groupId = groupId;
   }
   
-  public Void execute(CommandContext commandContext) {
+  protected Void executeCmd(CommandContext commandContext) {
     if(groupId == null) {
       throw new ProcessEngineException("groupId is null");
     }
     commandContext
-      .getGroupManager()
+      .getWritableIdentityProvider()
       .deleteGroup(groupId);
     
     return null;

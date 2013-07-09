@@ -4,7 +4,7 @@ ngDefine('cockpit.directives', [
   './onClickHideElement',
   './onClickShowElement',
   './resize',
-  './tree'
+  './activityInstanceTree'
 ], function(module) {
 
 });

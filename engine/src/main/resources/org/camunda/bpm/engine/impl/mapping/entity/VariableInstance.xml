@@ -9,18 +9,18 @@
   <insert id="insertVariableInstance" parameterType="org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity">
     insert into ${prefix}ACT_RU_VARIABLE (ID_, REV_, TYPE_, NAME_, PROC_INST_ID_, EXECUTION_ID_, TASK_ID_, BYTEARRAY_ID_, DOUBLE_, LONG_ , TEXT_, TEXT2_)
     values (
-	    #{id, jdbcType=VARCHAR},
-	    1,
-	    #{type, jdbcType=VARCHAR },
-	    #{name, jdbcType=VARCHAR},
+      #{id, jdbcType=VARCHAR},
+      1,
+      #{type, jdbcType=VARCHAR },
+      #{name, jdbcType=VARCHAR},
       #{processInstanceId, jdbcType=VARCHAR},
-	    #{executionId, jdbcType=VARCHAR},
+      #{executionId, jdbcType=VARCHAR},
       #{taskId, jdbcType=VARCHAR},
-	    #{byteArrayValueId, jdbcType=VARCHAR},
-	    #{doubleValue, jdbcType=DOUBLE},
-	    #{longValue, jdbcType=BIGINT},
-	    #{textValue, jdbcType=VARCHAR},
-	    #{textValue2, jdbcType=VARCHAR}
+      #{byteArrayValueId, jdbcType=VARCHAR},
+      #{doubleValue, jdbcType=DOUBLE},
+      #{longValue, jdbcType=BIGINT},
+      #{textValue, jdbcType=VARCHAR},
+      #{textValue2, jdbcType=VARCHAR}
     )
   </insert>
   
@@ -49,22 +49,22 @@
   <!-- VARIABLE INSTANCE RESULTMAP -->
 
 	<resultMap id="variableInstanceResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity">
-		<id property="id" column="ID_" jdbcType="VARCHAR" />
-    <result property="revision" column="REV_" jdbcType="INTEGER"/>
-		<result property="type" column="TYPE_" javaType="org.camunda.bpm.engine.impl.variable.VariableType" jdbcType="VARCHAR"/>
-		<result property="name" column="NAME_" javaType="String" jdbcType="VARCHAR" />
-    <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
-    <result property="executionId" column="EXECUTION_ID_" jdbcType="VARCHAR" />
-    <result property="taskId" column="TASK_ID_" jdbcType="VARCHAR" />
-    <result property="activityInstanceId" column="ACT_INST_ID_" jdbcType="VARCHAR" />
-		<result property="activityId" column="ACTIVITY_ID_" jdbcType="VARCHAR" />
-		<result property="isActive" column="IS_ACTIVE_" jdbcType="BOOLEAN" />
-		<result property="isConcurrencyScope" column="IS_CONCURRENCY_SCOPE_" jdbcType="BOOLEAN" />
-		<result property="byteArrayValueId" column="BYTEARRAY_ID_" jdbcType="VARCHAR" />
-		<result property="doubleValue" column="DOUBLE_" jdbcType="DOUBLE" />
-		<result property="textValue" column="TEXT_" jdbcType="VARCHAR"/>
-		<result property="textValue2" column="TEXT2_" jdbcType="VARCHAR"/>
-		<result property="longValue" column="LONG_" jdbcType="BIGINT"/>
+      <id property="id" column="ID_" jdbcType="VARCHAR" />
+      <result property="revision" column="REV_" jdbcType="INTEGER"/>
+      <result property="type" column="TYPE_" javaType="org.camunda.bpm.engine.impl.variable.VariableType" jdbcType="VARCHAR"/>
+      <result property="name" column="NAME_" javaType="String" jdbcType="VARCHAR" />
+      <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
+      <result property="executionId" column="EXECUTION_ID_" jdbcType="VARCHAR" />
+      <result property="taskId" column="TASK_ID_" jdbcType="VARCHAR" />
+      <result property="activityInstanceId" column="ACT_INST_ID_" jdbcType="VARCHAR" />
+      <result property="activityId" column="ACTIVITY_ID_" jdbcType="VARCHAR" />
+      <result property="isActive" column="IS_ACTIVE_" jdbcType="BOOLEAN" />
+      <result property="isConcurrencyScope" column="IS_CONCURRENCY_SCOPE_" jdbcType="BOOLEAN" />
+      <result property="byteArrayValueId" column="BYTEARRAY_ID_" jdbcType="VARCHAR" />
+      <result property="doubleValue" column="DOUBLE_" jdbcType="DOUBLE" />
+      <result property="textValue" column="TEXT_" jdbcType="VARCHAR"/>
+      <result property="textValue2" column="TEXT2_" jdbcType="VARCHAR"/>
+      <result property="longValue" column="LONG_" jdbcType="BIGINT"/>
 	</resultMap>
 
   <!-- VARIABLE INSTANCE SELECT -->
@@ -116,7 +116,7 @@
             
             <!-- executionIds -->
             <if test="executionIds != null &amp;&amp; executionIds.length > 0">
-              RES.EXECUTION_ID_ in
+              and RES.EXECUTION_ID_ in
               <foreach item="item" index="index" collection="executionIds"
                        open="(" separator="," close=")">
                 #{item}
@@ -125,7 +125,7 @@
             
             <!-- processInstanceIds -->
             <if test="processInstanceIds != null &amp;&amp; processInstanceIds.length > 0">
-              RES.PROC_INST_ID_ in
+              and RES.PROC_INST_ID_ in
               <foreach item="item" index="index" collection="processInstanceIds"
                        open="(" separator="," close=")">
                 #{item}
@@ -134,7 +134,7 @@
             
             <!-- taskIds -->
             <if test="taskIds != null &amp;&amp; taskIds.length > 0">
-              RES.TASK_ID_ in
+              and RES.TASK_ID_ in
               <foreach item="item" index="index" collection="taskIds"
                        open="(" separator="," close=")">
                 #{item}
@@ -143,7 +143,7 @@
             
             <!-- activityInstanceIds -->
             <if test="activityInstanceIds != null &amp;&amp; activityInstanceIds.length > 0">
-              EXECUTION.ACT_INST_ID_ in
+              and EXECUTION.ACT_INST_ID_ in
               <foreach item="item" index="index" collection="activityInstanceIds"
                        open="(" separator="," close=")">
                 #{item}
@@ -195,6 +195,10 @@
               </choose>
               </if>
             </foreach>
+            
+            <!-- Add this hook to prevent loading of byte arrays -->
+            and RES.TYPE_ != 'bytes'
+            
           </where>
     ) RES
   </sql>
