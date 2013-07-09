@@ -93,7 +93,7 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
     return null;
   }
   
-  public Object getVariableLocal(Object variableName) {
+  public Object getVariableLocal(String variableName) {
     ensureVariableInstancesInitialized();
     VariableInstanceEntity variableInstance = variableInstances.get(variableName);
     if (variableInstance!=null) {
@@ -165,7 +165,7 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
     return variableInstances.keySet();
   }
 
-  public void createVariablesLocal(Map<String, ? extends Object> variables) {
+  protected void createVariablesLocal(Map<String, ? extends Object> variables) {
     if (variables!=null) {
       for (Map.Entry<String, ? extends Object> entry: variables.entrySet()) {
         createVariableLocal(entry.getKey(), entry.getValue());
@@ -257,11 +257,11 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
     createVariableLocal(variableName, value);
   }
 
-  public Object setVariableLocal(String variableName, Object value) {
-    return setVariableLocal(variableName, value, getSourceActivityExecution());
+  public void setVariableLocal(String variableName, Object value) {
+    setVariableLocal(variableName, value, getSourceActivityExecution());
   }
 
-  public Object setVariableLocal(String variableName, Object value, ExecutionEntity sourceActivityExecution) {
+  protected void setVariableLocal(String variableName, Object value, ExecutionEntity sourceActivityExecution) {
     ensureVariableInstancesInitialized();
     VariableInstanceEntity variableInstance = variableInstances.get(variableName);
     if ((variableInstance != null) && (!variableInstance.getType().isAbleToStore(value))) {
@@ -274,11 +274,9 @@ public abstract class VariableScopeImpl implements Serializable, VariableScope {
     } else {
       updateVariableInstance(variableInstance, value, sourceActivityExecution);
     }
-    
-    return null;
   }
   
-  public void createVariableLocal(String variableName, Object value) {
+  protected void createVariableLocal(String variableName, Object value) {
     createVariableLocal(variableName, value, getSourceActivityExecution());
   }
 
