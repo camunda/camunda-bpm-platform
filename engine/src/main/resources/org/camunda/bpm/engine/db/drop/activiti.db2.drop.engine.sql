@@ -4,6 +4,8 @@ drop index ACT_IDX_IDENT_LNK_USER;
 drop index ACT_IDX_IDENT_LNK_GROUP;
 drop index ACT_IDX_VARIABLE_TASK_ID;
 drop index ACT_IDX_INC_CONFIGURATION;
+drop index ACT_UNIQ_AUTH_USER;
+drop index ACT_UNIQ_AUTH_GROUP;
 
 alter table ACT_GE_BYTEARRAY 
     drop foreign key ACT_FK_BYTEARR_DEPL;
@@ -65,11 +67,6 @@ alter table ACT_RU_INCIDENT
 alter table ACT_RU_INCIDENT
     drop foreign key ACT_FK_INC_RCAUSE; 
 
-alter table ACT_RU_AUTHORIZATION
-    drop constraint ACT_UNIQ_AUTH_GROUP; 
-    
-alter table ACT_RU_AUTHORIZATION
-    drop constraint ACT_UNIQ_AUTH_USER; 
     
 drop index ACT_IDX_EVENT_SUBSCR_CONFIG_;
 drop index ACT_IDX_ATHRZ_PROCEDEF;

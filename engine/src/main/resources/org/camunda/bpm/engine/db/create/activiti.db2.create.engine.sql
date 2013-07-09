@@ -168,7 +168,10 @@ create table ACT_RU_AUTHORIZATION (
     RESOURCE_TYPE_ varchar(255) not null,
     RESOURCE_ID_ varchar(64),
     PERMS_ integer,
-    primary key (ID_)
+    primary key (ID_),
+    UNI_USER_ID_ varchar (255) not null generated always as (case when "USER_ID_" is null then "ID_" else "USER_ID_" end),
+    UNI_GROUP_ID_ varchar (255) not null generated always as (case when "GROUP_ID_" is null then "ID_" else "GROUP_ID_" end),
+    UNI_RESOURCE_ID_ varchar (64) not null generated always as (case when "RESOURCE_ID_" is null then "ID_" else "RESOURCE_ID_" end)
 );
 
 create unique index ACT_UNIQ_RU_BUS_KEY on ACT_RU_EXECUTION(UNI_PROC_DEF_ID, UNI_BUSINESS_KEY);
@@ -180,6 +183,8 @@ create index ACT_IDX_EVENT_SUBSCR_CONFIG_ on ACT_RU_EVENT_SUBSCR(CONFIGURATION_)
 create index ACT_IDX_VARIABLE_TASK_ID on ACT_RU_VARIABLE(TASK_ID_);
 create index ACT_IDX_ATHRZ_PROCEDEF on ACT_RU_IDENTITYLINK(PROC_DEF_ID_);
 create index ACT_IDX_INC_CONFIGURATION on ACT_RU_INCIDENT(CONFIGURATION_);
+create unique index ACT_UNIQ_AUTH_USER on ACT_RU_AUTHORIZATION(UNI_USER_ID_,RESOURCE_TYPE_,UNI_RESOURCE_ID_);
+create unique index ACT_UNIQ_AUTH_GROUP on ACT_RU_AUTHORIZATION(UNI_GROUP_ID_,RESOURCE_TYPE_,UNI_RESOURCE_ID_);
 
 alter table ACT_GE_BYTEARRAY
     add constraint ACT_FK_BYTEARR_DEPL 
@@ -284,11 +289,3 @@ alter table ACT_RU_INCIDENT
     add constraint ACT_FK_INC_RCAUSE 
     foreign key (ROOT_CAUSE_INCIDENT_ID_) 
     references ACT_RU_INCIDENT (ID_);
-    
-alter table ACT_RU_AUTHORIZATION
-    add constraint ACT_UNIQ_AUTH_USER
-    unique (USER_ID_,RESOURCE_TYPE_,RESOURCE_ID_);
-    
-alter table ACT_RU_AUTHORIZATION
-    add constraint ACT_UNIQ_AUTH_GROUP
-    unique (GROUP_ID_,RESOURCE_TYPE_,RESOURCE_ID_);
