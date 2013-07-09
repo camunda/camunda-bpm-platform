@@ -57,6 +57,8 @@ public abstract class AbstractProcessEngineRestServiceTest extends
   protected static final String MESSAGE_URL = SINGLE_ENGINE_URL + "/message";
   protected static final String EXECUTION_URL = SINGLE_ENGINE_URL + "/execution";
   protected static final String VARIABLE_INSTANCE_URL = SINGLE_ENGINE_URL + "/variable-instance";
+  protected static final String USER_URL = SINGLE_ENGINE_URL + "/user";
+  protected static final String GROUP_URL = SINGLE_ENGINE_URL + "/group";
   
   protected String EXAMPLE_ENGINE_NAME = "anEngineName";
 
@@ -258,6 +260,28 @@ public abstract class AbstractProcessEngineRestServiceTest extends
     .when().get(VARIABLE_INSTANCE_URL);
     
     verify(mockRuntimeService).createVariableInstanceQuery();
+    verifyZeroInteractions(processEngine);
+  }
+  
+  @Test
+  public void testUserServiceEngineAccess() {
+    given().pathParam("name", EXAMPLE_ENGINE_NAME)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when().get(USER_URL);
+    
+    verify(mockIdentityService).createUserQuery();
+    verifyZeroInteractions(processEngine);
+  }
+  
+  @Test
+  public void testGroupServiceEngineAccess() {
+    given().pathParam("name", EXAMPLE_ENGINE_NAME)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when().get(GROUP_URL);
+    
+    verify(mockIdentityService).createGroupQuery();
     verifyZeroInteractions(processEngine);
   }
 }
