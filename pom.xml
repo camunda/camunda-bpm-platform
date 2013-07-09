@@ -114,8 +114,7 @@
         <module>engine-cdi</module>
         <module>engine-osgi</module>
         <module>engine-spring</module>          
-        <module>engine-rest</module>      
-        <module>identity/identity-ldap</module>
+        <module>engine-rest</module>
       </modules>
     </profile>    
     <profile>
