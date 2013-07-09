@@ -30,14 +30,14 @@ define([ "angular" ], function(angular) {
         }
         return variablesMap;
       },
-      
+
       mapToVariablesArray: function(variables_map) {
         var variablesArray = [];
-        
-        $.each(variables_map, function(name, value) {
-          variablesArray.push({name : name, value : value.value, type : type});
+
+        angular.forEach(variables_map, function(variable, name) {
+          variablesArray.push({ name : name, value : variable.value, type : variable.type });
         });
-        
+
         return variablesArray;
       },
 

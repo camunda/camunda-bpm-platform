@@ -1,31 +1,30 @@
 <div class="content-fixed">
 
   <div id="sidebar" class="content content-sidebar well">
-    
+
     <button on-click-hide-element="sidebar" selection="selection"></button>
-  
+
     <div class="page-header">
       <h1 ng-show="!!processDefinition.name">{{ processDefinition.name }}</h1>
       <h1 ng-show="!processDefinition.name">{{ processDefinition.key }}</h1>
     </div>
 
     <div>
-      <table>
-        <tbody>
-          <tr>
-            <td><strong>Version: </strong></td>
-            <td>{{ processDefinition.version }}</td>
-          </tr>
-          <tr>
-            <td><strong>Running instances (latest version): </strong></td>
-            <td>{{ processDefinitionLatestVersionCount.count }}</td>
-          </tr>
-          <tr>
-            <td><strong>Running instances (all versions): </strong></td>
-            <td>{{ processDefinitionTotalCount.count }}</td>
-          </tr>
-        </tbody>
-      </table>
+      <div>
+        <strong>Version</strong>
+        {{ processDefinition.version }}
+      </div>
+      <div>
+        <strong>Running Instances</strong>
+        <ul>
+          <li>
+            <strong>Latest Version</strong> {{ processDefinitionLatestVersionCount.count }}
+          </li>
+          <li>
+            <strong>All Versions</strong> {{ processDefinitionTotalCount.count }}
+          </li>
+        </ul>
+      </div>
     </div>
   </div>
 
@@ -33,7 +32,7 @@
     <div class="main">
       <div class="main-position">
         <button on-click-show-element="sidebar" selection="selection"></button>
-      
+
         <div process-diagram="semantic" process-definition="processDefinition" annotations="activityStatistics" incidents="incidents" on-scroll-and-zoom></div>
         <div view provider="processInstanceTable" vars="processDefinitionLatestVersionCount" class="value-content"></div>
       </div>
