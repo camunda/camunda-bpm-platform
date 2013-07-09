@@ -855,14 +855,7 @@ public class ExecutionImpl implements
     return currentActivityName;
   }
 
-
-  public void createVariableLocal(String variableName, Object value) {
-  }
-
-  public void createVariablesLocal(Map<String, ? extends Object> variables) {
-  }
-
-  public Object getVariableLocal(Object variableName) {
+  public Object getVariableLocal(String variableName) {
     return null;
   }
 
@@ -911,8 +904,7 @@ public class ExecutionImpl implements
   public void deleteVariablesLocal() {
   }
   
-  public Object setVariableLocal(String variableName, Object value) {
-    return null;
+  public void setVariableLocal(String variableName, Object value) {
   }
 
   public void setVariablesLocal(Map<String, ? extends Object> variables) {
