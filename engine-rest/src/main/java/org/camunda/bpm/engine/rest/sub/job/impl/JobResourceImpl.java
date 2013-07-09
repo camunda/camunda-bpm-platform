@@ -9,6 +9,7 @@ import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.rest.dto.job.JobDto;
 import org.camunda.bpm.engine.rest.dto.job.JobRetriesDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.sub.job.JobResource;
 import org.camunda.bpm.engine.runtime.Job;
 
@@ -44,6 +45,18 @@ public class JobResourceImpl implements JobResource {
 		} catch (ProcessEngineException e) {
 			throw new InvalidRequestException(Status.INTERNAL_SERVER_ERROR,e.getMessage());
 		}
+	}
+
+	@Override
+	public void executeJob() {
+		try {
+			ManagementService managementService = engine.getManagementService();
+			managementService.executeJob(this.jobId);	
+		} catch (ProcessEngineException e) {
+			throw new InvalidRequestException(Status.NOT_FOUND,e.getMessage());
+		}catch (RuntimeException r) {
+			throw new RestException(Status.INTERNAL_SERVER_ERROR,r.getMessage());
+		}				
 	}
 
 }

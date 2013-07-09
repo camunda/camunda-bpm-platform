@@ -21,6 +21,7 @@ import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.helper.MockJobBuilder;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.runtime.Job;
@@ -39,6 +40,7 @@ public abstract class AbstractJobRestServiceInteractionTest extends
 			+ "/job/{id}";
 	protected static final String JOB_RESOURCE_SET_RETRIES_URL = JOB_RESOURCE_URL
 			+ "/retries";
+	protected static final String JOB_RESOURCE_EXECUTE_JOB_URL = JOB_RESOURCE_URL + "/execute";
 
 	private ProcessEngine namedProcessEngine;
 	private ManagementService mockManagementService;
@@ -178,5 +180,57 @@ public abstract class AbstractJobRestServiceInteractionTest extends
 						equalTo("Job with id " + jobId + " does not exist"))
 				.when().get(JOB_RESOURCE_URL);
 	}
+	
+	@Test
+	public void testExecuteJob() {
+		given().pathParam("id", MockProvider.EXAMPLE_JOB_ID)
+				.then()
+				.expect()
+				.statusCode(Status.NO_CONTENT.getStatusCode())
+				.when().post(JOB_RESOURCE_EXECUTE_JOB_URL);
+		
+		verify(mockManagementService).executeJob(MockProvider.EXAMPLE_JOB_ID);		
+	}	
+	
+	@Test
+	public void testExecuteJobIdDoesntExist() {
+		String jobId = MockProvider.NON_EXISTING_JOB_ID;
+		
+		String expectedMessage = "No job found with id '" + jobId + "'";
+		
+		doThrow(new ProcessEngineException(expectedMessage))
+		.when(mockManagementService)
+		.executeJob(MockProvider.NON_EXISTING_JOB_ID);
 
+		    given()
+				.pathParam("id", jobId)
+				.then()
+				.expect()			
+				.statusCode(Status.NOT_FOUND.getStatusCode())
+				.contentType(ContentType.JSON)
+			    .body("type",equalTo(InvalidRequestException.class.getSimpleName()))
+			    .body("message",equalTo(expectedMessage))
+				.when()
+				.post(JOB_RESOURCE_EXECUTE_JOB_URL);			
+	}
+	
+	@Test
+	public void testExecuteJobRuntimeException() {
+		String jobId = MockProvider.EXAMPLE_JOB_ID;
+		
+		doThrow(new RuntimeException("Runtime exception"))
+		.when(mockManagementService)
+		.executeJob(jobId);	
+
+			given()
+				.pathParam("id", jobId)
+				.then()
+				.expect()			
+				.statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
+				.contentType(ContentType.JSON)
+			    .body("type",equalTo(RestException.class.getSimpleName()))
+			    .body("message",equalTo("Runtime exception"))
+				.when()
+				.post(JOB_RESOURCE_EXECUTE_JOB_URL);		
+	}	
 }
