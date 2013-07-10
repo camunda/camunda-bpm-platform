@@ -28,7 +28,7 @@ public interface VariableScope {
 
   Object getVariable(String variableName);
 
-  Object getVariableLocal(Object variableName);
+  Object getVariableLocal(String variableName);
 
   Set<String> getVariableNames();
 
@@ -36,7 +36,7 @@ public interface VariableScope {
 
   void setVariable(String variableName, Object value);
 
-  Object setVariableLocal(String variableName, Object value);
+  void setVariableLocal(String variableName, Object value);
 
   void setVariables(Map<String, ? extends Object> variables);
 
@@ -49,8 +49,6 @@ public interface VariableScope {
   boolean hasVariable(String variableName);
 
   boolean hasVariableLocal(String variableName);
-
-  void createVariableLocal(String variableName, Object value);
 
   /**
    * Removes the variable and creates a new

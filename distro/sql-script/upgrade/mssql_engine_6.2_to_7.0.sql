@@ -235,3 +235,19 @@ alter table ACT_RU_EXECUTION
 /** add SUSPENSION_STATE_ column to task table */
 alter table ACT_RU_TASK
     add SUSPENSION_STATE_ int;
+    
+/** add authorizations **/
+
+create table ACT_RU_AUTHORIZATION (
+    ID_ nvarchar(64) not null,
+    REV_ int,
+    GROUP_ID_ nvarchar(255),
+    USER_ID_ nvarchar(255),
+    RESOURCE_TYPE_ nvarchar(255) not null,
+    RESOURCE_ID_ nvarchar(64),
+    PERMS_ int,
+    primary key (ID_)
+);
+
+create unique index ACT_UNIQ_AUTH_USER on ACT_RU_AUTHORIZATION (USER_ID_,RESOURCE_TYPE_,RESOURCE_ID_) where USER_ID_ is not null;
+create unique index ACT_UNIQ_AUTH_GROUP on ACT_RU_AUTHORIZATION (GROUP_ID_,RESOURCE_TYPE_,RESOURCE_ID_) where GROUP_ID_ is not null;

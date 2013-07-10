@@ -137,12 +137,14 @@ public abstract class MockProvider {
   // user & groups
   public static final String EXAMPLE_GROUP_ID = "group1Id";
   public static final String EXAMPLE_GROUP_NAME = "group1";
+  public static final String EXAMPLE_GROUP_TYPE = "organizational-unit";
   public static final String EXAMPLE_GROUP_NAME_UPDATE = "group1Update";
  
   public static final String EXAMPLE_USER_ID = "userId";
   public static final String EXAMPLE_USER_FIRST_NAME = "firstName";
   public static final String EXAMPLE_USER_LAST_NAME = "lastName";
   public static final String EXAMPLE_USER_EMAIL = "test@example.org";
+  public static final String EXAMPLE_USER_PASSWORD = "s3cret";
   
   public static final String EXAMPLE_USER_FIRST_NAME_UPDATE = "firstNameUpdate";
   public static final String EXAMPLE_USER_LAST_NAME_UPDATE = "lastNameUpdate";
@@ -374,6 +376,7 @@ public abstract class MockProvider {
     Group mockGroup = mock(Group.class);
     when(mockGroup.getId()).thenReturn(EXAMPLE_GROUP_ID);
     when(mockGroup.getName()).thenReturn(EXAMPLE_GROUP_NAME);
+    when(mockGroup.getType()).thenReturn(EXAMPLE_GROUP_TYPE);
     
     return mockGroup;
   }

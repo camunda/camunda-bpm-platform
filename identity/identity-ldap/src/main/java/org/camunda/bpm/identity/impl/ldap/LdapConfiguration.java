@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -18,68 +18,68 @@ import java.util.Map;
 
 import javax.naming.directory.SearchControls;
 
-import org.camunda.bpm.engine.impl.digest.PasswordDigest;
+import org.camunda.bpm.engine.impl.digest.PasswordEncryptor;
 import org.camunda.bpm.engine.impl.digest.ShaHashDigest;
 
 
 /**
  * <p>Java Bean holding LDAP configuration</p>
- * 
+ *
  * @author Daniel Meyer
  *
  */
 public class LdapConfiguration {
-  
+
   protected String initialContextFactory = "com.sun.jndi.ldap.LdapCtxFactory";
   protected String securityAuthentication = "simple";
-  
+
   protected Map<String, String> contextProperties = new HashMap<String, String>();
-    
+
   protected String serverUrl;
   protected String managerDn = "";
   protected String managerPassword = "";
-  
+
   protected String baseDn = "";
 
   protected String userDnPattern = "";
-  
+
   protected String userSearchBase = "";
   protected String userSearchFilter = "(objectclass=person)";
-  
+
   protected String groupSearchBase = "";
   protected String groupSearchFilter = "(objectclass=groupOfNames)";
-   
+
   protected String userIdAttribute = "uid";
   protected String userFirstnameAttribute = "cn";
   protected String userLastnameAttribute = "sn";
   protected String userEmailAttribute = "email";
   protected String userPasswordAttribute = "userpassword";
-  
+
   protected String groupIdAttribute = "ou";
   protected String groupNameAttribute = "cn";
   protected String groupMemberAttribute = "memberOf";
-  
+
   protected boolean sortControlSupported = false;
-  
+
   protected boolean isUsePasswordDigest = false;
-  
-  protected PasswordDigest passwordDigest = new ShaHashDigest();
-  
-  
+
+  protected PasswordEncryptor passwordEncryptor = new ShaHashDigest();
+
+
   // getters / setters //////////////////////////////////////
-    
+
   public String getInitialContextFactory() {
     return initialContextFactory;
   }
-  
+
   public void setInitialContextFactory(String initialContextFactory) {
     this.initialContextFactory = initialContextFactory;
   }
-  
+
   public String getSecurityAuthentication() {
     return securityAuthentication;
   }
-  
+
   public void setSecurityAuthentication(String securityAuthentication) {
     this.securityAuthentication = securityAuthentication;
   }
@@ -87,7 +87,7 @@ public class LdapConfiguration {
   public Map<String, String> getContextProperties() {
     return contextProperties;
   }
-  
+
   public void setContextProperties(Map<String, String> contextProperties) {
     this.contextProperties = contextProperties;
   }
@@ -143,20 +143,20 @@ public class LdapConfiguration {
   public String getGroupNameAttribute() {
     return groupNameAttribute;
   }
-  
+
   public void setGroupNameAttribute(String groupNameAttribute) {
     this.groupNameAttribute = groupNameAttribute;
   }
 
-  
+
   public String getBaseDn() {
     return baseDn;
   }
-  
+
   public void setBaseDn(String baseDn) {
     this.baseDn = baseDn;
   }
-  
+
   public String getUserSearchBase() {
     return userSearchBase;
   }
@@ -212,11 +212,11 @@ public class LdapConfiguration {
   public void setUserPasswordAttribute(String userPasswordAttribute) {
     this.userPasswordAttribute = userPasswordAttribute;
   }
-  
+
   public boolean isSortControlSupported() {
     return sortControlSupported;
   }
-  
+
   public void setSortControlSupported(boolean sortControlSupported) {
     this.sortControlSupported = sortControlSupported;
   }
@@ -228,43 +228,43 @@ public class LdapConfiguration {
   public void setGroupIdAttribute(String groupIdAttribute) {
     this.groupIdAttribute = groupIdAttribute;
   }
-  
+
   public String getGroupMemberAttribute() {
     return groupMemberAttribute;
   }
-  
+
   public void setGroupMemberAttribute(String groupMemberAttribute) {
     this.groupMemberAttribute = groupMemberAttribute;
   }
-  
+
   public void setUsePasswordDigest(boolean isUsePasswordDigest) {
     this.isUsePasswordDigest = isUsePasswordDigest;
   }
-  
+
   public boolean isUsePasswordDigest() {
     return isUsePasswordDigest;
   }
 
-  /** The password digest to use for encrypting LDAP passwords.
-   * 
-   * <p>Some LDAP systems are configured in a way that they do not store the actual user password but rather 
-   * some encrypted or hashed representation of the password. In order to authenticate against such LDAP 
-   * installations we need to use the same hash / encryption procedure for transforming the user-provided 
+  /** The password encrptor to use for encrypting LDAP passwords.
+   *
+   * <p>Some LDAP systems are configured in a way that they do not store the actual user password but rather
+   * some encrypted or hashed representation of the password. In order to authenticate against such LDAP
+   * installations we need to use the same hash / encryption procedure for transforming the user-provided
    * password into the the encrypted / hashed form used by the LDAP installation.</p>
-   * 
-   * <p>By default, password digesting is turned off. In order to turn it on, use 
+   *
+   * <p>By default, password digesting is turned off. In order to turn it on, use
    * {@link #setUsePasswordDigest(boolean)}</p>
-   * 
-   * <p>If turned on, the default password digest implementation is used which works with 
+   *
+   * <p>If turned on, the default password digest implementation is used which works with
    * base64 encoded SHA hashes.</p>
-   *  
+   *
    */
-  public void setPasswordDigest(PasswordDigest passwordDigest) {
-    this.passwordDigest = passwordDigest;
+  public void setPasswordEncryptor(PasswordEncryptor passwordEncryptor) {
+    this.passwordEncryptor = passwordEncryptor;
   }
-  
-  public PasswordDigest getPasswordDigest() {
-    return passwordDigest;
+
+  public PasswordEncryptor getPasswordEncryptor() {
+    return passwordEncryptor;
   }
 
   public SearchControls getSearchControls() {
