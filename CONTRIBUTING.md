@@ -17,7 +17,7 @@ Before you ask a question, search the forum. The answer may have already been pr
 * Register yourself on our [issue tracker](https://app.camunda.com/jira/)
 * Search the list of open issues first, your bug or feature may have already been reported
 * When filing a bug
-  * Be consise
+  * Be concise
   * Qualify steps to reproduce a problem
   * Specify environment you found the bug in (library version etc.)
   * If possible, attach a test case that reproduces the problem
