@@ -29,9 +29,9 @@ import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
 public class UserQueryDto extends AbstractQueryDto<UserQuery> {
 
   private static final String SORT_BY_USER_ID_VALUE = "userId";
-  private static final String SORT_BY_USER_FIRSTNAME_VALUE = "userFirstName";
-  private static final String SORT_BY_USER_LASTNAME_VALUE = "userLastName";
-  private static final String SORT_BY_USER_EMAIL_VALUE = "userEmail";
+  private static final String SORT_BY_USER_FIRSTNAME_VALUE = "firstName";
+  private static final String SORT_BY_USER_LASTNAME_VALUE = "lastName";
+  private static final String SORT_BY_USER_EMAIL_VALUE = "email";
   
   private static final List<String> VALID_SORT_BY_VALUES;
   static {
@@ -42,13 +42,13 @@ public class UserQueryDto extends AbstractQueryDto<UserQuery> {
     VALID_SORT_BY_VALUES.add(SORT_BY_USER_EMAIL_VALUE);
   }
   
-  protected String userId;
-  protected String userFirstName;
-  protected String userFirstNameLike;
-  protected String userLastName;
-  protected String userLastNameLike;
-  protected String userEmail;
-  protected String userEmailLike;
+  protected String id;
+  protected String firstName;
+  protected String firstNameLike;
+  protected String lastName;
+  protected String lastNameLike;
+  protected String email;
+  protected String emailLike;
   protected String memberOfGroup;
   protected String potentialStarter;
     
@@ -60,34 +60,34 @@ public class UserQueryDto extends AbstractQueryDto<UserQuery> {
     super(queryParameters);
   }
 
-  @CamundaQueryParam("userId")
-  public void setUserId(String userId) {
-    this.userId = userId;
+  @CamundaQueryParam("id")
+  public void setId(String userId) {
+    this.id = userId;
   }
   
-  @CamundaQueryParam("userFirstName")
-  public void setUserFirstName(String userFirstName) {
-    this.userFirstName = userFirstName;
+  @CamundaQueryParam("firstName")
+  public void setFirstName(String userFirstName) {
+    this.firstName = userFirstName;
   }
 
-  @CamundaQueryParam("userFirstNameLike")
-  public void setUserFirstNameLike(String userFirstNameLike) {
-    this.userFirstNameLike = userFirstNameLike;
+  @CamundaQueryParam("firstNameLike")
+  public void setFirstNameLike(String userFirstNameLike) {
+    this.firstNameLike = userFirstNameLike;
   }
 
-  @CamundaQueryParam("userLastName")
-  public void setUserLastName(String userLastName) {
-    this.userLastName = userLastName;
+  @CamundaQueryParam("lastName")
+  public void setLastName(String userLastName) {
+    this.lastName = userLastName;
   }
 
-  @CamundaQueryParam("userEmail")
-  public void setUserEmail(String userEmail) {
-    this.userEmail = userEmail;
+  @CamundaQueryParam("email")
+  public void setEmail(String userEmail) {
+    this.email = userEmail;
   }
 
-  @CamundaQueryParam("userEmailLike")
-  public void setUserEmailLike(String userEmailLike) {
-    this.userEmailLike = userEmailLike;
+  @CamundaQueryParam("emailLike")
+  public void setEmailLike(String userEmailLike) {
+    this.emailLike = userEmailLike;
   }
   
   @CamundaQueryParam("memberOfGroup")
@@ -112,26 +112,26 @@ public class UserQueryDto extends AbstractQueryDto<UserQuery> {
 
   @Override
   protected void applyFilters(UserQuery query) {
-    if (userId != null) {
-      query.userId(userId);
+    if (id != null) {
+      query.userId(id);
     }
-    if (userFirstName != null) {
-      query.userFirstName(userFirstName);
+    if (firstName != null) {
+      query.userFirstName(firstName);
     }
-    if (userFirstNameLike != null) {
-      query.userFirstNameLike(userFirstNameLike);
+    if (firstNameLike != null) {
+      query.userFirstNameLike(firstNameLike);
     }
-    if (userLastName != null) {
-      query.userLastName(userLastName);
+    if (lastName != null) {
+      query.userLastName(lastName);
     }
-    if (userLastNameLike != null) {
-      query.userLastNameLike(userLastNameLike);
+    if (lastNameLike != null) {
+      query.userLastNameLike(lastNameLike);
     }
-    if (userEmail != null) {
-      query.userEmail(userEmail);
+    if (email != null) {
+      query.userEmail(email);
     }
-    if (userEmailLike != null) {
-      query.userEmailLike(userEmailLike);
+    if (emailLike != null) {
+      query.userEmailLike(emailLike);
     }
     if (memberOfGroup != null) {
       query.memberOfGroup(memberOfGroup);

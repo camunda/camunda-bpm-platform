@@ -58,7 +58,6 @@ public class UserDto extends LinkableDto {
     result.firstName = user.getFirstName();
     result.lastName = user.getLastName();
     result.email = user.getEmail();
-    result.password = user.getPassword();
     return result;
   }
   

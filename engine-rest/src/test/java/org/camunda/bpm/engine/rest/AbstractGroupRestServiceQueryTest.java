@@ -76,7 +76,7 @@ public abstract class AbstractGroupRestServiceQueryTest extends AbstractRestServ
   
   @Test
   public void testSortByParameterOnly() {
-    given().queryParam("sortBy", "groupName")
+    given().queryParam("sortBy", "name")
       .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
       .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
       .body("message", equalTo("Only a single sorting parameter specified. sortBy and sortOrder required"))
@@ -104,7 +104,7 @@ public abstract class AbstractGroupRestServiceQueryTest extends AbstractRestServ
   public void testSimpleGroupQuery() {
     String queryName = MockProvider.EXAMPLE_GROUP_NAME;
     
-    Response response = given().queryParam("groupName", queryName)
+    Response response = given().queryParam("name", queryName)
       .then().expect().statusCode(Status.OK.getStatusCode())
       .when().get(GROUP_QUERY_URL);
     
@@ -118,8 +118,10 @@ public abstract class AbstractGroupRestServiceQueryTest extends AbstractRestServ
     Assert.assertNotNull("The returned group should not be null.", instances.get(0));
     
     String returendName = from(content).getString("[0].name");
+    String returendType = from(content).getString("[0].type");
     
     Assert.assertEquals(MockProvider.EXAMPLE_GROUP_NAME, returendName);
+    Assert.assertEquals(MockProvider.EXAMPLE_GROUP_TYPE, returendType);
     
   }
   
@@ -127,7 +129,7 @@ public abstract class AbstractGroupRestServiceQueryTest extends AbstractRestServ
   public void testCompleteGetParameters() {
     
     Map<String, String> queryParameters = getCompleteStringQueryParameters();
-    queryParameters.put("groupMember", MockProvider.EXAMPLE_USER_ID);
+    queryParameters.put("member", MockProvider.EXAMPLE_USER_ID);
     
     RequestSpecification requestSpecification = given().contentType(POST_JSON_CONTENT_TYPE);
     for (Entry<String, String> paramEntry : queryParameters.entrySet()) {
@@ -138,6 +140,7 @@ public abstract class AbstractGroupRestServiceQueryTest extends AbstractRestServ
       .when().get(GROUP_QUERY_URL);
     
     verify(mockQuery).groupName(MockProvider.EXAMPLE_GROUP_NAME);
+    verify(mockQuery).groupType(MockProvider.EXAMPLE_GROUP_TYPE);
     verify(mockQuery).groupMember(MockProvider.EXAMPLE_USER_ID);
     
     verify(mockQuery).list();
@@ -147,7 +150,8 @@ public abstract class AbstractGroupRestServiceQueryTest extends AbstractRestServ
   private Map<String, String> getCompleteStringQueryParameters() {
     Map<String, String> parameters = new HashMap<String, String>();
     
-    parameters.put("groupName", MockProvider.EXAMPLE_GROUP_NAME);
+    parameters.put("name", MockProvider.EXAMPLE_GROUP_NAME);
+    parameters.put("type", MockProvider.EXAMPLE_GROUP_TYPE);
   
     return parameters;
   }

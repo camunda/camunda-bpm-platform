@@ -135,6 +135,7 @@ public abstract class MockProvider {
   // user & groups
   public static final String EXAMPLE_GROUP_ID = "group1Id";
   public static final String EXAMPLE_GROUP_NAME = "group1";
+  public static final String EXAMPLE_GROUP_TYPE = "organizational-unit";
   public static final String EXAMPLE_GROUP_NAME_UPDATE = "group1Update";
  
   public static final String EXAMPLE_USER_ID = "userId";
@@ -361,6 +362,7 @@ public abstract class MockProvider {
     Group mockGroup = mock(Group.class);
     when(mockGroup.getId()).thenReturn(EXAMPLE_GROUP_ID);
     when(mockGroup.getName()).thenReturn(EXAMPLE_GROUP_NAME);
+    when(mockGroup.getType()).thenReturn(EXAMPLE_GROUP_TYPE);
     
     return mockGroup;
   }

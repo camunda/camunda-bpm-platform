@@ -76,7 +76,7 @@ public abstract class AbstractUserRestServiceQueryTest extends AbstractRestServi
   
   @Test
   public void testSortByParameterOnly() {
-    given().queryParam("sortBy", "userFirstName")
+    given().queryParam("sortBy", "firstName")
       .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
       .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
       .body("message", equalTo("Only a single sorting parameter specified. sortBy and sortOrder required"))
@@ -104,7 +104,7 @@ public abstract class AbstractUserRestServiceQueryTest extends AbstractRestServi
   public void testSimpleUserQuery() {
     String queryFirstName = MockProvider.EXAMPLE_USER_FIRST_NAME;
     
-    Response response = given().queryParam("userFirstName", queryFirstName)
+    Response response = given().queryParam("firstName", queryFirstName)
       .then().expect().statusCode(Status.OK.getStatusCode())
       .when().get(USER_QUERY_URL);
     
@@ -153,9 +153,9 @@ public abstract class AbstractUserRestServiceQueryTest extends AbstractRestServi
   private Map<String, String> getCompleteStringQueryParameters() {
     Map<String, String> parameters = new HashMap<String, String>();
     
-    parameters.put("userFirstName", MockProvider.EXAMPLE_USER_FIRST_NAME);
-    parameters.put("userLastName", MockProvider.EXAMPLE_USER_LAST_NAME);
-    parameters.put("userEmail", MockProvider.EXAMPLE_USER_EMAIL);
+    parameters.put("firstName", MockProvider.EXAMPLE_USER_FIRST_NAME);
+    parameters.put("lastName", MockProvider.EXAMPLE_USER_LAST_NAME);
+    parameters.put("email", MockProvider.EXAMPLE_USER_EMAIL);
   
     return parameters;
   }
