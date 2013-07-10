@@ -17,7 +17,6 @@ import javax.ws.rs.DELETE;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import org.camunda.bpm.engine.rest.dto.identity.CreateGroupMemberDto;
@@ -32,13 +31,10 @@ public interface GroupMemberResource {
   @POST
   @Path("/create")
   @Consumes(MediaType.APPLICATION_JSON)
-  @Produces(MediaType.APPLICATION_JSON)
   public void createGroupMember(CreateGroupMemberDto groupMemberDto);
   
   @DELETE
   @Path("/{userId}")
-  @Consumes(MediaType.APPLICATION_JSON)
-  @Produces(MediaType.APPLICATION_JSON)
   public void deleteGroupMember(@PathParam("userId") String userId);
   
 }
