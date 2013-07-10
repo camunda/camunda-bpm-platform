@@ -27,6 +27,7 @@ import javax.ws.rs.core.Response.Status;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.GroupQuery;
+import org.camunda.bpm.engine.rest.dto.identity.CreateGroupMemberDto;
 import org.camunda.bpm.engine.rest.dto.identity.GroupDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
@@ -42,7 +43,10 @@ import com.jayway.restassured.http.ContentType;
 public abstract class AbstractGroupRestServiceInteractionTest extends AbstractRestServiceTest {
   
   protected static final String GROUP_URL = TEST_RESOURCE_ROOT_PATH + "/group/{id}";
-  protected static final String CREATE_GROUP_URL = TEST_RESOURCE_ROOT_PATH + "/group/create";
+  protected static final String GROUP_MEMBERS_URL = GROUP_URL+ "/members";
+  protected static final String GROUP_MEMBER_CREATE_URL = GROUP_MEMBERS_URL + "/create";
+  protected static final String GROUP_MEMBERS_DELETE_URL = GROUP_MEMBERS_URL + "/{userId}";
+  protected static final String GROUP_CREATE_URL = TEST_RESOURCE_ROOT_PATH + "/group/create";
   
   protected IdentityService identityServiceMock;
   
@@ -146,7 +150,7 @@ public abstract class AbstractGroupRestServiceInteractionTest extends AbstractRe
     
     given().body(GroupDto.fromGroup(newGroup)).contentType(ContentType.JSON)
       .then().expect().statusCode(Status.OK.getStatusCode()).contentType(ContentType.JSON)
-      .when().post(CREATE_GROUP_URL);
+      .when().post(GROUP_CREATE_URL);
     
     verify(identityServiceMock).newGroup(MockProvider.EXAMPLE_GROUP_ID);
     verify(newGroup).setName(MockProvider.EXAMPLE_GROUP_NAME);
@@ -163,10 +167,41 @@ public abstract class AbstractGroupRestServiceInteractionTest extends AbstractRe
       .then().expect().statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).contentType(ContentType.JSON)
       .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
       .body("message", equalTo("Exception while saving new group "))
-      .when().post(CREATE_GROUP_URL);
+      .when().post(GROUP_CREATE_URL);
     
     verify(identityServiceMock).newGroup(MockProvider.EXAMPLE_GROUP_ID);
     verify(identityServiceMock).saveGroup(newGroup);
+  }
+  
+  @Test
+  public void testCreateGroupMember() {
+    
+    CreateGroupMemberDto createGroupMemberDto = new CreateGroupMemberDto();
+    createGroupMemberDto.setUserId(MockProvider.EXAMPLE_USER_ID);
+    
+    given()
+        .pathParam("id", MockProvider.EXAMPLE_GROUP_ID)
+        .body(createGroupMemberDto).contentType(ContentType.JSON)
+    .then().expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+        .post(GROUP_MEMBER_CREATE_URL);
+    
+    verify(identityServiceMock).createMembership(MockProvider.EXAMPLE_USER_ID, MockProvider.EXAMPLE_GROUP_ID);
+  }
+  
+  @Test
+  public void testDeleteGroupMember() {
+
+    given()
+        .pathParam("id", MockProvider.EXAMPLE_GROUP_ID)
+        .pathParam("userId", MockProvider.EXAMPLE_USER_ID)
+    .then().expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+        .delete(GROUP_MEMBERS_DELETE_URL);
+    
+    verify(identityServiceMock).deleteMembership(MockProvider.EXAMPLE_USER_ID, MockProvider.EXAMPLE_GROUP_ID);
   }
   
   @Test
@@ -178,7 +213,7 @@ public abstract class AbstractGroupRestServiceInteractionTest extends AbstractRe
       .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
       .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
       .body("message", equalTo("Identity service implementation is read-only."))
-      .when().post(CREATE_GROUP_URL);
+      .when().post(GROUP_CREATE_URL);
     
     verify(identityServiceMock, never()).newGroup(MockProvider.EXAMPLE_GROUP_ID);    
   }
@@ -209,6 +244,41 @@ public abstract class AbstractGroupRestServiceInteractionTest extends AbstractRe
       .when().delete(GROUP_URL);
     
     verify(identityServiceMock, never()).deleteGroup(MockProvider.EXAMPLE_GROUP_ID);    
+  }
+  
+  @Test
+  public void testReadOnlyCreateGroupFails() {
+    when(identityServiceMock.isReadOnly()).thenReturn(true);
+    
+    CreateGroupMemberDto createGroupMemberDto = new CreateGroupMemberDto();
+    createGroupMemberDto.setUserId(MockProvider.EXAMPLE_USER_ID);
+    
+    given()
+      .pathParam("id", MockProvider.EXAMPLE_GROUP_ID)
+      .body(createGroupMemberDto).contentType(ContentType.JSON)
+    .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+      .body("message", equalTo("Identity service implementation is read-only."))
+    .when().post(GROUP_MEMBER_CREATE_URL);
+    
+    verify(identityServiceMock, never()).createMembership(MockProvider.EXAMPLE_USER_ID, MockProvider.EXAMPLE_GROUP_ID);    
+  }
+  
+  @Test
+  public void testReadOnlyGroupMemberDeleteFails() {
+    when(identityServiceMock.isReadOnly()).thenReturn(true);
+    
+    given()
+        .pathParam("id", MockProvider.EXAMPLE_GROUP_ID)
+        .pathParam("userId", MockProvider.EXAMPLE_USER_ID)
+    .then().expect()
+        .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+        .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+        .body("message", equalTo("Identity service implementation is read-only."))
+    .when()
+        .delete(GROUP_MEMBERS_DELETE_URL);
+    
+    verify(identityServiceMock, never()).deleteMembership(MockProvider.EXAMPLE_USER_ID, MockProvider.EXAMPLE_GROUP_ID);    
   }
 
 }

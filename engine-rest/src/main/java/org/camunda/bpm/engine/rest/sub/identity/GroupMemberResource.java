@@ -14,34 +14,31 @@ package org.camunda.bpm.engine.rest.sub.identity;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-import org.camunda.bpm.engine.rest.dto.identity.GroupDto;
+import org.camunda.bpm.engine.rest.dto.identity.CreateGroupMemberDto;
+
 
 /**
  * @author Daniel Meyer
  *
  */
-public interface GroupResource {
-
-  @GET
-  @Produces(MediaType.APPLICATION_JSON)
-  public GroupDto getGroup();
-
-  @DELETE
-  @Produces(MediaType.APPLICATION_JSON)
-  public void deleteGroup();
-
+public interface GroupMemberResource {
+  
   @POST
+  @Path("/create")
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
-  public GroupDto updateGroup(GroupDto Group);
+  public void createGroupMember(CreateGroupMemberDto groupMemberDto);
   
-  @Path("/members")
-  GroupMemberResource getGroupMembersResource();
-
+  @DELETE
+  @Path("/{userId}")
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
+  public void deleteGroupMember(@PathParam("userId") String userId);
+  
 }

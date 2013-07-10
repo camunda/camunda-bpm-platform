@@ -19,6 +19,7 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.rest.dto.identity.GroupDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+import org.camunda.bpm.engine.rest.sub.identity.GroupMemberResource;
 import org.camunda.bpm.engine.rest.sub.identity.GroupResource;
 
 /**
@@ -73,6 +74,10 @@ public class GroupResourceImpl extends AbstractIdentityResource implements Group
         
   }
 
+  public GroupMemberResource getGroupMembersResource() {
+    return new GroupMemberResourceImpl(processEngine, resourceId);
+  }
+  
   protected Group findGroupObject() {
     try {      
       return identityService.createGroupQuery()
