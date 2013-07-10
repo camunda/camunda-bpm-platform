@@ -28,9 +28,9 @@ import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
  */
 public class GroupQueryDto extends AbstractQueryDto<GroupQuery> {
 
-  private static final String SORT_BY_GROUP_ID_VALUE = "groupId";
-  private static final String SORT_BY_GROUP_NAME_VALUE = "groupName";
-  private static final String SORT_BY_GROUP_TYPE_VALUE = "groupType";
+  private static final String SORT_BY_GROUP_ID_VALUE = "id";
+  private static final String SORT_BY_GROUP_NAME_VALUE = "name";
+  private static final String SORT_BY_GROUP_TYPE_VALUE = "type";
   
   private static final List<String> VALID_SORT_BY_VALUES;
   static {
@@ -40,11 +40,11 @@ public class GroupQueryDto extends AbstractQueryDto<GroupQuery> {
     VALID_SORT_BY_VALUES.add(SORT_BY_GROUP_TYPE_VALUE);
   }
   
-  protected String groupId;
-  protected String groupName;
-  protected String groupNameLike;
-  protected String groupType;
-  protected String groupMember;
+  protected String id;
+  protected String name;
+  protected String nameLike;
+  protected String type;
+  protected String member;
     
   public GroupQueryDto() {
     
@@ -54,29 +54,29 @@ public class GroupQueryDto extends AbstractQueryDto<GroupQuery> {
     super(queryParameters);
   }
 
-  @CamundaQueryParam("groupId")
-  public void setGroupId(String groupId) {
-    this.groupId = groupId;
+  @CamundaQueryParam("id")
+  public void setId(String groupId) {
+    this.id = groupId;
   }
   
-  @CamundaQueryParam("groupName")
-  public void setGroupName(String groupName) {
-    this.groupName = groupName;
+  @CamundaQueryParam("name")
+  public void setName(String groupName) {
+    this.name = groupName;
   }
 
-  @CamundaQueryParam("groupNameLike")
-  public void setGroupNameLike(String groupNameLike) {
-    this.groupNameLike = groupNameLike;
+  @CamundaQueryParam("nameLike")
+  public void setNameLike(String groupNameLike) {
+    this.nameLike = groupNameLike;
   }
   
-  @CamundaQueryParam("groupType")
-  public void setGroupType(String groupType) {
-    this.groupType = groupType;
+  @CamundaQueryParam("type")
+  public void setType(String groupType) {
+    this.type = groupType;
   }
   
-  @CamundaQueryParam("groupMember")
-  public void setGroupMember(String groupMember) {
-    this.groupMember = groupMember;
+  @CamundaQueryParam("member")
+  public void setGroupMember(String member) {
+    this.member = member;
   }
     
   @Override
@@ -91,20 +91,20 @@ public class GroupQueryDto extends AbstractQueryDto<GroupQuery> {
 
   @Override
   protected void applyFilters(GroupQuery query) {
-    if (groupId != null) {
-      query.groupId(groupId);
+    if (id != null) {
+      query.groupId(id);
     }
-    if (groupName != null) {
-      query.groupName(groupName);
+    if (name != null) {
+      query.groupName(name);
     }
-    if (groupNameLike != null) {
-      query.groupNameLike(groupNameLike);
+    if (nameLike != null) {
+      query.groupNameLike(nameLike);
     }
-    if (groupType != null) {
-      query.groupType(groupType);
+    if (type != null) {
+      query.groupType(type);
     }
-    if (groupMember != null) {
-      query.groupMember(groupMember);
+    if (member != null) {
+      query.groupMember(member);
     }
   }
   
