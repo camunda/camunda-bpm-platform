@@ -19,9 +19,9 @@ public class EnginesFilterTest {
     Pattern pattern = EnginesFilter.HTML_FILE_PATTERN;
 
     // when
-    Matcher matcher1 = pattern.matcher("/app/");
-    Matcher matcher2 = pattern.matcher("/app/engine1/");
-    Matcher matcher3 = pattern.matcher("/app/engine1/something/asd.html");
+    Matcher matcher1 = pattern.matcher("/app/cockpit/");
+    Matcher matcher2 = pattern.matcher("/app/cockpit/engine1/");
+    Matcher matcher3 = pattern.matcher("/app/cockpit/engine1/something/asd.html");
 
     // then
 
