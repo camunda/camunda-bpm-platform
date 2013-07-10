@@ -260,7 +260,7 @@
       </build>
       <properties>
         <java.resources.override>src/main/runtime/develop/resources</java.resources.override>
-        <maven.tomcat.path>/cockpit</maven.tomcat.path>
+        <maven.tomcat.path>/camunda</maven.tomcat.path>
       </properties>
     </profile>
 

@@ -21,7 +21,7 @@ public class DashboardIT {
 
       TestProperties testProperties = new TestProperties(48080);
 
-      appUrl = testProperties.getApplicationPath("/cockpit");
+      appUrl = testProperties.getApplicationPath("/camunda/app/cockpit");
       driver = new FirefoxDriver();
     }
 

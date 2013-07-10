@@ -7,7 +7,7 @@
   var pluginPackages = window.PLUGIN_PACKAGES || [];
 
   require({
-    baseUrl: '../../',
+    baseUrl: '../../../',
     paths: {
       'ngDefine' : 'assets/vendor/requirejs-angular-define/ngDefine',
       'domReady' : 'assets/vendor/require/domReady',
@@ -30,7 +30,7 @@
       'angular-sanitize': { deps: [ 'angular' ] }
     },
     packages: [
-      { name: 'cockpit', location: 'app', main: 'cockpit' },
+      { name: 'cockpit', location: 'app/cockpit', main: 'cockpit' },
       { name: 'cockpit-plugin', location: 'app/plugin' },
       { name: 'camunda-common', location: 'assets/vendor/camunda-common' },
       { name: 'bpmn', location : 'assets/vendor/cabpmn' },

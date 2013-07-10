@@ -17,9 +17,9 @@ import org.camunda.bpm.cockpit.impl.web.filter.AbstractTemplateFilter;
  */
 public class EnginesFilter extends AbstractTemplateFilter {
 
-  public static final String COCKPIT_ROOT_PLACEHOLDER = "$COCKPIT_ROOT";
+  public static final String COCKPIT_ROOT_PLACEHOLDER = "$APP_ROOT";
 
-  public static Pattern HTML_FILE_PATTERN = Pattern.compile("/app/(?:(\\w+)/(?:(|(.*\\.html))))?");
+  public static Pattern HTML_FILE_PATTERN = Pattern.compile("/app/cockpit/(?:(\\w+)/(?:(|(.*\\.html))))?");
 
   @Override
   protected void applyFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
@@ -39,7 +39,7 @@ public class EnginesFilter extends AbstractTemplateFilter {
 
         // access to /app/
         // redirect to /app/{defaultEngineName}/
-        response.sendRedirect(String.format("%s/app/%s/", contextPath, getDefaultEngineName()));
+        response.sendRedirect(String.format("%s/app/cockpit/%s/index.html", contextPath, getDefaultEngineName()));
       } else {
 
         // access to /app/{engineName},
@@ -59,7 +59,7 @@ public class EnginesFilter extends AbstractTemplateFilter {
   }
 
   protected void serveIndexPage(String engineName, HttpServletRequest request, HttpServletResponse response) throws IOException {
-    String data = getWebResourceContents("/app/index.html");
+    String data = getWebResourceContents("/app/cockpit/index.html");
 
     data = data.replace(COCKPIT_ROOT_PLACEHOLDER, request.getContextPath());
 
@@ -73,7 +73,7 @@ public class EnginesFilter extends AbstractTemplateFilter {
     if ("".equals(page) || "index.html".equals(page)) {
       serveIndexPage(engineName, request, response);
     } else {
-      request.getRequestDispatcher("/app/" + page).forward(request, response);
+      request.getRequestDispatcher("/app/cockpit/" + page).forward(request, response);
     }
   }
 }

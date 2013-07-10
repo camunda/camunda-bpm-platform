@@ -14,12 +14,12 @@
   </filter>
   <filter-mapping>
     <filter-name>Client Plugins Filter</filter-name>
-    <url-pattern>/app/bootstrap.js</url-pattern>
+    <url-pattern>/app/cockpit/cockpit-bootstrap.js</url-pattern>
     <dispatcher>REQUEST</dispatcher>
   </filter-mapping>
   <filter-mapping>
     <filter-name>Client Plugins Filter</filter-name>
-    <url-pattern>/app/cockpit.js</url-pattern>
+    <url-pattern>/app/cockpit/cockpit.js</url-pattern>
     <dispatcher>REQUEST</dispatcher>
   </filter-mapping>
 
