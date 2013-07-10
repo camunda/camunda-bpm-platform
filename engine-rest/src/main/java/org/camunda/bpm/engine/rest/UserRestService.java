@@ -25,6 +25,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
+import org.camunda.bpm.engine.rest.dto.identity.UserCreateDto;
 import org.camunda.bpm.engine.rest.dto.identity.UserDto;
 import org.camunda.bpm.engine.rest.sub.identity.UserResource;
 
@@ -54,6 +55,6 @@ public interface UserRestService {
   
   @POST
   @Path("/create")
-  UserDto createUser(UserDto userDto);
+  UserDto createUser(UserCreateDto userDto);
   
 }

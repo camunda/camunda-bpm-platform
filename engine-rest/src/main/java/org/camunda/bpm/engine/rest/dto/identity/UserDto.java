@@ -33,7 +33,6 @@ public class UserDto extends LinkableDto {
   protected String firstName;
   protected String lastName;
   protected String email;
-  protected String password;
   
   // links ////////////////////////////////////////////////
 
@@ -74,9 +73,7 @@ public class UserDto extends LinkableDto {
     dbUser.setFirstName(getFirstName());
     dbUser.setLastName(getLastName());
     dbUser.setEmail(getEmail());
-    dbUser.setPassword(getPassword());  
   }
-  
 
   // getter / setters ////////////////////////////////////
   
@@ -110,14 +107,6 @@ public class UserDto extends LinkableDto {
 
   public void setEmail(String email) {
     this.email = email;
-  }
-
-  public String getPassword() {
-    return password;
-  }
-
-  public void setPassword(String password) {
-    this.password = password;
   }
 
 }

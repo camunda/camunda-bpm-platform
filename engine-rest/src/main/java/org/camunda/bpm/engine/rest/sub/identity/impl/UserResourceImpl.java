@@ -17,6 +17,7 @@ import javax.ws.rs.core.Response.Status;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.identity.User;
+import org.camunda.bpm.engine.rest.dto.identity.UpdateUserPasswordDto;
 import org.camunda.bpm.engine.rest.dto.identity.UserDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.sub.identity.UserResource;
@@ -71,6 +72,24 @@ public class UserResourceImpl extends AbstractIdentityResource implements UserRe
       throw new InvalidRequestException(Status.INTERNAL_SERVER_ERROR, "Exception while deleting user "+resourceId+": "+e.getMessage());
     }
         
+  }
+  
+  public void updatePassword(UpdateUserPasswordDto user) {
+    ensureNotReadOnly();
+    
+    User dbUser = findUserObject();
+    if(dbUser == null) {
+      throw new InvalidRequestException(Status.NOT_FOUND, "User with id " + resourceId + " does not exist");
+    }
+    
+    dbUser.setPassword(user.getPassword());
+    try {
+      identityService.saveUser(dbUser);
+      
+    } catch (ProcessEngineException e) {
+      throw new InvalidRequestException(Status.INTERNAL_SERVER_ERROR, "Exception while updating user "+resourceId+": "+e.getMessage());
+    }
+    
   }
 
   protected User findUserObject() {

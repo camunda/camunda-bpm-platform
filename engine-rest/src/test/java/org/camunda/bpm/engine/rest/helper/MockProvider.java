@@ -142,6 +142,7 @@ public abstract class MockProvider {
   public static final String EXAMPLE_USER_FIRST_NAME = "firstName";
   public static final String EXAMPLE_USER_LAST_NAME = "lastName";
   public static final String EXAMPLE_USER_EMAIL = "test@example.org";
+  public static final String EXAMPLE_USER_PASSWORD = "s3cret";
   
   public static final String EXAMPLE_USER_FIRST_NAME_UPDATE = "firstNameUpdate";
   public static final String EXAMPLE_USER_LAST_NAME_UPDATE = "lastNameUpdate";

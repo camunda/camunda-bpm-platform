@@ -23,6 +23,7 @@ import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.identity.UserQuery;
 import org.camunda.bpm.engine.rest.UserRestService;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
+import org.camunda.bpm.engine.rest.dto.identity.UserCreateDto;
 import org.camunda.bpm.engine.rest.dto.identity.UserDto;
 import org.camunda.bpm.engine.rest.dto.identity.UserQueryDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
@@ -77,7 +78,7 @@ public class UserRestServiceImpl extends AbstractRestProcessEngineAware implemen
     return new CountResultDto(count);
   }
 
-  public UserDto createUser(UserDto userDto) {
+  public UserDto createUser(UserCreateDto userDto) {
     final IdentityService identityService = getIdentityService();
     
     if(identityService.isReadOnly()) {
@@ -87,6 +88,7 @@ public class UserRestServiceImpl extends AbstractRestProcessEngineAware implemen
     try {
       User newUser = identityService.newUser(userDto.getId());
       userDto.update(newUser);
+      newUser.setPassword(userDto.getPassword());      
       identityService.saveUser(newUser);
       return UserDto.fromUser(newUser);
       
