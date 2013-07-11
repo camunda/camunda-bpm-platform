@@ -80,7 +80,27 @@
     <profile>
       <id>upgrade</id>
       <build>
-        <plugins>    
+        <plugins>
+        
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <configuration>
+              <includes>
+                <include>**/*Test.java</include>
+                <include>**/Test*.java</include>
+              </includes>
+            </configuration>
+          </plugin>
+        
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+		          <skip>true</skip>
+		        </configuration>
+          </plugin>
+            
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-dependency-plugin</artifactId>
@@ -147,7 +167,7 @@
                 <goals>
                   <goal>java</goal>
                 </goals>
-                <phase>pre-integration-test</phase>
+                <phase>post-integration-test</phase>
                 <configuration>
                   <includeProjectDependencies>true</includeProjectDependencies>
                   <includePluginDependencies>true</includePluginDependencies>
