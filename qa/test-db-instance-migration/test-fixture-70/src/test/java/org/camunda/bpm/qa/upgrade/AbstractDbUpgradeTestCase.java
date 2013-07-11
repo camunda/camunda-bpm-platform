@@ -72,32 +72,4 @@ public abstract class AbstractDbUpgradeTestCase {
     identityService = processEngine.getIdentityService();
     managementService = processEngine.getManagementService();
   }
-  
-  @AfterClass
-  public static void cleanDatabase() {
-    
-    // delete all deployments
-    RepositoryService repositoryService = cachedProcessEngine.getRepositoryService();
-    List<Deployment> deployments = repositoryService
-      .createDeploymentQuery()
-      .list();
-    for (Deployment deployment : deployments) {
-      repositoryService.deleteDeployment(deployment.getId(), true);
-    }
-    
-    // drop DB
-    ((ProcessEngineImpl)cachedProcessEngine).getProcessEngineConfiguration()
-      .getCommandExecutorTxRequired()
-      .execute(new Command<Void>() {
-        public Void execute(CommandContext commandContext) {
-          
-          commandContext.getDbSqlSession().dbSchemaDrop();
-          
-          return null;
-        }
-      });
-      
-    cachedProcessEngine.close();
-  }
-  
 }
