@@ -12,101 +12,45 @@
  */
 package org.camunda.bpm.engine.rest.dto.identity;
 
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.ws.rs.core.UriBuilder;
-
 import org.camunda.bpm.engine.identity.User;
-import org.camunda.bpm.engine.rest.ProcessInstanceRestService;
-import org.camunda.bpm.engine.rest.dto.AtomLink;
-import org.camunda.bpm.engine.rest.dto.LinkableDto;
 
 /**
  * @author Daniel Meyer
- *
+ * 
  */
-public class UserDto extends LinkableDto {
-  
-  protected String id;
-  protected String firstName;
-  protected String lastName;
-  protected String email;
-  
-  // links ////////////////////////////////////////////////
+public class UserDto {
 
-  public AtomLink generateLink(UriBuilder rootUriBuilder, String action, String relation) {
-    
-    UriBuilder builder = rootUriBuilder.path(ProcessInstanceRestService.class).path("{id}");
-    if (action != null) {
-      builder.path(action);
+  protected UserProfileDto profile;
+
+  protected UserCredentialsDto credentials;
+  
+  // transformers //////////////////////////////////
+  
+  public static UserDto fromUser(User user, boolean isIncludeCredentials) {
+    UserDto userDto = new UserDto();
+    userDto.setProfile(UserProfileDto.fromUser(user));
+    if(isIncludeCredentials) {
+      userDto.setCredentials(UserCredentialsDto.fromUser(user));
     }
-    
-    URI linkUri = builder.build(id);
-    AtomLink link = new AtomLink(relation, linkUri.toString());
-    return link;
-    
+    return userDto;
   }
+
+  // getters / setters /////////////////////////////
   
-  // transformers ////////////////////////////////////////
-  
-  public static UserDto fromUser(User user) {
-    UserDto result = new UserDto();
-    result.id = user.getId();
-    result.firstName = user.getFirstName();
-    result.lastName = user.getLastName();
-    result.email = user.getEmail();
-    return result;
-  }
-  
-  public static List<UserDto> fromUserList(List<User> sourceList) {
-    List<UserDto> resultList = new ArrayList<UserDto>(); 
-    for (User user : sourceList) {
-      resultList.add(fromUser(user));
-    }
-    return resultList;
-  }
-  
-  public void update(User dbUser) {  
-    dbUser.setId(getId());
-    dbUser.setFirstName(getFirstName());
-    dbUser.setLastName(getLastName());
-    dbUser.setEmail(getEmail());
+  public UserProfileDto getProfile() {
+    return profile;
   }
 
-  // getter / setters ////////////////////////////////////
-  
-  public String getId() {
-    return id;
+  public void setProfile(UserProfileDto profile) {
+    this.profile = profile;
   }
 
-  public void setId(String id) {
-    this.id = id;
+  public UserCredentialsDto getCredentials() {
+    return credentials;
   }
 
-  public String getFirstName() {
-    return firstName;
-  }
-
-  public void setFirstName(String firstName) {
-    this.firstName = firstName;
-  }
-
-  public String getLastName() {
-    return lastName;
-  }
-
-  public void setLastName(String lastName) {
-    this.lastName = lastName;
-  }
-
-  public String getEmail() {
-    return email;
-  }
-
-  public void setEmail(String email) {
-    this.email = email;
+  public void setCredentials(UserCredentialsDto credentials) {
+    this.credentials = credentials;
   }
 
 }

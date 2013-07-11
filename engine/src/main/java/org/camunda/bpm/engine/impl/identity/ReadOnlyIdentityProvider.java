@@ -16,7 +16,6 @@ import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.GroupQuery;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.identity.UserQuery;
-import org.camunda.bpm.engine.impl.UserQueryImpl;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.Session;
 
@@ -51,7 +50,7 @@ public interface ReadOnlyIdentityProvider extends Session {
    * @return a {@link UserQuery} object which can be used in the current command context
    * @throws IdentityProviderException in case an error occurs
    */
-  public UserQueryImpl createUserQuery(CommandContext commandContext);
+  public UserQuery createUserQuery(CommandContext commandContext);
 
   /**
    * @return 'true' if the password matches the

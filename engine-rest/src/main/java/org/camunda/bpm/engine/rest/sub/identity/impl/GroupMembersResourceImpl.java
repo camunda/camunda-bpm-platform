@@ -15,25 +15,24 @@ package org.camunda.bpm.engine.rest.sub.identity.impl;
 import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.rest.dto.identity.CreateGroupMemberDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
-import org.camunda.bpm.engine.rest.sub.identity.GroupMemberResource;
+import org.camunda.bpm.engine.rest.sub.identity.GroupMembersResource;
 
 /**
  * @author Daniel Meyer
  *
  */
-public class GroupMemberResourceImpl extends AbstractIdentityResource implements GroupMemberResource {
+public class GroupMembersResourceImpl extends AbstractIdentityResource implements GroupMembersResource {
 
-  public GroupMemberResourceImpl(ProcessEngine processEngine, String resourceId) {
+  public GroupMembersResourceImpl(ProcessEngine processEngine, String resourceId) {
     super(processEngine, resourceId);
   }
 
-  public void createGroupMember(CreateGroupMemberDto groupMemberDto) {
+  public void createGroupMember(String userId) {
     ensureNotReadOnly();
     
     try {
-      identityService.createMembership(groupMemberDto.getUserId(), resourceId);
+      identityService.createMembership(userId, resourceId);
       
     } catch(Exception e) {
       throw new InvalidRequestException(Status.INTERNAL_SERVER_ERROR, "Exception adding user to group "+resourceId+": "+e.getMessage());

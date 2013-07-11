@@ -15,36 +15,42 @@ package org.camunda.bpm.engine.rest.sub.identity;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
-import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-import org.camunda.bpm.engine.rest.dto.identity.UpdateUserPasswordDto;
-import org.camunda.bpm.engine.rest.dto.identity.UserDto;
+import org.camunda.bpm.engine.rest.dto.identity.UserCredentialsDto;
+import org.camunda.bpm.engine.rest.dto.identity.UserProfileDto;
 
 /**
  * @author Daniel Meyer
  *
  */
 public interface UserResource {
-    
-  @GET
-  @Produces(MediaType.APPLICATION_JSON)
-  public UserDto getUser();
 
   @DELETE
   @Produces(MediaType.APPLICATION_JSON)
   public void deleteUser();
+
+  // profile ///////////////////
   
-  @POST
-  @Consumes(MediaType.APPLICATION_JSON)
+  @GET
+  @Path("/profile")
   @Produces(MediaType.APPLICATION_JSON)
-  public UserDto updateUser(UserDto user);
+  public UserProfileDto getUserProfile();
   
-  @POST
-  @Path("/password")
+  @PUT
+  @Path("/profile")
   @Consumes(MediaType.APPLICATION_JSON)
-  public void updatePassword(UpdateUserPasswordDto user);
+  public void updateProfile(UserProfileDto profile);
+
+  // credentials //////////////
+  
+  @PUT
+  @Path("/credentials")
+  @Consumes(MediaType.APPLICATION_JSON)
+  public void updateCredentials(UserCredentialsDto account);
+  
   
 }

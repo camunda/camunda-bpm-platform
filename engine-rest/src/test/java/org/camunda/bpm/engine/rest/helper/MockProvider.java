@@ -388,6 +388,7 @@ public abstract class MockProvider {
     when(mockUser.getFirstName()).thenReturn(EXAMPLE_USER_FIRST_NAME);
     when(mockUser.getLastName()).thenReturn(EXAMPLE_USER_LAST_NAME);
     when(mockUser.getEmail()).thenReturn(EXAMPLE_USER_EMAIL);
+    when(mockUser.getPassword()).thenReturn(EXAMPLE_USER_PASSWORD);
     return mockUser;
   }
   
@@ -397,6 +398,7 @@ public abstract class MockProvider {
     when(mockUser.getFirstName()).thenReturn(EXAMPLE_USER_FIRST_NAME_UPDATE);
     when(mockUser.getLastName()).thenReturn(EXAMPLE_USER_LAST_NAME_UPDATE);
     when(mockUser.getEmail()).thenReturn(EXAMPLE_USER_EMAIL_UPDATE);
+    when(mockUser.getPassword()).thenReturn(EXAMPLE_USER_PASSWORD);
     return mockUser;
   }
   

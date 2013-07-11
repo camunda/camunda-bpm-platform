@@ -12,23 +12,26 @@
  */
 package org.camunda.bpm.engine.rest.dto.identity;
 
+import org.camunda.bpm.engine.identity.User;
+
 /**
  * @author Daniel Meyer
  *
  */
-public class UpdateUserPasswordDto {
+public class UserCredentialsDto {
   
-  protected String userId;
   protected String password;
   
-  // getters / setters /////////////////////////
+  // transformers //////////////////////////////////
   
-  public String getUserId() {
-    return userId;
+  public static UserCredentialsDto fromUser(User user) {
+    UserCredentialsDto result = new UserCredentialsDto();
+    result.setPassword(user.getPassword());
+    return result;
   }
-  public void setUserId(String userId) {
-    this.userId = userId;
-  } 
+  
+  // getters / setters /////////////////////////////
+  
   public String getPassword() {
     return password;
   }

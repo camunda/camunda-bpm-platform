@@ -36,7 +36,7 @@ public abstract class AbstractIdentityResource {
   
   protected void ensureNotReadOnly() {
     if(identityService.isReadOnly()) {
-      throw new InvalidRequestException(Status.BAD_REQUEST, "Identity service implementation is read-only.");
+      throw new InvalidRequestException(Status.FORBIDDEN, "Identity service implementation is read-only.");
     }
   }
 

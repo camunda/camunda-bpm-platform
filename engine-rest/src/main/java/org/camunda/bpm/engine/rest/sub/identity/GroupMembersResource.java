@@ -12,26 +12,21 @@
  */
 package org.camunda.bpm.engine.rest.sub.identity;
 
-import javax.ws.rs.Consumes;
 import javax.ws.rs.DELETE;
-import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
-import javax.ws.rs.core.MediaType;
-
-import org.camunda.bpm.engine.rest.dto.identity.CreateGroupMemberDto;
 
 
 /**
  * @author Daniel Meyer
  *
  */
-public interface GroupMemberResource {
+public interface GroupMembersResource {
   
-  @POST
-  @Path("/create")
-  @Consumes(MediaType.APPLICATION_JSON)
-  public void createGroupMember(CreateGroupMemberDto groupMemberDto);
+  @PUT
+  @Path("/{userId}")
+  public void createGroupMember(@PathParam("userId") String userId);
   
   @DELETE
   @Path("/{userId}")

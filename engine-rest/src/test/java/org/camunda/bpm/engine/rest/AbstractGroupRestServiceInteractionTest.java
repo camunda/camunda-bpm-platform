@@ -27,7 +27,6 @@ import javax.ws.rs.core.Response.Status;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.GroupQuery;
-import org.camunda.bpm.engine.rest.dto.identity.CreateGroupMemberDto;
 import org.camunda.bpm.engine.rest.dto.identity.GroupDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
@@ -43,9 +42,7 @@ import com.jayway.restassured.http.ContentType;
 public abstract class AbstractGroupRestServiceInteractionTest extends AbstractRestServiceTest {
   
   protected static final String GROUP_URL = TEST_RESOURCE_ROOT_PATH + "/group/{id}";
-  protected static final String GROUP_MEMBERS_URL = GROUP_URL+ "/members";
-  protected static final String GROUP_MEMBER_CREATE_URL = GROUP_MEMBERS_URL + "/create";
-  protected static final String GROUP_MEMBERS_DELETE_URL = GROUP_MEMBERS_URL + "/{userId}";
+  protected static final String GROUP_MEMBERS_URL = GROUP_URL + "/members/{userId}";
   protected static final String GROUP_CREATE_URL = TEST_RESOURCE_ROOT_PATH + "/group/create";
   
   protected IdentityService identityServiceMock;
@@ -114,8 +111,8 @@ public abstract class AbstractGroupRestServiceInteractionTest extends AbstractRe
     
     given().pathParam("id", MockProvider.EXAMPLE_GROUP_ID)
       .body(GroupDto.fromGroup(groupUpdate)).contentType(ContentType.JSON)
-      .then().expect().statusCode(Status.OK.getStatusCode())      
-      .when().post(GROUP_URL);
+      .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())      
+      .when().put(GROUP_URL);
     
     // initial group was updated
     verify(initialGroup).setName(groupUpdate.getName());
@@ -138,7 +135,7 @@ public abstract class AbstractGroupRestServiceInteractionTest extends AbstractRe
       .then().expect().statusCode(Status.NOT_FOUND.getStatusCode()).contentType(ContentType.JSON)
       .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
       .body("message", equalTo("Group with id aNonExistingGroup does not exist"))
-      .when().post(GROUP_URL);
+      .when().put(GROUP_URL);
     
     verify(identityServiceMock, never()).saveGroup(any(Group.class));    
   }
@@ -148,9 +145,12 @@ public abstract class AbstractGroupRestServiceInteractionTest extends AbstractRe
     Group newGroup = MockProvider.createMockGroup();    
     when(identityServiceMock.newGroup(MockProvider.EXAMPLE_GROUP_ID)).thenReturn(newGroup);
     
-    given().body(GroupDto.fromGroup(newGroup)).contentType(ContentType.JSON)
-      .then().expect().statusCode(Status.OK.getStatusCode()).contentType(ContentType.JSON)
-      .when().post(GROUP_CREATE_URL);
+    given()
+        .body(GroupDto.fromGroup(newGroup)).contentType(ContentType.JSON)
+    .then().expect()
+        .statusCode(Status.NO_CONTENT.getStatusCode())
+    .when()
+        .post(GROUP_CREATE_URL);
     
     verify(identityServiceMock).newGroup(MockProvider.EXAMPLE_GROUP_ID);
     verify(newGroup).setName(MockProvider.EXAMPLE_GROUP_NAME);
@@ -176,16 +176,13 @@ public abstract class AbstractGroupRestServiceInteractionTest extends AbstractRe
   @Test
   public void testCreateGroupMember() {
     
-    CreateGroupMemberDto createGroupMemberDto = new CreateGroupMemberDto();
-    createGroupMemberDto.setUserId(MockProvider.EXAMPLE_USER_ID);
-    
     given()
         .pathParam("id", MockProvider.EXAMPLE_GROUP_ID)
-        .body(createGroupMemberDto).contentType(ContentType.JSON)
+        .pathParam("userId", MockProvider.EXAMPLE_USER_ID)
     .then().expect()
         .statusCode(Status.NO_CONTENT.getStatusCode())
     .when()
-        .post(GROUP_MEMBER_CREATE_URL);
+        .put(GROUP_MEMBERS_URL);
     
     verify(identityServiceMock).createMembership(MockProvider.EXAMPLE_USER_ID, MockProvider.EXAMPLE_GROUP_ID);
   }
@@ -199,7 +196,7 @@ public abstract class AbstractGroupRestServiceInteractionTest extends AbstractRe
     .then().expect()
         .statusCode(Status.NO_CONTENT.getStatusCode())
     .when()
-        .delete(GROUP_MEMBERS_DELETE_URL);
+        .delete(GROUP_MEMBERS_URL);
     
     verify(identityServiceMock).deleteMembership(MockProvider.EXAMPLE_USER_ID, MockProvider.EXAMPLE_GROUP_ID);
   }
@@ -210,7 +207,7 @@ public abstract class AbstractGroupRestServiceInteractionTest extends AbstractRe
     when(identityServiceMock.isReadOnly()).thenReturn(true);
     
     given().body(GroupDto.fromGroup(newGroup)).contentType(ContentType.JSON)
-      .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+      .then().expect().statusCode(Status.FORBIDDEN.getStatusCode()).contentType(ContentType.JSON)
       .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
       .body("message", equalTo("Identity service implementation is read-only."))
       .when().post(GROUP_CREATE_URL);
@@ -223,12 +220,13 @@ public abstract class AbstractGroupRestServiceInteractionTest extends AbstractRe
     Group groupUdpdate = MockProvider.createMockGroup();    
     when(identityServiceMock.isReadOnly()).thenReturn(true);
     
-    given().pathParam("id", MockProvider.EXAMPLE_GROUP_ID)
-       .body(GroupDto.fromGroup(groupUdpdate)).contentType(ContentType.JSON)
-      .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
-      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
-      .body("message", equalTo("Identity service implementation is read-only."))
-      .when().post(GROUP_URL);
+    given()
+        .pathParam("id", MockProvider.EXAMPLE_GROUP_ID)
+        .body(GroupDto.fromGroup(groupUdpdate)).contentType(ContentType.JSON)
+    .then().expect().statusCode(Status.FORBIDDEN.getStatusCode()).contentType(ContentType.JSON)
+        .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+        .body("message", equalTo("Identity service implementation is read-only."))
+    .when().put(GROUP_URL);
     
     verify(identityServiceMock, never()).saveGroup(groupUdpdate);    
   }
@@ -237,29 +235,29 @@ public abstract class AbstractGroupRestServiceInteractionTest extends AbstractRe
   public void testReadOnlyGroupDeleteFails() {
     when(identityServiceMock.isReadOnly()).thenReturn(true);
     
-    given().pathParam("id", MockProvider.EXAMPLE_GROUP_ID)
-      .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
-      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
-      .body("message", equalTo("Identity service implementation is read-only."))
-      .when().delete(GROUP_URL);
+    given()
+        .pathParam("id", MockProvider.EXAMPLE_GROUP_ID)
+    .then().expect().statusCode(Status.FORBIDDEN.getStatusCode()).contentType(ContentType.JSON)
+        .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+        .body("message", equalTo("Identity service implementation is read-only."))
+    .when().delete(GROUP_URL);
     
     verify(identityServiceMock, never()).deleteGroup(MockProvider.EXAMPLE_GROUP_ID);    
   }
   
   @Test
-  public void testReadOnlyCreateGroupFails() {
+  public void testReadOnlyCreateGroupMemberFails() {
     when(identityServiceMock.isReadOnly()).thenReturn(true);
     
-    CreateGroupMemberDto createGroupMemberDto = new CreateGroupMemberDto();
-    createGroupMemberDto.setUserId(MockProvider.EXAMPLE_USER_ID);
-    
     given()
-      .pathParam("id", MockProvider.EXAMPLE_GROUP_ID)
-      .body(createGroupMemberDto).contentType(ContentType.JSON)
-    .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
-      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
-      .body("message", equalTo("Identity service implementation is read-only."))
-    .when().post(GROUP_MEMBER_CREATE_URL);
+        .pathParam("id", MockProvider.EXAMPLE_GROUP_ID)
+        .pathParam("userId", MockProvider.EXAMPLE_USER_ID)
+    .then().expect()
+        .statusCode(Status.FORBIDDEN.getStatusCode()).contentType(ContentType.JSON)
+        .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+        .body("message", equalTo("Identity service implementation is read-only."))
+    .when()
+        .put(GROUP_MEMBERS_URL);
     
     verify(identityServiceMock, never()).createMembership(MockProvider.EXAMPLE_USER_ID, MockProvider.EXAMPLE_GROUP_ID);    
   }
@@ -272,11 +270,11 @@ public abstract class AbstractGroupRestServiceInteractionTest extends AbstractRe
         .pathParam("id", MockProvider.EXAMPLE_GROUP_ID)
         .pathParam("userId", MockProvider.EXAMPLE_USER_ID)
     .then().expect()
-        .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+        .statusCode(Status.FORBIDDEN.getStatusCode()).contentType(ContentType.JSON)
         .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
         .body("message", equalTo("Identity service implementation is read-only."))
     .when()
-        .delete(GROUP_MEMBERS_DELETE_URL);
+        .delete(GROUP_MEMBERS_URL);
     
     verify(identityServiceMock, never()).deleteMembership(MockProvider.EXAMPLE_USER_ID, MockProvider.EXAMPLE_GROUP_ID);    
   }
