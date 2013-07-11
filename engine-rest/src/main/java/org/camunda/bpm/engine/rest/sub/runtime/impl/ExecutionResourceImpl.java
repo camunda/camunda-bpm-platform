@@ -12,13 +12,17 @@
  */
 package org.camunda.bpm.engine.rest.sub.runtime.impl;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.core.Response.Status;
 
+import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.rest.dto.job.JobDeleteMessageDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ExecutionDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ExecutionTriggerDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
@@ -28,6 +32,7 @@ import org.camunda.bpm.engine.rest.sub.runtime.EventSubscriptionResource;
 import org.camunda.bpm.engine.rest.sub.runtime.ExecutionResource;
 import org.camunda.bpm.engine.rest.util.DtoUtil;
 import org.camunda.bpm.engine.runtime.Execution;
+import org.camunda.bpm.engine.runtime.Job;
 
 public class ExecutionResourceImpl implements ExecutionResource {
 
@@ -59,8 +64,7 @@ public class ExecutionResourceImpl implements ExecutionResource {
       runtimeService.signal(executionId, variables);
     } catch (ProcessEngineException e) {
       throw new RestException(Status.INTERNAL_SERVER_ERROR, e, "Cannot signal execution " + executionId + ": " + e.getMessage());
-    }
-    
+    }    
   }
 
   @Override
@@ -73,4 +77,33 @@ public class ExecutionResourceImpl implements ExecutionResource {
     return new MessageEventSubscriptionResource(engine, executionId, messageName);
   }
 
+  @Override
+  public List<JobDeleteMessageDto> deleteJobs() {
+      RuntimeService runtimeService = engine.getRuntimeService();
+      Execution execution = runtimeService.createExecutionQuery().executionId(executionId).singleResult();
+
+     if (execution == null) {
+        throw new InvalidRequestException(Status.NOT_FOUND, "Execution with id " + executionId + " does not exist");
+     }
+
+     ManagementService managementService = engine.getManagementService();
+     List<Job> jobs = managementService.createJobQuery().executionId(execution.getId()).list();
+
+     List<JobDeleteMessageDto> jobDeleteMessages = new ArrayList<JobDeleteMessageDto>();
+
+     if (jobs == null) {
+        return jobDeleteMessages;
+     }
+
+     for (Job job : jobs) {
+		try {
+		  managementService.deleteJob(job.getId());
+		} catch (ProcessEngineException e) {
+          jobDeleteMessages.add(JobDeleteMessageDto.fromMessage(e.getMessage()));
+		  continue;
+        }
+	 }
+
+    return jobDeleteMessages;
+  }
 }

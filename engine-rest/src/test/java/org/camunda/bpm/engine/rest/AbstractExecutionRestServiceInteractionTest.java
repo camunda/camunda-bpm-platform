@@ -1,6 +1,7 @@
 package org.camunda.bpm.engine.rest;
 
 import static com.jayway.restassured.RestAssured.given;
+import static com.jayway.restassured.path.json.JsonPath.from;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
@@ -10,32 +11,41 @@ import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isNull;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import javax.ws.rs.core.Response.Status;
 
+import org.camunda.bpm.engine.ManagementService;
+import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.impl.RuntimeServiceImpl;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.helper.EqualsList;
 import org.camunda.bpm.engine.rest.helper.EqualsMap;
+import org.camunda.bpm.engine.rest.helper.MockJobBuilder;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.rest.util.VariablesBuilder;
 import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.EventSubscriptionQuery;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ExecutionQuery;
+import org.camunda.bpm.engine.runtime.Job;
+import org.camunda.bpm.engine.runtime.JobQuery;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.InOrder;
 
 import com.jayway.restassured.http.ContentType;
 import com.jayway.restassured.response.Response;
@@ -48,8 +58,10 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
   protected static final String SINGLE_EXECUTION_LOCAL_VARIABLE_URL = EXECUTION_LOCAL_VARIABLES_URL + "/{varId}";
   protected static final String MESSAGE_SUBSCRIPTION_URL = EXECUTION_URL + "/messageSubscriptions/{messageName}";
   protected static final String TRIGGER_MESSAGE_SUBSCRIPTION_URL = EXECUTION_URL + "/messageSubscriptions/{messageName}/trigger";
+  protected static final String EXECUTION_DELETE_JOB_URL = EXECUTION_URL + "/job";
   
   private RuntimeServiceImpl runtimeServiceMock;
+  private ManagementService managementServiceMock;
   
   @Before
   public void setUpRuntimeData() {
@@ -70,7 +82,7 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
     when(mockQuery.singleResult()).thenReturn(mockSubscription);
   }
 
-  @Test
+ @Test
   public void testGetSingleExecution() {
     Execution mockExecution = MockProvider.createMockExecution();
     ExecutionQuery sampleExecutionQuery = mock(ExecutionQuery.class);
@@ -407,5 +419,90 @@ public abstract class AbstractExecutionRestServiceInteractionTest extends Abstra
       .body("type", is(RestException.class.getSimpleName()))
       .body("message", is("Cannot trigger message " + messageName + " for execution " + MockProvider.EXAMPLE_EXECUTION_ID + ": expected exception"))
       .when().post(TRIGGER_MESSAGE_SUBSCRIPTION_URL);
+  } 
+  
+  @Test
+  public void testDeleteJobsByExecutionId() {
+
+      String executionId = MockProvider.EXAMPLE_EXECUTION_ID;
+
+	  Execution mockExecution = MockProvider.createMockExecution();
+	  ExecutionQuery executionQuery = createExecutionQueryMock(executionId);
+
+	  when(executionQuery.singleResult()).thenReturn(mockExecution);
+
+	  JobQuery mockQuery = createJobQueryMock(executionId);
+
+	  given().pathParam("id", executionId).then().expect()
+				.statusCode(Status.OK.getStatusCode())
+				.when()
+				.delete(EXECUTION_DELETE_JOB_URL);
+
+	  InOrder inOrder = inOrder(mockQuery);
+	  inOrder.verify(mockQuery).executionId(executionId);
+	  inOrder.verify(mockQuery).list();
+
+	  verify(managementServiceMock).deleteJob(MockProvider.EXAMPLE_JOB_ID);
+  }
+
+  @Test
+  public void testDeleteJobWhenItIsExecuting() {
+
+        String expectedMessage = "Cannot delete job when the job is being executed. Try again later.";
+		String executionId = MockProvider.EXAMPLE_EXECUTION_ID;
+
+		Execution mockExecution = MockProvider.createMockExecution();
+		ExecutionQuery executionQuery = createExecutionQueryMock(executionId);
+		when(executionQuery.singleResult()).thenReturn(mockExecution);
+
+		createJobQueryMock(executionId);
+	    doThrow(new ProcessEngineException(expectedMessage))
+			.when(managementServiceMock)
+			.deleteJob(MockProvider.EXAMPLE_JOB_ID);
+
+	   Response response = given().pathParam("id", executionId)
+	      .then().expect().statusCode(Status.OK.getStatusCode()).contentType(ContentType.JSON)
+	      .when().delete(EXECUTION_DELETE_JOB_URL);
+
+		String content = response.asString();
+		List<String> instances = from(content).getList("");
+		Assert.assertEquals("There should be one message returned.", 1,
+				instances.size());
+
+		String actualMessage = from(content).getString("[0].exceptionMessage");	
+		Assert.assertEquals(expectedMessage, actualMessage);
+  }
+
+  @Test
+  public void testDeleteJobsByNonExistentExecution() {
+
+	  String nonExistingExecutionId = "aNonExistingInstanceId";	
+	  ExecutionQuery executionQuery = createExecutionQueryMock(nonExistingExecutionId);
+	  when(executionQuery.singleResult()).thenReturn(null);
+
+	  given().pathParam("id", nonExistingExecutionId)
+	      .then().expect().statusCode(Status.NOT_FOUND.getStatusCode()).contentType(ContentType.JSON)
+	      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+	      .body("message", equalTo("Execution with id " + nonExistingExecutionId + " does not exist"))
+	      .when().delete(EXECUTION_DELETE_JOB_URL);
+  }
+
+  private JobQuery createJobQueryMock(String executionId) {
+	  managementServiceMock = mock(ManagementService.class);
+	  when(processEngine.getManagementService()).thenReturn(managementServiceMock);
+
+	  JobQuery mockQuery = mock(JobQuery.class);
+	  when(mockQuery.executionId(executionId)).thenReturn(mockQuery);
+	  when(managementServiceMock.createJobQuery()).thenReturn(mockQuery);
+	  List<Job> mockedJobs = MockProvider.createMockJobs();
+	  when(mockQuery.list()).thenReturn(mockedJobs);
+	  return mockQuery;
+  }
+
+  private ExecutionQuery createExecutionQueryMock(String executionId) {
+	  ExecutionQuery sampleExecutionQuery = mock(ExecutionQuery.class);
+	  when(runtimeServiceMock.createExecutionQuery()).thenReturn(sampleExecutionQuery);
+	  when(sampleExecutionQuery.executionId(executionId)).thenReturn(sampleExecutionQuery);
+	 return sampleExecutionQuery;
   }
 }
