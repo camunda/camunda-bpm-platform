@@ -80,7 +80,27 @@
     <profile>
       <id>upgrade</id>
       <build>
-        <plugins>    
+        <plugins>
+        
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-failsafe-plugin</artifactId>
+            <configuration>
+              <includes>
+                <include>**/*Test.java</include>
+                <include>**/Test*.java</include>
+              </includes>
+            </configuration>
+          </plugin>
+        
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-surefire-plugin</artifactId>
+            <configuration>
+		          <skip>true</skip>
+		        </configuration>
+          </plugin>
+            
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-dependency-plugin</artifactId>
@@ -140,6 +160,19 @@
                     <argument>process-engine-config70.xml</argument>
                     <argument>${project.build.directory}/scripts-current/sql/upgrade/${database.type}_engine_6.2_to_7.0.sql</argument>
                   </arguments>
+                </configuration>
+              </execution>
+              <execution>
+                <id>Drop upgraded DB</id>
+                <goals>
+                  <goal>java</goal>
+                </goals>
+                <phase>post-integration-test</phase>
+                <configuration>
+                  <includeProjectDependencies>true</includeProjectDependencies>
+                  <includePluginDependencies>true</includePluginDependencies>
+                  <classpathScope>test</classpathScope>
+                  <mainClass>org.camunda.bpm.qa.upgrade.DB70Dropper</mainClass>
                 </configuration>
               </execution>
             </executions>
