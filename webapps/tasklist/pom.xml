@@ -5,19 +5,19 @@
   <artifactId>camunda-tasklist-root</artifactId>
   <packaging>pom</packaging>
   <name>camunda BPM - tasklist - root</name>
-  
+
   <parent>
     <groupId>org.camunda.bpm</groupId>
     <artifactId>camunda-root</artifactId>
     <version>7.0.0-SNAPSHOT</version>
     <relativePath>../..</relativePath>
   </parent>
-  
+
   <modules>
     <module>tasklist</module>
     <module>tasklist-jboss</module>
     <module>tasklist-glassfish</module>
     <module>tasklist-tomcat</module>
   </modules>
-  
+
 </project>

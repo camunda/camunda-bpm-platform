@@ -62,7 +62,7 @@
       <artifactId>java-uuid-generator</artifactId>
       <scope>test</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>com.h2database</groupId>
       <artifactId>h2</artifactId>
@@ -135,6 +135,14 @@
           </archive>
         </configuration>
       </plugin>
+      <plugin>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <failIfNoTests>false</failIfNoTests>
+          <trimStackTrace>false</trimStackTrace>
+          <redirectTestOutputToFile>true</redirectTestOutputToFile>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
 
@@ -191,7 +199,7 @@
     </profile>
 
     <profile>
-      <id>dev</id>
+      <id>develop</id>
       <dependencies>
         <dependency>
           <groupId>org.jboss.resteasy</groupId>
@@ -229,7 +237,7 @@
                 </goals>
                 <configuration>
                   <sources>
-                    <source>src/main/runtime/dev/java</source>
+                    <source>src/main/runtime/develop/java</source>
                   </sources>
                 </configuration>
               </execution>
@@ -241,7 +249,7 @@
                 <configuration>
                   <resources>
                     <resource>
-                      <directory>src/main/runtime/dev/resources</directory>
+                      <directory>src/main/runtime/develop/resources</directory>
                     </resource>
                   </resources>
                 </configuration>
@@ -251,9 +259,174 @@
         </plugins>
       </build>
       <properties>
-        <java.resources.override>src/main/runtime/dev/resources</java.resources.override>
-        <maven.tomcat.path>/cockpit</maven.tomcat.path>
+        <java.resources.override>src/main/runtime/develop/resources</java.resources.override>
+        <maven.tomcat.path>/camunda</maven.tomcat.path>
       </properties>
     </profile>
+
+
+    <!-- database QA profiles -->
+
+    <profile>
+      <id>database</id>
+
+      <properties>
+        <db.properties.file>${user.home}/.camunda/jdbc/cockpit.${database}.properties</db.properties.file>
+      </properties>
+
+      <activation>
+        <property>
+          <name>database</name>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <!--
+              only worked with this version, there might be a bug with antrun
+              see http://jira.codehaus.org/browse/MANTRUN-109
+            -->
+            <version>1.4</version>
+            <executions>
+              <execution>
+                <id>database-test-create-schema</id>
+                <phase>process-test-classes</phase>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <configuration>
+                  <tasks>
+                    <echo message="updating activiti configuration to db ${database}" />
+                    <copy file="target/test-classes/activiti.cfg.db.xml" tofile="target/test-classes/activiti.cfg.xml" overwrite="true">
+                      <filterset filtersfile="${db.properties.file}" />
+                    </copy>
+
+                    <echo message="dropping schema in ${database}" />
+                    <java classname="org.camunda.bpm.engine.impl.db.DbSchemaDrop" classpathref="maven.test.classpath" />
+                  </tasks>
+                </configuration>
+              </execution>
+              <execution>
+                <id>database-test-drop-schema</id>
+                <phase>prepare-package</phase>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <configuration>
+                  <tasks>
+                    <echo message="dropping schema in ${database}" />
+                    <java classname="org.camunda.bpm.engine.impl.db.DbSchemaDrop" classpathref="maven.test.classpath" />
+                  </tasks>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+
+    <profile>
+      <id>oracle</id>
+      <activation>
+        <property>
+          <name>database</name>
+          <value>oracle</value>
+        </property>
+      </activation>
+      <dependencies>
+        <dependency>
+          <groupId>com.oracle.jdbc</groupId>
+          <artifactId>ojdbc6</artifactId>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+    </profile>
+
+    <profile>
+      <id>oracle10g</id>
+      <activation>
+        <property>
+          <name>database</name>
+          <value>oracle10g</value>
+        </property>
+      </activation>
+      <dependencies>
+        <dependency>
+          <groupId>com.oracle.jdbc</groupId>
+          <artifactId>ojdbc14</artifactId>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+    </profile>
+
+    <profile>
+      <id>db2</id>
+      <activation>
+        <property>
+          <name>database</name>
+          <value>db2</value>
+        </property>
+      </activation>
+      <dependencies>
+        <dependency>
+          <groupId>com.ibm.db2.jcc</groupId>
+          <artifactId>db2jcc4</artifactId>
+          <scope>test</scope>
+        </dependency>
+      </dependencies>
+    </profile>
+
+    <profile>
+      <id>mssql</id>
+        <activation>
+          <property>
+            <name>database</name>
+            <value>mssql</value>
+          </property>
+        </activation>
+        <dependencies>
+          <dependency>
+            <groupId>com.microsoft.sqlserver</groupId>
+            <artifactId>sqljdbc4</artifactId>
+            <scope>test</scope>
+          </dependency>
+       </dependencies>
+    </profile>
+
+    <profile>
+      <id>mysql</id>
+        <activation>
+          <property>
+            <name>database</name>
+            <value>mysql</value>
+          </property>
+        </activation>
+        <dependencies>
+          <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <scope>test</scope>
+          </dependency>
+       </dependencies>
+    </profile>
+
+    <profile>
+      <id>postgresql</id>
+        <activation>
+        <property>
+          <name>database</name>
+          <value>postgresql</value>
+        </property>
+      </activation>
+      <dependencies>
+        <dependency>
+          <groupId>postgresql</groupId>
+          <artifactId>postgresql</artifactId>
+          <scope>test</scope>
+        </dependency>
+       </dependencies>
+    </profile>
+
   </profiles>
 </project>

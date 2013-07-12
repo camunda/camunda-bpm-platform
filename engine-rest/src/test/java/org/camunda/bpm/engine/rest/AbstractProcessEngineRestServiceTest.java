@@ -36,6 +36,8 @@ import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ExecutionQuery;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
+import org.camunda.bpm.engine.runtime.VariableInstance;
+import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
 import org.camunda.bpm.engine.task.Task;
 import org.camunda.bpm.engine.task.TaskQuery;
 import org.junit.Before;
@@ -54,6 +56,9 @@ public abstract class AbstractProcessEngineRestServiceTest extends
   protected static final String IDENTITY_GROUPS_URL = SINGLE_ENGINE_URL + "/identity/groups";
   protected static final String MESSAGE_URL = SINGLE_ENGINE_URL + "/message";
   protected static final String EXECUTION_URL = SINGLE_ENGINE_URL + "/execution";
+  protected static final String VARIABLE_INSTANCE_URL = SINGLE_ENGINE_URL + "/variable-instance";
+  protected static final String USER_URL = SINGLE_ENGINE_URL + "/user";
+  protected static final String GROUP_URL = SINGLE_ENGINE_URL + "/group";
   
   protected String EXAMPLE_ENGINE_NAME = "anEngineName";
 
@@ -81,6 +86,7 @@ public abstract class AbstractProcessEngineRestServiceTest extends
     createTaskMock();
     createIdentityMocks();
     createExecutionMock();
+    createVariableInstanceMock();
   }
   
 
@@ -140,6 +146,16 @@ public abstract class AbstractProcessEngineRestServiceTest extends
     when(mockIdentityService.createUserQuery()).thenReturn(sampleUserQuery);
   }
   
+  
+  private void createVariableInstanceMock() {
+    List<VariableInstance> variables = new ArrayList<VariableInstance>();
+    VariableInstance mockInstance = MockProvider.createMockVariableInstance();
+    variables.add(mockInstance);
+    
+    VariableInstanceQuery mockVariableInstanceQuery = mock(VariableInstanceQuery.class);
+    when(mockVariableInstanceQuery.list()).thenReturn(variables);
+    when(mockRuntimeService.createVariableInstanceQuery()).thenReturn(mockVariableInstanceQuery);
+  }
 
   @Test
   public void testNonExistingEngineAccess() {
@@ -233,6 +249,39 @@ public abstract class AbstractProcessEngineRestServiceTest extends
     .when().get(EXECUTION_URL);
     
     verify(mockRuntimeService).createExecutionQuery();
+    verifyZeroInteractions(processEngine);
+  }
+  
+  @Test
+  public void testVariableInstanceServiceEngineAccess() {
+    given().pathParam("name", EXAMPLE_ENGINE_NAME)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when().get(VARIABLE_INSTANCE_URL);
+    
+    verify(mockRuntimeService).createVariableInstanceQuery();
+    verifyZeroInteractions(processEngine);
+  }
+  
+  @Test
+  public void testUserServiceEngineAccess() {
+    given().pathParam("name", EXAMPLE_ENGINE_NAME)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when().get(USER_URL);
+    
+    verify(mockIdentityService).createUserQuery();
+    verifyZeroInteractions(processEngine);
+  }
+  
+  @Test
+  public void testGroupServiceEngineAccess() {
+    given().pathParam("name", EXAMPLE_ENGINE_NAME)
+    .then().expect()
+      .statusCode(Status.OK.getStatusCode())
+    .when().get(GROUP_URL);
+    
+    verify(mockIdentityService).createGroupQuery();
     verifyZeroInteractions(processEngine);
   }
 }

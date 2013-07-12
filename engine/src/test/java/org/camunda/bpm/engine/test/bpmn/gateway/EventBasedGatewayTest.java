@@ -70,7 +70,7 @@ public class EventBasedGatewayTest extends PluggableProcessEngineTestCase {
     ClockUtil.setCurrentTime(new Date(ClockUtil.getCurrentTime().getTime() +10000));
     try {
       // wait for timer to fire
-      waitForJobExecutorToProcessAllJobs(10000, 100);
+      waitForJobExecutorToProcessAllJobs(10000);
       
       assertEquals(0, runtimeService.createEventSubscriptionQuery().count());    
       assertEquals(1, runtimeService.createProcessInstanceQuery().count());    

@@ -24,7 +24,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 /**
  * @author Tom Baeyens
  */
-public class CreateUserCmd implements Command<User>, Serializable {
+public class CreateUserCmd extends AbstractWritableIdentityServiceCmd<User> implements Command<User>, Serializable {
 
   private static final long serialVersionUID = 1L;
   
@@ -36,10 +36,10 @@ public class CreateUserCmd implements Command<User>, Serializable {
     }
     this.userId = userId;
   }
-
-  public User execute(CommandContext commandContext) {
+  
+  protected User executeCmd(CommandContext commandContext) {
     return commandContext
-      .getUserManager()
+      .getWritableIdentityProvider()
       .createNewUser(userId);
   }
 }

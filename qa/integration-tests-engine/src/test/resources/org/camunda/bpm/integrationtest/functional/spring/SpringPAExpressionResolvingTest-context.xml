@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans   http://www.springframework.org/schema/beans/spring-beans.xsd">
+       
+    <!-- Spring process application (handles bootstrapping) -->
+    <bean id="processApplication" class="org.camunda.bpm.engine.spring.application.SpringProcessApplication" />
+       
+    <!-- Spring bean to be invoked through the ApplicationContextElResolver -->
+    <bean id="exampleBean" class="org.camunda.bpm.integrationtest.functional.spring.beans.ExampleBean" />
+    
+</beans>

@@ -1,0 +1,164 @@
+/**
+ * Logo styling
+ */
+.navbar .brand {
+   display: block;
+   float: left;
+   background: no-repeat url('../../img/cockpit/app-logo.png');
+   width: 220px;
+   height: 39px;
+   padding: 0;
+}
+
+/**----------------
+Circle
+-------------------**/
+
+.circle {
+  border-radius: 50%;
+  width: 20px;
+  height: 20px;
+  background-color: #999999;
+  top: 100%;
+}
+
+.circle-red {
+  background-color: #b94a48;
+}
+
+.circle-green {
+  background-color: #468847;
+}
+
+/**------------------
+Tree
+---------------------**/
+
+.none-list-style {
+  list-style-type: none;
+}
+
+.clickable-tree-node:hover {
+  cursor: pointer;
+}
+
+.invisible-button {
+  padding: 0px;
+  cursor: pointer;
+  background-color: transparent;
+  border: 0px;
+  -webkit-appearance: none;
+}
+
+.activity-highlight  {
+  -webkit-box-shadow: 0px 0px 4px 4px rgba(30, 144, 255, 1);
+  -moz-box-shadow: 0px 0px 4px 4px rgba(30, 144, 255, 1);
+  box-shadow: 0px 0px 4px 4px rgb(30, 144, 255);
+  border-radius: 5px;
+}
+
+.navbar-search select {
+  margin-bottom: 5px;
+}
+
+/**----------content ----**/
+
+.content-fixed {
+  position: fixed;
+  top: 41px;
+  left: 0;
+  bottom: 41px;
+  right: 0;
+}
+
+@media (max-width: 767px) {
+  .content-fixed {
+    top: 61px;
+  }
+}
+
+.content {
+  float: left;
+  height: 100%;
+  overflow: auto;
+  box-sizing: border-box;
+}
+
+.content-main {
+  width: 80%;
+}
+
+.content-sidebar {
+  width: 20%;
+  position: relative;
+  float: left;
+}
+
+.main {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.main-position {
+  position: absolute;
+  left: 10px;
+  right: 10px;
+  height: 100%;
+  overflow: hidden;
+}
+
+
+.process-diagram {
+  height: 60%;
+  overflow: hidden;
+
+  /* disable text selection */
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}
+
+.value-content {
+  height: 40%;
+  overflow: auto;
+}
+
+.badge-position {
+  margin-left: -1.1em;
+  margin-top: -0.75em;
+  top: 100%;
+  position: absolute;
+}
+
+/** ---- sidebar ----**/
+
+.arrow-button {
+  float: right;
+  font-size: 20px;
+  font-weight: bold;
+  line-height: 20px;
+  text-shadow: 0 1px 0 #ffffff;
+  opacity: 0.4;
+  filter: alpha(opacity=20);
+}
+
+button.arrow-button {
+  padding: 0;
+  cursor: pointer;
+  background: transparent;
+  border: 0;
+  -webkit-appearance: none;
+}
+
+.arrow-button:hover,
+.arrow-button:focus {
+  color: #000000;
+  text-decoration: none;
+  cursor: pointer;
+  opacity: 0.6;
+  filter: alpha(opacity=40);
+}

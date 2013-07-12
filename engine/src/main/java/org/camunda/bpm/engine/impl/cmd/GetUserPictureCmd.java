@@ -19,10 +19,12 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.identity.Picture;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
-import org.camunda.bpm.engine.impl.persistence.entity.UserEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.IdentityInfoEntity;
 
 
 /**
+ * @author Daniel Meyer
  * @author Tom Baeyens
  */
 public class GetUserPictureCmd implements Command<Picture>, Serializable {
@@ -38,13 +40,20 @@ public class GetUserPictureCmd implements Command<Picture>, Serializable {
     if(userId == null) {
       throw new ProcessEngineException("userId is null");
     }
-    UserEntity user = (UserEntity) commandContext
-      .getUserManager()
-      .findUserById(userId);
-    if(user == null) {
-      throw new ProcessEngineException("user "+userId+" doesn't exist");
+    
+    IdentityInfoEntity pictureInfo = commandContext.getIdentityInfoManager()
+      .findUserInfoByUserIdAndKey(userId, "picture");
+    
+    if(pictureInfo != null) {
+      String pictureByteArrayId = pictureInfo.getValue();
+      if(pictureByteArrayId != null) {
+        ByteArrayEntity byteArray = commandContext.getDbSqlSession()
+          .selectById(ByteArrayEntity.class, pictureByteArrayId);
+        return new Picture(byteArray.getBytes(), byteArray.getName());
+      }
     }
-    return user.getPicture();
+    
+    return null;
   }
 
 }

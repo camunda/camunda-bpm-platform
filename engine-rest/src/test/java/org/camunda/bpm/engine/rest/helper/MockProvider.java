@@ -31,6 +31,7 @@ import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
+import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.task.DelegationState;
 import org.camunda.bpm.engine.task.Task;
 import org.joda.time.DateTime;
@@ -83,6 +84,14 @@ public abstract class MockProvider {
   public static final boolean EXAMPLE_PROCESS_INSTANCE_IS_SUSPENDED = false;
   public static final boolean EXAMPLE_PROCESS_INSTANCE_IS_ENDED = false;
   
+  // variable instance
+  public static final String EXAMPLE_VARIABLE_INSTANCE_NAME = "aVariableInstanceName";
+  public static final String EXAMPLE_VARIABLE_INSTANCE_TYPE = "aVariableInstanceType";
+  public static final String EXAMPLE_VARIABLE_INSTANCE_VALUE = "aVariableInstanceValue";
+  public static final String EXAMPLE_VARIABLE_INSTANCE_PROC_INST_ID = "aVariableInstanceProcInstId";
+  public static final String EXAMPLE_VARIABLE_INSTANCE_EXECUTION_ID = "aVariableInstanceExecutionId";
+  public static final String EXAMPLE_VARIABLE_INSTANCE_TASK_ID = "aVariableInstanceTaskId";
+  public static final String EXAMPLE_VARIABLE_INSTANCE_ACTIVITY_INSTANCE_ID = "aVariableInstanceVariableInstanceId";
   
   // execution
   public static final String EXAMPLE_EXECUTION_ID = "anExecutionId";
@@ -126,10 +135,18 @@ public abstract class MockProvider {
   // user & groups
   public static final String EXAMPLE_GROUP_ID = "group1Id";
   public static final String EXAMPLE_GROUP_NAME = "group1";
+  public static final String EXAMPLE_GROUP_TYPE = "organizational-unit";
+  public static final String EXAMPLE_GROUP_NAME_UPDATE = "group1Update";
  
   public static final String EXAMPLE_USER_ID = "userId";
   public static final String EXAMPLE_USER_FIRST_NAME = "firstName";
   public static final String EXAMPLE_USER_LAST_NAME = "lastName";
+  public static final String EXAMPLE_USER_EMAIL = "test@example.org";
+  public static final String EXAMPLE_USER_PASSWORD = "s3cret";
+  
+  public static final String EXAMPLE_USER_FIRST_NAME_UPDATE = "firstNameUpdate";
+  public static final String EXAMPLE_USER_LAST_NAME_UPDATE = "lastNameUpdate";
+  public static final String EXAMPLE_USER_EMAIL_UPDATE = "testUpdate@example.org";
   
   // tasks
   public static Task createMockTask() {
@@ -206,6 +223,20 @@ public abstract class MockProvider {
     when(mock.getProcessInstanceId()).thenReturn(EXAMPLE_PROCESS_INSTANCE_ID);
     when(mock.isSuspended()).thenReturn(EXAMPLE_PROCESS_INSTANCE_IS_SUSPENDED);
     when(mock.isEnded()).thenReturn(EXAMPLE_PROCESS_INSTANCE_IS_ENDED);
+    
+    return mock;
+  }
+  
+  public static VariableInstance createMockVariableInstance() {
+    VariableInstance mock = mock(VariableInstance.class);
+    
+    when(mock.getName()).thenReturn(EXAMPLE_VARIABLE_INSTANCE_NAME);
+    when(mock.getTypeName()).thenReturn(EXAMPLE_VARIABLE_INSTANCE_TYPE);
+    when(mock.getValue()).thenReturn(EXAMPLE_VARIABLE_INSTANCE_VALUE);
+    when(mock.getProcessInstanceId()).thenReturn(EXAMPLE_VARIABLE_INSTANCE_PROC_INST_ID);
+    when(mock.getExecutionId()).thenReturn(EXAMPLE_VARIABLE_INSTANCE_EXECUTION_ID);
+    when(mock.getTaskId()).thenReturn(EXAMPLE_VARIABLE_INSTANCE_TASK_ID);
+    when(mock.getActivityInstanceId()).thenReturn(EXAMPLE_VARIABLE_INSTANCE_ACTIVITY_INSTANCE_ID);
     
     return mock;
   }
@@ -327,13 +358,27 @@ public abstract class MockProvider {
   }
   
   // user & groups
-  public static List<Group> createMockGroups() {
-    List<Group> mockGroups = new ArrayList<Group>();
+  
+  public static Group createMockGroup() {
     Group mockGroup = mock(Group.class);
     when(mockGroup.getId()).thenReturn(EXAMPLE_GROUP_ID);
     when(mockGroup.getName()).thenReturn(EXAMPLE_GROUP_NAME);
-    mockGroups.add(mockGroup);
+    when(mockGroup.getType()).thenReturn(EXAMPLE_GROUP_TYPE);
     
+    return mockGroup;
+  }
+  
+  public static Group createMockGroupUpdate() {
+    Group mockGroup = mock(Group.class);
+    when(mockGroup.getId()).thenReturn(EXAMPLE_GROUP_ID);
+    when(mockGroup.getName()).thenReturn(EXAMPLE_GROUP_NAME_UPDATE);
+    
+    return mockGroup;
+  }
+  
+  public static List<Group> createMockGroups() {
+    List<Group> mockGroups = new ArrayList<Group>();
+    mockGroups.add(createMockGroup());
     return mockGroups;
   }
   
@@ -342,6 +387,24 @@ public abstract class MockProvider {
     when(mockUser.getId()).thenReturn(EXAMPLE_USER_ID);
     when(mockUser.getFirstName()).thenReturn(EXAMPLE_USER_FIRST_NAME);
     when(mockUser.getLastName()).thenReturn(EXAMPLE_USER_LAST_NAME);
+    when(mockUser.getEmail()).thenReturn(EXAMPLE_USER_EMAIL);
+    when(mockUser.getPassword()).thenReturn(EXAMPLE_USER_PASSWORD);
     return mockUser;
+  }
+  
+  public static User createMockUserUpdate() {
+    User mockUser = mock(User.class);
+    when(mockUser.getId()).thenReturn(EXAMPLE_USER_ID);
+    when(mockUser.getFirstName()).thenReturn(EXAMPLE_USER_FIRST_NAME_UPDATE);
+    when(mockUser.getLastName()).thenReturn(EXAMPLE_USER_LAST_NAME_UPDATE);
+    when(mockUser.getEmail()).thenReturn(EXAMPLE_USER_EMAIL_UPDATE);
+    when(mockUser.getPassword()).thenReturn(EXAMPLE_USER_PASSWORD);
+    return mockUser;
+  }
+  
+  public static List<User> createMockUsers() {
+    ArrayList<User> list = new ArrayList<User>();
+    list.add(createMockUser());
+    return list;
   }
 }

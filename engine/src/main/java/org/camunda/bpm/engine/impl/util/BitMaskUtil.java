@@ -25,8 +25,7 @@ package org.camunda.bpm.engine.impl.util;
 public class BitMaskUtil {
   
   // First 8 masks as constant to prevent having to math.pow() every time a bit needs flippin'.
-  
-  private static final int FLAG_BIT_1 = 1;    // 000...00000001
+  private static final int FLAG_BIT_1 = 1;    // 000...00000001  
   private static final int FLAG_BIT_2 = 2;    // 000...00000010
   private static final int FLAG_BIT_3 = 4;    // 000...00000100
   private static final int FLAG_BIT_4 = 8;    // 000...00001000

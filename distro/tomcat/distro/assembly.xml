@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <assembly xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
           xmlns="urn:maven:assembly:1.1.2">
-  
+
   <id>distro</id>
-  
+
   <formats>
     <format>zip</format>
     <format>tar.gz</format>
@@ -18,8 +18,8 @@
       </includes>
       <outputDirectory />
     </dependencySet>
-    
-      
+
+
     <dependencySet>
       <unpack>true</unpack>
       <unpackOptions>
@@ -31,7 +31,7 @@
         <include>org.camunda.bpm.distro:camunda-sql-scripts:jar:*</include>
       </includes>
     </dependencySet>
-  	
+
     <dependencySet>
       <outputDirectory />
       <unpack>true</unpack>
@@ -44,7 +44,7 @@
         <include>org.camunda.bpm.cycle:camunda-cycle-sql-scripts:jar:*</include>
       </includes>
     </dependencySet>
-		
+
 	<dependencySet>
   		<includes>
   			<include>org.camunda.bpm.cycle:camunda-cycle-tomcat:war:*</include>
@@ -52,7 +52,7 @@
   		<outputDirectory>server/apache-tomcat-${tomcat.version}/webapps/cycle</outputDirectory>
         <unpack>true</unpack>
   	</dependencySet>
-    
+
     <dependencySet>
         <includes>
             <include>org.camunda.bpm:camunda-engine-rest:war:*</include>
@@ -60,46 +60,43 @@
         <outputDirectory>server/apache-tomcat-${tomcat.version}/webapps/engine-rest</outputDirectory>
         <unpack>true</unpack>
     </dependencySet>
-    
+
     <dependencySet>
         <includes>
             <include>org.camunda.bpm.cockpit:camunda-cockpit-tomcat:war:*</include>
         </includes>
-        <outputDirectory>server/apache-tomcat-${tomcat.version}/webapps/cockpit</outputDirectory>
+        <outputDirectory>server/apache-tomcat-${tomcat.version}/webapps/camunda</outputDirectory>
         <unpack>true</unpack>
     </dependencySet>
-    
+
     <dependencySet>
         <includes>
-            <include>org.camunda.bpm.tasklist:camunda-tasklist:war:*</include>
+            <include>org.camunda.bpm.tasklist:camunda-tasklist-tomcat:war:*</include>
         </includes>
         <outputDirectory>server/apache-tomcat-${tomcat.version}/webapps/tasklist</outputDirectory>
         <unpack>true</unpack>
     </dependencySet>
-    
-    <!-- adding resteasy to camunda-tasklist -->    
-    <dependencySet>
-      <outputDirectory>server/apache-tomcat-${tomcat.version}/webapps/tasklist/WEB-INF/lib</outputDirectory>
-      <useTransitiveDependencies>true</useTransitiveDependencies>     
-      <useTransitiveFiltering>true</useTransitiveFiltering>
-      <includes>
-        <include>org.jboss.resteasy:resteasy-jaxrs:jar:*</include>
-      </includes>
-    </dependencySet>
-    
+
     <dependencySet>
         <includes>
             <include>org.camunda.bpm.example:camunda-example-invoice:war:*</include>
         </includes>
         <outputDirectory>server/apache-tomcat-${tomcat.version}/webapps/</outputDirectory>
     </dependencySet>
-		
+
+    <dependencySet>
+        <includes>
+            <include>org.camunda.bpm.example:camunda-example-wait-states:war:*</include>
+        </includes>
+        <outputDirectory>server/apache-tomcat-${tomcat.version}/webapps/</outputDirectory>
+    </dependencySet>
+
   </dependencySets>
-  
+
   <fileSets>
     <fileSet>
       <directory>../../camunda-welcome</directory>
-      <outputDirectory>server/apache-tomcat-${tomcat.version}/webapps/camunda-welcome</outputDirectory>      
-    </fileSet>  
+      <outputDirectory>server/apache-tomcat-${tomcat.version}/webapps/camunda-welcome</outputDirectory>
+    </fileSet>
   </fileSets>
 </assembly>

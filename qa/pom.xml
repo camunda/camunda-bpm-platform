@@ -74,6 +74,7 @@
         <module>tomcat-runtime</module>
         <module>integration-tests-webapps</module>
         <module>integration-tests-engine</module>
+        <!-- <module>test-db-upgrade</module> -->
       </modules>
 	</profile>  
   
@@ -116,12 +117,20 @@
       </modules>
     </profile>
     
+    <profile>
+      <id>upgrade</id>
+      <modules>
+        <module>test-db-upgrade</module>
+      </modules>
+    </profile>
+    
     <!-- db profiles -->
     
     <profile>
       <id>db2</id>
       <properties>
         <database.type>db2</database.type>
+        <glassfish.transactions.noxa>true</glassfish.transactions.noxa>
         <jboss.datasource.filename>db2-ds.xml</jboss.datasource.filename>
         <database.host>${env.db2.database.host}</database.host>
         <database.name>${env.db2.database.name}</database.name>
@@ -138,6 +147,7 @@
       <id>db2-xa</id>
       <properties>
         <database.type>db2</database.type>
+        <glassfish.transactions.noxa>false</glassfish.transactions.noxa>
         <jboss.datasource.filename>db2-xa-ds.xml</jboss.datasource.filename>
         <database.host>${env.db2.database.host}</database.host>
         <database.name>${env.db2.database.name}</database.name>
@@ -169,6 +179,7 @@
       <id>mssql</id>
       <properties>
         <database.type>mssql</database.type>
+        <glassfish.transactions.noxa>true</glassfish.transactions.noxa>
         <jboss.datasource.filename>mssql-ds.xml</jboss.datasource.filename>
         <database.host>${env.mssql.database.host}</database.host>
         <database.name>${env.mssql.database.name}</database.name>
@@ -185,6 +196,7 @@
       <id>mssql-xa</id>
       <properties>
         <database.type>mssql</database.type>
+        <glassfish.transactions.noxa>false</glassfish.transactions.noxa>
         <jboss.datasource.filename>mssql-xa-ds.xml</jboss.datasource.filename>
         <database.host>${env.mssql.database.host}</database.host>
         <database.name>${env.mssql.database.name}</database.name>
@@ -199,9 +211,45 @@
     </profile>
     
     <profile>
+      <id>mssql12</id>
+      <properties>
+        <database.type>mssql</database.type>
+        <glassfish.transactions.noxa>true</glassfish.transactions.noxa>
+        <jboss.datasource.filename>mssql-ds.xml</jboss.datasource.filename>
+        <database.host>${env.mssql12.database.host}</database.host>
+        <database.name>${env.mssql12.database.name}</database.name>
+        <database.user>${env.mssql12.database.user}</database.user>
+        <database.password>${env.mssql12.database.password}</database.password>
+        <database.driver>com.microsoft.sqlserver.jdbc.SQLServerDriver</database.driver>
+        <database.datasource.class>com.microsoft.sqlserver.jdbc.SQLServerDataSource</database.datasource.class>
+        <database.port>${env.mssql12.database.port}</database.port>
+        <database.url>jdbc:sqlserver://${database.host}:${database.port};DatabaseName=${database.name}</database.url>
+      </properties>
+    </profile>
+    
+    <profile>
+      <id>mssql12-xa</id>
+      <properties>
+        <database.type>mssql</database.type>
+        <glassfish.transactions.noxa>false</glassfish.transactions.noxa>
+        <jboss.datasource.filename>mssql-xa-ds.xml</jboss.datasource.filename>
+        <database.host>${env.mssql12.database.host}</database.host>
+        <database.name>${env.mssql12.database.name}</database.name>
+        <database.user>${env.mssql12.database.user}</database.user>
+        <database.password>${env.mssql12.database.password}</database.password>
+        <database.driver>com.microsoft.sqlserver.jdbc.SQLServerDriver</database.driver>
+        <database.datasource.class>com.microsoft.sqlserver.jdbc.SQLServerXADataSource</database.datasource.class>
+        <database.datasource.class.type>${database.datasource.class.type.xa}</database.datasource.class.type>
+        <database.port>${env.mssql12.database.port}</database.port>
+        <database.url>jdbc:sqlserver://${database.host}:${database.port};DatabaseName=${database.name}</database.url>
+      </properties>
+    </profile>
+    
+    <profile>
       <id>oracle</id>
       <properties>
         <database.type>oracle</database.type>
+        <glassfish.transactions.noxa>true</glassfish.transactions.noxa>
         <jboss.datasource.filename>oracle-ds.xml</jboss.datasource.filename>
         <database.host>${env.oracle.database.host}</database.host>
         <database.name>${env.oracle.database.name}</database.name>
@@ -218,6 +266,7 @@
       <id>oracle-xa</id>
       <properties>
         <database.type>oracle</database.type>
+        <glassfish.transactions.noxa>false</glassfish.transactions.noxa>
         <jboss.datasource.filename>oracle-xa-ds.xml</jboss.datasource.filename>
         <database.host>${env.oracle.database.host}</database.host>
         <database.name>${env.oracle.database.name}</database.name>
@@ -235,6 +284,7 @@
       <id>postgres</id>
       <properties>
         <database.type>postgres</database.type>
+        <glassfish.transactions.noxa>true</glassfish.transactions.noxa>
         <jboss.datasource.filename>postgres-ds.xml</jboss.datasource.filename>
         <database.host>${env.postgres.database.host}</database.host>
         <database.name>${env.postgres.database.name}</database.name>
@@ -251,6 +301,7 @@
       <id>postgres-xa</id>
       <properties>
         <database.type>postgres</database.type>
+        <glassfish.transactions.noxa>false</glassfish.transactions.noxa>
         <jboss.datasource.filename>postgres-xa-ds.xml</jboss.datasource.filename>
         <database.host>${env.postgres.database.host}</database.host>
         <database.name>${env.postgres.database.name}</database.name>
@@ -268,6 +319,7 @@
       <id>mysql</id>
       <properties>
         <database.type>mysql</database.type>
+        <glassfish.transactions.noxa>true</glassfish.transactions.noxa>
         <jboss.datasource.filename>mysql-ds.xml</jboss.datasource.filename>
         <database.host>${env.mysql.database.host}</database.host>
         <database.name>${env.mysql.database.name}</database.name>
@@ -284,6 +336,7 @@
       <id>mysql-xa</id>
       <properties>
         <database.type>mysql</database.type>
+        <glassfish.transactions.noxa>false</glassfish.transactions.noxa>
         <jboss.datasource.filename>mysql-xa-ds.xml</jboss.datasource.filename>
         <database.host>${env.mysql.database.host}</database.host>
         <database.name>${env.mysql.database.name}</database.name>

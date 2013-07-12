@@ -1,5 +1,6 @@
 package org.camunda.bpm.cockpit.plugin.base;
 
+import java.util.List;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.Callable;
@@ -11,6 +12,8 @@ import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.camunda.bpm.engine.impl.test.AbstractProcessEngineTestCase;
+import org.camunda.bpm.engine.impl.util.ClockUtil;
+import org.camunda.bpm.engine.runtime.Job;
 
 /**
  * Provides the {@link JobExecutor} related features of {@link AbstractProcessEngineTestCase}.
@@ -25,10 +28,11 @@ public class JobExecutorHelper {
     this.processEngine = (ProcessEngineImpl) processEngine;
   }
 
-  public void waitForJobExecutorToProcessAllJobs(long maxMillisToWait, long intervalMillis) {
+  public void waitForJobExecutorToProcessAllJobs(long maxMillisToWait) {
 
     JobExecutor jobExecutor = getProcessEngineConfiguration().getJobExecutor();
     jobExecutor.start();
+    long intervalMillis = 1000;
 
     try {
       Timer timer = new Timer();
@@ -58,10 +62,11 @@ public class JobExecutorHelper {
     }
   }
 
-  public void waitForJobExecutorOnCondition(long maxMillisToWait, long intervalMillis, Callable<Boolean> condition) {
+  public void waitForJobExecutorOnCondition(long maxMillisToWait, Callable<Boolean> condition) {
     JobExecutor jobExecutor = getProcessEngineConfiguration().getJobExecutor();
     jobExecutor.start();
-
+    long intervalMillis = 1000;
+    
     try {
       Timer timer = new Timer();
       InteruptTask task = new InteruptTask(Thread.currentThread());
@@ -88,11 +93,13 @@ public class JobExecutorHelper {
   }
 
   public boolean areJobsAvailable() {
-    return !getManagementService()
-      .createJobQuery()
-      .executable()
-      .list()
-      .isEmpty();
+    List<Job> list = processEngine.getManagementService().createJobQuery().list();
+    for (Job job : list) {
+      if (job.getRetries() > 0 && (job.getDuedate() == null || ClockUtil.getCurrentTime().after(job.getDuedate()))) {
+        return true;
+      }
+    }
+    return false;
   }
 
   private ProcessEngineConfigurationImpl getProcessEngineConfiguration() {

@@ -94,6 +94,7 @@
     <file>
       <source>src/README.txt</source>
       <filtered>true</filtered>
+      <lineEnding>crlf</lineEnding>
       <outputDirectory></outputDirectory>
     </file>
     <file>
@@ -110,6 +111,7 @@
     <file>
       <source>src/LICENSE-2.0.txt</source>
       <filtered>true</filtered>
+      <lineEnding>crlf</lineEnding>
       <outputDirectory></outputDirectory>
     </file>
     <file>

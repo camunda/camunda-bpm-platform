@@ -31,5 +31,6 @@
     <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/VariableInstance.xml" />
     <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/EventSubscription.xml" />
     <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/Statistics.xml" />
+    <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/Authorization.xml" />
 	</mappers>
 </configuration>

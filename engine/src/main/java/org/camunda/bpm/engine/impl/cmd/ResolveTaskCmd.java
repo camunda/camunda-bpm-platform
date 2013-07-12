@@ -33,10 +33,4 @@ public class ResolveTaskCmd extends CompleteTaskCmd {
   protected void completeTask(TaskEntity task) {
     task.resolve();
   }
-
-  @Override
-  protected String getSuspendedTaskException() {
-    return "Cannot resolve a suspended task";
-  }
-  
 }

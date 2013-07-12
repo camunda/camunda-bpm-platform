@@ -163,6 +163,8 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
     verifyStringParameterQueryInvocations();
     
     verify(mockQuery).taskUnassigned();
+    verify(mockQuery).active();
+    verify(mockQuery).suspended();
     
     verify(mockQuery).list();
   }
@@ -206,6 +208,8 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
     parameters.put("nameLike", "aNameLike");
     parameters.put("owner", "anOwner");
     parameters.put("unassigned", "true");
+    parameters.put("active", "true");
+    parameters.put("suspended", "true");
   
     return parameters;
   }
@@ -491,6 +495,11 @@ public abstract class AbstractTaskRestServiceQueryTest extends AbstractRestServi
     
     verifyStringParameterQueryInvocations();
     verifyIntegerParameterQueryInvocations();
+    
+    verify(mockQuery).taskUnassigned();
+    verify(mockQuery).active();
+    verify(mockQuery).suspended();
+    
     verify(mockQuery).taskCandidateGroupIn(argThat(new EqualsList(candidateGroups)));
   }
 

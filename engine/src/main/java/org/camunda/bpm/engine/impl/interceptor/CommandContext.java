@@ -28,14 +28,16 @@ import org.camunda.bpm.engine.impl.cfg.TransactionContext;
 import org.camunda.bpm.engine.impl.cfg.TransactionContextFactory;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbSqlSession;
+import org.camunda.bpm.engine.impl.identity.ReadOnlyIdentityProvider;
+import org.camunda.bpm.engine.impl.identity.WritableIdentityProvider;
 import org.camunda.bpm.engine.impl.jobexecutor.FailedJobCommandFactory;
 import org.camunda.bpm.engine.impl.persistence.entity.AttachmentManager;
+import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayManager;
 import org.camunda.bpm.engine.impl.persistence.entity.CommentManager;
 import org.camunda.bpm.engine.impl.persistence.entity.DeploymentManager;
 import org.camunda.bpm.engine.impl.persistence.entity.EventSubscriptionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionManager;
-import org.camunda.bpm.engine.impl.persistence.entity.GroupManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricActivityInstanceManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricDetailManager;
 import org.camunda.bpm.engine.impl.persistence.entity.HistoricProcessInstanceManager;
@@ -45,14 +47,12 @@ import org.camunda.bpm.engine.impl.persistence.entity.IdentityInfoManager;
 import org.camunda.bpm.engine.impl.persistence.entity.IdentityLinkManager;
 import org.camunda.bpm.engine.impl.persistence.entity.IncidentManager;
 import org.camunda.bpm.engine.impl.persistence.entity.JobManager;
-import org.camunda.bpm.engine.impl.persistence.entity.MembershipManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionManager;
 import org.camunda.bpm.engine.impl.persistence.entity.PropertyManager;
 import org.camunda.bpm.engine.impl.persistence.entity.ResourceManager;
 import org.camunda.bpm.engine.impl.persistence.entity.StatisticsManager;
 import org.camunda.bpm.engine.impl.persistence.entity.TableDataManager;
 import org.camunda.bpm.engine.impl.persistence.entity.TaskManager;
-import org.camunda.bpm.engine.impl.persistence.entity.UserManager;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceManager;
 import org.camunda.bpm.engine.impl.pvm.runtime.AtomicOperation;
 import org.camunda.bpm.engine.impl.pvm.runtime.InterpretableExecution;
@@ -121,7 +121,7 @@ public class CommandContext {
     }   
     
   }
-  
+
   protected ProcessApplicationReference getTargetProcessApplication(InterpretableExecution execution) {
     
     String deploymentId = execution.getProcessDefinition().getDeploymentId();
@@ -298,21 +298,9 @@ public class CommandContext {
   public IncidentManager getIncidentManager() {
     return getSession(IncidentManager.class);
   }
-  
-  public UserManager getUserManager() {
-    return getSession(UserManager.class);
-  }
-
-  public GroupManager getGroupManager() {
-    return getSession(GroupManager.class);
-  }
 
   public IdentityInfoManager getIdentityInfoManager() {
     return getSession(IdentityInfoManager.class);
-  }
-
-  public MembershipManager getMembershipManager() {
-    return getSession(MembershipManager.class);
   }
   
   public AttachmentManager getAttachmentManager() {
@@ -341,6 +329,18 @@ public class CommandContext {
   
   public StatisticsManager getStatisticsManager() {
     return getSession(StatisticsManager.class);
+  }
+  
+  public AuthorizationManager getAuthorizationManager() {
+    return getSession(AuthorizationManager.class);
+  }
+  
+  public ReadOnlyIdentityProvider getReadOnlyIdentityProvider() {
+    return getSession(ReadOnlyIdentityProvider.class);
+  }
+  
+  public WritableIdentityProvider getWritableIdentityProvider() {
+    return getSession(WritableIdentityProvider.class);
   }
 
   // getters and setters //////////////////////////////////////////////////////

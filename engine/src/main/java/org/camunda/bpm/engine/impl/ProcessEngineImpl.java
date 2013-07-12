@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.impl;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.FormService;
 import org.camunda.bpm.engine.HistoryService;
 import org.camunda.bpm.engine.IdentityService;
@@ -48,6 +49,7 @@ public class ProcessEngineImpl implements ProcessEngine {
   protected TaskService taskService;
   protected FormService formService;
   protected ManagementService managementService;
+  protected AuthorizationService authorizationService;
   protected String databaseSchemaUpdate;
   protected JobExecutor jobExecutor;
   protected CommandExecutor commandExecutor;
@@ -69,6 +71,7 @@ public class ProcessEngineImpl implements ProcessEngine {
     this.taskService = processEngineConfiguration.getTaskService();
     this.formService = processEngineConfiguration.getFormService();
     this.managementService = processEngineConfiguration.getManagementService();
+    this.authorizationService = processEngineConfiguration.getAuthorizationService();
     this.databaseSchemaUpdate = processEngineConfiguration.getDatabaseSchemaUpdate();
     this.jobExecutor = processEngineConfiguration.getJobExecutor();
     this.commandExecutor = processEngineConfiguration.getCommandExecutorTxRequired();
@@ -145,6 +148,10 @@ public class ProcessEngineImpl implements ProcessEngine {
   
   public FormService getFormService() {
     return formService;
+  }
+  
+  public AuthorizationService getAuthorizationService() {
+    return authorizationService;
   }
 
   public ProcessEngineConfigurationImpl getProcessEngineConfiguration() {

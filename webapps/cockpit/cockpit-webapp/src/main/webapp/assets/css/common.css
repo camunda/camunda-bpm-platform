@@ -1,0 +1,259 @@
+/**
+ * loaded to remove angular template flicker on site load
+ * @see http://docs.angularjs.org/api/ng.directive:ngCloak
+ */
+[ng\:cloak], [ng-cloak], .ng-cloak {
+    display: none;
+}
+
+/** loading icon integration */
+.icon-loading {
+  background-image: url(../img/ajax-loader.gif);
+  width: 16px;
+  height: 16px;
+  line-height: 16px;
+  background-position: 0px 0px;
+  opacity: 1.0;
+}
+
+
+/* apply a natural box layout model to all elements */
+* {
+  -moz-box-sizing: border-box;
+  -webkit-box-sizing: border-box;
+  box-sizing: border-box;
+}
+
+
+/* Bootstrap code examples
+-------------------------------------------------- */
+
+/* Base class */
+.f-box {
+  position: relative;
+  margin: 15px 0;
+  padding: 39px 19px 14px;
+  *padding-top: 19px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  -webkit-border-radius: 4px;
+     -moz-border-radius: 4px;
+          border-radius: 4px;
+}
+
+/* Echo out a label for the example */
+.f-box:after {
+  content: "Task";
+  position: absolute;
+  top: -1px;
+  left: -1px;
+  padding: 3px 7px;
+  font-size: 12px;
+  font-weight: bold;
+  background-color: #f5f5f5;
+  border: 1px solid #ddd;
+  color: #9da0a4;
+  -webkit-border-radius: 4px 0 4px 0;
+     -moz-border-radius: 4px 0 4px 0;
+          border-radius: 4px 0 4px 0;
+}
+
+.f-box p:first-child {
+  margin-bottom: 20px;
+}
+
+/* Tweak examples
+------------------------- */
+.f-box > p:last-child {
+  margin-bottom: 0;
+}
+
+/** help system */
+.help-toggle {
+  display: inline-block;
+  margin-left: 5px;
+  cursor: help;
+  opacity: 0.6;
+}
+
+.help-toggle:hover {
+  opacity: 1;
+}
+/** end help system */
+
+/** utilities */
+/** for image replacement */
+.ir {
+  display: block;
+  text-indent: -999em;
+  overflow: hidden;
+  background-repeat: no-repeat;
+  text-align: left;
+  direction: ltr;
+}
+/** end utilities */
+
+/**
+ * shared style declarations
+ */
+html, body {
+  height:100%;
+  min-height: 100%;
+}
+
+.offset-paragraph {
+  margin-bottom: 30px;
+}
+
+.content-inset {
+  padding-top: 60px;
+}
+
+/**
+ * sidebar-nav tweak (My Roundtrips)
+ */
+div.sidebar-nav > ul.nav.nav-list > li.nav-header {
+  font-size: 13px;
+  padding: 3px 0px;
+}
+
+footer {
+  padding-top: 11px;
+  border-top: 1px solid #E5E5E5;
+  background-color: whiteSmoke;
+  width: 100%;
+}
+
+.wrapper {
+  min-height: 100%;
+  height: auto !important; /* ie7 fix */
+  height: 100%;
+  margin: 0 auto -42px;
+}
+
+.push-down {
+  height: 42px;
+}
+
+
+/** usability tweeks */
+@media (max-width: 979px) {
+  .content-inset {
+    padding-top: 0px;
+  }
+}
+
+@media (max-width: 979px) {
+  .navbar-fixed-top .navbar-inner, .navbar-fixed-bottom .navbar-inner {
+    padding: 0px;
+  }
+}
+
+#navigation {
+  min-width: 220px;
+}
+
+.nav-list li {
+  word-wrap: break-word;
+}
+
+/** end usability tweeks */
+
+
+/**
+ * form styling
+ */
+form input.ng-dirty.ng-invalid {
+  background-color: #FFDEDE;
+  color: #000;
+}
+
+input.ng-invalid-required {
+  border-color: #f00;
+}
+
+/**
+ * roundtrip list
+ */
+li.actions .btn {
+  margin-top: 30px;
+  margin-right: 30px;
+  display: inline-block;
+}
+
+li.actions .btn:last-child {
+  margin-right: 0px;
+}
+
+/** popover styles */
+.popover-inner {
+  padding: 0px;
+  border: 1px solid #ccc;
+  border-radius: 0px;
+  background-color: #fff;
+}
+
+/** combo box styles */
+.combobox-container input,.typeahead.dropdown-menu, span#modelerName {
+  width: 233px;
+  -webkit-border-radius: 3px;
+  -moz-border-radius: 3px;
+  border-radius: 3px;
+}
+
+
+.task-table td {
+  vertical-align: middle;
+}
+
+.task-table tr {
+  height: 43px;
+}
+
+table tr.selected > td {
+  background: rgba(218, 234, 247, 0.60);
+}
+
+.table-hover tbody tr.selected:hover > td, .table-hover tbody tr.selected:hover > th {
+  background-color: #DAEAF7;
+}
+
+.modal-body {
+  max-height: 480px;
+}
+
+/** make sure that if screen res is 600px high or below, modal dialoges are scrollable */
+@media screen and (max-height: 600px){
+  .modal {
+    position: absolute;
+  }
+}
+
+/**----------------
+Headlines
+-------------------**/
+
+h1 {
+  font-size: 30px;
+}
+
+/**----------------
+Cursors
+-------------------**/
+
+.pagination li {
+  cursor: pointer;
+}
+
+.pagination .active, .pagination .disabled {
+  cursor: auto;
+}
+
+/**----------------
+Icons
+-------------------**/
+.icon-user-large {
+   background: no-repeat url('../img/user.png');
+   width: 35px;
+   height: 30px;
+}

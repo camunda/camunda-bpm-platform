@@ -47,6 +47,8 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificLimitBetweenStatements.put("h2", "");
     databaseSpecificOrderByStatements.put("h2", defaultOrderBy);
     databaseSpecificLimitBeforeNativeQueryStatements.put("h2", "");
+    addDatabaseSpecificStatement("h2", "selectAuthorizationByQueryCriteria", "selectAuthorizationByQueryCriteria_BITAND");
+    addDatabaseSpecificStatement("h2", "selectAuthorizationCountByQueryCriteria", "selectAuthorizationCountByQueryCriteria_BITAND");
     
 	  //mysql specific
     databaseSpecificLimitBeforeStatements.put("mysql", "");
@@ -93,6 +95,8 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificOrderByStatements.put("oracle", defaultOrderBy);
     databaseSpecificLimitBeforeNativeQueryStatements.put("oracle", "");
     addDatabaseSpecificStatement("oracle", "selectExclusiveJobsToExecute", "selectExclusiveJobsToExecute_integerBoolean");
+    addDatabaseSpecificStatement("oracle", "selectAuthorizationByQueryCriteria", "selectAuthorizationByQueryCriteria_BITAND");
+    addDatabaseSpecificStatement("oracle", "selectAuthorizationCountByQueryCriteria", "selectAuthorizationCountByQueryCriteria_BITAND");
     
     // db2
     databaseSpecificLimitBeforeStatements.put("db2", "SELECT SUB.* FROM (");
@@ -106,6 +110,8 @@ public class DbSqlSessionFactory implements SessionFactory {
     addDatabaseSpecificStatement("db2", "selectHistoricProcessInstanceByNativeQuery", "selectHistoricProcessInstanceByNativeQuery_mssql_or_db2");
     addDatabaseSpecificStatement("db2", "selectHistoricTaskInstanceByNativeQuery", "selectHistoricTaskInstanceByNativeQuery_mssql_or_db2");
     addDatabaseSpecificStatement("db2", "selectTaskByNativeQuery", "selectTaskByNativeQuery_mssql_or_db2");
+    addDatabaseSpecificStatement("db2", "selectAuthorizationByQueryCriteria", "selectAuthorizationByQueryCriteria_BITAND");
+    addDatabaseSpecificStatement("db2", "selectAuthorizationCountByQueryCriteria", "selectAuthorizationCountByQueryCriteria_BITAND");
     
     // mssql
     databaseSpecificLimitBeforeStatements.put("mssql", "SELECT SUB.* FROM (");

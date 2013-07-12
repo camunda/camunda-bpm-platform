@@ -141,6 +141,16 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
     return this;
   }
   
+  public ExecutionQuery processVariableValueEquals(String variableName, Object variableValue) {
+    addVariable(variableName, variableValue, QueryOperator.EQUALS, false);
+    return this;
+  }
+
+  public ExecutionQuery processVariableValueNotEquals(String variableName, Object variableValue) {
+    addVariable(variableName, variableValue, QueryOperator.NOT_EQUALS, false);
+    return this;
+  }
+  
   //ordering ////////////////////////////////////////////////////
   
   public ExecutionQueryImpl orderByProcessInstanceId() {
@@ -223,4 +233,5 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
   public void setEventSubscriptions(List<EventSubscriptionQueryValue> eventSubscriptions) {
     this.eventSubscriptions = eventSubscriptions;
   }
+  
 }

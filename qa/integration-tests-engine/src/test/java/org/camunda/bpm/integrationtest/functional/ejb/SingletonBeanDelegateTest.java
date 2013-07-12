@@ -45,7 +45,7 @@ public class SingletonBeanDelegateTest extends AbstractFoxPlatformIntegrationTes
     
     taskService.complete(taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult().getId());
     
-    waitForJobExecutorToProcessAllJobs(6000, 300);
+    waitForJobExecutorToProcessAllJobs(6000);
     
     Assert.assertEquals(true, runtimeService.getVariable(pi.getId(), SingletonBeanDelegate.class.getName()));
     
@@ -67,7 +67,7 @@ public class SingletonBeanDelegateTest extends AbstractFoxPlatformIntegrationTes
     
     taskService.complete(taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult().getId());
     
-    waitForJobExecutorToProcessAllJobs(6000, 300);
+    waitForJobExecutorToProcessAllJobs(6000);
     
     Assert.assertEquals(true, runtimeService.getVariable(pi.getId(), SingletonBeanDelegate.class.getName()));
     
@@ -88,7 +88,7 @@ public class SingletonBeanDelegateTest extends AbstractFoxPlatformIntegrationTes
       taskService.complete(taskService.createTaskQuery().processInstanceId(ids[i]).singleResult().getId());
     }
         
-    waitForJobExecutorToProcessAllJobs(60*1000, 300);
+    waitForJobExecutorToProcessAllJobs(60*1000);
     
     for(int i=0; i<instances; i++) {    
       Assert.assertEquals("Incovation=" + i, true, runtimeService.getVariable(ids[i], SingletonBeanDelegate.class.getName()));    

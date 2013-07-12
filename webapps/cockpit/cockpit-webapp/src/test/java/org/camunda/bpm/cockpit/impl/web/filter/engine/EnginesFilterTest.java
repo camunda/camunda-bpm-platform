@@ -4,6 +4,8 @@ import static org.fest.assertions.Assertions.assertThat;
 import java.util.regex.Matcher;
 
 import java.util.regex.Pattern;
+
+import org.camunda.bpm.webapp.impl.filter.ProcessEnginesFilter;
 import org.junit.Test;
 
 /**
@@ -16,12 +18,12 @@ public class EnginesFilterTest {
   public void testHTML_FILE_PATTERN() throws Exception {
 
     // given
-    Pattern pattern = EnginesFilter.HTML_FILE_PATTERN;
+    Pattern pattern = ProcessEnginesFilter.HTML_FILE_PATTERN;
 
     // when
-    Matcher matcher1 = pattern.matcher("/app/");
-    Matcher matcher2 = pattern.matcher("/app/engine1/");
-    Matcher matcher3 = pattern.matcher("/app/engine1/something/asd.html");
+    Matcher matcher1 = pattern.matcher("/app/cockpit/");
+    Matcher matcher2 = pattern.matcher("/app/cockpit/engine1/");
+    Matcher matcher3 = pattern.matcher("/app/cockpit/engine1/something/asd.html");
 
     // then
 

@@ -1,12 +1,12 @@
-<?xml version="1.0" encoding="UTF-8"?><definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:signavio="http://www.signavio.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" exporter="Signavio Process Editor, http://www.signavio.com" exporterVersion="7.0.0" expressionLanguage="http://www.w3.org/1999/XPath" id="sid-bb6e71e2-19d1-499d-8455-83835bc80592" targetNamespace="http://www.omg.org/spec/BPMN/20100524/MODEL" typeLanguage="http://www.w3.org/2001/XMLSchema" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/2.0/20100501/BPMN20.xsd">
-   <collaboration id="sid-b8366321-ee8a-43ce-80ea-55cd37b5e7d3">
+<?xml version="1.0" encoding="UTF-8"?><definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:signavio="http://www.signavio.com" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" exporter="Signavio Process Editor, http://www.signavio.com" exporterVersion="7.0.0" expressionLanguage="http://www.w3.org/1999/XPath" id="sid-5d5c657b-19f4-4cdf-8a8b-72ebfdd177cf" targetNamespace="http://www.omg.org/spec/BPMN/20100524/MODEL" typeLanguage="http://www.w3.org/2001/XMLSchema" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL http://www.omg.org/spec/BPMN/2.0/20100501/BPMN20.xsd">
+   <collaboration id="sid-9a8a4ff2-cb53-493e-b2cc-2042bbbc94b9">
       <participant id="TestLane_1" name="TestLane" processRef="CollaborationDropTest_">
          <extensionElements/>
       </participant>
    </collaboration>
    <process id="CollaborationDropTest_" isClosed="false" isExecutable="true" name="TestLane" processType="None">
       <extensionElements/>
-      <laneSet id="sid-a20a653b-4fa8-4d47-85d6-66e971e63af7">
+      <laneSet id="sid-baba5c44-c165-4b83-9918-79eac635a5ac">
          <lane id="lane_5">
             <flowNodeRef>startEvent_12</flowNodeRef>
             <flowNodeRef>Task1_16</flowNodeRef>
@@ -26,8 +26,8 @@
       <sequenceFlow id="sequenceFlow_28" isImmediate="true" name="" sourceRef="Task1_16" targetRef="endEvent_23"/>
       <sequenceFlow id="sequenceFlow_27" isImmediate="true" name="" sourceRef="startEvent_12" targetRef="Task1_16"/>
    </process>
-   <bpmndi:BPMNDiagram id="sid-5443e1b4-8b5e-4d83-af9b-f05273ce51a3">
-      <bpmndi:BPMNPlane bpmnElement="sid-b8366321-ee8a-43ce-80ea-55cd37b5e7d3" id="sid-57e7c1c0-1c0c-4ec9-bd67-84c3db87893a">
+   <bpmndi:BPMNDiagram id="sid-82ebe566-13f4-4ddc-a60f-17cf1c961562">
+      <bpmndi:BPMNPlane bpmnElement="sid-9a8a4ff2-cb53-493e-b2cc-2042bbbc94b9" id="sid-5f056a5b-6da6-450c-9400-d34a8754f326">
          <bpmndi:BPMNShape bpmnElement="TestLane_1" id="TestLane_1_gui" isHorizontal="true">
             <omgdc:Bounds height="250.0" width="600.0" x="0.0" y="0.0"/>
          </bpmndi:BPMNShape>

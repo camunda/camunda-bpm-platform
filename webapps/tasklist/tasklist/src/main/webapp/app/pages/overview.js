@@ -231,7 +231,7 @@ define(["angular", "bpmn/Bpmn"], function(angular, Bpmn) {
           height: 400
         });
 
-        diagram.annotate(task.taskDefinitionKey, "", [ "bpmn-highlight" ]);
+        diagram.annotation(task.taskDefinitionKey).addClasses([ "bpmn-highlight" ]);
 
         $scope.bpmn.diagram = diagram;
       });

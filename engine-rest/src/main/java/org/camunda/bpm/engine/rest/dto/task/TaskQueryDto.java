@@ -80,6 +80,8 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
   private String owner;
   private Integer priority;
   private Boolean unassigned;
+  private Boolean active;
+  private Boolean suspended;
 
   private Date dueAfter;
   private Date dueBefore;
@@ -206,6 +208,16 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
   @CamundaQueryParam(value = "unassigned", converter = BooleanConverter.class)
   public void setUnassigned(Boolean unassigned) {
     this.unassigned = unassigned;
+  }
+  
+  @CamundaQueryParam(value = "active", converter = BooleanConverter.class)
+  public void setActive(Boolean active) {
+    this.active = active;
+  }
+
+  @CamundaQueryParam(value = "suspended", converter = BooleanConverter.class)
+  public void setSuspended(Boolean suspended) {
+    this.suspended = suspended;
   }
 
   @CamundaQueryParam(value = "dueAfter", converter = DateConverter.class)
@@ -356,6 +368,12 @@ public class TaskQueryDto extends AbstractQueryDto<TaskQuery> {
     }
     if (candidateGroups != null) {
       query.taskCandidateGroupIn(candidateGroups);
+    }
+    if (active != null && active == true) {
+      query.active();
+    }
+    if (suspended != null && suspended == true) {
+      query.suspended();
     }
 
     if (taskVariables != null) {

@@ -120,7 +120,7 @@ public class MessageBoundaryEventTest extends PluggableProcessEngineTestCase {
       runtimeService.messageEventReceived("messageName_2", execution2.getId());
       fail();
     } catch (ProcessEngineException e) {
-      assertTextPresent("execution " + execution2.getId() + " doesn't exist", e.getMessage());
+      assertTextPresent("does not have a subscription to a message event with name 'messageName_2'", e.getMessage());
     }
     
     userTask = taskService.createTaskQuery().singleResult();
@@ -179,7 +179,7 @@ public class MessageBoundaryEventTest extends PluggableProcessEngineTestCase {
       runtimeService.messageEventReceived("messageName_2", execution2.getId());
       fail();
     } catch (ProcessEngineException e) {
-      assertTextPresent("execution " + execution2.getId() + " doesn't exist", e.getMessage());
+      assertTextPresent("does not have a subscription to a message event with name 'messageName_2'", e.getMessage());
     }
     
     // only process instance left

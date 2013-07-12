@@ -21,11 +21,12 @@ import org.camunda.bpm.engine.impl.db.HasRevision;
 import org.camunda.bpm.engine.impl.db.PersistentObject;
 import org.camunda.bpm.engine.impl.variable.ValueFields;
 import org.camunda.bpm.engine.impl.variable.VariableType;
+import org.camunda.bpm.engine.runtime.VariableInstance;
 
 /**
  * @author Tom Baeyens
  */
-public class VariableInstanceEntity implements ValueFields, PersistentObject, HasRevision, Serializable {
+public class VariableInstanceEntity implements VariableInstance, ValueFields, PersistentObject, HasRevision, Serializable {
 
   private static final long serialVersionUID = 1L;
 
@@ -37,6 +38,7 @@ public class VariableInstanceEntity implements ValueFields, PersistentObject, Ha
   protected String processInstanceId;
   protected String executionId;
   protected String taskId;
+  protected String activityInstanceId;
 
   protected Long longValue;
   protected Double doubleValue; 
@@ -268,5 +270,14 @@ public class VariableInstanceEntity implements ValueFields, PersistentObject, Ha
   }
   public void setTaskId(String taskId) {
     this.taskId = taskId;
+  }
+  public String getActivityInstanceId() {
+    return activityInstanceId;
+  }
+  public void setActivityInstanceId(String acitivtyInstanceId) {
+    this.activityInstanceId = acitivtyInstanceId;
+  }
+  public String getTypeName() {
+    return (type != null ? type.getTypeName() : null);
   }
 }

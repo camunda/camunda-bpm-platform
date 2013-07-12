@@ -16,7 +16,10 @@ package org.camunda.bpm.engine.impl.persistence.entity;
 import java.util.List;
 import java.util.Map;
 
+import org.camunda.bpm.engine.impl.Page;
+import org.camunda.bpm.engine.impl.VariableInstanceQueryImpl;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
+import org.camunda.bpm.engine.runtime.VariableInstance;
 
 
 /**
@@ -42,4 +45,14 @@ public class VariableInstanceManager extends AbstractManager {
       }
     }
   }
+  
+  public long findVariableInstanceCountByQueryCriteria(VariableInstanceQueryImpl variableInstanceQuery) {
+    return (Long) getDbSqlSession().selectOne("selectVariableInstanceCountByQueryCriteria", variableInstanceQuery);
+  }
+  
+  @SuppressWarnings("unchecked")
+  public List<VariableInstance> findVariableInstanceByQueryCriteria(VariableInstanceQueryImpl variableInstanceQuery, Page page) {
+    return getDbSqlSession().selectList("selectVariableInstanceByQueryCriteria", variableInstanceQuery, page);
+  }
+  
 }

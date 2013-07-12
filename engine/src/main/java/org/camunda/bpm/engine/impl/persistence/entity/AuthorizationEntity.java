@@ -1,0 +1,125 @@
+/* Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package org.camunda.bpm.engine.impl.persistence.entity;
+
+import java.io.Serializable;
+import java.util.HashMap;
+
+import org.camunda.bpm.engine.identity.Authorization;
+import org.camunda.bpm.engine.impl.db.HasRevision;
+import org.camunda.bpm.engine.impl.db.PersistentObject;
+
+/**
+ * @author Daniel Meyer
+ *
+ */
+public class AuthorizationEntity implements Authorization, PersistentObject, HasRevision, Serializable {
+
+  private static final long serialVersionUID = 1L;
+  
+  protected String id;
+  protected int revision;
+  
+  protected String userId;
+  protected String groupId;
+  protected String resourceType;
+  protected String resourceId;  
+  protected int permissions = 0; 
+  
+  // grant methods /////////////////////////////////
+  
+  public void addPermission(int auth) {
+    permissions |= auth;
+  }
+  
+  public void removePermission(int auth) {
+    permissions &= ~auth;
+  }
+  
+  public boolean hasPermission(int perm) {
+    return (permissions & perm) == perm;
+  }
+  
+  // getters setters ///////////////////////////////
+  
+  public String getGroupId() {
+    return groupId;
+  }
+  
+  public void setGroupId(String groupId) {
+    this.groupId = groupId;
+  }
+  
+  public String getUserId() {
+    return userId;
+  }
+
+  public void setUserId(String userId) {
+    this.userId = userId;
+  }
+
+  public String getResourceType() {
+    return resourceType;
+  }
+
+  public void setResourceType(String resourceType) {
+    this.resourceType = resourceType;
+  }
+
+  public String getResourceId() {
+    return resourceId;
+  }
+
+  public void setResourceId(String resourceId) {
+    this.resourceId = resourceId;
+  }
+
+  public String getId() {
+    return id;
+  }
+  
+  public void setId(String id) {
+    this.id = id;
+  }
+  public int getRevision() {
+    return revision;
+  }
+  public void setRevision(int revision) {
+    this.revision = revision;
+  }
+
+  public void setPermissions(int permissions) {
+    this.permissions = permissions;
+  }
+
+  public int getPermissions() {
+    return permissions;
+  }
+
+  public int getRevisionNext() {
+    return revision + 1;
+  }
+
+  public Object getPersistentState() {
+        
+    HashMap<String, Object> state = new HashMap<String, Object>();
+    state.put("userId", userId);
+    state.put("groupId", groupId);
+    state.put("resourceType", resourceType);
+    state.put("resourceId", resourceId);
+    state.put("permissions", permissions);
+    
+    return state;
+  }
+  
+}

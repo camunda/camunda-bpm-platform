@@ -56,6 +56,7 @@ public class QuerySessionFactory extends StandaloneProcessEngineConfiguration {
     initTransactionFactory();
     initTransactionContextFactory();
     initCommandExecutors();
+    initIdentityProviderSessionFactory();
     initSqlSessionFactory();
     initSessionFactories();
   }

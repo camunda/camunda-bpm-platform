@@ -103,7 +103,7 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
         .body("childTransitionInstances[0].executionId", equalTo(EXAMPLE_EXECUTION_ID))
         .when().get(PROCESS_INSTANCE_ACTIVIY_INSTANCES_URL);
     
-    Assert.assertEquals("Should return exactly nine properties", 8, response.jsonPath().getMap("").size());
+    Assert.assertEquals("Should return exactly eight properties", 8, response.jsonPath().getMap("").size());
   }
   
   @Test

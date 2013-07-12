@@ -44,7 +44,7 @@ public class SLSBDelegateTest extends AbstractFoxPlatformIntegrationTest {
     
     taskService.complete(taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult().getId());
     
-    waitForJobExecutorToProcessAllJobs(6000, 300);
+    waitForJobExecutorToProcessAllJobs(6000);
     
     Assert.assertEquals(true, runtimeService.getVariable(pi.getId(), SLSBDelegate.class.getName()));
     
@@ -65,7 +65,7 @@ public class SLSBDelegateTest extends AbstractFoxPlatformIntegrationTest {
     
     taskService.complete(taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult().getId());
     
-    waitForJobExecutorToProcessAllJobs(6000, 300);
+    waitForJobExecutorToProcessAllJobs(6000);
     
     Assert.assertEquals(true, runtimeService.getVariable(pi.getId(), SLSBDelegate.class.getName()));
     
@@ -86,7 +86,7 @@ public class SLSBDelegateTest extends AbstractFoxPlatformIntegrationTest {
       taskService.complete(taskService.createTaskQuery().processInstanceId(ids[i]).singleResult().getId());
     }
         
-    waitForJobExecutorToProcessAllJobs(60*1000, 300);
+    waitForJobExecutorToProcessAllJobs(60*1000);
     
     for(int i=0; i<instances; i++) {    
       Assert.assertEquals("Incovation=" + i, true, runtimeService.getVariable(ids[i], SLSBDelegate.class.getName()));    

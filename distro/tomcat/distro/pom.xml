@@ -58,7 +58,7 @@
 
     <dependency>
       <groupId>org.camunda.bpm.tasklist</groupId>
-      <artifactId>camunda-tasklist</artifactId>
+      <artifactId>camunda-tasklist-tomcat</artifactId>
       <version>${project.version}</version>
       <type>war</type>
     </dependency>
@@ -71,6 +71,13 @@
     <dependency>
       <groupId>org.camunda.bpm.example</groupId>
       <artifactId>camunda-example-invoice</artifactId>
+      <version>${project.version}</version>
+      <type>war</type>
+    </dependency>
+
+    <dependency>
+      <groupId>org.camunda.bpm.example</groupId>
+      <artifactId>camunda-example-wait-states</artifactId>
       <version>${project.version}</version>
       <type>war</type>
     </dependency>

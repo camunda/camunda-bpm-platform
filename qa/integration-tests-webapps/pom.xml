@@ -302,9 +302,9 @@
                   <groupId>org.camunda.bpm.cockpit</groupId>
                   <artifactId>camunda-cockpit-jboss</artifactId>
                   <type>war</type>
-                  <pingURL>http://localhost:${jboss.http.port}/cockpit</pingURL>
+                  <pingURL>http://localhost:${jboss.http.port}/camunda</pingURL>
                   <properties>
-                    <context>cockpit</context>
+                    <context>camunda</context>
                   </properties>
                 </deployable>
                 <deployable>
@@ -453,9 +453,9 @@
                   <groupId>org.camunda.bpm.cockpit</groupId>
                   <artifactId>camunda-cockpit-glassfish</artifactId>
                   <type>war</type>
-                  <pingURL>http://localhost:${http.port}/cockpit</pingURL>
+                  <pingURL>http://localhost:${http.port}/camunda</pingURL>
                   <properties>
-                    <context>cockpit</context>
+                    <context>camunda</context>
                   </properties>
                 </deployable>
                 <deployable>
@@ -576,9 +576,9 @@
                   <groupId>org.camunda.bpm.cockpit</groupId>
                   <artifactId>camunda-cockpit-tomcat</artifactId>
                   <type>war</type>
-                  <pingURL>http://localhost:${tomcat6.connector.http.port}/cockpit</pingURL>
+                  <pingURL>http://localhost:${tomcat6.connector.http.port}/camunda</pingURL>
                   <properties>
-                    <context>cockpit</context>
+                    <context>camunda</context>
                   </properties>
                 </deployable>
                 <deployable>

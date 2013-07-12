@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.SuspendedEntityInteractionException;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.impl.util.ClockUtil;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
@@ -156,16 +157,16 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
     try {
       runtimeService.startProcessInstanceById(processDefinition.getId());
       fail("Exception is expected but not thrown");
-    } catch(ProcessEngineException e) {
-      assertTextPresentIgnoreCase("cannot start process instance", e.getMessage());
+    } catch(SuspendedEntityInteractionException e) {
+      assertTextPresentIgnoreCase("is suspended", e.getMessage());
     }
     
     // By Key
     try {
       runtimeService.startProcessInstanceByKey(processDefinition.getKey());
       fail("Exception is expected but not thrown");
-    } catch(ProcessEngineException e) {
-      assertTextPresentIgnoreCase("cannot start process instance", e.getMessage());
+    } catch(SuspendedEntityInteractionException e) {
+      assertTextPresentIgnoreCase("is suspended", e.getMessage());
     }
   }
   
@@ -216,7 +217,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
       try {
         taskService.complete(task.getId());
         fail("A suspended task shouldn't be able to be continued");
-      } catch(ProcessEngineException e) {
+      } catch(SuspendedEntityInteractionException e) {
         // This is good
       }
     }
@@ -273,7 +274,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
     
     // The jobs should simply be executed
     ClockUtil.setCurrentTime(new Date(now.getTime() + (60 * 60 * 1000))); // Timer is set to fire on 5 minutes
-    waitForJobExecutorToProcessAllJobs(2000L, 100L);
+    waitForJobExecutorToProcessAllJobs(2000L);
     assertEquals(0, managementService.createJobQuery().count());
   }
   
@@ -297,13 +298,13 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
     // Move clock 8 days further and let job executor run
     long eightDaysSinceStartTime = oneWeekFromStartTime + (24 * 60 * 60 * 1000);
     ClockUtil.setCurrentTime(new Date(eightDaysSinceStartTime));
-    waitForJobExecutorToProcessAllJobs(5000L, 50L);
+    waitForJobExecutorToProcessAllJobs(5000L);
     
     // Try to start process instance. It should fail now.
     try {
       runtimeService.startProcessInstanceById(processDefinition.getId());
       fail();
-    } catch (ProcessEngineException e) {
+    } catch (SuspendedEntityInteractionException e) {
       assertTextPresentIgnoreCase("suspended", e.getMessage());
     }
     assertEquals(1, runtimeService.createProcessInstanceQuery().count());
@@ -351,13 +352,13 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
     // Move clock 9 days further and let job executor run
     long eightDaysSinceStartTime = oneWeekFromStartTime + (2 * 24 * 60 * 60 * 1000);
     ClockUtil.setCurrentTime(new Date(eightDaysSinceStartTime));
-    waitForJobExecutorToProcessAllJobs(5000L, 50L);
+    waitForJobExecutorToProcessAllJobs(5000L);
     
     // Try to start process instance. It should fail now.
     try {
       runtimeService.startProcessInstanceById(processDefinition.getId());
       fail();
-    } catch (ProcessEngineException e) {
+    } catch (SuspendedEntityInteractionException e) {
       assertTextPresentIgnoreCase("suspended", e.getMessage());
     }
     assertEquals(nrOfProcessInstances, runtimeService.createProcessInstanceQuery().count());
@@ -392,7 +393,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
     try {
       runtimeService.startProcessInstanceById(processDefinition.getId());
       fail();
-    } catch (ProcessEngineException e) {
+    } catch (SuspendedEntityInteractionException e) {
       assertTextPresentIgnoreCase("suspended", e.getMessage());
     }
     assertEquals(0, runtimeService.createProcessInstanceQuery().count());
@@ -406,7 +407,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
     // Move clock two days and let job executor run
     long twoDaysFromStart = startTime.getTime() + (2 * 24 * 60 * 60 * 1000);
     ClockUtil.setCurrentTime(new Date(twoDaysFromStart));
-    waitForJobExecutorToProcessAllJobs(5000L, 50L);
+    waitForJobExecutorToProcessAllJobs(5000L);
     
     // Starting a process instance should now succeed
     runtimeService.startProcessInstanceById(processDefinition.getId());
@@ -485,7 +486,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
     
     // Move time 3 hours and run job executor
     ClockUtil.setCurrentTime(new Date(startTime.getTime() + (3 * hourInMs)));
-    waitForJobExecutorToProcessAllJobs(5000L, 50L);
+    waitForJobExecutorToProcessAllJobs(5000L);
     assertEquals(nrOfProcessDefinitions, repositoryService.createProcessDefinitionQuery().count());
     assertEquals(0, repositoryService.createProcessDefinitionQuery().active().count());
     assertEquals(nrOfProcessDefinitions, repositoryService.createProcessDefinitionQuery().suspended().count());
@@ -500,7 +501,7 @@ public class ProcessDefinitionSuspensionTest extends PluggableProcessEngineTestC
     
     // Move time 6 hours and run job executor
     ClockUtil.setCurrentTime(new Date(startTime.getTime() + (6 *hourInMs)));
-    waitForJobExecutorToProcessAllJobs(5000L, 50L);
+    waitForJobExecutorToProcessAllJobs(5000L);
     assertEquals(nrOfProcessDefinitions, repositoryService.createProcessDefinitionQuery().count());
     assertEquals(nrOfProcessDefinitions, repositoryService.createProcessDefinitionQuery().active().count());
     assertEquals(0, repositoryService.createProcessDefinitionQuery().suspended().count());

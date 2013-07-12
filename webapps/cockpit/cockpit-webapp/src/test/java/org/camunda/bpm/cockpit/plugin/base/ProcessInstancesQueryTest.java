@@ -16,9 +16,9 @@ import static org.fest.assertions.Assertions.assertThat;
 
 import java.util.List;
 
-import org.camunda.bpm.cockpit.plugin.base.dto.IncidentStatisticsDto;
-import org.camunda.bpm.cockpit.plugin.base.dto.ProcessInstanceDto;
-import org.camunda.bpm.cockpit.plugin.base.resources.ProcessInstanceResource;
+import org.camunda.bpm.cockpit.impl.plugin.base.dto.IncidentStatisticsDto;
+import org.camunda.bpm.cockpit.impl.plugin.base.dto.ProcessInstanceDto;
+import org.camunda.bpm.cockpit.impl.plugin.base.resources.ProcessInstanceResource;
 import org.camunda.bpm.cockpit.plugin.test.AbstractCockpitPluginTest;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RepositoryService;
@@ -68,7 +68,7 @@ public class ProcessInstancesQueryTest extends AbstractCockpitPluginTest {
   public void testQuery() {
     startProcessInstances("userTaskProcess", 10);
 
-    helper.waitForJobExecutorToProcessAllJobs(15000, 500);
+    helper.waitForJobExecutorToProcessAllJobs(15000);
 
     String processDefinitionId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
 
@@ -84,7 +84,7 @@ public class ProcessInstancesQueryTest extends AbstractCockpitPluginTest {
   public void testQueryPagination() {
     startProcessInstances("userTaskProcess", 10);
 
-    helper.waitForJobExecutorToProcessAllJobs(15000, 500);
+    helper.waitForJobExecutorToProcessAllJobs(15000);
 
     String processDefinitionId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
 
@@ -107,7 +107,7 @@ public class ProcessInstancesQueryTest extends AbstractCockpitPluginTest {
   public void testQueryWithException() {
     startProcessInstances("userTaskProcess", 1);
 
-    helper.waitForJobExecutorToProcessAllJobs(15000, 500);
+    helper.waitForJobExecutorToProcessAllJobs(15000);
 
     String processDefinitionId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
 
@@ -134,7 +134,7 @@ public class ProcessInstancesQueryTest extends AbstractCockpitPluginTest {
   public void testQueryWithoutAnyIncident() {
     startProcessInstances("userTaskProcess", 1);
 
-    helper.waitForJobExecutorToProcessAllJobs(15000, 500);
+    helper.waitForJobExecutorToProcessAllJobs(15000);
 
     String processDefinitionId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
 
@@ -155,7 +155,7 @@ public class ProcessInstancesQueryTest extends AbstractCockpitPluginTest {
   public void testQueryWithContainingIncidents() {
     startProcessInstances("FailingProcess", 1);
 
-    helper.waitForJobExecutorToProcessAllJobs(15000, 500);
+    helper.waitForJobExecutorToProcessAllJobs(15000);
 
     String processDefinitionId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
 
@@ -182,7 +182,7 @@ public class ProcessInstancesQueryTest extends AbstractCockpitPluginTest {
   public void testQueryWithMoreThanOneIncident() {
     startProcessInstances("processWithTwoParallelFailingServices", 1);
 
-    helper.waitForJobExecutorToProcessAllJobs(15000, 500);
+    helper.waitForJobExecutorToProcessAllJobs(15000);
 
     String processDefinitionId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
 
@@ -222,7 +222,7 @@ public class ProcessInstancesQueryTest extends AbstractCockpitPluginTest {
   public void testNestedIncidents() {
     startProcessInstances("NestedCallActivity", 1);
 
-    helper.waitForJobExecutorToProcessAllJobs(15000, 500);
+    helper.waitForJobExecutorToProcessAllJobs(15000);
 
     String nestedCallActivityId = repositoryService
         .createProcessDefinitionQuery()

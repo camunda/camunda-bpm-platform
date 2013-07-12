@@ -65,12 +65,6 @@ public class StartProcessInstanceCmd implements Command<ProcessInstance>, Serial
       throw new ProcessEngineException("processDefinitionKey and processDefinitionId are null");
     }
     
-    // Do not start process a process instance if the process definition is suspended
-    if (processDefinition.isSuspended()) {
-      throw new ProcessEngineException("Cannot start process instance. Process definition " 
-              + processDefinition.getName() + " (id = " + processDefinition.getId() + ") is suspended");
-    }
-
     // Start the process instance
     ExecutionEntity processInstance = processDefinition.createProcessInstance(businessKey);
     if (variables!=null) {

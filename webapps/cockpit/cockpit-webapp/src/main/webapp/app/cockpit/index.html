@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>camunda Cockpit</title>
+
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <meta name="author" content="camunda services GmbH" />
+
+    <!-- settings the base path for relative links -->
+    <base href="./" cockpit-api="$APP_ROOT/api/cockpit/" engine-api="$APP_ROOT/api/engine/" />
+
+    <!-- Styles -->
+    <link href="$APP_ROOT/assets/css/cockpit/loader.css" rel="stylesheet" />
+
+    <!-- For IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- Favicon -->
+    <link href="$APP_ROOT/assets/img/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+
+    <!-- scripts -->
+    <script src="$APP_ROOT/assets/vendor/require/require.js"></script>
+
+    <script src="$APP_ROOT/app/cockpit/cockpit-bootstrap.js"></script>
+
+  </head>
+  <body>
+
+    <div class="wrapper">
+      <!-- Header -->
+      <div ng-include="'templates/header.html'"></div>
+
+      <div class="container-fluid content-container content-inset">
+        <div notifications-panel></div>
+
+        <div class="row-fluid content-container">
+          <!-- actual view body is rendered here whenever the url changes -->
+          <div ng-view class="span12">
+          </div>
+        </div>
+      </div>
+      <div class="push-down"><!-- // --></div>
+    </div>
+
+    <!-- footer -->
+    <footer class="content-container">
+      <div class="container-fluid">
+        <p><a href="http://camunda.org">powered by camunda BPM</a> / version ${project.version}</p>
+      </div>
+
+    </footer>
+  </body>
+</html>

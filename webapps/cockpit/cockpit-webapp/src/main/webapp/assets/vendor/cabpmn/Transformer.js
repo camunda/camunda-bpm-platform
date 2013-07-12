@@ -19,14 +19,12 @@ define([], function () {
   var NS_OMG_DC = "http://www.omg.org/spec/DD/20100524/DC";
   var NS_OMG_DI = "http://www.omg.org/spec/DD/20100524/DI";
 
-  /** the parse listeners are callbacks that are invoked by the transformer
-   * when activity definitions are created */
-  var parseListeners = [];
-
   function getXmlObject(source) {
     // use the browser's DOM implemenation
     var xmlDoc;
-    if (window.DOMParser) {
+    if (source instanceof Document) {
+        xmlDoc = source;
+    } else if (window.DOMParser) {
       var parser = new DOMParser();
       xmlDoc = parser.parseFromString(source,"text/xml");
     } else {
@@ -38,11 +36,14 @@ define([], function () {
   }
 
   function Transformer () {
+    this.parseListeners = [];
   }
 
-  Transformer.prototype.parseListeners = parseListeners;
-
   Transformer.prototype.transform =  function(source) {
+
+    /** the parse listeners are callbacks that are invoked by the transformer
+     * when activity definitions are created */
+    var parseListeners = this.parseListeners;
 
     var doc = getXmlObject(source);
     var definitions = doc.getElementsByTagNameNS(NS_BPMN_SEMANTIC, "definitions");
@@ -174,14 +175,14 @@ define([], function () {
       }
 
       return bpmnObject;
-    };
+    }
 
     function transformActivity(element, scope, sequenceFlows, bpmnDiElementIndex) {
       // the ActivityDefinition to be built
 
       var taskObject = createFlowElement(element, scope, sequenceFlows, bpmnDiElementIndex);
       return taskObject;
-    };
+    }
 
     function transformIoSpecification(element, scope, bpmnDiElementIndex) {
       var ioObject = createBpmnObject(element, scope, bpmnDiElementIndex);
@@ -201,7 +202,7 @@ define([], function () {
       ioObject["baseElements"] = baseElements;
 
       return ioObject;
-    };
+    }
 
     function transformLaneSet(laneSetElement, scope, bpmnDiElementIndex) {
       if (laneSetElement.childNodes.length == 0) {
@@ -218,7 +219,7 @@ define([], function () {
         createBpmnObject(element, scope, bpmnDiElementIndex);
       }
       while (element = element.nextSibling)
-    };
+    }
 
 
     function transformEvent(element, scope, sequenceFlows, bpmnDiElementIndex) {
@@ -233,7 +234,7 @@ define([], function () {
           if(child.nodeName.indexOf("EventDefinition") != -1) {
             var elementType = child.nodeName;
             if (elementType.indexOf(":") != -1) {
-              elementType = elementType.substr(elementType.indexOf(":") + 1, elementType.length)
+              elementType = elementType.substr(elementType.indexOf(":") + 1, elementType.length);
             }
             eventObject.eventDefinitions.push({
               type : elementType
@@ -243,7 +244,7 @@ define([], function () {
       }
 
       return eventObject;
-    };
+    }
 
     function createSequenceFlow(element, scopeActivity, bpmnDiElementIndex, index) {
 
@@ -288,7 +289,7 @@ define([], function () {
       } while(element = element.nextSibling);
 
       return index;
-    };
+    }
 
     /** transform <parallelGateway ... /> elements */
     function transformParallelGateway(element, scopeActivity, sequenceFlows, bpmnDiElementIndex) {
@@ -308,7 +309,7 @@ define([], function () {
       bpmnObject.cardinality = incomingFlows;
 
       return bpmnObject;
-    };
+    }
 
     /** transform <exclusiveGateway ... /> elements */
     function transformExclusiveGateway(element, scopeActivity, sequenceFlows, bpmnDiElementIndex) {
@@ -346,7 +347,7 @@ define([], function () {
         }
       }
       return bpmnObject;
-    };
+    }
 
     /** invokes all parse listeners */
     function invokeParseListeners(bpmnObject, element, scopeActivity, scopeElement) {

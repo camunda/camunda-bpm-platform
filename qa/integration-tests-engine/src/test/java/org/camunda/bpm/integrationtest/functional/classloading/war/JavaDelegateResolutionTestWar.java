@@ -84,7 +84,7 @@ public class JavaDelegateResolutionTestWar extends AbstractFoxPlatformIntegratio
     
     Assert.assertEquals(1, runtimeService.createProcessInstanceQuery().count());
     
-    waitForJobExecutorToProcessAllJobs(16000, 100);
+    waitForJobExecutorToProcessAllJobs(16000);
     
     Assert.assertEquals(0, runtimeService.createProcessInstanceQuery().count());
     
