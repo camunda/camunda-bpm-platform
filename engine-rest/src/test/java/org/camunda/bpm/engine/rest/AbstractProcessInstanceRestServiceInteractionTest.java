@@ -342,6 +342,108 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
   }
   
   @Test
+  public void testPutSingleVariableWithTypeString() {
+    String variableKey = "aVariableKey";
+    String variableValue = "aVariableValue";
+    String type = "String";
+    
+    Map<String, Object> variableJson = VariablesBuilder.getVariableValueMap(variableValue, type);
+    
+    given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).pathParam("varId", variableKey)
+      .contentType(ContentType.JSON).body(variableJson)
+      .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
+      .when().put(SINGLE_PROCESS_INSTANCE_VARIABLE_URL);
+    
+    verify(runtimeServiceMock).setVariable(eq(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID), eq(variableKey), 
+        eq(variableValue));
+  }
+  
+  @Test
+  public void testPutSingleVariableWithTypeInteger() {
+    String variableKey = "aVariableKey";
+    Integer variableValue = 123;
+    String type = "Integer";
+    
+    Map<String, Object> variableJson = VariablesBuilder.getVariableValueMap(variableValue, type);
+    
+    given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).pathParam("varId", variableKey)
+      .contentType(ContentType.JSON).body(variableJson)
+      .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
+      .when().put(SINGLE_PROCESS_INSTANCE_VARIABLE_URL);
+    
+    verify(runtimeServiceMock).setVariable(eq(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID), eq(variableKey), 
+        eq(variableValue));
+  }
+  
+  @Test
+  public void testPutSingleVariableWithTypeShort() {
+    String variableKey = "aVariableKey";
+    Short variableValue = 123;
+    String type = "Short";
+    
+    Map<String, Object> variableJson = VariablesBuilder.getVariableValueMap(variableValue, type);
+    
+    given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).pathParam("varId", variableKey)
+      .contentType(ContentType.JSON).body(variableJson)
+      .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
+      .when().put(SINGLE_PROCESS_INSTANCE_VARIABLE_URL);
+    
+    verify(runtimeServiceMock).setVariable(eq(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID), eq(variableKey), 
+        eq(variableValue));
+  }
+  
+  @Test
+  public void testPutSingleVariableWithTypeLong() {
+    String variableKey = "aVariableKey";
+    Long variableValue = Long.valueOf(123);
+    String type = "Long";
+    
+    Map<String, Object> variableJson = VariablesBuilder.getVariableValueMap(variableValue, type);
+    
+    given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).pathParam("varId", variableKey)
+      .contentType(ContentType.JSON).body(variableJson)
+      .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
+      .when().put(SINGLE_PROCESS_INSTANCE_VARIABLE_URL);
+    
+    verify(runtimeServiceMock).setVariable(eq(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID), eq(variableKey), 
+        eq(variableValue));
+  }
+  
+  @Test
+  public void testPutSingleVariableWithTypeDouble() {
+    String variableKey = "aVariableKey";
+    Double variableValue = 123.456;
+    String type = "Double";
+    
+    Map<String, Object> variableJson = VariablesBuilder.getVariableValueMap(variableValue, type);
+    
+    given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).pathParam("varId", variableKey)
+      .contentType(ContentType.JSON).body(variableJson)
+      .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
+      .when().put(SINGLE_PROCESS_INSTANCE_VARIABLE_URL);
+    
+    verify(runtimeServiceMock).setVariable(eq(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID), eq(variableKey), 
+        eq(variableValue));
+  }
+
+  @Test
+  public void testPutSingleVariableWithTypeBoolean() {
+    String variableKey = "aVariableKey";
+    Boolean variableValue = true;
+    String type = "Boolean";
+    
+    Map<String, Object> variableJson = VariablesBuilder.getVariableValueMap(variableValue, type);
+    
+    given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).pathParam("varId", variableKey)
+      .contentType(ContentType.JSON).body(variableJson)
+      .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
+      .when().put(SINGLE_PROCESS_INSTANCE_VARIABLE_URL);
+    
+    verify(runtimeServiceMock).setVariable(eq(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID), eq(variableKey), 
+        eq(variableValue));
+  }
+  
+  @Test
   public void testPutSingleVariableWithNoValue() {
     String variableKey = "aVariableKey";
     
