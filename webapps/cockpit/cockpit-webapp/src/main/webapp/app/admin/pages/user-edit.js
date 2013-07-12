@@ -6,10 +6,6 @@ define(['angular'], function(angular) {
 
   var Controller = ['$scope', '$routeParams', 'UserResource', 'Notifications', '$location', function ($scope, $routeParams, UserResource, Notifications, $location) {
 
-    // properties /////////////////////////////
-
-    $scope.action = $routeParams.action;
-    
     // used to display information about the user
     $scope.profile = null;
 
@@ -92,7 +88,7 @@ define(['angular'], function(angular) {
     // page controls ////////////////////////////////////
     
     $scope.show = function(fragment) {
-      return fragment == $scope.action;
+      return fragment == $location.search().tab;
     };
 
     $scope.activeClass = function(link) {
@@ -104,18 +100,24 @@ define(['angular'], function(angular) {
     
     loadProfile();
 
+    if(!$location.search().tab) {
+      $location.search({'tab': 'profile'});
+    }
+
   }];
 
   var RouteConfig = [ '$routeProvider', function($routeProvider) {
-    $routeProvider.when('/users/:userId/:action', {
+    $routeProvider.when('/users/:userId', {
       templateUrl: 'pages/user-edit.html',
-      controller: Controller
+      controller: Controller,
+      reloadOnSearch: false
     });
 
     // multi tenacy
-    $routeProvider.when('/:engine/users/:userId/:action', {
+    $routeProvider.when('/:engine/users/:userId', {
       templateUrl: 'pages/user-edit.html',
-      controller: Controller
+      controller: Controller,
+      reloadOnSearch: false
     });
   }];
 

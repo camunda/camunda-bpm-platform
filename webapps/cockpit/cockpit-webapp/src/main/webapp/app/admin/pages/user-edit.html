@@ -9,19 +9,19 @@
       <div class="span3">
         <div class="well sidebar-nav">
           <ul class="nav nav-list">
-            <li ng-class="activeClass('/profile')">
-              <a href="#/users/{{user.id}}/profile">Profile</a>
+            <li ng-class="activeClass('profile')">
+              <a href="#/users/{{user.id}}?tab=profile">Profile</a>
             </li>
-            <li ng-class="activeClass('/account')">
-              <a href="#/users/{{user.id}}/account">Account</a>
+            <li ng-class="activeClass('account')">
+              <a href="#/users/{{user.id}}?tab=account">Account</a>
             </li>
-            <li ng-class="activeClass('/groups')">
-              <a href="#/users/{{user.id}}/groups">Groups</a>
+            <li ng-class="activeClass('groups')">
+              <a href="#/users/{{user.id}}?tab=groups">Groups</a>
             </li>                    
           </ul>          
         </div>
       </div>
-      
+
       <div class="span9">
 
         <div ng-show="show('profile')"> 

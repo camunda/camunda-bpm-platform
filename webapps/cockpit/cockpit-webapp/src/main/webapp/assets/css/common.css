@@ -24,6 +24,12 @@
   box-sizing: border-box;
 }
 
+/* correct input field height */
+input {
+  min-height: 30px;
+  margin-bottom: 0px;
+}
+
 
 /* Bootstrap code examples
 -------------------------------------------------- */
