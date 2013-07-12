@@ -174,11 +174,6 @@ textarea.in-place-edit {
 
 }
 
-input.in-place-edit {
-  min-height: 30px;
-  margin-bottom: 0px;
-}
-
 input:focus.ng-invalid {
   border-color: #e9322d;
   -webkit-box-shadow: 0 0 6px #f8b9b7;
