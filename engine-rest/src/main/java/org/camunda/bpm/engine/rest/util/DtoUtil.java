@@ -38,32 +38,38 @@ public class DtoUtil {
         // boolean
         if (type.equalsIgnoreCase(BooleanType.TYPE_NAME)) {
           variablesMap.put(variable.getKey(), Boolean.valueOf(value.toString()));
-        } else
+          continue;
+        }
           
         // string
         if (type.equalsIgnoreCase(StringType.TYPE_NAME)) {
           variablesMap.put(variable.getKey(), String.valueOf(value));
-        } else
+          continue;
+        }
           
         // integer
         if (type.equalsIgnoreCase(IntegerType.TYPE_NAME)) {
           variablesMap.put(variable.getKey(), Integer.valueOf(value.toString()));
-        } else
+          continue;
+        }
           
         // short
         if (type.equalsIgnoreCase(ShortType.TYPE_NAME)) {
           variablesMap.put(variable.getKey(), Short.valueOf(value.toString()));
-        } else 
+          continue;
+        }
         
         // long
         if (type.equalsIgnoreCase(LongType.TYPE_NAME)) {
           variablesMap.put(variable.getKey(), Long.valueOf(value.toString()));
-        } else
+          continue;
+        }
   
         // double
         if (type.equalsIgnoreCase(DoubleType.TYPE_NAME)) {
           variablesMap.put(variable.getKey(), Double.valueOf(value.toString()));
-        } else
+          continue;
+        }
         
         // date
         if (type.equalsIgnoreCase(DateType.TYPE_NAME)) {
@@ -71,15 +77,14 @@ public class DtoUtil {
             SimpleDateFormat pattern = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
             Date date = pattern.parse(String.valueOf(value));
             variablesMap.put(variable.getKey(), date);
+            continue;
           } catch (ParseException e) {
             throw new ProcessEngineException("Cannot parse date.", e);
           }
         }
-      } else {
-        variablesMap.put(variable.getKey(), value);
       }
       
-      
+      variablesMap.put(variable.getKey(), value);
     }
     return variablesMap;
   }
