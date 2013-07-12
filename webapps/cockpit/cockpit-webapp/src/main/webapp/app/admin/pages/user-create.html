@@ -1,0 +1,73 @@
+<div class="container">
+  <section id="users">
+    <div class="row">
+      <div class="page-header">
+        <h1><i class="icon-user-large"></i> Create New User</h1>
+      </div>
+    </div>
+    <div class="row">
+      <form class="form-horizontal" name="createUserForm">
+        
+        <legend>User</legend>
+
+        <div class="control-group">
+          <label class="control-label" for="inputFirstname">Firstname*</label>
+          <div class="controls">
+            <input id="inputFirstname" name="firstname" type="text" ng-model="profile.firstName" novalidate required></input>
+            <p class="text-error" ng-show="createUserForm.firstname.$error.required">Firstname is required.</p>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <label class="control-label" for="inputLastname">Lastname*</label>
+          <div class="controls">
+            <input id="inputLastname" type="text" ng-model="profile.lastName" novalidate required></input>
+            <p class="text-error" ng-show="createUserForm.firstname.$error.required">Lastname is required.</p>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <label class="control-label" for="inputEmail">Email</label>
+          <div class="controls">
+            <input id="inputEmail" name="email" type="text" ng-model="profile.email" data-email></input>
+            <p class="text-error" ng-show="createUserForm.email.$error.email">Not a valid email address</p>
+          </div>
+        </div>
+
+        <legend>Account</legend>
+
+        <div class="control-group">
+          <label class="control-label" for="inputUserId">User id*</label>
+          <div class="controls">
+            <input id="inputUserId" name="userId" type="text" ng-model="profile.id" novalidate required></input>
+            <p class="text-error" ng-show="createUserForm.userId.$error.required">User id is required.</p>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <label class="control-label" for="inputPassword">Passowrd*:</label>
+          <div class="controls">
+            <input id="inputPassword" name="inputPassword" type="password" ng-model="credentials.password" data-password required></input>
+            <p class="text-error" ng-show="createUserForm.inputPassword.$error.password">Password must have at least 8 characters.</p>
+            <p class="text-error" ng-show="createUserForm.inputPassword.$error.required">Password is required.</p>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <label class="control-label" for="inputPasswordRepeat">Password (repeat)*:</label>
+          <div class="controls">
+            <input id="inputPasswordRepeat" name="inputPasswordRepeat" type="password" ng-model="credentials.password2" data-password-repeat="credentials.password"></input>
+            <p class="text-error" ng-show="createUserForm.inputPasswordRepeat.$error.passwordRepeat">Passwords must match.</p>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <div class="controls">
+            <button type="submit" class="btn"  data-ng-disabled="!createUserForm.$valid" data-ng-click="createUser()">Save new User</button>
+          </div>
+        </div>
+     
+      </form>
+    </div>
+  </section>
+</div>

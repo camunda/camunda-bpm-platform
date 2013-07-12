@@ -4,7 +4,9 @@ ngDefine('admin.resources', function(module) {
 
     return $resource(Uri.appUri('engine://user/:userId/:action'), { userId: '@id' }, {
       profile : {method:'GET', params: { 'action' : 'profile'}},
-      updateProfile : {method:'PUT', params: { 'action' : 'profile'}}
+      updateProfile : {method:'PUT', params: { 'action' : 'profile'}},
+      updateCredentials : {method:'PUT', params: { 'action' : 'credentials'}},
+      createUser : {method:'POST', params: { 'userId' : 'create'}}
     });
   }];
 
