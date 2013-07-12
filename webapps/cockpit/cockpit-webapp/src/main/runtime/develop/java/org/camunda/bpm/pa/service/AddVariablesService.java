@@ -25,16 +25,30 @@ public class AddVariablesService implements JavaDelegate {
 
     // Start process instance with different types of variables
     Map<String, Object> variables = new HashMap<String, Object>();
-    variables.put("longVar", 928374L);
     variables.put("shortVar", (short) 123);
+    variables.put("longVar", 928374L);
     variables.put("integerVar", 1234);
+    
+    variables.put("floatVar", (float) Float.MAX_VALUE);
+    variables.put("doubleVar", Double.MAX_VALUE);
+    
+    variables.put("trueBooleanVar", true);
+    variables.put("falseBooleanVar", false);
+    
     variables.put("stringVar", "coca-cola");
+    
     variables.put("dateVar", now);
+    
     variables.put("nullVar", null);
+    
     variables.put("serializableVar", serializable);
+    
     variables.put("bytesVar", bytes);
     variables.put("aByteVar", aByte);
     variables.put("value1", "xyz");
+    
+    CockpitVariable cockpitVar = new CockpitVariable("test", "cockpitVariableValue");
+    variables.put("cockpitVar", cockpitVar);
     
     execution.setVariablesLocal(variables);
   }

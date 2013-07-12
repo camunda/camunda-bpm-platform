@@ -22,15 +22,15 @@
           {{ statistic.instances }}
         </td>
         <td>
-          <div state-circle incidents="statistic.incidents" />
+          <div state-circle incidents="statistic.incidents"></div>
         </td>
       </tr>
-      <tr ngm-if="!statistics">
+      <tr ng-if="!statistics">
         <td colspan="3">
           <i class="icon-loading"></i> loading statistics...
         </td>
       </tr>
-      <tr ngm-if="statistics && !statistics.length">
+      <tr ng-if="statistics && !statistics.length">
         <td colspan="3">
           No process definitions.
         </td>

@@ -18,11 +18,11 @@ import org.camunda.bpm.engine.impl.persistence.entity.ByteArrayEntity;
  * @author Tom Baeyens
  */
 public class ByteArrayType implements VariableType {
-
-  private static final long serialVersionUID = 1L;
+  
+  public static final String TYPE_NAME = "bytes";
   
   public String getTypeName() {
-    return "bytes";
+    return TYPE_NAME;
   }
 
   public boolean isCachable() {
@@ -52,5 +52,9 @@ public class ByteArrayType implements VariableType {
       return true;
     }
     return byte[].class.isAssignableFrom(value.getClass());
+  }
+
+  public String getTypeNameForValue(Object value) {
+    return value.getClass().getSimpleName();
   }
 }

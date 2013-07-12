@@ -15,17 +15,17 @@
       <td>{{ processInstance.startTime }}</td>
       <td>{{ processInstance.businessKey }}</td>
       <td>
-        <div state-circle incidents="processInstance.incidents" />
+        <div state-circle incidents="processInstance.incidents"></div>
       </td>
     </tr>
 
-    <tr ngm-if="!processInstances">
+    <tr ng-if="!processInstances">
       <td colspan="4">
         <i class="icon-loading"></i> loading process instances...
       </td>
     </tr>
 
-    <tr ng-hide="processInstances && processInstances.length">
+    <tr ng-if="processInstances && !processInstances.length">
       <td  colspan="4">
         No process instances
       </td>

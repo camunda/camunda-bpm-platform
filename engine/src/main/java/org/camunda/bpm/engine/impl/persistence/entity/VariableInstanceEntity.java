@@ -278,6 +278,6 @@ public class VariableInstanceEntity implements VariableInstance, ValueFields, Pe
     this.activityInstanceId = acitivtyInstanceId;
   }
   public String getTypeName() {
-    return (type != null ? type.getTypeName() : null);
+    return (type != null ? type.getTypeNameForValue(getValue()) : null);
   }
 }

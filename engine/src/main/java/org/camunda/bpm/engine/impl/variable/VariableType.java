@@ -16,6 +16,7 @@ package org.camunda.bpm.engine.impl.variable;
 
 /**
  * @author Tom Baeyens
+ * @author roman.smirnov
  */
 public interface VariableType {
 
@@ -23,6 +24,14 @@ public interface VariableType {
    * name of variable type (limited to 100 characters length)
    */
   String getTypeName();
+  
+  /**
+   * <p>Returns the type name (i.e. the simple class name) of the passed value.</p>
+   * 
+   * <p><strong>Note:</strong>For a serializable value only the type name "Serializable"
+   * will currently be returned and not the simple class name of the passed value.</p>
+   */
+  String getTypeNameForValue(Object value);
   boolean isCachable();
   boolean isAbleToStore(Object value);
   void setValue(Object value, ValueFields valueFields);

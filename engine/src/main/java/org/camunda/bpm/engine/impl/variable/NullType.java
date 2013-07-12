@@ -18,11 +18,11 @@ package org.camunda.bpm.engine.impl.variable;
  * @author Tom Baeyens
  */
 public class NullType implements VariableType {
-
-  private static final long serialVersionUID = 1L;
+  
+  public static final String TYPE_NAME = "null";
 
   public String getTypeName() {
-    return "null";
+    return TYPE_NAME;
   }
 
   public boolean isCachable() {
@@ -38,5 +38,9 @@ public class NullType implements VariableType {
   }
 
   public void setValue(Object value, ValueFields valueFields) {
+  }
+  
+  public String getTypeNameForValue(Object value) {
+    return "Null";
   }
 }
