@@ -94,9 +94,14 @@ public abstract class AbstractFoxPlatformIntegrationTest {
 
   public void waitForJobExecutorToProcessAllJobs(long maxMillisToWait) {
     
+    JobExecutor jobExecutor = processEngineConfiguration.getJobExecutor();
+    waitForJobExecutorToProcessAllJobs(jobExecutor, maxMillisToWait);
+  }
+  
+  public void waitForJobExecutorToProcessAllJobs(JobExecutor jobExecutor, long maxMillisToWait) {
+    
     int checkInterval = 1000;
 
-    JobExecutor jobExecutor = processEngineConfiguration.getJobExecutor();
     jobExecutor.start();
     
     try {
