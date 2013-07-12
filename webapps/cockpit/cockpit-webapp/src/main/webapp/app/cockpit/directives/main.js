@@ -1,4 +1,6 @@
 ngDefine('cockpit.directives', [
+  './numeric',
+  './date',
   './processDiagram',
   './processDiagramPreview',
   './onClickHideElement',

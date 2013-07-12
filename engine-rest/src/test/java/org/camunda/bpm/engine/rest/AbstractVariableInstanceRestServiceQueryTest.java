@@ -18,6 +18,8 @@ import java.util.Map;
 import javax.ws.rs.core.Response.Status;
 import javax.xml.registry.InvalidRequestException;
 
+import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
+import org.camunda.bpm.engine.impl.variable.StringType;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
@@ -265,8 +267,9 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
 
   private List<VariableInstance> createIncompleteMockVariableInstances() {
     List<VariableInstance> mocks = new ArrayList<VariableInstance>();
-    VariableInstance mockInstance = mock(VariableInstance.class);
+    VariableInstanceEntity mockInstance = mock(VariableInstanceEntity.class);
     when(mockInstance.getName()).thenReturn(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME);
+    when(mockInstance.getType()).thenReturn(new StringType());
     
     mocks.add(mockInstance);
     return mocks;

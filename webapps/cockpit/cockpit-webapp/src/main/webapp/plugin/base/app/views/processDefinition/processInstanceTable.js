@@ -22,8 +22,6 @@ ngDefine('cockpit.plugin.base.views', function(module) {
     });
 
     function updateView(page) {
-      $scope.processInstances = null;
-
       var count = pages.size;
       var firstResult = (page - 1) * count;
 

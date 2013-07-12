@@ -24,6 +24,8 @@ import org.camunda.bpm.engine.form.StartFormData;
 import org.camunda.bpm.engine.form.TaskFormData;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;
+import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
+import org.camunda.bpm.engine.impl.variable.StringType;
 import org.camunda.bpm.engine.management.ActivityStatistics;
 import org.camunda.bpm.engine.management.IncidentStatistics;
 import org.camunda.bpm.engine.management.ProcessDefinitionStatistics;
@@ -228,9 +230,10 @@ public abstract class MockProvider {
   }
   
   public static VariableInstance createMockVariableInstance() {
-    VariableInstance mock = mock(VariableInstance.class);
+    VariableInstanceEntity mock = mock(VariableInstanceEntity.class);
     
     when(mock.getName()).thenReturn(EXAMPLE_VARIABLE_INSTANCE_NAME);
+    when(mock.getType()).thenReturn(new StringType());
     when(mock.getTypeName()).thenReturn(EXAMPLE_VARIABLE_INSTANCE_TYPE);
     when(mock.getValue()).thenReturn(EXAMPLE_VARIABLE_INSTANCE_VALUE);
     when(mock.getProcessInstanceId()).thenReturn(EXAMPLE_VARIABLE_INSTANCE_PROC_INST_ID);
