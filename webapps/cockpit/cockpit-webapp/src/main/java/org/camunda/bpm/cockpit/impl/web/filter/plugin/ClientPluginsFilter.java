@@ -21,8 +21,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.camunda.bpm.cockpit.Cockpit;
-import org.camunda.bpm.cockpit.impl.web.filter.AbstractTemplateFilter;
 import org.camunda.bpm.cockpit.plugin.spi.CockpitPlugin;
+import org.camunda.bpm.webapp.impl.filter.AbstractTemplateFilter;
 
 /**
  * A filter that injects the environment variables <code>PLUGIN_DEPENDENCIES</code>

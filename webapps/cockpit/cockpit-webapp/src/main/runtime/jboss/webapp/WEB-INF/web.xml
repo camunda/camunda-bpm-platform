@@ -26,7 +26,7 @@
   <!-- engines filter -->
   <filter>
     <filter-name>Engines Filter</filter-name>
-    <filter-class>org.camunda.bpm.cockpit.impl.web.filter.engine.EnginesFilter</filter-class>
+    <filter-class>org.camunda.bpm.webapp.impl.filter.ProcessEnginesFilter</filter-class>
   </filter>
   <filter-mapping>
     <filter-name>Engines Filter</filter-name>
@@ -58,7 +58,7 @@
     <servlet-class>org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher</servlet-class>
     <init-param>
       <param-name>javax.ws.rs.Application</param-name>
-      <param-value>org.camunda.bpm.cockpit.impl.web.EngineRestApplication</param-value>
+      <param-value>org.camunda.bpm.webapp.impl.rest.EngineRestApplication</param-value>
     </init-param>
     <init-param>
       <param-name>resteasy.servlet.mapping.prefix</param-name>

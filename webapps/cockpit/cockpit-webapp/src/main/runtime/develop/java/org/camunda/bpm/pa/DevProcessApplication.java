@@ -7,8 +7,10 @@ import java.util.Map;
 import org.camunda.bpm.application.PostDeploy;
 import org.camunda.bpm.application.ProcessApplication;
 import org.camunda.bpm.application.impl.ServletProcessApplication;
+import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 
 /**
@@ -72,6 +74,15 @@ public class DevProcessApplication extends ServletProcessApplication {
 
 
     ((ProcessEngineImpl) engine).getProcessEngineConfiguration().getJobExecutor().start();
+    
+    final IdentityService identityService = engine.getIdentityService();
+    
+    User jonny1 = identityService.newUser("jonny1");
+    jonny1.setFirstName("John");
+    jonny1.setLastName("Doe");    
+    identityService.saveUser(jonny1);
+    
 
   }
+  
 }

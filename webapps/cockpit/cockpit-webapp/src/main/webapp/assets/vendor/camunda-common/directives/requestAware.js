@@ -1,7 +1,7 @@
-ngDefine('camunda.common.directives', [ 'jquery' ], function(module, $) {
+ngDefine('camunda.common.directives', [ 'angular', 'jquery' ], function(module, angular, $) {
 
-  var Directive = function (RequestStatus) {
-    return {
+module.directive('requestAware', function(RequestStatus) {    
+  return {
       link: function(scope, element, attrs) {
 
         var DISABLE_AJAX_LOADER = "disableAjaxLoader";
@@ -9,8 +9,8 @@ ngDefine('camunda.common.directives', [ 'jquery' ], function(module, $) {
         var formName;
         var showAjaxLoader = true;
 
-        if (attrs.reqAware) {
-          var params = attrs.reqAware.split(",");
+        if (attrs.requestAware) {
+          var params = attrs.requestAware.split(",");
           formName = $.trim(params[0]);
           if (params[1] && $.trim(params[1]) == DISABLE_AJAX_LOADER) {
             showAjaxLoader = false;
@@ -76,11 +76,5 @@ ngDefine('camunda.common.directives', [ 'jquery' ], function(module, $) {
         }
       }
     };
-  };
-  
-  Directive.$inject = ["requestAware"];
-  
-  module
-    .directive("requestAware", Directive);
-  
+  });
 });
