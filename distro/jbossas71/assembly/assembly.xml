@@ -59,12 +59,12 @@
       <filtered>true</filtered>
       <outputDirectory></outputDirectory>
     </file>
-    <!-- <file>
+    <file>
       <source>src/start-camunda.sh</source>
       <filtered>true</filtered>
       <outputDirectory></outputDirectory>
       <fileMode>0755</fileMode>
-    </file> -->
+    </file>
     <file>
       <source>src/LICENSE-2.0.txt</source>
       <filtered>true</filtered>
