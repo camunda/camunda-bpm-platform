@@ -101,8 +101,13 @@ public class JobManager extends AbstractManager {
   
   @SuppressWarnings("unchecked")
   public List<JobEntity> findNextJobsToExecute(Page page) {
+    Map<String,Object> params = new HashMap<String, Object>();
     Date now = ClockUtil.getCurrentTime();
-    return getDbSqlSession().selectList("selectNextJobsToExecute", now, page);
+    params.put("now", now);
+    if (Context.getProcessEngineConfiguration().isJobExecutorDeploymentAware()) {
+      params.put("deploymentIds", Context.getProcessEngineConfiguration().getRegisteredDeployments());
+    }
+    return getDbSqlSession().selectList("selectNextJobsToExecute", params, page);
   }
   
   @SuppressWarnings("unchecked")

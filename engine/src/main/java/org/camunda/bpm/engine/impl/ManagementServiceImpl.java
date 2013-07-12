@@ -13,6 +13,8 @@
 package org.camunda.bpm.engine.impl;
 
 import java.sql.Connection;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.application.ProcessApplicationReference;
@@ -29,6 +31,7 @@ import org.camunda.bpm.engine.impl.cmd.GetTableMetaDataCmd;
 import org.camunda.bpm.engine.impl.cmd.GetTableNameCmd;
 import org.camunda.bpm.engine.impl.cmd.SetJobRetriesCmd;
 import org.camunda.bpm.engine.impl.cmd.UnregisterProcessApplication;
+import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.DbSqlSession;
 import org.camunda.bpm.engine.impl.db.DbSqlSessionFactory;
 import org.camunda.bpm.engine.impl.interceptor.Command;
@@ -122,6 +125,33 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
   
   public DeploymentStatisticsQuery createDeploymentStatisticsQuery() {
     return new DeploymentStatisticsQueryImpl(commandExecutor);
+  }
+
+  public List<String> getRegisteredDeployments() {
+    return commandExecutor.execute(new Command<List<String>>() {
+      public List<String> execute(CommandContext commandContext) {
+        return new ArrayList<String>(Context.getProcessEngineConfiguration().getRegisteredDeployments());
+      }
+    });
+  }
+
+  public void registerDeploymentForJobExecutor(final String deploymentId) {
+    commandExecutor.execute(new Command<Void>() {
+      public Void execute(CommandContext commandContext) {
+        Context.getProcessEngineConfiguration().getRegisteredDeployments().add(deploymentId);
+        return null;
+      }
+    });
+  }
+
+  @Override
+  public void unregisterDeploymentForJobExecutor(final String deploymentId) {
+    commandExecutor.execute(new Command<Void>() {
+      public Void execute(CommandContext commandContext) {
+        Context.getProcessEngineConfiguration().getRegisteredDeployments().remove(deploymentId);
+        return null;
+      }
+    });
   }
 
 }
