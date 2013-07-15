@@ -66,7 +66,7 @@ public class ProcessDefinitionResourceImpl implements ProcessDefinitionResource 
     try {
       definition = repoService.getProcessDefinition(processDefinitionId);
     } catch (ProcessEngineException e) {
-      throw new InvalidRequestException(Status.BAD_REQUEST, e, "No matching definition with id " + processDefinitionId);
+      throw new InvalidRequestException(Status.NOT_FOUND, e, "No matching definition with id " + processDefinitionId);
     }
 
     ProcessDefinitionDto result = ProcessDefinitionDto.fromProcessDefinition(definition);

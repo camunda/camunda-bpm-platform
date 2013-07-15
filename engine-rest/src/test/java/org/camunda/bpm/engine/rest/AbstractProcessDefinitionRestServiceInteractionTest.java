@@ -210,7 +210,7 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
     
     given().pathParam("id", "aNonExistingDefinitionId")
     .then().expect()
-      .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+      .statusCode(Status.NOT_FOUND.getStatusCode()).contentType(ContentType.JSON)
       .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
       .body("message", equalTo("No matching definition with id " + nonExistingId))
     .when().get(SINGLE_PROCESS_DEFINITION_URL);

@@ -85,7 +85,7 @@ public class TaskResourceImpl implements TaskResource {
   public TaskDto getTask() {
     Task task = getTaskById(taskId);
     if (task == null) {
-      throw new InvalidRequestException(Status.BAD_REQUEST, "No task id supplied");
+      throw new InvalidRequestException(Status.NOT_FOUND, "No matching task with id " + taskId);
     }
     
     return TaskDto.fromTask(task);

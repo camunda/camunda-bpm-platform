@@ -488,9 +488,9 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     when(mockQuery.singleResult()).thenReturn(null);
     
     given().pathParam("id", "aNonExistingTaskId")
-      .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+      .then().expect().statusCode(Status.NOT_FOUND.getStatusCode()).contentType(ContentType.JSON)
       .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
-      .body("message", equalTo("No task id supplied"))
+      .body("message", equalTo("No matching task with id aNonExistingTaskId"))
       .when().get(SINGLE_TASK_URL);
   }
 
