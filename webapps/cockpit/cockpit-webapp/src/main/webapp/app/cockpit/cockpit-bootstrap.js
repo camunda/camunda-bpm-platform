@@ -43,8 +43,6 @@
 
   /**
    *
-   * @param {string} name the application name
-   *
    * @see http://stackoverflow.com/questions/15499997/how-to-use-angular-scenario-with-requirejs
    */
   function ensureScenarioCompatibility() {

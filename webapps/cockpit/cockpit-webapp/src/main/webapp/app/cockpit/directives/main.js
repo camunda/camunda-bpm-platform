@@ -4,10 +4,8 @@ ngDefine('cockpit.directives', [
   './processDiagram',
   './engineSelect',
   './processDiagramPreview',
-  './onClickHideElement',
-  './onClickShowElement',
-  './resize',
-  './activityInstanceTree'
+  './activityInstanceTree',
+  './sitebarContainer'
 ], function(module) {
 
 });
