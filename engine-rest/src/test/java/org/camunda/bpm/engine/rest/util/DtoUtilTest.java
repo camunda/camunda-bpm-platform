@@ -13,7 +13,7 @@ import org.junit.Test;
 public class DtoUtilTest {
   
   @Test
-  public void testDtoUtilToMap_String() {
+  public void testDtoUtilToMap_String() throws Exception {
     // given
     String type = "String";
     
@@ -59,7 +59,7 @@ public class DtoUtilTest {
   }
   
   @Test
-  public void testDtoUtilToMap_Boolean() {
+  public void testDtoUtilToMap_Boolean() throws Exception {
     // given
     String type = "Boolean";
     
@@ -121,7 +121,7 @@ public class DtoUtilTest {
   }
   
   @Test
-  public void testDtoUtilToMap_Integer() {
+  public void testDtoUtilToMap_Integer() throws Exception {
     // given
     String type = "Integer";
     
@@ -159,7 +159,7 @@ public class DtoUtilTest {
   }
   
   @Test
-  public void testDtoUtilToMap_Short() {
+  public void testDtoUtilToMap_Short() throws Exception {
     // given
     String type = "Short";
     
@@ -197,7 +197,7 @@ public class DtoUtilTest {
   }
   
   @Test
-  public void testDtoUtilToMap_Long() {
+  public void testDtoUtilToMap_Long() throws Exception {
     // given
     String type = "Long";
     
@@ -235,7 +235,7 @@ public class DtoUtilTest {
   }
   
   @Test
-  public void testDtoUtilToMap_Double() {
+  public void testDtoUtilToMap_Double() throws Exception {
     // given
     String type = "Double";
     
@@ -281,7 +281,7 @@ public class DtoUtilTest {
   }
   
   @Test
-  public void testDtoUtilToMap_Date() {
+  public void testDtoUtilToMap_Date() throws Exception {
     // given
     String type = "Date";
     

@@ -129,4 +129,256 @@ public abstract class AbstractMessageRestServiceTest extends AbstractRestService
       .body("message", equalTo("No message name supplied"))
       .when().post(MESSAGE_URL);
   }
+  
+  @Test
+  public void testFailingDueToUnparseableIntegerInCorrelationKeys() {
+    String variableKey = "aVariableKey";
+    String variableValue = "1abc";
+    String variableType = "Integer";
+    
+    Map<String, Object> variableJson = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
+    
+    String messageName = "aMessageName";
+    
+    Map<String, Object> messageParameters = new HashMap<String, Object>();
+    messageParameters.put("messageName", messageName);
+    messageParameters.put("correlationKeys", variableJson);
+    
+    given().contentType(POST_JSON_CONTENT_TYPE).body(messageParameters)
+    .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
+    .body("type", equalTo(RestException.class.getSimpleName()))
+    .body("message", equalTo("Cannot deliver a message due to number format exception: For input string: \"1abc\""))
+    .when().post(MESSAGE_URL);
+  }
+  
+  @Test
+  public void testFailingDueToUnparseableShortInCorrelationKeys() {
+    String variableKey = "aVariableKey";
+    String variableValue = "1abc";
+    String variableType = "Short";
+    
+    Map<String, Object> variableJson = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
+    
+    String messageName = "aMessageName";
+    
+    Map<String, Object> messageParameters = new HashMap<String, Object>();
+    messageParameters.put("messageName", messageName);
+    messageParameters.put("correlationKeys", variableJson);
+    
+    given().contentType(POST_JSON_CONTENT_TYPE).body(messageParameters)
+    .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
+    .body("type", equalTo(RestException.class.getSimpleName()))
+    .body("message", equalTo("Cannot deliver a message due to number format exception: For input string: \"1abc\""))
+    .when().post(MESSAGE_URL);
+  }
+  
+  @Test
+  public void testFailingDueToUnparseableLongInCorrelationKeys() {
+    String variableKey = "aVariableKey";
+    String variableValue = "1abc";
+    String variableType = "Long";
+    
+    Map<String, Object> variableJson = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
+    
+    String messageName = "aMessageName";
+    
+    Map<String, Object> messageParameters = new HashMap<String, Object>();
+    messageParameters.put("messageName", messageName);
+    messageParameters.put("correlationKeys", variableJson);
+    
+    given().contentType(POST_JSON_CONTENT_TYPE).body(messageParameters)
+    .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
+    .body("type", equalTo(RestException.class.getSimpleName()))
+    .body("message", equalTo("Cannot deliver a message due to number format exception: For input string: \"1abc\""))
+    .when().post(MESSAGE_URL);
+  }
+  
+  @Test
+  public void testFailingDueToUnparseableDoubleInCorrelationKeys() {
+    String variableKey = "aVariableKey";
+    String variableValue = "1abc";
+    String variableType = "Double";
+    
+    Map<String, Object> variableJson = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
+    
+    String messageName = "aMessageName";
+    
+    Map<String, Object> messageParameters = new HashMap<String, Object>();
+    messageParameters.put("messageName", messageName);
+    messageParameters.put("correlationKeys", variableJson);
+    
+    given().contentType(POST_JSON_CONTENT_TYPE).body(messageParameters)
+    .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
+    .body("type", equalTo(RestException.class.getSimpleName()))
+    .body("message", equalTo("Cannot deliver a message due to number format exception: For input string: \"1abc\""))
+    .when().post(MESSAGE_URL);
+  }
+  
+  @Test
+  public void testFailingDueToUnparseableDateInCorrelationKeys() {
+    String variableKey = "aVariableKey";
+    String variableValue = "1abc";
+    String variableType = "Date";
+    
+    Map<String, Object> variableJson = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
+    
+    String messageName = "aMessageName";
+    
+    Map<String, Object> messageParameters = new HashMap<String, Object>();
+    messageParameters.put("messageName", messageName);
+    messageParameters.put("correlationKeys", variableJson);
+    
+    given().contentType(POST_JSON_CONTENT_TYPE).body(messageParameters)
+    .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
+    .body("type", equalTo(RestException.class.getSimpleName()))
+    .body("message", equalTo("Cannot deliver a message due to parse exception: Unparseable date: \"1abc\""))
+    .when().post(MESSAGE_URL);
+  }
+  
+  @Test
+  public void testFailingDueToNotSupportedTypeInCorrelationKeys() {
+    String variableKey = "aVariableKey";
+    String variableValue = "1abc";
+    String variableType = "X";
+    
+    Map<String, Object> variableJson = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
+    
+    String messageName = "aMessageName";
+    
+    Map<String, Object> messageParameters = new HashMap<String, Object>();
+    messageParameters.put("messageName", messageName);
+    messageParameters.put("correlationKeys", variableJson);
+    
+    given().contentType(POST_JSON_CONTENT_TYPE).body(messageParameters)
+    .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
+    .body("type", equalTo(RestException.class.getSimpleName()))
+    .body("message", equalTo("Cannot deliver a message: The variable type 'X' is not supported."))
+    .when().post(MESSAGE_URL);
+  }
+  
+  @Test
+  public void testFailingDueToUnparseableIntegerInProcessVariables() {
+    String variableKey = "aVariableKey";
+    String variableValue = "1abc";
+    String variableType = "Integer";
+    
+    Map<String, Object> variableJson = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
+    
+    String messageName = "aMessageName";
+    
+    Map<String, Object> messageParameters = new HashMap<String, Object>();
+    messageParameters.put("messageName", messageName);
+    messageParameters.put("processVariables", variableJson);
+    
+    given().contentType(POST_JSON_CONTENT_TYPE).body(messageParameters)
+    .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
+    .body("type", equalTo(RestException.class.getSimpleName()))
+    .body("message", equalTo("Cannot deliver a message due to number format exception: For input string: \"1abc\""))
+    .when().post(MESSAGE_URL);
+  }
+  
+  @Test
+  public void testFailingDueToUnparseableShortInProcessVariables() {
+    String variableKey = "aVariableKey";
+    String variableValue = "1abc";
+    String variableType = "Short";
+    
+    Map<String, Object> variableJson = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
+    
+    String messageName = "aMessageName";
+    
+    Map<String, Object> messageParameters = new HashMap<String, Object>();
+    messageParameters.put("messageName", messageName);
+    messageParameters.put("processVariables", variableJson);
+    
+    given().contentType(POST_JSON_CONTENT_TYPE).body(messageParameters)
+    .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
+    .body("type", equalTo(RestException.class.getSimpleName()))
+    .body("message", equalTo("Cannot deliver a message due to number format exception: For input string: \"1abc\""))
+    .when().post(MESSAGE_URL);
+  }
+  
+  @Test
+  public void testFailingDueToUnparseableLongInProcessVariables() {
+    String variableKey = "aVariableKey";
+    String variableValue = "1abc";
+    String variableType = "Long";
+    
+    Map<String, Object> variableJson = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
+    
+    String messageName = "aMessageName";
+    
+    Map<String, Object> messageParameters = new HashMap<String, Object>();
+    messageParameters.put("messageName", messageName);
+    messageParameters.put("processVariables", variableJson);
+    
+    given().contentType(POST_JSON_CONTENT_TYPE).body(messageParameters)
+    .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
+    .body("type", equalTo(RestException.class.getSimpleName()))
+    .body("message", equalTo("Cannot deliver a message due to number format exception: For input string: \"1abc\""))
+    .when().post(MESSAGE_URL);
+  }
+  
+  @Test
+  public void testFailingDueToUnparseableDoubleInProcessVariables() {
+    String variableKey = "aVariableKey";
+    String variableValue = "1abc";
+    String variableType = "Double";
+    
+    Map<String, Object> variableJson = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
+    
+    String messageName = "aMessageName";
+    
+    Map<String, Object> messageParameters = new HashMap<String, Object>();
+    messageParameters.put("messageName", messageName);
+    messageParameters.put("processVariables", variableJson);
+    
+    given().contentType(POST_JSON_CONTENT_TYPE).body(messageParameters)
+    .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
+    .body("type", equalTo(RestException.class.getSimpleName()))
+    .body("message", equalTo("Cannot deliver a message due to number format exception: For input string: \"1abc\""))
+    .when().post(MESSAGE_URL);
+  }
+  
+  @Test
+  public void testFailingDueToUnparseableDateInProcessVariables() {
+    String variableKey = "aVariableKey";
+    String variableValue = "1abc";
+    String variableType = "Date";
+    
+    Map<String, Object> variableJson = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
+    
+    String messageName = "aMessageName";
+    
+    Map<String, Object> messageParameters = new HashMap<String, Object>();
+    messageParameters.put("messageName", messageName);
+    messageParameters.put("processVariables", variableJson);
+    
+    given().contentType(POST_JSON_CONTENT_TYPE).body(messageParameters)
+    .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
+    .body("type", equalTo(RestException.class.getSimpleName()))
+    .body("message", equalTo("Cannot deliver a message due to parse exception: Unparseable date: \"1abc\""))
+    .when().post(MESSAGE_URL);
+  }
+  
+  @Test
+  public void testFailingDueToNotSupportedTypeInProcessVariables() {
+    String variableKey = "aVariableKey";
+    String variableValue = "1abc";
+    String variableType = "X";
+    
+    Map<String, Object> variableJson = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
+    
+    String messageName = "aMessageName";
+    
+    Map<String, Object> messageParameters = new HashMap<String, Object>();
+    messageParameters.put("messageName", messageName);
+    messageParameters.put("processVariables", variableJson);
+    
+    given().contentType(POST_JSON_CONTENT_TYPE).body(messageParameters)
+    .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
+    .body("type", equalTo(RestException.class.getSimpleName()))
+    .body("message", equalTo("Cannot deliver a message: The variable type 'X' is not supported."))
+    .when().post(MESSAGE_URL);
+  }
 }

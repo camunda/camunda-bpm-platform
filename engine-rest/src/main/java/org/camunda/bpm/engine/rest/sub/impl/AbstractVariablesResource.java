@@ -124,20 +124,34 @@ public abstract class AbstractVariablesResource implements VariableResource {
         
         // date
         if (type.equalsIgnoreCase(DateType.TYPE_NAME)) {
-          try {
-            SimpleDateFormat pattern = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-            Date date = pattern.parse(String.valueOf(value));
-            setVariableEntity(variableName, date);
-            return;
-          } catch (ParseException e) {
-            throw new ProcessEngineException("Cannot parse date.", e);
-          }
+          SimpleDateFormat pattern = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+          Date date = pattern.parse(String.valueOf(value));
+          setVariableEntity(variableName, date);
+          return;
         }
+        
+        // passed a non supported type
+        throw new IllegalArgumentException("The variable type '" + type + "' is not supported.");
       }
+      
+      // no type specified or value equals null then simply set the variable
       setVariableEntity(variableName, variable.getValue());
-    } catch (Exception e) {
+      
+    } catch (ProcessEngineException e) {
       String errorMessage = String.format("Cannot put %s variable %s: %s", getResourceTypeName(), variableName, e.getMessage());
       throw new RestException(Status.INTERNAL_SERVER_ERROR, e, errorMessage);
+      
+    } catch (NumberFormatException e) {
+      String errorMessage = String.format("Cannot put %s variable %s due to number format exception: %s", getResourceTypeName(), variableName, e.getMessage());
+      throw new RestException(Status.BAD_REQUEST, e, errorMessage);
+      
+    } catch (ParseException e) {
+      String errorMessage = String.format("Cannot put %s variable %s due to parse exception: %s", getResourceTypeName(), variableName, e.getMessage());
+      throw new RestException(Status.BAD_REQUEST, e, errorMessage);      
+    
+    } catch (IllegalArgumentException e) {
+      String errorMessage = String.format("Cannot put %s variable %s: %s", getResourceTypeName(), variableName, e.getMessage());
+      throw new RestException(Status.BAD_REQUEST, errorMessage);  
     }
   }
 
@@ -149,12 +163,28 @@ public abstract class AbstractVariablesResource implements VariableResource {
       String errorMessage = String.format("Cannot delete %s variable %s: %s", getResourceTypeName(), variableName, e.getMessage());
       throw new RestException(Status.INTERNAL_SERVER_ERROR, e, errorMessage);
     }
+    
   }
   
   @Override
   public void modifyVariables(PatchVariablesDto patch) {
-    Map<String, Object> variableModifications = DtoUtil.toMap(patch.getModifications());
+    Map<String, Object> variableModifications = null;
+    try {
+      variableModifications = DtoUtil.toMap(patch.getModifications());
+      
+    } catch (NumberFormatException e) {
+      String errorMessage = String.format("Cannot modify variables for %s due to number format exception: %s", getResourceTypeName(), e.getMessage());
+      throw new RestException(Status.BAD_REQUEST, e, errorMessage);
+      
+    } catch (ParseException e) {
+      String errorMessage = String.format("Cannot modify variables for %s due to parse exception: %s", getResourceTypeName(), e.getMessage());
+      throw new RestException(Status.BAD_REQUEST, e, errorMessage);      
     
+    } catch (IllegalArgumentException e) {
+      String errorMessage = String.format("Cannot modify variables for %s: %s", getResourceTypeName(), e.getMessage());
+      throw new RestException(Status.BAD_REQUEST, errorMessage);  
+    }
+      
     List<String> variableDeletions = patch.getDeletions();
     
     try {
@@ -163,6 +193,7 @@ public abstract class AbstractVariablesResource implements VariableResource {
       String errorMessage = String.format("Cannot modify variables for %s %s: %s", getResourceTypeName(), resourceId, e.getMessage());
       throw new RestException(Status.INTERNAL_SERVER_ERROR, e, errorMessage);
     }
+
     
   }
   

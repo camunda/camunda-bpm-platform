@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.variable.BooleanType;
 import org.camunda.bpm.engine.impl.variable.DateType;
 import org.camunda.bpm.engine.impl.variable.DoubleType;
@@ -24,7 +23,7 @@ public class DtoUtil {
    * @param variables
    * @return
    */
-  public static Map<String, Object> toMap(Map<String, VariableValueDto> variables) {
+  public static Map<String, Object> toMap(Map<String, VariableValueDto> variables) throws ParseException {
     if (variables == null) {
       return null;
     }
@@ -73,17 +72,17 @@ public class DtoUtil {
         
         // date
         if (type.equalsIgnoreCase(DateType.TYPE_NAME)) {
-          try {
-            SimpleDateFormat pattern = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
-            Date date = pattern.parse(String.valueOf(value));
-            variablesMap.put(variable.getKey(), date);
-            continue;
-          } catch (ParseException e) {
-            throw new ProcessEngineException("Cannot parse date.", e);
-          }
+          SimpleDateFormat pattern = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+          Date date = pattern.parse(String.valueOf(value));
+          variablesMap.put(variable.getKey(), date);
+          continue;
         }
+        
+        // passed a non supported type
+        throw new IllegalArgumentException("The variable type '" + type + "' is not supported.");   
       }
       
+      // no type specified or value equals null then simply add the variable
       variablesMap.put(variable.getKey(), value);
     }
     return variablesMap;

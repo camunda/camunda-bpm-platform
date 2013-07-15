@@ -18,8 +18,6 @@ import java.util.Map;
 import javax.ws.rs.core.Response.Status;
 import javax.xml.registry.InvalidRequestException;
 
-import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
-import org.camunda.bpm.engine.impl.variable.StringType;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
@@ -253,28 +251,7 @@ public abstract class AbstractVariableInstanceRestServiceQueryTest extends Abstr
     Assert.assertEquals(MockProvider.EXAMPLE_VARIABLE_INSTANCE_TASK_ID, returnedTaskId);
     Assert.assertEquals(MockProvider.EXAMPLE_VARIABLE_INSTANCE_ACTIVITY_INSTANCE_ID, returnedActivityId);    
   }
-  
-  @Test
-  public void testIncompleteVariableInstance() {
-    setUpMockVariableInstanceQuery(createIncompleteMockVariableInstances());
-    Response response = expect().statusCode(Status.OK.getStatusCode())
-        .when().get(VARIABLE_INSTANCE_QUERY_URL);
-    
-    String content = response.asString();
-    String returnedType = from(content).getString("[0].type");
-    Assert.assertNull("Should be null, as it is also null in the original variable instance on the server.", returnedType);
-  }
-
-  private List<VariableInstance> createIncompleteMockVariableInstances() {
-    List<VariableInstance> mocks = new ArrayList<VariableInstance>();
-    VariableInstanceEntity mockInstance = mock(VariableInstanceEntity.class);
-    when(mockInstance.getName()).thenReturn(MockProvider.EXAMPLE_VARIABLE_INSTANCE_NAME);
-    when(mockInstance.getType()).thenReturn(new StringType());
-    
-    mocks.add(mockInstance);
-    return mocks;
-  }
-  
+   
   @Test
   public void testAdditionalParametersExcludingVariableValues() {
     Map<String, String> queryParameters = new HashMap<String, String>();

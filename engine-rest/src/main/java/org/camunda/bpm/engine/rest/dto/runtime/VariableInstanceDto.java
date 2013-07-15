@@ -98,9 +98,9 @@ public class VariableInstanceDto {
     dto.setTaskId(entity.getTaskId());
     dto.setActivityInstanceId(entity.getActivityInstanceId());
     
-    if (!entity.getType().getTypeName().equals(SerializableType.TYPE_NAME)) {
+    if (!entity.getTypeName().equals(SerializableType.TYPE_NAME)) {
       dto.setValue(entity.getValue());
-      dto.setType(entity.getTypeName());
+      dto.setType(entity.getType().getTypeNameForValue(entity.getValue()));
     } else {
       dto.setValue("Cannot deserialize object.");
       dto.setType(entity.getType().getTypeNameForValue(null));

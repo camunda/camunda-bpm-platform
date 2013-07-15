@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.rest.sub.repository;
 
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -78,11 +79,24 @@ public class ProcessDefinitionResourceImpl implements ProcessDefinitionResource 
     RuntimeService runtimeService = engine.getRuntimeService();
 
     ProcessInstance instance = null;
-    Map<String, Object> variables = DtoUtil.toMap(parameters.getVariables());
     try {
+      Map<String, Object> variables = DtoUtil.toMap(parameters.getVariables());
       instance = runtimeService.startProcessInstanceById(processDefinitionId, variables);
+      
     } catch (ProcessEngineException e) {
       throw new RestException(Status.INTERNAL_SERVER_ERROR, e, "Cannot instantiate process definition " + processDefinitionId);
+      
+    } catch (NumberFormatException e) {
+      String errorMessage = String.format("Cannot instantiate process definition %s due to number format exception: %s", processDefinitionId, e.getMessage());
+      throw new RestException(Status.BAD_REQUEST, e, errorMessage);
+      
+    } catch (ParseException e) {
+      String errorMessage = String.format("Cannot instantiate process definition %s due to parse exception: %s", processDefinitionId, e.getMessage());
+      throw new RestException(Status.BAD_REQUEST, e, errorMessage);      
+    
+    } catch (IllegalArgumentException e) {
+      String errorMessage = String.format("Cannot instantiate process definition %s: %s", processDefinitionId, e.getMessage());
+      throw new RestException(Status.BAD_REQUEST, errorMessage);  
     }
 
     ProcessInstanceDto result = ProcessInstanceDto.fromProcessInstance(instance);

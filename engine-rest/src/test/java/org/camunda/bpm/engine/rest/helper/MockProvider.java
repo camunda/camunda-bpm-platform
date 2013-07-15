@@ -88,7 +88,7 @@ public abstract class MockProvider {
   
   // variable instance
   public static final String EXAMPLE_VARIABLE_INSTANCE_NAME = "aVariableInstanceName";
-  public static final String EXAMPLE_VARIABLE_INSTANCE_TYPE = "aVariableInstanceType";
+  public static final String EXAMPLE_VARIABLE_INSTANCE_TYPE = "String";
   public static final String EXAMPLE_VARIABLE_INSTANCE_VALUE = "aVariableInstanceValue";
   public static final String EXAMPLE_VARIABLE_INSTANCE_PROC_INST_ID = "aVariableInstanceProcInstId";
   public static final String EXAMPLE_VARIABLE_INSTANCE_EXECUTION_ID = "aVariableInstanceExecutionId";

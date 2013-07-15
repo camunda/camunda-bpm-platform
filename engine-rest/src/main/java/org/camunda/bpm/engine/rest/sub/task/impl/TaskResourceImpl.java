@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.engine.rest.sub.task.impl;
 
+import java.text.ParseException;
 import java.util.Map;
 
 import javax.ws.rs.core.Response.Status;
@@ -57,8 +58,22 @@ public class TaskResourceImpl implements TaskResource {
   public void complete(CompleteTaskDto dto) {
     TaskService taskService = engine.getTaskService();
 
-    Map<String, Object> variables = DtoUtil.toMap(dto.getVariables());
-    taskService.complete(taskId, variables);
+    try {
+      Map<String, Object> variables = DtoUtil.toMap(dto.getVariables());
+      taskService.complete(taskId, variables);
+      
+    } catch (NumberFormatException e) {
+      String errorMessage = String.format("Cannot complete task %s due to number format exception: %s", taskId, e.getMessage());
+      throw new RestException(Status.BAD_REQUEST, e, errorMessage);
+      
+    } catch (ParseException e) {
+      String errorMessage = String.format("Cannot complete task %s due to parse exception: %s", taskId, e.getMessage());
+      throw new RestException(Status.BAD_REQUEST, e, errorMessage);      
+    
+    } catch (IllegalArgumentException e) {
+      String errorMessage = String.format("Cannot complete task %s: %s", taskId, e.getMessage());
+      throw new RestException(Status.BAD_REQUEST, errorMessage);  
+    }
   }
 
   @Override
@@ -93,8 +108,24 @@ public class TaskResourceImpl implements TaskResource {
   @Override
   public void resolve(CompleteTaskDto dto) {
     TaskService taskService = engine.getTaskService();
-    Map<String, Object> variables = DtoUtil.toMap(dto.getVariables());
-    taskService.resolveTask(taskId, variables);
+    
+    try {
+      Map<String, Object> variables = DtoUtil.toMap(dto.getVariables());
+      taskService.resolveTask(taskId, variables);
+      
+    } catch (NumberFormatException e) {
+      String errorMessage = String.format("Cannot resolve task %s due to number format exception: %s", taskId, e.getMessage());
+      throw new RestException(Status.BAD_REQUEST, e, errorMessage);
+      
+    } catch (ParseException e) {
+      String errorMessage = String.format("Cannot resolve task %s due to parse exception: %s", taskId, e.getMessage());
+      throw new RestException(Status.BAD_REQUEST, e, errorMessage);      
+    
+    } catch (IllegalArgumentException e) {
+      String errorMessage = String.format("Cannot resolve task %s: %s", taskId, e.getMessage());
+      throw new RestException(Status.BAD_REQUEST, errorMessage);  
+    }
+    
   }
   
 

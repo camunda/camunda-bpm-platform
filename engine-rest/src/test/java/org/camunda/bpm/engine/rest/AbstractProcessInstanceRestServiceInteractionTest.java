@@ -16,7 +16,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -258,6 +260,114 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
   }
   
   @Test
+  public void testVariableModificationWithUnparseableInteger() {
+    String variableKey = "aKey";
+    String variableValue = "1abc";
+    String variableType = "Integer";
+    
+    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
+    
+    Map<String, Object> modifications = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
+    messageBodyJson.put("modifications", modifications);
+    
+    given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).contentType(ContentType.JSON).body(messageBodyJson)
+      .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
+      .body("type", equalTo(RestException.class.getSimpleName()))
+      .body("message", equalTo("Cannot modify variables for process instance due to number format exception: For input string: \"1abc\""))   
+      .when().post(PROCESS_INSTANCE_VARIABLES_URL);
+  }
+  
+  @Test
+  public void testVariableModificationWithUnparseableShort() {
+    String variableKey = "aKey";
+    String variableValue = "1abc";
+    String variableType = "Short";
+    
+    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
+    
+    Map<String, Object> modifications = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
+    messageBodyJson.put("modifications", modifications);
+    
+    given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).contentType(ContentType.JSON).body(messageBodyJson)
+      .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
+      .body("type", equalTo(RestException.class.getSimpleName()))
+      .body("message", equalTo("Cannot modify variables for process instance due to number format exception: For input string: \"1abc\""))   
+      .when().post(PROCESS_INSTANCE_VARIABLES_URL);
+  }
+  
+  @Test
+  public void testVariableModificationWithUnparseableLong() {
+    String variableKey = "aKey";
+    String variableValue = "1abc";
+    String variableType = "Long";
+    
+    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
+    
+    Map<String, Object> modifications = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
+    messageBodyJson.put("modifications", modifications);
+    
+    given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).contentType(ContentType.JSON).body(messageBodyJson)
+      .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
+      .body("type", equalTo(RestException.class.getSimpleName()))
+      .body("message", equalTo("Cannot modify variables for process instance due to number format exception: For input string: \"1abc\""))   
+      .when().post(PROCESS_INSTANCE_VARIABLES_URL);
+  }
+  
+  @Test
+  public void testVariableModificationWithUnparseableDouble() {
+    String variableKey = "aKey";
+    String variableValue = "1abc";
+    String variableType = "Double";
+    
+    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
+    
+    Map<String, Object> modifications = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
+    messageBodyJson.put("modifications", modifications);
+    
+    given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).contentType(ContentType.JSON).body(messageBodyJson)
+      .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
+      .body("type", equalTo(RestException.class.getSimpleName()))
+      .body("message", equalTo("Cannot modify variables for process instance due to number format exception: For input string: \"1abc\""))   
+      .when().post(PROCESS_INSTANCE_VARIABLES_URL);
+  }
+
+  @Test
+  public void testVariableModificationWithUnparseableDate() {
+    String variableKey = "aKey";
+    String variableValue = "1abc";
+    String variableType = "Date";
+    
+    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
+    
+    Map<String, Object> modifications = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
+    messageBodyJson.put("modifications", modifications);
+    
+    given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).contentType(ContentType.JSON).body(messageBodyJson)
+      .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
+      .body("type", equalTo(RestException.class.getSimpleName()))
+      .body("message", equalTo("Cannot modify variables for process instance due to parse exception: Unparseable date: \"1abc\""))   
+      .when().post(PROCESS_INSTANCE_VARIABLES_URL);
+  }
+  
+  @Test
+  public void testVariableModificationWithNotSupportedType() {
+    String variableKey = "aVariableKey";
+    String variableValue = "1abc";
+    String variableType = "X";
+    
+    Map<String, Object> messageBodyJson = new HashMap<String, Object>();
+    
+    Map<String, Object> modifications = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
+    messageBodyJson.put("modifications", modifications);
+    
+    given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).contentType(ContentType.JSON).body(messageBodyJson)
+      .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
+      .body("type", equalTo(RestException.class.getSimpleName()))
+      .body("message", equalTo("Cannot modify variables for process instance: The variable type 'X' is not supported.")) 
+      .when().post(PROCESS_INSTANCE_VARIABLES_URL);
+  }  
+  
+  @Test
   public void testVariableModificationForNonExistingProcessInstance() {
     doThrow(new ProcessEngineException("expected exception")).when(runtimeServiceMock).updateVariables(anyString(), any(Map.class), any(List.class));
     
@@ -376,6 +486,22 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
   }
   
   @Test
+  public void testPutSingleVariableWithUnparseableInteger() {
+    String variableKey = "aVariableKey";
+    String variableValue = "1abc";
+    String type = "Integer";
+    
+    Map<String, Object> variableJson = VariablesBuilder.getVariableValueMap(variableValue, type);
+    
+    given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).pathParam("varId", variableKey)
+      .contentType(ContentType.JSON).body(variableJson)
+      .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
+      .body("type", equalTo(RestException.class.getSimpleName()))
+      .body("message", equalTo("Cannot put process instance variable aVariableKey due to number format exception: For input string: \"1abc\""))
+      .when().put(SINGLE_PROCESS_INSTANCE_VARIABLE_URL);
+  }
+  
+  @Test
   public void testPutSingleVariableWithTypeShort() {
     String variableKey = "aVariableKey";
     Short variableValue = 123;
@@ -390,6 +516,22 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
     
     verify(runtimeServiceMock).setVariable(eq(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID), eq(variableKey), 
         eq(variableValue));
+  }
+  
+  @Test
+  public void testPutSingleVariableWithUnparseableShort() {
+    String variableKey = "aVariableKey";
+    String variableValue = "1abc";
+    String type = "Short";
+    
+    Map<String, Object> variableJson = VariablesBuilder.getVariableValueMap(variableValue, type);
+    
+    given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).pathParam("varId", variableKey)
+      .contentType(ContentType.JSON).body(variableJson)
+      .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
+      .body("type", equalTo(RestException.class.getSimpleName()))
+      .body("message", equalTo("Cannot put process instance variable aVariableKey due to number format exception: For input string: \"1abc\""))
+      .when().put(SINGLE_PROCESS_INSTANCE_VARIABLE_URL);
   }
   
   @Test
@@ -410,6 +552,22 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
   }
   
   @Test
+  public void testPutSingleVariableWithUnparseableLong() {
+    String variableKey = "aVariableKey";
+    String variableValue = "1abc";
+    String type = "Long";
+    
+    Map<String, Object> variableJson = VariablesBuilder.getVariableValueMap(variableValue, type);
+    
+    given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).pathParam("varId", variableKey)
+      .contentType(ContentType.JSON).body(variableJson)
+      .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
+      .body("type", equalTo(RestException.class.getSimpleName()))
+      .body("message", equalTo("Cannot put process instance variable aVariableKey due to number format exception: For input string: \"1abc\""))
+      .when().put(SINGLE_PROCESS_INSTANCE_VARIABLE_URL);
+  }
+  
+  @Test
   public void testPutSingleVariableWithTypeDouble() {
     String variableKey = "aVariableKey";
     Double variableValue = 123.456;
@@ -424,6 +582,22 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
     
     verify(runtimeServiceMock).setVariable(eq(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID), eq(variableKey), 
         eq(variableValue));
+  }
+  
+  @Test
+  public void testPutSingleVariableWithUnparseableDouble() {
+    String variableKey = "aVariableKey";
+    String variableValue = "1abc";
+    String type = "Double";
+    
+    Map<String, Object> variableJson = VariablesBuilder.getVariableValueMap(variableValue, type);
+    
+    given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).pathParam("varId", variableKey)
+      .contentType(ContentType.JSON).body(variableJson)
+      .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
+      .body("type", equalTo(RestException.class.getSimpleName()))
+      .body("message", equalTo("Cannot put process instance variable aVariableKey due to number format exception: For input string: \"1abc\""))
+      .when().put(SINGLE_PROCESS_INSTANCE_VARIABLE_URL);
   }
 
   @Test
@@ -441,6 +615,60 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
     
     verify(runtimeServiceMock).setVariable(eq(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID), eq(variableKey), 
         eq(variableValue));
+  }
+  
+  @Test
+  public void testPutSingleVariableWithTypeDate() throws Exception {
+    Date now = new Date();
+    SimpleDateFormat pattern = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss");
+    
+    String variableKey = "aVariableKey";
+    String variableValue = pattern.format(now);
+    String type = "Date";
+    
+    Date expectedValue = pattern.parse(variableValue);
+    
+    Map<String, Object> variableJson = VariablesBuilder.getVariableValueMap(variableValue, type);
+    
+    given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).pathParam("varId", variableKey)
+      .contentType(ContentType.JSON).body(variableJson)
+      .then().expect().statusCode(Status.NO_CONTENT.getStatusCode())
+      .when().put(SINGLE_PROCESS_INSTANCE_VARIABLE_URL);
+    
+    verify(runtimeServiceMock).setVariable(eq(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID), eq(variableKey), 
+        eq(expectedValue));
+  }
+  
+  @Test
+  public void testPutSingleVariableWithUnparseableDate() {
+    String variableKey = "aVariableKey";
+    String variableValue = "1abc";
+    String type = "Date";
+    
+    Map<String, Object> variableJson = VariablesBuilder.getVariableValueMap(variableValue, type);
+    
+    given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).pathParam("varId", variableKey)
+      .contentType(ContentType.JSON).body(variableJson)
+      .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
+      .body("type", equalTo(RestException.class.getSimpleName()))
+      .body("message", equalTo("Cannot put process instance variable aVariableKey due to parse exception: Unparseable date: \"1abc\""))
+      .when().put(SINGLE_PROCESS_INSTANCE_VARIABLE_URL);
+  }
+  
+  @Test
+  public void testPutSingleVariableWithNotSupportedType() {
+    String variableKey = "aVariableKey";
+    String variableValue = "1abc";
+    String type = "X";
+    
+    Map<String, Object> variableJson = VariablesBuilder.getVariableValueMap(variableValue, type);
+    
+    given().pathParam("id", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID).pathParam("varId", variableKey)
+      .contentType(ContentType.JSON).body(variableJson)
+      .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())
+      .body("type", equalTo(RestException.class.getSimpleName()))
+      .body("message", equalTo("Cannot put process instance variable aVariableKey: The variable type 'X' is not supported."))
+      .when().put(SINGLE_PROCESS_INSTANCE_VARIABLE_URL);
   }
   
   @Test
