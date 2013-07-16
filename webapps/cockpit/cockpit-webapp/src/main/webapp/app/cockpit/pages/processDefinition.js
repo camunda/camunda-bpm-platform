@@ -1,8 +1,11 @@
 ngDefine('cockpit.pages', [ 'angular' ], function(module, angular) {
 
-  var Controller = function($scope, Notifications, ProcessDefinitionResource, ProcessInstanceResource, Views, Transform, processDefinition) {
+  var Controller = function($scope, $rootScope, Notifications, ProcessDefinitionResource, ProcessInstanceResource, Views, Transform, processDefinition) {
 
     $scope.processDefinition = processDefinition;
+
+    // add process definition breadcrumb
+    $rootScope.addBreadcrumb({'type': 'processDefinition', 'processDefinition': processDefinition});
 
     $scope.processInstanceTable = Views.getProvider({ component: 'cockpit.processDefinition.instancesTable' });
 
@@ -60,7 +63,7 @@ ngDefine('cockpit.pages', [ 'angular' ], function(module, angular) {
     
   };
 
-  Controller.$inject = [ '$scope', 'Notifications', 'ProcessDefinitionResource', 'ProcessInstanceResource', 'Views', 'Transform', 'processDefinition' ];
+  Controller.$inject = [ '$scope', '$rootScope', 'Notifications', 'ProcessDefinitionResource', 'ProcessInstanceResource', 'Views', 'Transform', 'processDefinition' ];
 
   var RouteConfig = [ '$routeProvider', function($routeProvider) {
     $routeProvider.when('/process-definition/:processDefinitionId', {

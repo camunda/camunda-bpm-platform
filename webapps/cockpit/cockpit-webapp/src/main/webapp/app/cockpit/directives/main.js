@@ -1,4 +1,5 @@
 ngDefine('cockpit.directives', [
+  './breadcrumbs',
   './numeric',
   './date',
   './processDiagram',
