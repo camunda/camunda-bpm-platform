@@ -15,4 +15,4 @@ else
   (sleep 5; $BROWSER "http://localhost:8080/camunda-welcome/index.html";) &
 fi
 
-/bin/sh ./server/glassfish3/glassfish/bin/startserv.bat
+/bin/sh ./server/glassfish3/glassfish/bin/startserv.sh
