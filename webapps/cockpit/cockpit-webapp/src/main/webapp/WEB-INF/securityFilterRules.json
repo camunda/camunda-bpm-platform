@@ -1,0 +1,11 @@
+{
+  "pathFilter": { 
+      "deniedPaths" : [
+        { "path": "/api/engine/(.*)", "methods" : "*" }
+      ],
+      "allowedPaths" : [
+        { "path": "/api/engine/engine/", "methods" : "GET" },
+        { "path": "/api/engine/engine/(\\w+?)/(.*)", "methods" : "*", "matcher" : "org.camunda.bpm.webapp.impl.security.filter.AuthenticatedEngineRequestMatcher" }
+      ]
+  }
+}

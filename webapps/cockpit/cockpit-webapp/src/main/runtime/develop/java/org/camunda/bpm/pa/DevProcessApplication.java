@@ -80,6 +80,7 @@ public class DevProcessApplication extends ServletProcessApplication {
     User jonny1 = identityService.newUser("jonny1");
     jonny1.setFirstName("John");
     jonny1.setLastName("Doe");    
+    jonny1.setPassword("jonny1");
     identityService.saveUser(jonny1);
     
 

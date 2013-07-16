@@ -169,6 +169,15 @@
       <type>war</type>
       <scope>test</scope>
     </dependency>
+    
+    <dependency>
+      <groupId>org.camunda.bpm</groupId>
+      <artifactId>camunda-engine-rest</artifactId>
+      <scope>test</scope>
+      <type>jar</type>
+      <classifier>classes</classifier>
+      <version>${project.version}</version>
+    </dependency>
 
     <!-- db drivers for maven sql -->
     <dependency>
@@ -237,7 +246,7 @@
           <scope>test</scope>
           <type>war</type>
           <version>${project.version}</version>
-        </dependency>
+        </dependency>        
       </dependencies>
 
       <build>

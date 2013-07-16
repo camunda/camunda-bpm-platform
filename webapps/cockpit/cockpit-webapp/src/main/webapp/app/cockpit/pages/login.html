@@ -1,0 +1,26 @@
+<div ng-cloak>
+  
+  <div class="page-header">
+    <h1>Sign in</h1>
+  </div>
+   
+  <form class="form-horizontal" data-ng-submit="login()">
+    <div class="control-group">
+      <label class="control-label" for="inputUsername">Username</label>
+      <div class="controls">
+        <input type="text" id="inputUsername" placeholder="Username" data-ng-model="username">
+      </div>
+    </div>
+    <div class="control-group">
+      <label class="control-label" for="inputPassword">Password</label>
+      <div class="controls">
+        <input type="password" id="inputPassword" placeholder="Password" data-ng-model="password">
+      </div>
+    </div>
+    <div class="control-group">
+      <div class="controls">            
+        <button type="submit" class="btn">Sign in</button>
+      </div>
+    </div>
+  </form>
+</div>

@@ -16,7 +16,6 @@
   opacity: 1.0;
 }
 
-
 /* apply a natural box layout model to all elements */
 * {
   -moz-box-sizing: border-box;
@@ -28,6 +27,10 @@
 input {
   min-height: 30px;
   margin-bottom: 0px;
+}
+
+.navbar .nav>.active>a, .navbar .nav>li>a, .navbar .nav li.dropdown.open>.dropdown-toggle {
+  color:white;  
 }
 
 
@@ -318,6 +321,10 @@ Tree
 
 .navbar-search select {
   margin-bottom: 5px;
+}
+
+.navbar .btn-group {
+  margin-left: 5px;
 }
 
 /**----------content ----**/
