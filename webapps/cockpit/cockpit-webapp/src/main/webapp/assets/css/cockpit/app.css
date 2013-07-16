@@ -162,3 +162,29 @@ button.arrow-button {
   opacity: 0.6;
   filter: alpha(opacity=40);
 }
+
+/** ---- in-place variable editing ----**/
+
+.in-place-edit {
+  width: 100%;
+}
+
+textarea.in-place-edit {
+  resize: vertical;
+
+}
+
+input:focus.ng-invalid {
+  border-color: #e9322d;
+  -webkit-box-shadow: 0 0 6px #f8b9b7;
+  -moz-box-shadow: 0 0 6px #f8b9b7;
+  box-shadow: 0 0 6px #f8b9b7;
+}
+
+input.ng-invalid {
+  border-color: #e9322d;
+}
+
+.variable-invalid {
+  color: #e9322d;
+}

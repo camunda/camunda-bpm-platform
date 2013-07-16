@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.engine.rest.sub.runtime.impl;
 
+import java.text.ParseException;
 import java.util.Map;
 
 import javax.ws.rs.core.Response.Status;
@@ -59,14 +60,28 @@ public class MessageEventSubscriptionResource implements EventSubscriptionResour
   public void triggerEvent(ExecutionTriggerDto triggerDto) {
     RuntimeService runtimeService = engine.getRuntimeService();
     
-    Map<String, Object> variables = DtoUtil.toMap(triggerDto.getVariables());
     
     try {
+      Map<String, Object> variables = DtoUtil.toMap(triggerDto.getVariables());
       runtimeService.messageEventReceived(messageName, executionId, variables);
+      
     } catch (ProcessEngineException e) {
       throw new RestException(Status.INTERNAL_SERVER_ERROR, e, "Cannot trigger message " + messageName +
           " for execution " + executionId + ": " + e.getMessage());
+      
+    } catch (NumberFormatException e) {
+      String errorMessage = String.format("Cannot trigger message %s for execution %s: %s", messageName, executionId, e.getMessage());
+      throw new RestException(Status.BAD_REQUEST, e, errorMessage);
+      
+    } catch (ParseException e) {
+      String errorMessage = String.format("Cannot trigger message %s: %s", messageName, executionId, e.getMessage());
+      throw new RestException(Status.BAD_REQUEST, e, errorMessage);      
+    
+    } catch (IllegalArgumentException e) {
+      String errorMessage = String.format("Cannot trigger message %s: %s", messageName, executionId, e.getMessage());
+      throw new RestException(Status.BAD_REQUEST, errorMessage);  
     }
+    
   }
 
 }

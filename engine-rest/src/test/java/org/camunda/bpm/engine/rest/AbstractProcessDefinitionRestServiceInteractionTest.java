@@ -210,7 +210,7 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
     
     given().pathParam("id", "aNonExistingDefinitionId")
     .then().expect()
-      .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+      .statusCode(Status.NOT_FOUND.getStatusCode()).contentType(ContentType.JSON)
       .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
       .body("message", equalTo("No matching definition with id " + nonExistingId))
     .when().get(SINGLE_PROCESS_DEFINITION_URL);
@@ -240,4 +240,125 @@ public abstract class AbstractProcessDefinitionRestServiceInteractionTest extend
       .body("message", containsString("Cannot get start form data for process definition"))
     .when().get(START_FORM_URL);
   }
+  
+  @Test
+  public void testUnparseableIntegerVariable() {
+    String variableKey = "aVariableKey";
+    String variableValue = "1abc";
+    String variableType = "Integer";
+    
+    Map<String, Object> variableJson = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
+    
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("variables", variableJson);
+      
+    given().pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
+    .contentType(POST_JSON_CONTENT_TYPE).body(variables)
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+      .body("type", equalTo(RestException.class.getSimpleName()))
+      .body("message", containsString("Cannot instantiate process definition aProcDefId due to number format exception: For input string: \"1abc\""))
+    .when().post(START_PROCESS_INSTANCE_URL);
+  }
+  
+  @Test
+  public void testUnparseableShortVariable() {
+    String variableKey = "aVariableKey";
+    String variableValue = "1abc";
+    String variableType = "Short";
+    
+    Map<String, Object> variableJson = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
+    
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("variables", variableJson);
+      
+    given().pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
+    .contentType(POST_JSON_CONTENT_TYPE).body(variables)
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+      .body("type", equalTo(RestException.class.getSimpleName()))
+      .body("message", containsString("Cannot instantiate process definition aProcDefId due to number format exception: For input string: \"1abc\""))
+    .when().post(START_PROCESS_INSTANCE_URL);
+  }
+  
+  @Test
+  public void testUnparseableLongVariable() {
+    String variableKey = "aVariableKey";
+    String variableValue = "1abc";
+    String variableType = "Long";
+    
+    Map<String, Object> variableJson = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
+    
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("variables", variableJson);
+      
+    given().pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
+    .contentType(POST_JSON_CONTENT_TYPE).body(variables)
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+      .body("type", equalTo(RestException.class.getSimpleName()))
+      .body("message", containsString("Cannot instantiate process definition aProcDefId due to number format exception: For input string: \"1abc\""))
+    .when().post(START_PROCESS_INSTANCE_URL);
+  }
+  
+  @Test
+  public void testUnparseableDoubleVariable() {
+    String variableKey = "aVariableKey";
+    String variableValue = "1abc";
+    String variableType = "Double";
+    
+    Map<String, Object> variableJson = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
+    
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("variables", variableJson);
+      
+    given().pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
+    .contentType(POST_JSON_CONTENT_TYPE).body(variables)
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+      .body("type", equalTo(RestException.class.getSimpleName()))
+      .body("message", containsString("Cannot instantiate process definition aProcDefId due to number format exception: For input string: \"1abc\""))
+    .when().post(START_PROCESS_INSTANCE_URL);
+  }
+  
+  @Test
+  public void testUnparseableDateVariable() {
+    String variableKey = "aVariableKey";
+    String variableValue = "1abc";
+    String variableType = "Date";
+    
+    Map<String, Object> variableJson = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
+    
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("variables", variableJson);
+      
+    given().pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
+    .contentType(POST_JSON_CONTENT_TYPE).body(variables)
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+      .body("type", equalTo(RestException.class.getSimpleName()))
+      .body("message", containsString("Cannot instantiate process definition aProcDefId due to parse exception: Unparseable date: \"1abc\""))
+    .when().post(START_PROCESS_INSTANCE_URL);
+  }
+
+  @Test
+  public void testNotSupportedTypeVariable() {
+    String variableKey = "aVariableKey";
+    String variableValue = "1abc";
+    String variableType = "X";
+    
+    Map<String, Object> variableJson = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
+    
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("variables", variableJson);
+      
+    given().pathParam("id", MockProvider.EXAMPLE_PROCESS_DEFINITION_ID)
+    .contentType(POST_JSON_CONTENT_TYPE).body(variables)
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+      .body("type", equalTo(RestException.class.getSimpleName()))
+      .body("message", containsString("Cannot instantiate process definition aProcDefId: The variable type 'X' is not supported."))
+    .when().post(START_PROCESS_INSTANCE_URL);
+  }
+
 }

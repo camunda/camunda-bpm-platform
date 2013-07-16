@@ -19,10 +19,10 @@ package org.camunda.bpm.engine.impl.variable;
  */
 public class DoubleType implements VariableType {
 
-  private static final long serialVersionUID = 1L;
-
+  public static final String TYPE_NAME = "double";
+  
   public String getTypeName() {
-    return "double";
+    return TYPE_NAME;
   }
 
   public boolean isCachable() {
@@ -42,5 +42,9 @@ public class DoubleType implements VariableType {
       return true;
     }
     return Double.class.isAssignableFrom(value.getClass());
+  }
+  
+  public String getTypeNameForValue(Object value) {
+    return value.getClass().getSimpleName();
   }
 }

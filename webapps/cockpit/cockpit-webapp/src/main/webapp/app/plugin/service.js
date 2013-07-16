@@ -2,9 +2,7 @@
 
 /* Plugin Services */
 
-define([ "angular" ], function(angular) {
-
-  var module = angular.module("cockpit.plugin");
+ngDefine('cockpit.plugin', [ 'angular' ], function(module, angular) {
 
   function ViewsProvider() {
 
@@ -143,7 +141,5 @@ define([ "angular" ], function(angular) {
   }
 
   module.provider('Views', ViewsProvider);
-  // end config
 
-  return module;
 });

@@ -1,6 +1,7 @@
 package org.camunda.bpm.engine.rest;
 
 import static com.jayway.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
@@ -191,7 +192,127 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     
     verify(taskServiceMock).complete(eq(MockProvider.EXAMPLE_TASK_ID), argThat(new EqualsMap(expectedVariables)));
   }
+  
+  @Test
+  public void testCompleteWithUnparseableIntegerVariable() {
+    String variableKey = "aVariableKey";
+    String variableValue = "1abc";
+    String variableType = "Integer";
+    
+    Map<String, Object> variableJson = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
+    
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("variables", variableJson);
+      
+    given().pathParam("id", MockProvider.EXAMPLE_TASK_ID)
+    .contentType(POST_JSON_CONTENT_TYPE).body(variables)
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+      .body("type", equalTo(RestException.class.getSimpleName()))
+      .body("message", containsString("Cannot complete task anId due to number format exception: For input string: \"1abc\""))
+    .when().post(COMPLETE_TASK_URL);
+  }
 
+  @Test
+  public void testCompleteWithUnparseableShortVariable() {
+    String variableKey = "aVariableKey";
+    String variableValue = "1abc";
+    String variableType = "Short";
+    
+    Map<String, Object> variableJson = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
+    
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("variables", variableJson);
+      
+    given().pathParam("id", MockProvider.EXAMPLE_TASK_ID)
+    .contentType(POST_JSON_CONTENT_TYPE).body(variables)
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+      .body("type", equalTo(RestException.class.getSimpleName()))
+      .body("message", containsString("Cannot complete task anId due to number format exception: For input string: \"1abc\""))
+    .when().post(COMPLETE_TASK_URL);
+  }
+  
+  @Test
+  public void testCompleteWithUnparseableLongVariable() {
+    String variableKey = "aVariableKey";
+    String variableValue = "1abc";
+    String variableType = "Long";
+    
+    Map<String, Object> variableJson = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
+    
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("variables", variableJson);
+      
+    given().pathParam("id", MockProvider.EXAMPLE_TASK_ID)
+    .contentType(POST_JSON_CONTENT_TYPE).body(variables)
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+      .body("type", equalTo(RestException.class.getSimpleName()))
+      .body("message", containsString("Cannot complete task anId due to number format exception: For input string: \"1abc\""))
+    .when().post(COMPLETE_TASK_URL);
+  }
+  
+  @Test
+  public void testCompleteWithUnparseableDoubleVariable() {
+    String variableKey = "aVariableKey";
+    String variableValue = "1abc";
+    String variableType = "Double";
+    
+    Map<String, Object> variableJson = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
+    
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("variables", variableJson);
+      
+    given().pathParam("id", MockProvider.EXAMPLE_TASK_ID)
+    .contentType(POST_JSON_CONTENT_TYPE).body(variables)
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+      .body("type", equalTo(RestException.class.getSimpleName()))
+      .body("message", containsString("Cannot complete task anId due to number format exception: For input string: \"1abc\""))
+    .when().post(COMPLETE_TASK_URL);
+  }
+  
+  @Test
+  public void testCompleteWithUnparseableDateVariable() {
+    String variableKey = "aVariableKey";
+    String variableValue = "1abc";
+    String variableType = "Date";
+    
+    Map<String, Object> variableJson = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
+    
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("variables", variableJson);
+      
+    given().pathParam("id", MockProvider.EXAMPLE_TASK_ID)
+    .contentType(POST_JSON_CONTENT_TYPE).body(variables)
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+      .body("type", equalTo(RestException.class.getSimpleName()))
+      .body("message", containsString("Cannot complete task anId due to parse exception: Unparseable date: \"1abc\""))
+    .when().post(COMPLETE_TASK_URL);
+  }
+
+  @Test
+  public void testCompleteWithNotSupportedVariableType() {
+    String variableKey = "aVariableKey";
+    String variableValue = "1abc";
+    String variableType = "X";
+    
+    Map<String, Object> variableJson = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
+    
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("variables", variableJson);
+      
+    given().pathParam("id", MockProvider.EXAMPLE_TASK_ID)
+    .contentType(POST_JSON_CONTENT_TYPE).body(variables)
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+      .body("type", equalTo(RestException.class.getSimpleName()))
+      .body("message", containsString("Cannot complete task anId: The variable type 'X' is not supported."))
+    .when().post(COMPLETE_TASK_URL);
+  }
+  
   @Test
   public void testUnsuccessfulCompleteTask() {
     doThrow(new ProcessEngineException("expected exception")).when(taskServiceMock).complete(any(String.class), Matchers.<Map<String, Object>>any());
@@ -228,6 +349,126 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     
     verify(taskServiceMock).resolveTask(eq(MockProvider.EXAMPLE_TASK_ID), argThat(new EqualsMap(expectedVariables)));
   }
+  
+  @Test
+  public void testResolveTaskWithUnparseableIntegerVariable() {
+    String variableKey = "aVariableKey";
+    String variableValue = "1abc";
+    String variableType = "Integer";
+    
+    Map<String, Object> variableJson = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
+    
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("variables", variableJson);
+      
+    given().pathParam("id", MockProvider.EXAMPLE_TASK_ID)
+    .contentType(POST_JSON_CONTENT_TYPE).body(variables)
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+      .body("type", equalTo(RestException.class.getSimpleName()))
+      .body("message", containsString("Cannot resolve task anId due to number format exception: For input string: \"1abc\""))
+    .when().post(RESOLVE_TASK_URL);
+  }
+
+  @Test
+  public void testResolveTaskWithUnparseableShortVariable() {
+    String variableKey = "aVariableKey";
+    String variableValue = "1abc";
+    String variableType = "Short";
+    
+    Map<String, Object> variableJson = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
+    
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("variables", variableJson);
+      
+    given().pathParam("id", MockProvider.EXAMPLE_TASK_ID)
+    .contentType(POST_JSON_CONTENT_TYPE).body(variables)
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+      .body("type", equalTo(RestException.class.getSimpleName()))
+      .body("message", containsString("Cannot resolve task anId due to number format exception: For input string: \"1abc\""))
+    .when().post(RESOLVE_TASK_URL);
+  }
+  
+  @Test
+  public void testResolveTaskWithUnparseableLongVariable() {
+    String variableKey = "aVariableKey";
+    String variableValue = "1abc";
+    String variableType = "Long";
+    
+    Map<String, Object> variableJson = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
+    
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("variables", variableJson);
+      
+    given().pathParam("id", MockProvider.EXAMPLE_TASK_ID)
+    .contentType(POST_JSON_CONTENT_TYPE).body(variables)
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+      .body("type", equalTo(RestException.class.getSimpleName()))
+      .body("message", containsString("Cannot resolve task anId due to number format exception: For input string: \"1abc\""))
+    .when().post(RESOLVE_TASK_URL);
+  }
+  
+  @Test
+  public void testResolveTaskWithUnparseableDoubleVariable() {
+    String variableKey = "aVariableKey";
+    String variableValue = "1abc";
+    String variableType = "Double";
+    
+    Map<String, Object> variableJson = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
+    
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("variables", variableJson);
+      
+    given().pathParam("id", MockProvider.EXAMPLE_TASK_ID)
+    .contentType(POST_JSON_CONTENT_TYPE).body(variables)
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+      .body("type", equalTo(RestException.class.getSimpleName()))
+      .body("message", containsString("Cannot resolve task anId due to number format exception: For input string: \"1abc\""))
+    .when().post(RESOLVE_TASK_URL);
+  }
+  
+  @Test
+  public void testResolveTaskWithUnparseableDateVariable() {
+    String variableKey = "aVariableKey";
+    String variableValue = "1abc";
+    String variableType = "Date";
+    
+    Map<String, Object> variableJson = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
+    
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("variables", variableJson);
+      
+    given().pathParam("id", MockProvider.EXAMPLE_TASK_ID)
+    .contentType(POST_JSON_CONTENT_TYPE).body(variables)
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+      .body("type", equalTo(RestException.class.getSimpleName()))
+      .body("message", containsString("Cannot resolve task anId due to parse exception: Unparseable date: \"1abc\""))
+    .when().post(RESOLVE_TASK_URL);
+  }
+
+  @Test
+  public void testResolveTaskWithNotSupportedVariableType() {
+    String variableKey = "aVariableKey";
+    String variableValue = "1abc";
+    String variableType = "X";
+    
+    Map<String, Object> variableJson = VariablesBuilder.create().variable(variableKey, variableValue, variableType).getVariables();
+    
+    Map<String, Object> variables = new HashMap<String, Object>();
+    variables.put("variables", variableJson);
+      
+    given().pathParam("id", MockProvider.EXAMPLE_TASK_ID)
+    .contentType(POST_JSON_CONTENT_TYPE).body(variables)
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+      .body("type", equalTo(RestException.class.getSimpleName()))
+      .body("message", containsString("Cannot resolve task anId: The variable type 'X' is not supported."))
+    .when().post(RESOLVE_TASK_URL);
+  }
 
   @Test
   public void testUnsuccessfulResolving() {
@@ -247,9 +488,9 @@ public abstract class AbstractTaskRestServiceInteractionTest extends
     when(mockQuery.singleResult()).thenReturn(null);
     
     given().pathParam("id", "aNonExistingTaskId")
-      .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+      .then().expect().statusCode(Status.NOT_FOUND.getStatusCode()).contentType(ContentType.JSON)
       .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
-      .body("message", equalTo("No task id supplied"))
+      .body("message", equalTo("No matching task with id aNonExistingTaskId"))
       .when().get(SINGLE_TASK_URL);
   }
 

@@ -6,23 +6,23 @@
       </div>
     </div>
     <div class="row">
-      <div class="span4">
+      <div class="span3">
         <div class="well sidebar-nav">
           <ul class="nav nav-list">
-            <li ng-class="activeClass('/profile')">
-              <a href="#/users/{{user.id}}/profile">Profile</a>
+            <li ng-class="activeClass('profile')">
+              <a href="#/users/{{user.id}}?tab=profile">Profile</a>
             </li>
-            <li ng-class="activeClass('/account')">
-              <a href="#/users/{{user.id}}/account">Account</a>
+            <li ng-class="activeClass('account')">
+              <a href="#/users/{{user.id}}?tab=account">Account</a>
             </li>
-            <li ng-class="activeClass('/groups')">
-              <a href="#/users/{{user.id}}/groups">Groups</a>
+            <li ng-class="activeClass('groups')">
+              <a href="#/users/{{user.id}}?tab=groups">Groups</a>
             </li>                    
           </ul>          
         </div>
       </div>
 
-      <div class="span8">
+      <div class="span9">
 
         <div ng-show="show('profile')"> 
           <div class="box">
@@ -36,7 +36,7 @@
               <div class="control-group">
                 <label class="control-label" for="inputFirstname">Firstname*</label>
                 <div class="controls">
-                  <input id="inputFirstname" name="firstname" type="text" ng-model="profile.firstName" novalidate required autofocus></input>
+                  <input id="inputFirstname" name="firstname" type="text" ng-model="profile.firstName" novalidate required></input>
                   <p class="help-block" ng-show="editProfileForm.firstname.$error.required">Firstname is required.</p>
                 </div>
               </div>
@@ -73,17 +73,21 @@
 
               <legend>Change Password</legend>
 
+              <p>Type a new password to change the existing account password.</p>
+
               <div class="control-group">
-                <label class="control-label" for="inputPassword">Password:</label>
+                <label class="control-label" for="inputPassword">Password*:</label>
                 <div class="controls">
-                  <input id="inputPassword" type="password" ng-model="credentials.password" data-password="credentials.password2"></input>
+                  <input id="inputPassword" name="inputPassword" type="password" ng-model="credentials.password" data-password></input>
+                  <p class="text-error" ng-show="updateCredentialsForm.inputPassword.$error.password">Password must have at least 8 characters.</p>
                 </div>
               </div>
 
               <div class="control-group">
-                <label class="control-label" for="inputPasswordRepeat">Password (repeat):</label>
+                <label class="control-label" for="inputPasswordRepeat">Password (repeat)*:</label>
                 <div class="controls">
-                  <input id="inputPasswordRepeat" type="password" ng-model="credentials.password2" data-password="credentials.password"></input>
+                  <input id="inputPasswordRepeat" name="inputPasswordRepeat" type="password" ng-model="credentials.password2" data-password-repeat="credentials.password"></input>
+                  <p class="text-error" ng-show="updateCredentialsForm.inputPasswordRepeat.$error.passwordRepeat">Passwords must match.</p>
                 </div>
               </div>
 

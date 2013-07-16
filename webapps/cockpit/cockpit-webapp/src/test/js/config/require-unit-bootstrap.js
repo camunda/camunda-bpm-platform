@@ -29,8 +29,9 @@
       'jquery-mousewheel': { deps: [ 'jquery' ] },
     },
     packages: [
-      { name: 'cockpit', location: 'main/webapp/app', main: 'cockpit' },
+      { name: 'cockpit', location: 'main/webapp/app/cockpit', main: 'cockpit' },
       { name: 'cockpit-plugin', location: 'main/webapp/app/plugin' },
+      { name: 'base-plugin', location: 'main/webapp/plugin/base/app', main: 'plugin' },
       { name: 'camunda-common', location: 'main/webapp/assets/vendor/camunda-common' },
       { name: 'bpmn', location : 'main/webapp/assets/vendor/cabpmn' },
       { name: 'dojo', location : 'main/webapp/assets/vendor/dojo/dojo' },
@@ -56,6 +57,7 @@
     window._jQuery = $;
     window._jqLiteMode = false;
 
+    tests.unshift('/base/test/js/unit/browserTrigger.js');
     tests.unshift('/base/test/js/unit/testabilityPatch.js');
     
     require(tests, function() {
