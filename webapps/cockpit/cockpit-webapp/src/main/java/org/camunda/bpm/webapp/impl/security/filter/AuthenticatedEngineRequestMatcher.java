@@ -37,7 +37,7 @@ public class AuthenticatedEngineRequestMatcher extends RequestMatcher {
     } else {
       Matcher matcher = uriMatcher.matcher(uri);
       
-      if(matcher.matches() && matcher.groupCount() == 2) {
+      if(matcher.matches() && matcher.groupCount() == 1) {
         String engineName = matcher.group(1);
         return authentications.hasAuthenticationForProcessEngine(engineName);
         
