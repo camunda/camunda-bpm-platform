@@ -97,7 +97,28 @@ textarea.in-place-edit {
 }
 
 @media (min-width: 768px) {
-  .ctn-sitebar-container, .ctn-column {
+
+  .ctn-wrapper div[breadcrumbs] {
+    position: absolute;
+    height: 30px;
+    top: 0;
+    left: 0;
+    right: 0;
+
+    background: whiteSmoke;
+    border-bottom: 1px solid #E5E5E5;
+  }
+
+  .ctn-wrapper div[ng-view] {
+    position: absolute;
+    top: 30px;
+    left: 0;
+    bottom: 30px;
+    right: 0;
+    overflow: auto;
+  }
+
+  .ctn-content-container, .ctn-column {
     position: absolute;
     top: 0;
     left: 0;
@@ -109,24 +130,20 @@ textarea.in-place-edit {
     margin: 10px;
   }
 
-  .ctn-sitebar-container {
-    bottom: 31px;
-  }
-
   .ctn-column {
-    border-right: solid 1px #BBB;
+    border-left: solid 1px #BBB;
   }
 
-  .ctn-column:last-child {
-    border-right: none;
+  .ctn-column:first-child {
+    border-left: none;
   }
 
   .ctn-row {
-    border-bottom: solid 1px #BBB;
+    border-top: solid 1px #BBB;
   }
 
-  .ctn-row:last-child {
-    border-bottom: none;
+  .ctn-row:first-child {
+    border-top: none;
   }
 
   .ctn-sitebar {
@@ -142,10 +159,62 @@ textarea.in-place-edit {
     overflow: auto;
   }
 
-  .ctn-content-top {
-    height: 60%;
+  .ctn-content > div {
+    position: absolute;
+    left: 0;
+    right: 0;
     overflow: hidden;
   }
+
+  .ctn-content-top {
+    top: 0;
+    bottom: 350px;
+  }
+
+  .ctn-content-bottom {
+    top: auto;
+    bottom: 0;
+    height: 350px;
+  }
+
+  .ctn-collapsable-parent {
+    overflow: visible;
+  }
+
+  .ctn-tabbed .ctn-tabbed-content {
+    position: absolute;
+
+    left: 0;
+    top: 50px;
+    right: 0;
+    bottom: 0;
+  }
+}
+
+.resize-handle {
+  border: none 1px #E5E5E5;
+  position: absolute;
+  background: whiteSmoke;
+}
+
+.resize-handle.horizontal {
+  height: 5px;
+
+  right: 0;
+  left: 0;
+
+  border-style: solid none;
+
+  cursor: n-resize;
+}
+
+.resize-handle.vertical {
+  width: 5px;
+  top: 0;
+  bottom: 0;
+  cursor: e-resize;
+
+  border-style: none solid;
 }
 
 @media (max-width: 767px) {
@@ -161,6 +230,14 @@ textarea.in-place-edit {
   a.expand-collapse {
     visibility: hidden;
   }
+
+  .resize-handle {
+    display: none;
+  }
+}
+
+.ctn-tabbed {
+  position: relative;
 }
 
 .ctn-tabbed .nav-tabs {
@@ -170,6 +247,8 @@ textarea.in-place-edit {
 
 .ctn-tabbed .ctn-tabbed-content {
   margin: 10px;
+
+  overflow: auto;
 }
 
 /** dashboard page */
