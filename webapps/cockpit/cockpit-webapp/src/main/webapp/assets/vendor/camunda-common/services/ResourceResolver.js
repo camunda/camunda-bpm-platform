@@ -20,7 +20,7 @@ ngDefine('camunda.common.services.resolver', function(module) {
         function fail(errorResponse) {
           var message, replace;
 
-          if (errorResponse.status === 400) {
+          if (errorResponse.status === 404) {
             message = "No " + resourceName + " with ID " + id;
             replace = true;
           } else {

@@ -9,7 +9,7 @@
     <meta name="author" content="camunda services GmbH" />
 
     <!-- settings the base path for relative links -->
-    <base href="./" cockpit-api="$APP_ROOT/api/cockpit/" engine-api="$APP_ROOT/api/engine/" />
+    <base href="./" cockpit-api="$APP_ROOT/api/cockpit/" engine-api="$APP_ROOT/api/engine/" app-root="$APP_ROOT" />
 
     <!-- Styles -->
     <link href="$APP_ROOT/assets/css/cockpit/loader.css" rel="stylesheet" />
@@ -30,12 +30,14 @@
   </head>
   <body>
 
-    <div class="wrapper">
+    <div class="wrapper" ng-controller="AuthenticationController">
       <!-- Header -->
       <div ng-include="'templates/header.html'"></div>
 
       <div class="container-fluid content-container content-inset">
         <div notifications-panel></div>
+
+        <div breadcrumbs></div>
 
         <div class="row-fluid content-container">
           <!-- actual view body is rendered here whenever the url changes -->

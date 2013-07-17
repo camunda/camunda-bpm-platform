@@ -4,7 +4,8 @@ ngDefine('cockpit.resources', function(module) {
 
     return $resource(Uri.appUri('engine://engine/:engine/process-instance/:id/:action'), { id: '@id' }, {
       count: { method: 'GET', isArray: false, params: { id: 'count' }},
-      activityInstances: { method: 'GET', isArray: false, params: { action: 'activity-instances' }}
+      activityInstances: { method: 'GET', isArray: false, params: { action: 'activity-instances' }},
+      getSuperProcessInstance: { method: 'POST', isArray: true, params: { }}
     });
   }];
 

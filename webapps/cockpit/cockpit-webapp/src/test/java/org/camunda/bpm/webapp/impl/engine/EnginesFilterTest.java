@@ -1,11 +1,11 @@
-package org.camunda.bpm.cockpit.impl.web.filter.engine;
+package org.camunda.bpm.webapp.impl.engine;
 
 import static org.fest.assertions.Assertions.assertThat;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.camunda.bpm.webapp.impl.filter.ProcessEnginesFilter;
+import org.camunda.bpm.webapp.impl.engine.ProcessEnginesFilter;
 import org.junit.Test;
 
 /**
