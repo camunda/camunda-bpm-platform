@@ -80,7 +80,7 @@
   
   <!-- admin rest api -->
   <servlet>
-    <servlet-name>Cockpit Api</servlet-name>
+    <servlet-name>Admin Api</servlet-name>
     <servlet-class>org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher</servlet-class>
     <init-param>
       <param-name>javax.ws.rs.Application</param-name>
