@@ -11,9 +11,10 @@
     paths: {
       'ngDefine' : 'assets/vendor/requirejs-angular-define/ngDefine',
       'domReady' : 'assets/vendor/require/domReady',
-      'jquery' : 'assets/vendor/jquery-1.7.2.min',
-      'jquery-mousewheel' : 'assets/vendor/jquery.mousewheel',
-      'jquery-overscroll' : 'assets/vendor/jquery.overscroll',
+      'jquery' : 'assets/vendor/jquery/jquery',
+      'jquery-mousewheel' : 'assets/vendor/jquery/jquery.mousewheel',
+      'jquery-overscroll' : 'assets/vendor/jquery/jquery.overscroll',
+      'jquery-ui' : 'assets/vendor/jquery-ui/jquery-ui-1.10.3.custom.min',
       'bootstrap' : 'assets/vendor/bootstrap/js/bootstrap',
       'bootstrap-slider' : 'assets/vendor/bootstrap-slider/bootstrap-slider',
       'angular' : 'assets/vendor/angular/angular',
@@ -23,6 +24,7 @@
     shim: {
       'jquery-mousewheel' : { deps: [ 'jquery' ] },
       'jquery-overscroll' : { deps: [ 'jquery' ] },
+      'jquery-ui' : { deps: [ 'jquery' ] },
       'bootstrap' : { deps: [ 'jquery' ] },
       'bootstrap-slider' : { deps: [ 'jquery' ] },
       'angular' : { deps: [ 'jquery' ], exports: 'angular' },
@@ -67,7 +69,7 @@
     ensureScenarioCompatibility();
   }
 
-  require([ 'angular', 'angular-resource', 'angular-sanitize', 'ngDefine', 'bootstrap' ], function(angular) {
+  require([ 'angular', 'angular-resource', 'angular-sanitize', 'ngDefine', 'bootstrap', 'jquery-ui' ], function(angular) {
     require([ APP_NAME, 'domReady!' ], function() {
       bootstrapApp(angular);
     });
