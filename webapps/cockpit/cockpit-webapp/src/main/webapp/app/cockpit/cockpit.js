@@ -50,6 +50,10 @@
       };
     };
 
+    var DefaultController = [ '$rootScope', 'Notifications', 'Authentication', '$location', function($rootScope, Notifications, Authentication, $location) {
+      $rootScope.$on("responseError", new ResponseErrorHandler(Notifications, Authentication, $location).handlerFn);
+    }];
+
     var ProcessEngineSelectionController = [
       '$scope', '$http', '$location', '$window', 'Uri', 'Notifications',
       function($scope, $http, $location, $window, Uri, Notifications) {
@@ -87,9 +91,6 @@
           var path = $location.absUrl();      
           return path.indexOf(link) != -1 ? "active" : "";
         };
-
-        $scope.adminLink = Uri.appUri("adminbase://"+Uri.appUri(":engine")+"/");
-        $scope.taskListLink = Uri.appUri("../../../../tasklist");
     }];
 
     var AuthenticationController = [
@@ -97,15 +98,15 @@
       function($scope, Notifications, Authentication, $location, Uri) {
     
         $scope.authentication = Authentication;
-          
-        $scope.$on("responseError", new ResponseErrorHandler(Notifications, Authentication, $location).handlerFn);
+
+        $scope.$watch('authentication.auth.username', function(newValue) {
+          $scope.userName = newValue;
+        });
 
         $scope.logout = function() {
           Authentication.logout();
           $location.path("/");
         }
-
-        $scope.profileLink = Uri.appUri("adminbase://:engine/#/users/"+Authentication.auth.username+"?tab=profile");
     }];
 
     var ModuleConfig = [ '$routeProvider', '$httpProvider', 'UriProvider', function($routeProvider, $httpProvider, UriProvider) {
@@ -143,6 +144,7 @@
 
     module
       .config(ModuleConfig)
+      .controller('DefaultController', DefaultController)
       .controller('ProcessEngineSelectionController', ProcessEngineSelectionController)
       .controller('AuthenticationController', AuthenticationController)
       .controller('NavigationController', NavigationController);
