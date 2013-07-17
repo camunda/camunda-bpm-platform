@@ -3,20 +3,20 @@ ngDefine('cockpit.directives', [
 ], function(module, angular) {
 
   var ProcessEngineSelectionController = [
-    '$scope', '$rootScope', '$http', '$location', '$window', 'Uri', 'Notifications',
-    function($scope, $rootScope, $http, $location, $window, Uri, Notifications) {
+    '$scope', '$http', '$location', '$window', 'Uri', 'Notifications',
+    function($scope, $http, $location, $window, Uri, Notifications) {
 
     var current = Uri.appUri(':engine');
     var enginesByName = {};
 
-    $http.get(Uri.appUri('engine://engine')).then(function(response) {
+    $http.get(Uri.appUri('engine://engine/')).then(function(response) {
       $scope.engines = response.data;
 
       angular.forEach($scope.engines , function(engine) {
         enginesByName[engine.name] = engine;
       });
 
-      $scope.currentEngine = $rootScope.currentEngine = enginesByName[current];
+      $scope.currentEngine = enginesByName[current];
 
       if (!$scope.currentEngine) {
         Notifications.addError({ status: 'Not found', message: 'The process engine you are trying to access does not exist' });

@@ -1,0 +1,12 @@
+<ul class="nav pull-right" ng-if="authentication.auth.username" ng-cloak>
+  <li class="dropdown">
+    <a href="#" class="dropdown-toggle" data-toggle="dropdown"><i class="icon-home icon-white"></i> {{ authentication.auth.username }} <b class="caret"></b></a>
+    <ul class="dropdown-menu">
+      <li><a ng-click="logout()"><i class="icon-share"></i> Sign out</a></li>
+      <li><a href="{{profileLink}}"><i class="icon-user"></i> My Profile</a></li>
+      <li class="divider"></li>
+      <li><a href="{{adminLink}}">Admin</a></li>
+      <li><a href="{{taskListLink}}">Tasklist</a></li>
+    </ul>
+  </li>
+</ul>

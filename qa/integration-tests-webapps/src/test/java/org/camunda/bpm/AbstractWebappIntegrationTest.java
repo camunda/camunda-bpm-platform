@@ -24,10 +24,6 @@ import com.sun.jersey.client.apache4.ApacheHttpClient4;
 import com.sun.jersey.client.apache4.config.DefaultApacheHttpClient4Config;
 
 /**
- * <p>Abstract Base class for Webapp integration tests.</p>
- *
- * <p>Provides infrastructure for connecting to the application under
- * test and provides a HttpClient instance.</p>
  *
  * @author Daniel Meyer
  * @author Roman Smirnov

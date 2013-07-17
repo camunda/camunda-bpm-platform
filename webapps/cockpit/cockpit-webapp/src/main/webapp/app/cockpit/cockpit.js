@@ -11,16 +11,104 @@
   var commons = [
     'module:camunda.common.directives:camunda-common/directives/main',
     'module:camunda.common.extensions:camunda-common/extensions/main',
-    'module:camunda.common.services:camunda-common/services/main' ];
+    'module:camunda.common.services:camunda-common/services/main',
+    'module:camunda.common.pages.login:camunda-common/pages/login' ];
 
   var plugins = window.PLUGIN_DEPENDENCIES || [];
 
-  var dependencies = [ 'jquery', 'angular', 'module:ng', 'module:ngResource' ].concat(commons, cockpitCore, plugins);
+  var dependencies = [ 'jquery', 'angular', 'module:ng', 'module:ngResource', 'module:ngCookies'].concat(commons, cockpitCore, plugins);
 
   ngDefine('cockpit', dependencies, function(module, $, angular) {
 
-    var ModuleConfig = [ '$routeProvider', '$httpProvider', 'UriProvider',
-      function($routeProvider, $httpProvider, UriProvider) {
+    var ResponseErrorHandler = function(Notifications, Authentication, $location) {
+
+      this.handlerFn = function(event, responseError) {
+        var status = responseError.status,
+            data = responseError.data;
+
+        Notifications.clear({ type: "error" });
+
+        switch (status) {
+        case 500:
+          if (data && data.message) {
+            Notifications.addError({ status: "Error", message: data.message, exceptionType: data.exceptionType });
+          } else {
+            Notifications.addError({ status: "Error", message: "A problem occurred: Try to refresh the view or login and out of the application. If the problem persists, contact your administrator." });
+          }
+          break;
+        case 0:
+          Notifications.addError({ status: "Request Timeout", message:  "Your request timed out. Try refreshing the page." });
+          break;
+        case 401:
+          Authentication.clear();
+          $location.path("/login");
+
+          break;
+        default:
+          Notifications.addError({ status: "Error", message :  "A problem occurred: Try to refresh the view or login and out of the application. If the problem persists, contact your administrator." });
+        }
+      };
+    };
+
+    var ProcessEngineSelectionController = [
+      '$scope', '$http', '$location', '$window', 'Uri', 'Notifications',
+      function($scope, $http, $location, $window, Uri, Notifications) {
+
+      var current = Uri.appUri(':engine');
+      var enginesByName = {};
+
+      $http.get(Uri.appUri('engine://engine/')).then(function(response) {
+        $scope.engines = response.data;
+
+        angular.forEach($scope.engines , function(engine) {
+          enginesByName[engine.name] = engine;
+        });
+
+        $scope.currentEngine = enginesByName[current];
+
+        if (!$scope.currentEngine) {
+          Notifications.addError({ status: 'Not found', message: 'The process engine you are trying to access does not exist' });
+          $location.path('/dashboard')
+        }
+      });
+
+      $scope.$watch('currentEngine', function(engine) {
+        if (engine && current !== engine.name) {
+          $window.location.href = Uri.appUri("app://../" + engine.name + "/");
+        }
+      });
+    }];
+
+    var NavigationController = [
+      '$scope', '$location', 'Uri',
+      function($scope, $location, Uri) {
+
+        $scope.activeClass = function(link) {
+          var path = $location.absUrl();      
+          return path.indexOf(link) != -1 ? "active" : "";
+        };
+
+        $scope.adminLink = Uri.appUri("adminbase://"+Uri.appUri(":engine")+"/");
+        $scope.taskListLink = Uri.appUri("../../../../tasklist");
+    }];
+
+    var AuthenticationController = [
+      '$scope', 'Notifications', 'Authentication', '$location', 'Uri',
+      function($scope, Notifications, Authentication, $location, Uri) {
+    
+        $scope.authentication = Authentication;
+          
+        $scope.$on("responseError", new ResponseErrorHandler(Notifications, Authentication, $location).handlerFn);
+
+        $scope.logout = function() {
+          Authentication.logout();
+          $location.path("/");
+        }
+
+        $scope.profileLink = Uri.appUri("adminbase://:engine/#/users/"+Authentication.auth.username+"?tab=profile");
+    }];
+
+    var ModuleConfig = [ '$routeProvider', '$httpProvider', 'UriProvider', function($routeProvider, $httpProvider, UriProvider) {
 
       $httpProvider.responseInterceptors.push('httpStatusInterceptor');
       $routeProvider.otherwise({ redirectTo: '/dashboard' });
@@ -35,7 +123,9 @@
       }
 
       UriProvider.replace('app://', getUri('href'));
+      UriProvider.replace('adminbase://', getUri('app-root') + "/app/admin/");
       UriProvider.replace('cockpit://', getUri('cockpit-api'));
+      UriProvider.replace('admin://', getUri('cockpit-api') + "../admin/");
       UriProvider.replace('plugin://', getUri('cockpit-api') + 'plugin/');
       UriProvider.replace('engine://', getUri('engine-api'));
 
@@ -51,7 +141,13 @@
       }]);
     }];
 
-    module.config(ModuleConfig);
+    module
+      .config(ModuleConfig)
+      .controller('ProcessEngineSelectionController', ProcessEngineSelectionController)
+      .controller('AuthenticationController', AuthenticationController)
+      .controller('NavigationController', NavigationController);
+
+    return module;
   });
 
 })(window || this);

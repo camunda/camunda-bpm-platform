@@ -9,7 +9,7 @@
     <meta name="author" content="camunda services GmbH" />
 
     <!-- settings the base path for relative links -->
-    <base href="./" cockpit-api="$APP_ROOT/api/cockpit/" engine-api="$APP_ROOT/api/engine/" />
+    <base href="./" cockpit-api="$APP_ROOT/api/cockpit/" engine-api="$APP_ROOT/api/engine/" app-root="$APP_ROOT" />
 
     <!-- Styles -->
     <link href="$APP_ROOT/assets/css/cockpit/loader.css" rel="stylesheet" />
@@ -28,7 +28,7 @@
     <script src="$APP_ROOT/app/cockpit/cockpit-bootstrap.js"></script>
 
   </head>
-  <body>
+  <body ng-controller="AuthenticationController">
     <!-- navigation -->
     <div class="navbar navbar-fixed-top">
       <div class="navbar-inner">
@@ -37,6 +37,8 @@
             camunda cockpit
           </a>
 
+          <div ng-include="'templates/navigation.html'"></div>
+          
           <div engine-select></div>
         </div>
       </div>

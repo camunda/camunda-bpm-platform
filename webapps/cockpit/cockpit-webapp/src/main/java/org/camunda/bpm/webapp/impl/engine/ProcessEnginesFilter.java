@@ -1,4 +1,4 @@
-package org.camunda.bpm.webapp.impl.filter;
+package org.camunda.bpm.webapp.impl.engine;
 
 import java.io.IOException;
 import java.util.regex.Matcher;
@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.camunda.bpm.cockpit.Cockpit;
+import org.camunda.bpm.webapp.impl.filter.AbstractTemplateFilter;
 
 /**
  *

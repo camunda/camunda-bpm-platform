@@ -19,7 +19,8 @@
       'bootstrap-slider' : 'assets/vendor/bootstrap-slider/bootstrap-slider',
       'angular' : 'assets/vendor/angular/angular',
       'angular-resource' : 'assets/vendor/angular/angular-resource',
-      'angular-sanitize' : 'assets/vendor/angular/angular-sanitize'
+      'angular-sanitize' : 'assets/vendor/angular/angular-sanitize',
+      'angular-cookies' : 'assets/vendor/angular/angular-cookies'
     },
     shim: {
       'jquery-mousewheel' : { deps: [ 'jquery' ] },
@@ -29,7 +30,8 @@
       'bootstrap-slider' : { deps: [ 'jquery' ] },
       'angular' : { deps: [ 'jquery' ], exports: 'angular' },
       'angular-resource': { deps: [ 'angular' ] },
-      'angular-sanitize': { deps: [ 'angular' ] }
+      'angular-sanitize': { deps: [ 'angular' ] },
+      'angular-cookies': { deps: [ 'angular' ] }
     },
     packages: [
       { name: 'cockpit', location: 'app/cockpit', main: 'cockpit' },
@@ -69,7 +71,7 @@
     ensureScenarioCompatibility();
   }
 
-  require([ 'angular', 'angular-resource', 'angular-sanitize', 'ngDefine', 'bootstrap', 'jquery-ui' ], function(angular) {
+  require([ 'angular', 'angular-resource', 'angular-sanitize', 'angular-cookies', 'ngDefine', 'bootstrap', 'jquery-ui' ], function(angular) {
     require([ APP_NAME, 'domReady!' ], function() {
       bootstrapApp(angular);
     });

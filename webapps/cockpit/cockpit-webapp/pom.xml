@@ -95,6 +95,7 @@
       <version>1.17</version>
       <scope>test</scope>
     </dependency>
+          
   </dependencies>
 
   <build>
@@ -383,6 +384,23 @@
           <property>
             <name>database</name>
             <value>mssql</value>
+          </property>
+        </activation>
+        <dependencies>
+          <dependency>
+            <groupId>com.microsoft.sqlserver</groupId>
+            <artifactId>sqljdbc4</artifactId>
+            <scope>test</scope>
+          </dependency>
+       </dependencies>
+    </profile>
+
+    <profile>
+      <id>mssql12</id>
+        <activation>
+          <property>
+            <name>database</name>
+            <value>mssql12</value>
           </property>
         </activation>
         <dependencies>

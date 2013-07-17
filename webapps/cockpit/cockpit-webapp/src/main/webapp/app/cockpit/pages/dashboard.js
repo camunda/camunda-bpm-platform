@@ -4,9 +4,12 @@ define(['angular'], function(angular) {
 
   var module = angular.module('cockpit.pages');
 
-  var Controller = ['$scope', 'Views', function ($scope, Views) {
+  var Controller = ['$scope', '$rootScope', 'Views', function ($scope, $rootScope, Views) {
 
     $scope.dashboardProviders = Views.getProviders({ component: 'cockpit.dashboard'});
+
+    // reset breadcrumbs
+    $rootScope.clearBreadcrumbs();
 
   }];
 
