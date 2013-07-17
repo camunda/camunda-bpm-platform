@@ -1,6 +1,18 @@
 <div class="content-fixed">
 
   <div id="sidebar" class="content content-sidebar well">
+
+    <div class="btn-group">
+      <button class="btn">Action</button>
+      <button class="btn dropdown-toggle" data-toggle="dropdown">
+        <span class="caret"></span>
+      </button>
+      <ul class="dropdown-menu">
+        <li>
+          <a href ng-click="openCancelProcessInstanceDialog()">Cancel Process Instance</a>
+        </li>
+      </ul>
+    </div>
   
     <button on-click-hide-element="sidebar" selection="selection"></button>
   
@@ -33,3 +45,69 @@
   </div>
 
 </div>
+
+<!-- begin cancel confirmation-dialog -->
+<div modal-dialog model="cancelProcessInstanceDialog" ng-cloak>
+  <div class="modal hide" ng-controller="CancelProcessInstanceController" ng-if="cancelProcessInstanceDialog.renderHtml()"> 
+    <div class="modal-header">
+      <button ng-show="cancelProcessInstanceDialog.autoClosable" type="button" class="close" data-dismiss="modal">&times;</button>
+      <h3>Cancel Process Instance</h3>
+    </div>
+
+    <div class="modal-body">
+      <div notifications-panel></div>
+
+      <div ng-hide="status === 'cancellationSuccess' || status === 'cancellationFailed' || status === 'beforeCancellation' || status === 'loadingFailed'">
+        <i class="icon-loading"></i> loading process instance information...
+      </div>
+
+      <div ng-show="status === 'loadingFailed'">
+        <p>It was not possible to get further process instance informations to be able to cancel this process instance. Refresh the current page by pressing F5 and try once again to cancel this process instance.</p>
+      </div>
+
+      <div ng-show="status === 'beforeCancellation'">
+
+        <p ng-show="subProcessInstances.length > 0">
+          If you cancel this process instance the following sub process instances will also be canceled:
+          <ul>
+            <li ng-repeat="subProcessInstance in subProcessInstances">
+              <a href="#/process-definition/{{ subProcessInstance.definitionId }}/process-instance/{{ subProcessInstance.id }}" ng-click="close(status)">
+                {{ subProcessInstance.id | shorten:8 }}
+              </a>
+            </li>
+            <li ng-hide="subProcessInstances.length === subProcessInstancesCount">
+              and {{ subProcessInstancesCount - subProcessInstances.length }} other process instances.
+            </li>
+          </ul>
+        </p>
+
+        <p>Do you really want to cancel this process instance?</p>
+
+      </div>
+
+      <div ng-show="status === 'cancellationSuccess'">
+        <p>The process instance was canceled successfully.</p>
+        <p>After closing this dialog you will be redirected to the corresponding process definition overview.</p>
+      </div>
+
+      <div ng-show="status === 'cancellationFailed'">
+        <p>The process instance could not be canceled successfully.</p>
+        <p>Maybe the process instance has already been cancelled or finished. Try to press F5 to refresh the page.</p>
+      </div>
+
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn" ng-click="close(status)"
+              ng-disabled="status === 'performCancellation'"
+              ng-hide="status === 'cancellationSuccess' || status === 'cancellationFailed' || status === 'loadingFailed'">Close</button>
+      <button class="btn btn-primary" ng-click="close(status)"
+              ng-show="status === 'cancellationSuccess' || status === 'cancellationFailed' || status === 'loadingFailed'">OK</button>        
+      <button class="btn btn-primary" ng-click="cancelProcessInstance()"
+              ng-disabled="status !== 'beforeCancellation'"
+              ng-hide="status === 'cancellationSuccess' || status === 'cancellationFailed' || status === 'loadingFailed'">Cancel Process Instance</button>
+      
+    </div>
+  </div>
+</div>
+<!-- end add/edit connector-configuration-dialog -->

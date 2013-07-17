@@ -5,6 +5,7 @@ ngDefine('camunda.common.directives', [
   './requestAware',
   './paginator',
   './password',
+  './modalDialog',
   './stateCircle'
 ], function(module) {
 

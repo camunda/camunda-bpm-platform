@@ -460,3 +460,15 @@ input.ng-invalid {
    width: 35px;
    height: 30px;
 }
+
+/*---------modal dialog -------------*/
+.modal-body {
+  max-height: 480px;
+}
+
+/** make sure that if screen res is 600px high or below, modal dialoges are scrollable */
+@media screen and (max-height: 600px){
+  .modal {
+    position:absolute;
+  } 
+}
