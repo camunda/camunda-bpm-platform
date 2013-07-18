@@ -185,7 +185,7 @@ Icons
  ****************************/
 
 .ctn-main {
-  position: fixed;
+  position: absolute;
   top: 41px;
   left: 0;
   bottom: 0;
