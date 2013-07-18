@@ -65,6 +65,11 @@ ngDefine('camunda.common.services.uri', [ 'angular' ], function(module, angular)
     }];
   };
 
-  module
-    .provider("Uri", UriProvider);
+  module.provider("Uri", UriProvider);
+
+  module.filter('uri', [ 'Uri', function(Uri) {
+    return function(input) {
+      return Uri.appUri(input);
+    }
+  }]);
 });

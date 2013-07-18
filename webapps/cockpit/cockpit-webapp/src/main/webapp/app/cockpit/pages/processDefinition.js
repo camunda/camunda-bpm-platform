@@ -1,36 +1,15 @@
 ngDefine('cockpit.pages', [ 'angular' ], function(module, angular) {
 
-  var Controller = function($scope, Notifications, ProcessDefinitionResource, ProcessInstanceResource, Views, Transform, processDefinition) {
+  var Controller = function($scope, $rootScope, Notifications, ProcessDefinitionResource, ProcessInstanceResource, Views, Transform, processDefinition) {
 
     $scope.processDefinition = processDefinition;
+
+    // add process definition breadcrumb
+    $rootScope.addBreadcrumb({'type': 'processDefinition', 'processDefinition': processDefinition});
 
     $scope.processInstanceTable = Views.getProvider({ component: 'cockpit.processDefinition.instancesTable' });
 
     $scope.selection = {};
-    
-    $scope.$watch('selection.elements', function (newValue) {
-      if (!newValue) {
-        return;
-      }
-      
-      if (newValue.hidden) {
-        var elements = [];
-        if (newValue.hidden === 'sidebar') {
-          elements.push('main-content');
-        }
-        $scope.selection.elements.toResize = {toGreater: elements}; 
-        return;
-      };
-
-      if (newValue.visible) {
-        var elements = [];
-        if (newValue.visible === 'sidebar') {
-          elements.push('main-content');
-        }
-        $scope.selection.elements.toResize = {toShrink: elements}; 
-        return;
-      };
-    });
     
     ProcessInstanceResource.count({ processDefinitionKey : processDefinition.key }).$then(function(response) {
       $scope.processDefinitionTotalCount = response.data;
@@ -60,7 +39,7 @@ ngDefine('cockpit.pages', [ 'angular' ], function(module, angular) {
     
   };
 
-  Controller.$inject = [ '$scope', 'Notifications', 'ProcessDefinitionResource', 'ProcessInstanceResource', 'Views', 'Transform', 'processDefinition' ];
+  Controller.$inject = [ '$scope', '$rootScope', 'Notifications', 'ProcessDefinitionResource', 'ProcessInstanceResource', 'Views', 'Transform', 'processDefinition' ];
 
   var RouteConfig = [ '$routeProvider', function($routeProvider) {
     $routeProvider.when('/process-definition/:processDefinitionId', {

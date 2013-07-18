@@ -11,44 +11,17 @@
   var commons = [
     'module:camunda.common.directives:camunda-common/directives/main',
     'module:camunda.common.extensions:camunda-common/extensions/main',
-    'module:camunda.common.services:camunda-common/services/main' ];
+    'module:camunda.common.services:camunda-common/services/main',
+    'module:camunda.common.pages:camunda-common/pages/main' ];
 
   var plugins = window.PLUGIN_DEPENDENCIES || [];
 
-  var dependencies = [ 'jquery', 'angular', 'module:ng', 'module:ngResource' ].concat(commons, cockpitCore, plugins);
+  var dependencies = [ 'jquery', 'angular', 'module:ng', 'module:ngResource', 'module:ngCookies'].concat(commons, cockpitCore, plugins);
 
   ngDefine('cockpit', dependencies, function(module, $, angular) {
 
-    var ProcessEngineSelectionController = [
-      '$scope', '$rootScope', '$http', '$location', '$window', 'Uri', 'Notifications',
-      function($scope, $rootScope, $http, $location, $window, Uri, Notifications) {
-
-      var current = Uri.appUri(':engine');
-      var enginesByName = {};
-
-      $http.get(Uri.appUri('engine://engine')).then(function(response) {
-        $scope.engines = response.data;
-
-        angular.forEach($scope.engines , function(engine) {
-          enginesByName[engine.name] = engine;
-        });
-
-        $scope.currentEngine = $rootScope.currentEngine = enginesByName[current];
-
-        if (!$scope.currentEngine) {
-          Notifications.addError({ status: 'Not found', message: 'The process engine you are trying to access does not exist' });
-          $location.path('/dashboard')
-        }
-      });
-
-      $scope.$watch('currentEngine', function(engine) {
-        if (engine && current !== engine.name) {
-          $window.location.href = Uri.appUri("app://../" + engine.name + "/");
-        }
-      });
-    }];
-
     var ModuleConfig = [ '$routeProvider', '$httpProvider', 'UriProvider', function($routeProvider, $httpProvider, UriProvider) {
+
       $httpProvider.responseInterceptors.push('httpStatusInterceptor');
       $routeProvider.otherwise({ redirectTo: '/dashboard' });
 
@@ -62,7 +35,9 @@
       }
 
       UriProvider.replace('app://', getUri('href'));
+      UriProvider.replace('adminbase://', getUri('app-root') + "/app/admin/");
       UriProvider.replace('cockpit://', getUri('cockpit-api'));
+      UriProvider.replace('admin://', getUri('cockpit-api') + "../admin/");
       UriProvider.replace('plugin://', getUri('cockpit-api') + 'plugin/');
       UriProvider.replace('engine://', getUri('engine-api'));
 
@@ -78,12 +53,7 @@
       }]);
     }];
 
-    module
-      .config(ModuleConfig)
-      .controller('ProcessEngineSelectionController', ProcessEngineSelectionController);
-
-    return module;
-
+    module.config(ModuleConfig);
   });
 
 })(window || this);

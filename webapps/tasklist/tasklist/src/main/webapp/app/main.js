@@ -15,7 +15,7 @@ define([ "angularModule" ], function(angularModule) {
       'common.extensions',
       'common.services' ]);
 
-  var ResponseErrorHandler = function(Notifications, Authentication, $location) {
+   var ResponseErrorHandler = function(Notifications, Authentication, $location) {
 
     this.handlerFn = function(event, responseError) {
       var status = responseError.status,

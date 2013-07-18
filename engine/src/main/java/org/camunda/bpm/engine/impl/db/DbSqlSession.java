@@ -55,6 +55,7 @@ import org.camunda.bpm.engine.impl.UserQueryImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.upgrade.DbUpgradeStep;
+import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.impl.identity.db.DbGroupQueryImpl;
 import org.camunda.bpm.engine.impl.identity.db.DbUserQueryImpl;
 import org.camunda.bpm.engine.impl.interceptor.Session;
@@ -334,6 +335,12 @@ public class DbSqlSession implements Session {
     }
     return result;
   }
+  
+  public boolean selectBoolean(String statement, Object parameter) {
+    statement = dbSqlSessionFactory.mapStatement(statement);
+    List<Object> result = sqlSession.selectList(statement, parameter);
+    return (result == null || result.isEmpty()) ? false : true;
+  } 
   
   @SuppressWarnings("unchecked")
   public <T extends PersistentObject> T selectById(Class<T> entityClass, String id) {

@@ -1,11 +1,20 @@
 ngDefine('cockpit.pages', function(module) {
 
-  function ProcessInstanceController ($scope, $routeParams, $location, $q, $filter, ProcessDefinitionResource, ProcessInstanceResource, IncidentResource, Views, Transform) {
+  function ProcessInstanceController ($scope, $rootScope, $routeParams, $location, $q, $filter, ProcessDefinitionResource, ProcessInstanceResource, IncidentResource, Views, Transform, processInstance) {
     
     $scope.processDefinitionId = $routeParams.processDefinitionId;
     $scope.processInstanceId = $routeParams.processInstanceId;
 
+    $scope.processInstance = processInstance;
+
     $scope.selection = {};
+
+    $scope.cancelProcessInstanceDialog = new Dialog();
+    $scope.cancelProcessInstanceDialog.setAutoClosable(false);
+
+    $scope.openCancelProcessInstanceDialog = function () {
+      $scope.cancelProcessInstanceDialog.open();      
+    };
     
     $scope.$watch('selection.treeDiagramMapping', function (newValue) {
       if (!newValue) {
@@ -38,32 +47,6 @@ ngDefine('cockpit.pages', function(module) {
       }
       
     });
-    
-    $scope.$watch('selection.elements', function (newValue) {
-      if (!newValue) {
-        return;
-      }
-      
-      if (newValue.hidden) {
-        var elements = [];
-        if (newValue.hidden === 'sidebar') {
-          elements.push('main-content');
-        }
-        $scope.selection.elements.toResize = {toGreater: elements}; 
-        return;
-      };
-
-      if (newValue.visible) {
-        var elements = [];
-        if (newValue.visible === 'sidebar') {
-          elements.push('main-content');
-        }
-        $scope.selection.elements.toResize = {toShrink: elements}; 
-        return;
-      };
-    });
-    
-    $scope.processInstance = {};
     
     // get the process definition
     function loadProcessDefinition() {
@@ -117,7 +100,11 @@ ngDefine('cockpit.pages', function(module) {
       .then(function(results) {
         // first result is the process definition
         var processDefinition = results[0];
-        $scope.processInstance.processDefinition = processDefinition;
+        $scope.processInstance.processDefinition = processDefinition;     
+
+        // add process definition and process instance breadcrumb
+        $rootScope.addBreadcrumb({'type': 'processDefinition', 'processDefinition': processDefinition});
+        $rootScope.addBreadcrumb({'type': 'processInstance', 'processInstance': processInstance,'processDefinition': processDefinition});
         
         // second result is the bpmn20Xml
         var bpmn20Xml = results[1].bpmn20Xml;
@@ -306,12 +293,23 @@ ngDefine('cockpit.pages', function(module) {
 
   };
 
-  module.controller('ProcessInstanceController', [ '$scope', '$routeParams', '$location', '$q', '$filter', 'ProcessDefinitionResource', 'ProcessInstanceResource', 'IncidentResource', 'Views', 'Transform', ProcessInstanceController ]);
+  module.controller('ProcessInstanceController', [ '$scope', '$rootScope','$routeParams', '$location', '$q', '$filter', 'ProcessDefinitionResource', 'ProcessInstanceResource', 'IncidentResource', 'Views', 'Transform', 'processInstance', ProcessInstanceController ]);
 
   var RouteConfig = function ($routeProvider) {
     $routeProvider.when('/process-definition/:processDefinitionId/process-instance/:processInstanceId', {
       templateUrl: 'pages/process-instance.html',
       controller: 'ProcessInstanceController',
+      resolve: {
+        processInstance: ['ResourceResolver', 'ProcessInstanceResource',
+          function(ResourceResolver, ProcessInstanceResource) {
+            return ResourceResolver.getByRouteParam('processInstanceId', {
+              name: 'process instance',
+              resolve: function(id) {
+                return ProcessInstanceResource.get({ id : id });
+              }
+            });
+          }]
+      },      
       reloadOnSearch: false
     });
   };

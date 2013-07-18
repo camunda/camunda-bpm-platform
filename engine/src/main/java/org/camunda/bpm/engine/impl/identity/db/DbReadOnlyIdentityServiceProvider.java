@@ -16,8 +16,13 @@ import java.util.List;
 
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.GroupQuery;
+import org.camunda.bpm.engine.identity.Permission;
+import org.camunda.bpm.engine.identity.Permissions;
+import org.camunda.bpm.engine.identity.Resource;
+import org.camunda.bpm.engine.identity.Resources;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.identity.UserQuery;
+import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.impl.UserQueryImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.identity.ReadOnlyIdentityProvider;
@@ -38,6 +43,7 @@ public class DbReadOnlyIdentityServiceProvider extends AbstractManager implement
   // users /////////////////////////////////////////
 
   public UserEntity findUserById(String userId) {
+    checkAuthorization(Permissions.READ, Resources.USER, userId);
     return getDbSqlSession().selectById(UserEntity.class, userId);
   }
 
@@ -50,10 +56,12 @@ public class DbReadOnlyIdentityServiceProvider extends AbstractManager implement
   }
 
   public long findUserCountByQueryCriteria(DbUserQueryImpl query) {
+    configureQuery(query, Resources.USER);
     return (Long) getDbSqlSession().selectOne("selectUserCountByQueryCriteria", query);
   }
 
   public List<User> findUserByQueryCriteria(DbUserQueryImpl query) {
+    configureQuery(query, Resources.USER);
     return getDbSqlSession().selectList("selectUserByQueryCriteria", query);
   }
 
@@ -85,6 +93,7 @@ public class DbReadOnlyIdentityServiceProvider extends AbstractManager implement
   // groups //////////////////////////////////////////
 
   public GroupEntity findGroupById(String groupId) {
+    checkAuthorization(Permissions.READ, Resources.GROUP, groupId);
     return getDbSqlSession().selectById(GroupEntity.class, groupId);
   }
 
@@ -97,11 +106,29 @@ public class DbReadOnlyIdentityServiceProvider extends AbstractManager implement
   }
 
   public long findGroupCountByQueryCriteria(DbGroupQueryImpl query) {
+    configureQuery(query, Resources.GROUP);
     return (Long) getDbSqlSession().selectOne("selectGroupCountByQueryCriteria", query);
   }
 
   public List<Group> findGroupByQueryCriteria(DbGroupQueryImpl query) {
+    configureQuery(query, Resources.GROUP);
     return getDbSqlSession().selectList("selectGroupByQueryCriteria", query);
   }
+  
+  
+  //authorizations ////////////////////////////////////////////////////
+  
+  protected void configureQuery(@SuppressWarnings("rawtypes") AbstractQuery query, Resource resource) {
+    Context.getCommandContext()
+      .getAuthorizationManager()
+      .configureQuery(query, resource);    
+  }
+
+  protected void checkAuthorization(Permission permission, Resource resource, String resourceId) {
+    Context.getCommandContext()
+      .getAuthorizationManager()
+      .checkAuthorization(permission, resource, resourceId);
+ }
+
 
 }

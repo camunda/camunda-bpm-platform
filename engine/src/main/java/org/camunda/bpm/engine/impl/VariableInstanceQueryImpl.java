@@ -18,6 +18,7 @@ import java.util.List;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
+import org.camunda.bpm.engine.impl.variable.SerializableType;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.runtime.VariableInstanceQuery;
 
@@ -113,7 +114,10 @@ public class VariableInstanceQueryImpl extends AbstractVariableQueryImpl<Variabl
     for (VariableInstance variableInstance : result) {
       if (variableInstance instanceof VariableInstanceEntity) {
         VariableInstanceEntity variableInstanceEntity = (VariableInstanceEntity) variableInstance;
-        variableInstanceEntity.getValue();
+        // skip variable instances from type serializable
+        if (!variableInstanceEntity.getType().getTypeName().equals(SerializableType.TYPE_NAME)) {
+          variableInstanceEntity.getValue();
+        }
       }      
     }
     

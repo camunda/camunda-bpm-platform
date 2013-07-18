@@ -16,6 +16,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import org.camunda.bpm.engine.form.FormProperty;
@@ -24,12 +25,15 @@ import org.camunda.bpm.engine.form.StartFormData;
 import org.camunda.bpm.engine.form.TaskFormData;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;
+import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
+import org.camunda.bpm.engine.impl.variable.StringType;
 import org.camunda.bpm.engine.management.ActivityStatistics;
 import org.camunda.bpm.engine.management.IncidentStatistics;
 import org.camunda.bpm.engine.management.ProcessDefinitionStatistics;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.EventSubscription;
 import org.camunda.bpm.engine.runtime.Execution;
+import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 import org.camunda.bpm.engine.task.DelegationState;
@@ -86,7 +90,7 @@ public abstract class MockProvider {
   
   // variable instance
   public static final String EXAMPLE_VARIABLE_INSTANCE_NAME = "aVariableInstanceName";
-  public static final String EXAMPLE_VARIABLE_INSTANCE_TYPE = "aVariableInstanceType";
+  public static final String EXAMPLE_VARIABLE_INSTANCE_TYPE = "String";
   public static final String EXAMPLE_VARIABLE_INSTANCE_VALUE = "aVariableInstanceValue";
   public static final String EXAMPLE_VARIABLE_INSTANCE_PROC_INST_ID = "aVariableInstanceProcInstId";
   public static final String EXAMPLE_VARIABLE_INSTANCE_EXECUTION_ID = "aVariableInstanceExecutionId";
@@ -147,6 +151,21 @@ public abstract class MockProvider {
   public static final String EXAMPLE_USER_FIRST_NAME_UPDATE = "firstNameUpdate";
   public static final String EXAMPLE_USER_LAST_NAME_UPDATE = "lastNameUpdate";
   public static final String EXAMPLE_USER_EMAIL_UPDATE = "testUpdate@example.org";
+  // Jobs
+  public static final String EXAMPLE_JOB_ID = "aJobId";
+  public static final String NON_EXISTING_JOB_ID = "aNonExistingJobId";
+  public static final int EXAMPLE_NEGATIVE_JOB_RETRIES = -3; 
+  public static final int EXAMPLE_JOB_RETRIES = 3;
+  public static final String EXAMPLE_JOB_NO_EXCEPTION_MESSAGE = "";
+  public static final String EXAMPLE_EXCEPTION_MESSAGE = "aExceptionMessage";
+  public static final String EXAMPLE_EMPTY_JOB_ID = "";
+  public static final Date EXAMPLE_DUE_DATE = DateTime.now().toDate();
+  public static final Boolean EXAMPLE_WITH_RETRIES_LEFT = true;
+  public static final Boolean EXAMPLE_EXECUTABLE = true;
+  public static final Boolean EXAMPLE_TIMERS = true;
+  public static final Boolean EXAMPLE_MESSAGES = true;
+  public static final Boolean EXAMPLE_WITH_EXCEPTION= true;
+
   
   // tasks
   public static Task createMockTask() {
@@ -228,9 +247,10 @@ public abstract class MockProvider {
   }
   
   public static VariableInstance createMockVariableInstance() {
-    VariableInstance mock = mock(VariableInstance.class);
+    VariableInstanceEntity mock = mock(VariableInstanceEntity.class);
     
     when(mock.getName()).thenReturn(EXAMPLE_VARIABLE_INSTANCE_NAME);
+    when(mock.getType()).thenReturn(new StringType());
     when(mock.getTypeName()).thenReturn(EXAMPLE_VARIABLE_INSTANCE_TYPE);
     when(mock.getValue()).thenReturn(EXAMPLE_VARIABLE_INSTANCE_VALUE);
     when(mock.getProcessInstanceId()).thenReturn(EXAMPLE_VARIABLE_INSTANCE_PROC_INST_ID);
@@ -392,6 +412,28 @@ public abstract class MockProvider {
     return mockUser;
   }
   
+  // jobs
+  public static Job createMockJob() {
+		Job mock = new MockJobBuilder().id(EXAMPLE_JOB_ID)
+				.processInstanceId(EXAMPLE_PROCESS_INSTANCE_ID)
+				.executionId(EXAMPLE_EXECUTION_ID).retries(EXAMPLE_JOB_RETRIES)
+				.exceptionMessage(EXAMPLE_JOB_NO_EXCEPTION_MESSAGE)
+				.dueDate(EXAMPLE_DUE_DATE)
+				.build();
+		return mock;
+  }
+
+  public static List<Job> createMockJobs() {
+		List<Job> mockList = new ArrayList<Job>();
+		mockList.add(createMockJob());
+		return mockList;
+  }
+
+  public static List<Job> createMockEmptyJobList() {
+	List<Job> mockList = new ArrayList<Job>();	
+	return mockList;
+  }
+
   public static User createMockUserUpdate() {
     User mockUser = mock(User.class);
     when(mockUser.getId()).thenReturn(EXAMPLE_USER_ID);

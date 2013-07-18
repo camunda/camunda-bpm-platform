@@ -19,10 +19,10 @@ package org.camunda.bpm.engine.impl.variable;
  */
 public class ShortType implements VariableType {
 
-  private static final long serialVersionUID = 1L;
+  public static final String TYPE_NAME = "short";
   
   public String getTypeName() {
-    return "short";
+    return TYPE_NAME;
   }
 
   public boolean isCachable() {
@@ -52,5 +52,9 @@ public class ShortType implements VariableType {
     }
     return Short.class.isAssignableFrom(value.getClass())
            || short.class.isAssignableFrom(value.getClass());
+  }
+  
+  public String getTypeNameForValue(Object value) {
+    return value.getClass().getSimpleName();
   }
 }

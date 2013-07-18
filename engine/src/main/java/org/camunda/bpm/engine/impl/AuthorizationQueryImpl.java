@@ -17,6 +17,7 @@ import java.util.List;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.identity.Authorization;
 import org.camunda.bpm.engine.identity.AuthorizationQuery;
+import org.camunda.bpm.engine.identity.Permission;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 
@@ -75,9 +76,9 @@ public class AuthorizationQueryImpl extends AbstractQuery<AuthorizationQuery, Au
     return this;
   }
 
-  public AuthorizationQuery hasPermission(int permission) {
+  public AuthorizationQuery hasPermission(Permission p) {
     queryByPermission = true;
-    this.permission |= permission;
+    this.permission |= p.getId();
     return this;
   }
   

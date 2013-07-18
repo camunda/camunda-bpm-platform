@@ -12,8 +12,12 @@
  */
 package org.camunda.bpm.engine;
 
+import java.util.List;
+
 import org.camunda.bpm.engine.identity.Authorization;
 import org.camunda.bpm.engine.identity.AuthorizationQuery;
+import org.camunda.bpm.engine.identity.Permission;
+import org.camunda.bpm.engine.identity.Resource;
 
 
 /**
@@ -48,7 +52,7 @@ import org.camunda.bpm.engine.identity.AuthorizationQuery;
  * </pre>
  * finally the permissions to access that resource can be assigned:
  * <pre>
- * auth.addPermission(Authorization.PERMISSION_TYPE_READ);
+ * auth.addPermission(Permissions.READ);
  * </pre>
  * and the authorization object is saved:
  * <pre>
@@ -63,9 +67,9 @@ import org.camunda.bpm.engine.identity.AuthorizationQuery;
  * authorizationQuery.userId("john")
  *   .resourceType("processDefinition")
  *   .resourceId("2313")
- *   .hasPermission(Authorization.PERMISSION_TYPE_READ)
- *   .hasPermission(Authorization.PERMISSION_TYPE_WRITE)
- *   .hasPermission(Authorization.PERMISSION_TYPE_DELETE)
+ *   .hasPermission(Permissions.READ)
+ *   .hasPermission(Permissions.WRITE)
+ *   .hasPermission(Permissions.DELETE)
  *   .list();
  * </pre>
  * 
@@ -73,7 +77,7 @@ import org.camunda.bpm.engine.identity.AuthorizationQuery;
  * Permissions for the user "john". </p>
  * 
  * @author Daniel Meyer
- *
+ * @since 7.0
  */
 public interface AuthorizationService {
   
@@ -105,12 +109,41 @@ public interface AuthorizationService {
    * @throws ProcessEngineException if no such authorization exists or if an internal error occurs.
    */
   public void deleteAuthorization(String authorizationId);
-
-  // Query ////////////////////////////////////////////
   
   /**
    *  Constructs an authorization query.
    */
   public AuthorizationQuery createAuthorizationQuery();
+  
+  // Authorization Checks ////////////////////////////////
+  
+  /** 
+   * <p>Allows performing an authorization check.</p>
+   * <p>Returns true if the given user has permissions for interacting with the resource is the 
+   * requested way.</p>
+   * 
+   * <p>This method checks <em>global</em> permissions for the resource, see {@link Authorization#ANY}</p>
+   * 
+   * @param userId the id of the user for which the check is performed.
+   * @param groupIds a list of group ids the user is member of
+   * @param permission the permission(s) to check for.
+   * @param resource the resource for which the authorization is checked.
+   */
+  public boolean isUserAuthorized(String userId, List<String> groupIds, Permission permission, Resource resource);
+  
+  /** 
+   * <p>Allows performing an authorization check.</p>
+   * <p>Returns true if the given user has permissions for interacting with the resource is the 
+   * requested way.</p>
+   *   
+   * @param userId the id of the user for which the check is performed.
+   * @param groupIds a list of group ids the user is member of
+   * @param permission the permission(s) to check for.
+   * @param resource the resource for which the authorization is checked.
+   * @param resourceId the resource id for which the authorization check is performed.
+   */
+  public boolean isUserAuthorized(String userId, List<String> groupIds, Permission permission, Resource resource, String resourceId);
+
+
   
 }

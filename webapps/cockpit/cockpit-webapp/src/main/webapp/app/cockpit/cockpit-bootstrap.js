@@ -11,23 +11,27 @@
     paths: {
       'ngDefine' : 'assets/vendor/requirejs-angular-define/ngDefine',
       'domReady' : 'assets/vendor/require/domReady',
-      'jquery' : 'assets/vendor/jquery-1.7.2.min',
-      'jquery-mousewheel' : 'assets/vendor/jquery.mousewheel',
-      'jquery-overscroll' : 'assets/vendor/jquery.overscroll',
+      'jquery' : 'assets/vendor/jquery/jquery',
+      'jquery-mousewheel' : 'assets/vendor/jquery/jquery.mousewheel',
+      'jquery-overscroll' : 'assets/vendor/jquery/jquery.overscroll',
+      'jquery-ui' : 'assets/vendor/jquery-ui/jquery-ui-1.10.3.custom.min',
       'bootstrap' : 'assets/vendor/bootstrap/js/bootstrap',
       'bootstrap-slider' : 'assets/vendor/bootstrap-slider/bootstrap-slider',
       'angular' : 'assets/vendor/angular/angular',
       'angular-resource' : 'assets/vendor/angular/angular-resource',
-      'angular-sanitize' : 'assets/vendor/angular/angular-sanitize'
+      'angular-sanitize' : 'assets/vendor/angular/angular-sanitize',
+      'angular-cookies' : 'assets/vendor/angular/angular-cookies'
     },
     shim: {
       'jquery-mousewheel' : { deps: [ 'jquery' ] },
       'jquery-overscroll' : { deps: [ 'jquery' ] },
+      'jquery-ui' : { deps: [ 'jquery' ] },
       'bootstrap' : { deps: [ 'jquery' ] },
       'bootstrap-slider' : { deps: [ 'jquery' ] },
       'angular' : { deps: [ 'jquery' ], exports: 'angular' },
       'angular-resource': { deps: [ 'angular' ] },
-      'angular-sanitize': { deps: [ 'angular' ] }
+      'angular-sanitize': { deps: [ 'angular' ] },
+      'angular-cookies': { deps: [ 'angular' ] }
     },
     packages: [
       { name: 'cockpit', location: 'app/cockpit', main: 'cockpit' },
@@ -43,8 +47,6 @@
 
   /**
    *
-   * @param {string} name the application name
-   *
    * @see http://stackoverflow.com/questions/15499997/how-to-use-angular-scenario-with-requirejs
    */
   function ensureScenarioCompatibility() {
@@ -52,8 +54,10 @@
     var html = document.getElementsByTagName('html')[0];
 
     html.setAttribute('ng-app', APP_NAME);
-    html.dataset.ngApp = APP_NAME;
-
+    if (html.dataset) {
+      html.dataset.ngApp = APP_NAME;
+    }
+    
     if (top !== window) {
       window.parent.postMessage({ type: 'loadamd' }, '*');
     }
@@ -69,7 +73,7 @@
     ensureScenarioCompatibility();
   }
 
-  require([ 'angular', 'angular-resource', 'angular-sanitize', 'ngDefine', 'bootstrap' ], function(angular) {
+  require([ 'angular', 'angular-resource', 'angular-sanitize', 'angular-cookies', 'ngDefine', 'bootstrap', 'jquery-ui' ], function(angular) {
     require([ APP_NAME, 'domReady!' ], function() {
       bootstrapApp(angular);
     });

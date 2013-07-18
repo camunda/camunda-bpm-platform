@@ -4,7 +4,7 @@
 
 <mapper namespace="cockpit.base">
 
-  <resultMap id="processDefinitionMap" type="org.camunda.bpm.cockpit.plugin.base.dto.ProcessDefinitionDto">
+  <resultMap id="processDefinitionMap" type="org.camunda.bpm.cockpit.impl.plugin.base.dto.ProcessDefinitionDto">
     <id property="id" column="ID_" jdbcType="VARCHAR" />
     <result property="name" column="NAME_" jdbcType="VARCHAR" />
     <result property="key" column="KEY_" jdbcType="VARCHAR" />

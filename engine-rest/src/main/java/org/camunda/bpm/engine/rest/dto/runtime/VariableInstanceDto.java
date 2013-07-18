@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.rest.dto.runtime;
 
+import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
+import org.camunda.bpm.engine.impl.variable.SerializableType;
 import org.camunda.bpm.engine.runtime.VariableInstance;
 
 /**
@@ -86,15 +88,23 @@ public class VariableInstanceDto {
   }
   
   public static VariableInstanceDto fromVariableInstance(VariableInstance variableInstance) {
+    VariableInstanceEntity entity = (VariableInstanceEntity) variableInstance;
+    
     VariableInstanceDto dto = new VariableInstanceDto();
     
-    dto.setName(variableInstance.getName());
-    dto.setType(variableInstance.getTypeName());
-    dto.setValue(variableInstance.getValue());
-    dto.setProcessInstanceId(variableInstance.getProcessInstanceId());
-    dto.setExecutionId(variableInstance.getExecutionId());
-    dto.setTaskId(variableInstance.getTaskId());
-    dto.setActivityInstanceId(variableInstance.getActivityInstanceId());
+    dto.setName(entity.getName());
+    dto.setProcessInstanceId(entity.getProcessInstanceId());
+    dto.setExecutionId(entity.getExecutionId());
+    dto.setTaskId(entity.getTaskId());
+    dto.setActivityInstanceId(entity.getActivityInstanceId());
+    
+    if (!entity.getTypeName().equals(SerializableType.TYPE_NAME)) {
+      dto.setValue(entity.getValue());
+      dto.setType(entity.getType().getTypeNameForValue(entity.getValue()));
+    } else {
+      dto.setValue("Cannot deserialize object.");
+      dto.setType(entity.getType().getTypeNameForValue(null));
+    }
     
     return dto;
   }
