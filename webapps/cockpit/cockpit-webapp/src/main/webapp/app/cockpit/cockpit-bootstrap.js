@@ -54,8 +54,10 @@
     var html = document.getElementsByTagName('html')[0];
 
     html.setAttribute('ng-app', APP_NAME);
-    html.dataset.ngApp = APP_NAME;
-
+    if (html.dataset) {
+      html.dataset.ngApp = APP_NAME;
+    }
+    
     if (top !== window) {
       window.parent.postMessage({ type: 'loadamd' }, '*');
     }

@@ -1,6 +1,7 @@
-ngDefine('cockpit.directives', [
-  'angular'
-], function(module, angular) {
+ngDefine('camunda.common.directives', [
+  'angular', 
+  'require'
+], function(module, angular, require) {
 
   var ProcessEngineSelectionController = [
     '$scope', '$http', '$location', '$window', 'Uri', 'Notifications',
@@ -31,9 +32,11 @@ ngDefine('cockpit.directives', [
     });
   }];
 
+  console.log(require.toUrl('./engineSelect.html'));
+
   var EngineSelectDirective = function() {
     return {
-      templateUrl: 'directives/engineSelect.html',
+      templateUrl: require.toUrl('./engineSelect.html'),
       replace: true,
       controller: ProcessEngineSelectionController
     };

@@ -27,7 +27,7 @@ ngDefine('cockpit.pages', function(module, $) {
     function countSubProcessInstances () {
       var deferred = $q.defer();
 
-        ProcessInstanceResource.count({'superProcessInstanc': $scope.processInstance.id}).$then(function (response) {
+        ProcessInstanceResource.count({'superProcessInstance': $scope.processInstance.id}).$then(function (response) {
           deferred.resolve(response.data);
         }, function (error) {
           deferred.reject(error.data);

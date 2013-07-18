@@ -43,13 +43,15 @@ ngDefine('camunda.common.services.authentication', function(module, angular) {
         }
       });
 
-      return promise.then(function(response) {      
+      return promise.then(function(response) {
         if (response.status == 200) {
           self.auth.username = username;      
           return true;
         } else {
           return false;
         }
+      }, function(error) {
+        return false;
       });
     };
 

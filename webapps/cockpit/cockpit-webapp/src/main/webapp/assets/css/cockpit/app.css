@@ -82,6 +82,20 @@ a.expand-collapse:focus {
   filter: alpha(opacity=40);
 }
 
+/** ---- toolbar button ----**/
+.ctn-toolbar > a.btn {
+  opacity: 0.2;
+  filter: alpha(opacity=10);
+
+  cursor: pointer;
+}
+
+.ctn-toolbar > a.btn:hover,
+.ctn-toolbar > a.btn:focus {
+  opacity: 0.6;
+  filter: alpha(opacity=40);
+}
+
 /** ---- in-place variable editing ----**/
 
 .in-place-edit {
@@ -98,7 +112,7 @@ textarea.in-place-edit {
 
 @media (min-width: 768px) {
 
-  .ctn-wrapper div[breadcrumbs] {
+  .breadcrumbs-panel {
     position: absolute;
     height: 30px;
     top: 0;
@@ -128,7 +142,7 @@ textarea.in-place-edit {
 
   .ctn-toolbar {
     left: auto;
-    width: 40px;
+    width: 41px;
 
     border-left: 1px solid #E5E5E5;
     background-color: whiteSmoke;
@@ -161,7 +175,7 @@ textarea.in-place-edit {
 
   .ctn-content {
     left: 250px;
-    right: 40px;
+    right: 41px;
   }
 
   .ctn-sitebar, .ctn-content {

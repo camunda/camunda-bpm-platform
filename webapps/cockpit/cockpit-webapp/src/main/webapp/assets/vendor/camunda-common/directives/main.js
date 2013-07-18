@@ -3,6 +3,7 @@ ngDefine('camunda.common.directives', [
   './email',
   './help',
   './requestAware',
+  './engineSelect',
   './paginator',
   './password',
   './modalDialog',

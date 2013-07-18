@@ -115,6 +115,6 @@ ngDefine('cockpit.directives', [ 'angular' ], function(module, angular) {
   Directive.$inject = [ 'ProcessInstanceResource', 'ProcessDefinitionResource' ];
 
   module
-    .directive('breadcrumbs', Directive);
+    .directive('breadcrumbsPanel', Directive);
   
 });
