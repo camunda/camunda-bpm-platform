@@ -1,4 +1,4 @@
-ngDefine('camunda.common.pages.controllers', function(module) {
+ngDefine('camunda.common.pages', function(module) {
 
   var ResponseErrorHandler = function(Notifications, Authentication, $location) {
 

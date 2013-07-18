@@ -1,7 +1,5 @@
-'use strict';
-
-ngDefine('camunda.common.pages.login', [ 'angular', 'module:camunda.common.services.authentication:camunda-common/services/Authentication' ], 
-  function(module, angular) {
+ngDefine('camunda.common.pages.login', [ 'angular', 'require', 'module:camunda.common.services.authentication:camunda-common/services/Authentication' ], 
+  function(module, angular, require) {
 
   var Controller = ['$scope', 'Authentication', 'Notifications', '$location',
            function ($scope, Authentication, Notifications, $location) {
@@ -27,7 +25,7 @@ ngDefine('camunda.common.pages.login', [ 'angular', 'module:camunda.common.servi
 
   var RouteConfig = [ '$routeProvider', function($routeProvider) {
     $routeProvider.when('/login', {
-      templateUrl: 'pages/login.html',
+      templateUrl: require.toUrl('./login.html'),
       controller: Controller
     });
   }];
