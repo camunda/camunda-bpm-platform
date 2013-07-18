@@ -42,8 +42,6 @@
 
   /**
    *
-   * @param {string} name the application name
-   *
    * @see http://stackoverflow.com/questions/15499997/how-to-use-angular-scenario-with-requirejs
    */
   function ensureScenarioCompatibility() {
@@ -51,8 +49,10 @@
     var html = document.getElementsByTagName('html')[0];
 
     html.setAttribute('ng-app', APP_NAME);
-    html.dataset.ngApp = APP_NAME;
-
+    if (html.dataset) {
+      html.dataset.ngApp = APP_NAME;
+    }
+    
     if (top !== window) {
       window.parent.postMessage({ type: 'loadamd' }, '*');
     }
