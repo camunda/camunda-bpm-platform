@@ -4,7 +4,7 @@ define(['angular'], function(angular) {
 
   var module = angular.module('admin.pages');
 
-  var Controller = ['$scope', '$routeParams', 'UserResource', 'Notifications', '$location', function ($scope, $routeParams, UserResource, Notifications, $location) {
+  var Controller = ['$scope', '$routeParams', 'UserResource', 'GroupResource', 'GroupMembershipResource', 'Notifications', '$location', function ($scope, $routeParams, UserResource, GroupResource, GroupMembershipResource, Notifications, $location) {
 
     // used to display information about the user
     $scope.profile = null;
@@ -18,6 +18,12 @@ define(['angular'], function(angular) {
         password : "",
         password2 : ""
     };
+
+    // list of the user's groups
+    $scope.groupList = null;
+    $scope.groupIdList = null;
+
+    $scope.createGroupMembershipDialog = new Dialog();
 
     // common form validation //////////////////////////
 
@@ -85,6 +91,34 @@ define(['angular'], function(angular) {
       );
     }
 
+    // group form /////////////////////////////
+
+    var loadGroups = $scope.loadGroups = function() {
+      GroupResource.query({'member' : $routeParams.userId}).$then(function(response) {
+        $scope.groupList = response.data;     
+        $scope.groupIdList = [];
+        angular.forEach($scope.groupList, function(group) {
+          $scope.groupIdList.push(group.id);
+        });   
+      });
+    }
+
+    $scope.removeGroup = function(groupId) {
+      GroupMembershipResource.delete({'userId':$scope.user.id, 'groupId': groupId}).$then(
+        function(){
+          Notifications.addMessage({type:"success", status:"Success", message:"User "+$scope.user.id+" removed from group."});
+          loadGroups();
+        },
+        function(){
+          Notifications.addError({type:"error", status:"Error", message:"Could not remove user from group."});
+        }
+      );
+    }
+
+    $scope.openCreateGroupMembershipDialog = function() {
+      $scope.createGroupMembershipDialog.open();
+    }
+
     // page controls ////////////////////////////////////
     
     $scope.show = function(fragment) {
@@ -99,6 +133,7 @@ define(['angular'], function(angular) {
     // initialization ///////////////////////////////////
     
     loadProfile();
+    loadGroups();
 
     if(!$location.search().tab) {
       $location.search({'tab': 'profile'});

@@ -10,6 +10,7 @@ import org.camunda.bpm.application.impl.ServletProcessApplication;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 
@@ -78,10 +79,17 @@ public class DevProcessApplication extends ServletProcessApplication {
     final IdentityService identityService = engine.getIdentityService();
     
     User jonny1 = identityService.newUser("jonny1");
-    jonny1.setFirstName("John");
-    jonny1.setLastName("Doe");    
+    jonny1.setFirstName("Jonny");
+    jonny1.setLastName("Prosciutto");    
     jonny1.setPassword("jonny1");
     identityService.saveUser(jonny1);
+    
+    Group salesGroup = identityService.newGroup("sales");
+    salesGroup.setName("Sales");
+    salesGroup.setType("workflow");
+    identityService.saveGroup(salesGroup);
+    
+    identityService.createMembership("jonny1", "sales");
     
 
   }
