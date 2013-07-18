@@ -15,8 +15,10 @@ package org.camunda.bpm.engine.impl.persistence.entity;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.JobQueryImpl;
@@ -105,7 +107,10 @@ public class JobManager extends AbstractManager {
     Date now = ClockUtil.getCurrentTime();
     params.put("now", now);
     if (Context.getProcessEngineConfiguration().isJobExecutorDeploymentAware()) {
-      params.put("deploymentIds", Context.getProcessEngineConfiguration().getRegisteredDeployments());
+      Set<String> registeredDeployments = Context.getProcessEngineConfiguration().getRegisteredDeployments();
+      synchronized (registeredDeployments) {
+        params.put("deploymentIds", new HashSet<String>(registeredDeployments));
+      }
     }
     return getDbSqlSession().selectList("selectNextJobsToExecute", params, page);
   }

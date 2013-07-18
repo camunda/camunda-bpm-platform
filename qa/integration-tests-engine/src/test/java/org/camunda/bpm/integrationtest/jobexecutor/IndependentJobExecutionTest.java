@@ -58,7 +58,6 @@ public class IndependentJobExecutionTest extends AbstractFoxPlatformIntegrationT
   public void testDeploymentRegistration() {
     Set<String> registeredDeploymentsForEngine1 = engine1.getManagementService().getRegisteredDeployments();
     Set<String> registeredDeploymentsForDefaultEngine = processEngine.getManagementService().getRegisteredDeployments();
-    System.out.println(BpmPlatform.getProcessApplicationService().getProcessApplicationNames());
     List<ProcessApplicationDeploymentInfo> pa1DeploymentInfo = BpmPlatform.getProcessApplicationService().getProcessApplicationInfo("/pa1").getDeploymentInfo();
     
     Assert.assertEquals(1, pa1DeploymentInfo.size());
