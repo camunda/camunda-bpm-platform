@@ -32,11 +32,11 @@ public enum Resources implements Resource {
     this.id = id; 
   } 
   
-  public String getName() {
+  public String resourceName() {
     return name;
   }
 
-  public String getId() {
+  public String resourceType() {
     return id;
   }
   

@@ -57,7 +57,7 @@ public class AuthorizationManager extends AbstractManager {
     if(processEngineConfiguration.isAuthorizationChecksEnabled() && authenticatedUserId != null) {
       query.setAuthorizationCheckEnabled(true);
       query.setAuthUserId(authenticatedUserId);
-      query.setAuthResourceType(resource.getId());
+      query.setAuthResourceType(resource.resourceType());
       query.setAuthResourceId("RES.ID_");
       query.setAuthPerms(Permissions.READ.getId());
     }
@@ -73,7 +73,7 @@ public class AuthorizationManager extends AbstractManager {
 
       boolean isAuthorized = isAuthorized(authenticatedUserId, null, permission, resource, resourceId);
       if (!isAuthorized) {
-        throw new AuthorizationException(authenticatedUserId, permission.getName(), resource.getName(), resourceId);
+        throw new AuthorizationException(authenticatedUserId, permission.getName(), resource.resourceName(), resourceId);
       }
     }
 
@@ -84,7 +84,7 @@ public class AuthorizationManager extends AbstractManager {
     AuthorizationCheck authCheck = new AuthorizationCheck();
     authCheck.setAuthUserId(userId);
     authCheck.setAuthGroupIds(groupIds);
-    authCheck.setAuthResourceType(resource.getId());
+    authCheck.setAuthResourceType(resource.resourceType());
     authCheck.setAuthResourceId(resourceId);
     authCheck.setAuthPerms(permission.getId());
     

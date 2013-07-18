@@ -26,11 +26,11 @@ public class TestResource implements Resource {
     this.id = id;
   }
 
-  public String getName() {
+  public String resourceName() {
     return id;
   }
 
-  public String getId() {
+  public String resourceType() {
     return id;
   }
 

@@ -40,6 +40,9 @@ public enum Permissions implements Permission {
     this.id = id;
   }
   
+  public String toString() {
+    return name;
+  }
 
   public String getName() {
     return name;
@@ -47,6 +50,10 @@ public enum Permissions implements Permission {
 
   public int getId() {
     return id;
+  }
+  
+  public static Permission forName(String name) {
+    return valueOf(name);
   }
   
 }

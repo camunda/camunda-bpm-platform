@@ -12,11 +12,19 @@
  */
 package org.camunda.bpm.engine.test.api.identity;
 
+import static org.camunda.bpm.engine.identity.Authorization.ANY;
+import static org.camunda.bpm.engine.identity.Permissions.ALL;
+import static org.camunda.bpm.engine.identity.Permissions.CREATE;
+import static org.camunda.bpm.engine.identity.Permissions.DELETE;
+import static org.camunda.bpm.engine.identity.Permissions.READ;
+import static org.camunda.bpm.engine.identity.Permissions.UPDATE;
+import static org.camunda.bpm.engine.identity.Resources.GROUP;
+import static org.camunda.bpm.engine.identity.Resources.GROUP_MEMBERSHIP;
+import static org.camunda.bpm.engine.identity.Resources.USER;
+
 import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.identity.Authorization;
 import org.camunda.bpm.engine.identity.Group;
-import org.camunda.bpm.engine.identity.Permissions;
-import org.camunda.bpm.engine.identity.Resources;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.persistence.entity.GroupEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.UserEntity;
@@ -44,11 +52,11 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
     
     // add base permission which allows nobody to create users:
     Authorization basePerms = authorizationService.createNewAuthorization();
-    basePerms.setUserId(Authorization.ANY);
-    basePerms.setResourceType(Resources.USER.getId());
-    basePerms.setResourceId(Authorization.ANY);
-    basePerms.addPermission(Permissions.ALL); // add all then remove 'crate'
-    basePerms.removePermission(Permissions.CREATE);
+    basePerms.setUserId(ANY);
+    basePerms.setResourceType(USER.resourceType());
+    basePerms.setResourceId(ANY);
+    basePerms.addPermission(ALL); // add all then remove 'crate'
+    basePerms.removePermission(CREATE);
     authorizationService.saveAuthorization(basePerms);
     
     try {
@@ -56,9 +64,9 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
       fail("exception expected");
       
     } catch (AuthorizationException e) {
-      assertEquals(Permissions.CREATE.getName(), e.getViolatedPermissionName());
+      assertEquals(CREATE.getName(), e.getViolatedPermissionName());
       assertEquals(jonny2, e.getUserId());
-      assertEquals(Resources.USER.getName(), e.getResourceType());
+      assertEquals(USER.resourceName(), e.getResourceType());
       assertEquals(null, e.getResourceId());
     }
       
@@ -70,9 +78,9 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
       fail("exception expected");
       
     } catch (AuthorizationException e) {
-      assertEquals(Permissions.CREATE.getName(), e.getViolatedPermissionName());
+      assertEquals(CREATE.getName(), e.getViolatedPermissionName());
       assertEquals(jonny2, e.getUserId());
-      assertEquals(Resources.USER.getName(), e.getResourceType());
+      assertEquals(USER.resourceName(), e.getResourceType());
       assertEquals(null, e.getResourceId());
     }    
   }
@@ -89,11 +97,11 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
     
     // create global auth
     Authorization basePerms = authorizationService.createNewAuthorization();
-    basePerms.setUserId(Authorization.ANY);
-    basePerms.setResourceType(Resources.USER.getId());
-    basePerms.setResourceId(Authorization.ANY);
-    basePerms.addPermission(Permissions.ALL);
-    basePerms.removePermission(Permissions.DELETE); // revoke delete
+    basePerms.setUserId(ANY);
+    basePerms.setResourceType(USER.resourceType());
+    basePerms.setResourceId(ANY);
+    basePerms.addPermission(ALL);
+    basePerms.removePermission(DELETE); // revoke delete
     authorizationService.saveAuthorization(basePerms);
         
     try {
@@ -101,9 +109,9 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
       fail("exception expected");
       
     } catch (AuthorizationException e) {
-      assertEquals(Permissions.DELETE.getName(), e.getViolatedPermissionName());
+      assertEquals(DELETE.getName(), e.getViolatedPermissionName());
       assertEquals(jonny2, e.getUserId());
-      assertEquals(Resources.USER.getName(), e.getResourceType());
+      assertEquals(USER.resourceName(), e.getResourceType());
       assertEquals("jonny1", e.getResourceId());
     }
   }
@@ -120,11 +128,11 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
     
     // create global auth
     Authorization basePerms = authorizationService.createNewAuthorization();
-    basePerms.setUserId(Authorization.ANY);
-    basePerms.setResourceType(Resources.USER.getId());
-    basePerms.setResourceId(Authorization.ANY);
-    basePerms.addPermission(Permissions.ALL);
-    basePerms.removePermission(Permissions.UPDATE); // revoke update
+    basePerms.setUserId(ANY);
+    basePerms.setResourceType(USER.resourceType());
+    basePerms.setResourceId(ANY);
+    basePerms.addPermission(ALL);
+    basePerms.removePermission(UPDATE); // revoke update
     authorizationService.saveAuthorization(basePerms);
         
     // fetch user:
@@ -136,9 +144,9 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
       fail("exception expected");
       
     } catch (AuthorizationException e) {
-      assertEquals(Permissions.UPDATE.getName(), e.getViolatedPermissionName());
+      assertEquals(UPDATE.getName(), e.getViolatedPermissionName());
       assertEquals(jonny2, e.getUserId());
-      assertEquals(Resources.USER.getName(), e.getResourceType());
+      assertEquals(USER.resourceName(), e.getResourceType());
       assertEquals("jonny1", e.getResourceId());
     }
     
@@ -155,11 +163,11 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
     
     // add base permission which allows nobody to create groups:
     Authorization basePerms = authorizationService.createNewAuthorization();
-    basePerms.setUserId(Authorization.ANY);
-    basePerms.setResourceType(Resources.GROUP.getId());
-    basePerms.setResourceId(Authorization.ANY);
-    basePerms.addPermission(Permissions.ALL); // add all then remove 'crate'
-    basePerms.removePermission(Permissions.CREATE);
+    basePerms.setUserId(ANY);
+    basePerms.setResourceType(GROUP.resourceType());
+    basePerms.setResourceId(ANY);
+    basePerms.addPermission(ALL); // add all then remove 'crate'
+    basePerms.removePermission(CREATE);
     authorizationService.saveAuthorization(basePerms);
     
     try {
@@ -167,9 +175,9 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
       fail("exception expected");
       
     } catch (AuthorizationException e) {
-      assertEquals(Permissions.CREATE.getName(), e.getViolatedPermissionName());
+      assertEquals(CREATE.getName(), e.getViolatedPermissionName());
       assertEquals(jonny2, e.getUserId());
-      assertEquals(Resources.GROUP.getName(), e.getResourceType());
+      assertEquals(GROUP.resourceName(), e.getResourceType());
       assertEquals(null, e.getResourceId());
     }
       
@@ -181,9 +189,9 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
       fail("exception expected");
       
     } catch (AuthorizationException e) {
-      assertEquals(Permissions.CREATE.getName(), e.getViolatedPermissionName());
+      assertEquals(CREATE.getName(), e.getViolatedPermissionName());
       assertEquals(jonny2, e.getUserId());
-      assertEquals(Resources.GROUP.getName(), e.getResourceType());
+      assertEquals(GROUP.resourceName(), e.getResourceType());
       assertEquals(null, e.getResourceId());
     }    
   }
@@ -200,11 +208,11 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
     
     // create global auth
     Authorization basePerms = authorizationService.createNewAuthorization();
-    basePerms.setUserId(Authorization.ANY);
-    basePerms.setResourceType(Resources.GROUP.getId());
-    basePerms.setResourceId(Authorization.ANY);
-    basePerms.addPermission(Permissions.ALL);
-    basePerms.removePermission(Permissions.DELETE); // revoke delete
+    basePerms.setUserId(ANY);
+    basePerms.setResourceType(GROUP.resourceType());
+    basePerms.setResourceId(ANY);
+    basePerms.addPermission(ALL);
+    basePerms.removePermission(DELETE); // revoke delete
     authorizationService.saveAuthorization(basePerms);
         
     try {
@@ -212,9 +220,9 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
       fail("exception expected");
       
     } catch (AuthorizationException e) {
-      assertEquals(Permissions.DELETE.getName(), e.getViolatedPermissionName());
+      assertEquals(DELETE.getName(), e.getViolatedPermissionName());
       assertEquals(jonny2, e.getUserId());
-      assertEquals(Resources.GROUP.getName(), e.getResourceType());
+      assertEquals(GROUP.resourceName(), e.getResourceType());
       assertEquals("group1", e.getResourceId());
     }
               
@@ -233,11 +241,11 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
     
     // create global auth
     Authorization basePerms = authorizationService.createNewAuthorization();
-    basePerms.setUserId(Authorization.ANY);
-    basePerms.setResourceType(Resources.GROUP.getId());
-    basePerms.setResourceId(Authorization.ANY);
-    basePerms.addPermission(Permissions.ALL);
-    basePerms.removePermission(Permissions.UPDATE); // revoke update
+    basePerms.setUserId(ANY);
+    basePerms.setResourceType(GROUP.resourceType());
+    basePerms.setResourceId(ANY);
+    basePerms.addPermission(ALL);
+    basePerms.removePermission(UPDATE); // revoke update
     authorizationService.saveAuthorization(basePerms);
         
     // fetch user:
@@ -249,9 +257,9 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
       fail("exception expected");
       
     } catch (AuthorizationException e) {
-      assertEquals(Permissions.UPDATE.getName(), e.getViolatedPermissionName());
+      assertEquals(UPDATE.getName(), e.getViolatedPermissionName());
       assertEquals(jonny2, e.getUserId());
-      assertEquals(Resources.GROUP.getName(), e.getResourceType());
+      assertEquals(GROUP.resourceName(), e.getResourceType());
       assertEquals("group1", e.getResourceId());
     }
     
@@ -274,11 +282,11 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
         
     // add base permission which allows nobody to add users to groups
     Authorization basePerms = authorizationService.createNewAuthorization();
-    basePerms.setUserId(Authorization.ANY);
-    basePerms.setResourceType(Resources.GROUP_MEMBERSHIP.getId());
-    basePerms.setResourceId(Authorization.ANY);
-    basePerms.addPermission(Permissions.ALL); // add all then remove 'crate'
-    basePerms.removePermission(Permissions.CREATE);
+    basePerms.setUserId(ANY);
+    basePerms.setResourceType(GROUP_MEMBERSHIP.resourceType());
+    basePerms.setResourceId(ANY);
+    basePerms.addPermission(ALL); // add all then remove 'crate'
+    basePerms.removePermission(CREATE);
     authorizationService.saveAuthorization(basePerms);
     
     try {
@@ -286,9 +294,9 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
       fail("exception expected");
       
     } catch (AuthorizationException e) {
-      assertEquals(Permissions.CREATE.getName(), e.getViolatedPermissionName());
+      assertEquals(CREATE.getName(), e.getViolatedPermissionName());
       assertEquals(jonny2, e.getUserId());
-      assertEquals(Resources.GROUP_MEMBERSHIP.getName(), e.getResourceType());
+      assertEquals(GROUP_MEMBERSHIP.resourceName(), e.getResourceType());
       assertEquals("group1", e.getResourceId());
     }      
   }
@@ -306,11 +314,11 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
         
     // add base permission which allows nobody to add users to groups
     Authorization basePerms = authorizationService.createNewAuthorization();
-    basePerms.setUserId(Authorization.ANY);
-    basePerms.setResourceType(Resources.GROUP_MEMBERSHIP.getId());
-    basePerms.setResourceId(Authorization.ANY);
-    basePerms.addPermission(Permissions.ALL); // add all then remove 'delete'
-    basePerms.removePermission(Permissions.DELETE);
+    basePerms.setUserId(ANY);
+    basePerms.setResourceType(GROUP_MEMBERSHIP.resourceType());
+    basePerms.setResourceId(ANY);
+    basePerms.addPermission(ALL); // add all then remove 'delete'
+    basePerms.removePermission(DELETE);
     authorizationService.saveAuthorization(basePerms);
     
     try {
@@ -318,9 +326,9 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
       fail("exception expected");
       
     } catch (AuthorizationException e) {
-      assertEquals(Permissions.DELETE.getName(), e.getViolatedPermissionName());
+      assertEquals(DELETE.getName(), e.getViolatedPermissionName());
       assertEquals(jonny2, e.getUserId());
-      assertEquals(Resources.GROUP_MEMBERSHIP.getName(), e.getResourceType());
+      assertEquals(GROUP_MEMBERSHIP.resourceName(), e.getResourceType());
       assertEquals("group1", e.getResourceId());
     }      
   }
@@ -340,9 +348,9 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
 
     // set base permission for all users (no-one has any permissions on users)
     Authorization basePerms = authorizationService.createNewAuthorization();
-    basePerms.setUserId(Authorization.ANY);
-    basePerms.setResourceType(Resources.USER.getId());
-    basePerms.setResourceId(Authorization.ANY);
+    basePerms.setUserId(ANY);
+    basePerms.setResourceType(USER.resourceType());
+    basePerms.setResourceId(ANY);
     authorizationService.saveAuthorization(basePerms);
     
     // we cannot fetch the user
@@ -353,8 +361,8 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
     Authorization ourPerms = authorizationService.createNewAuthorization();
     ourPerms.setUserId(authUserId);
     ourPerms.setResourceType("user");
-    ourPerms.setResourceId(Authorization.ANY);
-    ourPerms.addPermission(Permissions.READ);
+    ourPerms.setResourceId(ANY);
+    ourPerms.addPermission(READ);
     authorizationService.saveAuthorization(ourPerms);
     
     // now we can fetch the user
@@ -363,7 +371,7 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
     
     // change the base permission:
     basePerms = authorizationService.createAuthorizationQuery().resourceType("user").userIdIn("*").singleResult();
-    basePerms.addPermission(Permissions.READ);
+    basePerms.addPermission(READ);
     authorizationService.saveAuthorization(basePerms);
     
     // we can still fetch the user
@@ -372,7 +380,7 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
     
     // revoke permission for jonny2:
     ourPerms = authorizationService.createAuthorizationQuery().resourceType("user").userIdIn(authUserId).singleResult();
-    ourPerms.removePermission(Permissions.READ);
+    ourPerms.removePermission(READ);
     authorizationService.saveAuthorization(ourPerms);
     
     // now we cannot fetch the user
@@ -406,9 +414,9 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
 
     // set base permission for all users (no-one has any permissions on groups)
     Authorization basePerms = authorizationService.createNewAuthorization();
-    basePerms.setUserId(Authorization.ANY);
-    basePerms.setResourceType(Resources.GROUP.getId());
-    basePerms.setResourceId(Authorization.ANY);
+    basePerms.setUserId(ANY);
+    basePerms.setResourceType(GROUP.resourceType());
+    basePerms.setResourceId(ANY);
     authorizationService.saveAuthorization(basePerms);
     
     // we cannot fetch the group
@@ -418,9 +426,9 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
     // now we add permission for jonny2 to read the group:
     Authorization ourPerms = authorizationService.createNewAuthorization();
     ourPerms.setUserId(authUserId);
-    ourPerms.setResourceType(Resources.GROUP.getId());
-    ourPerms.setResourceId(Authorization.ANY);
-    ourPerms.addPermission(Permissions.READ);
+    ourPerms.setResourceType(GROUP.resourceType());
+    ourPerms.setResourceId(ANY);
+    ourPerms.addPermission(READ);
     authorizationService.saveAuthorization(ourPerms);
     
     // now we can fetch the group
@@ -428,8 +436,8 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
     assertEquals(1, identityService.createGroupQuery().count());
     
     // change the base permission:
-    basePerms = authorizationService.createAuthorizationQuery().resourceType(Resources.GROUP.getId()).userIdIn("*").singleResult();
-    basePerms.addPermission(Permissions.READ);
+    basePerms = authorizationService.createAuthorizationQuery().resourceType(GROUP.resourceType()).userIdIn("*").singleResult();
+    basePerms.addPermission(READ);
     authorizationService.saveAuthorization(basePerms);
     
     // we can still fetch the group
@@ -437,8 +445,8 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
     assertEquals(1, identityService.createGroupQuery().count());
     
     // revoke permission for jonny2:
-    ourPerms = authorizationService.createAuthorizationQuery().resourceType(Resources.GROUP.getId()).userIdIn(authUserId).singleResult();
-    ourPerms.removePermission(Permissions.READ);
+    ourPerms = authorizationService.createAuthorizationQuery().resourceType(GROUP.resourceType()).userIdIn(authUserId).singleResult();
+    ourPerms.removePermission(READ);
     authorizationService.saveAuthorization(ourPerms);
     
     // now we cannot fetch the group

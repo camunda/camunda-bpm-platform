@@ -17,7 +17,9 @@ import java.util.Map;
 
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.GroupQuery;
+import org.camunda.bpm.engine.identity.Permissions;
 import org.camunda.bpm.engine.identity.Picture;
+import org.camunda.bpm.engine.identity.Resources;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.identity.UserQuery;
 import org.camunda.bpm.engine.impl.identity.Account;
@@ -63,6 +65,7 @@ public interface IdentityService {
    * {@link #saveUser(User)}.
    * @param userId id for the new user, cannot be null.
    * @throws UnsupportedOperationException if identity service implementation is read only. See {@link #isReadOnly()}
+   * @throws AuthorizationException if the user has no {@link Permissions#CREATE} permissions on {@link Resources#USER}.
    */
   User newUser(String userId);
   
@@ -71,7 +74,9 @@ public interface IdentityService {
    * @param user user to save, cannot be null.
    * @throws RuntimeException when a user with the same name already exists.
    * @throws UnsupportedOperationException if identity service implementation is read only. See {@link #isReadOnly()}
-   */
+   * @throws AuthorizationException if the user has no {@link Permissions#UPDATE} permissions on {@link Resources#USER} (update existing user)
+   * or if user has no {@link Permissions#CREATE} permissions on {@link Resources#USER} (save new user). 
+   */ 
   void saveUser(User user);
   
   /**
@@ -83,6 +88,7 @@ public interface IdentityService {
    * @param userId id of user to delete, cannot be null. When an id is passed
    * for an unexisting user, this operation is ignored.
    * @throws UnsupportedOperationException if identity service implementation is read only. See {@link #isReadOnly()}
+   * @throws AuthorizationException if the user has no {@link Permissions#DELETE} permissions on {@link Resources#USER}.
    */
   void deleteUser(String userId);
   
@@ -91,6 +97,7 @@ public interface IdentityService {
    * {@link #saveGroup(Group)}.
    * @param groupId id for the new group, cannot be null.
    * @throws UnsupportedOperationException if identity service implementation is read only. See {@link #isReadOnly()}
+   * @throws AuthorizationException if the user has no {@link Permissions#CREATE} permissions on {@link Resources#GROUP}.
    */
   Group newGroup(String groupId);
   
@@ -104,6 +111,8 @@ public interface IdentityService {
    * @param group group to save. Cannot be null.
    * @throws RuntimeException when a group with the same name already exists.
    * @throws UnsupportedOperationException if identity service implementation is read only. See {@link #isReadOnly()}
+   * @throws AuthorizationException if the user has no {@link Permissions#UPDATE} permissions on {@link Resources#GROUP} (update existing group)
+   * or if user has no {@link Permissions#CREATE} permissions on {@link Resources#GROUP} (save new user). 
    */
   void saveGroup(Group group);
   
@@ -112,6 +121,7 @@ public interface IdentityService {
    * is ignored.
    * @param groupId id of the group that should be deleted, cannot be null.
    * @throws UnsupportedOperationException if identity service implementation is read only. See {@link #isReadOnly()}
+   * @throws AuthorizationException if the user has no {@link Permissions#DELETE} permissions on {@link Resources#GROUP}.
    */
   void deleteGroup(String groupId);
 
@@ -121,6 +131,7 @@ public interface IdentityService {
    * @throws RuntimeException when the given user or group doesn't exist or when the user
    * is already member of the group.
    * @throws UnsupportedOperationException if identity service implementation is read only. See {@link #isReadOnly()}
+   * @throws AuthorizationException if the user has no {@link Permissions#CREATE} permissions on {@link Resources#GROUP_MEMBERSHIP}.
    */
   void createMembership(String userId, String groupId);
   
@@ -130,6 +141,7 @@ public interface IdentityService {
    * @param userId the user's id, cannot be null.
    * @param groupId the group's id, cannot be null.
    * @throws UnsupportedOperationException if identity service implementation is read only. See {@link #isReadOnly()}
+   * @throws AuthorizationException if the user has no {@link Permissions#DELETE} permissions on {@link Resources#GROUP_MEMBERSHIP}.
    */
   void deleteMembership(String userId, String groupId);
 

@@ -31,9 +31,9 @@ package org.camunda.bpm.engine.identity;
 public interface Resource {
   
   /** returns the name of the resource */
-  String getName();
+  String resourceName();
   
   /** returns the id of the resource */
-  String getId();
+  String resourceType();
 
 }
