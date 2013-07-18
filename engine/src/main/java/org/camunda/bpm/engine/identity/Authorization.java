@@ -20,77 +20,45 @@ package org.camunda.bpm.engine.identity;
  * <p>A permission defines the way a user or group is allowed to interact 
  * with a certain resource. Examples of permissions are READ, WRITE, UPDATE, ...</p> 
  * <p>A permission is either granted or revoked. Permissions are represented as 
- * integers (1,2,4,8,16,...) See: ({@link #PERMISSION_TYPE_ACCESS}, {@link #PERMISSION_TYPE_DELETE},
- * {@link #PERMISSION_TYPE_READ}, {@link #PERMISSION_TYPE_WRITE} ...</p>
+ * integers (1,2,4,8,16,...) See: {@link Permissions}. </p>
  * 
  * <p>A single authorization object may assign multiple permissions to a single user 
  * and resource:</p>
  * <pre>
- * authorization.addPermission(PERMISSION_TYPE_READ);
- * authorization.addPermission(PERMISSION_TYPE_WRITE);
- * authorization.addPermission(PERMISSION_TYPE_DELETE);
+ * authorization.addPermission(Permissions.READ);
+ * authorization.addPermission(Permissions.WRITE);
+ * authorization.addPermission(Permissions.DELETE);
  * </pre>
  *  
  * 
  * <h2>Resources</h2>
  * <p>Resources are entities for which a user or a group is authorized. Examples of 
  * resources are applications, process-definitions, process-instances, tasks ...</p> 
- * 
- * <p>A resource has a type and an id. The type ({@link #setResourceType(String)}) 
- * allows to group all resources of the same kind. A resource id is the identifier of 
- * an indivuidual resource instance ({@link #setResourceId(String)}). For example:
- * the resource type could be "processDefinition" and the resource-id could be the 
- * id of an individual process definition.</p>  
+ *   
  * 
  * @author Daniel Meyer
  * 
  */
 public interface Authorization {
+    
+  /** The identifyer used for relating to all users / resourceTypes / resourceIds.
+   * NOTE: cannot be used for groups. */
+  public static final String ANY = "*";
   
-  /** means that a resource can be accessed.            Value: 1 = (000...00000001) */
-  public static final int PERMISSION_TYPE_ACCESS = 1;     
-  /** means that a user has READ access to a resource   Value: 2 = (000...00000010)  */
-  public static final int PERMISSION_TYPE_READ = 2;       
-  /** means that a user has WRITE access to a resource  Value: 4 = (000...00000100) */
-  public static final int PERMISSION_TYPE_WRITE = 4;    
-  /** means that a user is allowed to DELETE a resource Value: 8 = (000...00001000) */
-  public static final int PERMISSION_TYPE_DELETE = 8;
-  
-  /** The identifier to be used for referring to all users. Adding an 
-   * {@link Authorization} for this userId makes sure it is applied 
-   * to all users */
-  public static final String ANY_USER_ID = "*";
-  
-  /** The identifier to be used for referring to all groups. Adding an 
-   * Authorization for this group Id allows applying it to all groups. */
-  public static final String ANY_GROUP_ID = "*";
-  
-  /** allows granting a permission. Out-of-the-box constants:
-   * <ul>
-   * <li> {@link #PERMISSION_TYPE_ACCESS} </li>
-   * <li> {@link #PERMISSION_TYPE_READ} </li>
-   * <li> {@link #PERMISSION_TYPE_WRITE} </li>
-   * <li> {@link #PERMISSION_TYPE_DELETE} </li>  
-   * </ul>
+  /** allows granting a permission. Out-of-the-box constants can be found in {@link Permissions}.
    * */
-  public void addPermission(int perm);
+  public void addPermission(Permission permission);
   
-  /** allows removing a permission. Out-of-the-box constants:
-   * <ul>
-   * <li> {@link #PERMISSION_TYPE_ACCESS} </li>
-   * <li> {@link #PERMISSION_TYPE_READ} </li>
-   * <li> {@link #PERMISSION_TYPE_WRITE} </li>
-   * <li> {@link #PERMISSION_TYPE_DELETE} </li> 
-   * </ul>
+  /** allows removing a permission. Out-of-the-box constants can be found in {@link Permissions}.
    * */
-  public void removePermission(int perm);
+  public void removePermission(Permission permission);
   
   /**
-   * Allows checking whether a permission is set by this {@link Authorization}. 
+   * Allows checking for a permission. Out-of-the-box constants can be found in {@link Permissions}.
    * 
    * @param perm the permission to check for
    */
-  public boolean hasPermission(int perm);
+  public boolean hasPermission(Permission permission);
   
   /** returns the permissions granted by this authorization */
   public int getPermissions();
@@ -112,7 +80,7 @@ public interface Authorization {
   /**
    * sets the type of the resource
    */
-  public void setResourceType(String resourceType);
+  public void setResourceType(String resourceId);
 
   /**
    * @return the type of the resource

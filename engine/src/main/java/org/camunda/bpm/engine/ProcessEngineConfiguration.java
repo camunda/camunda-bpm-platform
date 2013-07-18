@@ -144,6 +144,10 @@ public abstract class ProcessEngineConfiguration {
   protected ClassLoader classLoader;
   
   protected boolean createIncidentOnFailedJobEnabled = true;
+  
+  /** switch for controlling whether the process engine performs authorization checks.
+   * The default value is false. */
+  protected boolean isAuthorizationChecksEnabled = false;
 
   /** use one of the static createXxxx methods instead */
   protected ProcessEngineConfiguration() {
@@ -516,6 +520,15 @@ public abstract class ProcessEngineConfiguration {
 
   public ProcessEngineConfiguration setCreateIncidentOnFailedJobEnabled(boolean createIncidentOnFailedJobEnabled) {
     this.createIncidentOnFailedJobEnabled = createIncidentOnFailedJobEnabled;
+    return this;
+  }
+  
+  public boolean isAuthorizationChecksEnabled() {
+    return isAuthorizationChecksEnabled;
+  }
+  
+  public ProcessEngineConfiguration setAuthorizationChecksEnabled(boolean isAuthorizationChecksEnabled) {
+    this.isAuthorizationChecksEnabled = isAuthorizationChecksEnabled;
     return this;
   }
   

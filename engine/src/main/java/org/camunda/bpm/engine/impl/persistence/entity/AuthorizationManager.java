@@ -14,8 +14,17 @@ package org.camunda.bpm.engine.impl.persistence.entity;
 
 import java.util.List;
 
+import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.identity.Authorization;
+import org.camunda.bpm.engine.identity.Permission;
+import org.camunda.bpm.engine.identity.Permissions;
+import org.camunda.bpm.engine.identity.Resource;
+import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.impl.AuthorizationQueryImpl;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.db.AuthorizationCheck;
+import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 
 /**
@@ -40,5 +49,47 @@ public class AuthorizationManager extends AbstractManager {
   public AuthorizationEntity selectAuthorizationById(String authorizationId) {
     return getDbSqlSession().selectById(AuthorizationEntity.class, authorizationId);
   }
+  
+  public void configureQuery(@SuppressWarnings("rawtypes") AbstractQuery query, Resource resource) {
+    ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+    String authenticatedUserId = Authentication.getAuthenticatedUserId();
+    
+    if(processEngineConfiguration.isAuthorizationChecksEnabled() && authenticatedUserId != null) {
+      query.setAuthorizationCheckEnabled(true);
+      query.setAuthUserId(authenticatedUserId);
+      query.setAuthResourceType(resource.getId());
+      query.setAuthResourceId("RES.ID_");
+      query.setAuthPerms(Permissions.READ.getId());
+    }
+    
+  }
 
+  public void checkAuthorization(Permission permission, Resource resource, String resourceId) {
+    
+    final String authenticatedUserId = Authentication.getAuthenticatedUserId();
+    final ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+
+    if (processEngineConfiguration.isAuthorizationChecksEnabled() && authenticatedUserId != null) {
+
+      boolean isAuthorized = isAuthorized(authenticatedUserId, null, permission, resource, resourceId);
+      if (!isAuthorized) {
+        throw new AuthorizationException(authenticatedUserId, permission.getName(), resource.getName(), resourceId);
+      }
+    }
+
+  }
+
+  public boolean isAuthorized(String userId, List<String> groupIds, Permission permission, Resource resource, String resourceId) {
+
+    AuthorizationCheck authCheck = new AuthorizationCheck();
+    authCheck.setAuthUserId(userId);
+    authCheck.setAuthGroupIds(groupIds);
+    authCheck.setAuthResourceType(resource.getId());
+    authCheck.setAuthResourceId(resourceId);
+    authCheck.setAuthPerms(permission.getId());
+    
+    return getDbSqlSession().selectBoolean("isUserAuthorizedForResource", authCheck);
+  }
+
+  
 }

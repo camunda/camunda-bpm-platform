@@ -67,19 +67,6 @@
   <select id="selectAuthorization" resultMap="authorizationResultMap">
     select * FROM ${prefix}ACT_RU_AUTHORIZATION WHERE ID_ = #{id}
   </select>
-
-  <select id="selectAuthorizationByQueryCriteria_BITAND" parameterType="org.camunda.bpm.engine.impl.AuthorizationQueryImpl" resultMap="authorizationResultMap">
-    ${limitBefore}
-    select RES.* ${limitBetween}
-    <include refid="selectAuthorizationByQueryCriteriaSql_BITAND"/>
-    ${orderBy}
-    ${limitAfter}
-  </select>
-
-  <select id="selectAuthorizationCountByQueryCriteria_BITAND" parameterType="org.camunda.bpm.engine.impl.AuthorizationQueryImpl" resultType="long">
-    select count(distinct RES.ID_)
-    <include refid="selectAuthorizationByQueryCriteriaSql_BITAND"/>
-  </select>
   
   <select id="selectAuthorizationByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.AuthorizationQueryImpl" resultMap="authorizationResultMap">
     ${limitBefore}
@@ -93,44 +80,7 @@
     select count(distinct RES.ID_)
     <include refid="selectAuthorizationByQueryCriteriaSql"/>
   </select>
-  
-  <sql id="selectAuthorizationByQueryCriteriaSql_BITAND">
-    from ${prefix}ACT_RU_AUTHORIZATION RES
-    <where>
-      <if test="id != null">
-        RES.ID_ = #{id}
-      </if>
-      
-      <!-- userIds -->
-      <if test="userIds != null &amp;&amp; userIds.length > 0">
-        and RES.USER_ID_ in
-        <foreach item="item" index="index" collection="userIds"
-                 open="(" separator="," close=")">
-          #{item}
-        </foreach>
-      </if>
-      
-      <!-- groupIds -->
-      <if test="groupIds != null &amp;&amp; groupIds.length > 0">
-        and RES.GROUP_ID_ in
-        <foreach item="item" index="index" collection="groupIds"
-                 open="(" separator="," close=")">
-          #{item}
-        </foreach>
-      </if>
-      
-      <if test="resourceType != null">
-        and RES.RESOURCE_TYPE_ = #{resourceType}
-      </if>      
-      <if test="resourceId != null">
-        and RES.RESOURCE_ID_ = #{resourceId}
-      </if>     
-      <if test="queryByPermission">
-        and (BITAND(RES.PERMS_, #{permission})) = #{permission}  
-      </if>
-    </where>
-  </sql>
-  
+    
   <sql id="selectAuthorizationByQueryCriteriaSql">
     from ${prefix}ACT_RU_AUTHORIZATION RES
     <where>
@@ -163,9 +113,36 @@
         and RES.RESOURCE_ID_ = #{resourceId}
       </if>     
       <if test="queryByPermission">
-        and RES.PERMS_ &amp; #{permission} = #{permission}  
+        and ${bitand1}RES.PERMS_${bitand2}#{permission}${bitand3} = #{permission}  
       </if>
     </where>
   </sql>
+   
+  <select id="isUserAuthorizedForResource" resultType="string">
+    
+    <include refid="authCheck"/>
+    
+  </select>
   
+  <sql id="authCheck">
+    SELECT ID_ FROM ${prefix}ACT_RU_AUTHORIZATION A WHERE ${bitand1}A.PERMS_${bitand2}#{authPerms}${bitand3}=#{authPerms} AND A.RESOURCE_TYPE_ = #{authResourceType} AND (A.USER_ID_ = #{authUserId}) AND (<if test="authResourceId != null">A.RESOURCE_ID_ = #{authResourceId} OR</if> A.RESOURCE_ID_ = '*')
+    OR
+    (
+      SELECT ID_ FROM ${prefix}ACT_RU_AUTHORIZATION A WHERE ${bitand1}A.PERMS_${bitand2}#{authPerms}${bitand3}=#{authPerms} AND A.RESOURCE_TYPE_ = #{authResourceType} AND (A.USER_ID_ = '*') AND (<if test="authResourceId != null">A.RESOURCE_ID_ = #{authResourceId} OR</if> A.RESOURCE_ID_ = '*')
+      AND NOT EXISTS (
+        SELECT ID_ FROM ${prefix}ACT_RU_AUTHORIZATION A WHERE ${bitand1}A.PERMS_${bitand2}#{authPerms}${bitand3}!=#{authPerms} AND A.RESOURCE_TYPE_ = #{authResourceType} AND (A.USER_ID_ = #{authUserId}) AND (<if test="authResourceId != null">A.RESOURCE_ID_ = #{authResourceId} OR</if> A.RESOURCE_ID_ = '*')
+      )
+    )   
+  </sql>  
+    
+  <!-- reusable authorization check for queries. -->
+  <sql id="queryAuthorizationCheck">
+    <if test="isAuthorizationCheckEnabled &amp;&amp; authUserId != null">
+        AND EXISTS 
+        (          
+          <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.authCheck"/>
+        ) 
+    </if>
+  </sql>  
+    
 </mapper>

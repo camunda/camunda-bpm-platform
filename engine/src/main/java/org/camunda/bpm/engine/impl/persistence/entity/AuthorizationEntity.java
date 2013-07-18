@@ -16,6 +16,8 @@ import java.io.Serializable;
 import java.util.HashMap;
 
 import org.camunda.bpm.engine.identity.Authorization;
+import org.camunda.bpm.engine.identity.Permission;
+import org.camunda.bpm.engine.identity.Permissions;
 import org.camunda.bpm.engine.impl.db.HasRevision;
 import org.camunda.bpm.engine.impl.db.PersistentObject;
 
@@ -34,20 +36,20 @@ public class AuthorizationEntity implements Authorization, PersistentObject, Has
   protected String groupId;
   protected String resourceType;
   protected String resourceId;  
-  protected int permissions = 0; 
+  protected int permissions = Permissions.NONE.getId(); 
   
   // grant methods /////////////////////////////////
   
-  public void addPermission(int auth) {
-    permissions |= auth;
+  public void addPermission(Permission p) {
+    permissions |= p.getId();
   }
   
-  public void removePermission(int auth) {
-    permissions &= ~auth;
+  public void removePermission(Permission p) {
+    permissions &= ~p.getId();
   }
   
-  public boolean hasPermission(int perm) {
-    return (permissions & perm) == perm;
+  public boolean hasPermission(Permission p) {
+    return (permissions & p.getId()) == p.getId();
   }
   
   // getters setters ///////////////////////////////
