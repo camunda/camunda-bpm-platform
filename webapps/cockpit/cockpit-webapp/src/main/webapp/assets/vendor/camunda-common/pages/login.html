@@ -1,26 +1,9 @@
-<div ng-cloak>
+<form class="form-signin" ng-submit="login()">
+  <h2 class="form-signin-heading">Please sign in</h2>
+
+  <div class="notifications-panel"></div>
   
-  <div class="page-header">
-    <h1>Sign in</h1>
-  </div>
-   
-  <form class="form-horizontal" data-ng-submit="login()">
-    <div class="control-group">
-      <label class="control-label" for="inputUsername">Username</label>
-      <div class="controls">
-        <input type="text" id="inputUsername" placeholder="Username" data-ng-model="username">
-      </div>
-    </div>
-    <div class="control-group">
-      <label class="control-label" for="inputPassword">Password</label>
-      <div class="controls">
-        <input type="password" id="inputPassword" placeholder="Password" data-ng-model="password">
-      </div>
-    </div>
-    <div class="control-group">
-      <div class="controls">            
-        <button type="submit" class="btn">Sign in</button>
-      </div>
-    </div>
-  </form>
-</div>
+  <input type="text" class="input-block-level" placeholder="Username" ng-model="username" />
+  <input type="password" class="input-block-level" placeholder="Password" ng-model="password" />
+  <button class="btn btn-large btn-primary" type="submit">Sign in</button>
+</form>
