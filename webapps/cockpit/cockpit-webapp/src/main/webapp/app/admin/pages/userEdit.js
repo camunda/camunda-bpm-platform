@@ -108,14 +108,14 @@ define(['angular'], function(angular) {
 
   var RouteConfig = [ '$routeProvider', function($routeProvider) {
     $routeProvider.when('/users/:userId', {
-      templateUrl: 'pages/user-edit.html',
+      templateUrl: 'pages/userEdit.html',
       controller: Controller,
       reloadOnSearch: false
     });
 
     // multi tenacy
     $routeProvider.when('/:engine/users/:userId', {
-      templateUrl: 'pages/user-edit.html',
+      templateUrl: 'pages/userEdit.html',
       controller: Controller,
       reloadOnSearch: false
     });
