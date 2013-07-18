@@ -6,6 +6,7 @@ import java.util.Set;
 import org.camunda.bpm.BpmPlatform;
 import org.camunda.bpm.ProcessEngineService;
 import org.camunda.bpm.application.ProcessApplicationDeploymentInfo;
+import org.camunda.bpm.application.ProcessApplicationInfo;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -58,14 +59,28 @@ public class IndependentJobExecutionTest extends AbstractFoxPlatformIntegrationT
   public void testDeploymentRegistration() {
     Set<String> registeredDeploymentsForEngine1 = engine1.getManagementService().getRegisteredDeployments();
     Set<String> registeredDeploymentsForDefaultEngine = processEngine.getManagementService().getRegisteredDeployments();
-    List<ProcessApplicationDeploymentInfo> pa1DeploymentInfo = BpmPlatform.getProcessApplicationService().getProcessApplicationInfo("/pa1").getDeploymentInfo();
+    
+    ProcessApplicationInfo pa1Info = getProcessApplicationDeploymentInfo("pa1");
+    
+    List<ProcessApplicationDeploymentInfo> pa1DeploymentInfo = pa1Info.getDeploymentInfo();
     
     Assert.assertEquals(1, pa1DeploymentInfo.size());
     Assert.assertTrue(registeredDeploymentsForEngine1.contains(pa1DeploymentInfo.get(0).getDeploymentId()));
     
-    List<ProcessApplicationDeploymentInfo> pa2DeploymentInfo = BpmPlatform.getProcessApplicationService().getProcessApplicationInfo("/pa2").getDeploymentInfo();
+    ProcessApplicationInfo pa2Info = getProcessApplicationDeploymentInfo("pa2");
+    
+    List<ProcessApplicationDeploymentInfo> pa2DeploymentInfo = pa2Info.getDeploymentInfo();
     Assert.assertEquals(1, pa2DeploymentInfo.size());
     Assert.assertTrue(registeredDeploymentsForDefaultEngine.contains(pa2DeploymentInfo.get(0).getDeploymentId()));
+  }
+  
+  private ProcessApplicationInfo getProcessApplicationDeploymentInfo(String applicationName) {
+    ProcessApplicationInfo processApplicationInfo = BpmPlatform.getProcessApplicationService().getProcessApplicationInfo(applicationName);
+    if (processApplicationInfo == null) {
+      processApplicationInfo = BpmPlatform.getProcessApplicationService().getProcessApplicationInfo("/" + applicationName);
+    }
+    return processApplicationInfo;
+    
   }
   
   @OperateOnDeployment("pa1")
