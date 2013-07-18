@@ -1,26 +1,13 @@
 <div class="ctn-content-container ctn-collapsable-parent">
 
-  <div id="sidebar" class="content content-sidebar well">
+  <div class="ctn-toolbar"></div>
 
-    <div class="btn-group">
-      <button class="btn">Action</button>
-      <button class="btn dropdown-toggle" data-toggle="dropdown">
-        <span class="caret"></span>
-      </button>
-      <ul class="dropdown-menu">
-        <li>
-          <a href ng-click="openCancelProcessInstanceDialog()">Cancel Process Instance</a>
-        </li>
-      </ul>
-    </div>
-  
-    <button on-click-hide-element="sidebar" selection="selection"></button>
-  
+  <!-- sitebar -->
+  <div class="ctn-column ctn-sitebar ctn-collapsable" collapsable="left">
     <div activity-instance-tree="processInstance.activityInstanceTree" selection="selection"></div>
 
     <a class="hide-collapsable pull-right"></a>
   </div>
-
 
   <div class="ctn-column ctn-content ctn-collapsable-parent">
 

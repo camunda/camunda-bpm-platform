@@ -259,11 +259,6 @@ input.ng-invalid {
 }
 
 /** end input tweaks */
-.icon-user-large {
-   background: no-repeat url('../img/user.png');
-   width: 35px;
-   height: 30px;
-}
 
 /*---------modal dialog -------------*/
 .modal-body {
