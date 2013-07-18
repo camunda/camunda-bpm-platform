@@ -18,11 +18,13 @@ import org.camunda.bpm.container.RuntimeContainerDelegate;
 import org.camunda.bpm.container.impl.ejb.deployment.EjbJarAttachments;
 import org.camunda.bpm.container.impl.ejb.deployment.EjbJarParsePlatformXmlStep;
 import org.camunda.bpm.container.impl.ejb.deployment.StartJcaExecutorServiceStep;
+import org.camunda.bpm.container.impl.ejb.deployment.StopJcaExecutorServiceStep;
 import org.camunda.bpm.container.impl.jmx.JmxRuntimeContainerDelegate;
 import org.camunda.bpm.container.impl.jmx.deployment.PlatformXmlStartProcessEnginesStep;
 import org.camunda.bpm.container.impl.jmx.deployment.StopProcessApplicationsStep;
 import org.camunda.bpm.container.impl.jmx.deployment.StopProcessEnginesStep;
 import org.camunda.bpm.container.impl.jmx.deployment.jobexecutor.StartJobExecutorStep;
+import org.camunda.bpm.container.impl.jmx.deployment.jobexecutor.StopJobExecutorStep;
 
 
 /**
@@ -73,6 +75,8 @@ public class EjbBpmPlatformBootstrap {
     containerDelegate.getServiceContainer().createUndeploymentOperation("undeploying camunda BPM platform")
       .addStep(new StopProcessApplicationsStep())
       .addStep(new StopProcessEnginesStep())
+      .addStep(new StopJobExecutorStep())
+      .addStep(new StopJcaExecutorServiceStep())
       .execute();
     
     LOGGER.log(Level.INFO, "camunda BPM platform stopped.");
