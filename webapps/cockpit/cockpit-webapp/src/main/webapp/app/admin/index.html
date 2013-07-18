@@ -28,30 +28,41 @@
     <script src="$APP_ROOT/app/admin/admin-bootstrap.js"></script>
 
   </head>
-  <body>
+  <body ng-controller="DefaultController">
+    <!-- navigation -->
+    <div class="navbar navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container-fluid">
+          <a class="brand ir" href="#/">
+            camunda admin
+          </a>
 
-    <div class="wrapper" ng-controller="AuthenticationController">
-      <!-- Header -->
-      <div ng-include="'templates/header.html'"></div>
+          <div ng-include="'templates/navigation.html'"></div>
 
-      <div class="container-fluid content-container content-inset">        
-        <div notifications-panel></div>
-
-        <div class="row-fluid content-container">
-          <!-- actual view body is rendered here whenever the url changes -->
-          <div ng-view class="span12">
-          </div>
+          <div engine-select></div>
         </div>
       </div>
-      <div class="push-down"><!-- // --></div>
     </div>
 
-    <!-- footer -->
-    <footer class="content-container">
-      <div class="container-fluid">
-        <p><a href="http://camunda.org">powered by camunda BPM</a> / version ${project.version}</p>
+    <!-- content -->
+    <div class="ctn-main">
+      <div class="ctn-wrapper">
+        <div notifications-panel></div>
+        <div breadcrumbs></div>
+
+        <!-- view body provided by ngView -->
+        <div ng-view>
+        </div>
+
+        <div class="ctn-push-down"></div>
       </div>
 
-    </footer>
+      <!-- footer -->
+      <footer>
+        <div>
+          Powered by <a href="http://camunda.org">camunda BPM</a> / <span class="version">v${project.version}</span>
+        </div>
+      </footer>
+    </div>
   </body>
 </html>
