@@ -15,8 +15,17 @@ package org.camunda.bpm.engine.impl.identity.db;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.identity.Group;
+import org.camunda.bpm.engine.identity.Permission;
+import org.camunda.bpm.engine.identity.Permissions;
+import org.camunda.bpm.engine.identity.Resource;
+import org.camunda.bpm.engine.identity.Resources;
 import org.camunda.bpm.engine.identity.User;
+import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.context.Context;
+import org.camunda.bpm.engine.impl.db.AuthorizationCheck;
+import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.impl.identity.WritableIdentityProvider;
 import org.camunda.bpm.engine.impl.persistence.entity.GroupEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.UserEntity;
@@ -33,6 +42,7 @@ public class DbIdentityServiceProvider extends DbReadOnlyIdentityServiceProvider
   // users ////////////////////////////////////////////////////////
   
   public UserEntity createNewUser(String userId) {
+    checkAuthorization(Permissions.CREATE, Resources.USER, null);
     return new UserEntity(userId);
   }
   
@@ -43,8 +53,10 @@ public class DbIdentityServiceProvider extends DbReadOnlyIdentityServiceProvider
     userEntity.setPassword(encryptPassword(userEntity.getPassword()));
     
     if(userEntity.getRevision() == 0) {
+      checkAuthorization(Permissions.CREATE, Resources.USER, null);
       getDbSqlSession().insert(userEntity);
     } else {
+      checkAuthorization(Permissions.UPDATE, Resources.USER, user.getId());
       getDbSqlSession().update(userEntity);
     }
 
@@ -52,6 +64,7 @@ public class DbIdentityServiceProvider extends DbReadOnlyIdentityServiceProvider
   }
   
   public void deleteUser(String userId) {
+    checkAuthorization(Permissions.DELETE, Resources.USER, userId);
     UserEntity user = findUserById(userId);
     if(user != null) {
       deleteMembershipsByUserId(userId);
@@ -62,20 +75,24 @@ public class DbIdentityServiceProvider extends DbReadOnlyIdentityServiceProvider
   // groups ////////////////////////////////////////////////////////
 
   public GroupEntity createNewGroup(String groupId) {
+    checkAuthorization(Permissions.CREATE, Resources.GROUP, null);
     return new GroupEntity(groupId);
   }
-
-  public GroupEntity saveGroup(Group group) {
+  
+  public GroupEntity saveGroup(Group group) {    
     GroupEntity groupEntity = (GroupEntity) group;
     if(groupEntity.getRevision() == 0) {
+      checkAuthorization(Permissions.CREATE, Resources.GROUP, null);
       getDbSqlSession().insert(groupEntity);
     } else {
+      checkAuthorization(Permissions.UPDATE, Resources.GROUP, group.getId());
       getDbSqlSession().update(groupEntity);
     }
     return groupEntity;
   }
 
   public void deleteGroup(String groupId) {
+    checkAuthorization(Permissions.DELETE, Resources.GROUP, groupId);
     GroupEntity group = findGroupById(groupId);
     if(group != null) {
       deleteMembershipsByGroupId(groupId);
@@ -86,6 +103,7 @@ public class DbIdentityServiceProvider extends DbReadOnlyIdentityServiceProvider
   // membership //////////////////////////////////////////////////////
   
   public void createMembership(String userId, String groupId) {
+    checkAuthorization(Permissions.CREATE, Resources.GROUP_MEMBERSHIP, groupId);
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("userId", userId);
     parameters.put("groupId", groupId);
@@ -93,6 +111,7 @@ public class DbIdentityServiceProvider extends DbReadOnlyIdentityServiceProvider
   }
 
   public void deleteMembership(String userId, String groupId) {
+    checkAuthorization(Permissions.DELETE, Resources.GROUP_MEMBERSHIP, groupId);
     Map<String, Object> parameters = new HashMap<String, Object>();
     parameters.put("userId", userId);
     parameters.put("groupId", groupId);
@@ -100,11 +119,13 @@ public class DbIdentityServiceProvider extends DbReadOnlyIdentityServiceProvider
   }
   
   public void deleteMembershipsByUserId(String userId) {
+    checkAuthorization(Permissions.DELETE, Resources.USER, userId);
     getDbSqlSession().delete("deleteMembershipsByUserId", userId);
   }
   
   public void deleteMembershipsByGroupId(String groupId) {
+    checkAuthorization(Permissions.DELETE, Resources.GROUP_MEMBERSHIP, groupId);
     getDbSqlSession().delete("deleteMembershipsByGroupId", groupId);
   }
-
+  
 }

@@ -36,14 +36,9 @@ public class AuthenticationCookie {
     
     String contextPath = session.getServletContext().getContextPath();    
     
-    int maxAge = session.getMaxInactiveInterval();
-    if(maxAge <= 0) {
-      maxAge = 60000;
-    }
-    
     String value = getCockieValue(authentications);
         
-    return new NewCookie(AUTH_COOKIE_NAME, value, contextPath, null, null, maxAge, false);
+    return new NewCookie(AUTH_COOKIE_NAME, value, contextPath, null, null, Integer.MAX_VALUE, false);
   }
 
   private static String getCockieValue(Authentications authentications) {

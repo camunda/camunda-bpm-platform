@@ -24,6 +24,7 @@ import java.util.logging.Level;
 
 import junit.framework.AssertionFailedError;
 
+import org.apache.ibatis.logging.LogFactory;
 import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.FormService;
 import org.camunda.bpm.engine.HistoryService;
@@ -56,7 +57,7 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
 
   static {
     // this ensures that mybatis uses the jdk logging
-//    LogFactory.useJdkLogging();
+    LogFactory.useJdkLogging();
     // with an upgrade of mybatis, this might have to become org.mybatis.generator.logging.LogFactory.forceJavaLogging();
   }
   
@@ -115,6 +116,7 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
       
     } finally {
       TestHelper.annotationDeploymentTearDown(processEngine, deploymentId, getClass(), getName());
+      identityService.setAuthenticatedUserId(null);
       assertAndEnsureCleanDb();
       ClockUtil.reset();
       
@@ -309,6 +311,19 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
       result.addAll(getInstancesForActivitiyId(childInstance,activityId));
     }
     return result;
+  }
+  
+  protected void runAsUser(String userId, List<String> groupIds, Runnable r) {
+    try {
+      identityService.setAuthenticatedUserId(userId);
+      processEngineConfiguration.setAuthorizationChecksEnabled(true);
+      
+      r.run();
+      
+    } finally {
+      identityService.setAuthenticatedUserId(null);
+      processEngineConfiguration.setAuthorizationChecksEnabled(false);      
+    }
   }
   
 }
