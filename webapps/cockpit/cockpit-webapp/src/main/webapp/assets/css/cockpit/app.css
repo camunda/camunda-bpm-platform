@@ -98,7 +98,7 @@ textarea.in-place-edit {
 
 @media (min-width: 768px) {
 
-  .ctn-wrapper div[breadcrumbs] {
+  .breadcrumbs-panel {
     position: absolute;
     height: 30px;
     top: 0;

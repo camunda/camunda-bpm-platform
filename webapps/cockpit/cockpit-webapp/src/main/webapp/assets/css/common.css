@@ -97,30 +97,6 @@ input.ng-invalid-required {
   border-color: #f00;
 }
 
-/** combo box styles */
-.combobox-container input,.typeahead.dropdown-menu, span#modelerName {
-  width: 233px;
-  -webkit-border-radius: 3px;
-  -moz-border-radius: 3px;
-  border-radius: 3px;
-}
-
-.task-table td {
-  vertical-align: middle;
-}
-
-.task-table tr {
-  height: 43px;
-}
-
-table tr.selected > td {
-  background: rgba(218, 234, 247, 0.60);
-}
-
-.table-hover tbody tr.selected:hover > td, .table-hover tbody tr.selected:hover > th {
-  background-color: #DAEAF7;
-}
-
 .modal-body {
   max-height: 480px;
 }
@@ -236,6 +212,22 @@ footer:hover > div {
 
 footer .version {
   font-family: monospace;
+}
+
+@media (min-width: 768px) {
+  .notifications-panel {
+    position: fixed;
+    top: 90px;
+    left: 80px;
+    right: 80px;
+    z-index: 10;
+  }
+
+  .notifications-panel .alert {
+    -moz-box-shadow: 0 0 8px #888;
+    -webkit-box-shadow: 0 0 8px #888;
+    box-shadow: 0 0 8px #888;
+  }
 }
 
 /** end layout ui tweaks */
