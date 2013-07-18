@@ -48,8 +48,6 @@ ngDefine('cockpit.pages', function(module) {
       
     });
     
-    $scope.processInstance = {};
-    
     // get the process definition
     function loadProcessDefinition() {
       var deferred = $q.defer();
