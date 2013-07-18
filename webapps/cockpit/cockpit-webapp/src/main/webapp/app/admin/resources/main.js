@@ -1,7 +1,8 @@
 ngDefine('admin.resources', [
 	'./userResource',
 	'./groupResource',
-	'./groupMembershipResource'
+	'./groupMembershipResource',
+	'./initialUserResource'
 ], function(module) {
 
 });
