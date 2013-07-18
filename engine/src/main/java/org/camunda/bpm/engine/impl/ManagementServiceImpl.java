@@ -13,9 +13,9 @@
 package org.camunda.bpm.engine.impl;
 
 import java.sql.Connection;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.application.ProcessApplicationRegistration;
@@ -127,10 +127,10 @@ public class ManagementServiceImpl extends ServiceImpl implements ManagementServ
     return new DeploymentStatisticsQueryImpl(commandExecutor);
   }
 
-  public List<String> getRegisteredDeployments() {
-    return commandExecutor.execute(new Command<List<String>>() {
-      public List<String> execute(CommandContext commandContext) {
-        return new ArrayList<String>(Context.getProcessEngineConfiguration().getRegisteredDeployments());
+  public Set<String> getRegisteredDeployments() {
+    return commandExecutor.execute(new Command<Set<String>>() {
+      public Set<String> execute(CommandContext commandContext) {
+        return new HashSet<String>(Context.getProcessEngineConfiguration().getRegisteredDeployments());
       }
     });
   }

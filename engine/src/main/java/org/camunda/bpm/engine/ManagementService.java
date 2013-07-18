@@ -15,6 +15,7 @@ package org.camunda.bpm.engine;
 import java.sql.Connection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.application.ProcessApplicationRegistration;
@@ -167,9 +168,9 @@ public interface ManagementService {
 
   /**
    * Get the deployments that are registered the engine's job executor.
-   * This list is only relevant, if the engine configuration property <code>jobExecutorDeploymentAware</code> is set. 
+   * This set is only relevant, if the engine configuration property <code>jobExecutorDeploymentAware</code> is set. 
    */
-  List<String> getRegisteredDeployments();
+  Set<String> getRegisteredDeployments();
 
   /**
    * Register a deployment for the engine's job executor. 

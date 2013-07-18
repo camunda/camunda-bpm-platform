@@ -1,18 +1,24 @@
 package org.camunda.bpm.integrationtest.jobexecutor;
 
+import java.util.List;
+import java.util.Set;
+
 import org.camunda.bpm.BpmPlatform;
 import org.camunda.bpm.ProcessEngineService;
+import org.camunda.bpm.application.ProcessApplicationDeploymentInfo;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
+import org.camunda.bpm.engine.impl.cmd.AcquireJobsCmd;
+import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
+import org.camunda.bpm.engine.impl.jobexecutor.AcquiredJobs;
 import org.camunda.bpm.engine.impl.jobexecutor.JobExecutor;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.integrationtest.util.AbstractFoxPlatformIntegrationTest;
 import org.jboss.arquillian.container.test.api.Deployment;
+import org.jboss.arquillian.container.test.api.OperateOnDeployment;
 import org.jboss.arquillian.junit.Arquillian;
-import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.spec.JavaArchive;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.Assert;
 import org.junit.Before;
@@ -22,60 +28,74 @@ import org.junit.runner.RunWith;
 @RunWith(Arquillian.class)
 public class IndependentJobExecutionTest extends AbstractFoxPlatformIntegrationTest {
   
-  private ProcessEngine engine2;
-  private ProcessEngineConfigurationImpl engine2Configuration;
-  
-  private ProcessEngine engine3;
-  private ProcessEngineConfigurationImpl engine3Configuration;
+  private ProcessEngine engine1;
+  private ProcessEngineConfigurationImpl engine1Configuration;
   
   @Before
   public void setEngines() {
     ProcessEngineService engineService = BpmPlatform.getProcessEngineService();
-    engine2 = engineService.getProcessEngine("engine2");
-    engine3 = engineService.getProcessEngine("engine3");
-    engine2Configuration = ((ProcessEngineImpl) engine2).getProcessEngineConfiguration();
-    engine3Configuration = ((ProcessEngineImpl) engine2).getProcessEngineConfiguration();
+    engine1 = engineService.getProcessEngine("engine1");
+    engine1Configuration = ((ProcessEngineImpl) engine1).getProcessEngineConfiguration();
   }
-//  
-//  @Deployment(order = 0, name="engines")
-//  public static WebArchive enginesArchive() {    
-//    
-//    return initWebArchiveDeployment("engines.war")
-//          .addAsLibraries(
-//              ShrinkWrap.create(JavaArchive.class, "archives.jar")
-//              .addAsResource("twoEngines.xml", "META-INF/processes.xml"));
-//            
-//  }
-  
-  @Deployment(order = 1, name="archives")
-  public static WebArchive processArchive() {    
+
+  @Deployment(order = 0, name="pa1")
+  public static WebArchive processArchive1() {    
     
-    return initWebArchiveDeployment("archives.war")
-            .addAsLibraries(
-                ShrinkWrap.create(JavaArchive.class, "engines.jar")
-                  .addAsResource("twoEngines.xml", "META-INF/processes.xml"),
-                ShrinkWrap.create(JavaArchive.class, "archives.jar")
-                  .addAsResource("org/camunda/bpm/integrationtest/jobexecutor/IndependentArchives.xml", "META-INF/processes.xml")
-                  .addAsResource("org/camunda/bpm/integrationtest/jobexecutor/archive1process.bpmn20.xml")
-                  .addAsResource("org/camunda/bpm/integrationtest/jobexecutor/archive2process.bpmn20.xml"));
+    return initWebArchiveDeployment("pa1.war", "org/camunda/bpm/integrationtest/jobexecutor/pa1.xml")
+        .addAsResource("org/camunda/bpm/integrationtest/jobexecutor/archive1process.bpmn20.xml");
+            
   }
   
+  @Deployment(order = 1, name="pa2")
+  public static WebArchive processArchive2() {    
+    
+    return initWebArchiveDeployment("pa2.war", "org/camunda/bpm/integrationtest/jobexecutor/pa2.xml")
+        .addAsResource("org/camunda/bpm/integrationtest/jobexecutor/archive2process.bpmn20.xml");
+  }
+  
+  @OperateOnDeployment("pa1")
+  @Test
+  public void testDeploymentRegistration() {
+    Set<String> registeredDeploymentsForEngine1 = engine1.getManagementService().getRegisteredDeployments();
+    Set<String> registeredDeploymentsForDefaultEngine = processEngine.getManagementService().getRegisteredDeployments();
+    System.out.println(BpmPlatform.getProcessApplicationService().getProcessApplicationNames());
+    List<ProcessApplicationDeploymentInfo> pa1DeploymentInfo = BpmPlatform.getProcessApplicationService().getProcessApplicationInfo("/pa1").getDeploymentInfo();
+    
+    Assert.assertEquals(1, pa1DeploymentInfo.size());
+    Assert.assertTrue(registeredDeploymentsForEngine1.contains(pa1DeploymentInfo.get(0).getDeploymentId()));
+    
+    List<ProcessApplicationDeploymentInfo> pa2DeploymentInfo = BpmPlatform.getProcessApplicationService().getProcessApplicationInfo("/pa2").getDeploymentInfo();
+    Assert.assertEquals(1, pa2DeploymentInfo.size());
+    Assert.assertTrue(registeredDeploymentsForDefaultEngine.contains(pa2DeploymentInfo.get(0).getDeploymentId()));
+  }
+  
+  @OperateOnDeployment("pa1")
   @Test
   public void testIndependentJobExecution() {
-    JobExecutor jobExecutor2 = engine2Configuration.getJobExecutor();
-    JobExecutor jobExecutor3 = engine3Configuration.getJobExecutor();
+    JobExecutor jobExecutor1 = engine1Configuration.getJobExecutor();
+    JobExecutor defaultJobExecutor = processEngineConfiguration.getJobExecutor();
     
-    ProcessInstance instance1 = engine2.getRuntimeService().startProcessInstanceByKey("archive1Process");
-    ProcessInstance instance2 = engine3.getRuntimeService().startProcessInstanceByKey("archive2Process");
+    ProcessInstance instance1 = engine1.getRuntimeService().startProcessInstanceByKey("archive1Process");
+    ProcessInstance instance2 = processEngine.getRuntimeService().startProcessInstanceByKey("archive2Process");
     
-    waitForJobExecutorToProcessAllJobs(jobExecutor2, 5000L);
-    Job remainingJob = engine3.getManagementService().createJobQuery().singleResult();
-    Assert.assertNotNull("Should not have processed job that belongs to a deployment of engine3", remainingJob);
-    Assert.assertEquals(instance1.getId(), remainingJob.getProcessInstanceId());
+    Job job1 = managementService.createJobQuery().processInstanceId(instance1.getId()).singleResult();
+    Job job2 = managementService.createJobQuery().processInstanceId(instance2.getId()).singleResult();
     
-    waitForJobExecutorToProcessAllJobs(jobExecutor3, 5000L);
-    long remainingJobsCount = engine3.getManagementService().createJobQuery().count();
-    Assert.assertEquals("Should have processed the remaining job", 0, remainingJobsCount);
     
+    // the deployment aware configuration should only return the jobs of the registered deployments
+    CommandExecutor commandExecutor = engine1Configuration.getCommandExecutorTxRequired();
+    AcquiredJobs acquiredJobs = commandExecutor.execute(new AcquireJobsCmd(jobExecutor1));
+    
+    Assert.assertEquals(1, acquiredJobs.size());
+    Assert.assertTrue(acquiredJobs.contains(job1.getId()));
+    Assert.assertFalse(acquiredJobs.contains(job2.getId()));
+    
+    // the deployment unaware configuration should return both jobs
+    commandExecutor = processEngineConfiguration.getCommandExecutorTxRequired();
+    acquiredJobs = commandExecutor.execute(new AcquireJobsCmd(defaultJobExecutor));
+    
+    Assert.assertEquals(2, acquiredJobs.size());
+    Assert.assertTrue(acquiredJobs.contains(job1.getId()));
+    Assert.assertTrue(acquiredJobs.contains(job2.getId()));
   }
 }

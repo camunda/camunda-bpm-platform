@@ -38,9 +38,9 @@ public class DeploymentAwareJobExecutorTest extends AbstractProcessEngineTestCas
 
     runtimeService.startProcessInstanceByKey("simpleAsyncProcess");
     
-    List<String> registeredDeployments = managementService.getRegisteredDeployments();
+    Set<String> registeredDeployments = managementService.getRegisteredDeployments();
     Assert.assertEquals(1, registeredDeployments.size());
-    Assert.assertEquals(deploymentId, registeredDeployments.get(0));
+    Assert.assertTrue(registeredDeployments.contains(deploymentId));
     
     Job executableJob = managementService.createJobQuery().singleResult();
     

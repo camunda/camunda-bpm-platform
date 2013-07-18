@@ -59,17 +59,21 @@ public abstract class AbstractFoxPlatformIntegrationTest {
   protected RuntimeService runtimeService;
   protected TaskService taskService;
   
-  public static WebArchive initWebArchiveDeployment(String name) {
+  public static WebArchive initWebArchiveDeployment(String name, String processesXmlPath) {
     WebArchive archive = ShrinkWrap.create(WebArchive.class, name)
               .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml")
               .addAsLibraries(DeploymentHelper.getEngineCdi())
-              .addAsResource("META-INF/processes.xml", "META-INF/processes.xml")
+              .addAsResource(processesXmlPath, "META-INF/processes.xml")
               .addClass(AbstractFoxPlatformIntegrationTest.class)
               .addClass(TestContainer.class);
     
     TestContainer.addContainerSpecificResources(archive);
     
     return archive;
+  }
+  
+  public static WebArchive initWebArchiveDeployment(String name) {
+    return initWebArchiveDeployment(name, "META-INF/processes.xml");
   }
   
   public static WebArchive initWebArchiveDeployment() {

@@ -108,6 +108,10 @@ public class StartProcessEngineStep extends MBeanDeploymentOperationStep {
     for (Entry<String, String> property : properties.entrySet()) {
       Field propertyField = ReflectUtil.getField(property.getKey(), configurationClass);
       
+      if (propertyField == null) {
+        throw new ProcessEngineException("Field " + configurationClassName + "." + property.getKey() + " does not exist.");
+      }
+      
       Method setter = ReflectUtil.getSetter(property.getKey(), configurationClass, propertyField.getType());
       if(setter != null) {
         try {
