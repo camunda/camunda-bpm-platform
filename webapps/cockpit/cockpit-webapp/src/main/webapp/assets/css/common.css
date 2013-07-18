@@ -16,8 +16,8 @@
   opacity: 1.0;
 }
 
-/* apply a natural box layout model to all elements */
-* {
+/* apply a natural box layout model to box elements */
+div, textarea, input {
   -moz-box-sizing: border-box;
   -webkit-box-sizing: border-box;
   box-sizing: border-box;
