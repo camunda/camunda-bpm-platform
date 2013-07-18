@@ -126,7 +126,7 @@
   
   <sql id="authCheck">
     SELECT ID_ FROM ${prefix}ACT_RU_AUTHORIZATION A WHERE ${bitand1}A.PERMS_${bitand2}#{authPerms}${bitand3}=#{authPerms} AND A.RESOURCE_TYPE_ = #{authResourceType} AND (A.USER_ID_ = #{authUserId}) AND (<if test="authResourceId != null">A.RESOURCE_ID_ = #{authResourceId} OR</if> A.RESOURCE_ID_ = '*')
-    OR
+    UNION
     (
       SELECT ID_ FROM ${prefix}ACT_RU_AUTHORIZATION A WHERE ${bitand1}A.PERMS_${bitand2}#{authPerms}${bitand3}=#{authPerms} AND A.RESOURCE_TYPE_ = #{authResourceType} AND (A.USER_ID_ = '*') AND (<if test="authResourceId != null">A.RESOURCE_ID_ = #{authResourceId} OR</if> A.RESOURCE_ID_ = '*')
       AND NOT EXISTS (
