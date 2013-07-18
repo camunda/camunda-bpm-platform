@@ -112,8 +112,110 @@
             </form>  
           </div>
         </div>
+
+        <div ng-show="show('groups')"> 
+          <div class="box">
+
+            <form class="form-horizontal" name="updateGroupMemberships">
+
+              <legend>{{user.firstName}} {{user.lastName}}&#39;s Groups</legend>
+
+              <a class="btn pull-right" data-ng-click="openCreateGroupMembershipDialog()"><i class="icon-plus"></i> Add</a>
+
+              <table class="table" ng-hide="groupList.length == 0">
+                <thead>
+                  <tr>
+                    <th><!-- icons --></th>    
+                    <th>Group Id</th>
+                    <th>Group Name</th>
+                    <th>Group Type</th>  
+                    <th><!-- actions --></th>    
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr ng-repeat="group in groupList">
+                    <td>
+                      <!-- add group icon here -->
+                    </td>
+                    <td>
+                      <a href="#/groups/{{group.id}}?tab=group">{{group.id}}</a>
+                    </td>            
+                    <td>
+                      {{group.name}}
+                    </td>
+                    <td>
+                      {{group.type}}
+                    </td>
+                    <td>  
+                      <a class="btn btn-small" data-ng-click="removeGroup(group.id)">Remove</a>                      
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+
+              <p ng-show="groupList.length == 0">User {{user.firstName}} {{user.lastName}} is currently not member of any groups</p>
+
+            </form>  
+          </div>          
+        </div>
       
       </div>
     </div>
   </section>
+</div>
+
+<!-- create group membership modal -->
+<div modal-dialog model="createGroupMembershipDialog" ng-cloak>
+  <div class="modal hide" ng-if="createGroupMembershipDialog.renderHtml()" ng-controller="GroupMembershipDialogController"> 
+    <div class="modal-header">
+      <button ng-show="createGroupMembershipDialog.autoClosable" type="button" class="close" data-dismiss="modal">&times;</button>
+      <h3>Select Groups</h3>
+    </div>
+
+    <div class="modal-body">
+      <div notifications-panel></div>                
+      
+      <table class="table table-condensed" ng-hide="status !== 'beforeCreate' || availableGroups.length == 0">
+        <thead>
+          <tr>
+            <th></th>    
+            <th>Group Id</th>
+            <th>Group Name</th>
+            <th>Group Type</th>  
+          </tr>
+        </thead>
+        <tbody>
+          <tr ng-repeat="group in availableGroups">
+            <td>
+              <input type="checkbox" ng-model="group.checked" />
+            </td>
+            <td>
+              <a href="#/groups/{{group.id}}">{{group.id}}</a>
+            </td>            
+            <td>
+              {{group.name}}
+            </td>
+            <td>
+              {{group.type}}
+            </td>            
+          </tr>
+        </tbody>
+      </table>
+      
+      <p ng-show="availableGroups.length == 0">There are no additional groups available to which the user can be added.</p>
+
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn" ng-click="close()"
+              ng-disabled="status === 'performCreate'"
+              ng-hide="status === 'createSuccess' || status === 'createFailed' || status === 'loadingFailed'">Close</button>
+      <button class="btn btn-primary" ng-click="close(status)"
+              ng-show="status === 'createSuccess' || status === 'createFailed' || status === 'loadingFailed'">OK</button>        
+      <button class="btn btn-primary" ng-click="createGroupMemberships()"
+              ng-disabled="status !== 'beforeCreate'"
+              ng-hide="status === 'createSuccess' || status === 'createFailed' || status === 'loadingFailed' || availableGroups.length == 0">Add Groups</button>
+      
+    </div>
+  </div>
 </div>

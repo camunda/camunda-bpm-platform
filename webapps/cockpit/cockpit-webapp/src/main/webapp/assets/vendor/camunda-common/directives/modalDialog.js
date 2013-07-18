@@ -106,19 +106,7 @@ ngDefine('camunda.common.directives', [ 'angular', 'jquery' ], function(module, 
               break;    
           }
         });
-       
-        // <!>Daniel's master HACK to make sure dialog is positioned in 
-        // the middle of the screen at all times. 
-        scope.$watch(function() {
-          return $(dialog()).outerHeight();
-          }, function(after, before) {
-          if(after > before) {
-            var modal = $(dialog());
-            modal.css('margin-top', (modal.outerHeight() / 2));
-                 //.css('margin-left', (modal.outerWidth() / 2 * -1));
-        }
-        });
-        
+               
       }
     };
   };
