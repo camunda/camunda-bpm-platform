@@ -4,8 +4,11 @@ define(['angular'], function(angular) {
 
   var module = angular.module('admin.pages');
 
-  var Controller = ['$scope', function ($scope) {
-
+  var Controller = ['$scope', 'GroupResource', function ($scope, GroupResource) {
+    
+    GroupResource.query().$then(function(response) {
+      $scope.groupList = response.data;
+    });
 
   }];
 

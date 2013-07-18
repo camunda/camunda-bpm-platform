@@ -2,7 +2,7 @@
 
 ngDefine('camunda.common.services.authentication', function(module, angular) {
 
-  var ServiceProducer = function AuthenticationFactory($http, $cookies, $q, $rootScope, Uri) {
+  var ServiceProducer = function AuthenticationFactory($http, $cookies, $q, Uri) {
 
     var AUTH_COOKIE_NAME = "CAM-AUTH";
 
@@ -18,8 +18,8 @@ ngDefine('camunda.common.services.authentication', function(module, angular) {
     };
  
     function Authentication() {
-      readAuthFromCookie(this);      
-    };
+      readAuthFromCookie(this);
+    }
 
     Authentication.prototype.username = function() {
       return this.auth.username;
@@ -29,7 +29,7 @@ ngDefine('camunda.common.services.authentication', function(module, angular) {
       this.auth = {};
     };
 
-    Authentication.prototype.login = function(username, password, processEngineName) {
+    Authentication.prototype.login = function(username, password) {
       var self = this;
 
       var form = $.param({ 'username': username, 'password': password });
@@ -41,10 +41,10 @@ ngDefine('camunda.common.services.authentication', function(module, angular) {
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
         }
-      });        
+      });
 
       return promise.then(function(response) {      
-        if(response.status == 200) {
+        if (response.status == 200) {
           self.auth.username = username;      
           return true;
         } else {
@@ -67,7 +67,7 @@ ngDefine('camunda.common.services.authentication', function(module, angular) {
   };
 
 
-  ServiceProducer.$inject = [ '$http', '$cookies', '$q', '$rootScope', 'Uri' ];
+  ServiceProducer.$inject = [ '$http', '$cookies', '$q', 'Uri' ];
 
   module.service('Authentication', ServiceProducer);
 });

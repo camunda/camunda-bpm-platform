@@ -30,7 +30,7 @@ public interface AuthorizationQuery extends Query<AuthorizationQuery, Authorizat
   AuthorizationQuery groupIdIn(String... groupIds);
   
   /** only selects authorizations for the given resource type */
-  AuthorizationQuery resourceType(String resourceType);
+  AuthorizationQuery resourceType(String resourceId);
   
   /** only selects authorizations for the given resource id */
   AuthorizationQuery resourceId(String resourceId);
@@ -43,9 +43,9 @@ public interface AuthorizationQuery extends Query<AuthorizationQuery, Authorizat
    * authorizationQuery.userId("user1")
    *   .resourceType("processDefinition")
    *   .resourceId("2313")
-   *   .hasPermission(Authorization.PERMISSION_TYPE_READ)
-   *   .hasPermission(Authorization.PERMISSION_TYPE_WRITE)
-   *   .hasPermission(Authorization.PERMISSION_TYPE_DELETE)
+   *   .hasPermission(Permissions.READ)
+   *   .hasPermission(Permissions.WRITE)
+   *   .hasPermission(Permissions.DELETE)
    *   .list();
    * </pre>
    * 
@@ -53,7 +53,7 @@ public interface AuthorizationQuery extends Query<AuthorizationQuery, Authorizat
    * Permissions for the given user. 
    * 
    */
-  AuthorizationQuery hasPermission(int permission);
+  AuthorizationQuery hasPermission(Permission permission);
   
   // order by /////////////////////////////////////////////
   

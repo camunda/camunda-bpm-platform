@@ -6,7 +6,7 @@
 	<settings>
 		<setting name="lazyLoadingEnabled" value="false" />
 	</settings>
-	<mappers>
+	<mappers>  
     <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/Attachment.xml" />
     <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/Comment.xml" />
     <mapper resource="org/camunda/bpm/engine/impl/mapping/entity/Deployment.xml" />

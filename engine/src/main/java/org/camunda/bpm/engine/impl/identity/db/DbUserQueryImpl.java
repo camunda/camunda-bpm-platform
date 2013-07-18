@@ -39,7 +39,7 @@ public class DbUserQueryImpl extends UserQueryImpl {
   public DbUserQueryImpl() {
     super();
   }
-
+  
   // results //////////////////////////////////////////////////////////
 
   public long executeCount(CommandContext commandContext) {

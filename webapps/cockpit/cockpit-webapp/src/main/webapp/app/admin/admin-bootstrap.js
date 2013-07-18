@@ -9,9 +9,9 @@
     paths: {
       'ngDefine' : 'assets/vendor/requirejs-angular-define/ngDefine',
       'domReady' : 'assets/vendor/require/domReady',
-      'jquery' : 'assets/vendor/jquery-1.7.2.min',
-      'jquery-mousewheel' : 'assets/vendor/jquery.mousewheel',
-      'jquery-overscroll' : 'assets/vendor/jquery.overscroll',
+      'jquery' : 'assets/vendor/jquery/jquery',
+      'jquery-mousewheel' : 'assets/vendor/jquery/jquery.mousewheel',
+      'jquery-overscroll' : 'assets/vendor/jquery/jquery.overscroll',
       'bootstrap' : 'assets/vendor/bootstrap/js/bootstrap',
       'bootstrap-slider' : 'assets/vendor/bootstrap-slider/bootstrap-slider',
       'angular' : 'assets/vendor/angular/angular',

@@ -48,30 +48,8 @@ ngDefine('cockpit.pages', function(module) {
       
     });
     
-    $scope.$watch('selection.elements', function (newValue) {
-      if (!newValue) {
-        return;
-      }
-      
-      if (newValue.hidden) {
-        var elements = [];
-        if (newValue.hidden === 'sidebar') {
-          elements.push('main-content');
-        }
-        $scope.selection.elements.toResize = {toGreater: elements}; 
-        return;
-      };
-
-      if (newValue.visible) {
-        var elements = [];
-        if (newValue.visible === 'sidebar') {
-          elements.push('main-content');
-        }
-        $scope.selection.elements.toResize = {toShrink: elements}; 
-        return;
-      };
-    });
-        
+    $scope.processInstance = {};
+    
     // get the process definition
     function loadProcessDefinition() {
       var deferred = $q.defer();

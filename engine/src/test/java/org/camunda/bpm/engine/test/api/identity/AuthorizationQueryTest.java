@@ -16,6 +16,8 @@ import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.identity.Authorization;
+import org.camunda.bpm.engine.identity.Permission;
+import org.camunda.bpm.engine.identity.Permissions;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 
 /**
@@ -27,15 +29,15 @@ public class AuthorizationQueryTest extends PluggableProcessEngineTestCase {
   @Override
   protected void setUp() throws Exception {
     super.setUp();
-    createAuthorization("user1", null, "resource1", "resource1-1", Authorization.PERMISSION_TYPE_ACCESS);
-    createAuthorization("user1", null, "resource2", "resource2-1", Authorization.PERMISSION_TYPE_DELETE);
+    createAuthorization("user1", null, "resource1", "resource1-1", Permissions.ACCESS);
+    createAuthorization("user1", null, "resource2", "resource2-1", Permissions.DELETE);
     createAuthorization("user2", null, "resource1", "resource1-2");
-    createAuthorization("user3", null, "resource2", "resource2-1", Authorization.PERMISSION_TYPE_READ, Authorization.PERMISSION_TYPE_WRITE);
+    createAuthorization("user3", null, "resource2", "resource2-1", Permissions.READ, Permissions.UPDATE);
     
     createAuthorization(null, "group1", "resource1", "resource1-1");
-    createAuthorization(null, "group1", "resource1", "resource1-2", Authorization.PERMISSION_TYPE_WRITE);
-    createAuthorization(null, "group2", "resource2", "resource2-2", Authorization.PERMISSION_TYPE_READ, Authorization.PERMISSION_TYPE_WRITE);
-    createAuthorization(null, "group3", "resource2", "resource2-3", Authorization.PERMISSION_TYPE_DELETE);
+    createAuthorization(null, "group1", "resource1", "resource1-2", Permissions.UPDATE);
+    createAuthorization(null, "group2", "resource2", "resource2-2", Permissions.READ, Permissions.UPDATE);
+    createAuthorization(null, "group3", "resource2", "resource2-3", Permissions.DELETE);
   }
   
   protected void tearDown() throws Exception {
@@ -46,7 +48,7 @@ public class AuthorizationQueryTest extends PluggableProcessEngineTestCase {
     super.tearDown();
   }
 
-  protected void createAuthorization(String userId, String groupId, String resourceType, String resourceId, int... permissions) {
+  protected void createAuthorization(String userId, String groupId, String resourceType, String resourceId, Permission... permissions) {
     
     Authorization authorization = authorizationService.createNewAuthorization();
     authorization.setUserId(userId);
@@ -54,7 +56,7 @@ public class AuthorizationQueryTest extends PluggableProcessEngineTestCase {
     authorization.setResourceType(resourceType);
     authorization.setResourceId(resourceId);
     
-    for (int permission : permissions) {
+    for (Permission permission : permissions) {
       authorization.addPermission(permission);
     }
     
@@ -86,14 +88,14 @@ public class AuthorizationQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(0, authorizationService.createAuthorizationQuery().resourceId("non-existing").count());
     
     // query by permission
-    assertEquals(1, authorizationService.createAuthorizationQuery().hasPermission(Authorization.PERMISSION_TYPE_ACCESS).count());
-    assertEquals(2, authorizationService.createAuthorizationQuery().hasPermission(Authorization.PERMISSION_TYPE_DELETE).count());
-    assertEquals(2, authorizationService.createAuthorizationQuery().hasPermission(Authorization.PERMISSION_TYPE_READ).count());
-    assertEquals(3, authorizationService.createAuthorizationQuery().hasPermission(Authorization.PERMISSION_TYPE_WRITE).count());
+    assertEquals(1, authorizationService.createAuthorizationQuery().hasPermission(Permissions.ACCESS).count());
+    assertEquals(2, authorizationService.createAuthorizationQuery().hasPermission(Permissions.DELETE).count());
+    assertEquals(2, authorizationService.createAuthorizationQuery().hasPermission(Permissions.READ).count());
+    assertEquals(3, authorizationService.createAuthorizationQuery().hasPermission(Permissions.UPDATE).count());
     // multiple permissions at the same time
-    assertEquals(2, authorizationService.createAuthorizationQuery().hasPermission(Authorization.PERMISSION_TYPE_READ).hasPermission(Authorization.PERMISSION_TYPE_WRITE).count());
-    assertEquals(2, authorizationService.createAuthorizationQuery().hasPermission(Authorization.PERMISSION_TYPE_WRITE).hasPermission(Authorization.PERMISSION_TYPE_READ).count());
-    assertEquals(0, authorizationService.createAuthorizationQuery().hasPermission(Authorization.PERMISSION_TYPE_READ).hasPermission(Authorization.PERMISSION_TYPE_ACCESS).count());
+    assertEquals(2, authorizationService.createAuthorizationQuery().hasPermission(Permissions.READ).hasPermission(Permissions.UPDATE).count());
+    assertEquals(2, authorizationService.createAuthorizationQuery().hasPermission(Permissions.UPDATE).hasPermission(Permissions.READ).count());
+    assertEquals(0, authorizationService.createAuthorizationQuery().hasPermission(Permissions.READ).hasPermission(Permissions.ACCESS).count());
     
     // user id & resource type
     assertEquals(1, authorizationService.createAuthorizationQuery().userIdIn("user1").resourceType("resource1").count());
@@ -129,14 +131,14 @@ public class AuthorizationQueryTest extends PluggableProcessEngineTestCase {
     assertEquals(0, authorizationService.createAuthorizationQuery().resourceId("non-existing").list().size());
     
     // query by permission
-    assertEquals(1, authorizationService.createAuthorizationQuery().hasPermission(Authorization.PERMISSION_TYPE_ACCESS).list().size());
-    assertEquals(2, authorizationService.createAuthorizationQuery().hasPermission(Authorization.PERMISSION_TYPE_DELETE).list().size());
-    assertEquals(2, authorizationService.createAuthorizationQuery().hasPermission(Authorization.PERMISSION_TYPE_READ).list().size());
-    assertEquals(3, authorizationService.createAuthorizationQuery().hasPermission(Authorization.PERMISSION_TYPE_WRITE).list().size());
+    assertEquals(1, authorizationService.createAuthorizationQuery().hasPermission(Permissions.ACCESS).list().size());
+    assertEquals(2, authorizationService.createAuthorizationQuery().hasPermission(Permissions.DELETE).list().size());
+    assertEquals(2, authorizationService.createAuthorizationQuery().hasPermission(Permissions.READ).list().size());
+    assertEquals(3, authorizationService.createAuthorizationQuery().hasPermission(Permissions.UPDATE).list().size());
     // multiple permissions at the same time
-    assertEquals(2, authorizationService.createAuthorizationQuery().hasPermission(Authorization.PERMISSION_TYPE_READ).hasPermission(Authorization.PERMISSION_TYPE_WRITE).list().size());
-    assertEquals(2, authorizationService.createAuthorizationQuery().hasPermission(Authorization.PERMISSION_TYPE_WRITE).hasPermission(Authorization.PERMISSION_TYPE_READ).list().size());
-    assertEquals(0, authorizationService.createAuthorizationQuery().hasPermission(Authorization.PERMISSION_TYPE_READ).hasPermission(Authorization.PERMISSION_TYPE_ACCESS).list().size());
+    assertEquals(2, authorizationService.createAuthorizationQuery().hasPermission(Permissions.READ).hasPermission(Permissions.UPDATE).list().size());
+    assertEquals(2, authorizationService.createAuthorizationQuery().hasPermission(Permissions.UPDATE).hasPermission(Permissions.READ).list().size());
+    assertEquals(0, authorizationService.createAuthorizationQuery().hasPermission(Permissions.READ).hasPermission(Permissions.ACCESS).list().size());
     
     // user id & resource type
     assertEquals(1, authorizationService.createAuthorizationQuery().userIdIn("user1").resourceType("resource1").list().size());

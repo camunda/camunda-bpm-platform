@@ -28,12 +28,6 @@ import org.camunda.bpm.container.impl.jmx.kernel.MBeanServiceContainer;
  */
 public class StopJcaExecutorServiceStep extends MBeanDeploymentOperationStep {
 
-  protected ExecutorService executorService;
-
-  public StopJcaExecutorServiceStep(ExecutorService executorService) {
-    this.executorService = executorService;
-  }
-
   public String getName() {
     return "Stop JCA Executor Service";
   }

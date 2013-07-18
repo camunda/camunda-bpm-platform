@@ -39,14 +39,14 @@ define(['angular'], function(angular) {
   }];
 
   var RouteConfig = [ '$routeProvider', function($routeProvider) {
-    $routeProvider.when('/users/create', {
-      templateUrl: 'pages/user-create.html',
+    $routeProvider.when('/user-create', {
+      templateUrl: 'pages/userCreate.html',
       controller: Controller
     });
 
     // multi tenacy
-    $routeProvider.when('/:engine/users/create', {
-      templateUrl: 'pages/user-create.html',
+    $routeProvider.when('/:engine/user-create', {
+      templateUrl: 'pages/userCreate.html',
       controller: Controller
     });
   }];

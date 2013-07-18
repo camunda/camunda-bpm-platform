@@ -37,6 +37,10 @@ public class DbSqlSessionFactory implements SessionFactory {
   public static final Map<String, String> databaseSpecificOrderByStatements = new HashMap<String, String>();
   public static final Map<String, String> databaseSpecificLimitBeforeNativeQueryStatements = new HashMap<String, String>();
   
+  public static final Map<String, String> databaseSpecificBitAnd1 = new HashMap<String, String>();
+  public static final Map<String, String> databaseSpecificBitAnd2 = new HashMap<String, String>();
+  public static final Map<String, String> databaseSpecificBitAnd3 = new HashMap<String, String>();
+  
   static {
     
     String defaultOrderBy = " order by ${orderBy} ";
@@ -47,8 +51,9 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificLimitBetweenStatements.put("h2", "");
     databaseSpecificOrderByStatements.put("h2", defaultOrderBy);
     databaseSpecificLimitBeforeNativeQueryStatements.put("h2", "");
-    addDatabaseSpecificStatement("h2", "selectAuthorizationByQueryCriteria", "selectAuthorizationByQueryCriteria_BITAND");
-    addDatabaseSpecificStatement("h2", "selectAuthorizationCountByQueryCriteria", "selectAuthorizationCountByQueryCriteria_BITAND");
+    databaseSpecificBitAnd1.put("h2", "BITAND(");
+    databaseSpecificBitAnd2.put("h2", ",");
+    databaseSpecificBitAnd3.put("h2", ")");    
     
 	  //mysql specific
     databaseSpecificLimitBeforeStatements.put("mysql", "");
@@ -56,6 +61,9 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificLimitBetweenStatements.put("mysql", "");
     databaseSpecificOrderByStatements.put("mysql", defaultOrderBy);
     databaseSpecificLimitBeforeNativeQueryStatements.put("mysql", "");
+    databaseSpecificBitAnd1.put("mysql", "");
+    databaseSpecificBitAnd2.put("mysql", " & ");
+    databaseSpecificBitAnd3.put("mysql", "");
     addDatabaseSpecificStatement("mysql", "selectNextJobsToExecute", "selectNextJobsToExecute_mysql");
     addDatabaseSpecificStatement("mysql", "selectExclusiveJobsToExecute", "selectExclusiveJobsToExecute_mysql");
     addDatabaseSpecificStatement("mysql", "selectProcessDefinitionsByQueryCriteria", "selectProcessDefinitionsByQueryCriteria_mysql");
@@ -63,12 +71,16 @@ public class DbSqlSessionFactory implements SessionFactory {
     addDatabaseSpecificStatement("mysql", "selectDeploymentsByQueryCriteria", "selectDeploymentsByQueryCriteria_mysql");
     addDatabaseSpecificStatement("mysql", "selectDeploymentCountByQueryCriteria", "selectDeploymentCountByQueryCriteria_mysql");
     
+    
     //postgres specific
     databaseSpecificLimitBeforeStatements.put("postgres", "");
     databaseSpecificLimitAfterStatements.put("postgres", "LIMIT #{maxResults} OFFSET #{firstResult}");
     databaseSpecificLimitBetweenStatements.put("postgres", "");
     databaseSpecificOrderByStatements.put("postgres", defaultOrderBy);
     databaseSpecificLimitBeforeNativeQueryStatements.put("postgres", "");
+    databaseSpecificBitAnd1.put("postgres", "");
+    databaseSpecificBitAnd2.put("postgres", " & ");
+    databaseSpecificBitAnd3.put("postgres", "");
     addDatabaseSpecificStatement("postgres", "insertByteArray", "insertByteArray_postgres");
     addDatabaseSpecificStatement("postgres", "updateByteArray", "updateByteArray_postgres");
     addDatabaseSpecificStatement("postgres", "selectByteArray", "selectByteArray_postgres");
@@ -94,9 +106,10 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificLimitBetweenStatements.put("oracle", "");
     databaseSpecificOrderByStatements.put("oracle", defaultOrderBy);
     databaseSpecificLimitBeforeNativeQueryStatements.put("oracle", "");
+    databaseSpecificBitAnd1.put("oracle", "BITAND(");
+    databaseSpecificBitAnd2.put("oracle", ",");
+    databaseSpecificBitAnd3.put("oracle", ")");  
     addDatabaseSpecificStatement("oracle", "selectExclusiveJobsToExecute", "selectExclusiveJobsToExecute_integerBoolean");
-    addDatabaseSpecificStatement("oracle", "selectAuthorizationByQueryCriteria", "selectAuthorizationByQueryCriteria_BITAND");
-    addDatabaseSpecificStatement("oracle", "selectAuthorizationCountByQueryCriteria", "selectAuthorizationCountByQueryCriteria_BITAND");
     
     // db2
     databaseSpecificLimitBeforeStatements.put("db2", "SELECT SUB.* FROM (");
@@ -104,14 +117,15 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificLimitBetweenStatements.put("db2", ", row_number() over (ORDER BY ${orderBy}) rnk FROM ( select distinct RES.* ");
     databaseSpecificOrderByStatements.put("db2", "");
     databaseSpecificLimitBeforeNativeQueryStatements.put("db2", "SELECT SUB.* FROM ( select RES.* , row_number() over (ORDER BY ${orderBy}) rnk FROM (");
+    databaseSpecificBitAnd1.put("db2", "BITAND(");
+    databaseSpecificBitAnd2.put("db2", ",");
+    databaseSpecificBitAnd3.put("db2", ")");  
     addDatabaseSpecificStatement("db2", "selectExclusiveJobsToExecute", "selectExclusiveJobsToExecute_integerBoolean");
     addDatabaseSpecificStatement("db2", "selectExecutionByNativeQuery", "selectExecutionByNativeQuery_mssql_or_db2");
     addDatabaseSpecificStatement("db2", "selectHistoricActivityInstanceByNativeQuery", "selectHistoricActivityInstanceByNativeQuery_mssql_or_db2");
     addDatabaseSpecificStatement("db2", "selectHistoricProcessInstanceByNativeQuery", "selectHistoricProcessInstanceByNativeQuery_mssql_or_db2");
     addDatabaseSpecificStatement("db2", "selectHistoricTaskInstanceByNativeQuery", "selectHistoricTaskInstanceByNativeQuery_mssql_or_db2");
     addDatabaseSpecificStatement("db2", "selectTaskByNativeQuery", "selectTaskByNativeQuery_mssql_or_db2");
-    addDatabaseSpecificStatement("db2", "selectAuthorizationByQueryCriteria", "selectAuthorizationByQueryCriteria_BITAND");
-    addDatabaseSpecificStatement("db2", "selectAuthorizationCountByQueryCriteria", "selectAuthorizationCountByQueryCriteria_BITAND");
     
     // mssql
     databaseSpecificLimitBeforeStatements.put("mssql", "SELECT SUB.* FROM (");
@@ -119,6 +133,9 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificLimitBetweenStatements.put("mssql", ", row_number() over (ORDER BY ${orderBy}) rnk FROM ( select distinct RES.* ");
     databaseSpecificOrderByStatements.put("mssql", "");
     databaseSpecificLimitBeforeNativeQueryStatements.put("mssql", "SELECT SUB.* FROM ( select RES.* , row_number() over (ORDER BY ${orderBy}) rnk FROM (");
+    databaseSpecificBitAnd1.put("mssql", "");
+    databaseSpecificBitAnd2.put("mssql", " &");
+    databaseSpecificBitAnd3.put("mssql", "");  
     addDatabaseSpecificStatement("mssql", "selectExclusiveJobsToExecute", "selectExclusiveJobsToExecute_integerBoolean");
     addDatabaseSpecificStatement("mssql", "selectExecutionByNativeQuery", "selectExecutionByNativeQuery_mssql_or_db2");
     addDatabaseSpecificStatement("mssql", "selectHistoricActivityInstanceByNativeQuery", "selectHistoricActivityInstanceByNativeQuery_mssql_or_db2");
