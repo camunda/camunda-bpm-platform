@@ -71,9 +71,8 @@ public class IndependentJobExecutionTest extends AbstractFoxPlatformIntegrationT
   
   @OperateOnDeployment("pa1")
   @Test
-  public void testIndependentJobExecution() {
+  public void testDeploymentAwareJobAcquisition() {
     JobExecutor jobExecutor1 = engine1Configuration.getJobExecutor();
-    JobExecutor defaultJobExecutor = processEngineConfiguration.getJobExecutor();
     
     ProcessInstance instance1 = engine1.getRuntimeService().startProcessInstanceByKey("archive1Process");
     ProcessInstance instance2 = processEngine.getRuntimeService().startProcessInstanceByKey("archive2Process");
@@ -89,10 +88,22 @@ public class IndependentJobExecutionTest extends AbstractFoxPlatformIntegrationT
     Assert.assertEquals(1, acquiredJobs.size());
     Assert.assertTrue(acquiredJobs.contains(job1.getId()));
     Assert.assertFalse(acquiredJobs.contains(job2.getId()));
+  }
+  
+  @OperateOnDeployment("pa1")
+  @Test
+  public void testDeploymentUnawareJobAcquisition() {
+    JobExecutor defaultJobExecutor = processEngineConfiguration.getJobExecutor();
+    
+    ProcessInstance instance1 = engine1.getRuntimeService().startProcessInstanceByKey("archive1Process");
+    ProcessInstance instance2 = processEngine.getRuntimeService().startProcessInstanceByKey("archive2Process");
+    
+    Job job1 = managementService.createJobQuery().processInstanceId(instance1.getId()).singleResult();
+    Job job2 = managementService.createJobQuery().processInstanceId(instance2.getId()).singleResult();
     
     // the deployment unaware configuration should return both jobs
-    commandExecutor = processEngineConfiguration.getCommandExecutorTxRequired();
-    acquiredJobs = commandExecutor.execute(new AcquireJobsCmd(defaultJobExecutor));
+    CommandExecutor commandExecutor = processEngineConfiguration.getCommandExecutorTxRequired();
+    AcquiredJobs acquiredJobs = commandExecutor.execute(new AcquireJobsCmd(defaultJobExecutor));
     
     Assert.assertEquals(2, acquiredJobs.size());
     Assert.assertTrue(acquiredJobs.contains(job1.getId()));
