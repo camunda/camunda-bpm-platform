@@ -12,30 +12,29 @@
  */
 package org.camunda.bpm.engine.rest.sub.runtime;
 
-import javax.ws.rs.DELETE;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-import org.camunda.bpm.engine.rest.dto.runtime.ActivityInstanceDto;
-import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
-import org.camunda.bpm.engine.rest.sub.VariableResource;
+import org.camunda.bpm.engine.rest.dto.runtime.JobDto;
+import org.camunda.bpm.engine.rest.dto.runtime.JobRetriesDto;
 
-public interface ProcessInstanceResource {
-
+public interface JobResource {
+	
   @GET
   @Produces(MediaType.APPLICATION_JSON)
-  ProcessInstanceDto getProcessInstance();
+  JobDto getJob();
+	  
+  @PUT
+  @Path("/retries")
+  @Consumes(MediaType.APPLICATION_JSON)
+  void setJobRetries(JobRetriesDto dto);
   
-  @DELETE
-  void deleteProcessInstance();
-  
-  @Path("/variables")
-  VariableResource getVariablesResource();
-  
-  @GET
-  @Path("/activity-instances")
-  @Produces(MediaType.APPLICATION_JSON)
-  ActivityInstanceDto getActivityInstanceTree();
+  @POST
+  @Path("/execute")
+  void executeJob();
 }

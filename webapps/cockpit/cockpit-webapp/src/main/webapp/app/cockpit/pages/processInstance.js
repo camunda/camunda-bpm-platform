@@ -8,6 +8,13 @@ ngDefine('cockpit.pages', function(module) {
     $scope.processInstance = processInstance;
 
     $scope.selection = {};
+
+    $scope.cancelProcessInstanceDialog = new Dialog();
+    $scope.cancelProcessInstanceDialog.setAutoClosable(false);
+
+    $scope.openCancelProcessInstanceDialog = function () {
+      $scope.cancelProcessInstanceDialog.open();      
+    };
     
     $scope.$watch('selection.treeDiagramMapping', function (newValue) {
       if (!newValue) {

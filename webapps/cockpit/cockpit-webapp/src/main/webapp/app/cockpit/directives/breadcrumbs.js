@@ -48,7 +48,7 @@ ngDefine('cockpit.directives', [ 'angular' ], function(module, angular) {
     };
 
     function fetchAllSuperProcessInstances (subProcessInstanceId) {
-      ProcessInstanceResource.getSuperProcessInstance({}, { subProcessInstance: subProcessInstanceId }).$then(function (response) {
+      ProcessInstanceResource.query({'subProcessInstance': subProcessInstanceId}).$then(function (response) {
 
         if (response.data.length > 0) {
           var superProcessIntance = response.data[0];

@@ -1,8 +1,10 @@
 ngDefine('admin.pages', [
   './users', 
-  './user-create', 
-  './user-edit', 
-  './groups'
+  './userCreate', 
+  './userEdit', 
+  './groups',
+  './groupCreate',
+  './groupEdit'
 ], function(module) {
 
 });

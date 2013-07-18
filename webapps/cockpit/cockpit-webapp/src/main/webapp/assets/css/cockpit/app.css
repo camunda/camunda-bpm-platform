@@ -118,12 +118,20 @@ textarea.in-place-edit {
     overflow: auto;
   }
 
-  .ctn-content-container, .ctn-column {
+  .ctn-content-container, .ctn-column, .ctn-toolbar {
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
+  }
+
+  .ctn-toolbar {
+    left: auto;
+    width: 40px;
+
+    border-left: 1px solid #E5E5E5;
+    background-color: whiteSmoke;
   }
 
   .ctn-sitebar > div {
@@ -153,6 +161,7 @@ textarea.in-place-edit {
 
   .ctn-content {
     left: 250px;
+    right: 40px;
   }
 
   .ctn-sitebar, .ctn-content {

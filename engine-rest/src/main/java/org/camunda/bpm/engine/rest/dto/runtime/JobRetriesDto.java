@@ -10,16 +10,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.rest.dto;
+package org.camunda.bpm.engine.rest.dto.runtime;
 
-public class VariableQueryParameterDto extends ConditionQueryParameterDto {
+public class JobRetriesDto {
 
-  private String name;
-  
-  public String getName() {
-    return name;
+  private int retries;
+
+  public int getRetries() {
+    return retries;
   }
-  public void setName(String name) {
-    this.name = name;
+
+  public void setRetries(int retries) {
+    this.retries = retries;
   }
 }

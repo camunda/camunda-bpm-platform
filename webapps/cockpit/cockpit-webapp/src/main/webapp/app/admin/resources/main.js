@@ -1,5 +1,6 @@
 ngDefine('admin.resources', [
-	'./userResource'
+	'./userResource',
+	'./groupResource'
 ], function(module) {
 
 });
