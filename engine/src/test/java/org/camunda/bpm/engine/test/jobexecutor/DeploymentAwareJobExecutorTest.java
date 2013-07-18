@@ -33,8 +33,6 @@ public class DeploymentAwareJobExecutorTest extends AbstractProcessEngineTestCas
   
   @Deployment(resources = "org/camunda/bpm/engine/test/jobexecutor/simpleAsyncProcess.bpmn20.xml")
   public void testProcessingOfJobsWithMatchingDeployment() {
-    // TODO: think about registering a deployment by default when deploying
-    managementService.registerDeploymentForJobExecutor(deploymentId);
 
     runtimeService.startProcessInstanceByKey("simpleAsyncProcess");
     
@@ -70,8 +68,6 @@ public class DeploymentAwareJobExecutorTest extends AbstractProcessEngineTestCas
   public void testExplicitDeploymentRegistration() {
     runtimeService.startProcessInstanceByKey("simpleAsyncProcess");
     
-    processEngine.getManagementService().registerDeploymentForJobExecutor(deploymentId);
-   
     String otherDeploymentId = 
         deployAndInstantiateWithNewEngineConfiguration(
             "org/camunda/bpm/engine/test/jobexecutor/simpleAsyncProcessVersion2.bpmn20.xml");
@@ -87,6 +83,28 @@ public class DeploymentAwareJobExecutorTest extends AbstractProcessEngineTestCas
     }
     
     repositoryService.deleteDeployment(otherDeploymentId, true);
+  }
+  
+  @Deployment(resources = "org/camunda/bpm/engine/test/jobexecutor/simpleAsyncProcess.bpmn20.xml")
+  public void testDeploymentUnregistrationOnUndeployment() {
+    Assert.assertEquals(1, managementService.getRegisteredDeployments().size());
+    
+    repositoryService.deleteDeployment(deploymentId, true);
+    
+    Assert.assertEquals(0, managementService.getRegisteredDeployments().size());
+  }
+  
+  @Deployment(resources = "org/camunda/bpm/engine/test/jobexecutor/simpleAsyncProcess.bpmn20.xml")
+  public void testNoUnregistrationOnFailingUndeployment() {
+    runtimeService.startProcessInstanceByKey("simpleAsyncProcess");
+    
+    try {
+      repositoryService.deleteDeployment(deploymentId, false);
+      Assert.fail();
+    } catch (Exception e) {
+      // should still be registered, if not successfully undeployed
+      Assert.assertEquals(1, managementService.getRegisteredDeployments().size());
+    }
   }
   
   @Deployment(resources = "org/camunda/bpm/engine/test/jobexecutor/simpleAsyncProcess.bpmn20.xml")

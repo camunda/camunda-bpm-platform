@@ -13,17 +13,25 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import java.io.Serializable;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.cfg.TransactionState;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.deploy.DeleteDeploymentFailListener;
 
 /**
  * @author Joram Barrez
+ * @author Thorben Lindhauer
  */
 public class DeleteDeploymentCmd implements Command<Void>, Serializable {
 
   private static final long serialVersionUID = 1L;
+  
+  private static Logger log = Logger.getLogger(DeleteDeploymentCmd.class.getName());
+  
   protected String deploymentId;
   protected boolean cascade;
 
@@ -40,6 +48,20 @@ public class DeleteDeploymentCmd implements Command<Void>, Serializable {
     commandContext
       .getDeploymentManager()
       .deleteDeployment(deploymentId, cascade);
+    
+    DeleteDeploymentFailListener listener = new DeleteDeploymentFailListener(deploymentId);
+    
+    try {
+      new UnregisterDeploymentCmd(deploymentId).execute(commandContext);
+    } finally {
+      try {
+        commandContext.getTransactionContext().addTransactionListener(TransactionState.ROLLED_BACK, listener);
+      } catch (Exception e) {
+        log.log(Level.FINE, "Could not register transaction synchronization. Probably the TX has already been rolled back by application code.", e);
+        listener.execute(commandContext);
+      }
+    }
+    
     
     return null;
   }
