@@ -23,6 +23,11 @@ div, textarea, input {
   box-sizing: border-box;
 }
 
+.navbar-inner {
+      box-sizing: content-box;
+  moz-box-sizing: content-box;
+}
+
 /* correct input field height */
 input {
   min-height: 30px;
