@@ -21,7 +21,7 @@ package org.camunda.bpm.engine.identity;
 public enum Permissions implements Permission {
  
   NONE("NONE", 0),
-  ALL("ALL", ~0),
+  ALL("ALL", Integer.MAX_VALUE),
   
   READ("READ", 2),
   UPDATE("UPDATE", 4),
