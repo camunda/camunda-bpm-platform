@@ -21,7 +21,7 @@ ngDefine('camunda.common.directives', [ 'jquery' ], function(module, $) {
             return;
           }
 
-          var shown = true;
+          shown = true;
           
           setTimeout(function() {
             if (shown) {
@@ -31,8 +31,8 @@ ngDefine('camunda.common.directives', [ 'jquery' ], function(module, $) {
         }
 
         function hide() {
-          $(this).tooltip('hide');
           shown = false;
+          $(this).tooltip('hide');
         }
 
         $(element)
