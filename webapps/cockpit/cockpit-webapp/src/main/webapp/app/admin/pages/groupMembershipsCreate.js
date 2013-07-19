@@ -9,7 +9,7 @@ ngDefine('admin.pages', function(module, $) {
         LOADING_FAILED = 'loadingFailed';
 
     $scope.$on('$routeChangeStart', function () {
-      $scope.createGroupMembershipDialog.close();
+      $scope.close();
     });
 
     function loadAllGroups () {
@@ -43,20 +43,21 @@ ngDefine('admin.pages', function(module, $) {
 
       var promises = [];
 
-      angular.forEach($scope.availableGroups, function(group){
-
+      function createMembership(group, user) {
         var deferred = $q.defer();
 
         if(group.checked) {             
-          GroupMembershipResource.create({'groupId': group.id, 'userId':$scope.user.id}).$then(function (response) {
+          GroupMembershipResource.create({'groupId': group.id, 'userId':user.id}).$then(function (response) {
             deferred.resolve(response.data);
           }, function (error) {
             deferred.reject(error.data);
           });
         }
+        return deferred.promise;        
+      }
 
-        promises.push(deferred.promise);
-
+      angular.forEach($scope.availableGroups, function(group){
+        promises.push(createMembership(group, $scope.user));
       });
 
       $q.all([ promises ]).then(function(results) {
