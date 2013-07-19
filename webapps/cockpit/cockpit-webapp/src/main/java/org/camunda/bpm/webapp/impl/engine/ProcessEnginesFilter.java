@@ -42,7 +42,7 @@ public class ProcessEnginesFilter extends AbstractTemplateFilter {
 
         // access to /app/
         // redirect to /app/{defaultEngineName}/
-        response.sendRedirect(String.format("%s/app/%s/%s/index.html", contextPath, appName, getDefaultEngineName()));
+        response.sendRedirect(String.format("%s/app/%s/%s/", contextPath, appName, getDefaultEngineName()));
       } else {
 
         // access to /app/{engineName},
@@ -66,7 +66,7 @@ public class ProcessEnginesFilter extends AbstractTemplateFilter {
       request.getRequestDispatcher("/app/" + appName + "/" + page).forward(request, response);
     }
   }
-  
+
   protected boolean checkCreateInitialUser(String engineName) {
     ProcessEngine processEngine = Cockpit.getProcessEngine(engineName);
     if(!processEngine.getIdentityService().isReadOnly()) {
@@ -76,16 +76,16 @@ public class ProcessEnginesFilter extends AbstractTemplateFilter {
   }
 
   protected void serveIndexPage(String appName, HttpServletRequest request, HttpServletResponse response) throws IOException {
-    String data = getWebResourceContents("/app/"+appName+"/index.html");
-    
+    String data = getWebResourceContents("/app/" + appName + "/index.html");
+
     data = data.replace(APP_ROOT_PLACEHOLDER, request.getContextPath());
-    
+
     response.setContentLength(data.getBytes("UTF-8").length);
     response.setContentType("text/html");
-    
+
     response.getWriter().append(data);
   }
-  
+
   protected String getDefaultEngineName() {
     return Cockpit.getRuntimeDelegate().getDefaultProcessEngine().getName();
   }
