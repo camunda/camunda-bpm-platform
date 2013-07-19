@@ -25,6 +25,8 @@ import org.camunda.bpm.engine.form.StartFormData;
 import org.camunda.bpm.engine.form.TaskFormData;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;
+import org.camunda.bpm.engine.impl.persistence.entity.VariableInstanceEntity;
+import org.camunda.bpm.engine.impl.variable.StringType;
 import org.camunda.bpm.engine.management.ActivityStatistics;
 import org.camunda.bpm.engine.management.IncidentStatistics;
 import org.camunda.bpm.engine.management.ProcessDefinitionStatistics;
@@ -85,10 +87,10 @@ public abstract class MockProvider {
   public static final String ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID = "anotherId";
   public static final boolean EXAMPLE_PROCESS_INSTANCE_IS_SUSPENDED = false;
   public static final boolean EXAMPLE_PROCESS_INSTANCE_IS_ENDED = false;
-    
+  
   // variable instance
   public static final String EXAMPLE_VARIABLE_INSTANCE_NAME = "aVariableInstanceName";
-  public static final String EXAMPLE_VARIABLE_INSTANCE_TYPE = "aVariableInstanceType";
+  public static final String EXAMPLE_VARIABLE_INSTANCE_TYPE = "String";
   public static final String EXAMPLE_VARIABLE_INSTANCE_VALUE = "aVariableInstanceValue";
   public static final String EXAMPLE_VARIABLE_INSTANCE_PROC_INST_ID = "aVariableInstanceProcInstId";
   public static final String EXAMPLE_VARIABLE_INSTANCE_EXECUTION_ID = "aVariableInstanceExecutionId";
@@ -149,7 +151,6 @@ public abstract class MockProvider {
   public static final String EXAMPLE_USER_FIRST_NAME_UPDATE = "firstNameUpdate";
   public static final String EXAMPLE_USER_LAST_NAME_UPDATE = "lastNameUpdate";
   public static final String EXAMPLE_USER_EMAIL_UPDATE = "testUpdate@example.org";
-  
   // Jobs
   public static final String EXAMPLE_JOB_ID = "aJobId";
   public static final String NON_EXISTING_JOB_ID = "aNonExistingJobId";
@@ -159,6 +160,11 @@ public abstract class MockProvider {
   public static final String EXAMPLE_EXCEPTION_MESSAGE = "aExceptionMessage";
   public static final String EXAMPLE_EMPTY_JOB_ID = "";
   public static final Date EXAMPLE_DUE_DATE = DateTime.now().toDate();
+  public static final Boolean EXAMPLE_WITH_RETRIES_LEFT = true;
+  public static final Boolean EXAMPLE_EXECUTABLE = true;
+  public static final Boolean EXAMPLE_TIMERS = true;
+  public static final Boolean EXAMPLE_MESSAGES = true;
+  public static final Boolean EXAMPLE_WITH_EXCEPTION= true;
 
   
   // tasks
@@ -241,9 +247,10 @@ public abstract class MockProvider {
   }
   
   public static VariableInstance createMockVariableInstance() {
-    VariableInstance mock = mock(VariableInstance.class);
+    VariableInstanceEntity mock = mock(VariableInstanceEntity.class);
     
     when(mock.getName()).thenReturn(EXAMPLE_VARIABLE_INSTANCE_NAME);
+    when(mock.getType()).thenReturn(new StringType());
     when(mock.getTypeName()).thenReturn(EXAMPLE_VARIABLE_INSTANCE_TYPE);
     when(mock.getValue()).thenReturn(EXAMPLE_VARIABLE_INSTANCE_VALUE);
     when(mock.getProcessInstanceId()).thenReturn(EXAMPLE_VARIABLE_INSTANCE_PROC_INST_ID);
@@ -401,15 +408,7 @@ public abstract class MockProvider {
     when(mockUser.getFirstName()).thenReturn(EXAMPLE_USER_FIRST_NAME);
     when(mockUser.getLastName()).thenReturn(EXAMPLE_USER_LAST_NAME);
     when(mockUser.getEmail()).thenReturn(EXAMPLE_USER_EMAIL);
-    return mockUser;
-  }
-  
-  public static User createMockUserUpdate() {
-    User mockUser = mock(User.class);
-    when(mockUser.getId()).thenReturn(EXAMPLE_USER_ID);
-    when(mockUser.getFirstName()).thenReturn(EXAMPLE_USER_FIRST_NAME_UPDATE);
-    when(mockUser.getLastName()).thenReturn(EXAMPLE_USER_LAST_NAME_UPDATE);
-    when(mockUser.getEmail()).thenReturn(EXAMPLE_USER_EMAIL_UPDATE);
+    when(mockUser.getPassword()).thenReturn(EXAMPLE_USER_PASSWORD);
     return mockUser;
   }
   
@@ -435,6 +434,16 @@ public abstract class MockProvider {
 	return mockList;
   }
 
+  public static User createMockUserUpdate() {
+    User mockUser = mock(User.class);
+    when(mockUser.getId()).thenReturn(EXAMPLE_USER_ID);
+    when(mockUser.getFirstName()).thenReturn(EXAMPLE_USER_FIRST_NAME_UPDATE);
+    when(mockUser.getLastName()).thenReturn(EXAMPLE_USER_LAST_NAME_UPDATE);
+    when(mockUser.getEmail()).thenReturn(EXAMPLE_USER_EMAIL_UPDATE);
+    when(mockUser.getPassword()).thenReturn(EXAMPLE_USER_PASSWORD);
+    return mockUser;
+  }
+  
   public static List<User> createMockUsers() {
     ArrayList<User> list = new ArrayList<User>();
     list.add(createMockUser());

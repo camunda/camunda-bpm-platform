@@ -21,9 +21,11 @@ public class AddVariablesService implements JavaDelegate {
     
     // Start process instance with different types of variables
     Map<String, Object> variables = new HashMap<String, Object>();
-    variables.put("longVar", 928374L);
+    
     variables.put("shortVar", (short) 123);
     variables.put("integerVar", 1234);
+    variables.put("longVar", 928374L);
+       
     variables.put("stringVar", "coca-cola");
     variables.put("dateVar", now);
     variables.put("nullVar", null);

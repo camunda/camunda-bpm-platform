@@ -19,10 +19,10 @@ package org.camunda.bpm.engine.impl.variable;
  */
 public class IntegerType implements VariableType {
 
-  private static final long serialVersionUID = 1L;
+  public static final String TYPE_NAME = "integer";
   
   public String getTypeName() {
-    return "integer";
+    return TYPE_NAME;
   }
 
   public boolean isCachable() {
@@ -52,5 +52,9 @@ public class IntegerType implements VariableType {
     }
     return Integer.class.isAssignableFrom(value.getClass())
            || int.class.isAssignableFrom(value.getClass());
+  }
+  
+  public String getTypeNameForValue(Object value) {
+    return value.getClass().getSimpleName();
   }
 }

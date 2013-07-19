@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.ServiceLoader;
 import java.util.Set;
 
-import javax.ws.rs.PathParam;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 
@@ -104,7 +103,8 @@ public class ProcessEngineRestServiceImpl implements ProcessEngineRestService {
     subResource.setRelativeRootResourceUri(rootResourcePath);
     return subResource;
   }
-
+  
+  
   public GroupRestService getGroupRestService(String engineName) {
     String rootResourcePath = getRelativeEngineUri(engineName).toASCIIString();
     GroupRestServiceImpl subResource = new GroupRestServiceImpl(engineName);
@@ -150,4 +150,5 @@ public class ProcessEngineRestServiceImpl implements ProcessEngineRestService {
       throw new RestException(Status.INTERNAL_SERVER_ERROR, "No process engine provider found");
     }
   }
+
 }

@@ -1,0 +1,44 @@
+<div class="container">
+  <section id="groups">
+    <div class="row">
+      <div class="page-header">
+        <h1>Create New Group</h1>
+      </div>
+    </div>
+    <div class="row">
+      <form class="form-horizontal" name="createGroupForm">
+        
+        <div class="control-group">
+          <label class="control-label" for="inputGroupId">Group Id*</label>
+          <div class="controls">
+            <input id="inputGroupId" name="groupId" type="text" ng-model="group.id" novalidate required></input>
+            <span class="help-inline" ng-show="createGroupForm.groupId.$error.required">Group Id is required.</span>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <label class="control-label" for="inputName">Group Name*</label>
+          <div class="controls">
+            <input id="inputName" name="groupName" type="text" ng-model="group.name" novalidate required></input>
+            <span class="help-inline" ng-show="createGroupForm.groupName.$error.required">Name is required.</span>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <label class="control-label" for="inputType">Group Type</label>
+          <div class="controls">
+            <input id="inputType" name="groupType" type="text" ng-model="group.type"></input>
+          </div>
+        </div>
+
+        <div class="control-group">
+          <div class="controls">
+            <a class="btn" href="#/groups">Cancel</a>
+            <button type="submit" class="btn btn-primary"  data-ng-disabled="!createGroupForm.$valid" data-ng-click="createGroup()">Create new Group</button>
+          </div>
+        </div>
+     
+      </form>
+    </div>
+  </section>
+</div>

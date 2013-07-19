@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<process-application
+  xmlns="http://www.camunda.org/schema/1.0/ProcessApplication"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.camunda.org/schema/1.0/ProcessApplication http://www.camunda.org/schema/1.0/ProcessApplication ">
+
+  <process-archive name="archive2">
+    <process-engine>default</process-engine>
+    <process>org/camunda/bpm/integrationtest/jobexecutor/archive2process.bpmn20.xml</process>
+  
+    <properties>      
+      <property name="isDeleteUponUndeploy">true</property>
+      <property name="isScanForProcessDefinitions">false</property>
+    </properties>
+  </process-archive>
+
+</process-application>

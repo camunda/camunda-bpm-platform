@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.engine.rest.sub.runtime.impl;
 
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -59,12 +60,25 @@ public class ExecutionResourceImpl implements ExecutionResource {
   @Override
   public void signalExecution(ExecutionTriggerDto triggerDto) {
     RuntimeService runtimeService = engine.getRuntimeService();
-    Map<String, Object> variables = DtoUtil.toMap(triggerDto.getVariables());
     try {
+      Map<String, Object> variables = DtoUtil.toMap(triggerDto.getVariables());
       runtimeService.signal(executionId, variables);
+      
     } catch (ProcessEngineException e) {
       throw new RestException(Status.INTERNAL_SERVER_ERROR, e, "Cannot signal execution " + executionId + ": " + e.getMessage());
-    }    
+      
+    } catch (NumberFormatException e) {
+      String errorMessage = String.format("Cannot signal execution %s due to number format exception: %s", executionId, e.getMessage());
+      throw new RestException(Status.BAD_REQUEST, e, errorMessage);
+      
+    } catch (ParseException e) {
+      String errorMessage = String.format("Cannot signal execution %s due to parse exception: %s", executionId, e.getMessage());
+      throw new RestException(Status.BAD_REQUEST, e, errorMessage);      
+    
+    } catch (IllegalArgumentException e) {
+      String errorMessage = String.format("Cannot signal execution %s: %s", executionId, e.getMessage());
+      throw new RestException(Status.BAD_REQUEST, errorMessage);  
+    }
   }
 
   @Override

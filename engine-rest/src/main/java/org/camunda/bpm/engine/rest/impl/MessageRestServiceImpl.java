@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.engine.rest.impl;
 
+import java.text.ParseException;
 import java.util.Map;
 
 import javax.ws.rs.core.Response.Status;
@@ -42,13 +43,28 @@ public class MessageRestServiceImpl extends AbstractRestProcessEngineAware imple
     }
     
     RuntimeService runtimeService = processEngine.getRuntimeService();
-    Map<String, Object> correlationKeys = DtoUtil.toMap(messageDto.getCorrelationKeys());
-    Map<String, Object> processVariables = DtoUtil.toMap(messageDto.getProcessVariables());
+    
     try {
+      Map<String, Object> correlationKeys = DtoUtil.toMap(messageDto.getCorrelationKeys());
+      Map<String, Object> processVariables = DtoUtil.toMap(messageDto.getProcessVariables());
+      
       runtimeService.correlateMessage(messageDto.getMessageName(), messageDto.getBusinessKey(), 
           correlationKeys, processVariables);
+      
     } catch (MismatchingMessageCorrelationException e) {
       throw new RestException(Status.BAD_REQUEST, e);
+      
+    } catch (NumberFormatException e) {
+      String errorMessage = String.format("Cannot deliver a message due to number format exception: %s", e.getMessage());
+      throw new RestException(Status.BAD_REQUEST, e, errorMessage);
+      
+    } catch (ParseException e) {
+      String errorMessage = String.format("Cannot deliver a message due to parse exception: %s", e.getMessage());
+      throw new RestException(Status.BAD_REQUEST, e, errorMessage);      
+    
+    } catch (IllegalArgumentException e) {
+      String errorMessage = String.format("Cannot deliver a message: %s", e.getMessage());
+      throw new RestException(Status.BAD_REQUEST, errorMessage);  
     }
 
   }

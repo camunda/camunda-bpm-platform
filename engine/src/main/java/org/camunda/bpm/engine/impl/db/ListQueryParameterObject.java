@@ -17,7 +17,9 @@ package org.camunda.bpm.engine.impl.db;
 /**
  * @author Daniel Meyer
  */
-public class ListQueryParameterObject {
+public class ListQueryParameterObject extends AuthorizationCheck {
+  
+  private static final long serialVersionUID = 1L;
   
   protected int maxResults = Integer.MAX_VALUE;
   protected int firstResult = 0;

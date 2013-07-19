@@ -2,28 +2,28 @@
 <html>
   <head th:fragment="head">
     <title>camunda Cycle</title>
-    
+
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- 
+    <!--
     <meta name="description" content="" />
     -->
     <meta name="author" content="camunda services GmbH" />
-    
+
     <!-- Styles -->
-    <link th:href="@{/assets/css/bootstrap.css}" rel="stylesheet" />
+    <link th:href="@{/assets/css/bootstrap.min.css}" rel="stylesheet" />
     <link th:href="@{/assets/css/bootstrap-combobox.css}" rel="stylesheet" />
     <link th:href="@{/assets/css/app.css}" rel="stylesheet" />
     <link th:href="@{/assets/css/tree.css}" rel="stylesheet" />
-    
+
     <!-- For IE6-8 support of HTML5 elements -->
     <!--[if lt IE 9]>
       <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
-    
+
     <!-- Favicon -->
     <link rel="shortcut icon" type="image/x-icon" th:href="@{/assets/img/favicon.ico}" />
-    
+
     <base th:href="${currentUrl}" th:attr="app-base=@{/app/}" />
   </head>
   <body>
@@ -31,9 +31,9 @@
     <a th:fragment="logo" class="brand ir" th:href="@{/app/secured/view/index}">
       camunda cycle
     </a>
-    
+
     <!-- default navigation -->
-    <div th:fragment="navigation-default" class="navbar navbar-fixed-top content-container">
+    <div th:fragment="navigation-default" class="navbar navbar-inverse navbar-fixed-top content-container">
       <div class="navbar-inner">
         <div class="container-fluid">
           <a th:substituteby="fragment/common :: logo"></a>
@@ -41,9 +41,9 @@
         </div>
       </div>
     </div>
-    
+
     <!-- logged in navigation -->
-    <div th:fragment="navigation-logged-in" class="navbar navbar-fixed-top content-container">
+    <div th:fragment="navigation-logged-in" class="navbar navbar-inverse navbar-fixed-top content-container">
       <div class="navbar-inner">
         <div class="container-fluid">
           <a th:substituteby="fragment/common :: logo"></a>
@@ -78,41 +78,41 @@
         </div>
       </div>
     </div>
-    
+
     <!-- breadcrumbs -->
     <div th:fragment="breadcrumbs" class="row-fluid breadcrumbs">
       <div class="span12">
         <div>
           <ul class="breadcrumb">
             <li>
-              <a th:href="@{/app/secured/view/index/#/}">Home</a> 
+              <a th:href="@{/app/secured/view/index/#/}">Home</a>
             </li>
             <li ng-repeat="breadCrumb in breadCrumbs" ng-cloak>
-              <span class="divider">/</span> 
+              <span class="divider">/</span>
               <a href="#{{breadCrumb.href}}">{{breadCrumb.name}}</a>
             </li>
           </ul>
         </div>
       </div>
     </div>
-     
+
     <!-- footer -->
     <footer class="content-container" th:fragment="footer">
       <div class="container-fluid">
         <p><a th:href="@{/app/secured/view/index}">camunda cycle</a> / version ${project.version}</p>
       </div>
 
-      <script th:src="@{/assets/js/lib/jquery-1.7.2.min.js}"></script>      
+      <script th:src="@{/assets/js/lib/jquery-1.7.2.min.js}"></script>
       <script th:src="@{/assets/js/lib/bootstrap/bootstrap.js}"></script>
       <script th:src="@{/assets/js/lib/bootstrap/bootstrap-combobox.js}"></script>
       <script th:src="@{/assets/js/lib/angular/angular.js}"></script>
       <script th:src="@{/assets/js/lib/angular/angular-resource.js}"></script>
       <script th:src="@{/assets/js/lib/dojo/dojo/dojo.js}"></script>
-      
-      <!-- 
+
+      <!--
       <script th:src="@{'assets/js/lib/angular/i18n/angular-locale-' + ${locale} + '.js'}"></script>
       -->
-      
+
       <script th:src="@{/assets/js/app/extensions.js}"></script>
       <script th:src="@{/assets/js/app/directives.js}"></script>
       <script th:src="@{/assets/js/app/app.js}"></script>

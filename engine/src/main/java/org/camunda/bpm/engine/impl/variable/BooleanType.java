@@ -18,11 +18,11 @@ package org.camunda.bpm.engine.impl.variable;
  * @author Frederik Heremans
  */
 public class BooleanType implements VariableType {
-
-  private static final long serialVersionUID = 1L;
   
+  public static final String TYPE_NAME = "boolean";
+
   public String getTypeName() {
-    return "boolean";
+    return TYPE_NAME;
   }
 
   public boolean isCachable() {
@@ -55,5 +55,9 @@ public class BooleanType implements VariableType {
     }
     return Boolean.class.isAssignableFrom(value.getClass())
            || boolean.class.isAssignableFrom(value.getClass());
+  }
+
+  public String getTypeNameForValue(Object value) {
+    return value.getClass().getSimpleName();
   }
 }

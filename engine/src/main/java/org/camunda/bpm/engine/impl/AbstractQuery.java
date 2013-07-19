@@ -16,6 +16,7 @@ import java.io.Serializable;
 import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.identity.Authorization;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.ListQueryParameterObject;
 import org.camunda.bpm.engine.impl.interceptor.Command;
@@ -50,11 +51,10 @@ public abstract class AbstractQuery<T extends Query<?,?>, U> extends ListQueryPa
   protected QueryProperty orderProperty;
 
   protected AbstractQuery() {
-    parameter = this;
   }
-  
+
   protected AbstractQuery(CommandExecutor commandExecutor) {
-    this.commandExecutor = commandExecutor;
+    this.commandExecutor = commandExecutor;    
   }
   
   public AbstractQuery(CommandContext commandContext) {

@@ -50,4 +50,8 @@ public class CustomObjectType implements VariableType {
   public void setValue(Object value, ValueFields valueFields) {
     valueFields.setCachedValue(value);
   }
+
+  public String getTypeNameForValue(Object value) {
+    return value.getClass().getSimpleName();
+  }
 }

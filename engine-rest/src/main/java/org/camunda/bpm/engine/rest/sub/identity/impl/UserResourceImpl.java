@@ -17,8 +17,9 @@ import javax.ws.rs.core.Response.Status;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.identity.User;
-import org.camunda.bpm.engine.rest.dto.identity.UpdateUserPasswordDto;
+import org.camunda.bpm.engine.rest.dto.identity.UserCredentialsDto;
 import org.camunda.bpm.engine.rest.dto.identity.UserDto;
+import org.camunda.bpm.engine.rest.dto.identity.UserProfileDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.sub.identity.UserResource;
 
@@ -32,37 +33,47 @@ public class UserResourceImpl extends AbstractIdentityResource implements UserRe
     super(processEngine, userId);
   }
 
-  public UserDto getUser() {
+  public UserProfileDto getUserProfile() {
     
     User dbUser = findUserObject();    
     if(dbUser == null) {
       throw new InvalidRequestException(Status.NOT_FOUND, "User with id " + resourceId + " does not exist");
     }
     
-    return UserDto.fromUser(dbUser);
+    return UserProfileDto.fromUser(dbUser);
   }
 
 
-  public UserDto updateUser(UserDto user) {    
+  public void updateOrCreateUser(UserDto user) {    
     ensureNotReadOnly();
     
-    User dbUser = findUserObject();    
-    if(dbUser == null) {
-      throw new InvalidRequestException(Status.NOT_FOUND, "User with id " + resourceId + " does not exist");
-    }
-    
-    user.update(dbUser);        
     try {
+      
+      User dbUser = findUserObject();    
+      
+      if(dbUser == null) {
+        dbUser = identityService.newUser(resourceId);
+      }
+      
+      // update profile
+      if(user.getProfile() != null) {
+        user.getProfile().update(dbUser);
+      } 
+      
+      // update account
+      if(user.getCredentials() != null) {
+        dbUser.setPassword(user.getCredentials().getPassword());
+      }
+           
       identityService.saveUser(dbUser);
       
     } catch (ProcessEngineException e) {
       throw new InvalidRequestException(Status.INTERNAL_SERVER_ERROR, "Exception while updating user "+resourceId+": "+e.getMessage());
+      
     }
     
-    return UserDto.fromUser(dbUser);
   }
   
-
   public void deleteUser() {    
     ensureNotReadOnly();
     
@@ -74,7 +85,7 @@ public class UserResourceImpl extends AbstractIdentityResource implements UserRe
         
   }
   
-  public void updatePassword(UpdateUserPasswordDto user) {
+  public void updateCredentials(UserCredentialsDto account) {
     ensureNotReadOnly();
     
     User dbUser = findUserObject();
@@ -82,7 +93,7 @@ public class UserResourceImpl extends AbstractIdentityResource implements UserRe
       throw new InvalidRequestException(Status.NOT_FOUND, "User with id " + resourceId + " does not exist");
     }
     
-    dbUser.setPassword(user.getPassword());
+    dbUser.setPassword(account.getPassword());
     try {
       identityService.saveUser(dbUser);
       
@@ -90,6 +101,24 @@ public class UserResourceImpl extends AbstractIdentityResource implements UserRe
       throw new InvalidRequestException(Status.INTERNAL_SERVER_ERROR, "Exception while updating user "+resourceId+": "+e.getMessage());
     }
     
+  }
+  
+  public void updateProfile(UserProfileDto profile) {
+    ensureNotReadOnly();
+    
+    User dbUser = findUserObject();
+    if(dbUser == null) {
+      throw new InvalidRequestException(Status.NOT_FOUND, "User with id " + resourceId + " does not exist");
+    }
+    
+    profile.update(dbUser);
+    
+    try {
+      identityService.saveUser(dbUser);
+      
+    } catch (ProcessEngineException e) {
+      throw new InvalidRequestException(Status.INTERNAL_SERVER_ERROR, "Exception while updating user "+resourceId+": "+e.getMessage());
+    }
   }
 
   protected User findUserObject() {
@@ -101,6 +130,5 @@ public class UserResourceImpl extends AbstractIdentityResource implements UserRe
       throw new InvalidRequestException(Status.INTERNAL_SERVER_ERROR, "Exception while performing user query: "+e.getMessage());
     }
   }
-
 
 }

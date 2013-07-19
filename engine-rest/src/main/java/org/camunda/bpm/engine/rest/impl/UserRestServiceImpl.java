@@ -14,8 +14,11 @@ package org.camunda.bpm.engine.rest.impl;
 
 import java.util.List;
 
-import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
 import javax.ws.rs.core.UriInfo;
+import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -23,8 +26,8 @@ import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.identity.UserQuery;
 import org.camunda.bpm.engine.rest.UserRestService;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
-import org.camunda.bpm.engine.rest.dto.identity.UserCreateDto;
 import org.camunda.bpm.engine.rest.dto.identity.UserDto;
+import org.camunda.bpm.engine.rest.dto.identity.UserProfileDto;
 import org.camunda.bpm.engine.rest.dto.identity.UserQueryDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.sub.identity.UserResource;
@@ -48,12 +51,12 @@ public class UserRestServiceImpl extends AbstractRestProcessEngineAware implemen
     return new UserResourceImpl(getProcessEngine(), id);
   }
 
-  public List<UserDto> queryUsers(UriInfo uriInfo, Integer firstResult, Integer maxResults) {
+  public List<UserProfileDto> queryUsers(UriInfo uriInfo, Integer firstResult, Integer maxResults) {
     UserQueryDto queryDto = new UserQueryDto(uriInfo.getQueryParameters());
     return queryUsers(queryDto, firstResult, maxResults);
   }
 
-  public List<UserDto> queryUsers(UserQueryDto queryDto, Integer firstResult, Integer maxResults) {
+  public List<UserProfileDto> queryUsers(UserQueryDto queryDto, Integer firstResult, Integer maxResults) {
     
     UserQuery query = queryDto.toQuery(getProcessEngine());
     
@@ -64,8 +67,9 @@ public class UserRestServiceImpl extends AbstractRestProcessEngineAware implemen
       resultList = query.list();
     }
     
-    return UserDto.fromUserList(resultList);
+    return UserProfileDto.fromUserList(resultList);
   }
+  
 
   public CountResultDto getUserCount(UriInfo uriInfo) {
     UserQueryDto queryDto = new UserQueryDto(uriInfo.getQueryParameters());
@@ -77,23 +81,32 @@ public class UserRestServiceImpl extends AbstractRestProcessEngineAware implemen
     long count = query.count();
     return new CountResultDto(count);
   }
-
-  public UserDto createUser(UserCreateDto userDto) {
+  
+  public void createUser(UserDto userDto) {
     final IdentityService identityService = getIdentityService();
     
     if(identityService.isReadOnly()) {
-      throw new InvalidRequestException(Status.BAD_REQUEST, "Identity service implementation is read-only.");
+      throw new InvalidRequestException(Status.FORBIDDEN, "Identity service implementation is read-only.");
+    }
+    
+    UserProfileDto profile = userDto.getProfile();    
+    if(profile == null || profile.getId() == null) {
+      throw new InvalidRequestException(Status.BAD_REQUEST, "request object must provide profile information with valid id.");
     }
     
     try {
-      User newUser = identityService.newUser(userDto.getId());
-      userDto.update(newUser);
-      newUser.setPassword(userDto.getPassword());      
-      identityService.saveUser(newUser);
-      return UserDto.fromUser(newUser);
+      User newUser = identityService.newUser(profile.getId());    
+      profile.update(newUser);
       
-    } catch(RuntimeException e) {
-      throw new InvalidRequestException(Status.INTERNAL_SERVER_ERROR, "Exception while saving new user "+e.getMessage());
+      if(userDto.getCredentials() != null) {
+        newUser.setPassword(userDto.getCredentials().getPassword());
+      }
+      
+      identityService.saveUser(newUser);      
+      
+    } catch (RuntimeException e) {
+      throw new InvalidRequestException(Status.INTERNAL_SERVER_ERROR, "Exception while saving new user: "+e.getMessage());
+      
     }
   }
   

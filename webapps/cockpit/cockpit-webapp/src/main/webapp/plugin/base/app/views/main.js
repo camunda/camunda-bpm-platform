@@ -2,7 +2,7 @@ ngDefine('cockpit.plugin.base.views', [
   './dashboard/processDefinitionList',
   './dashboard/processDefinitionTiles',
   './processDefinition/processInstanceTable',
-  './processInstance/variablesTab'
+  './processInstance/variableInstancesTab'
 ], function(module) {
 
 });

@@ -14,6 +14,7 @@ ngDefine('camunda.common.directives.notificationsPanel', [
 
   module.directive('notificationsPanel', function(Notifications, $filter) {
     return {
+      restrict: 'EAC',
       scope: {
         filter: '=notificationsFilter'
       },

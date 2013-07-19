@@ -79,5 +79,8 @@ public class JPAEntityVariableType implements VariableType {
     return null;
   }
 
+  public String getTypeNameForValue(Object value) {
+    return value.getClass().getSimpleName();
+  }
  
 }

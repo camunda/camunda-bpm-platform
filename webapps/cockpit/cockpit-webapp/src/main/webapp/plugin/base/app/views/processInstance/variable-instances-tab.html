@@ -1,0 +1,107 @@
+<table class="table table-bordered table-hover table-condensed">
+  <thead>
+    <tr>
+      <th>Name</th>
+      <th>Value</th>
+      <th>Type</th>
+      <th>Scope</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr ng-repeat="variable in variables">
+      <td>
+        {{ variable.name }}
+      </td>
+      <td>
+
+        <div ng-if="!isInEditMode(variable)">
+          {{ variable.value }}
+          <span ng-if="!isSerializable(variable)" class="edit-toggle" ng-click="editVariable(variable)">
+            <i class="icon-pencil"></i>
+          </span>
+        </div>
+
+        <form ng-if="isInEditMode(variable)" ng-submit="submit(variable)" novalidate name="editVariableForm" class="inline-edit">
+
+          <fieldset>
+            <!-- handle boolean values -->
+            <div ng-if="isBoolean(variable)">
+              <label>
+                <input ng-model="getCopy(variable.id).value" ng-value="true" type="radio" name="boolean-value">
+                <span>true</span>
+              </label>
+              <label>
+                <input ng-model="getCopy(variable.id).value" ng-value="false" type="radio" name="boolean-value">
+                <span>false</span>
+              </label>                            
+            </div>
+            <!-- handle integer/short/long values -->
+            <input ng-if="isInteger(variable) || isShort(variable) || isLong(variable)" name="editIntegerValue" type="text"  
+                   numeric integer="true" ng-model="getCopy(variable.id).value" class="in-place-edit" autofocus>
+            
+            <!-- handle double/float values -->
+            <input ng-if="isDouble(variable) || isFloat(variable)" name="editFloatValue" type="text" 
+                   numeric ng-model="getCopy(variable.id).value" class="in-place-edit input" autofocus>
+
+            <!-- handle string values -->
+            <textarea ng-if="isString(variable) || isNull(variable)" rows="5" class="in-place-edit" ng-model="getCopy(variable.id).value" autofocus></textarea>
+
+            <!-- handle date values -->
+            <input ng-if="isDate(variable)" date name="editDateValue" ng-model="getCopy(variable.id).value" class="in-place-edit" type="text" autofocus>
+            
+          </fieldset>
+
+          <div class="inline-edit-footer">
+
+            <p class="variable-invalid" ng-show="editVariableForm.editDateValue.$error.date">
+              Invalid date: The date should have the pattern 'yyyy-MM-ddTHH:mm:ss'.
+            </p>
+            <p class="variable-invalid" ng-show="editVariableForm.editFloatValue.$error.numeric">
+              Invalid value: Only a float value is allowed.
+            </p>
+            <p class="variable-invalid" ng-show="editVariableForm.editIntegerValue.$error.numeric">
+              Invalid value: Only an integer value is allowed.
+            </p>
+
+            <p class="variable-invalid" ng-show="getExceptionForVariableId(variable.id)">
+              The passed value could not be stored, see error message: {{ getExceptionForVariableId(variable.id).message }}.
+            </p>
+
+            <div class="btn-group">
+              <button type="submit" class="btn btn-primary" ng-disabled="editVariableForm.$invalid" request-aware="editVariableForm">
+                <i class="icon-ok icon-white"></i>
+              </button>
+              <button type="button" class="btn" ng-click="closeInPlaceEditing(variable)">
+                <i class="icon-ban-circle"></i>
+              </button>
+            </div>
+          </div>
+
+        </form>
+        
+      </td>
+      <td>
+        {{ variable.type }}
+      </td>
+      <td>
+        <a href ng-click="selectActivityInstance(variable)" title="{{ variable.instance.id }}">
+          {{ variable.instance.name }}
+        </a>
+      </td>
+    </tr>
+
+    <tr ng-if="!variables">
+      <td colspan="4">
+        <i class="icon-loading"></i> loading process variables ...
+      </td>
+    </tr>    
+  
+    <tr ng-if="variables && !variables.length">
+      <td  colspan="4">
+        No process variables
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<div paginator total-pages="pages.total" current-page="pages.current"></div>

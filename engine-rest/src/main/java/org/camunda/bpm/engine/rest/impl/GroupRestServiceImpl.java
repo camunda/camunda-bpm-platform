@@ -76,18 +76,17 @@ public class GroupRestServiceImpl extends AbstractRestProcessEngineAware impleme
     return new CountResultDto(count);
   }
 
-  public GroupDto createGroup(GroupDto groupDto) {
+  public void createGroup(GroupDto groupDto) {
     final IdentityService identityService = getIdentityService();
     
     if(identityService.isReadOnly()) {
-      throw new InvalidRequestException(Status.BAD_REQUEST, "Identity service implementation is read-only.");
+      throw new InvalidRequestException(Status.FORBIDDEN, "Identity service implementation is read-only.");
     }
     
     try {
       Group newGroup = identityService.newGroup(groupDto.getId());
       groupDto.update(newGroup);
       identityService.saveGroup(newGroup);
-      return GroupDto.fromGroup(newGroup);
       
     } catch(RuntimeException e) {
       throw new InvalidRequestException(Status.INTERNAL_SERVER_ERROR, "Exception while saving new group "+e.getMessage());

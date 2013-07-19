@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.rest;
 
 import java.util.List;
 
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -53,6 +54,7 @@ public interface GroupRestService {
   
   @POST
   @Path("/create")
-  GroupDto createGroup(GroupDto GroupDto);
+  @Consumes(MediaType.APPLICATION_JSON)
+  void createGroup(GroupDto GroupDto);
   
 }

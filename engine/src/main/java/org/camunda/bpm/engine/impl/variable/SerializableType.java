@@ -34,8 +34,6 @@ public class SerializableType extends ByteArrayType {
 
   public static final String TYPE_NAME = "serializable";
   
-  private static final long serialVersionUID = 1L;
-  
   public String getTypeName() {
     return TYPE_NAME;
   }
@@ -104,6 +102,10 @@ public class SerializableType extends ByteArrayType {
   public boolean isAbleToStore(Object value) {
     return value instanceof Serializable;
   }
+
+  public String getTypeNameForValue(Object value) {
+    return "Serializable";
+  }
   
   protected static class ClassloaderAwareObjectInputStream extends ObjectInputStream {
 
@@ -111,7 +113,6 @@ public class SerializableType extends ByteArrayType {
       super(in);
     }
     
-    @Override
     protected Class<?> resolveClass(ObjectStreamClass desc) throws IOException, ClassNotFoundException {
       return ReflectUtil.loadClass(desc.getName());
     }

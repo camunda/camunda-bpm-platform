@@ -19,7 +19,7 @@ import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.rest.dto.identity.GroupDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
-import org.camunda.bpm.engine.rest.sub.identity.GroupMemberResource;
+import org.camunda.bpm.engine.rest.sub.identity.GroupMembersResource;
 import org.camunda.bpm.engine.rest.sub.identity.GroupResource;
 
 /**
@@ -43,7 +43,7 @@ public class GroupResourceImpl extends AbstractIdentityResource implements Group
   }
 
 
-  public GroupDto updateGroup(GroupDto group) {    
+  public void updateGroup(GroupDto group) {    
     ensureNotReadOnly();
     
     Group dbGroup = findGroupObject();    
@@ -58,8 +58,6 @@ public class GroupResourceImpl extends AbstractIdentityResource implements Group
     } catch (ProcessEngineException e) {
       throw new InvalidRequestException(Status.INTERNAL_SERVER_ERROR, "Exception while updating group "+resourceId+": "+e.getMessage());
     }
-    
-    return GroupDto.fromGroup(dbGroup);
   }
   
 
@@ -74,8 +72,8 @@ public class GroupResourceImpl extends AbstractIdentityResource implements Group
         
   }
 
-  public GroupMemberResource getGroupMembersResource() {
-    return new GroupMemberResourceImpl(processEngine, resourceId);
+  public GroupMembersResource getGroupMembersResource() {
+    return new GroupMembersResourceImpl(processEngine, resourceId);
   }
   
   protected Group findGroupObject() {

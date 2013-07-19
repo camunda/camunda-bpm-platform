@@ -21,10 +21,13 @@ import java.sql.DatabaseMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.naming.InitialContext;
@@ -331,6 +334,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected SessionFactory identityProviderSessionFactory;
 
   protected PasswordEncryptor passwordEncryptor;
+  
+  protected Set<String> registeredDeployments;
 
   // buildProcessEngine ///////////////////////////////////////////////////////
 
@@ -371,6 +376,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initCorrelationHandler();
     initIncidentHandlers();
     initPasswordDigest();
+    initDeploymentRegistration();
   }
 
   // failedJobCommandFactory ////////////////////////////////////////////////////////
@@ -635,6 +641,10 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
           properties.put("limitBetween" , DbSqlSessionFactory.databaseSpecificLimitBetweenStatements.get(databaseType));
           properties.put("orderBy" , DbSqlSessionFactory.databaseSpecificOrderByStatements.get(databaseType));
           properties.put("limitBeforeNativeQuery" , DbSqlSessionFactory.databaseSpecificLimitBeforeNativeQueryStatements.get(databaseType));
+          
+          properties.put("bitand1" , DbSqlSessionFactory.databaseSpecificBitAnd1.get(databaseType));
+          properties.put("bitand2" , DbSqlSessionFactory.databaseSpecificBitAnd2.get(databaseType));
+          properties.put("bitand3" , DbSqlSessionFactory.databaseSpecificBitAnd3.get(databaseType));
         }
         XMLConfigBuilder parser = new XMLConfigBuilder(reader,"", properties);
         Configuration configuration = parser.getConfiguration();
@@ -1063,6 +1073,13 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected void initPasswordDigest() {
     if(passwordEncryptor == null) {
       passwordEncryptor = new ShaHashDigest();
+    }
+  }
+  
+
+  protected void initDeploymentRegistration() {
+    if (registeredDeployments == null) {
+      registeredDeployments = Collections.synchronizedSet(new HashSet<String>());
     }
   }
 
@@ -1883,6 +1900,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public PasswordEncryptor getPasswordEncryptor() {
     return passwordEncryptor;
+  }
+
+  public Set<String> getRegisteredDeployments() {
+    return registeredDeployments;
+  }
+
+  public void setRegisteredDeployments(Set<String> registeredDeployments) {
+    this.registeredDeployments = registeredDeployments;
   }
 
 }

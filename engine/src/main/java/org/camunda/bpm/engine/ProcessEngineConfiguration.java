@@ -111,6 +111,7 @@ public abstract class ProcessEngineConfiguration {
   protected int idBlockSize = 100;
   protected String history = HISTORY_AUDIT;
   protected boolean jobExecutorActivate;
+  protected boolean jobExecutorDeploymentAware = false;
 
   protected String mailServerHost = "localhost";
   protected String mailServerUsername; // by default no name and password are provided, which 
@@ -144,6 +145,10 @@ public abstract class ProcessEngineConfiguration {
   protected ClassLoader classLoader;
   
   protected boolean createIncidentOnFailedJobEnabled = true;
+  
+  /** switch for controlling whether the process engine performs authorization checks.
+   * The default value is false. */
+  protected boolean isAuthorizationChecksEnabled = false;
 
   /** use one of the static createXxxx methods instead */
   protected ProcessEngineConfiguration() {
@@ -452,6 +457,15 @@ public abstract class ProcessEngineConfiguration {
     return this;
   }
   
+  public boolean isJobExecutorDeploymentAware() {
+    return jobExecutorDeploymentAware;
+  }
+
+  public ProcessEngineConfiguration setJobExecutorDeploymentAware(boolean jobExecutorDeploymentAware) {
+    this.jobExecutorDeploymentAware = jobExecutorDeploymentAware;
+    return this;
+  }
+
   public ClassLoader getClassLoader() {
     return classLoader;
   }
@@ -516,6 +530,15 @@ public abstract class ProcessEngineConfiguration {
 
   public ProcessEngineConfiguration setCreateIncidentOnFailedJobEnabled(boolean createIncidentOnFailedJobEnabled) {
     this.createIncidentOnFailedJobEnabled = createIncidentOnFailedJobEnabled;
+    return this;
+  }
+  
+  public boolean isAuthorizationChecksEnabled() {
+    return isAuthorizationChecksEnabled;
+  }
+  
+  public ProcessEngineConfiguration setAuthorizationChecksEnabled(boolean isAuthorizationChecksEnabled) {
+    this.isAuthorizationChecksEnabled = isAuthorizationChecksEnabled;
     return this;
   }
   

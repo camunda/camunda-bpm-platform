@@ -15,6 +15,8 @@ package org.camunda.bpm.application.impl.embedded;
 import org.camunda.bpm.BpmPlatform;
 import org.camunda.bpm.container.RuntimeContainerDelegate;
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
+import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 
 /**
@@ -40,6 +42,12 @@ public class EmbeddedProcessApplicationTest extends PluggableProcessEngineTestCa
     ProcessEngine processEngine = BpmPlatform.getProcessEngineService().getProcessEngine("embeddedEngine");
     assertNotNull(processEngine);
     assertEquals("embeddedEngine", processEngine.getName());
+    
+    ProcessEngineConfiguration configuration = ((ProcessEngineImpl) processEngine).getProcessEngineConfiguration();
+    
+    // assert engine properties specified
+    assertEquals(true, configuration.isJobExecutorDeploymentAware());
+    assertEquals(5, configuration.getJdbcMaxActiveConnections());
 
     processApplication.undeploy();
 

@@ -1,3 +1,15 @@
+/* Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.camunda.bpm.engine.rest;
 
 import java.util.List;
@@ -13,9 +25,10 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 
-import org.camunda.bpm.engine.rest.dto.job.JobDto;
-import org.camunda.bpm.engine.rest.dto.job.JobQueryDto;
-import org.camunda.bpm.engine.rest.sub.job.JobResource;
+import org.camunda.bpm.engine.rest.dto.CountResultDto;
+import org.camunda.bpm.engine.rest.dto.runtime.JobDto;
+import org.camunda.bpm.engine.rest.dto.runtime.JobQueryDto;
+import org.camunda.bpm.engine.rest.sub.runtime.JobResource;
 
 @Path(JobRestService.PATH)
 @Produces(MediaType.APPLICATION_JSON)
@@ -24,19 +37,32 @@ public interface JobRestService {
 	static final String PATH = "/job";
 	
 	 
-	  @Path("/{id}")
-	  JobResource getJob(@PathParam("id") String jobId);
-	  
-	  @GET
-	  @Produces(MediaType.APPLICATION_JSON)
-	  List<JobDto> getJobs(@Context UriInfo uriInfo,
-	      @QueryParam("firstResult") Integer firstResult, @QueryParam("maxResults") Integer maxResults);
+  @Path("/{id}")
+  JobResource getJob(@PathParam("id") String jobId);
+  
+  @GET
+  @Produces(MediaType.APPLICATION_JSON)
+  List<JobDto> getJobs(@Context UriInfo uriInfo,
+      @QueryParam("firstResult") Integer firstResult,
+      @QueryParam("maxResults") Integer maxResults);
 
 
-	  @POST
-	  @Consumes(MediaType.APPLICATION_JSON)
-	  @Produces(MediaType.APPLICATION_JSON)
-	  List<JobDto> queryJobs(JobQueryDto queryDto,
-	      @QueryParam("firstResult") Integer firstResult, @QueryParam("maxResults") Integer maxResults);
+  @POST
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
+  List<JobDto> queryJobs(JobQueryDto queryDto,
+      @QueryParam("firstResult") Integer firstResult,
+      @QueryParam("maxResults") Integer maxResults);
+  
+  @GET
+  @Path("/count")
+  @Produces(MediaType.APPLICATION_JSON)
+  CountResultDto getJobsCount(@Context UriInfo uriInfo);
+  
+  @POST
+  @Path("/count")
+  @Consumes(MediaType.APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
+  CountResultDto queryJobsCount(JobQueryDto queryDto);
 
 }

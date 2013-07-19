@@ -169,6 +169,15 @@
       <type>war</type>
       <scope>test</scope>
     </dependency>
+    
+    <dependency>
+      <groupId>org.camunda.bpm</groupId>
+      <artifactId>camunda-engine-rest</artifactId>
+      <scope>test</scope>
+      <type>jar</type>
+      <classifier>classes</classifier>
+      <version>${project.version}</version>
+    </dependency>
 
     <!-- db drivers for maven sql -->
     <dependency>
@@ -237,7 +246,7 @@
           <scope>test</scope>
           <type>war</type>
           <version>${project.version}</version>
-        </dependency>
+        </dependency>        
       </dependencies>
 
       <build>
@@ -302,9 +311,9 @@
                   <groupId>org.camunda.bpm.cockpit</groupId>
                   <artifactId>camunda-cockpit-jboss</artifactId>
                   <type>war</type>
-                  <pingURL>http://localhost:${jboss.http.port}/cockpit</pingURL>
+                  <pingURL>http://localhost:${jboss.http.port}/camunda</pingURL>
                   <properties>
-                    <context>cockpit</context>
+                    <context>camunda</context>
                   </properties>
                 </deployable>
                 <deployable>
@@ -453,9 +462,9 @@
                   <groupId>org.camunda.bpm.cockpit</groupId>
                   <artifactId>camunda-cockpit-glassfish</artifactId>
                   <type>war</type>
-                  <pingURL>http://localhost:${http.port}/cockpit</pingURL>
+                  <pingURL>http://localhost:${http.port}/camunda</pingURL>
                   <properties>
-                    <context>cockpit</context>
+                    <context>camunda</context>
                   </properties>
                 </deployable>
                 <deployable>
@@ -576,9 +585,9 @@
                   <groupId>org.camunda.bpm.cockpit</groupId>
                   <artifactId>camunda-cockpit-tomcat</artifactId>
                   <type>war</type>
-                  <pingURL>http://localhost:${tomcat6.connector.http.port}/cockpit</pingURL>
+                  <pingURL>http://localhost:${tomcat6.connector.http.port}/camunda</pingURL>
                   <properties>
-                    <context>cockpit</context>
+                    <context>camunda</context>
                   </properties>
                 </deployable>
                 <deployable>

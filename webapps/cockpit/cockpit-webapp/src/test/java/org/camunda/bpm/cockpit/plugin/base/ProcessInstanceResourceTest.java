@@ -16,8 +16,8 @@ import static org.fest.assertions.Assertions.assertThat;
 
 import java.util.List;
 
-import org.camunda.bpm.cockpit.plugin.base.dto.IncidentDto;
-import org.camunda.bpm.cockpit.plugin.base.resources.ProcessInstanceResource;
+import org.camunda.bpm.cockpit.impl.plugin.base.dto.IncidentDto;
+import org.camunda.bpm.cockpit.impl.plugin.base.resources.ProcessInstanceResource;
 import org.camunda.bpm.cockpit.plugin.test.AbstractCockpitPluginTest;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;

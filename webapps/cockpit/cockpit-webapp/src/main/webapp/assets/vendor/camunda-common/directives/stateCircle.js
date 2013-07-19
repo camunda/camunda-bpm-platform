@@ -10,11 +10,7 @@ ngDefine('camunda.common.directives', [ 'angular', 'jquery' ], function(module, 
         scope.$watch(attrs['incidents'], function() {
           updateStateCircle();
         });
-        
-        scope.$watch(attrs['incidentsForTypes'], function(oldValue, newValue) {
-          updateStateCircle();
-        });        
-        
+               
         function updateStateCircle() {
           
           var incidents = scope.$eval(attrs['incidents']);
