@@ -2,10 +2,10 @@ ngDefine('camunda.common.directives', [ 'angular', 'jquery' ], function(module, 
 
   var paginatorTmpl =
     '<div class="pagination pagination-centered">' +
-    '  <ul ngm-if="pages.length">' +
+    '  <ul ng-if="totalPages">' +
     '    <li ng-repeat="page in pages" ng-class="{ active: page.current, disabled: page.disabled }">' +
-    '      <a ngm-if="page.disabled" href ng-bind-html-unsafe="page.text"></a>' +
-    '      <a ngm-if="!page.disabled" ng-click="selectPage(page.number)" ng-bind-html-unsafe="page.text"></a>' +
+    '      <a ng-if="page.disabled" href ng-bind-html-unsafe="page.text"></a>' +
+    '      <a ng-if="!page.disabled" ng-click="selectPage(page.number)" ng-bind-html-unsafe="page.text"></a>' +
     '    </li>' +
     '  </ul>' +
     '</div>';
