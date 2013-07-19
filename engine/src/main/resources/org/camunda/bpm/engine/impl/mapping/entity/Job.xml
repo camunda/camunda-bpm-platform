@@ -68,7 +68,20 @@
 	  		(PI.SUSPENSION_STATE_ = 1)
       )
       
-      <if test="parameter.deploymentIds != null">
+      <if test="parameter.deploymentAware">
+        and (RES.DEPLOYMENT_ID_ is null 
+        <if test="parameter.deploymentIds != null">
+          or 
+          RES.DEPLOYMENT_ID_ in 
+	        <foreach item="deploymentId" index="index" collection="parameter.deploymentIds"
+	        open="(" separator="," close=")">
+	          #{deploymentId}
+	        </foreach>
+        </if>
+        )
+      </if>
+      
+      <if test="parameter.deploymentIds != null and !parameter.deploymentIds.isEmpty()">
         and (RES.DEPLOYMENT_ID_ is null or 
         RES.DEPLOYMENT_ID_ in 
         <foreach item="deploymentId" index="index" collection="parameter.deploymentIds"
@@ -198,15 +211,18 @@
 	 		or 
 	 		(PI.SUSPENSION_STATE_ = 1)     
 	    )  
-	   <if test="parameter.deploymentIds != null">
-	     and (RES.DEPLOYMENT_ID_ is null or 
-	     RES.DEPLOYMENT_ID_ in 
-	     <foreach item="deploymentId" index="index" collection="parameter.deploymentIds"
-	      open="(" separator="," close=")">
-	       #{deploymentId}
-	     </foreach>
-	     )
-	   </if>  
+	   <if test="parameter.deploymentAware">
+        and (RES.DEPLOYMENT_ID_ is null 
+        <if test="parameter.deploymentIds != null">
+          or 
+          RES.DEPLOYMENT_ID_ in 
+          <foreach item="deploymentId" index="index" collection="parameter.deploymentIds"
+          open="(" separator="," close=")">
+            #{deploymentId}
+          </foreach>
+        </if>
+        )
+      </if>  
 	  ${limitAfter}
   </select>
   
