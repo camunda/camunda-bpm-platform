@@ -111,6 +111,7 @@ public abstract class ProcessEngineConfiguration {
   protected int idBlockSize = 100;
   protected String history = HISTORY_AUDIT;
   protected boolean jobExecutorActivate;
+  protected boolean jobExecutorDeploymentAware = false;
 
   protected String mailServerHost = "localhost";
   protected String mailServerUsername; // by default no name and password are provided, which 
@@ -456,6 +457,15 @@ public abstract class ProcessEngineConfiguration {
     return this;
   }
   
+  public boolean isJobExecutorDeploymentAware() {
+    return jobExecutorDeploymentAware;
+  }
+
+  public ProcessEngineConfiguration setJobExecutorDeploymentAware(boolean jobExecutorDeploymentAware) {
+    this.jobExecutorDeploymentAware = jobExecutorDeploymentAware;
+    return this;
+  }
+
   public ClassLoader getClassLoader() {
     return classLoader;
   }

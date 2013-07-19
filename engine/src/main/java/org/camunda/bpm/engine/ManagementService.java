@@ -13,7 +13,9 @@
 package org.camunda.bpm.engine;
 
 import java.sql.Connection;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.application.ProcessApplicationRegistration;
@@ -163,5 +165,25 @@ public interface ManagementService {
    * Query for the number of activity instances aggregated by activities of a single process definition.
    */
   ActivityStatisticsQuery createActivityStatisticsQuery(String processDefinitionId);
+
+  /**
+   * Get the deployments that are registered the engine's job executor.
+   * This set is only relevant, if the engine configuration property <code>jobExecutorDeploymentAware</code> is set. 
+   */
+  Set<String> getRegisteredDeployments();
+
+  /**
+   * Register a deployment for the engine's job executor. 
+   * This is required, if the engine configuration property <code>jobExecutorDeploymentAware</code> is set. 
+   * If set to false, the job executor will execute any job.
+   */
+  void registerDeploymentForJobExecutor(String deploymentId);
+  
+  /**
+   * Unregister a deployment for the engine's job executor. 
+   * If the engine configuration property <code>jobExecutorDeploymentAware</code> is set, 
+   * jobs for the given deployment will no longer get acquired.
+   */
+  void unregisterDeploymentForJobExecutor(String deploymentId);
 
 }

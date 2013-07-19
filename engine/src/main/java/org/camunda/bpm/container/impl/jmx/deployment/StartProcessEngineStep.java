@@ -14,6 +14,7 @@ package org.camunda.bpm.container.impl.jmx.deployment;
 
 import static org.camunda.bpm.container.impl.jmx.deployment.Attachments.PROCESS_APPLICATION;
 
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
@@ -105,11 +106,17 @@ public class StartProcessEngineStep extends MBeanDeploymentOperationStep {
     
     Map<String, String> properties = processEngineXml.getProperties();
     for (Entry<String, String> property : properties.entrySet()) {
+      Field propertyField = ReflectUtil.getField(property.getKey(), configurationClass);
       
-      Method setter = ReflectUtil.getSetter(property.getKey(), configurationClass, String.class);
+      if (propertyField == null) {
+        throw new ProcessEngineException("Field " + configurationClassName + "." + property.getKey() + " does not exist.");
+      }
+      
+      Method setter = ReflectUtil.getSetter(property.getKey(), configurationClass, propertyField.getType());
       if(setter != null) {
         try {
-          setter.invoke(configuration, property.getValue());
+          Object value = convertToFieldType(property.getValue(), propertyField);
+          setter.invoke(configuration, value);
         } catch (Exception e) {
           throw new ProcessEngineException("Could not set value for property '"+property.getKey(), e);
         }
@@ -133,6 +140,19 @@ public class StartProcessEngineStep extends MBeanDeploymentOperationStep {
     JmxManagedProcessEngine managedProcessEngineService = new JmxManagedProcessEngineController(configuration);
     serviceContainer.startService(ServiceTypes.PROCESS_ENGINE, configuration.getProcessEngineName(), managedProcessEngineService);
             
+  }
+  
+  protected Object convertToFieldType(String value, Field field) {
+    Object propertyValue;
+    Class<?> expectedPropertyClass = field.getType();
+    if (expectedPropertyClass.isAssignableFrom(int.class)) {
+      propertyValue = Integer.parseInt(value);
+    } else if (expectedPropertyClass.isAssignableFrom(boolean.class)) {
+      propertyValue = Boolean.parseBoolean(value);
+    } else {
+      propertyValue = value;
+    }
+    return propertyValue;
   }
 
   protected JobExecutor getJobExecutorService(final MBeanServiceContainer serviceContainer) {
