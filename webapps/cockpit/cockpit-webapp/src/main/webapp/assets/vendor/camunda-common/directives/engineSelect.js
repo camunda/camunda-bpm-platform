@@ -30,7 +30,22 @@ ngDefine('camunda.common.directives', [
     return {
       templateUrl: require.toUrl('./engineSelect.html'),
       replace: true,
-      controller: ProcessEngineSelectionController
+      controller: ProcessEngineSelectionController, 
+      link: function(scope, element, attrs) {
+
+        var divider;
+
+        scope.$watch(attrs['ngShow'], function(newValue) {
+          if (newValue && !divider) {
+            divider = $('<li class="divider-vertical"></li>').insertAfter(element);
+          }
+
+          if (!newValue && divider) {
+            divider.remove();
+            divider = null;
+          }
+        });
+      }
     };
   };
 

@@ -183,27 +183,27 @@ Utilities
  * LAYOUT
  ****************************/
 
-.ctn-main {
-  position: absolute;
-  top: 41px;
-  left: 0;
-  bottom: 0;
-  right: 0;
-
-  overflow: auto;
-}
-
-@media (max-width: 767px) {
+@media (min-width: 768px) {
   .ctn-main {
-    top: 61px;
+    position: absolute;
+    top: 41px;
+    left: 0;
+    bottom: 0;
+    right: 0;
+
+    overflow: auto;
+  }
+
+  .ctn-wrapper {
+    min-height: 100%;
+    height: auto !important; /* ie7 fix */
+    height: 100%;
+    margin: 0 auto -64px;
   }
 }
 
-.ctn-wrapper {
-  min-height: 100%;
-  height: auto !important; /* ie7 fix */
-  height: 100%;
-  margin: 0 auto -64px;
+@media (max-width: 767px) {
+
 }
 
 .ctn-push-down {
