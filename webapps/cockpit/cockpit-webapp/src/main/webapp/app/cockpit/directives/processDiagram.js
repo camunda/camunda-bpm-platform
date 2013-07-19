@@ -126,6 +126,10 @@ ngDefine('cockpit.directives', [
       }
     });
     
+    $scope.$on('resize', function () {
+      $scope.$apply();
+    });
+
     /*------------------- Handle annotations/incidents ---------------------*/
     
     $scope.$watch('annotations', function(newValue) {

@@ -1,5 +1,5 @@
 <div class="nav-collapse collapse">   
-  <ul class="nav ng-scope" ng-controller="NavigationController">
+  <ul class="nav ng-scope" ng-controller="NavigationController" ng-show="userName">
 
     <li class="dropdown" ng-class="activeClass('#/user')">
       <a href="#/users">Users</a>           
@@ -12,6 +12,9 @@
 </div>
 
 <ul class="nav pull-right" ng-controller="AuthenticationController">
+
+  <li engine-select></li>
+  
   <li class="dropdown" ng-show="userName">
     <a href class="dropdown-toggle" data-toggle="dropdown">
       <i class="icon-user icon-white"></i> {{ userName }}

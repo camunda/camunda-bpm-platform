@@ -42,7 +42,7 @@ public class ProcessEnginesFilter extends AbstractTemplateFilter {
 
         // access to /app/
         // redirect to /app/{defaultEngineName}/
-        response.sendRedirect(String.format("%s/app/%s/%s/index.html", contextPath, appName, getDefaultEngineName()));
+        response.sendRedirect(String.format("%s/app/%s/%s/", contextPath, appName, getDefaultEngineName()));
       } else {
 
         // access to /app/{engineName},
@@ -58,7 +58,7 @@ public class ProcessEnginesFilter extends AbstractTemplateFilter {
   }
 
   protected void servePage(String appName, String engineName, String page, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-    if((page.equals("index.html") || page.equals("")) && checkCreateInitialUser(engineName)) {
+    if ((page.equals("index.html") || page.equals("")) && needsInitialUser(engineName)) {
       response.sendRedirect(String.format("%s/app/admin/%s/setup.html#/setup", request.getContextPath(), engineName));
     } else if ("".equals(page) || "index.html".equals(page) || "setup.html".equals(page)) {
       serveIndexPage(appName, request, response);
@@ -66,26 +66,31 @@ public class ProcessEnginesFilter extends AbstractTemplateFilter {
       request.getRequestDispatcher("/app/" + appName + "/" + page).forward(request, response);
     }
   }
-  
-  protected boolean checkCreateInitialUser(String engineName) {
+
+  protected boolean needsInitialUser(String engineName) {
     ProcessEngine processEngine = Cockpit.getProcessEngine(engineName);
+    if (processEngine == null) {
+      return false;
+    }
+
     if(!processEngine.getIdentityService().isReadOnly()) {
       return processEngine.getIdentityService().createUserQuery().count() == 0;
     }
+
     return false;
   }
 
   protected void serveIndexPage(String appName, HttpServletRequest request, HttpServletResponse response) throws IOException {
-    String data = getWebResourceContents("/app/"+appName+"/index.html");
-    
+    String data = getWebResourceContents("/app/" + appName + "/index.html");
+
     data = data.replace(APP_ROOT_PLACEHOLDER, request.getContextPath());
-    
+
     response.setContentLength(data.getBytes("UTF-8").length);
     response.setContentType("text/html");
-    
+
     response.getWriter().append(data);
   }
-  
+
   protected String getDefaultEngineName() {
     return Cockpit.getRuntimeDelegate().getDefaultProcessEngine().getName();
   }
