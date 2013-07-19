@@ -18,6 +18,7 @@ import java.util.Set;
 import javax.ws.rs.core.Application;
 
 import org.camunda.bpm.engine.rest.exception.ExceptionHandler;
+import org.camunda.bpm.engine.rest.exception.RestExceptionHandler;
 import org.camunda.bpm.engine.rest.mapper.JacksonConfigurator;
 import org.camunda.bpm.webapp.impl.security.auth.UserAuthenticationResource;
 import org.codehaus.jackson.jaxrs.JacksonJsonProvider;
@@ -35,9 +36,11 @@ public class AdminApplication extends Application {
 
     classes.add(JacksonConfigurator.class);
     classes.add(JacksonJsonProvider.class);
+    classes.add(RestExceptionHandler.class);
     classes.add(ExceptionHandler.class);
     
     classes.add(UserAuthenticationResource.class);
+    classes.add(SetupResource.class);
 
     return classes;
   }

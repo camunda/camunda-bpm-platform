@@ -5,7 +5,8 @@ ngDefine('admin.pages', [
   './groups',
   './groupCreate',
   './groupEdit',
-  './groupMembershipsCreate'
+  './groupMembershipsCreate',
+  './setup'
 ], function(module) {
 
 });

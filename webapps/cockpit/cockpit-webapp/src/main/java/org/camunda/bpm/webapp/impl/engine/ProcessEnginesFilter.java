@@ -9,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.camunda.bpm.cockpit.Cockpit;
+import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.webapp.impl.filter.AbstractTemplateFilter;
 
 /**
@@ -57,13 +58,23 @@ public class ProcessEnginesFilter extends AbstractTemplateFilter {
   }
 
   protected void servePage(String appName, String engineName, String page, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-    if ("".equals(page) || "index.html".equals(page)) {
+    if((page.equals("index.html") || page.equals("")) && checkCreateInitialUser(engineName)) {
+      response.sendRedirect(String.format("%s/app/admin/%s/setup.html#/setup", request.getContextPath(), engineName));
+    } else if ("".equals(page) || "index.html".equals(page) || "setup.html".equals(page)) {
       serveIndexPage(appName, request, response);
     } else {
       request.getRequestDispatcher("/app/" + appName + "/" + page).forward(request, response);
     }
   }
   
+  protected boolean checkCreateInitialUser(String engineName) {
+    ProcessEngine processEngine = Cockpit.getProcessEngine(engineName);
+    if(!processEngine.getIdentityService().isReadOnly()) {
+      return processEngine.getIdentityService().createUserQuery().count() == 0;
+    }
+    return false;
+  }
+
   protected void serveIndexPage(String appName, HttpServletRequest request, HttpServletResponse response) throws IOException {
     String data = getWebResourceContents("/app/"+appName+"/index.html");
     
