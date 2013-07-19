@@ -137,6 +137,7 @@ define(['angular'], function(angular) {
 
     if(!$location.search().tab) {
       $location.search({'tab': 'profile'});
+      $location.replace();
     }
 
   }];
