@@ -14,6 +14,20 @@
     <filter-name>AuthenticationFilter</filter-name>
     <url-pattern>/engine/*</url-pattern>
   </filter-mapping>
+  
+  <!-- REST cache control filter -->
+  <filter>
+    <filter-name>CacheControlFilter</filter-name>
+    <filter-class>org.camunda.bpm.engine.rest.filter.CacheControlFilter</filter-class>    
+  </filter>
+  <filter-mapping>
+    <filter-name>CacheControlFilter</filter-name>
+    <url-pattern>/engine/*</url-pattern>
+  </filter-mapping>
+  <filter-mapping>
+    <filter-name>CacheControlFilter</filter-name>
+    <url-pattern>/api/*</url-pattern>
+  </filter-mapping>
 
   <servlet>
     <servlet-name>Engine API</servlet-name>

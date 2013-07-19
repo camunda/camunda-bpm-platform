@@ -106,7 +106,6 @@ ngDefine('camunda.common.directives', [ 'angular', 'jquery' ], function(module, 
               break;    
           }
         });
-               
       }
     };
   };

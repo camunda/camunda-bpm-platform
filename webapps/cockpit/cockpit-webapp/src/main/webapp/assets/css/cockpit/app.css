@@ -295,3 +295,14 @@ textarea.in-place-edit {
 .btn-toolbar:hover {
   opacity: 1;
 }
+
+.ctn-sitebar h1 {
+  font-size: 20px;
+  line-height: 30px;
+
+  margin-top: 2px;
+}
+
+.ctn-sitebar .page-header {
+  padding-bottom: 0;
+}
