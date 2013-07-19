@@ -18,7 +18,7 @@ package org.camunda.bpm.engine.identity;
  * 
  * <p>A resource has a type and an id. The type ({@link #setResourceType(String)}) 
  * allows to group all resources of the same kind. A resource id is the identifier of 
- * an indivuidual resource instance ({@link #setResourceId(String)}). For example:
+ * an individual resource instance ({@link #setResourceId(String)}). For example:
  * the resource type could be "processDefinition" and the resource-id could be the 
  * id of an individual process definition.</p>  
  * 

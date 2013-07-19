@@ -27,6 +27,7 @@ import org.camunda.bpm.container.impl.jboss.config.ManagedProcessEngineMetadata;
 import org.camunda.bpm.container.impl.jboss.util.Tccl;
 import org.camunda.bpm.container.impl.jboss.util.Tccl.Operation;
 import org.camunda.bpm.container.impl.jmx.services.JmxManagedProcessEngineController;
+import org.camunda.bpm.container.impl.metadata.PropertyHelper;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -164,6 +165,8 @@ public class MscManagedProcessEngineController extends MscManagedProcessEngine {
     MscRuntimeContainerJobExecutor mscRuntimeContainerJobExecutor = mscRuntimeContainerJobExecutorInjector.getValue();
     processEngineConfiguration.setJobExecutor(mscRuntimeContainerJobExecutor);
     
+    PropertyHelper.applyProperties(processEngineConfiguration, processEngineMetadata.getConfigurationProperties());
+    
     processEngine = processEngineConfiguration.buildProcessEngine();        
   }
 
@@ -237,5 +240,8 @@ public class MscManagedProcessEngineController extends MscManagedProcessEngine {
   public InjectedValue<ExecutorService> getExecutorInjector() {
     return executorInjector;
   }
-  
+
+  public ManagedProcessEngineMetadata getProcessEngineMetadata() {
+    return processEngineMetadata;
+  }
 }
