@@ -89,6 +89,14 @@ public class ProcessEngineRestServiceImpl implements ProcessEngineRestService {
   }
   
   @Override
+  public JobRestService getJobRestService(String engineName) {
+	String rootResourcePath = getRelativeEngineUri(engineName).toASCIIString();
+	JobRestServiceImpl subResource = new JobRestServiceImpl(engineName);
+	subResource.setRelativeRootResourceUri(rootResourcePath);
+	return subResource;
+  }
+  
+  @Override
   public VariableInstanceRestService getVariableInstanceService(String engineName) {
     String rootResourcePath = getRelativeEngineUri(engineName).toASCIIString();
     VariableInstanceRestServiceImpl subResource = new VariableInstanceRestServiceImpl(engineName);
@@ -96,14 +104,7 @@ public class ProcessEngineRestServiceImpl implements ProcessEngineRestService {
     return subResource;
   }
   
-  @Override
-  public JobRestService getJobRestService(String engineName) {
-	String rootResourcePath = getRelativeEngineUri(engineName).toASCIIString();
-	JobRestServiceImpl subResource = new JobRestServiceImpl(engineName);
-	subResource.setRelativeRootResourceUri(rootResourcePath);
-	return subResource;
-  }
-
+  
   public GroupRestService getGroupRestService(String engineName) {
     String rootResourcePath = getRelativeEngineUri(engineName).toASCIIString();
     GroupRestServiceImpl subResource = new GroupRestServiceImpl(engineName);
