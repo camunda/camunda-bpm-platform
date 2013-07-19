@@ -13,6 +13,13 @@
 
   <!-- sitebar -->
   <div class="ctn-column ctn-sitebar ctn-collapsable" collapsable="left">
+
+    <div class="page-header">
+      <small>Process Instance</small>
+      <h1 ng-show="!!processInstance.processDefinition.name">{{ processInstance.processDefinition.name }} <span title="{{ processInstance.id }}">{{ processInstance.id | shorten:8 }}</span></h1>
+      <h1 ng-show="!processInstance.processDefinition.name">{{ processInstance.processDefinition.key }} <span title="{{ processInstance.id }}">{{ processInstance.id | shorten:8 }}</span></h1>
+    </div>
+
     <div activity-instance-tree="processInstance.activityInstanceTree" selection="selection"></div>
 
     <a class="hide-collapsable pull-right"></a>
