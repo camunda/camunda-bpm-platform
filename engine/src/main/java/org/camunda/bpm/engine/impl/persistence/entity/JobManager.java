@@ -106,10 +106,13 @@ public class JobManager extends AbstractManager {
     Map<String,Object> params = new HashMap<String, Object>();
     Date now = ClockUtil.getCurrentTime();
     params.put("now", now);
+    params.put("deploymentAware", Context.getProcessEngineConfiguration().isJobExecutorDeploymentAware());
     if (Context.getProcessEngineConfiguration().isJobExecutorDeploymentAware()) {
       Set<String> registeredDeployments = Context.getProcessEngineConfiguration().getRegisteredDeployments();
       synchronized (registeredDeployments) {
-        params.put("deploymentIds", new HashSet<String>(registeredDeployments));
+        if (!registeredDeployments.isEmpty()) {
+          params.put("deploymentIds", new HashSet<String>(registeredDeployments));
+        }
       }
     }
     return getDbSqlSession().selectList("selectNextJobsToExecute", params, page);
