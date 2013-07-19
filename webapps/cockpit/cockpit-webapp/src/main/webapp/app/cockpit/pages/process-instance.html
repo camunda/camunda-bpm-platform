@@ -1,13 +1,14 @@
 <div class="ctn-content-container ctn-collapsable-parent">
 
+  <!-- toolbar -->
   <div class="ctn-toolbar">
-      <a class="btn btn-link" href ng-click="openCancelProcessInstanceDialog()"
-          title="Cancel running process instance">
-        <i class="icon-remove-circle"></i>
-      </a>
-      <!--<a class="btn btn-link" href ng-click="openCancelProcessInstanceDialog()">
-        <i class="icon-repeat"></i>
-      </a>-->
+    <a class="btn btn-toolbar" href ng-click="openCancelProcessInstanceDialog()"
+       help
+       help-text="Cancel running process instance"
+       help-placement="'left'">
+      
+      <i class="icon-remove-circle"></i>
+    </a>
   </div>
 
   <!-- sitebar -->
@@ -69,16 +70,26 @@
 
         <p ng-show="subProcessInstances.length > 0">
           If you cancel this process instance the following sub process instances will also be canceled:
-          <ul>
-            <li ng-repeat="subProcessInstance in subProcessInstances">
-              <a href="#/process-definition/{{ subProcessInstance.definitionId }}/process-instance/{{ subProcessInstance.id }}" ng-click="close(status)">
-                {{ subProcessInstance.id | shorten:8 }}
-              </a>
-            </li>
-            <li ng-hide="subProcessInstances.length === subProcessInstancesCount">
-              and {{ subProcessInstancesCount - subProcessInstances.length }} other process instances.
-            </li>
-          </ul>
+
+          <table class="table table-bordered table-condensed">
+            <thead>
+              <tr><th>ID</th></tr>
+            </thead>
+            <tbody>
+              <tr ng-repeat="subProcessInstance in subProcessInstances">
+                <td>
+                  <a href="#/process-definition/{{ subProcessInstance.definitionId }}/process-instance/{{ subProcessInstance.id }}" ng-click="close(status)">
+                    {{ subProcessInstance.id | shorten:8 }}
+                  </a>
+                </td>
+              </tr>
+              <tr>
+                <td colspan="2" ng-hide="subProcessInstances.length === subProcessInstancesCount">
+                  and {{ subProcessInstancesCount - subProcessInstances.length }} other process instances.
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </p>
 
         <p>Do you really want to cancel this process instance?</p>
@@ -94,7 +105,6 @@
         <p>The process instance could not be canceled successfully.</p>
         <p>Maybe the process instance has already been cancelled or finished. Try to press F5 to refresh the page.</p>
       </div>
-
     </div>
 
     <div class="modal-footer">

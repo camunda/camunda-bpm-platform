@@ -8,13 +8,11 @@
     <div class="row">
       <form class="form-horizontal" name="createGroupForm">
         
-        <legend>Group</legend>
-
         <div class="control-group">
           <label class="control-label" for="inputGroupId">Group Id*</label>
           <div class="controls">
             <input id="inputGroupId" name="groupId" type="text" ng-model="group.id" novalidate required></input>
-            <p class="text-error" ng-show="createGroupForm.groupId.$error.required">Group Id is required.</p>
+            <span class="help-inline" ng-show="createGroupForm.groupId.$error.required">Group Id is required.</span>
           </div>
         </div>
 
@@ -22,7 +20,7 @@
           <label class="control-label" for="inputName">Group Name*</label>
           <div class="controls">
             <input id="inputName" name="groupName" type="text" ng-model="group.name" novalidate required></input>
-            <p class="text-error" ng-show="createGroupForm.groupName.$error.required">Name is required.</p>
+            <span class="help-inline" ng-show="createGroupForm.groupName.$error.required">Name is required.</span>
           </div>
         </div>
 
@@ -35,7 +33,8 @@
 
         <div class="control-group">
           <div class="controls">
-            <button type="submit" class="btn"  data-ng-disabled="!createGroupForm.$valid" data-ng-click="createGroup()">Create new Group</button>
+            <a class="btn" href="#/groups">Cancel</a>
+            <button type="submit" class="btn btn-primary"  data-ng-disabled="!createGroupForm.$valid" data-ng-click="createGroup()">Create new Group</button>
           </div>
         </div>
      

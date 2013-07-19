@@ -82,20 +82,6 @@ a.expand-collapse:focus {
   filter: alpha(opacity=40);
 }
 
-/** ---- toolbar button ----**/
-.ctn-toolbar > a.btn {
-  opacity: 0.2;
-  filter: alpha(opacity=10);
-
-  cursor: pointer;
-}
-
-.ctn-toolbar > a.btn:hover,
-.ctn-toolbar > a.btn:focus {
-  opacity: 0.6;
-  filter: alpha(opacity=40);
-}
-
 /** ---- in-place variable editing ----**/
 
 .in-place-edit {
@@ -212,6 +198,11 @@ textarea.in-place-edit {
     right: 0;
     bottom: 0;
   }
+
+  /** bootstrap fixes */
+  .tooltip {
+    position: absolute;
+  }
 }
 
 .resize-handle {
@@ -291,4 +282,16 @@ textarea.in-place-edit {
   line-height: 29px;
   padding: 0 10px 0 10px;
   font-size: 0.85em;
+}
+
+.btn-toolbar {
+  padding: 6px 8px;
+  line-height: 5px;
+  margin: 4px;
+
+  opacity: 0.7;
+}
+
+.btn-toolbar:hover {
+  opacity: 1;
 }

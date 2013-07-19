@@ -24,15 +24,7 @@ ngDefine('camunda.common.directives', [
         $location.path('/dashboard')
       }
     });
-
-    $scope.$watch('currentEngine', function(engine) {
-      if (engine && current !== engine.name) {
-        $window.location.href = Uri.appUri("app://../" + engine.name + "/");
-      }
-    });
   }];
-
-  console.log(require.toUrl('./engineSelect.html'));
 
   var EngineSelectDirective = function() {
     return {

@@ -12,8 +12,8 @@
 
 /** box */
 .box {
+  padding: 19px;
   position: relative;
-  padding: 5px 19px 14px;
   background-color: #fff;
   border: 1px solid #ddd;
   -webkit-border-radius: 4px;
@@ -21,4 +21,8 @@
           border-radius: 4px;
   margin-bottom: 20px;
 
+}
+
+.controls .help-inline {
+  color: #b94a48;
 }
