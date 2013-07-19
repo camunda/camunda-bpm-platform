@@ -36,7 +36,7 @@ ngDefine('camunda.common.directives', [ 'jquery' ], function(module, $) {
         }
 
         $(element)
-          .tooltip({ title: help, placement: p, trigger: 'manual' })
+          .tooltip({ title: help, placement: p, trigger: 'manual', container: 'body' })
           .click(hide)
           .hover(show, hide);
       }
