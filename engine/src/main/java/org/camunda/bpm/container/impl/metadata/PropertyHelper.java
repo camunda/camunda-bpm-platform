@@ -12,7 +12,13 @@
  */
 package org.camunda.bpm.container.impl.metadata;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.util.Map;
+
+import org.camunda.bpm.engine.ProcessEngineConfiguration;
+import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.util.ReflectUtil;
 
 /**
  * 
@@ -27,6 +33,52 @@ public class PropertyHelper {
       return defaultValue;
     } else {
       return Boolean.parseBoolean(value);
+    }
+  }
+
+  /**
+   * Converts a value to the type of the given field.
+   * @param value
+   * @param field
+   * @return
+   */
+  public static Object convertToFieldType(String value, Field field) {
+    Object propertyValue;
+    Class<?> expectedPropertyClass = field.getType();
+    if (expectedPropertyClass.isAssignableFrom(int.class)) {
+      propertyValue = Integer.parseInt(value);
+    } else if (expectedPropertyClass.isAssignableFrom(boolean.class)) {
+      propertyValue = Boolean.parseBoolean(value);
+    } else {
+      propertyValue = value;
+    }
+    return propertyValue;
+  }
+  
+  public static void applyProperty(ProcessEngineConfiguration configuration, String key, String stringValue) {
+    Class<?> configurationClass = configuration.getClass();
+    Field propertyField = ReflectUtil.getField(key, configurationClass);
+    
+    if (propertyField == null) {
+      throw new ProcessEngineException("Cannot set property " + key + " on configuration of class " + configurationClass);
+    }
+    
+    Object value = PropertyHelper.convertToFieldType(stringValue, propertyField);
+    Method setter = ReflectUtil.getSetter(key, configurationClass, propertyField.getType());
+    if(setter != null) {
+      try {
+        setter.invoke(configuration, value);
+      } catch (Exception e) {
+        throw new ProcessEngineException("Could not set value for property '"+key, e);
+      }
+    } else {
+      throw new ProcessEngineException("Could not find setter for property '"+key);
+    }
+  }
+  
+  public static void applyProperties(ProcessEngineConfiguration configuration, Map<String, String> properties) {
+    for (Map.Entry<String, String> property : properties.entrySet()) {
+      applyProperty(configuration, property.getKey(), property.getValue());
     }
   }
 

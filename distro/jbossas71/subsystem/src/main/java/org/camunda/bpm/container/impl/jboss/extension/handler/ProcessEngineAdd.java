@@ -171,7 +171,7 @@ public class ProcessEngineAdd extends AbstractAddStepHandler implements Descript
     String configuration = model.get(CONFIGURATION).asString();
     boolean isDefault = model.get(DEFAULT).asBoolean();
     
-    Map<String,Object> properties = new HashMap<String, Object>();
+    Map<String, String> properties = new HashMap<String, String>();
     if (model.hasDefined(Element.PROPERTIES.getLocalName())) {
       ModelNode propertiesNode = model.get(Element.PROPERTIES.getLocalName());
       List<Property> propertyList = propertiesNode.asPropertyList();
