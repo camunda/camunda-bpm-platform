@@ -82,9 +82,10 @@
 
       <div ng-show="status === 'beforeCancellation'">
 
-        <p ng-show="subProcessInstances.length > 0">
-          If you cancel this process instance the following sub process instances will also be canceled:
-
+        <div ng-show="subProcessInstances.length > 0">
+          <p>
+            If you cancel this process instance the following sub process instances will also be canceled:
+          </p>
           <table class="table table-bordered table-condensed">
             <thead>
               <tr><th>ID</th></tr>
@@ -104,7 +105,7 @@
               </tr>
             </tbody>
           </table>
-        </p>
+        </div>
 
         <p>Do you really want to cancel this process instance?</p>
 
