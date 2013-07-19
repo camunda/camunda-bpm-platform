@@ -68,6 +68,8 @@ public abstract class JobEntity implements Serializable, Job, PersistentObject, 
   protected String exceptionByteArrayId;
   
   protected String exceptionMessage;
+  
+  protected String deploymentId;
 
   public void execute(CommandContext commandContext) {
     ExecutionEntity execution = null;
@@ -88,12 +90,13 @@ public abstract class JobEntity implements Serializable, Job, PersistentObject, 
     
     dbSqlSession.insert(this);
     
-    // add link to execution
+    // add link to execution and deployment
     if(executionId != null) {
       ExecutionEntity execution = Context.getCommandContext()
         .getExecutionManager()
         .findExecutionById(executionId);
       execution.addJob(this);
+      this.deploymentId = execution.getProcessDefinition().getDeploymentId();
     }
   }
   
@@ -292,5 +295,13 @@ public abstract class JobEntity implements Serializable, Job, PersistentObject, 
         .selectById(ByteArrayEntity.class, exceptionByteArrayId);
     }
     return exceptionByteArray;
+  }
+
+  public String getDeploymentId() {
+    return deploymentId;
+  }
+
+  public void setDeploymentId(String deploymentId) {
+    this.deploymentId = deploymentId;
   }
 }

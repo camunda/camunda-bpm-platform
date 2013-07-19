@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.engine.rest.dto.runtime;
 
+import java.util.Date;
+
 import org.camunda.bpm.engine.runtime.Job;
 
 public class JobDto {
@@ -21,7 +23,7 @@ public class JobDto {
   private String executionId;
   private String exceptionMessage;
   private int retries;
-  private String dueDate;
+  private Date dueDate;
 
   public static JobDto fromJob(Job job) {
     JobDto dto = new JobDto();
@@ -30,7 +32,7 @@ public class JobDto {
     dto.executionId = job.getExecutionId();
     dto.exceptionMessage = job.getExceptionMessage();
     dto.retries = job.getRetries();
-    dto.dueDate = job.getDuedate().toString();
+    dto.dueDate = job.getDuedate();
     return dto;
   }
 
@@ -54,7 +56,7 @@ public class JobDto {
     return retries;
   }
 
-  public String getDueDate() {
+  public Date getDueDate() {
     return dueDate;
   }
 

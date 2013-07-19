@@ -15,10 +15,14 @@ package org.camunda.bpm.engine.impl.cmd;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import org.camunda.bpm.engine.impl.cfg.TransactionState;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
+import org.camunda.bpm.engine.impl.persistence.deploy.DeploymentFailListener;
 import org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ProcessDefinitionEntity;
 import org.camunda.bpm.engine.impl.persistence.entity.ResourceEntity;
@@ -33,6 +37,9 @@ import org.camunda.bpm.engine.repository.Deployment;
 public class DeployCmd<T> implements Command<Deployment>, Serializable {
 
   private static final long serialVersionUID = 1L;
+  
+  private static Logger log = Logger.getLogger(DeployCmd.class.getName());
+  
   protected DeploymentBuilderImpl deploymentBuilder;
 
   public DeployCmd(DeploymentBuilderImpl deploymentBuilder) {
@@ -67,6 +74,22 @@ public class DeployCmd<T> implements Command<Deployment>, Serializable {
     if (deploymentBuilder.getProcessDefinitionsActivationDate() != null) {
       scheduleProcessDefinitionActivation(commandContext, deployment);
     }
+    
+    
+    
+    try {
+      new RegisterDeploymentCmd(deployment.getId()).execute(commandContext);
+    } finally {
+      DeploymentFailListener listener = new DeploymentFailListener(deployment.getId());
+      
+      try {
+        commandContext.getTransactionContext().addTransactionListener(TransactionState.ROLLED_BACK, listener);
+      } catch (Exception e) {
+        log.log(Level.FINE, "Could not register transaction synchronization. Probably the TX has already been rolled back by application code.", e);
+        listener.execute(commandContext);
+      }
+    }
+    
     
     return deployment;
   }

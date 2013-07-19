@@ -66,6 +66,7 @@ create table ACT_RU_JOB (
     REPEAT_ nvarchar(255),
     HANDLER_TYPE_ nvarchar(255),
     HANDLER_CFG_ nvarchar(4000),
+    DEPLOYMENT_ID_ nvarchar(64),
     primary key (ID_)
 );
 
