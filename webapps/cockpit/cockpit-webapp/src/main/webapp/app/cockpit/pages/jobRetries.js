@@ -30,14 +30,12 @@ ngDefine('cockpit.pages', function(module, $) {
         return;
       }
 
-      var currentPage = newValue || 1
-      if (currentPage === oldValue) {
+      if (newValue === oldValue) {
         return;
       }
 
-
-      jobPages.current = currentPage;
-      updateJobTable(currentPage);
+      jobPages.current = newValue;
+      updateJobTable(newValue);
     });
 
     function updateJobTable(page) {
@@ -101,14 +99,12 @@ ngDefine('cockpit.pages', function(module, $) {
 
       if (failedJob.selected === true) {
         if (index === -1) {
-          jobIdToFailedJobMap[failedJob.id] = failedJob;
           selectedFailedJobIds.push(failedJob.id);
         }
         return;
       }
 
       if (failedJob.selected === false) {
-        jobIdToFailedJobMap[failedJob.id] = null;
         selectedFailedJobIds.splice(index, 1);
         if ($scope.allJobsSelected === true) {
           $scope.allJobsSelected = false;  
