@@ -120,6 +120,9 @@ ngDefine(
 
               collapsableElement.css(changeAttr, pos + pxc);
               compensateElement.css(direction, pos + pxc);
+            })
+            .on('dragstop', function(event) {
+              scope.$broadcast('resize', [ event ]);
             });
 
           hideHandle.click(function() {
