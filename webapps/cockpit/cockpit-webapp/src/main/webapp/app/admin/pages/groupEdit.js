@@ -72,6 +72,7 @@ define(['angular'], function(angular) {
 
     if(!$location.search().tab) {
       $location.search({'tab': 'group'});
+      $location.replace();
     }
 
   }];
