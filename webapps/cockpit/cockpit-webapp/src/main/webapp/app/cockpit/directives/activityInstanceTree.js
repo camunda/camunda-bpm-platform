@@ -3,10 +3,10 @@
 ngDefine('cockpit.directives', [ 'angular' ], function(module, angular) {
   
   var buttonTemplate =
-  '  <button ng-show="!activityInstanceTree.isOpen" type="button" ng-click="open(activityInstanceTree)" class="invisible-button">' + 
+  '  <button ng-show="!activityInstanceTree.isOpen" type="button" ng-click="open(activityInstanceTree)" class="btn-link">' + 
   '    <i class="icon-plus"></i>' +
   '  </button>' +  
-  '  <button ng-show="activityInstanceTree.isOpen" type="button" ng-click="close(activityInstanceTree)" class="invisible-button">' + 
+  '  <button ng-show="activityInstanceTree.isOpen" type="button" ng-click="close(activityInstanceTree)" class="btn-link">' + 
   '    <i class="icon-minus"></i>' +
   '  </button>';
   
