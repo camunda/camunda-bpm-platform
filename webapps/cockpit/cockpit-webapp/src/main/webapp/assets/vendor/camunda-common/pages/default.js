@@ -30,8 +30,15 @@ ngDefine('camunda.common.pages', function(module) {
     };
   };
 
-  var DefaultController = [ '$rootScope', 'Notifications', 'Authentication', '$location', function($rootScope, Notifications, Authentication, $location) {
+  var DefaultController = [ '$scope', '$rootScope', 'Notifications', 'Authentication', '$location', function($scope, $rootScope, Notifications, Authentication, $location) {
     $rootScope.$on("responseError", new ResponseErrorHandler(Notifications, Authentication, $location).handlerFn);
+
+    $scope.authentication = Authentication;
+
+    $scope.$watch('authentication.auth.username', function(newValue) {
+      $scope.userName = newValue;
+    });
+
   }];
 
   var ProcessEngineSelectionController = [
@@ -41,7 +48,7 @@ ngDefine('camunda.common.pages', function(module) {
     var current = Uri.appUri(':engine');
     var enginesByName = {};
 
-    $http.get(Uri.appUri('engine://engine/')).then(function(response) {
+    $http.get(Uri.appUri('engine://engine/')).then(function(response) { 
       $scope.engines = response.data;
 
       angular.forEach($scope.engines , function(engine) {
@@ -64,8 +71,8 @@ ngDefine('camunda.common.pages', function(module) {
   }];
 
   var NavigationController = [
-    '$scope', '$location', 'Uri',
-    function($scope, $location, Uri) {
+    '$scope', '$location', 'Authentication',
+    function($scope, $location, Authentication) {
 
       $scope.activeClass = function(link) {
         var path = $location.absUrl();      
@@ -74,15 +81,9 @@ ngDefine('camunda.common.pages', function(module) {
   }];
 
   var AuthenticationController = [
-    '$scope', 'Notifications', 'Authentication', '$location', 'Uri',
-    function($scope, Notifications, Authentication, $location, Uri) {
+    '$scope', 'Notifications', 'Authentication', '$location',
+    function($scope, Notifications, Authentication, $location) {
   
-      $scope.authentication = Authentication;
-
-      $scope.$watch('authentication.auth.username', function(newValue) {
-        $scope.userName = newValue;
-      });
-
       $scope.logout = function() {
         Authentication.logout();
         $location.path("/");
