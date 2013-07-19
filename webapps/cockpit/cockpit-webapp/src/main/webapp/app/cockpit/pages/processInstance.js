@@ -12,8 +12,15 @@ ngDefine('cockpit.pages', function(module) {
     $scope.cancelProcessInstanceDialog = new Dialog();
     $scope.cancelProcessInstanceDialog.setAutoClosable(false);
 
+    $scope.jobRetriesDialog = new Dialog();
+    $scope.jobRetriesDialog.setAutoClosable(false);
+
     $scope.openCancelProcessInstanceDialog = function () {
       $scope.cancelProcessInstanceDialog.open();      
+    };
+
+    $scope.openJobRetriesDialog = function () {
+      $scope.jobRetriesDialog.open();      
     };
     
     $scope.$watch('selection.treeDiagramMapping', function (newValue) {
@@ -125,6 +132,10 @@ ngDefine('cockpit.pages', function(module) {
 
         decorateActivityInstanceTree($scope.processInstance.activityInstanceTree, $scope.processInstance.activityIdToBpmnElementMap, $scope.processInstance.activityIdToInstancesMap, $scope.processInstance.instanceIdToInstanceMap, $scope.processInstance.semantic, processDefinition);
        
+        $scope.processInstance.executionIdToInstanceMap = {};
+
+        createExecutionIdToActivityInstanceMap($scope.processInstance.instanceIdToInstanceMap, $scope.processInstance.executionIdToInstanceMap);
+
         // contains activity id the current count of activity/transition instances
         $scope.processInstance.activityInstanceStatistics = [];
 
@@ -176,6 +187,25 @@ ngDefine('cockpit.pages', function(module) {
         }
         
       });
+    }
+
+    function createExecutionIdToActivityInstanceMap (instanceIdToInstanceMap, result) {
+      for (var key in instanceIdToInstanceMap) {
+        var instance = instanceIdToInstanceMap[key];
+
+        var executionIds = instance.executionIds;
+        if (executionIds) {
+          for (var i = 0, executionId; !!(executionId = executionIds[i]); i++) {
+            result[executionId] = instance;
+          }          
+        }
+
+        var executionId = instance.executionId;
+        if (executionId) {
+          result[executionId] = instance;
+        }
+
+      }
     }
 
     function decorateActivityInstanceTree(activityInstanceTree, activityIdToBpmnElementMap, activityIdToInstancesMap, instanceIdToInstanceMap, semantic, processDefinition) {

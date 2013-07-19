@@ -21,7 +21,7 @@
           </span>
         </div>
 
-        <form ng-if="isInEditMode(variable)" ng-submit="submit(variable)" novalidate name="editVariableForm" style="margin-bottom: 35px;">
+        <form ng-if="isInEditMode(variable)" ng-submit="submit(variable)" novalidate name="editVariableForm" class="inline-edit">
 
           <fieldset>
             <!-- handle boolean values -->
@@ -51,7 +51,7 @@
             
           </fieldset>
 
-          <div style="position:relative; width: 100%; padding-right: 80px;">
+          <div class="inline-edit-footer">
 
             <p class="variable-invalid" ng-show="editVariableForm.editDateValue.$error.date">
               Invalid date: The date should have the pattern 'yyyy-MM-ddTHH:mm:ss'.
@@ -67,7 +67,7 @@
               The passed value could not be stored, see error message: {{ getExceptionForVariableId(variable.id).message }}.
             </p>
 
-            <div class="btn-group" style="position: absolute; top: 0px; right: 0px;">
+            <div class="btn-group">
               <button type="submit" class="btn btn-primary" ng-disabled="editVariableForm.$invalid" request-aware="editVariableForm">
                 <i class="icon-ok icon-white"></i>
               </button>
@@ -104,4 +104,4 @@
   </tbody>
 </table>
 
-<div paginator total-pages="pages.total" current-page="pages.current" ng-show="variables.length"></div>
+<div paginator total-pages="pages.total" current-page="pages.current"></div>

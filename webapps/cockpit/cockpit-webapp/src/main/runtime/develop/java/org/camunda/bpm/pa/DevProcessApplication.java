@@ -25,6 +25,8 @@ public class DevProcessApplication extends ServletProcessApplication {
   public void startProcesses(ProcessEngine engine) {
 
     RuntimeService runtimeService = engine.getRuntimeService();
+    
+    runtimeService.startProcessInstanceByKey("multipleFailingServiceTasks");
 
     runtimeService.startProcessInstanceByKey("OrderProcess");
     runtimeService.startProcessInstanceByKey("FailingProcess");

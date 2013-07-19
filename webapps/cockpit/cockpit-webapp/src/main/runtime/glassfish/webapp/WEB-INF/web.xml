@@ -62,6 +62,16 @@
     <url-pattern>/app/*</url-pattern>
     <dispatcher>REQUEST</dispatcher>
   </filter-mapping>
+  
+  <!-- REST cache control filter -->
+  <filter>
+    <filter-name>CacheControlFilter</filter-name>
+    <filter-class>org.camunda.bpm.engine.rest.filter.CacheControlFilter</filter-class>    
+  </filter>
+  <filter-mapping>
+    <filter-name>CacheControlFilter</filter-name>
+    <url-pattern>/api/*</url-pattern>
+  </filter-mapping>
 
   <!-- cockpit rest api -->
   <servlet>
