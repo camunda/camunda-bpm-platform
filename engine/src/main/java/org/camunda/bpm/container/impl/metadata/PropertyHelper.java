@@ -16,7 +16,6 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Map;
 
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.impl.util.ReflectUtil;
 
@@ -55,7 +54,7 @@ public class PropertyHelper {
     return propertyValue;
   }
   
-  public static void applyProperty(ProcessEngineConfiguration configuration, String key, String stringValue) {
+  public static void applyProperty(Object configuration, String key, String stringValue) {
     Class<?> configurationClass = configuration.getClass();
     Field propertyField = ReflectUtil.getField(key, configurationClass);
     
@@ -76,7 +75,16 @@ public class PropertyHelper {
     }
   }
   
-  public static void applyProperties(ProcessEngineConfiguration configuration, Map<String, String> properties) {
+  /**
+   * Sets an objects fields via reflection from String values.
+   * Depending on the field's type the respective values are converted to int or boolean.
+   * 
+   * @param configuration
+   * @param properties
+   * @throws ProcessEngineException if a property is supplied that matches no field or
+   * if the field's type is not String, nor int, nor boolean.
+   */
+  public static void applyProperties(Object configuration, Map<String, String> properties) {
     for (Map.Entry<String, String> property : properties.entrySet()) {
       applyProperty(configuration, property.getKey(), property.getValue());
     }
