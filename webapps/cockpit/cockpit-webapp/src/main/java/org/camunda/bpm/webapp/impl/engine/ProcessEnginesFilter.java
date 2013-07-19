@@ -58,7 +58,7 @@ public class ProcessEnginesFilter extends AbstractTemplateFilter {
   }
 
   protected void servePage(String appName, String engineName, String page, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
-    if((page.equals("index.html") || page.equals("")) && checkCreateInitialUser(engineName)) {
+    if ((page.equals("index.html") || page.equals("")) && needsInitialUser(engineName)) {
       response.sendRedirect(String.format("%s/app/admin/%s/setup.html#/setup", request.getContextPath(), engineName));
     } else if ("".equals(page) || "index.html".equals(page) || "setup.html".equals(page)) {
       serveIndexPage(appName, request, response);
@@ -67,11 +67,16 @@ public class ProcessEnginesFilter extends AbstractTemplateFilter {
     }
   }
 
-  protected boolean checkCreateInitialUser(String engineName) {
+  protected boolean needsInitialUser(String engineName) {
     ProcessEngine processEngine = Cockpit.getProcessEngine(engineName);
+    if (processEngine == null) {
+      return false;
+    }
+
     if(!processEngine.getIdentityService().isReadOnly()) {
       return processEngine.getIdentityService().createUserQuery().count() == 0;
     }
+
     return false;
   }
 
