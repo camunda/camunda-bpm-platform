@@ -65,11 +65,21 @@ ngDefine('camunda.common.services.uri', [ 'angular' ], function(module, angular)
     }];
   };
 
-  module.provider("Uri", UriProvider);
-
-  module.filter('uri', [ 'Uri', function(Uri) {
+  /**
+   * A filter to be used in views to replace tokens in a url
+   *
+   * Example: 
+   * <pre>
+   *   <a ng-href="{{ 'engine://foo' | uri }}">Perform Foo</a>
+   * </pre>
+   */
+  var UriFilter = [ 'Uri', function(Uri) {
     return function(input) {
       return Uri.appUri(input);
     }
-  }]);
+  }];
+
+  module
+    .provider("Uri", UriProvider)
+    .filter('uri', UriFilter);
 });
