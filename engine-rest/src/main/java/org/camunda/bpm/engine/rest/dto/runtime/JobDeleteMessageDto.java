@@ -1,4 +1,4 @@
-package org.camunda.bpm.engine.rest.dto.job;
+package org.camunda.bpm.engine.rest.dto.runtime;
 
 public class JobDeleteMessageDto {
 

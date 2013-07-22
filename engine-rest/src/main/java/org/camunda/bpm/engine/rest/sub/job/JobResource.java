@@ -8,8 +8,8 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-import org.camunda.bpm.engine.rest.dto.job.JobDto;
-import org.camunda.bpm.engine.rest.dto.job.JobRetriesDto;
+import org.camunda.bpm.engine.rest.dto.runtime.JobDto;
+import org.camunda.bpm.engine.rest.dto.runtime.JobRetriesDto;
 
 public interface JobResource {
 	

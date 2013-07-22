@@ -23,9 +23,9 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
-import org.camunda.bpm.engine.rest.dto.job.JobDeleteMessageDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ExecutionDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ExecutionTriggerDto;
+import org.camunda.bpm.engine.rest.dto.runtime.JobDeleteMessageDto;
 import org.camunda.bpm.engine.rest.sub.VariableResource;
 
 public interface ExecutionResource {
