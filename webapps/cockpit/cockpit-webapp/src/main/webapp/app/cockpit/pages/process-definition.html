@@ -13,15 +13,25 @@
       <h1 ng-show="!processDefinition.name">{{ processDefinition.key }}</h1>
     </div>
 
-    <div>
-      <strong>Version</strong> {{ processDefinition.version }}
+    <div class="btn-group">
+      <button class="btn btn-mini dropdown-toggle" data-toggle="dropdown">
+        Version {{ currentVersion }}&nbsp;<span class="caret"></span>
+      </button>
+
+      <ul class="dropdown-menu">
+        <li ng-repeat="currentProcessDefinition in processDefinitions">
+          <a ng-href="#/process-definition/{{ currentProcessDefinition.id }}">
+            Version {{ currentProcessDefinition.version }}
+          </a>
+        </li>
+      </ul>
     </div>
 
     <div>
       <strong>Running Instances</strong>
       <ul>
         <li>
-          <strong>Latest Version</strong> {{ processDefinitionLatestVersionCount.count }}
+          <strong>Selected Version</strong> {{ processDefinitionCurrentVersionCount.count }}
         </li>
         <li>
           <strong>All Versions</strong> {{ processDefinitionTotalCount.count }}
