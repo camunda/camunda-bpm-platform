@@ -1291,6 +1291,7 @@ public class BpmnParse extends Parse {
     Element signalEventDefinitionElement = intermediateEventElement.element("signalEventDefinition");
     Element compensateEventDefinitionElement = intermediateEventElement.element("compensateEventDefinition");
     Element linkEventDefinitionElement = intermediateEventElement.element("linkEventDefinition");
+    Element messageEventDefinitionElement = intermediateEventElement.element("messageEventDefinition");
     
     // the link event gets a special treatment as a throwing link event (event source) 
     // will not create any activity instance but serves as a "redirection" to the catching link
@@ -1306,8 +1307,7 @@ public class BpmnParse extends Parse {
     } 
 
     boolean otherUnsupportedThrowingIntermediateEvent = 
-      (intermediateEventElement.element("escalationEventDefinition") != null) || //
-      (intermediateEventElement.element("messageEventDefinition") != null); //
+      (intermediateEventElement.element("escalationEventDefinition") != null); //
     // All other event definition types cannot be intermediate throwing (cancelEventDefinition, conditionalEventDefinition, errorEventDefinition, terminateEventDefinition, timerEventDefinition
         
     ActivityImpl nestedActivityImpl = createActivityOnScope(intermediateEventElement, scopeElement);
@@ -1321,7 +1321,9 @@ public class BpmnParse extends Parse {
     } else if(compensateEventDefinitionElement != null) {
       CompensateEventDefinition compensateEventDefinition = parseCompensateEventDefinition(compensateEventDefinitionElement, scopeElement);
       activityBehavior = new IntermediateThrowCompensationEventActivityBehavior(compensateEventDefinition);
-      
+    } else if (messageEventDefinitionElement != null) {
+      // CAM-436 same behaviour as service task
+      activityBehavior = parseServiceTask(messageEventDefinitionElement, scopeElement).getActivityBehavior();
     } else if (otherUnsupportedThrowingIntermediateEvent) {
       addError("Unsupported intermediate throw event type", intermediateEventElement);
     } else { // None intermediate event
