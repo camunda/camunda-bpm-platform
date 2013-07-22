@@ -12,7 +12,7 @@
  */
 package org.camunda.bpm.engine.test.api.identity;
 
-import org.camunda.bpm.engine.identity.Resource;
+import org.camunda.bpm.engine.authorization.Resource;
 
 /**
  * @author Daniel Meyer
@@ -20,17 +20,19 @@ import org.camunda.bpm.engine.identity.Resource;
  */
 public class TestResource implements Resource {
   
-  protected String id;
+  protected int id;
+  protected String name;
 
-  public TestResource(String id) {
+  public TestResource(String name, int id) {
+    this.name = name;
     this.id = id;
   }
 
   public String resourceName() {
-    return id;
+    return name;
   }
 
-  public String resourceType() {
+  public int resourceType() {
     return id;
   }
 

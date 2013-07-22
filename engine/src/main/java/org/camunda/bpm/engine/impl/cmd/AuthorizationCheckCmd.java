@@ -14,8 +14,8 @@ package org.camunda.bpm.engine.impl.cmd;
 
 import java.util.List;
 
-import org.camunda.bpm.engine.identity.Permission;
-import org.camunda.bpm.engine.identity.Resource;
+import org.camunda.bpm.engine.authorization.Permission;
+import org.camunda.bpm.engine.authorization.Resource;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationManager;

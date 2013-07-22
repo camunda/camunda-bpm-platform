@@ -15,10 +15,10 @@ package org.camunda.bpm.engine.impl.persistence.entity;
 import java.util.List;
 
 import org.camunda.bpm.engine.AuthorizationException;
-import org.camunda.bpm.engine.identity.Authorization;
-import org.camunda.bpm.engine.identity.Permission;
-import org.camunda.bpm.engine.identity.Permissions;
-import org.camunda.bpm.engine.identity.Resource;
+import org.camunda.bpm.engine.authorization.Authorization;
+import org.camunda.bpm.engine.authorization.Permission;
+import org.camunda.bpm.engine.authorization.Permissions;
+import org.camunda.bpm.engine.authorization.Resource;
 import org.camunda.bpm.engine.impl.AbstractQuery;
 import org.camunda.bpm.engine.impl.AuthorizationQueryImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
@@ -51,29 +51,30 @@ public class AuthorizationManager extends AbstractManager {
   }
   
   public void configureQuery(@SuppressWarnings("rawtypes") AbstractQuery query, Resource resource) {
-    ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
-    String authenticatedUserId = Authentication.getAuthenticatedUserId();
+    final ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+    final Authentication currentAuthentication = Authentication.getCurrentAuthentication();
     
-    if(processEngineConfiguration.isAuthorizationChecksEnabled() && authenticatedUserId != null) {
+    if(processEngineConfiguration.isAuthorizationChecksEnabled() && currentAuthentication != null) {
       query.setAuthorizationCheckEnabled(true);
-      query.setAuthUserId(authenticatedUserId);
+      query.setAuthUserId(currentAuthentication.getUserId());
+      query.setAuthGroupIds(currentAuthentication.getGroupIds());
       query.setAuthResourceType(resource.resourceType());
       query.setAuthResourceId("RES.ID_");
-      query.setAuthPerms(Permissions.READ.getId());
+      query.setAuthPerms(Permissions.READ.getValue());
     }
     
   }
 
   public void checkAuthorization(Permission permission, Resource resource, String resourceId) {
     
-    final String authenticatedUserId = Authentication.getAuthenticatedUserId();
     final ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
+    final Authentication currentAuthentication = Authentication.getCurrentAuthentication();
+    
+    if(processEngineConfiguration.isAuthorizationChecksEnabled() && currentAuthentication != null) {
 
-    if (processEngineConfiguration.isAuthorizationChecksEnabled() && authenticatedUserId != null) {
-
-      boolean isAuthorized = isAuthorized(authenticatedUserId, null, permission, resource, resourceId);
+      boolean isAuthorized = isAuthorized(currentAuthentication.getUserId(), currentAuthentication.getGroupIds(), permission, resource, resourceId);
       if (!isAuthorized) {
-        throw new AuthorizationException(authenticatedUserId, permission.getName(), resource.resourceName(), resourceId);
+        throw new AuthorizationException(currentAuthentication.getUserId(), permission.getName(), resource.resourceName(), resourceId);
       }
     }
 
@@ -86,7 +87,7 @@ public class AuthorizationManager extends AbstractManager {
     authCheck.setAuthGroupIds(groupIds);
     authCheck.setAuthResourceType(resource.resourceType());
     authCheck.setAuthResourceId(resourceId);
-    authCheck.setAuthPerms(permission.getId());
+    authCheck.setAuthPerms(permission.getValue());
     
     return getDbSqlSession().selectBoolean("isUserAuthorizedForResource", authCheck);
   }

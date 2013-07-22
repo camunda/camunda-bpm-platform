@@ -15,9 +15,10 @@ package org.camunda.bpm.engine.impl;
 import java.util.List;
 
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.identity.Authorization;
-import org.camunda.bpm.engine.identity.AuthorizationQuery;
-import org.camunda.bpm.engine.identity.Permission;
+import org.camunda.bpm.engine.authorization.Authorization;
+import org.camunda.bpm.engine.authorization.AuthorizationQuery;
+import org.camunda.bpm.engine.authorization.Permission;
+import org.camunda.bpm.engine.authorization.Resource;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 
@@ -32,10 +33,12 @@ public class AuthorizationQueryImpl extends AbstractQuery<AuthorizationQuery, Au
   protected String id;
   protected String[] userIds;
   protected String[] groupIds;
-  protected String resourceType;
+  protected int resourceType;
   protected String resourceId;
   protected int permission = 0;
+  protected Integer authorizationType;
   protected boolean queryByPermission = false;
+  protected Resource resource;
   
   public AuthorizationQueryImpl(CommandExecutor commandExecutor) {
     super(commandExecutor);
@@ -66,8 +69,9 @@ public class AuthorizationQueryImpl extends AbstractQuery<AuthorizationQuery, Au
     return this;
   }
 
-  public AuthorizationQuery resourceType(String resourceType) {
-    this.resourceType = resourceType;
+  public AuthorizationQuery resourceType(Resource resource) {
+    this.resource = resource;
+    this.resourceType = resource.resourceType();
     return this;
   }
 
@@ -78,7 +82,12 @@ public class AuthorizationQueryImpl extends AbstractQuery<AuthorizationQuery, Au
 
   public AuthorizationQuery hasPermission(Permission p) {
     queryByPermission = true;
-    this.permission |= p.getId();
+    this.permission |= p.getValue();
+    return this;
+  }
+  
+  public AuthorizationQuery authorizationType(Integer type) {
+    this.authorizationType = type;
     return this;
   }
   
@@ -113,7 +122,7 @@ public class AuthorizationQueryImpl extends AbstractQuery<AuthorizationQuery, Au
     return groupIds;
   }
 
-  public String getResourceType() {
+  public int getResourceType() {
     return resourceType;
   }
 
@@ -123,6 +132,10 @@ public class AuthorizationQueryImpl extends AbstractQuery<AuthorizationQuery, Au
 
   public int getPermission() {
     return permission;
+  }
+  
+  public Resource getResource() {
+    return resource;
   }
 
   public AuthorizationQuery orderByResourceType() {

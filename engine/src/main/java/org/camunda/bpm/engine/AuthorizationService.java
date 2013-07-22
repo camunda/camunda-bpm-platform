@@ -14,16 +14,14 @@ package org.camunda.bpm.engine;
 
 import java.util.List;
 
-import org.camunda.bpm.engine.identity.Authorization;
-import org.camunda.bpm.engine.identity.AuthorizationQuery;
-import org.camunda.bpm.engine.identity.Permission;
-import org.camunda.bpm.engine.identity.Resource;
+import org.camunda.bpm.engine.authorization.Authorization;
+import org.camunda.bpm.engine.authorization.AuthorizationQuery;
+import org.camunda.bpm.engine.authorization.Permission;
+import org.camunda.bpm.engine.authorization.Resource;
 
 
 /**
- * <p>The authorization service allows managing {@link Authorization Authorizations}.
- * Authorizations manage permissions of a given user/group to interact with a given 
- * resource.</p>
+ * <p>The authorization service allows managing {@link Authorization Authorizations}.</p>
  * 
  * <h2>Creating an authorization</h2>
  * <p>An authorization is created between a user/group and a resource. It describes 
@@ -60,22 +58,7 @@ import org.camunda.bpm.engine.identity.Resource;
  * </pre>
  * As a result, the given user or group will have permission to READ the referenced process definition. 
  * </p>
- * 
- * <h2>Checking a permission</h2>
- * <p>Permissions can be checked using a query:
- * <pre>
- * authorizationQuery.userId("john")
- *   .resourceType("processDefinition")
- *   .resourceId("2313")
- *   .hasPermission(Permissions.READ)
- *   .hasPermission(Permissions.WRITE)
- *   .hasPermission(Permissions.DELETE)
- *   .list();
- * </pre>
- * 
- * Selects all Authorization objects which provide READ,WRITE,DELETE 
- * Permissions for the user "john". </p>
- * 
+ *
  * @author Daniel Meyer
  * @since 7.0
  */
@@ -88,10 +71,11 @@ public interface AuthorizationService {
    * yet persistent and must be saved using the {@link #saveAuthorization(Authorization)}
    * method.</p>
    *   
-   * @param authorizationId
+   * @param authorizationType the type of the authorization. Legal values: {@link Authorization#AUTH_TYPE_GLOBAL}, 
+   * {@link Authorization#AUTH_TYPE_GRANT}, {@link Authorization#AUTH_TYPE_REVOKE}
    * @return an non-persistent Authorization object.
    */
-  public Authorization createNewAuthorization();
+  public Authorization createNewAuthorization(int authorizationType);
   
   /**
    * Allows saving an {@link Authorization} object.
@@ -122,7 +106,7 @@ public interface AuthorizationService {
    * <p>Returns true if the given user has permissions for interacting with the resource is the 
    * requested way.</p>
    * 
-   * <p>This method checks <em>global</em> permissions for the resource, see {@link Authorization#ANY}</p>
+   * <p>This method checks for the resource type, see {@link Authorization#ANY}</p>
    * 
    * @param userId the id of the user for which the check is performed.
    * @param groupIds a list of group ids the user is member of
@@ -143,7 +127,5 @@ public interface AuthorizationService {
    * @param resourceId the resource id for which the authorization check is performed.
    */
   public boolean isUserAuthorized(String userId, List<String> groupIds, Permission permission, Resource resource, String resourceId);
-
-
   
 }

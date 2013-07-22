@@ -160,14 +160,15 @@ create table ACT_RU_INCIDENT (
 );
 
 create table ACT_RU_AUTHORIZATION (
-    ID_ varchar(64) not null,
-    REV_ integer not null,
-    GROUP_ID_ varchar(255),
-    USER_ID_ varchar(255),
-    RESOURCE_TYPE_ varchar(255) not null,
-    RESOURCE_ID_ varchar(64),
-    PERMS_ integer,
-    primary key (ID_)
+  ID_ varchar(64) not null,
+  REV_ integer not null,
+  TYPE_ integer not null,
+  GROUP_ID_ varchar(255),
+  USER_ID_ varchar(255),
+  RESOURCE_TYPE_ integer not null,
+  RESOURCE_ID_ varchar(64),
+  PERMS_ integer,
+  primary key (ID_)
 );
 
 create index ACT_IDX_EXEC_BUSKEY on ACT_RU_EXECUTION(BUSINESS_KEY_);
@@ -303,12 +304,14 @@ create unique index ACT_UNIQ_RU_BUS_KEY on ACT_RU_EXECUTION
     case when BUSINESS_KEY_ is null then null else BUSINESS_KEY_ end);
 
 create unique index ACT_UNIQ_AUTH_USER on ACT_RU_AUTHORIZATION
-   (case when USER_ID_ is null then null else RESOURCE_TYPE_ end,
+   (case when USER_ID_ is null then null else TYPE_ end,
+    case when USER_ID_ is null then null else RESOURCE_TYPE_ end,
     case when USER_ID_ is null then null else RESOURCE_ID_ end,
     case when USER_ID_ is null then null else USER_ID_ end);
 
 create unique index ACT_UNIQ_AUTH_GROUP on ACT_RU_AUTHORIZATION
-   (case when GROUP_ID_ is null then null else RESOURCE_TYPE_ end,
+   (case when GROUP_ID_ is null then null else TYPE_ end,
+    case when GROUP_ID_ is null then null else RESOURCE_TYPE_ end,
     case when GROUP_ID_ is null then null else RESOURCE_ID_ end,
-    case when GROUP_ID_ is null then null else USER_ID_ end);
+    case when GROUP_ID_ is null then null else GROUP_ID_ end);
     

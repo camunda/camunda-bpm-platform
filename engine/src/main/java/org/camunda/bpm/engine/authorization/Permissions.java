@@ -10,10 +10,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.identity;
+package org.camunda.bpm.engine.authorization;
 
 /**
- * The set of built-in permissions for camunda BPM.
+ * The set of built-in {@link Permission Permissions} for camunda BPM.
  * 
  * @author Daniel Meyer
  *
@@ -28,7 +28,7 @@ public enum Permissions implements Permission {
   CREATE("CREATE", 8),
   DELETE("DELETE", 16),
   ACCESS("ACCESS", 32);  
-  // 10 additional (32 .. 16384(2^14)) are reserved
+  // 10 additional (32 ... 16384(=2^14)) are reserved
   
   // implmentation //////////////////////////
   
@@ -48,7 +48,7 @@ public enum Permissions implements Permission {
     return name;
   }
 
-  public int getId() {
+  public int getValue() {
     return id;
   }
   

@@ -15,11 +15,11 @@ package org.camunda.bpm.engine;
 import java.util.List;
 import java.util.Map;
 
+import org.camunda.bpm.engine.authorization.Permissions;
+import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.GroupQuery;
-import org.camunda.bpm.engine.identity.Permissions;
 import org.camunda.bpm.engine.identity.Picture;
-import org.camunda.bpm.engine.identity.Resources;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.identity.UserQuery;
 import org.camunda.bpm.engine.impl.identity.Account;
@@ -152,11 +152,31 @@ public interface IdentityService {
   boolean checkPassword(String userId, String password);
 
   /** 
-   * Passes the authenticated user id for this particular thread.
+   * Passes the authenticated user id for this thread.
    * All service method (from any service) invocations done by the same
-   * thread will have access to this authenticatedUserId. 
+   * thread will have access to this authenticatedUserId. Should be followed by 
+   * a call to {@link #clearAuthentication()} once the interaction is terminated. 
+   * 
+   * @param authenticatedUserId the id of the current user.
+   * @param groups the groups of the current user.
    */
   void setAuthenticatedUserId(String authenticatedUserId);
+  
+  /** 
+   * Passes the authenticated user id and groupIds for this thread.
+   * All service method (from any service) invocations done by the same
+   * thread will have access to this authenticatedUserId. Should be followed by 
+   * a call to {@link #clearAuthentication()} once the interaction is terminated.
+   * 
+   *  @param authenticatedUserId the id of the current user.
+   *  @param groups the groups of the current user.
+   */
+  void setAuthentication(String userId, List<String> groups);
+  
+  /** Allows clearing the current authentication. Does not throw exception if 
+   * no authentication exists.
+   * */
+  void clearAuthentication();
   
   /** Sets the picture for a given user.
    * @throws ProcessEngineException if the user doesn't exist.

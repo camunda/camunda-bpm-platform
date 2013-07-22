@@ -338,8 +338,12 @@ public class DbSqlSession implements Session {
   
   public boolean selectBoolean(String statement, Object parameter) {
     statement = dbSqlSessionFactory.mapStatement(statement);
-    List<Object> result = sqlSession.selectList(statement, parameter);
-    return (result == null || result.isEmpty()) ? false : true;
+    List<String> result = sqlSession.selectList(statement, parameter);
+    if(result != null) {
+      return result.contains(1);
+    } 
+    return false;  
+    
   } 
   
   @SuppressWarnings("unchecked")

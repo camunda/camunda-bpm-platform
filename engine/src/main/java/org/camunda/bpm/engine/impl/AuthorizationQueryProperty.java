@@ -16,7 +16,7 @@ package org.camunda.bpm.engine.impl;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.camunda.bpm.engine.identity.AuthorizationQuery;
+import org.camunda.bpm.engine.authorization.AuthorizationQuery;
 import org.camunda.bpm.engine.query.QueryProperty;
 
 /**
