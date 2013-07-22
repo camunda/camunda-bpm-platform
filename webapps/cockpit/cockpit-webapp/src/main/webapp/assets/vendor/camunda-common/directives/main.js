@@ -5,6 +5,7 @@ ngDefine('camunda.common.directives', [
   './requestAware',
   './engineSelect',
   './paginator',
+  'module:camunda.common.directives.ifLoggedIn:./ifLoggedIn',
   './password',
   './modalDialog',
   './stateCircle'
