@@ -131,31 +131,57 @@ ngDefine('cockpit.directives', [
     });
 
     /*------------------- Handle annotations/incidents ---------------------*/
+
+    var annotationsDone = false;
+    var incidentsDone = false;
+
+    $scope.$watch(function () { return bpmnRenderer; }, function (newValue) {
+      if (newValue) {
+        if (!annotationsDone && $scope.annotations) {
+          annotations();
+          annotationsDone = true;
+        }
+
+        if (!incidentsDone && $scope.incidents) {
+          incidents();
+          incidentsDone = true;
+        }
+
+      }
+    });
     
     $scope.$watch('annotations', function(newValue) {
-      if (newValue) {
+      if (newValue && bpmnRenderer && !annotationsDone) {
         annotations();
+        annotationsDone = true;
       }
     });
 
     function annotations() {
-      angular.forEach($scope.annotations, function (annotation) {
+      for (var i = 0, annotation; !!(annotation = $scope.annotations[i]); i++) {
         doAnnotate(annotation.id, annotation.count);
-      });
+      }
     }
     
     $scope.$watch('incidents', function(newValue) {
-      if (newValue) {
+      if (newValue && bpmnRenderer && !incidentsDone) {
         incidents();
+        incidentsDone = true;
       }
     });
     
     function incidents() {
-      angular.forEach($scope.incidents, function (activity) {
+      for (var i = 0, activity; !!(activity = $scope.incidents[i]); i++) {
         if (activity.incidents && activity.incidents.length > 0) {
           executeAnnotation(activity.id, '<p class="badge badge-important">!</p>');
         }
-      });
+      }
+
+/*      angular.forEach($scope.incidents, function (activity) {
+        if (activity.incidents && activity.incidents.length > 0) {
+          executeAnnotation(activity.id, '<p class="badge badge-important">!</p>');
+        }
+      });*/
     }
     
     function doAnnotate(activityId, count) {

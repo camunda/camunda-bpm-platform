@@ -1,8 +1,11 @@
 ngDefine('cockpit.pages', [ 'angular' ], function(module, angular) {
 
-  var Controller = function($scope, $rootScope, Notifications, ProcessDefinitionResource, ProcessInstanceResource, Views, Transform, processDefinition) {
+  var Controller = function($scope, $rootScope, $location, Notifications, ProcessDefinitionResource, ProcessInstanceResource, Views, Transform, processDefinition) {
 
     $scope.processDefinition = processDefinition;
+    $scope.currentVersion = processDefinition.version;
+
+    $scope.processDefinitions;
 
     // add process definition breadcrumb
     $rootScope.addBreadcrumb({'type': 'processDefinition', 'processDefinition': processDefinition});
@@ -10,13 +13,17 @@ ngDefine('cockpit.pages', [ 'angular' ], function(module, angular) {
     $scope.processInstanceTable = Views.getProvider({ component: 'cockpit.processDefinition.instancesTable' });
 
     $scope.selection = {};
-    
+
     ProcessInstanceResource.count({ processDefinitionKey : processDefinition.key }).$then(function(response) {
       $scope.processDefinitionTotalCount = response.data;
     });
-    
+
+    ProcessDefinitionResource.query({ 'key' : processDefinition.key, 'sortBy': 'version', 'sortOrder': 'asc' }).$then(function(response) {
+      $scope.processDefinitions = response.resource;
+    });
+
     ProcessInstanceResource.count({ processDefinitionId : processDefinition.id }).$then(function(response) {
-      $scope.processDefinitionLatestVersionCount = response.data;
+      $scope.processDefinitionCurrentVersionCount = response.data;
     });
     
     ProcessDefinitionResource.getBpmn20Xml({ id : processDefinition.id}).$then(function(response) {
@@ -39,7 +46,7 @@ ngDefine('cockpit.pages', [ 'angular' ], function(module, angular) {
     
   };
 
-  Controller.$inject = [ '$scope', '$rootScope', 'Notifications', 'ProcessDefinitionResource', 'ProcessInstanceResource', 'Views', 'Transform', 'processDefinition' ];
+  Controller.$inject = [ '$scope', '$rootScope', '$location', 'Notifications', 'ProcessDefinitionResource', 'ProcessInstanceResource', 'Views', 'Transform', 'processDefinition' ];
 
   var RouteConfig = [ '$routeProvider', function($routeProvider) {
     $routeProvider.when('/process-definition/:processDefinitionId', {
