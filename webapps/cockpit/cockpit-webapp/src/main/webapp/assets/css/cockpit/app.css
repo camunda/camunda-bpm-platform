@@ -2,12 +2,8 @@
  * Logo styling
  */
 .navbar .brand {
-   display: block;
-   float: left;
-   background: no-repeat url('../../img/cockpit/app-logo.png');
+   background-image: url('../../img/cockpit/app-logo.png');
    width: 220px;
-   height: 39px;
-   padding: 0;
 }
 
 

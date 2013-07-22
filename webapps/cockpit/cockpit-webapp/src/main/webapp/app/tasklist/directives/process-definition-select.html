@@ -1,0 +1,18 @@
+<li class="dropdown"
+    help
+    help-text="Start a process instance"
+    help-placement="'bottom'"
+    ng-show="processDefinitions.length">
+
+  <a href class="dropdown-toggle" data-toggle="dropdown">
+    <i class="icon-th-list icon-white"></i>
+  </a>
+
+  <ul class="dropdown-menu">
+    <li ng-repeat="definition in processDefinitions">
+      <a ng-href="#/process-definition/{{ definition.id }}">
+        {{ definition.name || definition.key }}
+      </a>
+    </li>
+  </ul>
+</li>

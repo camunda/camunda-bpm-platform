@@ -2,12 +2,8 @@
  * Logo styling
  */
 .navbar .brand {
-   display: block;
-   float: left;
-   background: no-repeat url('../../img/admin/app-logo.png');
-   width: 220px;
-   height: 39px;
-   padding: 0;
+   background-image: url('../../img/admin/app-logo.png');
+   width: 210px;
 }
 
 /** box */
