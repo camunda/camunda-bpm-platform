@@ -10,13 +10,6 @@
 
   <includeBaseDirectory>false</includeBaseDirectory>
   
-  <fileSets>
-    <fileSet>
-      <directory>src/main/runtime/tomcat/webapp</directory>
-      <outputDirectory>/</outputDirectory>    
-    </fileSet>      
-  </fileSets>
-
   <dependencySets>
     <dependencySet>
       <outputDirectory>WEB-INF/lib</outputDirectory>
@@ -30,9 +23,22 @@
     <dependencySet>
       <outputDirectory>/</outputDirectory>
       <includes>
-        <include>org.camunda.bpm:camunda-engine-rest:war:*</include>
-      </includes>
-      <unpack>true</unpack>
-    </dependencySet>
+        <include>org.camunda.bpm:camunda-engine-rest:war:*</include>        
+      </includes>      
+      <unpack>true</unpack>   
+      <unpackOptions>
+        <excludes>
+          <exclude>**/web.xml</exclude>        
+        </excludes>
+      </unpackOptions>   
+    </dependencySet>    
   </dependencySets>
+  
+  <fileSets>
+    <fileSet>
+      <directory>src/main/runtime/tomcat/webapp</directory>
+      <outputDirectory>/</outputDirectory>      
+    </fileSet>     
+  </fileSets>
+  
 </assembly>

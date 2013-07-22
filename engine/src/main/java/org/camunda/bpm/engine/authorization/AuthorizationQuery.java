@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.identity;
+package org.camunda.bpm.engine.authorization;
 
 import org.camunda.bpm.engine.query.Query;
 
@@ -20,6 +20,11 @@ import org.camunda.bpm.engine.query.Query;
  */
 public interface AuthorizationQuery extends Query<AuthorizationQuery, Authorization> {
 
+  /** only selects authorizations for the given type. Legal values:
+   * {@link Authorization#AUTH_TYPE_GLOBAL}, {@link Authorization#AUTH_TYPE_GRANT}
+   * {@link Authorization#AUTH_TYPE_REVOKE} */
+  AuthorizationQuery authorizationType(Integer type);
+  
   /** only selects authorizations for the given id */
   AuthorizationQuery authorizationId(String id);
   
@@ -30,7 +35,7 @@ public interface AuthorizationQuery extends Query<AuthorizationQuery, Authorizat
   AuthorizationQuery groupIdIn(String... groupIds);
   
   /** only selects authorizations for the given resource type */
-  AuthorizationQuery resourceType(String resourceId);
+  AuthorizationQuery resourceType(Resource resource);
   
   /** only selects authorizations for the given resource id */
   AuthorizationQuery resourceId(String resourceId);

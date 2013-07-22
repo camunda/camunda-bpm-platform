@@ -115,6 +115,14 @@ public class IdentityServiceImpl extends ServiceImpl implements IdentityService 
   public void setAuthenticatedUserId(String authenticatedUserId) {
     Authentication.setAuthenticatedUserId(authenticatedUserId);
   }
+  
+  public void setAuthentication(String userId, List<String> groups) {
+    Authentication.setCurrentAuthentication(userId, groups);
+  }
+  
+  public void clearAuthentication() {
+    Authentication.clearCurrentAuthentication();
+  }
 
   public String getUserInfo(String userId, String key) {
     return commandExecutor.execute(new GetUserInfoCmd(userId, key));

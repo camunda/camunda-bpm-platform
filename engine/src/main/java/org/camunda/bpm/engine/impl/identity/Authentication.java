@@ -13,19 +13,87 @@
 
 package org.camunda.bpm.engine.impl.identity;
 
+import java.util.ArrayList;
+import java.util.List;
+
 
 /**
+ * <p>Allows to expose the id of the currently authenticated user and his 
+ * groups to the process engine.</p>
+ * 
+ * <p>The current authentication is managed using a Thread Local. The value can 
+ * be set using {@link #setCurrentAuthentication(String, List)},  
+ * retrieved using {@link #getCurrentAuthentication()} and cleared 
+ * using {@link #clearCurrentAuthentication()}.</p>
+ * 
+ * <p>Users typically do not use this class directly but rather use 
+ * the corresponding Service API methods:
+ * <ul>
+ * <li></li> 
+ * </ul>
+ * </p>
+ * 
  * @author Tom Baeyens
+ * @author Daniel Meyer
  */
-public abstract class Authentication {
-
-  static ThreadLocal<String> authenticatedUserIdThreadLocal = new ThreadLocal<String>();
+public class Authentication {
   
-  public static void setAuthenticatedUserId(String authenticatedUserId) {
-    authenticatedUserIdThreadLocal.set(authenticatedUserId);
+  protected String authenticatedUserId;
+  protected List<String> authenticatedGroupIds;
+  
+  public Authentication() {    
   }
 
-  public static String getAuthenticatedUserId() {
-    return authenticatedUserIdThreadLocal.get();
+  public Authentication(String authenticatedUserId, List<String> groupIds) {
+    this.authenticatedUserId = authenticatedUserId;
+    this.authenticatedGroupIds = new ArrayList<String>(groupIds);    
   }
+  
+  public List<String> getGroupIds() {
+    return authenticatedGroupIds;
+  }
+ 
+  public String getUserId() {
+    return authenticatedUserId;
+  }
+  
+  // Thread local handling //////////////////////////////////////////
+
+  static ThreadLocal<Authentication> currentAuthentication = new ThreadLocal<Authentication>();
+
+  public static void setCurrentAuthentication(String authenticatedUserId, List<String> groupIds) {
+    currentAuthentication.set(new Authentication(authenticatedUserId, groupIds));    
+  }
+  
+  public static void clearCurrentAuthentication() {
+    currentAuthentication.remove();    
+  }
+
+  public static Authentication getCurrentAuthentication() {
+    if(currentAuthentication != null) {
+      return currentAuthentication.get();
+    } else { 
+      return null;
+    }
+  }
+
+  // backwards compatibility
+  public static void setAuthenticatedUserId(String authenticatedUserId) {
+    if(authenticatedUserId == null) {
+      clearCurrentAuthentication();
+    } else {
+      setCurrentAuthentication(authenticatedUserId, new ArrayList<String>());
+    }
+  }
+  
+  // backwards compatibility
+  public static String getAuthenticatedUserId() {
+    Authentication authentication = getCurrentAuthentication();
+    if(authentication != null) {
+      return authentication.authenticatedUserId;
+    } else {
+      return null;
+    }
+  }
+  
 }
