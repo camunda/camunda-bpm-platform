@@ -22,6 +22,9 @@ import org.camunda.bpm.engine.rest.exception.ProcessEngineExceptionHandler;
 import org.camunda.bpm.engine.rest.exception.RestExceptionHandler;
 import org.camunda.bpm.engine.rest.impl.ExecutionRestServiceImpl;
 import org.camunda.bpm.engine.rest.impl.GroupRestServiceImpl;
+import org.camunda.bpm.engine.rest.impl.HistoricActivityInstanceRestServiceImpl;
+import org.camunda.bpm.engine.rest.impl.HistoricProcessInstanceRestServiceImpl;
+import org.camunda.bpm.engine.rest.impl.HistoricVariableInstanceRestServiceImpl;
 import org.camunda.bpm.engine.rest.impl.IdentityRestServiceImpl;
 import org.camunda.bpm.engine.rest.impl.JobRestServiceImpl;
 import org.camunda.bpm.engine.rest.impl.MessageRestServiceImpl;
@@ -73,6 +76,10 @@ public class DefaultApplication extends Application {
     
     classes.add(ProcessEngineExceptionHandler.class);
     classes.add(RestExceptionHandler.class);
+    
+    classes.add(HistoricVariableInstanceRestServiceImpl.class);
+    classes.add(HistoricProcessInstanceRestServiceImpl.class);
+    classes.add(HistoricActivityInstanceRestServiceImpl.class);
     
     return classes;
   }
