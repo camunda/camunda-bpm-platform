@@ -27,15 +27,8 @@
   	  <version>${project.version}</version>
   	  <type>jar</type>
     </dependency>    
-    
-    <dependency>
-      <groupId>org.camunda.bpm.tasklist</groupId>
-      <artifactId>camunda-tasklist-glassfish</artifactId>
-      <version>${project.version}</version>
-      <type>war</type>
-    </dependency>
 
-	<!-- cycle -->
+  	<!-- cycle -->
     <dependency>
       <groupId>org.camunda.bpm.cycle</groupId>
       <artifactId>camunda-cycle-glassfish</artifactId>
