@@ -1824,64 +1824,73 @@ public class BpmnParse extends Parse {
    * Parses a sendTask declaration.
    */
   public ActivityImpl parseSendTask(Element sendTaskElement, ScopeImpl scope) {
-    ActivityImpl activity = createActivityOnScope(sendTaskElement, scope);
-    
-    activity.setAsync(isAsync(sendTaskElement));
-    activity.setExclusive(isExclusive(sendTaskElement));
-
-    // for e-mail
-    String type = sendTaskElement.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "type");
-
-    // for web service
-    String implementation = sendTaskElement.attribute("implementation");
-    String operationRef = this.resolveName(sendTaskElement.attribute("operationRef"));
-
-    // for e-mail
-    if (type != null) {
-      if (type.equalsIgnoreCase("mail")) {
-        parseEmailServiceTask(activity, sendTaskElement, parseFieldDeclarations(sendTaskElement));
-      } else if (type.equalsIgnoreCase("mule")) {
-        parseMuleServiceTask(activity, sendTaskElement, parseFieldDeclarations(sendTaskElement));
-      } else {
-        addError("Invalid usage of type attribute: '" + type + "'", sendTaskElement);
-      }
-
+    if (sendTaskElement.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "class")!=null 
+        || sendTaskElement.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "expression") !=null
+        || sendTaskElement.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "delegateExpression") != null) {
+      // CAM-942: If expression or class is set on a SendTask it behaves like a service task
+      // to allow implementing the send handling yourself
+      return parseServiceTask(sendTaskElement, scope);
+    }
+    else {    
+      ActivityImpl activity = createActivityOnScope(sendTaskElement, scope);
+      
+      activity.setAsync(isAsync(sendTaskElement));
+      activity.setExclusive(isExclusive(sendTaskElement));
+  
+      // for e-mail
+      String type = sendTaskElement.attributeNS(BpmnParser.ACTIVITI_BPMN_EXTENSIONS_NS, "type");
+  
       // for web service
-    } else if (implementation != null && operationRef != null && implementation.equalsIgnoreCase("##WebService")) {
-      if (!this.operations.containsKey(operationRef)) {
-        addError(operationRef + " does not exist", sendTaskElement);
+      String implementation = sendTaskElement.attribute("implementation");
+      String operationRef = this.resolveName(sendTaskElement.attribute("operationRef"));
+  
+      // for e-mail
+      if (type != null) {
+        if (type.equalsIgnoreCase("mail")) {
+          parseEmailServiceTask(activity, sendTaskElement, parseFieldDeclarations(sendTaskElement));
+        } else if (type.equalsIgnoreCase("mule")) {
+          parseMuleServiceTask(activity, sendTaskElement, parseFieldDeclarations(sendTaskElement));
+        } else {
+          addError("Invalid usage of type attribute: '" + type + "'", sendTaskElement);
+        }
+  
+        // for web service
+      } else if (implementation != null && operationRef != null && implementation.equalsIgnoreCase("##WebService")) {
+        if (!this.operations.containsKey(operationRef)) {
+          addError(operationRef + " does not exist", sendTaskElement);
+        } else {
+          Operation operation = this.operations.get(operationRef);
+          WebServiceActivityBehavior webServiceActivityBehavior = new WebServiceActivityBehavior(operation);
+  
+          Element ioSpecificationElement = sendTaskElement.element("ioSpecification");
+          if (ioSpecificationElement != null) {
+            IOSpecification ioSpecification = this.parseIOSpecification(ioSpecificationElement);
+            webServiceActivityBehavior.setIoSpecification(ioSpecification);
+          }
+  
+          for (Element dataAssociationElement : sendTaskElement.elements("dataInputAssociation")) {
+            AbstractDataAssociation dataAssociation = this.parseDataInputAssociation(dataAssociationElement);
+            webServiceActivityBehavior.addDataInputAssociation(dataAssociation);
+          }
+  
+          for (Element dataAssociationElement : sendTaskElement.elements("dataOutputAssociation")) {
+            AbstractDataAssociation dataAssociation = this.parseDataOutputAssociation(dataAssociationElement);
+            webServiceActivityBehavior.addDataOutputAssociation(dataAssociation);
+          }
+  
+          activity.setActivityBehavior(webServiceActivityBehavior);
+        }
       } else {
-        Operation operation = this.operations.get(operationRef);
-        WebServiceActivityBehavior webServiceActivityBehavior = new WebServiceActivityBehavior(operation);
-
-        Element ioSpecificationElement = sendTaskElement.element("ioSpecification");
-        if (ioSpecificationElement != null) {
-          IOSpecification ioSpecification = this.parseIOSpecification(ioSpecificationElement);
-          webServiceActivityBehavior.setIoSpecification(ioSpecification);
-        }
-
-        for (Element dataAssociationElement : sendTaskElement.elements("dataInputAssociation")) {
-          AbstractDataAssociation dataAssociation = this.parseDataInputAssociation(dataAssociationElement);
-          webServiceActivityBehavior.addDataInputAssociation(dataAssociation);
-        }
-
-        for (Element dataAssociationElement : sendTaskElement.elements("dataOutputAssociation")) {
-          AbstractDataAssociation dataAssociation = this.parseDataOutputAssociation(dataAssociationElement);
-          webServiceActivityBehavior.addDataOutputAssociation(dataAssociation);
-        }
-
-        activity.setActivityBehavior(webServiceActivityBehavior);
+        addError("One of the attributes 'type' or 'operation' is mandatory on sendTask.", sendTaskElement);
       }
-    } else {
-      addError("One of the attributes 'type' or 'operation' is mandatory on sendTask.", sendTaskElement);
+  
+      parseExecutionListenersOnScope(sendTaskElement, activity);
+  
+      for (BpmnParseListener parseListener : parseListeners) {
+        parseListener.parseSendTask(sendTaskElement, scope, activity);
+      }
+      return activity;
     }
-
-    parseExecutionListenersOnScope(sendTaskElement, activity);
-
-    for (BpmnParseListener parseListener : parseListeners) {
-      parseListener.parseSendTask(sendTaskElement, scope, activity);
-    }
-    return activity;
   }
 
   protected AbstractDataAssociation parseDataOutputAssociation(Element dataAssociationElement) {
