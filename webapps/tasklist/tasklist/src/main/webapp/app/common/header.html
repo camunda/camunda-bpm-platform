@@ -33,7 +33,8 @@
 
           <ul class="dropdown-menu">
             <li ng-repeat="definition in processDefinitions">
-              <a href="#/process-definition/{{definition.id}}">{{ definition.name }}</a>
+              <a ng-show="definition.name" href="#/process-definition/{{definition.id}}">{{ definition.name }}</a>
+              <a ng-show="!definition.name" href="#/process-definition/{{definition.id}}">{{ definition.key }}</a>
             </li>
           </ul>
         </div>
