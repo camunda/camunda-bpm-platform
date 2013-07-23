@@ -10,10 +10,12 @@ import org.camunda.bpm.application.impl.ServletProcessApplication;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RuntimeService;
+import org.camunda.bpm.engine.authorization.Groups;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
-import org.camunda.bpm.pa.demo.TasklistDemoData;
+import org.camunda.bpm.engine.impl.persistence.entity.GroupEntity;
+import org.camunda.bpm.pa.demo.InvoiceDemoDataGenerator;
 
 /**
  *
@@ -86,19 +88,24 @@ public class DevProcessApplication extends ServletProcessApplication {
 
     final IdentityService identityService = engine.getIdentityService();
 
+    Group group = new GroupEntity(Groups.CAMUNDA_ADMIN);
+    group.setName("camunda BPM admin users");
+    group.setType("system");
+
+    identityService.saveGroup(group);
+
     User jonny1 = identityService.newUser("jonny1");
     jonny1.setFirstName("Jonny");
     jonny1.setLastName("Prosciutto");
     jonny1.setPassword("jonny1");
     identityService.saveUser(jonny1);
 
-    // group sales created by tasklist demo data
-    identityService.createMembership("jonny1", "sales");
+    identityService.createMembership(jonny1.getId(), group.getId());
   }
 
   private void createTasklistDemoData(ProcessEngine engine) {
 
     // create tasklist demo data
-    new TasklistDemoData().createDemoData(engine);
+    new InvoiceDemoDataGenerator().createDemoData(engine);
   }
 }

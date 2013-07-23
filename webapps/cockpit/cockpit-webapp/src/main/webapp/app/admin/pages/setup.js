@@ -6,7 +6,7 @@ define(['angular'], function(angular) {
 
   var Controller = ['$scope', 'InitialUserResource', 'Notifications', '$location', 'Uri', function ($scope, InitialUserResource, Notifications, $location, Uri) {
 
-    if (/.*\/app\/admin\/(\w+)\/setup\//.test($location.absUrl())) {
+    if (!/.*\/app\/admin\/(\w+)\/setup\/.*/.test($location.absUrl())) {
       $location.path("/");
       return;
     }
@@ -30,8 +30,9 @@ define(['angular'], function(angular) {
     $scope.createUser = function() {
       var user = {
         profile : $scope.profile,
-        credentials : { password : $scope.credentials.password}
-      }
+        credentials : { password : $scope.credentials.password }
+      };
+
       InitialUserResource.create(user).$then(
         function(){
           Notifications.addMessage({ type:"success", status:"Success", message:"Successfully created user. You can now login with user " + user.profile.id });

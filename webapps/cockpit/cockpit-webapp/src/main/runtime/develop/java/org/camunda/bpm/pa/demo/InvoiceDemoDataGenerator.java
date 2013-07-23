@@ -7,11 +7,11 @@ import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;
 
 /**
- * @author: drobisch
+ * @author drobisch
  */
-public class TasklistDemoData {
+public class InvoiceDemoDataGenerator {
 
-    private final static Logger LOGGER = Logger.getLogger(TasklistDemoData.class.getName());
+    private final static Logger LOGGER = Logger.getLogger(InvoiceDemoDataGenerator.class.getName());
 
     public void createDemoData(ProcessEngine engine) {
 
