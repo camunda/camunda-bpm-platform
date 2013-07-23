@@ -91,20 +91,21 @@ WHERE SUSPENSION_STATE_ is null;
 /** add authorizations **/
 
 create table ACT_RU_AUTHORIZATION (
-    ID_ varchar(64) not null,
-    REV_ integer not null,
-    GROUP_ID_ varchar(255),
-    USER_ID_ varchar(255),
-    RESOURCE_TYPE_ varchar(255) not null,
-    RESOURCE_ID_ varchar(64),
-    PERMS_ integer,
-    primary key (ID_)
+  ID_ varchar(64) not null,
+  REV_ integer not null,
+  TYPE_ integer not null,
+  GROUP_ID_ varchar(255),
+  USER_ID_ varchar(255),
+  RESOURCE_TYPE_ integer not null,
+  RESOURCE_ID_ varchar(64),
+  PERMS_ integer,
+  primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 
 alter table ACT_RU_AUTHORIZATION
     add constraint ACT_UNIQ_AUTH_USER
-    unique (USER_ID_,RESOURCE_TYPE_,RESOURCE_ID_);
+    unique (USER_ID_,TYPE_,RESOURCE_TYPE_,RESOURCE_ID_);
     
 alter table ACT_RU_AUTHORIZATION
     add constraint ACT_UNIQ_AUTH_GROUP
-    unique (GROUP_ID_,RESOURCE_TYPE_,RESOURCE_ID_);
+    unique (GROUP_ID_,TYPE_,RESOURCE_TYPE_,RESOURCE_ID_);
