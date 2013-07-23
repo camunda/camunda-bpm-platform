@@ -58,7 +58,11 @@ define(["angular"], function(angular) {
     EngineApi.getProcessDefinitions().get({ id: processDefinitionId }).$then(function(response) {
       var processDefinition = response.resource;
 
-      Notifications.addMessage({ status: "Completed", message: "Instance of <a>" + processDefinition.name + "</a> has been started", duration: 5000 });
+      if (processDefinition.name) {
+        Notifications.addMessage({ status: "Completed", message: "Instance of <a>" + processDefinition.name + "</a> has been started", duration: 5000 });
+      } else {
+        Notifications.addMessage({ status: "Completed", message: "Instance of <a>" + processDefinition.key + "</a> has been started", duration: 5000 });
+      }
       $location.url("/overview");
     });
   };
