@@ -78,7 +78,6 @@
         <module>qa</module>            
         
         <module>webapps/h2-webapp</module>
-        <module>webapps/tasklist</module>
         <module>webapps/cycle</module>
         <module>webapps/cockpit</module>
                 
@@ -122,7 +121,6 @@
       <id>check-webapps</id>
       <modules>
         <module>webapps/cycle</module>
-        <module>webapps/tasklist</module>
         <module>webapps/cockpit</module>    
       </modules>
     </profile>  

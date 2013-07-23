@@ -2,12 +2,8 @@
  * Logo styling
  */
 .navbar .brand {
-   display: block;
-   float: left;
-   background: no-repeat url('../../img/cockpit/app-logo.png');
+   background-image: url('../../img/cockpit/app-logo.png');
    width: 220px;
-   height: 39px;
-   padding: 0;
 }
 
 
@@ -272,17 +268,6 @@ textarea.in-place-edit {
 }
 
 /** bootstrap tweaks */
-
-.breadcrumb {
-  margin: 0 0 20px;
-  background-color: inherit;
-  -webkit-border-radius: 0;
-  -moz-border-radius: 0;
-  border-radius: 0;
-  line-height: 29px;
-  padding: 0 10px 0 10px;
-  font-size: 0.85em;
-}
 
 .btn-toolbar {
   padding: 6px 8px;

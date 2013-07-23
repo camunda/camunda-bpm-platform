@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -55,6 +57,21 @@ public abstract class AbstractTemplateFilter implements Filter {
   protected abstract void applyFilter(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException;
 
   /**
+   * Returns true if the given web resource exists.
+   * 
+   * @param name
+   * @return
+   */
+  protected boolean hasWebResource(String name) {
+    try {
+      URL resource = filterConfig.getServletContext().getResource(name);
+      return resource != null;
+    } catch (MalformedURLException e) {
+      return false;
+    }
+  }
+
+  /**
    * Returns the string contents of a web resource with the given name.
    *
    * The resource must be static and text based.
@@ -62,7 +79,7 @@ public abstract class AbstractTemplateFilter implements Filter {
    * @param name the name of the resource
    *
    * @return the resource contents
-   * 
+   *
    * @throws IOException
    */
   protected String getWebResourceContents(String name) throws IOException {

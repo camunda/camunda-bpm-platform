@@ -1,4 +1,4 @@
-(function() {
+(function(window) {
 
   var cockpitCore = [
     'module:cockpit.pages:./pages/main',
