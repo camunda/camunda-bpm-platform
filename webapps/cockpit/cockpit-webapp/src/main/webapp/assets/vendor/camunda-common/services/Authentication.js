@@ -1,32 +1,57 @@
-"use strict";
+ngDefine('camunda.common.services.authentication', function(module) {
 
-ngDefine('camunda.common.services.authentication', function(module, angular) {
-
-  var ServiceProducer = function AuthenticationFactory($http, $cookies, $q, Uri) {
+  var ServiceProducer = [ '$rootScope', '$http', '$cookies', 'Uri', 
+  function AuthenticationFactory($rootScope, $http, $cookies, Uri) {
 
     var AUTH_COOKIE_NAME = "CAM-AUTH";
 
-    var readAuthFromCookie = function(self) {
-      
-      self.auth = {};
+    function parseCookie(name) {
+      var str = $cookies[name],
+          cookie;
 
-      var cookieValue = $cookies[AUTH_COOKIE_NAME];
-      if(!!cookieValue) {
-        var parsedCookie = JSON.parse(cookieValue.replace(/^"|"$|\\/g, ''));
-        self.auth.username = parsedCookie[Uri.appUri(':engine')];       
-      } 
-    };
+      if (str) {
+        try {
+          // replace leading and trailing `"` 
+          // from cookie and parse it as JSON
+          cookie = JSON.parse(str.replace(/^"|"$|\\/g, ''));
+        } catch (e) {
+          console.log('[Authentication] Failed to parse camunda cookie');
+        }
+      }
+
+      return cookie;
+    }
+
+    function readFromCookie(engine) {
+      
+      var cookie = parseCookie(AUTH_COOKIE_NAME),
+          name;
+
+      if (cookie) {
+        name = cookie[engine];
+
+        if (name) {
+          return { name: cookie[engine] };
+        }
+      } else {
+        return null;
+      }
+    }
  
     function Authentication() {
-      readAuthFromCookie(this);
+      var engine = Uri.appUri(':engine');
+
+      this.user = readFromCookie(engine);
+
+      $rootScope.authentication = this;
     }
 
     Authentication.prototype.username = function() {
-      return this.auth.username;
+      return (this.user || {}).name;
     };
 
     Authentication.prototype.clear = function() {
-      this.auth = {};
+      this.user = null;
     };
 
     Authentication.prototype.login = function(username, password) {
@@ -45,7 +70,7 @@ ngDefine('camunda.common.services.authentication', function(module, angular) {
 
       return promise.then(function(response) {
         if (response.status == 200) {
-          self.auth.username = username;      
+          self.user = { name: username };      
           return true;
         } else {
           return false;
@@ -60,16 +85,13 @@ ngDefine('camunda.common.services.authentication', function(module, angular) {
           promise = $http.post(Uri.appUri("admin://auth/user/:engine/logout"));
 
       return promise.then(function() {
-        self.clear();        
+        self.clear();
         return true;
       });
     };
 
     return new Authentication();
-  };
-
-
-  ServiceProducer.$inject = [ '$http', '$cookies', '$q', 'Uri' ];
+  }];
 
   module.service('Authentication', ServiceProducer);
 });

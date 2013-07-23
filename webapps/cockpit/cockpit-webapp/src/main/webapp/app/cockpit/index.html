@@ -6,12 +6,13 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
+    <meta name="description" content="camunda Cockpit" />
     <meta name="author" content="camunda services GmbH" />
 
     <!-- settings the base path for relative links -->
-    <base href="./" cockpit-api="$APP_ROOT/api/cockpit/" engine-api="$APP_ROOT/api/engine/" app-root="$APP_ROOT" />
+    <base href="$BASE" cockpit-api="$APP_ROOT/api/cockpit/" engine-api="$APP_ROOT/api/engine/" app-root="$APP_ROOT" />
 
-    <!-- Styles -->
+    <!-- styles -->
     <link href="$APP_ROOT/assets/css/cockpit/loader.css" rel="stylesheet" />
 
     <!-- For IE6-8 support of HTML5 elements -->
@@ -19,7 +20,7 @@
       <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
     <![endif]-->
 
-    <!-- Favicon -->
+    <!-- favicon -->
     <link href="$APP_ROOT/assets/img/favicon.ico" rel="shortcut icon" type="image/x-icon" />
 
     <!-- scripts -->
@@ -34,7 +35,7 @@
       <div class="navbar-inner">
         <div class="container-fluid">
           <a class="brand ir" href="#/">
-            camunda cockpit
+            camunda Cockpit
           </a>
 
           <div ng-include="'templates/navigation.html'"></div>

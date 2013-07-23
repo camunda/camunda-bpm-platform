@@ -134,6 +134,10 @@
               <addDefaultImplementationEntries>true</addDefaultImplementationEntries>
             </manifest>
           </archive>
+          <!-- exclude development resources (task forms etc.) -->
+          <packagingExcludes>
+            develop/**
+          </packagingExcludes>
         </configuration>
       </plugin>
       <plugin>

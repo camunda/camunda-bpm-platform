@@ -33,12 +33,6 @@ ngDefine('camunda.common.pages', function(module) {
   var DefaultController = [ '$scope', '$rootScope', 'Notifications', 'Authentication', '$location', function($scope, $rootScope, Notifications, Authentication, $location) {
     $rootScope.$on("responseError", new ResponseErrorHandler(Notifications, Authentication, $location).handlerFn);
 
-    $scope.authentication = Authentication;
-
-    $scope.$watch('authentication.auth.username', function(newValue) {
-      $scope.userName = newValue;
-    });
-
   }];
 
   var ProcessEngineSelectionController = [
@@ -70,9 +64,7 @@ ngDefine('camunda.common.pages', function(module) {
     });
   }];
 
-  var NavigationController = [
-    '$scope', '$location', 'Authentication',
-    function($scope, $location, Authentication) {
+  var NavigationController = [ '$scope', '$location', function($scope, $location) {
 
       $scope.activeClass = function(link) {
         var path = $location.absUrl();      
@@ -83,10 +75,9 @@ ngDefine('camunda.common.pages', function(module) {
   var AuthenticationController = [
     '$scope', 'Notifications', 'Authentication', '$location',
     function($scope, Notifications, Authentication, $location) {
-  
+      
       $scope.logout = function() {
         Authentication.logout();
-        $location.path("/");
       }
   }];
 

@@ -18,7 +18,7 @@ public class EnginesFilterTest {
   public void testHTML_FILE_PATTERN() throws Exception {
 
     // given
-    Pattern pattern = ProcessEnginesFilter.HTML_FILE_PATTERN;
+    Pattern pattern = ProcessEnginesFilter.APP_PREFIX_PATTERN;
 
     // when
     Matcher matcher1 = pattern.matcher("/app/cockpit/");
@@ -29,7 +29,7 @@ public class EnginesFilterTest {
     // then
     assertThat(matcher1.matches()).isTrue();
     assertThat(matcher1.group(1)).isEqualTo("cockpit");
-    assertThat(matcher1.groupCount()).isEqualTo(4);
+    assertThat(matcher1.groupCount()).isEqualTo(3);
     assertThat(matcher1.group(2)).isNull();
 
     assertThat(matcher2.matches()).isTrue();
@@ -41,7 +41,7 @@ public class EnginesFilterTest {
     assertThat(matcher3.group(1)).isEqualTo("cockpit");
     assertThat(matcher3.group(2)).isEqualTo("engine1");
     assertThat(matcher3.group(3)).isEqualTo("something/asd.html");
-    
+
     assertThat(matcher4.matches()).isTrue();
     assertThat(matcher4.group(1)).isEqualTo("admin");
     assertThat(matcher4.group(2)).isEqualTo("engine1");

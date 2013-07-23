@@ -131,38 +131,6 @@
     </dependency>
 
     <dependency>
-      <groupId>org.camunda.bpm.tasklist</groupId>
-      <artifactId>camunda-tasklist</artifactId>
-      <version>${project.version}</version>
-      <type>war</type>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.camunda.bpm.tasklist</groupId>
-      <artifactId>camunda-tasklist-tomcat</artifactId>
-      <version>${project.version}</version>
-      <type>war</type>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.camunda.bpm.tasklist</groupId>
-      <artifactId>camunda-tasklist-glassfish</artifactId>
-      <version>${project.version}</version>
-      <type>war</type>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.camunda.bpm.tasklist</groupId>
-      <artifactId>camunda-tasklist-jboss</artifactId>
-      <version>${project.version}</version>
-      <type>war</type>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
       <groupId>org.camunda.bpm.example</groupId>
       <artifactId>camunda-example-invoice</artifactId>
       <version>${project.version}</version>
@@ -317,15 +285,6 @@
                   </properties>
                 </deployable>
                 <deployable>
-                  <groupId>org.camunda.bpm.tasklist</groupId>
-                  <artifactId>camunda-tasklist-jboss</artifactId>
-                  <type>war</type>
-                  <pingURL>http://localhost:${jboss.http.port}/tasklist</pingURL>
-                  <properties>
-                    <context>tasklist</context>
-                  </properties>
-                </deployable>
-                <deployable>
                   <groupId>org.camunda.bpm.example</groupId>
                   <artifactId>camunda-example-invoice</artifactId>
                   <type>war</type>
@@ -468,15 +427,6 @@
                   </properties>
                 </deployable>
                 <deployable>
-                  <groupId>org.camunda.bpm.tasklist</groupId>
-                  <artifactId>camunda-tasklist-glassfish</artifactId>
-                  <type>war</type>
-                  <pingURL>http://localhost:${http.port}/tasklist</pingURL>
-                  <properties>
-                    <context>tasklist</context>
-                  </properties>
-                </deployable>
-                <deployable>
                   <groupId>org.camunda.bpm.example</groupId>
                   <artifactId>camunda-example-invoice</artifactId>
                   <type>war</type>
@@ -588,15 +538,6 @@
                   <pingURL>http://localhost:${tomcat6.connector.http.port}/camunda</pingURL>
                   <properties>
                     <context>camunda</context>
-                  </properties>
-                </deployable>
-                <deployable>
-                  <groupId>org.camunda.bpm.tasklist</groupId>
-                  <artifactId>camunda-tasklist-tomcat</artifactId>
-                  <type>war</type>
-                  <pingURL>http://localhost:${tomcat6.connector.http.port}/tasklist</pingURL>
-                  <properties>
-                    <context>tasklist</context>
                   </properties>
                 </deployable>
                 <deployable>

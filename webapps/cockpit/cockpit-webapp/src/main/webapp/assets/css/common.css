@@ -28,6 +28,7 @@ div, textarea, .inline-edit input {
   moz-box-sizing: content-box;
 }
 
+/** inline editing of elements */
 form.inline-edit {
   margin-bottom: 35px;
 }
@@ -39,7 +40,7 @@ form.inline-edit {
 .inline-edit-footer {
   position: relative;
   width: 100%;
-  padding-right: 80px;  
+  padding-right: 80px;
 }
 
 .inline-edit-footer .btn-group {
@@ -95,13 +96,14 @@ html, body {
   min-height: 100%;
 }
 
-@media (max-width: 979px) {
-  .navbar-fixed-top .navbar-inner, .navbar-fixed-bottom .navbar-inner {
-    padding: 0px;
-  }
+/** navbar brand */
+.navbar .brand {
+   display: block;
+   float: left;
+   background: no-repeat;
+   height: 39px;
+   padding: 0;
 }
-
-/** end usability tweeks */
 
 /**
  * form styling
@@ -135,7 +137,7 @@ h1 {
 }
 
 /**----------------
-Cursors
+Pagination
 -------------------**/
 
 .pagination li {
@@ -202,9 +204,12 @@ Utilities
   }
 }
 
-@media (max-width: 767px) {
-
+@media (max-width: 979px) {
+  .ctn-main {
+    top: 51px;
+  }
 }
+
 
 .ctn-push-down {
   height: 32px;
@@ -213,6 +218,13 @@ Utilities
 footer {
   margin-top: 32px;
   padding: 5px 10px;
+}
+
+@media (max-width: 767px) {
+  footer {
+    margin-left: -20px;
+    margin-right: -20px;
+  }
 }
 
 /** layout ui tweaks */
@@ -251,6 +263,17 @@ footer .version {
     -webkit-box-shadow: 0 0 8px #888;
     box-shadow: 0 0 8px #888;
   }
+
+  .breadcrumb {
+    margin: 0 0 20px;
+    background-color: inherit;
+    -webkit-border-radius: 0;
+    -moz-border-radius: 0;
+    border-radius: 0;
+    line-height: 29px;
+    padding: 0 10px 0 10px;
+    font-size: 0.85em;
+  }
 }
 
 /** end layout ui tweaks */
@@ -284,7 +307,7 @@ input.ng-invalid {
 @media screen and (max-height: 600px){
   .modal {
     position:absolute;
-  } 
+  }
 }
 
 /** signin form */

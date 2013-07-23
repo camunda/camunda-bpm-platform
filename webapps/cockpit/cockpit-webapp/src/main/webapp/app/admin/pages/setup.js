@@ -6,6 +6,11 @@ define(['angular'], function(angular) {
 
   var Controller = ['$scope', 'InitialUserResource', 'Notifications', '$location', 'Uri', function ($scope, InitialUserResource, Notifications, $location, Uri) {
 
+    if (!/.*\/app\/admin\/(\w+)\/setup\/.*/.test($location.absUrl())) {
+      $location.path("/");
+      return;
+    }
+
     $scope.engineName = Uri.appUri(':engine');
 
     // data model for user profile
@@ -25,15 +30,16 @@ define(['angular'], function(angular) {
     $scope.createUser = function() {
       var user = {
         profile : $scope.profile,
-        credentials : { password : $scope.credentials.password}
-      }
+        credentials : { password : $scope.credentials.password }
+      };
+
       InitialUserResource.create(user).$then(
         function(){
-          Notifications.addMessage({type:"success", status:"Success", message:"Successfully created user. You can now login with user "+user.profile.id});
+          Notifications.addMessage({ type:"success", status:"Success", message:"Successfully created user. You can now login with user " + user.profile.id });
           $location.path("/users");
         },
         function(){
-          Notifications.addError({type:"error", status:"Error", message:"Could not create initial user."});
+          Notifications.addError({ type:"error", status:"Error", message:"Could not create initial user." });
         }
       );
     }
