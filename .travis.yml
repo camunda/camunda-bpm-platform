@@ -1,0 +1,4 @@
+language: java
+script: "mvn clean install -Pengine-integration,jboss,h2"
+jdk:
+  - oraclejdk6
