@@ -79,13 +79,13 @@
         
         <module>webapps/h2-webapp</module>
         <module>webapps/cycle</module>
-        <module>webapps/cockpit</module>
-                
+        <module>webapps/camunda</module>
+        
         <module>javaee/ejb-service</module>
         <module>javaee/ejb-client</module>
         <module>javaee/jobexecutor-ra</module>
         <module>javaee/jobexecutor-rar</module>
-          
+        
         <module>engine</module>
         <module>engine-cdi</module>
         <module>engine-osgi</module>
@@ -121,7 +121,7 @@
       <id>check-webapps</id>
       <modules>
         <module>webapps/cycle</module>
-        <module>webapps/cockpit</module>    
+        <module>webapps/camunda</module>    
       </modules>
     </profile>  
   </profiles>

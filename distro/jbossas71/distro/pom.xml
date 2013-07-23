@@ -65,8 +65,8 @@
     </dependency>
     
     <dependency>
-      <groupId>org.camunda.bpm.cockpit</groupId>
-      <artifactId>camunda-cockpit-jboss</artifactId>
+      <groupId>org.camunda.bpm.webapp</groupId>
+      <artifactId>camunda-webapp-jboss</artifactId>
       <version>${project.version}</version>
       <type>war</type>
     </dependency>
