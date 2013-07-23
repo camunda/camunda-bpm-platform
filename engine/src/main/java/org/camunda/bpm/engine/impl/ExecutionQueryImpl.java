@@ -21,6 +21,7 @@ import org.camunda.bpm.engine.impl.interceptor.CommandExecutor;
 import org.camunda.bpm.engine.impl.persistence.entity.SuspensionState;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ExecutionQuery;
+import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 
 
 /**
@@ -44,6 +45,8 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
   protected String superProcessInstanceId;
   protected String subProcessInstanceId;
   private String businessKey;
+  protected Boolean onlyErroneous;
+  protected Integer retries;
   
   public ExecutionQueryImpl() {
   }
@@ -151,6 +154,16 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
     return this;
   }
   
+  public ExecutionQuery onlyErroneous() {
+      this.onlyErroneous = true;
+      return this;
+  }
+  
+  public ExecutionQuery retries(Integer retries) {
+      this.retries = retries;
+      return this;
+  }
+  
   //ordering ////////////////////////////////////////////////////
   
   public ExecutionQueryImpl orderByProcessInstanceId() {
@@ -233,5 +246,13 @@ public class ExecutionQueryImpl extends AbstractVariableQueryImpl<ExecutionQuery
   public void setEventSubscriptions(List<EventSubscriptionQueryValue> eventSubscriptions) {
     this.eventSubscriptions = eventSubscriptions;
   }
+
+  public boolean isOnlyErroneous() {
+    return (onlyErroneous != null && onlyErroneous);
+  }
   
+  public Integer getRetries() {
+    return retries;
+  }
+    
 }

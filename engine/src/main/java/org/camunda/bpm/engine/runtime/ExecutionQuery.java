@@ -164,6 +164,10 @@ public interface ExecutionQuery extends Query<ExecutionQuery, Execution>{
    */
   ExecutionQuery active();
   
+  ExecutionQuery onlyErroneous();
+  
+  ExecutionQuery retries(Integer retries);
+  
   //ordering //////////////////////////////////////////////////////////////
   
   /** Order by id (needs to be followed by {@link #asc()} or {@link #desc()}). */
