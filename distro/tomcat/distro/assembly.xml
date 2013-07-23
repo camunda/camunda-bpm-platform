@@ -73,7 +73,8 @@
         <includes>
             <include>org.camunda.bpm.example:camunda-example-invoice:war:*</include>
         </includes>
-        <outputDirectory>server/apache-tomcat-${tomcat.version}/webapps/</outputDirectory>
+        <outputDirectory>server/apache-tomcat-${tomcat.version}/webapps/camunda-invoice</outputDirectory>
+        <unpack>true</unpack>
     </dependencySet>
 
     <dependencySet>
