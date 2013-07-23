@@ -63,7 +63,7 @@
 
     <dependencySet>
         <includes>
-            <include>org.camunda.bpm.cockpit:camunda-cockpit-tomcat:war:*</include>
+            <include>org.camunda.bpm.webapp:camunda-webapp-tomcat:war:*</include>
         </includes>
         <outputDirectory>server/apache-tomcat-${tomcat.version}/webapps/camunda</outputDirectory>
         <unpack>true</unpack>

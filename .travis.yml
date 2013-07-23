@@ -1,6 +1,9 @@
 language: java
-script: "mvn clean install -Pengine-integration,jboss,h2"
+script: "mvn clean install -Pwebapps-integration,engine-integration,jboss,h2"
 jdk:
   - oraclejdk7
 notifications:
   email: false
+before_install:
+  - "export DISPLAY=:99.0"
+  - "sh -e /etc/init.d/xvfb start"
