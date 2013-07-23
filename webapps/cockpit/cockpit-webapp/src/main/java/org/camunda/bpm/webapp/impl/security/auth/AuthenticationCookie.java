@@ -18,6 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.ws.rs.core.NewCookie;
 
+
 /**
  * <p>Util class allowing to obtain a Cookie from the current Authentications.</p>
  * 

@@ -12,6 +12,7 @@
  */
 package org.camunda.bpm.webapp.impl.security.auth;
 
+
 /**
  * <p>An authentication for a user</p>
  * 

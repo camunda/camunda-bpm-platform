@@ -21,7 +21,6 @@ import java.util.NoSuchElementException;
 import java.util.ServiceLoader;
 import java.util.Set;
 
-import org.camunda.bpm.BpmPlatform;
 import org.camunda.bpm.cockpit.CockpitRuntimeDelegate;
 import org.camunda.bpm.cockpit.plugin.PluginRegistry;
 import org.camunda.bpm.cockpit.db.CommandExecutor;

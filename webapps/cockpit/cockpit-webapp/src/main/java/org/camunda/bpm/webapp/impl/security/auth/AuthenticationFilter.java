@@ -22,6 +22,7 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 
+
 /**
  * <p>Servlet {@link Filter} implementation responsible for poulating the
  * {@link Authentications#getCurrent()} thread-local (ie. binding the current

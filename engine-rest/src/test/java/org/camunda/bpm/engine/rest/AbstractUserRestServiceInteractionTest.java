@@ -27,7 +27,6 @@ import javax.ws.rs.core.Response.Status;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.identity.UserQuery;
-import org.camunda.bpm.engine.rest.dto.identity.UserCreateDto;
 import org.camunda.bpm.engine.rest.dto.identity.UserCredentialsDto;
 import org.camunda.bpm.engine.rest.dto.identity.UserDto;
 import org.camunda.bpm.engine.rest.dto.identity.UserProfileDto;

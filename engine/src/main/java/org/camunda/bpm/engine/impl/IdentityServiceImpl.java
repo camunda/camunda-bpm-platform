@@ -123,6 +123,10 @@ public class IdentityServiceImpl extends ServiceImpl implements IdentityService 
   public void clearAuthentication() {
     Authentication.clearCurrentAuthentication();
   }
+  
+  public Authentication getCurrentAuthentication() {
+    return Authentication.getCurrentAuthentication();
+  }
 
   public String getUserInfo(String userId, String key) {
     return commandExecutor.execute(new GetUserInfoCmd(userId, key));

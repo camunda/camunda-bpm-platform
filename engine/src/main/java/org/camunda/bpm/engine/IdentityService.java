@@ -23,6 +23,7 @@ import org.camunda.bpm.engine.identity.Picture;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.identity.UserQuery;
 import org.camunda.bpm.engine.impl.identity.Account;
+import org.camunda.bpm.engine.impl.identity.Authentication;
 
 
 /**
@@ -173,6 +174,11 @@ public interface IdentityService {
    */
   void setAuthentication(String userId, List<String> groups);
   
+  /**
+   * @return the current authentication for this process engine.
+   */
+  Authentication getCurrentAuthentication();
+    
   /** Allows clearing the current authentication. Does not throw exception if 
    * no authentication exists.
    * */
@@ -219,4 +225,5 @@ public interface IdentityService {
   /** Delete an entry of the generic extensibility key-value pairs associated with a user */
   @Deprecated
   void deleteUserAccount(String userId, String accountName);
+
 }
