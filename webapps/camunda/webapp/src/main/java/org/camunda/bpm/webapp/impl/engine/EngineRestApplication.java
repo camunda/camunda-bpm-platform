@@ -35,12 +35,14 @@ public class EngineRestApplication extends Application {
   public Set<Class<?>> getClasses() {
     Set<Class<?>> classes = new HashSet<Class<?>>();
 
+    // only provide named process engine access.
     classes.add(ProcessEngineRestServiceImpl.class);
 
     // mandatory
     classes.add(JacksonConfigurator.class);
     classes.add(JacksonJsonProvider.class);
     classes.add(RestExceptionHandler.class);
+    
     classes.add(ProcessEngineExceptionHandler.class);
     classes.add(ExceptionHandler.class);
     

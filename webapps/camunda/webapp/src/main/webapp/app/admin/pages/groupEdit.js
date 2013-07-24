@@ -48,9 +48,6 @@ define(['angular'], function(angular) {
         function(){
           Notifications.addMessage({type:"success", status:"Success", message:"Group "+$scope.group.id+" successfully deleted."});
           $location.path("/groups");
-        },
-        function(){
-          Notifications.addError({type:"error", status:"Error", message:"Could not delete group "+$scope.group.id+"."});
         }
       );
     }

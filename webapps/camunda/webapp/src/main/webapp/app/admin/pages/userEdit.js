@@ -50,9 +50,6 @@ define(['angular'], function(angular) {
         function(){
           Notifications.addMessage({type:"success", status:"Success", message:"User profile successfully updated."});
           loadProfile();
-        },
-        function(){
-          Notifications.addError({type:"error", status:"Error", message:"Could not update user profile."});
         }
       );
     }
@@ -70,9 +67,6 @@ define(['angular'], function(angular) {
         function(){
           Notifications.addMessage({type:"success", status:"Success", message:"Password successfully changed."});
           resetCredentials();
-        },
-        function(){
-          Notifications.addError({type:"error", status:"Error", message:"Could not change user password."});
         }
       );
     }
@@ -84,9 +78,6 @@ define(['angular'], function(angular) {
         function(){
           Notifications.addMessage({type:"success", status:"Success", message:"User "+$scope.user.id+" successfully deleted."});
           $location.path("/users");
-        },
-        function(){
-          Notifications.addError({type:"error", status:"Error", message:"Could not delete user "+$scope.user.id+"."});
         }
       );
     }
@@ -108,9 +99,6 @@ define(['angular'], function(angular) {
         function(){
           Notifications.addMessage({type:"success", status:"Success", message:"User "+$scope.user.id+" removed from group."});
           loadGroups();
-        },
-        function(){
-          Notifications.addError({type:"error", status:"Error", message:"Could not remove user from group."});
         }
       );
     }

@@ -29,9 +29,6 @@ define(['angular'], function(angular) {
         function(){
           Notifications.addMessage({type:"success", status:"Success", message:"Successfully created new user "+user.profile.id});
           $location.path("/users");
-        },
-        function(){
-          Notifications.addError({type:"error", status:"Error", message:"Could not update user profile."});
         }
       );
     }

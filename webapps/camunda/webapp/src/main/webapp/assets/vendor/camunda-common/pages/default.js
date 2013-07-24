@@ -16,12 +16,17 @@ ngDefine('camunda.common.pages', function(module) {
           Notifications.addError({ status: "Error", message: "A problem occurred: Try to refresh the view or login and out of the application. If the problem persists, contact your administrator." });
         }
         break;
+
       case 0:
         Notifications.addError({ status: "Request Timeout", message:  "Your request timed out. Try refreshing the page." });
         break;
+
       case 401:
         Authentication.clear();
         $location.path("/login");
+        break;
+      case 403:
+        Notifications.addError({ status: "Error", message :  "You are unauthorized to "+data.permissionName+" "+data.resourceName+" "+(!!data.resourceId?data.resourceId:"") });
 
         break;
       default:

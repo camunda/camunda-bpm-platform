@@ -19,9 +19,6 @@ define(['angular'], function(angular) {
         function(){
           Notifications.addMessage({type:"success", status:"Success", message:"Successfully created new group "+group.id});
           $location.path("/groups");
-        },
-        function(){
-          Notifications.addError({type:"error", status:"Error", message:"Could not create new group"});
         }
       );
     }
