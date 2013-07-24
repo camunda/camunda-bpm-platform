@@ -25,7 +25,7 @@ import org.camunda.bpm.engine.impl.pvm.process.ActivityImpl;
  * @author Tom Baeyens
  * @author Joram Barrez
  */
-public class TimerExecuteNestedActivityJobHandler implements JobHandler {
+public class TimerExecuteNestedActivityJobHandler extends JobHandler {
   
   private static Logger log = Logger.getLogger(TimerExecuteNestedActivityJobHandler.class.getName());
   

@@ -14,13 +14,14 @@ package org.camunda.bpm.engine.impl.jobexecutor;
 
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
+import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.pvm.runtime.AtomicOperation;
 
 /**
  * 
  * @author Daniel Meyer
  */
-public class AsyncContinuationJobHandler implements JobHandler {
+public class AsyncContinuationJobHandler extends JobHandler {
   
   public final static String TYPE = "async-continuation";
 
@@ -28,10 +29,16 @@ public class AsyncContinuationJobHandler implements JobHandler {
     return TYPE;
   }
 
+  @Override
+  public void execute(JobEntity job, String configuration, ExecutionEntity execution, CommandContext commandContext) {
+		execution.setCurrentJob(job);
+		execute(configuration, execution, commandContext);
+  }
+	  
   public void execute(String configuration, ExecutionEntity execution, CommandContext commandContext) {
     // ATM only AtomicOperationTransitionCreateScope can be performed asynchronously 
     AtomicOperation atomicOperation = AtomicOperation.TRANSITION_CREATE_SCOPE;
-    
+
     commandContext
       .performOperation(atomicOperation, execution);
   }

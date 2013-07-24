@@ -23,7 +23,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 /**
  * @author Tom Baeyens
  */
-public class TweetExceptionHandler implements JobHandler {
+public class TweetExceptionHandler extends JobHandler {
   
   private static Logger log = Logger.getLogger(TweetExceptionHandler.class.getName());
   
