@@ -12,8 +12,6 @@
  */
 package org.camunda.bpm.engine.rest.dto;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 
 /**
  *
@@ -21,10 +19,8 @@ import java.io.StringWriter;
  */
 public class ExceptionDto {
 
-  private String type;
-  private String message;
-
-  private String stacktrace;
+  protected String type;
+  protected String message;
 
   public ExceptionDto() {
 
@@ -38,21 +34,23 @@ public class ExceptionDto {
     return message;
   }
 
-  public static ExceptionDto fromException(Exception e, boolean includeStacktrace) {
+  public static ExceptionDto fromException(Exception e) {
 
     ExceptionDto dto = new ExceptionDto();
 
     dto.type = e.getClass().getSimpleName();
     dto.message = e.getMessage();
 
-    if (includeStacktrace) {
-      StringWriter writer = new StringWriter();
-
-      e.printStackTrace(new PrintWriter(writer));
-
-      dto.stacktrace = writer.toString();
-    }
-
     return dto;
   }
+
+  public void setType(String type) {
+    this.type = type;
+  }
+
+  public void setMessage(String message) {
+    this.message = message;
+  }
+  
+  
 }

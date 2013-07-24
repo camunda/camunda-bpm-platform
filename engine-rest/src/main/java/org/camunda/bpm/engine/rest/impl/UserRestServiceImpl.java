@@ -90,20 +90,15 @@ public class UserRestServiceImpl extends AbstractRestProcessEngineAware implemen
       throw new InvalidRequestException(Status.BAD_REQUEST, "request object must provide profile information with valid id.");
     }
     
-    try {
-      User newUser = identityService.newUser(profile.getId());    
-      profile.update(newUser);
-      
-      if(userDto.getCredentials() != null) {
-        newUser.setPassword(userDto.getCredentials().getPassword());
-      }
-      
-      identityService.saveUser(newUser);      
-      
-    } catch (RuntimeException e) {
-      throw new InvalidRequestException(Status.INTERNAL_SERVER_ERROR, "Exception while saving new user: "+e.getMessage());
-      
+    User newUser = identityService.newUser(profile.getId());    
+    profile.update(newUser);
+    
+    if(userDto.getCredentials() != null) {
+      newUser.setPassword(userDto.getCredentials().getPassword());
     }
+    
+    identityService.saveUser(newUser);      
+      
   }
   
   // utility methods //////////////////////////////////////

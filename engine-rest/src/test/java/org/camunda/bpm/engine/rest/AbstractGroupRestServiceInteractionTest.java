@@ -25,6 +25,7 @@ import static org.mockito.Mockito.when;
 import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.IdentityService;
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.GroupQuery;
 import org.camunda.bpm.engine.rest.dto.identity.GroupDto;
@@ -161,12 +162,11 @@ public abstract class AbstractGroupRestServiceInteractionTest extends AbstractRe
   public void testGroupCreateExistingFails() {
     Group newGroup = MockProvider.createMockGroup();    
     when(identityServiceMock.newGroup(MockProvider.EXAMPLE_GROUP_ID)).thenReturn(newGroup);
-    doThrow(new RuntimeException("")).when(identityServiceMock).saveGroup(newGroup);
+    doThrow(new ProcessEngineException("")).when(identityServiceMock).saveGroup(newGroup);
     
     given().body(GroupDto.fromGroup(newGroup)).contentType(ContentType.JSON)
       .then().expect().statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).contentType(ContentType.JSON)
-      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
-      .body("message", equalTo("Exception while saving new group "))
+      .body("type", equalTo(ProcessEngineException.class.getSimpleName()))
       .when().post(GROUP_CREATE_URL);
     
     verify(identityServiceMock).newGroup(MockProvider.EXAMPLE_GROUP_ID);

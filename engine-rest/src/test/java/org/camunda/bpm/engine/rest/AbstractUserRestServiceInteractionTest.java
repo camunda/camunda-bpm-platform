@@ -25,6 +25,7 @@ import static org.mockito.Mockito.when;
 import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.IdentityService;
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.identity.UserQuery;
 import org.camunda.bpm.engine.rest.dto.identity.UserCredentialsDto;
@@ -167,7 +168,7 @@ public abstract class AbstractUserRestServiceInteractionTest extends AbstractRes
   public void testUserCreateExistingFails() {
     User newUser = MockProvider.createMockUser();    
     when(identityServiceMock.newUser(MockProvider.EXAMPLE_USER_ID)).thenReturn(newUser);
-    doThrow(new RuntimeException("")).when(identityServiceMock).saveUser(newUser);
+    doThrow(new ProcessEngineException("")).when(identityServiceMock).saveUser(newUser);
     
     UserDto userDto = UserDto.fromUser(newUser, true);
     
@@ -175,8 +176,7 @@ public abstract class AbstractUserRestServiceInteractionTest extends AbstractRes
       .body(userDto).contentType(ContentType.JSON)
     .then()
       .statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode()).contentType(ContentType.JSON)
-      .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
-      .body("message", equalTo("Exception while saving new user: "))
+      .body("type", equalTo(ProcessEngineException.class.getSimpleName()))
     .when()
       .post(USER_CREATE_URL);
     

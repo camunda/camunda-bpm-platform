@@ -46,43 +46,29 @@ public class UserResourceImpl extends AbstractIdentityResource implements UserRe
 
   public void updateOrCreateUser(UserDto user) {    
     ensureNotReadOnly();
+      
+    User dbUser = findUserObject();    
     
-    try {
-      
-      User dbUser = findUserObject();    
-      
-      if(dbUser == null) {
-        dbUser = identityService.newUser(resourceId);
-      }
-      
-      // update profile
-      if(user.getProfile() != null) {
-        user.getProfile().update(dbUser);
-      } 
-      
-      // update account
-      if(user.getCredentials() != null) {
-        dbUser.setPassword(user.getCredentials().getPassword());
-      }
-           
-      identityService.saveUser(dbUser);
-      
-    } catch (ProcessEngineException e) {
-      throw new InvalidRequestException(Status.INTERNAL_SERVER_ERROR, "Exception while updating user "+resourceId+": "+e.getMessage());
-      
+    if(dbUser == null) {
+      dbUser = identityService.newUser(resourceId);
     }
     
+    // update profile
+    if(user.getProfile() != null) {
+      user.getProfile().update(dbUser);
+    } 
+    
+    // update account
+    if(user.getCredentials() != null) {
+      dbUser.setPassword(user.getCredentials().getPassword());
+    }
+         
+    identityService.saveUser(dbUser);
   }
   
   public void deleteUser() {    
-    ensureNotReadOnly();
-    
-    try {
-      identityService.deleteUser(resourceId);
-    } catch(ProcessEngineException e) {
-      throw new InvalidRequestException(Status.INTERNAL_SERVER_ERROR, "Exception while deleting user "+resourceId+": "+e.getMessage());
-    }
-        
+    ensureNotReadOnly();    
+    identityService.deleteUser(resourceId);        
   }
   
   public void updateCredentials(UserCredentialsDto account) {
@@ -94,13 +80,8 @@ public class UserResourceImpl extends AbstractIdentityResource implements UserRe
     }
     
     dbUser.setPassword(account.getPassword());
-    try {
-      identityService.saveUser(dbUser);
-      
-    } catch (ProcessEngineException e) {
-      throw new InvalidRequestException(Status.INTERNAL_SERVER_ERROR, "Exception while updating user "+resourceId+": "+e.getMessage());
-    }
     
+    identityService.saveUser(dbUser);    
   }
   
   public void updateProfile(UserProfileDto profile) {
@@ -113,12 +94,7 @@ public class UserResourceImpl extends AbstractIdentityResource implements UserRe
     
     profile.update(dbUser);
     
-    try {
-      identityService.saveUser(dbUser);
-      
-    } catch (ProcessEngineException e) {
-      throw new InvalidRequestException(Status.INTERNAL_SERVER_ERROR, "Exception while updating user "+resourceId+": "+e.getMessage());
-    }
+    identityService.saveUser(dbUser);      
   }
 
   protected User findUserObject() {

@@ -52,24 +52,14 @@ public class GroupResourceImpl extends AbstractIdentityResource implements Group
     }
     
     group.update(dbGroup);        
-    try {
-      identityService.saveGroup(dbGroup);
-      
-    } catch (ProcessEngineException e) {
-      throw new InvalidRequestException(Status.INTERNAL_SERVER_ERROR, "Exception while updating group "+resourceId+": "+e.getMessage());
-    }
+
+    identityService.saveGroup(dbGroup);
   }
   
 
   public void deleteGroup() {    
-    ensureNotReadOnly();
-    
-    try {
-      identityService.deleteGroup(resourceId);
-    } catch(ProcessEngineException e) {
-      throw new InvalidRequestException(Status.INTERNAL_SERVER_ERROR, "Exception while deleting group "+resourceId+": "+e.getMessage());
-    }
-        
+    ensureNotReadOnly();    
+    identityService.deleteGroup(resourceId);        
   }
 
   public GroupMembersResource getGroupMembersResource() {
