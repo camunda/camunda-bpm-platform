@@ -433,4 +433,15 @@ public class HistoryServiceTest extends PluggableProcessEngineTestCase {
     assertEquals(1, historyService.createNativeHistoricActivityInstanceQuery().sql("SELECT * FROM " + managementService.getTableName(HistoricProcessInstance.class)).listPage(0, 1).size());
   }
   
+  @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
+  public void testHistoricProcessInstanceQueryDeleted() {
+	assertTrue(historyService.createHistoricProcessInstanceQuery().count() == 0);
+	ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
+	assertTrue(historyService.createHistoricProcessInstanceQuery().count() == 1);
+
+    String deleteReason = "NotRequired";        
+    runtimeService.deleteProcessInstance(processInstance.getId(), deleteReason);
+    assertTrue(historyService.createHistoricProcessInstanceQuery().count() == 1);
+    assertTrue(historyService.createHistoricProcessInstanceQuery().deleted().count() == 1);
+  }
 }
