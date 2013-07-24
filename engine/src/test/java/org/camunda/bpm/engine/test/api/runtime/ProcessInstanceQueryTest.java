@@ -1111,5 +1111,27 @@ public class ProcessInstanceQueryTest extends PluggableProcessEngineTestCase {
   public void testNativeQueryPaging() {
     assertEquals(5, runtimeService.createNativeProcessInstanceQuery().sql("SELECT * FROM " + managementService.getTableName(ProcessInstance.class)).listPage(0, 5).size());
   }  
-
+  
+  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/async/AsyncTaskTest.testFailingAsycServiceTimer.bpmn20.xml"})
+  public void testQueryByHasExceptions() {	  
+  ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("asyncService");
+   
+   waitForJobExecutorToProcessAllJobs(10000L);
+   
+   assertTrue(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count() == 1);   
+   assertTrue(runtimeService.createProcessInstanceQuery().onlyErroneous().processInstanceId(processInstance.getId()).count() == 1);
+   runtimeService.deleteProcessInstance(processInstance.getId(), "dead"); 
+  }
+  
+  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/async/AsyncTaskTest.testFailingAsycServiceTimer.bpmn20.xml"})
+  public void testQueryByHasExceptionsAndNoRetries() {
+	  int retries = 0;
+	  ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("asyncService");
+	   
+	   waitForJobExecutorToProcessAllJobs(10000L);
+	   
+	   assertTrue(runtimeService.createProcessInstanceQuery().processInstanceId(processInstance.getId()).count() == 1);   
+	   assertTrue(runtimeService.createProcessInstanceQuery().onlyErroneous().retries(retries).processInstanceId(processInstance.getId()).count() == 1);
+	   runtimeService.deleteProcessInstance(processInstance.getId(), "dead"); 
+  }
 }
