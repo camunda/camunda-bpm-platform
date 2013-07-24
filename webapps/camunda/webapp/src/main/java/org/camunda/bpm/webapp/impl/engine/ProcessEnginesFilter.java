@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.camunda.bpm.cockpit.Cockpit;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.authorization.Groups;
+import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.webapp.impl.filter.AbstractTemplateFilter;
 
 /**
@@ -127,7 +128,15 @@ public class ProcessEnginesFilter extends AbstractTemplateFilter {
     }
 
     if (!processEngine.getIdentityService().isReadOnly()) {
-      return processEngine.getIdentityService().createUserQuery().memberOfGroup(Groups.CAMUNDA_ADMIN).count() == 0;
+      Authentication currentAuthentication = processEngine.getIdentityService().getCurrentAuthentication();
+      try {
+        processEngine.getIdentityService().clearAuthentication();
+        return processEngine.getIdentityService().createUserQuery().memberOfGroup(Groups.CAMUNDA_ADMIN).count() == 0;
+      } finally {
+        if(currentAuthentication != null) {
+          processEngine.getIdentityService().setAuthentication(currentAuthentication);
+        }        
+      }
     }
 
     return false;

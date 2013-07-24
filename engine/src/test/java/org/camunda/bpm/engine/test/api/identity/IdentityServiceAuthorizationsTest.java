@@ -43,14 +43,14 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
 
   @Override
   protected void tearDown() throws Exception {
-    processEngineConfiguration.setAuthorizationChecksEnabled(false);
+    processEngineConfiguration.setAuthorizationEnabled(false);
     cleanupAfterTest();
     super.tearDown();
   }
   
   public void testUserCreateAuthorizations() {
 
-    processEngineConfiguration.setAuthorizationChecksEnabled(true);
+    processEngineConfiguration.setAuthorizationEnabled(true);
     identityService.setAuthenticatedUserId(jonny2);
     
     // add base permission which allows nobody to create users:
@@ -94,7 +94,7 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
     identityService.saveUser(jonny1);    
     
     // turn on authorization
-    processEngineConfiguration.setAuthorizationChecksEnabled(true);    
+    processEngineConfiguration.setAuthorizationEnabled(true);    
     identityService.setAuthenticatedUserId(jonny2);
     
     // create global auth
@@ -124,7 +124,7 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
     identityService.saveUser(jonny1);    
     
     // turn on authorization
-    processEngineConfiguration.setAuthorizationChecksEnabled(true);    
+    processEngineConfiguration.setAuthorizationEnabled(true);    
     identityService.setAuthenticatedUserId(jonny2);
     
     // create global auth
@@ -158,7 +158,7 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
   
   public void testGroupCreateAuthorizations() {
 
-    processEngineConfiguration.setAuthorizationChecksEnabled(true);
+    processEngineConfiguration.setAuthorizationEnabled(true);
     identityService.setAuthenticatedUserId(jonny2);
     
     // add base permission which allows nobody to create groups:
@@ -202,7 +202,7 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
     identityService.saveGroup(group1);    
     
     // turn on authorization
-    processEngineConfiguration.setAuthorizationChecksEnabled(true);    
+    processEngineConfiguration.setAuthorizationEnabled(true);    
     identityService.setAuthenticatedUserId(jonny2);
     
     // create global auth
@@ -234,7 +234,7 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
     identityService.saveGroup(group1);     
     
     // turn on authorization
-    processEngineConfiguration.setAuthorizationChecksEnabled(true);    
+    processEngineConfiguration.setAuthorizationEnabled(true);    
     identityService.setAuthenticatedUserId(jonny2);
     
     // create global auth
@@ -274,7 +274,7 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
     Group group1 = identityService.newGroup("group1");
     identityService.saveGroup(group1);   
 
-    processEngineConfiguration.setAuthorizationChecksEnabled(true);
+    processEngineConfiguration.setAuthorizationEnabled(true);
     identityService.setAuthenticatedUserId(jonny2);
         
     // add base permission which allows nobody to add users to groups
@@ -305,7 +305,7 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
     Group group1 = identityService.newGroup("group1");
     identityService.saveGroup(group1);   
 
-    processEngineConfiguration.setAuthorizationChecksEnabled(true);
+    processEngineConfiguration.setAuthorizationEnabled(true);
     identityService.setAuthenticatedUserId(jonny2);
         
     // add base permission which allows nobody to add users to groups
@@ -339,7 +339,7 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
     identityService.saveUser(jonny1);
     
     // now enable checks
-    processEngineConfiguration.setAuthorizationChecksEnabled(true);
+    processEngineConfiguration.setAuthorizationEnabled(true);
 
     // set base permission for all users (no-one has any permissions on users)
     Authorization basePerms = authorizationService.createNewAuthorization(AUTH_TYPE_GLOBAL);
@@ -412,7 +412,7 @@ public class IdentityServiceAuthorizationsTest extends PluggableProcessEngineTes
     identityService.saveGroup(group1);
     
     // now enable checks
-    processEngineConfiguration.setAuthorizationChecksEnabled(true);
+    processEngineConfiguration.setAuthorizationEnabled(true);
 
     // set base permission for all users (no-one has any permissions on groups)
     Authorization basePerms = authorizationService.createNewAuthorization(AUTH_TYPE_GLOBAL);

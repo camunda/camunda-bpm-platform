@@ -418,13 +418,13 @@ public class AuthorizationServiceTest extends PluggableProcessEngineTestCase {
     List<String> jonnysGroups = Arrays.asList(new String[]{"sales", "marketing"});
     List<String> someOneElsesGroups = Arrays.asList(new String[]{"marketing"});
     
-    // if no authorizations are in Db, everything is authorized
-    assertTrue(authorizationService.isUserAuthorized("jonny", jonnysGroups, ALL, resource1));
-    assertTrue(authorizationService.isUserAuthorized("someone", someOneElsesGroups, CREATE, resource2));
-    assertTrue(authorizationService.isUserAuthorized("someone else", null, DELETE, resource1));
-    assertTrue(authorizationService.isUserAuthorized("jonny", jonnysGroups, ALL, resource1, "someId"));
-    assertTrue(authorizationService.isUserAuthorized("someone", someOneElsesGroups, CREATE, resource2, "someId"));
-    assertTrue(authorizationService.isUserAuthorized("someone else", null, DELETE, resource1, "someOtherId"));
+    // if no authorizations are in Db, nothing is authorized
+    assertFalse(authorizationService.isUserAuthorized("jonny", jonnysGroups, ALL, resource1));
+    assertFalse(authorizationService.isUserAuthorized("someone", someOneElsesGroups, CREATE, resource2));
+    assertFalse(authorizationService.isUserAuthorized("someone else", null, DELETE, resource1));
+    assertFalse(authorizationService.isUserAuthorized("jonny", jonnysGroups, ALL, resource1, "someId"));
+    assertFalse(authorizationService.isUserAuthorized("someone", someOneElsesGroups, CREATE, resource2, "someId"));
+    assertFalse(authorizationService.isUserAuthorized("someone else", null, DELETE, resource1, "someOtherId"));
     
   }
   

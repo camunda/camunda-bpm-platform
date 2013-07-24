@@ -12,6 +12,10 @@
  */
 package org.camunda.bpm.webapp.impl.security.auth;
 
+import java.util.List;
+
+import org.camunda.bpm.engine.identity.Group;
+
 
 /**
  * <p>An authentication for a user</p>
@@ -22,6 +26,8 @@ package org.camunda.bpm.webapp.impl.security.auth;
 public class UserAuthentication extends Authentication {
 
   private static final long serialVersionUID = 1L;
+  
+  protected List<String> groupIds;
 
   /**
    * @param userId the id of the user
@@ -29,6 +35,19 @@ public class UserAuthentication extends Authentication {
    */
   public UserAuthentication(String userId, String processEngineName) {
     super(userId, processEngineName);
+  }
+  
+  public UserAuthentication(String userId, List<String> groupIds, String processEngineName) {
+    super(userId, processEngineName);
+    this.groupIds = groupIds;
+  }
+
+  public List<String> getGroupIds() {
+    return groupIds;
+  }
+  
+  public void setGroupIds(List<String> groupIds) {
+    this.groupIds = groupIds;
   }
   
 }

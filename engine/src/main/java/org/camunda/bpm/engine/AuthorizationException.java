@@ -32,7 +32,7 @@ public class AuthorizationException extends ProcessEngineException {
     super(
         "The user with id '"+userId+ 
         "' does not have '"+permissionName+"' permission " +
-        "on resource ' " + (resourceId != null ? (resourceId+"' of type '") : "" ) + resourceType+"' .");
+        "on resource '" + (resourceId != null ? (resourceId+"' of type '") : "" ) + resourceType+"' .");
     this.resourceType = resourceType;
     this.permissionName = permissionName;    
     this.userId = userId;

@@ -12,7 +12,9 @@
  */
 package org.camunda.bpm.webapp.impl.security.auth;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.ServiceLoader;
 
 import javax.servlet.http.HttpServletRequest;
@@ -27,6 +29,8 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.identity.Group;
+import org.camunda.bpm.engine.identity.GroupQuery;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.spi.ProcessEngineProvider;
@@ -66,8 +70,19 @@ public class UserAuthenticationResource {
     } else {           
       final Authentications authentications = Authentications.getCurrent();
       
+      // get user's groups      
+      final List<Group> groupList = processEngine.getIdentityService().createGroupQuery()
+        .groupMember(username)
+        .list();
+      
+      // transform into list of strings:
+      List<String> groupIds = new ArrayList<String>();
+      for (Group group : groupList) {
+        groupIds.add(group.getId());
+      }
+      
       // create new authentication
-      UserAuthentication newAuthentication = new UserAuthentication(username, engineName);      
+      UserAuthentication newAuthentication = new UserAuthentication(username, groupIds, engineName);      
       authentications.addAuthentication(newAuthentication);      
       
       // send reponse including updated cookie.

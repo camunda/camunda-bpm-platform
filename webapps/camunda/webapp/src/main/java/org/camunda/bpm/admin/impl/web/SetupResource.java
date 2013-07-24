@@ -12,6 +12,13 @@
  */
 package org.camunda.bpm.admin.impl.web;
 
+import static org.camunda.bpm.engine.authorization.Authorization.ANY;
+import static org.camunda.bpm.engine.authorization.Authorization.AUTH_TYPE_GRANT;
+import static org.camunda.bpm.engine.authorization.Permissions.ALL;
+import static org.camunda.bpm.engine.authorization.Resources.GROUP;
+import static org.camunda.bpm.engine.authorization.Resources.GROUP_MEMBERSHIP;
+import static org.camunda.bpm.engine.authorization.Resources.USER;
+
 import java.util.Iterator;
 import java.util.ServiceLoader;
 
@@ -23,16 +30,19 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response.Status;
 
+import org.camunda.bpm.engine.AuthorizationService;
+import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.authorization.Groups;
-import org.camunda.bpm.engine.rest.dto.identity.GroupDto;
+import org.camunda.bpm.engine.identity.Group;
+import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity;
 import org.camunda.bpm.engine.rest.dto.identity.UserDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
-import org.camunda.bpm.engine.rest.impl.GroupRestServiceImpl;
 import org.camunda.bpm.engine.rest.impl.UserRestServiceImpl;
 import org.camunda.bpm.engine.rest.spi.ProcessEngineProvider;
-import org.camunda.bpm.engine.rest.sub.identity.GroupResource;
+import org.camunda.bpm.webapp.impl.security.SecurityActions;
+import org.camunda.bpm.webapp.impl.security.SecurityActions.SecurityAction;
 
 /**
  * <p>Jax RS resource allowing to perform the setup steps.</p>
@@ -50,39 +60,82 @@ public class SetupResource {
   @POST
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
-  public void createInitialUser(@PathParam("engine") String processEngineName, UserDto user) {
+  public void createInitialUser(final @PathParam("engine") String processEngineName, final UserDto user) throws Exception {
 
+    final ProcessEngine processEngine = lookupProcessEngine(processEngineName);    
+    if(processEngine == null) {
+      throw new InvalidRequestException(Status.BAD_REQUEST, "Process Engine '"+processEngineName+"' does not exist.");
+    }
+    
+    SecurityActions.runWithoutAuthentication(new SecurityAction<Void>() {
+      public Void execute() throws Exception {        
+        createInitialUserInternal(processEngineName, user, processEngine);        
+        return null;
+      }
+    }, processEngine);
+      
+  }
+
+  protected void createInitialUserInternal(String processEngineName, UserDto user, ProcessEngine processEngine) {
     // make sure we can process this request at this time
-    ensureSetupAvailable(lookupProcessEngine(processEngineName));
+    ensureSetupAvailable(processEngine);
 
     // reuse logic from rest api implementation
     UserRestServiceImpl userRestServiceImpl = new UserRestServiceImpl(processEngineName);
     userRestServiceImpl.createUser(user);
+    
+    // crate the camunda admin group
+    ensureCamundaAdminGroupExists(processEngine);
+    
+    // create group membership (add new user to admin group)
+    processEngine.getIdentityService()
+      .createMembership(user.getProfile().getId(), Groups.CAMUNDA_ADMIN);
+  }
 
-    // reuse logic from rest api implementation
-    GroupRestServiceImpl groupRestServiceImpl = new GroupRestServiceImpl(processEngineName);
-
-    GroupResource groupResource;
-
-    // get or create group
-    try {
-      groupResource = groupRestServiceImpl.getGroup(Groups.CAMUNDA_ADMIN);
-      groupResource.getGroup();
-    } catch (InvalidRequestException e) {
-
-      GroupDto groupDto = new GroupDto();
-      groupDto.setId(Groups.CAMUNDA_ADMIN);
-      groupDto.setName("camunda BPM admin group");
-      groupDto.setType("system");
-
-      groupRestServiceImpl.createGroup(groupDto);
+  protected void ensureCamundaAdminGroupExists(ProcessEngine processEngine) {
+        
+    final IdentityService identityService = processEngine.getIdentityService();
+    final AuthorizationService authorizationService = processEngine.getAuthorizationService();
+    
+    // create group
+    if(identityService.createGroupQuery().groupId(Groups.CAMUNDA_ADMIN).count() == 0) {      
+      Group camundaAdminGroup = identityService.newGroup(Groups.CAMUNDA_ADMIN);
+      camundaAdminGroup.setName("camunda BPM Administrators");
+      camundaAdminGroup.setType(Groups.GROUP_TYPE_SYSTEM);
+      identityService.saveGroup(camundaAdminGroup);      
     }
-
-    // create group membership for new user
-    groupRestServiceImpl
-        .getGroup(Groups.CAMUNDA_ADMIN)
-          .getGroupMembersResource()
-            .createGroupMember(user.getProfile().getId());
+       
+    // create administrator Authorizations for camunda admin group.      
+    // all permissions on 'USER'
+    if(authorizationService.createAuthorizationQuery().groupIdIn(Groups.CAMUNDA_ADMIN).resourceType(USER).resourceId(ANY).count() == 0) {      
+      AuthorizationEntity userAdminAuth = new AuthorizationEntity(AUTH_TYPE_GRANT);
+      userAdminAuth.setGroupId(Groups.CAMUNDA_ADMIN);
+      userAdminAuth.setResource(USER);
+      userAdminAuth.setResourceId(ANY);   
+      userAdminAuth.addPermission(ALL);
+      authorizationService.saveAuthorization(userAdminAuth);
+    }
+    
+    // all permissions on 'GROUP'
+    if(authorizationService.createAuthorizationQuery().groupIdIn(Groups.CAMUNDA_ADMIN).resourceType(GROUP).resourceId(ANY).count() == 0) {
+      AuthorizationEntity groupAdminAuth = new AuthorizationEntity(AUTH_TYPE_GRANT);
+      groupAdminAuth.setGroupId(Groups.CAMUNDA_ADMIN);
+      groupAdminAuth.setResource(GROUP);
+      groupAdminAuth.setResourceId(ANY);   
+      groupAdminAuth.addPermission(ALL);
+      authorizationService.saveAuthorization(groupAdminAuth);
+    }
+    
+    // all permissions on 'MEMBERSHIP'
+    if(authorizationService.createAuthorizationQuery().groupIdIn(Groups.CAMUNDA_ADMIN).resourceType(GROUP_MEMBERSHIP).resourceId(ANY).count() == 0) {
+      AuthorizationEntity groupMemberAdminAuth = new AuthorizationEntity(AUTH_TYPE_GRANT);
+      groupMemberAdminAuth.setGroupId(Groups.CAMUNDA_ADMIN);
+      groupMemberAdminAuth.setResource(GROUP_MEMBERSHIP);
+      groupMemberAdminAuth.setResourceId(ANY);   
+      groupMemberAdminAuth.addPermission(ALL);
+      authorizationService.saveAuthorization(groupMemberAdminAuth);      
+    }
+  
   }
 
   protected void ensureSetupAvailable(ProcessEngine processEngine) {

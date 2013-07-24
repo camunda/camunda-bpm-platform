@@ -60,7 +60,7 @@ public class ExpressionManagerTest extends PluggableProcessEngineTestCase {
   public void testAuthenticatedUserIdAvailable() {
     try {
       // Setup authentication
-      Authentication.setAuthenticatedUserId("frederik");
+      identityService.setAuthenticatedUserId("frederik");
       ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("testAuthenticatedUserIdAvailableProcess");
       
       // Check if the variable that has been set in service-task is the authenticated user
@@ -69,7 +69,7 @@ public class ExpressionManagerTest extends PluggableProcessEngineTestCase {
       assertEquals("frederik", value);
     } finally {
       // Cleanup
-      Authentication.setAuthenticatedUserId(null);
+      identityService.clearAuthentication();
     }
   }
 }

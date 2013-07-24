@@ -75,6 +75,8 @@ import org.camunda.bpm.engine.impl.calendar.CycleBusinessCalendar;
 import org.camunda.bpm.engine.impl.calendar.DueDateBusinessCalendar;
 import org.camunda.bpm.engine.impl.calendar.DurationBusinessCalendar;
 import org.camunda.bpm.engine.impl.calendar.MapBusinessCalendarManager;
+import org.camunda.bpm.engine.impl.cfg.auth.DefaultAuthorizationProvider;
+import org.camunda.bpm.engine.impl.cfg.auth.ResourceAuthorizationProvider;
 import org.camunda.bpm.engine.impl.cfg.standalone.StandaloneMybatisTransactionContextFactory;
 import org.camunda.bpm.engine.impl.db.DbIdGenerator;
 import org.camunda.bpm.engine.impl.db.DbSqlSessionFactory;
@@ -336,6 +338,8 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected PasswordEncryptor passwordEncryptor;
   
   protected Set<String> registeredDeployments;
+  
+  protected ResourceAuthorizationProvider resourceAuthorizationProvider;
 
   // buildProcessEngine ///////////////////////////////////////////////////////
 
@@ -377,6 +381,7 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
     initIncidentHandlers();
     initPasswordDigest();
     initDeploymentRegistration();
+    initResourceAuthorizationProvider();
   }
 
   // failedJobCommandFactory ////////////////////////////////////////////////////////
@@ -1081,6 +1086,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
   protected void initDeploymentRegistration() {
     if (registeredDeployments == null) {
       registeredDeployments = Collections.synchronizedSet(new HashSet<String>());
+    }
+  }
+  
+  // resource authorization provider //////////////////////////////////////////
+  
+  protected void initResourceAuthorizationProvider() {
+    if(resourceAuthorizationProvider == null) {
+      resourceAuthorizationProvider = new DefaultAuthorizationProvider();
     }
   }
 
@@ -1909,6 +1922,14 @@ public abstract class ProcessEngineConfigurationImpl extends ProcessEngineConfig
 
   public void setRegisteredDeployments(Set<String> registeredDeployments) {
     this.registeredDeployments = registeredDeployments;
+  }
+  
+  public ResourceAuthorizationProvider getResourceAuthorizationProvider() {
+    return resourceAuthorizationProvider;
+  }
+  
+  public void setResourceAuthorizationProvider(ResourceAuthorizationProvider resourceAuthorizationProvider) {
+    this.resourceAuthorizationProvider = resourceAuthorizationProvider;
   }
 
 }

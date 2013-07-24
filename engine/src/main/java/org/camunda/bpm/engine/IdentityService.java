@@ -173,6 +173,11 @@ public interface IdentityService {
    *  @param groups the groups of the current user.
    */
   void setAuthentication(String userId, List<String> groups);
+
+  /**
+   * @param currentAuthentication
+   */
+  public void setAuthentication(Authentication currentAuthentication);
   
   /**
    * @return the current authentication for this process engine.

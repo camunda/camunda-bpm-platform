@@ -4,6 +4,7 @@ package org.camunda.bpm.pa;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.camunda.bpm.admin.impl.web.SetupResource;
 import org.camunda.bpm.application.PostDeploy;
 import org.camunda.bpm.application.ProcessApplication;
 import org.camunda.bpm.application.impl.ServletProcessApplication;
@@ -15,6 +16,9 @@ import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
 import org.camunda.bpm.engine.impl.persistence.entity.GroupEntity;
+import org.camunda.bpm.engine.rest.dto.identity.UserCredentialsDto;
+import org.camunda.bpm.engine.rest.dto.identity.UserDto;
+import org.camunda.bpm.engine.rest.dto.identity.UserProfileDto;
 import org.camunda.bpm.pa.demo.InvoiceDemoDataGenerator;
 
 /**
@@ -25,13 +29,13 @@ import org.camunda.bpm.pa.demo.InvoiceDemoDataGenerator;
 public class DevProcessApplication extends ServletProcessApplication {
 
   @PostDeploy
-  public void startProcesses(ProcessEngine engine) {
+  public void startProcesses(ProcessEngine engine) throws Exception {    
+    createAdminDemoData(engine);    
     createTasklistDemoData(engine);
-
     createCockpitDemoData(engine);
   }
 
-  private void createCockpitDemoData(ProcessEngine engine) {
+  private void createCockpitDemoData(ProcessEngine engine) throws Exception {
     RuntimeService runtimeService = engine.getRuntimeService();
 
     runtimeService.startProcessInstanceByKey("multipleFailingServiceTasks");
@@ -85,27 +89,26 @@ public class DevProcessApplication extends ServletProcessApplication {
 
 
     ((ProcessEngineImpl) engine).getProcessEngineConfiguration().getJobExecutor().start();
+  }
 
-    final IdentityService identityService = engine.getIdentityService();
-
-    Group group = new GroupEntity(Groups.CAMUNDA_ADMIN);
-    group.setName("camunda BPM admin users");
-    group.setType("system");
-
-    identityService.saveGroup(group);
-
-    User jonny1 = identityService.newUser("jonny1");
-    jonny1.setFirstName("Jonny");
-    jonny1.setLastName("Prosciutto");
-    jonny1.setPassword("jonny1");
-    identityService.saveUser(jonny1);
-
-    identityService.createMembership(jonny1.getId(), group.getId());
+  private void createAdminDemoData(ProcessEngine engine) throws Exception {
+    UserDto user = new UserDto();
+    UserProfileDto profile = new UserProfileDto();
+    profile.setId("jonny1");
+    profile.setFirstName("Jonny");
+    profile.setLastName("Prosciutto");
+    UserCredentialsDto credentials = new UserCredentialsDto();
+    credentials.setPassword("jonny1");
+    user.setProfile(profile);
+    user.setCredentials(credentials);
+        
+    // manually perform setup
+    new SetupResource().createInitialUser(engine.getName(), user);
   }
 
   private void createTasklistDemoData(ProcessEngine engine) {
 
-    // create tasklist demo data
+    // create invoice demo data
     new InvoiceDemoDataGenerator().createDemoData(engine);
   }
 }
