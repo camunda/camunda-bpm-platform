@@ -19,11 +19,11 @@
     <result property="causeIncidentProcessInstanceId" column="CAUSE_PROC_INST_ID_" jdbcType="VARCHAR" />
     <result property="causeIncidentProcessDefinitionId" column="CAUSE_PROC_DEF_ID_" jdbcType="VARCHAR" />
     <result property="causeIncidentActivityId" column="CAUSE_ACTIVITY_ID_" jdbcType="VARCHAR" />
-    <result property="rootCauseIncidentProcessInstanceId" column="ROOT_CAUSE_PROC_INST_ID_" jdbcType="VARCHAR" />
-    <result property="rootCauseIncidentProcessDefinitionId" column="ROOT_CAUSE_PROC_DEF_ID_" jdbcType="VARCHAR" />
-    <result property="rootCauseIncidentActivityId" column="ROOT_CAUSE_ACTIVITY_ID_" jdbcType="VARCHAR" />
-    <result property="rootCauseIncidentMessage" column="ROOT_CAUSE_INCIDENT_MSG_" jdbcType="VARCHAR" />
-    <result property="rootCauseIncidentConfiguration" column="ROOT_CAUSE_INCIDENT_CONFIGURATION_" jdbcType="VARCHAR" />
+    <result property="rootCauseIncidentProcessInstanceId" column="ROOT_PROC_INST_ID_" jdbcType="VARCHAR" />
+    <result property="rootCauseIncidentProcessDefinitionId" column="ROOT_PROC_DEF_ID_" jdbcType="VARCHAR" />
+    <result property="rootCauseIncidentActivityId" column="ROOT_ACTIVITY_ID_" jdbcType="VARCHAR" />
+    <result property="rootCauseIncidentMessage" column="ROOT_INC_MSG_" jdbcType="VARCHAR" />
+    <result property="rootCauseIncidentConfiguration" column="ROOT_INC_CONF_" jdbcType="VARCHAR" />
   </resultMap>
   
   <select id="selectIncidentWithCauseAndRootCauseIncidentsCount" parameterType="org.camunda.bpm.cockpit.impl.plugin.base.query.parameter.IncidentQueryParameter"
@@ -44,28 +44,28 @@
   <sql id="selectIncidents">    
     from (
           select RES.*,
-                 CAUSE_INCIDENT.PROC_INST_ID_ CAUSE_PROC_INST_ID_,
-                 CAUSE_INCIDENT.PROC_DEF_ID_ CAUSE_PROC_DEF_ID_,
-                 CAUSE_INCIDENT.ACTIVITY_ID_ CAUSE_ACTIVITY_ID_,
-                 ROOT_CAUSE_INCIDENT.PROC_INST_ID_ ROOT_CAUSE_PROC_INST_ID_,
-                 ROOT_CAUSE_INCIDENT.PROC_DEF_ID_ ROOT_CAUSE_PROC_DEF_ID_,
-                 ROOT_CAUSE_INCIDENT.ACTIVITY_ID_ ROOT_CAUSE_ACTIVITY_ID_,
-                 ROOT_CAUSE_INCIDENT.INCIDENT_MSG_ ROOT_CAUSE_INCIDENT_MSG_,
-                 ROOT_CAUSE_INCIDENT.CONFIGURATION_ ROOT_CAUSE_INCIDENT_CONFIGURATION_
+                 CAUSE.PROC_INST_ID_ CAUSE_PROC_INST_ID_,
+                 CAUSE.PROC_DEF_ID_ CAUSE_PROC_DEF_ID_,
+                 CAUSE.ACTIVITY_ID_ CAUSE_ACTIVITY_ID_,
+                 ROOT.PROC_INST_ID_ ROOT_PROC_INST_ID_,
+                 ROOT.PROC_DEF_ID_ ROOT_PROC_DEF_ID_,
+                 ROOT.ACTIVITY_ID_ ROOT_ACTIVITY_ID_,
+                 ROOT.INCIDENT_MSG_ ROOT_INC_MSG_,
+                 ROOT.CONFIGURATION_ ROOT_INC_CONF_
           from
             ${prefix}ACT_RU_INCIDENT RES
             
           <!-- join with incident table to get the cause incident -->  
           left join
-            ${prefix}ACT_RU_INCIDENT CAUSE_INCIDENT
+            ${prefix}ACT_RU_INCIDENT CAUSE
           on
-            RES.CAUSE_INCIDENT_ID_ = CAUSE_INCIDENT.ID_
+            RES.CAUSE_INCIDENT_ID_ = CAUSE.ID_
             
           <!-- join once again with the incident table to get the root cause incident -->            
           left join
-            ${prefix}ACT_RU_INCIDENT ROOT_CAUSE_INCIDENT
+            ${prefix}ACT_RU_INCIDENT ROOT
           on
-            RES.ROOT_CAUSE_INCIDENT_ID_ = ROOT_CAUSE_INCIDENT.ID_
+            RES.ROOT_CAUSE_INCIDENT_ID_ = ROOT.ID_
             
           <where>
             <!-- processInstanceIds -->
