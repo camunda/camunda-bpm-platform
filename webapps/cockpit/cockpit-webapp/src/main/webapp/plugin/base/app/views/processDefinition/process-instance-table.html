@@ -15,7 +15,7 @@
       <td>{{ processInstance.startTime }}</td>
       <td>{{ processInstance.businessKey }}</td>
       <td>
-        <div state-circle incidents="processInstance.incidents"></div>
+        <a state-circle incidents="processInstance.incidents" href="#/process-definition/{{ processDefinitionId }}/process-instance/{{ processInstance.id }}?detailsTab=incidents-tab"></a>
       </td>
     </tr>
 

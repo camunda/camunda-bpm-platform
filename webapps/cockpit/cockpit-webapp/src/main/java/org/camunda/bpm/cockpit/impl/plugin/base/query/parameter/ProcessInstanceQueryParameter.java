@@ -17,6 +17,8 @@ import org.camunda.bpm.cockpit.impl.plugin.base.dto.ProcessInstanceDto;
 
 public class ProcessInstanceQueryParameter extends QueryParameters<ProcessInstanceDto> {
 
+  private static final long serialVersionUID = 1L;
+  
   protected String processDefinitionId;
   protected String orderBy = "START_TIME_ desc";
   

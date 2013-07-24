@@ -1,0 +1,85 @@
+<table class="table table-bordered table-hover table-condensed">
+  <thead>
+    <tr>
+      <th>Message</th>
+      <th>Type</th>
+      <th>Timestamp</th>
+      <th>Activity</th>
+      <th>Cause Process Instance Id</th>
+      <th>Root Cause Process Instance Id</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr ng-repeat="incident in incidents">
+      <td>
+        <div>
+          <span ng-show="incident.incidentType === 'failedJob'">
+            <a href="{{ getJobStacktraceUrl(incident) }}" target="_blank" ng-show="incident.rootCauseIncidentMessage"
+               help
+               help-text="Open stacktrace in new window"
+               help-placement="'right'">
+              {{ incident.rootCauseIncidentMessage }}
+            </a>
+            <a href="{{ getJobStacktraceUrl(incident) }}" target="_blank" ng-hide="incident.rootCauseIncidentMessage"
+               help
+               help-text="Open stacktrace in new window"
+               help-placement="'right'">
+              <i>Message is null.</i>
+            </a>
+          </span>
+          <span ng-hide="incident.incidentType === 'failedJob'">
+            <span ng-show="incident.rootCauseIncidentMessage">{{ incident.rootCauseIncidentMessage }}</span>
+            <span ng-hide="incident.rootCauseIncidentMessage"><i>Message is null.</i></span>
+          </span>
+
+
+        </div>
+      </td>
+      <td>
+        {{ getIncidentType(incident) }}
+      </td>
+      <td>
+        {{ incident.incidentTimestamp }}
+      </td>
+      <td>
+        <span ng-show="incident.linkable">
+          <a href ng-click="selectActivity(incident)">
+            {{ incident.activityName }}
+          </a>
+        </span>
+        <span ng-hide="incident.linkable">
+          {{ incident.activityName }}
+        </span>
+        
+      </td>
+      <td>
+        <span ng-show="incident.causeIncidentProcessInstanceId !== incident.processInstanceId" >
+          <a href="#/process-definition/{{ incident.causeIncidentProcessDefinitionId }}/process-instance/{{incident.causeIncidentProcessInstanceId}}?bpmnElements={{ incident.causeIncidentActivityId }}&detailsTab=incidents-tab">
+            {{ incident.causeIncidentProcessInstanceId | shorten:8}}
+          </a>
+        </span>
+      </td>
+      <td>
+        <span ng-show="incident.rootCauseIncidentProcessInstanceId !== incident.processInstanceId" >
+          <a href="#/process-definition/{{ incident.rootCauseIncidentProcessDefinitionId }}/process-instance/{{incident.rootCauseIncidentProcessInstanceId}}?bpmnElements={{ incident.rootCauseIncidentActivityId }}&detailsTab=incidents-tab">
+            {{ incident.rootCauseIncidentProcessInstanceId | shorten:8}}
+          </a>
+        </span>
+      </td>      
+    </tr>
+
+    <tr ng-if="!incidents">
+      <td colspan="6">
+        <i class="icon-loading"></i> loading incidents...
+      </td>
+    </tr>    
+  
+    <tr ng-if="incidents && !incidents.length">
+      <td  colspan="6">
+        No incidents
+      </td>
+    </tr>
+  </tbody>
+</table>
+
+<div paginator total-pages="pages.total" current-page="pages.current"></div>

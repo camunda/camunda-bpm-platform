@@ -6,8 +6,7 @@ ngDefine('camunda.common.directives', [
   './engineSelect',
   './paginator',
   './password',
-  './modalDialog',
-  './stateCircle'
+  './modalDialog'
 ], function(module) {
 
 });
