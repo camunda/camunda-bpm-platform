@@ -201,12 +201,12 @@
                           ELSE 1
                           
               <if test="authGroupIds != null &amp;&amp; authGroupIds.size() > 0">                          
-                        END
+                        END ${dbSpecificDummyTable}
                 )
               </if>
-            END   
+            END ${dbSpecificDummyTable}
       )
-    END  
+    END  ${dbSpecificDummyTable}
   </sql>  
     
   <!-- reusable authorization check for queries. -->
