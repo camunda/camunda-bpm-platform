@@ -13,10 +13,11 @@
   <!-- INCIDENT INSERT -->
 
   <insert id="insertIncident" parameterType="org.camunda.bpm.engine.impl.persistence.entity.IncidentEntity">
-    insert into ${prefix}ACT_RU_INCIDENT (ID_, INCIDENT_TIMESTAMP_, INCIDENT_TYPE_, EXECUTION_ID_, ACTIVITY_ID_, PROC_INST_ID_, PROC_DEF_ID_, CAUSE_INCIDENT_ID_, ROOT_CAUSE_INCIDENT_ID_, CONFIGURATION_)
+    insert into ${prefix}ACT_RU_INCIDENT (ID_, INCIDENT_TIMESTAMP_, INCIDENT_MSG_, INCIDENT_TYPE_, EXECUTION_ID_, ACTIVITY_ID_, PROC_INST_ID_, PROC_DEF_ID_, CAUSE_INCIDENT_ID_, ROOT_CAUSE_INCIDENT_ID_, CONFIGURATION_)
     values (
       #{id ,jdbcType=VARCHAR},
       #{incidentTimestamp, jdbcType=TIMESTAMP},
+      #{incidentMessage, jdbcType=VARCHAR},
       #{incidentType, jdbcType=VARCHAR},
       #{executionId ,jdbcType=VARCHAR},
       #{activityId ,jdbcType=VARCHAR},
@@ -34,6 +35,7 @@
     <id property="id" column="ID_" jdbcType="VARCHAR" />
     <result property="incidentTimestamp" column="INCIDENT_TIMESTAMP_" jdbcType="TIMESTAMP" />
     <result property="incidentType" column="INCIDENT_TYPE_" jdbcType="VARCHAR" />
+    <result property="incidentMessage" column="INCIDENT_MSG_" jdbcType="VARCHAR" />
     <result property="executionId" column="EXECUTION_ID_" jdbcType="VARCHAR" />
     <result property="activityId" column="ACTIVITY_ID_" jdbcType="VARCHAR" />
     <result property="processInstanceId" column="PROC_INST_ID_" jdbcType="VARCHAR" />
@@ -79,6 +81,9 @@
       <if test="incidentType != null">
         and RES.INCIDENT_TYPE_ = #{incidentType}
       </if>
+      <if test="incidentMessage != null">
+        and RES.INCIDENT_MSG_ = #{incidentMessage}
+      </if>      
       <if test="executionId != null">
         and RES.EXECUTION_ID_ = #{executionId}
       </if>

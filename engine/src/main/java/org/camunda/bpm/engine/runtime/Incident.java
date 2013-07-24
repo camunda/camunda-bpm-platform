@@ -61,6 +61,11 @@ public interface Incident {
   public String getIncidentType();
 
   /**
+   * Returns the incident message.
+   */
+  public String getIncidentMessage();
+  
+  /**
    * Returns the specific execution on which this 
    * incident has happened. 
    */
