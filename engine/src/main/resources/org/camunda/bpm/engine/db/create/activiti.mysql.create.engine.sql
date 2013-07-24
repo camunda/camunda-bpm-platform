@@ -279,12 +279,12 @@ alter table ACT_RU_INCIDENT
 alter table ACT_RU_INCIDENT
     add constraint ACT_FK_INC_CAUSE 
     foreign key (CAUSE_INCIDENT_ID_) 
-    references ACT_RU_INCIDENT (ID_);
+    references ACT_RU_INCIDENT (ID_) on delete cascade on update cascade;
 
 alter table ACT_RU_INCIDENT
     add constraint ACT_FK_INC_RCAUSE 
     foreign key (ROOT_CAUSE_INCIDENT_ID_) 
-    references ACT_RU_INCIDENT (ID_);
+    references ACT_RU_INCIDENT (ID_) on delete cascade on update cascade;
 
 alter table ACT_RU_AUTHORIZATION
     add constraint ACT_UNIQ_AUTH_USER
