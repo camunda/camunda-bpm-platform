@@ -12,7 +12,6 @@
  */
 package org.camunda.bpm.container.impl.metadata;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.util.Map;
 
@@ -41,12 +40,11 @@ public class PropertyHelper {
    * @param field
    * @return
    */
-  public static Object convertToFieldType(String value, Field field) {
+  public static Object convertToClass(String value, Class<?> clazz) {
     Object propertyValue;
-    Class<?> expectedPropertyClass = field.getType();
-    if (expectedPropertyClass.isAssignableFrom(int.class)) {
+    if (clazz.isAssignableFrom(int.class)) {
       propertyValue = Integer.parseInt(value);
-    } else if (expectedPropertyClass.isAssignableFrom(boolean.class)) {
+    } else if (clazz.isAssignableFrom(boolean.class)) {
       propertyValue = Boolean.parseBoolean(value);
     } else {
       propertyValue = value;
@@ -56,22 +54,20 @@ public class PropertyHelper {
   
   public static void applyProperty(Object configuration, String key, String stringValue) {
     Class<?> configurationClass = configuration.getClass();
-    Field propertyField = ReflectUtil.getField(key, configurationClass);
     
-    if (propertyField == null) {
-      throw new ProcessEngineException("Cannot set property " + key + " on configuration of class " + configurationClass);
-    }
+    Method setter = ReflectUtil.getSingleSetter(key, configurationClass);
     
-    Object value = PropertyHelper.convertToFieldType(stringValue, propertyField);
-    Method setter = ReflectUtil.getSetter(key, configurationClass, propertyField.getType());
     if(setter != null) {
       try {
+        Class<?> parameterClass = setter.getParameterTypes()[0];
+        Object value = PropertyHelper.convertToClass(stringValue, parameterClass);
+        
         setter.invoke(configuration, value);
       } catch (Exception e) {
-        throw new ProcessEngineException("Could not set value for property '"+key, e);
+        throw new ProcessEngineException("Could not set value for property '"+key + "' on class " + configurationClass.getCanonicalName(), e);
       }
     } else {
-      throw new ProcessEngineException("Could not find setter for property '"+key);
+      throw new ProcessEngineException("Could not find setter for property '"+ key + "' on class " + configurationClass.getCanonicalName());
     }
   }
   

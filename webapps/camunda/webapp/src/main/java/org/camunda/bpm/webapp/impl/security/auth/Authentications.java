@@ -23,16 +23,13 @@ import javax.servlet.http.HttpSession;
 /**
  * <p>Wrapper around current authentications.</p>
  * 
- * <p>In camunda BPM, authentications are managed per process engine: at a given 
- * point in time, there might be multiple authentications active for different 
- * users and process engines in a single session. The ituition is that a "physical" 
- * user may posess credentials for different process engines, each of these 
- * representing a different process engine user. For each process engine, there 
- * can be at most one authentication active in a given session.</p>
+ * <p>In camunda BPM rest and webapplicaitons, authentications are managed per 
+ * process engine: at a given point in time, there might be multiple authentications 
+ * active for different users and process engines in a single session. The ituition 
+ * is that a "physical" user may posess credentials for different process engines, 
+ * each of these representing a different process engine user. For each process 
+ * engine, there can be at most one authentication active in a given session.</p>
  *
- * <p>An instance of this class is stored in the {@link HttpSession} and may be 
- * obtained using {@link #getFromSession(HttpSession)}</p>
- * 
  * <p>In addition, the {@link AuthenticationFilter} binds an instance of this
  * class to a thread local and may be obtained by {@link #getCurrent()}</p>
  * 

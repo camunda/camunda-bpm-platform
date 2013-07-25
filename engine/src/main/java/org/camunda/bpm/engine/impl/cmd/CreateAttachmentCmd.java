@@ -76,7 +76,7 @@ public class CreateAttachmentCmd implements Command<Attachment> {
 
     CommentManager commentManager = commandContext.getCommentManager();
     if (commentManager.isHistoryEnabled()) {
-      String userId = Authentication.getAuthenticatedUserId();
+      String userId = commandContext.getAuthenticatedUserId();
       CommentEntity comment = new CommentEntity();
       comment.setUserId(userId);
       comment.setType(CommentEntity.TYPE_EVENT);

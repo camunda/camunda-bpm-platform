@@ -16,6 +16,7 @@ import java.beans.FeatureDescriptor;
 import java.util.Iterator;
 
 import org.camunda.bpm.engine.delegate.VariableScope;
+import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.impl.javax.el.ELContext;
 import org.camunda.bpm.engine.impl.javax.el.ELResolver;
@@ -58,7 +59,7 @@ public class VariableScopeElResolver extends ELResolver {
         return ((TaskEntity) variableScope).getExecution();
       } else if(LOGGED_IN_USER_KEY.equals(property)){
         context.setPropertyResolved(true);
-        return Authentication.getAuthenticatedUserId();
+        return Context.getCommandContext().getAuthenticatedUserId();
       } else {
         if (variableScope.hasVariable(variable)) {
           context.setPropertyResolved(true); // if not set, the next elResolver in the CompositeElResolver will be called

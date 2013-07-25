@@ -4,7 +4,10 @@ define(['angular'], function(angular) {
 
   var module = angular.module('admin.pages');
 
-  var Controller = ['$scope', '$routeParams', 'UserResource', 'GroupResource', 'GroupMembershipResource', 'Notifications', '$location', function ($scope, $routeParams, UserResource, GroupResource, GroupMembershipResource, Notifications, $location) {
+  var Controller = ['$scope', '$routeParams', 'UserResource', 'GroupResource', 'GroupMembershipResource', 'Notifications', '$location', 'AuthorizationResource',
+    function ($scope, $routeParams, UserResource, GroupResource, GroupMembershipResource, Notifications, $location, AuthorizationResource) {
+
+    $scope.userId = $routeParams.userId;
 
     // used to display information about the user
     $scope.profile = null;
@@ -25,6 +28,8 @@ define(['angular'], function(angular) {
 
     $scope.createGroupMembershipDialog = new Dialog();
 
+    $scope.availableOperations = {};
+
     // common form validation //////////////////////////
 
     /** form must be valid & user must have made some changes */
@@ -37,10 +42,15 @@ define(['angular'], function(angular) {
     // update profile form /////////////////////////////
 
     var loadProfile = $scope.loadProfile = function() {
-      UserResource.profile({userId : $routeParams.userId}).$then(function(response) {
+      UserResource.profile({userId : $scope.userId}).$then(function(response) {
         $scope.user = response.data;
         $scope.profile = angular.copy(response.data);
         $scope.profileCopy = angular.copy(response.data);
+
+        angular.forEach($scope.user.links, function(link){
+          $scope.availableOperations[link.rel] = true;
+        }); 
+
       });
     }
 
@@ -50,9 +60,6 @@ define(['angular'], function(angular) {
         function(){
           Notifications.addMessage({type:"success", status:"Success", message:"User profile successfully updated."});
           loadProfile();
-        },
-        function(){
-          Notifications.addError({type:"error", status:"Error", message:"Could not update user profile."});
         }
       );
     }
@@ -70,9 +77,6 @@ define(['angular'], function(angular) {
         function(){
           Notifications.addMessage({type:"success", status:"Success", message:"Password successfully changed."});
           resetCredentials();
-        },
-        function(){
-          Notifications.addError({type:"error", status:"Error", message:"Could not change user password."});
         }
       );
     }
@@ -84,9 +88,6 @@ define(['angular'], function(angular) {
         function(){
           Notifications.addMessage({type:"success", status:"Success", message:"User "+$scope.user.id+" successfully deleted."});
           $location.path("/users");
-        },
-        function(){
-          Notifications.addError({type:"error", status:"Error", message:"Could not delete user "+$scope.user.id+"."});
         }
       );
     }
@@ -108,15 +109,18 @@ define(['angular'], function(angular) {
         function(){
           Notifications.addMessage({type:"success", status:"Success", message:"User "+$scope.user.id+" removed from group."});
           loadGroups();
-        },
-        function(){
-          Notifications.addError({type:"error", status:"Error", message:"Could not remove user from group."});
         }
       );
     }
 
     $scope.openCreateGroupMembershipDialog = function() {
       $scope.createGroupMembershipDialog.open();
+    }
+
+    function checkRemoveGroupMembershipAuthorized() {
+      AuthorizationResource.check({permissionName:"delete", permissionValue:16, resourceName:"group membership", resourceType:3}).$then(function(response) {
+        $scope.availableOperations.removeGroup = response.data.authorized;
+      });
     }
 
     // page controls ////////////////////////////////////
@@ -134,6 +138,7 @@ define(['angular'], function(angular) {
     
     loadProfile();
     loadGroups();
+    checkRemoveGroupMembershipAuthorized();
 
     if(!$location.search().tab) {
       $location.search({'tab': 'profile'});

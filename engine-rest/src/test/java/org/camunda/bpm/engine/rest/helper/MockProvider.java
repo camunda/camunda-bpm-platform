@@ -165,6 +165,13 @@ public abstract class MockProvider {
   public static final Boolean EXAMPLE_TIMERS = true;
   public static final Boolean EXAMPLE_MESSAGES = true;
   public static final Boolean EXAMPLE_WITH_EXCEPTION= true;
+  
+  public static final String EXAMPLE_RESOURCE_TYPE_NAME = "exampleResource";
+  public static final int EXAMPLE_RESOURCE_TYPE_ID = 12345678;
+  public static final String EXAMPLE_RESOURCE_ID = "exampleResourceId";
+  public static final String EXAMPLE_PERMISSION_NAME = "examplePermissionName";
+  public static final int EXAMPLE_PERMISSION_VALUE = 1;
+  
 
   
   // tasks

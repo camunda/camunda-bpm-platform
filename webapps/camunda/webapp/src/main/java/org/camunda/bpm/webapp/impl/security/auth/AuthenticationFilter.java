@@ -13,6 +13,7 @@
 package org.camunda.bpm.webapp.impl.security.auth;
 
 import java.io.IOException;
+import java.util.List;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -21,6 +22,12 @@ import javax.servlet.ServletException;
 import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
+
+import org.camunda.bpm.cockpit.Cockpit;
+import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.webapp.impl.security.SecurityActions;
+import org.camunda.bpm.webapp.impl.security.SecurityActions.SecurityAction;
+
 
 /**
  * <p>Servlet {@link Filter} implementation responsible for poulating the
@@ -37,21 +44,58 @@ public class AuthenticationFilter implements Filter {
     
   }
 
-  public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws IOException, ServletException {
+  public void doFilter(final ServletRequest request, final ServletResponse response, final FilterChain chain) throws IOException, ServletException {
     
     final HttpServletRequest req = (HttpServletRequest) request;
     
-    // get user from session
-    Authentications authentications = Authentications.getFromSession(req.getSession());
-      
+    // get authentication from session
+    Authentications authentications = Authentications.getFromSession(req.getSession());      
     Authentications.setCurrent(authentications);
+    
     try {
-      // continue filter chain
-      chain.doFilter(request, response);
+      
+      SecurityActions.runWithAuthentications(new SecurityAction<Void>() {
+
+        public Void execute() throws Exception {
+          chain.doFilter(request, response);
+          return null;
+        }
+      }, authentications);
+      
+    } catch (ServletException e) {
+      throw e;      
+    } catch (IOException e) {
+      throw e;      
+    } catch (Exception e) {
+      throw new ServletException(e);
       
     } finally {
       Authentications.clearCurrent();
       
+    }
+    
+  }
+
+  protected void setProcessEngineAuthentications(Authentications authentications) {    
+    for (Authentication authentication : authentications.getAuthentications()) {
+      ProcessEngine processEngine = Cockpit.getProcessEngine(authentication.getProcessEngineName());
+      if(processEngine != null) {
+        List<String> groupIds = null;
+        String identityId = authentication.getIdentityId();
+        if(authentication instanceof UserAuthentication) {
+          groupIds = ((UserAuthentication) authentication).getGroupIds();
+        }
+        processEngine.getIdentityService().setAuthentication(identityId, groupIds);      
+      }            
+    }
+  }
+  
+  protected void clearProcessEngineAuthentications(Authentications authentications) {    
+    for (Authentication authentication : authentications.getAuthentications()) {
+      ProcessEngine processEngine = Cockpit.getProcessEngine(authentication.getProcessEngineName());
+      if(processEngine != null) {
+        processEngine.getIdentityService().clearAuthentication();      
+      }            
     }
   }
 

@@ -104,7 +104,7 @@ public class ProcessDefinitionEntity extends ProcessDefinitionImpl implements Pr
     
     String initiatorVariableName = (String) getProperty(BpmnParse.PROPERTYNAME_INITIATOR_VARIABLE_NAME);
     if (initiatorVariableName!=null) {
-      String authenticatedUserId = Authentication.getAuthenticatedUserId();
+      String authenticatedUserId = Context.getCommandContext().getAuthenticatedUserId();
       processInstance.setVariable(initiatorVariableName, authenticatedUserId);
     }
     

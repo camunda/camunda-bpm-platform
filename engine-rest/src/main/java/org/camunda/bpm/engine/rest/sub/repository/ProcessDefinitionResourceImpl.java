@@ -14,11 +14,14 @@ package org.camunda.bpm.engine.rest.sub.repository;
 
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.ws.rs.GET;
+import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 import javax.ws.rs.core.UriInfo;
@@ -34,6 +37,7 @@ import org.camunda.bpm.engine.impl.util.IoUtil;
 import org.camunda.bpm.engine.management.ActivityStatistics;
 import org.camunda.bpm.engine.management.ActivityStatisticsQuery;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
+import org.camunda.bpm.engine.rest.ProcessInstanceRestService;
 import org.camunda.bpm.engine.rest.dto.StatisticsResultDto;
 import org.camunda.bpm.engine.rest.dto.repository.ActivityStatisticsResultDto;
 import org.camunda.bpm.engine.rest.dto.repository.ProcessDefinitionDiagramDto;
@@ -100,8 +104,15 @@ public class ProcessDefinitionResourceImpl implements ProcessDefinitionResource 
     }
 
     ProcessInstanceDto result = ProcessInstanceDto.fromProcessInstance(instance);
-    UriBuilder rootUriBuilder = context.getBaseUriBuilder().path(rootResourcePath);
-    result.addReflexiveLink(rootUriBuilder, null, "self");
+    
+    URI uri = context.getBaseUriBuilder()
+      .path(rootResourcePath)
+      .path(ProcessInstanceRestService.class)
+      .path(instance.getId())
+      .build();
+    
+    result.addReflexiveLink(uri, HttpMethod.GET, "self");    
+    
     return result;
   }
 
