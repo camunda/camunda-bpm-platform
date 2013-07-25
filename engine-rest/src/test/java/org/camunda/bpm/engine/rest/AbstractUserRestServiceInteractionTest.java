@@ -113,7 +113,7 @@ public abstract class AbstractUserRestServiceInteractionTest extends AbstractRes
         .body("lastName", equalTo(MockProvider.EXAMPLE_USER_LAST_NAME))
         .body("email", equalTo(MockProvider.EXAMPLE_USER_EMAIL))
         
-        .body("links[0].href", equalTo(fullUserUrl))
+        .body("links[0].href", equalTo(fullUserUrl+"/profile"))
         .body("links[0].method", equalTo(HttpMethod.GET))
         .body("links[0].rel", equalTo("self"))
         
@@ -156,7 +156,7 @@ public abstract class AbstractUserRestServiceInteractionTest extends AbstractRes
         .body("lastName", equalTo(MockProvider.EXAMPLE_USER_LAST_NAME))
         .body("email", equalTo(MockProvider.EXAMPLE_USER_EMAIL))
         
-        .body("links[0].href", equalTo(fullUserUrl))
+        .body("links[0].href", equalTo(fullUserUrl+"/profile"))
         .body("links[0].method", equalTo(HttpMethod.GET))
         .body("links[0].rel", equalTo("self"))
         
@@ -195,7 +195,7 @@ public abstract class AbstractUserRestServiceInteractionTest extends AbstractRes
         .body("lastName", equalTo(MockProvider.EXAMPLE_USER_LAST_NAME))
         .body("email", equalTo(MockProvider.EXAMPLE_USER_EMAIL))
         
-        .body("links[0].href", equalTo(fullUserUrl))
+        .body("links[0].href", equalTo(fullUserUrl+"/profile"))
         .body("links[0].method", equalTo(HttpMethod.GET))
         .body("links[0].rel", equalTo("self"))
         

@@ -62,7 +62,8 @@ public class UserResourceImpl extends AbstractIdentityResource implements UserRe
     URI baseUri = baseUriBuilder.build();
     URI profileUri = baseUriBuilder.path("/profile").build();
     
-    user.addReflexiveLink(baseUri, HttpMethod.GET, "self");    
+    user.addReflexiveLink(profileUri, HttpMethod.GET, "self");    
+    
     if(isAuthorized(DELETE, USER, resourceId)) {
       user.addReflexiveLink(baseUri, HttpMethod.DELETE, "delete");
     }    
