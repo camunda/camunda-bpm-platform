@@ -121,7 +121,7 @@
       <id>check-webapps</id>
       <modules>
         <module>webapps/cycle</module>
-        <module>webapps/camunda</module>    
+        <module>webapps/camunda-webapp</module>    
       </modules>
     </profile>  
   </profiles>
