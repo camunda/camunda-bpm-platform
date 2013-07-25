@@ -59,10 +59,6 @@ ngDefine(
           var resizeHandleAttachAttr = vertical ? 'left' : 'top';
           var changeAxis = vertical ? 'x' : 'y';
 
-          // a tiny pixel compensation to make sure the resize handle is always positioned 
-          // right on the line between the two resizable containers
-          var pxc = direction == 'top' || direction == 'left' ? 3 : -3;
-
           /**
            * Create a { direction: i } object
            */
@@ -94,10 +90,10 @@ ngDefine(
 
             if (direction == 'left' || direction == 'top') {
               resizeHandle
-                .css(resizeHandleAttachAttr, collapsableSize - pxc)
+                .css(resizeHandleAttachAttr, collapsableSize)
             } else {
               resizeHandle
-                .css(resizeHandleAttachAttr, collapsablePosition[resizeHandleAttachAttr] - 5 - pxc);
+                .css(resizeHandleAttachAttr, collapsablePosition[resizeHandleAttachAttr]);
             }
           }
 
@@ -118,8 +114,8 @@ ngDefine(
               // update collapsed state on drag
               setCollapsed(pos < 10);
 
-              collapsableElement.css(changeAttr, pos + pxc);
-              compensateElement.css(direction, pos + pxc);
+              collapsableElement.css(changeAttr, pos);
+              compensateElement.css(direction, pos + 6);
             })
             .on('dragstop', function(event) {
               scope.$broadcast('resize', [ event ]);
@@ -131,13 +127,13 @@ ngDefine(
 
             resizeHandle.animate(createOffset(0));
             collapsableElement.animate(createSize(0));
-            compensateElement.animate(createOffset(pxc));
+            compensateElement.animate(createOffset(0));
           });
 
           showHandle.click(function() {
             setCollapsed(false);
 
-            resizeHandle.animate(createOffset(originalCollapsableSize - pxc));
+            resizeHandle.animate(createOffset(originalCollapsableSize));
             collapsableElement.animate(createSize(originalCollapsableSize));
             compensateElement.animate(createOffset(originalCollapsableSize));
           });

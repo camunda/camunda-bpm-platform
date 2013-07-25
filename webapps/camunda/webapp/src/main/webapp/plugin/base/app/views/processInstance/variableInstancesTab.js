@@ -1,6 +1,6 @@
 ngDefine('cockpit.plugin.base.views', function(module) {
 
-   function VariableInstancesController ($scope, $http, $location, Uri, LocalExecutionVariableResource, RequestStatus) {
+   function VariableInstancesController ($scope, $http, $location, $q, Uri, LocalExecutionVariableResource, RequestStatus) {
 
     // input: processInstanceId, selection, processInstance
 
@@ -39,31 +39,97 @@ ngDefine('cockpit.plugin.base.views', function(module) {
       
     });
 
-    $scope.$watch('selection.treeDiagramMapping.activityInstances', function (newValue) {
+    $scope.$watch('selection.view.activityInstances', function (newValue) {
       var instances = newValue || [];
       activityInstanceIds = [];
 
-      // collect the instance ids
-      angular.forEach(instances, function (instance) {
-        var instanceId = instance.id;
-        activityInstanceIds.push(instanceId);
-      });
+      function waitForActivityIdToInstancesMap() {
+        var deferred = $q.defer();
+
+        $scope.$watch('processInstance.activityIdToInstancesMap', function (newValue) {
+          if (newValue) {
+            deferred.resolve(newValue);
+          }
+        });
+
+        return deferred.promise;
+      }
+
+      if (instances.length !== 0) {
+        // collect the instance ids
+        angular.forEach(instances, function (instance) {
+          var instanceId = instance.id;
+          activityInstanceIds.push(instanceId);
+        });
+      } else {
+        // if the array of instances is empty, then check the
+        // search parameters 'activityInstances'.
+        // if the search parameter is set, then collect the
+        // instance ids from it.
+        var searchParams = $location.search().activityInstances;
+
+        if (searchParams) {
+          if (angular.isString(searchParams)) {
+            activityInstanceIds = searchParams.split(',');
+          } else if (angular.isArray(searchParams)) {
+            activityInstanceIds = searchParams;
+          }
+        } else {
+          searchParams = $location.search().bpmnElements;
+          var bpmnElementIds = [];
+          if (searchParams) {
+            if (angular.isString(searchParams)) {
+              bpmnElementIds = searchParams.split(',');
+            } else if (angular.isArray(searchParams)) {
+              bpmnElementIds = searchParams;
+            }            
+
+            var activityIdToInstancesMap = null;
+            if (!$scope.processInstance.activityIdToInstancesMap) {
+              waitForActivityIdToInstancesMap().then(function(result) {
+                for (var key in result) {
+                  var instances = result[key];
+
+                  for (var i = 0, instance; !!(instance = instances[i]); i++) {
+                    activityInstanceIds.push(instance.id);
+                  }
+                }
+              });
+            } else {
+              activityIdToInstancesMap = $scope.processInstance.activityIdToInstancesMap;
+              for (var key in activityIdToInstancesMap) {
+                var instances = activityIdToInstancesMap[key];
+
+                for (var i = 0, instance; !!(instance = instances[i]); i++) {
+                  activityInstanceIds.push(instance.id);
+                }
+              }
+            }
+          }
+        }
+      }
 
       // always reset the current page to null
       $location.search('page', null);
-      if ($scope.processInstance.instanceIdToInstanceMap) {
-        alreadyUpdated = true;
-        updateView(1);    
+
+      function waitForInstanceIdToInstanceMap() {
+        var deferred = $q.defer();
+
+        $scope.$watch('processInstance.instanceIdToInstanceMap', function (newValue) {
+          if (newValue) {
+            deferred.resolve(newValue);
+          }
+        });
+
+        return deferred.promise;
       }
 
-    });
-
-    // This $watch on 'processInstance.instanceIdToInstance' is necessary due to race
-    // conditions. It can happen, that the view will be updated before the the properpty
-    // instanceIdToInstanceMap of the variable processInstance has been set.
-    $scope.$watch('processInstance.instanceIdToInstanceMap', function (newValue) {
-      if (newValue && activityInstanceIds && !alreadyUpdated) {
-        updateView(1);
+      if ($scope.processInstance.instanceIdToInstanceMap) {
+        updateView(1);    
+      } else {
+        waitForInstanceIdToInstanceMap().then(function () {
+          updateView(1);
+        });
       }
 
     });
@@ -119,7 +185,7 @@ ngDefine('cockpit.plugin.base.views', function(module) {
     }
 
     $scope.selectActivityInstance = function (variable) {
-      $scope.selection.treeDiagramMapping = {activityInstances: [ variable.instance ], scrollTo: variable.instance};
+      $scope.selection.view = {activityInstances: [ variable.instance ], scrollTo: variable.instance};
     }
 
     $scope.editVariable = function (variable) {
@@ -245,7 +311,7 @@ ngDefine('cockpit.plugin.base.views', function(module) {
 
   };
 
-  module.controller('VariableInstancesController', [ '$scope', '$http', '$location', 'Uri', 'LocalExecutionVariableResource', 'RequestStatus', VariableInstancesController ]);
+  module.controller('VariableInstancesController', [ '$scope', '$http', '$location', '$q', 'Uri', 'LocalExecutionVariableResource', 'RequestStatus', VariableInstancesController ]);
 
   var Configuration = function PluginConfiguration(ViewsProvider) {
 
@@ -253,7 +319,8 @@ ngDefine('cockpit.plugin.base.views', function(module) {
       id: 'variables-tab',
       label: 'Variables',
       url: 'plugin://base/static/app/views/processInstance/variable-instances-tab.html',
-      controller: 'VariableInstancesController'
+      controller: 'VariableInstancesController',
+      priority: 10
     });
   };
 

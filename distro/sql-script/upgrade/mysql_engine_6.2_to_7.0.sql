@@ -1,6 +1,7 @@
 create table ACT_RU_INCIDENT (
   ID_ varchar(64) not null,
   INCIDENT_TIMESTAMP_ timestamp not null,
+  INCIDENT_MSG_ varchar(4000),
   INCIDENT_TYPE_ varchar(255) not null,
   EXECUTION_ID_ varchar(64),
   ACTIVITY_ID_ varchar(255),
@@ -32,12 +33,12 @@ alter table ACT_RU_INCIDENT
 alter table ACT_RU_INCIDENT
     add constraint ACT_FK_INC_CAUSE 
     foreign key (CAUSE_INCIDENT_ID_) 
-    references ACT_RU_INCIDENT (ID_);
+    references ACT_RU_INCIDENT (ID_) on delete cascade on update cascade;
 
 alter table ACT_RU_INCIDENT
     add constraint ACT_FK_INC_RCAUSE 
     foreign key (ROOT_CAUSE_INCIDENT_ID_) 
-    references ACT_RU_INCIDENT (ID_);
+    references ACT_RU_INCIDENT (ID_) on delete cascade on update cascade;
     
 create index ACT_IDX_HI_ACT_INST_COMP on ACT_HI_ACTINST(EXECUTION_ID_, ACT_ID_, END_TIME_, ID_);
 

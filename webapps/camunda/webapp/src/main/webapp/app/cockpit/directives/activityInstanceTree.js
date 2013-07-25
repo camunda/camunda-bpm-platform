@@ -18,7 +18,7 @@ ngDefine('cockpit.directives', [ 'angular' ], function(module, angular) {
                          '</ul>';
   
   
-  var Directive = function ($compile) {
+  var Directive = function ($location, $q, $compile) {
     return {
       restrict: 'EAC',
       scope: {
@@ -30,20 +30,84 @@ ngDefine('cockpit.directives', [ 'angular' ], function(module, angular) {
         scope.$watch('activityInstanceTree', function (newValue) {
           if (newValue) {
             createTree(newValue);
+
+            var searchParams = $location.search().activityInstances;
+
+            if (searchParams) {
+              var activityInstanceIds = [];
+
+              if (searchParams && angular.isString(searchParams)) {
+                activityInstanceIds = searchParams.split(',');
+              } else if (searchParams && angular.isArray(searchParams)) {
+                activityInstanceIds = searchParams;
+              }
+
+              var index = activityInstanceIds.indexOf(newValue.id);
+              if (index !== -1) {
+                newValue.isSelected = true;
+                scope.selection.view.activityInstances.push(newValue);
+              }
+            } else {
+              searchParams = $location.search().bpmnElements;
+
+              if (searchParams) {
+                var bpmnElementIds = [];
+
+                if (angular.isString(searchParams)) {
+                  bpmnElementIds = searchParams.split(',');
+                } else if (angular.isArray(searchParams)) {
+                  bpmnElementIds = searchParams
+                }
+
+                var activityId = newValue.activityId || newValue.targetActivityId;
+
+                var index = bpmnElementIds.indexOf(activityId);
+                if (index !== -1) {
+                  newValue.isSelected = true;
+                  scope.selection.view.activityInstances.push(newValue);
+                }
+              }
+            }
           }
         });
 
-        scope.$watch('selection.treeDiagramMapping.activityInstances', function(newValue, oldValue) {
+        scope.$watch('selection.view.activityInstances', function(newValue, oldValue) {
+          var activityInstanceIds = [];
+
+          var searchParams = $location.search().activityInstances;
+          if (searchParams && angular.isString(searchParams)) {
+            activityInstanceIds = searchParams.split(',');
+          } else if (searchParams && angular.isArray(searchParams)) {
+            activityInstanceIds = searchParams;
+          }
+
           if (oldValue) {
             if (oldValue.indexOf(scope.activityInstanceTree) != -1) {
               scope.activityInstanceTree.isSelected = false;
+
+              var index = activityInstanceIds.indexOf(scope.activityInstanceTree.id);
+              if (index !== -1) {
+                activityInstanceIds.splice(index, 1);
+              }
             }
           }
           if (newValue) {
             if (newValue.indexOf(scope.activityInstanceTree) != -1) {
               scope.activityInstanceTree.isSelected = true;
+
+              var index = activityInstanceIds.indexOf(scope.activityInstanceTree.id);
+              if (index === -1) {
+                activityInstanceIds.push(scope.activityInstanceTree.id);
+              }
             }
-          }          
+          }
+
+          if (activityInstanceIds.length === 0) {
+            $location.search('activityInstances', null);
+          } else {
+            $location.search('activityInstances', activityInstanceIds);
+          }
+          $location.replace();
         });
         
         var nodeHandler = function ($event) {
@@ -66,13 +130,13 @@ ngDefine('cockpit.directives', [ 'angular' ], function(module, angular) {
           if ($event.ctrlKey) {
             // if the 'ctrl' key has been pushed down, then select or deselect the clicked instance
             
-            if (scope.selection.treeDiagramMapping && scope.selection.treeDiagramMapping.activityInstances) {
+            if (scope.selection.view && scope.selection.view.activityInstances) {
               
-              var index = scope.selection.treeDiagramMapping.activityInstances.indexOf(selectedNode);
+              var index = scope.selection.view.activityInstances.indexOf(selectedNode);
               
               if (index != -1) {
                 // if the clicked instance is already selected then deselect it.
-                angular.forEach(scope.selection.treeDiagramMapping.activityInstances, function (instance) {
+                angular.forEach(scope.selection.view.activityInstances, function (instance) {
                   if (instance.id != selectedNode.id) {
                     instances.push(instance);
                   }
@@ -81,7 +145,7 @@ ngDefine('cockpit.directives', [ 'angular' ], function(module, angular) {
                 
               } else if (index == -1) {
                 // if the clicked instance is not already selected then select it together with other instances.
-                angular.forEach(scope.selection.treeDiagramMapping.activityInstances, function (instance) {
+                angular.forEach(scope.selection.view.activityInstances, function (instance) {
                   instances.push(instance);
                 });
                 instances.push(selectedNode);
@@ -94,7 +158,7 @@ ngDefine('cockpit.directives', [ 'angular' ], function(module, angular) {
             
           }
           
-          scope.selection.treeDiagramMapping = {activityInstances: instances, scrollTo: scrollTo};
+          scope.selection.view = {activityInstances: instances, scrollTo: scrollTo};
           scope.$apply();
           
         };
