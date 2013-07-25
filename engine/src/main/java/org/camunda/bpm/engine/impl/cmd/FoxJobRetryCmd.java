@@ -65,10 +65,17 @@ public class FoxJobRetryCmd implements Command<Object> {
     DurationHelper durationHelper = new DurationHelper(failedJobRetryTimeCycle);
     job.setLockExpirationTime(durationHelper.getDateAfter());
     
-    // check if this is jobs' first execution, then change default retries
-    if (job.getRevision() == 2) {
+    // check if this is jobs' first execution (recognize this because no exception is set. Only the first execution can be without exception - because if no exception occurred the job would have been completed)
+    // see https://app.camunda.com/jira/browse/CAM-1039
+    if (job.getExceptionByteArrayId() == null && job.getExceptionMessage()==null) {
+        log.fine("Applying JobRetryStrategy '" + failedJobRetryTimeCycle+ "' the first time for job " + job.getId() + " with "+durationHelper.getTimes()+" retries");
+      // then change default retries to the ones configured
       job.setRetries(durationHelper.getTimes());
     }
+    else {
+    	log.fine("Decrementing retries of JobRetryStrategy '" + failedJobRetryTimeCycle+ "' for job " + job.getId());    	
+    }
+    
     job.setRetries(job.getRetries() - 1);
     
     if (exception != null) {
