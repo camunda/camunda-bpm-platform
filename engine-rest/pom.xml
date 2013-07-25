@@ -295,13 +295,7 @@
               <workDirectory>target/assembly/work</workDirectory>
             </configuration>
           </execution>
-        </executions>
-      </plugin>
 
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-assembly-plugin</artifactId>
-        <executions>
           <execution>
             <id>was</id>
             <phase>package</phase>
