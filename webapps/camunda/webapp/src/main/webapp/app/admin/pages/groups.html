@@ -2,7 +2,10 @@
   <div class="page-header">
     <h1>Groups</h1>
   </div>      
-  <a class="btn pull-right" href="#/group-create"><i class="icon-plus"></i> New Group</a>
+
+  <div show-if-authorized auth-permission="create" auth-resource-name="group"> 
+    <a class="btn pull-right" href="#/group-create"><i class="icon-plus"></i> New Group</a>
+  </div>
      
   <table class="table table-condensed">
     <thead>
@@ -29,8 +32,7 @@
           {{group.type}}
         </td>
         <td>  
-          <a href="#/groups/{{group.id}}">Edit</a> |
-          <a href="#/groups/{{group.id}}">Delete</a>
+          <a href="#/groups/{{group.id}}">Edit</a>
         </td>
       </tr>
     </tbody>

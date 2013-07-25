@@ -25,10 +25,17 @@ ngDefine('camunda.common.pages', function(module) {
         Authentication.clear();
         $location.path("/login");
         break;
-      case 403:
-        Notifications.addError({ status: "Error", message :  "You are unauthorized to "+data.permissionName+" "+data.resourceName+" "+(!!data.resourceId?data.resourceId:"") });
 
-        break;
+      case 403:
+        if(!!data.type && data.type=="AuthorizationException") {
+          Notifications.addError({ status: "Error", message :  "You are unauthorized to "
+            + data.permissionName.toLowerCase()+" "
+            + data.resourceName.toLowerCase()
+            + (!!data.resourceId ? " " + data.resourceId : "s")
+            + "." });
+          break;
+        }
+        
       default:
         Notifications.addError({ status: "Error", message :  "A problem occurred: Try to refresh the view or login and out of the application. If the problem persists, contact your administrator." });
       }

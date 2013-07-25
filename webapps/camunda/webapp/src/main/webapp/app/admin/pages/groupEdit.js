@@ -8,6 +8,9 @@ define(['angular'], function(angular) {
 
     $scope.group = null;
     $scope.groupName = null;
+    $scope.groupId = $routeParams.groupId;
+
+    $scope.availableOperations = {};
 
     // common form validation //////////////////////////
 
@@ -25,6 +28,11 @@ define(['angular'], function(angular) {
         $scope.group = response.data;
         $scope.groupName = (!!response.data.name ? response.data.name : response.data.id);
         $scope.groupCopy = angular.copy(response.data);
+
+        angular.forEach($scope.group.links, function(link){
+          $scope.availableOperations[link.rel] = true;
+        }); 
+
       });
     }
 

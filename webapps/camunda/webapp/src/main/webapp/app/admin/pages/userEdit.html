@@ -12,7 +12,7 @@
             <li ng-class="activeClass('profile')">
               <a href="#/users/{{user.id}}?tab=profile">Profile</a>
             </li>
-            <li ng-class="activeClass('account')">
+            <li ng-class="activeClass('account')" ng-show="availableOperations.update">
               <a href="#/users/{{user.id}}?tab=account">Account</a>
             </li>
             <li ng-class="activeClass('groups')">
@@ -33,41 +33,45 @@
 
               <legend>Profile</legend>
 
-              <div class="control-group">
-                <label class="control-label" for="inputFirstname">Firstname*</label>
-                <div class="controls">
-                  <input id="inputFirstname" name="firstname" type="text" ng-model="profile.firstName" novalidate required></input>
-                  <p class="help-block" ng-show="editProfileForm.firstname.$error.required">Firstname is required.</p>
-                </div>
-              </div>
+              <div ng-show="availableOperations.update">
 
-              <div class="control-group">
-                <label class="control-label" for="inputLastname">Lastname*</label>
-                <div class="controls">
-                  <input id="inputLastname" type="text" ng-model="profile.lastName" novalidate required></input>
-                  <p class="help-block" ng-show="editProfileForm.firstname.$error.required">Lastname is required.</p>
+                <div class="control-group">
+                  <label class="control-label" for="inputFirstname">Firstname*</label>
+                  <div class="controls">
+                    <input id="inputFirstname" name="firstname" type="text" ng-model="profile.firstName" novalidate required ng-disabled="!availableOperations.update"></input>
+                    <p class="help-block" ng-show="editProfileForm.firstname.$error.required">Firstname is required.</p>
+                  </div>
                 </div>
-              </div>
 
-              <div class="control-group">
-                <label class="control-label" for="inputEmail">Email</label>
-                <div class="controls">
-                  <input id="inputEmail" name="email" type="text" ng-model="profile.email" data-email></input>
-                  <p class="help-block" ng-show="editProfileForm.email.$error.email">Not a valid email address</p>
+                <div class="control-group">
+                  <label class="control-label" for="inputLastname">Lastname*</label>
+                  <div class="controls">
+                    <input id="inputLastname" type="text" ng-model="profile.lastName" novalidate required ng-disabled="!availableOperations.update"></input>
+                    <p class="help-block" ng-show="editProfileForm.firstname.$error.required">Lastname is required.</p>
+                  </div>
                 </div>
-              </div>
 
-              <div class="control-group">
-                <div class="controls">
-                  <button type="submit" class="btn"  data-ng-disabled="!canSubmit(editProfileForm, 'profile')" data-ng-click="updateProfile()">Update Profile</button>
+                <div class="control-group">
+                  <label class="control-label" for="inputEmail">Email</label>
+                  <div class="controls">
+                    <input id="inputEmail" name="email" type="text" ng-model="profile.email" data-email ng-disabled="!availableOperations.update"></input>
+                    <p class="help-block" ng-show="editProfileForm.email.$error.email">Not a valid email address</p>
+                  </div>
                 </div>
+
+                <div class="control-group" ng-show="availableOperations.update">
+                  <div class="controls">
+                    <button type="submit" class="btn"  data-ng-disabled="!canSubmit(editProfileForm, 'profile')" data-ng-click="updateProfile()">Update Profile</button>
+                  </div>
+                </div>
+
               </div>
-           
+                       
             </form>
           </div>
         </div>
 
-        <div ng-show="show('account')"> 
+        <div ng-show="show('account')" ng-show="availableOperations.update"> 
           <div class="box">
             <form class="form-horizontal" name="updateCredentialsForm">
 
@@ -99,7 +103,7 @@
            
             </form>  
           </div>
-          <div class="box">
+          <div class="box" ng-show="availableOperations.delete">
             <form class="form-horizontal">
 
               <legend>Delete User</legend>
@@ -120,7 +124,9 @@
 
               <legend>{{user.firstName}} {{user.lastName}}&#39;s Groups</legend>
 
-              <a class="btn pull-right" data-ng-click="openCreateGroupMembershipDialog()"><i class="icon-plus"></i> Add</a>
+              <div show-if-authorized auth-permission="create" auth-resource-name="group membership">
+                <a class="btn pull-right" data-ng-click="openCreateGroupMembershipDialog()"><i class="icon-plus"></i> Add</a>
+              </div>
 
               <table class="table" ng-hide="groupList.length == 0">
                 <thead>
@@ -129,7 +135,7 @@
                     <th>Group Id</th>
                     <th>Group Name</th>
                     <th>Group Type</th>  
-                    <th><!-- actions --></th>    
+                    <th ng-show="availableOperations.removeGroup"><!-- actions --></th>    
                   </tr>
                 </thead>
                 <tbody>
@@ -146,7 +152,7 @@
                     <td>
                       {{group.type}}
                     </td>
-                    <td>  
+                    <td ng-show="availableOperations.removeGroup">  
                       <a class="btn btn-small" data-ng-click="removeGroup(group.id)">Remove</a>                      
                     </td>
                   </tr>

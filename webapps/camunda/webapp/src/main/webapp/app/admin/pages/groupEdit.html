@@ -30,7 +30,7 @@
               <div class="control-group">
                 <label class="control-label" for="inputName">Group Name*</label>
                 <div class="controls">
-                  <input id="inputName" name="groupName" type="text" ng-model="group.name" novalidate required></input>
+                  <input id="inputName" name="groupName" type="text" ng-model="group.name" novalidate required ng-disabled="!availableOperations.update"></input>
                   <p class="text-error" ng-show="createGroupForm.groupName.$error.required">Name is required.</p>
                 </div>
               </div>
@@ -38,11 +38,11 @@
               <div class="control-group">
                 <label class="control-label" for="inputType">Group Type</label>
                 <div class="controls">
-                  <input id="inputType" name="groupType" type="text" ng-model="group.type"></input>
+                  <input id="inputType" name="groupType" type="text" ng-model="group.type" ng-disabled="!availableOperations.update"></input>                  
                 </div>
               </div>
 
-              <div class="control-group">
+              <div class="control-group" ng-show="availableOperations.update">
                 <div class="controls">
                   <button type="submit" class="btn"  data-ng-disabled="!canSubmit(editGroupForm, 'group')" data-ng-click="updateGroup()">Update Group</button>
                 </div>
@@ -50,7 +50,7 @@
            
             </form>
           </div>
-          <div class="box">
+          <div class="box" ng-show="availableOperations.delete">
             <form class="form-horizontal">
 
               <legend>Delete Group</legend>

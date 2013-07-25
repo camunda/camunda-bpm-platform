@@ -10,6 +10,7 @@
   var commons = [
     'module:camunda.common.directives:camunda-common/directives/main',
     'module:camunda.common.extensions:camunda-common/extensions/main',
+    'module:camunda.common.resources:camunda-common/resources/main',
     'module:camunda.common.services:camunda-common/services/main',
     'module:camunda.common.pages:camunda-common/pages/main'];
 
