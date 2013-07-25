@@ -27,7 +27,7 @@ public abstract class AbstractHistoricActivityInstanceRestServiceQueryTest
 		extends AbstractRestServiceTest {
 
 	protected static final String HISTORIC_ACTIVITY_INSTANCE_RESOURCE_URL = TEST_RESOURCE_ROOT_PATH
-			+ "/historic-activity-instance";
+			+ "/history/activity-instance";
 	
 	HistoricActivityInstanceQuery mockQuery;
 	

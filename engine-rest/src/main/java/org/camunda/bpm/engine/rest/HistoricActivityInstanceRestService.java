@@ -19,7 +19,7 @@ import org.camunda.bpm.engine.rest.dto.history.HistoricActivityInstanceQueryDto;
 @Produces(MediaType.APPLICATION_JSON)
 public interface HistoricActivityInstanceRestService {
 
-	  public static final String PATH = "/historic-activity-instance"; 
+	  public static final String PATH = "/activity-instance"; 
 	  
 	  /**
 	   * Exposes the {@link HistoricActivityInstanceQuery} interface as a REST service.
