@@ -36,7 +36,7 @@
     <version.mssql.oss>1.2.4</version.mssql.oss>
     <version.mssql>4.0</version.mssql>
     <version.db2.97>9.7</version.db2.97>
-    <version.postgre>9.1-902.jdbc4</version.postgre>
+    <version.postgre>9.1-901-1.jdbc4</version.postgre>
 
       <!-- OSGi bundles properties -->
       <activiti.artifact />
