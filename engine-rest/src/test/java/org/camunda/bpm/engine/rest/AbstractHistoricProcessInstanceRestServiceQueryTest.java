@@ -29,7 +29,7 @@ public abstract class AbstractHistoricProcessInstanceRestServiceQueryTest extend
 		AbstractRestServiceTest {
 
 	protected static final String HISTORIC_PROCESS_INSTANCE_RESOURCE_URL = TEST_RESOURCE_ROOT_PATH
-			+ "/historic-process-instance";
+			+ "/history/process-instance";
 	
 	HistoricProcessInstanceQuery mockQuery;	
 	

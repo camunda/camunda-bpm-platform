@@ -19,7 +19,7 @@ import org.camunda.bpm.engine.rest.dto.history.HistoricVariableInstanceQueryDto;
 @Produces(MediaType.APPLICATION_JSON)
 public interface HistoricVariableInstanceRestService {
 
-	  public static final String PATH = "/historic-variable-instance"; 
+	  public static final String PATH = "/variable-instance"; 
 	  
 	  /**
 	   * Exposes the {@link HistoricVariableInstanceQuery} interface as a REST service.
