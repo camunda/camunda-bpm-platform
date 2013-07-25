@@ -27,7 +27,7 @@ public abstract class AbstractHistoricVariableInstanceRestServiceQueryTest
 		extends AbstractRestServiceTest {
 
 	protected static final String HISTORIC_VARIABLE_INSTANCE_RESOURCE_URL = TEST_RESOURCE_ROOT_PATH
-			+ "/historic-variable-instance";
+			+ "/history/variable-instance";
 	
 	HistoricVariableInstanceQuery mockQuery;
 	

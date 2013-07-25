@@ -19,7 +19,7 @@ import org.camunda.bpm.engine.rest.dto.history.HistoricProcessInstanceQueryDto;
 @Produces(MediaType.APPLICATION_JSON)
 public interface HistoricProcessInstanceRestService {
 	
-	  public static final String PATH = "/historic-process-instance";	  
+	  public static final String PATH = "/process-instance";	  
 	  
 	  /**
 	   * Exposes the {@link HistoriProcessInstanceQuery} interface as a REST service.

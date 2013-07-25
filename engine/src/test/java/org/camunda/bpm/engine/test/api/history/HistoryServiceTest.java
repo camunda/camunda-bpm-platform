@@ -435,7 +435,6 @@ public class HistoryServiceTest extends PluggableProcessEngineTestCase {
   
   @Deployment(resources = { "org/camunda/bpm/engine/test/api/oneTaskProcess.bpmn20.xml" })
   public void testHistoricProcessInstanceQueryDeleted() {
-
 	assertTrue(historyService.createHistoricProcessInstanceQuery().count() == 0);
 	ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("oneTaskProcess");
 	assertTrue(historyService.createHistoricProcessInstanceQuery().count() == 1);
