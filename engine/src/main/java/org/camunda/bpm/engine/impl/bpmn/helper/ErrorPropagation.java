@@ -47,11 +47,15 @@ public class ErrorPropagation {
 
   private static final Logger LOG = Logger.getLogger(ErrorPropagation.class.getName());
 
-  public static void propagateError(BpmnError error, ActivityExecution execution) throws Exception {    
-    propagateError(error.getErrorCode(), execution);
+  public static void propagateThrowable(Exception e, ActivityExecution execution) throws Exception {    
+    propagateError(e.getClass().getName(), e, execution);
   }
   
-  public static void propagateError(String errorCode, ActivityExecution execution) throws Exception {
+  public static void propagateError(BpmnError error, ActivityExecution execution) throws Exception {    
+    propagateError(error.getErrorCode(), null, execution);
+  }
+  
+  public static void propagateError(String errorCode, Exception e, ActivityExecution execution) throws Exception {
     // find local error handler
     String eventHandlerId = findLocalErrorEventHandler(execution, errorCode);  
 
@@ -63,10 +67,13 @@ public class ErrorPropagation {
       if (superExecution != null) {
         executeCatchInSuperProcess(errorCode, superExecution);
       } else {
-        LOG.info(execution.getActivity().getId() + " throws error event with errorCode '"
-                + errorCode + "', but no catching boundary event was defined. "
-                +   "Execution will simply be ended (none end event semantics).");
-        execution.end();
+        if (e==null) {
+          LOG.info(execution.getActivity().getId() + " throws error event with errorCode '"
+                  + errorCode + "', but no catching boundary event was defined. "
+                  +   "Execution will simply be ended (none end event semantics).");
+          execution.end();
+        } else
+          throw e;
       }
     }
   }
