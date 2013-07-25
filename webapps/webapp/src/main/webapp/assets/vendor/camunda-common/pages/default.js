@@ -90,6 +90,7 @@ ngDefine('camunda.common.pages', function(module) {
       
       $scope.logout = function() {
         Authentication.logout();
+        $location.path("/");
       }
   }];
 
