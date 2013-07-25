@@ -43,7 +43,7 @@ public class GroupRestServiceImpl extends AbstractRestProcessEngineAware impleme
   }
 
   public GroupResource getGroup(String id) {
-    return new GroupResourceImpl(getProcessEngine(), id);
+    return new GroupResourceImpl(getProcessEngine(), id, relativeRootResourcePath);
   }
 
   public List<GroupDto> queryGroups(UriInfo uriInfo, Integer firstResult, Integer maxResults) {

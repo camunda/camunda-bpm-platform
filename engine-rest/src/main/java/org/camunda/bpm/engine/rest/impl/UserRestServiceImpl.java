@@ -44,7 +44,7 @@ public class UserRestServiceImpl extends AbstractRestProcessEngineAware implemen
   }
 
   public UserResource getUser(String id) {
-    return new UserResourceImpl(getProcessEngine(), id);
+    return new UserResourceImpl(getProcessEngine(), id, relativeRootResourcePath);
   }
 
   public List<UserProfileDto> queryUsers(UriInfo uriInfo, Integer firstResult, Integer maxResults) {

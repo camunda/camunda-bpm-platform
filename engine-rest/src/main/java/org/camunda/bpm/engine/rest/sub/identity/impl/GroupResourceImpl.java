@@ -12,11 +12,20 @@
  */
 package org.camunda.bpm.engine.rest.sub.identity.impl;
 
+import static org.camunda.bpm.engine.authorization.Permissions.DELETE;
+import static org.camunda.bpm.engine.authorization.Permissions.UPDATE;
+import static org.camunda.bpm.engine.authorization.Resources.GROUP;
+
+import java.net.URI;
+
+import javax.ws.rs.HttpMethod;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriInfo;
 
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.identity.Group;
+import org.camunda.bpm.engine.rest.GroupRestService;
 import org.camunda.bpm.engine.rest.dto.identity.GroupDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.sub.identity.GroupMembersResource;
@@ -28,18 +37,38 @@ import org.camunda.bpm.engine.rest.sub.identity.GroupResource;
  */
 public class GroupResourceImpl extends AbstractIdentityResource implements GroupResource {
   
-  public GroupResourceImpl(ProcessEngine processEngine, String groupId) {
+  private String rootResourcePath;
+
+  public GroupResourceImpl(ProcessEngine processEngine, String groupId, String rootResourcePath) {
     super(processEngine, groupId);
+    this.rootResourcePath = rootResourcePath;
   }
 
-  public GroupDto getGroup() {
+  public GroupDto getGroup(UriInfo context) {
     
     Group dbGroup = findGroupObject();    
     if(dbGroup == null) {
       throw new InvalidRequestException(Status.NOT_FOUND, "Group with id " + resourceId + " does not exist");
     }
     
-    return GroupDto.fromGroup(dbGroup);
+    GroupDto group = GroupDto.fromGroup(dbGroup);
+    
+    // add links if operations are authorized
+    URI uri = context.getBaseUriBuilder()
+        .path(rootResourcePath)
+        .path(GroupRestService.class)
+        .path(resourceId)
+        .build();
+    
+    group.addReflexiveLink(uri, HttpMethod.GET, "self");    
+    if(isAuthorized(DELETE, GROUP, resourceId)) {
+      group.addReflexiveLink(uri, HttpMethod.DELETE, "delete");
+    }    
+    if(isAuthorized(UPDATE, GROUP, resourceId)) {
+      group.addReflexiveLink(uri, HttpMethod.PUT, "update");
+    }
+    
+    return group;
   }
 
 
