@@ -8,13 +8,17 @@ ngDefine('cockpit.directives', [
     'jquery-mousewheel'
   ], function(module, angular, $, Bpmn) {
 
-  function DirectiveController($scope, $element, $attrs, $filter, $window) {
+  function DirectiveController($scope, $element, $attrs, $filter, $location, $q, $window) {
     
     var w = angular.element($window);
+
+    var bpmnElements;
     
     var activityHighligtClass = 'activity-highlight';
     var bpmnRenderer = null;
     var zoomLevel = 1;
+
+    var selectedBpmnElementIds;
     
     $scope.$on('$destroy', function() {
       bpmnRenderer = null;
@@ -28,6 +32,7 @@ ngDefine('cockpit.directives', [
      */
     $scope.$watch('processDiagram', function(newValue, oldValue) {
       if (newValue) {
+        bpmnElements = getBpmnElements();
         bpmnRenderer = new Bpmn();
         renderDiagram();
         initializeScrollAndZoomFunctions();
@@ -176,12 +181,6 @@ ngDefine('cockpit.directives', [
           executeAnnotation(activity.id, '<p class="badge badge-important">!</p>');
         }
       }
-
-/*      angular.forEach($scope.incidents, function (activity) {
-        if (activity.incidents && activity.incidents.length > 0) {
-          executeAnnotation(activity.id, '<p class="badge badge-important">!</p>');
-        }
-      });*/
     }
     
     function doAnnotate(activityId, count) {
@@ -247,14 +246,15 @@ ngDefine('cockpit.directives', [
             if (!moved && mousedown) {
               // if the mouse have not moved and a mousedown happend,
               // then you have to deselect the current selection.
-              if ($scope.selection && $scope.selection.treeDiagramMapping) {
+              if ($scope.selection && $scope.selection.view) {
                 
                 // get selected target
                 var targetId = $($event.target).attr('id');
                 
                 if ($scope.clickableElements.indexOf(targetId) == -1) {
                   // in that case clear the selected bpmnElements
-                  $scope.selection.treeDiagramMapping = {bpmnElements: []};
+
+                  $scope.selection.view = {bpmnElements: []};
                   $scope.$apply();
                 }
               }              
@@ -265,7 +265,7 @@ ngDefine('cockpit.directives', [
           mousedown = false;
         });
     }
-    
+   
     /* Handler to handle click event on a clickable bpmn element */
     var clickHandler = function($event) {
       var selectedBpmnElement = $event.data;
@@ -273,43 +273,97 @@ ngDefine('cockpit.directives', [
       if ($event.ctrlKey) {
         // if the 'ctrl' key has been pushed down, then select or deselect the clicked element
         
-        if ($scope.selection.treeDiagramMapping && $scope.selection.treeDiagramMapping.bpmnElements) {
+        if ($scope.selection.view && $scope.selection.view.bpmnElements) {
           var elements = [];
           
-          var index = $scope.selection.treeDiagramMapping.bpmnElements.indexOf(selectedBpmnElement);
+          var index = $scope.selection.view.bpmnElements.indexOf(selectedBpmnElement);
           
           if (index != -1) {
             // if the clicked element is already selected then deselect it.
-            angular.forEach($scope.selection.treeDiagramMapping.bpmnElements, function (element) {
+            angular.forEach($scope.selection.view.bpmnElements, function (element) {
               if (element.id != selectedBpmnElement.id) {
                 elements.push(element);
               }
             });
-            
+
           } else if (index == -1) {
             // if the clicked element is not already selected then select it together with other elements.
             elements.push(selectedBpmnElement);
-            angular.forEach($scope.selection.treeDiagramMapping.bpmnElements, function (element) {
+            angular.forEach($scope.selection.view.bpmnElements, function (element) {
               elements.push(element);
-            });            
+            });
           }
           
           // set the selected bpmn elements
-          $scope.selection.treeDiagramMapping = {bpmnElements: elements};
+          $scope.selection.view = {bpmnElements: elements};
           $scope.$apply();
           return;
         }
       }
       
-      
-      $scope.selection.treeDiagramMapping = {bpmnElements: [ selectedBpmnElement ]};
+      $scope.selection.view = {bpmnElements: [ selectedBpmnElement ]};
       $scope.$apply();
     };
+
+    /*------------------- Handle search parameter in location ---------------------*/
+
+    $scope.$watch(function() { return $location.search().bpmnElements; }, function(newValue, oldValue) {
+      // if newValue and oldValue are not defined,
+      // then only initialize the array of selected
+      // bpmn element ids.
+      if (!newValue && !oldValue) {
+        selectedBpmnElementIds = [];
+        return;
+      }
+
+      if (angular.isArray(newValue)) {
+        return;
+      }
+
+      function waitForBpmnElements() {
+        var deferred = $q.defer();
+
+        $scope.$watch(function () { return bpmnElements; }, function (newValue, oldValue) {
+          if (!oldValue && newValue) {
+            deferred.resolve(newValue);
+          }
+        })
+
+        return deferred.promise;
+      }
+
+      if (angular.isString(newValue)) {
+        selectedBpmnElementIds = newValue.split(',');
+        if (!bpmnElements) {
+          waitForBpmnElements().then(function(result) {
+            handleInitialSelection(result, selectedBpmnElementIds);
+          });
+        } else {
+          handleInitialSelection(bpmnElements, selectedBpmnElementIds);
+        }
+      }
+
+    });
     
+    function handleInitialSelection(bpmnElements, selectedBpmnElementIds) {
+      for(var i = 0, selectedBpmnElementId; !!(selectedBpmnElementId = selectedBpmnElementIds[i]); i++) {
+        var bpmnElement = bpmnElements[selectedBpmnElementId];
+        if (bpmnElement) {
+          $scope.selection.view.bpmnElements.push(bpmnElement);
+          selectActivity(bpmnElement);          
+        }
+      }
+      var lastBpmnElement = $scope.selection.view.bpmnElements[$scope.selection.view.bpmnElements.length-1];
+      if (lastBpmnElement) {
+        scrollTo(lastBpmnElement);  
+      }
+    }
+
     function registerEventHandlersOnBaseElements() {
       if ($scope.selection) {
-        var model = selectProcessObject(); 
-        registerEventHandlersOnBaseElement(model);
+        for (var key in bpmnElements) {
+          registerEventHandlersOnBaseElement(bpmnElements[key]);
+        }
       }
     }
     
@@ -339,98 +393,124 @@ ngDefine('cockpit.directives', [
             }          
           });
       }
-      
-      if (element.baseElements) {
-        angular.forEach(element.baseElements, function(baseElement) {
-          registerEventHandlersOnBaseElement(baseElement);
-        });
-      }
     }
     
     /*------------------- Handle selected activity id---------------------*/
     
-    $scope.$watch('selection.treeDiagramMapping.bpmnElements', function(newValue, oldValue) {
+    $scope.$watch('selection.view.bpmnElements', function(newValue, oldValue) {
       if (oldValue) {
-        deselectActivity(oldValue);
-      }
-      if (newValue) {
-        selectActivity(newValue);
-      }
-    });
-
-    function selectActivity(bpmnElements) {
-      angular.forEach(bpmnElements, function(bpmnElement) {
-        if (bpmnElement) {
-          bpmnElement.isSelected = true;
-          try {
-            bpmnRenderer.annotation(bpmnElement.id).addClasses([ activityHighligtClass ]);
-          } catch (error) {
-            console.log('Could not add css class ' + activityHighligtClass + ' on element ' + bpmnElement.id + ': ' + error.message);
+        angular.forEach(oldValue, function(bpmnElement) {
+          deselectActivity(bpmnElement);
+          var index = selectedBpmnElementIds.indexOf(bpmnElement.id);
+          if (index !== -1) {
+            selectedBpmnElementIds.splice(index, 1);
           }
-        }
-      });
-    }
-    
-    function deselectActivity(bpmnElements) {
-      angular.forEach(bpmnElements, function(bpmnElement) {
-        if (bpmnElement) {
-          bpmnElement.isSelected = false;
-          try {
-            bpmnRenderer.annotation(bpmnElement.id).removeClasses([ activityHighligtClass ]);
-          } catch (error) {
-            console.log('Could not remove css class ' + activityHighligtClass + ' on element ' + bpmnElement.id + ': ' + error.message);
-          }
-        }
-      });
-    }
-    
-    $scope.$watch('selection.treeDiagramMapping.scrollToBpmnElement', function(newValue) {
-      if (newValue) {
-        
-        // parent size
-        var parentElementHeight = $element.height();
-        var parentElementWidth = $element.width();
-        
-        // get the bpmn element to scroll to
-        var bpmnElement = $('#' + $element.attr('id') + '> #' + newValue.id);
-
-        // get the height and width of the bpmn element
-        var bpmnElementHeight = bpmnElement.height();
-        var bpmnElementWidth = bpmnElement.width();
-        
-        // get the top and left position of the bpmn element
-        var bpmnElementTop = parseInt(bpmnElement.css('top'));
-        var bpmnElementLeft = parseInt(bpmnElement.css('left'));
-        
-        var scrollTop = (bpmnElementTop +  (bpmnElementHeight/2)) - parentElementHeight/2;
-        var scrollLeft = (bpmnElementLeft +  (bpmnElementWidth/2)) - parentElementWidth/2;
-        
-        $element.animate({
-          scrollTop: scrollTop,
-          scrollLeft: scrollLeft
         });
       }
-    });
-    
-    /**
-     * Iterate over processDiagram and check whether the
-     * process definition key is equals to process diagram id
-     * and whether the process diagram is a process.
-     * If the conditions match then the corresponding process
-     * diagram will be returned.
-     */
-    function selectProcessObject() {
-      var key = $scope.processDefinition.key;
+      if (newValue) {
+        angular.forEach(newValue, function(bpmnElement) {
+          selectActivity(bpmnElement);
+          var index = selectedBpmnElementIds.indexOf(bpmnElement.id);
+          if (index === -1) {
+            selectedBpmnElementIds.push(bpmnElement.id);
+          }
+        });
+      }
+      if (selectedBpmnElementIds.length === 0) {
+        $location.search('bpmnElements', null);
+      } else {
+        $location.search('bpmnElements', selectedBpmnElementIds);
+      }
+      $location.replace();
       
+    });
+
+    function selectActivity(bpmnElement) {
+      if (bpmnElement) {
+        bpmnElement.isSelected = true;
+        try {
+          bpmnRenderer.annotation(bpmnElement.id).addClasses([ activityHighligtClass ]);
+        } catch (error) {
+          console.log('Could not add css class ' + activityHighligtClass + ' on element ' + bpmnElement.id + ': ' + error.message);
+        }
+      }
+    }
+    
+    function deselectActivity(bpmnElement) {
+      if (bpmnElement) {
+        bpmnElement.isSelected = false;
+        try {
+          bpmnRenderer.annotation(bpmnElement.id).removeClasses([ activityHighligtClass ]);
+        } catch (error) {
+          console.log('Could not remove css class ' + activityHighligtClass + ' on element ' + bpmnElement.id + ': ' + error.message);
+        }
+      }
+    }
+    
+    $scope.$watch('selection.view.scrollToBpmnElement', function(newValue) {
+      if (newValue) {
+        scrollTo(newValue)
+      }
+    });
+
+    function scrollTo(element) {
+      // parent size
+      var parentElementHeight = $element.height();
+      var parentElementWidth = $element.width();
+      
+      // get the bpmn element to scroll to
+      var bpmnElement = $('#' + $element.attr('id') + '> #' + element.id);
+
+      // get the height and width of the bpmn element
+      var bpmnElementHeight = bpmnElement.height();
+      var bpmnElementWidth = bpmnElement.width();
+      
+      // get the top and left position of the bpmn element
+      var bpmnElementTop = parseInt(bpmnElement.css('top'));
+      var bpmnElementLeft = parseInt(bpmnElement.css('left'));
+      
+      var scrollTop = (bpmnElementTop +  (bpmnElementHeight/2)) - parentElementHeight/2;
+      var scrollLeft = (bpmnElementLeft +  (bpmnElementWidth/2)) - parentElementWidth/2;
+      
+      $element.animate({
+        scrollTop: scrollTop,
+        scrollLeft: scrollLeft
+      });
+    }
+
+    function getBpmnElements () {
+      var result = {};
+
+      var key = $scope.processDefinition.key;
+
+      var diagram = null;
+
       for (var i = 0; i < $scope.processDiagram.length; i++) {
         var currentDiagram = $scope.processDiagram[i];
         if (currentDiagram.type === 'process') {
           
           if (currentDiagram.id === key) {
-            return currentDiagram;
+            diagram = currentDiagram;
+            break;
           }
         }
       }
+
+      getBpmnElementsHelper(diagram, result);
+
+      return result;
+
+    }
+
+    function getBpmnElementsHelper(element, result) {
+      result[element.id] = element;
+
+      if (element.baseElements) {
+        angular.forEach(element.baseElements, function(baseElement) {
+          getBpmnElementsHelper(baseElement, result);
+        });
+      }
+
     }
     
     this.getRenderer = function () {

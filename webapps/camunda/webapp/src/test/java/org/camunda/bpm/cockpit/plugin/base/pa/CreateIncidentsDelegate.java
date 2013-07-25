@@ -21,15 +21,15 @@ public class CreateIncidentsDelegate implements JavaDelegate {
   @Override
   public void execute(DelegateExecution execution) throws Exception {
     
-    IncidentEntity.createAndInsertIncident("anIncident", execution.getId(), "test1");
-    IncidentEntity.createAndInsertIncident("anIncident", execution.getId(), "test2");
-    IncidentEntity.createAndInsertIncident("anIncident", execution.getId(), "test3");
+    IncidentEntity.createAndInsertIncident("anIncident", execution.getId(), "test1", "aMessage");
+    IncidentEntity.createAndInsertIncident("anIncident", execution.getId(), "test2", "aMessage");
+    IncidentEntity.createAndInsertIncident("anIncident", execution.getId(), "test3", "aMessage");
 
-    IncidentEntity.createAndInsertIncident("anotherIncident", execution.getId(), "test1");
-    IncidentEntity.createAndInsertIncident("anotherIncident", execution.getId(), "test2");
-    IncidentEntity.createAndInsertIncident("anotherIncident", execution.getId(), "test3");
-    IncidentEntity.createAndInsertIncident("anotherIncident", execution.getId(), "test4");
-    IncidentEntity.createAndInsertIncident("anotherIncident", execution.getId(), "test5");
+    IncidentEntity.createAndInsertIncident("anotherIncident", execution.getId(), "test1", "anotherMessage");
+    IncidentEntity.createAndInsertIncident("anotherIncident", execution.getId(), "test2", "anotherMessage");
+    IncidentEntity.createAndInsertIncident("anotherIncident", execution.getId(), "test3", "anotherMessage");
+    IncidentEntity.createAndInsertIncident("anotherIncident", execution.getId(), "test4", "anotherMessage");
+    IncidentEntity.createAndInsertIncident("anotherIncident", execution.getId(), "test5", "anotherMessage");
   }
 
 }

@@ -7,8 +7,7 @@ ngDefine('camunda.common.directives', [
   './paginator',
   'module:camunda.common.directives.ifLoggedIn:./ifLoggedIn',
   './password',
-  './modalDialog',
-  './stateCircle'
+  './modalDialog'
 ], function(module) {
 
 });

@@ -79,8 +79,8 @@ public class ProcessInstanceResourceTest extends AbstractCockpitPluginTest {
     assertThat(dto.getActivityId()).isEqualTo("ServiceTask_1");
     assertThat(dto.getProcessInstanceId()).isEqualTo(processInstance.getId());
     assertThat(dto.getProcessDefinitionId()).isEqualTo(processDefinition.getId());
-    assertThat(dto.getCauseIncidentId()).isNull();
-    assertThat(dto.getRootCauseIncidentId()).isNull();
+    assertThat(dto.getCauseIncidentId()).isEqualTo(dto.getId());
+    assertThat(dto.getRootCauseIncidentId()).isEqualTo(dto.getId());
     assertThat(dto.getConfiguration()).isEqualTo(job.getId());
   }
 
