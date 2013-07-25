@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.camunda.bpm.webapp</groupId>
+  <artifactId>camunda-webapp-root</artifactId>
+  <packaging>pom</packaging>
+  <name>camunda BPM - webapp - root</name>
+
+  <parent>
+    <groupId>org.camunda.bpm</groupId>
+    <artifactId>camunda-root</artifactId>
+    <version>7.0.0-SNAPSHOT</version>
+    <relativePath>../..</relativePath>
+  </parent>
+
+  <modules>
+    <module>core</module>
+    <module>webapp</module>
+    <module>tomcat</module>
+    <module>glassfish</module>
+    <module>jboss</module>
+  </modules>
+
+  <properties>
+    <tomcat6.connector.http.port>48080</tomcat6.connector.http.port>
+    <tomcat6.connector.http.redirectPort>48443</tomcat6.connector.http.redirectPort>
+    <tomcat6.connector.ajp.port>48009</tomcat6.connector.ajp.port>
+    <tomcat6.connector.ajp.redirectPort>48443</tomcat6.connector.ajp.redirectPort>
+    <tomcat6.server.port>48005</tomcat6.server.port>
+  </properties>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.camunda.bpm.webapp</groupId>
+        <artifactId>camunda-webapp-core</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.camunda.bpm</groupId>
+        <artifactId>camunda-engine-rest</artifactId>
+        <classifier>classes</classifier>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.camunda.bpm</groupId>
+        <artifactId>camunda-engine-rest</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jboss.arquillian</groupId>
+        <artifactId>arquillian-bom</artifactId>
+        <version>1.0.3.Final</version>
+        <scope>import</scope>
+        <type>pom</type>
+      </dependency>
+      </dependencies>
+  </dependencyManagement>
+</project>
