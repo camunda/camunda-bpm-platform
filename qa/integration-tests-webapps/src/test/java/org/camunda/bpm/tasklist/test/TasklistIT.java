@@ -30,6 +30,9 @@ public class TasklistIT {
     testProperties = new TestProperties(48080);
     appUrl = testProperties.getApplicationPath("/camunda/app/tasklist");
     driver = new FirefoxDriver();
+    
+    testUtil = new TestUtil(testProperties);
+    testUtil.createInitialUser("admin", "admin", "Mr.", "Admin");
   }
 
   @Test
@@ -52,6 +55,8 @@ public class TasklistIT {
 
   @After
   public void after() {
+    testUtil.deleteUser("admin");
+    testUtil.destroy();
     driver.close();
   }
 }
