@@ -134,22 +134,6 @@ textarea.in-place-edit {
     margin: 10px;
   }
 
-  .ctn-column {
-    border-left: solid 1px #BBB;
-  }
-
-  .ctn-column:first-child {
-    border-left: none;
-  }
-
-  .ctn-row {
-    border-top: solid 1px #BBB;
-  }
-
-  .ctn-row:first-child {
-    border-top: none;
-  }
-
   .ctn-sitebar {
     width: 250px;
     right: auto;
