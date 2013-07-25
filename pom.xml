@@ -79,7 +79,7 @@
         
         <module>webapps/h2-webapp</module>
         <module>webapps/cycle</module>
-        <module>webapps/camunda</module>
+        <module>webapps/camunda-webapp</module>
         
         <module>javaee/ejb-service</module>
         <module>javaee/ejb-client</module>
