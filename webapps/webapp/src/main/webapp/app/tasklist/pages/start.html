@@ -1,0 +1,34 @@
+<div class="control-group" ngm-if="form.loaded">
+  <h5>Start Process Instance</h5>
+  <h3>{{ processDefinition.name }}</h3>
+
+  <hr />
+
+  <form ng-submit="submit()">
+    <div ngm-if="!form.key && !form.generic">
+      <p>
+        It looks as if no form has been defined to start the process.
+      </p>
+
+      <button class="btn" ng-click="activateGeneric()">Start process using generic form</button>
+    </div>
+    <div ngm-if="form.generic">
+      <h5>Variables</h5>
+
+      <p>
+        Use the form below to add variables that will be be passed onto the process instance upon process start.
+      </p>
+
+      <div ng-include="'common/form/generic-variables.html'"></div>
+    </div>
+
+    <div ngm-if="form.embedded && !form.generic">
+      <div style="margin: 20px 0 20px 0" ng-include="form.key" task-variables="variables"></div>
+    </div>
+
+    <div ngm-if="form.key || form.generic">
+      <button class="btn btn-primary" type="submit">Start Process</button>
+      <button class="btn" ng-click="cancel()">Cancel</button>
+    </div>
+  </form>
+</div>
