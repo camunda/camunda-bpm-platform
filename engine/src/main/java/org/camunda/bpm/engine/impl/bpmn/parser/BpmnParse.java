@@ -2396,6 +2396,7 @@ public class BpmnParse extends Parse {
       Element errorEventDefinition = endEventElement.element("errorEventDefinition");
       Element cancelEventDefinition = endEventElement.element("cancelEventDefinition");
       Element terminateEventDefinition = endEventElement.element("terminateEventDefinition");
+      Element messageEventDefinitionElement = endEventElement.element("messageEventDefinition");
       if (errorEventDefinition != null) { // error end event
         String errorRef = errorEventDefinition.attribute("errorRef");
         if (errorRef == null || "".equals(errorRef)) {
@@ -2417,6 +2418,9 @@ public class BpmnParse extends Parse {
         }
       } else if (terminateEventDefinition != null) {
         activity.setActivityBehavior(new TerminateEndEventActivityBehavior());
+      } else if (messageEventDefinitionElement != null) {
+        // CAM-436 same behaviour as service task
+        activity.setActivityBehavior(parseServiceTask(messageEventDefinitionElement, scope).getActivityBehavior());
       } else { // default: none end event
         activity.setActivityBehavior(new NoneEndEventActivityBehavior());
       }
