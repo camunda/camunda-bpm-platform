@@ -23,7 +23,7 @@ public abstract class AbstractConnectorTestBase {
   public static final String TMP_DIR_NAME = "connector-test-tmp-dir";
   public static final ConnectorNode TMP_FOLDER =
     new ConnectorNode("//" + TMP_DIR_NAME, TMP_DIR_NAME, ConnectorNodeType.FOLDER);
-  
+
   private ConnectorNode tmpFolder;
 
   /**
@@ -32,24 +32,25 @@ public abstract class AbstractConnectorTestBase {
    * @return
    */
   public abstract Connector getConnector();
-  
+
   @Before
-  public void setUp() throws Exception {
+  public void before() throws Exception {
+
     Connector connector = getConnector();
     if (connector.getNode(TMP_FOLDER.getId()) != null) {
       return;
     }
-    
+
     String message = "create folder";
     tmpFolder = connector.createNode("//", TMP_DIR_NAME, ConnectorNodeType.FOLDER, message);
-    if(connector.isSupportsCommitMessage()) {
+    if (connector.isSupportsCommitMessage()) {
       assertThat(tmpFolder.getMessage()).isEqualTo(message);
     }
 
     assertThat(tmpFolder).isEqualTo(TMP_FOLDER);
-    
+
     ConnectorNode node = connector.getNode(tmpFolder.getId());
-    if(connector.isSupportsCommitMessage()) {
+    if (connector.isSupportsCommitMessage()) {
       assertThat(node.getMessage()).isEqualTo(message);
     }
 
@@ -59,9 +60,9 @@ public abstract class AbstractConnectorTestBase {
     } catch (IllegalArgumentException e) {
       // anticipated
     }
-    
+
     // not alphabetically ordered!
-    String[] filesToImport = new String[]{"test-rhs.bpmn", "test-lhs.bpmn"};
+    String[] filesToImport = new String[]{ "test-rhs.bpmn", "test-lhs.bpmn" };
 
     // when
     for (String file : filesToImport) {
@@ -71,7 +72,7 @@ public abstract class AbstractConnectorTestBase {
     // import another file with no extension
     importFile(connector, "test-rhs.bpmn", "test-rhs");
   }
-  
+
   @Test
   public void shouldNotThrowExceptionWhenObtainingContentInfoOfNonExistentFile() throws Exception {
     // give
@@ -144,7 +145,7 @@ public abstract class AbstractConnectorTestBase {
 
   @Test
   public void shouldGetSingleFileContents() throws Exception {
-    // given 
+    // given
     Connector connector = getConnector();
 
     InputStream originalInputStream = null;
@@ -167,13 +168,14 @@ public abstract class AbstractConnectorTestBase {
 
   @Test
   public void shouldUpdateSingleFileContentFromConnector() throws Exception {
-    // given 
+    // given
     Connector connector = getConnector();
 
     InputStream originalInputStream = null;
     InputStream nodeInputStream = null;
 
     ConnectorNode sourceFileNode = new ConnectorNode("//" + TMP_DIR_NAME + "/test-lhs.bpmn", "test-lhs.bpmn");
+    ConnectorNode destFileNode = null;
 
     // now, with seconds accuracy
     Date now = DateUtil.getNormalizedDate(System.currentTimeMillis());
@@ -182,7 +184,7 @@ public abstract class AbstractConnectorTestBase {
       originalInputStream = connector.getContent(sourceFileNode);
       byte[] inputBytes = IoUtil.readInputStream(originalInputStream, "connector is is");
 
-      ConnectorNode destFileNode = connector.createNode("//" + TMP_DIR_NAME, "/test-lhs-copy.bpmn", ConnectorNodeType.ANY_FILE, null);
+      destFileNode = connector.createNode("//" + TMP_DIR_NAME, "/test-lhs-copy.bpmn", ConnectorNodeType.ANY_FILE, null);
 
       // when
       ContentInformation updatedContentInfo = connector.updateContent(
@@ -200,55 +202,70 @@ public abstract class AbstractConnectorTestBase {
       // then
       assertThat(nodeBytes).isEqualTo(inputBytes);
     } finally {
+      safeDeleteNode(destFileNode, connector);
       IoUtil.closeSilently(originalInputStream, nodeInputStream);
     }
   }
-  
+
   @Test
   public void shouldSetCreateAndUpdateMessage() throws Exception {
     Connector connector = getConnector();
-    if(connector.isSupportsCommitMessage()) {
-      // given
-  
-      String createMessage = "initial create";
-      ConnectorNode destFileNode = connector.createNode("//" + TMP_DIR_NAME, "/test-lhs-copy2.bpmn", ConnectorNodeType.ANY_FILE, createMessage);
-      
-      destFileNode = connector.getNode(destFileNode.getId());
-      assertThat(destFileNode.getMessage()).isEqualTo(createMessage);
-  
-      // when
-      String updateMessage = "updating node ...";
-      connector.updateContent(destFileNode, new ByteArrayInputStream("Test".getBytes()), updateMessage);
-  
-      // now the message is equal to the update message
-      destFileNode = connector.getNode(destFileNode.getId());
-      assertThat(destFileNode.getMessage()).isEqualTo(updateMessage);
+    ConnectorNode destFileNode = null;
+
+    try {
+      if (connector.isSupportsCommitMessage()) {
+        // given
+
+        String createMessage = "initial create";
+        destFileNode = connector.createNode("//" + TMP_DIR_NAME, "/test-lhs-copy2.bpmn", ConnectorNodeType.ANY_FILE, createMessage);
+
+        destFileNode = connector.getNode(destFileNode.getId());
+        assertThat(destFileNode.getMessage()).isEqualTo(createMessage);
+
+        // when
+        String updateMessage = "updating node ...";
+        connector.updateContent(destFileNode, new ByteArrayInputStream("Test".getBytes()), updateMessage);
+
+        // now the message is equal to the update message
+        destFileNode = connector.getNode(destFileNode.getId());
+        assertThat(destFileNode.getMessage()).isEqualTo(updateMessage);
+
+        connector.deleteNode(destFileNode, "cleanup");
+      }
+    } finally {
+      safeDeleteNode(destFileNode, connector);
     }
   }
-  
+
   @Test
   public void shouldSetDeleteMessage() throws Exception {
     Connector connector = getConnector();
-    if(connector.isSupportsCommitMessage()) {
-      // given
-  
-      String createMessage = "initial create";
-      ConnectorNode destFileNode = connector.createNode("//" + TMP_DIR_NAME, "/test-lhs-copy3.bpmn", ConnectorNodeType.ANY_FILE, createMessage);
-      
-      destFileNode = connector.getNode(destFileNode.getId());
-      assertThat(destFileNode.getMessage()).isEqualTo(createMessage);
-      
-      String deleteMessage = "deleting node ...";
-      connector.deleteNode(destFileNode, deleteMessage);
-      
-      ConnectorNode parentNode = connector.getNode("//" + TMP_DIR_NAME);
-      assertThat(parentNode.getMessage()).isEqualTo(deleteMessage);
+    ConnectorNode destFileNode = null;
+
+    try {
+      if (connector.isSupportsCommitMessage()) {
+        // given
+
+        String createMessage = "initial create";
+        destFileNode = connector.createNode("//" + TMP_DIR_NAME, "/test-lhs-copy3.bpmn", ConnectorNodeType.ANY_FILE, createMessage);
+
+        destFileNode = connector.getNode(destFileNode.getId());
+        assertThat(destFileNode.getMessage()).isEqualTo(createMessage);
+
+        String deleteMessage = "deleting node ...";
+        connector.deleteNode(destFileNode, deleteMessage);
+
+        ConnectorNode parentNode = connector.getNode("//" + TMP_DIR_NAME);
+        assertThat(parentNode.getMessage()).isEqualTo(deleteMessage);
+      }
+    } finally {
+      safeDeleteNode(destFileNode, connector);
     }
   }
 
   @Test
   public void shouldUpdateSingleFileContents() throws Exception {
-    // given 
+    // given
     Connector connector = getConnector();
 
     InputStream originalInputStream = null;
@@ -302,5 +319,15 @@ public abstract class AbstractConnectorTestBase {
     // compare by time to mitigate problems with time zone comparison
     assertThat(lastModified.getTime()).isGreaterThanOrEqualTo(beforeUpdate.getTime());
     assertThat(lastModified.getTime()).isLessThanOrEqualTo(new Date().getTime());
+  }
+
+  private void safeDeleteNode(ConnectorNode destFileNode, Connector connector) {
+    if (destFileNode != null) {
+      try {
+        connector.deleteNode(destFileNode, "cleanup");
+      } catch (Exception e) {
+        ;
+      }
+    }
   }
 }

@@ -149,11 +149,14 @@ Icons
 -------------------**/
 
 .circle {
-  border-radius: 50%;
+  background-color: #999999;
   width: 20px;
   height: 20px;
-  background-color: #999999;
-  top: 100%;
+  float: left;
+
+  -webkit-border-radius: 50%;
+     -moz-border-radius: 50%;
+          border-radius: 50%;  
 }
 
 .circle-red {

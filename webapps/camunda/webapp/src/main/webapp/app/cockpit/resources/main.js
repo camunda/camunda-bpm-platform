@@ -4,7 +4,7 @@ ngDefine('cockpit.resources', [
   './incidentResource',
   './processInstanceResource',
   './localExecutionVariableResource',
-  './jobResource',
+  './jobResource'
 ], function(module) {
 
 });

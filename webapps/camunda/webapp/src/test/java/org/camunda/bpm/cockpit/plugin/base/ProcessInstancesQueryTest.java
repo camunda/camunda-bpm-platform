@@ -207,7 +207,7 @@ public class ProcessInstancesQueryTest extends AbstractCockpitPluginTest {
       } else if (incidentType.equals("anotherIncident")) {
         assertThat(incident.getIncidentCount()).isEqualTo(5);
       } else {
-        Assert.fail(incidentType + " no expected.");
+        Assert.fail(incidentType + " not expected.");
       }
 
     }

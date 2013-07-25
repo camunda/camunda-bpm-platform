@@ -34,5 +34,10 @@ public class BaseRootResource extends AbstractPluginRootResource {
   public ProcessInstanceResource getProcessInstanceResource(@PathParam("engine") String engineName) {
     return subResource(new ProcessInstanceResource(engineName), engineName);
   }
+  
+  @Path("{engine}" + IncidentRestService.PATH)
+  public IncidentRestService getIncidentRestService(@PathParam("engine") String engineName) {
+    return subResource(new IncidentRestService(engineName), engineName);
+  }
 
 }

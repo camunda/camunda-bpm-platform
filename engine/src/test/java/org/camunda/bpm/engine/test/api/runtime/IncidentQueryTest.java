@@ -87,6 +87,27 @@ public class IncidentQueryTest extends PluggableProcessEngineTestCase {
     assertNull(incident);
   }
   
+  public void testQueryByIncidentMessage() {
+    IncidentQuery query = runtimeService.createIncidentQuery().incidentMessage("Expected exception.");
+    assertEquals(4, query.count());
+    
+    List<Incident> incidents = query.list();
+    assertFalse(incidents.isEmpty());
+    assertEquals(4, incidents.size());
+  }
+  
+  public void testQueryByInvalidIncidentMessage() {
+    IncidentQuery query = runtimeService.createIncidentQuery().incidentMessage("invalid");
+    
+    assertEquals(0, query.count());
+    
+    List<Incident> incidents = query.list();
+    assertTrue(incidents.isEmpty());
+    
+    Incident incident = query.singleResult();
+    assertNull(incident);
+  }
+  
   public void testQueryByProcessDefinitionId() {
     String processDefinitionId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
     
@@ -260,13 +281,11 @@ public class IncidentQueryTest extends PluggableProcessEngineTestCase {
     assertNotNull(causeIncident);
     
     IncidentQuery query = runtimeService.createIncidentQuery().causeIncidentId(causeIncident.getId());
-    assertEquals(1, query.count());
+    assertEquals(2, query.count());
     
     List<Incident> incidents = query.list();
     assertFalse(incidents.isEmpty());
-    assertEquals(1, incidents.size());
-    
-    assertNotNull(query.singleResult());
+    assertEquals(2, incidents.size());
   }
   
   public void testQueryByRootCauseIncidentIdEqualsNull() {
@@ -304,11 +323,11 @@ public class IncidentQueryTest extends PluggableProcessEngineTestCase {
     assertNotNull(incident);
     
     IncidentQuery query = runtimeService.createIncidentQuery().rootCauseIncidentId(incident.getId());
-    assertEquals(2, query.count());
+    assertEquals(3, query.count());
     
     List<Incident> incidents = query.list();
     assertFalse(incidents.isEmpty());
-    assertEquals(2, incidents.size());
+    assertEquals(3, incidents.size());
     
     try {
       query.singleResult();

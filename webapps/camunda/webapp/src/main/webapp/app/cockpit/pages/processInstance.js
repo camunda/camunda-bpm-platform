@@ -7,7 +7,7 @@ ngDefine('cockpit.pages', function(module) {
 
     $scope.processInstance = processInstance;
 
-    $scope.selection = {};
+    $scope.selection = { view: {bpmnElements: [], activityInstances: [] }};
 
     $scope.cancelProcessInstanceDialog = new Dialog();
     $scope.cancelProcessInstanceDialog.setAutoClosable(false);
@@ -23,32 +23,32 @@ ngDefine('cockpit.pages', function(module) {
       $scope.jobRetriesDialog.open();      
     };
     
-    $scope.$watch('selection.treeDiagramMapping', function (newValue) {
+    $scope.$watch('selection.view', function (newValue) {
       if (!newValue) {
         return;
       }
 
       if (newValue.scrollTo) {
-        var bpmnElement = $scope.processInstance.activityIdToBpmnElementMap[newValue.scrollTo.activityId];
-        $scope.selection.treeDiagramMapping.scrollTo = null;
-        $scope.selection.treeDiagramMapping.scrollToBpmnElement = bpmnElement;
+        var bpmnElement = $scope.processInstance.activityIdToBpmnElementMap[newValue.scrollTo.activityId || newValue.scrollTo.targetActivityId];
+        $scope.selection.view.scrollTo = null;
+        $scope.selection.view.scrollToBpmnElement = bpmnElement;
       }
       
       if (newValue.activityInstances) {
-        $scope.selection.treeDiagramMapping.bpmnElements = [];
+        $scope.selection.view.bpmnElements = [];
         angular.forEach(newValue.activityInstances, function(activityInstance) {
           var activityId = activityInstance.activityId || activityInstance.targetActivityId;
           var bpmnElement = $scope.processInstance.activityIdToBpmnElementMap[activityId];
-          $scope.selection.treeDiagramMapping.bpmnElements.push(bpmnElement);
+          $scope.selection.view.bpmnElements.push(bpmnElement);
         });
         return;
       }
       
       if (newValue.bpmnElements) {
-        $scope.selection.treeDiagramMapping.activityInstances = [];
+        $scope.selection.view.activityInstances = [];
         angular.forEach(newValue.bpmnElements, function(bpmnElement) {
           var instanceList = $scope.processInstance.activityIdToInstancesMap[bpmnElement.id];
-          $scope.selection.treeDiagramMapping.activityInstances = $scope.selection.treeDiagramMapping.activityInstances.concat(instanceList);
+          $scope.selection.view.activityInstances = $scope.selection.view.activityInstances.concat(instanceList);
         });
         return;
       }

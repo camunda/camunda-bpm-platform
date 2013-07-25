@@ -38,6 +38,7 @@ public class IncidentEntity implements Incident, PersistentObject {
   protected String causeIncidentId;
   protected String rootCauseIncidentId;
   protected String configuration;
+  protected String incidentMessage;
   
   public List<IncidentEntity> createRecursiveIncidents() {
     List<IncidentEntity> createdIncidents = new ArrayList<IncidentEntity>();
@@ -61,7 +62,7 @@ public class IncidentEntity implements Incident, PersistentObject {
    
       if (superExecutionId != null && !superExecutionId.isEmpty()) {
         
-        IncidentEntity newIncident = createAndInsertIncident(incidentType, superExecutionId, null);
+        IncidentEntity newIncident = createAndInsertIncident(incidentType, superExecutionId, null, null);
         newIncident.setCauseIncidentId(id);
         newIncident.setRootCauseIncidentId(rootCauseIncidentId);
         createdIncidents.add(newIncident);
@@ -70,13 +71,23 @@ public class IncidentEntity implements Incident, PersistentObject {
     }
   }
   
-  public static IncidentEntity createAndInsertIncident(String incidentType, String configuration) {
+  public static IncidentEntity createAndInsertIncident(String incidentType, String configuration, String message) {
+    
+    String incidentId = Context
+        .getProcessEngineConfiguration()
+        .getDbSqlSessionFactory()
+        .getIdGenerator()
+        .getNextId();
     
     // decorate new incident
     IncidentEntity newIncident = new IncidentEntity();
+    newIncident.setId(incidentId);
     newIncident.setIncidentTimestamp(ClockUtil.getCurrentTime());
+    newIncident.setIncidentMessage(message);
     newIncident.setConfiguration(configuration);
     newIncident.setIncidentType(incidentType);
+    newIncident.setCauseIncidentId(incidentId);
+    newIncident.setRootCauseIncidentId(incidentId);
         
     // persist new incident
     Context
@@ -87,7 +98,7 @@ public class IncidentEntity implements Incident, PersistentObject {
     return newIncident;
   }
   
-  public static IncidentEntity createAndInsertIncident(String incidentType, String executionId, String configuration) {
+  public static IncidentEntity createAndInsertIncident(String incidentType, String executionId, String configuration, String message) {
     
     // fetch execution
     ExecutionEntity execution = Context
@@ -96,16 +107,16 @@ public class IncidentEntity implements Incident, PersistentObject {
       .findExecutionById(executionId);
         
     // decorate new incident
-    IncidentEntity newIncident = createAndInsertIncident(incidentType, configuration);
+    IncidentEntity newIncident = createAndInsertIncident(incidentType, configuration, message);
     newIncident.setExecution(execution);
          
     return newIncident;
   }
   
-  public static IncidentEntity createAndInsertIncident(String incidentType, String processDefinitionId, String activityId, String configuration) {
+  public static IncidentEntity createAndInsertIncident(String incidentType, String processDefinitionId, String activityId, String configuration, String message) {
         
     // decorate new incident
-    IncidentEntity newIncident = createAndInsertIncident(incidentType, configuration);
+    IncidentEntity newIncident = createAndInsertIncident(incidentType, configuration, message);
     
     newIncident.setActivityId(activityId);
     newIncident.setProcessDefinitionId(processDefinitionId);
@@ -169,6 +180,14 @@ public class IncidentEntity implements Incident, PersistentObject {
   
   public void setIncidentType(String incidentType) {
     this.incidentType = incidentType; 
+  }
+  
+  public String getIncidentMessage() {
+    return incidentMessage;
+  }
+  
+  public void setIncidentMessage(String incidentMessage) {
+    this.incidentMessage = incidentMessage;
   }
 
   public String getExecutionId() {
@@ -249,6 +268,7 @@ public class IncidentEntity implements Incident, PersistentObject {
     Map<String, Object> persistentState = new HashMap<String, Object>();
     persistentState.put("incidentTimestamp", this.incidentTimestamp);
     persistentState.put("incidentType", this.incidentType);
+    persistentState.put("incidentMessage", this.incidentMessage);
     persistentState.put("executionId", this.executionId);
     persistentState.put("activityId", this.activityId);
     persistentState.put("processInstanceId", this.processInstanceId);
