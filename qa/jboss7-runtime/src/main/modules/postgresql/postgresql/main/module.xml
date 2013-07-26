@@ -1,6 +1,6 @@
 <module xmlns="urn:jboss:module:1.1" name="postgresql.postgresql">
   <resources>
-    <resource-root path="postgresql-9.1-902.jdbc4.jar"/>
+    <resource-root path="postgresql-9.1-901-1.jdbc4.jar"/>
   </resources>
   
   <dependencies>
