@@ -96,7 +96,7 @@ public class ServiceTaskDelegateExpressionActivityBehavior extends TaskActivityB
       if (error != null) {
         ErrorPropagation.propagateError(error, execution);
       } else {
-        throw exc;
+        ErrorPropagation.propagateException(exc, execution);
       }
 
     }

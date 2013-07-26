@@ -4,20 +4,37 @@
   xmlns:activiti="http://activiti.org/bpmn"
   targetNamespace="Examples">
   
+  <error id="myError" errorCode="23"/>
+  <error id="myException" errorCode="org.camunda.bpm.engine.test.bpmn.event.error.MyBusinessException" />
+  
   <process id="catchErrorThrownByJavaDelegateOnCallActivity-parent">
   
     <startEvent id="theStart" />
     <sequenceFlow id="flow1" sourceRef="theStart" targetRef="callSubProcess" />
     
-    <callActivity id="callSubProcess" calledElement="catchErrorThrownByJavaDelegateOnCallActivity-child" />
+    <callActivity id="callSubProcess" calledElement="catchErrorThrownByJavaDelegateOnCallActivity-child" >
+     <extensionElements>
+      <activiti:in source="exceptionType" target="exceptionType" ></activiti:in>
+     </extensionElements>
+    </callActivity> 
     
     <boundaryEvent id="catchError" attachedToRef="callSubProcess">
-      <errorEventDefinition />
+      <errorEventDefinition errorRef="myError" />
     </boundaryEvent>
+    
+    <boundaryEvent id="catchException" attachedToRef="callSubProcess">
+      <errorEventDefinition errorRef="myException" />
+    </boundaryEvent>
+    
     <sequenceFlow id="flow3" sourceRef="catchError" targetRef="escalatedTask" />
     
+    <sequenceFlow id="flow4" sourceRef="catchException" targetRef="escalatedExceptionTask" />
+    
     <userTask id="escalatedTask" name="Escalated Task" />
-    <sequenceFlow id="flow4" sourceRef="callSubProcess" targetRef="theEnd" />
+    
+    <userTask id="escalatedExceptionTask" name="Escalated Exception Task" />
+    
+    <sequenceFlow id="flow5" sourceRef="callSubProcess" targetRef="theEnd" />
     
     <endEvent id="theEnd" />
     

@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions" 
+  xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+  xmlns:activiti="http://activiti.org/bpmn"
+  targetNamespace="Examples">
+  
+  <error id="myException" errorCode="org.camunda.bpm.engine.test.bpmn.event.error.MyBusinessException"/>
+  
+  <process id="testCatchExceptionThrownByScriptTask">
+  
+    <startEvent id="theStart" />
+    <sequenceFlow id="flow1" sourceRef="theStart" targetRef="scriptTask" />
+    
+    <scriptTask id="scriptTask" scriptFormat="groovy">
+      <script>
+        throw new org.camunda.bpm.engine.test.bpmn.event.error.MyBusinessException("This is a business exception, which can be caught by a BPMN Error Event.");
+      </script>
+    </scriptTask>
+    
+    <boundaryEvent id="catchException" attachedToRef="scriptTask">
+      <errorEventDefinition errorRef="myException"/>
+    </boundaryEvent>
+    
+    <sequenceFlow id="flow3" sourceRef="catchException" targetRef="escalatedExceptionTask" />
+    
+    <userTask id="escalatedExceptionTask" name="Escalated Exception Task" />
+    <sequenceFlow id="flow4" sourceRef="scriptTask" targetRef="theEnd" />
+    
+    <endEvent id="theEnd" />
+    
+  </process>
+
+</definitions>
