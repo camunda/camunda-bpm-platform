@@ -50,6 +50,9 @@ public class AuthorizationCheck implements Serializable {
   /** the id of the resource to check permissions for */
   protected String authResourceId;
   
+  /** query parameter for resaource Id. Is injected as RAW parameter into the query */
+  protected String authResourceIdQueryParam;
+  
   /** the default permissions to use if no matching authorization 
    * can be found.*/
   protected int authDefaultPerm = Permissions.ALL.getValue();
@@ -111,5 +114,12 @@ public class AuthorizationCheck implements Serializable {
   public void setAuthDefaultPerm(int authDefaultPerm) {
     this.authDefaultPerm = authDefaultPerm;
   }
-      
+
+  public String getAuthResourceIdQueryParam() {
+    return authResourceIdQueryParam;
+  }
+
+  public void setAuthResourceIdQueryParam(String authResourceIdQueryParam) {
+    this.authResourceIdQueryParam = authResourceIdQueryParam;
+  }
 }

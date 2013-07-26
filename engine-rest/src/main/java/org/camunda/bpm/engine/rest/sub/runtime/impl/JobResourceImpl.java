@@ -45,6 +45,17 @@ public class JobResourceImpl implements JobResource {
 
     return JobDto.fromJob(job);
   }
+  
+  @Override
+  public String getStacktrace() {
+    try {
+      ManagementService managementService = engine.getManagementService();
+      String stacktrace = managementService.getJobExceptionStacktrace(jobId);
+      return stacktrace;
+    } catch (ProcessEngineException e) {
+      throw new InvalidRequestException(Status.NOT_FOUND, e.getMessage());
+    }
+  }
 
   @Override
   public void setJobRetries(JobRetriesDto dto) {

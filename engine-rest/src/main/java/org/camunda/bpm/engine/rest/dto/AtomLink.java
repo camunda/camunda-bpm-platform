@@ -15,12 +15,17 @@ package org.camunda.bpm.engine.rest.dto;
 
 public class AtomLink {
 
+  private String method;
   private String href;
   private String rel;
   
-  public AtomLink(String rel, String href) {
+  public AtomLink() {
+  }
+  
+  public AtomLink(String rel, String href, String method) {
     this.href = href;
     this.rel = rel;
+    this.method = method;
   }
   
   public String getHref() {
@@ -37,6 +42,14 @@ public class AtomLink {
   
   public void setRel(String rel) {
     this.rel = rel;
+  }
+  
+  public String getMethod() {
+    return method;
+  }
+  
+  public void setMethod(String method) {
+    this.method = method;
   }
   
 }

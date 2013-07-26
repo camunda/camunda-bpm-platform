@@ -35,17 +35,20 @@ import org.camunda.bpm.engine.rest.helper.MockJobBuilder;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.JobQuery;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InOrder;
 
 import com.jayway.restassured.http.ContentType;
+import com.jayway.restassured.response.Response;
 
 public abstract class AbstractJobRestServiceInteractionTest extends AbstractRestServiceTest {
 
   protected static final String JOB_RESOURCE_URL = TEST_RESOURCE_ROOT_PATH + "/job/{id}";
   protected static final String JOB_RESOURCE_SET_RETRIES_URL = JOB_RESOURCE_URL + "/retries";
   protected static final String JOB_RESOURCE_EXECUTE_JOB_URL = JOB_RESOURCE_URL + "/execute";
+  protected static final String JOB_RESOURCE_GET_STACKTRACE_URL = JOB_RESOURCE_URL + "/stacktrace";
 
   private ProcessEngine namedProcessEngine;
   private ManagementService mockManagementService;
@@ -185,4 +188,30 @@ public abstract class AbstractJobRestServiceInteractionTest extends AbstractRest
     .body("type", equalTo(RestException.class.getSimpleName())).body("message", equalTo("Runtime exception"))
     .when().post(JOB_RESOURCE_EXECUTE_JOB_URL);
   }
+  
+  @Test
+  public void testGetStacktrace() {
+    String stacktrace = "aStacktrace";
+    when(mockManagementService.getJobExceptionStacktrace(MockProvider.EXAMPLE_JOB_ID)).thenReturn(stacktrace);
+    
+    Response response = given().pathParam("id", MockProvider.EXAMPLE_JOB_ID)
+    .then().expect().statusCode(Status.OK.getStatusCode()).contentType(ContentType.TEXT)
+    .when().get(JOB_RESOURCE_GET_STACKTRACE_URL);
+    
+    String content = response.asString();
+    Assert.assertEquals(stacktrace, content);
+  }
+  
+  @Test
+  public void testGetStacktraceJobNotFound() {
+    String exceptionMessage = "job not found";
+    doThrow(new ProcessEngineException(exceptionMessage)).when(mockManagementService).getJobExceptionStacktrace(MockProvider.EXAMPLE_JOB_ID);
+    
+    given().pathParam("id", MockProvider.EXAMPLE_JOB_ID)
+    .then().expect().statusCode(Status.NOT_FOUND.getStatusCode())
+    .body("type", equalTo(InvalidRequestException.class.getSimpleName()))
+    .body("message", equalTo(exceptionMessage))
+    .when().get(JOB_RESOURCE_GET_STACKTRACE_URL);
+  }
+  
 }

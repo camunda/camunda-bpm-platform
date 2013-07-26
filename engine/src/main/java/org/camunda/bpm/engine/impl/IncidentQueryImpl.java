@@ -29,6 +29,7 @@ public class IncidentQueryImpl extends AbstractQuery<IncidentQuery, Incident> im
 
   protected String id;
   protected String incidentType;
+  protected String incidentMessage;
   protected String executionId;
   protected String activityId;
   protected String processInstanceId;
@@ -57,6 +58,11 @@ public class IncidentQueryImpl extends AbstractQuery<IncidentQuery, Incident> im
     this.incidentType = incidentType;
     return this;
   }
+  
+  public IncidentQuery incidentMessage(String incidentMessage) {
+    this.incidentMessage = incidentMessage;
+    return this;
+  }  
 
   public IncidentQuery executionId(String executionId) {
     this.executionId = executionId;

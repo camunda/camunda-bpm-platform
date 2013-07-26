@@ -46,7 +46,9 @@ public class Authentication {
 
   public Authentication(String authenticatedUserId, List<String> groupIds) {
     this.authenticatedUserId = authenticatedUserId;
-    this.authenticatedGroupIds = new ArrayList<String>(groupIds);    
+    if(groupIds != null) {
+      this.authenticatedGroupIds = new ArrayList<String>(groupIds);
+    } 
   }
   
   public List<String> getGroupIds() {
@@ -55,45 +57,6 @@ public class Authentication {
  
   public String getUserId() {
     return authenticatedUserId;
-  }
-  
-  // Thread local handling //////////////////////////////////////////
-
-  static ThreadLocal<Authentication> currentAuthentication = new ThreadLocal<Authentication>();
-
-  public static void setCurrentAuthentication(String authenticatedUserId, List<String> groupIds) {
-    currentAuthentication.set(new Authentication(authenticatedUserId, groupIds));    
-  }
-  
-  public static void clearCurrentAuthentication() {
-    currentAuthentication.remove();    
-  }
-
-  public static Authentication getCurrentAuthentication() {
-    if(currentAuthentication != null) {
-      return currentAuthentication.get();
-    } else { 
-      return null;
-    }
-  }
-
-  // backwards compatibility
-  public static void setAuthenticatedUserId(String authenticatedUserId) {
-    if(authenticatedUserId == null) {
-      clearCurrentAuthentication();
-    } else {
-      setCurrentAuthentication(authenticatedUserId, new ArrayList<String>());
-    }
-  }
-  
-  // backwards compatibility
-  public static String getAuthenticatedUserId() {
-    Authentication authentication = getCurrentAuthentication();
-    if(authentication != null) {
-      return authentication.authenticatedUserId;
-    } else {
-      return null;
-    }
   }
   
 }

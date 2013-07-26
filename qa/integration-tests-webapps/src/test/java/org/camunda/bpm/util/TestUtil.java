@@ -42,7 +42,7 @@ public class TestUtil {
     client.destroy();
   }
 
-  public void createUser(String id, String password, String firstName, String lastName) {
+  public void createInitialUser(String id, String password, String firstName, String lastName) {
 
     UserDto user = new UserDto();
     UserCredentialsDto credentials = new UserCredentialsDto();
@@ -54,7 +54,7 @@ public class TestUtil {
     profile.setLastName(lastName);
     user.setProfile(profile);
 
-    WebResource webResource = client.resource(testProperties.getApplicationPath("/engine-rest/user/create"));
+    WebResource webResource = client.resource(testProperties.getApplicationPath("/camunda/api/admin/setup/default/user/create"));
     ClientResponse clientResponse = webResource.accept(MediaType.APPLICATION_JSON).type(MediaType.APPLICATION_JSON).post(ClientResponse.class, user);
     clientResponse.close();
   }
@@ -63,7 +63,5 @@ public class TestUtil {
     // delete admin user
     WebResource webResource = client.resource(testProperties.getApplicationPath("/engine-rest/user/admin"));
     webResource.accept(MediaType.APPLICATION_JSON).type(MediaType.APPLICATION_JSON).delete();
-
-
   }
 }

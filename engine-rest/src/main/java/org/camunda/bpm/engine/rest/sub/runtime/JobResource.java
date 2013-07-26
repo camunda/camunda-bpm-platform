@@ -28,6 +28,11 @@ public interface JobResource {
   @GET
   @Produces(MediaType.APPLICATION_JSON)
   JobDto getJob();
+  
+  @GET
+  @Path("/stacktrace")
+  @Produces(MediaType.TEXT_PLAIN)
+  String getStacktrace();
 	  
   @PUT
   @Path("/retries")

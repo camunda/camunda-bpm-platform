@@ -2,9 +2,6 @@ package org.camunda.bpm.cycle.connector;
 
 import java.io.File;
 
-import org.camunda.bpm.cycle.connector.AbstractConnectorTestBase;
-import org.camunda.bpm.cycle.connector.Connector;
-import org.camunda.bpm.cycle.connector.ConnectorLoginMode;
 import org.camunda.bpm.cycle.connector.svn.SvnConnector;
 import org.camunda.bpm.cycle.connector.test.util.RepositoryUtil;
 import org.camunda.bpm.cycle.entity.ConnectorConfiguration;
@@ -16,11 +13,10 @@ import org.junit.BeforeClass;
 public class SvnConnectorTest extends AbstractConnectorTestBase {
 
   private static SvnConnector connector;
-  
+
   private static final File SVN_DIRECTORY = new File("target/svn-repository");
-  
-  @BeforeClass
-  public static void beforeClass() throws Exception {
+
+  public static void setupConnector() throws Exception {
 
     String svnUrl = RepositoryUtil.createSVNRepository(SVN_DIRECTORY);
 
@@ -35,15 +31,23 @@ public class SvnConnectorTest extends AbstractConnectorTestBase {
     connector.init();
   }
 
-  @AfterClass
-  public static void afterClass() throws Exception {
+  public static void teardownConnector() throws Exception {
     connector.dispose();
     RepositoryUtil.clean(SVN_DIRECTORY);
+  }
+
+  @BeforeClass
+  public static void beforeClass() throws Exception {
+    setupConnector();
+  }
+
+  @AfterClass
+  public static void afterClass() throws Exception {
+    teardownConnector();
   }
 
   @Override
   public Connector getConnector() {
     return connector;
   }
-
 }

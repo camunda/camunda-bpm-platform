@@ -37,7 +37,7 @@ public interface IncidentHandler {
   /**
    * Handle an incident that arose in the context of an execution.
    */
-  public void handleIncident(String processDefinitionId, String activityId, String executionId, String configuration);
+  public void handleIncident(String processDefinitionId, String activityId, String executionId, String configuration, String message);
 
   /**
    * Resolve an incident that arose in the context of an execution.
