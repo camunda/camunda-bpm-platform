@@ -12,16 +12,10 @@
  */
 package org.camunda.bpm.engine.rest.dto.identity;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.ws.rs.core.UriBuilder;
-
 import org.camunda.bpm.engine.identity.User;
-import org.camunda.bpm.engine.rest.ProcessInstanceRestService;
-import org.camunda.bpm.engine.rest.UserRestService;
-import org.camunda.bpm.engine.rest.dto.AtomLink;
 import org.camunda.bpm.engine.rest.dto.LinkableDto;
 
 /**
@@ -94,17 +88,4 @@ public class UserProfileDto extends LinkableDto {
   public void setEmail(String email) {
     this.email = email;
   }
-
-  public AtomLink generateLink(UriBuilder rootUriBuilder, String action, String method, String relation) {
-    
-    UriBuilder builder = rootUriBuilder.path(UserRestService.class).path("{id}");
-    if (action != null) {
-      builder.path(action);
-    }
-    
-    URI linkUri = builder.build(id);
-    AtomLink link = new AtomLink(relation, linkUri.toString(), method);
-    return link;
-  }
-  
 }
