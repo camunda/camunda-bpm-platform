@@ -15,8 +15,8 @@
  */
 package org.camunda.bpm.container.impl.jboss.extension.handler;
 
-import static org.camunda.bpm.container.impl.jboss.extension.ModelConstants.DATASOURCE;
 import static org.camunda.bpm.container.impl.jboss.extension.ModelConstants.ACQUISITION_STRATEGY;
+import static org.camunda.bpm.container.impl.jboss.extension.ModelConstants.DATASOURCE;
 import static org.camunda.bpm.container.impl.jboss.extension.ModelConstants.DEFAULT;
 import static org.camunda.bpm.container.impl.jboss.extension.ModelConstants.HISTORY_LEVEL;
 import static org.camunda.bpm.container.impl.jboss.extension.ModelConstants.JOB_ACQUISITIONS;

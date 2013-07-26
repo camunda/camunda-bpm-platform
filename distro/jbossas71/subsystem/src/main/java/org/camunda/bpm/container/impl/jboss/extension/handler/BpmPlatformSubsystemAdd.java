@@ -18,8 +18,8 @@ package org.camunda.bpm.container.impl.jboss.extension.handler;
 import java.util.List;
 
 import org.camunda.bpm.container.impl.jboss.deployment.processor.ModuleDependencyProcessor;
-import org.camunda.bpm.container.impl.jboss.deployment.processor.ProcessApplicationProcessor;
 import org.camunda.bpm.container.impl.jboss.deployment.processor.ProcessApplicationDeploymentProcessor;
+import org.camunda.bpm.container.impl.jboss.deployment.processor.ProcessApplicationProcessor;
 import org.camunda.bpm.container.impl.jboss.deployment.processor.ProcessEngineStartProcessor;
 import org.camunda.bpm.container.impl.jboss.deployment.processor.ProcessesXmlProcessor;
 import org.camunda.bpm.container.impl.jboss.extension.ModelConstants;
