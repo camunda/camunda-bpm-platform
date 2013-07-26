@@ -256,3 +256,7 @@ alter table ACT_RU_AUTHORIZATION
 alter table ACT_RU_AUTHORIZATION
     add constraint ACT_UNIQ_AUTH_GROUP
     unique (TYPE_,GROUP_ID_,RESOURCE_TYPE_,RESOURCE_ID_);
+
+/** add deployment id to JOB table **/
+alter table ACT_RU_JOB 
+    add DEPLOYMENT_ID_ varchar(64);

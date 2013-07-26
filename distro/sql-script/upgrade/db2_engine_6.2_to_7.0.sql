@@ -114,3 +114,9 @@ create table ACT_RU_AUTHORIZATION (
 
 create unique index ACT_UNIQ_AUTH_USER on ACT_RU_AUTHORIZATION(TYPE_,UNI_USER_ID_,RESOURCE_TYPE_,UNI_RESOURCE_ID_);
 create unique index ACT_UNIQ_AUTH_GROUP on ACT_RU_AUTHORIZATION(TYPE_,UNI_GROUP_ID_,RESOURCE_TYPE_,UNI_RESOURCE_ID_);
+
+-- add deployment id -------------------------------------------
+
+/** add deployment id to job table */
+alter table ACT_RU_JOB 
+    add DEPLOYMENT_ID_ varchar(64),

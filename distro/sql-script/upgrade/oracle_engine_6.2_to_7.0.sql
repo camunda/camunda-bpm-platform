@@ -250,3 +250,7 @@ create unique index ACT_UNIQ_AUTH_GROUP on ACT_RU_AUTHORIZATION
     case when GROUP_ID_ is null then null else RESOURCE_TYPE_ end,
     case when GROUP_ID_ is null then null else RESOURCE_ID_ end,
     case when GROUP_ID_ is null then null else GROUP_ID_ end);
+
+/** add deployment id to JOB table **/
+alter table ACT_RU_JOB 
+    add DEPLOYMENT_ID_ NVARCHAR2(64);
