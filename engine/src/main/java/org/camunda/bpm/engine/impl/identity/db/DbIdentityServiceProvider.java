@@ -135,19 +135,19 @@ public class DbIdentityServiceProvider extends DbReadOnlyIdentityServiceProvider
   
   protected void createDefaultAuthorizations(UserEntity userEntity) {
     if(Context.getProcessEngineConfiguration().isAuthorizationEnabled()) {
-      saveAuthorizations(getResourceAuthorizationProvider().newUser(userEntity));
+      saveDefaultAuthorizations(getResourceAuthorizationProvider().newUser(userEntity));
     }
   }
 
   protected void createDefaultAuthorizations(Group group) {
     if(Context.getProcessEngineConfiguration().isAuthorizationEnabled()) {
-      saveAuthorizations(getResourceAuthorizationProvider().newGroup(group));
+      saveDefaultAuthorizations(getResourceAuthorizationProvider().newGroup(group));
     }
   }
 
   protected void createDefaultMembershipAuthorizations(String userId, String groupId) {
     if(Context.getProcessEngineConfiguration().isAuthorizationEnabled()) {
-      saveAuthorizations(getResourceAuthorizationProvider().groupMembershipCreated(groupId, userId));
+      saveDefaultAuthorizations(getResourceAuthorizationProvider().groupMembershipCreated(groupId, userId));
     }
   }
   
@@ -162,17 +162,20 @@ public class DbIdentityServiceProvider extends DbReadOnlyIdentityServiceProvider
       .deleteAuthorizationsByResourceId(resource, resourceId);
   }
   
-  protected void saveAuthorizations(AuthorizationEntity[] authorizations) {
+  protected void saveDefaultAuthorizations(final AuthorizationEntity[] authorizations) {
     if(authorizations == null) {
       return;
       
     } else {     
-      AuthorizationManager authorizationManager = Context.getCommandContext()
-        .getAuthorizationManager();      
-      for (AuthorizationEntity authorization : authorizations) {
-        authorizationManager.insert(authorization);      
-      }
-      
+      Context.getCommandContext().runWithoutAuthentication(new Runnable() {
+        public void run() {
+          AuthorizationManager authorizationManager = Context.getCommandContext()
+              .getAuthorizationManager();      
+          for (AuthorizationEntity authorization : authorizations) {
+            authorizationManager.insert(authorization);      
+          }
+        }
+      });      
     }
   }
 }

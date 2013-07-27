@@ -368,6 +368,17 @@ public class CommandContext {
     IdentityService identityService = processEngineConfiguration.getIdentityService();
     return identityService.getCurrentAuthentication();
   }
+  
+  public void runWithoutAuthentication(Runnable runnable) {   
+    IdentityService identityService = processEngineConfiguration.getIdentityService();
+    Authentication currentAuthentication = identityService.getCurrentAuthentication();
+    try {
+      identityService.clearAuthentication();
+      runnable.run();
+    } finally {
+      identityService.setAuthentication(currentAuthentication);
+    }
+  }
 
   public String getAuthenticatedUserId() {
     IdentityService identityService = processEngineConfiguration.getIdentityService();

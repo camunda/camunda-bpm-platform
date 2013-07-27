@@ -130,6 +130,9 @@
       <if test="queryByPermission">
         and ${bitand1}RES.PERMS_${bitand2}#{permission}${bitand3} = #{permission}  
       </if>
+      
+      <include refid="org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity.queryAuthorizationCheck" />
+      
     </where>
   </sql>
    

@@ -17,7 +17,9 @@ import java.util.List;
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.AuthorizationQuery;
 import org.camunda.bpm.engine.authorization.Permission;
+import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resource;
+import org.camunda.bpm.engine.authorization.Resources;
 
 
 /**
@@ -74,15 +76,22 @@ public interface AuthorizationService {
    * @param authorizationType the type of the authorization. Legal values: {@link Authorization#AUTH_TYPE_GLOBAL}, 
    * {@link Authorization#AUTH_TYPE_GRANT}, {@link Authorization#AUTH_TYPE_REVOKE}
    * @return an non-persistent Authorization object.
+   * @throws AuthorizationException if the user has no {@link Permissions#CREATE} permissions on {@link Resources#AUTHORIZATION}.
    */
   public Authorization createNewAuthorization(int authorizationType);
   
   /**
-   * Allows saving an {@link Authorization} object.
+   * Allows saving an {@link Authorization} object. Use this method for persiting new 
+   * transient {@link Authorization} objects obtained through {@link #createNewAuthorization(int)} or
+   * for updating persistent objects.
    *  
-   * @param transientAuthorization a transient (non-persistent) Authorization object. 
+   * @param authorization a Authorization object. 
    * @return the authorization object.
    * @throws ProcessEngineException in case an internal error occurs
+   * @throws AuthorizationException if the user has no 
+   *          {@link Permissions#CREATE} permissions (in case of persisting a transient object) or no 
+   *          {@link Permissions#UPDATE} permissions (in case of updating a persistent object) 
+   *          on {@link Resources#AUTHORIZATION}
    */
   public Authorization saveAuthorization(Authorization authorization);
   
@@ -91,6 +100,7 @@ public interface AuthorizationService {
    *  
    * @param authorizationId the id of the Authorization object to delete. 
    * @throws ProcessEngineException if no such authorization exists or if an internal error occurs.
+   * @throws AuthorizationException if the user has no {@link Permissions#DELETE} permissions on {@link Resources#AUTHORIZATION}.
    */
   public void deleteAuthorization(String authorizationId);
   

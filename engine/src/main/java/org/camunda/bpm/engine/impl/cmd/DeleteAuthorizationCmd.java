@@ -13,6 +13,7 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.impl.AuthorizationQueryImpl;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity;
@@ -34,8 +35,9 @@ public class DeleteAuthorizationCmd implements Command<Void> {
     
     final AuthorizationManager authorizationManager = commandContext.getAuthorizationManager();
     
-    AuthorizationEntity authorization = authorizationManager
-      .selectAuthorizationById(authorizationId);
+    AuthorizationEntity authorization = (AuthorizationEntity) new AuthorizationQueryImpl(commandContext)
+      .authorizationId(authorizationId)
+      .singleResult();
    
     if(authorization == null) {
       throw new ProcessEngineException("Authorization for Id '"+authorizationId+"' does not exist.");

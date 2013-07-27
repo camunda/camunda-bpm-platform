@@ -20,9 +20,9 @@ import org.camunda.bpm.engine.authorization.AuthorizationQuery;
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Resource;
 import org.camunda.bpm.engine.impl.cmd.AuthorizationCheckCmd;
+import org.camunda.bpm.engine.impl.cmd.CreateAuthorizationCommand;
 import org.camunda.bpm.engine.impl.cmd.DeleteAuthorizationCmd;
 import org.camunda.bpm.engine.impl.cmd.SaveAuthorizationCmd;
-import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity;
 
 /**
  * @author Daniel Meyer
@@ -35,7 +35,7 @@ public class AuthorizationServiceImpl extends ServiceImpl implements Authorizati
   }
   
   public Authorization createNewAuthorization(int type) {
-    return new AuthorizationEntity(type);
+    return commandExecutor.execute(new CreateAuthorizationCommand(type));
   }
   
   public Authorization saveAuthorization(Authorization authorization) {

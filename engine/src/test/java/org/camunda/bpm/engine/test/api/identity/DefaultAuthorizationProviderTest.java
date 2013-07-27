@@ -47,6 +47,13 @@ public class DefaultAuthorizationProviderTest extends PluggableProcessEngineTest
     jonnyIsGod.setResourceId(ANY);
     jonnyIsGod.addPermission(ALL);
     authorizationService.saveAuthorization(jonnyIsGod);
+    
+    jonnyIsGod = authorizationService.createNewAuthorization(AUTH_TYPE_GRANT);
+    jonnyIsGod.setUserId("jonny");
+    jonnyIsGod.setResource(AUTHORIZATION);
+    jonnyIsGod.setResourceId(ANY);
+    jonnyIsGod.addPermission(ALL);
+    authorizationService.saveAuthorization(jonnyIsGod);
         
     // enable authorizations
     processEngineConfiguration.setAuthorizationEnabled(true);    

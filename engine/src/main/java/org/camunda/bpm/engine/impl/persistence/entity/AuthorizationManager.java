@@ -12,6 +12,12 @@
  */
 package org.camunda.bpm.engine.impl.persistence.entity;
 
+import static org.camunda.bpm.engine.authorization.Authorization.ANY;
+import static org.camunda.bpm.engine.authorization.Permissions.CREATE;
+import static org.camunda.bpm.engine.authorization.Permissions.DELETE;
+import static org.camunda.bpm.engine.authorization.Permissions.UPDATE;
+import static org.camunda.bpm.engine.authorization.Resources.AUTHORIZATION;
+
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +32,7 @@ import org.camunda.bpm.engine.impl.AuthorizationQueryImpl;
 import org.camunda.bpm.engine.impl.cfg.ProcessEngineConfigurationImpl;
 import org.camunda.bpm.engine.impl.context.Context;
 import org.camunda.bpm.engine.impl.db.AuthorizationCheck;
+import org.camunda.bpm.engine.impl.db.PersistentObject;
 import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.impl.persistence.AbstractManager;
 
@@ -33,26 +40,43 @@ import org.camunda.bpm.engine.impl.persistence.AbstractManager;
  * @author Daniel Meyer
  *
  */
+@SuppressWarnings({"unchecked", "rawtypes"})
 public class AuthorizationManager extends AbstractManager {
 
-  @SuppressWarnings("unchecked")
+  public Authorization createNewAuthorization(int type) {
+    checkAuthorization(CREATE, AUTHORIZATION, null);
+    return new AuthorizationEntity(type);
+  }
+  
+  public void insert(PersistentObject authorization) {
+    checkAuthorization(CREATE, AUTHORIZATION, null);
+    getDbSqlSession().insert(authorization);
+  }
+  
   public List<Authorization> selectAuthorizationByQueryCriteria(AuthorizationQueryImpl authorizationQuery) {    
+    configureQuery(authorizationQuery, AUTHORIZATION);
     return getDbSqlSession().selectList("selectAuthorizationByQueryCriteria", authorizationQuery);    
   }
   
   public Long selectAuthorizationCountByQueryCriteria(AuthorizationQueryImpl authorizationQuery) {
+    configureQuery(authorizationQuery, AUTHORIZATION);
     return (Long) getDbSqlSession().selectOne("selectAuthorizationCountByQueryCriteria", authorizationQuery);
   }
 
   public void update(AuthorizationEntity authorization) {
+    checkAuthorization(UPDATE, AUTHORIZATION, authorization.getId());
     getDbSqlSession().update(authorization);    
   }
-
-  public AuthorizationEntity selectAuthorizationById(String authorizationId) {
-    return getDbSqlSession().selectById(AuthorizationEntity.class, authorizationId);
+  
+  public void delete(PersistentObject authorization) {
+    checkAuthorization(DELETE, AUTHORIZATION, authorization.getId());
+    deleteAuthorizationsByResourceId(AUTHORIZATION, authorization.getId());
+    super.delete(authorization);
   }
   
-  public void configureQuery(@SuppressWarnings("rawtypes") AbstractQuery query, Resource resource) {
+  // authorization checks ///////////////////////////////////////////
+  
+  public void configureQuery(AbstractQuery query, Resource resource) {
     final ProcessEngineConfigurationImpl processEngineConfiguration = Context.getProcessEngineConfiguration();
     final Authentication currentAuthentication = Context.getCommandContext().getAuthentication();
     
