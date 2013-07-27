@@ -11,8 +11,9 @@ import javax.servlet.http.HttpServletResponse;
 import org.camunda.bpm.cockpit.Cockpit;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.authorization.Groups;
-import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.webapp.impl.filter.AbstractTemplateFilter;
+import org.camunda.bpm.webapp.impl.security.SecurityActions;
+import org.camunda.bpm.webapp.impl.security.SecurityActions.SecurityAction;
 
 /**
  *
@@ -122,24 +123,27 @@ public class ProcessEnginesFilter extends AbstractTemplateFilter {
   }
 
   protected boolean needsInitialUser(String engineName) {
-    ProcessEngine processEngine = Cockpit.getProcessEngine(engineName);
+    final ProcessEngine processEngine = Cockpit.getProcessEngine(engineName);
     if (processEngine == null) {
       return false;
     }
 
-    if (!processEngine.getIdentityService().isReadOnly()) {
-      Authentication currentAuthentication = processEngine.getIdentityService().getCurrentAuthentication();
-      try {
-        processEngine.getIdentityService().clearAuthentication();
-        return processEngine.getIdentityService().createUserQuery().memberOfGroup(Groups.CAMUNDA_ADMIN).count() == 0;
-      } finally {
-        if(currentAuthentication != null) {
-          processEngine.getIdentityService().setAuthentication(currentAuthentication);
-        }        
-      }
+    if (processEngine.getIdentityService().isReadOnly()) {
+      return false;
+      
+    } else {
+    
+      return SecurityActions.runWithoutAuthentication(new SecurityAction<Boolean>() {
+        public Boolean execute() {
+          return processEngine.getIdentityService()
+              .createUserQuery()
+              .memberOfGroup(Groups.CAMUNDA_ADMIN).count() == 0;
+        }
+      }, processEngine);
+   
+      
     }
 
-    return false;
   }
 
   protected void serveIndexPage(String appName, String engineName, String contextPath, HttpServletRequest request, HttpServletResponse response) throws IOException {

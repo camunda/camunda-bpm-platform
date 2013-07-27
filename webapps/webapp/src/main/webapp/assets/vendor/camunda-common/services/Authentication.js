@@ -31,7 +31,11 @@ ngDefine('camunda.common.services.authentication', function(module) {
         name = cookie[engine];
 
         if (name) {
-          return { name: cookie[engine] };
+          return { 
+            name: cookie[engine].userId,
+            isCockpitAuthorized: cookie[engine].cockpit,
+            isTasklistAuthorized: cookie[engine].tasklist
+           };
         }
       } else {
         return null;
@@ -50,6 +54,14 @@ ngDefine('camunda.common.services.authentication', function(module) {
       return (this.user || {}).name;
     };
 
+    Authentication.prototype.isCockpitAuthorized = function() {
+      return !!this.user ? this.user.isCockpitAuthorized : true;
+    };
+
+    Authentication.prototype.isTasklistAuthorized = function() {
+      return !!this.user ? this.user.isTasklistAuthorized : true;
+    };
+
     Authentication.prototype.clear = function() {
       this.user = null;
     };
@@ -61,7 +73,7 @@ ngDefine('camunda.common.services.authentication', function(module) {
 
       var promise = $http({
         method: 'POST',
-        url: Uri.appUri("admin://auth/user/:engine/login"),
+        url: Uri.appUri("admin://auth/user/:engine/login/:appName"),
         data: form,
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded'
@@ -70,7 +82,11 @@ ngDefine('camunda.common.services.authentication', function(module) {
 
       return promise.then(function(response) {
         if (response.status == 200) {
-          self.user = { name: username };      
+          self.user = { 
+            name: response.data.userId,
+            isCockpitAuthorized: response.data.cockpitAuthorized,
+            isTasklistAuthorized: response.data.tasklistAuthorized
+          };      
           return true;
         } else {
           return false;

@@ -14,8 +14,6 @@ package org.camunda.bpm.webapp.impl.security.auth;
 
 import java.util.List;
 
-import org.camunda.bpm.engine.identity.Group;
-
 
 /**
  * <p>An authentication for a user</p>
@@ -28,20 +26,25 @@ public class UserAuthentication extends Authentication {
   private static final long serialVersionUID = 1L;
   
   protected List<String> groupIds;
+  
+  protected boolean tasklistAuthorized;
+  
+  protected boolean cockpitAuthorized;
 
   /**
    * @param userId the id of the user
+   * @param groupIds
    * @param processEngineName the name of the process engine
+   * @param cockpitAuthorized 
+   * @param tasklistAuthorized 
    */
-  public UserAuthentication(String userId, String processEngineName) {
-    super(userId, processEngineName);
-  }
-  
-  public UserAuthentication(String userId, List<String> groupIds, String processEngineName) {
+  public UserAuthentication(String userId, List<String> groupIds, String processEngineName, boolean tasklistAuthorized, boolean cockpitAuthorized) {
     super(userId, processEngineName);
     this.groupIds = groupIds;
+    this.tasklistAuthorized = tasklistAuthorized;
+    this.cockpitAuthorized = cockpitAuthorized;
   }
-
+  
   public List<String> getGroupIds() {
     return groupIds;
   }
@@ -49,5 +52,22 @@ public class UserAuthentication extends Authentication {
   public void setGroupIds(List<String> groupIds) {
     this.groupIds = groupIds;
   }
+
+  public boolean isTasklistAuthorized() {
+    return tasklistAuthorized;
+  }
+
+  public void setTasklistAuthorized(boolean tasklistAuthorized) {
+    this.tasklistAuthorized = tasklistAuthorized;
+  }
+
+  public boolean isCockpitAuthorized() {
+    return cockpitAuthorized;
+  }
+
+  public void setCockpitAuthorized(boolean cockpitAuthorized) {
+    this.cockpitAuthorized = cockpitAuthorized;
+  }
+  
   
 }

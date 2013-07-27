@@ -15,9 +15,6 @@ package org.camunda.bpm.admin.impl.web;
 import static org.camunda.bpm.engine.authorization.Authorization.ANY;
 import static org.camunda.bpm.engine.authorization.Authorization.AUTH_TYPE_GRANT;
 import static org.camunda.bpm.engine.authorization.Permissions.ALL;
-import static org.camunda.bpm.engine.authorization.Resources.GROUP;
-import static org.camunda.bpm.engine.authorization.Resources.GROUP_MEMBERSHIP;
-import static org.camunda.bpm.engine.authorization.Resources.USER;
 
 import java.util.Iterator;
 import java.util.ServiceLoader;
@@ -34,6 +31,8 @@ import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.authorization.Groups;
+import org.camunda.bpm.engine.authorization.Resource;
+import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity;
 import org.camunda.bpm.engine.rest.dto.identity.UserDto;
@@ -60,7 +59,7 @@ public class SetupResource {
   @POST
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
-  public void createInitialUser(final @PathParam("engine") String processEngineName, final UserDto user) throws Exception {
+  public void createInitialUser(final @PathParam("engine") String processEngineName, final UserDto user) {
 
     final ProcessEngine processEngine = lookupProcessEngine(processEngineName);    
     if(processEngine == null) {
@@ -68,7 +67,7 @@ public class SetupResource {
     }
     
     SecurityActions.runWithoutAuthentication(new SecurityAction<Void>() {
-      public Void execute() throws Exception {        
+      public Void execute() {        
         createInitialUserInternal(processEngineName, user, processEngine);        
         return null;
       }
@@ -104,38 +103,19 @@ public class SetupResource {
       camundaAdminGroup.setType(Groups.GROUP_TYPE_SYSTEM);
       identityService.saveGroup(camundaAdminGroup);      
     }
-       
-    // create administrator Authorizations for camunda admin group.      
-    // all permissions on 'USER'
-    if(authorizationService.createAuthorizationQuery().groupIdIn(Groups.CAMUNDA_ADMIN).resourceType(USER).resourceId(ANY).count() == 0) {      
-      AuthorizationEntity userAdminAuth = new AuthorizationEntity(AUTH_TYPE_GRANT);
-      userAdminAuth.setGroupId(Groups.CAMUNDA_ADMIN);
-      userAdminAuth.setResource(USER);
-      userAdminAuth.setResourceId(ANY);   
-      userAdminAuth.addPermission(ALL);
-      authorizationService.saveAuthorization(userAdminAuth);
-    }
     
-    // all permissions on 'GROUP'
-    if(authorizationService.createAuthorizationQuery().groupIdIn(Groups.CAMUNDA_ADMIN).resourceType(GROUP).resourceId(ANY).count() == 0) {
-      AuthorizationEntity groupAdminAuth = new AuthorizationEntity(AUTH_TYPE_GRANT);
-      groupAdminAuth.setGroupId(Groups.CAMUNDA_ADMIN);
-      groupAdminAuth.setResource(GROUP);
-      groupAdminAuth.setResourceId(ANY);   
-      groupAdminAuth.addPermission(ALL);
-      authorizationService.saveAuthorization(groupAdminAuth);
+    // create ADMIN authorizations on all built-in resources
+    for (Resource resource : Resources.values()) {
+      if(authorizationService.createAuthorizationQuery().groupIdIn(Groups.CAMUNDA_ADMIN).resourceType(resource).resourceId(ANY).count() == 0) {      
+        AuthorizationEntity userAdminAuth = new AuthorizationEntity(AUTH_TYPE_GRANT);
+        userAdminAuth.setGroupId(Groups.CAMUNDA_ADMIN);
+        userAdminAuth.setResource(resource);
+        userAdminAuth.setResourceId(ANY);   
+        userAdminAuth.addPermission(ALL);
+        authorizationService.saveAuthorization(userAdminAuth);
+      }      
     }
-    
-    // all permissions on 'MEMBERSHIP'
-    if(authorizationService.createAuthorizationQuery().groupIdIn(Groups.CAMUNDA_ADMIN).resourceType(GROUP_MEMBERSHIP).resourceId(ANY).count() == 0) {
-      AuthorizationEntity groupMemberAdminAuth = new AuthorizationEntity(AUTH_TYPE_GRANT);
-      groupMemberAdminAuth.setGroupId(Groups.CAMUNDA_ADMIN);
-      groupMemberAdminAuth.setResource(GROUP_MEMBERSHIP);
-      groupMemberAdminAuth.setResourceId(ANY);   
-      groupMemberAdminAuth.addPermission(ALL);
-      authorizationService.saveAuthorization(groupMemberAdminAuth);      
-    }
-  
+         
   }
 
   protected void ensureSetupAvailable(ProcessEngine processEngine) {

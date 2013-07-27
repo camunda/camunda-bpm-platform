@@ -27,7 +27,7 @@ import org.camunda.bpm.webapp.impl.security.auth.UserAuthentication;
  */
 public class SecurityActions {
   
-  public static <T> T runWithAuthentications(SecurityAction<T> action, Authentications authentications) throws Exception {
+  public static <T> T runWithAuthentications(SecurityAction<T> action, Authentications authentications) {
         
     try {
       for (Authentication authentication : authentications.getAuthentications()) {
@@ -65,7 +65,7 @@ public class SecurityActions {
     }
   }
 
-  public static <T> T runWithoutAuthentication(SecurityAction<T> action, ProcessEngine processEngine) throws Exception {
+  public static <T> T runWithoutAuthentication(SecurityAction<T> action, ProcessEngine processEngine) {
     
     final IdentityService identityService = processEngine.getIdentityService();
     org.camunda.bpm.engine.impl.identity.Authentication currentAuth = identityService.getCurrentAuthentication();
@@ -82,7 +82,7 @@ public class SecurityActions {
   }
   
   public static interface SecurityAction<T> {
-    public T execute() throws Exception;
+    public T execute();
   }
 
 }

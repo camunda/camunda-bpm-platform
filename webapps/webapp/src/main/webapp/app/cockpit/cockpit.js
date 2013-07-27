@@ -34,6 +34,7 @@
         return uri;
       }
 
+      UriProvider.replace(':appName', 'cockpit');
       UriProvider.replace('app://', getUri('href'));
       UriProvider.replace('adminbase://', getUri('app-root') + "/app/admin/");
       UriProvider.replace('cockpit://', getUri('cockpit-api'));
