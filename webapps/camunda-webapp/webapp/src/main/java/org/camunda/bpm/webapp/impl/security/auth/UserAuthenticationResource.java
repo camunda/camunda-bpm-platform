@@ -12,6 +12,9 @@
  */
 package org.camunda.bpm.webapp.impl.security.auth;
 
+import static org.camunda.bpm.engine.authorization.Permissions.*;
+import static org.camunda.bpm.engine.authorization.Resources.*;
+
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -28,9 +31,9 @@ import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.Response.Status;
 
+import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.identity.Group;
-import org.camunda.bpm.engine.identity.GroupQuery;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.spi.ProcessEngineProvider;
@@ -50,12 +53,13 @@ public class UserAuthenticationResource {
   protected HttpServletRequest request;
 
   @POST
-  @Path("/{processEngineName}/login")  
+  @Path("/{processEngineName}/login/{appName}")  
   public Response doLogin(
-      @PathParam("processEngineName") String engineName, 
+      @PathParam("processEngineName") String engineName,
+      @PathParam("appName") String appName, 
       @FormParam("username") String username, 
       @FormParam("password") String password) {
-
+    
     final ProcessEngine processEngine = lookupProcessEngine(engineName);
     if(processEngine == null) {
       throw new InvalidRequestException(Status.BAD_REQUEST, "Process engine with name "+engineName+" does not exisist");
@@ -68,7 +72,6 @@ public class UserAuthenticationResource {
       return Response.status(Status.UNAUTHORIZED).build();
 
     } else {           
-      final Authentications authentications = Authentications.getCurrent();
       
       // get user's groups      
       final List<Group> groupList = processEngine.getIdentityService().createGroupQuery()
@@ -81,12 +84,29 @@ public class UserAuthenticationResource {
         groupIds.add(group.getId());
       }
       
+      // check user's app authorizations
+      AuthorizationService authorizationService = processEngine.getAuthorizationService();
+      boolean tasklistAuthorized = authorizationService.isUserAuthorized(username, groupIds, ACCESS, APPLICATION, "tasklist");
+      boolean cockpitAuthorized = authorizationService.isUserAuthorized(username, groupIds, ACCESS, APPLICATION, "cockpit");
+      
+      if(appName.equals("tasklist") && !tasklistAuthorized) {
+        return Response.status(Status.UNAUTHORIZED).build();
+        
+      } else if(appName.equals("cockpit") && !cockpitAuthorized) {
+        return Response.status(Status.UNAUTHORIZED).build();
+        
+      }
+      
+      final Authentications authentications = Authentications.getCurrent();
+              
       // create new authentication
-      UserAuthentication newAuthentication = new UserAuthentication(username, groupIds, engineName);      
+      UserAuthentication newAuthentication = new UserAuthentication(username, groupIds, engineName, tasklistAuthorized, cockpitAuthorized);      
       authentications.addAuthentication(newAuthentication);      
       
       // send reponse including updated cookie.
-      return createAuthCookie(Response.ok(), authentications).build();
+      return createAuthCookie(Response.ok(), authentications)
+        .entity(AuthenticationDto.fromAuthentication(newAuthentication))
+        .build();
     }
   }
 

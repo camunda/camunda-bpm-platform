@@ -2,7 +2,13 @@ package org.camunda.bpm.pa.demo;
 
 import java.util.logging.Logger;
 
+import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.ProcessEngine;
+import static org.camunda.bpm.engine.authorization.Authorization.*;
+import static org.camunda.bpm.engine.authorization.Permissions.*;
+import static org.camunda.bpm.engine.authorization.Resources.*;
+
+import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.identity.Group;
 import org.camunda.bpm.engine.identity.User;
 
@@ -75,5 +81,30 @@ public class InvoiceDemoDataGenerator {
       engine.getIdentityService().createMembership("john", "sales");
       engine.getIdentityService().createMembership("mary", "accounting");
       engine.getIdentityService().createMembership("peter", "management");
+      
+      // authorize groups for tasklist:
+      
+      AuthorizationService authorizationService = engine.getAuthorizationService();
+      
+      Authorization salesTasklistAuth = authorizationService.createNewAuthorization(AUTH_TYPE_GRANT);
+      salesTasklistAuth.setGroupId("sales");
+      salesTasklistAuth.addPermission(ACCESS);
+      salesTasklistAuth.setResourceId("tasklist");
+      salesTasklistAuth.setResource(APPLICATION);
+      authorizationService.saveAuthorization(salesTasklistAuth);
+      
+      Authorization accountingTasklistAuth = authorizationService.createNewAuthorization(AUTH_TYPE_GRANT);
+      accountingTasklistAuth.setGroupId("accounting");
+      accountingTasklistAuth.addPermission(ACCESS);
+      accountingTasklistAuth.setResourceId("tasklist");
+      accountingTasklistAuth.setResource(APPLICATION);
+      authorizationService.saveAuthorization(accountingTasklistAuth);
+      
+      Authorization managementTasklistAuth = authorizationService.createNewAuthorization(AUTH_TYPE_GRANT);
+      managementTasklistAuth.setGroupId("management");
+      managementTasklistAuth.addPermission(ACCESS);
+      managementTasklistAuth.setResourceId("tasklist");
+      managementTasklistAuth.setResource(APPLICATION);
+      authorizationService.saveAuthorization(managementTasklistAuth);
     }
 }

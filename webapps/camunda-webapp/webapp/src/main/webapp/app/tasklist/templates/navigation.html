@@ -32,7 +32,7 @@
       </a>
 
       <ul class="dropdown-menu">
-        <li>
+        <li ng-show="authentication.isCockpitAuthorized()">
           <a ng-href="{{ '../../cockpit/:engine/' | uri }}">Cockpit</a>
         </li>
         <li>

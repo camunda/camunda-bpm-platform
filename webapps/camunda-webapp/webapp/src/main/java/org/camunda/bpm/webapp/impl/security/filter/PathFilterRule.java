@@ -28,7 +28,7 @@ public class PathFilterRule implements SecurityFilterRule {
 
   protected List<RequestMatcher> deniedPaths = new ArrayList<RequestMatcher>();
   protected List<RequestMatcher> allowedPaths = new ArrayList<RequestMatcher>();
-
+  
   public boolean isRequestAuthorized(HttpServletRequest req) {
 
     String contextPath = req.getContextPath();
@@ -60,5 +60,5 @@ public class PathFilterRule implements SecurityFilterRule {
   public List<RequestMatcher> getDeniedPaths() {
     return deniedPaths;
   }
-
+  
 }

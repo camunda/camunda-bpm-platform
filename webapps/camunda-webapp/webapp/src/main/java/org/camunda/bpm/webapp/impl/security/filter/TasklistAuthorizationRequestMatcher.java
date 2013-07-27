@@ -10,35 +10,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.authorization;
+package org.camunda.bpm.webapp.impl.security.filter;
 
-/**
- * <p>The set of built-in resurce names.</p>
- * 
- * @author Daniel Meyer
- *
- */
-public enum Resources implements Resource {
-  
-  APPLICATION("Application", 0),
-  USER("User", 1),
-  GROUP("Group", 2),
-  GROUP_MEMBERSHIP("Group membership", 3);
-  
-  String name;
-  int id;
-  
-  Resources(String name, int id) {
-    this.name = name; 
-    this.id = id; 
-  } 
-  
-  public String resourceName() {
-    return name;
+import org.camunda.bpm.webapp.impl.security.auth.UserAuthentication;
+
+public class TasklistAuthorizationRequestMatcher extends AuthorizedAppRequestMatcher {
+
+  public TasklistAuthorizationRequestMatcher(String pattern, String[] methods) {
+    super(pattern, methods);
   }
 
-  public int resourceType() {
-    return id;
+  protected boolean getAppAuthorization(UserAuthentication userAuthentication) {
+    return userAuthentication.isTasklistAuthorized();
   }
-  
+
 }

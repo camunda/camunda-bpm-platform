@@ -47,15 +47,38 @@ public class AuthenticationCookie {
     StringBuilder cookieWriter = new StringBuilder();
     cookieWriter.append("{");    
     for(int i = 0; i < authList.size(); i++) {
-      Authentication auth = authList.get(i);
+      UserAuthentication auth = (UserAuthentication) authList.get(i);
       if(i > 0) {
         cookieWriter.append(",");  
       }
       cookieWriter.append("\"");
       cookieWriter.append(auth.getProcessEngineName());
-      cookieWriter.append("\":\"");
-      cookieWriter.append(auth.getIdentityId());
       cookieWriter.append("\"");
+      cookieWriter.append(":");
+      cookieWriter.append("{");
+      
+      cookieWriter.append("\"");
+      cookieWriter.append("userId");
+      cookieWriter.append("\"");      
+      cookieWriter.append(":");      
+      cookieWriter.append("\"");
+      cookieWriter.append(auth.getIdentityId());
+      cookieWriter.append("\",");
+      
+      cookieWriter.append("\"");
+      cookieWriter.append("cockpit");
+      cookieWriter.append("\"");      
+      cookieWriter.append(":");      
+      cookieWriter.append(auth.isCockpitAuthorized());  
+      cookieWriter.append(",");      
+      
+      cookieWriter.append("\"");
+      cookieWriter.append("tasklist");
+      cookieWriter.append("\"");      
+      cookieWriter.append(":");      
+      cookieWriter.append(auth.isTasklistAuthorized());      
+      
+      cookieWriter.append("}");
     }    
     cookieWriter.append("}");
     return cookieWriter.toString();

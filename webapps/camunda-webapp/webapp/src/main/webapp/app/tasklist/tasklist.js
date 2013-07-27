@@ -29,6 +29,7 @@
         return uri;
       }
 
+      UriProvider.replace(':appName', 'tasklist');
       UriProvider.replace('app://', getUri('href'));
       UriProvider.replace('adminbase://', getUri('app-root') + "/app/admin/");
       UriProvider.replace('tasklist://', getUri('tasklist-api'));
