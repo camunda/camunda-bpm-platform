@@ -41,7 +41,7 @@ public class UserResourceImpl extends AbstractIdentityResource implements UserRe
   protected String rootResourcePath;
 
   public UserResourceImpl(ProcessEngine processEngine, String userId, String rootResourcePath) {
-    super(processEngine, userId);
+    super(processEngine, USER, userId);
     this.rootResourcePath = rootResourcePath;
   }
 
@@ -64,10 +64,10 @@ public class UserResourceImpl extends AbstractIdentityResource implements UserRe
     
     user.addReflexiveLink(profileUri, HttpMethod.GET, "self");    
     
-    if(isAuthorized(DELETE, USER, resourceId)) {
+    if(isAuthorized(DELETE)) {
       user.addReflexiveLink(baseUri, HttpMethod.DELETE, "delete");
     }    
-    if(isAuthorized(UPDATE, USER, resourceId)) {
+    if(isAuthorized(UPDATE)) {
       user.addReflexiveLink(profileUri, HttpMethod.PUT, "update");
     }
     

@@ -12,6 +12,9 @@
  */
 package org.camunda.bpm.engine.authorization;
 
+import org.camunda.bpm.engine.identity.Group;
+import org.camunda.bpm.engine.identity.User;
+
 /**
  * <p>An {@link Authorization} assigns a set of {@link Permission Permissions} 
  * to an identity to interact with a given {@link Resource}.</p>
@@ -27,7 +30,7 @@ package org.camunda.bpm.engine.authorization;
  * <h2>Identities</h2>
  * <p>camunda BPM distinguished two types of identities: <em>users</em> and 
  * <em>groups</em>. Authorizations can either range over all users 
- * (userId = {@link #ANY}), a group of users or an individual user.</p>
+ * (userId = {@link #ANY}), an individual {@link User} or a {@link Group} of users.</p>
  * 
  * <h2>Permissions</h2>
  * <p>A {@link Permission} defines the way an identity is allowed to interact 
@@ -68,9 +71,9 @@ package org.camunda.bpm.engine.authorization;
  * </p>
  *   
  * <h2>Authorization Precedence</h2>
- * <p>Authorizations may range over an individual user, a group of users or all ({@link #ANY} 
- * users = Global authorization). The may apply to an individual resource instance or all resource
- * instances of the same type (resourceId = {@link #ANY}). The precedence is as follows:
+ * <p>Authorizations may range over all users, an individual user or a group of users or . 
+ * They may apply to an individual resource instance or all instances of the same type 
+ * (resourceId = {@link #ANY}). The precedence is as follows:
  * <ol>
  *  <li>An authorization applying to an individual resource instance preceds over an authorization
  *  applying to all instances of the same resource type.</li>  
@@ -119,6 +122,10 @@ public interface Authorization {
    * */
   public void removePermission(Permission permission);
   
+  /** sets the permissions to the provided value. 
+   * */
+  public void setPermissions(int permissions);
+  
   /**
    * Allows checking for a permission Out-of-the-box constants can be found in {@link Permissions}.
    * 
@@ -142,6 +149,11 @@ public interface Authorization {
    * @return the id of the resource
    */
   public String getResourceId();
+  
+  /**
+   * sets the type of the resource
+   */
+  public void setResourceType(int resourceTypeId);
 
   /**
    * sets the type of the resource

@@ -10,25 +10,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.rest.wink;
+package org.camunda.bpm.engine.rest.resteasy;
 
-import org.camunda.bpm.engine.rest.AbstractAuthorizationRestServiceTest;
+import org.camunda.bpm.engine.rest.AbstractAuthorizationRestServiceQueryTest;
 import org.camunda.bpm.engine.rest.util.EmbeddedServerBootstrap;
-import org.camunda.bpm.engine.rest.util.WinkTomcatServerBootstrap;
+import org.camunda.bpm.engine.rest.util.ResteasyServerBootstrap;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
-/**
- * @author Daniel Meyer
- *
- */
-public class AuthorizationRestServiceTest extends AbstractAuthorizationRestServiceTest {
+public class AuthorizationRestServiceQueryTest extends AbstractAuthorizationRestServiceQueryTest {
 
   protected static EmbeddedServerBootstrap serverBootstrap;  
   
   @BeforeClass
   public static void setUpEmbeddedRuntime() {
-    serverBootstrap = new WinkTomcatServerBootstrap();
+    serverBootstrap = new ResteasyServerBootstrap();
     serverBootstrap.start();
   }
   

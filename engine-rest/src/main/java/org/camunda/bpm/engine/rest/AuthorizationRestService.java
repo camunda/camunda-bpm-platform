@@ -12,13 +12,23 @@
  */
 package org.camunda.bpm.engine.rest;
 
+import java.util.List;
+
+import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
+import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.UriInfo;
 
+import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.authorization.AuthorizationCheckResultDto;
+import org.camunda.bpm.engine.rest.dto.authorization.AuthorizationDto;
+import org.camunda.bpm.engine.rest.sub.authorization.AuthorizationResource;
 
 /**
  * @author Daniel Meyer
@@ -39,5 +49,23 @@ public interface AuthorizationRestService {
       @QueryParam("resourceName") String resourceName,
       @QueryParam("resourceType") Integer resourceType,
       @QueryParam("resourceId") String resourceId);
+  
+  @Path("/{id}")
+  AuthorizationResource getAuthorization(@PathParam("id") String id);
+  
+  @GET
+  @Produces(MediaType.APPLICATION_JSON)
+  List<AuthorizationDto> queryAuthorizations(@Context UriInfo uriInfo,
+      @QueryParam("firstResult") Integer firstResult, @QueryParam("maxResults") Integer maxResults);
+
+  @GET
+  @Path("/count")
+  @Produces(MediaType.APPLICATION_JSON)
+  CountResultDto getAuthorizationCount(@Context UriInfo uriInfo);
+  
+  @POST
+  @Path("/create")
+  @Consumes(MediaType.APPLICATION_JSON)
+  void createAuthorization(AuthorizationDto AuthorizationDto);
   
 }

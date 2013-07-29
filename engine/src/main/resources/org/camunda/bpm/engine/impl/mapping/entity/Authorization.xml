@@ -121,7 +121,7 @@
         </foreach>
       </if>
       
-      <if test="resource != null">
+      <if test="queryByResourceType">
         and RES.RESOURCE_TYPE_ = #{resourceType}
       </if>      
       <if test="resourceId != null">

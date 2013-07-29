@@ -13,14 +13,24 @@
 package org.camunda.bpm.engine.rest.impl;
 
 
+import java.util.List;
+
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriInfo;
 
 import org.camunda.bpm.engine.AuthorizationService;
+import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.authorization.Authorization;
+import org.camunda.bpm.engine.authorization.AuthorizationQuery;
 import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.rest.AuthorizationRestService;
+import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.authorization.AuthorizationCheckResultDto;
+import org.camunda.bpm.engine.rest.dto.authorization.AuthorizationDto;
+import org.camunda.bpm.engine.rest.dto.authorization.AuthorizationQueryDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+import org.camunda.bpm.engine.rest.sub.authorization.AuthorizationResource;
+import org.camunda.bpm.engine.rest.sub.authorization.impl.AuthorizationResourceImpl;
 import org.camunda.bpm.engine.rest.util.AuthorizationUtil;
 
 /**
@@ -73,6 +83,65 @@ public class AuthorizationRestServiceImpl extends AbstractRestProcessEngineAware
     }
     
     return new AuthorizationCheckResultDto(isUserAuthorized, authorizationUtil, resourceId);
+  }
+  
+  public AuthorizationResource getAuthorization(String id) {
+    return new AuthorizationResourceImpl(getProcessEngine(), id, relativeRootResourcePath);
+  }
+
+  public List<AuthorizationDto> queryAuthorizations(UriInfo uriInfo, Integer firstResult, Integer maxResults) {
+    AuthorizationQueryDto queryDto = new AuthorizationQueryDto(uriInfo.getQueryParameters());
+    return queryAuthorizations(queryDto, firstResult, maxResults);
+  }
+
+  public List<AuthorizationDto> queryAuthorizations(AuthorizationQueryDto queryDto, Integer firstResult, Integer maxResults) {
+    
+    AuthorizationQuery query = queryDto.toQuery(getProcessEngine());
+    
+    List<Authorization> resultList;
+    if(firstResult != null || maxResults != null) {
+      resultList = executePaginatedQuery(query, firstResult, maxResults);
+    } else {
+      resultList = query.list();
+    }
+    
+    return AuthorizationDto.fromAuthorizationList(resultList);
+  }
+
+  public CountResultDto getAuthorizationCount(UriInfo uriInfo) {
+    AuthorizationQueryDto queryDto = new AuthorizationQueryDto(uriInfo.getQueryParameters());
+    return getAuthorizationCount(queryDto);
+  }
+
+  protected CountResultDto getAuthorizationCount(AuthorizationQueryDto queryDto) {
+    AuthorizationQuery query = queryDto.toQuery(getProcessEngine());    
+    long count = query.count();
+    return new CountResultDto(count);
+  }
+
+  public void createAuthorization(AuthorizationDto dto) {
+    final AuthorizationService authorizationService = processEngine.getAuthorizationService();
+
+    Authorization newAuthorization = authorizationService.createNewAuthorization(dto.getType());    
+    AuthorizationDto.update(dto, newAuthorization);
+    
+    authorizationService.saveAuthorization(newAuthorization);      
+  }
+  
+  // utility methods //////////////////////////////////////
+  
+  protected List<Authorization> executePaginatedQuery(AuthorizationQuery query, Integer firstResult, Integer maxResults) {
+    if (firstResult == null) {
+      firstResult = 0;
+    }
+    if (maxResults == null) {
+      maxResults = Integer.MAX_VALUE;
+    }
+    return query.listPage(firstResult, maxResults); 
+  }
+
+  protected IdentityService getIdentityService() {
+    return getProcessEngine().getIdentityService();
   }
 
 }

@@ -20,13 +20,13 @@ import org.camunda.bpm.engine.query.Query;
  */
 public interface AuthorizationQuery extends Query<AuthorizationQuery, Authorization> {
 
+  /** only selects authorizations for the given id */
+  AuthorizationQuery authorizationId(String id);
+  
   /** only selects authorizations for the given type. Legal values:
    * {@link Authorization#AUTH_TYPE_GLOBAL}, {@link Authorization#AUTH_TYPE_GRANT}
    * {@link Authorization#AUTH_TYPE_REVOKE} */
   AuthorizationQuery authorizationType(Integer type);
-  
-  /** only selects authorizations for the given id */
-  AuthorizationQuery authorizationId(String id);
   
   /** only selects authorizations for the given user ids */
   AuthorizationQuery userIdIn(String... userIds);
@@ -36,6 +36,9 @@ public interface AuthorizationQuery extends Query<AuthorizationQuery, Authorizat
   
   /** only selects authorizations for the given resource type */
   AuthorizationQuery resourceType(Resource resource);
+  
+  /** only selects authorizations for the given resource type */
+  AuthorizationQuery resourceType(int resourceType);
   
   /** only selects authorizations for the given resource id */
   AuthorizationQuery resourceId(String resourceId);
