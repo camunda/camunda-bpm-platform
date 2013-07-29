@@ -12,19 +12,14 @@
  */
 package org.camunda.bpm.engine.rest.dto.authorization;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.camunda.bpm.engine.authorization.Authorization;
-import org.camunda.bpm.engine.rest.dto.LinkableDto;
 
 /**
  * @author Daniel Meyer
  *
  */
-public class AuthorizationDto extends LinkableDto {
-  
-  protected String id;
+public class AuthorizationCreateDto {
+
   protected Integer type;
   protected Integer permissions;  
   protected String userId;
@@ -33,22 +28,8 @@ public class AuthorizationDto extends LinkableDto {
   protected String resourceId;
   
   // transformers ///////////////////////////////////////
-  
-  public static AuthorizationDto fromAuthorization(Authorization dbAuthorization) {
-    AuthorizationDto authorizationDto = new AuthorizationDto();
     
-    authorizationDto.setId(dbAuthorization.getId());
-    authorizationDto.setType(dbAuthorization.getAuthorizationType());
-    authorizationDto.setPermissions(dbAuthorization.getPermissions());
-    authorizationDto.setUserId(dbAuthorization.getUserId());
-    authorizationDto.setGroupId(dbAuthorization.getGroupId());
-    authorizationDto.setResourceType(dbAuthorization.getResourceType());
-    authorizationDto.setResourceId(dbAuthorization.getResourceId());
-    
-    return authorizationDto;
-  }
-  
-  public static void update(AuthorizationDto dto, Authorization dbAuthorization) {
+  public static void update(AuthorizationCreateDto dto, Authorization dbAuthorization) {
     
     dbAuthorization.setGroupId(dto.getGroupId());
     dbAuthorization.setUserId(dto.getUserId());
@@ -57,25 +38,9 @@ public class AuthorizationDto extends LinkableDto {
     dbAuthorization.setPermissions(dto.getPermissions());
     
   }
-  
-  public static List<AuthorizationDto> fromAuthorizationList(List<Authorization> resultList) {
-    ArrayList<AuthorizationDto> result = new ArrayList<AuthorizationDto>();
     
-    for (Authorization authorization : resultList) {
-      result.add(fromAuthorization(authorization));      
-    }
-    
-    return result;
-  } 
-  
   //////////////////////////////////////////////////////
   
-  public String getId() {
-    return id;
-  }
-  public void setId(String id) {
-    this.id = id;
-  }
   public int getType() {
     return type;
   }
@@ -112,5 +77,4 @@ public class AuthorizationDto extends LinkableDto {
   public void setResourceId(String resourceId) {
     this.resourceId = resourceId;
   }
-
 }

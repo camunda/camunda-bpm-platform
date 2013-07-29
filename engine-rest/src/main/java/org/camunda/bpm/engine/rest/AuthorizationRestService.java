@@ -27,6 +27,7 @@ import javax.ws.rs.core.UriInfo;
 
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.authorization.AuthorizationCheckResultDto;
+import org.camunda.bpm.engine.rest.dto.authorization.AuthorizationCreateDto;
 import org.camunda.bpm.engine.rest.dto.authorization.AuthorizationDto;
 import org.camunda.bpm.engine.rest.sub.authorization.AuthorizationResource;
 
@@ -66,6 +67,6 @@ public interface AuthorizationRestService {
   @POST
   @Path("/create")
   @Consumes(MediaType.APPLICATION_JSON)
-  void createAuthorization(AuthorizationDto AuthorizationDto);
+  AuthorizationDto createAuthorization(@Context UriInfo context, AuthorizationCreateDto dto);
   
 }

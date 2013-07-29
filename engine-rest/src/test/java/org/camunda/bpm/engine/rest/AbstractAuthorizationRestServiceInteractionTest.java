@@ -250,67 +250,85 @@ public abstract class AbstractAuthorizationRestServiceInteractionTest extends Ab
     
     Authorization authorization = MockProvider.createMockGlobalAuthorization();
     when(authorizationServiceMock.createNewAuthorization(Authorization.AUTH_TYPE_GLOBAL)).thenReturn(authorization);
+    when(authorizationServiceMock.saveAuthorization(authorization)).thenReturn(authorization);
       
+    AuthorizationQuery authorizationQuery = mock(AuthorizationQuery.class);
+    when(authorizationServiceMock.createAuthorizationQuery()).thenReturn(authorizationQuery);
+    when(authorizationQuery.authorizationId(MockProvider.EXAMPLE_AUTHORIZATION_ID)).thenReturn(authorizationQuery);
+    when(authorizationQuery.singleResult()).thenReturn(authorization);
+    
     AuthorizationDto dto = AuthorizationDto.fromAuthorization(authorization);
     
     given()
         .body(dto).contentType(ContentType.JSON)
     .then().expect()
-        .statusCode(Status.NO_CONTENT.getStatusCode())
+        .statusCode(Status.OK.getStatusCode())
     .when()
         .post(AUTH_CREATE_PATH);
     
     verify(authorizationServiceMock).createNewAuthorization(Authorization.AUTH_TYPE_GLOBAL);
     verify(authorization).setUserId(Authorization.ANY);
-    verify(authorization).setResourceType(authorization.getAuthorizationType());
-    verify(authorization).setResourceId(authorization.getResourceId());
-    verify(authorization).setPermissions(authorization.getPermissions());
+    verify(authorization, times(2)).setResourceType(authorization.getAuthorizationType());
+    verify(authorization, times(2)).setResourceId(authorization.getResourceId());
+    verify(authorization, times(2)).setPermissions(authorization.getPermissions());
     verify(authorizationServiceMock).saveAuthorization(authorization);
   }
   
   @Test
   public void testCreateGrantAuthorization() {
-    
+
     Authorization authorization = MockProvider.createMockGrantAuthorization();
     when(authorizationServiceMock.createNewAuthorization(Authorization.AUTH_TYPE_GRANT)).thenReturn(authorization);
+    when(authorizationServiceMock.saveAuthorization(authorization)).thenReturn(authorization);
       
+    AuthorizationQuery authorizationQuery = mock(AuthorizationQuery.class);
+    when(authorizationServiceMock.createAuthorizationQuery()).thenReturn(authorizationQuery);
+    when(authorizationQuery.authorizationId(MockProvider.EXAMPLE_AUTHORIZATION_ID)).thenReturn(authorizationQuery);
+    when(authorizationQuery.singleResult()).thenReturn(authorization);
+    
     AuthorizationDto dto = AuthorizationDto.fromAuthorization(authorization);
     
     given()
         .body(dto).contentType(ContentType.JSON)
     .then().expect()
-        .statusCode(Status.NO_CONTENT.getStatusCode())
+        .statusCode(Status.OK.getStatusCode())
     .when()
         .post(AUTH_CREATE_PATH);
     
     verify(authorizationServiceMock).createNewAuthorization(Authorization.AUTH_TYPE_GRANT);
-    verify(authorization).setUserId(authorization.getUserId());
-    verify(authorization).setResourceType(authorization.getAuthorizationType());
-    verify(authorization).setResourceId(authorization.getResourceId());
-    verify(authorization).setPermissions(authorization.getPermissions());
+    verify(authorization, times(2)).setUserId(authorization.getUserId());
+    verify(authorization, times(2)).setResourceType(authorization.getAuthorizationType());
+    verify(authorization, times(2)).setResourceId(authorization.getResourceId());
+    verify(authorization, times(2)).setPermissions(authorization.getPermissions());
     verify(authorizationServiceMock).saveAuthorization(authorization);
   }
   
   @Test
   public void testCreateRevokeAuthorization() {
-    
+
     Authorization authorization = MockProvider.createMockRevokeAuthorization();
     when(authorizationServiceMock.createNewAuthorization(Authorization.AUTH_TYPE_REVOKE)).thenReturn(authorization);
+    when(authorizationServiceMock.saveAuthorization(authorization)).thenReturn(authorization);
       
+    AuthorizationQuery authorizationQuery = mock(AuthorizationQuery.class);
+    when(authorizationServiceMock.createAuthorizationQuery()).thenReturn(authorizationQuery);
+    when(authorizationQuery.authorizationId(MockProvider.EXAMPLE_AUTHORIZATION_ID)).thenReturn(authorizationQuery);
+    when(authorizationQuery.singleResult()).thenReturn(authorization);
+    
     AuthorizationDto dto = AuthorizationDto.fromAuthorization(authorization);
     
     given()
         .body(dto).contentType(ContentType.JSON)
     .then().expect()
-        .statusCode(Status.NO_CONTENT.getStatusCode())
+        .statusCode(Status.OK.getStatusCode())
     .when()
         .post(AUTH_CREATE_PATH);
     
     verify(authorizationServiceMock).createNewAuthorization(Authorization.AUTH_TYPE_REVOKE);
-    verify(authorization).setUserId(authorization.getUserId());
-    verify(authorization).setResourceType(authorization.getAuthorizationType());
-    verify(authorization).setResourceId(authorization.getResourceId());
-    verify(authorization).setPermissions(authorization.getPermissions());
+    verify(authorization, times(2)).setUserId(authorization.getUserId());
+    verify(authorization, times(2)).setResourceType(authorization.getAuthorizationType());
+    verify(authorization, times(2)).setResourceId(authorization.getResourceId());
+    verify(authorization, times(2)).setPermissions(authorization.getPermissions());
     verify(authorizationServiceMock).saveAuthorization(authorization);
   }
   

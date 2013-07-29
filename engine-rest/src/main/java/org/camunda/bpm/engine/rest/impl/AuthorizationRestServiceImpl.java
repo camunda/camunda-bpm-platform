@@ -26,6 +26,7 @@ import org.camunda.bpm.engine.impl.identity.Authentication;
 import org.camunda.bpm.engine.rest.AuthorizationRestService;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.authorization.AuthorizationCheckResultDto;
+import org.camunda.bpm.engine.rest.dto.authorization.AuthorizationCreateDto;
 import org.camunda.bpm.engine.rest.dto.authorization.AuthorizationDto;
 import org.camunda.bpm.engine.rest.dto.authorization.AuthorizationQueryDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
@@ -119,13 +120,15 @@ public class AuthorizationRestServiceImpl extends AbstractRestProcessEngineAware
     return new CountResultDto(count);
   }
 
-  public void createAuthorization(AuthorizationDto dto) {
+  public AuthorizationDto createAuthorization(UriInfo context, AuthorizationCreateDto dto) {
     final AuthorizationService authorizationService = processEngine.getAuthorizationService();
 
     Authorization newAuthorization = authorizationService.createNewAuthorization(dto.getType());    
-    AuthorizationDto.update(dto, newAuthorization);
+    AuthorizationCreateDto.update(dto, newAuthorization);
     
-    authorizationService.saveAuthorization(newAuthorization);      
+    newAuthorization = authorizationService.saveAuthorization(newAuthorization);      
+    
+    return getAuthorization(newAuthorization.getId()).getAuthorization(context);    
   }
   
   // utility methods //////////////////////////////////////
