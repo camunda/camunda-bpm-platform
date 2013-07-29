@@ -20,29 +20,59 @@ import java.util.logging.Logger;
 
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
 
+import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.rest.dto.AuthorizationExceptionDto;
 import org.camunda.bpm.engine.rest.dto.ExceptionDto;
 
 /**
- * Translates any {@link ProcessEngineException} to a HTTP 500 error and a JSON response. 
- * Response content format: <code>{"type" : "ExceptionType", "message" : "some exception message"}
+ * <p>Translates any {@link ProcessEngineException} to a HTTP 500 error and a JSON response. 
+ * Response content format: <code>{"type" : "ExceptionType", "message" : "some exception message"}</code>
+ * </p>
+ * 
+ * <p>Provides dedicated exception handling for {@link AuthorizationException AuthorizationExceptions}:
+ * The status code is always set to 403, "Forbidden" and details about the requested resource and 
+ * violated permission are added to the response body</p>
+ * 
+ * 
  * @author Thorben Lindhauer
+ * @author Daniel Meyer
  */
 @Provider
 public class ProcessEngineExceptionHandler implements ExceptionMapper<ProcessEngineException> {
 
   private static final Logger LOGGER = Logger.getLogger(ExceptionHandler.class.getSimpleName());
 
-  @Override
   public Response toResponse(ProcessEngineException exception) {
-    ExceptionDto dto = ExceptionDto.fromException(exception, true);
-
+    
     LOGGER.log(Level.WARNING, getStackTrace(exception));
     
-    return Response.serverError().entity(dto).type(MediaType.APPLICATION_JSON_TYPE).build();
+    // provide custom handling of authorization exception
+    if (exception instanceof AuthorizationException) {
+      
+      AuthorizationExceptionDto exceptionDto = AuthorizationExceptionDto.fromException((AuthorizationException)exception);      
+      
+      return Response
+        .status(Status.FORBIDDEN)
+        .entity(exceptionDto)
+        .type(MediaType.APPLICATION_JSON_TYPE)
+        .build();
+      
+    } else {
+      
+      ExceptionDto exceptionDto = ExceptionDto.fromException(exception);
+      
+      return Response
+        .serverError()
+        .entity(exceptionDto)
+        .type(MediaType.APPLICATION_JSON_TYPE)
+        .build();
+    }
+    
   }
 
   protected String getStackTrace(Throwable aThrowable) {

@@ -14,12 +14,9 @@ package org.camunda.bpm.container.impl.jmx.deployment;
 
 import static org.camunda.bpm.container.impl.jmx.deployment.Attachments.PROCESS_APPLICATION;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.camunda.bpm.application.AbstractProcessApplication;
 import org.camunda.bpm.container.impl.jmx.JmxRuntimeContainerDelegate.ServiceTypes;
@@ -28,6 +25,7 @@ import org.camunda.bpm.container.impl.jmx.kernel.MBeanDeploymentOperationStep;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanServiceContainer;
 import org.camunda.bpm.container.impl.jmx.services.JmxManagedProcessEngine;
 import org.camunda.bpm.container.impl.jmx.services.JmxManagedProcessEngineController;
+import org.camunda.bpm.container.impl.metadata.PropertyHelper;
 import org.camunda.bpm.container.impl.metadata.spi.ProcessEngineXml;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -105,26 +103,7 @@ public class StartProcessEngineStep extends MBeanDeploymentOperationStep {
     configuration.setDataSourceJndiName(datasourceJndiName);
     
     Map<String, String> properties = processEngineXml.getProperties();
-    for (Entry<String, String> property : properties.entrySet()) {
-      Field propertyField = ReflectUtil.getField(property.getKey(), configurationClass);
-      
-      if (propertyField == null) {
-        throw new ProcessEngineException("Field " + configurationClassName + "." + property.getKey() + " does not exist.");
-      }
-      
-      Method setter = ReflectUtil.getSetter(property.getKey(), configurationClass, propertyField.getType());
-      if(setter != null) {
-        try {
-          Object value = convertToFieldType(property.getValue(), propertyField);
-          setter.invoke(configuration, value);
-        } catch (Exception e) {
-          throw new ProcessEngineException("Could not set value for property '"+property.getKey(), e);
-        }
-      } else {
-        throw new ProcessEngineException("Could not find setter for property '"+property.getKey());
-      }
-      
-    }
+    PropertyHelper.applyProperties(configuration, properties);
     
     if(processEngineXml.getJobAcquisitionName() != null && !processEngineXml.getJobAcquisitionName().isEmpty()) {
       JobExecutor jobExecutor = getJobExecutorService(serviceContainer);
@@ -140,19 +119,6 @@ public class StartProcessEngineStep extends MBeanDeploymentOperationStep {
     JmxManagedProcessEngine managedProcessEngineService = new JmxManagedProcessEngineController(configuration);
     serviceContainer.startService(ServiceTypes.PROCESS_ENGINE, configuration.getProcessEngineName(), managedProcessEngineService);
             
-  }
-  
-  protected Object convertToFieldType(String value, Field field) {
-    Object propertyValue;
-    Class<?> expectedPropertyClass = field.getType();
-    if (expectedPropertyClass.isAssignableFrom(int.class)) {
-      propertyValue = Integer.parseInt(value);
-    } else if (expectedPropertyClass.isAssignableFrom(boolean.class)) {
-      propertyValue = Boolean.parseBoolean(value);
-    } else {
-      propertyValue = value;
-    }
-    return propertyValue;
   }
 
   protected JobExecutor getJobExecutorService(final MBeanServiceContainer serviceContainer) {

@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.notNullValue;
+import static org.hamcrest.Matchers.nullValue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.argThat;
@@ -51,6 +52,8 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
   protected static final String SINGLE_PROCESS_INSTANCE_VARIABLE_URL = PROCESS_INSTANCE_VARIABLES_URL + "/{varId}";
   protected static final String PROCESS_INSTANCE_ACTIVIY_INSTANCES_URL = PROCESS_INSTANCE_URL + "/activity-instances";
   
+  private static final String EXAMPLE_PROCESS_INSTANCE_ID_WITH_NULL_VALUE_AS_VARIABLE = "aProcessInstanceWithNullValueAsVariable";
+  
   protected static final Map<String, Object> EXAMPLE_OBJECT_VARIABLES = new HashMap<String, Object>();
   static {
     ExampleVariableObject variableValue = new ExampleVariableObject();
@@ -68,6 +71,7 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
     // variables
     when(runtimeServiceMock.getVariables(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID)).thenReturn(EXAMPLE_VARIABLES);
     when(runtimeServiceMock.getVariables(MockProvider.ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID)).thenReturn(EXAMPLE_OBJECT_VARIABLES);
+    when(runtimeServiceMock.getVariables(EXAMPLE_PROCESS_INSTANCE_ID_WITH_NULL_VALUE_AS_VARIABLE)).thenReturn(EXAMPLE_VARIABLES_WITH_NULL_VALUE);
     
     // activity instances
     when(runtimeServiceMock.getActivityInstance(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID)).thenReturn(EXAMPLE_ACTIVITY_INSTANCE);
@@ -143,6 +147,19 @@ public abstract class AbstractProcessInstanceRestServiceInteractionTest extends
     
     Assert.assertEquals("Should return exactly one variable", 1, response.jsonPath().getMap("").size());
   }
+
+  @Test
+  public void testGetVariablesWithNullValue() {
+    Response response = given().pathParam("id", EXAMPLE_PROCESS_INSTANCE_ID_WITH_NULL_VALUE_AS_VARIABLE)
+      .then().expect().statusCode(Status.OK.getStatusCode())
+      .body(EXAMPLE_ANOTHER_VARIABLE_KEY, notNullValue())
+      .body(EXAMPLE_ANOTHER_VARIABLE_KEY + ".value", nullValue())
+      .body(EXAMPLE_ANOTHER_VARIABLE_KEY + ".type", equalTo("Null"))
+      .when().get(PROCESS_INSTANCE_VARIABLES_URL);
+    
+    Assert.assertEquals("Should return exactly one variable", 1, response.jsonPath().getMap("").size());
+  }
+  
 
   @Test
   public void testJavaObjectVariableSerialization() {

@@ -22,6 +22,7 @@ import java.util.Set;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriBuilder;
 
+import org.camunda.bpm.engine.rest.AuthorizationRestService;
 import org.camunda.bpm.engine.rest.ExecutionRestService;
 import org.camunda.bpm.engine.rest.GroupRestService;
 import org.camunda.bpm.engine.rest.HistoryRestService;
@@ -116,6 +117,13 @@ public class ProcessEngineRestServiceImpl implements ProcessEngineRestService {
   public UserRestService getUserRestService(String engineName) {
     String rootResourcePath = getRelativeEngineUri(engineName).toASCIIString();
     UserRestServiceImpl subResource = new UserRestServiceImpl(engineName);
+    subResource.setRelativeRootResourceUri(rootResourcePath);
+    return subResource;
+  }
+  
+  public AuthorizationRestService getAuthorizationRestService(String engineName) {
+    String rootResourcePath = getRelativeEngineUri(engineName).toASCIIString();
+    AuthorizationRestServiceImpl subResource = new AuthorizationRestServiceImpl(engineName);
     subResource.setRelativeRootResourceUri(rootResourcePath);
     return subResource;
   }

@@ -1,6 +1,7 @@
 create table ACT_RU_INCIDENT (
   ID_ NVARCHAR2(64) not null,
   INCIDENT_TIMESTAMP_ TIMESTAMP(6) not null,
+  INCIDENT_MSG_ NVARCHAR2(2000),
   INCIDENT_TYPE_ NVARCHAR2(255) not null,
   EXECUTION_ID_ NVARCHAR2(64),
   ACTIVITY_ID_ NVARCHAR2(255),
@@ -227,22 +228,29 @@ WHERE SUSPENSION_STATE_ is null;
         
 /** add authorizations **/
 create table ACT_RU_AUTHORIZATION (
-    ID_ varchar(64) not null,
-    REV_ integer not null,
-    GROUP_ID_ varchar(255),
-    USER_ID_ varchar(255),
-    RESOURCE_TYPE_ varchar(255) not null,
-    RESOURCE_ID_ varchar(64),
-    PERMS_ integer,
-    primary key (ID_)
+  ID_ varchar(64) not null,
+  REV_ integer not null,
+  TYPE_ integer not null,
+  GROUP_ID_ varchar(255),
+  USER_ID_ varchar(255),
+  RESOURCE_TYPE_ integer not null,
+  RESOURCE_ID_ varchar(64),
+  PERMS_ integer,
+  primary key (ID_)
 );
 
 create unique index ACT_UNIQ_AUTH_USER on ACT_RU_AUTHORIZATION
-   (case when USER_ID_ is null then null else RESOURCE_TYPE_ end,
+   (case when USER_ID_ is null then null else TYPE_ end,
+    case when USER_ID_ is null then null else RESOURCE_TYPE_ end,
     case when USER_ID_ is null then null else RESOURCE_ID_ end,
     case when USER_ID_ is null then null else USER_ID_ end);
 
 create unique index ACT_UNIQ_AUTH_GROUP on ACT_RU_AUTHORIZATION
-   (case when GROUP_ID_ is null then null else RESOURCE_TYPE_ end,
+   (case when GROUP_ID_ is null then null else TYPE_ end,
+    case when GROUP_ID_ is null then null else RESOURCE_TYPE_ end,
     case when GROUP_ID_ is null then null else RESOURCE_ID_ end,
-    case when GROUP_ID_ is null then null else USER_ID_ end);
+    case when GROUP_ID_ is null then null else GROUP_ID_ end);
+
+/** add deployment id to JOB table **/
+alter table ACT_RU_JOB 
+    add DEPLOYMENT_ID_ NVARCHAR2(64);

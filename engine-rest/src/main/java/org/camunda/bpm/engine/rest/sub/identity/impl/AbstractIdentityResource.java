@@ -16,22 +16,21 @@ import javax.ws.rs.core.Response.Status;
 
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.authorization.Resource;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+import org.camunda.bpm.engine.rest.sub.impl.AbstractAuthorizedRestResource;
 
 /**
  * @author Daniel Meyer
  *
  */
-public abstract class AbstractIdentityResource {
+public abstract class AbstractIdentityResource extends AbstractAuthorizedRestResource {
   
-  protected final String resourceId;
-  protected final ProcessEngine processEngine;
   protected final IdentityService identityService;
   
-  public AbstractIdentityResource(ProcessEngine processEngine, String resourceId) {
-    this.processEngine = processEngine;
+  public AbstractIdentityResource(ProcessEngine processEngine, Resource resource, String resourceId) {
+    super(processEngine, resource, resourceId);
     this.identityService = processEngine.getIdentityService();
-    this.resourceId = resourceId;
   }
   
   protected void ensureNotReadOnly() {
@@ -39,5 +38,5 @@ public abstract class AbstractIdentityResource {
       throw new InvalidRequestException(Status.FORBIDDEN, "Identity service implementation is read-only.");
     }
   }
-
+ 
 }

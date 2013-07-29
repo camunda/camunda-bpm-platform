@@ -12,10 +12,8 @@
  */
 package org.camunda.bpm.engine.rest.sub.identity.impl;
 
-import javax.ws.rs.core.Response.Status;
-
 import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
+import org.camunda.bpm.engine.authorization.Resources;
 import org.camunda.bpm.engine.rest.sub.identity.GroupMembersResource;
 
 /**
@@ -25,31 +23,19 @@ import org.camunda.bpm.engine.rest.sub.identity.GroupMembersResource;
 public class GroupMembersResourceImpl extends AbstractIdentityResource implements GroupMembersResource {
 
   public GroupMembersResourceImpl(ProcessEngine processEngine, String resourceId) {
-    super(processEngine, resourceId);
+    super(processEngine, Resources.GROUP_MEMBERSHIP, resourceId);
   }
 
   public void createGroupMember(String userId) {
     ensureNotReadOnly();
     
-    try {
-      identityService.createMembership(userId, resourceId);
-      
-    } catch(Exception e) {
-      throw new InvalidRequestException(Status.INTERNAL_SERVER_ERROR, "Exception adding user to group "+resourceId+": "+e.getMessage());
-    }
+    identityService.createMembership(userId, resourceId);      
   }
 
   public void deleteGroupMember(String userId) {
     ensureNotReadOnly();
     
-    try {
-      identityService.deleteMembership(userId, resourceId);
-      
-    } catch(Exception e) {
-      throw new InvalidRequestException(Status.INTERNAL_SERVER_ERROR, "Exception removing user form group "+resourceId+": "+e.getMessage());
-      
-    }
-
+    identityService.deleteMembership(userId, resourceId);
   }
 
 }

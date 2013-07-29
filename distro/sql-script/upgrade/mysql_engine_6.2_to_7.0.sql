@@ -1,6 +1,7 @@
 create table ACT_RU_INCIDENT (
   ID_ varchar(64) not null,
   INCIDENT_TIMESTAMP_ timestamp not null,
+  INCIDENT_MSG_ varchar(4000),
   INCIDENT_TYPE_ varchar(255) not null,
   EXECUTION_ID_ varchar(64),
   ACTIVITY_ID_ varchar(255),
@@ -32,12 +33,12 @@ alter table ACT_RU_INCIDENT
 alter table ACT_RU_INCIDENT
     add constraint ACT_FK_INC_CAUSE 
     foreign key (CAUSE_INCIDENT_ID_) 
-    references ACT_RU_INCIDENT (ID_);
+    references ACT_RU_INCIDENT (ID_) on delete cascade on update cascade;
 
 alter table ACT_RU_INCIDENT
     add constraint ACT_FK_INC_RCAUSE 
     foreign key (ROOT_CAUSE_INCIDENT_ID_) 
-    references ACT_RU_INCIDENT (ID_);
+    references ACT_RU_INCIDENT (ID_) on delete cascade on update cascade;
     
 create index ACT_IDX_HI_ACT_INST_COMP on ACT_HI_ACTINST(EXECUTION_ID_, ACT_ID_, END_TIME_, ID_);
 
@@ -91,20 +92,25 @@ WHERE SUSPENSION_STATE_ is null;
 /** add authorizations **/
 
 create table ACT_RU_AUTHORIZATION (
-    ID_ varchar(64) not null,
-    REV_ integer not null,
-    GROUP_ID_ varchar(255),
-    USER_ID_ varchar(255),
-    RESOURCE_TYPE_ varchar(255) not null,
-    RESOURCE_ID_ varchar(64),
-    PERMS_ integer,
-    primary key (ID_)
+  ID_ varchar(64) not null,
+  REV_ integer not null,
+  TYPE_ integer not null,
+  GROUP_ID_ varchar(255),
+  USER_ID_ varchar(255),
+  RESOURCE_TYPE_ integer not null,
+  RESOURCE_ID_ varchar(64),
+  PERMS_ integer,
+  primary key (ID_)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE utf8_bin;
 
 alter table ACT_RU_AUTHORIZATION
     add constraint ACT_UNIQ_AUTH_USER
-    unique (USER_ID_,RESOURCE_TYPE_,RESOURCE_ID_);
+    unique (USER_ID_,TYPE_,RESOURCE_TYPE_,RESOURCE_ID_);
     
 alter table ACT_RU_AUTHORIZATION
     add constraint ACT_UNIQ_AUTH_GROUP
-    unique (GROUP_ID_,RESOURCE_TYPE_,RESOURCE_ID_);
+    unique (GROUP_ID_,TYPE_,RESOURCE_TYPE_,RESOURCE_ID_);
+    
+/** add deployment ID to job table  **/
+alter table ACT_RU_JOB 
+    add DEPLOYMENT_ID_ varchar(64);

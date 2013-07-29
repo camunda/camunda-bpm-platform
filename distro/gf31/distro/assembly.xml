@@ -48,13 +48,6 @@
     </dependencySet>
 
     <dependencySet>
-  		<includes>
-  			<include>org.camunda.bpm.tasklist:camunda-tasklist-glassfish:war:*</include>
-  		</includes>
-  		<outputDirectory>server/glassfish3/glassfish/domains/domain1/autodeploy</outputDirectory>
-  	</dependencySet>
-
-    <dependencySet>
       <includes>
         <include>org.camunda.bpm.cycle:camunda-cycle-glassfish:war:*</include>
       </includes>
@@ -70,7 +63,7 @@
 
     <dependencySet>
       <includes>
-        <include>org.camunda.bpm.cockpit:camunda-cockpit-glassfish:war:*</include>
+        <include>org.camunda.bpm.webapp:camunda-webapp-glassfish:war:*</include>
       </includes>
       <outputDirectory>server/glassfish3/glassfish/domains/domain1/autodeploy</outputDirectory>
     </dependencySet>

@@ -1,0 +1,18 @@
+<li class="dropdown"
+    help
+    help-text="If you have multiple engines running you can select the process engine here. The data displayed in this application is based on the selected engine only."
+    help-placement="'bottom'"
+    ng-show="engines.length > 1 && currentEngine">
+
+  <a href class="dropdown-toggle" data-toggle="dropdown">
+    {{ currentEngine.name }}
+  </a>
+
+  <ul class="dropdown-menu">
+    <li ng-repeat="(id, engine) in engines">
+      <a ng-href="{{ 'app://../' + engine.name + '/' | uri }}">
+        {{ engine.name }}
+      </a>
+    </li>
+  </ul>
+</li>

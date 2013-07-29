@@ -52,7 +52,19 @@ public abstract class AbstractVariablesResource implements VariableResource {
     Map<String, VariableValueDto> values = new HashMap<String, VariableValueDto>();
 
     for (Map.Entry<String, Object> entry : getVariableEntities().entrySet()) {
-      values.put(entry.getKey(), new VariableValueDto(entry.getValue(), entry.getValue().getClass().getSimpleName()));
+      String key = entry.getKey();
+      Object value = entry.getValue();
+      String simpleClassName = null;
+      
+      if (value != null) {
+        // if the value is not equals null, then get the simple class name.
+        simpleClassName = value.getClass().getSimpleName();
+      } else {
+        // if the value is equals null, then the simple class name is "Null".
+        simpleClassName = "Null";
+      }
+      
+      values.put(key, new VariableValueDto(value, simpleClassName));
     }
 
     return values;

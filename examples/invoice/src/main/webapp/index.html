@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>camunda invoice example</title>
+
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <meta name="description" content="camunda invoice example" />
+    <meta name="author" content="camunda services GmbH" />
+
+    <!-- styles -->
+    <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="assets/css/common.css" rel="stylesheet" />
+    <link href="assets/css/app.css" rel="stylesheet" />
+
+    <!-- For IE6-8 support of HTML5 elements -->
+    <!--[if lt IE 9]>
+      <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- favicon -->
+    <link href="/camunda/assets/img/favicon.ico" rel="shortcut icon" type="image/x-icon" />
+  </head>
+
+  <body>
+
+    <!-- navigation -->
+    <div class="navbar navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+          <a class="brand" href="#/">
+            invoice example
+          </a>
+
+          <ul class="nav pull-right">
+
+            <li class="dropdown">
+              <a href class="dropdown-toggle" data-toggle="dropdown">
+                <i class="icon-home"></i>
+              </a>
+
+              <ul class="dropdown-menu">
+                <li>
+                  <a href="/camunda/app/tasklist/">Tasklist</a>
+                </li>
+                <li>
+                  <a href="/camunda/app/cockpit/">Cockpit</a>
+                </li>
+                <li>
+                  <a href="/camunda/app/admin/">Admin</a>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- content -->
+    <div class="ctn-main">
+      <div class="ctn-wrapper container">
+
+        <div class="row">
+
+          <div class="span12">
+            <div class="page-header">
+              <h1>Overview</h1>
+            </div>
+
+            <p>
+              This example allows you to walk through the features of camundaBPM guided by a simple invoice process.
+            </p>
+            <p>
+              Get started with the example by logging into the <a target="_blank" href="/camunda/app/tasklist/">camunda Tasklist</a> using
+              the credentials <code>demo:demo</code>.
+            </p>
+
+          </div>
+        </div>
+        <div class="row">
+          <div class="span12">
+
+            <div class="page-header">
+              <h1>Available Personas</h1>
+            </div>
+
+            <p>
+              The following logins are provided by the show case and can be used to play around with the invoice process:
+            </p>
+
+            <table class="table table-bordered table-striped" style="max-width: 400px">
+              <tr>
+                <th>Username</th>
+                <th>Password</th>
+                <th>Groups</th>
+              </tr>
+
+              <tr>
+                <td>demo</td>
+                <td>demo</td>
+                <td>Sales, Accounting, Management</td>
+              </tr>
+
+              <tr>
+                <td>john</td>
+                <td>john</td>
+                <td>Sales</td>
+              </tr>
+
+              <tr>
+                <td>mary</td>
+                <td>mary</td>
+                <td>Accounting</td>
+              </tr>
+
+              <tr>
+                <td>peter</td>
+                <td>peter</td>
+                <td>Management</td>
+              </tr>
+            </table>
+          </div>
+        </div>
+
+        <div class="ctn-push-down"></div>
+      </div>
+
+      <!-- footer -->
+      <footer>
+        <div>
+          Powered by <a href="http://camunda.org">camunda BPM</a>
+        </div>
+      </footer>
+    </div>
+  </body>
+
+  <script type="text/javascript" src="assets/vendor/jquery/jquery.min.js"></script>
+  <script type="text/javascript" src="assets/vendor/bootstrap/js/bootstrap.min.js"></script>
+</html>

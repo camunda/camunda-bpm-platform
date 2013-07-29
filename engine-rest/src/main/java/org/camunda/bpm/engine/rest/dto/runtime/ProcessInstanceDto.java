@@ -12,12 +12,6 @@
  */
 package org.camunda.bpm.engine.rest.dto.runtime;
 
-import java.net.URI;
-
-import javax.ws.rs.core.UriBuilder;
-
-import org.camunda.bpm.engine.rest.ProcessInstanceRestService;
-import org.camunda.bpm.engine.rest.dto.AtomLink;
 import org.camunda.bpm.engine.rest.dto.LinkableDto;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 
@@ -59,16 +53,4 @@ public class ProcessInstanceDto extends LinkableDto {
     return result;
   }
 
-  @Override
-  public AtomLink generateLink(UriBuilder rootUriBuilder, String action, String relation) {
-    
-    UriBuilder builder = rootUriBuilder.path(ProcessInstanceRestService.class).path("{id}");
-    if (action != null) {
-      builder.path(action);
-    }
-    
-    URI linkUri = builder.build(id);
-    AtomLink link = new AtomLink(relation, linkUri.toString());
-    return link;
-  }
 }

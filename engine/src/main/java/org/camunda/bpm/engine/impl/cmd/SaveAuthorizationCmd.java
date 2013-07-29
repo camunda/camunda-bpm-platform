@@ -13,7 +13,7 @@
 package org.camunda.bpm.engine.impl.cmd;
 
 import org.camunda.bpm.engine.ProcessEngineException;
-import org.camunda.bpm.engine.identity.Authorization;
+import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.impl.interceptor.Command;
 import org.camunda.bpm.engine.impl.interceptor.CommandContext;
 import org.camunda.bpm.engine.impl.persistence.entity.AuthorizationEntity;
@@ -28,11 +28,11 @@ public class SaveAuthorizationCmd implements Command<Authorization> {
   protected AuthorizationEntity authorization;
 
   public SaveAuthorizationCmd(Authorization authorization) {
-    validate(authorization);
     this.authorization = (AuthorizationEntity) authorization;
+    validate();
   }
 
-  protected void validate(Authorization authorization) {
+  protected void validate() {
     if(authorization.getUserId() == null &&
         authorization.getGroupId() == null) {
       throw new ProcessEngineException("Authorization must either have a 'userId' or a 'groupId'.");
@@ -40,9 +40,9 @@ public class SaveAuthorizationCmd implements Command<Authorization> {
     if(authorization.getUserId() != null && authorization.getGroupId() != null) {
       throw new ProcessEngineException("Authorization cannot define 'userId' or a 'groupId' at the same time.");
     }
-    if(authorization.getResourceType() == null) {
+    if(authorization.getResource() == null) {
       throw new ProcessEngineException("Authorization 'resourceType' cannot be null.");
-    }   
+    }
   }
   
   public Authorization execute(CommandContext commandContext) {

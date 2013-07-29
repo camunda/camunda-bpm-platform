@@ -1,0 +1,39 @@
+<table class="table table-bordered table-hover table-condensed">
+  <thead>
+    <th>Called Process Instance</th>
+    <th>Process Definition</th>
+    <th>Activity</th>
+  </thead>
+  <tbody>
+    <tr ng-repeat="calledProcessInstance in calledProcessInstances">
+      <td>
+        <a href="#/process-definition/{{ calledProcessInstance.processDefinitionId }}/process-instance/{{ calledProcessInstance.id }}">
+          {{ calledProcessInstance.id | shorten:8 }}
+        </a>
+      </td>
+      <td>
+        <a href="#/process-definition/{{ calledProcessInstance.processDefinitionId }}?parentProcessDefinitionId={{processInstance.processDefinition.id}}">
+          {{ calledProcessInstance.processDefinitionName }}
+        </a>
+      </td>
+      <td>
+        <a href ng-click="selectActivityInstance(calledProcessInstance.instance)">
+          {{ calledProcessInstance.instance.name }}
+        <a>
+      </td>
+    </tr>
+
+    <tr ng-if="!calledProcessInstances">
+      <td colspan="3">
+        <i class="icon-loading"></i> loading called process instances...
+      </td>
+    </tr>
+
+    <tr ng-if="calledProcessInstances && !calledProcessInstances.length">
+      <td  colspan="3">
+        No called process instances
+      </td>
+    </tr>
+
+  </tbody>
+</table>

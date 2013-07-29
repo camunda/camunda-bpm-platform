@@ -52,6 +52,9 @@ import org.camunda.bpm.engine.impl.persistence.entity.IdentityInfoEntity;
  */
 public class IdentityServiceImpl extends ServiceImpl implements IdentityService {
   
+  /** thread local holding the current authentication */
+  private ThreadLocal<Authentication> currentAuthentication = new ThreadLocal<Authentication>();
+  
   public boolean isReadOnly() {
     return commandExecutor.execute(new IsIdentityServiceReadOnlyCmd());
   }
@@ -113,7 +116,27 @@ public class IdentityServiceImpl extends ServiceImpl implements IdentityService 
   }
 
   public void setAuthenticatedUserId(String authenticatedUserId) {
-    Authentication.setAuthenticatedUserId(authenticatedUserId);
+    currentAuthentication.set(new Authentication(authenticatedUserId, null));    
+  }
+  
+  public void setAuthentication(Authentication auth) {
+    if(auth == null) {
+      clearAuthentication();
+    } else {
+      currentAuthentication.set(auth);
+    }
+  }
+  
+  public void setAuthentication(String userId, List<String> groups) {
+    currentAuthentication.set(new Authentication(userId, groups));
+  }
+  
+  public void clearAuthentication() {
+    currentAuthentication.remove();
+  }
+  
+  public Authentication getCurrentAuthentication() {
+    return currentAuthentication.get();
   }
 
   public String getUserInfo(String userId, String key) {

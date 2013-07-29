@@ -50,10 +50,17 @@ public abstract class AbstractRestServiceTest {
   
   protected static final String EXAMPLE_VARIABLE_KEY = "aVariableKey";
   protected static final String EXAMPLE_VARIABLE_VALUE = "aVariableValue";
+  protected static final String EXAMPLE_ANOTHER_VARIABLE_KEY = "anotherVariableKey";
+  protected static final String EXAMPLE_ANOTHER_VARIABLE_VALUE_NULL = null;
   
   protected static final Map<String, Object> EXAMPLE_VARIABLES = new HashMap<String, Object>();
   static {
     EXAMPLE_VARIABLES.put(EXAMPLE_VARIABLE_KEY, EXAMPLE_VARIABLE_VALUE);
+  }
+  
+  protected static final Map<String, Object> EXAMPLE_VARIABLES_WITH_NULL_VALUE = new HashMap<String, Object>();
+  static {
+    EXAMPLE_VARIABLES_WITH_NULL_VALUE.put(EXAMPLE_ANOTHER_VARIABLE_KEY, EXAMPLE_ANOTHER_VARIABLE_VALUE_NULL);
   }
   
   protected static final String EXAMPLE_ACTIVITY_INSTANCE_ID = "anActivityInstanceId";

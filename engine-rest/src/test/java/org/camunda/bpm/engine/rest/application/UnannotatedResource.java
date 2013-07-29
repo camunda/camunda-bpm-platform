@@ -4,6 +4,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.core.Response.Status;
 
+import org.camunda.bpm.engine.AuthorizationException;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 
@@ -31,5 +32,11 @@ public class UnannotatedResource {
   @Path("/restException")
   public String throwRestException() throws Exception {
     throw new RestException(Status.BAD_REQUEST, "expected exception");
+  }
+  
+  @GET
+  @Path("/authorizationException")
+  public String throwAuthorizationException() throws Exception {
+    throw new AuthorizationException("someUser", "somePermission", "someResourceName", "someResourceId");
   }
 }
