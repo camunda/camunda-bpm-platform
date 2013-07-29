@@ -9,6 +9,7 @@ import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.history.HistoricActivityInstance;
 import org.camunda.bpm.engine.history.HistoricActivityInstanceQuery;
 import org.camunda.bpm.engine.rest.HistoricActivityInstanceRestService;
+import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricActivityInstanceDto;
 import org.camunda.bpm.engine.rest.dto.history.HistoricActivityInstanceQueryDto;
 
@@ -54,5 +55,22 @@ public class HistoricActivityInstanceRestServiceImpl extends AbstractRestProcess
 		}
 		return query.listPage(firstResult, maxResults);
 	}
+	
+	@Override
+	public CountResultDto getHistoricActivityInstancesCount(UriInfo uriInfo) {
+	   HistoricActivityInstanceQueryDto queryDto = new HistoricActivityInstanceQueryDto(uriInfo.getQueryParameters());
+	   return queryHistoricActivityInstancesCount(queryDto);
+	}
 
+	@Override
+	public CountResultDto queryHistoricActivityInstancesCount(HistoricActivityInstanceQueryDto queryDto) {
+	   ProcessEngine engine = getProcessEngine();
+	   HistoricActivityInstanceQuery query = queryDto.toQuery(engine);
+	    
+	   long count = query.count();
+	   CountResultDto result = new CountResultDto();
+	   result.setCount(count);
+	    
+	   return result;
+	}
 }

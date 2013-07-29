@@ -23,12 +23,12 @@ import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 
 public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricProcessInstanceQuery> {
 
-	private static final String SORT_BY_PROCESS_INSTANCE_ID_VALUE = "processInstanceId";
-	private static final String SORT_BY_PROCESS_DEFINITION_ID_VALUE = "processDefinitionId";
-	private static final String SORT_BY_PROCESS_INSTANCE_BUSINESS_KEY_VALUE = "processInstanceBusinessKey";
-	private static final String SORT_BY_PROCESS_INSTANCE_START_TIME_VALUE = "processInstanceStartTime";
-	private static final String SORT_BY_PROCESS_INSTANCE_END_TIME_VALUE = "processInstanceEndTime";
-	private static final String SORT_BY_PROCESS_INSTANCE_DURATION_VALUE = "processInstanceDuration";
+	private static final String SORT_BY_PROCESS_INSTANCE_ID_VALUE = "instanceId";
+	private static final String SORT_BY_PROCESS_DEFINITION_ID_VALUE = "definitionId";
+	private static final String SORT_BY_PROCESS_INSTANCE_BUSINESS_KEY_VALUE = "businessKey";
+	private static final String SORT_BY_PROCESS_INSTANCE_START_TIME_VALUE = "startTime";
+	private static final String SORT_BY_PROCESS_INSTANCE_END_TIME_VALUE = "endTime";
+	private static final String SORT_BY_PROCESS_INSTANCE_DURATION_VALUE = "duration";
 	
 	private static final List<String> VALID_SORT_BY_VALUES;
 	static {
@@ -41,22 +41,26 @@ public class HistoricProcessInstanceQueryDto extends AbstractQueryDto<HistoricPr
 		VALID_SORT_BY_VALUES.add(SORT_BY_PROCESS_INSTANCE_DURATION_VALUE);
 	}
 	
-	   private String processInstanceId;
-	   private Set<String> processInstanceIds;
-	   private String processDefinitionId;
-	   private String processDefinitionKey;
-	   private List<String> processDefinitionKeys;
-	   private String processInstanceBusinessKey;
-	   private Boolean finished;
-	   private Date startedBefore;
-	   private Date startedAfter;
-	   private Date finishedBefore;
-	   private Date finishedAfter;
-	   private String startedBy;
-	   private String superProcessInstanceId;
-	   private Boolean deleted;
+	private String processInstanceId;
+	private Set<String> processInstanceIds;
+	private String processDefinitionId;
+	private String processDefinitionKey;
+	private List<String> processDefinitionKeys;
+	private String processInstanceBusinessKey;
+	private Boolean finished;
+	private Date startedBefore;
+	private Date startedAfter;
+	private Date finishedBefore;
+	private Date finishedAfter;
+	private String startedBy;
+	private String superProcessInstanceId;
+	private Boolean deleted;
 	  
 	private List<VariableQueryParameterDto> variables;
+	
+	public HistoricProcessInstanceQueryDto() {
+		
+	}
 	
 	public HistoricProcessInstanceQueryDto(MultivaluedMap<String, String> queryParameters) {
 	    super(queryParameters);
