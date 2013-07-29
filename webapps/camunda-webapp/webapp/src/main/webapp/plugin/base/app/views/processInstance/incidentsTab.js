@@ -25,30 +25,13 @@ ngDefine('cockpit.plugin.base.views', function(module) {
       }
     });
 
-    $scope.$watch('selection.view.bpmnElements', function (newValue) {
-      var bpmnElements = newValue || [];
+    $scope.$watch(function () { return $location.search().bpmnElements; }, function (newValue) {
       activityIds = [];
 
-      if (bpmnElements.length !== 0) {
-        // collect the bpmn element ids
-        angular.forEach(bpmnElements, function (bpmnElement) {
-          if (bpmnElement) {
-            var bpmnElementId = bpmnElement.id;
-            activityIds.push(bpmnElementId);          
-          }
-        });        
-      } else {
-        // if the array of bpmnElements is empty, then check the
-        // search parameters 'bpmnElements'.
-        // if the search parameter is set, then collect the
-        // bpmn element ids from it.
-        var searchParams = $location.search().bpmnElements;
-
-        if (searchParams && angular.isString(searchParams)) {
-          activityIds = searchParams.split(',');
-        } else if (searchParams && angular.isArray(searchParams)) {
-          activityIds = searchParams;
-        }
+      if (newValue && angular.isString(newValue)) {
+        activityIds = newValue.split(',');
+      } else if (newValue && angular.isArray(newValue)) {
+        activityIds = newValue;
       }
 
       // always reset the current page to null
@@ -58,6 +41,7 @@ ngDefine('cockpit.plugin.base.views', function(module) {
         alreadyUpdated = true;
         updateView(1);    
       }
+
     });
 
     // This $watch on 'processInstance.activityIdToBpmnElementMap' is necessary due to race
@@ -133,7 +117,7 @@ ngDefine('cockpit.plugin.base.views', function(module) {
     $scope.selectActivity = function (incident) {
       var activityId = incident.activityId;
       var bpmnElement = $scope.processInstance.activityIdToBpmnElementMap[activityId];
-      $scope.selection.view = {'bpmnElements': [ bpmnElement ], 'scrollTo': {'activityId': bpmnElement.id }};
+      $scope.selection.view = {'bpmnElements': [ bpmnElement ], 'scrollTo': {'activityId': bpmnElement.id }, 'selectedBpmnElement': {'element': bpmnElement}};
     };
 
     $scope.getJobStacktraceUrl = function (incident) {
@@ -153,7 +137,7 @@ ngDefine('cockpit.plugin.base.views', function(module) {
       label: 'Incidents',
       url: 'plugin://base/static/app/views/processInstance/incidents-tab.html',
       controller: 'IncidentsController',
-      priority: 5
+      priority: 10
     });
   };
 
