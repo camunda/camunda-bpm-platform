@@ -89,7 +89,7 @@ public class ActivityInstanceDto {
     result.childActivityInstances = fromListOfActivityInstance(instance.getChildActivityInstances());
     result.childTransitionInstances = TransitionInstanceDto.fromListOfTransitionInstance(instance.getChildTransitionInstances());
     result.executionIds = instance.getExecutionIds();
-    result.name = ((ActivityInstanceImpl)instance).getActivityName();
+    result.name = instance.getActivityName();
     return result;
   }
   
