@@ -43,6 +43,17 @@ public class AuthorizationServiceTest extends PluggableProcessEngineTestCase {
     super.tearDown();
   }
   
+  public void testDeleteNonExistingAuthorization() {
+    
+    try {
+      authorizationService.deleteAuthorization("nonExisiting");
+      fail();
+    } catch (Exception e) {
+      assertTextPresent("Authorization for Id 'nonExisiting' does not exist.", e.getMessage());
+    }
+        
+  }
+  
   public void testCreateAuthorizationWithUserId() {
     
     TestResource resource1 = new TestResource("resource1",100);

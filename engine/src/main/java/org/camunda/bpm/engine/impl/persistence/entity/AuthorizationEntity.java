@@ -114,7 +114,7 @@ public class AuthorizationEntity implements Authorization, PersistentObject, Has
     return resourceType;
   }
   
-  public void setResourceType(Integer type) {
+  public void setResourceType(int type) {
     this.resourceType = type;
   }
   

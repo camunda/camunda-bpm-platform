@@ -40,7 +40,7 @@ public class GroupResourceImpl extends AbstractIdentityResource implements Group
   private String rootResourcePath;
 
   public GroupResourceImpl(ProcessEngine processEngine, String groupId, String rootResourcePath) {
-    super(processEngine, groupId);
+    super(processEngine, GROUP, groupId);
     this.rootResourcePath = rootResourcePath;
   }
 
@@ -61,10 +61,10 @@ public class GroupResourceImpl extends AbstractIdentityResource implements Group
         .build();
     
     group.addReflexiveLink(uri, HttpMethod.GET, "self");    
-    if(isAuthorized(DELETE, GROUP, resourceId)) {
+    if(isAuthorized(DELETE)) {
       group.addReflexiveLink(uri, HttpMethod.DELETE, "delete");
     }    
-    if(isAuthorized(UPDATE, GROUP, resourceId)) {
+    if(isAuthorized(UPDATE)) {
       group.addReflexiveLink(uri, HttpMethod.PUT, "update");
     }
     

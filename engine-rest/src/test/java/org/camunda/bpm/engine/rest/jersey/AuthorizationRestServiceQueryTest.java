@@ -10,21 +10,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.rest.resteasy;
+package org.camunda.bpm.engine.rest.jersey;
 
-import org.camunda.bpm.engine.rest.AbstractAuthorizationRestServiceTest;
+import org.camunda.bpm.engine.rest.AbstractAuthorizationRestServiceQueryTest;
 import org.camunda.bpm.engine.rest.util.EmbeddedServerBootstrap;
-import org.camunda.bpm.engine.rest.util.ResteasyServerBootstrap;
+import org.camunda.bpm.engine.rest.util.JerseyServerBootstrap;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
-public class AuthorizationRestServiceTest extends AbstractAuthorizationRestServiceTest {
+public class AuthorizationRestServiceQueryTest extends AbstractAuthorizationRestServiceQueryTest {
 
   protected static EmbeddedServerBootstrap serverBootstrap;  
   
   @BeforeClass
   public static void setUpEmbeddedRuntime() {
-    serverBootstrap = new ResteasyServerBootstrap();
+    serverBootstrap = new JerseyServerBootstrap();
     serverBootstrap.start();
   }
   
@@ -32,4 +32,5 @@ public class AuthorizationRestServiceTest extends AbstractAuthorizationRestServi
   public static void tearDownEmbeddedRuntime() {
     serverBootstrap.stop();
   }
+  
 }

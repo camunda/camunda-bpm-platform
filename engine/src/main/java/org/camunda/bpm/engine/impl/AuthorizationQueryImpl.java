@@ -38,7 +38,7 @@ public class AuthorizationQueryImpl extends AbstractQuery<AuthorizationQuery, Au
   protected int permission = 0;
   protected Integer authorizationType;
   protected boolean queryByPermission = false;
-  protected Resource resource;
+  protected boolean queryByResourceType = false;
   
   public AuthorizationQueryImpl(CommandExecutor commandExecutor) {
     super(commandExecutor);
@@ -70,8 +70,12 @@ public class AuthorizationQueryImpl extends AbstractQuery<AuthorizationQuery, Au
   }
 
   public AuthorizationQuery resourceType(Resource resource) {
-    this.resource = resource;
-    this.resourceType = resource.resourceType();
+    return resourceType(resource.resourceType());
+  }
+  
+  public AuthorizationQuery resourceType(int resourceType) {
+    this.resourceType = resourceType;
+    queryByResourceType = true;
     return this;
   }
 
@@ -134,8 +138,8 @@ public class AuthorizationQueryImpl extends AbstractQuery<AuthorizationQuery, Au
     return permission;
   }
   
-  public Resource getResource() {
-    return resource;
+  public boolean isQueryByResourceType() {
+    return queryByResourceType;
   }
 
   public AuthorizationQuery orderByResourceType() {

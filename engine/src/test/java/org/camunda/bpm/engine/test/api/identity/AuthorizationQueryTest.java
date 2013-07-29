@@ -91,6 +91,8 @@ public class AuthorizationQueryTest extends PluggableProcessEngineTestCase {
     // query by resource type
     assertEquals(4, authorizationService.createAuthorizationQuery().resourceType(resource1).count());
     assertEquals(0, authorizationService.createAuthorizationQuery().resourceType(nonExisting).count());
+    assertEquals(4, authorizationService.createAuthorizationQuery().resourceType(resource1.resourceType()).count());
+    assertEquals(0, authorizationService.createAuthorizationQuery().resourceType(nonExisting.resourceType()).count());
     
     // query by resource id
     assertEquals(2, authorizationService.createAuthorizationQuery().resourceId("resource1-2").count());

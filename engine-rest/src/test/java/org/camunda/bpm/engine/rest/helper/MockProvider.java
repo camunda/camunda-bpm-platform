@@ -16,9 +16,11 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
+import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.form.FormProperty;
 import org.camunda.bpm.engine.form.FormType;
 import org.camunda.bpm.engine.form.StartFormData;
@@ -137,12 +139,14 @@ public abstract class MockProvider {
   public static final int ANOTHER_EXAMPLE_INCIDENT_COUNT = 2;
 
   // user & groups
-  public static final String EXAMPLE_GROUP_ID = "group1Id";
+  public static final String EXAMPLE_GROUP_ID = "groupId1";
+  public static final String EXAMPLE_GROUP_ID2 = "groupId2";
   public static final String EXAMPLE_GROUP_NAME = "group1";
   public static final String EXAMPLE_GROUP_TYPE = "organizational-unit";
   public static final String EXAMPLE_GROUP_NAME_UPDATE = "group1Update";
  
   public static final String EXAMPLE_USER_ID = "userId";
+  public static final String EXAMPLE_USER_ID2 = "userId2";
   public static final String EXAMPLE_USER_FIRST_NAME = "firstName";
   public static final String EXAMPLE_USER_LAST_NAME = "lastName";
   public static final String EXAMPLE_USER_EMAIL = "test@example.org";
@@ -168,10 +172,15 @@ public abstract class MockProvider {
   
   public static final String EXAMPLE_RESOURCE_TYPE_NAME = "exampleResource";
   public static final int EXAMPLE_RESOURCE_TYPE_ID = 12345678;
+  public static final String EXAMPLE_RESOURCE_TYPE_ID_STRING = "12345678";
   public static final String EXAMPLE_RESOURCE_ID = "exampleResourceId";
   public static final String EXAMPLE_PERMISSION_NAME = "examplePermissionName";
   public static final int EXAMPLE_PERMISSION_VALUE = 1;
+  public static final String EXAMPLE_PERMISSION_VALUE_STRING = "1";
   
+  public static final String EXAMPLE_AUTHORIZATION_ID = "someAuthorizationId";
+  public static final int EXAMPLE_AUTHORIZATION_TYPE = 0;
+  public static final String EXAMPLE_AUTHORIZATION_TYPE_STRING = "0";
 
   
   // tasks
@@ -456,4 +465,73 @@ public abstract class MockProvider {
     list.add(createMockUser());
     return list;
   }
+  
+  public static Authorization createMockGlobalAuthorization() {
+    Authorization mockAuthorization = mock(Authorization.class);
+    
+    when(mockAuthorization.getId()).thenReturn(EXAMPLE_AUTHORIZATION_ID);
+    when(mockAuthorization.getAuthorizationType()).thenReturn(Authorization.AUTH_TYPE_GLOBAL);
+    when(mockAuthorization.getUserId()).thenReturn(Authorization.ANY);
+    
+    when(mockAuthorization.getResourceType()).thenReturn(EXAMPLE_RESOURCE_TYPE_ID);
+    when(mockAuthorization.getResourceId()).thenReturn(EXAMPLE_RESOURCE_ID);
+    when(mockAuthorization.getPermissions()).thenReturn(EXAMPLE_PERMISSION_VALUE);
+        
+    return mockAuthorization;
+  }
+  
+  public static Authorization createMockGrantAuthorization() {
+    Authorization mockAuthorization = mock(Authorization.class);
+    
+    when(mockAuthorization.getId()).thenReturn(EXAMPLE_AUTHORIZATION_ID);
+    when(mockAuthorization.getAuthorizationType()).thenReturn(Authorization.AUTH_TYPE_GRANT);
+    when(mockAuthorization.getUserId()).thenReturn(EXAMPLE_USER_ID);
+    
+    when(mockAuthorization.getResourceType()).thenReturn(EXAMPLE_RESOURCE_TYPE_ID);
+    when(mockAuthorization.getResourceId()).thenReturn(EXAMPLE_RESOURCE_ID);
+    when(mockAuthorization.getPermissions()).thenReturn(EXAMPLE_PERMISSION_VALUE);
+        
+    return mockAuthorization;
+  }
+  
+  public static Authorization createMockRevokeAuthorization() {
+    Authorization mockAuthorization = mock(Authorization.class);
+    
+    when(mockAuthorization.getId()).thenReturn(EXAMPLE_AUTHORIZATION_ID);
+    when(mockAuthorization.getAuthorizationType()).thenReturn(Authorization.AUTH_TYPE_REVOKE);
+    when(mockAuthorization.getUserId()).thenReturn(EXAMPLE_USER_ID);
+    
+    when(mockAuthorization.getResourceType()).thenReturn(EXAMPLE_RESOURCE_TYPE_ID);
+    when(mockAuthorization.getResourceId()).thenReturn(EXAMPLE_RESOURCE_ID);
+    when(mockAuthorization.getPermissions()).thenReturn(EXAMPLE_PERMISSION_VALUE);
+        
+    return mockAuthorization;
+  }
+  
+  public static List<Authorization> createMockAuthorizations() {
+    return Arrays.asList(new Authorization[]{
+        createMockGlobalAuthorization(),
+        createMockGrantAuthorization(),
+        createMockRevokeAuthorization()
+    });
+  }
+  
+  public static List<Authorization> createMockGrantAuthorizations() {
+    return Arrays.asList(new Authorization[]{
+        createMockGrantAuthorization()
+    });
+  }
+  
+  public static List<Authorization> createMockRevokeAuthorizations() {
+    return Arrays.asList(new Authorization[]{
+        createMockRevokeAuthorization()
+    });
+  }
+  
+  public static List<Authorization> createMockGlobalAuthorizations() {
+    return Arrays.asList(new Authorization[]{
+        createMockGlobalAuthorization()
+    });
+  }
+ 
 }
