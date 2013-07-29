@@ -158,6 +158,7 @@ Icons
   height: 20px;
   background-color: #999999;
   top: 100%;
+  float: left;
 }
 
 .circle-red {

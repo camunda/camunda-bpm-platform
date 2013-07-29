@@ -30,44 +30,6 @@ ngDefine('cockpit.directives', [ 'angular' ], function(module, angular) {
         scope.$watch('activityInstanceTree', function (newValue) {
           if (newValue) {
             createTree(newValue);
-
-            var searchParams = $location.search().activityInstances;
-
-            if (searchParams) {
-              var activityInstanceIds = [];
-
-              if (searchParams && angular.isString(searchParams)) {
-                activityInstanceIds = searchParams.split(',');
-              } else if (searchParams && angular.isArray(searchParams)) {
-                activityInstanceIds = searchParams;
-              }
-
-              var index = activityInstanceIds.indexOf(newValue.id);
-              if (index !== -1) {
-                newValue.isSelected = true;
-                scope.selection.view.activityInstances.push(newValue);
-              }
-            } else {
-              searchParams = $location.search().bpmnElements;
-
-              if (searchParams) {
-                var bpmnElementIds = [];
-
-                if (angular.isString(searchParams)) {
-                  bpmnElementIds = searchParams.split(',');
-                } else if (angular.isArray(searchParams)) {
-                  bpmnElementIds = searchParams
-                }
-
-                var activityId = newValue.activityId || newValue.targetActivityId;
-
-                var index = bpmnElementIds.indexOf(activityId);
-                if (index !== -1) {
-                  newValue.isSelected = true;
-                  scope.selection.view.activityInstances.push(newValue);
-                }
-              }
-            }
           }
         });
 
@@ -78,7 +40,11 @@ ngDefine('cockpit.directives', [ 'angular' ], function(module, angular) {
           if (searchParams && angular.isString(searchParams)) {
             activityInstanceIds = searchParams.split(',');
           } else if (searchParams && angular.isArray(searchParams)) {
-            activityInstanceIds = searchParams;
+            activityInstanceIds = angular.copy(searchParams);
+          }
+
+          if (!scope.activityInstanceTree) {
+            return;
           }
 
           if (oldValue) {
@@ -155,14 +121,13 @@ ngDefine('cockpit.directives', [ 'angular' ], function(module, angular) {
           } else {
             // else, push selected node to instances array
             instances.push(selectedNode);
-            
           }
           
           scope.selection.view = {activityInstances: instances, scrollTo: scrollTo};
           scope.$apply();
           
         };
-        
+
         function createTree (activityInstanceTree) {
           var template = labelTemplate;
           

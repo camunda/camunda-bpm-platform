@@ -7,7 +7,7 @@ ngDefine('cockpit.pages', function(module) {
 
     $scope.processInstance = processInstance;
 
-    $scope.selection = { view: {bpmnElements: [], activityInstances: [] }};
+    $scope.selection = {};
 
     $scope.cancelProcessInstanceDialog = new Dialog();
     $scope.cancelProcessInstanceDialog.setAutoClosable(false);
@@ -23,7 +23,11 @@ ngDefine('cockpit.pages', function(module) {
       $scope.jobRetriesDialog.open();      
     };
     
-    $scope.$watch('selection.view', function (newValue) {
+    $scope.$on('$routeChangeStart', function () {
+      $rootScope.clearBreadcrumbs();
+    });
+    
+    $scope.$watch('selection.view', function (newValue, oldValue) {
       if (!newValue) {
         return;
       }
@@ -34,6 +38,90 @@ ngDefine('cockpit.pages', function(module) {
         $scope.selection.view.scrollToBpmnElement = bpmnElement;
       }
       
+      if (newValue.initialize) {
+
+        if (newValue.initialize.bpmnElements) {
+          newValue['activityInstances'] = newValue.activityInstances || [];
+          
+          var activityInstances = $location.search().activityInstances || [];
+          if (angular.isString(activityInstances)) {
+            activityInstances = activityInstances.split(',');
+          }
+
+          angular.forEach(newValue.initialize.bpmnElements, function(bpmnElement) {
+            var instanceList = $scope.processInstance.activityIdToInstancesMap[bpmnElement.id];
+
+            if (activityInstances.length === 0) {
+              newValue.activityInstances = newValue.activityInstances.concat(instanceList);
+
+            } else {
+              var atLeastOneAdded = false;
+              angular.forEach(instanceList, function (instance) {
+                var index = activityInstances.indexOf(instance.id);
+                if (index !== -1) {
+                  newValue.activityInstances.push(instance);
+                  atLeastOneAdded = true;
+                }
+              });
+              if (!atLeastOneAdded) {
+                newValue.activityInstances = newValue.activityInstances.concat(instanceList);                
+              }
+            }
+
+          });
+          return;
+        }
+        if (newValue.initialize.activityInstances) {
+          newValue['bpmnElements'] = newValue.bpmnElements || [];
+
+          var bpmnElements = $location.search().bpmnElements || [];
+          if (angular.isString(bpmnElements)) {
+            bpmnElements = bpmnElements.split(',');
+          }
+
+          angular.forEach(newValue.initialize.activityInstances, function (instance) {
+            var bpmnElement = $scope.processInstance.activityIdToBpmnElementMap[instance.activityId || instance.targetActivityId];
+            if (bpmnElement) {
+              var index = newValue.bpmnElements.indexOf(bpmnElement);
+              if (index === -1) {
+                newValue.bpmnElements.push(bpmnElement);
+              }
+              var searchParamIndex = bpmnElements.indexOf(bpmnElement.id);
+              if (searchParamIndex === -1) {
+                bpmnElements.push(bpmnElement.id);
+              }
+            }          
+          });
+          
+          if (bpmnElements.length > 0) {
+            $location.search('bpmnElements', bpmnElements);
+            $location.replace();
+            newValue.scrollToBpmnElement = newValue.bpmnElements[newValue.bpmnElements.length-1];
+          }
+          return;          
+        }        
+
+      }
+
+      if (newValue.selectedBpmnElement) {
+        newValue.activityInstances = newValue.selectedBpmnElement.ctrlKey ? oldValue.activityInstances : [];
+
+        if (newValue.selectedBpmnElement.remove) {
+          var activityInstances = [];
+          angular.forEach(newValue.activityInstances, function(instance) {
+            if (instance.activityId !== newValue.selectedBpmnElement.id ||
+                instance.targetActivityId !== newValue.selectedBpmnElement.id)
+              activityInstances.push(instance);
+          });
+          newValue.activityInstances = activityInstances;
+        } else {
+          var instanceList = $scope.processInstance.activityIdToInstancesMap[newValue.selectedBpmnElement.element.id];
+          $scope.selection.view.activityInstances = $scope.selection.view.activityInstances.concat(instanceList);
+        }
+        newValue.selectedBpmnElement = null;
+        return;
+      }
+
       if (newValue.activityInstances) {
         $scope.selection.view.bpmnElements = [];
         angular.forEach(newValue.activityInstances, function(activityInstance) {
@@ -44,16 +132,61 @@ ngDefine('cockpit.pages', function(module) {
         return;
       }
       
-      if (newValue.bpmnElements) {
-        $scope.selection.view.activityInstances = [];
-        angular.forEach(newValue.bpmnElements, function(bpmnElement) {
-          var instanceList = $scope.processInstance.activityIdToInstancesMap[bpmnElement.id];
-          $scope.selection.view.activityInstances = $scope.selection.view.activityInstances.concat(instanceList);
-        });
+    });
+
+    $scope.$watch(function() { return $location.search().activityInstances; }, function (newValue, oldValue) {
+
+      function waitForActivityInstances() {
+        var deferred = $q.defer();
+
+        $scope.$watch('processInstance.instanceIdToInstanceMap', function (newValue, oldValue) {
+          if (!oldValue && newValue) {
+            deferred.resolve(newValue);
+          }
+        })
+
+        return deferred.promise;
+      }
+
+      if (!newValue && oldValue) {
+        if ($scope.selection.view) {
+          $scope.selection.view = {activityInstances: []};
+        }
         return;
       }
-      
+
+      if (newValue && angular.isString(newValue)) {
+
+        var searchParameter = newValue.split(',');
+
+        if (searchParameter.length === 0) {
+          $scope.selection.view = {activityInstances: []};
+          return;          
+        }
+
+        if ($scope.processInstance.activityInstances) {
+          selectActivityInstances($scope.processInstance.instanceIdToInstanceMap, searchParameter);
+        } else {
+          waitForActivityInstances().then(function (result) {
+            selectActivityInstances(result, searchParameter);
+          });
+        }
+      }
+
     });
+
+    function selectActivityInstances(instanceMap, searchParameter) {
+      var selectedActivityInstances = [];
+      for(var i = 0, selection; !!(selection = searchParameter[i]); i++) {
+        var instance = instanceMap[selection];
+        if (instance) {
+          selectedActivityInstances.push(instance);
+        }
+      }
+      $scope.selection['view'] = {};
+      $scope.selection.view['initialize'] = {activityInstances: selectedActivityInstances}
+      $scope.selection.view['activityInstances'] = selectedActivityInstances;
+    }
     
     // get the process definition
     function loadProcessDefinition() {

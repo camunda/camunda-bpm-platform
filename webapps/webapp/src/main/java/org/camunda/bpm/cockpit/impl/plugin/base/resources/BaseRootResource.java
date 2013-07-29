@@ -29,10 +29,15 @@ public class BaseRootResource extends AbstractPluginRootResource {
   public BaseRootResource() {
     super(BasePlugin.ID);
   }
+  
+  @Path("{engine}" + ProcessDefinitionRestService.PATH)
+  public ProcessDefinitionRestService getProcessDefinitionResource(@PathParam("engine") String engineName) {
+    return subResource(new ProcessDefinitionRestService(engineName), engineName);
+  }
 
-  @Path("{engine}" + ProcessInstanceResource.PATH)
-  public ProcessInstanceResource getProcessInstanceResource(@PathParam("engine") String engineName) {
-    return subResource(new ProcessInstanceResource(engineName), engineName);
+  @Path("{engine}" + ProcessInstanceRestService.PATH)
+  public ProcessInstanceRestService getProcessInstanceRestService(@PathParam("engine") String engineName) {
+    return subResource(new ProcessInstanceRestService(engineName), engineName);
   }
   
   @Path("{engine}" + IncidentRestService.PATH)

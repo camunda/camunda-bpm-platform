@@ -39,74 +39,13 @@ ngDefine('cockpit.plugin.base.views', function(module) {
       
     });
 
-    $scope.$watch('selection.view.activityInstances', function (newValue) {
-      var instances = newValue || [];
+    $scope.$watch(function() { return $location.search().activityInstances; }, function (newValue) {
       activityInstanceIds = [];
 
-      function waitForActivityIdToInstancesMap() {
-        var deferred = $q.defer();
-
-        $scope.$watch('processInstance.activityIdToInstancesMap', function (newValue) {
-          if (newValue) {
-            deferred.resolve(newValue);
-          }
-        });
-
-        return deferred.promise;
-      }
-
-      if (instances.length !== 0) {
-        // collect the instance ids
-        angular.forEach(instances, function (instance) {
-          var instanceId = instance.id;
-          activityInstanceIds.push(instanceId);
-        });
-      } else {
-        // if the array of instances is empty, then check the
-        // search parameters 'activityInstances'.
-        // if the search parameter is set, then collect the
-        // instance ids from it.
-        var searchParams = $location.search().activityInstances;
-
-        if (searchParams) {
-          if (angular.isString(searchParams)) {
-            activityInstanceIds = searchParams.split(',');
-          } else if (angular.isArray(searchParams)) {
-            activityInstanceIds = searchParams;
-          }
-        } else {
-          searchParams = $location.search().bpmnElements;
-          var bpmnElementIds = [];
-          if (searchParams) {
-            if (angular.isString(searchParams)) {
-              bpmnElementIds = searchParams.split(',');
-            } else if (angular.isArray(searchParams)) {
-              bpmnElementIds = searchParams;
-            }            
-
-            var activityIdToInstancesMap = null;
-            if (!$scope.processInstance.activityIdToInstancesMap) {
-              waitForActivityIdToInstancesMap().then(function(result) {
-                for (var key in result) {
-                  var instances = result[key];
-
-                  for (var i = 0, instance; !!(instance = instances[i]); i++) {
-                    activityInstanceIds.push(instance.id);
-                  }
-                }
-              });
-            } else {
-              activityIdToInstancesMap = $scope.processInstance.activityIdToInstancesMap;
-              for (var key in activityIdToInstancesMap) {
-                var instances = activityIdToInstancesMap[key];
-
-                for (var i = 0, instance; !!(instance = instances[i]); i++) {
-                  activityInstanceIds.push(instance.id);
-                }
-              }
-            }
-          }
-        }
+      if (newValue && angular.isString(newValue)) {
+        activityInstanceIds = newValue.split(',');
+      } else if (newValue && angular.isArray(newValue)) {
+        activityInstanceIds = newValue;
       }
 
       // always reset the current page to null
@@ -320,7 +259,7 @@ ngDefine('cockpit.plugin.base.views', function(module) {
       label: 'Variables',
       url: 'plugin://base/static/app/views/processInstance/variable-instances-tab.html',
       controller: 'VariableInstancesController',
-      priority: 10
+      priority: 15
     });
   };
 

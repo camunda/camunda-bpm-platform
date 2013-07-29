@@ -25,7 +25,7 @@ ngDefine('cockpit.directives', [ 'angular' ], function(module, angular) {
           breadcrumb.label = processDefinition.name || processDefinition.key || processDefinition.id;
           breadcrumb.href = '/process-definition/' + processDefinition.id;
           breadcrumb.divider = '/';
-          $rootScope.breadcrumbs = [ breadcrumb ];
+          $rootScope.breadcrumbs.push(breadcrumb);
           return;
         case 'processInstance': 
           var processInstance = breadcrumb.processInstance;

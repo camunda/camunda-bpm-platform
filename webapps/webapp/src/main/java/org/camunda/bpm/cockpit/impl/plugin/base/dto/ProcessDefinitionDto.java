@@ -12,12 +12,16 @@
  */
 package org.camunda.bpm.cockpit.impl.plugin.base.dto;
 
+import java.util.List;
+
 public class ProcessDefinitionDto {
   
   protected String id;
   protected String name;
   protected String key;
-  protected int version;
+  protected long version;
+  protected List<String> calledFromActivityIds;
+  
   protected int failedJobs;
   
   public ProcessDefinitionDto() {}
@@ -45,5 +49,20 @@ public class ProcessDefinitionDto {
   public void setKey(String key) {
     this.key = key;
   }
+  
+  public long getVersion() {
+    return version;
+  }
+  
+  public void setVersion(long version) {
+    this.version = version;
+  }
 
+  public List<String> getCalledFromActivityIds() {
+    return calledFromActivityIds;
+  }
+
+  public void setCalledFromActivityIds(List<String> calledFromActivityIds) {
+    this.calledFromActivityIds = calledFromActivityIds;
+  }
 }

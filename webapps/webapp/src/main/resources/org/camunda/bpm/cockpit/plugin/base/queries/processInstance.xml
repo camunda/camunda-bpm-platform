@@ -13,6 +13,22 @@
       <result property="incidentCount" column="INCIDENT_COUNT_" jdbcType="INTEGER"/>
     </collection>
   </resultMap>
+  
+  <resultMap id="calledProcessInstanceMap" type="org.camunda.bpm.cockpit.impl.plugin.base.dto.CalledProcessInstanceDto">
+    <id property="id" column="ID_" jdbcType="VARCHAR" />
+    <result property="processDefinitionId" column="SUPER_PROC_DEF_ID_" jdbcType="VARCHAR"/>
+    <result property="processDefinitionKey" column="KEY_" jdbcType="VARCHAR"/>
+    <result property="processDefinitionName" column="NAME_" jdbcType="VARCHAR"/>
+    <result property="callActivityInstanceId" column="ACT_INST_ID_" jdbcType="VARCHAR"/>
+    <result property="callActivityId" column="ACT_ID_" jdbcType="VARCHAR"/>
+  </resultMap>  
+  
+  <select id="selectRunningProcessInstancesCount" parameterType="org.camunda.bpm.cockpit.impl.plugin.base.query.parameter.ProcessInstanceQueryParameter"
+          resultType="long">
+    select count(distinct RES.ID_)
+    <include refid="selectProcessInstances" />              
+          
+  </select>
 
   <select id="selectRunningProcessInstancesIncludingIncidents" parameterType="org.camunda.bpm.cockpit.impl.plugin.base.query.parameter.ProcessInstanceQueryParameter"
           resultMap="processInstanceMap">
@@ -64,9 +80,80 @@
     ON 
       RES.ID_ = HISTORY.PROC_INST_ID_
     </if>
-    where
-      RES.ID_ = RES.PROC_INST_ID_ and
-      RES.PROC_DEF_ID_ = #{processDefinitionId}
+    <where>
+      RES.ID_ = RES.PROC_INST_ID_
+      
+      <!-- processDefinitionId -->
+      <if test="processDefinitionId != null">
+      and RES.PROC_DEF_ID_ = #{processDefinitionId}
+      </if>
+      
+      <!-- businessKey -->
+      <if test="businessKey != null">
+      and RES.BUSINESS_KEY_ = #{businessKey}
+      </if>
+            
+      <!-- activityIds -->
+      <if test="activityIdIn != null &amp;&amp; activityIdIn.length > 0">
+      and RES.ID_ in 
+        (
+          select
+            PROC_INST_ID_
+          from
+            ${prefix}ACT_RU_EXECUTION
+          where
+            ACT_ID_ in
+            <foreach item="item" index="index" collection="activityIdIn"
+                     open="(" separator="," close=")">
+              #{item}
+            </foreach>
+            <if test="processDefinitionId != null">
+            and PROC_DEF_ID_ = #{processDefinitionId}
+            </if>
+        )  
+      </if>
+      
+      <!-- parentProcessDefinitionId -->
+      <if test="parentProcessDefinitionId != null">
+      and RES.SUPER_EXEC_ IN (select ID_ from ${prefix}ACT_RU_EXECUTION where PROC_DEF_ID_ = #{parentProcessDefinitionId})
+      </if>
+
+    </where>
+  </sql>
+  
+  <select id="selectCalledProcessInstances" parameterType="org.camunda.bpm.cockpit.impl.plugin.base.query.parameter.ProcessInstanceQueryParameter"
+          resultMap="calledProcessInstanceMap">      
+    select RES.ID_, EXEC1.ACT_INST_ID_, EXEC1.ACT_ID_, PROC.ID_ AS SUPER_PROC_DEF_ID_, PROC.KEY_, PROC.NAME_
+    <include refid="selectCalledProcessInstancesByCriteria" />
+    ${orderBy}
+  </select>
+  
+  <sql id="selectCalledProcessInstancesByCriteria">
+    from
+      ${prefix}ACT_RU_EXECUTION RES
+    inner join
+      ${prefix}ACT_RU_EXECUTION EXEC1
+    on
+      RES.SUPER_EXEC_ = EXEC1.ID_
+    inner join
+      ${prefix}ACT_RE_PROCDEF PROC
+    on
+      RES.PROC_DEF_ID_ = PROC.ID_
+    <where>
+      <!-- parentProcessInstanceId -->
+      <if test="parentProcessInstanceId != null">
+      EXEC1.PROC_INST_ID_ = #{parentProcessInstanceId}
+      </if>
+           
+      <!-- activityInstanceIds -->
+      <if test="activityInstanceIdIn != null &amp;&amp; activityInstanceIdIn.length > 0">
+      and EXEC1.ACT_INST_ID_ in
+      <foreach item="item" index="index" collection="activityInstanceIdIn"
+               open="(" separator="," close=")">
+        #{item}
+      </foreach>
+      </if>  
+    </where>
   </sql>
 
 </mapper>
