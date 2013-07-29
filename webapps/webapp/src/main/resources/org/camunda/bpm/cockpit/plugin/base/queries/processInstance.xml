@@ -123,7 +123,7 @@
   
   <select id="selectCalledProcessInstances" parameterType="org.camunda.bpm.cockpit.impl.plugin.base.query.parameter.ProcessInstanceQueryParameter"
           resultMap="calledProcessInstanceMap">      
-    select RES.ID_, EXEC1.ACT_INST_ID_, EXEC1.ACT_ID_, PROC.ID_ AS SUPER_PROC_DEF_ID_, PROC.KEY_, PROC.NAME_
+    select RES.ID_, EXEC1.ACT_INST_ID_, EXEC1.ACT_ID_, PROC_.ID_ AS SUPER_PROC_DEF_ID_, PROC_.KEY_, PROC_.NAME_
     <include refid="selectCalledProcessInstancesByCriteria" />
     ${orderBy}
   </select>
@@ -136,9 +136,9 @@
     on
       RES.SUPER_EXEC_ = EXEC1.ID_
     inner join
-      ${prefix}ACT_RE_PROCDEF PROC
+      ${prefix}ACT_RE_PROCDEF PROC_
     on
-      RES.PROC_DEF_ID_ = PROC.ID_
+      RES.PROC_DEF_ID_ = PROC_.ID_
     <where>
       <!-- parentProcessInstanceId -->
       <if test="parentProcessInstanceId != null">
