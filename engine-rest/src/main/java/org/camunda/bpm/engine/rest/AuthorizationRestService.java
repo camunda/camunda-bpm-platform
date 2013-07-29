@@ -67,6 +67,7 @@ public interface AuthorizationRestService {
   @POST
   @Path("/create")
   @Consumes(MediaType.APPLICATION_JSON)
+  @Produces(MediaType.APPLICATION_JSON)
   AuthorizationDto createAuthorization(@Context UriInfo context, AuthorizationCreateDto dto);
   
 }
