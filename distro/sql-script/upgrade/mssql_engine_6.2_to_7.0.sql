@@ -272,4 +272,4 @@ alter table ACT_RU_AUTHORIZATION
 
 /** add deployment ids to jobs **/
 alter table ACT_RU_JOB 
-    add DEPLOYMENT_ID_ varchar(64);
+    add DEPLOYMENT_ID_ nvarchar(64);
