@@ -148,6 +148,7 @@ create table ACT_RU_EVENT_SUBSCR (
 create table ACT_RU_INCIDENT (
   ID_ nvarchar(64) not null,
   INCIDENT_TIMESTAMP_ datetime2 not null,
+  INCIDENT_MSG_ nvarchar(4000),
   INCIDENT_TYPE_ nvarchar(255) not null,
   EXECUTION_ID_ nvarchar(64),
   ACTIVITY_ID_ nvarchar(255),
@@ -160,14 +161,15 @@ create table ACT_RU_INCIDENT (
 );
 
 create table ACT_RU_AUTHORIZATION (
-    ID_ nvarchar(64) not null,
-    REV_ int,
-    GROUP_ID_ nvarchar(255),
-    USER_ID_ nvarchar(255),
-    RESOURCE_TYPE_ nvarchar(255) not null,
-    RESOURCE_ID_ nvarchar(64),
-    PERMS_ int,
-    primary key (ID_)
+  ID_ nvarchar(64) not null,
+  REV_ int,
+  TYPE_ int not null,
+  GROUP_ID_ nvarchar(255),
+  USER_ID_ nvarchar(255),
+  RESOURCE_TYPE_ int not null,
+  RESOURCE_ID_ nvarchar(64),
+  PERMS_ int,
+  primary key (ID_)
 );
 
 create index ACT_IDX_EXEC_BUSKEY on ACT_RU_EXECUTION(BUSINESS_KEY_);
@@ -179,8 +181,8 @@ create index ACT_IDX_VARIABLE_TASK_ID on ACT_RU_VARIABLE(TASK_ID_);
 create unique index ACT_UNIQ_RU_BUS_KEY on ACT_RU_EXECUTION (PROC_DEF_ID_, BUSINESS_KEY_) where BUSINESS_KEY_ is not null;
 create index ACT_IDX_ATHRZ_PROCEDEF on ACT_RU_IDENTITYLINK(PROC_DEF_ID_);
 create index ACT_IDX_INC_CONFIGURATION on ACT_RU_INCIDENT(CONFIGURATION_);
-create unique index ACT_UNIQ_AUTH_USER on ACT_RU_AUTHORIZATION (USER_ID_,RESOURCE_TYPE_,RESOURCE_ID_) where USER_ID_ is not null;
-create unique index ACT_UNIQ_AUTH_GROUP on ACT_RU_AUTHORIZATION (GROUP_ID_,RESOURCE_TYPE_,RESOURCE_ID_) where GROUP_ID_ is not null;
+create unique index ACT_UNIQ_AUTH_USER on ACT_RU_AUTHORIZATION (TYPE_,USER_ID_,RESOURCE_TYPE_,RESOURCE_ID_) where USER_ID_ is not null;
+create unique index ACT_UNIQ_AUTH_GROUP on ACT_RU_AUTHORIZATION (TYPE_,GROUP_ID_,RESOURCE_TYPE_,RESOURCE_ID_) where GROUP_ID_ is not null;
 
 alter table ACT_GE_BYTEARRAY
     add constraint ACT_FK_BYTEARR_DEPL 

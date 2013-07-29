@@ -1,0 +1,18 @@
+{
+  "pathFilter": { 
+      "deniedPaths" : [
+        { "path": "/api/engine/.*", "methods" : "*" },
+        { "path": "/api/cockpit/.*", "methods" : "*" },        
+        { "path": "/app/tasklist/\\w+/.*", "methods" : "*" },
+        { "path": "/app/cockpit/\\w+/.*", "methods" : "*" }        
+      ],
+      "allowedPaths" : [       
+        { "path": "/api/engine/engine/", "methods" : "GET" },
+        { "path": "/api/engine/engine/(\\w+)/.*", "methods" : "*", "matcher" : "org.camunda.bpm.webapp.impl.security.filter.AuthenticatedEngineRequestMatcher" },
+        { "path": "/api/cockpit/plugin/(\\w+)/static/.*", "methods" : "GET" },
+        { "path": "/api/cockpit/plugin/\\w+/(\\w+)/.*", "methods" : "*", "matcher" : "org.camunda.bpm.webapp.impl.security.filter.AuthenticatedEngineRequestMatcher" },
+        { "path": "/app/tasklist/(\\w+)/.*", "methods" : "*", "matcher" : "org.camunda.bpm.webapp.impl.security.filter.TasklistAuthorizationRequestMatcher" },
+        { "path": "/app/cockpit/(\\w+)/.*", "methods" : "*", "matcher" : "org.camunda.bpm.webapp.impl.security.filter.CockpitAuthorizationRequestMatcher" }        
+      ]
+  }
+}

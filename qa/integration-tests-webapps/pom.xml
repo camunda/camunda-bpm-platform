@@ -107,56 +107,24 @@
     </dependency>
 
     <dependency>
-      <groupId>org.camunda.bpm.cockpit</groupId>
-      <artifactId>camunda-cockpit-tomcat</artifactId>
+      <groupId>org.camunda.bpm.webapp</groupId>
+      <artifactId>camunda-webapp-tomcat</artifactId>
       <version>${project.version}</version>
       <type>war</type>
       <scope>test</scope>
     </dependency>
 
     <dependency>
-      <groupId>org.camunda.bpm.cockpit</groupId>
-      <artifactId>camunda-cockpit-glassfish</artifactId>
+      <groupId>org.camunda.bpm.webapp</groupId>
+      <artifactId>camunda-webapp-glassfish</artifactId>
       <version>${project.version}</version>
       <type>war</type>
       <scope>test</scope>
     </dependency>
 
     <dependency>
-      <groupId>org.camunda.bpm.cockpit</groupId>
-      <artifactId>camunda-cockpit-jboss</artifactId>
-      <version>${project.version}</version>
-      <type>war</type>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.camunda.bpm.tasklist</groupId>
-      <artifactId>camunda-tasklist</artifactId>
-      <version>${project.version}</version>
-      <type>war</type>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.camunda.bpm.tasklist</groupId>
-      <artifactId>camunda-tasklist-tomcat</artifactId>
-      <version>${project.version}</version>
-      <type>war</type>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.camunda.bpm.tasklist</groupId>
-      <artifactId>camunda-tasklist-glassfish</artifactId>
-      <version>${project.version}</version>
-      <type>war</type>
-      <scope>test</scope>
-    </dependency>
-
-    <dependency>
-      <groupId>org.camunda.bpm.tasklist</groupId>
-      <artifactId>camunda-tasklist-jboss</artifactId>
+      <groupId>org.camunda.bpm.webapp</groupId>
+      <artifactId>camunda-webapp-jboss</artifactId>
       <version>${project.version}</version>
       <type>war</type>
       <scope>test</scope>
@@ -308,21 +276,12 @@
                   </properties>
                 </deployable>
                 <deployable>
-                  <groupId>org.camunda.bpm.cockpit</groupId>
-                  <artifactId>camunda-cockpit-jboss</artifactId>
+                  <groupId>org.camunda.bpm.webapp</groupId>
+                  <artifactId>camunda-webapp-jboss</artifactId>
                   <type>war</type>
                   <pingURL>http://localhost:${jboss.http.port}/camunda</pingURL>
                   <properties>
                     <context>camunda</context>
-                  </properties>
-                </deployable>
-                <deployable>
-                  <groupId>org.camunda.bpm.tasklist</groupId>
-                  <artifactId>camunda-tasklist-jboss</artifactId>
-                  <type>war</type>
-                  <pingURL>http://localhost:${jboss.http.port}/tasklist</pingURL>
-                  <properties>
-                    <context>tasklist</context>
                   </properties>
                 </deployable>
                 <deployable>
@@ -459,21 +418,12 @@
                   </properties>
                 </deployable>
                 <deployable>
-                  <groupId>org.camunda.bpm.cockpit</groupId>
-                  <artifactId>camunda-cockpit-glassfish</artifactId>
+                  <groupId>org.camunda.bpm.webapp</groupId>
+                  <artifactId>camunda-webapp-glassfish</artifactId>
                   <type>war</type>
                   <pingURL>http://localhost:${http.port}/camunda</pingURL>
                   <properties>
                     <context>camunda</context>
-                  </properties>
-                </deployable>
-                <deployable>
-                  <groupId>org.camunda.bpm.tasklist</groupId>
-                  <artifactId>camunda-tasklist-glassfish</artifactId>
-                  <type>war</type>
-                  <pingURL>http://localhost:${http.port}/tasklist</pingURL>
-                  <properties>
-                    <context>tasklist</context>
                   </properties>
                 </deployable>
                 <deployable>
@@ -582,21 +532,12 @@
                   </properties>
                 </deployable>
                 <deployable>
-                  <groupId>org.camunda.bpm.cockpit</groupId>
-                  <artifactId>camunda-cockpit-tomcat</artifactId>
+                  <groupId>org.camunda.bpm.webapp</groupId>
+                  <artifactId>camunda-webapp-tomcat</artifactId>
                   <type>war</type>
                   <pingURL>http://localhost:${tomcat6.connector.http.port}/camunda</pingURL>
                   <properties>
                     <context>camunda</context>
-                  </properties>
-                </deployable>
-                <deployable>
-                  <groupId>org.camunda.bpm.tasklist</groupId>
-                  <artifactId>camunda-tasklist-tomcat</artifactId>
-                  <type>war</type>
-                  <pingURL>http://localhost:${tomcat6.connector.http.port}/tasklist</pingURL>
-                  <properties>
-                    <context>tasklist</context>
                   </properties>
                 </deployable>
                 <deployable>
@@ -717,37 +658,37 @@
               <dependency>
                 <groupId>mysql</groupId>
                 <artifactId>mysql-connector-java</artifactId>
-                <version>5.1.21</version>
+                <version>${version.mysql}</version>
               </dependency>
               <dependency>
                 <groupId>com.oracle.jdbc</groupId>
                 <artifactId>ojdbc6</artifactId>
-                <version>11.2.0.3</version>
+                <version>${version.oracle11g}</version>
               </dependency>
               <dependency>
                 <groupId>com.oracle.jdbc</groupId>
                 <artifactId>ojdbc14</artifactId>
-                <version>10.2.0.5</version>
+                <version>${version.oracle10g}</version>
               </dependency>
               <dependency>
                 <groupId>com.ibm.db2.jcc</groupId>
                 <artifactId>db2jcc4</artifactId>
-                <version>9.7</version>
+                <version>${version.db2.97}</version>
               </dependency>
               <dependency>
                 <groupId>com.microsoft.sqlserver</groupId>
                 <artifactId>sqljdbc4</artifactId>
-                <version>4.0</version>
+                <version>${version.mssql}</version>
               </dependency>
               <dependency>
                 <groupId>postgresql</groupId>
                 <artifactId>postgresql</artifactId>
-                <version>9.1-902.jdbc4</version>
+                <version>${version.postgre}</version>
               </dependency>
               <dependency>
                 <groupId>com.h2database</groupId>
                 <artifactId>h2</artifactId>
-                <version>1.3.168</version>
+                <version>${version.h2}</version>
               </dependency>
             </dependencies>
             <configuration>

@@ -16,8 +16,10 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.camunda.bpm.engine.authorization.Permissions;
+
 /**
- * <p>Base class for implementing authorization aware queries.</p>
+ * <p>Input for the authorization check alogrithm</p>
  * 
  * @author Daniel Meyer
  *
@@ -43,10 +45,17 @@ public class AuthorizationCheck implements Serializable {
   protected int authPerms;
   
   /** the type of the resource to check permissions for */
-  protected String authResourceType;
+  protected int authResourceType;
   
   /** the id of the resource to check permissions for */
   protected String authResourceId;
+  
+  /** query parameter for resaource Id. Is injected as RAW parameter into the query */
+  protected String authResourceIdQueryParam;
+  
+  /** the default permissions to use if no matching authorization 
+   * can be found.*/
+  protected int authDefaultPerm = Permissions.ALL.getValue();
   
   // getters / setters /////////////////////////////////////////
   
@@ -82,11 +91,11 @@ public class AuthorizationCheck implements Serializable {
     this.authPerms = authPerms;
   }
   
-  public String getAuthResourceType() {
+  public int getAuthResourceType() {
     return authResourceType;
   }
   
-  public void setAuthResourceType(String authResourceType) {
+  public void setAuthResourceType(int authResourceType) {
     this.authResourceType = authResourceType;
   }  
   
@@ -97,5 +106,20 @@ public class AuthorizationCheck implements Serializable {
   public void setAuthResourceId(String authResourceId) {
     this.authResourceId = authResourceId;
   }
-    
+
+  public int getAuthDefaultPerm() {
+    return authDefaultPerm;
+  }
+
+  public void setAuthDefaultPerm(int authDefaultPerm) {
+    this.authDefaultPerm = authDefaultPerm;
+  }
+
+  public String getAuthResourceIdQueryParam() {
+    return authResourceIdQueryParam;
+  }
+
+  public void setAuthResourceIdQueryParam(String authResourceIdQueryParam) {
+    this.authResourceIdQueryParam = authResourceIdQueryParam;
+  }
 }

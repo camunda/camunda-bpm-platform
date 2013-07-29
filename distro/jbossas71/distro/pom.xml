@@ -58,13 +58,6 @@
     </dependency>
     
     <dependency>
-      <groupId>org.camunda.bpm.tasklist</groupId>
-      <artifactId>camunda-tasklist-jboss</artifactId>
-      <version>${project.version}</version>
-      <type>war</type>
-    </dependency>
-    
-    <dependency>
       <groupId>org.camunda.bpm</groupId>
       <artifactId>camunda-engine-rest</artifactId>
       <version>${project.version}</version>
@@ -72,8 +65,8 @@
     </dependency>
     
     <dependency>
-      <groupId>org.camunda.bpm.cockpit</groupId>
-      <artifactId>camunda-cockpit-jboss</artifactId>
+      <groupId>org.camunda.bpm.webapp</groupId>
+      <artifactId>camunda-webapp-jboss</artifactId>
       <version>${project.version}</version>
       <type>war</type>
     </dependency>

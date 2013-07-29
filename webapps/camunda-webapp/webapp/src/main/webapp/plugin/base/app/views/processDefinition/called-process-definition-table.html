@@ -1,0 +1,44 @@
+<table class="table table-bordered table-hover table-condensed">
+  <thead>
+    <th>Called Process Definition</th>
+    <th>Activity</th>
+  </thead>
+  <tbody>
+    <tr ng-repeat="calledProcessDefinition in calledProcessDefinitions">
+      <td>
+        <a href="#/process-definition/{{ calledProcessDefinition.id }}?parentProcessDefinitionId={{ processDefinition.id }}">
+          {{ calledProcessDefinition.name }}
+        </a>
+      </td>
+      <td>
+        <span ng-show="calledProcessDefinition.calledFromActivityIds.length === 1">
+          <a href ng-click="selectBpmnElement(calledProcessDefinition.calledFromActivityIds[0].bpmnElement)">
+            {{ calledProcessDefinition.calledFromActivityIds[0].bpmnElement.name }}
+          </a>
+        </span>
+        <span ng-show="calledProcessDefinition.calledFromActivityIds.length > 1">
+          <ul>
+            <li ng-repeat="activity in calledProcessDefinition.calledFromActivityIds">
+              <a href ng-click="selectBpmnElement(activity.bpmnElement)">
+                {{ activity.bpmnElement.name }}
+              </a>
+            </li>
+          <ul>
+        </span>
+      </td>
+    </tr>
+
+    <tr ng-if="!calledProcessDefinitions">
+      <td colspan="2">
+        <i class="icon-loading"></i> loading called process definitions...
+      </td>
+    </tr>
+
+    <tr ng-if="calledProcessDefinitions && !calledProcessDefinitions.length">
+      <td  colspan="2">
+        No called process definitions
+      </td>
+    </tr>
+
+  </tbody>
+</table>

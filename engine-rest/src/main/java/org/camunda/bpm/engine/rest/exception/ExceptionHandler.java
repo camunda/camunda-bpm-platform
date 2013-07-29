@@ -37,7 +37,7 @@ public class ExceptionHandler implements ExceptionMapper<Exception> {
 
   @Override
   public Response toResponse(Exception exception) {
-    ExceptionDto dto = ExceptionDto.fromException(exception, true);
+    ExceptionDto dto = ExceptionDto.fromException(exception);
 
     LOGGER.log(Level.WARNING, getStackTrace(exception));
     

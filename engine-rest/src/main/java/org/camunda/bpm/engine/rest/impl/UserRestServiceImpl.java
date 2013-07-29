@@ -14,14 +14,10 @@ package org.camunda.bpm.engine.rest.impl;
 
 import java.util.List;
 
-import javax.ws.rs.Consumes;
-import javax.ws.rs.POST;
-import javax.ws.rs.Path;
-import javax.ws.rs.core.UriInfo;
 import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.core.UriInfo;
 
 import org.camunda.bpm.engine.IdentityService;
-import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.identity.UserQuery;
 import org.camunda.bpm.engine.rest.UserRestService;
@@ -48,7 +44,7 @@ public class UserRestServiceImpl extends AbstractRestProcessEngineAware implemen
   }
 
   public UserResource getUser(String id) {
-    return new UserResourceImpl(getProcessEngine(), id);
+    return new UserResourceImpl(getProcessEngine(), id, relativeRootResourcePath);
   }
 
   public List<UserProfileDto> queryUsers(UriInfo uriInfo, Integer firstResult, Integer maxResults) {
@@ -94,20 +90,15 @@ public class UserRestServiceImpl extends AbstractRestProcessEngineAware implemen
       throw new InvalidRequestException(Status.BAD_REQUEST, "request object must provide profile information with valid id.");
     }
     
-    try {
-      User newUser = identityService.newUser(profile.getId());    
-      profile.update(newUser);
-      
-      if(userDto.getCredentials() != null) {
-        newUser.setPassword(userDto.getCredentials().getPassword());
-      }
-      
-      identityService.saveUser(newUser);      
-      
-    } catch (RuntimeException e) {
-      throw new InvalidRequestException(Status.INTERNAL_SERVER_ERROR, "Exception while saving new user: "+e.getMessage());
-      
+    User newUser = identityService.newUser(profile.getId());    
+    profile.update(newUser);
+    
+    if(userDto.getCredentials() != null) {
+      newUser.setPassword(userDto.getCredentials().getPassword());
     }
+    
+    identityService.saveUser(newUser);      
+      
   }
   
   // utility methods //////////////////////////////////////

@@ -2,6 +2,7 @@
 create table ACT_RU_INCIDENT (
   ID_ varchar(64) not null,
   INCIDENT_TIMESTAMP_ timestamp not null,
+  INCIDENT_MSG_ varchar(4000),
   INCIDENT_TYPE_ varchar(255) not null,
   EXECUTION_ID_ varchar(64),
   ACTIVITY_ID_ varchar(255),
@@ -97,18 +98,25 @@ WHERE SUSPENSION_STATE_ is null;
 -- add authorizations --------------------------------------
 
 create table ACT_RU_AUTHORIZATION (
-    ID_ varchar(64) not null,
-    REV_ integer not null,
-    GROUP_ID_ varchar(255),
-    USER_ID_ varchar(255),
-    RESOURCE_TYPE_ varchar(255) not null,
-    RESOURCE_ID_ varchar(64),
-    PERMS_ integer,
-    primary key (ID_),
-    UNI_USER_ID_ varchar (255) not null generated always as (case when "USER_ID_" is null then "ID_" else "USER_ID_" end),
-    UNI_GROUP_ID_ varchar (255) not null generated always as (case when "GROUP_ID_" is null then "ID_" else "GROUP_ID_" end),
-    UNI_RESOURCE_ID_ varchar (64) not null generated always as (case when "RESOURCE_ID_" is null then "ID_" else "RESOURCE_ID_" end)
+  ID_ varchar(64) not null,
+  REV_ integer not null,
+  TYPE_ integer not null,
+  GROUP_ID_ varchar(255),
+  USER_ID_ varchar(255),
+  RESOURCE_TYPE_ integer not null,
+  RESOURCE_ID_ varchar(64),
+  PERMS_ integer,
+  primary key (ID_),
+  UNI_USER_ID_ varchar (255) not null generated always as (case when "USER_ID_" is null then "ID_" else "USER_ID_" end),
+  UNI_GROUP_ID_ varchar (255) not null generated always as (case when "GROUP_ID_" is null then "ID_" else "GROUP_ID_" end),
+  UNI_RESOURCE_ID_ varchar (64) not null generated always as (case when "RESOURCE_ID_" is null then "ID_" else "RESOURCE_ID_" end)
 );
 
-create unique index ACT_UNIQ_AUTH_USER on ACT_RU_AUTHORIZATION(UNI_USER_ID_,RESOURCE_TYPE_,UNI_RESOURCE_ID_);
-create unique index ACT_UNIQ_AUTH_GROUP on ACT_RU_AUTHORIZATION(UNI_GROUP_ID_,RESOURCE_TYPE_,UNI_RESOURCE_ID_);
+create unique index ACT_UNIQ_AUTH_USER on ACT_RU_AUTHORIZATION(TYPE_,UNI_USER_ID_,RESOURCE_TYPE_,UNI_RESOURCE_ID_);
+create unique index ACT_UNIQ_AUTH_GROUP on ACT_RU_AUTHORIZATION(TYPE_,UNI_GROUP_ID_,RESOURCE_TYPE_,UNI_RESOURCE_ID_);
+
+-- add deployment id -------------------------------------------
+
+/** add deployment id to job table */
+alter table ACT_RU_JOB 
+    add DEPLOYMENT_ID_ varchar(64);

@@ -316,13 +316,13 @@ public abstract class AbstractProcessEngineTestCase extends PvmTestCase {
   protected void runAsUser(String userId, List<String> groupIds, Runnable r) {
     try {
       identityService.setAuthenticatedUserId(userId);
-      processEngineConfiguration.setAuthorizationChecksEnabled(true);
+      processEngineConfiguration.setAuthorizationEnabled(true);
       
       r.run();
       
     } finally {
       identityService.setAuthenticatedUserId(null);
-      processEngineConfiguration.setAuthorizationChecksEnabled(false);      
+      processEngineConfiguration.setAuthorizationEnabled(false);      
     }
   }
   

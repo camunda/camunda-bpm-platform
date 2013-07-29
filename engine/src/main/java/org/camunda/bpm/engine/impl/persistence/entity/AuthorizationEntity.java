@@ -15,9 +15,11 @@ package org.camunda.bpm.engine.impl.persistence.entity;
 import java.io.Serializable;
 import java.util.HashMap;
 
-import org.camunda.bpm.engine.identity.Authorization;
-import org.camunda.bpm.engine.identity.Permission;
-import org.camunda.bpm.engine.identity.Permissions;
+import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.authorization.Authorization;
+import org.camunda.bpm.engine.authorization.Permission;
+import org.camunda.bpm.engine.authorization.Permissions;
+import org.camunda.bpm.engine.authorization.Resource;
 import org.camunda.bpm.engine.impl.db.HasRevision;
 import org.camunda.bpm.engine.impl.db.PersistentObject;
 
@@ -32,33 +34,68 @@ public class AuthorizationEntity implements Authorization, PersistentObject, Has
   protected String id;
   protected int revision;
   
+  protected int authorizationType;
+  protected int permissions;  
   protected String userId;
   protected String groupId;
-  protected String resourceType;
+  protected Integer resourceType;
   protected String resourceId;  
-  protected int permissions = Permissions.NONE.getId(); 
+
+  public AuthorizationEntity() {
+  }
+  
+  public AuthorizationEntity(int type) {
+    this.authorizationType = type;
+    if(type == AUTH_TYPE_GLOBAL) {
+      this.userId = ANY;
+      this.permissions = Permissions.NONE.getValue();
+      
+    } else if(type == AUTH_TYPE_GRANT) {
+      this.permissions = Permissions.NONE.getValue();
+      
+    } else if(type == AUTH_TYPE_REVOKE) {
+      this.permissions = Permissions.ALL.getValue();
+      
+    } else {
+      throw new ProcessEngineException("Unrecognized authorization type '"+type+"' Must be one of "
+          +AUTH_TYPE_GLOBAL+","+AUTH_TYPE_GRANT+", "+AUTH_TYPE_REVOKE);
+      
+    }
+  }
+
   
   // grant methods /////////////////////////////////
-  
+
   public void addPermission(Permission p) {
-    permissions |= p.getId();
+    permissions |= p.getValue();
   }
   
   public void removePermission(Permission p) {
-    permissions &= ~p.getId();
+    permissions &= ~p.getValue();
   }
   
   public boolean hasPermission(Permission p) {
-    return (permissions & p.getId()) == p.getId();
+    return (permissions & p.getValue()) == p.getValue();
   }
   
   // getters setters ///////////////////////////////
+
+  public int getAuthorizationType() {
+    return authorizationType;
+  }
+  
+  public void setAuthorizationType(int authorizationType) {
+    this.authorizationType = authorizationType;
+  }
   
   public String getGroupId() {
     return groupId;
   }
   
   public void setGroupId(String groupId) {
+    if(authorizationType == AUTH_TYPE_GLOBAL) {
+      throw new ProcessEngineException("Cannot use gorouId for GLOBAL authorization.");
+    }
     this.groupId = groupId;
   }
   
@@ -67,15 +104,26 @@ public class AuthorizationEntity implements Authorization, PersistentObject, Has
   }
 
   public void setUserId(String userId) {
+    if(authorizationType == AUTH_TYPE_GLOBAL && !ANY.equals(userId)) {
+      throw new ProcessEngineException("Illegal value "+userId+" for userId for GLOBAL authorization. must be '"+ANY+"'.");
+    }
     this.userId = userId;
   }
 
-  public String getResourceType() {
+  public int getResourceType() {
+    return resourceType;
+  }
+  
+  public void setResourceType(int type) {
+    this.resourceType = type;
+  }
+  
+  public Integer getResource() {
     return resourceType;
   }
 
-  public void setResourceType(String resourceType) {
-    this.resourceType = resourceType;
+  public void setResource(Resource resource) {
+    this.resourceType = resource.resourceType();
   }
 
   public String getResourceId() {

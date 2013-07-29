@@ -95,7 +95,7 @@ public class AddIdentityLinkCmd implements Command<Void>, Serializable {
 
     CommentManager commentManager = commandContext.getCommentManager();
     if (commentManager.isHistoryEnabled()) {
-      String authenticatedUserId = Authentication.getAuthenticatedUserId();
+      String authenticatedUserId = commandContext.getAuthenticatedUserId();
       CommentEntity comment = new CommentEntity();
       comment.setUserId(authenticatedUserId);
       comment.setType(CommentEntity.TYPE_EVENT);

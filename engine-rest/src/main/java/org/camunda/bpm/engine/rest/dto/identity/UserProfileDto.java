@@ -16,18 +16,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.camunda.bpm.engine.identity.User;
+import org.camunda.bpm.engine.rest.dto.LinkableDto;
 
 /**
  * @author Daniel Meyer
  *
  */
-public class UserProfileDto {
+public class UserProfileDto extends LinkableDto {
 
   protected String id;
   protected String firstName;
   protected String lastName;
   protected String email;
-  
+    
   // transformers ////////////////////////////////////////
   
   public static UserProfileDto fromUser(User user) {
@@ -87,5 +88,4 @@ public class UserProfileDto {
   public void setEmail(String email) {
     this.email = email;
   }
-  
 }

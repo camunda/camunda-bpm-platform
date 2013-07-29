@@ -17,7 +17,11 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import org.camunda.bpm.engine.ClassLoadingException;
@@ -188,8 +192,7 @@ public abstract class ReflectUtil {
    * Returns the setter-method for the given field name or null if no setter exists.
    */
   public static Method getSetter(String fieldName, Class<?> clazz, Class<?> fieldType) {
-    String setterName = "set" + Character.toTitleCase(fieldName.charAt(0)) +
-      fieldName.substring(1, fieldName.length());
+    String setterName = buildSetterName(fieldName);
     try {
       // Using getMathods(), getMathod(...) expects exact parameter type
       // matching and ignores inheritance-tree.
@@ -206,6 +209,48 @@ public abstract class ReflectUtil {
     } catch (SecurityException e) {
       throw new ProcessEngineException("Not allowed to access method " + setterName + " on class " + clazz.getCanonicalName());
     }
+  }
+  
+  /**
+   * Returns a setter method based on the fieldName and the java beans setter naming convention or null if none exists.
+   * If multiple setters with different parameter types are present, an exception is thrown.
+   * If they have the same parameter type, one of those methods is returned.
+   */
+  public static Method getSingleSetter(String fieldName, Class<?> clazz) {
+    String setterName = buildSetterName(fieldName);
+    try {
+      // Using getMathods(), getMathod(...) expects exact parameter type
+      // matching and ignores inheritance-tree.
+      Method[] methods = clazz.getMethods();
+      List<Method> candidates = new ArrayList<Method>();
+      Set<Class<?>> parameterTypes = new HashSet<Class<?>>();
+      for(Method method : methods) {
+        if(method.getName().equals(setterName)) {
+          Class<?>[] paramTypes = method.getParameterTypes();
+          
+          if(paramTypes != null && paramTypes.length == 1) {
+            candidates.add(method);
+            parameterTypes.add(paramTypes[0]);
+          }
+        }
+      }
+      
+      if (parameterTypes.size() > 1) {
+        throw new ProcessEngineException("There exists more than one setter method with different argument types named " + setterName + " on class " + clazz.getCanonicalName());
+      }
+      if (candidates.size() >= 1) {
+        return candidates.get(0);
+      }
+      
+      return null;
+    } catch (SecurityException e) {
+      throw new ProcessEngineException("Not allowed to access method " + setterName + " on class " + clazz.getCanonicalName());
+    }
+  }
+  
+  private static String buildSetterName(String fieldName) {
+    return "set" + Character.toTitleCase(fieldName.charAt(0)) +
+        fieldName.substring(1, fieldName.length());
   }
 
   private static Method findMethod(Class< ? extends Object> clazz, String methodName, Object[] args) {

@@ -53,13 +53,6 @@
   		</includes>
   		<outputDirectory>server/jboss-as-${version.jboss.as}/standalone/deployments</outputDirectory>
   	</dependencySet>
-    
-  	<dependencySet>
-  		<includes>
-  			<include>org.camunda.bpm.tasklist:camunda-tasklist-jboss:war:*</include>
-  		</includes>
-  		<outputDirectory>server/jboss-as-${version.jboss.as}/standalone/deployments</outputDirectory>
-  	</dependencySet>
   
   	<dependencySet>
   		<includes>
@@ -77,7 +70,7 @@
     
     <dependencySet>
         <includes>
-          <include>org.camunda.bpm.cockpit:camunda-cockpit-jboss:war:*</include>
+          <include>org.camunda.bpm.webapp:camunda-webapp-jboss:war:*</include>
         </includes>
         <outputDirectory>server/jboss-as-${version.jboss.as}/standalone/deployments</outputDirectory>
     </dependencySet>

@@ -27,6 +27,7 @@ import org.camunda.bpm.container.impl.jboss.config.ManagedProcessEngineMetadata;
 import org.camunda.bpm.container.impl.jboss.util.Tccl;
 import org.camunda.bpm.container.impl.jboss.util.Tccl.Operation;
 import org.camunda.bpm.container.impl.jmx.services.JmxManagedProcessEngineController;
+import org.camunda.bpm.container.impl.metadata.PropertyHelper;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineConfiguration;
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -64,7 +65,6 @@ public class MscManagedProcessEngineController extends MscManagedProcessEngine {
   // This ensures that they are available when this service is started
   protected final InjectedValue<TransactionManager> transactionManagerInjector = new InjectedValue<TransactionManager>();
   protected final InjectedValue<DataSourceReferenceFactoryService> datasourceBinderServiceInjector = new InjectedValue<DataSourceReferenceFactoryService>();
-  protected final InjectedValue<MscRuntimeContainerDelegate> runtimeContainerDelegate = new InjectedValue<MscRuntimeContainerDelegate>();
   protected final InjectedValue<MscRuntimeContainerJobExecutor> mscRuntimeContainerJobExecutorInjector = new InjectedValue<MscRuntimeContainerJobExecutor>();
     
   protected ManagedProcessEngineMetadata processEngineMetadata;
@@ -84,39 +84,42 @@ public class MscManagedProcessEngineController extends MscManagedProcessEngine {
     executorInjector.getValue().submit(new Runnable() {
       public void run() {
         try {
-          start();
-          context.complete();          
+          startInternal(context);
+          context.complete();   
+          
+        } catch (StartException e) {
+          context.failed(e);
+          
         } catch (Throwable e) {
           context.failed(new StartException(e));
+          
         }
       }
     });
   }
   
   public void stop(final StopContext context) {
-    context.asynchronous();    
-    executorInjector.getValue().submit(new Runnable() {
-      public void run() {
-        try {
-          
-          try {
-            processEngine.close();      
-          } catch(Exception e) {
-            LOGGER.log(Level.SEVERE, "exception while closing process engine", e);
-          }      
-          
-        } finally {
-          
-          MscRuntimeContainerDelegate mscRuntimeContainerDelegate = runtimeContainerDelegate.getValue();
-          mscRuntimeContainerDelegate.processEngineStopped(processEngine);
-          
-          context.complete();
-        }
+    stopInternal(context);     
+  }
+
+  protected void stopInternal(StopContext context) {
+
+    try {
+      super.stop(context);
+      
+    } finally {
+
+      try {
+        processEngine.close();
+
+      } catch (Exception e) {
+        LOGGER.log(Level.SEVERE, "exception while closing process engine", e);
+
       }
-    });
+    }
   }
     
-  public void start() {        
+  public void startInternal(StartContext context) throws StartException {        
     // setting the TCCL to the Classloader of this module.
     // this exploits a hack in MyBatis allowing it to use the TCCL to load the 
     // mapping files from the process engine module
@@ -128,8 +131,8 @@ public class MscManagedProcessEngineController extends MscManagedProcessEngine {
 
     }, ProcessEngine.class.getClassLoader());   
     
-    MscRuntimeContainerDelegate mscRuntimeContainerDelegate = runtimeContainerDelegate.getValue();
-    mscRuntimeContainerDelegate.processEngineStarted(processEngine);
+    // invoke super start behavior.
+    super.start(context);
   }
     
   protected void startProcessEngine() {
@@ -163,6 +166,8 @@ public class MscManagedProcessEngineController extends MscManagedProcessEngine {
     // set job executor on process engine.
     MscRuntimeContainerJobExecutor mscRuntimeContainerJobExecutor = mscRuntimeContainerJobExecutorInjector.getValue();
     processEngineConfiguration.setJobExecutor(mscRuntimeContainerJobExecutor);
+    
+    PropertyHelper.applyProperties(processEngineConfiguration, processEngineMetadata.getConfigurationProperties());
     
     processEngine = processEngineConfiguration.buildProcessEngine();        
   }
@@ -202,10 +207,6 @@ public class MscManagedProcessEngineController extends MscManagedProcessEngine {
   public Injector<DataSourceReferenceFactoryService> getDatasourceBinderServiceInjector() {
     return datasourceBinderServiceInjector;
   }
-    
-  public InjectedValue<MscRuntimeContainerDelegate> getContainerPlatformServiceInjector() {
-    return runtimeContainerDelegate;
-  }
   
   public InjectedValue<MscRuntimeContainerJobExecutor> getMscRuntimeContainerJobExecutorInjector() {
     return mscRuntimeContainerJobExecutorInjector;
@@ -217,7 +218,7 @@ public class MscManagedProcessEngineController extends MscManagedProcessEngine {
     ContextNames.BindInfo datasourceBindInfo = ContextNames.bindInfoFor(processEngineConfiguration.getDatasourceJndiName());
     serviceBuilder.addDependency(ServiceName.JBOSS.append("txn").append("TransactionManager"), TransactionManager.class, service.getTransactionManagerInjector())
       .addDependency(datasourceBindInfo.getBinderServiceName(), DataSourceReferenceFactoryService.class, service.getDatasourceBinderServiceInjector())
-      .addDependency(ServiceNames.forMscRuntimeContainerDelegate(), MscRuntimeContainerDelegate.class, service.getContainerPlatformServiceInjector())
+      .addDependency(ServiceNames.forMscRuntimeContainerDelegate(), MscRuntimeContainerDelegate.class, service.getRuntimeContainerDelegateInjector())
       .addDependency(ServiceNames.forMscRuntimeContainerJobExecutorService(jobExecutorName), MscRuntimeContainerJobExecutor.class, service.getMscRuntimeContainerJobExecutorInjector())
       .addDependency(ServiceNames.forMscExecutorService())         
       .setInitialMode(Mode.ACTIVE);
@@ -237,5 +238,8 @@ public class MscManagedProcessEngineController extends MscManagedProcessEngine {
   public InjectedValue<ExecutorService> getExecutorInjector() {
     return executorInjector;
   }
-  
+
+  public ManagedProcessEngineMetadata getProcessEngineMetadata() {
+    return processEngineMetadata;
+  }
 }

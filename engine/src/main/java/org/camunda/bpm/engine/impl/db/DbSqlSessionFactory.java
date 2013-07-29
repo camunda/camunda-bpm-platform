@@ -41,6 +41,8 @@ public class DbSqlSessionFactory implements SessionFactory {
   public static final Map<String, String> databaseSpecificBitAnd2 = new HashMap<String, String>();
   public static final Map<String, String> databaseSpecificBitAnd3 = new HashMap<String, String>();
   
+  public static final Map<String, String> databaseSpecificDummyTable = new HashMap<String, String>();
+  
   static {
     
     String defaultOrderBy = " order by ${orderBy} ";
@@ -54,6 +56,7 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificBitAnd1.put("h2", "BITAND(");
     databaseSpecificBitAnd2.put("h2", ",");
     databaseSpecificBitAnd3.put("h2", ")");    
+    databaseSpecificDummyTable.put("h2", "");
     
 	  //mysql specific
     databaseSpecificLimitBeforeStatements.put("mysql", "");
@@ -64,6 +67,7 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificBitAnd1.put("mysql", "");
     databaseSpecificBitAnd2.put("mysql", " & ");
     databaseSpecificBitAnd3.put("mysql", "");
+    databaseSpecificDummyTable.put("mysql", "");
     addDatabaseSpecificStatement("mysql", "selectNextJobsToExecute", "selectNextJobsToExecute_mysql");
     addDatabaseSpecificStatement("mysql", "selectExclusiveJobsToExecute", "selectExclusiveJobsToExecute_mysql");
     addDatabaseSpecificStatement("mysql", "selectProcessDefinitionsByQueryCriteria", "selectProcessDefinitionsByQueryCriteria_mysql");
@@ -81,6 +85,7 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificBitAnd1.put("postgres", "");
     databaseSpecificBitAnd2.put("postgres", " & ");
     databaseSpecificBitAnd3.put("postgres", "");
+    databaseSpecificDummyTable.put("postgres", "");
     addDatabaseSpecificStatement("postgres", "insertByteArray", "insertByteArray_postgres");
     addDatabaseSpecificStatement("postgres", "updateByteArray", "updateByteArray_postgres");
     addDatabaseSpecificStatement("postgres", "selectByteArray", "selectByteArray_postgres");
@@ -106,6 +111,7 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificLimitBetweenStatements.put("oracle", "");
     databaseSpecificOrderByStatements.put("oracle", defaultOrderBy);
     databaseSpecificLimitBeforeNativeQueryStatements.put("oracle", "");
+    databaseSpecificDummyTable.put("oracle", "FROM DUAL");
     databaseSpecificBitAnd1.put("oracle", "BITAND(");
     databaseSpecificBitAnd2.put("oracle", ",");
     databaseSpecificBitAnd3.put("oracle", ")");  
@@ -120,6 +126,7 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificBitAnd1.put("db2", "BITAND(");
     databaseSpecificBitAnd2.put("db2", ",");
     databaseSpecificBitAnd3.put("db2", ")");  
+    databaseSpecificDummyTable.put("db2", "FROM SYSIBM.SYSDUMMY1");
     addDatabaseSpecificStatement("db2", "selectExclusiveJobsToExecute", "selectExclusiveJobsToExecute_integerBoolean");
     addDatabaseSpecificStatement("db2", "selectExecutionByNativeQuery", "selectExecutionByNativeQuery_mssql_or_db2");
     addDatabaseSpecificStatement("db2", "selectHistoricActivityInstanceByNativeQuery", "selectHistoricActivityInstanceByNativeQuery_mssql_or_db2");
@@ -136,6 +143,7 @@ public class DbSqlSessionFactory implements SessionFactory {
     databaseSpecificBitAnd1.put("mssql", "");
     databaseSpecificBitAnd2.put("mssql", " &");
     databaseSpecificBitAnd3.put("mssql", "");  
+    databaseSpecificDummyTable.put("mssql", "");
     addDatabaseSpecificStatement("mssql", "selectExclusiveJobsToExecute", "selectExclusiveJobsToExecute_integerBoolean");
     addDatabaseSpecificStatement("mssql", "selectExecutionByNativeQuery", "selectExecutionByNativeQuery_mssql_or_db2");
     addDatabaseSpecificStatement("mssql", "selectHistoricActivityInstanceByNativeQuery", "selectHistoricActivityInstanceByNativeQuery_mssql_or_db2");

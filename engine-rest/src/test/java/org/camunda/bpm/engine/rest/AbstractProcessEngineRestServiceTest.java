@@ -59,6 +59,8 @@ public abstract class AbstractProcessEngineRestServiceTest extends
   protected static final String VARIABLE_INSTANCE_URL = SINGLE_ENGINE_URL + "/variable-instance";
   protected static final String USER_URL = SINGLE_ENGINE_URL + "/user";
   protected static final String GROUP_URL = SINGLE_ENGINE_URL + "/group";
+  protected static final String AUTHORIZATION_URL = SINGLE_ENGINE_URL + AuthorizationRestService.PATH;
+  protected static final String AUTHORIZATION_CHECK_URL = AUTHORIZATION_URL + "/check";
   
   protected String EXAMPLE_ENGINE_NAME = "anEngineName";
 
@@ -284,5 +286,13 @@ public abstract class AbstractProcessEngineRestServiceTest extends
     
     verify(mockIdentityService).createGroupQuery();
     verifyZeroInteractions(processEngine);
+  }
+  
+  @Test
+  public void testAuthorizationServiceEngineAccess() {
+    given().pathParam("name", EXAMPLE_ENGINE_NAME)
+    .then().expect()
+      .statusCode(Status.BAD_REQUEST.getStatusCode())
+    .when().get(AUTHORIZATION_CHECK_URL);    
   }
 }

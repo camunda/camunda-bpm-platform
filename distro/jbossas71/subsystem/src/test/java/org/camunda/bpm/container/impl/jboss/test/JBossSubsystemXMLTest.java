@@ -16,11 +16,14 @@
 package org.camunda.bpm.container.impl.jboss.test;
 
 import java.util.List;
+import java.util.Map;
 
+import org.camunda.bpm.container.impl.jboss.config.ManagedProcessEngineMetadata;
 import org.camunda.bpm.container.impl.jboss.extension.Attribute;
 import org.camunda.bpm.container.impl.jboss.extension.BpmPlatformExtension;
 import org.camunda.bpm.container.impl.jboss.extension.Element;
 import org.camunda.bpm.container.impl.jboss.extension.ModelConstants;
+import org.camunda.bpm.container.impl.jboss.service.MscManagedProcessEngineController;
 import org.camunda.bpm.container.impl.jboss.service.ServiceNames;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.jboss.as.controller.PathAddress;
@@ -31,6 +34,7 @@ import org.jboss.as.subsystem.test.AbstractSubsystemTest;
 import org.jboss.as.subsystem.test.KernelServices;
 import org.jboss.dmr.ModelNode;
 import org.jboss.msc.service.ServiceContainer;
+import org.jboss.msc.service.ServiceController;
 import org.jboss.msc.service.ServiceName;
 import org.junit.Assert;
 import org.junit.Test;
@@ -134,7 +138,19 @@ public class JBossSubsystemXMLTest extends AbstractSubsystemTest {
     Assert.assertNotNull("platform service should be installed", container.getService(PLATFORM_SERVICE_NAME));
     Assert.assertNotNull("process engine service should be bound in JNDI", container.getService(processEngineServiceBindingServiceName));
     
-    Assert.assertNotNull("process engine controller for engine __default is installed ", container.getService(ServiceNames.forManagedProcessEngine("__default")));
+    ServiceController<?> defaultEngineService = container.getService(ServiceNames.forManagedProcessEngine("__default"));
+    
+    Assert.assertNotNull("process engine controller for engine __default is installed ", defaultEngineService);
+    
+    ManagedProcessEngineMetadata metadata = ((MscManagedProcessEngineController) defaultEngineService.getService()).getProcessEngineMetadata();
+    Map<String, String> configurationProperties = metadata.getConfigurationProperties();
+    Assert.assertEquals("default", configurationProperties.get("job-name"));
+    Assert.assertEquals("default", configurationProperties.get("job-acquisition"));
+    Assert.assertEquals("default", configurationProperties.get("job-acquisition-name"));
+    
+    Map<String, String> foxLegacyProperties = metadata.getFoxLegacyProperties();
+    Assert.assertTrue(foxLegacyProperties.isEmpty());
+    
     Assert.assertNotNull("process engine controller for engine __test is installed ", container.getService(ServiceNames.forManagedProcessEngine("__test")));
     Assert.assertNotNull("process engine controller for engine __emptyPropertiesTag is installed ", container.getService(ServiceNames.forManagedProcessEngine("__emptyPropertiesTag")));
     Assert.assertNotNull("process engine controller for engine __noPropertiesTag is installed ", container.getService(ServiceNames.forManagedProcessEngine("__noPropertiesTag")));

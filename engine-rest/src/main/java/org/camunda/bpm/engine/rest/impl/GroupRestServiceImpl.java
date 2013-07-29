@@ -43,7 +43,7 @@ public class GroupRestServiceImpl extends AbstractRestProcessEngineAware impleme
   }
 
   public GroupResource getGroup(String id) {
-    return new GroupResourceImpl(getProcessEngine(), id);
+    return new GroupResourceImpl(getProcessEngine(), id, relativeRootResourcePath);
   }
 
   public List<GroupDto> queryGroups(UriInfo uriInfo, Integer firstResult, Integer maxResults) {
@@ -83,14 +83,10 @@ public class GroupRestServiceImpl extends AbstractRestProcessEngineAware impleme
       throw new InvalidRequestException(Status.FORBIDDEN, "Identity service implementation is read-only.");
     }
     
-    try {
-      Group newGroup = identityService.newGroup(groupDto.getId());
-      groupDto.update(newGroup);
-      identityService.saveGroup(newGroup);
+    Group newGroup = identityService.newGroup(groupDto.getId());
+    groupDto.update(newGroup);
+    identityService.saveGroup(newGroup);
       
-    } catch(RuntimeException e) {
-      throw new InvalidRequestException(Status.INTERNAL_SERVER_ERROR, "Exception while saving new group "+e.getMessage());
-    }
   }
   
   // utility methods //////////////////////////////////////
