@@ -39,7 +39,24 @@ public class DevProcessApplication extends ServletProcessApplication {
     RuntimeService runtimeService = engine.getRuntimeService();
 
     runtimeService.startProcessInstanceByKey("multipleFailingServiceTasks");
+    
+    runtimeService.startProcessInstanceByKey("TwoParallelCallActivitiesCallingDifferentProcess");
+    runtimeService.startProcessInstanceByKey("TwoParallelCallActivitiesCallingDifferentProcess");
+    runtimeService.startProcessInstanceByKey("TwoParallelCallActivitiesCallingDifferentProcess");
 
+    runtimeService.startProcessInstanceByKey("TwoParallelCallActivitiesCallingSameProcess");
+    runtimeService.startProcessInstanceByKey("TwoParallelCallActivitiesCallingSameProcess");
+    runtimeService.startProcessInstanceByKey("TwoParallelCallActivitiesCallingSameProcess");
+    runtimeService.startProcessInstanceByKey("TwoParallelCallActivitiesCallingSameProcess");
+    
+    runtimeService.startProcessInstanceByKey("CallingCallActivity");
+    runtimeService.startProcessInstanceByKey("CallingCallActivity");
+    runtimeService.startProcessInstanceByKey("CallingCallActivity");
+    runtimeService.startProcessInstanceByKey("CallingCallActivity");
+    runtimeService.startProcessInstanceByKey("CallingCallActivity");
+    runtimeService.startProcessInstanceByKey("CallingCallActivity");
+    runtimeService.startProcessInstanceByKey("CallingCallActivity");
+    
     runtimeService.startProcessInstanceByKey("OrderProcess");
     runtimeService.startProcessInstanceByKey("FailingProcess");
     runtimeService.startProcessInstanceByKey("FailingProcess");
@@ -57,6 +74,13 @@ public class DevProcessApplication extends ServletProcessApplication {
     runtimeService.startProcessInstanceByKey("FailingProcess");
     runtimeService.startProcessInstanceByKey("FailingProcess");
 
+    runtimeService.startProcessInstanceByKey("AnotherFailingProcess");
+    runtimeService.startProcessInstanceByKey("AnotherFailingProcess");
+    runtimeService.startProcessInstanceByKey("AnotherFailingProcess");
+    runtimeService.startProcessInstanceByKey("AnotherFailingProcess");
+    runtimeService.startProcessInstanceByKey("AnotherFailingProcess");
+    runtimeService.startProcessInstanceByKey("AnotherFailingProcess");
+    
     runtimeService.startProcessInstanceByKey("CallActivity");
     runtimeService.startProcessInstanceByKey("CallActivity");
     runtimeService.startProcessInstanceByKey("CallActivity");

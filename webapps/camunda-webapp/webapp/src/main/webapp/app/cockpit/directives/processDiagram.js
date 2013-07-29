@@ -18,7 +18,7 @@ ngDefine('cockpit.directives', [
     var bpmnRenderer = null;
     var zoomLevel = 1;
 
-    var selectedBpmnElementIds;
+    /*var selectedBpmnElementIds;*/
     
     $scope.$on('$destroy', function() {
       bpmnRenderer = null;
@@ -269,15 +269,18 @@ ngDefine('cockpit.directives', [
     /* Handler to handle click event on a clickable bpmn element */
     var clickHandler = function($event) {
       var selectedBpmnElement = $event.data;
-      
+      var ctrlKey = $event.ctrlKey;
+
       if ($event.ctrlKey) {
         // if the 'ctrl' key has been pushed down, then select or deselect the clicked element
         
         if ($scope.selection.view && $scope.selection.view.bpmnElements) {
           var elements = [];
-          
+
           var index = $scope.selection.view.bpmnElements.indexOf(selectedBpmnElement);
           
+          var remove = false;
+
           if (index != -1) {
             // if the clicked element is already selected then deselect it.
             angular.forEach($scope.selection.view.bpmnElements, function (element) {
@@ -286,6 +289,8 @@ ngDefine('cockpit.directives', [
               }
             });
 
+            remove = true;
+
           } else if (index == -1) {
             // if the clicked element is not already selected then select it together with other elements.
             elements.push(selectedBpmnElement);
@@ -293,33 +298,30 @@ ngDefine('cockpit.directives', [
               elements.push(element);
             });
           }
+
+          var view = $scope.selection.view = angular.extend({}, $scope.selection.view);
           
           // set the selected bpmn elements
-          $scope.selection.view = {bpmnElements: elements};
+          view['bpmnElements'] = elements;
+          view['selectedBpmnElement'] = {element: selectedBpmnElement, ctrlKey: true, remove: remove};
+          view['initialize'] = null;
+
           $scope.$apply();
           return;
         }
       }
       
-      $scope.selection.view = {bpmnElements: [ selectedBpmnElement ]};
+      $scope.selection['view'] = {};
+      $scope.selection.view['bpmnElements'] = [ selectedBpmnElement ];
+      $scope.selection.view['selectedBpmnElement'] = {element: selectedBpmnElement, ctrlKey: false, remove: false};
+      $scope.selection.view['scrollToBpmnElement'] = selectedBpmnElement;
+
       $scope.$apply();
     };
 
     /*------------------- Handle search parameter in location ---------------------*/
 
     $scope.$watch(function() { return $location.search().bpmnElements; }, function(newValue, oldValue) {
-      // if newValue and oldValue are not defined,
-      // then only initialize the array of selected
-      // bpmn element ids.
-      if (!newValue && !oldValue) {
-        selectedBpmnElementIds = [];
-        return;
-      }
-
-      if (angular.isArray(newValue)) {
-        return;
-      }
-
       function waitForBpmnElements() {
         var deferred = $q.defer();
 
@@ -332,43 +334,86 @@ ngDefine('cockpit.directives', [
         return deferred.promise;
       }
 
-      if (angular.isString(newValue)) {
-        selectedBpmnElementIds = newValue.split(',');
-        if (!bpmnElements) {
-          waitForBpmnElements().then(function(result) {
-            handleInitialSelection(result, selectedBpmnElementIds);
-          });
+      if (!newValue && oldValue) {
+        var view = $scope.selection.view = angular.extend({}, $scope.selection.view);
+        view.bpmnElements = null;
+        return;
+      }
+
+      if (newValue && angular.isArray(newValue) && !$scope.selection.view) {
+        var searchParameter = newValue;
+
+        if (bpmnElements) {
+          selectBpmnElements(bpmnElements, searchParameter);
         } else {
-          handleInitialSelection(bpmnElements, selectedBpmnElementIds);
+          waitForBpmnElements().then(function (result) {
+            selectBpmnElements(bpmnElements, searchParameter);
+          });
         }
       }
 
+      if (newValue && angular.isString(newValue)) {
+
+        var searchParameter = newValue.split(',');
+
+        if (searchParameter.length === 0) {
+          $scope.selection.view = {bpmnElements: []};
+          return;          
+        }
+
+        if (bpmnElements) {
+          selectBpmnElements(bpmnElements, searchParameter);
+        } else {
+          waitForBpmnElements().then(function (result) {
+            selectBpmnElements(bpmnElements, searchParameter);
+          });
+        }
+
+      }
     });
-    
-    function handleInitialSelection(bpmnElements, selectedBpmnElementIds) {
-      for(var i = 0, selectedBpmnElementId; !!(selectedBpmnElementId = selectedBpmnElementIds[i]); i++) {
-        var bpmnElement = bpmnElements[selectedBpmnElementId];
+
+    function selectBpmnElements (bpmnElements, searchParameter) {
+      var selectedBpmnElements = [];
+      for(var i = 0, selection; !!(selection = searchParameter[i]); i++) {
+        var bpmnElement = bpmnElements[selection];
         if (bpmnElement) {
-          $scope.selection.view.bpmnElements.push(bpmnElement);
-          selectActivity(bpmnElement);          
+          selectedBpmnElements.push(bpmnElement);
         }
       }
-      var lastBpmnElement = $scope.selection.view.bpmnElements[$scope.selection.view.bpmnElements.length-1];
-      if (lastBpmnElement) {
-        scrollTo(lastBpmnElement);  
-      }
+      $scope.selection['view'] = {};
+      $scope.selection.view['initialize'] = {bpmnElements: selectedBpmnElements}
+      $scope.selection.view['scrollToBpmnElement'] = selectedBpmnElements[selectedBpmnElements.length-1];
+      $scope.selection.view['bpmnElements'] = selectedBpmnElements;
     }
 
     function registerEventHandlersOnBaseElements() {
+      function waitForBpmnElements () {
+        var deferred = $q.defer();
+        $scope.$watch(function () { return bpmnElements; }, function (newValue) {
+          if (newValue) {
+            deferred.resolve(newValue);
+          }
+        });
+        return deferred.promise;
+      }
       if ($scope.selection) {
-        for (var key in bpmnElements) {
-          registerEventHandlersOnBaseElement(bpmnElements[key]);
+        if (bpmnElements) {
+          for (var key in bpmnElements) {
+
+            registerEventHandlersOnBaseElement(bpmnElements[key]);
+          }          
+        } else {
+          waitForBpmnElements().then(function(bpmnElements) {
+            for (var key in bpmnElements) {
+
+              registerEventHandlersOnBaseElement(bpmnElements[key]);
+            }   
+          });
         }
       }
     }
     
     function registerEventHandlersOnBaseElement(element) {
-
       if ($scope.clickableElements.indexOf(element.id) != -1) {
         $('#' + element.id)
         
@@ -398,12 +443,23 @@ ngDefine('cockpit.directives', [
     /*------------------- Handle selected activity id---------------------*/
     
     $scope.$watch('selection.view.bpmnElements', function(newValue, oldValue) {
+      var selectedBpmnElementIds = [];
+      var searchParameter = $location.search().bpmnElements;
+
+      if (searchParameter && angular.isString(searchParameter)) {
+        selectedBpmnElementIds = searchParameter.split(',');
+      } else if (searchParameter && angular.isArray(searchParameter)) {
+        selectedBpmnElementIds = angular.copy(searchParameter);
+      }
+
       if (oldValue) {
         angular.forEach(oldValue, function(bpmnElement) {
           deselectActivity(bpmnElement);
-          var index = selectedBpmnElementIds.indexOf(bpmnElement.id);
-          if (index !== -1) {
-            selectedBpmnElementIds.splice(index, 1);
+          if (selectedBpmnElementIds) {
+            var index = selectedBpmnElementIds.indexOf(bpmnElement.id);
+            if (index !== -1) {
+              selectedBpmnElementIds.splice(index, 1);
+            }
           }
         });
       }
@@ -422,7 +478,6 @@ ngDefine('cockpit.directives', [
         $location.search('bpmnElements', selectedBpmnElementIds);
       }
       $location.replace();
-      
     });
 
     function selectActivity(bpmnElement) {

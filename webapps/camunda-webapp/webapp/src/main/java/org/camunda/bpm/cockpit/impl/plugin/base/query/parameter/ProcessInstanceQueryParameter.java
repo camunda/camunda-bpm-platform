@@ -12,38 +12,112 @@
  */
 package org.camunda.bpm.cockpit.impl.plugin.base.query.parameter;
 
-import org.camunda.bpm.cockpit.db.QueryParameters;
-import org.camunda.bpm.cockpit.impl.plugin.base.dto.ProcessInstanceDto;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
-public class ProcessInstanceQueryParameter extends QueryParameters<ProcessInstanceDto> {
+import javax.ws.rs.core.MultivaluedMap;
+
+import org.camunda.bpm.cockpit.impl.plugin.base.dto.ProcessInstanceDto;
+import org.camunda.bpm.cockpit.rest.dto.AbstractRestQueryParametersDto;
+import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
+import org.camunda.bpm.engine.rest.dto.converter.StringArrayConverter;
+
+public class ProcessInstanceQueryParameter extends AbstractRestQueryParametersDto<ProcessInstanceDto> {
 
   private static final long serialVersionUID = 1L;
   
+  private static final String SORT_BY_PROCESS_INSTANCE_START_TIME = "startTime";
+  
+  private static final List<String> VALID_SORT_BY_VALUES;
+  static {
+    VALID_SORT_BY_VALUES = new ArrayList<String>();
+    VALID_SORT_BY_VALUES.add(SORT_BY_PROCESS_INSTANCE_START_TIME);
+  }
+  
+  private static final Map<String, String> ORDER_BY_VALUES;
+  static {
+    ORDER_BY_VALUES = new HashMap<String, String>();
+    ORDER_BY_VALUES.put(SORT_BY_PROCESS_INSTANCE_START_TIME, "START_TIME_");
+  }
+  
   protected String processDefinitionId;
-  protected String orderBy = "START_TIME_ desc";
+  protected String parentProcessDefinitionId;
+  protected String[] activityIdIn;
+  protected String[] activityInstanceIdIn;
+  protected String businessKey;
+  protected String parentProcessInstanceId;
   
   public ProcessInstanceQueryParameter() {
   }
   
-  public ProcessInstanceQueryParameter(int firstResult, int maxResults) {
-    this.firstResult = firstResult;
-    this.maxResults = maxResults;
+  public ProcessInstanceQueryParameter(MultivaluedMap<String, String> queryParameter) {
+    super(queryParameter);
   }
-
+  
   public String getProcessDefinitionId() {
     return processDefinitionId;
   }
 
+  @CamundaQueryParam(value="processDefinitionId")
   public void setProcessDefinitionId(String processDefinitionId) {
     this.processDefinitionId = processDefinitionId;
   }
   
-  public String getOrderBy() {
-    return orderBy;
+  public String getParentProcessDefinitionId() {
+    return parentProcessDefinitionId;
+  }
+
+  @CamundaQueryParam(value="parentProcessDefinitionId")
+  public void setParentProcessDefinitionId(String parentProcessDefinitionId) {
+    this.parentProcessDefinitionId = parentProcessDefinitionId;
   }
   
-  public void setOrderBy(String orderBy) {
-    this.orderBy = orderBy;
+  public String getParentProcessInstanceId() {
+    return parentProcessInstanceId;
+  }
+
+  @CamundaQueryParam(value="parentProcessInstanceId")
+  public void setParentProcessInstanceId(String parentProcessInstanceId) {
+    this.parentProcessInstanceId = parentProcessInstanceId;
+  }
+
+  public String[] getActivityIdIn() {
+    return activityIdIn;
+  }
+
+  @CamundaQueryParam(value="activityIdIn", converter = StringArrayConverter.class)
+  public void setActivityIdIn(String[] activityIdIn) {
+    this.activityIdIn = activityIdIn;
+  }
+
+  public String[] getActivityInstanceIdIn() {
+    return activityInstanceIdIn;
+  }
+
+  @CamundaQueryParam(value="activityInstanceIdIn", converter = StringArrayConverter.class)
+  public void setActivityInstanceIdIn(String[] activityInstanceIdIn) {
+    this.activityInstanceIdIn = activityInstanceIdIn;
+  }
+  
+  public String getBusinessKey() {
+    return businessKey;
+  }
+
+  @CamundaQueryParam(value="businessKey")
+  public void setBusinessKey(String businessKey) {
+    this.businessKey = businessKey;
+  }
+  
+  @Override
+  protected String getOrderByValue(String sortBy) {
+    return ORDER_BY_VALUES.get(sortBy);
+  }
+
+  @Override
+  protected boolean isValidSortByValue(String value) {
+    return VALID_SORT_BY_VALUES.contains(value);
   }
 
 }
