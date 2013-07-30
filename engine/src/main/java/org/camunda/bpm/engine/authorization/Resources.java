@@ -13,7 +13,7 @@
 package org.camunda.bpm.engine.authorization;
 
 /**
- * <p>The set of built-in resurce names.</p>
+ * <p>The set of built-in {@link Resource} names.</p>
  * 
  * @author Daniel Meyer
  *
