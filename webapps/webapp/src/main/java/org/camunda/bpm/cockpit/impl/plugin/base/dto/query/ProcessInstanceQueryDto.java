@@ -21,7 +21,6 @@ import javax.ws.rs.core.MultivaluedMap;
 
 import org.camunda.bpm.cockpit.impl.plugin.base.dto.ProcessInstanceDto;
 import org.camunda.bpm.cockpit.rest.dto.AbstractRestQueryParametersDto;
-import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.impl.QueryVariableValue;
 import org.camunda.bpm.engine.impl.variable.VariableTypes;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
@@ -148,7 +147,7 @@ public class ProcessInstanceQueryDto extends AbstractRestQueryParametersDto<Proc
 
   private List<QueryVariableValue> createQueryVariableValues(VariableTypes variableTypes, List<VariableQueryParameterDto> variables) {
 
-    List<QueryVariableValue> values = new ArrayList();
+    List<QueryVariableValue> values = new ArrayList<QueryVariableValue>();
 
     if (variables == null) {
       return values;

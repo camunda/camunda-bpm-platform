@@ -14,6 +14,7 @@ public class ProcessDefinitionQueryDto extends AbstractRestQueryParametersDto<Pr
   protected String parentProcessDefinitionId;
   protected String superProcessDefinitionId;
   protected String[] activityIdIn;
+  protected String businessKey;
   
   public ProcessDefinitionQueryDto() { }
   
@@ -48,6 +49,15 @@ public class ProcessDefinitionQueryDto extends AbstractRestQueryParametersDto<Pr
     this.activityIdIn = activityIdIn;
   }
 
+  public String getBusinessKey() {
+    return businessKey;
+  }
+
+  @CamundaQueryParam(value="businessKey")
+  public void setBusinessKey(String businessKey) {
+    this.businessKey = businessKey;
+  }
+  
   @Override
   protected String getOrderByValue(String sortBy) {
     return super.getOrderBy();
