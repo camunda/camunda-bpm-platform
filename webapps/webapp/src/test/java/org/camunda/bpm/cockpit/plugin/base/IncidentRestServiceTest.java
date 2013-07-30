@@ -214,6 +214,7 @@ public class IncidentRestServiceTest extends AbstractCockpitPluginTest {
     queryParameter.setActivityIdIn(activityIds);
 
     List<IncidentDto> result = resource.queryIncidents(queryParameter, null, null);
+    
     assertThat(result).isEmpty();
   }
   
@@ -225,10 +226,11 @@ public class IncidentRestServiceTest extends AbstractCockpitPluginTest {
   })
   public void testQueryWithNestedIncidents() {
     ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("NestedCallActivity");
-    ProcessInstance processInstance2 = runtimeService.createProcessInstanceQuery().processDefinitionKey("CallActivity").singleResult();
-    ProcessInstance processInstance3 = runtimeService.createProcessInstanceQuery().processDefinitionKey("FailingProcess").singleResult();
     
     helper.waitForJobExecutorToProcessAllJobs(15000);
+    
+    ProcessInstance processInstance2 = runtimeService.createProcessInstanceQuery().processDefinitionKey("CallActivity").singleResult();
+    ProcessInstance processInstance3 = runtimeService.createProcessInstanceQuery().processDefinitionKey("FailingProcess").singleResult();
 
     String[] processInstanceIds= {processInstance1.getId()};
     
@@ -266,7 +268,6 @@ public class IncidentRestServiceTest extends AbstractCockpitPluginTest {
   
   @Test
   @Deployment(resources = {
-    "processes/failing-process.bpmn",
     "processes/process-with-two-parallel-failing-services.bpmn"
   })
   public void testQueryPaginiation() {
