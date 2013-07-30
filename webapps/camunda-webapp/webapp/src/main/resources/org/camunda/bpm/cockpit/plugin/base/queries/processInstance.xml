@@ -97,27 +97,35 @@
             
       <!-- activityIds -->
       <if test="activityIdIn != null &amp;&amp; activityIdIn.length > 0">
-      and RES.ID_ in 
-        (
-          select
-            PROC_INST_ID_
-          from
-            ${prefix}ACT_RU_EXECUTION
-          where
-            ACT_ID_ in
-            <foreach item="item" index="index" collection="activityIdIn"
-                     open="(" separator="," close=")">
-              #{item}
-            </foreach>
-            <if test="processDefinitionId != null">
-            and PROC_DEF_ID_ = #{processDefinitionId}
-            </if>
-        )  
+      and EXISTS (
+                    select
+                      PROC_INST_ID_
+                    from
+                      ${prefix}ACT_RU_EXECUTION
+                    where
+                      RES.ID_ = PROC_INST_ID_
+                      and
+                      <foreach item="item" index="index" collection="activityIdIn"
+                               open="(" separator="OR" close=")">
+                        ACT_ID_ = #{item}
+                      </foreach>
+                      <if test="processDefinitionId != null">
+                      and PROC_DEF_ID_ = #{processDefinitionId}
+                      </if>                     
+                  )
       </if>
       
       <!-- parentProcessDefinitionId -->
       <if test="parentProcessDefinitionId != null">
-      and RES.SUPER_EXEC_ IN (select ID_ from ${prefix}ACT_RU_EXECUTION where PROC_DEF_ID_ = #{parentProcessDefinitionId})
+      and EXISTS (
+                    select
+                      ID_
+                    from
+                      ${prefix}ACT_RU_EXECUTION
+                    where
+                      PROC_DEF_ID_ = #{parentProcessDefinitionId}
+                      and RES.SUPER_EXEC_ = ID_
+                  )
       </if>
 
     </where>
@@ -149,10 +157,10 @@
            
       <!-- activityInstanceIds -->
       <if test="activityInstanceIdIn != null &amp;&amp; activityInstanceIdIn.length > 0">
-      and EXEC1.ACT_INST_ID_ in
+      and 
       <foreach item="item" index="index" collection="activityInstanceIdIn"
-               open="(" separator="," close=")">
-        #{item}
+               open="(" separator="or" close=")">
+        EXEC1.ACT_INST_ID_ = #{item}
       </foreach>
       </if>  
     </where>

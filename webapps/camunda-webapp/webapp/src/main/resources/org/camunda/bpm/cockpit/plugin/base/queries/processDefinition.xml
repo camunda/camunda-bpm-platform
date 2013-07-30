@@ -76,10 +76,10 @@
       
       <!-- activityIds -->
       <if test="activityIdIn != null &amp;&amp; activityIdIn.length > 0">
-        and EXEC2.ACT_ID_ in
+        and 
         <foreach item="item" index="index" collection="activityIdIn"
-                 open="(" separator="," close=")">
-          #{item}
+                 open="(" separator="or" close=")">
+          EXEC2.ACT_ID_ = #{item}
         </foreach>
       </if>
     </where>

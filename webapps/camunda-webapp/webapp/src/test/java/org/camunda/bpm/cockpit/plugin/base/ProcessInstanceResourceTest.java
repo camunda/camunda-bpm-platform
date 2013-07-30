@@ -20,17 +20,14 @@ import org.camunda.bpm.cockpit.impl.plugin.base.dto.CalledProcessInstanceDto;
 import org.camunda.bpm.cockpit.impl.plugin.base.dto.IncidentDto;
 import org.camunda.bpm.cockpit.impl.plugin.base.dto.ProcessInstanceDto;
 import org.camunda.bpm.cockpit.impl.plugin.base.query.parameter.ProcessInstanceQueryParameter;
-import org.camunda.bpm.cockpit.impl.plugin.base.resources.ProcessInstanceRestService;
 import org.camunda.bpm.cockpit.impl.plugin.base.sub.resources.ProcessInstanceResource;
 import org.camunda.bpm.cockpit.plugin.test.AbstractCockpitPluginTest;
 import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RepositoryService;
 import org.camunda.bpm.engine.RuntimeService;
-import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.runtime.ActivityInstance;
-import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
@@ -65,13 +62,14 @@ public class ProcessInstanceResourceTest extends AbstractCockpitPluginTest {
   @Deployment(resources = "processes/failing-process.bpmn")
   public void testGetIncidents() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("FailingProcess");
+    
+    helper.waitForJobExecutorToProcessAllJobs(15000);
+    
     resource = new ProcessInstanceResource(getProcessEngine().getName(), processInstance.getId());
     
     ProcessDefinition processDefinition = repositoryService
         .createProcessDefinitionQuery()
         .singleResult();
-    
-    helper.waitForJobExecutorToProcessAllJobs(15000);
     
     Job job = managementService.createJobQuery().singleResult();
       
@@ -96,14 +94,15 @@ public class ProcessInstanceResourceTest extends AbstractCockpitPluginTest {
   @Deployment(resources = {"processes/failing-process.bpmn", "processes/call-activity.bpmn"})
   public void testGetRecursivePropagatedIncident() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("CallActivity");
+    
+    helper.waitForJobExecutorToProcessAllJobs(15000);
+    
     resource = new ProcessInstanceResource(getProcessEngine().getName(), processInstance.getId());
     
     ProcessDefinition processDefinition = repositoryService
         .createProcessDefinitionQuery()
         .processDefinitionKey("CallActivity")
         .singleResult();
-    
-    helper.waitForJobExecutorToProcessAllJobs(15000);
     
     List<IncidentDto> incidents = resource.getIncidents();
     assertThat(incidents).isNotEmpty();
@@ -126,9 +125,10 @@ public class ProcessInstanceResourceTest extends AbstractCockpitPluginTest {
   @Deployment(resources = "processes/process-with-two-parallel-failing-services.bpmn")
   public void testGetTenIncidents() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("processWithTwoParallelFailingServices");
-    resource = new ProcessInstanceResource(getProcessEngine().getName(), processInstance.getId());
     
     helper.waitForJobExecutorToProcessAllJobs(15000);
+    
+    resource = new ProcessInstanceResource(getProcessEngine().getName(), processInstance.getId());
     
     List<IncidentDto> incidents = resource.getIncidents();
     assertThat(incidents).isNotEmpty();
@@ -139,23 +139,22 @@ public class ProcessInstanceResourceTest extends AbstractCockpitPluginTest {
   @Test
   @Deployment(resources = {
       "processes/two-parallel-call-activities-calling-different-process.bpmn",
-      "processes/failing-process.bpmn",
-      "processes/another-failing-process.bpmn"
+      "processes/user-task-process.bpmn",
+      "processes/another-user-task-process.bpmn"
     })
   public void testGetCalledProcessInstancesByParentProcessInstanceId() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("TwoParallelCallActivitiesCallingDifferentProcess");
+    
     resource = new ProcessInstanceResource(getProcessEngine().getName(), processInstance.getId());
     
-    helper.waitForJobExecutorToProcessAllJobs(15000);
-    
-    ProcessDefinition failingProcess = repositoryService
+    ProcessDefinition userTaskProcess = repositoryService
         .createProcessDefinitionQuery()
-        .processDefinitionKey("FailingProcess")
+        .processDefinitionKey("userTaskProcess")
         .singleResult();
     
-    ProcessDefinition anotherFailingProcess = repositoryService
+    ProcessDefinition anotherUserTaskProcess = repositoryService
         .createProcessDefinitionQuery()
-        .processDefinitionKey("AnotherFailingProcess")
+        .processDefinitionKey("anotherUserTaskProcess")
         .singleResult();
     
     ProcessInstanceQueryParameter queryParameter = new ProcessInstanceQueryParameter();
@@ -167,11 +166,11 @@ public class ProcessInstanceResourceTest extends AbstractCockpitPluginTest {
     ProcessDefinition compareWith = null;
     for (ProcessInstanceDto instance : result) {
       CalledProcessInstanceDto dto = (CalledProcessInstanceDto) instance;
-      if (dto.getProcessDefinitionId().equals(failingProcess.getId())) {
-        compareWith = failingProcess;
+      if (dto.getProcessDefinitionId().equals(userTaskProcess.getId())) {
+        compareWith = userTaskProcess;
         assertThat(dto.getCallActivityId()).isEqualTo("firstCallActivity");
-      } else if (dto.getProcessDefinitionId().equals(anotherFailingProcess.getId())) {
-        compareWith = anotherFailingProcess;
+      } else if (dto.getProcessDefinitionId().equals(anotherUserTaskProcess.getId())) {
+        compareWith = anotherUserTaskProcess;
         assertThat(dto.getCallActivityId()).isEqualTo("secondCallActivity");
       } else {
         Assert.fail("Unexpected called process instance: " + dto.getId());
@@ -188,11 +187,12 @@ public class ProcessInstanceResourceTest extends AbstractCockpitPluginTest {
   @Test
   @Deployment(resources = {
       "processes/two-parallel-call-activities-calling-different-process.bpmn",
-      "processes/failing-process.bpmn",
-      "processes/another-failing-process.bpmn"
+      "processes/user-task-process.bpmn",
+      "processes/another-user-task-process.bpmn"
     })
   public void testGetCalledProcessInstancesByParentProcessInstanceIdAndActivityInstanceId() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("TwoParallelCallActivitiesCallingDifferentProcess");
+    
     resource = new ProcessInstanceResource(getProcessEngine().getName(), processInstance.getId());
     
     ActivityInstance processInstanceActivityInstance = runtimeService.getActivityInstance(processInstance.getId());
@@ -209,8 +209,6 @@ public class ProcessInstanceResourceTest extends AbstractCockpitPluginTest {
         Assert.fail("Unexpected activity instance with activity id: " + child.getActivityId() + " and instance id: " + child.getId());
       }
     }
-    
-    helper.waitForJobExecutorToProcessAllJobs(15000);
     
     ProcessInstanceQueryParameter queryParameter1 = new ProcessInstanceQueryParameter();
     String[] activityInstanceIds1 = {firstActivityInstanceId};

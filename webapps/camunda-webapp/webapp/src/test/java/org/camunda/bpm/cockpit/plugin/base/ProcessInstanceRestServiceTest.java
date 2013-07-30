@@ -69,9 +69,7 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
     "processes/user-task-process.bpmn"
   })
   public void testQuery() {
-    startProcessInstances("userTaskProcess", 10);
-
-    helper.waitForJobExecutorToProcessAllJobs(15000);
+    startProcessInstances("userTaskProcess", 3);
 
     String processDefinitionId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
 
@@ -80,7 +78,7 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
     
     List<ProcessInstanceDto> result = resource.queryProcessInstances(queryParameter, null, null);
     assertThat(result).isNotEmpty();
-    assertThat(result).hasSize(10);
+    assertThat(result).hasSize(3);
   }
   
   @Test
@@ -88,9 +86,7 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
     "processes/user-task-process.bpmn"
   })
   public void testQueryCount() {
-    startProcessInstances("userTaskProcess", 10);
-
-    helper.waitForJobExecutorToProcessAllJobs(15000);
+    startProcessInstances("userTaskProcess", 3);
 
     String processDefinitionId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
 
@@ -99,7 +95,7 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
     
     CountResultDto result = resource.queryProcessInstancesCount(queryParameter);
     assertThat(result).isNotNull();
-    assertThat(result.getCount()).isEqualTo(10);
+    assertThat(result.getCount()).isEqualTo(3);
   }
 
   @Test
@@ -107,24 +103,22 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
     "processes/user-task-process.bpmn"
   })
   public void testQueryPagination() {
-    startProcessInstances("userTaskProcess", 10);
-
-    helper.waitForJobExecutorToProcessAllJobs(15000);
+    startProcessInstances("userTaskProcess", 5);
 
     String processDefinitionId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
     
     ProcessInstanceQueryParameter queryParameter = new ProcessInstanceQueryParameter();
     queryParameter.setProcessDefinitionId(processDefinitionId);
 
-    List<ProcessInstanceDto> result = resource.queryProcessInstances(queryParameter, 0, 5);
+    List<ProcessInstanceDto> result = resource.queryProcessInstances(queryParameter, 0, 3);
     assertThat(result).isNotEmpty();
-    assertThat(result).hasSize(5);
+    assertThat(result).hasSize(3);
 
     result = resource.queryProcessInstances(queryParameter, 2, 3);
     assertThat(result).isNotEmpty();
     assertThat(result).hasSize(3);
 
-    result = resource.queryProcessInstances(queryParameter, 6, 1);
+    result = resource.queryProcessInstances(queryParameter, 3, 1);
     assertThat(result).isNotEmpty();
     assertThat(result).hasSize(1);
   }
@@ -135,8 +129,6 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
   })
   public void testQueryWithoutAnyIncident() {
     startProcessInstances("userTaskProcess", 1);
-
-    helper.waitForJobExecutorToProcessAllJobs(15000);
 
     String processDefinitionId = repositoryService.createProcessDefinitionQuery().singleResult().getId();
     
@@ -304,9 +296,7 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
       "processes/user-task-process.bpmn"
     })
   public void testQueryByBusinessKey() {
-    startProcessInstances("userTaskProcess", 10);
-
-    helper.waitForJobExecutorToProcessAllJobs(15000);
+    startProcessInstances("userTaskProcess", 3);
 
     ProcessInstanceQueryParameter queryParameter = new ProcessInstanceQueryParameter();
     queryParameter.setBusinessKey("businessKey_2");
@@ -321,9 +311,7 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
       "processes/user-task-process.bpmn"
     })
   public void testQueryByBusinessKeyCount() {
-    startProcessInstances("userTaskProcess", 10);
-
-    helper.waitForJobExecutorToProcessAllJobs(15000);
+    startProcessInstances("userTaskProcess", 3);
 
     ProcessInstanceQueryParameter queryParameter = new ProcessInstanceQueryParameter();
     queryParameter.setBusinessKey("businessKey_2");
@@ -339,8 +327,8 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
       "processes/failing-process.bpmn"
     })
   public void testQueryByBusinessKeyWithMoreThanOneProcess() {
-    startProcessInstances("userTaskProcess", 10);
-    startProcessInstances("FailingProcess", 10);
+    startProcessInstances("userTaskProcess", 3);
+    startProcessInstances("FailingProcess", 3);
 
     helper.waitForJobExecutorToProcessAllJobs(15000);
 
@@ -358,8 +346,8 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
       "processes/failing-process.bpmn"
     })
   public void testQueryByBusinessKeyWithMoreThanOneProcessCount() {
-    startProcessInstances("userTaskProcess", 10);
-    startProcessInstances("FailingProcess", 10);
+    startProcessInstances("userTaskProcess", 3);
+    startProcessInstances("FailingProcess", 3);
 
     helper.waitForJobExecutorToProcessAllJobs(15000);
 
@@ -376,11 +364,9 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
       "processes/user-task-process.bpmn"
     })
   public void testQueryByBusinessKeyAndProcessDefinition() {
-    startProcessInstances("userTaskProcess", 10);
-
+    startProcessInstances("userTaskProcess", 3);
+    
     ProcessDefinition userTaskProcess = repositoryService.createProcessDefinitionQuery().singleResult();
-
-    helper.waitForJobExecutorToProcessAllJobs(15000);
 
     ProcessInstanceQueryParameter queryParameter = new ProcessInstanceQueryParameter();
     queryParameter.setBusinessKey("businessKey_2");
@@ -396,11 +382,9 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
       "processes/user-task-process.bpmn"
     })
   public void testQueryByBusinessKeyAndProcessDefinitionCount() {
-    startProcessInstances("userTaskProcess", 10);
-
+    startProcessInstances("userTaskProcess", 3);
+    
     ProcessDefinition userTaskProcess = repositoryService.createProcessDefinitionQuery().singleResult();
-
-    helper.waitForJobExecutorToProcessAllJobs(15000);
 
     ProcessInstanceQueryParameter queryParameter = new ProcessInstanceQueryParameter();
     queryParameter.setBusinessKey("businessKey_2");
@@ -414,13 +398,11 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
   @Test
   @Deployment(resources = {
       "processes/two-parallel-call-activities-calling-different-process.bpmn",
-      "processes/failing-process.bpmn",
-      "processes/another-failing-process.bpmn"
+      "processes/user-task-process.bpmn",
+      "processes/another-user-task-process.bpmn"
     })
   public void testQueryByActivityId() {
-    startProcessInstances("TwoParallelCallActivitiesCallingDifferentProcess", 10);
-
-    helper.waitForJobExecutorToProcessAllJobs(15000);
+    startProcessInstances("TwoParallelCallActivitiesCallingDifferentProcess", 2);
 
     ProcessInstanceQueryParameter queryParameter = new ProcessInstanceQueryParameter();
     
@@ -429,19 +411,17 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
     
     List<ProcessInstanceDto> result = resource.queryProcessInstances(queryParameter, null, null);
     assertThat(result).isNotEmpty();
-    assertThat(result).hasSize(10);
+    assertThat(result).hasSize(2);
   }
   
   @Test
   @Deployment(resources = {
       "processes/two-parallel-call-activities-calling-different-process.bpmn",
-      "processes/failing-process.bpmn",
-      "processes/another-failing-process.bpmn"
+      "processes/user-task-process.bpmn",
+      "processes/another-user-task-process.bpmn"
     })
   public void testQueryByActivityIdCount() {
-    startProcessInstances("TwoParallelCallActivitiesCallingDifferentProcess", 10);
-
-    helper.waitForJobExecutorToProcessAllJobs(15000);
+    startProcessInstances("TwoParallelCallActivitiesCallingDifferentProcess", 2);
 
     ProcessInstanceQueryParameter queryParameter = new ProcessInstanceQueryParameter();
     
@@ -450,19 +430,17 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
     
     CountResultDto result = resource.queryProcessInstancesCount(queryParameter);
     assertThat(result).isNotNull();
-    assertThat(result.getCount()).isEqualTo(10);
+    assertThat(result.getCount()).isEqualTo(2);
   }
   
   @Test
   @Deployment(resources = {
       "processes/two-parallel-call-activities-calling-different-process.bpmn",
-      "processes/failing-process.bpmn",
-      "processes/another-failing-process.bpmn"
+      "processes/user-task-process.bpmn",
+      "processes/another-user-task-process.bpmn"
     })
   public void testQueryByActivityIds() {
-    startProcessInstances("TwoParallelCallActivitiesCallingDifferentProcess", 10);
-
-    helper.waitForJobExecutorToProcessAllJobs(15000);
+    startProcessInstances("TwoParallelCallActivitiesCallingDifferentProcess", 2);
 
     ProcessInstanceQueryParameter queryParameter = new ProcessInstanceQueryParameter();
     
@@ -471,19 +449,17 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
     
     List<ProcessInstanceDto> result = resource.queryProcessInstances(queryParameter, null, null);
     assertThat(result).isNotEmpty();
-    assertThat(result).hasSize(10);
+    assertThat(result).hasSize(2);
   }
   
   @Test
   @Deployment(resources = {
       "processes/two-parallel-call-activities-calling-different-process.bpmn",
-      "processes/failing-process.bpmn",
-      "processes/another-failing-process.bpmn"
+      "processes/user-task-process.bpmn",
+      "processes/another-user-task-process.bpmn"
     })
   public void testQueryByActivityIdsCount() {
-    startProcessInstances("TwoParallelCallActivitiesCallingDifferentProcess", 10);
-
-    helper.waitForJobExecutorToProcessAllJobs(15000);
+    startProcessInstances("TwoParallelCallActivitiesCallingDifferentProcess", 2);
 
     ProcessInstanceQueryParameter queryParameter = new ProcessInstanceQueryParameter();
     
@@ -492,24 +468,22 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
     
     CountResultDto result = resource.queryProcessInstancesCount(queryParameter);
     assertThat(result).isNotNull();
-    assertThat(result.getCount()).isEqualTo(10);
+    assertThat(result.getCount()).isEqualTo(2);
   }
   
   @Test
   @Deployment(resources = {
       "processes/two-parallel-call-activities-calling-different-process.bpmn",
-      "processes/failing-process.bpmn",
-      "processes/another-failing-process.bpmn"
+      "processes/user-task-process.bpmn",
+      "processes/another-user-task-process.bpmn"
     })
   public void testQueryByActivityIdAndProcessDefinitionId() {
-    startProcessInstances("TwoParallelCallActivitiesCallingDifferentProcess", 10);
+    startProcessInstances("TwoParallelCallActivitiesCallingDifferentProcess", 2);
     
     ProcessDefinition processDef = repositoryService
         .createProcessDefinitionQuery()
         .processDefinitionKey("TwoParallelCallActivitiesCallingDifferentProcess")
         .singleResult();
-
-    helper.waitForJobExecutorToProcessAllJobs(15000);
 
     ProcessInstanceQueryParameter queryParameter = new ProcessInstanceQueryParameter();
     queryParameter.setProcessDefinitionId(processDef.getId());
@@ -518,24 +492,22 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
     
     List<ProcessInstanceDto> result = resource.queryProcessInstances(queryParameter, null, null);
     assertThat(result).isNotEmpty();
-    assertThat(result).hasSize(10);
+    assertThat(result).hasSize(2);
   }
   
   @Test
   @Deployment(resources = {
       "processes/two-parallel-call-activities-calling-different-process.bpmn",
-      "processes/failing-process.bpmn",
-      "processes/another-failing-process.bpmn"
+      "processes/user-task-process.bpmn",
+      "processes/another-user-task-process.bpmn"
     })
   public void testQueryByActivityIdAndProcessDefinitionIdCount() {
-    startProcessInstances("TwoParallelCallActivitiesCallingDifferentProcess", 10);
+    startProcessInstances("TwoParallelCallActivitiesCallingDifferentProcess", 2);
     
     ProcessDefinition processDef = repositoryService
         .createProcessDefinitionQuery()
         .processDefinitionKey("TwoParallelCallActivitiesCallingDifferentProcess")
         .singleResult();
-
-    helper.waitForJobExecutorToProcessAllJobs(15000);
 
     ProcessInstanceQueryParameter queryParameter = new ProcessInstanceQueryParameter();
     queryParameter.setProcessDefinitionId(processDef.getId());
@@ -544,191 +516,167 @@ public class ProcessInstanceRestServiceTest extends AbstractCockpitPluginTest {
     
     CountResultDto result = resource.queryProcessInstancesCount(queryParameter);
     assertThat(result).isNotNull();
-    assertThat(result.getCount()).isEqualTo(10);
+    assertThat(result.getCount()).isEqualTo(2);
   }
   
   @Test
   @Deployment(resources = {
       "processes/two-parallel-call-activities-calling-different-process.bpmn",
-      "processes/failing-process.bpmn",
-      "processes/another-failing-process.bpmn"
+      "processes/user-task-process.bpmn",
+      "processes/another-user-task-process.bpmn"
     })
   public void testQueryByParentProcessDefinitionId() {
-    startProcessInstances("TwoParallelCallActivitiesCallingDifferentProcess", 10);
-    startProcessInstances("FailingProcess", 5);
-    startProcessInstances("AnotherFailingProcess", 5);
+    startProcessInstances("TwoParallelCallActivitiesCallingDifferentProcess", 2);
 
     ProcessDefinition twoCallActivitiesProcess = repositoryService
         .createProcessDefinitionQuery()
         .processDefinitionKey("TwoParallelCallActivitiesCallingDifferentProcess")
         .singleResult();
-   
-    helper.waitForJobExecutorToProcessAllJobs(15000);
 
     ProcessInstanceQueryParameter queryParameter = new ProcessInstanceQueryParameter();
     queryParameter.setParentProcessDefinitionId(twoCallActivitiesProcess.getId());
     
     List<ProcessInstanceDto> result = resource.queryProcessInstances(queryParameter, null, null);
     assertThat(result).isNotEmpty();
-    assertThat(result).hasSize(20);
+    assertThat(result).hasSize(4);
   }
   
   @Test
   @Deployment(resources = {
       "processes/two-parallel-call-activities-calling-different-process.bpmn",
-      "processes/failing-process.bpmn",
-      "processes/another-failing-process.bpmn"
+      "processes/user-task-process.bpmn",
+      "processes/another-user-task-process.bpmn"
     })
   public void testQueryByParentProcessDefinitionIdCount() {
-    startProcessInstances("TwoParallelCallActivitiesCallingDifferentProcess", 10);
-    startProcessInstances("FailingProcess", 5);
-    startProcessInstances("AnotherFailingProcess", 5);
+    startProcessInstances("TwoParallelCallActivitiesCallingDifferentProcess", 2);
 
     ProcessDefinition twoCallActivitiesProcess = repositoryService
         .createProcessDefinitionQuery()
         .processDefinitionKey("TwoParallelCallActivitiesCallingDifferentProcess")
         .singleResult();
-   
-    helper.waitForJobExecutorToProcessAllJobs(15000);
 
     ProcessInstanceQueryParameter queryParameter = new ProcessInstanceQueryParameter();
     queryParameter.setParentProcessDefinitionId(twoCallActivitiesProcess.getId());
     
     CountResultDto result = resource.queryProcessInstancesCount(queryParameter);
     assertThat(result).isNotNull();
-    assertThat(result.getCount()).isEqualTo(20);
+    assertThat(result.getCount()).isEqualTo(4);
   }
   
   @Test
   @Deployment(resources = {
       "processes/two-parallel-call-activities-calling-different-process.bpmn",
-      "processes/failing-process.bpmn",
-      "processes/another-failing-process.bpmn"
+      "processes/user-task-process.bpmn",
+      "processes/another-user-task-process.bpmn"
     })
   public void testQueryByParentProcessDefinitionIdAndProcessDefinitionId() {
-    startProcessInstances("TwoParallelCallActivitiesCallingDifferentProcess", 10);
-    startProcessInstances("FailingProcess", 5);
-    startProcessInstances("AnotherFailingProcess", 5);
+    startProcessInstances("TwoParallelCallActivitiesCallingDifferentProcess", 2);
 
     ProcessDefinition twoCallActivitiesProcess = repositoryService
         .createProcessDefinitionQuery()
         .processDefinitionKey("TwoParallelCallActivitiesCallingDifferentProcess")
         .singleResult();
 
-    ProcessDefinition failingProcess = repositoryService
+    ProcessDefinition userTaskProcess = repositoryService
         .createProcessDefinitionQuery()
-        .processDefinitionKey("FailingProcess")
+        .processDefinitionKey("userTaskProcess")
         .singleResult();
-    
-    helper.waitForJobExecutorToProcessAllJobs(15000);
 
     ProcessInstanceQueryParameter queryParameter = new ProcessInstanceQueryParameter();
     queryParameter.setParentProcessDefinitionId(twoCallActivitiesProcess.getId());
-    queryParameter.setProcessDefinitionId(failingProcess.getId());
+    queryParameter.setProcessDefinitionId(userTaskProcess.getId());
     
     List<ProcessInstanceDto> result = resource.queryProcessInstances(queryParameter, null, null);
     assertThat(result).isNotEmpty();
-    assertThat(result).hasSize(10);
+    assertThat(result).hasSize(2);
   }
   
   @Test
   @Deployment(resources = {
       "processes/two-parallel-call-activities-calling-different-process.bpmn",
-      "processes/failing-process.bpmn",
-      "processes/another-failing-process.bpmn"
+      "processes/user-task-process.bpmn",
+      "processes/another-user-task-process.bpmn"
     })
   public void testQueryByParentProcessDefinitionIdAndProcessDefinitionIdCount() {
-    startProcessInstances("TwoParallelCallActivitiesCallingDifferentProcess", 10);
-    startProcessInstances("FailingProcess", 5);
-    startProcessInstances("AnotherFailingProcess", 5);
+    startProcessInstances("TwoParallelCallActivitiesCallingDifferentProcess", 2);
 
     ProcessDefinition twoCallActivitiesProcess = repositoryService
         .createProcessDefinitionQuery()
         .processDefinitionKey("TwoParallelCallActivitiesCallingDifferentProcess")
         .singleResult();
 
-    ProcessDefinition failingProcess = repositoryService
+    ProcessDefinition userTaskProcess = repositoryService
         .createProcessDefinitionQuery()
-        .processDefinitionKey("FailingProcess")
+        .processDefinitionKey("userTaskProcess")
         .singleResult();
     
-    helper.waitForJobExecutorToProcessAllJobs(15000);
-
     ProcessInstanceQueryParameter queryParameter = new ProcessInstanceQueryParameter();
     queryParameter.setParentProcessDefinitionId(twoCallActivitiesProcess.getId());
-    queryParameter.setProcessDefinitionId(failingProcess.getId());
+    queryParameter.setProcessDefinitionId(userTaskProcess.getId());
     
     CountResultDto result = resource.queryProcessInstancesCount(queryParameter);
     assertThat(result).isNotNull();
-    assertThat(result.getCount()).isEqualTo(10);
+    assertThat(result.getCount()).isEqualTo(2);
   }
   
   @Test
   @Deployment(resources = {
       "processes/two-parallel-call-activities-calling-different-process.bpmn",
-      "processes/failing-process.bpmn",
-      "processes/another-failing-process.bpmn"
+      "processes/user-task-process.bpmn",
+      "processes/another-user-task-process.bpmn"
     })
   public void testQueryByParentProcessDefinitionIdAndProcessDefinitionIdAndActivityId() {
-    startProcessInstances("TwoParallelCallActivitiesCallingDifferentProcess", 10);
-    startProcessInstances("FailingProcess", 5);
-    startProcessInstances("AnotherFailingProcess", 5);
+    startProcessInstances("TwoParallelCallActivitiesCallingDifferentProcess", 2);
 
     ProcessDefinition twoCallActivitiesProcess = repositoryService
         .createProcessDefinitionQuery()
         .processDefinitionKey("TwoParallelCallActivitiesCallingDifferentProcess")
         .singleResult();
 
-    ProcessDefinition failingProcess = repositoryService
+    ProcessDefinition userTaskProcess = repositoryService
         .createProcessDefinitionQuery()
-        .processDefinitionKey("FailingProcess")
+        .processDefinitionKey("userTaskProcess")
         .singleResult();
-    
-    helper.waitForJobExecutorToProcessAllJobs(15000);
 
     ProcessInstanceQueryParameter queryParameter = new ProcessInstanceQueryParameter();
     queryParameter.setParentProcessDefinitionId(twoCallActivitiesProcess.getId());
-    queryParameter.setProcessDefinitionId(failingProcess.getId());
-    String[] activityIds = {"ServiceTask_1"};
+    queryParameter.setProcessDefinitionId(userTaskProcess.getId());
+    String[] activityIds = {"theUserTask"};
     queryParameter.setActivityIdIn(activityIds);
     
     List<ProcessInstanceDto> result = resource.queryProcessInstances(queryParameter, null, null);
     assertThat(result).isNotEmpty();
-    assertThat(result).hasSize(10);
+    assertThat(result).hasSize(2);
   }
   
   @Test
   @Deployment(resources = {
       "processes/two-parallel-call-activities-calling-different-process.bpmn",
-      "processes/failing-process.bpmn",
-      "processes/another-failing-process.bpmn"
+      "processes/user-task-process.bpmn",
+      "processes/another-user-task-process.bpmn"
     })
   public void testQueryByParentProcessDefinitionIdAndProcessDefinitionIdAndActivityIdCount() {
-    startProcessInstances("TwoParallelCallActivitiesCallingDifferentProcess", 10);
-    startProcessInstances("FailingProcess", 5);
-    startProcessInstances("AnotherFailingProcess", 5);
+    startProcessInstances("TwoParallelCallActivitiesCallingDifferentProcess", 2);
 
     ProcessDefinition twoCallActivitiesProcess = repositoryService
         .createProcessDefinitionQuery()
         .processDefinitionKey("TwoParallelCallActivitiesCallingDifferentProcess")
         .singleResult();
 
-    ProcessDefinition failingProcess = repositoryService
+    ProcessDefinition userTaskProcess = repositoryService
         .createProcessDefinitionQuery()
-        .processDefinitionKey("FailingProcess")
+        .processDefinitionKey("userTaskProcess")
         .singleResult();
     
-    helper.waitForJobExecutorToProcessAllJobs(15000);
-
     ProcessInstanceQueryParameter queryParameter = new ProcessInstanceQueryParameter();
     queryParameter.setParentProcessDefinitionId(twoCallActivitiesProcess.getId());
-    queryParameter.setProcessDefinitionId(failingProcess.getId());
-    String[] activityIds = {"ServiceTask_1"};
+    queryParameter.setProcessDefinitionId(userTaskProcess.getId());
+    String[] activityIds = {"theUserTask"};
     queryParameter.setActivityIdIn(activityIds);
     
     CountResultDto result = resource.queryProcessInstancesCount(queryParameter);
     assertThat(result).isNotNull();
-    assertThat(result.getCount()).isEqualTo(10);
+    assertThat(result.getCount()).isEqualTo(2);
   }
   
 }

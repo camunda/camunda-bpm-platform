@@ -25,8 +25,6 @@ public class ProcessDefinitionResourceTest extends AbstractCockpitPluginTest {
   private ProcessEngine processEngine;
   private RuntimeService runtimeService;
   private RepositoryService repositoryService;
-  private JobExecutorHelper helper;
-
   private ProcessDefinitionResource resource;
   
   @Before
@@ -35,25 +33,22 @@ public class ProcessDefinitionResourceTest extends AbstractCockpitPluginTest {
 
     processEngine = getProcessEngine();
 
-    helper = new JobExecutorHelper(processEngine);
-
     runtimeService = processEngine.getRuntimeService();
     repositoryService = processEngine.getRepositoryService();
   }
   
   @Test
   @Deployment(resources = {
-    "processes/failing-process.bpmn",
-    "processes/call-activity.bpmn"
+    "processes/user-task-process.bpmn",
+    "processes/calling-user-task-process.bpmn"
   })
   public void testCalledProcessDefinitionBySuperProcessDefinitionId() {
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("CallActivity");
-    resource = new ProcessDefinitionResource(getProcessEngine().getName(), processInstance.getProcessDefinitionId());
-
-    helper.waitForJobExecutorToProcessAllJobs(15000);
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("CallingUserTaskProcess");
     
-    ProcessDefinition failingProcess = repositoryService.createProcessDefinitionQuery()
-        .processDefinitionKey("FailingProcess")
+    resource = new ProcessDefinitionResource(getProcessEngine().getName(), processInstance.getProcessDefinitionId());
+  
+    ProcessDefinition userTaskProcess = repositoryService.createProcessDefinitionQuery()
+        .processDefinitionKey("userTaskProcess")
         .singleResult();
 
     ProcessDefinitionQueryParameter queryParameter = new ProcessDefinitionQueryParameter();
@@ -64,10 +59,10 @@ public class ProcessDefinitionResourceTest extends AbstractCockpitPluginTest {
     
     ProcessDefinitionDto dto = result.get(0);
     
-    assertThat(dto.getId()).isEqualTo(failingProcess.getId());
-    assertThat(dto.getKey()).isEqualTo(failingProcess.getKey());
-    assertThat(dto.getName()).isEqualTo(failingProcess.getName());
-    assertThat(dto.getVersion()).isEqualTo(failingProcess.getVersion());
+    assertThat(dto.getId()).isEqualTo(userTaskProcess.getId());
+    assertThat(dto.getKey()).isEqualTo(userTaskProcess.getKey());
+    assertThat(dto.getName()).isEqualTo(userTaskProcess.getName());
+    assertThat(dto.getVersion()).isEqualTo(userTaskProcess.getVersion());
     assertThat(dto.getCalledFromActivityIds()).hasSize(1);
     
     String calledFrom = dto.getCalledFromActivityIds().get(0);
@@ -78,17 +73,16 @@ public class ProcessDefinitionResourceTest extends AbstractCockpitPluginTest {
   
   @Test
   @Deployment(resources = {
-    "processes/failing-process.bpmn",
+      "processes/user-task-process.bpmn",
     "processes/two-parallel-call-activities-calling-same-process.bpmn"
   })
   public void testCalledProcessDefinitionBySuperProcessDefinitionIdWithTwoActivityCallingSameProcess() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("TwoParallelCallActivitiesCallingSameProcess");
+    
     resource = new ProcessDefinitionResource(getProcessEngine().getName(), processInstance.getProcessDefinitionId());
     
-    helper.waitForJobExecutorToProcessAllJobs(15000);
-    
-    ProcessDefinition failingProcess = repositoryService.createProcessDefinitionQuery()
-        .processDefinitionKey("FailingProcess")
+    ProcessDefinition userTaskProcess = repositoryService.createProcessDefinitionQuery()
+        .processDefinitionKey("userTaskProcess")
         .singleResult();
 
     ProcessDefinitionQueryParameter queryParameter = new ProcessDefinitionQueryParameter();
@@ -99,10 +93,10 @@ public class ProcessDefinitionResourceTest extends AbstractCockpitPluginTest {
     
     ProcessDefinitionDto dto = result.get(0);
     
-    assertThat(dto.getId()).isEqualTo(failingProcess.getId());
-    assertThat(dto.getKey()).isEqualTo(failingProcess.getKey());
-    assertThat(dto.getName()).isEqualTo(failingProcess.getName());
-    assertThat(dto.getVersion()).isEqualTo(failingProcess.getVersion());
+    assertThat(dto.getId()).isEqualTo(userTaskProcess.getId());
+    assertThat(dto.getKey()).isEqualTo(userTaskProcess.getKey());
+    assertThat(dto.getName()).isEqualTo(userTaskProcess.getName());
+    assertThat(dto.getVersion()).isEqualTo(userTaskProcess.getVersion());
     assertThat(dto.getCalledFromActivityIds()).hasSize(2);
     
     for (String activityId : dto.getCalledFromActivityIds()) {
@@ -118,21 +112,19 @@ public class ProcessDefinitionResourceTest extends AbstractCockpitPluginTest {
   
   @Test
   @Deployment(resources = {
-    "processes/failing-process.bpmn",
+    "processes/user-task-process.bpmn",
     "processes/two-parallel-call-activities-calling-same-process.bpmn",
-    "processes/call-activity.bpmn"
+    "processes/calling-user-task-process.bpmn"
   })
   public void testCalledProcessDefinitionByCallingSameProcessFromDifferentProcessDefinitions() {
     ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("TwoParallelCallActivitiesCallingSameProcess");
     ProcessDefinitionResource resource1 = new ProcessDefinitionResource(getProcessEngine().getName(), processInstance1.getProcessDefinitionId());
     
-    ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("CallActivity");
+    ProcessInstance processInstance2 = runtimeService.startProcessInstanceByKey("CallingUserTaskProcess");
     ProcessDefinitionResource resource2 = new ProcessDefinitionResource(getProcessEngine().getName(), processInstance2.getProcessDefinitionId());
 
-    helper.waitForJobExecutorToProcessAllJobs(15000);
-    
-    ProcessDefinition failingProcess = repositoryService.createProcessDefinitionQuery()
-        .processDefinitionKey("FailingProcess")
+    ProcessDefinition userTaskProcess = repositoryService.createProcessDefinitionQuery()
+        .processDefinitionKey("userTaskProcess")
         .singleResult();
 
     ProcessDefinitionQueryParameter queryParameter1 = new ProcessDefinitionQueryParameter();
@@ -143,10 +135,10 @@ public class ProcessDefinitionResourceTest extends AbstractCockpitPluginTest {
     
     ProcessDefinitionDto dto1 = result1.get(0);
     
-    assertThat(dto1.getId()).isEqualTo(failingProcess.getId());
-    assertThat(dto1.getKey()).isEqualTo(failingProcess.getKey());
-    assertThat(dto1.getName()).isEqualTo(failingProcess.getName());
-    assertThat(dto1.getVersion()).isEqualTo(failingProcess.getVersion());
+    assertThat(dto1.getId()).isEqualTo(userTaskProcess.getId());
+    assertThat(dto1.getKey()).isEqualTo(userTaskProcess.getKey());
+    assertThat(dto1.getName()).isEqualTo(userTaskProcess.getName());
+    assertThat(dto1.getVersion()).isEqualTo(userTaskProcess.getVersion());
     assertThat(dto1.getCalledFromActivityIds()).hasSize(2);
     
     for (String activityId : dto1.getCalledFromActivityIds()) {
@@ -167,10 +159,10 @@ public class ProcessDefinitionResourceTest extends AbstractCockpitPluginTest {
     
     ProcessDefinitionDto dto2 = result2.get(0);
     
-    assertThat(dto2.getId()).isEqualTo(failingProcess.getId());
-    assertThat(dto2.getKey()).isEqualTo(failingProcess.getKey());
-    assertThat(dto2.getName()).isEqualTo(failingProcess.getName());
-    assertThat(dto2.getVersion()).isEqualTo(failingProcess.getVersion());
+    assertThat(dto2.getId()).isEqualTo(userTaskProcess.getId());
+    assertThat(dto2.getKey()).isEqualTo(userTaskProcess.getKey());
+    assertThat(dto2.getName()).isEqualTo(userTaskProcess.getName());
+    assertThat(dto2.getVersion()).isEqualTo(userTaskProcess.getVersion());
     assertThat(dto2.getCalledFromActivityIds()).hasSize(1);
     
     String calledFrom = dto2.getCalledFromActivityIds().get(0);
@@ -180,22 +172,21 @@ public class ProcessDefinitionResourceTest extends AbstractCockpitPluginTest {
   
   @Test
   @Deployment(resources = {
-    "processes/failing-process.bpmn",
-    "processes/another-failing-process.bpmn",
+    "processes/user-task-process.bpmn",
+    "processes/another-user-task-process.bpmn",
     "processes/two-parallel-call-activities-calling-different-process.bpmn"
   })
   public void testCalledProcessDefinitionByCallingDifferentProcessFromSameProcessDefinitions() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("TwoParallelCallActivitiesCallingDifferentProcess");
+    
     resource = new ProcessDefinitionResource(getProcessEngine().getName(), processInstance.getProcessDefinitionId());
     
-    helper.waitForJobExecutorToProcessAllJobs(15000);
-    
-    ProcessDefinition failingProcess = repositoryService.createProcessDefinitionQuery()
-        .processDefinitionKey("FailingProcess")
+    ProcessDefinition userTaskProcess = repositoryService.createProcessDefinitionQuery()
+        .processDefinitionKey("userTaskProcess")
         .singleResult();
 
-    ProcessDefinition anotherFailingProcess = repositoryService.createProcessDefinitionQuery()
-        .processDefinitionKey("AnotherFailingProcess")
+    ProcessDefinition anotherUserTaskProcess = repositoryService.createProcessDefinitionQuery()
+        .processDefinitionKey("anotherUserTaskProcess")
         .singleResult();
     
     ProcessDefinitionQueryParameter queryParameter = new ProcessDefinitionQueryParameter();
@@ -207,16 +198,16 @@ public class ProcessDefinitionResourceTest extends AbstractCockpitPluginTest {
     ProcessDefinition compareWith = null;
     for (ProcessDefinitionDto dto : result) {
       String id = dto.getId();
-      if (id.equals(failingProcess.getId())) {
-        compareWith = failingProcess;
+      if (id.equals(userTaskProcess.getId())) {
+        compareWith = userTaskProcess;
         assertThat(dto.getCalledFromActivityIds()).hasSize(1);
         
         String calledFrom = dto.getCalledFromActivityIds().get(0);
         
         assertThat(calledFrom).isEqualTo("firstCallActivity");
         
-      } else if (id.equals(anotherFailingProcess.getId())) {
-        compareWith = anotherFailingProcess;
+      } else if (id.equals(anotherUserTaskProcess.getId())) {
+        compareWith = anotherUserTaskProcess;
         assertThat(dto.getCalledFromActivityIds()).hasSize(1);
         
         String calledFrom = dto.getCalledFromActivityIds().get(0);
@@ -237,20 +228,18 @@ public class ProcessDefinitionResourceTest extends AbstractCockpitPluginTest {
   
   @Test
   @Deployment(resources = {
-    "processes/failing-process.bpmn",
-    "processes/process-with-two-parallel-failing-services.bpmn",
+    "processes/user-task-process.bpmn",
+    "processes/another-user-task-process.bpmn",
     "processes/dynamic-call-activity.bpmn"
   })
   public void testCalledProcessDefinitionByCallingDifferentProcessFromSameCallActivity() {
     Map<String, Object> vars1 = new HashMap<String, Object>();
-    vars1.put("callProcess", "FailingProcess");
+    vars1.put("callProcess", "userTaskProcess");
     runtimeService.startProcessInstanceByKey("DynamicCallActivity", vars1);
 
     Map<String, Object> vars2 = new HashMap<String, Object>();
-    vars2.put("callProcess", "processWithTwoParallelFailingServices");
+    vars2.put("callProcess", "anotherUserTaskProcess");
     runtimeService.startProcessInstanceByKey("DynamicCallActivity", vars2);
-    
-    helper.waitForJobExecutorToProcessAllJobs(15000);
     
     ProcessDefinition dynamicCallActivity = repositoryService.createProcessDefinitionQuery()
         .processDefinitionKey("DynamicCallActivity")
@@ -258,12 +247,12 @@ public class ProcessDefinitionResourceTest extends AbstractCockpitPluginTest {
     
     resource = new ProcessDefinitionResource(getProcessEngine().getName(), dynamicCallActivity.getId());
     
-    ProcessDefinition failingProcess = repositoryService.createProcessDefinitionQuery()
-        .processDefinitionKey("FailingProcess")
+    ProcessDefinition userTaskProcess = repositoryService.createProcessDefinitionQuery()
+        .processDefinitionKey("userTaskProcess")
         .singleResult();
 
-    ProcessDefinition processWithTwoParallelFailingServices = repositoryService.createProcessDefinitionQuery()
-        .processDefinitionKey("processWithTwoParallelFailingServices")
+    ProcessDefinition anotherUserTaskProcess = repositoryService.createProcessDefinitionQuery()
+        .processDefinitionKey("anotherUserTaskProcess")
         .singleResult();
     
     ProcessDefinitionQueryParameter queryParameter = new ProcessDefinitionQueryParameter();
@@ -275,10 +264,10 @@ public class ProcessDefinitionResourceTest extends AbstractCockpitPluginTest {
     ProcessDefinition compareWith = null;
     for (ProcessDefinitionDto dto : result) {
       String id = dto.getId();
-      if (id.equals(failingProcess.getId())) {
-        compareWith = failingProcess;
-      } else if (id.equals(processWithTwoParallelFailingServices.getId())) {
-        compareWith = processWithTwoParallelFailingServices;
+      if (id.equals(userTaskProcess.getId())) {
+        compareWith = userTaskProcess;
+      } else if (id.equals(anotherUserTaskProcess.getId())) {
+        compareWith = anotherUserTaskProcess;
       } else {
         Assert.fail("Unexpected process definition: " + id);
       }
@@ -297,24 +286,24 @@ public class ProcessDefinitionResourceTest extends AbstractCockpitPluginTest {
   
   @Test
   @Deployment(resources = {
-      "processes/failing-process.bpmn",
-      "processes/call-activity.bpmn",
-      "processes/nested-call-activity.bpmn"
+      "processes/user-task-process.bpmn",
+      "processes/calling-user-task-process.bpmn",
+      "processes/nested-calling-user-task-process.bpmn"
     })
   public void testCalledProcessDefinitionQueryBySuperProcessDefinitionId() {
-    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("NestedCallActivity");
-    
-    ProcessDefinition callActivityProcess = repositoryService
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("NestedCallingUserTaskProcess");
+       
+    ProcessDefinition callingUserTaskProcess = repositoryService
         .createProcessDefinitionQuery()
-        .processDefinitionKey("CallActivity")
+        .processDefinitionKey("CallingUserTaskProcess")
         .singleResult();
     
-    ProcessDefinition failingProcess = repositoryService
+    ProcessDefinition userTaskProcess = repositoryService
         .createProcessDefinitionQuery()
-        .processDefinitionKey("FailingProcess")
+        .processDefinitionKey("userTaskProcess")
         .singleResult();
     
-    resource = new ProcessDefinitionResource(getProcessEngine().getName(), callActivityProcess.getId());
+    resource = new ProcessDefinitionResource(getProcessEngine().getName(), callingUserTaskProcess.getId());
     ProcessDefinitionQueryParameter queryParameter = new ProcessDefinitionQueryParameter();
     queryParameter.setSuperProcessDefinitionId(processInstance.getProcessDefinitionId());
     
@@ -324,10 +313,10 @@ public class ProcessDefinitionResourceTest extends AbstractCockpitPluginTest {
     
     ProcessDefinitionDto dto = result.get(0);
     
-    assertThat(dto.getId()).isEqualTo(failingProcess.getId());
-    assertThat(dto.getKey()).isEqualTo(failingProcess.getKey());
-    assertThat(dto.getName()).isEqualTo(failingProcess.getName());
-    assertThat(dto.getVersion()).isEqualTo(failingProcess.getVersion());
+    assertThat(dto.getId()).isEqualTo(userTaskProcess.getId());
+    assertThat(dto.getKey()).isEqualTo(userTaskProcess.getKey());
+    assertThat(dto.getName()).isEqualTo(userTaskProcess.getName());
+    assertThat(dto.getVersion()).isEqualTo(userTaskProcess.getVersion());
     assertThat(dto.getCalledFromActivityIds()).hasSize(1);
     
     String calledFrom = dto.getCalledFromActivityIds().get(0);
@@ -337,22 +326,20 @@ public class ProcessDefinitionResourceTest extends AbstractCockpitPluginTest {
   
   @Test
   @Deployment(resources = {
-    "processes/failing-process.bpmn",
-    "processes/another-failing-process.bpmn",
+    "processes/user-task-process.bpmn",
+    "processes/another-user-task-process.bpmn",
     "processes/two-parallel-call-activities-calling-different-process.bpmn"
   })
   public void testCalledProcessDefinitionQueryByActivityId() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("TwoParallelCallActivitiesCallingDifferentProcess");
     resource = new ProcessDefinitionResource(getProcessEngine().getName(), processInstance.getProcessDefinitionId());
     
-    helper.waitForJobExecutorToProcessAllJobs(15000);
-    
-    ProcessDefinition failingProcess = repositoryService.createProcessDefinitionQuery()
-        .processDefinitionKey("FailingProcess")
+    ProcessDefinition userTaskProcess = repositoryService.createProcessDefinitionQuery()
+        .processDefinitionKey("userTaskProcess")
         .singleResult();
 
-    ProcessDefinition anotherFailingProcess = repositoryService.createProcessDefinitionQuery()
-        .processDefinitionKey("AnotherFailingProcess")
+    ProcessDefinition anotherUserTaskProcess = repositoryService.createProcessDefinitionQuery()
+        .processDefinitionKey("anotherUserTaskProcess")
         .singleResult();
     
     ProcessDefinitionQueryParameter queryParameter1 = new ProcessDefinitionQueryParameter();
@@ -365,10 +352,10 @@ public class ProcessDefinitionResourceTest extends AbstractCockpitPluginTest {
     
     ProcessDefinitionDto dto1 = result1.get(0);
     
-    assertThat(dto1.getId()).isEqualTo(failingProcess.getId());
-    assertThat(dto1.getKey()).isEqualTo(failingProcess.getKey());
-    assertThat(dto1.getName()).isEqualTo(failingProcess.getName());
-    assertThat(dto1.getVersion()).isEqualTo(failingProcess.getVersion());
+    assertThat(dto1.getId()).isEqualTo(userTaskProcess.getId());
+    assertThat(dto1.getKey()).isEqualTo(userTaskProcess.getKey());
+    assertThat(dto1.getName()).isEqualTo(userTaskProcess.getName());
+    assertThat(dto1.getVersion()).isEqualTo(userTaskProcess.getVersion());
     assertThat(dto1.getCalledFromActivityIds()).hasSize(1);
     
     String calledFrom1 = dto1.getCalledFromActivityIds().get(0);
@@ -385,10 +372,10 @@ public class ProcessDefinitionResourceTest extends AbstractCockpitPluginTest {
     
     ProcessDefinitionDto dto2 = result2.get(0);
     
-    assertThat(dto2.getId()).isEqualTo(anotherFailingProcess.getId());
-    assertThat(dto2.getKey()).isEqualTo(anotherFailingProcess.getKey());
-    assertThat(dto2.getName()).isEqualTo(anotherFailingProcess.getName());
-    assertThat(dto2.getVersion()).isEqualTo(anotherFailingProcess.getVersion());
+    assertThat(dto2.getId()).isEqualTo(anotherUserTaskProcess.getId());
+    assertThat(dto2.getKey()).isEqualTo(anotherUserTaskProcess.getKey());
+    assertThat(dto2.getName()).isEqualTo(anotherUserTaskProcess.getName());
+    assertThat(dto2.getVersion()).isEqualTo(anotherUserTaskProcess.getVersion());
     assertThat(dto2.getCalledFromActivityIds()).hasSize(1);
     
     String calledFrom2 = dto2.getCalledFromActivityIds().get(0);
