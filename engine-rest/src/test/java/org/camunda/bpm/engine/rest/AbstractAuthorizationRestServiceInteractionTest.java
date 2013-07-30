@@ -365,7 +365,7 @@ public abstract class AbstractAuthorizationRestServiceInteractionTest extends Ab
     given()
         .pathParam("id", MockProvider.EXAMPLE_AUTHORIZATION_ID)
     .then().expect()
-        .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+        .statusCode(Status.NOT_FOUND.getStatusCode()).contentType(ContentType.JSON)
         .body("message", equalTo("Authorization with id "+MockProvider.EXAMPLE_AUTHORIZATION_ID+" does not exist."))
     .when()
         .delete(AUTH_RESOURCE_PATH);
@@ -421,7 +421,7 @@ public abstract class AbstractAuthorizationRestServiceInteractionTest extends Ab
         .pathParam("id", MockProvider.EXAMPLE_AUTHORIZATION_ID)
         .body(dto).contentType(ContentType.JSON)
     .then().expect()
-        .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+        .statusCode(Status.NOT_FOUND.getStatusCode()).contentType(ContentType.JSON)
         .body("message", equalTo("Authorization with id "+MockProvider.EXAMPLE_AUTHORIZATION_ID+" does not exist."))
     .when()
         .delete(AUTH_RESOURCE_PATH);
@@ -467,7 +467,7 @@ public abstract class AbstractAuthorizationRestServiceInteractionTest extends Ab
     given()
         .pathParam("id", MockProvider.EXAMPLE_AUTHORIZATION_ID)
     .then().expect()
-        .statusCode(Status.BAD_REQUEST.getStatusCode()).contentType(ContentType.JSON)
+        .statusCode(Status.NOT_FOUND.getStatusCode()).contentType(ContentType.JSON)
         .body("message", equalTo("Authorization with id "+MockProvider.EXAMPLE_AUTHORIZATION_ID+" does not exist."))
     .when()
         .get(AUTH_RESOURCE_PATH);
