@@ -32,7 +32,7 @@
     from ACT_RE_PROCDEF procdef
   </select>
 
-  <select id="selectCalledProcessDefinitions" parameterType="org.camunda.bpm.cockpit.impl.plugin.base.query.parameter.ProcessDefinitionQueryParameter"
+  <select id="selectCalledProcessDefinitions" parameterType="org.camunda.bpm.cockpit.impl.plugin.base.dto.query.ProcessDefinitionQueryDto"
           resultMap="calledProcessDefinitionMap">
     select RES.ID_, RES.KEY_, RES.NAME_, RES.VERSION_, EXEC2.ACT_ID_
     <include refid="selectCalledProcesses"/>

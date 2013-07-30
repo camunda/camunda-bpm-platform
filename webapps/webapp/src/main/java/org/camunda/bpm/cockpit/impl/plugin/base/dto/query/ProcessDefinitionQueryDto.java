@@ -1,4 +1,4 @@
-package org.camunda.bpm.cockpit.impl.plugin.base.query.parameter;
+package org.camunda.bpm.cockpit.impl.plugin.base.dto.query;
 
 import javax.ws.rs.core.MultivaluedMap;
 
@@ -7,7 +7,7 @@ import org.camunda.bpm.cockpit.rest.dto.AbstractRestQueryParametersDto;
 import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
 import org.camunda.bpm.engine.rest.dto.converter.StringArrayConverter;
 
-public class ProcessDefinitionQueryParameter extends AbstractRestQueryParametersDto<ProcessDefinitionDto> {
+public class ProcessDefinitionQueryDto extends AbstractRestQueryParametersDto<ProcessDefinitionDto> {
 
   private static final long serialVersionUID = 1L;
   
@@ -15,9 +15,9 @@ public class ProcessDefinitionQueryParameter extends AbstractRestQueryParameters
   protected String superProcessDefinitionId;
   protected String[] activityIdIn;
   
-  public ProcessDefinitionQueryParameter() { }
+  public ProcessDefinitionQueryDto() { }
   
-  public ProcessDefinitionQueryParameter(MultivaluedMap<String, String> queryParameters) {
+  public ProcessDefinitionQueryDto(MultivaluedMap<String, String> queryParameters) {
     super(queryParameters);
   }
 

@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.camunda.bpm.cockpit.impl.plugin.base.dto.ProcessDefinitionDto;
-import org.camunda.bpm.cockpit.impl.plugin.base.query.parameter.ProcessDefinitionQueryParameter;
+import org.camunda.bpm.cockpit.impl.plugin.base.dto.query.ProcessDefinitionQueryDto;
 import org.camunda.bpm.cockpit.impl.plugin.base.sub.resources.ProcessDefinitionResource;
 import org.camunda.bpm.cockpit.plugin.test.AbstractCockpitPluginTest;
 import org.camunda.bpm.engine.ProcessEngine;
@@ -56,7 +56,7 @@ public class ProcessDefinitionResourceTest extends AbstractCockpitPluginTest {
         .processDefinitionKey("FailingProcess")
         .singleResult();
 
-    ProcessDefinitionQueryParameter queryParameter = new ProcessDefinitionQueryParameter();
+    ProcessDefinitionQueryDto queryParameter = new ProcessDefinitionQueryDto();
     
     List<ProcessDefinitionDto> result = resource.queryCalledProcessDefinitions(queryParameter);
     assertThat(result).isNotEmpty();
@@ -91,7 +91,7 @@ public class ProcessDefinitionResourceTest extends AbstractCockpitPluginTest {
         .processDefinitionKey("FailingProcess")
         .singleResult();
 
-    ProcessDefinitionQueryParameter queryParameter = new ProcessDefinitionQueryParameter();
+    ProcessDefinitionQueryDto queryParameter = new ProcessDefinitionQueryDto();
     
     List<ProcessDefinitionDto> result = resource.queryCalledProcessDefinitions(queryParameter);
     assertThat(result).isNotEmpty();
@@ -135,7 +135,7 @@ public class ProcessDefinitionResourceTest extends AbstractCockpitPluginTest {
         .processDefinitionKey("FailingProcess")
         .singleResult();
 
-    ProcessDefinitionQueryParameter queryParameter1 = new ProcessDefinitionQueryParameter();
+    ProcessDefinitionQueryDto queryParameter1 = new ProcessDefinitionQueryDto();
     
     List<ProcessDefinitionDto> result1 = resource1.queryCalledProcessDefinitions(queryParameter1);
     assertThat(result1).isNotEmpty();
@@ -159,7 +159,7 @@ public class ProcessDefinitionResourceTest extends AbstractCockpitPluginTest {
       }
     }
     
-    ProcessDefinitionQueryParameter queryParameter2 = new ProcessDefinitionQueryParameter();
+    ProcessDefinitionQueryDto queryParameter2 = new ProcessDefinitionQueryDto();
     
     List<ProcessDefinitionDto> result2 = resource2.queryCalledProcessDefinitions(queryParameter2);
     assertThat(result2).isNotEmpty();
@@ -198,7 +198,7 @@ public class ProcessDefinitionResourceTest extends AbstractCockpitPluginTest {
         .processDefinitionKey("AnotherFailingProcess")
         .singleResult();
     
-    ProcessDefinitionQueryParameter queryParameter = new ProcessDefinitionQueryParameter();
+    ProcessDefinitionQueryDto queryParameter = new ProcessDefinitionQueryDto();
     
     List<ProcessDefinitionDto> result = resource.queryCalledProcessDefinitions(queryParameter);
     assertThat(result).isNotEmpty();
@@ -266,7 +266,7 @@ public class ProcessDefinitionResourceTest extends AbstractCockpitPluginTest {
         .processDefinitionKey("processWithTwoParallelFailingServices")
         .singleResult();
     
-    ProcessDefinitionQueryParameter queryParameter = new ProcessDefinitionQueryParameter();
+    ProcessDefinitionQueryDto queryParameter = new ProcessDefinitionQueryDto();
     
     List<ProcessDefinitionDto> result = resource.queryCalledProcessDefinitions(queryParameter);
     assertThat(result).isNotEmpty();
@@ -315,7 +315,7 @@ public class ProcessDefinitionResourceTest extends AbstractCockpitPluginTest {
         .singleResult();
     
     resource = new ProcessDefinitionResource(getProcessEngine().getName(), callActivityProcess.getId());
-    ProcessDefinitionQueryParameter queryParameter = new ProcessDefinitionQueryParameter();
+    ProcessDefinitionQueryDto queryParameter = new ProcessDefinitionQueryDto();
     queryParameter.setSuperProcessDefinitionId(processInstance.getProcessDefinitionId());
     
     List<ProcessDefinitionDto> result = resource.queryCalledProcessDefinitions(queryParameter);
@@ -355,7 +355,7 @@ public class ProcessDefinitionResourceTest extends AbstractCockpitPluginTest {
         .processDefinitionKey("AnotherFailingProcess")
         .singleResult();
     
-    ProcessDefinitionQueryParameter queryParameter1 = new ProcessDefinitionQueryParameter();
+    ProcessDefinitionQueryDto queryParameter1 = new ProcessDefinitionQueryDto();
     String[] activityIds1 = {"firstCallActivity"};
     queryParameter1.setActivityIdIn(activityIds1);
     
@@ -375,7 +375,7 @@ public class ProcessDefinitionResourceTest extends AbstractCockpitPluginTest {
     
     assertThat(calledFrom1).isEqualTo("firstCallActivity");
     
-    ProcessDefinitionQueryParameter queryParameter2 = new ProcessDefinitionQueryParameter();
+    ProcessDefinitionQueryDto queryParameter2 = new ProcessDefinitionQueryDto();
     String[] activityIds2 = {"secondCallActivity"};
     queryParameter2.setActivityIdIn(activityIds2);
     
@@ -395,7 +395,7 @@ public class ProcessDefinitionResourceTest extends AbstractCockpitPluginTest {
     
     assertThat(calledFrom2).isEqualTo("secondCallActivity");
     
-    ProcessDefinitionQueryParameter queryParameter3 = new ProcessDefinitionQueryParameter();
+    ProcessDefinitionQueryDto queryParameter3 = new ProcessDefinitionQueryDto();
     String[] activityIds3 = {"firstCallActivity", "secondCallActivity"};
     queryParameter3.setActivityIdIn(activityIds3);
     

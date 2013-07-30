@@ -13,7 +13,7 @@
       <result property="incidentCount" column="INCIDENT_COUNT_" jdbcType="INTEGER"/>
     </collection>
   </resultMap>
-  
+
   <resultMap id="calledProcessInstanceMap" type="org.camunda.bpm.cockpit.impl.plugin.base.dto.CalledProcessInstanceDto">
     <id property="id" column="ID_" jdbcType="VARCHAR" />
     <result property="processDefinitionId" column="SUPER_PROC_DEF_ID_" jdbcType="VARCHAR"/>
@@ -21,16 +21,16 @@
     <result property="processDefinitionName" column="NAME_" jdbcType="VARCHAR"/>
     <result property="callActivityInstanceId" column="ACT_INST_ID_" jdbcType="VARCHAR"/>
     <result property="callActivityId" column="ACT_ID_" jdbcType="VARCHAR"/>
-  </resultMap>  
-  
-  <select id="selectRunningProcessInstancesCount" parameterType="org.camunda.bpm.cockpit.impl.plugin.base.query.parameter.ProcessInstanceQueryParameter"
+  </resultMap>
+
+  <select id="selectRunningProcessInstancesCount" parameterType="org.camunda.bpm.cockpit.impl.plugin.base.dto.query.ProcessInstanceQueryDto"
           resultType="long">
     select count(distinct RES.ID_)
-    <include refid="selectProcessInstances" />              
-          
+    <include refid="selectProcessInstances" />
+
   </select>
 
-  <select id="selectRunningProcessInstancesIncludingIncidents" parameterType="org.camunda.bpm.cockpit.impl.plugin.base.query.parameter.ProcessInstanceQueryParameter"
+  <select id="selectRunningProcessInstancesIncludingIncidents" parameterType="org.camunda.bpm.cockpit.impl.plugin.base.dto.query.ProcessInstanceQueryDto"
           resultMap="processInstanceMap">
     select
       INSTANCE.ID_,
@@ -72,32 +72,43 @@
     on
       INSTANCE.ID_ = INCIDENT.PROC_INST_ID_
   </select>
-  
+
   <sql id="selectProcessInstances">
     from
       ${prefix}ACT_RU_EXECUTION RES
     <if test="historyEnabled">
     left join
       ${prefix}ACT_HI_PROCINST HISTORY
-    ON 
+    ON
       RES.ID_ = HISTORY.PROC_INST_ID_
     </if>
+    <!-- query for variables join -->
+    <foreach collection="queryVariableValues" index="index" item="queryVariableValue">
+      <choose>
+        <when test="queryVariableValue.local">
+          inner join ${prefix}ACT_RU_VARIABLE A${index} on RES.ID_ = A${index}.EXECUTION_ID_
+        </when>
+        <otherwise>
+          inner join ${prefix}ACT_RU_VARIABLE A${index} on RES.PROC_INST_ID_ = A${index}.PROC_INST_ID_
+        </otherwise>
+      </choose>
+    </foreach>
     <where>
       RES.ID_ = RES.PROC_INST_ID_
-      
+
       <!-- processDefinitionId -->
       <if test="processDefinitionId != null">
       and RES.PROC_DEF_ID_ = #{processDefinitionId}
       </if>
-      
+
       <!-- businessKey -->
       <if test="businessKey != null">
       and RES.BUSINESS_KEY_ = #{businessKey}
       </if>
-            
+
       <!-- activityIds -->
       <if test="activityIdIn != null &amp;&amp; activityIdIn.length > 0">
-      and RES.ID_ in 
+      and RES.ID_ in
         (
           select
             PROC_INST_ID_
@@ -112,24 +123,73 @@
             <if test="processDefinitionId != null">
             and PROC_DEF_ID_ = #{processDefinitionId}
             </if>
-        )  
+        )
       </if>
-      
+
       <!-- parentProcessDefinitionId -->
       <if test="parentProcessDefinitionId != null">
       and RES.SUPER_EXEC_ IN (select ID_ from ${prefix}ACT_RU_EXECUTION where PROC_DEF_ID_ = #{parentProcessDefinitionId})
       </if>
 
+      <!-- PLEASE NOTE: If you change anything have a look into the HistoricVariableInstance & HistoricProcessInstance, the same query object is used there! -->
+      <foreach collection="queryVariableValues" index="index" item="queryVariableValue">
+        <if test="!queryVariableValue.local">
+          <!-- When process instance variable is queried for, only process variables are taken into account -->
+          and A${index}.EXECUTION_ID_ = A${index}.PROC_INST_ID_
+        </if>
+      	and A${index}.NAME_= #{queryVariableValue.name}
+        <if test="!queryVariableValue.type.equals('null')">
+        <!-- When operator is not-equals or type of value is null, type doesn't matter! -->
+          and A${index}.TYPE_ = #{queryVariableValue.type}
+        </if>
+      	<if test="queryVariableValue.textValue != null &amp;&amp; queryVariableValue.longValue == null &amp;&amp; queryVariableValue.doubleValue == null">
+	      and A${index}.TEXT_
+	      <choose>
+	        <when test="queryVariableValue.operator.equals('LIKE')">LIKE</when>
+	        <otherwise><include refid="executionVariableOperator" /></otherwise>
+	      </choose>
+	        #{queryVariableValue.textValue}
+      	</if>
+      	<if test="queryVariableValue.textValue2 != null">
+	      and A${index}.TEXT2_
+	      <choose>
+	        <when test="queryVariableValue.operator.equals('LIKE')">LIKE</when>
+	        <otherwise><include refid="executionVariableOperator" /></otherwise>
+	      </choose>
+	        #{queryVariableValue.textValue2}
+      	</if>
+      	<if test="queryVariableValue.longValue != null">
+	      and A${index}.LONG_
+	      <include refid="executionVariableOperator" />
+	      #{queryVariableValue.longValue}
+      	</if>
+      	<if test="queryVariableValue.doubleValue != null">
+	      and A${index}.DOUBLE_
+	      <include refid="executionVariableOperator" />
+	      #{queryVariableValue.doubleValue}
+      	</if>
+      	<!-- Null variable type -->
+      	<if test="queryVariableValue.textValue == null &amp;&amp; queryVariableValue.textValue2 == null &amp;&amp; queryVariableValue.longValue == null &amp;&amp; queryVariableValue.doubleValue == null">
+          <choose>
+	        <when test="queryVariableValue.operator.equals('NOT_EQUALS')">
+	          and (A${index}.TEXT_ is not null or A${index}.TEXT2_ is not null or A${index}.LONG_ is not null or A${index}.DOUBLE_ is not null or A${index}.BYTEARRAY_ID_ is not null)
+	        </when>
+	        <otherwise>
+			  and A${index}.TEXT_ is null and A${index}.TEXT2_ is null and A${index}.LONG_ is null and A${index}.DOUBLE_ is null and A${index}.BYTEARRAY_ID_ is null
+	        </otherwise>
+	      </choose>
+      	</if>
+      </foreach>
     </where>
   </sql>
-  
-  <select id="selectCalledProcessInstances" parameterType="org.camunda.bpm.cockpit.impl.plugin.base.query.parameter.ProcessInstanceQueryParameter"
-          resultMap="calledProcessInstanceMap">      
+
+  <select id="selectCalledProcessInstances" parameterType="org.camunda.bpm.cockpit.impl.plugin.base.dto.query.ProcessInstanceQueryDto"
+          resultMap="calledProcessInstanceMap">
     select RES.ID_, EXEC1.ACT_INST_ID_, EXEC1.ACT_ID_, PROC_.ID_ AS SUPER_PROC_DEF_ID_, PROC_.KEY_, PROC_.NAME_
     <include refid="selectCalledProcessInstancesByCriteria" />
     ${orderBy}
   </select>
-  
+
   <sql id="selectCalledProcessInstancesByCriteria">
     from
       ${prefix}ACT_RU_EXECUTION RES
@@ -146,7 +206,7 @@
       <if test="parentProcessInstanceId != null">
       EXEC1.PROC_INST_ID_ = #{parentProcessInstanceId}
       </if>
-           
+
       <!-- activityInstanceIds -->
       <if test="activityInstanceIdIn != null &amp;&amp; activityInstanceIdIn.length > 0">
       and EXEC1.ACT_INST_ID_ in
@@ -154,8 +214,18 @@
                open="(" separator="," close=")">
         #{item}
       </foreach>
-      </if>  
+      </if>
     </where>
   </sql>
 
+  <sql id="executionVariableOperator">
+    <choose>
+   	  <when test="queryVariableValue.operator.equals('EQUALS')">=</when>
+   	  <when test="queryVariableValue.operator.equals('NOT_EQUALS')">&lt;&gt;</when>
+   	  <when test="queryVariableValue.operator.equals('GREATER_THAN')">&gt;</when>
+   	  <when test="queryVariableValue.operator.equals('GREATER_THAN_OR_EQUAL')">&gt;=</when>
+   	  <when test="queryVariableValue.operator.equals('LESS_THAN')">&lt;</when>
+   	  <when test="queryVariableValue.operator.equals('LESS_THAN_OR_EQUAL')">&lt;=</when>
+   </choose>
+  </sql>
 </mapper>

@@ -12,7 +12,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 
 import org.camunda.bpm.cockpit.impl.plugin.base.dto.ProcessDefinitionDto;
-import org.camunda.bpm.cockpit.impl.plugin.base.query.parameter.ProcessDefinitionQueryParameter;
+import org.camunda.bpm.cockpit.impl.plugin.base.dto.query.ProcessDefinitionQueryDto;
 import org.camunda.bpm.cockpit.plugin.resource.AbstractPluginResource;
 
 public class ProcessDefinitionResource extends AbstractPluginResource {
@@ -28,7 +28,7 @@ public class ProcessDefinitionResource extends AbstractPluginResource {
   @Path("/called-process-definitions")
   @Produces(MediaType.APPLICATION_JSON)
   public List<ProcessDefinitionDto> getCalledProcessDefinitions(@Context UriInfo uriInfo) {
-    ProcessDefinitionQueryParameter queryParameter = new ProcessDefinitionQueryParameter(uriInfo.getQueryParameters());
+    ProcessDefinitionQueryDto queryParameter = new ProcessDefinitionQueryDto(uriInfo.getQueryParameters());
     return queryCalledProcessDefinitions(queryParameter);
   }
 
@@ -36,7 +36,7 @@ public class ProcessDefinitionResource extends AbstractPluginResource {
   @Path("/called-process-definitions")
   @Produces(MediaType.APPLICATION_JSON)
   @Consumes(MediaType.APPLICATION_JSON)
-  public List<ProcessDefinitionDto> queryCalledProcessDefinitions(ProcessDefinitionQueryParameter queryParameter) {  
+  public List<ProcessDefinitionDto> queryCalledProcessDefinitions(ProcessDefinitionQueryDto queryParameter) {  
     queryParameter.setParentProcessDefinitionId(id);
     List<ProcessDefinitionDto> result = getQueryService().executeQuery("selectCalledProcessDefinitions", queryParameter);
     return result;

@@ -26,13 +26,13 @@
     <result property="rootCauseIncidentConfiguration" column="ROOT_INC_CONF_" jdbcType="VARCHAR" />
   </resultMap>
   
-  <select id="selectIncidentWithCauseAndRootCauseIncidentsCount" parameterType="org.camunda.bpm.cockpit.impl.plugin.base.query.parameter.IncidentQueryParameter"
+  <select id="selectIncidentWithCauseAndRootCauseIncidentsCount" parameterType="org.camunda.bpm.cockpit.impl.plugin.base.dto.query.IncidentQueryDto"
            resultType="long">
     select count(distinct RES.ID_)
     <include refid="selectIncidents" />
   </select>
 
-  <select id="selectIncidentWithCauseAndRootCauseIncidents" parameterType="org.camunda.bpm.cockpit.impl.plugin.base.query.parameter.IncidentQueryParameter"
+  <select id="selectIncidentWithCauseAndRootCauseIncidents" parameterType="org.camunda.bpm.cockpit.impl.plugin.base.dto.query.IncidentQueryDto"
           resultMap="incidentResultMap">
     ${limitBefore}
     select RES.* ${limitBetween}
