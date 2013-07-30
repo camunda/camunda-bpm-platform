@@ -42,7 +42,7 @@ public class ProcessDefinitionResourceTest extends AbstractCockpitPluginTest {
     "processes/user-task-process.bpmn",
     "processes/calling-user-task-process.bpmn"
   })
-  public void testCalledProcessDefinitionBySuperProcessDefinitionId() {
+  public void testCalledProcessDefinitionByParentProcessDefinitionId() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("CallingUserTaskProcess");
 
     resource = new ProcessDefinitionResource(getProcessEngine().getName(), processInstance.getProcessDefinitionId());
@@ -76,7 +76,7 @@ public class ProcessDefinitionResourceTest extends AbstractCockpitPluginTest {
       "processes/user-task-process.bpmn",
     "processes/two-parallel-call-activities-calling-same-process.bpmn"
   })
-  public void testCalledProcessDefinitionBySuperProcessDefinitionIdWithTwoActivityCallingSameProcess() {
+  public void testCalledProcessDefinitionByParentProcessDefinitionIdWithTwoActivityCallingSameProcess() {
     ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("TwoParallelCallActivitiesCallingSameProcess");
 
     resource = new ProcessDefinitionResource(getProcessEngine().getName(), processInstance.getProcessDefinitionId());
@@ -391,5 +391,60 @@ public class ProcessDefinitionResourceTest extends AbstractCockpitPluginTest {
     assertThat(result3).hasSize(2);
 
   }
+  
+  @Test
+  @Deployment(resources = {
+    "processes/user-task-process.bpmn",
+    "processes/another-user-task-process.bpmn",
+    "processes/two-parallel-call-activities-calling-different-process.bpmn"
+  })
+  public void testCalledProcessDefinitionQueryByBusinessKey() {
+    runtimeService.startProcessInstanceByKey("TwoParallelCallActivitiesCallingDifferentProcess", "aBusinessKey");
+    runtimeService.startProcessInstanceByKey("TwoParallelCallActivitiesCallingDifferentProcess", "anotherBusinessKey");
+    
+    ProcessDefinition parallelProcess = repositoryService.createProcessDefinitionQuery()
+        .processDefinitionKey("TwoParallelCallActivitiesCallingDifferentProcess")
+        .singleResult();
+       
+    resource = new ProcessDefinitionResource(getProcessEngine().getName(), parallelProcess.getId());
+    
+    ProcessDefinitionQueryDto queryParameter1 = new ProcessDefinitionQueryDto();
+    queryParameter1.setBusinessKey("aBusinessKey");
 
+    List<ProcessDefinitionDto> result1 = resource.queryCalledProcessDefinitions(queryParameter1);
+    assertThat(result1).isNotEmpty();
+    assertThat(result1).hasSize(2);
+    
+    ProcessDefinitionQueryDto queryParameter2 = new ProcessDefinitionQueryDto();
+    queryParameter2.setBusinessKey("anotherBusinessKey");
+
+    List<ProcessDefinitionDto> result2 = resource.queryCalledProcessDefinitions(queryParameter2);
+    assertThat(result2).isNotEmpty();
+    assertThat(result2).hasSize(2);
+  }
+  
+  @Test
+  @Deployment(resources = {
+    "processes/user-task-process.bpmn",
+    "processes/another-user-task-process.bpmn",
+    "processes/two-parallel-call-activities-calling-different-process.bpmn"
+  })
+  public void testCalledProcessDefinitionQueryByInvalidBusinessKey() {
+    runtimeService.startProcessInstanceByKey("TwoParallelCallActivitiesCallingDifferentProcess", "aBusinessKey");
+    
+    ProcessDefinition parallelProcess = repositoryService.createProcessDefinitionQuery()
+        .processDefinitionKey("TwoParallelCallActivitiesCallingDifferentProcess")
+        .singleResult();
+       
+    resource = new ProcessDefinitionResource(getProcessEngine().getName(), parallelProcess.getId());
+    
+    ProcessDefinitionQueryDto queryParameter1 = new ProcessDefinitionQueryDto();
+    queryParameter1.setBusinessKey("anInvalidBusinessKey");
+
+    List<ProcessDefinitionDto> result1 = resource.queryCalledProcessDefinitions(queryParameter1);
+    assertThat(result1).isEmpty();
+    assertThat(result1).hasSize(0);
+    
+  }
+  
 }
