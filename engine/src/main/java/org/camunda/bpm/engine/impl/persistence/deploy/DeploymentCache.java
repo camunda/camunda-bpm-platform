@@ -83,6 +83,18 @@ public class DeploymentCache {
     processDefinition = resolveProcessDefinition(processDefinition);
     return processDefinition;
   }
+  
+  public ProcessDefinitionEntity findDeployedProcessDefinitionByDeploymentAndKey(String deploymentId, String processDefinitionKey) {
+    ProcessDefinitionEntity processDefinition = (ProcessDefinitionEntity) Context
+      .getCommandContext()
+      .getProcessDefinitionManager()
+      .findProcessDefinitionByDeploymentAndKey(deploymentId, processDefinitionKey);
+    if (processDefinition==null) {
+      throw new ProcessEngineException("no processes deployed with key = '" + processDefinitionKey + "' in deployment = '" + deploymentId + "'");
+    }
+    processDefinition = resolveProcessDefinition(processDefinition);
+    return processDefinition;
+  }  
 
   public ProcessDefinitionEntity resolveProcessDefinition(ProcessDefinitionEntity processDefinition) {
     String processDefinitionId = processDefinition.getId();
