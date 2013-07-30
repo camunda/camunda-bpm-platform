@@ -41,13 +41,17 @@ public class BpmnDiagramService extends AbstractRestService {
   
   @Inject
   private BpmnDiagramRepository bpmnDiagramRepository;
-  
-  @Inject
-  private ConnectorRegistry connectorRegistry;
-  
+
   @Inject
   private ConnectorService connectorService;
-  
+
+  private ConnectorRegistry connectorRegistry;
+
+  @Inject
+  public void setConnectorRegistry(ConnectorRegistry connectorRegistry) {
+    this.connectorRegistry = connectorRegistry;
+  }
+
 //  @GET
 //  public List<BpmnDiagramDTO> list() {
 //    // NOTE: No such thing as list for diagrams
