@@ -189,6 +189,12 @@
       <if test="superProcessInstanceId != null">
         and RES.SUPER_PROCESS_INSTANCE_ID_ = #{superProcessInstanceId}
       </if>
+      <if test="deleted != null">
+        and RES.END_TIME_ is not NULL and RES.DELETE_REASON_ is not NULL  
+      </if>
+      <if test="notdeleted != null">
+        and RES.DELETE_REASON_ is NULL  
+      </if> 
       <foreach collection="queryVariableValues" index="index" item="queryVariableValue">
         and A${index}.NAME_= #{queryVariableValue.name}
         <if test="!queryVariableValue.type.equals('null')">
