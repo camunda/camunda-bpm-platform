@@ -14,16 +14,16 @@ import org.camunda.bpm.engine.rest.dto.converter.BooleanConverter;
 
 public class HistoricActivityInstanceQueryDto extends AbstractQueryDto<HistoricActivityInstanceQuery> {
 
-	private static final String SORT_BY_HISTORIC_ACTIVITY_INSTANCE_ID_VALUE = "historicActivityInstanceId";
-	private static final String SORT_BY_PROCESS_INSTANCE_ID_VALUE = "processInstanceId";
-	private static final String SORT_BY_PROCESS_DEFINITION_ID_VALUE = "processDefinitionId";
+	private static final String SORT_BY_HISTORIC_ACTIVITY_INSTANCE_ID_VALUE = "activityInstanceId";
+	private static final String SORT_BY_PROCESS_INSTANCE_ID_VALUE = "instanceId";
+	private static final String SORT_BY_PROCESS_DEFINITION_ID_VALUE = "definitionId";
 	private static final String SORT_BY_EXECUTION_ID_VALUE = "executionId";
 	private static final String SORT_BY_ACTIVITY_ID_VALUE = "activityId";
 	private static final String SORT_BY_ACTIVITY_NAME_VALUE = "activityName";
 	private static final String SORT_BY_ACTIVITY_TYPE_VALUE = "activityType";
-	private static final String SORT_BY_HISTORIC_ACTIVITY_INSTANCE_START_TIME_VALUE = "historicActivityInstanceStartTime";
-	private static final String SORT_BY_HISTORIC_ACTIVITY_INSTANCE_END_TIME_VALUE = "historicActivityInstanceEndTime";
-	private static final String SORT_BY_HISTORIC_ACTIVITY_INSTANCE_DURATION_VALUE = "historicActivityInstanceDuration";
+	private static final String SORT_BY_HISTORIC_ACTIVITY_INSTANCE_START_TIME_VALUE = "startTime";
+	private static final String SORT_BY_HISTORIC_ACTIVITY_INSTANCE_END_TIME_VALUE = "endTime";
+	private static final String SORT_BY_HISTORIC_ACTIVITY_INSTANCE_DURATION_VALUE = "duration";
 	
 	private static final List<String> VALID_SORT_BY_VALUES;
 	static {
@@ -40,15 +40,19 @@ public class HistoricActivityInstanceQueryDto extends AbstractQueryDto<HistoricA
 		VALID_SORT_BY_VALUES.add(SORT_BY_HISTORIC_ACTIVITY_INSTANCE_DURATION_VALUE);
 	}	
 	
-	 private String processInstanceId;	
-	 private String processDefinitionId;	 
-	 private String executionId;	
-	 private String activityId;
-	 private String activityName;	 
-	 private String activityType;	
-	 private String userId;
-	 private Boolean finished;	 
-	
+	private String processInstanceId;
+	private String processDefinitionId;
+	private String executionId;
+	private String activityId;
+	private String activityName;
+	private String activityType;
+	private String userId;
+    private Boolean finished;
+
+	public HistoricActivityInstanceQueryDto() {
+			
+    }
+	 
 	public HistoricActivityInstanceQueryDto(MultivaluedMap<String, String> queryParameters) {
 	    super(queryParameters);
 	}

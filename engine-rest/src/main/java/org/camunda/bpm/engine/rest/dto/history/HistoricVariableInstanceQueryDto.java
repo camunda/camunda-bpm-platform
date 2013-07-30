@@ -12,7 +12,7 @@ import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
 
 public class HistoricVariableInstanceQueryDto extends AbstractQueryDto<HistoricVariableInstanceQuery> {
 
-	private static final String SORT_BY_PROCESS_INSTANCE_ID_VALUE = "processInstanceId";
+	private static final String SORT_BY_PROCESS_INSTANCE_ID_VALUE = "instanceId";
 	private static final String SORT_BY_VARIABLE_NAME_VALUE = "variableName";
 
 	private static final List<String> VALID_SORT_BY_VALUES;
@@ -26,6 +26,10 @@ public class HistoricVariableInstanceQueryDto extends AbstractQueryDto<HistoricV
 	private String variableName;
 	private String variableNameLike;
 	private Object variableValue;
+	
+	public HistoricVariableInstanceQueryDto() {
+		
+	}
 	
 	public HistoricVariableInstanceQueryDto(
 			MultivaluedMap<String, String> queryParameters) {
