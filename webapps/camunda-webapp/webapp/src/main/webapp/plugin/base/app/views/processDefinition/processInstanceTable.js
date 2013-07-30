@@ -91,8 +91,15 @@ ngDefine('cockpit.plugin.base.views', function(module) {
 
       var defaultParams = {
         processDefinitionId: processDefinitionId,
+        parentProcessDefinitionId: parentProcessDefinitionId,
+        activityIdIn: activityIds
+      };
+
+      var pagingParams = {
         firstResult: firstResult,
-        maxResults: count
+        maxResults: count,
+        sortBy: 'startTime',
+        sortOrder: 'asc'
       };
 
       var clear = function(obj) {
@@ -105,16 +112,17 @@ ngDefine('cockpit.plugin.base.views', function(module) {
         return obj;
       }
 
-      var params = angular.extend({}, clear(filter.search || {}), defaultParams);
+      var countParams = angular.extend({}, clear(filter.search || {}), defaultParams);
+      var params = angular.extend(countParams, pagingParams);
 
       $scope.processInstances = null;
 
-      $http.post(Uri.appUri('engine://engine/:engine/process-instance'), params).then(function(result) {
-        $scope.processInstances = result.data;
+      PluginProcessInstanceResource.query(params).$then(function(data) {
+        $scope.processInstances = data.resource;
       });
 
-      $http.post(Uri.appUri('engine://engine/:engine/process-instance/count'), params).then(function(result) {
-        pages.total = Math.ceil(result.data.count / pages.size);
+      PluginProcessInstanceResource.count(countParams).$then(function(data) {
+        pages.total = Math.ceil(data.data.count / pages.size);
       });
     };
 
