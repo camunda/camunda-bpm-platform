@@ -161,6 +161,12 @@ public interface HistoricProcessInstanceQuery extends Query<HistoricProcessInsta
    * ids match. */
   HistoricProcessInstanceQuery superProcessInstanceId(String superProcessInstanceId);
 
+  /** Only select historic process instance that are deleted. */
+  HistoricProcessInstanceQuery deleted();
+  
+  /** Only select historic process instance that are not yet deleted. */
+  HistoricProcessInstanceQuery notDeleted();
+  
   // below is deprecated and should be removed in 5.12
 
   /** Only select historic process instances that were started as of the provided

@@ -17,6 +17,7 @@ import java.util.List;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -82,4 +83,14 @@ public interface ProcessInstanceRestService {
   @Produces(MediaType.APPLICATION_JSON)
   CountResultDto queryProcessInstancesCount(ProcessInstanceQueryDto query);
   
+
+  @PUT
+  @Path("/{id}/suspend")
+  void suspendProcessInstance(@PathParam("id") String processInstanceId);
+  
+  @PUT
+  @Path("/{id}/activate")
+  void activateProcessInstance(@PathParam("id") String processInstanceId);
+
+
 }

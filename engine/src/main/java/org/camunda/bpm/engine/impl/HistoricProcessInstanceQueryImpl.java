@@ -47,6 +47,8 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
   protected Date finishedAfter;
   protected String processDefinitionKey;
   protected Set<String> processInstanceIds;
+  protected boolean deleted = false;
+  protected boolean notdeleted = false;
   
   public HistoricProcessInstanceQueryImpl() {
   }
@@ -175,6 +177,16 @@ public class HistoricProcessInstanceQueryImpl extends AbstractVariableQueryImpl<
     return commandContext
       .getHistoricProcessInstanceManager()
       .findHistoricProcessInstancesByQueryCriteria(this, page);
+  }
+  
+  public HistoricProcessInstanceQuery deleted() {
+	 this.deleted = true;
+	 return this;
+  }
+
+  public HistoricProcessInstanceQuery notDeleted() {
+	 this.notdeleted = true;
+	 return this;
   }
   
   public String getBusinessKey() {

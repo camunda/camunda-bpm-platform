@@ -26,6 +26,8 @@ import org.junit.Test;
  * @author nico.rehwaldt
  */
 public class PluginQueryTest extends AbstractCockpitPluginTest {
+  
+  
 
   @Test
   public void testCustomQuery() {

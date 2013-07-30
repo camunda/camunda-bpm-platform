@@ -35,6 +35,7 @@ import org.camunda.bpm.engine.rest.helper.MockJobBuilder;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.JobQuery;
+
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -42,6 +43,7 @@ import org.mockito.InOrder;
 
 import com.jayway.restassured.http.ContentType;
 import com.jayway.restassured.response.Response;
+
 
 public abstract class AbstractJobRestServiceInteractionTest extends AbstractRestServiceTest {
 
