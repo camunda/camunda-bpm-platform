@@ -18,9 +18,7 @@ import static org.camunda.bpm.engine.rest.dto.VariableQueryParameterDto.*;
 import java.util.Arrays;
 import java.util.List;
 
-import javax.ws.rs.HEAD;
 import org.camunda.bpm.cockpit.impl.plugin.base.dto.IncidentStatisticsDto;
-import org.camunda.bpm.cockpit.impl.plugin.base.dto.ProcessInstanceDto;
 import org.camunda.bpm.cockpit.impl.plugin.base.dto.ProcessInstanceDto;
 import org.camunda.bpm.cockpit.impl.plugin.base.dto.query.ProcessInstanceQueryDto;
 import org.camunda.bpm.cockpit.impl.plugin.base.resources.ProcessInstanceRestService;

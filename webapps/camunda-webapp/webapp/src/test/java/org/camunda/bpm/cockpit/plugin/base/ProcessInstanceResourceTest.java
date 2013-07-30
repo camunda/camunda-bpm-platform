@@ -16,7 +16,6 @@ import static org.fest.assertions.Assertions.assertThat;
 
 import java.util.List;
 
-import javax.ws.rs.HEAD;
 import org.camunda.bpm.cockpit.impl.plugin.base.dto.CalledProcessInstanceDto;
 import org.camunda.bpm.cockpit.impl.plugin.base.dto.IncidentDto;
 import org.camunda.bpm.cockpit.impl.plugin.base.dto.ProcessInstanceDto;
