@@ -20,7 +20,10 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.Map;
 
 import org.camunda.bpm.application.ProcessApplicationInfo;
@@ -100,6 +103,10 @@ public abstract class MockProvider {
   public static final String ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID = "anotherId";
   public static final boolean EXAMPLE_PROCESS_INSTANCE_IS_SUSPENDED = false;
   public static final boolean EXAMPLE_PROCESS_INSTANCE_IS_ENDED = false;
+  public static final String EXAMPLE_PROCESS_INSTANCE_ID_LIST = EXAMPLE_PROCESS_INSTANCE_ID + "," + ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID;
+  public static final String EXAMPLE_PROCESS_INSTANCE_ID_LIST_WITH_DUP = EXAMPLE_PROCESS_INSTANCE_ID + "," + ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID + "," + EXAMPLE_PROCESS_INSTANCE_ID;
+  public static final String EXAMPLE_NON_EXISTENT_PROCESS_INSTANCE_ID = "aNonExistentProcInstId";
+  public static final String EXAMPLE_PROCESS_INSTANCE_ID_LIST_WITH_NONEXISTENT_ID = EXAMPLE_PROCESS_INSTANCE_ID + "," + EXAMPLE_NON_EXISTENT_PROCESS_INSTANCE_ID;
 
   // variable instance
   public static final String EXAMPLE_VARIABLE_INSTANCE_NAME = "aVariableInstanceName";
@@ -685,4 +692,28 @@ public abstract class MockProvider {
 
     return mock;
   }
+  public static List<ProcessInstance> createAnotherMockProcessInstanceList() {
+	List<ProcessInstance> mockProcessInstanceList = new ArrayList<ProcessInstance>();
+	mockProcessInstanceList.add(createMockInstance());
+	mockProcessInstanceList.add(createAnotherMockInstance());
+	return mockProcessInstanceList;
+  }
+
+  public static ProcessInstance createAnotherMockInstance() {
+	ProcessInstance mock = mock(ProcessInstance.class);
+
+	when(mock.getId()).thenReturn(ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID);
+	when(mock.getBusinessKey()).thenReturn(EXAMPLE_PROCESS_INSTANCE_BUSINESS_KEY);
+	when(mock.getProcessDefinitionId()).thenReturn(EXAMPLE_PROCESS_DEFINITION_ID);
+	when(mock.getProcessInstanceId()).thenReturn(ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID);
+	when(mock.isSuspended()).thenReturn(EXAMPLE_PROCESS_INSTANCE_IS_SUSPENDED);
+	when(mock.isEnded()).thenReturn(EXAMPLE_PROCESS_INSTANCE_IS_ENDED);
+
+	return mock;
+  }
+
+  public static Set<String> createMockSetFromList(String list){
+	  return new HashSet<String>(Arrays.asList(list.split(",")));
+  }
+
 }
