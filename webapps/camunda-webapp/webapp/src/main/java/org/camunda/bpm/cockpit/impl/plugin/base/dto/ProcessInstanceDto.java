@@ -3,6 +3,7 @@ package org.camunda.bpm.cockpit.impl.plugin.base.dto;
 import java.util.Date;
 import java.util.List;
 
+
 public class ProcessInstanceDto {
 
   protected String id;
@@ -27,7 +28,7 @@ public class ProcessInstanceDto {
   public void setBusinessKey(String businessKey) {
     this.businessKey = businessKey;
   }
-  
+
   public Date getStartTime() {
     return startTime;
   }
@@ -39,7 +40,7 @@ public class ProcessInstanceDto {
   public List<IncidentStatisticsDto> getIncidents() {
     return incidents;
   }
-  
+
   public void setIncidents(List<IncidentStatisticsDto> incidents) {
     this.incidents = incidents;
   }

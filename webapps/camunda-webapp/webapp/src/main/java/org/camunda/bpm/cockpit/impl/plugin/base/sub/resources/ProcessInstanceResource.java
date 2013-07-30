@@ -12,7 +12,7 @@ import javax.ws.rs.core.UriInfo;
 
 import org.camunda.bpm.cockpit.impl.plugin.base.dto.IncidentDto;
 import org.camunda.bpm.cockpit.impl.plugin.base.dto.ProcessInstanceDto;
-import org.camunda.bpm.cockpit.impl.plugin.base.query.parameter.ProcessInstanceQueryParameter;
+import org.camunda.bpm.cockpit.impl.plugin.base.dto.query.ProcessInstanceQueryDto;
 import org.camunda.bpm.cockpit.plugin.resource.AbstractPluginResource;
 import org.camunda.bpm.engine.runtime.Incident;
 
@@ -42,14 +42,14 @@ public class ProcessInstanceResource extends AbstractPluginResource {
   @Path("/called-process-instances")
   @Produces(MediaType.APPLICATION_JSON)
   public List<ProcessInstanceDto> getCalledProcessInstances(@Context UriInfo uriInfo) {
-    ProcessInstanceQueryParameter queryParameter = new ProcessInstanceQueryParameter(uriInfo.getQueryParameters());
+    ProcessInstanceQueryDto queryParameter = new ProcessInstanceQueryDto(uriInfo.getQueryParameters());
     return queryCalledProcessInstances(queryParameter);
   }
   
   @POST
   @Path("/called-process-instances")
   @Produces(MediaType.APPLICATION_JSON)
-  public List<ProcessInstanceDto> queryCalledProcessInstances(ProcessInstanceQueryParameter queryParameter) {
+  public List<ProcessInstanceDto> queryCalledProcessInstances(ProcessInstanceQueryDto queryParameter) {
     queryParameter.setParentProcessInstanceId(id);
     return getQueryService().executeQuery("selectCalledProcessInstances", queryParameter);
   }
