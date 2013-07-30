@@ -15,6 +15,7 @@ package org.camunda.bpm.engine.impl.pvm.delegate;
 import java.util.List;
 
 import org.camunda.bpm.engine.delegate.DelegateExecution;
+import org.camunda.bpm.engine.impl.persistence.entity.JobEntity;
 import org.camunda.bpm.engine.impl.pvm.PvmActivity;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessDefinition;
 import org.camunda.bpm.engine.impl.pvm.PvmProcessInstance;
@@ -159,5 +160,6 @@ public interface ActivityExecution extends DelegateExecution {
    * resources are removed. The execution itself can continue execution. 
    */
   void destroyScope(String string);
-  
+
+  JobEntity getCurrentJob();  
 }

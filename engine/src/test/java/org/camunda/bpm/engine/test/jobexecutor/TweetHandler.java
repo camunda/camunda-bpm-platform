@@ -20,7 +20,7 @@ import org.camunda.bpm.engine.impl.jobexecutor.JobHandler;
 import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.junit.Assert;
 
-public class TweetHandler implements JobHandler {
+public class TweetHandler extends JobHandler {
 
   List<String> messages = new ArrayList<String>();
 

@@ -473,4 +473,62 @@ public abstract class AbstractExecutionRestServiceQueryTest extends
     
     verify(mockedQuery).count();
   }
+  
+  @Test
+  public void testExecutionRetrievalHasExceptions() {
+	boolean onlyErroneous = true;
+	Response response = given()
+	    		          .queryParam("onlyErroneous", onlyErroneous)
+	                      .then().expect().statusCode(Status.OK.getStatusCode())
+	                      .when().get(EXECUTION_QUERY_URL);
+	    
+	// assert query invocation
+	InOrder inOrder = Mockito.inOrder(mockedQuery);
+	inOrder.verify(mockedQuery).onlyErroneous();
+	inOrder.verify(mockedQuery).list();
+	    
+	String content = response.asString();
+	List<String> executions = from(content).getList("");
+	Assert.assertEquals("There should be one execution returned.", 1, executions.size());
+	Assert.assertNotNull("There should be one execution returned", executions.get(0));
+	    
+	String returnedExecutionId = from(content).getString("[0].id");
+	Boolean returnedIsEnded = from(content).getBoolean("[0].ended");
+	String returnedProcessInstanceId = from(content).getString("[0].processInstanceId");
+	
+	Assert.assertEquals(MockProvider.EXAMPLE_EXECUTION_ID, returnedExecutionId);
+	Assert.assertEquals(MockProvider.EXAMPLE_EXECUTION_IS_ENDED, returnedIsEnded);
+	Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID, returnedProcessInstanceId);
+  } 
+
+  @Test
+  public void testExecutionRetrievalHasExceptionsNoRetries() {
+	int retries = 0;
+	boolean onlyErroneous = true;
+    Response response = given()
+    		                .queryParam("onlyErroneous", onlyErroneous)
+                            .queryParam("retries", retries)
+                            .then().expect().statusCode(Status.OK.getStatusCode())
+                            .when().get(EXECUTION_QUERY_URL);
+    
+    // assert query invocation
+    InOrder inOrder = Mockito.inOrder(mockedQuery);
+    inOrder.verify(mockedQuery).onlyErroneous();
+    inOrder.verify(mockedQuery).retries(retries);
+    inOrder.verify(mockedQuery).list();
+    
+    String content = response.asString();
+    List<String> executions = from(content).getList("");
+    Assert.assertEquals("There should be one execution returned.", 1, executions.size());
+    Assert.assertNotNull("There should be one execution returned", executions.get(0));
+    
+    String returnedExecutionId = from(content).getString("[0].id");
+    Boolean returnedIsEnded = from(content).getBoolean("[0].ended");
+    String returnedProcessInstanceId = from(content).getString("[0].processInstanceId");
+  
+    Assert.assertEquals(MockProvider.EXAMPLE_EXECUTION_ID, returnedExecutionId);
+    Assert.assertEquals(MockProvider.EXAMPLE_EXECUTION_IS_ENDED, returnedIsEnded);
+    Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID, returnedProcessInstanceId);
+  }
+  
 }

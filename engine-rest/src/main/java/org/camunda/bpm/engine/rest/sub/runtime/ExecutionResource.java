@@ -12,7 +12,10 @@
  */
 package org.camunda.bpm.engine.rest.sub.runtime;
 
+import java.util.List;
+
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -22,6 +25,7 @@ import javax.ws.rs.core.MediaType;
 
 import org.camunda.bpm.engine.rest.dto.runtime.ExecutionDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ExecutionTriggerDto;
+import org.camunda.bpm.engine.rest.dto.runtime.JobDeleteMessageDto;
 import org.camunda.bpm.engine.rest.sub.VariableResource;
 
 public interface ExecutionResource {
@@ -41,4 +45,9 @@ public interface ExecutionResource {
   
   @Path("/messageSubscriptions/{messageName}")
   EventSubscriptionResource getMessageEventSubscription(@PathParam("messageName") String messageName);
+  
+  @DELETE
+  @Path("/job")
+  @Produces(MediaType.APPLICATION_JSON)
+  List<JobDeleteMessageDto> deleteJobs();
 }

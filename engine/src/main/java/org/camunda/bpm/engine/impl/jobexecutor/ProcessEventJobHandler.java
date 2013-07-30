@@ -21,7 +21,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 /**
  * @author Daniel Meyer
  */
-public class ProcessEventJobHandler implements JobHandler {
+public class ProcessEventJobHandler extends JobHandler {
   
   public final static String TYPE = "event"; 
 

@@ -142,6 +142,14 @@
     <if test="businessKey != null">
         inner join ${prefix}ACT_RU_EXECUTION INST on RES.PROC_INST_ID_ = INST.ID_
     </if>
+    <if test="onlyErroneous || retries != null">
+        <if test="onlyProcessInstances">
+            inner join ${prefix}ACT_RU_JOB J on RES.ID_ = J.PROCESS_INSTANCE_ID_
+        </if>
+        <if test="!onlyProcessInstances">
+            inner join ${prefix}ACT_RU_JOB J on RES.ID_ = J.EXECUTION_ID_
+        </if>
+    </if>
     inner join ${prefix}ACT_RE_PROCDEF P on RES.PROC_DEF_ID_ = P.ID_
     <where>
       <if test="onlyProcessInstances">
@@ -241,6 +249,12 @@
     	 <foreach collection="eventSubscriptions" index="index" item="eventSubscriptionValue">
     	    and (EVT${index}.EVENT_TYPE_ = #{eventSubscriptionValue.eventType} and EVT${index}.EVENT_NAME_ = #{eventSubscriptionValue.eventName}) 
 	    </foreach>
+      </if>
+      <if test="onlyErroneous">
+        and J.EXCEPTION_STACK_ID_ is not null
+      </if>
+      <if test="retries != null">
+        and J.RETRIES_ = #{retries}
       </if>
     </where>
   </sql>

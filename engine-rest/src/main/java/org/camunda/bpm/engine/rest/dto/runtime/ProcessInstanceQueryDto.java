@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.rest.dto.runtime;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response.Status;
@@ -23,9 +24,11 @@ import org.camunda.bpm.engine.rest.dto.CamundaQueryParam;
 import org.camunda.bpm.engine.rest.dto.AbstractQueryDto;
 import org.camunda.bpm.engine.rest.dto.VariableQueryParameterDto;
 import org.camunda.bpm.engine.rest.dto.converter.BooleanConverter;
+import org.camunda.bpm.engine.rest.dto.converter.IntegerConverter;
 import org.camunda.bpm.engine.rest.dto.converter.VariableListConverter;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
+import org.camunda.bpm.engine.rest.dto.converter.StringSetConverter;
 
 public class ProcessInstanceQueryDto extends AbstractQueryDto<ProcessInstanceQuery> {
 
@@ -48,6 +51,9 @@ public class ProcessInstanceQueryDto extends AbstractQueryDto<ProcessInstanceQue
   private String subProcessInstance;
   private Boolean active;
   private Boolean suspended;
+  private Boolean onlyErroneous;
+  private Integer retries;
+  private Set<String> processInstanceIds;
   
   private List<VariableQueryParameterDto> variables;
   
@@ -61,6 +67,11 @@ public class ProcessInstanceQueryDto extends AbstractQueryDto<ProcessInstanceQue
 
   public String getProcessDefinitionKey() {
     return processDefinitionKey;
+  }
+  
+  @CamundaQueryParam(value = "processInstanceIds", converter = StringSetConverter.class)
+  public void setProcessInstanceIds(Set<String> processInstanceIds) {
+		this.processInstanceIds = processInstanceIds;
   }
 
   @CamundaQueryParam("processDefinitionKey")
@@ -102,6 +113,16 @@ public class ProcessInstanceQueryDto extends AbstractQueryDto<ProcessInstanceQue
   public void setVariables(List<VariableQueryParameterDto> variables) {
     this.variables = variables;
   }
+
+  @CamundaQueryParam(value = "onlyErroneous", converter = BooleanConverter.class)
+  public void setOnlyErroneous(Boolean onlyErroneous) {
+    this.onlyErroneous = onlyErroneous;
+  }
+  
+  @CamundaQueryParam(value = "retries", converter = IntegerConverter.class)
+  public void setRetries(Integer retries) {
+    this.retries = retries;
+  }
   
   @Override
   protected boolean isValidSortByValue(String value) {
@@ -115,6 +136,10 @@ public class ProcessInstanceQueryDto extends AbstractQueryDto<ProcessInstanceQue
 
   @Override
   protected void applyFilters(ProcessInstanceQuery query) {
+	  
+    if (processInstanceIds != null) {
+      query.processInstanceIds(processInstanceIds);
+    }
     if (processDefinitionKey != null) {
       query.processDefinitionKey(processDefinitionKey);
     }
@@ -160,6 +185,12 @@ public class ProcessInstanceQueryDto extends AbstractQueryDto<ProcessInstanceQue
           throw new InvalidRequestException(Status.BAD_REQUEST, "Invalid variable comparator specified: " + op);
         }
       }
+    }
+    if (onlyErroneous != null && onlyErroneous == true) {
+      query.onlyErroneous();
+    }
+    if (retries != null) {
+      query.retries(retries);
     }
   }
 

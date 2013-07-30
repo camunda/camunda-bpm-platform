@@ -15,13 +15,17 @@ package org.camunda.bpm.engine.rest.impl;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.UriInfo;
 
 import org.camunda.bpm.engine.ProcessEngine;
+import org.camunda.bpm.engine.ProcessEngineException;
+import org.camunda.bpm.engine.RuntimeService;
 import org.camunda.bpm.engine.rest.ProcessInstanceRestService;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.runtime.ProcessInstanceQueryDto;
+import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.sub.runtime.ProcessInstanceResource;
 import org.camunda.bpm.engine.rest.sub.runtime.impl.ProcessInstanceResourceImpl;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
@@ -100,4 +104,23 @@ public class ProcessInstanceRestServiceImpl extends AbstractRestProcessEngineAwa
     return new ProcessInstanceResourceImpl(getProcessEngine(), processInstanceId);
   }
 
+  public void suspendProcessInstance(String processInstanceId) {
+		
+	try {
+	  RuntimeService runtimeService = getProcessEngine().getRuntimeService();
+	  runtimeService.suspendProcessInstanceById(processInstanceId);
+	} catch (ProcessEngineException e){
+	    throw new InvalidRequestException(Status.NOT_FOUND, e, "Process instance with id " + processInstanceId + " does not exist");
+	} 
+  }
+
+  @Override
+  public void activateProcessInstance(String processInstanceId) {
+	try {
+	  RuntimeService runtimeService = getProcessEngine().getRuntimeService();
+	  runtimeService.activateProcessInstanceById(processInstanceId);
+	} catch (ProcessEngineException e){
+	  throw new InvalidRequestException(Status.NOT_FOUND, e, "Process instance with id " + processInstanceId + " does not exist");
+	}
+  }
 }

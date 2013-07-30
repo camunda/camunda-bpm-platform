@@ -40,6 +40,7 @@ import org.camunda.bpm.engine.impl.persistence.entity.ExecutionEntity;
 import org.camunda.bpm.engine.impl.test.PluggableProcessEngineTestCase;
 import org.camunda.bpm.engine.runtime.Execution;
 import org.camunda.bpm.engine.runtime.ExecutionQuery;
+import org.camunda.bpm.engine.runtime.Job;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.test.Deployment;
 import org.junit.Assert;
@@ -1107,5 +1108,30 @@ public void testBooleanVariable() throws Exception {
     for (Execution activeExecution : activeExecutions) {
       assertEquals(activeExecution.getProcessInstanceId(), sequentialProcessInstanceIds.get(0));
     }
+  }
+  
+  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/async/AsyncTaskTest.testFailingAsycServiceTimer.bpmn20.xml"})
+  public void testQueryByHasExceptions() {	  
+  ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("asyncService");
+   
+   waitForJobExecutorToProcessAllJobs(10000L);
+   
+   Job job = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
+   assertTrue(runtimeService.createExecutionQuery().executionId(job.getExecutionId()).count() == 1);   
+   assertTrue(runtimeService.createExecutionQuery().onlyErroneous().executionId(job.getExecutionId()).count() == 1);
+   runtimeService.deleteProcessInstance(processInstance.getId(), "dead"); 
+  }
+  
+  @Deployment(resources = {"org/camunda/bpm/engine/test/bpmn/async/AsyncTaskTest.testFailingAsycServiceTimer.bpmn20.xml"})
+  public void testQueryByHasExceptionsAndNoRetries() {
+	  int retries = 0;
+	  ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("asyncService");
+	   
+	   waitForJobExecutorToProcessAllJobs(10000L);
+	   
+	   Job job = managementService.createJobQuery().processInstanceId(processInstance.getId()).singleResult();
+	   assertTrue(runtimeService.createExecutionQuery().executionId(job.getExecutionId()).count() == 1);   
+	   assertTrue(runtimeService.createExecutionQuery().onlyErroneous().retries(retries).executionId(job.getExecutionId()).count() == 1);
+	   runtimeService.deleteProcessInstance(processInstance.getId(), "dead"); 
   }
 }
