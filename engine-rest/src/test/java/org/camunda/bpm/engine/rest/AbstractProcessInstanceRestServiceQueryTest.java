@@ -6,26 +6,33 @@ import static com.jayway.restassured.path.json.JsonPath.from;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.argThat;
+import org.mockito.ArgumentMatcher;
+import org.mockito.InOrder;
+import org.mockito.Mockito;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.ws.rs.core.Response.Status;
 import javax.xml.registry.InvalidRequestException;
 
+import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.rest.helper.MockProvider;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 import org.camunda.bpm.engine.runtime.ProcessInstanceQuery;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.InOrder;
-import org.mockito.Mockito;
+
 
 import com.jayway.restassured.http.ContentType;
 import com.jayway.restassured.response.Response;
@@ -396,4 +403,94 @@ public abstract class AbstractProcessInstanceRestServiceQueryTest extends
     
     verify(mockedQuery).count();
   }
+
+  @Test
+  public void testInstancecRetrievalByList() {
+	List<ProcessInstance> mockProcessInstanceList = new ArrayList<ProcessInstance>();
+	mockProcessInstanceList.add(MockProvider.createMockInstance());
+	mockProcessInstanceList.add(MockProvider.createAnotherMockInstance());	  
+	ProcessInstanceQuery instanceQuery = mock(ProcessInstanceQuery.class);
+	when(instanceQuery.list()).thenReturn(mockProcessInstanceList);
+	when(processEngine.getRuntimeService().createProcessInstanceQuery()).thenReturn(instanceQuery); 
+    
+    Response response = given().queryParam("processInstanceIds", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID_LIST)
+        .then().expect().statusCode(Status.OK.getStatusCode())
+        .when().get(PROCESS_INSTANCE_QUERY_URL);
+    
+    // assert query invocation
+    InOrder inOrder = Mockito.inOrder(instanceQuery);
+    Set<String> expectedSet = MockProvider.createMockSetFromList(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID_LIST);
+    inOrder.verify(instanceQuery).processInstanceIds(argThat(new IsSetThatContainsAllOf(expectedSet)));
+    inOrder.verify(instanceQuery).list();
+    
+    String content = response.asString();
+    List<String> instances = from(content).getList("");
+    Assert.assertEquals("There should be two process definitions returned.", 2, instances.size());
+    
+    String returnedInstanceId1 = from(content).getString("[0].id");
+    String returnedInstanceId2 = from(content).getString("[1].id");
+    
+    Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID, returnedInstanceId1);
+    Assert.assertEquals(MockProvider.ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID, returnedInstanceId2);
+  }
+
+  
+  @Test
+  public void testInstanceRetrievalByListWithDuplicate() {
+	List<ProcessInstance> mockProcessInstanceList = new ArrayList<ProcessInstance>();
+	mockProcessInstanceList.add(MockProvider.createMockInstance());
+	mockProcessInstanceList.add(MockProvider.createAnotherMockInstance());	  
+	ProcessInstanceQuery instanceQuery = mock(ProcessInstanceQuery.class);
+	when(instanceQuery.list()).thenReturn(mockProcessInstanceList);
+	when(processEngine.getRuntimeService().createProcessInstanceQuery()).thenReturn(instanceQuery); 
+	    
+	Response response = given().queryParam("processInstanceIds", MockProvider.EXAMPLE_PROCESS_INSTANCE_ID_LIST_WITH_DUP)
+	  .then().expect().statusCode(Status.OK.getStatusCode())
+	  .when().get(PROCESS_INSTANCE_QUERY_URL);
+	    
+	// assert query invocation
+	InOrder inOrder = Mockito.inOrder(instanceQuery);
+	Set<String> expectedSet = MockProvider.createMockSetFromList(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID_LIST);
+	inOrder.verify(instanceQuery).processInstanceIds(argThat(new IsSetThatContainsAllOf(expectedSet)));
+	inOrder.verify(instanceQuery).list();
+	    
+	String content = response.asString();
+	List<String> instances = from(content).getList("");
+	Assert.assertEquals("There should be two process definitions returned.", 2, instances.size());
+	    
+	String returnedInstanceId1 = from(content).getString("[0].id");
+	String returnedInstanceId2 = from(content).getString("[1].id");
+	    
+	Assert.assertEquals(MockProvider.EXAMPLE_PROCESS_INSTANCE_ID, returnedInstanceId1);
+	Assert.assertEquals(MockProvider.ANOTHER_EXAMPLE_PROCESS_INSTANCE_ID, returnedInstanceId2);
+  }
+  
+  @Test
+  public void testInstanceRetrievalByListWithEmpty() {  
+	ProcessInstanceQuery instanceQuery = mock(ProcessInstanceQuery.class);
+	when(instanceQuery.list()).thenReturn(null);
+	String expectedExceptionMessage = "Set of process instance ids is empty";
+	doThrow(new ProcessEngineException(expectedExceptionMessage)).when(instanceQuery).processInstanceIds(any(Set.class));
+	when(processEngine.getRuntimeService().createProcessInstanceQuery()).thenReturn(instanceQuery); 
+	    
+	String emptyList = "";
+    given().queryParam("processInstanceIds", emptyList)
+	  .then().expect().statusCode(Status.INTERNAL_SERVER_ERROR.getStatusCode())
+	  .body("type", equalTo(ProcessEngineException.class.getSimpleName()))
+      .body("message", equalTo(expectedExceptionMessage))
+	  .when().get(PROCESS_INSTANCE_QUERY_URL);
+  }
+  
+  private class IsSetThatContainsAllOf extends ArgumentMatcher<Set<String>> {
+	  
+	Set<String> expectedSet;
+	  
+	IsSetThatContainsAllOf(Set<String> expectedSet){
+		  this.expectedSet = expectedSet;
+	}
+	  
+    public boolean matches(Object set) {
+          return expectedSet.containsAll((Set) set);
+    }
+   }    
 }
