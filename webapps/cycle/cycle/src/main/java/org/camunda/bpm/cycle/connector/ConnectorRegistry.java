@@ -27,8 +27,12 @@ public class ConnectorRegistry {
   @Inject
   private ThreadsafeAspect threadsafeAspect;
 
-  @Inject
   private ConnectorCache cache;
+
+  @Inject
+  public void setConnectorCache(ConnectorCache cache) {
+    this.cache = cache;
+  }
 
   /**
    * Default connector configurations are configured in the spring application context. 

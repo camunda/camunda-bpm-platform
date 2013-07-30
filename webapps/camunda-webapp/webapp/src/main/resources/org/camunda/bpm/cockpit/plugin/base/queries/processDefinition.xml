@@ -51,17 +51,7 @@
       ${prefix}ACT_RU_EXECUTION EXEC2
     on
       EXEC1.SUPER_EXEC_ = EXEC2.ID_
-      
-    <if test="superProcessDefinitionId != null">
-    inner join
-      ACT_RU_EXECUTION EXEC3
-    on
-      EXEC2.PROC_INST_ID_ = EXEC3.ID_
-    inner join
-      ACT_RU_EXECUTION EXEC4
-    on
-      EXEC3.SUPER_EXEC_ = EXEC4.ID_    
-    </if>
+
     <where>
     
       <!-- parentProcessDefinitionId -->      
@@ -71,7 +61,19 @@
 
       <!-- superProcessDefinitionId -->      
       <if test="superProcessDefinitionId != null">
-        and EXEC4.PROC_DEF_ID_ = #{superProcessDefinitionId}
+      and EXISTS (
+                    select
+                      EXEC4.ID_
+                    from
+                      ${prefix}ACT_RU_EXECUTION EXEC3
+                    inner join
+                      ${prefix}ACT_RU_EXECUTION EXEC4
+                    on
+                      EXEC3.SUPER_EXEC_ = EXEC4.ID_ 
+                    where
+                      EXEC2.PROC_INST_ID_ = EXEC3.ID_
+                      and EXEC4.PROC_DEF_ID_ = #{superProcessDefinitionId}
+                  )
       </if>
       
       <!-- activityIds -->
@@ -82,6 +84,20 @@
           EXEC2.ACT_ID_ = #{item}
         </foreach>
       </if>
+      
+      <!-- businessKey -->
+      <if test="businessKey != null">
+      and EXISTS (
+                    select
+                      ID_
+                    from
+                      ${prefix}ACT_RU_EXECUTION
+                    where
+                      EXEC2.PROC_INST_ID_ = ID_
+                      and BUSINESS_KEY_ = #{businessKey}
+                  )
+      </if>      
+      
     </where>
   </sql>
 
