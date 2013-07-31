@@ -4,7 +4,8 @@ define(['angular'], function(angular) {
 
   var module = angular.module('admin.pages');
 
-  var Controller = ['$scope', '$routeParams', 'GroupResource', 'Notifications', '$location', function ($scope, $routeParams, GroupResource, Notifications, $location) {
+  var Controller = ['$scope', '$routeParams', 'GroupResource', 'AuthorizationResource', 'Notifications', '$location', 
+    function ($scope, $routeParams, GroupResource, AuthorizationResource, Notifications, $location) {
 
     $scope.group = null;
     $scope.groupName = null;

@@ -78,16 +78,6 @@ a.expand-collapse:focus {
   filter: alpha(opacity=40);
 }
 
-/** ---- in-place variable editing ----**/
-
-.in-place-edit {
-  width: 100%;
-}
-
-textarea.in-place-edit {
-  resize: vertical;
-}
-
 .variable-invalid {
   color: #e9322d;
 }

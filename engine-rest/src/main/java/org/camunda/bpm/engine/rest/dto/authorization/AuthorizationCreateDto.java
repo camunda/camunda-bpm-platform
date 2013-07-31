@@ -13,6 +13,7 @@
 package org.camunda.bpm.engine.rest.dto.authorization;
 
 import org.camunda.bpm.engine.authorization.Authorization;
+import org.camunda.bpm.engine.rest.dto.converter.PermissionConverter;
 
 /**
  * @author Daniel Meyer
@@ -21,7 +22,7 @@ import org.camunda.bpm.engine.authorization.Authorization;
 public class AuthorizationCreateDto {
 
   protected Integer type;
-  protected Integer permissions;  
+  protected String[] permissions;  
   protected String userId;
   protected String groupId;
   protected Integer resourceType;
@@ -35,7 +36,7 @@ public class AuthorizationCreateDto {
     dbAuthorization.setUserId(dto.getUserId());
     dbAuthorization.setResourceType(dto.getResourceType());
     dbAuthorization.setResourceId(dto.getResourceId());
-    dbAuthorization.setPermissions(dto.getPermissions());
+    dbAuthorization.setPermissions(PermissionConverter.getPermissionsForNames(dto.getPermissions()));
     
   }
     
@@ -47,10 +48,10 @@ public class AuthorizationCreateDto {
   public void setType(int type) {
     this.type = type;
   }
-  public Integer getPermissions() {
+  public String[] getPermissions() {
     return permissions;
   }
-  public void setPermissions(Integer permissions) {
+  public void setPermissions(String[] permissions) {
     this.permissions = permissions;
   }
   public String getUserId() {

@@ -33,6 +33,7 @@ import org.camunda.bpm.engine.AuthorizationService;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.AuthorizationQuery;
+import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.impl.AuthorizationServiceImpl;
 import org.camunda.bpm.engine.impl.IdentityServiceImpl;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
@@ -141,12 +142,12 @@ public abstract class AbstractAuthorizationRestServiceQueryTest extends Abstract
     
     Assert.assertEquals(mockAuthorization.getId(), from(content).getString("[0].id"));
     Assert.assertEquals(mockAuthorization.getAuthorizationType(), from(content).getInt("[0].type"));
-    Assert.assertEquals(mockAuthorization.getPermissions(), from(content).getInt("[0].permissions"));
+    Assert.assertEquals(Permissions.READ.getName(), from(content).getString("[0].permissions[0]"));
+    Assert.assertEquals(Permissions.UPDATE.getName(), from(content).getString("[0].permissions[1]"));
     Assert.assertEquals(mockAuthorization.getUserId(), from(content).getString("[0].userId"));
     Assert.assertEquals(mockAuthorization.getGroupId(), from(content).getString("[0].groupId"));
     Assert.assertEquals(mockAuthorization.getResourceType(), from(content).getInt("[0].resourceType"));
     Assert.assertEquals(mockAuthorization.getResourceId(), from(content).getString("[0].resourceId"));
-    
     
   }
   

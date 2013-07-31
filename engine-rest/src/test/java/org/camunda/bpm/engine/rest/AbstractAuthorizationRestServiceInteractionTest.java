@@ -37,6 +37,7 @@ import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.authorization.Authorization;
 import org.camunda.bpm.engine.authorization.AuthorizationQuery;
 import org.camunda.bpm.engine.authorization.Permission;
+import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.authorization.Resource;
 import org.camunda.bpm.engine.impl.AuthorizationServiceImpl;
 import org.camunda.bpm.engine.impl.IdentityServiceImpl;
@@ -79,12 +80,11 @@ public abstract class AbstractAuthorizationRestServiceInteractionTest extends Ab
 
     Authentication authentication = new Authentication(MockProvider.EXAMPLE_USER_ID, exampleGroups);    
     when(identityServiceMock.getCurrentAuthentication()).thenReturn(authentication);    
-    AuthorizationUtil authorizationUtil = new AuthorizationUtil(MockProvider.EXAMPLE_RESOURCE_TYPE_NAME, MockProvider.EXAMPLE_RESOURCE_TYPE_ID, MockProvider.EXAMPLE_PERMISSION_NAME, MockProvider.EXAMPLE_PERMISSION_VALUE);
+    AuthorizationUtil authorizationUtil = new AuthorizationUtil(MockProvider.EXAMPLE_RESOURCE_TYPE_NAME, MockProvider.EXAMPLE_RESOURCE_TYPE_ID, MockProvider.EXAMPLE_PERMISSION_NAME);
     when(authorizationServiceMock.isUserAuthorized(MockProvider.EXAMPLE_USER_ID, exampleGroups, authorizationUtil, authorizationUtil)).thenReturn(true);
     
     given()
         .queryParam("permissionName", MockProvider.EXAMPLE_PERMISSION_NAME)
-        .queryParam("permissionValue", MockProvider.EXAMPLE_PERMISSION_VALUE)
         .queryParam("resourceName", MockProvider.EXAMPLE_RESOURCE_TYPE_NAME)
         .queryParam("resourceType", MockProvider.EXAMPLE_RESOURCE_TYPE_ID)
     .then().expect().statusCode(Status.OK.getStatusCode()).contentType(MediaType.APPLICATION_JSON)
@@ -106,12 +106,11 @@ public abstract class AbstractAuthorizationRestServiceInteractionTest extends Ab
 
     Authentication authentication = new Authentication(MockProvider.EXAMPLE_USER_ID, exampleGroups);    
     when(identityServiceMock.getCurrentAuthentication()).thenReturn(authentication);    
-    AuthorizationUtil authorizationUtil = new AuthorizationUtil(MockProvider.EXAMPLE_RESOURCE_TYPE_NAME, MockProvider.EXAMPLE_RESOURCE_TYPE_ID, MockProvider.EXAMPLE_PERMISSION_NAME, MockProvider.EXAMPLE_PERMISSION_VALUE);
+    AuthorizationUtil authorizationUtil = new AuthorizationUtil(MockProvider.EXAMPLE_RESOURCE_TYPE_NAME, MockProvider.EXAMPLE_RESOURCE_TYPE_ID, MockProvider.EXAMPLE_PERMISSION_NAME);
     when(authorizationServiceMock.isUserAuthorized(MockProvider.EXAMPLE_USER_ID, exampleGroups, authorizationUtil, authorizationUtil)).thenReturn(false);
     
     given()
         .queryParam("permissionName", MockProvider.EXAMPLE_PERMISSION_NAME)
-        .queryParam("permissionValue", MockProvider.EXAMPLE_PERMISSION_VALUE)
         .queryParam("resourceName", MockProvider.EXAMPLE_RESOURCE_TYPE_NAME)
         .queryParam("resourceType", MockProvider.EXAMPLE_RESOURCE_TYPE_ID)
     .then().expect().statusCode(Status.OK.getStatusCode()).contentType(MediaType.APPLICATION_JSON)
@@ -132,12 +131,11 @@ public abstract class AbstractAuthorizationRestServiceInteractionTest extends Ab
 
     Authentication authentication = new Authentication(MockProvider.EXAMPLE_USER_ID, exampleGroups);    
     when(identityServiceMock.getCurrentAuthentication()).thenReturn(authentication);    
-    AuthorizationUtil authorizationUtil = new AuthorizationUtil(MockProvider.EXAMPLE_RESOURCE_TYPE_NAME, MockProvider.EXAMPLE_RESOURCE_TYPE_ID, MockProvider.EXAMPLE_PERMISSION_NAME, MockProvider.EXAMPLE_PERMISSION_VALUE);
+    AuthorizationUtil authorizationUtil = new AuthorizationUtil(MockProvider.EXAMPLE_RESOURCE_TYPE_NAME, MockProvider.EXAMPLE_RESOURCE_TYPE_ID, MockProvider.EXAMPLE_PERMISSION_NAME);
     when(authorizationServiceMock.isUserAuthorized(MockProvider.EXAMPLE_USER_ID, exampleGroups, authorizationUtil, authorizationUtil, MockProvider.EXAMPLE_RESOURCE_ID)).thenReturn(true);
     
     given()
         .queryParam("permissionName", MockProvider.EXAMPLE_PERMISSION_NAME)
-        .queryParam("permissionValue", MockProvider.EXAMPLE_PERMISSION_VALUE)
         .queryParam("resourceName", MockProvider.EXAMPLE_RESOURCE_TYPE_NAME)
         .queryParam("resourceType", MockProvider.EXAMPLE_RESOURCE_TYPE_ID)
         .queryParam("resourceId", MockProvider.EXAMPLE_RESOURCE_ID)
@@ -160,12 +158,11 @@ public abstract class AbstractAuthorizationRestServiceInteractionTest extends Ab
 
     Authentication authentication = new Authentication(MockProvider.EXAMPLE_USER_ID, exampleGroups);    
     when(identityServiceMock.getCurrentAuthentication()).thenReturn(authentication);    
-    AuthorizationUtil authorizationUtil = new AuthorizationUtil(MockProvider.EXAMPLE_RESOURCE_TYPE_NAME, MockProvider.EXAMPLE_RESOURCE_TYPE_ID, MockProvider.EXAMPLE_PERMISSION_NAME, MockProvider.EXAMPLE_PERMISSION_VALUE);
+    AuthorizationUtil authorizationUtil = new AuthorizationUtil(MockProvider.EXAMPLE_RESOURCE_TYPE_NAME, MockProvider.EXAMPLE_RESOURCE_TYPE_ID, MockProvider.EXAMPLE_PERMISSION_NAME);
     when(authorizationServiceMock.isUserAuthorized(MockProvider.EXAMPLE_USER_ID, exampleGroups, authorizationUtil, authorizationUtil, MockProvider.EXAMPLE_RESOURCE_ID)).thenReturn(false);
     
     given()
         .queryParam("permissionName", MockProvider.EXAMPLE_PERMISSION_NAME)
-        .queryParam("permissionValue", MockProvider.EXAMPLE_PERMISSION_VALUE)
         .queryParam("resourceName", MockProvider.EXAMPLE_RESOURCE_TYPE_NAME)
         .queryParam("resourceType", MockProvider.EXAMPLE_RESOURCE_TYPE_ID)
         .queryParam("resourceId", MockProvider.EXAMPLE_RESOURCE_ID)
@@ -189,12 +186,11 @@ public abstract class AbstractAuthorizationRestServiceInteractionTest extends Ab
 
     when(identityServiceMock.getCurrentAuthentication()).thenReturn(null);    
     
-    AuthorizationUtil authorizationUtil = new AuthorizationUtil(MockProvider.EXAMPLE_RESOURCE_TYPE_NAME, MockProvider.EXAMPLE_RESOURCE_TYPE_ID, MockProvider.EXAMPLE_PERMISSION_NAME, MockProvider.EXAMPLE_PERMISSION_VALUE);
+    AuthorizationUtil authorizationUtil = new AuthorizationUtil(MockProvider.EXAMPLE_RESOURCE_TYPE_NAME, MockProvider.EXAMPLE_RESOURCE_TYPE_ID, MockProvider.EXAMPLE_PERMISSION_NAME);
     when(authorizationServiceMock.isUserAuthorized(MockProvider.EXAMPLE_USER_ID, exampleGroups, authorizationUtil, authorizationUtil)).thenReturn(false);
     
     given()
         .queryParam("permissionName", MockProvider.EXAMPLE_PERMISSION_NAME)
-        .queryParam("permissionValue", MockProvider.EXAMPLE_PERMISSION_VALUE)
         .queryParam("resourceName", MockProvider.EXAMPLE_RESOURCE_TYPE_NAME)
         .queryParam("resourceType", MockProvider.EXAMPLE_RESOURCE_TYPE_ID)
     .then().expect().statusCode(Status.UNAUTHORIZED.getStatusCode())        
@@ -212,28 +208,17 @@ public abstract class AbstractAuthorizationRestServiceInteractionTest extends Ab
         
     given()
         .queryParam("permissionName", MockProvider.EXAMPLE_PERMISSION_NAME)
-        .queryParam("permissionValue", MockProvider.EXAMPLE_PERMISSION_VALUE)
         .queryParam("resourceName", MockProvider.EXAMPLE_RESOURCE_TYPE_NAME)
     .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())        
     .when().get(AUTH_CHECK_PATH);
     
     given()
         .queryParam("permissionName", MockProvider.EXAMPLE_PERMISSION_NAME)
-        .queryParam("permissionValue", MockProvider.EXAMPLE_PERMISSION_VALUE)
         .queryParam("resourceType", MockProvider.EXAMPLE_RESOURCE_TYPE_ID)
     .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())        
     .when().get(AUTH_CHECK_PATH);
-    
-    
+           
     given()
-        .queryParam("permissionName", MockProvider.EXAMPLE_PERMISSION_NAME)
-        .queryParam("resourceName", MockProvider.EXAMPLE_RESOURCE_TYPE_NAME)
-        .queryParam("resourceType", MockProvider.EXAMPLE_RESOURCE_TYPE_ID)
-    .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())        
-    .when().get(AUTH_CHECK_PATH);
-    
-    given()
-        .queryParam("permissionValue", MockProvider.EXAMPLE_PERMISSION_VALUE)
         .queryParam("resourceName", MockProvider.EXAMPLE_RESOURCE_TYPE_NAME)
         .queryParam("resourceType", MockProvider.EXAMPLE_RESOURCE_TYPE_ID)
     .then().expect().statusCode(Status.BAD_REQUEST.getStatusCode())        
@@ -270,7 +255,7 @@ public abstract class AbstractAuthorizationRestServiceInteractionTest extends Ab
     verify(authorization).setUserId(Authorization.ANY);
     verify(authorization, times(2)).setResourceType(authorization.getAuthorizationType());
     verify(authorization, times(2)).setResourceId(authorization.getResourceId());
-    verify(authorization, times(2)).setPermissions(authorization.getPermissions());
+    verify(authorization, times(2)).setPermissions(authorization.getPermissions(Permissions.values()));
     verify(authorizationServiceMock).saveAuthorization(authorization);
   }
   
@@ -299,7 +284,7 @@ public abstract class AbstractAuthorizationRestServiceInteractionTest extends Ab
     verify(authorization, times(2)).setUserId(authorization.getUserId());
     verify(authorization, times(2)).setResourceType(authorization.getAuthorizationType());
     verify(authorization, times(2)).setResourceId(authorization.getResourceId());
-    verify(authorization, times(2)).setPermissions(authorization.getPermissions());
+    verify(authorization, times(2)).setPermissions(authorization.getPermissions(Permissions.values()));
     verify(authorizationServiceMock).saveAuthorization(authorization);
   }
   
@@ -328,7 +313,7 @@ public abstract class AbstractAuthorizationRestServiceInteractionTest extends Ab
     verify(authorization, times(2)).setUserId(authorization.getUserId());
     verify(authorization, times(2)).setResourceType(authorization.getAuthorizationType());
     verify(authorization, times(2)).setResourceId(authorization.getResourceId());
-    verify(authorization, times(2)).setPermissions(authorization.getPermissions());
+    verify(authorization, times(2)).setPermissions(authorization.getPermissions(Permissions.values()));
     verify(authorizationServiceMock).saveAuthorization(authorization);
   }
   
@@ -446,7 +431,8 @@ public abstract class AbstractAuthorizationRestServiceInteractionTest extends Ab
         .statusCode(Status.OK.getStatusCode()).contentType(ContentType.JSON)
         .body("id", equalTo(authorization.getId()))
         .body("type", equalTo(authorization.getAuthorizationType()))
-        .body("permissions", equalTo(authorization.getPermissions()))
+        .body("permissions[0]", equalTo(Permissions.READ.getName()))
+        .body("permissions[1]", equalTo(Permissions.UPDATE.getName()))
         .body("userId", equalTo(authorization.getUserId()))
         .body("groupId", equalTo(authorization.getGroupId()))
         .body("resourceType", equalTo(authorization.getResourceType()))

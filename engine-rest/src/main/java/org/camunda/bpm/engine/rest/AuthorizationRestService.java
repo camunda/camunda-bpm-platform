@@ -46,7 +46,6 @@ public interface AuthorizationRestService {
   @Produces(MediaType.APPLICATION_JSON)
   public AuthorizationCheckResultDto isUserAuthorized(
       @QueryParam("permissionName") String permissionName,
-      @QueryParam("permissionValue") Integer permissionValue,
       @QueryParam("resourceName") String resourceName,
       @QueryParam("resourceType") Integer resourceType,
       @QueryParam("resourceId") String resourceId);

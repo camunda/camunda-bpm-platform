@@ -82,7 +82,7 @@ public class DefaultAuthorizationProviderTest extends PluggableProcessEngineTest
     assertEquals(AUTH_TYPE_GRANT, authorization.getAuthorizationType());
     assertEquals(USER.resourceType(), authorization.getResourceType());
     assertEquals("jonny2", authorization.getResourceId());
-    assertEquals(ALL.getValue(), authorization.getPermissions());
+    assertTrue(authorization.isPermissionGranted(ALL));
     
     // delete the user
     identityService.deleteUser("jonny2");
@@ -104,7 +104,7 @@ public class DefaultAuthorizationProviderTest extends PluggableProcessEngineTest
     assertEquals(AUTH_TYPE_GRANT, authorization.getAuthorizationType());
     assertEquals(GROUP.resourceType(), authorization.getResourceType());
     assertEquals("sales", authorization.getResourceId());
-    assertEquals(READ.getValue(), authorization.getPermissions());
+    assertTrue(authorization.isPermissionGranted(READ));
     
     // delete the group
     identityService.deleteGroup("sales");

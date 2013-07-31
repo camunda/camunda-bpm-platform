@@ -3,7 +3,7 @@
     <h1>Groups</h1>
   </div>      
 
-  <div show-if-authorized auth-permission="create" auth-resource-name="group"> 
+  <div show-if-authorized auth-permission="CREATE" auth-resource-name="group"> 
     <a class="btn pull-right" href="#/group-create"><i class="icon-plus"></i> New Group</a>
   </div>
      
@@ -20,7 +20,7 @@
     <tbody>
       <tr ng-repeat="group in groupList">
         <td>
-          <!-- add group icon here -->
+          <i class="icon-th"></i>
         </td>
         <td>
           <a href="#/groups/{{group.id}}">{{group.id}}</a>

@@ -65,9 +65,9 @@ public class AuthenticationFilter implements Filter {
         }
       }, authentications);
       
-    } finally {
+    } finally {      
       Authentications.clearCurrent();
-      
+      Authentications.updateSession(req.getSession(), authentications);
     }
     
   }

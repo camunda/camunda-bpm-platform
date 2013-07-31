@@ -20,14 +20,28 @@ package org.camunda.bpm.engine.authorization;
  */
 public enum Permissions implements Permission {
  
+  /** The none permission means 'no action', 'doing nothing'. 
+   * It does not mean that no permissions are granted. */
   NONE("NONE", 0),
+  
+  /** Indicates that  all interactions are permitted. */
   ALL("ALL", Integer.MAX_VALUE),
   
+  /** Indicates that READ interactions are permitted. */
   READ("READ", 2),
+  
+  /** Indicates that UPDATE interactions are permitted. */
   UPDATE("UPDATE", 4),
+  
+  /** Indicates that CREATE interactions are permitted. */
   CREATE("CREATE", 8),
+  
+  /** Indicates that DELETE interactions are permitted. */
   DELETE("DELETE", 16),
+  
+  /** Indicates that ACCESS interactions are permitted. */
   ACCESS("ACCESS", 32);  
+  
   // 10 additional (32 ... 16384(=2^14)) are reserved
   
   // implmentation //////////////////////////

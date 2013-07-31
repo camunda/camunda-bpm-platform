@@ -1,4 +1,7 @@
 ngDefine('admin.pages', [
+  './authorizations',
+  './authorizationCreate',
+  './authorizationDeleteConfirm',
   './users', 
   './userCreate', 
   './userEdit', 

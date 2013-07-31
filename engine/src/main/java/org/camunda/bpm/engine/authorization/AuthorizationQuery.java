@@ -70,5 +70,5 @@ public interface AuthorizationQuery extends Query<AuthorizationQuery, Authorizat
   
   /** Order by resource id (needs to be followed by {@link #asc()} or {@link #desc()}). */
   AuthorizationQuery orderByResourceId();
-    
+  
 }

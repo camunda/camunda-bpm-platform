@@ -20,6 +20,7 @@ import java.util.concurrent.Callable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import org.apache.ibatis.exceptions.PersistenceException;
 import org.camunda.bpm.application.ProcessApplicationReference;
 import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngineException;
@@ -191,6 +192,8 @@ public class CommandContext {
     if (exception != null) {
       if (exception instanceof Error) {
         throw (Error) exception;
+      } else if (exception instanceof PersistenceException) {
+        throw new ProcessEngineException("Process engnine persistence exception", exception);
       } else if (exception instanceof RuntimeException) {
         throw (RuntimeException) exception;
       } else {

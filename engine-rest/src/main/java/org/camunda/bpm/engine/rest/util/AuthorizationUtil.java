@@ -14,6 +14,7 @@ package org.camunda.bpm.engine.rest.util;
 
 import org.camunda.bpm.engine.authorization.Permission;
 import org.camunda.bpm.engine.authorization.Resource;
+import org.camunda.bpm.engine.rest.dto.converter.PermissionConverter;
 
 /**
  * @author Daniel Meyer
@@ -26,11 +27,11 @@ public class AuthorizationUtil implements Permission, Resource {
   protected String permissionName;
   protected int permissionValue;
   
-  public AuthorizationUtil(String resourceName, int resourceType, String permissionName, int permissionValue) {
+  public AuthorizationUtil(String resourceName, int resourceType, String permissionName) {
     this.resourceName = resourceName;
     this.resourceType = resourceType;
     this.permissionName = permissionName;
-    this.permissionValue = permissionValue;
+    this.permissionValue = PermissionConverter.getPermissionForName(permissionName).getValue();
   }
 
   public String resourceName() {

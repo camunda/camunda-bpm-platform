@@ -16,7 +16,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.camunda.bpm.engine.authorization.Authorization;
+import org.camunda.bpm.engine.authorization.Permission;
+import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.rest.dto.LinkableDto;
+import org.camunda.bpm.engine.rest.dto.converter.PermissionConverter;
 
 /**
  * @author Daniel Meyer
@@ -26,7 +29,7 @@ public class AuthorizationDto extends LinkableDto {
   
   protected String id;
   protected Integer type;
-  protected Integer permissions;  
+  protected String[] permissions;
   protected String userId;
   protected String groupId;
   protected Integer resourceType;
@@ -39,7 +42,10 @@ public class AuthorizationDto extends LinkableDto {
     
     authorizationDto.setId(dbAuthorization.getId());
     authorizationDto.setType(dbAuthorization.getAuthorizationType());
-    authorizationDto.setPermissions(dbAuthorization.getPermissions());
+    
+    Permission[] dbPermissions = dbAuthorization.getPermissions(Permissions.values());
+    authorizationDto.setPermissions(PermissionConverter.getNamesForPermissions(dbPermissions));
+    
     authorizationDto.setUserId(dbAuthorization.getUserId());
     authorizationDto.setGroupId(dbAuthorization.getGroupId());
     authorizationDto.setResourceType(dbAuthorization.getResourceType());
@@ -54,7 +60,7 @@ public class AuthorizationDto extends LinkableDto {
     dbAuthorization.setUserId(dto.getUserId());
     dbAuthorization.setResourceType(dto.getResourceType());
     dbAuthorization.setResourceId(dto.getResourceId());
-    dbAuthorization.setPermissions(dto.getPermissions());
+    dbAuthorization.setPermissions(PermissionConverter.getPermissionsForNames(dto.getPermissions()));
     
   }
   
@@ -81,11 +87,11 @@ public class AuthorizationDto extends LinkableDto {
   }
   public void setType(int type) {
     this.type = type;
-  }
-  public Integer getPermissions() {
+  }  
+  public String[] getPermissions() {
     return permissions;
   }
-  public void setPermissions(Integer permissions) {
+  public void setPermissions(String[] permissions) {
     this.permissions = permissions;
   }
   public String getUserId() {

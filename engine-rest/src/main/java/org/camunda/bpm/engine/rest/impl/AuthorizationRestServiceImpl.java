@@ -47,15 +47,12 @@ public class AuthorizationRestServiceImpl extends AbstractRestProcessEngineAware
     super(engineName);
   }
 
-  public AuthorizationCheckResultDto isUserAuthorized(String permissionName, Integer permissionValue, String resourceName, Integer resourceType, String resourceId) {    
+  public AuthorizationCheckResultDto isUserAuthorized(String permissionName, String resourceName, Integer resourceType, String resourceId) {    
     
     // validate request:
     if(permissionName == null) {
       throw new InvalidRequestException(Status.BAD_REQUEST, "Query parameter 'permissionName' cannot be null");
-      
-    } else if(permissionValue == null) {
-      throw new InvalidRequestException(Status.BAD_REQUEST, "Query parameter 'permissionValue' cannot be null");
-      
+            
     } else if(resourceName == null) {
       throw new InvalidRequestException(Status.BAD_REQUEST, "Query parameter 'resourceName' cannot be null");
       
@@ -72,7 +69,7 @@ public class AuthorizationRestServiceImpl extends AbstractRestProcessEngineAware
     final AuthorizationService authorizationService = processEngine.getAuthorizationService();
     
     // create new authorization dto implementing both Permission and Resource
-    AuthorizationUtil authorizationUtil = new AuthorizationUtil(resourceName, resourceType, permissionName, permissionValue);    
+    AuthorizationUtil authorizationUtil = new AuthorizationUtil(resourceName, resourceType, permissionName);    
 
     boolean isUserAuthorized = false;    
     if(resourceId == null || Authorization.ANY.equals(resourceId)) {

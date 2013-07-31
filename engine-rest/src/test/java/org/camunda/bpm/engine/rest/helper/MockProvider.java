@@ -21,6 +21,8 @@ import java.util.Date;
 import java.util.List;
 
 import org.camunda.bpm.engine.authorization.Authorization;
+import org.camunda.bpm.engine.authorization.Permission;
+import org.camunda.bpm.engine.authorization.Permissions;
 import org.camunda.bpm.engine.form.FormProperty;
 import org.camunda.bpm.engine.form.FormType;
 import org.camunda.bpm.engine.form.StartFormData;
@@ -174,9 +176,9 @@ public abstract class MockProvider {
   public static final int EXAMPLE_RESOURCE_TYPE_ID = 12345678;
   public static final String EXAMPLE_RESOURCE_TYPE_ID_STRING = "12345678";
   public static final String EXAMPLE_RESOURCE_ID = "exampleResourceId";
-  public static final String EXAMPLE_PERMISSION_NAME = "examplePermissionName";
-  public static final int EXAMPLE_PERMISSION_VALUE = 1;
-  public static final String EXAMPLE_PERMISSION_VALUE_STRING = "1";
+  public static final String EXAMPLE_PERMISSION_NAME = "READ";
+  public static final Permission[] EXAMPLE_PERMISSION_VALUES = new Permission[] {Permissions.READ, Permissions.UPDATE};
+  public static final String[] EXAMPLE_PERMISSION_VALUES_STRING = new String[] {"READ", "UPDATE"};
   
   public static final String EXAMPLE_AUTHORIZATION_ID = "someAuthorizationId";
   public static final int EXAMPLE_AUTHORIZATION_TYPE = 0;
@@ -475,7 +477,7 @@ public abstract class MockProvider {
     
     when(mockAuthorization.getResourceType()).thenReturn(EXAMPLE_RESOURCE_TYPE_ID);
     when(mockAuthorization.getResourceId()).thenReturn(EXAMPLE_RESOURCE_ID);
-    when(mockAuthorization.getPermissions()).thenReturn(EXAMPLE_PERMISSION_VALUE);
+    when(mockAuthorization.getPermissions(Permissions.values())).thenReturn(EXAMPLE_PERMISSION_VALUES);
         
     return mockAuthorization;
   }
@@ -489,7 +491,7 @@ public abstract class MockProvider {
     
     when(mockAuthorization.getResourceType()).thenReturn(EXAMPLE_RESOURCE_TYPE_ID);
     when(mockAuthorization.getResourceId()).thenReturn(EXAMPLE_RESOURCE_ID);
-    when(mockAuthorization.getPermissions()).thenReturn(EXAMPLE_PERMISSION_VALUE);
+    when(mockAuthorization.getPermissions(Permissions.values())).thenReturn(EXAMPLE_PERMISSION_VALUES);
         
     return mockAuthorization;
   }
@@ -503,7 +505,7 @@ public abstract class MockProvider {
     
     when(mockAuthorization.getResourceType()).thenReturn(EXAMPLE_RESOURCE_TYPE_ID);
     when(mockAuthorization.getResourceId()).thenReturn(EXAMPLE_RESOURCE_ID);
-    when(mockAuthorization.getPermissions()).thenReturn(EXAMPLE_PERMISSION_VALUE);
+    when(mockAuthorization.getPermissions(Permissions.values())).thenReturn(EXAMPLE_PERMISSION_VALUES);
         
     return mockAuthorization;
   }

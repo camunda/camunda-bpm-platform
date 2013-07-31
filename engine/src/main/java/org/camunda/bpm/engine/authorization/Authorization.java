@@ -122,19 +122,51 @@ public interface Authorization {
    * */
   public void removePermission(Permission permission);
   
-  /** sets the permissions to the provided value. 
-   * */
-  public void setPermissions(int permissions);
-  
   /**
-   * Allows checking for a permission Out-of-the-box constants can be found in {@link Permissions}.
+   * Allows checking whether this authorization grants a specific permission.
    * 
    * @param perm the permission to check for
+   * @throws IllegalStateException if this {@link Authorization} is of type {@link #AUTH_TYPE_REVOKE}
    */
-  public boolean hasPermission(Permission permission);
+  public boolean isPermissionGranted(Permission permission);
   
-  /** returns the permissions granted by this authorization */
-  public int getPermissions();
+  /**
+   * Allows checking whether this authorization revokes a specific permission.
+   * 
+   * @param perm the permission to check for
+   * @throws IllegalStateException if this {@link Authorization} is of type {@link #AUTH_TYPE_GRANT}
+   */
+  public boolean isPermissionRevoked(Permission permission);
+  
+  /** 
+   * Allows checking whether this authorization grants / revokes a set of permissions.
+   * Usually the set of built-in permissions is used: {@link Permissions#values()}
+   *  
+   * The return value of this method depends on the type of the authorization:
+   * <ul>
+   *  <li>For {@link #AUTH_TYPE_GLOBAL}: all permissions in the parameter list granted by this authorization are returned. </li>
+   *  <li>For {@link #AUTH_TYPE_GRANT}: all permissions in the parameter list granted by this authorization are returned. </li>
+   *  <li>For {@link #AUTH_TYPE_REVOKE}: all permissions in the parameter list revoked by this authorization are returned. </li>
+   * </ul>
+   * 
+   * @param an array of permissions to check for.
+   * @return Returns the set of {@link Permission Permissions} provided by this {@link Authorization}.
+   *  */
+  public Permission[] getPermissions(Permission[] permissions);
+  
+  /** 
+   * Sets the permissions to the provided value. Replaces all permissions.
+   *  
+   * The effect of this method depends on the type of this authorization:
+   * <ul>
+   *  <li>For {@link #AUTH_TYPE_GLOBAL}: all provided permissions are granted.</li>
+   *  <li>For {@link #AUTH_TYPE_GRANT}: all provided permissions are granted.</li>
+   *  <li>For {@link #AUTH_TYPE_REVOKE}: all provided permissions are revoked.</li>
+   * </ul>
+   *  
+   *  @param a set of permissions.
+   * */
+  public void setPermissions(Permission[] permissions);
   
   
   /** @return the ID of the {@link Authorization} object */
