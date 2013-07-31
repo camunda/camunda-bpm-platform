@@ -1,4 +1,3 @@
-
 package org.camunda.bpm.pa;
 
 import java.util.HashMap;
@@ -8,14 +7,9 @@ import org.camunda.bpm.admin.impl.web.SetupResource;
 import org.camunda.bpm.application.PostDeploy;
 import org.camunda.bpm.application.ProcessApplication;
 import org.camunda.bpm.application.impl.ServletProcessApplication;
-import org.camunda.bpm.engine.IdentityService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.RuntimeService;
-import org.camunda.bpm.engine.authorization.Groups;
-import org.camunda.bpm.engine.identity.Group;
-import org.camunda.bpm.engine.identity.User;
 import org.camunda.bpm.engine.impl.ProcessEngineImpl;
-import org.camunda.bpm.engine.impl.persistence.entity.GroupEntity;
 import org.camunda.bpm.engine.rest.dto.identity.UserCredentialsDto;
 import org.camunda.bpm.engine.rest.dto.identity.UserDto;
 import org.camunda.bpm.engine.rest.dto.identity.UserProfileDto;
@@ -38,7 +32,15 @@ public class DevProcessApplication extends ServletProcessApplication {
   private void createCockpitDemoData(ProcessEngine engine) throws Exception {
     RuntimeService runtimeService = engine.getRuntimeService();
 
-    runtimeService.startProcessInstanceByKey("multipleFailingServiceTasks");
+    Map<String, Object> vars1 = new HashMap<String, Object>();
+    vars1.put("booleanVar", true);
+    runtimeService.startProcessInstanceByKey("ProcessWithExclusiveGateway", "secondUserTask", vars1);
+    
+    Map<String, Object> vars2 = new HashMap<String, Object>();
+    vars2.put("booleanVar", false);
+    runtimeService.startProcessInstanceByKey("ProcessWithExclusiveGateway", "firstUserTask", vars2);
+    
+    runtimeService.startProcessInstanceByKey("multipleFailingServiceTasks", "aBusinessKey");
     
     runtimeService.startProcessInstanceByKey("TwoParallelCallActivitiesCallingDifferentProcess");
     runtimeService.startProcessInstanceByKey("TwoParallelCallActivitiesCallingDifferentProcess");
