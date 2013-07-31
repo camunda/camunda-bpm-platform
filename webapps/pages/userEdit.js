@@ -118,7 +118,7 @@ define(['angular'], function(angular) {
     }
 
     function checkRemoveGroupMembershipAuthorized() {
-      AuthorizationResource.check({permissionName:"delete", permissionValue:16, resourceName:"group membership", resourceType:3}).$then(function(response) {
+      AuthorizationResource.check({permissionName:"DELETE", resourceName:"group membership", resourceType:3}).$then(function(response) {
         $scope.availableOperations.removeGroup = response.data.authorized;
       });
     }

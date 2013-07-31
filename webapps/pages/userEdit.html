@@ -33,7 +33,7 @@
 
               <legend>Profile</legend>
 
-              <div ng-show="availableOperations.update">
+              <div>
 
                 <div class="control-group">
                   <label class="control-label" for="inputFirstname">Firstname*</label>
@@ -124,7 +124,7 @@
 
               <legend>{{user.firstName}} {{user.lastName}}&#39;s Groups</legend>
 
-              <div show-if-authorized auth-permission="create" auth-resource-name="group membership">
+              <div show-if-authorized auth-permission="CREATE" auth-resource-name="group membership">
                 <a class="btn pull-right" data-ng-click="openCreateGroupMembershipDialog()"><i class="icon-plus"></i> Add</a>
               </div>
 
