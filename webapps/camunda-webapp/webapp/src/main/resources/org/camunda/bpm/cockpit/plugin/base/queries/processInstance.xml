@@ -82,10 +82,6 @@
     ON
       RES.ID_ = HISTORY.PROC_INST_ID_
     </if>
-    <!-- query for variables join -->
-    <foreach collection="queryVariableValues" index="index" item="queryVariableValue">
-      inner join ${prefix}ACT_RU_VARIABLE A${index} on RES.PROC_INST_ID_ = A${index}.PROC_INST_ID_
-    </foreach>
     <where>
       RES.ID_ = RES.PROC_INST_ID_
 
@@ -102,84 +98,91 @@
       <!-- activityIds -->
       <if test="activityIdIn != null &amp;&amp; activityIdIn.length > 0">
       and EXISTS (
-                    select
-                      PROC_INST_ID_
-                    from
-                      ${prefix}ACT_RU_EXECUTION
-                    where
-                      RES.ID_ = PROC_INST_ID_
-                      and
-                      <foreach item="item" index="index" collection="activityIdIn"
-                               open="(" separator="OR" close=")">
-                        ACT_ID_ = #{item}
-                      </foreach>
-                      <if test="processDefinitionId != null">
-                      and PROC_DEF_ID_ = #{processDefinitionId}
-                      </if>
-                  )
+        select
+          PROC_INST_ID_
+        from
+          ${prefix}ACT_RU_EXECUTION
+        where
+          RES.ID_ = PROC_INST_ID_
+          and
+          <foreach item="item" index="index" collection="activityIdIn"
+                   open="(" separator="OR" close=")">
+            ACT_ID_ = #{item}
+          </foreach>
+          <if test="processDefinitionId != null">
+          and PROC_DEF_ID_ = #{processDefinitionId}
+          </if>
+      )
       </if>
 
       <!-- parentProcessDefinitionId -->
       <if test="parentProcessDefinitionId != null">
       and EXISTS (
-                    select
-                      ID_
-                    from
-                      ${prefix}ACT_RU_EXECUTION
-                    where
-                      PROC_DEF_ID_ = #{parentProcessDefinitionId}
-                      and RES.SUPER_EXEC_ = ID_
-                  )
+        select
+          ID_
+        from
+          ${prefix}ACT_RU_EXECUTION
+        where
+          PROC_DEF_ID_ = #{parentProcessDefinitionId}
+          and RES.SUPER_EXEC_ = ID_
+      )
       </if>
 
+      <!-- queryVariables -->
       <!-- PLEASE NOTE: If you change anything have a look into the HistoricVariableInstance & HistoricProcessInstance, the same query object is used there! -->
       <foreach collection="queryVariableValues" index="index" item="queryVariableValue">
-        <if test="!queryVariableValue.local">
-          <!-- When process instance variable is queried for, only process variables are taken into account -->
-          and A${index}.EXECUTION_ID_ = A${index}.PROC_INST_ID_
-        </if>
-      	and A${index}.NAME_= #{queryVariableValue.name}
+      and EXISTS (
+        select
+          ID_
+        from
+          ${prefix}ACT_RU_VARIABLE
+        where
+          RES.PROC_INST_ID_ = PROC_INST_ID_
+
+          and NAME_= #{queryVariableValue.name}
+
         <if test="!queryVariableValue.type.equals('null')">
         <!-- When operator is not-equals or type of value is null, type doesn't matter! -->
-          and A${index}.TYPE_ = #{queryVariableValue.type}
+          and TYPE_ = #{queryVariableValue.type}
         </if>
-      	<if test="queryVariableValue.textValue != null &amp;&amp; queryVariableValue.longValue == null &amp;&amp; queryVariableValue.doubleValue == null">
-	      and A${index}.TEXT_
-	      <choose>
-	        <when test="queryVariableValue.operator.equals('LIKE')">LIKE</when>
-	        <otherwise><include refid="executionVariableOperator" /></otherwise>
-	      </choose>
-	        #{queryVariableValue.textValue}
-      	</if>
-      	<if test="queryVariableValue.textValue2 != null">
-	      and A${index}.TEXT2_
-	      <choose>
-	        <when test="queryVariableValue.operator.equals('LIKE')">LIKE</when>
-	        <otherwise><include refid="executionVariableOperator" /></otherwise>
-	      </choose>
-	        #{queryVariableValue.textValue2}
-      	</if>
-      	<if test="queryVariableValue.longValue != null">
-	      and A${index}.LONG_
-	      <include refid="executionVariableOperator" />
-	      #{queryVariableValue.longValue}
-      	</if>
-      	<if test="queryVariableValue.doubleValue != null">
-	      and A${index}.DOUBLE_
-	      <include refid="executionVariableOperator" />
-	      #{queryVariableValue.doubleValue}
-      	</if>
-      	<!-- Null variable type -->
-      	<if test="queryVariableValue.textValue == null &amp;&amp; queryVariableValue.textValue2 == null &amp;&amp; queryVariableValue.longValue == null &amp;&amp; queryVariableValue.doubleValue == null">
+        <if test="queryVariableValue.textValue != null &amp;&amp; queryVariableValue.longValue == null &amp;&amp; queryVariableValue.doubleValue == null">
+          and TEXT_
+        <choose>
+          <when test="queryVariableValue.operator.equals('LIKE')">LIKE</when>
+          <otherwise><include refid="executionVariableOperator" /></otherwise>
+        </choose>
+          #{queryVariableValue.textValue}
+        </if>
+        <if test="queryVariableValue.textValue2 != null">
+          and TEXT2_
+        <choose>
+          <when test="queryVariableValue.operator.equals('LIKE')">LIKE</when>
+          <otherwise><include refid="executionVariableOperator" /></otherwise>
+        </choose>
+          #{queryVariableValue.textValue2}
+        </if>
+        <if test="queryVariableValue.longValue != null">
+          and LONG_
+        <include refid="executionVariableOperator" />
+        #{queryVariableValue.longValue}
+        </if>
+        <if test="queryVariableValue.doubleValue != null">
+        and DOUBLE_
+        <include refid="executionVariableOperator" />
+        #{queryVariableValue.doubleValue}
+        </if>
+        <!-- Null variable type -->
+        <if test="queryVariableValue.textValue == null &amp;&amp; queryVariableValue.textValue2 == null &amp;&amp; queryVariableValue.longValue == null &amp;&amp; queryVariableValue.doubleValue == null">
           <choose>
-	        <when test="queryVariableValue.operator.equals('NOT_EQUALS')">
-	          and (A${index}.TEXT_ is not null or A${index}.TEXT2_ is not null or A${index}.LONG_ is not null or A${index}.DOUBLE_ is not null or A${index}.BYTEARRAY_ID_ is not null)
-	        </when>
-	        <otherwise>
-			  and A${index}.TEXT_ is null and A${index}.TEXT2_ is null and A${index}.LONG_ is null and A${index}.DOUBLE_ is null and A${index}.BYTEARRAY_ID_ is null
-	        </otherwise>
-	      </choose>
-      	</if>
+          <when test="queryVariableValue.operator.equals('NOT_EQUALS')">
+            and (TEXT_ is not null or TEXT2_ is not null or LONG_ is not null or DOUBLE_ is not null or BYTEARRAY_ID_ is not null)
+          </when>
+          <otherwise>
+        and TEXT_ is null and TEXT2_ is null and LONG_ is null and DOUBLE_ is null and BYTEARRAY_ID_ is null
+          </otherwise>
+        </choose>
+        </if>
+      )
       </foreach>
     </where>
   </sql>
