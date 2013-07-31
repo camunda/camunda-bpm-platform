@@ -28,7 +28,7 @@ import org.camunda.bpm.engine.authorization.Resources;
  * <h2>Creating an authorization</h2>
  * <p>An authorization is created between a user/group and a resource. It describes 
  * the user/group's <em>permissions</em> to access that resource. An authorization may 
- * express different permissions, such as the permission to READ, WRITE, DELTE the 
+ * express different permissions, such as the permission to READ, WRITE, DELETE the 
  * resource. (See {@link Authorization} for details).</p>
  * 
  * <h2>Granting / revoking permissions</h2>
@@ -81,7 +81,7 @@ public interface AuthorizationService {
   public Authorization createNewAuthorization(int authorizationType);
   
   /**
-   * Allows saving an {@link Authorization} object. Use this method for persiting new 
+   * Allows saving an {@link Authorization} object. Use this method for persisting new 
    * transient {@link Authorization} objects obtained through {@link #createNewAuthorization(int)} or
    * for updating persistent objects.
    *  

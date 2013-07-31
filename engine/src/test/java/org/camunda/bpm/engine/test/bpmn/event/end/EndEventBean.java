@@ -10,36 +10,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.engine.authorization;
+
+package org.camunda.bpm.engine.test.bpmn.event.end;
+
+import java.io.Serializable;
+
+import org.camunda.bpm.engine.delegate.JavaDelegate;
 
 /**
- * <p>The set of built-in {@link Resource} names.</p>
- * 
- * @author Daniel Meyer
- *
+ * @author Kristin Polenz
  */
-public enum Resources implements Resource {
-  
-  APPLICATION("Application", 0),
-  USER("User", 1),
-  GROUP("Group", 2),
-  GROUP_MEMBERSHIP("Group membership", 3),
-  AUTHORIZATION("Authorization", 4);
-  
-  String name;
-  int id;
-  
-  Resources(String name, int id) {
-    this.name = name; 
-    this.id = id; 
-  } 
-  
-  public String resourceName() {
-    return name;
+public class EndEventBean implements Serializable {
+
+  private static final long serialVersionUID = 1L;
+
+  public JavaDelegate getJavaDelegate() {
+    return new DummyServiceTask();
   }
 
-  public int resourceType() {
-    return id;
-  }
-  
 }

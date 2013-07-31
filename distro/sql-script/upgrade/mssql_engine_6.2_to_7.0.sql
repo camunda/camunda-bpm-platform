@@ -262,13 +262,8 @@ create table ACT_RU_AUTHORIZATION (
   primary key (ID_)
 );
 
-alter table ACT_RU_AUTHORIZATION
-    add constraint ACT_UNIQ_AUTH_USER
-    unique (TYPE_,USER_ID_,RESOURCE_TYPE_,RESOURCE_ID_);
-    
-alter table ACT_RU_AUTHORIZATION
-    add constraint ACT_UNIQ_AUTH_GROUP
-    unique (TYPE_,GROUP_ID_,RESOURCE_TYPE_,RESOURCE_ID_);
+create unique index ACT_UNIQ_AUTH_USER on ACT_RU_AUTHORIZATION (TYPE_,USER_ID_,RESOURCE_TYPE_,RESOURCE_ID_) where USER_ID_ is not null;
+create unique index ACT_UNIQ_AUTH_GROUP on ACT_RU_AUTHORIZATION (TYPE_,GROUP_ID_,RESOURCE_TYPE_,RESOURCE_ID_) where GROUP_ID_ is not null;
 
 /** add deployment ids to jobs **/
 alter table ACT_RU_JOB 

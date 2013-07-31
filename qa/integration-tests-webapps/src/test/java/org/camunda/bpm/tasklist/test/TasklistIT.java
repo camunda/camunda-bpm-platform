@@ -2,10 +2,13 @@ package org.camunda.bpm.tasklist.test;
 
 
 import org.camunda.bpm.TestProperties;
+import org.camunda.bpm.util.SeleniumScreenshotRule;
 import org.camunda.bpm.util.TestUtil;
 import org.junit.After;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.Rule;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -19,17 +22,19 @@ import org.openqa.selenium.support.ui.WebDriverWait;
  */
 public class TasklistIT {
 
-  protected WebDriver driver;
+  protected static WebDriver driver = new FirefoxDriver();
   protected String appUrl;
 
   protected TestProperties testProperties;
   private TestUtil testUtil;
 
+  @Rule
+  public SeleniumScreenshotRule screenshotRule = new SeleniumScreenshotRule(driver);
+
   @Before
   public void before() throws Exception {
     testProperties = new TestProperties(48080);
     appUrl = testProperties.getApplicationPath("/camunda/app/tasklist");
-    driver = new FirefoxDriver();
     
     testUtil = new TestUtil(testProperties);
     testUtil.createInitialUser("admin", "admin", "Mr.", "Admin");
@@ -57,6 +62,10 @@ public class TasklistIT {
   public void after() {
     testUtil.deleteUser("admin");
     testUtil.destroy();
+  }
+
+  @AfterClass
+  public static void cleanup() {
     driver.close();
   }
 }

@@ -1,6 +1,8 @@
 package org.camunda.bpm.util;
 
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.camunda.bpm.TestProperties;
@@ -56,7 +58,13 @@ public class TestUtil {
 
     WebResource webResource = client.resource(testProperties.getApplicationPath("/camunda/api/admin/setup/default/user/create"));
     ClientResponse clientResponse = webResource.accept(MediaType.APPLICATION_JSON).type(MediaType.APPLICATION_JSON).post(ClientResponse.class, user);
-    clientResponse.close();
+    try {
+      if (clientResponse.getStatus() != Response.Status.NO_CONTENT.getStatusCode()) {
+        throw new WebApplicationException(clientResponse.getStatus());
+      }
+    } finally {
+      clientResponse.close();
+    }
   }
   
   public void deleteUser(String id) {
