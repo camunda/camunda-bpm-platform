@@ -265,3 +265,27 @@ a.expand-collapse:focus {
 .ctn-sitebar .page-header {
   padding-bottom: 0;
 }
+
+.table-filter .filter-toggle {
+  width: 10px;
+  text-align: right;
+  padding: 4px 10px;
+}
+
+.table-condensed input[type=text] {
+  height: 14px;
+  line-height: 14px;
+  margin-bottom: 0px;
+}
+
+.table-condensed .btn {
+  padding: 1px 4px;
+}
+
+.input-append {
+  margin-bottom: 0;
+}
+
+.table-filter .filter {
+  background: #FFFBEC;
+}

@@ -17,7 +17,7 @@ import static org.fest.assertions.Assertions.assertThat;
 import java.util.List;
 
 import org.camunda.bpm.cockpit.impl.plugin.base.dto.IncidentDto;
-import org.camunda.bpm.cockpit.impl.plugin.base.query.parameter.IncidentQueryParameter;
+import org.camunda.bpm.cockpit.impl.plugin.base.dto.query.IncidentQueryDto;
 import org.camunda.bpm.cockpit.impl.plugin.base.resources.IncidentRestService;
 import org.camunda.bpm.cockpit.plugin.test.AbstractCockpitPluginTest;
 import org.camunda.bpm.engine.ProcessEngine;
@@ -64,7 +64,7 @@ public class IncidentRestServiceTest extends AbstractCockpitPluginTest {
 
     String[] processInstanceIds= {processInstance1.getId()};
     
-    IncidentQueryParameter queryParameter = new IncidentQueryParameter();
+    IncidentQueryDto queryParameter = new IncidentQueryDto();
     queryParameter.setProcessInstanceIdIn(processInstanceIds);
 
     List<IncidentDto> result = resource.queryIncidents(queryParameter, null, null);
@@ -106,7 +106,7 @@ public class IncidentRestServiceTest extends AbstractCockpitPluginTest {
 
     String[] processInstanceIds= {processInstance1.getId(), processInstance2.getId()};
     
-    IncidentQueryParameter queryParameter = new IncidentQueryParameter();
+    IncidentQueryDto queryParameter = new IncidentQueryDto();
     queryParameter.setProcessInstanceIdIn(processInstanceIds);
 
     List<IncidentDto> result = resource.queryIncidents(queryParameter, null, null);
@@ -125,7 +125,7 @@ public class IncidentRestServiceTest extends AbstractCockpitPluginTest {
 
     String[] activityIds= {"theServiceTask1"};
     
-    IncidentQueryParameter queryParameter = new IncidentQueryParameter();
+    IncidentQueryDto queryParameter = new IncidentQueryDto();
     queryParameter.setActivityIdIn(activityIds);
 
     List<IncidentDto> result = resource.queryIncidents(queryParameter, null, null);
@@ -166,7 +166,7 @@ public class IncidentRestServiceTest extends AbstractCockpitPluginTest {
 
     String[] activityIds= {"theServiceTask1", "theServiceTask2"};
     
-    IncidentQueryParameter queryParameter = new IncidentQueryParameter();
+    IncidentQueryDto queryParameter = new IncidentQueryDto();
     queryParameter.setActivityIdIn(activityIds);
 
     List<IncidentDto> result = resource.queryIncidents(queryParameter, null, null);
@@ -186,7 +186,7 @@ public class IncidentRestServiceTest extends AbstractCockpitPluginTest {
     String[] processInstanceIds= {processInstance.getId()};
     String[] activityIds= {"ServiceTask_1"};
     
-    IncidentQueryParameter queryParameter = new IncidentQueryParameter();
+    IncidentQueryDto queryParameter = new IncidentQueryDto();
     queryParameter.setProcessInstanceIdIn(processInstanceIds);
     queryParameter.setActivityIdIn(activityIds);
 
@@ -209,11 +209,12 @@ public class IncidentRestServiceTest extends AbstractCockpitPluginTest {
     String[] processInstanceIds= {processInstance.getId()};
     String[] activityIds= {"theServiceTask1"}; // is an activity id in "processWithTwoParallelFailingServices" 
     
-    IncidentQueryParameter queryParameter = new IncidentQueryParameter();
+    IncidentQueryDto queryParameter = new IncidentQueryDto();
     queryParameter.setProcessInstanceIdIn(processInstanceIds);
     queryParameter.setActivityIdIn(activityIds);
 
     List<IncidentDto> result = resource.queryIncidents(queryParameter, null, null);
+    
     assertThat(result).isEmpty();
   }
   
@@ -225,14 +226,15 @@ public class IncidentRestServiceTest extends AbstractCockpitPluginTest {
   })
   public void testQueryWithNestedIncidents() {
     ProcessInstance processInstance1 = runtimeService.startProcessInstanceByKey("NestedCallActivity");
-    ProcessInstance processInstance2 = runtimeService.createProcessInstanceQuery().processDefinitionKey("CallActivity").singleResult();
-    ProcessInstance processInstance3 = runtimeService.createProcessInstanceQuery().processDefinitionKey("FailingProcess").singleResult();
     
     helper.waitForJobExecutorToProcessAllJobs(15000);
+    
+    ProcessInstance processInstance2 = runtimeService.createProcessInstanceQuery().processDefinitionKey("CallActivity").singleResult();
+    ProcessInstance processInstance3 = runtimeService.createProcessInstanceQuery().processDefinitionKey("FailingProcess").singleResult();
 
     String[] processInstanceIds= {processInstance1.getId()};
     
-    IncidentQueryParameter queryParameter = new IncidentQueryParameter();
+    IncidentQueryDto queryParameter = new IncidentQueryDto();
     queryParameter.setProcessInstanceIdIn(processInstanceIds);
 
     List<IncidentDto> result = resource.queryIncidents(queryParameter, null, null);
@@ -266,7 +268,6 @@ public class IncidentRestServiceTest extends AbstractCockpitPluginTest {
   
   @Test
   @Deployment(resources = {
-    "processes/failing-process.bpmn",
     "processes/process-with-two-parallel-failing-services.bpmn"
   })
   public void testQueryPaginiation() {
@@ -274,7 +275,7 @@ public class IncidentRestServiceTest extends AbstractCockpitPluginTest {
     
     helper.waitForJobExecutorToProcessAllJobs(15000);
 
-    IncidentQueryParameter queryParameter = new IncidentQueryParameter();
+    IncidentQueryDto queryParameter = new IncidentQueryDto();
 
     List<IncidentDto> result = resource.queryIncidents(queryParameter, 0, 2);
     assertThat(result).isNotEmpty();

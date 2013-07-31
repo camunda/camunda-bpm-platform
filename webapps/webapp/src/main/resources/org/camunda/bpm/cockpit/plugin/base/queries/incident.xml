@@ -26,13 +26,13 @@
     <result property="rootCauseIncidentConfiguration" column="ROOT_INC_CONF_" jdbcType="VARCHAR" />
   </resultMap>
   
-  <select id="selectIncidentWithCauseAndRootCauseIncidentsCount" parameterType="org.camunda.bpm.cockpit.impl.plugin.base.query.parameter.IncidentQueryParameter"
+  <select id="selectIncidentWithCauseAndRootCauseIncidentsCount" parameterType="org.camunda.bpm.cockpit.impl.plugin.base.dto.query.IncidentQueryDto"
            resultType="long">
     select count(distinct RES.ID_)
     <include refid="selectIncidents" />
   </select>
 
-  <select id="selectIncidentWithCauseAndRootCauseIncidents" parameterType="org.camunda.bpm.cockpit.impl.plugin.base.query.parameter.IncidentQueryParameter"
+  <select id="selectIncidentWithCauseAndRootCauseIncidents" parameterType="org.camunda.bpm.cockpit.impl.plugin.base.dto.query.IncidentQueryDto"
           resultMap="incidentResultMap">
     ${limitBefore}
     select RES.* ${limitBetween}
@@ -70,19 +70,19 @@
           <where>
             <!-- processInstanceIds -->
             <if test="processInstanceIdIn != null &amp;&amp; processInstanceIdIn.length > 0">
-              and RES.PROC_INST_ID_ in
+              and 
               <foreach item="item" index="index" collection="processInstanceIdIn"
-                       open="(" separator="," close=")">
-                #{item}
+                       open="(" separator="or" close=")">
+                RES.PROC_INST_ID_ = #{item}
               </foreach>
             </if>
             
             <!-- activityIds -->
             <if test="activityIdIn != null &amp;&amp; activityIdIn.length > 0">
-              and RES.ACTIVITY_ID_ in
+              and 
               <foreach item="item" index="index" collection="activityIdIn"
-                       open="(" separator="," close=")">
-                #{item}
+                       open="(" separator="or" close=")">
+                RES.ACTIVITY_ID_ = #{item}
               </foreach>
             </if>         
             

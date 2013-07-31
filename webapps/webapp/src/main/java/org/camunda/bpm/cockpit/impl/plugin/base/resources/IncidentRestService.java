@@ -25,7 +25,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.UriInfo;
 
 import org.camunda.bpm.cockpit.impl.plugin.base.dto.IncidentDto;
-import org.camunda.bpm.cockpit.impl.plugin.base.query.parameter.IncidentQueryParameter;
+import org.camunda.bpm.cockpit.impl.plugin.base.dto.query.IncidentQueryDto;
 import org.camunda.bpm.cockpit.plugin.resource.AbstractPluginResource;
 import org.camunda.bpm.engine.rest.dto.CountResultDto;
 
@@ -46,14 +46,14 @@ public class IncidentRestService extends AbstractPluginResource {
   public List<IncidentDto> getIncidents(@Context UriInfo uriInfo,
       @QueryParam("firstResult") Integer firstResult,
       @QueryParam("maxResults") Integer maxResults) {
-    IncidentQueryParameter queryParameter = new IncidentQueryParameter(uriInfo.getQueryParameters());
+    IncidentQueryDto queryParameter = new IncidentQueryDto(uriInfo.getQueryParameters());
     return queryIncidents(queryParameter, firstResult, maxResults);
   }
   
   @POST
   @Produces(MediaType.APPLICATION_JSON)
   @Consumes(MediaType.APPLICATION_JSON)
-  public List<IncidentDto> queryIncidents(IncidentQueryParameter queryParameter,
+  public List<IncidentDto> queryIncidents(IncidentQueryDto queryParameter,
       @QueryParam("firstResult") Integer firstResult,
       @QueryParam("maxResults") Integer maxResults) {
     
@@ -62,7 +62,7 @@ public class IncidentRestService extends AbstractPluginResource {
     return matchingIncidents;
   }
   
-  private void paginateQueryParameters(IncidentQueryParameter queryParameter, Integer firstResult, Integer maxResults) {
+  private void paginateQueryParameters(IncidentQueryDto queryParameter, Integer firstResult, Integer maxResults) {
     if (firstResult == null) {
       firstResult = 0;
     }
@@ -77,7 +77,7 @@ public class IncidentRestService extends AbstractPluginResource {
   @Path("/count")
   @Produces(MediaType.APPLICATION_JSON)
   public CountResultDto getIncidentsCount(@Context UriInfo uriInfo) {
-    IncidentQueryParameter queryParameter = new IncidentQueryParameter(uriInfo.getQueryParameters());
+    IncidentQueryDto queryParameter = new IncidentQueryDto(uriInfo.getQueryParameters());
     return queryIncidentsCount(queryParameter);
   }
   
@@ -85,7 +85,7 @@ public class IncidentRestService extends AbstractPluginResource {
   @Path("/count")
   @Consumes(MediaType.APPLICATION_JSON)
   @Produces(MediaType.APPLICATION_JSON)
-  public CountResultDto queryIncidentsCount(IncidentQueryParameter queryParameter) {
+  public CountResultDto queryIncidentsCount(IncidentQueryDto queryParameter) {
     CountResultDto result = new CountResultDto();
     long count = getQueryService().executeQueryRowCount("selectIncidentWithCauseAndRootCauseIncidentsCount", queryParameter);
     result.setCount(count);

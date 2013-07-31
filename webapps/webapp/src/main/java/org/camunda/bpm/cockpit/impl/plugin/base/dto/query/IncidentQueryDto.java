@@ -10,7 +10,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.camunda.bpm.cockpit.impl.plugin.base.query.parameter;
+package org.camunda.bpm.cockpit.impl.plugin.base.dto.query;
 
 import javax.ws.rs.core.MultivaluedMap;
 
@@ -22,16 +22,16 @@ import org.camunda.bpm.engine.rest.dto.converter.StringArrayConverter;
 /**
  * @author roman.smirnov
  */
-public class IncidentQueryParameter extends AbstractRestQueryParametersDto<IncidentDto> {
+public class IncidentQueryDto extends AbstractRestQueryParametersDto<IncidentDto> {
   
   private static final long serialVersionUID = 1L;
     
   protected String[] processInstanceIdIn;
   protected String[] activityIdIn;
   
-  public IncidentQueryParameter() { }
+  public IncidentQueryDto() { }
   
-  public IncidentQueryParameter(MultivaluedMap<String, String> queryParameters) {
+  public IncidentQueryDto(MultivaluedMap<String, String> queryParameters) {
     super(queryParameters);
   }
   
