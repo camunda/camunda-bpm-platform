@@ -314,7 +314,6 @@ ngDefine('cockpit.directives', [
       $scope.selection['view'] = {};
       $scope.selection.view['bpmnElements'] = [ selectedBpmnElement ];
       $scope.selection.view['selectedBpmnElement'] = {element: selectedBpmnElement, ctrlKey: false, remove: false};
-      $scope.selection.view['scrollToBpmnElement'] = selectedBpmnElement;
 
       $scope.$apply();
     };
