@@ -147,5 +147,9 @@ public class Authentications implements Serializable {
     }
     return authentications;
   }
+  
+  public static void updateSession(HttpSession session, Authentications authentications) {
+    session.setAttribute(CAM_AUTH_SESSION_KEY, authentications);
+  }
 
 }

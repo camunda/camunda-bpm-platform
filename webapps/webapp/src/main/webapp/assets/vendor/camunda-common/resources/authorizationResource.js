@@ -5,7 +5,8 @@ ngDefine('camunda.common.resources.authorization', [
   var AuthorizationResource = [ '$resource', 'Uri', function ($resource, Uri) {
 
     return $resource(Uri.appUri('engine://engine/:engine/authorization/:action'), { action: '@action' }, {
-      check : {method:'GET', params: { 'action' : 'check'},  cache : true}
+      check : {method:'GET', params: { 'action' : 'check'},  cache : true},
+      create : {method:'POST', params: { 'action' : 'create'}}
     });  
 
   }];

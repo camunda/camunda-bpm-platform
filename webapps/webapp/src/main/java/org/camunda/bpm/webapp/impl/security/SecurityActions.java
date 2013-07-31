@@ -29,15 +29,16 @@ public class SecurityActions {
   
   public static <T> T runWithAuthentications(SecurityAction<T> action, Authentications authentications) {
         
+    List<Authentication> currentAuthentications = authentications.getAuthentications(); 
     try {
-      for (Authentication authentication : authentications.getAuthentications()) {
+      for (Authentication authentication : currentAuthentications) {
         authenticateProcessEngine(authentication);
       }    
       
       return action.execute();
       
     } finally {
-      for (Authentication authentication : authentications.getAuthentications()) {
+      for (Authentication authentication : currentAuthentications) {
         clearAuthentication(authentication);
       }
     }

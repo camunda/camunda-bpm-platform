@@ -49,6 +49,16 @@ form.inline-edit {
   right: 0px;
 }
 
+/** ---- in-place editing ----**/
+
+.in-place-edit {
+  width: 100%;
+}
+
+textarea.in-place-edit {
+  resize: vertical;
+}
+
 /** help system */
 .help-toggle {
   display: inline-block;
@@ -337,3 +347,4 @@ input.ng-invalid {
   margin-bottom: 15px;
   padding: 7px 9px;
 }
+

@@ -2,20 +2,12 @@ ngDefine('camunda.common.directives.showIfAuthorized', [
   'module:camunda.common.resources.authorization:../resources/authorizationResource', 
 ], function(module) {
 
-  var builtInPermissions = {
-    "none": 0,
-    "all": 2147483647,
-    "read": 2,
-    "update": 4,
-    "create": 8,
-    "delete": 16,
-    "access": 32  
-  };
-
   var builtInResources = {
+    "application": 0,
     "user": 1,
     "group": 2,
-    "group membership": 3
+    "group membership": 3,
+    "authorization": 4,
   };
 
   var mapParameters = function(permissionName, resource, resourceId) {
@@ -23,7 +15,6 @@ ngDefine('camunda.common.directives.showIfAuthorized', [
     var request = {};
 
     request.permissionName = permissionName;
-    request.permissionValue = builtInPermissions[permissionName];
     request.resourceName = resource;
     request.resourceType = builtInResources[resource];
     
@@ -42,6 +33,7 @@ ngDefine('camunda.common.directives.showIfAuthorized', [
       restrict: 'A',
       compile: function (element, attr, transclude) {
         return function ($scope, $element, $attr) {
+          
           var animate = $animator($scope, $attr);
           var childElement, childScope;
 
