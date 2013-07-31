@@ -511,6 +511,32 @@ public class AuthorizationServiceTest extends PluggableProcessEngineTestCase {
       
   }
   
+  public void testGlobalAuthPermissions() {
+    
+    AuthorizationEntity authorization = new AuthorizationEntity(AUTH_TYPE_GRANT);
+    assertFalse(authorization.isPermissionGranted(ALL));
+    assertTrue(authorization.isPermissionGranted(NONE));    
+    List<Permission> perms = Arrays.asList(authorization.getPermissions(Permissions.values()));
+    assertTrue(perms.contains(NONE));
+    assertEquals(1, perms.size());
+    
+    authorization.addPermission(READ);    
+    perms = Arrays.asList(authorization.getPermissions(Permissions.values()));
+    assertTrue(perms.contains(NONE));
+    assertTrue(perms.contains(READ));
+    assertEquals(2, perms.size());    
+    assertTrue(authorization.isPermissionGranted(READ));
+    assertTrue(authorization.isPermissionGranted(NONE)); // (none is always granted => you are always authorized to do nothing)
+    
+    try {
+      authorization.isPermissionRevoked(READ);
+      fail("Exception expected");
+    } catch (IllegalStateException e) {
+      assertTextPresent("Method isPermissionRevoked cannot be used for authorization type GRANT.", e.getMessage());
+    }
+      
+  }
+  
   public void testRevokeAuthPermissions() {
     
     AuthorizationEntity authorization = new AuthorizationEntity(AUTH_TYPE_REVOKE);
