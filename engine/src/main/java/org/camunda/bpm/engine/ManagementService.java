@@ -13,7 +13,7 @@
 package org.camunda.bpm.engine;
 
 import java.sql.Connection;
-import java.util.List;
+import java.util.Date;
 import java.util.Map;
 import java.util.Set;
 
@@ -135,6 +135,15 @@ public interface ManagementService {
    * @param retries number of retries.
    */
   void setJobRetries(String jobId, int retries);
+  
+  /**
+   * Sets a new due date for the provided id. 
+   * When newDuedate is null, the job is executed with the next
+   * job executor run. 
+   * @param jobId id of job to modify, cannot be null.
+   * @param newDuedate new date for job execution
+   */
+  void setJobDuedate(String jobId, Date newDuedate);
 
   /**
    * Returns the full stacktrace of the exception that occurs when the job
