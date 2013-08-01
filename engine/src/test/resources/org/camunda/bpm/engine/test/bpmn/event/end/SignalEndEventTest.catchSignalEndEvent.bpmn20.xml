@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions id="definitions"
+	xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+	xmlns:activiti="http://activiti.org/bpmn" 
+	targetNamespace="Examples">
+  
+  <signal id="mySignal" name="alert" />
+
+	<process id="catchSignalEndEvent">
+
+		<startEvent id="start" />
+    
+    <sequenceFlow id="flow1" sourceRef="start" targetRef="catchSignal" />
+  
+    <intermediateCatchEvent id="catchSignal">
+      <signalEventDefinition signalRef="mySignal"/>
+    </intermediateCatchEvent>
+    
+    <sequenceFlow id="flow2" sourceRef="catchSignal" targetRef="taskAfterSignalCatch" />
+    
+    <userTask id="taskAfterSignalCatch" name="task after catching the signal" />
+    
+    <sequenceFlow id="flow4" sourceRef="taskAfterSignalCatch" targetRef="end" />
+    
+		<endEvent id="end" />
+
+	</process>
+
+	
+
+</definitions>
