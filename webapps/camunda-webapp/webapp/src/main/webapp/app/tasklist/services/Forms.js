@@ -46,8 +46,8 @@ ngDefine('tasklist.services', [
        * @param form {object} optional
        */
       parseFormData: function(data, form) {
-        var key = data.formKey,
-          applicationContextPath = data.applicationContextPath;
+        var key = data.key,
+          applicationContextPath = data.contextPath;
 
         form = form || {};
 
