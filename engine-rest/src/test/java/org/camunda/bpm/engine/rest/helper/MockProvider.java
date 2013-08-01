@@ -17,6 +17,7 @@ import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 
@@ -535,5 +536,12 @@ public abstract class MockProvider {
         createMockGlobalAuthorization()
     });
   }
- 
+
+  public static Date createMockDuedate() {
+    Calendar cal = Calendar.getInstance();
+    cal.setTime(new Date());
+    cal.add(Calendar.DATE, 3);
+    return cal.getTime();
+  }
+
 }
