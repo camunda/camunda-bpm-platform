@@ -14,7 +14,7 @@
 	</process-engine>
   <process-archive name="archive1">
     <process-engine>engine1</process-engine>
-    <process>org/camunda/bpm/integrationtest/jobexecutor/archive1process.bpmn20.xml</process>
+    <process>org/camunda/bpm/integrationtest/jobexecutor/IndependentJobExecutionTest.process1.bpmn20.xml</process>
   
     <properties>      
       <property name="isDeleteUponUndeploy">true</property>

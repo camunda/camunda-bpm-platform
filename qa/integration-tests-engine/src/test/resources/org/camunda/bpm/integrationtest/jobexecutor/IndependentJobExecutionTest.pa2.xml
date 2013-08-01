@@ -6,7 +6,7 @@
 
   <process-archive name="archive2">
     <process-engine>default</process-engine>
-    <process>org/camunda/bpm/integrationtest/jobexecutor/archive2process.bpmn20.xml</process>
+    <process>org/camunda/bpm/integrationtest/jobexecutor/IndependentJobExecutionTest.process2.bpmn20.xml</process>
   
     <properties>      
       <property name="isDeleteUponUndeploy">true</property>
