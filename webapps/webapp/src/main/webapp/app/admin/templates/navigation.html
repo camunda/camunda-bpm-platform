@@ -9,7 +9,7 @@
       <a href="#/groups">Groups</a>
     </li>
 
-    <li class="dropdown" ng-class="activeClass('#/authorization')">
+    <li class="dropdown" ng-class="activeClass('#/authorization')" show-if-authorized auth-permission="ALL" auth-resource-name="authorization">
       <a href="#/authorization?resource=0">Authorizations</a>
     </li>
   </ul>
