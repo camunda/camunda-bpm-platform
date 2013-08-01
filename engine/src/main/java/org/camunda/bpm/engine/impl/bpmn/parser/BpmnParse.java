@@ -57,6 +57,7 @@ import org.camunda.bpm.engine.impl.bpmn.behavior.SequentialMultiInstanceBehavior
 import org.camunda.bpm.engine.impl.bpmn.behavior.ServiceTaskDelegateExpressionActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.ServiceTaskExpressionActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.ShellActivityBehavior;
+import org.camunda.bpm.engine.impl.bpmn.behavior.SignalEndEventActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.SubProcessActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.TaskActivityBehavior;
 import org.camunda.bpm.engine.impl.bpmn.behavior.TerminateEndEventActivityBehavior;
@@ -2397,6 +2398,7 @@ public class BpmnParse extends Parse {
       Element cancelEventDefinition = endEventElement.element("cancelEventDefinition");
       Element terminateEventDefinition = endEventElement.element("terminateEventDefinition");
       Element messageEventDefinitionElement = endEventElement.element("messageEventDefinition");
+      Element signalEventDefinition = endEventElement.element("signalEventDefinition");
       if (errorEventDefinition != null) { // error end event
         String errorRef = errorEventDefinition.attribute("errorRef");
         if (errorRef == null || "".equals(errorRef)) {
@@ -2421,6 +2423,10 @@ public class BpmnParse extends Parse {
       } else if (messageEventDefinitionElement != null) {
         // CAM-436 same behaviour as service task
         activity.setActivityBehavior(parseServiceTask(messageEventDefinitionElement, scope).getActivityBehavior());
+      } else if (signalEventDefinition != null) {
+          activity.setProperty("type", "signalEndEvent");
+          EventSubscriptionDeclaration signalDefinition = parseSignalEventDefinition(signalEventDefinition);
+          activity.setActivityBehavior(new SignalEndEventActivityBehavior(signalDefinition));
       } else { // default: none end event
         activity.setActivityBehavior(new NoneEndEventActivityBehavior());
       }
