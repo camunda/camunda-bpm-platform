@@ -21,13 +21,13 @@
     <dependency>
       <groupId>org.apache.tomcat</groupId>
       <artifactId>apache-tomcat-dist</artifactId>
-      <version>${tomcat.version}</version>
+      <version>${version.tomcat}</version>
       <type>tar.gz</type>
     </dependency>
     <dependency>
       <groupId>org.apache.tomcat</groupId>
       <artifactId>tomcat-jdbc</artifactId>
-      <version>7.0.33</version>
+      <version>${version.tomcat}</version>
     </dependency>
 
     <dependency>

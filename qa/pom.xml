@@ -55,7 +55,7 @@
 	<tomcat6.connector.ajp.port>48009</tomcat6.connector.ajp.port>
 	<tomcat6.connector.ajp.redirectPort>48443</tomcat6.connector.ajp.redirectPort>
     <tomcat6.server.port>48005</tomcat6.server.port>
-	<tomcat6.runtime.location>../tomcat-runtime/target/server/apache-tomcat-7.0.33</tomcat6.runtime.location>
+	<tomcat6.runtime.location>../tomcat-runtime/target/server/apache-tomcat-${version.tomcat}</tomcat6.runtime.location>
 
 
     <database.datasource.class.type>javax.sql.DataSource</database.datasource.class.type>

@@ -47,6 +47,6 @@ Contents:
 ==================      
         
 camunda BPM platform version: ${project.version}
-Apache Tomcat Server version: ${tomcat.version}
+Apache Tomcat Server version: ${version.tomcat}
 
 =================

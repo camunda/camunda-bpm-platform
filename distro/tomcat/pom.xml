@@ -14,10 +14,6 @@
 
   <name>camunda BPM - tomcat</name>
 
-  <properties>
-    <tomcat.version>7.0.33</tomcat.version>
-  </properties>
-
   <modules>
     <module>assembly</module>
     <module>distro</module>
