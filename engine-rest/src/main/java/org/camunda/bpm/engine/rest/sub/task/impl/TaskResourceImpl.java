@@ -17,11 +17,15 @@ import java.util.Map;
 
 import javax.ws.rs.core.Response.Status;
 
+import org.camunda.bpm.BpmPlatform;
+import org.camunda.bpm.ProcessApplicationService;
+import org.camunda.bpm.application.ProcessApplicationInfo;
 import org.camunda.bpm.engine.FormService;
 import org.camunda.bpm.engine.ProcessEngine;
 import org.camunda.bpm.engine.ProcessEngineException;
 import org.camunda.bpm.engine.TaskService;
 import org.camunda.bpm.engine.form.FormData;
+import org.camunda.bpm.engine.repository.ProcessDefinition;
 import org.camunda.bpm.engine.rest.dto.task.CompleteTaskDto;
 import org.camunda.bpm.engine.rest.dto.task.FormDto;
 import org.camunda.bpm.engine.rest.dto.task.TaskDto;
@@ -29,6 +33,7 @@ import org.camunda.bpm.engine.rest.dto.task.UserIdDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
 import org.camunda.bpm.engine.rest.sub.task.TaskResource;
+import org.camunda.bpm.engine.rest.util.ApplicationContextPathUtil;
 import org.camunda.bpm.engine.rest.util.DtoUtil;
 import org.camunda.bpm.engine.task.Task;
 
@@ -94,15 +99,17 @@ public class TaskResourceImpl implements TaskResource {
   @Override
   public FormDto getForm() {
     FormService formService = engine.getFormService();
-
+    Task task = getTaskById(taskId);
     FormData formData;
     try {
       formData = formService.getTaskFormData(taskId);
     } catch (ProcessEngineException e) {
       throw new RestException(Status.BAD_REQUEST, e, "Cannot get form for task " + taskId);
     }
-    
-    return FormDto.fromFormData(formData);
+
+    FormDto dto = FormDto.fromFormData(formData);
+    dto.setContextPath(ApplicationContextPathUtil.getApplicationPath(engine, task.getProcessDefinitionId()));
+    return dto;
   }
 
   @Override
@@ -135,7 +142,7 @@ public class TaskResourceImpl implements TaskResource {
    * @param id
    * @return
    */
-  private Task getTaskById(String id) {
+  protected Task getTaskById(String id) {
     return engine.getTaskService().createTaskQuery().taskId(id).singleResult();
   }
 }

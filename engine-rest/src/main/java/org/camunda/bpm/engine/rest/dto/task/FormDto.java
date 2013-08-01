@@ -21,6 +21,7 @@ import org.camunda.bpm.engine.form.FormData;
 public class FormDto {
 
   private String key;
+  private String contextPath;
 
   public void setKey(String form) {
     this.key = form;
@@ -28,6 +29,14 @@ public class FormDto {
 
   public String getKey() {
     return key;
+  }
+
+  public void setContextPath(String contextPath) {
+    this.contextPath = contextPath;
+  }
+
+  public String getContextPath() {
+    return contextPath;
   }
 
   public static FormDto fromFormData(FormData formData) {

@@ -47,6 +47,7 @@ import org.camunda.bpm.engine.rest.dto.runtime.StartProcessInstanceDto;
 import org.camunda.bpm.engine.rest.dto.task.FormDto;
 import org.camunda.bpm.engine.rest.exception.InvalidRequestException;
 import org.camunda.bpm.engine.rest.exception.RestException;
+import org.camunda.bpm.engine.rest.util.ApplicationContextPathUtil;
 import org.camunda.bpm.engine.rest.util.DtoUtil;
 import org.camunda.bpm.engine.runtime.ProcessInstance;
 
@@ -173,8 +174,9 @@ public class ProcessDefinitionResourceImpl implements ProcessDefinitionResource 
     } catch (ProcessEngineException e) {
       throw new InvalidRequestException(Status.BAD_REQUEST, e, "Cannot get start form data for process definition " + processDefinitionId);
     }
+    FormDto dto = FormDto.fromFormData(formData);
+    dto.setContextPath(ApplicationContextPathUtil.getApplicationPath(engine, processDefinitionId));
 
-    return FormDto.fromFormData(formData);
+    return dto;
   }
-
 }
