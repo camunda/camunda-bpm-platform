@@ -21,7 +21,7 @@
       'angular-resource' : 'assets/vendor/angular/angular-resource',
       'angular-sanitize' : 'assets/vendor/angular/angular-sanitize',
       'angular-cookies' : 'assets/vendor/angular/angular-cookies',
-      'angular-data-depend' : 'assets/vendor/angular-data-depend'
+      'angular-data-depend' : 'assets/vendor/angular-data-depend/dataDepend'
     },
     shim: {
       'jquery-mousewheel' : { deps: [ 'jquery' ] },
