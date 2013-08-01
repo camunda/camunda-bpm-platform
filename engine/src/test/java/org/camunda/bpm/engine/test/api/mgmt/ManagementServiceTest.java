@@ -13,7 +13,9 @@
 
 package org.camunda.bpm.engine.test.api.mgmt;
 
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
 
 import junit.framework.Assert;
 
@@ -237,4 +239,83 @@ public class ManagementServiceTest extends PluggableProcessEngineTestCase {
     // Clean up
     managementService.executeJob(timerJob.getId());
   }
+  
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/ManagementServiceTest.testGetJobExceptionStacktrace.bpmn20.xml"})
+  public void testSetJobDuedate() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("exceptionInJobExecution");
+
+    // The execution is waiting in the first usertask. This contains a boundary
+    // timer event.
+    Job timerJob = managementService.createJobQuery()
+      .processInstanceId(processInstance.getId())
+      .singleResult();
+    
+    assertNotNull("No job found for process instance", timerJob);
+    assertNotNull(timerJob.getDuedate());
+
+    Calendar cal = Calendar.getInstance();
+    cal.setTime(new Date());
+    cal.add(Calendar.DATE, 3); // add 3 days on the actual date
+    managementService.setJobDuedate(timerJob.getId(), cal.getTime());
+
+    timerJob = managementService.createJobQuery()
+      .processInstanceId(processInstance.getId())
+      .singleResult();
+    
+    cal = Calendar.getInstance();
+    cal.setTime(new Date());
+    cal.add(Calendar.DATE, 3);
+    assertEquals(cal.getTime().getTime(), timerJob.getDuedate().getTime());
+  }
+  
+  @Deployment(resources = {"org/camunda/bpm/engine/test/api/mgmt/ManagementServiceTest.testGetJobExceptionStacktrace.bpmn20.xml"})
+  public void testSetJobDuedateDateNull() {
+    ProcessInstance processInstance = runtimeService.startProcessInstanceByKey("exceptionInJobExecution");
+
+    // The execution is waiting in the first usertask. This contains a boundary
+    // timer event.
+    Job timerJob = managementService.createJobQuery()
+      .processInstanceId(processInstance.getId())
+      .singleResult();
+    
+    assertNotNull("No job found for process instance", timerJob);
+    assertNotNull(timerJob.getDuedate());
+
+    managementService.setJobDuedate(timerJob.getId(), null);
+
+    timerJob = managementService.createJobQuery()
+      .processInstanceId(processInstance.getId())
+      .singleResult();
+    
+    assertNull(timerJob.getDuedate());
+  }  
+  
+  
+  public void testSetJobDuedateJobIdNull() {
+    try {
+      managementService.setJobDuedate(null, new Date());
+      fail("ProcessEngineException expected");
+    } catch (ProcessEngineException re) {
+      assertTextPresent("The job id is mandatory, but 'null' has been provided.", re.getMessage());
+    }
+  }
+  
+  public void testSetJobDuedateEmptyJobId() {
+    try {
+      managementService.setJobDuedate("", new Date());
+      fail("ProcessEngineException expected");
+    } catch (ProcessEngineException re) {
+      assertTextPresent("The job id is mandatory, but '' has been provided.", re.getMessage());
+    }
+  }
+  
+  public void testSetJobDuedateUnexistingJobId() {
+    try {
+      managementService.setJobDuedate("unexistingjob", new Date());
+      fail("ProcessEngineException expected");
+    } catch (ProcessEngineException re) {
+      assertTextPresent("No job found with id 'unexistingjob'.", re.getMessage());
+    }
+  }
+  
 }
