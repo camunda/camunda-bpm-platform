@@ -45,7 +45,7 @@ public interface ProcessDefinitionRestService {
   
   /**
    * Exposes the {@link ProcessDefinitionQuery} interface as a REST service.
-   * @param query
+   * @param uriInfo
    * @param firstResult
    * @param maxResults
    * @return

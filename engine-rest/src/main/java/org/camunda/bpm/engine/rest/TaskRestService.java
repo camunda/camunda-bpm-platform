@@ -45,7 +45,7 @@ public interface TaskRestService {
       @QueryParam("firstResult") Integer firstResult, @QueryParam("maxResults") Integer maxResults);
 
   /**
-   * Expects the same parameters as {@link TaskRestService#getTasks(TaskQueryDto, Integer, Integer)} (as
+   * Expects the same parameters as {@link TaskRestService#getTasks(UriInfo, Integer, Integer)} (as
    * JSON message body) and allows more than one variable check.
    * @param query
    * @param firstResult

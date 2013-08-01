@@ -41,7 +41,7 @@ public interface VariableInstanceRestService {
   /**
    * Exposes the {@link VariableInstanceQuery} interface as a REST service.
    * 
-   * @param query
+   * @param uriInfo
    * @param firstResult
    * @param maxResults
    * @return
@@ -54,10 +54,10 @@ public interface VariableInstanceRestService {
 
   /**
    * Expects the same parameters as
-   * {@link VariableInstanceRestService#getVariableInstances(VariableInstanceQueryDto, Integer, Integer)} (as a JSON message body)
+   * {@link VariableInstanceRestService#getVariableInstances(UriInfo, Integer, Integer)} (as a JSON message body)
    * and allows for any number of variable checks.
    * 
-   * @param query
+   * @param queryDto
    * @param firstResult
    * @param maxResults
    * @return
