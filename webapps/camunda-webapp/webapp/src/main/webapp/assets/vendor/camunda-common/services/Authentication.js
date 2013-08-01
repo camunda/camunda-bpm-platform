@@ -1,7 +1,7 @@
 ngDefine('camunda.common.services.authentication', function(module) {
 
-  var ServiceProducer = [ '$rootScope', '$http', '$cookies', 'Uri', 
-  function AuthenticationFactory($rootScope, $http, $cookies, Uri) {
+  var ServiceProducer = [ '$rootScope', '$http', '$cookies', 'Uri', '$cacheFactory',
+  function AuthenticationFactory($rootScope, $http, $cookies, Uri, $cacheFactory) {
 
     var AUTH_COOKIE_NAME = "CAM-AUTH";
 
@@ -102,6 +102,8 @@ ngDefine('camunda.common.services.authentication', function(module) {
 
       return promise.then(function() {
         self.clear();
+        // clear http cache
+        $cacheFactory.get("$http").removeAll();
         return true;
       });
     };
