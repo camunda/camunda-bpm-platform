@@ -39,5 +39,9 @@ public class TestContainer {
   public static void addContainerSpecificResourcesForNonPa(WebArchive webArchive) {
     // nothing to do
   }
+
+  public static void addContainerSpecificProcessEngineConfigurationClass(WebArchive deployment) {
+    // nothing to do
+  }
   
 }

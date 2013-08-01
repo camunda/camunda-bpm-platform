@@ -36,5 +36,9 @@ public class TestContainer {
     .addAsWebInfResource("web.xml");
     
   }
+
+  public static void addContainerSpecificProcessEngineConfigurationClass(WebArchive deployment) {
+    // nothing to do
+  }
   
 }

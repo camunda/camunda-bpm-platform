@@ -37,4 +37,8 @@ public class TestContainer {
     // nothing to do
   }
 
+  public static void addContainerSpecificProcessEngineConfigurationClass(WebArchive deployment) {
+    // nothing to do
+  }
+
 }
