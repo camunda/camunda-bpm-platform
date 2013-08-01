@@ -95,8 +95,9 @@ public class CallActivityContextSwitchTest extends AbstractFoxPlatformIntegratio
     // and there the class can be resolved and the bean is known.
     Map<String, Object> processVariables = new HashMap<String, Object>();
     processVariables.put("calledElement", "calledProcessSyncNoWait");
-    runtimeService.startProcessInstanceByKey("mainProcessSyncNoWait", processVariables);
- 
+    ProcessInstance pi = runtimeService.startProcessInstanceByKey("mainProcessSyncNoWait", processVariables);
+
+    Assert.assertNull(runtimeService.createProcessInstanceQuery().processDefinitionId(pi.getId()).singleResult());
   }
   
   @Test
@@ -120,7 +121,9 @@ public class CallActivityContextSwitchTest extends AbstractFoxPlatformIntegratio
     Assert.assertEquals(true, runtimeService.getVariable(pi.getId(), DelegateAfter.class.getName()));
     
     taskService.complete(taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult().getId());
- 
+
+    Assert.assertNull(runtimeService.createProcessInstanceQuery().processDefinitionId(pi.getId()).singleResult());
+    Assert.assertNull(runtimeService.createProcessInstanceQuery().processDefinitionId(calledPi.getId()).singleResult());
   }
   
   @Test
@@ -146,7 +149,9 @@ public class CallActivityContextSwitchTest extends AbstractFoxPlatformIntegratio
     Assert.assertEquals(true, runtimeService.getVariable(pi.getId(), DelegateAfter.class.getName()));
     
     taskService.complete(taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult().getId());
- 
+
+    Assert.assertNull(runtimeService.createProcessInstanceQuery().processDefinitionId(pi.getId()).singleResult());
+    Assert.assertNull(runtimeService.createProcessInstanceQuery().processDefinitionId(calledPi.getId()).singleResult());
   }
   
   @Test
@@ -172,7 +177,9 @@ public class CallActivityContextSwitchTest extends AbstractFoxPlatformIntegratio
     Assert.assertEquals(true, runtimeService.getVariable(pi.getId(), DelegateAfter.class.getName()));
     
     taskService.complete(taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult().getId());
- 
+
+    Assert.assertNull(runtimeService.createProcessInstanceQuery().processDefinitionId(pi.getId()).singleResult());
+    Assert.assertNull(runtimeService.createProcessInstanceQuery().processDefinitionId(calledPi.getId()).singleResult());
   }
   
   @Test
@@ -198,7 +205,9 @@ public class CallActivityContextSwitchTest extends AbstractFoxPlatformIntegratio
     Assert.assertEquals(true, runtimeService.getVariable(pi.getId(), DelegateAfter.class.getName()));
     
     taskService.complete(taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult().getId());
- 
+
+    Assert.assertNull(runtimeService.createProcessInstanceQuery().processDefinitionId(pi.getId()).singleResult());
+    Assert.assertNull(runtimeService.createProcessInstanceQuery().processDefinitionId(calledPi.getId()).singleResult());
   }
   
   // the same in main process but called process async
@@ -230,7 +239,9 @@ public class CallActivityContextSwitchTest extends AbstractFoxPlatformIntegratio
     Assert.assertEquals(true, runtimeService.getVariable(pi.getId(), DelegateAfter.class.getName()));
     
     taskService.complete(taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult().getId());
- 
+
+    Assert.assertNull(runtimeService.createProcessInstanceQuery().processDefinitionId(pi.getId()).singleResult());
+    Assert.assertNull(runtimeService.createProcessInstanceQuery().processDefinitionId(calledPi.getId()).singleResult());
   }
   
   @Test
@@ -256,7 +267,9 @@ public class CallActivityContextSwitchTest extends AbstractFoxPlatformIntegratio
     Assert.assertEquals(true, runtimeService.getVariable(pi.getId(), DelegateAfter.class.getName()));
     
     taskService.complete(taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult().getId());
- 
+
+    Assert.assertNull(runtimeService.createProcessInstanceQuery().processDefinitionId(pi.getId()).singleResult());
+    Assert.assertNull(runtimeService.createProcessInstanceQuery().processDefinitionId(calledPi.getId()).singleResult());
   }
   
   @Test
@@ -282,7 +295,9 @@ public class CallActivityContextSwitchTest extends AbstractFoxPlatformIntegratio
     Assert.assertEquals(true, runtimeService.getVariable(pi.getId(), DelegateAfter.class.getName()));
     
     taskService.complete(taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult().getId());
- 
+
+    Assert.assertNull(runtimeService.createProcessInstanceQuery().processDefinitionId(pi.getId()).singleResult());
+    Assert.assertNull(runtimeService.createProcessInstanceQuery().processDefinitionId(calledPi.getId()).singleResult());
   }
   
   @Test
@@ -310,7 +325,9 @@ public class CallActivityContextSwitchTest extends AbstractFoxPlatformIntegratio
     Assert.assertEquals(true, runtimeService.getVariable(pi.getId(), DelegateAfter.class.getName()));
     
     taskService.complete(taskService.createTaskQuery().processInstanceId(pi.getId()).singleResult().getId());
- 
+
+    Assert.assertNull(runtimeService.createProcessInstanceQuery().processDefinitionId(pi.getId()).singleResult());
+    Assert.assertNull(runtimeService.createProcessInstanceQuery().processDefinitionId(calledPi.getId()).singleResult());
   }
   
   
