@@ -41,29 +41,35 @@ ngDefine('admin.pages', function(module, $) {
     $scope.createGroupMemberships = function () {
       $scope.status = PERFORM_CREATE;
 
-      var promises = [];
 
-      function createMembership(group, user) {
-        var deferred = $q.defer();
-
-        if(group.checked) {             
-          GroupMembershipResource.create({'groupId': group.id, 'userId':user.id}).$then(function (response) {
-            deferred.resolve(response.data);
-          }, function (error) {
-            deferred.reject(error.data);
-          });
-        }
-        return deferred.promise;        
-      }
-
+      var selectedGroupIds = [];
       angular.forEach($scope.availableGroups, function(group){
-        promises.push(createMembership(group, $scope.user));
+        if(group.checked) {             
+          selectedGroupIds.push(group.id);
+        }        
       });
 
-      $q.all([ promises ]).then(function(results) {
+      var completeCount = 0;
+      var deferred = $q.defer();
+      angular.forEach(selectedGroupIds, function(groupId) {        
+        
+        GroupMembershipResource.create({'groupId': groupId, 'userId':$scope.user.id}).$then(function (response) {          
+          completeCount++;
+          if(completeCount == selectedGroupIds.length) {
+            deferred.resolve();
+          }
+        }, function (error) {
+          completeCount++;
+          if(completeCount == selectedGroupIds.length) {
+            deferred.reject();
+          }
+        });
+
+      });
+     
+      deferred.promise.then(function(results) {
         $scope.status = CREATE_SUCCESS;        
-        $scope.loadGroups();
-        Notifications.addMessage({type:"success", status:"Success", message:"User was added to groups."});        
+        $scope.loadGroups();     
       }, function (error) {
         $scope.status = CREATE_FAILED;
         Notifications.addError({'status': 'Failed', 'message': 'Creating group memberships failed: ' + error.message, 'exclusive': ['type']});
