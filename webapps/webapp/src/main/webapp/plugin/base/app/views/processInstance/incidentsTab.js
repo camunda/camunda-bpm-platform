@@ -2,13 +2,15 @@ ngDefine('cockpit.plugin.base.views', function(module) {
 
    function IncidentsController ($scope, $http, $location, Uri) {
 
-    // input: processInstanceId, selection, processInstance
+    // input: selection, processInstance, processData
+
+    var processData = $scope.processData;
 
     $scope.stacktraceDialog = new Dialog();
 
     var pages = $scope.pages = { size: 50, total: 0 };
 
-    var activityIds = null;
+    var bpmnElements = [];
     var alreadyUpdated = false;
 
     $scope.$watch(function() { return $location.search().page; }, function(newValue) {
@@ -20,50 +22,22 @@ ngDefine('cockpit.plugin.base.views', function(module) {
       var search = $location.search().page;
 
       if (search || currentPage !== 1) {
-        $location.search('page', currentPage);
-        updateView(currentPage);  
+
+        $scope.updateLocation(function (location) {
+          location.search('page', currentPage);
+        });
       }
+
+      updateView(currentPage);  
     });
 
-    $scope.$watch(function () { return $location.search().bpmnElements; }, function (newValue) {
-      activityIds = [];
-
-      if (newValue && angular.isString(newValue)) {
-        activityIds = newValue.split(',');
-      } else if (newValue && angular.isArray(newValue)) {
-        activityIds = newValue;
+    processData.get('filter', function (filter) {
+      if (!filter) {
+        return;
       }
 
-      // always reset the current page to null
-      $location.search('page', null);
-      if ($scope.processInstance.activityIdToBpmnElementMap && 
-          $scope.processInstance.activityIdToInstancesMap) {
-        alreadyUpdated = true;
-        updateView(1);    
-      }
-
-    });
-
-    // This $watch on 'processInstance.activityIdToBpmnElementMap' is necessary due to race
-    // conditions. It can happen, that the view will be updated before the the properpty
-    // instanceIdToInstanceMap of the variable processInstance has been set.
-    $scope.$watch('processInstance.activityIdToBpmnElementMap', function (newValue) {
-      if (newValue && activityIds && !alreadyUpdated && $scope.processInstance.activityIdToInstancesMap) {
-        alreadyUpdated = true;
-        updateView(1);
-      }
-
-    });
-
-    // This $watch on 'processInstance.activityIdToInstancesMap' is necessary due to race
-    // conditions. It can happen, that the view will be updated before the the properpty
-    // instanceIdToInstanceMap of the variable processInstance has been set.
-    $scope.$watch('processInstance.activityIdToInstancesMap', function (newValue) {
-      if (newValue && activityIds && !alreadyUpdated && $scope.processInstance.activityIdToBpmnElementMap) {
-        alreadyUpdated = true;
-        updateView(1);
-      }
-
+      bpmnElements = filter.bpmnElements || [];
+      updateView(filter.page || 1);
     });
 
     function updateView(page) {
@@ -74,8 +48,8 @@ ngDefine('cockpit.plugin.base.views', function(module) {
 
       // get the 'count' of incidents
       $http.post(Uri.appUri('plugin://base/:engine/incident/count'), {
-        'processInstanceIdIn' : [ $scope.processInstanceId ],
-        'activityIdIn' :  activityIds
+        'processInstanceIdIn' : [ $scope.processInstance.id ],
+        'activityIdIn' :  bpmnElements
       })
       .success(function(data) {
         pages.total = Math.ceil(data.count / pages.size);
@@ -83,18 +57,20 @@ ngDefine('cockpit.plugin.base.views', function(module) {
 
       // get the incidents
       $http.post(Uri.appUri('plugin://base/:engine/incident'), {
-        'processInstanceIdIn' : [ $scope.processInstanceId ],
-        'activityIdIn' :  activityIds
+        'processInstanceIdIn' : [ $scope.processInstance.id ],
+        'activityIdIn' :  bpmnElements
       }, {
         params: {firstResult: firstResult, maxResults: count}
       })
       .success(function(data) { 
-        angular.forEach(data, function (incident) {
-          var activityId = incident.activityId;
-          var bpmnElement = $scope.processInstance.activityIdToBpmnElementMap[activityId];
-          incident.activityName = bpmnElement.name || bpmnElement.id;
-          incident.linkable = $scope.processInstance.activityIdToInstancesMap[activityId] && $scope.processInstance.activityIdToInstancesMap[activityId].length > 0;
-        });
+        processData.get([ 'bpmnElements', 'activityIdToInstancesMap'], function (bpmnElements, activityIdToInstancesMap) {
+          angular.forEach(data, function (incident) {
+            var activityId = incident.activityId;
+            var bpmnElement = bpmnElements[activityId];
+            incident.activityName = bpmnElement.name || bpmnElement.id;
+            incident.linkable = bpmnElements[activityId] && activityIdToInstancesMap[activityId].length > 0;
+          });
+        })
 
         $scope.incidents = data;
       });
@@ -107,7 +83,6 @@ ngDefine('cockpit.plugin.base.views', function(module) {
 
       return incident.incidentType;
     };
-
 
     $scope.openStacktraceDialog = function (incident) {
       $scope.selectedIncidentToShowStacktrace = incident;
