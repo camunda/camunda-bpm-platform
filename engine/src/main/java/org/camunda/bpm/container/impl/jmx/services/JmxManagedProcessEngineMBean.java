@@ -12,6 +12,8 @@
  */
 package org.camunda.bpm.container.impl.jmx.services;
 
+import java.util.Set;
+
 import org.camunda.bpm.engine.ProcessEngine;
 
 /**
@@ -26,5 +28,16 @@ public interface JmxManagedProcessEngineMBean {
    * @return the name of the {@link ProcessEngine} 
    */
   public String getName();
-
+  
+  /**
+   * If the engine's job executor is deloyment aware, these are the deployments it
+   * acquires jobs for.
+   * 
+   * @return all deployments that are registered with this {@link ProcessEngine}
+   */
+  public Set<String> getRegisteredDeployments();
+  
+  public void registerDeployment(String deploymentId);
+  
+  public void unregisterDeployment(String deploymentId);
 }
