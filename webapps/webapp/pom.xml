@@ -309,7 +309,7 @@
                 <configuration>
                   <tasks>
                     <echo message="updating activiti configuration to db ${database}" />
-                    <copy file="target/test-classes/activiti.cfg.db.xml" tofile="target/test-classes/activiti.cfg.xml" overwrite="true">
+                    <copy file="target/test-classes/camunda.cfg.db.xml" tofile="target/test-classes/camunda.cfg.xml" overwrite="true">
                       <filterset filtersfile="${db.properties.file}" />
                     </copy>
 
