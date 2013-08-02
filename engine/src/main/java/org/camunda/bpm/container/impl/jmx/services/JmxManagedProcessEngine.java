@@ -12,10 +12,12 @@
  */
 package org.camunda.bpm.container.impl.jmx.services;
 
+import java.util.Set;
+
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanService;
 import org.camunda.bpm.container.impl.jmx.kernel.MBeanServiceContainer;
+import org.camunda.bpm.engine.ManagementService;
 import org.camunda.bpm.engine.ProcessEngine;
-import org.camunda.bpm.engine.ProcessEngineConfiguration;
 
 /**
  * <p>Represents a process engine managed by the {@link MBeanServiceContainer}</p>
@@ -25,7 +27,6 @@ import org.camunda.bpm.engine.ProcessEngineConfiguration;
  */
 public class JmxManagedProcessEngine implements MBeanService<ProcessEngine>, JmxManagedProcessEngineMBean {
   
-  protected ProcessEngineConfiguration processEngineConfiguration;
   protected ProcessEngine processEngine;
   
   // for subclasses
@@ -54,6 +55,21 @@ public class JmxManagedProcessEngine implements MBeanService<ProcessEngine>, Jmx
   
   public ProcessEngine getValue() {
     return processEngine;
+  }
+
+  public Set<String> getRegisteredDeployments() {
+    ManagementService managementService = processEngine.getManagementService();
+    return managementService.getRegisteredDeployments();
+  }
+
+  public void registerDeployment(String deploymentId) {
+    ManagementService managementService = processEngine.getManagementService();
+    managementService.registerDeploymentForJobExecutor(deploymentId);
+  }
+
+  public void unregisterDeployment(String deploymentId) {
+    ManagementService managementService = processEngine.getManagementService();
+    managementService.unregisterDeploymentForJobExecutor(deploymentId);
   }
 
 }

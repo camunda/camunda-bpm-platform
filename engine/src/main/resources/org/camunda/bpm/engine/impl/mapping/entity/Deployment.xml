@@ -18,7 +18,7 @@
   <delete id="deleteDeployment" parameterType="string">
     delete from ${prefix}ACT_RE_DEPLOYMENT where ID_ = #{id}
   </delete>
-
+  
   <!-- DEPLOYMENT RESULTMAP -->
   
   <resultMap id="deploymentResultMap" type="org.camunda.bpm.engine.impl.persistence.entity.DeploymentEntity">
@@ -28,6 +28,10 @@
   </resultMap>
 
   <!-- DEPLOYMENT SELECT -->
+
+  <select id="selectDeployment" parameterType="string" resultMap="deploymentResultMap">
+    select * from ${prefix}ACT_RE_DEPLOYMENT where ID_ = #{id}
+  </select>
 
   <select id="selectDeploymentsByQueryCriteria" parameterType="org.camunda.bpm.engine.impl.DeploymentQueryImpl" resultMap="deploymentResultMap">
   	${limitBefore}
@@ -59,10 +63,6 @@
     
   <select id="selectDeploymentsByName" parameterType="org.camunda.bpm.engine.impl.db.ListQueryParameterObject" resultMap="deploymentResultMap">
     select * from ${prefix}ACT_RE_DEPLOYMENT D where NAME_=#{parameter} order by D.DEPLOY_TIME_ desc
-  </select>
-  
-  <select id="selectDeploymentById" parameterType="string" resultMap="deploymentResultMap">
-    select * from ${prefix}ACT_RE_DEPLOYMENT where ID_ = #{id}
   </select>
 
   <!-- mysql specific -->
